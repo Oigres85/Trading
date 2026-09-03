@@ -1,4 +1,4 @@
-⟦ BUILD v412 · generato 03/09/2026 19:08 ⟧
+⟦ BUILD v413 · generato 03/09/2026 19:17 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -56,7 +56,7 @@ C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invec
 
 
 DATI AL 03/09/2026, 19:08:47 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 15:08, fase: REGULAR — festività USA non considerate) · CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live: KOSPI +0,26% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,14% · Fut S&P +1,03% · BTC +5,09% [24/7] · SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi.
+CONTESTO DI SESSIONE (ora ET 15:17, fase: REGULAR — festività USA non considerate) · CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live: KOSPI +0,26% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,14% · Fut S&P +1,03% · BTC +5,09% [24/7] · SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
 · DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 03/09/2026, 19:08:47, prossimo run 03/09/2026, 20:00:00. La barra giornaliera sotto quei numeri e' del 2026-09-03.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-02) · Curva 10A-3M (2026-09-02) · Treasury USA 30A (2026-09-01) · Tasso reale 10A (TIPS) (2026-09-01) · Inflazione attesa 10A (breakeven) (2026-09-02) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
@@ -99,7 +99,7 @@ QUADRO MACRO:
       Kelsey Berro, fixed income portfolio manager JPMorgan Asset Management, and Deborah Cunningham, executive vice president, CIO global liquidity markets, and senior portfolio manager at Federated Hermes, join Michael McKee on "Bloomberg Real Yield." Stocks rose and bond yields fell as Federal Reserve Governor Christopher
     · [Bloomberg, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Cliffwater, Blackstone Private Credit Funds Cap Redemptions
       Bloomberg's Olivia Fishlow joins Michael McKee on "Bloomberg Real Yield." Cliffwater’s flagship private credit fund again capped redemptions at 5% in the third quarter, after investors sought to pull about 16% of shares. The biggest such BDC, the $77 billion Blackstone Private Credit Fund, disclosed Thursday that it wo
-    · [Bloomberg, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Bond Market Ignored in Spending Plans: Erik Wasson
+    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Bond Market Ignored in Spending Plans: Erik Wasson
       Bloomberg's Erik Wasson joins Michael McKee on "Bloomberg Real Yield." US bond yields are spiking in part because of concerns over the total US public debt blowing past $40 trillion. Not only are congressional lawmakers shrugging that off, some are indicating that more deficit spending is yet to come.
  (Source: Bloombe
     · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Global Bond Yields Rise, Waller Speaks Out | Real Yield 9/3/2026
@@ -184,7 +184,7 @@ MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment
 - Will Ethereum dip to $2,250 by December 31, 2026?: 60% [Δ7g —]
 ⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
-=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ===
+=== IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
 - MU: 22.4% dell'azionario · +989,28% dal carico
 - NVDA: 20.8% dell'azionario · +163,23% dal carico
@@ -253,11 +253,11 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsVertiv is buying Utility Innovations for up to $2.6 billion.
   [CRWV] · [Nasdaq, 10h fa] Nvidia Beat Earnings Estimates Again (15 Times Straight). History Says the Stock Will Do This Next.
       Key PointsDespite beating Wall Street's estimates, Nvidia stock dropped by an average of 4% during the month following the last eight quarterly reports.
-  [CRWV] · [Nasdaq, 11h fa] Should CoreWeave and Nebius Group Investors Be Worried About Circular Financing? Here's What the Numbers Say
+  [CRWV] · [Nasdaq, 12h fa] Should CoreWeave and Nebius Group Investors Be Worried About Circular Financing? Here's What the Numbers Say
       Key PointsCoreWeave and Nebius Group both have backstops from Nvidia.
   [MRVL] · [Nasdaq, 2h fa] ALAB Stock Down 24% in a Month: Should Investors Buy the Dip or Wait?
       Astera Labs is gaining momentum from strong Scorpio, Aries and Taurus demand, with robust third-quarter growth expectations supporting its AI infrastructure story.
-  [MRVL] · [Nasdaq, 4h fa] Can PENG Turn Integrated Memory Growth Into an Edge Over Competitors?
+  [MRVL] · [Nasdaq, 5h fa] Can PENG Turn Integrated Memory Growth Into an Edge Over Competitors?
       Penguin Solutions' Integrated Memory surge, CXL offerings and MemoryAI performance gains are sharpening its competitive position in AI infrastructure.
   [MU] · [Nasdaq, 2h fa] Snowflake Q2 Earnings Beat on Product Revenues and AI Strength
       SNOW's Q2 earnings and revenues beat estimates as product revenues jump 37%, AI demand accelerates growth, and fiscal 2027 guidance moves higher.
@@ -265,7 +265,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsTaiwan Semiconductor and Micron Technology continue to see huge demand.
   [NVDA] · [Nasdaq, 1h fa] Jensen Huang to Spend $13 Billion to Take On OpenAI and Anthropic. Should You Buy Nvidia Stock?
       Key PointsThis morning, CEO Jensen Huang announced Nvidia's agreement to acquire Hugging Face for $12.9 billion.
-  [NVDA] · [Nasdaq, 1h fa] Can CAT's AI Push With FieldAI Redefine Industrial Operations?
+  [NVDA] · [Nasdaq, 2h fa] Can CAT's AI Push With FieldAI Redefine Industrial Operations?
       Caterpillar is advancing industrial AI through FieldAI, combining robotics and operational data to build safer, smarter and more productive job sites.
   [ORCL] · [Nasdaq, 2h fa] Snowflake Q2 Earnings Beat on Product Revenues and AI Strength
       SNOW's Q2 earnings and revenues beat estimates as product revenues jump 37%, AI demand accelerates growth, and fiscal 2027 guidance moves higher.
