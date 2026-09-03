@@ -7180,6 +7180,51 @@ check("v410 l'ordine di cercare NON scende nella coda: resta un'istruzione", suV
   }
   return true;`));
 
+/* ═══ v411 — IL NUMERO FISSO ERA TORNATO, NELLA TESTATA ═════════════════════════════════
+   Trovato rileggendo il pacchetto v410 come il modello che lo riceve. La v410 aveva appena
+   tolto dalla CODA il conteggio scritto a mano — perche' un numero fisso in prosa invecchia da
+   solo — e io l'avevo riscritto nella TESTATA un paragrafo piu' in la': "segue i titoli che il
+   CEO possiede piu' DUE NOMI soli".
+   ⚠ La testata e' il posto in cui quel difetto e' PEGGIO, perche' nessun gate la conta: se il
+   CEO aggiunge tre nomi a ui_watchlist.json, la coda dice cinque e l'istruzione continua a dire
+   due — e l'istruzione e' quella che il modello legge per prima.
+   ⚠ E la seconda frase contraddiceva A1bis: "l'unico blocco in cui la fonte sei tu" e' falso su
+   una testata che ordina gia' di cercare le notizie. Un pacchetto che si contraddice fra due
+   sezioni e' la classe che il collaudo B5 ordina al lettore di segnalare. */
+check("v411 la testata non scrive a mano un conteggio che la coda calcola", (() => {
+  const file = readFileSync(join(ROOT, "config", "prompt_header_macro.txt"), "utf8");
+  const m = src.match(/const DEFAULT_PROMPT_HEADER = `([\s\S]*?)`;/);
+  if (!m) return no("DEFAULT_PROMPT_HEADER non trovato");
+  const guai = [];
+  for (const [dove, testo] of [["file", file], ["fallback", m[1]]]) {
+    const i = testo.indexOf("[B8]");
+    if (i < 0) { guai.push(dove + ": manca [B8]"); continue; }
+    const sez = testo.slice(i, (testo.indexOf("\n[", i + 4) + 1) || testo.length);
+    /* un numero scritto in lettere o in cifre accanto ai nomi seguiti e' il conteggio fissato */
+    if (/(due|tre|quattro|cinque|\b\d+\b) nomi/i.test(sez) || /\b\d+ titoli seguiti/.test(sez)) {
+      guai.push(dove + ": [B8] fissa un conteggio che la coda calcola a ogni run");
+    }
+    /* e deve rimandare al conteggio vero invece di sostituirlo */
+    if (sez.indexOf("la coda") < 0 && sez.indexOf("in coda") < 0) {
+      guai.push(dove + ": [B8] non rimanda al conteggio pubblicato nella coda");
+    }
+  }
+  return guai.length ? no(guai.join(" · ")) : true;
+})());
+
+check("v411 [B8] non contraddice A1bis su chi cerca", (() => {
+  const file = readFileSync(join(ROOT, "config", "prompt_header_macro.txt"), "utf8");
+  /* ⚠ A1bis ordina la ricerca delle notizie: dire che gli ingressi sono "l'UNICO blocco in cui
+     la fonte sei tu" e' falso, e una testata che si contraddice logora il collaudo che impone
+     al lettore di segnalare le contraddizioni. */
+  if (file.indexOf("A1bis") < 0) return no("A1bis non c'e' piu': il check misura un mondo che non esiste");
+  const i = file.indexOf("[B8]");
+  if (i < 0) return no("manca [B8]");
+  const sez = file.slice(i, (file.indexOf("\n[", i + 4) + 1) || file.length);
+  return sez.indexOf("unico blocco") < 0
+    || no("[B8] si dichiara l'unico blocco a fonte esterna, ma A1bis ordina gia' di cercare");
+})());
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
