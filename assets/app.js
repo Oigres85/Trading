@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "393";
+const BUILD_VERSION = "406";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8905,6 +8905,71 @@ function buildPrompt() {
     const rl = rigaLeva(m);
     if (rl) lines.push(rl);
   }
+  /* ═══ v406 — QUATTRO COSE CHE LA PAGINA MOSTRA E IL PACCHETTO NON PORTAVA ═════════════════
+     Rilievo del CEO: "molte informazioni del sistema non ci sono nel prompt … il sistema non e'
+     un riassunto affidabile di cio' che posso vedere scorrendo la pagina". Misurato invece di
+     dato per buono: `data.json` porta 42 blocchi macro, la pagina ne apre 34, e i tre esempi
+     citati (VIX, Fear & Greed, put/call) IL PACCHETTO LI HA GIA'. Ma il rilievo di fondo era
+     corretto, e il controllo ha separato i buchi veri dalle rimozioni decise:
+       · componenti di Fear & Greed → tolte apposta in v263, DOPO che il CEO le aveva tolte dalla
+         pagina in v262: pagina e pacchetto dicevano cose diverse sullo stesso indicatore;
+       · risk_sentiment e macroquant → sono NOSTRI compositi 0-100, e la v200 li ha tolti sui
+         numeri (hit-rate 29%, sette punti peggio del Nasdaq). La testata lo dichiara;
+       · EUR/JPY → tolto in v138 perche' ridondante col blocco Carry.
+     Restano quattro fatti veri, non duplicati altrove, e sono questi. */
+  const _tt = (DATA && DATA.totals) || {};
+  const _shar = numero(_tt.portfolio_sharpe_ratio), _sort = numero(_tt.portfolio_sortino_ratio);
+  if (Number.isFinite(_shar) || Number.isFinite(_sort)) {
+    const _rf = numero(_tt.risk_free_rate);
+    lines.push(`- EFFICIENZA DEL LIBRO (la pagina la mostra, e qui mancava): `
+      + `${Number.isFinite(_shar) ? `Sharpe ${fmtNum.format(_shar)}` : ""}`
+      + `${Number.isFinite(_shar) && Number.isFinite(_sort) ? " · " : ""}`
+      + `${Number.isFinite(_sort) ? `Sortino ${fmtNum.format(_sort)}` : ""}`
+      + `${Number.isFinite(_rf) ? ` (tasso privo di rischio ${fmtNum.format(Math.round(_rf * 1000) / 10)}%)` : ""}. `
+      + `⚠ Misurano il rendimento PER UNITA' DI RISCHIO su una finestra passata, non una previsione. `
+      + `Il Sortino non penalizza i rialzi, quindi su un libro che sale a strappi sta sopra lo Sharpe `
+      + `per costruzione: la differenza fra i due dice quanto del rischio e' al RIALZO. ⚠ Non entrano `
+      + `nelle discipline piu' sotto, che misurano un'altra cosa — concentrazione ed esposizione, non `
+      + `efficienza: un libro puo' avere Sharpe alto E stare oltre ogni soglia di concentrazione.`);
+  }
+  if (m.buffett && Number.isFinite(numero(m.buffett.ratio))) {
+    lines.push(`- CAPITALIZZAZIONE DEL MERCATO SU PIL (indicatore di Buffett): `
+      + `${fmtNum.format(numero(m.buffett.ratio))}%. ⚠ E' un RAPPORTO, non un punteggio: quanto vale `
+      + `l'azionario americano rispetto all'economia che lo produce. La convenzione di lettura `
+      + `(sotto 100% economico, 100-140% equo, oltre 140% caro) e' una CONVENZIONE del mestiere e non `
+      + `un dato del file. ⚠ E' lento e strutturale: dice quanto e' caro il mercato, non quando gira — `
+      + `un valore estremo puo' restare estremo per anni, quindi non e' un segnale di uscita ma il `
+      + `contesto in cui ogni multiplo di questo pacchetto va letto.`);
+  }
+  /* ⚠ La struttura del prezzo sugli indici: si pubblicano i LIVELLI, non il punteggio 0-100 che
+     la pipeline calcola accanto — quello e' un nostro composito, ed e' la categoria che la v200
+     ha tolto. I livelli invece sono coordinate: dove sta la liquidita' sopra e sotto il prezzo. */
+  const _smc = ((m.smart_money || {}).smc_indices) || {};
+  const _smcRighe = Object.values(_smc).filter(x => x && (Number.isFinite(numero(x.liq_above)) || Number.isFinite(numero(x.liq_below))))
+    .map(x => `${x.label_idx || "indice"}: struttura ${x.structure || "n.d."}`
+      + `${Number.isFinite(numero(x.liq_above)) ? ` · liquidita' SOPRA il prezzo a ${fmtNum.format(numero(x.liq_above))}` : ""}`
+      + `${Number.isFinite(numero(x.liq_below)) ? ` · liquidita' SOTTO a ${fmtNum.format(numero(x.liq_below))}` : ""}`
+      + `${x.order_block && Number.isFinite(numero(x.order_block.lo)) ? ` · ultimo order block ${x.order_block.dir || ""} ${fmtNum.format(numero(x.order_block.lo))}-${fmtNum.format(numero(x.order_block.hi))}` : ""}`);
+  if (_smcRighe.length) {
+    lines.push(`- STRUTTURA DEL PREZZO SUGLI INDICI (la pagina la mostra, e qui mancava): `
+      + _smcRighe.join(" | ") + `. ⚠ Sono LIVELLI calcolati sulle barre, non previsioni: la `
+      + `"liquidita'" e' dove si addensano gli stop, cioe' dove un movimento trova carburante se ci `
+      + `arriva. ⚠ NON si pubblica il punteggio 0-100 che il sistema calcola accanto: e' un nostro `
+      + `composito, ed e' la categoria che questo pacchetto ha tolto dalla v200.`);
+  }
+  /* ⚠⚠ v406 — E QUELLO CHE RESTA FUORI SI DICHIARA, invece di lasciare al lettore un buco che
+     non puo' distinguere da un dato mancante. E' la classe v393: dichiarare un numero e non
+     mostrarne gli elementi e' peggio che tacere entrambi. */
+  lines.push(`- ⚠ QUELLO CHE LA PAGINA MOSTRA E QUESTO PACCHETTO NON PORTA, con la ragione: `
+    + `(a) i COMPOSITI 0-100 calcolati da noi — sentiment di rischio, quadro macro sintetico, `
+    + `punteggio della struttura di prezzo: tolti dalla v200 sui numeri del loro track record, e la `
+    + `testata lo dichiara; le loro componenti sono gli indicatori che trovi gia' qui uno per uno, `
+    + `e una loro seconda uscita qui sarebbe lo stesso segnale contato due volte; `
+    + `(b) le COMPONENTI di Fear & Greed, tolte quando sono state tolte dalla pagina, perche' ognuna `
+    + `ha una scheda propria e pagina e pacchetto dicevano cose diverse sullo stesso indicatore; `
+    + `(c) EUR/JPY, ridondante col blocco Carry qui sopra. `
+    + `⚠ Questa riga esiste perche' "il sistema non ha il dato" e "il sistema ce l'ha e non te lo `
+    + `passa" si leggono uguali e sono cose diverse.`);
   /* v331 — quale testata sta viaggiando in QUESTO pacchetto */
   if (typeof provenienzaTestata === "function") lines.push(`- PROVENIENZA DELLE REGOLE: ${provenienzaTestata()}.`);
   if (m.credit) {

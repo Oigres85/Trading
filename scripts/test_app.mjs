@@ -522,12 +522,25 @@ check("v138 streghe: nel prompt SOLO se <30 giorni; a 62g sparisce", run(`
   const near = buildPrompt();
   delete DATA.macro.witching;
   return !far.includes("4 streghe") && near.includes("4 streghe") && near.includes("tra 12 gg")`));
-check("v138 tagli: TOP 10 CAPITALIZZAZIONI ed EUR/JPY fuori dal payload", run(`
+/* ⚠⚠ VENTITREESIMA rottura di un check ancorato a una STRINGA LETTERALE, e stavolta l'ha
+   provocata una riga piu' onesta di prima: la v406 dichiara nel pacchetto cosa la pagina mostra
+   e lui non porta, e fra le ragioni NOMINA EUR/JPY. Il gate pretendeva l'assenza della
+   sottostringa ed e' andato rosso su codice corretto.
+   L'invariante vero non e' "la stringa non compare": e' che di EUR/JPY non esca la QUOTAZIONE.
+   Quindi si verifica il FATTO — il valore iniettato non compare da nessuna parte — e si concede
+   il nome solo alla riga che ne dichiara l'esclusione. Un nome citato per dire che manca e' il
+   contrario di un dato pubblicato. */
+check("v138 tagli: TOP 10 CAPITALIZZAZIONI fuori, di EUR/JPY nessuna quotazione", run(`
   DATA.top_caps = [{ ticker: "AAPL", name: "Apple", mcap_usd: 4.8e12, change_pct: 1 }];
   DATA.macro.markets = [{ label: "EUR/JPY", value: "185.76", change_pct: -0.1 }, { label: "EUR/USD", value: "1.14", change_pct: 0.1 }];
   const p = buildPrompt();
   DATA.top_caps = []; DATA.macro.markets = [];
-  return !p.includes("TOP 10 CAPITALIZZAZIONI") && !p.includes("EUR/JPY") && p.includes("EUR/USD")`));
+  if (p.includes("TOP 10 CAPITALIZZAZIONI")) return false;
+  if (!p.includes("EUR/USD")) return false;
+  if (p.includes("185.76") || p.includes("185,76")) return false;   // la quotazione non deve uscire
+  /* ogni riga che lo nomina deve essere quella delle esclusioni dichiarate, non una quotazione */
+  const righe = p.split(String.fromCharCode(10)).filter(r => r.includes("EUR/JPY"));
+  return righe.every(r => r.includes("NON PORTA"))`));
 
 check("v138 curva: riga indicators etichettata GIORNALIERA (non più 'serie mensile')", run(`
   const saved = DATA.macro.indicators;
@@ -4845,6 +4858,19 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
       sospetti.push(t.slice(Math.max(0, b.index - 28), b.index + 10).replace(/\n/g, "⏎"));
     }
   }
+  /* ⚠⚠ v406 — LA STESSA CAUSA, UN SINTOMO PIU' BRUTALE: una VIRGOLETTA sfuggita dentro un
+     template (barra-virgolette) arriva al vm come virgoletta NUDA e chiude la stringa a meta'.
+     Non produce una regex che non matcha: produce un errore di sintassi DENTRO il vm, cioe' un
+     check che muore in eccezione. E `node --check` non lo vede, perche' per lui e' testo dentro
+     un template. Non esiste nessuna ragione legittima di scriverla: il template l'ha gia'
+     mangiata prima che il vm la veda, quindi la si cerca in TUTTI i template passati al vm, non
+     solo in quelli che contengono una regex. Costata un giro di debug in v406. */
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+    const t = m[0];
+    for (const b of t.matchAll(/(?<!\\)\\["']/g)) {
+      sospetti.push("virgoletta sfuggita: " + t.slice(Math.max(0, b.index - 34), b.index + 12).replace(/\n/g, "⏎"));
+    }
+  }
   if (sospetti.length) {
     console.log(`  ⛔ ${sospetti.length} backslash singoli in template → il vm li mangia: raddoppiali. `
       + sospetti.slice(0, 2).join(" · "));
@@ -6748,6 +6774,93 @@ check("v405 nel pacchetto di titolo la stessa riga nomina il titolo analizzato",
   const p = buildPromptTicker("CRWV");
   return p.indexOf("gruppo correlato di CRWV") >= 0
       && p.indexOf("QUESTE NON SONO NOTIZIE SU NOMI SEPARATI") < 0;`));
+
+/* ═══ v406 — L'INVARIANTE PAGINA ↔ PACCHETTO, NEI DUE VERSI ═══════════════════════════════
+   Rilievo del CEO: "il sistema non e' un riassunto affidabile di cio' che posso vedere
+   scorrendo la pagina". Misurato invece che dato per buono: sui tre esempi che citava (VIX,
+   Fear & Greed, put/call) il pacchetto li aveva GIA'; ma quattro fatti mancavano davvero, e
+   nessuno se ne sarebbe accorto — il divario era cresciuto da solo, in silenzio, esattamente
+   come il comando /aggiorna della v387.
+   ⚠ Un gate che aggiunge e basta non serve: fra un mese la pipeline pubblica una chiave nuova,
+   la pagina la disegna e il pacchetto resta indietro. Qui l'invariante e' nei DUE VERSI: ogni
+   indicatore che la PAGINA sa aprire deve essere O nel pacchetto O nel registro qui sotto con
+   la sua ragione scritta. Il registro non e' una lista di comodita': e' la RICEVUTA delle
+   rimozioni gia' decise, e se un giorno un blocco esce dal pacchetto senza motivazione il
+   check lo dice. Un secondo meta-check impedisce che una chiave stia in tutti e due i posti. */
+check("v406 ogni indicatore che la pagina apre e' nel pacchetto o dichiarato fuori con la ragione", suVeri(`
+  /* la sonda e' una stringa che DEVE comparire nel pacchetto quando l'indicatore c'e'. Per le
+     statistiche ufficiali (chiavi "in:") si ricava dall'ETICHETTA di MACRO_INFO, che e' la
+     stessa che il pacchetto stampa: cosi' non c'e' un secondo elenco da tenere allineato. */
+  const SONDA = {
+    "mk:^TNX": "Treasury USA 10A", "mk:EURUSD=X": "EUR/USD",
+    fear_greed: "Fear & Greed", vix: "VIX:", credit: "Rischio Credito",
+    liquidity: "Liquidit", dollar: "Righello Dollaro", fedwatch: "FedWatch",
+    carry: "Carry USA-Giappone", putcall: "Put/Call SPY",
+    yield_recession: "Curva vs Recessione", systemic_risk: "Rischio Sistemico",
+    buffett: "indicatore di Buffett", decouple: "Disaccoppiamento",
+    smart_money: "STRUTTURA DEL PREZZO SUGLI INDICI", sp500_pe: "P/E Ratio S&P 500",
+    corp_profit: "Profitti Aziendali Reali", fed_market: "Tasso EFFETTIVO",
+  };
+  /* ⚠ LE ESCLUSIONI SONO DECISIONI GIA' PRESE E ANNOTATE, non comodita' di oggi. */
+  const FUORI = {
+    "mk:EURJPY=X": "v138 — ridondante col blocco Carry, che porta gia' il rischio yen",
+    sentiment: "v200 — composito 0-100 nostro, tolto sui numeri del suo track record",
+    thermometer: "v200 — composito 0-100 nostro, stessa ragione",
+  };
+  const p = buildCIOText();
+  const mancanti = [];
+  for (const k of Object.keys(MACRO_INFO)) {
+    if (FUORI[k]) continue;
+    const sonda = k.indexOf("in:") === 0 ? (MACRO_INFO[k] || [])[0] : SONDA[k];
+    if (!sonda) { mancanti.push(k + " (nessuna sonda ne' esclusione)"); continue; }
+    /* ⚠ NIENTE VIRGOLETTE SFUGGITE QUI DENTRO: siamo in un template literal, che si mangia il
+       backslash — la barra-virgolette arriva al vm come una virgoletta nuda e spezza la stringa.
+       node --check non lo vede (e' dentro un template) e il check muore in eccezione. */
+    if (p.indexOf(sonda) < 0) mancanti.push(k + " (sonda assente dal pacchetto: " + sonda + ")");
+  }
+  if (mancanti.length) { console.log("      ↳ " + mancanti.join(" · ")); return false; }
+  /* e nessuna chiave puo' stare in tutti e due i posti: sarebbe una ricevuta che si contraddice */
+  const doppie = Object.keys(FUORI).filter(k => SONDA[k]);
+  if (doppie.length) { console.log("      ↳ in entrambi i registri: " + doppie.join(", ")); return false; }
+  return Object.keys(MACRO_INFO).length >= 30;`));
+
+/* ⚠ e il check va provato TOGLIENDO un blocco: se il pacchetto smette di pubblicare Buffett il
+   gate deve accorgersene, altrimenti e' una lista che si guarda da sola. */
+check("v406 togliendo un blocco dal pacchetto il gate se ne accorge", suVeri(`
+  delete DATA.macro.buffett;
+  const p = buildCIOText();
+  return p.indexOf("indicatore di Buffett") < 0;`));
+
+/* ═══ v406 — I QUATTRO FATTI CHE MANCAVANO ════════════════════════════════════════════════ */
+check("v406 il pacchetto porta Sharpe e Sortino del libro, che la pagina mostra", suVeri(`
+  const p = buildCIOText();
+  return p.indexOf("EFFICIENZA DEL LIBRO") >= 0
+      && p.indexOf("Sharpe") >= 0
+      /* ⚠ indexOf e' sensibile al maiuscolo: la riga scrive "Non entrano", con la N grande.
+         La prima stesura cercava la minuscola ed era rossa su codice giusto. */
+      && p.indexOf("entrano nelle discipline") >= 0;`));
+
+check("v406 il rapporto capitalizzazione/PIL esce come RAPPORTO, non come punteggio", suVeri(`
+  const p = buildCIOText();
+  return p.indexOf("CAPITALIZZAZIONE DEL MERCATO SU PIL") >= 0
+      && p.indexOf("E' un RAPPORTO, non un punteggio") >= 0
+      && p.indexOf("CONVENZIONE del mestiere") >= 0;`));
+
+check("v406 della struttura di prezzo escono i LIVELLI e non il punteggio 0-100", suVeri(`
+  const p = buildCIOText();
+  const i = p.indexOf("STRUTTURA DEL PREZZO SUGLI INDICI");
+  if (i < 0) return false;
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  return riga.indexOf("liquidita' SOPRA il prezzo") >= 0
+      && riga.indexOf("NON si pubblica il punteggio") >= 0;`));
+
+/* ⚠⚠ LA RIGA CHE CHIUDE IL BUCO STRUTTURALE: "il sistema non ha il dato" e "ce l'ha e non te lo
+   passa" si leggono uguali e sono cose diverse (classe v393). */
+check("v406 il pacchetto dichiara cosa la pagina mostra e lui non porta, con la ragione", suVeri(`
+  const p = buildCIOText();
+  return p.indexOf("QUELLO CHE LA PAGINA MOSTRA E QUESTO PACCHETTO NON PORTA") >= 0
+      && p.indexOf("si leggono uguali e sono cose diverse") >= 0
+      && p.indexOf("stesso segnale contato due volte") >= 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {
