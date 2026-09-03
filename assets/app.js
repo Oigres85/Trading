@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "410";
+const BUILD_VERSION = "411";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8049,7 +8049,7 @@ Richiesta esplicita del CEO: alleggerimenti, vendite, incrementi ed eventuali in
  · ORDINA PER URGENZA, non per dimensione: cosa cambia se non si fa niente questa settimana.
 
 [B8] GLI INGRESSI SU TITOLI NUOVI: LA RICERCA E' TUA, E IL SISTEMA TE LO DICE.
-Decisione del CEO. ⚠ Il sistema NON ha un universo di candidati da cui pescare: segue i titoli che il CEO possiede piu' due nomi soli, e il resto sono indici e benchmark — la coda lo dichiara con i numeri. Quindi le proposte di ingresso NON possono poggiare su dati di questo pacchetto, e questo e' l'unico blocco della tua risposta in cui la fonte sei tu.
+Decisione del CEO. ⚠ Il sistema NON ha un universo di candidati da cui pescare: segue le posizioni del libro, pochissimi altri titoli e per il resto indici e benchmark. ⚠⚠ QUANTI SIANO NON E' SCRITTO QUI: la coda li CONTA a ogni run e pubblica i tre numeri, perche' un conteggio fisso in una istruzione invecchia da solo mentre il libro cambia — leggi quello, non questa riga. Quindi le proposte di ingresso NON possono poggiare su un elenco di candidati del sistema: i nomi li porti tu, come gia' fai per le notizie che A1bis ti ordina di cercare.
  · PARTI DA CIO' CHE IL PACCHETTO TI DA' PER ORIENTARTI, che non e' uno screening ma e' meglio di niente: la ROTAZIONE SETTORIALE sui 21 ETF — e in particolare i comparti in cui il libro NON e' presente, che e' la lettura per cui quel blocco esiste — le NOTIZIE, i canali macro misurati sulle posizioni, e i comparti da cui il quadro macro ti fa attendere pressione o sollievo.
  · ⚠ OGNI NOME CHE PROPONI E' UNA TUA AFFERMAZIONE, non un dato del sistema: dillo, e porta la verifica con te (fonte e data). Vale la regola A1 come per ogni fatto esterno.
  · ⚠ E VALE ANCHE QUI IL DIVIETO DI DIMENSIONARE, e la disciplina di rischio in coda: un nome nuovo che cade dentro il gruppo correlato gia' misurato NON diversifica, aggiunge alla stessa scommessa. Verificalo prima di proporlo, e se il pacchetto non permette di verificarlo, scrivilo.
@@ -8500,7 +8500,27 @@ function buildPrompt(opz) {
     const br = m.breadth;
     const base = `SPY (cap-pesato) ${signTxt(br.spy_1m_pct)} vs RSP (equi-pesato) ${signTxt(br.rsp_1m_pct)} a 1M · spread ${signTxt(br.divergence_pp, "pp")}`;
     if (br.alert) {
-      lines.push(`- ⚠ [BREADTH DIVERGENCE] Ampiezza di mercato in deterioramento: ${base}. ${br.note || ""} DIRETTIVA: il rally NON è confermato dall'azione media — prudenza sui nuovi ingressi (sizing ridotto o ingresso post-conferma), priorità ai candidati con RS propria e non trainata dall'indice; per il book già concentrato sulle megacap questo è il segnale d'allarme più specifico: verifica la distanza degli stop ratchet.`);
+      /* ═══ v411 — UN FOSSILE CON TRE DIFETTI, VISIBILE SOLO QUANDO L'AMPIEZZA DIVERGE ══════
+         Questo ramo si rende solo con `br.alert`, e i dati che lo accendono sono arrivati solo
+         ora: e' il ramo irraggiungibile PER I DATI della v390/v404, che i gate di coerenza non
+         vedono al momento del merge. Quando si e' acceso, C9 ha trovato dentro:
+           (a) una DIRETTIVA nella coda — ottava volta in questo progetto (v156, v179, v180,
+               v389, v402, v404, v406): le istruzioni vivono nella testata, il payload porta fatti;
+           (b) una prescrizione di DIMENSIONAMENTO ("sizing ridotto"), cioe' esattamente cio' che
+               la testata vieta e che la v410 ha appena rimesso al centro con [B7];
+           (c) un rimando allo "stop ratchet", RIMOSSO NELLA v256 — un rimando a un blocco che
+               non esiste piu', la classe che C10 sorveglia.
+         Restano i FATTI, che sono quelli utili: di quanto i due indici divergono, cosa significa
+         meccanicamente, e perche' riguarda QUESTO libro. La conseguenza la trae chi legge, che
+         e' precisamente cio' che [B7] gli chiede. */
+      lines.push(`- ⚠ [AMPIEZZA IN DETERIORAMENTO] ${base}. ${br.note || ""} `
+        + `Il cap-pesato sta facendo meglio dell'equi-pesato di ${signTxt(br.divergence_pp, "pp")}: `
+        + `meccanicamente vuol dire che il movimento dell'indice e' retto da POCHI nomi grandi e `
+        + `non dall'azione media del mercato. ⚠ PERCHE' RIGUARDA QUESTO LIBRO IN PARTICOLARE: le `
+        + `posizioni piu' pesanti sono megacap correlate fra loro (il gruppo di fattore misurato `
+        + `nel blocco del libro), quindi il libro e' esposto proprio ai nomi che stanno reggendo `
+        + `l'indice da soli — la stessa concentrazione che lo ha fatto salire e' quella che lo `
+        + `espone se quei nomi si fermano.`);
     } else {
       /* ═══ v405 — L'ETICHETTA ASSUMEVA IL RALLY INVECE DI MISURARLO ══════════════════════
          Diceva "rally con partecipazione ampia" anche quando ENTRAMBI gli indici erano in calo:

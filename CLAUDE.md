@@ -3084,6 +3084,63 @@ di una funzionalità. Validato togliendo il blocco dal solo fallback: morde.
 **Costo misurato**: pacchetto macro 71.209 → 74.840 caratteri (+5,1%), di cui ~2.900 sono le due
 sezioni di testata e ~700 la riga del perimetro.
 
+## 🪞 v411 — IL NUMERO FISSO ERA TORNATO, NELLA TESTATA, UN PARAGRAFO PIÙ IN LÀ
+
+Trovato **eseguendo il pacchetto v410 su me stesso**, l'esercizio ricorrente di questo file — ed è
+il modo in cui i difetti di questa sessione sono stati trovati tutti.
+
+La v410 aveva appena tolto dalla CODA il conteggio scritto a mano, con tanto di gate che lo valida
+aggiungendo un titolo e verificando che il numero si muova. E nella TESTATA, scritta nella stessa
+mezz'ora, avevo messo: *"segue i titoli che il CEO possiede **più due nomi soli**"*.
+
+> ⚠⚠ **La testata è il posto in cui quel difetto è PEGGIO**, perché nessun gate la conta: se il
+> CEO aggiunge tre nomi a `ui_watchlist.json`, la coda dice cinque e l'istruzione continua a dire
+> due — e l'istruzione è quella che il modello legge **per prima**.
+
+*Scrivere la regola e non applicarla a sé stessi è la classe già annotata in v313* (il confine
+`\nfunction` usato dopo aver documentato che era sbagliato). Ora `[B8]` **rimanda** al conteggio
+invece di sostituirlo, e un gate verifica che nessun numero rientri — in entrambe le copie della
+testata.
+
+### E una seconda frase contraddiceva A1bis
+`[B8]` diceva *"questo è l'unico blocco della tua risposta in cui la fonte sei tu"*. È **falso** su
+una testata che con A1bis ordina già di cercare le notizie macro. Una testata che si contraddice
+fra due sezioni logora il collaudo B5, che impone al lettore di segnalare esattamente quelle
+contraddizioni: **un pacchetto che genera falsi positivi nel proprio controllo di qualità lo
+svuota** (classe v400). Ora la riga si aggancia ad A1bis invece di negarla.
+
+⚠ Entrambi i gate sono validati per iniezione, e guardano **file e fallback** — un obbligo che
+vive in una copia sola è la trappola v331.
+
+### 🦴 E il rebase ha acceso un fossile che nessuno aveva mai visto
+Rientrando dal conflitto con i dati freschi del CI, C9 ha trovato un imperativo in un ramo che
+**non si era mai reso**: `[BREADTH DIVERGENCE]`, che compare solo quando `br.alert` è vero — e i
+dati che lo accendono sono arrivati proprio con quel run. È il **ramo irraggiungibile per i DATI**
+di v390/v404, che i gate di coerenza non vedono al momento del merge.
+
+Quando si è acceso, dentro c'erano **tre difetti insieme**:
+
+| difetto | classe |
+|---|---|
+| una **DIRETTIVA** nella coda | C9, **ottava volta** (v156, v179, v180, v389, v402, v404, v406) |
+| una prescrizione di **dimensionamento** (*"sizing ridotto"*) | ciò che la testata vieta e che la v410 ha appena rimesso al centro con `[B7]` |
+| un rimando allo **"stop ratchet"**, rimosso nella v256 | rimando a un blocco che non esiste più (C10) |
+
+Restano i **fatti**, che sono quelli utili: di quanto i due indici divergono, cosa significa
+meccanicamente (il movimento è retto da pochi nomi grandi), e perché riguarda **questo** libro —
+le posizioni più pesanti sono proprio le megacap che stanno reggendo l'indice da sole. La
+conseguenza la trae chi legge, che è precisamente ciò che `[B7]` gli chiede.
+
+⚠⚠ **E il gate v126 PINNAVA IL COMPORTAMENTO SBAGLIATO**: pretendeva la stringa *"prudenza sui
+nuovi ingressi"*, cioè proprio la direttiva che C9 vieta. Venticinquesima rottura di un check
+ancorato a una stringa letterale, e la peggiore specie — *un gate che pinna un difetto lo rende
+permanente* (v326). Riagganciato all'invariante: il ramo si accende solo quando serve, pubblica la
+**misura**, e non contiene né ordini né quantità. Validato reintroducendo la direttiva: morde.
+
+> **La lezione operativa, già scritta in questo file e ripagata oggi**: dopo un rebase che porta
+> dati nuovi, i gate di coerenza vanno **rieseguiti**, perché i rami che dipendono dai dati
+> possono essersi accesi per la prima volta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
