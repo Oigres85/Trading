@@ -7737,6 +7737,45 @@ check("v414 due utili attesi diversi non escono senza dire che potrebbero non es
   }
   return guai.length ? "pubblicano due utili attesi diversi senza dichiararlo: " + guai.join(", ") : true;`));
 
+/* ⚠⚠ v415 — UNA RIGA FUORI PASSO NON PUO' DATARE TUTTO IL PACCHETTO.
+   `SEMPRE_APERTI` prendeva `-USD` e mancava i cambi (`EURUSD=X`) e i futures (`ES=F`), che
+   scambiano quasi ininterrottamente: il 04/09 una riga su 23 portava il 2026-09-04 mentre le
+   22 azionarie erano al 03, e prendendo il MASSIMO quella riga dichiarava tutto il pacchetto
+   fresco di un giorno. Il danno vero non era la data ma l'avviso che spariva: a eta' zero la
+   riga sceglie il ramo rassicurante invece di quello che grida che i prezzi sono vecchi.
+   ⚠ Lo stato si COSTRUISCE: si inietta una riga sempre-aperta avanti di un giorno e si
+   verifica che la data dichiarata non la segua. Aspettare che i dati producano il caso
+   sarebbe verde per assenza del fenomeno. */
+check("v415 uno strumento sempre aperto non sposta la data della barra dichiarata", suVeriEsito(`
+  const R = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const chiudono = R.filter(r => r && typeof r.price_asof === "string" && !/(-(USD|USDT|EUR)|=[XF])$/i.test(String(r.ticker || "")));
+  if (chiudono.length < 5) return "meno di cinque righe di mercati che chiudono: il check non misura niente";
+  const base = ultimaBarraDisponibile();
+  if (!base) return "ultimaBarraDisponibile non ha risposto: il check non misura niente";
+  /* si costruisce il caso: un cambio e un future gia' passati al giorno dopo */
+  const domani = new Date(new Date(base + "T00:00:00").getTime() + 86400000).toISOString().slice(0, 10);
+  DATA.watchlist = [...(DATA.watchlist || []),
+    { ticker: "EURUSD=X", price_asof: domani },
+    { ticker: "ES=F", price_asof: domani }];
+  const dopo = ultimaBarraDisponibile();
+  return dopo === base ? true
+    : "un cambio e un future avanti di un giorno hanno spostato la data dichiarata da " + base + " a " + dopo;`));
+
+/* ⚠ E una singola riga azionaria in anticipo non deve bastare: la data e' quella della
+   MAGGIORANZA, perche' e' quella su cui poggiano i numeri di mercato del pacchetto. */
+check("v415 la data della barra e' quella della maggioranza, non di una riga sola", suVeriEsito(`
+  const base = ultimaBarraDisponibile();
+  if (!base) return "ultimaBarraDisponibile non ha risposto: il check non misura niente";
+  const quante = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])]
+    .filter(r => r && r.price_asof === base && !/(-(USD|USDT|EUR)|=[XF])$/i.test(String(r.ticker || ""))).length;
+  if (quante < 5) return "solo " + quante + " righe sulla data dichiarata: il check non misura niente";
+  const domani = new Date(new Date(base + "T00:00:00").getTime() + 86400000).toISOString().slice(0, 10);
+  DATA.watchlist = [...(DATA.watchlist || []), { ticker: "ZZTEST", price_asof: domani }];
+  const dopo = ultimaBarraDisponibile();
+  return dopo === base ? true
+    : "una sola riga in anticipo ha spostato la data da " + base + " a " + dopo
+      + " (" + quante + " righe portano " + base + ")";`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
