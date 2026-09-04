@@ -3300,6 +3300,77 @@ accende a qualunque ora giri la suite. Tutti e quattro validati per iniezione: m
   **97** come chiamate, perché alcuni girano in ciclo. Il pavimento conta i punti di chiamata,
   non i check riportati. Rimesso a 90; quello di `test_app.mjs` sale a 490 su 510.
 
+## 🔎 v415 — PRIMO GIRO DI RICOGNIZIONE: cinque difetti, e tre erano la stessa forma
+
+Primo dei due giri che la tolleranza scelta dal CEO richiede (*"zero difetti materiali su due
+giri consecutivi"*). Cinque difetti materiali, **nessuno trovato dai gate** — tutti leggendo i
+due pacchetti come il modello che li riceve, che a questo punto è una misura: in tre sessioni
+consecutive la suite non ne ha trovato uno.
+
+| difetto | cosa affermava | cosa era vero |
+|---|---|---|
+| **l'etichetta del credito** | *"— Mercato del Credito Rilassato"*, con la legenda delle bande | quattro righe sopra, la stessa lettura porta *"⚠⚠ MA STA AL 4° PERCENTILE … l'etichetta e il percentile dicono cose opposte"*: la copia **senza** il correttivo è quella che vince, perché è la più corta |
+| **il contributo al rischio** | *"quota della varianza attribuibile a **ciascuna** posizione"* | uno `.slice(0, 6)` su **dodici**, e il taglio prendeva la coda in cui il rischio sta SOTTO il peso — GOOGL 5,7%→1,3%, PLTR 6,1%→3,3%, cioè l'altra metà del confronto per cui il blocco esiste |
+| **l'autofinanziamento** | soglia dichiarata *"nessuna posizione con FCF negativo **E** interessi non coperti"* | lo stato veniva da due bande sul **peso**: due posizioni soddisfano la congiunzione, quindi la soglia stampata diceva OLTRE e la riga stampava AL LIMITE |
+| **la clausola sulle revisioni** | *"(-4,37 diviso -3,42 dà +28%)"* | i valori di CRWV **al momento della v400**, stampati accanto ai valori vivi della stessa frase (-3,48 → -4,24): due coppie di stime per la stessa grandezza, in una riga |
+| **due utili attesi** | entrambi *"il consenso sul prossimo esercizio fiscale"* | `stats.eps_forward` −1,95 e `analisti.eps_ora` −4,24 — **più del doppio** — e nessuno dei due campi dichiara a quale esercizio si riferisce |
+
+### La forma comune: il pacchetto forniva da solo i falsi positivi del proprio collaudo
+Tre dei cinque (credito, revisioni, utili attesi) sono **due valori per la stessa grandezza**, che
+è esattamente ciò che B5 ordina al lettore di segnalare. È la classe che un LLM reale ci ha
+segnalato in v409 sull'autonomia di cassa, e che la v412 aveva chiuso su una riga sola.
+*Un pacchetto che genera i falsi positivi del proprio controllo di qualità lo logora*, e il costo
+non è la riga sbagliata: è che chi legge smette di fidarsi anche del resto.
+
+⚠ **Su due di questi la correzione NON è scegliere un numero.** Sull'utile atteso il sistema non
+sa quale esercizio copra ciascun campo: si pubblicano entrambi, ciascuno col proprio riferimento,
+e si dichiara che non è stabilito descrivano la stessa annualità — la forma della v409. *Meglio
+non avere dati che averli non corretti* (v396); qui i dati c'erano entrambi, ed era l'etichetta a
+affermare più di quanto potesse.
+
+⚠ **E la clausola con i numeri scritti a mano è la TERZA incarnazione del conteggio fisso**
+(v410 nella coda, v411 nella testata, ora dentro una clausola esplicativa). Un numero scritto a
+mano invecchia da solo e in silenzio — e qui la coppia viva stava **due parole prima**. Non si
+aggiorna l'esempio: si toglie, perché la regola non ha bisogno di numeri propri quando quelli a
+cui si applica sono nella stessa frase.
+
+### 🎯 Un gate ha trovato un difetto che non aveva in mente
+Il check sui due utili attesi è andato rosso su **MSTR**, che non era il caso da cui era nato: la
+dichiarazione viveva solo nel ramo della PERDITA, e MSTR ha lo stesso scarto con l'utile atteso
+positivo. È la classe v412 — *una correzione applicata a un ramo e non all'altro* — presa dal
+check invece che da una rilettura, che è il motivo per cui i gate si scrivono sulla PROPRIETÀ e
+non sul caso che li ha originati.
+
+⚠ **E il gate sul contributo al rischio ha nominato i sei nomi nascosti** invece di dire "manca
+qualcosa": un check che riporta *quali* posizioni sono sparite costa una riga in più e vale un
+giro di indagine a chi verrà dopo.
+
+### 🧨 Due inciampi di metodo
+- ⚠ **Un check che non morde è decorativo.** La prima stesura del gate sullo spread contava le
+  RIGHE: il duplicato stava dentro una riga sola insieme al dato di IG, quindi il conteggio
+  restava a uno e l'iniezione passava. Riscritto sulla proprietà davvero violata — il livello
+  esce da un punto solo. *Quando un check non morde, la prima cosa da guardare non è il codice:
+  è se la proprietà che stai verificando può essere falsa.*
+- ⚠⚠ **C9 NON HA VISTO tre miei imperativi** (*"Non sommarli, non farne una media, prendilo dalla
+  fonte"*): il detector riconosce certe forme e non l'imperativo negativo con clitico. Riscritti
+  come fatti lo stesso — **la regola non dipende dal fatto che il gate la sorvegli**, ed è
+  annotato qui che quel buco esiste invece di essere scoperto la prossima volta.
+- ⚠ Un check partito su `buildPrompt()` mentre il blocco vive in `contestoPortafoglio`, cioè
+  dentro `buildCIOText`: *un check sulla funzione sbagliata misura un'altra cosa* (v405).
+
+### 📋 Annotati e NON corretti, per la regola scelta dal CEO
+Difetti **cosmetici**, che non cambiano nessuna conclusione, elencati qui perché la decisione sia
+sua e non una dimenticanza:
+- un refuso: *"la ricerca che **il questo** pacchetto ti impone"* nel blocco notizie;
+- Put/Call ed etichetta *"(Elevato)"* sul Forward P/E escono senza la propria banda di lettura;
+- la riga delle scommesse effettive dice *"2,3 su 12 nomi"* mentre il libro ne elenca 13: il
+  dodicesimo denominatore è dichiarato altrove (SKHY non ha abbastanza sedute in comune) ma non
+  in quella riga.
+
+> **La ragione della regola, misurata:** dei sette difetti del giro precedente, **tre li avevo
+> introdotti io poche ore prima correggendone altri**. Correggere un cosmetico costa un'occasione
+> di introdurre un difetto materiale, e il prezzo non vale il guadagno.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

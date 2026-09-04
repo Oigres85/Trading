@@ -7576,6 +7576,167 @@ check("v414 nessuna uscita in finestra sparisce dal calendario senza essere nomi
   return persi.length ? "hanno una data confermata in finestra e la riga non li nomina: " + persi.join(" · ")
                       : true;`));
 
+/* ⚠⚠ v414 — L'ETICHETTA DEL CREDITO ESCE DA UN PUNTO SOLO, CON LA SUA CORREZIONE.
+   La v405 ha aggiunto alla riga del credito l'avviso che al 4° percentile "rilassato" descrive
+   il livello e non la posizione nella distribuzione. Un secondo blocco ripubblicava la stessa
+   etichetta e la stessa legenda delle bande SENZA quell'avviso: la copia piu' corta e' quella
+   che vince, ed e' la classe v161/v207 unita alla v412 (correzione applicata a un ramo solo).
+   ⚠ L'invariante non e' "l'etichetta non compare due volte" — sarebbe un ancoraggio alla
+   forma — ma che DOVUNQUE compaia porti accanto il correttivo del percentile. */
+check("v414 il credito non pubblica la sua etichetta senza la correzione del percentile", suVeriEsito(`
+  const p = buildPrompt();
+  const R = p.split(String.fromCharCode(10));
+  const bande = R.filter(r => r.indexOf("sotto 4% rilassato, 4-5% attenzione") >= 0);
+  if (!bande.length) return "la legenda delle bande sul credito non compare: il check non misura niente";
+  if (bande.length > 1) return "la legenda delle bande esce da " + bande.length + " punti di stampa invece che da uno";
+  /* dove l'etichetta e' pubblicata, il percentile che la smentisce dev'essere nella stessa riga */
+  const conEtichetta = R.filter(r => r.toLowerCase().indexOf("credito rilassato") >= 0);
+  if (!conEtichetta.length) return "l'etichetta del credito non compare: il check non misura niente";
+  const senzaCorrettivo = conEtichetta.filter(r => r.indexOf("PERCENTILE") < 0 && r.indexOf("percentile") < 0);
+  return senzaCorrettivo.length
+    ? "l'etichetta del credito esce senza il correttivo del percentile in " + senzaCorrettivo.length + " riga/e"
+    : true;`));
+
+/* ⚠ E il movimento a un mese dello spread usciva in TRE rese: -0,12 pp, -4% e -4,32%. Due
+   arrotondamenti della stessa grandezza sono cio' che il collaudo B5 ordina al lettore di
+   segnalare: il pacchetto non deve produrre da solo i falsi positivi del proprio controllo di
+   qualita' (v412, v400). */
+check("v414 il livello dello spread HY e il suo movimento escono da una riga sola", suVeriEsito(`
+  /* ⚠ LA PRIMA STESURA CONTAVA LE RIGHE e non mordeva: il duplicato stava dentro UNA riga
+     insieme al dato di IG, quindi il conteggio restava a uno. Un check che non morde e'
+     decorativo — riscritto sulla proprieta' che era davvero violata: il LIVELLO dello spread
+     e' pubblicato da un punto solo, e il secondo blocco porta cio' che il primo non ha. */
+  const sr = (DATA.macro || {}).systemic_risk;
+  if (!sr || sr.hy_oas == null) return "systemic_risk assente: il check non misura niente";
+  const p = buildPrompt();
+  const R = p.split(String.fromCharCode(10));
+  const livello = String(sr.hy_oas);
+  const conLivello = R.filter(r => r.indexOf("HY OAS " + livello) >= 0 || r.indexOf("(HY OAS, proxy CDS): " + livello) >= 0);
+  if (!conLivello.length) return "il livello dello spread HY non compare: il check non misura niente";
+  return conLivello.length === 1 ? true
+    : "il livello dello spread HY esce da " + conLivello.length + " righe: "
+      + conLivello.map(r => r.slice(0, 70)).join(" | ");`));
+
+/* ⚠⚠ v414 — "CIASCUNA POSIZIONE" DEVE VOLER DIRE CIASCUNA.
+   Uno `.slice(0, 6)` mostrava sei posizioni su dodici sotto un'etichetta che le prometteva
+   tutte, e il taglio cadeva sulla coda in cui il rischio sta SOTTO il peso — l'altra meta'
+   del confronto per cui il blocco esiste. Stessa classe delle notizie contate e poi nascoste
+   (v393) e del tetto sulle news chiuso in questa stessa versione.
+   ⚠ L'invariante e' il CONFRONTO fra chi ha la misura nei dati e chi compare nella riga: un
+   check che contasse un numero fisso di voci invecchierebbe al primo titolo aggiunto o tolto
+   (C10, red team I6, il pavimento numerico di v208). */
+check("v414 il contributo al rischio pubblica tutte le posizioni che hanno la misura", suVeriEsito(`
+  const conMisura = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])]
+    .filter(r => r && r.risk_contrib_pct != null && isFinite(Number(r.risk_contrib_pct)))
+    .map(r => String(r.ticker).toUpperCase());
+  if (conMisura.length < 4) return "solo " + conMisura.length + " posizioni con contributo al rischio: il check non misura niente";
+  /* ⚠ il blocco vive in contestoPortafoglio, che entra nel pacchetto consegnato: un check
+     sulla funzione sbagliata misura un'altra cosa (v405). */
+  const p = buildCIOText();
+  const i = p.indexOf("CONTRIBUTO AL RISCHIO");
+  if (i < 0) return "il blocco del contributo al rischio non compare";
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  const persi = conMisura.filter(tk => riga.indexOf(tk + " peso ") < 0);
+  return persi.length
+    ? "hanno un contributo al rischio misurato e non compaiono nella riga: " + persi.join(" · ")
+      + " (su " + conMisura.length + " totali)"
+    : true;`));
+
+/* ⚠⚠ v414 — LO STATO DI OGNI DISCIPLINA DEVE ESSERE RIPRODUCIBILE DALLA SOGLIA CHE STAMPA.
+   La regola sull'autofinanziamento dichiarava un criterio PER POSIZIONE a tolleranza zero
+   ("nessuna posizione con FCF negativo E interessi non coperti") e calcolava lo stato da due
+   bande sul PESO: sul libro reale la soglia dichiarata diceva OLTRE e la riga stampava AL
+   LIMITE. Classe v316/v326 — la formula calcola una cosa, l'etichetta ne dichiara un'altra.
+   ⚠ Il check verifica la PROPRIETA' che il difetto viola per costruzione: dove la disciplina
+   ha una soglia numerica dichiarata e una misura numerica, lo stato deve concordare col
+   confronto fra le due. Un check sui valori attesi si sbaglierebbe insieme al codice (v326). */
+check("v414 lo stato di ogni disciplina concorda con la soglia che la riga dichiara", suVeriEsito(`
+  const D = disciplinaRischio();
+  const R = (D && D.regole) || D;
+  if (!Array.isArray(R) || R.length < 5) return "disciplinaRischio non ha restituito le regole: il check non misura niente";
+  const guai = [];
+  let misurate = 0;
+  for (const r of R) {
+    if (!Number.isFinite(r.valore) || !Number.isFinite(r.sogliaPct)) continue;
+    misurate++;
+    const oltre = r.valore > r.sogliaPct;
+    /* DENTRO su una misura che supera la propria soglia dichiarata e' la contraddizione */
+    if (oltre && r.stato === "DENTRO") guai.push(r.nome + ": " + r.valore + " oltre " + r.sogliaPct + " ma stato DENTRO");
+    if (!oltre && r.stato === "OLTRE") guai.push(r.nome + ": " + r.valore + " sotto " + r.sogliaPct + " ma stato OLTRE");
+  }
+  if (misurate < 3) return "solo " + misurate + " discipline con soglia numerica: il check non misura niente";
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠ E la riga dell'autofinanziamento deve dichiarare il criterio che produce davvero lo stato:
+   una soglia stampata che non genera l'etichetta accanto e' un'affermazione non sostenuta
+   (v240 — ogni soglia disegnata e' un'affermazione, o viene dal dato o si dichiara convenzione). */
+check("v414 l'autofinanziamento dichiara la soglia di peso da cui lo stato viene davvero", suVeriEsito(`
+  const D = disciplinaRischio();
+  const R = (D && D.regole) || D;
+  const r = (Array.isArray(R) ? R : []).find(x => x && String(x.nome).indexOf("Autofinanziamento") >= 0);
+  if (!r) return "la regola dell'autofinanziamento non compare: il check non misura niente";
+  const s = String(r.soglia);
+  const dichiaraBande = s.indexOf("10%") >= 0 && s.indexOf("20%") >= 0;
+  if (!dichiaraBande) return "lo stato viene da due bande sul peso e la soglia stampata non le nomina: " + s;
+  /* e se esistono posizioni che soddisfano la congiunzione, la misura lo deve dire */
+  const m = String(r.misura);
+  const nomina = m.indexOf("ENTRAMBE le condizioni") >= 0;
+  return nomina ? true : "la misura non dice se qualche posizione soddisfa entrambe le condizioni";`));
+
+/* ⚠⚠ v414 — NESSUN NUMERO SCRITTO A MANO NELLE CLAUSOLE CHE SPIEGANO UN DATO VIVO.
+   La clausola sull'inversione di segno delle revisioni citava "-4,37 diviso -3,42": i valori
+   di CRWV al momento della v400, stampati accanto ai valori vivi della stessa frase. Terza
+   incarnazione del conteggio fisso (v410, v411): un numero scritto a mano invecchia da solo e
+   in silenzio, e qui la coppia viva stava due parole prima.
+   ⚠ L'invariante e' generale e si valida sui dati: le stime che la riga nomina devono essere
+   QUELLE del titolo, non un esempio. */
+check("v414 la clausola sulle revisioni non porta stime scritte a mano", suVeriEsito(`
+  const R = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const conRev = R.filter(r => r && r.analisti && r.analisti.eps_ora != null && r.analisti.eps_90g_fa != null
+                            && Number(r.analisti.eps_ora) < 0);
+  if (!conRev.length) return "nessun titolo con revisioni su una perdita: il check non misura niente";
+  const tk = String(conRev[0].ticker).toUpperCase();
+  const vivi = [conRev[0].analisti.eps_ora, conRev[0].analisti.eps_90g_fa]
+    .map(v => Math.abs(Number(v)).toFixed(2).replace(".", ","));
+  const p = buildPromptTicker(tk);
+  const i = p.indexOf("REVISIONI DEGLI UTILI");
+  if (i < 0) return "il blocco delle revisioni non compare per " + tk;
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  /* si raccolgono i numeri con due decimali che la riga cita, e nessuno deve essere estraneo
+     alle stime vive del titolo (i tre valori: ora, 90 giorni fa, 7 giorni fa) */
+  const ammessi = new Set(vivi);
+  const e7 = conRev[0].analisti.eps_7g_fa;
+  if (e7 != null) ammessi.add(Math.abs(Number(e7)).toFixed(2).replace(".", ","));
+  const citati = riga.split("-").map(s => s.slice(0, 4)).filter(s => /^[0-9],[0-9][0-9]$/.test(s));
+  const estranei = citati.filter(s => !ammessi.has(s));
+  return estranei.length
+    ? "la riga cita stime che non sono quelle del titolo (" + tk + "): " + [...new Set(estranei)].join(", ")
+      + " — vive: " + [...ammessi].join(", ")
+    : true;`));
+
+/* ⚠⚠ v414 — DUE UTILI ATTESI CON LO STESSO NOME.
+   `stats.eps_forward` e `analisti.eps_ora` sono due campi diversi dell'aggregatore, su CRWV
+   -1,95 e -4,24, e il pacchetto li descriveva entrambi come il consenso sul prossimo esercizio.
+   Nessuno dei due porta un periodo, quindi il sistema non puo' affermare che coincidano: la
+   forma corretta e' quella della v409 sull'autonomia di cassa — si pubblicano entrambi e si
+   dichiara che non e' stabilito descrivano la stessa annualita'. */
+check("v414 due utili attesi diversi non escono senza dire che potrebbero non essere lo stesso periodo", suVeriEsito(`
+  const R = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const doppi = R.filter(r => {
+    const a = r && r.analisti, s = r && r.stats;
+    if (!a || !s || a.eps_ora == null || s.eps_forward == null) return false;
+    const x = Number(a.eps_ora), y = Number(s.eps_forward);
+    return isFinite(x) && isFinite(y) && Math.abs(x - y) > Math.max(0.05, Math.abs(y) * 0.05);
+  });
+  if (!doppi.length) return "nessun titolo con due utili attesi divergenti: il check non misura niente";
+  const guai = [];
+  for (const r of doppi.slice(0, 3)) {
+    const tk = String(r.ticker).toUpperCase();
+    const p = buildPromptTicker(tk);
+    if (p.indexOf("DUE UTILI ATTESI DIVERSI") < 0) guai.push(tk);
+  }
+  return guai.length ? "pubblicano due utili attesi diversi senza dichiararlo: " + guai.join(", ") : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
