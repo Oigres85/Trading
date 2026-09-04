@@ -8446,6 +8446,41 @@ check("v423 l'avviso sulla trimestrale vicina e' raggiungibile anche fuori dal l
     return true;
   } finally { r.earnings_date = prima; }`));
 
+/* ⚠⚠ v424 — DUE NUMERI DEL LIBRO SCRITTI A MANO DENTRO LE ISTRUZIONI. La regola sui
+   denominatori diceva: 'confrontare due percentuali: "23% del capitale" e "34% del rischio" sono
+   confrontabili solo perche' il pacchetto dichiara che stanno sullo stesso insieme'. Si leggono
+   come i numeri VIVI di questo libro — e quasi lo erano: il peso di MU e' 22,5%, non 23.
+   ⚠ TERZA incarnazione del conteggio fisso: v410 nella coda, v411 nella testata un paragrafo
+   piu' in la', v415 nella clausola sulle revisioni. E la TESTATA e' il posto in cui e' peggio,
+   perche' nessun gate la conta ed e' la parte che il modello legge per prima: la regola che deve
+   insegnargli a diffidare dei numeri incoerenti gliene forniva uno.
+   ⚠ Il rimedio e' quello della v415: non si aggiorna l'esempio, si TOGLIE.
+   ⚠ LA PROPRIETA' NON E' "niente numeri nelle istruzioni" — ce ne sono di legittimi (il tetto di
+   parole, la soglia del 2% sullo scarto di prezzo, il formato "−6% dal riferimento"). E'
+   piu' stretta: nelle ISTRUZIONI nessuna percentuale si presenta come una quota DI QUESTO LIBRO,
+   perche' e' l'aggancio che la fa invecchiare col portafoglio. Verificato che oggi non esista
+   nessuna occorrenza legittima di quella forma. */
+check("v424 le istruzioni non citano percentuali del libro scritte a mano", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const guai = [];
+  const rx = new RegExp("[0-9]+[,.]?[0-9]*%[^" + NL + "]{0,20}?"
+    + "(del capitale|del rischio|dell.azionario|del libro|del NAV|del patrimonio)", "g");
+  const casi = [
+    ["titolo", buildPromptTicker("CRWV"), "QUADRO MACRO DI RIFERIMENTO"],
+    ["macro",  buildCIOText(),            "DATI AL "],
+  ];
+  for (const [nome, p, finePreambolo] of casi) {
+    const i = p.indexOf(finePreambolo);
+    if (i < 0) return nome + ": non trovo la fine delle istruzioni, il check non misura niente";
+    const istruzioni = p.slice(0, i);
+    rx.lastIndex = 0;
+    let m;
+    while ((m = rx.exec(istruzioni))) guai.push(nome + ': "' + m[0] + '"');
+  }
+  return guai.length
+    ? guai.join(" · ") + " — una quota del libro scritta nelle istruzioni invecchia col portafoglio"
+    : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
