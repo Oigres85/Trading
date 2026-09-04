@@ -7955,6 +7955,33 @@ check("v416 la variazione di seduta resta pubblicata, nominando la seduta", suVe
   return conSeduta >= 3 ? true
     : "solo " + conSeduta + " variazioni nominano la seduta: la riga potrebbe essere sparita invece di essere corretta";`));
 
+/* ⚠⚠ v417 — LA TESTATA NON PUO' DICHIARARE MENO LETTURE DI QUANTE LA CODA NE PUBBLICHI.
+   Diceva "LE FINESTRE SONO DUE" mentre la coda pubblica anche il terzo sguardo della v403 (il
+   quinto di sedute con l'escursione maggiore): chi legge tratta la terza riga come rumore o la
+   salta, e proprio quella risponde alla domanda che un libro a leva pone. Classe v413 — la
+   testata che contraddice la propria coda — prodotta dalla v403 senza accorgersene.
+   ⚠ L'invariante lega le DUE parti: se la coda rende il terzo sguardo, la testata deve
+   nominarlo E dichiarare che non e' una finestra ma un sottoinsieme con un altro denominatore.
+   Un gate su una parte sola invecchia appena l'altra cambia. */
+check("v417 se la coda pubblica il terzo sguardo, la testata lo nomina e ne dichiara la natura", suVeriEsito(`
+  const R = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const conEvento = R.filter(r => r && r.tv && r.tv.sensibilita
+    && Object.values(r.tv.sensibilita).some(v => v && v.evento));
+  if (!conEvento.length) return "nessun titolo col terzo sguardo nei dati: il check non misura niente";
+  const tk = String(conEvento[0].ticker).toUpperCase();
+  const p = buildPromptTicker(tk);
+  const codaRende = p.indexOf("quando il canale si muove FORTE") >= 0;
+  if (!codaRende) return "il titolo ha il campo ma la coda non rende il terzo sguardo: stato incoerente";
+  /* la testata sta PRIMA della coda: si guarda la regione delle istruzioni */
+  const inizioDati = p.indexOf("QUADRO MACRO:");
+  const testata = inizioDati > 0 ? p.slice(0, inizioDati) : p;
+  const nomina = testata.indexOf("QUINTO DI SEDUTE") >= 0;
+  const dichiaraNatura = testata.indexOf("NON e' una terza finestra") >= 0
+                      && testata.indexOf("denominatore diverso") >= 0;
+  if (!nomina) return "la coda pubblica il terzo sguardo e la testata non lo nomina";
+  return dichiaraNatura ? true
+    : "la testata nomina il terzo sguardo ma non dichiara che e' un sottoinsieme con un altro denominatore";`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
