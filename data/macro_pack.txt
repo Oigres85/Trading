@@ -1,4 +1,4 @@
-⟦ BUILD v419 · generato 04/09/2026 12:33 ⟧
+⟦ BUILD v420 · generato 04/09/2026 13:06 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 04/09/2026, 12:33:47 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 08:33, fase: PRE-MARKET — festività USA non considerate) · ANTICIPATORI: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,29% · Fut S&P -0,05% · BTC +3,34% [24/7] · SEI PRIMA DELLA CAMPANA (apertura tra ~1h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura.
+DATI AL 04/09/2026, 13:06:08 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 09:06, fase: PRE-MARKET — festività USA non considerate) · ANTICIPATORI: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,14% · Fut S&P -0,27% · BTC -2,14% [24/7] · SEI PRIMA DELLA CAMPANA (apertura tra ~0.4h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 04/09/2026, 12:33:47, prossimo run 04/09/2026, 13:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-09-03 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 04/09/2026, 13:06:08, prossimo run 04/09/2026, 13:30:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-09-03 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-03) · Curva 10A-3M (2026-09-03) · Treasury USA 30A (2026-09-02) · Tasso reale 10A (TIPS) (2026-09-02) · Inflazione attesa 10A (breakeven) (2026-09-03) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -68,18 +68,18 @@ Quindi: usa questo pacchetto per la STORIA MISURATA, e cerca online il REGIME e 
 
 QUADRO MACRO:
 - Fear & Greed: 45 (Paura), 1 settimana fa 52, 1 mese fa 60, 1 anno fa 61 — livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati, non due segnali.
-- VIX: 14.27 (-0,35% nell'ultima seduta [chiusura del 03/09] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
-- Fed Funds Rate: range ATTUALE 3.50–3.75% · tasso implicito futures 3.82% · PROSSIMA RIUNIONE FOMC: 16/09/2026 (il tasso resta valido fino alla prossima decisione FOMC)
-- Carry USA-Giappone: spread tassi 10A 1,8 pp (US10A 4.76%, JGB10A 2.97%), USD/JPY 156.57 (-0,61% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
+- VIX: 14.2 (-0,84% nell'ultima seduta [chiusura del 03/09] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
+- Fed Funds Rate: range ATTUALE 3.50–3.75% · tasso implicito futures 3.79% · PROSSIMA RIUNIONE FOMC: 16/09/2026 (il tasso resta valido fino alla prossima decisione FOMC)
+- Carry USA-Giappone: spread tassi 10A 1,83 pp (US10A 4.8%, JGB10A 2.97%), USD/JPY 155.97 (-0,99% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1.03 — equilibrato (put 983781, call 952661)
-- Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,9% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $68B su $863B di BIL+SHV+SPY (SPY da solo $795B)) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, riferito a luglio 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
-- Righello Dollaro (DXY): 99.04 · 3 mesi -1,01% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
+- Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,7% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $68B su $880B di BIL+SHV+SPY (SPY da solo $812B)) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, riferito a luglio 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
+- Righello Dollaro (DXY): 99.21 · 3 mesi -0,84% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7747,71 vs SMA125 7301,05 (+6,12%) · Nasdaq 100 29.482,32 vs SMA125 28.060,15 (+5,07%) — sopra = trend primario integro, sotto = deterioramento.
-- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 29.657 (+0,29%) · S&P 500 (ES) 7753,75 (-0,05%) — in rialzo oltre il rumore: apertura USA attesa in gap-up.
+- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 29.530,25 (-0,14%) · S&P 500 (ES) 7736,5 (-0,27%) — in calo oltre il rumore: apertura USA attesa in gap-down.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 0,81× (-13,25% 5g) · TQQQ 3x NDX RVol 0,81× (-1,73% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
 - Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) +0,44% vs RSP (equi-pesato) +0,15% a 1M · spread +0,29pp — rally con partecipazione uniforme (alert se SPY+ con RSP− o spread >4pp). ⚠ L'ampiezza misura la DISTANZA fra i due indici, non la direzione: qui il verso lo da' il cap-pesato, e con entrambi in rialzo la salita e' partecipata.
-- Treasury USA 10A: 4.76% (-0,03 pp nell'ultima seduta) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,79% (FRED DGS10, osservazione del 2026-09-02): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
-- EUR/USD: 1.1592 (+0,05% nell'ultima seduta)
+- Treasury USA 10A: 4.80% (+0,04 pp nell'ultima seduta) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,79% (FRED DGS10, osservazione del 2026-09-02): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
+- EUR/USD: 1.1605 (+0,17% nell'ultima seduta)
 - PIL USA (t/t ann.): 1.5% (riferito al 2° trimestre 2026 (aprile-giugno) · acquisito il 04/09/2026 · ultima uscita 26/08/2026 (9 giorni fa) · prossimo aggiornamento 30/09/2026 (calendario ufficiale, Gross Domestic Product, via FRED) · BEA, trimestrale · serie TRIMESTRALE, il dato più recente disponibile)
 - Vendite al dettaglio (m/m): -0.6% (riferito a luglio 2026 · acquisito il 04/09/2026 · ultima uscita 14/08/2026 (21 giorni fa) · prossimo aggiornamento 16/09/2026 (calendario ufficiale, Advance Monthly Sales for Retail and Food Services, via FRED) · Census, mensile)
 - Non-Farm Payrolls: -23K (riferito a luglio 2026 · acquisito il 04/09/2026 · ultima uscita 04/09/2026 (0 giorni fa) · prossimo aggiornamento 02/10/2026 (calendario ufficiale, Employment Situation, via FRED) · BLS, mensile)
@@ -93,32 +93,34 @@ QUADRO MACRO:
 - Inflazione (a/a): CPI 3.4% · PCE 3.7% — due misure della STESSA grandezza, non due segnali: la Fed guarda il PCE. Rilevazioni: CPI riferito a luglio 2026 · acquisito il 04/09/2026 · ultima uscita 12/08/2026 (23 giorni fa) · prossimo aggiornamento 11/09/2026 (calendario ufficiale, Consumer Price Index, via FRED) · BLS, mensile · PCE riferito a luglio 2026 · acquisito il 04/09/2026 · ultima uscita 26/08/2026 (9 giorni fa) · prossimo aggiornamento 30/09/2026 (calendario ufficiale, Personal Income and Outlays, via FRED) · BEA, mensile.
 - CURVA DEI TASSI USA (FRED (Federal Reserve Bank of St. Louis), OSSERVAZIONI PUBBLICATE — non stime, ultima del 2026-09-02, quindi NON di oggi: la fonte pubblica con qualche giorno di ritardo): 3 mesi 3,92% [+0,14 vs 3,78% del 2026-06-04] · 2 anni 4,39% [+0,34 vs 4,05% del 2026-06-04] · 5 anni 4,54% [+0,36 vs 4,18% del 2026-06-04] · 10 anni 4,79% [+0,32 vs 4,47% del 2026-06-04] · 30 anni 5,27% [+0,3 vs 4,97% del 2026-06-04]. Pendenza 3 mesi→30 anni: +1,35 pp, era +1,19 pp tre mesi fa. Fra parentesi quadre lo scarto dalla stessa scadenza tre mesi fa: e' un confronto fra due osservazioni datate, non una tendenza ricostruita.
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): settembre -0,66% negli anni di midterm contro -0,53% su tutti gli anni, 30% di mesi positivi, esiti da -11,7% a +18% · ottobre +3,94% negli anni di midterm contro +1,7% su tutti gli anni, 80% di mesi positivi, esiti da -8,7% a +18,9% · novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
-- MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 11.352 (+0,11% nell'ultima seduta) — +100,3% in un anno, e sta al 63% dell'intervallo annuale 5668–14.635 · Rame 6,67 $/lb (+1,38% nell'ultima seduta) — +48,6% in un anno, e sta al 98% dell'intervallo annuale 4,48–6,71 · Petrolio WTI 90,42 $ (-0,96% nell'ultima seduta) — +42,4% in un anno, e sta al 61% dell'intervallo annuale 55,27–112,95 · Oro 4512 $/oz (+0,46% nell'ultima seduta) — +26,5% in un anno, e sta al 54% dell'intervallo annuale 3566–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
-- TITOLI MACRO — 8 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 11 pubblicate DOPO l'ultima chiusura USA del 2026-09-03, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
+- MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 11.352 (+0,11% nell'ultima seduta) — +100,3% in un anno, e sta al 63% dell'intervallo annuale 5668–14.635 · Rame 6,63 $/lb (+0,85% nell'ultima seduta) — +47,8% in un anno, e sta al 97% dell'intervallo annuale 4,48–6,71 · Petrolio WTI 90,05 $ (-1,37% nell'ultima seduta) — +41,9% in un anno, e sta al 60% dell'intervallo annuale 55,27–112,95 · Oro 4452 $/oz (-0,89% nell'ultima seduta) — +24,8% in un anno, e sta al 51% dell'intervallo annuale 3566–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
+- TITOLI MACRO — 10 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 12 pubblicate DOPO l'ultima chiusura USA del 2026-09-03, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
+    · [CNBC Economia, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] U.S. payrolls rose 162,000 in August, much more than expected; unemployment rate at 4.1%
+      Nonfarm payrolls were expected to increase by 53,000 in August while the unemployment rate held at 4.1%, according to the Dow Jones consensus.
+    · [MarketWatch, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Is the stock market open on Labor Day? What about bond trading? Will the post office deliver mail?
+      Here’s how trading hours and other services are affected by the Labor Day holiday on Monday, Sept. 7.
     · [CNBC Economia, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] The big business of personal protection: How private security became a $50 billion industry
       Private security spending and guard employment have climbed as companies and communities respond to high-profile attacks, even as violent crime falls.
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] US Stock Futures Steady Ahead of Key August Jobs Data
-      US stock futures drifted higher on Friday as traders awaited the crucial August jobs report for more signals about the potential for Federal Reserve interest-rate hikes.
+    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] US Stock Futures Slip as Jobs Growth Fuels Fed-Hike Bets
+      US stock futures erased early gains to briefly touch session lows on Friday after the US added 162,000 jobs in August, raising concerns that the Federal Reserve may hike interest rates soon.
     · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Stocks Steady Ahead of Jobs Report; US Retail Diesel Hits Record High | Bloomberg Brief 09/04/2026
       US equity futures and Treasuries hold steady ahead of the August payrolls report. US retail diesel prices rise to a record high as the wars roil the market. DeepSeek plans to deploy at least 160,000 of Huawei’s top accelerators at a massive new data center in Inner Mongolia. Mark Haefele of UBS Global Management and Ve
     · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Cocoa Trims Weekly Loss as Deficit Risks Cloud Supply Outlook
       Cocoa futures rose in New York and London, trimming a weekly decline, as the market grapples with the prospect of sufficient short-term supplies being followed by a deficit in the season ahead.
     · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] JD Vance Says ‘Proper and Responsible’ for Fed to Lower Interest Rates
       US Vice President JD Vance said on Thursday the Trump administration believes “that the Fed should be lowering interest rates," to help make home ownership more affordable. Michael McKee reports on Bloomberg Television. (Source: Bloomberg)
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Soaring Jet Fuel Prices Cool Investor Appetite for Airline Bonds
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Soaring Jet Fuel Prices Cool Investor Appetite for Airline Bonds
       As the US-Iran battle escalates, surging jet fuel prices are driving up borrowing costs for airlines, further dimming the prospects for smaller American carriers.
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Volkswagen Plans 50,000 Job Cuts; Anthropic Nears $15B Credit Deal | The Pulse 9/4/2026
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Volkswagen Plans 50,000 Job Cuts; Anthropic Nears $15B Credit Deal | The Pulse 9/4/2026
       "The Pulse With Francine Lacqua" is all about conversations with high profile guests in the beating heart of global business, economics, finance and politics. Based in London, we go wherever the story is, bringing you exclusive interviews and market-moving scoops.
 
 Today's guests: Nouriel Roubini, Roubini Macro Associa
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] US Yield Swings Abate Before Jobs Data After Volatile Week
-      US Treasuries posted small moves at the end of a volatile week as bondholders awaited a key jobs report for clues on the Federal Reserve’s interest-rate path.
-    · [Bloomberg, 12h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Gold Steadies as Traders Look to US Jobs Data for Fed Clues
-      Gold steadied as traders waited to see whether Friday’s payrolls report will provide the Federal Reserve enough justification to hold off on an interest-rate hike in September.
+    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] European Stocks Briefly Trim Gains as Hot US Jobs Boost Fed Bets
+      European stocks briefly pared gains as traders boosted wagers of a Federal Reserve rate hike following a hotter-than-expected US jobs report. Volkswagen AG shares jumped on plans for a sweeping restructuring at the carmaker.
     · [Bloomberg, 14h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Anthropic Finalizing $15 Billion Pre-IPO Credit Facility
       Anthropic PBC is set to finalize an expansion of its revolving credit facility to $15 billion, according to people familiar with the matter, clearing a hurdle before the artificial intelligence firm’s public filing for its highly anticipated IPO.
-    · [Bloomberg, 14h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] US Stocks and Treasuries Steady Ahead of Jobs Data: Markets Wrap
-      US stocks and Treasuries held steady as traders waited to see whether Friday’s payrolls report will offer the Federal Reserve enough justification to hold off on an interest-rate hike in September.
+    · [Bloomberg, 15h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Stocks and Bonds Fall as Jobs Fuel Fed-Hike Bets: Markets Wrap
+      A stronger-than-anticipated increase in US jobs drove stocks and bonds lower as traders boosted their bets the Federal Reserve will raise rates this month.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-09-11 Inflazione CPI (a/a) (precedente 3.4%) · 2026-09-16 Vendite al dettaglio (m/m) (precedente -0.6%) · 2026-09-17 Manifattura Philly Fed (al posto dell'ISM) (precedente +47.4). ⚠ Per 3 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich), Curva 10A-2A, Treasury USA 30A): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 3 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-3M, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-09-10 ORCL. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
 - Forward P/E S&P 500 [FORWARD, fonte: WSJ (estimate) — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: 21.1× vs media storica 16.5× (Elevato). Valutazioni tese, e la leva va letta CON IL SUO ORIZZONTE: il livello alto dice quanto carburante c'e', ma il verso cambia col periodo che si guarda — i tre orizzonti stanno nella riga LEVA DEGLI OPERATORI qui sotto, e non concordano.
@@ -137,8 +139,8 @@ Today's guests: Nouriel Roubini, Roubini Macro Associa
 - Disaccoppiamento S&P 500 vs PIL reale: gap +48 pp su una finestra di 2.8 anni (azionario +54,3% contro PIL reale +6,3% dal 2023-07-01). ⚠ COME SI LEGGE: è una differenza CUMULATA, quindi cresce meccanicamente con la lunghezza della finestra — la soglia dei "40 pp" citata in letteratura NON è confrontabile con finestre di durata diversa, e su 2.8 anni di mercato al rialzo viene superata quasi sempre. Serve come contesto di valutazione, NON come segnale di uscita.
 - Curva 10A-2A: +0.43 pp (rilevazione 2026-09-03, serie GIORNALIERA FRED T10Y2Y, ultima chiusura) — positiva da tempo — l'ultima inversione risale a 498 sedute fa, quindi NON è una dis-inversione in corso ma una curva normalizzata da tempo
 - Curva vs Recessione (modello storico FRED, stessa curva della riga qui sopra): 12m fa +0.56 pp (media mensile del modello), Curva normale. PIL reale YoY 2.1%, sussidi disocc. 205800. NB: la curva NON si sta irripidendo (oggi 0.43 contro 0.56 di 12 mesi fa): la regola "irripidimento post-inversione → recessione entro ~12 mesi" NON è attiva adesso, e va citata solo se e quando lo diventa.
-- FedWatch prossima riunione 2026-09-16 (fra 11 giorni) (dai futures sui Fed Funds a 30 giorni: tasso implicito 3.82% vs punto medio del range attuale): RIALZO 78% · invariato 22% · taglio 0% · POLYMARKET sulla stessa riunione: sull'INVARIATO Polymarket quota 60% contro il 22% dei futures (38 punti di divergenza) · sul RIALZO quota 40% contro il 78% (38 punti)
-- STRUTTURA A TERMINE DELLE ATTESE FED (dai futures, riunioni successive): 28/10 invariato 10% · rialzo 90% · taglio 0% | 09/12 invariato 0% · rialzo 100% · taglio 0%. La FORMA conta piu' del primo punto: se la probabilita' di rialzo cresce con l'orizzonte, il mercato non sta dicendo "Fed ferma", sta dicendo "ferma per ora".
+- FedWatch prossima riunione 2026-09-16 (fra 11 giorni) (dai futures sui Fed Funds a 30 giorni: tasso implicito 3.79% vs punto medio del range attuale): RIALZO 66% · invariato 34% · taglio 0% · POLYMARKET sulla stessa riunione: sull'INVARIATO Polymarket quota 48% contro il 34% dei futures (14 punti di divergenza) · sul RIALZO quota 52% contro il 66% (14 punti)
+- STRUTTURA A TERMINE DELLE ATTESE FED (dai futures, riunioni successive): 28/10 invariato 22% · rialzo 78% · taglio 0% | 09/12 invariato 10% · rialzo 90% · taglio 0%. La FORMA conta piu' del primo punto: se la probabilita' di rialzo cresce con l'orizzonte, il mercato non sta dicendo "Fed ferma", sta dicendo "ferma per ora".
 
 ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):
 - Innovazione (ARKK): 1M +14,4%, 3M +9%
@@ -175,12 +177,12 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 - Prossime "4 streghe" (quadruple witching): 18/09/2026 (tra 13 gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
-- Will there be no change in Fed interest rates after the September 2026 meeting?: 60% [Δ7g —]
-- Will the Fed increase interest rates by 25 bps after the September 2026 meeting?: 40% [Δ7g —]
-- Fed rate hike in 2026?: 66% [Δ7g —]
-- Will no Fed rate cuts happen in 2026?: 92% [Δ7g —]
-- Will the price of Bitcoin be above $80,000 on September 4?: 90% [Δ7g —]
-- Will the price of Bitcoin be above $84,000 on September 4?: 4% [Δ7g —]
+- Will there be no change in Fed interest rates after the September 2026 meeting?: 48% [Δ7g —]
+- Will the Fed increase interest rates by 25 bps after the September 2026 meeting?: 52% [Δ7g —]
+- Fed rate hike in 2026?: 72% [Δ7g —]
+- Will the price of Bitcoin be above $80,000 on September 4?: 32% [Δ7g —]
+- Will no Fed rate cuts happen in 2026?: 93% [Δ7g —]
+⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -248,32 +250,24 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsNvidia expects its next-generation Vera server CPU to gain terrific traction among multiple customers.
   [BE] · [Nasdaq, 18h fa] Bloom Energy: Unlocking Massive Growth Behind the Meter
       As long-term grid bottlenecks clash with the relentless power requirements of AI, off-grid energy generation has become a necessity.
-  [BE] · [Nasdaq, 19h fa] I'm Calling It: Bloom Energy's Revenue Guidance Will Keep Surprising Wall Street Through Year-End
+  [BE] · [Nasdaq, 20h fa] I'm Calling It: Bloom Energy's Revenue Guidance Will Keep Surprising Wall Street Through Year-End
       Key PointsFuel cell company Bloom Energy has already raised its full-year revenue guidance once this year.
-  [CRWV] · [Nasdaq, 27h fa] Nvidia Beat Earnings Estimates Again (15 Times Straight). History Says the Stock Will Do This Next.
+  [CRWV] · [Nasdaq, 1h fa] CoreWeave vs. Nebius: Which AI Infrastructure Stock Is the Better Buy?
+      Key PointsCoreWeave has greater scale and a solid track record, but its heavy reliance on debt makes its growth more expensive and risky.
+  [CRWV] · [Nasdaq, 28h fa] Nvidia Beat Earnings Estimates Again (15 Times Straight). History Says the Stock Will Do This Next.
       Key PointsDespite beating Wall Street's estimates, Nvidia stock dropped by an average of 4% during the month following the last eight quarterly reports.
-  [CRWV] · [Nasdaq, 29h fa] Should CoreWeave and Nebius Group Investors Be Worried About Circular Financing? Here's What the Numbers Say
-      Key PointsCoreWeave and Nebius Group both have backstops from Nvidia.
   [MRVL] · [Nasdaq, 1h fa] Is Marvell Technology a Millionaire-Maker Stock?
       Key PointsMarvell stock has strong AI-driven growth potential, but its huge run-up this year has already priced in much of the opportunity.
-  [MRVL] · [Nasdaq, 3h fa] Best Semiconductor Stock to Buy: Marvell Stock or Qualcomm Stock?
+  [MRVL] · [Nasdaq, 4h fa] Best Semiconductor Stock to Buy: Marvell Stock or Qualcomm Stock?
       Demand for semiconductors is soaring, and these companies are benefiting.
   [MU] · [Nasdaq, 3h fa] If I Were in My 20s, I'd Buy This Spectacular Nasdaq-100 Index Fund and Hold It Forever
       Key PointsMost of the trillion-dollar technology stocks driving the artificial intelligence (AI) revolution can be found in the Nasdaq-100 index.
-  [MU] · [Nasdaq, 7h fa] Nvidia vs. Micron: Which Is the Better AI Semiconductor Stock to Own for the Next 5 Years?
+  [MU] · [Nasdaq, 8h fa] Nvidia vs. Micron: Which Is the Better AI Semiconductor Stock to Own for the Next 5 Years?
       Key PointsNvidia remains the chip leader for AI training and is well positioned for AI inference and agentic AI.
-  [NVDA] · [Nasdaq, 1h fa] Every Hyperscaler Raised Capex Again. These 3 Boring Industrials Get Paid No Matter Who Wins the AI Race.
-      Key PointsCaterpillar provides much more than heavy equipment.
-  [NVDA] · [Nasdaq, 1h fa] Breakfast News: Week in Review
-      Breakfast News: Week in Review
-
-September 4, 2026
-
-
-
-1. The Cheapest AI Yet Squeezes the Companies Selling It
-
-Source: Image created by Jester AI.
+  [NVDA] · [Nasdaq, 1h fa] CoreWeave vs. Nebius: Which AI Infrastructure Stock Is the Better Buy?
+      Key PointsCoreWeave has greater scale and a solid track record, but its heavy reliance on debt makes its growth more expensive and risky.
+  [NVDA] · [Nasdaq, 1h fa] Pre-Market Most Active for Sep 4, 2026 :  SUNB, AMC, TSLL, IBIT, NVDA, NIO, TQQQ, NOK, LULU, DAIC, PL, BMNR
+      The NASDAQ 100 Pre-Market Indicator is up 50.22 to 29,532.54.  The total Pre-Market volume is currently 108,599,638 shares traded.The following are the most active stocks for the pre-market session: Sunbelt Rentals Holdings, Inc. (SUNB) is -1.02 at $64.97, with 14,745,161 shares
   [ORCL] · [Nasdaq, 1h fa] Breakfast News: Week in Review
       Breakfast News: Week in Review
 
@@ -284,12 +278,12 @@ September 4, 2026
 1. The Cheapest AI Yet Squeezes the Companies Selling It
 
 Source: Image created by Jester AI.
-  [ORCL] · [Nasdaq, 15h fa] Why Is Oracle Stock Up Today?
+  [ORCL] · [Nasdaq, 16h fa] Why Is Oracle Stock Up Today?
       Key PointsShares of Oracle jumped on Thursday, Sept. 3, 2026, as Fed Governor Christopher Waller signaled support for holding interest rates steady if inflation data continues improving.
+  [RGTI] · [Nasdaq, 1h fa] Here's How D-Wave Quantum's Commercial Momentum Is Gaining Strength
+      QBTS' commercial momentum is strengthening as QCaaS revenues, bookings, backlog and production adoption rise despite flat quarterly sales.
   [RGTI] · [Nasdaq, 22h fa] Rigetti's Massive $100M Quantum Opportunity Comes With a Critical Catch
       Rigetti Computing (NASDAQ: RGTI) is gaining strategic validation from government support and paying hardware customers, but the shareholder equation remains unsettled. The upside could grow substantially if those early signals become repeatable demand, provided capital requiremen
-  [RGTI] · [Nasdaq, 24h fa] QUBT Bets on Scale as Rising Costs Weigh on Profitability
-      Quantum Computing is betting on higher production volumes and scalable manufacturing as rising costs and gross losses weigh on profitability.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
 === LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH, APPLICATA A QUESTO LIBRO ===
@@ -346,9 +340,9 @@ I tre dati che questa sezione NON contiene, e senza i quali una quantita' non e'
 === ANALISI STORICA DELLE SERIE MACRO (traiettorie: pendenze, percentili nel range, inversioni) ===
 · HY OAS (spread high yield, serie 1A): 2,66% · Δ1M -4,32% (2026-08-03→2026-09-02) · range 1A [2,6–3,46] · percentile 4° (compressione estrema: il credito non prezza rischio)
 · Curva 10A–2A (serie ~2A): 0,43pp · Δ1M 0pp (2026-08-04→2026-09-03) · Δ3M 0,01pp · ultima inversione 498 sedute fa
-· VIX (spark 30 sedute): 14,3 · ultima seduta -0,35% · percentile finestra 5° · term VIX/VIX3M 0,82 (contango: calma)
+· VIX (spark 30 sedute): 14,2 · ultima seduta -0,84% · percentile finestra 2° · term VIX/VIX3M 0,82 (contango: calma)
 · Treasury 10A (serie ~18M): 4,79% · Δ1M +1,91% (2026-08-03→2026-09-02) · range [3,97–4,79] su 369 rilevazioni · percentile 100° (costo del capitale ai massimi del periodo: e' il canale che comprime i multipli lunghi)
 · Treasury 30A (serie ~18M): 5,27% · Δ1M +0,76% (2026-08-03→2026-09-02) · range [4,41–5,31] su 369 rilevazioni · percentile 99° (parte lunga ai massimi: il mercato chiede premio a termine)
-· Rame (serie ~12M): 6,67 $/lb · Δ1M -0,52% (2026-08-05→2026-09-04) · range [4,48–6,71] (serie giornaliera completa) · percentile 98° sulle 127 rilevazioni campionate qui (input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center)
-· Petrolio WTI (serie ~12M): 90,42 $ · Δ1M +20,21% (2026-08-05→2026-09-04) · range [55,27–112,95] (serie giornaliera completa) · percentile 76° sulle 127 rilevazioni campionate qui
+· Rame (serie ~12M): 6,63 $/lb · Δ1M -1,04% (2026-08-05→2026-09-04) · range [4,48–6,71] (serie giornaliera completa) · percentile 97° sulle 127 rilevazioni campionate qui (input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center)
+· Petrolio WTI (serie ~12M): 90,05 $ · Δ1M +19,72% (2026-08-05→2026-09-04) · range [55,27–112,95] (serie giornaliera completa) · percentile 76° sulle 127 rilevazioni campionate qui
 USO METODOLOGICO: sulle serie macro sia i valori ESTREMI (HY OAS ai minimi del range, VIX ai minimi della sua distribuzione) sia le INVERSIONI DI TENDENZA (spread in allargamento, curva in dis-inversione) sono i due modi in cui questi indicatori hanno storicamente anticipato i punti di svolta.
