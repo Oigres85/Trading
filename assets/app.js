@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "416";
+const BUILD_VERSION = "417";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -13414,6 +13414,22 @@ function buildPromptTicker(tkGrezzo) {
 `e' il fatto: un canale spento sull'anno e acceso sull'ultimo trimestre e' precisamente il caso`,
 `in cui il numero annuale, letto da solo, fa scrivere "nessuna relazione" su cio' che sta`,
 `muovendo il titolo adesso.`,
+/* ⚠⚠ v417 — LA TESTATA DICEVA "LE FINESTRE SONO DUE" E LA CODA PUBBLICAVA TRE RIGHE.
+   La v403 ha aggiunto il terzo sguardo — la regressione sul quinto di sedute in cui il canale ha
+   l'escursione maggiore — e la testata non l'ha mai nominato: chi legge viene istruito che le
+   letture sono due e ne trova tre, quindi tratta la terza come rumore o la salta. E' proprio il
+   blocco aggiunto per la domanda che un libro a leva pone ("il giorno che i tassi saltano, quanto
+   perdo"), cioe' quello che serve di piu'. Classe v413: la testata che contraddice la propria
+   coda, e la v403 l'ha resa incompleta senza accorgersene.
+   ⚠ Si dice anche COSA e', perche' non e' una terza finestra ma un SOTTOINSIEME: il suo R² ha un
+   altro denominatore e la coda lo dichiara riga per riga. Chiamarlo "finestra" inviterebbe a
+   confrontarlo con gli altri due, che e' l'errore che quella dichiarazione esiste per impedire. */
+`⚠ E OLTRE ALLE DUE FINESTRE C'E' UN TERZO SGUARDO, quando i dati lo permettono: la stessa`,
+`regressione sul QUINTO DI SEDUTE in cui il canale si e' mosso di piu'. NON e' una terza finestra`,
+`ed e' calcolato su un sottoinsieme scelto, quindi il suo R² ha un denominatore diverso e non si`,
+`confronta con quello delle altre due — la riga lo dichiara. Cio' che si confronta e' il BETA, e`,
+`risponde alla domanda che le medie non pongono: non quanto si muovono insieme in una giornata`,
+`qualunque, ma quanto pesa il canale nelle giornate che contano.`,
 `Se vuoi sostenere un canale che entrambe le finestre danno sotto il pavimento, di' perche' ti`,
 `aspetti che si accenda ora — un bilancio che cambia, una scadenza di debito, una quota di ricavi`,
 `esteri — e dichiara che stai andando CONTRO la misura. Raccontare il canale dei tassi su un`,

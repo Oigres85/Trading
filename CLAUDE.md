@@ -3548,6 +3548,48 @@ l'etichetta, che è esattamente ciò che il codice deve garantire.
 citava una chiave fra apici inversi. `modifica_sicura` ha rifiutato **entrambe** le scritture e
 il file è rimasto intatto — lo strumento ha fatto il lavoro per cui esiste.
 
+## 🔭 v417 — LA TESTATA DICEVA "LE FINESTRE SONO DUE" E LA CODA NE PUBBLICAVA TRE
+
+Ottavo giro di ricognizione. La v403 ha aggiunto il **terzo sguardo** — la regressione sul quinto
+di sedute in cui il canale ha l'escursione maggiore — e la testata non l'ha **mai nominato**:
+continuava a dire *"⚠⚠ E LE FINESTRE SONO DUE"*. Chi legge viene istruito che le letture sono due
+e ne trova tre su tutti e quattro i canali, quindi tratta la terza come rumore o la salta — ed è
+proprio il blocco aggiunto per la domanda che un libro a leva pone (*"il giorno che i tassi
+saltano, quanto perdo"*), cioè quello che serve di più.
+
+È la classe **v413** — la testata che contraddice la propria coda — e **la v403 l'ha prodotta
+senza accorgersene**, aggiungendo alla coda senza toccare le istruzioni che la descrivono.
+
+⚠ Si dice anche **cosa è**, perché non è una terza finestra ma un **sottoinsieme**: il suo R² ha
+un altro denominatore e la coda lo dichiara riga per riga. Chiamarlo "finestra" inviterebbe a
+confrontarlo con gli altri due, che è precisamente l'errore che quella dichiarazione esiste per
+impedire.
+
+⚠ **Il gate lega le DUE parti**: se la coda rende il terzo sguardo, la testata deve nominarlo E
+dichiararne la natura. Un gate su una parte sola invecchia appena l'altra cambia — validato
+iniettando entrambe le metà.
+
+### 🔬 Il resto del giro è stato meccanico, e non ha trovato niente
+Invece di un'altra lettura lineare ho attaccato la classe dominante con degli scanner:
+- **coppie di campi che la pipeline pubblica per la stessa grandezza**: 39 divergenze
+  (`sma50_dist_pct` a una cifra contro `tv.tecnica…dist_pct` a due) — reali, ma dopo la v415 il
+  payload ne legge **una sola**, quindi non arrivano a chi legge;
+- **conteggi dichiarati contro elementi elencati**: 4=4 sull'autofinanziamento, 5=5 sullo stato
+  complessivo, 8=8 sul gruppo correlato, 5=5 sull'approfondimento, 12 voci di contributo al
+  rischio che sommano a 100,1% col peso escluso dichiarato.
+
+⚠⚠ **E tre "difetti" segnalati dai miei scanner erano artefatti delle mie regex** — si fermavano
+al primo `)` o `.` interno alla riga. *Un allarme va verificato contro il testo vero prima di
+diventare una correzione*: è il rovescio della regola sulle iniezioni che non mordono, e qui mi
+avrebbe fatto "correggere" tre righe corrette.
+
+### 🦴 Un ramo morto, annotato e NON rimosso
+Il ripiego sul campo di riga per la distanza dalle medie è **strutturalmente irraggiungibile**:
+`sma50_dist_pct` richiede ≥50 barre e `batteria_tecnica` ne richiede ≥30, quindi chi ha il primo
+ha sempre il secondo (misurato: 23 righe su 23). È la classe **v234** — *un ramo che non può
+essere raggiunto non è una protezione* — ma rimuoverlo è un **taglio**, e il congelamento lo
+vieta finché il sistema non è stabile. Annotato qui per la fase di potatura.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
