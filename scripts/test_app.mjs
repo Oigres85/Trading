@@ -8578,6 +8578,56 @@ check("v425 gli invarianti reggono su tutti gli stati costruiti, non solo su que
   DATA = JSON.parse(salva); STATO_PTF = salvaPtf; recomputeTotals();
   return guai.length ? guai.slice(0, 5).join(" · ") + (guai.length > 5 ? " (+" + (guai.length - 5) + ")" : "") : true;`));
 
+/* ⚠⚠ v426 — SU UN TITOLO CHE LA PIPELINE NON SEGUE IL SISTEMA NON HA NIENTE, E NON LO DICEVA.
+   Il box accetta qualunque simbolo, e `datiNostriDelTitolo` ritorna "" quando il titolo non e' ne'
+   in portafoglio, ne' fra i seguiti, ne' fra i simboli macro. In quel caso il pacchetto
+   consegnava ~87.000 caratteri di macro, libro e disciplina su un titolo di cui non porta UN
+   numero — e le istruzioni continuavano a rimandare PER NOME al blocco "QUELLO CHE IL SISTEMA SA
+   GIA'", che li' non esiste: e' la classe C10 (rimando a una sezione inesistente), gia' pagata
+   tre volte in questo progetto con "A4", "STEP 3" e "PASSO 0".
+   ⚠ Trovato dal censimento degli stati allargato (v425): con un titolo seguito quel ramo non si
+   accende mai, quindi nessuna lettura lo avrebbe visto.
+   ⚠ Non si correggeva aggiungendo dati che non abbiamo (v396): si DICHIARA il buco e si tolgono
+   i rimandi — forma v406, "il sistema non ha il dato" e "ce l'ha e non te lo passa" si leggono
+   uguali.
+   ⚠ Il check percorre i DUE versi: sul titolo ignoto la dichiarazione c'e' e il rimando no; sul
+   titolo seguito il blocco c'e' e il rimando pure. Un gate che ne esercita uno solo non vedrebbe
+   ne' la sparizione della dichiarazione ne' quella del blocco. */
+check("v426 su un titolo che il sistema non segue il pacchetto lo dichiara e non rimanda al blocco assente",
+  suVeriEsito(`
+  const tutti = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const noti = new Set(tutti.filter(r => r && r.ticker).map(r => String(r.ticker).toUpperCase()));
+  const IGNOTO = ["ZZZQ", "QQZZ", "XYZW"].find(t => !noti.has(t));
+  if (!IGNOTO) return "non trovo un ticker davvero ignoto: il check non misura niente";
+  const seguito = (tutti.find(r => r && r.tv && r.tv.tecnica) || {}).ticker;
+  if (!seguito) return "nessun titolo seguito nei dati: il check non misura niente";
+
+  const guai = [];
+  /* ⚠ IL RIMANDO VA A CAPO nel testo delle istruzioni, quindi una sonda che lo cerca intero non
+     lo trova mai e il check resta verde con il rimando dentro — la prima stesura sbagliava cosi',
+     e l'iniezione non mordeva (v419: non prova che il gate sia inutile, prova che hai iniettato
+     un'altra cosa). Si prende il pezzo che sta su UNA riga sola ed e' unico del rimando:
+     l'INTESTAZIONE del blocco comincia con "===" e non con "nel blocco". */
+  const rimanda = (p) => p.indexOf("nel blocco " + String.fromCharCode(34) + "QUELLO CHE IL") >= 0;
+
+  const pi = buildPromptTicker(IGNOTO);
+  if (pi.indexOf("IL SISTEMA NON HA NESSUN DATO PROPRIO") < 0)
+    guai.push("ignoto: il pacchetto non dichiara di non avere dati su " + IGNOTO);
+  if (pi.indexOf("=== QUELLO CHE IL SISTEMA SA GIA' DI") >= 0)
+    guai.push("ignoto: il blocco dati compare su un titolo che il sistema non ha");
+  if (rimanda(pi))
+    guai.push("ignoto: le istruzioni rimandano ancora al blocco 'QUELLO CHE IL SISTEMA SA GIA'', che non c'e'");
+
+  const ps = buildPromptTicker(String(seguito).toUpperCase());
+  if (ps.indexOf("=== QUELLO CHE IL SISTEMA SA GIA' DI") < 0)
+    guai.push("seguito: il blocco dati e' sparito da " + seguito);
+  if (ps.indexOf("IL SISTEMA NON HA NESSUN DATO PROPRIO") >= 0)
+    guai.push("seguito: dichiara di non avere dati su un titolo che segue");
+  if (!rimanda(ps))
+    guai.push("seguito: le istruzioni non rimandano piu' al blocco dati che c'e'");
+
+  return guai.length ? guai.join(" · ") : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
