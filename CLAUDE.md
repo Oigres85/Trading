@@ -3685,6 +3685,40 @@ vieta — `ord` esteso ai titoli seguiti ma non posseduti — il gate morde e ri
 > e vale anche al rovescio: un'iniezione che non morde non prova che il gate sia inutile — prova
 > che hai iniettato un'altra cosa.
 
+## 🏷️ v420 — GLI STATI ERANO TRE, NON DUE, E IL TERZO AFFERMAVA IL FALSO
+
+Undicesimo giro, dedicato alla variante meno esercitata: il pacchetto di un titolo che il sistema
+segue ma il CEO **non possiede**. L'intestazione del blocco del libro diceva:
+
+> `=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ===`
+
+su TSM, che **non compare fra le tredici posizioni elencate due righe più sotto**. La condizione
+era `tkCorrente`, vero per QUALSIASI pacchetto di titolo, mentre l'affermazione riguarda
+l'appartenenza al libro.
+
+⚠⚠ **E contraddiceva il blocco 0 della stessa testata**, che su un titolo non posseduto chiede
+correttamente *"a quale prezzo diventa interessante"* — cioè lo inquadra come INGRESSO. Il
+lettore riceve due inquadramenti opposti dello stesso titolo nello stesso pacchetto: tenere o
+comprare.
+
+> È la **stessa classe della v419**, chiusa il giorno prima un livello più sotto (la
+> dichiarazione del taglio che si accendeva su un titolo non posseduto). La stessa condizione
+> sbagliata sopravviveva nell'intestazione. **Quando si corregge un predicato si cercano TUTTI i
+> punti che lo usano** — averne corretto uno non è averlo corretto.
+
+⚠ Il terzo stato non è una versione annacquata del secondo: dice una cosa **in più e utile** —
+che il titolo *entrerebbe* in questo libro, che è il contesto in cui la disciplina di rischio e
+il gruppo correlato più sotto vanno letti (v410: un nome dentro il gruppo già misurato non
+diversifica, aggiunge alla stessa scommessa).
+
+⚠ **Una derivazione sola**: l'intestazione e la dichiarazione del taglio rispondono alla stessa
+domanda ("il titolo in esame è fra le posizioni?") e la calcolavano due volte. Ora `tolto` è
+`inLibro` — due risposte alla stessa domanda divergono al primo ritocco (v161, v207, v316).
+
+⚠ **I gate percorrono i TRE stati** (macro · titolo posseduto · titolo non posseduto): un gate
+che ne esercita due non avrebbe visto il terzo, che è esattamente com'è nato il difetto — e come
+è nato quello della v419.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

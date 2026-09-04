@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "419";
+const BUILD_VERSION = "420";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10483,9 +10483,28 @@ function contestoPortafoglio(tkCorrente) {
      la testata gli ordina due schermate prima — ed e' precisamente la contraddizione che il
      collaudo B5 gli impone di segnalare, prodotta dal pacchetto stesso.
      ⚠ Stessa classe della v405: una riga scritta per UN contesto e resa in DUE. */
-  L.push(tkCorrente
-    ? "=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ==="
-    : "=== IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===");
+  /* ⚠⚠ v420 — GLI STATI SONO TRE, NON DUE, E IL TERZO AFFERMAVA IL FALSO.
+     La condizione era `tkCorrente`, che e' vero per QUALSIASI pacchetto di titolo — posseduto o
+     no — mentre l'intestazione dice "IL LIBRO IN CUI QUESTA POSIZIONE VIVE". Analizzando TSM,
+     che il sistema segue ma il CEO non ha, quella riga afferma che TSM sia una posizione del
+     libro: non lo e', e non compare fra le tredici elencate due righe piu' sotto.
+     ⚠ E CONTRADDICE IL BLOCCO 0 DELLA STESSA TESTATA, che su un titolo non posseduto chiede
+     correttamente "a quale prezzo diventa interessante" — cioe' lo inquadra come INGRESSO. Il
+     lettore riceve due inquadramenti opposti dello stesso titolo nello stesso pacchetto.
+     ⚠ Stessa classe della v419, che ho chiuso un livello piu' sotto (la dichiarazione del taglio
+     che si accendeva su un titolo non posseduto): la stessa condizione sbagliata sopravviveva
+     nell'intestazione. Quando si corregge un predicato, si cercano TUTTI i punti che lo usano.
+     ⚠ Il terzo stato non e' una versione annacquata del secondo: dice una cosa in piu' e utile —
+     che il titolo entrerebbe in questo libro, che e' il contesto in cui la disciplina di rischio
+     e il gruppo correlato piu' sotto vanno letti (v410: un nome dentro il gruppo gia' misurato
+     non diversifica, aggiunge alla stessa scommessa). */
+  const inLibro = !!tkCorrente && azionarie.some(x => x && x.r
+    && String(x.r.ticker).toUpperCase() === String(tkCorrente).toUpperCase());
+  L.push(!tkCorrente
+    ? "=== IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ==="
+    : inLibro
+      ? "=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ==="
+      : `=== IL LIBRO IN CUI QUESTO TITOLO ENTREREBBE — ${String(tkCorrente).toUpperCase()} NON E' FRA LE POSIZIONI (contesto, non richiesta di analisi del portafoglio) ===`);
   const fuori = fuoriAzionarioEur();
   if (fuori) {
     const tot = totAz + fuori.totale;
@@ -10538,8 +10557,10 @@ function contestoPortafoglio(tkCorrente) {
      non ha il dato" e "ce l'ha e non te lo passa" si leggono uguali e sono cose diverse. */
   /* il titolo in esame e' stato DAVVERO tolto solo se stava fra le posizioni: su un titolo che
      il CEO non possiede non c'e' nessun taglio da dichiarare. */
-  const tolto = !!tkCorrente && ord.some(x => x && x.r
-    && String(x.r.ticker).toUpperCase() === String(tkCorrente).toUpperCase());
+  /* ⚠ v420 — UNA DERIVAZIONE SOLA: `tolto` e l'intestazione rispondono alla STESSA domanda
+     ("il titolo in esame e' fra le posizioni?") e la calcolavano due volte. Due derivazioni
+     della stessa domanda divergono al primo ritocco — v161, v207, v316. */
+  const tolto = inLibro;
   const righeTec = ord.map(x => {
     const r = x.r, s = r.stats || {};
     if (tolto && String(r.ticker).toUpperCase() === String(tkCorrente).toUpperCase()) return null;
