@@ -1,4 +1,4 @@
-⟦ BUILD v427 · generato 04/09/2026 21:55 ⟧
+⟦ BUILD v427 · generato 04/09/2026 22:10 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 04/09/2026, 21:55:58 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 17:55, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,16% · Fut S&P -0,55% · BTC -2,02% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~63.6h); il "→ agg." incorpora già il gap after.
+DATI AL 04/09/2026, 22:10:22 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 18:10, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,16% · Fut S&P -0,55% · BTC -1,96% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~63.3h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 04/09/2026, 21:55:58, prossimo run 04/09/2026, 22:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-04.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 04/09/2026, 22:10:22, prossimo run 05/09/2026, 04:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-04.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-04) · Curva 10A-3M (2026-09-04) · Treasury USA 30A (2026-09-03) · Tasso reale 10A (TIPS) (2026-09-03) · Inflazione attesa 10A (breakeven) (2026-09-04) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -72,7 +72,7 @@ QUADRO MACRO:
 - Fed Funds Rate: range ATTUALE 3.50–3.75% · tasso implicito futures 3.78% · PROSSIMA RIUNIONE FOMC: 16/09/2026 (il tasso resta valido fino alla prossima decisione FOMC)
 - Carry USA-Giappone: spread tassi 10A 1,82 pp (US10A 4.78%, JGB10A 2.97%), USD/JPY 156.22 (-0,83% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1.15 — prevalgono put = copertura/pessimismo (estremi = contrarian rialzista) (put 4456416, call 3890192)
-- Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,7% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $68B su $880B di BIL+SHV+SPY (SPY da solo $812B)) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, riferito a luglio 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
+- Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,9% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $68B su $863B di BIL+SHV+SPY (SPY da solo $795B)) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, riferito a luglio 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
 - Righello Dollaro (DXY): 99.16 · 3 mesi -0,89% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7718,6 vs SMA125 7308,43 (+5,61%) · Nasdaq 100 29.544,15 vs SMA125 28.096,77 (+5,15%) — sopra = trend primario integro, sotto = deterioramento.
 - Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 29.523 (-0,16%) · S&P 500 (ES) 7715 (-0,55%) — in calo oltre il rumore: apertura USA attesa in gap-down.
@@ -101,7 +101,7 @@ QUADRO MACRO:
       Ketaki Sharma, founder and CEO of Algorithm Research, says the inflation is the main factor to watch in assessing the the bond market and the Federal Reserve’s next move. She speaks on "Horizons: Middle East and Africa." (Source: Bloomberg)
     · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Honey Deuces, Tickets, Merch: US Open Spending
       Bloomberg's Lisa Mateo joins Scarlet Fu and Tom Keene on "Bloomberg Money." They discuss how people are spending their money at the US Open. (Source: Bloomberg)
-    · [CNBC Economia, 3h fa] Women accounted for almost all of job gains in August. Here's why
+    · [CNBC Economia, 4h fa] Women accounted for almost all of job gains in August. Here's why
       Women accounted for virtually all of August's payroll gains, the latest sign of their growing power in the labor market.
     · [CNBC Economia, 5h fa] U.S. payrolls rose 162,000 in August, much more than expected; unemployment rate at 4.1%
       Nonfarm payrolls were expected to increase by 53,000 in August while the unemployment rate held at 4.1%, according to the Dow Jones consensus.
@@ -234,7 +234,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (74,3% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
   [AMD] · [Nasdaq, 7h fa] Intel Witnesses an Uptrend in Estimate Revisions: Is it Worth Buying?
       INTC's estimate revisions point higher as AI demand, manufacturing gains and expanding custom silicon offset supply and competition risks.
-  [AMD] · [Nasdaq, 7h fa] SMCI Rises 29% Year to Date: Time to Buy, Sell or Hold the Stock?
+  [AMD] · [Nasdaq, 8h fa] SMCI Rises 29% Year to Date: Time to Buy, Sell or Hold the Stock?
       Super Micro Computer gains 29% YTD as record backlog, AI partnerships and rising shipments fuel growth, while improving margins add to its appeal.
   [BE] · [Nasdaq, 8h fa] Zacks Investment Ideas feature highlights: Bloom Energy and Tesla
       Bloom Energy's on-site power systems could help address AI data center power shortages as grid bottlenecks persist and demand accelerates.
@@ -248,13 +248,13 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Looking at options trading activity among components of the S&amp;P 500 index, there is noteworthy activity today in GE Aerospace (Symbol: GE), where a total volume of 35,893 contracts has been traded thus far today, a contract volume which is representative of approximately 3.6
   [MRVL] · [Nasdaq, 5h fa] Why Marvell Stock Rallied Today
       Key PointsAI chip and infrastructure stocks got a lift from Nvidia's acquisition of Hugging Face.
-  [MU] · [Nasdaq, 3h fa] The Nasdaq, S&P 500, and Dow All Fell Slightly Friday. The Jobs Report Wasn't Really Why.
+  [MU] · [Nasdaq, 4h fa] The Nasdaq, S&P 500, and Dow All Fell Slightly Friday. The Jobs Report Wasn't Really Why.
       Key PointsThe Nasdaq Composite fell 0.3%, the S&amp;P 500 0.4%, and the Dow 0.5% by early Friday afternoon.
   [MU] · [Nasdaq, 5h fa] Micron vs. Sandisk: Which AI Memory Stock Is the Better Buy?
       Key PointsSandisk's sales rose 372% in the most recent quarter.
-  [NVDA] · [Nasdaq, 1h fa] After Hours Most Active for Sep 4, 2026 :  NIO, INTC, TEVA, AMZN, F, NVDA, XOM, KO, CNH, ABUS, META, SMCI
+  [NVDA] · [Nasdaq, 2h fa] After Hours Most Active for Sep 4, 2026 :  NIO, INTC, TEVA, AMZN, F, NVDA, XOM, KO, CNH, ABUS, META, SMCI
       The NASDAQ 100 After Hours Indicator is down -45.18 to 29,498.97.  The total After hours volume is currently 112,199,562 shares traded.The following are the most active stocks for the after hours session: NIO Inc. (NIO) is +0.0015 at $3.80, with 7,386,156 shares traded. NIO's cur
-  [NVDA] · [Nasdaq, 1h fa] Jensen Huang Said This Word Exactly 1 Time During Nvidia's Earnings Call, and That Was Enough to Put Artificial Intelligence (AI) Bubble Fears to Rest
+  [NVDA] · [Nasdaq, 2h fa] Jensen Huang Said This Word Exactly 1 Time During Nvidia's Earnings Call, and That Was Enough to Put Artificial Intelligence (AI) Bubble Fears to Rest
       Key PointsThe top five AI hyperscalers are expected to spend close to $800 billion on capex this year and $1.3 trillion next year.
   [ORCL] · [Nasdaq, 7h fa] Snowflake Gains 17% Post Q2 Earnings: Buy, Sell or Hold the Stock?
       SNOW stock jumps 16.6% after Q2 second-quarter results as AI adoption, enterprise growth, and higher product revenue guidance fuel momentum.
@@ -268,7 +268,7 @@ September 4, 2026
 1. The Cheapest AI Yet Squeezes the Companies Selling It
 
 Source: Image created by Jester AI.
-  [RGTI] · [Nasdaq, 8h fa] Should You Invest in Rigetti Computing (RGTI) Based on Bullish Wall Street Views?
+  [RGTI] · [Nasdaq, 9h fa] Should You Invest in Rigetti Computing (RGTI) Based on Bullish Wall Street Views?
       Based on the average brokerage recommendation (ABR), Rigetti Computing (RGTI) should be added to one's portfolio. Wall Street analysts' overly optimistic recommendations cast doubt on the effectiveness of this highly sought-after metric. So, is the stock worth buying?
   [RGTI] · [Nasdaq, 10h fa] Here's How D-Wave Quantum's Commercial Momentum Is Gaining Strength
       QBTS' commercial momentum is strengthening as QCaaS revenues, bookings, backlog and production adoption rise despite flat quarterly sales.
