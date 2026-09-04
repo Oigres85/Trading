@@ -971,8 +971,17 @@ check("v261 il payload dichiara la data della barra, non solo l'ora del run", su
   DATA.portfolio.forEach(r => { r.price_asof = "2026-08-07"; });
   (DATA.watchlist || []).forEach(r => { r.price_asof = "2026-08-07"; });
   const t = buildPrompt();
-  return /LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-07/.test(t)
-      && /non sono prezzi di adesso/.test(t)`));
+  /* ⚠ un [^backslash-n] dentro un template passato al vm diventa un NEWLINE VERO, e un a capo
+     dentro un letterale di espressione regolare e' un errore di sintassi: il check moriva in
+     eccezione. E' il fratello della trappola dei backslash gia' scritta in CLAUDE.md, su una
+     sequenza che il meta-gate non copriva. Il rimedio e' quello di sempre: indexOf, che non ha
+     niente da sfuggire (v400, v409). */
+  const iBarra = t.indexOf("LA BARRA GIORNALIERA SOTTO");
+  return iBarra >= 0 && t.slice(iBarra, iBarra + 120).indexOf("2026-08-07") >= 0
+      && /non sono prezzi di adesso/.test(t)
+      /* ⚠ e con tutte le sedute allineate NON deve comparire la dichiarazione di
+         disallineamento: qui sopra sono state messe tutte alla stessa data. */
+      && t.indexOf("MA NON TUTTE") < 0`));
 
 /* ── v261 — la pipeline scrive l'asof: il gate legge il SORGENTE, non i dati (il CI non ha ancora girato) ── */
 {
@@ -3699,8 +3708,9 @@ check("v284 opzioni: la scheda e il pacchetto dichiarano se la scadenza non e' l
 check("v286 opzioni: volumi e contratti aperti sono etichettati per quello che sono", (() => {
   const i = src.indexOf("function datiNostriDelTitolo");
   const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /volumi scambiati oggi/.test(corpo) && /CONTRATTI APERTI/.test(corpo)
-      && /grandezza diversa dai volumi/.test(corpo);
+  return /volumi scambiati[^"`]*: put/.test(corpo) && /CONTRATTI APERTI/.test(corpo)
+      && /grandezza diversa dai volumi/.test(corpo)
+      && !/volumi scambiati oggi/.test(corpo);
 })());
 
 /* ⚠ v398 — DICIOTTESIMA rottura di un check ancorato a una stringa letterale: pretendeva
@@ -4902,7 +4912,13 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
   for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
-    for (const b of t.matchAll(/(?<!\\)\\[dwsbDWSB]/g)) {
+    /* ⚠⚠ v422 — LA CLASSE SI ALLARGA A n/r/t/0, e la ragione e' peggiore delle altre: dentro un
+       template `barra-n` diventa un A CAPO VERO, e un a capo dentro un letterale di espressione
+       regolare NON e' una regex che non matcha — e' un ERRORE DI SINTASSI dentro il vm, cioe' un
+       check che muore in eccezione. Costato un giro in questa stessa versione, scrivendo
+       [^barra-n] in un gate riagganciato. Nel progetto l'idioma corretto esiste gia' ed e'
+       String.fromCharCode(10): non c'e' nessun uso legittimo di queste sequenze qui dentro. */
+    for (const b of t.matchAll(/(?<!\\)\\[dwsbDWSBnrt0]/g)) {
       sospetti.push(t.slice(Math.max(0, b.index - 28), b.index + 10).replace(/\n/g, "⏎"));
     }
   }
@@ -8294,6 +8310,85 @@ check("v421 il peso del gruppo correlato esce con lo stesso numero in ogni blocc
     if (t3.size > 1) guai.push(nome + ": il peso delle prime tre esce con " + t3.size
       + " valori diversi (" + [...t3.keys()].join(" e ") + ")");
   }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v422 — "oggi" ACCANTO A UN NUMERO CHE NON E' DI OGGI, IN TRE SEDI CHE LA v416 NON
+   COPRIVA. Il gate v416 cercava DUE FORME letterali ("% oggi)" e "· oggi ") e quindi non vedeva
+   ", oggi -13%" sulla scheda del titolo, "volumi scambiati oggi" sulle opzioni, ne' "oggi 0.43"
+   sulla curva. Non si e' rotto: non ha mai coperto quei casi — un gate ancorato a una FORMA
+   sorveglia le occorrenze che l'autore aveva in mente, non la proprieta'.
+   ⚠ E le tre sedi erano contraddette dal pacchetto stesso: il guadagno dal carico stava quattro
+   righe sopra "Variazione della seduta del 03/09/2026: +4,49% — NON e' la seduta di oggi"; i
+   volumi delle opzioni si dicevano "di oggi" mentre due righe sotto il pacchetto dichiara che
+   lo snapshot e' stato preso FUORI dalla sessione regolare (book vuoto); la curva porta la
+   propria rilevazione del 03/09.
+   ⚠ LA PROPRIETA', non la forma: "oggi" puo' stare accanto a un numero SOLO se la stessa riga
+   dichiara che la rilevazione e' odierna — che e' esattamente il ramo legittimo della v193, dove
+   il VIX scrive "oggi" solo quando lo snapshot e' davvero di oggi. Cosi' il gate copre anche le
+   sedi che verranno. */
+check("v422 nessun numero porta l'avverbio 'oggi' senza dichiarare la rilevazione odierna", suVeriEsito(`
+  const guai = [];
+  const NL = String.fromCharCode(10);
+  const rx = new RegExp("oggi[^" + NL + "]{0,14}?[-+]?[0-9]|[-+]?[0-9][^" + NL + "]{0,6}?[ ]oggi([ ]|[)]|,|$)", "g");
+  for (const [nome, p] of [["macro", buildCIOText()],
+                           ["titolo", buildPromptTicker("CRWV")]]) {
+    for (const r of p.split(NL)) {
+      /* le ISTRUZIONI parlano di "oggi" come concetto ("un dato di due mesi non e' lo stato di
+         oggi"): la regola riguarda i FATTI, cioe' le righe di dati, che cominciano con "- ". */
+      if (r.slice(0, 2) !== "- ") continue;
+      rx.lastIndex = 0;
+      const m = rx.exec(r);
+      if (!m) continue;
+      if (r.indexOf("rilevazione odierna") >= 0) continue;   // ramo legittimo v193
+      guai.push(nome + ": " + r.slice(0, 110));
+    }
+  }
+  return guai.length ? guai.slice(0, 4).join(" · ") : true;`));
+
+/* ⚠ e il ramo legittimo deve restare RAGGIUNGIBILE: un check che vieta e basta passerebbe anche
+   se "oggi" sparisse del tutto, e allora il VIX di giornata non si distinguerebbe piu' da uno
+   di ieri (v406 — togliere in silenzio e' peggio del difetto). */
+check("v422 il ramo 'rilevazione odierna' esiste ancora e porta il proprio numero", suVeriEsito(`
+  const p = buildCIOText();
+  const NL = String.fromCharCode(10);
+  const riga = p.split(NL).find(r => r.indexOf("rilevazione odierna") >= 0);
+  if (!riga) return true;   // oggi lo snapshot non e' odierno: il ramo non si rende, e va bene
+  return /[-+][0-9]+(,[0-9]+)?%[ ]oggi/.test(riga) ? true
+    : "il ramo odierno c'e' ma non porta piu' la variazione accanto: " + riga.slice(0, 90);`));
+
+/* ⚠⚠ v422 — LA RIGA DI FRESCHEZZA AFFERMAVA UNA DATA SOLA MENTRE ALCUNE RIGHE NE PORTANO
+   UN'ALTRA. Misurato sul run delle 13:06: l'intestazione diceva "LA BARRA GIORNALIERA SOTTO
+   QUEI NUMERI E' DEL 2026-09-03 … non sono prezzi di adesso" e il VIX, che quella stessa
+   intestazione NOMINA fra "quei numeri", dichiarava rilevazione odierna. E' la v186 su un altro
+   blocco: l'invariante non e' che le date coincidano — non dipende da noi — ma che quando NON
+   coincidono il pacchetto lo DICHIARI.
+   ⚠ Lo stato si COSTRUISCE in entrambi i versi: una riga piu' fresca dev'essere dichiarata, e
+   con tutte le sedute allineate la dichiarazione NON deve comparire — una riga che avvisa
+   sempre non avvisa. */
+check("v422 la riga di freschezza dichiara le quotazioni piu' fresche della maggioranza", suVeriEsito(`
+  const az = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r && typeof r.price_asof === "string" && !/(-(USD|USDT|EUR)|=[XF])$/i.test(String(r.ticker || "")));
+  if (az.length < 4) return "meno di quattro quotazioni datate: il check non misura niente";
+  const NL = String.fromCharCode(10);
+  const testa = () => (buildCIOText().split(NL).find(r => r.indexOf("DATI DI MERCATO (") >= 0) || "");
+  const guai = [];
+
+  const base = az[0].price_asof;
+  for (const r of az) r.price_asof = base;                    // tutte sulla stessa seduta
+  const allineate = testa();
+  if (allineate.indexOf("MA NON TUTTE") >= 0)
+    guai.push("con tutte le sedute allineate la riga dichiara comunque un disallineamento");
+
+  const dopo = new Date(Date.parse(base + "T00:00:00") + 86400000).toISOString().slice(0, 10);
+  az[0].price_asof = dopo;                                    // una sola riga piu' avanti
+  const sfasate = testa();
+  if (sfasate.indexOf("MA NON TUTTE") < 0)
+    guai.push("una quotazione ha la barra del giorno dopo e la riga di freschezza non lo dichiara");
+  if (sfasate.indexOf(dopo) < 0)
+    guai.push("il disallineamento e' dichiarato ma senza dire di quale seduta si tratta");
+  if (sfasate.indexOf(base) < 0)
+    guai.push("la data della maggioranza e' sparita dalla riga");
+
   return guai.length ? guai.join(" · ") : true;`));
 
 let fail = 0;

@@ -3719,6 +3719,102 @@ domanda ("il titolo in esame è fra le posizioni?") e la calcolavano due volte. 
 che ne esercita due non avrebbe visto il terzo, che è esattamente com'è nato il difetto — e come
 è nato quello della v419.
 
+## 🪞 v421 — L'HARNESS LEGGEVA IL RAMO SBAGLIATO, E PER UNDICI GIRI
+
+Dodicesimo giro. Prima dei difetti, **un difetto del metodo**: il mio harness lasciava
+`STATO_PTF` nullo (la `fetch` è rifiutata fuori dal browser), quindi ho letto per undici giri il
+ramo del blocco dei pesi che dichiara cassa e BTP **non disponibili**. In produzione
+`config/portfolio_state.json` c'è e il ramo è l'altro. Due dei tre difetti di questo giro vivono
+lì dentro.
+
+> **Un harness che semplifica un ingresso non produce un pacchetto più semplice: ne produce uno
+> DIVERSO, e i difetti dell'altro ramo restano invisibili quanto quelli di un ramo raro** (v190).
+> Prima di leggere un pacchetto, va verificato che l'harness percorra i rami della produzione.
+
+| difetto | cosa affermava | cosa era vero |
+|---|---|---|
+| **la riga dei tre dati** | *"la liquidità disponibile del CEO … **Nessuno dei tre è nel sistema**"* | venti righe sopra: *"l'azionario vale l'85,6% del totale, accanto a **liquidità (al 2026-08-08)** e titoli di Stato"* — quel denominatore la contiene |
+| **le fonti delle notizie** | *"(fonti: CNBC, Bloomberg, MarketWatch)"* | MarketWatch aveva servito **zero** voci; il feed rispondeva, ma "letta e muta" e "NON letta" si leggono uguali |
+| **la concentrazione** | 74% / 58% nel blocco CONCENTRAZIONE | **73,6% / 58,5%** nella DISCIPLINA e 74% nelle NOTIZIE — la stessa derivazione, tre rese |
+
+⚠⚠ **Sul primo il danno non è il falso positivo di B5: è che IL DIVIETO DI DIMENSIONARE POGGIA
+SU QUELLA RIGA.** Un lettore che trova la premessa smentita conclude che il divieto sia
+eccessivo e comincia a dimensionare — la cosa che tutto il pacchetto esiste per impedire. La
+correzione non toglie né il divieto né il denominatore: dice **esattamente** cosa il sistema ha
+(una cifra annotata a mano, datata, su UN conto) e perché non basta. Forma v406/v409.
+
+⚠⚠ **Il secondo è la v389 per una via nuova, e il gate non poteva vederlo**: `validate_macro`
+sorveglia l'età **aggregata**, quindi due fonti vive su tre tengono il totale fresco e la terza
+può morire in silenzio per sempre. Ora una fonte **non raggiunta** alza il proprio allarme; una
+fonte **muta** no, perché è il caso normale — *un gate che suona sempre viene ignorato proprio
+quando serve*. E finché il CI non rigenera, la riga **dichiara di non poter distinguere** invece
+di affermare ciò che non sa.
+
+⚠⚠ **Il terzo è peggiore di una semplice divergenza**, perché fra i due blocchi c'è scritto
+*"QUESTE MISURE SONO LE STESSE: contale UNA VOLTA SOLA"*. **Dichiarare che due numeri sono lo
+stesso e poi stamparli diversi è peggio che non dichiararlo.** Nessuna tolleranza (v415): fra due
+rese della STESSA grandezza dalla STESSA fonte i numeri devono **coincidere**. Una formattazione
+sola a livello di modulo (`pct1`), invece di quattro `toFixed(0)` da tenere allineati a mano.
+
+### 🧨 E il mio gate è stato sbagliato due volte, nei versi opposti
+Prima **troppo largo** — `posizioni = N% dell'azionario` prendeva anche la finestra delle
+trimestrali (70,9%) e la dipendenza dal mercato dei capitali (17,4%), grandezze **diverse**: rosso
+su codice giusto, e mi avrebbe fatto "correggere" due righe corrette. Poi, stretto con una
+**lookahead condivisa**, ha smesso di mordere: la lookahead scritta per una sede ne spegneva
+un'altra. Sesta incarnazione dell'ancoraggio aperto **e la sua conseguenza**.
+> Ogni sede vuole il proprio ancoraggio chiuso, e un **pavimento sulle sedi trovate** perché il
+> gate non possa addormentarsi in silenzio.
+
+⚠ **Ventisettesima e ventottesima rottura di un check ancorato a una stringa letterale**, e
+tutte e due **su codice più corretto di prima**: v348 e v398 pretendevano la percentuale come
+INTERO.
+
+## 🕐 v422 — "OGGI" ACCANTO A TRE NUMERI CHE NON ERANO DI OGGI
+
+Il gate v416 cercava **due forme letterali** (`% oggi)` e `· oggi `) e quindi non ha mai coperto
+`, oggi -13%`, `volumi scambiati oggi`, `oggi 0.43`. **Non si è rotto: non copriva.**
+> *Un gate ancorato a una FORMA sorveglia le occorrenze che l'autore aveva in mente, non la
+> proprietà.* Ora la proprietà è una: **"oggi" può stare accanto a un numero solo se la stessa
+> riga dichiara la rilevazione odierna** — che è il ramo legittimo della v193.
+
+| sede | cosa diceva | cosa lo contraddiceva, nello stesso pacchetto |
+|---|---|---|
+| scheda del titolo | *"105 quote a un carico di 97,199, **oggi -13%**"* | quattro righe sotto: *"Variazione della seduta del 03/09: +4,49% — **NON è la seduta di oggi**"* |
+| opzioni | *"**volumi scambiati oggi**: put 5431, call 9137"* | due righe sotto: *"il book è vuoto … succede quando lo SNAPSHOT è preso FUORI dalla sessione regolare"* — alle 09:06 ET nessuna seduta ha scambiato |
+| curva | *"**oggi** 0.43 contro 0.56 di 12 mesi fa"* | la riga porta la propria rilevazione, 03/09 |
+
+⚠ Sul primo il rimedio non è una didascalia ma il **nome della grandezza** — `-13% dal carico` —
+che è anche quello che il blocco del libro usa già: una formulazione sola per una grandezza sola.
+
+### 🕰️ E la riga di freschezza affermava una data sola mentre alcune righe ne portavano un'altra
+*"⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI È DEL 2026-09-03 … non sono prezzi di adesso"* e, dieci
+righe sotto, *"VIX 14.2 (-0,84% oggi — **rilevazione odierna**)"* — su un VIX che quella stessa
+intestazione **nomina** fra "quei numeri". Entrambe vere di righe diverse (2 quotazioni su 19
+avevano già la barra del 04/09), e contraddittorie per chi legge — proprio dove il collaudo B5
+manda il lettore per primo.
+
+> È la **v186 su un altro blocco**: l'invariante non è che le date coincidano — non dipende da noi
+> — ma che quando **non** coincidono il pacchetto lo **dichiari**. La v415 aveva scelto la
+> maggioranza invece del massimo, che era giusto, e aveva lasciato implicito che *una maggioranza
+> esiste solo se qualcuno sta fuori*.
+
+⚠ Una derivazione sola: `sedutePrezzi()` risponde con la distribuzione e `ultimaBarraDisponibile()`
+ne è la vista — un secondo conteggio divergerebbe al primo ritocco (v161, v207, v316).
+
+### 🦴 Trentesima rottura di un check letterale, e la specie peggiore
+**v286 PRETENDEVA la stringa `volumi scambiati oggi`**, cioè esattamente l'etichetta falsa. *Un
+gate che pinna un difetto lo rende permanente* (v326, v411, v415). Riagganciato all'invariante:
+volumi e contratti aperti restano etichettati come grandezze diverse, **e "oggi" non rientra**.
+(La ventinovesima è v261, che pretendeva `SOTTO QUEI NUMERI`.)
+
+### 🔧 Lo strumento è cambiato, non l'attenzione
+Scrivendo un gate riagganciato ho messo `[^\n]` dentro un template passato al vm: `\n` diventa
+un **a capo vero**, e un a capo dentro un letterale di espressione regolare **non** è una regex
+che non matcha — è un **errore di sintassi dentro il vm**, cioè un check che muore in eccezione.
+Il meta-gate dei backslash copriva `\d \w \s \b` e le virgolette, non questa. Ora copre anche
+`n r t 0`: nel progetto l'idioma corretto esiste già (`String.fromCharCode(10)`) e non c'è nessun
+uso legittimo di quelle sequenze lì dentro. Validato per iniezione.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

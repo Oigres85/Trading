@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "421";
+const BUILD_VERSION = "422";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2012,7 +2012,21 @@ function prossimoRunPipeline(adesso = new Date()) {
    spostarla. A parita' di frequenza vince la piu' recente. */
 const SEMPRE_APERTI = /(-(USD|USDT|EUR)|=[XF])$/i;   // BTC-USD, EURUSD=X, ES=F: quotano a borse chiuse
 
-function ultimaBarraDisponibile() {
+/* ⚠⚠ v422 — LA RIGA DI FRESCHEZZA AFFERMAVA UNA DATA SOLA MENTRE IL VIX NE DICHIARAVA
+   UN'ALTRA. Misurato sul run delle 13:06 del 04/09: l'intestazione diceva "LA BARRA GIORNALIERA
+   SOTTO QUEI NUMERI E' DEL 2026-09-03 — 1 giorno fa … non sono prezzi di adesso", e dieci righe
+   sotto "- VIX: 14.2 (-0,84% oggi — rilevazione odierna)". Entrambe vere di righe DIVERSE — il
+   VIX ha la barra piu' fresca, la maggioranza no — e l'intestazione nomina esplicitamente il VIX
+   fra "quei numeri", quindi le due si contraddicono per chi legge. E il collaudo B5 manda il
+   lettore proprio li': "FRESCHEZZA. Dati di mercato: la barra giornaliera dichiarata in cima".
+   ⚠ E' la v186 su un altro blocco: l'invariante NON e' che le date coincidano — non dipende da
+   noi — ma che quando NON coincidono il pacchetto lo DICHIARI. La v415 ha scelto la maggioranza
+   invece del massimo, che era la scelta giusta, e ha lasciato implicito che una maggioranza
+   esiste solo se qualcuno sta fuori.
+   ⚠ UNA DERIVAZIONE SOLA: `ultimaBarraDisponibile` resta la risposta alla domanda "qual e' la
+   data delle quotazioni", e la distribuzione esce dalla stessa funzione invece che da un
+   secondo conteggio che divergerebbe al primo ritocco (v161, v207, v316). */
+function sedutePrezzi() {
   const date = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .filter(r => r && !SEMPRE_APERTI.test(String(r.ticker || "")))
     .map(r => r && r.price_asof).filter(x => typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x));
@@ -2023,7 +2037,19 @@ function ultimaBarraDisponibile() {
   for (const [d, n] of conta) {
     if (n > quante || (n === quante && d > vinta)) { vinta = d; quante = n; }
   }
-  return vinta;                                 // la data della MAGGIORANZA dei mercati che chiudono
+  const piuFresche = [...conta.entries()].filter(([d]) => d > vinta);
+  return {
+    maggioranza: vinta,
+    quante,
+    totale: date.length,
+    piuFresche: piuFresche.sort((a, b) => (a[0] < b[0] ? -1 : 1)),
+    quanteFresche: piuFresche.reduce((s, x) => s + x[1], 0),
+  };
+}
+
+function ultimaBarraDisponibile() {
+  const s = sedutePrezzi();
+  return s ? s.maggioranza : null;              // la data della MAGGIORANZA dei mercati che chiudono
 }
 
 /* la data del dato di un blocco macro: prima quella dichiarata dalla pipeline, poi il ripiego */
@@ -2034,6 +2060,18 @@ function asofBlocco(blocco) {
   }
   const dedotta = ultimaBarraDisponibile();
   return dedotta ? { data: dedotta, dedotta: true } : null;
+}
+
+/* ⚠ la dichiarazione del disallineamento, in una sede sola: e' la stessa frase in due rami
+   della riga di freschezza, e scritta due volte divergerebbe (v161, v207, v316). Quando le
+   sedute coincidono non dice niente — una riga che avvisa sempre non avvisa. */
+function disallineoSedute() {
+  const s = sedutePrezzi();
+  if (!s || !s.piuFresche.length) return "";
+  return ` ⚠ MA NON TUTTE: ${s.quanteFresche} quotazioni su ${s.totale} hanno gia' la barra di `
+    + `${s.piuFresche.map(x => x[0]).join(" e ")}, perche' le barre arrivano a scaglioni. Le righe che `
+    + `la portano sono piu' fresche di questa data, e ciascuna dichiara la propria: fra loro NON sono `
+    + `prezzate allo stesso istante.`;
 }
 
 function rigaFreschezzaMercato(blocco) {
@@ -8346,10 +8384,11 @@ function buildPrompt(opz) {
     lines.push(`· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, `
       + `momentum): scaricati al run delle ${quando}${prossimo ? `, prossimo run ${prossimo}` : ""}. `
       + (barra && etaBarra >= 1
-          ? `⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL ${barra} — ${etaBarra} ${etaBarra === 1 ? "giorno" : "giorni"} fa. `
+          ? `⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL ${barra} — ${etaBarra} ${etaBarra === 1 ? "giorno" : "giorni"} fa. `
             + `Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.`
+            + disallineoSedute()
           : barra
-              ? `La barra giornaliera sotto quei numeri e' del ${barra}.`
+              ? `La barra giornaliera sotto la maggioranza di quei numeri e' del ${barra}.` + disallineoSedute()
               : `⚠ La data della barra giornaliera sotto quei numeri NON e' disponibile: non dare per scontato che sia di oggi.`));
     if (conCalendario.length) {
       lines.push(`· STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): `
@@ -9353,7 +9392,7 @@ function buildPrompt(opz) {
     // v229 — NON ripete il valore della curva: e' lo STESSO numero della riga sopra, e ripeterlo
     // lo faceva sembrare una seconda rilevazione. Qui sta solo cio' che questa riga aggiunge:
     // il confronto a 12 mesi del modello storico e la regola dell'irripidimento.
-    lines.push(`- Curva vs Recessione (modello storico FRED, stessa curva della riga qui sopra): ${yr.curve_12m_ago != null ? `12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago} pp (media mensile del modello)` : "confronto a 12 mesi non disponibile"}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. ${yr.steepening ? "NB: la curva si sta IRRIPIDENDO dopo l'inversione — storicamente questa configurazione ha preceduto una recessione entro ~12 mesi (la curva shiftata di 12m anticipa il calo del PIL)." : `NB: la curva NON si sta irripidendo (oggi ${yr.current_curve} contro ${yr.curve_12m_ago} di 12 mesi fa): la regola \"irripidimento post-inversione → recessione entro ~12 mesi\" NON è attiva adesso, e va citata solo se e quando lo diventa.`}`);
+    lines.push(`- Curva vs Recessione (modello storico FRED, stessa curva della riga qui sopra): ${yr.curve_12m_ago != null ? `12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago} pp (media mensile del modello)` : "confronto a 12 mesi non disponibile"}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. ${yr.steepening ? "NB: la curva si sta IRRIPIDENDO dopo l'inversione — storicamente questa configurazione ha preceduto una recessione entro ~12 mesi (la curva shiftata di 12m anticipa il calo del PIL)." : `NB: la curva NON si sta irripidendo (${yr.current_curve} all'ultima rilevazione contro ${yr.curve_12m_ago} di 12 mesi fa): la regola \"irripidimento post-inversione → recessione entro ~12 mesi\" NON è attiva adesso, e va citata solo se e quando lo diventa.`}`);
   }
   // ═══ v203 — MEMORIA STORICA e CICLO DEI SEMICONDUTTORI: RIMOSSI su decisione del CEO.
   // Erano gli unici due blocchi che non avevano MAI girato con dati veri: FRED non risponde
@@ -12682,7 +12721,18 @@ function datiNostriDelTitolo(tk) {
     const pl = tec.pesoLibro || null;
     const peso = pl ? pl.pct : null;
     L.push(`- ⚠ QUESTO TITOLO E' GIA' IN PORTAFOGLIO: ${fmtNum.format(q)} quote a un prezzo medio di carico `
-      + `di ${pmc}${g != null ? `, oggi ${signTxt(Math.round(g * 10) / 10)}` : ""}`
+      /* ⚠⚠ v422 — "oggi -13%" ERA UN AVVERBIO CHE AFFERMAVA QUANDO, SU UNA GRANDEZZA CHE NON
+         E' UNA VARIAZIONE DI SEDUTA. Quattro righe piu' sotto lo stesso pacchetto scrive
+         "Variazione della seduta del 03/09/2026: +4,49% — ⚠ NON e' la seduta di oggi": chi
+         legge trova due "oggi" con due numeri e nessun modo di sapere che parlano di due cose
+         diverse. E' la classe v193/v234 (stato del mercato e freschezza del dato sono due cose
+         diverse) chiusa dalla v416 su TRE sedi — indicatori, materie prime, digest VIX — e
+         rimasta aperta su questa: la classe v412, una correzione applicata a un ramo e non
+         agli altri.
+         ⚠ Il rimedio non e' una didascalia ma il NOME della grandezza, che e' anche quello
+         che il blocco del libro usa gia' ("-13% dal carico"): una formulazione sola per una
+         grandezza sola (v161, v207, v316), invece di due sinonimi che divergono. */
+      + `di ${pmc}${g != null ? `, ${signTxt(Math.round(g * 10) / 10)} dal carico` : ""}`
       + (peso != null ? `, e vale il ${peso}% del controvalore azionario del libro `
           + `(su ${pl.quante} posizioni, sul solo comparto azionario)` : "")
       + `. `
@@ -12729,7 +12779,7 @@ function datiNostriDelTitolo(tk) {
   }
   if (f.opzioni && f.opzioni.ratio != null) {
     L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
-      + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati oggi: put ${f.opzioni.put}, call ${f.opzioni.call})`
+      + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati nell'ultima seduta rilevata: put ${f.opzioni.put}, call ${f.opzioni.call})`
       + (f.opzioni.nonLaPiuVicina
           ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' CONTRATTI APERTI (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina} — grandezza diversa dai volumi qui sopra: i contratti aperti sono posizioni ancora in essere, i volumi sono gli scambi della giornata, e non si sommano ne' si confrontano). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
           : ""));
