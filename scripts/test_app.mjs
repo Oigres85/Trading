@@ -7776,6 +7776,50 @@ check("v415 la data della barra e' quella della maggioranza, non di una riga sol
     : "una sola riga in anticipo ha spostato la data da " + base + " a " + dopo
       + " (" + quante + " righe portano " + base + ")";`));
 
+/* ⚠⚠ v415 — LA STESSA DISTANZA DALLA MEDIA, TRE RESE NELLO STESSO PACCHETTO.
+   La pipeline pubblica la distanza in DUE campi con due arrotondamenti — `sma50_dist_pct` a una
+   cifra, `tv.tecnica.medie.sma50.dist_pct` a due — e il pacchetto ne leggeva uno nella scheda
+   del titolo e l'altro nel blocco del libro, poi ne riarrotondava un terzo nei dettagli
+   tecnici: su CRWV -1,5% · -1,45% · -1,4%. Terza incarnazione della classe v340/v349, che la
+   v407 aveva chiusa sul solo blocco del libro.
+   ⚠ IL GATE v414 NON LA PRENDEVA: la sua tolleranza e' 0,051 e lo scarto fra -1,45 e -1,5 e'
+   esattamente 0,05 — passava per cinque millesimi. Qui l'invariante e' piu' stretto perche' e'
+   la stessa grandezza dalla stessa fonte: le rese devono COINCIDERE, non somigliarsi. */
+check("v415 la distanza dalle medie esce identica in tutti i punti del pacchetto", suVeriEsito(`
+  const R = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const con = R.filter(r => r && r.tv && r.tv.tecnica && r.tv.tecnica.medie
+                         && r.tv.tecnica.medie.sma50 && r.tv.tecnica.medie.sma200);
+  if (!con.length) return "nessun titolo con le medie della pipeline: il check non misura niente";
+  const guai = [];
+  for (const r of con.slice(0, 3)) {
+    const tk = String(r.ticker).toUpperCase();
+    const p = buildPromptTicker(tk);
+    for (const n of ["50", "200"]) {
+      const rese = new Set();
+      for (const et of ["- Media a " + n + " sedute", "Media semplice " + n + ":"]) {
+        const i = p.indexOf(et);
+        if (i < 0) continue;
+        const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+        const j = riga.indexOf("il prezzo le sta ");
+        if (j < 0) continue;
+        rese.add(riga.slice(j + 17).split(",").length > 1
+          ? riga.slice(j + 17, riga.indexOf("%", j) + 1) : riga.slice(j + 17, riga.indexOf("%", j) + 1));
+      }
+      /* e la resa del blocco del libro, che legge la stessa fonte */
+      const k = p.indexOf(tk + ": medie: ");
+      if (k >= 0) {
+        const riga = p.slice(k, p.indexOf(String.fromCharCode(10), k));
+        const m = riga.indexOf(" dalla " + n);
+        if (m >= 0) {
+          const pezzo = riga.slice(0, m);
+          rese.add(pezzo.slice(pezzo.lastIndexOf(" ") + 1));
+        }
+      }
+      if (rese.size > 1) guai.push(tk + " media " + n + ": " + [...rese].join(" contro "));
+    }
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

@@ -3404,6 +3404,33 @@ cambio e un future avanti di un giorno, e una riga azionaria in anticipo. Sotto 
 vecchia logica la data base tornava **2026-09-04**, che è la prova diretta del difetto sui dati
 veri.
 
+## 📏 v415 — LA STESSA DISTANZA DALLA MEDIA, TRE RESE NELLO STESSO PACCHETTO
+
+Su CRWV, la distanza del prezzo dalla media a 50 sedute usciva **tre volte con tre valori**:
+
+| dove | valore |
+|---|---|
+| scheda del titolo — *"Media a 50 sedute: 85.81"* | **−1,5%** |
+| dettagli tecnici — *"Media semplice 50: 85.81"* | **−1,4%** |
+| blocco del libro — *"medie: … dalla 50"* | **−1,45%** |
+
+**Due cause indipendenti, e vanno chiuse entrambe:**
+1. la pipeline pubblica la distanza in **due campi** con due arrotondamenti — `sma50_dist_pct`
+   a una cifra, `tv.tecnica.medie.sma50.dist_pct` a due — e il pacchetto ne leggeva uno di qua e
+   uno di là. **La v340 aveva già spostato il LIVELLO sulla fonte unica e lasciato indietro la
+   DISTANZA**, e la v407 aveva chiuso il caso sul solo blocco del libro: terza incarnazione;
+2. l'helper dei dettagli tecnici **ri-arrotondava** a una cifra un valore che la fonte pubblica
+   a due — e `Math.round(-14.5)` in JS dà `-14`, quindi −1,45 usciva −1,4 e non −1,5.
+
+> ⚠⚠ **E IL GATE v414 NON LA PRENDEVA, per cinque millesimi.** La sua tolleranza è 0,051 e lo
+> scarto fra −1,45 e −1,5 è esattamente 0,05. Una tolleranza tarata su "due arrotondamenti
+> legittimi possono differire" è giusta fra grandezze calcolate in due modi, ed è **sbagliata**
+> fra due rese della STESSA grandezza dalla STESSA fonte: lì devono coincidere, non somigliarsi.
+> Il gate nuovo pretende l'identità e ha morso su entrambe le cause, iniettate una alla volta.
+
+⚠ Il ripiego sul campo di riga resta per le posizioni che la pipeline non ha mai visto: lì
+`tv.tecnica` non esiste, e una riga in meno sarebbe peggio di una cifra in meno.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
