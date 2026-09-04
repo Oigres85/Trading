@@ -3590,6 +3590,64 @@ ha sempre il secondo (misurato: 23 righe su 23). È la classe **v234** — *un r
 essere raggiunto non è una protezione* — ma rimuoverlo è un **taglio**, e il congelamento lo
 vieta finché il sistema non è stabile. Annotato qui per la fase di potatura.
 
+## ✂️ v418 — LA PRIMA POTATURA, E L'HA DECISA UNA MISURA
+
+Decisione del CEO dopo la misura: *"A se non è gratis non possiamo consentirlo"*. Quindi non un
+taglio con perdita — **il taglio è stato reso gratuito prima di essere fatto**.
+
+### La misura che l'ha deciso: perturbazione, non impressione
+Si cambia un campo nei dati e si conta in quanti **BLOCCHI distinti** del pacchetto cambia
+qualcosa. Un campo che tocca tre blocchi è un fatto scritto in tre posti, cioè tre occasioni di
+divergere.
+
+| | 1 blocco | 2 blocchi | **3 blocchi** |
+|---|---|---|---|
+| pacchetto **macro** | 7/13 | 4 | **0** |
+| pacchetto **titolo**, prima | 5/13 | 3 | **5** |
+| pacchetto **titolo**, dopo | 6/13 | 5 | **2** |
+
+⚠⚠ **E QUESTO HA CORRETTO UNA MIA RACCOMANDAZIONE.** Avevo scritto due volte al CEO che "ridurre
+i blocchi rende impossibile la classe", come se valesse ovunque. **Nel pacchetto macro la
+duplicazione era già sparita** — nessun campo raggiunge tre blocchi — e lì non c'era niente da
+potare. La leva vera era piccola e stava tutta nel pacchetto di titolo.
+
+### Il taglio: il titolo analizzato era descritto TRE volte
+La sua scheda, il blocco DETTAGLI TECNICI, **e la sua riga dentro l'elenco del libro**. È
+esattamente il terzetto che ha prodotto il difetto v415, dove la stessa distanza dalla media
+usciva `-1,5% / -1,45% / -1,4%`.
+
+Delle nove grandezze che quella riga portava, **otto erano già nei due blocchi sopra** e una no:
+la distanza dal massimo a 52 settimane nel verso *"quanto è già sceso"*. Quella è stata
+**spostata prima** — la scheda ora pubblica anche il verso opposto, dichiarando che è lo stesso
+fatto e non un secondo dato — e solo dopo la riga è stata tolta.
+
+⚠ **Nel pacchetto MACRO non si tocca niente**: lì quella riga è l'unica descrizione tecnica che
+il titolo riceve, e toglierla sarebbe una perdita invece di una potatura. Il taglio vale SOLO
+dove la duplicazione esiste.
+
+⚠ **E l'escluso si NOMINA** (v406): la riga dichiara chi manca, perché, e dove stanno gli stessi
+numeri in forma più estesa. *"Il sistema non ha il dato"* e *"ce l'ha e non te lo passa"* si
+leggono uguali.
+
+### 🦴 Tre gate sono andati rossi, e nessuno è stato zittito
+Confrontavano la scheda con la riga del libro, che non esiste più nel pacchetto di titolo. A
+ciascuno è stato **riagganciato l'invariante**, non allentato:
+
+- **v414** — l'invariante non era "scheda contro libro" ma *due sedi che descrivono lo stesso
+  titolo non divergono*. Le sedi rimaste sono due e il confronto resta, **allargato ai LIVELLI**
+  delle medie, che sono precisamente ciò che divergeva nella v340. Validato per iniezione.
+- **v413** — ora raccoglie tutte le occorrenze del conteggio dei giorni **nei DUE pacchetti** e
+  pretende che concordino: più forte di prima, non più debole.
+- ⚠⚠ **v316 era rotto DAL MIO TESTO**: cercava la frase `DETTAGLI TECNICI`, che compare anche
+  nella riga che DICHIARA l'esclusione — quindi la trovava pure quando la sezione non c'era. Le
+  altre due sonde dello stesso check erano già ancorate all'intestazione (`--- COME IL MACRO
+  ARRIVA A`); questa no. **Chi cerca l'ASSENZA di una sezione guarda la sua INTESTAZIONE**, non
+  una frase che la nomina: sesta incarnazione del gate che trova sé stesso (v213, v240, v393, v395).
+
+⚠ **Decima volta che C9 prende un mio costrutto nella coda**: `Ripeterli` è un infinito con
+clitico, non un imperativo, ma il detector non li distingue. Riformulato invece di allentare un
+gate che ha già trovato nove ordini veri.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

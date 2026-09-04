@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "417";
+const BUILD_VERSION = "418";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10524,8 +10524,21 @@ function contestoPortafoglio(tkCorrente) {
      ⚠ Sono i numeri GIA' CALCOLATI dal sistema sulle stesse barre del grafico: l'LLM non deve
      ricalcolarli ne' cercarli, e la riga dei metodi lo dice. */
   const nRid = (v, d = 1) => Number.isFinite(v) ? fmtNum.format(Math.round(v * 10 ** d) / 10 ** d) : null;
+  /* ⚠⚠ v418 — IL TITOLO ANALIZZATO ERA DESCRITTO TRE VOLTE, E LE TRE DIVERGEVANO.
+     Misurato per perturbazione (si cambia un campo nei dati e si conta in quanti BLOCCHI del
+     pacchetto cambia qualcosa): nel pacchetto di TITOLO cinque campi su tredici toccano TRE
+     blocchi — la scheda del titolo, i DETTAGLI TECNICI e la sua riga qui dentro. E' esattamente
+     il terzetto che ha prodotto il difetto della v415, dove la stessa distanza dalla media
+     usciva -1,5% / -1,45% / -1,4%.
+     ⚠ Nel pacchetto MACRO non si tocca niente: li' nessun campo raggiunge tre blocchi (misurato)
+     e la riga e' l'unica descrizione tecnica che quel titolo riceve. Il taglio vale SOLO dove la
+     duplicazione esiste, cioe' per il titolo in esame nel suo stesso pacchetto.
+     ⚠⚠ E NON E' UN TAGLIO IN SILENZIO (v406): la riga sparita viene NOMINATA con la ragione e
+     col rimando ai due blocchi che portano gli stessi fatti in forma piu' estesa. "Il sistema
+     non ha il dato" e "ce l'ha e non te lo passa" si leggono uguali e sono cose diverse. */
   const righeTec = ord.map(x => {
     const r = x.r, s = r.stats || {};
+    if (tkCorrente && String(r.ticker).toUpperCase() === String(tkCorrente).toUpperCase()) return null;
     const p = [];
     /* ⚠ v407 — LA MEDIA A 20 GIORNI, CHIESTA DAL CEO ("es. media mobile 20 giorni dei titoli
        sarebbe utile"). Il sistema la calcola per OGNI titolo seguito dalla v316 e la pubblicava
@@ -10573,7 +10586,14 @@ function contestoPortafoglio(tkCorrente) {
   if (righeTec.length) {
     L.push("TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre "
       + "giornaliere Yahoo con auto_adjust, le stesse che disegnano il grafico — non vanno "
-      + "ricalcolati ne' cercati online):");
+      + "ricalcolati ne' cercati online)"
+      /* ⚠ v418 — L'ESCLUSO SI NOMINA, con la ragione e col rimando (v406). */
+      + (tkCorrente ? `. ⚠ ${String(tkCorrente).toUpperCase()} NON compare in questo elenco ed e' `
+          + `l'unica assenza: e' il titolo in esame, e i suoi stessi numeri stanno piu' sopra in `
+          + `forma piu' estesa (la sua scheda e il blocco DETTAGLI TECNICI, che porta dodici medie `
+          + `invece di tre e gli oscillatori). Una loro ripetizione qui sarebbe la terza scrittura `
+          + `degli stessi fatti, cioe' la terza occasione di divergere. Il suo PESO nel libro resta `
+          + `nell'elenco qui sopra, dov'e' marcato` : "") + ":");
     righeTec.forEach(r => L.push(r));
     L.push("⚠ COME SI LEGGE QUESTO ELENCO. La distanza dal massimo a 52 settimane e la posizione "
       + "rispetto alle medie dicono cose diverse: la prima misura quanto e' gia' sceso il titolo, "
@@ -12480,7 +12500,24 @@ function datiNostriDelTitolo(tk) {
             + `e non l'indice, ma e' vecchio quanto la sessione che l'ha prodotto: non aggiunge niente all'ultima chiusura.`));
   }
   /* i livelli arrivano gia' ordinati, col lato misurato e la provenienza dichiarata. */
-  f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)} — ${x.fonte}`));
+  /* ⚠⚠ v418 — IL DRAWDOWN DAL MASSIMO, PRIMA DI TOGLIERE LA RIGA CHE LO PORTAVA.
+     La riga tecnica del titolo analizzato dentro il blocco del libro viene rimossa (vedi
+     contestoPortafoglio): delle nove grandezze che portava, otto erano gia' in questa scheda e
+     nei DETTAGLI TECNICI, e UNA sola no — la distanza dal massimo a 52 settimane nel verso
+     "quanto e' gia' sceso". Qui la stessa coppia esce nel verso opposto ("il massimo sta +81%
+     sopra il riferimento"), che e' lo stesso fatto e si legge diversamente.
+     ⚠ Si DICHIARA che sono un fatto solo nei due versi: senza quella clausola sarebbero due
+     numeri sulla stessa grandezza, cioe' precisamente il difetto che questo taglio serve a
+     ridurre (v184, v412). Un taglio che perde un fatto non e' gratuito: si sposta prima, si
+     toglie dopo. */
+  const versoOpposto = (x) => {
+    if (!/^Massimo 52 settimane$/.test(x.nome)) return "";
+    if (!Number.isFinite(f.prezzo) || !Number.isFinite(x.v) || !x.v || f.prezzo >= x.v) return "";
+    const giu = Math.round((f.prezzo / x.v - 1) * 1000) / 10;
+    return ` — e nell'altro verso: il prezzo sta ${signTxt(giu)} SOTTO quel massimo, che e' lo `
+      + `stesso fatto e non un secondo dato`;
+  };
+  f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)}${versoOpposto(x)} — ${x.fonte}`));
 
   /* ═══ v293 — FIBONACCI ED EMA LI CALCOLIAMO NOI ═════════════════════════════════════════
      Richiesta del CEO: fra i dati tecnici vuole "supporti e resistenze, SMA, EMA, Fibonacci".
