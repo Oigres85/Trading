@@ -3815,6 +3815,48 @@ Il meta-gate dei backslash copriva `\d \w \s \b` e le virgolette, non questa. Or
 `n r t 0`: nel progetto l'idioma corretto esiste già (`String.fromCharCode(10)`) e non c'è nessun
 uso legittimo di quelle sequenze lì dentro. Validato per iniezione.
 
+## 🏷️ v423 — UNA VARIABILE PER DUE DOMANDE, E LA PIÙ RESTRITTIVA VINCEVA
+
+Tredicesimo giro, trovato leggendo il pacchetto del **titolo seguito e non posseduto** — la
+variante che il giro precedente aveva appena mostrato essere la meno esercitata.
+
+`rigaLibro` filtrava per `qta > 0 && pmc > 0`, cioè rispondeva a *"è una POSIZIONE?"*. Da lei
+venivano anche il **nome della società** e la **data della prossima trimestrale**, che sono
+proprietà del TITOLO e non del possesso. Su TSM il pacchetto apriva così:
+
+> `ANALISI DI TSM — 04/09/2026`
+
+mentre `data.json` porta `name: "Taiwan Semiconductor Manu…"` e `earnings_date: 2026-10-15`.
+
+⚠⚠ **È la v397 sopravvissuta nel ramo che nessuno esercitava, ed è peggio lì che altrove**: un
+nome fuori dal libro è quello che il CEO conosce meno, e il PASSO 0 gli ordina di cercarlo online
+**senza dirgli come si chiama**. Classe v419/v420, la variante non posseduta — la terza volta in
+tre versioni che un difetto vive solo lì.
+
+⚠ La stessa conflazione rendeva **irraggiungibile** l'avviso *"c'è un evento dentro l'orizzonte
+breve"* per ogni titolo non posseduto: *un ramo che non può essere raggiunto non è una
+protezione* (v234).
+
+> **Due domande vogliono due derivazioni, e nessuna delle due filtra per l'altra.** È la classe
+> v226, dove una chiave serviva a classificare la famiglia E ad aprire il pannello, veniva
+> azzerata per il secondo uso e poi raggruppata sul primo.
+
+### 🎯 E la mia iniezione non mordeva perché sondavo la stringa sbagliata
+Il check cercava `"9 giorni"` nel pacchetto — ma la **scheda dati** stampa *"Prossima trimestrale
+attesa (fra 9 giorni)"* da un'altra derivazione, quindi restava verde con la conflazione
+reintrodotta. Riagganciato all'avviso delle ISTRUZIONI, che è ciò che il ramo produce. *Un check
+sulla stringa sbagliata misura un'altra cosa* (v405), e un'iniezione che non morde è un no-op
+silenzioso.
+
+### 📋 Annotati e NON corretti (regola del CEO: i cosmetici si annotano)
+- `shortName` di Yahoo per TSM arriva **già troncato** (`Taiwan Semiconductor Manu…`): l'ellissi è
+  della fonte, non nostra. `longName` sarebbe più completo, ma è un miglioramento e non una
+  bonifica — sotto congelamento non si fa.
+- `esercizio 2022: ricavi 0.0 mld · utile netto -0.0 mld (margine -196.2%)`: l'unità "mld" è
+  sbagliata per la scala di quell'anno, e il margine non è verificabile dai due zeri stampati.
+- Blocco 8 dice *"Questa **posizione** aggiunge una scommessa nuova al libro"* anche su un titolo
+  non posseduto — dove si legge come l'ingresso ipotetico, quindi non cambia nessuna conclusione.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

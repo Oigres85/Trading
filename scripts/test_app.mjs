@@ -8391,6 +8391,61 @@ check("v422 la riga di freschezza dichiara le quotazioni piu' fresche della magg
 
   return guai.length ? guai.join(" · ") : true;`));
 
+/* ⚠⚠ v423 — IL NOME DELLA SOCIETA' SPARIVA SUI TITOLI NON POSSEDUTI, E IL SISTEMA CE L'AVEVA.
+   `rigaLibro` filtrava per `qta > 0 && pmc > 0` — cioe' rispondeva a "e' una POSIZIONE?" — e da
+   lei venivano anche il NOME e la data della prossima trimestrale, che sono proprieta' del
+   TITOLO e non del possesso. Su TSM il pacchetto apriva con "ANALISI DI TSM — 04/09/2026"
+   mentre `data.json` porta `name: "Taiwan Semiconductor Manu…"`.
+   ⚠ E' la v397 sopravvissuta nel ramo che nessuno esercitava, ed e' peggio li' che altrove: un
+   nome fuori dal libro e' quello che il CEO conosce meno, e il PASSO 0 gli ordina di cercarlo
+   online senza dirgli come si chiama. Classe v419/v420, la variante non posseduta.
+   ⚠ La stessa conflazione rendeva IRRAGGIUNGIBILE l'avviso sulla trimestrale entro l'orizzonte
+   per ogni titolo non posseduto: un ramo che non puo' essere raggiunto non e' una protezione
+   (v234).
+   ⚠ Il check esercita ENTRAMBI gli stati, che e' esattamente com'e' nato il difetto: sui titoli
+   posseduti il nome c'era, e nessuno aveva letto l'altro pacchetto. */
+check("v423 il nome della societa' esce anche sui titoli seguiti e non posseduti", suVeriEsito(`
+  const tutti = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const conNome = (r) => r && r.name && String(r.name).trim()
+    && String(r.name).toUpperCase() !== String(r.ticker).toUpperCase();
+  const dentro = tutti.filter(r => conNome(r) && r.qta && r.tv && r.tv.tecnica);
+  const fuori  = tutti.filter(r => conNome(r) && !r.qta && r.tv && r.tv.tecnica);
+  if (!dentro.length || !fuori.length)
+    return "servono un posseduto e un non posseduto CON nome: ne ho " + dentro.length + " e " + fuori.length;
+  const guai = [];
+  for (const [stato, r] of [["posseduto", dentro[0]], ["non posseduto", fuori[0]]]) {
+    const tk = String(r.ticker).toUpperCase();
+    const testa = buildPromptTicker(tk).split(String.fromCharCode(10))[0];
+    if (testa.indexOf(String(r.name).trim()) < 0)
+      guai.push(stato + " (" + tk + "): il nome '" + String(r.name).trim()
+        + "' e' in data.json e non compare nell'intestazione — " + testa);
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠ e la seconda meta' della stessa conflazione: l'avviso "trimestrale dentro l'orizzonte" deve
+   poter scattare anche su un titolo non posseduto. Lo stato si COSTRUISCE — la data reale puo'
+   cadere fuori dai 60 giorni in qualunque giorno, e un check che aspetta i dati del giorno va
+   verde o rosso da solo (v233, v402). */
+check("v423 l'avviso sulla trimestrale vicina e' raggiungibile anche fuori dal libro", suVeriEsito(`
+  const tutti = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const r = tutti.find(x => x && !x.qta && x.tv && x.tv.tecnica);
+  if (!r) return "nessun titolo seguito e non posseduto: il check non misura niente";
+  const fra = (g) => { const d = new Date(); d.setHours(12, 0, 0, 0);
+    return new Date(d.getTime() + g * 86400000).toISOString().slice(0, 10); };
+  const prima = r.earnings_date;
+  try {
+    r.earnings_date = fra(9);
+    const p = buildPromptTicker(String(r.ticker).toUpperCase());
+    /* ⚠ LA SONDA VA SULL'AVVISO DELLE ISTRUZIONI, non su "9 giorni": la scheda dati stampa
+       "Prossima trimestrale attesa (fra 9 giorni)" da un'ALTRA derivazione, quindi la prima
+       stesura restava verde con la conflazione reintrodotta. Un check sulla stringa sbagliata
+       misura un'altra cosa (v405), e un'iniezione che non morde e' un no-op silenzioso. */
+    if (p.indexOf("C'E' UN EVENTO DENTRO L'ORIZZONTE BREVE") < 0)
+      return "trimestrale fra 9 giorni su un titolo non posseduto e le istruzioni non portano "
+        + "l'avviso dell'evento dentro l'orizzonte: il ramo resta irraggiungibile fuori dal libro";
+    return true;
+  } finally { r.earnings_date = prima; }`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
