@@ -11417,7 +11417,21 @@ function fattiTitolo(tk) {
     pavimento: sotto.length ? sotto[0] : null,
     opzioni: opz,
     tecnici: riga ? { rsi: numero(riga.rsi), atr: numero(riga.atr_14), atrPct: numero(riga.atr_pct),
-                      sma50: numero(riga.sma50_dist_pct), sma200: numero(riga.sma200_dist_pct),
+                      /* ⚠⚠ v415 — LA v340 AVEVA SPOSTATO IL LIVELLO SULLA FONTE UNICA E LASCIATO
+                         INDIETRO LA DISTANZA. `sma50_dist_pct` e `tv.tecnica.medie.sma50.dist_pct`
+                         sono la STESSA grandezza pubblicata dalla pipeline con due arrotondamenti
+                         (una cifra contro due): su CRWV -1,5 e -1,45. Il livello leggeva gia' la
+                         seconda (riga qui sotto), la distanza no, quindi lo stesso pacchetto
+                         stampava "il prezzo le sta -1,5%" nella scheda del titolo e "-1,45% dalla
+                         50" nel blocco del libro. E' la terza incarnazione della classe v340/v349,
+                         e la v407 l'aveva chiusa sul solo blocco del libro.
+                         ⚠ Il ripiego sul campo di riga resta per le posizioni che la pipeline non
+                         ha mai visto: li' `tv.tecnica` non esiste e una riga in meno sarebbe peggio
+                         di una cifra in meno. */
+                      sma50: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma50?.dist_pct)
+                             ?? numero(riga.sma50_dist_pct),
+                      sma200: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma200?.dist_pct)
+                             ?? numero(riga.sma200_dist_pct),
                       /* ⚠⚠ v340 — IL LIVELLO VERO DELLA MEDIA, non piu' ricavato all'indietro.
                          `sma50`/`sma200` qui sopra sono DISTANZE percentuali calcolate dalla
                          pipeline contro la CHIUSURA. La v314 stampava il livello derivandolo
@@ -12104,7 +12118,12 @@ function tvBlocchi(tk) {
   const tv = r && r.tv;
   if (!tv) return [];
   const F = [];
-  const pc = (v) => (v == null ? "n.d." : signTxt(Math.round(v * 10) / 10));
+  /* ⚠ v415 — NON SI RIARROTONDA UN VALORE GIA' ARROTONDATO DALLA FONTE. Questo helper
+     riportava a UNA cifra le distanze che la pipeline pubblica a DUE, quindi la stessa
+     distanza usciva "-1,4%" qui e "-1,45%" nel blocco del libro: due rese dello stesso
+     numero, che il collaudo di congruita' ordina al lettore di segnalare (v412). Si stampa
+     il valore come la fonte lo pubblica. */
+  const pc = (v) => (v == null ? "n.d." : signTxt(v));
 
   if (tv.performance) {
     const et = { s1: "1 settimana", m1: "1 mese", m3: "3 mesi", m6: "6 mesi", ytd: "da inizio anno",
