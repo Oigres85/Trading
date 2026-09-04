@@ -3465,6 +3465,40 @@ della v401 e al gate nuovo, che misura il ramo dichiarato.
 ⚠ Il gate nuovo, iniettando la rimozione della guardia, morde su **quattro canali** dei dati veri
 (MU/tassi, AMD/tassi, NVDA/tassi, NVDA/dollaro) e li nomina uno per uno.
 
+## 🏷️ v415 — `[MRVL]` SIGNIFICA "TROVATA NEL FEED DI MRVL", NON "NOTIZIA SU MRVL"
+
+Misurato sul run del 04/09: delle quattordici voci mostrate nel blocco delle notizie sui titoli
+del libro, **quattro erano su un'altra società** — un pezzo su Nvidia sotto `[CRWV]`, uno su
+Astera Labs e uno su Penguin Solutions sotto `[MRVL]`, una cronaca di mercato con Tesla e Goldman
+sotto `[MU]`.
+
+**Non è un difetto della raccolta.** La v399 ha scelto Nasdaq proprio perché *l'attribuzione viene
+dalla FONTE invece che da un'euristica nostra*, e i feed dei fornitori includono regolarmente
+pezzi su concorrenti e sul comparto. Il difetto era l'**ETICHETTA**, che affermava più di quanto
+il dato sostenga: `[MRVL]` si legge *"notizia su MRVL"* e significa *"voce trovata nel feed di
+MRVL"*.
+
+> ⚠ **E non si filtra.** Filtrare vorrebbe dire indovinare di chi parla un titolo, che è
+> esattamente l'euristica che la v399 ha rifiutato scegliendo Nasdaq invece del feed multi-ticker
+> di Yahoo. Si dichiara cosa l'etichetta è, e chi legge ha il titolo dell'articolo davanti.
+
+⚠ Una voce su un'altra società **resta informativa per il canale** — è la ragione per cui il
+blocco esiste (v398: l'LLM non conosce il libro) — ma non è attribuibile al nome sotto cui compare.
+
+### 🧪 E il mio primo gate era DECORATIVO
+Cercava tre forme letterali (`titolo.indexOf(TK`, …) e l'iniezione realistica —
+`String(v.titolo).toUpperCase().indexOf(TK)` — non ne matchava nessuna: restava **verde col
+difetto dentro**, e a morderlo era il gate v398 sull'ESITO. È la trappola numero uno di questo
+file, l'ancoraggio a una stringa letterale, commessa **dentro un gate scritto per impedirne
+un'altra**. Ora guarda la proprietà: una riga che mette in relazione il TITOLO dell'articolo col
+ticker, in qualunque forma.
+
+> **Quando un'iniezione non morde e un ALTRO gate sì, il proprio gate non è ridondante: è rotto.**
+
+⚠ E una sonda sulla chiave sbagliata: `DATA.macro.news_titoli` non esiste — la chiave sta alla
+radice ed è `per_titolo`, non `per_ticker`. Un check su una chiave che non c'è è verde (o rosso)
+per assenza di dati invece che di difetti, ed è già costato in v196 e v229.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
