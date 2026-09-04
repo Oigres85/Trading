@@ -3225,6 +3225,81 @@ erano difetti di **lettura** — un numero detto due volte, una riga che nega l'
 formulazione debole sul caso urgente. In due sessioni consecutive tutti i difetti materiali sono
 stati trovati eseguendo il pacchetto come il destinatario, e nessuno dai gate.
 
+## 🧊 v414 — CONGELAMENTO E BONIFICA: la decisione del CEO, e le tre bugie che ha prodotto
+
+Istruzione del CEO, testuale: *"È possibile avviare attività anche agentica per sanare
+definitivamente tutti i problemi che emergono o arrivare al massimo punto di tolleranza per
+arrivare ad utilizzare il sistema senza lavorare sempre sulla rettifica anche se questo porta ad
+eliminare una parte delle funzioni. **Meglio un sistema stabile ridotto che ampio ma da cui
+emergono costantemente bug.**"*
+
+**Strategia scelta: congelamento + bonifica.** Nessuna funzionalità nuova; si bonificano i
+difetti accumulati; le classi ricorrenti diventano gate che le rendono **impossibili** invece
+che rare; **non si taglia niente finché il sistema non è stabile** — tagliare mentre si bonifica
+è la classe v201-v204, che in questo progetto ha morso tre volte in quattro versioni.
+
+**Tolleranza scelta: zero difetti materiali su DUE giri consecutivi.** Un difetto è *materiale*
+se cambia una conclusione; i difetti **cosmetici si annotano e NON si correggono** — ed è una
+scelta misurata, non pigrizia: dei sette difetti trovati ieri, **tre li avevo introdotti io
+poche ore prima correggendone altri**. La velocità di modifica è metà della sorgente di bug,
+quanto l'ampiezza.
+
+⚠⚠ **E QUESTO CONTRADDICE IN PARTE LA PREMESSA DEL CEO.** Misurato sulla provenienza: ~3 difetti
+su 7 nascevano da una modifica fatta la stessa sessione, ~4 preesistevano. Ridurre le funzioni
+non tocca la prima metà: quella si chiude solo **rallentando**. Ridurre le funzioni tocca invece
+la seconda, perché la classe "stessa grandezza scritta in due posti" cresce col quadrato del
+numero di blocchi. Per questo il congelamento viene **prima** del taglio, non dopo.
+
+### I tre difetti materiali di questo giro — tutti trovati leggendo il pacchetto, nessuno dai gate
+
+| difetto | cosa affermava | cosa era vero |
+|---|---|---|
+| **le notizie contate e poi troncate** | *"18 pubblicate DOPO l'ultima chiusura … e sono **TUTTE** elencate qui sotto"* | uno `.slice(0, 12)` sull'unione ne stampava **12** |
+| **la quota di cash istituzionale** | *"7,9% (proxy AUM BIL+SHV $68B vs SPY $795B)"* | 68/795 fa **8,6%**: il denominatore vero è la SOMMA (863), e non era dichiarato |
+| **il calendario delle uscite** | tre serie dichiaravano *"prossimo aggiornamento"* confermato in finestra e non comparivano; l'esclusione dichiarata nominava **tre indicatori diversi** | l'esclusione è corretta (regola v290) ma copriva **una classe su due** |
+
+⚠ **Il primo è la v393 per una via nuova**: là spariva una CLASSE di voci, qui una CODA, e
+l'intestazione afferma il contrario in entrambi i casi. Il tetto **non è stato tolto**: si è
+spostato sulla classe che può tagliare senza mentire — le voci non ancora prezzate entrano
+sempre, tutte, perché sono l'unica classe che cambia una decisione (v158) — e quando taglia, lo
+**dichiara**.
+
+⚠ **Il secondo è un falso positivo che il pacchetto produceva contro sé stesso**: il collaudo B5
+ordina al lettore di segnalare due valori per la stessa grandezza, e qui glieli forniva il
+pacchetto. *Un pacchetto che genera i falsi positivi del proprio controllo di qualità lo logora*
+(classe v400, v412). Il denominatore ora si nomina **nella riga**, non nella nota della
+pipeline: la nota arriva da un run che può essere vecchio, l'etichetta no.
+
+⚠ **Il terzo è la v406 su un registro nuovo**: *"il sistema non ha il dato"* e *"ce l'ha e non te
+lo passa"* si leggono uguali. Il gate è nei **due versi**, come quello pagina↔pacchetto: ogni
+indicatore con una data confermata in finestra è o elencato o **nominato fra gli esclusi con la
+sua ragione**. Un gate che controlla solo la presenza invecchia da solo alla prima classe nuova.
+
+### 🧪 Lo stato si COSTRUISCE, tre volte su quattro
+Nessuno dei tre fenomeni esiste nello snapshot di oggi: le voci dopo la chiusura sono **zero**,
+le masse cambiano a ogni run, e un check che li leggesse sarebbe **verde per assenza del
+fenomeno** — la trappola pagata quattro volte in questo file. I gate piazzano le voci **dopo
+l'ultima chiusura vera**, che per costruzione è un istante già avvenuto (v402), quindi il ramo si
+accende a qualunque ora giri la suite. Tutti e quattro validati per iniezione: morde ciascuno.
+
+### 🧨 Tre trappole rifatte nella stessa mezz'ora, tutte già scritte in questo file
+- ⚠⚠ **Un backtick dentro un template passato al vm**, per la QUARTA volta, e di nuovo in un
+  commento che CITAVA del codice — che è precisamente quando viene naturale usare gli apici
+  inversi. `modifica_sicura` **non l'ha rifiutato** perché il risultato resta sintatticamente
+  valido (`` ` `` + variabile + `` ` `` concatena), ed è il caso che `node --check` non vede. La
+  suite è morta **rumorosamente** all'import invece di passare a vuoto — che è il comportamento
+  progettato — ma il meta-gate dei backtick vive DENTRO il file che sorveglia: quando la rottura
+  è a livello di modulo, non arriva mai a girare. È `self_check` a coprirlo, perché verifica che
+  ogni suite **esegua e parli**.
+- ⚠ **C9 ha preso un mio imperativo nella coda** — **nona** volta (v156, v179, v180, v389, v402,
+  v404, v406). Qui era un falso positivo di forma: *"il sistema … non le **elenca**"* è un
+  indicativo, omografo dell'imperativo. Riformulato invece di allentare un detector che ha già
+  trovato otto ordini veri: *un gate che punisce il comportamento corretto va aggiornato*
+  (v199), ma non quando la correzione costerebbe di indebolirlo su otto casi per un omografo.
+- ⚠ **Un pavimento alzato troppo**: `test_analisi_libro.py` **riporta** 106 check e ne contiene
+  **97** come chiamate, perché alcuni girano in ciclo. Il pavimento conta i punti di chiamata,
+  non i check riportati. Rimesso a 90; quello di `test_app.mjs` sale a 490 su 510.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
