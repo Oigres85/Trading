@@ -1252,6 +1252,37 @@ _corto = ud.sensibilita_macro(_cE.iloc[-100:], {"tassi": ("TLT", "i tassi", _bE.
 check("v403 su un campione troppo piccolo il terzo sguardo tace invece di inventare un pavimento",
       _corto.get("evento") is None)
 
+# ═══ v421 — TRE ESITI PER OGNI FONTE MACRO, NON UNO ════════════════════════════════════════
+# `fonti` elencava le fonti CONFIGURATE, quindi il pacchetto scriveva "(fonti: CNBC, Bloomberg,
+# MarketWatch)" anche nel run in cui MarketWatch non aveva servito niente. "Letta e senza voci
+# macro" e "NON letta" si leggono uguali e significano l'opposto: e' il guasto della v389, dove
+# un try/except per-fonte ha tenuto le news morte un anno mentre l'elenco continuava a nominare
+# le fonti morte. La v399 lo ha chiuso per le notizie PER TITOLO; il blocco macro era rimasto
+# indietro (classe v412, correzione applicata a un ramo e non all'altro).
+_dqf = ud.validate_macro({"news": {"voci": [{"quando": datetime.now(timezone.utc).isoformat()}],
+                                   "fonti": ["Alfa"], "fonti_mute": ["Beta"],
+                                   "fonti_non_lette": ["Gamma"]}})
+check("v421 una fonte macro non raggiunta fa suonare il gate",
+      any(a.startswith("news_fonti") and "Gamma" in a for a in _dqf["alerts"]))
+
+# ⚠ una fonte MUTA non e' un allarme: puo' non aver avuto notizie macro in questo run, ed e' il
+# caso normale di MarketWatch. Se suonasse anche li', il gate diventerebbe rumore e verrebbe
+# ignorato proprio quando una fonte muore davvero.
+_dqf2 = ud.validate_macro({"news": {"voci": [{"quando": datetime.now(timezone.utc).isoformat()}],
+                                    "fonti": ["Alfa"], "fonti_mute": ["Beta"],
+                                    "fonti_non_lette": []}})
+check("v421 una fonte muta NON fa suonare il gate",
+      not any(a.startswith("news_fonti") for a in _dqf2["alerts"]))
+
+# ⚠⚠ E IL COLLEGAMENTO, non solo il controllo (lezione v399): i due check sopra passano un
+# dizionario costruito a mano, quindi proverebbero il gate anche se la pipeline smettesse di
+# distinguere i tre esiti. Qui si guarda il codice che li produce.
+check("v421 la pipeline registra CHI HA SERVITO, non chi era configurato",
+      '"fonti": serviti,' in _SRC_UD_CODICE
+      and '"fonti_non_lette": non_letti,' in _SRC_UD_CODICE
+      and "non_letti.append(fonte)" in _SRC_UD_CODICE
+      and "[f for f, _, _ in NEWS_FONTI]" not in _SRC_UD_CODICE)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)

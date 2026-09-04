@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "420";
+const BUILD_VERSION = "421";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -146,6 +146,21 @@ const $ = (sel) => document.querySelector(sel);
 const fmtEUR = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 const fmtUSD = new Intl.NumberFormat("it-IT", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const fmtNum = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 2 });
+/* ⚠⚠ v421 — LA STESSA GRANDEZZA RESA CON DUE PRECISIONI IN DUE BLOCCHI CHE IL PACCHETTO
+   DICHIARA ESSERE LO STESSO SEGNALE. Misurato sul pacchetto del 04/09: la concentrazione di
+   fattore usciva "74% dell'azionario" nel blocco CONCENTRAZIONE e "73,6%" nella DISCIPLINA, e
+   il peso delle prime tre "58%" contro "58,5%". La derivazione era gia' UNA (pesoSemi, ord) —
+   il difetto non era il calcolo ma la RESA: `toFixed(0)` di qua, una cifra di la'.
+   ⚠ E qui e' peggio che altrove, perche' fra i due blocchi c'e' scritto "QUESTE MISURE SONO LE
+   STESSE DEL BLOCCO QUI SOPRA, non misure nuove: contale UNA VOLTA SOLA". Dichiarare che due
+   numeri sono lo stesso e poi stamparli diversi e' peggio che non dichiararlo: il lettore e'
+   istruito a trattarli come uno e ne vede due, e il collaudo B5 gli ordina di segnalarlo. Il
+   pacchetto fornisce da solo i falsi positivi del proprio controllo di qualita' (v400, v412).
+   ⚠ La tolleranza NON e' la risposta: v415 lo ha gia' stabilito — fra due rese della STESSA
+   grandezza dalla STESSA fonte i numeri devono COINCIDERE, non somigliarsi. Quindi una
+   formattazione sola, a livello di modulo, invece di quattro `toFixed(0)` da tenere allineati
+   a mano (che e' il registro che invecchia da solo: C10, red team I6). */
+const pct1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, c =>
@@ -8817,7 +8832,26 @@ function buildPrompt(opz) {
      i numeri che contengono, e il filtro che li seleziona e' automatico. */
   {
     const ORE = 8;
-    const fonti = (m.news && m.news.fonti || []).join(", ");
+    /* ⚠⚠ v421 — "(fonti: A, B, C)" ELENCAVA LE FONTI CONFIGURATE, NON QUELLE CHE HANNO
+       SERVITO. Misurato sul run del 04/09: la riga nominava MarketWatch fra le fonti delle 18
+       voci, e MarketWatch ne aveva prodotte ZERO. Il feed rispondeva — quindi oggi era "letta,
+       nessuna voce macro" — ma dal pacchetto quel caso e' INDISTINGUIBILE da "non letta", che
+       e' il guasto per cui le news macro sono rimaste morte un anno (v389): un `try/except`
+       per-fonte spegne la funzionalita' in silenzio, il job esce 0, e l'elenco delle fonti
+       continua a nominare quelle morte. La v399 aveva gia' chiuso il caso per le notizie PER
+       TITOLO tenendo tre esiti distinti; il blocco macro e' rimasto indietro — la classe v412,
+       una correzione applicata a un ramo e non all'altro.
+       ⚠ Finche' il CI non ha rigenerato, le due chiavi nuove non ci sono: allora la riga
+       DICHIARA di non poter distinguere, invece di affermare quello che non sa (v187/v400:
+       togliere in silenzio una riga che il pacchetto pubblicava e' peggio del difetto). */
+    const _fn = (m.news || {});
+    const _sv = _fn.fonti || [];
+    const _mu = _fn.fonti_mute, _nl = _fn.fonti_non_lette;
+    const fonti = _sv.join(", ")
+      + (Array.isArray(_mu) && _mu.length ? ` · lette e senza voci macro in questo run: ${_mu.join(", ")}` : "")
+      + (Array.isArray(_nl) && _nl.length ? ` · ⚠ NON LETTE, la fonte non ha risposto: ${_nl.join(", ")}` : "")
+      + (Array.isArray(_mu) && Array.isArray(_nl) ? "" : " ⚠ questo elenco e' quello delle fonti CONFIGURATE"
+        + ", non di quelle che hanno servito: una fonte muta e una irraggiungibile qui si leggono uguali");
     const voci = (m.news && m.news.voci) || [];
     const adesso = Date.now();
     const conEta = voci
@@ -10451,9 +10485,35 @@ function disciplinaTesto() {
      che in questo progetto e' gia' costata tre volte (v156, v179, v180).
      Quello che resta nel payload e' il FATTO che rende il divieto sensato: i tre dati che il
      sistema non ha. Sta nella regola "Leva, esposizione lorda e copertura" qui sopra. */
+  /* ⚠⚠ v421 — QUESTA RIGA NEGAVA UN DATO CHE IL PACCHETTO USA VENTI RIGHE PIU' SU.
+     Il blocco dei pesi apre con "l'azionario vale l'85,6% del totale, accanto a liquidita'
+     (al 2026-08-08) e titoli di Stato": quel denominatore CONTIENE la cassa. E qui si leggeva
+     "la liquidita' disponibile del CEO ... Nessuno dei tre e' nel sistema". Due affermazioni
+     opposte sullo stesso dato nello stesso pacchetto — precisamente cio' che il collaudo B5
+     ordina a chi legge di segnalare, fornito dal pacchetto stesso (classe v400, v412, v414:
+     un pacchetto che produce i falsi positivi del proprio controllo di qualita' lo logora).
+     ⚠ E il danno non e' solo il falso positivo: il divieto di dimensionare POGGIA su questa
+     riga. Un lettore che trova la premessa smentita conclude che il divieto sia eccessivo e
+     comincia a dimensionare, che e' la cosa che tutto il pacchetto esiste per impedire.
+     ⚠ La correzione non toglie ne' il divieto ne' il denominatore: dice ESATTAMENTE cosa il
+     sistema ha e perche' non basta (forma v406/v409). Una cifra annotata a mano, datata, su
+     UN conto non e' "la liquidita' disponibile" — ed e' la differenza che rende il divieto
+     giusto invece che smentito.
+     ⚠ La cassa si rilegge da `fuoriAzionarioEur()`, la stessa funzione del blocco dei pesi:
+     una seconda lettura dello stato divergerebbe al primo ritocco (v161, v207, v316). */
+  const _liq = (typeof fuoriAzionarioEur === "function" ? fuoriAzionarioEur() : null);
+  const _vLiq = _liq && _liq.voci.find(x => /liquidit/i.test(x.che));
   L.push("I tre dati che questa sezione NON contiene, e senza i quali una quantita' non e' "
     + "calcolabile: la liquidita' disponibile del CEO, gli altri conti, la sua situazione fiscale. "
-    + "Nessuno dei tre e' nel sistema.");
+    + (_vLiq
+      ? "⚠ Della prima il sistema ha SOLO la cifra che il CEO ha annotato lui stesso"
+        + (_vLiq.al ? ` il ${String(_vLiq.al).slice(0, 10)}` : "")
+        + ", ed e' quella che il blocco dei pesi qui sopra usa per dire quanto pesa l'azionario "
+        + "sul totale: e' il saldo annotato di QUESTO conto a QUELLA data, non la liquidita' di "
+        + "cui il CEO dispone oggi ne' quella che potrebbe impiegare. Gli altri due non sono nel "
+        + "sistema affatto. Il divieto di dimensionare resta quindi in piedi per intero: manca "
+        + "quanto prima, non meno."
+      : "Nessuno dei tre e' nel sistema."));
   return L.join("\n");
 }
 
@@ -10754,8 +10814,8 @@ function contestoPortafoglio(tkCorrente) {
   const gf = gruppoFattore(azionarie, totAz);
   const { SOGLIA_FATTORE, ancora, corrCon, misurato, semi, pesoSemi } = gf;
   const primeTre = ord.slice(0, 3).reduce((s, x) => s + x.v, 0) / totAz * 100;
-  L.push(`CONCENTRAZIONE: le prime tre posizioni valgono il ${primeTre.toFixed(0)}% dell'azionario`
-    + `${semi.length >= 2 ? ` · ${semi.length} posizioni si muovono INSIEME e valgono il ${pesoSemi.toFixed(0)}% dell'azionario: `
+  L.push(`CONCENTRAZIONE: le prime tre posizioni valgono il ${pct1(primeTre)}% dell'azionario`
+    + `${semi.length >= 2 ? ` · ${semi.length} posizioni si muovono INSIEME e valgono il ${pct1(pesoSemi)}% dell'azionario: `
         + semi.map(x => `${x.r.ticker}${misurato && corrCon.get(x.r.ticker) != null ? ` ${corrCon.get(x.r.ticker).toFixed(2)}` : ""}`).join(", ")
         + (misurato
             ? ` — il gruppo NON e' una lista di settore: e' chi ha correlazione dei rendimenti giornalieri ≥ ${SOGLIA_FATTORE} con ${ancora} sulle sedute in comune (numero accanto a ogni nome)`
@@ -10780,7 +10840,7 @@ function contestoPortafoglio(tkCorrente) {
       + `non e' un'incoerenza. ⚠ E "indipendenti" vale RISPETTO A ${ancora}: fra loro possono muoversi insieme, `
       + `perche' il sistema misura contro una sola ancora e non pubblica la matrice completa.`);
     if (nonMisurati.length) L.push(`  ⚠ NON MISURABILI, quindi fuori dal conto per mancanza di dati e non perche' indipendenti: `
-      + `${nonMisurati.join(", ")} — meno di 60 sedute in comune con ${ancora}. Il loro peso NON e' incluso nel ${pesoSemi.toFixed(0)}%.`);
+      + `${nonMisurati.join(", ")} — meno di 60 sedute in comune con ${ancora}. Il loro peso NON e' incluso nel ${pct1(pesoSemi)}%.`);
   }
   /* ═══ v404 — E DENTRO QUEL GRUPPO CI SONO DUE RISCHI, NON UNO ══════════════════════════════
      Il grappolo misura la co-movimentazione nella giornata media, ed e' vera. Ma un salto dei
@@ -10802,7 +10862,7 @@ function contestoPortafoglio(tkCorrente) {
       + `⚠⚠ E' LA DISTINZIONE CHE IL GRAPPOLO NON FA: quei nomi si muovono insieme agli altri nella `
       + `giornata media, ma un rialzo dei tassi o una stretta del credito riprezza il COSTO DEL LORO `
       + `PIANO, mentre sugli autofinanziati agisce solo come fattore di sconto. Un evento sul credito `
-      + `colpisce ${dip.pesoDipende.toFixed(1)}% del libro, non il ${pesoSemi.toFixed(0)}% del gruppo. `
+      + `colpisce ${dip.pesoDipende.toFixed(1)}% del libro, non il ${pct1(pesoSemi)}% del gruppo. `
       + `⚠ CONVENZIONE DICHIARATA, non un dato del file: la soglia e' il SEGNO del flusso libero. E non `
       + `e' un giudizio sulla societa' — costruire a debito puo' essere la scommessa giusta: cambia il `
       + `CANALE da cui il rischio arriva, non il merito della scommessa. `
@@ -10993,12 +11053,12 @@ function contestoPortafoglio(tkCorrente) {
           + `gruppo correlato di ${TK} (${gfN.misurato ? "correlazione misurata sopra " + gfN.SOGLIA_FATTORE
               : "classificazione di settore, correlazione non misurabile in questo run"}), cioe' si `
           + `muovono insieme. Una notizia su di loro e' una notizia su questa posizione, e vale per `
-          + `il PESO DEL GRUPPO (${Math.round(gfN.pesoSemi)}% dell'azionario), non per un nome solo.`
+          + `il PESO DEL GRUPPO (${pct1(gfN.pesoSemi)}% dell'azionario), non per un nome solo.`
         : `⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato `
           + `(${gfN.misurato ? "correlazione misurata sopra " + gfN.SOGLIA_FATTORE
               : "classificazione di settore, correlazione non misurabile in questo run"}) si muovono `
           + `insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO `
-          + `(${Math.round(gfN.pesoSemi)}% dell'azionario) e non per il peso del nome che la porta. `
+          + `(${pct1(gfN.pesoSemi)}% dell'azionario) e non per il peso del nome che la porta. `
           + `Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.`;
       L.push(_rif + altre.map(({ t, v }) => `\n  [${t}]` + riga(v).replace(/^\n {4}/, " ")).join(""));
     }

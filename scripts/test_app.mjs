@@ -4090,7 +4090,8 @@ check("v348 contesto: il pacchetto del titolo porta i PESI, mai gli importi", su
 
 check("v348 contesto: la concentrazione per fattore e' una somma dichiarata, non un giudizio", suVeri(`
   const p = buildPromptTicker("MU");
-  return /le prime tre posizioni valgono il \\d+%/.test(p)
+  return p.indexOf("le prime tre posizioni valgono il") >= 0
+      && /le prime tre posizioni valgono il [0-9]+(,[0-9]+)?%/.test(p)
       && /l'esposizione del libro a quel fattore e' la loro somma/.test(p)`));
 
 /* ══ v348 — IL P/E FORWARD, CHE IL SISTEMA AVEVA E NON PUBBLICAVA ══════════════════════════ */
@@ -6344,7 +6345,7 @@ check("v398 le notizie sugli altri nomi del gruppo sono marcate come notizie sul
   return p.indexOf("RIGUARDANO IL FATTORE") >= 0
       && p.indexOf("[NVDA]") >= 0
       && p.indexOf("Titolo di prova su Nvidia") >= 0
-      && /PESO DEL GRUPPO \\(\\d+% dell'azionario\\)/.test(p);`));
+      && /PESO DEL GRUPPO \\([0-9]+(,[0-9]+)?% dell'azionario\\)/.test(p);`));
 
 check("v398 un titolo NON LETTO non si legge come 'nessuna notizia'", suVeri(_INIETTA_NEWS + `
   const p = buildPromptTicker("CRWV");
@@ -8148,6 +8149,150 @@ check("v420 l'intestazione e la dichiarazione del taglio concordano sempre", suV
     if (daIntestazione !== daTaglio)
       guai.push(tk + ": intestazione dice " + (daIntestazione ? "posizione" : "non posizione")
         + " e la dichiarazione del taglio dice " + (daTaglio ? "tolto" : "non tolto"));
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v421 — IL PACCHETTO NEGAVA UN DATO CHE USA VENTI RIGHE PIU' SU.
+   Il blocco dei pesi apre con "l'azionario vale l'85,6% del totale, accanto a liquidita'
+   (al 2026-08-08) e titoli di Stato" — quel denominatore CONTIENE la cassa — e la chiusura
+   della disciplina diceva "la liquidita' disponibile del CEO ... Nessuno dei tre e' nel
+   sistema". Due affermazioni opposte sullo stesso dato dentro lo stesso pacchetto, cioe'
+   precisamente cio' che il collaudo B5 ordina a chi legge di segnalare: il pacchetto
+   forniva da solo i falsi positivi del proprio controllo di qualita' (v400, v412, v414).
+   ⚠ E il divieto di dimensionare POGGIA su quella riga: un lettore che trova la premessa
+   smentita conclude che il divieto sia eccessivo — che e' la cosa che tutto il pacchetto
+   esiste per impedire.
+   ⚠ Il check percorre ENTRAMBI i rami costruendo lo stato, invece di prendere quello che
+   capita: con STATO_PTF nullo la riga "Nessuno dei tre" e' vera e deve restare. Un gate che
+   esercitasse un ramo solo non avrebbe visto il difetto, che vive solo nell'altro. */
+check("v421 la riga dei tre dati non nega la cassa che il pacchetto usa nei pesi", suVeriEsito(`
+  const tk = (DATA.watchlist.find(r => r && Number(r.qta) > 0 && !String(r.ticker).startsWith("^")) || {}).ticker;
+  const riga = (p) => { const i = p.indexOf("I tre dati che questa sezione NON contiene");
+    return i < 0 ? "" : p.slice(i, p.indexOf(String.fromCharCode(10), i)); };
+  const guai = [];
+
+  STATO_PTF = { cash: { v: 10000, at: "2026-08-08" }, btp: { v: { qty: 40000, pmc: 100 } } };
+  const conCassa = buildPromptTicker(tk);
+  const rc = riga(conCassa);
+  if (!rc) guai.push("con la cassa nota la riga dei tre dati non compare affatto");
+  if (rc.indexOf("Nessuno dei tre e' nel sistema") >= 0)
+    guai.push("il sistema HA la cassa (e la usa nei pesi) e la riga dichiara che nessuno dei tre c'e'");
+  if (rc.indexOf("2026-08-08") < 0)
+    guai.push("la riga non dice a quale data e' annotata la cassa che il pacchetto sta usando");
+  if (conCassa.indexOf("MA NON E' IL PATRIMONIO") < 0)
+    guai.push("il blocco dei pesi non usa la cassa: il check non sta misurando la contraddizione");
+
+  STATO_PTF = null;
+  const senza = riga(buildPromptTicker(tk));
+  if (senza.indexOf("Nessuno dei tre e' nel sistema") < 0)
+    guai.push("senza stato patrimoniale la riga non dichiara piu' che i tre dati mancano");
+
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v421 — "(fonti: A, B, C)" ELENCAVA LE FONTI CONFIGURATE, NON QUELLE CHE HANNO SERVITO.
+   Misurato sul run del 04/09: la riga nominava MarketWatch fra le fonti delle 18 voci e
+   MarketWatch ne aveva prodotte ZERO. Il feed rispondeva — quindi era "letta e muta" — ma dal
+   pacchetto quel caso e' INDISTINGUIBILE da "non letta", che e' il guasto per cui le news macro
+   sono rimaste morte un anno (v389). La v399 aveva gia' chiuso il caso per le notizie PER
+   TITOLO tenendo tre esiti distinti: il blocco macro era rimasto indietro, classe v412.
+   ⚠ Lo stato si COSTRUISCE: nel data.json di oggi le chiavi nuove non esistono ancora (le
+   scrive il run successivo della pipeline), quindi un check che le leggesse sarebbe verde per
+   assenza del fenomeno — la trappola pagata quattro volte in questo progetto. */
+check("v421 le notizie macro distinguono fonte che serve, fonte muta e fonte non letta", suVeriEsito(`
+  const riga = (p) => { const i = p.indexOf("- TITOLI MACRO");
+    return i < 0 ? "" : p.slice(i, p.indexOf(String.fromCharCode(10), i)); };
+  if (!(DATA.macro && DATA.macro.news && (DATA.macro.news.voci || []).length))
+    return "il data.json non ha voci macro: il check non misura niente";
+  const guai = [];
+
+  DATA.macro.news.fonti = ["Alfa"];
+  DATA.macro.news.fonti_mute = ["Beta"];
+  DATA.macro.news.fonti_non_lette = ["Gamma"];
+  const tre = riga(buildCIOText());
+  if (tre.indexOf("Alfa") < 0) guai.push("la fonte che ha servito non e' nominata");
+  if (tre.indexOf("Beta") < 0 || tre.indexOf("senza voci macro") < 0)
+    guai.push("la fonte letta e muta non e' distinta: " + tre.slice(0, 160));
+  if (tre.indexOf("Gamma") < 0 || tre.indexOf("NON LETTE") < 0)
+    guai.push("la fonte non raggiunta non e' distinta da una muta: " + tre.slice(0, 160));
+  const iB = tre.indexOf("Beta"), iG = tre.indexOf("Gamma");
+  if (iB >= 0 && iG >= 0 && tre.slice(Math.min(iB, iG), Math.max(iB, iG)).indexOf("NON LETTE") < 0
+      && tre.slice(Math.min(iB, iG), Math.max(iB, iG)).indexOf("senza voci") < 0)
+    guai.push("muta e non letta finiscono nello stesso elenco");
+
+  delete DATA.macro.news.fonti_mute;
+  delete DATA.macro.news.fonti_non_lette;
+  const vecchio = riga(buildCIOText());
+  if (vecchio.indexOf("fonti CONFIGURATE") < 0)
+    guai.push("senza le chiavi nuove la riga afferma comunque chi ha servito invece di dichiarare che non lo sa");
+
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v421 — LA STESSA GRANDEZZA RESA CON DUE PRECISIONI, IN DUE BLOCCHI CHE IL PACCHETTO
+   DICHIARA ESSERE LO STESSO SEGNALE. Misurato sul pacchetto del 04/09: la concentrazione di
+   fattore usciva "74% dell'azionario" nel blocco CONCENTRAZIONE, "73,6%" nella DISCIPLINA e
+   di nuovo "74%" nel blocco delle notizie; il peso delle prime tre "58%" contro "58,5%".
+   La derivazione era gia' UNA: il difetto stava nella RESA, `toFixed(0)`/`Math.round` di qua e
+   una cifra di la'.
+   ⚠ E fra i due blocchi c'e' scritto "QUESTE MISURE SONO LE STESSE DEL BLOCCO QUI SOPRA:
+   contale UNA VOLTA SOLA". Dichiarare che due numeri sono lo stesso e poi stamparli diversi e'
+   peggio che non dichiararlo — il lettore e' istruito a trattarli come uno e ne vede due, e il
+   collaudo B5 gli ordina di segnalarlo: il pacchetto produce da solo i falsi positivi del
+   proprio controllo di qualita' (classe v400, v412, v414).
+   ⚠ Il gate NON ammette tolleranza, ed e' la lezione v415: fra due rese della STESSA grandezza
+   dalla STESSA fonte i numeri devono COINCIDERE, non somigliarsi. Una tolleranza tarata su
+   "due arrotondamenti legittimi possono differire" e' giusta fra grandezze calcolate in due
+   modi, e sbagliata qui.
+   ⚠ Cerca le occorrenze per la LORO FORMA nel testo, non per un elenco di frasi scritto a
+   mano: un registro di punti di stampa invecchia da solo al primo blocco nuovo (C10, red team
+   I6, MACRO_CARD_BY_PANEL che copriva 7 pannelli su 37). */
+check("v421 il peso del gruppo correlato esce con lo stesso numero in ogni blocco", suVeriEsito(`
+  /* ⚠ OGNI SEDE HA IL PROPRIO ANCORAGGIO, CHIUSO. La prima stesura ne usava uno solo, largo
+     ("posizioni = N% dell'azionario"), e prendeva anche la finestra delle trimestrali (70,9%)
+     e la dipendenza dal mercato dei capitali (17,4%), che sono grandezze DIVERSE: il check era
+     rosso su codice corretto. Stringendolo con una lookahead condivisa e' diventato il difetto
+     opposto — NON MORDEVA piu' sull'iniezione, perche' la lookahead scritta per una sede
+     spegneva un'altra. Sesta incarnazione dell'ancoraggio aperto, e sua conseguenza.
+     ⚠ Il PAVIMENTO sulle sedi trovate e' la difesa contro il gate che si addormenta: se domani
+     una riformulazione fa mancare i riferimenti, il check lo dice invece di uscire verde per
+     assenza del fenomeno (meta-gate dei dormienti, v350). */
+  const SEDI_GRUPPO = [
+    "si muovono INSIEME e valgono il ([0-9]+(?:,[0-9]+)?)%",
+    "Il loro peso NON e. incluso nel ([0-9]+(?:,[0-9]+)?)%",
+    "posizioni = ([0-9]+(?:,[0-9]+)?)% dell'azionario [(]",
+    "([0-9]+(?:,[0-9]+)?)% del capitale si muove insieme",
+    "non il ([0-9]+(?:,[0-9]+)?)% del gruppo",
+    "PESO DEL GRUPPO [(]([0-9]+(?:,[0-9]+)?)%",
+  ];
+  const SEDI_TRE = [
+    "le prime tre posizioni valgono il ([0-9]+(?:,[0-9]+)?)%",
+    "[+] AMD = ([0-9]+(?:,[0-9]+)?)%",
+  ];
+  const raccogli = (p, sedi) => {
+    const vis = new Map();
+    for (const src of sedi) {
+      const rx = new RegExp(src, "g");
+      let m;
+      while ((m = rx.exec(p))) { if (!vis.has(m[1])) vis.set(m[1], []); vis.get(m[1]).push(src); }
+    }
+    return vis;
+  };
+  const guai = [];
+  for (const nome of ["macro", "titolo"]) {
+    const p = nome === "macro" ? buildCIOText() : (() => {
+      const tk = (DATA.watchlist.find(r => r && Number(r.qta) > 0 && !String(r.ticker).startsWith("^")) || {}).ticker;
+      return buildPromptTicker(tk); })();
+
+    const g = raccogli(p, SEDI_GRUPPO);
+    const nSediG = [...g.values()].reduce((s, x) => s + x.length, 0);
+    if (nSediG < 4) guai.push(nome + ": trovate solo " + nSediG + " sedi del peso del gruppo su 6, il check si sta addormentando");
+    if (g.size > 1) guai.push(nome + ": il peso del gruppo correlato esce con " + g.size
+      + " valori diversi (" + [...g.keys()].join(" e ") + ")");
+
+    const t3 = raccogli(p, SEDI_TRE);
+    const nSediT = [...t3.values()].reduce((s, x) => s + x.length, 0);
+    if (nSediT < 2) guai.push(nome + ": trovate solo " + nSediT + " sedi del peso delle prime tre su 2");
+    if (t3.size > 1) guai.push(nome + ": il peso delle prime tre esce con " + t3.size
+      + " valori diversi (" + [...t3.keys()].join(" e ") + ")");
   }
   return guai.length ? guai.join(" · ") : true;`));
 

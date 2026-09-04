@@ -3037,12 +3037,28 @@ def fetch_macro():
     try:
         import email.utils as _eu
         news = []
+        # ⚠⚠ v421 — TRE ESITI DISTINTI, NON UNO. `fonti` elencava le fonti CONFIGURATE, quindi
+        # il pacchetto scriveva "(fonti: CNBC Economia, Bloomberg, MarketWatch)" anche in un run
+        # in cui MarketWatch non aveva servito NIENTE — e "letta, nessuna voce macro" e "NON
+        # letta" si leggono uguali e significano l'opposto. E' esattamente il guasto della v389,
+        # dove un `try/except` per-fonte ha tenuto le news macro morte per un anno senza che
+        # nessuno potesse accorgersene: il job usciva 0 e l'elenco delle fonti continuava a
+        # nominare quelle morte. La v399 lo ha gia' chiuso per le notizie PER TITOLO tenendo tre
+        # esiti distinti; il blocco macro era rimasto indietro (classe v412, una correzione
+        # applicata a un ramo e non all'altro).
+        # ⚠ Il conteggio di `validate_macro` non lo prende: sorveglia l'eta' AGGREGATA, quindi
+        # due fonti vive su tre tengono il totale fresco e la terza puo' morire in silenzio.
+        # E' la "dodici sorveglianti e una fonte scoperta" della v389, un livello piu' sotto.
+        serviti, muti, non_letti = [], [], []
         for fonte, url, filtra in NEWS_FONTI:
             try:
                 r = http_get(url, timeout=15)
                 testo = r.text
-                news.extend(voci_rss(testo, fonte, NEWS_RE if filtra else None, 30))
+                prese = voci_rss(testo, fonte, NEWS_RE if filtra else None, 30)
+                news.extend(prese)
+                (serviti if prese else muti).append(fonte)
             except Exception as e:  # noqa: BLE001
+                non_letti.append(fonte)
                 print(f"!! news {fonte}: {e}", file=sys.stderr)
         # piu' recenti in cima, senza doppioni di titolo
         visti, puliti = set(), []
@@ -3055,7 +3071,9 @@ def fetch_macro():
         if puliti:
             macro["news"] = {
                 "voci": puliti[:18],
-                "fonti": [f for f, _, _ in NEWS_FONTI],
+                "fonti": serviti,
+                "fonti_mute": muti,
+                "fonti_non_lette": non_letti,
                 "filtro": ("CNBC Economia entra per intero (e' gia' un feed di economia); "
                            "Bloomberg e MarketWatch passano da un filtro per termine macro, "
                            "imperfetto per costruzione"),
@@ -4451,6 +4469,20 @@ def validate_macro(macro):
                 "ok" if piu_recente <= 48 else "stale",
                 f"{len(voci)} voci, la piu' recente di {piu_recente:.0f} ore"
                 + ("" if piu_recente <= 48 else " — oltre due giorni: sospetta una fonte caduta"))
+
+    # ⚠⚠ v421 — IL CHECK SOPRA GUARDA L'ETA' AGGREGATA, E QUINDI NON VEDE UNA FONTE MORTA.
+    # Due fonti vive su tre tengono la piu' recente dentro le 48 ore: la terza puo' smettere di
+    # rispondere per sempre senza che nessun allarme suoni. E' la "dodici sorveglianti e una
+    # fonte scoperta" della v389 un livello piu' sotto — la' era scoperta la funzionalita',
+    # qui la singola fonte dentro una funzionalita' sorvegliata.
+    # ⚠ Una fonte MUTA non e' un allarme: puo' non avere avuto notizie macro in questo run, ed
+    # e' il caso normale di MarketWatch. Una fonte NON LETTA si': ha alzato un'eccezione, cioe'
+    # la richiesta e' fallita.
+    non_lette = nw.get("fonti_non_lette") or []
+    if non_lette:
+        add("news_fonti", str(today), 2, "missing",
+            f"{len(non_lette)} fonte/i non raggiunta/e in questo run: {', '.join(map(str, non_lette))}"
+            + " — le voci mancanti non sono 'nessuna notizia', sono una fonte caduta")
 
     # --- fonti v390: ognuna nasce sorvegliata, non dopo il primo guasto -----------------
     # ⚠ La lezione delle news e' costata la vita intera della funzionalita': una fonte che
