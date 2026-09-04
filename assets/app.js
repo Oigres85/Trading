@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "415";
+const BUILD_VERSION = "416";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8584,7 +8584,18 @@ function buildPrompt(opz) {
   // USA-Giappone (USD/JPY + tasso BoJ), e il rischio cambio del fondo è EUR/USD.
   const dgs10 = (((m.tassi || {}).scadenze || []).find(x => x && x.key === "a10") || {});
   (m.markets || []).filter(x => !/EUR\/JPY/i.test(x.label || "")).forEach(x => {
-    let riga = `- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`;
+    /* ⚠⚠ v416 — "OGGI" SU UNA BARRA CHE IL PACCHETTO DICHIARA DI IERI.
+       La riga di freschezza dice "LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-09-03 —
+       1 giorno fa: non sono prezzi di adesso", e sei righe dello stesso pacchetto attaccavano
+       "oggi" alla variazione giornaliera. E' la classe v193/v234 — stato del mercato e
+       freschezza del dato sono due cose diverse — e la correzione della v193 era arrivata alla
+       riga del VIX e non a queste. Il collaudo B5 ordina a chi legge di segnalare le
+       contraddizioni: qui gliele forniva il pacchetto.
+       ⚠ NON si scrive una data: gli strumenti hanno barre di sedute diverse (un cambio passa al
+       giorno dopo ore prima di un'azione), e affermarne UNA per tutti e' il difetto chiuso in
+       v415 — una riga che datava l'intero pacchetto. "Nell'ultima seduta" e' vero per ciascuno,
+       e quale sia quella seduta lo dice la riga di freschezza. */
+    let riga = `- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} nell'ultima seduta)`;
     if (String(x.key || "").toUpperCase() === "^TNX" && dgs10.value != null) {
       riga += ` [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI `
         + `porta lo stesso decennale a ${fmtNum.format(dgs10.value)}% (FRED DGS10, osservazione del `
@@ -8753,7 +8764,7 @@ function buildPrompt(opz) {
          internamente coerente con la lettura sbagliata. Una convenzione decimale sola in tutto
          il pacchetto, ed e' quella italiana che il resto usa gia'. */
       pezzi.push(`${v.label || k} ${fmtNum.format(v.value)}${v.unita ? " " + v.unita : ""}`
-        + (v.change_pct != null ? ` (${signTxt(v.change_pct)} oggi)` : "")
+        + (v.change_pct != null ? ` (${signTxt(v.change_pct)} nell'ultima seduta)` : "")   // v416: vedi la nota sugli indicatori
         + (varAnno != null ? ` — ${signTxt(Math.round(varAnno * 10) / 10)} in un anno` : "")
         + (pos != null && v.min_1y != null && v.max_1y != null
             ? `, e sta al ${Math.round(pos)}% dell'intervallo annuale ${fmtNum.format(v.min_1y)}–${fmtNum.format(v.max_1y)}` : ""));
@@ -9641,7 +9652,7 @@ function buildHistoricalDigests() {
   const vxs = Array.isArray(vx.spark) ? vx.spark.map(dgFin).filter(x => x != null) : [];
   const vxPct = dgPercentile(vxs, vx.value);
   out.push({ label: "VIX (spark 30 sedute)", text: dgFin(vx.value) != null
-    ? `${dgTxt(vx.value, "", 1)} · oggi ${signTxt(dgFin(vx.change_pct))} · percentile finestra ${dgTxt(vxPct, "°", 0)} · term VIX/VIX3M ${dgTxt((m.smart_money || {}).vix_term_ratio, "", 2)}${dgFin((m.smart_money || {}).vix_term_ratio) != null ? ((m.smart_money || {}).vix_term_ratio >= 1 ? " (BACKWARDATION: stress)" : " (contango: calma)") : ""}`
+    ? `${dgTxt(vx.value, "", 1)} · ultima seduta ${signTxt(dgFin(vx.change_pct))} · percentile finestra ${dgTxt(vxPct, "°", 0)} · term VIX/VIX3M ${dgTxt((m.smart_money || {}).vix_term_ratio, "", 2)}${dgFin((m.smart_money || {}).vix_term_ratio) != null ? ((m.smart_money || {}).vix_term_ratio >= 1 ? " (BACKWARDATION: stress)" : " (contango: calma)") : ""}`
     : "—" });
 
   /* ══ v345 — QUATTRO SERIE CHE IL SISTEMA AVEVA E NON LEGGEVA ═══════════════════════════

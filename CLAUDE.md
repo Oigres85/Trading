@@ -3499,6 +3499,55 @@ ticker, in qualunque forma.
 radice ed è `per_titolo`, non `per_ticker`. Un check su una chiave che non c'è è verde (o rosso)
 per assenza di dati invece che di difetti, ed è già costato in v196 e v229.
 
+## 🕐 v416 — SEI RIGHE DICEVANO "OGGI" SU UNA BARRA CHE IL PACCHETTO DICHIARA DI IERI
+
+Trovato nel giro successivo, sui dati freschi del CI. Il pacchetto diceva, a poche righe di
+distanza:
+
+> ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL **2026-09-03** — 1 giorno fa … **non sono
+> prezzi di adesso**
+>
+> Semiconduttori (SOX) 11.352 (+0,11% **oggi**) · Rame 6,67 $/lb (+1,47% **oggi**) · Petrolio
+> WTI 90,69 $ (−0,67% **oggi**) · Oro 4524 $/oz (+0,72% **oggi**) · EUR/USD 1.1627 (+0,36%
+> **oggi**) · VIX … · **oggi** −0,84%
+
+È la classe **v193/v234** — *stato del mercato e freschezza del dato sono due cose diverse* — e
+la correzione della v193 era arrivata alla riga del VIX **del quadro macro** e non a queste tre
+sedi: la classe v412, una correzione applicata a un ramo e non agli altri. Il collaudo B5 ordina
+a chi legge di segnalare le contraddizioni interne, e qui gliele forniva il pacchetto.
+
+⚠⚠ **E NON SI SCRIVE UNA DATA.** Gli strumenti hanno barre di sedute diverse — un cambio passa
+al giorno dopo molte ore prima di un'azione, ed è precisamente il fatto misurato in v415 — quindi
+affermare UNA data per tutti sarebbe lo stesso difetto appena chiuso. *"Nell'ultima seduta"* è
+vero per ciascuno, e **quale** sia quella seduta lo dice la riga di freschezza.
+
+⚠ Il gate è **indipendente dall'orologio**: non "oggi è vietato quando la barra è di ieri", che
+andrebbe rosso o verde a seconda del giorno in cui gira la suite (v402), ma *una variazione di
+seduta si nomina per la seduta, mai con un avverbio che afferma quando*. E un secondo gate
+verifica che la variazione **resti pubblicata**: un check sulla sola assenza passerebbe anche se
+la riga sparisse (v406).
+
+### 🕳️ E il difetto vero di questo giro era NEL GATE, non nel sistema
+Il check v414 sulla quota di cash istituzionale è andato **rosso sui dati nuovi, su codice
+corretto**. Causa: iniettava su `macro.liquidity`, mentre la chiave è **`macro.liquidity_split`**
+— quindi il payload usava i dati veri e il check passava solo perché il valore reale coincideva
+per caso con quello iniettato (68/863 = 7,9 su entrambi). Il run del CI ha cambiato le masse
+(68/880 = **7,7**) e ha smascherato il finto verde.
+
+> **Seconda sonda sulla chiave sbagliata in una sessione** (la prima su `news_titoli`, alla
+> radice invece che sotto `macro`), e **l'ho annotata la prima volta senza che questo bastasse a
+> impedire la seconda**.
+
+⚠⚠ **E riscrivendolo l'ho trovato CIRCOLARE**: iniettava la nota *nuova* — quella che il
+denominatore lo nomina già — e poi accettava la dichiarazione trovata in qualunque punto della
+riga, quindi leggeva la **propria iniezione** invece del codice e restava verde anche togliendo
+l'etichetta. Ora inietta la nota **vecchia**, così il denominatore può venire da un posto solo:
+l'etichetta, che è esattamente ciò che il codice deve garantire.
+
+⚠ Quinta volta con un **backtick dentro un template passato al vm**, di nuovo in un commento che
+citava una chiave fra apici inversi. `modifica_sicura` ha rifiutato **entrambe** le scritture e
+il file è rimasto intatto — lo strumento ha fatto il lavoro per cui esiste.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

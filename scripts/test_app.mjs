@@ -7537,15 +7537,31 @@ check("v414 news: quando il tetto taglia, la riga dichiara quante voci restano f
    ⚠ Lo stato si costruisce: il gate inietta masse note invece di fidarsi di quelle del giorno,
    che possono cambiare da un run all'altro (v233, un check che misura i dati del giorno). */
 check("v414 la quota di cash istituzionale dichiara il denominatore che la riproduce", suVeriEsito(`
-  const salvato = DATA.macro.liquidity;
-  const A = 68, B = 795;                       // le masse del pacchetto reale, in miliardi
+  /* ⚠⚠ SECONDA SONDA SULLA CHIAVE SBAGLIATA in questa sessione (la prima su news_titoli).
+     La chiave e' macro.liquidity_split, non macro.liquidity: iniettando su quella inesistente
+     il payload usava i DATI VERI, e il check passava solo perche' il valore reale coincideva
+     per caso con quello iniettato (68/863 = 7,9 su entrambi). Verde per una ragione che non
+     c'entra col difetto — e l'ha smascherato il run del CI, che ha cambiato le masse
+     (68/880 = 7,7) facendo andare rosso il check su codice CORRETTO.
+     ⚠ Il difetto non era nel codice sorvegliato: la nota della pipeline dichiara davvero il
+     denominatore. Era nel gate. */
+  const salvato = DATA.macro.liquidity_split;
+  const A = 68, B = 795;                       // masse scelte, indipendenti da quelle del giorno
   const quotaSomma = Math.round(A / (A + B) * 1000) / 10;   // 7,9
   const quotaSpy  = Math.round(A / B * 1000) / 10;          // 8,6
-  DATA.macro.liquidity = Object.assign({}, salvato || {}, {
+  /* ⚠⚠ E LA NOTA INIETTATA E' QUELLA VECCHIA, DI PROPOSITO. La prima stesura iniettava la nota
+     NUOVA (che il denominatore lo nomina gia') e poi accettava la dichiarazione trovata in
+     qualunque punto della riga: cosi' il check leggeva la propria iniezione invece del codice,
+     ed e' rimasto verde anche togliendo l'etichetta dalla riga. Check CIRCOLARE, la classe
+     v393/v395 del gate che trova se stesso.
+     Con la nota vecchia il denominatore puo' venire da un posto solo — l'etichetta — che e'
+     esattamente cio' che il codice deve garantire: la nota arriva da un run che puo' essere
+     vecchio, l'etichetta no. */
+  DATA.macro.liquidity_split = Object.assign({}, salvato || {}, {
     inst_cash_pct: quotaSomma,
-    inst_note: "AUM BIL+SHV $" + A + "B su $" + (A + B) + "B di BIL+SHV+SPY (SPY da solo $" + B + "B)" });
+    inst_note: "AUM BIL+SHV $" + A + "B vs SPY $" + B + "B" });
   const p = buildPrompt();
-  DATA.macro.liquidity = salvato;
+  DATA.macro.liquidity_split = salvato;
   const i = p.indexOf("Istituzionali Cash:");
   if (i < 0) return "la riga del cash istituzionale non compare nel pacchetto";
   const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
@@ -7553,7 +7569,7 @@ check("v414 la quota di cash istituzionale dichiara il denominatore che la ripro
    && riga.indexOf(String(quotaSomma)) < 0) return "la riga non pubblica la quota iniettata: " + riga;
   /* la prova vera: la riga deve dire su COSA e' calcolata quella quota, e il totale nominato
      deve essere quello che la riproduce. Col denominatore sbagliato (SPY da solo) uscirebbe 8,6. */
-  const dichiaraSomma = riga.indexOf("totale BIL+SHV+SPY") >= 0 || riga.indexOf("su $" + (A + B) + "B") >= 0;
+  const dichiaraSomma = riga.indexOf("totale BIL+SHV+SPY") >= 0;
   if (!dichiaraSomma) return "pubblica una percentuale e non nomina il denominatore: " + riga;
   return Math.abs(quotaSomma - A / (A + B) * 100) < 0.06 ? true
     : "il denominatore dichiarato non riproduce il numero pubblicato";`));
@@ -7910,6 +7926,34 @@ check("v415 nessun filtro euristico decide di chi parla una notizia", (() => {
     && (r.indexOf("indexOf(TK") >= 0 || r.indexOf("includes(TK") >= 0
         || r.indexOf("indexOf(t)") >= 0 || r.indexOf("includes(t)") >= 0));
 })());
+
+/* ⚠⚠ v416 — NESSUNA VARIAZIONE GIORNALIERA SI CHIAMA "OGGI".
+   La riga di freschezza dichiara che la barra e' dell'ultima chiusura, spesso di ieri, e sei
+   righe dello stesso pacchetto attaccavano "oggi" alla variazione: il pacchetto forniva da solo
+   la contraddizione che il collaudo B5 ordina al lettore di segnalare. Classe v193/v234, con la
+   correzione arrivata alla riga del VIX e non a queste (classe v412, un ramo solo).
+   ⚠ L'invariante e' INDIPENDENTE DALL'OROLOGIO — non "oggi e vietato quando la barra e di ieri",
+   che andrebbe rosso o verde a seconda del giorno in cui gira la suite (v402), ma: una variazione
+   di seduta si nomina per la SEDUTA, mai con un avverbio che afferma quando. */
+check("v416 nessuna variazione di seduta e' etichettata 'oggi' nel pacchetto", suVeriEsito(`
+  const guai = [];
+  for (const [nome, p] of [["macro", buildCIOText()], ["titolo", buildPromptTicker("CRWV")]]) {
+    const righe = p.split(String.fromCharCode(10));
+    for (const r of righe) {
+      if (r.indexOf("% oggi)") >= 0 || r.indexOf(" oggi ") >= 0 && r.indexOf("· oggi ") >= 0) {
+        guai.push(nome + ": " + r.slice(0, 90));
+      }
+    }
+  }
+  return guai.length ? guai.slice(0, 4).join(" · ") : true;`));
+
+/* ⚠ e la forma corretta dev'esserci davvero: un check che verifica solo l'ASSENZA passerebbe
+   anche se la variazione sparisse del tutto (v406 — togliere in silenzio e' peggio del difetto). */
+check("v416 la variazione di seduta resta pubblicata, nominando la seduta", suVeriEsito(`
+  const p = buildCIOText();
+  const conSeduta = (p.split("nell'ultima seduta)").length - 1);
+  return conSeduta >= 3 ? true
+    : "solo " + conSeduta + " variazioni nominano la seduta: la riga potrebbe essere sparita invece di essere corretta";`));
 
 let fail = 0;
 for (const [name, ok] of T) {
