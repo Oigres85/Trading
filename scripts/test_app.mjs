@@ -8095,6 +8095,62 @@ check("v419 su un titolo non posseduto l'elenco del libro resta intero", suVeriE
   return righe === attesi ? true
     : "analizzando un titolo NON posseduto l'elenco ha " + righe + " righe invece di " + attesi;`));
 
+/* ⚠⚠ v420 — L'INTESTAZIONE DEL LIBRO HA TRE STATI, E IL TERZO AFFERMAVA IL FALSO.
+   La condizione era `tkCorrente`, vero per QUALSIASI pacchetto di titolo: analizzando un titolo
+   che il CEO non possiede, la riga diceva "IL LIBRO IN CUI QUESTA POSIZIONE VIVE" — cioe' che
+   quel titolo fosse una posizione — mentre non compare fra quelle elencate due righe sotto, e
+   mentre il blocco 0 della stessa testata lo inquadra correttamente come INGRESSO.
+   Stessa classe della v419, chiusa un livello piu' sotto: la stessa condizione sbagliata
+   sopravviveva nell'intestazione. Quando si corregge un predicato si cercano TUTTI i punti che
+   lo usano.
+   ⚠ Il check percorre i TRE stati (macro · titolo posseduto · titolo non posseduto): un gate che
+   ne esercita due non avrebbe visto il terzo, che e' esattamente com'e' nato il difetto. */
+check("v420 l'intestazione del libro dice il vero in tutti e tre gli stati", suVeriEsito(`
+  const tutti = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const dentro = tutti.filter(r => r && r.qta && r.tv && r.tv.tecnica).map(r => String(r.ticker).toUpperCase());
+  const fuori  = tutti.filter(r => r && !r.qta && r.tv && r.tv.tecnica).map(r => String(r.ticker).toUpperCase());
+  if (!dentro.length || !fuori.length)
+    return "servono un titolo posseduto e uno no: ne ho " + dentro.length + " e " + fuori.length;
+  const testa = (p) => { const i = p.indexOf("=== IL LIBRO");
+    return i < 0 ? "" : p.slice(i, p.indexOf(String.fromCharCode(10), i)); };
+  const guai = [];
+
+  const macro = testa(buildCIOText());
+  if (macro.indexOf("E' L'OGGETTO DELL'ANALISI") < 0)
+    guai.push("macro: l'intestazione non dichiara che il libro e' l'oggetto (" + macro.slice(0, 50) + ")");
+
+  const posseduto = testa(buildPromptTicker(dentro[0]));
+  if (posseduto.indexOf("QUESTA POSIZIONE VIVE") < 0)
+    guai.push(dentro[0] + " e' in portafoglio e l'intestazione non lo tratta da posizione");
+
+  const nonPosseduto = testa(buildPromptTicker(fuori[0]));
+  if (nonPosseduto.indexOf("QUESTA POSIZIONE VIVE") >= 0)
+    guai.push(fuori[0] + " NON e' in portafoglio e l'intestazione lo chiama posizione del libro");
+  if (nonPosseduto.indexOf(fuori[0] + " NON E' FRA LE POSIZIONI") < 0)
+    guai.push(fuori[0] + " non e' fra le posizioni e l'intestazione non lo dichiara");
+
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠ e la domanda "il titolo in esame e' fra le posizioni?" ha UNA derivazione sola: due
+   risposte alla stessa domanda divergono al primo ritocco (v161, v207, v316). */
+check("v420 l'intestazione e la dichiarazione del taglio concordano sempre", suVeriEsito(`
+  const tutti = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const casi = [
+    ...tutti.filter(r => r && r.qta && r.tv && r.tv.tecnica).slice(0, 2),
+    ...tutti.filter(r => r && !r.qta && r.tv && r.tv.tecnica).slice(0, 2),
+  ].map(r => String(r.ticker).toUpperCase());
+  if (casi.length < 3) return "meno di tre casi disponibili: il check non misura niente";
+  const guai = [];
+  for (const tk of casi) {
+    const p = buildPromptTicker(tk);
+    const daIntestazione = p.indexOf("=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE") >= 0;
+    const daTaglio = p.indexOf(tk + " NON compare in questo elenco") >= 0;
+    if (daIntestazione !== daTaglio)
+      guai.push(tk + ": intestazione dice " + (daIntestazione ? "posizione" : "non posizione")
+        + " e la dichiarazione del taglio dice " + (daTaglio ? "tolto" : "non tolto"));
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
