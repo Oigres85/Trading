@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "414";
+const BUILD_VERSION = "415";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9228,7 +9228,21 @@ function buildPrompt(opz) {
   }
   if (m.systemic_risk) {
     const sr = m.systemic_risk;
-    lines.push(`- Rischio Sistemico & Credito (proxy CDS): HY OAS ${sr.hy_oas}% (${signTxt(sr.hy_chg_1m)} 1m), IG OAS ${sr.ig_oas ?? "—"}% (ICE BofA US Corporate, indice IG AMPIO · ${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""} — ${sr.status} [etichetta nostra, dalle bande sull'HY OAS: sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi.]`);
+    /* ⚠⚠ v414 — LA CORREZIONE DELLA v405 ERA ARRIVATA A UN SOLO PUNTO DI STAMPA SU DUE.
+       La riga "Rischio Credito" pubblica l'etichetta dalle bande E la correzione che la
+       smentisce ("sta al 4° percentile: l'etichetta e il percentile dicono cose opposte, e il
+       percentile e' il piu' informativo"). Questa riga ripubblicava la STESSA etichetta —
+       "Mercato del Credito Rilassato" — e la STESSA legenda delle bande, senza la correzione:
+       chi legge qui riceve la lettura che l'altra riga dichiara fuorviante. E' la classe
+       v161/v207 (due punti di stampa della stessa affermazione che divergono) unita alla v412
+       (la correzione applicata a un ramo e non all'altro), e la copia SENZA il correttivo e'
+       sempre quella che vince, perche' e' la piu' breve.
+       ⚠ E lo stesso movimento a un mese usciva in TRE rese — -0,12 pp, -4% e -4,32% — cioe'
+       due arrotondamenti della stessa grandezza, che il collaudo B5 ordina al lettore di
+       segnalare (v412). Qui resta solo cio' che questa riga porta da sola: IG OAS, il rapporto
+       HY/IG e lo stress finanziario. Non e' un taglio di informazione ma di ridondanza (v184),
+       quindi non chiede la dichiarazione che la v406 impone alle assenze. */
+    lines.push(`- Rischio Sistemico & Credito (proxy CDS) — cio' che la riga Rischio Credito qui sopra non porta, sullo STESSO spread e senza ripeterne il livello ne' l'etichetta: IG OAS ${sr.ig_oas ?? "—"}% (ICE BofA US Corporate, indice IG AMPIO · ${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""}. ⚠ Il rapporto HY/IG dice come si distribuisce il compenso per il rischio fra le due qualita': sale quando il mercato chiede molto piu' compenso sul debito peggiore, ed e' un'informazione che nessuno dei due livelli da' da solo.`);
   }
   /* v259 — "Istituzionali VS Retail" fuori dal payload: stessa ragione del sentiment
      globale — e' una media di SMC indici, VIX term, HY/IG e put/call, tutti gia' pubblicati. */
@@ -10223,14 +10237,41 @@ function disciplinaRischio() {
       const a = autonomiaCassa(cmb);
       return a ? `, ${a.voci.map(v => v.testo).join(" e ")}` : "";
     };
+    /* ⚠⚠ v414 — LA SOGLIA STAMPATA E LO STATO CALCOLATO MISURAVANO DUE COSE DIVERSE.
+       La riga dichiarava "nessuna posizione con flusso di cassa libero negativo E interessi non
+       coperti" — un criterio PER POSIZIONE a tolleranza zero — e lo stato veniva invece da due
+       bande sul PESO (oltre il 20% "OLTRE", oltre il 10% "AL LIMITE"). Sul libro di oggi due
+       posizioni soddisfano la congiunzione dichiarata, quindi la soglia stampata diceva OLTRE e
+       la riga stampava AL LIMITE. E' la classe v316/v326 — la formula calcola una cosa,
+       l'etichetta ne dichiara un'altra, e nessuna delle due mente da sola — sulla riga che lega
+       il libro al canale del credito, cioe' una di quelle che una conseguenza operativa la
+       cambiano davvero.
+       ⚠ Non si sceglie fra i due criteri: si dichiarano ENTRAMBI, perche' rispondono a due
+       domande diverse. La congiunzione dice SE esiste un nome che si finanzia col debito senza
+       coprirne gli interessi; le bande sul peso dicono QUANTO libro ci sta dentro — e il primo
+       da solo sarebbe permanentemente rosso su un fondo growth, il che non distingue niente
+       (la lezione v329 sul conteggio che era un pavimento). Lo stato resta quello delle bande,
+       ed e' ora RIPRODUCIBILE da cio' che la riga stampa. */
+    const strette = fragili.filter(o => Number.isFinite(o.cop) && o.cop < 1
+                                     && Number.isFinite(o.fcf) && o.fcf < 0);
+    const pesoStrette = strette.reduce((s, o) => s + o.peso, 0);
     R.push({
       nome: "Autofinanziamento delle partecipate",
-      soglia: "nessuna posizione con flusso di cassa libero negativo E interessi non coperti dalla gestione",
+      soglia: "oltre il 10% dell'azionario in societa' con flusso di cassa libero negativo o interessi non coperti = AL LIMITE, oltre il 20% = OLTRE"
+        + (strette.length ? "; e separatamente, nessuna posizione che soddisfi ENTRAMBE le condizioni insieme" : ""),
       provenienza: "CONVENZIONE, ed e' quella che distingue un fondo growth da un fondo speculativo: si accetta di "
-        + "pagare la crescita, non di finanziarla col debito altrui. Le righe di bilancio sono nel file; la regola no.",
+        + "pagare la crescita, non di finanziarla col debito altrui. Le righe di bilancio sono nel file; la regola no. "
+        + "⚠ Le due bande sul peso sono anch'esse una convenzione di lettura, non un dato: servono a graduare uno stato "
+        + "che il solo criterio per posizione lascerebbe rosso per costruzione su un libro di crescita.",
       misura: `${fragili.length} ${fragili.length === 1 ? "posizione" : "posizioni"} = ${n1(pesoFragili)}% dell'azionario: `
         + fragili.map(o => `${o.tk} (${Number.isFinite(o.cop) && o.cop < 1 ? (o.cop < 0 ? "EBIT negativo" : `copertura ${n1(o.cop)}×`) : "FCF negativo"}`
-            + `${autonomia(o.cmb)}${o.al ? `, bilancio al ${o.al}` : ""})`).join(", "),
+            + `${autonomia(o.cmb)}${o.al ? `, bilancio al ${o.al}` : ""})`).join(", ")
+        + (strette.length
+            ? `. ⚠ DI QUESTE, ${strette.length} ${strette.length === 1 ? "soddisfa" : "soddisfano"} ENTRAMBE le condizioni `
+              + `— flusso libero negativo E interessi non coperti dalla gestione — per un ${n1(pesoStrette)}% dell'azionario: `
+              + `${strette.map(o => o.tk).join(", ")}. Sul criterio per posizione la regola e' violata; lo stato qui accanto `
+              + `viene dalle bande sul peso, che e' una lettura piu' graduata della stessa cosa.`
+            : `. ⚠ Nessuna soddisfa ENTRAMBE le condizioni insieme: sul criterio per posizione la regola non e' violata.`),
       valore: pesoFragili,
       unita: "pct_azionario", sogliaPct: 10,
       stato: pesoFragili > 20 ? "OLTRE" : pesoFragili > 10 ? "AL LIMITE" : "DENTRO",
@@ -10684,11 +10725,31 @@ function contestoPortafoglio(tkCorrente) {
     .map(x => ({ tk: x.r.ticker, peso: x.v / totAz * 100, mcr: numero(x.r.risk_contrib_pct) }))
     .sort((a, b) => b.mcr - a.mcr);
   if (conMcr.length >= 3) {
+    /* ⚠⚠ v414 — "CIASCUNA POSIZIONE" E POI SEI SU DODICI. Uno `.slice(0, 6)` sotto un'etichetta
+       che prometteva la quota di varianza di OGNI posizione: le sei mostrate valgono l'82,5%
+       della varianza, e le sei taciute il restante 17,5%. E' la stessa classe delle notizie
+       contate e poi nascoste (v393) e del tetto sulle news chiuso poche righe fa in questa
+       stessa versione — una promessa di completezza smentita da un taglio silenzioso.
+       ⚠⚠ E QUI IL TAGLIO PRENDEVA PROPRIO LA CODA INFORMATIVA. Il blocco esiste per far vedere
+       dove il rischio si scosta dal peso, e ordinando per rischio decrescente le prime sei sono
+       tutte quelle in cui il rischio SUPERA il peso: sparivano GOOGL (peso 5,7% → rischio 1,3%)
+       e PLTR (6,1% → 3,3%), cioe' l'altro lato del confronto, che e' meta' della risposta.
+       ⚠ Escono tutte: sono dodici voci e la loro somma fa 100%, quindi l'elenco si verifica da
+       solo. E chi non ha la misura si NOMINA (v389, v404): "non contribuisce" e "non e'
+       misurabile" si leggono uguali e sono cose diverse. */
+    const senzaMcr = azionarie.filter(x => !Number.isFinite(numero(x.r.risk_contrib_pct)))
+      .map(x => x.r.ticker);
     L.push(`CONTRIBUTO AL RISCHIO (quota della varianza del libro attribuibile a ciascuna posizione, `
-      + `dalle correlazioni misurate — e' un ordinamento DIVERSO dal peso): `
-      + conMcr.slice(0, 6).map(x => `${x.tk} peso ${x.peso.toFixed(1)}% → rischio ${x.mcr}%`).join(" · ")
+      + `dalle correlazioni misurate — e' un ordinamento DIVERSO dal peso; sono tutte, e sommano a 100%): `
+      + conMcr.map(x => `${x.tk} peso ${x.peso.toFixed(1)}% → rischio ${x.mcr}%`).join(" · ")
       + `. ⚠ Dove rischio e peso divergono, la posizione porta piu' (o meno) varianza di quanto il suo peso suggerisca: `
-      + `e' l'effetto delle correlazioni, non della dimensione.`);
+      + `e' l'effetto delle correlazioni, non della dimensione — e vale in ENTRAMBI i versi, perche' `
+      + `una posizione che pesa piu' di quanto rischia e' l'altra meta' della stessa domanda.`
+      + (senzaMcr.length
+          ? ` ⚠ FUORI DAL CONTO PER MANCANZA DI DATI, non perche' non contribuisca: ${senzaMcr.join(", ")} `
+            + `— senza abbastanza sedute in comune la varianza non e' attribuibile, quindi il 100% qui `
+            + `sopra e' calcolato SENZA quel peso.`
+          : ""));
   }
   const tot0 = (DATA && DATA.totals) || {};
   const motoreVuoto = !Number.isFinite(numero(tot0.var95_hist_pct))
@@ -12614,8 +12675,20 @@ function datiNostriDelTitolo(tk) {
               : r7.peggiora === rev90.peggiora
                 ? `, di cui ${fmtNum.format(Math.round(r7.pct * 10) / 10)}% nell'ultima settimana`
                 : `, ma nell'ultima settimana ${_revTxt(r7)}`)
-          + (rev90.perdita ? ` ⚠ SU UNA PERDITA il rapporto fra due stime inverte il senso `
-              + `(-4,37 diviso -3,42 da' +28%, ma il conto peggiora): qui il verso e' quello scritto a parole` : ""));
+          /* ⚠⚠ v414 — L'ESEMPIO PORTAVA NUMERI SCRITTI A MANO CHE I DATI AVEVANO SUPERATO.
+             La clausola citava "-4,37 diviso -3,42", i valori di CRWV al momento della v400,
+             e li stampava accanto ai valori VIVI della stessa frase (-3,48 → -4,24): due
+             coppie di stime per la stessa grandezza, nella stessa riga, e chi legge non puo'
+             sapere quale sia quella vera. E' il conteggio fisso della v410/v411 per la terza
+             volta — un numero scritto a mano invecchia da solo e in silenzio — aggravato dal
+             fatto che qui la coppia viva e' stampata due parole prima.
+             ⚠ Non si aggiorna l'esempio: si toglie. La regola non ha bisogno di numeri propri
+             quando quelli a cui si applica sono nella stessa frase, e un numero che ha bisogno
+             di una didascalia per non essere frainteso vale meno della parola che lo rende
+             inutile (v392). */
+          + (rev90.perdita ? ` ⚠ SU UNA PERDITA il rapporto percentuale fra le due stime qui sopra `
+              + `inverte il senso — dividere due numeri negativi da' un segno positivo mentre il conto `
+              + `peggiora — quindi il verso da leggere e' quello scritto A PAROLE, non ricavato dal rapporto` : ""));
       }
       if (nn(an.su_30g) != null && nn(an.giu_30g) != null) {
         const su = nn(an.su_30g), giu = nn(an.giu_30g);
@@ -12912,10 +12985,35 @@ function datiNostriDelTitolo(tk) {
         + `quindi conta lo scostamento dalla propria media, non il livello.`);
     }
 
+    /* ⚠⚠ v414 — DUE UTILI ATTESI, ENTRAMBI CHIAMATI "PROSSIMO ESERCIZIO".
+       `stats.eps_forward` (qui) e `analisti.eps_ora` (nella riga delle REVISIONI) sono due campi
+       diversi dello stesso fornitore e su CRWV valgono -1,95 e -4,24: piu' del doppio. Il
+       pacchetto li pubblicava entrambi a poche righe di distanza descrivendoli con le STESSE
+       parole, cioe' forniva da solo il falso positivo che il collaudo di congruita' ordina al
+       lettore di segnalare (v400, v409, v412).
+       ⚠⚠ E IL SISTEMA NON SA QUALE ESERCIZIO COPRANO: nessuno dei due campi porta un periodo.
+       Quindi non si sceglie e non si indovina — si DICHIARA che sono due campi distinti e che
+       non e' stabilito descrivano la stessa annualita'. E' la forma della v409 sull'autonomia
+       di cassa: due numeri utili, ciascuno col proprio riferimento, e scritto che non si
+       confrontano. Meglio non avere dati che avere dati non corretti (v396); qui i dati ci
+       sono entrambi, ed e' l'etichetta che non poteva affermare quello che affermava. */
+    const _epsRev = (t.analisti && Number.isFinite(numero(t.analisti.eps_ora)))
+      ? numero(t.analisti.eps_ora) : null;
+    const _dueEps = (_epsRev != null && Number.isFinite(t.epsFwd)
+                     && Math.abs(_epsRev - t.epsFwd) > Math.max(0.05, Math.abs(t.epsFwd) * 0.05))
+      ? ` ⚠⚠ ATTENZIONE, IL PACCHETTO PORTA DUE UTILI ATTESI DIVERSI: questo (${fmtNum.format(t.epsFwd)}) e `
+        + `quello della riga REVISIONI DEGLI UTILI (${fmtNum.format(_epsRev)}). Vengono da DUE CAMPI distinti `
+        + `dell'aggregatore e nessuno dei due dichiara a quale esercizio si riferisce, quindi il sistema NON `
+        + `puo' affermare che descrivano la stessa annualita' — la differenza puo' essere di periodo, non di `
+        + `stima. Sommarli, mediarli o usarne uno per correggere l'altro produce quindi un numero che non `
+        + `corrisponde a nessuna annualita': l'unico utile atteso affermabile e' quello preso dalla fonte con `
+        + `l'esercizio dichiarato accanto.`
+      : "";
+
     /* utile atteso NEGATIVO: non esiste un multiplo, esiste una perdita attesa */
     if (Number.isFinite(t.epsFwd) && t.epsFwd <= 0) {
       L.push(`- UTILE PER AZIONE ATTESO: ${fmtNum.format(t.epsFwd)} — il consenso degli analisti si aspetta una `
-        + `PERDITA sul prossimo esercizio fiscale. ⚠ IL P/E PROSPETTICO NON ESISTE E NON VIENE PUBBLICATO: `
+        + `PERDITA sul prossimo esercizio fiscale.${_dueEps} ⚠ IL P/E PROSPETTICO NON ESISTE E NON VIENE PUBBLICATO: `
         + `prezzo diviso un utile negativo da' un numero che MIGLIORA quando i conti peggiorano `
         + `(a ${fmtNum.format(t.epsFwd)} sarebbe ${(f.prezzo / t.epsFwd).toFixed(1)}×, a `
         + `${fmtNum.format(t.epsFwd * 2)} diventerebbe ${(f.prezzo / (t.epsFwd * 2)).toFixed(1)}×, cioe' `
@@ -12925,6 +13023,11 @@ function datiNostriDelTitolo(tk) {
       L.push(`- P/E PROSPETTICO: ${Number.isFinite(t.peFwd) ? t.peFwd.toFixed(1) + "×" : "n.d."}`
         + `${Number.isFinite(t.epsFwd) ? ` (utile per azione atteso ${fmtNum.format(t.epsFwd)})` : ""}`
         + ` — e' il CONSENSO DEGLI ANALISTI sul PROSSIMO ESERCIZIO FISCALE (convenzione di yfinance \`forwardEps\`), non una guidance della societa'`
+        /* ⚠ v414 — la dichiarazione dei due utili attesi vale su ENTRAMBI i rami: la prima
+           stesura la metteva solo su quello della perdita, e il gate ha trovato MSTR, che ha
+           lo stesso scarto con l'utile atteso positivo. E' la classe v412 — una correzione
+           applicata a un ramo e non all'altro — presa dal check invece che da una rilettura. */
+        + _dueEps
         + `${Number.isFinite(t.pe) && Number.isFinite(t.peFwd) && t.pe > 0 ? ` e non un tasso di crescita: ${(t.pe / t.peFwd).toFixed(1)}× di scarto fra i due multipli misura quanto utile in piu' il consenso si aspetta, non quanto il titolo sia caro` : ""}.`
         + ` ⚠⚠ PRIMA DI CONFRONTARLO CON UN FORWARD P/E TROVATO ONLINE, GUARDA A CHE ESERCIZIO SI RIFERISCE: per una societa' `
         + `con anno fiscale sfasato "il prossimo esercizio" puo' essere un anno piu' avanti di quello che quotano i siti di `
