@@ -3888,6 +3888,50 @@ Rame esce **97°** percentile nel digest storico e **97%** dell'intervallo annua
 macro: sono due grandezze diverse con le basi dichiarate, e coincidono per caso — il petrolio, con
 76° contro 61%, lo dimostra. Non è un difetto, ma un lettore potrebbe contarle come due conferme.
 
+## 🗺️ v425 — IL CENSIMENTO DEGLI STATI: i gate girano su UNO stato, i difetti vivono negli altri
+
+Quindicesimo giro, e **non è stata un'altra lettura**. La diagnosi dopo tre giri consecutivi da un
+difetto ciascuno: tutti e sette i difetti dei giri 12-14 erano della **stessa famiglia** —
+qualcosa corretto in una sede e non nelle altre, invisibile perché quel ramo non si accendeva coi
+dati del giorno.
+
+> **Leggere il pacchetto trova un difetto per giro, indefinitamente**, perché ogni giro esercita
+> una variante nuova e ci ritrova la stessa classe. La tolleranza "zero difetti su due giri" non è
+> raggiungibile leggendo: va cambiato lo strumento, non aumentata l'attenzione.
+
+Quindi: **si costruiscono gli stati e si passano gli invarianti su ciascuno.** Otto stati (barra di
+oggi · di ieri · di quattro giorni fa · sedute disallineate · senza stato patrimoniale · senza
+notizie macro · fonte macro non letta · senza notizie per titolo) × tre pacchetti (macro · titolo
+posseduto · titolo non posseduto) = **24 combinazioni**, un secondo e mezzo di generazione, cinque
+invarianti presi dai difetti dei giri precedenti.
+
+### ⚠⚠ E ha morso subito, su un difetto MIO della v421
+La cautela sulle fonti veniva **concatenata dentro `fonti`**, che serve anche come BOOLEANO dietro
+`${fonti ? "(fonti previste: " + fonti + ")" : ""}`. Con `macro.news` assente l'elenco è vuoto ma
+la stringa no, quindi il ramo *"la raccolta non ha prodotto voci"* stampava:
+
+> `(fonti previste:  ⚠ questo elenco e' quello delle fonti CONFIGURATE …)`
+
+cioè **una cautela su un elenco che non c'è, che per di più afferma che l'elenco esiste** — nel
+ramo che esiste apposta per dire che la raccolta è fallita.
+
+> **Un valore che serve anche come booleano non deve portare prosa.** Nessuna rilettura lo avrebbe
+> trovato: quel ramo non si accende con i dati veri.
+
+### 🎯 E il mio censimento ha sbagliato due volte, nei due modi soliti
+- **Ancoraggio aperto nel mio stesso scanner**: filtravo i pacchetti di titolo con
+  `nome.indexOf("titolo")`, e lo stato *"senza notizie per titolo"* contiene "titolo". Settima
+  incarnazione, dentro lo strumento scritto per trovare le altre.
+- **Un allarme che non era un difetto**: il gate pescava **BTC-USD**, il cui `name` È `"BTC-USD"`,
+  e pretendeva la parentesi col nome della società — che il codice omette correttamente. *Un
+  allarme va verificato contro il testo vero prima di diventare una correzione* (v417).
+- **E la prima iniezione non mordeva**: avevo tolto la guardia `_sv.length` invece di rimettere la
+  cautela DENTRO `fonti`, cioè avevo iniettato un'altra cosa. Con la forma vera il gate morde e
+  nomina lo stato: *"I7 senza notizie macro / macro"* (v419).
+
+⚠ **Costo misurato**: la suite passa da ~2 a ~14 secondi. È il prezzo di 24 generazioni di
+pacchetto, e vale la classe che copre.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

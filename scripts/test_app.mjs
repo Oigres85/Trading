@@ -8481,6 +8481,103 @@ check("v424 le istruzioni non citano percentuali del libro scritte a mano", suVe
     ? guai.join(" · ") + " — una quota del libro scritta nelle istruzioni invecchia col portafoglio"
     : true;`));
 
+/* ⚠⚠⚠ v425 — IL CENSIMENTO DEGLI STATI: i gate girano su UNO stato, i difetti vivono negli altri.
+   Diagnosi dopo tre giri consecutivi da un difetto ciascuno: tutti e sette i difetti dei giri
+   12-14 erano della stessa famiglia — qualcosa corretto in una sede e non nelle altre, e
+   invisibile perche' il ramo non si accendeva con i dati del giorno. Leggere il pacchetto trova
+   un difetto per giro, indefinitamente, perche' ogni giro esercita una variante nuova.
+   Quindi invece di un'altra lettura: si COSTRUISCONO gli stati e si passano gli invarianti su
+   ciascuno. Otto stati per tre pacchetti = 24 combinazioni, un secondo e mezzo.
+   ⚠ E ha morso subito, su un difetto MIO della v421: la cautela sulle fonti veniva concatenata
+   dentro `fonti`, che serve anche come BOOLEANO dietro `${fonti ? …}`. Con `macro.news` assente
+   l'elenco e' vuoto ma la stringa no, quindi il ramo "la raccolta non ha prodotto voci"
+   stampava "(fonti previste:  ⚠ questo elenco e' quello delle fonti CONFIGURATE …)": una cautela
+   su un elenco che non c'e', che per di piu' afferma che l'elenco esiste. Nessuna rilettura lo
+   avrebbe trovato — quel ramo non si accende con i dati veri.
+   ⚠ Un valore che serve anche come booleano non deve portare prosa. */
+check("v425 gli invarianti reggono su tutti gli stati costruiti, non solo su quello di oggi", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const iso = (g) => new Date(Date.now() + g * 86400000).toISOString().slice(0, 10);
+  const righeQuotate = () => [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(r => r && r.price_asof);
+
+  const STATI = {
+    "barra di oggi":            () => righeQuotate().forEach(r => { r.price_asof = iso(0); }),
+    "barra di ieri":            () => righeQuotate().forEach(r => { r.price_asof = iso(-1); }),
+    "barra di 4 giorni fa":     () => righeQuotate().forEach(r => { r.price_asof = iso(-4); }),
+    "sedute disallineate":      () => righeQuotate().forEach((r, i) => { r.price_asof = i < 2 ? iso(0) : iso(-1); }),
+    "senza stato patrimoniale": () => { STATO_PTF = null; },
+    "senza notizie macro":      () => { if (DATA.macro) delete DATA.macro.news; },
+    "fonte macro non letta":    () => { if (DATA.macro && DATA.macro.news) {
+                                   DATA.macro.news.fonti = ["Alfa"];
+                                   DATA.macro.news.fonti_mute = [];
+                                   DATA.macro.news.fonti_non_lette = ["Gamma"]; } },
+    "senza notizie per titolo": () => { delete DATA.news_titoli; },
+  };
+  const tutti = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const dentro = tutti.find(r => r && r.qta && r.tv && r.tv.tecnica && r.name
+    && String(r.name).toUpperCase() !== String(r.ticker).toUpperCase());
+  /* ⚠ il nome deve essere DIVERSO dal ticker, altrimenti la parentesi non va aggiunta ed e'
+     giusto che manchi: la prima stesura pescava BTC-USD, il cui name E' "BTC-USD", e il check
+     era rosso su codice corretto. Un allarme va verificato contro il testo vero prima di
+     diventare una correzione (v417). */
+  const fuori  = tutti.find(r => r && !r.qta && r.tv && r.tv.tecnica && r.name
+    && String(r.name).toUpperCase() !== String(r.ticker).toUpperCase());
+  if (!dentro || !fuori) return "servono un posseduto e un non posseduto con nome: il check non misura";
+
+  const rxOggi = new RegExp("oggi[^" + NL + "]{0,14}?[-+]?[0-9]|[-+]?[0-9][^" + NL + "]{0,6}?[ ]oggi([ ]|[)]|,|$)");
+  const SEDI = [
+    "si muovono INSIEME e valgono il ([0-9]+(?:,[0-9]+)?)%",
+    "Il loro peso NON e. incluso nel ([0-9]+(?:,[0-9]+)?)%",
+    "posizioni = ([0-9]+(?:,[0-9]+)?)% dell'azionario [(]",
+    "([0-9]+(?:,[0-9]+)?)% del capitale si muove insieme",
+    "non il ([0-9]+(?:,[0-9]+)?)% del gruppo",
+    "PESO DEL GRUPPO [(]([0-9]+(?:,[0-9]+)?)%",
+  ];
+  const guai = [];
+  const salva = JSON.stringify(DATA), salvaPtf = STATO_PTF;
+
+  for (const nomeStato of Object.keys(STATI)) {
+    DATA = JSON.parse(salva); STATO_PTF = salvaPtf; recomputeTotals();
+    STATI[nomeStato]();
+    const casi = [
+      ["macro", buildCIOText()],
+      ["posseduto", buildPromptTicker(String(dentro.ticker).toUpperCase())],
+      ["non posseduto", buildPromptTicker(String(fuori.ticker).toUpperCase())],
+    ];
+    for (const [nomePac, p] of casi) {
+      const dove = nomeStato + " / " + nomePac;
+
+      // I1 — nessun numero con l'avverbio "oggi" senza rilevazione odierna (v422)
+      for (const r of p.split(NL)) {
+        if (r.slice(0, 2) !== "- ") continue;
+        if (rxOggi.test(r) && r.indexOf("rilevazione odierna") < 0) guai.push("I1 " + dove + ": " + r.slice(0, 80));
+      }
+
+      // I3 — il peso del gruppo esce con un valore solo (v421)
+      const vis = new Set();
+      for (const src of SEDI) { const rx = new RegExp(src, "g"); let m; while ((m = rx.exec(p))) vis.add(m[1]); }
+      if (vis.size > 1) guai.push("I3 " + dove + ": peso del gruppo con " + vis.size + " valori");
+
+      // I4 — le voci non prezzate dichiarate sono tutte elencate (v414)
+      const mn = p.match(new RegExp("([0-9]+) pubblicate DOPO l'ultima chiusura USA[^" + NL + "]*sono TUTTE elencate"));
+      if (mn) {
+        const n = (p.match(/DOPO l'ultima chiusura: il prezzo non l'ha ancora votata\]/g) || []).length;
+        if (n !== Number(mn[1])) guai.push("I4 " + dove + ": dichiara " + mn[1] + " voci e ne elenca " + n);
+      }
+
+      // I5 — il nome della societa' esce sui pacchetti di titolo (v423)
+      if (nomePac !== "macro" && !/^ANALISI DI [A-Z.]+ [(].+[)] — /.test(p.split(NL)[0]))
+        guai.push("I5 " + dove + ": intestazione senza nome societa'");
+
+      // I7 — nessun elenco di fonti vuoto, e nessuna cautela su un elenco che non c'e' (v425)
+      if (p.indexOf("fonti previste: )") >= 0 || p.indexOf("(fonti: )") >= 0
+          || /fonti (previste: )?[^a-zA-Z0-9(]{0,3}⚠/.test(p))
+        guai.push("I7 " + dove + ": elenco delle fonti vuoto o con la sola cautela");
+    }
+  }
+  DATA = JSON.parse(salva); STATO_PTF = salvaPtf; recomputeTotals();
+  return guai.length ? guai.slice(0, 5).join(" · ") + (guai.length > 5 ? " (+" + (guai.length - 5) + ")" : "") : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
