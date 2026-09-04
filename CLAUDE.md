@@ -3648,6 +3648,43 @@ ciascuno è stato **riagganciato l'invariante**, non allentato:
 clitico, non un imperativo, ma il detector non li distingue. Riformulato invece di allentare un
 gate che ha già trovato nove ordini veri.
 
+## 🕳️ v419 — LA DICHIARAZIONE DEL TAGLIO ERA FALSA SU UN TITOLO NON POSSEDUTO
+
+Decimo giro di ricognizione. Il difetto è **mio, della v418, trovato esercitando il taglio su un
+titolo fuori dal libro** invece che sui tre dentro.
+
+Analizzando TSM — che il sistema segue ma il CEO non possiede — l'elenco del libro conteneva
+tutte e tredici le posizioni (giusto: TSM non è una posizione, non c'era niente da togliere) e la
+riga di intestazione diceva comunque:
+
+> *"⚠ TSM NON compare in questo elenco ed è l'unica assenza: è il titolo in esame, e i suoi
+> stessi numeri stanno più sopra in forma più estesa"*
+
+**Due affermazioni false**: che TSM fosse una posizione, e che l'avessimo tolta. Proprio nella
+riga che esiste per impedire che un'assenza si legga male (v406).
+
+> È il **ramo raro della v190** — *un difetto in un ramo che si accende di rado non è raro, è
+> solo invisibile* — creato dal taglio della v418 e invisibile finché il taglio è stato provato
+> solo su titoli in portafoglio. **La dichiarazione di un taglio deve essere vera quanto il
+> taglio.**
+
+⚠ Il gate percorre **entrambi** i rami — un titolo posseduto e uno no — perché un check che ne
+esercita uno solo non avrebbe visto il difetto che la v418 ha creato. Ed è per questo che il
+taglio della v418 andava esercitato oltre i casi comodi: i tre titoli su cui l'avevo verificato
+erano tutti dentro il libro.
+
+### 🎯 E il secondo gate non era decorativo: stavo iniettando la cosa sbagliata
+Il check *"su un titolo non posseduto l'elenco resta intero"* non mordeva alla prima iniezione, e
+stavo per toglierlo come decorativo. Non lo era: quella iniezione (ripristinare la condizione
+della v418) è un **no-op** per quella proprietà, perché un titolo non posseduto non sta in `ord`
+e il filtro per nome non rimuove nulla comunque. Iniettando invece ciò che la proprietà davvero
+vieta — `ord` esteso ai titoli seguiti ma non posseduti — il gate morde e riporta *"l'elenco ha
+15 righe invece di 13"*.
+
+> **L'iniezione va scelta fra i casi che il gate DEVE prendere, non fra quelli comodi** (v389),
+> e vale anche al rovescio: un'iniezione che non morde non prova che il gate sia inutile — prova
+> che hai iniettato un'altra cosa.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

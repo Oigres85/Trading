@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "418";
+const BUILD_VERSION = "419";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10536,9 +10536,13 @@ function contestoPortafoglio(tkCorrente) {
      ⚠⚠ E NON E' UN TAGLIO IN SILENZIO (v406): la riga sparita viene NOMINATA con la ragione e
      col rimando ai due blocchi che portano gli stessi fatti in forma piu' estesa. "Il sistema
      non ha il dato" e "ce l'ha e non te lo passa" si leggono uguali e sono cose diverse. */
+  /* il titolo in esame e' stato DAVVERO tolto solo se stava fra le posizioni: su un titolo che
+     il CEO non possiede non c'e' nessun taglio da dichiarare. */
+  const tolto = !!tkCorrente && ord.some(x => x && x.r
+    && String(x.r.ticker).toUpperCase() === String(tkCorrente).toUpperCase());
   const righeTec = ord.map(x => {
     const r = x.r, s = r.stats || {};
-    if (tkCorrente && String(r.ticker).toUpperCase() === String(tkCorrente).toUpperCase()) return null;
+    if (tolto && String(r.ticker).toUpperCase() === String(tkCorrente).toUpperCase()) return null;
     const p = [];
     /* ⚠ v407 — LA MEDIA A 20 GIORNI, CHIESTA DAL CEO ("es. media mobile 20 giorni dei titoli
        sarebbe utile"). Il sistema la calcola per OGNI titolo seguito dalla v316 e la pubblicava
@@ -10588,7 +10592,18 @@ function contestoPortafoglio(tkCorrente) {
       + "giornaliere Yahoo con auto_adjust, le stesse che disegnano il grafico — non vanno "
       + "ricalcolati ne' cercati online)"
       /* ⚠ v418 — L'ESCLUSO SI NOMINA, con la ragione e col rimando (v406). */
-      + (tkCorrente ? `. ⚠ ${String(tkCorrente).toUpperCase()} NON compare in questo elenco ed e' `
+      /* ⚠⚠ v419 — LA DICHIARAZIONE SI ACCENDEVA ANCHE SU UN TITOLO NON POSSEDUTO, e li' era
+         FALSA. Analizzando TSM — che il sistema segue ma il CEO non ha — l'elenco conteneva
+         tutte e tredici le posizioni e la riga diceva comunque "TSM NON compare in questo
+         elenco ed e' l'unica assenza: e' il titolo in esame". Cioe' affermava che TSM fosse
+         una posizione e che l'avessimo tolta: due cose false, nella riga che esiste per
+         impedire che un'assenza si legga male.
+         E' il ramo raro della v190 — un difetto in un ramo che si accende di rado non e' raro,
+         e' solo invisibile — creato dal taglio della v418 e trovato esercitandolo su un titolo
+         fuori dal libro invece che sui tre dentro.
+         ⚠ Ora la riga si accende SOLO se il titolo era davvero nell'elenco: la dichiarazione
+         di un taglio deve essere vera quanto il taglio. */
+      + (tolto ? `. ⚠ ${String(tkCorrente).toUpperCase()} NON compare in questo elenco ed e' `
           + `l'unica assenza: e' il titolo in esame, e i suoi stessi numeri stanno piu' sopra in `
           + `forma piu' estesa (la sua scheda e il blocco DETTAGLI TECNICI, che porta dodici medie `
           + `invece di tre e gli oscillatori). Una loro ripetizione qui sarebbe la terza scrittura `
