@@ -8628,6 +8628,103 @@ check("v426 su un titolo che il sistema non segue il pacchetto lo dichiara e non
 
   return guai.length ? guai.join(" · ") : true;`));
 
+/* ⚠⚠ v427 — CON MENO DI DUE POSIZIONI IL LIBRO E LA DISCIPLINA SPARIVANO IN SILENZIO, e la
+   testata continuava a prometterli TRE volte (apertura, [B6], [B7]). E' la classe C10 — rimando a
+   una sezione inesistente — cioe' esattamente il difetto chiuso in v426 per il titolo
+   sconosciuto, un livello piu' su. E lo stato e' raggiungibile: non serve che il CEO venda tutto,
+   basta che `config/posizioni.json` non risponda, e il pacchetto perde un terzo di se' senza
+   dirlo mentre le istruzioni mandano a cercare quello che non c'e'.
+   ⚠ Trovato dal censimento sull'asse del PORTAFOGLIO: v425 e v426 lo coprivano su dati e
+   orologio, non sulla FORMA del libro. Con tredici posizioni quel ramo non si accende mai. */
+check("v427 con meno di due posizioni il libro e la disciplina dichiarano l'assenza", suVeriEsito(`
+  const salva = JSON.stringify(DATA);
+  const righe = () => [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(r => r && r.qta > 0);
+  const guai = [];
+  try {
+    for (const [nome, quante] of [["libro vuoto", 0], ["una sola posizione", 1]]) {
+      DATA = JSON.parse(salva); recomputeTotals();
+      righe().slice(quante).forEach(r => { r.qta = 0; });
+      recomputeTotals();
+      const p = buildCIOText();
+      if (p.indexOf("=== IL LIBRO NON C'E'") < 0)
+        guai.push(nome + ": il blocco del libro sparisce senza dichiararlo");
+      if (p.indexOf("LA DISCIPLINA DI RISCHIO NON E' CALCOLABILE") < 0)
+        guai.push(nome + ": la disciplina sparisce senza dichiararlo");
+      if (p.indexOf("CONCENTRAZIONE:") >= 0)
+        guai.push(nome + ": pubblica una concentrazione su un libro che non ha posizioni da confrontare");
+    }
+    DATA = JSON.parse(salva); recomputeTotals();
+    const pieno = buildCIOText();
+    if (pieno.indexOf("=== IL LIBRO NON C'E'") >= 0)
+      guai.push("libro pieno: dichiara l'assenza di un libro che c'e'");
+    if (pieno.indexOf("CONCENTRAZIONE:") < 0)
+      guai.push("libro pieno: la concentrazione e' sparita");
+  } finally { DATA = JSON.parse(salva); recomputeTotals(); }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠ v427 — "le prime TRE posizioni" su un libro che ne ha meno di tre afferma un nome che non
+   esiste, e la misura usciva "A + B = 100%" sotto quel titolo. Il numero si conta, non si scrive
+   (v410, v411, v415, v424): la stessa classe, qui su una parola invece che su una cifra. */
+check("v427 l'etichetta delle prime posizioni conta quante ce ne sono davvero", suVeriEsito(`
+  const salva = JSON.stringify(DATA);
+  const guai = [];
+  try {
+    const az = () => [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+      .filter(r => r && r.qta > 0 && !/^BTP|^BOT|^CCT|^IT000/i.test(String(r.ticker)));
+    for (const [quante, atteso, vietato] of [[2, "le prime due posizioni", "le prime tre posizioni"],
+                                             [1, "la prima posizione", "le prime due posizioni"]]) {
+      DATA = JSON.parse(salva); recomputeTotals();
+      az().slice(quante).forEach(r => { r.qta = 0; });
+      recomputeTotals();
+      const p = buildCIOText();
+      if (p.indexOf("CONCENTRAZIONE: " + atteso) < 0)
+        guai.push(quante + " azionarie: la concentrazione non le chiama '" + atteso + "'");
+      if (p.indexOf(vietato) >= 0)
+        guai.push(quante + " azionarie: il pacchetto dice ancora '" + vietato + "'");
+    }
+    DATA = JSON.parse(salva); recomputeTotals();
+    if (buildCIOText().indexOf("CONCENTRAZIONE: le prime tre posizioni") < 0)
+      guai.push("libro pieno: la forma a tre e' sparita");
+  } finally { DATA = JSON.parse(salva); recomputeTotals(); }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v427 — IL RISCHIO DELLA PIPELINE ACCANTO AI PESI DI ADESSO. Dopo una modifica del libro i
+   pesi sono nuovi e il contributo al rischio e' quello del run precedente: non e' ricalcolabile
+   lato pagina (v391, v316). La PAGINA lo dichiara dalla v391; il PACCHETTO no — classe v412, una
+   correzione applicata a una superficie e non all'altra, e qui pesa di piu' perche' il pacchetto
+   e' quello su cui si decide.
+   ⚠ E l'avviso NON deve suonare sempre: `POSIZIONI_LOCALI_MODIFICATE` contiene il BTP a ogni
+   caricamento, e il BTP non entra nel comparto su cui il rischio e' calcolato. */
+check("v427 il pacchetto dichiara quando i pesi sono piu' freschi delle quote di rischio", suVeriEsito(`
+  const salva = JSON.stringify(POSIZIONI_LOCALI_MODIFICATE);
+  const guai = [];
+  const SPIA = "MODIFICATO DOPO L'ULTIMO GIRO";
+  try {
+    POSIZIONI_LOCALI_MODIFICATE = [];
+    if (buildCIOText().indexOf(SPIA) >= 0) guai.push("senza modifiche locali l'avviso compare comunque");
+
+    const btp = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+      .find(r => r && /^BTP|^IT000/i.test(String(r.ticker)));
+    if (btp) {
+      POSIZIONI_LOCALI_MODIFICATE = [String(btp.ticker)];
+      if (buildCIOText().indexOf(SPIA) >= 0)
+        guai.push("il BTP fa suonare un avviso sul comparto azionario, dove non entra");
+    }
+
+    const az = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+      .find(r => r && r.qta > 0 && Number.isFinite(Number(r.risk_contrib_pct)));
+    if (!az) return "nessuna posizione azionaria con contributo al rischio: il check non misura";
+    POSIZIONI_LOCALI_MODIFICATE = [String(az.ticker)];
+    const p = buildCIOText();
+    if (p.indexOf(SPIA) < 0)
+      guai.push("con " + az.ticker + " modificata il pacchetto non dichiara che il rischio e' vecchio");
+    if (p.indexOf(String(az.ticker) + ")") < 0 && p.indexOf("(" + String(az.ticker)) < 0)
+      guai.push("l'avviso non nomina la posizione modificata");
+    if ((p.split(SPIA).length - 1) < 2)
+      guai.push("l'avviso copre il contributo al rischio ma non gli aggregati (VaR, ES, beta, correlazione), che escono dalla stessa matrice");
+  } finally { POSIZIONI_LOCALI_MODIFICATE = JSON.parse(salva); }
+  return guai.length ? guai.join(" · ") : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

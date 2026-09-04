@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "426";
+const BUILD_VERSION = "427";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10163,8 +10163,15 @@ function disciplinaRischio() {
 
   /* ── 2. le prime tre ───────────────────────────────────────────────────────────────── */
   const tre = ord.slice(0, 3).reduce((s, x) => s + x.v, 0) / totAz * 100;
+  /* ⚠ v427 — QUANTE SONO DAVVERO. Su un libro di due posizioni `slice(0, 3)` ne restituisce due
+     e l'etichetta continuava a dire "le prime TRE", affermando un nome che non c'e' — e la
+     misura usciva "A + B = 100%" sotto quel titolo. Il numero si conta, non si scrive (v410,
+     v411, v415, v424): e' la stessa classe, qui su una parola invece che su una cifra. */
+  const quanteTre = Math.min(3, ord.length);
+  const paroleTre = quanteTre === 1 ? "la prima posizione"
+    : quanteTre === 2 ? "le prime due posizioni" : "le prime tre posizioni";
   R.push({
-    nome: "Peso delle prime tre posizioni",
+    nome: "Peso del" + (quanteTre === 1 ? "la prima posizione" : quanteTre === 2 ? "le prime due posizioni" : "le prime tre posizioni"),
     soglia: "40% del capitale azionario",
     provenienza: "CONVENZIONE: e' il confine oltre il quale un libro smette di essere un portafoglio concentrato e "
       + "diventa tre scommesse con un contorno. Nessuna autorita' la fissa; serve a rendere confrontabile il livello.",
@@ -10497,7 +10504,16 @@ function disciplinaRischio() {
    il modo piu' rapido di trasformare una lettura in un obbligo. */
 function disciplinaTesto() {
   const d = (typeof disciplinaRischio === "function") ? disciplinaRischio() : null;
-  if (!d || !d.regole.length) return "";
+  /* ⚠ v427 — anche qui il silenzio: [B7] promette "le nove regole della DISCIPLINA DI RISCHIO in
+     coda" e senza regole il blocco spariva. Il rimando resta nella testata, quindi l'assenza va
+     dichiarata dove il blocco sarebbe stato (forma v406/v426). */
+  if (!d || !d.regole.length) {
+    return "=== LA DISCIPLINA DI RISCHIO NON E' CALCOLABILE IN QUESTO PACCHETTO ===\n"
+      + "Le nove regole a cui le istruzioni rimandano confrontano MISURE DEL LIBRO con soglie del "
+      + "mestiere: senza posizioni non c'e' niente da confrontare, e una soglia senza la sua "
+      + "misura accanto non e' una regola, e' un'opinione. ⚠ Vedi il blocco del libro qui sopra "
+      + "per la ragione dell'assenza.";
+  }
   const oltre = d.regole.filter(r => r.stato === "OLTRE");
   const L = [];
   L.push("=== LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH, APPLICATA A QUESTO LIBRO ===");
@@ -10572,7 +10588,35 @@ function disciplinaTesto() {
 function contestoPortafoglio(tkCorrente) {
   const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
-  if (righe.length < 2) return "";
+  /* ⚠⚠ v427 — CON MENO DI DUE POSIZIONI L'INTERO BLOCCO DEL LIBRO SPARIVA IN SILENZIO, e la
+     testata continuava a prometterlo TRE volte: l'apertura ("in coda il LIBRO su cui quel macro
+     atterra"), [B6] ("il pacchetto porta le posizioni del fondo, la loro concentrazione, il
+     contributo al rischio di ciascuna") e [B7] ("le nove regole della DISCIPLINA DI RISCHIO in
+     coda"). E' la classe C10 — rimando a una sezione inesistente — cioe' ESATTAMENTE il difetto
+     chiuso in v426 per il titolo sconosciuto, un livello piu' su.
+     ⚠ E lo stato e' raggiungibile davvero: non serve che il CEO venda tutto — basta che
+     `config/posizioni.json` non risponda, e il pacchetto perde un terzo di se' senza dirlo,
+     mentre le istruzioni mandano il lettore a cercare quello che non c'e'.
+     ⚠ Trovato dal censimento sull'asse del PORTAFOGLIO (v425/v426 lo coprivano su dati e
+     orologio, non sulla forma del libro). Nessuna lettura lo avrebbe visto: con tredici
+     posizioni quel ramo non si accende. */
+  if (righe.length < 2) {
+    const quante = righe.length;
+    return "=== IL LIBRO NON C'E': " + (quante === 0
+        ? "il sistema non vede NESSUNA posizione"
+        : "il sistema vede UNA SOLA posizione (" + String(righe[0].ticker) + ")")
+      + " ===\n"
+      + "Le istruzioni sopra rimandano al libro, alla sua concentrazione, al contributo al rischio "
+      + "di ciascuna posizione e alla disciplina di rischio: QUEI BLOCCHI NON CI SONO IN QUESTO "
+      + "PACCHETTO, e la ragione e' questa. Concentrazione, gruppo correlato, scommesse effettive e "
+      + "contributo al rischio sono misure fra posizioni: con "
+      + (quante === 0 ? "nessuna" : "una sola") + " non esistono, non valgono zero.\n"
+      + "⚠ Non e' un blocco andato perso ne' un giudizio sul libro: o il CEO non ha posizioni "
+      + "aperte, oppure il file che le contiene non e' stato letto in questo run — e il sistema "
+      + "non sa distinguere i due casi. Se ti aspettavi il libro, chiedilo prima di concludere.\n"
+      + "⚠ Tutto il resto del pacchetto (quadro macro, serie storiche, notizie) e' vero e usabile: "
+      + "quello che manca e' il LATO LIBRO, e con lui ogni conclusione che poggia sui pesi.";
+  }
   const val = (r) => {
     const q = numero(r.qta ?? r.qty), p = numero(r.price), pmc = numero(r.pmc);
     if (!Number.isFinite(q)) return null;
@@ -10634,6 +10678,35 @@ function contestoPortafoglio(tkCorrente) {
       + "descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a "
       + "dimensionare, e dimensionare e' vietato.");
   }
+  /* ⚠⚠ v427 — IL RISCHIO DELLA PIPELINE ACCANTO AI PESI DI ADESSO, SENZA DIRLO. La v391 ha
+     stabilito che il contributo al rischio NON e' ricalcolabile lato pagina — serve la matrice di
+     covarianza sulle serie complete, e rifarla dalle spark darebbe un numero plausibile e
+     divergente (v316) — quindi dopo una modifica del libro i PESI sono nuovi e il RISCHIO e'
+     quello del run precedente. La PAGINA lo dichiara da allora; il PACCHETTO no: e' la classe
+     v412, una correzione applicata a una superficie e non all'altra, e qui pesa di piu' perche'
+     il pacchetto e' quello su cui si decide.
+     ⚠ Una derivazione sola: `POSIZIONI_LOCALI_MODIFICATE` e' la stessa lista che accende
+     l'avviso nel grafico. Un secondo rilevatore divergerebbe al primo ritocco (v161, v207, v316).
+     ⚠⚠ E STA A LIVELLO DI FUNZIONE, prima di TUTTI i suoi usi: la prima stesura la dichiarava
+     dentro l'if del contributo al rischio e la usava dopo, fuori scope — 217 check rossi al
+     primo giro. E' esattamente la trappola v409 con `n1`, rifatta. */
+  /* ⚠⚠ E SOLO I NOMI CHE ENTRANO DAVVERO NEL CONFRONTO. `POSIZIONI_LOCALI_MODIFICATE` contiene
+     anche il BTP — che la pipeline non pubblica in watchlist, quindi risulta "toccato" a OGNI
+     caricamento — e il BTP non e' nel comparto azionario su cui il contributo al rischio e'
+     calcolato. Senza questa intersezione l'avviso usciva su ogni pacchetto nominando un titolo
+     che con quel confronto non c'entra: un avviso che suona sempre non avvisa, ed e' la stessa
+     ragione per cui in v421 una fonte MUTA non fa suonare il gate. Misurato: senza il filtro
+     compariva su tutti i run con "(BTP-V28)". */
+  const _azSet = new Set(azionarie.map(x => String(x.r.ticker).toUpperCase()));
+  const _mod = ((typeof POSIZIONI_LOCALI_MODIFICATE !== "undefined" ? POSIZIONI_LOCALI_MODIFICATE : []) || [])
+    .filter(t => _azSet.has(String(t).toUpperCase()));
+  const _avvisoStale = _mod.length
+    ? ` ⚠⚠ ATTENZIONE, IL LIBRO E' STATO MODIFICATO DOPO L'ULTIMO GIRO DELLA PIPELINE `
+      + `(${_mod.join(", ")}): i PESI sono aggiornati, le quote di RISCHIO no — si ricalcolano solo `
+      + `al prossimo giro, perche' richiedono la matrice di covarianza sulle serie complete. Su `
+      + `quelle righe peso e rischio descrivono due libri diversi, e il loro confronto NON e' `
+      + `affermabile. Non e' un errore di calcolo: e' un dato che deve ancora arrivare.`
+    : "";
   const ord = [...azionarie].sort((a, b) => b.v - a.v);
   ord.forEach(x => {
     const pct = x.v / totAz * 100;
@@ -10866,7 +10939,11 @@ function contestoPortafoglio(tkCorrente) {
   const gf = gruppoFattore(azionarie, totAz);
   const { SOGLIA_FATTORE, ancora, corrCon, misurato, semi, pesoSemi } = gf;
   const primeTre = ord.slice(0, 3).reduce((s, x) => s + x.v, 0) / totAz * 100;
-  L.push(`CONCENTRAZIONE: le prime tre posizioni valgono il ${pct1(primeTre)}% dell'azionario`
+  /* ⚠ v427 — stessa correzione della disciplina: su un libro corto "le prime tre" nomina una
+     posizione che non esiste. Le due sedi restano DUE RESE DELLO STESSO NUMERO (v421) e ora
+     anche dello stesso conteggio. */
+  const quanteCima = Math.min(3, ord.length);
+  L.push(`CONCENTRAZIONE: ${quanteCima === 1 ? "la prima posizione vale" : quanteCima === 2 ? "le prime due posizioni valgono" : "le prime tre posizioni valgono"} il ${pct1(primeTre)}% dell'azionario`
     + `${semi.length >= 2 ? ` · ${semi.length} posizioni si muovono INSIEME e valgono il ${pct1(pesoSemi)}% dell'azionario: `
         + semi.map(x => `${x.r.ticker}${misurato && corrCon.get(x.r.ticker) != null ? ` ${corrCon.get(x.r.ticker).toFixed(2)}` : ""}`).join(", ")
         + (misurato
@@ -10941,7 +11018,7 @@ function contestoPortafoglio(tkCorrente) {
        misurabile" si leggono uguali e sono cose diverse. */
     const senzaMcr = azionarie.filter(x => !Number.isFinite(numero(x.r.risk_contrib_pct)))
       .map(x => x.r.ticker);
-    L.push(`CONTRIBUTO AL RISCHIO (quota della varianza del libro attribuibile a ciascuna posizione, `
+    L.push(_avvisoStale + `CONTRIBUTO AL RISCHIO (quota della varianza del libro attribuibile a ciascuna posizione, `
       + `dalle correlazioni misurate — e' un ordinamento DIVERSO dal peso; sono tutte, e sommano a 100%): `
       + conMcr.map(x => `${x.tk} peso ${x.peso.toFixed(1)}% → rischio ${x.mcr}%`).join(" · ")
       + `. ⚠ Dove rischio e peso divergono, la posizione porta piu' (o meno) varianza di quanto il suo peso suggerisca: `
@@ -10971,7 +11048,11 @@ function contestoPortafoglio(tkCorrente) {
   if (Number.isFinite(numero(tot0.avg_pairwise_corr))) bit.push(`correlazione media fra le posizioni ${numero(tot0.avg_pairwise_corr)}`);
   if (bit.length) L.push(`RISCHIO DEL LIBRO NEL SUO INSIEME: ${bit.join(" · ")}. `
     + `⚠ Sono misure a UN GIORNO su distribuzione storica: dicono quanto e' ampia una giornata brutta ordinaria, `
-    + `non quanto puo' scendere il libro in un ciclo. Per quello serve il drawdown qui sotto.`);
+    + `non quanto puo' scendere il libro in un ciclo. Per quello serve il drawdown qui sotto.`
+    /* ⚠ v427 — VaR, ES, beta e correlazione media escono dalla STESSA matrice del contributo al
+       rischio, quindi invecchiano insieme a lui: senza questa riga descrivevano il libro nuovo
+       con i numeri del vecchio. */
+    + _avvisoStale);
   /* il drawdown: in un libro di crescita il rischio non e' la volatilita', e' quanto profondo
      si scende e quanto ci si mette a tornare. I dati c'erano e nessuno li guardava. */
   const dd = (serie) => {
