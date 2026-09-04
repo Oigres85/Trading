@@ -6676,10 +6676,22 @@ check("v403 il R² condizionato dichiara di NON essere confrontabile con gli alt
 
 /* ⚠ il confronto fra i due beta e' il messaggio: 2,4 contro 0,75 e' il triplo, e la riga deve
    dirlo in cifre invece di lasciarlo calcolare a chi legge. */
+/* ⚠⚠ v415 — QUESTO GATE PINNAVA IL COMPORTAMENTO SBAGLIATO. Pretendeva il confronto in cifre
+   sul canale `tassi` della fixture, la cui finestra LUNGA sta sotto il pavimento del rumore
+   (R² 0,007 contro 0,015): cioe' esigeva proprio la percentuale calcolata su un beta che il
+   pacchetto dichiara non misurabile — il difetto trovato leggendo il pacchetto di CRWV.
+   *Un gate che pinna un difetto lo rende permanente* (v326, v411).
+   ⚠ L'invariante non cambia — quando i due beta SONO misurabili, il confronto esce in cifre —
+   ma ora il check COSTRUISCE quello stato invece di prenderlo da una fixture che rappresenta il
+   caso opposto. La fixture condivisa resta intatta: serve al caso "canale acceso solo di
+   recente" della v401 e a `v415`, che misura il ramo dichiarato. */
 check("v403 il beta delle sedute forti si confronta in cifre con quello della finestra lunga", suVeri(`
   const r = DATA.watchlist.find(x => x.ticker === "MU");
   if (!r) return false;
   r.tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  /* entrambi i termini sopra il proprio pavimento: e' la condizione in cui il confronto e' lecito */
+  r.tv.sensibilita.tassi.r2 = 0.2;
+  r.tv.sensibilita.tassi.acceso = true;
   const p = buildPromptTicker("MU");
   return p.indexOf("220% PIU' AMPIO") >= 0;`));
 
@@ -7818,6 +7830,42 @@ check("v415 la distanza dalle medie esce identica in tutti i punti del pacchetto
       if (rese.size > 1) guai.push(tk + " media " + n + ": " + [...rese].join(" contro "));
     }
   }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v415 — NESSUNA PERCENTUALE CALCOLATA SU UN BETA CHE IL PACCHETTO CHIAMA RUMORE.
+   Su CRWV il canale tassi ha R² 0 sulla finestra lunga e la riga dichiara "NESSUNA relazione
+   misurabile"; due righe dopo il pacchetto pubblicava "e' il 124% PIU' AMPIO di quello della
+   finestra lunga". Una percentuale a tre cifre su una base che il blocco stesso, nella propria
+   nota di chiusura, chiama "rumore stimato con tre decimali". La guardia esisteva ma guardava
+   la GRANDEZZA del beta (>0,05), non la sua MISURABILITA' — la meta' mancante della v316 (un
+   beta senza il suo R² e' mezzo numero) applicata al rapporto fra due beta.
+   ⚠ L'invariante e' generale: il confronto percentuale esce SOLO se entrambi i termini stanno
+   sopra il proprio pavimento del rumore. Sotto, si dichiara che non e' affermabile (v199). */
+check("v415 il confronto fra beta non si calcola su un termine sotto il pavimento del rumore", suVeriEsito(`
+  const R = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const con = R.filter(r => r && r.tv && r.tv.sensibilita
+    && Object.values(r.tv.sensibilita).some(v => v && v.evento && typeof v.acceso === "boolean"));
+  if (!con.length) return "nessun titolo con il beta condizionato: il check non misura niente";
+  const guai = [];
+  let spenti = 0;
+  for (const r of con.slice(0, 4)) {
+    const tk = String(r.ticker).toUpperCase();
+    const p = buildPromptTicker(tk);
+    for (const [nome, v] of Object.entries(r.tv.sensibilita)) {
+      if (!v || !v.evento || v.acceso !== false) continue;   // solo i canali sotto il pavimento
+      spenti++;
+      const i = p.indexOf("- " + nome + " (");
+      if (i < 0) continue;
+      const fine = p.indexOf("EFFETTO lo distorcerebbe", i);
+      const blocco = p.slice(i, fine > 0 ? fine : i + 3000);
+      const confronta = blocco.indexOf("PIU' AMPIO") >= 0 || blocco.indexOf("piu' contenuto") >= 0;
+      const dichiara = blocco.indexOf("NON E' AFFERMABILE") >= 0;
+      if (confronta) guai.push(tk + "/" + nome + ": pubblica un confronto percentuale su un beta sotto il pavimento");
+      else if (!dichiara) guai.push(tk + "/" + nome + ": non confronta e non dice perche'");
+    }
+  }
+  /* ⚠ IL FENOMENO DEVE ESSERCI: senza canali spenti il check sarebbe verde per assenza. */
+  if (!spenti) return "nessun canale sotto il pavimento del rumore nei dati: il check non misura niente";
   return guai.length ? guai.join(" · ") : true;`));
 
 let fail = 0;

@@ -12359,12 +12359,38 @@ function tvBlocchi(tk) {
           + `${Number.isFinite(numero(e.escursione_min)) ? `, oltre ${e.escursione_min}% in valore assoluto` : ""}) — `
           + `beta ${e.beta > 0 ? "+" : ""}${e.beta}, R² ${e.r2} contro un pavimento del rumore di ${e.r2_soglia}. `
           + `${e.campione} sedute, dal ${e.da} al ${e.a}.`);
-        const scarto = (Number.isFinite(numero(e.beta)) && Number.isFinite(numero(v.beta)) && Math.abs(numero(v.beta)) > 0.05)
+        /* ⚠⚠ v415 — LA PERCENTUALE SI CALCOLAVA CONTRO UN BETA CHE IL PACCHETTO CHIAMA RUMORE.
+           Su CRWV il canale tassi ha R² 0 sulla finestra lunga, e la riga dichiara "NESSUNA
+           relazione misurabile": due righe dopo pubblicava "e' il 124% PIU' AMPIO di quello
+           della finestra lunga". Cioe' una percentuale a tre cifre calcolata su una base che il
+           blocco stesso, nella propria nota di chiusura, definisce "rumore stimato con tre
+           decimali". La guardia c'era ma guardava la GRANDEZZA del beta (>0,05), non la sua
+           MISURABILITA' — ed e' proprio la meta' mancante che la v316 aveva chiuso altrove: un
+           beta senza il suo R² e' mezzo numero, e un rapporto fra due beta di cui uno non e'
+           misurabile non e' un numero affatto.
+           ⚠ Conta anche il beta condizionato: se e' sotto il PROPRIO pavimento, il confronto ha
+           un termine solo valido. Sotto la soglia non si pubblica una stima piu' prudente — si
+           dichiara che il confronto non e' affermabile (v199: un numero fuori orizzonte e'
+           peggio di nessun numero). */
+        const _sopra = (m) => m && typeof m.acceso === "boolean" ? m.acceso
+          : (Number.isFinite(numero(m && m.r2)) && Number.isFinite(numero(m && m.r2_soglia))
+              ? numero(m.r2) >= numero(m.r2_soglia) : null);
+        const _baseOk = _sopra(v), _condOk = _sopra(e);
+        const scarto = (Number.isFinite(numero(e.beta)) && Number.isFinite(numero(v.beta))
+                        && Math.abs(numero(v.beta)) > 0.05 && _baseOk !== false && _condOk !== false)
           ? Math.round((Math.abs(numero(e.beta)) / Math.abs(numero(v.beta)) - 1) * 100) : null;
+        const _perche = scarto != null ? ""
+          : (_baseOk === false && _condOk === false
+              ? `, e il confronto fra i due NON E' AFFERMABILE: nessuno dei due supera il proprio pavimento del rumore, quindi il loro rapporto sarebbe una percentuale fra due numeri che il sistema dichiara non misurabili`
+              : _baseOk === false
+                ? `, e il confronto con la finestra lunga NON E' AFFERMABILE: quel beta sta sotto il proprio pavimento del rumore, quindi una percentuale calcolata su di lui misurerebbe rumore`
+                : _condOk === false
+                  ? `, ma questo beta sta sotto il proprio pavimento del rumore: il confronto con la finestra lunga NON E' AFFERMABILE`
+                  : "");
         F.push(`  ⚠ QUESTO R² NON SI CONFRONTA con quello delle due righe qui sopra: e' calcolato su un `
           + `sottoinsieme scelto, quindi ha un DENOMINATORE diverso. Quello che si confronta e' il BETA`
           + `${scarto != null ? `, ed e' ${scarto > 0 ? `${scarto}% PIU' AMPIO` : `${-scarto}% piu' contenuto`} `
-              + `di quello della finestra lunga` : ""}: dice come si comporta il canale nelle giornate che `
+              + `di quello della finestra lunga: ` : `${_perche}. Il beta di queste sedute `}dice come si comporta il canale nelle giornate che `
           /* ⚠ v404 — C9 HA PRESO QUESTA RIGA, e solo quando la pipeline ha prodotto il campo:
              il ramo era irraggiungibile PER I DATI, non per l'orologio (classe v390). Diceva
              "Selezionare… selezionarle…", cioe' due imperativi dentro la coda — quinta volta in
