@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-04T22:49:49Z",
+ "updated_at": "2026-09-04T23:31:49Z",
  "eurusd": 1.1621,
  "totals": {
   "usd_value": 0,
@@ -957,10 +957,10 @@
    "sortino_6m": 3.42,
    "prepost": {
     "label": "after",
-    "price": 1013.55,
-    "change_pct": -0.3
+    "price": 1013.48,
+    "change_pct": -0.31
    },
-   "prezzo_limite_aggiustato": 1013.55,
+   "prezzo_limite_aggiustato": 1013.48,
    "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -2927,17 +2927,17 @@
    },
    "health": 46,
    "eps": 3.92,
-   "beta": 2.49,
+   "beta": 2.48,
    "sharpe_1y": 1.59,
    "sortino_1y": 2.58,
    "sharpe_6m": 2.43,
    "sortino_6m": 4.1,
    "prepost": {
     "label": "after",
-    "price": 476.3,
-    "change_pct": -0.27
+    "price": 476.06,
+    "change_pct": -0.32
    },
-   "prezzo_limite_aggiustato": 476.3,
+   "prezzo_limite_aggiustato": 476.06,
    "risk_reward": "1:0.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -4732,24 +4732,24 @@
    },
    "health": 79,
    "eps": 7.9,
-   "beta": 2.21,
+   "beta": 2.22,
    "sharpe_1y": 0.76,
    "sortino_1y": 1.12,
    "sharpe_6m": 1.22,
    "sortino_6m": 1.87,
    "prepost": {
     "label": "after",
-    "price": 230.02,
-    "change_pct": -0.15
+    "price": 229.88,
+    "change_pct": -0.21
    },
-   "prezzo_limite_aggiustato": 230.02,
+   "prezzo_limite_aggiustato": 229.88,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 5562502742016.0,
     "shares": 24147000000.0,
-    "float_shares": 23127324000.0,
+    "float_shares": 23129252000.0,
     "float_pct": 95.8,
     "avg_volume_30d": 136892814.0,
     "pe_ttm": 29.1595,
@@ -4775,10 +4775,7 @@
     "short_float": 0.0123,
     "buyback_yield": 0.0072,
     "ps": 18.36,
-    "ev_s": 18.09,
-    "altman_z": 13.22,
-    "altman_missing": 0,
-    "altman_model": "Z''"
+    "ev_s": 18.09
    },
    "combustione": {
     "cassa": 13237000000.0,
@@ -5529,7 +5526,7 @@
      "a1": 23.62,
      "a3": 430.56,
      "a5": 1015.64,
-     "a10": 13588.51
+     "a10": 13588.5
     },
     "stagionalita": [
      {
@@ -6482,10 +6479,10 @@
    "sortino_6m": 0.93,
    "prepost": {
     "label": "after",
-    "price": 338.99,
-    "change_pct": 0.16
+    "price": 338.97,
+    "change_pct": 0.15
    },
-   "prezzo_limite_aggiustato": 338.99,
+   "prezzo_limite_aggiustato": 338.97,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -6511,14 +6508,14 @@
     "target_mean": 428.0667,
     "fcf": 22665000960.0,
     "gross_margin": 0.609,
-    "enterprise_value": 4084870414336.0,
-    "ev_ebitda": 23.59,
+    "enterprise_value": 4035705831424.0,
+    "ev_ebitda": 23.306,
     "peg": 1.27,
     "roa": 0.1296,
     "short_float": 0.0124,
     "buyback_yield": 0.011,
     "ps": 9.28,
-    "ev_s": 9.16
+    "ev_s": 9.05
    },
    "combustione": {
     "cassa": 55911000000.0,
@@ -8027,10 +8024,10 @@
    "sortino_6m": 0.44,
    "prepost": {
     "label": "after",
-    "price": 174.45,
-    "change_pct": 0.07
+    "price": 174.5,
+    "change_pct": 0.1
    },
-   "prezzo_limite_aggiustato": 174.45,
+   "prezzo_limite_aggiustato": 174.5,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -9867,10 +9864,10 @@
    "sortino_6m": 0.13,
    "prepost": {
     "label": "after",
-    "price": 159.43,
-    "change_pct": 0.41
+    "price": 159.45,
+    "change_pct": 0.42
    },
-   "prezzo_limite_aggiustato": 159.43,
+   "prezzo_limite_aggiustato": 159.45,
    "risk_reward": "1:0.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -10657,7 +10654,7 @@
      "a1": -42.9,
      "a3": 55.29,
      "a5": 94.94,
-     "a10": 369.31
+     "a10": 369.32
     },
     "stagionalita": [
      {
@@ -11908,24 +11905,24 @@
    },
    "health": 55,
    "eps": 26.94,
-   "beta": 2.22,
+   "beta": 2.18,
    "sharpe_1y": 2.01,
    "sortino_1y": 3.08,
    "sharpe_6m": 1.46,
    "sortino_6m": 2.13,
    "prepost": {
     "label": "after",
-    "price": 466.22,
+    "price": 466.19,
     "change_pct": -0.27
    },
-   "prezzo_limite_aggiustato": 466.22,
+   "prezzo_limite_aggiustato": 466.19,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 168538456064.0,
     "shares": 360540944.0,
-    "float_shares": 358013552.0,
+    "float_shares": 358020763.0,
     "float_pct": 99.3,
     "avg_volume_30d": 8441877.0,
     "pe_ttm": 17.3519,
@@ -11940,7 +11937,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0013,
-    "price_to_book": 22.3505,
+    "price_to_book": null,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13706,10 +13703,10 @@
    "sortino_6m": 2.97,
    "prepost": {
     "label": "after",
-    "price": 222.4,
-    "change_pct": -0.51
+    "price": 222.07,
+    "change_pct": -0.66
    },
-   "prezzo_limite_aggiustato": 222.4,
+   "prezzo_limite_aggiustato": 222.07,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -13731,7 +13728,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0011,
-    "price_to_book": 10.5772,
+    "price_to_book": 10.7455,
     "target_mean": 284.998,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -15235,17 +15232,17 @@
    },
    "health": 24,
    "eps": -0.83,
-   "beta": 2.01,
+   "beta": 2.02,
    "sharpe_1y": -0.03,
    "sortino_1y": -0.04,
    "sharpe_6m": -0.27,
    "sortino_6m": -0.41,
    "prepost": {
     "label": "after",
-    "price": 15.23,
-    "change_pct": 0.2
+    "price": 15.2,
+    "change_pct": 0.0
    },
-   "prezzo_limite_aggiustato": 15.23,
+   "prezzo_limite_aggiustato": 15.2,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -16699,10 +16696,10 @@
    "sortino_6m": 1.69,
    "prepost": {
     "label": "after",
-    "price": 267.61,
-    "change_pct": 5.83
+    "price": 266.33,
+    "change_pct": 5.32
    },
-   "prezzo_limite_aggiustato": 267.61,
+   "prezzo_limite_aggiustato": 266.33,
    "risk_reward": null,
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -18026,10 +18023,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "after",
-    "price": 175.34,
-    "change_pct": -0.94
+    "price": 174.92,
+    "change_pct": -1.18
    },
-   "prezzo_limite_aggiustato": 175.34,
+   "prezzo_limite_aggiustato": 174.92,
    "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -19347,10 +19344,10 @@
    "sortino_6m": 0.19,
    "prepost": {
     "label": "after",
-    "price": 142.79,
-    "change_pct": -0.01
+    "price": 142.89,
+    "change_pct": 0.06
    },
-   "prezzo_limite_aggiustato": 142.79,
+   "prezzo_limite_aggiustato": 142.89,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -20843,10 +20840,10 @@
    "sortino_6m": 0.62,
    "prepost": {
     "label": "after",
-    "price": 89.01,
-    "change_pct": -0.39
+    "price": 89.04,
+    "change_pct": -0.36
    },
-   "prezzo_limite_aggiustato": 89.01,
+   "prezzo_limite_aggiustato": 89.04,
    "risk_reward": "1:2.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -21827,26 +21824,26 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79659.24,
+   "price": 79750.0,
    "price_asof": "2026-09-04",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -1.98,
+   "change_pct": -1.87,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -36.9,
-   "sma200_dist_pct": 14.4,
-   "sma50_dist_pct": 15.8,
+   "ath_dist_pct": -36.8,
+   "sma200_dist_pct": 14.5,
+   "sma50_dist_pct": 16.0,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -36.9,
+   "w52_dist_pct": -36.8,
    "day_high": 81392.3,
    "day_low": 78671.32,
    "support": 62648.57,
    "resistance": 82262.21,
-   "rsi": 66.5,
-   "volume": 38302601216,
-   "vol_ratio": 1.32,
+   "rsi": 66.8,
+   "volume": 37833756672,
+   "vol_ratio": 1.3,
    "atr_14": 2486.87,
    "atr_pct": 3.12,
    "signal": "Sopra SMA50",
@@ -21857,7 +21854,7 @@
      77403.62,
      77300.48,
      81271.74,
-     79659.24
+     79750.0
     ],
     "m6": [
      78657.25,
@@ -21985,7 +21982,7 @@
      77403.62,
      77300.48,
      81271.74,
-     79659.24
+     79750.0
     ],
     "all": [
      386.94,
@@ -22132,7 +22129,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79659.24
+     79750.0
     ],
     "m1": [
      62975.59,
@@ -22156,7 +22153,7 @@
      77403.62,
      77300.48,
      81271.74,
-     79659.24
+     79750.0
     ],
     "m3": [
      60003.76,
@@ -22224,7 +22221,7 @@
      77403.62,
      77300.48,
      81271.74,
-     79659.24
+     79750.0
     ],
     "y1": [
      110723.6,
@@ -22300,146 +22297,151 @@
      73032.76,
      78564.98,
      77667.57,
-     79659.24
+     79750.0
     ],
     "d1": [
-     81169.93,
-     81252.91,
+     81174.18,
+     81252.92,
      81254.68,
-     81309.23,
-     81235.14,
+     81309.93,
+     81239.47,
      81044.81,
      80941.58,
      80948.13,
-     80796.2,
+     80799.5,
      80810.25,
      80797.55,
-     80977.49,
+     80975.28,
      80840.29,
      80809.85,
      80693.61,
-     80759.64,
+     80760.23,
      80741.43,
-     80767.62,
+     80766.0,
      80881.65,
-     80931.31,
+     80931.32,
      80916.71,
      80819.15,
      80874.42,
      80923.32,
      80855.62,
-     80969.53,
+     80965.62,
      81183.8,
-     81169.56,
+     81171.64,
      81033.47,
      81062.5,
-     81008.0,
-     80984.24,
-     81127.94,
+     81014.05,
+     80979.76,
+     81129.86,
      80989.99,
-     80981.8,
+     80969.98,
      80856.95,
      80941.82,
      81000.61,
-     80830.39,
+     80826.77,
      80676.3,
-     80831.24,
+     80831.19,
      80763.73,
-     80882.06,
+     80876.98,
      80914.97,
-     80836.4,
+     80837.85,
      80838.0,
      80768.14,
      80696.91,
-     80624.12,
-     80755.99,
-     80900.99,
-     81099.47,
+     80622.12,
+     80767.68,
+     80900.98,
+     81101.23,
      81039.2,
-     81216.13,
-     81160.07,
+     81201.11,
+     81160.08,
      81075.08,
-     80970.76,
+     80970.77,
      81075.74,
-     81154.42,
+     81155.11,
      81097.95,
      81111.46,
-     80947.97,
-     80857.41,
-     80959.2,
+     80959.06,
+     80851.22,
+     80958.24,
      81078.88,
-     81108.06,
+     81102.81,
      81103.55,
      81185.0,
      81271.09,
      81240.86,
      81248.59,
-     81276.21,
-     81175.0,
-     81245.97,
-     81211.93,
-     79863.33,
-     79709.43,
-     79626.36,
-     79402.08,
-     79219.23,
-     79409.37,
-     79218.96,
-     79382.08,
-     79280.37,
-     79467.62,
-     79402.62,
-     79300.2,
-     79382.26,
-     79008.43,
-     78801.38,
-     78985.02,
-     79194.82,
-     79293.5,
-     79366.3,
-     79524.9,
-     79438.29,
+     81277.21,
+     81169.35,
+     81223.57,
+     81211.92,
+     79820.03,
+     79716.9,
+     79644.44,
+     79401.02,
+     79231.23,
+     79409.36,
+     79227.47,
+     79390.26,
+     79276.44,
+     79467.61,
+     79407.0,
+     79317.79,
+     79345.56,
+     79004.49,
+     78800.23,
+     78982.59,
+     79188.5,
+     79295.55,
+     79367.85,
+     79524.91,
+     79438.3,
      79413.17,
-     79446.48,
-     79518.12,
-     79742.59,
-     79858.41,
-     79744.38,
-     79690.22,
+     79448.1,
+     79517.92,
+     79750.0,
+     79858.55,
+     79746.4,
+     79690.23,
      79619.9,
      79588.76,
      79517.06,
-     79481.24,
-     79466.08,
+     79481.25,
+     79474.96,
      79564.51,
-     79527.67,
-     79576.71,
-     79635.36,
+     79528.31,
+     79584.18,
+     79635.35,
      79640.73,
-     79635.21,
+     79633.16,
      79723.44,
-     79715.12,
+     79715.11,
      79817.36,
-     79758.69,
-     79699.9,
-     79693.91,
-     79853.15,
-     79831.12,
-     79764.08,
-     79751.77,
-     79732.44,
-     79752.61,
+     79761.95,
+     79699.91,
+     79694.96,
+     79842.15,
+     79831.13,
+     79760.27,
+     79751.76,
+     79732.43,
+     79752.6,
      79769.98,
      79794.13,
-     79801.84,
+     79801.85,
      79817.55,
-     79786.85,
-     79637.9,
-     79690.37,
-     79719.74,
-     79690.95,
+     79791.67,
+     79653.0,
+     79690.36,
+     79719.73,
+     79700.27,
      79693.4,
-     79680.01
+     79680.02,
+     79676.98,
+     79660.58,
+     79630.83,
+     79723.65,
+     79750.0
     ]
    },
    "earnings_date": null,
@@ -22451,9 +22453,9 @@
    "sharpe_1y": -0.71,
    "sortino_1y": -0.96,
    "sharpe_6m": 0.01,
-   "sortino_6m": 0.01,
+   "sortino_6m": 0.02,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79659.24,
+   "prezzo_limite_aggiustato": 79750.0,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22466,22 +22468,22 @@
     "w1": {
      "support": 76248.3,
      "resistance": 82262.21,
-     "change_pct": 1.41
+     "change_pct": 1.53
     },
     "m1": {
      "support": 62487.7,
      "resistance": 82262.21,
-     "change_pct": 26.49
+     "change_pct": 26.64
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82262.21,
-     "change_pct": 32.76
+     "change_pct": 32.91
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -9.27
+     "change_pct": -9.17
     }
    },
    "financials": [],
@@ -22508,74 +22510,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79659.24,
+     "prezzo": 79750.0,
      "medie": {
       "sma10": {
-       "liv": 78721.24,
-       "dist_pct": 1.19
+       "liv": 78730.31,
+       "dist_pct": 1.3
       },
       "ema10": {
-       "liv": 78230.24,
-       "dist_pct": 1.83
+       "liv": 78246.74,
+       "dist_pct": 1.92
       },
       "sma20": {
-       "liv": 75611.01,
-       "dist_pct": 5.35
+       "liv": 75615.55,
+       "dist_pct": 5.47
       },
       "ema20": {
-       "liv": 75680.35,
-       "dist_pct": 5.26
+       "liv": 75688.99,
+       "dist_pct": 5.37
       },
       "sma30": {
-       "liv": 71712.64,
-       "dist_pct": 11.08
+       "liv": 71715.66,
+       "dist_pct": 11.2
       },
       "ema30": {
-       "liv": 73559.47,
-       "dist_pct": 8.29
+       "liv": 73565.32,
+       "dist_pct": 8.41
       },
       "sma50": {
-       "liv": 68776.01,
-       "dist_pct": 15.82
+       "liv": 68777.83,
+       "dist_pct": 15.95
       },
       "ema50": {
-       "liv": 71046.45,
-       "dist_pct": 12.12
+       "liv": 71050.01,
+       "dist_pct": 12.24
       },
       "sma100": {
-       "liv": 66338.76,
-       "dist_pct": 20.08
+       "liv": 66339.66,
+       "dist_pct": 20.21
       },
       "ema100": {
-       "liv": 69633.16,
-       "dist_pct": 14.4
+       "liv": 69634.96,
+       "dist_pct": 14.53
       },
       "sma200": {
-       "liv": 69622.28,
-       "dist_pct": 14.42
+       "liv": 69622.74,
+       "dist_pct": 14.55
       },
       "ema200": {
-       "liv": 72657.47,
-       "dist_pct": 9.64
+       "liv": 72658.37,
+       "dist_pct": 9.76
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 66.5,
+      "rsi14": 66.8,
       "macd": {
-       "linea": 3415.69,
-       "segnale": 3466.58,
-       "istogramma": -50.89
+       "linea": 3422.93,
+       "segnale": 3468.03,
+       "istogramma": -45.1
       },
-      "stoch_k": 60.8,
-      "stoch_d": 72.6,
-      "williams_r": -39.2,
-      "cci20": 44.8,
+      "stoch_k": 62.1,
+      "stoch_d": 73.0,
+      "williams_r": -37.9,
+      "cci20": 45.0,
       "adx14": 45.5,
       "di_su": 37.5,
       "di_giu": 9.6,
-      "momentum10": 1094.27
+      "momentum10": 1185.02
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23068,19 +23070,19 @@
       "o": 81271.92,
       "h": 81392.3,
       "l": 78671.32,
-      "c": 79659.24
+      "c": 79750.0
      }
     ],
     "performance": {
-     "s1": 2.56,
-     "m1": 25.64,
-     "m3": 36.03,
-     "m6": 1.89,
-     "a1": -8.75,
-     "ytd": -10.22,
-     "a3": 195.39,
-     "a5": 81.91,
-     "a10": 12964.57
+     "s1": 2.68,
+     "m1": 25.78,
+     "m3": 36.19,
+     "m6": 2.01,
+     "a1": -8.65,
+     "ytd": -10.12,
+     "a3": 195.72,
+     "a5": 82.12,
+     "a10": 12979.45
     },
     "stagionalita": [
      {
@@ -23158,7 +23160,7 @@
      {
       "mese": 9,
       "media": -1.55,
-      "mediana": -0.83,
+      "mediana": -0.78,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23193,9 +23195,9 @@
      }
     ]
    },
-   "rs_1m": 26.4,
+   "rs_1m": 26.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 25.9,
+   "rs_ndx_1m": 26.1,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -35888,10 +35890,10 @@
    "sortino_6m": 1.48,
    "prepost": {
     "label": "after",
-    "price": 427.64,
-    "change_pct": -0.3
+    "price": 427.66,
+    "change_pct": -0.29
    },
-   "prezzo_limite_aggiustato": 427.64,
+   "prezzo_limite_aggiustato": 427.66,
    "risk_reward": "1:0.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -37561,10 +37563,10 @@
    "sortino_6m": 0.37,
    "prepost": {
     "label": "after",
-    "price": 357.3,
-    "change_pct": -0.17
+    "price": 357.32,
+    "change_pct": -0.16
    },
-   "prezzo_limite_aggiustato": 357.3,
+   "prezzo_limite_aggiustato": 357.32,
    "risk_reward": "1:2.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -47873,7 +47875,7 @@
     },
     {
      "titolo": "Stocks Fall as Jobs Fuel Bets Fed Will Raise Rates: Markets Wrap",
-     "riassunto": "A stronger-than-anticipated increase in US jobs drove stocks and short-dated bonds lower, with traders boosting their bets the Federal Reserve will raise rates this month.",
+     "riassunto": "A stronger-than-anticipated increase in US jobs drove stocks and short-dated notes lower, with traders boosting their bets the Federal Reserve will raise rates this month.",
      "fonte": "Bloomberg",
      "quando": "2026-09-03T22:14:26Z",
      "url": "https://www.bloomberg.com/news/articles/2026-09-03/stock-market-today-dow-s-p-live-updates"
@@ -52824,7 +52826,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 30
+     "score": 31
     },
     {
      "label": "Treasury 10A",
@@ -52969,7 +52971,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": 69700000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-04",
     "price": 211.92,
     "d1": -0.88,
@@ -53145,27 +53147,27 @@
      {
       "tk": "TSLA",
       "nome": "Tesla Inc",
-      "peso": 9.6
-     },
-     {
-      "tk": "SPCX",
-      "nome": "Space Exploration Technologies Corp Cl",
-      "peso": 6.1
-     },
-     {
-      "tk": "CRCL",
-      "nome": "Circle Internet Group Inc Ordinary Sha",
-      "peso": 5.7
+      "peso": 9.7
      },
      {
       "tk": "TEM",
       "nome": "Tempus AI Inc Class A common stock",
-      "peso": 5.5
+      "peso": 4.9
      },
      {
-      "tk": "COIN",
-      "nome": "Coinbase Global Inc Ordinary Shares - ",
+      "tk": "SPCX",
+      "nome": "Space Exploration Technologies Corp Cl",
+      "peso": 4.9
+     },
+     {
+      "tk": "CRSP",
+      "nome": "CRISPR Therapeutics AG",
       "peso": 4.7
+     },
+     {
+      "tk": "SHOP",
+      "nome": "Shopify Inc Registered Shs -A- Subord ",
+      "peso": 4.3
      }
     ],
     "score": 81
@@ -53218,7 +53220,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-04",
     "price": 171.45,
     "d1": -1.04,
@@ -53394,27 +53396,27 @@
      {
       "tk": "NTNX",
       "nome": "Nutanix Inc Class A",
-      "peso": 4.2
+      "peso": 4.3
      },
      {
       "tk": "ANET",
       "nome": "Arista Networks Inc",
-      "peso": 3.9
-     },
-     {
-      "tk": "P",
-      "nome": "Everpure Inc Class A",
-      "peso": 3.7
+      "peso": 4.0
      },
      {
       "tk": "MSFT",
       "nome": "Microsoft Corp",
+      "peso": 3.8
+     },
+     {
+      "tk": "P",
+      "nome": "Everpure Inc Class A",
       "peso": 3.6
      },
      {
-      "tk": "MDB",
-      "nome": "MongoDB Inc Class A",
-      "peso": 3.6
+      "tk": "GOOGL",
+      "nome": "Alphabet Inc Class A",
+      "peso": 3.3
      }
     ],
     "score": 70
@@ -54105,7 +54107,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-04",
     "price": 84.17,
     "d1": 0.68,
@@ -54188,7 +54190,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": 272056000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-04",
     "price": 187.28,
     "d1": 0.7,
@@ -54271,7 +54273,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": 120253000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-04",
     "price": 114.91,
     "d1": -1.33,
@@ -54520,7 +54522,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-04",
     "price": 567.01,
     "d1": 2.61,
@@ -54530,27 +54532,27 @@
      {
       "tk": "NVDA",
       "nome": "NVIDIA Corp",
-      "peso": 22.6
+      "peso": 20.8
      },
      {
       "tk": "TSM",
       "nome": "Taiwan Semiconductor Manufacturing Co ",
-      "peso": 9.7
+      "peso": 9.6
      },
      {
       "tk": "AVGO",
       "nome": "Broadcom Inc",
-      "peso": 6.1
-     },
-     {
-      "tk": "MU",
-      "nome": "Micron Technology Inc",
-      "peso": 5.5
+      "peso": 6.6
      },
      {
       "tk": "AMD",
       "nome": "Advanced Micro Devices Inc",
-      "peso": 5.4
+      "peso": 5.7
+     },
+     {
+      "tk": "MU",
+      "nome": "Micron Technology Inc",
+      "peso": 5.2
      }
     ],
     "score": 38
@@ -54613,27 +54615,27 @@
      {
       "tk": "FSLR",
       "nome": "First Solar Inc",
-      "peso": 9.9
+      "peso": 10.0
      },
      {
       "tk": "NXT",
-      "nome": "Nextpower Inc",
-      "peso": 8.8
+      "nome": "Nextpower Inc Class A",
+      "peso": 9.3
      },
      {
       "tk": "ENLT.TA",
       "nome": "Enlight Renewable Energy Ltd",
-      "peso": 7.2
+      "peso": 7.6
      },
      {
       "tk": "ENPH",
       "nome": "Enphase Energy Inc",
-      "peso": 6.6
+      "peso": 6.5
      },
      {
       "tk": "DORL.TA",
       "nome": "Doral Group Renewable Eneryy Resources",
-      "peso": 4.7
+      "peso": 4.6
      }
     ],
     "score": 9
@@ -57301,14 +57303,14 @@
    "rate_date": "2026-08-01"
   },
   "sp500_pe": {
-   "current": 29.8,
+   "current": 26.4,
    "avg_10y": null,
    "pct_rank": null,
-   "score": 51,
+   "score": 59,
    "history": [
     {
      "d": "2026-09-04",
-     "v": 29.8
+     "v": 26.4
     }
    ],
    "label": "Sopravvalutazione",
@@ -57661,8 +57663,8 @@
    "label": "Sfavorevole"
   },
   "liquidity_split": {
-   "inst_cash_pct": 7.7,
-   "inst_note": "AUM BIL+SHV $68B su $880B di BIL+SHV+SPY (SPY da solo $812B)",
+   "inst_cash_pct": 7.9,
+   "inst_note": "AUM BIL+SHV $68B su $863B di BIL+SHV+SPY (SPY da solo $795B)",
    "retail_mmf_bln": 3016.7,
    "retail_yoy_pct": 6.2,
    "retail_pctile_5y": 94,
@@ -57896,6 +57898,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "The Nuclear IPO Boom Is Back: How Westinghouse and Its Rivals Stack Up for Long-Term Investors",
+      "riassunto": "Key PointsA new wave of nuclear IPOs ranges from solid operators like Westinghouse to highly speculative start-ups.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-04T22:34:01Z",
+      "url": "https://www.nasdaq.com/articles/nuclear-ipo-boom-back-how-westinghouse-and-its-rivals-stack-long-term-investors"
+     },
+     {
       "titolo": "2 High-Yield Dividend Stocks Worth Buying Right Now",
       "riassunto": "Key PointsExxonMobil is on track to become a Dividend King.",
       "fonte": "Nasdaq",
@@ -57929,13 +57938,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T15:05:00Z",
       "url": "https://www.nasdaq.com/articles/snowflake-gains-17-post-q2-earnings-buy-sell-or-hold-stock"
-     },
-     {
-      "titolo": "TTD Stock Plunges 60% Year to Date: Time to Cut Losses and Exit?",
-      "riassunto": "TTD has plunged 60.3% YTD as revenue growth slows amid soft ad demand across key categories despite long-term growth opportunities.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T14:23:00Z",
-      "url": "https://www.nasdaq.com/articles/ttd-stock-plunges-60-year-date-time-cut-losses-and-exit"
      }
     ],
     "MRVL": [
@@ -57984,6 +57986,13 @@
     ],
     "MSTR": [
      {
+      "titolo": "Strategy (MSTR) Sees a More Significant Dip Than Broader Market: Some Facts to Know",
+      "riassunto": "In the latest trading session, Strategy (MSTR) closed at $142.8, marking a -1.39% move from the previous day.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-04T21:50:02Z",
+      "url": "https://www.nasdaq.com/articles/strategy-mstr-sees-more-significant-dip-broader-market-some-facts-know"
+     },
+     {
       "titolo": "Noteworthy Friday Option Activity: SNOW, GME, MSTR",
       "riassunto": "Looking at options trading activity among components of the Russell 3000 index, there is noteworthy activity today in Snowflake Inc (Symbol: SNOW), where a total volume of 126,902 contracts has been traded thus far today, a contract volume which is representative of approximatel",
       "fonte": "Nasdaq",
@@ -58017,16 +58026,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-03T12:05:00Z",
       "url": "https://www.nasdaq.com/articles/i-think-ishares-bitcoin-trust-ibit-best-bitcoin-etf-buy-right-now"
-     },
-     {
-      "titolo": "Stocks Settle Lower as Bond Yields Surge",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.71% on Tuesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.79%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down by -1.29%.  E-mini S&P futures (ESU26 ) fell -0.71%, and September E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-02T16:35:59Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-bond-yields-surge"
      }
     ],
     "MU": [
+     {
+      "titolo": "Why ASML Holding Stock Bumped 4% Higher Today",
+      "riassunto": "Key PointsASML specializes in the lithography systems that \"print\" circuits onto chips.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-04T22:51:22Z",
+      "url": "https://www.nasdaq.com/articles/why-asml-holding-stock-bumped-4-higher-today"
+     },
      {
       "titolo": "David Tepper Sold 41% of His Micron Shares and It Is Still His Second-Biggest Holding",
       "riassunto": "Key PointsAppaloosa cut its Micron position by 41% during the second quarter, selling 690,000 shares.",
@@ -58061,16 +58070,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T14:45:00Z",
       "url": "https://www.nasdaq.com/articles/wdc-stocks-big-rally-buy-sell-or-hold-after-70-6-month-surge"
-     },
-     {
-      "titolo": "$1.3 Trillion in Projected Data Center Spending in 2027 Makes These Stocks No-Brainer Buys",
-      "riassunto": "Key PointsNvidia and Broadcom are two of the biggest beneficiaries of rising spending.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T14:40:00Z",
-      "url": "https://www.nasdaq.com/articles/13-trillion-projected-data-center-spending-2027-makes-these-stocks-no-brainer-buys"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Looking Ahead to the Q3 Earnings Season: What to Expect",
+      "riassunto": "2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-04T22:05:00Z",
+      "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
+     },
      {
       "titolo": "Elon Musk Committed SpaceX to Building &quot;Exclusively on Nvidia.&quot; Here's What That Locks In for SpaceX's Compute Bill.",
       "riassunto": "Key PointsSpaceX spent $15.8 billion on AI computing during the second quarter, 86% of its capital expenditures.",
@@ -58105,16 +58114,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T18:58:01Z",
       "url": "https://www.nasdaq.com/articles/prediction-what-1000-investment-nvidia-will-be-worth-2029"
-     },
-     {
-      "titolo": "Founder-Led Companies That Are Redefining Technology and Growth",
-      "riassunto": "NVIDIA, Amazon, Palantir, Dell and Fortinet stand out as founder-run companies with strong vision, innovation and long-term growth drivers.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T18:08:00Z",
-      "url": "https://www.nasdaq.com/articles/founder-led-companies-are-redefining-technology-and-growth"
      }
     ],
     "ORCL": [
+     {
+      "titolo": "Looking Ahead to the Q3 Earnings Season: What to Expect",
+      "riassunto": "2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-04T22:05:00Z",
+      "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
+     },
      {
       "titolo": "Snowflake Gains 17% Post Q2 Earnings: Buy, Sell or Hold the Stock?",
       "riassunto": "SNOW stock jumps 16.6% after Q2 second-quarter results as AI adoption, enterprise growth, and higher product revenue guidance fuel momentum.",
@@ -58149,13 +58158,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-03T17:35:00Z",
       "url": "https://www.nasdaq.com/articles/snowflake-q2-earnings-beat-product-revenues-and-ai-strength"
-     },
-     {
-      "titolo": "Why Investors Need to Take Advantage of These 2 Computer and Technology Stocks Now",
-      "riassunto": "Investors looking for ways to find stocks that are set to beat quarterly earnings estimates should check out the Zacks Earnings ESP.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-03T12:55:01Z",
-      "url": "https://www.nasdaq.com/articles/why-investors-need-take-advantage-these-2-computer-and-technology-stocks-now-13"
      }
     ],
     "PLTR": [
@@ -58314,7 +58316,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-04T22:49:49Z"
+   "letto_il": "2026-09-04T23:31:49Z"
   }
  },
  "broker": null,
@@ -58454,6 +58456,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "The Nuclear IPO Boom Is Back: How Westinghouse and Its Rivals Stack Up for Long-Term Investors",
+     "riassunto": "Key PointsA new wave of nuclear IPOs ranges from solid operators like Westinghouse to highly speculative start-ups.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-04T22:34:01Z",
+     "url": "https://www.nasdaq.com/articles/nuclear-ipo-boom-back-how-westinghouse-and-its-rivals-stack-long-term-investors"
+    },
+    {
      "titolo": "2 High-Yield Dividend Stocks Worth Buying Right Now",
      "riassunto": "Key PointsExxonMobil is on track to become a Dividend King.",
      "fonte": "Nasdaq",
@@ -58487,13 +58496,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T15:05:00Z",
      "url": "https://www.nasdaq.com/articles/snowflake-gains-17-post-q2-earnings-buy-sell-or-hold-stock"
-    },
-    {
-     "titolo": "TTD Stock Plunges 60% Year to Date: Time to Cut Losses and Exit?",
-     "riassunto": "TTD has plunged 60.3% YTD as revenue growth slows amid soft ad demand across key categories despite long-term growth opportunities.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T14:23:00Z",
-     "url": "https://www.nasdaq.com/articles/ttd-stock-plunges-60-year-date-time-cut-losses-and-exit"
     }
    ],
    "MRVL": [
@@ -58542,6 +58544,13 @@
    ],
    "MSTR": [
     {
+     "titolo": "Strategy (MSTR) Sees a More Significant Dip Than Broader Market: Some Facts to Know",
+     "riassunto": "In the latest trading session, Strategy (MSTR) closed at $142.8, marking a -1.39% move from the previous day.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-04T21:50:02Z",
+     "url": "https://www.nasdaq.com/articles/strategy-mstr-sees-more-significant-dip-broader-market-some-facts-know"
+    },
+    {
      "titolo": "Noteworthy Friday Option Activity: SNOW, GME, MSTR",
      "riassunto": "Looking at options trading activity among components of the Russell 3000 index, there is noteworthy activity today in Snowflake Inc (Symbol: SNOW), where a total volume of 126,902 contracts has been traded thus far today, a contract volume which is representative of approximatel",
      "fonte": "Nasdaq",
@@ -58575,16 +58584,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-03T12:05:00Z",
      "url": "https://www.nasdaq.com/articles/i-think-ishares-bitcoin-trust-ibit-best-bitcoin-etf-buy-right-now"
-    },
-    {
-     "titolo": "Stocks Settle Lower as Bond Yields Surge",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.71% on Tuesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.79%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down by -1.29%.  E-mini S&P futures (ESU26 ) fell -0.71%, and September E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-02T16:35:59Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-lower-bond-yields-surge"
     }
    ],
    "MU": [
+    {
+     "titolo": "Why ASML Holding Stock Bumped 4% Higher Today",
+     "riassunto": "Key PointsASML specializes in the lithography systems that \"print\" circuits onto chips.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-04T22:51:22Z",
+     "url": "https://www.nasdaq.com/articles/why-asml-holding-stock-bumped-4-higher-today"
+    },
     {
      "titolo": "David Tepper Sold 41% of His Micron Shares and It Is Still His Second-Biggest Holding",
      "riassunto": "Key PointsAppaloosa cut its Micron position by 41% during the second quarter, selling 690,000 shares.",
@@ -58619,16 +58628,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T14:45:00Z",
      "url": "https://www.nasdaq.com/articles/wdc-stocks-big-rally-buy-sell-or-hold-after-70-6-month-surge"
-    },
-    {
-     "titolo": "$1.3 Trillion in Projected Data Center Spending in 2027 Makes These Stocks No-Brainer Buys",
-     "riassunto": "Key PointsNvidia and Broadcom are two of the biggest beneficiaries of rising spending.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T14:40:00Z",
-     "url": "https://www.nasdaq.com/articles/13-trillion-projected-data-center-spending-2027-makes-these-stocks-no-brainer-buys"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Looking Ahead to the Q3 Earnings Season: What to Expect",
+     "riassunto": "2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-04T22:05:00Z",
+     "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
+    },
     {
      "titolo": "Elon Musk Committed SpaceX to Building &quot;Exclusively on Nvidia.&quot; Here's What That Locks In for SpaceX's Compute Bill.",
      "riassunto": "Key PointsSpaceX spent $15.8 billion on AI computing during the second quarter, 86% of its capital expenditures.",
@@ -58663,16 +58672,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T18:58:01Z",
      "url": "https://www.nasdaq.com/articles/prediction-what-1000-investment-nvidia-will-be-worth-2029"
-    },
-    {
-     "titolo": "Founder-Led Companies That Are Redefining Technology and Growth",
-     "riassunto": "NVIDIA, Amazon, Palantir, Dell and Fortinet stand out as founder-run companies with strong vision, innovation and long-term growth drivers.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T18:08:00Z",
-     "url": "https://www.nasdaq.com/articles/founder-led-companies-are-redefining-technology-and-growth"
     }
    ],
    "ORCL": [
+    {
+     "titolo": "Looking Ahead to the Q3 Earnings Season: What to Expect",
+     "riassunto": "2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-04T22:05:00Z",
+     "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
+    },
     {
      "titolo": "Snowflake Gains 17% Post Q2 Earnings: Buy, Sell or Hold the Stock?",
      "riassunto": "SNOW stock jumps 16.6% after Q2 second-quarter results as AI adoption, enterprise growth, and higher product revenue guidance fuel momentum.",
@@ -58707,13 +58716,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-03T17:35:00Z",
      "url": "https://www.nasdaq.com/articles/snowflake-q2-earnings-beat-product-revenues-and-ai-strength"
-    },
-    {
-     "titolo": "Why Investors Need to Take Advantage of These 2 Computer and Technology Stocks Now",
-     "riassunto": "Investors looking for ways to find stocks that are set to beat quarterly earnings estimates should check out the Zacks Earnings ESP.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-03T12:55:01Z",
-     "url": "https://www.nasdaq.com/articles/why-investors-need-take-advantage-these-2-computer-and-technology-stocks-now-13"
     }
    ],
    "PLTR": [
@@ -58872,7 +58874,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-04T22:49:49Z"
+  "letto_il": "2026-09-04T23:31:49Z"
  },
  "predictions": [
   {
@@ -58882,7 +58884,7 @@
   },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?",
-   "yes": 50,
+   "yes": 48,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
@@ -60139,7 +60141,7 @@
      ],
      "call_wall": 470.0,
      "put_wall": 340.0,
-     "opt_volume": 49980
+     "opt_volume": 49970
     }
    ]
   },
@@ -67097,7 +67099,7 @@
      ],
      "call_wall": 200.0,
      "put_wall": 80.0,
-     "opt_volume": 59452
+     "opt_volume": 59451
     },
     {
      "date": "2026-09-25",
@@ -68671,7 +68673,7 @@
      ],
      "call_wall": 1000.0,
      "put_wall": 800.0,
-     "opt_volume": 97178
+     "opt_volume": 97489
     }
    ]
   },
@@ -76705,7 +76707,7 @@
      ],
      "call_wall": 610.0,
      "put_wall": 250.0,
-     "opt_volume": 6856
+     "opt_volume": 6860
     },
     {
      "date": "2026-09-25",
@@ -79584,7 +79586,7 @@
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
-    "sp500_pe": 51,
+    "sp500_pe": 59,
     "smart_money": 62,
     "macroquant": 56,
     "seasonality": 38,
@@ -79762,6 +79764,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-04T22:49:49Z"
+  "generated_at": "2026-09-04T23:31:50Z"
  }
 }
