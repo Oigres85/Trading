@@ -3857,6 +3857,37 @@ silenzioso.
 - Blocco 8 dice *"Questa **posizione** aggiunge una scommessa nuova al libro"* anche su un titolo
   non posseduto — dove si legge come l'ingresso ipotetico, quindi non cambia nessuna conclusione.
 
+## 🔢 v424 — DUE NUMERI DEL LIBRO SCRITTI A MANO, DENTRO LE ISTRUZIONI
+
+Quattordicesimo giro. La regola sui denominatori del collaudo diceva:
+
+> *confrontare due percentuali: **"23% del capitale"** e **"34% del rischio"** sono confrontabili
+> solo perché il pacchetto dichiara che stanno sullo stesso insieme*
+
+Si leggono come i numeri **vivi** di questo libro — e quasi lo erano: il peso di MU è **22,5%**,
+non 23. Chi cerca "23% del capitale" nel pacchetto non lo trova.
+
+⚠⚠ **Terza incarnazione del conteggio fisso**: v410 nella coda, v411 nella testata un paragrafo
+più in là, v415 nella clausola sulle revisioni. E la testata è il posto in cui è **peggio** —
+nessun gate la conta, ed è la parte che il modello legge per prima: *la regola che deve
+insegnargli a diffidare dei numeri incoerenti gliene forniva uno.*
+
+⚠ Il rimedio è quello già scelto in v415: **non si aggiorna l'esempio, si toglie.** Una regola sui
+denominatori non ha bisogno di numeri propri quando quelli a cui si applica stanno nel pacchetto e
+ciascuno porta già il proprio insieme dichiarato.
+
+### La proprietà del gate non è "niente numeri nelle istruzioni"
+Ce ne sono di legittimi: il tetto di parole, la soglia del 2% sullo scarto di prezzo, il formato
+`"−6% dal riferimento"`. La proprietà è più stretta e verificata priva di falsi positivi: **nelle
+istruzioni nessuna percentuale si presenta come una quota DI QUESTO LIBRO** (*del capitale · del
+rischio · dell'azionario · del libro · del NAV · del patrimonio*), perché è l'aggancio che la fa
+invecchiare col portafoglio. Vale su entrambi i pacchetti.
+
+### 📋 Annotato e non corretto
+Rame esce **97°** percentile nel digest storico e **97%** dell'intervallo annuale nel quadro
+macro: sono due grandezze diverse con le basi dichiarate, e coincidono per caso — il petrolio, con
+76° contro 61%, lo dimostra. Non è un difetto, ma un lettore potrebbe contarle come due conferme.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

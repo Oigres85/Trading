@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "423";
+const BUILD_VERSION = "424";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -13832,8 +13832,21 @@ function buildPromptTicker(tkGrezzo) {
 `      osservazione FRED, il flusso di cassa libero dall'aggregatore e dal rendiconto): dove lo fa,`,
 `      lo dichiara. Se trovi DUE VALORI per la stessa grandezza SENZA quella dichiarazione, e' un`,
 `      difetto e va in SEGNALAZIONI. Controlla anche che i denominatori siano gli stessi prima di`,
-`      confrontare due percentuali: "23% del capitale" e "34% del rischio" sono confrontabili solo`,
-`      perche' il pacchetto dichiara che stanno sullo stesso insieme.`,
+/* ⚠⚠ v424 — QUI C'ERANO DUE NUMERI SCRITTI A MANO: "23% del capitale" e "34% del rischio".
+   Si leggevano come i numeri VIVI di questo libro — e quasi lo erano: il peso di MU e' 22,5%, non
+   23. Un conteggio fisso in una istruzione invecchia da solo mentre il libro cambia, ed e' la
+   TERZA volta in questo progetto: v410 nella coda, v411 nella testata un paragrafo piu' in la',
+   v415 nella clausola sulle revisioni.
+   ⚠ E la testata e' il posto in cui il difetto e' PEGGIO, perche' nessun gate la conta e perche'
+   e' la parte che il modello legge PER PRIMA: chi cerca "23% del capitale" nel pacchetto non lo
+   trova, e la regola che dovrebbe insegnargli a diffidare dei numeri incoerenti gliene fornisce
+   uno.
+   ⚠ Il rimedio e' quello gia' scelto in v415: NON si aggiorna l'esempio, si TOGLIE. Una regola
+   sui denominatori non ha bisogno di numeri propri quando quelli a cui si applica stanno nel
+   pacchetto e ciascuno porta gia' il proprio insieme dichiarato. */
+`      confrontare due percentuali: un peso sul capitale e una quota del rischio sono confrontabili`,
+`      solo perche' il pacchetto dichiara che stanno sullo stesso insieme, e lo dichiara riga per`,
+`      riga: e' quella dichiarazione che devi cercare, non un numero che ti aspetti.`,
 ``,
 `  (3) AFFIDABILITA' — di che RANGO e' la fonte, e regge il peso che le stai dando?`,
 `      Fonte primaria (deposito societario) > dati di mercato > stampa finanziaria > aggregatori.`,
