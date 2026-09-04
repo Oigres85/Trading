@@ -3995,7 +3995,13 @@ check("v316 titolo: senza i dati della pipeline il blocco non esiste e non si in
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
   if (r) delete r.tv;
   const p = buildPromptTicker("MU");
-  return !/DETTAGLI TECNICI/.test(p) && !/--- COME IL MACRO ARRIVA A/.test(p)
+  /* ⚠ v418 — LA SONDA CERCAVA LA FRASE, NON LA SEZIONE. "DETTAGLI TECNICI" compare anche
+     nella riga che DICHIARA l'esclusione del titolo in esame dall'elenco del libro, quindi il
+     check la trovava pure quando la sezione non c'era. Le altre due sonde di questo stesso
+     check erano gia' ancorate all'intestazione (--- COME IL MACRO ARRIVA A): questa no.
+     Chi cerca l'ASSENZA di una sezione deve guardare la sua INTESTAZIONE, non una frase che
+     la nomina — e' la classe del gate che trova se stesso (v213, v240, v393, v395). */
+  return !/--- DETTAGLI TECNICI/.test(p) && !/--- COME IL MACRO ARRIVA A/.test(p)
       && !/PERFORMANCE PER ORIZZONTE/.test(p) && p.length > 5000`));
 
 check("v316 live: il refresh ricalcola il guadagno che la tabella legge davvero", (() => {
@@ -7361,14 +7367,24 @@ check("v413 lo stesso evento porta lo stesso numero di giorni in tutto il pacche
   for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
     if (r && String(r.ticker).toUpperCase() === "CRWV") r.earnings_date = iso;
   }
-  const p = buildPromptTicker("CRWV");
-  const scheda = p.split(String.fromCharCode(10)).find(r => r.indexOf("Prossima trimestrale") >= 0);
-  const libro = p.split(String.fromCharCode(10)).find(r => r.indexOf("- CRWV: medie") >= 0);
-  if (!scheda || !libro) return "una delle due righe non compare: il check non misura niente";
-  const a = (scheda.match(/fra (\\d+) giorn/) || [])[1];
-  const b = (libro.match(/trimestrale fra (\\d+) giorni/) || [])[1];
-  if (!a || !b) return "giorni non estratti: scheda=" + scheda.slice(0, 60) + " libro=" + libro.slice(-40);
-  return a === b || ("stesso evento, due conteggi: la scheda dice " + a + " e il libro " + b);`));
+  /* ⚠ v418 — RIAGGANCIATO: la riga tecnica del titolo in esame e' uscita dal blocco del libro
+     (era la terza scrittura degli stessi fatti), quindi il vecchio confronto scheda↔libro non
+     ha piu' un secondo termine NEL PACCHETTO DI TITOLO. L'invariante pero' non e' quel
+     confronto: e' che lo stesso evento porti lo stesso numero di giorni OVUNQUE compaia. Ora
+     si raccolgono tutte le occorrenze nei DUE pacchetti — dove la riga del libro esiste ancora
+     — e si pretende che concordino. Piu' forte di prima, non piu' debole. */
+  const conteggi = new Map();
+  for (const [dove, p] of [["titolo", buildPromptTicker("CRWV")], ["macro", buildCIOText()]]) {
+    for (const r of p.split(String.fromCharCode(10))) {
+      if (r.indexOf("CRWV") < 0 && r.indexOf("Prossima trimestrale") < 0) continue;
+      const m = r.match(/fra ([0-9]+) giorn/);
+      if (m) conteggi.set(dove + ": " + r.trim().slice(0, 46), m[1]);
+    }
+  }
+  const valori = new Set([...conteggi.values()]);
+  if (conteggi.size < 2) return "solo " + conteggi.size + " occorrenza del conteggio: il check non misura niente";
+  return valori.size === 1 || ("stesso evento, conteggi diversi: "
+    + [...conteggi.entries()].map(([k, v]) => k + " -> " + v).join(" | "));`));
 
 check("v413 il giorno stesso si scrive OGGI, non 'fra 0 giorni'", suVeriEsito(`
   const d = new Date();
@@ -7416,7 +7432,7 @@ check("v413 il pacchetto macro non nega l'analisi del portafoglio che la sua tes
    ⚠ La tolleranza NON e' zero: la scheda arrotonda a una cifra e il libro a due (7,3% contro
    7,31%). Si confronta a meta' del passo piu' grosso, che accetta l'arrotondamento e prende una
    divergenza vera — 68 contro 69 e' un'unita' intera, cento volte la tolleranza. */
-check("v414 i fatti sul titolo coincidono fra la sua scheda e la riga del libro", suVeriEsito(`
+check("v414 i fatti sul titolo coincidono fra la sua scheda e i suoi dettagli tecnici", suVeriEsito(`
   const p = buildPromptTicker("CRWV");
   const R = p.split(String.fromCharCode(10));
   /* ⚠ I DUE BLOCCHI SCRIVONO I NUMERI IN DUE FORMATI: la scheda usa il punto decimale (46.3,
@@ -7440,28 +7456,35 @@ check("v414 i fatti sul titolo coincidono fra la sua scheda e la riga del libro"
     s200:  num((primo(/- Media a 200 sedute: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/) || [])[1]),
     trim:  num((primo(/- Prossima trimestrale attesa: [-0-9]+ \\(fra ([0-9]+) giorn/) || [])[1]),
   };
-  /* ── la RIGA DEL LIBRO per lo stesso titolo ── */
-  const riga = R.filter(r => r.indexOf("- CRWV: medie") === 0);
+  /* ── il blocco DETTAGLI TECNICI, che descrive lo STESSO titolo ──
+     ⚠ v418 — RIAGGANCIATO. Il confronto era scheda ↔ riga del libro, e quella riga e' uscita
+     dal pacchetto di titolo perche' era la TERZA scrittura degli stessi fatti. L'invariante non
+     era quel confronto: era che due sedi che descrivono lo stesso titolo non divergano. Le sedi
+     rimaste sono due e il confronto resta — anzi si allarga ai LIVELLI delle medie, che sono
+     precisamente cio' che divergeva nella v340 (557,27 qui contro 556,46 trenta righe sotto). */
+  const dt = (() => { const i = R.findIndex(r => r.indexOf("--- DETTAGLI TECNICI") === 0);
+    return i < 0 ? [] : R.slice(i, i + 20); })();
   const libro = {
-    rsi:   num((primo(/RSI ([-0-9.,]+)/, riga) || [])[1]),
-    atr:   num((primo(/ampiezza tipica di seduta ([-0-9.,]+)%/, riga) || [])[1]),
-    s20:   num((primo(/([-0-9.,]+)% dalla 20(?![0-9])/, riga) || [])[1]),
-    s50:   num((primo(/([-0-9.,]+)% dalla 50(?![0-9])/, riga) || [])[1]),
-    s200:  num((primo(/([-0-9.,]+)% dalla 200(?![0-9])/, riga) || [])[1]),
-    trim:  num((primo(/trimestrale fra ([0-9]+) giorni/, riga) || [])[1]),
+    rsi:   num((primo(/RSI 14: ([-0-9.,]+)/, dt) || [])[1]),
+    s50:   num((primo(/Media semplice 50: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/, dt) || [])[1]),
+    s200:  num((primo(/Media semplice 200: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/, dt) || [])[1]),
+    liv50: num((primo(/Media semplice 50: ([-0-9.,]+) —/, dt) || [])[1]),
+    liv200:num((primo(/Media semplice 200: ([-0-9.,]+) —/, dt) || [])[1]),
   };
+  scheda.liv50  = num((primo(/- Media a 50 sedute: ([-0-9.,]+) —/) || [])[1]);
+  scheda.liv200 = num((primo(/- Media a 200 sedute: ([-0-9.,]+) —/) || [])[1]);
   /* ⚠ IL FENOMENO DEVE ESSERCI: se l'estrazione non trova niente il check sarebbe verde per
      assenza di dati invece che per assenza di difetti — la trappola gia' pagata quattro volte. */
   const chiavi = Object.keys(scheda).filter(k => scheda[k] != null && libro[k] != null);
   if (chiavi.length < 4) {
-    return "estratti solo " + chiavi.length + " fatti in comune su 6: il check non sta misurando niente ("
+    return "estratti solo " + chiavi.length + " fatti in comune: il check non sta misurando niente ("
       + JSON.stringify(scheda) + " contro " + JSON.stringify(libro) + ")";
   }
   const guai = [];
   for (const k of chiavi) {
     /* tolleranza = meta' del passo di arrotondamento piu' grosso fra i due (una cifra) */
     if (Math.abs(scheda[k] - libro[k]) > 0.051) {
-      guai.push(k + ": la scheda dice " + scheda[k] + " e il libro " + libro[k]);
+      guai.push(k + ": la scheda dice " + scheda[k] + " e i dettagli tecnici " + libro[k]);
     }
   }
   return guai.length ? guai.join(" · ") : true;`));
@@ -7981,6 +8004,59 @@ check("v417 se la coda pubblica il terzo sguardo, la testata lo nomina e ne dich
   if (!nomina) return "la coda pubblica il terzo sguardo e la testata non lo nomina";
   return dichiaraNatura ? true
     : "la testata nomina il terzo sguardo ma non dichiara che e' un sottoinsieme con un altro denominatore";`));
+
+/* ⚠⚠ v418 — IL TITOLO ANALIZZATO NON SI DESCRIVE TRE VOLTE.
+   Misurato per perturbazione: nel pacchetto di titolo cinque campi su tredici toccavano TRE
+   blocchi (scheda · DETTAGLI TECNICI · riga nel libro), ed e' il terzetto che ha prodotto il
+   difetto v415 (-1,5% / -1,45% / -1,4% per la stessa distanza). Nel pacchetto MACRO nessun
+   campo raggiunge tre blocchi, quindi li' non si tocca niente. */
+check("v418 nel pacchetto di titolo il titolo in esame non ha una riga tecnica nel libro", suVeriEsito(`
+  const p = buildPromptTicker("CRWV");
+  const righe = p.split(String.fromCharCode(10)).filter(r => /^- [A-Z]{2,5}: medie:/.test(r));
+  if (righe.length < 5) return "solo " + righe.length + " righe tecniche: il check non misura niente";
+  const sua = righe.filter(r => r.indexOf("- CRWV: medie:") === 0);
+  return sua.length === 0 ? true
+    : "il titolo in esame ha ancora la sua riga tecnica dentro il blocco del libro";`));
+
+/* ⚠ e nel pacchetto MACRO non manca nessuno: li' quella riga e' l'unica descrizione tecnica che
+   il titolo riceve, e toglierla sarebbe una perdita invece di una potatura. */
+check("v418 nel pacchetto macro restano le righe tecniche di TUTTE le posizioni", suVeriEsito(`
+  const attesi = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])]
+    .filter(r => r && r.tv && r.tv.tecnica && r.qta)
+    .map(r => String(r.ticker).toUpperCase());
+  const p = buildCIOText();
+  const presenti = new Set((p.match(/^- ([A-Z]{2,5}): medie:/gm) || [])
+    .map(r => r.replace(/^- /, "").replace(/: medie:$/, "")));
+  if (attesi.length < 5) return "meno di cinque posizioni con tecnica: il check non misura niente";
+  const persi = attesi.filter(t => !presenti.has(t));
+  return persi.length ? "spariti dal pacchetto macro: " + persi.join(", ") : true;`));
+
+/* ⚠⚠ IL TAGLIO DEV'ESSERE GRATUITO: ogni grandezza che la riga rimossa portava resta nel
+   pacchetto. Otto erano gia' nella scheda e nei dettagli tecnici; la nona — la distanza dal
+   massimo a 52 settimane nel verso "quanto e' sceso" — e' stata spostata PRIMA di tagliare.
+   Un taglio che perde un fatto non e' una potatura (v406, v201-v204). */
+check("v418 il taglio non perde nessun fatto: il drawdown dal massimo resta pubblicato", suVeriEsito(`
+  const r = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])]
+    .find(x => String(x.ticker).toUpperCase() === "CRWV");
+  if (!r || !isFinite(Number(r.w52_dist_pct))) return "w52_dist_pct assente: il check non misura niente";
+  const p = buildPromptTicker("CRWV");
+  const atteso = Math.abs(Math.round(Number(r.w52_dist_pct) * 10) / 10).toFixed(1).replace(".", ",");
+  const i = p.indexOf("- Massimo 52 settimane");
+  if (i < 0) return "la riga del massimo a 52 settimane non compare";
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  if (riga.indexOf(atteso) < 0) return "il drawdown dal massimo (" + atteso + ") non e' piu' pubblicato da nessuna parte";
+  /* e si dichiara che e' lo stesso fatto nei due versi, altrimenti sono due numeri sulla stessa grandezza */
+  return riga.indexOf("stesso fatto e non un secondo dato") >= 0 ? true
+    : "i due versi escono senza dichiarare che sono lo stesso fatto";`));
+
+/* ⚠ e l'esclusione si NOMINA con la ragione: togliere in silenzio e' peggio del difetto (v406). */
+check("v418 l'assenza del titolo in esame dall'elenco viene dichiarata, non taciuta", suVeriEsito(`
+  const p = buildPromptTicker("CRWV");
+  const i = p.indexOf("TECNICA E FONDAMENTALI DI OGNI POSIZIONE");
+  if (i < 0) return "il blocco tecnico del libro non compare";
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  return riga.indexOf("CRWV NON compare in questo elenco") >= 0 && riga.indexOf("DETTAGLI TECNICI") >= 0
+    ? true : "il titolo in esame sparisce dall'elenco senza che la riga lo dichiari";`));
 
 let fail = 0;
 for (const [name, ok] of T) {
