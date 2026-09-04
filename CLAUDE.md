@@ -3371,6 +3371,39 @@ sua e non una dimenticanza:
 > introdotti io poche ore prima correggendone altri**. Correggere un cosmetico costa un'occasione
 > di introdurre un difetto materiale, e il prezzo non vale il guadagno.
 
+## 🕰️ v415 — UNA RIGA SU VENTITRÉ DATAVA TUTTO IL PACCHETTO, E SPEGNEVA L'AVVISO
+
+Trovato nel secondo giro, leggendo la riga di FRESCHEZZA — quella che esiste apposta per dire
+quanto sono vecchi i dati di mercato. Diceva:
+
+> *"La barra giornaliera sotto quei numeri è del **2026-09-04**"*
+
+mentre **22 righe azionarie su 23** portavano il **2026-09-03**, e il blocco delle notizie nello
+stesso pacchetto diceva correttamente *"l'ultima chiusura USA del 2026-09-03"*.
+
+`SEMPRE_APERTI` era `/-(USD|USDT|EUR)$/i`: prende `BTC-USD` e **manca i cambi** (`EURUSD=X`) e i
+futures (`ES=F`), che Yahoo scrive col suffisso `=X` e `=F`. Un cambio scambia quasi
+ininterrottamente, quindi la sua barra passa al giorno dopo molte ore prima di quella azionaria —
+e prendendo il **massimo**, quella singola riga dettava la data dell'intero pacchetto.
+
+> ⚠⚠ **IL DANNO NON ERA LA DATA: ERA L'AVVISO CHE SPARIVA.** Con età zero la riga sceglie il ramo
+> rassicurante (*"la barra è del …"*) invece di quello che grida *"⚠ non sono prezzi di adesso,
+> sono l'ultima chiusura, N giorni fa"*. Cioè proprio la riga scritta per misurare la vecchiaia
+> dei dati li dichiarava freschi di un giorno — classe **v193/v234** (*stato del mercato e
+> freschezza del dato sono due cose diverse*) dentro la riga di freschezza.
+
+Due correzioni, entrambe già regole di questo progetto:
+- **la forma del simbolo, non un elenco di nomi** (v410): `/(-(USD|USDT|EUR)|=[XF])$/i`. Un elenco
+  invecchia da solo al primo strumento nuovo;
+- **la data della MAGGIORANZA, non il massimo**: è quella su cui poggiano i numeri di mercato, e
+  una singola riga fuori passo — un mercato estero già passato al giorno dopo, una barra arrivata
+  in anticipo — non può più spostarla.
+
+⚠ **I due gate costruiscono lo stato** invece di aspettare che i dati lo producano: iniettano un
+cambio e un future avanti di un giorno, e una riga azionaria in anticipo. Sotto iniezione della
+vecchia logica la data base tornava **2026-09-04**, che è la prova diretta del difetto sui dati
+veri.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

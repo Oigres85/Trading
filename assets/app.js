@@ -1978,14 +1978,37 @@ function prossimoRunPipeline(adesso = new Date()) {
    quattro righe sotto un "WEEKEND, MERCATI CHIUSI".
    Le cripto non hanno chiusura: la loro barra e' sempre di oggi, e per questo non puo' parlare
    per le azioni. La freschezza di un mercato la dice il suo mercato. */
-const SEMPRE_APERTI = /-(USD|USDT|EUR)$/i;      // BTC-USD, ETH-USD… quotano anche a borse chiuse
+/* ⚠⚠ v415 — `-USD` NON COPRIVA LE VALUTE, E UNA SOLA RIGA DATAVA TUTTO IL PACCHETTO.
+   Yahoo scrive i cambi come `EURUSD=X` e i futures come `ES=F`: la vecchia classe prendeva
+   BTC-USD e mancava entrambi. I cambi scambiano quasi ininterrottamente, quindi la loro barra
+   passa al giorno dopo molte ore prima di quella azionaria — e il 04/09 UNA riga su 23 portava
+   il 2026-09-04 mentre le 22 azionarie erano ferme al 03. Prendendo il MASSIMO, quella riga
+   dettava la data dichiarata per l'intero pacchetto.
+   ⚠⚠ E IL DANNO NON ERA LA DATA: ERA L'AVVISO CHE SPARIVA. Con eta' zero la riga sceglie il
+   ramo rassicurante ("la barra e' del …") invece di quello che grida "⚠ non sono prezzi di
+   adesso, sono l'ultima chiusura, N giorni fa". Cioe' proprio la riga che esiste per dire
+   quanto sono vecchi i dati li dichiarava freschi di un giorno, ed e' la classe v193/v234 —
+   stato del mercato e freschezza del dato sono due cose diverse — nella riga di freschezza.
+   ⚠ Gli strumenti si riconoscono dalla FORMA del simbolo, non da un elenco di nomi da tenere
+   allineato (v410): un elenco invecchia da solo al primo strumento nuovo.
+   ⚠ E non si prende piu' il massimo ma la data che la MAGGIORANZA delle righe porta: e' quella
+   su cui poggiano i numeri di mercato del pacchetto, e una singola riga fuori passo — un
+   mercato estero gia' passato al giorno dopo, una barra arrivata in anticipo — non puo' piu'
+   spostarla. A parita' di frequenza vince la piu' recente. */
+const SEMPRE_APERTI = /(-(USD|USDT|EUR)|=[XF])$/i;   // BTC-USD, EURUSD=X, ES=F: quotano a borse chiuse
 
 function ultimaBarraDisponibile() {
   const date = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .filter(r => r && !SEMPRE_APERTI.test(String(r.ticker || "")))
     .map(r => r && r.price_asof).filter(x => typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x));
   if (!date.length) return null;
-  return date.sort()[date.length - 1];          // la piu' recente fra quelle dei mercati che chiudono
+  const conta = new Map();
+  for (const d of date) conta.set(d, (conta.get(d) || 0) + 1);
+  let vinta = null, quante = -1;
+  for (const [d, n] of conta) {
+    if (n > quante || (n === quante && d > vinta)) { vinta = d; quante = n; }
+  }
+  return vinta;                                 // la data della MAGGIORANZA dei mercati che chiudono
 }
 
 /* la data del dato di un blocco macro: prima quella dichiarata dalla pipeline, poi il ripiego */
