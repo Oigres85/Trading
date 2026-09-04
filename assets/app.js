@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "424";
+const BUILD_VERSION = "425";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8886,11 +8886,24 @@ function buildPrompt(opz) {
     const _fn = (m.news || {});
     const _sv = _fn.fonti || [];
     const _mu = _fn.fonti_mute, _nl = _fn.fonti_non_lette;
+    /* ⚠⚠ v425 — LA MIA CLAUSOLA DELLA v421 RENDEVA NON VUOTA UNA LISTA VUOTA. `fonti` viene
+       usata due volte, e la seconda dietro una guardia di verita': `${fonti ? "(fonti previste: "
+       + fonti + ")" : ""}`. Appendendo la cautela SEMPRE, quella guardia passava anche quando di
+       fonti non ce n'era nessuna, e il ramo "la raccolta non ha prodotto voci" — che si accende
+       proprio quando `macro.news` non esiste — stampava
+           "(fonti previste:  ⚠ questo elenco e' quello delle fonti CONFIGURATE …)"
+       cioe' una cautela SU UN ELENCO CHE NON C'E', che per di piu' afferma che l'elenco esiste.
+       Trovato dal censimento degli stati, non da una rilettura: quel ramo non si accende con i
+       dati veri.
+       ⚠ La cautela e' un'ALTRA informazione e va tenuta separata dall'elenco, invece di essere
+       concatenata dentro: un valore che serve anche come booleano non deve portare prosa. */
     const fonti = _sv.join(", ")
       + (Array.isArray(_mu) && _mu.length ? ` · lette e senza voci macro in questo run: ${_mu.join(", ")}` : "")
-      + (Array.isArray(_nl) && _nl.length ? ` · ⚠ NON LETTE, la fonte non ha risposto: ${_nl.join(", ")}` : "")
-      + (Array.isArray(_mu) && Array.isArray(_nl) ? "" : " ⚠ questo elenco e' quello delle fonti CONFIGURATE"
-        + ", non di quelle che hanno servito: una fonte muta e una irraggiungibile qui si leggono uguali");
+      + (Array.isArray(_nl) && _nl.length ? ` · ⚠ NON LETTE, la fonte non ha risposto: ${_nl.join(", ")}` : "");
+    const cautelaFonti = (_sv.length && !(Array.isArray(_mu) && Array.isArray(_nl)))
+      ? " ⚠ questo elenco e' quello delle fonti CONFIGURATE, non di quelle che hanno servito: "
+        + "una fonte muta e una irraggiungibile qui si leggono uguali"
+      : "";
     const voci = (m.news && m.news.voci) || [];
     const adesso = Date.now();
     const conEta = voci
@@ -8911,7 +8924,7 @@ function buildPrompt(opz) {
     if (!conEta.length) {
       lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE: IL SISTEMA NON NE HA. ⚠ Questo NON `
         + `significa "non e' uscita nessuna notizia": significa che in questo run la raccolta dei feed `
-        + `non ha prodotto voci${fonti ? ` (fonti previste: ${fonti})` : ""}, e il sistema non sa dire se `
+        + `non ha prodotto voci${fonti ? ` (fonti previste: ${fonti}${cautelaFonti})` : ""}, e il sistema non sa dire se `
         + `il mondo fosse silenzioso o la fonte irraggiungibile. Trattalo come un dato MANCANTE, non come `
         + `un dato negativo: le notizie macro delle ultime ore vanno cercate online, e questa assenza va `
         + `riportata nelle SEGNALAZIONI AL SISTEMA.`);
@@ -8956,7 +8969,7 @@ function buildPrompt(opz) {
         + (x.riassunto ? `\n      ${x.riassunto}` : "");
       lines.push(`- TITOLI MACRO — ${dentro.length} dentro le ultime ${ORE} ORE`
         + (dentro.length ? "" : `, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le ${mostra.length} piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha ${Math.round(conEta[0].ore)} ore`)
-        + ` (fonti: ${fonti})`
+        + ` (fonti: ${fonti}${cautelaFonti})`
         + (nonPrezzate != null ? ` · ${nonPrezzate.length} pubblicate DOPO l'ultima chiusura USA del ${chiusura.asof}, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto` : "")
         + (omesse > 0 ? ` · ⚠ altre ${omesse} voci il sistema le HA e qui sotto non compaiono (tetto di 12 titoli): il taglio cade solo su quelle gia' dentro il prezzo di chiusura, mai su quelle pubblicate dopo` : "")
         + `. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i `
