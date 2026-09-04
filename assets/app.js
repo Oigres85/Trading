@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "422";
+const BUILD_VERSION = "423";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -13476,9 +13476,26 @@ function buildPromptTicker(tkGrezzo) {
   const prossimoRun = (typeof prossimoRunPipeline === "function" && prossimoRunPipeline())
     ? prossimoRunPipeline().toLocaleString("it-IT") : "n.d.";
 
-  const rigaLibro = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .find(r => r && String(r.ticker || "").toUpperCase() === tk
-            && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  /* ⚠⚠ v423 — UNA VARIABILE SERVIVA A DUE DOMANDE DIVERSE, E LA PIU' RESTRITTIVA VINCEVA.
+     `rigaLibro` filtrava per `qta > 0 && pmc > 0`, cioe' rispondeva a "e' una POSIZIONE?", e da
+     lei venivano anche il NOME DELLA SOCIETA' e la data della prossima trimestrale — che sono
+     proprieta' del TITOLO, non del possesso. Su un titolo seguito e non posseduto la riga esiste
+     in `data.json` con `name` e `earnings_date`, e il pacchetto li buttava via:
+       "ANALISI DI TSM — 04/09/2026"   invece di   "ANALISI DI TSM (Taiwan Semiconductor…)"
+     ⚠ E' la v397 sopravvissuta nel ramo che nessuno esercitava: la' il nome mancava sempre,
+     qui manca solo quando il titolo NON e' in portafoglio — cioe' esattamente quando serve di
+     piu', perche' un nome fuori dal libro e' quello che il CEO conosce meno e il PASSO 0 gli
+     ordina di cercarlo online. Classe v419/v420, la variante non posseduta.
+     ⚠ E la stessa conflazione rendeva IRRAGGIUNGIBILE l'avviso sulla trimestrale entro
+     l'orizzonte per ogni titolo non posseduto: un ramo che non puo' essere raggiunto non e' una
+     protezione (v234).
+     ⚠ Due domande, due derivazioni, e nessuna delle due filtra per l'altra: e' la classe v226,
+     dove una chiave serviva a classificare la famiglia E ad aprire il pannello, veniva azzerata
+     per il secondo uso e poi raggruppata sul primo. */
+  const rigaTitolo = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .find(r => r && String(r.ticker || "").toUpperCase() === tk);
+  const rigaLibro = rigaTitolo && numero(rigaTitolo.qta ?? rigaTitolo.qty) > 0
+    && numero(rigaTitolo.pmc) > 0 ? rigaTitolo : undefined;
   const giaDentro = !!rigaLibro;
   /* ⚠ un evento datato DENTRO l'orizzonte cambia l'oggetto della domanda: un prezzo "a
      settimane" scritto tre giorni prima di una trimestrale non e' lo stesso prezzo. Il
@@ -13491,7 +13508,7 @@ function buildPromptTicker(tkGrezzo) {
      da questa funzione" valeva per le occorrenze cercate, non per tutte. Il gate ora e' allargato
      a tutto il file invece che alla sola riga della prossima trimestrale. */
   const giorniTrim = (() => {
-    const d = rigaLibro && rigaLibro.earnings_date;
+    const d = rigaTitolo && rigaTitolo.earnings_date;
     const q = giorniAllaTrimestrale(d);
     return Number.isFinite(q) && q >= 0 && q <= 60 ? { g: q, quando: String(d).slice(0, 10) } : null;
   })();
@@ -13500,9 +13517,9 @@ function buildPromptTicker(tkGrezzo) {
    obbligatorio) e non ha mai scritto come si chiama l'azienda: su un ticker ambiguo o poco
    noto, chi legge deve indovinarlo per aprire il sito investor relations o EDGAR. Il dato e'
    in `data.json` da sempre (`name`) e non arrivava al pacchetto. */
-`ANALISI DI ${tk}${(rigaLibro && rigaLibro.name && String(rigaLibro.name).trim()
-   && String(rigaLibro.name).toUpperCase() !== String(tk).toUpperCase())
-   ? " (" + String(rigaLibro.name).trim() + ")" : ""} — ${oggi}`,
+`ANALISI DI ${tk}${(rigaTitolo && rigaTitolo.name && String(rigaTitolo.name).trim()
+   && String(rigaTitolo.name).toUpperCase() !== String(tk).toUpperCase())
+   ? " (" + String(rigaTitolo.name).trim() + ")" : ""} — ${oggi}`,
 ``,
 `Sei un analista azionario senior. Devi produrre un'analisi operativa su ${tk}: tecnica, fondamentale, notizie, e il collegamento col quadro macro che trovi in coda.`,
 ``,
