@@ -8058,6 +8058,43 @@ check("v418 l'assenza del titolo in esame dall'elenco viene dichiarata, non taci
   return riga.indexOf("CRWV NON compare in questo elenco") >= 0 && riga.indexOf("DETTAGLI TECNICI") >= 0
     ? true : "il titolo in esame sparisce dall'elenco senza che la riga lo dichiari";`));
 
+/* ⚠⚠ v419 — LA DICHIARAZIONE DEL TAGLIO DEV'ESSERE VERA QUANTO IL TAGLIO.
+   Il taglio della v418 toglie dal blocco del libro la riga tecnica del titolo IN ESAME, e la
+   riga di intestazione lo dichiara. Su un titolo che il CEO NON possiede non c'e' nessun taglio
+   — l'elenco resta intero — e la dichiarazione diceva lo stesso "TSM NON compare in questo
+   elenco ed e' l'unica assenza: e' il titolo in esame": affermava che TSM fosse una posizione e
+   che fosse stata tolta, due cose false, proprio nella riga che esiste per impedire che
+   un'assenza si legga male. Ramo raro della v190, creato dalla v418.
+   ⚠ Il check percorre ENTRAMBI i rami — un titolo posseduto e uno no — perche' un gate che
+   esercita un ramo solo non avrebbe visto il difetto che ha creato la v418. */
+check("v419 il taglio si dichiara solo dove e' avvenuto davvero", suVeriEsito(`
+  const tutti = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const dentro = tutti.filter(r => r && r.qta && r.tv && r.tv.tecnica).map(r => String(r.ticker).toUpperCase());
+  const fuori  = tutti.filter(r => r && !r.qta && r.tv && r.tv.tecnica).map(r => String(r.ticker).toUpperCase());
+  if (!dentro.length || !fuori.length)
+    return "servono un titolo posseduto e uno no: ne ho " + dentro.length + " e " + fuori.length;
+  const guai = [];
+  for (const [tk, posseduto] of [[dentro[0], true], [fuori[0], false]]) {
+    const p = buildPromptTicker(tk);
+    const suaRiga = p.split(String.fromCharCode(10)).some(r => r.indexOf("- " + tk + ": medie:") === 0);
+    const dichiara = p.indexOf(tk + " NON compare in questo elenco") >= 0;
+    if (posseduto && suaRiga) guai.push(tk + " e' in portafoglio e la sua riga tecnica c'e' ancora");
+    if (posseduto && !dichiara) guai.push(tk + " e' stato tolto dall'elenco senza che la riga lo dichiari");
+    if (!posseduto && dichiara) guai.push(tk + " non e' in portafoglio e la riga dichiara un taglio che non c'e' stato");
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠ e su un titolo non posseduto l'elenco resta INTERO: il taglio non deve accorciarlo. */
+check("v419 su un titolo non posseduto l'elenco del libro resta intero", suVeriEsito(`
+  const tutti = [...((DATA.portfolio) || []), ...((DATA.watchlist) || [])];
+  const attesi = tutti.filter(r => r && r.qta && r.tv && r.tv.tecnica).length;
+  const fuori = tutti.find(r => r && !r.qta && r.tv && r.tv.tecnica);
+  if (!fuori || attesi < 5) return "stato insufficiente: " + attesi + " posizioni, non posseduto " + !!fuori;
+  const p = buildPromptTicker(String(fuori.ticker).toUpperCase());
+  const righe = (p.match(/^- [A-Z]{2,5}: medie:/gm) || []).length;
+  return righe === attesi ? true
+    : "analizzando un titolo NON posseduto l'elenco ha " + righe + " righe invece di " + attesi;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
