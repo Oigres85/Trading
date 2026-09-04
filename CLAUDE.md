@@ -3431,6 +3431,40 @@ Su CRWV, la distanza del prezzo dalla media a 50 sedute usciva **tre volte con t
 ⚠ Il ripiego sul campo di riga resta per le posizioni che la pipeline non ha mai visto: lì
 `tv.tecnica` non esiste, e una riga in meno sarebbe peggio di una cifra in meno.
 
+## 📐 v415 — UNA PERCENTUALE A TRE CIFRE CALCOLATA SU UN NUMERO CHE IL PACCHETTO CHIAMA RUMORE
+
+Sul canale tassi di CRWV il pacchetto diceva, a quattro righe di distanza:
+
+> · finestra lunga — beta +0.21, R² 0 … → **NESSUNA relazione misurabile su questa finestra**
+> · quando il canale si muove FORTE — beta +0.47 … ed è il **124% PIÙ AMPIO** di quello della
+>   finestra lunga
+
+Cioè una percentuale calcolata su una base che il blocco stesso, nella propria nota di chiusura,
+definisce *"rumore stimato con tre decimali"*. La guardia c'era — `Math.abs(beta) > 0.05` — e
+guardava la **GRANDEZZA** del beta, non la sua **MISURABILITÀ**.
+
+> ⚠⚠ È la metà mancante della **v316**: *un beta senza il suo R² è mezzo numero*, applicata al
+> **rapporto fra due beta**. Un rapporto di cui un termine non è misurabile non è un numero
+> imperfetto: non è un numero. E qui il difetto era peggiore che altrove, perché il canale tassi
+> su un titolo che costruisce a debito è esattamente quello su cui un lettore cerca una cifra.
+
+Ora il confronto esce **solo se entrambi i termini stanno sopra il proprio pavimento del rumore**;
+sotto, la riga dichiara che non è affermabile e dice quale dei due manca — *un numero fuori
+orizzonte è peggio di nessun numero* (v199).
+
+### 🦴 E il gate della v403 PINNAVA il difetto — ventiseiesima rottura, la specie peggiore
+Pretendeva `220% PIU' AMPIO` sul canale `tassi` della fixture, **la cui finestra lunga sta sotto
+il pavimento** (R² 0,007 contro 0,015): esigeva letteralmente la percentuale calcolata su un beta
+non misurabile. *Un gate che pinna un difetto lo rende permanente* (v326, v411).
+
+L'invariante non è cambiato — quando i due beta SONO misurabili il confronto esce in cifre — ma
+ora il check **costruisce** quello stato invece di prenderlo da una fixture che rappresenta il
+caso opposto. La fixture condivisa resta intatta: serve al caso *"canale acceso solo di recente"*
+della v401 e al gate nuovo, che misura il ramo dichiarato.
+
+⚠ Il gate nuovo, iniettando la rimozione della guardia, morde su **quattro canali** dei dati veri
+(MU/tassi, AMD/tassi, NVDA/tassi, NVDA/dollaro) e li nomina uno per uno.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
