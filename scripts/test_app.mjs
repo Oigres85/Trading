@@ -2800,15 +2800,34 @@ check("v320 leva: pubblica il parametro storico, e non è il '% del massimo'", s
 /* ⚠⚠ L'INVARIANTE CHE CONTA: il verdetto sistemico non puo' dire "leva ai massimi" mentre la
    fonte unica dice che si sta ritirando. Due derivazioni della stessa domanda sono gia' esistite
    qui, e quella sbagliata era l'unica che arrivava all'LLM. */
-check("v320 leva: il verdetto sistemico non contraddice marginDebtState", suVeri(`
+/* ⚠⚠ VENTISEIESIMA rottura di un check ancorato a una STRINGA LETTERALE, e della specie
+   peggiore: pretendeva la frase "la leva si sta RITIRANDO dai massimi", cioe' proprio
+   l'affermazione che la v414 ha tolto perche' era il difetto — dichiarava un VERSO senza il
+   proprio ORIZZONTE, e la riga successiva avverte che leggerne uno solo porta alla conclusione
+   opposta (in ritiro sul mese, in espansione su trimestre e anno). Un gate che pinna un difetto
+   lo rende permanente (v326, v411).
+   L'invariante vero non e' "una delle due frasi c'e'": e' che il pacchetto non affermi sulla
+   leva una direzione che contraddice la propria fonte, e che i tre orizzonti siano pubblicati
+   perche' chi legge possa vedere che non concordano. */
+check("v320 leva: nessuna direzione affermata contro la fonte, e i tre orizzonti sono pubblicati", suVeriEsito(`
   const st = marginDebtState();
-  if (!st) return true;
+  if (!st) return "marginDebtState non produce nulla: il check non sta misurando niente";
   const p = buildPrompt();
-  const massimi = p.includes("leva in espansione sui massimi");
-  const ritiro = p.includes("la leva si sta RITIRANDO dai massimi");
-  /* esattamente uno dei due, e quello giusto: se la fonte unica dice rollover, il pacchetto
-     deve dire ritiro e non massimi */
-  return (massimi !== ritiro) && (st.rollover ? ritiro : !ritiro)`));
+  /* (1) i NUMERI dei tre orizzonti devono esserci: e' quello che permette al lettore di vedere
+     che il verso dipende dalla finestra, ed e' l'informazione vera. */
+  const riga = p.split(String.fromCharCode(10)).find(r => r.indexOf("LEVA DEGLI OPERATORI") === 2);
+  if (!riga) return "la riga LEVA DEGLI OPERATORI non compare: senza i numeri il verso non e' verificabile";
+  for (const orizzonte of ["sull'anno", "nell'ultimo mese", "sul trimestre"]) {
+    if (riga.indexOf(orizzonte) < 0) return "manca l'orizzonte: " + orizzonte;
+  }
+  /* (2) e nessuna affermazione di direzione deve contraddire la fonte unica */
+  if (st.rollover && p.indexOf("leva in espansione sui massimi") >= 0) {
+    return "la fonte dice deleveraging e il pacchetto dice espansione sui massimi";
+  }
+  if (!st.rollover && p.indexOf("la leva si sta RITIRANDO") >= 0) {
+    return "la fonte NON dice deleveraging e il pacchetto lo afferma";
+  }
+  return true;`));
 
 check("v320 leva: la scheda esiste, disegna la serie e dichiara che le date sono ricostruite", suVeri(`
   const f = (FORMA_INDICATORE["leva"] || (() => null))(DATA.macro || {});
@@ -7291,15 +7310,35 @@ check("v413 i giorni alla trimestrale vengono da UNA sola derivazione", (() => {
     const nome = codice.slice(i, codice.indexOf("(", i)).replace("function ", "").trim();
     if (nome !== "giorniAllaTrimestrale") artigianali.push(nome + ": " + m[0].slice(0, 46));
   }
-  /* ⚠ NON tutte sono sulla trimestrale — l'eta' di un dato e' un'altra grandezza. Si guarda
-     solo dentro il blocco che stampa la trimestrale del titolo. */
-  const i = codice.indexOf("Prossima trimestrale");
-  const intorno = codice.slice(Math.max(0, i - 900), i + 400);
-  if (/86400000/.test(intorno)) {
-    return no("la riga della prossima trimestrale calcola i giorni per conto proprio: " + intorno.slice(intorno.indexOf("86400000") - 70, intorno.indexOf("86400000") + 10));
+  /* ⚠⚠ v414 — LA FINESTRA ERA TROPPO STRETTA. Guardava 1.300 caratteri attorno alla riga
+     "Prossima trimestrale", e la SETTIMA derivazione stava in un altro blocco (l'evento dentro
+     l'orizzonte breve), quindi passava. Ora si guarda OGNI punto del file che divide una
+     differenza di date per un giorno E nomina la trimestrale: l'invariante non e' "quella riga
+     e' pulita" ma "nessuno calcola quella grandezza per conto proprio". */
+  const sospetti = [];
+  for (const m of codice.matchAll(/86400000/g)) {
+    const da = Math.max(0, m.index - 340), a = m.index + 120;
+    const blocco = codice.slice(da, a);
+    /* si contano solo i punti che parlano di TRIMESTRALE: l'eta' di un dato o la distanza fra
+       due rilevazioni sono altre grandezze, e dividerle per un giorno e' legittimo. */
+    if (!/trimestrale|earnings_date/i.test(blocco)) continue;
+    /* ⚠ E NON OGNI DIVISIONE PER UN GIORNO E' UN CONTEGGIO DI GIORNI: `/ 86400000 / 30.4`
+       converte in MESI (l'eta' della tabella dei trimestri), che e' un'altra grandezza e non
+       deve passare dalla funzione dei giorni. Il gate segnalava quel punto come difetto: era un
+       falso positivo, e correggerlo avrebbe rotto codice sano. Si escludono le conversioni. */
+    if (/86400000\s*\/(?!\/)/.test(codice.slice(m.index, m.index + 24))) continue;
+    const i = codice.lastIndexOf("function ", m.index);
+    const nome = codice.slice(i, codice.indexOf("(", i)).replace("function ", "").trim();
+    if (nome !== "giorniAllaTrimestrale") {
+      sospetti.push(nome + ": " + blocco.slice(blocco.length - 150).replace(/\s+/g, " "));
+    }
   }
-  return intorno.indexOf("giorniAllaTrimestrale") >= 0
-    || no("la riga della prossima trimestrale non passa dalla funzione unica");
+  if (sospetti.length) {
+    return no(sospetti.length + " derivazione/i dei giorni alla trimestrale fuori dalla funzione unica · " + sospetti[0]);
+  }
+  /* ⚠ e il fenomeno deve esserci: se nessuno chiamasse la funzione, il check sarebbe verde a vuoto */
+  return (codice.match(/giorniAllaTrimestrale\(/g) || []).length >= 3
+    || no("quasi nessuno chiama la funzione unica: il check non sta misurando niente");
 })());
 
 check("v413 lo stesso evento porta lo stesso numero di giorni in tutto il pacchetto", suVeriEsito(`
@@ -7351,6 +7390,191 @@ check("v413 il pacchetto macro non nega l'analisi del portafoglio che la sua tes
   /* e il macro deve dire il contrario in modo esplicito */
   return macro.indexOf("E' L'OGGETTO DELL'ANALISI") >= 0
     || "il pacchetto macro non dichiara che il libro e' l'oggetto dell'analisi";`));
+
+/* ═══ v414 — LO STESSO FATTO IN DUE PUNTI DEVE COINCIDERE, E ORA LO VERIFICA UN GATE ═════
+   Decisione del CEO dopo la giornata della v406-v413: congelare le funzionalita' e convertire
+   le classi ricorrenti in gate che le rendano IMPOSSIBILI invece che rare.
+   ⚠ La classe dominante di questo progetto e' "la stessa grandezza detta in due posti": v161,
+   v207, v316, v409 (l'autonomia di cassa), v412 (lo spread tre volte), v413 (68 contro 69
+   giorni). Ogni volta il difetto e' stato trovato LEGGENDO il pacchetto, mai da un gate.
+   ⚠⚠ Il pacchetto di titolo pubblica gli stessi fatti DUE VOLTE per costruzione: nella scheda
+   del titolo analizzato e nella riga che quel titolo ha dentro il blocco del libro. Sono due
+   percorsi di codice diversi sulle stesse barre, quindi possono divergere — ed e' esattamente
+   quello che e' successo con i giorni alla trimestrale. Qui si confrontano uno per uno.
+   ⚠ La tolleranza NON e' zero: la scheda arrotonda a una cifra e il libro a due (7,3% contro
+   7,31%). Si confronta a meta' del passo piu' grosso, che accetta l'arrotondamento e prende una
+   divergenza vera — 68 contro 69 e' un'unita' intera, cento volte la tolleranza. */
+check("v414 i fatti sul titolo coincidono fra la sua scheda e la riga del libro", suVeriEsito(`
+  const p = buildPromptTicker("CRWV");
+  const R = p.split(String.fromCharCode(10));
+  /* ⚠ I DUE BLOCCHI SCRIVONO I NUMERI IN DUE FORMATI: la scheda usa il punto decimale (46.3,
+     numeri JS grezzi), il libro la virgola all'italiana (46,3) col punto per le migliaia. Un
+     normalizzatore che assume un formato solo trasforma 46.3 in 463 — e' successo scrivendo
+     questo gate, ed e' la stessa classe di difetto che il gate sorveglia, in miniatura. */
+  const num = (s) => { if (s == null) return null;
+    let t = String(s).replace("%", "").trim();
+    t = t.indexOf(",") >= 0 ? t.replace(/\\./g, "").replace(",", ".")   // italiano: virgola decimale
+                            : t;                                        // grezzo: punto decimale
+    const v = parseFloat(t);
+    return Number.isFinite(v) ? v : null; };
+  const primo = (re, dove) => { for (const r of (dove || R)) { const m = r.match(re); if (m) return m; } return null; };
+
+  /* ── la SCHEDA del titolo ── */
+  const scheda = {
+    rsi:   num((primo(/- RSI\\(14\\): ([-0-9.,]+)/) || [])[1]),
+    atr:   num((primo(/- ATR\\(14\\): [-0-9.,]+ \\(([-0-9.,]+)% del prezzo/) || [])[1]),
+    s20:   num((primo(/Media semplice 20: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/) || [])[1]),
+    s50:   num((primo(/- Media a 50 sedute: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/) || [])[1]),
+    s200:  num((primo(/- Media a 200 sedute: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/) || [])[1]),
+    trim:  num((primo(/- Prossima trimestrale attesa: [-0-9]+ \\(fra ([0-9]+) giorn/) || [])[1]),
+  };
+  /* ── la RIGA DEL LIBRO per lo stesso titolo ── */
+  const riga = R.filter(r => r.indexOf("- CRWV: medie") === 0);
+  const libro = {
+    rsi:   num((primo(/RSI ([-0-9.,]+)/, riga) || [])[1]),
+    atr:   num((primo(/ampiezza tipica di seduta ([-0-9.,]+)%/, riga) || [])[1]),
+    s20:   num((primo(/([-0-9.,]+)% dalla 20(?![0-9])/, riga) || [])[1]),
+    s50:   num((primo(/([-0-9.,]+)% dalla 50(?![0-9])/, riga) || [])[1]),
+    s200:  num((primo(/([-0-9.,]+)% dalla 200(?![0-9])/, riga) || [])[1]),
+    trim:  num((primo(/trimestrale fra ([0-9]+) giorni/, riga) || [])[1]),
+  };
+  /* ⚠ IL FENOMENO DEVE ESSERCI: se l'estrazione non trova niente il check sarebbe verde per
+     assenza di dati invece che per assenza di difetti — la trappola gia' pagata quattro volte. */
+  const chiavi = Object.keys(scheda).filter(k => scheda[k] != null && libro[k] != null);
+  if (chiavi.length < 4) {
+    return "estratti solo " + chiavi.length + " fatti in comune su 6: il check non sta misurando niente ("
+      + JSON.stringify(scheda) + " contro " + JSON.stringify(libro) + ")";
+  }
+  const guai = [];
+  for (const k of chiavi) {
+    /* tolleranza = meta' del passo di arrotondamento piu' grosso fra i due (una cifra) */
+    if (Math.abs(scheda[k] - libro[k]) > 0.051) {
+      guai.push(k + ": la scheda dice " + scheda[k] + " e il libro " + libro[k]);
+    }
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v414 — L'INTESTAZIONE PROMETTEVA "TUTTE" E IL CORPO NE STAMPAVA DODICI.
+   Con 18 voci non ancora prezzate la riga dichiarava "18 pubblicate DOPO l'ultima chiusura …
+   e sono TUTTE elencate qui sotto" e uno `.slice(0, 12)` sull'unione ne mostrava 12. E' la
+   v393 per una via nuova: li' spariva una CLASSE di voci, qui una CODA, e l'intestazione
+   afferma il contrario in entrambi i casi.
+   ⚠ LO STATO SI COSTRUISCE, non si aspetta che i dati lo producano: nello snapshot di oggi le
+   voci dopo la chiusura sono ZERO, quindi un check che si limitasse a leggere il pacchetto
+   sarebbe verde per ASSENZA DEL FENOMENO — la trappola gia' pagata quattro volte in questo
+   file. Le voci si piazzano DOPO l'ultima chiusura vera, che per costruzione e' un istante
+   gia' avvenuto (v402), quindi il ramo si accende a qualunque ora giri la suite. */
+check("v414 news: le voci non ancora prezzate sono TUTTE elencate, quante che siano", suVeriEsito(`
+  const salvato = DATA.macro.news;
+  const ora = Date.now();
+  const ch = lastUsEquityCloseUTC();
+  if (!ch) { DATA.macro.news = salvato; return "lastUsEquityCloseUTC non ha risposto: stato non costruito"; }
+  const chiusa = ch.at.getTime();
+  const voci = [];
+  for (let i = 0; i < 24; i++) {
+    /* dopo la chiusura E nel passato: il massimo tiene il primo vincolo, il minuto per indice
+       il secondo. Un istante costruito con Date.now() e basta cadrebbe prima della campana
+       nelle ore in cui la chiusura e' recente. */
+    const t = Math.max(chiusa + 1000, ora - (i + 1) * 60000);
+    voci.push({ titolo: "Titolo sintetico numero " + i + " sul credito", riassunto: "", fonte: "Fonte X",
+                quando: new Date(t).toISOString().slice(0, 19) + "Z" });
+  }
+  DATA.macro.news = { fonti: ["Fonte X"], filtro: "prova", voci };
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  const marcatore = "DOPO l'ultima chiusura: il prezzo non l'ha ancora votata";
+  const stampate = (p.split(marcatore).length - 1);
+  const sonda = " pubblicate DOPO l'ultima chiusura USA del ";
+  const i = p.indexOf(sonda);
+  if (i < 0) return "la riga che conta le voci non prezzate non compare";
+  const pre = p.slice(0, i);
+  const dichiarate = parseInt(pre.slice(pre.lastIndexOf(" ") + 1), 10);
+  if (!(dichiarate > 12)) return "stato non costruito: solo " + dichiarate + " voci dopo la chiusura, il tetto non morde";
+  return dichiarate === stampate ? true
+    : "ne dichiara " + dichiarate + " e ne stampa " + stampate;`));
+
+/* ⚠ E il tetto NON e' stato tolto: si e' spostato sulla classe che puo' tagliare senza mentire.
+   Quando taglia, lo DICHIARA — "il sistema non ha il dato" e "ce l'ha e non te lo passa" si
+   leggono uguali (v406). Qui le voci sono tutte molto vecchie, quindi nessuna e' dopo la
+   chiusura e il tetto cade tutto sulle altre: stato deterministico, nessuna dipendenza
+   dall'orologio. */
+check("v414 news: quando il tetto taglia, la riga dichiara quante voci restano fuori", suVeriEsito(`
+  const salvato = DATA.macro.news;
+  const ora = Date.now();
+  const voci = [];
+  for (let i = 0; i < 20; i++) {
+    voci.push({ titolo: "Titolo vecchio numero " + i + " sul lavoro", riassunto: "", fonte: "Fonte X",
+                quando: new Date(ora - (400 + i) * 3600000).toISOString().slice(0, 19) + "Z" });
+  }
+  DATA.macro.news = { fonti: ["Fonte X"], filtro: "prova", voci };
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  const stampate = (p.split(String.fromCharCode(10) + "    \u00b7 [Fonte X").length - 1);
+  if (stampate !== 12) return "il tetto non ha tagliato come previsto: stampate " + stampate;
+  /* ⚠ C9 ha preso la prima stesura di questa riga: "non le elenca" e' un indicativo, ma e'
+     omografo dell'imperativo e il detector non puo' distinguerli. Riformulata invece di
+     allentare un gate che ha gia' trovato otto ordini veri nella coda. */
+  return p.indexOf("altre 8 voci il sistema le HA e qui sotto non compaiono") >= 0 ? true
+    : "il tetto taglia 8 voci e la riga non lo dichiara";`));
+
+/* ⚠⚠ v414 — LA PERCENTUALE DEVE ESSERE RIPRODUCIBILE DAL DENOMINATORE CHE DICHIARA.
+   Non basta che la riga NOMINI un denominatore: deve nominare quello giusto, altrimenti la
+   dichiarazione e' decorativa e il numero resta irriproducibile. Il check estrae le due masse
+   dalla nota e verifica che il valore pubblicato sia la quota sulla SOMMA (7,9%) e non il
+   rapporto con SPY (8,6%) — cioe' che l'etichetta e il calcolo dicano la stessa cosa.
+   ⚠ Lo stato si costruisce: il gate inietta masse note invece di fidarsi di quelle del giorno,
+   che possono cambiare da un run all'altro (v233, un check che misura i dati del giorno). */
+check("v414 la quota di cash istituzionale dichiara il denominatore che la riproduce", suVeriEsito(`
+  const salvato = DATA.macro.liquidity;
+  const A = 68, B = 795;                       // le masse del pacchetto reale, in miliardi
+  const quotaSomma = Math.round(A / (A + B) * 1000) / 10;   // 7,9
+  const quotaSpy  = Math.round(A / B * 1000) / 10;          // 8,6
+  DATA.macro.liquidity = Object.assign({}, salvato || {}, {
+    inst_cash_pct: quotaSomma,
+    inst_note: "AUM BIL+SHV $" + A + "B su $" + (A + B) + "B di BIL+SHV+SPY (SPY da solo $" + B + "B)" });
+  const p = buildPrompt();
+  DATA.macro.liquidity = salvato;
+  const i = p.indexOf("Istituzionali Cash:");
+  if (i < 0) return "la riga del cash istituzionale non compare nel pacchetto";
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  if (riga.indexOf(String(quotaSomma).replace(".", ",")) < 0
+   && riga.indexOf(String(quotaSomma)) < 0) return "la riga non pubblica la quota iniettata: " + riga;
+  /* la prova vera: la riga deve dire su COSA e' calcolata quella quota, e il totale nominato
+     deve essere quello che la riproduce. Col denominatore sbagliato (SPY da solo) uscirebbe 8,6. */
+  const dichiaraSomma = riga.indexOf("totale BIL+SHV+SPY") >= 0 || riga.indexOf("su $" + (A + B) + "B") >= 0;
+  if (!dichiaraSomma) return "pubblica una percentuale e non nomina il denominatore: " + riga;
+  return Math.abs(quotaSomma - A / (A + B) * 100) < 0.06 ? true
+    : "il denominatore dichiarato non riproduce il numero pubblicato";`));
+
+/* ⚠⚠ v414 — OGNI INDICATORE CON UNA DATA IN FINESTRA E' ELENCATO O NOMINATO FRA GLI ESCLUSI.
+   Tre serie giornaliere (Curva 10A-3M, Tasso reale 10A, Inflazione attesa 10A) pubblicavano
+   nella propria riga un "prossimo aggiornamento" confermato dentro le due settimane e non
+   comparivano nel calendario: le toglie la regola v290 (una serie giornaliera non e' un
+   appuntamento), ma l'esclusione dichiarata nominava tre indicatori DIVERSI — quelli senza
+   data. Chi legge non poteva distinguere una regola da una dimenticanza.
+   ⚠ L'invariante e' nei DUE VERSI, come il gate pagina↔pacchetto della v406: un gate che
+   controlla solo la presenza invecchia da solo alla prima classe nuova di esclusione. */
+check("v414 nessuna uscita in finestra sparisce dal calendario senza essere nominata", suVeriEsito(`
+  const p = buildPrompt();
+  const i = p.indexOf("- IN USCITA NELLE PROSSIME");
+  if (i < 0) return "la riga del calendario non compare nel pacchetto";
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  const limite = new Date(oggi); limite.setDate(limite.getDate() + 14);
+  const attesi = [];
+  for (const ind of ((DATA.macro || {}).indicators || [])) {
+    const c = cadenzaDato(ind.key, ind.date);
+    if (!c || !c.prossimo || !c.confermato) continue;
+    const d = new Date(c.prossimo + "T00:00:00");
+    if (isNaN(d) || d < oggi || d > limite) continue;
+    attesi.push(ind.label);
+  }
+  /* ⚠ IL FENOMENO DEVE ESSERCI: senza indicatori in finestra il check sarebbe verde per
+     assenza di dati invece che per assenza di difetti (trappola pagata quattro volte). */
+  if (attesi.length < 2) return "solo " + attesi.length + " indicatori con data in finestra: il check non misura niente";
+  const persi = attesi.filter(l => riga.indexOf(l) < 0);
+  return persi.length ? "hanno una data confermata in finestra e la riga non li nomina: " + persi.join(" · ")
+                      : true;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

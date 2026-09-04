@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "413";
+const BUILD_VERSION = "414";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8415,7 +8415,15 @@ function buildPrompt(opz) {
   if (m.liquidity_split) {
     const L = m.liquidity_split;
     const bits = [];
-    if (L.inst_cash_pct != null) bits.push(`Istituzionali Cash: ${fmtNum.format(L.inst_cash_pct)}% (proxy ${L.inst_note || "AUM BIL+SHV vs SPY"})`);
+    /* ⚠⚠ v414 — UNA PERCENTUALE SENZA IL PROPRIO DENOMINATORE INVITA A RICALCOLARLA SBAGLIATA.
+       La riga pubblicava "7,9% (proxy AUM BIL+SHV $68B vs SPY $795B)": 68/795 fa 8,6%, quindi
+       chi legge trova un numero che non torna e conclude che il sistema sbagli. Non sbagliava —
+       il denominatore e' la SOMMA (68/863 = 7,9%) — ma non lo diceva, e il collaudo di congruita'
+       ordina a chi legge di segnalare esattamente questo. E' la classe che coherence_check
+       chiama denominatori non dichiarati, qui prodotta dal pacchetto contro se stesso (v400).
+       ⚠ Il denominatore si nomina nella RIGA, non nella nota della pipeline: la nota arriva da
+       un run che puo' essere vecchio, l'etichetta no. */
+    if (L.inst_cash_pct != null) bits.push(`Istituzionali Cash: ${fmtNum.format(L.inst_cash_pct)}% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy ${L.inst_note || "AUM BIL+SHV vs SPY"})`);
     /* ⚠ v349 — LA DATA C'ERA IN PAGINA E NON NEL PACCHETTO. La scheda dichiara "Rilevazione
        del 01/06/2026 — serie MENSILE, non e' il dato di oggi"; qui il numero usciva nudo, e
        siccome non compare nell'elenco delle STATISTICHE UFFICIALI della premessa finiva nella
@@ -8818,14 +8826,32 @@ function buildPrompt(opz) {
          Le voci NON ancora prezzate entrano sempre, dentro o fuori finestra: e' l'unica classe
          che cambia una decisione, perche' il prezzo non le ha ancora votate (v158). */
       const base = dentro.length ? dentro : conEta;
-      const mostra = [...new Set([...base, ...(nonPrezzate || [])])]
-        .sort((a, b) => a.ore - b.ore).slice(0, 12);
+      /* ⚠⚠ v414 — L'INTESTAZIONE PROMETTEVA "TUTTE" E IL CORPO NE STAMPAVA DODICI.
+         Il tetto era uno `.slice(0, 12)` sull'unione, quindi con 18 voci non ancora prezzate
+         la riga dichiarava "18 pubblicate DOPO l'ultima chiusura … e sono TUTTE elencate qui
+         sotto" e ne mostrava 12. E' esattamente il difetto che la v393 aveva chiuso — contare
+         delle notizie e poi nasconderle — tornato per una via diversa: li' spariva una CLASSE
+         di voci, qui sparisce una CODA, e l'intestazione afferma il contrario in entrambi i
+         casi. Chi legge sa che esistono, non puo' vederle, e non ha modo di chiederle.
+         ⚠ Il tetto NON si toglie: si sposta sulla classe che il tetto puo' tagliare senza
+         mentire. Le voci non ancora prezzate entrano SEMPRE, tutte, perche' sono l'unica
+         classe che cambia una decisione (il prezzo non le ha ancora votate, v158). Il resto
+         ha un tetto, e la riga DICHIARA quante ne ha lasciate fuori: "il sistema non ha il
+         dato" e "ce l'ha e non te lo passa" si leggono uguali (v406). */
+      const np = nonPrezzate || [];
+      const npSet = new Set(np);
+      const resto = base.filter(v => !npSet.has(v));
+      const TETTO_ALTRE = Math.max(0, 12 - np.length);
+      const restoMostrato = resto.slice(0, TETTO_ALTRE);
+      const omesse = resto.length - restoMostrato.length;
+      const mostra = [...np, ...restoMostrato].sort((a, b) => a.ore - b.ore);
       const riga = (x) => `\n    · [${x.fonte}, ${Math.round(x.ore)}h fa${chiusura && Date.parse(x.quando) > chiusura.at.getTime() ? ", DOPO l'ultima chiusura: il prezzo non l'ha ancora votata" : ""}] ${x.titolo}`
         + (x.riassunto ? `\n      ${x.riassunto}` : "");
       lines.push(`- TITOLI MACRO — ${dentro.length} dentro le ultime ${ORE} ORE`
         + (dentro.length ? "" : `, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le ${mostra.length} piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha ${Math.round(conEta[0].ore)} ore`)
         + ` (fonti: ${fonti})`
         + (nonPrezzate != null ? ` · ${nonPrezzate.length} pubblicate DOPO l'ultima chiusura USA del ${chiusura.asof}, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto` : "")
+        + (omesse > 0 ? ` · ⚠ altre ${omesse} voci il sistema le HA e qui sotto non compaiono (tetto di 12 titoli): il taglio cade solo su quelle gia' dentro il prezzo di chiusura, mai su quelle pubblicate dopo` : "")
         + `. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i `
         + `numeri che contengono, e la selezione e' automatica (${(m.news && m.news.filtro) || ""}). I riassunti `
         + `sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di `
@@ -8862,6 +8888,28 @@ function buildPrompt(opz) {
       const senzaCal = ((DATA.macro || {}).indicators || [])
         .filter(i => { const c = cadenzaDato(i.key, i.date); return c && !c.prossimo; })
         .map(i => i.label);
+      /* ⚠⚠ v414 — LA RICEVUTA DEGLI ESCLUSI NE COPRIVA UNA CLASSE SU DUE.
+         Tre serie — Curva 10A-3M, Tasso reale 10A, Inflazione attesa 10A — pubblicano nella
+         propria riga "prossimo aggiornamento" con una data CONFERMATA dentro la finestra, e
+         non compaiono qui: le toglie la regola v290, perche' una serie giornaliera non e' un
+         appuntamento. La regola e' giusta; il difetto e' che l'esclusione dichiarata nominava
+         gli indicatori SENZA data, cioe' tre nomi DIVERSI. Chi legge trovava tre date nel
+         corpo del pacchetto, non le trovava nel calendario, e leggeva come esclusione
+         dichiarata una frase che parlava d'altro — "il sistema non ha il dato" e "ce l'ha e
+         non te lo passa" si leggono uguali (v406, v393).
+         ⚠ Si nominano quelle che sarebbero entrate: una serie giornaliera la cui prossima
+         uscita cade fuori finestra non e' un'esclusione, e' semplicemente fuori dal periodo
+         che l'intestazione dichiara. */
+      const oggiCal = new Date(); oggiCal.setHours(0, 0, 0, 0);
+      const limiteCal = new Date(oggiCal); limiteCal.setDate(limiteCal.getDate() + 14);
+      const giornalieri = ((DATA.macro || {}).indicators || [])
+        .filter(i => {
+          const c = cadenzaDato(i.key, i.date);
+          if (!c || !c.prossimo || !c.confermato || c.passo !== "giornaliero") return false;
+          const d = new Date(c.prossimo + "T00:00:00");
+          return !isNaN(d) && d >= oggiCal && d <= limiteCal;
+        })
+        .map(i => i.label);
       lines.push(`- IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI `
         + `CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il `
         + `sistema non proietta piu' date proprie. `
@@ -8870,6 +8918,13 @@ function buildPrompt(opz) {
             ? `⚠ Per ${senzaCal.length} indicatori il calendario ufficiale non copre la serie e la `
               + `data del prossimo aggiornamento NON E' DISPONIBILE (${senzaCal.join(", ")}): non `
               + `sono elencati sopra, e la loro assenza non significa che non escano. `
+            : "")
+        + (giornalieri.length
+            ? `⚠ Altri ${giornalieri.length} indicatori HANNO una data confermata in finestra e non `
+              + `sono elencati sopra di proposito (${giornalieri.join(", ")}): sono serie `
+              + `GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro `
+              + `prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. `
+              + `La data la trovi nella riga dell'indicatore, sopra. `
             : "")
         + (utili.length
             ? `trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): ${utili.join(" · ")}.`
@@ -8975,7 +9030,13 @@ function buildPrompt(opz) {
       return `, ⚠ CARRY-FORWARD dal run precedente${d ? ` (rilevato ${String(d).slice(0, 10)}${age != null ? `, ${age}g fa` : ""})` : ""} — la fonte era irraggiungibile: pesalo come dato DATATO, non odierno`;
     };
     lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
-        ? "Valutazioni tese, ma la leva si sta RITIRANDO dai massimi: il livello alto dice quanto carburante c'era, il verso negativo dice che il deleveraging e' gia' cominciato — i numeri stanno nella riga LEVA DEGLI OPERATORI."
+        /* ⚠⚠ v414 — QUESTA RIGA AFFERMAVA UN VERSO SENZA IL PROPRIO ORIZZONTE, e la riga
+           successiva dichiara che leggerne uno solo porta alla conclusione opposta: la leva e' in
+           ritiro sull'ULTIMO MESE e ancora in espansione sul trimestre e sull'anno. Dire "il
+           deleveraging e' gia' cominciato" senza dire su quale finestra e' esattamente l'errore che
+           la riga sotto mette in guardia dal commettere — il pacchetto si contraddiceva da solo a
+           due righe di distanza. Ora l'orizzonte e' nella frase, e la frase non conclude. */
+        ? "Valutazioni tese, e la leva va letta CON IL SUO ORIZZONTE: il livello alto dice quanto carburante c'e', ma il verso cambia col periodo che si guarda — i tre orizzonti stanno nella riga LEVA DEGLI OPERATORI qui sotto, e non concordano."
         : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva.")}`);
     const rl = rigaLeva(m);
     if (rl) lines.push(rl);
@@ -10571,6 +10632,25 @@ function contestoPortafoglio(tkCorrente) {
     + `. ⚠ Titoli che condividono lo stesso fattore sono UNA scommessa scritta piu' volte, non `
     + `posizioni indipendenti: l'esposizione del libro a quel fattore e' la loro somma, `
     + `non il peso del singolo nome.`);
+  /* ⚠⚠ v414 — QUESTE DUE SOTTO-VOCI STAVANO SOTTO IL DRAWDOWN, e parlano d'altro: la
+     "soglia", l'"ancora" e il peso del gruppo appartengono alla CONCENTRAZIONE qui sopra
+     (correlazione con l'ancora), non alla discesa dal massimo. Lette in sequenza sembravano
+     riferirsi a una soglia di drawdown che in quel blocco non esiste — un rimando a una
+     grandezza assente, la classe che C10 sorveglia. Spostate dove il loro riferimento vive.
+     ⚠ Ricevuta del movimento scritta prima: il blocco contiene due sole `L.push` e dichiara solo
+     variabili locali; dipende da corrCon, SOGLIA_FATTORE, ancora e pesoSemi, tutte definite
+     prima di questa riga. Nessun vicino portato via (v201-v204). */
+  if (misurato) {
+    const nonMisurati = azionarie.filter(x => corrCon.get(x.r.ticker) == null).map(x => x.r.ticker);
+    const sottoSoglia = azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c < SOGLIA_FATTORE; })
+      .map(x => `${x.r.ticker} ${corrCon.get(x.r.ticker).toFixed(2)}`);
+    if (sottoSoglia.length) L.push(`  Sotto soglia, cioe' misurati e indipendenti dall'ancora: ${sottoSoglia.join(", ")}`
+      + `. ⚠ I valori sono arrotondati a due decimali: un nome che appare qui a ${SOGLIA_FATTORE.toFixed(2)} sta sotto la soglia di pochi millesimi, `
+      + `non e' un'incoerenza. ⚠ E "indipendenti" vale RISPETTO A ${ancora}: fra loro possono muoversi insieme, `
+      + `perche' il sistema misura contro una sola ancora e non pubblica la matrice completa.`);
+    if (nonMisurati.length) L.push(`  ⚠ NON MISURABILI, quindi fuori dal conto per mancanza di dati e non perche' indipendenti: `
+      + `${nonMisurati.join(", ")} — meno di 60 sedute in comune con ${ancora}. Il loro peso NON e' incluso nel ${pesoSemi.toFixed(0)}%.`);
+  }
   /* ═══ v404 — E DENTRO QUEL GRUPPO CI SONO DUE RISCHI, NON UNO ══════════════════════════════
      Il grappolo misura la co-movimentazione nella giornata media, ed e' vera. Ma un salto dei
      tassi o una stretta del credito non colpisce chi si autofinanzia e chi prende a prestito
@@ -10657,17 +10737,6 @@ function contestoPortafoglio(tkCorrente) {
       + `. ⚠ E' il calo gia' AVVENUTO, non una previsione: serve a sapere quanto e' ordinario per questi titoli, `
       + `perche' una discesa dentro quel range non e' una rottura della tesi e una fuori lo e'.`);
   }
-  if (misurato) {
-    const nonMisurati = azionarie.filter(x => corrCon.get(x.r.ticker) == null).map(x => x.r.ticker);
-    const sottoSoglia = azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c < SOGLIA_FATTORE; })
-      .map(x => `${x.r.ticker} ${corrCon.get(x.r.ticker).toFixed(2)}`);
-    if (sottoSoglia.length) L.push(`  Sotto soglia, cioe' misurati e indipendenti dall'ancora: ${sottoSoglia.join(", ")}`
-      + `. ⚠ I valori sono arrotondati a due decimali: un nome che appare qui a ${SOGLIA_FATTORE.toFixed(2)} sta sotto la soglia di pochi millesimi, `
-      + `non e' un'incoerenza. ⚠ E "indipendenti" vale RISPETTO A ${ancora}: fra loro possono muoversi insieme, `
-      + `perche' il sistema misura contro una sola ancora e non pubblica la matrice completa.`);
-    if (nonMisurati.length) L.push(`  ⚠ NON MISURABILI, quindi fuori dal conto per mancanza di dati e non perche' indipendenti: `
-      + `${nonMisurati.join(", ")} — meno di 60 sedute in comune con ${ancora}. Il loro peso NON e' incluso nel ${pesoSemi.toFixed(0)}%.`);
-  }
   /* ⚠ v360 — IL CONFRONTO, che e' la sola forma in cui una misura di rischio si legge.
      "Volatilita' 51,5%" da solo non dice niente; "51,5% contro il 52,6% degli stessi nomi
      equipesati e il 22,1% del Nasdaq" dice tre cose insieme: quanto pesano le scelte di peso,
@@ -10732,7 +10801,12 @@ function contestoPortafoglio(tkCorrente) {
     L.push(`--- NOTIZIE SUI TITOLI DEL LIBRO (${canali}, finestra ${nt.finestra_giorni || 14} giorni) ---`);
     L.push(`⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui `
       + `per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che il `
-      + `PASSO 0 ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.`);
+      + `questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.`);
+    /* ⚠ v414 — QUI DICEVA "la ricerca che il PASSO 0 ti impone". Questo blocco esce in ENTRAMBI i
+       pacchetti, ma "PASSO 0" e' una sezione del solo pacchetto di TITOLO: nel macro l'obbligo di
+       cercare si chiama A1bis, quindi il lettore riceveva un rimando a un blocco inesistente — la
+       classe che C10 sorveglia, e la stessa v405/v413 di una riga scritta per un contesto e resa in
+       due. Ora nomina l'OBBLIGO invece dell'etichetta, che e' vero in tutti e due. */
     if (mie.length) {
       L.push(`Su ${TK} (${mie.length} ${mie.length === 1 ? "voce" : "voci"}):` + mie.map(riga).join(""));
     } else if ((nt.senza_notizie || []).map(String).includes(TK)) {
@@ -13028,10 +13102,16 @@ function buildPromptTicker(tkGrezzo) {
   /* ⚠ un evento datato DENTRO l'orizzonte cambia l'oggetto della domanda: un prezzo "a
      settimane" scritto tre giorni prima di una trimestrale non e' lo stesso prezzo. Il
      pacchetto lo dice, ma nel calendario macro, a trenta righe da chi deve usarlo. */
+  /* ⚠⚠ v414 — LA SETTIMA DERIVAZIONE, e l'ha trovata il gate della v413, non una rilettura.
+     Contava istanti come la sesta (`new Date(d) - Date.now()` arrotondato) invece dei giorni di
+     calendario, quindi divergeva dal resto del pacchetto di un giorno e scriveva "fra 0 giorni"
+     il giorno stesso, dove tutti gli altri blocchi dicono OGGI.
+     ⚠ Conferma la lezione della v413: la dichiarazione "chiunque chieda FRA QUANTO RIPORTA passa
+     da questa funzione" valeva per le occorrenze cercate, non per tutte. Il gate ora e' allargato
+     a tutto il file invece che alla sola riga della prossima trimestrale. */
   const giorniTrim = (() => {
     const d = rigaLibro && rigaLibro.earnings_date;
-    if (!d) return null;
-    const q = Math.round((new Date(d) - Date.now()) / 86400000);
+    const q = giorniAllaTrimestrale(d);
     return Number.isFinite(q) && q >= 0 && q <= 60 ? { g: q, quando: String(d).slice(0, 10) } : null;
   })();
   const istruzioni = [
@@ -13203,7 +13283,7 @@ function buildPromptTicker(tkGrezzo) {
 `· LUNGO (oltre l'anno): la tesi vale ancora se il ciclo del settore gira? Cosa la romperebbe?`,
 `Non un voto: un ragionamento con numeri sopra, e per ciascun orizzonte cosa ti smentirebbe.`,
 (giorniTrim
-  ? `⚠ C'E' UN EVENTO DENTRO L'ORIZZONTE BREVE: la trimestrale esce il ${giorniTrim.quando}, fra ${giorniTrim.g} giorni. `
+  ? `⚠ C'E' UN EVENTO DENTRO L'ORIZZONTE BREVE: la trimestrale esce il ${giorniTrim.quando}, ${giorniTrim.g === 0 ? "OGGI" : `fra ${giorniTrim.g} ${giorniTrim.g === 1 ? "giorno" : "giorni"}`}. `
     + `Una lettura del breve scritta prima di quella data e' un'altra cosa da una scritta dopo: di' esplicitamente se `
     + `quello che scrivi vale FINO alla trimestrale o OLTRE, perche' le due risposte sono diverse.`
   : ``),

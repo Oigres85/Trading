@@ -3948,7 +3948,10 @@ def fetch_liquidity_split():
         mm = aums["BIL"] + aums["SHV"]
         if mm > 0 and aums["SPY"] > 0:
             out["inst_cash_pct"] = round(mm / (mm + aums["SPY"]) * 100, 1)
-            out["inst_note"] = f"AUM BIL+SHV ${mm/1e9:.0f}B vs SPY ${aums['SPY']/1e9:.0f}B"
+            # ⚠ v414 — la nota nominava le due masse e taceva il denominatore vero (la somma):
+            # 68 su 795 fa 8,6%, e il numero pubblicato era 7,9% su 863. Ora la somma e' scritta.
+            out["inst_note"] = (f"AUM BIL+SHV ${mm/1e9:.0f}B su ${(mm + aums['SPY'])/1e9:.0f}B "
+                                f"di BIL+SHV+SPY (SPY da solo ${aums['SPY']/1e9:.0f}B)")
     except Exception as e:  # noqa: BLE001
         print(f"!! liquidity inst: {e}", file=sys.stderr)
     try:
