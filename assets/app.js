@@ -10884,8 +10884,24 @@ function contestoPortafoglio(tkCorrente) {
     const canali = (nt.canali || []).join(" con riserva su ") || "RSS per ticker";
     L.push(`--- NOTIZIE SUI TITOLI DEL LIBRO (${canali}, finestra ${nt.finestra_giorni || 14} giorni) ---`);
     L.push(`⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui `
-      + `per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che il `
+      + `per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che `
       + `questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.`);
+    /* ⚠⚠ v415 — L'ETICHETTA [TICKER] DICE DA QUALE FEED VIENE LA VOCE, NON DI CHI PARLA.
+       Misurato sul run del 04/09: su quattordici voci mostrate, QUATTRO erano su un'altra
+       societa' — un pezzo su Nvidia sotto [CRWV], uno su Astera Labs e uno su Penguin Solutions
+       sotto [MRVL], una cronaca di mercato con Tesla e Goldman sotto [MU]. Non e' un difetto
+       della raccolta: la v399 ha scelto Nasdaq PROPRIO perche' l'attribuzione viene dalla fonte
+       invece che da un'euristica nostra, e i feed dei fornitori includono regolarmente pezzi su
+       concorrenti e sul comparto. Il difetto era l'ETICHETTA, che afferma piu' di quanto il dato
+       sostenga: `[MRVL]` si legge "notizia su MRVL" e significa "voce trovata nel feed di MRVL".
+       ⚠ Non si filtra: filtrare vorrebbe dire indovinare di chi parla un titolo, che e'
+       l'euristica che la v399 ha rifiutato. Si dichiara cosa l'etichetta e', e chi legge ha il
+       titolo dell'articolo davanti per stabilire il resto. */
+    L.push(`⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non `
+      + `una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su `
+      + `concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il `
+      + `titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta `
+      + `informativa per il canale, non attribuibile al nome sotto cui compare.`);
     /* ⚠ v414 — QUI DICEVA "la ricerca che il PASSO 0 ti impone". Questo blocco esce in ENTRAMBI i
        pacchetti, ma "PASSO 0" e' una sezione del solo pacchetto di TITOLO: nel macro l'obbligo di
        cercare si chiama A1bis, quindi il lettore riceveva un rimando a un blocco inesistente — la

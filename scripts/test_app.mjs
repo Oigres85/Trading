@@ -7868,6 +7868,49 @@ check("v415 il confronto fra beta non si calcola su un termine sotto il paviment
   if (!spenti) return "nessun canale sotto il pavimento del rumore nei dati: il check non misura niente";
   return guai.length ? guai.join(" · ") : true;`));
 
+/* ⚠⚠ v415 — L'ETICHETTA [TICKER] DICE DA QUALE FEED VIENE LA VOCE, NON DI CHI PARLA.
+   Misurato sul run del 04/09: su quattordici voci mostrate, quattro erano su un'altra societa'
+   (Nvidia sotto [CRWV], Astera Labs e Penguin Solutions sotto [MRVL], una cronaca di mercato
+   sotto [MU]). Non e' un difetto della raccolta — la v399 ha scelto Nasdaq proprio perche'
+   l'attribuzione viene dalla FONTE e non da un'euristica nostra — ma dell'ETICHETTA, che
+   affermava piu' di quanto il dato sostenga.
+   ⚠ E NON SI FILTRA: filtrare vorrebbe dire indovinare di chi parla un titolo, cioe' proprio
+   l'euristica che la v399 ha rifiutato scegliendo Nasdaq invece del feed multi-ticker di Yahoo.
+   Il gate difende la DICHIARAZIONE, non un filtro. */
+check("v415 il blocco notizie dichiara che [TICKER] e' il feed, non l'oggetto dell'articolo", suVeriEsito(`
+  /* ⚠ la chiave sta alla RADICE, non sotto macro: una sonda sulla chiave sbagliata rende il
+     check verde (o rosso) per assenza di dati invece che di difetti — v196, v229. */
+  const nt = DATA && DATA.news_titoli;
+  if (!nt || !nt.per_titolo) return "news_titoli assente: il check non misura niente";
+  const p = buildCIOText();
+  const i = p.indexOf("NOTIZIE SUI TITOLI DEL LIBRO");
+  if (i < 0) return "il blocco delle notizie sui titoli non compare";
+  const testa = p.slice(i, i + 2500);
+  return testa.indexOf("e' il feed DELLA FONTE per quel titolo") >= 0
+      && testa.indexOf("non una garanzia che l'articolo parli di lui") >= 0
+    ? true
+    : "il blocco non dichiara cosa significa l'etichetta [TICKER]";`));
+
+/* ⚠ e la scelta della v399 resta: nessun filtro per contenuto, che sarebbe l'euristica rifiutata.
+   Se un domani comparisse, questo check lo direbbe — l'invariante e' che l'attribuzione venga
+   dalla fonte, non da noi. */
+/* ⚠ LA PRIMA STESURA DI QUESTO CHECK ERA DECORATIVA: cercava tre forme letterali e
+   l'iniezione realistica — `String(v.titolo).toUpperCase().indexOf(TK)` — non ne matchava
+   nessuna, quindi restava verde col difetto dentro (a morderlo era v398, sull'ESITO).
+   Un check ancorato a una forma letterale e' la trappola numero uno di questo file: ora
+   guarda la PROPRIETA' — una riga che mette in relazione il TITOLO dell'articolo col ticker,
+   in qualunque forma. */
+check("v415 nessun filtro euristico decide di chi parla una notizia", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("NOTIZIE SUI TITOLI DEL LIBRO");
+  if (i < 0) return false;
+  const righe = src.slice(Math.max(0, i - 2000), i + 4000).split(String.fromCharCode(10))
+    .filter(r => r.trim().indexOf("//") !== 0 && r.trim().indexOf("*") !== 0);
+  return !righe.some(r => r.indexOf("titolo") >= 0
+    && (r.indexOf("indexOf(TK") >= 0 || r.indexOf("includes(TK") >= 0
+        || r.indexOf("indexOf(t)") >= 0 || r.indexOf("includes(t)") >= 0));
+})());
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
