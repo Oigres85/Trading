@@ -3986,6 +3986,57 @@ dentro. Riagganciato al pezzo che sta su una riga sola ed è unico del rimando �
 blocco comincia con `===`, il rimando con `nel blocco`. *Un'iniezione che non morde non prova che il
 gate sia inutile: prova che hai iniettato un'altra cosa* (v419).
 
+## 📉 v427 — IL LIBRO SPARIVA E LA TESTATA CONTINUAVA A PROMETTERLO
+
+Diciassettesimo giro, sull'ultimo asse non censito: la **forma del portafoglio** (libro vuoto · una
+posizione · due · nessuna correlata · nessun FCF negativo · tutti negativi). v425 e v426 lo
+coprivano su dati e orologio, non sulla forma del libro.
+
+### Con meno di due posizioni sparivano DUE blocchi, in silenzio
+`contestoPortafoglio` aveva `if (righe.length < 2) return ""`, e `disciplinaTesto` lo stesso senza
+regole. Intanto la testata li prometteva **tre volte**: l'apertura (*"in coda il LIBRO su cui quel
+macro atterra"*), `[B6]` (*"il pacchetto porta le posizioni del fondo, la loro concentrazione, il
+contributo al rischio di ciascuna"*) e `[B7]` (*"le nove regole della DISCIPLINA DI RISCHIO in
+coda"*).
+
+> È la classe **C10** — rimando a una sezione inesistente — cioè **esattamente il difetto chiuso in
+> v426 per il titolo sconosciuto, un livello più su.** Due giri consecutivi, stessa forma, superfici
+> diverse.
+
+⚠ **E lo stato è raggiungibile davvero**: non serve che il CEO venda tutto — basta che
+`config/posizioni.json` non risponda, e il pacchetto perde un terzo di sé senza dirlo mentre le
+istruzioni mandano il lettore a cercare quello che non c'è.
+
+### "le prime TRE posizioni" su un libro che ne ha due
+`slice(0, 3)` ne restituisce due e l'etichetta continuava ad affermare un terzo nome, con la misura
+*"A + B = 100%"* sotto quel titolo. **Il numero si conta, non si scrive** (v410, v411, v415, v424):
+stessa classe, qui su una parola invece che su una cifra. Corretto in entrambe le sedi — la
+concentrazione e la regola 2 della disciplina — che restano due rese dello stesso conteggio (v421).
+
+### ⚠⚠ E il rischio della pipeline stava accanto ai pesi di adesso, senza dirlo
+Dopo una modifica del libro i **pesi** sono nuovi e il **contributo al rischio** è quello del run
+precedente: non è ricalcolabile lato pagina (v391, v316). La **pagina** lo dichiara dalla v391; il
+**pacchetto** no — classe v412, una correzione applicata a una superficie e non all'altra, e qui
+pesa di più perché il pacchetto è quello su cui si decide. L'avviso copre anche VaR, ES, beta e
+correlazione media, che escono dalla **stessa matrice** e invecchiano con lui.
+
+⚠ **E non deve suonare sempre**: `POSIZIONI_LOCALI_MODIFICATE` contiene il BTP a **ogni**
+caricamento (la pipeline non lo pubblica in watchlist) e il BTP non entra nel comparto azionario su
+cui il rischio è calcolato. Senza l'intersezione l'avviso usciva su ogni pacchetto nominando un
+titolo che con quel confronto non c'entra — *un avviso che suona sempre non avvisa*, la stessa
+ragione per cui in v421 una fonte muta non fa suonare il gate.
+
+### 🧨 Due trappole rifatte, e la seconda è nuova come forma
+- ⚠⚠ **`_avvisoStale` dichiarata dentro un `if` e usata fuori**: 217 check rossi al primo giro. È
+  la trappola **v409** con `n1`, identica. Ora sta a livello di funzione, prima di tutti i suoi usi.
+- ⚠⚠ **UN'INIEZIONE CHE ROMPE IL FILE SI LEGGE COME UN GATE CHE NON MORDE.** La mia iniezione di
+  validazione tagliava per indici invece di sostituire una stringa esatta, e ha asportato anche
+  delle definizioni di funzione: la suite moriva all'import, `grep FAIL` non trovava niente, e
+  l'esito era indistinguibile da *"il gate non ha morso"*. Stavo per dichiarare decorativo un gate
+  che funziona.
+  > **Anche le iniezioni vanno fatte con `modifica_sicura`**, non solo le correzioni: lo strumento
+  > esiste per rifiutare un risultato che non regge, e un'iniezione è una modifica come le altre.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
