@@ -3929,8 +3929,62 @@ ramo che esiste apposta per dire che la raccolta è fallita.
   cautela DENTRO `fonti`, cioè avevo iniettato un'altra cosa. Con la forma vera il gate morde e
   nomina lo stato: *"I7 senza notizie macro / macro"* (v419).
 
-⚠ **Costo misurato**: la suite passa da ~2 a ~14 secondi. È il prezzo di 24 generazioni di
-pacchetto, e vale la classe che copre.
+### ⚠⚠ E IL "COSTO MISURATO" CHE AVEVO SCRITTO QUI ERA FALSO — corretto in v426
+Avevo annotato *"la suite passa da ~2 a ~14 secondi, il prezzo di 24 generazioni di pacchetto"*.
+**Non l'avevo misurato**: avevo confrontato i 14 secondi con un numero che ricordavo. Misurato
+davvero, disabilitando il gate e poi tornando al commit precedente:
+
+| | tempo |
+|---|---|
+| `test_app.mjs` **con** il censimento | 13,1 s |
+| `test_app.mjs` **senza** (gate disabilitato) | 13,1 s |
+| `test_app.mjs` al commit **prima** della v425 | 13,6 s |
+
+Una generazione di pacchetto costa **12-18 ms**: ventiquattro fanno ~0,4 s. Il censimento non si
+vede. La suite era già lenta, per altro.
+
+> **L'ho scritto nella versione il cui tema è "si misura invece di assumere", e nel documento che
+> esiste per non ripetere gli errori.** Un numero pubblicato senza misura è la stessa classe delle
+> soglie inventate (v240) e dei conteggi scritti a mano (v410/v411/v415/v424) — qui applicata a
+> una misura di ingegneria invece che a un dato di mercato, e nel posto in cui fa più danno,
+> perché è il registro su cui si decide se una modifica vale il suo prezzo.
+
+⚠ Osservato una volta e **non riprodotto in quattro tentativi**: `self_check` ha dato una volta
+*"test_app.mjs: stampa un rapporto invece di uscire in silenzio"* con la suite verde eseguita a
+mano. Annotato invece che dichiarato risolto: non ho una causa.
+
+## 🕳️ v426 — 87.000 CARATTERI SU UN TITOLO DI CUI IL SISTEMA NON SA NULLA
+
+Sedicesimo giro. Il censimento della v425, **allargato** agli stati che non copriva — orologio
+(sessione aperta · chiusa · pre-market · weekend, con `Date` sostituita nel contesto) e assenza dei
+blocchi opzionali (opzioni · EDGAR · sensibilità macro · batteria tecnica) — ha portato il conto a
+**51 pacchetti**. I sei invarianti hanno retto su tutti.
+
+Il difetto l'ha trovato lo **stato che non avevo ancora esercitato**: un ticker che la pipeline non
+segue affatto. Il box accetta qualunque simbolo, e per `SNOW` il pacchetto consegnava **87.000
+caratteri** di macro, libro e disciplina su un titolo di cui non porta *un solo numero*.
+
+⚠⚠ **E le istruzioni continuavano a rimandare PER NOME al blocco che non c'era**: *"Molti di questi
+numeri sono già calcolati nel blocco «QUELLO CHE IL SISTEMA SA GIÀ» qui sotto: usa QUELLI"*. È la
+classe **C10** — rimando a una sezione inesistente — già pagata tre volte con "A4", "STEP 3" e
+"PASSO 0".
+
+> **Il ramo non si accende mai su un titolo seguito**, quindi nessuna lettura del pacchetto lo
+> avrebbe visto: è precisamente ciò per cui il censimento esiste.
+
+⚠ Non si correggeva aggiungendo dati che non abbiamo (v396): si **dichiara il buco** e si tolgono i
+rimandi — forma v406. La dichiarazione sta **dove il blocco sarebbe stato**, perché un buco
+annunciato altrove si legge come una sezione saltata, e dice anche cosa resta valido (macro, libro,
+disciplina servono a dire *in quale quadro quel titolo entrerebbe*).
+
+⚠ Verificato che i pacchetti dei titoli **seguiti** non cambino: le sole differenze sono l'ora del
+prossimo run e l'età delle notizie, cioè l'orologio.
+
+### 🎯 E la sonda del mio gate non mordeva perché il rimando VA A CAPO
+Cercavo la frase intera, che nel testo è spezzata su due righe: il check restava verde col rimando
+dentro. Riagganciato al pezzo che sta su una riga sola ed è unico del rimando — l'intestazione del
+blocco comincia con `===`, il rimando con `nel blocco`. *Un'iniezione che non morde non prova che il
+gate sia inutile: prova che hai iniettato un'altra cosa* (v419).
 
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 

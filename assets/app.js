@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "425";
+const BUILD_VERSION = "426";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -13525,6 +13525,22 @@ function buildPromptTicker(tkGrezzo) {
     const q = giorniAllaTrimestrale(d);
     return Number.isFinite(q) && q >= 0 && q <= 60 ? { g: q, quando: String(d).slice(0, 10) } : null;
   })();
+  /* ⚠⚠ v426 — SU UN TITOLO CHE LA PIPELINE NON SEGUE IL SISTEMA NON HA NIENTE, E NON LO DICEVA.
+     `datiNostriDelTitolo` ritorna "" quando il titolo non e' ne' in portafoglio, ne' seguito, ne'
+     fra i simboli macro — cioe' per qualunque ticker che il CEO scriva nel box e che la pipeline
+     non abbia mai visto (il box accetta qualunque simbolo). In quel caso il pacchetto consegnava
+     ~87.000 caratteri di macro, libro e disciplina su un titolo di cui non porta UN numero, e le
+     istruzioni continuavano a rimandare per NOME al blocco "QUELLO CHE IL SISTEMA SA GIA'":
+     un rimando a una sezione inesistente, che e' la classe C10 gia' pagata tre volte in questo
+     progetto ("A4", "STEP 3", "PASSO 0").
+     ⚠ Trovato dal censimento degli stati allargato (v425): nessuna lettura lo avrebbe visto,
+     perche' con un titolo seguito quel ramo non si accende mai.
+     ⚠ Non e' un difetto da correggere aggiungendo dati che non abbiamo (v396: meglio non avere
+     dati che averli non corretti): si DICHIARA il buco e si tolgono i rimandi al blocco assente,
+     che e' la forma v406 — "il sistema non ha il dato" e "ce l'ha e non te lo passa" si leggono
+     uguali. */
+  const schedaTitolo = datiNostriDelTitolo(tk);
+  const senzaScheda = !schedaTitolo;
   const istruzioni = [
 /* ⚠ v397 — IL NOME DELLA SOCIETA' MANCAVA. Il pacchetto ordina di cercare online (PASSO 0,
    obbligatorio) e non ha mai scritto come si chiama l'azienda: su un ticker ambiguo o poco
@@ -13682,9 +13698,15 @@ function buildPromptTicker(tkGrezzo) {
 ``,
 `5) TECNICA — i livelli, non le sensazioni.`,
 `Supporti e resistenze, medie semplici ed ESPONENZIALI, ritracciamenti di FIBONACCI, RSI, ATR`,
-`e i muri delle opzioni. ⚠ Molti di questi numeri sono gia' calcolati nel blocco "QUELLO CHE IL`,
-`SISTEMA SA GIA'" qui sotto, con il metodo dichiarato: usa QUELLI. Se ne trovi altri online che`,
-`non tornano, scrivi entrambi e di' quale usi e perche' — non sostituirli in silenzio.`,
+(senzaScheda
+  ? `e i muri delle opzioni. ⚠ SU QUESTO TITOLO IL SISTEMA NON HA NESSUN NUMERO — vedi la riga in`
+  : `e i muri delle opzioni. ⚠ Molti di questi numeri sono gia' calcolati nel blocco "QUELLO CHE IL`),
+(senzaScheda
+  ? `fondo alle istruzioni: prezzo, livelli, medie, oscillatori e fondamentali vanno tutti cercati`
+  : `SISTEMA SA GIA'" qui sotto, con il metodo dichiarato: usa QUELLI. Se ne trovi altri online che`),
+(senzaScheda
+  ? `online, ciascuno con fonte e data, e il prezzo di riferimento lo scegli e lo dichiari tu.`
+  : `non tornano, scrivi entrambi e di' quale usi e perche' — non sostituirli in silenzio.`),
 ``,
 `6) SENTIMENT — degli analisti E del retail, tenuti separati.`,
 `ANALISTI: consenso (quanti compra/mantieni/vendi), target medio e distanza dal prezzo, e la`,
@@ -13906,7 +13928,23 @@ function buildPromptTicker(tkGrezzo) {
   /* v389 — la disciplina di rischio sta SUBITO DOPO il contesto del libro e PRIMA dei dati
      macro: e' il blocco che dice con quale metro leggere tutto il resto, e un metro consegnato
      in coda arriva quando il giudizio e' gia' scritto (stessa ragione della v156). */
-  return [istruzioni, datiNostriDelTitolo(tk), contestoPortafoglio(tk), disciplinaTesto(),
+  /* ⚠ la dichiarazione sta FRA le istruzioni e il resto, dove il blocco mancante sarebbe stato:
+     un buco annunciato altrove si legge come una sezione saltata. */
+  const buco = senzaScheda
+    ? `=== SU ${tk} IL SISTEMA NON HA NESSUN DATO PROPRIO — E' L'UNICA COSA CHE PUO' DIRTI DI LUI ===\n`
+      + `Questo titolo non e' in portafoglio, non e' fra quelli che la pipeline segue, e non e' un `
+      + `indice o una materia prima del quadro macro: percio' il blocco che di solito porta prezzo, `
+      + `livelli, medie, oscillatori, opzioni, fondamentali, consenso e sensibilita' macro NON `
+      + `esiste in questo pacchetto, e le istruzioni sopra non ti rimandano a lui.\n`
+      + `⚠ Non e' un blocco andato perso: e' il perimetro del sistema, dichiarato. Il macro, il `
+      + `libro e la disciplina di rischio che trovi qui sotto sono veri e usabili — servono a dire `
+      + `in quale quadro ${tk} entrerebbe e accanto a quali scommesse gia' aperte — ma OGNI numero `
+      + `su ${tk} devi portarlo tu, con fonte e data, e il prezzo di riferimento lo scegli e lo `
+      + `dichiari tu una volta sola (regola 3).\n`
+      + `⚠ Se ti aspettavi i numeri del sistema, la ragione e' questa e non un guasto: perche' li `
+      + `abbia, ${tk} deve entrare fra i titoli seguiti.`
+    : "";
+  return [istruzioni, buco, schedaTitolo, contestoPortafoglio(tk), disciplinaTesto(),
           diarioOperazioni(tk), soloDati, storico].filter(Boolean).join("\n\n");
 }
 
