@@ -3452,11 +3452,20 @@ def fetch_macro():
 
     # Buffett Indicator (capitalizzazione totale USA / PIL)
     try:
-        w5000 = float(yf.Ticker("^W5000").history(period="5d")["Close"].dropna().iloc[-1])  # ~ market cap in $B
-        gdp = fred_series("GDP", 1)[-1][1]                                                   # PIL annualizzato $B
+        _w = yf.Ticker("^W5000").history(period="5d")["Close"].dropna()
+        w5000 = float(_w.iloc[-1])                                                           # ~ market cap in $B
+        _gdp = fred_series("GDP", 1)[-1]
+        gdp = _gdp[1]                                                                        # PIL annualizzato $B
         ratio = round(w5000 / gdp * 100, 1)
+        # ⚠⚠ v430 — IL RAPPORTO HA DUE DATE, E NON SONO LA STESSA. Il numeratore è la chiusura
+        # di ieri, il denominatore è il PIL TRIMESTRALE, che può avere mesi. Pubblicarlo senza
+        # dirlo lo fa leggere come una misura di oggi, e viola l'istruzione permanente del CEO
+        # ("solo ultimo dato ufficiale con data acquisizione … se non abbiamo queste informazioni
+        # dici dato non disponibile"): qui le informazioni ci sono, mancava solo di consegnarle.
         macro["buffett"] = {
             "ratio": ratio,
+            "data_borsa": str(_w.index[-1].date()),
+            "data_pil": str(_gdp[0])[:10],
             "score": round(clamp(100 - (ratio - 75) / 1.5)),   # alto = sopravvalutato = rosso
             "label": "Sopravvalutato" if ratio >= 150 else "Sottovalutato" if ratio <= 90 else "Equo",
         }
@@ -5257,8 +5266,15 @@ def compute_risk_metrics(rows, watch_rows=None):
             r["max_corr"] = round(float(cvals.max()), 2)
             r["max_corr_with"] = str(cvals.idxmax())
 
+    # ⚠⚠ v430 — LA FINESTRA E' PARTE DEL NUMERO. Sharpe, Sortino, VaR, ES, beta e correlazione
+    # media escono TUTTI da questo `df`, cioè dall'intersezione delle serie: quante sedute siano
+    # non era pubblicato da nessuna parte, mentre il blocco del drawdown nel pacchetto dichiara
+    # le proprie "~125 sedute". Due misure di rischio dello stesso libro, affiancate, su finestre
+    # diverse e una sola dichiarata: è la classe "denominatori non dichiarati" fra due blocchi.
     return {"sharpe": sharpe, "sortino": sortino, "portfolio_beta_ndx": port_beta,
             "avg_pairwise_corr": avg_pairwise,
+            "finestra_sedute": int(df.shape[0]),
+            "finestra_da": str(df.index[0].date()), "finestra_a": str(df.index[-1].date()),
             "var95_1d_pct": var95_1d_pct, "es95_1d_pct": es95_1d_pct,
             "var95_hist_pct": var95_hist_pct, "es95_hist_pct": es95_hist_pct}
 

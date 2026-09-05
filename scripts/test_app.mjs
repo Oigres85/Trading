@@ -6180,17 +6180,29 @@ check("v392 una serie mensile o trimestrale dichiara il PERIODO, non un giorno",
       && /riferito a [a-z]+ \\d{4}/.test(nfp)
       && !/riferito a \\d{2}\\/\\d{2}\\/\\d{4}/.test(nfp);`));
 
-check("v392 il trimestre dichiarato e' quello GIUSTO per ogni mese d'inizio", (() => {
-  /* la convenzione: la data e' il PRIMO giorno del trimestre. Gennaio->1°, aprile->2°,
-     luglio->3°, ottobre->4°. Un errore qui sposterebbe un dato di tre mesi. */
-  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
-  const i = src.indexOf("const periodo = (s) => {");
-  const b = src.slice(i, src.indexOf("const stessoGiorno", i));
-  const q = (m) => Math.floor((m - 1) / 3) + 1;
-  return /Math\.floor\(\(m - 1\) \/ 3\) \+ 1/.test(b)
-      && q(1) === 1 && q(4) === 2 && q(7) === 3 && q(10) === 4
-      && q(3) === 1 && q(6) === 2 && q(9) === 3 && q(12) === 4;
-})());
+/* ⚠⚠ Il gate cercava l'aritmetica del trimestre DENTRO `const periodo`, cioe' era ancorato al
+   LUOGO invece che alla proprieta': la v430 ha estratto quel calcolo in `trimestreEsteso` —
+   perche' serviva anche al rapporto di Buffett e riscriverlo sarebbe stata la classe v161 — e
+   il check e' andato rosso su codice piu' corretto di prima. Ora ESERCITA la funzione su tutti
+   e dodici i mesi: una proprieta' che nessuna riorganizzazione del file puo' rompere per caso,
+   e che l'aritmetica sbagliata viola per costruzione. */
+check("v392 il trimestre dichiarato e' quello GIUSTO per ogni mese d'inizio", suVeriEsito(`
+  const atteso = ["1°","1°","1°","2°","2°","2°","3°","3°","3°","4°","4°","4°"];
+  const primo = ["gennaio","aprile","luglio","ottobre"];
+  const ultimo = ["marzo","giugno","settembre","dicembre"];
+  const guai = [];
+  for (let m = 1; m <= 12; m++) {
+    const d = "2026-" + String(m).padStart(2, "0") + "-01";
+    const t = trimestreEsteso(d);
+    const q = Math.floor((m - 1) / 3);
+    if (t.indexOf(atteso[m - 1] + " trimestre 2026") !== 0) guai.push(d + " -> " + t);
+    else if (t.indexOf("(" + primo[q] + "-" + ultimo[q] + ")") < 0) guai.push(d + ": mesi sbagliati -> " + t);
+  }
+  /* e la riga di cadenza deve continuare a usarLO, non una seconda copia della convenzione */
+  const r = rigaCadenza("gdp", "2026-04-01");
+  if (r.indexOf("al 2° trimestre 2026 (aprile-giugno)") < 0)
+    guai.push("la riga di cadenza non passa piu' dal trimestre esteso: " + r.slice(0, 80));
+  return guai.length ? guai.slice(0, 4).join(" · ") : true;`));
 
 check("v392 l'eta' in giorni resta attaccata alla PUBBLICAZIONE, che e' cio' che misura", (() => {
   const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
@@ -6824,19 +6836,43 @@ check("v404 il peso su cui il dato manca si dichiara invece di finire fra gli au
 /* ═══ v405 — TRE ETICHETTE CHE DICEVANO PIU' (O ALTRO) DEL PROPRIO DATO ════════════════════
    Trovate leggendo il pacchetto macro come il modello che lo riceve. Nessuna rompeva niente:
    sono la classe dei difetti che non si rompono, e si vedono solo eseguendo il payload. */
-check("v405 l'ampiezza non chiama 'rally' un mese in cui entrambi gli indici scendono", suVeri(`
+/* ⚠⚠ TRENTUNESIMA ROTTURA DI UN CHECK ANCORATO A UNA STRINGA LETTERALE, e della specie
+   peggiore: il secondo di questi due PRETENDEVA la parola "rally", cioe' esattamente
+   l'etichetta che la v430 ha tolto perche' afferma una grandezza che la riga non misura.
+   Un gate che pinna un difetto lo rende permanente (v326, v411, v415).
+   L'invariante della v405 non era la parola ma il VERSO: lo da' il cap-pesato, e con
+   entrambi gli indici in calo la riga non descrive una salita. Riagganciato li', e il verso
+   si esercita in tutti e tre gli stati costruendoli. */
+check("v405 il verso dell'ampiezza lo da' il cap-pesato, in tutti e tre gli stati", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const riga = () => (buildPrompt().split(NL).find(r => r.indexOf("- Ampiezza di mercato") === 0) || "");
+  const guai = [];
   DATA.macro = DATA.macro || {};
-  DATA.macro.breadth = { spy_1m_pct: -0.8, rsp_1m_pct: -0.74, divergence_pp: -0.06, alert: false };
-  const p = buildPrompt();
-  return p.indexOf("discesa con partecipazione uniforme") >= 0
-      && p.indexOf("rally con partecipazione") < 0;`));
-
-check("v405 con entrambi in rialzo l'ampiezza torna a chiamarlo rally", suVeri(`
-  DATA.macro = DATA.macro || {};
-  DATA.macro.breadth = { spy_1m_pct: 2.1, rsp_1m_pct: 1.9, divergence_pp: 0.2, alert: false };
-  const p = buildPrompt();
-  return p.indexOf("rally con partecipazione uniforme") >= 0
-      && p.indexOf("discesa con partecipazione") < 0;`));
+  const casi = [
+    [-0.8, -0.74, "ribasso", "rialzo"],
+    [2.1, 1.9, "rialzo", "ribasso"],
+    [0.21, 0.19, "rialzo", "ribasso"],
+    /* ⚠⚠ IL CASO CHE DISCRIMINA DAVVERO, e che la prima stesura non aveva: i due indici con
+       SEGNI OPPOSTI. Con tre casi concordi l'iniezione "leggi RSP invece di SPY" NON MORDEVA —
+       l'invariante e' proprio che il verso lo da' il cap-pesato, e senza un caso in cui i due
+       divergono il gate non lo misurava. E' la lezione v389/v419: l'iniezione va scelta fra i
+       casi che il gate DEVE prendere, e quando non morde la prima domanda e' se il gate
+       contenga il fenomeno. ⚠ L'allarme resta spento apposta: acceso, la riga passa dall'altro
+       ramo, che e' quello della divergenza e non quello del verso. */
+    [-0.5, 0.4, "ribasso", "rialzo"],
+  ];
+  for (const [spy, rsp, atteso, vietato] of casi) {
+    DATA.macro.breadth = { spy_1m_pct: spy, rsp_1m_pct: rsp, divergence_pp: spy - rsp, alert: false };
+    const r = riga();
+    if (!r) { guai.push("con SPY " + spy + " la riga non viene emessa"); continue; }
+    if (r.indexOf("mese in " + atteso) < 0) guai.push("con SPY " + spy + " il verso non e' 'mese in " + atteso + "'");
+    if (r.indexOf("mese in " + vietato) >= 0) guai.push("con SPY " + spy + " la riga descrive anche un mese in " + vietato);
+    if (r.indexOf("partecipazione uniforme") < 0) guai.push("con SPY " + spy + " sparisce la lettura dell'ampiezza");
+  }
+  /* e la divergenza ampia resta "trainata dalle megacap", che e' l'altra meta' della lettura */
+  DATA.macro.breadth = { spy_1m_pct: 3.4, rsp_1m_pct: 0.2, divergence_pp: 3.2, alert: false };
+  if (riga().indexOf("trainata dalle megacap") < 0) guai.push("con spread 3,2pp l'ampiezza non e' dichiarata trainata dalle megacap");
+  return guai.length ? guai.join(" · ") : true;`));
 
 /* ⚠ "rilassato" e' corretto contro la banda e falso contro la distribuzione: al 3° percentile
    il compenso per il rischio non ha piu' spazio dalla parte favorevole. Le due letture stavano
@@ -8852,6 +8888,112 @@ check("v428 il drawdown del titolo analizzato e' pubblicato anche fuori dai sett
   if (!fuori) guai.push("nessun titolo cade fuori dai sette: il check non sta misurando il caso per cui esiste");
   if (!dentro) guai.push("nessun titolo cade dentro i sette: il verso opposto non e' esercitato");
   return guai.length ? guai.slice(0, 4).join(" · ") : true;`));
+
+
+/* ══ v430 — QUATTRO DIFETTI TROVATI ESEGUENDO IL PACCHETTO MACRO COME IL SUO DESTINATARIO ══
+   Tre dei quattro sono la stessa forma: il pacchetto forniva da solo i falsi positivi del
+   proprio collaudo B5 — due valori per la stessa grandezza, o un'etichetta che afferma piu' del
+   dato. E' la classe che un LLM reale ha gia' segnalato in v409 sull'autonomia di cassa. */
+
+/* ⚠⚠ "RALLY" SU UN MESE DA +0,21%. La v405 aveva chiuso il SEGNO e lasciato aperta l'AMPIEZZA.
+   La proprieta' non e' "la parola rally e' vietata": e' che l'etichetta non affermi una
+   GRANDEZZA che la riga non misura. Esercitata sui tre versi, costruendo lo stato. */
+check("v430 l'ampiezza non chiama rally un mese quasi fermo", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const br = DATA.macro && DATA.macro.breadth;
+  if (!br) return "il data.json non ha il blocco ampiezza: il check non misura niente";
+  const riga = () => (buildCIOText().split(NL).find(r => r.indexOf("- Ampiezza di mercato") === 0) || "");
+  const guai = [];
+  const casi = [[0.21, 0.19, "in rialzo"], [-0.8, -0.74, "in ribasso"], [3.4, 0.2, "in rialzo"]];
+  for (const [spy, rsp, atteso] of casi) {
+    br.spy_1m_pct = spy; br.rsp_1m_pct = rsp; br.divergence_pp = spy - rsp; br.alert = false;
+    const r = riga();
+    if (!r) { guai.push("con SPY " + spy + " la riga dell'ampiezza non viene emessa"); continue; }
+    if (r.indexOf("rally") >= 0) guai.push("con SPY " + spy + "% a un mese la riga parla ancora di un rally");
+    if (r.indexOf("mese " + atteso) < 0) guai.push("con SPY " + spy + " manca il verso 'mese " + atteso + "'");
+  }
+  /* e il fatto deve restare pubblicato: un check sulla sola assenza passerebbe anche se la riga
+     smettesse di portare i due numeri (v406). */
+  br.spy_1m_pct = 0.21; br.rsp_1m_pct = 0.19; br.divergence_pp = 0.02;
+  if (riga().indexOf("+0,21%") < 0) guai.push("la riga non pubblica piu' il movimento del cap-pesato");
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ IL RAPPORTO DI BUFFETT HA DUE DATE E NON NE DICHIARAVA NESSUNA. Istruzione permanente del
+   CEO (v396): ultimo dato con la sua data, o "dato non disponibile". Il check percorre ENTRAMBI
+   i rami — con le date e senza — perche' il ramo del ripiego e' quello che gira finche' il CI
+   non ha rigenerato, ed e' proprio quello che nessuna lettura del pacchetto vedrebbe. */
+check("v430 il rapporto di Buffett dichiara le proprie due date, o che non le ha", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const b = DATA.macro && DATA.macro.buffett;
+  if (!b) return "il data.json non ha il rapporto di Buffett: il check non misura niente";
+  const riga = () => (buildCIOText().split(NL).find(r => r.indexOf("- CAPITALIZZAZIONE DEL MERCATO SU PIL") === 0) || "");
+  const guai = [];
+  delete b.data_borsa; delete b.data_pil;
+  const senza = riga();
+  if (!senza) guai.push("senza le date la riga di Buffett sparisce del tutto");
+  if (senza.indexOf("NON SONO DISPONIBILI") < 0)
+    guai.push("senza le date il pacchetto pubblica il rapporto senza dire che non e' databile");
+  b.data_borsa = "2026-09-04"; b.data_pil = "2026-04-01";
+  const con = riga();
+  if (con.indexOf("04/09/2026") < 0) guai.push("con le date manca la chiusura di borsa del numeratore");
+  if (con.indexOf("2° trimestre 2026") < 0) guai.push("con le date il PIL non esce come PERIODO (classe v392)");
+  if (con.indexOf("NON SONO DISPONIBILI") >= 0) guai.push("con le date il pacchetto dichiara comunque di non averle");
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ SHARPE, SORTINO, VaR, ES, BETA E CORRELAZIONE MEDIA senza la propria finestra, accanto a un
+   drawdown che dichiara le sue ~125 sedute: due misure di rischio dello stesso libro su due basi
+   e una sola dichiarata. Anche qui i due rami, perche' il ripiego e' quello di oggi. */
+check("v430 le misure di rischio della pipeline portano la propria finestra", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const t = DATA.totals || (DATA.totals = {});
+  const righe = () => { const p = buildCIOText().split(NL); return [
+    p.find(r => r.indexOf("- EFFICIENZA DEL LIBRO") === 0) || "",
+    p.find(r => r.indexOf("RISCHIO DEL LIBRO NEL SUO INSIEME") === 0) || ""]; };
+  const guai = [];
+  delete t.finestra_sedute; delete t.finestra_da; delete t.finestra_a;
+  for (const r of righe()) {
+    if (!r) { guai.push("una delle due righe di rischio non viene emessa"); continue; }
+    if (r.indexOf("non dichiara") < 0) guai.push("senza la finestra la riga non dichiara di non averla");
+  }
+  t.finestra_sedute = 373; t.finestra_da = "2025-03-04"; t.finestra_a = "2026-09-04";
+  const [eff, tot] = righe();
+  if (eff.indexOf("su 373 sedute") < 0) guai.push("l'efficienza del libro non pubblica la finestra");
+  if (tot.indexOf("su 373 sedute") < 0) guai.push("VaR/ES/beta/correlazione non pubblicano la finestra");
+  if (tot.indexOf("04/03/2025") < 0 || tot.indexOf("04/09/2026") < 0) guai.push("gli estremi della finestra non escono");
+  if (tot.indexOf("NON e' la finestra del drawdown") < 0)
+    guai.push("non e' dichiarato che le due basi sono diverse da quella del drawdown");
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ LA FORMULA STAMPATA NON RIPRODUCEVA IL NUMERO STAMPATO: il pacchetto scriveva la forma a
+   PESI UGUALI mentre `effettive()` usa l'Herfindahl dei pesi veri (con k=12 e rho 0,35 la
+   formula pubblicata da' 2,47 contro il 2,3 pubblicato). Il check non guarda la stringa — sarebbe
+   la trentunesima rottura di un ancoraggio letterale — ma la PROPRIETA': la formula pubblicata,
+   applicata ai numeri che il pacchetto pubblica, deve dare il numero che il pacchetto pubblica. */
+check("v430 la formula delle scommesse effettive riproduce il numero pubblicato", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const p = buildCIOText();
+  const guai = [];
+  const rigaProfili = p.split(NL).find(r => r.indexOf("- Il tuo libro:") === 0) || "";
+  const m = rigaProfili.match(/scommesse effettive ([0-9]+[.,][0-9]+) su ([0-9]+) nomi/);
+  if (!m) return "il profilo del libro non pubblica le scommesse effettive: il check non misura niente";
+  const eff = Number(String(m[1]).replace(",", ".")), k = Number(m[2]);
+  const rc = p.split(NL).find(r => r.indexOf("RISCHIO DEL LIBRO NEL SUO INSIEME") === 0) || "";
+  const mr = rc.match(/correlazione media fra le posizioni ([0-9]+[.,][0-9]+)/);
+  if (!mr) return "la correlazione media non e' pubblicata: il check non misura niente";
+  const rho = Number(String(mr[1]).replace(",", "."));
+  /* la forma a pesi uguali: e' quella che il pacchetto stampava, ed e' quella che NON torna */
+  const uguali = 1 / (1 / k + (k - 1) / k * rho);
+  if (Math.abs(uguali - eff) < 0.05)
+    guai.push("su questo libro le due forme coincidono: il check non discrimina (peso quasi uniforme)");
+  /* la forma dichiarata deve nominare l'Herfindahl, cioe' la grandezza che spiega lo scarto */
+  const dove = p.split(NL).filter(r => r.indexOf("SCOMMESSE EFFETTIVE") >= 0 || r.indexOf("paniere di poche idee") >= 0);
+  if (dove.length < 2) guai.push("la formula non compare in entrambi i punti di stampa");
+  for (const r of dove) {
+    if (r.indexOf("Herfindahl") < 0)
+      guai.push("un punto di stampa dichiara ancora la forma a pesi uguali, che non riproduce il numero");
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
 
 let fail = 0;
 for (const [name, ok] of T) {
