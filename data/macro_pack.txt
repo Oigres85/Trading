@@ -1,4 +1,4 @@
-⟦ BUILD v430 · generato 05/09/2026 08:09 ⟧
+⟦ BUILD v430 · generato 05/09/2026 08:42 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 05/09/2026, 08:09:25 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 04:09, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -0,02% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~53.4h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 05/09/2026, 08:42:21 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 04:42, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -0,06% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~52.8h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 05/09/2026, 08:09:25, prossimo run 05/09/2026, 09:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 05/09/2026, 08:42:21, prossimo run 05/09/2026, 09:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-04) · Curva 10A-3M (2026-09-04) · Treasury USA 30A (2026-09-03) · Tasso reale 10A (TIPS) (2026-09-03) · Inflazione attesa 10A (breakeven) (2026-09-04) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -99,7 +99,7 @@ QUADRO MACRO:
       The global bond selloff is proving no wrecking ball for Wall Street, repricing the cost of money without setting off the usual scramble out of risk assets.
     · [Bloomberg, 12h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Algorithm Research CEO on Interest Rates Expectations
       Ketaki Sharma, founder and CEO of Algorithm Research, says the inflation is the main factor to watch in assessing the the bond market and the Federal Reserve’s next move. She speaks on "Horizons: Middle East and Africa." (Source: Bloomberg)
-    · [Bloomberg, 12h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Honey Deuces, Tickets, Merch: US Open Spending
+    · [Bloomberg, 13h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Honey Deuces, Tickets, Merch: US Open Spending
       Bloomberg's Lisa Mateo joins Scarlet Fu and Tom Keene on "Bloomberg Money." They discuss how people are spending their money at the US Open. (Source: Bloomberg)
     · [CNBC Economia, 14h fa] Women accounted for almost all of job gains in August. Here's why
       Women accounted for virtually all of August's payroll gains, the latest sign of their growing power in the labor market.
@@ -109,9 +109,7 @@ QUADRO MACRO:
       Shares of Fair Isaac Corp., Equifax Inc. and TransUnion tumbled on Friday after Federal Housing Finance Agency Director Bill Pulte renewed his long-standing criticism of the costs of consumer credit scores.
     · [CNBC Economia, 18h fa] The big business of personal protection: How private security became a $50 billion industry
       Private security spending and guard employment have climbed as companies and communities respond to high-profile attacks, even as violent crime falls.
-    · [Bloomberg, 19h fa] Bond Traders Boost Fed-Hike Odds After Jobs, Await Inflation
-      Treasuries capped a choppy week of trading with higher short-term yields after a stronger-than-expected employment report on Friday nudged up expectations for a Federal Reserve interest-rate hike this month. Next week, key inflation data looms.
-    · [Bloomberg, 20h fa] S&P 500 Ends Week Flat as Strong Jobs Growth Fuels Fed-Hike Bets
+    · [Bloomberg, 21h fa] S&P 500 Ends Week Flat as Strong Jobs Growth Fuels Fed-Hike Bets
       US stocks finished lower on Friday as the American economy ​added more jobs than expected in August, raising expectations that the Federal Reserve may hike interest rates soon.
     · [Bloomberg, 32h fa] Dollar Posts Weekly Loss as Yen Jumps Amid Shifting Rate Bets
       The dollar slid to start September as mixed signals on the Federal Reserve’s next move kept traders on edge ahead of a pivotal inflation report, while a surging yen reverberated across global currency markets.
@@ -119,6 +117,8 @@ QUADRO MACRO:
       A stronger-than-anticipated increase in US jobs drove stocks and short-dated notes lower, with traders boosting their bets the Federal Reserve will raise rates this month.
     · [CNBC Economia, 37h fa] The big August jobs report is due out Friday. Here's what to expect for what has been a jobless summer
       August nonfarm payrolls are expected to rise by 53,000 as a subdued labor market keeps Fed attention focused on inflation.
+    · [CNBC Economia, 43h fa] Fed Governor Waller indicates he will support holding rates steady at September meeting
+      In remarks that seem to contrast with statements last week from Chairman Kevin Warsh, Waller expressed confidence in the current inflation trends.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-09-11 Inflazione CPI (a/a) (precedente 3.4%) · 2026-09-16 Vendite al dettaglio (m/m) (precedente -0.6%) · 2026-09-17 Manifattura Philly Fed (al posto dell'ISM) (precedente +47.4). ⚠ Per 3 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich), Curva 10A-2A, Treasury USA 30A): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 3 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-3M, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-09-10 ORCL. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
 - Forward P/E S&P 500 [FORWARD, fonte: WSJ (estimate) — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: 21.2× vs media storica 16.5× (Elevato). Valutazioni tese, e la leva va letta CON IL SUO ORIZZONTE: il livello alto dice quanto carburante c'e', ma il verso cambia col periodo che si guarda — i tre orizzonti stanno nella riga LEVA DEGLI OPERATORI qui sotto, e non concordano.
@@ -242,33 +242,33 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (74,3% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 17h fa] Intel Witnesses an Uptrend in Estimate Revisions: Is it Worth Buying?
+  [AMD] · [Nasdaq, 18h fa] Intel Witnesses an Uptrend in Estimate Revisions: Is it Worth Buying?
       INTC's estimate revisions point higher as AI demand, manufacturing gains and expanding custom silicon offset supply and competition risks.
   [AMD] · [Nasdaq, 18h fa] SMCI Rises 29% Year to Date: Time to Buy, Sell or Hold the Stock?
       Super Micro Computer gains 29% YTD as record backlog, AI partnerships and rising shipments fuel growth, while improving margins add to its appeal.
-  [BE] · [Nasdaq, 18h fa] Zacks Investment Ideas feature highlights: Bloom Energy and Tesla
+  [BE] · [Nasdaq, 19h fa] Zacks Investment Ideas feature highlights: Bloom Energy and Tesla
       Bloom Energy's on-site power systems could help address AI data center power shortages as grid bottlenecks persist and demand accelerates.
-  [BE] · [Nasdaq, 37h fa] Bloom Energy: Unlocking Massive Growth Behind the Meter
+  [BE] · [Nasdaq, 38h fa] Bloom Energy: Unlocking Massive Growth Behind the Meter
       As long-term grid bottlenecks clash with the relentless power requirements of AI, off-grid energy generation has become a necessity.
   [CRWV] · [Nasdaq, 14h fa] BigBear.ai vs. CoreWeave: Evaluating the Better Artificial Intelligence Stock to Buy for 2026
       Key PointsBigBear.ai provides decision-intelligence software used by national security and supply chain organizations to navigate complex data environments.
-  [CRWV] · [Nasdaq, 17h fa] Will Nebius Group's Mega AI Deals Power Its 2027 Growth Story?
+  [CRWV] · [Nasdaq, 18h fa] Will Nebius Group's Mega AI Deals Power Its 2027 Growth Story?
       NBIS is building toward 2027 growth as multibillion-dollar AI cloud deals, premium pricing and major capacity expansion strengthen its revenue outlook.
   [MRVL] · [Nasdaq, 15h fa] Noteworthy Friday Option Activity: GE, MRVL, SNPS
       Looking at options trading activity among components of the S&amp;P 500 index, there is noteworthy activity today in GE Aerospace (Symbol: GE), where a total volume of 35,893 contracts has been traded thus far today, a contract volume which is representative of approximately 3.6
   [MRVL] · [Nasdaq, 15h fa] Why Marvell Stock Rallied Today
       Key PointsAI chip and infrastructure stocks got a lift from Nvidia's acquisition of Hugging Face.
-  [MU] · [Nasdaq, 9h fa] Why ASML Holding Stock Bumped 4% Higher Today
+  [MU] · [Nasdaq, 10h fa] Why ASML Holding Stock Bumped 4% Higher Today
       Key PointsASML specializes in the lithography systems that "print" circuits onto chips.
-  [MU] · [Nasdaq, 10h fa] Looking Ahead to the Q3 Earnings Season: What to Expect
+  [MU] · [Nasdaq, 11h fa] Looking Ahead to the Q3 Earnings Season: What to Expect
       2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.
   [NVDA] · [Nasdaq, 10h fa] Broadcom (AVGO) Stock Is Down After Q3 Earnings: Is It Too Soon to Buy the Dip?
       Despite posting strong quarterly results this week, Broadcom stock is down almost 15% over the last month and more than 25% below its all-time high reached in June.
-  [NVDA] · [Nasdaq, 10h fa] Looking Ahead to the Q3 Earnings Season: What to Expect
+  [NVDA] · [Nasdaq, 11h fa] Looking Ahead to the Q3 Earnings Season: What to Expect
       2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.
-  [ORCL] · [Nasdaq, 10h fa] Looking Ahead to the Q3 Earnings Season: What to Expect
+  [ORCL] · [Nasdaq, 11h fa] Looking Ahead to the Q3 Earnings Season: What to Expect
       2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.
-  [ORCL] · [Nasdaq, 17h fa] Snowflake Gains 17% Post Q2 Earnings: Buy, Sell or Hold the Stock?
+  [ORCL] · [Nasdaq, 18h fa] Snowflake Gains 17% Post Q2 Earnings: Buy, Sell or Hold the Stock?
       SNOW stock jumps 16.6% after Q2 second-quarter results as AI adoption, enterprise growth, and higher product revenue guidance fuel momentum.
   [RGTI] · [Nasdaq, 10h fa] Rigetti Computing Stock: Time to Buy This Quantum Computing Stock?
       Investors are hopeful that quantum stocks could be the next thing to soar after AI stocks.
