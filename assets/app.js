@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "427";
+const BUILD_VERSION = "429";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1870,6 +1870,42 @@ function cadenzaDato(chiave, dataRilevazione) {
   const _passate = _valide(_uff && _uff.passate).filter((x) => new Date(x + "T00:00:00") <= oggi);
 
   const pubblicato = _passate.length ? _passate[_passate.length - 1] : null;
+  /* ⚠⚠ v428 — "ULTIMA USCITA 0 GIORNI FA" ACCANTO A UN'OSSERVAZIONE VECCHIA DI UN PERIODO.
+     `pubblicato` e' l'ultima uscita GIA' AVVENUTA DELLA SERIE, letta dal calendario ufficiale:
+     NON e' la data in cui e' stato pubblicato il valore che il pacchetto porta. Quando l'uscita
+     e' appena avvenuta ma la pipeline ha ancora l'osservazione del periodo precedente, la riga
+     accoppia un valore superato a "0 giorni fa", e "0 giorni fa" si legge come freschezza del
+     VALORE.
+     Misurato il 04/09/2026 eseguendo il pacchetto con la ricerca web: la riga diceva
+     `Non-Farm Payrolls: -23K (riferito a luglio 2026 · ultima uscita 04/09/2026 (0 giorni fa))`
+     e l'uscita del 04/09 era il rapporto di AGOSTO, +162.000 contro attese di +53.000. Stesso
+     caso sulla disoccupazione. E' il dato macro che quel giorno ha spostato di ~8 punti le
+     probabilita' di rialzo a dodici giorni dal FOMC.
+     ⚠ E' la famiglia v392 — il periodo descritto e la data di pubblicazione sono due cose
+     diverse — su un campo che finora le teneva insieme senza dirlo.
+     ⚠ LA REGOLA NON INVENTA SOGLIE: usa solo cio' che il sistema ha. Se l'ultima uscita cade
+     oltre UN PASSO DI CADENZA dopo la fine del periodo che portiamo, quella uscita ha quasi
+     certamente coperto un periodo che qui non c'e'. Verificato riga per riga sul pacchetto
+     vero: scatta su NFP e disoccupazione (uscita 04/09 su luglio), tace su CPI (12/08 su
+     luglio), PIL (26/08 sul 2° trimestre), vendite al dettaglio (14/08 su luglio), Philly Fed
+     (20/08 su agosto) e sulle serie giornaliere. */
+  const _passoGiorni = { giornaliero: 1, settimanale: 7, mensile: 31, trimestrale: 92 }[c.passo] || null;
+  const _fine = (() => {
+    const t = String(dataRilevazione).slice(0, 10);
+    if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(t) || !_passoGiorni) return null;
+    if (_passoGiorni <= 7) return new Date(t + "T00:00:00");
+    const a = Number(t.slice(0, 4)), m = Number(t.slice(5, 7));
+    const mesi = _passoGiorni >= 92 ? 3 : 1;
+    return new Date(Date.UTC(a, m - 1 + mesi, 0));       // ultimo giorno del periodo
+  })();
+  /* ⚠ SOLO SULLE SERIE A PERIODO. Su una giornaliera il "passo" e' un giorno LAVORATIVO — fra
+     venerdi' e lunedi' ne passano tre di calendario — e un giorno di ritardo di pubblicazione e'
+     la norma, non un periodo mancante: la prima stesura faceva scattare l'avviso sul TIPS a
+     10 anni (osservazione del 02/09, uscita del 04/09), che e' un ritardo ordinario. L'avviso
+     esiste per il caso in cui manca un PERIODO INTERO, e la data dell'osservazione sta gia'
+     scritta sulla riga. Verificato contro il testo vero prima di correggere (v417). */
+  const superato = !!(pubblicato && _fine && _passoGiorni > 7
+    && new Date(pubblicato + "T00:00:00") - _fine > _passoGiorni * 86400000);
   const prossimo = _prossime.length ? _prossime[0] : null;
   const eta = pubblicato
     ? Math.max(0, Math.round((oggi - new Date(pubblicato + "T00:00:00")) / 86400000))
@@ -1882,7 +1918,7 @@ function cadenzaDato(chiave, dataRilevazione) {
     /* null non e' "zero": chi stampa deve scrivere "dato non disponibile", non un trattino
        che si legge come "nessun aggiornamento previsto" (la lezione del buco che non e' uno
        zero, v205, applicata alle date). */
-    pubblicato, eta, prossimo,
+    pubblicato, eta, prossimo, superato,
     confermato: !!prossimo,
     calendario: (_uff && _uff.release) || null,
     passo: c.passo, fonte: c.nome, nota: c.nota,
@@ -1931,6 +1967,12 @@ function rigaCadenza(chiave, dataRilevazione) {
   return `riferito ${periodo(c.rilevato)}`
     + ` · acquisito ${c.acquisito ? "il " + it(c.acquisito) : ND}`
     + ` · ultima uscita ${c.pubblicato ? `${it(c.pubblicato)} (${c.eta} giorni fa)` : ND}`
+    + (c.superato
+        ? ` ⚠⚠ QUELL'USCITA NON E' QUELLA DI QUESTO VALORE: cade oltre un passo di cadenza dopo `
+          + `la fine del periodo qui sopra, quindi ha pubblicato un periodo PIU' RECENTE che il `
+          + `sistema non ha ancora. Il numero che leggi e' superato: cerca online l'ultimo, e `
+          + `usa quello`
+        : "")
     + ` · prossimo aggiornamento ${c.prossimo
         ? `${it(c.prossimo)} (calendario ufficiale${c.calendario ? ", " + c.calendario : ""}, via FRED)`
         : ND}`
@@ -11078,6 +11120,29 @@ function contestoPortafoglio(tkCorrente) {
       + `e quante sedute sono passate dal picco al ritorno su quel livello): `
       + dds.slice(0, 6).map(x => `${x.tk} ${x.d.pct.toFixed(0)}% (${x.d.sedute} sedute sott'acqua${x.d.recuperato ? "" : ", NON ancora recuperato"})`).join(" · ")
       + `${dds.length > 6 ? ` · il meno profondo del libro: ${dds[dds.length - 1].tk} ${dds[dds.length - 1].d.pct.toFixed(0)}%` : ""}`
+      /* ⚠⚠ v428 — IL BLOCCO 8 CHIEDE UN CONFRONTO CHE LA CODA NON PERMETTEVA. Le istruzioni
+         ordinano: "LA DISCESA IN CORSO E' ORDINARIA O E' UNA ROTTURA? Confronta il drawdown
+         attuale del titolo con quello massimo gia' avvenuto e con le sedute che ci sono volute
+         per recuperarlo". E qui si pubblicavano solo i SEI piu' profondi piu' il meno profondo:
+         per qualunque titolo che non stia in quei sette — cioe' il caso comune — il numero da
+         confrontare NON C'ERA, e la domanda restava senza metro.
+         Trovato eseguendo il pacchetto su MU (-23,6% dal massimo a 52 settimane, e nessun
+         drawdown proprio pubblicato). E' la classe C10: un'istruzione che rimanda a un dato che
+         la coda non porta.
+         ⚠ Stessa derivazione (`dd`), nessun secondo calcolo: si aggiunge la riga del titolo in
+         esame quando l'elenco non la contiene gia'. */
+      + (() => {
+        const tk = String(tkCorrente || "").toUpperCase();
+        if (!tk) return "";
+        const mio = dds.find(x => String(x.tk).toUpperCase() === tk);
+        if (!mio) return "";
+        const gia = dds.slice(0, 6).concat(dds.length > 6 ? [dds[dds.length - 1]] : []);
+        if (gia.some(x => String(x.tk).toUpperCase() === tk)) return "";
+        return ` · ⚠ e il titolo di questa analisi, che non e' fra i piu' profondi ne' il meno `
+          + `profondo: ${mio.tk} ${mio.d.pct.toFixed(0)}% (${mio.d.sedute} sedute sott'acqua`
+          + `${mio.d.recuperato ? "" : ", NON ancora recuperato"}) — e' il metro con cui misurare `
+          + `se la sua discesa attuale sia ordinaria per lui`;
+      })()
       + `. ⚠ E' il calo gia' AVVENUTO, non una previsione: serve a sapere quanto e' ordinario per questi titoli, `
       + `perche' una discesa dentro quel range non e' una rottura della tesi e una fuori lo e'.`);
   }

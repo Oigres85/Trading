@@ -4037,6 +4037,81 @@ ragione per cui in v421 una fonte muta non fa suonare il gate.
   > **Anche le iniezioni vanno fatte con `modifica_sicura`**, non solo le correzioni: lo strumento
   > esiste per rifiutare un risultato che non regge, e un'iniezione è una modifica come le altre.
 
+## 📅 v428 — "ULTIMA USCITA 0 GIORNI FA" ACCANTO A UN VALORE VECCHIO DI UN PERIODO
+
+Diciannovesimo giro, ed è il primo trovato **eseguendo il pacchetto con la ricerca web attiva** —
+cioè facendo la cosa che nessun gate può fare.
+
+`pubblicato` è l'ultima uscita già avvenuta **della serie**, letta dal calendario ufficiale FRED:
+non è la data in cui è stato pubblicato il valore che il pacchetto porta. Quando l'uscita è appena
+avvenuta ma la pipeline ha ancora l'osservazione del periodo precedente, la riga accoppia un
+valore superato a *"0 giorni fa"* — e "0 giorni fa" si legge come freschezza del **valore**.
+
+| il pacchetto scriveva | alla fonte |
+|---|---|
+| `Non-Farm Payrolls: -23K (riferito a luglio 2026 · ultima uscita 04/09/2026 (0 giorni fa))` | l'uscita del 04/09 era il rapporto di **agosto: +162.000** contro attese di +53.000 |
+| stessa forma su `Disoccupazione` | idem, 4,1% di agosto |
+
+⚠⚠ **È il dato macro che quel giorno ha spostato di ~8 punti le probabilità di rialzo**, a dodici
+giorni dal FOMC. Famiglia **v392** — il periodo descritto e la data di pubblicazione sono due cose
+diverse — su un campo che finora le teneva insieme senza dirlo.
+
+⚠ **La regola non inventa soglie**: usa il passo di cadenza che il sistema già dichiara. Se
+l'ultima uscita cade oltre UN passo dopo la fine del periodo portato, quell'uscita ha coperto un
+periodo che qui non c'è. Verificato riga per riga: scatta su NFP e disoccupazione, tace su CPI
+(12/08 su luglio), PIL (26/08 sul 2° trimestre), vendite al dettaglio, Philly Fed.
+
+⚠ **E NON vale sulle serie a periodo breve.** La prima stesura faceva scattare l'avviso sul TIPS a
+10 anni (osservazione del 02/09, uscita del 04/09): su una giornaliera il passo è un giorno
+LAVORATIVO e un giorno di ritardo di pubblicazione è la norma, non un periodo mancante. *Un
+allarme va verificato contro il testo vero prima di diventare una correzione* (v417).
+
+## 📉 v428 — IL BLOCCO 8 CHIEDEVA UN CONFRONTO CHE LA CODA NON PERMETTEVA
+
+Le istruzioni ordinano: *"LA DISCESA IN CORSO È ORDINARIA O È UNA ROTTURA? Confronta il drawdown
+attuale del titolo con quello massimo già avvenuto"*. E il pacchetto pubblicava solo i **sei più
+profondi** più il meno profondo: per qualunque titolo fuori da quei sette — **il caso comune** — il
+numero da confrontare non c'era.
+
+Trovato eseguendo il pacchetto su MU: −23,6% dal massimo a 52 settimane e nessun drawdown proprio
+pubblicato. Col numero (**−39%, 49 sedute sott'acqua**) la risposta cambia da *"non posso dirlo"* a
+*"la discesa è ordinaria per questo titolo"* — che è una conclusione diversa.
+
+⚠ Stessa derivazione (`dd`), nessun secondo calcolo: si aggiunge la riga del titolo in esame solo
+quando l'elenco non la contiene già, e nel pacchetto macro non compare affatto.
+
+### 🧪 Tre inciampi nei gate, tutti già scritti in questo file
+- **Una data iniettata nel FUTURO**: `_passate` scarta le uscite future, quindi `pubblicato`
+  restava null e il check era rosso su codice corretto.
+- **Un sotto-check verde per assenza**: pescava *"Curva 10A-2A"*, che ha una riga DEDICATA senza
+  "ultima uscita", quindi la sonda non poteva trovare la spia. Ora sceglie una giornaliera la cui
+  riga porta davvero la cadenza, **e se non ce n'è lo dichiara** invece di tacere.
+- **E la stessa iniezione futura, di nuovo**, sul ramo giornaliero: l'uscita iniettata dev'essere
+  di oggi, e l'osservazione di almeno due giorni fa — altrimenti il caso non discrimina nulla.
+
+## 🧭 v429 — DUE GATE CHE ANDAVANO ROSSI A CALENDARIO, SU CODICE CORRETTO
+
+Il `git pull --rebase` che porta i dati freschi del CI ha fatto cadere due check, **entrambi
+avendo torto**: il codice era giusto e a cambiare erano i dati del giorno. E' esattamente il buco
+descritto in v403 — *con la regola "si unisce sempre", la CI gira DOPO la pubblicazione, quindi
+la corsa locale dei gate e' l'unica protezione, e non gira sugli stessi dati.*
+
+| gate | perche' e' andato rosso |
+|---|---|
+| **v321** (il punteggio fuso e' il peggiore dei due) | pretendeva che disoccupazione e nuovi posti fossero **in disaccordo oggi**. Il rapporto di agosto e' uscito forte, i due si sono allineati, e il check ha smesso di trovare il fenomeno che misura |
+| **v428** (un valore superato dall'ultima uscita) | costruiva l'uscita iniettata partendo dalla data VERA della rilevazione. Quando la fine del periodo cade vicino a oggi non c'e' spazio per un'uscita "ben oltre" che sia anche **passata**, e il check si dichiarava *"non costruibile"* |
+
+> **Uno stato che si aspetta invece di costruirlo e' un check che vale finche' i dati lo
+> concedono.** Entrambi ora **iniettano** cio' che misurano: v321 mette 80 e 15 sui due
+> componenti del lavoro (e percorre anche il verso opposto — 62 e 58 non devono produrre un
+> disaccordo che non c'e'), v428 sposta la rilevazione **cinque mesi indietro**, cosi' le due
+> uscite iniettate sono nel passato per costruzione a qualunque ora giri la suite.
+
+⚠ Tre iniezioni per validarli, tutte con `modifica_sicura` (regola v427: **anche le iniezioni
+sono modifiche**, e una che rompe il file si legge come un gate che non morde): la fusione che
+tiene il punteggio di A, la guardia sul passo breve che cade, l'avviso che non viene mai emesso.
+Mordono tutte e tre — e la prima ne ha svegliato anche un secondo, `v321 per COSTRUZIONE`.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
