@@ -8725,6 +8725,110 @@ check("v427 il pacchetto dichiara quando i pesi sono piu' freschi delle quote di
   } finally { POSIZIONI_LOCALI_MODIFICATE = JSON.parse(salva); }
   return guai.length ? guai.join(" · ") : true;`));
 
+/* ⚠⚠ v428 — "ULTIMA USCITA 0 GIORNI FA" ACCANTO A UN VALORE VECCHIO DI UN PERIODO.
+   `pubblicato` e' l'ultima uscita gia' avvenuta DELLA SERIE, dal calendario ufficiale: non e' la
+   data in cui e' stato pubblicato il valore che il pacchetto porta. Quando l'uscita e' appena
+   avvenuta ma la pipeline ha ancora l'osservazione precedente, la riga accoppia un valore
+   superato a "0 giorni fa" — che si legge come freschezza del VALORE.
+   Misurato il 04/09/2026 eseguendo il pacchetto con la ricerca web attiva: la riga dei Non-Farm
+   Payrolls dava -23K di LUGLIO con "ultima uscita 04/09 (0 giorni fa)", e l'uscita del 04/09 era
+   il rapporto di AGOSTO (+162.000 contro attese di +53.000). Idem la disoccupazione. E' il dato
+   che quel giorno ha spostato di ~8 punti le probabilita' di rialzo, a dodici giorni dal FOMC.
+   ⚠ Famiglia v392: il periodo descritto e la data di pubblicazione sono due cose diverse.
+   ⚠ La regola non inventa soglie — usa il passo di cadenza che il sistema gia' dichiara — e
+   NON vale sulle serie a periodo breve, dove un giorno di ritardo e' la norma e non un periodo
+   mancante (il falso positivo sul TIPS a 10 anni, preso prima di pubblicare). */
+check("v428 un valore superato dall'ultima uscita della serie viene dichiarato tale", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const SPIA = "QUELL'USCITA NON E' QUELLA DI QUESTO VALORE";
+  const cal = DATA.macro && DATA.macro.calendario_uscite && DATA.macro.calendario_uscite.per_chiave;
+  if (!cal) return "il data.json non ha il calendario delle uscite: il check non misura niente";
+  const salva = JSON.stringify(cal);
+  const guai = [];
+  const riga = (etichetta) => (buildCIOText().split(NL).find(r => r.indexOf("- " + etichetta + ":") === 0) || "");
+  try {
+    /* stato COSTRUITO: un'uscita mensile due mesi dopo la fine del periodo portato. */
+    const ind = (DATA.macro.indicators || []).find(i => i && i.key === "nfp" && i.date);
+    if (!ind) return "nessun indicatore mensile con data: il check non misura niente";
+    /* ⚠ LA DATA INIETTATA DEV'ESSERE PASSATA: \`_passate\` scarta le uscite future, quindi la
+       prima stesura (periodo + 75 giorni) usciva nel futuro, \`pubblicato\` restava null e il
+       check era rosso su codice corretto. Si parte dalla FINE del periodo e si limita a oggi. */
+    const d0 = String(ind.date).slice(0, 10);
+    const fine = new Date(Date.UTC(Number(d0.slice(0, 4)), Number(d0.slice(5, 7)), 0));
+    const oggiISO = new Date().toISOString().slice(0, 10);
+    const tardi = new Date(Math.min(Date.now(), fine.getTime() + 40 * 86400000)).toISOString().slice(0, 10);
+    const presto = new Date(fine.getTime() + 5 * 86400000).toISOString().slice(0, 10);
+    if (tardi <= new Date(fine.getTime() + 31 * 86400000).toISOString().slice(0, 10))
+      return "oggi (" + oggiISO + ") e' troppo vicino alla fine del periodo: lo stato non e' costruibile";
+
+    cal[ind.key] = { passate: [tardi], prossime: [] };
+    if (riga(ind.label).indexOf(SPIA) < 0)
+      guai.push("uscita ben oltre il periodo portato e la riga non dichiara che il valore e' superato");
+
+    cal[ind.key] = { passate: [presto], prossime: [] };
+    if (riga(ind.label).indexOf(SPIA) >= 0)
+      guai.push("uscita DENTRO il periodo portato e la riga lo dichiara comunque superato");
+
+    /* ⚠ e su una serie GIORNALIERA non deve scattare: li' il passo e' un giorno lavorativo e un
+       ritardo di pubblicazione e' ordinario, non un periodo mancante. */
+    /* ⚠ NON BASTA CHE SIA GIORNALIERA: la riga deve passare davvero dalla cadenza. La prima
+       stesura pescava "Curva 10A-2A", che ha una riga DEDICATA senza "ultima uscita": la sonda
+       non poteva trovare la spia e il sotto-check era verde per assenza del fenomeno — la
+       trappola pagata quattro volte in questo progetto. Ora si prende una giornaliera la cui
+       riga porta davvero la cadenza, e se non ce n'e' il check lo DICE invece di tacere. */
+    const gio = (DATA.macro.indicators || []).find(i => i && i.date
+      && typeof CADENZA_FONTE !== "undefined" && CADENZA_FONTE[i.key]
+      && CADENZA_FONTE[i.key].passo === "giornaliero"
+      && riga(i.label).indexOf("ultima uscita") >= 0
+      /* ⚠ e l'osservazione dev'essere di almeno due giorni fa: e' la sola condizione in cui una
+         giornaliera puo' superare il proprio passo. Con un'osservazione di ieri l'iniezione non
+         discriminerebbe nulla e il sotto-check sarebbe verde comunque. */
+      && Date.now() - Date.parse(String(i.date).slice(0, 10) + "T00:00:00") >= 2 * 86400000);
+    if (!gio) guai.push("nessuna serie giornaliera con osservazione di due giorni fa: il ramo del falso positivo non e' esercitato");
+    if (gio) {
+      /* l'uscita iniettata e' OGGI: passata per costruzione, e oltre un giorno dall'osservazione. */
+      cal[gio.key] = { passate: [new Date().toISOString().slice(0, 10)], prossime: [] };
+      if (riga(gio.label).indexOf(SPIA) >= 0)
+        guai.push("su una serie giornaliera un ritardo ordinario di pubblicazione fa scattare l'avviso");
+    }
+  } finally { Object.assign(cal, JSON.parse(salva)); }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v428 — IL BLOCCO 8 CHIEDEVA UN CONFRONTO CHE LA CODA NON PERMETTEVA: "confronta il
+   drawdown attuale del titolo con quello massimo gia' avvenuto". Il pacchetto pubblicava solo i
+   SEI piu' profondi piu' il meno profondo, quindi per qualunque titolo fuori da quei sette — il
+   caso comune — il numero da confrontare non c'era. Trovato eseguendo il pacchetto su MU.
+   ⚠ Il check percorre i DUE versi: il titolo fuori dai sette lo ottiene, e chi c'e' gia' non
+   viene stampato due volte. E nel pacchetto MACRO la riga non deve comparire: li' non c'e' un
+   titolo in esame. */
+check("v428 il drawdown del titolo analizzato e' pubblicato anche fuori dai sette dell'elenco", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const SPIA = "e il titolo di questa analisi";
+  const rigaDD = (p) => (p.split(NL).find(r => r.indexOf("DRAWDOWN MASSIMO delle singole") === 0) || "");
+  const guai = [];
+
+  if (rigaDD(buildCIOText()).indexOf(SPIA) >= 0)
+    guai.push("il pacchetto macro aggiunge la riga del titolo in esame, che li' non esiste");
+
+  const az = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r && r.qta > 0 && r.sparks && Array.isArray(r.sparks.m6) && r.sparks.m6.length >= 30);
+  if (az.length < 8) return "meno di otto posizioni con serie: il check non misura niente";
+
+  let fuori = 0, dentro = 0;
+  for (const r of az) {
+    const tk = String(r.ticker).toUpperCase();
+    const riga = rigaDD(buildPromptTicker(tk));
+    if (!riga) { guai.push(tk + ": il blocco drawdown non c'e' affatto"); continue; }
+    /* il titolo compare nell'elenco principale? allora NON deve esserci la riga aggiunta. */
+    const nellElenco = riga.slice(0, riga.indexOf(SPIA) >= 0 ? riga.indexOf(SPIA) : riga.length)
+      .indexOf(tk + " -") >= 0;
+    if (nellElenco) { dentro++; if (riga.indexOf(SPIA) >= 0) guai.push(tk + ": e' gia' nell'elenco e viene stampato due volte"); }
+    else { fuori++; if (riga.indexOf(SPIA) < 0) guai.push(tk + ": non e' fra i sette e il suo drawdown non viene pubblicato"); }
+  }
+  if (!fuori) guai.push("nessun titolo cade fuori dai sette: il check non sta misurando il caso per cui esiste");
+  if (!dentro) guai.push("nessun titolo cade dentro i sette: il verso opposto non e' esercitato");
+  return guai.length ? guai.slice(0, 4).join(" · ") : true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
