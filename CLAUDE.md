@@ -4089,6 +4089,29 @@ quando l'elenco non la contiene già, e nel pacchetto macro non compare affatto.
 - **E la stessa iniezione futura, di nuovo**, sul ramo giornaliero: l'uscita iniettata dev'essere
   di oggi, e l'osservazione di almeno due giorni fa — altrimenti il caso non discrimina nulla.
 
+## 🧭 v429 — DUE GATE CHE ANDAVANO ROSSI A CALENDARIO, SU CODICE CORRETTO
+
+Il `git pull --rebase` che porta i dati freschi del CI ha fatto cadere due check, **entrambi
+avendo torto**: il codice era giusto e a cambiare erano i dati del giorno. E' esattamente il buco
+descritto in v403 — *con la regola "si unisce sempre", la CI gira DOPO la pubblicazione, quindi
+la corsa locale dei gate e' l'unica protezione, e non gira sugli stessi dati.*
+
+| gate | perche' e' andato rosso |
+|---|---|
+| **v321** (il punteggio fuso e' il peggiore dei due) | pretendeva che disoccupazione e nuovi posti fossero **in disaccordo oggi**. Il rapporto di agosto e' uscito forte, i due si sono allineati, e il check ha smesso di trovare il fenomeno che misura |
+| **v428** (un valore superato dall'ultima uscita) | costruiva l'uscita iniettata partendo dalla data VERA della rilevazione. Quando la fine del periodo cade vicino a oggi non c'e' spazio per un'uscita "ben oltre" che sia anche **passata**, e il check si dichiarava *"non costruibile"* |
+
+> **Uno stato che si aspetta invece di costruirlo e' un check che vale finche' i dati lo
+> concedono.** Entrambi ora **iniettano** cio' che misurano: v321 mette 80 e 15 sui due
+> componenti del lavoro (e percorre anche il verso opposto — 62 e 58 non devono produrre un
+> disaccordo che non c'e'), v428 sposta la rilevazione **cinque mesi indietro**, cosi' le due
+> uscite iniettate sono nel passato per costruzione a qualunque ora giri la suite.
+
+⚠ Tre iniezioni per validarli, tutte con `modifica_sicura` (regola v427: **anche le iniezioni
+sono modifiche**, e una che rompe il file si legge come un gate che non morde): la fusione che
+tiene il punteggio di A, la guardia sul passo breve che cade, l'avviso che non viene mai emesso.
+Mordono tutte e tre — e la prima ne ha svegliato anche un secondo, `v321 per COSTRUZIONE`.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

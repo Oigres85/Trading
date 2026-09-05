@@ -2883,13 +2883,30 @@ check("v321 dati: nessuna tessera legge un campo che in data.json non esiste", (
    nuovi posti stavano a 19, con "-23K" stampato due centimetri sotto: il punteggio peggiore
    spariva dalla pagina insieme alla tessera che lo portava. Una fusione puo' unire due VISTE
    della stessa cosa, non due giudizi opposti. */
-check("v321 fusioni: il punteggio fuso e' il PEGGIORE dei due, e lo scarto resta visibile", suVeri(`
-  const u = (DATA.macro && DATA.macro.indicators || []).find(x => x && x.key === "unemp");
-  const n = (DATA.macro && DATA.macro.indicators || []).find(x => x && x.key === "nfp");
-  if (!u || !n) return true;
+/* ⚠⚠ v429 — LO STATO SI COSTRUISCE, NON SI TROVA. La prima stesura leggeva i punteggi del
+   GIORNO e pretendeva che i due componenti del lavoro fossero in disaccordo: il 05/09/2026 il
+   rapporto di agosto e' uscito forte, i due si sono allineati, e il check e' andato ROSSO SU
+   CODICE CORRETTO — verde o rosso a seconda del dato, che e' un buco nella sola rete rimasta
+   prima della pubblicazione (v403). Ora i due punteggi vengono INIETTATI, quindi il fenomeno
+   c'e' per costruzione, e si percorre anche il verso opposto: due punteggi vicini non devono
+   produrre un disaccordo che non esiste. */
+check("v321 fusioni: il punteggio fuso e' il PEGGIORE dei due, e lo scarto resta visibile", suVeriEsito(`
+  const inds = (DATA.macro && DATA.macro.indicators) || [];
+  const u = inds.find(x => x && x.key === "unemp");
+  const n = inds.find(x => x && x.key === "nfp");
+  if (!u || !n) return "il data.json non ha le due tessere del lavoro: il check non misura niente";
+  const guai = [];
+  u.impact = 80; n.impact = 15;
   const t = indicatoriClassifica().find(x => /Mercato del lavoro/i.test(x.nome || ""));
-  if (!t) return true;
-  return t.score <= 40 && (t.sub || "").includes("non concordano")`));
+  if (!t) return "la fusione del mercato del lavoro non produce nessuna tessera";
+  if (t.score !== 15) guai.push("il punteggio fuso e' " + t.score + " invece del peggiore dei due (15)");
+  if (String(t.sub || "").indexOf("non concordano") < 0) guai.push("lo scarto fra 80 e 15 non viene dichiarato");
+  u.impact = 62; n.impact = 58;
+  const c = indicatoriClassifica().find(x => /Mercato del lavoro/i.test(x.nome || ""));
+  if (c && String(c.sub || "").indexOf("non concordano") >= 0)
+    guai.push("due punteggi vicini (62 e 58) vengono dichiarati in disaccordo");
+  if (c && c.score !== 58) guai.push("con punteggi concordi il fuso e' " + c.score + " invece di 58");
+  return guai.length ? guai.join(" · ") : true;`));
 
 check("v321 fusioni: la regola vale per COSTRUZIONE, non per il caso di oggi", (() => {
   const i = src.indexOf("for (const f of FUSIONI)");
@@ -8748,18 +8765,25 @@ check("v428 un valore superato dall'ultima uscita della serie viene dichiarato t
   const riga = (etichetta) => (buildCIOText().split(NL).find(r => r.indexOf("- " + etichetta + ":") === 0) || "");
   try {
     /* stato COSTRUITO: un'uscita mensile due mesi dopo la fine del periodo portato. */
-    const ind = (DATA.macro.indicators || []).find(i => i && i.key === "nfp" && i.date);
-    if (!ind) return "nessun indicatore mensile con data: il check non misura niente";
-    /* ⚠ LA DATA INIETTATA DEV'ESSERE PASSATA: \`_passate\` scarta le uscite future, quindi la
-       prima stesura (periodo + 75 giorni) usciva nel futuro, \`pubblicato\` restava null e il
-       check era rosso su codice corretto. Si parte dalla FINE del periodo e si limita a oggi. */
-    const d0 = String(ind.date).slice(0, 10);
-    const fine = new Date(Date.UTC(Number(d0.slice(0, 4)), Number(d0.slice(5, 7)), 0));
-    const oggiISO = new Date().toISOString().slice(0, 10);
-    const tardi = new Date(Math.min(Date.now(), fine.getTime() + 40 * 86400000)).toISOString().slice(0, 10);
-    const presto = new Date(fine.getTime() + 5 * 86400000).toISOString().slice(0, 10);
-    if (tardi <= new Date(fine.getTime() + 31 * 86400000).toISOString().slice(0, 10))
-      return "oggi (" + oggiISO + ") e' troppo vicino alla fine del periodo: lo stato non e' costruibile";
+    /* ⚠⚠ v429 — SI COSTRUISCE ANCHE LA RILEVAZIONE, non solo l'uscita. La prima stesura
+       prendeva la data VERA dell'indicatore e ci sommava i giorni: quando la fine del periodo
+       portato cade vicino a oggi non c'e' spazio per un'uscita "ben oltre" che sia anche
+       PASSATA (le uscite future vengono scartate), e il check si dichiarava NON COSTRUIBILE —
+       cioe' andava rosso a calendario, il 05/09/2026, su codice corretto. Ora la rilevazione
+       viene spostata cinque mesi indietro: le due uscite iniettate sono nel passato per
+       costruzione, a qualunque ora giri la suite. */
+    const ind = (DATA.macro.indicators || []).find(i => i && i.key && i.date
+      && typeof CADENZA_FONTE !== "undefined" && CADENZA_FONTE[i.key]
+      && CADENZA_FONTE[i.key].passo === "mensile"
+      && riga(i.label).indexOf("ultima uscita") >= 0);
+    if (!ind) return "nessun indicatore mensile la cui riga porti la cadenza: il check non misura niente";
+    const iso = (t) => new Date(t).toISOString().slice(0, 10);
+    const q = new Date();
+    const mese = new Date(Date.UTC(q.getUTCFullYear(), q.getUTCMonth() - 5, 1));
+    ind.date = iso(mese);
+    const fine = Date.UTC(mese.getUTCFullYear(), mese.getUTCMonth() + 1, 0);
+    const tardi = iso(fine + 40 * 86400000);
+    const presto = iso(fine + 5 * 86400000);
 
     cal[ind.key] = { passate: [tardi], prossime: [] };
     if (riga(ind.label).indexOf(SPIA) < 0)
