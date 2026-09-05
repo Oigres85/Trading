@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-05T16:10:54Z",
+ "updated_at": "2026-09-05T16:55:49Z",
  "eurusd": 1.1621,
  "totals": {
   "usd_value": 0,
@@ -1746,7 +1746,7 @@
      "a1": 508.55,
      "a3": 1411.03,
      "a5": 1366.69,
-     "a10": 5763.38
+     "a10": 5763.39
     },
     "stagionalita": [
      {
@@ -6471,7 +6471,7 @@
     "target_mediana": 429.0
    },
    "health": 39,
-   "eps": 19.93,
+   "eps": 19.94,
    "beta": 1.23,
    "sharpe_1y": 1.07,
    "sortino_1y": 1.69,
@@ -6492,9 +6492,9 @@
     "float_shares": 10879563400.0,
     "float_pct": null,
     "avg_volume_30d": 30102998.0,
-    "pe_ttm": 16.9824,
+    "pe_ttm": 16.9739,
     "forward_pe": 22.7854,
-    "eps_ttm": 19.93,
+    "eps_ttm": 19.94,
     "eps_forward": 14.8542,
     "revenue_fy": 445865984000.0,
     "net_income_fy": 244118994944.0,
@@ -9002,7 +9002,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 3.08,
-   "pe": 27.2,
+   "pe": 26.5,
    "ath": 341.82,
    "ath_dist_pct": -53.5,
    "sma200_dist_pct": -5.4,
@@ -9856,7 +9856,7 @@
     "target_mediana": 240.0
    },
    "health": 77,
-   "eps": 5.83,
+   "eps": 6.0,
    "beta": 1.73,
    "sharpe_1y": -0.63,
    "sortino_1y": -0.98,
@@ -9877,9 +9877,9 @@
     "float_shares": 1713332956.0,
     "float_pct": 59.5,
     "avg_volume_30d": 31523807.0,
-    "pe_ttm": 27.235,
+    "pe_ttm": 26.4633,
     "forward_pe": 14.4771,
-    "eps_ttm": 5.83,
+    "eps_ttm": 6.0,
     "eps_forward": 10.9676,
     "revenue_fy": 67356999680.0,
     "net_income_fy": 16984000512.0,
@@ -11955,28 +11955,32 @@
    },
    "combustione": {
     "cassa": 1579000000.0,
+    "debito": 1052000000.0,
+    "patrimonio": 8864000000.0,
     "bilancio_al": "2026-06-30",
-    "ocf_ttm": 3286000000.0,
+    "ocf_ttm": 3929000000.0,
     "capex_ttm": -381000000.0,
     "trimestri": 4,
     "cashflow_al": "2026-06-30",
-    "fcf_ttm": 2905000000.0,
+    "fcf_ttm": 3548000000.0,
     "mesi_capex": 49.7,
+    "debito_netto": -527000000.0,
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 225000000.0,
-    "ebit_ttm": 7230000000.0,
+    "oneri_ttm": 165000000.0,
+    "ebit_ttm": 10070000000.0,
     "trimestri": 4,
     "conto_al": "2026-06-30",
-    "copertura": 32.13,
-    "oneri_var_4trim_pct": -48.6,
+    "copertura": 61.03,
+    "oneri_var_4trim_pct": -76.3,
     "oneri_trim": [
-     74000000,
      59000000,
      54000000,
-     38000000
+     38000000,
+     14000000
     ],
+    "debito_corrente": 1052000000.0,
     "valuta": "USD"
    },
    "fuori_mercato": {
@@ -12944,6 +12948,14 @@
     },
     "conto_trim": [
      {
+      "trim": "2026-06-30",
+      "ricavi": 3747000000,
+      "utile": 3069000000,
+      "operativo": 1606000000,
+      "margine": 81.9,
+      "margine_op": 42.9
+     },
+     {
       "trim": "2026-03-31",
       "ricavi": 3337000000,
       "utile": 3205000000,
@@ -12974,14 +12986,6 @@
       "operativo": 681000000,
       "margine": 9.9,
       "margine_op": 26.1
-     },
-     {
-      "trim": "2025-03-31",
-      "ricavi": 2294000000,
-      "utile": 524000000,
-      "operativo": 559000000,
-      "margine": 22.8,
-      "margine_op": 24.4
      }
     ]
    },
@@ -18062,27 +18066,32 @@
     "altman_model": "Z''"
    },
    "combustione": {
+    "cassa": 26835986000000.0,
+    "patrimonio": 262380610000000.0,
+    "bilancio_al": "2026-06-30",
     "ocf_ttm": 126925786000000.0,
     "capex_ttm": -29990022000000.0,
     "trimestri": 4,
     "cashflow_al": "2026-06-30",
     "fcf_ttm": 96935764000000.0,
+    "mesi_capex": 10.7,
     "emissione_netta_pct": 5.18,
     "valuta": "KRW"
    },
    "credito": {
-    "oneri_ttm": 833135000000.0,
+    "oneri_ttm": 767018000000.0,
     "ebit_ttm": 93616316000000.0,
     "trimestri": 4,
     "conto_al": "2026-06-30",
-    "copertura": 112.37,
-    "oneri_var_4trim_pct": -24.3,
+    "copertura": 122.05,
+    "oneri_var_4trim_pct": -32.5,
     "oneri_trim": [
-     220451000000,
      228759000000,
      216982000000,
-     166943000000
+     166943000000,
+     154334000000
     ],
+    "debito_lungo": 12727761000000.0,
     "valuta": "KRW"
    },
    "fuori_mercato": {
@@ -18558,6 +18567,14 @@
     },
     "conto_trim": [
      {
+      "trim": "2026-06-30",
+      "ricavi": 79318746000000,
+      "utile": 93820236000000,
+      "operativo": null,
+      "margine": 118.3,
+      "margine_op": null
+     },
+     {
       "trim": "2026-03-31",
       "ricavi": 52576287000000,
       "utile": 40330176000000,
@@ -18588,14 +18605,6 @@
       "operativo": 9212851000000,
       "margine": 31.5,
       "margine_op": 41.4
-     },
-     {
-      "trim": "2025-03-31",
-      "ricavi": 17639141000000,
-      "utile": 8107081000000,
-      "operativo": 7440504000000,
-      "margine": 46.0,
-      "margine_op": 42.2
      }
     ]
    },
@@ -21812,28 +21821,28 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79795.95,
+   "price": 80021.49,
    "price_asof": "2026-09-05",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.16,
+   "change_pct": 0.44,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -36.8,
-   "sma200_dist_pct": 14.5,
-   "sma50_dist_pct": 15.5,
+   "ath_dist_pct": -36.6,
+   "sma200_dist_pct": 14.8,
+   "sma50_dist_pct": 15.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -36.8,
-   "day_high": 79812.45,
+   "w52_dist_pct": -36.6,
+   "day_high": 79989.64,
    "day_low": 79480.93,
    "support": 62687.1,
    "resistance": 82262.21,
-   "rsi": 66.8,
-   "volume": 17838505984,
+   "rsi": 67.2,
+   "volume": 17491015680,
    "vol_ratio": 1.29,
-   "atr_14": 2337.6,
-   "atr_pct": 2.93,
+   "atr_14": 2350.26,
+   "atr_pct": 2.94,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -21842,7 +21851,7 @@
      77300.48,
      81271.74,
      79671.97,
-     79795.95
+     80021.49
     ],
     "m6": [
      78538.23,
@@ -21970,7 +21979,7 @@
      77300.48,
      81271.74,
      79671.97,
-     79795.95
+     80021.49
     ],
     "all": [
      386.94,
@@ -22117,7 +22126,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79795.95
+     80021.49
     ],
     "m1": [
      63024.32,
@@ -22141,7 +22150,7 @@
      77300.48,
      81271.74,
      79671.97,
-     79795.95
+     80021.49
     ],
     "m3": [
      61485.3,
@@ -22209,7 +22218,7 @@
      77300.48,
      81271.74,
      79671.97,
-     79795.95
+     80021.49
     ],
     "y1": [
      110650.98,
@@ -22285,7 +22294,7 @@
      78335.19,
      79027.42,
      78548.63,
-     79795.95
+     80021.49
     ],
     "d1": [
      79660.54,
@@ -22384,7 +22393,12 @@
      79711.65,
      79750.0,
      79765.71,
-     79847.35
+     79847.35,
+     79769.49,
+     79863.17,
+     79987.48,
+     79943.32,
+     80021.49
     ]
    },
    "earnings_date": null,
@@ -22393,12 +22407,12 @@
    "health": 79,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.71,
+   "sharpe_1y": -0.7,
    "sortino_1y": -0.95,
-   "sharpe_6m": -0.02,
-   "sortino_6m": -0.03,
+   "sharpe_6m": -0.0,
+   "sortino_6m": -0.01,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79795.95,
+   "prezzo_limite_aggiustato": 80021.49,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22411,22 +22425,22 @@
     "w1": {
      "support": 76248.3,
      "resistance": 82262.21,
-     "change_pct": 3.09
+     "change_pct": 3.38
     },
     "m1": {
      "support": 62648.57,
      "resistance": 82262.21,
-     "change_pct": 26.61
+     "change_pct": 26.97
     },
     "m3": {
      "support": 59532.32,
      "resistance": 82262.21,
-     "change_pct": 29.78
+     "change_pct": 30.15
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -9.15
+     "change_pct": -8.9
     }
    },
    "financials": [],
@@ -22453,74 +22467,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79795.95,
+     "prezzo": 80021.49,
      "medie": {
       "sma10": {
-       "liv": 78799.36,
-       "dist_pct": 1.26
+       "liv": 78821.91,
+       "dist_pct": 1.52
       },
       "ema10": {
-       "liv": 78516.81,
-       "dist_pct": 1.63
+       "liv": 78557.81,
+       "dist_pct": 1.86
       },
       "sma20": {
-       "liv": 76460.51,
-       "dist_pct": 4.36
+       "liv": 76471.79,
+       "dist_pct": 4.64
       },
       "ema20": {
-       "liv": 76073.41,
-       "dist_pct": 4.89
+       "liv": 76094.89,
+       "dist_pct": 5.16
       },
       "sma30": {
-       "liv": 72230.86,
-       "dist_pct": 10.47
+       "liv": 72238.37,
+       "dist_pct": 10.77
       },
       "ema30": {
-       "liv": 73962.59,
-       "dist_pct": 7.89
+       "liv": 73977.14,
+       "dist_pct": 8.17
       },
       "sma50": {
-       "liv": 69094.19,
-       "dist_pct": 15.49
+       "liv": 69098.71,
+       "dist_pct": 15.81
       },
       "ema50": {
-       "liv": 71390.05,
-       "dist_pct": 11.77
+       "liv": 71398.89,
+       "dist_pct": 12.08
       },
       "sma100": {
-       "liv": 66401.48,
-       "dist_pct": 20.17
+       "liv": 66403.73,
+       "dist_pct": 20.51
       },
       "ema100": {
-       "liv": 69834.61,
-       "dist_pct": 14.26
+       "liv": 69839.07,
+       "dist_pct": 14.58
       },
       "sma200": {
-       "liv": 69683.85,
-       "dist_pct": 14.51
+       "liv": 69684.98,
+       "dist_pct": 14.83
       },
       "ema200": {
-       "liv": 72726.76,
-       "dist_pct": 9.72
+       "liv": 72729.0,
+       "dist_pct": 10.03
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 66.8,
+      "rsi14": 67.2,
       "macd": {
-       "linea": 3327.18,
-       "segnale": 3438.86,
-       "istogramma": -111.69
+       "linea": 3345.17,
+       "segnale": 3442.46,
+       "istogramma": -97.29
       },
-      "stoch_k": 62.8,
-      "stoch_d": 71.0,
-      "williams_r": -37.2,
-      "cci20": 33.8,
+      "stoch_k": 66.2,
+      "stoch_d": 72.2,
+      "williams_r": -33.8,
+      "cci20": 35.0,
       "adx14": 46.5,
-      "di_su": 37.0,
-      "di_giu": 9.5,
-      "momentum10": 768.53
+      "di_su": 36.8,
+      "di_giu": 9.4,
+      "momentum10": 994.07
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23011,21 +23025,21 @@
      {
       "d": "2026-09-05",
       "o": 79676.33,
-      "h": 79812.45,
+      "h": 79989.64,
       "l": 79480.93,
-      "c": 79795.95
+      "c": 80021.49
      }
     ],
     "performance": {
-     "s1": 1.59,
-     "m1": 26.71,
-     "m3": 32.98,
-     "m6": 1.45,
-     "a1": -9.12,
-     "ytd": -10.07,
-     "a3": 195.89,
-     "a5": 82.22,
-     "a10": 12986.99
+     "s1": 1.88,
+     "m1": 27.07,
+     "m3": 33.36,
+     "m6": 1.73,
+     "a1": -8.86,
+     "ytd": -9.82,
+     "a3": 196.73,
+     "a5": 82.74,
+     "a10": 13023.98
     },
     "stagionalita": [
      {
@@ -23102,8 +23116,8 @@
      },
      {
       "mese": 9,
-      "media": -1.54,
-      "mediana": -0.75,
+      "media": -1.52,
+      "mediana": -0.6,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23138,9 +23152,9 @@
      }
     ]
    },
-   "rs_1m": 26.5,
+   "rs_1m": 26.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 26.0,
+   "rs_ndx_1m": 26.4,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -35110,7 +35124,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.85,
-   "pe": 31.8,
+   "pe": 31.0,
    "ath": 479.0,
    "ath_dist_pct": -10.5,
    "sma200_dist_pct": 15.4,
@@ -35825,7 +35839,7 @@
     "target_mediana": 537.0
    },
    "health": 73,
-   "eps": 13.47,
+   "eps": 13.85,
    "beta": 1.25,
    "sharpe_1y": 1.35,
    "sortino_1y": 2.04,
@@ -35846,9 +35860,9 @@
     "float_shares": 37843003812.0,
     "float_pct": null,
     "avg_volume_30d": 12982542.0,
-    "pe_ttm": 31.8419,
+    "pe_ttm": 30.9682,
     "forward_pe": 19.6197,
-    "eps_ttm": 13.47,
+    "eps_ttm": 13.85,
     "eps_forward": 21.8612,
     "revenue_fy": null,
     "net_income_fy": null,
@@ -35876,34 +35890,34 @@
     "altman_model": "Z''"
    },
    "combustione": {
-    "cassa": 3134218000000.0,
+    "cassa": 3134218213000.0,
     "debito": 982447000000.0,
     "patrimonio": 6432518000000.0,
     "bilancio_al": "2026-06-30",
-    "ocf_ttm": 2634679108000.0,
-    "capex_ttm": -1497619065000.0,
+    "ocf_ttm": 2634679085000.0,
+    "capex_ttm": -1510012148000.0,
     "trimestri": 4,
     "cashflow_al": "2026-06-30",
-    "fcf_ttm": 1137060043000.0,
-    "mesi_capex": 25.1,
-    "debito_netto": -2151771000000.0,
+    "fcf_ttm": 1124666937000.0,
+    "mesi_capex": 24.9,
+    "debito_netto": -2151771213000.0,
     "valuta": "TWD"
    },
    "credito": {
-    "oneri_ttm": 11396167000.0,
+    "oneri_ttm": 11803942000.0,
     "ebit_ttm": 2679757799000.0,
     "trimestri": 4,
     "conto_al": "2026-06-30",
-    "copertura": 235.15,
-    "oneri_var_4trim_pct": 1.5,
+    "copertura": 227.02,
+    "oneri_var_4trim_pct": 4.3,
     "oneri_trim": [
-     2677274000,
      2958568000,
      3043463000,
-     2716862000
+     2716862000,
+     3085049000
     ],
-    "debito_corrente": 167410000000.0,
-    "debito_lungo": 815037000000.0,
+    "debito_corrente": 167409865000.0,
+    "debito_lungo": 864263674000.0,
     "valuta": "TWD"
    },
    "fuori_mercato": {
@@ -36867,7 +36881,7 @@
     "conto_trim": [
      {
       "trim": "2026-06-30",
-      "ricavi": 1270381000000,
+      "ricavi": 1270380250000,
       "utile": 706562000000,
       "operativo": 766603000000,
       "margine": 55.6,
@@ -36899,8 +36913,8 @@
      },
      {
       "trim": "2025-06-30",
-      "ricavi": 933792000000,
-      "utile": 398273000000,
+      "ricavi": 933791869000,
+      "utile": 398273102000,
       "operativo": 463423000000,
       "margine": 42.7,
       "margine_op": 49.6
@@ -38391,7 +38405,7 @@
      {
       "mese": 11,
       "media": 5.26,
-      "mediana": 5.95,
+      "mediana": 5.94,
       "positivi_pct": 82,
       "campione": 17,
       "peggio": -11.4,
@@ -47740,6 +47754,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Jobs and Iran add to Trump’s midterm headaches. Why that’s good for bonds and bad for energy stocks.",
+     "riassunto": "The president needs lower gasoline prices and mortgage rates — fast.",
+     "fonte": "MarketWatch",
+     "quando": "2026-09-05T16:34:00Z",
+     "url": "https://www.marketwatch.com/story/jobs-and-iran-add-to-trumps-midterm-headaches-why-thats-good-for-bonds-and-bad-for-energy-stocks-551cb765?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "Jobs Surge Raises Odds of September Fed Hike",
      "riassunto": "On Bloomberg This Weekend, Seaport Research Partner Managing Director & Chief Equity Strategist Jonathan Golub says a stronger-than-expected US jobs report reinforces the case for the Federal Reserve to raise interest rates, despite President Donald Trump’s calls for lower borrowing costs. Golub also says to hosts Chri",
      "fonte": "Bloomberg",
@@ -47857,22 +47878,14 @@
      "fonte": "CNBC Economia",
      "quando": "2026-08-29T20:22:12Z",
      "url": "https://www.cnbc.com/2026/08/29/k-shaped-economy-c-shaped-e-shape.html"
-    },
-    {
-     "titolo": "Fed Chairman Warsh expresses concern about inflation, advocates for 'quieter' central bank",
-     "riassunto": "He used the speech to outline his philosophy on policymaking while carefully sidestepping any signals",
-     "fonte": "CNBC Economia",
-     "quando": "2026-08-28T16:11:51Z",
-     "url": "https://www.cnbc.com/2026/08/28/kevin-warsh-jackson-hole-federal-reserve-inflation.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
-    "Bloomberg"
-   ],
-   "fonti_mute": [
+    "Bloomberg",
     "MarketWatch"
    ],
+   "fonti_mute": [],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -52769,7 +52782,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 52
+     "score": 55
     },
     {
      "label": "Treasury 10A",
@@ -57975,6 +57988,13 @@
     ],
     "MU": [
      {
+      "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
+      "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-05T16:22:00Z",
+      "url": "https://www.nasdaq.com/articles/kraken-robotics-stock-down-55-september-month-buy-dip"
+     },
+     {
       "titolo": "3 Incredible High-Growth Stocks to Buy With $10,000 Right Now",
       "riassunto": "Key PointsNvidia is growing rapidly at a cheap price tag.",
       "fonte": "Nasdaq",
@@ -58008,16 +58028,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T22:05:00Z",
       "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
-     },
-     {
-      "titolo": "David Tepper Sold 41% of His Micron Shares and It Is Still His Second-Biggest Holding",
-      "riassunto": "Key PointsAppaloosa cut its Micron position by 41% during the second quarter, selling 690,000 shares.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T21:34:01Z",
-      "url": "https://www.nasdaq.com/articles/david-tepper-sold-41-his-micron-shares-and-it-still-his-second-biggest-holding"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
+      "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-05T16:22:00Z",
+      "url": "https://www.nasdaq.com/articles/kraken-robotics-stock-down-55-september-month-buy-dip"
+     },
      {
       "titolo": "Most Investors Overpay for AI Hype. Nvidia Is the Exception.",
       "riassunto": "Key PointsNvidia's second-quarter revenue more than doubled to $96.2 billion.",
@@ -58052,13 +58072,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-05T09:50:00Z",
       "url": "https://www.nasdaq.com/articles/nvidia-stock-buy-or-sell-my-final-verdict"
-     },
-     {
-      "titolo": "Jensen Huang Just Sent a Signal That Could Matter More Than the September Effect",
-      "riassunto": "Key PointsNvidia expects fiscal 2028 revenue growth of about 70%, even though customer forecasts point to stronger demand.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T09:14:00Z",
-      "url": "https://www.nasdaq.com/articles/jensen-huang-just-sent-signal-could-matter-more-september-effect"
      }
     ],
     "ORCL": [
@@ -58261,7 +58274,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-05T16:10:54Z"
+   "letto_il": "2026-09-05T16:55:49Z"
   }
  },
  "broker": null,
@@ -58533,6 +58546,13 @@
    ],
    "MU": [
     {
+     "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
+     "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-05T16:22:00Z",
+     "url": "https://www.nasdaq.com/articles/kraken-robotics-stock-down-55-september-month-buy-dip"
+    },
+    {
      "titolo": "3 Incredible High-Growth Stocks to Buy With $10,000 Right Now",
      "riassunto": "Key PointsNvidia is growing rapidly at a cheap price tag.",
      "fonte": "Nasdaq",
@@ -58566,16 +58586,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T22:05:00Z",
      "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
-    },
-    {
-     "titolo": "David Tepper Sold 41% of His Micron Shares and It Is Still His Second-Biggest Holding",
-     "riassunto": "Key PointsAppaloosa cut its Micron position by 41% during the second quarter, selling 690,000 shares.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T21:34:01Z",
-     "url": "https://www.nasdaq.com/articles/david-tepper-sold-41-his-micron-shares-and-it-still-his-second-biggest-holding"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
+     "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-05T16:22:00Z",
+     "url": "https://www.nasdaq.com/articles/kraken-robotics-stock-down-55-september-month-buy-dip"
+    },
     {
      "titolo": "Most Investors Overpay for AI Hype. Nvidia Is the Exception.",
      "riassunto": "Key PointsNvidia's second-quarter revenue more than doubled to $96.2 billion.",
@@ -58610,13 +58630,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-05T09:50:00Z",
      "url": "https://www.nasdaq.com/articles/nvidia-stock-buy-or-sell-my-final-verdict"
-    },
-    {
-     "titolo": "Jensen Huang Just Sent a Signal That Could Matter More Than the September Effect",
-     "riassunto": "Key PointsNvidia expects fiscal 2028 revenue growth of about 70%, even though customer forecasts point to stronger demand.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T09:14:00Z",
-     "url": "https://www.nasdaq.com/articles/jensen-huang-just-sent-signal-could-matter-more-september-effect"
     }
    ],
    "ORCL": [
@@ -58819,7 +58832,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-05T16:10:54Z"
+  "letto_il": "2026-09-05T16:55:49Z"
  },
  "predictions": [
   {
@@ -79555,7 +79568,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -79607,6 +79620,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-05T16:10:54Z"
+  "generated_at": "2026-09-05T16:55:50Z"
  }
 }
