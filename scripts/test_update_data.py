@@ -82,6 +82,24 @@ check("risk: correlazioni annotate su ogni riga",
       all(r.get("avg_corr") is not None and r.get("max_corr_with") for r in panel))
 check("risk: avg_pairwise_corr in [-1,1]", risk.get("avg_pairwise_corr") is not None and -1 <= risk["avg_pairwise_corr"] <= 1)
 
+# ⚠⚠ v430 — LA FINESTRA E' PARTE DEL NUMERO. Sharpe, Sortino, VaR, ES, beta e correlazione media
+# escono TUTTI dallo stesso pannello, e quante sedute fosse non usciva da nessuna parte: nel
+# pacchetto stavano accanto a un drawdown che dichiara le proprie ~125 sedute, cioe' due misure
+# di rischio dello stesso libro su due basi e una sola dichiarata. Il check verifica il FATTO
+# (la finestra e' quella davvero usata, non un numero qualunque) invece della presenza.
+check("v430 risk: la finestra del calcolo esce col numero", risk.get("finestra_sedute") == 252)
+check("v430 risk: la finestra porta i propri estremi",
+      risk.get("finestra_da") == dates[0].strftime("%Y-%m-%d")
+      and risk.get("finestra_a") == dates[-1].strftime("%Y-%m-%d"))
+# ⚠ e deve seguire l'INTERSEZIONE, non il pannello: una serie piu' corta accorcia la finestra di
+# tutti, ed e' precisamente il caso in cui dichiararla serve.
+_corto = [dict(r) for r in panel]
+_corto[0] = dict(_corto[0], _ret_series=_corto[0]["_ret_series"][60:],
+                 _ret_dates=_corto[0]["_ret_dates"][60:])
+_r2 = compute_risk_metrics(_corto, []) or {}
+check("v430 risk: la finestra e' l'INTERSEZIONE delle serie, non la piu' lunga",
+      _r2.get("finestra_sedute") == 192 and _r2.get("finestra_da") == dates[60].strftime("%Y-%m-%d"))
+
 # ---------- v207: finestra comune fra due serie (disaccoppiamento / profitti) ----------
 # Il difetto: fred_series senza freq="m" restituiva la frequenza NATIVA, e SP500 su FRED e'
 # GIORNALIERA -> 36 "mesi" erano 36 sedute (7 settimane). Le due serie venivano poi rebasate a

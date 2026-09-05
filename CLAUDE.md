@@ -4112,6 +4112,69 @@ sono modifiche**, e una che rompe il file si legge come un gate che non morde): 
 tiene il punteggio di A, la guardia sul passo breve che cade, l'avviso che non viene mai emesso.
 Mordono tutte e tre — e la prima ne ha svegliato anche un secondo, `v321 per COSTRUZIONE`.
 
+## 🔎 v430 — QUATTRO DIFETTI TROVATI ESEGUENDO IL PACCHETTO MACRO COME IL SUO DESTINATARIO
+
+Tre dei quattro sono la stessa forma, ed e' quella che questo progetto paga da otto versioni:
+**il pacchetto forniva da solo i falsi positivi del proprio collaudo B5**.
+
+| difetto | cosa affermava | cosa era vero |
+|---|---|---|
+| **l'ampiezza** | *"rally con partecipazione uniforme"* | SPY **+0,21%** e RSP **+0,19%** in un mese: il mercato era fermo |
+| **il rapporto di Buffett** | *"238,2%"*, senza nessuna data | ha **DUE** date — la chiusura di borsa al numeratore, il PIL **trimestrale** al denominatore |
+| **Sharpe, Sortino, VaR, ES, beta, correlazione media** | *"su una finestra passata"* | la finestra non era pubblicata da nessuna parte, e accanto c'e' un drawdown che dichiara le proprie ~125 sedute |
+| **le scommesse effettive** | la formula stampata era `1/(1/k + (k-1)/k·rho)` | il numero esce da `1/((1-rho)·H + rho)` con H l'Herfindahl dei **pesi veri**: con k=12 e rho 0,35 la formula pubblicata da' **2,47** contro il **2,3** pubblicato |
+
+⚠ **Sul primo il rimedio NON e' una soglia** su quanto un mese debba muoversi per essere un
+rally — sarebbe una tacca non sostenuta (v240) — ma togliere dall'etichetta la parola che
+afferma una **grandezza** che la riga non misura. La v405 aveva chiuso il SEGNO e lasciato
+aperta l'ampiezza: e' la famiglia dell'autonomia di *"1022,6 mesi"* (v389), aritmeticamente
+esatta e comunicativamente falsa.
+
+⚠ **Sul secondo vale l'istruzione permanente del CEO** (v396): *"solo ultimo dato ufficiale con
+data acquisizione … se non abbiamo queste informazioni dici dato non disponibile"*. Qui le
+informazioni c'erano — la pipeline le aveva sotto mano e non le consegnava — e nel ripiego, che
+gira finche' il CI non rigenera, il pacchetto **dichiara di non poterlo datare**.
+
+⚠ **Sul quarto la testata ordina a chi legge di NON rifare i conti e di segnalare cio' che non
+torna.** Un lettore che segue quell'ordine trova 2,47 dove il pacchetto scrive 2,3: e' il
+collaudo che si logora, non la riga che sbaglia. Ora la formula vive in **una stringa sola** per
+i due punti di stampa — due rese della stessa convenzione divergono al primo ritocco, ed e'
+esattamente cosi' che questa e' nata.
+
+### 🦴 Tre fossili svegliati, nessuno zittito
+- ⚠⚠ **TRENTUNESIMA rottura di un check ancorato a una stringa letterale, e della specie
+  peggiore**: v405 *pretendeva* la parola `rally con partecipazione uniforme`, cioe' proprio
+  l'etichetta appena tolta. *Un gate che pinna un difetto lo rende permanente* (v326, v411,
+  v415). Riagganciato all'invariante vero — **il verso lo da' il cap-pesato** — ed esercitato
+  costruendo tutti gli stati.
+- **v392 era ancorato al LUOGO**, non alla proprieta': cercava l'aritmetica del trimestre dentro
+  `const periodo`, e la v430 l'ha estratta in `trimestreEsteso` perche' serviva anche a Buffett.
+  Ora **esercita la funzione sui dodici mesi**: una proprieta' che nessuna riorganizzazione del
+  file puo' rompere per caso.
+
+### 🛑 Due errori di metodo, e il primo e' costato lavoro
+- ⚠⚠ **UN'INIEZIONE CHE RIPRISTINA CON `git checkout` CANCELLA IL LAVORO NON COMMITTATO.**
+  L'harness delle iniezioni faceva `git checkout -- assets/app.js` per tornare indietro: ma le
+  modifiche **da validare** erano ancora non committate, e il checkout le ha cancellate insieme
+  all'iniezione. Le quattro correzioni sono state riapplicate da capo.
+  > La v427 aveva scritto *"anche le iniezioni vanno fatte con `modifica_sicura`"*. Manca la
+  > seconda meta': **anche il RIPRISTINO e' parte dell'iniezione**, e va fatto da uno snapshot
+  > preso prima, mai dal commit — l'unico stato che il commit conosce e' quello che stai
+  > cercando di cambiare.
+  ⚠ E due processi che iniettano sullo stesso file **si sporcano lo snapshot a vicenda**: un run
+  finito in background e uno in primo piano hanno lasciato in `app.js` l'iniezione dell'uno e
+  nello snapshot dell'altro. Un'iniezione alla volta.
+- ⚠⚠ **UN'INIEZIONE CHE NON MORDE NON PROVA CHE IL GATE SIA INUTILE: PROVA CHE IL GATE NON
+  CONTIENE IL FENOMENO.** L'iniezione *"leggi RSP invece di SPY"* non mordeva perche' tutti e tre
+  i casi del gate avevano i due indici **con lo stesso segno** — e l'invariante e' proprio che il
+  verso lo da' il cap-pesato. Aggiunto il caso che discrimina (SPY −0,5% con RSP +0,4%): morde.
+  E' la lezione v389/v419 nella sua forma piu' pura.
+- ⚠ **Undicesima volta che C9 prende un mio costrutto nella coda**: `affiancarle`, infinito con
+  clitico, che il detector non distingue dall'imperativo. Riformulato come fatto invece di
+  allentare un gate che ha gia' trovato dieci ordini veri.
+- ⚠ E **il backtick dentro un template** per la sesta volta, di nuovo in un commento che citava
+  del codice: `modifica_sicura` ha rifiutato la scrittura e il file e' rimasto intatto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

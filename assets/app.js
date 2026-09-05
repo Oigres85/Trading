@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "429";
+const BUILD_VERSION = "430";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1929,11 +1929,57 @@ function cadenzaDato(chiave, dataRilevazione) {
    un LLM reale l'ha letta come data di PUBBLICAZIONE, obiettando che il pacchetto sbagliava
    l'eta'. Non sbagliava: 2026-07-01 e' il mese di LUGLIO, e la pubblicazione e' un'altra cosa.
    Stessa famiglia della riga trimestrale del PIL, e stesso rimedio: si scrive il periodo. */
+/* ⚠ v430 — la data in forma italiana era un `it` LOCALE ridefinito in quattro punti del file
+   con tre contratti diversi. Qui serve a livello di modulo e non se ne aggiunge un quinto. */
+function dataIt(s) {
+  const x = String(s || "").slice(0, 10);
+  return /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(x) ? `${x.slice(8, 10)}/${x.slice(5, 7)}/${x.slice(0, 4)}` : x;
+}
+
+/* ⚠⚠ v430 — LA FINESTRA E' PARTE DEL NUMERO, E IL PACCHETTO NE DICHIARAVA UNA SOLA. Sharpe,
+   Sortino, VaR, ES, beta e correlazione media escono tutti dalla stessa matrice della pipeline;
+   il drawdown e i profili di confronto escono da ~125 sedute calcolate lato pagina. Due misure
+   di rischio dello stesso libro, affiancate, su due basi — e una sola dichiarata. Il collaudo
+   B5 ordina a chi legge di segnalare proprio questo, quindi il pacchetto glielo forniva.
+   ⚠ Finche' la pipeline non ha rigenerato, la finestra non c'e': si dichiara che non e' nota
+   invece di far sparire la riga (classe v187/v400) o di affermare un numero che non abbiamo. */
+function finestraRischio() {
+  const t = (DATA && DATA.totals) || {};
+  const n = numero(t.finestra_sedute);
+  if (!Number.isFinite(n) || n <= 0) return "su una finestra passata che questo snapshot non dichiara";
+  return `su ${n} sedute` + (t.finestra_da && t.finestra_a
+    ? ` (${dataIt(t.finestra_da)}–${dataIt(t.finestra_a)})` : "");
+}
+
 function meseEsteso(s) {
   const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
                 "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
   const t = String(s).slice(0, 10), m = Number(t.slice(5, 7));
   return (m >= 1 && m <= 12) ? `${MESI[m - 1]} ${t.slice(0, 4)}` : t;
+}
+
+/* ⚠⚠ v430 — LA FORMULA STAMPATA NON RIPRODUCEVA IL NUMERO STAMPATO. Il pacchetto scriveva
+   "1/(1/k + (k-1)/k·correlazione media)" in due punti, ma `effettive()` usa l'indice di
+   Herfindahl dei PESI VERI: 1/((1-rho)·H + rho). Le due coincidono solo a pesi uguali, e su
+   questo libro no — con k=12 e rho 0,35 la formula pubblicata da' 2,47 contro il 2,3 pubblicato.
+   La testata ordina a chi legge di NON rifare i conti e di segnalare quello che non torna: qui
+   il pacchetto gli forniva il falso positivo del proprio collaudo (classe v409/v412/v415).
+   ⚠ Una stringa sola per i due punti di stampa: due rese della stessa convenzione divergono al
+   primo ritocco, ed e' precisamente cosi' che questa e' nata. */
+const FORMULA_EFFETTIVE = "1/((1-rho)·H + rho), dove rho e' la correlazione media e H l'indice "
+  + "di Herfindahl dei pesi (la somma dei loro quadrati); a pesi uguali H vale 1/k e la formula "
+  + "si riduce alla forma nota 1/(1/k + (k-1)/k·rho)";
+
+/* ⚠ v430 — il trimestre esteso viveva SOLO dentro `cadenzaDato`, e il rapporto di Buffett ne
+   aveva bisogno: riscriverlo li' sarebbe stata la classe v161/v207 — due rese della stessa
+   convenzione che divergono al primo ritocco. Estratto qui, e `periodo` lo chiama. */
+function trimestreEsteso(s) {
+  const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+                "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+  const x = String(s).slice(0, 10), a = x.slice(0, 4), m = Number(x.slice(5, 7));
+  if (!(m >= 1 && m <= 12)) return x;
+  const q = Math.floor((m - 1) / 3) + 1;
+  return `${q}° trimestre ${a} (${MESI[(q - 1) * 3]}-${MESI[(q - 1) * 3 + 2]})`;
 }
 
 /* la riga da mostrare sotto una card macro e da mettere nel payload */
@@ -1950,11 +1996,7 @@ function rigaCadenza(chiave, dataRilevazione) {
                 "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
   const periodo = (s) => {
     const a = s.slice(0, 4), m = Number(s.slice(5, 7));
-    if (c.passo === "trimestrale") {
-      const q = Math.floor((m - 1) / 3) + 1;
-      const da = MESI[(q - 1) * 3], a2 = MESI[(q - 1) * 3 + 2];
-      return `al ${q}° trimestre ${a} (${da}-${a2})`;
-    }
+    if (c.passo === "trimestrale") return `al ${trimestreEsteso(s)}`;
     if (c.passo === "mensile") return `a ${MESI[m - 1]} ${a}`;
     return `al ${it(s)}`;      // giornaliero: il giorno E' il periodo
   };
@@ -8669,7 +8711,16 @@ function buildPrompt(opz) {
          corso, il calo non e' concentrato). Il segno si legge dal cap-pesato, che e' l'indice
          di riferimento; l'ampiezza resta la distanza fra i due. */
       const _amp = br.divergence_pp > 2 ? "trainata dalle megacap" : "uniforme";
-      const _verso = numero(br.spy_1m_pct) > 0 ? "rally" : numero(br.spy_1m_pct) < 0 ? "discesa" : "mercato piatto";
+      /* ⚠⚠ v430 — "RALLY" SU UN MESE DA +0,21%. La v405 aveva corretto il SEGNO — l'etichetta
+         diceva "rally" anche con entrambi gli indici in calo — e aveva lasciato aperta
+         l'AMPIEZZA: il 05/09/2026 SPY faceva +0,21% e RSP +0,19% in un mese, cioe' il mercato
+         era fermo, e la riga annunciava "rally con partecipazione uniforme". E' la famiglia
+         dell'autonomia di "1022,6 mesi" (v389): aritmeticamente esatto, comunicativamente
+         falso. ⚠ Il rimedio NON e' una soglia inventata su quanto un mese debba muoversi per
+         essere un rally — sarebbe una tacca non sostenuta (v240) — ma togliere dall'etichetta
+         la parola che afferma una GRANDEZZA che la riga non misura. La direzione resta, e
+         l'ampiezza del movimento sta gia' in cifre due parole prima, dentro `base`. */
+      const _verso = numero(br.spy_1m_pct) > 0 ? "mese in rialzo" : numero(br.spy_1m_pct) < 0 ? "mese in ribasso" : "mese piatto";
       lines.push(`- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): ${base} — ${_verso} `
         + `con partecipazione ${_amp} (alert se SPY+ con RSP− o spread >4pp). ⚠ L'ampiezza misura la `
         + `DISTANZA fra i due indici, non la direzione: qui il verso lo da' il cap-pesato, e con `
@@ -9224,7 +9275,7 @@ function buildPrompt(opz) {
       + `${Number.isFinite(_shar) && Number.isFinite(_sort) ? " · " : ""}`
       + `${Number.isFinite(_sort) ? `Sortino ${fmtNum.format(_sort)}` : ""}`
       + `${Number.isFinite(_rf) ? ` (tasso privo di rischio ${fmtNum.format(Math.round(_rf * 1000) / 10)}%)` : ""}. `
-      + `⚠ Misurano il rendimento PER UNITA' DI RISCHIO su una finestra passata, non una previsione. `
+      + `⚠ Misurano il rendimento PER UNITA' DI RISCHIO ${finestraRischio()}, non una previsione. `
       + `Il Sortino non penalizza i rialzi, quindi su un libro che sale a strappi sta sopra lo Sharpe `
       + `per costruzione: la differenza fra i due dice quanto del rischio e' al RIALZO. ⚠ Non entrano `
       + `nelle discipline piu' sotto, che misurano un'altra cosa — concentrazione ed esposizione, non `
@@ -9237,7 +9288,16 @@ function buildPrompt(opz) {
       + `(sotto 100% economico, 100-140% equo, oltre 140% caro) e' una CONVENZIONE del mestiere e non `
       + `un dato del file. ⚠ E' lento e strutturale: dice quanto e' caro il mercato, non quando gira — `
       + `un valore estremo puo' restare estremo per anni, quindi non e' un segnale di uscita ma il `
-      + `contesto in cui ogni multiplo di questo pacchetto va letto.`);
+      + `contesto in cui ogni multiplo di questo pacchetto va letto.`
+      + (m.buffett.data_borsa && m.buffett.data_pil
+          ? ` ⚠ HA DUE DATE E NON SONO LA STESSA: il numeratore e' la capitalizzazione alla `
+            + `chiusura del ${dataIt(m.buffett.data_borsa)}, il denominatore e' il PIL nominale `
+            + `riferito al ${trimestreEsteso(m.buffett.data_pil)} — un dato TRIMESTRALE, quindi `
+            + `il rapporto si muove ogni giorno dal solo lato della borsa.`
+          : ` ⚠ LE SUE DUE DATE NON SONO DISPONIBILI in questo snapshot: il numeratore e' una `
+            + `chiusura di borsa e il denominatore un PIL trimestrale, quindi non hanno la stessa `
+            + `freschezza, ma il sistema non porta ancora le due rilevazioni — arrivano col `
+            + `prossimo giro della pipeline. Fino ad allora il rapporto non e' databile.`));
   }
   /* ⚠ La struttura del prezzo sugli indici: si pubblicano i LIVELLI, non il punteggio 0-100 che
      la pipeline calcola accanto — quello e' un nostro composito, ed e' la categoria che la v200
@@ -10255,7 +10315,7 @@ function disciplinaRischio() {
       nome: "Scommesse davvero indipendenti",
       soglia: "almeno 5 decisioni indipendenti",
       provenienza: "CONVENZIONE: sotto le cinque, la diversificazione non riduce piu' il rischio in modo apprezzabile "
-        + "e il libro si comporta come un paniere di poche idee. La formula (1/(1/k + (k-1)/k·correlazione media)) e' "
+        + "e il libro si comporta come un paniere di poche idee. La formula (" + FORMULA_EFFETTIVE + ") e' "
         + "standard; la soglia di 5 e' una convenzione di lettura.",
       misura: `${n1(mio.eff)} su ${mio.n} nomi`,
       valore: mio.eff,
@@ -11090,7 +11150,10 @@ function contestoPortafoglio(tkCorrente) {
   if (Number.isFinite(numero(tot0.avg_pairwise_corr))) bit.push(`correlazione media fra le posizioni ${numero(tot0.avg_pairwise_corr)}`);
   if (bit.length) L.push(`RISCHIO DEL LIBRO NEL SUO INSIEME: ${bit.join(" · ")}. `
     + `⚠ Sono misure a UN GIORNO su distribuzione storica: dicono quanto e' ampia una giornata brutta ordinaria, `
-    + `non quanto puo' scendere il libro in un ciclo. Per quello serve il drawdown qui sotto.`
+    + `non quanto puo' scendere il libro in un ciclo. Per quello serve il drawdown qui sotto. `
+    + `⚠ Tutte e quattro sono calcolate ${finestraRischio()}. Quella NON e' la finestra del `
+    + `drawdown qui sotto: sono due misure dello stesso libro su due basi diverse, e questa riga `
+    + `esiste perche' senza di essa il denominatore resterebbe non dichiarato.`
     /* ⚠ v427 — VaR, ES, beta e correlazione media escono dalla STESSA matrice del contributo al
        rischio, quindi invecchiano insieme a lui: senza questa riga descrivevano il libro nuovo
        con i numeri del vecchio. */
@@ -11161,7 +11224,7 @@ function contestoPortafoglio(tkCorrente) {
     L.push(`⚠ COME SI LEGGONO. La differenza fra due righe e' l'effetto di UNA scelta: "pesi uguali" `
       + `contro "pesi reali" isola quanto hanno reso le scelte di peso; "senza le prime tre" isola la `
       + `concentrazione; l'indice isola la selezione dei nomi. Le SCOMMESSE EFFETTIVE sono `
-      + `1/(1/k + (k-1)/k·correlazione media): dicono quante decisioni indipendenti ci sono davvero `
+      + `${FORMULA_EFFETTIVE}: dicono quante decisioni indipendenti ci sono davvero `
       + `dentro k posizioni. ⚠ Sono misure su una finestra passata, non previsioni, e non sono un `
       + `obiettivo: un libro di crescita concentrato ha per costruzione volatilita' e drawdown `
       + `superiori all'indice — il punto e' sapere di quanto, non ridurli.`);
