@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-05T17:04:02Z",
+ "updated_at": "2026-09-05T17:57:28Z",
  "eurusd": 1.1621,
  "totals": {
   "usd_value": 0,
@@ -1774,7 +1774,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -4778,24 +4778,18 @@
     "ev_s": 18.25
    },
    "combustione": {
-    "cassa": 13237000000.0,
-    "debito": 12348000000.0,
-    "patrimonio": 195474000000.0,
-    "bilancio_al": "2026-04-30",
     "ocf_ttm": 125648000000.0,
     "capex_ttm": -6572000000.0,
     "trimestri": 4,
-    "cashflow_al": "2026-04-30",
+    "cashflow_al": "2026-07-31",
     "fcf_ttm": 119076000000.0,
-    "mesi_capex": 24.2,
-    "debito_netto": -889000000.0,
     "valuta": "USD"
    },
    "credito": {
     "oneri_ttm": 298000000.0,
     "ebit_ttm": 189741000000.0,
     "trimestri": 4,
-    "conto_al": "2026-04-30",
+    "conto_al": "2026-07-31",
     "copertura": 636.71,
     "oneri_var_4trim_pct": 64.5,
     "oneri_trim": [
@@ -4804,8 +4798,6 @@
      73000000,
      102000000
     ],
-    "debito_corrente": 1000000000.0,
-    "debito_lungo": 7470000000.0,
     "valuta": "USD"
    },
    "fuori_mercato": {
@@ -13762,7 +13754,7 @@
     "oneri_ttm": 414500000.0,
     "ebit_ttm": 3328500000.0,
     "trimestri": 4,
-    "conto_al": "2026-04-30",
+    "conto_al": "2026-07-31",
     "copertura": 8.03,
     "oneri_var_4trim_pct": 354.1,
     "oneri_trim": [
@@ -17797,7 +17789,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 8.14,
-   "pe": 10.6,
+   "pe": 9.9,
    "ath": 194.8,
    "ath_dist_pct": -9.1,
    "sma200_dist_pct": null,
@@ -18015,7 +18007,7 @@
     "target_mediana": 240.0
    },
    "health": 58,
-   "eps": 16.73,
+   "eps": 17.91,
    "beta": 2.39,
    "sharpe_1y": null,
    "sortino_1y": null,
@@ -18036,9 +18028,9 @@
     "float_shares": 5671182650.0,
     "float_pct": 79.9,
     "avg_volume_30d": 34073315.0,
-    "pe_ttm": 10.5798,
+    "pe_ttm": 9.8827,
     "forward_pe": 5.1938,
-    "eps_ttm": 16.73,
+    "eps_ttm": 17.91,
     "eps_forward": 34.0794,
     "revenue_fy": null,
     "net_income_fy": null,
@@ -18067,23 +18059,25 @@
    },
    "combustione": {
     "cassa": 26835986000000.0,
+    "debito": 21113139000000.0,
     "patrimonio": 262380610000000.0,
     "bilancio_al": "2026-06-30",
     "ocf_ttm": 126925786000000.0,
-    "capex_ttm": -29990022000000.0,
+    "capex_ttm": -36497183000000.0,
     "trimestri": 4,
     "cashflow_al": "2026-06-30",
-    "fcf_ttm": 96935764000000.0,
-    "mesi_capex": 10.7,
+    "fcf_ttm": 90428603000000.0,
+    "mesi_capex": 8.8,
     "emissione_netta_pct": 5.18,
+    "debito_netto": -5722847000000.0,
     "valuta": "KRW"
    },
    "credito": {
     "oneri_ttm": 767018000000.0,
-    "ebit_ttm": 93616316000000.0,
+    "ebit_ttm": 207535971000000.0,
     "trimestri": 4,
     "conto_al": "2026-06-30",
-    "copertura": 122.05,
+    "copertura": 270.58,
     "oneri_var_4trim_pct": -32.5,
     "oneri_trim": [
      228759000000,
@@ -18091,6 +18085,7 @@
      166943000000,
      154334000000
     ],
+    "debito_corrente": 5858873000000.0,
     "debito_lungo": 12727761000000.0,
     "valuta": "KRW"
    },
@@ -18570,9 +18565,9 @@
       "trim": "2026-06-30",
       "ricavi": 79318746000000,
       "utile": 93820236000000,
-      "operativo": null,
+      "operativo": 60542608000000,
       "margine": 118.3,
-      "margine_op": null
+      "margine_op": 76.3
      },
      {
       "trim": "2026-03-31",
@@ -21821,27 +21816,27 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 80053.78,
+   "price": 80086.22,
    "price_asof": "2026-09-05",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.48,
+   "change_pct": 0.52,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -36.6,
+   "ath_dist_pct": -36.5,
    "sma200_dist_pct": 14.9,
    "sma50_dist_pct": 15.9,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -36.6,
-   "day_high": 80096.13,
+   "w52_dist_pct": -36.5,
+   "day_high": 80134.7,
    "day_low": 79480.93,
    "support": 62687.1,
    "resistance": 82262.21,
    "rsi": 67.3,
-   "volume": 17418790912,
+   "volume": 18067159040,
    "vol_ratio": 1.29,
-   "atr_14": 2357.86,
+   "atr_14": 2360.62,
    "atr_pct": 2.95,
    "signal": "Sopra SMA50",
    "signal_class": "good",
@@ -21851,7 +21846,7 @@
      77300.48,
      81271.74,
      79671.97,
-     80053.78
+     80086.22
     ],
     "m6": [
      78538.23,
@@ -21979,7 +21974,7 @@
      77300.48,
      81271.74,
      79671.97,
-     80053.78
+     80086.22
     ],
     "all": [
      386.94,
@@ -22126,7 +22121,7 @@
      58558.86,
      62813.75,
      78548.63,
-     80053.78
+     80086.22
     ],
     "m1": [
      63024.32,
@@ -22150,7 +22145,7 @@
      77300.48,
      81271.74,
      79671.97,
-     80053.78
+     80086.22
     ],
     "m3": [
      61485.3,
@@ -22218,7 +22213,7 @@
      77300.48,
      81271.74,
      79671.97,
-     80053.78
+     80086.22
     ],
     "y1": [
      110650.98,
@@ -22294,7 +22289,7 @@
      78335.19,
      79027.42,
      78548.63,
-     80053.78
+     80086.22
     ],
     "d1": [
      79660.54,
@@ -22399,7 +22394,12 @@
      79987.48,
      79943.32,
      80097.99,
-     80053.78
+     80039.12,
+     80124.14,
+     80060.62,
+     80070.13,
+     80052.28,
+     80068.91
     ]
    },
    "earnings_date": null,
@@ -22410,10 +22410,10 @@
    "beta": null,
    "sharpe_1y": -0.7,
    "sortino_1y": -0.94,
-   "sharpe_6m": -0.0,
-   "sortino_6m": -0.0,
+   "sharpe_6m": 0.0,
+   "sortino_6m": 0.0,
    "prepost": null,
-   "prezzo_limite_aggiustato": 80053.78,
+   "prezzo_limite_aggiustato": 80086.22,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22426,22 +22426,22 @@
     "w1": {
      "support": 76248.3,
      "resistance": 82262.21,
-     "change_pct": 3.42
+     "change_pct": 3.47
     },
     "m1": {
      "support": 62648.57,
      "resistance": 82262.21,
-     "change_pct": 27.02
+     "change_pct": 27.07
     },
     "m3": {
      "support": 59532.32,
      "resistance": 82262.21,
-     "change_pct": 30.2
+     "change_pct": 30.25
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -8.86
+     "change_pct": -8.82
     }
    },
    "financials": [],
@@ -22468,55 +22468,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 80053.78,
+     "prezzo": 80086.22,
      "medie": {
       "sma10": {
-       "liv": 78825.14,
-       "dist_pct": 1.56
+       "liv": 78828.39,
+       "dist_pct": 1.6
       },
       "ema10": {
-       "liv": 78563.68,
-       "dist_pct": 1.9
+       "liv": 78569.58,
+       "dist_pct": 1.93
       },
       "sma20": {
-       "liv": 76473.4,
-       "dist_pct": 4.68
+       "liv": 76475.03,
+       "dist_pct": 4.72
       },
       "ema20": {
-       "liv": 76097.96,
-       "dist_pct": 5.2
+       "liv": 76101.05,
+       "dist_pct": 5.24
       },
       "sma30": {
-       "liv": 72239.45,
-       "dist_pct": 10.82
+       "liv": 72240.53,
+       "dist_pct": 10.86
       },
       "ema30": {
-       "liv": 73979.22,
-       "dist_pct": 8.21
+       "liv": 73981.32,
+       "dist_pct": 8.25
       },
       "sma50": {
-       "liv": 69099.35,
-       "dist_pct": 15.85
+       "liv": 69100.0,
+       "dist_pct": 15.9
       },
       "ema50": {
-       "liv": 71400.16,
-       "dist_pct": 12.12
+       "liv": 71401.43,
+       "dist_pct": 12.16
       },
       "sma100": {
-       "liv": 66404.06,
-       "dist_pct": 20.56
+       "liv": 66404.38,
+       "dist_pct": 20.6
       },
       "ema100": {
-       "liv": 69839.71,
-       "dist_pct": 14.63
+       "liv": 69840.35,
+       "dist_pct": 14.67
       },
       "sma200": {
-       "liv": 69685.14,
-       "dist_pct": 14.88
+       "liv": 69685.3,
+       "dist_pct": 14.93
       },
       "ema200": {
-       "liv": 72729.32,
-       "dist_pct": 10.07
+       "liv": 72729.64,
+       "dist_pct": 10.11
       }
      },
      "medie_battute": 12,
@@ -22524,18 +22524,18 @@
      "oscillatori": {
       "rsi14": 67.3,
       "macd": {
-       "linea": 3347.74,
-       "segnale": 3442.98,
-       "istogramma": -95.23
+       "linea": 3350.33,
+       "segnale": 3443.49,
+       "istogramma": -93.16
       },
-      "stoch_k": 66.7,
-      "stoch_d": 72.3,
-      "williams_r": -33.3,
-      "cci20": 35.4,
+      "stoch_k": 67.2,
+      "stoch_d": 72.5,
+      "williams_r": -32.8,
+      "cci20": 35.6,
       "adx14": 46.5,
       "di_su": 36.7,
       "di_giu": 9.4,
-      "momentum10": 1026.36
+      "momentum10": 1058.8
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23026,21 +23026,21 @@
      {
       "d": "2026-09-05",
       "o": 79676.33,
-      "h": 80096.13,
+      "h": 80134.7,
       "l": 79480.93,
-      "c": 80053.78
+      "c": 80086.22
      }
     ],
     "performance": {
-     "s1": 1.92,
-     "m1": 27.12,
-     "m3": 33.41,
-     "m6": 1.78,
-     "a1": -8.82,
-     "ytd": -9.78,
-     "a3": 196.85,
-     "a5": 82.81,
-     "a10": 13029.27
+     "s1": 1.96,
+     "m1": 27.17,
+     "m3": 33.47,
+     "m6": 1.82,
+     "a1": -8.79,
+     "ytd": -9.74,
+     "a3": 196.97,
+     "a5": 82.88,
+     "a10": 13034.59
     },
     "stagionalita": [
      {
@@ -23118,7 +23118,7 @@
      {
       "mese": 9,
       "media": -1.51,
-      "mediana": -0.58,
+      "mediana": -0.56,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23153,9 +23153,9 @@
      }
     ]
    },
-   "rs_1m": 26.9,
+   "rs_1m": 27.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 26.4,
+   "rs_ndx_1m": 26.5,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -35892,8 +35892,8 @@
    },
    "combustione": {
     "cassa": 3134218213000.0,
-    "debito": 982447000000.0,
-    "patrimonio": 6432518000000.0,
+    "debito": 1064949595000.0,
+    "patrimonio": 6432518334000.0,
     "bilancio_al": "2026-06-30",
     "ocf_ttm": 2634679085000.0,
     "capex_ttm": -1510012148000.0,
@@ -35901,7 +35901,7 @@
     "cashflow_al": "2026-06-30",
     "fcf_ttm": 1124666937000.0,
     "mesi_capex": 24.9,
-    "debito_netto": -2151771213000.0,
+    "debito_netto": -2069268618000.0,
     "valuta": "TWD"
    },
    "credito": {
@@ -36883,8 +36883,8 @@
      {
       "trim": "2026-06-30",
       "ricavi": 1270380250000,
-      "utile": 706562000000,
-      "operativo": 766603000000,
+      "utile": 706561938000,
+      "operativo": 766568191000,
       "margine": 55.6,
       "margine_op": 60.3
      },
@@ -36916,7 +36916,7 @@
       "trim": "2025-06-30",
       "ricavi": 933791869000,
       "utile": 398273102000,
-      "operativo": 463423000000,
+      "operativo": 463440498000,
       "margine": 42.7,
       "margine_op": 49.6
      }
@@ -52783,7 +52783,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 56
+     "score": 55
     },
     {
      "label": "Treasury 10A",
@@ -57857,6 +57857,20 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Anthropic Could Be the Next Mega IPO: 2 Magnificent Stocks That Already Own a Piece of the AI Unicorn",
+      "riassunto": "Key PointsAI company Anthropic is slated to go public later this year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-05T17:05:00Z",
+      "url": "https://www.nasdaq.com/articles/anthropic-could-be-next-mega-ipo-2-magnificent-stocks-already-own-piece-ai-unicorn"
+     },
+     {
+      "titolo": "Warren Buffett's Successor Greg Abel Spent $4.5 Billion Buying 1 Stock Last Quarter, and He Spent At Least $3.3 Billion Buying More This Quarter",
+      "riassunto": "Key PointsGreg Abel broke two long streaks started by Warren Buffett in the last few years of his tenure as CEO.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-05T16:50:00Z",
+      "url": "https://www.nasdaq.com/articles/warren-buffetts-successor-greg-abel-spent-45-billion-buying-1-stock-last-quarter-and-he"
+     },
+     {
       "titolo": "Sundar Pichai's Gemini App Grew From 400 Million to Over 1 Billion Monthly Users in a Little Over a Year. Does That Adoption Curve Justify Alphabet's AI Spending Binge?",
       "riassunto": "Key PointsDroves of ordinary users of AI-powered chatbot assistants are gravitating to the latest version of Google's Gemini app.",
       "fonte": "Nasdaq",
@@ -57883,20 +57897,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-05T09:20:00Z",
       "url": "https://www.nasdaq.com/articles/greg-abel-betting-lower-interest-rates-berkshire-hathaway-ceo-just-trimmed-bank-stocks"
-     },
-     {
-      "titolo": "The Nuclear IPO Boom Is Back: How Westinghouse and Its Rivals Stack Up for Long-Term Investors",
-      "riassunto": "Key PointsA new wave of nuclear IPOs ranges from solid operators like Westinghouse to highly speculative start-ups.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T22:34:01Z",
-      "url": "https://www.nasdaq.com/articles/nuclear-ipo-boom-back-how-westinghouse-and-its-rivals-stack-long-term-investors"
-     },
-     {
-      "titolo": "Broadcom (AVGO) Stock Is Down After Q3 Earnings: Is It Too Soon to Buy the Dip?",
-      "riassunto": "Despite posting strong quarterly results this week, Broadcom stock is down almost 15% over the last month and more than 25% below its all-time high reached in June.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T22:20:00Z",
-      "url": "https://www.nasdaq.com/articles/broadcom-avgo-stock-down-after-q3-earnings-it-too-soon-buy-dip"
      }
     ],
     "MRVL": [
@@ -58275,7 +58275,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-05T17:04:02Z"
+   "letto_il": "2026-09-05T17:57:28Z"
   }
  },
  "broker": null,
@@ -58415,6 +58415,20 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Anthropic Could Be the Next Mega IPO: 2 Magnificent Stocks That Already Own a Piece of the AI Unicorn",
+     "riassunto": "Key PointsAI company Anthropic is slated to go public later this year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-05T17:05:00Z",
+     "url": "https://www.nasdaq.com/articles/anthropic-could-be-next-mega-ipo-2-magnificent-stocks-already-own-piece-ai-unicorn"
+    },
+    {
+     "titolo": "Warren Buffett's Successor Greg Abel Spent $4.5 Billion Buying 1 Stock Last Quarter, and He Spent At Least $3.3 Billion Buying More This Quarter",
+     "riassunto": "Key PointsGreg Abel broke two long streaks started by Warren Buffett in the last few years of his tenure as CEO.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-05T16:50:00Z",
+     "url": "https://www.nasdaq.com/articles/warren-buffetts-successor-greg-abel-spent-45-billion-buying-1-stock-last-quarter-and-he"
+    },
+    {
      "titolo": "Sundar Pichai's Gemini App Grew From 400 Million to Over 1 Billion Monthly Users in a Little Over a Year. Does That Adoption Curve Justify Alphabet's AI Spending Binge?",
      "riassunto": "Key PointsDroves of ordinary users of AI-powered chatbot assistants are gravitating to the latest version of Google's Gemini app.",
      "fonte": "Nasdaq",
@@ -58441,20 +58455,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-05T09:20:00Z",
      "url": "https://www.nasdaq.com/articles/greg-abel-betting-lower-interest-rates-berkshire-hathaway-ceo-just-trimmed-bank-stocks"
-    },
-    {
-     "titolo": "The Nuclear IPO Boom Is Back: How Westinghouse and Its Rivals Stack Up for Long-Term Investors",
-     "riassunto": "Key PointsA new wave of nuclear IPOs ranges from solid operators like Westinghouse to highly speculative start-ups.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T22:34:01Z",
-     "url": "https://www.nasdaq.com/articles/nuclear-ipo-boom-back-how-westinghouse-and-its-rivals-stack-long-term-investors"
-    },
-    {
-     "titolo": "Broadcom (AVGO) Stock Is Down After Q3 Earnings: Is It Too Soon to Buy the Dip?",
-     "riassunto": "Despite posting strong quarterly results this week, Broadcom stock is down almost 15% over the last month and more than 25% below its all-time high reached in June.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T22:20:00Z",
-     "url": "https://www.nasdaq.com/articles/broadcom-avgo-stock-down-after-q3-earnings-it-too-soon-buy-dip"
     }
    ],
    "MRVL": [
@@ -58833,7 +58833,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-05T17:04:02Z"
+  "letto_il": "2026-09-05T17:57:28Z"
  },
  "predictions": [
   {
@@ -58845,26 +58845,6 @@
    "question": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?",
    "yes": 50,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $76,000 on September 5?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-5-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $78,000 on September 5?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-5-2026"
-  },
-  {
-   "question": "Bitcoin Up or Down on September 5?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-5-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $74,000 on September 5?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-74k-on-september-5-2026"
   }
  ],
  "options": {
@@ -79621,6 +79601,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-05T17:04:03Z"
+  "generated_at": "2026-09-05T17:57:28Z"
  }
 }
