@@ -1,4 +1,4 @@
-⟦ BUILD v430 · generato 06/09/2026 17:17 ⟧
+⟦ BUILD v430 · generato 06/09/2026 17:28 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 06/09/2026, 17:17:27 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 13:17, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -0,24% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~20.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 06/09/2026, 17:28:42 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 13:28, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -0,13% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~20h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 06/09/2026, 17:17:27, prossimo run 06/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 06/09/2026, 17:28:42, prossimo run 06/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-04) · Curva 10A-3M (2026-09-04) · Treasury USA 30A (2026-09-03) · Tasso reale 10A (TIPS) (2026-09-03) · Inflazione attesa 10A (breakeven) (2026-09-04) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -103,9 +103,9 @@ QUADRO MACRO:
       Canada is set to impose new retaliatory tariffs of as much as 50% on US goods starting Sept. 8, targeting $27.6 billion of imports including steel, aluminum, pulp and paper, appliances and agricultural equipment. Bloomberg News Ottawa Bureau Chief Brian Platt tells Christina Ruffini and Jeff Mason on Bloomberg This Wee
     · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] BlackRock to JPMorgan Bet on EM as Turmoil Seizes Global Bonds
       As government bonds from major economies buckle, funds including those run by JPMorgan Asset Management and BlackRock Inc. have found an unlikely edge in emerging markets.
-    · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] US Iran Fight Shifts to Economic Endurance
+    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] US Iran Fight Shifts to Economic Endurance
       The Trump administration is intensifying economic pressure on Iran through sanctions and a blockade, with Treasury Secretary Scott Bessent saying Tehran has about 30 million barrels of crude left for potential Chinese buyers. Bloomberg News Middle East Reporter Dan Williams joins Christina Ruffini and Jeff Mason on Blo
-    · [CNBC Economia, 17h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] From ‘mystery vacations’ to hostels, budget travelers get thrifty as prices rise
+    · [CNBC Economia, 18h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] From ‘mystery vacations’ to hostels, budget travelers get thrifty as prices rise
       Despite rising prices and the travel industry focusing on the luxury segment, budget-minded vacationers are still finding ways to get away.
     · [CNBC Economia, 22h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump turns up the heat on Warsh as Fed rate hike looms
       Ten days ahead of the next Federal Reserve meeting, the Trump administration looks to be in a full-court press to halt a rate hike in its tracks.
@@ -237,11 +237,11 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsAMD committed in late July to invest up to $5 billion in Anthropic, alongside an agreement to deploy up to 2 gigawatts of its Instinct MI450 series GPUs.
   [AMD] · [Nasdaq, 31h fa] Got $1,000? 3 Stocks Building the Physical Artificial Intelligence (AI) Era
       Key PointsAstera Labs is positioned to benefit as AI systems require faster, more efficient movement of data between GPUs, CPUs, memory, and networking equipment.
-  [BE] · [Nasdaq, 30h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
+  [BE] · [Nasdaq, 31h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
       Key PointsBloom&rsquo;s backlog swelled to $20 billion at the end of 2025.
   [BE] · [Nasdaq, 51h fa] Vertiv’s UIG Deal Targets the Next Big Constraint in AI Data Centers
       Vertiv Holdings (NYSE: VRT)&nbsp;just made its clearest statement yet about where the next phase of AI infrastructure spending is headed. On Sept.&nbsp;2, the&nbsp;company announced it will&nbsp;acquire&nbsp;UtilityInnovation&nbsp;Group (UIG), a microgrid and behind-the-meter power specialist. The deal will
-  [CRWV] · [Nasdaq, 30h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
+  [CRWV] · [Nasdaq, 31h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
       Key PointsBloom&rsquo;s backlog swelled to $20 billion at the end of 2025.
   [CRWV] · [Nasdaq, 47h fa] BigBear.ai vs. CoreWeave: Evaluating the Better Artificial Intelligence Stock to Buy for 2026
       Key PointsBigBear.ai provides decision-intelligence software used by national security and supply chain organizations to navigate complex data environments.
@@ -253,7 +253,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsThe stock looks dirt cheap, but for a good reason.
   [MU] · [Nasdaq, 25h fa] Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?
       Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.
-  [NVDA] · [Nasdaq, 1h fa] Nvidia's Critical Shift Beyond GPUs Could Fuel a New Growth Phase
+  [NVDA] · [Nasdaq, 2h fa] Nvidia's Critical Shift Beyond GPUs Could Fuel a New Growth Phase
       Nvidia (NASDAQ: NVDA) is moving beyond selling GPUs by helping build the infrastructure that its clients could depend on for decades. Just one AI factory project, for example, creates an intriguing possibility: long-lived facilities that can be upgraded with new generations of Nv
   [NVDA] · [Nasdaq, 4h fa] Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?
       Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.
