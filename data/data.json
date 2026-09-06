@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-06T12:00:06Z",
+ "updated_at": "2026-09-06T12:29:38Z",
  "eurusd": 1.1621,
  "totals": {
   "usd_value": 0,
@@ -1770,7 +1770,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -21772,28 +21772,28 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79912.87,
+   "price": 79993.97,
    "price_asof": "2026-09-06",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.11,
+   "change_pct": 0.21,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -36.7,
-   "sma200_dist_pct": 14.6,
-   "sma50_dist_pct": 15.2,
+   "ath_dist_pct": -36.6,
+   "sma200_dist_pct": 14.7,
+   "sma50_dist_pct": 15.3,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -36.7,
+   "w52_dist_pct": -36.6,
    "day_high": 80106.03,
    "day_low": 79682.58,
    "support": 63980.32,
    "resistance": 82262.21,
-   "rsi": 67.0,
-   "volume": 20207429632,
+   "rsi": 67.2,
+   "volume": 20166574080,
    "vol_ratio": 0.63,
    "atr_14": 2227.27,
-   "atr_pct": 2.79,
+   "atr_pct": 2.78,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -21802,7 +21802,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79912.87
+     79993.97
     ],
     "m6": [
      79827.91,
@@ -21930,7 +21930,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79912.87
+     79993.97
     ],
     "all": [
      386.94,
@@ -22077,7 +22077,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79671.97
+     79993.97
     ],
     "m1": [
      62818.65,
@@ -22101,7 +22101,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79912.87
+     79993.97
     ],
     "m3": [
      62544.2,
@@ -22169,7 +22169,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79912.87
+     79993.97
     ],
     "y1": [
      110224.7,
@@ -22245,7 +22245,7 @@
      77083.41,
      80257.54,
      77403.62,
-     79912.87
+     79993.97
     ],
     "d1": [
      79883.96,
@@ -22319,7 +22319,10 @@
      79941.01,
      79970.98,
      79952.98,
-     79920.37
+     79920.37,
+     79916.67,
+     79936.03,
+     79991.99
     ]
    },
    "earnings_date": null,
@@ -22328,12 +22331,12 @@
    "health": 79,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.7,
+   "sharpe_1y": -0.69,
    "sortino_1y": -0.94,
-   "sharpe_6m": -0.0,
-   "sortino_6m": -0.0,
+   "sharpe_6m": 0.0,
+   "sortino_6m": 0.01,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79912.87,
+   "prezzo_limite_aggiustato": 79993.97,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22346,22 +22349,22 @@
     "w1": {
      "support": 76248.3,
      "resistance": 82262.21,
-     "change_pct": 3.38
+     "change_pct": 3.48
     },
     "m1": {
      "support": 62648.57,
      "resistance": 82262.21,
-     "change_pct": 27.21
+     "change_pct": 27.34
     },
     "m3": {
      "support": 61176.72,
      "resistance": 82262.21,
-     "change_pct": 27.77
+     "change_pct": 27.9
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -8.29
+     "change_pct": -8.2
     }
    },
    "financials": [],
@@ -22388,74 +22391,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79912.87,
+     "prezzo": 79993.97,
      "medie": {
       "sma10": {
-       "liv": 78767.69,
-       "dist_pct": 1.45
+       "liv": 78775.8,
+       "dist_pct": 1.55
       },
       "ema10": {
-       "liv": 78774.79,
-       "dist_pct": 1.44
+       "liv": 78789.53,
+       "dist_pct": 1.53
       },
       "sma20": {
-       "liv": 77232.24,
-       "dist_pct": 3.47
+       "liv": 77236.29,
+       "dist_pct": 3.57
       },
       "ema20": {
-       "liv": 76441.48,
-       "dist_pct": 4.54
+       "liv": 76449.2,
+       "dist_pct": 4.64
       },
       "sma30": {
-       "liv": 72732.88,
-       "dist_pct": 9.87
+       "liv": 72735.58,
+       "dist_pct": 9.98
       },
       "ema30": {
-       "liv": 74348.16,
-       "dist_pct": 7.48
+       "liv": 74353.4,
+       "dist_pct": 7.59
       },
       "sma50": {
-       "liv": 69397.08,
-       "dist_pct": 15.15
+       "liv": 69398.7,
+       "dist_pct": 15.27
       },
       "ema50": {
-       "liv": 71725.33,
-       "dist_pct": 11.42
+       "liv": 71728.51,
+       "dist_pct": 11.52
       },
       "sma100": {
-       "liv": 66467.16,
-       "dist_pct": 20.23
+       "liv": 66467.97,
+       "dist_pct": 20.35
       },
       "ema100": {
-       "liv": 70034.43,
-       "dist_pct": 14.11
+       "liv": 70036.04,
+       "dist_pct": 14.22
       },
       "sma200": {
-       "liv": 69751.43,
-       "dist_pct": 14.57
+       "liv": 69751.84,
+       "dist_pct": 14.68
       },
       "ema200": {
-       "liv": 72787.57,
-       "dist_pct": 9.79
+       "liv": 72788.37,
+       "dist_pct": 9.9
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 67.0,
+      "rsi14": 67.2,
       "macd": {
-       "linea": 3230.16,
-       "segnale": 3397.48,
-       "istogramma": -167.32
+       "linea": 3236.63,
+       "segnale": 3398.77,
+       "istogramma": -162.14
       },
-      "stoch_k": 60.9,
-      "stoch_d": 61.7,
-      "williams_r": -39.1,
-      "cci20": 27.5,
+      "stoch_k": 62.3,
+      "stoch_d": 62.2,
+      "williams_r": -37.7,
+      "cci20": 27.7,
       "adx14": 47.4,
       "di_su": 36.1,
       "di_giu": 9.3,
-      "momentum10": -344.67
+      "momentum10": -263.57
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22948,19 +22951,19 @@
       "o": 79830.38,
       "h": 80106.03,
       "l": 79682.58,
-      "c": 79912.87
+      "c": 79993.97
      }
     ],
     "performance": {
-     "s1": 3.24,
-     "m1": 26.8,
-     "m3": 29.97,
-     "m6": 1.75,
-     "a1": -9.02,
-     "ytd": -9.94,
-     "a3": 196.33,
-     "a5": 82.49,
-     "a10": 13006.16
+     "s1": 3.35,
+     "m1": 26.93,
+     "m3": 30.1,
+     "m6": 1.85,
+     "a1": -8.93,
+     "ytd": -9.85,
+     "a3": 196.63,
+     "a5": 82.67,
+     "a10": 13019.47
     },
     "stagionalita": [
      {
@@ -23037,8 +23040,8 @@
      },
      {
       "mese": 9,
-      "media": -1.55,
-      "mediana": -0.83,
+      "media": -1.52,
+      "mediana": -0.62,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23073,9 +23076,9 @@
      }
     ]
    },
-   "rs_1m": 27.1,
+   "rs_1m": 27.2,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 26.6,
+   "rs_ndx_1m": 26.8,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -47346,6 +47349,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "US Iran Fight Shifts to Economic Endurance",
+     "riassunto": "The Trump administration is intensifying economic pressure on Iran through sanctions and a blockade, with Treasury Secretary Scott Bessent saying Tehran has about 30 million barrels of crude left for potential Chinese buyers. Bloomberg News Middle East Reporter Dan Williams joins Christina Ruffini and Jeff Mason on Blo",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-06T11:54:03Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-06/us-iran-fight-shifts-to-economic-endurance-video"
+    },
+    {
      "titolo": "From ‘mystery vacations’ to hostels, budget travelers get thrifty as prices rise",
      "riassunto": "Despite rising prices and the travel industry focusing on the luxury segment, budget-minded vacationers are still finding ways to get away.",
      "fonte": "CNBC Economia",
@@ -47463,13 +47473,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-08-31T11:23:42Z",
      "url": "https://www.cnbc.com/2026/08/31/india-economy-gdp-energy-el-nino.html"
-    },
-    {
-     "titolo": "China's factory activity shrinks for second straight month, contracting less than expected",
-     "riassunto": "China's manufacturing activity shrank for a second straight month, keeping pressure on Beijing to support the economy as growth loses momentum.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-08-31T03:15:01Z",
-     "url": "https://www.cnbc.com/2026/08/31/china-pmi-august-economy-slowdown.html"
     }
    ],
    "fonti": [
@@ -52374,7 +52377,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 52
     },
     {
      "label": "Treasury 10A",
@@ -57448,6 +57451,20 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Why Rezolve AI Stock Plummeted This Week",
+      "riassunto": "Key PointsRezolve AI stock fell this week after the company posted its first-half results.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T11:20:00Z",
+      "url": "https://www.nasdaq.com/articles/why-rezolve-ai-stock-plummeted-week"
+     },
+     {
+      "titolo": "6 Hyperscalers Driving the AI Revolution Are Projected to Spend $1.3 Trillion on Capex in 2027. Only 1 Is Forecast to Have Positive Free Cash Flow.",
+      "riassunto": "Key PointsMajor capital expenditures have begun to hamper free cash flow for many hyperscalers.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T10:42:00Z",
+      "url": "https://www.nasdaq.com/articles/6-hyperscalers-driving-ai-revolution-are-projected-spend-13-trillion-capex-2027-only-1"
+     },
+     {
       "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
       "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
       "fonte": "Nasdaq",
@@ -57474,20 +57491,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-05T15:05:00Z",
       "url": "https://www.nasdaq.com/articles/sundar-pichais-gemini-app-grew-400-million-over-1-billion-monthly-users-little-over-year"
-     },
-     {
-      "titolo": "Most Investors Overpay for AI Hype. Nvidia Is the Exception.",
-      "riassunto": "Key PointsNvidia's second-quarter revenue more than doubled to $96.2 billion.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T14:29:00Z",
-      "url": "https://www.nasdaq.com/articles/most-investors-overpay-ai-hype-nvidia-exception"
-     },
-     {
-      "titolo": "Amazon, Alphabet, and Microsoft: Two I'm Buying and One I'm Selling",
-      "riassunto": "Key PointsAmazon and Alphabet are seeing their cloud growth rates rapidly accelerate.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T09:48:00Z",
-      "url": "https://www.nasdaq.com/articles/amazon-alphabet-and-microsoft-two-im-buying-and-one-im-selling"
      }
     ],
     "MRVL": [
@@ -57624,6 +57627,20 @@
     ],
     "NVDA": [
      {
+      "titolo": "Prediction: Nvidia Will Join the Vanguard Russell 1000 Value ETF Before the End of the Year. Here's Why the ETF Is an Excellent Buy Now.",
+      "riassunto": "Key PointsThe Vanguard Russell 1000 Value ETF holds stocks traditionally labeled as growth names, including Amazon, Apple, and Microsoft.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T11:27:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-join-vanguard-russell-1000-value-etf-end-year-heres-why-etf"
+     },
+     {
+      "titolo": "Prediction: Nvidia Stock Will Double in Under a Year",
+      "riassunto": "Key PointsDemand for AI computing products isn't slowing down.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T10:25:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-nvidia-stock-will-double-under-year"
+     },
+     {
       "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
       "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
       "fonte": "Nasdaq",
@@ -57650,23 +57667,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-05T14:29:00Z",
       "url": "https://www.nasdaq.com/articles/most-investors-overpay-ai-hype-nvidia-exception"
-     },
-     {
-      "titolo": "3 Incredible High-Growth Stocks to Buy With $10,000 Right Now",
-      "riassunto": "Key PointsNvidia is growing rapidly at a cheap price tag.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T14:04:00Z",
-      "url": "https://www.nasdaq.com/articles/3-incredible-high-growth-stocks-buy-10000-right-now"
-     },
-     {
-      "titolo": "Recent News From Nvidia and SK Hynix Reveals Exactly What the Market Expects for Micron Technology's Future",
-      "riassunto": "Key PointsNvidia increased its supply commitments by $160 billion last quarter, mostly related to memory.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T12:05:00Z",
-      "url": "https://www.nasdaq.com/articles/recent-news-nvidia-and-sk-hynix-reveals-exactly-what-market-expects-micron-technologys"
      }
     ],
     "ORCL": [
+     {
+      "titolo": "6 Hyperscalers Driving the AI Revolution Are Projected to Spend $1.3 Trillion on Capex in 2027. Only 1 Is Forecast to Have Positive Free Cash Flow.",
+      "riassunto": "Key PointsMajor capital expenditures have begun to hamper free cash flow for many hyperscalers.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T10:42:00Z",
+      "url": "https://www.nasdaq.com/articles/6-hyperscalers-driving-ai-revolution-are-projected-spend-13-trillion-capex-2027-only-1"
+     },
+     {
+      "titolo": "I Own Both Oracle and NuScale for Different Reasons. Here's How They Fit Together.",
+      "riassunto": "Key PointsOracle and NuScale Power stand to benefit from growing demand for AI for different reasons.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T10:12:00Z",
+      "url": "https://www.nasdaq.com/articles/i-own-both-oracle-and-nuscale-different-reasons-heres-how-they-fit-together"
+     },
      {
       "titolo": "I Love Bloom Energy for 1 Reason, and It's Not the Backlog",
       "riassunto": "Key PointsBloom&rsquo;s backlog swelled to $20 billion at the end of 2025.",
@@ -57694,20 +57711,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T11:50:00Z",
       "url": "https://www.nasdaq.com/articles/breakfast-news-week-review"
-     },
-     {
-      "titolo": "Why Is Oracle Stock Up Today?",
-      "riassunto": "Key PointsShares of Oracle jumped on Thursday, Sept. 3, 2026, as Fed Governor Christopher Waller signaled support for holding interest rates steady if inflation data continues improving.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-03T21:20:08Z",
-      "url": "https://www.nasdaq.com/articles/why-oracle-stock-today"
-     },
-     {
-      "titolo": "Down 55% From Its High, Is Oracle a Buy?",
-      "riassunto": "Key PointsThe company saw strong revenue and backlog growth in fiscal 2026, but free cash flow turned sharply negative.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-03T19:57:00Z",
-      "url": "https://www.nasdaq.com/articles/down-55-its-high-oracle-buy"
      }
     ],
     "PLTR": [
@@ -57866,7 +57869,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-06T12:00:06Z"
+   "letto_il": "2026-09-06T12:29:38Z"
   }
  },
  "broker": null,
@@ -58006,6 +58009,20 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Why Rezolve AI Stock Plummeted This Week",
+     "riassunto": "Key PointsRezolve AI stock fell this week after the company posted its first-half results.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T11:20:00Z",
+     "url": "https://www.nasdaq.com/articles/why-rezolve-ai-stock-plummeted-week"
+    },
+    {
+     "titolo": "6 Hyperscalers Driving the AI Revolution Are Projected to Spend $1.3 Trillion on Capex in 2027. Only 1 Is Forecast to Have Positive Free Cash Flow.",
+     "riassunto": "Key PointsMajor capital expenditures have begun to hamper free cash flow for many hyperscalers.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T10:42:00Z",
+     "url": "https://www.nasdaq.com/articles/6-hyperscalers-driving-ai-revolution-are-projected-spend-13-trillion-capex-2027-only-1"
+    },
+    {
      "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
      "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
      "fonte": "Nasdaq",
@@ -58032,20 +58049,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-05T15:05:00Z",
      "url": "https://www.nasdaq.com/articles/sundar-pichais-gemini-app-grew-400-million-over-1-billion-monthly-users-little-over-year"
-    },
-    {
-     "titolo": "Most Investors Overpay for AI Hype. Nvidia Is the Exception.",
-     "riassunto": "Key PointsNvidia's second-quarter revenue more than doubled to $96.2 billion.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T14:29:00Z",
-     "url": "https://www.nasdaq.com/articles/most-investors-overpay-ai-hype-nvidia-exception"
-    },
-    {
-     "titolo": "Amazon, Alphabet, and Microsoft: Two I'm Buying and One I'm Selling",
-     "riassunto": "Key PointsAmazon and Alphabet are seeing their cloud growth rates rapidly accelerate.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T09:48:00Z",
-     "url": "https://www.nasdaq.com/articles/amazon-alphabet-and-microsoft-two-im-buying-and-one-im-selling"
     }
    ],
    "MRVL": [
@@ -58182,6 +58185,20 @@
    ],
    "NVDA": [
     {
+     "titolo": "Prediction: Nvidia Will Join the Vanguard Russell 1000 Value ETF Before the End of the Year. Here's Why the ETF Is an Excellent Buy Now.",
+     "riassunto": "Key PointsThe Vanguard Russell 1000 Value ETF holds stocks traditionally labeled as growth names, including Amazon, Apple, and Microsoft.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T11:27:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-join-vanguard-russell-1000-value-etf-end-year-heres-why-etf"
+    },
+    {
+     "titolo": "Prediction: Nvidia Stock Will Double in Under a Year",
+     "riassunto": "Key PointsDemand for AI computing products isn't slowing down.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T10:25:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-nvidia-stock-will-double-under-year"
+    },
+    {
      "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
      "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
      "fonte": "Nasdaq",
@@ -58208,23 +58225,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-05T14:29:00Z",
      "url": "https://www.nasdaq.com/articles/most-investors-overpay-ai-hype-nvidia-exception"
-    },
-    {
-     "titolo": "3 Incredible High-Growth Stocks to Buy With $10,000 Right Now",
-     "riassunto": "Key PointsNvidia is growing rapidly at a cheap price tag.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T14:04:00Z",
-     "url": "https://www.nasdaq.com/articles/3-incredible-high-growth-stocks-buy-10000-right-now"
-    },
-    {
-     "titolo": "Recent News From Nvidia and SK Hynix Reveals Exactly What the Market Expects for Micron Technology's Future",
-     "riassunto": "Key PointsNvidia increased its supply commitments by $160 billion last quarter, mostly related to memory.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T12:05:00Z",
-     "url": "https://www.nasdaq.com/articles/recent-news-nvidia-and-sk-hynix-reveals-exactly-what-market-expects-micron-technologys"
     }
    ],
    "ORCL": [
+    {
+     "titolo": "6 Hyperscalers Driving the AI Revolution Are Projected to Spend $1.3 Trillion on Capex in 2027. Only 1 Is Forecast to Have Positive Free Cash Flow.",
+     "riassunto": "Key PointsMajor capital expenditures have begun to hamper free cash flow for many hyperscalers.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T10:42:00Z",
+     "url": "https://www.nasdaq.com/articles/6-hyperscalers-driving-ai-revolution-are-projected-spend-13-trillion-capex-2027-only-1"
+    },
+    {
+     "titolo": "I Own Both Oracle and NuScale for Different Reasons. Here's How They Fit Together.",
+     "riassunto": "Key PointsOracle and NuScale Power stand to benefit from growing demand for AI for different reasons.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T10:12:00Z",
+     "url": "https://www.nasdaq.com/articles/i-own-both-oracle-and-nuscale-different-reasons-heres-how-they-fit-together"
+    },
     {
      "titolo": "I Love Bloom Energy for 1 Reason, and It's Not the Backlog",
      "riassunto": "Key PointsBloom&rsquo;s backlog swelled to $20 billion at the end of 2025.",
@@ -58252,20 +58269,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T11:50:00Z",
      "url": "https://www.nasdaq.com/articles/breakfast-news-week-review"
-    },
-    {
-     "titolo": "Why Is Oracle Stock Up Today?",
-     "riassunto": "Key PointsShares of Oracle jumped on Thursday, Sept. 3, 2026, as Fed Governor Christopher Waller signaled support for holding interest rates steady if inflation data continues improving.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-03T21:20:08Z",
-     "url": "https://www.nasdaq.com/articles/why-oracle-stock-today"
-    },
-    {
-     "titolo": "Down 55% From Its High, Is Oracle a Buy?",
-     "riassunto": "Key PointsThe company saw strong revenue and backlog growth in fiscal 2026, but free cash flow turned sharply negative.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-03T19:57:00Z",
-     "url": "https://www.nasdaq.com/articles/down-55-its-high-oracle-buy"
     }
    ],
    "PLTR": [
@@ -58424,7 +58427,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-06T12:00:06Z"
+  "letto_il": "2026-09-06T12:29:38Z"
  },
  "predictions": [
   {
@@ -58449,7 +58452,7 @@
   },
   {
    "question": "Bitcoin Up or Down on September 6?",
-   "yes": 66,
+   "yes": 72,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-6-2026"
   },
   {
@@ -79194,7 +79197,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 12 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -79246,6 +79249,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-06T12:00:06Z"
+  "generated_at": "2026-09-06T12:29:38Z"
  }
 }
