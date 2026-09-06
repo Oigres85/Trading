@@ -1,4 +1,4 @@
-⟦ BUILD v430 · generato 06/09/2026 17:28 ⟧
+⟦ BUILD v430 · generato 06/09/2026 18:03 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 06/09/2026, 17:28:42 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 13:28, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -0,13% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~20h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 06/09/2026, 18:03:43 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 14:03, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +1,64% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -0,08% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19.5h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 06/09/2026, 17:28:42, prossimo run 06/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 06/09/2026, 18:03:43, prossimo run 06/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-04) · Curva 10A-3M (2026-09-04) · Treasury USA 30A (2026-09-03) · Tasso reale 10A (TIPS) (2026-09-03) · Inflazione attesa 10A (breakeven) (2026-09-04) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -97,21 +97,21 @@ QUADRO MACRO:
 - TITOLI MACRO — 5 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 9 pubblicate DOPO l'ultima chiusura USA del 2026-09-04, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Rep. Stevens Says Canadian Tariffs Are Squeezing Michigan
       On Bloomberg This Weekend, Michigan Representative Haley Stevens (D) says escalating US tariffs on Canadian goods are raising costs and creating uncertainty for manufacturers in her district, with the deeply integrated auto supply chain particularly exposed. Stevens tells hosts Christina Ruffini and Jeff Mason that she
-    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump Says Canada’s Dollar ‘Imbalance’ With US Is Unacceptable
+    · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump Says Canada’s Dollar ‘Imbalance’ With US Is Unacceptable
       “Canada’s (currency) Dollar imbalance with the U.S. is unacceptable,” President Donald Trump says in a Truth Social post.
     · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Canada Hits Back With New US Tariffs
       Canada is set to impose new retaliatory tariffs of as much as 50% on US goods starting Sept. 8, targeting $27.6 billion of imports including steel, aluminum, pulp and paper, appliances and agricultural equipment. Bloomberg News Ottawa Bureau Chief Brian Platt tells Christina Ruffini and Jeff Mason on Bloomberg This Wee
-    · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] BlackRock to JPMorgan Bet on EM as Turmoil Seizes Global Bonds
+    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] BlackRock to JPMorgan Bet on EM as Turmoil Seizes Global Bonds
       As government bonds from major economies buckle, funds including those run by JPMorgan Asset Management and BlackRock Inc. have found an unlikely edge in emerging markets.
     · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] US Iran Fight Shifts to Economic Endurance
       The Trump administration is intensifying economic pressure on Iran through sanctions and a blockade, with Treasury Secretary Scott Bessent saying Tehran has about 30 million barrels of crude left for potential Chinese buyers. Bloomberg News Middle East Reporter Dan Williams joins Christina Ruffini and Jeff Mason on Blo
     · [CNBC Economia, 18h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] From ‘mystery vacations’ to hostels, budget travelers get thrifty as prices rise
       Despite rising prices and the travel industry focusing on the luxury segment, budget-minded vacationers are still finding ways to get away.
-    · [CNBC Economia, 22h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump turns up the heat on Warsh as Fed rate hike looms
+    · [CNBC Economia, 23h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump turns up the heat on Warsh as Fed rate hike looms
       Ten days ahead of the next Federal Reserve meeting, the Trump administration looks to be in a full-court press to halt a rate hike in its tracks.
-    · [MarketWatch, 23h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Why the jobs report will actually be good for bonds
+    · [MarketWatch, 24h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Why the jobs report will actually be good for bonds
       Based on the chatter on Wall Street, you’d think labor has never had it so good. Sadly for working Americans, this isn’t actually the case.
-    · [MarketWatch, 23h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] 7% mortgage rates are already here, some buyers and mortgage experts say
+    · [MarketWatch, 24h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] 7% mortgage rates are already here, some buyers and mortgage experts say
       Mortgage rates ticked up to a new high for the year, delivering more bad news for home buyers.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-09-11 Inflazione CPI (a/a) (precedente 3.4%) · 2026-09-16 Vendite al dettaglio (m/m) (precedente -0.6%) · 2026-09-17 Manifattura Philly Fed (al posto dell'ISM) (precedente +47.4). ⚠ Per 3 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich), Curva 10A-2A, Treasury USA 30A): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 3 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-3M, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-09-10 ORCL. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -193,7 +193,7 @@ TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre
 - NVDA: medie: +4,67% dalla 20, +9,4% dalla 50, +17,22% dalla 200 · RSI 60,4 · -2,5% dal massimo 52s · forza relativa 1M +7,8 pp vs SOX · ampiezza tipica di seduta 3,2% · P/E prospettico 14,9× · ricavi +105,9% a/a · trimestrale fra 72 giorni
 - AMD: medie: +0,5% dalla 20, -4,35% dalla 50, +40,05% dalla 200 · RSI 49,7 · -18,3% dal massimo 52s · forza relativa 1M +0,2 pp vs SOX · ampiezza tipica di seduta 4,7% · P/E prospettico 30,9× · ricavi +50,1% a/a · trimestrale fra 58 giorni
 - MSTR: medie: +23,61% dalla 20, +37,97% dalla 50, +2,67% dalla 200 · RSI 66,2 · -60,9% dal massimo 52s · forza relativa 1M +46,9 pp vs NDX · ampiezza tipica di seduta 6,1% · P/E prospettico 2,9× · ricavi +6,9% a/a · trimestrale fra 53 giorni
-- PLTR: medie: -1,46% dalla 20, +16,31% dalla 50, +15,17% dalla 200 · RSI 54,2 · -16% dal massimo 52s · forza relativa 1M +11,2 pp vs NDX · ampiezza tipica di seduta 4,9% · P/E prospettico 75,3× · ricavi +92,8% a/a · trimestrale fra 57 giorni
+- PLTR: medie: -1,46% dalla 20, +16,31% dalla 50, +15,17% dalla 200 · RSI 54,2 · -16% dal massimo 52s · forza relativa 1M +11,2 pp vs NDX · ampiezza tipica di seduta 4,9% · P/E prospettico 74,9× · ricavi +92,8% a/a · trimestrale fra 57 giorni
 - GOOGL: medie: -1,44% dalla 20, -2,84% dalla 50, +0,88% dalla 200 · RSI 45 · -17,1% dal massimo 52s · forza relativa 1M -5,9 pp vs NDX · ampiezza tipica di seduta 2,4% · P/E prospettico 22,8× · ricavi +24,2% a/a · trimestrale fra 52 giorni
 - WDC: medie: +0,7% dalla 20, -7,79% dalla 50, +25,42% dalla 200 · RSI 48,3 · -41,6% dal massimo 52s · forza relativa 1M +3,4 pp vs SP500 · ampiezza tipica di seduta 7,1% · P/E prospettico 14,7× · ricavi +43,8% a/a · trimestrale fra 60 giorni
 - ORCL: medie: +7,06% dalla 20, +13,62% dalla 50, -5,44% dalla 200 · RSI 61 · -53,5% dal massimo 52s · forza relativa 1M +10,6 pp vs SP500 · ampiezza tipica di seduta 4,3% · P/E prospettico 14,5× · ricavi +20,6% a/a · trimestrale fra 4 giorni
@@ -233,37 +233,37 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (74,3% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 19h fa] AMD Committed Up to $5 Billion to Anthropic, and Anthropic's IPO Prospectus Is Reportedly Days Away
+  [AMD] · [Nasdaq, 20h fa] AMD Committed Up to $5 Billion to Anthropic, and Anthropic's IPO Prospectus Is Reportedly Days Away
       Key PointsAMD committed in late July to invest up to $5 billion in Anthropic, alongside an agreement to deploy up to 2 gigawatts of its Instinct MI450 series GPUs.
   [AMD] · [Nasdaq, 31h fa] Got $1,000? 3 Stocks Building the Physical Artificial Intelligence (AI) Era
       Key PointsAstera Labs is positioned to benefit as AI systems require faster, more efficient movement of data between GPUs, CPUs, memory, and networking equipment.
   [BE] · [Nasdaq, 31h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
       Key PointsBloom&rsquo;s backlog swelled to $20 billion at the end of 2025.
-  [BE] · [Nasdaq, 51h fa] Vertiv’s UIG Deal Targets the Next Big Constraint in AI Data Centers
+  [BE] · [Nasdaq, 52h fa] Vertiv’s UIG Deal Targets the Next Big Constraint in AI Data Centers
       Vertiv Holdings (NYSE: VRT)&nbsp;just made its clearest statement yet about where the next phase of AI infrastructure spending is headed. On Sept.&nbsp;2, the&nbsp;company announced it will&nbsp;acquire&nbsp;UtilityInnovation&nbsp;Group (UIG), a microgrid and behind-the-meter power specialist. The deal will
   [CRWV] · [Nasdaq, 31h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
       Key PointsBloom&rsquo;s backlog swelled to $20 billion at the end of 2025.
-  [CRWV] · [Nasdaq, 47h fa] BigBear.ai vs. CoreWeave: Evaluating the Better Artificial Intelligence Stock to Buy for 2026
+  [CRWV] · [Nasdaq, 48h fa] BigBear.ai vs. CoreWeave: Evaluating the Better Artificial Intelligence Stock to Buy for 2026
       Key PointsBigBear.ai provides decision-intelligence software used by national security and supply chain organizations to navigate complex data environments.
-  [MRVL] · [Nasdaq, 48h fa] Noteworthy Friday Option Activity: GE, MRVL, SNPS
+  [MRVL] · [Nasdaq, 49h fa] Noteworthy Friday Option Activity: GE, MRVL, SNPS
       Looking at options trading activity among components of the S&amp;P 500 index, there is noteworthy activity today in GE Aerospace (Symbol: GE), where a total volume of 35,893 contracts has been traded thus far today, a contract volume which is representative of approximately 3.6
-  [MRVL] · [Nasdaq, 48h fa] Why Marvell Stock Rallied Today
+  [MRVL] · [Nasdaq, 49h fa] Why Marvell Stock Rallied Today
       Key PointsAI chip and infrastructure stocks got a lift from Nvidia's acquisition of Hugging Face.
-  [MU] · [Nasdaq, 4h fa] Prediction: Micron Stock Will Skyrocket After Sept. 30
+  [MU] · [Nasdaq, 0h fa] Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.
+      Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.
+  [MU] · [Nasdaq, 5h fa] Prediction: Micron Stock Will Skyrocket After Sept. 30
       Key PointsThe stock looks dirt cheap, but for a good reason.
-  [MU] · [Nasdaq, 25h fa] Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?
-      Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.
+  [NVDA] · [Nasdaq, 2h fa] What to Invest in for the Next 5 Years: My Prediction Is Boring, and That's the Point
+      Key PointsThe AI infrastructure build-out is still in its early innings, which suggests that there is still a lot of money to be made for companies supplying it.
   [NVDA] · [Nasdaq, 2h fa] Nvidia's Critical Shift Beyond GPUs Could Fuel a New Growth Phase
       Nvidia (NASDAQ: NVDA) is moving beyond selling GPUs by helping build the infrastructure that its clients could depend on for decades. Just one AI factory project, for example, creates an intriguing possibility: long-lived facilities that can be upgraded with new generations of Nv
-  [NVDA] · [Nasdaq, 4h fa] Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?
-      Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.
   [ORCL] · [Nasdaq, 7h fa] 6 Hyperscalers Driving the AI Revolution Are Projected to Spend $1.3 Trillion on Capex in 2027. Only 1 Is Forecast to Have Positive Free Cash Flow.
       Key PointsMajor capital expenditures have begun to hamper free cash flow for many hyperscalers.
-  [ORCL] · [Nasdaq, 7h fa] I Own Both Oracle and NuScale for Different Reasons. Here's How They Fit Together.
+  [ORCL] · [Nasdaq, 8h fa] I Own Both Oracle and NuScale for Different Reasons. Here's How They Fit Together.
       Key PointsOracle and NuScale Power stand to benefit from growing demand for AI for different reasons.
-  [RGTI] · [Nasdaq, 13h fa] Where Will Rigetti Computing Stock Be in 3 Years?
+  [RGTI] · [Nasdaq, 14h fa] Where Will Rigetti Computing Stock Be in 3 Years?
       Key PointsRigetti's management has said that commercial revenue is still in its early stages.
-  [RGTI] · [Nasdaq, 18h fa] IonQ vs. Rigetti Computing: Which Pure-Play Quantum Pioneer Has the Stronger Technology Advantage?
+  [RGTI] · [Nasdaq, 19h fa] IonQ vs. Rigetti Computing: Which Pure-Play Quantum Pioneer Has the Stronger Technology Advantage?
       Key PointsIonQ's process is more accurate but slower.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 

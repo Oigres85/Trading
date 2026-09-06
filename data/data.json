@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-06T17:28:42Z",
+ "updated_at": "2026-09-06T18:03:43Z",
  "eurusd": 1.1621,
  "totals": {
   "usd_value": 0,
@@ -8022,9 +8022,9 @@
     "float_pct": 91.7,
     "avg_volume_30d": 40826409.0,
     "pe_ttm": 149.0,
-    "forward_pe": 75.3293,
+    "forward_pe": 74.9494,
     "eps_ttm": 1.17,
-    "eps_forward": 2.3142,
+    "eps_forward": 2.326,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
     "revenue_growth": 0.928,
@@ -21772,11 +21772,11 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79722.26,
+   "price": 79757.99,
    "price_asof": "2026-09-06",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.13,
+   "change_pct": -0.08,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -36.8,
@@ -21789,8 +21789,8 @@
    "day_low": 79510.45,
    "support": 63980.32,
    "resistance": 82262.21,
-   "rsi": 66.4,
-   "volume": 19365058560,
+   "rsi": 66.6,
+   "volume": 18940727296,
    "vol_ratio": 0.63,
    "atr_14": 2239.56,
    "atr_pct": 2.81,
@@ -21802,7 +21802,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79722.26
+     79757.99
     ],
     "m6": [
      79827.91,
@@ -21930,7 +21930,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79722.26
+     79757.99
     ],
     "all": [
      386.94,
@@ -22077,7 +22077,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79722.26
+     79757.99
     ],
     "m1": [
      62818.65,
@@ -22101,7 +22101,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79722.26
+     79757.99
     ],
     "m3": [
      62544.2,
@@ -22169,7 +22169,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79722.26
+     79757.99
     ],
     "y1": [
      110224.7,
@@ -22245,7 +22245,7 @@
      77083.41,
      80257.54,
      77403.62,
-     79722.26
+     79757.99
     ],
     "d1": [
      79883.96,
@@ -22352,7 +22352,11 @@
      79700.05,
      79644.61,
      79625.24,
-     79722.43
+     79722.43,
+     79700.31,
+     79737.21,
+     79739.88,
+     79757.99
     ]
    },
    "earnings_date": null,
@@ -22362,11 +22366,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.7,
-   "sortino_1y": -0.95,
+   "sortino_1y": -0.94,
    "sharpe_6m": -0.02,
-   "sortino_6m": -0.03,
+   "sortino_6m": -0.02,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79722.26,
+   "prezzo_limite_aggiustato": 79757.99,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22379,22 +22383,22 @@
     "w1": {
      "support": 76248.3,
      "resistance": 82262.21,
-     "change_pct": 3.13
+     "change_pct": 3.18
     },
     "m1": {
      "support": 62648.57,
      "resistance": 82262.21,
-     "change_pct": 26.91
+     "change_pct": 26.97
     },
     "m3": {
      "support": 61176.72,
      "resistance": 82262.21,
-     "change_pct": 27.47
+     "change_pct": 27.52
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -8.51
+     "change_pct": -8.47
     }
    },
    "financials": [],
@@ -22421,74 +22425,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79722.26,
+     "prezzo": 79757.99,
      "medie": {
       "sma10": {
-       "liv": 78748.62,
-       "dist_pct": 1.24
+       "liv": 78752.2,
+       "dist_pct": 1.28
       },
       "ema10": {
-       "liv": 78740.13,
-       "dist_pct": 1.25
+       "liv": 78746.63,
+       "dist_pct": 1.28
       },
       "sma20": {
-       "liv": 77222.71,
-       "dist_pct": 3.24
+       "liv": 77224.5,
+       "dist_pct": 3.28
       },
       "ema20": {
-       "liv": 76423.32,
-       "dist_pct": 4.32
+       "liv": 76426.73,
+       "dist_pct": 4.36
       },
       "sma30": {
-       "liv": 72726.52,
-       "dist_pct": 9.62
+       "liv": 72727.71,
+       "dist_pct": 9.67
       },
       "ema30": {
-       "liv": 74335.87,
-       "dist_pct": 7.25
+       "liv": 74338.17,
+       "dist_pct": 7.29
       },
       "sma50": {
-       "liv": 69393.27,
-       "dist_pct": 14.88
+       "liv": 69393.98,
+       "dist_pct": 14.94
       },
       "ema50": {
-       "liv": 71717.85,
-       "dist_pct": 11.16
+       "liv": 71719.25,
+       "dist_pct": 11.21
       },
       "sma100": {
-       "liv": 66465.25,
-       "dist_pct": 19.95
+       "liv": 66465.61,
+       "dist_pct": 20.0
       },
       "ema100": {
-       "liv": 70030.66,
-       "dist_pct": 13.84
+       "liv": 70031.37,
+       "dist_pct": 13.89
       },
       "sma200": {
-       "liv": 69750.48,
-       "dist_pct": 14.3
+       "liv": 69750.66,
+       "dist_pct": 14.35
       },
       "ema200": {
-       "liv": 72785.67,
-       "dist_pct": 9.53
+       "liv": 72786.02,
+       "dist_pct": 9.58
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 66.4,
+      "rsi14": 66.6,
       "macd": {
-       "linea": 3214.96,
-       "segnale": 3394.44,
-       "istogramma": -179.48
+       "linea": 3217.81,
+       "segnale": 3395.01,
+       "istogramma": -177.2
       },
-      "stoch_k": 57.8,
-      "stoch_d": 60.7,
-      "williams_r": -42.2,
-      "cci20": 26.4,
+      "stoch_k": 58.4,
+      "stoch_d": 60.9,
+      "williams_r": -41.6,
+      "cci20": 26.5,
       "adx14": 47.4,
       "di_su": 35.9,
       "di_giu": 9.2,
-      "momentum10": -535.28
+      "momentum10": -499.55
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22981,19 +22985,19 @@
       "o": 79830.38,
       "h": 80106.03,
       "l": 79510.45,
-      "c": 79722.26
+      "c": 79757.99
      }
     ],
     "performance": {
-     "s1": 3.0,
-     "m1": 26.49,
-     "m3": 29.66,
-     "m6": 1.51,
-     "a1": -9.24,
-     "ytd": -10.15,
-     "a3": 195.62,
-     "a5": 82.05,
-     "a10": 12974.9
+     "s1": 3.04,
+     "m1": 26.55,
+     "m3": 29.72,
+     "m6": 1.55,
+     "a1": -9.2,
+     "ytd": -10.11,
+     "a3": 195.75,
+     "a5": 82.13,
+     "a10": 12980.76
     },
     "stagionalita": [
      {
@@ -23070,8 +23074,8 @@
      },
      {
       "mese": 9,
-      "media": -1.55,
-      "mediana": -0.79,
+      "media": -1.54,
+      "mediana": -0.77,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23106,9 +23110,9 @@
      }
     ]
    },
-   "rs_1m": 26.8,
+   "rs_1m": 26.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 26.3,
+   "rs_ndx_1m": 26.4,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -35523,7 +35527,7 @@
     "gross_margin": 0.6423,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.79,
+    "peg": 0.81,
     "roa": 0.19,
     "short_float": 0.0062,
     "buyback_yield": -0.0,
@@ -57481,6 +57485,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "What to Invest in for the Next 5 Years: My Prediction Is Boring, and That's the Point",
+      "riassunto": "Key PointsThe AI infrastructure build-out is still in its early innings, which suggests that there is still a lot of money to be made for companies supplying it.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T16:28:00Z",
+      "url": "https://www.nasdaq.com/articles/what-invest-next-5-years-my-prediction-boring-and-thats-point"
+     },
+     {
       "titolo": "Will Alphabet Break Warren Buffett's Cardinal Rule of Investing?",
       "riassunto": "Key PointsWarren Buffett has long said that the key to investing is finding stocks that can consistently earn high returns on capital.",
       "fonte": "Nasdaq",
@@ -57514,13 +57525,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-06T09:20:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-greg-abel-announces-another-whole-company-acquisition-year-end"
-     },
-     {
-      "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
-      "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T19:40:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
      }
     ],
     "MRVL": [
@@ -57613,6 +57617,13 @@
     ],
     "MU": [
      {
+      "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
+      "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T17:34:01Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-near-its-high-while-its-biggest-chip-peers-sit-18-32-below-theirs-these-are-chip"
+     },
+     {
       "titolo": "Prediction: Micron Stock Will Skyrocket After Sept. 30",
       "riassunto": "Key PointsThe stock looks dirt cheap, but for a good reason.",
       "fonte": "Nasdaq",
@@ -57646,16 +57657,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-05T10:26:00Z",
       "url": "https://www.nasdaq.com/articles/chinas-biggest-memory-chip-stock-almost-good-micron"
-     },
-     {
-      "titolo": "Why ASML Holding Stock Bumped 4% Higher Today",
-      "riassunto": "Key PointsASML specializes in the lithography systems that \"print\" circuits onto chips.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T22:51:22Z",
-      "url": "https://www.nasdaq.com/articles/why-asml-holding-stock-bumped-4-higher-today"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "What to Invest in for the Next 5 Years: My Prediction Is Boring, and That's the Point",
+      "riassunto": "Key PointsThe AI infrastructure build-out is still in its early innings, which suggests that there is still a lot of money to be made for companies supplying it.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T16:28:00Z",
+      "url": "https://www.nasdaq.com/articles/what-invest-next-5-years-my-prediction-boring-and-thats-point"
+     },
      {
       "titolo": "Nvidia's Critical Shift Beyond GPUs Could Fuel a New Growth Phase",
       "riassunto": "Nvidia (NASDAQ: NVDA) is moving beyond selling GPUs by helping build the infrastructure that its clients could depend on for decades. Just one AI factory project, for example, creates an intriguing possibility: long-lived facilities that can be upgraded with new generations of Nv",
@@ -57690,13 +57701,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-06T09:10:00Z",
       "url": "https://www.nasdaq.com/articles/meet-nvidia-backed-stock-thats-growing-454-pace-its-screaming-buy-right-now"
-     },
-     {
-      "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
-      "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T19:40:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
      }
     ],
     "ORCL": [
@@ -57899,7 +57903,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-06T17:28:42Z"
+   "letto_il": "2026-09-06T18:03:43Z"
   }
  },
  "broker": null,
@@ -58039,6 +58043,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "What to Invest in for the Next 5 Years: My Prediction Is Boring, and That's the Point",
+     "riassunto": "Key PointsThe AI infrastructure build-out is still in its early innings, which suggests that there is still a lot of money to be made for companies supplying it.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T16:28:00Z",
+     "url": "https://www.nasdaq.com/articles/what-invest-next-5-years-my-prediction-boring-and-thats-point"
+    },
+    {
      "titolo": "Will Alphabet Break Warren Buffett's Cardinal Rule of Investing?",
      "riassunto": "Key PointsWarren Buffett has long said that the key to investing is finding stocks that can consistently earn high returns on capital.",
      "fonte": "Nasdaq",
@@ -58072,13 +58083,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-06T09:20:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-greg-abel-announces-another-whole-company-acquisition-year-end"
-    },
-    {
-     "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
-     "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T19:40:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
     }
    ],
    "MRVL": [
@@ -58171,6 +58175,13 @@
    ],
    "MU": [
     {
+     "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
+     "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T17:34:01Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-near-its-high-while-its-biggest-chip-peers-sit-18-32-below-theirs-these-are-chip"
+    },
+    {
      "titolo": "Prediction: Micron Stock Will Skyrocket After Sept. 30",
      "riassunto": "Key PointsThe stock looks dirt cheap, but for a good reason.",
      "fonte": "Nasdaq",
@@ -58204,16 +58215,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-05T10:26:00Z",
      "url": "https://www.nasdaq.com/articles/chinas-biggest-memory-chip-stock-almost-good-micron"
-    },
-    {
-     "titolo": "Why ASML Holding Stock Bumped 4% Higher Today",
-     "riassunto": "Key PointsASML specializes in the lithography systems that \"print\" circuits onto chips.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T22:51:22Z",
-     "url": "https://www.nasdaq.com/articles/why-asml-holding-stock-bumped-4-higher-today"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "What to Invest in for the Next 5 Years: My Prediction Is Boring, and That's the Point",
+     "riassunto": "Key PointsThe AI infrastructure build-out is still in its early innings, which suggests that there is still a lot of money to be made for companies supplying it.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T16:28:00Z",
+     "url": "https://www.nasdaq.com/articles/what-invest-next-5-years-my-prediction-boring-and-thats-point"
+    },
     {
      "titolo": "Nvidia's Critical Shift Beyond GPUs Could Fuel a New Growth Phase",
      "riassunto": "Nvidia (NASDAQ: NVDA) is moving beyond selling GPUs by helping build the infrastructure that its clients could depend on for decades. Just one AI factory project, for example, creates an intriguing possibility: long-lived facilities that can be upgraded with new generations of Nv",
@@ -58248,13 +58259,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-06T09:10:00Z",
      "url": "https://www.nasdaq.com/articles/meet-nvidia-backed-stock-thats-growing-454-pace-its-screaming-buy-right-now"
-    },
-    {
-     "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
-     "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T19:40:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
     }
    ],
    "ORCL": [
@@ -58457,7 +58461,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-06T17:28:42Z"
+  "letto_il": "2026-09-06T18:03:43Z"
  },
  "predictions": [
   {
@@ -79264,6 +79268,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-06T17:28:43Z"
+  "generated_at": "2026-09-06T18:03:43Z"
  }
 }
