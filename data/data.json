@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-06T12:29:38Z",
+ "updated_at": "2026-09-06T16:23:47Z",
  "eurusd": 1.1621,
  "totals": {
   "usd_value": 0,
@@ -21772,28 +21772,28 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79993.97,
+   "price": 79678.38,
    "price_asof": "2026-09-06",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.21,
+   "change_pct": -0.18,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -36.6,
-   "sma200_dist_pct": 14.7,
-   "sma50_dist_pct": 15.3,
+   "ath_dist_pct": -36.9,
+   "sma200_dist_pct": 14.2,
+   "sma50_dist_pct": 14.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -36.6,
+   "w52_dist_pct": -36.9,
    "day_high": 80106.03,
-   "day_low": 79682.58,
+   "day_low": 79510.45,
    "support": 63980.32,
    "resistance": 82262.21,
-   "rsi": 67.2,
-   "volume": 20166574080,
+   "rsi": 66.2,
+   "volume": 20513671168,
    "vol_ratio": 0.63,
-   "atr_14": 2227.27,
-   "atr_pct": 2.78,
+   "atr_14": 2239.56,
+   "atr_pct": 2.81,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -21802,7 +21802,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79993.97
+     79678.38
     ],
     "m6": [
      79827.91,
@@ -21930,7 +21930,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79993.97
+     79678.38
     ],
     "all": [
      386.94,
@@ -22077,7 +22077,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79993.97
+     79678.38
     ],
     "m1": [
      62818.65,
@@ -22101,7 +22101,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79993.97
+     79678.38
     ],
     "m3": [
      62544.2,
@@ -22169,7 +22169,7 @@
      81271.74,
      79671.97,
      79823.87,
-     79993.97
+     79678.38
     ],
     "y1": [
      110224.7,
@@ -22245,7 +22245,7 @@
      77083.41,
      80257.54,
      77403.62,
-     79993.97
+     79678.38
     ],
     "d1": [
      79883.96,
@@ -22322,7 +22322,31 @@
      79920.37,
      79916.67,
      79936.03,
-     79991.99
+     79991.99,
+     80000.61,
+     79939.87,
+     79976.23,
+     79918.18,
+     79890.01,
+     79822.89,
+     79771.39,
+     79797.01,
+     79809.45,
+     79828.72,
+     79748.98,
+     79637.01,
+     79557.74,
+     79712.81,
+     79685.99,
+     79525.59,
+     79539.74,
+     79644.48,
+     79632.4,
+     79684.88,
+     79661.99,
+     79604.94,
+     79692.0,
+     79678.38
     ]
    },
    "earnings_date": null,
@@ -22331,13 +22355,13 @@
    "health": 79,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.69,
-   "sortino_1y": -0.94,
-   "sharpe_6m": 0.0,
-   "sortino_6m": 0.01,
+   "sharpe_1y": -0.7,
+   "sortino_1y": -0.95,
+   "sharpe_6m": -0.02,
+   "sortino_6m": -0.03,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79993.97,
-   "risk_reward": "1:0.5",
+   "prezzo_limite_aggiustato": 79678.38,
+   "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22349,22 +22373,22 @@
     "w1": {
      "support": 76248.3,
      "resistance": 82262.21,
-     "change_pct": 3.48
+     "change_pct": 3.08
     },
     "m1": {
      "support": 62648.57,
      "resistance": 82262.21,
-     "change_pct": 27.34
+     "change_pct": 26.84
     },
     "m3": {
      "support": 61176.72,
      "resistance": 82262.21,
-     "change_pct": 27.9
+     "change_pct": 27.4
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -8.2
+     "change_pct": -8.56
     }
    },
    "financials": [],
@@ -22391,74 +22415,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79993.97,
+     "prezzo": 79678.38,
      "medie": {
       "sma10": {
-       "liv": 78775.8,
-       "dist_pct": 1.55
+       "liv": 78744.24,
+       "dist_pct": 1.19
       },
       "ema10": {
-       "liv": 78789.53,
-       "dist_pct": 1.53
+       "liv": 78732.15,
+       "dist_pct": 1.2
       },
       "sma20": {
-       "liv": 77236.29,
-       "dist_pct": 3.57
+       "liv": 77220.52,
+       "dist_pct": 3.18
       },
       "ema20": {
-       "liv": 76449.2,
-       "dist_pct": 4.64
+       "liv": 76419.14,
+       "dist_pct": 4.26
       },
       "sma30": {
-       "liv": 72735.58,
-       "dist_pct": 9.98
+       "liv": 72725.06,
+       "dist_pct": 9.56
       },
       "ema30": {
-       "liv": 74353.4,
-       "dist_pct": 7.59
+       "liv": 74333.03,
+       "dist_pct": 7.19
       },
       "sma50": {
-       "liv": 69398.7,
-       "dist_pct": 15.27
+       "liv": 69392.39,
+       "dist_pct": 14.82
       },
       "ema50": {
-       "liv": 71728.51,
-       "dist_pct": 11.52
+       "liv": 71716.13,
+       "dist_pct": 11.1
       },
       "sma100": {
-       "liv": 66467.97,
-       "dist_pct": 20.35
+       "liv": 66464.82,
+       "dist_pct": 19.88
       },
       "ema100": {
-       "liv": 70036.04,
-       "dist_pct": 14.22
+       "liv": 70029.79,
+       "dist_pct": 13.78
       },
       "sma200": {
-       "liv": 69751.84,
-       "dist_pct": 14.68
+       "liv": 69750.26,
+       "dist_pct": 14.23
       },
       "ema200": {
-       "liv": 72788.37,
-       "dist_pct": 9.9
+       "liv": 72785.23,
+       "dist_pct": 9.47
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 67.2,
+      "rsi14": 66.2,
       "macd": {
-       "linea": 3236.63,
-       "segnale": 3398.77,
-       "istogramma": -162.14
+       "linea": 3211.46,
+       "segnale": 3393.74,
+       "istogramma": -182.28
       },
-      "stoch_k": 62.3,
-      "stoch_d": 62.2,
-      "williams_r": -37.7,
-      "cci20": 27.7,
+      "stoch_k": 57.0,
+      "stoch_d": 60.4,
+      "williams_r": -43.0,
+      "cci20": 26.3,
       "adx14": 47.4,
-      "di_su": 36.1,
-      "di_giu": 9.3,
-      "momentum10": -263.57
+      "di_su": 35.9,
+      "di_giu": 9.2,
+      "momentum10": -579.16
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22950,20 +22974,20 @@
       "d": "2026-09-06",
       "o": 79830.38,
       "h": 80106.03,
-      "l": 79682.58,
-      "c": 79993.97
+      "l": 79510.45,
+      "c": 79678.38
      }
     ],
     "performance": {
-     "s1": 3.35,
-     "m1": 26.93,
-     "m3": 30.1,
-     "m6": 1.85,
-     "a1": -8.93,
-     "ytd": -9.85,
-     "a3": 196.63,
-     "a5": 82.67,
-     "a10": 13019.47
+     "s1": 2.94,
+     "m1": 26.42,
+     "m3": 29.59,
+     "m6": 1.45,
+     "a1": -9.29,
+     "ytd": -10.2,
+     "a3": 195.46,
+     "a5": 81.95,
+     "a10": 12967.71
     },
     "stagionalita": [
      {
@@ -23040,8 +23064,8 @@
      },
      {
       "mese": 9,
-      "media": -1.52,
-      "mediana": -0.62,
+      "media": -1.55,
+      "mediana": -0.82,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23076,9 +23100,9 @@
      }
     ]
    },
-   "rs_1m": 27.2,
+   "rs_1m": 26.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 26.8,
+   "rs_ndx_1m": 26.3,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -47349,6 +47373,34 @@
   "news": {
    "voci": [
     {
+     "titolo": "Rep. Stevens Says Canadian Tariffs Are Squeezing Michigan",
+     "riassunto": "On Bloomberg This Weekend, Michigan Representative Haley Stevens (D) says escalating US tariffs on Canadian goods are raising costs and creating uncertainty for manufacturers in her district, with the deeply integrated auto supply chain particularly exposed. Stevens tells hosts Christina Ruffini and Jeff Mason that she",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-06T14:44:06Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-06/rep-stevens-says-tariffs-are-squeezing-michigan-video"
+    },
+    {
+     "titolo": "Trump Says Canada’s Dollar ‘Imbalance’ With US Is Unacceptable",
+     "riassunto": "“Canada’s (currency) Dollar imbalance with the U.S. is unacceptable,” President Donald Trump says in a Truth Social post.",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-06T13:22:20Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-06/trump-says-canada-s-dollar-imbalance-with-us-is-unacceptable"
+    },
+    {
+     "titolo": "Canada Hits Back With New US Tariffs",
+     "riassunto": "Canada is set to impose new retaliatory tariffs of as much as 50% on US goods starting Sept. 8, targeting $27.6 billion of imports including steel, aluminum, pulp and paper, appliances and agricultural equipment. Bloomberg News Ottawa Bureau Chief Brian Platt tells Christina Ruffini and Jeff Mason on Bloomberg This Wee",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-06T12:38:01Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-06/canada-hits-back-with-new-us-tariffs-video"
+    },
+    {
+     "titolo": "BlackRock to JPMorgan Bet on EM as Turmoil Seizes Global Bonds",
+     "riassunto": "As government bonds from major economies buckle, funds including those run by JPMorgan Asset Management and BlackRock Inc. have found an unlikely edge in emerging markets.",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-06T12:30:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-06/blackrock-to-jpmorgan-bet-on-em-as-turmoil-seizes-global-bonds"
+    },
+    {
      "titolo": "US Iran Fight Shifts to Economic Endurance",
      "riassunto": "The Trump administration is intensifying economic pressure on Iran through sanctions and a blockade, with Treasury Secretary Scott Bessent saying Tehran has about 30 million barrels of crude left for potential Chinese buyers. Bloomberg News Middle East Reporter Dan Williams joins Christina Ruffini and Jeff Mason on Blo",
      "fonte": "Bloomberg",
@@ -47382,20 +47434,6 @@
      "fonte": "MarketWatch",
      "quando": "2026-09-05T18:09:00Z",
      "url": "https://www.marketwatch.com/story/7-mortgage-rates-are-already-here-some-buyers-mortgage-experts-say-c51a7e04?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "Jobs and Iran add to Trump’s midterm headaches. Why that’s good for bonds and bad for energy stocks.",
-     "riassunto": "The president needs lower gasoline prices and mortgage rates — fast.",
-     "fonte": "MarketWatch",
-     "quando": "2026-09-05T16:34:00Z",
-     "url": "https://www.marketwatch.com/story/jobs-and-iran-add-to-trumps-midterm-headaches-why-thats-good-for-bonds-and-bad-for-energy-stocks-551cb765?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "Jobs Surge Raises Odds of September Fed Hike",
-     "riassunto": "On Bloomberg This Weekend, Seaport Research Partner Managing Director & Chief Equity Strategist Jonathan Golub says a stronger-than-expected US jobs report reinforces the case for the Federal Reserve to raise interest rates, despite President Donald Trump’s calls for lower borrowing costs. Golub also says to hosts Chri",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-05T15:37:28Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-09-05/jobs-surge-raises-odds-of-september-fed-hike-video"
     },
     {
      "titolo": "Women accounted for almost all of job gains in August. Here's why",
@@ -47459,20 +47497,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-01T10:50:27Z",
      "url": "https://www.cnbc.com/2026/09/01/euro-zone-inflation-rate-hike.html"
-    },
-    {
-     "titolo": "Bank of England chief warns new AI models threaten global financial stability",
-     "riassunto": "Bank of England Governor Andrew Bailey has warned that frontier AI could materially increase cyber risks to the global financial system.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-08-31T13:35:11Z",
-     "url": "https://www.cnbc.com/2026/08/31/bailey-frontier-ai-financial-stability-risk.html"
-    },
-    {
-     "titolo": "India’s economy expands 7.8% in fiscal first quarter, beating estimates",
-     "riassunto": "The economy was driven by a strong performance in the financial, real estate, information technology and professional services sectors.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-08-31T11:23:42Z",
-     "url": "https://www.cnbc.com/2026/08/31/india-economy-gdp-energy-el-nino.html"
     }
    ],
    "fonti": [
@@ -52360,7 +52384,7 @@
    "calls": 568509
   },
   "risk_sentiment": {
-   "score": 49,
+   "score": 48,
    "label": "Neutrale",
    "components": [
     {
@@ -52377,7 +52401,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 52
+     "score": 48
     },
     {
      "label": "Treasury 10A",
@@ -57451,6 +57475,20 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Will Alphabet Break Warren Buffett's Cardinal Rule of Investing?",
+      "riassunto": "Key PointsWarren Buffett has long said that the key to investing is finding stocks that can consistently earn high returns on capital.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T15:15:00Z",
+      "url": "https://www.nasdaq.com/articles/will-alphabet-break-warren-buffetts-cardinal-rule-investing"
+     },
+     {
+      "titolo": "Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?",
+      "riassunto": "Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T13:35:00Z",
+      "url": "https://www.nasdaq.com/articles/despite-revenue-skyrocketing-more-100-nvidia-stock-trades-24-times-forward-earnings-market"
+     },
+     {
       "titolo": "Why Rezolve AI Stock Plummeted This Week",
       "riassunto": "Key PointsRezolve AI stock fell this week after the company posted its first-half results.",
       "fonte": "Nasdaq",
@@ -57465,32 +57503,18 @@
       "url": "https://www.nasdaq.com/articles/6-hyperscalers-driving-ai-revolution-are-projected-spend-13-trillion-capex-2027-only-1"
      },
      {
+      "titolo": "Prediction: Greg Abel Announces Another Whole-Company Acquisition Before Year-End",
+      "riassunto": "Key PointsBerkshire Hathaway, after a lull, is showing some interest in putting its hoard of idle cash to work.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T09:20:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-greg-abel-announces-another-whole-company-acquisition-year-end"
+     },
+     {
       "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
       "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
       "fonte": "Nasdaq",
       "quando": "2026-09-05T19:40:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
-     },
-     {
-      "titolo": "Anthropic Could Be the Next Mega IPO: 2 Magnificent Stocks That Already Own a Piece of the AI Unicorn",
-      "riassunto": "Key PointsAI company Anthropic is slated to go public later this year.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T17:05:00Z",
-      "url": "https://www.nasdaq.com/articles/anthropic-could-be-next-mega-ipo-2-magnificent-stocks-already-own-piece-ai-unicorn"
-     },
-     {
-      "titolo": "Warren Buffett's Successor Greg Abel Spent $4.5 Billion Buying 1 Stock Last Quarter, and He Spent At Least $3.3 Billion Buying More This Quarter",
-      "riassunto": "Key PointsGreg Abel broke two long streaks started by Warren Buffett in the last few years of his tenure as CEO.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T16:50:00Z",
-      "url": "https://www.nasdaq.com/articles/warren-buffetts-successor-greg-abel-spent-45-billion-buying-1-stock-last-quarter-and-he"
-     },
-     {
-      "titolo": "Sundar Pichai's Gemini App Grew From 400 Million to Over 1 Billion Monthly Users in a Little Over a Year. Does That Adoption Curve Justify Alphabet's AI Spending Binge?",
-      "riassunto": "Key PointsDroves of ordinary users of AI-powered chatbot assistants are gravitating to the latest version of Google's Gemini app.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T15:05:00Z",
-      "url": "https://www.nasdaq.com/articles/sundar-pichais-gemini-app-grew-400-million-over-1-billion-monthly-users-little-over-year"
      }
     ],
     "MRVL": [
@@ -57583,6 +57607,13 @@
     ],
     "MU": [
      {
+      "titolo": "Prediction: Micron Stock Will Skyrocket After Sept. 30",
+      "riassunto": "Key PointsThe stock looks dirt cheap, but for a good reason.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T13:32:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-micron-stock-will-skyrocket-after-sept-30"
+     },
+     {
       "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
       "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
       "fonte": "Nasdaq",
@@ -57616,16 +57647,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T22:51:22Z",
       "url": "https://www.nasdaq.com/articles/why-asml-holding-stock-bumped-4-higher-today"
-     },
-     {
-      "titolo": "Looking Ahead to the Q3 Earnings Season: What to Expect",
-      "riassunto": "2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T22:05:00Z",
-      "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Nvidia's Critical Shift Beyond GPUs Could Fuel a New Growth Phase",
+      "riassunto": "Nvidia (NASDAQ: NVDA) is moving beyond selling GPUs by helping build the infrastructure that its clients could depend on for decades. Just one AI factory project, for example, creates an intriguing possibility: long-lived facilities that can be upgraded with new generations of Nv",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T15:50:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidias-critical-shift-beyond-gpus-could-fuel-new-growth-phase"
+     },
+     {
+      "titolo": "Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?",
+      "riassunto": "Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T13:35:00Z",
+      "url": "https://www.nasdaq.com/articles/despite-revenue-skyrocketing-more-100-nvidia-stock-trades-24-times-forward-earnings-market"
+     },
      {
       "titolo": "Prediction: Nvidia Will Join the Vanguard Russell 1000 Value ETF Before the End of the Year. Here's Why the ETF Is an Excellent Buy Now.",
       "riassunto": "Key PointsThe Vanguard Russell 1000 Value ETF holds stocks traditionally labeled as growth names, including Amazon, Apple, and Microsoft.",
@@ -57641,32 +57679,18 @@
       "url": "https://www.nasdaq.com/articles/prediction-nvidia-stock-will-double-under-year"
      },
      {
+      "titolo": "Meet the Nvidia-Backed Stock That's Growing at a 454% Pace (It's a Screaming Buy Right Now)",
+      "riassunto": "Key PointsNebius's neocloud business is booming thanks to a strong partnership with Nvidia.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T09:10:00Z",
+      "url": "https://www.nasdaq.com/articles/meet-nvidia-backed-stock-thats-growing-454-pace-its-screaming-buy-right-now"
+     },
+     {
       "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
       "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
       "fonte": "Nasdaq",
       "quando": "2026-09-05T19:40:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
-     },
-     {
-      "titolo": "Broadcom vs. Nvidia: 1 Critical Metric Shows Which Artificial Intelligence (AI) Chipmaker Is the Better Buy After Earnings",
-      "riassunto": "Key PointsBroadcom's chips are designed to handle some highly specific compute needs for each of its clients.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T19:05:00Z",
-      "url": "https://www.nasdaq.com/articles/broadcom-vs-nvidia-1-critical-metric-shows-which-artificial-intelligence-ai-chipmaker"
-     },
-     {
-      "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
-      "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T16:22:00Z",
-      "url": "https://www.nasdaq.com/articles/kraken-robotics-stock-down-55-september-month-buy-dip"
-     },
-     {
-      "titolo": "Most Investors Overpay for AI Hype. Nvidia Is the Exception.",
-      "riassunto": "Key PointsNvidia's second-quarter revenue more than doubled to $96.2 billion.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T14:29:00Z",
-      "url": "https://www.nasdaq.com/articles/most-investors-overpay-ai-hype-nvidia-exception"
      }
     ],
     "ORCL": [
@@ -57683,6 +57707,13 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-06T10:12:00Z",
       "url": "https://www.nasdaq.com/articles/i-own-both-oracle-and-nuscale-different-reasons-heres-how-they-fit-together"
+     },
+     {
+      "titolo": "Got $10,000 to Invest This September? These Energy Stocks Could Turn It Into $639 in Annual Income.",
+      "riassunto": "Key PointsMPLX offers an ultra-high, reliable distribution.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-06T08:55:00Z",
+      "url": "https://www.nasdaq.com/articles/got-10000-invest-september-these-energy-stocks-could-turn-it-639-annual-income"
      },
      {
       "titolo": "I Love Bloom Energy for 1 Reason, and It's Not the Backlog",
@@ -57704,13 +57735,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T15:05:00Z",
       "url": "https://www.nasdaq.com/articles/snowflake-gains-17-post-q2-earnings-buy-sell-or-hold-stock"
-     },
-     {
-      "titolo": "Breakfast News: Week in Review",
-      "riassunto": "Breakfast News: Week in Review\n\nSeptember 4, 2026\n\n\n\n1. The Cheapest AI Yet Squeezes the Companies Selling It\n\nSource: Image created by Jester AI.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T11:50:00Z",
-      "url": "https://www.nasdaq.com/articles/breakfast-news-week-review"
      }
     ],
     "PLTR": [
@@ -57869,7 +57893,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-06T12:29:38Z"
+   "letto_il": "2026-09-06T16:23:47Z"
   }
  },
  "broker": null,
@@ -58009,6 +58033,20 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Will Alphabet Break Warren Buffett's Cardinal Rule of Investing?",
+     "riassunto": "Key PointsWarren Buffett has long said that the key to investing is finding stocks that can consistently earn high returns on capital.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T15:15:00Z",
+     "url": "https://www.nasdaq.com/articles/will-alphabet-break-warren-buffetts-cardinal-rule-investing"
+    },
+    {
+     "titolo": "Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?",
+     "riassunto": "Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T13:35:00Z",
+     "url": "https://www.nasdaq.com/articles/despite-revenue-skyrocketing-more-100-nvidia-stock-trades-24-times-forward-earnings-market"
+    },
+    {
      "titolo": "Why Rezolve AI Stock Plummeted This Week",
      "riassunto": "Key PointsRezolve AI stock fell this week after the company posted its first-half results.",
      "fonte": "Nasdaq",
@@ -58023,32 +58061,18 @@
      "url": "https://www.nasdaq.com/articles/6-hyperscalers-driving-ai-revolution-are-projected-spend-13-trillion-capex-2027-only-1"
     },
     {
+     "titolo": "Prediction: Greg Abel Announces Another Whole-Company Acquisition Before Year-End",
+     "riassunto": "Key PointsBerkshire Hathaway, after a lull, is showing some interest in putting its hoard of idle cash to work.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T09:20:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-greg-abel-announces-another-whole-company-acquisition-year-end"
+    },
+    {
      "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
      "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
      "fonte": "Nasdaq",
      "quando": "2026-09-05T19:40:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
-    },
-    {
-     "titolo": "Anthropic Could Be the Next Mega IPO: 2 Magnificent Stocks That Already Own a Piece of the AI Unicorn",
-     "riassunto": "Key PointsAI company Anthropic is slated to go public later this year.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T17:05:00Z",
-     "url": "https://www.nasdaq.com/articles/anthropic-could-be-next-mega-ipo-2-magnificent-stocks-already-own-piece-ai-unicorn"
-    },
-    {
-     "titolo": "Warren Buffett's Successor Greg Abel Spent $4.5 Billion Buying 1 Stock Last Quarter, and He Spent At Least $3.3 Billion Buying More This Quarter",
-     "riassunto": "Key PointsGreg Abel broke two long streaks started by Warren Buffett in the last few years of his tenure as CEO.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T16:50:00Z",
-     "url": "https://www.nasdaq.com/articles/warren-buffetts-successor-greg-abel-spent-45-billion-buying-1-stock-last-quarter-and-he"
-    },
-    {
-     "titolo": "Sundar Pichai's Gemini App Grew From 400 Million to Over 1 Billion Monthly Users in a Little Over a Year. Does That Adoption Curve Justify Alphabet's AI Spending Binge?",
-     "riassunto": "Key PointsDroves of ordinary users of AI-powered chatbot assistants are gravitating to the latest version of Google's Gemini app.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T15:05:00Z",
-     "url": "https://www.nasdaq.com/articles/sundar-pichais-gemini-app-grew-400-million-over-1-billion-monthly-users-little-over-year"
     }
    ],
    "MRVL": [
@@ -58141,6 +58165,13 @@
    ],
    "MU": [
     {
+     "titolo": "Prediction: Micron Stock Will Skyrocket After Sept. 30",
+     "riassunto": "Key PointsThe stock looks dirt cheap, but for a good reason.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T13:32:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-micron-stock-will-skyrocket-after-sept-30"
+    },
+    {
      "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
      "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
      "fonte": "Nasdaq",
@@ -58174,16 +58205,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T22:51:22Z",
      "url": "https://www.nasdaq.com/articles/why-asml-holding-stock-bumped-4-higher-today"
-    },
-    {
-     "titolo": "Looking Ahead to the Q3 Earnings Season: What to Expect",
-     "riassunto": "2026 Q3 earnings for the S&P 500 index are expected to increase by +23% from the same period last year on +11.2% higher revenues, reflecting the 13th consecutive period of growth. Revisions for the period remain positive, a continuation of the trend we've seen over the past year.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T22:05:00Z",
-     "url": "https://www.nasdaq.com/articles/looking-ahead-q3-earnings-season-what-expect"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Nvidia's Critical Shift Beyond GPUs Could Fuel a New Growth Phase",
+     "riassunto": "Nvidia (NASDAQ: NVDA) is moving beyond selling GPUs by helping build the infrastructure that its clients could depend on for decades. Just one AI factory project, for example, creates an intriguing possibility: long-lived facilities that can be upgraded with new generations of Nv",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T15:50:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidias-critical-shift-beyond-gpus-could-fuel-new-growth-phase"
+    },
+    {
+     "titolo": "Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?",
+     "riassunto": "Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T13:35:00Z",
+     "url": "https://www.nasdaq.com/articles/despite-revenue-skyrocketing-more-100-nvidia-stock-trades-24-times-forward-earnings-market"
+    },
     {
      "titolo": "Prediction: Nvidia Will Join the Vanguard Russell 1000 Value ETF Before the End of the Year. Here's Why the ETF Is an Excellent Buy Now.",
      "riassunto": "Key PointsThe Vanguard Russell 1000 Value ETF holds stocks traditionally labeled as growth names, including Amazon, Apple, and Microsoft.",
@@ -58199,32 +58237,18 @@
      "url": "https://www.nasdaq.com/articles/prediction-nvidia-stock-will-double-under-year"
     },
     {
+     "titolo": "Meet the Nvidia-Backed Stock That's Growing at a 454% Pace (It's a Screaming Buy Right Now)",
+     "riassunto": "Key PointsNebius's neocloud business is booming thanks to a strong partnership with Nvidia.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T09:10:00Z",
+     "url": "https://www.nasdaq.com/articles/meet-nvidia-backed-stock-thats-growing-454-pace-its-screaming-buy-right-now"
+    },
+    {
      "titolo": "Prediction: Amazon Will Join Nvidia, Apple, and Alphabet in the $4 Trillion Club Before 2029",
      "riassunto": "Key PointsAmazon stock has underperformed the broader market over the last five years.",
      "fonte": "Nasdaq",
      "quando": "2026-09-05T19:40:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-amazon-will-join-nvidia-apple-and-alphabet-4-trillion-club-2029"
-    },
-    {
-     "titolo": "Broadcom vs. Nvidia: 1 Critical Metric Shows Which Artificial Intelligence (AI) Chipmaker Is the Better Buy After Earnings",
-     "riassunto": "Key PointsBroadcom's chips are designed to handle some highly specific compute needs for each of its clients.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T19:05:00Z",
-     "url": "https://www.nasdaq.com/articles/broadcom-vs-nvidia-1-critical-metric-shows-which-artificial-intelligence-ai-chipmaker"
-    },
-    {
-     "titolo": "Kraken Robotics Stock Is Down 55% -- Is September the Month to Buy the Dip?",
-     "riassunto": "Key PointsKraken Robotics stock has seen a huge pullback since hitting a lifetime high in March 2026.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T16:22:00Z",
-     "url": "https://www.nasdaq.com/articles/kraken-robotics-stock-down-55-september-month-buy-dip"
-    },
-    {
-     "titolo": "Most Investors Overpay for AI Hype. Nvidia Is the Exception.",
-     "riassunto": "Key PointsNvidia's second-quarter revenue more than doubled to $96.2 billion.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T14:29:00Z",
-     "url": "https://www.nasdaq.com/articles/most-investors-overpay-ai-hype-nvidia-exception"
     }
    ],
    "ORCL": [
@@ -58241,6 +58265,13 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-06T10:12:00Z",
      "url": "https://www.nasdaq.com/articles/i-own-both-oracle-and-nuscale-different-reasons-heres-how-they-fit-together"
+    },
+    {
+     "titolo": "Got $10,000 to Invest This September? These Energy Stocks Could Turn It Into $639 in Annual Income.",
+     "riassunto": "Key PointsMPLX offers an ultra-high, reliable distribution.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-06T08:55:00Z",
+     "url": "https://www.nasdaq.com/articles/got-10000-invest-september-these-energy-stocks-could-turn-it-639-annual-income"
     },
     {
      "titolo": "I Love Bloom Energy for 1 Reason, and It's Not the Backlog",
@@ -58262,13 +58293,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T15:05:00Z",
      "url": "https://www.nasdaq.com/articles/snowflake-gains-17-post-q2-earnings-buy-sell-or-hold-stock"
-    },
-    {
-     "titolo": "Breakfast News: Week in Review",
-     "riassunto": "Breakfast News: Week in Review\n\nSeptember 4, 2026\n\n\n\n1. The Cheapest AI Yet Squeezes the Companies Selling It\n\nSource: Image created by Jester AI.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T11:50:00Z",
-     "url": "https://www.nasdaq.com/articles/breakfast-news-week-review"
     }
    ],
    "PLTR": [
@@ -58427,7 +58451,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-06T12:29:38Z"
+  "letto_il": "2026-09-06T16:23:47Z"
  },
  "predictions": [
   {
@@ -58441,24 +58465,9 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
-   "question": "Will the price of Bitcoin be above $76,000 on September 6?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-6-2026"
-  },
-  {
    "question": "Will Bitcoin dip to $55,000 in September?",
    "yes": 2,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-55k-in-september-2026"
-  },
-  {
-   "question": "Bitcoin Up or Down on September 6?",
-   "yes": 72,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-6-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $78,000 on September 6?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-6-2026"
   }
  ],
  "options": {
@@ -79067,7 +79076,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 42,
-    "risk_sentiment": 49,
+    "risk_sentiment": 48,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
@@ -79197,7 +79206,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -79249,6 +79258,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-06T12:29:38Z"
+  "generated_at": "2026-09-06T16:23:48Z"
  }
 }
