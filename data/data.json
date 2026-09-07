@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-07T09:01:45Z",
+ "updated_at": "2026-09-07T09:49:32Z",
  "eurusd": 1.1625,
  "totals": {
   "usd_value": 0,
@@ -4736,9 +4736,9 @@
     "float_pct": 95.8,
     "avg_volume_30d": 135559144.0,
     "pe_ttm": 29.1595,
-    "forward_pe": 14.9022,
+    "forward_pe": 14.8437,
     "eps_ttm": 7.9,
-    "eps_forward": 15.4581,
+    "eps_forward": 15.5191,
     "revenue_fy": 302970011648.0,
     "net_income_fy": 192880001024.0,
     "revenue_growth": 1.059,
@@ -4758,7 +4758,10 @@
     "short_float": 0.0123,
     "buyback_yield": 0.0072,
     "ps": 18.36,
-    "ev_s": 18.25
+    "ev_s": 18.25,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -5500,7 +5503,7 @@
      "a1": 23.62,
      "a3": 430.56,
      "a5": 1015.64,
-     "a10": 13588.5
+     "a10": 13588.51
     },
     "stagionalita": [
      {
@@ -11892,7 +11895,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0013,
-    "price_to_book": null,
+    "price_to_book": 22.3505,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13675,7 +13678,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0011,
-    "price_to_book": 10.7455,
+    "price_to_book": 10.5772,
     "target_mean": 284.998,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -21723,25 +21726,25 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79441.75,
+   "price": 79405.17,
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -1.13,
+   "change_pct": -1.18,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -37.0,
-   "sma200_dist_pct": 13.8,
-   "sma50_dist_pct": 14.0,
+   "ath_dist_pct": -37.1,
+   "sma200_dist_pct": 13.7,
+   "sma50_dist_pct": 13.9,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -37.0,
+   "w52_dist_pct": -37.1,
    "day_high": 80387.91,
    "day_low": 79218.68,
    "support": 64111.07,
    "resistance": 82262.21,
-   "rsi": 64.1,
-   "volume": 22999773184,
+   "rsi": 63.9,
+   "volume": 22851897344,
    "vol_ratio": 0.66,
    "atr_14": 2203.41,
    "atr_pct": 2.77,
@@ -21753,7 +21756,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79441.75
+     79405.17
     ],
     "m6": [
      80927.05,
@@ -21881,7 +21884,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79441.75
+     79405.17
     ],
     "all": [
      386.94,
@@ -22028,7 +22031,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79441.75
+     79405.17
     ],
     "m1": [
      64506.25,
@@ -22052,7 +22055,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79441.75
+     79405.17
     ],
     "m3": [
      63088.3,
@@ -22120,7 +22123,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79441.75
+     79405.17
     ],
     "y1": [
      111167.62,
@@ -22196,7 +22199,7 @@
      77755.27,
      77830.29,
      77300.48,
-     79441.75
+     79405.17
     ],
     "d1": [
      80315.11,
@@ -22206,53 +22209,58 @@
      80135.99,
      80149.36,
      80217.26,
-     79955.99,
+     79955.98,
      79915.95,
-     79961.99,
-     79846.49,
+     79961.98,
+     79846.5,
      79913.39,
      79879.92,
      79823.55,
-     79956.33,
-     79998.72,
+     79958.38,
+     79998.73,
      80247.4,
-     80080.0,
+     80098.01,
      79967.23,
-     79777.08,
+     79781.98,
      79776.02,
      79729.63,
-     79624.65,
+     79619.47,
      79643.24,
-     79613.99,
-     79676.98,
-     79649.79,
-     79605.6,
+     79627.88,
+     79676.99,
+     79649.8,
+     79605.61,
      79667.98,
      79639.41,
-     79748.1,
+     79742.32,
      79763.98,
      79862.73,
      79820.78,
-     79847.99,
-     79785.57,
+     79847.98,
+     79785.56,
      79798.04,
      79797.88,
-     79746.55,
-     79706.24,
-     79665.29,
-     79661.6,
-     79576.5,
-     79603.66,
+     79746.9,
+     79700.28,
+     79665.28,
+     79662.69,
+     79574.3,
+     79603.65,
      79439.16,
-     79311.05,
-     79266.94,
-     79321.05,
+     79312.42,
+     79271.13,
+     79321.04,
      79413.45,
-     79452.56,
-     79454.04,
+     79446.29,
+     79449.6,
      79484.91,
      79465.46,
-     79410.12
+     79410.12,
+     79430.54,
+     79532.05,
+     79447.05,
+     79400.75,
+     79377.23
     ]
    },
    "earnings_date": null,
@@ -22262,11 +22270,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.72,
-   "sortino_1y": -0.97,
-   "sharpe_6m": -0.14,
-   "sortino_6m": -0.21,
+   "sortino_1y": -0.98,
+   "sharpe_6m": -0.15,
+   "sortino_6m": -0.22,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79441.75,
+   "prezzo_limite_aggiustato": 79405.17,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22279,22 +22287,22 @@
     "w1": {
      "support": 76940.88,
      "resistance": 82262.21,
-     "change_pct": -2.25
+     "change_pct": -2.3
     },
     "m1": {
      "support": 62687.1,
      "resistance": 82262.21,
-     "change_pct": 23.15
+     "change_pct": 23.1
     },
     "m3": {
      "support": 61275.83,
      "resistance": 82262.21,
-     "change_pct": 25.92
+     "change_pct": 25.86
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.16
+     "change_pct": -10.21
     }
    },
    "financials": [],
@@ -22321,74 +22329,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79441.75,
+     "prezzo": 79405.17,
      "medie": {
       "sma10": {
-       "liv": 78972.55,
-       "dist_pct": 0.59
+       "liv": 78968.89,
+       "dist_pct": 0.55
       },
       "ema10": {
-       "liv": 78961.09,
-       "dist_pct": 0.61
+       "liv": 78954.44,
+       "dist_pct": 0.57
       },
       "sma20": {
-       "liv": 77992.15,
-       "dist_pct": 1.86
+       "liv": 77990.32,
+       "dist_pct": 1.81
       },
       "ema20": {
-       "liv": 76764.89,
-       "dist_pct": 3.49
+       "liv": 76761.4,
+       "dist_pct": 3.44
       },
       "sma30": {
-       "liv": 73232.02,
-       "dist_pct": 8.48
+       "liv": 73230.8,
+       "dist_pct": 8.43
       },
       "ema30": {
-       "liv": 74703.17,
-       "dist_pct": 6.34
+       "liv": 74700.81,
+       "dist_pct": 6.3
       },
       "sma50": {
-       "liv": 69700.84,
-       "dist_pct": 13.98
+       "liv": 69700.11,
+       "dist_pct": 13.92
       },
       "ema50": {
-       "liv": 72044.4,
-       "dist_pct": 10.27
+       "liv": 72042.97,
+       "dist_pct": 10.22
       },
       "sma100": {
-       "liv": 66528.4,
-       "dist_pct": 19.41
+       "liv": 66528.04,
+       "dist_pct": 19.36
       },
       "ema100": {
-       "liv": 70229.83,
-       "dist_pct": 13.12
+       "liv": 70229.1,
+       "dist_pct": 13.07
       },
       "sma200": {
-       "liv": 69816.04,
-       "dist_pct": 13.79
+       "liv": 69815.86,
+       "dist_pct": 13.74
       },
       "ema200": {
-       "liv": 72882.35,
-       "dist_pct": 9.0
+       "liv": 72881.98,
+       "dist_pct": 8.95
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 64.1,
+      "rsi14": 63.9,
       "macd": {
-       "linea": 3104.94,
-       "segnale": 3344.55,
-       "istogramma": -239.61
+       "linea": 3102.03,
+       "segnale": 3343.97,
+       "istogramma": -241.94
       },
-      "stoch_k": 53.1,
-      "stoch_d": 61.5,
-      "williams_r": -46.9,
-      "cci20": 18.0,
+      "stoch_k": 52.5,
+      "stoch_d": 61.3,
+      "williams_r": -47.5,
+      "cci20": 17.9,
       "adx14": 48.3,
       "di_su": 34.9,
       "di_giu": 9.0,
-      "momentum10": 1611.46
+      "momentum10": 1574.88
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22881,19 +22889,19 @@
       "o": 80351.4,
       "h": 80387.91,
       "l": 79218.68,
-      "c": 79441.75
+      "c": 79405.17
      }
     ],
     "performance": {
-     "s1": 2.77,
-     "m1": 26.46,
-     "m3": 27.02,
-     "m6": -0.48,
-     "a1": -8.83,
-     "ytd": -10.47,
-     "a3": 194.58,
-     "a5": 81.41,
-     "a10": 12928.9
+     "s1": 2.72,
+     "m1": 26.4,
+     "m3": 26.96,
+     "m6": -0.53,
+     "a1": -8.87,
+     "ytd": -10.51,
+     "a3": 194.44,
+     "a5": 81.33,
+     "a10": 12922.9
     },
     "stagionalita": [
      {
@@ -22971,7 +22979,7 @@
      {
       "mese": 9,
       "media": -1.58,
-      "mediana": -0.97,
+      "mediana": -1.0,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23008,7 +23016,7 @@
    },
    "rs_1m": 23.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 22.6,
+   "rs_ndx_1m": 22.5,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -23019,28 +23027,28 @@
    "name": "^VIX",
    "currency": "PTS",
    "price_src": "yahoo",
-   "price": 15.04,
+   "price": 15.06,
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 3.51,
+   "change_pct": 3.65,
    "pe": null,
    "ath": 89.53,
    "ath_dist_pct": -83.2,
-   "sma200_dist_pct": -17.4,
-   "sma50_dist_pct": -6.8,
+   "sma200_dist_pct": -17.3,
+   "sma50_dist_pct": -6.7,
    "w52_high": 35.3,
    "w52_low": 13.38,
-   "w52_dist_pct": -57.4,
+   "w52_dist_pct": -57.3,
    "day_high": 15.09,
    "day_low": 14.99,
    "support": 13.8,
    "resistance": 16.82,
-   "rsi": 47.7,
+   "rsi": 47.8,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 1.2,
-   "atr_pct": 7.96,
+   "atr_pct": 7.95,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -23049,7 +23057,7 @@
      15.2,
      14.32,
      14.53,
-     15.04
+     15.06
     ],
     "m6": [
      24.23,
@@ -23177,7 +23185,7 @@
      15.2,
      14.32,
      14.53,
-     15.04
+     15.06
     ],
     "all": [
      25.36,
@@ -23620,7 +23628,7 @@
      16.45,
      15.99,
      14.92,
-     15.04
+     15.06
     ],
     "m1": [
      14.9,
@@ -23644,7 +23652,7 @@
      15.2,
      14.32,
      14.53,
-     15.04
+     15.06
     ],
     "m3": [
      15.4,
@@ -23712,7 +23720,7 @@
      15.2,
      14.32,
      14.53,
-     15.04
+     15.06
     ],
     "y1": [
      15.11,
@@ -23776,7 +23784,12 @@
      15.0,
      15.01,
      15.02,
-     15.02
+     15.02,
+     15.04,
+     15.03,
+     15.03,
+     15.06,
+     15.05
     ]
    },
    "earnings_date": null,
@@ -23790,7 +23803,7 @@
    "sharpe_6m": -0.91,
    "sortino_6m": -1.32,
    "prepost": null,
-   "prezzo_limite_aggiustato": 15.04,
+   "prezzo_limite_aggiustato": 15.06,
    "risk_reward": "1:0.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -23803,22 +23816,22 @@
     "w1": {
      "support": 13.8,
      "resistance": 16.82,
-     "change_pct": -7.96
+     "change_pct": -7.83
     },
     "m1": {
      "support": 13.8,
      "resistance": 16.82,
-     "change_pct": 0.94
+     "change_pct": 1.07
     },
     "m3": {
      "support": 13.8,
      "resistance": 23.34,
-     "change_pct": -2.34
+     "change_pct": -2.21
     },
     "y1": {
      "support": 13.38,
      "resistance": 35.3,
-     "change_pct": 0.0
+     "change_pct": 0.13
     }
    },
    "financials": [],
@@ -23845,74 +23858,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 15.04,
+     "prezzo": 15.06,
      "medie": {
       "sma10": {
-       "liv": 14.99,
-       "dist_pct": 0.3
+       "liv": 15.0,
+       "dist_pct": 0.42
       },
       "ema10": {
        "liv": 15.01,
-       "dist_pct": 0.21
+       "dist_pct": 0.32
       },
       "sma20": {
        "liv": 15.08,
-       "dist_pct": -0.26
+       "dist_pct": -0.13
       },
       "ema20": {
        "liv": 15.27,
-       "dist_pct": -1.48
+       "dist_pct": -1.36
       },
       "sma30": {
        "liv": 15.57,
-       "dist_pct": -3.42
+       "dist_pct": -3.3
       },
       "ema30": {
        "liv": 15.55,
-       "dist_pct": -3.27
+       "dist_pct": -3.14
       },
       "sma50": {
        "liv": 16.13,
-       "dist_pct": -6.77
+       "dist_pct": -6.65
       },
       "ema50": {
        "liv": 16.06,
-       "dist_pct": -6.36
+       "dist_pct": -6.24
       },
       "sma100": {
        "liv": 16.96,
-       "dist_pct": -11.32
+       "dist_pct": -11.2
       },
       "ema100": {
        "liv": 16.97,
-       "dist_pct": -11.37
+       "dist_pct": -11.26
       },
       "sma200": {
        "liv": 18.21,
-       "dist_pct": -17.4
+       "dist_pct": -17.3
       },
       "ema200": {
        "liv": 17.47,
-       "dist_pct": -13.89
+       "dist_pct": -13.78
       }
      },
      "medie_battute": 2,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 47.7,
+      "rsi14": 47.8,
       "macd": {
        "linea": -0.38,
        "segnale": -0.42,
        "istogramma": 0.04
       },
-      "stoch_k": 41.1,
-      "stoch_d": 24.1,
-      "williams_r": -58.9,
-      "cci20": -8.7,
+      "stoch_k": 41.7,
+      "stoch_d": 24.3,
+      "williams_r": -58.3,
+      "cci20": -8.2,
       "adx14": 18.2,
       "di_su": 24.5,
       "di_giu": 20.5,
-      "momentum10": -0.81
+      "momentum10": -0.79
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -24405,19 +24418,19 @@
       "o": 15.02,
       "h": 15.09,
       "l": 14.99,
-      "c": 15.04
+      "c": 15.06
      }
     ],
     "performance": {
-     "s1": 0.8,
-     "m1": -0.73,
-     "m3": -6.35,
-     "m6": -39.67,
-     "a1": -0.46,
-     "ytd": 3.65,
-     "a3": -14.16,
-     "a5": -35.0,
-     "a10": 13.17
+     "s1": 0.94,
+     "m1": -0.59,
+     "m3": -6.23,
+     "m6": -39.59,
+     "a1": -0.33,
+     "ytd": 3.79,
+     "a3": -14.04,
+     "a5": -34.92,
+     "a10": 13.32
     },
     "stagionalita": [
      {
@@ -24494,8 +24507,8 @@
      },
      {
       "mese": 9,
-      "media": 7.93,
-      "mediana": 0.8,
+      "media": 7.94,
+      "mediana": 0.94,
       "positivi_pct": 51,
       "campione": 37,
       "peggio": -23.0,
@@ -24530,9 +24543,9 @@
      }
     ]
    },
-   "rs_1m": 0.8,
+   "rs_1m": 1.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 0.4,
+   "rs_ndx_1m": 0.5,
    "beta_ndx": -4.54,
    "avg_corr": -0.37,
    "max_corr": -0.22,
@@ -24561,7 +24574,7 @@
    "support": 28927.25,
    "resistance": 30343.0,
    "rsi": 52.6,
-   "volume": 46379,
+   "volume": 48487,
    "vol_ratio": 0.99,
    "atr_14": 435.86,
    "atr_pct": 1.47,
@@ -25901,7 +25914,7 @@
    "support": 6213.78,
    "resistance": 7216.62,
    "rsi": 54.9,
-   "volume": 237911,
+   "volume": 240446,
    "vol_ratio": 0.7,
    "atr_14": 302.9,
    "atr_pct": 4.33,
@@ -31071,6 +31084,11 @@
      1.16,
      1.16,
      1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
      1.16
     ]
    },
@@ -31856,7 +31874,7 @@
    "support": 6.41,
    "resistance": 6.75,
    "rsi": 60.0,
-   "volume": 6178,
+   "volume": 6524,
    "vol_ratio": 0.41,
    "atr_14": 0.09,
    "atr_pct": 1.41,
@@ -33197,7 +33215,7 @@
    "support": 79.62,
    "resistance": 93.14,
    "rsi": 65.3,
-   "volume": 38683,
+   "volume": 41617,
    "vol_ratio": 1.26,
    "atr_14": 3.5,
    "atr_pct": 3.83,
@@ -38050,8 +38068,8 @@
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
-   "value": 15.04,
-   "change_pct": 3.51,
+   "value": 15.06,
+   "change_pct": 3.65,
    "spark": [
     18.21,
     20.66,
@@ -38082,7 +38100,7 @@
     15.2,
     14.32,
     14.53,
-    15.04
+    15.06
    ],
    "asof": "2026-09-07"
   },
@@ -45045,8 +45063,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "179.52",
-    "change_pct": -0.82,
+    "value": "179.48",
+    "change_pct": -0.84,
     "suffix": "%"
    }
   ],
@@ -47139,6 +47157,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Yields at 5.5% Would Spell Trouble for Stocks, SocGen Warns",
+     "riassunto": "Alain Bokobza, head of global asset allocation at Societe Generale, discusses factors weighing on bond yields and the knock-on impact on equities. He speaks on Bloomberg Television. (Source: Bloomberg)",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-07T09:21:00Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-07/yields-at-5-5-spell-trouble-for-stocks-socgen-warns-video"
+    },
+    {
      "titolo": "Japan's foreign reserves drop by a record $80 billion in August following yen intervention",
      "riassunto": "Finance ministry data showed that Japan's official foreign reserves stand at $1.207 trillion, down from July's figure of $1.287 trillion.",
      "fonte": "CNBC Economia",
@@ -47146,18 +47171,11 @@
      "url": "https://www.cnbc.com/2026/09/07/japan-foreign-reserves-yen-intervention.html"
     },
     {
-     "titolo": "This Week Is All About US CPI: 3-Minute MLIV",
-     "riassunto": "Guy Johnson and Adam Linton break down today's key themes for analysts and investors on \"Bloomberg: The Opening Trade.\"  (Source: Bloomberg)",
+     "titolo": "Bond Market: Gilts, BTPs, OATs Hit by Fears of Energy Shock, Political Risk",
+     "riassunto": "Spiraling gas prices and growing political risks are accelerating a selloff in Europe’s bond market, the steepest among major economies in recent weeks.",
      "fonte": "Bloomberg",
-     "quando": "2026-09-07T07:14:56Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-09-07/this-week-is-all-about-us-cpi-3-minute-mliv-video"
-    },
-    {
-     "titolo": "Germany’s Stimulus Spending Fails to Lift Investor Confidence in Markets",
-     "riassunto": "Germany’s underperformance might look misplaced considering the massive injection of government stimulus. But even billions in spending can’t address all investor concerns, with another inflamed by Sunday’s state election result.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-07T06:24:53Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-07/german-stock-market-s-massive-underperformance-looks-deserved"
+     "quando": "2026-09-07T04:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-07/bond-market-gilts-btps-oats-hit-by-fears-of-energy-shock-political-risk"
     },
     {
      "titolo": "Japan Likely Sold Treasuries to Fund Record Yen Intervention",
@@ -47165,13 +47183,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-09-06T23:56:48Z",
      "url": "https://www.bloomberg.com/news/articles/2026-09-06/japan-likely-sold-treasuries-to-fund-record-yen-intervention"
-    },
-    {
-     "titolo": "Gold Falls as US Jobs Data, Hormuz Clashes Boost Rate-Hike Bets",
-     "riassunto": "Gold extended a decline, as stronger-than-expected US jobs growth and rising tensions in the Middle East raised prospects for an interest-rate hike as early as next week.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-06T23:28:46Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-06/gold-holds-decline-as-traders-weigh-prospects-for-fed-rate-hike"
     },
     {
      "titolo": "BlackRock, JPMorgan Bet on EM as Turmoil Seizes Global Bonds",
@@ -47263,6 +47274,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-08-31T13:35:11Z",
      "url": "https://www.cnbc.com/2026/08/31/bailey-frontier-ai-financial-stability-risk.html"
+    },
+    {
+     "titolo": "India’s economy expands 7.8% in fiscal first quarter, beating estimates",
+     "riassunto": "The economy was driven by a strong performance in the financial, real estate, information technology and professional services sectors.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-31T11:23:42Z",
+     "url": "https://www.cnbc.com/2026/08/31/india-economy-gdp-energy-el-nino.html"
     }
    ],
    "fonti": [
@@ -52132,8 +52150,8 @@
    "us10": 4.78,
    "jp10": 2.91,
    "spread": 1.87,
-   "usdjpy": 154.47,
-   "usdjpy_chg_1m": -2.49,
+   "usdjpy": 154.43,
+   "usdjpy_chg_1m": -2.51,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -52315,7 +52333,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-09-04",
     "price": 211.92,
     "d1": -0.88,
@@ -52564,7 +52582,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-09-04",
     "price": 171.45,
     "d1": -1.04,
@@ -53451,7 +53469,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-09-04",
     "price": 84.17,
     "d1": 0.68,
@@ -53534,7 +53552,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-09-04",
     "price": 187.28,
     "d1": 0.7,
@@ -53617,7 +53635,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-09-04",
     "price": 114.91,
     "d1": -1.33,
@@ -53866,7 +53884,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-09-04",
     "price": 567.01,
     "d1": 2.61,
@@ -56720,7 +56738,7 @@
    },
    "smc_avg": 47,
    "vix3m": 17.6,
-   "vix_term_ratio": 0.854,
+   "vix_term_ratio": 0.855,
    "ig_spread": 1.0,
    "hy_ig_ratio": 2.65,
    "divergence": -17,
@@ -57016,8 +57034,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 98.96,
-   "chg_3m_pct": -0.95,
+   "value": 98.91,
+   "chg_3m_pct": -1.0,
    "flag": null,
    "src": "DXY"
   },
@@ -57242,6 +57260,20 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Billionaire Bill Ackman Sells Alphabet Stock and Buys a Mega-Cap Stock Down 42% From Its High",
+      "riassunto": "Key PointsIn the second quarter, Bill Ackman's hedge fund sold its entire stake in Alphabet and started a position in Netflix.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T09:08:01Z",
+      "url": "https://www.nasdaq.com/articles/billionaire-bill-ackman-sells-alphabet-stock-and-buys-mega-cap-stock-down-42-its-high"
+     },
+     {
+      "titolo": "This is the Best Bargain in the &quot;Magnificent Seven&quot; Right Now",
+      "riassunto": "Key PointsThe &ldquo;Magnificent Seven&rdquo; tech stocks are each, to some degree, involved in the artificial intelligence market.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T08:30:01Z",
+      "url": "https://www.nasdaq.com/articles/best-bargain-magnificent-seven-right-now"
+     },
+     {
       "titolo": "What a $10,000 Investment in SpaceX Could Be Worth by September 2027",
       "riassunto": "Key PointsThe SpaceX stock price has recently rebounded above its IPO price of $135.",
       "fonte": "Nasdaq",
@@ -57268,20 +57300,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-06T15:15:00Z",
       "url": "https://www.nasdaq.com/articles/will-alphabet-break-warren-buffetts-cardinal-rule-investing"
-     },
-     {
-      "titolo": "Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?",
-      "riassunto": "Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T13:35:00Z",
-      "url": "https://www.nasdaq.com/articles/despite-revenue-skyrocketing-more-100-nvidia-stock-trades-24-times-forward-earnings-market"
-     },
-     {
-      "titolo": "Why Rezolve AI Stock Plummeted This Week",
-      "riassunto": "Key PointsRezolve AI stock fell this week after the company posted its first-half results.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T11:20:00Z",
-      "url": "https://www.nasdaq.com/articles/why-rezolve-ai-stock-plummeted-week"
      }
     ],
     "MRVL": [
@@ -57506,6 +57524,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "SpaceX Stock Is Down 34% From Its High. History Suggests a $10,000 Investment Will Be Worth This Much by Mid-2027.",
+      "riassunto": "Key PointsSpaceX completed the largest IPO in history back in June.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T08:33:00Z",
+      "url": "https://www.nasdaq.com/articles/spacex-stock-down-34-its-high-history-suggests-10000-investment-will-be-worth-much-mid"
+     },
+     {
       "titolo": "Michael Burry Says Palantir's Books Look More Like a Consultant's Than a Software Company's",
       "riassunto": "Key PointsPalantir's accounts receivable reached $1.49 billion at the end of June, up from $1.04 billion at the end of 2025.",
       "fonte": "Nasdaq",
@@ -57539,13 +57564,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T13:11:00Z",
       "url": "https://www.nasdaq.com/articles/palantirs-ai-growth-worth-premium-valuation-its-stock"
-     },
-     {
-      "titolo": "Not Nvidia. Not Palantir. This AI Stock Could Have the Most Upside.",
-      "riassunto": "Key PointsMost AI stocks already trade at lofty premiums.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T11:20:00Z",
-      "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-ai-stock-could-have-most-upside"
      }
     ],
     "RGTI": [
@@ -57660,7 +57678,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-07T09:01:45Z"
+   "letto_il": "2026-09-07T09:49:32Z"
   }
  },
  "broker": null,
@@ -57800,6 +57818,20 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Billionaire Bill Ackman Sells Alphabet Stock and Buys a Mega-Cap Stock Down 42% From Its High",
+     "riassunto": "Key PointsIn the second quarter, Bill Ackman's hedge fund sold its entire stake in Alphabet and started a position in Netflix.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T09:08:01Z",
+     "url": "https://www.nasdaq.com/articles/billionaire-bill-ackman-sells-alphabet-stock-and-buys-mega-cap-stock-down-42-its-high"
+    },
+    {
+     "titolo": "This is the Best Bargain in the &quot;Magnificent Seven&quot; Right Now",
+     "riassunto": "Key PointsThe &ldquo;Magnificent Seven&rdquo; tech stocks are each, to some degree, involved in the artificial intelligence market.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T08:30:01Z",
+     "url": "https://www.nasdaq.com/articles/best-bargain-magnificent-seven-right-now"
+    },
+    {
      "titolo": "What a $10,000 Investment in SpaceX Could Be Worth by September 2027",
      "riassunto": "Key PointsThe SpaceX stock price has recently rebounded above its IPO price of $135.",
      "fonte": "Nasdaq",
@@ -57826,20 +57858,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-06T15:15:00Z",
      "url": "https://www.nasdaq.com/articles/will-alphabet-break-warren-buffetts-cardinal-rule-investing"
-    },
-    {
-     "titolo": "Despite Revenue Skyrocketing More Than 100%, Nvidia Stock Trades at 24 Times Forward Earnings. Is the Market Warning Investors About What's to Come?",
-     "riassunto": "Key PointsDuring the most recent fiscal quarter, Nvidia's growth figures showed investors that the AI boom is still in full swing.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T13:35:00Z",
-     "url": "https://www.nasdaq.com/articles/despite-revenue-skyrocketing-more-100-nvidia-stock-trades-24-times-forward-earnings-market"
-    },
-    {
-     "titolo": "Why Rezolve AI Stock Plummeted This Week",
-     "riassunto": "Key PointsRezolve AI stock fell this week after the company posted its first-half results.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T11:20:00Z",
-     "url": "https://www.nasdaq.com/articles/why-rezolve-ai-stock-plummeted-week"
     }
    ],
    "MRVL": [
@@ -58064,6 +58082,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "SpaceX Stock Is Down 34% From Its High. History Suggests a $10,000 Investment Will Be Worth This Much by Mid-2027.",
+     "riassunto": "Key PointsSpaceX completed the largest IPO in history back in June.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T08:33:00Z",
+     "url": "https://www.nasdaq.com/articles/spacex-stock-down-34-its-high-history-suggests-10000-investment-will-be-worth-much-mid"
+    },
+    {
      "titolo": "Michael Burry Says Palantir's Books Look More Like a Consultant's Than a Software Company's",
      "riassunto": "Key PointsPalantir's accounts receivable reached $1.49 billion at the end of June, up from $1.04 billion at the end of 2025.",
      "fonte": "Nasdaq",
@@ -58097,13 +58122,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T13:11:00Z",
      "url": "https://www.nasdaq.com/articles/palantirs-ai-growth-worth-premium-valuation-its-stock"
-    },
-    {
-     "titolo": "Not Nvidia. Not Palantir. This AI Stock Could Have the Most Upside.",
-     "riassunto": "Key PointsMost AI stocks already trade at lofty premiums.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T11:20:00Z",
-     "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-ai-stock-could-have-most-upside"
     }
    ],
    "RGTI": [
@@ -58218,7 +58236,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-07T09:01:45Z"
+  "letto_il": "2026-09-07T09:49:32Z"
  },
  "predictions": [
   {
@@ -58233,7 +58251,7 @@
   },
   {
    "question": "Will the price of Bitcoin be above $78,000 on September 7?",
-   "yes": 96,
+   "yes": 97,
    "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-7-2026"
   },
   {
@@ -66371,7 +66389,7 @@
      ],
      "call_wall": 200.0,
      "put_wall": 80.0,
-     "opt_volume": 59455
+     "opt_volume": 59456
     },
     {
      "date": "2026-09-25",
@@ -75915,7 +75933,7 @@
      ],
      "call_wall": 610.0,
      "put_wall": 250.0,
-     "opt_volume": 6860
+     "opt_volume": 6856
     },
     {
      "date": "2026-09-25",
@@ -78887,8 +78905,8 @@
    "sharpe": 1.72,
    "gain_pct": 2.35,
    "eur_value": 40941.28,
-   "vix": 15.04,
-   "vix_term": 0.854,
+   "vix": 15.06,
+   "vix_term": 0.855,
    "titles": {},
    "macro_scores": {
     "fear_greed": 42,
@@ -79022,7 +79040,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -79074,6 +79092,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-07T09:01:46Z"
+  "generated_at": "2026-09-07T09:49:33Z"
  }
 }
