@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-09-07T14:04:55Z",
- "eurusd": 1.1632,
+ "updated_at": "2026-09-07T14:37:51Z",
+ "eurusd": 1.1633,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -21723,28 +21723,28 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79324.41,
+   "price": 79038.37,
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -1.28,
+   "change_pct": -1.63,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -37.1,
-   "sma200_dist_pct": 13.6,
-   "sma50_dist_pct": 13.8,
+   "ath_dist_pct": -37.4,
+   "sma200_dist_pct": 13.2,
+   "sma50_dist_pct": 13.4,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -37.1,
+   "w52_dist_pct": -37.4,
    "day_high": 80387.91,
-   "day_low": 79218.68,
+   "day_low": 79046.88,
    "support": 64111.07,
    "resistance": 82262.21,
-   "rsi": 63.6,
-   "volume": 23433840640,
+   "rsi": 62.5,
+   "volume": 23366885376,
    "vol_ratio": 0.66,
-   "atr_14": 2203.41,
-   "atr_pct": 2.78,
+   "atr_14": 2215.68,
+   "atr_pct": 2.8,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -21753,7 +21753,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79324.41
+     79038.37
     ],
     "m6": [
      80927.05,
@@ -21881,7 +21881,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79324.41
+     79038.37
     ],
     "all": [
      386.94,
@@ -22028,7 +22028,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79335.0
+     79038.37
     ],
     "m1": [
      64506.25,
@@ -22052,7 +22052,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79324.41
+     79038.37
     ],
     "m3": [
      63088.3,
@@ -22120,7 +22120,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79324.41
+     79038.37
     ],
     "y1": [
      111167.62,
@@ -22196,7 +22196,7 @@
      77755.27,
      77830.29,
      77300.48,
-     79324.41
+     79038.37
     ],
     "d1": [
      80315.11,
@@ -22283,7 +22283,10 @@
      79383.5,
      79364.1,
      79400.34,
-     79335.0
+     79328.83,
+     79166.36,
+     79072.3,
+     79060.48
     ]
    },
    "earnings_date": null,
@@ -22293,11 +22296,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.73,
-   "sortino_1y": -0.98,
-   "sharpe_6m": -0.15,
-   "sortino_6m": -0.23,
+   "sortino_1y": -0.99,
+   "sharpe_6m": -0.18,
+   "sortino_6m": -0.26,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79324.41,
+   "prezzo_limite_aggiustato": 79038.37,
    "risk_reward": "1:0.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22310,22 +22313,22 @@
     "w1": {
      "support": 76940.88,
      "resistance": 82262.21,
-     "change_pct": -2.4
+     "change_pct": -2.75
     },
     "m1": {
      "support": 62687.1,
      "resistance": 82262.21,
-     "change_pct": 22.97
+     "change_pct": 22.53
     },
     "m3": {
      "support": 61275.83,
      "resistance": 82262.21,
-     "change_pct": 25.74
+     "change_pct": 25.28
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.3
+     "change_pct": -10.62
     }
    },
    "financials": [],
@@ -22352,74 +22355,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79324.41,
+     "prezzo": 79038.37,
      "medie": {
       "sma10": {
-       "liv": 78960.81,
-       "dist_pct": 0.46
+       "liv": 78932.21,
+       "dist_pct": 0.13
       },
       "ema10": {
-       "liv": 78939.75,
-       "dist_pct": 0.49
+       "liv": 78887.75,
+       "dist_pct": 0.19
       },
       "sma20": {
-       "liv": 77986.28,
-       "dist_pct": 1.72
+       "liv": 77971.98,
+       "dist_pct": 1.37
       },
       "ema20": {
-       "liv": 76753.71,
-       "dist_pct": 3.35
+       "liv": 76726.47,
+       "dist_pct": 3.01
       },
       "sma30": {
-       "liv": 73228.11,
-       "dist_pct": 8.33
+       "liv": 73218.57,
+       "dist_pct": 7.95
       },
       "ema30": {
-       "liv": 74695.6,
-       "dist_pct": 6.2
+       "liv": 74677.14,
+       "dist_pct": 5.84
       },
       "sma50": {
-       "liv": 69698.49,
-       "dist_pct": 13.81
+       "liv": 69692.77,
+       "dist_pct": 13.41
       },
       "ema50": {
-       "liv": 72039.8,
-       "dist_pct": 10.11
+       "liv": 72028.59,
+       "dist_pct": 9.73
       },
       "sma100": {
-       "liv": 66527.23,
-       "dist_pct": 19.24
+       "liv": 66524.37,
+       "dist_pct": 18.81
       },
       "ema100": {
-       "liv": 70227.5,
-       "dist_pct": 12.95
+       "liv": 70221.84,
+       "dist_pct": 12.56
       },
       "sma200": {
-       "liv": 69815.45,
-       "dist_pct": 13.62
+       "liv": 69814.02,
+       "dist_pct": 13.21
       },
       "ema200": {
-       "liv": 72881.18,
-       "dist_pct": 8.84
+       "liv": 72878.33,
+       "dist_pct": 8.45
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.6,
+      "rsi14": 62.5,
       "macd": {
-       "linea": 3095.58,
-       "segnale": 3342.68,
-       "istogramma": -247.1
+       "linea": 3072.77,
+       "segnale": 3338.12,
+       "istogramma": -265.35
       },
-      "stoch_k": 51.1,
-      "stoch_d": 60.9,
-      "williams_r": -48.9,
-      "cci20": 17.7,
-      "adx14": 48.3,
-      "di_su": 34.9,
-      "di_giu": 9.0,
-      "momentum10": 1494.12
+      "stoch_k": 46.4,
+      "stoch_d": 59.3,
+      "williams_r": -53.6,
+      "cci20": 16.4,
+      "adx14": 48.1,
+      "di_su": 34.7,
+      "di_giu": 9.5,
+      "momentum10": 1208.08
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22911,20 +22914,20 @@
       "d": "2026-09-07",
       "o": 80351.4,
       "h": 80387.91,
-      "l": 79218.68,
-      "c": 79324.41
+      "l": 79046.88,
+      "c": 79038.37
      }
     ],
     "performance": {
-     "s1": 2.62,
-     "m1": 26.28,
-     "m3": 26.83,
-     "m6": -0.63,
-     "a1": -8.97,
-     "ytd": -10.6,
-     "a3": 194.14,
-     "a5": 81.14,
-     "a10": 12909.65
+     "s1": 2.25,
+     "m1": 25.82,
+     "m3": 26.37,
+     "m6": -0.99,
+     "a1": -9.3,
+     "ytd": -10.92,
+     "a3": 193.08,
+     "a5": 80.49,
+     "a10": 12862.74
     },
     "stagionalita": [
      {
@@ -23001,8 +23004,8 @@
      },
      {
       "mese": 9,
-      "media": -1.59,
-      "mediana": -1.04,
+      "media": -1.62,
+      "mediana": -1.23,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23037,9 +23040,9 @@
      }
     ]
    },
-   "rs_1m": 22.9,
+   "rs_1m": 22.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 22.4,
+   "rs_ndx_1m": 21.9,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -23050,28 +23053,28 @@
    "name": "^VIX",
    "currency": "PTS",
    "price_src": "yahoo",
-   "price": 15.11,
+   "price": 15.18,
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 3.99,
+   "change_pct": 4.47,
    "pe": null,
    "ath": 89.53,
-   "ath_dist_pct": -83.1,
-   "sma200_dist_pct": -17.0,
-   "sma50_dist_pct": -6.3,
+   "ath_dist_pct": -83.0,
+   "sma200_dist_pct": -16.6,
+   "sma50_dist_pct": -5.9,
    "w52_high": 35.3,
    "w52_low": 13.38,
-   "w52_dist_pct": -57.2,
+   "w52_dist_pct": -57.0,
    "day_high": 15.27,
    "day_low": 14.99,
    "support": 13.8,
    "resistance": 16.82,
-   "rsi": 48.1,
+   "rsi": 48.4,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 1.21,
-   "atr_pct": 8.01,
+   "atr_pct": 7.97,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -23080,7 +23083,7 @@
      15.2,
      14.32,
      14.53,
-     15.11
+     15.18
     ],
     "m6": [
      24.23,
@@ -23208,7 +23211,7 @@
      15.2,
      14.32,
      14.53,
-     15.11
+     15.18
     ],
     "all": [
      25.36,
@@ -23651,7 +23654,7 @@
      16.45,
      15.99,
      14.92,
-     15.11
+     15.18
     ],
     "m1": [
      14.9,
@@ -23675,7 +23678,7 @@
      15.2,
      14.32,
      14.53,
-     15.11
+     15.18
     ],
     "m3": [
      15.4,
@@ -23743,7 +23746,7 @@
      15.2,
      14.32,
      14.53,
-     15.11
+     15.18
     ],
     "y1": [
      15.11,
@@ -23838,21 +23841,24 @@
      15.15,
      15.09,
      15.1,
-     15.11
+     15.09,
+     15.13,
+     15.17,
+     15.18
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 42,
+   "health": 43,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.03,
    "sortino_1y": -0.04,
-   "sharpe_6m": -0.9,
-   "sortino_6m": -1.31,
+   "sharpe_6m": -0.89,
+   "sortino_6m": -1.3,
    "prepost": null,
-   "prezzo_limite_aggiustato": 15.11,
+   "prezzo_limite_aggiustato": 15.18,
    "risk_reward": "1:0.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -23865,22 +23871,22 @@
     "w1": {
      "support": 13.8,
      "resistance": 16.82,
-     "change_pct": -7.53
+     "change_pct": -7.1
     },
     "m1": {
      "support": 13.8,
      "resistance": 16.82,
-     "change_pct": 1.41
+     "change_pct": 1.88
     },
     "m3": {
      "support": 13.8,
      "resistance": 23.34,
-     "change_pct": -1.88
+     "change_pct": -1.43
     },
     "y1": {
      "support": 13.38,
      "resistance": 35.3,
-     "change_pct": 0.47
+     "change_pct": 0.93
     }
    },
    "financials": [],
@@ -23903,74 +23909,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 15.11,
+     "prezzo": 15.18,
      "medie": {
       "sma10": {
-       "liv": 15.0,
-       "dist_pct": 0.72
+       "liv": 15.01,
+       "dist_pct": 1.14
       },
       "ema10": {
-       "liv": 15.02,
-       "dist_pct": 0.59
+       "liv": 15.03,
+       "dist_pct": 0.97
       },
       "sma20": {
-       "liv": 15.08,
-       "dist_pct": 0.19
+       "liv": 15.09,
+       "dist_pct": 0.63
       },
       "ema20": {
-       "liv": 15.27,
-       "dist_pct": -1.06
+       "liv": 15.28,
+       "dist_pct": -0.65
       },
       "sma30": {
        "liv": 15.58,
-       "dist_pct": -2.99
+       "dist_pct": -2.55
       },
       "ema30": {
-       "liv": 15.55,
-       "dist_pct": -2.84
+       "liv": 15.56,
+       "dist_pct": -2.42
       },
       "sma50": {
-       "liv": 16.13,
-       "dist_pct": -6.35
+       "liv": 16.14,
+       "dist_pct": -5.92
       },
       "ema50": {
-       "liv": 16.06,
-       "dist_pct": -5.94
+       "liv": 16.07,
+       "dist_pct": -5.52
       },
       "sma100": {
        "liv": 16.96,
-       "dist_pct": -10.91
+       "dist_pct": -10.5
       },
       "ema100": {
        "liv": 16.97,
-       "dist_pct": -10.97
+       "dist_pct": -10.56
       },
       "sma200": {
        "liv": 18.21,
-       "dist_pct": -17.02
+       "dist_pct": -16.64
       },
       "ema200": {
        "liv": 17.47,
-       "dist_pct": -13.49
+       "dist_pct": -13.1
       }
      },
      "medie_battute": 3,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 48.1,
+      "rsi14": 48.4,
       "macd": {
-       "linea": -0.38,
+       "linea": -0.37,
        "segnale": -0.42,
        "istogramma": 0.04
       },
-      "stoch_k": 43.4,
-      "stoch_d": 24.9,
-      "williams_r": -56.6,
-      "cci20": -3.1,
+      "stoch_k": 45.7,
+      "stoch_d": 25.6,
+      "williams_r": -54.3,
+      "cci20": -1.6,
       "adx14": 18.3,
       "di_su": 25.3,
       "di_giu": 20.3,
-      "momentum10": -0.74
+      "momentum10": -0.67
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -24463,19 +24469,19 @@
       "o": 15.02,
       "h": 15.27,
       "l": 14.99,
-      "c": 15.11
+      "c": 15.18
      }
     ],
     "performance": {
-     "s1": 1.27,
-     "m1": -0.26,
-     "m3": -5.92,
-     "m6": -39.39,
-     "a1": 0.0,
-     "ytd": 4.14,
-     "a3": -13.76,
-     "a5": -34.7,
-     "a10": 13.69
+     "s1": 1.74,
+     "m1": 0.2,
+     "m3": -5.48,
+     "m6": -39.11,
+     "a1": 0.46,
+     "ytd": 4.62,
+     "a3": -13.36,
+     "a5": -34.4,
+     "a10": 14.22
     },
     "stagionalita": [
      {
@@ -24552,8 +24558,8 @@
      },
      {
       "mese": 9,
-      "media": 7.95,
-      "mediana": 1.27,
+      "media": 7.96,
+      "mediana": 1.74,
       "positivi_pct": 51,
       "campione": 37,
       "peggio": -23.0,
@@ -24588,9 +24594,9 @@
      }
     ]
    },
-   "rs_1m": 1.3,
+   "rs_1m": 1.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 0.8,
+   "rs_ndx_1m": 1.3,
    "beta_ndx": -4.54,
    "avg_corr": -0.37,
    "max_corr": -0.22,
@@ -24619,7 +24625,7 @@
    "support": 28927.25,
    "resistance": 30343.0,
    "rsi": 52.6,
-   "volume": 68261,
+   "volume": 73608,
    "vol_ratio": 0.99,
    "atr_14": 435.86,
    "atr_pct": 1.47,
@@ -30491,20 +30497,20 @@
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.03,
+   "change_pct": 0.04,
    "pe": null,
    "ath": 1.6,
    "ath_dist_pct": -27.4,
-   "sma200_dist_pct": -0.0,
+   "sma200_dist_pct": 0.0,
    "sma50_dist_pct": 1.1,
    "w52_high": 1.2,
    "w52_low": 1.13,
-   "w52_dist_pct": -3.3,
+   "w52_dist_pct": -3.2,
    "day_high": 1.16,
    "day_low": 1.16,
    "support": 1.15,
    "resistance": 1.17,
-   "rsi": 57.4,
+   "rsi": 57.6,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 0.01,
@@ -31159,6 +31165,10 @@
      1.16,
      1.16,
      1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
      1.16
     ]
    },
@@ -31168,10 +31178,10 @@
    "health": 61,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.76,
-   "sortino_1y": -1.1,
+   "sharpe_1y": -0.75,
+   "sortino_1y": -1.09,
    "sharpe_6m": -0.3,
-   "sortino_6m": -0.45,
+   "sortino_6m": -0.44,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.16,
    "risk_reward": "1:1.1",
@@ -31186,22 +31196,22 @@
     "w1": {
      "support": 1.16,
      "resistance": 1.16,
-     "change_pct": 0.12
+     "change_pct": 0.13
     },
     "m1": {
      "support": 1.15,
      "resistance": 1.17,
-     "change_pct": 0.93
+     "change_pct": 0.94
     },
     "m3": {
      "support": 1.13,
      "resistance": 1.17,
-     "change_pct": 0.95
+     "change_pct": 0.96
     },
     "y1": {
      "support": 1.13,
      "resistance": 1.2,
-     "change_pct": -2.02
+     "change_pct": -2.01
     }
    },
    "financials": [],
@@ -31232,66 +31242,66 @@
      "medie": {
       "sma10": {
        "liv": 1.16,
-       "dist_pct": 0.02
+       "dist_pct": 0.03
       },
       "ema10": {
        "liv": 1.16,
-       "dist_pct": 0.1
+       "dist_pct": 0.11
       },
       "sma20": {
        "liv": 1.16,
-       "dist_pct": 0.17
+       "dist_pct": 0.18
       },
       "ema20": {
        "liv": 1.16,
-       "dist_pct": 0.26
+       "dist_pct": 0.27
       },
       "sma30": {
        "liv": 1.16,
-       "dist_pct": 0.5
+       "dist_pct": 0.52
       },
       "ema30": {
        "liv": 1.16,
-       "dist_pct": 0.44
+       "dist_pct": 0.45
       },
       "sma50": {
        "liv": 1.15,
-       "dist_pct": 1.05
+       "dist_pct": 1.06
       },
       "ema50": {
        "liv": 1.16,
-       "dist_pct": 0.61
+       "dist_pct": 0.62
       },
       "sma100": {
        "liv": 1.16,
-       "dist_pct": 0.57
+       "dist_pct": 0.58
       },
       "ema100": {
        "liv": 1.16,
-       "dist_pct": 0.55
+       "dist_pct": 0.57
       },
       "sma200": {
        "liv": 1.16,
-       "dist_pct": -0.01
+       "dist_pct": 0.0
       },
       "ema200": {
        "liv": 1.16,
-       "dist_pct": 0.25
+       "dist_pct": 0.26
       }
      },
      "medie_battute": 11,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 57.4,
+      "rsi14": 57.6,
       "macd": {
        "linea": 0.0,
        "segnale": 0.0,
        "istogramma": -0.0
       },
-      "stoch_k": 44.7,
-      "stoch_d": 33.2,
-      "williams_r": -55.3,
-      "cci20": 13.1,
+      "stoch_k": 45.6,
+      "stoch_d": 33.5,
+      "williams_r": -54.4,
+      "cci20": 13.5,
       "adx14": 28.4,
       "di_su": 20.8,
       "di_giu": 14.3,
@@ -31792,15 +31802,15 @@
      }
     ],
     "performance": {
-     "s1": 0.37,
-     "m1": 0.65,
-     "m3": 0.17,
-     "m6": 0.96,
-     "a1": -1.12,
-     "ytd": -1.01,
-     "a3": 9.86,
-     "a5": 0.26,
-     "a10": 3.68
+     "s1": 0.38,
+     "m1": 0.66,
+     "m3": 0.18,
+     "m6": 0.97,
+     "a1": -1.11,
+     "ytd": -1.0,
+     "a3": 9.88,
+     "a5": 0.27,
+     "a10": 3.69
     },
     "stagionalita": [
      {
@@ -31939,15 +31949,15 @@
    "w52_high": 6.75,
    "w52_low": 4.48,
    "w52_dist_pct": -1.0,
-   "day_high": 6.72,
+   "day_high": 6.73,
    "day_low": 6.64,
    "support": 6.41,
    "resistance": 6.75,
    "rsi": 60.0,
-   "volume": 8999,
+   "volume": 10938,
    "vol_ratio": 0.41,
    "atr_14": 0.09,
-   "atr_pct": 1.41,
+   "atr_pct": 1.42,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -32526,7 +32536,7 @@
    "tech_by_range": {
     "w1": {
      "support": 6.41,
-     "resistance": 6.72,
+     "resistance": 6.73,
      "change_pct": 2.7
     },
     "m1": {
@@ -32632,10 +32642,10 @@
       "stoch_k": 80.4,
       "stoch_d": 61.9,
       "williams_r": -19.6,
-      "cci20": 98.2,
-      "adx14": 9.3,
-      "di_su": 34.7,
-      "di_giu": 25.6,
+      "cci20": 100.9,
+      "adx14": 9.4,
+      "di_su": 35.1,
+      "di_giu": 25.5,
       "momentum10": 0.08
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
@@ -33127,7 +33137,7 @@
      {
       "d": "2026-09-07",
       "o": 6.67,
-      "h": 6.72,
+      "h": 6.73,
       "l": 6.64,
       "c": 6.68
      }
@@ -33285,7 +33295,7 @@
    "support": 79.62,
    "resistance": 93.14,
    "rsi": 65.3,
-   "volume": 67042,
+   "volume": 72452,
    "vol_ratio": 1.26,
    "atr_14": 3.5,
    "atr_pct": 3.83,
@@ -38138,8 +38148,8 @@
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
-   "value": 15.11,
-   "change_pct": 3.99,
+   "value": 15.18,
+   "change_pct": 4.47,
    "spark": [
     18.21,
     20.66,
@@ -38170,7 +38180,7 @@
     15.2,
     14.32,
     14.53,
-    15.11
+    15.18
    ],
    "asof": "2026-09-07"
   },
@@ -45126,15 +45136,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1632",
-    "change_pct": 0.03,
+    "value": "1.1633",
+    "change_pct": 0.04,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "179.74",
-    "change_pct": -0.7,
+    "value": "179.52",
+    "change_pct": -0.82,
     "suffix": "%"
    }
   ],
@@ -47227,6 +47237,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Deutsche Bank’s Allen Says Traders Are Wrong on Rates or Prices",
+     "riassunto": "Investors are underestimating the scale of rate hikes needed to tackle inflation given upward pressure on prices, according to Deutsche Bank AG strategist Henry Allen.",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-07T14:01:57Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-07/deutsche-bank-s-allen-says-traders-are-wrong-on-rates-or-prices"
+    },
+    {
      "titolo": "Is the stock market open today for Labor Day? What about bond trading and mail delivery?",
      "riassunto": "Here’s how trading hours and other services are affected by the Labor Day holiday on Monday, Sept. 7.",
      "fonte": "MarketWatch",
@@ -47344,13 +47361,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-08-31T13:35:11Z",
      "url": "https://www.cnbc.com/2026/08/31/bailey-frontier-ai-financial-stability-risk.html"
-    },
-    {
-     "titolo": "India’s economy expands 7.8% in fiscal first quarter, beating estimates",
-     "riassunto": "The economy was driven by a strong performance in the financial, real estate, information technology and professional services sectors.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-08-31T11:23:42Z",
-     "url": "https://www.cnbc.com/2026/08/31/india-economy-gdp-energy-el-nino.html"
     }
    ],
    "fonti": [
@@ -52219,8 +52229,8 @@
    "us10": 4.78,
    "jp10": 2.91,
    "spread": 1.87,
-   "usdjpy": 154.59,
-   "usdjpy_chg_1m": -2.41,
+   "usdjpy": 154.35,
+   "usdjpy_chg_1m": -2.56,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -52238,7 +52248,7 @@
    "calls": 568509
   },
   "risk_sentiment": {
-   "score": 47,
+   "score": 46,
    "label": "Neutrale",
    "components": [
     {
@@ -52255,7 +52265,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 38
+     "score": 34
     },
     {
      "label": "Treasury 10A",
@@ -56807,7 +56817,7 @@
    },
    "smc_avg": 47,
    "vix3m": 17.6,
-   "vix_term_ratio": 0.858,
+   "vix_term_ratio": 0.862,
    "ig_spread": 1.0,
    "hy_ig_ratio": 2.65,
    "divergence": -17,
@@ -56819,7 +56829,7 @@
     },
     {
      "label": "Struttura VIX (contango/backw.)",
-     "score": 98
+     "score": 97
     },
     {
      "label": "Spread HY/IG (fuga qualità)",
@@ -57103,8 +57113,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 98.91,
-   "chg_3m_pct": -1.0,
+   "value": 98.86,
+   "chg_3m_pct": -1.05,
    "flag": null,
    "src": "DXY"
   },
@@ -57197,6 +57207,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "NVIDIA's Hugging Face Buyout: Can It Further Strengthen AI Dominance?",
+      "riassunto": "NVDA's $12.93B Hugging Face deal is likely to deepen its AI moat by combining chip leadership with a vast open-model platform and developer ecosystem.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T13:02:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidias-hugging-face-buyout-can-it-further-strengthen-ai-dominance"
+     },
+     {
       "titolo": "Prediction: Data Center Passes 70% of AMD's Revenue in 2027, Before the Helios Ramp Is Finished",
       "riassunto": "Key PointsData center generated 58% of AMD's revenue in the second quarter, versus about 42% a year earlier.",
       "fonte": "Nasdaq",
@@ -57230,13 +57247,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-06T13:40:00Z",
       "url": "https://www.nasdaq.com/articles/why-hewlett-packard-enterprises-sell-may-not-last"
-     },
-     {
-      "titolo": "AMD Committed Up to $5 Billion to Anthropic, and Anthropic's IPO Prospectus Is Reportedly Days Away",
-      "riassunto": "Key PointsAMD committed in late July to invest up to $5 billion in Anthropic, alongside an agreement to deploy up to 2 gigawatts of its Instinct MI450 series GPUs.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T22:03:01Z",
-      "url": "https://www.nasdaq.com/articles/amd-committed-5-billion-anthropic-and-anthropics-ipo-prospectus-reportedly-days-away"
      }
     ],
     "BE": [
@@ -57461,6 +57471,13 @@
     ],
     "MU": [
      {
+      "titolo": "Micron Technology, Inc. (MU) Is a Trending Stock: Facts to Know Before Betting on It",
+      "riassunto": "Micron (MU) has been one of the stocks most watched by Zacks.com users lately. So, it is worth exploring what lies ahead for the stock.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T13:00:05Z",
+      "url": "https://www.nasdaq.com/articles/micron-technology-inc-mu-trending-stock-facts-know-betting-it-0"
+     },
+     {
       "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
       "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
       "fonte": "Nasdaq",
@@ -57494,16 +57511,30 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-05T12:05:00Z",
       "url": "https://www.nasdaq.com/articles/recent-news-nvidia-and-sk-hynix-reveals-exactly-what-market-expects-micron-technologys"
-     },
-     {
-      "titolo": "China's Biggest Memory Chip Stock Is Almost as Good as Micron",
-      "riassunto": "Key PointsMicron rival CXMT IPO'd with a near half-trillion-dollar market capitalization in July.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T10:26:00Z",
-      "url": "https://www.nasdaq.com/articles/chinas-biggest-memory-chip-stock-almost-good-micron"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "NVIDIA's Hugging Face Buyout: Can It Further Strengthen AI Dominance?",
+      "riassunto": "NVDA's $12.93B Hugging Face deal is likely to deepen its AI moat by combining chip leadership with a vast open-model platform and developer ecosystem.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T13:02:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidias-hugging-face-buyout-can-it-further-strengthen-ai-dominance"
+     },
+     {
+      "titolo": "Nebius Stock Up 254% in a Year: Should You Buy, Hold or Sell?",
+      "riassunto": "NBIS surges 253.5% in a year on AI infrastructure demand, but high capital needs and valuation raise questions about further upside.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T12:38:00Z",
+      "url": "https://www.nasdaq.com/articles/nebius-stock-254-year-should-you-buy-hold-or-sell"
+     },
+     {
+      "titolo": "Buy These 5 Semiconductor Stocks as Sales Skyrocket on Solid AI Demand",
+      "riassunto": "ADI, TSM, TXN, NVDA and ACMR could benefit as surging semiconductor sales and solid AI demand fuel optimism for chip stocks.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T12:36:00Z",
+      "url": "https://www.nasdaq.com/articles/buy-these-5-semiconductor-stocks-sales-skyrocket-solid-ai-demand"
+     },
      {
       "titolo": "The Stock Market Is Flashing a Warning Seen Only 6 Times Since 1871, and History Is Crystal Clear That a Disaster Could Be Heading Toward Wall Street",
       "riassunto": "Key PointsThe CAPE ratio accounts for 10 years' worth of inflation-adjusted earnings, making it helpful for gauging long-term market trends.",
@@ -57524,27 +57555,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-07T03:38:01Z",
       "url": "https://www.nasdaq.com/articles/history-says-what-nvidias-last-big-acquisition-became-hugging-face-will-cost-nearly-twice"
-     },
-     {
-      "titolo": "Did Nvidia Just Say Checkmate to AMD and Intel?",
-      "riassunto": "Key PointsNvidia has built strong leadership in the AI chip market over time.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T22:30:01Z",
-      "url": "https://www.nasdaq.com/articles/did-nvidia-just-say-checkmate-amd-and-intel"
-     },
-     {
-      "titolo": "Could $10,000 Invested in Nvidia Today Make You a Millionaire?",
-      "riassunto": "Key PointsNvidia can become a significantly larger company over the next decade, driven by secular growth in the semiconductor market and new catalysts.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T19:43:00Z",
-      "url": "https://www.nasdaq.com/articles/could-10000-invested-nvidia-today-make-you-millionaire"
-     },
-     {
-      "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
-      "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T17:34:01Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-near-its-high-while-its-biggest-chip-peers-sit-18-32-below-theirs-these-are-chip"
      }
     ],
     "ORCL": [
@@ -57593,6 +57603,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "Palantir Stock Could Make a Dramatic Move Over the Next Year (Hint: It Implies a Big Move)",
+      "riassunto": "Key PointsPalantir's growth trajectory is improving at a terrific pace, driven by the robust demand for its AI software platform.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T13:43:00Z",
+      "url": "https://www.nasdaq.com/articles/palantir-stock-could-make-dramatic-move-over-next-year-hint-it-implies-big-move"
+     },
+     {
       "titolo": "SpaceX Stock Is Down 34% From Its High. History Suggests a $10,000 Investment Will Be Worth This Much by Mid-2027.",
       "riassunto": "Key PointsSpaceX completed the largest IPO in history back in June.",
       "fonte": "Nasdaq",
@@ -57626,13 +57643,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T13:35:02Z",
       "url": "https://www.nasdaq.com/articles/palantir-technologies-inc-pltr-just-flashed-golden-cross-signal-do-you-buy"
-     },
-     {
-      "titolo": "Is Palantir's AI Growth Worth the Premium Valuation of its Stock?",
-      "riassunto": "PLTR pairs 93% revenue growth with a 62% adjusted operating margin, but its premium valuation leaves little room for disappointment.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-04T13:11:00Z",
-      "url": "https://www.nasdaq.com/articles/palantirs-ai-growth-worth-premium-valuation-its-stock"
      }
     ],
     "RGTI": [
@@ -57681,6 +57691,13 @@
     ],
     "WDC": [
      {
+      "titolo": "Investors Heavily Search Western Digital Corporation (WDC): Here is What You Need to Know",
+      "riassunto": "Western Digital (WDC) has been one of the stocks most watched by Zacks.com users lately. So, it is worth exploring what lies ahead for the stock.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T13:00:03Z",
+      "url": "https://www.nasdaq.com/articles/investors-heavily-search-western-digital-corporation-wdc-here-what-you-need-know-0"
+     },
+     {
       "titolo": "Here's How Much a $1000 Investment in Western Digital Made 10 Years Ago Would Be Worth Today",
       "riassunto": "Why investing for the long run, especially if you buy certain popular stocks, could reap huge rewards.",
       "fonte": "Nasdaq",
@@ -57714,13 +57731,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T14:45:00Z",
       "url": "https://www.nasdaq.com/articles/wdc-stocks-big-rally-buy-sell-or-hold-after-70-6-month-surge"
-     },
-     {
-      "titolo": "Nasdaq 100 Movers: AVGO, HONIV",
-      "riassunto": "In early trading on Thursday, shares of Honeywell International topped the list of the day's best performing components of the Nasdaq 100 index, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing Nasdaq 100 component thus fa",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-03T14:25:18Z",
-      "url": "https://www.nasdaq.com/articles/nasdaq-100-movers-avgo-honiv"
      }
     ]
    },
@@ -57747,13 +57757,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-07T14:04:55Z"
+   "letto_il": "2026-09-07T14:37:51Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "NVIDIA's Hugging Face Buyout: Can It Further Strengthen AI Dominance?",
+     "riassunto": "NVDA's $12.93B Hugging Face deal is likely to deepen its AI moat by combining chip leadership with a vast open-model platform and developer ecosystem.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T13:02:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidias-hugging-face-buyout-can-it-further-strengthen-ai-dominance"
+    },
     {
      "titolo": "Prediction: Data Center Passes 70% of AMD's Revenue in 2027, Before the Helios Ramp Is Finished",
      "riassunto": "Key PointsData center generated 58% of AMD's revenue in the second quarter, versus about 42% a year earlier.",
@@ -57788,13 +57805,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-06T13:40:00Z",
      "url": "https://www.nasdaq.com/articles/why-hewlett-packard-enterprises-sell-may-not-last"
-    },
-    {
-     "titolo": "AMD Committed Up to $5 Billion to Anthropic, and Anthropic's IPO Prospectus Is Reportedly Days Away",
-     "riassunto": "Key PointsAMD committed in late July to invest up to $5 billion in Anthropic, alongside an agreement to deploy up to 2 gigawatts of its Instinct MI450 series GPUs.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T22:03:01Z",
-     "url": "https://www.nasdaq.com/articles/amd-committed-5-billion-anthropic-and-anthropics-ipo-prospectus-reportedly-days-away"
     }
    ],
    "BE": [
@@ -58019,6 +58029,13 @@
    ],
    "MU": [
     {
+     "titolo": "Micron Technology, Inc. (MU) Is a Trending Stock: Facts to Know Before Betting on It",
+     "riassunto": "Micron (MU) has been one of the stocks most watched by Zacks.com users lately. So, it is worth exploring what lies ahead for the stock.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T13:00:05Z",
+     "url": "https://www.nasdaq.com/articles/micron-technology-inc-mu-trending-stock-facts-know-betting-it-0"
+    },
+    {
      "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
      "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
      "fonte": "Nasdaq",
@@ -58052,16 +58069,30 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-05T12:05:00Z",
      "url": "https://www.nasdaq.com/articles/recent-news-nvidia-and-sk-hynix-reveals-exactly-what-market-expects-micron-technologys"
-    },
-    {
-     "titolo": "China's Biggest Memory Chip Stock Is Almost as Good as Micron",
-     "riassunto": "Key PointsMicron rival CXMT IPO'd with a near half-trillion-dollar market capitalization in July.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T10:26:00Z",
-     "url": "https://www.nasdaq.com/articles/chinas-biggest-memory-chip-stock-almost-good-micron"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "NVIDIA's Hugging Face Buyout: Can It Further Strengthen AI Dominance?",
+     "riassunto": "NVDA's $12.93B Hugging Face deal is likely to deepen its AI moat by combining chip leadership with a vast open-model platform and developer ecosystem.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T13:02:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidias-hugging-face-buyout-can-it-further-strengthen-ai-dominance"
+    },
+    {
+     "titolo": "Nebius Stock Up 254% in a Year: Should You Buy, Hold or Sell?",
+     "riassunto": "NBIS surges 253.5% in a year on AI infrastructure demand, but high capital needs and valuation raise questions about further upside.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T12:38:00Z",
+     "url": "https://www.nasdaq.com/articles/nebius-stock-254-year-should-you-buy-hold-or-sell"
+    },
+    {
+     "titolo": "Buy These 5 Semiconductor Stocks as Sales Skyrocket on Solid AI Demand",
+     "riassunto": "ADI, TSM, TXN, NVDA and ACMR could benefit as surging semiconductor sales and solid AI demand fuel optimism for chip stocks.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T12:36:00Z",
+     "url": "https://www.nasdaq.com/articles/buy-these-5-semiconductor-stocks-sales-skyrocket-solid-ai-demand"
+    },
     {
      "titolo": "The Stock Market Is Flashing a Warning Seen Only 6 Times Since 1871, and History Is Crystal Clear That a Disaster Could Be Heading Toward Wall Street",
      "riassunto": "Key PointsThe CAPE ratio accounts for 10 years' worth of inflation-adjusted earnings, making it helpful for gauging long-term market trends.",
@@ -58082,27 +58113,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-07T03:38:01Z",
      "url": "https://www.nasdaq.com/articles/history-says-what-nvidias-last-big-acquisition-became-hugging-face-will-cost-nearly-twice"
-    },
-    {
-     "titolo": "Did Nvidia Just Say Checkmate to AMD and Intel?",
-     "riassunto": "Key PointsNvidia has built strong leadership in the AI chip market over time.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T22:30:01Z",
-     "url": "https://www.nasdaq.com/articles/did-nvidia-just-say-checkmate-amd-and-intel"
-    },
-    {
-     "titolo": "Could $10,000 Invested in Nvidia Today Make You a Millionaire?",
-     "riassunto": "Key PointsNvidia can become a significantly larger company over the next decade, driven by secular growth in the semiconductor market and new catalysts.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T19:43:00Z",
-     "url": "https://www.nasdaq.com/articles/could-10000-invested-nvidia-today-make-you-millionaire"
-    },
-    {
-     "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
-     "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T17:34:01Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-near-its-high-while-its-biggest-chip-peers-sit-18-32-below-theirs-these-are-chip"
     }
    ],
    "ORCL": [
@@ -58151,6 +58161,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "Palantir Stock Could Make a Dramatic Move Over the Next Year (Hint: It Implies a Big Move)",
+     "riassunto": "Key PointsPalantir's growth trajectory is improving at a terrific pace, driven by the robust demand for its AI software platform.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T13:43:00Z",
+     "url": "https://www.nasdaq.com/articles/palantir-stock-could-make-dramatic-move-over-next-year-hint-it-implies-big-move"
+    },
+    {
      "titolo": "SpaceX Stock Is Down 34% From Its High. History Suggests a $10,000 Investment Will Be Worth This Much by Mid-2027.",
      "riassunto": "Key PointsSpaceX completed the largest IPO in history back in June.",
      "fonte": "Nasdaq",
@@ -58184,13 +58201,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T13:35:02Z",
      "url": "https://www.nasdaq.com/articles/palantir-technologies-inc-pltr-just-flashed-golden-cross-signal-do-you-buy"
-    },
-    {
-     "titolo": "Is Palantir's AI Growth Worth the Premium Valuation of its Stock?",
-     "riassunto": "PLTR pairs 93% revenue growth with a 62% adjusted operating margin, but its premium valuation leaves little room for disappointment.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-04T13:11:00Z",
-     "url": "https://www.nasdaq.com/articles/palantirs-ai-growth-worth-premium-valuation-its-stock"
     }
    ],
    "RGTI": [
@@ -58239,6 +58249,13 @@
    ],
    "WDC": [
     {
+     "titolo": "Investors Heavily Search Western Digital Corporation (WDC): Here is What You Need to Know",
+     "riassunto": "Western Digital (WDC) has been one of the stocks most watched by Zacks.com users lately. So, it is worth exploring what lies ahead for the stock.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T13:00:03Z",
+     "url": "https://www.nasdaq.com/articles/investors-heavily-search-western-digital-corporation-wdc-here-what-you-need-know-0"
+    },
+    {
      "titolo": "Here's How Much a $1000 Investment in Western Digital Made 10 Years Ago Would Be Worth Today",
      "riassunto": "Why investing for the long run, especially if you buy certain popular stocks, could reap huge rewards.",
      "fonte": "Nasdaq",
@@ -58272,13 +58289,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T14:45:00Z",
      "url": "https://www.nasdaq.com/articles/wdc-stocks-big-rally-buy-sell-or-hold-after-70-6-month-surge"
-    },
-    {
-     "titolo": "Nasdaq 100 Movers: AVGO, HONIV",
-     "riassunto": "In early trading on Thursday, shares of Honeywell International topped the list of the day's best performing components of the Nasdaq 100 index, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing Nasdaq 100 component thus fa",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-03T14:25:18Z",
-     "url": "https://www.nasdaq.com/articles/nasdaq-100-movers-avgo-honiv"
     }
    ]
   },
@@ -58305,7 +58315,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-07T14:04:55Z"
+  "letto_il": "2026-09-07T14:37:51Z"
  },
  "predictions": [
   {
@@ -58324,9 +58334,9 @@
    "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-7-2026"
   },
   {
-   "question": "Will the price of Bitcoin be above $80,000 on September 7?",
-   "yes": 4,
-   "link": "https://polymarket.com/event/bitcoin-above-80k-on-september-7-2026"
+   "question": "Will the price of Bitcoin be above $76,000 on September 7?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-7-2026"
   },
   {
    "question": "Will the price of Bitcoin be above $72,000 on September 8?",
@@ -58334,9 +58344,9 @@
    "link": "https://polymarket.com/event/bitcoin-above-72k-on-september-8-2026"
   },
   {
-   "question": "Will the price of Bitcoin be above $76,000 on September 7?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-7-2026"
+   "question": "Bitcoin Up or Down on September 7?",
+   "yes": 2,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-7-2026"
   }
  ],
  "options": {
@@ -78974,12 +78984,12 @@
    "sharpe": 1.72,
    "gain_pct": 2.35,
    "eur_value": 40941.28,
-   "vix": 15.11,
-   "vix_term": 0.858,
+   "vix": 15.18,
+   "vix_term": 0.862,
    "titles": {},
    "macro_scores": {
     "fear_greed": 42,
-    "risk_sentiment": 47,
+    "risk_sentiment": 46,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
@@ -79109,7 +79119,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 3 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -79161,6 +79171,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-07T14:04:55Z"
+  "generated_at": "2026-09-07T14:37:51Z"
  }
 }
