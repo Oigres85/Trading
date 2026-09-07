@@ -1,4 +1,4 @@
-⟦ BUILD v430 · generato 07/09/2026 18:50 ⟧
+⟦ BUILD v430 · generato 07/09/2026 18:58 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 07/09/2026, 18:50:24 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 14:50, fase: REGULAR — festività USA non considerate) · CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live: KOSPI +4,61% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -1,48% [24/7] · SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi.
+DATI AL 07/09/2026, 18:58:18 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 14:58, fase: REGULAR — festività USA non considerate) · CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live: KOSPI +4,61% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -1,47% [24/7] · SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 07/09/2026, 18:50:24, prossimo run 07/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 3 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile. ⚠ MA NON TUTTE: 1 quotazioni su 18 hanno gia' la barra di 2026-09-07, perche' le barre arrivano a scaglioni. Le righe che la portano sono piu' fresche di questa data, e ciascuna dichiara la propria: fra loro NON sono prezzate allo stesso istante.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 07/09/2026, 18:58:18, prossimo run 07/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 3 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile. ⚠ MA NON TUTTE: 1 quotazioni su 18 hanno gia' la barra di 2026-09-07, perche' le barre arrivano a scaglioni. Le righe che la portano sono piu' fresche di questa data, e ciascuna dichiara la propria: fra loro NON sono prezzate allo stesso istante.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-04) · Curva 10A-3M (2026-09-04) · Treasury USA 30A (2026-09-03) · Tasso reale 10A (TIPS) (2026-09-03) · Inflazione attesa 10A (breakeven) (2026-09-04) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -73,7 +73,7 @@ QUADRO MACRO:
 - Carry USA-Giappone: spread tassi 10A 1,87 pp (US10A 4.78%, JGB10A 2.91%), USD/JPY 154.35 (-2,56% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1.35 — prevalgono put = copertura/pessimismo (estremi = contrarian rialzista) (put 765921, call 568509)
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,7% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $68B su $880B di BIL+SHV+SPY (SPY da solo $812B)) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, riferito a luglio 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
-- Righello Dollaro (DXY): 98.91 · 3 mesi -1% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
+- Righello Dollaro (DXY): 98.92 · 3 mesi -0,99% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7718,6 vs SMA125 7308,43 (+5,61%) · Nasdaq 100 29.544,15 vs SMA125 28.096,77 (+5,15%) — sopra = trend primario integro, sotto = deterioramento.
 - Futures USA LIVE: Nasdaq 100 (NQ) 29.565,25 (-0,02%) · S&P 500 (ES) 7722 (-0,46%) — la sessione e' GIA' APERTA, quindi non anticipano niente: servono a vedere se il movimento in corso e' coerente col resto o se il cash si sta staccando dai future.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 0,94× (+5,34% 5g) · TQQQ 3x NDX RVol 0,83× (+0,72% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
@@ -243,7 +243,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       NBIS surges 253.5% in a year on AI infrastructure demand, but high capital needs and valuation raise questions about further upside.
   [MRVL] · [Nasdaq, 25h fa] Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.
       Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.
-  [MRVL] · [Nasdaq, 73h fa] Noteworthy Friday Option Activity: GE, MRVL, SNPS
+  [MRVL] · [Nasdaq, 74h fa] Noteworthy Friday Option Activity: GE, MRVL, SNPS
       Looking at options trading activity among components of the S&amp;P 500 index, there is noteworthy activity today in GE Aerospace (Symbol: GE), where a total volume of 35,893 contracts has been traded thus far today, a contract volume which is representative of approximately 3.6
   [MU] · [Nasdaq, 1h fa] Is Micron Technology Stock Running Out of Steam?
       Key PointsMicron's stock is down close to 20% from its 52-week high.

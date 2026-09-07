@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-07T18:50:24Z",
+ "updated_at": "2026-09-07T18:58:18Z",
  "eurusd": 1.1627,
  "totals": {
   "usd_value": 0,
@@ -5500,7 +5500,7 @@
      "a1": 23.62,
      "a3": 430.56,
      "a5": 1015.64,
-     "a10": 13588.5
+     "a10": 13588.51
     },
     "stagionalita": [
      {
@@ -21723,11 +21723,11 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79163.98,
+   "price": 79169.23,
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -1.48,
+   "change_pct": -1.47,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -37.3,
@@ -21741,7 +21741,7 @@
    "support": 64111.07,
    "resistance": 82262.21,
    "rsi": 63.0,
-   "volume": 24934236160,
+   "volume": 24834340864,
    "vol_ratio": 0.66,
    "atr_14": 2235.22,
    "atr_pct": 2.82,
@@ -21753,7 +21753,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79163.98
+     79169.23
     ],
     "m6": [
      80927.05,
@@ -21881,7 +21881,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79163.98
+     79169.23
     ],
     "all": [
      386.94,
@@ -22028,7 +22028,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79163.98
+     79169.23
     ],
     "m1": [
      64506.25,
@@ -22052,7 +22052,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79163.98
+     79169.23
     ],
     "m3": [
      63088.3,
@@ -22120,7 +22120,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79163.98
+     79169.23
     ],
     "y1": [
      111167.62,
@@ -22196,7 +22196,7 @@
      77755.27,
      77830.29,
      77300.48,
-     79163.98
+     79169.23
     ],
     "d1": [
      80315.11,
@@ -22311,7 +22311,8 @@
      79164.16,
      79142.98,
      79103.7,
-     79148.15
+     79148.15,
+     79210.4
     ]
    },
    "earnings_date": null,
@@ -22325,7 +22326,7 @@
    "sharpe_6m": -0.17,
    "sortino_6m": -0.25,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79163.98,
+   "prezzo_limite_aggiustato": 79169.23,
    "risk_reward": "1:0.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22343,17 +22344,17 @@
     "m1": {
      "support": 62687.1,
      "resistance": 82262.21,
-     "change_pct": 22.72
+     "change_pct": 22.73
     },
     "m3": {
      "support": 61275.83,
      "resistance": 82262.21,
-     "change_pct": 25.48
+     "change_pct": 25.49
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.48
+     "change_pct": -10.47
     }
    },
    "financials": [],
@@ -22380,55 +22381,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79163.98,
+     "prezzo": 79169.23,
      "medie": {
       "sma10": {
-       "liv": 78944.77,
+       "liv": 78945.3,
        "dist_pct": 0.28
       },
       "ema10": {
-       "liv": 78910.58,
-       "dist_pct": 0.32
+       "liv": 78911.54,
+       "dist_pct": 0.33
       },
       "sma20": {
-       "liv": 77978.26,
-       "dist_pct": 1.52
+       "liv": 77978.52,
+       "dist_pct": 1.53
       },
       "ema20": {
-       "liv": 76738.43,
-       "dist_pct": 3.16
+       "liv": 76738.93,
+       "dist_pct": 3.17
       },
       "sma30": {
-       "liv": 73222.76,
-       "dist_pct": 8.11
+       "liv": 73222.93,
+       "dist_pct": 8.12
       },
       "ema30": {
-       "liv": 74685.25,
+       "liv": 74685.58,
        "dist_pct": 6.0
       },
       "sma50": {
-       "liv": 69695.28,
+       "liv": 69695.39,
        "dist_pct": 13.59
       },
       "ema50": {
-       "liv": 72033.51,
-       "dist_pct": 9.9
+       "liv": 72033.72,
+       "dist_pct": 9.91
       },
       "sma100": {
-       "liv": 66525.62,
-       "dist_pct": 19.0
+       "liv": 66525.68,
+       "dist_pct": 19.01
       },
       "ema100": {
-       "liv": 70224.33,
-       "dist_pct": 12.73
+       "liv": 70224.43,
+       "dist_pct": 12.74
       },
       "sma200": {
-       "liv": 69814.65,
-       "dist_pct": 13.39
+       "liv": 69814.68,
+       "dist_pct": 13.4
       },
       "ema200": {
-       "liv": 72879.58,
-       "dist_pct": 8.62
+       "liv": 72879.63,
+       "dist_pct": 8.63
       }
      },
      "medie_battute": 12,
@@ -22436,18 +22437,18 @@
      "oscillatori": {
       "rsi14": 63.0,
       "macd": {
-       "linea": 3082.79,
-       "segnale": 3340.12,
-       "istogramma": -257.33
+       "linea": 3083.2,
+       "segnale": 3340.2,
+       "istogramma": -257.0
       },
-      "stoch_k": 48.5,
+      "stoch_k": 48.6,
       "stoch_d": 60.0,
-      "williams_r": -51.5,
+      "williams_r": -51.4,
       "cci20": 15.9,
       "adx14": 47.9,
       "di_su": 34.4,
       "di_giu": 10.3,
-      "momentum10": 1333.69
+      "momentum10": 1338.94
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22940,19 +22941,19 @@
       "o": 80351.4,
       "h": 80387.91,
       "l": 78773.36,
-      "c": 79163.98
+      "c": 79169.23
      }
     ],
     "performance": {
-     "s1": 2.41,
-     "m1": 26.02,
-     "m3": 26.57,
+     "s1": 2.42,
+     "m1": 26.03,
+     "m3": 26.58,
      "m6": -0.83,
      "a1": -9.15,
      "ytd": -10.78,
-     "a3": 193.55,
-     "a5": 80.78,
-     "a10": 12883.34
+     "a3": 193.57,
+     "a5": 80.79,
+     "a10": 12884.2
     },
     "stagionalita": [
      {
@@ -31108,6 +31109,7 @@
      1.16
     ],
     "d1": [
+     1.16,
      1.16,
      1.16,
      1.16,
@@ -45200,8 +45202,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "179.41",
-    "change_pct": -0.88,
+    "value": "179.40",
+    "change_pct": -0.89,
     "suffix": "%"
    }
   ],
@@ -57170,8 +57172,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 98.91,
-   "chg_3m_pct": -1.0,
+   "value": 98.92,
+   "chg_3m_pct": -0.99,
    "flag": null,
    "src": "DXY"
   },
@@ -57814,7 +57816,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-07T18:50:24Z"
+   "letto_il": "2026-09-07T18:58:18Z"
   }
  },
  "broker": null,
@@ -58372,7 +58374,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-07T18:50:24Z"
+  "letto_il": "2026-09-07T18:58:18Z"
  },
  "predictions": [
   {
@@ -79218,6 +79220,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-07T18:50:24Z"
+  "generated_at": "2026-09-07T18:58:19Z"
  }
 }
