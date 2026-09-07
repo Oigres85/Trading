@@ -1,4 +1,4 @@
-⟦ BUILD v430 · generato 07/09/2026 19:38 ⟧
+⟦ BUILD v430 · generato 07/09/2026 21:07 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 07/09/2026, 19:38:00 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 15:38, fase: REGULAR — festività USA non considerate) · CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live: KOSPI +4,61% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -1,22% [24/7] · SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi.
+DATI AL 07/09/2026, 21:07:05 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 17:07, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +4,61% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P -0,46% · BTC -1,42% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~16.4h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 07/09/2026, 19:38:00, prossimo run 07/09/2026, 20:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 3 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile. ⚠ MA NON TUTTE: 1 quotazioni su 18 hanno gia' la barra di 2026-09-07, perche' le barre arrivano a scaglioni. Le righe che la portano sono piu' fresche di questa data, e ciascuna dichiara la propria: fra loro NON sono prezzate allo stesso istante.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 07/09/2026, 21:07:05, prossimo run 07/09/2026, 22:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-04 — 3 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile. ⚠ MA NON TUTTE: 1 quotazioni su 18 hanno gia' la barra di 2026-09-07, perche' le barre arrivano a scaglioni. Le righe che la portano sono piu' fresche di questa data, e ciascuna dichiara la propria: fra loro NON sono prezzate allo stesso istante.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-04) · Curva 10A-3M (2026-09-04) · Treasury USA 30A (2026-09-03) · Tasso reale 10A (TIPS) (2026-09-03) · Inflazione attesa 10A (breakeven) (2026-09-04) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -68,18 +68,18 @@ Quindi: usa questo pacchetto per la STORIA MISURATA, e cerca online il REGIME e 
 
 QUADRO MACRO:
 - Fear & Greed: 42 (Paura), 1 settimana fa 52, 1 mese fa 60, 1 anno fa 61 — livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati, non due segnali.
-- VIX: 15.3 (+5,3% oggi — rilevazione odierna)
+- VIX: 15.3 (+5,3% nell'ultima seduta [chiusura del 04/09] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
 - Fed Funds Rate: range ATTUALE 3.50–3.75% · tasso implicito futures 3.79% · PROSSIMA RIUNIONE FOMC: 16/09/2026 (il tasso resta valido fino alla prossima decisione FOMC)
-- Carry USA-Giappone: spread tassi 10A 1,87 pp (US10A 4.78%, JGB10A 2.91%), USD/JPY 154.36 (-2,56% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
+- Carry USA-Giappone: spread tassi 10A 1,87 pp (US10A 4.78%, JGB10A 2.91%), USD/JPY 154.33 (-2,57% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1.35 — prevalgono put = copertura/pessimismo (estremi = contrarian rialzista) (put 765921, call 568509)
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,7% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $68B su $880B di BIL+SHV+SPY (SPY da solo $812B)) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, riferito a luglio 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
-- Righello Dollaro (DXY): 98.92 · 3 mesi -0,99% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
+- Righello Dollaro (DXY): 99.18 · 3 mesi -0,73% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7718,6 vs SMA125 7308,43 (+5,61%) · Nasdaq 100 29.544,15 vs SMA125 28.096,77 (+5,15%) — sopra = trend primario integro, sotto = deterioramento.
-- Futures USA LIVE: Nasdaq 100 (NQ) 29.565,25 (-0,02%) · S&P 500 (ES) 7722 (-0,46%) — la sessione e' GIA' APERTA, quindi non anticipano niente: servono a vedere se il movimento in corso e' coerente col resto o se il cash si sta staccando dai future.
+- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 29.565,25 (-0,02%) · S&P 500 (ES) 7722 (-0,46%) — in calo oltre il rumore: apertura USA attesa in gap-down.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 0,94× (+5,34% 5g) · TQQQ 3x NDX RVol 0,83× (+0,72% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
 - Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) +0,21% vs RSP (equi-pesato) +0,19% a 1M · spread +0,02pp — mese in rialzo con partecipazione uniforme (alert se SPY+ con RSP− o spread >4pp). ⚠ L'ampiezza misura la DISTANZA fra i due indici, non la direzione: qui il verso lo da' il cap-pesato, e con entrambi in rialzo la salita e' partecipata.
 - Treasury USA 10A: 4.78% (+0,02 pp nell'ultima seduta) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,77% (FRED DGS10, osservazione del 2026-09-03): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
-- EUR/USD: 1.1625 (-0,03% nell'ultima seduta)
+- EUR/USD: 1.1627 (-0,02% nell'ultima seduta)
 - PIL USA (t/t ann.): 1.5% (riferito al 2° trimestre 2026 (aprile-giugno) · acquisito il 07/09/2026 · ultima uscita 26/08/2026 (12 giorni fa) · prossimo aggiornamento 30/09/2026 (calendario ufficiale, Gross Domestic Product, via FRED) · BEA, trimestrale · serie TRIMESTRALE, il dato più recente disponibile)
 - Vendite al dettaglio (m/m): -0.6% (riferito a luglio 2026 · acquisito il 07/09/2026 · ultima uscita 14/08/2026 (24 giorni fa) · prossimo aggiornamento 16/09/2026 (calendario ufficiale, Advance Monthly Sales for Retail and Food Services, via FRED) · Census, mensile)
 - Non-Farm Payrolls: +162K (riferito a agosto 2026 · acquisito il 07/09/2026 · ultima uscita 04/09/2026 (3 giorni fa) · prossimo aggiornamento 02/10/2026 (calendario ufficiale, Employment Situation, via FRED) · BLS, mensile)
@@ -94,20 +94,24 @@ QUADRO MACRO:
 - CURVA DEI TASSI USA (FRED (Federal Reserve Bank of St. Louis), OSSERVAZIONI PUBBLICATE — non stime, ultima del 2026-09-03, quindi NON di oggi: la fonte pubblica con qualche giorno di ritardo): 3 mesi 3,89% [+0,11 vs 3,78% del 2026-06-05] · 2 anni 4,34% [+0,17 vs 4,17% del 2026-06-05] · 5 anni 4,52% [+0,23 vs 4,29% del 2026-06-05] · 10 anni 4,77% [+0,22 vs 4,55% del 2026-06-05] · 30 anni 5,25% [+0,24 vs 5,01% del 2026-06-05]. Pendenza 3 mesi→30 anni: +1,36 pp, era +1,23 pp tre mesi fa. Fra parentesi quadre lo scarto dalla stessa scadenza tre mesi fa: e' un confronto fra due osservazioni datate, non una tendenza ricostruita.
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): settembre -0,66% negli anni di midterm contro -0,53% su tutti gli anni, 30% di mesi positivi, esiti da -11,7% a +18% · ottobre +3,94% negli anni di midterm contro +1,7% su tutti gli anni, 80% di mesi positivi, esiti da -8,7% a +18,9% · novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
 - MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 11.735 (+3,37% nell'ultima seduta) — +103,7% in un anno, e sta al 67% dell'intervallo annuale 5761–14.635 · Rame 6,68 $/lb (+1,3% nell'ultima seduta) — +48,8% in un anno, e sta al 99% dell'intervallo annuale 4,49–6,71 · Petrolio WTI 91,48 $ (0% nell'ultima seduta) — +46,9% in un anno, e sta al 63% dell'intervallo annuale 55,27–112,95 · Oro 4477 $/oz (+1,06% nell'ultima seduta) — +23% in un anno, e sta al 50% dell'intervallo annuale 3637–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
-- TITOLI MACRO — 2 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 7 pubblicate DOPO l'ultima chiusura USA del 2026-09-04, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
-    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Copper Hits All-Time High Amid Tariff Turmoil, Mine Struggles
+- TITOLI MACRO — 4 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 9 pubblicate DOPO l'ultima chiusura USA del 2026-09-04, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
+    · [Bloomberg, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Sapporo Breweries CSO on Tariffs, Iran War
+      Sapporo Breweries is shifting some production to the US from Canada due to 50% tariffs imposed on beer exports from the country, Chief Strategy Officer Rieko Shofu said. She spoke exclusively with Bloomberg's Shery Ahn on being impacted by tariffs, as well as the Iran war. (Source: Bloomberg)
+    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Why Are Japan’s Bond Yields Rising? What’s Driving the Surge
+      Government bonds are generally viewed as one of the safest assets to invest in. That’s because it’s considered relatively unlikely that the issuer — a government — will go bankrupt. Among the world’s major government debt markets, Japan’s $7.5 trillion bond market has, for decades, been considered one of the most stabl
+    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Copper Hits All-Time High Amid Tariff Turmoil, Mine Struggles
       Copper surged to its highest-ever price on the London Metal Exchange after a weeks-long rally fueled by anticipation that President Donald Trump will expand US tariffs to imports of refined metal.
-    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Deutsche Bank’s Allen Says Traders Are Wrong on Rates or Prices
+    · [Bloomberg, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Deutsche Bank’s Allen Says Traders Are Wrong on Rates or Prices
       Investors are underestimating the scale of rate hikes needed to tackle inflation given upward pressure on prices, according to Deutsche Bank AG strategist Henry Allen.
-    · [MarketWatch, 8h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Is the stock market open today for Labor Day? What about bond trading and mail delivery?
+    · [MarketWatch, 10h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Is the stock market open today for Labor Day? What about bond trading and mail delivery?
       Here’s how trading hours and other services are affected by the Labor Day holiday on Monday, Sept. 7.
-    · [CNBC Economia, 12h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Japan's foreign reserves drop by a record $80 billion in August following yen intervention
+    · [CNBC Economia, 13h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Japan's foreign reserves drop by a record $80 billion in August following yen intervention
       Finance ministry data showed that Japan's official foreign reserves stand at $1.207 trillion, down from July's figure of $1.287 trillion.
-    · [Bloomberg, 20h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Gold Edges Lower as Traders Focus on Oil Price Swings and Dollar
+    · [Bloomberg, 22h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Gold Edges Lower as Traders Focus on Oil Price Swings and Dollar
       Gold edged lower, as traders monitored volatile oil prices and the yen’s movements against the US dollar.
-    · [CNBC Economia, 44h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] From ‘mystery vacations’ to hostels, budget travelers get thrifty as prices rise
+    · [CNBC Economia, 45h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] From ‘mystery vacations’ to hostels, budget travelers get thrifty as prices rise
       Despite rising prices and the travel industry focusing on the luxury segment, budget-minded vacationers are still finding ways to get away.
-    · [CNBC Economia, 48h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump turns up the heat on Warsh as Fed rate hike looms
+    · [CNBC Economia, 50h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump turns up the heat on Warsh as Fed rate hike looms
       Ten days ahead of the next Federal Reserve meeting, the Trump administration looks to be in a full-court press to halt a rate hike in its tracks.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-09-11 Inflazione CPI (a/a) (precedente 3.4%) · 2026-09-16 Vendite al dettaglio (m/m) (precedente -0.6%) · 2026-09-17 Manifattura Philly Fed (al posto dell'ISM) (precedente +47.4). ⚠ Per 3 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich), Curva 10A-2A, Treasury USA 30A): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 3 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-3M, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-09-10 ORCL. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -168,7 +172,7 @@ MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment
 - Will there be no change in Fed interest rates after the September 2026 meeting?: 48% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the September 2026 meeting?: 52% [Δ7g —]
 - Will Ethereum dip to $2,250 by December 31, 2026?: 54% [Δ7g —]
-⚠ 2 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
+⚠ 3 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -188,7 +192,7 @@ Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo d
 TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre giornaliere Yahoo con auto_adjust, le stesse che disegnano il grafico — non vanno ricalcolati ne' cercati online):
 - MU: medie: +7,77% dalla 20, +8,35% dalla 50, +67,66% dalla 200 · RSI 60,1 · -19% dal massimo 52s · forza relativa 1M +17,9 pp vs SOX · ampiezza tipica di seduta 5,4% · P/E prospettico 6,6× · ricavi +345,7% a/a · trimestrale fra 23 giorni
 - NVDA: medie: +4,67% dalla 20, +9,4% dalla 50, +17,22% dalla 200 · RSI 60,4 · -2,5% dal massimo 52s · forza relativa 1M +7,8 pp vs SOX · ampiezza tipica di seduta 3,2% · P/E prospettico 14,8× · ricavi +105,9% a/a · trimestrale fra 71 giorni
-- AMD: medie: +0,5% dalla 20, -4,35% dalla 50, +40,05% dalla 200 · RSI 49,7 · -18,3% dal massimo 52s · forza relativa 1M +0,2 pp vs SOX · ampiezza tipica di seduta 4,7% · P/E prospettico 30,9× · ricavi +50,1% a/a · trimestrale fra 57 giorni
+- AMD: medie: +0,5% dalla 20, -4,35% dalla 50, +40,05% dalla 200 · RSI 49,7 · -18,3% dal massimo 52s · forza relativa 1M +0,2 pp vs SOX · ampiezza tipica di seduta 4,7% · P/E prospettico 30,8× · ricavi +50,1% a/a · trimestrale fra 57 giorni
 - MSTR: medie: +23,61% dalla 20, +37,97% dalla 50, +2,67% dalla 200 · RSI 66,2 · -60,9% dal massimo 52s · forza relativa 1M +46,9 pp vs NDX · ampiezza tipica di seduta 6,1% · P/E prospettico 2,9× · ricavi +6,9% a/a · trimestrale fra 52 giorni
 - PLTR: medie: -1,46% dalla 20, +16,31% dalla 50, +15,17% dalla 200 · RSI 54,2 · -16% dal massimo 52s · forza relativa 1M +11,2 pp vs NDX · ampiezza tipica di seduta 4,9% · P/E prospettico 74,9× · ricavi +92,8% a/a · trimestrale fra 56 giorni
 - GOOGL: medie: -1,44% dalla 20, -2,84% dalla 50, +0,88% dalla 200 · RSI 45 · -17,1% dal massimo 52s · forza relativa 1M -5,9 pp vs NDX · ampiezza tipica di seduta 2,4% · P/E prospettico 22,8× · ricavi +24,2% a/a · trimestrale fra 51 giorni
@@ -230,37 +234,37 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (74,3% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 2h fa] Broadcom Drops 10% in 3 Months: Buy, Sell or Hold the Stock?
-      AVGO's AI revenues are surging, but margin pressure, supply constraints, customer concentration and a premium valuation cloud the stock???s outlook.
-  [AMD] · [Nasdaq, 7h fa] NVIDIA's Hugging Face Buyout: Can It Further Strengthen AI Dominance?
-      NVDA's $12.93B Hugging Face deal is likely to deepen its AI moat by combining chip leadership with a vast open-model platform and developer ecosystem.
-  [BE] · [Nasdaq, 57h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
+  [AMD] · [Nasdaq, 1h fa] Set a Fair Starting Line, as Favorites Can Falter
+      On Dec. 4, 2024, The Trade Desk (NASDAQ:TTD) touched $141.53. Our first Rule Breakers recommendation, made in February 2017 at a split-adjusted $3.43 a share, was up more than 40-fold.
+  [AMD] · [Nasdaq, 2h fa] Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.
+      Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.
+  [BE] · [Nasdaq, 58h fa] I Love Bloom Energy for 1 Reason, and It's Not the Backlog
       Key PointsBloom&rsquo;s backlog swelled to $20 billion at the end of 2025.
-  [BE] · [Nasdaq, 77h fa] Vertiv’s UIG Deal Targets the Next Big Constraint in AI Data Centers
+  [BE] · [Nasdaq, 79h fa] Vertiv’s UIG Deal Targets the Next Big Constraint in AI Data Centers
       Vertiv Holdings (NYSE: VRT)&nbsp;just made its clearest statement yet about where the next phase of AI infrastructure spending is headed. On Sept.&nbsp;2, the&nbsp;company announced it will&nbsp;acquire&nbsp;UtilityInnovation&nbsp;Group (UIG), a microgrid and behind-the-meter power specialist. The deal will
-  [CRWV] · [Nasdaq, 5h fa] CRWV Stock Takes a 13% Hit in 3 Months: Time to Buy, Hold or Bail Out?
+  [CRWV] · [Nasdaq, 6h fa] CRWV Stock Takes a 13% Hit in 3 Months: Time to Buy, Hold or Bail Out?
       CoreWeave's huge AI-cloud backlog fuels growth, but soaring capital spending, debt and losses raise questions about its next move.
-  [CRWV] · [Nasdaq, 7h fa] Nebius Stock Up 254% in a Year: Should You Buy, Hold or Sell?
+  [CRWV] · [Nasdaq, 8h fa] Nebius Stock Up 254% in a Year: Should You Buy, Hold or Sell?
       NBIS surges 253.5% in a year on AI infrastructure demand, but high capital needs and valuation raise questions about further upside.
-  [MRVL] · [Nasdaq, 26h fa] Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.
+  [MRVL] · [Nasdaq, 3h fa] Should You Buy Marvell Technology Stock Before Oct. 6?
+      Key PointsMarvell Technology has been experiencing strong demand for its chips, as companies invest heavily in artificial intelligence.
+  [MRVL] · [Nasdaq, 28h fa] Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.
       Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.
-  [MRVL] · [Nasdaq, 74h fa] Noteworthy Friday Option Activity: GE, MRVL, SNPS
-      Looking at options trading activity among components of the S&amp;P 500 index, there is noteworthy activity today in GE Aerospace (Symbol: GE), where a total volume of 35,893 contracts has been traded thus far today, a contract volume which is representative of approximately 3.6
-  [MU] · [Nasdaq, 2h fa] Is Micron Technology Stock Running Out of Steam?
+  [MU] · [Nasdaq, 4h fa] Is Micron Technology Stock Running Out of Steam?
       Key PointsMicron's stock is down close to 20% from its 52-week high.
-  [MU] · [Nasdaq, 5h fa] Most People Asking &quot;What Should I Invest In?&quot; Are Overthinking It. Start With Index Funds and These 4 Stocks.
+  [MU] · [Nasdaq, 6h fa] Most People Asking &quot;What Should I Invest In?&quot; Are Overthinking It. Start With Index Funds and These 4 Stocks.
       Key PointsWith so many investments to choose from, getting started can be overwhelming.
-  [NVDA] · [Nasdaq, 2h fa] Broadcom Drops 10% in 3 Months: Buy, Sell or Hold the Stock?
-      AVGO's AI revenues are surging, but margin pressure, supply constraints, customer concentration and a premium valuation cloud the stock???s outlook.
-  [NVDA] · [Nasdaq, 5h fa] Most People Asking &quot;What Should I Invest In?&quot; Are Overthinking It. Start With Index Funds and These 4 Stocks.
-      Key PointsWith so many investments to choose from, getting started can be overwhelming.
-  [ORCL] · [Nasdaq, 5h fa] Workday's Q2 Beat and AI Gains Raise the Stakes for Fiscal 2028 Growth
+  [NVDA] · [Nasdaq, 2h fa] Nvidia Stock: Is It Still a Good Buy at $230?
+      Key PointsNvidia's growth rate accelerated in its most recent quarter, with its top line more than doubling.
+  [NVDA] · [Nasdaq, 2h fa] Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.
+      Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.
+  [ORCL] · [Nasdaq, 1h fa] Oracle Stock Is 54% Below Its High. The Last Time It Fell That Far, Getting Back Took More Than a Decade.
+      Key PointsMeasured on monthly closing prices, Oracle stock peaked at a split-adjusted $45.47 in August 2000 and didn't close a month above that level until June 2017.
+  [ORCL] · [Nasdaq, 6h fa] Workday's Q2 Beat and AI Gains Raise the Stakes for Fiscal 2028 Growth
       Workday's Q2 beat, accelerating AI adoption and a higher-margin outlook shift attention to whether AI can drive fiscal 2028 growth.
-  [ORCL] · [Nasdaq, 5h fa] Is Workday a Buy as AI Growth Rises but Valuation Sends Mixed Signals?
-      Workday pairs 13% subscription growth, rising AI adoption and strong cash flow with a mixed valuation and ongoing competition and execution risks.
-  [RGTI] · [Nasdaq, 39h fa] Where Will Rigetti Computing Stock Be in 3 Years?
+  [RGTI] · [Nasdaq, 41h fa] Where Will Rigetti Computing Stock Be in 3 Years?
       Key PointsRigetti's management has said that commercial revenue is still in its early stages.
-  [RGTI] · [Nasdaq, 44h fa] IonQ vs. Rigetti Computing: Which Pure-Play Quantum Pioneer Has the Stronger Technology Advantage?
+  [RGTI] · [Nasdaq, 46h fa] IonQ vs. Rigetti Computing: Which Pure-Play Quantum Pioneer Has the Stronger Technology Advantage?
       Key PointsIonQ's process is more accurate but slower.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 

@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-09-07T19:38:00Z",
- "eurusd": 1.1625,
+ "updated_at": "2026-09-07T21:07:05Z",
+ "eurusd": 1.1627,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -2939,9 +2939,9 @@
     "float_pct": 99.4,
     "avg_volume_30d": 26151144.0,
     "pe_ttm": 121.8291,
-    "forward_pe": 30.9092,
+    "forward_pe": 30.785,
     "eps_ttm": 3.92,
-    "eps_forward": 15.4507,
+    "eps_forward": 15.5131,
     "revenue_fy": 41305001984.0,
     "net_income_fy": 6469000192.0,
     "revenue_growth": 0.501,
@@ -4758,7 +4758,10 @@
     "short_float": 0.0123,
     "buyback_yield": 0.0072,
     "ps": 18.36,
-    "ev_s": 18.25
+    "ev_s": 18.25,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -5500,7 +5503,7 @@
      "a1": 23.62,
      "a3": 430.56,
      "a5": 1015.64,
-     "a10": 13588.51
+     "a10": 13588.5
     },
     "stagionalita": [
      {
@@ -11892,7 +11895,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0013,
-    "price_to_book": null,
+    "price_to_book": 22.3505,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13675,7 +13678,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0011,
-    "price_to_book": 10.7455,
+    "price_to_book": 10.5772,
     "target_mean": 284.998,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -21723,26 +21726,26 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 79368.47,
+   "price": 79206.03,
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -1.22,
+   "change_pct": -1.42,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -37.1,
-   "sma200_dist_pct": 13.7,
-   "sma50_dist_pct": 13.9,
+   "ath_dist_pct": -37.2,
+   "sma200_dist_pct": 13.5,
+   "sma50_dist_pct": 13.6,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -37.1,
+   "w52_dist_pct": -37.2,
    "day_high": 80387.91,
    "day_low": 78773.36,
    "support": 64111.07,
    "resistance": 82262.21,
-   "rsi": 63.8,
-   "volume": 24876384256,
-   "vol_ratio": 0.66,
+   "rsi": 63.1,
+   "volume": 24823912448,
+   "vol_ratio": 0.84,
    "atr_14": 2235.22,
    "atr_pct": 2.82,
    "signal": "Sopra SMA50",
@@ -21753,7 +21756,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79368.47
+     79206.03
     ],
     "m6": [
      80927.05,
@@ -21881,7 +21884,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79368.47
+     79206.03
     ],
     "all": [
      386.94,
@@ -22028,7 +22031,7 @@
      58558.86,
      62813.75,
      78548.63,
-     79368.47
+     79206.03
     ],
     "m1": [
      64506.25,
@@ -22052,7 +22055,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79368.47
+     79206.03
     ],
     "m3": [
      63088.3,
@@ -22120,7 +22123,7 @@
      79671.97,
      79823.87,
      80350.05,
-     79368.47
+     79206.03
     ],
     "y1": [
      111167.62,
@@ -22196,7 +22199,7 @@
      77755.27,
      77830.29,
      77300.48,
-     79368.47
+     79206.03
     ],
     "d1": [
      80315.11,
@@ -22206,50 +22209,50 @@
      80135.99,
      80149.36,
      80217.26,
-     79955.99,
+     79955.98,
      79915.95,
-     79961.99,
-     79846.49,
+     79961.98,
+     79846.5,
      79913.39,
      79879.92,
      79823.55,
-     79956.33,
-     79998.72,
+     79958.38,
+     79998.73,
      80247.4,
-     80080.0,
+     80098.01,
      79967.23,
-     79777.08,
+     79781.98,
      79776.02,
      79729.63,
-     79624.65,
+     79619.47,
      79643.24,
-     79613.99,
-     79676.98,
-     79649.79,
-     79605.6,
+     79627.88,
+     79676.99,
+     79649.8,
+     79605.61,
      79667.98,
      79639.41,
-     79748.1,
+     79742.32,
      79763.98,
      79862.73,
      79820.78,
-     79847.99,
-     79785.57,
+     79847.98,
+     79785.56,
      79798.04,
      79797.88,
-     79746.55,
-     79706.24,
-     79665.29,
-     79661.6,
-     79576.5,
-     79603.66,
+     79746.9,
+     79700.28,
+     79665.28,
+     79662.69,
+     79574.3,
+     79603.65,
      79439.16,
-     79311.05,
-     79266.94,
-     79321.05,
+     79312.42,
+     79271.13,
+     79321.04,
      79413.45,
-     79452.56,
-     79454.04,
+     79446.29,
+     79449.6,
      79484.91,
      79465.46,
      79410.12,
@@ -22258,17 +22261,17 @@
      79447.05,
      79400.75,
      79377.23,
-     79324.02,
+     79315.8,
      79388.94,
-     79368.75,
-     79385.83,
+     79368.74,
+     79387.42,
      79413.48,
      79445.19,
-     79406.43,
+     79415.83,
      79313.48,
-     79406.39,
+     79405.0,
      79439.48,
-     79450.43,
+     79450.42,
      79406.19,
      79416.38,
      79412.81,
@@ -22276,16 +22279,16 @@
      79475.88,
      79494.29,
      79468.0,
-     79594.04,
-     79589.01,
+     79594.03,
+     79589.0,
      79619.99,
-     79622.21,
-     79383.5,
+     79622.22,
+     79384.99,
      79364.1,
-     79400.34,
+     79401.08,
      79328.83,
-     79166.36,
-     79072.3,
+     79166.4,
+     79072.31,
      79060.48,
      79026.34,
      79242.62,
@@ -22299,12 +22302,12 @@
      78894.6,
      78800.01,
      78921.09,
-     78988.1,
+     78988.11,
      78992.99,
      79007.91,
      79136.2,
      79103.11,
-     79076.36,
+     79076.37,
      79146.81,
      79154.04,
      79159.1,
@@ -22316,7 +22319,16 @@
      79177.49,
      79157.22,
      79239.99,
-     79373.25
+     79373.25,
+     79326.81,
+     79347.49,
+     79309.04,
+     79215.69,
+     79195.1,
+     79207.14,
+     79172.26,
+     79195.54,
+     79211.52
     ]
    },
    "earnings_date": null,
@@ -22325,13 +22337,13 @@
    "health": 78,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.72,
+   "sharpe_1y": -0.73,
    "sortino_1y": -0.98,
-   "sharpe_6m": -0.15,
-   "sortino_6m": -0.22,
+   "sharpe_6m": -0.16,
+   "sortino_6m": -0.24,
    "prepost": null,
-   "prezzo_limite_aggiustato": 79368.47,
-   "risk_reward": "1:0.6",
+   "prezzo_limite_aggiustato": 79206.03,
+   "risk_reward": "1:0.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22343,22 +22355,22 @@
     "w1": {
      "support": 76940.88,
      "resistance": 82262.21,
-     "change_pct": -2.34
+     "change_pct": -2.54
     },
     "m1": {
      "support": 62687.1,
      "resistance": 82262.21,
-     "change_pct": 23.04
+     "change_pct": 22.79
     },
     "m3": {
      "support": 61275.83,
      "resistance": 82262.21,
-     "change_pct": 25.81
+     "change_pct": 25.55
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.25
+     "change_pct": -10.43
     }
    },
    "financials": [],
@@ -22385,74 +22397,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 79368.47,
+     "prezzo": 79206.03,
      "medie": {
       "sma10": {
-       "liv": 78965.22,
-       "dist_pct": 0.51
+       "liv": 78948.98,
+       "dist_pct": 0.33
       },
       "ema10": {
-       "liv": 78947.76,
-       "dist_pct": 0.53
+       "liv": 78918.23,
+       "dist_pct": 0.36
       },
       "sma20": {
-       "liv": 77988.49,
-       "dist_pct": 1.77
+       "liv": 77980.36,
+       "dist_pct": 1.57
       },
       "ema20": {
-       "liv": 76757.91,
-       "dist_pct": 3.4
+       "liv": 76742.44,
+       "dist_pct": 3.21
       },
       "sma30": {
-       "liv": 73229.57,
-       "dist_pct": 8.38
+       "liv": 73224.16,
+       "dist_pct": 8.17
       },
       "ema30": {
-       "liv": 74698.44,
-       "dist_pct": 6.25
+       "liv": 74687.96,
+       "dist_pct": 6.05
       },
       "sma50": {
-       "liv": 69699.37,
-       "dist_pct": 13.87
+       "liv": 69696.13,
+       "dist_pct": 13.64
       },
       "ema50": {
-       "liv": 72041.53,
-       "dist_pct": 10.17
+       "liv": 72035.16,
+       "dist_pct": 9.95
       },
       "sma100": {
-       "liv": 66527.67,
-       "dist_pct": 19.3
+       "liv": 66526.04,
+       "dist_pct": 19.06
       },
       "ema100": {
-       "liv": 70228.38,
-       "dist_pct": 13.01
+       "liv": 70225.16,
+       "dist_pct": 12.79
       },
       "sma200": {
-       "liv": 69815.67,
-       "dist_pct": 13.68
+       "liv": 69814.86,
+       "dist_pct": 13.45
       },
       "ema200": {
-       "liv": 72881.62,
-       "dist_pct": 8.9
+       "liv": 72880.0,
+       "dist_pct": 8.68
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.8,
+      "rsi14": 63.1,
       "macd": {
-       "linea": 3099.1,
-       "segnale": 3343.38,
-       "istogramma": -244.28
+       "linea": 3086.14,
+       "segnale": 3340.79,
+       "istogramma": -254.65
       },
-      "stoch_k": 51.9,
-      "stoch_d": 61.1,
-      "williams_r": -48.1,
-      "cci20": 16.5,
+      "stoch_k": 49.2,
+      "stoch_d": 60.2,
+      "williams_r": -50.8,
+      "cci20": 16.1,
       "adx14": 47.9,
       "di_su": 34.4,
       "di_giu": 10.3,
-      "momentum10": 1538.18
+      "momentum10": 1375.74
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22945,19 +22957,19 @@
       "o": 80351.4,
       "h": 80387.91,
       "l": 78773.36,
-      "c": 79368.47
+      "c": 79206.03
      }
     ],
     "performance": {
-     "s1": 2.68,
-     "m1": 26.35,
-     "m3": 26.9,
-     "m6": -0.58,
-     "a1": -8.92,
-     "ytd": -10.55,
-     "a3": 194.31,
-     "a5": 81.24,
-     "a10": 12916.88
+     "s1": 2.47,
+     "m1": 26.09,
+     "m3": 26.64,
+     "m6": -0.78,
+     "a1": -9.1,
+     "ytd": -10.74,
+     "a3": 193.7,
+     "a5": 80.87,
+     "a10": 12890.24
     },
     "stagionalita": [
      {
@@ -23034,8 +23046,8 @@
      },
      {
       "mese": 9,
-      "media": -1.59,
-      "mediana": -1.02,
+      "media": -1.6,
+      "mediana": -1.12,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -23070,9 +23082,9 @@
      }
     ]
    },
-   "rs_1m": 22.9,
+   "rs_1m": 22.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 22.5,
+   "rs_ndx_1m": 22.2,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -24663,7 +24675,7 @@
    "resistance": 30343.0,
    "rsi": 52.6,
    "volume": 88329,
-   "vol_ratio": 0.99,
+   "vol_ratio": 0.16,
    "atr_14": 435.86,
    "atr_pct": 1.47,
    "signal": "Trend rialzista",
@@ -30534,7 +30546,7 @@
    "price_asof": "2026-09-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.03,
+   "change_pct": -0.02,
    "pe": null,
    "ath": 1.6,
    "ath_dist_pct": -27.5,
@@ -30547,7 +30559,7 @@
    "day_low": 1.16,
    "support": 1.15,
    "resistance": 1.17,
-   "rsi": 56.4,
+   "rsi": 56.6,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 0.01,
@@ -31236,6 +31248,15 @@
      1.16,
      1.16,
      1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
      1.16
     ]
    },
@@ -31245,7 +31266,7 @@
    "health": 60,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.77,
+   "sharpe_1y": -0.76,
    "sortino_1y": -1.11,
    "sharpe_6m": -0.32,
    "sortino_6m": -0.48,
@@ -31263,22 +31284,22 @@
     "w1": {
      "support": 1.16,
      "resistance": 1.16,
-     "change_pct": 0.07
+     "change_pct": 0.08
     },
     "m1": {
      "support": 1.15,
      "resistance": 1.17,
-     "change_pct": 0.87
+     "change_pct": 0.88
     },
     "m3": {
      "support": 1.13,
      "resistance": 1.17,
-     "change_pct": 0.89
+     "change_pct": 0.9
     },
     "y1": {
      "support": 1.13,
      "resistance": 1.2,
-     "change_pct": -2.07
+     "change_pct": -2.06
     }
    },
    "financials": [],
@@ -31309,7 +31330,7 @@
      "medie": {
       "sma10": {
        "liv": 1.16,
-       "dist_pct": -0.04
+       "dist_pct": -0.03
       },
       "ema10": {
        "liv": 1.16,
@@ -31317,58 +31338,58 @@
       },
       "sma20": {
        "liv": 1.16,
-       "dist_pct": 0.12
+       "dist_pct": 0.13
       },
       "ema20": {
        "liv": 1.16,
-       "dist_pct": 0.21
+       "dist_pct": 0.22
       },
       "sma30": {
        "liv": 1.16,
-       "dist_pct": 0.45
+       "dist_pct": 0.46
       },
       "ema30": {
        "liv": 1.16,
-       "dist_pct": 0.38
+       "dist_pct": 0.39
       },
       "sma50": {
        "liv": 1.15,
-       "dist_pct": 0.99
+       "dist_pct": 1.01
       },
       "ema50": {
        "liv": 1.16,
-       "dist_pct": 0.56
+       "dist_pct": 0.57
       },
       "sma100": {
        "liv": 1.16,
-       "dist_pct": 0.51
+       "dist_pct": 0.53
       },
       "ema100": {
        "liv": 1.16,
-       "dist_pct": 0.5
+       "dist_pct": 0.51
       },
       "sma200": {
        "liv": 1.16,
-       "dist_pct": -0.07
+       "dist_pct": -0.06
       },
       "ema200": {
        "liv": 1.16,
-       "dist_pct": 0.19
+       "dist_pct": 0.2
       }
      },
      "medie_battute": 10,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 56.4,
+      "rsi14": 56.6,
       "macd": {
        "linea": 0.0,
        "segnale": 0.0,
        "istogramma": -0.0
       },
-      "stoch_k": 40.1,
-      "stoch_d": 31.6,
-      "williams_r": -59.9,
-      "cci20": 11.1,
+      "stoch_k": 41.0,
+      "stoch_d": 31.9,
+      "williams_r": -59.0,
+      "cci20": 11.5,
       "adx14": 28.4,
       "di_su": 20.8,
       "di_giu": 14.3,
@@ -31869,15 +31890,15 @@
      }
     ],
     "performance": {
-     "s1": 0.31,
-     "m1": 0.59,
-     "m3": 0.11,
-     "m6": 0.9,
-     "a1": -1.18,
-     "ytd": -1.07,
-     "a3": 9.8,
-     "a5": 0.2,
-     "a10": 3.62
+     "s1": 0.32,
+     "m1": 0.6,
+     "m3": 0.12,
+     "m6": 0.91,
+     "a1": -1.17,
+     "ytd": -1.05,
+     "a3": 9.81,
+     "a5": 0.22,
+     "a10": 3.63
     },
     "stagionalita": [
      {
@@ -32022,7 +32043,7 @@
    "resistance": 6.75,
    "rsi": 60.0,
    "volume": 14681,
-   "vol_ratio": 0.41,
+   "vol_ratio": 6.85,
    "atr_14": 0.1,
    "atr_pct": 1.43,
    "signal": "Trend rialzista",
@@ -33363,7 +33384,7 @@
    "resistance": 93.29,
    "rsi": 65.3,
    "volume": 98569,
-   "vol_ratio": 1.26,
+   "vol_ratio": 0.38,
    "atr_14": 3.52,
    "atr_pct": 3.84,
    "signal": "Trend rialzista",
@@ -45203,15 +45224,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1625",
-    "change_pct": -0.03,
+    "value": "1.1627",
+    "change_pct": -0.02,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "179.40",
-    "change_pct": -0.89,
+    "value": "179.24",
+    "change_pct": -0.97,
     "suffix": "%"
    }
   ],
@@ -47304,6 +47325,20 @@
   "news": {
    "voci": [
     {
+     "titolo": "Sapporo Breweries CSO on Tariffs, Iran War",
+     "riassunto": "Sapporo Breweries is shifting some production to the US from Canada due to 50% tariffs imposed on beer exports from the country, Chief Strategy Officer Rieko Shofu said. She spoke exclusively with Bloomberg's Shery Ahn on being impacted by tariffs, as well as the Iran war. (Source: Bloomberg)",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-07T21:00:56Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-07/sapporo-breweries-cso-on-tariffs-iran-war-video"
+    },
+    {
+     "titolo": "Why Are Japan’s Bond Yields Rising? What’s Driving the Surge",
+     "riassunto": "Government bonds are generally viewed as one of the safest assets to invest in. That’s because it’s considered relatively unlikely that the issuer — a government — will go bankrupt. Among the world’s major government debt markets, Japan’s $7.5 trillion bond market has, for decades, been considered one of the most stabl",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-07T20:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-07/why-are-japan-s-bond-yields-rising-what-s-driving-the-surge"
+    },
+    {
      "titolo": "Copper Hits All-Time High Amid Tariff Turmoil, Mine Struggles",
      "riassunto": "Copper surged to its highest-ever price on the London Metal Exchange after a weeks-long rally fueled by anticipation that President Donald Trump will expand US tariffs to imports of refined metal.",
      "fonte": "Bloomberg",
@@ -47414,20 +47449,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-01T10:50:27Z",
      "url": "https://www.cnbc.com/2026/09/01/euro-zone-inflation-rate-hike.html"
-    },
-    {
-     "titolo": "Bank of England chief warns new AI models threaten global financial stability",
-     "riassunto": "Bank of England Governor Andrew Bailey has warned that frontier AI could materially increase cyber risks to the global financial system.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-08-31T13:35:11Z",
-     "url": "https://www.cnbc.com/2026/08/31/bailey-frontier-ai-financial-stability-risk.html"
-    },
-    {
-     "titolo": "India’s economy expands 7.8% in fiscal first quarter, beating estimates",
-     "riassunto": "The economy was driven by a strong performance in the financial, real estate, information technology and professional services sectors.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-08-31T11:23:42Z",
-     "url": "https://www.cnbc.com/2026/08/31/india-economy-gdp-energy-el-nino.html"
     }
    ],
    "fonti": [
@@ -52296,8 +52317,8 @@
    "us10": 4.78,
    "jp10": 2.91,
    "spread": 1.87,
-   "usdjpy": 154.36,
-   "usdjpy_chg_1m": -2.56,
+   "usdjpy": 154.33,
+   "usdjpy_chg_1m": -2.57,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -52315,7 +52336,7 @@
    "calls": 568509
   },
   "risk_sentiment": {
-   "score": 47,
+   "score": 46,
    "label": "Neutrale",
    "components": [
     {
@@ -52332,7 +52353,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 38
+     "score": 36
     },
     {
      "label": "Treasury 10A",
@@ -52479,7 +52500,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-09-04",
     "price": 211.92,
     "d1": -0.88,
@@ -52728,7 +52749,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-09-04",
     "price": 171.45,
     "d1": -1.04,
@@ -53615,7 +53636,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-09-04",
     "price": 84.17,
     "d1": 0.68,
@@ -53698,7 +53719,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-09-04",
     "price": 187.28,
     "d1": 0.7,
@@ -53781,7 +53802,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-09-04",
     "price": 114.91,
     "d1": -1.33,
@@ -54030,7 +54051,7 @@
       "qqq": 94.8
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-09-04",
     "price": 567.01,
     "d1": 2.61,
@@ -57180,8 +57201,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 98.92,
-   "chg_3m_pct": -0.99,
+   "value": 99.18,
+   "chg_3m_pct": -0.73,
    "flag": null,
    "src": "DXY"
   },
@@ -57274,6 +57295,20 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Set a Fair Starting Line, as Favorites Can Falter",
+      "riassunto": "On Dec. 4, 2024, The Trade Desk (NASDAQ:TTD) touched $141.53. Our first Rule Breakers recommendation, made in February 2017 at a split-adjusted $3.43 a share, was up more than 40-fold.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T19:39:01Z",
+      "url": "https://www.nasdaq.com/articles/set-fair-starting-line-favorites-can-falter"
+     },
+     {
+      "titolo": "Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.",
+      "riassunto": "Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T18:50:00Z",
+      "url": "https://www.nasdaq.com/articles/berkshire-hathaway-owns-ai-exposure-3-different-ways-heres-why-thats-not-same-owning"
+     },
+     {
       "titolo": "Broadcom Drops 10% in 3 Months: Buy, Sell or Hold the Stock?",
       "riassunto": "AVGO's AI revenues are surging, but margin pressure, supply constraints, customer concentration and a premium valuation cloud the stock???s outlook.",
       "fonte": "Nasdaq",
@@ -57300,20 +57335,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-06T22:30:01Z",
       "url": "https://www.nasdaq.com/articles/did-nvidia-just-say-checkmate-amd-and-intel"
-     },
-     {
-      "titolo": "Could $10,000 Invested in Nvidia Today Make You a Millionaire?",
-      "riassunto": "Key PointsNvidia can become a significantly larger company over the next decade, driven by secular growth in the semiconductor market and new catalysts.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T19:43:00Z",
-      "url": "https://www.nasdaq.com/articles/could-10000-invested-nvidia-today-make-you-millionaire"
-     },
-     {
-      "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
-      "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T17:34:01Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-near-its-high-while-its-biggest-chip-peers-sit-18-32-below-theirs-these-are-chip"
      }
     ],
     "BE": [
@@ -57406,6 +57427,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.",
+      "riassunto": "Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T18:50:00Z",
+      "url": "https://www.nasdaq.com/articles/berkshire-hathaway-owns-ai-exposure-3-different-ways-heres-why-thats-not-same-owning"
+     },
+     {
       "titolo": "Is Apple Stock a Buy Now Ahead of its Product Launch Event?",
       "riassunto": "Ahead of Wednesday's launch, AAPL faces a tricky mix: strong demand, rising costs, tight supply, and a premium stock valuation.",
       "fonte": "Nasdaq",
@@ -57439,16 +57467,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-07T06:20:00Z",
       "url": "https://www.nasdaq.com/articles/what-10000-investment-spacex-could-be-worth-september-2027"
-     },
-     {
-      "titolo": "Berkshire Hathaway's Cash Fell From $397 Billion to $366 Billion in a Single Quarter",
-      "riassunto": "Key PointsBerkshire Hathaway had been amassing an ever-growing war chest since 2022.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-07T00:50:00Z",
-      "url": "https://www.nasdaq.com/articles/berkshire-hathaways-cash-fell-397-billion-366-billion-single-quarter"
      }
     ],
     "MRVL": [
+     {
+      "titolo": "Should You Buy Marvell Technology Stock Before Oct. 6?",
+      "riassunto": "Key PointsMarvell Technology has been experiencing strong demand for its chips, as companies invest heavily in artificial intelligence.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T18:14:21Z",
+      "url": "https://www.nasdaq.com/articles/should-you-buy-marvell-technology-stock-oct-6"
+     },
      {
       "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
       "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
@@ -57483,13 +57511,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-04T09:05:00Z",
       "url": "https://www.nasdaq.com/articles/best-semiconductor-stock-buy-marvell-stock-or-qualcomm-stock"
-     },
-     {
-      "titolo": "ALAB Stock Down 24% in a Month: Should Investors Buy the Dip or Wait?",
-      "riassunto": "Astera Labs is gaining momentum from strong Scorpio, Aries and Taurus demand, with robust third-quarter growth expectations supporting its AI infrastructure story.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-03T17:32:00Z",
-      "url": "https://www.nasdaq.com/articles/alab-stock-down-24-month-should-investors-buy-dip-or-wait"
      }
     ],
     "MSTR": [
@@ -57582,6 +57603,20 @@
     ],
     "NVDA": [
      {
+      "titolo": "Nvidia Stock: Is It Still a Good Buy at $230?",
+      "riassunto": "Key PointsNvidia's growth rate accelerated in its most recent quarter, with its top line more than doubling.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T19:20:01Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-stock-it-still-good-buy-230"
+     },
+     {
+      "titolo": "Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.",
+      "riassunto": "Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T18:50:00Z",
+      "url": "https://www.nasdaq.com/articles/berkshire-hathaway-owns-ai-exposure-3-different-ways-heres-why-thats-not-same-owning"
+     },
+     {
       "titolo": "Broadcom Drops 10% in 3 Months: Buy, Sell or Hold the Stock?",
       "riassunto": "AVGO's AI revenues are surging, but margin pressure, supply constraints, customer concentration and a premium valuation cloud the stock???s outlook.",
       "fonte": "Nasdaq",
@@ -57608,23 +57643,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-07T13:02:00Z",
       "url": "https://www.nasdaq.com/articles/nvidias-hugging-face-buyout-can-it-further-strengthen-ai-dominance"
-     },
-     {
-      "titolo": "Nebius Stock Up 254% in a Year: Should You Buy, Hold or Sell?",
-      "riassunto": "NBIS surges 253.5% in a year on AI infrastructure demand, but high capital needs and valuation raise questions about further upside.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-07T12:38:00Z",
-      "url": "https://www.nasdaq.com/articles/nebius-stock-254-year-should-you-buy-hold-or-sell"
-     },
-     {
-      "titolo": "Buy These 5 Semiconductor Stocks as Sales Skyrocket on Solid AI Demand",
-      "riassunto": "ADI, TSM, TXN, NVDA and ACMR could benefit as surging semiconductor sales and solid AI demand fuel optimism for chip stocks.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-07T12:36:00Z",
-      "url": "https://www.nasdaq.com/articles/buy-these-5-semiconductor-stocks-sales-skyrocket-solid-ai-demand"
      }
     ],
     "ORCL": [
+     {
+      "titolo": "Oracle Stock Is 54% Below Its High. The Last Time It Fell That Far, Getting Back Took More Than a Decade.",
+      "riassunto": "Key PointsMeasured on monthly closing prices, Oracle stock peaked at a split-adjusted $45.47 in August 2000 and didn't close a month above that level until June 2017.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-07T20:37:01Z",
+      "url": "https://www.nasdaq.com/articles/oracle-stock-54-below-its-high-last-time-it-fell-far-getting-back-took-more-decade"
+     },
      {
       "titolo": "Workday's Q2 Beat and AI Gains Raise the Stakes for Fiscal 2028 Growth",
       "riassunto": "Workday's Q2 beat, accelerating AI adoption and a higher-margin outlook shift attention to whether AI can drive fiscal 2028 growth.",
@@ -57659,13 +57687,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-06T10:12:00Z",
       "url": "https://www.nasdaq.com/articles/i-own-both-oracle-and-nuscale-different-reasons-heres-how-they-fit-together"
-     },
-     {
-      "titolo": "Got $10,000 to Invest This September? These Energy Stocks Could Turn It Into $639 in Annual Income.",
-      "riassunto": "Key PointsMPLX offers an ultra-high, reliable distribution.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-06T08:55:00Z",
-      "url": "https://www.nasdaq.com/articles/got-10000-invest-september-these-energy-stocks-could-turn-it-639-annual-income"
      }
     ],
     "PLTR": [
@@ -57824,13 +57845,27 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-07T19:38:00Z"
+   "letto_il": "2026-09-07T21:07:05Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Set a Fair Starting Line, as Favorites Can Falter",
+     "riassunto": "On Dec. 4, 2024, The Trade Desk (NASDAQ:TTD) touched $141.53. Our first Rule Breakers recommendation, made in February 2017 at a split-adjusted $3.43 a share, was up more than 40-fold.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T19:39:01Z",
+     "url": "https://www.nasdaq.com/articles/set-fair-starting-line-favorites-can-falter"
+    },
+    {
+     "titolo": "Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.",
+     "riassunto": "Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T18:50:00Z",
+     "url": "https://www.nasdaq.com/articles/berkshire-hathaway-owns-ai-exposure-3-different-ways-heres-why-thats-not-same-owning"
+    },
     {
      "titolo": "Broadcom Drops 10% in 3 Months: Buy, Sell or Hold the Stock?",
      "riassunto": "AVGO's AI revenues are surging, but margin pressure, supply constraints, customer concentration and a premium valuation cloud the stock???s outlook.",
@@ -57858,20 +57893,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-06T22:30:01Z",
      "url": "https://www.nasdaq.com/articles/did-nvidia-just-say-checkmate-amd-and-intel"
-    },
-    {
-     "titolo": "Could $10,000 Invested in Nvidia Today Make You a Millionaire?",
-     "riassunto": "Key PointsNvidia can become a significantly larger company over the next decade, driven by secular growth in the semiconductor market and new catalysts.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T19:43:00Z",
-     "url": "https://www.nasdaq.com/articles/could-10000-invested-nvidia-today-make-you-millionaire"
-    },
-    {
-     "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
-     "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T17:34:01Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-near-its-high-while-its-biggest-chip-peers-sit-18-32-below-theirs-these-are-chip"
     }
    ],
    "BE": [
@@ -57964,6 +57985,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.",
+     "riassunto": "Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T18:50:00Z",
+     "url": "https://www.nasdaq.com/articles/berkshire-hathaway-owns-ai-exposure-3-different-ways-heres-why-thats-not-same-owning"
+    },
+    {
      "titolo": "Is Apple Stock a Buy Now Ahead of its Product Launch Event?",
      "riassunto": "Ahead of Wednesday's launch, AAPL faces a tricky mix: strong demand, rising costs, tight supply, and a premium stock valuation.",
      "fonte": "Nasdaq",
@@ -57997,16 +58025,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-07T06:20:00Z",
      "url": "https://www.nasdaq.com/articles/what-10000-investment-spacex-could-be-worth-september-2027"
-    },
-    {
-     "titolo": "Berkshire Hathaway's Cash Fell From $397 Billion to $366 Billion in a Single Quarter",
-     "riassunto": "Key PointsBerkshire Hathaway had been amassing an ever-growing war chest since 2022.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-07T00:50:00Z",
-     "url": "https://www.nasdaq.com/articles/berkshire-hathaways-cash-fell-397-billion-366-billion-single-quarter"
     }
    ],
    "MRVL": [
+    {
+     "titolo": "Should You Buy Marvell Technology Stock Before Oct. 6?",
+     "riassunto": "Key PointsMarvell Technology has been experiencing strong demand for its chips, as companies invest heavily in artificial intelligence.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T18:14:21Z",
+     "url": "https://www.nasdaq.com/articles/should-you-buy-marvell-technology-stock-oct-6"
+    },
     {
      "titolo": "Nvidia Is Near Its High While Its Biggest Chip Peers Sit 18% to 32% Below Theirs. These Are the Chip Stocks to Buy.",
      "riassunto": "Key PointsNvidia closed Friday 2.6% below its 52-week high, while AMD, Micron, Broadcom, and Marvell finished 18% to 32% below theirs.",
@@ -58041,13 +58069,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-04T09:05:00Z",
      "url": "https://www.nasdaq.com/articles/best-semiconductor-stock-buy-marvell-stock-or-qualcomm-stock"
-    },
-    {
-     "titolo": "ALAB Stock Down 24% in a Month: Should Investors Buy the Dip or Wait?",
-     "riassunto": "Astera Labs is gaining momentum from strong Scorpio, Aries and Taurus demand, with robust third-quarter growth expectations supporting its AI infrastructure story.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-03T17:32:00Z",
-     "url": "https://www.nasdaq.com/articles/alab-stock-down-24-month-should-investors-buy-dip-or-wait"
     }
    ],
    "MSTR": [
@@ -58140,6 +58161,20 @@
    ],
    "NVDA": [
     {
+     "titolo": "Nvidia Stock: Is It Still a Good Buy at $230?",
+     "riassunto": "Key PointsNvidia's growth rate accelerated in its most recent quarter, with its top line more than doubling.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T19:20:01Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-stock-it-still-good-buy-230"
+    },
+    {
+     "titolo": "Berkshire Hathaway Owns AI Exposure in 3 Different Ways. Here's Why That's Not the Same as Owning Nvidia.",
+     "riassunto": "Key PointsBerkshire is invested in AI through Apple, Alphabet, and Moody&rsquo;s.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T18:50:00Z",
+     "url": "https://www.nasdaq.com/articles/berkshire-hathaway-owns-ai-exposure-3-different-ways-heres-why-thats-not-same-owning"
+    },
+    {
      "titolo": "Broadcom Drops 10% in 3 Months: Buy, Sell or Hold the Stock?",
      "riassunto": "AVGO's AI revenues are surging, but margin pressure, supply constraints, customer concentration and a premium valuation cloud the stock???s outlook.",
      "fonte": "Nasdaq",
@@ -58166,23 +58201,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-07T13:02:00Z",
      "url": "https://www.nasdaq.com/articles/nvidias-hugging-face-buyout-can-it-further-strengthen-ai-dominance"
-    },
-    {
-     "titolo": "Nebius Stock Up 254% in a Year: Should You Buy, Hold or Sell?",
-     "riassunto": "NBIS surges 253.5% in a year on AI infrastructure demand, but high capital needs and valuation raise questions about further upside.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-07T12:38:00Z",
-     "url": "https://www.nasdaq.com/articles/nebius-stock-254-year-should-you-buy-hold-or-sell"
-    },
-    {
-     "titolo": "Buy These 5 Semiconductor Stocks as Sales Skyrocket on Solid AI Demand",
-     "riassunto": "ADI, TSM, TXN, NVDA and ACMR could benefit as surging semiconductor sales and solid AI demand fuel optimism for chip stocks.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-07T12:36:00Z",
-     "url": "https://www.nasdaq.com/articles/buy-these-5-semiconductor-stocks-sales-skyrocket-solid-ai-demand"
     }
    ],
    "ORCL": [
+    {
+     "titolo": "Oracle Stock Is 54% Below Its High. The Last Time It Fell That Far, Getting Back Took More Than a Decade.",
+     "riassunto": "Key PointsMeasured on monthly closing prices, Oracle stock peaked at a split-adjusted $45.47 in August 2000 and didn't close a month above that level until June 2017.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-07T20:37:01Z",
+     "url": "https://www.nasdaq.com/articles/oracle-stock-54-below-its-high-last-time-it-fell-far-getting-back-took-more-decade"
+    },
     {
      "titolo": "Workday's Q2 Beat and AI Gains Raise the Stakes for Fiscal 2028 Growth",
      "riassunto": "Workday's Q2 beat, accelerating AI adoption and a higher-margin outlook shift attention to whether AI can drive fiscal 2028 growth.",
@@ -58217,13 +58245,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-06T10:12:00Z",
      "url": "https://www.nasdaq.com/articles/i-own-both-oracle-and-nuscale-different-reasons-heres-how-they-fit-together"
-    },
-    {
-     "titolo": "Got $10,000 to Invest This September? These Energy Stocks Could Turn It Into $639 in Annual Income.",
-     "riassunto": "Key PointsMPLX offers an ultra-high, reliable distribution.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-06T08:55:00Z",
-     "url": "https://www.nasdaq.com/articles/got-10000-invest-september-these-energy-stocks-could-turn-it-639-annual-income"
     }
    ],
    "PLTR": [
@@ -58382,7 +58403,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-07T19:38:00Z"
+  "letto_il": "2026-09-07T21:07:05Z"
  },
  "predictions": [
   {
@@ -58409,6 +58430,11 @@
    "question": "Will Bitcoin dip to $55,000 in September?",
    "yes": 2,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-55k-in-september-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $76,000 on September 8?",
+   "yes": 98,
+   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-8-2026"
   }
  ],
  "options": {
@@ -66530,7 +66556,7 @@
      ],
      "call_wall": 200.0,
      "put_wall": 80.0,
-     "opt_volume": 59455
+     "opt_volume": 59456
     },
     {
      "date": "2026-09-25",
@@ -76074,7 +76100,7 @@
      ],
      "call_wall": 610.0,
      "put_wall": 250.0,
-     "opt_volume": 6860
+     "opt_volume": 6856
     },
     {
      "date": "2026-09-25",
@@ -79051,7 +79077,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 42,
-    "risk_sentiment": 47,
+    "risk_sentiment": 46,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
@@ -79181,7 +79207,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 4 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -79233,6 +79259,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-07T19:38:00Z"
+  "generated_at": "2026-09-07T21:07:06Z"
  }
 }
