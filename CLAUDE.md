@@ -4228,6 +4228,58 @@ introdotto da una correzione di questa sessione. Il primo giro d'uso vero ha tro
 un'ora un difetto che venti giri di lettura non avevano visto, ed e' la conferma della
 decisione di iniziare a usare il sistema invece di aspettare due giri puliti in laboratorio.
 
+## 💱 v432 — LA QUOTA DELL'AZIONARIO SUL PATRIMONIO MESCOLAVA DUE VALUTE
+
+Trovata ricalcolando il libro a mano, fuori dal sistema, su richiesta del CEO: i miei pesi
+coincidevano al decimale con quelli del pacchetto, ma la quota dell'azionario sul patrimonio no —
+**84,1% contro l'86,0% pubblicato**.
+
+`totAz` somma i controvalori nella valuta di QUOTAZIONE — dollari, per dodici posizioni su
+tredici — mentre `fuoriAzionarioEur()` restituisce EURO. Il rapporto fra i due:
+
+| | calcolo | esito |
+|---|---|---|
+| pubblicato | 306.866 **$** / (306.866 **$** + 50.000 **€**) | **86,0%** |
+| corretto | 263.903 € / (263.903 € + 50.000 €) | **84,1%** |
+
+⚠⚠ **Non e' un numero decorativo: e' il MOLTIPLICATORE** che il pacchetto consegna a chi legge
+(*"sul patrimonio intero va moltiplicata per 0,86"*) per riportare ogni misura di rischio —
+VaR, ES, drawdown, contributo al rischio — dal comparto azionario al patrimonio. Sottostimava
+cassa e titoli di Stato di due punti.
+
+⚠ **E' la classe v183 sfuggita al gate che esiste per lei.** `fx_check` genera il payload due
+volte con cambi diversi e cerca gli IMPORTI in € che non si muovono: questo e' un RAPPORTO, non
+un importo, e nessun euro compariva nella riga. La lezione e' che un gate ancorato al TIPO di
+oggetto (importi) non copre la stessa classe di difetto in un'altra forma.
+
+⚠ **Senza cambio il rapporto non si pubblica**: la riga dichiara che la quota non e' calcolabile
+e che le misure descrivono l'azionario, non il patrimonio. Un moltiplicatore sbagliato e' peggio
+di un moltiplicatore assente (v199).
+
+### Il gate verifica l'invarianza, non il valore
+Un rapporto fra due grandezze nella STESSA valuta e' invariante al cambio; questo non lo e' —
+l'azionario e' in dollari e il resto in euro — quindi la proprieta' e' che **la quota si muova
+col cambio, e nel verso giusto**: dollaro piu' debole, azionario che pesa meno. Con la vecchia
+formula si muoveva nel verso opposto. Piu' il ramo del cambio assente. Due iniezioni, mordono
+entrambe.
+
+⚠ **E il check era verde per assenza del fenomeno alla prima stesura**: la suite gira con
+`STATO_PTF` nullo, quindi il codice prendeva il ramo che la quota non la pubblica affatto. E'
+la trappola **v421** — il mio harness che ha letto il ramo sbagliato per undici giri — e il
+rimedio e' lo stesso: lo stato si COSTRUISCE dentro il check.
+
+⚠ Settima volta con un **backtick dentro un template passato al vm**, di nuovo in un commento
+che citava il nome di una funzione: `modifica_sicura` ha rifiutato la scrittura.
+
+### 📓 E il libro esce dal sistema
+Su decisione del CEO (*"il sistema non e' affidabile e spreco token per aggiustarlo"*) le
+posizioni e le misure di rischio vivono ora in **`memoria/LIBRO.md`**, con le quantita', i PMC
+confermati (NVDA a 87,1667: `portfolio_state.json` diceva 81,167 ed era sbagliato), la
+liquidita', e la fotografia del livello C — contributo al rischio, gruppo correlato, beta di
+libro, VaR/ES, scommesse effettive, drawdown — con **la tabella di quanto invecchia ciascuna
+misura**. Il sistema resta acceso e continua a girare da solo: non va MANTENUTO per essere
+LETTO, e sei numeri si rinfrescano incollando un blocco.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
