@@ -161,6 +161,17 @@ jobs:
         run: |
           set +e
           titolo="Pipeline caduta — run #${GITHUB_RUN_NUMBER}"
+          # ⚠⚠ L'ETICHETTA VA CREATA, ALTRIMENTI L'ALLARME NON PUO' SUONARE. Misurato l'08/09/2026:
+          # `pipeline` non esisteva nel repo, quindi `gh issue create --label pipeline` falliva con
+          # "could not add label: 'pipeline' not found" e NESSUNA Issue veniva aperta. La pipeline
+          # era caduta due volte quella mattina, i dati della dashboard erano fermi da quattordici
+          # ore, e non c'era traccia da nessuna parte.
+          # E' la classe gia' pagata con `log_verdict.mjs` (v390): un errore coperto da una rete di
+          # sicurezza sopravvive quanto la rete — qui la rete era il `set +e` piu' l'`exit 0`, che
+          # rendevano invisibile il fallimento dell'allarme stesso.
+          # ⚠ `--force` rende il comando idempotente: si puo' eseguire a ogni caduta senza rumore.
+          gh label create pipeline --color B60205 \
+            --description "La pipeline dati e' caduta: i dati della dashboard sono fermi" --force
           # una sola Issue aperta per volta: un allarme che si ripete dieci volte si ignora
           aperta=$(gh issue list --state open --label pipeline --limit 1 --json number --jq '.[0].number')
           corpo="Il workflow \`${GITHUB_WORKFLOW}\` e' fallito.

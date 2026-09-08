@@ -805,6 +805,8 @@ _SRC_UD = (Path(__file__).resolve().parent / "update_data.py").read_text(encodin
 # Regola: chi cerca l'ASSENZA di una costruzione deve guardare il CODICE, non la prosa
 # che lo circonda. Chi ne cerca la PRESENZA puo' continuare a usare _SRC_UD.
 _SRC_UD_CODICE = "\n".join(r.split("#")[0] for r in _SRC_UD.splitlines())
+# il gate di qualita' dati: serve a provare che una regola non e' stata allentata (v208)
+_SRC_AUDIT = (Path(__file__).resolve().parent / "audit_data.py").read_text(encoding="utf-8")
 _i_scrub = _SRC_UD.find("stats = scrub_cross_currency_stats(")
 _i_ps = _SRC_UD.find('stats["ps"] =')
 check("v367 P/S ed EV/S calcolati DOPO la ripulitura cross-currency (SK hynix: KRW vs USD)",
@@ -1300,6 +1302,44 @@ check("v421 la pipeline registra CHI HA SERVITO, non chi era configurato",
       and '"fonti_non_lette": non_letti,' in _SRC_UD_CODICE
       and "non_letti.append(fonte)" in _SRC_UD_CODICE
       and "[f for f, _, _ in NEWS_FONTI]" not in _SRC_UD_CODICE)
+
+# ── v433 — l'arrotondamento non deve DISTRUGGERE il dato su uno strumento a prezzo basso ──
+# ⚠⚠ La pipeline e' MORTA per questo. `round(atr_14, 2)` su EURUSD=X a 1,16 dava 0,0 e
+# `audit_data` alzava una violazione HARD ("in borsa un valore nullo non esiste") — il gate
+# aveva ragione, a sbagliare era la scrittura. E scattava PER CASO: l'ATR di quel cambio vale
+# ~0,005, cioe' esattamente sul confine dei due decimali, quindi il 07/09 usciva 0,01 e l'08/09
+# 0,00. E' la classe v233/v349 — dipendere dal caso invece che dalla proprieta' — sul DATO.
+# ⚠ Lo stato si COSTRUISCE: nessun `data.json` di oggi contiene per forza il caso, e un check
+# che aspetta il fenomeno vale finche' i dati lo concedono (v429).
+for _nome, _px, _atr in (("EURUSD=X sul confine", 1.16, 0.0049912),
+                         ("EURUSD=X piu' quieto", 1.16, 0.0031),
+                         ("strumento sotto l'unita'", 0.42, 0.00042)):
+    _r = ud.arrotonda_alla_scala(_atr, _px)
+    check("v433 ATR di %s non annullato dall'arrotondamento" % _nome,
+          _r is not None and _r > 0)
+    check("v433 ATR di %s resta fedele entro il mezzo per cento" % _nome,
+          abs(_r - _atr) <= abs(_atr) * 0.005)
+
+# ⚠ E NESSUNA REGRESSIONE dove due decimali bastavano: una correzione si stringe a cio' che e'
+# rotto. Sopra i 10 il valore pubblicato dev'essere IDENTICO a quello di prima.
+for _nome, _px, _atr in (("MU", 1016.59, 54.8412), ("BTC-USD", 79170.52, 2235.2231),
+                         ("^VIX", 15.3, 1.2134), ("^GSPC", 6800.0, 71.4)):
+    check("v433 sopra i 10 l'arrotondamento di %s e' invariato" % _nome,
+          ud.arrotonda_alla_scala(_atr, _px) == round(_atr, 2))
+
+# ⚠⚠ E IL COLLEGAMENTO, non solo la funzione (lezione v399): togliendo la riga che la aggancia
+# al payload i check sopra resterebbero tutti verdi e la pipeline tornerebbe a morire.
+check("v433 il payload usa l'arrotondamento alla scala, non round(_, 2)",
+      '"atr_14": arrotonda_alla_scala(atr_14, price)' in _SRC_UD_CODICE
+      and '"atr_14": round(atr_14, 2)' not in _SRC_UD_CODICE)
+
+# ⚠ La violazione che ha ucciso il run: `audit_data` rifiuta un valore nullo nel payload, ed e'
+# la regola giusta. Il check prova che il gate MORDE ancora — se un domani lo allentassero per
+# far passare questo caso, la protezione sparirebbe insieme al difetto (v208).
+# ⚠ La sonda va verificata contro il TESTO VERO: la prima stesura cercava "<=" mentre il file
+# scrive "≤". Un check rosso su codice giusto e' una sonda sbagliata, non un gate che morde.
+check("v433 il gate di audit continua a rifiutare un atr_14 nullo",
+      '"atr_14"' in _SRC_AUDIT and "\u2264 0 o non-finito nel payload" in _SRC_AUDIT)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

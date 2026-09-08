@@ -4280,6 +4280,70 @@ libro, VaR/ES, scommesse effettive, drawdown — con **la tabella di quanto inve
 misura**. Il sistema resta acceso e continua a girare da solo: non va MANTENUTO per essere
 LETTO, e sei numeri si rinfrescano incollando un blocco.
 
+## 💥 v433 — LA PIPELINE ERA MORTA DA STAMATTINA, E L'ALLARME NON POTEVA SUONARE
+
+Trovato guardando i run del CI dopo un merge, non da una segnalazione: `Aggiorna dati dashboard`
+era fallito **due volte** (08:37 e 09:11), `data/data.json` era fermo alle **21:51 del giorno
+prima**, e la pagina viva serviva dati di ieri sera. Due difetti indipendenti, e il secondo è il
+motivo per cui il primo è passato inosservato.
+
+### 1. L'arrotondamento distruggeva il dato, e scattava PER CASO
+
+```
+HARD  EURUSD=X: atr_14=0.0 ≤ 0 o non-finito nel payload   → exit 1
+```
+
+`round(atr_14, 2)` va bene su MU a 1016 $ e **distrugge** il dato su un cambio a 1,16: l'ATR vero
+di EUR/USD vale ~0,005, cioè **esattamente sul confine dei due decimali**. Il 07/09 usciva 0,01,
+l'08/09 usciva 0,00.
+
+> ⚠⚠ **Il gate aveva ragione — in borsa un valore nullo non esiste — e a sbagliare era la
+> scrittura.** Davanti a un check rosso la domanda non è come farlo tacere: è quale invariante
+> volesse difendere.
+
+⚠ **Il difetto dipendeva dal caso invece che dalla proprietà**: da che lato dell'arrotondamento
+cadeva l'ATR di un cambio decideva se la pipeline moriva. È la classe v233/v349/v397 — già pagata
+tre volte sui CHECK — qui sul **dato**.
+
+⚠ **E il segno che il valore era sbagliato PRIMA di annullarsi c'era, pubblicato accanto**:
+`atr_pct` si calcola dall'ATR **non** arrotondato e diceva 0,43%, mentre `atr_14` arrotondato
+diceva 0,01 su 1,16, cioè 0,86%. **Due derivazioni della stessa grandezza, una distrutta
+dall'arrotondamento e una no** (classe v161/v207), e nessuna delle due mentiva da sola.
+
+⚠ **La correzione si stringe a ciò che è rotto**: sopra i 10 non cambia nulla. La prima stesura
+portava il VIX da 1,21 a 1,213 — una cifra in più su un valore che andava bene. Verificato con
+quattro check di non-regressione, non a ragionamento.
+
+### 2. ⚠⚠ L'ALLARME NON POTEVA SUONARE, E NON L'AVEVA MAI POTUTO
+
+Lo step che apre la Issue *"Pipeline caduta"* usa `gh issue create --label pipeline`, e
+**l'etichetta `pipeline` non esiste nel repo**: il comando falliva con *"could not add label:
+'pipeline' not found"* e **nessuna Issue veniva creata**. Verificato: 85 Issue aperte, tutte
+`alert`, **zero** «Pipeline caduta».
+
+> **Un errore coperto da una rete di sicurezza sopravvive quanto la rete** — è la lezione di
+> `log_verdict.mjs` (v390), qui applicata alla rete stessa: `set +e` più `exit 0` rendevano
+> invisibile il fallimento **dell'allarme**, cioè della cosa che esiste per rendere visibili
+> gli altri.
+
+⚠ `gh label create … --force` è idempotente: si può eseguire a ogni caduta senza rumore.
+⚠ L'etichetta `alert` esisteva — per questo gli allarmi sui *dati* si vedevano da mesi e quello
+sulla *pipeline* no. Una funzionalità che non ha mai funzionato non si distingue da una che non
+serve.
+
+### 🧪 I gate, e la sonda sbagliata
+Sette check nuovi: tre che lo stato **costruito** non venga annullato, quattro di
+non-regressione sopra i 10, più il **collegamento** (v399: togliendo la riga che aggancia
+l'helper al payload i check sul valore restano tutti verdi e la pipeline torna a morire) e la
+prova che il gate di `audit_data` **non sia stato allentato** per far passare il caso — sarebbe
+il modo classico di perdere la protezione insieme al difetto (v203, v208).
+
+⚠ **La mia sonda cercava `<=` mentre il file scrive `≤`**: check rosso su codice giusto. *Un
+check rosso è prima di tutto una sonda da verificare contro il testo vero.*
+⚠ Validato con due iniezioni, entrambe via `modifica_sicura` e con **il ripristino da uno
+snapshot preso prima, mai da `git checkout`** (v430): rimettendo `round(_, 2)` cade il check del
+collegamento, appiattendo le bande cadono i sei check sul valore.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
