@@ -29,3 +29,7 @@ __pycache__/
 .claude/*
 !.claude/commands/
 !.claude/launch.json
+
+# cache dei dati raccolti: si rigenera in ~90 secondi con scripts/raccolta/,
+# quindi non vive nel repo (3,8 MB a run, e sarebbe uno storico di copie identiche)
+memoria/dati/
