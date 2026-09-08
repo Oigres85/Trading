@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "430";
+const BUILD_VERSION = "431";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8548,8 +8548,23 @@ function buildPrompt(opz) {
       return u.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
     })();
     const vixFresco = usRegularSessionOpen() && snapshotOggi;
-    const vixAsof = (() => { const c = lastUsEquityCloseUTC();
-      return c ? `[chiusura del ${String(c.at.getUTCDate()).padStart(2, "0")}/${String(c.at.getUTCMonth() + 1).padStart(2, "0")}]` : "[ultima chiusura]"; })();
+    /* ⚠⚠ v431 — LA DATA DELL'ETICHETTA VENIVA DALL'OROLOGIO, IL VALORE DAI DATI, E I DUE
+       DIVERGEVANO. L'08/09/2026 il pacchetto pubblicava "VIX 15.3 (+5,3% nell'ultima seduta
+       [chiusura del 04/09])": la chiusura VERIFICATA del 04/09 era 14,53 (+1,47%), e il 15,3
+       porta `asof` 2026-09-07 — un giorno in cui i mercati USA erano chiusi per il Labor Day.
+       L'etichetta attribuiva quindi a una seduta un valore che non e' il suo, con uno scarto
+       del 5% sul numero che il pacchetto stesso indica come anticipatore dei punti di svolta
+       (percentile del VIX nella propria distribuzione).
+       ⚠ Il rimedio non e' un calendario delle festivita' che il sistema non ha: e' che la data
+       venga dal DATO, cioe' da `m.vix.asof`, che la pipeline pubblica accanto al valore. E' la
+       classe v193 — stato del mercato e freschezza del dato sono due cose diverse — applicata
+       alla data di un'etichetta invece che al suo aggettivo. L'orologio resta solo come ripiego
+       quando la pipeline non porta la propria data. */
+    const vixAsof = (() => {
+      const a = String((m.vix || {}).asof || "").slice(0, 10);
+      if (/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(a)) return `[chiusura del ${a.slice(8, 10)}/${a.slice(5, 7)}]`;
+      const c = lastUsEquityCloseUTC();
+      return c ? `[chiusura del ${String(c.at.getUTCDate()).padStart(2, "0")}/${String(c.at.getUTCMonth() + 1).padStart(2, "0")}, data ricavata dall'orologio: la pipeline non porta quella del dato]` : "[ultima chiusura]"; })();
     lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? "oggi — rilevazione odierna" : `nell'ultima seduta ${vixAsof} — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario`})`);
   }
   else if (m.vix) lines.push("- VIX: n.d. (valore scartato dal sanity check)");
