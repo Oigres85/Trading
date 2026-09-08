@@ -1,20 +1,20 @@
 {
  "al": "2026-09-08",
  "sedute": 187,
- "generato": "2026-09-08T18:04:57+00:00",
+ "generato": "2026-09-08T18:14:57+00:00",
  "quota_azionaria": 0.8428,
  "posizioni_al": "2026-08-23",
  "posizioni_giorni": 16,
  "sedute_scartate": {},
  "esclusi": {
-  "SKHY": 0.027
+  "SKHY": 0.0271
  },
  "perche_esclusi": {
   "SKHY": "storia corta"
  },
  "volatilita": 0.4914,
  "drawdown_max": -0.2476,
- "drawdown_oggi": -0.0129,
+ "drawdown_oggi": -0.0124,
  "scommesse_effettive": 2.28,
  "correlazione_media": 0.345,
  "scommesse_effettive_ribassi": 3.28,
@@ -23,29 +23,29 @@
  "pesi": {
   "MU": 0.2352,
   "AMD": 0.1674,
-  "NVDA": 0.2011,
-  "GOOGL": 0.0558,
+  "NVDA": 0.201,
+  "GOOGL": 0.0557,
   "PLTR": 0.0566,
   "ORCL": 0.0375,
   "WDC": 0.0401,
-  "MRVL": 0.0317,
+  "MRVL": 0.0316,
   "RGTI": 0.0236,
-  "BE": 0.0373,
-  "MSTR": 0.0784,
+  "BE": 0.0372,
+  "MSTR": 0.0786,
   "CRWV": 0.0353
  },
  "contributo_rischio": {
-  "MU": 0.3553,
+  "MU": 0.3554,
   "AMD": 0.1973,
-  "NVDA": 0.1063,
+  "NVDA": 0.1062,
   "GOOGL": 0.0104,
   "PLTR": 0.0221,
   "ORCL": 0.0241,
   "WDC": 0.0503,
   "MRVL": 0.0349,
-  "RGTI": 0.028,
-  "BE": 0.0573,
-  "MSTR": 0.0659,
+  "RGTI": 0.0281,
+  "BE": 0.0571,
+  "MSTR": 0.0662,
   "CRWV": 0.048
  },
  "volatilita_nome": {
@@ -102,7 +102,7 @@
    "MRVL": 0.37,
    "RGTI": 0.35,
    "BE": 0.38,
-   "MSTR": 0.39,
+   "MSTR": 0.38,
    "CRWV": 0.48
   },
   "GOOGL": {
@@ -206,7 +206,7 @@
   "MSTR": {
    "MU": 0.19,
    "AMD": 0.27,
-   "NVDA": 0.39,
+   "NVDA": 0.38,
    "GOOGL": 0.23,
    "PLTR": 0.41,
    "ORCL": 0.38,
@@ -233,19 +233,19 @@
   }
  },
  "prezzi": {
-  "MU": 1018.7,
-  "AMD": 507.57,
+  "MU": 1019.51,
+  "AMD": 507.91,
   "NVDA": 225.89,
-  "GOOGL": 338.55,
-  "PLTR": 171.66,
-  "ORCL": 162.62,
-  "WDC": 486.82,
-  "MRVL": 228.59,
-  "RGTI": 15.43,
-  "BE": 282.53,
-  "SKHY": 187.33,
-  "MSTR": 137.38,
-  "CRWV": 102.07
+  "GOOGL": 338.16,
+  "PLTR": 171.61,
+  "ORCL": 162.57,
+  "WDC": 487.07,
+  "MRVL": 228.58,
+  "RGTI": 15.47,
+  "BE": 281.89,
+  "SKHY": 187.74,
+  "MSTR": 137.85,
+  "CRWV": 102.08
  },
  "carico": {
   "MU": 87.63,
