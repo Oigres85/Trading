@@ -12,6 +12,29 @@ senza GitHub Actions e senza chiavi API, e li mettono in cache sotto `memoria/da
 | `tecnica.py` | indicatori e statistiche storiche dalle barre giornaliere |
 | `libro.py` | rischio di libro: correlazioni, contributo al rischio, VaR/ES, scommesse effettive |
 | `macro.py` | quadro macro con percentili calcolati sulla serie intera e su finestre dichiarate |
+| `cambio.py` | EUR/USD dal tasso di riferimento **BCE** |
+| `quadro_macro.py` | le 21 serie FRED con percentili, direzione e la loro profondità vera |
+| `fondamentali.py` | bilanci depositati, target degli analisti, storico utili (Nasdaq) |
+| `notizie.py` | notizie per titolo dai feed dei fornitori |
+| `canali.py` | sensibilità di ogni titolo ai canali macro, con il pavimento del rumore |
+| `assembla.py` | mette insieme tutto in `memoria/dati/quadro.json` |
+| `rapporto_html.py` | rende il quadro in una pagina, senza grafici |
+
+## ⚠ Il cambio viene dalla BCE, non da FRED
+
+`DEXUSEU` esiste su FRED ed è comodo, ma viene ridistribuito con giorni di ritardo — misurato
+l'08/09/2026: ultima osservazione il **28/08**, undici giorni prima. Su un moltiplicatore che
+riporta VaR, ES, drawdown e contributo al rischio dal comparto azionario al **patrimonio**,
+undici giorni di cambio valgono circa un punto percentuale.
+
+Il tasso di riferimento BCE è ufficiale, gratuito, senza chiave, e porta 90 giorni di storico.
+Si pubblica intorno alle 16:00 CET di ogni giorno lavorativo TARGET: prima di quell'ora la data
+più recente è quella del giorno prima, ed è corretto. **La data viaggia col numero.**
+
+⚠ E due limiti si dichiarano invece di sparire: la conversione è al cambio di **oggi**, non al
+costo sostenuto (il cambio di carico è diverso posizione per posizione e il sistema non lo
+conosce); il BTP è valorizzato **alla pari** perché la sua quotazione viva non c'è — e il
+rapporto misura quanto pesa non saperla, ±0,2 punti sulla quota.
 
 ## ⚠⚠ L'USER-AGENT VA PER FONTE, E IL VERSO È OPPOSTO FRA LE DUE
 
