@@ -29,13 +29,22 @@
 situazione fiscale. **Il divieto di dimensionare resta in piedi**: direzione, priorità e livelli
 di prezzo sì; quantità no.
 
-## 2. LIVELLO C — le misure che NON sono reperibili online
+## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
-> Dipendono dalla matrice di covarianza sulle serie complete delle tredici posizioni. Non si
-> ricalcolano da dati parziali: un numero plausibile e diverso al posto di quello vero è il
-> difetto peggiore che questo progetto abbia prodotto.
+> ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da
+> dati parziali». È falso: i dati non sono parziali. Con lo storico completo delle posizioni
+> — 1.255 barre giornaliere per titolo, raccolte da `scripts/raccolta/` senza chiave e senza la
+> pipeline — `scripts/raccolta/libro.py` ricostruisce la matrice di covarianza e ne esce con i
+> **numeri della pipeline**: pesi identici, correlazione media **0,357** contro 0,35, scommesse
+> effettive **2,2** contro 2,3, gli stessi otto nomi nel gruppo correlato. Gli scarti residui
+> sono la finestra dichiarata, non il metodo.
+>
+> L'avevo scritto due volte al CEO e una volta qui. Resta vera la ragione per cui la frase era
+> stata scritta — *un numero plausibile e diverso al posto di quello vero è il difetto peggiore
+> che questo progetto produca* — ma la conclusione che ne avevo tratto no.
 
-**Fotografia del 07/09/2026** (run pipeline 21:51 UTC, ultima barra 04/09/2026).
+**Fotografia del 07/09/2026** (run pipeline 21:51 UTC, ultima barra 04/09/2026). Il ricalcolo
+indipendente dell'08/09 sta in `memoria/dati/quadro.json`, rigenerabile in ~90 secondi.
 
 ### Contributo al rischio — quota della varianza del libro, somma 100%
 
@@ -56,6 +65,23 @@ di prezzo sì; quantità no.
 
 ⚠ **SKHY è FUORI dal conto** — meno di 60 sedute in comune con l'ancora. Il 100% è calcolato
 senza il suo peso: non è "non contribuisce", è "non misurabile".
+
+> ⚠⚠ **E ORA È MISURATA (08/09/2026), su una finestra corta e DICHIARATA.** L'ADS `SKHY` è
+> quotata dal 13/07/2026: quaranta sedute è tutta la sua vita, non un buco della raccolta.
+> Su quelle quaranta: correlazione con NVDA **0,45** — cioè **dentro** il gruppo correlato — e
+> con **MU 0,83**, il legame più forte del libro. Volatilità annua 117,6%.
+> **SKHY non diversifica rispetto a MU: aggiunge alla stessa scommessa.**
+>
+> ⚠ La tentazione era sostituire la serie di Seoul (KRX-000660, 1.222 barre). Misurato e
+> **rifiutato**: in won e su una seduta che chiude prima di New York la correlazione con NVDA
+> scende a **0,20** (0,22 sfasando di una seduta), cioè sotto la soglia del gruppo correlato.
+> Una serie lunga che inverte la conclusione è peggio di una serie corta dichiarata. Le due
+> quotazioni vivono sotto due chiavi distinte e nessuna si traveste dall'altra.
+>
+> ⚠ E una serie corta non deve accorciare il libro: intersecando tutto, le 124 sedute della
+> matrice diventavano 39 per tutti e ogni numero cambiava in silenzio — il segno che la misura
+> aveva smesso di misurare era **ES95 identico al VaR95**, perché con 39 rendimenti la coda al
+> 5% ha due osservazioni. Ora chi non copre la finestra viene escluso e dichiarato.
 
 ### Gruppo correlato — correlazione dei rendimenti giornalieri ≥ 0,35 con NVDA
 

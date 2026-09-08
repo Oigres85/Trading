@@ -39,8 +39,19 @@ def analizza(sedute=125, ancora="NVDA"):
     S = {tk: serie(tk) for tk in POS}
     mancanti = [tk for tk, s in S.items() if not s]
     S = {tk: s for tk, s in S.items() if s}
-    comuni = sorted(set.intersection(*[set(s) for s in S.values()]))
+    # ⚠⚠ UNA SERIE CORTA NON DEVE ACCORCIARE IL LIBRO. Intersecando tutto, l'ADS SKHY
+    # (40 barre) portava la finestra da 125 a 39 sedute per TUTTI e cambiava ogni numero in
+    # silenzio: il contributo di NVDA passava da 11,7% a 9,7%, quello di GOOGL a 0,0%, e il
+    # segno che la misura aveva smesso di misurare era ES95 IDENTICO al VaR95 — con 39
+    # rendimenti la coda al 5% ha due osservazioni, quindi la media della coda E' il quantile.
+    # Si tiene la finestra chiesta e si ESCLUDE chi non la copre, dichiarandolo: `corte()` poi
+    # li misura sulla loro finestra, che e' un'altra domanda con un altro denominatore.
+    lunghe = {tk: v for tk, v in S.items() if len(v) >= sedute}
+    corti = sorted(set(S) - set(lunghe))
+    if not lunghe: raise RuntimeError("nessuna serie copre la finestra chiesta")
+    comuni = sorted(set.intersection(*[set(s) for s in lunghe.values()]))
     fin = comuni[-sedute:] if len(comuni) >= sedute else comuni
+    S = lunghe
     R = {tk: rendimenti(S[tk], fin) for tk in S}
     tks = sorted(R, key=lambda t: -POS[t][0]*S[t][fin[-1]])
     # pesi MTM sul comparto azionario misurabile
@@ -73,7 +84,7 @@ def analizza(sedute=125, ancora="NVDA"):
     for x in curva:
         picco = max(picco, x); dd = min(dd, x/picco-1)
     return {"finestra_sedute": len(fin)-1, "dal": fin[0], "al": fin[-1],
-            "non_misurabili": mancanti, "ancora": ancora,
+            "non_misurabili": mancanti, "fuori_finestra": corti, "ancora": ancora,
             "pesi": {t: round(w[t]*100, 1) for t in tks},
             "contributo_rischio": {t: round(mcr[t], 1) for t in tks},
             "corr_ancora": {t: round(corr_anc[t], 2) for t in tks if corr_anc.get(t) is not None},
@@ -82,6 +93,55 @@ def analizza(sedute=125, ancora="NVDA"):
             "var95_1g_pct": round(-q5*100, 2), "es95_1g_pct": round(-media(coda)*100, 2),
             "drawdown_max_pct": round(dd*100, 1)}
 
+# ─────────────────────────────────────────────────────────────────────────────────────────
+def corte(sedute=125, minimo=25, ancora="NVDA"):
+    """Le posizioni che NON entrano nella matrice principale, misurate sulla LORO finestra.
+
+    ⚠⚠ NASCE DA UNA MISURA CHE HA RIFIUTATO LA RISPOSTA COMODA. SKHY e' l'ADS di SK hynix,
+    quotata dal 13/07/2026: 40 sedute, sotto le 125 della matrice. Il listino di casa (Seoul,
+    KRX-000660) ne ha 1.222 — e usarlo come sostituto sembrava il rimedio ovvio. Misurato:
+
+        ADS SKHY  vs NVDA, 40 sedute        corr 0,452     vs MU  corr 0,826
+        Seoul KRW vs NVDA, 250 sedute       corr 0,196
+        Seoul KRW vs NVDA, sfasata di 1     corr 0,219
+
+    La serie LUNGA e' la serie SBAGLIATA: il won e la seduta coreana che chiude prima di New
+    York spezzano una giornata di informazione americana su due barre, e la correlazione scende
+    sotto la meta'. Col sostituto SKHY sarebbe finita fra gli "indipendenti dall'ancora"
+    (0,20 < 0,35) mentre lo strumento posseduto sta DENTRO il gruppo correlato. Un numero
+    plausibile che inverte la conclusione e' il difetto peggiore che questo progetto produca.
+
+    Quindi: finestra corta e DICHIARATA, mai una finestra lunga di un'altra cosa.
+    ⚠ I numeri di qui NON si confrontano con quelli di `analizza()`: altra finestra, altro
+    denominatore. Si leggono come "quanto si muove con", non come quota del rischio di libro.
+    """
+    p = analizza(sedute)
+    fuori = [t for t in POS if t not in p["pesi"]]
+    out = {}
+    for tk in fuori:
+        s = serie(tk)
+        if not s:
+            out[tk] = {"stato": "nessuna serie", "sedute": 0}
+            continue
+        altri = {t: serie(t) for t in POS if t != tk}
+        altri = {t: v for t, v in altri.items() if v}
+        com = sorted(set(s) & set.intersection(*[set(v) for v in altri.values()]))
+        if len(com) < minimo:
+            out[tk] = {"stato": f"solo {len(com)} sedute in comune, sotto il minimo di {minimo}",
+                       "sedute": len(com)}
+            continue
+        rr = rendimenti(s, com)
+        c = {t: corr(rr, rendimenti(altri[t], com)) for t in altri}
+        c = {t: round(v, 2) for t, v in c.items() if v is not None}
+        ordinati = sorted(c.items(), key=lambda x: -x[1])
+        out[tk] = {"stato": "misurata su finestra corta", "sedute": len(com),
+                   "dal": com[0], "al": com[-1],
+                   "corr_ancora": c.get(ancora), "corr_per_titolo": dict(ordinati),
+                   "piu_correlato": ordinati[0] if ordinati else None,
+                   "volatilita_annua_pct": round(dev(rr) * (252 ** 0.5) * 100, 1)}
+    return out
+
 if __name__ == "__main__":
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 125
-    print(json.dumps(analizza(n), indent=1, ensure_ascii=False))
+    print(json.dumps({"principale": analizza(n), "finestra_corta": corte(n)},
+                     indent=1, ensure_ascii=False))

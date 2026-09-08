@@ -49,3 +49,48 @@ chi ti sta dicendo di rallentare (lezione v398).
 - **Chiusure**: `stockanalysis.com` porta anche la **rettificata**, che è quella giusta per medie,
   rendimenti e volatilità. Il canale di riserva (`api.nasdaq.com`) **non** la porta, e in quel
   caso il file lo dichiara nel campo `fonte`.
+
+## Il rapporto
+
+`assembla.py` mette insieme quello che i raccoglitori hanno letto in `memoria/dati/quadro.json`
+(non calcola nulla di nuovo: chiama i moduli che già esistono — una seconda derivazione della
+stessa grandezza diverge al primo ritocco). `rapporto_html.py` lo rende in una pagina.
+
+**Niente grafici**, per decisione del CEO dell'08/09/2026: *"grafici eliminali ma tieni conto dei
+dati che da essi emergono compreso storico per quelli macro"*. La lettura che un grafico darebbe
+è il percentile, e quello è un numero.
+
+Ciclo completo, ~90 secondi:
+
+```
+cd scripts/raccolta
+python3 preleva.py MU NVDA AMD MSTR PLTR GOOGL WDC ORCL BE MRVL CRWV RGTI TSM SKHY SPY QQQ SMH TLT UUP
+python3 fondamentali.py MU NVDA AMD MSTR PLTR GOOGL WDC ORCL BE MRVL CRWV RGTI TSM SKHY
+python3 notizie.py     MU NVDA AMD MSTR PLTR GOOGL WDC ORCL BE MRVL CRWV RGTI TSM SKHY
+python3 quadro_macro.py          # 21 serie FRED, in cache per serie
+python3 assembla.py              # → memoria/dati/quadro.json
+python3 rapporto_html.py /tmp/quadro.html
+```
+
+## Le cinque sezioni dello schema del CEO, e da dove escono
+
+| sezione | fonte |
+|---|---|
+| 1 · Dati di mercato e prezzi | barre giornaliere + `api.nasdaq.com/quote/…/summary` |
+| 2 · Dati finanziari e rapporti chiave | `api.nasdaq.com/company/…/financials` — conto economico, stato patrimoniale, flussi di cassa e indici, quattro trimestri e quattro esercizi |
+| 3 · Analisi tecnica e indicatori | calcolati qui dalle barre: RSI, MACD, stocastico, StochRSI, CCI, ATR, ADX, SMA 5/10/20/50/100/200, EMA, pivot di Fibonacci |
+| 4 · Target price e rating analisti | `api.nasdaq.com/analyst/…/targetprice` e `/ratings` |
+| 5 · Storico utili e previsioni | `api.nasdaq.com/company/…/earnings-surprise` e `/analyst/…/earnings-forecast` |
+
+⚠ **Niente è ricalcolato e niente è stimato nei bilanci**: ogni riga esce dal deposito con la
+propria data di chiusura periodo accanto, e dove quel deposito ha più di cento giorni la scheda
+lo dichiara. Un TTM non si compone sommando quattro trimestri presi da tabelle diverse.
+
+⚠ **Su un indice cumulativo il percentile del livello non è un'informazione.** CPI e PCE escono
+al 100° percentile della propria storia *per costruzione* — un indice che sale sta sempre al
+proprio massimo — e chi legge concluderebbe «inflazione da record». Per quelle serie il
+percentile si calcola sulla **variazione a dodici mesi**, e la riga lo dichiara.
+
+⚠ **L'ADS di SK hynix e l'azione di Seoul sono due chiavi distinte**, mai una travestita
+dall'altra: la seconda è la stessa società in un'altra valuta e su un'altra seduta, e misurata
+dà una conclusione **opposta** sul gruppo correlato (0,20 contro 0,45). Vedi `memoria/LIBRO.md`.

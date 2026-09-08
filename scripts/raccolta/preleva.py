@@ -45,6 +45,36 @@ def _get(url, timeout=30, tentativi=3, ua=UA):
         time.sleep(1.5 * (i + 1))
     raise RuntimeError("curl " + ultimo)
 
+# ⚠⚠ IL LISTINO DI CASA NON E' LO STRUMENTO CHE SI POSSIEDE, ed e' l'errore che stavo per fare.
+# SKHY e' "SK hynix Inc. American Depositary Shares", quotata negli Stati Uniti a 181,50 $: le
+# fonti USA ne portano ~40 barre perche' l'ADS e' quotata da poco, non perche' manchi il dato.
+# La share di Seoul (KRX-000660) ha 1.222 barre ed e' la STESSA societa', ma in WON, su una
+# SEDUTA DIVERSA e con un rapporto di conversione proprio. Sostituirla all'ADS darebbe una serie
+# lunga e sbagliata: e' il difetto v203 — pubblicare un percentile su una serie che non e' quella
+# che dichiari e' peggio che non pubblicarlo.
+# Quindi due chiavi DISTINTE: `SKHY` resta lo strumento posseduto, `SKHY.KRX` e' la societa'.
+SOTTOSTANTI = {"SKHY": {"sym": "krx-000660", "valuta": "KRW", "borsa": "Seoul (KRX)",
+                        "nome": "SK hynix Inc. (azione ordinaria, listino di casa)",
+                        "nota": "000660.KS — sottostante dell'ADS SKHY, altra valuta e altra seduta"}}
+
+def storico_sottostante(tk, anni=5):
+    """Il listino di CASA di un emittente estero. NON e' lo strumento posseduto: si salva sotto
+    una chiave propria e chi lo usa dichiara valuta, borsa e che non e' la stessa quotazione."""
+    e = SOTTOSTANTI[tk.upper()]
+    j = json.loads(_get(f"https://stockanalysis.com/api/symbol/q/{e['sym']}/history"
+                        f"?range={anni}Y&period=Daily"))
+    if j.get("status") != 200 or not j.get("data"):
+        raise RuntimeError(f"krx: risposta {j.get('status')} {str(j.get('message'))[:50]}")
+    b = [{"d": x["t"], "o": x["o"], "h": x["h"], "l": x["l"],
+          "c": x["c"], "adj": x.get("a", x["c"]), "v": x.get("v")}
+         for x in j["data"] if x.get("c") is not None]
+    b.sort(key=lambda x: x["d"])
+    return {"fonte": f"stockanalysis.com · {e['borsa']}", "valuta": e["valuta"],
+            "borsa": e["borsa"], "nome": e["nome"], "nota_simbolo": e["nota"],
+            "sottostante_di": tk.upper(), "strumento_posseduto": False,
+            "letto_il": datetime.now(timezone.utc).isoformat(),
+            "ticker": tk.upper() + ".KRX", "barre": b}
+
 def storico_titolo(tk, anni=5):
     """Ritorna {fonte, letto_il, barre:[{d,o,h,l,c,adj,v}]} dal piu' VECCHIO al piu' recente."""
     errori = []
@@ -57,7 +87,9 @@ def storico_titolo(tk, anni=5):
                   "c": x["c"], "adj": x.get("a", x["c"]), "v": x.get("v")}
                  for x in j["data"] if x.get("c") is not None]
             b.sort(key=lambda x: x["d"])
-            if len(b) >= 60:
+            # ⚠ 20 e non 60: uno strumento quotato da POCO non e' un dato mancante.
+            # La scarsita' si dichiara (`barre`), non si trasforma in un "non letto" (v389).
+            if len(b) >= 20:
                 return {"fonte": "stockanalysis.com", "letto_il": datetime.now(timezone.utc).isoformat(),
                         "ticker": tk.upper(), "barre": b}
             errori.append(f"stockanalysis: solo {len(b)} barre")
@@ -84,7 +116,7 @@ def storico_titolo(tk, anni=5):
             b.append({"d": f"{a}-{m}-{g}", "o": n(x.get("open")), "h": n(x.get("high")),
                       "l": n(x.get("low")), "c": c, "adj": c, "v": n(x.get("volume"))})
         b.sort(key=lambda x: x["d"])
-        if len(b) >= 60:
+        if len(b) >= 20:
             return {"fonte": "api.nasdaq.com (chiusure NON rettificate)",
                     "letto_il": datetime.now(timezone.utc).isoformat(),
                     "ticker": tk.upper(), "barre": b}
@@ -123,3 +155,12 @@ if __name__ == "__main__":
             print(f"{tk:<6} NON LETTO · {d['errori']}")
         salva(f"ohlc_{tk.upper()}.json", d)
         time.sleep(0.4)
+        if tk.upper() in SOTTOSTANTI:
+            try:
+                q = storico_sottostante(tk)
+                print(f"{tk+'.KRX':<10} {len(q['barre']):>5} barre · {q['barre'][0]['d']} → "
+                      f"{q['barre'][-1]['d']} · {q['fonte']} · {q['valuta']} · NON e' lo strumento posseduto")
+                salva(f"ohlc_{tk.upper()}.KRX.json", q)
+            except Exception as e:
+                print(f"{tk+'.KRX':<10} NON LETTO · {e}")
+            time.sleep(0.4)
