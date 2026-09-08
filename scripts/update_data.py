@@ -1285,6 +1285,36 @@ def recupera_seduta_persa(ticker, hist, price_src):
     return alt, bk[1]
 
 
+def arrotonda_alla_scala(v, prezzo):
+    """Arrotonda tenendo la RISOLUZIONE dello strumento, non un numero fisso di decimali.
+
+    ⚠⚠ NASCE DA UNA PIPELINE CADUTA. `round(atr_14, 2)` va bene su MU a 1016 $ e distrugge il
+    dato su EURUSD=X a 1,16: l'ATR vero di quel cambio vale ~0,005, cioe' esattamente sul
+    confine dei due decimali. Il 07/09 e' uscito 0,01, l'08/09 e' uscito 0,00 e `audit_data`
+    ha alzato una violazione HARD ("atr_14=0.0 <= 0 nel payload") — giustamente, perche' in
+    borsa un valore nullo non esiste. Il gate aveva ragione; a sbagliare era la scrittura.
+
+    ⚠ Il difetto non si vedeva perche' scattava PER CASO: da che lato dell'arrotondamento
+    cadeva l'ATR di un cambio decideva se la pipeline moriva o no. E' la classe v233/v349 —
+    *un check che dipende dal caso invece che dalla proprieta' va rosso da solo* — qui sul
+    dato invece che sul check.
+
+    ⚠ E il segno che il valore era gia' sbagliato PRIMA di annullarsi c'era: `atr_pct` si
+    calcola dall'ATR NON arrotondato e diceva 0,43%, mentre `atr_14` arrotondato diceva 0,01
+    su un prezzo di 1,16 — cioe' 0,86%. Due derivazioni della stessa grandezza, una
+    distrutta dall'arrotondamento e una no (classe v161/v207).
+    """
+    if v is None or prezzo is None or prezzo <= 0:
+        return round(v, 2) if v is not None else None
+    # ⚠ Sopra i 10 NON si cambia niente: due decimali su un titolo a 15 $ hanno gia' tutta la
+    # risoluzione che serve, e allargarli cambierebbe valori che andavano bene. Una correzione
+    # si stringe a cio' che e' rotto.
+    if prezzo >= 10:  dec = 2
+    elif prezzo >= 1: dec = 5
+    else:             dec = 7
+    return round(v, dec)
+
+
 def seduta_arretrata(ticker, price_asof):
     """La seduta pubblicata ORA e' PIU' VECCHIA di quella gia' a disco? Ritorna quella vecchia.
 
@@ -1844,7 +1874,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "rsi": rsi,
         "volume": int(vol),
         "vol_ratio": vol_ratio,   # RVol full-day robusto (vedi sopra): n.d. se volume 0/assente
-        "atr_14": round(atr_14, 2) if atr_14 else None,
+        "atr_14": arrotonda_alla_scala(atr_14, price) if atr_14 else None,
         "atr_pct": round(atr_14 / price * 100, 2) if atr_14 and price else None,
         "signal": sig,
         "signal_class": sig_class,
