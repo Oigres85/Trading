@@ -4344,6 +4344,37 @@ check rosso è prima di tutto una sonda da verificare contro il testo vero.*
 snapshot preso prima, mai da `git checkout`** (v430): rimettendo `round(_, 2)` cade il check del
 collegamento, appiattendo le bande cadono i sei check sul valore.
 
+## 🕐 v434 — LA v193 GUARDAVA LA DATA DEL RUN, NON QUELLA DEL DATO
+
+Seconda metà del difetto chiuso stamattina con la v431, e **l'ha trovata un gate andato rosso da
+solo** dopo che la pipeline ha rigenerato `data.json`. Il pre-commit ha bloccato il commit.
+
+`vixFresco` era `usRegularSessionOpen() && snapshotOggi`, dove `snapshotOggi` legge
+**`DATA.updated_at`** — cioè quando la PIPELINE ha girato. Ma `m.vix.asof` dice da quale barra
+viene il **valore**, ed è un'altra cosa. Stamattina divergevano davvero: alle 12:19 UTC il run
+era dell'08/09 e il VIX portava `asof` **2026-09-07**, il Labor Day.
+
+> Con la sessione aperta quella riga avrebbe dichiarato *"rilevazione odierna"* su un valore di
+> un giorno in cui i mercati erano chiusi — **cioè esattamente il difetto che la v193 esiste per
+> impedire, sopravvissuto perché il suo rimedio controllava il RUN invece del DATO.**
+
+⚠ La v431 aveva corretto **un ramo su due**: il ramo a sessione chiusa (dove ho messo `vixAsof`)
+e non quello a sessione aperta, che sceglie l'aggettivo senza mai consultare `asof`. È la classe
+v412 — una correzione applicata a un ramo e non all'altro — su una riga che avevo appena
+riscritto.
+
+⚠⚠ **E il check ha morso una seconda volta, avendo ancora ragione**: senza `asof` la riga diceva
+*"rilevazione odierna"* senza dichiarare che quella freschezza è **dedotta dall'ora del run**.
+*"Il dato dice di essere di oggi"* e *"assumo sia di oggi perché il run è di oggi"* si leggono
+uguali e sono due cose diverse (v406) — anche quando il ripiego è il mio.
+
+⚠ Il check esercita ora **entrambi i rami**, perché uno solo andrebbe rosso a orologio (v402):
+con la sessione aperta la dichiarazione da pretendere è *"dedotta dall'ora del run"*, con la
+sessione chiusa è *"ricavata dall'orologio"*.
+
+⚠ Validato per iniezione rimettendo `vixFresco` sul run: morde. Ripristino da uno **snapshot
+preso prima**, mai da `git checkout` (v430).
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
