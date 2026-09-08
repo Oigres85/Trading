@@ -219,7 +219,7 @@ hr{border:0;border-top:1px solid var(--riga);margin:26px 0}
 </style>''')
 
 # ── guscio e indice ──────────────────────────────────────────────────────────────────────
-VOCI = [("apertura", "In apertura"), ("libro", "Il libro"), ("rischio", "Rischio e correlazioni"),
+VOCI = [("apertura", "In apertura"), ("analisi", "L'analisi di oggi"), ("libro", "Il libro"), ("rischio", "Rischio e correlazioni"),
         ("macro", "Quadro macro"), ("canali", "I canali macro→titolo"),
         ("giunzioni", "Le giunzioni"), ("schede", "Schede per titolo"),
         ("notizie", "Notizie"), ("confronto", "Questo contro GitHub"), ("manca", "Cosa manca")]
@@ -229,13 +229,13 @@ w('<p class="marchio">Quadro del Libro</p>')
 w(f'<p class="sotto">{gen.strftime("%d/%m/%Y · %H:%M")} UTC</p>')
 w('<nav>')
 w('<p class="gruppo">Documento</p>')
-for a, t in VOCI[:6]: w(f'<a href="#{a}">{t}</a>')
+for a, t in VOCI[:7]: w(f'<a href="#{a}">{t}</a>')
 w('<p class="gruppo">Posizioni</p>')
 for tk in ORDINE + SEGUITI:
     marchio = "" if TIT[tk]["posseduto"] else " ·seguito"
     w(f'<a href="#t-{tk}"><span class="tk">{tk}</span>{marchio}</a>')
 w('<p class="gruppo">Coda</p>')
-for a, t in VOCI[6:]: w(f'<a href="#{a}">{t}</a>')
+for a, t in VOCI[7:]: w(f'<a href="#{a}">{t}</a>')
 w('</nav></aside><main>')
 
 # ── 1. IN APERTURA ───────────────────────────────────────────────────────────────────────
@@ -303,6 +303,18 @@ w('<div class="nota attenzione"><b>E dal lato dei tassi la misura non trova quas
   'il legame non si vede, non che non esista: se i tassi contano, contano come <b>evento</b>, e la '
   'regressione sulle sedute di massima escursione del canale è lì per misurare proprio quello.</div>')
 w('</section>')
+
+# ── L'ANALISI DI OGGI ────────────────────────────────────────────────────────────────────
+# ⚠ Vive in un modulo suo: e' l'unica parte DATATA del rapporto (il resto e' il quadro dei
+# dati, che si rigenera identico). Se non e' calcolabile, il rapporto esce lo stesso e lo
+# dichiara — un blocco che sparisce in silenzio e' peggio di un blocco assente (v406).
+try:
+    import analisi_html
+    for _r in analisi_html.sezione()[0]: w(_r)
+except Exception as _e:
+    w('<section id="analisi"><h2>L\'analisi di oggi</h2>'
+      '<div class="nota forte">Non generata in questo run: <code>'
+      + e(str(_e)[:200]) + '</code>. Il quadro dei dati qui sotto e\' completo.</div></section>')
 
 # ── 2. IL LIBRO ──────────────────────────────────────────────────────────────────────────
 w('<section id="libro"><h2>Il libro</h2>')

@@ -9056,8 +9056,14 @@ check("v431 la data dell'etichetta del VIX viene dal dato, non dall'orologio", s
      passare per data del dato una data calcolata. */
   delete v.asof;
   const senza = riga();
-  if (senza.indexOf("ricavata dall'orologio") < 0)
-    guai.push("senza asof la riga non dichiara che la data viene dall'orologio");
+  /* ⚠ v434 — DUE RAMI, NON UNO. Con la sessione USA aperta e il run di oggi la riga prende il
+     ramo "rilevazione odierna" e non nomina nessuna chiusura: li' la dichiarazione da pretendere
+     e' che la data sia DEDOTTA dal run. Con la sessione chiusa prende l'altro ramo e nomina
+     l'orologio. Un check che ne esercita uno solo va rosso a orologio (v402). */
+  const dichiara = senza.indexOf("ricavata dall'orologio") >= 0
+                || senza.indexOf("dedotta dall'ora del run") >= 0;
+  if (!dichiara)
+    guai.push("senza asof la riga non dichiara da dove viene la data: " + senza.slice(0, 110));
   return guai.length ? guai.join(" · ") : true;`));
 
 

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "432";
+const BUILD_VERSION = "434";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8542,12 +8542,31 @@ function buildPrompt(opz) {
     // odierna)" mentre lo snapshot era del 26/07, cioe' cinque giorni prima. E' la stessa
     // classe dell'etichetta KOSPI: lo STATO DEL MERCATO e la FRESCHEZZA DEL DATO sono due
     // cose diverse, e qui servono entrambe vere.
-    const snapshotOggi = (() => {
+    /* ⚠⚠ v434 — LA v193 GUARDAVA LA DATA DEL RUN, NON QUELLA DEL DATO, ed e' la seconda meta'
+       del difetto chiuso stamattina con la v431. `updated_at` dice quando la PIPELINE ha girato;
+       `m.vix.asof` dice da quale barra viene il VALORE. Sono due cose diverse, e stamattina
+       divergevano davvero: alle 12:19 UTC il run era dell'08/09 e il VIX portava `asof`
+       2026-09-07, il Labor Day. Con la sessione aperta quella riga avrebbe dichiarato
+       "rilevazione odierna" su un valore di un giorno in cui i mercati erano chiusi — cioe'
+       esattamente il difetto che la v193 esiste per impedire, sopravvissuto perche' il suo
+       rimedio controllava il run invece del dato.
+       ⚠ Il ripiego su `updated_at` resta SOLO quando la pipeline non porta `asof`, ed e' il caso
+       in cui la data del dato non la sappiamo: li' si continua come prima invece di far sparire
+       la riga (v406). */
+    const oggiISO = new Date().toISOString().slice(0, 10);
+    const vixHaData = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(String((m.vix || {}).asof || "").slice(0, 10));
+    const datoDiOggi = (() => {
+      if (vixHaData) return String(m.vix.asof).slice(0, 10) === oggiISO;
       const u = DATA?.updated_at ? new Date(DATA.updated_at) : null;
       if (!u || isNaN(u)) return false;
-      return u.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
+      return u.toISOString().slice(0, 10) === oggiISO;
     })();
-    const vixFresco = usRegularSessionOpen() && snapshotOggi;
+    const vixFresco = usRegularSessionOpen() && datoDiOggi;
+    /* ⚠ E ANCHE IL RAMO FRESCO DICHIARA DA DOVE VIENE LA SUA FRESCHEZZA. Senza `asof` la riga
+       diceva "rilevazione odierna" senza un cenno al fatto che quella data e' DEDOTTA dall'ora
+       del run: "il dato dice di essere di oggi" e "assumo sia di oggi perche' il run e' di oggi"
+       si leggono uguali e sono due cose diverse (v406). Il check lo ha preso subito. */
+    const vixFontData = vixHaData ? "" : ", data dedotta dall'ora del run: la pipeline non porta quella del dato";
     /* ⚠⚠ v431 — LA DATA DELL'ETICHETTA VENIVA DALL'OROLOGIO, IL VALORE DAI DATI, E I DUE
        DIVERGEVANO. L'08/09/2026 il pacchetto pubblicava "VIX 15.3 (+5,3% nell'ultima seduta
        [chiusura del 04/09])": la chiusura VERIFICATA del 04/09 era 14,53 (+1,47%), e il 15,3
@@ -8565,7 +8584,7 @@ function buildPrompt(opz) {
       if (/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(a)) return `[chiusura del ${a.slice(8, 10)}/${a.slice(5, 7)}]`;
       const c = lastUsEquityCloseUTC();
       return c ? `[chiusura del ${String(c.at.getUTCDate()).padStart(2, "0")}/${String(c.at.getUTCMonth() + 1).padStart(2, "0")}, data ricavata dall'orologio: la pipeline non porta quella del dato]` : "[ultima chiusura]"; })();
-    lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? "oggi — rilevazione odierna" : `nell'ultima seduta ${vixAsof} — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario`})`);
+    lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? `oggi — rilevazione odierna${vixFontData}` : `nell'ultima seduta ${vixAsof} — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario`})`);
   }
   else if (m.vix) lines.push("- VIX: n.d. (valore scartato dal sanity check)");
   if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${m.fedwatch.target_range} · tasso implicito futures ${m.fedwatch.implied_rate}%${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
