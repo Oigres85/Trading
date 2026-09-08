@@ -4175,6 +4175,59 @@ esattamente cosi' che questa e' nata.
 - ⚠ E **il backtick dentro un template** per la sesta volta, di nuovo in un commento che citava
   del codice: `modifica_sicura` ha rifiutato la scrittura e il file e' rimasto intatto.
 
+## 🧪 v431 — PRIMO GIRO OPERATIVO, E IL PRIMO DIFETTO E' DI CLASSE A
+
+Il CEO ha incollato il pacchetto della pagina viva (08/09/2026 07:46). Due esiti.
+
+### La data dell'etichetta veniva dall'OROLOGIO, il valore dai DATI
+Il pacchetto pubblicava:
+
+> `- VIX: 15.3 (+5,3% nell'ultima seduta [chiusura del 04/09] ...)`
+
+La chiusura **verificata** del 04/09/2026 era **14,53 (+1,47%)**. Il 15,3 porta `asof`
+**2026-09-07**, il giorno del Labor Day. Cioe' un valore attribuito a una seduta che non e' la
+sua, con uno scarto del **5%** sull'indicatore che il pacchetto stesso nomina fra i due
+anticipatori dei punti di svolta — e il percentile che ne segue passa dal 15° al 55°.
+
+Causa: `vixAsof` veniva da `lastUsEquityCloseUTC()`, cioe' dal calendario, mentre il valore
+viene da `m.vix.value`, che porta accanto la propria `m.vix.asof`. **Due derivazioni per la
+stessa domanda** (v161/v207), e quella sbagliata era la piu' comoda.
+⚠ Il rimedio NON e' un calendario delle festivita' che il sistema non ha: e' che la data venga
+dal DATO. L'orologio resta come ripiego, e in quel ramo la riga **dichiara** che la data e'
+calcolata invece di farla passare per la data del dato.
+⚠ E la riga di freschezza contava quella barra fra le "piu' fresche", spiegandola con *"le barre
+arrivano a scaglioni"* — vero in generale, falso per questa: era una barra su un giorno di
+chiusura.
+
+### 🦴 Sei gate rossi insieme, e avevano torto tutti e sei
+CRWV ha depositato il proprio Q2: bilancio al 30/06, deposito dell'11/08, quarantadue giorni di
+distanza — **sotto la soglia dei 60**. Il fenomeno "tabella dei trimestri ferma" e' semplicemente
+sparito dai dati, e con lui il disallineamento fra ricavi a dodici mesi e somma dei quattro
+trimestri (**scarto 0,01%**). Sei check che ASPETTAVANO quello stato sono andati rossi su codice
+corretto: la classe **v429**, la corsa locale dei gate che non gira sugli stessi dati del CI.
+
+> **Uno stato che si aspetta invece di costruirlo e' un check che vale finche' i dati lo
+> concedono.** Ora `_TABELLA_FERMA` costruisce il ritardo: toglie il trimestre di testa e mette
+> il deposito cento giorni dopo la data di bilancio che il titolo porta — quindi la soglia e'
+> superata per costruzione, a qualunque data futura del bilancio, senza dipendere dall'orologio.
+
+⚠ **La prima stesura costruiva META' dello stato**: spostava la data del deposito e lasciava i
+quattro trimestri intatti, quindi lo scarto restava allo 0,01% e la riga prendeva il ramo
+*"verificato: coincide"* — il check misurava un fenomeno che nei dati non c'era piu'. "Tabella
+ferma" vuol dire che alla tabella MANCA il trimestre piu' recente: sono due fatti, e vanno
+costruiti entrambi.
+
+⚠ **E la costante e' stata dichiarata dove e' nata invece che prima del suo primo uso**: `const`
+in un modulo ES non e' sollevata, quindi la suite e' morta all'import — **rumorosamente**, senza
+stampare nulla, che e' il comportamento progettato. E' la trappola `n1` della v409 e
+`_avvisoStale` della v427, terza incarnazione.
+
+### Il punteggio del primo giro: A=1 · B=0 · C=0 → **75**
+Il difetto e' **preesistente** (`vixAsof` risale al 25/08, verificato con `git log -S`), non
+introdotto da una correzione di questa sessione. Il primo giro d'uso vero ha trovato in
+un'ora un difetto che venti giri di lettura non avevano visto, ed e' la conferma della
+decisione di iniziare a usare il sistema invece di aspettare due giri puliti in laboratorio.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

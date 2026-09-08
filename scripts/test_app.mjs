@@ -4800,7 +4800,37 @@ check("v357 TTM: il rapporto coi trimestri si VERIFICA, non si afferma", suVeri(
   }
   return true;`));
 
-check("v357 trimestri: una tabella ferma non permette di affermare il verso della crescita", suVeri(`
+/* ⚠⚠ v431 — I SEI GATE QUI SOTTO ASPETTAVANO UNO STATO INVECE DI COSTRUIRLO, E IL MONDO L'HA
+   TOLTO. Misuravano il caso "la tabella dei trimestri e' ferma a un trimestre gia' superato dal
+   deposito EDGAR" sui dati VERI di CRWV: l'08/09/2026 CRWV ha depositato il proprio Q2, il
+   bilancio e' passato al 30/06 e il deposito dell'11/08 e' finito a 42 giorni di distanza, sotto
+   la soglia dei 60. Sei check rossi tutti insieme, su codice corretto — e' la classe v429, la
+   corsa locale dei gate che non gira sugli stessi dati del CI.
+   ⚠ La soluzione non e' allentare la soglia: e' COSTRUIRE il ritardo. Il deposito viene messo
+   cento giorni dopo la data di bilancio che il titolo porta, quindi lo scarto supera la soglia
+   per costruzione a qualunque data futura del bilancio, e non dipende dall'orologio. */
+const _TABELLA_FERMA = `
+  (() => {
+    const r = DATA.watchlist.concat(DATA.portfolio).find(x => x && x.ticker === "CRWV");
+    /* ⚠ LO STATO E' DOPPIO, e la prima stesura ne costruiva solo meta': "tabella ferma" vuol dire
+       che alla tabella MANCA il trimestre piu' recente, quindi i quattro trimestri stampati non
+       sommano piu' ai ricavi su dodici mesi dell'aggregatore. Con la sola data del deposito
+       spostata, lo scarto restava allo 0,01% e la riga prendeva il ramo "verificato: coincide" —
+       cioe' il check misurava un fenomeno che nei dati non c'era piu'. Si toglie il trimestre
+       di testa: e' esattamente la forma reale del difetto che questi gate sorvegliano. */
+    if (r && r.tv && Array.isArray(r.tv.conto_trim) && r.tv.conto_trim.length > 4) r.tv.conto_trim.shift();
+    const base = String((r && r.combustione && r.combustione.bilancio_al) || "2026-06-30").slice(0, 10);
+    const dep = new Date(new Date(base + "T00:00:00").getTime() + 100 * 86400000).toISOString().slice(0, 10);
+    DATA.macro.sec_calendario = DATA.macro.sec_calendario || {};
+    DATA.macro.sec_calendario.per_titolo = DATA.macro.sec_calendario.per_titolo || {};
+    DATA.macro.sec_calendario.per_titolo.CRWV =
+      Object.assign({ n_depositi: 5, cadenza_gg: 93 },
+        DATA.macro.sec_calendario.per_titolo.CRWV, { ultimo_deposito: dep });
+    return dep;
+  })();
+`;
+
+check("v357 trimestri: una tabella ferma non permette di affermare il verso della crescita", suVeri(_TABELLA_FERMA + `
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "CRWV");
   const ct = ((r || {}).tv || {}).conto_trim || [];
   if (!r || !r.earnings_date || !ct.length) return true;
@@ -6342,7 +6372,7 @@ check("v397 il massimo storico si pubblica quando dice altro dal massimo a 52 se
   r.ath = salva;
   return haStorico && senza;`));
 
-check("v397 la tabella dei trimestri vecchia si diagnostica dal DEPOSITO, non dalla stima", suVeri(`
+check("v397 la tabella dei trimestri vecchia si diagnostica dal DEPOSITO, non dalla stima", suVeri(_TABELLA_FERMA + `
   const p = buildPromptTicker("CRWV");
   const sec = ((DATA.macro.sec_calendario || {}).per_titolo || {}).CRWV;
   if (!sec || !sec.ultimo_deposito) return false;          // muto: manca il fenomeno
@@ -6462,13 +6492,13 @@ check("v400 due misure davvero opposte SONO annunciate come divergenza", suVeri(
 /* ═══ v400 — IL PACCHETTO NON PRESENTA PIU' COME MISTERO CIO' CHE SA ═══════════════════════
    Lo scarto fra i ricavi su dodici mesi dell'aggregatore e la somma dei quattro trimestri E'
    il trimestre che la tabella non ha, e il deposito EDGAR lo dice nello stesso pacchetto. */
-check("v400 il residuo dei ricavi 12 mesi e' spiegato dal deposito, non dichiarato ignoto", suVeri(`
+check("v400 il residuo dei ricavi 12 mesi e' spiegato dal deposito, non dichiarato ignoto", suVeri(_TABELLA_FERMA + `
   const p = buildPromptTicker("CRWV");
   if (p.indexOf("NON QUADRA CON I TRIMESTRI") < 0) return false;   // il fenomeno c'e'
   return p.indexOf("E' SPIEGATO: la tabella dei trimestri e' ferma") >= 0
       && p.indexOf("non e' spiegato dai dati qui presenti") < 0;`));
 
-check("v400 senza deposito EDGAR il residuo torna a dichiararsi non spiegato", suVeri(`
+check("v400 senza deposito EDGAR il residuo torna a dichiararsi non spiegato", suVeri(_TABELLA_FERMA + `
   delete DATA.macro.sec_calendario;
   const p = buildPromptTicker("CRWV");
   return p.indexOf("non e' spiegato dai dati qui presenti") >= 0
@@ -6478,17 +6508,17 @@ check("v400 senza deposito EDGAR il residuo torna a dichiararsi non spiegato", s
    Erano i due blocchi su cui si regge l'analisi di una societa' che costruisce a debito, ed
    erano gli unici due senza l'avviso costruito sul deposito EDGAR: cassa 2,2 mld al 31/03
    contro 5,524 del 10-Q depositato l'11/08, con due conclusioni al presente costruite sopra. */
-check("v400 COMBUSTIONE DI CASSA dichiara che il bilancio non e' l'ultimo depositato", suVeri(`
+check("v400 COMBUSTIONE DI CASSA dichiara che il bilancio non e' l'ultimo depositato", suVeri(_TABELLA_FERMA + `
   const p = buildPromptTicker("CRWV");
   if (p.indexOf("COMBUSTIONE DI CASSA [bilancio al") < 0) return false;
   return p.indexOf("E QUESTO BILANCIO NON E' L'ULTIMO") >= 0;`));
 
-check("v400 CREDITO dichiara che il conto economico non e' l'ultimo depositato", suVeri(`
+check("v400 CREDITO dichiara che il conto economico non e' l'ultimo depositato", suVeri(_TABELLA_FERMA + `
   const p = buildPromptTicker("CRWV");
   if (p.indexOf("- CREDITO [conto economico al") < 0) return false;
   return p.indexOf("E QUESTO CONTO ECONOMICO NON E' L'ULTIMO") >= 0;`));
 
-check("v400 senza deposito EDGAR i due avvisi tacciono invece di affermare a vuoto", suVeri(`
+check("v400 senza deposito EDGAR i due avvisi tacciono invece di affermare a vuoto", suVeri(_TABELLA_FERMA + `
   delete DATA.macro.sec_calendario;
   const p = buildPromptTicker("CRWV");
   return p.indexOf("E QUESTO BILANCIO NON E' L'ULTIMO") < 0
@@ -8992,6 +9022,42 @@ check("v430 la formula delle scommesse effettive riproduce il numero pubblicato"
     if (r.indexOf("Herfindahl") < 0)
       guai.push("un punto di stampa dichiara ancora la forma a pesi uguali, che non riproduce il numero");
   }
+  return guai.length ? guai.join(" · ") : true;`));
+
+
+
+/* ⚠⚠ v431 — PRIMO GIRO OPERATIVO, PRIMO DIFETTO DI CLASSE A: LA DATA DELL'ETICHETTA VENIVA
+   DALL'OROLOGIO E IL VALORE DAI DATI. Il pacchetto dell'08/09/2026 pubblicava "VIX 15.3 (+5,3%
+   nell'ultima seduta [chiusura del 04/09])" mentre la chiusura verificata del 04/09 era 14,53
+   (+1,47%): il 15,3 porta asof 2026-09-07, il giorno del Labor Day. Un valore attribuito a una
+   seduta che non e' la sua, con uno scarto del 5% sull'indicatore che il pacchetto stesso nomina
+   fra gli anticipatori dei punti di svolta.
+   ⚠ Il check verifica la PROPRIETA' — la data stampata e' quella del dato — costruendo lo stato
+   invece di aspettarlo, e percorre anche il ripiego, che e' il ramo che nessuna lettura vede. */
+check("v431 la data dell'etichetta del VIX viene dal dato, non dall'orologio", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const v = DATA.macro && DATA.macro.vix;
+  if (!v) return "il data.json non ha il VIX: il check non misura niente";
+  const riga = () => (buildCIOText().split(NL).find(r => r.indexOf("- VIX:") === 0) || "");
+  const guai = [];
+  for (const [asof, atteso] of [["2026-09-07", "07/09"], ["2026-03-02", "02/03"]]) {
+    v.asof = asof;
+    const r = riga();
+    if (!r) { guai.push("con asof " + asof + " la riga del VIX non viene emessa"); continue; }
+    if (r.indexOf("chiusura del " + atteso) < 0)
+      guai.push("con asof " + asof + " l'etichetta non dichiara quella data: " + r.slice(0, 90));
+  }
+  /* e il valore deve restare pubblicato: un check sulla sola data passerebbe anche se la riga
+     perdesse il numero (v406). */
+  v.asof = "2026-09-07";
+  if (riga().indexOf(String(v.value)) < 0) guai.push("la riga non pubblica piu' il valore del VIX");
+  /* ⚠ il RIPIEGO e' il ramo che nessuna lettura del pacchetto vede, perche' con i dati veri non
+     si accende mai: senza asof la data viene dall'orologio E la riga lo DICHIARA, invece di far
+     passare per data del dato una data calcolata. */
+  delete v.asof;
+  const senza = riga();
+  if (senza.indexOf("ricavata dall'orologio") < 0)
+    guai.push("senza asof la riga non dichiara che la data viene dall'orologio");
   return guai.length ? guai.join(" · ") : true;`));
 
 
