@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "431";
+const BUILD_VERSION = "432";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10780,9 +10780,27 @@ function contestoPortafoglio(tkCorrente) {
       : `=== IL LIBRO IN CUI QUESTO TITOLO ENTREREBBE — ${String(tkCorrente).toUpperCase()} NON E' FRA LE POSIZIONI (contesto, non richiesta di analisi del portafoglio) ===`);
   const fuori = fuoriAzionarioEur();
   if (fuori) {
-    const tot = totAz + fuori.totale;
-    const quota = tot > 0 ? totAz / tot * 100 : null;
-    L.push("Pesi sul solo comparto AZIONARIO, che e' il denominatore con cui le posizioni si "
+    /* ⚠⚠ v432 — IL RAPPORTO MESCOLAVA DUE VALUTE. `totAz` somma i controvalori nella valuta di
+       QUOTAZIONE (dollari, per dodici posizioni su tredici) mentre `fuoriAzionarioEur` restituisce
+       EURO: il rapporto fra i due dava 86,0% invece di 84,1%, e il pacchetto consegnava quel
+       numero come il MOLTIPLICATORE con cui riportare ogni misura di rischio al patrimonio intero.
+       Sottostimava il peso di cassa e titoli di Stato di due punti.
+       ⚠ E' la classe v183 — un dollaro trattato come un euro — che il gate valuta sorveglia dalla
+       v183: gli e' sfuggita perche' cerca IMPORTI in € nel payload, e questo e' un RAPPORTO.
+       ⚠ Se il cambio non c'e', il rapporto non si pubblica: un moltiplicatore sbagliato e' peggio
+       di un moltiplicatore assente (v199). */
+    const _fx = numero(DATA && DATA.eurusd);
+    const totAzEur = Number.isFinite(_fx) && _fx > 0 ? totAz / _fx : null;
+    const tot = totAzEur == null ? null : totAzEur + fuori.totale;
+    const quota = tot && tot > 0 ? totAzEur / tot * 100 : null;
+    L.push(quota == null
+      ? "Pesi sul solo comparto AZIONARIO, che e' il denominatore con cui le posizioni si "
+        + "confrontano fra loro. ⚠ MA NON E' IL PATRIMONIO: accanto ci sono liquidita' e titoli di "
+        + "Stato, e QUANTO PESI L'AZIONARIO SUL TOTALE NON E' CALCOLABILE in questo run, perche' "
+        + "manca il cambio EUR/USD con cui rendere confrontabili le due parti. Le misure di rischio "
+        + "piu' sotto descrivono l'AZIONARIO, non il patrimonio. Nessun importo assoluto: servirebbe "
+        + "a dimensionare, e dimensionare e' vietato."
+      : "Pesi sul solo comparto AZIONARIO, che e' il denominatore con cui le posizioni si "
       + "confrontano fra loro. ⚠ MA NON E' IL PATRIMONIO: l'azionario vale "
       + `${/^(8|11)/.test(String(Math.round(quota))) ? "l'" : "il "}${fmtNum.format(Math.round(quota * 10) / 10)}% del totale, accanto a `
       + fuori.voci.map(x => `${x.che}${x.al ? ` (al ${String(x.al).slice(0, 10)})` : ""}`).join(" e ")

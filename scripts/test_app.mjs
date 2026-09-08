@@ -9061,6 +9061,49 @@ check("v431 la data dell'etichetta del VIX viene dal dato, non dall'orologio", s
   return guai.length ? guai.join(" · ") : true;`));
 
 
+
+/* ⚠⚠ v432 — LA QUOTA DELL'AZIONARIO SUL PATRIMONIO MESCOLAVA DUE VALUTE. `totAz` somma i
+   controvalori nella valuta di QUOTAZIONE (dollari) e `fuoriAzionarioEur` restituisce euro: il
+   rapporto dava 86,0% invece di 84,1%, e quel numero e' il MOLTIPLICATORE con cui il pacchetto
+   dice di riportare ogni misura di rischio al patrimonio intero. E' la classe v183 sfuggita al
+   gate valuta, che cerca IMPORTI in € e non RAPPORTI fra grandezze in valute diverse.
+   ⚠ Il check verifica la PROPRIETA' — il rapporto e' invariante al cambio solo se entrambi i
+   termini sono nella stessa valuta — costruendo lo stato: con lo stesso libro e un cambio
+   diverso la quota DEVE cambiare (l'azionario e' in dollari, cassa e BTP in euro), e con la
+   vecchia formula cambierebbe nel verso opposto. Piu' il ramo del cambio assente. */
+check("v432 la quota dell'azionario sul patrimonio e' calcolata in una valuta sola", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const riga = () => (buildCIOText().split(NL).find(r => r.indexOf("Pesi sul solo comparto AZIONARIO") === 0) || "");
+  const quota = () => { const m = riga().match(/azionario vale (?:l'|il )([0-9]+,[0-9])% del totale/); return m ? Number(m[1].replace(",", ".")) : null; };
+  const guai = [];
+  /* ⚠⚠ LO STATO PATRIMONIALE SI COSTRUISCE: la suite gira con STATO_PTF nullo, quindi la
+     funzione che somma cassa e titoli di Stato torna null e il codice prende l'altro ramo —
+     quello che NON pubblica la quota. E' la trappola v421, dove il mio harness ha letto il ramo
+     sbagliato per undici giri. Senza questa riga il check sarebbe verde per assenza del
+     fenomeno, non per assenza di difetti. */
+  STATO_PTF = { cash: { v: 10000, at: "2026-08-08" }, btp: { v: { qty: 40000, pmc: 100 }, at: "" } };
+  DATA.eurusd = 1.1628;
+  const q1 = quota();
+  if (q1 == null) return "la riga dei pesi non pubblica la quota: il check non misura niente";
+  /* un dollaro piu' debole vale meno euro, quindi l'azionario in dollari pesa MENO sul totale */
+  DATA.eurusd = 1.4;
+  const q2 = quota();
+  if (q2 == null) guai.push("con un cambio diverso la quota sparisce");
+  else if (!(q2 < q1 - 1)) guai.push("la quota non scende con un dollaro piu' debole (" + q1 + " -> " + q2 + "): il rapporto non e' in una valuta sola");
+  DATA.eurusd = 1.0;
+  const q3 = quota();
+  if (q3 != null && !(q3 > q1 + 1)) guai.push("la quota non sale con un dollaro piu' forte (" + q1 + " -> " + q3 + ")");
+  /* ⚠ e senza cambio non si pubblica un moltiplicatore inventato */
+  DATA.eurusd = null;
+  const r = riga();
+  if (!r) guai.push("senza cambio la riga dei pesi sparisce del tutto");
+  else {
+    if (r.indexOf("NON E' CALCOLABILE") < 0) guai.push("senza cambio la quota non si dichiara non calcolabile");
+    if (r.indexOf("del totale") >= 0) guai.push("senza cambio il pacchetto pubblica comunque una quota");
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
