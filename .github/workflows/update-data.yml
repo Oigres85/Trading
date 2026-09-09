@@ -54,7 +54,18 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # ⚠ v444 — bump per la deprecazione di Node 20 (vedi tests.yml): la v5 dichiara
+      # `using: node24`, che e' cio' su cui GitHub gia' forza la v4.
+      # ⚠⚠ E `persist-credentials` E' DICHIARATO invece che ereditato. Il passo finale di questo
+      # workflow fa un `git push` NUDO: funziona solo perche' il checkout lascia le credenziali
+      # nel git config locale. Quella dipendenza era INVISIBILE — bastava un cambio di default
+      # a monte e la pipeline avrebbe smesso di committare in silenzio, cioe' la classe che
+      # questo progetto paga da sempre (v387, v433: un run degradato che si presenta come
+      # riuscito). Verificato sul manifesto della v5: l'input esiste e il default e' `true`;
+      # scriverlo non cambia niente oggi e toglie l'assunzione domani (regola v240).
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: true
 
       - uses: actions/setup-python@v5
         with:

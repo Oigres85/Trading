@@ -4636,6 +4636,50 @@ mercato dei capitali della v404, che stampava `16.6%` col punto.
 grezzo nella scheda **`v370` resta verde** (oggi i due valori coincidono per caso) e a mordere è
 solo la guardia strutturale.
 
+## ⚙️ v444 — NODE 20 DEPRECATO, E LA DIPENDENZA INVISIBILE DELLA PIPELINE
+
+Il CEO ha mandato la schermata di un run rosso: era il **#403**, il merge della v441, già chiuso
+dalla v442 — `main` era verde da due run. Ma nella stessa schermata c'era un warning vero:
+
+> *Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run
+> on Node.js 24: `actions/checkout@v4`, `actions/setup-node@v4`.*
+
+Oggi non rompe niente perché **GitHub le forza al posto nostro**. Il giorno in cui smette di
+forzarle si rompono, e si romperebbero in **entrambi** i workflow — test *e* pipeline dati.
+È la classe già pagata due volte: *un errore coperto da una rete di sicurezza sopravvive quanto
+la rete* (v390 col `continue-on-error`, v433 con l'etichetta `pipeline` inesistente).
+
+### Il rischio vero non era il bump: era il `git push` nudo
+`update-data.yml` chiude con un `git push` **senza token esplicito**: funziona solo perché
+`actions/checkout` lascia le credenziali nel git config locale. Se la v5 avesse cambiato quel
+default, la pipeline avrebbe smesso di committare **in silenzio** — un run verde che non pubblica
+niente, e ce ne accorgeremmo dall'età dei dati il giorno dopo.
+
+**Verificato sulla fonte primaria** (il manifesto delle azioni al tag `v5`), non a memoria:
+
+| | esito |
+|---|---|
+| `checkout@v5` / `setup-node@v5` — runtime | **`node24`**, cioè ciò su cui GitHub già forza la v4 |
+| `persist-credentials` in v5 | **esiste, default `true`** |
+| `node-version` in setup-node v5 | esiste |
+| unica rottura v5 dichiarata | `allow-unsafe-pr-checkout` su `pull_request_target` — **nessun workflow lo usa** |
+
+⚠⚠ **E la dipendenza è stata DICHIARATA invece che ereditata**: `persist-credentials: true` è ora
+scritto nel workflow. Non cambia niente oggi e toglie l'assunzione domani — è la regola v240
+(*una soglia che non è nel file è un'affermazione*) applicata a un default di terzi.
+
+### La verifica è arrivata PRIMA del merge, per costruzione
+`tests.yml` ha il trigger `pull_request` dalla v389 e fra i suoi `paths` c'è sé stesso: cambiare
+quel file fa girare la PR **con le azioni nuove**, prima che tocchino `main`. Il bump si è
+verificato da solo.
+
+⚠ Quello che la PR **non** copre è `update-data.yml`, che gira solo su cron e `workflow_dispatch`:
+il suo `checkout@v5` — e quindi il push — si esercitano al primo run dati. Annotato invece che
+dato per buono.
+
+⚠ `?v=` e `BUILD_VERSION` **non** sono stati toccati: questa versione cambia solo `.github/`, e
+nessun file servito al browser. Bumparli sarebbe rumore (regola v440).
+
 ## 🔢 v443 — IL GATE SCRITTO IERI ERA ANCORATO ALLA FORMA, E IL DIFETTO ERA IN ALTRE TRE SEDI
 
 La v442 ha chiuso due sedi in cui lo stesso peso usciva in due rese e ha lasciato una guardia a
