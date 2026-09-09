@@ -892,8 +892,47 @@ check("v265 nessuna grandezza compare due volte fra le schede", suVeri(`
   return conta("vix") <= 1 && conta("put") <= 1 && conta("credito") <= 1
       && conta("curva") <= 1 && conta("momentum") <= 1 && conta("ampiezza") <= 1`));
 
-check("v265 i componenti di Fear & Greed non sono piu' schede a se' (richiesta CEO)", suVeri(`
-  return indicatoriClassifica().every(x => String(x.k).indexOf("fg:") !== 0)`));
+/* ⚠⚠ v445 — LO STATO SI COSTRUISCE. Questo check leggeva i dati del giorno, e per mesi e'
+   stato verde perche' il quinto componente F&G spariva per DEDUPLICA contro la scheda
+   "Put/Call ratio (SPY)" — non perche' fosse escluso. Il 09/09 la fonte put/call e' caduta per
+   UN run, quella scheda non e' nata, e il componente e' rientrato: il check e' andato rosso
+   avendo ragione, su un difetto che c'era da sempre e che nessun dato aveva mai mostrato.
+   Ora il ramo si costruisce — si toglie `putcall` dallo snapshot — cosi' l'invariante vale a
+   prescindere da quali fonti abbiano risposto oggi (v429, v431, v435, v438). */
+check("v265 nessun componente di Fear & Greed e' una scheda a se', anche se cade la fonte put/call",
+  suVeriEsito(`
+  const guai = [];
+  if (!indicatoriClassifica().every(x => String(x.k).indexOf("fg:") !== 0))
+    guai.push("con i dati di oggi un componente F&G e' gia' una scheda a se'");
+  /* la fonte che teneva su la deduplica sparisce: e' successo davvero, e deve restare vero */
+  const salva = DATA.macro.putcall;
+  try {
+    delete DATA.macro.putcall;
+    const rientrati = indicatoriClassifica().map(x => String(x.k)).filter(k => k.indexOf("fg:") === 0);
+    if (rientrati.length) guai.push("senza la fonte put/call rientrano come schede: " + rientrati.join(", "));
+  } finally { if (salva !== undefined) DATA.macro.putcall = salva; }
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ⚠⚠ v445 — E LA FONTE CADUTA SI DICHIARA, nei DUE versi (v438): col dato il pacchetto
+   pubblica il rapporto, senza il dato dice che manca. Un check sulla sola assenza passerebbe
+   anche se la riga sparisse del tutto, che e' esattamente il difetto (v406). */
+check("v445 put/call: col dato pubblica il rapporto, senza il dato dichiara che manca",
+  suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const riga = () => (buildCIOText().split(NL).find(r => r.indexOf("- Put/Call") === 0) || "");
+  const guai = [];
+  const salva = DATA.macro.putcall;
+  try {
+    DATA.macro.putcall = { symbol: "SPY", name: "S&P 500 ETF", ratio: 1.33, puts: 4325457, calls: 3241738 };
+    const conDato = riga();
+    if (conDato.indexOf("1.33") < 0) guai.push("col dato il rapporto non esce piu'");
+    if (conDato.indexOf("NON DISPONIBILE") >= 0) guai.push("col dato il pacchetto dichiara comunque il buco");
+    delete DATA.macro.putcall;
+    const senza = riga();
+    if (!senza) guai.push("senza il dato la riga sparisce del tutto invece di dichiarare il buco");
+    else if (senza.indexOf("NON DISPONIBILE") < 0) guai.push("senza il dato la riga non dichiara che la misura manca");
+  } finally { if (salva !== undefined) DATA.macro.putcall = salva; else delete DATA.macro.putcall; }
+  return guai.length ? guai.join(" · ") : true;`));
 
 /* ── v258 — la spiegazione del popup vive anche nella scheda ── */
 check("v258 il contenuto del popup esce nella scheda, prosa compresa", (() => {
@@ -9004,17 +9043,23 @@ check("v428 un valore superato dall'ultima uscita della serie viene dichiarato t
        non poteva trovare la spia e il sotto-check era verde per assenza del fenomeno — la
        trappola pagata quattro volte in questo progetto. Ora si prende una giornaliera la cui
        riga porta davvero la cadenza, e se non ce n'e' il check lo DICE invece di tacere. */
+    /* ⚠⚠ v445 — QUESTO RAMO ASPETTAVA LO STATO INVECE DI COSTRUIRLO, e il ramo mensile qui
+       sopra lo costruisce: la stessa correzione applicata a una meta' e non all'altra (v412).
+       Pretendeva di TROVARE una giornaliera con l'osservazione di almeno due giorni: il 09/09
+       alle 21:30 la piu' vecchia ne aveva 1,9 — quarantasei ore — e il sotto-check si e'
+       dichiarato muto, cioe' rosso su codice corretto, a seconda dell'ORA in cui gira.
+       Ora l'osservazione si sposta a tre giorni fa: il caso che discrimina esiste per
+       costruzione, a qualunque ora e con qualunque snapshot (v429, v431, v435). */
     const gio = (DATA.macro.indicators || []).find(i => i && i.date
       && typeof CADENZA_FONTE !== "undefined" && CADENZA_FONTE[i.key]
       && CADENZA_FONTE[i.key].passo === "giornaliero"
-      && riga(i.label).indexOf("ultima uscita") >= 0
-      /* ⚠ e l'osservazione dev'essere di almeno due giorni fa: e' la sola condizione in cui una
-         giornaliera puo' superare il proprio passo. Con un'osservazione di ieri l'iniezione non
-         discriminerebbe nulla e il sotto-check sarebbe verde comunque. */
-      && Date.now() - Date.parse(String(i.date).slice(0, 10) + "T00:00:00") >= 2 * 86400000);
-    if (!gio) guai.push("nessuna serie giornaliera con osservazione di due giorni fa: il ramo del falso positivo non e' esercitato");
+      && riga(i.label).indexOf("ultima uscita") >= 0);
+    if (!gio) guai.push("nessuna serie giornaliera la cui riga porti la cadenza: il ramo del falso positivo non e' esercitato");
     if (gio) {
-      /* l'uscita iniettata e' OGGI: passata per costruzione, e oltre un giorno dall'osservazione. */
+      /* l'osservazione si porta a tre giorni fa e l'uscita iniettata e' OGGI: passata per
+         costruzione, e ben oltre un giorno dall'osservazione — cioe' il caso in cui l'avviso
+         scatterebbe se la guardia sul passo breve non ci fosse. */
+      gio.date = new Date(Date.now() - 3 * 86400000).toISOString().slice(0, 10);
       cal[gio.key] = { passate: [new Date().toISOString().slice(0, 10)], prossime: [] };
       if (riga(gio.label).indexOf(SPIA) >= 0)
         guai.push("su una serie giornaliera un ritardo ordinario di pubblicazione fa scattare l'avviso");

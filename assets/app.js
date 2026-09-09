@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "443";
+const BUILD_VERSION = "445";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4101,7 +4101,17 @@ function indicatoriClassifica() {
      e la si copiava su ogni scheda: comodo e sbagliato appena i blocchi hanno barre diverse
      (Yahoo pubblica in tempi diversi, gia' pagato in v186 sul portafoglio). Ogni scheda ora
      chiede la propria: `k` porta la chiave del blocco macro, e da li' si risale al suo `asof`. */
-  return out.filter(x => !FUORI.has(x.k))
+  /* ⚠⚠ v445 — IL QUINTO COMPONENTE F&G ERA ESCLUSO PER EFFETTO COLLATERALE. La richiesta del
+     CEO (v263, v265) e' che i componenti di Fear & Greed non siano schede a se': quattro erano
+     nominati in FUORI, il quinto — `fg:opzioni-put-call` — spariva solo perche' la deduplica
+     per nome lo accoppiava alla scheda "Put/Call ratio (SPY)". Il 09/09 la fonte put/call e'
+     caduta per UN run, quella scheda non e' nata, la deduplica non ha piu' avuto niente da
+     accoppiare e il componente e' RIENTRATO come scheda propria — una cosa che il CEO aveva
+     tolto, riapparsa perche' una fonte terza non ha risposto.
+     Un'esclusione che dipende dall'esistenza di un'ALTRA scheda non e' un'esclusione: e' una
+     coincidenza. Ora il prefisso decide, e i quattro nomi restano in FUORI come ricevuta di
+     quali fossero e perche'. */
+  return out.filter(x => !FUORI.has(x.k) && String(x.k).indexOf("fg:") !== 0)
     .map(x => {
       if (x.cadenza) return x;
       const chiave = String(x.k || "").replace(/^(in:|mk:|fg:)/, "");
@@ -8690,7 +8700,17 @@ function buildPrompt(opz) {
     if ((m.carry.boj_meetings || []).length) cl += `; prossima riunione BoJ ${new Date(m.carry.boj_meetings[0] + "T00:00:00").toLocaleDateString("it-IT")} (rischio unwind se BoJ alza o lo yen si rafforza)`;
     lines.push(cl);
   }
-  if (m.putcall) {
+  /* ⚠⚠ v445 — LA FONTE PUO' CADERE PER UN RUN, E IL SILENZIO SI LEGGE COME "NIENTE DA DIRE".
+     Il 09/09 alle 21:23 `macro.putcall` e' sparito dallo snapshot (c'era nei quattro run
+     precedenti): la riga smetteva di esistere e chi legge non poteva distinguere "il sistema
+     non ha il dato" da "ce l'ha e non te lo passa" — la regola v406, gia' pagata sulla
+     liquidita' in v438 con la stessa causa (una fonte muta per un run solo). */
+  if (!m.putcall || m.putcall.ratio == null) {
+    lines.push(`- Put/Call SPY: DATO NON DISPONIBILE in questo run — la fonte non ha restituito `
+      + `la catena opzioni. Non e' un rapporto neutro ne' un'assenza di copertura: e' una misura `
+      + `che manca, e il sentiment sulle opzioni in questo pacchetto non e' misurato.`);
+  }
+  if (m.putcall && m.putcall.ratio != null) {
     const r = m.putcall.ratio;
     const bias = r > 1.1 ? "prevalgono put = copertura/pessimismo (estremi = contrarian rialzista)" : r < 0.7 ? "prevalgono call = euforia (estremi = contrarian ribassista)" : "equilibrato";
     lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${r} — ${bias} (put ${m.putcall.puts}, call ${m.putcall.calls})`);

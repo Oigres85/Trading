@@ -4636,6 +4636,54 @@ mercato dei capitali della v404, che stampava `16.6%` col punto.
 grezzo nella scheda **`v370` resta verde** (oggi i due valori coincidono per caso) e a mordere è
 solo la guardia strutturale.
 
+## 🃏 v445 — UNA FONTE CADUTA PER UN RUN HA FATTO RIENTRARE UNA SCHEDA CHE IL CEO AVEVA TOLTO
+
+Il `pre-push` ha morso di nuovo, e per la seconda volta in due ore: il rebase prima del push ha
+portato il run delle 21:23 e **tre check sono caduti**. Causa unica: **`macro.putcall` è sparito
+dallo snapshot** — c'era nei quattro run precedenti, la fonte non ha restituito la catena opzioni
+per un giro solo. È la classe **v438** (`inst_cash_pct` sparito per un run) con un'altra fonte.
+
+### 1. ⚠⚠ Il quinto componente di Fear & Greed era escluso per EFFETTO COLLATERALE
+La richiesta del CEO (v263, v265) è che i componenti di F&G non siano schede a sé. Quattro erano
+nominati in `FUORI`; il quinto — `fg:opzioni-put-call` — spariva **solo perché la deduplica per
+nome lo accoppiava alla scheda "Put/Call ratio (SPY)"**. Caduta la fonte, quella scheda non è
+nata, la deduplica non ha più avuto niente da accoppiare, e **il componente è rientrato come
+scheda propria**: una cosa che il CEO aveva tolto, riapparsa perché una fonte terza non ha
+risposto.
+
+> **Un'esclusione che dipende dall'esistenza di un'ALTRA scheda non è un'esclusione: è una
+> coincidenza.** Ora decide il PREFISSO, e i quattro nomi restano in `FUORI` come ricevuta di
+> quali fossero e perché.
+
+⚠ Il difetto **c'era da sempre** e nessun dato l'aveva mai mostrato: è il ramo raro della v190,
+irraggiungibile *per i dati* (v390, v404). Il check era verde per una ragione che non c'entrava
+con ciò che verificava.
+
+### 2. La riga del put/call spariva in silenzio
+Senza `macro.putcall` il pacchetto non nominava affatto le opzioni. *"Il sistema non ha il dato"*
+e *"ce l'ha e non te lo passa"* si leggono uguali (v406): ora la riga dichiara il buco e dice
+anche cosa **non** è — *"non è un rapporto neutro né un'assenza di copertura: è una misura che
+manca"*. È stato **v406 a prenderlo**, cioè il gate nei due versi scritto per questa esattamente
+classe: *un gate scritto ieri che prende un difetto di oggi che non aveva in mente sta facendo il
+suo lavoro* (v408).
+
+⚠ I due gate nuovi sono nei **due versi** (v438): col dato il pacchetto pubblica il rapporto,
+senza il dato dichiara che manca. Un check sulla sola assenza passerebbe anche se la riga
+sparisse del tutto — che è il difetto.
+
+### 3. 🕐 E il terzo era un mio check che andava rosso a SECONDA DELL'ORA
+Il ramo giornaliero di **v428** pretendeva di *trovare* una serie con l'osservazione di almeno
+due giorni. Alle 21:30 la più vecchia ne aveva **1,9 — quarantasei ore** — e il sotto-check si
+dichiarava muto, cioè rosso su codice corretto.
+
+Il ramo **mensile della stessa funzione costruisce** la rilevazione; il giornaliero la aspettava:
+la solita correzione applicata a una metà e non all'altra (v412). Ora l'osservazione si sposta a
+tre giorni fa e il caso che discrimina esiste per costruzione, a qualunque ora (v429, v431, v435).
+
+> **Il conto del `pre-push` dopo due ore di vita: tre difetti in due rebase**, di cui uno che
+> sarebbe rimasto invisibile fino al prossimo capriccio di una fonte. Senza, `main` sarebbe
+> andata rossa due volte di fila.
+
 ## ⚙️ v444 — NODE 20 DEPRECATO, E LA DIPENDENZA INVISIBILE DELLA PIPELINE
 
 Il CEO ha mandato la schermata di un run rosso: era il **#403**, il merge della v441, già chiuso
