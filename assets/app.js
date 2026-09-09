@@ -4718,10 +4718,26 @@ const FORMA_INDICATORE = {
        un tutto, nessuna negativa. Nessun testo guida, come chiesto. */
     const f = m.fedwatch; if (!f || !Array.isArray(f.meetings) || !f.meetings.length) return null;
     const it = (d) => { const p = String(d).split("-"); return `${p[2]}/${p[1]}`; };
-    const rr = f.meetings.slice(0, 4).map(x => ({ d: it(x.date),
+    /* ⚠⚠ v443 — UNA RIUNIONE NON PREZZATA NON E' UNA RIUNIONE A ZERO. Il contratto a 30 giorni
+       prezza SOLO il proprio mese (v441): per le successive i tre campi sono null, e coercerli
+       a 0 disegnava una barra vuota che si legge "il mercato non prezza nessun movimento" —
+       cioe' l'opposto di "questo strumento non lo misura". E' la classe C14, informazione
+       mancante travestita da informazione presente, e la v441 l'aveva chiusa nel PACCHETTO
+       lasciando indietro la scheda: una correzione applicata a un ramo e non all'altro (v412). */
+    /* ⚠ `Number(null)` vale 0 e `Number.isFinite(0)` e' VERO: la prima stesura di questa guardia
+       considerava prezzata ogni riunione, cioe' non filtrava niente. Il campo si guarda per
+       quello che e' — assente — non passando dalla conversione a numero. */
+    const c = (v) => v != null && Number.isFinite(Number(v));
+    const prezzata = (x) => c(x.cut_prob) || c(x.hold_prob) || c(x.hike_prob);
+    const rr = f.meetings.slice(0, 4).filter(prezzata).map(x => ({ d: it(x.date),
       taglio: Math.round(Number(x.cut_prob) || 0),
       fermo: Math.round(Number(x.hold_prob) || 0),
       rialzo: Math.round(Number(x.hike_prob) || 0) }));
+    const nonPrezzate = f.meetings.slice(0, 4).filter(x => !prezzata(x)).map(x => it(x.date));
+    if (!rr.length) return { g: `<div class="muted" style="font-size:11px;line-height:1.5">Il future sui Fed Funds a 30 giorni prezza `
+      + `solo il proprio mese: nessuna delle riunioni in elenco (${nonPrezzate.join(", ")}) `
+      + `e' prezzata da questo contratto.</div>`, score: null,
+      n: `nessuna riunione prezzata da questo contratto — non e' "nessun movimento atteso"` };
     const W = 320, RH = 30, H = rr.length * RH + 18, L = 44, R = W - 8;
     const righe = rr.map((x, i) => {
       const y = 12 + i * RH;

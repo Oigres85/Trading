@@ -4703,6 +4703,71 @@ inglese** (`AMD returns 7.7% in a month`) e le **correlazioni**, che col punto c
 *Un allarme va verificato contro il testo vero prima di diventare una correzione* (v417) — qui
 mi avrebbe fatto "correggere" undici righe corrette.
 
+## 🏦 v443 — IL BLOCCO FEDWATCH DELLA PIPELINE ERA MORTO DAL GIORNO IN CUI L'HO SCRITTO
+
+Trovato dal `pre-push` **al suo primo utilizzo**, un'ora dopo averlo scritto: il rebase ha portato
+tre run del CI e **tre check sono caduti**. Senza rieseguirli, `main` sarebbe andata rossa una
+seconda volta di fila.
+
+Due erano sonde da riagganciare. Il terzo era un difetto **mio, della v441**, e grosso:
+
+```python
+fm = macro.get("fed_market") or {}          # riga 2705
+...
+macro["fed_market"] = { ... }               # riga 3824  ← MILLE RIGHE PIU' SOTTO
+```
+
+La chiave **non esiste ancora** quando il blocco FedWatch la legge. Quindi `effr_corrente` era
+**sempre** `None`, `movimenti` **sempre** `None`, e ogni riunione usciva `prezzata_dal_contratto:
+false` con tutti i campi a `null`. Verificato su `data.json` prodotto dal CI: `base_effr: None`,
+`movimenti: None`, tre probabilità nulle su tutte e quattro le riunioni.
+
+> ⚠⚠ **Il pacchetto restava CORRETTO — e per questo il difetto era invisibile proprio dove si
+> guarda.** `app.js` rifà il conto da sé (il ripiego della v441, scritto per scavalcare uno
+> snapshot vecchio), quindi il CEO leggeva `1.37 MOVIMENTI da 25bp` mentre la pipeline non
+> pubblicava niente e la scheda della dashboard mostrava tre zeri.
+
+**È la lezione v399 nella sua forma più pura**: i sei gate della v441 provavano il **CONTROLLO**
+— la funzione, chiamata a mano con i suoi argomenti — e non il **COLLEGAMENTO**, cioè da dove
+arriva il suo ingresso in produzione.
+
+⚠ Il gate nuovo non nomina il difetto: **ogni chiave di `macro` che il blocco FedWatch legge
+dev'essere già stata scritta più sopra, oppure la lettura deve avere un ripiego che non dipende da
+`macro`**. Vale anche per le letture che verranno dopo. Validato per iniezione: togliendo il
+ripiego, il check morde e **nomina la chiave tardiva**.
+⚠ Il ripiego usa la **stessa serie** di `fed_market` (l'ultima osservazione di FEDFUNDS), non una
+seconda derivazione: i due numeri coincidono per costruzione invece che per fortuna (v161, v207).
+
+### 🕳️ E la scheda disegnava tre zeri dove non c'era misura
+La v441 ha stabilito che il front-month prezza **solo il proprio mese**, e nel pacchetto lo
+dichiara. La **scheda della dashboard** no: coerceva i `null` a `0` e disegnava una barra impilata
+vuota, che si legge *"il mercato non prezza nessun movimento"* — l'opposto di *"questo strumento
+non lo misura"*. Classe **C14**, e la solita correzione applicata a una superficie e non all'altra
+(v412). Ora una riunione non prezzata non prende una barra, e se non ce n'è nessuna la scheda dice
+perché.
+
+⚠ **E la mia prima guardia non filtrava niente**: `Number(null)` vale `0` e `Number.isFinite(0)` è
+**vero**, quindi ogni riunione risultava "prezzata". Il campo assente si guarda per quello che è
+(`!= null`), non passando dalla conversione a numero.
+
+### 🦴 Due sonde che pretendevano una CIFRA DECIMALE, ed è lo specchio della v442
+| gate | pretendeva | i dati del 09/09 |
+|---|---|---|
+| **v432** | `azionario vale l'([0-9]+,[0-9])% del totale` | la quota è caduta su **84%** esatto |
+| **v418** | `Math.abs(...).toFixed(1)` → `38,0` | `w52_dist_pct` di CRWV è **−38,0** esatto, e il pacchetto scrive `-38%` |
+
+Il formattatore unico lascia cadere lo zero finale — correttamente — e le due sonde andavano rosse
+su codice giusto. **È lo specchio esatto del difetto della v442**, che si era visto il giorno in
+cui il peso di MU era caduto su un intero: la stessa coincidenza dei dati, dall'altro lato.
+*Un check che dipende da quante cifre ha il numero di oggi non misura una proprietà* (v429, v435).
+
+⚠ E il **v333** pinnava uno stato che la v441 ha reso opzionale: pretendeva che la prima riunione
+avesse **sempre** i tre esiti a somma 100. Riscritto costruendo **entrambi** i rami — prezzata e
+non prezzata — è diventato il gate che ha trovato il difetto della scheda.
+
+⚠ **Ottava volta con un backtick dentro un template passato al vm**, di nuovo in un commento che
+citava del codice: `modifica_sicura` ha rifiutato la scrittura e il file è rimasto intatto.
+
 ## 🚪 v443 — FRA IL REBASE E IL PUSH NON GIRAVA NIENTE
 
 Il difetto **procedurale** che ha reso rossa `main` in v442 non era il codice: era che il

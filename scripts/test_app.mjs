@@ -3087,6 +3087,16 @@ check("v333 forme: le cinque schede rifatte disegnano barre a confronto, non sca
   m.liquidity_split = Object.assign({ retail_mmf_bln: 3000, retail_yoy_pct: 6.2,
                                       retail_date: "2026-07-01" },
                                     m.liquidity_split || {}, { inst_cash_pct: 7.7 });
+  /* ⚠ v443 — e la stessa cosa per FedWatch, per la stessa ragione: dalla v441 una riunione che
+     il front-month NON prezza non riceve piu' una barra a zero — correttamente — quindi con uno
+     snapshot in cui nessuna riunione e' prezzata la scheda dichiara il buco invece di disegnare,
+     e questo check andava rosso su codice giusto. Lo stato in cui LE BARRE devono esistere si
+     costruisce, invece di aspettare che i dati del giorno lo concedano. */
+  m.fedwatch = Object.assign({ target_range: "3,50-3,75%", implied_rate: 3.79 },
+                             m.fedwatch || {},
+                             { meetings: [{ date: "2026-09-16", cut_prob: null, hike_prob: 37,
+                                            hold_prob: 63, mosse_25bp: 0.37,
+                                            prezzata_dal_contratto: true }] });
   const attese = ["breadth", "momentum", "froth", "fedwatch", "liquidity"];
   return attese.every(k => {
     const f = (FORMA_INDICATORE[k] || (() => null))(m);
@@ -3131,18 +3141,44 @@ check("v333 dueBarre: scala condivisa e soglia disegnata dove esiste", suVeri(`
   return f.g.includes("stroke-dasharray") && f.g.includes("allarme")
       && (f.g.split("<rect ").length - 1) >= 2`));
 
-check("v333 fedwatch: una barra per riunione, coi tre esiti che sommano a 100", suVeri(`
-  const f = (DATA.macro || {}).fedwatch;
-  if (!f || !(f.meetings || []).length) return true;
-  const forma = FORMA_INDICATORE["fedwatch"](DATA.macro || {});
-  const r = f.meetings[0];
-  const tot = (Number(r.cut_prob) || 0) + (Number(r.hold_prob) || 0) + (Number(r.hike_prob) || 0);
-  /* i tre esiti sono esaustivi: se non sommano a 100 la barra impilata mentirebbe sulla larghezza */
-  const nudo = forma.n.replace(/<[^>]*>/g, "");
-  return Math.abs(tot - 100) <= 2
-      && nudo.includes(Math.round(Number(r.hike_prob) || 0) + "% rialzo")
-      && nudo.includes(Math.round(Number(r.hold_prob) || 0) + "% fermo")
-      && !/Come si legge/.test(forma.n)`));   // il CEO: "non inserire testo guida"
+/* ⚠⚠ v443 — IL CHECK PINNAVA UNO STATO CHE LA v441 HA RESO OPZIONALE. Pretendeva che la prima
+   riunione avesse SEMPRE i tre esiti a somma 100, e li leggeva dai dati del giorno: quando il
+   contratto ha smesso di prezzare quella riunione — che e' il comportamento corretto, il
+   front-month prezza solo il proprio mese — e' andato rosso su codice giusto (v429, v431).
+   ⚠ E riscrivendolo e' venuto fuori il difetto vero, che nessun gate della v441 vedeva: la
+   scheda coerceva i null a ZERO e disegnava una barra vuota, cioe' "il mercato non prezza
+   nessun movimento" al posto di "questo strumento non lo misura" — classe C14, e la stessa
+   correzione applicata al pacchetto e non alla pagina (v412).
+   Ora lo stato si COSTRUISCE nei due versi, e il check misura la PROPRIETA': prezzata -> i tre
+   esiti sommano a 100 e la barra esiste; non prezzata -> nessuna barra e la riga lo dichiara. */
+check("v333 fedwatch: prezzata -> tre esiti a somma 100; non prezzata -> lo dichiara", suVeriEsito(`
+  const macro = DATA.macro || {};
+  const base = { target_range: "3,50-3,75%", implied_rate: 3.79, next_fomc: "2026-09-16" };
+  const guai = [];
+  /* ramo A: la riunione E' prezzata dal contratto */
+  macro.fedwatch = Object.assign({}, base, { meetings: [
+    { date: "2026-09-16", cut_prob: null, hike_prob: 37, hold_prob: 63, mosse_25bp: 0.37, prezzata_dal_contratto: true },
+    { date: "2026-10-28", cut_prob: null, hike_prob: null, hold_prob: null, mosse_25bp: null, prezzata_dal_contratto: false } ] });
+  const a = FORMA_INDICATORE["fedwatch"](macro);
+  if (!a || !a.g) guai.push("prezzata: la scheda non rende niente");
+  else {
+    const nudo = String(a.n).replace(/<[^>]*>/g, "");
+    if (nudo.indexOf("37% rialzo") < 0) guai.push("prezzata: il rialzo non compare nella riga");
+    if (nudo.indexOf("63% fermo") < 0) guai.push("prezzata: il fermo non compare nella riga");
+    if (/Come si legge/.test(a.n)) guai.push("e' tornato il testo guida che il CEO ha chiesto di togliere");
+    /* la riunione NON prezzata non deve prendere una barra: sarebbe uno zero inventato */
+    if (String(a.g).indexOf("28/10") >= 0) guai.push("la riunione non prezzata prende comunque una barra");
+  }
+  /* ramo B: NESSUNA riunione e' prezzata */
+  macro.fedwatch = Object.assign({}, base, { meetings: [
+    { date: "2026-09-16", cut_prob: null, hike_prob: null, hold_prob: null, mosse_25bp: null, prezzata_dal_contratto: false } ] });
+  const b = FORMA_INDICATORE["fedwatch"](macro);
+  if (!b) guai.push("non prezzata: la scheda sparisce invece di dichiarare il buco");
+  else {
+    if (String(b.g).indexOf("prezza") < 0) guai.push("non prezzata: la scheda non dichiara perche' non c'e' niente da disegnare");
+    if (String(b.g).indexOf("rect") >= 0) guai.push("non prezzata: disegna comunque una barra, cioe' uno zero che nessuno ha misurato");
+  }
+  return guai.length ? guai.join(" · ") : true;`));
 
 check("v333 liquidita': porta la data della RILEVAZIONE, non quella del payload", suVeri(`
   const l = (DATA.macro || {}).liquidity_split;
@@ -8238,7 +8274,11 @@ check("v418 il taglio non perde nessun fatto: il drawdown dal massimo resta pubb
     .find(x => String(x.ticker).toUpperCase() === "CRWV");
   if (!r || !isFinite(Number(r.w52_dist_pct))) return "w52_dist_pct assente: il check non misura niente";
   const p = buildPromptTicker("CRWV");
-  const atteso = Math.abs(Math.round(Number(r.w52_dist_pct) * 10) / 10).toFixed(1).replace(".", ",");
+  /* ⚠ v443 — stessa forma: l'arrotondamento a una cifra fissa pretende lo zero finale, e il valore di CRWV e' caduto
+     su -38,0 esatto mentre il pacchetto — correttamente — scrive "-38%". Il numero atteso si
+     costruisce con la STESSA convenzione del pacchetto, non con una propria. */
+  const _v = Math.abs(Math.round(Number(r.w52_dist_pct) * 10) / 10);
+  const atteso = (Number.isInteger(_v) ? String(_v) : String(_v).replace(".", ","));
   const i = p.indexOf("- Massimo 52 settimane");
   if (i < 0) return "la riga del massimo a 52 settimane non compare";
   const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
@@ -9178,7 +9218,13 @@ check("v431 la data dell'etichetta del VIX viene dal dato, non dall'orologio", s
 check("v432 la quota dell'azionario sul patrimonio e' calcolata in una valuta sola", suVeriEsito(`
   const NL = String.fromCharCode(10);
   const riga = () => (buildCIOText().split(NL).find(r => r.indexOf("Pesi sul solo comparto AZIONARIO") === 0) || "");
-  const quota = () => { const m = riga().match(/azionario vale (?:l'|il )([0-9]+,[0-9])% del totale/); return m ? Number(m[1].replace(",", ".")) : null; };
+  /* ⚠ v443 — LA SONDA PRETENDEVA UNA CIFRA DECIMALE. Il 09/09 la quota e' caduta su un intero
+     esatto (84%), il formattatore unico ha giustamente lasciato cadere lo zero, e il check e'
+     andato rosso su codice corretto. E' lo SPECCHIO del difetto della v442, che si era visto il
+     giorno in cui il peso di MU era caduto su un intero: la stessa coincidenza dei dati, dall'
+     altro lato. Un check che dipende da quante cifre ha il numero di oggi non misura una
+     proprieta' (v429, v435). */
+  const quota = () => { const m = riga().match(/azionario vale (?:l'|il )([0-9]+(?:,[0-9])?)% del totale/); return m ? Number(m[1].replace(",", ".")) : null; };
   const guai = [];
   /* ⚠⚠ LO STATO PATRIMONIALE SI COSTRUISCE: la suite gira con STATO_PTF nullo, quindi la
      funzione che somma cassa e titoli di Stato torna null e il codice prende l'altro ramo —

@@ -1411,6 +1411,27 @@ check("v441 il blocco FedWatch e' agganciato a movimenti_impliciti_fomc, non sol
       "movimenti_impliciti_fomc(implied, effr_corrente" in _cod_fw
       and "quarti = (mid - implied)" not in _cod_fw)
 
+# ══ v443 — IL COLLEGAMENTO ERA ROTTO DALL'ORDINE DI SCRITTURA, e i sei gate della v441 non
+#    potevano vederlo. `effr_corrente` veniva letto da `macro["fed_market"]["current_rate"]`,
+#    ma quella chiave viene scritta MILLE RIGHE PIU' SOTTO nello stesso file: qui non esiste
+#    ancora, quindi la lettura tornava SEMPRE None, `mov` era sempre None, e ogni riunione
+#    usciva "non prezzata" con tutti i campi a null. Il pacchetto restava giusto solo perche'
+#    `app.js` rifa' il conto da se' — cioe' il difetto era invisibile dove si guarda.
+#    E' la lezione v399 nella sua forma piu' pura: i gate provavano il CONTROLLO (la funzione
+#    chiamata a mano) e non il COLLEGAMENTO (da dove arriva il suo ingresso in produzione).
+# ⚠ La proprieta' e' generale e non nomina il difetto: ogni chiave di `macro` che il blocco
+#   FedWatch LEGGE dev'essere gia' stata scritta piu' sopra, oppure la lettura deve avere un
+#   ripiego che non dipende da `macro`. Vale anche per le letture che verranno dopo.
+_i_fw = _src.index('macro["fedwatch"] = {')
+_pre_fw = _src[:_i_fw]
+_blocco_effr = _pre_fw[_pre_fw.rindex("effr_corrente = None"):]
+_letture = set(__import__("re").findall(r'macro\.get\("([a-z_]+)"\)', _blocco_effr))
+_tardive = sorted(k for k in _letture
+                  if ('macro["%s"] = ' % k) in _src and _src.index('macro["%s"] = ' % k) > _i_fw)
+check("v443 il blocco FedWatch non dipende da una chiave che il file scrive dopo di lui"
+      + (" (tardive: %s)" % ", ".join(_tardive) if _tardive else ""),
+      not _tardive or "fred_series(\"FEDFUNDS\"" in _blocco_effr)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)
