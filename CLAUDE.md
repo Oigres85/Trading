@@ -265,7 +265,9 @@ nasce una PR **la si unisce** invece di lasciarla aperta.
 > fra la modifica e il push: ora quella finestra dà **direttamente sulla produzione**.
 > Attivarlo, una volta per macchina: `git config core.hooksPath .githooks`
 
-⚠ `main` riceve anche i commit del CI (`Aggiornamento dati …`, ~ogni 30 minuti): **prima di
+⚠ `main` riceve anche i commit del CI (`Aggiornamento dati …`, 14-15 volte al giorno nei
+feriali e 11 nei weekend — misurato in v437, NON "ogni 30 minuti" come diceva questa riga):
+**prima di
 ogni push** serve `git pull --rebase origin main`. Sui conflitti in `data/data.json` vince la
 versione remota fresca — i calcoli si rifanno al run successivo.
 
@@ -4532,3 +4534,61 @@ cache tolta → esce 2.
 misuravo l'uscita di `tail` e leggevo `exit=0` su tre gate che stavano correttamente uscendo 1.
 È la classe v400 nella sua forma più pura — *la misura calcola una cosa e l'etichetta ne dichiara
 un'altra* — commessa mentre validavo un gate scritto contro quella stessa classe.
+
+## 🕰️ v437 — IL CRON DI GITHUB NON È UN ORARIO, È UNA CODA: 99-263 MINUTI DI RITARDO
+
+Istruzione del CEO: *"Dovrebbe essere avulsa dai parametri orari del sistema … Dobbiamo cercare
+di uscire totalmente dal sistema di github"*. Misurato prima di proporre, ed è la misura che ha
+deciso il disegno — e che ha **corretto la diagnosi che avevo dato io il giorno prima**.
+
+Avevo scritto al CEO che *"GitHub salta o ritarda i cron schedulati sotto carico"*, con l'accento
+sul salta. Falso: sui 100 run schedulati dall'01/09 al 09/09 i run partono quasi tutti (11 su 11
+nei weekend, 14-15 su 16 nei feriali). **Partono ore dopo.**
+
+| cron (UTC) | ora italiana dichiarata | ritardo misurato | ora reale |
+|---|---|---|---|
+| 04:00 | 06:00 | +245 / +263 min | ~10:10 |
+| 08:00 | 10:00 | +219 / +238 min | ~13:40 |
+| 13:30 | 15:30 | +159 / +171 min | ~18:10 |
+| 15:00 | 17:00 | +122 / +146 min | ~19:05 |
+| 19:00 | 21:00 | +108 / +116 min | ~22:50 |
+| 21:00 | 22:00 |  +99 / +103 min | ~00:40 del giorno dopo |
+
+⚠⚠ **L'aggancio slot→run non è un'ipotesi, è forzato dalla causalità**: nei due giorni di weekend
+ci sono esattamente 11 slot e 11 run, e qualunque altro accoppiamento darebbe un run **prima** del
+proprio slot. È il modo per misurare un ritardo senza che GitHub dichiari quale cron ha sparato.
+
+⚠⚠ **E IL COMMENTO DEL WORKFLOW DICHIARAVA LE SEI ORE ITALIANE COME SE FOSSERO SERVITE.** Nessuna
+lo è mai stata. È la classe v240/v405 — *un'etichetta che afferma più del proprio dato* — dentro il
+nostro stesso repository, sopravvissuta perché nessun gate legge i `.yml` e perché un orario
+sbagliato **non si rompe**: i dati arrivano, solo dopo.
+
+⚠ **Il ritardo non si compensa spostando il cron indietro**: varia di 2,7 volte (99→263 minuti).
+Sottrarre una costante a una distribuzione sposta l'errore, non lo toglie — è la stessa ragione per
+cui in v210 la soglia dell'ingresso irraggiungibile è in ATR e non in percentuale.
+
+### La misura che ha deciso: sono due code diverse, e solo una è congesta
+Stesso workflow chiamato dall'esterno con `workflow_dispatch` il 09/09 alle 09:28:13 UTC → **run
+creato alle 09:28:19**, cioè ≤ 6 secondi, compresa la latenza della chiamata.
+
+> **Non serve spostare la pipeline fuori da GitHub: serve spostarne l'OROLOGIO.** Ed è anche
+> l'unico pezzo che può uscire subito a costo zero — `workflow_dispatch` era già attivo, quindi la
+> correzione non tocca una riga di codice eseguibile.
+
+I 12 cron **restano come rete di sicurezza, non come orario**: se lo scheduler esterno tace i dati
+arrivano lo stesso, in ritardo ma ci sono. *Un dato in ritardo è meglio di nessun dato; un orario
+dichiarato e falso no.* Ricetta, verifica e stato: **`memoria/OROLOGIO.md`**.
+
+⚠ **Non si spengono i cron mentre si accende lo scheduler esterno.** Se i dati smettessero di
+arrivare non si saprebbe quale delle due cose è stata — è la regola già pagata in v185 e v207
+(misurare un cambiamento contro dati rigenerati nel frattempo sporca il confronto).
+
+### «Uscire totalmente da GitHub»: il costo, contato invece che stimato
+`grep` sul codice: **8 file di `config/` scritti dal browser con la Contents API** (diario,
+override macro, testata del prompt, ordine sezioni, parametri di rischio, posizioni, watchlist,
+stato patrimoniale) e 7 letture da `raw.githubusercontent`. Pages serve `main`; le Issue sono il
+canale unico di allarme.
+
+> Spostare hosting e lettura dati è un **trasloco**. La persistenza è una **riscrittura**, e il
+> congelamento la vieta. «Uscire da GitHub» e «avere i dati all'ora giusta» sembravano la stessa
+> cosa e non lo sono: rotto era l'orologio, e quello esce gratis.

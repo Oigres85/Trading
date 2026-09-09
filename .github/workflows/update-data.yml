@@ -2,26 +2,43 @@ name: Aggiorna dati dashboard
 
 on:
   schedule:
-    # RADAR TATTICO — orari ITALIA richiesti: 06:00 · 10:00 · 15:30 · 17:00 · 21:00 · 22:00.
-    #   06:00 chiusura mercati asiatici · 10:00 sessione europea + futures USA · 15:30 · 17:00
-    #   assestamento post-apertura Wall Street · 21:00 preparazione Power Hour · 22:00.
-    # GitHub cron è in UTC: per far cadere questi orari LOCALI tutto l'anno includo sia CEST
-    # (estate, UTC+2) sia CET (inverno, UTC+1). L'eventuale run "extra" fuori stagione è
-    # innocuo (concurrency group + commit no-op se i dati non cambiano).
-    - cron: "0 4 * * *"     # 06:00 CEST
-    - cron: "0 5 * * *"     # 06:00 CET
-    - cron: "0 8 * * *"     # 10:00 CEST
-    - cron: "0 9 * * *"     # 10:00 CET
-    - cron: "30 13 * * *"   # 15:30 CEST
-    - cron: "30 14 * * *"   # 15:30 CET
-    - cron: "0 15 * * *"    # 17:00 CEST
-    - cron: "0 16 * * *"    # 17:00 CET
-    - cron: "0 19 * * *"    # 21:00 CEST
-    - cron: "0 20 * * *"    # 21:00 CET  /  22:00 CEST
-    - cron: "0 21 * * *"    # 22:00 CET
-    # RUN ORARIO durante la sessione USA (giorni feriali) per non perdere la freschezza di
-    # verdetto/technicals/macro mentre Wall Street è aperta. 13:00–22:00 UTC copre le
-    # 15:00–23:00 ITALIA sia in CEST (13–21 UTC) sia in CET (14–22 UTC).
+    # ⚠⚠ v437 — QUESTI ORARI NON SONO GLI ORARI IN CUI IL RUN PARTE, E NON LO SONO MAI STATI.
+    # Misurato sui 100 run schedulati dal 01/09 al 09/09/2026: GitHub fa partire OGNI cron in
+    # ritardo, sempre, da 99 a 263 minuti. L'aggancio slot->run e' forzato dalla causalita' sui
+    # due giorni di weekend (11 slot, 11 run, e qualunque altro accoppiamento darebbe un run
+    # PRIMA del proprio slot, che e' impossibile):
+    #   04:00 -> +245/+263 min    05:00 -> +220/+239    08:00 -> +219/+238    09:00 -> +193/+208
+    #   13:30 -> +159/+171        14:30 -> +144/+165    15:00 -> +122/+146    16:00 -> +116/+122
+    #   19:00 -> +108/+116        20:00 -> +116/+117    21:00 ->  +99/+103
+    #
+    # Le sei ore ITALIANE che questo blocco dichiarava di servire cadono in realta' cosi':
+    #   06:00 -> ~10:10     10:00 -> ~13:40     15:30 -> ~18:10
+    #   17:00 -> ~19:05     21:00 -> ~22:50     22:00 -> ~00:40 del giorno dopo
+    # Il ritardo VARIA di 2,7 volte, quindi non si compensa spostando il cron indietro: si
+    # sposterebbe una distribuzione trattandola come una costante.
+    #
+    # PER QUESTO L'OROLOGIO E' USCITO DA GITHUB. Lo scheduler vero chiama dall'esterno
+    # l'endpoint workflow_dispatch qui sotto — misurato il 09/09: run creato in <= 6 secondi,
+    # contro i 99-263 minuti del cron — in fuso Europe/Rome, quindi senza il doppione CEST/CET
+    # che vive in questo blocco. Ricetta, stato e verifica: memoria/OROLOGIO.md
+    #
+    # I CRON RESTANO COME RETE DI SICUREZZA, NON COME ORARIO: se lo scheduler esterno tace, i
+    # dati si aggiornano lo stesso, in ritardo ma ci sono. Un dato in ritardo e' meglio di
+    # nessun dato; un orario dichiarato e falso no, ed e' quello che questa versione ha tolto.
+    # Le etichette qui sotto dicono lo slot NOMINALE e, accanto, dove atterra davvero.
+    - cron: "0 4 * * *"     # nominale 06:00 CEST  -> reale ~10:10
+    - cron: "0 5 * * *"     # nominale 06:00 CET   -> reale ~10:10
+    - cron: "0 8 * * *"     # nominale 10:00 CEST  -> reale ~13:40
+    - cron: "0 9 * * *"     # nominale 10:00 CET   -> reale ~13:40
+    - cron: "30 13 * * *"   # nominale 15:30 CEST  -> reale ~18:10
+    - cron: "30 14 * * *"   # nominale 15:30 CET   -> reale ~18:10
+    - cron: "0 15 * * *"    # nominale 17:00 CEST  -> reale ~19:05
+    - cron: "0 16 * * *"    # nominale 17:00 CET   -> reale ~19:05
+    - cron: "0 19 * * *"    # nominale 21:00 CEST  -> reale ~22:50
+    - cron: "0 20 * * *"    # nominale 21:00 CET / 22:00 CEST
+    - cron: "0 21 * * *"    # nominale 22:00 CET   -> reale ~00:40
+    # Rete oraria durante la sessione USA (giorni feriali). Anche questa arriva in ritardo, ma
+    # essendo oraria il ritardo si traduce in copertura spostata, non in un buco.
     - cron: "0 13-22 * * 1-5"
   workflow_dispatch:
 
