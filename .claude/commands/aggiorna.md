@@ -63,7 +63,15 @@ leggerla, non dopo.
 
 ## PARTE 2 — I dati e i grafici
 
-6. `python3 scripts/rapporto.py` e `python3 scripts/scenari.py`.
+6. `python3 scripts/rapporto.py`, `python3 scripts/scenari.py` e
+   **`python3 scripts/conseguenze.py`** — quest'ultimo e' l'ARITMETICA DELLA SCELTA, aggiunto
+   su richiesta esplicita del CEO (09/09/2026): quante azioni servono per portare un nome a una
+   soglia dichiarata, l'effetto MISURATO di quella mossa sulla volatilita' e sulle scommesse
+   effettive ricalcolate dalla matrice vera, il conto fiscale al 26%, e il prezzo a cui la
+   stessa soglia si raggiunge senza operare.
+   ⚠ Non e' una raccomandazione e non aggira il confine: ogni numero e' DERIVATO dai dati del
+   libro. Cio' che il sistema non sa — altri conti e posizione fiscale pregressa — resta
+   dichiarato in testa al suo output invece di essere colmato da un'assunzione.
    Il rapporto porta, per ogni posizione: prezzo e carico, tecnica, **FONDAM.**, **SOLIDITA'**,
    **CONSENSO** e **TARGET**, **CASSA/DEBITO/CONTO**, **FLUSSO** (dark pool e non-ATS), **SHORT**,
    **CANALI** (beta col proprio R² verso mercato, settore, tassi, dollaro) e **STAGION.**

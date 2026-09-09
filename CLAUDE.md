@@ -4377,6 +4377,88 @@ sessione chiusa è *"ricavata dall'orologio"*.
 ⚠ Validato per iniezione rimettendo `vixFresco` sul run: morde. Ripristino da uno **snapshot
 preso prima**, mai da `git checkout` (v430).
 
+## ⚖️ v439 — IL CONFINE SPOSTATO, E LA MISURA CHE HA SMENTITO L'INTUIZIONE
+
+Istruzione del CEO, testuale: *"trova soluzioni per fornirmi anche queste informazioni"* —
+alleggerimenti, vendite, incrementi, dimensionamento. La soluzione non è stata togliere il
+confine: è stata **accorgersi di dov'era davvero**.
+
+La ragione scritta in `DECISIONI.md` non era *"i numeri sulle quantità sono vietati"*: era che
+**senza liquidità, altri conti e situazione fiscale una quantità è un'invenzione travestita da
+misura**. Due dei tre buchi si sono chiusi da soli — la liquidità l'ha confermata il CEO
+(10.000 € l'08/09), l'aliquota italiana al 26% è un fatto pubblico — e il terzo impedisce di
+dire *quale* mossa fare, non di calcolare **cosa comporta** una mossa.
+
+> **Quello che manca impedisce di scegliere. Non impedisce di fare l'aritmetica.** E
+> l'aritmetica era esattamente il lavoro che il CEO faceva a mano dopo aver letto l'analisi.
+
+`scripts/conseguenze.py`: azioni da spostare per raggiungere una soglia dichiarata, effetto
+misurato sul libro **ricalcolato dalla matrice vera** (`sqrt(w' S w)`, mai la volatilità
+pubblicata scalata a occhio — sarebbe plausibile e sbagliata, classe v391), conto fiscale, e il
+prezzo a cui la soglia si raggiunge **senza operare**.
+
+### ⚠⚠ E AL PRIMO GIRO HA SMENTITO L'INTUIZIONE, che è la ragione per cui va calcolata
+Portare NVDA dal 20% al 15% **ALZA** la volatilità del libro da 49,3% a 50,8%. NVDA ha
+volatilità 39% contro l'87% di MU: dentro questo libro fa da **zavorra**, e ridurla concentra il
+resto. *Alleggerire la seconda posizione più grande peggiora il rischio.* Chi si fosse fidato del
+ragionamento invece del ricalcolo avrebbe fatto l'opposto di ciò che voleva — ed è la stessa
+famiglia delle scommesse effettive cieche ai pesi, nella riga il cui compito era isolare i pesi.
+
+⚠ **Il divieto che resta**: presentare un'aritmetica come la quantità *giusta*, e colmare in
+silenzio i due buchi rimasti. Se una conclusione dipende dagli altri conti o dalle minusvalenze
+pregresse, quel pezzo **non viene da qui** e va chiesto, non assunto.
+
+⚠ **E ho introdotto io un denominatore doppio scrivendolo**: il tool pubblicava le prime tre al
+**60,9%** (i 12 nomi della matrice) mentre la disciplina del pacchetto le pubblica al **59,2%**
+(tutti e 13, SKHY compreso). Stessa regola, due insiemi. Ora il denominatore si **nomina nella
+riga**, che è la correzione già scelta in v414 sulla quota di cash istituzionale.
+
+## 🧾 v439 — TRE DIFETTI ANNOTATI IERI, CORRETTI OGGI SU RICHIESTA DEL CEO
+
+Erano stati messi da parte come cosmetici sotto congelamento. Il CEO ha chiesto di correggerli,
+e uno dei tre **non era cosmetico**.
+
+| difetto | cosa era vero |
+|---|---|
+| **il BTP valorizzato al CARICO** | `fuoriAzionarioEur` faceva `qty × pmc / 100` dentro un totale in cui l'azionario è a mercato — e quel totale produce la **quota azionaria**, cioè il moltiplicatore con cui VaR, ES, drawdown e contributo al rischio passano al patrimonio. 40.000 € contro 40.908 €, quota 84,29% invece di 84,05% |
+| **`riconciliazione.py` col rimedio sbagliato** | usciva 2 dicendo *"rigenera la raccolta"*; rigenerata, nulla cambiava — la causa era la barra di OGGI in formazione, e a mercato aperto i due strati **non possono** coincidere |
+| **`portfolio_state.json`** | portava un blocco `holdings` con RGTI a 595 quote contro 463 e NVDA a pmc 81,167 (che il CEO ha confermato sbagliato l'08/09), **letto da nessuno** |
+
+⚠⚠ **Il primo era una convenzione doppia dentro una somma sola**, ed è la classe v161/v207: la
+convenzione `nominale × prezzo / 100` esisteva **già** in `valorePosizioni()`, che però legge
+`r.price`. Due derivazioni della stessa grandezza e **una sola era a mercato**. Il carico resta
+il ripiego, ora **dichiarato** — perché senza la riga della pipeline il BTP non può sparire dal
+denominatore: il patrimonio si rimpicciolirebbe da solo e ogni percentuale di rischio si
+gonfierebbe.
+
+⚠ **Il secondo è la classe v391 applicata a un gate**: *un messaggio che descrive il fallimento
+sbagliato manda a rifare un'operazione già fatta*. Ora `barra_in_formazione()` legge la campana
+dal **fuso** (`America/New_York`, che sa da sé dell'ora legale) invece che da un offset scritto a
+mano (v240), e le due cause hanno due messaggi. ⚠ Le festività USA restano ignote: in un giorno
+di chiusura la funzione risponde "in formazione" fino alle 16:00, che è il **verso prudente** —
+dichiara non misurabile invece di annunciare divergenze che sarebbero il movimento del mercato.
+
+⚠ **Il terzo era una seconda copia del libro che invecchiava da sola.** La ricevuta è stata
+scritta prima del taglio, chiave per chiave: `cash` e `btp` hanno consumatori in due file,
+`holdings` **zero**. Nessun vicino da portare via — è un oggetto JSON, non un blocco di codice.
+
+### 🦴 Trentaduesima rottura di un check ancorato a una stringa letterale, e aveva torto
+Il gate *"le posizioni vengono da posizioni.json"* pretendeva che `data.json` **non comparisse
+mai** nel sorgente, ed è andato rosso quando `stato_patrimoniale` ha cominciato a leggere da lì
+il **prezzo del BTP** — che non è una posizione. L'invariante scritto nel suo stesso commento è
+più stretto e più vero: le POSIZIONI non devono venire dalla pipeline, così che se la pipeline
+muore l'analisi continui a dire la verità. Ora si guarda il **corpo della funzione** che le
+legge, e un secondo check pretende che **ogni** lettura della pipeline abbia il proprio ripiego.
+
+⚠ Tutti e quattro i gate nuovi validati **per iniezione**, con `modifica_sicura` anche per le
+iniezioni e ripristino da uno snapshot preso **prima**, mai da `git checkout` (v430): mordono
+tutti e quattro. E lo stato si **costruisce** invece di aspettarlo — l'ora si inietta, così il
+check dei fusi non dipende da quando gira (v402), e il prezzo del BTP si inietta a 110, così il
+check non è verde per coincidenza se il mercato lo porta a 100 (v233, v349, v431).
+
+⚠ **Pavimento della suite alzato 90 → 105** (`test_analisi_libro.py` è a 114). I pavimenti
+salgono quando la suite cresce.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

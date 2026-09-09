@@ -49,8 +49,25 @@ def stato_patrimoniale():
         return None
     cassa = (s.get("cash") or {}).get("v")
     bv = (s.get("btp") or {}).get("v") or {}
-    btp = (bv.get("qty") or 0) * (bv.get("pmc") or 0) / 100 or None
-    return {"cassa": cassa, "btp": btp, "cassa_al": (s.get("cash") or {}).get("at")}
+    # ⚠⚠ v439 — IL BTP AL PREZZO DI MERCATO, NON AL CARICO. Questa riga usava `pmc` e finiva
+    # dentro un totale in cui l'azionario e' a mercato: due convenzioni in una somma sola, e
+    # quella somma e' il denominatore con cui ogni misura di rischio passa al patrimonio.
+    # Il carico resta il ripiego, DICHIARATO in `btp_base`, per quando la pipeline non
+    # pubblica la riga. Stessa correzione di `fuoriAzionarioEur` in assets/app.js.
+    prezzo, base = None, "prezzo di carico (la pipeline non pubblica la riga)"
+    try:
+        dd = json.loads((ROOT / "data" / "data.json").read_text(encoding="utf-8"))
+        for r in (dd.get("portfolio") or []):
+            if str(r.get("ticker") or "").startswith("BTP"):
+                p = r.get("price")
+                if isinstance(p, (int, float)) and p > 0:
+                    prezzo, base = float(p), "prezzo di mercato"
+                break
+    except Exception:
+        pass
+    btp = (bv.get("qty") or 0) * (prezzo if prezzo else (bv.get("pmc") or 0)) / 100 or None
+    return {"cassa": cassa, "btp": btp, "btp_base": base,
+            "cassa_al": (s.get("cash") or {}).get("at")}
 
 
 def misura(tickers, prezzi, pesi, bench="^NDX"):

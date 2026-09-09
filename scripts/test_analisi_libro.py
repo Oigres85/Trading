@@ -215,8 +215,31 @@ check("nessuna mappa selettore→titolo scritta a mano dentro il raccoglitore",
 
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
+# ⚠⚠ v439 — TRENTADUESIMA ROTTURA DI UN CHECK ANCORATO A UNA STRINGA LETTERALE, e aveva
+#   torto: pretendeva che "data.json" non comparisse MAI nel sorgente, ed e' andato rosso
+#   quando `stato_patrimoniale` ha cominciato a leggere da li' il PREZZO del BTP — che non e'
+#   una posizione. L'invariante scritto nel commento qui sopra e in DECISIONI.md e' piu'
+#   stretto e piu' vero: le POSIZIONI non devono venire dalla pipeline, cosi' che se la
+#   pipeline muore l'analisi continui a dire la verita'. Ora si guarda il CORPO della funzione
+#   che le legge, e si pretende che ogni lettura della pipeline abbia il proprio ripiego.
+def _corpo_di(sorgente, nome):
+    """Il corpo di una funzione di primo livello, fino alla prossima a colonna zero."""
+    i = sorgente.find(f"def {nome}(")
+    assert i >= 0, f"funzione {nome} non trovata"
+    resto = sorgente[i:]
+    j = resto.find("\ndef ", 1)
+    return resto[:j] if j > 0 else resto
+
+_corpo_pos = _corpo_di(src, "carica_posizioni")
 check("le posizioni vengono da config/posizioni.json, non da data/data.json",
-      "config\" / \"posizioni.json" in src and "data.json" not in src)
+      "config\" / \"posizioni.json" in src and "data.json" not in _corpo_pos)
+# ⚠ e una lettura della pipeline che NON ha ripiego reintrodurrebbe la dipendenza dall'altra
+#   porta: se data.json manca, lo script deve degradare dichiarando, non fallire (v203).
+_letture_pipe = [n for n in ("carica_posizioni", "stato_patrimoniale")
+                 if "data.json" in _corpo_di(src, n)]
+check("ogni lettura della pipeline in analisi_libro.py porta il proprio ripiego dichiarato",
+      all("except" in _corpo_di(src, n) for n in _letture_pipe),
+      extra=f"funzioni che leggono la pipeline: {_letture_pipe or 'nessuna'}")
 check("la soglia di esclusione e' dichiarata come costante, non sparsa nel codice",
       "MIN_SEDUTE = " in src and src.count("MIN_SEDUTE") >= 2)
 # ⚠ yfinance e' la dipendenza unica di questa strada e oggi ha restituito colonne vuote su due
@@ -523,6 +546,77 @@ check("il comando chiede il campione REALE dei backtest, non le osservazioni sov
       "campione REALE" in _cmd and "5 titoli distinti" in _cmd)
 check("il comando impone R² accanto al beta: un canale sotto 0,05 non si racconta",
       "R²" in _cmd and "0,05" in _cmd)
+
+
+# ═══ v439 — LE TRE CORREZIONI DEL GIRO DEL 09/09 ═════════════════════════════════════════
+# ⚠ Tutti e tre COSTRUISCONO lo stato che misurano invece di aspettarlo dai dati del giorno:
+#   un check che vale finche' i dati lo concedono va rosso da solo (v429, v431, v435).
+
+# --- 1. il BTP si valorizza a MERCATO, non al carico ---
+# La quota azionaria e' il MOLTIPLICATORE con cui ogni misura di rischio passa al patrimonio:
+# se il BTP entra al costo dentro un totale che e' a mercato, quel moltiplicatore mescola due
+# convenzioni. L'invariante non e' un numero, e' che il prezzo VINCA sul carico quando c'e'.
+import json as _json
+_ROOT = Path(__file__).resolve().parent.parent
+_orig_stato = (_ROOT / "config" / "portfolio_state.json").read_text(encoding="utf-8")
+_orig_dati = (_ROOT / "data" / "data.json").read_text(encoding="utf-8")
+try:
+    _st = {"cash": {"v": 1000, "at": "x"}, "btp": {"v": {"qty": 40000, "pmc": 100}, "at": ""}}
+    (_ROOT / "config" / "portfolio_state.json").write_text(_json.dumps(_st), encoding="utf-8")
+    _dd = _json.loads(_orig_dati)
+    _dd["portfolio"] = [{"ticker": "BTP-V28", "price": 110.0, "qty": 40000}]
+    (_ROOT / "data" / "data.json").write_text(_json.dumps(_dd), encoding="utf-8")
+    import importlib as _il; _il.reload(A)
+    _sp = A.stato_patrimoniale()
+    check("v439 il BTP entra al PREZZO di mercato, non al carico",
+          _sp and abs(_sp["btp"] - 44000.0) < 0.01 and _sp.get("btp_base") == "prezzo di mercato",
+          extra=f"ottenuto {_sp}")
+    # ⚠ e il ripiego sul carico deve restare, DICHIARATO: senza riga di pipeline il BTP non
+    #   puo' sparire dal denominatore — sarebbe un patrimonio piu' piccolo del vero.
+    _dd["portfolio"] = []
+    (_ROOT / "data" / "data.json").write_text(_json.dumps(_dd), encoding="utf-8")
+    _il.reload(A)
+    _sp2 = A.stato_patrimoniale()
+    check("v439 senza la riga della pipeline si ripiega sul carico E lo dichiara",
+          _sp2 and abs(_sp2["btp"] - 40000.0) < 0.01 and "carico" in (_sp2.get("btp_base") or ""),
+          extra=f"ottenuto {_sp2}")
+finally:
+    (_ROOT / "config" / "portfolio_state.json").write_text(_orig_stato, encoding="utf-8")
+    (_ROOT / "data" / "data.json").write_text(_orig_dati, encoding="utf-8")
+    import importlib as _il2; _il2.reload(A)
+
+# --- 2. portfolio_state.json non ospita una seconda copia del libro ---
+# Le posizioni vivono in config/posizioni.json e in memoria/LIBRO.md. Una copia in piu' non si
+# rompe: invecchia in silenzio, ed e' come RGTI ci e' rimasta a 595 quote contro 463.
+_stato_chiavi = set(_json.loads(_orig_stato))
+check("v439 portfolio_state.json porta solo cassa e BTP, non una copia delle posizioni",
+      "holdings" not in _stato_chiavi and {"cash", "btp"} <= _stato_chiavi,
+      extra=f"chiavi trovate: {sorted(_stato_chiavi)}")
+
+# --- 3. riconciliazione: la barra in formazione non e' una cache vecchia ---
+# ⚠ Le due cause hanno rimedi diversi e uno dei due NON ESISTE: a mercato aperto rigenerare la
+#   raccolta e' lavoro sprecato. L'ora si INIETTA, cosi' il check non dipende da quando gira
+#   (v402: un ramo temporale che nessun test puo' esercitare non e' una protezione).
+sys.path.insert(0, str(_ROOT / "scripts"))
+import riconciliazione as _ric
+from datetime import datetime as _dt, timezone as _tz
+_aperto = _dt(2026, 9, 9, 17, 30, tzinfo=_tz.utc)    # 13:30 ET, campana non suonata
+_chiuso = _dt(2026, 9, 9, 21, 30, tzinfo=_tz.utc)    # 17:30 ET, seduta finita
+check("v439 a sessione aperta la barra di oggi risulta IN FORMAZIONE",
+      _ric.barra_in_formazione("2026-09-09", _aperto) is True)
+check("v439 a sessione chiusa la stessa barra risulta CHIUSA",
+      _ric.barra_in_formazione("2026-09-09", _chiuso) is False)
+check("v439 una seduta che non e' oggi e' sempre chiusa, a qualunque ora",
+      _ric.barra_in_formazione("2026-09-08", _aperto) is False
+      and _ric.barra_in_formazione("2026-09-08", _chiuso) is False)
+# ⚠ il COLLEGAMENTO, non solo il controllo: togliendo la riga che aggancia la funzione al
+#   messaggio i tre check qui sopra restano verdi e il gate torna a dare il rimedio sbagliato
+#   (lezione v399 — il check provava il controllo, non il collegamento).
+_src_ric = (_ROOT / "scripts" / "riconciliazione.py").read_text(encoding="utf-8")
+_corpo_ric = "\n".join(l for l in _src_ric.splitlines() if not l.lstrip().startswith("#"))
+check("v439 il messaggio del gate e' agganciato a barra_in_formazione, non solo definito",
+      "barra_in_formazione(seduta_pipe)" in _corpo_ric
+      and "IN FORMAZIONE" in _corpo_ric and "cache della raccolta e' indietro" in _corpo_ric)
 
 
 _T = len(ESEGUITI)

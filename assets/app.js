@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "438";
+const BUILD_VERSION = "439";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -488,10 +488,29 @@ function fuoriAzionarioEur() {
   const st = STATO_PTF;
   if (!st) return null;
   const cassa = numero((st.cash || {}).v);
-  const btp = st.btp && st.btp.v ? numero(st.btp.v.qty) * numero(st.btp.v.pmc) / 100 : null;
+  /* ⚠⚠ v439 — IL BTP SI VALORIZZA AL PREZZO DI MERCATO, NON AL CARICO. Questa riga faceva
+     `qty * pmc / 100`, cioe' il COSTO, e finiva dentro un totale in cui l'azionario e' a
+     mercato: due convenzioni di valorizzazione dentro una somma sola, ed e' quella somma a
+     produrre la quota azionaria, cioe' il MOLTIPLICATORE con cui ogni misura di rischio passa
+     dall'azionario al patrimonio. Misurato il 09/09: 40.000 € al carico contro 40.908 € a
+     mercato (BTP-V28 a 102,27), quota 84,29% contro 84,05%.
+     ⚠ La convenzione `nominale x prezzo / 100` esisteva GIA' in valorePosizioni(), che pero'
+     legge `r.price`: erano due derivazioni della stessa grandezza e solo una era a mercato
+     (classe v161/v207). Ora anche questa parte dal prezzo, e il carico resta il ripiego
+     DICHIARATO per quando la pipeline non pubblica la riga. */
+  const _rigaBtp = (DATA && Array.isArray(DATA.portfolio) ? DATA.portfolio : [])
+    .find(r => String((r || {}).ticker || "").startsWith("BTP"));
+  const _pBtp = numero(_rigaBtp && (_rigaBtp.price ?? _rigaBtp.prezzo));
+  const _aMercato = Number.isFinite(_pBtp) && _pBtp > 0;
+  const _qBtp = st.btp && st.btp.v ? numero(st.btp.v.qty) : null;
+  const btp = Number.isFinite(_qBtp)
+    ? _qBtp * (_aMercato ? _pBtp : numero(st.btp.v.pmc)) / 100
+    : null;
   const voci = [];
   if (Number.isFinite(cassa) && cassa > 0) voci.push({ che: "liquidita'", eur: cassa, al: (st.cash || {}).at || null });
-  if (Number.isFinite(btp) && btp > 0) voci.push({ che: "titoli di Stato", eur: btp, al: (st.btp || {}).at || null });
+  if (Number.isFinite(btp) && btp > 0) voci.push({
+    che: "titoli di Stato", eur: btp, al: (st.btp || {}).at || null,
+    base: _aMercato ? "prezzo di mercato" : "prezzo di carico (la pipeline non pubblica la riga)" });
   if (!voci.length) return null;
   return { voci, totale: voci.reduce((a2, x) => a2 + x.eur, 0) };
 }

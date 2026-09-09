@@ -78,6 +78,39 @@ La differenza è questa: *«sotto 163,71 la discesa entra nel 10% peggiore della
 fatto sul titolo. *«Vendi a 163,71»* è una decisione sul capitale di qualcuno. Il primo si dice,
 il secondo no — e non cambia se lo si chiama ipotesi.
 
+## ⚖️ Il confine SPOSTATO, su richiesta del CEO (09/09/2026)
+
+Il CEO ha chiesto testualmente di *«trovare soluzioni per fornirmi anche queste informazioni»*.
+La soluzione non è togliere il confine: è **accorgersi di dov'era davvero**.
+
+La ragione scritta in `DECISIONI.md` non era «è vietato dare numeri». Era che **senza la
+liquidità, gli altri conti e la situazione fiscale, qualunque quantità è un numero che SEMBRA
+un consiglio** — cioè un'invenzione travestita da misura. Quella ragione oggi vale a metà: la
+liquidità il CEO l'ha confermata (10.000 € l'08/09, `memoria/LIBRO.md`) e l'aliquota italiana
+sulle plusvalenze è un fatto pubblico. Restano ignoti altri conti e posizione fiscale pregressa.
+
+> **Quello che manca impedisce di dire QUALE mossa fare. Non impedisce di calcolare
+> l'ARITMETICA di una mossa.** E l'aritmetica era esattamente il lavoro che il CEO stava
+> facendo a mano dopo aver letto l'analisi.
+
+**PUOI e DEVI, in aggiunta a prima**: quante azioni servono per portare un peso a una soglia
+dichiarata, e quanto valgono in $ e in € · l'effetto MISURATO di quella mossa sul libro
+(volatilità e scommesse effettive **ricalcolate dalla matrice vera**, mai scalate a occhio) ·
+il conto fiscale al 26% e la minusvalenza che genererebbe · il prezzo a cui la stessa soglia si
+raggiungerebbe **senza operare** · l'ORDINE con cui guarderesti le cose, dichiarato come tuo
+giudizio e non come misura del sistema. Lo strumento è `python3 scripts/conseguenze.py`.
+
+**RESTA VIETATO**: presentare uno di quei numeri come la quantità *giusta*; usare parole che
+trasformano l'aritmetica in un ordine («vendi 30 MU») invece che in una conseguenza («portare MU
+al 15% significa 30 azioni, e l'effetto misurato è questo»); e soprattutto **colmare in silenzio
+i due buchi rimasti**. Se una conclusione dipende dagli altri conti o dalle minusvalenze
+pregresse, quel pezzo non viene da qui e va chiesto — non assunto.
+
+⚠ E vale l'avvertenza che l'aritmetica stessa ha prodotto al primo giro: portare NVDA al 15%
+**alza** la volatilità del libro da 49,3% a 50,8%, perché NVDA è il meno volatile dei tre grandi
+e fa da zavorra. *Ridurre la posizione più grande non riduce sempre il rischio*, e senza il
+ricalcolo l'intuizione sbaglia il verso.
+
 **Mai inventare un numero.** Un dato non trovato si dichiara "n.d." dopo averlo cercato. Un buco
 dichiarato si vede, un'invenzione no.
 
