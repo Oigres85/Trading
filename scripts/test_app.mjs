@@ -3087,6 +3087,16 @@ check("v333 forme: le cinque schede rifatte disegnano barre a confronto, non sca
   m.liquidity_split = Object.assign({ retail_mmf_bln: 3000, retail_yoy_pct: 6.2,
                                       retail_date: "2026-07-01" },
                                     m.liquidity_split || {}, { inst_cash_pct: 7.7 });
+  /* ⚠ v443 — e la stessa cosa per FedWatch, per la stessa ragione: dalla v441 una riunione che
+     il front-month NON prezza non riceve piu' una barra a zero — correttamente — quindi con uno
+     snapshot in cui nessuna riunione e' prezzata la scheda dichiara il buco invece di disegnare,
+     e questo check andava rosso su codice giusto. Lo stato in cui LE BARRE devono esistere si
+     costruisce, invece di aspettare che i dati del giorno lo concedano. */
+  m.fedwatch = Object.assign({ target_range: "3,50-3,75%", implied_rate: 3.79 },
+                             m.fedwatch || {},
+                             { meetings: [{ date: "2026-09-16", cut_prob: null, hike_prob: 37,
+                                            hold_prob: 63, mosse_25bp: 0.37,
+                                            prezzata_dal_contratto: true }] });
   const attese = ["breadth", "momentum", "froth", "fedwatch", "liquidity"];
   return attese.every(k => {
     const f = (FORMA_INDICATORE[k] || (() => null))(m);
@@ -3131,18 +3141,44 @@ check("v333 dueBarre: scala condivisa e soglia disegnata dove esiste", suVeri(`
   return f.g.includes("stroke-dasharray") && f.g.includes("allarme")
       && (f.g.split("<rect ").length - 1) >= 2`));
 
-check("v333 fedwatch: una barra per riunione, coi tre esiti che sommano a 100", suVeri(`
-  const f = (DATA.macro || {}).fedwatch;
-  if (!f || !(f.meetings || []).length) return true;
-  const forma = FORMA_INDICATORE["fedwatch"](DATA.macro || {});
-  const r = f.meetings[0];
-  const tot = (Number(r.cut_prob) || 0) + (Number(r.hold_prob) || 0) + (Number(r.hike_prob) || 0);
-  /* i tre esiti sono esaustivi: se non sommano a 100 la barra impilata mentirebbe sulla larghezza */
-  const nudo = forma.n.replace(/<[^>]*>/g, "");
-  return Math.abs(tot - 100) <= 2
-      && nudo.includes(Math.round(Number(r.hike_prob) || 0) + "% rialzo")
-      && nudo.includes(Math.round(Number(r.hold_prob) || 0) + "% fermo")
-      && !/Come si legge/.test(forma.n)`));   // il CEO: "non inserire testo guida"
+/* ⚠⚠ v443 — IL CHECK PINNAVA UNO STATO CHE LA v441 HA RESO OPZIONALE. Pretendeva che la prima
+   riunione avesse SEMPRE i tre esiti a somma 100, e li leggeva dai dati del giorno: quando il
+   contratto ha smesso di prezzare quella riunione — che e' il comportamento corretto, il
+   front-month prezza solo il proprio mese — e' andato rosso su codice giusto (v429, v431).
+   ⚠ E riscrivendolo e' venuto fuori il difetto vero, che nessun gate della v441 vedeva: la
+   scheda coerceva i null a ZERO e disegnava una barra vuota, cioe' "il mercato non prezza
+   nessun movimento" al posto di "questo strumento non lo misura" — classe C14, e la stessa
+   correzione applicata al pacchetto e non alla pagina (v412).
+   Ora lo stato si COSTRUISCE nei due versi, e il check misura la PROPRIETA': prezzata -> i tre
+   esiti sommano a 100 e la barra esiste; non prezzata -> nessuna barra e la riga lo dichiara. */
+check("v333 fedwatch: prezzata -> tre esiti a somma 100; non prezzata -> lo dichiara", suVeriEsito(`
+  const macro = DATA.macro || {};
+  const base = { target_range: "3,50-3,75%", implied_rate: 3.79, next_fomc: "2026-09-16" };
+  const guai = [];
+  /* ramo A: la riunione E' prezzata dal contratto */
+  macro.fedwatch = Object.assign({}, base, { meetings: [
+    { date: "2026-09-16", cut_prob: null, hike_prob: 37, hold_prob: 63, mosse_25bp: 0.37, prezzata_dal_contratto: true },
+    { date: "2026-10-28", cut_prob: null, hike_prob: null, hold_prob: null, mosse_25bp: null, prezzata_dal_contratto: false } ] });
+  const a = FORMA_INDICATORE["fedwatch"](macro);
+  if (!a || !a.g) guai.push("prezzata: la scheda non rende niente");
+  else {
+    const nudo = String(a.n).replace(/<[^>]*>/g, "");
+    if (nudo.indexOf("37% rialzo") < 0) guai.push("prezzata: il rialzo non compare nella riga");
+    if (nudo.indexOf("63% fermo") < 0) guai.push("prezzata: il fermo non compare nella riga");
+    if (/Come si legge/.test(a.n)) guai.push("e' tornato il testo guida che il CEO ha chiesto di togliere");
+    /* la riunione NON prezzata non deve prendere una barra: sarebbe uno zero inventato */
+    if (String(a.g).indexOf("28/10") >= 0) guai.push("la riunione non prezzata prende comunque una barra");
+  }
+  /* ramo B: NESSUNA riunione e' prezzata */
+  macro.fedwatch = Object.assign({}, base, { meetings: [
+    { date: "2026-09-16", cut_prob: null, hike_prob: null, hold_prob: null, mosse_25bp: null, prezzata_dal_contratto: false } ] });
+  const b = FORMA_INDICATORE["fedwatch"](macro);
+  if (!b) guai.push("non prezzata: la scheda sparisce invece di dichiarare il buco");
+  else {
+    if (String(b.g).indexOf("prezza") < 0) guai.push("non prezzata: la scheda non dichiara perche' non c'e' niente da disegnare");
+    if (String(b.g).indexOf("rect") >= 0) guai.push("non prezzata: disegna comunque una barra, cioe' uno zero che nessuno ha misurato");
+  }
+  return guai.length ? guai.join(" · ") : true;`));
 
 check("v333 liquidita': porta la data della RILEVAZIONE, non quella del payload", suVeri(`
   const l = (DATA.macro || {}).liquidity_split;
@@ -4662,9 +4698,16 @@ check("v355 rischio: il contributo al rischio e' pubblicato accanto al peso", su
   if (conMcr.length < 3) return true;
   const p = buildPromptTicker("NVDA");
   /* peso e rischio sono due ordinamenti diversi: MU pesa il 23,1% e contribuisce il 35,0% del
-     rischio, NVDA pesa il 19,8% e ne contribuisce l'11,1% */
-  return /CONTRIBUTO AL RISCHIO/.test(p) && /peso [\\d.]+% → rischio [\\d.]+%/.test(p)
-      && /ordinamento DIVERSO dal peso/.test(p);`));
+     rischio, NVDA pesa il 19,8% e ne contribuisce l'11,1%
+     ⚠ v443 — TRENTAQUATTRESIMA ROTTURA DI UN CHECK ANCORATO ALLA FORMA, e su codice PIU'
+     corretto: la sonda era [d.]+ e pretendeva quindi il punto decimale, cioe' proprio la resa
+     che il pacchetto non deve avere — mentre il commento qui sopra scriveva gia' "23,1%" con la
+     virgola. Un gate che pinna un difetto lo rende permanente (v326, v411, v415, v422, v441).
+     Riagganciato al fatto, ed e' diventato piu' forte: la coppia esce accanto, E il peso non
+     torna a scriversi col punto — che e' il difetto della v443. */
+  return /CONTRIBUTO AL RISCHIO/.test(p) && /peso [0-9,]+% → rischio [0-9,]+%/.test(p)
+      && /ordinamento DIVERSO dal peso/.test(p)
+      && !/peso [0-9]+[.][0-9]+%/.test(p);`));
 
 check("v355 rischio: VaR ed ES del libro arrivano nel pacchetto quando esistono", suVeri(`
   const t = DATA.totals || {};
@@ -8231,7 +8274,11 @@ check("v418 il taglio non perde nessun fatto: il drawdown dal massimo resta pubb
     .find(x => String(x.ticker).toUpperCase() === "CRWV");
   if (!r || !isFinite(Number(r.w52_dist_pct))) return "w52_dist_pct assente: il check non misura niente";
   const p = buildPromptTicker("CRWV");
-  const atteso = Math.abs(Math.round(Number(r.w52_dist_pct) * 10) / 10).toFixed(1).replace(".", ",");
+  /* ⚠ v443 — stessa forma: l'arrotondamento a una cifra fissa pretende lo zero finale, e il valore di CRWV e' caduto
+     su -38,0 esatto mentre il pacchetto — correttamente — scrive "-38%". Il numero atteso si
+     costruisce con la STESSA convenzione del pacchetto, non con una propria. */
+  const _v = Math.abs(Math.round(Number(r.w52_dist_pct) * 10) / 10);
+  const atteso = (Number.isInteger(_v) ? String(_v) : String(_v).replace(".", ","));
   const i = p.indexOf("- Massimo 52 settimane");
   if (i < 0) return "la riga del massimo a 52 settimane non compare";
   const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
@@ -9171,7 +9218,13 @@ check("v431 la data dell'etichetta del VIX viene dal dato, non dall'orologio", s
 check("v432 la quota dell'azionario sul patrimonio e' calcolata in una valuta sola", suVeriEsito(`
   const NL = String.fromCharCode(10);
   const riga = () => (buildCIOText().split(NL).find(r => r.indexOf("Pesi sul solo comparto AZIONARIO") === 0) || "");
-  const quota = () => { const m = riga().match(/azionario vale (?:l'|il )([0-9]+,[0-9])% del totale/); return m ? Number(m[1].replace(",", ".")) : null; };
+  /* ⚠ v443 — LA SONDA PRETENDEVA UNA CIFRA DECIMALE. Il 09/09 la quota e' caduta su un intero
+     esatto (84%), il formattatore unico ha giustamente lasciato cadere lo zero, e il check e'
+     andato rosso su codice corretto. E' lo SPECCHIO del difetto della v442, che si era visto il
+     giorno in cui il peso di MU era caduto su un intero: la stessa coincidenza dei dati, dall'
+     altro lato. Un check che dipende da quante cifre ha il numero di oggi non misura una
+     proprieta' (v429, v435). */
+  const quota = () => { const m = riga().match(/azionario vale (?:l'|il )([0-9]+(?:,[0-9])?)% del totale/); return m ? Number(m[1].replace(",", ".")) : null; };
   const guai = [];
   /* ⚠⚠ LO STATO PATRIMONIALE SI COSTRUISCE: la suite gira con STATO_PTF nullo, quindi la
      funzione che somma cassa e titoli di Stato torna null e il codice prende l'altro ramo —
@@ -9304,12 +9357,73 @@ check("v442 · le percentuali del libro passano tutte dal formattatore unico, no
       guai.push("la riga del libro non usa piu' il formattatore unico");
     if (!/vale il \$\{pct1\(peso\)\}% del controvalore azionario/.test(codice))
       guai.push("la scheda del titolo non usa piu' il formattatore unico");
-    // e nessuna percentuale "dell'azionario" deve tornare a formattarsi da sola
-    const soloSue = [...codice.matchAll(/\$\{([^}]*toFixed\(1\)[^}]*)\}% dell'azionario/g)];
-    if (soloSue.length) guai.push("torna un toFixed(1) su una percentuale dell'azionario: "
-      + soloSue.map(m => m[1]).join(", "));
+    /* ⚠⚠ v443 — LA TERZA SONDA ERA ANCORATA ALLA FORMA, NON ALLA PROPRIETA'. Cercava un
+       `toFixed(1)` seguito ESATTAMENTE da "% dell'azionario", quindi copriva le due sedi che
+       avevo in mente e nessun'altra: il giorno dopo lo stesso peso usciva "23.0%" dentro
+       CONTRIBUTO AL RISCHIO e "16.7% del libro" dentro DIPENDENZA, e il gate restava verde.
+       E' la lezione v422 — *un gate ancorato a una FORMA sorveglia le occorrenze che l'autore
+       aveva in mente* — rifatta DENTRO il gate scritto il giorno prima per chiudere la classe.
+       La proprieta' vera: nel blocco del libro nessuna percentuale con DECIMALI si formatta da
+       sola. `toFixed(0)` resta ammesso e la ragione e' scritta: un intero non ha separatore
+       decimale, quindi non puo' divergere dal formattatore unico. */
+    const corpo = bloccoDa(src, "function contestoPortafoglio(", { max: 30000 })
+      .split(String.fromCharCode(10)).filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l)).join(String.fromCharCode(10));
+    const soloSue = [...corpo.matchAll(/\$\{([^}]*toFixed\([12]\)[^}]*)\}%/g)];
+    if (soloSue.length) guai.push("una percentuale del libro si formatta da sola invece di passare "
+      + "dal formattatore unico: " + soloSue.map(m => m[1]).join(", "));
     return guai.length ? no(guai.join(" · ")) : true;
   })());
+
+/* ═══ v443 — DUE SEDI CHE IL PACCHETTO DICHIARA IDENTICHE, E DUE RESE ════════════════════════
+   Il blocco della disciplina scrive testualmente "QUESTE MISURE SONO LE STESSE DEL BLOCCO DEL
+   LIBRO QUI SOPRA … Contale UNA VOLTA SOLA", e poi il drawdown usciva "-24.8%" di la' e "24,8%"
+   di qua, le scommesse effettive "2.3" contro "2,3". *Dichiarare che due numeri sono lo stesso e
+   poi stamparli diversi e' peggio che non dichiararlo* (v421): il collaudo B5 ordina al lettore
+   di segnalare due valori per la stessa grandezza, e glieli forniva il pacchetto.
+   Nessuna tolleranza (v415): fra due rese della STESSA grandezza dalla STESSA fonte i numeri
+   devono COINCIDERE, non somigliarsi.
+   ⚠ Il check ha un PAVIMENTO: se non trova entrambe le coppie si dichiara MUTO invece di passare
+   per assenza del fenomeno — la trappola gia' pagata quattro volte in questo progetto. */
+check("v443 · drawdown e scommesse effettive: una misura sola, una resa sola", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const libro = contestoPortafoglio(null) || "", disc = disciplinaTesto() || "";
+  const righeL = libro.split(NL), righeD = disc.split(NL);
+  const dopo = (s, ago) => { const i = s.indexOf(ago); return i < 0 ? null : s.slice(i + ago.length); };
+  const num = (s) => { if (s == null) return null; const m = s.match(/^-?[0-9]+(,[0-9]+)?/); return m ? m[0] : null; };
+  const rigaProf = righeL.find(l => l.indexOf("- Il tuo libro:") === 0);
+  if (!rigaProf) return "MUTO: sparita la riga dei profili di rischio, il confronto non e' misurabile";
+  const ddP = num(dopo(rigaProf, "drawdown massimo ")), effP = num(dopo(rigaProf, "scommesse effettive "));
+  const rD = righeD.find(l => l.indexOf("nel libro:") >= 0 && l.indexOf("sulle ultime") >= 0);
+  const rE = righeD.find(l => l.indexOf("nel libro:") >= 0 && l.indexOf(" nomi") >= 0);
+  const ddD = rD ? num(dopo(rD, "nel libro: ")) : null, effD = rE ? num(dopo(rE, "nel libro: ")) : null;
+  const manca = [];
+  if (!ddP || !ddD) manca.push("drawdown");
+  if (!effP || !effD) manca.push("scommesse effettive");
+  if (manca.length) return "MUTO: non trovo entrambe le sedi per " + manca.join(", ");
+  const abs = (s) => s.charAt(0) === "-" ? s.slice(1) : s;
+  const guai = [];
+  if (abs(ddP) !== abs(ddD)) guai.push("drawdown: i profili scrivono " + ddP + ", la disciplina " + ddD);
+  if (effP !== effD) guai.push("scommesse effettive: i profili scrivono " + effP + ", la disciplina " + effD);
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ═══ v443 — UN FORMATTATORE SOLO, E NON PUO' ESSERCENE UN SECONDO ═══════════════════════════
+   La causa strutturale delle v421, v442 e v443 non erano le sedi di stampa: era che il
+   formattatore delle percentuali era scritto CINQUE volte — `pct1` a livello di modulo piu'
+   quattro cloni locali byte-identici (`n1`) e tre copie inline del suo corpo. Con cinque copie,
+   "quale delle due rese e' quella giusta" e' una domanda che si ripresenta a ogni riga nuova.
+   Il gate guarda il CODICE e non puo' essere verde per fortuna: il corpo del formattatore
+   compare UNA volta sola, ed e' quella di `pct1`. */
+check("v443 · il formattatore delle percentuali del libro e' UNO SOLO", (() => {
+  const codice = src.split(String.fromCharCode(10))
+    .filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l)).join(String.fromCharCode(10));
+  const corpo = "fmtNum.format(Math.round(v * 10) / 10)";
+  const n = codice.split(corpo).length - 1;
+  if (n !== 1) return no("il corpo del formattatore e' scritto " + n + " volte: le copie divergono "
+    + "al primo ritocco, ed e' cosi' che la stessa percentuale e' uscita in due rese (v421, v442)");
+  if (!/const pct1 = \(v\) =>/.test(codice)) return no("sparito pct1: il formattatore unico non esiste piu'");
+  if (/const n1 = \(v\) =>/.test(codice)) return no("e' tornato un clone locale del formattatore");
+  return true;
+})());
 
 let fail = 0;
 for (const [name, ok] of T) {

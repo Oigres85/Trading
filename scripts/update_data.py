@@ -2702,13 +2702,29 @@ def fetch_macro():
         # ⚠ Il front-month prezza SOLO il proprio mese: le riunioni successive non si proiettano
         #   piu' — si dichiara che questo contratto non le prezza (v199).
         oggi_utc = datetime.now(timezone.utc).date()
+        # ⚠⚠ v443 — QUESTA LETTURA TORNAVA SEMPRE None, E IL BLOCCO NON PUBBLICAVA NULLA.
+        #   `macro["fed_market"]` viene scritto MILLE RIGHE PIU' SOTTO: qui la chiave non esiste
+        #   ancora, quindi `effr_corrente` era None, `mov` era None, e ogni riunione usciva
+        #   "non prezzata dal contratto" con tutti i campi a null. Il pacchetto restava corretto
+        #   solo perche' `app.js` rifa' il conto da se' (il ripiego della v441) — cioe' il difetto
+        #   era invisibile proprio dove si guarda.
+        #   E' la lezione v399 nella sua forma piu' pura: i sei gate della v441 provavano il
+        #   CONTROLLO (la funzione, chiamata a mano) e non il COLLEGAMENTO (da dove arriva il suo
+        #   ingresso in produzione).
+        # ⚠ La stessa serie di `fed_market`, non una seconda derivazione: l'ultima osservazione
+        #   di FEDFUNDS e' la stessa in entrambe le chiamate, quindi i due numeri coincidono per
+        #   costruzione invece che per fortuna (v161, v207).
         effr_corrente = None
         try:
             fm = macro.get("fed_market") or {}
             if isinstance(fm.get("current_rate"), (int, float)):
                 effr_corrente = float(fm["current_rate"])
-        except Exception:  # noqa: BLE001
-            pass
+            else:
+                _ff = fred_series("FEDFUNDS", 2)
+                if _ff:
+                    effr_corrente = round(float(_ff[-1][1]), 2)
+        except Exception as e:  # noqa: BLE001
+            print(f"!! fedwatch: EFFR non risolto: {e}", file=sys.stderr)
         mov = movimenti_impliciti_fomc(implied, effr_corrente, fomc[0] if fomc else None, oggi_utc)
         cut_prob = hike_prob = None
         if mov:

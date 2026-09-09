@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "442";
+const BUILD_VERSION = "443";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4718,10 +4718,26 @@ const FORMA_INDICATORE = {
        un tutto, nessuna negativa. Nessun testo guida, come chiesto. */
     const f = m.fedwatch; if (!f || !Array.isArray(f.meetings) || !f.meetings.length) return null;
     const it = (d) => { const p = String(d).split("-"); return `${p[2]}/${p[1]}`; };
-    const rr = f.meetings.slice(0, 4).map(x => ({ d: it(x.date),
+    /* ⚠⚠ v443 — UNA RIUNIONE NON PREZZATA NON E' UNA RIUNIONE A ZERO. Il contratto a 30 giorni
+       prezza SOLO il proprio mese (v441): per le successive i tre campi sono null, e coercerli
+       a 0 disegnava una barra vuota che si legge "il mercato non prezza nessun movimento" —
+       cioe' l'opposto di "questo strumento non lo misura". E' la classe C14, informazione
+       mancante travestita da informazione presente, e la v441 l'aveva chiusa nel PACCHETTO
+       lasciando indietro la scheda: una correzione applicata a un ramo e non all'altro (v412). */
+    /* ⚠ `Number(null)` vale 0 e `Number.isFinite(0)` e' VERO: la prima stesura di questa guardia
+       considerava prezzata ogni riunione, cioe' non filtrava niente. Il campo si guarda per
+       quello che e' — assente — non passando dalla conversione a numero. */
+    const c = (v) => v != null && Number.isFinite(Number(v));
+    const prezzata = (x) => c(x.cut_prob) || c(x.hold_prob) || c(x.hike_prob);
+    const rr = f.meetings.slice(0, 4).filter(prezzata).map(x => ({ d: it(x.date),
       taglio: Math.round(Number(x.cut_prob) || 0),
       fermo: Math.round(Number(x.hold_prob) || 0),
       rialzo: Math.round(Number(x.hike_prob) || 0) }));
+    const nonPrezzate = f.meetings.slice(0, 4).filter(x => !prezzata(x)).map(x => it(x.date));
+    if (!rr.length) return { g: `<div class="muted" style="font-size:11px;line-height:1.5">Il future sui Fed Funds a 30 giorni prezza `
+      + `solo il proprio mese: nessuna delle riunioni in elenco (${nonPrezzate.join(", ")}) `
+      + `e' prezzata da questo contratto.</div>`, score: null,
+      n: `nessuna riunione prezzata da questo contratto — non e' "nessun movimento atteso"` };
     const W = 320, RH = 30, H = rr.length * RH + 18, L = 44, R = W - 8;
     const righe = rr.map((x, i) => {
       const y = 12 + i * RH;
@@ -5406,9 +5422,8 @@ function renderCredito() {
     if (nota) nota.textContent = "";
     return;
   }
-  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
   const M = (v) => v == null ? "—"
-    : Math.abs(v) >= 1e9 ? `${n1(v / 1e9)} mld` : `${fmtNum.format(Math.round(v / 1e6))} mln`;
+    : Math.abs(v) >= 1e9 ? `${pct1(v / 1e9)} mld` : `${fmtNum.format(Math.round(v / 1e6))} mln`;
   const scoperti = righe.filter((r) => r.cop != null && r.cop < 1);
   const inSecca = righe.filter((r) => r.corrente != null && r.cassa != null && r.cassa < r.corrente);
   const acceleranti = righe.filter((r) => r.var4 != null && r.var4 >= 25 && r.var4 < 1000 && r.conta)
@@ -5416,10 +5431,10 @@ function renderCredito() {
   const frasi = [];
   frasi.push(scoperti.length
     ? `<b>${scoperti.length} ${scoperti.length === 1 ? "nome non copre" : "nomi non coprono"} gli interessi con la gestione operativa:</b> `
-      + `${scoperti.map((r) => `${esc(r.tk)} (${r.cop < 0 ? "EBIT negativo" : `${n1(r.cop)}×`})`).join(", ")}. `
+      + `${scoperti.map((r) => `${esc(r.tk)} (${r.cop < 0 ? "EBIT negativo" : `${pct1(r.cop)}×`})`).join(", ")}. `
       + `Gli oneri li pagano con cassa, debito nuovo o nuove azioni — non con quello che guadagnano.`
     : `<b>Tutti i nomi del libro coprono gli interessi con la gestione operativa.</b> `
-      + `La copertura piu' bassa e' ${n1(Math.min(...righe.filter((r) => r.cop != null).map((r) => r.cop)))}×.`);
+      + `La copertura piu' bassa e' ${pct1(Math.min(...righe.filter((r) => r.cop != null).map((r) => r.cop)))}×.`);
   if (inSecca.length)
     frasi.push(`<b>${inSecca.length} ${inSecca.length === 1 ? "nome ha" : "nomi hanno"} meno cassa del debito che scade entro l'anno:</b> `
       + `${inSecca.map((r) => `${esc(r.tk)} (${M(r.cassa)} contro ${M(r.corrente)})`).join(", ")}. `
@@ -5440,7 +5455,7 @@ function renderCredito() {
       </tr></thead><tbody>`
     + righe.map((r) => `<tr>
         <td><b>${esc(r.tk)}</b> <span class="muted">${esc(r.nome.slice(0, 22))}</span></td>
-        <td class="${r.cop != null && r.cop < 1 ? "neg" : ""}">${r.cop == null ? "—" : r.cop < 0 ? "non copre" : `${n1(r.cop)}×`}</td>
+        <td class="${r.cop != null && r.cop < 1 ? "neg" : ""}">${r.cop == null ? "—" : r.cop < 0 ? "non copre" : `${pct1(r.cop)}×`}</td>
         <td>${M(r.oneri)}${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
         <td class="${r.var4 != null && r.var4 >= 25 && r.conta ? "neg" : ""}">${r.var4 == null || r.var4 <= -100 ? "—" : signTxt(r.var4)}</td>
         <td class="${r.corrente != null && r.cassa != null && r.cassa < r.corrente ? "neg" : ""}">${M(r.corrente)}<span class="muted"> vs ${M(r.cassa)}</span>${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
@@ -5494,7 +5509,6 @@ function renderCredito() {
    vuoto e' l'errore gia' respinto in v233. */
 function graficiDisciplina(d) {
   const g = (d && d.graf) || {};
-  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
   const parti = [];
 
   /* ── 1. di quanto ogni disciplina supera la propria soglia, in punti percentuali ────── */
@@ -5502,8 +5516,8 @@ function graficiDisciplina(d) {
     const righe = [...g.scostamenti].sort((a, b) => b.oltre - a.oltre).map(s => ({
       nome: s.nome.replace(/ \(.*\)$/, ""),
       valore: Math.round(s.oltre * 10) / 10,
-      testo: `${s.oltre > 0 ? "+" : ""}${n1(s.oltre)} pp`,
-      suggerimento: `${n1(s.misura)}% nel libro contro una soglia del ${n1(s.soglia)}%`,
+      testo: `${s.oltre > 0 ? "+" : ""}${pct1(s.oltre)} pp`,
+      suggerimento: `${pct1(s.misura)}% nel libro contro una soglia del ${pct1(s.soglia)}%`,
       colore: s.oltre > 0 ? "var(--red)" : "var(--green)",
     }));
     parti.push(`<div class="disc-graf">
@@ -5527,7 +5541,7 @@ function graficiDisciplina(d) {
           extra: f.nomi.join(", ") },
         { nome: "Indipendenti dall'ancora", val: f.fuori, colore: "var(--green)" },
       ], { aria: "concentrazione di fattore",
-           centro: { sopra: "si muove insieme", grande: `${n1(f.dentro)}%`, sotto: "dell'azionario" } })}
+           centro: { sopra: "si muove insieme", grande: `${pct1(f.dentro)}%`, sotto: "dell'azionario" } })}
       <div class="muted struct-note">Non e' un raggruppamento per etichetta di settore: e' chi ha
         correlazione dei rendimenti giornalieri sopra la soglia con l'ancora, sulle sedute in comune.
         ⚠ "Indipendenti" vale <b>rispetto all'ancora</b>: fra loro quei nomi possono muoversi insieme,
@@ -5545,7 +5559,7 @@ function graficiDisciplina(d) {
       return {
         nome: `${MESI[m - 1]} ${a}`,
         valore: Math.round(e.pct * 10) / 10,
-        testo: e.pct > 0 ? `${n1(e.pct)}%` : "—",
+        testo: e.pct > 0 ? `${pct1(e.pct)}%` : "—",
         evidenzia: e.pct > soglia,
         colore: e.pct > soglia ? "var(--red)" : "var(--blue)",
         suggerimento: e.tk.length ? e.tk.join(", ") : "nessuna trimestrale attesa",
@@ -5555,7 +5569,7 @@ function graficiDisciplina(d) {
     parti.push(`<div class="disc-graf">
       <div class="disc-graf-tit">Quando riprezza il libro: percentuale dell'azionario che riporta, per mese</div>
       ${barreOrdinate(righe, { nota: `Il mese piu' carico e' <b>${esc(picco.nome)}</b> con il `
-        + `${n1(picco.valore)}% dell'azionario. `
+        + `${pct1(picco.valore)}% dell'azionario. `
         /* ⚠⚠ DUE FINESTRE DIVERSE SULLA STESSA DOMANDA, E VANNO DICHIARATE. La regola qui sotto
            misura la finestra MOBILE di 21 giorni piu' densa, che puo' stare a cavallo di due
            mesi; questo grafico raggruppa per MESE DI CALENDARIO. I due numeri divergono per
@@ -5624,8 +5638,7 @@ function renderRischio() {
       + `calcolo non ha i dati per misurarlo.</div>`;
     return;
   }
-  const pct = (v) => `${v > 0 ? "+" : ""}${fmtNum.format(Math.round(v * 10) / 10)}%`;
-  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
+  const pct = (v) => `${v > 0 ? "+" : ""}${pct1(v)}%`;
   const P = Object.fromEntries(pr.profili.map(x => [x.nome, x]));
   const mio = pr.profili[0];
   const eq = pr.profili.find(x => x.nome.startsWith("Stessi nomi"));
@@ -5636,16 +5649,16 @@ function renderRischio() {
   if (eq) {
     const meglio = mio.dd > eq.dd;
     frasi.push(`<b>Le tue scelte di peso ${meglio ? "hanno ridotto" : "hanno aumentato"} la discesa peggiore.</b> `
-      + `Con gli stessi nomi a peso uguale il libro sarebbe sceso del ${n1(Math.abs(eq.dd))}% invece del `
-      + `${n1(Math.abs(mio.dd))}%${meglio ? " — concentrare sui nomi che hanno tenuto ha aiutato, su questa finestra" : ""}.`);
+      + `Con gli stessi nomi a peso uguale il libro sarebbe sceso del ${pct1(Math.abs(eq.dd))}% invece del `
+      + `${pct1(Math.abs(mio.dd))}%${meglio ? " — concentrare sui nomi che hanno tenuto ha aiutato, su questa finestra" : ""}.`);
   }
   if (senza) {
     const meglio = senza.dd > mio.dd;
     frasi.push(`<b>Togliere le tre posizioni maggiori ${meglio ? "avrebbe attenuato" : "non avrebbe attenuato"} la discesa.</b> `
       + `Senza ${esc(senza.nome.replace(/^Senza le prime tre \(|\)$/g, ""))} il drawdown sarebbe stato del `
-      + `${n1(Math.abs(senza.dd))}% contro il ${n1(Math.abs(mio.dd))}% vero.`
+      + `${pct1(Math.abs(senza.dd))}% contro il ${pct1(Math.abs(mio.dd))}% vero.`
       + (Number.isFinite(senza.eff) && Number.isFinite(mio.eff) && senza.eff >= mio.eff - 0.15
-        ? ` E le decisioni indipendenti resterebbero ${n1(senza.eff)}, come adesso: la concentrazione `
+        ? ` E le decisioni indipendenti resterebbero ${pct1(senza.eff)}, come adesso: la concentrazione `
           + `non sta in quelle tre posizioni, sta nel fatto che le dodici fanno lo stesso mestiere.`
         : ""));
   }
@@ -5654,14 +5667,14 @@ function renderRischio() {
     const r = mio.vol / b2.vol;
     const quanto = Math.abs(r - 1) < 0.12
       ? `<b>Oscilla quanto ${nome}.</b>`
-      : `<b>Oscilla ${n1(r)} volte ${nome}.</b>`;
+      : `<b>Oscilla ${pct1(r)} volte ${nome}.</b>`;
     const dd = Math.abs(mio.dd) - Math.abs(b2.dd);
-    frasi.push(`${quanto} Volatilit&agrave; ${n1(mio.vol)}% contro ${n1(b2.vol)}%; nella discesa peggiore ha perso `
-      + `${Math.abs(dd) < 1 ? "quanto lui" : `${n1(Math.abs(dd))} punti ${dd > 0 ? "in pi&ugrave;" : "in meno"}`} `
-      + `(${n1(Math.abs(mio.dd))}% contro ${n1(Math.abs(b2.dd))}%).`);
+    frasi.push(`${quanto} Volatilit&agrave; ${pct1(mio.vol)}% contro ${pct1(b2.vol)}%; nella discesa peggiore ha perso `
+      + `${Math.abs(dd) < 1 ? "quanto lui" : `${pct1(Math.abs(dd))} punti ${dd > 0 ? "in pi&ugrave;" : "in meno"}`} `
+      + `(${pct1(Math.abs(mio.dd))}% contro ${pct1(Math.abs(b2.dd))}%).`);
   }
   if (Number.isFinite(mio.eff)) {
-    frasi.push(`<b>${mio.n} nomi, ma ${n1(mio.eff)} decisioni indipendenti.</b> Le posizioni si muovono `
+    frasi.push(`<b>${mio.n} nomi, ma ${pct1(mio.eff)} decisioni indipendenti.</b> Le posizioni si muovono `
       + `abbastanza insieme da valere, per il rischio, poco pi&ugrave; di ${Math.round(mio.eff)} scommesse: `
       + `il resto &egrave; la stessa scommessa scritta pi&ugrave; volte.`);
   }
@@ -5737,8 +5750,8 @@ function renderRischio() {
          frase dice che non c'e' niente da dire finche' la pipeline non ha rigenerato. */
       const coerenti = pt.filter(p => !stale.has(p.tk));
       const peggio = coerenti[0], meglio = coerenti[coerenti.length - 1];
-      const p1 = (v) => `${fmtNum.format(Math.round(v * 10) / 10)}%`;
-      const pp = (v) => `${v > 0 ? "+" : ""}${fmtNum.format(Math.round(v * 10) / 10)} pp`;
+      const p1 = (v) => `${pct1(v)}%`;
+      const pp = (v) => `${v > 0 ? "+" : ""}${pct1(v)} pp`;
       const ilPct = (v) => {
         const i = Math.floor(Math.abs(Math.round(v * 10) / 10));
         return `${(i === 1 || i === 8 || i === 11 || i === 18 || (i >= 80 && i <= 89)) ? "l'" : "il "}${p1(v)}`;
@@ -10299,7 +10312,11 @@ function autonomiaCassa(cmb) {
   /* ⚠ oltre i cinque anni il numero non porta piu' informazione — dice solo "non e' un problema
      di cassa" — e stampato per esteso ("1022,6 mesi") fa dubitare di tutto il blocco invece che
      di quella riga. E' aritmeticamente giusto e comunicativamente falso (v389). */
-  /* ⚠ `n1` e' un helper LOCALE di disciplinaRischio, non una funzione globale: usarlo qui
+  /* ⚠ v443 — qui c'era `n1`, un helper LOCALE di disciplinaRischio riscritto quattro volte
+     identico: usarlo fuori dal suo scope faceva morire il render (v409), e le sue quattro copie
+     sono la ragione per cui la stessa percentuale usciva in due rese. Ora il formattatore e'
+     UNO SOLO a livello di modulo (`pct1`), come la v421 aveva stabilito. Il vecchio testo:
+     `n1` e' un helper LOCALE di disciplinaRischio, non una funzione globale: usarlo qui
      faceva morire il render al primo titolo con combustione. L'arrotondamento si scrive qui. */
   const quanto = (m) => m > 60 ? "oltre 5 anni" : `${fmtNum.format(Math.round(m * 10) / 10)} mesi`;
   const voci = [];
@@ -10394,7 +10411,6 @@ function disciplinaRischio() {
   const ord = [...azionarie].sort((a, b) => b.v - a.v);
   const peso = (x) => x.v / totAz * 100;
   const R = [];
-  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
   const n0 = (v) => fmtNum.format(Math.round(v));
 
   /* ── 1. quanto pesa il nome piu' grande ────────────────────────────────────────────── */
@@ -10404,12 +10420,12 @@ function disciplinaRischio() {
     soglia: "15% del capitale azionario, con tolleranza fino al 20-25% quando la posizione e' cresciuta da sola",
     provenienza: "CONVENZIONE del mestiere: un fondo growth concentrato entra fra il 5% e il 10% e lascia correre i vincitori, "
       + "rivedendo la posizione quando la deriva la porta oltre un quinto del libro. Non e' un dato del file.",
-    misura: `${primo.r.ticker} al ${n1(peso(primo))}% dell'azionario`,
+    misura: `${primo.r.ticker} al ${pct1(peso(primo))}% dell'azionario`,
     valore: peso(primo),
     unita: "pct_azionario", sogliaPct: 15,   // v393 — vedi `graf.scostamenti`
     stato: peso(primo) > 20 ? "OLTRE" : peso(primo) > 15 ? "AL LIMITE" : "DENTRO",
     spiega: `La domanda che la soglia pone non e' "e' troppo?" ma "se questo nome perdesse meta' del suo valore in `
-      + `una seduta, il libro reggerebbe?": ${n1(peso(primo) / 2)} punti di patrimonio azionario in un giorno. `
+      + `una seduta, il libro reggerebbe?": ${pct1(peso(primo) / 2)} punti di patrimonio azionario in un giorno. `
       + `Il peso e' cresciuto col prezzo, quindi non e' una scelta di ingresso — e' una scelta di NON aver ridotto, `
       + `che e' comunque una scelta.`,
   });
@@ -10428,11 +10444,11 @@ function disciplinaRischio() {
     soglia: "40% del capitale azionario",
     provenienza: "CONVENZIONE: e' il confine oltre il quale un libro smette di essere un portafoglio concentrato e "
       + "diventa tre scommesse con un contorno. Nessuna autorita' la fissa; serve a rendere confrontabile il livello.",
-    misura: `${ord.slice(0, 3).map(x => x.r.ticker).join(" + ")} = ${n1(tre)}%`,
+    misura: `${ord.slice(0, 3).map(x => x.r.ticker).join(" + ")} = ${pct1(tre)}%`,
     valore: tre,
     unita: "pct_azionario", sogliaPct: 40,
     stato: tre > 50 ? "OLTRE" : tre > 40 ? "AL LIMITE" : "DENTRO",
-    spiega: `Le altre ${azionarie.length - 3} posizioni si dividono il ${n1(100 - tre)}%: sul rischio del `
+    spiega: `Le altre ${azionarie.length - 3} posizioni si dividono il ${pct1(100 - tre)}%: sul rischio del `
       + `libro pesano poco, quindi il loro contributo alla varianza e' marginale rispetto alle prime tre.`,
   });
 
@@ -10444,14 +10460,14 @@ function disciplinaRischio() {
       soglia: "40% del capitale azionario su un solo fattore",
       provenienza: "CONVENZIONE, ed e' la regola che i fondi growth violano piu' spesso senza accorgersene: la "
         + "diversificazione si conta sui FATTORI, non sui nomi. Il file non contiene nessuna soglia; la misura si'.",
-      misura: `${gf.semi.length} posizioni = ${n1(gf.pesoSemi)}% dell'azionario (${gf.semi.map(x => x.r.ticker).join(", ")})`,
+      misura: `${gf.semi.length} posizioni = ${pct1(gf.pesoSemi)}% dell'azionario (${gf.semi.map(x => x.r.ticker).join(", ")})`,
       valore: gf.pesoSemi,
       unita: "pct_azionario", sogliaPct: 40,
       stato: gf.pesoSemi > 55 ? "OLTRE" : gf.pesoSemi > 40 ? "AL LIMITE" : "DENTRO",
       spiega: gf.misurato
         ? `Non e' un raggruppamento per etichetta di settore: e' chi ha correlazione dei rendimenti giornalieri `
           + `≥ ${gf.SOGLIA_FATTORE} con ${gf.ancora} sulle sedute in comune. ⚠ E' LA RIGA PIU' IMPORTANTE DELLA SEZIONE: `
-          + `${n1(gf.pesoSemi)}% del capitale si muove insieme, quindi il libro ha UNA posizione da ${n1(gf.pesoSemi)}% `
+          + `${pct1(gf.pesoSemi)}% del capitale si muove insieme, quindi il libro ha UNA posizione da ${pct1(gf.pesoSemi)}% `
           + `scritta ${gf.semi.length} volte. Un evento che colpisce il fattore non colpisce un nome: li colpisce tutti.`
         : `⚠ Gruppo per ETICHETTA di settore: le serie per misurare le correlazioni non c'erano in questo run, quindi `
           + `questa riga e' meno solida delle altre e va letta come indicazione.`,
@@ -10468,7 +10484,7 @@ function disciplinaRischio() {
       provenienza: "CONVENZIONE: sotto le cinque, la diversificazione non riduce piu' il rischio in modo apprezzabile "
         + "e il libro si comporta come un paniere di poche idee. La formula (" + FORMULA_EFFETTIVE + ") e' "
         + "standard; la soglia di 5 e' una convenzione di lettura.",
-      misura: `${n1(mio.eff)} su ${mio.n} nomi`,
+      misura: `${pct1(mio.eff)} su ${mio.n} nomi`,
       valore: mio.eff,
       unita: "conteggio",
       stato: mio.eff < 3 ? "OLTRE" : mio.eff < 5 ? "AL LIMITE" : "DENTRO",
@@ -10487,7 +10503,7 @@ function disciplinaRischio() {
       provenienza: "CONVENZIONE di governance: molti fondi scrivono nel proprio regolamento due soglie, una di "
         + "revisione e una di azione, fissate in anticipo proprio perche' nel mezzo di una discesa il giudizio e' "
         + "peggiore. Il file non le contiene.",
-      misura: `${n1(dd)}% sulle ultime ${pr.sedute} sedute, ${mio.sotto} sedute sott'acqua`
+      misura: `${pct1(dd)}% sulle ultime ${pr.sedute} sedute, ${mio.sotto} sedute sott'acqua`
         + `${mio.recuperato ? ", recuperato" : ", NON ancora recuperato"}`,
       valore: dd,
       unita: "pct_valore_nel_tempo",   // altro denominatore: NON e' una frazione del libro
@@ -10548,7 +10564,7 @@ function disciplinaRischio() {
       soglia: "40% del capitale che riprezza nella stessa finestra di tre settimane",
       provenienza: "CONVENZIONE: tre settimane e' la finestra tipica in cui si addensa una stagione di trimestrali. "
         + "La soglia serve a rendere visibile un rischio che il calendario nasconde perche' e' distribuito su piu' righe.",
-      misura: `${best.dentro.length} posizioni = ${n1(best.p)}% dell'azionario fra il ${gg(best.da)} e il ${gg(best.a)} `
+      misura: `${best.dentro.length} posizioni = ${pct1(best.p)}% dell'azionario fra il ${gg(best.da)} e il ${gg(best.a)} `
         + `(${best.dentro.map(y => y.x.r.ticker).join(", ")})`,
       valore: best.p,
       unita: "pct_azionario", sogliaPct: 40,
@@ -10588,7 +10604,7 @@ function disciplinaRischio() {
         + "esegue; le tre sedute sono il confine convenzionale fra una posizione liquida e una illiquida.",
       misura: peggiore.gg < 0.05
         ? `la posizione meno liquida (${peggiore.tk}) si chiuderebbe in meno di un decimo di seduta`
-        : `${peggiore.tk}: ${n1(peggiore.gg)} sedute`,
+        : `${peggiore.tk}: ${pct1(peggiore.gg)} sedute`,
       valore: peggiore.gg,
       unita: "sedute",
       stato: peggiore.gg > 3 ? "OLTRE" : peggiore.gg > 1 ? "AL LIMITE" : "NON VINCOLA",
@@ -10643,12 +10659,12 @@ function disciplinaRischio() {
         + "pagare la crescita, non di finanziarla col debito altrui. Le righe di bilancio sono nel file; la regola no. "
         + "⚠ Le due bande sul peso sono anch'esse una convenzione di lettura, non un dato: servono a graduare uno stato "
         + "che il solo criterio per posizione lascerebbe rosso per costruzione su un libro di crescita.",
-      misura: `${fragili.length} ${fragili.length === 1 ? "posizione" : "posizioni"} = ${n1(pesoFragili)}% dell'azionario: `
-        + fragili.map(o => `${o.tk} (${Number.isFinite(o.cop) && o.cop < 1 ? (o.cop < 0 ? "EBIT negativo" : `copertura ${n1(o.cop)}×`) : "FCF negativo"}`
+      misura: `${fragili.length} ${fragili.length === 1 ? "posizione" : "posizioni"} = ${pct1(pesoFragili)}% dell'azionario: `
+        + fragili.map(o => `${o.tk} (${Number.isFinite(o.cop) && o.cop < 1 ? (o.cop < 0 ? "EBIT negativo" : `copertura ${pct1(o.cop)}×`) : "FCF negativo"}`
             + `${autonomia(o.cmb)}${o.al ? `, bilancio al ${o.al}` : ""})`).join(", ")
         + (strette.length
             ? `. ⚠ DI QUESTE, ${strette.length} ${strette.length === 1 ? "soddisfa" : "soddisfano"} ENTRAMBE le condizioni `
-              + `— flusso libero negativo E interessi non coperti dalla gestione — per un ${n1(pesoStrette)}% dell'azionario: `
+              + `— flusso libero negativo E interessi non coperti dalla gestione — per un ${pct1(pesoStrette)}% dell'azionario: `
               + `${strette.map(o => o.tk).join(", ")}. Sul criterio per posizione la regola e' violata; lo stato qui accanto `
               + `viene dalle bande sul peso, che e' una lettura piu' graduata della stessa cosa.`
             : `. ⚠ Nessuna soddisfa ENTRAMBE le condizioni insieme: sul criterio per posizione la regola non e' violata.`),
@@ -11258,18 +11274,18 @@ function contestoPortafoglio(tkCorrente) {
   const dip = dipendenzaFinanziaria(azionarie, totAz);
   if (dip.dipende.length || dip.autonome.length) {
     const nelGruppo = new Set(semi.map(x => x.r.ticker));
-    const elenco = dip.dipende.map(x => `${x.tk} ${x.peso.toFixed(1)}%`
+    const elenco = dip.dipende.map(x => `${x.tk} ${pct1(x.peso)}%`
       + `${nelGruppo.has(x.tk) ? " [nel gruppo correlato]" : ""} (${severitaCopertura(x.copertura)})`).join(" · ");
     L.push(`DIPENDENZA DAL MERCATO DEI CAPITALI (un taglio TRASVERSALE al gruppo qui sopra, non un `
       + `secondo raggruppamento dello stesso tipo): ${pct1(dip.pesoDipende)}% dell'azionario e' in `
       + `societa' con flusso di cassa LIBERO NEGATIVO su dodici mesi — il piano corrente non si paga con `
-      + `la cassa che generano — contro ${dip.pesoAutonome.toFixed(1)}% che si autofinanzia`
-      + `${dip.pesoIgnote > 0.05 ? ` e ${dip.pesoIgnote.toFixed(1)}% su cui il dato manca` : ""}. `
+      + `la cassa che generano — contro ${pct1(dip.pesoAutonome)}% che si autofinanzia`
+      + `${dip.pesoIgnote > 0.05 ? ` e ${pct1(dip.pesoIgnote)}% su cui il dato manca` : ""}. `
       + `${elenco ? `Chi dipende: ${elenco}. ` : ""}`
       + `⚠⚠ E' LA DISTINZIONE CHE IL GRAPPOLO NON FA: quei nomi si muovono insieme agli altri nella `
       + `giornata media, ma un rialzo dei tassi o una stretta del credito riprezza il COSTO DEL LORO `
       + `PIANO, mentre sugli autofinanziati agisce solo come fattore di sconto. Un evento sul credito `
-      + `colpisce ${dip.pesoDipende.toFixed(1)}% del libro, non il ${pct1(pesoSemi)}% del gruppo. `
+      + `colpisce ${pct1(dip.pesoDipende)}% del libro, non il ${pct1(pesoSemi)}% del gruppo. `
       + `⚠ CONVENZIONE DICHIARATA, non un dato del file: la soglia e' il SEGNO del flusso libero. E non `
       + `e' un giudizio sulla societa' — costruire a debito puo' essere la scommessa giusta: cambia il `
       + `CANALE da cui il rischio arriva, non il merito della scommessa. `
@@ -11298,7 +11314,7 @@ function contestoPortafoglio(tkCorrente) {
       .map(x => x.r.ticker);
     L.push(_avvisoStale + `CONTRIBUTO AL RISCHIO (quota della varianza del libro attribuibile a ciascuna posizione, `
       + `dalle correlazioni misurate — e' un ordinamento DIVERSO dal peso; sono tutte, e sommano a 100%): `
-      + conMcr.map(x => `${x.tk} peso ${x.peso.toFixed(1)}% → rischio ${x.mcr}%`).join(" · ")
+      + conMcr.map(x => `${x.tk} peso ${pct1(x.peso)}% → rischio ${pct1(x.mcr)}%`).join(" · ")
       + `. ⚠ Dove rischio e peso divergono, la posizione porta piu' (o meno) varianza di quanto il suo peso suggerisca: `
       + `e' l'effetto delle correlazioni, non della dimensione — e vale in ENTRAMBI i versi, perche' `
       + `una posizione che pesa piu' di quanto rischia e' l'altra meta' della stessa domanda.`
@@ -11393,9 +11409,9 @@ function contestoPortafoglio(tkCorrente) {
   if (pr && pr.profili.length >= 3) {
     L.push(`IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sulle STESSE `
       + `${pr.sedute} sedute e dagli stessi dati — nessun numero viene da fuori):`);
-    pr.profili.forEach(x => L.push(`- ${x.nome}: volatilita' annua ${x.vol.toFixed(1)}% · drawdown massimo `
-      + `${x.dd.toFixed(1)}% (${x.sotto} sedute sott'acqua${x.recuperato ? ", recuperato" : ", NON recuperato"})`
-      + `${x.eff != null && !x.indice ? ` · scommesse effettive ${x.eff.toFixed(1)} su ${x.n} nomi` : ""}`
+    pr.profili.forEach(x => L.push(`- ${x.nome}: volatilita' annua ${pct1(x.vol)}% · drawdown massimo `
+      + `${pct1(x.dd)}% (${x.sotto} sedute sott'acqua${x.recuperato ? ", recuperato" : ", NON recuperato"})`
+      + `${x.eff != null && !x.indice ? ` · scommesse effettive ${pct1(x.eff)} su ${x.n} nomi` : ""}`
       + ` — ${x.nota}`));
     L.push(`⚠ COME SI LEGGONO. La differenza fra due righe e' l'effetto di UNA scelta: "pesi uguali" `
       + `contro "pesi reali" isola quanto hanno reso le scelte di peso; "senza le prime tre" isola la `
