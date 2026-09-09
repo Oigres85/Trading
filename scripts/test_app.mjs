@@ -3519,14 +3519,27 @@ check("v345 il digest storico misura anche tassi e input industriali, non solo c
    dire cosa prezza il mercato — pubblicare solo il primo punto fa sembrare fermo un mercato
    che sta dicendo "ferma per ora". Classe v199 rovesciata: li' il contratto non prezzava quella
    riunione, qui prezzava anche le successive e non lo dicevamo. */
-check("v345 il pacchetto pubblica la struttura a termine delle attese Fed, non solo la prossima", suVeri(`
+/* ⚠⚠ v441 — TRENTATREESIMA ROTTURA DI UN CHECK ANCORATO A UNA STRINGA LETTERALE, e della
+   specie peggiore: questo gate PRETENDEVA "STRUTTURA A TERMINE DELLE ATTESE FED", cioe' la
+   riga costruita sulla rampa inventata `cut_prob + i*12`. Chiedeva letteralmente che il
+   pacchetto continuasse a pubblicare 78% a ottobre e 90% a dicembre — numeri che nessun
+   mercato ha quotato. *Un gate che pinna un difetto lo rende permanente* (v326, v411, v415,
+   v422).
+   L'invariante che voleva davvero difendere resta, ed e' PIU' FORTE di prima: il pacchetto non
+   deve tacere le riunioni successive. Prima le nominava con numeri finti; ora le nomina
+   dichiarando che questo contratto non le prezza — che e' la stessa protezione contro il
+   silenzio, senza l'invenzione. */
+check("v345 il pacchetto non tace le riunioni successive: le nomina e ne dichiara lo stato", suVeri(`
   const riunioni = ((DATA.macro || {}).fedwatch || {}).meetings || [];
-  if (riunioni.length < 2) return true;          // con una sola riunione non c'e' curva da dire
+  if (riunioni.length < 2) return true;          // con una sola riunione non c'e' niente da dire
   const p = buildPrompt();
-  if (p.indexOf("STRUTTURA A TERMINE DELLE ATTESE FED") < 0) return false;
-  /* la seconda riunione dev'essere nominata: e' il punto che il pacchetto prima taceva */
   const d2 = String(riunioni[1].date || "");
-  return d2.length >= 10 && p.indexOf(d2.slice(8, 10) + "/" + d2.slice(5, 7)) > 0`));
+  if (d2.length < 10) return false;
+  /* la seconda riunione dev'essere NOMINATA: e' il punto che il pacchetto prima taceva */
+  if (p.indexOf(d2.slice(8, 10) + "/" + d2.slice(5, 7)) < 0) return false;
+  /* e il suo stato dichiarato: prezzata con un numero, oppure dichiarata non prezzata. Il
+     terzo caso — nominarla e lasciarla senza stato — e' quello che non deve esistere. */
+  return p.indexOf("NON le prezza") > 0 || p.indexOf("RIUNIONI SUCCESSIVE") > 0`));
 
 /* ══ v346 — "CORREZIONE O ROTTURA?" ERA INDECIDIBILE COL PACCHETTO ════════════════════════
    La rotazione dava 1 mese e 3 mesi. Con quei due soli numeri un comparto a -3,4% e'
@@ -9187,6 +9200,87 @@ check("v432 la quota dell'azionario sul patrimonio e' calcolata in una valuta so
   }
   return guai.length ? guai.join(" · ") : true;`));
 
+
+/* ═══ v441 — LA METODOLOGIA CME, e le due derivazioni che devono coincidere ═══════════════
+   ⚠ Lo stato si COSTRUISCE: `implied_rate` cambia a ogni run del CI e un check che lo
+   aspettasse andrebbe rosso a calendario (v429, v431, v435). */
+check("v441 · un rialzo pieno da meta' mese vale UN movimento, non mezzo",
+  suVeriEsito(`
+    const eff = 3.63, imp = eff + 0.25 * (14 / 30);
+    const r = movimentiImpliciti(imp, eff, "2026-09-16", new Date("2026-09-10T00:00:00Z"));
+    if (!r) return "nessun risultato su uno stato che il conto deve saper leggere";
+    if (Math.abs(r.mosse_25bp - 1) > 0.01) return "movimenti " + r.mosse_25bp + " invece di 1";
+    if (r.giorni_vecchio !== 16 || r.giorni_nuovo !== 14 || r.giorni_mese !== 30)
+      return "ponderazione sbagliata: " + JSON.stringify(r);
+    return true;`));
+
+/* ⚠⚠ IL RIPIEGO DEVE DARE LO STESSO NUMERO DELLA PIPELINE. Sono due implementazioni della
+   stessa domanda in due linguaggi, ed e' la classe che questo progetto ha pagato tre volte
+   (v161, v207, v316). Il valore atteso qui e' quello che `movimenti_impliciti_fomc` produce
+   sugli stessi ingressi, verificato dalla suite Python sullo stesso stato costruito. */
+check("v441 · il ripiego JS riproduce la pipeline sullo stesso stato",
+  suVeriEsito(`
+    const r = movimentiImpliciti(3.79, 3.63, "2026-09-16", new Date("2026-09-10T00:00:00Z"));
+    if (!r) return "il ripiego non calcola cio' che la pipeline calcola";
+    if (Math.abs(r.mosse_25bp - 1.37) > 0.01)
+      return "il ripiego da' " + r.mosse_25bp + ", la pipeline 1.37";
+    return true;`));
+
+/* ⚠ Una riunione fuori dal mese del contratto non si prezza: e' la v199 nella sua forma
+   corretta — il limite non e' "35 giorni" ma "lo stesso mese di calendario". */
+check("v441 · fuori dal mese del contratto non esce nessun numero",
+  suVeriEsito(`
+    const d = new Date("2026-09-10T00:00:00Z");
+    if (movimentiImpliciti(3.79, 3.63, "2026-10-28", d)) return "ottobre viene prezzato da settembre";
+    if (movimentiImpliciti(5.0, 3.63, "2026-09-16", d)) return "un implied assurdo produce un numero";
+    return true;`));
+
+/* ⚠⚠ E IL RIPIEGO NON SI FIDA DELLO SNAPSHOT VECCHIO. Finche' il CI non rigenera, data.json
+   porta le probabilita' della formula sbagliata (66%): se ramiFedWatch le accettasse, la
+   pagina continuerebbe a pubblicarle. Il check inietta la forma VECCHIA e pretende che venga
+   scavalcata — validato per iniezione, perche' un check che leggesse la forma nuova sarebbe
+   verde per costruzione (v416, il gate circolare). */
+check("v441 · le probabilita' dello snapshot vecchio vengono scavalcate, non accettate",
+  suVeriEsito(`
+    const fw = { implied_rate: 3.79, target_range: "3.50–3.75%",
+                 meetings: [{ date: "2026-09-16", hike_prob: 66, cut_prob: 0, hold_prob: 34 }] };
+    DATA.macro = DATA.macro || {};
+    DATA.macro.fed_market = { current_rate: 3.63, rate_date: "2026-08-01" };
+    const mt = ramiFedWatch(fw, fw.meetings[0]);
+    if (mt.hike_prob === 66) return "il 66% della formula vecchia e' sopravvissuto";
+    if (mt.mosse_25bp == null) return "il ripiego non ha ricalcolato i movimenti";
+    if (Math.abs(mt.mosse_25bp - 1.37) > 0.01) return "movimenti " + mt.mosse_25bp;
+    if (mt.hike_prob != null) return "sopra il movimento intero non deve uscire una probabilita'";
+    return true;`));
+
+/* ⚠ Dentro (0,1] invece la probabilita' ESISTE e va pubblicata: un check che provasse solo il
+   ramo dei movimenti lascerebbe l'altro non esercitato (v190, v234). */
+check("v441 · sotto il movimento intero la probabilita' esce, e i tre rami con lei",
+  suVeriEsito(`
+    const eff = 3.63, imp = eff + 0.5 * 0.25 * (14 / 30);   // mezzo movimento
+    const fw = { implied_rate: imp, meetings: [{ date: "2026-09-16" }] };
+    DATA.macro = DATA.macro || {};
+    DATA.macro.fed_market = { current_rate: eff };
+    const mt = ramiFedWatch(fw, fw.meetings[0]);
+    if (mt.hike_prob == null) return "nessuna probabilita' dove ne esiste una";
+    if (Math.abs(mt.hike_prob - 50) > 2) return "probabilita' " + mt.hike_prob + " invece di ~50";
+    if (mt.hold_prob == null) return "il ramo invariato non viene pubblicato";
+    return true;`));
+
+/* ⚠⚠ E LA RAMPA INVENTATA NON DEVE RIENTRARE NEL PACCHETTO: pubblicava 78% a ottobre e 90% a
+   dicembre, numeri che nessun mercato ha quotato. Ora quelle riunioni si DICHIARANO non
+   prezzate — e "0%" sarebbe l'opposto, non l'assenza (v389, v406). */
+check("v441 · il pacchetto dichiara le riunioni non prezzate invece di stampare zeri",
+  suVeriEsito(`
+    const p = buildPrompt();
+    const i = p.indexOf("RIUNIONI SUCCESSIVE");
+    if (i < 0) return "la riga delle riunioni successive non c'e' piu' del tutto";
+    const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+    if (riga.indexOf("NON le prezza") < 0) return "non dichiara di non prezzarle";
+    if (/invariato 0% . rialzo 0%/.test(riga)) return "stampa ancora zeri al posto della dichiarazione";
+    if (p.indexOf("STRUTTURA A TERMINE DELLE ATTESE FED") >= 0)
+      return "la curva costruita sulla rampa inventata e' tornata";
+    return true;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

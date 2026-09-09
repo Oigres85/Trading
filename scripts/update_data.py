@@ -13,6 +13,7 @@ Fonti (tutte gratuite):
 - RSS (solo news sui titoli in portafoglio): CNBC, Bloomberg, Yahoo Finance,
   Investing.com, Google News
 """
+import calendar
 import csv
 # ⚠ v389 — `html` MANCAVA, e le news erano morte da quando sono nate (v304).
 # Ogni run del CI stampava tre righe identiche — `!! news CNBC Economia: name 'html' is not
@@ -202,6 +203,66 @@ def sane_val(v, lo, hi, what=""):
 # giorni-2) e il prompt stampava due date diverse per la stessa riunione (28/07 vs 29/07).
 FOMC_2026 = ["2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
              "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09"]
+
+
+def movimenti_impliciti_fomc(implied, effr, riunione, mese_contratto):
+    """La metodologia CME FedWatch, invece della nostra approssimazione (v441).
+
+    ⚠⚠ IL CONTRATTO E' UNA MEDIA DI MESE, NON UN TASSO DI FINE MESE. Il future Fed Funds a 30
+    giorni settla sulla MEDIA dell'EFFR sul mese di CALENDARIO. La formula vecchia faceva
+    `(mid - implied)/0.25` e trattava il tasso implicito come se fosse quello DOPO la riunione:
+    con il FOMC il 16 settembre solo 14 giorni su 30 portano il tasso nuovo, quindi quella
+    formula sottostima di quasi il doppio. Misurato sui dati del 09/09 (implied 3,79, EFFR
+    3,63): la formula vecchia dava 66%, la metodologia CME da' 1,37 movimenti da 25bp.
+
+    ⚠ SI CONFRONTA CON L'EFFR, NON COL PUNTO MEDIO DEL RANGE. Il contratto settla sull'EFFR
+    effettivo (3,63), non sul centro della fascia dichiarata (3,625): sono due grandezze
+    diverse e il sistema le pubblica gia' entrambe, in due righe che dicono di esserlo.
+
+    ⚠⚠ E SI RESTITUISCONO I MOVIMENTI, NON UNA PROBABILITA'. Sopra il movimento intero non
+    esiste "una probabilita'": 1,37 significa un rialzo da 25bp pienamente prezzato PIU' il 37%
+    di un secondo. Schiacciarlo a "100%" perderebbe il fatto, e chiamarlo "137%" sarebbe una
+    probabilita' impossibile — la classe v400, dove la formula calcola una cosa e l'etichetta
+    ne dichiara un'altra. La conversione in probabilita' la fa chi stampa, e solo dentro (0, 1].
+
+    Ritorna None quando il conto non e' affermabile, invece di pubblicare un numero che non
+    significa niente (v199): fuori dal mese del contratto, o con un implied cosi' lontano da
+    non essere attribuibile alla riunione di questo mese.
+    """
+    if implied is None or effr is None or not riunione:
+        return None
+    try:
+        r = datetime.strptime(riunione, "%Y-%m-%d").date()
+    except Exception:  # noqa: BLE001
+        return None
+    # ⚠ Il front-month prezza SOLO il proprio mese: una riunione di ottobre non e' dentro il
+    #   contratto di settembre. E' la regola v199 nella sua forma corretta — il limite non e'
+    #   "35 giorni" ma "lo stesso mese di calendario del contratto".
+    if (r.year, r.month) != (mese_contratto.year, mese_contratto.month):
+        return None
+    # il FOMC annuncia a fine seconda giornata: il target nuovo vale dal giorno LAVORATIVO dopo
+    eff = r + timedelta(days=1)
+    while eff.weekday() >= 5:
+        eff += timedelta(days=1)
+    if eff.month != r.month:               # riunione a cavallo del mese: nessun giorno residuo
+        return None
+    giorni = calendar.monthrange(r.year, r.month)[1]
+    n1 = eff.day - 1                       # giorni al tasso VECCHIO
+    n2 = giorni - n1                       # giorni al tasso NUOVO
+    if n2 <= 0:
+        return None
+    r_fine = (implied - (n1 / giorni) * effr) / (n2 / giorni)
+    mosse = (r_fine - effr) / 0.25
+    # ⚠ Guardia di plausibilita': oltre tre movimenti da 25bp su una riunione sola il numero non
+    #   e' attribuibile a questa riunione — molto piu' probabilmente il contratto letto non e'
+    #   quello del mese corrente. Si dichiara invece di pubblicare (v396: meglio non avere dati
+    #   che averli non corretti). Non e' una soglia sul mercato: e' il confine oltre il quale la
+    #   nostra ipotesi sul contratto smette di reggere.
+    if abs(mosse) > 3:
+        return None
+    return {"mosse_25bp": round(mosse, 2), "tasso_atteso_fine_mese": round(r_fine, 3),
+            "giorni_vecchio": n1, "giorni_nuovo": n2, "giorni_mese": giorni,
+            "base_effr": effr, "riunione": riunione}
 
 
 def next_fomc_date():
@@ -2628,23 +2689,57 @@ def fetch_macro():
         # rischio stava dall'altra parte. Il 26/07/2026 il valore grezzo era -38,0: cioe' 38% di
         # probabilita' di RIALZO, esattamente il numero pubblicato da CME FedWatch quel giorno.
         # Il sistema aveva la cifra giusta e la cestinava a tre giorni dal FOMC.
-        quarti = (mid - implied) / 0.25 * 100
-        cut_prob = round(max(0, min(100, quarti)))
-        hike_prob = round(max(0, min(100, -quarti)))
+        # ═══ v441 — LA METODOLOGIA CME, al posto della nostra approssimazione ═════════════
+        # La formula vecchia era `quarti = (mid - implied)/0.25*100`, e sbagliava tre volte:
+        #   1. trattava la MEDIA DEL MESE come il tasso POST-riunione (sottostima quasi 2x);
+        #   2. confrontava col punto medio del RANGE invece che con l'EFFR, che il contratto
+        #      settla davvero e che il sistema pubblica gia' in fed_market.current_rate;
+        #   3. proiettava le riunioni successive con `+ i*12`, dodici punti a riunione scritti
+        #      a mano: il pacchetto pubblicava 78% a ottobre e 90% a dicembre, numeri che
+        #      nessun mercato ha quotato (classe v240, una soglia inventata).
+        # Misurato il 09/09 con implied 3,79 ed EFFR 3,63: la vecchia dava 66%, CME pubblicava
+        # ~57%, e la metodologia corretta sul NOSTRO implied da' 1,37 movimenti da 25bp.
+        # ⚠ Il front-month prezza SOLO il proprio mese: le riunioni successive non si proiettano
+        #   piu' — si dichiara che questo contratto non le prezza (v199).
+        oggi_utc = datetime.now(timezone.utc).date()
+        effr_corrente = None
+        try:
+            fm = macro.get("fed_market") or {}
+            if isinstance(fm.get("current_rate"), (int, float)):
+                effr_corrente = float(fm["current_rate"])
+        except Exception:  # noqa: BLE001
+            pass
+        mov = movimenti_impliciti_fomc(implied, effr_corrente, fomc[0] if fomc else None, oggi_utc)
+        cut_prob = hike_prob = None
+        if mov:
+            m25 = mov["mosse_25bp"]
+            # ⚠ Una PROBABILITA' esiste solo dentro (0, 1]: sopra, il movimento intero e' gia'
+            #   prezzato e il resto e' la quota di un secondo. Schiacciare a 100 perderebbe il
+            #   fatto, scrivere 137% sarebbe una probabilita' impossibile (v400).
+            if 0 < m25 <= 1:
+                hike_prob = round(m25 * 100)
+            elif -1 <= m25 < 0:
+                cut_prob = round(-m25 * 100)
         meetings = []
-        for i, d in enumerate(fomc[:4]):
-            # la cumulata cresce nel tempo sul ramo ATTIVO: se il mercato prezza rialzi, e' la
-            # probabilita' di rialzo a salire con l'orizzonte, non quella di taglio.
-            pc = min(100, cut_prob + i * 12) if cut_prob else 0
-            ph = min(100, hike_prob + i * 12) if hike_prob else 0
-            meetings.append({"date": d, "cut_prob": pc, "hike_prob": ph,
-                             "hold_prob": max(0, 100 - pc - ph)})
+        for d in fomc[:4]:
+            dentro = mov is not None and d == mov["riunione"]
+            meetings.append({"date": d, "cut_prob": cut_prob if dentro else None,
+                             "hike_prob": hike_prob if dentro else None,
+                             "hold_prob": (max(0, 100 - (cut_prob or 0) - (hike_prob or 0))
+                                           if dentro and (cut_prob is not None or hike_prob is not None)
+                                           else None),
+                             "mosse_25bp": mov["mosse_25bp"] if dentro else None,
+                             "prezzata_dal_contratto": dentro})
         macro["fedwatch"] = {
             "target_range": f"{target_low:.2f}–{target:.2f}%",
             "implied_rate": implied,
             "delta_bp": round((implied - mid) * 100),
             "next_cut_prob": cut_prob,
             "next_hike_prob": hike_prob,
+            # il FATTO che il calcolo produce davvero, accanto alla probabilita' che ne deriva
+            # solo dove e' tale. `None` significa "questo contratto non prezza quella riunione".
+            "movimenti": mov,
+            "base_effr": effr_corrente,
             "next_fomc": next_fomc_date(),   # data esplicita della prossima riunione FOMC
             "meetings": meetings,
             # Dot Plot: mediana SEP (Summary of Economic Projections) — da aggiornare a ogni SEP
