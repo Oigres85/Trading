@@ -25,9 +25,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      # ⚠ v444 — NODE 20 E' DEPRECATO. GitHub sta gia' FORZANDO checkout@v4 e setup-node@v4 a
+      # girare su Node 24 ("are being forced to run on Node.js 24"): oggi e' un warning, il
+      # giorno in cui smette di forzarle quelle azioni si rompono. La v5 di entrambe dichiara
+      # `using: node24`, quindi il bump non cambia il runtime — lo rende dichiarato invece che
+      # imposto da fuori. Unica rottura v5 di checkout: `allow-unsafe-pr-checkout` su
+      # `pull_request_target`, che nessun workflow di questo repo usa.
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: { node-version: "22" }
       - name: Sintassi + test motore JS (vm, DOM-stub)
         run: |
