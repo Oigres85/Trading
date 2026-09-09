@@ -4459,3 +4459,76 @@ qualunque ora giri la suite e con qualunque spread pubblichi la pipeline.
 ⚠ Validati per iniezione tutti e tre, con `modifica_sicura` e ripristino da uno **snapshot preso
 prima**, mai da `git checkout` (v430): rimettendo `[-0-9.,]` cade il gate della scheda,
 spegnendo `_estremo` cadono i due gate del credito (v405 e v414 insieme).
+
+## 🔀 v436 — DUE STRATI DATI: LA MISURA HA DECISO IL TAGLIO, E NON ERA QUELLO CHE PENSAVO
+
+Avevo scritto al CEO che la duplicazione fra `scripts/update_data.py` e `scripts/raccolta/` era
+«il tetto strutturale all'affidabilità», dando per scontato che i due strati **divergessero**.
+Misurato prima di tagliare, su quattordici titoli:
+
+| | chiusura | RSI | ATR% | dist. media 50 |
+|---|---|---|---|---|
+| scarto massimo pipeline ↔ raccolta | **0,00%** | **0,05** | **0,00** | **0,05** |
+
+**Coincidono.** Due implementazioni indipendenti, su fonti diverse (Yahoo contro
+stockanalysis.com), scritte a mesi di distanza, danno lo stesso numero. La premessa della mia
+raccomandazione era sbagliata, ed è la seconda volta in due giorni che una misura corregge una
+mia affermazione (l'altra: il "costo misurato" del censimento, v425).
+
+### ⚠⚠ Il pericolo vero era un altro, e si era già manifestato
+`quadro.json` — il file che `assembla.py` produceva — portava **VIX 14,32 al 03/09** mentre la
+cache FRED sotto di lui era stata rinfrescata **la mattina stessa**. Un secondo quadro assemblato
+**senza cron e senza gate** può essere più vecchio dei propri ingressi, e chi lo legge non lo
+vede. Nel rapporto al CEO ho pubblicato i valori giusti solo perché ho letto il log fresco invece
+del file assemblato: **fortuna, non metodo**.
+
+> Il difetto non era che i due strati calcolassero diverso: era che ce n'era uno con un cron, dei
+> gate e una pagina viva, e uno **assemblato a mano che produceva un secondo quadro completo**.
+> Si toglie quello, non i dati.
+
+**La decisione**: una grandezza, un proprietario. `data/data.json` è la fonte **pubblicata** —
+prezzi, indicatori, macro, rischio. `scripts/raccolta/` è uno **strumento di misura** per le sole
+tre cose che la pipeline non ha: storico OHLC completo **con le date** (le `sparks` sono
+sotto-campionate e senza date, quindi niente covarianza né finestre datate), bilanci depositati e
+stime per esercizio, universo esteso.
+
+**Il taglio, con la ricevuta scritta prima**: `assembla.py`, `rapporto_html.py`,
+`analisi_html.py`, `macro.py` — **1.646 righe su 2.717, il 61%**. Nessun consumatore fuori da
+`scripts/raccolta/` (verificato con grep su py/mjs/js/yml), e tutti e quattro già morti per
+decisioni del CEO: l'HTML *("elimina generazione artefatto, costa token")*, gli ingressi, e
+`macro.py` che copriva le **stesse identiche 21 serie** di `quadro_macro.py` scrivendo un file
+che nessuno leggeva. ⚠ `analisi_html.py` teneva anche `CASSA_EUR` e `BTP_NOMINALE` scritti a
+mano — una seconda copia dei numeri di `memoria/LIBRO.md`, che invecchia da sola (v410/v411/v424).
+
+### 🔬 E la misura ha trovato un difetto che non cercavo: su serie corta l'RSI non è un fatto
+
+L'unico titolo che divergeva era SKHY, di **6,1 punti di RSI**. Non è un difetto di nessuno dei
+due: è che gli indicatori a **smorzamento di Wilder** (RSI, ATR, ADX) su una serie corta
+dipendono dalla convenzione più che dal mercato. Misurato sulle stesse barre:
+
+| | MU (1.255 barre) | SKHY (41 barre) |
+|---|---|---|
+| Wilder, seme = media dei primi 14 | 57,7 | **64,2** |
+| Wilder, seme = prima variazione | 57,7 | **75,3** |
+| media semplice sulle ultime 14 | 60,3 | 74,8 |
+| pubblicato dalla pipeline | **57,7** | **58,1** |
+
+Su serie lunga tutte le convenzioni convergono; su 41 barre lo stesso indicatore vale **da 58 a
+75**. Quindi il gate **non confronta** gli indicatori sotto 100 barre — e li **nomina** invece di
+saltarli in silenzio (v406). Vale per SKHY oggi e per qualunque quotazione recente domani.
+
+### 🔒 `scripts/riconciliazione.py`
+Confronta i due strati sulle grandezze che entrambi calcolano, con **la tolleranza e la sua
+ragione scritte accanto** (v240). Tre esiti distinti: `0` coincidono · `1` divergono, con lo
+scarto e il perché · `2` **non misurabile** — cache assente, o meno di tre titoli con serie
+abbastanza lunga. *Un confronto che non confronta niente non è un confronto* (v196, v229).
+
+⚠ Validato per iniezione, tutte e tre con `modifica_sicura` e ripristino da snapshot preso prima
+(v430): chiusura perturbata dell'1% → esce 1 su quattro grandezze; **soglia serie corta abbassata
+a 10 → SKHY rientra ed esce 1**, che è la prova che l'esclusione è portante e non decorativa;
+cache tolta → esce 2.
+
+⚠⚠ **E la prima verifica delle iniezioni era falsa**: leggevo `$?` dopo una pipe `| tail`, quindi
+misuravo l'uscita di `tail` e leggevo `exit=0` su tre gate che stavano correttamente uscendo 1.
+È la classe v400 nella sua forma più pura — *la misura calcola una cosa e l'etichetta ne dichiara
+un'altra* — commessa mentre validavo un gate scritto contro quella stessa classe.

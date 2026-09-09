@@ -41,7 +41,14 @@ leggerla, non dopo.
    node scripts/coherence_check.mjs       # il pacchetto non deve contraddire se stesso
    node scripts/fx_check.mjs              # nessun dollaro col simbolo €
    python3 scripts/test_update_data.py    # la pipeline che produrrà i dati di domani
+   python3 scripts/riconciliazione.py     # i due strati dati coincidono ancora? (v436)
    ```
+
+   ⚠ `riconciliazione.py` ha **tre** esiti e vanno distinti: `0` i due strati coincidono ·
+   `1` divergono, e la riga dice su quale grandezza e di quanto · `2` **non misurabile**,
+   perché la cache di `scripts/raccolta/` non c'è o è troppo corta. Il `2` non è un
+   successo: si rigenera la raccolta e si rilancia, oppure si dichiara che quel giro non
+   ha verificato la coerenza fra gli strati.
 
    ⚠ `test_update_data.py` è nell'elenco per una ragione precisa: la pipeline è rimasta ferma
    **tre giorni** senza che nessuno se ne accorgesse (v369), e l'età da sola quel guasto lo

@@ -1,5 +1,39 @@
 # Raccolta dati fuori dal sistema GitHub
 
+## ⚠⚠ IL RUOLO, PRIMA DEI MODULI (v436)
+
+Questi script **non sono un secondo sistema**: sono uno **strumento di misura**.
+
+| | chi e' | cosa possiede |
+|---|---|---|
+| `scripts/update_data.py` -> `data/data.json` | la **PIPELINE**, su cron, con 860 check | **la fonte di verita' PUBBLICATA**: prezzi, RSI, ATR, distanze dalle medie, macro, contributo al rischio, correlazioni. La pagina viva e il pacchetto leggono lei. |
+| `scripts/raccolta/` -> `memoria/dati/*` | lo **STRUMENTO**, a richiesta | solo cio' che la pipeline **non ha**: storico OHLC completo **con le date**, bilanci depositati e stime per esercizio, universo esteso (ETF e nomi fuori dal libro) |
+
+**Regola: una grandezza, un proprietario.** Dove la pipeline pubblica un numero, quel numero
+viene da lei — anche quando la raccolta saprebbe calcolarlo. La raccolta lo calcola per
+*verificarlo*, non per sostituirlo.
+
+⚠ Misurato il 09/09/2026 su quattordici titoli: le due implementazioni **coincidono** — chiusure
+identiche al centesimo, RSI entro 0,05 punti, ATR% identico, distanze dalle medie entro 0,05.
+Due implementazioni indipendenti, su fonti diverse, scritte a mesi di distanza. Il pericolo non
+era che divergessero: era che potessero cominciare a farlo in silenzio.
+`scripts/riconciliazione.py` rende quel silenzio impossibile — e va eseguito quando la raccolta
+viene rigenerata.
+
+### ✂️ Cosa e' stato TOLTO in v436, e perche' era gratis
+`assembla.py`, `rapporto_html.py`, `analisi_html.py`, `macro.py` — 1.646 righe su 2.717.
+Erano il **secondo quadro assemblato**, cioe' l'artefatto che compete con `data.json`, ed erano
+gia' morti per decisione del CEO: l'HTML ("elimina generazione artefatto, costa token") e gli
+ingressi. `macro.py` copriva le **stesse identiche 21 serie** di `quadro_macro.py` e scriveva un
+file che nessuno leggeva.
+
+⚠ E il difetto che il taglio chiude si era gia' manifestato: `quadro.json` portava VIX 14,32 al
+03/09 mentre la cache FRED sotto di lui era stata rinfrescata la mattina stessa. **Un file
+assemblato senza cron puo' essere piu' vecchio dei propri ingressi**, e chi lo legge non lo vede.
+I raccoglitori grezzi restano: ciascuno scrive il proprio file e nessuno assembla un secondo
+quadro completo.
+
+
 Nasce dalla decisione del CEO (08/09/2026): *"il sistema non è affidabile e spreco token per
 aggiustarlo"*. Questi script acquisiscono gli stessi dati **senza** la pipeline `update_data.py`,
 senza GitHub Actions e senza chiavi API, e li mettono in cache sotto `memoria/dati/`
@@ -11,14 +45,13 @@ senza GitHub Actions e senza chiavi API, e li mettono in cache sotto `memoria/da
 | `fred_cache.py` | scarica le serie FRED **una alla volta**, con pausa e cache per serie |
 | `tecnica.py` | indicatori e statistiche storiche dalle barre giornaliere |
 | `libro.py` | rischio di libro: correlazioni, contributo al rischio, VaR/ES, scommesse effettive |
-| `macro.py` | quadro macro con percentili calcolati sulla serie intera e su finestre dichiarate |
 | `cambio.py` | EUR/USD dal tasso di riferimento **BCE** |
 | `quadro_macro.py` | le 21 serie FRED con percentili, direzione e la loro profondità vera |
 | `fondamentali.py` | bilanci depositati, target degli analisti, storico utili (Nasdaq) |
 | `notizie.py` | notizie per titolo dai feed dei fornitori |
 | `canali.py` | sensibilità di ogni titolo ai canali macro, con il pavimento del rumore |
-| `assembla.py` | mette insieme tutto in `memoria/dati/quadro.json` |
-| `rapporto_html.py` | rende il quadro in una pagina, senza grafici |
+| **`../riconciliazione.py`** | **il gate**: verifica che dove i due strati calcolano la stessa grandezza i numeri coincidano |
+
 
 ## ⚠ Il cambio viene dalla BCE, non da FRED
 
@@ -75,9 +108,9 @@ chi ti sta dicendo di rallentare (lezione v398).
 
 ## Il rapporto
 
-`assembla.py` mette insieme quello che i raccoglitori hanno letto in `memoria/dati/quadro.json`
-(non calcola nulla di nuovo: chiama i moduli che già esistono — una seconda derivazione della
-stessa grandezza diverge al primo ritocco). `rapporto_html.py` lo rende in una pagina.
+⚠ v436: non esiste piu' un file che assembla tutto. Ogni raccoglitore scrive il
+proprio, e `scripts/riconciliazione.py` verifica che dove la pipeline pubblica la
+stessa grandezza i due numeri coincidano.
 
 **Niente grafici**, per decisione del CEO dell'08/09/2026: *"grafici eliminali ma tieni conto dei
 dati che da essi emergono compreso storico per quelli macro"*. La lettura che un grafico darebbe
@@ -91,8 +124,7 @@ python3 preleva.py MU NVDA AMD MSTR PLTR GOOGL WDC ORCL BE MRVL CRWV RGTI TSM SK
 python3 fondamentali.py MU NVDA AMD MSTR PLTR GOOGL WDC ORCL BE MRVL CRWV RGTI TSM SKHY
 python3 notizie.py     MU NVDA AMD MSTR PLTR GOOGL WDC ORCL BE MRVL CRWV RGTI TSM SKHY
 python3 quadro_macro.py          # 21 serie FRED, in cache per serie
-python3 assembla.py              # → memoria/dati/quadro.json
-python3 rapporto_html.py /tmp/quadro.html
+python3 ../riconciliazione.py    # i due strati coincidono? (esce 1 se no, 2 se non misurabile)
 ```
 
 ## Le cinque sezioni dello schema del CEO, e da dove escono
