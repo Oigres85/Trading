@@ -20,8 +20,9 @@
    perche' una delle due cose che deve sorvegliare e' che le suite non vengano svuotate: un
    guardiano dentro la stanza che sorveglia non serve a niente. */
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, openSync, closeSync, rmSync, mkdtempSync } from "node:fs";
 import { join, dirname } from "node:path";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
@@ -168,12 +169,27 @@ for (const s of SUITE) {
 
   /* ⚠ IL CONTROLLO CHE AVREBBE PRESO IL DISASTRO DI OGGI: la suite deve PARLARE. Un file che
      esce 0 senza stampare niente non e' una suite verde, e' una suite che non c'e' piu'. */
+  /* ⚠⚠ v443 — L'USCITA SI LEGGE DA UN FILE, NON DA UNA PIPE. Due volte (v425 e oggi) questo
+     check e' andato rosso da solo su `test_app.mjs` — la suite piu' loquace, 45 KB — mentre
+     eseguita a mano stampava il proprio rapporto e usciva 0. Fallito UN solo check dei due:
+     quindi il figlio era uscito 0 e allo stdout raccolto mancava l'ultima riga, cioe' una
+     TRONCATURA della pipe sotto carico. La causa non l'ho riprodotta a comando, e lo scrivo
+     invece di dichiararla risolta; quello che ho tolto e' il MECCANISMO che puo' troncare —
+     un file su disco non ha un buffer che si perde alla morte del processo.
+     ⚠ La ragione per cui vale la pena: un gate che puo' andare rosso per caso invece che per
+     la proprieta' che misura viene ignorato proprio quando ha ragione (v233, v349, v397, v431). */
   let uscita = "", codice = 0;
+  const dir = mkdtempSync(join(tmpdir(), "selfcheck-"));
+  const out = join(dir, "uscita.txt");
+  const fd = openSync(out, "w");
   try {
-    uscita = execFileSync(s.cmd, [percorso], { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    execFileSync(s.cmd, [percorso], { cwd: ROOT, stdio: ["ignore", fd, fd] });
   } catch (e) {
-    uscita = String((e.stdout || "") + (e.stderr || ""));
     codice = e.status == null ? 1 : e.status;
+  } finally {
+    closeSync(fd);
+    uscita = existsSync(out) ? readFileSync(out, "utf8") : "";
+    rmSync(dir, { recursive: true, force: true });
   }
   check(`${s.file}: stampa un rapporto invece di uscire in silenzio`, s.firma.test(uscita));
   /* ⚠ v285 — SI DICE PERCHE' NON PASSA. Per otto versioni la CI e' stata rossa perche' questo

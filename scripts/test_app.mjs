@@ -4662,9 +4662,16 @@ check("v355 rischio: il contributo al rischio e' pubblicato accanto al peso", su
   if (conMcr.length < 3) return true;
   const p = buildPromptTicker("NVDA");
   /* peso e rischio sono due ordinamenti diversi: MU pesa il 23,1% e contribuisce il 35,0% del
-     rischio, NVDA pesa il 19,8% e ne contribuisce l'11,1% */
-  return /CONTRIBUTO AL RISCHIO/.test(p) && /peso [\\d.]+% → rischio [\\d.]+%/.test(p)
-      && /ordinamento DIVERSO dal peso/.test(p);`));
+     rischio, NVDA pesa il 19,8% e ne contribuisce l'11,1%
+     ⚠ v443 — TRENTAQUATTRESIMA ROTTURA DI UN CHECK ANCORATO ALLA FORMA, e su codice PIU'
+     corretto: la sonda era [d.]+ e pretendeva quindi il punto decimale, cioe' proprio la resa
+     che il pacchetto non deve avere — mentre il commento qui sopra scriveva gia' "23,1%" con la
+     virgola. Un gate che pinna un difetto lo rende permanente (v326, v411, v415, v422, v441).
+     Riagganciato al fatto, ed e' diventato piu' forte: la coppia esce accanto, E il peso non
+     torna a scriversi col punto — che e' il difetto della v443. */
+  return /CONTRIBUTO AL RISCHIO/.test(p) && /peso [0-9,]+% → rischio [0-9,]+%/.test(p)
+      && /ordinamento DIVERSO dal peso/.test(p)
+      && !/peso [0-9]+[.][0-9]+%/.test(p);`));
 
 check("v355 rischio: VaR ed ES del libro arrivano nel pacchetto quando esistono", suVeri(`
   const t = DATA.totals || {};
@@ -9304,12 +9311,73 @@ check("v442 · le percentuali del libro passano tutte dal formattatore unico, no
       guai.push("la riga del libro non usa piu' il formattatore unico");
     if (!/vale il \$\{pct1\(peso\)\}% del controvalore azionario/.test(codice))
       guai.push("la scheda del titolo non usa piu' il formattatore unico");
-    // e nessuna percentuale "dell'azionario" deve tornare a formattarsi da sola
-    const soloSue = [...codice.matchAll(/\$\{([^}]*toFixed\(1\)[^}]*)\}% dell'azionario/g)];
-    if (soloSue.length) guai.push("torna un toFixed(1) su una percentuale dell'azionario: "
-      + soloSue.map(m => m[1]).join(", "));
+    /* ⚠⚠ v443 — LA TERZA SONDA ERA ANCORATA ALLA FORMA, NON ALLA PROPRIETA'. Cercava un
+       `toFixed(1)` seguito ESATTAMENTE da "% dell'azionario", quindi copriva le due sedi che
+       avevo in mente e nessun'altra: il giorno dopo lo stesso peso usciva "23.0%" dentro
+       CONTRIBUTO AL RISCHIO e "16.7% del libro" dentro DIPENDENZA, e il gate restava verde.
+       E' la lezione v422 — *un gate ancorato a una FORMA sorveglia le occorrenze che l'autore
+       aveva in mente* — rifatta DENTRO il gate scritto il giorno prima per chiudere la classe.
+       La proprieta' vera: nel blocco del libro nessuna percentuale con DECIMALI si formatta da
+       sola. `toFixed(0)` resta ammesso e la ragione e' scritta: un intero non ha separatore
+       decimale, quindi non puo' divergere dal formattatore unico. */
+    const corpo = bloccoDa(src, "function contestoPortafoglio(", { max: 30000 })
+      .split(String.fromCharCode(10)).filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l)).join(String.fromCharCode(10));
+    const soloSue = [...corpo.matchAll(/\$\{([^}]*toFixed\([12]\)[^}]*)\}%/g)];
+    if (soloSue.length) guai.push("una percentuale del libro si formatta da sola invece di passare "
+      + "dal formattatore unico: " + soloSue.map(m => m[1]).join(", "));
     return guai.length ? no(guai.join(" · ")) : true;
   })());
+
+/* ═══ v443 — DUE SEDI CHE IL PACCHETTO DICHIARA IDENTICHE, E DUE RESE ════════════════════════
+   Il blocco della disciplina scrive testualmente "QUESTE MISURE SONO LE STESSE DEL BLOCCO DEL
+   LIBRO QUI SOPRA … Contale UNA VOLTA SOLA", e poi il drawdown usciva "-24.8%" di la' e "24,8%"
+   di qua, le scommesse effettive "2.3" contro "2,3". *Dichiarare che due numeri sono lo stesso e
+   poi stamparli diversi e' peggio che non dichiararlo* (v421): il collaudo B5 ordina al lettore
+   di segnalare due valori per la stessa grandezza, e glieli forniva il pacchetto.
+   Nessuna tolleranza (v415): fra due rese della STESSA grandezza dalla STESSA fonte i numeri
+   devono COINCIDERE, non somigliarsi.
+   ⚠ Il check ha un PAVIMENTO: se non trova entrambe le coppie si dichiara MUTO invece di passare
+   per assenza del fenomeno — la trappola gia' pagata quattro volte in questo progetto. */
+check("v443 · drawdown e scommesse effettive: una misura sola, una resa sola", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const libro = contestoPortafoglio(null) || "", disc = disciplinaTesto() || "";
+  const righeL = libro.split(NL), righeD = disc.split(NL);
+  const dopo = (s, ago) => { const i = s.indexOf(ago); return i < 0 ? null : s.slice(i + ago.length); };
+  const num = (s) => { if (s == null) return null; const m = s.match(/^-?[0-9]+(,[0-9]+)?/); return m ? m[0] : null; };
+  const rigaProf = righeL.find(l => l.indexOf("- Il tuo libro:") === 0);
+  if (!rigaProf) return "MUTO: sparita la riga dei profili di rischio, il confronto non e' misurabile";
+  const ddP = num(dopo(rigaProf, "drawdown massimo ")), effP = num(dopo(rigaProf, "scommesse effettive "));
+  const rD = righeD.find(l => l.indexOf("nel libro:") >= 0 && l.indexOf("sulle ultime") >= 0);
+  const rE = righeD.find(l => l.indexOf("nel libro:") >= 0 && l.indexOf(" nomi") >= 0);
+  const ddD = rD ? num(dopo(rD, "nel libro: ")) : null, effD = rE ? num(dopo(rE, "nel libro: ")) : null;
+  const manca = [];
+  if (!ddP || !ddD) manca.push("drawdown");
+  if (!effP || !effD) manca.push("scommesse effettive");
+  if (manca.length) return "MUTO: non trovo entrambe le sedi per " + manca.join(", ");
+  const abs = (s) => s.charAt(0) === "-" ? s.slice(1) : s;
+  const guai = [];
+  if (abs(ddP) !== abs(ddD)) guai.push("drawdown: i profili scrivono " + ddP + ", la disciplina " + ddD);
+  if (effP !== effD) guai.push("scommesse effettive: i profili scrivono " + effP + ", la disciplina " + effD);
+  return guai.length ? guai.join(" · ") : true;`));
+
+/* ═══ v443 — UN FORMATTATORE SOLO, E NON PUO' ESSERCENE UN SECONDO ═══════════════════════════
+   La causa strutturale delle v421, v442 e v443 non erano le sedi di stampa: era che il
+   formattatore delle percentuali era scritto CINQUE volte — `pct1` a livello di modulo piu'
+   quattro cloni locali byte-identici (`n1`) e tre copie inline del suo corpo. Con cinque copie,
+   "quale delle due rese e' quella giusta" e' una domanda che si ripresenta a ogni riga nuova.
+   Il gate guarda il CODICE e non puo' essere verde per fortuna: il corpo del formattatore
+   compare UNA volta sola, ed e' quella di `pct1`. */
+check("v443 · il formattatore delle percentuali del libro e' UNO SOLO", (() => {
+  const codice = src.split(String.fromCharCode(10))
+    .filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l)).join(String.fromCharCode(10));
+  const corpo = "fmtNum.format(Math.round(v * 10) / 10)";
+  const n = codice.split(corpo).length - 1;
+  if (n !== 1) return no("il corpo del formattatore e' scritto " + n + " volte: le copie divergono "
+    + "al primo ritocco, ed e' cosi' che la stessa percentuale e' uscita in due rese (v421, v442)");
+  if (!/const pct1 = \(v\) =>/.test(codice)) return no("sparito pct1: il formattatore unico non esiste piu'");
+  if (/const n1 = \(v\) =>/.test(codice)) return no("e' tornato un clone locale del formattatore");
+  return true;
+})());
 
 let fail = 0;
 for (const [name, ok] of T) {

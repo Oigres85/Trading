@@ -1,0 +1,63 @@
+#!/bin/sh
+# ═══ v443 — FRA IL REBASE E IL PUSH NON GIRAVA NIENTE ═══════════════════════════════════════
+# Il 09/09 il merge della v441 ha lasciato `main` ROSSA. Il codice era giusto e i gate erano
+# verdi quando li avevo eseguiti: fra quel momento e il push c'e' stato un
+# `git pull --rebase origin main` che ha portato un `data.json` nuovo, e i gate NON sono stati
+# rieseguiti. Un check che dipende dai dati e' passato da verde a rosso senza che nessuno
+# guardasse.
+#
+# ⚠⚠ IL `pre-commit` NON PUO' COPRIRLO: gira al COMMIT, cioe' PRIMA del rebase. La finestra
+# scoperta e' esattamente commit -> rebase -> push, ed e' la finestra che da' sulla produzione,
+# perche' GitHub Pages serve `main` e il push E' la pubblicazione.
+#
+# La regola era gia' scritta in CLAUDE.md da v411 — *dopo un rebase che porta dati nuovi i gate
+# vanno rieseguiti* — ed e' stata letta, scritta e saltata nello stesso pomeriggio. Per questo
+# non e' un promemoria: e' un hook. *Un difetto di metodo ripetuto non si corregge con
+# l'attenzione: si corregge cambiando lo strumento perche' non lo accetti piu'.*
+#
+# ⚠ QUALI GATE, E PERCHE' SOLO QUESTI. Misurato il 09/09: `test_update_data.py` ha ZERO
+# riferimenti a `data/data.json` e resta verde anche svuotando il file — il suo verdetto non
+# puo' cambiare per un rebase dei dati, e costa 60 secondi su 87. Sta in CI e nel pre-commit.
+# Qui girano i sei che leggono i dati davvero (controprova: `coherence_check` esce 1 sul file
+# svuotato). Costo misurato: ~27 secondi.
+# ⚠ Un hook troppo lento viene scavalcato con --no-verify, ed e' la classe "un avviso che suona
+# sempre non avvisa" (v421, v427): la selezione e' per necessita', non per fretta.
+#
+# Attivazione (una volta sola, per macchina):   git config core.hooksPath .githooks
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+echo "· gate sui dati, sull'albero che stai per pubblicare"
+echo "  data/data.json: $(python3 -c "import json;print(json.load(open('data/data.json'))['updated_at'])" 2>/dev/null || echo '?')"
+
+fallito=""
+esegui() {
+  nome="$1"; shift
+  if ! out=$("$@" 2>&1); then
+    fallito="$nome"
+    echo "✗ PUSH BLOCCATO da $nome:"
+    echo "$out" | grep -E "^FAIL|INCOERENZE|HARD|violazion" | head -8
+    echo "  (riesegui:  $*)"
+    return 1
+  fi
+  return 0
+}
+
+esegui "test_app.mjs"          node scripts/test_app.mjs                    || exit 1
+esegui "test_analisi_libro.py" python3 scripts/test_analisi_libro.py        || exit 1
+esegui "audit_data.py"         python3 scripts/audit_data.py data/data.json || exit 1
+esegui "redteam.mjs"           node scripts/redteam.mjs                     || exit 1
+esegui "coherence_check.mjs"   node scripts/coherence_check.mjs             || exit 1
+esegui "fx_check.mjs"          node scripts/fx_check.mjs                    || exit 1
+
+# ⚠ riconciliazione ha TRE esiti e solo l'1 e' un guasto: il 2 ("non misurabile") e' il caso
+#   normale a mercato aperto, quando la barra della pipeline e' ancora in formazione (v439).
+#   Bloccare sul 2 renderebbe l'hook inutilizzabile meta' giornata.
+python3 scripts/riconciliazione.py >/dev/null 2>&1 || rc=$?
+if [ "${rc:-0}" = "1" ]; then
+  echo "✗ PUSH BLOCCATO da riconciliazione.py: i due strati dati DIVERGONO"
+  python3 scripts/riconciliazione.py | tail -12
+  exit 1
+fi
+
+echo "✓ i gate che leggono i dati sono verdi su questo albero"

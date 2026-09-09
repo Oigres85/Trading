@@ -401,6 +401,11 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
   ed esegue l'autocontrollo prima di lasciar committare. La CI li prendeva comunque, ma *dopo*
   il push e dopo che il CEO poteva già aver aperto la pagina.
   Attivazione, una volta per macchina: `git config core.hooksPath .githooks`
+- **`.githooks/pre-push` (v443)** — chiude la finestra che il pre-commit NON può vedere:
+  `commit → rebase → push`. Il `git pull --rebase` porta un `data.json` nuovo e i gate che
+  leggono i dati vanno rieseguiti PRIMA del push — la regola v411, saltata, che ha reso rossa
+  `main` in v442. Esegue i sei gate che i dati li leggono davvero (~27 s misurati);
+  `test_update_data.py` resta fuori perché è indipendente da `data/data.json` (misurato).
 - `node scripts/self_check.mjs` — **AUTOCONTROLLO (v277)**: l'unico gate che guarda il SISTEMA
   invece dei dati. Nasce da due errori fatti nello stesso giorno che nessun altro gate ha preso,
   perché tutti gli altri controllano il PRODOTTO e nessuno l'OPERAZIONE che lo modifica:
@@ -4630,6 +4635,117 @@ mercato dei capitali della v404, che stampava `16.6%` col punto.
 ⚠ Validata per iniezione, e la seconda iniezione dimostra perché serviva: rimettendo il numero
 grezzo nella scheda **`v370` resta verde** (oggi i due valori coincidono per caso) e a mordere è
 solo la guardia strutturale.
+
+## 🔢 v443 — IL GATE SCRITTO IERI ERA ANCORATO ALLA FORMA, E IL DIFETTO ERA IN ALTRE TRE SEDI
+
+La v442 ha chiuso due sedi in cui lo stesso peso usciva in due rese e ha lasciato una guardia a
+sorvegliare la classe. Quella guardia cercava un `toFixed(1)` seguito **esattamente** da
+`% dell'azionario`: copriva le due sedi che avevo in mente e nessun'altra.
+
+> ⚠⚠ È la lezione **v422** — *un gate ancorato a una FORMA sorveglia le occorrenze che l'autore
+> aveva in mente, non la proprietà* — rifatta **dentro il gate scritto il giorno prima per
+> chiudere quella stessa classe.**
+
+Misurato sul pacchetto vero, non sul sorgente: **dodici posizioni su tredici** avevano il proprio
+peso stampato due volte, con due rese, nello stesso pacchetto.
+
+| dove | come usciva |
+|---|---|
+| riga del libro | `MU: 23% dell'azionario` |
+| CONTRIBUTO AL RISCHIO | `MU peso **23.0%** → rischio 34.4%` |
+| DIPENDENZA DAL MERCATO DEI CAPITALI | `16,7% dell'azionario` … otto righe dopo `colpisce **16.7%** del libro` |
+| elenco «chi dipende» | `MSTR **7.4%**` contro `MSTR: 7,4% dell'azionario` |
+
+⚠ Il caso peggiore stava **dentro la stessa frase**: `16,7%` e `16.7%` a otto righe di distanza,
+sulla stessa grandezza, con la seconda che dice esplicitamente di essere la prima.
+
+### E due misure che il pacchetto DICHIARA identiche uscivano diverse
+Il blocco della disciplina scrive testualmente *"QUESTE MISURE SONO LE STESSE DEL BLOCCO DEL
+LIBRO QUI SOPRA … Contale UNA VOLTA SOLA"*, e poi:
+
+| misura | profili di rischio | disciplina |
+|---|---|---|
+| drawdown del libro | `-24.8%` | `24,8%` |
+| scommesse effettive | `2.3` | `2,3` |
+
+> **Dichiarare che due numeri sono lo stesso e poi stamparli diversi è peggio che non
+> dichiararlo** (v421). Il collaudo B5 ordina a chi legge di segnalare due valori per la stessa
+> grandezza: qui glieli forniva il pacchetto, nel punto in cui gli aveva appena promesso il
+> contrario.
+
+### 🩹 La causa strutturale: il formattatore era scritto CINQUE volte
+La v421 aveva stabilito *"una formattazione sola a livello di modulo (`pct1`)"*. Nel file c'erano
+`pct1` **più quattro cloni locali byte-identici** (`n1`, in `renderCredito`, `graficiDisciplina`,
+`renderRischio`, `disciplinaRischio`) **più tre copie inline del suo corpo**. Con otto sedi che
+fanno la stessa cosa, *"quale delle due rese è quella giusta"* è una domanda che si ripresenta a
+ogni riga nuova — ed è esattamente quello che è successo in v421, v442 e qui.
+
+Ora il corpo del formattatore compare **una volta sola** e un gate lo verifica sul codice: non può
+essere verde per fortuna, e non aspetta che i dati del giorno mostrino il difetto.
+⚠ Ricevuta del taglio scritta prima (v201-v204): i quattro cloni sono quattro righe singole, i
+vicini sono stati letti uno per uno, le 36 chiamate `n1(` sono tutte alla lambda, e il `n1`
+**numerico** di `movimentiImpliciti` (v441) non è mai seguito da una parentesi — quindi la
+sostituzione non ha confini da indovinare.
+
+### 🦴 Trentaquattresima rottura di un check ancorato a una stringa letterale
+**v355** pretendeva `peso [\d.]+% → rischio [\d.]+%`, cioè **il punto decimale**: la resa che il
+pacchetto non deve avere. È andato rosso su codice più corretto — e il commento due righe sopra
+scriveva già *"MU pesa il 23,1%"* con la virgola, cioè **il commento conosceva la convenzione
+giusta mentre la sonda pretendeva quella sbagliata** (classe v326). *Un gate che pinna un difetto
+lo rende permanente* (v326, v411, v415, v422, v441). Riagganciato al fatto ed è diventato **più
+forte**: la coppia esce accanto, **e** il peso non torna a scriversi col punto.
+
+### 🎯 Cinque falsi positivi su sei, e li ha smascherati il testo vero
+Il mio scanner sul sorgente segnalava sei campi formattati in più modi. **Cinque erano variabili
+locali omonime in scope diversi** (`v`, `yoy`, `r`, `pct`, `px`) e uno solo era reale. Idem sul
+pacchetto: lo scanner dei numeri scritti in entrambe le forme pescava i **titoli delle notizie in
+inglese** (`AMD returns 7.7% in a month`) e le **correlazioni**, che col punto ci vanno.
+*Un allarme va verificato contro il testo vero prima di diventare una correzione* (v417) — qui
+mi avrebbe fatto "correggere" undici righe corrette.
+
+## 🚪 v443 — FRA IL REBASE E IL PUSH NON GIRAVA NIENTE
+
+Il difetto **procedurale** che ha reso rossa `main` in v442 non era il codice: era che il
+`git pull --rebase` prima del push porta un `data.json` nuovo e **i gate non venivano
+rieseguiti**. La regola era scritta in questo file da v411, letta e saltata lo stesso pomeriggio.
+
+⚠⚠ **Il `pre-commit` non può coprirla**: gira al COMMIT, cioè **prima** del rebase. La finestra
+scoperta è esattamente `commit → rebase → push`, ed è quella che dà **direttamente sulla
+produzione** — Pages serve `main`, e il push È la pubblicazione.
+
+Quindi non un promemoria ma un **`.githooks/pre-push`**. *Un difetto di metodo ripetuto non si
+corregge con l'attenzione: si corregge cambiando lo strumento perché non lo accetti più.*
+
+⚠ **Quali gate, e perché solo quelli — misurato, non scelto a occhio**: `test_update_data.py` ha
+**zero** riferimenti a `data/data.json` e resta verde anche svuotando il file (controprova:
+`coherence_check` esce 1 sullo stesso file svuotato). Il suo verdetto non può cambiare per un
+rebase dei dati, e costa **60 secondi su 87**. Restano i sei che i dati li leggono davvero: costo
+misurato **~27 secondi**, exit 1 su dati perturbati con il nome del gate caduto.
+⚠ Un hook lento viene scavalcato con `--no-verify`, ed è la classe *"un avviso che suona sempre
+non avvisa"* (v421, v427): la selezione è per necessità, non per fretta.
+⚠ `riconciliazione.py` ha **tre** esiti e solo l'`1` blocca: il `2` — non misurabile — è il caso
+normale a mercato aperto (v439), e bloccare su quello renderebbe l'hook inutilizzabile mezza
+giornata.
+
+Attivazione, una volta per macchina: `git config core.hooksPath .githooks`
+
+## 🎲 v443 — UN GATE CHE ANDAVA ROSSO PER CASO: tolto il meccanismo, non dichiarata la causa
+
+`self_check` è andato rosso da solo due volte (v425 e oggi) su *"test_app.mjs: stampa un rapporto
+invece di uscire in silenzio"*, con la suite eseguita a mano perfettamente verde. Fallito **un
+solo** check dei due: quindi il figlio usciva 0 e allo stdout raccolto mancava l'ultima riga —
+cioè una **troncatura della pipe**, sulla suite più loquace (45 KB) e sotto carico.
+
+**La causa non l'ho riprodotta a comando, e lo scrivo invece di dichiararla risolta.** Quello che
+è stato tolto è il **meccanismo** che può troncare: l'uscita delle suite si legge ora da un file
+su disco, che non ha un buffer da perdere alla morte del processo.
+
+> La ragione per cui vale la pena: **un gate che può andare rosso per caso invece che per la
+> proprietà che misura viene ignorato proprio quando ha ragione** (v233, v349, v397, v431).
+
+⚠ Validato per iniezione nei due versi: una suite che esce 0 **senza parlare** fa cadere *"stampa
+un rapporto"*; una che parla ma **fallisce** fa cadere *"passa"*. Ripristino da uno snapshot
+preso prima, mai da `git checkout` (v430).
 
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
