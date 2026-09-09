@@ -75,6 +75,22 @@ Fuso    Europe/Rome
 Risposta attesa: **204 No Content**. Un 404 quasi sempre significa permesso mancante, non URL
 sbagliato — GitHub risponde 404 anche quando la risorsa esiste ma il token non la può vedere.
 
+⚠ **Accendere la notifica di fallimento del job** (*Notify me when… the job fails*). Senza, il
+giorno che il token scade o GitHub rifiuta, lo scheduler **muore in silenzio** e i dati tornano
+in ritardo senza che nessuno lo sappia: è esattamente il guasto della v433, dove l'allarme della
+pipeline non poteva suonare perché mancava un'etichetta. Un orologio che si ferma deve dirlo.
+
+⚠ **Il fuso vive DENTRO il singolo job** (`schedule.timezone`), non solo nelle impostazioni
+dell'account — verificato sullo schema pubblicato dell'API. Impostarlo sul job è la forma robusta:
+se un domani si tocca l'account, i sei job restano ancorati a Europe/Rome per conto proprio.
+
+**b-bis) La stessa cosa in dieci secondi, se si preferisce l'API alla UI.** Console → Settings →
+**API** → genera una chiave, poi un `PUT https://api.cron-job.org/jobs` per ciascuna delle sei ore
+con `Authorization: Bearer <chiave>` e il corpo `{"job": {…}}` — schema in
+<https://docs.cron-job.org/rest-api.html>, `requestMethod: 1` è POST. Il limite dichiarato è
+**5 richieste al secondo**. ⚠ La chiave API è un segreto quanto la password: dà accesso all'intero
+account, non al solo job.
+
 **c) Alternative, con il loro difetto scritto accanto** (nessuna è meglio, sono ripieghi):
 - *Cloudflare Workers Cron* — gratis e affidabile, ma il cron è **in UTC**: l'ora legale torna a
   mano, cioè torna il problema che stiamo togliendo.
