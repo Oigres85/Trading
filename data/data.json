@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-09-09T21:23:31Z",
- "eurusd": 1.1637,
+ "updated_at": "2026-09-09T22:08:48Z",
+ "eurusd": 1.1639,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -957,10 +957,10 @@
    "sortino_6m": 3.17,
    "prepost": {
     "label": "after",
-    "price": 1025.66,
-    "change_pct": -0.21
+    "price": 1025.1,
+    "change_pct": -0.26
    },
-   "prezzo_limite_aggiustato": 1025.66,
+   "prezzo_limite_aggiustato": 1025.1,
    "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -1765,7 +1765,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -2925,10 +2925,10 @@
    "sortino_6m": 4.25,
    "prepost": {
     "label": "after",
-    "price": 521.65,
-    "change_pct": 0.11
+    "price": 520.73,
+    "change_pct": -0.07
    },
-   "prezzo_limite_aggiustato": 521.65,
+   "prezzo_limite_aggiustato": 520.73,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -2939,9 +2939,9 @@
     "float_pct": 99.4,
     "avg_volume_30d": 26011540.0,
     "pe_ttm": 132.2576,
-    "forward_pe": 33.5907,
+    "forward_pe": 33.3784,
     "eps_ttm": 3.94,
-    "eps_forward": 15.5131,
+    "eps_forward": 15.6118,
     "revenue_fy": 41305001984.0,
     "net_income_fy": 6469000192.0,
     "revenue_growth": 0.501,
@@ -4722,10 +4722,10 @@
    "sortino_6m": 1.34,
    "prepost": {
     "label": "after",
-    "price": 223.65,
-    "change_pct": -0.01
+    "price": 223.56,
+    "change_pct": -0.05
    },
-   "prezzo_limite_aggiustato": 223.65,
+   "prezzo_limite_aggiustato": 223.56,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -4758,7 +4758,10 @@
     "short_float": 0.0123,
     "buyback_yield": 0.0074,
     "ps": 17.83,
-    "ev_s": 17.88
+    "ev_s": 17.88,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -5498,9 +5501,9 @@
      "m6": 21.2,
      "ytd": 18.58,
      "a1": 20.03,
-     "a3": 415.15,
+     "a3": 415.16,
      "a5": 983.24,
-     "a10": 13190.97
+     "a10": 13190.98
     },
     "stagionalita": [
      {
@@ -6453,10 +6456,10 @@
    "sortino_6m": 0.49,
    "prepost": {
     "label": "after",
-    "price": 331.28,
-    "change_pct": 0.19
+    "price": 331.02,
+    "change_pct": 0.11
    },
-   "prezzo_limite_aggiustato": 331.28,
+   "prezzo_limite_aggiustato": 331.02,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -7990,10 +7993,10 @@
    "sortino_6m": 0.5,
    "prepost": {
     "label": "after",
-    "price": 169.8,
-    "change_pct": 0.16
+    "price": 169.7,
+    "change_pct": 0.1
    },
-   "prezzo_limite_aggiustato": 169.8,
+   "prezzo_limite_aggiustato": 169.7,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -9822,10 +9825,10 @@
    "sortino_6m": 0.34,
    "prepost": {
     "label": "after",
-    "price": 161.86,
-    "change_pct": 0.14
+    "price": 162.25,
+    "change_pct": 0.38
    },
-   "prezzo_limite_aggiustato": 161.86,
+   "prezzo_limite_aggiustato": 162.25,
    "risk_reward": "1:0.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -11867,10 +11870,10 @@
    "sortino_6m": 1.96,
    "prepost": {
     "label": "after",
-    "price": 482.5,
-    "change_pct": 0.05
+    "price": 482.82,
+    "change_pct": 0.11
    },
-   "prezzo_limite_aggiustato": 482.5,
+   "prezzo_limite_aggiustato": 482.82,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -11892,7 +11895,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0012,
-    "price_to_book": null,
+    "price_to_book": 23.059,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13650,10 +13653,10 @@
    "sortino_6m": 3.0,
    "prepost": {
     "label": "after",
-    "price": 235.16,
-    "change_pct": 0.06
+    "price": 234.91,
+    "change_pct": -0.04
    },
-   "prezzo_limite_aggiustato": 235.16,
+   "prezzo_limite_aggiustato": 234.91,
    "risk_reward": "1:0.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -13675,7 +13678,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.001,
-    "price_to_book": 11.2964,
+    "price_to_book": 11.1195,
     "target_mean": 284.998,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -15178,10 +15181,10 @@
    "sortino_6m": -0.4,
    "prepost": {
     "label": "after",
-    "price": 15.31,
-    "change_pct": 0.46
+    "price": 15.29,
+    "change_pct": 0.33
    },
-   "prezzo_limite_aggiustato": 15.31,
+   "prezzo_limite_aggiustato": 15.29,
    "risk_reward": "1:2.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -16627,10 +16630,10 @@
    "sortino_6m": 1.5,
    "prepost": {
     "label": "after",
-    "price": 268.87,
-    "change_pct": -0.15
+    "price": 268.4,
+    "change_pct": -0.33
    },
-   "prezzo_limite_aggiustato": 268.87,
+   "prezzo_limite_aggiustato": 268.4,
    "risk_reward": "1:0.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -17919,7 +17922,7 @@
      199.41
     ]
    },
-   "earnings_date": "2026-10-27",
+   "earnings_date": null,
    "rating": {
     "key": "strong_buy",
     "n": 13,
@@ -17950,10 +17953,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "after",
-    "price": 198.01,
-    "change_pct": -0.31
+    "price": 197.33,
+    "change_pct": -0.65
    },
-   "prezzo_limite_aggiustato": 198.01,
+   "prezzo_limite_aggiustato": 197.33,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -19282,10 +19285,10 @@
    "sortino_6m": -0.23,
    "prepost": {
     "label": "after",
-    "price": 132.97,
-    "change_pct": 0.2
+    "price": 132.81,
+    "change_pct": 0.08
    },
-   "prezzo_limite_aggiustato": 132.97,
+   "prezzo_limite_aggiustato": 132.81,
    "risk_reward": "1:0.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -20770,10 +20773,10 @@
    "sortino_6m": 0.73,
    "prepost": {
     "label": "after",
-    "price": 92.24,
-    "change_pct": -2.85
+    "price": 92.55,
+    "change_pct": -2.52
    },
-   "prezzo_limite_aggiustato": 92.24,
+   "prezzo_limite_aggiustato": 92.55,
    "risk_reward": "1:1.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -21746,28 +21749,28 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 78131.65,
+   "price": 78026.61,
    "price_asof": "2026-09-09",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.39,
+   "change_pct": -0.53,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.1,
-   "sma200_dist_pct": 11.7,
-   "sma50_dist_pct": 11.3,
+   "ath_dist_pct": -38.2,
+   "sma200_dist_pct": 11.6,
+   "sma50_dist_pct": 11.2,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.1,
+   "w52_dist_pct": -38.2,
    "day_high": 79691.66,
    "day_low": 78060.02,
    "support": 73011.41,
    "resistance": 82262.21,
-   "rsi": 58.9,
-   "volume": 28734347264,
+   "rsi": 58.4,
+   "volume": 28768053248,
    "vol_ratio": 0.94,
    "atr_14": 2173.25,
-   "atr_pct": 2.78,
+   "atr_pct": 2.79,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21776,7 +21779,7 @@
      80350.05,
      79115.85,
      78438.58,
-     78131.65
+     78026.61
     ],
     "m6": [
      80009.99,
@@ -21904,7 +21907,7 @@
      80350.05,
      79115.85,
      78438.58,
-     78131.65
+     78026.61
     ],
     "all": [
      386.94,
@@ -22051,7 +22054,7 @@
      58558.86,
      62813.75,
      78548.63,
-     78131.66
+     78026.61
     ],
     "m1": [
      69266.19,
@@ -22075,7 +22078,7 @@
      80350.05,
      79115.85,
      78438.58,
-     78131.65
+     78026.61
     ],
     "m3": [
      63995.02,
@@ -22143,7 +22146,7 @@
      80350.05,
      79115.85,
      78438.58,
-     78131.65
+     78026.61
     ],
     "y1": [
      111530.55,
@@ -22219,138 +22222,142 @@
      78564.98,
      77667.57,
      79671.97,
-     78131.65
+     78026.61
     ],
     "d1": [
-     78550.87,
+     78550.88,
      78719.3,
-     78651.5,
-     78613.75,
+     78662.55,
+     78613.74,
      78686.76,
-     78777.7,
-     78700.18,
-     78733.94,
-     78676.58,
+     78777.69,
+     78700.19,
+     78723.56,
+     78670.53,
      78760.04,
-     78837.19,
-     78879.67,
-     78879.16,
-     78789.79,
-     78824.22,
-     78770.16,
-     78788.52,
+     78840.36,
+     78879.66,
+     78877.45,
+     78803.86,
+     78826.88,
+     78771.23,
+     78786.43,
      78771.27,
-     78660.79,
-     78582.07,
-     78576.32,
+     78660.78,
+     78582.06,
+     78591.62,
      78580.62,
      78639.99,
      78635.14,
-     78914.93,
-     78823.91,
-     78907.84,
+     78921.32,
+     78823.92,
+     78907.37,
      78899.43,
-     79177.62,
-     79158.96,
-     79121.63,
+     79181.85,
+     79152.13,
+     79119.4,
      79260.93,
-     79172.85,
-     79018.91,
-     78912.38,
-     78911.45,
+     79171.53,
+     79014.2,
+     78906.94,
+     78911.46,
      78871.24,
-     79105.82,
+     79106.25,
      79212.31,
-     79174.13,
+     79180.39,
      79173.93,
-     79116.78,
-     79193.1,
+     79116.79,
+     79182.58,
      79240.76,
-     79285.9,
-     79211.68,
-     79185.51,
+     79285.91,
+     79211.69,
+     79185.2,
      79238.44,
-     79415.95,
-     79394.61,
+     79415.94,
+     79411.48,
      79553.21,
-     79677.75,
-     79633.38,
+     79677.76,
+     79637.79,
      79691.97,
      79643.58,
      79524.13,
      79447.36,
-     79389.6,
-     79068.12,
-     78950.05,
-     79022.39,
+     79389.61,
+     79077.46,
+     78950.11,
+     79022.38,
      78999.5,
-     79067.98,
+     79067.99,
      79137.5,
-     79060.36,
+     79061.96,
      78859.7,
      78778.56,
-     78847.81,
+     78847.8,
      78908.98,
-     79053.02,
+     79055.0,
      78999.14,
      79280.43,
-     79294.61,
+     79300.5,
      79368.0,
-     79366.42,
+     79367.63,
      79494.99,
-     79489.12,
-     79588.16,
-     79610.47,
+     79489.13,
+     79588.17,
+     79608.87,
      79494.81,
-     79532.27,
-     79661.77,
-     79221.7,
-     79157.38,
-     79041.28,
-     79059.99,
-     78933.38,
+     79531.3,
+     79645.42,
+     79224.01,
+     79165.32,
+     79060.63,
+     79065.81,
+     78929.6,
      79280.27,
-     78972.34,
-     78893.39,
-     78793.47,
+     78966.83,
+     78897.3,
+     78786.17,
      78470.26,
-     78047.58,
+     78048.19,
      78568.72,
      78627.78,
      78655.68,
      78729.21,
-     78645.73,
+     78650.25,
      78485.4,
-     78855.59,
+     78855.58,
      78791.77,
      78717.0,
      78708.0,
      78846.58,
      78834.23,
-     78790.78,
-     78685.88,
-     78786.27,
+     78782.7,
+     78689.88,
+     78786.84,
      78720.08,
      78587.71,
      78590.59,
      78566.4,
      78521.92,
-     78411.48,
+     78454.46,
      78369.01,
      78470.38,
      78554.16,
-     78519.66,
-     78282.17,
-     78215.91,
-     78183.31,
+     78526.71,
+     78279.54,
+     78210.4,
+     78183.35,
      78239.0,
-     78207.07,
-     78225.11,
-     78268.45,
+     78204.98,
+     78225.1,
+     78268.46,
      78189.43,
-     78298.55,
+     78299.4,
      78224.57,
-     78131.66
+     78229.12,
+     78159.75,
+     78225.14,
+     78114.05,
+     78026.61
     ]
    },
    "earnings_date": null,
@@ -22360,11 +22367,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.76,
-   "sortino_1y": -1.02,
+   "sortino_1y": -1.03,
    "sharpe_6m": -0.38,
-   "sortino_6m": -0.55,
+   "sortino_6m": -0.57,
    "prepost": null,
-   "prezzo_limite_aggiustato": 78131.65,
+   "prezzo_limite_aggiustato": 78026.61,
    "risk_reward": "1:1.0",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22377,22 +22384,22 @@
     "w1": {
      "support": 77635.69,
      "resistance": 80530.65,
-     "change_pct": -2.12
+     "change_pct": -2.25
     },
     "m1": {
      "support": 64111.07,
      "resistance": 82262.21,
-     "change_pct": 12.8
+     "change_pct": 12.65
     },
     "m3": {
      "support": 61275.83,
      "resistance": 82262.21,
-     "change_pct": 22.09
+     "change_pct": 21.93
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -11.95
+     "change_pct": -12.06
     }
    },
    "financials": [],
@@ -22419,74 +22426,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 78131.65,
+     "prezzo": 78026.61,
      "medie": {
       "sma10": {
-       "liv": 79005.64,
-       "dist_pct": -1.11
+       "liv": 78995.14,
+       "dist_pct": -1.23
       },
       "ema10": {
-       "liv": 78692.89,
-       "dist_pct": -0.71
+       "liv": 78673.79,
+       "dist_pct": -0.82
       },
       "sma20": {
-       "liv": 78689.42,
-       "dist_pct": -0.71
+       "liv": 78684.17,
+       "dist_pct": -0.84
       },
       "ema20": {
-       "liv": 77013.87,
-       "dist_pct": 1.45
+       "liv": 77003.86,
+       "dist_pct": 1.33
       },
       "sma30": {
-       "liv": 74148.31,
-       "dist_pct": 5.37
+       "liv": 74144.81,
+       "dist_pct": 5.24
       },
       "ema30": {
-       "liv": 75131.41,
-       "dist_pct": 3.99
+       "liv": 75124.63,
+       "dist_pct": 3.86
       },
       "sma50": {
-       "liv": 70191.02,
-       "dist_pct": 11.31
+       "liv": 70188.92,
+       "dist_pct": 11.17
       },
       "ema50": {
-       "liv": 72512.24,
-       "dist_pct": 7.75
+       "liv": 72508.12,
+       "dist_pct": 7.61
       },
       "sma100": {
-       "liv": 66641.85,
-       "dist_pct": 17.24
+       "liv": 66640.8,
+       "dist_pct": 17.09
       },
       "ema100": {
-       "liv": 70539.66,
-       "dist_pct": 10.76
+       "liv": 70537.58,
+       "dist_pct": 10.62
       },
       "sma200": {
-       "liv": 69917.21,
-       "dist_pct": 11.75
+       "liv": 69916.69,
+       "dist_pct": 11.6
       },
       "ema200": {
-       "liv": 72995.24,
-       "dist_pct": 7.04
+       "liv": 72994.2,
+       "dist_pct": 6.89
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 58.9,
+      "rsi14": 58.4,
       "macd": {
-       "linea": 2603.09,
-       "segnale": 3112.85,
-       "istogramma": -509.76
+       "linea": 2594.71,
+       "segnale": 3111.17,
+       "istogramma": -516.46
       },
-      "stoch_k": 31.3,
-      "stoch_d": 38.5,
-      "williams_r": -68.7,
-      "cci20": 0.2,
+      "stoch_k": 29.6,
+      "stoch_d": 37.9,
+      "williams_r": -70.4,
+      "cci20": -0.2,
       "adx14": 47.0,
       "di_su": 31.3,
       "di_giu": 12.6,
-      "momentum10": 464.08
+      "momentum10": 359.04
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22979,19 +22986,19 @@
       "o": 78446.18,
       "h": 79691.66,
       "l": 78060.02,
-      "c": 78131.65
+      "c": 78026.61
      }
     ],
     "performance": {
-     "s1": -1.93,
-     "m1": 20.8,
-     "m3": 22.95,
-     "m6": -4.05,
-     "a1": -10.72,
-     "ytd": -11.95,
-     "a3": 189.72,
-     "a5": 78.42,
-     "a10": 12714.03
+     "s1": -2.07,
+     "m1": 20.63,
+     "m3": 22.78,
+     "m6": -4.18,
+     "a1": -10.84,
+     "ytd": -12.06,
+     "a3": 189.33,
+     "a5": 78.18,
+     "a10": 12696.81
     },
     "stagionalita": [
      {
@@ -23068,8 +23075,8 @@
      },
      {
       "mese": 9,
-      "media": -1.72,
-      "mediana": -1.81,
+      "media": -1.73,
+      "mediana": -1.87,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23104,9 +23111,9 @@
      }
     ]
    },
-   "rs_1m": 14.3,
+   "rs_1m": 14.2,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 13.5,
+   "rs_ndx_1m": 13.3,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -30708,15 +30715,15 @@
    "w52_high": 1.2,
    "w52_low": 1.13,
    "w52_dist_pct": -3.2,
-   "day_high": 1.17,
+   "day_high": 1.16,
    "day_low": 1.16,
    "support": 1.15,
    "resistance": 1.17,
    "rsi": 57.8,
    "volume": 0,
    "vol_ratio": null,
-   "atr_14": 0.00473,
-   "atr_pct": 0.41,
+   "atr_14": 0.00459,
+   "atr_pct": 0.39,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -31412,6 +31419,10 @@
      1.16,
      1.16,
      1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
      1.16
     ]
    },
@@ -31438,7 +31449,7 @@
    "tech_by_range": {
     "w1": {
      "support": 1.16,
-     "resistance": 1.17,
+     "resistance": 1.16,
      "change_pct": 0.45
     },
     "m1": {
@@ -31464,11 +31475,11 @@
     "label": "Accumulazione",
     "structure": "rialzista",
     "bos": null,
-    "bull_fvg": 3,
+    "bull_fvg": 4,
     "bear_fvg": 0,
     "last_fvg": {
      "dir": "rialzista",
-     "lo": 1.15,
+     "lo": 1.16,
      "hi": 1.16
     },
     "liq_above": 1.17,
@@ -31544,10 +31555,10 @@
       "stoch_k": 48.4,
       "stoch_d": 40.8,
       "williams_r": -51.6,
-      "cci20": 19.2,
-      "adx14": 27.4,
-      "di_su": 21.8,
-      "di_giu": 13.1,
+      "cci20": 18.3,
+      "adx14": 27.0,
+      "di_su": 20.0,
+      "di_giu": 13.5,
       "momentum10": -0.0
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
@@ -32039,7 +32050,7 @@
      {
       "d": "2026-09-09",
       "o": 1.16,
-      "h": 1.17,
+      "h": 1.16,
       "l": 1.16,
       "c": 1.16
      }
@@ -35795,10 +35806,10 @@
    "sortino_6m": 1.42,
    "prepost": {
     "label": "after",
-    "price": 435.36,
-    "change_pct": 0.0
+    "price": 435.27,
+    "change_pct": -0.02
    },
-   "prezzo_limite_aggiustato": 435.36,
+   "prezzo_limite_aggiustato": 435.27,
    "risk_reward": "1:0.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -37460,10 +37471,10 @@
    "sortino_6m": 0.27,
    "prepost": {
     "label": "after",
-    "price": 364.55,
-    "change_pct": 0.05
+    "price": 364.3,
+    "change_pct": -0.02
    },
-   "prezzo_limite_aggiustato": 364.55,
+   "prezzo_limite_aggiustato": 364.3,
    "risk_reward": "1:2.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -38639,8 +38650,16 @@
    "delta_bp": 17,
    "next_cut_prob": null,
    "next_hike_prob": null,
-   "movimenti": null,
-   "base_effr": null,
+   "movimenti": {
+    "mosse_25bp": 1.37,
+    "tasso_atteso_fine_mese": 3.973,
+    "giorni_vecchio": 16,
+    "giorni_nuovo": 14,
+    "giorni_mese": 30,
+    "base_effr": 3.63,
+    "riunione": "2026-09-16"
+   },
+   "base_effr": 3.63,
    "next_fomc": "2026-09-16",
    "meetings": [
     {
@@ -38648,8 +38667,8 @@
      "cut_prob": null,
      "hike_prob": null,
      "hold_prob": null,
-     "mosse_25bp": null,
-     "prezzata_dal_contratto": false
+     "mosse_25bp": 1.37,
+     "prezzata_dal_contratto": true
     },
     {
      "date": "2026-10-28",
@@ -45577,15 +45596,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1637",
-    "change_pct": 0.08,
+    "value": "1.1639",
+    "change_pct": 0.1,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "178.59",
-    "change_pct": -0.17,
+    "value": "178.61",
+    "change_pct": -0.16,
     "suffix": "%"
    }
   ],
@@ -47695,13 +47714,6 @@
      "url": "https://www.marketwatch.com/story/treasury-to-buy-back-more-government-bonds-than-previously-announced-940363ee?mod=mw_rss_topstories"
     },
     {
-     "titolo": "Fed rate hike hinges on two key inflation reports in the next two days",
-     "riassunto": "Consumer and wholesale prices are rising again. Just how bad does it have to get for the Fed to act?",
-     "fonte": "MarketWatch",
-     "quando": "2026-09-09T16:18:00Z",
-     "url": "https://www.marketwatch.com/story/fed-rate-hike-hinges-on-two-key-inflation-reports-in-the-next-two-days-09d63bd9?mod=mw_rss_topstories"
-    },
-    {
      "titolo": "U.S. reveals import ban on slew of Canadian goods as trade war escalates",
      "riassunto": "Import bans on motorbikes, alcohol and dairy products are due to come into effect on Sept. 29 as the rift between the countries deepens.",
      "fonte": "CNBC Economia",
@@ -47709,7 +47721,7 @@
      "url": "https://www.cnbc.com/2026/09/09/us-canada-trade-war-import-ban.html"
     },
     {
-     "titolo": "Bessent’s Upsized Buybacks Get Hit by Treasury Market Reality",
+     "titolo": "Bessent’s Upsized Buybacks Get Hit by Bond Market Reality",
      "riassunto": "Treasury Secretary Scott Bessent’s unusual move to supersize his department’s debt buyback program stumbled on Wednesday, when an announcement on the size of the first enlarged operation proved insufficient to halt market declines.",
      "fonte": "Bloomberg",
      "quando": "2026-09-09T15:02:22Z",
@@ -47798,6 +47810,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-04T14:15:04Z",
      "url": "https://www.cnbc.com/2026/09/04/private-security-spending-crime-allied-universal.html"
+    },
+    {
+     "titolo": "The big August jobs report is due out Friday. Here's what to expect for what has been a jobless summer",
+     "riassunto": "August nonfarm payrolls are expected to rise by 53,000 as a subdued labor market keeps Fed attention focused on inflation.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-03T19:38:09Z",
+     "url": "https://www.cnbc.com/2026/09/03/august-2026-jobs-report-payrolls.html"
     }
    ],
    "fonti": [
@@ -52654,8 +52673,8 @@
    "us10": 4.84,
    "jp10": 2.9,
    "spread": 1.94,
-   "usdjpy": 153.54,
-   "usdjpy_chg_1m": -2.75,
+   "usdjpy": 153.48,
+   "usdjpy_chg_1m": -2.79,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -52665,8 +52684,15 @@
    ],
    "note": "Spread in compressione: il carry trade USD/JPY è meno conveniente; attenzione a possibili rientri di capitali verso lo yen."
   },
+  "putcall": {
+   "symbol": "SPY",
+   "name": "S&P 500 ETF",
+   "ratio": 1.33,
+   "puts": 4511034,
+   "calls": 3381632
+  },
   "risk_sentiment": {
-   "score": 52,
+   "score": 44,
    "label": "Neutrale",
    "components": [
     {
@@ -52678,8 +52704,12 @@
      "score": 81
     },
     {
+     "label": "Put/Call",
+     "score": 0
+    },
+    {
      "label": "Bitcoin",
-     "score": 46
+     "score": 44
     },
     {
      "label": "Treasury 10A",
@@ -52909,7 +52939,7 @@
       "qqq": 93.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-09-09",
     "price": 205.49,
     "d1": -0.89,
@@ -53241,7 +53271,7 @@
       "qqq": 93.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-09-09",
     "price": 166.58,
     "d1": -0.33,
@@ -53407,7 +53437,7 @@
       "qqq": 93.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-09-09",
     "price": 187.87,
     "d1": 0.0,
@@ -53630,7 +53660,7 @@
       "qqq": 93.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-09-09",
     "price": 574.29,
     "d1": 0.1,
@@ -54128,7 +54158,7 @@
       "qqq": 93.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-09-09",
     "price": 112.46,
     "d1": -1.34,
@@ -54294,7 +54324,7 @@
       "qqq": 93.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-09-09",
     "price": 81.71,
     "d1": -1.52,
@@ -57158,14 +57188,14 @@
    "rate_date": "2026-08-01"
   },
   "sp500_pe": {
-   "current": 26.2,
+   "current": 26.1,
    "avg_10y": null,
    "pct_rank": null,
-   "score": 59,
+   "score": 60,
    "history": [
     {
      "d": "2026-09-09",
-     "v": 26.2
+     "v": 26.1
     }
    ],
    "label": "Sopravvalutazione",
@@ -57183,8 +57213,8 @@
    "fetched_at": "2026-09-09"
   },
   "smart_money": {
-   "score": 61,
-   "label": "Ottimista",
+   "score": 57,
+   "label": "Neutrale",
    "smc_indices": {
     "sp500": {
      "bias": 36,
@@ -57234,7 +57264,7 @@
    "vix_term_ratio": 0.872,
    "ig_spread": 0.99,
    "hy_ig_ratio": 2.7,
-   "divergence": -22,
+   "divergence": -18,
    "divergence_label": "Smart money ottimista / Retail pessimista",
    "components": [
     {
@@ -57248,11 +57278,15 @@
     {
      "label": "Spread HY/IG (fuga qualità)",
      "score": 76
+    },
+    {
+     "label": "Copertura PUT (P/C ratio)",
+     "score": 39
     }
    ]
   },
   "macroquant": {
-   "score": 56,
+   "score": 55,
    "label": "Rallentamento",
    "components": [
     {
@@ -57329,7 +57363,7 @@
     },
     {
      "label": "Smart Money (VIX+HY/IG+P/C)",
-     "score": 61
+     "score": 57
     }
    ],
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
@@ -57523,7 +57557,7 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 98.78,
+   "value": 98.77,
    "chg_3m_pct": -1.18,
    "flag": null,
    "src": "DXY"
@@ -57620,14 +57654,14 @@
       "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-09T20:56:13Z",
+      "quando": "2026-09-09T21:38:35Z",
       "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
      },
      {
       "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-09T20:44:56Z",
+      "quando": "2026-09-09T21:33:21Z",
       "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
      },
      {
@@ -57749,6 +57783,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "3 Reasons Meta Has Turned the Corner",
+      "riassunto": "After a successful agentic AI debut and a favorable, high-stakes multi-year legal settlement, Meta Platforms has finally turned the corner.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-09T20:15:00Z",
+      "url": "https://www.nasdaq.com/articles/3-reasons-meta-has-turned-corner"
+     },
+     {
       "titolo": "SpaceX Built AI Data Centers So Fast, Some Ran Without Backup Power for Months. Now It Faces a $920 Million Deadline.",
       "riassunto": "Key PointsSpaceX's data centers haven't been as reliable as expected due to engineering and other issues.",
       "fonte": "Nasdaq",
@@ -57782,29 +57823,22 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-09T15:57:00Z",
       "url": "https://www.nasdaq.com/articles/alphabets-roic-strong-googl-stock-buy-now"
-     },
-     {
-      "titolo": "Dow Movers: GOOGL, HONIV",
-      "riassunto": "In early trading on Wednesday, shares of Honeywell International topped the list of the day's best performing Dow Jones Industrial Average components, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing Dow component thus far",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-09T15:33:52Z",
-      "url": "https://www.nasdaq.com/articles/dow-movers-googl-honiv-0"
      }
     ],
     "MRVL": [
      {
-      "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-09T21:02:07Z",
-      "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
-     },
-     {
       "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-09T21:02:07Z",
+      "quando": "2026-09-09T21:38:35Z",
       "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
+     },
+     {
+      "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-09T21:33:21Z",
+      "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
      },
      {
       "titolo": "Marvell Has Raised Its Growth Outlook 3 Times Since December. The Stock Still Sits 28% Below Its High.",
@@ -57881,18 +57915,18 @@
     ],
     "MU": [
      {
-      "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-09T21:06:51Z",
-      "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
-     },
-     {
       "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-09T21:02:07Z",
+      "quando": "2026-09-09T21:49:44Z",
       "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
+     },
+     {
+      "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-09T21:49:44Z",
+      "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
      },
      {
       "titolo": "Prediction: Micron's Sept. 30 Earnings Could Be the Most Important Catalyst for AI Memory Stocks This Year",
@@ -58101,18 +58135,18 @@
     ],
     "WDC": [
      {
-      "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-09T21:02:07Z",
-      "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
-     },
-     {
       "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-09T21:02:07Z",
+      "quando": "2026-09-09T22:06:22Z",
       "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
+     },
+     {
+      "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-09T22:01:51Z",
+      "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
      },
      {
       "titolo": "Seagate's HAMR Bet is Paying Off: Can Mozaic Sustain the Momentum?",
@@ -58167,7 +58201,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-09T21:23:31Z"
+   "letto_il": "2026-09-09T22:08:48Z"
   }
  },
  "broker": null,
@@ -58178,14 +58212,14 @@
      "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-09T20:56:13Z",
+     "quando": "2026-09-09T21:38:35Z",
      "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
     },
     {
      "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-09T20:44:56Z",
+     "quando": "2026-09-09T21:33:21Z",
      "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
     },
     {
@@ -58307,6 +58341,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "3 Reasons Meta Has Turned the Corner",
+     "riassunto": "After a successful agentic AI debut and a favorable, high-stakes multi-year legal settlement, Meta Platforms has finally turned the corner.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-09T20:15:00Z",
+     "url": "https://www.nasdaq.com/articles/3-reasons-meta-has-turned-corner"
+    },
+    {
      "titolo": "SpaceX Built AI Data Centers So Fast, Some Ran Without Backup Power for Months. Now It Faces a $920 Million Deadline.",
      "riassunto": "Key PointsSpaceX's data centers haven't been as reliable as expected due to engineering and other issues.",
      "fonte": "Nasdaq",
@@ -58340,29 +58381,22 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-09T15:57:00Z",
      "url": "https://www.nasdaq.com/articles/alphabets-roic-strong-googl-stock-buy-now"
-    },
-    {
-     "titolo": "Dow Movers: GOOGL, HONIV",
-     "riassunto": "In early trading on Wednesday, shares of Honeywell International topped the list of the day's best performing Dow Jones Industrial Average components, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing Dow component thus far",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-09T15:33:52Z",
-     "url": "https://www.nasdaq.com/articles/dow-movers-googl-honiv-0"
     }
    ],
    "MRVL": [
     {
-     "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-09T21:02:07Z",
-     "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
-    },
-    {
      "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-09T21:02:07Z",
+     "quando": "2026-09-09T21:38:35Z",
      "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
+    },
+    {
+     "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-09T21:33:21Z",
+     "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
     },
     {
      "titolo": "Marvell Has Raised Its Growth Outlook 3 Times Since December. The Stock Still Sits 28% Below Its High.",
@@ -58439,18 +58473,18 @@
    ],
    "MU": [
     {
-     "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-09T21:06:51Z",
-     "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
-    },
-    {
      "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-09T21:02:07Z",
+     "quando": "2026-09-09T21:49:44Z",
      "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
+    },
+    {
+     "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-09T21:49:44Z",
+     "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
     },
     {
      "titolo": "Prediction: Micron's Sept. 30 Earnings Could Be the Most Important Catalyst for AI Memory Stocks This Year",
@@ -58659,18 +58693,18 @@
    ],
    "WDC": [
     {
-     "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-09T21:02:07Z",
-     "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
-    },
-    {
      "titolo": "Stocks Pressured as Inflation Fears Boost Bond Yields",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-09T21:02:07Z",
+     "quando": "2026-09-09T22:06:22Z",
      "url": "https://www.nasdaq.com/articles/stocks-pressured-inflation-fears-boost-bond-yields"
+    },
+    {
+     "titolo": "Stocks and Bonds Fall as Crude Oil Surges",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.25% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.69%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.12%.  E-mini S&P futures (ESU26 ) are down -0.92%, and September E-mini Nasdaq futures (NQU26...",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-09T22:01:51Z",
+     "url": "https://www.nasdaq.com/articles/stocks-and-bonds-fall-crude-oil-surges"
     },
     {
      "titolo": "Seagate's HAMR Bet is Paying Off: Can Mozaic Sustain the Momentum?",
@@ -58725,7 +58759,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-09T21:23:31Z"
+  "letto_il": "2026-09-09T22:08:48Z"
  },
  "predictions": [
   {
@@ -58739,18 +58773,18 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
+   "question": "Will the price of Bitcoin be above $76,000 on September 10?",
+   "yes": 93,
+   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-10-2026"
+  },
+  {
    "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
    "yes": 8,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
   },
   {
-   "question": "Will the price of Bitcoin be above $76,000 on September 10?",
-   "yes": 95,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-10-2026"
-  },
-  {
    "question": "Will the price of Bitcoin be above $74,000 on September 10?",
-   "yes": 99,
+   "yes": 98,
    "link": "https://polymarket.com/event/bitcoin-above-74k-on-september-10-2026"
   }
  ],
@@ -66513,7 +66547,7 @@
      ],
      "call_wall": 200.0,
      "put_wall": 100.0,
-     "opt_volume": 72677
+     "opt_volume": 72678
     },
     {
      "date": "2026-09-25",
@@ -75689,7 +75723,7 @@
      ],
      "call_wall": 610.0,
      "put_wall": 250.0,
-     "opt_volume": 10096
+     "opt_volume": 10092
     },
     {
      "date": "2026-09-25",
@@ -78734,13 +78768,13 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 39,
-    "risk_sentiment": 52,
+    "risk_sentiment": 44,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
-    "sp500_pe": 59,
-    "smart_money": 61,
-    "macroquant": 56,
+    "sp500_pe": 60,
+    "smart_money": 57,
+    "macroquant": 55,
     "seasonality": 35,
     "in:cpi": 58,
     "in:pce": 49,
@@ -78864,7 +78898,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -78916,6 +78950,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-09T21:23:32Z"
+  "generated_at": "2026-09-09T22:08:48Z"
  }
 }
