@@ -60,6 +60,15 @@ def carica_pipeline():
             righe[tk] = r
     return D, righe
 
+def _seduta_raccolta(tk):
+    """L'ultima seduta presente nello storico della raccolta, o None."""
+    p = os.path.join(CACHE, f"ohlc_{tk}.json")
+    try:
+        b = (json.load(open(p)) or {}).get("barre") or []
+        return str(b[-1].get("d") or "") or None
+    except Exception:
+        return None
+
 def confronta():
     D, PIPE = carica_pipeline()
     if not PIPE:
@@ -78,7 +87,7 @@ def confronta():
               "`python3 scripts/raccolta/preleva.py <TICKER...>`")
         return 2
 
-    guai, confrontati, corti, saltati = [], [], [], []
+    guai, confrontati, corti, saltati, sedute_diverse = [], [], [], [], []
     print(f"pipeline: {D.get('updated_at')}   ·   {len(tickers)} titoli con storico nella raccolta\n")
     print(f"{'tk':<7}{'barre':>6}{'chiusura':>11}{'Δ%':>8}{'RSI':>7}{'Δ':>7}{'ATR%':>7}{'Δ':>7}"
           f"{'d50':>8}{'Δ':>7}{'d200':>8}{'Δ':>7}")
@@ -93,6 +102,16 @@ def confronta():
         if not s or "errore" in s:
             saltati.append(tk)
             continue
+        # ⚠⚠ v438 — DUE SEDUTE DIVERSE NON SI CONFRONTANO. La raccolta si aggiorna a mano e
+        #    puo' fermarsi alla chiusura di ieri mentre la pipeline ha gia' la barra di oggi:
+        #    allora OGNI grandezza diverge, e la divergenza misura il movimento del mercato,
+        #    non il disaccordo fra i due strati. E' la classe v186/v207 dentro lo strumento
+        #    scritto per sorvegliarla — e un gate che suona ogni giorno smette di essere letto.
+        sp, sr = str(r.get("price_asof") or ""), _seduta_raccolta(tk)
+        if sp and sr and sp != sr:
+            sedute_diverse.append(f"{tk} (pipeline {sp}, raccolta {sr})")
+            continue
+
         m, t = s["mercato"], s["tecnica"]
         nb = s.get("barre") or 0
         d = t.get("dist_medie_pct") or {}
@@ -142,6 +161,16 @@ def confronta():
               f"di ventaglio su SKHY): {' · '.join(corti)}")
     if saltati:
         print(f"⚠ non leggibili dalla raccolta: {' · '.join(saltati)}")
+
+    if sedute_diverse:
+        print(f"⚠ {len(sedute_diverse)} titoli NON confrontati: i due strati sono su sedute "
+              f"diverse — {' · '.join(sedute_diverse[:6])}"
+              + (" …" if len(sedute_diverse) > 6 else ""))
+    if sedute_diverse and not confrontati:
+        print("\nNON MISURABILE: nessun titolo e' sulla stessa seduta nei due strati. La "
+              "raccolta si rinfresca con `python3 scripts/raccolta/preleva.py <TICKER...>`; "
+              "finche' non lo si fa, la differenza misurerebbe il movimento del mercato.")
+        return 2
 
     # ⚠ un confronto che non confronta niente non e' un confronto (v196, v229)
     pieni = [tk for tk in confrontati if tk not in [c.split(" ")[0] for c in corti]]

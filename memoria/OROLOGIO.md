@@ -75,6 +75,29 @@ Fuso    Europe/Rome
 Risposta attesa: **204 No Content**. Un 404 quasi sempre significa permesso mancante, non URL
 sbagliato — GitHub risponde 404 anche quando la risorsa esiste ma il token non la può vedere.
 
+## Stato: ACCESO dal 09/09/2026
+
+| scatto | ritardo sull'orario dichiarato |
+|---|---|
+| 15:30 → partito 15:30:40 | **40 secondi** |
+| prova → partita 16:18:12 | **12 secondi** |
+| (per confronto) cron di GitHub | **99 – 263 minuti** |
+
+Catena provata da capo a fondo: lo scheduler chiama, GitHub risponde `204`, la pipeline gira e
+i dati freschi sono su `main` **due minuti e mezzo dopo**.
+
+> ⚠⚠ **L'UNICO BANCO DI PROVA VALIDO È UN JOB VERO.** Il proxy di rete dell'ambiente di sviluppo
+> **sostituisce l'header `Authorization`**: misurato il 09/09, un token *inventato* — e perfino
+> nessun token — ottiene `200` e l'identità del CEO. Quindi da lì dentro **non si può dire nulla**
+> sui permessi di un token esterno, e il `403 "Resource not accessible by integration"` che si
+> ottiene è quello dell'integrazione della sessione, non del token che si crede di provare.
+> Per collaudare un token: si crea un job usa-e-getta due minuti nel futuro, si legge il suo
+> storico, lo si cancella. È la strada che il token percorrerà davvero.
+
+⚠ **`401` e `403` dicono due cose diverse, e la differenza è la diagnosi**: `403` = token valido a
+cui manca un permesso; **`401` = token non più valido** (cancellato o rigenerato). È stato il
+passaggio da 403 a 401 a smascherare che il token nei job era stato invalidato, non depotenziato.
+
 ⚠ **Accendere la notifica di fallimento del job** (*Notify me when… the job fails*). Senza, il
 giorno che il token scade o GitHub rifiuta, lo scheduler **muore in silenzio** e i dati tornano
 in ritardo senza che nessuno lo sappia: è esattamente il guasto della v433, dove l'allarme della

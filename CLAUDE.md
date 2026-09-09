@@ -4592,3 +4592,72 @@ canale unico di allarme.
 > Spostare hosting e lettura dati è un **trasloco**. La persistenza è una **riscrittura**, e il
 > congelamento la vieta. «Uscire da GitHub» e «avere i dati all'ora giusta» sembravano la stessa
 > cosa e non lo sono: rotto era l'orologio, e quello esce gratis.
+
+## 🔌 v438 — IL MIO STRUMENTO DI MISURA SOSTITUIVA LE CREDENZIALI, E HO ACCUSATO IL CEO PER TRE GIRI
+
+Accendendo lo scheduler esterno (v437) il token del CEO rispondeva `403 "Resource not accessible
+by integration"` sull'unica operazione che conta — far partire il workflow. L'ho mandato **tre
+volte** su GitHub a correggere un permesso, e il permesso non è mai stato il problema.
+
+**Il proxy di rete di questo ambiente sostituisce l'header `Authorization`.** Misurato:
+
+| richiesta | esito |
+|---|---|
+| `GET /user` con un token **inventato di sana pianta** | **200**, e risponde `login: Oigres85` |
+| `GET /user` **senza nessun token** | **200**, stessa identità |
+
+Quindi ogni mio `curl` verso GitHub misurava i permessi **della sessione**, mai quelli del token
+che credevo di provare — ed è per questo che il messaggio diceva *"by integration"*, che è il
+linguaggio delle App, non dei token personali. Il segnale c'era nel testo e non l'ho letto.
+
+> ⚠⚠ **È la classe v421 nella sua forma più pura** — *un harness che semplifica un ingresso non
+> produce un risultato più semplice: ne produce uno DIVERSO* — e stavolta il costo non è stato un
+> difetto invisibile ma tre giri di lavoro fatti fare al CEO su un guasto inesistente.
+
+**La regola che ne esce**: prima di emettere un verdetto su una credenziale esterna, verificare
+che il proprio canale la trasmetta. Il controllo costa una riga — *una richiesta con un token
+falso deve fallire*; se riesce, lo strumento sta mentendo. E il banco di prova valido è la strada
+vera: un job usa-e-getta due minuti nel futuro, il suo storico, poi lo si cancella.
+
+⚠ **`401` non è `403`, e la differenza è tutta la diagnosi.** Attraverso il canale vero il token
+ha risposto **401**, cioè *non più valido* — cancellato mentre se ne creava un altro — non *privo
+di permesso*. Avevo raccontato al CEO una storia (*"il permesso è stato concesso e poi tolto"*)
+costruita su misure che non misuravano niente. Un codice di errore letto per un altro è la stessa
+famiglia del percentile scambiato per variazione (v316).
+
+⚠ E la ricostruzione a posteriori era anch'essa sbagliata: l'unica misura vera di quel token —
+`204` alle 15:30:40, passata da cron-job.org senza il mio proxy in mezzo — diceva che funzionava,
+e l'ho spiegata come una finestra di permesso aperta e richiusa invece che come la prova che lo
+strumento sbagliato ero io. **Quando una misura contraddice le altre, il sospettato è lo strumento
+che non ha percorso la strada vera.**
+
+### 🪞 E lo stesso giorno il gate della v436 ha gridato al lupo, per la stessa ragione
+Il pre-commit ha bloccato il commit: `riconciliazione.py` dichiarava **65 divergenze** fra i due
+strati dati. Nessuna era vera. La pipeline aveva la barra del **09/09** (sessione aperta), la
+cache della raccolta era stata letta alle **04:39**, prima dell'apertura americana, quindi si
+fermava all'**08/09**: il gate stava misurando **il movimento del mercato**, non il disaccordo
+fra i due strati.
+
+> **È la classe v186/v207 — «il book può essere prezzato su sedute diverse» — dentro lo strumento
+> che ho scritto ieri per sorvegliare proprio quella famiglia.** Avevo confrontato due strati
+> senza verificare che parlassero dello stesso giorno.
+
+Ora il gate legge la seduta di ciascuno strato, **salta i titoli che non coincidono nominandoli**
+(v406) e, se non ne resta nessuno, esce **2 — non misurabile** con la ragione vera, invece di
+1 — divergono con una ragione falsa. *Un gate che suona ogni giorno smette di essere letto*
+(v421, v427). Validato per iniezione: togliendo la guardia tornano le 65 divergenze.
+
+⚠ E misurando l'esito ho rifatto **la trappola scritta ieri in v436**: `$?` dopo una pipe
+`| tail` misura l'uscita di `tail`, e leggevo `exit=0` su un gate che stava correttamente
+uscendo 2. Due giorni di fila, stessa riga.
+
+### 🕳️ Il difetto vero che tutto questo ha portato a galla
+`inst_cash_pct` valeva **7,7 in ogni run da giorni** ed è sparito **esattamente nel run** che il
+mio job di prova ha innescato: la fonte AUM non ha risposto e la pipeline ha lasciato cadere la
+chiave uscendo comunque 0 — un run degradato che si presenta come riuscito (v387, v433).
+
+Le due barre della liquidità hanno bisogno di **due** numeri: con uno solo il grafico usciva
+**vuoto e muto**. Ora la scheda dichiara perché il confronto non è disegnabile — *"il sistema non
+ha il dato" e "ce l'ha e non te lo passa" si leggono uguali* (v406) — e il gate è **nei due
+versi**: con due numeri disegna, con uno solo dichiara. Entrambe le direzioni validate per
+iniezione.
