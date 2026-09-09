@@ -619,6 +619,119 @@ check("v439 il messaggio del gate e' agganciato a barra_in_formazione, non solo 
       and "IN FORMAZIONE" in _corpo_ric and "cache della raccolta e' indietro" in _corpo_ric)
 
 
+# ═══ v440 — I GATE DELLO STRUMENTO NUOVO ═════════════════════════════════════════════════
+# ⚠⚠ `scripts/conseguenze.py` e' nato ieri e nessun check lo guardava: *una fonte che nessun
+#   gate sorveglia puo' morire il giorno in cui nasce* (v390). E qui il costo sarebbe piu' alto
+#   che altrove, perche' e' lo strumento che il CEO usa per decidere QUANTO muovere: un numero
+#   sbagliato qui non produce un'analisi imprecisa, produce un ordine sbagliato.
+# ⚠ I check guardano PROPRIETA' che una formula sbagliata non puo' soddisfare per caso — non i
+#   valori che mi aspetto, che si possono sbagliare insieme al codice (v326).
+import subprocess as _sp, re as _re
+_CONS = _sp.run([sys.executable, str(_ROOT / "scripts" / "conseguenze.py")],
+                capture_output=True, text=True, cwd=str(_ROOT))
+_out = _CONS.stdout
+check("v440 conseguenze.py esegue e parla", _CONS.returncode == 0 and len(_out) > 500,
+      extra=f"exit {_CONS.returncode}, {len(_out)} caratteri, stderr: {_CONS.stderr[:200]}")
+
+_lib = _json.loads((_ROOT / "data" / "libro.json").read_text(encoding="utf-8"))
+_dati = _json.loads((_ROOT / "data" / "data.json").read_text(encoding="utf-8"))
+_px = {r["ticker"]: float(r["price"]) for r in
+       ((_dati.get("watchlist") or []) + (_dati.get("portfolio") or []))
+       if r.get("ticker") and isinstance(r.get("price"), (int, float))}
+_pos = {r["ticker"]: r for r in
+        _json.loads((_ROOT / "config" / "posizioni.json").read_text(encoding="utf-8"))["posizioni"]}
+
+# --- 1. la ricostruzione COINCIDE con cio' che la pipeline pubblica ---
+# ⚠⚠ E' il check che rende affidabile tutto il resto: l'effetto di una mossa si calcola
+#   RIFACENDO sqrt(w' S w) dalla matrice, non scalando la volatilita' pubblicata (v391 — un
+#   numero plausibile e divergente e' peggio di uno dichiarato mancante). Se la ricostruzione
+#   non riproduce il punto di partenza, ogni "dopo la mossa" e' costruito su una base diversa.
+#   Misurato il 09/09: 49,30% contro 49,30%, scarto 0,000 pp.
+sys.path.insert(0, str(_ROOT / "scripts"))
+import conseguenze as _C
+_v0 = _C.vol_libro(_lib["pesi"], _lib["correlazioni"], _lib["volatilita_nome"])
+_s0 = _C.scommesse(_lib["pesi"], _lib["correlazioni"])
+check("v440 la volatilita' ricostruita dalla matrice riproduce quella pubblicata",
+      _v0 is not None and abs(_v0 - _lib["volatilita"]) < 0.0005,
+      extra=f"ricostruita {_v0}, pubblicata {_lib['volatilita']}")
+check("v440 le scommesse effettive ricostruite riproducono quelle pubblicate",
+      _s0 is not None and abs(_s0 - _lib["scommesse_effettive"]) < 0.01,
+      extra=f"ricostruite {_s0}, pubblicate {_lib['scommesse_effettive']}")
+
+# --- 2. il numero di azioni PORTA DAVVERO ALLA SOGLIA (giro di andata e ritorno) ---
+# ⚠ Si legge dall'OUTPUT vero e si riapplica ai prezzi veri: un check che ricalcolasse la
+#   formula confermerebbe la mia stessa assunzione invece di misurare la proprieta' (v326).
+_SOGLIA = _C.SOGLIE["nome"][0]
+_tot = sum(_px[t] * _pos[t]["qta"] for t in _lib["pesi"] if t in _px and t in _pos)
+_mosse = _re.findall(r"▸ (\w+) — oggi[^\n]*\n\s+per arrivare al \d+%: ([\d.,]+) azioni su ([\d.,]+)", _out)
+def _num(s): return float(s.replace(",", ""))
+_esiti, _passi = [], []
+for _tk, _m, _q in _mosse:
+    _p = _px.get(_tk)
+    if not _p: continue
+    _qn = _num(_q) - _num(_m)
+    _nuovoTot = _tot - _num(_m) * _p
+    _esiti.append((_tk, _qn * _p / _nuovoTot))
+    _passi.append(_p / _nuovoTot)          # quanto pesa UNA azione sul libro dopo la mossa
+# ⚠ Con le azioni INTERE il peso non cade esattamente sulla soglia: l'invariante e' che la
+#   RAGGIUNGA (stia sotto) e che non la superi di piu' di quanto vale una singola azione —
+#   spostarne una in meno la lascerebbe sopra, una in piu' sarebbe di troppo.
+check("v440 le azioni da spostare portano il peso alla soglia, a meno di un'azione intera",
+      len(_esiti) >= 1 and all(w <= _SOGLIA + 1e-9 and (_SOGLIA - w) < _passo
+                               for (_, w), _passo in zip(_esiti, _passi)),
+      extra=f"pesi risultanti: {[(t, round(w*100, 3)) for t, w in _esiti]} contro {_SOGLIA*100}%")
+
+# --- 3. il PREZZO a cui la soglia si raggiunge da sola la raggiunge davvero ---
+# Il ramo "senza operare" e' quello che evita una vendita: se il prezzo e' sbagliato, il CEO
+# aspetta un livello che non riporta niente dove dice.
+_prezzi = _re.findall(r"▸ (\w+) —[\s\S]*?si raggiunge se \w+ scende a ([\d.,]+) \$", _out)
+_esitiP = []
+for _tk, _ps in _prezzi:
+    _p, _q = _px.get(_tk), (_pos.get(_tk) or {}).get("qta")
+    if not (_p and _q): continue
+    _altri = _tot - _q * _p
+    _nuovo = _num(_ps)
+    _esitiP.append((_tk, _q * _nuovo / (_altri + _q * _nuovo)))
+check("v440 il prezzo 'senza operare' porta il peso alla soglia, non a un altro livello",
+      len(_esitiP) >= 1 and all(abs(w - _SOGLIA) < 0.005 for _, w in _esitiP),
+      extra=f"pesi a quel prezzo: {[(t, round(w*100, 2)) for t, w in _esitiP]}")
+
+# --- 3bis. le cifre stampate sono coerenti fra loro: non si vende mezza azione ---
+# ⚠⚠ E' il difetto chiuso in v440: le azioni si stampavano arrotondate e controvalore,
+#   plusvalenza e imposta si calcolavano sul numero con la virgola. Il CEO leggeva "29 azioni"
+#   accanto al controvalore di 28,94. Classe v433/v415 — due derivazioni della stessa
+#   grandezza, una arrotondata e una no — su uno strumento che dice QUANTO muovere.
+_coer = _re.findall(r"▸ (\w+) — oggi[^\n]*\n\s+per arrivare al \d+%: ([\d.,]+) azioni su [\d.,]+\s+\(([\d.,]+) \$", _out)
+check("v440 il controvalore stampato e' le azioni STAMPATE per il prezzo, non una frazione",
+      len(_coer) >= 1 and all(abs(_num(c) - _num(m) * _px[t]) < 1 for t, m, c in _coer if t in _px),
+      extra=f"terne (titolo, azioni, controvalore): {_coer}")
+
+# --- 4. il conto fiscale e' il 26% della plusvalenza di CIO' CHE SI MUOVE ---
+# ⚠ Non della posizione intera: e' l'errore naturale, e darebbe un'imposta 2-3 volte piu' alta
+#   su MU. L'aliquota e' un FATTO (partecipazioni non qualificate), non una convenzione nostra.
+_fisc = _re.findall(r"▸ (\w+) —[\s\S]*?plusvalenza ([\d.,]+) \$ → imposta ([\d.,]+) \$", _out)
+check("v440 l'imposta e' il 26% della plusvalenza delle sole azioni spostate",
+      len(_fisc) >= 1 and all(abs(_num(i) - _num(p) * _C.ALIQUOTA) < 2 for _, p, i in _fisc)
+      and all(abs(_num(p) - (_px[t] - _pos[t]["pmc"]) * _num(dict((a, b) for a, b, c in _mosse)[t])) < 2
+              for t, p, i in _fisc if t in _px and t in _pos),
+      extra=f"coppie plus/imposta: {_fisc}")
+
+# --- 5. le tre cose che il sistema NON sa restano dichiarate in testa ---
+# ⚠⚠ E' la riga che tiene lo strumento dalla parte dei fatti: senza, l'aritmetica si legge come
+#   la quantita' GIUSTA invece che come la conseguenza di una soglia. Il divieto di dimensionare
+#   e' stato spostato, non tolto (v439), e poggia su questa dichiarazione.
+check("v440 lo strumento dichiara in testa i due buchi che nessun numero colma",
+      "altri conti" in _out and "fiscale pregressa" in _out
+      and "non quale mossa fare" in _out and "nessuno e' una raccomandazione" in _out)
+
+# --- 6. il denominatore delle prime tre e' NOMINATO ---
+# La disciplina del pacchetto pubblica la stessa regola su tutti i nomi e da' un numero piu'
+# basso: affiancarli senza dirlo e' cio' che il collaudo ordina a chi legge di segnalare (v414).
+check("v440 la riga delle prime tre nomina il proprio denominatore e l'altro",
+      "denominatore: i" in _out and "nomi DENTRO la matrice" in _out
+      and "stessa misura su due insiemi" in _out)
+
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
