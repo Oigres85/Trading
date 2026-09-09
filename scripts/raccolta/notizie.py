@@ -68,7 +68,14 @@ def formatta(d, ore=None):
     return out
 
 if __name__ == "__main__":
-    tks = sys.argv[1:] or ["MU"]
+    # ⚠ v436: NON si ripiega su un titolo di comodo. Il default `or ["MU"]` faceva sembrare
+    # riuscita una raccolta che copriva 1 titolo su 13, e riscriveva la cache con quell'unica
+    # voce: e' la classe "verde per assenza" applicata a uno strumento. Si dichiara e si esce.
+    tks = [t.upper() for t in sys.argv[1:]]
+    if not tks:
+        print("NESSUN TICKER: uso `python3 notizie.py MU NVDA ...` — questo script non ha un\n"
+              "default, perche' una raccolta parziale che riscrive la cache si legge come completa.")
+        sys.exit(2)
     res = raccogli(tks)
     tutto = {}
     for d in res:

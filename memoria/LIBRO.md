@@ -44,7 +44,9 @@ di prezzo sì; quantità no.
 > che questo progetto produca* — ma la conclusione che ne avevo tratto no.
 
 **Fotografia del 07/09/2026** (run pipeline 21:51 UTC, ultima barra 04/09/2026). Il ricalcolo
-indipendente dell'08/09 sta in `memoria/dati/quadro.json`, rigenerabile in ~90 secondi.
+indipendente si rigenera in ~90 secondi con `scripts/raccolta/`.
+> ⚠ v436: `quadro.json` non esiste piu'. La fonte PUBBLICATA e' `data/data.json` (la pipeline); la
+> raccolta e' lo strumento che la verifica — `python3 scripts/riconciliazione.py`.
 
 ### Contributo al rischio — quota della varianza del libro, somma 100%
 
