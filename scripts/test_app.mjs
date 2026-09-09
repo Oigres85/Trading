@@ -7549,11 +7549,11 @@ check("v414 i fatti sul titolo coincidono fra la sua scheda e i suoi dettagli te
 
   /* ── la SCHEDA del titolo ── */
   const scheda = {
-    rsi:   num((primo(/- RSI\\(14\\): ([-0-9.,]+)/) || [])[1]),
-    atr:   num((primo(/- ATR\\(14\\): [-0-9.,]+ \\(([-0-9.,]+)% del prezzo/) || [])[1]),
-    s20:   num((primo(/Media semplice 20: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/) || [])[1]),
-    s50:   num((primo(/- Media a 50 sedute: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/) || [])[1]),
-    s200:  num((primo(/- Media a 200 sedute: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/) || [])[1]),
+    rsi:   num((primo(/- RSI\\(14\\): ([-+0-9.,]+)/) || [])[1]),
+    atr:   num((primo(/- ATR\\(14\\): [-+0-9.,]+ \\(([-+0-9.,]+)% del prezzo/) || [])[1]),
+    s20:   num((primo(/Media semplice 20: [-+0-9.,]+ — il prezzo le sta ([-+0-9.,]+)%/) || [])[1]),
+    s50:   num((primo(/- Media a 50 sedute: [-+0-9.,]+ — il prezzo le sta ([-+0-9.,]+)%/) || [])[1]),
+    s200:  num((primo(/- Media a 200 sedute: [-+0-9.,]+ — il prezzo le sta ([-+0-9.,]+)%/) || [])[1]),
     trim:  num((primo(/- Prossima trimestrale attesa: [-0-9]+ \\(fra ([0-9]+) giorn/) || [])[1]),
   };
   /* ── il blocco DETTAGLI TECNICI, che descrive lo STESSO titolo ──
@@ -7565,14 +7565,14 @@ check("v414 i fatti sul titolo coincidono fra la sua scheda e i suoi dettagli te
   const dt = (() => { const i = R.findIndex(r => r.indexOf("--- DETTAGLI TECNICI") === 0);
     return i < 0 ? [] : R.slice(i, i + 20); })();
   const libro = {
-    rsi:   num((primo(/RSI 14: ([-0-9.,]+)/, dt) || [])[1]),
-    s50:   num((primo(/Media semplice 50: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/, dt) || [])[1]),
-    s200:  num((primo(/Media semplice 200: [-0-9.,]+ — il prezzo le sta ([-0-9.,]+)%/, dt) || [])[1]),
-    liv50: num((primo(/Media semplice 50: ([-0-9.,]+) —/, dt) || [])[1]),
-    liv200:num((primo(/Media semplice 200: ([-0-9.,]+) —/, dt) || [])[1]),
+    rsi:   num((primo(/RSI 14: ([-+0-9.,]+)/, dt) || [])[1]),
+    s50:   num((primo(/Media semplice 50: [-+0-9.,]+ — il prezzo le sta ([-+0-9.,]+)%/, dt) || [])[1]),
+    s200:  num((primo(/Media semplice 200: [-+0-9.,]+ — il prezzo le sta ([-+0-9.,]+)%/, dt) || [])[1]),
+    liv50: num((primo(/Media semplice 50: ([-+0-9.,]+) —/, dt) || [])[1]),
+    liv200:num((primo(/Media semplice 200: ([-+0-9.,]+) —/, dt) || [])[1]),
   };
-  scheda.liv50  = num((primo(/- Media a 50 sedute: ([-0-9.,]+) —/) || [])[1]);
-  scheda.liv200 = num((primo(/- Media a 200 sedute: ([-0-9.,]+) —/) || [])[1]);
+  scheda.liv50  = num((primo(/- Media a 50 sedute: ([-+0-9.,]+) —/) || [])[1]);
+  scheda.liv200 = num((primo(/- Media a 200 sedute: ([-+0-9.,]+) —/) || [])[1]);
   /* ⚠ IL FENOMENO DEVE ESSERCI: se l'estrazione non trova niente il check sarebbe verde per
      assenza di dati invece che per assenza di difetti — la trappola gia' pagata quattro volte. */
   const chiavi = Object.keys(scheda).filter(k => scheda[k] != null && libro[k] != null);
@@ -7735,6 +7735,22 @@ check("v414 nessuna uscita in finestra sparisce dal calendario senza essere nomi
    ⚠ L'invariante non e' "l'etichetta non compare due volte" — sarebbe un ancoraggio alla
    forma — ma che DOVUNQUE compaia porti accanto il correttivo del percentile. */
 check("v414 il credito non pubblica la sua etichetta senza la correzione del percentile", suVeriEsito(`
+  /* ⚠⚠ LO STATO SI COSTRUISCE, NON SI ASPETTA (v425, v429, v431). La prima stesura leggeva
+     il percentile del giorno: HY OAS e' passato da 2,65 a 2,68, il valore e' uscito dall'estremo
+     basso, il correttivo ha smesso di essere emesso — correttamente — e il check e' andato ROSSO
+     SU CODICE GIUSTO, a calendario. E' la classe v429: un check che vale finche' i dati lo
+     concedono. Qui la serie e il livello si costruiscono perche' il valore corrente stia dentro
+     la banda "rilassato" E all'estremo basso della propria distribuzione, a qualunque ora giri
+     la suite e con qualunque spread pubblichi la pipeline. */
+  const cr = (DATA.macro || {}).credit;
+  if (!cr) return "il blocco credit non esiste nei dati: il check non misura niente";
+  const base = Date.parse("2025-10-01T00:00:00Z");
+  const st = [];
+  for (let i = 0; i < 30; i++) {
+    st.push({ d: new Date(base + i * 11 * 86400000).toISOString().slice(0, 10), v: 4 + i * 0.05 });
+  }
+  st.push({ d: new Date(base + 330 * 86400000).toISOString().slice(0, 10), v: 2.5 });
+  cr.history = st; cr.spread_hy = 2.5;
   const p = buildPrompt();
   const R = p.split(String.fromCharCode(10));
   const bande = R.filter(r => r.indexOf("sotto 4% rilassato, 4-5% attenzione") >= 0);

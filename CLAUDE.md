@@ -4423,3 +4423,39 @@ senior con verifica web. Il lettore del report È Claude: il testo è il report.
 - **Gemini** (sia il generatore di report `cio_report.mjs` sia l'LLM-critic `llm_critic.mjs`):
   eliminati. L'analisi la fa l'utente incollando l'export del Report CIO in Claude.
 - **Morning brief** (`morning_brief.py` + workflow): eliminato (era solo-WhatsApp).
+
+## 📏 v435 — DUE DERIVAZIONI DELLA DISTANZA DAL MASSIMO, E UN GATE CHE VEDEVA SOLO I NEGATIVI
+
+`main` e' andato rosso subito dopo il merge della v434 (552/555). Tre check caduti, e le tre
+diagnosi sono tre classi diverse — nessuno dei tre era rumore.
+
+### 1. Il difetto vero: la distanza dal massimo a 52 settimane si calcolava due volte
+`versoOpposto` la ricavava da `prezzo / massimo - 1`, mentre la pipeline la pubblica gia' in
+`w52_dist_pct`. Sul valore esatto **-32,3695** i due arrotondamenti divergono: **-32,3 contro
+-32,4**. E' la classe **v161/v207** su una grandezza che la v418 aveva appena spostato nella
+scheda proprio *perche' non fosse scritta due volte* — la duplicazione e' rientrata dalla porta
+dell'aritmetica invece che da quella del testo. Ora il campo della pipeline vince e il calcolo
+resta solo come ripiego per chi quel campo non ce l'ha.
+
+### 2. ⚠⚠ IL GATE ERA VERDE PER MESI PERCHE' LA CLASSE DI CARATTERI OMETTEVA IL SEGNO PIU'
+Il check v414 (scheda ↔ dettagli tecnici) estraeva i numeri con `[-0-9.,]`, che **non contiene
+`+`**: quindi su `+20,86` l'estrazione tornava `null`. Finche' CRWV stava SOTTO le proprie medie
+tutte le distanze erano negative e il check misurava davvero; appena il titolo e' salito sopra,
+tre chiavi su cinque sono diventate `null`, il pavimento delle quattro chiavi in comune non e'
+stato raggiunto e il check si e' **dichiarato muto** — correttamente.
+
+> **Il gate ha fatto la cosa giusta due volte**: ha misurato finche' poteva e ha detto di non
+> poter piu' misurare invece di passare a vuoto. Il difetto era nella sonda, non nell'invariante:
+> *un check rosso e' prima di tutto una sonda da verificare contro il testo vero* (v433).
+
+### 3. Un check che valeva finche' i dati lo concedevano
+Il gate sul credito pretendeva **incondizionatamente** il correttivo del percentile, che il
+codice emette solo sotto il 5° percentile. HY OAS e' passato da 2,65 a 2,68, il valore e' uscito
+dall'estremo, il correttivo ha smesso di essere emesso — **correttamente** — e il check e'
+andato rosso a calendario. Classe **v429**: ora la serie e il livello si **costruiscono** perche'
+il valore stia dentro la banda "rilassato" E all'estremo basso della propria distribuzione, a
+qualunque ora giri la suite e con qualunque spread pubblichi la pipeline.
+
+⚠ Validati per iniezione tutti e tre, con `modifica_sicura` e ripristino da uno **snapshot preso
+prima**, mai da `git checkout` (v430): rimettendo `[-0-9.,]` cade il gate della scheda,
+spegnendo `_estremo` cadono i due gate del credito (v405 e v414 insieme).

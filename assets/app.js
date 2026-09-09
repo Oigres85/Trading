@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "434";
+const BUILD_VERSION = "435";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -11868,6 +11868,13 @@ function fattiTitolo(tk) {
                  : daMacro ? { alto: NaN, basso: NaN, vol: NaN, var: NaN, varPct: daMacro.varPct }
                         : null,
     ext: (vivo && vivo.ext) || null,
+    /* ⚠⚠ v435 — LA DISTANZA DAL MASSIMO A 52 SETTIMANE E' PUBBLICATA DALLA PIPELINE, e
+       ricalcolarla qui produceva DUE RESE DELLA STESSA GRANDEZZA. Misurato su CRWV: la pipeline
+       scrive -32,3 (dal proprio `price`, 103,64) e la pagina ricavava -32,4 (da `f.prezzo`, che
+       e' un altro numero) — il valore esatto e' -32,3695, quindi i due arrotondamenti cadono ai
+       due lati e nessuno dei due mente da solo. E' la classe v340/v415, dove la stessa distanza
+       dalla media usciva in tre rese: la seconda derivazione si toglie, non si allinea. */
+    w52DistPct: riga ? numero(riga.w52_dist_pct) : null,
     livelli: L,
     tetto: sopra.length ? sopra[sopra.length - 1] : null,
     pavimento: sotto.length ? sotto[0] : null,
@@ -12922,7 +12929,13 @@ function datiNostriDelTitolo(tk) {
   const versoOpposto = (x) => {
     if (!/^Massimo 52 settimane$/.test(x.nome)) return "";
     if (!Number.isFinite(f.prezzo) || !Number.isFinite(x.v) || !x.v || f.prezzo >= x.v) return "";
-    const giu = Math.round((f.prezzo / x.v - 1) * 1000) / 10;
+    /* ⚠ v435 — si PUBBLICA il numero della pipeline invece di ricalcolarlo: due derivazioni
+       della stessa grandezza divergono al primo arrotondamento, e qui divergevano davvero
+       (-32,3 contro -32,4 sullo stesso titolo, nello stesso pacchetto). Il ricalcolo resta
+       SOLO come ripiego quando la pipeline non porta il campo — e li' e' l'unico numero
+       disponibile, non un secondo parere. */
+    const giu = Number.isFinite(f.w52DistPct) ? f.w52DistPct
+                                              : Math.round((f.prezzo / x.v - 1) * 1000) / 10;
     return ` — e nell'altro verso: il prezzo sta ${signTxt(giu)} SOTTO quel massimo, che e' lo `
       + `stesso fatto e non un secondo dato`;
   };
