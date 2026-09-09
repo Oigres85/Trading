@@ -4459,6 +4459,70 @@ check non è verde per coincidenza se il mercato lo porta a 100 (v233, v349, v43
 ⚠ **Pavimento della suite alzato 90 → 105** (`test_analisi_libro.py` è a 114). I pavimenti
 salgono quando la suite cresce.
 
+## 🔢 v440 — LO STRUMENTO NUOVO NASCE SORVEGLIATO, E IL PRIMO CHECK HA TROVATO UN MIO DIFETTO
+
+`scripts/conseguenze.py` è nato ieri e **nessun gate lo guardava**: *una fonte che nessun check
+sorveglia può morire il giorno in cui nasce* (v390). E qui il costo sarebbe più alto che altrove,
+perché è lo strumento che dice **quanto muovere**: un numero sbagliato lì non produce un'analisi
+imprecisa, produce un ordine sbagliato.
+
+### ⚠⚠ Le azioni si stampavano arrotondate e i soldi si calcolavano sulla frazione
+Il tool scriveva `{mosse:,.0f}` — *"29 azioni"* — e calcolava controvalore, plusvalenza e imposta
+sul numero **con la virgola** (28,94). **Non si vende una frazione di azione**: il numero
+comprabile è l'unico vero e ogni altra cifra è la sua conseguenza. Due derivazioni della stessa
+grandezza, una arrotondata e una no — classe **v433** (l'ATR distrutto dall'arrotondamento) e
+**v415** (la distanza dalla media in tre rese) — su uno strumento che dimensiona.
+
+Ora si arrotonda **per eccesso** (spostarne una in meno lascia il peso sopra la soglia, cioè non
+la raggiunge) e **il peso risultante si pubblica**: con le azioni intere non cade esattamente
+sulla soglia, e affermare il contrario sarebbe un'etichetta che dice più del proprio dato
+(v240, v405). Misurato: *"31 azioni (32.062 $) → il peso scende al 14,82%"*.
+
+### 🔒 La ricostruzione riproduce la pipeline, ed è ciò che rende affidabile tutto il resto
+L'effetto di una mossa si calcola **rifacendo `sqrt(w' S w)` dalla matrice**, mai scalando la
+volatilità pubblicata (v391: un numero plausibile e divergente è peggio di uno dichiarato
+mancante). Il gate verifica il punto di partenza contro `libro.json`:
+
+| | ricostruita | pubblicata | scarto |
+|---|---|---|---|
+| volatilità | 49,30% | 49,30% | **0,000 pp** |
+| scommesse effettive | 2,2735 | 2,27 | 0,0035 (l'arrotondamento di pubblicazione) |
+
+Due implementazioni indipendenti che convergono: se il punto di partenza non coincidesse, ogni
+"dopo la mossa" starebbe su una base diversa.
+
+### Gli invarianti, scelti perché una formula sbagliata non può soddisfarli per caso (v326)
+- **il giro di andata e ritorno**: le azioni stampate, riapplicate ai prezzi veri, portano il peso
+  alla soglia — sotto di essa e a meno di quanto pesa **una singola azione**;
+- **il prezzo "senza operare"**: a quel livello il peso vale la soglia, non un altro numero. È il
+  ramo che evita una vendita: se sbaglia, si aspetta un livello che non riporta niente dove dice;
+- **le cifre stampate sono coerenti fra loro**: il controvalore è le azioni STAMPATE per il prezzo;
+- **l'imposta è il 26% della plusvalenza delle sole azioni spostate**, non della posizione intera
+  — l'errore naturale, che su MU darebbe un'imposta più che doppia;
+- **i due buchi restano dichiarati in testa**: è la riga su cui poggia il confine spostato della
+  v439. Senza, l'aritmetica si legge come la quantità *giusta*.
+
+⚠ Quattro iniezioni, tutte con `modifica_sicura` e ripristino da snapshot preso prima (v430):
+mordono tutte e quattro, e la prima ne accende **tre insieme** — il segno che gli invarianti si
+sovrappongono sul difetto vero invece di misurare tre volte la stessa cosa.
+
+⚠ **Quarta sonda sbagliata in una sessione**: il check pretendeva *"non è una raccomandazione"*
+mentre il file scrive *"nessuno è una raccomandazione"*. *Un check rosso è prima di tutto una
+sonda da verificare contro il testo vero* (v433) — e le due diagnosi di oggi erano opposte: un
+rosso era un difetto mio nel codice, l'altro un difetto mio nella sonda.
+
+### 🦴 E il pavimento ha morso avendo ragione, sull'errore che v414 aveva già annotato
+L'ho alzato a **115** contando i check *riportati* (123). `self_check` conta i **punti di
+chiamata**, che sono 114 — perché alcuni girano in ciclo. È **testualmente** l'inciampo scritto in
+v414 (*"il pavimento conta i punti di chiamata, non i check riportati"*), ripetuto leggendo la
+riga che lo spiega. Rimesso a **108**, con margine: un pavimento incollato al conteggio di oggi va
+rosso al primo check tolto per una ragione legittima (v400).
+
+⚠ **Il `?v=` NON è stato toccato**, e non è una dimenticanza: la v440 cambia solo `scripts/`,
+nessun file servito al browser. Il cache-busting esiste per gli asset che cambiano; bumparlo qui
+sarebbe rumore, e `self_check` verifica che `BUILD_VERSION` e `?v=` restino allineati — lo sono,
+entrambi a 439.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

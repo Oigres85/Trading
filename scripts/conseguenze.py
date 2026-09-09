@@ -143,7 +143,18 @@ def principale():
         tot = sum(px[x] * quote[x] for x in pesi if px.get(x) and quote.get(x))
         # w' = (q'p) / (tot - (q-q')p)  ->  q' = w'(tot - qp) / (p(1 - w'))
         qn = lim * (tot - q * p) / (p * (1 - lim))
-        mosse = q - qn
+        # ⚠⚠ v440 — LE AZIONI SONO INTERE, E TUTTO IL RESTO DERIVA DA QUELLE. La prima stesura
+        #   stampava `{mosse:,.0f}` e calcolava controvalore, plusvalenza e imposta sul numero
+        #   con la virgola: il CEO leggeva "29 azioni" accanto a un controvalore che vale
+        #   28,94 azioni. Non si vende una frazione di azione, quindi il numero comprabile e'
+        #   l'unico vero e gli altri sono la sua conseguenza — due derivazioni della stessa
+        #   grandezza, una arrotondata e una no, e' la classe v433/v415 su uno strumento che
+        #   dice QUANTO muovere.
+        # ⚠ Si arrotonda PER ECCESSO: spostarne una in meno lascia il peso sopra la soglia,
+        #   cioe' non la raggiunge. E il peso che ne risulta si PUBBLICA, perche' con le azioni
+        #   intere non cade esattamente sulla soglia e affermare il contrario sarebbe
+        #   un'etichetta che dice piu' del proprio dato (v240, v405).
+        mosse = math.ceil(q - qn)
         if mosse <= 0:
             continue
         contro = mosse * p
@@ -158,9 +169,11 @@ def principale():
         # il prezzo a cui la soglia si raggiunge DA SOLA, senza operare
         altri = tot - q * p
         p_soglia = lim * altri / (q * (1 - lim))
+        pesoDopo = (q - mosse) * p / resto
         print(f"\n▸ {t} — oggi {w*100:.1f}% dell'azionario, {mcr.get(t, 0)*100:.1f}% della varianza")
         print(f"   per arrivare al {lim*100:.0f}%: {mosse:,.0f} azioni su {q:,.0f}"
-              f"  ({contro:,.0f} $" + (f" = {contro/fx:,.0f} €" if fx else "") + ")")
+              f"  ({contro:,.0f} $" + (f" = {contro/fx:,.0f} €" if fx else "")
+              + f") → il peso scende al {pesoDopo*100:.2f}%")
         print(f"   effetto MISURATO sul libro: volatilita' {v0*100:.1f}% → {v1*100:.1f}%"
               f" · scommesse effettive {s0:.2f} → {s1:.2f}")
         if plus is not None:
