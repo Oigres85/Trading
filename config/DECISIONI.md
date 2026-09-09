@@ -43,6 +43,27 @@ Il confine è fra un fatto sul titolo («sotto X la discesa entra nel 10% peggio
 e una decisione sul capitale («vendi a X»). Non cambia se la seconda si chiama ipotesi.
 `soglie.py` arriva fino a quel confine deliberatamente, e i suoi test lo presidiano.
 
+### Settembre 2026 — il confine spostato, e cosa la misura ha corretto
+
+Il CEO ha chiesto di ricevere anche alleggerimenti, vendite, incrementi e dimensionamento.
+Rileggendo **perché** il confine stava lì è emerso che la ragione era più stretta di come era
+stata applicata: non «i numeri sulle quantità sono vietati», ma **«senza liquidità, altri conti
+e situazione fiscale una quantità è un'invenzione travestita da misura»**. Due dei tre buchi si
+sono chiusi da soli — la liquidità l'ha confermata il CEO, l'aliquota è pubblica — e il terzo
+impedisce di dire *quale* mossa fare, non di calcolare *cosa comporta* una mossa.
+
+Da qui `scripts/conseguenze.py`: azioni da spostare per raggiungere una soglia dichiarata,
+effetto misurato sul libro ricalcolato dalla matrice vera, conto fiscale, e il prezzo a cui la
+soglia si raggiunge senza operare. Il divieto che resta è di **presentare un'aritmetica come la
+quantità giusta**, e di colmare in silenzio i due buchi rimasti.
+
+⚠⚠ **E la misura ha subito smentito l'intuizione, che è la ragione per cui va calcolata invece
+che stimata**: portare NVDA dal 20% al 15% **alza** la volatilità del libro da 49,3% a 50,8%.
+NVDA ha volatilità 39% contro l'87% di MU: dentro questo libro fa da zavorra, e ridurla
+concentra il resto. *Alleggerire la seconda posizione più grande peggiora il rischio*, e chi si
+fosse fidato del ragionamento invece del ricalcolo avrebbe fatto l'opposto di quello che voleva.
+È la stessa lezione delle scommesse effettive cieche ai pesi, in un'altra forma.
+
 ## Perché la dashboard resta
 
 Non per leggere l'analisi: per **scrivere le posizioni**. È l'unico punto in cui è indispensabile.

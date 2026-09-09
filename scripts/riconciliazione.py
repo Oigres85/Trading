@@ -69,6 +69,35 @@ def _seduta_raccolta(tk):
     except Exception:
         return None
 
+
+def barra_in_formazione(seduta_pipeline, adesso=None):
+    """La seduta della pipeline e' quella di OGGI e la campana non e' ancora suonata?
+
+    ⚠⚠ v439 — NASCE DA UN RIMEDIO CHE NON POTEVA FUNZIONARE. Il 09/09 questo gate e' uscito 2
+    su tutti e 15 i titoli e ha detto: *"la raccolta si rinfresca con preleva.py"*. Rigenerata,
+    e nulla e' cambiato — perche' la causa non era la cache: la pipeline portava la barra di
+    OGGI ancora in formazione (mercato aperto) e stockanalysis.com pubblica alla CHIUSURA,
+    quindi si fermava per forza a ieri. Un messaggio che descrive il fallimento sbagliato manda
+    a rifare un'operazione gia' fatta (classe v391), e su un gate lo rende rumore.
+
+    ⚠ La campana si legge dal FUSO, non da un orario scritto a mano: `America/New_York` sa da
+    sola quando scatta l'ora legale, e un +4/-5 in costante e' la classe delle soglie inventate
+    (v240). Le FESTIVITA' NON sono note al sistema (voce aperta in CLAUDE.md): in un giorno di
+    chiusura questa funzione risponde "in formazione" fino alle 16:00 — e' il verso prudente,
+    perche' dichiara NON MISURABILE invece di annunciare divergenze che sarebbero il movimento
+    del mercato.
+    """
+    from datetime import datetime, time as _t, timezone
+    try:
+        from zoneinfo import ZoneInfo
+        ny = ZoneInfo("America/New_York")
+    except Exception:
+        return None                      # senza fuso non si afferma niente
+    ora = (adesso or datetime.now(timezone.utc)).astimezone(ny)
+    if str(seduta_pipeline or "") != ora.date().isoformat():
+        return False                     # la pipeline non e' su oggi: la barra e' chiusa
+    return ora.time() < _t(16, 0)        # prima della campana la barra di oggi non e' finita
+
 def confronta():
     D, PIPE = carica_pipeline()
     if not PIPE:
@@ -167,9 +196,21 @@ def confronta():
               f"diverse — {' · '.join(sedute_diverse[:6])}"
               + (" …" if len(sedute_diverse) > 6 else ""))
     if sedute_diverse and not confrontati:
-        print("\nNON MISURABILE: nessun titolo e' sulla stessa seduta nei due strati. La "
-              "raccolta si rinfresca con `python3 scripts/raccolta/preleva.py <TICKER...>`; "
-              "finche' non lo si fa, la differenza misurerebbe il movimento del mercato.")
+        # ⚠⚠ v439 — DUE CAUSE DIVERSE, DUE RIMEDI DIVERSI, E UNO DEI DUE NON ESISTE.
+        # Con la barra di oggi ancora in formazione i due strati NON POSSONO coincidere:
+        # rigenerare la raccolta e' lavoro sprecato, e dirlo era il difetto.
+        seduta_pipe = sedute_diverse[0].split("pipeline ")[1].split(",")[0]
+        aperta = barra_in_formazione(seduta_pipe)
+        if aperta:
+            print("\nNON MISURABILE: la pipeline porta la barra di OGGI ancora IN FORMAZIONE "
+                  "(sessione USA non ancora chiusa) e la raccolta pubblica solo sedute chiuse, "
+                  "quindi si ferma alla precedente. NON e' una cache vecchia e rigenerarla non "
+                  "cambia nulla: il confronto torna misurabile dopo la campana delle 16:00 ET.")
+        else:
+            print("\nNON MISURABILE: nessun titolo e' sulla stessa seduta nei due strati, e la "
+                  "barra della pipeline e' CHIUSA — qui la cache della raccolta e' indietro "
+                  "davvero. Si rinfresca con `python3 scripts/raccolta/preleva.py <TICKER...>`; "
+                  "finche' non lo si fa, la differenza misurerebbe il movimento del mercato.")
         return 2
 
     # ⚠ un confronto che non confronta niente non e' un confronto (v196, v229)

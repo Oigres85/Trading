@@ -5743,6 +5743,45 @@ check("v371 · il pacchetto dichiara quanto pesa l'azionario sul patrimonio, non
     if (!/va moltiplicata per/.test(p)) return "non da' il fattore con cui riportare le misure sul patrimonio";
     return true;`));
 
+/* ═══ v439 — IL BTP SI VALORIZZA A MERCATO, NON AL CARICO ════════════════════════════════
+   `fuoriAzionarioEur` faceva qty * pmc / 100, cioe' il COSTO, dentro un totale in cui
+   l'azionario e' a mercato: due convenzioni di valorizzazione in una somma sola. E quella
+   somma produce la QUOTA AZIONARIA, cioe' il moltiplicatore con cui VaR, ES, drawdown e
+   contributo al rischio passano dall'azionario al patrimonio. Misurato il 09/09: 40.000 al
+   carico contro 40.908 a mercato, quota 84,29% invece di 84,05%.
+   ⚠ La convenzione "nominale x prezzo / 100" esisteva GIA' in valorePosizioni(), che pero'
+   legge r.price: due derivazioni della stessa grandezza, una sola a mercato (v161/v207).
+   ⚠ Lo stato si COSTRUISCE: con i dati del giorno il prezzo del BTP potrebbe capitare a 100 e
+   il check sarebbe verde per coincidenza, non per la proprieta' (v233, v349, v431). */
+check("v439 · il BTP entra nel patrimonio al PREZZO di mercato, non al carico",
+  suVeriEsito(`
+    STATO_PTF = { cash: { v: 10000, at: "2026-08-08" }, btp: { v: { qty: 40000, pmc: 100 } } };
+    DATA.portfolio = [{ ticker: "BTP-V28", price: 110, qty: 40000, currency: "EUR" }];
+    const f = fuoriAzionarioEur();
+    if (!f) return "nessuno stato patrimoniale con cassa e BTP presenti";
+    const b = f.voci.find(v => v.che.indexOf("Stato") >= 0);
+    if (!b) return "la voce dei titoli di Stato non c'e'";
+    if (Math.abs(b.eur - 44000) > 0.01)
+      return "valorizzato " + b.eur + " invece di 44000: usa ancora il carico";
+    if (String(b.base || "").indexOf("mercato") < 0)
+      return "non dichiara di essere al prezzo di mercato: base = " + b.base;
+    return true;`));
+
+/* ⚠ e il ripiego sul carico deve RESTARE, dichiarato: senza la riga della pipeline il BTP non
+   puo' sparire dal denominatore, altrimenti il patrimonio si rimpicciolisce da solo e ogni
+   percentuale di rischio si gonfia. "Non ho il prezzo" e "non ho il titolo" sono cose diverse. */
+check("v439 · senza la riga della pipeline il BTP ripiega sul carico E lo dichiara",
+  suVeriEsito(`
+    STATO_PTF = { cash: { v: 10000, at: "2026-08-08" }, btp: { v: { qty: 40000, pmc: 100 } } };
+    DATA.portfolio = [];
+    const f = fuoriAzionarioEur();
+    const b = f && f.voci.find(v => v.che.indexOf("Stato") >= 0);
+    if (!b) return "il BTP e' sparito dal denominatore invece di ripiegare sul carico";
+    if (Math.abs(b.eur - 40000) > 0.01) return "ripiego sbagliato: " + b.eur;
+    if (String(b.base || "").indexOf("carico") < 0)
+      return "non dichiara di essere al carico: base = " + b.base;
+    return true;`));
+
 /* ⚠ e senza il file il pacchetto deve DIRLO, non fingere un totale: un denominatore inventato
    e' peggio di un denominatore dichiarato mancante. */
 check("v371 · senza lo stato patrimoniale il pacchetto lo dichiara invece di inventare un totale",
