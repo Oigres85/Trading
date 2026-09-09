@@ -3080,12 +3080,35 @@ check("v331 ricerca: il pacchetto DICHIARA quale testata sta portando", suVeri(`
    La riscrittura conta le GRAFFE e asserisce, prima di tagliare, che dentro i confini ci sia
    UNA sola voce e nessuno dei vicini noti. */
 check("v333 forme: le cinque schede rifatte disegnano barre a confronto, non scale da decodificare", suVeri(`
+  const m = JSON.parse(JSON.stringify(DATA.macro || {}));
+  /* lo stato si COSTRUISCE: le due barre della liquidita' hanno bisogno di DUE numeri, e il
+     09/09 la fonte non ha restituito inst_cash_pct per un run — il check e' andato rosso su
+     codice corretto. Un check che vale finche' i dati lo concedono non e' un check (v429). */
+  m.liquidity_split = Object.assign({ retail_mmf_bln: 3000, retail_yoy_pct: 6.2,
+                                      retail_date: "2026-07-01" },
+                                    m.liquidity_split || {}, { inst_cash_pct: 7.7 });
   const attese = ["breadth", "momentum", "froth", "fedwatch", "liquidity"];
   return attese.every(k => {
-    const f = (FORMA_INDICATORE[k] || (() => null))(DATA.macro || {});
+    const f = (FORMA_INDICATORE[k] || (() => null))(m);
     if (!f) return true;
     return typeof f.g === "string" && f.g.includes("<svg") && !f.g.includes("tk-zona");
   })`));
+
+/* ══ v438 — IL GRAFICO SPARIVA SENZA UNA PAROLA ═══════════════════════════════════════════
+   Le due barre della liquidita' confrontano variazione annua e quota istituzionale. Il 09/09 la
+   fonte AUM non ha risposto per UN run, `inst_cash_pct` non e' stato scritto, e la scheda ha
+   perso il grafico restando muta. E' la classe v406: "il sistema non ha il dato" e "ce l'ha e
+   non te lo passa" si leggono uguali. Il gate e' nei DUE versi — con due numeri si disegna, con
+   uno solo si dichiara — perche' sorvegliare una meta' sola invecchia alla prima classe nuova. */
+check("v438 liquidita': con un dato solo il confronto non si disegna e la scheda lo DICHIARA", suVeri(`
+  const m = JSON.parse(JSON.stringify(DATA.macro || {}));
+  m.liquidity_split = { retail_mmf_bln: 3000, retail_yoy_pct: 6.2, retail_date: "2026-07-01" };
+  const uno = FORMA_INDICATORE["liquidity"](m);
+  m.liquidity_split = Object.assign({}, m.liquidity_split, { inst_cash_pct: 7.7 });
+  const due = FORMA_INDICATORE["liquidity"](m);
+  return uno && due
+      && uno.g === "" && uno.n.indexOf("non e' disegnabile in questo run") >= 0
+      && due.g.indexOf("<svg") >= 0 && due.n.indexOf("non e' disegnabile in questo run") < 0`));
 
 /* ⚠ LA RICEVUTA DEL TAGLIO, resa eseguibile: le voci vicine a quelle riscritte devono esserci
    ancora. Senza questo check il taglio sbagliato sarebbe passato — l'ho scoperto solo perche'

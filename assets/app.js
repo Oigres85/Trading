@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "435";
+const BUILD_VERSION = "438";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5205,6 +5205,10 @@ const FORMA_INDICATORE = {
       n: `<b>${fmtNum.format(l.retail_mmf_bln)} miliardi</b> fermi nei fondi monetari retail`
         + (l.retail_yoy_pct != null ? `, <b>${signTxt(l.retail_yoy_pct)}</b> sull'anno` : "") + `.`
         + (l.retail_date ? ` <span class="muted">Rilevazione del ${it(l.retail_date)} — serie MENSILE, non e' il dato di oggi.</span>` : "")
+        /* ⚠ v438 — le due barre hanno bisogno di DUE numeri: il 09/09 la fonte non ha restituito
+           la quota istituzionale per un run e il grafico spariva senza una parola. "Il sistema non
+           ha il dato" e "ce l'ha e non te lo passa" si leggono uguali (v406). */
+        + (voci.length < 2 ? ` <span class="muted">⚠ Il confronto non e' disegnabile in questo run: manca la quota di cassa istituzionale, che la fonte non ha restituito.</span>` : "")
         + `<br><b>Come si legge:</b> e' il denaro parcheggiato che potrebbe entrare in borsa. Il LIVELLO `
         + `da solo dice poco perche' cresce quasi sempre; conta la DIREZIONE: in aumento vuol dire che `
         + `qualcuno sta uscendo dal rischio, in calo che sta rientrando. ⚠ Il percentile a 5 anni non e' `
