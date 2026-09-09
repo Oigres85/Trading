@@ -4597,6 +4597,40 @@ averlo).
 prima (v430): mordono tutte. ⚠ Pavimenti alzati contando i **punti di chiamata** — 545 su 570 per
 `test_app.mjs`, 185 su 195 per `test_update_data.py` — che è l'errore appena pagato in v440.
 
+## 🔴 v442 — `main` È ANDATA ROSSA, E LA CAUSA PROCEDURALE ERA MIA
+
+Il merge della v441 ha lasciato `main` **rosso**: 563/564, un solo check. Non era un mio check
+nuovo — tutti e sei i v441 erano verdi — ma **v370**, preesistente, caduto sui dati che il CI
+aveva e io no.
+
+> ⚠⚠ **La causa procedurale è mia e va scritta**: il `git pull --rebase origin main` prima del
+> push ha portato `c845183 Aggiornamento dati 18:14`, e **non ho rieseguito i gate dopo**. È
+> testualmente la regola della v411 — *dopo un rebase che porta dati nuovi i gate vanno
+> rieseguiti, perché i rami che dipendono dai dati possono essersi accesi per la prima volta* —
+> letta, scritta, e saltata nello stesso pomeriggio.
+
+### Il difetto era vero, preesistente, e i dati l'hanno solo reso visibile
+Il peso di MU usciva **`23.0%`** nella riga del libro (`toFixed(1)`) e **`23%`** nella scheda del
+titolo (il numero grezzo interpolato): due rese della stessa grandezza dalla stessa fonte, più un
+punto decimale inglese dentro un pacchetto che ovunque usa la virgola. Classe **v421**, che aveva
+già chiuso questa famiglia introducendo `pct1` — e due sedi non ci erano passate.
+
+**Il difetto c'era da sempre.** Finché il peso aveva un decimale non nullo le due forme
+coincidevano nella cifra; è emerso il giorno in cui è caduto su un intero esatto. È la classe
+**v429**: *uno stato che si aspetta invece di costruirlo è un check che vale finché i dati lo
+concedono*.
+
+### La guardia nuova guarda il CODICE, e ha trovato una terza sede al primo giro
+`v370` confronta i due numeri **come sono stampati**, quindi vede il difetto solo quando le due
+formattazioni divergono davvero — ed era rimasto verde per mesi. La guardia `v442` verifica invece
+che ogni percentuale dell'azionario passi dal formattatore unico: non può essere verde per
+fortuna. Al primo giro ha trovato una **terza** sede che non avevo notato — la dipendenza dal
+mercato dei capitali della v404, che stampava `16.6%` col punto.
+
+⚠ Validata per iniezione, e la seconda iniezione dimostra perché serviva: rimettendo il numero
+grezzo nella scheda **`v370` resta verde** (oggi i due valori coincidono per caso) e a mordere è
+solo la guardia strutturale.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

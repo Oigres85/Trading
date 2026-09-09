@@ -9282,6 +9282,35 @@ check("v441 · il pacchetto dichiara le riunioni non prezzate invece di stampare
       return "la curva costruita sulla rampa inventata e' tornata";
     return true;`));
 
+/* ═══ v442 — LA GUARDIA STRUTTURALE SUL FORMATTATORE ══════════════════════════════════════
+   ⚠⚠ Il check v370 qui sopra confronta i due numeri COME SONO STAMPATI, quindi vede il difetto
+   solo quando le due formattazioni divergono davvero: e' rimasto verde per mesi con
+   `toFixed(1)` da una parte e il numero grezzo dall'altra, perche' finche' il peso aveva un
+   decimale non nullo "22,5" e "22.5"... coincidevano nella cifra. L'ha preso solo il giorno in
+   cui il peso e' caduto su un intero esatto e sono usciti "23.0" e "23" — cioe' per un
+   accidente dei dati, che e' la classe v429: uno stato che si aspetta invece di costruirlo.
+   Questa guardia guarda il CODICE: le percentuali del libro escono tutte dal formattatore
+   unico introdotto dalla v421, e nessuna dal proprio `toFixed`. Non puo' essere verde per
+   fortuna, e non aspetta che i dati del giorno mostrino il difetto. */
+check("v442 · le percentuali del libro passano tutte dal formattatore unico, non da toFixed",
+  (() => {
+    // ⚠ si toglie la prosa: i commenti che SPIEGANO la rimozione citano `toFixed(1)` per forza
+    //   — e' il gate che trova se' stesso (v213, v240, v393, v395, v418).
+    const codice = src.split(String.fromCharCode(10))
+      .filter(l => !/^\s*(\/\/|\*|\/\*)/.test(l)).join(String.fromCharCode(10));
+    const guai = [];
+    // le due sedi che divergevano devono nominare pct1
+    if (!/\$\{pct1\(pct\)\}% dell'azionario/.test(codice))
+      guai.push("la riga del libro non usa piu' il formattatore unico");
+    if (!/vale il \$\{pct1\(peso\)\}% del controvalore azionario/.test(codice))
+      guai.push("la scheda del titolo non usa piu' il formattatore unico");
+    // e nessuna percentuale "dell'azionario" deve tornare a formattarsi da sola
+    const soloSue = [...codice.matchAll(/\$\{([^}]*toFixed\(1\)[^}]*)\}% dell'azionario/g)];
+    if (soloSue.length) guai.push("torna un toFixed(1) su una percentuale dell'azionario: "
+      + soloSue.map(m => m[1]).join(", "));
+    return guai.length ? no(guai.join(" · ")) : true;
+  })());
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

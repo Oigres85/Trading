@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "441";
+const BUILD_VERSION = "442";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10983,7 +10983,14 @@ function contestoPortafoglio(tkCorrente) {
     const pct = x.v / totAz * 100;
     const g = numero(x.r.gain_pct_pos ?? x.r.gain_pct);
     const qui = String(x.r.ticker).toUpperCase() === String(tkCorrente || "").toUpperCase() ? "  ← IL TITOLO DI QUESTA ANALISI" : "";
-    L.push(`- ${x.r.ticker}: ${pct.toFixed(1)}% dell'azionario${Number.isFinite(g) ? ` · ${signTxt(g)} dal carico` : ""}${qui}`);
+    /* ⚠⚠ v442 — UN FORMATTATORE SOLO. Qui c'era `toFixed(1)` e nella scheda del titolo il
+       numero grezzo interpolato: sullo stesso peso di MU uscivano "23.0" e "23", due rese
+       della stessa grandezza dalla stessa fonte — e il punto decimale inglese in un pacchetto
+       che ovunque usa la virgola. Il difetto c'era da sempre e i dati l'hanno reso visibile
+       solo quando il peso e' caduto su un intero esatto (classe v429). `pct1` esiste dalla
+       v421 proprio per questo: fra due rese della STESSA grandezza i numeri devono
+       COINCIDERE, non somigliarsi. */
+    L.push(`- ${x.r.ticker}: ${pct1(pct)}% dell'azionario${Number.isFinite(g) ? ` · ${signTxt(g)} dal carico` : ""}${qui}`);
   });
 
   /* ═══ v389 — TECNICA E FONDAMENTALI DI TUTTE LE POSIZIONI, NON SOLO DI QUELLA ANALIZZATA ═══
@@ -11254,7 +11261,7 @@ function contestoPortafoglio(tkCorrente) {
     const elenco = dip.dipende.map(x => `${x.tk} ${x.peso.toFixed(1)}%`
       + `${nelGruppo.has(x.tk) ? " [nel gruppo correlato]" : ""} (${severitaCopertura(x.copertura)})`).join(" · ");
     L.push(`DIPENDENZA DAL MERCATO DEI CAPITALI (un taglio TRASVERSALE al gruppo qui sopra, non un `
-      + `secondo raggruppamento dello stesso tipo): ${dip.pesoDipende.toFixed(1)}% dell'azionario e' in `
+      + `secondo raggruppamento dello stesso tipo): ${pct1(dip.pesoDipende)}% dell'azionario e' in `
       + `societa' con flusso di cassa LIBERO NEGATIVO su dodici mesi — il piano corrente non si paga con `
       + `la cassa che generano — contro ${dip.pesoAutonome.toFixed(1)}% che si autofinanzia`
       + `${dip.pesoIgnote > 0.05 ? ` e ${dip.pesoIgnote.toFixed(1)}% su cui il dato manca` : ""}. `
@@ -13137,7 +13144,7 @@ function datiNostriDelTitolo(tk) {
          che il blocco del libro usa gia' ("-13% dal carico"): una formulazione sola per una
          grandezza sola (v161, v207, v316), invece di due sinonimi che divergono. */
       + `di ${pmc}${g != null ? `, ${signTxt(Math.round(g * 10) / 10)} dal carico` : ""}`
-      + (peso != null ? `, e vale il ${peso}% del controvalore azionario del libro `
+      + (peso != null ? `, e vale il ${pct1(peso)}% del controvalore azionario del libro `
           + `(su ${pl.quante} posizioni, sul solo comparto azionario)` : "")
       + `. `
       + `Non e' una decisione di ingresso ma di mantenimento: il prezzo di carico non cambia cosa fa il `
