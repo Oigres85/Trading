@@ -1341,6 +1341,76 @@ check("v433 il payload usa l'arrotondamento alla scala, non round(_, 2)",
 check("v433 il gate di audit continua a rifiutare un atr_14 nullo",
       '"atr_14"' in _SRC_AUDIT and "\u2264 0 o non-finito nel payload" in _SRC_AUDIT)
 
+# ═══ v441 — LA METODOLOGIA CME, e gli invarianti che la vecchia formula violava ═══════════
+# ⚠ Si costruisce lo stato invece di leggerlo dai dati del giorno: `implied` cambia a ogni run
+#   e un check che lo aspettasse andrebbe rosso a calendario (v429, v431, v435).
+from datetime import date as _date
+_MOV = ud.movimenti_impliciti_fomc
+
+# --- 1. la ponderazione sui giorni: e' cio' che la formula vecchia ignorava ---
+# Con un rialzo da 25bp EFFETTIVO da meta' mese, la media del mese sale solo di meta' passo.
+# La formula vecchia leggeva quella media come il tasso di fine mese e sottostimava di 2x.
+_r = _MOV(3.63 + 0.25 * (14 / 30), 3.63, "2026-09-16", _date(2026, 9, 1))
+check(f"v441 un rialzo pieno da meta' mese si legge come UN movimento, non come mezzo "
+      f"(misurato {_r['mosse_25bp'] if _r else 'None'})",
+      _r is not None and abs(_r["mosse_25bp"] - 1.0) < 0.01)
+check("v441 la ponderazione e' quella vera: 16 giorni prima, 14 dopo, su 30",
+      _r is not None and (_r["giorni_vecchio"], _r["giorni_nuovo"], _r["giorni_mese"]) == (16, 14, 30))
+
+# --- 2. la formula VECCHIA violava questo invariante, ed e' la prova che era sbagliata ---
+_vecchia = (3.625 - (3.63 + 0.25 * (14 / 30))) / 0.25 * 100
+check(f"v441 la formula vecchia, sullo stesso stato, dava {-_vecchia:.0f}% dove il movimento "
+      f"e' pieno (100%): sbagliava di piu' del doppio",
+      abs(-_vecchia - 100) > 40)
+
+# --- 3. il segno: un taglio e' un movimento negativo, non uno zero ---
+_t = _MOV(3.63 - 0.25 * (14 / 30), 3.63, "2026-09-16", _date(2026, 9, 1))
+check(f"v441 un taglio pieno esce come -1 movimento (misurato "
+      f"{_t['mosse_25bp'] if _t else 'None'}), col segno che il max(0,...) buttava via",
+      _t is not None and abs(_t["mosse_25bp"] + 1.0) < 0.01)
+
+# --- 4. fuori dal mese del contratto NON si pubblica: e' la v199 nella sua forma corretta ---
+# ⚠ Il limite non e' "35 giorni" ma "lo stesso mese di calendario": un front-month di settembre
+#   non prezza ottobre, e la rampa +i*12 fingeva di saperlo.
+check("v441 una riunione fuori dal mese del contratto non produce nessun numero",
+      _MOV(3.79, 3.63, "2026-10-28", _date(2026, 9, 1)) is None
+      and _MOV(3.79, 3.63, "2026-12-09", _date(2026, 9, 1)) is None)
+
+# --- 5. la guardia di plausibilita': oltre tre movimenti si dichiara invece di pubblicare ---
+check("v441 un implied non attribuibile a questa riunione si dichiara, non si pubblica",
+      _MOV(5.00, 3.63, "2026-09-16", _date(2026, 9, 1)) is None)
+
+# --- 6. e gli ingressi mancanti non producono un numero ---
+check("v441 senza EFFR o senza implied non si inventa niente",
+      _MOV(None, 3.63, "2026-09-16", _date(2026, 9, 1)) is None
+      and _MOV(3.79, None, "2026-09-16", _date(2026, 9, 1)) is None
+      and _MOV(3.79, 3.63, None, _date(2026, 9, 1)) is None)
+
+# --- 7. la rampa inventata non deve rientrare ---
+# ⚠⚠ Era `cut_prob + i*12`: dodici punti a riunione scritti a mano, che pubblicavano 78% a
+#   ottobre e 90% a dicembre — numeri che nessun mercato ha quotato (classe v240). Il check
+#   guarda il CODICE senza commenti, perche' la nota che spiega la rimozione la cita per forza
+#   (v213, v240, v393 — il gate che trova se' stesso).
+_cod_fw = "\n".join(l for l in _src.splitlines() if not l.strip().startswith("#"))
+# ⚠⚠ SETTIMA INCARNAZIONE DELL'ANCORAGGIO APERTO, e dentro un gate scritto contro un altro
+#   numero inventato: la prima stesura cercava la sottostringa "* 12", che in update_data.py
+#   compare QUATTRO volte legittimamente (annualizzazioni, aritmetica dei mesi, un punteggio).
+#   Rosso su codice corretto. L'invariante non e' una stringa ma una PROPRIETA': il ciclo che
+#   costruisce `meetings` non deve avere un indice, perche' senza indice non esiste rampa —
+#   la vecchia usava `enumerate(fomc[:4])` proprio per averlo.
+_blocco_meetings = _cod_fw.split("meetings = []")[1].split("macro[\"fedwatch\"]")[0] \
+    if "meetings = []" in _cod_fw else ""
+check("v441 il ciclo delle riunioni non ha un indice, quindi non puo' proiettare una rampa",
+      bool(_blocco_meetings) and "enumerate" not in _blocco_meetings
+      and "prezzata_dal_contratto" in _blocco_meetings)
+
+# --- 8. il collegamento, non solo il controllo (v399) ---
+# Togliendo la riga che aggancia la funzione al blocco FedWatch, i sette check qui sopra
+# restano tutti verdi e la pipeline torna a pubblicare la formula vecchia.
+check("v441 il blocco FedWatch e' agganciato a movimenti_impliciti_fomc, non solo definita",
+      "movimenti_impliciti_fomc(implied, effr_corrente" in _cod_fw
+      and "quarti = (mid - implied)" not in _cod_fw)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)

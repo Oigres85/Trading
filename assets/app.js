@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "439";
+const BUILD_VERSION = "441";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7224,16 +7224,68 @@ function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine =
    usata da entrambi. Stessa lezione di v161 (usRegularSessionOpen derivata da usSessionInfo).
    La derivazione dal tasso implicito serve per compatibilità all'indietro: finché il CI non
    rigenera, i `meetings` possono non avere hike_prob. */
+/* v441 — LA METODOLOGIA CME, e il gemello di movimenti_impliciti_fomc() della pipeline.
+   Il future Fed Funds a 30 giorni settla sulla MEDIA dell'EFFR sul mese di CALENDARIO: con il
+   FOMC a meta' mese solo una parte dei giorni porta il tasso nuovo. La formula precedente
+   trattava quella media come il tasso POST-riunione e sottostimava di quasi il doppio.
+   ⚠ Si confronta con l'EFFR (fed_market.current_rate), non col punto medio del range: e' cio'
+   su cui il contratto settla davvero, ed e' un altro numero (3,63 contro 3,625).
+   ⚠ Ritorna i MOVIMENTI da 25bp, non una probabilita': sopra il movimento intero non esiste
+   una probabilita' — 1,37 vuol dire un rialzo pieno piu' il 37% di un secondo. */
+function movimentiImpliciti(implied, effr, riunione, meseContratto) {
+  if (!Number.isFinite(implied) || !Number.isFinite(effr) || !riunione) return null;
+  const r = new Date(String(riunione) + "T00:00:00Z");
+  if (isNaN(r.getTime())) return null;
+  // il front-month prezza SOLO il proprio mese: e' la regola v199 nella sua forma corretta —
+  // il limite non e' "35 giorni" ma "lo stesso mese di calendario del contratto".
+  if (r.getUTCFullYear() !== meseContratto.getUTCFullYear()
+      || r.getUTCMonth() !== meseContratto.getUTCMonth()) return null;
+  const eff = new Date(r.getTime() + 86400000);          // annuncio a fine 2a giornata
+  while (eff.getUTCDay() === 0 || eff.getUTCDay() === 6) eff.setUTCDate(eff.getUTCDate() + 1);
+  if (eff.getUTCMonth() !== r.getUTCMonth()) return null;
+  const giorni = new Date(Date.UTC(r.getUTCFullYear(), r.getUTCMonth() + 1, 0)).getUTCDate();
+  const n1 = eff.getUTCDate() - 1, n2 = giorni - n1;
+  if (n2 <= 0) return null;
+  const rFine = (implied - (n1 / giorni) * effr) / (n2 / giorni);
+  const mosse = (rFine - effr) / 0.25;
+  // oltre tre movimenti su una riunione sola il numero non e' attribuibile a questa riunione:
+  // molto piu' probabilmente il contratto letto non e' quello del mese corrente. Si dichiara.
+  if (Math.abs(mosse) > 3) return null;
+  return { mosse_25bp: Math.round(mosse * 100) / 100, giorni_vecchio: n1, giorni_nuovo: n2,
+           giorni_mese: giorni, base_effr: effr };
+}
+
 function ramiFedWatch(fw, riunione) {
   const mt = { ...(riunione || {}) };
-  if (mt.hike_prob == null && fw?.implied_rate != null && fw?.target_range) {
-    const [lo, hi] = String(fw.target_range).replace("%", "").split("–").map(Number);
-    if (Number.isFinite(lo) && Number.isFinite(hi)) {
-      const quarti = ((lo + hi) / 2 - fw.implied_rate) / 0.25 * 100;
-      mt.cut_prob = Math.round(Math.max(0, Math.min(100, quarti)));
-      mt.hike_prob = Math.round(Math.max(0, Math.min(100, -quarti)));
-      mt.hold_prob = Math.max(0, 100 - mt.cut_prob - mt.hike_prob);
-    }
+  /* ⚠⚠ v441 — NON CI SI FIDA DELLE PROBABILITA' DELLO SNAPSHOT VECCHIO. Prima il ripiego
+     scattava solo con hike_prob nullo, quindi finche' il CI non rigenera avrebbe continuato a
+     pubblicare il 66% prodotto dalla formula sbagliata. Qui la derivazione si RIFA' sempre,
+     salvo che lo snapshot porti gia' il campo nuovo `movimenti` (cioe' venga dalla pipeline
+     corretta). E' lo stesso ripiego dei rami FedWatch di v187, con l'aggiunta che il dato
+     vecchio va scavalcato invece che accettato. */
+  const daPipeline = fw && fw.movimenti && fw.movimenti.riunione === mt.date;
+  const mv = daPipeline ? fw.movimenti
+    : movimentiImpliciti(numero(fw && fw.implied_rate),
+                         numero(((DATA.macro || {}).fed_market || {}).current_rate),
+                         mt.date, new Date());
+  mt.mosse_25bp = mv ? mv.mosse_25bp : null;
+  mt.prezzata = !!mv;
+  // ⚠ la ponderazione viaggia col numero: la riga del pacchetto la nomina, e senza questi campi
+  //   stampava "ponderando i ? giorni prima e i ? dopo" — un punto interrogativo dove il lettore
+  //   cerca la prova che il conto e' quello di CME e non il nostro di prima.
+  mt.giorni_vecchio = mv ? mv.giorni_vecchio : null;
+  mt.giorni_nuovo = mv ? mv.giorni_nuovo : null;
+  mt.giorni_mese = mv ? mv.giorni_mese : null;
+  mt.base_effr = mv ? mv.base_effr : null;
+  mt.cut_prob = mt.hike_prob = mt.hold_prob = null;
+  if (mv) {
+    const x = mv.mosse_25bp;
+    // una PROBABILITA' esiste solo dentro (0, 1]: sopra, il movimento intero e' gia' prezzato
+    // e il resto e' la quota di un secondo. Schiacciare a 100 perderebbe il fatto (v400).
+    if (x > 0 && x <= 1) mt.hike_prob = Math.round(x * 100);
+    else if (x < 0 && x >= -1) mt.cut_prob = Math.round(-x * 100);
+    if (mt.hike_prob != null || mt.cut_prob != null)
+      mt.hold_prob = Math.max(0, 100 - (mt.hike_prob || 0) - (mt.cut_prob || 0));
   }
   return mt;
 }
@@ -9588,11 +9640,28 @@ function buildPrompt(opz) {
     // v193 — TUTTI E TRE I RAMI, SEMPRE, anche a zero (richiesta CEO). Il v187 mostrava solo
     // quelli attivi: uno zero esplicito e' informazione ("il mercato non prezza affatto un
     // taglio"), mentre l'assenza della voce lascia il dubbio che il dato manchi.
-    const rami = [
-      `RIALZO ${mt.hike_prob ?? 0}%`,
-      `invariato ${mt.hold_prob ?? 0}%`,
-      `taglio ${mt.cut_prob ?? 0}%`,
-    ];
+    /* ⚠⚠ v441 — SOPRA IL MOVIMENTO INTERO NON ESISTE UNA PROBABILITA', e "0%" sarebbe falso.
+       Con 1,37 movimenti da 25bp impliciti, un rialzo e' PIENAMENTE prezzato e il resto e' la
+       quota di un secondo: schiacciarlo a "RIALZO 100%" perderebbe il fatto e stamparlo come
+       "137%" sarebbe una probabilita' impossibile (v400). E il ramo `?? 0` era peggio ancora —
+       con la probabilita' nulla per costruzione avrebbe scritto "RIALZO 0%", cioe' l'opposto.
+       Il "0% esplicito e' informazione" della v193 vale quando lo zero e' MISURATO, non quando
+       nasce da un campo assente (v389). */
+    const rami = [];
+    if (mt.hike_prob != null || mt.cut_prob != null) {
+      rami.push(`RIALZO ${mt.hike_prob ?? 0}%`, `invariato ${mt.hold_prob ?? 0}%`,
+                `taglio ${mt.cut_prob ?? 0}%`);
+    } else if (mt.prezzata && mt.mosse_25bp != null) {
+      const x = mt.mosse_25bp, su = x > 0;
+      rami.push(`${Math.abs(x).toFixed(2)} MOVIMENTI da 25bp ${su ? "AL RIALZO" : "AL RIBASSO"} impliciti`
+        + ` — cioe' ${su ? "un rialzo" : "un taglio"} da 25bp gia' pienamente prezzato`
+        + (Math.abs(x) > 1 ? `, piu' il ${Math.round((Math.abs(x) - 1) * 100)}% di un secondo` : "")
+        + `. NON e' una probabilita': oltre il movimento intero la grandezza che il contratto`
+        + ` esprime e' quanti movimenti, non con che probabilita' uno`);
+    } else {
+      rami.push("NON CALCOLABILE da questo contratto: il future Fed Funds a 30 giorni prezza la"
+        + " media del MESE CORRENTE, e questa riunione non ci cade dentro");
+    }
     // stessa riunione quotata su Polymarket? (i mercati di previsione sono già nel payload)
     const cerca = (re) => (DATA.predictions || []).find(x => /\bfed\b/i.test(x.question || "") && re.test(x.question || ""));
     // il campo di Polymarket in data.json si chiama `yes` ed e' gia' in percentuale (17 = 17%);
@@ -9612,18 +9681,43 @@ function buildPrompt(opz) {
       const d = Math.abs(pmHike - mt.hike_prob);
       pezzi.push(`sul RIALZO quota ${pmHike}% contro il ${mt.hike_prob}%${d >= 10 ? ` (${d} punti)` : ""}`);
     }
+    /* ⚠⚠ v441 — QUANDO I FUTURES NON DANNO UNA PROBABILITA', IL CONFRONTO NON SPARISCE.
+       I due `pezzi` qui sopra si agganciano a hike_prob/hold_prob, che con piu' di un movimento
+       intero sono nulli per costruzione: senza questo ramo la riga perderebbe in silenzio il
+       confronto fra due fonti sulla stessa riunione, che e' informazione a se' stante (v187) e
+       che proprio qui diverge piu' che mai. ⚠ E si DICHIARA che le due grandezze non hanno la
+       stessa unita': i futures dicono quanti movimenti, Polymarket con che probabilita' uno. */
+    if (!pezzi.length && mt.prezzata && mt.mosse_25bp != null && (pmHike != null || pmHold != null)) {
+      const q = [];
+      if (pmHike != null) q.push(`RIALZO ${pmHike}%`);
+      if (pmHold != null) q.push(`INVARIATO ${pmHold}%`);
+      pezzi.push(`${q.join(" · ")} — ⚠ NON e' lo stesso numero in due versioni: i futures`
+        + ` esprimono QUANTI movimenti sono prezzati (${mt.mosse_25bp}), Polymarket con che`
+        + ` PROBABILITA' se ne verifichi uno. Che le due letture divergano cosi' tanto e' esso`
+        + ` stesso un fatto: una delle due sta prezzando qualcosa che l'altra non prezza`);
+    }
     const conf = pezzi.length ? ` · POLYMARKET sulla stessa riunione: ${pezzi.join(" · ")}` : "";
     const pmPct = pmHike;
     /* ⚠ v345 — LA CURVA DELLE ATTESE, non solo il primo punto. `meetings` porta le riunioni
        successive con le loro probabilita': e' la FORMA a dire cosa prezza il mercato. Sulla
        prossima riunione la Fed sembra ferma; tre riunioni piu' in la' il rialzo e' quotato
        molto di piu', e quella pendenza e' l'informazione. */
-    const succ = ((m.fedwatch || {}).meetings || []).slice(1, 4)
-      .filter(x => x && x.date)
-      .map(x => `${x.date.slice(8, 10)}/${x.date.slice(5, 7)} invariato ${x.hold_prob ?? 0}% · rialzo ${x.hike_prob ?? 0}% · taglio ${x.cut_prob ?? 0}%`);
-    const curva = succ.length
-      ? `\n- STRUTTURA A TERMINE DELLE ATTESE FED (dai futures, riunioni successive): ${succ.join(" | ")}`
-        + `. La FORMA conta piu' del primo punto: se la probabilita' di rialzo cresce con l'orizzonte, il mercato non sta dicendo "Fed ferma", sta dicendo "ferma per ora".`
+    /* ⚠⚠ v441 — LA CURVA DELLE ATTESE NON ESISTEVA: era una RAMPA INVENTATA. La pipeline la
+       costruiva con `cut_prob + i*12`, dodici punti a riunione scritti a mano, e il pacchetto
+       pubblicava 78% a ottobre e 90% a dicembre — numeri che nessun mercato ha quotato, con la
+       forma delle soglie inventate della v240. E la "pendenza che e' l'informazione" era la
+       pendenza della costante 12, non del mercato.
+       Un front-month prezza SOLO il proprio mese: le riunioni successive vogliono i contratti
+       dei loro mesi, che il sistema non scarica. Quindi si DICHIARA di non prezzarle e si
+       indica la fonte che lo fa (v199, v406) — invece di stampare zeri, che si leggerebbero
+       come "il mercato non prezza nulla". */
+    const altre = ((m.fedwatch || {}).meetings || []).slice(1, 4).filter(x => x && x.date)
+      .map(x => `${x.date.slice(8, 10)}/${x.date.slice(5, 7)}`);
+    const curva = altre.length
+      ? `\n- RIUNIONI SUCCESSIVE (${altre.join(", ")}): questo contratto NON le prezza — il future`
+        + ` Fed Funds a 30 giorni copre la media del mese corrente, e servirebbero i contratti dei`
+        + ` rispettivi mesi, che il sistema non scarica. Il numero non c'e', e non e' zero:`
+        + ` i mercati di previsione in coda quotano alcune di quelle riunioni.`
       : "";
     // ═══ v199 — IL CONTRATTO NON PREZZA QUELLA RIUNIONE. ZQ=F e' il future Fed Funds a 30
     // giorni sul MESE CORRENTE: prezza la media del mese in corso, non una riunione fra sei
@@ -9642,7 +9736,7 @@ function buildPrompt(opz) {
       lines.push(`- FedWatch — NON CALCOLABILE per la riunione del ${mt.date} (fra ${giorniAllaRiunione} giorni): il tasso implicito ${m.fedwatch.implied_rate}% viene dal future Fed Funds a 30 giorni, che prezza il MESE IN CORSO e non una riunione così lontana. Le probabilità derivate da quel contratto non riguarderebbero quella data.`
         + (pmPct != null ? ` La fonte che quota proprio quella riunione è il mercato di previsione: rialzo ${pmPct}%.` : " Nessun mercato di previsione disponibile su quella riunione in questo payload."));
     } else {
-      lines.push(`- FedWatch prossima riunione ${mt.date}${giorniAllaRiunione != null ? ` (fra ${giorniAllaRiunione} giorni)` : ""} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% vs punto medio del range attuale): ${rami.join(" · ")}${conf}${curva}`);
+      lines.push(`- FedWatch prossima riunione ${mt.date}${giorniAllaRiunione != null ? ` (fra ${giorniAllaRiunione} giorni)` : ""} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% — media attesa del mese — contro l'EFFR corrente ${mt.prezzata && mt.base_effr != null ? mt.base_effr : (((DATA.macro || {}).fed_market || {}).current_rate ?? "n.d.")}%, ponderando i ${mt.giorni_vecchio ?? "?"} giorni prima e i ${mt.giorni_nuovo ?? "?"} dopo l'entrata in vigore): ${rami.join(" · ")}${conf}${curva}`);
     }
   }
   if ((m.tilt || []).length) {

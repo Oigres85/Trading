@@ -4523,6 +4523,80 @@ nessun file servito al browser. Il cache-busting esiste per gli asset che cambia
 sarebbe rumore, e `self_check` verifica che `BUILD_VERSION` e `?v=` restino allineati — lo sono,
 entrambi a 439.
 
+## 🏦 v441 — IL FUTURE È UNA MEDIA DI MESE, E LA NOSTRA FORMULA LO LEGGEVA COME UN TASSO
+
+Scelta del CEO fra le due strade che gli avevo messo davanti: **(b) implementare la metodologia
+CME per intero**, invece di togliere il numero. Il difetto era triplo, nella stessa derivazione,
+**duplicata** in `update_data.py` e in `app.js` — e a sei giorni dal FOMC.
+
+| | il sistema | CME pubblicato | la metodologia CME sul NOSTRO implied |
+|---|---|---|---|
+| riunione 16/09 | **RIALZO 66%** | ~57% | **1,37 movimenti da 25bp** |
+
+**1. La formula trattava la MEDIA DEL MESE come il tasso POST-riunione.** `ZQ` settla sulla media
+dell'EFFR sul mese di **calendario**: col FOMC il 16 settembre solo **14 giorni su 30** portano il
+tasso nuovo. Misurato dall'iniezione che rimuove la ponderazione: escono **0,47 movimenti dove la
+verità è 1,0** — cioè esattamente il dimezzamento che produceva il 66%.
+
+**2. Il confronto era col punto medio del RANGE (3,625) invece che con l'EFFR (3,63)**, che è ciò
+su cui il contratto settla davvero e che il sistema **pubblica già** in `fed_market.current_rate`.
+Due grandezze diverse, e il pacchetto ha una riga che dice esplicitamente che lo sono.
+
+**3. La "struttura a termine" era una RAMPA INVENTATA.** `cut_prob + i*12`: dodici punti a
+riunione, scritti a mano, senza provenienza. Il pacchetto pubblicava **78% a ottobre e 90% a
+dicembre** — numeri che nessun mercato ha quotato — e la nota diceva *"la FORMA conta più del
+primo punto"*: era la forma della costante 12, non del mercato. Classe v240 pura.
+
+### ⚠⚠ Sopra il movimento intero non esiste una probabilità
+1,37 significa **un rialzo da 25bp pienamente prezzato più il 37% di un secondo**. Schiacciarlo a
+"RIALZO 100%" perde il fatto; scriverlo "137%" è una probabilità impossibile (v400). Quindi la
+funzione restituisce i **movimenti** — il fatto che il calcolo produce davvero — e la conversione
+in probabilità avviene **solo dentro (0, 1]**, dove è tale. È la forma della v409: il numero non
+esce mai senza il proprio denominatore.
+
+⚠ **Il front-month prezza SOLO il proprio mese**, ed è la v199 nella sua forma corretta: il limite
+non è "35 giorni" ma *lo stesso mese di calendario del contratto*. Le riunioni successive ora si
+**dichiarano non prezzate** invece di ricevere numeri finti — e *"0%"* sarebbe l'opposto
+dell'assenza, non l'assenza (v389, v406).
+
+⚠ **Guardia di plausibilità**: oltre tre movimenti su una riunione sola il numero non è
+attribuibile a quella riunione — molto più probabilmente il contratto letto non è quello del mese
+corrente. Si dichiara invece di pubblicare. ⚠ **Quale contratto Yahoo serva come `ZQ=F` resta non
+verificabile da qui** (trappola v203): l'ho dichiarato prima di scrivere il codice, non dopo.
+
+### ⚠⚠ Il ripiego non si fida dello snapshot vecchio, ed è la parte che si dimentica
+`data.json` porta ancora le probabilità della formula sbagliata finché il CI non rigenera. Il
+ripiego di `ramiFedWatch` scattava solo con `hike_prob` **nullo**: avrebbe continuato a pubblicare
+il 66% per ore. Ora la derivazione si **rifà sempre**, salvo che lo snapshot porti il campo nuovo
+`movimenti`. È il ripiego dei rami FedWatch di v187 con un'aggiunta: **il dato vecchio va
+scavalcato, non accettato.**
+
+### 🦴 Due gate hanno accusato il colpo, nessuno zittito
+- ⚠⚠ **TRENTATREESIMA rottura di un check ancorato a una stringa letterale, e della specie
+  peggiore**: **v345** pretendeva `STRUTTURA A TERMINE DELLE ATTESE FED`, cioè letteralmente la
+  riga costruita sulla rampa inventata — chiedeva che il pacchetto continuasse a pubblicare 78% e
+  90%. *Un gate che pinna un difetto lo rende permanente* (v326, v411, v415, v422). L'invariante
+  che voleva davvero difendere resta ed è **più forte**: le riunioni successive non si tacciono —
+  si nominano **e se ne dichiara lo stato**; nominarle senza stato è il caso che non deve esistere.
+- **C14 puniva la correzione che gli dava ragione**, come già in v199. Ora riconosce la **terza
+  forma legittima** — i movimenti — alla stessa condizione: che la riga dichiari di non essere una
+  probabilità **e** affianchi l'altra fonte. Validato per iniezione su entrambe le condizioni:
+  toglierne una qualsiasi lo fa mordere di nuovo, quindi l'eccezione non è un lasciapassare (v203).
+  ⚠ E il suo allarme era **mal attribuito**: contava i rami di *Polymarket* nella stessa riga, e ne
+  trovava uno solo perché cercava `invariato` minuscolo dove quel pezzo scrive `INVARIATO`. *Un
+  detector che legge tutta la riga non sa di chi siano i numeri che ci trova.*
+
+### 🧨 E l'ancoraggio aperto per la SETTIMA volta, dentro il gate scritto contro un'invenzione
+Il check *"nessuna rampa"* cercava la sottostringa `* 12`, che in `update_data.py` compare
+**quattro volte legittimamente** (annualizzazioni, aritmetica dei mesi, un punteggio): rosso su
+codice corretto. Riagganciato alla proprietà — **il ciclo che costruisce `meetings` non ha un
+indice, e senza indice non esiste rampa possibile** (la vecchia usava `enumerate` proprio per
+averlo).
+
+⚠ Quattro iniezioni sui gate portanti, tutte con `modifica_sicura` e ripristino da snapshot preso
+prima (v430): mordono tutte. ⚠ Pavimenti alzati contando i **punti di chiamata** — 545 su 570 per
+`test_app.mjs`, 185 su 195 per `test_update_data.py` — che è l'errore appena pagato in v440.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

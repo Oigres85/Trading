@@ -488,7 +488,29 @@ function c14_codaAZero(t) {
       flag("C14 limite dichiarato senza alternativa", "la riga FedWatch dice di non poter calcolare ma non indica quale fonte prezzi quella riunione");
     return;
   }
-  const rami = ["RIALZO", "taglio", "invariato"].filter(r => new RegExp(`${r} \\d+%`).test(riga));
+  /* ⚠⚠ v441 — LA TERZA FORMA LEGITTIMA: I MOVIMENTI. Il future Fed Funds a 30 giorni settla
+     sulla MEDIA del mese, e quando il mercato prezza piu' di un movimento intero non esiste
+     "una probabilita'": 1,37 vuol dire un rialzo da 25bp pienamente prezzato piu' il 37% di un
+     secondo. Pubblicarlo come "RIALZO 100%" perderebbe il fatto, come "137%" sarebbe una
+     probabilita' impossibile. C14 nasce contro lo zero solitario che si legge come "nessun
+     rischio": una riga che dichiara un movimento intero gia' prezzato e' l'opposto di quel
+     difetto, e va riconosciuta — con la stessa condizione della v199, cioe' che nomini anche
+     l'altra fonte. Senza questa eccezione il detector puniva di nuovo la correzione che gli
+     dava ragione.
+     ⚠ E il flag che ha fatto scattare era per di piu' mal attribuito: contava i rami di
+     POLYMARKET nella stessa riga, e ne trovava uno solo perche' il filtro cerca "invariato"
+     minuscolo mentre quel pezzo scrive "INVARIATO". Un detector che legge tutta la riga non sa
+     di chi siano i numeri che ci trova. */
+  if (/MOVIMENTI da 25bp/.test(riga)) {
+    if (/NON e' una probabilita'/.test(riga)
+        && /POLYMARKET|mercato di previsione/i.test(riga))
+      ok("C14 la riga FedWatch pubblica i movimenti impliciti, dichiara che non sono una probabilità e affianca l'altra fonte");
+    else
+      flag("C14 movimenti senza dichiarazione o senza alternativa",
+        "la riga FedWatch pubblica movimenti impliciti ma non dichiara che non sono una probabilità, oppure non affianca la fonte che quota quella riunione");
+    return;
+  }
+  const rami = ["RIALZO", "taglio", "invariato"].filter(r => new RegExp(`${r} \\d+%`, "i").test(riga));
   const soloZeri = [...riga.matchAll(/(RIALZO|taglio|invariato) (\d+)%/g)].every(m => m[2] === "0");
   if (rami.length < 2) {
     flag("C14 probabilità a senso unico", `la riga FedWatch pubblica un solo ramo (${rami[0] || "nessuno"}): `
