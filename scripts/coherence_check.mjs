@@ -666,7 +666,14 @@ function c17_verdettiSenzaRegola(t) {
   const NOSTRE = ["Sopravvalutazione", "Valutazione elevata", "Valutazione normale",
     "Mercato del Credito Rilassato", "Mercato del Credito Attenzione",
     "Mercato del Credito Stress", "Mercato del Credito Crisi",
-    "(Elevato)", "Tensione moderata", "Tensione elevata"];
+    /* ⚠ v447 — l'ancora era "(Elevato)" CON la parentesi di chiusura, e ha smesso di
+       trovare l'etichetta quando la riga e' diventata piu' corretta: il forward P/E ora
+       dichiara accanto al proprio nome che la banda e' una convenzione e non un dato del
+       file (v240), quindi la parentesi non chiude piu' subito dopo la parola. Il detector si
+       e' dichiarato MUTO invece di passare a vuoto — che e' il suo lavoro — e va riagganciato
+       al FATTO (l'etichetta esce) invece che alla punteggiatura che la seguiva.
+       Trentaseiesima rottura di un check ancorato a una stringa letterale. */
+    "(Elevato", "Tensione moderata", "Tensione elevata"];
   /* cio' che vale come metro scritto accanto */
   const METRO = ["etichetta nostra", "bande di lettura", "soglia di lettura", "soglia",
     "media storica", "confine a"];

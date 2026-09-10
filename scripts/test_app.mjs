@@ -925,7 +925,15 @@ check("v445 put/call: col dato pubblica il rapporto, senza il dato dichiara che 
   try {
     DATA.macro.putcall = { symbol: "SPY", name: "S&P 500 ETF", ratio: 1.33, puts: 4325457, calls: 3241738 };
     const conDato = riga();
-    if (conDato.indexOf("1.33") < 0) guai.push("col dato il rapporto non esce piu'");
+    /* ⚠ v447 — QUI C'ERA indexOf("1.33"), cioe' il PUNTO inglese: il gate pretendeva
+       esattamente la resa che v442 e v443 hanno tolto dal pacchetto, ed e' andato rosso
+       quando il rapporto e' passato da fmtNum. Trentacinquesima rottura di un check
+       ancorato a una stringa letterale, e della specie peggiore — un gate che pinna un
+       difetto lo rende permanente (v326, v411, v415, v422, v441, v443).
+       Riagganciato al fatto ed e' piu' forte: il valore esce nella convenzione del
+       pacchetto E il punto inglese non rientra. */
+    if (conDato.indexOf("1,33") < 0) guai.push("col dato il rapporto non esce piu' nella convenzione del pacchetto");
+    if (conDato.indexOf("1.33") >= 0) guai.push("il rapporto e' tornato a uscire col punto inglese");
     if (conDato.indexOf("NON DISPONIBILE") >= 0) guai.push("col dato il pacchetto dichiara comunque il buco");
     delete DATA.macro.putcall;
     const senza = riga();
@@ -4805,8 +4813,14 @@ check("v355 crescita: i ricavi portano la variazione, non solo il livello", suVe
   const ct = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).tv || {}).conto_trim || [];
   if (ct.length < 3) return true;
   const p = buildPromptTicker("NVDA");
-  /* si pubblicavano cinque ricavi assoluti e si lasciavano quattro divisioni al lettore */
-  return /ricavi [\\d.]+ mld \\([-+][\\d.]+% t\\/t\\)/.test(p)
+  /* si pubblicavano cinque ricavi assoluti e si lasciavano quattro divisioni al lettore.
+     ⚠ v447 — l'ancora era /ricavi [\\d.]+ mld \\([-+][\\d.]+% t\\/t\\)/, che pinnava DUE forme:
+     il punto inglese (tolto da v442/v443) e l'unita' "mld", che dalla v447 si sceglie sul
+     blocco perche' su una societa' da 13 milioni di ricavi "0.0 mld" quattro volte di fila
+     cancellava la traiettoria. Riagganciato al FATTO: ogni riga di ricavi porta la propria
+     variazione t/t, qualunque sia l'unita'. */
+  return /ricavi [\\d.,]+ (mld|mln|migliaia) \\([-+][\\d,]+% t\\/t\\)/.test(p)
+      && !/ricavi [\\d]+[.][\\d]+ (mld|mln) /.test(p)
       && /TRAIETTORIA DELLA CRESCITA/.test(p)
       && /SECONDA derivata dei ricavi/.test(p);`));
 
@@ -9501,6 +9515,178 @@ check("v443 · il formattatore delle percentuali del libro e' UNO SOLO", (() => 
     + "al primo ritocco, ed e' cosi' che la stessa percentuale e' uscita in due rese (v421, v442)");
   if (!/const pct1 = \(v\) =>/.test(codice)) return no("sparito pct1: il formattatore unico non esiste piu'");
   if (/const n1 = \(v\) =>/.test(codice)) return no("e' tornato un clone locale del formattatore");
+  return true;
+})());
+
+/* ═══ v447 — LA SCALA NON PUO' ANNULLARE IL DATO, E LA VALUTA SI NOMINA ═════════════════════
+   Due invarianti sul conto economico, entrambi nati da un difetto misurato sul pacchetto vero.
+   ⚠ Lo stato si COSTRUISCE, non si aspetta: oggi nel libro c'e' RGTI (ricavi in milioni) e ci
+   sono TSM e SKHY (bilanci in valuta locale), ma domani potrebbero non esserci e il check
+   sarebbe verde per assenza del fenomeno — la trappola pagata quattro volte in questo file. */
+check("v447 · la scala del conto economico non annulla la traiettoria", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const guai = [];
+  const riga = (r) => (DATA.watchlist || []).find(x => x && x.ticker === r);
+  const t = riga("NVDA");
+  if (!t) return "NVDA non e' nei dati: il check non e' costruibile";
+  const salvaFin = t.financials, salvaTv = t.tv;
+  try {
+    /* una societa' con ricavi in MILIONI e una traiettoria in discesa del 46%: e' il caso RGTI,
+       che con l'unita' fissa a mld usciva "0.0 mld" quattro volte identiche. */
+    t.financials = [
+      { year: 2022, revenue: 13102000, net_income: -71520000, margin: -545.9 },
+      { year: 2023, revenue: 12008000, net_income: -75110000, margin: -625.5 },
+      { year: 2024, revenue: 10790000, net_income: -200990000, margin: -1862.7 },
+      { year: 2025, revenue: 7088000, net_income: -216210000, margin: -3050.4 },
+    ];
+    const p = buildPromptTicker("NVDA");
+    const righe = p.split(NL).filter(r => r.indexOf("- esercizio 20") === 0);
+    if (righe.length !== 4) guai.push("le righe dell'esercizio sono " + righe.length + " invece di 4");
+    const importi = righe.map(r => (r.match(/ricavi ([^ ]+) (mld|mln|migliaia)/) || [])[1]);
+    if (importi.some(x => x == null)) guai.push("una riga non porta ricavi con la propria unita'");
+    else if (new Set(importi).size !== 4) {
+      guai.push("quattro esercizi diversi rendono " + new Set(importi).size + " importi distinti ("
+        + importi.join(", ") + "): la scala sta annullando la traiettoria");
+    }
+    /* e il punto inglese non deve rientrare (v442, v443) */
+    if (righe.some(r => /ricavi [0-9]+[.][0-9]/.test(r))) guai.push("i ricavi sono tornati col punto inglese");
+  } finally { t.financials = salvaFin; t.tv = salvaTv; }
+  return guai.length ? guai.join(" \u00b7 ") : true;`));
+
+check("v447 · gli importi del conto economico dichiarano la propria valuta di bilancio", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const guai = [];
+  const t = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
+  if (!t) return "NVDA non e' nei dati: il check non e' costruibile";
+  const salvaVb = t.valuta_bilancio, salvaSt = t.stats, salvaFin = t.financials;
+  const dichiara = () => buildPromptTicker("NVDA").split(NL)
+    .find(r => r.indexOf("⚠ IMPORTI IN") === 0 || r.indexOf("⚠ La valuta di bilancio non e' pubblicata") === 0) || "";
+  try {
+    if (!(Array.isArray(t.financials) && t.financials.some(x => x && x.revenue))) {
+      t.financials = [{ year: 2025, revenue: 1e9, net_income: 1e8, margin: 10 }];
+    }
+    /* 1. la pipeline ha pubblicato il campo: la valuta si NOMINA */
+    t.valuta_bilancio = "TWD";
+    const conCampo = dichiara();
+    if (conCampo.indexOf("TWD") < 0) guai.push("col campo pubblicato la valuta di bilancio non viene nominata");
+    /* 2. campo assente ma bilanci in valuta locale: si dichiara che NON e' quella di quotazione */
+    delete t.valuta_bilancio;
+    t.stats = Object.assign({}, t.stats || {}, { cross_currency: true });
+    const ripiego = dichiara();
+    if (ripiego.indexOf("DIVERSA da quella di quotazione") < 0) {
+      guai.push("senza il campo, un bilancio in valuta locale non viene dichiarato tale");
+    }
+    if (ripiego.indexOf("TWD") >= 0) guai.push("il ripiego NOMINA una valuta che non conosce");
+    /* 3. nessuno dei due: si dichiara di non saperlo, non si tace */
+    t.stats = Object.assign({}, salvaSt || {}); delete t.stats.cross_currency;
+    if (!dichiara()) guai.push("senza nessuna delle due informazioni il pacchetto non dichiara niente");
+  } finally {
+    if (salvaVb !== undefined) t.valuta_bilancio = salvaVb; else delete t.valuta_bilancio;
+    t.stats = salvaSt; t.financials = salvaFin;
+  }
+  return guai.length ? guai.join(" \u00b7 ") : true;`));
+
+/* ⚠ v447 — IL DENOMINATORE DELLE SCOMMESSE EFFETTIVE STA NELLA RIGA CHE LO USA.
+   "2,3 su 12 nomi" accanto a un libro che ne elenca 13 si legge come un errore del sistema, e
+   il collaudo B5 ordina a chi legge di segnalarlo: il pacchetto forniva da solo il falso
+   positivo del proprio controllo di qualita' (v400, v409, v412, v414, v415). */
+check("v447 · il blocco del rischio nomina le posizioni che restano fuori dal suo denominatore", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const pr = profiliRischio();
+  if (!pr) return "profiliRischio() non produce nulla: il check non e' costruibile";
+  const p = buildCIOText();
+  const intest = p.split(NL).find(r => r.indexOf("IL DENOMINATORE DI QUESTO BLOCCO") >= 0) || "";
+  const usati = pr.profili[0] && pr.profili[0].n;
+  if (pr.esclusi.length === 0) {
+    return intest ? "nessuna posizione e' esclusa e il pacchetto dichiara comunque un'esclusione" : true;
+  }
+  const guai = [];
+  if (!intest) guai.push(pr.esclusi.length + " posizioni restano fuori dalla matrice e il pacchetto non lo dichiara");
+  else {
+    for (const tk of pr.esclusi) if (intest.indexOf(tk) < 0) guai.push("l'escluso " + tk + " non e' nominato");
+    if (intest.indexOf(String(usati)) < 0) guai.push("l'intestazione non porta il numero di nomi davvero usati");
+    if (intest.indexOf(String(pr.inLibro)) < 0) guai.push("l'intestazione non porta il numero di posizioni del libro");
+  }
+  return guai.length ? guai.join(" \u00b7 ") : true;`));
+
+/* ⚠ v447 — LE SOGLIE DI LETTURA SONO AFFERMAZIONI (v240). Ne' `macro.putcall` ne'
+   `macro.forward_pe` portano una distribuzione: le bande che decidono le loro etichette sono
+   convenzioni, e vanno dichiarate tali invece di passare per misure. */
+check("v447 · le etichette senza distribuzione dichiarano che la banda e' una convenzione", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const guai = [];
+  const salva = DATA.macro.putcall, salvaFp = DATA.macro.forward_pe;
+  try {
+    DATA.macro.putcall = { symbol: "SPY", name: "S&P 500 ETF", ratio: 1.31, puts: 100, calls: 80 };
+    DATA.macro.forward_pe = { value: 21.2, avg_hist: 16.5, label: "Elevato", source: "WSJ" };
+    const p = buildCIOText();
+    const pc = p.split(NL).find(r => r.indexOf("- Put/Call") === 0) || "";
+    if (!pc) guai.push("la riga del put/call non esce");
+    else {
+      if (pc.indexOf("BANDE DI SOLA LETTURA") < 0) guai.push("il put/call non dichiara che le sue soglie sono una convenzione");
+      if (pc.indexOf("NON ha lo storico") < 0) guai.push("il put/call non dichiara di non poter collocare un estremo");
+    }
+    const fp = p.split(NL).find(r => r.indexOf("- Forward P/E") === 0) || "";
+    if (!fp) guai.push("la riga del forward P/E non esce");
+    else if (fp.indexOf("bande FISSE") < 0) guai.push("il forward P/E non dichiara che l'etichetta viene da bande fisse");
+  } finally {
+    if (salva !== undefined) DATA.macro.putcall = salva; else delete DATA.macro.putcall;
+    if (salvaFp !== undefined) DATA.macro.forward_pe = salvaFp; else delete DATA.macro.forward_pe;
+  }
+  return guai.length ? guai.join(" \u00b7 ") : true;`));
+
+/* ⚠ v447 — "QUESTA POSIZIONE" SU UN TITOLO CHE NON E' UNA POSIZIONE. I tre stati si
+   percorrono tutti e tre: un gate che ne esercita due non vede il terzo, ed e' esattamente
+   cosi' che sono nati i difetti di v419, v420 e v423. */
+check("v447 · il blocco 8 non chiama posizione un titolo che il libro non ha", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const guai = [];
+  const inLibro = (DATA.watchlist || []).filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  const fuori = (DATA.watchlist || []).find(r => r && !(numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0)
+    && !/^\\^|=[XF]$|-USD$/.test(String(r.ticker || "")));
+  if (!inLibro.length || !fuori) return "servono un titolo posseduto e uno seguito e non posseduto: non costruibile";
+  const tesi = (tk) => buildPromptTicker(tk).split(NL).find(r => r.indexOf("· LA TESI REGG") === 0) || "";
+  const dentro = tesi(inLibro[0].ticker), estraneo = tesi(fuori.ticker);
+  if (dentro.indexOf("Questa posizione aggiunge") < 0) guai.push("sul titolo POSSEDUTO la riga non lo chiama piu' posizione");
+  if (estraneo.indexOf("Questa posizione") >= 0) {
+    guai.push("su " + fuori.ticker + ", che NON e' nel libro, la riga lo chiama comunque posizione");
+  }
+  if (estraneo.indexOf("NON e' nel libro") < 0) guai.push("su un titolo non posseduto la riga non dichiara che non e' nel libro");
+  /* e le due rese devono avere lo stesso numero di righe: un ramo vuoto lascia una riga bianca */
+  for (const [tk, et] of [[inLibro[0].ticker, "posseduto"], [fuori.ticker, "non posseduto"]]) {
+    const rr = buildPromptTicker(tk).split(NL);
+    const i = rr.findIndex(r => r.indexOf("· LA TESI REGG") === 0);
+    if (i >= 0 && rr.slice(i, i + 4).some(r => r === "")) guai.push("il blocco 8 (" + et + ") contiene una riga vuota");
+  }
+  return guai.length ? guai.join(" \u00b7 ") : true;`));
+
+/* ⚠ v447 — IL NOME DELLA SOCIETA' NON VIENE PIU' TRONCATO DA NOI. L'annotazione diceva che
+   l'ellissi arrivava dalla fonte: era falso, la tagliavano due righe di update_data.py a 26
+   caratteri, e il pacchetto apriva con "ANALISI DI TSM (Taiwan Semiconductor Manu…)" mentre il
+   PASSO 0 ordina di cercare online una societa' di cui non dice il nome intero (v397). */
+check("v447 pipeline: il nome della societa' non viene troncato a una larghezza da tabella", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const codice = py.split(String.fromCharCode(10)).filter(l => !/^\s*#/.test(l)).join(String.fromCharCode(10));
+  if (!/auto_name = \(info\.get\("longName"\) or info\.get\("shortName"\) or ticker\)/.test(codice)) {
+    return no("il nome non prende piu' longName come prima scelta: per un emittente estero "
+      + "shortName arriva abbreviato e il pacchetto non sa come si chiama la societa'");
+  }
+  const m = codice.match(/if len\(auto_name\) > (\d+):/);
+  if (!m) return no("sparito il tetto sulla lunghezza del nome: `name` finisce anche nelle "
+    + "etichette dei grafici, dove una stringa senza fine sfonda la colonna (v394)");
+  if (Number(m[1]) < 40) return no("il tetto sul nome e' tornato a " + m[1] + " caratteri: a quella "
+    + "larghezza i nomi degli emittenti esteri escono troncati");
+  return true;
+})());
+
+/* ⚠ v447 — la valuta di bilancio dev'essere PUBBLICATA, non solo usata per ripulire gli stats */
+check("v447 pipeline: la riga pubblica la valuta in cui e' redatto il bilancio", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const codice = py.split(String.fromCharCode(10)).filter(l => !/^\s*#/.test(l)).join(String.fromCharCode(10));
+  if (!/"valuta_bilancio": \(info\.get\("financialCurrency"\) or currency\)/.test(codice)) {
+    return no("la riga non pubblica piu' valuta_bilancio: senza, il conto economico stampa "
+      + "grandezze assolute di emittenti in valute diverse senza dire in quale (v183, v404)");
+  }
   return true;
 })());
 

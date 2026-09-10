@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "446";
+const BUILD_VERSION = "447";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -161,6 +161,60 @@ const fmtNum = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 2 });
    formattazione sola, a livello di modulo, invece di quattro `toFixed(0)` da tenere allineati
    a mano (che e' il registro che invecchia da solo: C10, red team I6). */
 const pct1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
+
+/* ═══ v447 — LA SCALA SI SCEGLIE SUL BLOCCO, E LA VALUTA SI NOMINA ════════════════════════
+   Due difetti nello stesso posto, entrambi misurati sul pacchetto vero e nessuno dei due
+   cosmetico.
+
+   1. LA SCALA DISTRUGGEVA IL DATO. Il conto economico stampava sempre `(v/1e9).toFixed(1)`
+      e RGTI usciva cosi':
+          esercizio 2022: ricavi 0.0 mld   (13.102.000)
+          esercizio 2023: ricavi 0.0 mld   (12.008.000)
+          esercizio 2024: ricavi 0.0 mld   (10.790.000)
+          esercizio 2025: ricavi 0.0 mld   ( 7.088.000)
+      Quattro zeri identici dove la serie vera SCENDE del 46%: la traiettoria — che e' il
+      motivo per cui la tabella esiste — spariva, e il margine (-545,9% -> -3050,4%) non era
+      verificabile da nessuno dei numeri stampati. E' la classe v433, dove l'arrotondamento
+      a due decimali annullava l'ATR di un cambio e uccideva la pipeline.
+
+   2. LA VALUTA NON ERA DICHIARATA. Accanto a "MU ricavi 30,8 mld" (dollari) il pacchetto
+      scriveva "SKHY 44.621,6 mld" (won) e "TSM 2.263,9 mld" (TWD), senza che nessuna delle
+      tre righe dicesse in quale valuta fosse. Un lettore ne ricava che TSM fatturi 73 volte
+      MU, mentre il rapporto vero e' 2,5. La regola v183/v404 — "solo segni e rapporti, mai
+      grandezze fra titoli" — era stata applicata a `fcf_ttm` e non al conto economico:
+      classe v412, una correzione applicata a un ramo e non agli altri.
+
+   ⚠⚠ L'UNITA' SI SCEGLIE UNA VOLTA PER BLOCCO, dal valore piu' grande che contiene, non
+   riga per riga: righe con unita' diverse nella stessa tabella non si confrontano a colpo
+   d'occhio, ed e' il confronto il motivo per cui la tabella c'e'.
+
+   ⚠ Una funzione sola per il conto annuale E per quello trimestrale: erano due lambda con
+   DUE convenzioni diverse (una cifra contro due) per la stessa grandezza — la classe
+   v161/v207 gia' presente prima che la toccassi.
+
+   ⚠ E i numeri passano da `fmtNum`, cioe' con la VIRGOLA: `toFixed` scrive il punto inglese,
+   che e' esattamente cio' che v442 e v443 hanno tolto dalle percentuali. */
+function scalaImporti(valori) {
+  const max = Math.max(0, ...valori.filter(v => v != null && Number.isFinite(v)).map(Math.abs));
+  const [div, et] = max >= 1e9 ? [1e9, "mld"] : max >= 1e6 ? [1e6, "mln"] : [1e3, "migliaia"];
+  return (v) => (v == null || !Number.isFinite(v) ? "n.d." : `${fmtNum.format(Math.round(v / div * 100) / 100)} ${et}`);
+}
+
+/* ⚠ La valuta di BILANCIO, che non e' quella di quotazione. La pipeline la pubblica in
+   `valuta_bilancio` (v447); finche' il CI non ha rigenerato il campo non c'e', e allora
+   `stats.cross_currency` — che la pipeline scrive da sempre quando le due divergono — dice
+   almeno che NON e' quella di quotazione. Il ripiego DICHIARA di essere un ripiego invece di
+   nominare una valuta che non conosce: "il sistema non ha il dato" e "ce l'ha e non te lo
+   passa" si leggono uguali (v406), e inventare la valuta sarebbe peggio di entrambi (v396). */
+function valutaBilancio(r) {
+  const v = r && r.valuta_bilancio;
+  if (v) return { txt: String(v), certa: true };
+  if (r && r.stats && r.stats.cross_currency === true) {
+    return { txt: `valuta LOCALE dell'emittente, DIVERSA da quella di quotazione`
+      + `${r.currency ? ` (${r.currency})` : ""} — quale non e' ancora pubblicato`, certa: false };
+  }
+  return { txt: "", certa: false };
+}
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, c =>
@@ -8612,6 +8666,16 @@ function buildPrompt(opz) {
     lines.push(`· SERIE STORICHE E PERCENTILI${nomiSerie.length ? ` (${nomiSerie.join(", ")})` : ""}: `
       + `calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. `
       + `Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.`);
+    /* ⚠ v447 — la dichiarazione sta QUI, una volta, e non su ognuna delle sette righe: e' la
+       regola della convenzione dell'ADX (v407), dove ripeterla su ogni scheda costava
+       cinquecento caratteri per dire cinque volte la stessa cosa. */
+    lines.push(`· ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune `
+      + `materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta `
+      + `quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE `
+      + `NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade `
+      + `fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. `
+      + `Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel `
+      + `mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.`);
   }
   /* v344 — la mappa dei propri limiti, PRIMA dei numeri. Un pacchetto che non dichiara il
      proprio perimetro viene letto come se non ne avesse uno. */
@@ -8741,8 +8805,25 @@ function buildPrompt(opz) {
   }
   if (m.putcall && m.putcall.ratio != null) {
     const r = m.putcall.ratio;
-    const bias = r > 1.1 ? "prevalgono put = copertura/pessimismo (estremi = contrarian rialzista)" : r < 0.7 ? "prevalgono call = euforia (estremi = contrarian ribassista)" : "equilibrato";
-    lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${r} — ${bias} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
+    /* ⚠⚠ v447 — LA RIGA NOMINAVA GLI "ESTREMI" SENZA DIRE DOVE SONO. Il verso c'era
+       ("prevalgono put"), la banda no: chi legge 1,31 non ha modo di sapere se sia un valore
+       ordinario o un estremo, e la parola "estremi" nella stessa frase invita a decidere che
+       lo sia. E' la classe v240 — una soglia disegnata e' un'AFFERMAZIONE — su un'etichetta
+       di testo invece che su una tacca.
+       ⚠⚠ E LA BANDA NON PUO' VENIRE DAL FILE: `macro.putcall` porta ratio, puts e calls e
+       BASTA — nessuno storico, nessun percentile. Quindi le due soglie (1,1 e 0,7) sono una
+       CONVENZIONE DI LETTURA e vanno dichiarate tali, non spacciate per una misura: e' la
+       differenza fra "il 2% e' il target dichiarato della Fed" e "bande di sola lettura".
+       ⚠ E si dichiara anche cosa manca: senza una distribuzione, "estremo" non e'
+       collocabile. Inventare un percentile sarebbe peggio di non averlo (v396). */
+    const bias = r > 1.1 ? "prevalgono le PUT = copertura/pessimismo" : r < 0.7 ? "prevalgono le CALL = euforia" : "zona centrale, nessuno dei due prevale";
+    lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${fmtNum.format(r)} — ${bias} (put ${m.putcall.puts}, call ${m.putcall.calls}). `
+      + `BANDE DI SOLA LETTURA, convenzione del mestiere e non un dato di questo file: sopra 1,1 `
+      + `prevalgono le put, sotto 0,7 le call, in mezzo e' zona centrale. ⚠ Il sistema NON ha lo `
+      + `storico di questa serie, quindi non puo' dire a quale percentile stia il valore di oggi: `
+      + `dove cominci un ESTREMO — che e' il punto in cui la lettura si rovescia in contrarian — `
+      + `qui non e' stabilito, e non va dedotto dalle due soglie qui sopra, che separano il verso `
+      + `e non l'intensita'.`);
   }
   if (m.liquidity_split) {
     const L = m.liquidity_split;
@@ -9413,7 +9494,7 @@ function buildPrompt(opz) {
       const age = d ? Math.round((Date.now() - new Date(d)) / 86400000) : null;
       return `, ⚠ CARRY-FORWARD dal run precedente${d ? ` (rilevato ${String(d).slice(0, 10)}${age != null ? `, ${age}g fa` : ""})` : ""} — la fonte era irraggiungibile: pesalo come dato DATATO, non odierno`;
     };
-    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
+    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label} — ⚠ l'etichetta viene da bande FISSE, convenzione di lettura e non un dato di questo file: oltre 22 "Estremo", oltre 18 "Elevato", oltre 14 "Normale", sotto "Conveniente". Il FATTO nella riga e' il confronto con la media storica, che e' un campo del file; l'etichetta non porta nessuna informazione in piu' del numero). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
         /* ⚠⚠ v414 — QUESTA RIGA AFFERMAVA UN VERSO SENZA IL PROPRIO ORIZZONTE, e la riga
            successiva dichiara che leggerne uno solo porta alla conclusione opposta: la leva e' in
            ritiro sull'ULTIMO MESE e ancora in espansione sul trimestre e sull'anno. Dire "il
@@ -10116,6 +10197,19 @@ function buildHistoricalDigests() {
       const gg = Math.round((new Date(dUlt) - new Date(punti[0].d)) / 86400000);
       finestra = gg >= 640 ? ` (serie ~${Math.round(gg / 365)}A)` : ` (serie ~${Math.round(gg / 30)}M)`;
     }
+    /* ⚠⚠ v447 — IL PERCENTILE E LA POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, E
+       QUI SI LEGGEVANO COME DUE CONFERME. Il quadro macro pubblica "Rame ... sta al 100%
+       dell'intervallo annuale 4,54–6,8" e questo digest "percentile 100°": sul rame coincidono
+       PER CASO — sta al proprio massimo, dove le due misure convergono per costruzione — e il
+       petrolio lo dimostra, con 76° di percentile contro il 61% dell'intervallo.
+       Il percentile conta QUANTE rilevazioni stanno sotto; la posizione nell'intervallo misura
+       DOVE cade fra il minimo e il massimo, e ignora quanto tempo il prezzo ci abbia passato.
+       Un lettore che le trova entrambe a 100 conta due prove dove ce n'e' una sola — la classe
+       che il pacchetto tratta gia' per CPI/PCE e per la curva ("contarli come due prove
+       raddoppia un segnale solo"), non ancora applicata a queste due.
+       ⚠ Non si toglie nessuna delle due: rispondono a domande diverse ed entrambe servono. Si
+       dichiara che sono diverse, che e' la stessa correzione scelta in v389 fra il blocco del
+       libro e la disciplina. */
     out.push({ label: nome + finestra, text:
       `${dgTxt(v, unita, decimali)} · Δ1M ${signTxt(delta, "%")}${comeDelta} · ${rgGiu != null && rgSu != null
         ? `range [${dgTxt(rgGiu, "", decimali)}–${dgTxt(rgSu, "", decimali)}] (serie giornaliera completa) · percentile ${dgTxt(pct, "°", 0)} sulle ${h.length} rilevazioni campionate qui`
@@ -10198,9 +10292,19 @@ function buildHistoricalDigests() {
    Ogni colonna e' misurata sulle stesse 125 sedute: la differenza fra due colonne e' l'effetto
    di quella singola scelta, e nessun numero viene da fuori. */
 function profiliRischio() {
-  const righe = [...((DATA && DATA.watchlist) || []), ...((DATA && DATA.portfolio) || [])]
-    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.controvalore) > 0
-              && (((r.sparks || {}).m6) || []).length >= 120);
+  /* ⚠⚠ v447 — IL DENOMINATORE SI NOMINA NELLA RIGA CHE LO USA. La riga pubblicava
+     "scommesse effettive 2,3 su 12 nomi" mentre il libro ne elenca 13: SKHY non ha abbastanza
+     sedute in comune e resta fuori dalla misura. L'esclusione era dichiarata ALTROVE, in un
+     altro blocco, e chi legge questa riga non ha modo di sapere che i 12 non sono i 13 di
+     poche righe sopra — e' la classe dei denominatori non dichiarati che `coherence_check`
+     sorveglia dentro un blocco e non FRA due blocchi (v409, v414, v439).
+     ⚠ Gli esclusi si NOMINANO, non si contano soltanto: "il sistema non ha il dato" e "ce l'ha
+     e non te lo passa" si leggono uguali (v406, v389). */
+  const ammesse = [...((DATA && DATA.watchlist) || []), ...((DATA && DATA.portfolio) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.controvalore) > 0);
+  const righe = ammesse.filter(r => (((r.sparks || {}).m6) || []).length >= 120);
+  const esclusi = ammesse.filter(r => !righe.includes(r))
+    .map(r => String(r.ticker || "").toUpperCase()).filter(Boolean);
   if (righe.length < 4) return null;
   const n = Math.min(...righe.map(r => r.sparks.m6.length));
   const rend = (s) => { const t = s.slice(-n); return t.slice(1).map((v, i) => (t[i] ? v / t[i] - 1 : 0)); };
@@ -10228,9 +10332,14 @@ function profiliRischio() {
     for (let i = iMin; i < cum.length; i++) if (cum[i] >= cum[iPiccoDelPeggio]) { rec = i; break; }
     return { vol, dd: peggio * 100, sotto: (rec >= 0 ? rec : cum.length - 1) - iPiccoDelPeggio, recuperato: rec >= 0 };
   };
-  /* SCOMMESSE EFFETTIVE: 1/(1/k + (k-1)/k·rho). Dodici nomi con correlazione media 0,43 non
-     sono dodici decisioni: sono due e mezzo. E' il numero che rende leggibile una
-     concentrazione, e non compare in nessun terminale. */
+  /* SCOMMESSE EFFETTIVE. Dodici nomi con correlazione media 0,43 non sono dodici decisioni:
+     sono due e mezzo. E' il numero che rende leggibile una concentrazione, e non compare in
+     nessun terminale.
+     ⚠ v447 — QUI IL COMMENTO DICHIARAVA UNA FORMULA CHE IL CODICE NON USA PIU':
+     "1/(1/k + (k-1)/k·rho)", cioe' la versione cieca ai pesi. La v430 aveva corretto la
+     formula PUBBLICATA (FORMULA_EFFETTIVE) e lasciato indietro questa, che e' l'unica che
+     legge chi mette mano al codice. La formula vera e' quella della costante, e sta scritta
+     in un posto solo apposta. */
   const correlaMedia = (tks) => {
     const rs = new Map(tks.map(t => [t, rend(righe.find(x => x.ticker === t).sparks.m6)]));
     const cs = [];
@@ -10278,7 +10387,7 @@ function profiliRischio() {
     if (s.length >= 120) out.push({ nome: et, nota: "isola l'effetto della selezione dei nomi",
       ...misura(rend(s)), eff: 1, n: 1, indice: true });
   }
-  return { sedute: n - 1, profili: out };
+  return { sedute: n - 1, profili: out, esclusi, inLibro: ammesse.length };
 }
 
 /* ══ v389 — IL GRUPPO DI FATTORE, IN UN POSTO SOLO ═════════════════════════════════════════
@@ -11462,6 +11571,15 @@ function contestoPortafoglio(tkCorrente) {
   if (pr && pr.profili.length >= 3) {
     L.push(`IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sulle STESSE `
       + `${pr.sedute} sedute e dagli stessi dati — nessun numero viene da fuori):`);
+    /* ⚠ v447 — il denominatore NELLA riga, non in un altro blocco: "su 12 nomi" accanto a un
+       libro che ne elenca 13 si legge come un errore, e il collaudo B5 ordina di segnalarlo. */
+    if (pr.esclusi && pr.esclusi.length) {
+      L.push(`⚠ IL DENOMINATORE DI QUESTO BLOCCO NON E' IL LIBRO INTERO: le misure qui sotto stanno `
+        + `su ${pr.profili[0] && pr.profili[0].n} nomi delle ${pr.inLibro} posizioni, perche' `
+        + `${pr.esclusi.join(", ")} non ${pr.esclusi.length === 1 ? "ha" : "hanno"} abbastanza sedute `
+        + `in comune per entrare nella matrice (servono almeno 120 rilevazioni). Le "scommesse `
+        + `effettive N su M" che seguono contano quindi M nomi, non tutte le posizioni.`);
+    }
     pr.profili.forEach(x => L.push(`- ${x.nome}: volatilita' annua ${pct1(x.vol)}% · drawdown massimo `
       + `${pct1(x.dd)}% (${x.sotto} sedute sott'acqua${x.recuperato ? ", recuperato" : ", NON recuperato"})`
       + `${x.eff != null && !x.indice ? ` · scommesse effettive ${pct1(x.eff)} su ${x.n} nomi` : ""}`
@@ -12823,11 +12941,17 @@ function tvBlocchi(tk) {
 
   const annuali = (r && Array.isArray(r.financials)) ? r.financials.filter(x => x && x.revenue) : [];
   if (annuali.length) {
+    const vbA = valutaBilancio(r);
     F.push(``, `--- CONTO ECONOMICO ANNUALE (ultimi ${annuali.length} esercizi) ---`);
-    const mldA = (v) => (v == null ? "n.d." : `${(v / 1e9).toFixed(1)} mld`);
+    /* ⚠ v447 — l'unita' vale per TUTTO il blocco (scalaImporti) e la valuta si nomina: senza,
+       "ricavi 2.263,9 mld" di un emittente estero si legge accanto ai dollari di un altro. */
+    const mldA = scalaImporti(annuali.flatMap(a2 => [a2.revenue, a2.net_income]));
+    F.push(vbA.txt
+      ? `⚠ IMPORTI IN ${vbA.certa ? vbA.txt : ""}${vbA.certa ? " — la valuta di BILANCIO dell'emittente, che per gli emittenti esteri NON e' quella di quotazione" : vbA.txt}. Non si confrontano con gli importi di un altro titolo senza convertirli; i MARGINI e le variazioni percentuali, che valuta non hanno, si confrontano.`
+      : `⚠ La valuta di bilancio non e' pubblicata da questo giro della pipeline: gli importi qui sotto sono nella valuta in cui l'emittente redige il bilancio, che per un emittente estero NON e' quella di quotazione. I MARGINI e le variazioni percentuali non hanno valuta e restano confrontabili.`);
     annuali.forEach(a2 => F.push(`- esercizio ${a2.year}: ricavi ${mldA(a2.revenue)}`
       + (a2.net_income != null ? ` \u00b7 utile netto ${mldA(a2.net_income)}` : "")
-      + (a2.margin != null ? ` (margine ${a2.margin}%)` : "")));
+      + (a2.margin != null ? ` (margine ${pct1(a2.margin)}%)` : "")));
     F.push(`⚠ L'etichetta dell'esercizio e' quella della fonte, e per molte societa' l'anno fiscale `
       + `NON chiude a dicembre: accostare questi anni ai trimestri qui sotto senza sapere dove chiude `
       + `l'esercizio accosta periodi diversi.`);
@@ -12835,16 +12959,18 @@ function tvBlocchi(tk) {
 
   if (tv.conto_trim && tv.conto_trim.length) {
     F.push(``, `--- CONTO ECONOMICO TRIMESTRALE (ultimi ${tv.conto_trim.length} trimestri) ---`);
-    const mld = (v) => (v == null ? "n.d." : `${(v / 1e9).toFixed(2)} mld`);
+    /* ⚠ v447 — la STESSA funzione del conto annuale: erano due lambda con due convenzioni
+       diverse (una cifra contro due) per la stessa grandezza, cioe' la classe v161/v207. */
+    const mld = scalaImporti(tv.conto_trim.flatMap(q => [q.ricavi, q.operativo, q.utile]));
     /* la traiettoria, non solo i livelli: t/t per ogni trimestre e la sua variazione */
     const cres = tv.conto_trim.map((q, i) => {
       const prec = tv.conto_trim[i + 1];
       return (prec && prec.ricavi) ? Math.round((q.ricavi / prec.ricavi - 1) * 1000) / 10 : null;
     });
     tv.conto_trim.forEach((q, i) => F.push(`- ${q.trim}: ricavi ${mld(q.ricavi)}`
-      + (cres[i] != null ? ` (${cres[i] > 0 ? "+" : ""}${cres[i]}% t/t)` : "")
-      + (q.operativo != null ? ` \u00b7 risultato operativo ${mld(q.operativo)}${q.margine_op != null ? ` (${q.margine_op}%)` : ""}` : "")
-      + (q.utile != null ? ` \u00b7 utile netto ${mld(q.utile)}${q.margine != null ? ` (margine ${q.margine}%)` : ""}` : "")));
+      + (cres[i] != null ? ` (${cres[i] > 0 ? "+" : ""}${pct1(cres[i])}% t/t)` : "")
+      + (q.operativo != null ? ` \u00b7 risultato operativo ${mld(q.operativo)}${q.margine_op != null ? ` (${pct1(q.margine_op)}%)` : ""}` : "")
+      + (q.utile != null ? ` \u00b7 utile netto ${mld(q.utile)}${q.margine != null ? ` (margine ${pct1(q.margine)}%)` : ""}` : "")));
     /* la SECONDA derivata: se la crescita accelera o rallenta. In growth e' il segnale. */
     const validi = cres.filter(x => x != null);
     /* la serie e' aggiornata? due controlli indipendenti, entrambi sui dati gia' presenti */
@@ -14225,8 +14351,21 @@ function buildPromptTicker(tkGrezzo) {
 `8) IL RISCHIO, dal lato del libro e non del titolo — massimo 12 righe.`,
 `Il pacchetto porta in coda le misure di rischio del libro e il confronto con versioni`,
 `alternative dello stesso libro. Usale per rispondere a queste quattro domande, in quest'ordine:`,
-`· LA TESI REGGE IL RISCHIO CHE PORTA? Questa posizione aggiunge una scommessa NUOVA al libro,`,
-`  oppure riscrive una che il libro ha gia'? Guarda le scommesse effettive e la correlazione col`,
+/* ⚠ v447 — "QUESTA POSIZIONE" SU UN TITOLO CHE NON E' UNA POSIZIONE. La riga era scritta
+   per il caso posseduto e resa identica nell'altro, dove il titolo in esame NON e' nel libro:
+   e' la classe v405/v413 (una riga scritta per un contesto e resa in due) e la stessa cecita'
+   sul ramo non posseduto gia' pagata in v419, v420 e v423. ⚠ E chiamarla "posizione" contraddice
+   il blocco 0, che sullo stesso titolo chiede correttamente a quale prezzo diventi interessante:
+   due inquadramenti opposti dello stesso nome nello stesso pacchetto. */
+(giaDentro
+  ? `· LA TESI REGGE IL RISCHIO CHE PORTA? Questa posizione aggiunge una scommessa NUOVA al libro,`
+    + String.fromCharCode(10)
+    + `  oppure riscrive una che il libro ha gia'? Guarda le scommesse effettive e la correlazione col`
+  : `· LA TESI REGGEREBBE IL RISCHIO CHE PORTA? Questo titolo NON e' nel libro: se ci entrasse,`
+    + String.fromCharCode(10)
+    + `  aggiungerebbe una scommessa NUOVA o riscriverebbe una che il libro ha gia'? Guarda le`
+    + String.fromCharCode(10)
+    + `  scommesse effettive e la correlazione col`),
 `  gruppo: se sono due decisioni scritte otto volte, il rischio del singolo nome non e' il rischio.`,
 `· QUALE FATTO ROMPEREBBE PIU' POSIZIONI INSIEME? Nomina UN evento datato e osservabile che`,
 `  colpirebbe contemporaneamente i nomi correlati, e di' quali. Un rischio che colpisce un nome`,

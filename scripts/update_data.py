@@ -1771,6 +1771,15 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             _comb = combustione(t, stats.get("market_cap"), stats.get("buyback_yield"))
             if _comb:
                 _comb["valuta"] = g("financialCurrency") or g("currency")
+        # ⚠⚠ v447 — LA VALUTA DI BILANCIO VALE PER TUTTO IL CONTO ECONOMICO, non solo per
+        # combustione e credito. La regola v404 ("solo segni e rapporti, mai grandezze fra
+        # titoli: SKHY pubblica in won") era stata applicata a `fcf_ttm` e NON al conto
+        # economico, che pubblica RICAVI e UTILE in valore assoluto. Misurato sul pacchetto
+        # vero: SKHY "ricavi 44621.6 mld" (won) e TSM "2263.9 mld" (TWD) accanto a MU
+        # "30.8 mld" (dollari), senza che nessuna delle tre righe dica in che valuta e'.
+        # E' la classe v412 — una correzione applicata a un ramo e non agli altri.
+        # ⚠ Il campo esce SEMPRE, anche quando coincide con la valuta di quotazione: un
+        # campo che c'e' solo nel caso strano costringe chi legge a dedurre dal silenzio.
         except Exception as _e:
             print(f"!! combustione {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
             _comb = None
@@ -1891,9 +1900,17 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         parts.append(clamp(50 + (m1[-1] / m1[0] - 1) * 100 * 5))
     health = round(sum(parts) / len(parts)) if parts else None
 
-    auto_name = (info.get("shortName") or ticker).strip()
-    if len(auto_name) > 26:
-        auto_name = auto_name[:25].rstrip() + "…"
+    # ⚠ v447 — LA TRONCATURA ERA NOSTRA, NON DELLA FONTE. L'annotazione diceva che Yahoo
+    # consegnava "Taiwan Semiconductor Manu…" gia' tagliato: falso, il taglio e' queste due
+    # righe. Il pacchetto apriva con "ANALISI DI TSM (Taiwan Semiconductor Manu…)" e il PASSO 0
+    # ordina di cercare la societa' online senza dire per intero come si chiama — cioe' la
+    # v397 sopravvissuta dentro un nostro troncamento.
+    # ⚠ `longName` prima di `shortName`: e' il nome per esteso, e per gli emittenti esteri e'
+    # l'unico che identifica la societa'. Il tetto sale a 64 e resta perche' `name` finisce
+    # anche nelle etichette dei grafici, dove una stringa senza fine sfonda la colonna (v394).
+    auto_name = (info.get("longName") or info.get("shortName") or ticker).strip()
+    if len(auto_name) > 64:
+        auto_name = auto_name[:63].rstrip() + "…"
     # sanity: una variazione intraday >+150% / <-80% su una large cap (>$5 mld) è un glitch API.
     # Con UNA sola barra di storico (IPO del giorno prima: visto su SKHYV) prev==price darebbe
     # uno 0% FINTO — meglio n.d. che un numero inventato (il day-2 reale era +13%).
@@ -1908,6 +1925,10 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "ticker": ticker,
         "name": name or auto_name,
         "currency": currency,
+        # v447 — la valuta in cui sono espressi RICAVI, UTILE e le voci del conto economico.
+        # Diversa da `currency` per gli emittenti esteri (TSM: TWD contro un ADR in USD;
+        # SKHY: KRW). Chi stampa una grandezza assoluta la nomina; chi stampa un rapporto no.
+        "valuta_bilancio": (info.get("financialCurrency") or currency),
         "price_src": price_src,          # "yahoo" | "stooq" (fallback prezzi etichettato)
         "price": round(price, 2),
         "price_asof": price_asof,        # data dell'ultima chiusura valida (staleness dichiarabile)
