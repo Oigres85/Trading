@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "445";
+const BUILD_VERSION = "446";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4738,12 +4738,41 @@ const FORMA_INDICATORE = {
        considerava prezzata ogni riunione, cioe' non filtrava niente. Il campo si guarda per
        quello che e' — assente — non passando dalla conversione a numero. */
     const c = (v) => v != null && Number.isFinite(Number(v));
-    const prezzata = (x) => c(x.cut_prob) || c(x.hold_prob) || c(x.hike_prob);
-    const rr = f.meetings.slice(0, 4).filter(prezzata).map(x => ({ d: it(x.date),
+    /* ⚠⚠ v446 — GLI STATI SONO TRE, NON DUE, E IERI NE HO VISTI DUE. La v445 ha scritto questa
+       guardia guardando uno snapshot in cui la pipeline era ROTTA e i tre campi erano nulli
+       ovunque: quindi "senza probabilita'" e "non prezzata" sembravano la stessa cosa. Riparata
+       la pipeline (v443), il 16/09 e' tornata PREZZATA con 1,37 movimenti — e sopra il movimento
+       intero una probabilita' NON ESISTE per costruzione (v441), quindi i tre campi restano
+       nulli. Risultato: la scheda dichiarava "nessuna riunione prezzata da questo contratto"
+       mentre il pacchetto, sugli stessi dati, pubblicava 1,37 movimenti. Due superfici, due
+       affermazioni opposte, cioe' cio' che il collaudo B5 ordina di segnalare.
+       Gli stati sono quelli del pacchetto: PROBABILITA' (barra) · MOVIMENTI (il fatto, senza
+       barra: una barra impilata di parti di un tutto non esiste sopra il movimento intero) ·
+       NON PREZZATA (la dichiarazione). */
+    const conProb = (x) => c(x.cut_prob) || c(x.hold_prob) || c(x.hike_prob);
+    const prezzata = (x) => conProb(x) || c(x.mosse_25bp);
+    const rr = f.meetings.slice(0, 4).filter(conProb).map(x => ({ d: it(x.date),
       taglio: Math.round(Number(x.cut_prob) || 0),
       fermo: Math.round(Number(x.hold_prob) || 0),
       rialzo: Math.round(Number(x.hike_prob) || 0) }));
+    /* le riunioni prezzate in MOVIMENTI: il fatto si pubblica, la barra no */
+    const inMosse = f.meetings.slice(0, 4).filter(x => !conProb(x) && c(x.mosse_25bp))
+      .map(x => ({ d: it(x.date), n: Number(x.mosse_25bp) }));
     const nonPrezzate = f.meetings.slice(0, 4).filter(x => !prezzata(x)).map(x => it(x.date));
+    /* ⚠ la stessa resa del pacchetto: `pct1` arrotonda a UNA cifra e faceva uscire "1,4" dove
+       il pacchetto scrive "1,37" — di nuovo due valori per la stessa grandezza. */
+    const mosse2 = (v) => fmtNum.format(Math.round(Math.abs(v) * 100) / 100);
+    const rigaMosse = inMosse.map(x => `<div>${x.d}: <b>${mosse2(x.n)} movimenti da 25bp `
+      + `${x.n > 0 ? "AL RIALZO" : "AL TAGLIO"}</b> impliciti — sopra il movimento intero non e' `
+      + `una probabilita', e il contratto non ne esprime una</div>`).join("");
+    if (!rr.length && inMosse.length) return {
+      g: `<div class="muted" style="font-size:11px;line-height:1.5">${rigaMosse}`
+        + `${nonPrezzate.length ? `<div>Non prezzate da questo contratto, che copre solo il `
+            + `proprio mese: ${nonPrezzate.join(", ")}.</div>` : ""}</div>`,
+      score: null,
+      n: `${inMosse.map(x => x.d + ": " + mosse2(x.n) + " movimenti da 25bp "
+            + (x.n > 0 ? "al rialzo" : "al taglio")).join(" · ")}`
+        + ` — non e' una probabilita': sopra il movimento intero il contratto non ne esprime una` };
     if (!rr.length) return { g: `<div class="muted" style="font-size:11px;line-height:1.5">Il future sui Fed Funds a 30 giorni prezza `
       + `solo il proprio mese: nessuna delle riunioni in elenco (${nonPrezzate.join(", ")}) `
       + `e' prezzata da questo contratto.</div>`, score: null,
@@ -9686,7 +9715,11 @@ function buildPrompt(opz) {
                 `taglio ${mt.cut_prob ?? 0}%`);
     } else if (mt.prezzata && mt.mosse_25bp != null) {
       const x = mt.mosse_25bp, su = x > 0;
-      rami.push(`${Math.abs(x).toFixed(2)} MOVIMENTI da 25bp ${su ? "AL RIALZO" : "AL RIBASSO"} impliciti`
+      /* ⚠ v446 — UNA RESA SOLA. `toFixed(2)` stampa "1.37" col punto decimale inglese dentro
+         un pacchetto che ovunque usa la virgola, e la SCHEDA della dashboard pubblica lo stesso
+         numero: due superfici, due rese della stessa misura — la classe che la v442 e la v443
+         hanno pagato sui pesi. Il formattatore e' quello del progetto, qui e nella scheda. */
+      rami.push(`${fmtNum.format(Math.round(Math.abs(x) * 100) / 100)} MOVIMENTI da 25bp ${su ? "AL RIALZO" : "AL RIBASSO"} impliciti`
         + ` — cioe' ${su ? "un rialzo" : "un taglio"} da 25bp gia' pienamente prezzato`
         + (Math.abs(x) > 1 ? `, piu' il ${Math.round((Math.abs(x) - 1) * 100)}% di un secondo` : "")
         + `. NON e' una probabilita': oltre il movimento intero la grandezza che il contratto`
