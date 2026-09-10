@@ -4948,6 +4948,134 @@ su disco, che non ha un buffer da perdere alla morte del processo.
 un rapporto"*; una che parla ma **fallisce** fa cadere *"passa"*. Ripristino da uno snapshot
 preso prima, mai da `git checkout` (v430).
 
+## 🧾 v447 — GLI OTTO "COSMETICI": DUE NON LO ERANO, E UNO NON ESISTEVA PIÙ
+
+Il CEO: *"Fix tutto"* sull'elenco dei cosmetici messi da parte sotto congelamento. **Verificati
+uno per uno sul testo VERO dei tre pacchetti** prima di toccare qualcosa (v417 — *un allarme va
+verificato contro il testo vero prima di diventare una correzione*), e la verifica ha cambiato
+l'elenco:
+
+| # | annotato | verificato |
+|---|---|---|
+| 1 | refuso *"il questo pacchetto ti impone"* | **NON ESISTE**: già corretto in v414. Non l'avevo ricontrollato prima di annotarlo |
+| 2 | *"Questa **posizione**"* su un titolo non posseduto | confermato |
+| 3 | Put/Call senza banda di lettura | confermato |
+| 4 | *"(Elevato)"* sul Forward P/E senza banda | confermato |
+| 5 | *"2,3 su **12** nomi"* con 13 in libro | confermato |
+| 6 | *"0.0 mld"*, scala sbagliata | **CONFERMATO E PEGGIORE — non è cosmetico** |
+| 7 | Rame 97° percentile contro 97% dell'intervallo | confermato |
+| 8 | `shortName` troncato da Yahoo | confermato il sintomo, **sbagliata la causa: il taglio è NOSTRO** |
+
+### ⚠⚠ Il numero 6 erano DUE difetti materiali, e li ho classificati male
+**(a) La valuta di bilancio non era dichiarata.** Il pacchetto scriveva, per titoli diversi:
+
+| | stampato | valuta vera |
+|---|---|---|
+| MU | `ricavi 30.8 mld` | dollari |
+| TSM | `ricavi 2263.9 mld` | **TWD** |
+| SKHY | `ricavi 44621.6 mld` | **won** |
+
+Nessuna delle tre righe diceva in che valuta fosse. Un lettore ne ricava che TSM fatturi
+**73 volte** MU; il rapporto vero è **2,5**. È la regola v404 — *"SOLO SEGNI E RAPPORTI, MAI
+GRANDEZZE FRA TITOLI: SKHY lo pubblica in won"* — applicata a `fcf_ttm` e **mai al conto
+economico**, che pubblica ricavi e utile in valore assoluto. Classe **v412**: una correzione
+applicata a un ramo e non agli altri.
+
+⚠ La pipeline **conosceva** il dato: `scrub_cross_currency_stats` usa `financialCurrency` dalla
+v-lontana e lo attacca a `combustione` e `credito`. Semplicemente non lo pubblicava sulla riga.
+
+**(b) L'arrotondamento distruggeva la traiettoria.** RGTI usciva così:
+```
+esercizio 2022: ricavi 0.0 mld     (13.102.000)
+esercizio 2023: ricavi 0.0 mld     (12.008.000)
+esercizio 2024: ricavi 0.0 mld     (10.790.000)
+esercizio 2025: ricavi 0.0 mld     ( 7.088.000)
+```
+**Quattro zeri identici dove la serie vera SCENDE del 46%.** La traiettoria — cioè il motivo per
+cui la tabella esiste — spariva, e il margine (da −545,9% a −3050,4%) non era verificabile da
+nessuno dei numeri stampati. È la classe **v433**, dove `round(_, 2)` annullava l'ATR di un
+cambio e uccideva la pipeline.
+
+⚠⚠ **L'unità si sceglie UNA VOLTA PER BLOCCO**, dal valore più grande che contiene, non riga per
+riga: righe con unità diverse nella stessa tabella non si confrontano a colpo d'occhio, ed è il
+confronto il motivo per cui la tabella c'è.
+
+⚠ **E c'erano già DUE convenzioni per la stessa grandezza** prima che le toccassi: il conto
+annuale usava una cifra decimale, il trimestrale due — classe v161/v207, in casa da sempre. Ora
+la funzione è una sola. E i numeri passano da `fmtNum`, cioè con la **virgola**: `toFixed` scrive
+il punto inglese, che è esattamente ciò che v442 e v443 hanno tolto dalle percentuali.
+
+### 🏷️ Il numero 8: avevo incolpato la fonte, e il taglio era nel nostro codice
+L'annotazione diceva *"l'ellissi è della fonte, non nostra"*. **Falso**: `update_data.py:1894`
+faceva `auto_name[:25] + "…"` su un tetto di 26 caratteri. Il pacchetto apriva con
+*"ANALISI DI TSM (Taiwan Semiconductor Manu…)"* mentre il PASSO 0 ordina di cercare online una
+società di cui non dice il nome intero — la **v397 sopravvissuta dentro un nostro troncamento**.
+Ora si prende `longName` per primo e il tetto sale a 64 (resta, perché `name` finisce anche nelle
+etichette dei grafici, dove una stringa senza fine sfonda la colonna — v394).
+
+> **Un difetto annotato con la causa sbagliata resta chiuso alla correzione**: l'avevo messo fra
+> i cosmetici *perché* credevo che la fonte lo imponesse. La classificazione seguiva la diagnosi,
+> e la diagnosi non era stata verificata.
+
+### 📏 I numeri 3 e 4: due etichette senza distribuzione (v240)
+Né `macro.putcall` né `macro.forward_pe` portano uno storico: le soglie che decidono le loro
+etichette (1,1 / 0,7 e 14 / 18 / 22) sono **convenzioni scritte a mano**, e passavano per misure.
+Ora entrambe le righe dichiarano di essere bande di sola lettura.
+⚠ Sul put/call si dichiara anche **cosa manca**: senza distribuzione, *"estremi"* — che la riga
+nominava — non è collocabile. Inventare un percentile sarebbe peggio di non averlo (v396).
+
+### 🔢 Il numero 5: il denominatore nella riga che lo usa
+*"scommesse effettive 2,3 su 12 nomi"* accanto a un libro che ne elenca 13. SKHY non ha
+abbastanza sedute in comune, e l'esclusione era dichiarata **in un altro blocco**. Ora
+`profiliRischio` restituisce gli esclusi e la riga li **nomina** (v406): il pacchetto forniva da
+solo il falso positivo del proprio collaudo B5.
+
+### 🌡️ Il numero 7: due grandezze che oggi valgono entrambe 100
+Rame: **100° percentile** nel digest e **100% dell'intervallo annuale** nel quadro macro.
+Coincidono **per caso** — sta al proprio massimo, dove le due misure convergono per costruzione —
+e il petrolio lo dimostra, con 76° contro 61%. Il percentile conta *quante rilevazioni stanno
+sotto*; la posizione nell'intervallo misura *dove cade fra minimo e massimo*, e ignora quanto
+tempo il prezzo ci abbia passato. Nessuna delle due si toglie: si **dichiara che sono diverse**,
+una volta sola nell'intestazione (regola v407, non su ognuna delle sette righe).
+
+### 🦴 Tre gate rossi, e tutti e tre avevano torto sulla FORMA
+- ⚠⚠ **Trentacinquesima rottura di un check ancorato a una stringa letterale, specie peggiore**:
+  **v445** pretendeva `indexOf("1.33")` — il **punto inglese**, cioè esattamente la resa che v442
+  e v443 hanno tolto dal pacchetto. *Un gate che pinna un difetto lo rende permanente* (v326,
+  v411, v415, v422, v441, v443). Riagganciato al fatto ed è più forte: il valore esce nella
+  convenzione del pacchetto **e** il punto non rientra.
+- **v355** pinnava due forme insieme: il punto inglese **e** l'unità `mld`. Riagganciato al fatto
+  — ogni riga di ricavi porta la propria variazione t/t, qualunque sia l'unità.
+- ⚠⚠ **Trentaseiesima, e l'ha denunciata il detector stesso**: **C17** cercava `"(Elevato)"` CON
+  la parentesi di chiusura, che non chiude più subito dopo la parola perché la riga ora dichiara
+  la propria banda. Il detector **si è dichiarato MUTO** invece di passare a vuoto — *"un detector
+  muto si legge come una conferma"*, la guardia che ha in casa — e a essere riagganciata è stata
+  la sonda, non abbassato il pavimento.
+
+### 🧪 Il metodo
+⚠ **Nove iniezioni, tutte con `modifica_sicura` e ripristino da uno snapshot preso PRIMA**, mai
+da `git checkout` (v430), una alla volta: mordono tutte e nove.
+⚠ **Lo stato si COSTRUISCE**: oggi nel libro ci sono RGTI (ricavi in milioni), TSM e SKHY
+(bilanci in valuta locale) e SKHY escluso dalla matrice — domani potrebbero non esserci, e i
+check sarebbero verdi per assenza del fenomeno. I gate iniettano il caso invece di aspettarlo
+(v425, v429, v431, v435).
+⚠ **I tre stati si percorrono tutti e tre** (macro · titolo posseduto · titolo non posseduto): un
+gate che ne esercita due non vede il terzo, ed è esattamente così che sono nati i difetti di
+v419, v420 e v423.
+⚠ **Dodicesima volta che C9 prende un mio costrutto nella coda**: `Contarle`, infinito con
+clitico che il detector non distingue dall'imperativo. Riformulato come fatto invece di allentare
+un gate che ha già trovato undici ordini veri.
+⚠ Un ramo che rende **stringa vuota** dentro l'array delle istruzioni produce una **riga bianca**
+nel pacchetto: le due rese del blocco 8 stanno in una voce sola con gli a capo dentro.
+⚠ E un commento dichiarava una formula che il codice non usa più: `1/(1/k + (k-1)/k·rho)`, la
+versione cieca ai pesi. La **v430 aveva corretto la formula PUBBLICATA e lasciato indietro
+quella che legge chi mette mano al codice.**
+
+### 📋 Cosa resta fuori, e perché
+Il ramo morto della v417 — il ripiego sul campo di riga per la distanza dalle medie, misurato
+strutturalmente irraggiungibile (23 righe su 23) — **NON è stato rimosso**: è una **potatura**,
+non un cosmetico, e il congelamento la vieta finché il sistema non è stabile. Resta annotato.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
