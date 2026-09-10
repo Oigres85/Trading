@@ -3208,6 +3208,40 @@ check("v333 fedwatch: prezzata -> tre esiti a somma 100; non prezzata -> lo dich
     /* la riunione NON prezzata non deve prendere una barra: sarebbe uno zero inventato */
     if (String(a.g).indexOf("28/10") >= 0) guai.push("la riunione non prezzata prende comunque una barra");
   }
+  /* ⚠⚠ v446 — RAMO CHE IERI NON HO VISTO. La v443 ha riparato la pipeline e il 16/09 e' tornata
+     PREZZATA con 1,37 movimenti: sopra il movimento intero una probabilita' NON esiste (v441),
+     quindi i tre campi restano nulli — e la scheda, che guardava solo quelli, dichiarava
+     "nessuna riunione prezzata" mentre il pacchetto sugli STESSI dati pubblicava 1,37. Due
+     superfici, due affermazioni opposte. Scrivere il check su due stati quando ce ne sono tre
+     e' la stessa cecita' della v419/v420. */
+  macro.fedwatch = Object.assign({}, base, { meetings: [
+    { date: "2026-09-16", cut_prob: null, hike_prob: null, hold_prob: null, mosse_25bp: 1.37, prezzata_dal_contratto: true },
+    { date: "2026-10-28", cut_prob: null, hike_prob: null, hold_prob: null, mosse_25bp: null, prezzata_dal_contratto: false } ] });
+  const c = FORMA_INDICATORE["fedwatch"](macro);
+  if (!c) guai.push("movimenti: la scheda sparisce");
+  else {
+    if (String(c.g).indexOf("non e' prezzata") >= 0 || String(c.n).indexOf("nessuna riunione prezzata") >= 0)
+      guai.push("movimenti: la scheda dichiara NON prezzata una riunione che il contratto prezza");
+    if (String(c.g).indexOf("1,37") < 0) guai.push("movimenti: il numero non esce, o non nella resa del pacchetto");
+    if (String(c.g).indexOf("rect") >= 0) guai.push("movimenti: disegna una barra impilata dove non esiste una probabilita'");
+    if (String(c.g).indexOf("28/10") < 0) guai.push("movimenti: la riunione non prezzata non viene piu' nominata");
+    /* ⚠⚠ e la riunione PREZZATA non deve comparire fra le non prezzate: la scheda si
+       contraddirebbe da sola, che e' il difetto v445 in versione locale. Senza questa sonda
+       l'iniezione che rimette la guardia vecchia NON mordeva — un gate che non prende la forma
+       da cui e' nato e' decorativo (v415, v419). */
+    const _dopo = String(c.g).split("Non prezzate")[1] || "";
+    if (_dopo.indexOf("16/09") >= 0)
+      guai.push("movimenti: la riunione prezzata compare ANCHE fra le non prezzate");
+  }
+  /* ⚠ e la SCHEDA e il PACCHETTO devono dire lo stesso numero: e' la classe v442/v443 */
+  const _mac = DATA.macro; DATA.macro = macro;
+  try {
+    const NL2 = String.fromCharCode(10);
+    const rp = buildCIOText().split(NL2).find(r => r.indexOf("- FedWatch") === 0) || "";
+    if (rp && rp.indexOf("1,37") < 0)
+      guai.push("il pacchetto rende i movimenti in un'altra forma della scheda: " + rp.slice(0, 120));
+  } finally { DATA.macro = _mac; }
+
   /* ramo B: NESSUNA riunione e' prezzata */
   macro.fedwatch = Object.assign({}, base, { meetings: [
     { date: "2026-09-16", cut_prob: null, hike_prob: null, hold_prob: null, mosse_25bp: null, prezzata_dal_contratto: false } ] });

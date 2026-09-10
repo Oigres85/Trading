@@ -4636,6 +4636,50 @@ mercato dei capitali della v404, che stampava `16.6%` col punto.
 grezzo nella scheda **`v370` resta verde** (oggi i due valori coincidono per caso) e a mordere è
 solo la guardia strutturale.
 
+## 🏦 v446 — LE DUE VERIFICHE SONO PASSATE, E LA SECONDA HA SCOPERTO UN DIFETTO DELLA v445
+
+Le due cose lasciate aperte ieri sera erano agganciate al primo run dati col codice nuovo. Il run
+delle **04:03** le ha chiuse entrambe:
+
+| verifica | esito |
+|---|---|
+| il `git push` nudo regge con `checkout@v5` (v444) | ✅ **quattro commit dati** dopo il merge |
+| FedWatch torna a pubblicare (v443) | ✅ `base_effr 3,63` · `movimenti.mosse_25bp 1,37` · 16/09 **prezzata** |
+
+### ⚠⚠ Ma il secondo esito ha acceso un ramo che la v445 non poteva vedere
+Sopra il movimento intero **una probabilità non esiste** (v441), quindi `cut/hold/hike` restano
+nulli anche su una riunione **prezzata**. La guardia che avevo scritto ieri sera guardava solo
+quei tre campi — perché li avevo scritti leggendo uno snapshot in cui la pipeline era **rotta** e
+tutto era nullo ovunque. Risultato sui dati veri di stamattina:
+
+| superficie | cosa diceva |
+|---|---|
+| pacchetto | *"1.37 MOVIMENTI da 25bp AL RIALZO impliciti"* |
+| **scheda della dashboard** | *"nessuna delle riunioni in elenco è prezzata da questo contratto"* |
+
+**Due superfici, due affermazioni opposte sugli stessi dati** — cioè ciò che il collaudo B5
+ordina al lettore di segnalare. Gli stati sono **tre**, non due, e sono quelli che il pacchetto
+usa già: PROBABILITÀ (barra) · MOVIMENTI (il fatto, senza barra — una barra impilata di *parti di
+un tutto* non esiste sopra il movimento intero) · NON PREZZATA (la dichiarazione).
+
+> È la cecità della **v419/v420** su una superficie nuova: scrivere il ramo guardando lo stato
+> che i dati mostrano oggi, quando gli stati sono di più. E ieri lo stato che vedevo era
+> *prodotto da un difetto mio*, il che lo rendeva ancora meno rappresentativo.
+
+### 🔁 E le due superfici rendevano lo stesso numero in due modi
+`1,4` sulla scheda (`pct1`, una cifra) contro `1.37` nel pacchetto (`toFixed(2)`, punto inglese).
+La classe su cui è girata tutta la v442-v443, ricomparsa su una misura nuova nel giro di un
+giorno. Ora la resa è **una sola** e le due superfici dicono entrambe `1,37`.
+
+### 🎯 E la mia prima iniezione NON MORDEVA — perché il gate aveva un buco, non l'iniezione
+Rimettendo la guardia della v445 la suite restava **verde**. Non era l'iniezione sbagliata (v419):
+il ramo dei movimenti non passa da `prezzata`, che serve solo a comporre l'elenco delle non
+prezzate — quindi il difetto reintrodotto faceva comparire il 16/09 **contemporaneamente** fra le
+prezzate e fra le non prezzate, e nessuna sonda lo guardava. Aggiunta quella, mordono entrambe.
+
+> **Un gate che non prende la forma da cui è nato è decorativo** (v415, v419) — e qui a dirlo è
+> stata l'iniezione, non la rilettura.
+
 ## 🃏 v445 — UNA FONTE CADUTA PER UN RUN HA FATTO RIENTRARE UNA SCHEDA CHE IL CEO AVEVA TOLTO
 
 Il `pre-push` ha morso di nuovo, e per la seconda volta in due ore: il rebase prima del push ha
