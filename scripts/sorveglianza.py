@@ -221,16 +221,26 @@ def raccogli(d, adesso, finestra_min, tickers):
     macro.sort(key=lambda x: x["quando"], reverse=True)
 
     # ── movimenti: solo con --chiusura, e la ragione sta nella docstring ────────────────────
+    # ⚠⚠ DUE GRANDEZZE, NON UNA. La variazione da chiusura a chiusura non vede la seduta in cui
+    #   il prezzo va lontano e torna: misurato sul libro dell'11/09, ORCL ha percorso il 10,1%
+    #   fra minimo e massimo — DUE VOLTE la propria ampiezza, dopo la trimestrale — e ha chiuso
+    #   a +0,04%. Con la sola variazione quel giorno il brief sarebbe stato muto sull'unico nome
+    #   che aveva avuto una giornata. L'escursione e' la seconda meta' della stessa domanda.
+    #   ⚠ E non e' una soglia che suona sempre: misurata sulle 13 posizioni di quel giorno, la
+    #   supera UNA (ORCL), mentre la variazione non ne prende nessuna.
     moss = []
     for tk, r in righe.items():
         ch, atr = _num(r.get("change_pct")), _num(r.get("atr_pct"))
         if ch is None or not atr:
             continue
+        hi, lo, px = _num(r.get("day_high")), _num(r.get("day_low")), _num(r.get("price"))
+        esc = ((hi - lo) / px * 100) if (hi is not None and lo is not None and px) else None
         rap = abs(ch) / atr
-        if rap >= SOGLIA_ATR:
-            moss.append({"tk": tk, "var": ch, "atr": atr, "rap": rap,
-                         "rischio": _num(r.get("risk_contrib_pct"))})
-    moss.sort(key=lambda x: -x["rap"])
+        rap_esc = (esc / atr) if esc is not None else None
+        if rap >= SOGLIA_ATR or (rap_esc is not None and rap_esc >= SOGLIA_ATR):
+            moss.append({"tk": tk, "var": ch, "atr": atr, "rap": rap, "esc": esc,
+                         "rap_esc": rap_esc, "rischio": _num(r.get("risk_contrib_pct"))})
+    moss.sort(key=lambda x: -max(x["rap"], x["rap_esc"] or 0))
 
     # ── trimestrali ─────────────────────────────────────────────────────────────────────────
     trim = []
@@ -365,7 +375,17 @@ def stampa(b, adesso, finestra_min, chiusura, pos_al):
         r = f" · {_pct(v['rischio'], 1)} della varianza" if v["rischio"] is not None else \
             " · quota di varianza non pubblicata"
         rap = f"{v['rap']:.1f}".replace(".", ",")
-        a(f"  {v['tk']}: {_pct(v['var'])} contro ATR {_pct(v['atr'])} → {rap}x{r}")
+        a(f"  {v['tk']}: chiusura {_pct(v['var'])} contro ATR {_pct(v['atr'])} → {rap}x{r}")
+        if v["rap_esc"] is not None and v["rap_esc"] >= SOGLIA_ATR:
+            re_ = f"{v['rap_esc']:.1f}".replace(".", ",")
+            # ⚠ L'etichetta non afferma una direzione che il dato non porta (v405): un'escursione
+            #   ampia che chiude piatta dice che il prezzo e' andato lontano ed e' tornato, non
+            #   che e' salito o sceso. Dove invece anche la chiusura supera la soglia, le due
+            #   misure concordano e la riga lo scrive: e' un segnale solo, non due prove.
+            q = ("ed e' tornato: la chiusura resta dentro la propria ampiezza"
+                 if v["rap"] < SOGLIA_ATR else "e la chiusura conferma la direzione")
+            a(f"      escursione della seduta {_pct(v['esc'])} → {re_}x l'ampiezza — "
+              f"il prezzo e' andato lontano {q}")
 
     a("")
     a(f"--- TRIMESTRALI ENTRO {GIORNI_TRIM} GIORNI ---")
