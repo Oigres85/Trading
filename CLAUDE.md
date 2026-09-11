@@ -5076,6 +5076,83 @@ Il ramo morto della v417 — il ripiego sul campo di riga per la distanza dalle 
 strutturalmente irraggiungibile (23 righe su 23) — **NON è stato rimosso**: è una **potatura**,
 non un cosmetico, e il congelamento la vieta finché il sistema non è stabile. Resta annotato.
 
+## 📡 v448 — I FEED C'ERANO, ED ERA LA SORVEGLIANZA A NON GUARDARLI
+
+Rilievo del CEO: *"cercassi anche feed online correlati al mio portafoglio e a questioni macro
+fortemente importanti"*. **Misurato prima di costruire, e la misura ha cambiato il lavoro**: i
+feed esistono e sono vivi dalla v398-v399. Sul run delle 15:04 dell'11/09 il sistema
+aveva **72 voci per-titolo** da Nasdaq su 12 titoli (SKHY non letto: emittente coreano, nessun
+feed Nasdaq) e **18 voci macro** da CNBC/Bloomberg/MarketWatch, tutte e tre le fonti lette e
+nessuna muta. Il buco non era la raccolta: era che la **Routine oraria** guardava prezzo,
+trimestrali, credito, pipeline e FOMC — e **non apriva mai i due feed**.
+
+### ⚠⚠ LO SCRIPT SELEZIONA, IL MODELLO GIUDICA — e la divisione non è estetica
+`scripts/sorveglianza.py` fa la parte deterministica: finestra temporale, attribuzione,
+freschezza, movimento contro l'ampiezza del titolo, soglie. Non decide se una notizia sia
+importante.
+
+Un elenco di parole chiave che classifica "evento" contro "commento" sarebbe il **registro
+fisso che invecchia da solo** (C10, red team I6, `MACRO_CARD_BY_PANEL` che copriva 7 pannelli
+su 37). E la misura lo dimostra: nessuna lista separa *"Oracle (ORCL) Q1 2027 Earnings Call
+Transcript"* da *"Forget the Capex Fears: Why Alphabet and Amazon Are Must-Buys"*. Un modello
+che legge le voci **fresche**, che sono poche, sì.
+
+### 🔁 LA DEDUPLICA È LA FINESTRA, E NON SERVE NESSUNO STATO
+La Routine accende una sessione **nuova** a ogni scatto: nessuna memoria fra un'ora e l'altra.
+Uno stato dedup andrebbe committato nel repo — cioè una sessione autonoma che scrive su `main`,
+che è la produzione. Quindi una voce entra nel brief **l'ora in cui è dentro la finestra di 70
+minuti**, e all'ora dopo ne esce da sé.
+
+⚠⚠ **E per la stessa ragione i PREZZI non stanno nel brief orario.** `change_pct` è la
+variazione dalla chiusura precedente: sopra soglia resterebbe tale per **tutta la seduta**, cioè
+suonerebbe a ogni scatto. *Un avviso che suona sempre non avvisa* (v421, v427). Il movimento si
+guarda con `--chiusura`, allo scatto dopo la campana, dove è un fatto del giorno e suona **una
+volta**.
+
+### 🏷️ «Bloom Energy» marcava BE su una notizia di PBF Energy
+Difetto vero, visto sul feed del giorno. `nomi_citati` provava **tutti** i token del nome della
+società, e "Energy" è il settore, non il nome. Ora si prova **solo il primo token distintivo**:
+il nome identifica, quelli dopo descrivono il comparto.
+
+⚠ Il confronto sul **ticker** è sensibile al maiuscolo di proposito: `BE` e `MU` sono parole
+inglesi comuni, e un ancoraggio aperto qui accenderebbe il marcatore su quasi ogni titolo —
+l'ottava incarnazione della trappola `mg-card`/`mg-card-head`.
+
+⚠⚠ **E il caso peggiore del libro di oggi è MSTR, che si chiama `Strategy Inc`**: senza
+l'elenco delle parole generiche, ogni titolo che contiene "strategy" marcherebbe quella
+posizione. L'elenco non è di ticker (invecchierebbe a ogni nome nuovo) ma di **parole inglesi
+generiche**, che cambiano molto più lentamente del libro.
+
+### 🎯 Un'iniezione che non morde può voler dire che il GATE non discrimina
+Iniettando il ritorno a "tutti i token", il gate restava **verde**: il falso positivo di `Bloom
+Energy` lo chiudeva già l'elenco delle parole generiche, quindi quel caso non misurava la
+proprietà che credevo. Non era l'iniezione sbagliata (v419) e non era un gate decorativo
+(v415): era un gate che **copriva due correzioni con un caso solo**. Sdoppiato — un caso per le
+parole generiche (MSTR/`Strategy`) e uno per il primo token — mordono entrambi.
+
+> **Quando un'iniezione non morde, le possibilità sono tre e vanno distinte**: hai iniettato
+> un'altra cosa (v419), il gate è decorativo (v415), oppure il gate misura una proprietà che
+> *un'altra* correzione già garantisce. La terza si riconosce perché il difetto iniettato **non
+> si manifesta**, non perché il check non lo veda.
+
+### 🦴 Il gate del censimento ha morso appena lo strumento è nato
+`sorveglianza.py` non era in `.claude/commands/aggiorna.md` e il check v387 è andato rosso al
+primo giro: *"mai nominati: sorveglianza.py"*. È dichiarato **fuori** con la sua ragione —
+seleziona un SOTTOINSIEME di ciò che `/aggiorna` guarda per intero, ed eseguirlo lì
+affiancherebbe una seconda resa delle stesse grandezze a quella del rapporto (classe v161/v207).
+
+⚠ Undici iniezioni, **tutte mordono**, tutte con `modifica_sicura` e ripristino verificato **per
+hash** da uno snapshot preso prima, mai da `git checkout` (v427, v430). Fra queste, il
+**collegamento** e non il controllo (v399, v443): rinominando `news_titoli` in `data.json` il
+brief uscirebbe vuoto in silenzio, e il gate che legge il file vero lo prende.
+
+⚠ **E una mia sonda era sbagliata**: cercavo `"ASSENTE"` in tutto il brief, che lo contiene
+legittimamente nella riga del feed macro. *Un check rosso è prima di tutto una sonda da
+verificare contro il testo vero* (v433).
+
+⚠ `?v=` e `BUILD_VERSION` **non** sono stati toccati: questa versione cambia solo `scripts/` e
+`.claude/`, nessun file servito al browser (regola v440).
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

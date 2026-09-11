@@ -732,6 +732,177 @@ check("v440 la riga delle prime tre nomina il proprio denominatore e l'altro",
       and "stessa misura su due insiemi" in _out)
 
 
+# ═══ v448 — SORVEGLIANZA: il selettore su cui la Routine oraria decide ═══════════════════════
+# ⚠⚠ LO STATO SI COSTRUISCE, NON SI ASPETTA. Nessuno di questi fenomeni esiste nello snapshot di
+#   oggi (zero voci fuori finestra, zero pipeline ferme, zero movimenti oltre 2x ATR): un check
+#   che li leggesse sarebbe verde per ASSENZA DEL FENOMENO, la trappola gia' pagata cinque volte
+#   in questo progetto (v196, v229, v421, v429, v431). Qui i dati sono sintetici e contengono il
+#   caso per costruzione, a qualunque ora giri la suite.
+import datetime as _dt
+import subprocess as _sub
+import sorveglianza as _S
+
+_ORA = _dt.datetime(2026, 9, 11, 16, 0, tzinfo=_dt.timezone.utc)
+
+
+def _snap(voci_tk=None, voci_macro=None, righe=None, **kw):
+    """Uno snapshot minimo che contiene esattamente il fenomeno da misurare."""
+    nt = {"per_titolo": voci_tk if voci_tk is not None else {}, "letto_il": "2026-09-11T15:00:00Z",
+          "non_letti": kw.get("non_letti", []), "senza_notizie": kw.get("senza_notizie", [])}
+    d = {"updated_at": kw.get("updated_at", "2026-09-11T15:00:00Z"),
+         "portfolio": righe or [], "watchlist": [],
+         "macro": {"news": ({"voci": voci_macro, "fonti": ["F1"], "fonti_mute": kw.get("mute", []),
+                             "fonti_non_lette": kw.get("non_lette", [])}
+                            if voci_macro is not None else {}),
+                   "credit": {"spread_hy": kw.get("hy", 2.7)},
+                   "fedwatch": {"meetings": kw.get("meetings", [])}}}
+    if voci_tk is not None or kw.get("forza_nt"):
+        d["news_titoli"] = nt
+    return d
+
+
+def _voce(quando, titolo, url="u"):
+    return {"quando": quando, "titolo": titolo, "fonte": "Nasdaq", "url": url}
+
+
+# --- 1. la finestra E' la deduplica: una voce vecchia non rientra all'ora dopo ---
+# ⚠ E' il perno dell'intero disegno: la Routine accende una sessione NUOVA a ogni scatto e non ha
+#   memoria, quindi senza la finestra la stessa notizia suonerebbe ogni ora finche' resta nel feed
+#   (il feed ha una finestra di 14 giorni).
+_b = _S.raccogli(_snap(voci_tk={"MU": [_voce("2026-09-11T15:30:00Z", "dentro"),
+                                       _voce("2026-09-11T14:00:00Z", "fuori")]}), _ORA, 70, {"MU"})
+check("v448 la finestra tiene la voce fresca e lascia fuori quella vecchia",
+      [v["titolo"] for v in _b["titoli"]] == ["dentro"],
+      extra=f"raccolte: {[v['titolo'] for v in _b['titoli']]}")
+
+# --- 2. l'orologio e' un PARAMETRO, non l'ora in cui gira la suite (v402) ---
+_d2 = _snap(voci_tk={"MU": [_voce("2026-09-11T15:30:00Z", "x")]})
+check("v448 spostando l'orologio avanti la stessa voce esce dalla finestra",
+      len(_S.raccogli(_d2, _ORA, 70, {"MU"})["titoli"]) == 1
+      and len(_S.raccogli(_d2, _ORA + _dt.timedelta(hours=3), 70, {"MU"})["titoli"]) == 0)
+
+# --- 3. il marcatore del ticker e' SENSIBILE AL MAIUSCOLO ---
+# ⚠ `BE` e `MU` sono parole inglesi comuni: un ancoraggio aperto accenderebbe il marcatore su
+#   quasi ogni titolo. E' la trappola mg-card/mg-card-head, gia' pagata quattro volte.
+_nomi = {"BE": "Bloom Energy Corporation", "MU": "Micron Technology, Inc."}
+check("v448 'be' minuscolo non marca BE, '(BE)' si'",
+      _S.nomi_citati("This could be a good day for chips", _nomi) == []
+      and "BE" in _S.nomi_citati("Bloom Energy (BE) beats estimates", _nomi),
+      extra=f"minuscolo={_S.nomi_citati('This could be a good day for chips', _nomi)}")
+
+# --- 4. una parola generica del nome non accende il marcatore ---
+# Difetto vero, visto sul feed del giorno: `Bloom Energy` marcava BE su "PBF Energy and Lennar
+# have been highlighted..." perche' si provavano TUTTI i token del nome e "Energy" e' il settore.
+check("v448 'PBF Energy' non marca Bloom Energy, 'Bloom' si'",
+      _S.nomi_citati("PBF Energy and Lennar have been highlighted", _nomi) == []
+      and _S.nomi_citati("Bloom beats on revenue", _nomi) == ["BE"])
+# ⚠ Il caso sopra e' il difetto REALE visto sul feed, e da solo non discrimina: lo chiude gia'
+#   l'elenco delle parole generiche. Questo secondo caso misura la proprieta' che resta —
+#   SOLO il primo token identifica la societa' — con un secondo token che generico non e'.
+check("v448 il secondo token del nome non identifica la societa'",
+      _S.nomi_citati("Beacon Roofing Supply rises", {"XX": "Alpha Beacon Holdings"}) == []
+      and _S.nomi_citati("Alpha Beacon wins contract", {"XX": "Alpha Beacon Holdings"}) == ["XX"])
+# ⚠⚠ E il caso PIU' pericoloso del libro di oggi: MSTR si chiama `Strategy Inc`. Senza l'elenco
+#   delle parole generiche, ogni titolo che contiene la parola "strategy" — e ne contiene una
+#   valanga — marcherebbe MSTR, cioe' il marcatore sarebbe acceso sempre e non direbbe piu'
+#   niente. Il ticker resta la strada che funziona.
+check("v448 un nome che E' una parola comune non accende il marcatore, il ticker si'",
+      _S.nomi_citati("Company outlines new growth strategy", {"MSTR": "Strategy Inc"}) == []
+      and _S.nomi_citati("MSTR jumps on buyback", {"MSTR": "Strategy Inc"}) == ["MSTR"])
+
+# --- 5. la stessa voce in piu' feed e' UNA riga, e i feed si sommano ---
+# In quanti feed compare e' informazione: uno = notizia sul nome, sei = cronaca di mercato.
+_b5 = _S.raccogli(_snap(voci_tk={"MU": [_voce("2026-09-11T15:30:00Z", "cronaca")],
+                                 "AMD": [_voce("2026-09-11T15:30:00Z", "cronaca")],
+                                 "NVDA": [_voce("2026-09-11T15:31:00Z", "propria")]}),
+                  _ORA, 70, {"MU", "AMD", "NVDA"})
+_per = {v["titolo"]: v["feed"] for v in _b5["titoli"]}
+check("v448 una voce in due feed resta una riga e dichiara entrambi i feed",
+      len(_b5["titoli"]) == 2 and sorted(_per["cronaca"]) == ["AMD", "MU"]
+      and _per["propria"] == ["NVDA"], extra=str(_per))
+
+# --- 6. il MOVIMENTO non esce nello scatto orario, esce solo dopo la campana ---
+# ⚠⚠ `change_pct` e' la variazione dalla chiusura precedente: sopra soglia resterebbe tale per
+#   tutta la seduta, quindi nello scatto orario suonerebbe OGNI VOLTA. Un avviso che suona sempre
+#   non avvisa (v421, v427). E' una proprieta' della resa, non un dettaglio di stampa.
+_righe6 = [{"ticker": "MU", "name": "Micron", "change_pct": -12.0, "atr_pct": 5.0,
+            "risk_contrib_pct": 33.7}]
+_b6 = _S.raccogli(_snap(righe=_righe6, voci_tk={}), _ORA, 70, {"MU"})
+_orario = _S.stampa(_b6, _ORA, 70, False, "2026-08-23")
+_dopo = _S.stampa(_b6, _ORA, 70, True, "2026-08-23")
+check("v448 il movimento oltre soglia esce con --chiusura e NON nello scatto orario",
+      "MOVIMENTO OLTRE" not in _orario and "MU:" not in _orario
+      and "MOVIMENTO OLTRE" in _dopo and "MU:" in _dopo)
+
+# --- 7. la soglia e' sull'ampiezza DEL TITOLO, non una percentuale uguale per tutti ---
+# ⚠ Lezione v210: una soglia percentuale segnala sempre lo stesso nome, quello piu' volatile.
+#   Qui i due titoli si muovono dello STESSO 8% e solo quello stretto deve scattare.
+_b7 = _S.raccogli(_snap(righe=[
+    {"ticker": "LARGO", "change_pct": 8.0, "atr_pct": 7.0},
+    {"ticker": "STRETTO", "change_pct": 8.0, "atr_pct": 2.0}], voci_tk={}),
+    _ORA, 70, {"LARGO", "STRETTO"})
+check("v448 a parita' di variazione scatta solo chi supera la PROPRIA ampiezza",
+      [v["tk"] for v in _b7["movimenti"]] == ["STRETTO"],
+      extra=str([(v["tk"], round(v["rap"], 2)) for v in _b7["movimenti"]]))
+
+# --- 8. fonte ASSENTE, fonte NON LETTA e fonte MUTA si dichiarano in tre modi diversi ---
+# ⚠⚠ "nessuna notizia" e "la fonte non ha risposto" si leggono uguali e significano l'opposto
+#   (v389, v421). E' la classe che ha tenuto le news macro morte per un anno.
+_ass = _S.stampa(_S.raccogli(_snap(voci_tk=None), _ORA, 70, {"MU"}), _ORA, 70, False, "x")
+_nl = _S.stampa(_S.raccogli(_snap(voci_tk={"MU": []}, non_letti=["SKHY"], senza_notizie=["BE"]),
+                            _ORA, 70, {"MU"}), _ORA, 70, False, "x")
+check("v448 assente, non letta e muta producono tre dichiarazioni distinte",
+      "ASSENTE dallo snapshot" in _ass and "misura che manca" in _ass
+      and "NON letti (la fonte non ha risposto): SKHY" in _nl
+      and "letti e senza voci: BE" in _nl and "FEED PER-TITOLO: ASSENTE" not in _nl)
+# ⚠ La sonda e' stata sbagliata alla prima stesura: cercava "ASSENTE" in tutto il brief, che lo
+#   contiene legittimamente nella riga del feed MACRO (in quello scenario macro.news e' vuoto).
+#   Un check rosso e' prima di tutto una sonda da verificare contro il testo vero (v433).
+
+# --- 9. la pipeline ferma oltre 24 ore e' un GUASTO dichiarato, non un ritardo ---
+_vecchio = _S.stampa(_S.raccogli(_snap(voci_tk={}, updated_at="2026-09-09T15:00:00Z"),
+                                 _ORA, 70, {"MU"}), _ORA, 70, False, "x")
+check("v448 oltre 24 ore il brief dichiara la pipeline ferma e che i prezzi non sono di adesso",
+      "PIPELINE FERMA" in _vecchio and "NON sono quelli di adesso" in _vecchio
+      and "49.0 ore" in _vecchio)
+
+# --- 10. ogni soglia stampata si DICHIARA convenzione (v240) ---
+# Nel file non esiste nessun limite di movimento e nessuna soglia di spread: sono affermazioni
+# del mestiere, e una tacca disegnata senza provenienza e' esattamente il difetto della v240.
+_conv = _S.stampa(_S.raccogli(_snap(voci_tk={}, hy=2.7, meetings=[
+    {"date": "2026-09-16", "mosse_25bp": 1.97, "prezzata_dal_contratto": True}]),
+    _ORA, 70, {"MU"}), _ORA, 70, True, "x")
+check("v448 movimento, credito e FOMC dichiarano cosa e' convenzione e cosa e' calcolo nostro",
+      "e' una CONVENZIONE" in _conv and "convenzione, non un dato del file" in _conv
+      and "nostro calcolo sul future, NON una probabilita'" in _conv)
+
+# --- 11. IL COLLEGAMENTO, non il controllo (v399, v443) ---
+# ⚠⚠ I dieci check sopra passano un dizionario costruito a mano: se domani la pipeline
+#   rinominasse una chiave, resterebbero tutti verdi e il brief uscirebbe vuoto in silenzio —
+#   che e' letteralmente il guasto per cui le news macro sono morte un anno. Questo check legge
+#   il data.json VERO e pretende che le chiavi che lo script interroga esistano davvero.
+_vero = _S._dati()
+_nt_vero = _vero.get("news_titoli") or {}
+_mn_vero = (_vero.get("macro") or {}).get("news") or {}
+check("v448 le chiavi che il selettore legge esistono nel data.json vero",
+      isinstance(_nt_vero.get("per_titolo"), dict) and len(_nt_vero["per_titolo"]) > 0
+      and isinstance(_mn_vero.get("voci"), list)
+      and all("quando" in v and "titolo" in v for v in _mn_vero["voci"][:3])
+      and isinstance(((_vero.get("macro") or {}).get("fedwatch") or {}).get("meetings"), list),
+      extra=f"per_titolo={len(_nt_vero.get('per_titolo') or {})} macro={len(_mn_vero.get('voci') or [])}")
+
+# --- 12. gira davvero, sui dati veri, ed esce 0 ---
+# Un modulo che importa non e' un comando che funziona: la Routine lo invoca da riga di comando.
+_run = _sub.run([sys.executable, str(Path(__file__).resolve().parent / "sorveglianza.py"),
+                 "--chiusura", "--adesso", "2026-09-11T16:00:00Z"],
+                capture_output=True, text=True, cwd=str(Path(__file__).resolve().parent.parent))
+check("v448 il comando gira sui dati veri, esce 0 e stampa tutte le sezioni",
+      _run.returncode == 0 and "SORVEGLIANZA LIBRO" in _run.stdout
+      and "NOTIZIE SUI NOMI DEL LIBRO" in _run.stdout and "MACRO, ultimi" in _run.stdout
+      and "MOVIMENTO OLTRE" in _run.stdout and "CREDITO:" in _run.stdout,
+      extra=(_run.stderr or "")[-300:])
+
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

@@ -165,6 +165,10 @@ aggiorna"*. In concreto:
 
 Gli strumenti per un nome solo — `soglie.py TICKER`, `analisi_libro.py TICKER`,
 `pacchetto_verdetto.py TICKER` — restano fuori per costruzione: qui l'oggetto è il libro.
+`scripts/sorveglianza.py` **non si esegue da qui**: è il selettore della Routine oraria, e
+seleziona un SOTTOINSIEME di ciò che questo comando guarda per intero — le notizie fresche del
+giro, il movimento contro l'ampiezza del titolo, credito e FOMC. Eseguirlo qui aggiungerebbe una
+seconda resa delle stesse grandezze accanto a quella del rapporto, che è la classe v161/v207.
 `scripts/modifica_sicura.py` non è un passo di questo comando: è la libreria che ogni modifica ai
 sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf.py` è la libreria
 che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed
