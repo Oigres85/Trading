@@ -1,4 +1,4 @@
-⟦ BUILD v450 · generato 11/09/2026 22:05 ⟧
+⟦ BUILD v450 · generato 11/09/2026 22:18 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 11/09/2026, 22:05:29 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 18:05, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,11% · Fut S&P +0,76% · BTC +0,68% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~63.4h); il "→ agg." incorpora già il gap after.
+DATI AL 11/09/2026, 22:18:16 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 18:18, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,11% · Fut S&P +0,76% · BTC +0,76% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~63.2h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 11/09/2026, 22:05:29, prossimo run 12/09/2026, 04:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-11.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 11/09/2026, 22:18:16, prossimo run 12/09/2026, 04:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-11.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-11) · Curva 10A-3M (2026-09-11) · Treasury USA 30A (2026-09-10) · Tasso reale 10A (TIPS) (2026-09-10) · Inflazione attesa 10A (breakeven) (2026-09-11) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -100,13 +100,13 @@ QUADRO MACRO:
       Bill Dudley, a Bloomberg Opinion columnist and former president of the Federal Reserve Bank of New York, says he would be shocked if the Federal Reserve did not raise interest rates by 25 basis points at their next meeting. He speaks on "Bloomberg The Close." (Source: Bloomberg)
     · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Japan’s GPIF May Sell $62 Billion of Treasuries, Santander Says
       Japan’s Government Pension Investment Fund could sell as much as $62 billion of US Treasuries without a formal revamp of its asset-allocation policy, according to analysts at Banco Santander SA.
-    · [MarketWatch, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Oracle shook off fears about AI spending, but its stock still loses ground
+    · [MarketWatch, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Oracle shook off fears about AI spending, but its stock still loses ground
       “Several of Oracle’s bear cases were addressed head on” in the latest earnings report, according to an analyst.
     · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] AI-Obsessed Wall Street Pours Billions Into Inflation-Era Bets
       The list of challenges confronting Wall Street piled up this week. Oil firmly above $100. Inflation refusing to disappear. A defiant bond market that all but dared Scott Bessent to bring more policy firepower.
     · [CNBC Economia, 5h fa] Consumer outlook plunges in September as inflation outlook worsens
       The survey's headline index hit a level of 47.8, down 7.5% from the August reading and off 13.2% from a year ago.
-    · [CNBC Economia, 6h fa] Record U.S. cyclosporiasis outbreak is over, CDC says
+    · [CNBC Economia, 7h fa] Record U.S. cyclosporiasis outbreak is over, CDC says
       The largest outbreak, linked to shredded iceberg lettuce from Taylor Farms, sickened more than 12,000 people.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-09-16 Vendite al dettaglio (m/m) (precedente -0.6%) · 2026-09-17 Manifattura Philly Fed (al posto dell'ISM) (precedente +47.4). ⚠ Per 3 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich), Curva 10A-2A, Treasury USA 30A): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 3 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-3M, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. nessuna trimestrale fra i titoli seguiti. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -234,7 +234,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (71,2% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
   [AMD] · [Nasdaq, 4h fa] 1 Thing I Wish I'd Known About the Stock Market When I First Started Investing
       Key PointsSelling AMD at a 33% gain in 2004 felt like skill, but the stock would have soared from $15 to $500 per stub in 22 years.
-  [AMD] · [Nasdaq, 4h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
+  [AMD] · [Nasdaq, 5h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...
   [CRWV] · [Nasdaq, 1h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...
@@ -242,7 +242,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The S&P 500 Index ($SPX ) (SPY ) is up +0.87%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.77%.  E-mini S&P futures (ESU26 ) are up +1.01%, and September E-mini Nasdaq futures (NQU26 )...
   [MRVL] · [Nasdaq, 3h fa] Astera Labs vs. Marvell Technology: Which AI-Driven Tech Stock Is a Better Buy in 2026?
       Key PointsAstera Labs specializes in high-speed connectivity solutions for AI infrastructure and is growing revenue at a triple-digit pace.
-  [MRVL] · [Nasdaq, 4h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
+  [MRVL] · [Nasdaq, 5h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...
   [MU] · [Nasdaq, 1h fa] Applied Materials vs. Micron Technology: Which Technology Stock Is a Better Buy in 2026?
       Key PointsApplied Materials is a leading provider of the equipment and software essential for manufacturing advanced semiconductors.
@@ -250,12 +250,12 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Value ETFs are outperforming growth funds, but many hold surprising exposure to the AI boom.
   [NVDA] · [Nasdaq, 4h fa] CoreWeave Is My Top IPO Pick Right Now: Over 75% of Its Revenue Is Locked In Through Contracts
       Key PointsCoreWeave&rsquo;s backlog grew to $104 billion in its latest quarter.
-  [NVDA] · [Nasdaq, 4h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
+  [NVDA] · [Nasdaq, 5h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...
+  [ORCL] · [Nasdaq, 0h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+      The S&P 500 Index ($SPX ) (SPY ) is up +0.87%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.77%.  E-mini S&P futures (ESU26 ) are up +1.01%, and September E-mini Nasdaq futures (NQU26 )...
   [ORCL] · [Nasdaq, 1h fa] Oracle Says Its Expiring AI Contracts Are Renewing 20% Higher
       Key PointsOracle says GPU capacity that came up for renewal in fiscal Q1 was renewed or resold at a 20% premium to prior contracts.
-  [ORCL] · [Nasdaq, 1h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
-      The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...
   [RGTI] · [Nasdaq, 11h fa] Not IonQ, Not Rigetti Computing. This Quantum Computing Stock Could Be September's Biggest Winner.
       Key PointsIonQ and Rigetti Computing both have annual revenue growth of more than 100%.
   [RGTI] · [Nasdaq, 13h fa] The Zacks Analyst Blog Highlights D-Wave Quantum, Rigetti, IBM, Alphabet and Amazon
