@@ -845,6 +845,40 @@ check("v448 a parita' di variazione scatta solo chi supera la PROPRIA ampiezza",
       [v["tk"] for v in _b7["movimenti"]] == ["STRETTO"],
       extra=str([(v["tk"], round(v["rap"], 2)) for v in _b7["movimenti"]]))
 
+# --- 7b. l'ESCURSIONE e' la seconda meta' della domanda ---
+# ⚠⚠ Il caso reale che ha aperto questo ramo: l'11/09 ORCL ha percorso il 10,1% fra minimo e
+#   massimo dopo la trimestrale — due volte la propria ampiezza — e ha chiuso a +0,04%. Con la
+#   sola variazione da chiusura a chiusura il brief sarebbe stato MUTO sull'unico nome del libro
+#   che avesse avuto una giornata. E l'etichetta non afferma una direzione che il dato non
+#   porta (v405): un'escursione che chiude piatta dice che il prezzo e' tornato, non dove e'
+#   andato.
+_b7b = _S.raccogli(_snap(righe=[
+    {"ticker": "TORNA", "change_pct": 0.04, "atr_pct": 5.0, "day_high": 166.0,
+     "day_low": 150.0, "price": 153.0},
+    {"ticker": "FERMO", "change_pct": 0.5, "atr_pct": 5.0, "day_high": 101.0,
+     "day_low": 99.0, "price": 100.0}], voci_tk={}), _ORA, 70, {"TORNA", "FERMO"})
+_t7b = _S.stampa(_b7b, _ORA, 70, True, "x")
+check("v448 l'escursione oltre soglia entra anche con la chiusura piatta, e dichiara il ritorno",
+      [v["tk"] for v in _b7b["movimenti"]] == ["TORNA"]
+      and "escursione della seduta" in _t7b and "ed e' tornato" in _t7b,
+      extra=str([v["tk"] for v in _b7b["movimenti"]]))
+
+# --- 7c. quando le due misure CONCORDANO la riga non dice che il prezzo e' tornato ---
+_b7c = _S.raccogli(_snap(righe=[{"ticker": "CROLLA", "change_pct": -14.0, "atr_pct": 5.0,
+                                 "day_high": 101.0, "day_low": 85.0, "price": 86.0}],
+                         voci_tk={}), _ORA, 70, {"CROLLA"})
+_t7c = _S.stampa(_b7c, _ORA, 70, True, "x")
+check("v448 con chiusura ed escursione entrambe oltre soglia la riga parla di conferma, non di ritorno",
+      "la chiusura conferma la direzione" in _t7c and "ed e' tornato" not in _t7c)
+
+# --- 7d. senza minimo e massimo il titolo non sparisce: resta la chiusura ---
+# ⚠ Un ripiego che fa sparire una riga e' peggio del dato mancante (v187, v406).
+_b7d = _S.raccogli(_snap(righe=[{"ticker": "SENZA", "change_pct": -13.0, "atr_pct": 5.0}],
+                        voci_tk={}), _ORA, 70, {"SENZA"})
+check("v448 senza minimo e massimo la soglia sulla chiusura funziona lo stesso",
+      [v["tk"] for v in _b7d["movimenti"]] == ["SENZA"]
+      and _b7d["movimenti"][0]["rap_esc"] is None)
+
 # --- 8. fonte ASSENTE, fonte NON LETTA e fonte MUTA si dichiarano in tre modi diversi ---
 # ⚠⚠ "nessuna notizia" e "la fonte non ha risposto" si leggono uguali e significano l'opposto
 #   (v389, v421). E' la classe che ha tenuto le news macro morte per un anno.

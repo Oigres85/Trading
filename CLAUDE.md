@@ -5153,6 +5153,48 @@ verificare contro il testo vero* (v433).
 ⚠ `?v=` e `BUILD_VERSION` **non** sono stati toccati: questa versione cambia solo `scripts/` e
 `.claude/`, nessun file servito al browser (regola v440).
 
+## 📉 v449 — LA SOGLIA GUARDAVA UNA GRANDEZZA SOLA, E IL GIORNO IN CUI SERVIVA ERA L'ALTRA
+
+Trovato **misurando per scrivere il rapporto al CEO**, un'ora dopo aver messo in produzione la
+v448 — cioè sul mio stesso codice appena spedito.
+
+L'11/09 ORCL ha riportato i risultati: il prezzo è arrivato a **165,99** dal minimo di **150,55**
+e ha chiuso a **153,01, cioè +0,04%**. Un'escursione del **10,1%**, due volte la propria ampiezza,
+su una posizione del libro, il giorno della trimestrale.
+
+| soglia | cosa vedeva |
+|---|---|
+| variazione da chiusura a chiusura (v448) | **0,01×** l'ampiezza → nessun avviso |
+| escursione minimo-massimo | **2,0×** l'ampiezza → l'unico nome del libro che avesse avuto una giornata |
+
+> **Una soglia che misura la sola chiusura è cieca alla seduta in cui il prezzo va lontano e
+> torna** — che è precisamente la forma che prende una trimestrale respinta dal mercato.
+
+⚠ **E non è una soglia che suona sempre**, misurato prima di scriverla: sulle 13 posizioni di
+quel giorno l'escursione la supera **una** (ORCL) e la variazione **nessuna**. Se ne avesse
+segnalate otto sarebbe stata la classe *"un avviso che suona sempre non avvisa"* (v421, v427).
+
+⚠⚠ **L'ETICHETTA NON AFFERMA UNA DIREZIONE CHE IL DATO NON PORTA** (v405): un'escursione ampia
+che chiude piatta dice che il prezzo **è andato lontano ed è tornato**, non che è salito o sceso.
+Dove anche la chiusura supera la soglia le due misure concordano, e la riga lo scrive — *un
+segnale solo, non due prove* (B3).
+
+⚠ Il ripiego è dichiarato e non fa sparire niente: senza minimo e massimo resta la soglia sulla
+chiusura. *Un ripiego che fa sparire una riga è peggio del dato mancante* (v187, v406).
+
+⚠ Tredici iniezioni sul selettore, **tutte mordono**, con ripristino verificato per hash da uno
+snapshot preso prima (v427, v430). Fra queste, l'iniezione che rimette la sola chiusura e quella
+che fa raccontare l'escursione come una direzione.
+
+⚠ **E una mia iniezione era ancorata al codice della versione prima**: `if rap >= SOGLIA_ATR:`
+non esiste più, e l'harness è morto sull'assert invece di iniettare a vuoto — il comportamento
+progettato. *Anche le iniezioni invecchiano quando il codice cambia*, e un'ancora che non si
+trova va riagganciata, non allentata.
+
+⚠ L'apostrofo dentro una stringa Python scritta da uno script che scrive un altro script mi ha
+rotto il file **due volte**: l'ancora si sceglie **senza apostrofi** quando si può. È la famiglia
+dei backtick e dei backslash dentro un template passato al vm, su un altro linguaggio.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
