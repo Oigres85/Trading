@@ -5441,6 +5441,134 @@ check("v393 il calendario di UMich e' quello della primaria: stesso mese, non il
       && r.includes("UMich (fonte primaria)")
       && !r.includes("via FRED");`));
 
+/* ═══ v450 — IL CONTROLLO INCROCIATO SU DUE FONTI CHE QUOTANO LA STESSA RIUNIONE ═══════════
+   ⚠⚠ LO STATO SI COSTRUISCE. Oggi i dati veri contengono la divergenza (1,97 contro 0,82), ma
+   basta che la pipeline legga il contratto giusto perche' sparisca: un check che la LEGGESSE
+   sarebbe verde per assenza del fenomeno il giorno dopo. E' la trappola pagata in v196, v229,
+   v421, v429, v431, v435. Qui le quotazioni e il tasso implicito si iniettano. */
+
+check("v450 l'attesa si ricava dalla DISTRIBUZIONE quotata, non da una voce sola",
+  suVeriEsito(
+    "DATA.predictions = ["
+    + " {question: 'Will there be no change in Fed interest rates after the September 2026 meeting?', yes: 18},"
+    + " {question: 'Will the Fed increase interest rates by 25 bps after the September 2026 meeting?', yes: 82}];"
+    + "const a = attesaPrevisione('2026-09-16');"
+    + "if (a !== 0.82) return 'attesa ' + a + ' invece di 0,82';"
+    + "DATA.predictions = [{question: 'Will the Fed increase interest rates by 25 bps after the September 2026 meeting?', yes: 82}];"
+    + "if (attesaPrevisione('2026-09-16') !== null) return 'con una voce sola ha costruito un-attesa';"
+    + "return true;"));
+
+check("v450 la quotazione di un-ALTRA riunione non entra nell'attesa di questa",
+  suVeriEsito(
+    "DATA.predictions = ["
+    + " {question: 'Will there be no change in Fed interest rates after the October 2026 meeting?', yes: 10},"
+    + " {question: 'Will the Fed increase interest rates by 25 bps after the October 2026 meeting?', yes: 90}];"
+    + "if (attesaPrevisione('2026-09-16') !== null) return 'ha usato la riunione di ottobre per settembre';"
+    + "if (attesaPrevisione('2026-10-28') !== 0.9) return 'su ottobre da ' + attesaPrevisione('2026-10-28');"
+    + "return true;"));
+
+/* ⚠ LA SOGLIA E' UN MOVIMENTO INTERO, ed e' una convenzione dichiarata (v240). Il check
+   percorre i DUE versi: sotto la soglia le due fonti possono divergere legittimamente e il
+   numero resta una misura; sopra, non descrivono lo stesso mondo. Un check su un verso solo
+   accetterebbe una guardia che marca sospetto tutto (v438, l'avviso che suona sempre). */
+const _FW450 = (mosse, pmHike) =>
+  "DATA.predictions = ["
+  + " {question: 'Will there be no change in Fed interest rates after the September 2026 meeting?', yes: " + (100 - pmHike) + "},"
+  + " {question: 'Will the Fed increase interest rates by 25 bps after the September 2026 meeting?', yes: " + pmHike + "}];"
+  + "DATA.macro.fedwatch = {implied_rate: 0, meetings: [{date: '2026-09-16'}],"
+  + " movimenti: {riunione: '2026-09-16', mosse_25bp: " + mosse + ", giorni_vecchio: 16, giorni_nuovo: 14, giorni_mese: 30, base_effr: 3.63}};";
+
+check("v450 oltre un movimento intero di divergenza la derivazione e' marcata sospetta",
+  suVeriEsito(_FW450(1.97, 82)
+    + "const r = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);"
+    + "if (r.attesa_previsione !== 0.82) return 'attesa ' + r.attesa_previsione;"
+    + "if (!r.sospetta) return 'divergenza 1,15 e non e- sospetta';"
+    + "return true;"));
+
+check("v450 sotto la soglia le due fonti divergono senza che il numero smetta di essere misura",
+  suVeriEsito(_FW450(0.6, 82)
+    + "const r = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);"
+    + "if (r.sospetta) return 'divergenza 0,22 marcata sospetta: la guardia suonerebbe sempre';"
+    + "if (r.hike_prob !== 60) return 'hike_prob ' + r.hike_prob + ' invece di 60';"
+    + "return true;"));
+
+/* ⚠⚠ IL PACCHETTO NON DEVE CONTRADDIRSI. La prima stesura dichiarava la derivazione non
+   attribuibile e due righe dopo, nel blocco Polymarket, scriveva ancora "una delle due sta
+   prezzando qualcosa che l'altra non prezza" — cioe' trattava le due letture come entrambe
+   legittime. E' il pacchetto che genera da solo il falso positivo del proprio collaudo B5
+   (v400, v412, v414, v415), qui prodotto dalla correzione stessa. */
+check("v450 il pacchetto dichiara la non attribuibilita' e NON si contraddice due righe dopo",
+  suVeriEsito(_FW450(1.97, 82)
+    + "const p = buildPrompt();"
+    + "if (p.indexOf('DERIVAZIONE NON ATTRIBUIBILE') < 0) return 'manca la dichiarazione';"
+    + "if (p.indexOf('1,97 movimenti da 25bp') < 0) return 'il numero e- sparito invece di essere dichiarato';"
+    + "if (p.indexOf('ne quotano 0,82') < 0) return 'manca il numero della seconda fonte';"
+    + "if (p.indexOf('una delle due sta prezzando qualcosa che l') >= 0) return 'si contraddice: le tratta ancora come entrambe legittime';"
+    + "if (p.indexOf('(1.97)') >= 0) return 'punto decimale inglese rientrato';"
+    + "return true;"));
+
+check("v450 senza divergenza il pacchetto torna a pubblicare il numero come misura",
+  suVeriEsito(_FW450(0.6, 82)
+    + "const p = buildPrompt();"
+    + "if (p.indexOf('DERIVAZIONE NON ATTRIBUIBILE') >= 0) return 'dichiara sospetto un numero concorde';"
+    + "if (p.indexOf('RIALZO 60%') < 0) return 'non pubblica piu- la probabilita- quando esiste';"
+    + "return true;"));
+
+/* ⚠⚠ LA TESSERA ASSEGNAVA 50 = NEUTRO sulla riunione piu' prezzata del trimestre, perche' il
+   punteggio veniva dalle PROBABILITA' e il `?? 0` le faceva valere zero quando superano il
+   movimento intero. E' il difetto che la v443 ha chiuso sulla scheda a barre e lasciato su
+   questa superficie e sul popup (classe v412). */
+/* ⚠⚠ IL CHECK LEGGE LA TESSERA VERA, non ricalcola la formula. La prima stesura si calcolava
+   da se- il punteggio (50 - mosse x 50) e poi verificava che valesse 0: era CIRCOLARE, e
+   l-iniezione che riportava la tessera alle probabilita- restava verde. Un check che non passa
+   dal codice reale certifica una strada immaginaria (v226), ed e- la definizione di gate
+   decorativo (v415). Ora esegue `indicatoriClassifica()` e legge la voce prodotta. */
+check("v450 la tessera macro non vale piu' 50 = neutro quando la probabilita' non esiste",
+  suVeriEsito(_FW450(1.97, 82)
+    + "const r = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);"
+    + "if (r.hike_prob != null) return 'premessa sbagliata: la probabilita- esiste';"
+    + "const t = indicatoriClassifica().find(x => x && x.k === 'fedwatch');"
+    + "if (!t) return 'la tessera fedwatch non viene piu- prodotta';"
+    + "if (t.score !== 0) return 'punteggio ' + t.score + ' invece di 0 sul rialzo pienamente prezzato';"
+    + "if (String(t.sub).indexOf('rialzo 0%') >= 0) return 'la tessera stampa ancora rialzo 0%';"
+    + "if (String(t.sub).indexOf('1,97') < 0 || String(t.sub).indexOf('0,82') < 0)"
+    + "  return 'la tessera non porta i due numeri: ' + t.sub;"
+    + "return true;"));
+
+/* ⚠ LA CONTINUITA' E' LA PROVA CHE NON SONO DUE DERIVAZIONI: nel tratto dove esistono entrambe
+   le rese devono coincidere al punto, altrimenti il punteggio cambierebbe di scatto passando
+   da 0,99 a 1,01 movimenti — un salto che non e' nel mercato ma nella nostra formula. */
+check("v450 il punteggio dai movimenti coincide con quello dalle probabilita' dove esistono entrambe",
+  suVeriEsito(_FW450(0.5, 50)
+    + "const r = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);"
+    + "const daProb = 50 + (r.cut_prob || 0) * 0.5 - (r.hike_prob || 0) * 0.5;"
+    + "const daMosse = 50 - (r.mosse_25bp || 0) * 50;"
+    + "if (Math.abs(daProb - daMosse) > 0.001) return 'prob ' + daProb + ' contro mosse ' + daMosse;"
+    + "return true;"));
+
+check("v450 il popup non stampa piu' tre zeri dove non c'e' probabilita'",
+  suVeriEsito(_FW450(1.97, 82)
+    + "const r = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);"
+    + "const riga = rigaFedWatch(r);"
+    + "if (riga.indexOf('rialzo 0%') >= 0 || riga.indexOf('taglio 0%') >= 0) return 'stampa ancora gli zeri: ' + riga;"
+    + "if (riga.indexOf('1,97') < 0 || riga.indexOf('0,82') < 0) return 'la riga non porta i due numeri: ' + riga;"
+    + "const nonPrezzata = rigaFedWatch({prezzata: false});"
+    + "if (nonPrezzata.indexOf('non prezzata') < 0) return 'la riunione non prezzata non lo dichiara';"
+    + "return true;"));
+
+/* ⚠ TRE SUPERFICI, GLI STESSI DUE NUMERI. E' la classe v443/v446 — una correzione applicata a
+   una superficie e non alle altre — misurata invece che sperata. */
+check("v450 pacchetto, tessera e popup pubblicano gli stessi due numeri",
+  suVeriEsito(_FW450(1.97, 82)
+    + "const r = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);"
+    + "const frase = divergenzaFedWatch(r), riga = rigaFedWatch(r), p = buildPrompt();"
+    + "for (const n of ['1,97', '0,82']) {"
+    + "  if (frase.indexOf(n) < 0) return 'la frase condivisa non porta ' + n;"
+    + "  if (riga.indexOf(n) < 0) return 'il popup non porta ' + n;"
+    + "  if (p.indexOf(n) < 0) return 'il pacchetto non porta ' + n; }"
+    + "if (p.indexOf(frase) < 0) return 'il pacchetto non usa la frase condivisa: due formulazioni';"
+    + "return true;"));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

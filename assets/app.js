@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "447";
+const BUILD_VERSION = "450";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3905,9 +3905,26 @@ function indicatoriClassifica() {
     sub: `${fmtNum.format(m.forward_pe.value)}× vs media storica ${fmtNum.format(m.forward_pe.avg ?? 16.5)}×` });
   if ((m.fedwatch?.meetings || []).length) {
     const rf = ramiFedWatch(m.fedwatch, m.fedwatch.meetings[0]);
+    /* ⚠⚠ v450 — IL PUNTEGGIO VENIVA DALLE PROBABILITA', CHE SOPRA UN MOVIMENTO INTERO SONO
+       NULLE PER COSTRUZIONE (v441): il `?? 0` le faceva valere zero, quindi la tessera scriveva
+       "rialzo 0% · invariato 0% · taglio 0%" e assegnava 50, cioe' NEUTRO, sulla riunione piu'
+       prezzata del trimestre. E' il difetto che la v443 ha chiuso sulla scheda a barre e ha
+       lasciato su questa superficie e sul popup: una correzione applicata a una superficie e non
+       alle altre (v412). Ora il punteggio esce dai MOVIMENTI, che e' la grandezza che il
+       contratto produce davvero: nel tratto dove esistono entrambe le rese coincidono al punto
+       (a 0,5 movimenti: 50 - 25 = 25, come 50 - hike 50 x 0,5).
+       ⚠ Il punteggio resta anche quando la derivazione e' SOSPETTA, e la ragione e' misurata: le
+       due fonti divergono sulla GRANDEZZA, non sul VERSO — 1,97 e 0,82 stanno entrambe dalla
+       parte del rialzo, e il punteggio satura comunque nella meta' restrittiva. Si dichiara che
+       la magnitudine e' in disputa invece di togliere una direzione su cui le fonti concordano. */
     orf.push({ k: "fedwatch", nome: "Attese sui tassi (prossimo FOMC)",
-      score: cl(50 + (rf.cut_prob ?? 0) * 0.5 - (rf.hike_prob ?? 0) * 0.5),
-      sub: `rialzo ${rf.hike_prob ?? 0}% · invariato ${rf.hold_prob ?? 0}% · taglio ${rf.cut_prob ?? 0}%` });
+      score: cl(50 - (rf.mosse_25bp ?? 0) * 50),
+      sub: rf.sospetta ? `⚠ ${divergenzaFedWatch(rf)} — il VERSO resta il rialzo, in disputa e' la grandezza`
+        : rf.hike_prob != null || rf.cut_prob != null
+          ? `rialzo ${rf.hike_prob ?? 0}% · invariato ${rf.hold_prob ?? 0}% · taglio ${rf.cut_prob ?? 0}%`
+          : rf.mosse_25bp != null
+            ? `${fmtNum.format(rf.mosse_25bp)} movimenti da 25bp impliciti — oltre il movimento intero non e' una probabilita'`
+            : "questo contratto non prezza la riunione: il future a 30 giorni copre il mese corrente" });
   }
   if (m.witching?.days != null) orf.push({ k: "witching", nome: "Prossima scadenza tecnica",
     score: m.witching.days <= 5 ? 30 : m.witching.days <= 15 ? 45 : 62,
@@ -7361,6 +7378,73 @@ function movimentiImpliciti(implied, effr, riunione, meseContratto) {
            giorni_mese: giorni, base_effr: effr };
 }
 
+/* ⚠⚠ v450 — IL CONTROLLO INCROCIATO, PERCHE' IL CONTRATTO NON E' VERIFICABILE DA QUI.
+   La v441 ha dichiarato di non poter verificare QUALE contratto Yahoo serva come `ZQ=F`
+   (trappola v203). Quel limite e' diventato un numero sbagliato: l'11/09 la nostra derivazione
+   dava 1,97 movimenti sul FOMC del 16/09 mentre CME FedWatch pubblicava ~0,7 e Polymarket
+   quotava +25bp all'82% e invariato al 18% — cioe' due rialzi quasi pieni contro uno solo.
+   Non si indovina quale contratto sia: si usa la SECONDA fonte che il sistema gia' ha.
+
+   ⚠ Le due grandezze restano diverse (v441, C14): i futures dicono QUANTI movimenti, i mercati
+   di previsione con che PROBABILITA' se ne verifichi uno. Ma da una distribuzione quotata si
+   ricava un'ATTESA nella stessa unita' — somma di (probabilita' x passi) — e quella si
+   confronta. Oggi: 0,18x0 + 0,82x1 = 0,82 movimenti.
+
+   ⚠ SOGLIA_DIVERGENZA e' una CONVENZIONE DICHIARATA (v240), non un dato del file: un movimento
+   INTERO, cioe' la granularita' della cosa misurata. Sotto, le due fonti possono legittimamente
+   differire (strumenti, commissioni, popolazioni diverse); sopra, descrivono due mondi. */
+const SOGLIA_DIVERGENZA = 1;
+const MESI_EN = ["january", "february", "march", "april", "may", "june", "july", "august",
+                 "september", "october", "november", "december"];
+
+function attesaPrevisione(dataRiunione) {
+  const d = new Date(String(dataRiunione) + "T00:00:00Z");
+  if (isNaN(d.getTime())) return null;
+  const mese = MESI_EN[d.getUTCMonth()], anno = String(d.getUTCFullYear());
+  let atteso = 0, viste = 0;
+  for (const x of (typeof DATA !== "undefined" && DATA && DATA.predictions) || []) {
+    const t = String((x && x.question) || "");
+    if (!/\bfed\b/i.test(t)) continue;
+    const b = t.toLowerCase();
+    // ⚠ La domanda deve riguardare QUESTA riunione: senza il filtro la quota di ottobre
+    //   finirebbe accanto ai movimenti di settembre. Se non nomina nessun mese si accetta.
+    const citati = MESI_EN.filter(m => b.indexOf(m) >= 0);
+    if (citati.length && (citati.indexOf(mese) < 0 || b.indexOf(anno) < 0)) continue;
+    const p = numero(x.yes != null ? x.yes : x.probability);
+    if (p == null) continue;
+    const pct = p > 1 ? p : p * 100;
+    if (/no change|unchanged|hold/.test(b)) { viste++; continue; }   // contribuisce zero
+    const bp = (b.match(/by\s+(\d+)\s*bps/) || [])[1];
+    if (!bp) continue;
+    const passi = Number(bp) / 25;
+    if (/increase|hike|raise/.test(b)) { atteso += pct / 100 * passi; viste++; }
+    else if (/decrease|cut|lower/.test(b)) { atteso -= pct / 100 * passi; viste++; }
+  }
+  // ⚠ Con una sola voce non c'e' una distribuzione, quindi non c'e' un'attesa: si dichiara
+  //   assente invece di costruirne una su un ramo solo (v389, v406).
+  return viste >= 2 ? Math.round(atteso * 100) / 100 : null;
+}
+
+/* La frase della divergenza vive in un posto solo: pacchetto, tessera macro e popup la
+   pubblicano tutte e tre, e tre formulazioni divergono al primo ritocco (v161, v207, v443). */
+function divergenzaFedWatch(mt) {
+  if (!mt || !mt.sospetta) return "";
+  return `la nostra derivazione dal future da' ${fmtNum.format(mt.mosse_25bp)} movimenti da 25bp`
+    + ` mentre i mercati di previsione sulla STESSA riunione ne quotano`
+    + ` ${fmtNum.format(mt.attesa_previsione)}: oltre un movimento intero di distanza, quindi le`
+    + ` due letture non descrivono lo stesso mondo e il nostro numero NON e' attribuibile`;
+}
+
+/* La riga che il popup mostra per una riunione: tre stati, gli stessi del pacchetto e della
+   scheda a barre (v446) — PROBABILITA' · MOVIMENTI · NON PREZZATA — piu' la disputa. */
+function rigaFedWatch(r) {
+  if (!r || !r.prezzata) return `<span class="muted">non prezzata da questo contratto</span>`;
+  if (r.sospetta) return `<span class="neg">${fmtNum.format(r.mosse_25bp)} movimenti</span> ⚠ contro ${fmtNum.format(r.attesa_previsione)} dei mercati di previsione — derivazione non attribuibile`;
+  if (r.hike_prob != null || r.cut_prob != null)
+    return `<span class="neg">rialzo ${r.hike_prob ?? 0}%</span> · invariato ${r.hold_prob ?? 0}% · <span class="pos">taglio ${r.cut_prob ?? 0}%</span>`;
+  return `<span class="${r.mosse_25bp > 0 ? "neg" : "pos"}">${fmtNum.format(r.mosse_25bp)} movimenti da 25bp</span> — oltre il movimento intero non e' una probabilita'`;
+}
+
 function ramiFedWatch(fw, riunione) {
   const mt = { ...(riunione || {}) };
   /* ⚠⚠ v441 — NON CI SI FIDA DELLE PROBABILITA' DELLO SNAPSHOT VECCHIO. Prima il ripiego
@@ -7383,6 +7467,10 @@ function ramiFedWatch(fw, riunione) {
   mt.giorni_nuovo = mv ? mv.giorni_nuovo : null;
   mt.giorni_mese = mv ? mv.giorni_mese : null;
   mt.base_effr = mv ? mv.base_effr : null;
+  // v450 — il confronto con la seconda fonte viaggia COL numero, non in una nota lontana
+  mt.attesa_previsione = mv ? attesaPrevisione(mt.date) : null;
+  mt.sospetta = !!(mv && mt.attesa_previsione != null
+                   && Math.abs(mv.mosse_25bp - mt.attesa_previsione) > SOGLIA_DIVERGENZA);
   mt.cut_prob = mt.hike_prob = mt.hold_prob = null;
   if (mv) {
     const x = mv.mosse_25bp;
@@ -7843,12 +7931,12 @@ function openMacroInfo(key) {
     // nel payload in v187 e sopravvissuta qui per due versioni.
     const primo = ramiFedWatch(fw, (fw.meetings || [])[0]);
     extra = `<div class="info-line"><b>Range attuale:</b> ${fw.target_range} · implicito ${fmtNum.format(fw.implied_rate)}%</div>
-      <div class="info-line"><b>Prossima riunione:</b> <span class="neg">rialzo ${primo.hike_prob ?? 0}%</span> · invariato ${primo.hold_prob ?? 0}% · <span class="pos">taglio ${primo.cut_prob ?? 0}%</span></div>`;
+      <div class="info-line"><b>Prossima riunione:</b> ${rigaFedWatch(primo)}</div>`;
     if ((fw.meetings || []).length) {
       extra += `<table class="info-table"><thead><tr><th>Riunione FOMC</th><th>Rialzo</th><th>Invariato</th><th>Taglio</th></tr></thead><tbody>`
         + fw.meetings.map(x => { const r = ramiFedWatch(fw, x); return `<tr><td>${new Date(r.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}</td>
-          <td class="neg">${r.hike_prob ?? 0}%</td><td>${r.hold_prob ?? 0}%</td><td class="pos">${r.cut_prob ?? 0}%</td></tr>`; }).join("")
-        + `</tbody></table><div class="info-line muted" style="font-size:11px">Probabilità stimate dai futures sui Fed Funds (stile CME FedWatch). Tutti e tre i rami sono sempre mostrati, anche a zero: uno zero esplicito è informazione, l'assenza della voce no.</div>`;
+          <td colspan="3">${rigaFedWatch(r)}</td></tr>`; }).join("")
+        + `</tbody></table><div class="info-line muted" style="font-size:11px">Probabilità stimate dai futures sui Fed Funds (stile CME FedWatch). ⚠ Una probabilità esiste solo fino a un movimento intero: oltre, il contratto dice QUANTI movimenti sono prezzati, e uno zero stampato al suo posto direbbe l'opposto. Una riunione che questo contratto non prezza lo dichiara invece di prendere tre zeri.</div>`;
     }
     if ((fw.dot_plot || []).length) {            // Dot Plot: mediana proiezioni FOMC
       const mx = Math.max(...fw.dot_plot.map(d => d.median));
@@ -9794,6 +9882,16 @@ function buildPrompt(opz) {
     if (mt.hike_prob != null || mt.cut_prob != null) {
       rami.push(`RIALZO ${mt.hike_prob ?? 0}%`, `invariato ${mt.hold_prob ?? 0}%`,
                 `taglio ${mt.cut_prob ?? 0}%`);
+    } else if (mt.prezzata && mt.sospetta) {
+      /* ⚠⚠ v450 — QUI LA CORREZIONE MORDE: senza, la riga affermava "un rialzo da 25bp gia'
+         pienamente prezzato piu' il 97% di un secondo" su un numero che la seconda fonte non
+         sostiene. L'avviso sta DENTRO l'affermazione, non in una nota piu' sotto: la frase che
+         si legge e' quella (v391). Il numero non sparisce — sparirebbe l'unica prova che la
+         divergenza esiste (v406) — ma smette di presentarsi come misura. */
+      rami.push(`⚠⚠ DERIVAZIONE NON ATTRIBUIBILE A QUESTA RIUNIONE: ${divergenzaFedWatch(mt)}.`
+        + ` La causa piu' probabile e' che il contratto letto come front-month non sia quello del`
+        + ` mese corrente — un limite che il sistema dichiara di non poter verificare. Per questa`
+        + ` riunione vale la quotazione dei mercati di previsione qui sotto, non la nostra`);
     } else if (mt.prezzata && mt.mosse_25bp != null) {
       const x = mt.mosse_25bp, su = x > 0;
       /* ⚠ v446 — UNA RESA SOLA. `toFixed(2)` stampa "1.37" col punto decimale inglese dentro
@@ -9838,10 +9936,20 @@ function buildPrompt(opz) {
       const q = [];
       if (pmHike != null) q.push(`RIALZO ${pmHike}%`);
       if (pmHold != null) q.push(`INVARIATO ${pmHold}%`);
-      pezzi.push(`${q.join(" · ")} — ⚠ NON e' lo stesso numero in due versioni: i futures`
-        + ` esprimono QUANTI movimenti sono prezzati (${mt.mosse_25bp}), Polymarket con che`
-        + ` PROBABILITA' se ne verifichi uno. Che le due letture divergano cosi' tanto e' esso`
-        + ` stesso un fatto: una delle due sta prezzando qualcosa che l'altra non prezza`);
+      /* ⚠⚠ v450 — QUANDO LA DERIVAZIONE E' SOSPETTA QUESTA RIGA SI CONTRADDICEVA CON QUELLA
+         SOPRA. Diceva "una delle due sta prezzando qualcosa che l'altra non prezza", cioe'
+         trattava le due letture come entrambe legittime, due righe dopo aver dichiarato che la
+         nostra non e' attribuibile. E' il pacchetto che produce da solo il falso positivo del
+         proprio collaudo B5 (v400, v412, v414, v415) — qui generato dalla correzione stessa.
+         ⚠ E `${mt.mosse_25bp}` grezzo stampava "1.97" col punto inglese dentro un pacchetto che
+         ovunque usa la virgola: la classe chiusa da v442 e v443, rientrata da una riga sola. */
+      pezzi.push(mt.sospetta
+        ? `${q.join(" · ")} — su questa riunione e' la quotazione da usare: la derivazione dal`
+          + ` future e' dichiarata non attribuibile qui sopra`
+        : `${q.join(" · ")} — ⚠ NON e' lo stesso numero in due versioni: i futures`
+          + ` esprimono QUANTI movimenti sono prezzati (${fmtNum.format(mt.mosse_25bp)}), Polymarket con che`
+          + ` PROBABILITA' se ne verifichi uno. Che le due letture divergano cosi' tanto e' esso`
+          + ` stesso un fatto: una delle due sta prezzando qualcosa che l'altra non prezza`);
     }
     const conf = pezzi.length ? ` · POLYMARKET sulla stessa riunione: ${pezzi.join(" · ")}` : "";
     const pmPct = pmHike;
