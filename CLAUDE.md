@@ -5195,6 +5195,98 @@ trova va riagganciata, non allentata.
 rotto il file **due volte**: l'ancora si sceglie **senza apostrofi** quando si può. È la famiglia
 dei backtick e dei backslash dentro un template passato al vm, su un altro linguaggio.
 
+## 🏦 v450 — IL CONTRATTO NON È VERIFICABILE DA QUI, MA LA SECONDA FONTE SÌ
+
+Il CEO ha chiesto feed online; verificandoli è uscito un numero nostro che non torna, e il FOMC
+era fra cinque giorni. Sulla riunione del **16/09**, tre letture:
+
+| fonte | 16/09 |
+|---|---|
+| Polymarket (già dentro `data.json`) | +25bp **82%** · invariato 18% → **0,82 movimenti attesi** |
+| CME FedWatch (verificato online) | **~66-70%** di un rialzo da 25bp |
+| **nostra derivazione dal future** | **1,97 movimenti** — due rialzi quasi pieni |
+
+Siamo l'unico outlier, di circa tre volte. La causa probabile è che `ZQ=F` di Yahoo non serva il
+contratto di settembre — **ed è esattamente il limite che la v441 aveva DICHIARATO di non poter
+verificare** (trappola v203). Yahoo rifiuta la connessione da questo ambiente, quindi non si
+indovina: *un ID indovinato e scritto come se fosse certo è peggio di un tentativo dichiarato*
+(v195).
+
+> **Quando la fonte non è verificabile, si verifica il RISULTATO contro l'altra fonte che il
+> sistema già ha.** La guardia di plausibilità della v441 scattava oltre **tre** movimenti: 1,97
+> ci passava sotto comodamente. Una soglia più bassa sarebbe stata una tacca senza provenienza
+> (v240) e avrebbe soppresso un ambiente in cui 50bp sono davvero prezzati.
+
+### Le due grandezze restano diverse, e il confronto passa da una terza
+I futures dicono QUANTI movimenti, i mercati di previsione con che PROBABILITÀ se ne verifichi
+uno (v441, C14). Ma da una **distribuzione quotata** si ricava un'attesa nella stessa unità —
+somma di (probabilità × passi) — e quella si confronta: oggi 0,18×0 + 0,82×1 = **0,82**.
+
+⚠ `SOGLIA_DIVERGENZA` è **un movimento intero**, cioè la granularità della cosa misurata, e la
+riga lo dichiara convenzione (v240). Sotto, due fonti possono legittimamente differire
+(strumenti, commissioni, popolazioni); sopra, descrivono due mondi. Il gate percorre **entrambi i
+versi**: una guardia che marca sospetto tutto è l'avviso che suona sempre (v421, v427, v438).
+
+⚠ **Con una voce sola non c'è distribuzione, quindi non c'è attesa**: si dichiara assente invece
+di costruirla su un ramo solo. E la domanda deve riguardare **questa** riunione — senza il filtro
+sul mese, la quota di ottobre finirebbe accanto ai movimenti di settembre.
+
+⚠ **Il numero non sparisce**: sparirebbe l'unica prova che la divergenza esiste (v406). Smette di
+presentarsi come misura, e l'avviso sta **dentro** l'affermazione, non in una nota più sotto — la
+frase che si legge è quella (v391).
+
+### ⚠⚠ E LA CORREZIONE HA PRODOTTO DA SOLA IL FALSO POSITIVO DEL PROPRIO COLLAUDO
+Due righe sotto la nuova dichiarazione, il blocco Polymarket continuava a scrivere *"una delle
+due sta prezzando qualcosa che l'altra non prezza"* — cioè trattava le due letture come entrambe
+legittime, subito dopo aver detto che la nostra non è attribuibile. È la classe v400/v412/v414/
+v415, **generata dalla correzione stessa**. E nella stessa frase `${mt.mosse_25bp}` grezzo
+stampava `1.97` col punto inglese: la classe chiusa da v442 e v443, rientrata da una riga sola.
+
+### 🕳️ E il difetto della v443 era stato corretto su UNA superficie su TRE
+Misurato rendendo le superfici sui dati veri, non rileggendo il codice:
+
+| superficie | cosa pubblicava oggi |
+|---|---|
+| scheda a barre (corretta in v443) | corretta |
+| **tessera macro** | *"rialzo 0% · invariato 0% · taglio 0%"* e **punteggio 50 = NEUTRO** |
+| **popup** | *"rialzo 0% · invariato 0% · taglio 0%"*, riga e tabella |
+
+Sopra il movimento intero le probabilità sono **nulle per costruzione** (v441) e il `?? 0` le
+faceva valere zero: la tessera dichiarava neutra la riunione più prezzata del trimestre, e quel
+punteggio entra nella classificazione macro. Classe **v412** — una correzione applicata a una
+superficie e non alle altre — per la seconda volta sullo stesso blocco.
+
+⚠ Ora il punteggio esce dai **MOVIMENTI**, che è la grandezza che il contratto produce davvero, e
+un gate verifica la **continuità**: dove esistono entrambe le rese coincidono al punto (a 0,5
+movimenti: 50 − 25 = 25, come 50 − hike 50 × 0,5). Senza quella prova sarebbero due derivazioni,
+e il punteggio salterebbe passando da 0,99 a 1,01 movimenti — un salto che sta nella formula, non
+nel mercato.
+
+⚠ **Il punteggio resta anche quando la derivazione è sospetta**, e la ragione è misurata: le due
+fonti divergono sulla GRANDEZZA, non sul VERSO — 1,97 e 0,82 stanno entrambe dalla parte del
+rialzo. Si dichiara che la magnitudine è in disputa invece di togliere una direzione su cui le
+fonti concordano.
+
+⚠ La frase della divergenza vive in **un posto solo** (`divergenzaFedWatch`) e la riga del popup
+in un altro (`rigaFedWatch`): tre superfici con tre formulazioni divergono al primo ritocco
+(v161, v207, v443, v446), e un gate verifica che il pacchetto usi la frase condivisa invece di
+scriversene una propria.
+
+### 🎯 Il mio gate sulla tessera era CIRCOLARE, e l'ha detto l'iniezione
+Si calcolava da sé il punteggio (`50 - mosse × 50`) e poi verificava che valesse 0: l'iniezione
+che riportava la tessera alle probabilità restava **verde**. *Un check che non passa dal codice
+reale certifica una strada immaginaria* (v226), ed è la definizione di gate decorativo (v415).
+Ora esegue `indicatoriClassifica()` e legge la voce prodotta.
+
+⚠ **E ho violato la regola v430 mentre validavo**: ho modificato `assets/app.js` (il bump di
+`BUILD_VERSION`) **mentre l'harness delle iniezioni ci stava lavorando**. Due processi che
+scrivono sullo stesso file si sporcano lo snapshot a vicenda, ed è scritto in questo file da
+v430 — *un'iniezione alla volta*. Nessun danno perché me ne sono accorto prima del commit, ma il
+bump è stato riapplicato dopo la fine dell'harness invece che prima.
+
+⚠ `?v=` e `BUILD_VERSION` **sono stati bumpati** qui, a differenza di v448 e v449: questa
+versione tocca `assets/app.js`, cioè un file servito al browser (regola v440).
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
