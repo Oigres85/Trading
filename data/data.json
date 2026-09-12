@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T08:56:03Z",
+ "updated_at": "2026-09-12T12:03:39Z",
  "eurusd": 1.1602,
  "totals": {
   "usd_value": 0,
@@ -82,7 +82,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -0.22,
-   "pe": 22.1,
+   "pe": 22.0,
    "ath": 1254.81,
    "ath_dist_pct": -22.3,
    "sma200_dist_pct": 56.8,
@@ -950,7 +950,7 @@
     "target_mediana": 1540.0
    },
    "health": 79,
-   "eps": 44.18,
+   "eps": 44.28,
    "beta": 2.22,
    "sharpe_1y": 2.24,
    "sortino_1y": 3.6,
@@ -970,10 +970,10 @@
     "shares": 1129393151.0,
     "float_shares": 1125620978.0,
     "float_pct": 99.7,
-    "avg_volume_30d": 41244370.0,
-    "pe_ttm": 22.0747,
+    "avg_volume_30d": 40929053.0,
+    "pe_ttm": 22.0248,
     "forward_pe": 6.249,
-    "eps_ttm": 44.18,
+    "eps_ttm": 44.28,
     "eps_forward": 156.0661,
     "revenue_fy": 90273996800.0,
     "net_income_fy": 50468999168.0,
@@ -1742,7 +1742,7 @@
      "a1": 483.81,
      "a3": 1349.59,
      "a5": 1307.06,
-     "a10": 5525.0
+     "a10": 5525.01
     },
     "stagionalita": [
      {
@@ -2055,7 +2055,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.49,
-   "pe": 128.1,
+   "pe": 131.7,
    "ath": 584.73,
    "ath_dist_pct": -11.7,
    "sma200_dist_pct": 48.8,
@@ -2923,7 +2923,7 @@
     "target_mediana": 620.0
    },
    "health": 81,
-   "eps": 4.03,
+   "eps": 3.92,
    "beta": 2.48,
    "sharpe_1y": 1.63,
    "sortino_1y": 2.65,
@@ -2943,10 +2943,10 @@
     "shares": 1632475042.0,
     "float_shares": 1623447455.0,
     "float_pct": 99.4,
-    "avg_volume_30d": 25688293.0,
-    "pe_ttm": 128.072,
+    "avg_volume_30d": 25485840.0,
+    "pe_ttm": 131.6658,
     "forward_pe": 33.2762,
-    "eps_ttm": 4.03,
+    "eps_ttm": 3.92,
     "eps_forward": 15.5105,
     "revenue_fy": 41305001984.0,
     "net_income_fy": 6469000192.0,
@@ -4608,7 +4608,7 @@
      218.29
     ],
     "y1": [
-     177.4,
+     177.39,
      176.25,
      177.76,
      187.17,
@@ -4743,9 +4743,9 @@
    "stats": {
     "market_cap": 5271048421376.0,
     "shares": 24147000000.0,
-    "float_shares": 23129734000.0,
+    "float_shares": 23130698000.0,
     "float_pct": 95.8,
-    "avg_volume_30d": 132796621.0,
+    "avg_volume_30d": 132087064.0,
     "pe_ttm": 27.6316,
     "forward_pe": 14.0221,
     "eps_ttm": 7.9,
@@ -5515,7 +5515,7 @@
      "a1": 17.28,
      "a3": 403.33,
      "a5": 958.37,
-     "a10": 12885.79
+     "a10": 12885.8
     },
     "stagionalita": [
      {
@@ -5828,7 +5828,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.77,
-   "pe": 16.7,
+   "pe": 17.0,
    "ath": 408.1,
    "ath_dist_pct": -17.1,
    "sma200_dist_pct": 0.6,
@@ -6461,7 +6461,7 @@
     "target_mediana": 429.0
    },
    "health": 47,
-   "eps": 20.28,
+   "eps": 19.94,
    "beta": 1.23,
    "sharpe_1y": 0.99,
    "sortino_1y": 1.56,
@@ -6481,10 +6481,10 @@
     "shares": 5867155790.0,
     "float_shares": 10879563400.0,
     "float_pct": null,
-    "avg_volume_30d": 29851170.0,
-    "pe_ttm": 16.6913,
+    "avg_volume_30d": 29850733.0,
+    "pe_ttm": 16.9759,
     "forward_pe": 22.7581,
-    "eps_ttm": 20.28,
+    "eps_ttm": 19.94,
     "eps_forward": 14.8738,
     "revenue_fy": 445865984000.0,
     "net_income_fy": 244118994944.0,
@@ -7563,7 +7563,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 0.83,
-   "pe": 140.5,
+   "pe": 142.9,
    "ath": 207.52,
    "ath_dist_pct": -19.4,
    "sma200_dist_pct": 10.4,
@@ -8003,7 +8003,7 @@
     "target_mediana": 205.1
    },
    "health": 63,
-   "eps": 1.19,
+   "eps": 1.17,
    "beta": 1.62,
    "sharpe_1y": -0.1,
    "sortino_1y": -0.15,
@@ -8023,10 +8023,10 @@
     "shares": 2300713329.0,
     "float_shares": 2109933407.0,
     "float_pct": 91.7,
-    "avg_volume_30d": 40642578.0,
-    "pe_ttm": 140.5294,
+    "avg_volume_30d": 40235169.0,
+    "pe_ttm": 142.9316,
     "forward_pe": 71.8969,
-    "eps_ttm": 1.19,
+    "eps_ttm": 1.17,
     "eps_forward": 2.326,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
@@ -8986,7 +8986,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -1.74,
-   "pe": 24.0,
+   "pe": 23.5,
    "ath": 341.82,
    "ath_dist_pct": -56.0,
    "sma200_dist_pct": -9.9,
@@ -9840,7 +9840,7 @@
     "target_mediana": 240.0
    },
    "health": 54,
-   "eps": 6.27,
+   "eps": 6.39,
    "beta": 1.73,
    "sharpe_1y": -1.22,
    "sortino_1y": -1.68,
@@ -9858,33 +9858,33 @@
    "stats": {
     "market_cap": 432877174784.0,
     "shares": 2880471000.0,
-    "float_shares": 1713332956.0,
-    "float_pct": 59.5,
-    "avg_volume_30d": 31564200.0,
-    "pe_ttm": 23.9681,
+    "float_shares": 1764206460.0,
+    "float_pct": 61.2,
+    "avg_volume_30d": 32337727.0,
+    "pe_ttm": 23.518,
     "forward_pe": 13.6691,
-    "eps_ttm": 6.27,
+    "eps_ttm": 6.39,
     "eps_forward": 10.9941,
-    "revenue_fy": 67356999680.0,
-    "net_income_fy": 16984000512.0,
-    "revenue_growth": 0.206,
-    "earnings_growth": 0.219,
-    "profit_margin": 0.2537,
-    "roe": 0.5338,
-    "debt_to_equity": 388.87,
+    "revenue_fy": 71776002048.0,
+    "net_income_fy": 18736001024.0,
+    "revenue_growth": 0.296,
+    "earnings_growth": 0.545,
+    "profit_margin": 0.2636,
+    "roe": 0.4119,
+    "debt_to_equity": 232.054,
     "dividend_yield": 0.0133,
     "price_to_book": 11.5245,
     "target_mean": 241.4132,
-    "fcf": -24536750080.0,
-    "gross_margin": 0.6582,
-    "enterprise_value": 581579243520.0,
-    "ev_ebitda": 19.072,
+    "fcf": -41130123264.0,
+    "gross_margin": 0.6396,
+    "enterprise_value": 564584448000.0,
+    "ev_ebitda": 16.503,
     "peg": 0.91,
-    "roa": 0.065,
+    "roa": 0.0634,
     "short_float": 0.026,
     "buyback_yield": -0.0143,
-    "ps": 6.43,
-    "ev_s": 8.63,
+    "ps": 6.03,
+    "ev_s": 7.87,
     "altman_z": 0.89,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -10947,7 +10947,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -2.98,
-   "pe": 17.1,
+   "pe": 16.6,
    "ath": 799.61,
    "ath_dist_pct": -44.1,
    "sma200_dist_pct": 18.0,
@@ -11890,7 +11890,7 @@
     "target_mediana": 640.0
    },
    "health": 45,
-   "eps": 26.12,
+   "eps": 26.92,
    "beta": 2.18,
    "sharpe_1y": 1.87,
    "sortino_1y": 2.87,
@@ -11908,12 +11908,12 @@
    "stats": {
     "market_cap": 161226686464.0,
     "shares": 360540944.0,
-    "float_shares": 358020763.0,
+    "float_shares": 358024368.0,
     "float_pct": 99.3,
-    "avg_volume_30d": 8384985.0,
-    "pe_ttm": 17.1202,
+    "avg_volume_30d": 8332358.0,
+    "pe_ttm": 16.6114,
     "forward_pe": 14.0846,
-    "eps_ttm": 26.12,
+    "eps_ttm": 26.92,
     "eps_forward": 31.7495,
     "revenue_fy": 12919000064.0,
     "net_income_fy": 9285999616.0,
@@ -13696,9 +13696,9 @@
    "stats": {
     "market_cap": 212184170496.0,
     "shares": 876926613.0,
-    "float_shares": 873997461.0,
+    "float_shares": 873988692.0,
     "float_pct": 99.7,
-    "avg_volume_30d": 31645580.0,
+    "avg_volume_30d": 31245996.0,
     "pe_ttm": 75.1911,
     "forward_pe": 35.0674,
     "eps_ttm": 3.14,
@@ -15236,7 +15236,7 @@
     "shares": 333768747.0,
     "float_shares": 327994548.0,
     "float_pct": 98.3,
-    "avg_volume_30d": 22513272.0,
+    "avg_volume_30d": 22185561.0,
     "pe_ttm": null,
     "forward_pe": -74.4878,
     "eps_ttm": -0.83,
@@ -16204,7 +16204,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 6.68,
-   "pe": 332.2,
+   "pe": 358.1,
    "ath": 351.28,
    "ath_dist_pct": -21.5,
    "sma200_dist_pct": 41.6,
@@ -16670,7 +16670,7 @@
     "target_mediana": 288.5
    },
    "health": 88,
-   "eps": 0.83,
+   "eps": 0.77,
    "beta": 3.81,
    "sharpe_1y": 1.22,
    "sortino_1y": 1.86,
@@ -16688,12 +16688,12 @@
    "stats": {
     "market_cap": 81215922176.0,
     "shares": 294527346.0,
-    "float_shares": 289317157.0,
+    "float_shares": 289299486.0,
     "float_pct": 98.2,
-    "avg_volume_30d": 15224865.0,
-    "pe_ttm": 332.2289,
+    "avg_volume_30d": 15198656.0,
+    "pe_ttm": 358.1169,
     "forward_pe": 56.0453,
-    "eps_ttm": 0.83,
+    "eps_ttm": 0.77,
     "eps_forward": 4.9201,
     "revenue_fy": 3113149952.0,
     "net_income_fy": 244942000.0,
@@ -18020,9 +18020,9 @@
    "stats": {
     "market_cap": 1349221220352.0,
     "shares": 7098548910.0,
-    "float_shares": 5671182650.0,
+    "float_shares": 5673884737.0,
     "float_pct": 79.9,
-    "avg_volume_30d": 33169359.0,
+    "avg_volume_30d": 32762991.0,
     "pe_ttm": 11.0957,
     "forward_pe": 5.5773,
     "eps_ttm": 17.13,
@@ -19353,7 +19353,7 @@
     "target_mediana": 200.0
    },
    "health": 76,
-   "eps": -101.02,
+   "eps": -99.16,
    "beta": 3.6,
    "sharpe_1y": -1.23,
    "sortino_1y": -1.72,
@@ -19373,10 +19373,10 @@
     "shares": 377641410.0,
     "float_shares": 363654304.0,
     "float_pct": 96.3,
-    "avg_volume_30d": 23474506.0,
+    "avg_volume_30d": 23408556.0,
     "pe_ttm": null,
     "forward_pe": 2.6464,
-    "eps_ttm": -101.02,
+    "eps_ttm": -99.16,
     "eps_forward": 49.49,
     "revenue_fy": 498347008.0,
     "net_income_fy": -31367133184.0,
@@ -20866,7 +20866,7 @@
     "shares": 458871690.0,
     "float_shares": 327678926.0,
     "float_pct": 71.4,
-    "avg_volume_30d": 28280088.0,
+    "avg_volume_30d": 28107900.0,
     "pe_ttm": null,
     "forward_pe": -45.6687,
     "eps_ttm": -3.54,
@@ -21835,11 +21835,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77343.15,
+   "price": 77334.93,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.22,
+   "change_pct": 0.21,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -38.7,
@@ -21848,14 +21848,14 @@
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -38.7,
-   "day_high": 77366.49,
+   "day_high": 77376.09,
    "day_low": 77171.18,
    "support": 76162.91,
    "resistance": 82262.21,
    "rsi": 55.3,
-   "volume": 31686879232,
+   "volume": 30423738368,
    "vol_ratio": 1.21,
-   "atr_14": 2142.01,
+   "atr_14": 2142.69,
    "atr_pct": 2.77,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -21865,7 +21865,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77343.15
+     77334.93
     ],
     "m6": [
      82138.93,
@@ -21993,7 +21993,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77343.15
+     77334.93
     ],
     "all": [
      386.94,
@@ -22140,7 +22140,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77343.15
+     77334.93
     ],
     "m1": [
      77083.41,
@@ -22164,7 +22164,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77343.15
+     77334.93
     ],
     "m3": [
      63193.15,
@@ -22232,7 +22232,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77343.15
+     77334.93
     ],
     "y1": [
      116101.58,
@@ -22308,7 +22308,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77343.15
+     77334.93
     ],
     "d1": [
      77280.33,
@@ -22364,7 +22364,25 @@
      77284.87,
      77288.68,
      77332.54,
-     77343.15
+     77323.18,
+     77345.51,
+     77342.75,
+     77360.9,
+     77330.46,
+     77318.12,
+     77309.09,
+     77356.32,
+     77380.53,
+     77355.97,
+     77332.89,
+     77348.74,
+     77289.99,
+     77299.32,
+     77308.67,
+     77283.51,
+     77287.27,
+     77329.84,
+     77339.48
     ]
    },
    "earnings_date": null,
@@ -22378,7 +22396,7 @@
    "sharpe_6m": -0.38,
    "sortino_6m": -0.56,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77343.15,
+   "prezzo_limite_aggiustato": 77334.93,
    "risk_reward": "1:1.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22391,22 +22409,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.4
+     "change_pct": -1.41
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.34
+     "change_pct": 0.33
     },
     "m3": {
      "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 22.39
+     "change_pct": 22.38
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.39
+     "change_pct": -15.4
     }
    },
    "financials": [],
@@ -22433,55 +22451,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77343.15,
+     "prezzo": 77334.93,
      "medie": {
       "sma10": {
-       "liv": 78801.66,
-       "dist_pct": -1.85
+       "liv": 78800.84,
+       "dist_pct": -1.86
       },
       "ema10": {
-       "liv": 77975.62,
-       "dist_pct": -0.81
+       "liv": 77974.13,
+       "dist_pct": -0.82
       },
       "sma20": {
-       "liv": 78591.37,
-       "dist_pct": -1.59
+       "liv": 78590.96,
+       "dist_pct": -1.6
       },
       "ema20": {
-       "liv": 77033.28,
-       "dist_pct": 0.4
+       "liv": 77032.49,
+       "dist_pct": 0.39
       },
       "sma30": {
-       "liv": 75510.19,
-       "dist_pct": 2.43
+       "liv": 75509.92,
+       "dist_pct": 2.42
       },
       "ema30": {
-       "liv": 75485.24,
-       "dist_pct": 2.46
+       "liv": 75484.71,
+       "dist_pct": 2.45
       },
       "sma50": {
-       "liv": 70910.4,
-       "dist_pct": 9.07
+       "liv": 70910.24,
+       "dist_pct": 9.06
       },
       "ema50": {
-       "liv": 73028.6,
-       "dist_pct": 5.91
+       "liv": 73028.28,
+       "dist_pct": 5.9
       },
       "sma100": {
-       "liv": 67008.78,
-       "dist_pct": 15.42
+       "liv": 67008.7,
+       "dist_pct": 15.41
       },
       "ema100": {
-       "liv": 70923.17,
-       "dist_pct": 9.05
+       "liv": 70923.01,
+       "dist_pct": 9.04
       },
       "sma200": {
-       "liv": 70091.5,
-       "dist_pct": 10.35
+       "liv": 70091.46,
+       "dist_pct": 10.33
       },
       "ema200": {
-       "liv": 73231.74,
-       "dist_pct": 5.61
+       "liv": 73231.66,
+       "dist_pct": 5.6
       }
      },
      "medie_battute": 9,
@@ -22489,18 +22507,18 @@
      "oscillatori": {
       "rsi14": 55.3,
       "macd": {
-       "linea": 1815.62,
-       "segnale": 2571.36,
-       "istogramma": -755.74
+       "linea": 1814.96,
+       "segnale": 2571.23,
+       "istogramma": -756.27
       },
-      "stoch_k": 19.4,
+      "stoch_k": 19.2,
       "stoch_d": 13.7,
-      "williams_r": -80.6,
+      "williams_r": -80.8,
       "cci20": -17.6,
       "adx14": 44.4,
       "di_su": 29.5,
       "di_giu": 14.0,
-      "momentum10": 42.67
+      "momentum10": 34.45
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22991,21 +23009,21 @@
      {
       "d": "2026-09-12",
       "o": 77201.88,
-      "h": 77366.49,
+      "h": 77376.09,
       "l": 77171.18,
-      "c": 77343.15
+      "c": 77334.93
      }
     ],
     "performance": {
-     "s1": -2.24,
-     "m1": -1.27,
-     "m3": 24.23,
-     "m6": -4.12,
+     "s1": -2.25,
+     "m1": -1.28,
+     "m3": 24.22,
+     "m6": -4.13,
      "a1": -14.64,
      "ytd": -12.84,
-     "a3": 186.8,
-     "a5": 76.62,
-     "a10": 12584.72
+     "a3": 186.77,
+     "a5": 76.6,
+     "a10": 12583.37
     },
     "stagionalita": [
      {
@@ -35095,7 +35113,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.22,
-   "pe": 31.6,
+   "pe": 31.9,
    "ath": 479.0,
    "ath_dist_pct": -9.6,
    "sma200_dist_pct": 15.5,
@@ -35810,7 +35828,7 @@
     "target_mediana": 536.0
    },
    "health": 71,
-   "eps": 13.73,
+   "eps": 13.56,
    "beta": 1.25,
    "sharpe_1y": 1.23,
    "sortino_1y": 1.84,
@@ -35830,10 +35848,10 @@
     "shares": 5186474013.0,
     "float_shares": 37843003812.0,
     "float_pct": null,
-    "avg_volume_30d": 12738916.0,
-    "pe_ttm": 31.5543,
+    "avg_volume_30d": 12704888.0,
+    "pe_ttm": 31.9499,
     "forward_pe": 19.76,
-    "eps_ttm": 13.73,
+    "eps_ttm": 13.56,
     "eps_forward": 21.9251,
     "revenue_fy": null,
     "net_income_fy": null,
@@ -37500,7 +37518,7 @@
     "shares": 4773629865.0,
     "float_shares": 4714771009.0,
     "float_pct": 98.8,
-    "avg_volume_30d": 23830144.0,
+    "avg_volume_30d": 23786801.0,
     "pe_ttm": 46.0547,
     "forward_pe": 18.6748,
     "eps_ttm": 7.86,
@@ -47702,6 +47720,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Oil and Gas Markets Signal Winter Crisis and Rising Interest Rates",
+     "riassunto": "The surge in oil, gas and diesel prices is forcing central banks and governments to reassess the impact of the wars in Iran and Ukraine.",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-12T11:00:02Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-12/oil-and-gas-markets-signal-winter-crisis-and-rising-interest-rates"
+    },
+    {
      "titolo": "The Fed could raise interest rates three times. Here’s where the market could face the stiffest test.",
      "riassunto": "Economists note that the Fed historically has not been content to raise rates only once.",
      "fonte": "MarketWatch",
@@ -47714,27 +47739,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-09-11T23:03:26Z",
      "url": "https://www.bloomberg.com/news/videos/2026-09-11/former-ny-fed-president-on-remembering-9-11-video"
-    },
-    {
-     "titolo": "Bond Trader Whose Wrong-Way Bets Collapsed Firm Gets 16 Years",
-     "riassunto": "A former trader at IFS Securities Inc. was ordered to serve more than 16 years in prison for unauthorized bond trades in 2019 that led to $30 million in losses and bankrupted the Chicago broker-dealer.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-11T22:33:53Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-11/bond-trader-whose-wrong-way-bets-collapsed-firm-gets-16-years"
-    },
-    {
-     "titolo": "Bill Dudley Expects Fed to Raise Rate by 25 Bps",
-     "riassunto": "Bill Dudley, a Bloomberg Opinion columnist and former president of the Federal Reserve Bank of New York, says he would be shocked if the Federal Reserve did not raise interest rates by 25 basis points at their next meeting. He speaks on \"Bloomberg The Close.\" (Source: Bloomberg)",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-11T21:12:16Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-09-11/dudley-expects-fed-to-raise-rate-by-25-bps-video"
-    },
-    {
-     "titolo": "Japan’s GPIF May Sell $62 Billion of Treasuries, Santander Says",
-     "riassunto": "Japan’s Government Pension Investment Fund could sell as much as $62 billion of US Treasuries without a formal revamp of its asset-allocation policy, according to analysts at Banco Santander SA.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-11T21:08:09Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-11/japan-s-gpif-may-sell-62-billion-of-treasuries-santander-says"
     },
     {
      "titolo": "Oracle shook off fears about AI spending, but its stock still loses ground",
@@ -47826,6 +47830,20 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-05T23:55:52Z",
      "url": "https://www.cnbc.com/2026/09/05/budget-travel-vacation-costs.html"
+    },
+    {
+     "titolo": "Trump turns up the heat on Warsh as Fed rate hike looms",
+     "riassunto": "Ten days ahead of the next Federal Reserve meeting, the Trump administration looks to be in a full-court press to halt a rate hike in its tracks.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-05T19:12:53Z",
+     "url": "https://www.cnbc.com/2026/09/05/trump-warsh-fed-september-rate-hike.html"
+    },
+    {
+     "titolo": "Women accounted for almost all of job gains in August. Here's why",
+     "riassunto": "Women accounted for virtually all of August's payroll gains, the latest sign of their growing power in the labor market.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-04T18:27:39Z",
+     "url": "https://www.cnbc.com/2026/09/04/jobs-report-women-payrolls.html"
     }
    ],
    "fonti": [
@@ -57660,6 +57678,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "AMD’s CFO, Jean Hu, Just Announced Fantastic News for Investors",
+      "riassunto": "Key PointsAMD's addressable opportunity could soar over the next few years, according to Jean Hu.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T10:05:01Z",
+      "url": "https://www.nasdaq.com/articles/amds-cfo-jean-hu-just-announced-fantastic-news-investors"
+     },
+     {
       "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
       "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
       "fonte": "Nasdaq",
@@ -57693,13 +57718,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T15:05:00Z",
       "url": "https://www.nasdaq.com/articles/forget-amd-heres-who-nvidia-really-needs-be-worried-about"
-     },
-     {
-      "titolo": "MRVL Rides on the AI Capex Wave: What's Ahead for Investors?",
-      "riassunto": "Marvell Technology is riding on AI infrastructure growth with custom silicon, interconnect and optics, but faces trade risks and rising competition.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T13:12:00Z",
-      "url": "https://www.nasdaq.com/articles/mrvl-rides-ai-capex-wave-whats-ahead-investors"
      }
     ],
     "BE": [
@@ -57748,6 +57766,13 @@
     ],
     "CRWV": [
      {
+      "titolo": "Nvidia Stock Could Reach $490 by End of 2027 Based on Current Growth Projections",
+      "riassunto": "Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:23:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...",
       "fonte": "Nasdaq",
@@ -57781,16 +57806,30 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T14:49:00Z",
       "url": "https://www.nasdaq.com/articles/coreweave-doubles-down-physical-ai-can-crwv-capture-more-demand"
-     },
-     {
-      "titolo": "Nebius' Heavy CapEx Push: Can Customer Prepayments Ease the Strain?",
-      "riassunto": "NBIS plans $20-$25B in 2026 capex, while more than $9B in customer prepayments could help fund its aggressive AI infrastructure expansion.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T12:22:00Z",
-      "url": "https://www.nasdaq.com/articles/nebius-heavy-capex-push-can-customer-prepayments-ease-strain"
      }
     ],
     "GOOGL": [
+     {
+      "titolo": "The $760 Billion AI Risk That Nobody Is Talking About. But Should.",
+      "riassunto": "Key PointsThe AI boom is real.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T11:23:00Z",
+      "url": "https://www.nasdaq.com/articles/760-billion-ai-risk-nobody-talking-about-should"
+     },
+     {
+      "titolo": "Should You Buy Alphabet Stock Right Now?",
+      "riassunto": "Key PointsAlphabet's second-quarter revenue rose 24% year over year, up from 14% growth in the year-ago quarter.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:43:01Z",
+      "url": "https://www.nasdaq.com/articles/should-you-buy-alphabet-stock-right-now"
+     },
+     {
+      "titolo": "Nike Is Being Deleted From the S&P 100. Is Its Seat in the Dow Jones Industrial Average in Jeopardy?",
+      "riassunto": "Key PointsNike's turnaround is progressing at a sluggish pace.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:35:00Z",
+      "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
+     },
      {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
@@ -57811,27 +57850,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T23:40:27Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-0"
-     },
-     {
-      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up +0.87%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.77%.  E-mini S&P futures (ESU26 ) are up +1.01%, and September E-mini Nasdaq futures (NQU26 )...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T23:34:06Z",
-      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices"
-     },
-     {
-      "titolo": "Apple, Microsoft, and Nvidia Top the List of Largest Companies by Market Cap. Here's the One I'm Buying Now.",
-      "riassunto": "Key PointsNvidia's massive growth rate will widen the gap between it and other companies.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T23:20:00Z",
-      "url": "https://www.nasdaq.com/articles/apple-microsoft-and-nvidia-top-list-largest-companies-market-cap-heres-one-im-buying-now"
-     },
-     {
-      "titolo": "Alphabet (GOOGL) Beats Stock Market Upswing: What Investors Need to Know",
-      "riassunto": "Alphabet (GOOGL) closed the most recent trading day at $338.99, moving +1.92% from the previous trading session.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T21:45:02Z",
-      "url": "https://www.nasdaq.com/articles/alphabet-googl-beats-stock-market-upswing-what-investors-need-know"
      }
     ],
     "MRVL": [
@@ -57880,6 +57898,13 @@
     ],
     "MSTR": [
      {
+      "titolo": "Strategy Sold Bitcoin at $60K and Then Bought It at $80K. That's Why I'm Not Buying Bitcoin Treasury Companies Right Now.",
+      "riassunto": "Key PointsUntil the price of Bitcoin recovers, the business model of Bitcoin treasury companies will remain under immense strain.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:57:00Z",
+      "url": "https://www.nasdaq.com/articles/strategy-sold-bitcoin-60k-and-then-bought-it-80k-thats-why-im-not-buying-bitcoin-treasury"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
@@ -57913,16 +57938,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-09T13:00:05Z",
       "url": "https://www.nasdaq.com/articles/investors-heavily-search-strategy-inc-mstr-here-what-you-need-know"
-     },
-     {
-      "titolo": "Michael Saylor's Strategy Continues to Sell Bitcoin. That's Why I'm Doubling Down on Bitcoin Right Now.",
-      "riassunto": "Key PointsStrategy sold some of its Bitcoin in August, joining prior recent sales.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-05T10:12:00Z",
-      "url": "https://www.nasdaq.com/articles/michael-saylors-strategy-continues-sell-bitcoin-thats-why-im-doubling-down-bitcoin-right"
      }
     ],
     "MU": [
+     {
+      "titolo": "Where Will Micron Be in 10 Years?",
+      "riassunto": "Key PointsMicron has generated massive revenue and seen its stock price rise by about 628% over the past year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T11:35:00Z",
+      "url": "https://www.nasdaq.com/articles/where-will-micron-be-10-years"
+     },
+     {
+      "titolo": "Is Micron Stock the Next Nvidia? The Answer May Shock Investors.",
+      "riassunto": "Key PointsNvidia dominates the AI infrastructure market, and it benefits from a durable competitive advantage in its full-stack ecosystem that spans hardware and software.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:08:01Z",
+      "url": "https://www.nasdaq.com/articles/micron-stock-next-nvidia-answer-may-shock-investors"
+     },
      {
       "titolo": "Applied Materials vs. Micron Technology: Which Technology Stock Is a Better Buy in 2026?",
       "riassunto": "Key PointsApplied Materials is a leading provider of the equipment and software essential for manufacturing advanced semiconductors.",
@@ -57950,64 +57982,50 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T12:34:00Z",
       "url": "https://www.nasdaq.com/articles/micron-bets-long-term-sca-deals-can-it-lower-earnings-cyclicality"
-     },
-     {
-      "titolo": "Not IonQ, Not Rigetti Computing. This Quantum Computing Stock Could Be September's Biggest Winner.",
-      "riassunto": "Key PointsIonQ and Rigetti Computing both have annual revenue growth of more than 100%.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T11:20:00Z",
-      "url": "https://www.nasdaq.com/articles/not-ionq-not-rigetti-computing-quantum-computing-stock-could-be-septembers-biggest-winner"
-     },
-     {
-      "titolo": "These 2 Hardware Leaders Will Cash In on the Next Data Center Memory Crunch",
-      "riassunto": "Key PointsSandisk and Micron are primed to cash in on a generational demand shift.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T09:50:00Z",
-      "url": "https://www.nasdaq.com/articles/these-2-hardware-leaders-will-cash-next-data-center-memory-crunch"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Prediction: Nvidia Will Overtake Apple in Stock Buybacks and Dividends Under New Apple CEO John Ternus",
+      "riassunto": "Key PointsOver the last 15 years, Apple reduced its share count by 43.2% under CEO Tim Cook.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T10:36:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-overtake-apple-stock-buybacks-and-dividends-under-new-apple-ceo"
+     },
+     {
+      "titolo": "Nike Is Being Deleted From the S&P 100. Is Its Seat in the Dow Jones Industrial Average in Jeopardy?",
+      "riassunto": "Key PointsNike's turnaround is progressing at a sluggish pace.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:35:00Z",
+      "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
+     },
+     {
+      "titolo": "Nvidia Stock Could Reach $490 by End of 2027 Based on Current Growth Projections",
+      "riassunto": "Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:23:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
+     },
+     {
+      "titolo": "Warren Buffett Loves Wide Moats: 3 AI Infrastructure Stocks That Fit the Bill",
+      "riassunto": "Key PointsASML has a monopoly on the technology that powers the AI boom.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:20:00Z",
+      "url": "https://www.nasdaq.com/articles/warren-buffett-loves-wide-moats-3-ai-infrastructure-stocks-fit-bill"
+     },
+     {
+      "titolo": "Is Micron Stock the Next Nvidia? The Answer May Shock Investors.",
+      "riassunto": "Key PointsNvidia dominates the AI infrastructure market, and it benefits from a durable competitive advantage in its full-stack ecosystem that spans hardware and software.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:08:01Z",
+      "url": "https://www.nasdaq.com/articles/micron-stock-next-nvidia-answer-may-shock-investors"
+     },
      {
       "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
       "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
       "fonte": "Nasdaq",
       "quando": "2026-09-12T08:23:00Z",
       "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
-     },
-     {
-      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T06:39:11Z",
-      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
-     },
-     {
-      "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
-      "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T05:50:00Z",
-      "url": "https://www.nasdaq.com/articles/michael-burry-staying-short-nvidia-palantir-and-tesla-warning-possible-1987-type-fall-ai"
-     },
-     {
-      "titolo": "Apple, Microsoft, and Nvidia Top the List of Largest Companies by Market Cap. Here's the One I'm Buying Now.",
-      "riassunto": "Key PointsNvidia's massive growth rate will widen the gap between it and other companies.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T23:20:00Z",
-      "url": "https://www.nasdaq.com/articles/apple-microsoft-and-nvidia-top-list-largest-companies-market-cap-heres-one-im-buying-now"
-     },
-     {
-      "titolo": "CoreWeave Is My Top IPO Pick Right Now: Over 75% of Its Revenue Is Locked In Through Contracts",
-      "riassunto": "Key PointsCoreWeave&rsquo;s backlog grew to $104 billion in its latest quarter.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T17:50:00Z",
-      "url": "https://www.nasdaq.com/articles/coreweave-my-top-ipo-pick-right-now-over-75-its-revenue-locked-through-contracts"
-     },
-     {
-      "titolo": "Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T17:46:30Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
      }
     ],
     "ORCL": [
@@ -58056,6 +58074,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "If SpaceX Stock Falls Below $100, History Suggests This Is the Move to Make",
+      "riassunto": "Key PointsSince its public debut in June, SpaceX stock has soared to as much as 50% above its opening trading price, and has also slumped to as far as 30% below it.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T09:07:00Z",
+      "url": "https://www.nasdaq.com/articles/if-spacex-stock-falls-below-100-history-suggests-move-make"
+     },
+     {
       "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
       "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
       "fonte": "Nasdaq",
@@ -58089,13 +58114,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-10T23:03:11Z",
       "url": "https://www.nasdaq.com/articles/palantir-technologies-showcases-sovereign-ai-wins-nvidia-cisco-and-faa"
-     },
-     {
-      "titolo": "Not Nvidia, Not Palantir. This Might Be September's Most Important AI Infrastructure Stock.",
-      "riassunto": "Key PointsNvidia and Palantir have already reported this earnings season, and both companies delivered monster results.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-10T18:24:00Z",
-      "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-might-be-septembers-most-important-ai-infrastructure-stock"
      }
     ],
     "RGTI": [
@@ -58210,13 +58228,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T08:56:03Z"
+   "letto_il": "2026-09-12T12:03:39Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "AMD’s CFO, Jean Hu, Just Announced Fantastic News for Investors",
+     "riassunto": "Key PointsAMD's addressable opportunity could soar over the next few years, according to Jean Hu.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T10:05:01Z",
+     "url": "https://www.nasdaq.com/articles/amds-cfo-jean-hu-just-announced-fantastic-news-investors"
+    },
     {
      "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
      "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
@@ -58251,13 +58276,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T15:05:00Z",
      "url": "https://www.nasdaq.com/articles/forget-amd-heres-who-nvidia-really-needs-be-worried-about"
-    },
-    {
-     "titolo": "MRVL Rides on the AI Capex Wave: What's Ahead for Investors?",
-     "riassunto": "Marvell Technology is riding on AI infrastructure growth with custom silicon, interconnect and optics, but faces trade risks and rising competition.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T13:12:00Z",
-     "url": "https://www.nasdaq.com/articles/mrvl-rides-ai-capex-wave-whats-ahead-investors"
     }
    ],
    "BE": [
@@ -58306,6 +58324,13 @@
    ],
    "CRWV": [
     {
+     "titolo": "Nvidia Stock Could Reach $490 by End of 2027 Based on Current Growth Projections",
+     "riassunto": "Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:23:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...",
      "fonte": "Nasdaq",
@@ -58339,16 +58364,30 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T14:49:00Z",
      "url": "https://www.nasdaq.com/articles/coreweave-doubles-down-physical-ai-can-crwv-capture-more-demand"
-    },
-    {
-     "titolo": "Nebius' Heavy CapEx Push: Can Customer Prepayments Ease the Strain?",
-     "riassunto": "NBIS plans $20-$25B in 2026 capex, while more than $9B in customer prepayments could help fund its aggressive AI infrastructure expansion.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T12:22:00Z",
-     "url": "https://www.nasdaq.com/articles/nebius-heavy-capex-push-can-customer-prepayments-ease-strain"
     }
    ],
    "GOOGL": [
+    {
+     "titolo": "The $760 Billion AI Risk That Nobody Is Talking About. But Should.",
+     "riassunto": "Key PointsThe AI boom is real.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T11:23:00Z",
+     "url": "https://www.nasdaq.com/articles/760-billion-ai-risk-nobody-talking-about-should"
+    },
+    {
+     "titolo": "Should You Buy Alphabet Stock Right Now?",
+     "riassunto": "Key PointsAlphabet's second-quarter revenue rose 24% year over year, up from 14% growth in the year-ago quarter.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:43:01Z",
+     "url": "https://www.nasdaq.com/articles/should-you-buy-alphabet-stock-right-now"
+    },
+    {
+     "titolo": "Nike Is Being Deleted From the S&P 100. Is Its Seat in the Dow Jones Industrial Average in Jeopardy?",
+     "riassunto": "Key PointsNike's turnaround is progressing at a sluggish pace.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:35:00Z",
+     "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
+    },
     {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
@@ -58369,27 +58408,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T23:40:27Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-0"
-    },
-    {
-     "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up +0.87%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.77%.  E-mini S&P futures (ESU26 ) are up +1.01%, and September E-mini Nasdaq futures (NQU26 )...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T23:34:06Z",
-     "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices"
-    },
-    {
-     "titolo": "Apple, Microsoft, and Nvidia Top the List of Largest Companies by Market Cap. Here's the One I'm Buying Now.",
-     "riassunto": "Key PointsNvidia's massive growth rate will widen the gap between it and other companies.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T23:20:00Z",
-     "url": "https://www.nasdaq.com/articles/apple-microsoft-and-nvidia-top-list-largest-companies-market-cap-heres-one-im-buying-now"
-    },
-    {
-     "titolo": "Alphabet (GOOGL) Beats Stock Market Upswing: What Investors Need to Know",
-     "riassunto": "Alphabet (GOOGL) closed the most recent trading day at $338.99, moving +1.92% from the previous trading session.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T21:45:02Z",
-     "url": "https://www.nasdaq.com/articles/alphabet-googl-beats-stock-market-upswing-what-investors-need-know"
     }
    ],
    "MRVL": [
@@ -58438,6 +58456,13 @@
    ],
    "MSTR": [
     {
+     "titolo": "Strategy Sold Bitcoin at $60K and Then Bought It at $80K. That's Why I'm Not Buying Bitcoin Treasury Companies Right Now.",
+     "riassunto": "Key PointsUntil the price of Bitcoin recovers, the business model of Bitcoin treasury companies will remain under immense strain.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:57:00Z",
+     "url": "https://www.nasdaq.com/articles/strategy-sold-bitcoin-60k-and-then-bought-it-80k-thats-why-im-not-buying-bitcoin-treasury"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
@@ -58471,16 +58496,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-09T13:00:05Z",
      "url": "https://www.nasdaq.com/articles/investors-heavily-search-strategy-inc-mstr-here-what-you-need-know"
-    },
-    {
-     "titolo": "Michael Saylor's Strategy Continues to Sell Bitcoin. That's Why I'm Doubling Down on Bitcoin Right Now.",
-     "riassunto": "Key PointsStrategy sold some of its Bitcoin in August, joining prior recent sales.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-05T10:12:00Z",
-     "url": "https://www.nasdaq.com/articles/michael-saylors-strategy-continues-sell-bitcoin-thats-why-im-doubling-down-bitcoin-right"
     }
    ],
    "MU": [
+    {
+     "titolo": "Where Will Micron Be in 10 Years?",
+     "riassunto": "Key PointsMicron has generated massive revenue and seen its stock price rise by about 628% over the past year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T11:35:00Z",
+     "url": "https://www.nasdaq.com/articles/where-will-micron-be-10-years"
+    },
+    {
+     "titolo": "Is Micron Stock the Next Nvidia? The Answer May Shock Investors.",
+     "riassunto": "Key PointsNvidia dominates the AI infrastructure market, and it benefits from a durable competitive advantage in its full-stack ecosystem that spans hardware and software.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:08:01Z",
+     "url": "https://www.nasdaq.com/articles/micron-stock-next-nvidia-answer-may-shock-investors"
+    },
     {
      "titolo": "Applied Materials vs. Micron Technology: Which Technology Stock Is a Better Buy in 2026?",
      "riassunto": "Key PointsApplied Materials is a leading provider of the equipment and software essential for manufacturing advanced semiconductors.",
@@ -58508,64 +58540,50 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T12:34:00Z",
      "url": "https://www.nasdaq.com/articles/micron-bets-long-term-sca-deals-can-it-lower-earnings-cyclicality"
-    },
-    {
-     "titolo": "Not IonQ, Not Rigetti Computing. This Quantum Computing Stock Could Be September's Biggest Winner.",
-     "riassunto": "Key PointsIonQ and Rigetti Computing both have annual revenue growth of more than 100%.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T11:20:00Z",
-     "url": "https://www.nasdaq.com/articles/not-ionq-not-rigetti-computing-quantum-computing-stock-could-be-septembers-biggest-winner"
-    },
-    {
-     "titolo": "These 2 Hardware Leaders Will Cash In on the Next Data Center Memory Crunch",
-     "riassunto": "Key PointsSandisk and Micron are primed to cash in on a generational demand shift.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T09:50:00Z",
-     "url": "https://www.nasdaq.com/articles/these-2-hardware-leaders-will-cash-next-data-center-memory-crunch"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Prediction: Nvidia Will Overtake Apple in Stock Buybacks and Dividends Under New Apple CEO John Ternus",
+     "riassunto": "Key PointsOver the last 15 years, Apple reduced its share count by 43.2% under CEO Tim Cook.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T10:36:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-overtake-apple-stock-buybacks-and-dividends-under-new-apple-ceo"
+    },
+    {
+     "titolo": "Nike Is Being Deleted From the S&P 100. Is Its Seat in the Dow Jones Industrial Average in Jeopardy?",
+     "riassunto": "Key PointsNike's turnaround is progressing at a sluggish pace.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:35:00Z",
+     "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
+    },
+    {
+     "titolo": "Nvidia Stock Could Reach $490 by End of 2027 Based on Current Growth Projections",
+     "riassunto": "Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:23:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
+    },
+    {
+     "titolo": "Warren Buffett Loves Wide Moats: 3 AI Infrastructure Stocks That Fit the Bill",
+     "riassunto": "Key PointsASML has a monopoly on the technology that powers the AI boom.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:20:00Z",
+     "url": "https://www.nasdaq.com/articles/warren-buffett-loves-wide-moats-3-ai-infrastructure-stocks-fit-bill"
+    },
+    {
+     "titolo": "Is Micron Stock the Next Nvidia? The Answer May Shock Investors.",
+     "riassunto": "Key PointsNvidia dominates the AI infrastructure market, and it benefits from a durable competitive advantage in its full-stack ecosystem that spans hardware and software.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:08:01Z",
+     "url": "https://www.nasdaq.com/articles/micron-stock-next-nvidia-answer-may-shock-investors"
+    },
     {
      "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
      "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
      "fonte": "Nasdaq",
      "quando": "2026-09-12T08:23:00Z",
      "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
-    },
-    {
-     "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T06:39:11Z",
-     "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
-    },
-    {
-     "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
-     "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T05:50:00Z",
-     "url": "https://www.nasdaq.com/articles/michael-burry-staying-short-nvidia-palantir-and-tesla-warning-possible-1987-type-fall-ai"
-    },
-    {
-     "titolo": "Apple, Microsoft, and Nvidia Top the List of Largest Companies by Market Cap. Here's the One I'm Buying Now.",
-     "riassunto": "Key PointsNvidia's massive growth rate will widen the gap between it and other companies.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T23:20:00Z",
-     "url": "https://www.nasdaq.com/articles/apple-microsoft-and-nvidia-top-list-largest-companies-market-cap-heres-one-im-buying-now"
-    },
-    {
-     "titolo": "CoreWeave Is My Top IPO Pick Right Now: Over 75% of Its Revenue Is Locked In Through Contracts",
-     "riassunto": "Key PointsCoreWeave&rsquo;s backlog grew to $104 billion in its latest quarter.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T17:50:00Z",
-     "url": "https://www.nasdaq.com/articles/coreweave-my-top-ipo-pick-right-now-over-75-its-revenue-locked-through-contracts"
-    },
-    {
-     "titolo": "Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T17:46:30Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
     }
    ],
    "ORCL": [
@@ -58614,6 +58632,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "If SpaceX Stock Falls Below $100, History Suggests This Is the Move to Make",
+     "riassunto": "Key PointsSince its public debut in June, SpaceX stock has soared to as much as 50% above its opening trading price, and has also slumped to as far as 30% below it.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T09:07:00Z",
+     "url": "https://www.nasdaq.com/articles/if-spacex-stock-falls-below-100-history-suggests-move-make"
+    },
+    {
      "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
      "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
      "fonte": "Nasdaq",
@@ -58647,13 +58672,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-10T23:03:11Z",
      "url": "https://www.nasdaq.com/articles/palantir-technologies-showcases-sovereign-ai-wins-nvidia-cisco-and-faa"
-    },
-    {
-     "titolo": "Not Nvidia, Not Palantir. This Might Be September's Most Important AI Infrastructure Stock.",
-     "riassunto": "Key PointsNvidia and Palantir have already reported this earnings season, and both companies delivered monster results.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-10T18:24:00Z",
-     "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-might-be-septembers-most-important-ai-infrastructure-stock"
     }
    ],
    "RGTI": [
@@ -58768,7 +58786,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T08:56:03Z"
+  "letto_il": "2026-09-12T12:03:39Z"
  },
  "predictions": [
   {
@@ -58788,18 +58806,18 @@
   },
   {
    "question": "Will the price of Bitcoin be above $78,000 on September 12?",
-   "yes": 4,
+   "yes": 2,
    "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-12-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $76,000 on September 12?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-12-2026"
   },
   {
    "question": "Fed Rate Hike by September 2026 Meeting?",
    "yes": 78,
    "link": "https://polymarket.com/event/fed-rate-hike-by-september-2026-meeting"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $76,000 on September 12?",
-   "yes": 99,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-12-2026"
   }
  ],
  "options": {
@@ -79198,7 +79216,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 9 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -79250,6 +79268,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T08:56:04Z"
+  "generated_at": "2026-09-12T12:03:40Z"
  }
 }
