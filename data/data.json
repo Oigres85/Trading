@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T19:02:48Z",
+ "updated_at": "2026-09-12T20:03:04Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -1742,7 +1742,7 @@
      "a1": 483.81,
      "a3": 1349.59,
      "a5": 1307.06,
-     "a10": 5525.0
+     "a10": 5525.01
     },
     "stagionalita": [
      {
@@ -11792,7 +11792,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -21835,7 +21835,7 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77134.46,
+   "price": 77134.99,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
@@ -21843,20 +21843,20 @@
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -38.9,
-   "sma200_dist_pct": 10.0,
+   "sma200_dist_pct": 10.1,
    "sma50_dist_pct": 8.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -38.9,
    "day_high": 77468.78,
-   "day_low": 77115.34,
+   "day_low": 77045.0,
    "support": 76162.91,
    "resistance": 82262.21,
    "rsi": 54.6,
-   "volume": 14246722560,
+   "volume": 14304257024,
    "vol_ratio": 1.21,
-   "atr_14": 2153.3,
-   "atr_pct": 2.79,
+   "atr_14": 2158.33,
+   "atr_pct": 2.8,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21865,7 +21865,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77134.46
+     77134.99
     ],
     "m6": [
      82138.93,
@@ -21993,7 +21993,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77134.46
+     77134.99
     ],
     "all": [
      386.94,
@@ -22140,7 +22140,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77134.46
+     77134.99
     ],
     "m1": [
      77083.41,
@@ -22164,7 +22164,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77134.46
+     77134.99
     ],
     "m3": [
      63193.15,
@@ -22232,7 +22232,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77134.46
+     77134.99
     ],
     "y1": [
      116101.58,
@@ -22308,7 +22308,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77134.46
+     77134.99
     ],
     "d1": [
      77280.33,
@@ -22425,7 +22425,13 @@
      77144.39,
      77175.03,
      77138.82,
-     77134.46
+     77151.99,
+     77165.4,
+     77125.56,
+     77135.08,
+     77065.8,
+     77100.94,
+     77134.99
     ]
    },
    "earnings_date": null,
@@ -22439,7 +22445,7 @@
    "sharpe_6m": -0.4,
    "sortino_6m": -0.58,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77134.46,
+   "prezzo_limite_aggiustato": 77134.99,
    "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22494,54 +22500,54 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77134.46,
+     "prezzo": 77134.99,
      "medie": {
       "sma10": {
-       "liv": 78780.8,
+       "liv": 78780.85,
        "dist_pct": -2.09
       },
       "ema10": {
-       "liv": 77937.68,
+       "liv": 77937.78,
        "dist_pct": -1.03
       },
       "sma20": {
-       "liv": 78580.94,
+       "liv": 78580.97,
        "dist_pct": -1.84
       },
       "ema20": {
-       "liv": 77013.4,
+       "liv": 77013.45,
        "dist_pct": 0.16
       },
       "sma30": {
-       "liv": 75503.24,
+       "liv": 75503.26,
        "dist_pct": 2.16
       },
       "ema30": {
-       "liv": 75471.77,
+       "liv": 75471.81,
        "dist_pct": 2.2
       },
       "sma50": {
-       "liv": 70906.23,
+       "liv": 70906.24,
        "dist_pct": 8.78
       },
       "ema50": {
-       "liv": 73020.42,
+       "liv": 73020.44,
        "dist_pct": 5.63
       },
       "sma100": {
        "liv": 67006.7,
-       "dist_pct": 15.11
+       "dist_pct": 15.12
       },
       "ema100": {
-       "liv": 70919.04,
+       "liv": 70919.05,
        "dist_pct": 8.76
       },
       "sma200": {
-       "liv": 70090.45,
+       "liv": 70090.46,
        "dist_pct": 10.05
       },
       "ema200": {
-       "liv": 73229.66,
+       "liv": 73229.67,
        "dist_pct": 5.33
       }
      },
@@ -22550,18 +22556,18 @@
      "oscillatori": {
       "rsi14": 54.6,
       "macd": {
-       "linea": 1798.97,
-       "segnale": 2568.03,
-       "istogramma": -769.06
+       "linea": 1799.01,
+       "segnale": 2568.04,
+       "istogramma": -769.03
       },
       "stoch_k": 15.9,
       "stoch_d": 12.6,
       "williams_r": -84.1,
-      "cci20": -18.3,
+      "cci20": -18.6,
       "adx14": 44.4,
-      "di_su": 29.4,
+      "di_su": 29.3,
       "di_giu": 13.9,
-      "momentum10": -166.02
+      "momentum10": -165.48
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23053,8 +23059,8 @@
       "d": "2026-09-12",
       "o": 77201.88,
       "h": 77468.78,
-      "l": 77115.34,
-      "c": 77134.46
+      "l": 77045.0,
+      "c": 77134.99
      }
     ],
     "performance": {
@@ -23064,9 +23070,9 @@
      "m6": -4.38,
      "a1": -14.87,
      "ytd": -13.07,
-     "a3": 186.02,
+     "a3": 186.03,
      "a5": 76.14,
-     "a10": 12550.49
+     "a10": 12550.58
     },
     "stagionalita": [
      {
@@ -52762,7 +52768,7 @@
    "calls": 171857
   },
   "risk_sentiment": {
-   "score": 43,
+   "score": 44,
    "label": "Neutrale",
    "components": [
     {
@@ -57853,6 +57859,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Google's Historic 396 MW Clean Energy Deal Just Changed the Game for 1 AI Power Play",
+      "riassunto": "Key PointsGoogle entered into a 396 MW power purchase agreement with Fervo Energy for geothermal energy.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T19:05:00Z",
+      "url": "https://www.nasdaq.com/articles/googles-historic-396-mw-clean-energy-deal-just-changed-game-1-ai-power-play"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
@@ -57886,13 +57899,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T05:20:00Z",
       "url": "https://www.nasdaq.com/articles/3-ways-invest-anthropic-pre-ipo"
-     },
-     {
-      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T23:40:27Z",
-      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-0"
      }
     ],
     "MRVL": [
@@ -57985,6 +57991,13 @@
     ],
     "MU": [
      {
+      "titolo": "Broadcom vs. Micron Technology: Which Technology Stock Is a Better Buy in 2026?",
+      "riassunto": "Key PointsBroadcom is a networking and infrastructure software giant with strong ties to enterprise and artificial intelligence data centers.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T18:08:22Z",
+      "url": "https://www.nasdaq.com/articles/broadcom-vs-micron-technology-which-technology-stock-better-buy-2026"
+     },
+     {
       "titolo": "Where Will Micron Be in 10 Years?",
       "riassunto": "Key PointsMicron has generated massive revenue and seen its stock price rise by about 628% over the past year.",
       "fonte": "Nasdaq",
@@ -58018,13 +58031,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T17:46:30Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
-     },
-     {
-      "titolo": "Micron Bets on Long-Term SCA Deals: Can It Lower Earnings Cyclicality?",
-      "riassunto": "MU's long-term customer deals lock in volumes and pricing, improving demand visibility and softening earnings swings through future memory cycles.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T12:34:00Z",
-      "url": "https://www.nasdaq.com/articles/micron-bets-long-term-sca-deals-can-it-lower-earnings-cyclicality"
      }
     ],
     "NVDA": [
@@ -58271,7 +58277,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T19:02:48Z"
+   "letto_il": "2026-09-12T20:03:04Z"
   }
  },
  "broker": null,
@@ -58411,6 +58417,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Google's Historic 396 MW Clean Energy Deal Just Changed the Game for 1 AI Power Play",
+     "riassunto": "Key PointsGoogle entered into a 396 MW power purchase agreement with Fervo Energy for geothermal energy.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T19:05:00Z",
+     "url": "https://www.nasdaq.com/articles/googles-historic-396-mw-clean-energy-deal-just-changed-game-1-ai-power-play"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
@@ -58444,13 +58457,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T05:20:00Z",
      "url": "https://www.nasdaq.com/articles/3-ways-invest-anthropic-pre-ipo"
-    },
-    {
-     "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T23:40:27Z",
-     "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-0"
     }
    ],
    "MRVL": [
@@ -58543,6 +58549,13 @@
    ],
    "MU": [
     {
+     "titolo": "Broadcom vs. Micron Technology: Which Technology Stock Is a Better Buy in 2026?",
+     "riassunto": "Key PointsBroadcom is a networking and infrastructure software giant with strong ties to enterprise and artificial intelligence data centers.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T18:08:22Z",
+     "url": "https://www.nasdaq.com/articles/broadcom-vs-micron-technology-which-technology-stock-better-buy-2026"
+    },
+    {
      "titolo": "Where Will Micron Be in 10 Years?",
      "riassunto": "Key PointsMicron has generated massive revenue and seen its stock price rise by about 628% over the past year.",
      "fonte": "Nasdaq",
@@ -58576,13 +58589,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T17:46:30Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
-    },
-    {
-     "titolo": "Micron Bets on Long-Term SCA Deals: Can It Lower Earnings Cyclicality?",
-     "riassunto": "MU's long-term customer deals lock in volumes and pricing, improving demand visibility and softening earnings swings through future memory cycles.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T12:34:00Z",
-     "url": "https://www.nasdaq.com/articles/micron-bets-long-term-sca-deals-can-it-lower-earnings-cyclicality"
     }
    ],
    "NVDA": [
@@ -58829,7 +58835,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T19:02:48Z"
+  "letto_il": "2026-09-12T20:03:04Z"
  },
  "predictions": [
   {
@@ -58844,7 +58850,7 @@
   },
   {
    "question": "Fed rate hike in 2026?",
-   "yes": 88,
+   "yes": 86,
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
   },
   {
@@ -79119,7 +79125,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 33,
-    "risk_sentiment": 43,
+    "risk_sentiment": 44,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
@@ -79249,7 +79255,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 4 ore"
+    "note": "18 voci, la piu' recente di 5 ore"
    },
    {
     "key": "sec_calendario",
@@ -79301,6 +79307,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T19:02:49Z"
+  "generated_at": "2026-09-12T20:03:04Z"
  }
 }
