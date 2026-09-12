@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T08:26:01Z",
+ "updated_at": "2026-09-12T08:56:03Z",
  "eurusd": 1.1602,
  "totals": {
   "usd_value": 0,
@@ -1742,7 +1742,7 @@
      "a1": 483.81,
      "a3": 1349.59,
      "a5": 1307.06,
-     "a10": 5525.01
+     "a10": 5525.0
     },
     "stagionalita": [
      {
@@ -5515,7 +5515,7 @@
      "a1": 17.28,
      "a3": 403.33,
      "a5": 958.37,
-     "a10": 12885.8
+     "a10": 12885.79
     },
     "stagionalita": [
      {
@@ -21835,25 +21835,25 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77287.01,
+   "price": 77343.15,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.15,
+   "change_pct": 0.22,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.8,
+   "ath_dist_pct": -38.7,
    "sma200_dist_pct": 10.3,
-   "sma50_dist_pct": 9.0,
+   "sma50_dist_pct": 9.1,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.8,
+   "w52_dist_pct": -38.7,
    "day_high": 77366.49,
    "day_low": 77171.18,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 55.2,
-   "volume": 31853209600,
+   "rsi": 55.3,
+   "volume": 31686879232,
    "vol_ratio": 1.21,
    "atr_14": 2142.01,
    "atr_pct": 2.77,
@@ -21865,7 +21865,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77287.01
+     77343.15
     ],
     "m6": [
      82138.93,
@@ -21993,7 +21993,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77287.01
+     77343.15
     ],
     "all": [
      386.94,
@@ -22140,7 +22140,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77287.02
+     77343.15
     ],
     "m1": [
      77083.41,
@@ -22164,7 +22164,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77287.01
+     77343.15
     ],
     "m3": [
      63193.15,
@@ -22232,7 +22232,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77287.01
+     77343.15
     ],
     "y1": [
      116101.58,
@@ -22308,7 +22308,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77287.01
+     77343.15
     ],
     "d1": [
      77280.33,
@@ -22361,7 +22361,10 @@
      77268.66,
      77273.21,
      77279.99,
-     77287.02
+     77284.87,
+     77288.68,
+     77332.54,
+     77343.15
     ]
    },
    "earnings_date": null,
@@ -22370,13 +22373,13 @@
    "health": 69,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.86,
+   "sharpe_1y": -0.85,
    "sortino_1y": -1.15,
    "sharpe_6m": -0.38,
-   "sortino_6m": -0.57,
+   "sortino_6m": -0.56,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77287.01,
-   "risk_reward": "1:1.2",
+   "prezzo_limite_aggiustato": 77343.15,
+   "risk_reward": "1:1.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22388,22 +22391,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.47
+     "change_pct": -1.4
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.26
+     "change_pct": 0.34
     },
     "m3": {
      "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 22.3
+     "change_pct": 22.39
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.45
+     "change_pct": -15.39
     }
    },
    "financials": [],
@@ -22430,74 +22433,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77287.01,
+     "prezzo": 77343.15,
      "medie": {
       "sma10": {
-       "liv": 78796.05,
-       "dist_pct": -1.92
+       "liv": 78801.66,
+       "dist_pct": -1.85
       },
       "ema10": {
-       "liv": 77965.42,
-       "dist_pct": -0.87
+       "liv": 77975.62,
+       "dist_pct": -0.81
       },
       "sma20": {
-       "liv": 78588.57,
-       "dist_pct": -1.66
+       "liv": 78591.37,
+       "dist_pct": -1.59
       },
       "ema20": {
-       "liv": 77027.93,
-       "dist_pct": 0.34
+       "liv": 77033.28,
+       "dist_pct": 0.4
       },
       "sma30": {
-       "liv": 75508.32,
-       "dist_pct": 2.36
+       "liv": 75510.19,
+       "dist_pct": 2.43
       },
       "ema30": {
-       "liv": 75481.61,
-       "dist_pct": 2.39
+       "liv": 75485.24,
+       "dist_pct": 2.46
       },
       "sma50": {
-       "liv": 70909.28,
-       "dist_pct": 8.99
+       "liv": 70910.4,
+       "dist_pct": 9.07
       },
       "ema50": {
-       "liv": 73026.4,
-       "dist_pct": 5.83
+       "liv": 73028.6,
+       "dist_pct": 5.91
       },
       "sma100": {
-       "liv": 67008.22,
-       "dist_pct": 15.34
+       "liv": 67008.78,
+       "dist_pct": 15.42
       },
       "ema100": {
-       "liv": 70922.06,
-       "dist_pct": 8.97
+       "liv": 70923.17,
+       "dist_pct": 9.05
       },
       "sma200": {
-       "liv": 70091.22,
-       "dist_pct": 10.27
+       "liv": 70091.5,
+       "dist_pct": 10.35
       },
       "ema200": {
-       "liv": 73231.18,
-       "dist_pct": 5.54
+       "liv": 73231.74,
+       "dist_pct": 5.61
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 55.2,
+      "rsi14": 55.3,
       "macd": {
-       "linea": 1811.14,
-       "segnale": 2570.47,
-       "istogramma": -759.32
+       "linea": 1815.62,
+       "segnale": 2571.36,
+       "istogramma": -755.74
       },
-      "stoch_k": 18.4,
-      "stoch_d": 13.4,
-      "williams_r": -81.6,
-      "cci20": -17.9,
+      "stoch_k": 19.4,
+      "stoch_d": 13.7,
+      "williams_r": -80.6,
+      "cci20": -17.6,
       "adx14": 44.4,
       "di_su": 29.5,
       "di_giu": 14.0,
-      "momentum10": -13.47
+      "momentum10": 42.67
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22990,19 +22993,19 @@
       "o": 77201.88,
       "h": 77366.49,
       "l": 77171.18,
-      "c": 77287.01
+      "c": 77343.15
      }
     ],
     "performance": {
-     "s1": -2.31,
-     "m1": -1.34,
-     "m3": 24.14,
-     "m6": -4.19,
-     "a1": -14.7,
-     "ytd": -12.9,
-     "a3": 186.59,
-     "a5": 76.49,
-     "a10": 12575.51
+     "s1": -2.24,
+     "m1": -1.27,
+     "m3": 24.23,
+     "m6": -4.12,
+     "a1": -14.64,
+     "ytd": -12.84,
+     "a3": 186.8,
+     "a5": 76.62,
+     "a10": 12584.72
     },
     "stagionalita": [
      {
@@ -23079,8 +23082,8 @@
      },
      {
       "mese": 9,
-      "media": -1.81,
-      "mediana": -2.34,
+      "media": -1.8,
+      "mediana": -2.31,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23115,9 +23118,9 @@
      }
     ]
    },
-   "rs_1m": 1.4,
+   "rs_1m": 1.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.5,
+   "rs_ndx_1m": 1.6,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -25399,7 +25402,7 @@
      29384.5,
      29395.5,
      29387.25,
-     29391.75
+     29387.0
     ]
    },
    "earnings_date": null,
@@ -52715,7 +52718,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 52
     },
     {
      "label": "Treasury 10A",
@@ -57657,6 +57660,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
+      "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T08:23:00Z",
+      "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
+     },
+     {
       "titolo": "1 Thing I Wish I'd Known About the Stock Market When I First Started Investing",
       "riassunto": "Key PointsSelling AMD at a 33% gain in 2004 felt like skill, but the stock would have soared from $15 to $500 per stub in 22 years.",
       "fonte": "Nasdaq",
@@ -57690,13 +57700,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T13:12:00Z",
       "url": "https://www.nasdaq.com/articles/mrvl-rides-ai-capex-wave-whats-ahead-investors"
-     },
-     {
-      "titolo": "PBF Energy and Lennar have been highlighted as Zacks Bull and Bear of the Day",
-      "riassunto": "PBF Energy surges on record profitability and rising estimates, while Lennar faces shrinking revenue, weak demand and falling margins.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T12:50:00Z",
-      "url": "https://www.nasdaq.com/articles/pbf-energy-and-lennar-have-been-highlighted-zacks-bull-and-bear-day"
      }
     ],
     "BE": [
@@ -57965,6 +57968,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
+      "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T08:23:00Z",
+      "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
@@ -57998,13 +58008,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T17:46:30Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
-     },
-     {
-      "titolo": "TSMC Just Delivered Fantastic News for Nvidia Shareholders",
-      "riassunto": "Key PointsNvidia has delivered record earnings due to its expertise in AI.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T17:30:01Z",
-      "url": "https://www.nasdaq.com/articles/tsmc-just-delivered-fantastic-news-nvidia-shareholders"
      }
     ],
     "ORCL": [
@@ -58207,13 +58210,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T08:26:01Z"
+   "letto_il": "2026-09-12T08:56:03Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
+     "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T08:23:00Z",
+     "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
+    },
     {
      "titolo": "1 Thing I Wish I'd Known About the Stock Market When I First Started Investing",
      "riassunto": "Key PointsSelling AMD at a 33% gain in 2004 felt like skill, but the stock would have soared from $15 to $500 per stub in 22 years.",
@@ -58248,13 +58258,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T13:12:00Z",
      "url": "https://www.nasdaq.com/articles/mrvl-rides-ai-capex-wave-whats-ahead-investors"
-    },
-    {
-     "titolo": "PBF Energy and Lennar have been highlighted as Zacks Bull and Bear of the Day",
-     "riassunto": "PBF Energy surges on record profitability and rising estimates, while Lennar faces shrinking revenue, weak demand and falling margins.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T12:50:00Z",
-     "url": "https://www.nasdaq.com/articles/pbf-energy-and-lennar-have-been-highlighted-zacks-bull-and-bear-day"
     }
    ],
    "BE": [
@@ -58523,6 +58526,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
+     "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T08:23:00Z",
+     "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
@@ -58556,13 +58566,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T17:46:30Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
-    },
-    {
-     "titolo": "TSMC Just Delivered Fantastic News for Nvidia Shareholders",
-     "riassunto": "Key PointsNvidia has delivered record earnings due to its expertise in AI.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T17:30:01Z",
-     "url": "https://www.nasdaq.com/articles/tsmc-just-delivered-fantastic-news-nvidia-shareholders"
     }
    ],
    "ORCL": [
@@ -58765,7 +58768,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T08:26:01Z"
+  "letto_il": "2026-09-12T08:56:03Z"
  },
  "predictions": [
   {
@@ -79247,6 +79250,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T08:26:02Z"
+  "generated_at": "2026-09-12T08:56:04Z"
  }
 }
