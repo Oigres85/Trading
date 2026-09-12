@@ -1088,6 +1088,26 @@ _PAGINA = Path("scripts/brief_pagina.py").read_text(encoding="utf-8")
 check("v451 la pagina non ricalcola e non va in rete: rende gli stessi numeri del testo",
       "atr_wilder" not in _PAGINA and "urllib" not in _PAGINA and "requests" not in _PAGINA)
 
+# ⚠⚠ IL REPO E' PUBBLICO (verificato il 12/09/2026: visibility "public"). Una chiave API
+#    committata qui dentro e' una chiave pubblicata. La chiave FRED vive nel prompt delle
+#    Routine, che e' privato dell'account, e arriva allo script come variabile d'ambiente.
+_CHIAVI_VIETATE = [p for p in Path("config").glob("*key*") if p.is_file()]
+check("v451 nessun file di chiavi in config/ (il repo e' pubblico)",
+      not _CHIAVI_VIETATE, extra=", ".join(str(p) for p in _CHIAVI_VIETATE))
+check("v451 .gitignore blocca comunque config/fred_key.txt",
+      "config/fred_key.txt" in Path(".gitignore").read_text(encoding="utf-8"))
+# Una chiave FRED e' 32 caratteri esadecimali minuscoli: si cerca la FORMA, non un valore.
+import re as _re
+_SOSPETTI = []
+for _p in list(Path("scripts").glob("*.py")) + list(Path("scripts").glob("*.mjs")) + \
+          [Path("CLAUDE.md"), Path("index.html")]:
+    if not _p.exists():
+        continue
+    for _m in _re.finditer(r"(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])", _p.read_text(encoding="utf-8")):
+        _SOSPETTI.append(f"{_p}:{_m.group()[:6]}...")
+check("v451 nessuna stringa con la forma di una chiave API nei sorgenti",
+      not _SOSPETTI, extra=" · ".join(_SOSPETTI[:4]))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

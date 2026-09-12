@@ -33,3 +33,6 @@ __pycache__/
 # cache dei dati raccolti: si rigenera in ~90 secondi con scripts/raccolta/,
 # quindi non vive nel repo (3,8 MB a run, e sarebbe uno storico di copie identiche)
 memoria/dati/
+
+# ⚠ Il repo e PUBBLICO: nessuna chiave API puo entrare qui dentro.
+config/fred_key.txt
