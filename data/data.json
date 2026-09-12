@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T04:03:44Z",
+ "updated_at": "2026-09-12T08:04:04Z",
  "eurusd": 1.1602,
  "totals": {
   "usd_value": 0,
@@ -987,8 +987,8 @@
     "target_mean": 1513.1111,
     "fcf": 7639499776.0,
     "gross_margin": 0.7257,
-    "enterprise_value": 1081455869952.0,
-    "ev_ebitda": 15.852,
+    "enterprise_value": 1081805963264.0,
+    "ev_ebitda": 15.857,
     "peg": 0.14,
     "roa": 0.3487,
     "short_float": 0.0264,
@@ -1742,7 +1742,7 @@
      "a1": 483.81,
      "a3": 1349.59,
      "a5": 1307.06,
-     "a10": 5525.01
+     "a10": 5525.0
     },
     "stagionalita": [
      {
@@ -4608,7 +4608,7 @@
      218.29
     ],
     "y1": [
-     177.39,
+     177.4,
      176.25,
      177.76,
      187.17,
@@ -4762,14 +4762,14 @@
     "target_mean": 327.6544,
     "fcf": 41809874944.0,
     "gross_margin": 0.7467,
-    "enterprise_value": 5234287968256.0,
-    "ev_ebitda": 26.007,
+    "enterprise_value": 5237179940864.0,
+    "ev_ebitda": 26.021,
     "peg": 0.59,
     "roa": 0.5357,
     "short_float": 0.0129,
     "buyback_yield": 0.0076,
     "ps": 17.4,
-    "ev_s": 17.28
+    "ev_s": 17.29
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -5515,7 +5515,7 @@
      "a1": 17.28,
      "a3": 403.33,
      "a5": 958.37,
-     "a10": 12885.8
+     "a10": 12885.79
     },
     "stagionalita": [
      {
@@ -7563,7 +7563,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 0.83,
-   "pe": 141.7,
+   "pe": 140.5,
    "ath": 207.52,
    "ath_dist_pct": -19.4,
    "sma200_dist_pct": 10.4,
@@ -8003,7 +8003,7 @@
     "target_mediana": 205.1
    },
    "health": 63,
-   "eps": 1.18,
+   "eps": 1.19,
    "beta": 1.62,
    "sharpe_1y": -0.1,
    "sortino_1y": -0.15,
@@ -8024,9 +8024,9 @@
     "float_shares": 2109933407.0,
     "float_pct": 91.7,
     "avg_volume_30d": 40642578.0,
-    "pe_ttm": 141.7203,
+    "pe_ttm": 140.5294,
     "forward_pe": 71.8969,
-    "eps_ttm": 1.18,
+    "eps_ttm": 1.19,
     "eps_forward": 2.326,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
@@ -9862,9 +9862,9 @@
     "float_pct": 59.5,
     "avg_volume_30d": 31564200.0,
     "pe_ttm": 23.9681,
-    "forward_pe": 13.6729,
+    "forward_pe": 13.6691,
     "eps_ttm": 6.27,
-    "eps_forward": 10.9911,
+    "eps_forward": 10.9941,
     "revenue_fy": 67356999680.0,
     "net_income_fy": 16984000512.0,
     "revenue_growth": 0.206,
@@ -10947,7 +10947,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -2.98,
-   "pe": 16.6,
+   "pe": 17.1,
    "ath": 799.61,
    "ath_dist_pct": -44.1,
    "sma200_dist_pct": 18.0,
@@ -11890,7 +11890,7 @@
     "target_mediana": 640.0
    },
    "health": 45,
-   "eps": 26.92,
+   "eps": 26.12,
    "beta": 2.18,
    "sharpe_1y": 1.87,
    "sortino_1y": 2.87,
@@ -11911,9 +11911,9 @@
     "float_shares": 358020763.0,
     "float_pct": 99.3,
     "avg_volume_30d": 8384985.0,
-    "pe_ttm": 16.6114,
+    "pe_ttm": 17.1202,
     "forward_pe": 14.0846,
-    "eps_ttm": 26.92,
+    "eps_ttm": 26.12,
     "eps_forward": 31.7495,
     "revenue_fy": 12919000064.0,
     "net_income_fy": 9285999616.0,
@@ -11927,14 +11927,14 @@
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
-    "enterprise_value": 160744964096.0,
-    "ev_ebitda": 32.136,
+    "enterprise_value": 160838696960.0,
+    "ev_ebitda": 32.155,
     "peg": 0.92,
     "roa": 0.2076,
     "short_float": 0.0619,
     "buyback_yield": 0.0161,
     "ps": 12.48,
-    "ev_s": 12.44,
+    "ev_s": 12.45,
     "altman_z": 9.76,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -19353,7 +19353,7 @@
     "target_mediana": 200.0
    },
    "health": 76,
-   "eps": -99.16,
+   "eps": -101.02,
    "beta": 3.6,
    "sharpe_1y": -1.23,
    "sortino_1y": -1.72,
@@ -19376,7 +19376,7 @@
     "avg_volume_30d": 23474506.0,
     "pe_ttm": null,
     "forward_pe": 2.6464,
-    "eps_ttm": -99.16,
+    "eps_ttm": -101.02,
     "eps_forward": 49.49,
     "revenue_fy": 498347008.0,
     "net_income_fy": -31367133184.0,
@@ -20846,7 +20846,7 @@
     "target_mediana": 150.0
    },
    "health": 40,
-   "eps": -3.55,
+   "eps": -3.54,
    "beta": null,
    "sharpe_1y": -0.28,
    "sortino_1y": -0.42,
@@ -20869,7 +20869,7 @@
     "avg_volume_30d": 28280088.0,
     "pe_ttm": null,
     "forward_pe": -45.6687,
-    "eps_ttm": -3.55,
+    "eps_ttm": -3.54,
     "eps_forward": -1.9486,
     "revenue_fy": 7590000128.0,
     "net_income_fy": -1928000000.0,
@@ -20883,8 +20883,8 @@
     "target_mean": 144.4571,
     "fcf": -9088615424.0,
     "gross_margin": 0.6742,
-    "enterprise_value": 95144214528.0,
-    "ev_ebitda": 25.111,
+    "enterprise_value": 95155240960.0,
+    "ev_ebitda": 25.114,
     "peg": null,
     "roa": -0.0024,
     "short_float": 0.1784,
@@ -21835,40 +21835,39 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77271.32,
+   "price": 77258.03,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.92,
+   "change_pct": 0.11,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 10.3,
-   "sma50_dist_pct": 9.4,
+   "sma200_dist_pct": 10.2,
+   "sma50_dist_pct": 9.0,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -38.8,
    "day_high": 77366.49,
-   "day_low": 77201.88,
-   "support": 75624.95,
+   "day_low": 77171.18,
+   "support": 76162.91,
    "resistance": 82262.21,
    "rsi": 55.1,
-   "volume": 35500396544,
-   "vol_ratio": 0.98,
-   "atr_14": 2087.68,
-   "atr_pct": 2.7,
+   "volume": 31802818560,
+   "vol_ratio": 1.21,
+   "atr_14": 2142.01,
+   "atr_pct": 2.77,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
     "w1": [
-     79115.85,
      78438.58,
      78259.52,
      76568.12,
-     77271.32
+     77173.8,
+     77258.03
     ],
     "m6": [
-     80664.37,
      82138.93,
      81728.3,
      80477.49,
@@ -21993,7 +21992,8 @@
      78438.58,
      78259.52,
      76568.12,
-     77271.32
+     77173.8,
+     77258.03
     ],
     "all": [
      386.94,
@@ -22140,10 +22140,9 @@
      58558.86,
      62813.75,
      78548.63,
-     77271.32
+     77258.03
     ],
     "m1": [
-     78335.19,
      77083.41,
      77755.27,
      78964.48,
@@ -22164,10 +22163,10 @@
      78438.58,
      78259.52,
      76568.12,
-     77271.32
+     77173.8,
+     77258.03
     ],
     "m3": [
-     62257.57,
      63193.15,
      64127.14,
      63802.03,
@@ -22232,7 +22231,8 @@
      78438.58,
      78259.52,
      76568.12,
-     77271.32
+     77173.8,
+     77258.03
     ],
     "y1": [
      116101.58,
@@ -22307,7 +22307,8 @@
      77755.27,
      77830.29,
      77300.48,
-     79115.85
+     79115.85,
+     77258.03
     ],
     "d1": [
      77280.33,
@@ -22334,21 +22335,45 @@
      77254.56,
      77243.98,
      77253.63,
-     77271.32
+     77289.12,
+     77284.76,
+     77228.44,
+     77265.01,
+     77238.91,
+     77230.24,
+     77188.91,
+     77214.49,
+     77208.79,
+     77233.3,
+     77223.53,
+     77235.45,
+     77190.58,
+     77193.72,
+     77225.78,
+     77247.67,
+     77308.83,
+     77294.77,
+     77312.08,
+     77321.82,
+     77309.36,
+     77273.83,
+     77263.01,
+     77268.66,
+     77258.03
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 66,
+   "health": 69,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.86,
    "sortino_1y": -1.15,
-   "sharpe_6m": -0.35,
-   "sortino_6m": -0.51,
+   "sharpe_6m": -0.39,
+   "sortino_6m": -0.57,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77271.32,
+   "prezzo_limite_aggiustato": 77258.03,
    "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22359,39 +22384,39 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 76470.64,
-     "resistance": 80432.31,
-     "change_pct": -2.33
+     "support": 76162.91,
+     "resistance": 79818.34,
+     "change_pct": -1.51
     },
     "m1": {
-     "support": 73011.41,
+     "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": -1.36
+     "change_pct": 0.23
     },
     "m3": {
-     "support": 61492.65,
+     "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 24.12
+     "change_pct": 22.26
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -14.71
+     "change_pct": -15.49
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 58,
+    "bias": 62,
     "label": "Lieve rialzo",
     "structure": "laterale",
     "bos": null,
     "bull_fvg": 4,
-    "bear_fvg": 1,
+    "bear_fvg": 0,
     "last_fvg": {
-     "dir": "ribassista",
-     "lo": 77366.49,
-     "hi": 77768.15
+     "dir": "rialzista",
+     "lo": 73369.8,
+     "hi": 76526.71
     },
     "liq_above": 79463.71,
     "liq_below": 76909.35,
@@ -22403,55 +22428,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77271.32,
+     "prezzo": 77258.03,
      "medie": {
       "sma10": {
-       "liv": 78807.15,
+       "liv": 78793.15,
        "dist_pct": -1.95
       },
       "ema10": {
-       "liv": 78133.9,
-       "dist_pct": -1.1
+       "liv": 77960.15,
+       "dist_pct": -0.9
       },
       "sma20": {
-       "liv": 78616.86,
-       "dist_pct": -1.71
+       "liv": 78587.12,
+       "dist_pct": -1.69
       },
       "ema20": {
-       "liv": 77009.95,
-       "dist_pct": 0.34
+       "liv": 77025.17,
+       "dist_pct": 0.3
       },
       "sma30": {
-       "liv": 75048.75,
-       "dist_pct": 2.96
+       "liv": 75507.36,
+       "dist_pct": 2.32
       },
       "ema30": {
-       "liv": 75363.4,
-       "dist_pct": 2.53
+       "liv": 75479.74,
+       "dist_pct": 2.36
       },
       "sma50": {
-       "liv": 70647.46,
-       "dist_pct": 9.38
+       "liv": 70908.7,
+       "dist_pct": 8.95
       },
       "ema50": {
-       "liv": 72856.32,
-       "dist_pct": 6.06
+       "liv": 73025.26,
+       "dist_pct": 5.8
       },
       "sma100": {
-       "liv": 66874.34,
-       "dist_pct": 15.55
+       "liv": 67007.93,
+       "dist_pct": 15.3
       },
       "ema100": {
-       "liv": 70795.41,
-       "dist_pct": 9.15
+       "liv": 70921.49,
+       "dist_pct": 8.93
       },
       "sma200": {
-       "liv": 70025.67,
-       "dist_pct": 10.35
+       "liv": 70091.07,
+       "dist_pct": 10.23
       },
       "ema200": {
-       "liv": 73191.39,
-       "dist_pct": 5.57
+       "liv": 73230.89,
+       "dist_pct": 5.5
       }
      },
      "medie_battute": 9,
@@ -22459,29 +22484,22 @@
      "oscillatori": {
       "rsi14": 55.1,
       "macd": {
-       "linea": 2027.37,
-       "segnale": 2761.85,
-       "istogramma": -734.48
+       "linea": 1808.83,
+       "segnale": 2570.0,
+       "istogramma": -761.17
       },
-      "stoch_k": 17.0,
-      "stoch_d": 18.6,
-      "williams_r": -83.0,
-      "cci20": -15.9,
-      "adx14": 44.6,
-      "di_su": 28.2,
-      "di_giu": 15.5,
-      "momentum10": -132.3
+      "stoch_k": 18.0,
+      "stoch_d": 13.3,
+      "williams_r": -82.0,
+      "cci20": -18.0,
+      "adx14": 44.4,
+      "di_su": 29.5,
+      "di_giu": 14.0,
+      "momentum10": -42.45
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
-     {
-      "d": "2026-07-04",
-      "o": 62545.13,
-      "h": 63398.41,
-      "l": 62287.59,
-      "c": 63088.3
-     },
      {
       "d": "2026-07-05",
       "o": 63089.06,
@@ -22959,23 +22977,30 @@
       "c": 76568.12
      },
      {
+      "d": "2026-09-11",
+      "o": 76559.12,
+      "h": 79818.34,
+      "l": 76162.91,
+      "c": 77173.8
+     },
+     {
       "d": "2026-09-12",
       "o": 77201.88,
       "h": 77366.49,
-      "l": 77201.88,
-      "c": 77271.32
+      "l": 77171.18,
+      "c": 77258.03
      }
     ],
     "performance": {
-     "s1": -3.83,
-     "m1": 5.8,
-     "m3": 22.08,
-     "m6": -3.64,
-     "a1": -14.09,
-     "ytd": -12.92,
-     "a3": 186.53,
-     "a5": 76.46,
-     "a10": 12572.94
+     "s1": -2.35,
+     "m1": -1.38,
+     "m3": 24.09,
+     "m6": -4.22,
+     "a1": -14.73,
+     "ytd": -12.93,
+     "a3": 186.48,
+     "a5": 76.42,
+     "a10": 12570.76
     },
     "stagionalita": [
      {
@@ -23053,7 +23078,7 @@
      {
       "mese": 9,
       "media": -1.81,
-      "mediana": -2.35,
+      "mediana": -2.36,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23088,9 +23113,9 @@
      }
     ]
    },
-   "rs_1m": -0.2,
+   "rs_1m": 1.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -0.1,
+   "rs_ndx_1m": 1.5,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -25123,7 +25148,7 @@
      30523.5,
      28404.25,
      29513.0,
-     29391.75
+     29387.0
     ],
     "m1": [
      29853.25,
@@ -26087,7 +26112,7 @@
      {
       "mese": 9,
       "media": -1.48,
-      "mediana": -0.27,
+      "mediana": -0.28,
       "positivi_pct": 41,
       "campione": 22,
       "peggio": -20.2,
@@ -32598,7 +32623,7 @@
      6.19,
      6.44,
      6.59,
-     6.56
+     6.55
     ],
     "m1": [
      6.6,
@@ -33565,7 +33590,7 @@
      },
      {
       "mese": 9,
-      "media": -0.23,
+      "media": -0.24,
       "mediana": 0.04,
       "positivi_pct": 52,
       "campione": 23,
@@ -34043,7 +34068,7 @@
      69.5,
      84.67,
      85.76,
-     99.99
+     100.05
     ],
     "m1": [
      83.27,
@@ -35010,12 +35035,12 @@
      },
      {
       "mese": 9,
-      "media": -1.25,
+      "media": -1.24,
       "mediana": -3.92,
       "positivi_pct": 43,
       "campione": 23,
       "peggio": -13.9,
-      "meglio": 16.6
+      "meglio": 16.7
      },
      {
       "mese": 10,
@@ -36569,7 +36594,7 @@
      "a1": 56.34,
      "a3": 417.5,
      "a5": 319.23,
-     "a10": 1681.44
+     "a10": 1681.43
     },
     "stagionalita": [
      {
@@ -47735,20 +47760,6 @@
      "url": "https://www.cnbc.com/2026/09/11/cpi-inflation-report-august-2026.html"
     },
     {
-     "titolo": "Dollar Wavers as CPI Adds to Fed Hike Bets While Oil Falls",
-     "riassunto": "The dollar oscillated Friday after a key gauge of US consumer prices rose by more than expected, pushing traders to add to bets that the Federal Reserve will raise interest rates next week.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-11T13:21:27Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-11/dollar-wavers-as-inflation-aids-fed-hike-bets-while-oil-falls"
-    },
-    {
-     "titolo": "Treasuries End Bruising Week With Fed Hike Bets Firmed After CPI",
-     "riassunto": "The $32 trillion US bond market ended a bruising week that pushed yields to multiyear highs, with investors more convinced the Federal Reserve will raise interest rates next week to address sticky inflation.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-11T12:38:05Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-11/treasuries-fall-as-higher-than-expected-cpi-boosts-fed-hike-odds"
-    },
-    {
      "titolo": "Friday's CPI inflation report is even more important than usual. Here's what to expect",
      "riassunto": "The Bureau of Labor Statistics will release the August consumer price index report at 8:30 a.m.",
      "fonte": "CNBC Economia",
@@ -47796,6 +47807,20 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-08T14:15:38Z",
      "url": "https://www.cnbc.com/2026/09/07/japan-foreign-reserves-yen-intervention.html"
+    },
+    {
+     "titolo": "China's imports in August miss estimates as calls for rebalancing trade grow",
+     "riassunto": "China's exports and imports gathered momentum in August, as the world's second-largest economy faces mounting pressure to rebalance trade.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-08T04:45:07Z",
+     "url": "https://www.cnbc.com/2026/09/08/china-exports-imports-august-trade-rebalance-demand-surplus-.html"
+    },
+    {
+     "titolo": "From ‘mystery vacations’ to hostels, budget travelers get thrifty as prices rise",
+     "riassunto": "Despite rising prices and the travel industry focusing on the luxury segment, budget-minded vacationers are still finding ways to get away.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-05T23:55:52Z",
+     "url": "https://www.cnbc.com/2026/09/05/budget-travel-vacation-costs.html"
     }
    ],
    "fonti": [
@@ -52688,7 +52713,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 59
+     "score": 51
     },
     {
      "label": "Treasury 10A",
@@ -57765,8 +57790,15 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T03:05:12Z",
+      "quando": "2026-09-12T06:39:11Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+     },
+     {
+      "titolo": "3 Ways to Invest in Anthropic Pre-IPO",
+      "riassunto": "Key PointsSome tech giants already have Anthropic stakes, which you can get exposure to by investing in those companies.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T05:20:00Z",
+      "url": "https://www.nasdaq.com/articles/3-ways-invest-anthropic-pre-ipo"
      },
      {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
@@ -57795,13 +57827,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T21:45:02Z",
       "url": "https://www.nasdaq.com/articles/alphabet-googl-beats-stock-market-upswing-what-investors-need-know"
-     },
-     {
-      "titolo": "Google Wallet Rolls Out Full-Screen Redesign For Passes On Android",
-      "riassunto": "(RTTNews) - Google under Alphabet Inc. (GOOG) is rolling out a redesigned interface for passes in Google Wallet on Android, following a homepage update that introduced search in May.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T21:41:07Z",
-      "url": "https://www.nasdaq.com/articles/google-wallet-rolls-out-full-screen-redesign-passes-android"
      }
     ],
     "MRVL": [
@@ -57809,7 +57834,7 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T03:05:12Z",
+      "quando": "2026-09-12T06:39:11Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
      },
      {
@@ -57853,7 +57878,7 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T03:05:12Z",
+      "quando": "2026-09-12T06:39:11Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
      },
      {
@@ -57941,8 +57966,15 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T03:05:12Z",
+      "quando": "2026-09-12T06:39:11Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+     },
+     {
+      "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
+      "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T05:50:00Z",
+      "url": "https://www.nasdaq.com/articles/michael-burry-staying-short-nvidia-palantir-and-tesla-warning-possible-1987-type-fall-ai"
      },
      {
       "titolo": "Apple, Microsoft, and Nvidia Top the List of Largest Companies by Market Cap. Here's the One I'm Buying Now.",
@@ -57971,13 +58003,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T17:30:01Z",
       "url": "https://www.nasdaq.com/articles/tsmc-just-delivered-fantastic-news-nvidia-shareholders"
-     },
-     {
-      "titolo": "AI Capex Creates New Investment Cycle: NVIDIA & 2 Other Stocks to Buy",
-      "riassunto": "AI capex is fueling a new infrastructure cycle, with NVIDIA, Arista Networks and Vertiv well-positioned across computing, networking and power.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T15:21:00Z",
-      "url": "https://www.nasdaq.com/articles/ai-capex-creates-new-investment-cycle-nvidia-2-other-stocks-buy"
      }
     ],
     "ORCL": [
@@ -57985,7 +58010,7 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T03:05:12Z",
+      "quando": "2026-09-12T06:39:11Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
      },
      {
@@ -58026,6 +58051,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
+      "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T05:50:00Z",
+      "url": "https://www.nasdaq.com/articles/michael-burry-staying-short-nvidia-palantir-and-tesla-warning-possible-1987-type-fall-ai"
+     },
+     {
       "titolo": "BigBear.ai Stock Dives 29% in the Past 3 Months: Hold or Fold?",
       "riassunto": "BBAI's AI demand and rising backlog offer growth potential, but persistent losses, modest growth and government-contract risks weigh on its outlook.",
       "fonte": "Nasdaq",
@@ -58059,13 +58091,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-10T18:24:00Z",
       "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-might-be-septembers-most-important-ai-infrastructure-stock"
-     },
-     {
-      "titolo": "Is Palantir Stock an Undervalued AI Stock to Buy?",
-      "riassunto": "Sales are booming as enterprises and institutions look to implement AI into their operations.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-10T17:19:30Z",
-      "url": "https://www.nasdaq.com/articles/palantir-stock-undervalued-ai-stock-buy"
      }
     ],
     "RGTI": [
@@ -58180,7 +58205,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T04:03:44Z"
+   "letto_il": "2026-09-12T08:04:04Z"
   }
  },
  "broker": null,
@@ -58323,8 +58348,15 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T03:05:12Z",
+     "quando": "2026-09-12T06:39:11Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+    },
+    {
+     "titolo": "3 Ways to Invest in Anthropic Pre-IPO",
+     "riassunto": "Key PointsSome tech giants already have Anthropic stakes, which you can get exposure to by investing in those companies.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T05:20:00Z",
+     "url": "https://www.nasdaq.com/articles/3-ways-invest-anthropic-pre-ipo"
     },
     {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
@@ -58353,13 +58385,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T21:45:02Z",
      "url": "https://www.nasdaq.com/articles/alphabet-googl-beats-stock-market-upswing-what-investors-need-know"
-    },
-    {
-     "titolo": "Google Wallet Rolls Out Full-Screen Redesign For Passes On Android",
-     "riassunto": "(RTTNews) - Google under Alphabet Inc. (GOOG) is rolling out a redesigned interface for passes in Google Wallet on Android, following a homepage update that introduced search in May.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T21:41:07Z",
-     "url": "https://www.nasdaq.com/articles/google-wallet-rolls-out-full-screen-redesign-passes-android"
     }
    ],
    "MRVL": [
@@ -58367,7 +58392,7 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T03:05:12Z",
+     "quando": "2026-09-12T06:39:11Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
     },
     {
@@ -58411,7 +58436,7 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T03:05:12Z",
+     "quando": "2026-09-12T06:39:11Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
     },
     {
@@ -58499,8 +58524,15 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T03:05:12Z",
+     "quando": "2026-09-12T06:39:11Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+    },
+    {
+     "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
+     "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T05:50:00Z",
+     "url": "https://www.nasdaq.com/articles/michael-burry-staying-short-nvidia-palantir-and-tesla-warning-possible-1987-type-fall-ai"
     },
     {
      "titolo": "Apple, Microsoft, and Nvidia Top the List of Largest Companies by Market Cap. Here's the One I'm Buying Now.",
@@ -58529,13 +58561,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T17:30:01Z",
      "url": "https://www.nasdaq.com/articles/tsmc-just-delivered-fantastic-news-nvidia-shareholders"
-    },
-    {
-     "titolo": "AI Capex Creates New Investment Cycle: NVIDIA & 2 Other Stocks to Buy",
-     "riassunto": "AI capex is fueling a new infrastructure cycle, with NVIDIA, Arista Networks and Vertiv well-positioned across computing, networking and power.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T15:21:00Z",
-     "url": "https://www.nasdaq.com/articles/ai-capex-creates-new-investment-cycle-nvidia-2-other-stocks-buy"
     }
    ],
    "ORCL": [
@@ -58543,7 +58568,7 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T03:05:12Z",
+     "quando": "2026-09-12T06:39:11Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
     },
     {
@@ -58584,6 +58609,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?",
+     "riassunto": "Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T05:50:00Z",
+     "url": "https://www.nasdaq.com/articles/michael-burry-staying-short-nvidia-palantir-and-tesla-warning-possible-1987-type-fall-ai"
+    },
+    {
      "titolo": "BigBear.ai Stock Dives 29% in the Past 3 Months: Hold or Fold?",
      "riassunto": "BBAI's AI demand and rising backlog offer growth potential, but persistent losses, modest growth and government-contract risks weigh on its outlook.",
      "fonte": "Nasdaq",
@@ -58617,13 +58649,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-10T18:24:00Z",
      "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-might-be-septembers-most-important-ai-infrastructure-stock"
-    },
-    {
-     "titolo": "Is Palantir Stock an Undervalued AI Stock to Buy?",
-     "riassunto": "Sales are booming as enterprises and institutions look to implement AI into their operations.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-10T17:19:30Z",
-     "url": "https://www.nasdaq.com/articles/palantir-stock-undervalued-ai-stock-buy"
     }
    ],
    "RGTI": [
@@ -58738,7 +58763,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T04:03:44Z"
+  "letto_il": "2026-09-12T08:04:04Z"
  },
  "predictions": [
   {
@@ -58757,18 +58782,18 @@
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
   },
   {
+   "question": "Will the price of Bitcoin be above $78,000 on September 12?",
+   "yes": 3,
+   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-12-2026"
+  },
+  {
    "question": "Fed Rate Hike by September 2026 Meeting?",
    "yes": 78,
    "link": "https://polymarket.com/event/fed-rate-hike-by-september-2026-meeting"
   },
   {
-   "question": "Will the price of Bitcoin be above $78,000 on September 12?",
-   "yes": 6,
-   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-12-2026"
-  },
-  {
    "question": "Will the price of Bitcoin be above $76,000 on September 12?",
-   "yes": 98,
+   "yes": 99,
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-12-2026"
   }
  ],
@@ -79168,7 +79193,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 4 ore"
+    "note": "18 voci, la piu' recente di 8 ore"
    },
    {
     "key": "sec_calendario",
@@ -79220,6 +79245,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T04:03:45Z"
+  "generated_at": "2026-09-12T08:04:04Z"
  }
 }
