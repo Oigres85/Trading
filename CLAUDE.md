@@ -5368,6 +5368,60 @@ grandezze (v161/v207).
 ⚠ `?v=` e `BUILD_VERSION` **non** toccati: nessun file servito al browser (regola v440).
 
 
+## 🔑 v452 — LA CHIAVE NON VIVE DA NESSUNA PARTE, PERCHÉ LA PIPELINE CE L'HA GIÀ
+
+Il CEO non ha accesso a `claude.ai` per impostare la variabile d'ambiente, e i due posti
+alternativi erano entrambi chiusi: il repo è **pubblico** (una chiave committata è una chiave
+pubblicata) e il classificatore blocca — giustamente — la scrittura di una credenziale dentro il
+prompt di una Routine.
+
+**La soluzione non era un quarto nascondiglio: era accorgersi che il problema non esisteva.**
+`scripts/update_data.py` ha la chiave FRED nei secret di GitHub da sempre, gira 14-15 volte al
+giorno e pubblica quelle serie in `data/data.json`. Il brief le legge di lì.
+
+| serve | dove stava già |
+|---|---|
+| Treasury 10A | `tassi.scadenze[a10]` |
+| Curva 10A-2A · CPI · Disoccupazione · NFP · TIPS 10A | `indicators[]` |
+| HY OAS | `credit.spread_hy` |
+| NFCI · **SLOOS** | `credito_banche` |
+| Fed Funds effettivo | `fed_market.current_rate` |
+| EUR/USD | `markets[EURUSD=X]` |
+
+⚠ **La fetch diretta a FRED è stata TOLTA, non affiancata**: due strade per la stessa grandezza
+divergono al primo ritocco (v161, v207, v316). Una sola derivazione, e un gate verifica che né
+`stlouisfed.org` né `FRED_API_KEY` rientrino nel file.
+
+⚠⚠ **IL PREZZO SI DICHIARA**: se la pipeline si ferma, la macro si ferma con lei. Quindi il
+blocco pubblica **l'età del run** e, oltre le 24 ore, scrive `PIPELINE FERMA DA N ORE`. E ogni
+riga porta la **propria** rilevazione, che è un'altra data — quella del run non la sostituisce
+mai (classe v431: l'etichetta dall'orologio e il valore dai dati).
+
+⚠ **Due campi non hanno una data nel file** (Fed Funds effettivo, EUR/USD) e lo **dichiarano**
+invece di ereditare quella del run. Sarebbe la data di un'altra cosa.
+
+### 🦴 Due gate rossi, entrambi riagganciati e nessuno zittito
+- **«le posizioni vengono da LIBRO.md e non dalla pipeline»** pretendeva che `data.json` non
+  comparisse **mai** nel file. È **testualmente la v439**, stessa classe e stesso riaggancio:
+  l'invariante scritto nel suo commento è più stretto — le **POSIZIONI** non devono venire dalla
+  pipeline, così che se la pipeline muore il libro resti vero. Ora guarda il **corpo di
+  `leggi_libro`**, non il file intero.
+- **«senza chiave FRED si dichiara il buco»**: la chiave non esiste più. L'invariante che contava
+  non era *«senza chiave»* ma **«senza il dato si dichiara il buco»** (v396). Riagganciato ai due
+  rami veri — file assente e file illeggibile.
+
+### 🎯 E la sonda era sulla chiave sbagliata, per la terza volta
+Cinque righe su undici uscivano *«rilevazione non dichiarata»* — **falso**: le date c'erano.
+`indicators[]` scrive `date`, mentre `tassi.scadenze` scrive `observation_date`, e avevo
+riusato il secondo nome sul primo oggetto. *Un check — o una lettura — sulla chiave sbagliata
+misura un'altra cosa* (v196, v229, v415, v416). Trovato **guardando l'uscita**, non il codice.
+
+⚠ Cinque iniezioni, **tutte mordono**, con `modifica_sicura` anche per le iniezioni e ripristino
+verificato per hash da uno snapshot preso prima (v427, v430). Pavimento 148 → 151.
+
+⚠ `?v=` e `BUILD_VERSION` **non** toccati: nessun file servito al browser (regola v440).
+
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

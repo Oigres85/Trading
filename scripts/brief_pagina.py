@@ -135,19 +135,34 @@ def genera(d):
 
     mf = d["macro_fred"]
     if mf["stato"] != "ok":
-        serie = ('<p class="mancante"><b>Serie macro assenti.</b> Inflazione, curva 10A-2A, HY OAS, '
-                 'NFCI e Fed Funds non sono in questa lettura. Non è «nessun movimento»: '
-                 'è il dato che manca.</p>')
+        serie = (f'<p class="mancante"><b>Serie macro assenti — {e(mf["stato"])}.</b> '
+                 'Inflazione, curva 10A-2A, HY OAS, NFCI e Fed Funds non sono in questa lettura. '
+                 'Non e\u0300 «nessun movimento»: e\u0300 il dato che manca.</p>')
     else:
-        righe = "".join(
-            f'<tr><td>{e(s["nome"])}</td><td class="mono num">{n2(s["valore"])}</td>'
-            f'<td class="mono num {cls(s.get("delta"))}">{sg(s.get("delta"),2,"") if s.get("delta") is not None else "—"}</td>'
-            f'<td class="data mono">{e(s["data"])}</td></tr>'
-            if "valore" in s else
-            f'<tr><td>{e(s["nome"])}</td><td colspan="3" class="ko">{e(s.get("stato","n.d."))}</td></tr>'
-            for s in mf["serie"])
-        serie = (f'<table class="fred"><thead><tr><th>serie</th><th class="num">valore</th>'
-                 f'<th class="num">Δ</th><th>rilevazione</th></tr></thead><tbody>{righe}</tbody></table>')
+        eta = mf.get("eta_ore")
+        # L'eta del run si dichiara SEMPRE: se la pipeline si ferma, la macro si ferma con lei.
+        if eta is None:
+            cap = ('<p class="mancante">Le serie vengono dalla pipeline, che non dichiara quando '
+                   'ha girato: la loro freschezza non &egrave; verificabile.</p>')
+        elif eta > 24:
+            cap = (f'<p class="mancante"><b>Pipeline ferma da {n2(eta,1)} ore.</b> '
+                   'Queste serie non si aggiornano da allora: ogni riga porta comunque la '
+                   'propria rilevazione, che &egrave; pi&ugrave; vecchia del run.</p>')
+        else:
+            cap = (f'<p class="note-fonti">Dalla pipeline, run di <b>{n2(eta,1)} ore</b> fa. '
+                   'Ogni riga porta la <b>propria</b> rilevazione, che &egrave; un&rsquo;altra data.</p>')
+        righe = ""
+        for s in mf["serie"]:
+            quando = (f'<td class="data mono">{e(s["data"])}</td>' if s.get("data")
+                      else '<td class="data ko">non dichiarata</td>')
+            prec = (f'<td class="mono num">{n2(s["prec"])}</td>'
+                    if isinstance(s.get("prec"), (int, float)) else '<td class="num data">&mdash;</td>')
+            nota = f'<div class="note">{e(s["nota"])}</div>' if s.get("nota") else ""
+            righe += (f'<tr><td>{e(s["nome"])}{nota}</td>'
+                      f'<td class="mono num"><b>{e(s["valore"])}</b></td>{prec}{quando}</tr>')
+        serie = (cap + '<table class="fred"><thead><tr><th>serie</th><th class="num">valore</th>'
+                 '<th class="num">prima</th><th>rilevazione</th></tr></thead>'
+                 f'<tbody>{righe}</tbody></table>')
 
     fonti_ko = ""
     if nw["titoli_non_letti"]:
