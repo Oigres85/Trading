@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T13:32:59Z",
+ "updated_at": "2026-09-12T15:03:22Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -4608,7 +4608,7 @@
      218.29
     ],
     "y1": [
-     177.4,
+     177.39,
      176.25,
      177.76,
      187.17,
@@ -5515,7 +5515,7 @@
      "a1": 17.28,
      "a3": 403.33,
      "a5": 958.37,
-     "a10": 12885.79
+     "a10": 12885.8
     },
     "stagionalita": [
      {
@@ -21835,28 +21835,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77280.01,
+   "price": 77445.3,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.14,
+   "change_pct": 0.35,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 10.3,
-   "sma50_dist_pct": 9.0,
+   "ath_dist_pct": -38.6,
+   "sma200_dist_pct": 10.5,
+   "sma50_dist_pct": 9.2,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.8,
-   "day_high": 77376.09,
+   "w52_dist_pct": -38.6,
+   "day_high": 77468.78,
    "day_low": 77171.18,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 55.1,
-   "volume": 24955353088,
+   "rsi": 55.7,
+   "volume": 19370358784,
    "vol_ratio": 1.21,
-   "atr_14": 2142.69,
-   "atr_pct": 2.77,
+   "atr_14": 2149.31,
+   "atr_pct": 2.78,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21865,7 +21865,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77280.01
+     77445.3
     ],
     "m6": [
      82138.93,
@@ -21993,7 +21993,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77280.01
+     77445.3
     ],
     "all": [
      386.94,
@@ -22140,7 +22140,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77280.01
+     77445.3
     ],
     "m1": [
      77083.41,
@@ -22164,7 +22164,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77280.01
+     77445.3
     ],
     "m3": [
      63193.15,
@@ -22232,7 +22232,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77280.01
+     77445.3
     ],
     "y1": [
      116101.58,
@@ -22308,7 +22308,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77280.01
+     77445.3
     ],
     "d1": [
      77280.33,
@@ -22392,7 +22392,16 @@
      77317.38,
      77295.93,
      77266.94,
-     77280.01
+     77289.65,
+     77274.71,
+     77320.1,
+     77360.0,
+     77349.0,
+     77369.99,
+     77415.23,
+     77424.75,
+     77453.11,
+     77445.3
     ]
    },
    "earnings_date": null,
@@ -22401,13 +22410,13 @@
    "health": 69,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.86,
-   "sortino_1y": -1.15,
-   "sharpe_6m": -0.38,
-   "sortino_6m": -0.57,
+   "sharpe_1y": -0.85,
+   "sortino_1y": -1.14,
+   "sharpe_6m": -0.37,
+   "sortino_6m": -0.55,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77280.01,
-   "risk_reward": "1:1.2",
+   "prezzo_limite_aggiustato": 77445.3,
+   "risk_reward": "1:1.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22419,22 +22428,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.48
+     "change_pct": -1.27
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.26
+     "change_pct": 0.47
     },
     "m3": {
      "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 22.29
+     "change_pct": 22.55
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.46
+     "change_pct": -15.28
     }
    },
    "financials": [],
@@ -22461,74 +22470,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77280.01,
+     "prezzo": 77445.3,
      "medie": {
       "sma10": {
-       "liv": 78795.35,
-       "dist_pct": -1.92
+       "liv": 78811.88,
+       "dist_pct": -1.73
       },
       "ema10": {
-       "liv": 77964.14,
-       "dist_pct": -0.88
+       "liv": 77994.19,
+       "dist_pct": -0.7
       },
       "sma20": {
-       "liv": 78588.22,
-       "dist_pct": -1.66
+       "liv": 78596.48,
+       "dist_pct": -1.46
       },
       "ema20": {
-       "liv": 77027.26,
-       "dist_pct": 0.33
+       "liv": 77043.0,
+       "dist_pct": 0.52
       },
       "sma30": {
-       "liv": 75508.09,
-       "dist_pct": 2.35
+       "liv": 75513.6,
+       "dist_pct": 2.56
       },
       "ema30": {
-       "liv": 75481.16,
-       "dist_pct": 2.38
+       "liv": 75491.83,
+       "dist_pct": 2.59
       },
       "sma50": {
-       "liv": 70909.14,
-       "dist_pct": 8.98
+       "liv": 70912.44,
+       "dist_pct": 9.21
       },
       "ema50": {
-       "liv": 73026.12,
-       "dist_pct": 5.83
+       "liv": 73032.6,
+       "dist_pct": 6.04
       },
       "sma100": {
-       "liv": 67008.15,
-       "dist_pct": 15.33
+       "liv": 67009.81,
+       "dist_pct": 15.57
       },
       "ema100": {
-       "liv": 70921.92,
-       "dist_pct": 8.96
+       "liv": 70925.19,
+       "dist_pct": 9.19
       },
       "sma200": {
-       "liv": 70091.18,
-       "dist_pct": 10.26
+       "liv": 70092.01,
+       "dist_pct": 10.49
       },
       "ema200": {
-       "liv": 73231.11,
-       "dist_pct": 5.53
+       "liv": 73232.76,
+       "dist_pct": 5.75
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 55.1,
+      "rsi14": 55.7,
       "macd": {
-       "linea": 1810.58,
-       "segnale": 2570.35,
-       "istogramma": -759.77
+       "linea": 1823.77,
+       "segnale": 2572.99,
+       "istogramma": -749.22
       },
-      "stoch_k": 18.3,
-      "stoch_d": 13.4,
-      "williams_r": -81.7,
-      "cci20": -17.9,
+      "stoch_k": 21.0,
+      "stoch_d": 14.3,
+      "williams_r": -79.0,
+      "cci20": -16.8,
       "adx14": 44.4,
-      "di_su": 29.5,
-      "di_giu": 14.0,
-      "momentum10": -20.47
+      "di_su": 29.4,
+      "di_giu": 13.9,
+      "momentum10": 144.82
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23019,21 +23028,21 @@
      {
       "d": "2026-09-12",
       "o": 77201.88,
-      "h": 77376.09,
+      "h": 77468.78,
       "l": 77171.18,
-      "c": 77280.01
+      "c": 77445.3
      }
     ],
     "performance": {
-     "s1": -2.32,
-     "m1": -1.35,
-     "m3": 24.13,
-     "m6": -4.2,
-     "a1": -14.7,
-     "ytd": -12.91,
-     "a3": 186.56,
-     "a5": 76.48,
-     "a10": 12574.36
+     "s1": -2.11,
+     "m1": -1.14,
+     "m3": 24.39,
+     "m6": -3.99,
+     "a1": -14.52,
+     "ytd": -12.72,
+     "a3": 187.18,
+     "a5": 76.85,
+     "a10": 12601.47
     },
     "stagionalita": [
      {
@@ -23110,8 +23119,8 @@
      },
      {
       "mese": 9,
-      "media": -1.81,
-      "mediana": -2.35,
+      "media": -1.79,
+      "mediana": -2.24,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23146,9 +23155,9 @@
      }
     ]
    },
-   "rs_1m": 1.4,
+   "rs_1m": 1.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.5,
+   "rs_ndx_1m": 1.7,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -36625,9 +36634,9 @@
      "m6": 29.33,
      "ytd": 36.25,
      "a1": 56.34,
-     "a3": 417.49,
+     "a3": 417.5,
      "a5": 319.23,
-     "a10": 1681.44
+     "a10": 1681.43
     },
     "stagionalita": [
      {
@@ -47730,6 +47739,20 @@
   "news": {
    "voci": [
     {
+     "titolo": "Higher Interest Rates May Be the New Normal",
+     "riassunto": "Joining Bloomberg This Weekend, Bloomberg Economics Chief Economist Tom Orlik says higher interest rates may be the new normal, leaving governments, businesses and households facing a mounting cost from debt accumulated during years of cheap borrowing. Orlik tells hosts David Gura and Christina Ruffini that Fed Chair K",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-12T14:17:03Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-12/higher-interest-rates-may-be-the-new-normal-video"
+    },
+    {
+     "titolo": "‘Crazy’ French Inversion Shows Credit Is a Haven: Credit Weekly",
+     "riassunto": "Bond traders are making an unusual judgment about risk in French financial markets: they believe collateralized bank bonds are safer than government debt.",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-12T14:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-12/-crazy-french-inversion-shows-credit-is-a-haven-credit-weekly"
+    },
+    {
      "titolo": "Inflation is outpacing wage growth again, squeezing Americans’ paychecks",
      "riassunto": "In August, consumer prices rose 3.4% over the past year while wages increased just 3.1%.",
      "fonte": "CNBC Economia",
@@ -47840,20 +47863,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-05T23:55:52Z",
      "url": "https://www.cnbc.com/2026/09/05/budget-travel-vacation-costs.html"
-    },
-    {
-     "titolo": "Trump turns up the heat on Warsh as Fed rate hike looms",
-     "riassunto": "Ten days ahead of the next Federal Reserve meeting, the Trump administration looks to be in a full-court press to halt a rate hike in its tracks.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-05T19:12:53Z",
-     "url": "https://www.cnbc.com/2026/09/05/trump-warsh-fed-september-rate-hike.html"
-    },
-    {
-     "titolo": "Women accounted for almost all of job gains in August. Here's why",
-     "riassunto": "Women accounted for virtually all of August's payroll gains, the latest sign of their growing power in the labor market.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-04T18:27:39Z",
-     "url": "https://www.cnbc.com/2026/09/04/jobs-report-women-payrolls.html"
     }
    ],
    "fonti": [
@@ -52746,7 +52755,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 54
     },
     {
      "label": "Treasury 10A",
@@ -57823,7 +57832,7 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T12:40:15Z",
+      "quando": "2026-09-12T14:14:29Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
      },
      {
@@ -57867,7 +57876,7 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T13:05:45Z",
+      "quando": "2026-09-12T14:14:29Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
      },
      {
@@ -57911,7 +57920,7 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T13:05:45Z",
+      "quando": "2026-09-12T14:14:29Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
      },
      {
@@ -57999,8 +58008,15 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T13:05:45Z",
+      "quando": "2026-09-12T14:14:29Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+     },
+     {
+      "titolo": "Apple and Taiwan Semiconductor Manufacturing Just Announced a Cutting-Edge Chip. 1 Stock Offers Far Greater Upside.",
+      "riassunto": "Key PointsTaiwan Semiconductor expects strong growth for the rest of 2026 and 2027.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T13:44:00Z",
+      "url": "https://www.nasdaq.com/articles/apple-and-taiwan-semiconductor-manufacturing-just-announced-cutting-edge-chip-1-stock"
      },
      {
       "titolo": "Breakfast News: 4 CEOs Playing the Long Game",
@@ -58029,13 +58045,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T09:23:00Z",
       "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
-     },
-     {
-      "titolo": "Warren Buffett Loves Wide Moats: 3 AI Infrastructure Stocks That Fit the Bill",
-      "riassunto": "Key PointsASML has a monopoly on the technology that powers the AI boom.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T09:20:00Z",
-      "url": "https://www.nasdaq.com/articles/warren-buffett-loves-wide-moats-3-ai-infrastructure-stocks-fit-bill"
      }
     ],
     "ORCL": [
@@ -58043,7 +58052,7 @@
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-12T13:05:45Z",
+      "quando": "2026-09-12T14:14:29Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
      },
      {
@@ -58238,7 +58247,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T13:32:59Z"
+   "letto_il": "2026-09-12T15:03:22Z"
   }
  },
  "broker": null,
@@ -58381,7 +58390,7 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T12:40:15Z",
+     "quando": "2026-09-12T14:14:29Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
     },
     {
@@ -58425,7 +58434,7 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T13:05:45Z",
+     "quando": "2026-09-12T14:14:29Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
     },
     {
@@ -58469,7 +58478,7 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T13:05:45Z",
+     "quando": "2026-09-12T14:14:29Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
     },
     {
@@ -58557,8 +58566,15 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T13:05:45Z",
+     "quando": "2026-09-12T14:14:29Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+    },
+    {
+     "titolo": "Apple and Taiwan Semiconductor Manufacturing Just Announced a Cutting-Edge Chip. 1 Stock Offers Far Greater Upside.",
+     "riassunto": "Key PointsTaiwan Semiconductor expects strong growth for the rest of 2026 and 2027.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T13:44:00Z",
+     "url": "https://www.nasdaq.com/articles/apple-and-taiwan-semiconductor-manufacturing-just-announced-cutting-edge-chip-1-stock"
     },
     {
      "titolo": "Breakfast News: 4 CEOs Playing the Long Game",
@@ -58587,13 +58603,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T09:23:00Z",
      "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
-    },
-    {
-     "titolo": "Warren Buffett Loves Wide Moats: 3 AI Infrastructure Stocks That Fit the Bill",
-     "riassunto": "Key PointsASML has a monopoly on the technology that powers the AI boom.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T09:20:00Z",
-     "url": "https://www.nasdaq.com/articles/warren-buffett-loves-wide-moats-3-ai-infrastructure-stocks-fit-bill"
     }
    ],
    "ORCL": [
@@ -58601,7 +58610,7 @@
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-12T13:05:45Z",
+     "quando": "2026-09-12T14:14:29Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
     },
     {
@@ -58796,12 +58805,12 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T13:32:59Z"
+  "letto_il": "2026-09-12T15:03:22Z"
  },
  "predictions": [
   {
    "question": "Will there be no change in Fed interest rates after the September 2026 meeting?",
-   "yes": 20,
+   "yes": 22,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615"
   },
   {
@@ -58815,19 +58824,19 @@
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-12-2026"
   },
   {
+   "question": "Will the price of Bitcoin be above $78,000 on September 12?",
+   "yes": 2,
+   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-12-2026"
+  },
+  {
+   "question": "Bitcoin Up or Down on September 12?",
+   "yes": 2,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-12-2026"
+  },
+  {
    "question": "Fed rate hike in 2026?",
    "yes": 88,
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $74,000 on September 12?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-74k-on-september-12-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $72,000 on September 12?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-72k-on-september-12-2026"
   }
  ],
  "options": {
@@ -79278,6 +79287,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T13:33:00Z"
+  "generated_at": "2026-09-12T15:03:22Z"
  }
 }
