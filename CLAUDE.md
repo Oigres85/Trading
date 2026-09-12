@@ -5287,6 +5287,87 @@ bump è stato riapplicato dopo la fine dell'harness invece che prima.
 ⚠ `?v=` e `BUILD_VERSION` **sono stati bumpati** qui, a differenza di v448 e v449: questa
 versione tocca `assets/app.js`, cioè un file servito al browser (regola v440).
 
+## 📰 v451 — IL BRIEF DIVENTA IL PRODOTTO, E LA MISURA HA DECISO DOVE VIVE
+
+Decisione del CEO (12/09/2026): niente intraday, ingressi una tantum con stop su
+Investing.com, e **due letture al giorno** — 08:30 «cosa è successo stanotte e cosa guardare
+oggi», 16:00 «apertura USA appena avvenuta». Aveva chiesto Twitter, Reddit e Bloomberg.
+
+**Misurato prima di costruire, e la misura ha cambiato metà del lavoro:**
+
+| fonte | esito dal 12/09/2026 |
+|---|---|
+| **X / Twitter** | 200 con il solo involucro JavaScript: **zero testo di tweet**. Nitter morto, syndication 0 byte |
+| **Reddit** | **403**. Ed era già VIETATO in casa, da quando un LLM marcò `[VERIFICATO]` medie mobili con fonte Reddit |
+| **StockTwits** (il sostituto raggiungibile) | ✅ freschissimo, e misurato **chiacchiera**: *"$NVDA PEG ratio? Come on in PEG!"*, zero fatti su 30 messaggi |
+| **Bloomberg** | ✅ 40 voci fresche (markets + technology) |
+| **WSJ** `feeds.a.dj.com` | ⚠⚠ **200, 20 voci ben formate, datate GENNAIO 2025** — venti mesi fa |
+
+> ⚠⚠ **Il WSJ è il reperto che vale più degli altri: una fonte che risponde 200 con contenuto
+> plausibile e MORTO.** Cablato senza guardare le date, il brief di stamattina avrebbe portato
+> il rout di DeepSeek come notizia di oggi. Non era un difetto — WSJ non è fra le fonti news —
+> ma è **una trappola evitata perché la fetch è stata misurata invece che ricordata** (v203).
+> Resta escluso, con la ragione scritta e un gate che lo sorveglia.
+
+### ⚠⚠ E FUORI DA GITHUB I PREZZI CI SONO, con gli STESSI numeri
+La mia obiezione principale a spostare il prodotto era che senza la pipeline morissero ATR,
+stop, correlazione e contributo al rischio. **La misura me l'ha tolta**: `stockanalysis.com`
+serve **13 nomi su 13, 252 barre datate, in 3,0 secondi** da questo ambiente (Yahoo: 429
+sempre). E l'ATR ricalcolato di là riproduce `data.json`:
+
+| | MU | AMD | WDC | CRWV | NVDA |
+|---|---|---|---|---|---|
+| `data.json` | 51,84 | 22,64 | 31,46 | 6,44 | 6,83 |
+| ricalcolato | **51,84** | **22,64** | **31,46** | **6,44** | 6,87 |
+
+⚠ **Ma solo con la convenzione giusta.** La media semplice a 14 dava **44,15 su MU, il 17% in
+meno**, e stavo per segnalarlo al CEO come divergenza fra fonti. Era la mia convenzione:
+**Wilder vince 8 su 8**. *Un allarme va verificato contro il testo vero prima di diventare una
+correzione* (v417) — e qui mi avrebbe fatto «correggere» un sistema che era giusto.
+
+### Cosa fa lo script e cosa NON fa
+`scripts/brief.py` **seleziona**, il modello **giudica** (regola v448). Dentro: finestra
+temporale, attribuzione dalla fonte, ampiezza in ATR (mai in percentuale — v210), livelli,
+tre sorti distinte per ogni fonte. Fuori: qualunque elenco di parole che decida se una notizia
+è importante.
+
+⚠ **La stessa voce in più feed è cronaca di mercato, non una notizia sul nome**: non si toglie,
+si **conta** e si dichiara. Misurato sul run di stamattina: *"Stocks Shake Off CPI Report"*
+compariva in **12 feed**; *"Oracle Says Its Expiring AI Contracts Are Renewing 20% Higher"* in
+uno solo. È la discriminazione che serve, e la fa il conteggio invece di un'euristica.
+
+⚠ **Il filtro macro è un registro di PAROLE e si dichiara fallibile nei due versi.** CNBC
+Economia entra per intero — la selezione l'ha fatta una redazione, che è meglio del mio elenco
+(v389); Bloomberg e MarketWatch sono generalisti e passano dal filtro.
+
+⚠ **Le posizioni vengono da `memoria/LIBRO.md`, mai dalla pipeline** (v439): se la pipeline
+muore, il brief deve continuare a dire la verità sul libro. Un gate lo sorveglia.
+
+⚠ **Senza chiave FRED si dichiara il buco** invece di fingerlo: *"non è 'nessun movimento', è
+il dato che manca"* (istruzione permanente del CEO, v396).
+
+### 🧪 Sedici gate nuovi, e il sedicesimo era decorativo
+Sette iniezioni, **tutte mordono**, con `modifica_sicura` anche per le iniezioni e ripristino
+verificato **per hash** da uno snapshot preso prima, mai da `git checkout` (v427, v430).
+
+⚠⚠ **Un'iniezione non mordeva, e la colpa era del GATE**: il check sulla soglia verificava che
+il NOME `var_atr` esistesse, non che il calcolo **dividesse per l'ampiezza**. Restava verde su
+un confronto fatto in percentuale — cioè proprio il difetto v210. Stretto sulla divisione,
+morde su entrambe le forme. *Quando un'iniezione non morde le possibilità sono tre* (v448), e
+questa era la seconda: **gate decorativo**.
+
+⚠ E il gate «le posizioni non vengono dalla pipeline» ha trovato **sé stesso**: `data.json`
+compare per forza nella docstring che SPIEGA la misura. Settima incarnazione (v213, v240, v393,
+v395, v418). Ora si tolgono commenti **e docstring** via AST prima di cercare un'assenza.
+
+⚠ Il gate del censimento (v387) ha morso al primo giro: lo strumento nuovo non era in
+`/aggiorna`. È dichiarato **fuori** con la sua ragione — seleziona un sottoinsieme di ciò che
+quel comando guarda per intero, ed eseguirlo lì affiancherebbe una seconda resa delle stesse
+grandezze (v161/v207).
+
+⚠ `?v=` e `BUILD_VERSION` **non** toccati: nessun file servito al browser (regola v440).
+
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

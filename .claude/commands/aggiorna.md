@@ -169,6 +169,13 @@ Gli strumenti per un nome solo — `soglie.py TICKER`, `analisi_libro.py TICKER`
 seleziona un SOTTOINSIEME di ciò che questo comando guarda per intero — le notizie fresche del
 giro, il movimento contro l'ampiezza del titolo, credito e FOMC. Eseguirlo qui aggiungerebbe una
 seconda resa delle stesse grandezze accanto a quella del rapporto, che è la classe v161/v207.
+`scripts/brief.py` resta **fuori** con la sua ragione: è il prodotto quotidiano deciso dal CEO
+il 12/09/2026 (due letture al giorno via Routine, 08:30 e 16:00 italiane), e seleziona un
+SOTTOINSIEME di ciò che questo comando guarda per intero. Eseguirlo qui affiancherebbe una
+seconda resa delle stesse grandezze a quella del rapporto, che è la classe v161/v207.
+⚠ Non dipende da GitHub Actions: prende prezzi e notizie da sé (stockanalysis.com + Nasdaq per
+simbolo), quindi continua a funzionare anche se la pipeline è ferma — e lo dichiara.
+
 `scripts/modifica_sicura.py` non è un passo di questo comando: è la libreria che ogni modifica ai
 sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf.py` è la libreria
 che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed

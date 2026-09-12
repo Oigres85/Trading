@@ -937,6 +937,104 @@ check("v448 il comando gira sui dati veri, esce 0 e stampa tutte le sezioni",
       extra=(_run.stderr or "")[-300:])
 
 
+
+# ============================ v451 — BRIEF QUOTIDIANO ============================
+# Lo strumento nasce SORVEGLIATO: una fonte che nessun check guarda puo' morire il giorno in
+# cui nasce (v390) — le news macro sono state morte un anno prima che qualcuno se ne accorgesse.
+_BRIEF = Path("scripts/brief.py").read_text(encoding="utf-8")
+# ⚠ Chi cerca l'ASSENZA di una costruzione guarda il CODICE: i commenti e le docstring che
+# SPIEGANO la misura contengono per forza le stringhe cercate — e' il gate che trova se stesso
+# (v213, v240, v393, v395). Qui si tolgono sia i commenti sia le docstring.
+def _solo_codice_py(sorgente):
+    import ast as _ast
+    albero = _ast.parse(sorgente)
+    docs = set()
+    for nodo in _ast.walk(albero):
+        if isinstance(nodo, (_ast.Module, _ast.FunctionDef, _ast.AsyncFunctionDef, _ast.ClassDef)):
+            corpo = getattr(nodo, "body", [])
+            if corpo and isinstance(corpo[0], _ast.Expr) and isinstance(corpo[0].value, _ast.Constant) \
+               and isinstance(corpo[0].value.value, str):
+                docs.add(id(corpo[0]))
+    righe = sorgente.splitlines()
+    fuori = set()
+    for nodo in _ast.walk(albero):
+        if id(nodo) in docs:
+            for n in range(nodo.lineno - 1, nodo.end_lineno):
+                fuori.add(n)
+    return "\n".join(r.split("#")[0] for i, r in enumerate(righe) if i not in fuori)
+
+_BRIEF_CODICE = _solo_codice_py(_BRIEF)
+
+import importlib.util as _ilu
+_sp = _ilu.spec_from_file_location("_bf", "scripts/brief.py")
+_bf = _ilu.module_from_spec(_sp); _sp.loader.exec_module(_bf)
+
+check("v451 l'ATR e' quello di WILDER, non la media semplice a 14",
+      "def atr_wilder" in _BRIEF_CODICE and "a = (a * (n - 1) + x) / n" in _BRIEF_CODICE)
+
+# Lo stato si COSTRUISCE (v425, v429, v431): barre in cui l'ampiezza CROLLA a meta' serie, dove
+# Wilder (memoria lunga) e la media a 14 (memoria corta) devono divergere per costruzione.
+_b = [{"t": f"d{i}", "o": 100, "h": 100 + (10 if i < 20 else 1),
+       "l": 100 - (10 if i < 20 else 1), "c": 100} for i in range(40)]
+_w = _bf.atr_wilder(_b)
+_m14 = sum(max(_b[i]["h"] - _b[i]["l"], abs(_b[i]["h"] - _b[i-1]["c"]), abs(_b[i]["l"] - _b[i-1]["c"]))
+           for i in range(len(_b) - 14, len(_b))) / 14
+check("v451 Wilder ha memoria lunga: su ampiezza in calo sta SOPRA la media a 14",
+      _w is not None and _w > _m14 * 1.5, extra=f"wilder={_w:.2f} media14={_m14:.2f}")
+
+# ⚠ NON basta che il NOME esista: il gate deve vedere la DIVISIONE per l'ampiezza, altrimenti
+# resta verde su un confronto fatto in percentuale (iniezione che non mordeva, 12/09/2026).
+check("v451 la soglia del movimento e' in ATR, mai in percentuale",
+      "SOGLIA_ATR" in _BRIEF_CODICE and "non una percentuale" in _BRIEF
+      and 'r["escursione_pct"] / r["atr_pct"]' in _BRIEF_CODICE
+      and 'abs(q["cp"]) / r["atr_pct"]' in _BRIEF_CODICE)
+
+check("v451 si guarda l'ESCURSIONE oltre alla chiusura (v449)",
+      "escursione_pct" in _BRIEF_CODICE
+      and 'r.get("escursione_atr")' in _BRIEF_CODICE)
+
+check("v451 le tre sorti di una fonte sono distinte e rese tutte e tre",
+      all(x in _BRIEF_CODICE for x in ("titoli_non_letti", "titoli_muti",
+                                       "macro_non_lette", "macro_mute"))
+      and "NON LETTI (diverso da" in _BRIEF and "letti e senza voci in finestra" in _BRIEF)
+
+check("v451 il filtro macro dichiara di essere a parole e fallibile nei due versi",
+      "_e_macro" in _BRIEF_CODICE and "TERMINI_MACRO" in _BRIEF_CODICE
+      and "filtro A PAROLE" in _BRIEF and "fallibile in entrambi i versi" in _BRIEF)
+
+# ⚠⚠ WSJ risponde 200 con venti voci ben formate datate GENNAIO 2025. Misurato il 12/09/2026.
+check("v451 WSJ resta ESCLUSO e la ragione e' scritta, non dimenticata",
+      "feeds.a.dj.com" not in _BRIEF_CODICE and "ESCLUSO DELIBERATAMENTE" in _BRIEF
+      and "GENNAIO 2025" in _BRIEF)
+
+check("v451 Reddit, X e StockTwits non sono fonti del brief",
+      not any(x in _BRIEF_CODICE for x in ("reddit.com", "//x.com", "twitter.com", "stocktwits")))
+
+check("v451 le posizioni vengono da memoria/LIBRO.md e non dalla pipeline",
+      "LIBRO.md" in _BRIEF_CODICE and "data.json" not in _BRIEF_CODICE)
+
+check("v451 senza chiave FRED si dichiara il buco invece di tacere",
+      "CHIAVE ASSENTE" in _BRIEF_CODICE and "e' il dato che manca" in _BRIEF
+      and "nessun movimento" in _BRIEF)
+
+check("v451 l'etichetta del feed dichiara la PROVENIENZA, non l'attribuzione",
+      "NON 'notizia su TK'" in _BRIEF and "in_feed" in _BRIEF_CODICE)
+
+check("v451 le variazioni nominano la seduta e non usano un avverbio (v416)",
+      "nell'ultima seduta" in _BRIEF and "seduta del {r.get(" in _BRIEF)
+
+check("v451 il brief dichiara il confine: livelli si', quantita' no",
+      "Direzione e livelli si', quantita' no" in _BRIEF and "NON conosce: altri conti" in _BRIEF)
+
+# Il libro si legge davvero: un modulo che importa non e' un parser che funziona.
+_pos, _cassa = _bf.leggi_libro()
+check("v451 il parser del libro trova le 13 azioni, il BTP e la liquidita'",
+      len([p for p in _pos if p["valuta"] == "USD"]) == 13
+      and any(p["tk"].startswith("BTP") for p in _pos) and _cassa == 10000,
+      extra=f"{len(_pos)} righe, cassa={_cassa}")
+check("v451 il PMC di NVDA e' quello confermato dal CEO, non quello vecchio",
+      any(p["tk"] == "NVDA" and abs(p["pmc"] - 87.1667) < 0.001 for p in _pos))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
