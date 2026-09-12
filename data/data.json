@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T18:08:45Z",
+ "updated_at": "2026-09-12T19:02:48Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -1742,7 +1742,7 @@
      "a1": 483.81,
      "a3": 1349.59,
      "a5": 1307.06,
-     "a10": 5525.01
+     "a10": 5525.0
     },
     "stagionalita": [
      {
@@ -1770,7 +1770,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -4608,7 +4608,7 @@
      218.29
     ],
     "y1": [
-     177.39,
+     177.4,
      176.25,
      177.76,
      187.17,
@@ -5515,7 +5515,7 @@
      "a1": 17.28,
      "a3": 403.33,
      "a5": 958.37,
-     "a10": 12885.8
+     "a10": 12885.79
     },
     "stagionalita": [
      {
@@ -11792,7 +11792,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -21835,28 +21835,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77202.55,
+   "price": 77134.46,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.04,
+   "change_pct": -0.05,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 10.1,
-   "sma50_dist_pct": 8.9,
+   "ath_dist_pct": -38.9,
+   "sma200_dist_pct": 10.0,
+   "sma50_dist_pct": 8.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.8,
+   "w52_dist_pct": -38.9,
    "day_high": 77468.78,
-   "day_low": 77166.08,
+   "day_low": 77115.34,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 54.9,
-   "volume": 14963138560,
+   "rsi": 54.6,
+   "volume": 14246722560,
    "vol_ratio": 1.21,
-   "atr_14": 2149.68,
-   "atr_pct": 2.78,
+   "atr_14": 2153.3,
+   "atr_pct": 2.79,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21865,7 +21865,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77202.55
+     77134.46
     ],
     "m6": [
      82138.93,
@@ -21993,7 +21993,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77202.55
+     77134.46
     ],
     "all": [
      386.94,
@@ -22140,7 +22140,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77202.55
+     77134.46
     ],
     "m1": [
      77083.41,
@@ -22164,7 +22164,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77202.55
+     77134.46
     ],
     "m3": [
      63193.15,
@@ -22232,7 +22232,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77202.55
+     77134.46
     ],
     "y1": [
      116101.58,
@@ -22308,7 +22308,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77202.55
+     77134.46
     ],
     "d1": [
      77280.33,
@@ -22419,21 +22419,27 @@
      77263.72,
      77221.38,
      77175.9,
-     77168.97
+     77168.97,
+     77154.43,
+     77177.24,
+     77144.39,
+     77175.03,
+     77138.82,
+     77134.46
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 69,
+   "health": 68,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.86,
    "sortino_1y": -1.15,
-   "sharpe_6m": -0.39,
+   "sharpe_6m": -0.4,
    "sortino_6m": -0.58,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77202.55,
+   "prezzo_limite_aggiustato": 77134.46,
    "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22446,22 +22452,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.58
+     "change_pct": -1.66
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.15
+     "change_pct": 0.07
     },
     "m3": {
      "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 22.17
+     "change_pct": 22.06
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.55
+     "change_pct": -15.62
     }
    },
    "financials": [],
@@ -22488,74 +22494,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77202.55,
+     "prezzo": 77134.46,
      "medie": {
       "sma10": {
-       "liv": 78787.6,
-       "dist_pct": -2.01
+       "liv": 78780.8,
+       "dist_pct": -2.09
       },
       "ema10": {
-       "liv": 77950.06,
-       "dist_pct": -0.96
+       "liv": 77937.68,
+       "dist_pct": -1.03
       },
       "sma20": {
-       "liv": 78584.34,
-       "dist_pct": -1.76
+       "liv": 78580.94,
+       "dist_pct": -1.84
       },
       "ema20": {
-       "liv": 77019.89,
-       "dist_pct": 0.24
+       "liv": 77013.4,
+       "dist_pct": 0.16
       },
       "sma30": {
-       "liv": 75505.51,
-       "dist_pct": 2.25
+       "liv": 75503.24,
+       "dist_pct": 2.16
       },
       "ema30": {
-       "liv": 75476.16,
-       "dist_pct": 2.29
+       "liv": 75471.77,
+       "dist_pct": 2.2
       },
       "sma50": {
-       "liv": 70907.59,
-       "dist_pct": 8.88
+       "liv": 70906.23,
+       "dist_pct": 8.78
       },
       "ema50": {
-       "liv": 73023.09,
-       "dist_pct": 5.72
+       "liv": 73020.42,
+       "dist_pct": 5.63
       },
       "sma100": {
-       "liv": 67007.38,
-       "dist_pct": 15.21
+       "liv": 67006.7,
+       "dist_pct": 15.11
       },
       "ema100": {
-       "liv": 70920.39,
-       "dist_pct": 8.86
+       "liv": 70919.04,
+       "dist_pct": 8.76
       },
       "sma200": {
-       "liv": 70090.79,
-       "dist_pct": 10.15
+       "liv": 70090.45,
+       "dist_pct": 10.05
       },
       "ema200": {
-       "liv": 73230.34,
-       "dist_pct": 5.42
+       "liv": 73229.66,
+       "dist_pct": 5.33
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 54.9,
+      "rsi14": 54.6,
       "macd": {
-       "linea": 1804.4,
-       "segnale": 2569.12,
-       "istogramma": -764.71
+       "linea": 1798.97,
+       "segnale": 2568.03,
+       "istogramma": -769.06
       },
-      "stoch_k": 17.0,
-      "stoch_d": 13.0,
-      "williams_r": -83.0,
-      "cci20": -17.8,
+      "stoch_k": 15.9,
+      "stoch_d": 12.6,
+      "williams_r": -84.1,
+      "cci20": -18.3,
       "adx14": 44.4,
       "di_su": 29.4,
       "di_giu": 13.9,
-      "momentum10": -97.93
+      "momentum10": -166.02
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23047,20 +23053,20 @@
       "d": "2026-09-12",
       "o": 77201.88,
       "h": 77468.78,
-      "l": 77166.08,
-      "c": 77202.55
+      "l": 77115.34,
+      "c": 77134.46
      }
     ],
     "performance": {
-     "s1": -2.42,
-     "m1": -1.45,
-     "m3": 24.01,
-     "m6": -4.29,
-     "a1": -14.79,
-     "ytd": -12.99,
-     "a3": 186.28,
-     "a5": 76.3,
-     "a10": 12561.66
+     "s1": -2.5,
+     "m1": -1.53,
+     "m3": 23.9,
+     "m6": -4.38,
+     "a1": -14.87,
+     "ytd": -13.07,
+     "a3": 186.02,
+     "a5": 76.14,
+     "a10": 12550.49
     },
     "stagionalita": [
      {
@@ -23138,7 +23144,7 @@
      {
       "mese": 9,
       "media": -1.82,
-      "mediana": -2.4,
+      "mediana": -2.44,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23173,9 +23179,9 @@
      }
     ]
    },
-   "rs_1m": 1.3,
+   "rs_1m": 1.2,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.4,
+   "rs_ndx_1m": 1.3,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -36652,9 +36658,9 @@
      "m6": 29.33,
      "ytd": 36.25,
      "a1": 56.34,
-     "a3": 417.49,
+     "a3": 417.5,
      "a5": 319.23,
-     "a10": 1681.43
+     "a10": 1681.44
     },
     "stagionalita": [
      {
@@ -52756,7 +52762,7 @@
    "calls": 171857
   },
   "risk_sentiment": {
-   "score": 44,
+   "score": 43,
    "label": "Neutrale",
    "components": [
     {
@@ -58023,6 +58029,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "Better AI Chip Stock: Broadcom vs. Nvidia",
+      "riassunto": "Key PointsBroadcom&rsquo;s AI semiconductor revenue jumped 221% year over year as demand for custom chips accelerated.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T17:46:00Z",
+      "url": "https://www.nasdaq.com/articles/better-ai-chip-stock-broadcom-vs-nvidia"
+     },
+     {
       "titolo": "Prediction: Nvidia Stock Could Be Worth This Much by January 2028",
       "riassunto": "Key PointsNvidia says that its forecast for the next fiscal year is supply-constrained, not demand-constrained.",
       "fonte": "Nasdaq",
@@ -58056,13 +58069,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T11:50:00Z",
       "url": "https://www.nasdaq.com/articles/breakfast-news-4-ceos-playing-long-game"
-     },
-     {
-      "titolo": "Prediction: Nvidia Will Overtake Apple in Stock Buybacks and Dividends Under New Apple CEO John Ternus",
-      "riassunto": "Key PointsOver the last 15 years, Apple reduced its share count by 43.2% under CEO Tim Cook.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T10:36:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-overtake-apple-stock-buybacks-and-dividends-under-new-apple-ceo"
      }
     ],
     "ORCL": [
@@ -58265,7 +58271,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T18:08:45Z"
+   "letto_il": "2026-09-12T19:02:48Z"
   }
  },
  "broker": null,
@@ -58581,6 +58587,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "Better AI Chip Stock: Broadcom vs. Nvidia",
+     "riassunto": "Key PointsBroadcom&rsquo;s AI semiconductor revenue jumped 221% year over year as demand for custom chips accelerated.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T17:46:00Z",
+     "url": "https://www.nasdaq.com/articles/better-ai-chip-stock-broadcom-vs-nvidia"
+    },
+    {
      "titolo": "Prediction: Nvidia Stock Could Be Worth This Much by January 2028",
      "riassunto": "Key PointsNvidia says that its forecast for the next fiscal year is supply-constrained, not demand-constrained.",
      "fonte": "Nasdaq",
@@ -58614,13 +58627,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T11:50:00Z",
      "url": "https://www.nasdaq.com/articles/breakfast-news-4-ceos-playing-long-game"
-    },
-    {
-     "titolo": "Prediction: Nvidia Will Overtake Apple in Stock Buybacks and Dividends Under New Apple CEO John Ternus",
-     "riassunto": "Key PointsOver the last 15 years, Apple reduced its share count by 43.2% under CEO Tim Cook.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T10:36:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-overtake-apple-stock-buybacks-and-dividends-under-new-apple-ceo"
     }
    ],
    "ORCL": [
@@ -58823,7 +58829,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T18:08:45Z"
+  "letto_il": "2026-09-12T19:02:48Z"
  },
  "predictions": [
   {
@@ -58837,24 +58843,14 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
-   "question": "Will the price of Bitcoin be above $76,000 on September 12?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-12-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $74,000 on September 12?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-74k-on-september-12-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $72,000 on September 12?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-72k-on-september-12-2026"
-  },
-  {
    "question": "Fed rate hike in 2026?",
    "yes": 88,
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
+  },
+  {
+   "question": "Fed Rate Hike by October 2026 Meeting?",
+   "yes": 82,
+   "link": "https://polymarket.com/event/fed-rate-hike-by-october-2026-meeting"
   }
  ],
  "options": {
@@ -79123,7 +79119,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 33,
-    "risk_sentiment": 44,
+    "risk_sentiment": 43,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
@@ -79253,7 +79249,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 3 ore"
+    "note": "18 voci, la piu' recente di 4 ore"
    },
    {
     "key": "sec_calendario",
@@ -79305,6 +79301,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T18:08:46Z"
+  "generated_at": "2026-09-12T19:02:49Z"
  }
 }
