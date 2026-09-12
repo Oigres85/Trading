@@ -1,4 +1,4 @@
-⟦ BUILD v450 · generato 12/09/2026 17:23 ⟧
+⟦ BUILD v450 · generato 12/09/2026 17:35 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 12/09/2026, 17:23:33 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 13:23, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,09% · Fut S&P +0,75% · BTC +0,14% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~44.1h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 12/09/2026, 17:35:08 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 13:35, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,09% · Fut S&P +0,75% · BTC +0,1% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~43.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 12/09/2026, 17:23:33, prossimo run 12/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-11 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 12/09/2026, 17:35:08, prossimo run 12/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-11 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-11) · Curva 10A-3M (2026-09-11) · Treasury USA 30A (2026-09-10) · Tasso reale 10A (TIPS) (2026-09-10) · Inflazione attesa 10A (breakeven) (2026-09-11) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -100,11 +100,11 @@ QUADRO MACRO:
       PNC Chief Investment Officer Amanda Agati is on Bloomberg This Weekend and says the Fed faces a difficult decision as energy-driven inflation pushes markets toward expectations for higher rates, warning that further tightening could risk a policy error. Agati also tells hosts David Gura and Christina Ruffini investors 
     · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Higher Interest Rates May Be the New Normal
       Joining Bloomberg This Weekend, Bloomberg Economics Chief Economist Tom Orlik says higher interest rates may be the new normal, leaving governments, businesses and households facing a mounting cost from debt accumulated during years of cheap borrowing. Orlik tells hosts David Gura and Christina Ruffini that Fed Chair K
-    · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] ‘Crazy’ French Inversion Shows Credit Is a Haven: Credit Weekly
+    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] ‘Crazy’ French Inversion Shows Credit Is a Haven: Credit Weekly
       Bond traders are making an unusual judgment about risk in French financial markets: they believe collateralized bank bonds are safer than government debt.
     · [CNBC Economia, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Inflation is outpacing wage growth again, squeezing Americans’ paychecks
       In August, consumer prices rose 3.4% over the past year while wages increased just 3.1%.
-    · [MarketWatch, 17h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] The Fed could raise interest rates three times. Here’s where the market could face the stiffest test.
+    · [MarketWatch, 18h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] The Fed could raise interest rates three times. Here’s where the market could face the stiffest test.
       Economists note that the Fed historically has not been content to raise rates only once.
     · [MarketWatch, 21h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Oracle shook off fears about AI spending, but its stock still loses ground
       “Several of Oracle’s bear cases were addressed head on” in the latest earnings report, according to an analyst.
@@ -231,7 +231,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (71,2% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
   [AMD] · [Nasdaq, 5h fa] AMD Just Raised the Top of the Company's 2030 Market to $3 Trillion
       Key PointsSpeaking at Citi's technology conference on Tuesday, Sept. 8, AMD's chief financial officer said the company's total addressable market could reach $2 trillion to $3 trillion by 2030.
-  [AMD] · [Nasdaq, 7h fa] AMD’s CFO, Jean Hu, Just Announced Fantastic News for Investors
+  [AMD] · [Nasdaq, 8h fa] AMD’s CFO, Jean Hu, Just Announced Fantastic News for Investors
       Key PointsAMD's addressable opportunity could soar over the next few years, according to Jean Hu.
   [CRWV] · [Nasdaq, 8h fa] Nvidia Stock Could Reach $490 by End of 2027 Based on Current Growth Projections
       Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.
@@ -245,7 +245,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsMicron has generated massive revenue and seen its stock price rise by about 628% over the past year.
   [MU] · [Nasdaq, 8h fa] Is Micron Stock the Next Nvidia? The Answer May Shock Investors.
       Key PointsNvidia dominates the AI infrastructure market, and it benefits from a durable competitive advantage in its full-stack ecosystem that spans hardware and software.
-  [NVDA] · [Nasdaq, 2h fa] 40,000 Employees Today and 4 Million Agents Tomorrow: Nvidia CEO Jensen Huang Believes Agentic AI Will Soon Become the Norm in the Workplace
+  [NVDA] · [Nasdaq, 3h fa] 40,000 Employees Today and 4 Million Agents Tomorrow: Nvidia CEO Jensen Huang Believes Agentic AI Will Soon Become the Norm in the Workplace
       Key PointsAgentic AI refers to automated systems powered by AI that largely act independently to carry out tasks.
   [NVDA] · [Nasdaq, 3h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...
@@ -255,7 +255,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...
   [RGTI] · [Nasdaq, 30h fa] Not IonQ, Not Rigetti Computing. This Quantum Computing Stock Could Be September's Biggest Winner.
       Key PointsIonQ and Rigetti Computing both have annual revenue growth of more than 100%.
-  [RGTI] · [Nasdaq, 32h fa] The Zacks Analyst Blog Highlights D-Wave Quantum, Rigetti, IBM, Alphabet and Amazon
+  [RGTI] · [Nasdaq, 33h fa] The Zacks Analyst Blog Highlights D-Wave Quantum, Rigetti, IBM, Alphabet and Amazon
       Alphabet, Amazon and IBM offer diversified AI and quantum exposure as hyperscalers ramp infrastructure spending and quantum technology advances.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
