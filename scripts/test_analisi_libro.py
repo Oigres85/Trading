@@ -1035,6 +1035,59 @@ check("v451 il parser del libro trova le 13 azioni, il BTP e la liquidita'",
 check("v451 il PMC di NVDA e' quello confermato dal CEO, non quello vecchio",
       any(p["tk"] == "NVDA" and abs(p["pmc"] - 87.1667) < 0.001 for p in _pos))
 
+# --- le trimestrali: dichiarate DALLA FONTE, non proiettate da noi (v396)
+check("v451 il calendario NON passa da FMP (le Routine non portano connettori)",
+      "api.nasdaq.com/api/calendar/earnings" in _BRIEF_CODICE
+      and "mcp__FMP" not in _BRIEF_CODICE and "le Routine non portano connettori" in _BRIEF)
+
+check("v451 i giorni non letti si distinguono da 'nessuna uscita'",
+      "giorni_non_letti" in _BRIEF_CODICE
+      and "diverso da 'nessuna uscita'" in _BRIEF
+      and "non e' 'nessuna trimestrale mai'" in _BRIEF.lower())
+
+# ⚠ Lo stato si COSTRUISCE, non si prende da un file in /tmp: un check che dipende da cosa
+#   c'e' sul disco e' verde o rosso a seconda dell'ambiente, non della proprieta' (v425, v429).
+import importlib.util as _ilu2
+_sp2 = _ilu2.spec_from_file_location("_bp", "scripts/brief_pagina.py")
+_bp = _ilu2.module_from_spec(_sp2); _sp2.loader.exec_module(_bp)
+
+_BASE = {
+    "ora": "2026-09-12T14:00:00+00:00", "ora_utc": "2026-09-12T12:00:00+00:00",
+    "modo": "mattina", "finestra_h": 16.0, "seduta_base": "2026-09-11",
+    "cassa_eur": 10000.0, "secondi": 9.9,
+    "tecnica": [{"tk": "MU", "barre": 252, "seduta": "2026-09-11", "px": 975.26,
+                 "var_pct": -0.22, "atr": 51.84, "atr_pct": 5.32, "peso": 23.2,
+                 "sma20": 964.0, "d20_atr": 0.2, "sma50": 930.0, "d50_atr": 0.9,
+                 "sma200": 620.0, "d200_atr": 6.8, "supporto20": 887.61, "resistenza20": 1042.40,
+                 "supp_atr": 1.7, "res_atr": 1.3, "dmax52_pct": -22.3,
+                 "escursione_pct": None, "escursione_atr": None, "var_atr": 0.04}],
+    "news": {"per_titolo": [], "macro": [], "macro_scartate": 0, "titoli_non_letti": [],
+             "titoli_muti": [], "macro_non_lette": [], "macro_mute": []},
+    "macro_fred": {"stato": "CHIAVE ASSENTE", "serie": []},
+}
+
+_vuoto = dict(_BASE); _vuoto["trimestrali"] = {"attesi": [], "giorni_non_letti": [], "finestra": 21}
+_html = _bp.genera(_vuoto)
+check("v451 senza trimestrali la pagina DICHIARA il buco invece di far sparire il blocco",
+      "Trimestrali in arrivo" in _html and "Nessuna trimestrale dichiarata dalla fonte" in _html)
+
+_pieno = dict(_BASE)
+_pieno["trimestrali"] = {"finestra": 21, "giorni_non_letti": [],
+                         "attesi": [{"tk": "MU", "data": "2026-09-30", "quando": "time-after-hours",
+                                     "eps_atteso": "$31.17", "trimestre": "Aug/2026", "giorni": 18}]}
+_html2 = _bp.genera(_pieno)
+check("v451 con una trimestrale la pagina la pubblica con data, orario e consenso",
+      "2026-09-30" in _html2 and "dopo la campana" in _html2
+      and "31.17" in _html2 and "fra 18g" in _html2)
+
+check("v451 senza chiave FRED la pagina dichiara il buco, non lo tace",
+      "Serie macro assenti" in _html and "e' il dato che manca".replace("e'", "\u00e8") in _html
+      or "il dato che manca" in _html)
+
+_PAGINA = Path("scripts/brief_pagina.py").read_text(encoding="utf-8")
+check("v451 la pagina non ricalcola e non va in rete: rende gli stessi numeri del testo",
+      "atr_wilder" not in _PAGINA and "urllib" not in _PAGINA and "requests" not in _PAGINA)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

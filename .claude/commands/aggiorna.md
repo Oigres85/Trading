@@ -169,7 +169,7 @@ Gli strumenti per un nome solo — `soglie.py TICKER`, `analisi_libro.py TICKER`
 seleziona un SOTTOINSIEME di ciò che questo comando guarda per intero — le notizie fresche del
 giro, il movimento contro l'ampiezza del titolo, credito e FOMC. Eseguirlo qui aggiungerebbe una
 seconda resa delle stesse grandezze accanto a quella del rapporto, che è la classe v161/v207.
-`scripts/brief.py` resta **fuori** con la sua ragione: è il prodotto quotidiano deciso dal CEO
+`scripts/brief.py` e `scripts/brief_pagina.py` restano **fuori** con la loro ragione: è il prodotto quotidiano deciso dal CEO
 il 12/09/2026 (due letture al giorno via Routine, 08:30 e 16:00 italiane), e seleziona un
 SOTTOINSIEME di ciò che questo comando guarda per intero. Eseguirlo qui affiancherebbe una
 seconda resa delle stesse grandezze a quella del rapporto, che è la classe v161/v207.
