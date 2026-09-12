@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T12:03:39Z",
+ "updated_at": "2026-09-12T12:33:12Z",
  "eurusd": 1.1602,
  "totals": {
   "usd_value": 0,
@@ -4608,7 +4608,7 @@
      218.29
     ],
     "y1": [
-     177.39,
+     177.4,
      176.25,
      177.76,
      187.17,
@@ -11792,7 +11792,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -12995,7 +12995,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 4.03,
-   "pe": 75.2,
+   "pe": 78.2,
    "ath": 329.8,
    "ath_dist_pct": -28.4,
    "sma200_dist_pct": 52.6,
@@ -13678,7 +13678,7 @@
     "target_mediana": 282.0
    },
    "health": 83,
-   "eps": 3.14,
+   "eps": 3.02,
    "beta": 2.25,
    "sharpe_1y": 1.59,
    "sortino_1y": 2.54,
@@ -13699,9 +13699,9 @@
     "float_shares": 873988692.0,
     "float_pct": 99.7,
     "avg_volume_30d": 31245996.0,
-    "pe_ttm": 75.1911,
+    "pe_ttm": 78.1788,
     "forward_pe": 35.0674,
-    "eps_ttm": 3.14,
+    "eps_ttm": 3.02,
     "eps_forward": 6.7328,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
@@ -21835,16 +21835,16 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77334.93,
+   "price": 77308.62,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.21,
+   "change_pct": 0.17,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -38.7,
    "sma200_dist_pct": 10.3,
-   "sma50_dist_pct": 9.1,
+   "sma50_dist_pct": 9.0,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -38.7,
@@ -21852,8 +21852,8 @@
    "day_low": 77171.18,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 55.3,
-   "volume": 30423738368,
+   "rsi": 55.2,
+   "volume": 29690572800,
    "vol_ratio": 1.21,
    "atr_14": 2142.69,
    "atr_pct": 2.77,
@@ -21865,7 +21865,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77334.93
+     77308.62
     ],
     "m6": [
      82138.93,
@@ -21993,7 +21993,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77334.93
+     77308.62
     ],
     "all": [
      386.94,
@@ -22140,7 +22140,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77334.93
+     77308.62
     ],
     "m1": [
      77083.41,
@@ -22164,7 +22164,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77334.93
+     77308.62
     ],
     "m3": [
      63193.15,
@@ -22232,7 +22232,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77334.93
+     77308.62
     ],
     "y1": [
      116101.58,
@@ -22308,7 +22308,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77334.93
+     77308.62
     ],
     "d1": [
      77280.33,
@@ -22382,7 +22382,11 @@
      77283.51,
      77287.27,
      77329.84,
-     77339.48
+     77339.48,
+     77330.41,
+     77314.51,
+     77298.04,
+     77308.62
     ]
    },
    "earnings_date": null,
@@ -22396,8 +22400,8 @@
    "sharpe_6m": -0.38,
    "sortino_6m": -0.56,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77334.93,
-   "risk_reward": "1:1.1",
+   "prezzo_limite_aggiustato": 77308.62,
+   "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22409,22 +22413,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.41
+     "change_pct": -1.44
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.33
+     "change_pct": 0.29
     },
     "m3": {
      "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 22.38
+     "change_pct": 22.34
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.4
+     "change_pct": -15.43
     }
    },
    "financials": [],
@@ -22451,74 +22455,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77334.93,
+     "prezzo": 77308.62,
      "medie": {
       "sma10": {
-       "liv": 78800.84,
-       "dist_pct": -1.86
+       "liv": 78798.21,
+       "dist_pct": -1.89
       },
       "ema10": {
-       "liv": 77974.13,
-       "dist_pct": -0.82
+       "liv": 77969.34,
+       "dist_pct": -0.85
       },
       "sma20": {
-       "liv": 78590.96,
-       "dist_pct": -1.6
+       "liv": 78589.65,
+       "dist_pct": -1.63
       },
       "ema20": {
-       "liv": 77032.49,
-       "dist_pct": 0.39
+       "liv": 77029.99,
+       "dist_pct": 0.36
       },
       "sma30": {
-       "liv": 75509.92,
-       "dist_pct": 2.42
+       "liv": 75509.04,
+       "dist_pct": 2.38
       },
       "ema30": {
-       "liv": 75484.71,
-       "dist_pct": 2.45
+       "liv": 75483.01,
+       "dist_pct": 2.42
       },
       "sma50": {
-       "liv": 70910.24,
-       "dist_pct": 9.06
+       "liv": 70909.71,
+       "dist_pct": 9.02
       },
       "ema50": {
-       "liv": 73028.28,
-       "dist_pct": 5.9
+       "liv": 73027.24,
+       "dist_pct": 5.86
       },
       "sma100": {
-       "liv": 67008.7,
-       "dist_pct": 15.41
+       "liv": 67008.44,
+       "dist_pct": 15.37
       },
       "ema100": {
-       "liv": 70923.01,
-       "dist_pct": 9.04
+       "liv": 70922.49,
+       "dist_pct": 9.0
       },
       "sma200": {
-       "liv": 70091.46,
-       "dist_pct": 10.33
+       "liv": 70091.32,
+       "dist_pct": 10.3
       },
       "ema200": {
-       "liv": 73231.66,
-       "dist_pct": 5.6
+       "liv": 73231.4,
+       "dist_pct": 5.57
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 55.3,
+      "rsi14": 55.2,
       "macd": {
-       "linea": 1814.96,
-       "segnale": 2571.23,
-       "istogramma": -756.27
+       "linea": 1812.87,
+       "segnale": 2570.81,
+       "istogramma": -757.94
       },
-      "stoch_k": 19.2,
-      "stoch_d": 13.7,
-      "williams_r": -80.8,
-      "cci20": -17.6,
+      "stoch_k": 18.8,
+      "stoch_d": 13.6,
+      "williams_r": -81.2,
+      "cci20": -17.7,
       "adx14": 44.4,
       "di_su": 29.5,
       "di_giu": 14.0,
-      "momentum10": 34.45
+      "momentum10": 8.14
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23011,19 +23015,19 @@
       "o": 77201.88,
       "h": 77376.09,
       "l": 77171.18,
-      "c": 77334.93
+      "c": 77308.62
      }
     ],
     "performance": {
-     "s1": -2.25,
-     "m1": -1.28,
-     "m3": 24.22,
-     "m6": -4.13,
-     "a1": -14.64,
-     "ytd": -12.84,
-     "a3": 186.77,
-     "a5": 76.6,
-     "a10": 12583.37
+     "s1": -2.28,
+     "m1": -1.31,
+     "m3": 24.18,
+     "m6": -4.16,
+     "a1": -14.67,
+     "ytd": -12.87,
+     "a3": 186.67,
+     "a5": 76.54,
+     "a10": 12579.05
     },
     "stagionalita": [
      {
@@ -23101,7 +23105,7 @@
      {
       "mese": 9,
       "media": -1.8,
-      "mediana": -2.31,
+      "mediana": -2.33,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -57986,6 +57990,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "Breakfast News: 4 CEOs Playing the Long Game",
+      "riassunto": "SEPTEMBER 12, 2026\nWhat separates a capable CEO from a great one? It&rsquo;s not just vision or great timing. When you look closely at the architects of some of the biggest businesses, distinct patterns of greatness begin to emerge. Four Fools &mdash; two from Team Rule Breakers, two from T",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T11:50:00Z",
+      "url": "https://www.nasdaq.com/articles/breakfast-news-4-ceos-playing-long-game"
+     },
+     {
       "titolo": "Prediction: Nvidia Will Overtake Apple in Stock Buybacks and Dividends Under New Apple CEO John Ternus",
       "riassunto": "Key PointsOver the last 15 years, Apple reduced its share count by 43.2% under CEO Tim Cook.",
       "fonte": "Nasdaq",
@@ -58019,13 +58030,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T09:08:01Z",
       "url": "https://www.nasdaq.com/articles/micron-stock-next-nvidia-answer-may-shock-investors"
-     },
-     {
-      "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
-      "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T08:23:00Z",
-      "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
      }
     ],
     "ORCL": [
@@ -58228,7 +58232,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T12:03:39Z"
+   "letto_il": "2026-09-12T12:33:12Z"
   }
  },
  "broker": null,
@@ -58544,6 +58548,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "Breakfast News: 4 CEOs Playing the Long Game",
+     "riassunto": "SEPTEMBER 12, 2026\nWhat separates a capable CEO from a great one? It&rsquo;s not just vision or great timing. When you look closely at the architects of some of the biggest businesses, distinct patterns of greatness begin to emerge. Four Fools &mdash; two from Team Rule Breakers, two from T",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T11:50:00Z",
+     "url": "https://www.nasdaq.com/articles/breakfast-news-4-ceos-playing-long-game"
+    },
+    {
      "titolo": "Prediction: Nvidia Will Overtake Apple in Stock Buybacks and Dividends Under New Apple CEO John Ternus",
      "riassunto": "Key PointsOver the last 15 years, Apple reduced its share count by 43.2% under CEO Tim Cook.",
      "fonte": "Nasdaq",
@@ -58577,13 +58588,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T09:08:01Z",
      "url": "https://www.nasdaq.com/articles/micron-stock-next-nvidia-answer-may-shock-investors"
-    },
-    {
-     "titolo": "Billionaire Stanley Druckenmiller Dumped Broadcom, Intel, and Micron for This Chip Stock. Here's Why.",
-     "riassunto": "Key PointsDruckenmiller has a long history of success as a hedge fund manager and today oversees more than $5 billion at his family office.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T08:23:00Z",
-     "url": "https://www.nasdaq.com/articles/billionaire-stanley-druckenmiller-dumped-broadcom-intel-and-micron-chip-stock-heres-why"
     }
    ],
    "ORCL": [
@@ -58786,7 +58790,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T12:03:39Z"
+  "letto_il": "2026-09-12T12:33:12Z"
  },
  "predictions": [
   {
@@ -79216,7 +79220,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -79268,6 +79272,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T12:03:40Z"
+  "generated_at": "2026-09-12T12:33:14Z"
  }
 }
