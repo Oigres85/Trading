@@ -1,4 +1,4 @@
-⟦ BUILD v450 · generato 12/09/2026 08:04 ⟧
+⟦ BUILD v450 · generato 12/09/2026 08:26 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 12/09/2026, 08:04:04 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 04:04, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,09% · Fut S&P +0,75% · BTC +0,11% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~53.4h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 12/09/2026, 08:26:01 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 04:26, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,09% · Fut S&P +0,75% · BTC +0,15% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~53.1h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 12/09/2026, 08:04:04, prossimo run 12/09/2026, 09:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-11 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 12/09/2026, 08:26:01, prossimo run 12/09/2026, 09:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-11 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-11) · Curva 10A-3M (2026-09-11) · Treasury USA 30A (2026-09-10) · Tasso reale 10A (TIPS) (2026-09-10) · Inflazione attesa 10A (breakeven) (2026-09-11) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -95,8 +95,8 @@ QUADRO MACRO:
 - CURVA DEI TASSI USA (FRED (Federal Reserve Bank of St. Louis), OSSERVAZIONI PUBBLICATE — non stime, ultima del 2026-09-10, quindi NON di oggi: la fonte pubblica con qualche giorno di ritardo): 3 mesi 4% [+0,22 vs 3,78% del 2026-06-12] · 2 anni 4,56% [+0,47 vs 4,09% del 2026-06-12] · 5 anni 4,75% [+0,54 vs 4,21% del 2026-06-12] · 10 anni 4,95% [+0,47 vs 4,48% del 2026-06-12] · 30 anni 5,37% [+0,4 vs 4,97% del 2026-06-12]. Pendenza 3 mesi→30 anni: +1,37 pp, era +1,19 pp tre mesi fa. Fra parentesi quadre lo scarto dalla stessa scadenza tre mesi fa: e' un confronto fra due osservazioni datate, non una tendenza ricostruita.
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): settembre -0,66% negli anni di midterm contro -0,53% su tutti gli anni, 30% di mesi positivi, esiti da -11,7% a +18% · ottobre +3,94% negli anni di midterm contro +1,7% su tutti gli anni, 80% di mesi positivi, esiti da -8,7% a +18,9% · novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
 - MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 11.824 (+1,81% nell'ultima seduta) — +97% in un anno, e sta al 67% dell'intervallo annuale 6002–14.635 · Rame 6,47 $/lb (+0,04% nell'ultima seduta) — +41% in un anno, e sta al 85% dell'intervallo annuale 4,54–6,8 · Petrolio WTI 100,05 $ (-2,37% nell'ultima seduta) — +59,6% in un anno, e sta al 78% dell'intervallo annuale 55,27–112,95 · Oro 4366 $/oz (+0,04% nell'ultima seduta) — +19,6% in un anno, e sta al 43% dell'intervallo annuale 3644–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
-- TITOLI MACRO — 0 dentro le ultime 8 ORE, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le 12 piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha 8 ore (fonti: CNBC Economia, Bloomberg, MarketWatch) · 6 pubblicate DOPO l'ultima chiusura USA del 2026-09-11, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto · ⚠ altre 6 voci il sistema le HA e qui sotto non compaiono (tetto di 12 titoli): il taglio cade solo su quelle gia' dentro il prezzo di chiusura, mai su quelle pubblicate dopo. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
-    · [MarketWatch, 8h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] The Fed could raise interest rates three times. Here’s where the market could face the stiffest test.
+- TITOLI MACRO — 0 dentro le ultime 8 ORE, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le 12 piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha 9 ore (fonti: CNBC Economia, Bloomberg, MarketWatch) · 6 pubblicate DOPO l'ultima chiusura USA del 2026-09-11, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto · ⚠ altre 6 voci il sistema le HA e qui sotto non compaiono (tetto di 12 titoli): il taglio cade solo su quelle gia' dentro il prezzo di chiusura, mai su quelle pubblicate dopo. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
+    · [MarketWatch, 9h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] The Fed could raise interest rates three times. Here’s where the market could face the stiffest test.
       Economists note that the Fed historically has not been content to raise rates only once.
     · [Bloomberg, 9h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Former NY Fed President on Remembering 9/11
       William Dudley discussed his experience on a diverted flight during the FAA ground stop after the 9/11 attacks. Dudley said the plane was unable to land in the U.S. and was sent to Saint John’s, Newfoundland, where passengers were kept for six days. He speaks with Romaine Bostick and Tyler Kendall on "The Close." (Sour
@@ -106,17 +106,17 @@ QUADRO MACRO:
       Bill Dudley, a Bloomberg Opinion columnist and former president of the Federal Reserve Bank of New York, says he would be shocked if the Federal Reserve did not raise interest rates by 25 basis points at their next meeting. He speaks on "Bloomberg The Close." (Source: Bloomberg)
     · [Bloomberg, 11h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Japan’s GPIF May Sell $62 Billion of Treasuries, Santander Says
       Japan’s Government Pension Investment Fund could sell as much as $62 billion of US Treasuries without a formal revamp of its asset-allocation policy, according to analysts at Banco Santander SA.
-    · [MarketWatch, 11h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Oracle shook off fears about AI spending, but its stock still loses ground
+    · [MarketWatch, 12h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Oracle shook off fears about AI spending, but its stock still loses ground
       “Several of Oracle’s bear cases were addressed head on” in the latest earnings report, according to an analyst.
-    · [CNBC Economia, 15h fa] Consumer outlook plunges in September as inflation outlook worsens
+    · [CNBC Economia, 16h fa] Consumer outlook plunges in September as inflation outlook worsens
       The survey's headline index hit a level of 47.8, down 7.5% from the August reading and off 13.2% from a year ago.
-    · [CNBC Economia, 16h fa] Record U.S. cyclosporiasis outbreak is over, CDC says
+    · [CNBC Economia, 17h fa] Record U.S. cyclosporiasis outbreak is over, CDC says
       The largest outbreak, linked to shredded iceberg lettuce from Taylor Farms, sickened more than 12,000 people.
-    · [CNBC Economia, 18h fa] Inflation persisted in August, potentially locking in a Fed interest rate hike
+    · [CNBC Economia, 19h fa] Inflation persisted in August, potentially locking in a Fed interest rate hike
       The all-items consumer price index was expected to rise 0.4% in August, with core, excluding food and energy, showing a 0.2% gain, according to the Dow Jones consensus.
     · [CNBC Economia, 37h fa] Friday's CPI inflation report is even more important than usual. Here's what to expect
       The Bureau of Labor Statistics will release the August consumer price index report at 8:30 a.m.
-    · [CNBC Economia, 39h fa] The likelihood of a Fed interest rate hike next week just got a lot higher
+    · [CNBC Economia, 40h fa] The likelihood of a Fed interest rate hike next week just got a lot higher
       Traders pushed chances for a rate increase to 70% in morning action.
     · [CNBC Economia, 43h fa] Wholesale prices rose 0.4% in August, as expected
       The producer price index was expected to rise 0.4% in August, according to the Dow Jones consensus forecast.
@@ -179,7 +179,7 @@ MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment
 - Will there be no change in Fed interest rates after the September 2026 meeting?: 20% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the September 2026 meeting?: 78% [Δ7g —]
 - Fed rate hike in 2026?: 88% [Δ7g —]
-- Will the price of Bitcoin be above $78,000 on September 12?: 3% [Δ7g —]
+- Will the price of Bitcoin be above $78,000 on September 12?: 4% [Δ7g —]
 - Fed Rate Hike by September 2026 Meeting?: 78% [Δ7g —]
 ⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
@@ -246,13 +246,13 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (71,2% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
   [AMD] · [Nasdaq, 14h fa] 1 Thing I Wish I'd Known About the Stock Market When I First Started Investing
       Key PointsSelling AMD at a 33% gain in 2004 felt like skill, but the stock would have soared from $15 to $500 per stub in 22 years.
-  [AMD] · [Nasdaq, 14h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
+  [AMD] · [Nasdaq, 15h fa] Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...
-  [CRWV] · [Nasdaq, 8h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [CRWV] · [Nasdaq, 9h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...
-  [CRWV] · [Nasdaq, 8h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [CRWV] · [Nasdaq, 9h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) is up +0.87%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.77%.  E-mini S&P futures (ESU26 ) are up +1.01%, and September E-mini Nasdaq futures (NQU26 )...
-  [MRVL] · [Nasdaq, 1h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [MRVL] · [Nasdaq, 2h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...
   [MRVL] · [Nasdaq, 11h fa] Top Stock Reports for Meta Platforms, Marvell & Amphenol
       Marvell's AI infrastructure gains, custom silicon growth and networking momentum point to a higher multi-year outlook.
@@ -260,13 +260,13 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsApplied Materials is a leading provider of the equipment and software essential for manufacturing advanced semiconductors.
   [MU] · [Nasdaq, 14h fa] Are Value ETFs the New AI Trade?
       Value ETFs are outperforming growth funds, but many hold surprising exposure to the AI boom.
-  [NVDA] · [Nasdaq, 1h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [NVDA] · [Nasdaq, 2h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...
-  [NVDA] · [Nasdaq, 2h fa] Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?
+  [NVDA] · [Nasdaq, 3h fa] Michael Burry Is Staying Short Nvidia, Palantir, and Tesla, Warning of a Possible &quot;1987-Type Fall&quot; for AI Stocks. Should Investors Take the Bet Seriously?
       Key PointsBurry's concerns about leverage are valid. Investors have been happily ramping up their margins, while leveraged ETFs add additional debt to the market.
-  [ORCL] · [Nasdaq, 1h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [ORCL] · [Nasdaq, 2h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...
-  [ORCL] · [Nasdaq, 8h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [ORCL] · [Nasdaq, 9h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...
   [RGTI] · [Nasdaq, 21h fa] Not IonQ, Not Rigetti Computing. This Quantum Computing Stock Could Be September's Biggest Winner.
       Key PointsIonQ and Rigetti Computing both have annual revenue growth of more than 100%.
