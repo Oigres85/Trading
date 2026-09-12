@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T15:03:22Z",
+ "updated_at": "2026-09-12T16:25:43Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -4608,7 +4608,7 @@
      218.29
     ],
     "y1": [
-     177.39,
+     177.4,
      176.25,
      177.76,
      187.17,
@@ -5515,7 +5515,7 @@
      "a1": 17.28,
      "a3": 403.33,
      "a5": 958.37,
-     "a10": 12885.8
+     "a10": 12885.79
     },
     "stagionalita": [
      {
@@ -21835,25 +21835,25 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77445.3,
+   "price": 77367.62,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.35,
+   "change_pct": 0.25,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.6,
-   "sma200_dist_pct": 10.5,
-   "sma50_dist_pct": 9.2,
+   "ath_dist_pct": -38.7,
+   "sma200_dist_pct": 10.4,
+   "sma50_dist_pct": 9.1,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.6,
+   "w52_dist_pct": -38.7,
    "day_high": 77468.78,
    "day_low": 77171.18,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 55.7,
-   "volume": 19370358784,
+   "rsi": 55.4,
+   "volume": 16543119360,
    "vol_ratio": 1.21,
    "atr_14": 2149.31,
    "atr_pct": 2.78,
@@ -21865,7 +21865,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77445.3
+     77367.62
     ],
     "m6": [
      82138.93,
@@ -21993,7 +21993,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77445.3
+     77367.62
     ],
     "all": [
      386.94,
@@ -22140,7 +22140,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77445.3
+     77367.62
     ],
     "m1": [
      77083.41,
@@ -22164,7 +22164,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77445.3
+     77367.62
     ],
     "m3": [
      63193.15,
@@ -22232,7 +22232,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77445.3
+     77367.62
     ],
     "y1": [
      116101.58,
@@ -22308,7 +22308,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77445.3
+     77367.62
     ],
     "d1": [
      77280.33,
@@ -22401,7 +22401,15 @@
      77415.23,
      77424.75,
      77453.11,
-     77445.3
+     77435.73,
+     77405.82,
+     77418.81,
+     77388.61,
+     77379.91,
+     77369.09,
+     77401.49,
+     77345.11,
+     77367.62
     ]
    },
    "earnings_date": null,
@@ -22411,11 +22419,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.85,
-   "sortino_1y": -1.14,
-   "sharpe_6m": -0.37,
-   "sortino_6m": -0.55,
+   "sortino_1y": -1.15,
+   "sharpe_6m": -0.38,
+   "sortino_6m": -0.56,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77445.3,
+   "prezzo_limite_aggiustato": 77367.62,
    "risk_reward": "1:1.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22428,22 +22436,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.27
+     "change_pct": -1.37
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.47
+     "change_pct": 0.37
     },
     "m3": {
      "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 22.55
+     "change_pct": 22.43
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.28
+     "change_pct": -15.37
     }
    },
    "financials": [],
@@ -22470,74 +22478,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77445.3,
+     "prezzo": 77367.62,
      "medie": {
       "sma10": {
-       "liv": 78811.88,
-       "dist_pct": -1.73
+       "liv": 78804.11,
+       "dist_pct": -1.82
       },
       "ema10": {
-       "liv": 77994.19,
-       "dist_pct": -0.7
+       "liv": 77980.07,
+       "dist_pct": -0.79
       },
       "sma20": {
-       "liv": 78596.48,
-       "dist_pct": -1.46
+       "liv": 78592.6,
+       "dist_pct": -1.56
       },
       "ema20": {
-       "liv": 77043.0,
-       "dist_pct": 0.52
+       "liv": 77035.61,
+       "dist_pct": 0.43
       },
       "sma30": {
-       "liv": 75513.6,
-       "dist_pct": 2.56
+       "liv": 75511.01,
+       "dist_pct": 2.46
       },
       "ema30": {
-       "liv": 75491.83,
-       "dist_pct": 2.59
+       "liv": 75486.81,
+       "dist_pct": 2.49
       },
       "sma50": {
-       "liv": 70912.44,
-       "dist_pct": 9.21
+       "liv": 70910.89,
+       "dist_pct": 9.11
       },
       "ema50": {
-       "liv": 73032.6,
-       "dist_pct": 6.04
+       "liv": 73029.56,
+       "dist_pct": 5.94
       },
       "sma100": {
-       "liv": 67009.81,
-       "dist_pct": 15.57
+       "liv": 67009.03,
+       "dist_pct": 15.46
       },
       "ema100": {
-       "liv": 70925.19,
-       "dist_pct": 9.19
+       "liv": 70923.66,
+       "dist_pct": 9.09
       },
       "sma200": {
-       "liv": 70092.01,
-       "dist_pct": 10.49
+       "liv": 70091.62,
+       "dist_pct": 10.38
       },
       "ema200": {
-       "liv": 73232.76,
-       "dist_pct": 5.75
+       "liv": 73231.98,
+       "dist_pct": 5.65
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 55.7,
+      "rsi14": 55.4,
       "macd": {
-       "linea": 1823.77,
-       "segnale": 2572.99,
-       "istogramma": -749.22
+       "linea": 1817.57,
+       "segnale": 2571.75,
+       "istogramma": -754.18
       },
-      "stoch_k": 21.0,
-      "stoch_d": 14.3,
-      "williams_r": -79.0,
-      "cci20": -16.8,
+      "stoch_k": 19.8,
+      "stoch_d": 13.9,
+      "williams_r": -80.2,
+      "cci20": -17.1,
       "adx14": 44.4,
       "di_su": 29.4,
       "di_giu": 13.9,
-      "momentum10": 144.82
+      "momentum10": 67.14
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23030,19 +23038,19 @@
       "o": 77201.88,
       "h": 77468.78,
       "l": 77171.18,
-      "c": 77445.3
+      "c": 77367.62
      }
     ],
     "performance": {
-     "s1": -2.11,
-     "m1": -1.14,
-     "m3": 24.39,
-     "m6": -3.99,
-     "a1": -14.52,
-     "ytd": -12.72,
-     "a3": 187.18,
-     "a5": 76.85,
-     "a10": 12601.47
+     "s1": -2.21,
+     "m1": -1.24,
+     "m3": 24.27,
+     "m6": -4.09,
+     "a1": -14.61,
+     "ytd": -12.81,
+     "a3": 186.89,
+     "a5": 76.68,
+     "a10": 12588.73
     },
     "stagionalita": [
      {
@@ -23119,8 +23127,8 @@
      },
      {
       "mese": 9,
-      "media": -1.79,
-      "mediana": -2.24,
+      "media": -1.8,
+      "mediana": -2.29,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23155,9 +23163,9 @@
      }
     ]
    },
-   "rs_1m": 1.7,
+   "rs_1m": 1.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.7,
+   "rs_ndx_1m": 1.6,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -36636,7 +36644,7 @@
      "a1": 56.34,
      "a3": 417.5,
      "a5": 319.23,
-     "a10": 1681.43
+     "a10": 1681.44
     },
     "stagionalita": [
      {
@@ -47739,6 +47747,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Energy Driven Inflation Complicates Fed Rate Call",
+     "riassunto": "PNC Chief Investment Officer Amanda Agati is on Bloomberg This Weekend and says the Fed faces a difficult decision as energy-driven inflation pushes markets toward expectations for higher rates, warning that further tightening could risk a policy error. Agati also tells hosts David Gura and Christina Ruffini investors ",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-12T15:11:38Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-12/energy-driven-inflation-complicates-fed-rate-call-video"
+    },
+    {
      "titolo": "Higher Interest Rates May Be the New Normal",
      "riassunto": "Joining Bloomberg This Weekend, Bloomberg Economics Chief Economist Tom Orlik says higher interest rates may be the new normal, leaving governments, businesses and households facing a mounting cost from debt accumulated during years of cheap borrowing. Orlik tells hosts David Gura and Christina Ruffini that Fed Chair K",
      "fonte": "Bloomberg",
@@ -47758,13 +47773,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-12T12:49:15Z",
      "url": "https://www.cnbc.com/2026/09/12/inflation-is-outpacing-wage-growth-again-squeezing-americans-paychecks.html"
-    },
-    {
-     "titolo": "Oil and Gas Markets Signal Winter Crisis and Rising Interest Rates",
-     "riassunto": "The surge in oil, gas and diesel prices is forcing central banks and governments to reassess the impact of the wars in Iran and Ukraine.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-12T11:00:02Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-12/oil-and-gas-markets-signal-winter-crisis-and-rising-interest-rates"
     },
     {
      "titolo": "The Fed could raise interest rates three times. Here’s where the market could face the stiffest test.",
@@ -52755,7 +52763,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 54
+     "score": 53
     },
     {
      "label": "Treasury 10A",
@@ -58005,6 +58013,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "40,000 Employees Today and 4 Million Agents Tomorrow: Nvidia CEO Jensen Huang Believes Agentic AI Will Soon Become the Norm in the Workplace",
+      "riassunto": "Key PointsAgentic AI refers to automated systems powered by AI that largely act independently to carry out tasks.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T14:58:00Z",
+      "url": "https://www.nasdaq.com/articles/40000-employees-today-and-4-million-agents-tomorrow-nvidia-ceo-jensen-huang-believes"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
@@ -58038,13 +58053,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T09:35:00Z",
       "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
-     },
-     {
-      "titolo": "Nvidia Stock Could Reach $490 by End of 2027 Based on Current Growth Projections",
-      "riassunto": "Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T09:23:00Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
      }
     ],
     "ORCL": [
@@ -58084,14 +58092,21 @@
       "url": "https://www.nasdaq.com/articles/orcl-buy-following-121-iaas-growth-q1-earnings"
      },
      {
-      "titolo": "XLG, MA, COST, ORCL: ETF Inflow Alert",
-      "riassunto": "Looking today at week-over-week shares outstanding changes among the universe of ETFs covered at ETF Channel, one standout is the Invesco S&amp;P 500 Top 50 ETF (Symbol: XLG) where we have detected an approximate $406.7 million dollar inflow -- that's a 3.7% increase week over w",
+      "titolo": "Oracle’s AI Spending Is Still Huge, But the Payoff Is Starting to Show in Earnings",
+      "riassunto": "Oracle&rsquo;s (NASDAQ: ORCL) stock price is on track for a substantial recovery and a sustained, prolonged upswing as the monetization of its AI ambition begins.\nHighlights from the Q1 fiscal year 2027 (FY2027) release reveal the impacts of spending, capital raises, and dilution, ove",
       "fonte": "Nasdaq",
-      "quando": "2026-09-11T14:55:53Z",
-      "url": "https://www.nasdaq.com/articles/xlg-ma-cost-orcl-etf-inflow-alert"
+      "quando": "2026-09-11T15:30:00Z",
+      "url": "https://www.nasdaq.com/articles/oracles-ai-spending-still-huge-payoff-starting-show-earnings"
      }
     ],
     "PLTR": [
+     {
+      "titolo": "Palantir's Growth Has Kept Accelerating, but Can the Rally Continue?",
+      "riassunto": "Key PointsPalantir's revenue growth rate has continued to accelerate, but Wall Street thinks it will start to slow this quarter.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T15:55:00Z",
+      "url": "https://www.nasdaq.com/articles/palantirs-growth-has-kept-accelerating-can-rally-continue"
+     },
      {
       "titolo": "3 Agentic AI Stocks to Own Before AI Changes the World as We Know It",
       "riassunto": "Key PointsPalantir looks like it could be one of the biggest agentic AI winners.",
@@ -58126,13 +58141,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T13:00:03Z",
       "url": "https://www.nasdaq.com/articles/palantir-technologies-inc-pltr-attracting-investor-attention-here-what-you-should-know-1"
-     },
-     {
-      "titolo": "Alex Karp Set Palantir a 134% Growth Target for the Whole Company. Here's What It Would Take to Hit It.",
-      "riassunto": "Key PointsU.S. commercial revenue grew 149% year over year in Palantir's second quarter, and full-year U.S. commercial guidance calls for at least 134% growth.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T07:29:01Z",
-      "url": "https://www.nasdaq.com/articles/alex-karp-set-palantir-134-growth-target-whole-company-heres-what-it-would-take-hit-it"
      }
     ],
     "RGTI": [
@@ -58247,7 +58255,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T15:03:22Z"
+   "letto_il": "2026-09-12T16:25:43Z"
   }
  },
  "broker": null,
@@ -58563,6 +58571,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "40,000 Employees Today and 4 Million Agents Tomorrow: Nvidia CEO Jensen Huang Believes Agentic AI Will Soon Become the Norm in the Workplace",
+     "riassunto": "Key PointsAgentic AI refers to automated systems powered by AI that largely act independently to carry out tasks.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T14:58:00Z",
+     "url": "https://www.nasdaq.com/articles/40000-employees-today-and-4-million-agents-tomorrow-nvidia-ceo-jensen-huang-believes"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
@@ -58596,13 +58611,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T09:35:00Z",
      "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
-    },
-    {
-     "titolo": "Nvidia Stock Could Reach $490 by End of 2027 Based on Current Growth Projections",
-     "riassunto": "Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T09:23:00Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-stock-could-reach-490-end-2027-based-current-growth-projections"
     }
    ],
    "ORCL": [
@@ -58642,14 +58650,21 @@
      "url": "https://www.nasdaq.com/articles/orcl-buy-following-121-iaas-growth-q1-earnings"
     },
     {
-     "titolo": "XLG, MA, COST, ORCL: ETF Inflow Alert",
-     "riassunto": "Looking today at week-over-week shares outstanding changes among the universe of ETFs covered at ETF Channel, one standout is the Invesco S&amp;P 500 Top 50 ETF (Symbol: XLG) where we have detected an approximate $406.7 million dollar inflow -- that's a 3.7% increase week over w",
+     "titolo": "Oracle’s AI Spending Is Still Huge, But the Payoff Is Starting to Show in Earnings",
+     "riassunto": "Oracle&rsquo;s (NASDAQ: ORCL) stock price is on track for a substantial recovery and a sustained, prolonged upswing as the monetization of its AI ambition begins.\nHighlights from the Q1 fiscal year 2027 (FY2027) release reveal the impacts of spending, capital raises, and dilution, ove",
      "fonte": "Nasdaq",
-     "quando": "2026-09-11T14:55:53Z",
-     "url": "https://www.nasdaq.com/articles/xlg-ma-cost-orcl-etf-inflow-alert"
+     "quando": "2026-09-11T15:30:00Z",
+     "url": "https://www.nasdaq.com/articles/oracles-ai-spending-still-huge-payoff-starting-show-earnings"
     }
    ],
    "PLTR": [
+    {
+     "titolo": "Palantir's Growth Has Kept Accelerating, but Can the Rally Continue?",
+     "riassunto": "Key PointsPalantir's revenue growth rate has continued to accelerate, but Wall Street thinks it will start to slow this quarter.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T15:55:00Z",
+     "url": "https://www.nasdaq.com/articles/palantirs-growth-has-kept-accelerating-can-rally-continue"
+    },
     {
      "titolo": "3 Agentic AI Stocks to Own Before AI Changes the World as We Know It",
      "riassunto": "Key PointsPalantir looks like it could be one of the biggest agentic AI winners.",
@@ -58684,13 +58699,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T13:00:03Z",
      "url": "https://www.nasdaq.com/articles/palantir-technologies-inc-pltr-attracting-investor-attention-here-what-you-should-know-1"
-    },
-    {
-     "titolo": "Alex Karp Set Palantir a 134% Growth Target for the Whole Company. Here's What It Would Take to Hit It.",
-     "riassunto": "Key PointsU.S. commercial revenue grew 149% year over year in Palantir's second quarter, and full-year U.S. commercial guidance calls for at least 134% growth.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T07:29:01Z",
-     "url": "https://www.nasdaq.com/articles/alex-karp-set-palantir-134-growth-target-whole-company-heres-what-it-would-take-hit-it"
     }
    ],
    "RGTI": [
@@ -58805,17 +58813,17 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T15:03:22Z"
+  "letto_il": "2026-09-12T16:25:43Z"
  },
  "predictions": [
   {
    "question": "Will there be no change in Fed interest rates after the September 2026 meeting?",
-   "yes": 22,
+   "yes": 20,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615"
   },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?",
-   "yes": 78,
+   "yes": 80,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
@@ -58824,19 +58832,19 @@
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-12-2026"
   },
   {
-   "question": "Will the price of Bitcoin be above $78,000 on September 12?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-12-2026"
-  },
-  {
-   "question": "Bitcoin Up or Down on September 12?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-12-2026"
-  },
-  {
    "question": "Fed rate hike in 2026?",
    "yes": 88,
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $74,000 on September 12?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-74k-on-september-12-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $72,000 on September 12?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-72k-on-september-12-2026"
   }
  ],
  "options": {
@@ -79287,6 +79295,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T15:03:22Z"
+  "generated_at": "2026-09-12T16:25:44Z"
  }
 }
