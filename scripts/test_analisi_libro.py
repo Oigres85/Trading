@@ -1010,12 +1010,34 @@ check("v451 WSJ resta ESCLUSO e la ragione e' scritta, non dimenticata",
 check("v451 Reddit, X e StockTwits non sono fonti del brief",
       not any(x in _BRIEF_CODICE for x in ("reddit.com", "//x.com", "twitter.com", "stocktwits")))
 
-check("v451 le posizioni vengono da memoria/LIBRO.md e non dalla pipeline",
-      "LIBRO.md" in _BRIEF_CODICE and "data.json" not in _BRIEF_CODICE)
+# ⚠ RIAGGANCIATO in v452. L'invariante non e' "data.json non compare mai": da v452 il blocco
+# macro legge le serie dalla pipeline, che le pubblica con la chiave FRED nei secret di GitHub
+# (il repo e' pubblico e l'ambiente delle Routine non eredita variabili: non c'e' altro posto).
+# L'invariante vero, scritto nel commento del gate originale, e' piu' stretto: le POSIZIONI non
+# devono venire dalla pipeline, cosi' che se la pipeline muore il libro resti vero (v439 —
+# stesso riaggancio, stessa ragione, sulla stessa classe).
+_CORPO_LIBRO = _BRIEF_CODICE[_BRIEF_CODICE.index("def leggi_libro"):]
+_CORPO_LIBRO = _CORPO_LIBRO[:_CORPO_LIBRO.index("\ndef ", 5)]
+check("v451 le POSIZIONI vengono da memoria/LIBRO.md, mai dalla pipeline",
+      "LIBRO.md" in _CORPO_LIBRO and "data.json" not in _CORPO_LIBRO)
+check("v452 il blocco macro legge la pipeline e ne DICHIARA l'eta'",
+      "def macro_dalla_pipeline" in _BRIEF_CODICE
+      and "updated_at" in _BRIEF_CODICE and "eta_ore" in _BRIEF_CODICE
+      and "PIPELINE FERMA DA" in _BRIEF)
 
-check("v451 senza chiave FRED si dichiara il buco invece di tacere",
-      "CHIAVE ASSENTE" in _BRIEF_CODICE and "e' il dato che manca" in _BRIEF
-      and "nessun movimento" in _BRIEF)
+# ⚠ RIAGGANCIATO in v452: la chiave FRED non esiste piu' in questo strumento. L'invariante
+# che contava non era "senza chiave" ma **senza il dato si dichiara il buco** (v396).
+check("v452 senza i dati della pipeline si dichiara il buco invece di tacere",
+      "data.json ASSENTE" in _BRIEF_CODICE and "data.json ILLEGGIBILE" in _BRIEF_CODICE
+      and "e' il dato che manca" in _BRIEF and "nessun movimento" in _BRIEF)
+check("v452 nessuna chiamata diretta a FRED e nessuna chiave nel brief",
+      "stlouisfed.org" not in _BRIEF_CODICE and "FRED_API_KEY" not in _BRIEF_CODICE
+      and "api_key" not in _BRIEF_CODICE)
+# ⚠ Una riga che non porta la data lo DICHIARA invece di prendere quella del run, che sarebbe
+#   la data di un'altra cosa (classe v431: l'etichetta dall'orologio e il valore dai dati).
+check("v452 una serie senza rilevazione lo dichiara, non eredita la data del run",
+      "rilevazione non dichiarata" in _BRIEF
+      and "il file non dichiara la rilevazione di questo campo" in _BRIEF)
 
 check("v451 l'etichetta del feed dichiara la PROVENIENZA, non l'attribuzione",
       "NON 'notizia su TK'" in _BRIEF and "in_feed" in _BRIEF_CODICE)

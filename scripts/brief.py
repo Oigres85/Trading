@@ -290,36 +290,92 @@ def calendario_trimestrali(tickers, giorni=21):
     return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni}
 
 
-# ---------------------------------------------------------------- macro FRED
-SERIE_FRED = [("DGS10", "Treasury 10A"), ("T10Y2Y", "Curva 10A-2A"),
-              ("BAMLH0A0HYM2", "HY OAS"), ("NFCI", "NFCI"),
-              ("CPIAUCNS", "CPI (grezzo)"), ("UNRATE", "Disoccupazione"),
-              ("DFF", "Fed Funds effettivo"), ("DEXUSEU", "EUR/USD")]
+# ---------------------------------------------------------------- macro dalla pipeline
+# ⚠⚠ LA CHIAVE FRED NON VIVE QUI, E NON VIVE DA NESSUNA PARTE. La pipeline
+# (scripts/update_data.py, GitHub Actions) ce l'ha nei secret e pubblica queste serie in
+# data/data.json 14-15 volte al giorno. Leggerle di la' costa zero credenziali: il repo e'
+# PUBBLICO (verificato il 12/09/2026), quindi una chiave committata sarebbe una chiave
+# pubblicata, e l'ambiente delle Routine non la puo' ereditare.
+#
+# ⚠ E' UNA SOLA DERIVAZIONE, non due: la fetch diretta a FRED e' stata TOLTA, non affiancata.
+# Due strade per la stessa grandezza divergono al primo ritocco (v161, v207, v316).
+#
+# ⚠⚠ IL PREZZO DI QUESTA SCELTA VA DICHIARATO, non nascosto: se la pipeline si ferma, la
+# macro si ferma con lei. Quindi ogni riga porta la PROPRIA data di rilevazione (dal file, non
+# dall'orologio) e il blocco dichiara l'ETA' DEL RUN. Le POSIZIONI restano fuori: quelle
+# vengono da memoria/LIBRO.md e da nient'altro, cosi' se la pipeline muore il libro resta
+# vero (regola v439).
+
+# (chiave in data.json, nome da mostrare, come arrivarci)
+def _ind(macro, key):
+    for x in (macro.get("indicators") or []):
+        if x.get("key") == key:
+            return x
+    return None
 
 
-def macro_fred():
-    chiave = os.environ.get("FRED_API_KEY") or ""
-    p = os.path.join(RADICE, "config", "fred_key.txt")
-    if not chiave and os.path.exists(p):
-        chiave = open(p).read().strip()
-    if not chiave:
+def macro_dalla_pipeline():
+    p = os.path.join(RADICE, "data", "data.json")
+    if not os.path.exists(p):
         # ⚠ Si DICHIARA il buco, non si finge (istruzione permanente del CEO, v396).
-        return {"stato": "CHIAVE ASSENTE", "serie": []}
-    out = []
-    for sid, nome in SERIE_FRED:
+        return {"stato": "data.json ASSENTE", "serie": [], "eta_ore": None, "run": None}
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+    except Exception as e:
+        return {"stato": f"data.json ILLEGGIBILE: {str(e)[:40]}", "serie": [],
+                "eta_ore": None, "run": None}
+    m = d.get("macro") or {}
+    run = d.get("updated_at")
+    eta = None
+    if run:
         try:
-            d = jget(f"https://api.stlouisfed.org/fred/series/observations?series_id={sid}"
-                     f"&api_key={chiave}&file_type=json&sort_order=desc&limit=2", 20)
-            oss = [o for o in d.get("observations", []) if o.get("value") not in (".", None)]
-            if not oss:
-                out.append({"id": sid, "nome": nome, "stato": "nessuna osservazione"}); continue
-            v = float(oss[0]["value"])
-            prec = float(oss[1]["value"]) if len(oss) > 1 else None
-            out.append({"id": sid, "nome": nome, "valore": v, "data": oss[0]["date"],
-                        "prec": prec, "delta": (v - prec) if prec is not None else None})
-        except Exception as e:
-            out.append({"id": sid, "nome": nome, "stato": str(e)[:40]})
-    return {"stato": "ok", "serie": out}
+            t = datetime.fromisoformat(run.replace("Z", "+00:00"))
+            eta = (datetime.now(timezone.utc) - t).total_seconds() / 3600
+        except Exception:
+            pass
+
+    def riga(nome, valore, data, prec=None, nota=None):
+        return {"nome": nome, "valore": valore, "data": data, "prec": prec, "nota": nota}
+
+    out = []
+    # tassi: la scadenza a 10 anni, con la data che la pipeline dichiara sulla scadenza stessa
+    a10 = next((s for s in ((m.get("tassi") or {}).get("scadenze") or [])
+                if s.get("key") == "a10"), None)
+    if a10:
+        out.append(riga("Treasury 10A", a10.get("value"), a10.get("observation_date")))
+    for key, nome in (("curve", "Curva 10A-2A"), ("cpi", "Inflazione CPI (a/a)"),
+                      ("unemp", "Disoccupazione"), ("nfp", "Non-Farm Payrolls"),
+                      ("real10", "Tasso reale 10A (TIPS)")):
+        x = _ind(m, key)
+        if x:
+            # ⚠ il campo e' "date": provato sul file vero, non indovinato dal nome della
+            #   chiave usata da `tassi.scadenze`, che invece scrive "observation_date".
+            out.append(riga(nome, x.get("value"), x.get("date")))
+    cr = m.get("credit") or {}
+    if cr.get("spread_hy") is not None:
+        out.append(riga("HY OAS (credito)", cr["spread_hy"], cr.get("date")))
+    cb = m.get("credito_banche") or {}
+    nf = cb.get("nfci") or {}
+    if nf.get("valore") is not None:
+        out.append(riga("NFCI (condizioni fin.)", nf["valore"], nf.get("data"),
+                        prec=nf.get("mese_fa")))
+    sl = cb.get("sloos") or {}
+    if sl.get("valore") is not None:
+        # ⚠ IL SEGNO DI SLOOS NON E' INTUITIVO (v390): negativo = banche che ALLENTANO.
+        out.append(riga("SLOOS (banche)", sl["valore"], sl.get("data"),
+                        prec=sl.get("precedente"),
+                        nota="negativo = le banche allentano"))
+    fm = m.get("fed_market") or {}
+    if fm.get("current_rate") is not None:
+        # ⚠ Il file NON porta una data per questo campo: si dichiara invece di prendere
+        #   quella del run, che sarebbe la data di un'altra cosa (classe v431).
+        out.append(riga("Fed Funds effettivo", fm["current_rate"], None,
+                        nota="il file non dichiara la rilevazione di questo campo"))
+    eur = next((x for x in (m.get("markets") or []) if x.get("key") == "EURUSD=X"), None)
+    if eur:
+        out.append(riga("EUR/USD", eur.get("value"), None,
+                        prec=None, nota="quotazione dello snapshot, non una serie datata"))
+    return {"stato": "ok", "serie": out, "eta_ore": eta, "run": run}
 
 
 # ---------------------------------------------------------------- resa
@@ -449,11 +505,22 @@ def componi(modo, dati):
         A(f"  ⚠ SERIE MACRO: {mf['stato']} — inflazione, curva, HY OAS, NFCI e Fed Funds NON")
         A("    sono in questo brief. Non e' 'nessun movimento': e' il dato che manca.")
     else:
+        eta = mf.get("eta_ore")
+        # ⚠ L'eta' del run si dichiara SEMPRE: se la pipeline si ferma, la macro si ferma con
+        #   lei, e chi legge deve poterlo vedere invece di dedurlo (v369, v406).
+        if eta is None:
+            A("  ⚠ le serie vengono dalla pipeline, che non dichiara quando ha girato")
+        elif eta > 24:
+            A(f"  ⚠⚠ PIPELINE FERMA DA {n2(eta,1)} ORE: queste serie non si aggiornano da allora.")
+        else:
+            A(f"  dalla pipeline, run di {n2(eta,1)} ore fa — ogni riga porta la PROPRIA rilevazione")
         for s in mf["serie"]:
-            if "valore" in s:
-                A(f"  {s['nome']:22} {n2(s['valore'],2):>10}   al {s['data']}   {sgn(s.get('delta'),2,'') if s.get('delta') is not None else ''}")
-            else:
-                A(f"  {s['nome']:22} {s.get('stato','n.d.')}")
+            quando = f"al {s['data']}" if s.get("data") else "rilevazione non dichiarata"
+            prec = ""
+            if s.get("prec") is not None and isinstance(s.get("valore"), (int, float)):
+                prec = f"   (prima {n2(s['prec'],2)})"
+            nota = f"   — {s['nota']}" if s.get("nota") else ""
+            A(f"  {s['nome']:24} {str(s['valore']):>10}   {quando}{prec}{nota}")
 
     A("")
     A("-" * 66)
@@ -492,7 +559,7 @@ def main():
     da = ora_utc - timedelta(hours=finestra)
     nw = raccogli_news(tickers, da)
     cal = calendario_trimestrali(tickers)
-    mf = macro_fred()
+    mf = macro_dalla_pipeline()
 
     sedute = [r["seduta"] for r in tec if r.get("seduta")]
     base = max(set(sedute), key=sedute.count) if sedute else "n.d."
