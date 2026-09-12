@@ -251,6 +251,45 @@ def raccogli_news(tickers, da):
             "macro_non_lette": macro_ko, "macro_mute": macro_muti}
 
 
+# ---------------------------------------------------------------- trimestrali
+# ⚠ NON via FMP: le Routine non portano connettori, quindi una sessione automatica non
+#   avrebbe quel tool. Un pezzo del brief che funziona solo quando lo lancio io a mano non
+#   serve a niente (trappola v203: la strada che conta e' quella della produzione).
+# ⚠ Nasdaq espone il calendario PER GIORNO: l'attribuzione viene dalla fonte, non da noi (v399).
+def _trim_giorno(giorno):
+    try:
+        d = jget(f"https://api.nasdaq.com/api/calendar/earnings?date={giorno}", 15)
+    except Exception as ex:
+        return giorno, None, str(ex)[:40]
+    righe = (d.get("data") or {}).get("rows") or []
+    return giorno, righe, None
+
+
+def calendario_trimestrali(tickers, giorni=21):
+    """Le uscite dichiarate DALLA FONTE nei prossimi giorni. Nessuna proiezione nostra: se
+    una data non c'e', si dice che non c'e' (istruzione permanente del CEO, v396)."""
+    oggi = datetime.now(timezone.utc).date()
+    date = []
+    for i in range(giorni):
+        g = oggi + timedelta(days=i)
+        if g.weekday() < 5:                      # i mercati USA non riportano nel fine settimana
+            date.append(g.isoformat())
+    attesi, non_letti = [], []
+    cercati = {t.upper() for t in tickers}
+    with ThreadPoolExecutor(max_workers=PARALLELI) as ex:
+        for giorno, righe, errore in ex.map(_trim_giorno, date):
+            if righe is None:
+                non_letti.append(giorno); continue
+            for r in righe:
+                if str(r.get("symbol", "")).upper() in cercati:
+                    attesi.append({"tk": r["symbol"].upper(), "data": giorno,
+                                   "quando": r.get("time", ""), "eps_atteso": r.get("epsForecast"),
+                                   "trimestre": r.get("fiscalQuarterEnding"),
+                                   "giorni": (datetime.fromisoformat(giorno).date() - oggi).days})
+    attesi.sort(key=lambda x: x["data"])
+    return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni}
+
+
 # ---------------------------------------------------------------- macro FRED
 SERIE_FRED = [("DGS10", "Treasury 10A"), ("T10Y2Y", "Curva 10A-2A"),
               ("BAMLH0A0HYM2", "HY OAS"), ("NFCI", "NFCI"),
@@ -346,6 +385,21 @@ def componi(modo, dati):
         A(f"  {r['tk']:6} seduta del {r.get('seduta','n.d.')}: {' · '.join(q)}")
         A(f"         {riga_titolo(r, True).split(chr(10))[1].strip()}")
 
+    # --- 1bis. TRIMESTRALI IN ARRIVO
+    cal = dati["trimestrali"]
+    A("")
+    A(f"TRIMESTRALI DICHIARATE DALLA FONTE — prossimi {cal['finestra']} giorni")
+    if not cal["attesi"]:
+        A("  nessuna. ⚠ Non e' 'nessuna trimestrale mai': e' che nella finestra la fonte non")
+        A("  ne dichiara. Oltre la finestra il sistema non guarda.")
+    for x in cal["attesi"]:
+        q = {"time-pre-market": "prima della campana", "time-after-hours": "dopo la campana"}.get(
+            x["quando"], x["quando"] or "orario non dichiarato")
+        eps = f" · consenso {x['eps_atteso']}" if x.get("eps_atteso") else ""
+        A(f"  {x['tk']:6} {x['data']} (fra {x['giorni']}g) · {q}{eps}")
+    if cal["giorni_non_letti"]:
+        A(f"  ⚠ giorni NON letti (diverso da 'nessuna uscita'): {len(cal['giorni_non_letti'])}")
+
     # --- 2. LIVELLI DEL LIBRO
     A("")
     A("DOVE STA OGNI POSIZIONE (livelli misurati — la decisione resta sul tuo grafico)")
@@ -437,6 +491,7 @@ def main():
     ora_utc = datetime.now(timezone.utc)
     da = ora_utc - timedelta(hours=finestra)
     nw = raccogli_news(tickers, da)
+    cal = calendario_trimestrali(tickers)
     mf = macro_fred()
 
     sedute = [r["seduta"] for r in tec if r.get("seduta")]
@@ -444,14 +499,21 @@ def main():
 
     dati = {"ora": ora_utc + timedelta(hours=2), "ora_utc": ora_utc, "modo": modo,
             "finestra_h": finestra, "tecnica": tec, "news": nw, "macro_fred": mf,
+            "trimestrali": cal,
             "seduta_base": base, "cassa_eur": cassa, "secondi": round(time.time() - t0, 1)}
     testo = componi(modo, dati)
     print(testo)
     print(f"\n[generato in {dati['secondi']}s]")
     if a.json:
         s = dict(dati); s["ora"] = s["ora"].isoformat(); s["ora_utc"] = s["ora_utc"].isoformat()
-        s["news"] = {k: ([{**x, "quando": x["quando"].isoformat()} for x in v] if v and isinstance(v[0], dict) else v)
-                     for k, v in nw.items()}
+        def _ser(v):
+            # ⚠ nw contiene liste di dizionari, liste di stringhe E un intero (macro_scartate):
+            #   un ramo che assume una forma sola rompe sul primo valore diverso.
+            if isinstance(v, list):
+                return [{**x, "quando": x["quando"].isoformat()} if isinstance(x, dict) and x.get("quando")
+                        else x for x in v]
+            return v
+        s["news"] = {k: _ser(v) for k, v in nw.items()}
         s["testo"] = testo
         json.dump(s, open(a.json, "w"), ensure_ascii=False, indent=1)
 
