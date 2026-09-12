@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-12T21:58:44Z",
+ "updated_at": "2026-09-12T22:54:21Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -4608,7 +4608,7 @@
      218.29
     ],
     "y1": [
-     177.39,
+     177.4,
      176.25,
      177.76,
      187.17,
@@ -11795,7 +11795,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -21838,11 +21838,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77237.37,
+   "price": 77221.42,
    "price_asof": "2026-09-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.08,
+   "change_pct": 0.06,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -38.8,
@@ -21855,9 +21855,9 @@
    "day_low": 77045.0,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 55.0,
-   "volume": 14207457280,
-   "vol_ratio": 0.45,
+   "rsi": 54.9,
+   "volume": 13653444608,
+   "vol_ratio": 0.43,
    "atr_14": 2158.33,
    "atr_pct": 2.79,
    "signal": "Trend rialzista",
@@ -21868,7 +21868,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77237.37
+     77221.42
     ],
     "m6": [
      82138.93,
@@ -21996,7 +21996,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77237.37
+     77221.42
     ],
     "all": [
      386.94,
@@ -22143,7 +22143,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77237.37
+     77221.42
     ],
     "m1": [
      77083.41,
@@ -22167,7 +22167,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77237.37
+     77221.42
     ],
     "m3": [
      63193.15,
@@ -22235,7 +22235,7 @@
      78259.52,
      76568.12,
      77173.8,
-     77237.37
+     77221.42
     ],
     "y1": [
      116101.58,
@@ -22311,7 +22311,7 @@
      77830.29,
      77300.48,
      79115.85,
-     77237.37
+     77221.42
     ],
     "d1": [
      77280.33,
@@ -22445,7 +22445,13 @@
      77164.07,
      77217.75,
      77224.13,
-     77258.34
+     77258.34,
+     77257.82,
+     77209.67,
+     77278.8,
+     77185.22,
+     77183.69,
+     77221.42
     ]
    },
    "earnings_date": null,
@@ -22459,7 +22465,7 @@
    "sharpe_6m": -0.39,
    "sortino_6m": -0.57,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77237.37,
+   "prezzo_limite_aggiustato": 77221.42,
    "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22472,22 +22478,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.53
+     "change_pct": -1.55
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.2
+     "change_pct": 0.18
     },
     "m3": {
      "support": 61645.75,
      "resistance": 82262.21,
-     "change_pct": 22.22
+     "change_pct": 22.2
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.51
+     "change_pct": -15.53
     }
    },
    "financials": [],
@@ -22514,74 +22520,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77237.37,
+     "prezzo": 77221.42,
      "medie": {
       "sma10": {
-       "liv": 78791.09,
-       "dist_pct": -1.97
+       "liv": 78789.49,
+       "dist_pct": -1.99
       },
       "ema10": {
-       "liv": 77956.39,
-       "dist_pct": -0.92
+       "liv": 77953.49,
+       "dist_pct": -0.94
       },
       "sma20": {
-       "liv": 78586.08,
-       "dist_pct": -1.72
+       "liv": 78585.29,
+       "dist_pct": -1.74
       },
       "ema20": {
-       "liv": 77023.2,
-       "dist_pct": 0.28
+       "liv": 77021.68,
+       "dist_pct": 0.26
       },
       "sma30": {
-       "liv": 75506.67,
-       "dist_pct": 2.29
+       "liv": 75506.14,
+       "dist_pct": 2.27
       },
       "ema30": {
-       "liv": 75478.41,
-       "dist_pct": 2.33
+       "liv": 75477.38,
+       "dist_pct": 2.31
       },
       "sma50": {
-       "liv": 70908.29,
-       "dist_pct": 8.93
+       "liv": 70907.97,
+       "dist_pct": 8.9
       },
       "ema50": {
-       "liv": 73024.45,
-       "dist_pct": 5.77
+       "liv": 73023.83,
+       "dist_pct": 5.75
       },
       "sma100": {
-       "liv": 67007.73,
-       "dist_pct": 15.27
+       "liv": 67007.57,
+       "dist_pct": 15.24
       },
       "ema100": {
-       "liv": 70921.08,
-       "dist_pct": 8.91
+       "liv": 70920.76,
+       "dist_pct": 8.88
       },
       "sma200": {
-       "liv": 70090.97,
-       "dist_pct": 10.2
+       "liv": 70090.89,
+       "dist_pct": 10.17
       },
       "ema200": {
-       "liv": 73230.69,
-       "dist_pct": 5.47
+       "liv": 73230.53,
+       "dist_pct": 5.45
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 55.0,
+      "rsi14": 54.9,
       "macd": {
-       "linea": 1807.18,
-       "segnale": 2569.67,
-       "istogramma": -762.49
+       "linea": 1805.91,
+       "segnale": 2569.42,
+       "istogramma": -763.51
       },
-      "stoch_k": 17.6,
-      "stoch_d": 13.2,
-      "williams_r": -82.4,
+      "stoch_k": 17.4,
+      "stoch_d": 13.1,
+      "williams_r": -82.6,
       "cci20": -18.2,
       "adx14": 44.4,
       "di_su": 29.3,
       "di_giu": 13.9,
-      "momentum10": -63.11
+      "momentum10": -79.05
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23074,19 +23080,19 @@
       "o": 77201.88,
       "h": 77468.78,
       "l": 77045.0,
-      "c": 77237.37
+      "c": 77221.42
      }
     ],
     "performance": {
-     "s1": -2.37,
-     "m1": -1.4,
-     "m3": 24.06,
-     "m6": -4.25,
-     "a1": -14.75,
-     "ytd": -12.95,
-     "a3": 186.4,
-     "a5": 76.38,
-     "a10": 12567.37
+     "s1": -2.39,
+     "m1": -1.42,
+     "m3": 24.04,
+     "m6": -4.27,
+     "a1": -14.77,
+     "ytd": -12.97,
+     "a3": 186.35,
+     "a5": 76.34,
+     "a10": 12564.75
     },
     "stagionalita": [
      {
@@ -23164,7 +23170,7 @@
      {
       "mese": 9,
       "media": -1.81,
-      "mediana": -2.38,
+      "mediana": -2.39,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23201,7 +23207,7 @@
    },
    "rs_1m": 1.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.5,
+   "rs_ndx_1m": 1.4,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -36680,7 +36686,7 @@
      "a1": 56.34,
      "a3": 417.5,
      "a5": 319.23,
-     "a10": 1681.44
+     "a10": 1681.43
     },
     "stagionalita": [
      {
@@ -57741,6 +57747,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Nvidia vs. AMD: Elon Musk Picked a Side on the SpaceX Earnings Call",
+      "riassunto": "Key PointsNvidia and AMD are the two leading GPU designers for artificial intelligence (AI) workloads.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T21:20:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-vs-amd-elon-musk-picked-side-spacex-earnings-call"
+     },
+     {
       "titolo": "AMD Just Raised the Top of the Company's 2030 Market to $3 Trillion",
       "riassunto": "Key PointsSpeaking at Citi's technology conference on Tuesday, Sept. 8, AMD's chief financial officer said the company's total addressable market could reach $2 trillion to $3 trillion by 2030.",
       "fonte": "Nasdaq",
@@ -57774,13 +57787,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T17:46:30Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
-     },
-     {
-      "titolo": "AMD Expands Into Rack-Scale AI as Agentic Workloads Boost CPU Demand",
-      "riassunto": "TSMC Revenue Jumps 53% in August, Signaling Strong AI Chip DemandAdvanced Micro Devices (NASDAQ:AMD) executives said the company is expanding its role in artificial intelligence from a semiconductor supplier toward a provider of rack-scale systems and software, while positioning",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T17:02:03Z",
-      "url": "https://www.nasdaq.com/articles/amd-expands-rack-scale-ai-agentic-workloads-boost-cpu-demand"
      }
     ],
     "BE": [
@@ -58049,6 +58055,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "Nvidia vs. AMD: Elon Musk Picked a Side on the SpaceX Earnings Call",
+      "riassunto": "Key PointsNvidia and AMD are the two leading GPU designers for artificial intelligence (AI) workloads.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-12T21:20:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-vs-amd-elon-musk-picked-side-spacex-earnings-call"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
@@ -58082,13 +58095,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T13:44:00Z",
       "url": "https://www.nasdaq.com/articles/apple-and-taiwan-semiconductor-manufacturing-just-announced-cutting-edge-chip-1-stock"
-     },
-     {
-      "titolo": "Breakfast News: 4 CEOs Playing the Long Game",
-      "riassunto": "SEPTEMBER 12, 2026\nWhat separates a capable CEO from a great one? It&rsquo;s not just vision or great timing. When you look closely at the architects of some of the biggest businesses, distinct patterns of greatness begin to emerge. Four Fools &mdash; two from Team Rule Breakers, two from T",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T11:50:00Z",
-      "url": "https://www.nasdaq.com/articles/breakfast-news-4-ceos-playing-long-game"
      }
     ],
     "ORCL": [
@@ -58291,13 +58297,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-12T21:58:44Z"
+   "letto_il": "2026-09-12T22:54:21Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Nvidia vs. AMD: Elon Musk Picked a Side on the SpaceX Earnings Call",
+     "riassunto": "Key PointsNvidia and AMD are the two leading GPU designers for artificial intelligence (AI) workloads.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T21:20:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-vs-amd-elon-musk-picked-side-spacex-earnings-call"
+    },
     {
      "titolo": "AMD Just Raised the Top of the Company's 2030 Market to $3 Trillion",
      "riassunto": "Key PointsSpeaking at Citi's technology conference on Tuesday, Sept. 8, AMD's chief financial officer said the company's total addressable market could reach $2 trillion to $3 trillion by 2030.",
@@ -58332,13 +58345,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T17:46:30Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
-    },
-    {
-     "titolo": "AMD Expands Into Rack-Scale AI as Agentic Workloads Boost CPU Demand",
-     "riassunto": "TSMC Revenue Jumps 53% in August, Signaling Strong AI Chip DemandAdvanced Micro Devices (NASDAQ:AMD) executives said the company is expanding its role in artificial intelligence from a semiconductor supplier toward a provider of rack-scale systems and software, while positioning",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T17:02:03Z",
-     "url": "https://www.nasdaq.com/articles/amd-expands-rack-scale-ai-agentic-workloads-boost-cpu-demand"
     }
    ],
    "BE": [
@@ -58607,6 +58613,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "Nvidia vs. AMD: Elon Musk Picked a Side on the SpaceX Earnings Call",
+     "riassunto": "Key PointsNvidia and AMD are the two leading GPU designers for artificial intelligence (AI) workloads.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-12T21:20:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-vs-amd-elon-musk-picked-side-spacex-earnings-call"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
@@ -58640,13 +58653,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T13:44:00Z",
      "url": "https://www.nasdaq.com/articles/apple-and-taiwan-semiconductor-manufacturing-just-announced-cutting-edge-chip-1-stock"
-    },
-    {
-     "titolo": "Breakfast News: 4 CEOs Playing the Long Game",
-     "riassunto": "SEPTEMBER 12, 2026\nWhat separates a capable CEO from a great one? It&rsquo;s not just vision or great timing. When you look closely at the architects of some of the biggest businesses, distinct patterns of greatness begin to emerge. Four Fools &mdash; two from Team Rule Breakers, two from T",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T11:50:00Z",
-     "url": "https://www.nasdaq.com/articles/breakfast-news-4-ceos-playing-long-game"
     }
    ],
    "ORCL": [
@@ -58849,7 +58855,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-12T21:58:44Z"
+  "letto_il": "2026-09-12T22:54:21Z"
  },
  "predictions": [
   {
@@ -79269,7 +79275,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 7 ore"
+    "note": "18 voci, la piu' recente di 8 ore"
    },
    {
     "key": "sec_calendario",
@@ -79321,6 +79327,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-12T21:58:44Z"
+  "generated_at": "2026-09-12T22:54:22Z"
  }
 }
