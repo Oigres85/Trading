@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-13T04:03:47Z",
+ "updated_at": "2026-09-13T08:04:00Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -935,16 +935,16 @@
     "upside_pct": 55.1
    },
    "analisti": {
-    "eps_ora": 155.0252,
-    "eps_90g_fa": 109.4243,
-    "eps_7g_fa": 155.0252,
-    "revisione_90g_pct": 41.67,
-    "revisione_7g_pct": 0.0,
+    "eps_ora": 156.0661,
+    "eps_90g_fa": 112.1695,
+    "eps_7g_fa": 155.8047,
+    "revisione_90g_pct": 39.13,
+    "revisione_7g_pct": 0.17,
     "su_30g": 2,
     "giu_30g": 2,
     "eps_min": 106.89,
     "eps_max": 221.27,
-    "eps_n": 39,
+    "eps_n": 36,
     "target_min": 361.0,
     "target_max": 2200.0,
     "target_mediana": 1540.0
@@ -2958,7 +2958,7 @@
     "gross_margin": 0.5572,
     "enterprise_value": 833734311936.0,
     "ev_ebitda": 87.192,
-    "peg": 0.51,
+    "peg": 0.53,
     "roa": 0.0513,
     "short_float": 0.0257,
     "buyback_yield": 0.0023,
@@ -4600,7 +4600,7 @@
      218.29
     ],
     "y1": [
-     177.39,
+     177.4,
      176.25,
      177.76,
      187.17,
@@ -4704,10 +4704,10 @@
    "analisti": {
     "eps_ora": 15.5675,
     "eps_90g_fa": 12.6718,
-    "eps_7g_fa": 15.4042,
+    "eps_7g_fa": 15.4581,
     "revisione_90g_pct": 22.85,
-    "revisione_7g_pct": 1.06,
-    "su_30g": 39,
+    "revisione_7g_pct": 0.71,
+    "su_30g": 41,
     "giu_30g": 0,
     "eps_min": 9.8,
     "eps_max": 18.746,
@@ -4735,7 +4735,7 @@
    "stats": {
     "market_cap": 5271048421376.0,
     "shares": 24147000000.0,
-    "float_shares": 23129734000.0,
+    "float_shares": 23130698000.0,
     "float_pct": 95.8,
     "avg_volume_30d": 132087064.0,
     "pe_ttm": 27.6316,
@@ -4756,15 +4756,12 @@
     "gross_margin": 0.7467,
     "enterprise_value": 5237179940864.0,
     "ev_ebitda": 26.021,
-    "peg": 0.55,
+    "peg": 0.46,
     "roa": 0.5357,
     "short_float": 0.0129,
     "buyback_yield": 0.0076,
     "ps": 17.4,
-    "ev_s": 17.29,
-    "altman_z": 13.22,
-    "altman_missing": 0,
-    "altman_model": "Z''"
+    "ev_s": 17.29
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -9804,23 +9801,23 @@
    "rating": {
     "key": "buy",
     "n": 41,
-    "target": 241.41,
-    "upside_pct": 60.6
+    "target": 239.1,
+    "upside_pct": 59.1
    },
    "analisti": {
-    "eps_ora": 11.0212,
+    "eps_ora": 10.9941,
     "eps_90g_fa": 10.8669,
     "eps_7g_fa": 10.9676,
-    "revisione_90g_pct": 1.42,
-    "revisione_7g_pct": 0.49,
+    "revisione_90g_pct": 1.17,
+    "revisione_7g_pct": 0.24,
     "su_30g": 3,
     "giu_30g": 0,
     "eps_min": 9.0,
-    "eps_max": 13.51,
-    "eps_n": 39,
+    "eps_max": 13.3,
+    "eps_n": 40,
     "target_min": 110.0,
     "target_max": 400.0,
-    "target_mediana": 240.0
+    "target_mediana": 239.0
    },
    "health": 54,
    "eps": 6.39,
@@ -9841,33 +9838,33 @@
    "stats": {
     "market_cap": 432877174784.0,
     "shares": 2880471000.0,
-    "float_shares": 1713332956.0,
-    "float_pct": 59.5,
+    "float_shares": 1764206460.0,
+    "float_pct": 61.2,
     "avg_volume_30d": 32337727.0,
     "pe_ttm": 23.518,
-    "forward_pe": 13.6812,
+    "forward_pe": 13.6691,
     "eps_ttm": 6.39,
-    "eps_forward": 10.9844,
-    "revenue_fy": 67356999680.0,
-    "net_income_fy": 16984000512.0,
-    "revenue_growth": 0.206,
-    "earnings_growth": 0.219,
-    "profit_margin": 0.2537,
-    "roe": 0.5338,
-    "debt_to_equity": 388.87,
+    "eps_forward": 10.9941,
+    "revenue_fy": 71776002048.0,
+    "net_income_fy": 18736001024.0,
+    "revenue_growth": 0.296,
+    "earnings_growth": 0.545,
+    "profit_margin": 0.2636,
+    "roe": 0.4119,
+    "debt_to_equity": 232.054,
     "dividend_yield": 0.0133,
     "price_to_book": 11.5245,
-    "target_mean": 241.4132,
-    "fcf": -24536750080.0,
-    "gross_margin": 0.6582,
-    "enterprise_value": 581579243520.0,
-    "ev_ebitda": 19.072,
-    "peg": 0.91,
-    "roa": 0.065,
+    "target_mean": 239.0961,
+    "fcf": -41130123264.0,
+    "gross_margin": 0.6396,
+    "enterprise_value": 564584448000.0,
+    "ev_ebitda": 16.503,
+    "peg": 0.85,
+    "roa": 0.0634,
     "short_float": 0.026,
     "buyback_yield": -0.0143,
-    "ps": 6.43,
-    "ev_s": 8.63,
+    "ps": 6.03,
+    "ev_s": 7.87,
     "altman_z": 0.89,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -11887,7 +11884,7 @@
    "stats": {
     "market_cap": 161226686464.0,
     "shares": 360540944.0,
-    "float_shares": 358020763.0,
+    "float_shares": 358024368.0,
     "float_pct": 99.3,
     "avg_volume_30d": 8332358.0,
     "pe_ttm": 16.6114,
@@ -11902,7 +11899,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0013,
-    "price_to_book": 21.3808,
+    "price_to_book": null,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13686,7 +13683,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.001,
-    "price_to_book": 11.171,
+    "price_to_book": 11.3488,
     "target_mean": 284.6409,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -15187,7 +15184,7 @@
     "target_mediana": 30.0
    },
    "health": 21,
-   "eps": -0.84,
+   "eps": -0.83,
    "beta": 2.01,
    "sharpe_1y": -0.25,
    "sortino_1y": -0.38,
@@ -15210,7 +15207,7 @@
     "avg_volume_30d": 22185561.0,
     "pe_ttm": null,
     "forward_pe": -74.4878,
-    "eps_ttm": -0.84,
+    "eps_ttm": -0.83,
     "eps_forward": -0.205,
     "revenue_fy": 13353000.0,
     "net_income_fy": -238672000.0,
@@ -21786,40 +21783,39 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77184.25,
+   "price": 77107.38,
    "price_asof": "2026-09-13",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.01,
+   "change_pct": -0.21,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 10.1,
-   "sma50_dist_pct": 8.9,
+   "ath_dist_pct": -38.9,
+   "sma200_dist_pct": 9.9,
+   "sma50_dist_pct": 8.4,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.8,
+   "w52_dist_pct": -38.9,
    "day_high": 77308.94,
-   "day_low": 77172.52,
+   "day_low": 77090.64,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 54.8,
-   "volume": 12812009472,
-   "vol_ratio": 1.21,
-   "atr_14": 2137.8,
-   "atr_pct": 2.77,
+   "rsi": 54.4,
+   "volume": 12269087744,
+   "vol_ratio": 0.4,
+   "atr_14": 2020.47,
+   "atr_pct": 2.62,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
     "w1": [
-     78438.58,
      78259.52,
      76568.12,
      77173.8,
-     77184.25
+     77270.47,
+     77107.38
     ],
     "m6": [
-     82138.93,
      81728.3,
      80477.49,
      79277.12,
@@ -21944,7 +21940,8 @@
      78259.52,
      76568.12,
      77173.8,
-     77184.25
+     77270.47,
+     77107.38
     ],
     "all": [
      386.94,
@@ -22091,10 +22088,9 @@
      58558.86,
      62813.75,
      78548.63,
-     77184.25
+     77107.38
     ],
     "m1": [
-     77083.41,
      77755.27,
      78964.48,
      78564.98,
@@ -22115,10 +22111,10 @@
      78259.52,
      76568.12,
      77173.8,
-     77184.25
+     77270.47,
+     77107.38
     ],
     "m3": [
-     63193.15,
      64127.14,
      63802.03,
      63758.22,
@@ -22183,7 +22179,8 @@
      78259.52,
      76568.12,
      77173.8,
-     77184.25
+     77270.47,
+     77107.38
     ],
     "y1": [
      115950.51,
@@ -22258,10 +22255,11 @@
      78964.48,
      78245.81,
      81271.74,
-     78438.58
+     78438.58,
+     77107.38
     ],
     "d1": [
-     77272.99,
+     77269.45,
      77254.31,
      77250.51,
      77252.33,
@@ -22271,7 +22269,7 @@
      77255.66,
      77305.01,
      77223.63,
-     77271.24,
+     77271.23,
      77275.0,
      77277.25,
      77261.8,
@@ -22280,27 +22278,51 @@
      77276.14,
      77280.0,
      77289.35,
-     77261.9,
+     77261.91,
      77260.14,
      77196.28,
      77199.45,
      77189.51,
-     77184.25
+     77188.39,
+     77184.74,
+     77215.35,
+     77210.03,
+     77194.01,
+     77197.51,
+     77202.53,
+     77221.11,
+     77246.36,
+     77274.25,
+     77286.98,
+     77299.0,
+     77298.74,
+     77279.24,
+     77271.06,
+     77281.62,
+     77277.49,
+     77111.46,
+     77129.32,
+     77148.39,
+     77135.1,
+     77113.48,
+     77137.65,
+     77096.0,
+     77107.38
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 68,
+   "health": 67,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.86,
    "sortino_1y": -1.15,
-   "sharpe_6m": -0.39,
-   "sortino_6m": -0.58,
+   "sharpe_6m": -0.51,
+   "sortino_6m": -0.76,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77184.25,
-   "risk_reward": "1:1.2",
+   "prezzo_limite_aggiustato": 77107.38,
+   "risk_reward": "1:1.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22312,30 +22334,30 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.6
+     "change_pct": -1.47
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": 0.13
+     "change_pct": -0.83
     },
     "m3": {
-     "support": 61645.75,
+     "support": 61769.0,
      "resistance": 82262.21,
-     "change_pct": 22.14
+     "change_pct": 20.24
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -15.57
+     "change_pct": -17.87
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 62,
-    "label": "Lieve rialzo",
-    "structure": "laterale",
+    "bias": 44,
+    "label": "Lieve ribasso",
+    "structure": "ribassista",
     "bos": null,
     "bull_fvg": 4,
     "bear_fvg": 0,
@@ -22354,85 +22376,78 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77184.25,
+     "prezzo": 77107.38,
      "medie": {
       "sma10": {
-       "liv": 78785.77,
-       "dist_pct": -2.03
+       "liv": 78377.96,
+       "dist_pct": -1.62
       },
       "ema10": {
-       "liv": 77946.73,
-       "dist_pct": -0.98
+       "liv": 77806.95,
+       "dist_pct": -0.9
       },
       "sma20": {
-       "liv": 78583.43,
-       "dist_pct": -1.78
+       "liv": 78494.88,
+       "dist_pct": -1.77
       },
       "ema20": {
-       "liv": 77018.14,
-       "dist_pct": 0.22
+       "liv": 77034.07,
+       "dist_pct": 0.1
       },
       "sma30": {
-       "liv": 75504.9,
-       "dist_pct": 2.22
+       "liv": 75978.83,
+       "dist_pct": 1.49
       },
       "ema30": {
-       "liv": 75474.98,
-       "dist_pct": 2.26
+       "liv": 75585.5,
+       "dist_pct": 2.01
       },
       "sma50": {
-       "liv": 70907.22,
-       "dist_pct": 8.85
+       "liv": 71164.86,
+       "dist_pct": 8.35
       },
       "ema50": {
-       "liv": 73022.37,
-       "dist_pct": 5.7
+       "liv": 73185.81,
+       "dist_pct": 5.36
       },
       "sma100": {
-       "liv": 67007.2,
-       "dist_pct": 15.19
+       "liv": 67169.9,
+       "dist_pct": 14.79
       },
       "ema100": {
-       "liv": 70919.92,
-       "dist_pct": 8.83
+       "liv": 71044.12,
+       "dist_pct": 8.53
       },
       "sma200": {
-       "liv": 70090.7,
-       "dist_pct": 10.12
+       "liv": 70136.87,
+       "dist_pct": 9.94
       },
       "ema200": {
-       "liv": 73226.23,
-       "dist_pct": 5.41
+       "liv": 73265.7,
+       "dist_pct": 5.24
       }
      },
      "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 54.8,
+      "rsi14": 54.4,
       "macd": {
-       "linea": 1802.94,
-       "segnale": 2568.83,
-       "istogramma": -765.88
+       "linea": 1611.84,
+       "segnale": 2378.53,
+       "istogramma": -766.69
       },
-      "stoch_k": 16.7,
-      "stoch_d": 12.9,
-      "williams_r": -83.3,
-      "cci20": -18.5,
-      "adx14": 44.4,
-      "di_su": 29.6,
-      "di_giu": 14.0,
-      "momentum10": -116.23
+      "stoch_k": 15.5,
+      "stoch_d": 16.7,
+      "williams_r": -84.5,
+      "cci20": -20.3,
+      "adx14": 43.8,
+      "di_su": 29.1,
+      "di_giu": 13.8,
+      "momentum10": -4164.36
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
-     {
-      "d": "2026-07-05",
-      "o": 63089.06,
-      "h": 63935.85,
-      "l": 62413.99,
-      "c": 63547.88
-     },
      {
       "d": "2026-07-06",
       "o": 63551.02,
@@ -22910,23 +22925,30 @@
       "c": 77173.8
      },
      {
+      "d": "2026-09-12",
+      "o": 77175.07,
+      "h": 77479.66,
+      "l": 77045.0,
+      "c": 77270.47
+     },
+     {
       "d": "2026-09-13",
       "o": 77270.22,
       "h": 77308.94,
-      "l": 77172.52,
-      "c": 77184.25
+      "l": 77090.64,
+      "c": 77107.38
      }
     ],
     "performance": {
-     "s1": -2.44,
-     "m1": -1.47,
-     "m3": 23.98,
-     "m6": -4.31,
-     "a1": -14.81,
-     "ytd": -13.01,
-     "a3": 186.21,
-     "a5": 76.26,
-     "a10": 12558.66
+     "s1": -1.7,
+     "m1": 0.03,
+     "m3": 22.02,
+     "m6": -6.13,
+     "a1": -15.65,
+     "ytd": -13.1,
+     "a3": 185.92,
+     "a5": 76.08,
+     "a10": 12546.05
     },
     "stagionalita": [
      {
@@ -23003,8 +23025,8 @@
      },
      {
       "mese": 9,
-      "media": -1.82,
-      "mediana": -2.41,
+      "media": -1.83,
+      "mediana": -2.46,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23039,9 +23061,9 @@
      }
     ]
    },
-   "rs_1m": 1.3,
+   "rs_1m": 0.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.4,
+   "rs_ndx_1m": 0.4,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -36202,9 +36224,9 @@
      "m6": 29.33,
      "ytd": 36.25,
      "a1": 56.34,
-     "a3": 417.49,
+     "a3": 417.5,
      "a5": 319.23,
-     "a10": 1681.43
+     "a10": 1681.44
     },
     "stagionalita": [
      {
@@ -36512,7 +36534,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 0.32,
-   "pe": 46.2,
+   "pe": 46.1,
    "ath": 495.0,
    "ath_dist_pct": -26.9,
    "sma200_dist_pct": -2.0,
@@ -37085,7 +37107,7 @@
     "target_mediana": 535.0
    },
    "health": 21,
-   "eps": 7.83,
+   "eps": 7.86,
    "beta": 1.46,
    "sharpe_1y": -0.05,
    "sortino_1y": -0.07,
@@ -37106,9 +37128,9 @@
     "float_shares": 4714771009.0,
     "float_pct": 98.8,
     "avg_volume_30d": 23786801.0,
-    "pe_ttm": 46.2312,
+    "pe_ttm": 46.0547,
     "forward_pe": 18.6748,
-    "eps_ttm": 7.83,
+    "eps_ttm": 7.86,
     "eps_forward": 19.3839,
     "revenue_fy": 89103998976.0,
     "net_income_fy": 38264999936.0,
@@ -52302,7 +52324,7 @@
    "calls": 171857
   },
   "risk_sentiment": {
-   "score": 44,
+   "score": 43,
    "label": "Neutrale",
    "components": [
     {
@@ -52319,7 +52341,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 50
+     "score": 48
     },
     {
      "label": "Treasury 10A",
@@ -52549,7 +52571,7 @@
       "qqq": 93.0
      }
     },
-    "azioni_in_circolazione": 69700000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-11",
     "price": 202.93,
     "d1": 0.14,
@@ -53047,7 +53069,7 @@
       "qqq": 93.0
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-11",
     "price": 165.36,
     "d1": -0.18,
@@ -53213,7 +53235,7 @@
       "qqq": 93.0
      }
     },
-    "azioni_in_circolazione": 272056000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-11",
     "price": 187.67,
     "d1": 1.32,
@@ -53685,7 +53707,7 @@
       "qqq": 93.0
      }
     },
-    "azioni_in_circolazione": 120253000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-11",
     "price": 112.96,
     "d1": 0.89,
@@ -53768,7 +53790,7 @@
       "qqq": 93.0
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-11",
     "price": 568.53,
     "d1": 1.47,
@@ -53934,7 +53956,7 @@
       "qqq": 93.0
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-11",
     "price": 82.14,
     "d1": 0.13,
@@ -57569,6 +57591,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "Oracle's AI Chips Ran 97.9% Utilized Last Quarter. For Nvidia, That Is What a Shortage Looks Like.",
+      "riassunto": "Key PointsOracle delivered 850 megawatts of AI capacity, containing more than 300,000 GPUs, to customers in its fiscal first quarter alone.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T03:38:01Z",
+      "url": "https://www.nasdaq.com/articles/oracles-ai-chips-ran-979-utilized-last-quarter-nvidia-what-shortage-looks"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
@@ -57602,16 +57631,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T14:58:00Z",
       "url": "https://www.nasdaq.com/articles/40000-employees-today-and-4-million-agents-tomorrow-nvidia-ceo-jensen-huang-believes"
-     },
-     {
-      "titolo": "Apple and Taiwan Semiconductor Manufacturing Just Announced a Cutting-Edge Chip. 1 Stock Offers Far Greater Upside.",
-      "riassunto": "Key PointsTaiwan Semiconductor expects strong growth for the rest of 2026 and 2027.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T13:44:00Z",
-      "url": "https://www.nasdaq.com/articles/apple-and-taiwan-semiconductor-manufacturing-just-announced-cutting-edge-chip-1-stock"
      }
     ],
     "ORCL": [
+     {
+      "titolo": "Oracle's Larry Ellison Cancels $7.5 Bln Stock Sale Plan",
+      "riassunto": "(RTTNews) - Oracle Corp. (ORCL) announced that Chairman and Chief Technology Officer Larry Ellison has cancelled his plan to sell up to 50 million shares of the company, valued at about $7.5 billion.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T03:50:00Z",
+      "url": "https://www.nasdaq.com/articles/oracles-larry-ellison-cancels-75-bln-stock-sale-plan"
+     },
+     {
+      "titolo": "Oracle's AI Chips Ran 97.9% Utilized Last Quarter. For Nvidia, That Is What a Shortage Looks Like.",
+      "riassunto": "Key PointsOracle delivered 850 megawatts of AI capacity, containing more than 300,000 GPUs, to customers in its fiscal first quarter alone.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T03:38:01Z",
+      "url": "https://www.nasdaq.com/articles/oracles-ai-chips-ran-979-utilized-last-quarter-nvidia-what-shortage-looks"
+     },
      {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
@@ -57639,20 +57675,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T21:12:02Z",
       "url": "https://www.nasdaq.com/articles/oracle-says-its-expiring-ai-contracts-are-renewing-20-higher"
-     },
-     {
-      "titolo": "Is ORCL a Buy Following 121% IaaS Growth in Q1 Earnings?",
-      "riassunto": "Oracle's cloud and AI momentum is accelerating, with surging IaaS revenues, strong visibility and improving profitability supporting ORCL's growth.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T19:00:00Z",
-      "url": "https://www.nasdaq.com/articles/orcl-buy-following-121-iaas-growth-q1-earnings"
-     },
-     {
-      "titolo": "Oracle’s AI Spending Is Still Huge, But the Payoff Is Starting to Show in Earnings",
-      "riassunto": "Oracle&rsquo;s (NASDAQ: ORCL) stock price is on track for a substantial recovery and a sustained, prolonged upswing as the monetization of its AI ambition begins.\nHighlights from the Q1 fiscal year 2027 (FY2027) release reveal the impacts of spending, capital raises, and dilution, ove",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T15:30:00Z",
-      "url": "https://www.nasdaq.com/articles/oracles-ai-spending-still-huge-payoff-starting-show-earnings"
      }
     ],
     "PLTR": [
@@ -57811,7 +57833,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-13T04:03:47Z"
+   "letto_il": "2026-09-13T08:04:00Z"
   }
  },
  "broker": null,
@@ -58127,6 +58149,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "Oracle's AI Chips Ran 97.9% Utilized Last Quarter. For Nvidia, That Is What a Shortage Looks Like.",
+     "riassunto": "Key PointsOracle delivered 850 megawatts of AI capacity, containing more than 300,000 GPUs, to customers in its fiscal first quarter alone.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T03:38:01Z",
+     "url": "https://www.nasdaq.com/articles/oracles-ai-chips-ran-979-utilized-last-quarter-nvidia-what-shortage-looks"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
@@ -58160,16 +58189,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T14:58:00Z",
      "url": "https://www.nasdaq.com/articles/40000-employees-today-and-4-million-agents-tomorrow-nvidia-ceo-jensen-huang-believes"
-    },
-    {
-     "titolo": "Apple and Taiwan Semiconductor Manufacturing Just Announced a Cutting-Edge Chip. 1 Stock Offers Far Greater Upside.",
-     "riassunto": "Key PointsTaiwan Semiconductor expects strong growth for the rest of 2026 and 2027.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T13:44:00Z",
-     "url": "https://www.nasdaq.com/articles/apple-and-taiwan-semiconductor-manufacturing-just-announced-cutting-edge-chip-1-stock"
     }
    ],
    "ORCL": [
+    {
+     "titolo": "Oracle's Larry Ellison Cancels $7.5 Bln Stock Sale Plan",
+     "riassunto": "(RTTNews) - Oracle Corp. (ORCL) announced that Chairman and Chief Technology Officer Larry Ellison has cancelled his plan to sell up to 50 million shares of the company, valued at about $7.5 billion.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T03:50:00Z",
+     "url": "https://www.nasdaq.com/articles/oracles-larry-ellison-cancels-75-bln-stock-sale-plan"
+    },
+    {
+     "titolo": "Oracle's AI Chips Ran 97.9% Utilized Last Quarter. For Nvidia, That Is What a Shortage Looks Like.",
+     "riassunto": "Key PointsOracle delivered 850 megawatts of AI capacity, containing more than 300,000 GPUs, to customers in its fiscal first quarter alone.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T03:38:01Z",
+     "url": "https://www.nasdaq.com/articles/oracles-ai-chips-ran-979-utilized-last-quarter-nvidia-what-shortage-looks"
+    },
     {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
@@ -58197,20 +58233,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T21:12:02Z",
      "url": "https://www.nasdaq.com/articles/oracle-says-its-expiring-ai-contracts-are-renewing-20-higher"
-    },
-    {
-     "titolo": "Is ORCL a Buy Following 121% IaaS Growth in Q1 Earnings?",
-     "riassunto": "Oracle's cloud and AI momentum is accelerating, with surging IaaS revenues, strong visibility and improving profitability supporting ORCL's growth.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T19:00:00Z",
-     "url": "https://www.nasdaq.com/articles/orcl-buy-following-121-iaas-growth-q1-earnings"
-    },
-    {
-     "titolo": "Oracle’s AI Spending Is Still Huge, But the Payoff Is Starting to Show in Earnings",
-     "riassunto": "Oracle&rsquo;s (NASDAQ: ORCL) stock price is on track for a substantial recovery and a sustained, prolonged upswing as the monetization of its AI ambition begins.\nHighlights from the Q1 fiscal year 2027 (FY2027) release reveal the impacts of spending, capital raises, and dilution, ove",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T15:30:00Z",
-     "url": "https://www.nasdaq.com/articles/oracles-ai-spending-still-huge-payoff-starting-show-earnings"
     }
    ],
    "PLTR": [
@@ -58369,7 +58391,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-13T04:03:47Z"
+  "letto_il": "2026-09-13T08:04:00Z"
  },
  "predictions": [
   {
@@ -58383,11 +58405,6 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
-   "question": "Fed rate hike in 2026?",
-   "yes": 86,
-   "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
-  },
-  {
    "question": "Fed Rate Hike by October 2026 Meeting?",
    "yes": 82,
    "link": "https://polymarket.com/event/fed-rate-hike-by-october-2026-meeting"
@@ -58399,8 +58416,13 @@
   },
   {
    "question": "Will the price of Bitcoin be above $78,000 on September 13?",
-   "yes": 6,
+   "yes": 4,
    "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-13-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $74,000 on September 13?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-74k-on-september-13-2026"
   }
  ],
  "options": {
@@ -65720,7 +65742,7 @@
      ],
      "call_wall": 200.0,
      "put_wall": 80.0,
-     "opt_volume": 213221
+     "opt_volume": 213220
     },
     {
      "date": "2026-09-25",
@@ -67616,7 +67638,7 @@
      ],
      "call_wall": 1100.0,
      "put_wall": 500.0,
-     "opt_volume": 143471
+     "opt_volume": 143782
     }
    ]
   },
@@ -75112,7 +75134,7 @@
      ],
      "call_wall": 610.0,
      "put_wall": 250.0,
-     "opt_volume": 13687
+     "opt_volume": 13691
     },
     {
      "date": "2026-09-25",
@@ -78703,7 +78725,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 33,
-    "risk_sentiment": 44,
+    "risk_sentiment": 43,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
@@ -78833,7 +78855,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 13 ore"
+    "note": "18 voci, la piu' recente di 17 ore"
    },
    {
     "key": "sec_calendario",
@@ -78885,6 +78907,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-13T04:03:47Z"
+  "generated_at": "2026-09-13T08:04:01Z"
  }
 }
