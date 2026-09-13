@@ -1,4 +1,4 @@
-⟦ BUILD v450 · generato 13/09/2026 17:34 ⟧
+⟦ BUILD v450 · generato 13/09/2026 17:49 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 13/09/2026, 17:34:14 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 13:34, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,09% · Fut S&P +0,75% · BTC -0,04% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 13/09/2026, 17:49:44 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 13:49, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,76% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,09% · Fut S&P +0,75% · BTC +0,01% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19.7h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 13/09/2026, 17:34:14, prossimo run 13/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-11 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 13/09/2026, 17:49:44, prossimo run 13/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-11 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-11) · Curva 10A-3M (2026-09-11) · Treasury USA 30A (2026-09-10) · Tasso reale 10A (TIPS) (2026-09-10) · Inflazione attesa 10A (breakeven) (2026-09-11) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -158,8 +158,8 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
 - Will there be no change in Fed interest rates after the September 2026 meeting?: 22% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the September 2026 meeting?: 78% [Δ7g —]
-- Will Ethereum reach $3,200 in September?: 7% [Δ7g —]
-- Fed rate hike in 2026?: 88% [Δ7g —]
+- Will Ethereum reach $3,200 in September?: 6% [Δ7g —]
+- Fed rate hike in 2026?: 86% [Δ7g —]
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -222,7 +222,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (71,2% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 2h fa] Prediction: 2 AI Semiconductor Stocks That Will Join Micron and Broadcom in the $1 Trillion Club by 2028
+  [AMD] · [Nasdaq, 3h fa] Prediction: 2 AI Semiconductor Stocks That Will Join Micron and Broadcom in the $1 Trillion Club by 2028
       Key PointsThis chipmaker's new rack-scale system could help it gain share in data center real estate over the next few years.
   [AMD] · [Nasdaq, 3h fa] Predicting Intel's Value by 2030 Could Make It Worth a Look Right Now
       Key PointsHealthy server CPU demand and tight supply will be a tailwind for Intel.
@@ -230,9 +230,9 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsNvidia is expanding its growth opportunities by investing in other AI companies and by launching more powerful products.
   [CRWV] · [Nasdaq, 42h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) is up +0.89%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.81%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.95%.  E-mini S&P futures (ESU26 ) are up +0.82%, and September E-mini Nasdaq futures (NQU26 )...
-  [MRVL] · [Nasdaq, 2h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [MRVL] · [Nasdaq, 0h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...
-  [MRVL] · [Nasdaq, 7h fa] Wall Street Analyst Sees Between 19% to 37% Upside in These 5 AI Chip Stocks
+  [MRVL] · [Nasdaq, 8h fa] Wall Street Analyst Sees Between 19% to 37% Upside in These 5 AI Chip Stocks
       Key PointsNvidia and Broadcom are both poised to see strong revenue growth driven by insatiable demand for AI compute power.
   [MU] · [Nasdaq, 1h fa] Will Micron Technology Stock Soar to $1,500 After Sept. 30?
       Key PointsMicron Technology is one of the world's top suppliers of high-bandwidth memory (HBM) for data centers.
@@ -242,7 +242,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...
   [NVDA] · [Nasdaq, 5h fa] Is It Too Late to Buy Nvidia Stock?
       Key PointsNvidia's revenue rose 106% year over year to $96.2 billion in the fiscal second quarter, its fourth quarter in a row of accelerating growth.
-  [ORCL] · [Nasdaq, 2h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
+  [ORCL] · [Nasdaq, 0h fa] Stocks Shake Off CPI Report and Rally on Lower Oil Prices
       The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...
   [ORCL] · [Nasdaq, 14h fa] Oracle's Larry Ellison Cancels $7.5 Bln Stock Sale Plan
       (RTTNews) - Oracle Corp. (ORCL) announced that Chairman and Chief Technology Officer Larry Ellison has cancelled his plan to sell up to 50 million shares of the company, valued at about $7.5 billion.
