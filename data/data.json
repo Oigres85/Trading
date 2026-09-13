@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-13T13:33:58Z",
+ "updated_at": "2026-09-13T15:02:50Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -4600,7 +4600,7 @@
      218.29
     ],
     "y1": [
-     177.4,
+     177.39,
      176.25,
      177.76,
      187.17,
@@ -17946,16 +17946,16 @@
    "rating": {
     "key": "buy",
     "n": 14,
-    "target": 247.14,
-    "upside_pct": 30.0
+    "target": 248.43,
+    "upside_pct": 30.7
    },
    "analisti": {
-    "eps_ora": 34.0794,
+    "eps_ora": 33.8776,
     "eps_90g_fa": null,
     "eps_7g_fa": 34.0794,
     "revisione_90g_pct": null,
-    "revisione_7g_pct": 0.0,
-    "su_30g": 1,
+    "revisione_7g_pct": -0.59,
+    "su_30g": 2,
     "giu_30g": 0,
     "eps_min": 23.081,
     "eps_max": 44.898,
@@ -17999,7 +17999,7 @@
     "debt_to_equity": 72.077,
     "dividend_yield": null,
     "price_to_book": null,
-    "target_mean": 247.1429,
+    "target_mean": 248.4286,
     "fcf": null,
     "gross_margin": 0.7627,
     "enterprise_value": null,
@@ -21786,28 +21786,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 76602.88,
+   "price": 77135.11,
    "price_asof": "2026-09-13",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.86,
+   "change_pct": -0.18,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -39.3,
-   "sma200_dist_pct": 9.2,
-   "sma50_dist_pct": 7.7,
+   "ath_dist_pct": -38.9,
+   "sma200_dist_pct": 10.0,
+   "sma50_dist_pct": 8.4,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -39.3,
+   "w52_dist_pct": -38.9,
    "day_high": 77308.94,
    "day_low": 76503.83,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 52.4,
-   "volume": 13070976000,
+   "rsi": 54.5,
+   "volume": 13395584000,
    "vol_ratio": 0.4,
    "atr_14": 2062.39,
-   "atr_pct": 2.69,
+   "atr_pct": 2.67,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21816,7 +21816,7 @@
      76568.12,
      77173.8,
      77270.47,
-     76602.88
+     77135.11
     ],
     "m6": [
      81728.3,
@@ -21944,7 +21944,7 @@
      76568.12,
      77173.8,
      77270.47,
-     76602.88
+     77135.11
     ],
     "all": [
      386.94,
@@ -22091,7 +22091,7 @@
      58558.86,
      62813.75,
      78548.63,
-     76602.88
+     77135.11
     ],
     "m1": [
      77755.27,
@@ -22115,7 +22115,7 @@
      76568.12,
      77173.8,
      77270.47,
-     76602.88
+     77135.11
     ],
     "m3": [
      64127.14,
@@ -22183,7 +22183,7 @@
      76568.12,
      77173.8,
      77270.47,
-     76602.88
+     77135.11
     ],
     "y1": [
      115950.51,
@@ -22259,7 +22259,7 @@
      78245.81,
      81271.74,
      78438.58,
-     76602.88
+     77135.11
     ],
     "d1": [
      77272.99,
@@ -22343,22 +22343,31 @@
      76671.42,
      76736.61,
      76631.48,
-     76602.88
+     76639.99,
+     76738.75,
+     76838.11,
+     76831.71,
+     76978.82,
+     77047.22,
+     77074.25,
+     77150.48,
+     77176.26,
+     77135.11
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 65,
+   "health": 67,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.87,
-   "sortino_1y": -1.17,
-   "sharpe_6m": -0.56,
-   "sortino_6m": -0.82,
+   "sharpe_1y": -0.86,
+   "sortino_1y": -1.15,
+   "sharpe_6m": -0.51,
+   "sortino_6m": -0.75,
    "prepost": null,
-   "prezzo_limite_aggiustato": 76602.88,
-   "risk_reward": "1:1.4",
+   "prezzo_limite_aggiustato": 77135.11,
+   "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22370,22 +22379,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -2.12
+     "change_pct": -1.44
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": -1.48
+     "change_pct": -0.8
     },
     "m3": {
      "support": 61769.0,
      "resistance": 82262.21,
-     "change_pct": 19.45
+     "change_pct": 20.28
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -18.41
+     "change_pct": -17.84
     }
    },
    "financials": [],
@@ -22403,7 +22412,7 @@
      "hi": 76526.71
     },
     "liq_above": 79463.71,
-    "liq_below": 76248.3,
+    "liq_below": 76909.35,
     "order_block": {
      "dir": "rialzista",
      "lo": 77300.48,
@@ -22412,74 +22421,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 76602.88,
+     "prezzo": 77135.11,
      "medie": {
       "sma10": {
-       "liv": 78327.51,
-       "dist_pct": -2.2
+       "liv": 78380.73,
+       "dist_pct": -1.59
       },
       "ema10": {
-       "liv": 77715.22,
-       "dist_pct": -1.43
+       "liv": 77811.99,
+       "dist_pct": -0.87
       },
       "sma20": {
-       "liv": 78469.66,
-       "dist_pct": -2.38
+       "liv": 78496.27,
+       "dist_pct": -1.73
       },
       "ema20": {
-       "liv": 76986.02,
-       "dist_pct": -0.5
+       "liv": 77036.71,
+       "dist_pct": 0.13
       },
       "sma30": {
-       "liv": 75962.01,
-       "dist_pct": 0.84
+       "liv": 75979.76,
+       "dist_pct": 1.52
       },
       "ema30": {
-       "liv": 75552.96,
-       "dist_pct": 1.39
+       "liv": 75587.29,
+       "dist_pct": 2.05
       },
       "sma50": {
-       "liv": 71154.77,
-       "dist_pct": 7.66
+       "liv": 71165.41,
+       "dist_pct": 8.39
       },
       "ema50": {
-       "liv": 73166.03,
-       "dist_pct": 4.7
+       "liv": 73186.9,
+       "dist_pct": 5.39
       },
       "sma100": {
-       "liv": 67164.86,
-       "dist_pct": 14.05
+       "liv": 67170.18,
+       "dist_pct": 14.84
       },
       "ema100": {
-       "liv": 71034.13,
-       "dist_pct": 7.84
+       "liv": 71044.67,
+       "dist_pct": 8.57
       },
       "sma200": {
-       "liv": 70134.35,
-       "dist_pct": 9.22
+       "liv": 70137.01,
+       "dist_pct": 9.98
       },
       "ema200": {
-       "liv": 73260.68,
-       "dist_pct": 4.56
+       "liv": 73265.98,
+       "dist_pct": 5.28
       }
      },
-     "medie_battute": 8,
+     "medie_battute": 9,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 52.4,
+      "rsi14": 54.5,
       "macd": {
-       "linea": 1571.59,
-       "segnale": 2370.48,
-       "istogramma": -798.89
+       "linea": 1614.05,
+       "segnale": 2378.97,
+       "istogramma": -764.92
       },
-      "stoch_k": 7.2,
-      "stoch_d": 14.0,
-      "williams_r": -92.8,
-      "cci20": -25.2,
+      "stoch_k": 15.9,
+      "stoch_d": 16.9,
+      "williams_r": -84.1,
+      "cci20": -22.8,
       "adx14": 43.4,
       "di_su": 28.5,
       "di_giu": 15.4,
-      "momentum10": -4668.86
+      "momentum10": -4136.63
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22972,19 +22981,19 @@
       "o": 77270.22,
       "h": 77308.94,
       "l": 76503.83,
-      "c": 76602.88
+      "c": 77135.11
      }
     ],
     "performance": {
-     "s1": -2.34,
-     "m1": -0.62,
-     "m3": 21.22,
-     "m6": -6.74,
-     "a1": -16.2,
-     "ytd": -13.67,
-     "a3": 184.05,
-     "a5": 74.93,
-     "a10": 12463.31
+     "s1": -1.66,
+     "m1": 0.07,
+     "m3": 22.06,
+     "m6": -6.09,
+     "a1": -15.62,
+     "ytd": -13.07,
+     "a3": 186.03,
+     "a5": 76.14,
+     "a10": 12550.6
     },
     "stagionalita": [
      {
@@ -23061,8 +23070,8 @@
      },
      {
       "mese": 9,
-      "media": -1.88,
-      "mediana": -2.78,
+      "media": -1.82,
+      "mediana": -2.44,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23097,9 +23106,9 @@
      }
     ]
    },
-   "rs_1m": -0.3,
+   "rs_1m": 0.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -0.2,
+   "rs_ndx_1m": 0.5,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -36260,9 +36269,9 @@
      "m6": 29.33,
      "ytd": 36.25,
      "a1": 56.34,
-     "a3": 417.5,
+     "a3": 417.49,
      "a5": 319.23,
-     "a10": 1681.43
+     "a10": 1681.44
     },
     "stagionalita": [
      {
@@ -47368,13 +47377,6 @@
      "url": "https://www.bloomberg.com/news/articles/2026-09-13/after-oil-surge-and-war-emerging-markets-unfazed-by-fed-risk"
     },
     {
-     "titolo": "Energy Driven Inflation Complicates Fed Rate Call",
-     "riassunto": "PNC Chief Investment Officer Amanda Agati is on Bloomberg This Weekend and says the Fed faces a difficult decision as energy-driven inflation pushes markets toward expectations for higher rates, warning that further tightening could risk a policy error. Agati also tells hosts David Gura and Christina Ruffini investors ",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-12T15:11:38Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-09-12/energy-driven-inflation-complicates-fed-rate-call-video"
-    },
-    {
      "titolo": "Inflation is outpacing wage growth again, squeezing Americans’ paychecks",
      "riassunto": "In August, consumer prices rose 3.4% over the past year while wages increased just 3.1%.",
      "fonte": "CNBC Economia",
@@ -47485,6 +47487,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-04T18:27:39Z",
      "url": "https://www.cnbc.com/2026/09/04/jobs-report-women-payrolls.html"
+    },
+    {
+     "titolo": "U.S. payrolls rose 162,000 in August, much more than expected; unemployment rate at 4.1%",
+     "riassunto": "Nonfarm payrolls were expected to increase by 53,000 in August while the unemployment rate held at 4.1%, according to the Dow Jones consensus.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-04T17:16:37Z",
+     "url": "https://www.cnbc.com/2026/09/04/jobs-report-august-2026.html"
     }
    ],
    "fonti": [
@@ -52377,7 +52386,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 42
+     "score": 48
     },
     {
      "label": "Treasury 10A",
@@ -57451,11 +57460,25 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Google Bought YouTube for $1.65 Billion in 2006. The Streaming Platform Is Now the Main Driver of a Roughly $93 Billion Business at Alphabet.",
+      "riassunto": "Key PointsNot only has YouTube's reach and revenue grown exponentially since Google bought it, but it has also become a leader in the entire content industry.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T13:40:00Z",
+      "url": "https://www.nasdaq.com/articles/google-bought-youtube-165-billion-2006-streaming-platform-now-main-driver-roughly-93"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
       "quando": "2026-09-13T13:17:53Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+     },
+     {
+      "titolo": "Sundar Pichai Says Alphabet's Cloud Backlog Hit $514 Billion After 82% Revenue Growth Last Quarter. Is Google Cloud Becoming a Bigger Growth Driver Than Search?",
+      "riassunto": "Key PointsCloud looks positioned to eventually become Alphabet's biggest long-term growth engine, but Search remains the main driver for now.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T12:23:00Z",
+      "url": "https://www.nasdaq.com/articles/sundar-pichai-says-alphabets-cloud-backlog-hit-514-billion-after-82-revenue-growth-last"
      },
      {
       "titolo": "Can Alphabet Overtake Nvidia in 2027?",
@@ -57477,20 +57500,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T22:35:01Z",
       "url": "https://www.nasdaq.com/articles/not-nvidia-not-micron-dirt-cheap-magnificent-seven-stock-could-be-biggest-winner-trillion"
-     },
-     {
-      "titolo": "Google's Historic 396 MW Clean Energy Deal Just Changed the Game for 1 AI Power Play",
-      "riassunto": "Key PointsGoogle entered into a 396 MW power purchase agreement with Fervo Energy for geothermal energy.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T19:05:00Z",
-      "url": "https://www.nasdaq.com/articles/googles-historic-396-mw-clean-energy-deal-just-changed-game-1-ai-power-play"
-     },
-     {
-      "titolo": "The $760 Billion AI Risk That Nobody Is Talking About. But Should.",
-      "riassunto": "Key PointsThe AI boom is real.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T11:23:00Z",
-      "url": "https://www.nasdaq.com/articles/760-billion-ai-risk-nobody-talking-about-should"
      }
     ],
     "MRVL": [
@@ -57583,6 +57592,13 @@
     ],
     "MU": [
      {
+      "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Soar After Sept. 30 (Hint: It's Not Micron)",
+      "riassunto": "Key PointsWhile memory stocks continue to run hot, expectations are high heading into Micron's earnings report.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T12:55:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-soar-after-sept-30-hint-its-not"
+     },
+     {
       "titolo": "Broadcom vs. Micron Technology: Which Technology Stock Is a Better Buy in 2026?",
       "riassunto": "Key PointsBroadcom is a networking and infrastructure software giant with strong ties to enterprise and artificial intelligence data centers.",
       "fonte": "Nasdaq",
@@ -57616,13 +57632,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-11T18:08:00Z",
       "url": "https://www.nasdaq.com/articles/are-value-etfs-new-ai-trade"
-     },
-     {
-      "titolo": "Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-11T17:46:30Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
      }
     ],
     "NVDA": [
@@ -57632,6 +57641,20 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-13T13:17:53Z",
       "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+     },
+     {
+      "titolo": "Is It Too Late to Buy Nvidia Stock?",
+      "riassunto": "Key PointsNvidia's revenue rose 106% year over year to $96.2 billion in the fiscal second quarter, its fourth quarter in a row of accelerating growth.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T13:01:01Z",
+      "url": "https://www.nasdaq.com/articles/it-too-late-buy-nvidia-stock"
+     },
+     {
+      "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Soar After Sept. 30 (Hint: It's Not Micron)",
+      "riassunto": "Key PointsWhile memory stocks continue to run hot, expectations are high heading into Micron's earnings report.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T12:55:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-soar-after-sept-30-hint-its-not"
      },
      {
       "titolo": "Shiba Inu vs. Nvidia: Which Is More Likely to Win Over the Next 5 Years?",
@@ -57653,20 +57676,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-13T10:05:00Z",
       "url": "https://www.nasdaq.com/articles/wall-street-analyst-sees-between-19-37-upside-these-5-ai-chip-stocks"
-     },
-     {
-      "titolo": "Can Alphabet Overtake Nvidia in 2027?",
-      "riassunto": "Key PointsNvidia's expected 70% growth rate keeps Alphabet far away from its title as the world's largest company.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-13T08:45:00Z",
-      "url": "https://www.nasdaq.com/articles/can-alphabet-overtake-nvidia-2027"
-     },
-     {
-      "titolo": "3 Unstoppable Dow Stocks Worth Buying Right Now",
-      "riassunto": "Key PointsNvidia expects revenue to increased 70% next year, on top of higher growth this year,",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-13T08:22:00Z",
-      "url": "https://www.nasdaq.com/articles/3-unstoppable-dow-stocks-worth-buying-right-now"
      }
     ],
     "ORCL": [
@@ -57803,6 +57812,13 @@
     ],
     "WDC": [
      {
+      "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Soar After Sept. 30 (Hint: It's Not Micron)",
+      "riassunto": "Key PointsWhile memory stocks continue to run hot, expectations are high heading into Micron's earnings report.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T12:55:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-soar-after-sept-30-hint-its-not"
+     },
+     {
       "titolo": "Western Digital Sees AI-Driven HDD Demand Outpacing Supply Through 2027",
       "riassunto": "Why China&rsquo;s Memory Chip Breakthrough Won't Crash the MarketWestern Digital (NASDAQ:WDC) CFO Kris Sennesael said the hard-disk-drive market has become more structurally tied to cloud and artificial-intelligence infrastructure spending, arguing that the company has greater demand v",
       "fonte": "Nasdaq",
@@ -57836,13 +57852,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-10T18:46:33Z",
       "url": "https://www.nasdaq.com/articles/stocks-fall-crude-prices-soar-and-bond-yields-climb"
-     },
-     {
-      "titolo": "Can Seagate Sustain Its Strong Revenue Growth in Fiscal 2027?",
-      "riassunto": "STX expects fiscal 2027 revenue growth to exceed fiscal 2026 as cloud demand, AI adoption and HAMR expansion support mass-capacity storage.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-10T15:07:00Z",
-      "url": "https://www.nasdaq.com/articles/can-seagate-sustain-its-strong-revenue-growth-fiscal-2027"
      }
     ]
    },
@@ -57869,7 +57878,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-13T13:33:58Z"
+   "letto_il": "2026-09-13T15:02:50Z"
   }
  },
  "broker": null,
@@ -58009,11 +58018,25 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Google Bought YouTube for $1.65 Billion in 2006. The Streaming Platform Is Now the Main Driver of a Roughly $93 Billion Business at Alphabet.",
+     "riassunto": "Key PointsNot only has YouTube's reach and revenue grown exponentially since Google bought it, but it has also become a leader in the entire content industry.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T13:40:00Z",
+     "url": "https://www.nasdaq.com/articles/google-bought-youtube-165-billion-2006-streaming-platform-now-main-driver-roughly-93"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
      "quando": "2026-09-13T13:17:53Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+    },
+    {
+     "titolo": "Sundar Pichai Says Alphabet's Cloud Backlog Hit $514 Billion After 82% Revenue Growth Last Quarter. Is Google Cloud Becoming a Bigger Growth Driver Than Search?",
+     "riassunto": "Key PointsCloud looks positioned to eventually become Alphabet's biggest long-term growth engine, but Search remains the main driver for now.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T12:23:00Z",
+     "url": "https://www.nasdaq.com/articles/sundar-pichai-says-alphabets-cloud-backlog-hit-514-billion-after-82-revenue-growth-last"
     },
     {
      "titolo": "Can Alphabet Overtake Nvidia in 2027?",
@@ -58035,20 +58058,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T22:35:01Z",
      "url": "https://www.nasdaq.com/articles/not-nvidia-not-micron-dirt-cheap-magnificent-seven-stock-could-be-biggest-winner-trillion"
-    },
-    {
-     "titolo": "Google's Historic 396 MW Clean Energy Deal Just Changed the Game for 1 AI Power Play",
-     "riassunto": "Key PointsGoogle entered into a 396 MW power purchase agreement with Fervo Energy for geothermal energy.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T19:05:00Z",
-     "url": "https://www.nasdaq.com/articles/googles-historic-396-mw-clean-energy-deal-just-changed-game-1-ai-power-play"
-    },
-    {
-     "titolo": "The $760 Billion AI Risk That Nobody Is Talking About. But Should.",
-     "riassunto": "Key PointsThe AI boom is real.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T11:23:00Z",
-     "url": "https://www.nasdaq.com/articles/760-billion-ai-risk-nobody-talking-about-should"
     }
    ],
    "MRVL": [
@@ -58141,6 +58150,13 @@
    ],
    "MU": [
     {
+     "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Soar After Sept. 30 (Hint: It's Not Micron)",
+     "riassunto": "Key PointsWhile memory stocks continue to run hot, expectations are high heading into Micron's earnings report.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T12:55:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-soar-after-sept-30-hint-its-not"
+    },
+    {
      "titolo": "Broadcom vs. Micron Technology: Which Technology Stock Is a Better Buy in 2026?",
      "riassunto": "Key PointsBroadcom is a networking and infrastructure software giant with strong ties to enterprise and artificial intelligence data centers.",
      "fonte": "Nasdaq",
@@ -58174,13 +58190,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-11T18:08:00Z",
      "url": "https://www.nasdaq.com/articles/are-value-etfs-new-ai-trade"
-    },
-    {
-     "titolo": "Stocks Settle Lower as Surging Crude Prices Boost Fed Rate Hike Chances",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.58% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.60%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.08%.  E-mini S&P futures (ESU26 ) fell -0.61%, and September E-mini Nasdaq futures (NQU26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-11T17:46:30Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-lower-surging-crude-prices-boost-fed-rate-hike-chances"
     }
    ],
    "NVDA": [
@@ -58190,6 +58199,20 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-13T13:17:53Z",
      "url": "https://www.nasdaq.com/articles/stocks-shake-cpi-report-and-rally-lower-oil-prices-1"
+    },
+    {
+     "titolo": "Is It Too Late to Buy Nvidia Stock?",
+     "riassunto": "Key PointsNvidia's revenue rose 106% year over year to $96.2 billion in the fiscal second quarter, its fourth quarter in a row of accelerating growth.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T13:01:01Z",
+     "url": "https://www.nasdaq.com/articles/it-too-late-buy-nvidia-stock"
+    },
+    {
+     "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Soar After Sept. 30 (Hint: It's Not Micron)",
+     "riassunto": "Key PointsWhile memory stocks continue to run hot, expectations are high heading into Micron's earnings report.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T12:55:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-soar-after-sept-30-hint-its-not"
     },
     {
      "titolo": "Shiba Inu vs. Nvidia: Which Is More Likely to Win Over the Next 5 Years?",
@@ -58211,20 +58234,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-13T10:05:00Z",
      "url": "https://www.nasdaq.com/articles/wall-street-analyst-sees-between-19-37-upside-these-5-ai-chip-stocks"
-    },
-    {
-     "titolo": "Can Alphabet Overtake Nvidia in 2027?",
-     "riassunto": "Key PointsNvidia's expected 70% growth rate keeps Alphabet far away from its title as the world's largest company.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-13T08:45:00Z",
-     "url": "https://www.nasdaq.com/articles/can-alphabet-overtake-nvidia-2027"
-    },
-    {
-     "titolo": "3 Unstoppable Dow Stocks Worth Buying Right Now",
-     "riassunto": "Key PointsNvidia expects revenue to increased 70% next year, on top of higher growth this year,",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-13T08:22:00Z",
-     "url": "https://www.nasdaq.com/articles/3-unstoppable-dow-stocks-worth-buying-right-now"
     }
    ],
    "ORCL": [
@@ -58361,6 +58370,13 @@
    ],
    "WDC": [
     {
+     "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Soar After Sept. 30 (Hint: It's Not Micron)",
+     "riassunto": "Key PointsWhile memory stocks continue to run hot, expectations are high heading into Micron's earnings report.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T12:55:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-soar-after-sept-30-hint-its-not"
+    },
+    {
      "titolo": "Western Digital Sees AI-Driven HDD Demand Outpacing Supply Through 2027",
      "riassunto": "Why China&rsquo;s Memory Chip Breakthrough Won't Crash the MarketWestern Digital (NASDAQ:WDC) CFO Kris Sennesael said the hard-disk-drive market has become more structurally tied to cloud and artificial-intelligence infrastructure spending, arguing that the company has greater demand v",
      "fonte": "Nasdaq",
@@ -58394,13 +58410,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-10T18:46:33Z",
      "url": "https://www.nasdaq.com/articles/stocks-fall-crude-prices-soar-and-bond-yields-climb"
-    },
-    {
-     "titolo": "Can Seagate Sustain Its Strong Revenue Growth in Fiscal 2027?",
-     "riassunto": "STX expects fiscal 2027 revenue growth to exceed fiscal 2026 as cloud demand, AI adoption and HAMR expansion support mass-capacity storage.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-10T15:07:00Z",
-     "url": "https://www.nasdaq.com/articles/can-seagate-sustain-its-strong-revenue-growth-fiscal-2027"
     }
    ]
   },
@@ -58427,12 +58436,12 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-13T13:33:58Z"
+  "letto_il": "2026-09-13T15:02:50Z"
  },
  "predictions": [
   {
    "question": "Will there be no change in Fed interest rates after the September 2026 meeting?",
-   "yes": 22,
+   "yes": 20,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615"
   },
   {
@@ -58442,23 +58451,23 @@
   },
   {
    "question": "Will the price of Bitcoin be above $76,000 on September 13?",
-   "yes": 95,
+   "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-13-2026"
   },
   {
+   "question": "Will Ethereum reach $3,200 in September?",
+   "yes": 6,
+   "link": "https://polymarket.com/event/will-ethereum-reach-3200-in-september-2026"
+  },
+  {
    "question": "Will the price of Bitcoin be above $74,000 on September 13?",
-   "yes": 99,
+   "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-74k-on-september-13-2026"
   },
   {
    "question": "Fed rate hike in 2026?",
    "yes": 88,
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
-  },
-  {
-   "question": "Fed Rate Hike by October 2026 Meeting?",
-   "yes": 84,
-   "link": "https://polymarket.com/event/fed-rate-hike-by-october-2026-meeting"
   }
  ],
  "options": {
@@ -78891,7 +78900,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -78943,6 +78952,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-13T13:33:58Z"
+  "generated_at": "2026-09-13T15:02:51Z"
  }
 }
