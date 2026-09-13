@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-13T08:04:00Z",
+ "updated_at": "2026-09-13T09:07:40Z",
  "eurusd": 1.1601,
  "totals": {
   "usd_value": 0,
@@ -1738,7 +1738,7 @@
      "a1": 483.81,
      "a3": 1349.59,
      "a5": 1307.06,
-     "a10": 5525.01
+     "a10": 5525.0
     },
     "stagionalita": [
      {
@@ -1766,7 +1766,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -5503,7 +5503,7 @@
      "a1": 17.28,
      "a3": 403.33,
      "a5": 958.37,
-     "a10": 12885.8
+     "a10": 12885.79
     },
     "stagionalita": [
      {
@@ -6488,7 +6488,7 @@
     "gross_margin": 0.609,
     "enterprise_value": 4036194992128.0,
     "ev_ebitda": 23.309,
-    "peg": 1.22,
+    "peg": 1.21,
     "roa": 0.1296,
     "short_float": 0.0132,
     "buyback_yield": 0.011,
@@ -8026,7 +8026,7 @@
     "gross_margin": 0.848,
     "enterprise_value": 392776450048.0,
     "ev_ebitda": 147.514,
-    "peg": 1.63,
+    "peg": 1.61,
     "roa": 0.1729,
     "short_float": 0.0303,
     "buyback_yield": 0.0002,
@@ -13631,16 +13631,16 @@
    "rating": {
     "key": "strong_buy",
     "n": 42,
-    "target": 284.64,
-    "upside_pct": 20.6
+    "target": 285.3,
+    "upside_pct": 20.8
    },
    "analisti": {
-    "eps_ora": 6.7199,
+    "eps_ora": 6.7328,
     "eps_90g_fa": 6.1726,
-    "eps_7g_fa": 6.7158,
-    "revisione_90g_pct": 8.87,
-    "revisione_7g_pct": 0.06,
-    "su_30g": 28,
+    "eps_7g_fa": 6.7209,
+    "revisione_90g_pct": 9.07,
+    "revisione_7g_pct": 0.18,
+    "su_30g": 33,
     "giu_30g": 1,
     "eps_min": 5.65,
     "eps_max": 8.09,
@@ -13684,7 +13684,7 @@
     "debt_to_equity": 28.525,
     "dividend_yield": 0.001,
     "price_to_book": 11.3488,
-    "target_mean": 284.6409,
+    "target_mean": 285.3031,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
     "enterprise_value": 208389390336.0,
@@ -16673,7 +16673,7 @@
     "gross_margin": 0.3165,
     "enterprise_value": 81342750720.0,
     "ev_ebitda": 194.377,
-    "peg": 0.61,
+    "peg": 0.62,
     "roa": 0.056,
     "short_float": 0.0743,
     "buyback_yield": -0.0007,
@@ -21783,28 +21783,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77107.38,
+   "price": 76845.52,
    "price_asof": "2026-09-13",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.21,
+   "change_pct": -0.55,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.9,
-   "sma200_dist_pct": 9.9,
-   "sma50_dist_pct": 8.4,
+   "ath_dist_pct": -39.1,
+   "sma200_dist_pct": 9.6,
+   "sma50_dist_pct": 8.0,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.9,
+   "w52_dist_pct": -39.1,
    "day_high": 77308.94,
-   "day_low": 77090.64,
+   "day_low": 76761.87,
    "support": 76162.91,
    "resistance": 82262.21,
-   "rsi": 54.4,
-   "volume": 12269087744,
+   "rsi": 53.4,
+   "volume": 12507840512,
    "vol_ratio": 0.4,
-   "atr_14": 2020.47,
-   "atr_pct": 2.62,
+   "atr_14": 2043.96,
+   "atr_pct": 2.66,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21813,7 +21813,7 @@
      76568.12,
      77173.8,
      77270.47,
-     77107.38
+     76845.52
     ],
     "m6": [
      81728.3,
@@ -21941,7 +21941,7 @@
      76568.12,
      77173.8,
      77270.47,
-     77107.38
+     76845.52
     ],
     "all": [
      386.94,
@@ -22088,7 +22088,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77107.38
+     76845.52
     ],
     "m1": [
      77755.27,
@@ -22112,7 +22112,7 @@
      76568.12,
      77173.8,
      77270.47,
-     77107.38
+     76845.52
     ],
     "m3": [
      64127.14,
@@ -22180,7 +22180,7 @@
      76568.12,
      77173.8,
      77270.47,
-     77107.38
+     76845.52
     ],
     "y1": [
      115950.51,
@@ -22256,7 +22256,7 @@
      78245.81,
      81271.74,
      78438.58,
-     77107.38
+     76845.52
     ],
     "d1": [
      77269.45,
@@ -22307,21 +22307,27 @@
      77113.48,
      77137.65,
      77096.0,
-     77107.38
+     77134.99,
+     77045.26,
+     77001.93,
+     76881.86,
+     76800.93,
+     76798.16,
+     76824.59
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 67,
+   "health": 66,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.86,
-   "sortino_1y": -1.15,
-   "sharpe_6m": -0.51,
-   "sortino_6m": -0.76,
+   "sortino_1y": -1.16,
+   "sharpe_6m": -0.54,
+   "sortino_6m": -0.79,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77107.38,
+   "prezzo_limite_aggiustato": 76845.52,
    "risk_reward": "1:1.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22334,22 +22340,22 @@
     "w1": {
      "support": 76162.91,
      "resistance": 79818.34,
-     "change_pct": -1.47
+     "change_pct": -1.81
     },
     "m1": {
      "support": 75624.95,
      "resistance": 82262.21,
-     "change_pct": -0.83
+     "change_pct": -1.17
     },
     "m3": {
      "support": 61769.0,
      "resistance": 82262.21,
-     "change_pct": 20.24
+     "change_pct": 19.83
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -17.87
+     "change_pct": -18.15
     }
    },
    "financials": [],
@@ -22367,7 +22373,7 @@
      "hi": 76526.71
     },
     "liq_above": 79463.71,
-    "liq_below": 76909.35,
+    "liq_below": 76248.3,
     "order_block": {
      "dir": "rialzista",
      "lo": 77300.48,
@@ -22376,74 +22382,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77107.38,
+     "prezzo": 76845.52,
      "medie": {
       "sma10": {
-       "liv": 78377.96,
-       "dist_pct": -1.62
+       "liv": 78351.77,
+       "dist_pct": -1.92
       },
       "ema10": {
-       "liv": 77806.95,
-       "dist_pct": -0.9
+       "liv": 77759.34,
+       "dist_pct": -1.18
       },
       "sma20": {
-       "liv": 78494.88,
-       "dist_pct": -1.77
+       "liv": 78481.79,
+       "dist_pct": -2.08
       },
       "ema20": {
-       "liv": 77034.07,
-       "dist_pct": 0.1
+       "liv": 77009.13,
+       "dist_pct": -0.21
       },
       "sma30": {
-       "liv": 75978.83,
-       "dist_pct": 1.49
+       "liv": 75970.1,
+       "dist_pct": 1.15
       },
       "ema30": {
-       "liv": 75585.5,
-       "dist_pct": 2.01
+       "liv": 75568.61,
+       "dist_pct": 1.69
       },
       "sma50": {
-       "liv": 71164.86,
-       "dist_pct": 8.35
+       "liv": 71159.62,
+       "dist_pct": 7.99
       },
       "ema50": {
-       "liv": 73185.81,
-       "dist_pct": 5.36
+       "liv": 73175.54,
+       "dist_pct": 5.02
       },
       "sma100": {
-       "liv": 67169.9,
-       "dist_pct": 14.79
+       "liv": 67167.29,
+       "dist_pct": 14.41
       },
       "ema100": {
-       "liv": 71044.12,
-       "dist_pct": 8.53
+       "liv": 71038.93,
+       "dist_pct": 8.17
       },
       "sma200": {
-       "liv": 70136.87,
-       "dist_pct": 9.94
+       "liv": 70135.56,
+       "dist_pct": 9.57
       },
       "ema200": {
-       "liv": 73265.7,
-       "dist_pct": 5.24
+       "liv": 73263.09,
+       "dist_pct": 4.89
       }
      },
-     "medie_battute": 9,
+     "medie_battute": 8,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 54.4,
+      "rsi14": 53.4,
       "macd": {
-       "linea": 1611.84,
-       "segnale": 2378.53,
-       "istogramma": -766.69
+       "linea": 1590.95,
+       "segnale": 2374.35,
+       "istogramma": -783.4
       },
-      "stoch_k": 15.5,
-      "stoch_d": 16.7,
-      "williams_r": -84.5,
-      "cci20": -20.3,
-      "adx14": 43.8,
-      "di_su": 29.1,
-      "di_giu": 13.8,
-      "momentum10": -4164.36
+      "stoch_k": 11.2,
+      "stoch_d": 15.3,
+      "williams_r": -88.8,
+      "cci20": -23.0,
+      "adx14": 43.6,
+      "di_su": 28.7,
+      "di_giu": 14.6,
+      "momentum10": -4426.22
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22935,20 +22941,20 @@
       "d": "2026-09-13",
       "o": 77270.22,
       "h": 77308.94,
-      "l": 77090.64,
-      "c": 77107.38
+      "l": 76761.87,
+      "c": 76845.52
      }
     ],
     "performance": {
-     "s1": -1.7,
-     "m1": 0.03,
-     "m3": 22.02,
-     "m6": -6.13,
-     "a1": -15.65,
-     "ytd": -13.1,
-     "a3": 185.92,
-     "a5": 76.08,
-     "a10": 12546.05
+     "s1": -2.03,
+     "m1": -0.31,
+     "m3": 21.6,
+     "m6": -6.44,
+     "a1": -15.94,
+     "ytd": -13.4,
+     "a3": 184.95,
+     "a5": 75.48,
+     "a10": 12503.1
     },
     "stagionalita": [
      {
@@ -23025,8 +23031,8 @@
      },
      {
       "mese": 9,
-      "media": -1.83,
-      "mediana": -2.46,
+      "media": -1.85,
+      "mediana": -2.63,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -23061,9 +23067,9 @@
      }
     ]
    },
-   "rs_1m": 0.3,
+   "rs_1m": 0.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 0.4,
+   "rs_ndx_1m": 0.1,
    "beta_ndx": 0.8,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -36224,7 +36230,7 @@
      "m6": 29.33,
      "ytd": 36.25,
      "a1": 56.34,
-     "a3": 417.5,
+     "a3": 417.49,
      "a5": 319.23,
      "a10": 1681.44
     },
@@ -52341,7 +52347,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 48
+     "score": 45
     },
     {
      "label": "Treasury 10A",
@@ -57415,6 +57421,20 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Can Alphabet Overtake Nvidia in 2027?",
+      "riassunto": "Key PointsNvidia's expected 70% growth rate keeps Alphabet far away from its title as the world's largest company.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T08:45:00Z",
+      "url": "https://www.nasdaq.com/articles/can-alphabet-overtake-nvidia-2027"
+     },
+     {
+      "titolo": "3 Unstoppable Dow Stocks Worth Buying Right Now",
+      "riassunto": "Key PointsNvidia expects revenue to increased 70% next year, on top of higher growth this year,",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T08:22:00Z",
+      "url": "https://www.nasdaq.com/articles/3-unstoppable-dow-stocks-worth-buying-right-now"
+     },
+     {
       "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
       "fonte": "Nasdaq",
@@ -57441,20 +57461,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T11:23:00Z",
       "url": "https://www.nasdaq.com/articles/760-billion-ai-risk-nobody-talking-about-should"
-     },
-     {
-      "titolo": "Should You Buy Alphabet Stock Right Now?",
-      "riassunto": "Key PointsAlphabet's second-quarter revenue rose 24% year over year, up from 14% growth in the year-ago quarter.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T09:43:01Z",
-      "url": "https://www.nasdaq.com/articles/should-you-buy-alphabet-stock-right-now"
-     },
-     {
-      "titolo": "Nike Is Being Deleted From the S&P 100. Is Its Seat in the Dow Jones Industrial Average in Jeopardy?",
-      "riassunto": "Key PointsNike's turnaround is progressing at a sluggish pace.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T09:35:00Z",
-      "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
      }
     ],
     "MRVL": [
@@ -57591,6 +57597,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "3 Unstoppable Dow Stocks Worth Buying Right Now",
+      "riassunto": "Key PointsNvidia expects revenue to increased 70% next year, on top of higher growth this year,",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-13T08:22:00Z",
+      "url": "https://www.nasdaq.com/articles/3-unstoppable-dow-stocks-worth-buying-right-now"
+     },
+     {
       "titolo": "Oracle's AI Chips Ran 97.9% Utilized Last Quarter. For Nvidia, That Is What a Shortage Looks Like.",
       "riassunto": "Key PointsOracle delivered 850 megawatts of AI capacity, containing more than 300,000 GPUs, to customers in its fiscal first quarter alone.",
       "fonte": "Nasdaq",
@@ -57624,13 +57637,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-12T17:17:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-nvidia-stock-could-be-worth-much-january-2028"
-     },
-     {
-      "titolo": "40,000 Employees Today and 4 Million Agents Tomorrow: Nvidia CEO Jensen Huang Believes Agentic AI Will Soon Become the Norm in the Workplace",
-      "riassunto": "Key PointsAgentic AI refers to automated systems powered by AI that largely act independently to carry out tasks.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-12T14:58:00Z",
-      "url": "https://www.nasdaq.com/articles/40000-employees-today-and-4-million-agents-tomorrow-nvidia-ceo-jensen-huang-believes"
      }
     ],
     "ORCL": [
@@ -57833,7 +57839,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-13T08:04:00Z"
+   "letto_il": "2026-09-13T09:07:40Z"
   }
  },
  "broker": null,
@@ -57973,6 +57979,20 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Can Alphabet Overtake Nvidia in 2027?",
+     "riassunto": "Key PointsNvidia's expected 70% growth rate keeps Alphabet far away from its title as the world's largest company.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T08:45:00Z",
+     "url": "https://www.nasdaq.com/articles/can-alphabet-overtake-nvidia-2027"
+    },
+    {
+     "titolo": "3 Unstoppable Dow Stocks Worth Buying Right Now",
+     "riassunto": "Key PointsNvidia expects revenue to increased 70% next year, on top of higher growth this year,",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T08:22:00Z",
+     "url": "https://www.nasdaq.com/articles/3-unstoppable-dow-stocks-worth-buying-right-now"
+    },
+    {
      "titolo": "Stocks Shake Off CPI Report and Rally on Lower Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) on Friday rose by +0.86%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose by +0.98%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) rose by +0.91%.  E-mini S&P futures (ESU26 ) rose +0.83%, and September E-mini Nasdaq futures (NQU26...",
      "fonte": "Nasdaq",
@@ -57999,20 +58019,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T11:23:00Z",
      "url": "https://www.nasdaq.com/articles/760-billion-ai-risk-nobody-talking-about-should"
-    },
-    {
-     "titolo": "Should You Buy Alphabet Stock Right Now?",
-     "riassunto": "Key PointsAlphabet's second-quarter revenue rose 24% year over year, up from 14% growth in the year-ago quarter.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T09:43:01Z",
-     "url": "https://www.nasdaq.com/articles/should-you-buy-alphabet-stock-right-now"
-    },
-    {
-     "titolo": "Nike Is Being Deleted From the S&P 100. Is Its Seat in the Dow Jones Industrial Average in Jeopardy?",
-     "riassunto": "Key PointsNike's turnaround is progressing at a sluggish pace.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T09:35:00Z",
-     "url": "https://www.nasdaq.com/articles/nike-being-deleted-sp-100-its-seat-dow-jones-industrial-average-jeopardy"
     }
    ],
    "MRVL": [
@@ -58149,6 +58155,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "3 Unstoppable Dow Stocks Worth Buying Right Now",
+     "riassunto": "Key PointsNvidia expects revenue to increased 70% next year, on top of higher growth this year,",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-13T08:22:00Z",
+     "url": "https://www.nasdaq.com/articles/3-unstoppable-dow-stocks-worth-buying-right-now"
+    },
+    {
      "titolo": "Oracle's AI Chips Ran 97.9% Utilized Last Quarter. For Nvidia, That Is What a Shortage Looks Like.",
      "riassunto": "Key PointsOracle delivered 850 megawatts of AI capacity, containing more than 300,000 GPUs, to customers in its fiscal first quarter alone.",
      "fonte": "Nasdaq",
@@ -58182,13 +58195,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-12T17:17:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-nvidia-stock-could-be-worth-much-january-2028"
-    },
-    {
-     "titolo": "40,000 Employees Today and 4 Million Agents Tomorrow: Nvidia CEO Jensen Huang Believes Agentic AI Will Soon Become the Norm in the Workplace",
-     "riassunto": "Key PointsAgentic AI refers to automated systems powered by AI that largely act independently to carry out tasks.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-12T14:58:00Z",
-     "url": "https://www.nasdaq.com/articles/40000-employees-today-and-4-million-agents-tomorrow-nvidia-ceo-jensen-huang-believes"
     }
    ],
    "ORCL": [
@@ -58391,7 +58397,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-13T08:04:00Z"
+  "letto_il": "2026-09-13T09:07:40Z"
  },
  "predictions": [
   {
@@ -58405,19 +58411,19 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
+   "question": "Fed rate hike in 2026?",
+   "yes": 89,
+   "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
+  },
+  {
    "question": "Fed Rate Hike by October 2026 Meeting?",
    "yes": 82,
    "link": "https://polymarket.com/event/fed-rate-hike-by-october-2026-meeting"
   },
   {
    "question": "Will the price of Bitcoin be above $76,000 on September 13?",
-   "yes": 98,
+   "yes": 95,
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-13-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $78,000 on September 13?",
-   "yes": 4,
-   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-13-2026"
   },
   {
    "question": "Will the price of Bitcoin be above $74,000 on September 13?",
@@ -78855,7 +78861,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 17 ore"
+    "note": "18 voci, la piu' recente di 18 ore"
    },
    {
     "key": "sec_calendario",
@@ -78907,6 +78913,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-13T08:04:01Z"
+  "generated_at": "2026-09-13T09:07:40Z"
  }
 }
