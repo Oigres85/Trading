@@ -5422,6 +5422,82 @@ verificato per hash da uno snapshot preso prima (v427, v430). Pavimento 148 → 
 ⚠ `?v=` e `BUILD_VERSION` **non** toccati: nessun file servito al browser (regola v440).
 
 
+## 🔌 v453 — LE DUE LETTURE NON HANNO MAI FUNZIONATO, E IL GUASTO ERA MUTO PER COSTRUZIONE
+
+Segnalazione del CEO, testuale: *"8.15 trascorse non è partito nulla"*. La Routine **era
+partita** — `fired_at 06:19:22Z`, stato `SUCCEEDED` — ed è questo che rendeva il guasto
+invisibile: uno scatto riuscito che non produce niente si legge come uno scatto che non è
+avvenuto.
+
+**Il numero che ha aperto la diagnosi è la DURATA, non l'esito**: 46 secondi, contro i 23 che il
+solo `brief.py` impiega. Un lavoro che non può stare nel tempo che ha impiegato non è stato
+fatto, qualunque cosa dica lo stato.
+
+| misura | scatto fallito | scatto riuscito |
+|---|---|---|
+| durata | **46 s** | 3 m 57 s |
+| token prodotti | **2.111** | 10.337 |
+| pagina pubblicata | no | sì, due volte |
+
+### La causa: il container delle sessioni automatiche NON ha la repo
+```
+ls: cannot access '/home/user/Trading': No such file or directory
+```
+`session_request.config.sources` è **vuoto**: la Routine crea una sessione nuova a ogni scatto e
+nessuno ci clona dentro il libro. Quindi `cd /home/user/Trading` falliva alla prima riga, e con
+lui tutto il resto.
+
+⚠⚠ **Non era mai funzionato, e non era un caso isolato**: entrambe le Routine sono nate sabato
+12/09 e lunedì 14 era il **primo giorno feriale**. Anche la sorveglianza dell'11/09 era durata
+68 secondi senza produrre nulla, e l'avevamo letta come *"silenzio, che è l'esito giusto"* —
+cioè la classe **v389** (il `try/except` per-fonte che spegne la funzionalità invece di
+proteggerla) applicata a una sessione intera: *un guasto che si presenta come il comportamento
+normale sopravvive finché qualcuno non misura il tempo.*
+
+**Correzione**: il repo è pubblico, quindi la sessione se lo clona da sé, senza credenziali —
+`git clone --depth 1 --branch main`, misurato **1 secondo e 6,7 MB**. Nessun segreto da
+custodire, e il `--branch main` chiude per costruzione il secondo difetto qui sotto.
+
+### 🕳️ Il secondo difetto: il falso «PIPELINE FERMA DA 39,4 ORE»
+Il brief lo dichiarava mentre la pipeline aveva girato **2,5 ore prima**. `data/data.json` lo
+scrive solo il CI **su `main`**: da un ramo di lavoro quel file è fermo al momento in cui il ramo
+è nato, e `git pull` nudo tira il ramo corrente.
+
+> **La riga che esiste per segnalare i guasti stava producendo il guasto che segnala.** È la
+> classe già pagata in v400, v412, v414, v415 e v421 — *il pacchetto fornisce da solo i falsi
+> positivi del proprio collaudo* — qui su una superficie nuova, e con l'aggravante che il
+> bersaglio è l'allarme di sistema: chi lo vede suonare a vuoto smette di crederci proprio il
+> giorno in cui la pipeline si ferma davvero.
+
+### 🩺 La regola nuova: un guasto DESCRITTO vale più di una pagina mancante
+Nei prompt c'è ora una clausola `1bis`: clone fallito, script mancante, errore Python, pagina non
+pubblicabile → **si pubblica lo stesso**, sullo stesso URL, con in cima una sezione `Diagnosi`
+che riporta il comando, il codice di uscita e le ultime righe dell'errore, **testuali**; e la
+notifica dice cosa è fallito invece del contenuto di mercato.
+
+⚠⚠ **Ed è quella clausola ad aver trovato la causa**, non una rilettura: non potendo leggere il
+transcript di una sessione automatica, l'unico canale osservabile è ciò che quella sessione
+pubblica. Rifatto lo scatto con l'ordine di pubblicare l'errore, la pagina ha riportato il
+`No such file or directory` alla riga esatta.
+> *"Una lettura che non arriva e una lettura vuota si leggono uguali"* era già scritto nel
+> prompt come avvertenza. Non bastava: un'avvertenza non è un canale. Adesso lo è.
+
+⚠ **E la sessione ha corretto la MIA ipotesi.** Avevo diagnosticato un problema di ramo e glielo
+avevo scritto nell'istruzione di diagnosi; lei ha risposto *"non è un problema di branch (come
+ipotizzato), è l'assenza totale della repo"*. Un'ipotesi messa in un prompt è un'ancora: va
+scritta come domanda, non come premessa, o si riceve la conferma invece della misura (classe
+v326, il check che conferma la propria assunzione).
+
+### ✅ Collaudo sulla strada vera, non sul controllo
+Il fatto che `brief.py` giri **qui** non dice nulla su dove gira la Routine: è la lezione **v399
+/ v443** (*si prova il COLLEGAMENTO, non il CONTROLLO*) e **v438** (*un harness che semplifica un
+ingresso produce un risultato diverso, non più semplice*). Quindi la verifica è stata uno scatto
+vero col prompt corretto: pagina pubblicata alle 08:39, **nessuna sezione Diagnosi**, **nessun
+allarme pipeline**, macro *"run di 2,6 ore fa"*, e la verifica online fatta — la sessione ha
+trovato e datato da sé la trimestrale ORCL dietro l'escursione del 10,75%.
+
+⚠ Il `?v=` e `BUILD_VERSION` **non** sono stati toccati: nessun file servito al browser (v440).
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
