@@ -5498,6 +5498,57 @@ trovato e datato da sé la trimestrale ORCL dietro l'escursione del 10,75%.
 
 ⚠ Il `?v=` e `BUILD_VERSION` **non** sono stati toccati: nessun file servito al browser (v440).
 
+## 🪞 v455 — LA v454 HA DIVISO IL TESTO E HA LASCIATO INDIETRO LA PAGINA
+
+Trovato **provando la ricetta scritta nel prompt della Routine invece di darla per buona** — cioè
+eseguendo `brief.py` e `brief_pagina.py` in fila, come li esegue la sessione automatica.
+
+La v454 ha separato posizioni e sorvegliati nel **testo** del brief. `brief_pagina.py` no:
+ordinava per peso con `x.get("peso") or 0`, quindi SMCI e OKLO — peso `None` — finivano **in
+fondo alla griglia delle posizioni**, indistinguibili da una posizione il cui peso non è stato
+calcolato. E nell'elenco dei mossi comparivano senza etichetta.
+
+> **Due rese della stessa domanda che divergono** (v161, v207, v443), e qui quella sbagliata
+> **afferma un possesso che non esiste**. È la classe v412 — una correzione applicata a una
+> superficie e non all'altra — commessa nella versione precedente, il giorno prima.
+
+⚠ Il blocco nuovo **dichiara cosa sono** ("non in posizione · zero quote, zero peso · fuori dal
+patrimonio e dal contributo al rischio"): separarli senza dirlo lascia chi legge a indovinare
+perché una scheda non ha peso (v406). E senza sorvegliati il blocco **non compare affatto** —
+una sezione vuota si legge come un dato mancante.
+
+⚠ **Lo stato si COSTRUISCE**: oggi i sorvegliati sono due, domani potrebbero essere zero e il
+gate sarebbe verde per assenza del fenomeno (v425, v429, v431, v435). I sei check della v455
+rendono un JSON finto con un sorvegliato dentro, e percorrono anche il ramo senza.
+
+⚠ **E la mia prima fixture ha nascosto un'eccezione dentro un `try/except`**: `genera()` moriva
+su `KeyError: 'stato'` e il check leggeva la stringa `"ECCEZIONE: …"`, cioè era rosso per la
+ragione sbagliata. Tolto il `try`: se la resa esplode, la suite deve morire rumorosamente.
+
+⚠ Due iniezioni, mordono entrambe, con `modifica_sicura` e **ripristino verificato per hash da
+uno snapshot preso prima**, mai da `git checkout` (v427, v430).
+
+⚠ `?v=` e `BUILD_VERSION` **non** toccati: questa versione cambia solo `scripts/` (regola v440).
+
+### 🔌 E le due Routine tornano a pubblicare — ma per ME, non per il CEO
+Decisione del CEO (14/09/2026): la **notifica push** resta l'unica cosa che gli arriva (lui non
+apre pagine), l'**artefatto** torna come **traccia di verifica** che l'analista in chat legge per
+controllare che lo scatto abbia fatto il lavoro. E la **ricerca web diventa obbligatoria a ogni
+scatto**, non condizionata: lo scatto delle 15:45 del 14/09 è durato **82 secondi** ed è stato
+dichiarato riuscito — in 82 secondi nessuna ricerca è avvenuta.
+
+> **Un lavoro che non lascia traccia non è distinguibile da un lavoro non fatto**, ed è la stessa
+> misura che ha diagnosticato la v453: là il segnale fu la DURATA (46 s contro i 23 del solo
+> script), non lo stato `SUCCEEDED`. La traccia elenca comandi con codice di uscita, ricerche
+> fatte con fonte e data, e il testo esatto della notifica: con zero ricerche lo dichiara in
+> maiuscolo invece di lasciarlo dedurre da un tempo di esecuzione.
+
+⚠ **La traccia va IN FONDO alla pagina, mai in cima**: `brief_pagina.py` comincia con il proprio
+`<title>`, che è il nome dell'artefatto e si legge solo se resta all'inizio del file. Nel primo
+prompt avevo scritto che il file comincia con `<header>` — falso, e l'ho corretto **misurando
+l'uscita**, non rileggendo il sorgente.
+
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

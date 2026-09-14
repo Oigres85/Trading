@@ -80,7 +80,14 @@ def genera(d):
     SOGLIA = 1.5
     mossi = [r for r in vivi if (r.get("var_atr") or 0) >= SOGLIA or (r.get("escursione_atr") or 0) >= SOGLIA]
     mossi.sort(key=lambda r: max(r.get("var_atr") or 0, r.get("escursione_atr") or 0), reverse=True)
-    ordinati = sorted(vivi, key=lambda x: -(x.get("peso") or 0)) + [r for r in t if r.get("errore")]
+    # v455 — I SORVEGLIATI NON SONO POSIZIONI, E LA PAGINA DEVE DIRLO COME LO DICE IL TESTO.
+    #   Prima finivano dentro `ordinati` con peso None, cioe' in fondo alla griglia delle
+    #   posizioni, indistinguibili da una posizione il cui peso non e' stato calcolato. Il testo
+    #   del brief li separa dalla v454 e la pagina no: due rese della stessa domanda che
+    #   divergono (v161, v207, v443), e qui quella sbagliata AFFERMA un possesso che non c'e'.
+    posseduti = [r for r in vivi if not r.get("sorvegliato")]
+    osservati = [r for r in vivi if r.get("sorvegliato")]
+    ordinati = sorted(posseduti, key=lambda x: -(x.get("peso") or 0)) + [r for r in t if r.get("errore")]
     nw = d["news"]
     ora = datetime.fromisoformat(d["ora"])
     ora_utc = datetime.fromisoformat(d["ora_utc"])
@@ -110,7 +117,8 @@ def genera(d):
                 q.append(f'chiusura {sg(r["var_pct"])} = <b>{n2(r["var_atr"],1)}×</b> la propria ampiezza')
             if (r.get("escursione_atr") or 0) >= SOGLIA:
                 q.append(f'escursione {n2(r["escursione_pct"])}% = <b>{n2(r["escursione_atr"],1)}×</b>')
-            allerta += (f'<li><span class="tk">{e(r["tk"])}</span>'
+            sorv = ' <span class="sorv">sorvegliato, non in posizione</span>' if r.get("sorvegliato") else ""
+            allerta += (f'<li><span class="tk">{e(r["tk"])}</span>{sorv}'
                         f'<span class="seduta">seduta del {e(r.get("seduta"))}</span>'
                         f'<span class="dett">{" · ".join(q)}</span></li>')
         blocco_allerta = f'<ul class="allerta">{allerta}</ul>'
@@ -171,12 +179,24 @@ def genera(d):
     if nw["macro_non_lette"]:
         fonti_ko += f'<p class="mancante"><b>Fonti macro NON lette:</b> {e(", ".join(nw["macro_non_lette"]))}</p>'
 
+    if osservati:
+        blocco_sorv = (
+            '<section>\n  <h2>Sorvegliati — {} nomi, <b>non in posizione</b></h2>\n'
+            '  <p class="sub">Zero quote, zero peso: stanno fuori dal patrimonio, dal contributo '
+            'al rischio e da ogni misura del libro. Qui c\u2019\u00e8 solo la loro tecnica, letta '
+            'con lo stesso righello delle posizioni.</p>\n'
+            '  <div class="posizioni">{}</div>\n</section>\n'
+        ).format(len(osservati), "".join(riga_posizione(r) for r in osservati))
+    else:
+        blocco_sorv = ""
+
     return TEMPLATE.format(
         modo=modo, data=ora.strftime("%d/%m/%Y"), oraora=ora.strftime("%H:%M"),
         seduta=e(d["seduta_base"]), finestra=n2(d["finestra_h"], 0),
         nmossi=len(mossi), nvivi=len(vivi),
         allerta=blocco_allerta, trimestrali=blocco_trim, fintrim=cal["finestra"],
         posizioni="".join(riga_posizione(r) for r in ordinati),
+        sorvegliati=blocco_sorv,
         nvoci=len(nw["per_titolo"]), voci=voci or '<li class="quiete">Nessuna voce in finestra.</li>',
         muti=(f'<p class="note-fonti">Letti e senza voci in finestra: {e(", ".join(nw["titoli_muti"]))}.</p>'
               if nw["titoli_muti"] else ""),
@@ -255,6 +275,8 @@ h2 {{ font-family:var(--cond); font-weight:700; font-size:13px; letter-spacing:.
 .quiete {{ color:var(--muted); font-size:14px; background:var(--raise);
   border:1px solid var(--line-soft); padding:13px 15px; margin:14px 0 0; }}
 
+.sorv {{ font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:var(--warn);
+  background:var(--warn-bg); padding:1px 6px; border-radius:3px; margin-left:6px; }}
 .posizioni {{ display:grid; grid-template-columns:repeat(auto-fill,minmax(285px,1fr)); gap:1px;
   background:var(--line-soft); border:1px solid var(--line-soft); }}
 .pos {{ background:var(--surface); padding:13px 15px 15px; min-width:0; }}
@@ -346,6 +368,8 @@ footer b {{ color:var(--muted); font-weight:600; }}
   Livelli misurati: la decisione resta sul tuo grafico.</p>
   <div class="posizioni">{posizioni}</div>
 </section>
+
+{sorvegliati}
 
 <section>
   <h2>Notizie sui tuoi nomi — {nvoci} voci</h2>
