@@ -1208,6 +1208,70 @@ check("v454 i sorvegliati entrano nella tecnica (altrimenti il monitoraggio non 
 check("v454 il blocco dei sorvegliati dichiara che non sono posizioni",
       "NON in posizione" in _BRIEF and "zero peso" in _BRIEF)
 
+# ═══ v455 — LA PAGINA DEVE SEPARARE I SORVEGLIATI COME LI SEPARA IL TESTO ═══════════════
+# La v454 ha diviso posizioni e sorvegliati nel TESTO del brief e ha lasciato indietro la
+# PAGINA: `brief_pagina.py` li ordinava per peso (None -> 0) dentro la stessa griglia, cioe'
+# in fondo alle posizioni, indistinguibili da una posizione il cui peso non e' stato
+# calcolato. Due rese della stessa domanda che divergono (v161, v207, v443), e qui quella
+# sbagliata AFFERMA un possesso che non esiste.
+# ⚠ Lo stato si COSTRUISCE: oggi i sorvegliati nel libro sono due, domani potrebbero essere
+#   zero e il gate sarebbe verde per assenza del fenomeno (v425, v429, v431, v435).
+_spp = _ilu.spec_from_file_location("_bp", "scripts/brief_pagina.py")
+_bp = _ilu.module_from_spec(_spp); _spp.loader.exec_module(_bp)
+
+def _riga_finta(tk, peso, sorv=False):
+    r = {"tk": tk, "px": 100.0, "var_pct": 0.5, "var_atr": 0.2, "escursione_pct": 1.0,
+         "escursione_atr": 0.3, "supporto20": 90.0, "resistenza20": 110.0,
+         "sma20": 99.0, "sma50": 98.0, "sma200": 95.0, "seduta": "2026-09-14",
+         "atr_pct": 2.5, "peso": peso}
+    if sorv:
+        r["sorvegliato"] = True; r["peso"] = None
+    return r
+
+_DATI_F = {"ora": "2026-09-14T15:45:00", "ora_utc": "2026-09-14T13:45:00", "modo": "pomeriggio",
+           "finestra_h": 8.0, "seduta_base": "2026-09-14", "cassa_eur": 10000.0, "secondi": 12.0,
+           "tecnica": [_riga_finta("AAA", 60.0), _riga_finta("BBB", 40.0),
+                       _riga_finta("ZZZ", None, sorv=True)],
+           "news": {"per_titolo": [], "macro": [], "titoli_muti": [], "titoli_non_letti": [],
+                    "macro_non_lette": [], "macro_scartate": 0},
+           "macro_fred": {"stato": "ok", "eta_ore": 1.0, "serie": []},
+           "trimestrali": {"attesi": [], "giorni_non_letti": [], "finestra": 21}}
+# ⚠ Nessun try/except intorno a `genera`: un'eccezione inghiottita rende il gate verde per
+#   assenza del fenomeno invece che per assenza del difetto, ed e' la trappola pagata quattro
+#   volte in questo progetto. Se la resa esplode, la suite deve morire rumorosamente.
+_HTML_F = _bp.genera(_DATI_F)
+
+_i_pos = _HTML_F.find("Dove sta ogni posizione")
+_i_sorv = _HTML_F.find("Sorvegliati")
+check("v455 la pagina rende un blocco SORVEGLIATI separato da quello delle posizioni",
+      _i_pos > 0 and _i_sorv > _i_pos, extra=f"pos={_i_pos} sorv={_i_sorv}")
+_griglia_pos = _HTML_F[_i_pos:_i_sorv] if _i_sorv > _i_pos > 0 else _HTML_F
+check("v455 il sorvegliato NON compare fra le posizioni",
+      ">ZZZ<" not in _griglia_pos and ">AAA<" in _griglia_pos,
+      extra=f"ZZZ tra le posizioni: {_griglia_pos.count('>ZZZ<')}")
+check("v455 il sorvegliato compare nel proprio blocco",
+      _i_sorv > 0 and ">ZZZ<" in _HTML_F[_i_sorv:])
+# Comparire separati non basta: la pagina deve DIRE cosa sono (v406 — «non ho il dato» e
+# «ce l'ho e non te lo passo» si leggono uguali, e qui si legge «posizione senza peso»).
+check("v455 il blocco dichiara che non sono posizioni e non hanno peso",
+      "non in posizione" in _HTML_F.lower() and "zero peso" in _HTML_F.lower())
+# Un sorvegliato che si muove resta nell'elenco dei mossi — e' il motivo per cui e' sorvegliato
+# — ma li' dev'essere marcato, altrimenti si legge come una posizione che si e' mossa.
+_DATI_M = dict(_DATI_F)
+_DATI_M["tecnica"] = [_riga_finta("AAA", 100.0), dict(_riga_finta("ZZZ", None, sorv=True),
+                                                      var_atr=3.0, escursione_atr=3.2)]
+_HTML_M = _bp.genera(_DATI_M)
+_i_m = _HTML_M.find(">ZZZ<")
+check("v455 un sorvegliato fra i mossi e' marcato come tale",
+      _i_m > 0 and "sorvegliato, non in posizione" in _HTML_M[_i_m:_i_m + 400],
+      extra=_HTML_M[_i_m:_i_m + 160].replace(chr(10), " "))
+# Senza sorvegliati il blocco NON deve comparire: una sezione vuota si legge come un dato
+# mancante, ed e' il ramo che il libro percorre ogni volta che il CEO non ne segue nessuno.
+_DATI_V = dict(_DATI_F); _DATI_V["tecnica"] = [_riga_finta("AAA", 100.0)]
+check("v455 senza sorvegliati il blocco non compare affatto",
+      "Sorvegliati" not in _bp.genera(_DATI_V))
+
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
