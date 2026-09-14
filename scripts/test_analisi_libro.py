@@ -1049,7 +1049,7 @@ check("v451 il brief dichiara il confine: livelli si', quantita' no",
       "Direzione e livelli si', quantita' no" in _BRIEF and "NON conosce: altri conti" in _BRIEF)
 
 # Il libro si legge davvero: un modulo che importa non e' un parser che funziona.
-_pos, _cassa = _bf.leggi_libro()
+_pos, _cassa, _sorv = _bf.leggi_libro()
 check("v451 il parser del libro trova le 13 azioni, il BTP e la liquidita'",
       len([p for p in _pos if p["valuta"] == "USD"]) == 13
       and any(p["tk"].startswith("BTP") for p in _pos) and _cassa == 10000,
@@ -1129,6 +1129,84 @@ for _p in list(Path("scripts").glob("*.py")) + list(Path("scripts").glob("*.mjs"
         _SOSPETTI.append(f"{_p}:{_m.group()[:6]}...")
 check("v451 nessuna stringa con la forma di una chiave API nei sorgenti",
       not _SOSPETTI, extra=" · ".join(_SOSPETTI[:4]))
+
+# ═══ v454 — IL PARSER LEGGE SOLO LA SEZIONE CHE DICHIARA DI LEGGERE ════════════════════
+# Trovato il 14/09/2026 misurando il libro: leggi_libro() scorreva il FILE INTERO e raccoglieva
+# anche la tabella delle correlazioni (sezione 4), dove "| MU | 0,40 | 0,71 | WDC |" diventava
+# quantita' 0,40, PMC 0,71, valuta WDC. 26 righe invece di 14. Nessun effetto sull'uscita solo
+# perche' il filtro valuta=="USD" le scartava PER COINCIDENZA — nessuna correlazione si chiama
+# "USD". Il gate v451 verificava la PROVENIENZA (le posizioni vengono da LIBRO.md) e non
+# l'ESTRAZIONE (quale tabella). Lo stato si COSTRUISCE: si scrive un LIBRO.md finto con una
+# tabella estranea della stessa forma, cosi' il check non dipende da cosa contiene il file vero.
+import tempfile as _tf, shutil as _sh, importlib as _il
+_FINTO = """# LIBRO finto per il gate
+
+## 1. POSIZIONI — confermate
+
+| Ticker | Quantita | PMC | Valuta | Note |
+|---|---|---|---|---|
+| AAA | 10 | 5,00 | USD | |
+| BBB | 20 | 7,50 | USD | |
+
+**Liquidita: 1.000 €**
+
+## 1bis. SORVEGLIATI
+
+| Ticker | Nota |
+|---|---|
+| ZZZ | candidato |
+
+## 4. Correlazione media e massima per posizione
+
+| Ticker | media | massima | con | a | b | c |
+|---|---|---|---|---|---|---|
+| AAA | 0,40 | 0,71 | BBB | 2,87 | 2,51 | 4,06 |
+| BBB | 0,38 | 0,71 | AAA | 2,44 | 2,01 | 3,08 |
+"""
+def _leggi_finto():
+    import brief as _b
+    _d = _tf.mkdtemp()
+    import os as _os
+    _os.makedirs(_os.path.join(_d, "memoria"), exist_ok=True)
+    open(_os.path.join(_d, "memoria", "LIBRO.md"), "w", encoding="utf-8").write(_FINTO)
+    _old = _b.RADICE
+    try:
+        _b.RADICE = _d
+        return _b.leggi_libro()
+    finally:
+        _b.RADICE = _old
+        _sh.rmtree(_d, ignore_errors=True)
+
+_POS_F, _CASSA_F, _SORV_F = _leggi_finto()
+check("v454 il parser NON raccoglie la tabella delle correlazioni fra le posizioni",
+      len(_POS_F) == 2 and {p["tk"] for p in _POS_F} == {"AAA", "BBB"},
+      extra=f"{len(_POS_F)} righe: {[p['tk'] for p in _POS_F]}")
+# ⚠ La coincidenza da cui il difetto era coperto: nessuna correlazione si chiama "USD". Se un
+#   domani ne nascesse una, il filtro valuta cadrebbe. Qui si verifica che le righe estranee non
+#   arrivino proprio, non che il filtro le scarti.
+check("v454 nessuna riga con valuta che e' un ticker (era la forma del difetto)",
+      all(p["valuta"] in ("USD", "EUR") for p in _POS_F),
+      extra=str([(p["tk"], p["valuta"]) for p in _POS_F]))
+check("v454 i sorvegliati si leggono, e la riga separatore |---| non e' un ticker",
+      [s["tk"] for s in _SORV_F] == ["ZZZ"], extra=str([s["tk"] for s in _SORV_F]))
+check("v454 la liquidita' continua a leggersi", _CASSA_F == 1000.0, extra=str(_CASSA_F))
+
+# I SORVEGLIATI non devono toccare NESSUN aggregato del libro: il peso si calcola sul solo
+# elenco delle posizioni. Un titolo non posseduto che diluisse i pesi sarebbe la classe v439
+# (una seconda copia del libro che invecchia da sola), qui in forma peggiore.
+_CORPO_MAIN = _BRIEF_CODICE[_BRIEF_CODICE.index("azioni = [p for p in pos"):]
+_CORPO_MAIN = _CORPO_MAIN[:_CORPO_MAIN.index("ora_utc = datetime")]
+check("v454 il peso e il patrimonio si calcolano SOLO sulle posizioni, mai sui sorvegliati",
+      'tot = sum((idx[p["tk"]].get("px") or 0) * p["qta"] for p in azioni)' in _CORPO_MAIN
+      and 'for p in azioni:' in _CORPO_MAIN
+      and 'for s in sorv:' in _CORPO_MAIN
+      and '"peso"' not in _CORPO_MAIN.split("for s in sorv:")[1])
+check("v454 i sorvegliati entrano nella tecnica (altrimenti il monitoraggio non esiste)",
+      'tickers = [p["tk"] for p in azioni] + [s["tk"] for s in sorv]' in _BRIEF_CODICE)
+# E la riga deve DICHIARARE che non sono posizioni: «sorvegliato» e «posseduto» si leggono
+# uguali in una tabella di livelli, ed e' la classe v406.
+check("v454 il blocco dei sorvegliati dichiara che non sono posizioni",
+      "NON in posizione" in _BRIEF and "zero peso" in _BRIEF)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

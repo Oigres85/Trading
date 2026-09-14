@@ -29,6 +29,21 @@
 situazione fiscale. **Il divieto di dimensionare resta in piedi**: direzione, priorità e livelli
 di prezzo sì; quantità no.
 
+## 1bis. SORVEGLIATI — non in posizione, monitorati come i titoli del libro
+
+Il CEO li segue per una rotazione possibile. **Non sono posizioni**: non entrano nel patrimonio,
+nei pesi, nel contributo al rischio ne' in nessuna misura del libro. Entrano solo nella lettura
+tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
+
+| Ticker | Nota |
+|---|---|
+| SMCI | Super Micro Computer — server AI. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
+| OKLO | Oklo — reattori nucleari modulari per datacenter. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
+
+⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
+su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
+gia' concentrato.
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da

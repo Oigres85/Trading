@@ -84,9 +84,23 @@ def leggi_libro():
     """Le posizioni vengono da memoria/LIBRO.md, MAI dalla pipeline: se la pipeline muore,
     il brief deve continuare a dire la verita' sul libro (regola v439)."""
     p = os.path.join(RADICE, "memoria", "LIBRO.md")
-    pos, cassa = [], None
+    pos, cassa, sorv = [], None, []
+    # ⚠ v454 — SI LEGGE SOLO LA SEZIONE CHE SI DICHIARA DI LEGGERE. Il parser scorreva il file
+    #   intero e raccoglieva anche la tabella delle correlazioni (sezione 4), dove
+    #   "| MU | 0,40 | 0,71 | WDC |" diventava quantita' 0,40, PMC 0,71, valuta WDC: 26 righe
+    #   invece di 14. Reggeva solo perche' il filtro valuta=="USD" le scartava per COINCIDENZA —
+    #   nessuna correlazione si chiama "USD". Ora ogni tabella si legge dentro il proprio
+    #   titolo, e una sezione nuova non puo' piu' finire nelle posizioni.
+    sez = None
     for riga in open(p, encoding="utf-8"):
-        m = re.match(r"\|\s*([A-Z0-9.\-]+)\s*\|\s*([\d.,]+)(?:\s*nominali)?\s*\|\s*\*{0,2}([\d.,]+)\*{0,2}\s*\|\s*(\w+)", riga)
+        if riga.startswith("## "):
+            t = riga.upper()
+            sez = "pos" if "POSIZIONI" in t else ("sorv" if "SORVEGLIATI" in t else None)
+        if sez == "sorv":
+            ms = re.match(r"\|\s*([A-Z][A-Z0-9.\-]{0,5})\s*\|\s*([^|]*)\|", riga)
+            if ms and ms.group(1) != "Ticker":   # la riga separatore |---| non ha lettere
+                sorv.append({"tk": ms.group(1), "nota": ms.group(2).strip()})
+        m = re.match(r"\|\s*([A-Z0-9.\-]+)\s*\|\s*([\d.,]+)(?:\s*nominali)?\s*\|\s*\*{0,2}([\d.,]+)\*{0,2}\s*\|\s*(\w+)", riga) if sez == "pos" else None
         if m:
             tk, q, pmc, val = m.group(1), m.group(2), m.group(3), m.group(4)
             if tk in ("Ticker",):
@@ -96,7 +110,7 @@ def leggi_libro():
         mc = re.search(r"Liquidit[aà]:\s*([\d.]+)\s*€", riga)
         if mc:
             cassa = float(mc.group(1).replace(".", ""))
-    return pos, cassa
+    return pos, cassa, sorv
 
 
 # ---------------------------------------------------------------- prezzi e livelli
@@ -459,11 +473,22 @@ def componi(modo, dati):
     # --- 2. LIVELLI DEL LIBRO
     A("")
     A("DOVE STA OGNI POSIZIONE (livelli misurati — la decisione resta sul tuo grafico)")
-    for r in sorted(vivi, key=lambda x: -(x.get("peso") or 0)):
+    for r in sorted([x for x in vivi if not x.get("sorvegliato")], key=lambda x: -(x.get("peso") or 0)):
         A(riga_titolo(r, True))
     for r in t:
         if r.get("errore"):
             A(riga_titolo(r))
+
+    # --- 2bis. SORVEGLIATI — stessa tecnica, ma NON sono posizioni e la riga lo dichiara
+    osservati = [x for x in vivi if x.get("sorvegliato")]
+    if osservati:
+        A("")
+        A(f"SORVEGLIATI — {len(osservati)}, NON in posizione: zero quote, zero peso, fuori da")
+        A("  patrimonio, contributo al rischio e da ogni misura del libro. Solo tecnica e notizie.")
+        for r in osservati:
+            A(riga_titolo(r, True))
+            if r.get("nota_sorv"):
+                A(f"         {r['nota_sorv']}")
 
     # --- 3. NOTIZIE SUI NOMI
     nw = dati["news"]
@@ -542,9 +567,13 @@ def main():
     finestra = a.finestra if a.finestra else (16.0 if modo == "mattina" else 8.0)
 
     t0 = time.time()
-    pos, cassa = leggi_libro()
+    pos, cassa, sorv = leggi_libro()
     azioni = [p for p in pos if p["valuta"] == "USD"]
-    tickers = [p["tk"] for p in azioni]
+    # ⚠ v454 — i SORVEGLIATI entrano nella tecnica e nelle notizie, MAI negli aggregati del
+    #   libro: il peso si calcola sul solo `azioni`, quindi un titolo non posseduto non puo'
+    #   diluire i pesi ne' entrare nel patrimonio. Portano `sorvegliato: True` perche' chi
+    #   legge non li confonda con una posizione.
+    tickers = [p["tk"] for p in azioni] + [s["tk"] for s in sorv]
 
     with ThreadPoolExecutor(max_workers=PARALLELI) as ex:
         tec = list(ex.map(tecnica, tickers))
@@ -554,6 +583,10 @@ def main():
         r = idx[p["tk"]]
         r["peso"] = ((r.get("px") or 0) * p["qta"] / tot * 100) if tot else None
         r["qta"] = p["qta"]; r["pmc"] = p["pmc"]
+    for s in sorv:
+        r = idx.get(s["tk"])
+        if r:
+            r["sorvegliato"] = True; r["nota_sorv"] = s["nota"]
 
     ora_utc = datetime.now(timezone.utc)
     da = ora_utc - timedelta(hours=finestra)
