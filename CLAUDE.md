@@ -5549,6 +5549,102 @@ prompt avevo scritto che il file comincia con `<header>` — falso, e l'ho corre
 l'uscita**, non rileggendo il sorgente.
 
 
+## 🎲 v456 — DUE GATE ROSSI SU `main`, E NESSUNO DEI DUE ERA UN DIFETTO DEL SISTEMA
+
+Il `pre-push` ha bloccato un push il cui HEAD era **identico a `origin/main`**: i due check non
+cadevano su una mia modifica, cadevano sui **dati del giorno**. Stessa causa, due sedi.
+
+| gate | pretendeva | i dati del 15/09 |
+|---|---|---|
+| **v320** (leva) | `Math.abs(trim - qoq) > 0.5`, cioè che i due orizzonti DIVERGESSERO | debito a margine **+2,6% sul mese e +2,7% sul trimestre**: scarto 0,1 |
+| **v349** (digest) | `primo !== estraneo`, cioè che il valore della serie fosse DIVERSO dalla quotazione | `DGS10` e `carry.us10` valgono **entrambi 4,96** |
+
+> **Un check che dipende da quanto valgono i numeri di oggi non misura una proprietà**
+> (v429, v435, v443). Due orizzonti possono legittimamente convergere; due fonti possono
+> legittimamente coincidere. L'invariante non era la differenza dei valori: era che le
+> **derivazioni** fossero due e ciascuna scritta col proprio nome.
+
+⚠⚠ **E v349 aveva GIÀ pagato questa identica trappola — su sé stesso.** La v395 annota:
+*«v349 provava che il VIX legge la propria serie confrontandola per disuguaglianza di valore …
+i due numeri sono venuti uguali per caso … ora perturba la serie»*. Il rimedio fu applicato al
+ramo del VIX e **non a quello del Treasury**: la classe v412, una correzione applicata a un ramo
+e non all'altro, dentro il check che quella lezione l'aveva imparata.
+
+Ora lo stato si **COSTRUISCE**: il check nuovo sposta `carry.us10` di 1,5 punti dalla serie, così
+«viene dalla serie» e «viene dal carry» smettono di essere indistinguibili a qualunque valore i
+dati assumano.
+
+### 🎯 L'iniezione ha dimostrato che il check vecchio era CIECO, non solo fragile
+Riportando il digest a leggere la quotazione di mercato (il difetto originale della v349), morde
+**solo il check nuovo**. Quello vecchio resta verde: oggi le due fonti hanno lo stesso valore,
+quindi `primo === atteso` è soddisfatto comunque. *Un gate che non prende il difetto da cui è
+nato è decorativo* (v415, v419, v446) — e qui lo è diventato per un capriccio dei dati.
+
+### 🧨 Due trappole rifatte scrivendo la correzione, entrambe prese dagli strumenti
+- ⚠⚠ **NONA volta con un backtick dentro un template passato al vm**, e per l'ennesima volta in
+  un **commento che CITAVA del codice** — che è precisamente quando viene naturale usare gli
+  apici inversi. `modifica_sicura` ha rifiutato la scrittura e il file è rimasto intatto.
+- ⚠⚠ **Il doppio escape perso passando da Python al `.mjs`**: scrivendo `"\\n"` in uno script
+  Python si ottiene `\n` **singolo** nel file generato, che dentro un template diventa un a capo
+  vero — cioè un errore di sintassi DENTRO il vm, non una regex che non matcha. L'ha preso il
+  meta-gate dei backslash, e il check è comparso come **CHECK MALFORMATO** invece di passare a
+  vuoto. *Quando uno script scrive un altro script, il livello di escape è due, non uno.*
+- ⚠ E la prima iniezione **ha rotto il file** (`macro` non in scope al posto di `m`): quattro
+  check sono esplosi in `CHECK MALFORMATO` e l'esito era indistinguibile da «morde tutto».
+  È la trappola v427 nel verso opposto: *un'iniezione che rompe il file non misura niente*.
+  Ripristino da snapshot preso prima e verificato per hash, mai da `git checkout` (v430).
+
+⚠ `?v=` e `BUILD_VERSION` **non** toccati: cambia solo `scripts/test_app.mjs` (regola v440).
+
+
+## 🧭 v457 — LA RIGA DELLA LEVA AFFERMAVA UN RITIRO ACCANTO AL PROPRIO NUMERO POSITIVO
+
+Trovato dal `coherence_check`, che è andato rosso su `main` subito dopo i due gate della v456.
+Il pacchetto scriveva, **nella stessa riga**:
+
+> `+2,6% nell'ultimo mese · +2,7% sul trimestre` … *"qui la leva è altissima, **in ritiro
+> sull'ULTIMO MESE** e ancora in espansione sul trimestre e sull'anno"*
+
+La frase era **scritta a mano come costante**. Era vera quando fu scritta in v326 (mese negativo,
+trimestre positivo) ed è diventata falsa il giorno in cui i tre orizzonti si sono allineati —
+senza che nulla si rompesse.
+
+> È la classe dei **conteggi scritti a mano che invecchiano da soli e in silenzio** (v410, v411,
+> v415, v424), qui applicata a una **direzione** invece che a una cifra, e per di più dentro la
+> riga che si chiude spiegando che *il verso dipende dall'orizzonte*.
+
+⚠ Ora i versi si **ricavano dai segni**: nessuna frase può più contraddire il numero accanto. E
+quando i tre concordano il pacchetto lo dichiara — *un segnale solo, non tre prove* (B3) — invece
+di elencarli come conferme indipendenti.
+
+### 🎯 C17 aveva un ancoraggio aperto, e l'ha mostrato lo stesso giorno
+Il detector vieta le etichette del composito rimosso in v200 — `MacroQuant`, `Espansione`,
+`Rallentamento`, `Contrazione` — cercandole come **parole nude**. Ma *"Espansione"* è anche
+l'etichetta legittima dello **stato della leva**, che non è una media di punteggi nostri ma il
+nome di una banda su una serie FINRA, con la propria soglia accanto. Il 15/09 il detector è
+andato rosso su codice corretto. **Ottava incarnazione dell'ancoraggio aperto**, e la riga della
+leva si esclude **nominandola**, non allentando il detector: nel quadro macro sintetico quelle
+parole restano vietate.
+
+### 🧨 Quattro inciampi scrivendo i gate, tutti già in questo file
+- ⚠⚠ **`find()` prendeva la riga sbagliata**: *due* righe del pacchetto contengono
+  `LEVA DEGLI OPERATORI` — quella della leva e quella del Forward P/E, che la cita — e il check
+  misurava la seconda. È la trappola **v399** (*`validate_macro(macro)` compare due volte e
+  `find()` prende la prima*): ci si ancora all'**inizio** della riga, non a una sottostringa.
+- ⚠ **`suVeriEsito` restituisce un BOOLEANO**, non la stringa: il check confrontava `typeof ===
+  "string"` su un `false` e falliva sempre. `suVeri` è quello che rende il valore.
+- ⚠ **`check()` prende due argomenti**: il terzo `{ extra: … }` veniva ignorato in silenzio.
+- ⚠⚠ **E il meta-gate dei backslash estraeva l'elenco degli helper con `[a-zA-Z|]+`**, che **non
+  comprende l'underscore**: con un helper chiamato `_LEVA` l'estrazione si fermava prima e il
+  gate si dichiarava scoperto su codice corretto. *Una sonda deve leggere l'alfabeto vero, non
+  quello che l'autore aveva in mente* (v422). Allargata a `[a-zA-Z_$|]+`.
+
+⚠ Quattro gate nuovi, **lo stato si COSTRUISCE** (orizzonti concordi in salita, discordi, tutti
+in ritiro): oggi i tre concordano, domani no, e un check che leggesse i dati del giorno sarebbe
+verde per il caso invece che per la proprietà (v429, v435, v456). Iniezione della frase scritta
+a mano: **mordono tutti e quattro**, ripristino da snapshot preso prima e verificato per hash.
+
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
