@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "450";
+const BUILD_VERSION = "457";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8567,11 +8567,40 @@ function rigaLeva(m) {
           + `il "% del massimo", che in un mercato al rialzo sta sopra il 95% quasi sempre e quindi non `
           + `distingue niente. `
         : "")
-    + `⚠ LIVELLO E VERSO SONO DUE FATTI DIVERSI, E IL VERSO DIPENDE DALL'ORIZZONTE: qui la leva `
-    + `e' altissima, in ritiro sull'ULTIMO MESE e ancora in espansione sul trimestre e sull'anno. `
-    + `Il livello dice quanto carburante c'e' per un deleveraging; il mese dice che il massimo e' `
-    + `stato superato; il trimestre e l'anno dicono che la tendenza di fondo non e' ancora girata. `
-    + `Chi legge un orizzonte solo conclude il contrario di chi ne legge un altro. `
+    /* ⚠⚠ v457 — QUI LA FRASE ERA SCRITTA A MANO: diceva SEMPRE "in ritiro sull'ULTIMO MESE e
+       ancora in espansione sul trimestre e sull'anno". Era vera quando fu scritta in v326 e il
+       15/09/2026 era FALSA: mese +2,6%, trimestre +2,7%, anno +37,2% — tutti e tre in espansione,
+       e la riga affermava un ritiro accanto al proprio numero positivo. E' la classe dei conteggi
+       scritti a mano che invecchiano da soli e in silenzio (v410, v411, v415, v424), qui su una
+       DIREZIONE invece che su una cifra, dentro la riga che si chiude dicendo che il verso
+       dipende dall'orizzonte. Ora i versi si RICAVANO dai segni: nessuna frase puo' piu'
+       contraddire il numero che le sta accanto. */
+    + (() => {
+        /* gli orizzonti portano l'articolo gia' eliso: "su" + "l'anno" darebbe "su l'anno" */
+        const o = [["ultimo mese", md.qoq], ["trimestre", trim], ["anno", md.yoy]]
+          .filter((x) => x[1] != null && Number.isFinite(Number(x[1])));
+        if (!o.length) return "";
+        const su = o.filter((x) => Number(x[1]) > 0).map((x) => x[0]);
+        const giu = o.filter((x) => Number(x[1]) < 0).map((x) => x[0]);
+        /* la preposizione si articola qui: "su" + "l'anno" darebbe "su l'anno" */
+        const art = (n) => (n === "ultimo mese" || n === "anno") ? "sull'" + n : "sul " + n;
+        const elenco = (a) => a.length === 1 ? art(a[0])
+          : a.slice(0, -1).map(art).join(", ") + " e " + art(a[a.length - 1]);
+        let verso;
+        if (su.length && giu.length)
+          verso = `in espansione ${elenco(su)} e in ritiro ${elenco(giu)}: `
+            + `chi legge un orizzonte solo conclude il contrario di chi ne legge un altro. `;
+        else if (giu.length)
+          verso = `in ritiro ${elenco(giu)} — gli orizzonti concordano, quindi sono `
+            + `UN segnale solo e non tre prove. `;
+        else
+          verso = `in espansione ${elenco(su)} — gli orizzonti concordano, quindi sono `
+            + `UN segnale solo e non tre prove. `;
+        return `⚠ LIVELLO E VERSO SONO DUE FATTI DIVERSI, E IL VERSO DIPENDE DALL'ORIZZONTE: `
+          + `qui la leva e' altissima, ${verso}`
+          + `Il livello dice quanto carburante c'e' per un deleveraging; il verso dice se la `
+          + `tendenza di fondo stia girando. `;
+      })()
     + (cad ? `[${cad}]` : "");
 }
 

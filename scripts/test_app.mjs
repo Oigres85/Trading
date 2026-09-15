@@ -2832,10 +2832,16 @@ check("v320 leva: il pacchetto porta i NUMERI, non solo il verdetto", suVeri(`
         const h = (md.history || []).map(Number).filter(Number.isFinite);
         if (h.length < 4 || !h[h.length - 4]) return true;
         const trim = Math.round((h[h.length - 1] / h[h.length - 4] - 1) * 1000) / 10;
-        /* i due orizzonti hanno numeri diversi e ognuno e' scritto col proprio nome */
+        /* ⚠ v456 — QUI C'ERA Math.abs(trim - md.qoq) > 0.5, cioe' la pretesa che i due
+           orizzonti DIVERGESSERO nei dati del giorno. Il 15/09/2026 il debito a margine ha
+           fatto +2,6% sul mese e +2,7% sul trimestre — scarto 0,1 — e il gate e' andato rosso
+           su codice corretto: due orizzonti possono legittimamente convergere.
+           E' la classe v429/v435/v443: un check che dipende da quanto valgono i numeri di oggi
+           non misura una proprieta'. L'invariante della v326 non era "i numeri sono diversi"
+           ma "sono DUE DERIVAZIONI diverse, ciascuna scritta col proprio nome" — ed e' quello
+           che il ramo costruito qui sotto verifica, perturbando lo storico. */
         return r.includes(signTxt(trim) + " sul trimestre")
-            && r.includes(signTxt(md.qoq) + " nell'ultimo mese")
-            && Math.abs(trim - md.qoq) > 0.5;
+            && r.includes(signTxt(md.qoq) + " nell'ultimo mese");
       })()
       && (r.includes("rilevazione") || r.includes("riferito a "))
       /* ⚠ v396 — qui c'era un includes sulla stringa "prossimo atteso": SEDICESIMA rottura di un check
@@ -4403,10 +4409,27 @@ check("v349 digest: il valore collocato viene dalla stessa fonte della serie", s
   const primo = (riga.match(/Treasury 10A[^:]*:\\s*([\\d,.]+)%/) || [])[1];
   if (!primo) return false;
   const atteso = String(sc.value).replace(".", ",");
-  const estraneo = String(((m.carry || {}).us10 ?? "")).replace(".", ",");
   /* il valore collocato deve essere quello della SERIE (FRED DGS10), non la quotazione di
-     mercato (^TNX) che veniva da un'altra fonte: 100° percentile era il sintomo */
-  return primo === atteso && primo !== estraneo;`));
+     mercato (^TNX) che veniva da un'altra fonte: 100° percentile era il sintomo.
+     ⚠ v456 — QUI C'ERA primo !== estraneo con estraneo = carry.us10. Il 15/09/2026 le due
+     fonti sono venute UGUALI (4,96 entrambe) e il gate e' andato rosso su codice corretto:
+     non poteva piu' distinguerle. E' la trappola che QUESTO STESSO check aveva gia' pagato
+     sul VIX (v395): due serie possono coincidere per caso, non possono muoversi insieme.
+     Il ramo costruito qui sotto perturba la fonte estranea, cosi' la distinzione esiste
+     per costruzione a qualunque valore i dati assumano. */
+  return primo === atteso;`));
+
+check("v349 digest: il 10A resta ancorato alla SERIE anche se l'altra fonte diverge", suVeri(`
+  const m = DATA.macro || {};
+  const sc = ((m.tassi || {}).scadenze || []).find(x => x && x.key === "a10");
+  if (!sc) return true;
+  /* lo stato si COSTRUISCE: si sposta la quotazione di mercato lontano dalla serie, cosi'
+     "viene dalla serie" e "viene dal carry" smettono di essere indistinguibili (v425, v429). */
+  m.carry = Object.assign({}, m.carry || {}, { us10: Number(sc.value) + 1.5 });
+  const riga = historicalDigestText().split("\\n").find(l => l.includes("Treasury 10A"));
+  if (!riga) return false;
+  const primo = (riga.match(/Treasury 10A[^:]*:\\s*([\\d,.]+)%/) || [])[1];
+  return primo === String(sc.value).replace(".", ",");`));
 
 check("v349 liquidita': il dato mensile porta la sua data anche nel pacchetto", suVeri(`
   const L = (DATA.macro || {}).liquidity_split || {};
@@ -5089,7 +5112,7 @@ check("meta: nessun backtick dentro un template passato al vm", (() => {
   /* si isola ogni template passato a un helper del vm e si guarda se, PRIMA della chiusura,
      compare un backtick non escapato: se c'e', il template finisce li' e il resto del check
      diventa sintassi arbitraria — che e' come si e' rotta la suite tre volte oggi. */
-  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito)\(`/g;
+  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito|_LEVA)\(`/g;
   const guasti = [];
   for (const m of mio.matchAll(APERTURE)) {
     const da = m.index + m[0].length;
@@ -5122,7 +5145,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
      essi i backslash non raddoppiati davanti alle classi che contano. */
   const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
     /* ⚠⚠ v422 — LA CLASSE SI ALLARGA A n/r/t/0, e la ragione e' peggiore delle altre: dentro un
@@ -5142,7 +5165,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      un template. Non esiste nessuna ragione legittima di scriverla: il template l'ha gia'
      mangiata prima che il vm la veda, quindi la si cerca in TUTTI i template passati al vm, non
      solo in quelli che contengono una regex. Costata un giro di debug in v406. */
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     for (const b of t.matchAll(/(?<!\\)\\["']/g)) {
       sospetti.push("virgoletta sfuggita: " + t.slice(Math.max(0, b.index - 34), b.index + 12).replace(/\n/g, "⏎"));
@@ -5875,7 +5898,11 @@ check("v368 · quando i due FCF coincidono lo dice, invece di tacere",
    questo check confronta l'elenco con TUTTI gli helper che passano un template al vm. */
 check("meta: il rilevatore dei backslash copre ogni helper che passa un template al vm", (() => {
   const mio = readFileSync(new URL(import.meta.url), "utf8");
-  const scanner = mio.match(/matchAll\(\/\(\?:([a-zA-Z|]+)\)\\\(`/);
+  /* ⚠ v457 — la classe era [a-zA-Z|]+ e NON comprendeva l'underscore: con un helper chiamato
+     _LEVA l'estrazione si fermava prima e il meta-gate si dichiarava scoperto su codice
+     corretto. Un identificatore JS puo' contenere _ e $: la sonda deve leggere l'alfabeto
+     vero, non quello che l'autore aveva in mente (v422). */
+  const scanner = mio.match(/matchAll\(\/\(\?:([a-zA-Z_$|]+)\)\\\(`/);
   if (!scanner) return no("non trovo piu' l'elenco degli helper nel rilevatore: e' cieco");
   const coperti = new Set(scanner[1].split("|"));
   /* gli helper sono quelli definiti come `const X = (...) => run(` / `=> suVeri(` */
@@ -9817,6 +9844,47 @@ check("v447 pipeline: la riga pubblica la valuta in cui e' redatto il bilancio",
   }
   return true;
 })());
+
+/* ═══ v457 — LA FRASE SUI VERSI DELLA LEVA NON PUO' CONTRADDIRE I SEGNI ═══════════════
+   Era scritta a mano ("in ritiro sull'ULTIMO MESE e ancora in espansione sul trimestre e
+   sull'anno"): vera in v326, FALSA il 15/09/2026 con tutti e tre gli orizzonti positivi.
+   ⚠ Lo stato si COSTRUISCE: oggi i tre concordano, domani no, e un check che leggesse i dati
+   del giorno sarebbe verde per il caso invece che per la proprieta' (v429, v435, v456). */
+const _LEVA = (qoq, trim, yoy) => suVeri(`
+  const m = DATA.macro || {};
+  m.margin_debt = Object.assign({}, m.margin_debt || {},
+    { qoq: ${qoq}, yoy: ${yoy}, history: [100, 100, 100, ${100 * (1 + trim / 100)}] });
+  /* ⚠ v457 — DUE righe del pacchetto contengono "LEVA DEGLI OPERATORI": quella della leva e
+     quella del Forward P/E, che la cita. find() prendeva la prima e il check misurava un'altra
+     riga — la trappola v399, un indice preso dal posto sbagliato. Ci si ancora all'INIZIO. */
+  const r = buildPrompt().split(String.fromCharCode(10))
+    .find(x => x.trimStart().indexOf("- LEVA DEGLI OPERATORI") === 0);
+  if (!r) return "riga della leva assente";
+  const d = r.slice(r.indexOf("LIVELLO E VERSO"));
+  return d.slice(0, 320);`);
+
+/* tutti e tre in espansione: nessun "in ritiro", e si dichiara che e' UN segnale solo */
+const _concordi = _LEVA(2.6, 2.7, 37.2);
+check("v457 leva: con gli orizzonti concordi la frase non afferma un ritiro",
+  typeof _concordi === "string" && _concordi.includes("in espansione")
+  && !_concordi.includes("in ritiro"));
+check("v457 leva: orizzonti concordi = UN segnale solo, non tre prove",
+  typeof _concordi === "string" && _concordi.includes("UN segnale solo"));
+
+/* mese in ritiro, trimestre e anno in espansione: la frase deve NOMINARE entrambi i versi */
+const _discordi = _LEVA(-1.8, 4.1, 22.0);
+check("v457 leva: con gli orizzonti discordi la frase nomina entrambi i versi",
+  typeof _discordi === "string" && _discordi.includes("in ritiro")
+  && _discordi.includes("in espansione") && _discordi.includes("ultimo mese"));
+
+/* tutti in ritiro: nessuna espansione affermata */
+const _giu = _LEVA(-1.2, -3.4, -8.0);
+check("v457 leva: con tutti gli orizzonti in ritiro non si afferma nessuna espansione",
+  typeof _giu === "string" && _giu.includes("in ritiro") && !_giu.includes("in espansione"));
+
+/* e la preposizione si articola: "su l'anno" e' un refuso che il CEO legge */
+check("v457 leva: la preposizione e' articolata, mai 'su l' + articolo",
+  typeof _concordi === "string" && !_concordi.includes("su l'") && !_concordi.includes("su il "));
 
 let fail = 0;
 for (const [name, ok] of T) {

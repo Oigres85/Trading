@@ -679,8 +679,15 @@ function c17_verdettiSenzaRegola(t) {
     "media storica", "confine a"];
   /* il composito non deve rientrare: e' un giudizio che nessuna banda puo' rendere onesto,
      perche' la sua "regola" e' la media di altri sette giudizi nostri */
+  /* ⚠⚠ v457 — ANCORAGGIO APERTO: "Espansione" appartiene al vocabolario del composito rimosso
+     in v200 E a quello, legittimo, dello STATO DELLA LEVA ("Stato: Espansione leva ELEVATA"),
+     che non e' una media di punteggi nostri ma l'etichetta di una serie FINRA con la sua banda
+     accanto. Il 15/09/2026 il detector e' andato rosso su quella riga, cioe' su codice corretto.
+     La riga della leva si esclude NOMINANDOLA, non allentando il detector: il composito vero
+     vive nel quadro macro sintetico e li' continua a essere vietato. */
+  const SEDE_LEGITTIMA = "LEVA DEGLI OPERATORI";
   for (const vietata of ["MacroQuant", "Espansione", "Rallentamento", "Contrazione"]) {
-    const riga = t.split("\n").find((x) => x.includes(vietata));
+    const riga = t.split("\n").find((x) => x.includes(vietata) && !x.includes(SEDE_LEGITTIMA));
     if (riga && !/NON e' (piu' )?nel pacchetto/.test(riga))
       flag("C17", `il composito e' rientrato nel payload ("${vietata}"): e' la media di sette `
         + `punteggi 0-100 nostri, cioe' proprio cio' che B2 dichiara rimosso nella riga che si `
