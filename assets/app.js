@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "457";
+const BUILD_VERSION = "458";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10011,16 +10011,25 @@ function buildPrompt(opz) {
     // Quando la riunione e' oltre la copertura del contratto non si pubblica una probabilita'
     // che non significa nulla: si dichiara il limite e si indica la fonte che quella riunione
     // la prezza davvero. Un numero fuori orizzonte e' peggio di nessun numero.
-    const giorniAllaRiunione = (() => {
-      const d = new Date(mt.date + "T00:00:00");
-      return isNaN(d) ? null : Math.round((d - new Date()) / 86400000);
-    })();
+    /* v458 — SETTIMA DERIVAZIONE DEI GIORNI, e sbagliava sul caso piu' urgente.
+       Qui si contavano ISTANTI: alle 16:44 del 15/09 la riunione del 16/09 usciva
+       "fra 0 giorni", che si legge OGGI su un FOMC che e' DOMANI. E' la classe v228/v413,
+       dove la riga PRIORITA' nascondeva la trimestrale del giorno stesso. La funzione unica
+       conta GIORNI DI CALENDARIO in ora locale, ed e' l'unica strada ammessa. */
+    const giorniAllaRiunione = giorniAllaTrimestrale(mt.date);
+    /* ⚠ 0 e 1 non si scrivono in cifre: "fra 0 giorni" e "fra 1 giorni" affermano male
+       proprio i due casi in cui l'evento decide la settimana. */
+    const quandoRiunione = giorniAllaRiunione == null ? ""
+      : giorniAllaRiunione === 0 ? " (OGGI)"
+      : giorniAllaRiunione === 1 ? " (DOMANI)"
+      : giorniAllaRiunione < 0 ? " (gia' avvenuta, " + Math.abs(giorniAllaRiunione) + " giorni fa)"
+      : " (fra " + giorniAllaRiunione + " giorni)";
     const fuoriOrizzonte = giorniAllaRiunione != null && giorniAllaRiunione > 35;
     if (fuoriOrizzonte) {
-      lines.push(`- FedWatch — NON CALCOLABILE per la riunione del ${mt.date} (fra ${giorniAllaRiunione} giorni): il tasso implicito ${m.fedwatch.implied_rate}% viene dal future Fed Funds a 30 giorni, che prezza il MESE IN CORSO e non una riunione così lontana. Le probabilità derivate da quel contratto non riguarderebbero quella data.`
+      lines.push(`- FedWatch — NON CALCOLABILE per la riunione del ${mt.date}${quandoRiunione}: il tasso implicito ${m.fedwatch.implied_rate}% viene dal future Fed Funds a 30 giorni, che prezza il MESE IN CORSO e non una riunione così lontana. Le probabilità derivate da quel contratto non riguarderebbero quella data.`
         + (pmPct != null ? ` La fonte che quota proprio quella riunione è il mercato di previsione: rialzo ${pmPct}%.` : " Nessun mercato di previsione disponibile su quella riunione in questo payload."));
     } else {
-      lines.push(`- FedWatch prossima riunione ${mt.date}${giorniAllaRiunione != null ? ` (fra ${giorniAllaRiunione} giorni)` : ""} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% — media attesa del mese — contro l'EFFR corrente ${mt.prezzata && mt.base_effr != null ? mt.base_effr : (((DATA.macro || {}).fed_market || {}).current_rate ?? "n.d.")}%, ponderando i ${mt.giorni_vecchio ?? "?"} giorni prima e i ${mt.giorni_nuovo ?? "?"} dopo l'entrata in vigore): ${rami.join(" · ")}${conf}${curva}`);
+      lines.push(`- FedWatch prossima riunione ${mt.date}${quandoRiunione} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% — media attesa del mese — contro l'EFFR corrente ${mt.prezzata && mt.base_effr != null ? mt.base_effr : (((DATA.macro || {}).fed_market || {}).current_rate ?? "n.d.")}%, ponderando i ${mt.giorni_vecchio ?? "?"} giorni prima e i ${mt.giorni_nuovo ?? "?"} dopo l'entrata in vigore): ${rami.join(" · ")}${conf}${curva}`);
     }
   }
   if ((m.tilt || []).length) {

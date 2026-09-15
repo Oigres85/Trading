@@ -5645,6 +5645,61 @@ verde per il caso invece che per la proprietà (v429, v435, v456). Iniezione del
 a mano: **mordono tutti e quattro**, ripristino da snapshot preso prima e verificato per hash.
 
 
+## 🗓️ v458 — IL FOMC DI DOMANI SI LEGGEVA «FRA 0 GIORNI», E LA GUARDIA ERA UN RACCOGLITORE MORTO
+
+Preso dal `pre-push` dopo il `git pull --rebase` che ha portato il run del CI delle 14:07: il
+gate **v413** è andato rosso — e **non sulla trimestrale per cui era stato scritto**. Il divieto
+di `fra 0 giorni` ha trovato la riga FedWatch:
+
+> `- FedWatch prossima riunione 2026-09-16 (fra 0 giorni)`
+
+Il 15/09 alle 16:44, con il **FOMC il 16**. Un gate che prende un difetto che non aveva in mente
+sta facendo il suo lavoro (v408) — e il bersaglio era la riga macro più importante della
+settimana, alla vigilia di una riunione che i mercati di previsione quotano **RIALZO 88%**.
+
+**Causa: la SETTIMA derivazione dei giorni**, che contava **istanti** invece di giorni di
+calendario:
+`Math.round((new Date(mt.date + "T00:00:00") - new Date()) / 86400000)` → a nove ore e venti
+dalla mezzanotte del 16, **0**. È testualmente la classe **v228** (la trimestrale del giorno
+stesso che spariva dalla riga PRIORITÀ) e **v413** (68 contro 69 giorni), su un tipo di data che
+le due correzioni precedenti non avevano guardato: *una dichiarazione di unicità vale solo per le
+occorrenze che sono state cercate.*
+
+⚠ **0 e 1 non si scrivono in cifre.** `fra 0 giorni` si legge *oggi* e `fra 1 giorni` non è
+nemmeno italiano: sono i due casi in cui l'evento decide la settimana. Ora la riga dice **OGGI**
+e **DOMANI**, e un evento già passato lo dichiara invece di stampare un numero negativo.
+
+### 🪦 E LA GUARDIA CHE DOVEVA PRENDERLO SI RIEMPIVA SENZA ESSERE MAI LETTA
+Dentro il gate v413 c'era `const artigianali = []`, un ciclo che ci spingeva dentro ogni
+derivazione artigianale… **e nessuna riga che lo leggesse**. Solo `sospetti` veniva restituito.
+
+> **Un raccoglitore morto è peggio di una guardia assente**: si legge come una protezione, occupa
+> il posto in cui uno andrebbe a scriverne una, e passa a vuoto per sempre. È la famiglia della
+> suite mangiata a metà (v277) e del blocco report che contava 174 check e ne verificava 161
+> (v205), qui su quattro righe invece che su un file.
+
+**Perché era stato lasciato muto, e come si chiude davvero.** Il suo schema prendeva anche le
+**ETÀ** (`Date.now()` meno una data passata), che sono un'altra grandezza e si dividono per un
+giorno legittimamente: misurate sul file vero, **cinque occorrenze, tutte sane**. Farlo mordere
+così avrebbe prodotto cinque falsi positivi.
+
+⚠⚠ **La proprietà che discrimina è l'ORDINE DEGLI OPERANDI**: un'età sottrae il passato da
+ADESSO; un conto alla rovescia sottrae ADESSO da una data futura. Il gate guarda ora solo la
+seconda forma, e **morde** — validato reintroducendo la derivazione vecchia: cadono tre check.
+
+⚠ E il check nuovo **costruisce lo stato** invece di aspettarlo: inietta la data della riunione a
+**0, 1 e 9 giorni** e percorre tutti e tre i rami. Oggi la riunione è domani, fra un mese sarà
+lontana, e un check che leggesse i dati del giorno sarebbe verde per il caso invece che per la
+proprietà (v429, v431, v435, v456). La **seconda iniezione** — solo la resa `(OGGI)`/`(DOMANI)`
+rimessa in cifre, lasciando intatta la derivazione unica — fa cadere **soltanto** il check nuovo:
+è la prova che non è un doppione di quello sul sorgente.
+
+### 🔁 E la finestra scoperta era di nuovo `commit → rebase → push`
+Nessuno di questi due difetti era visibile prima del rebase: il conteggio a zero esiste **solo**
+nelle ore fra la mezzanotte UTC e la riunione del giorno dopo, e il raccoglitore morto non ha mai
+parlato in vita sua. Li ha trovati il **`.githooks/pre-push`**, che gira DOPO il rebase — la rete
+che la v443 ha messo esattamente lì. Senza, `main` sarebbe andata rossa per la terza volta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
