@@ -7781,12 +7781,25 @@ check("v413 i giorni alla trimestrale vengono da UNA sola derivazione", (() => {
   /* ⚠ si guarda il CODICE senza commenti: quelli che spiegano il difetto contengono per forza
      le formule che il gate cerca (v213, v240, v393, v409). */
   const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  /* ⚠⚠ v458 — QUESTO ELENCO NON VENIVA MAI LETTO: si riempiva e nessuno lo guardava mai, cioe'
+     era un RACCOGLITORE MORTO travestito da guardia — la forma peggiore di test, quella che
+     passa a vuoto. E infatti non ha visto la SETTIMA derivazione, il conto alla rovescia della
+     riunione Fed, che alle 16:44 del 15/09 scriveva "fra 0 giorni" su un FOMC di DOMANI.
+     Il motivo per cui era stato lasciato muto e' che il suo schema prendeva anche le ETA'
+     (adesso meno una data passata), che sono un'altra grandezza e si dividono per un giorno
+     legittimamente: misurate sul file vero, cinque occorrenze tutte sane.
+     ⚠ La proprieta' che DISCRIMINA e' l'ORDINE DEGLI OPERANDI: un'eta' sottrae il passato da
+     ADESSO, un conto alla rovescia sottrae ADESSO da una data futura. Si guarda solo la
+     seconda forma, e ora MORDE. */
   const artigianali = [];
-  /* qualunque differenza fra una data e "adesso" divisa per un giorno, fuori dalla funzione */
-  for (const m of codice.matchAll(/(Date\.now\(\)|new Date\(\))[^;\n]{0,80}?86400000/g)) {
+  for (const m of codice.matchAll(/-\s*(Date\.now\(\)|new Date\(\)(\.getTime\(\))?)[^;\n]{0,40}?86400000/g)) {
     const i = codice.lastIndexOf("function ", m.index);
     const nome = codice.slice(i, codice.indexOf("(", i)).replace("function ", "").trim();
-    if (nome !== "giorniAllaTrimestrale") artigianali.push(nome + ": " + m[0].slice(0, 46));
+    if (nome !== "giorniAllaTrimestrale") artigianali.push(nome + ": " + m[0].replace(/\s+/g, " ").slice(0, 60));
+  }
+  if (artigianali.length) {
+    return no(artigianali.length + " conto/i alla rovescia verso una data futura fuori dalla funzione unica · "
+      + artigianali[0]);
   }
   /* ⚠⚠ v414 — LA FINESTRA ERA TROPPO STRETTA. Guardava 1.300 caratteri attorno alla riga
      "Prossima trimestrale", e la SETTIMA derivazione stava in un altro blocco (l'evento dentro
@@ -7818,6 +7831,34 @@ check("v413 i giorni alla trimestrale vengono da UNA sola derivazione", (() => {
   return (codice.match(/giorniAllaTrimestrale\(/g) || []).length >= 3
     || no("quasi nessuno chiama la funzione unica: il check non sta misurando niente");
 })());
+
+/* ═══ v458 — LA RIUNIONE FED DI DOMANI SI LEGGEVA COME QUELLA DI OGGI ════════════════════
+   Trovato dal `pre-push` dopo un rebase che ha portato i dati freschi del CI: il gate v413
+   che vieta "fra 0 giorni" e' andato rosso, e NON sulla trimestrale per cui era stato scritto
+   — sul FOMC. E' un gate che prende un difetto che non aveva in mente (v408).
+   ⚠ Lo stato si COSTRUISCE: oggi la riunione e' domani, fra un mese sara' lontana, e un check
+   che aspettasse i dati del giorno sarebbe verde per il caso invece che per la proprieta'
+   (v429, v431, v435, v456). Si inietta la data a 0, 1 e 9 giorni e si percorrono tutti e tre. */
+check("v458 la riunione Fed dichiara OGGI e DOMANI, mai 'fra 0 giorni'", suVeriEsito(`
+  const m = (DATA.macro = DATA.macro || {});
+  const fw = (m.fedwatch = m.fedwatch || {});
+  const base = ((fw.meetings || [])[0]) || {};
+  const coda = (fw.meetings || []).slice(1);
+  const zero = new Date(); zero.setHours(0, 0, 0, 0);
+  const iso = (n) => { const d = new Date(zero); d.setDate(d.getDate() + n);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")
+         + "-" + String(d.getDate()).padStart(2, "0"); };
+  const guasti = [];
+  for (const [n, atteso] of [[0, "(OGGI)"], [1, "(DOMANI)"], [9, "(fra 9 giorni)"]]) {
+    fw.meetings = [Object.assign({}, base, { date: iso(n) })].concat(coda);
+    const riga = buildPrompt().split(String.fromCharCode(10))
+      .find((x) => x.indexOf("FedWatch") >= 0 && x.indexOf(iso(n)) >= 0);
+    if (!riga) { guasti.push(n + "g: nessuna riga FedWatch porta quella data"); continue; }
+    if (riga.indexOf(atteso) < 0) guasti.push(n + "g: atteso " + atteso + " -> " + riga.slice(0, 90));
+    if (riga.indexOf("fra 0 giorni") >= 0 || riga.indexOf("fra 1 giorni") >= 0)
+      guasti.push(n + "g: conta ISTANTI invece di giorni di calendario");
+  }
+  return guasti.length === 0 || guasti.join(" | ");`));
 
 check("v413 lo stesso evento porta lo stesso numero di giorni in tutto il pacchetto", suVeriEsito(`
   /* si COSTRUISCE lo stato invece di aspettare che i dati lo producano (v402) */
