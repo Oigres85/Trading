@@ -1,51 +1,51 @@
 {
  "al": "2026-09-17",
  "sedute": 187,
- "generato": "2026-09-17T18:28:06+00:00",
- "quota_azionaria": 0.8405,
+ "generato": "2026-09-17T18:44:17+00:00",
+ "quota_azionaria": 0.8403,
  "posizioni_al": "2026-08-23",
  "posizioni_giorni": 25,
  "sedute_scartate": {},
  "esclusi": {
-  "SKHY": 0.027
+  "SKHY": 0.0271
  },
  "perche_esclusi": {
   "SKHY": "storia corta"
  },
- "volatilita": 0.486,
- "drawdown_max": -0.2443,
- "drawdown_oggi": -0.0243,
+ "volatilita": 0.4858,
+ "drawdown_max": -0.2444,
+ "drawdown_oggi": -0.0258,
  "scommesse_effettive": 2.3,
  "correlazione_media": 0.339,
  "scommesse_effettive_ribassi": 3.38,
  "correlazione_ribassi": 0.176,
  "sedute_ribassi": 46,
  "pesi": {
-  "MU": 0.2293,
+  "MU": 0.2294,
   "AMD": 0.1829,
   "NVDA": 0.1989,
-  "GOOGL": 0.058,
+  "GOOGL": 0.0581,
   "PLTR": 0.0588,
   "ORCL": 0.0351,
   "WDC": 0.0356,
-  "MRVL": 0.0339,
-  "RGTI": 0.025,
+  "MRVL": 0.034,
+  "RGTI": 0.0249,
   "BE": 0.0374,
-  "MSTR": 0.077,
+  "MSTR": 0.0767,
   "CRWV": 0.0282
  },
  "contributo_rischio": {
-  "MU": 0.3492,
+  "MU": 0.3495,
   "AMD": 0.2205,
   "NVDA": 0.1061,
   "GOOGL": 0.0099,
   "PLTR": 0.0222,
   "ORCL": 0.0222,
-  "WDC": 0.0444,
-  "MRVL": 0.0383,
-  "RGTI": 0.0299,
-  "BE": 0.0562,
-  "MSTR": 0.0641,
+  "WDC": 0.0446,
+  "MRVL": 0.0384,
+  "RGTI": 0.0298,
+  "BE": 0.0563,
+  "MSTR": 0.0637,
   "CRWV": 0.0369
  },
  "volatilita_nome": {
@@ -57,10 +57,10 @@
   "ORCL": 0.585,
   "WDC": 0.843,
   "MRVL": 0.859,
-  "RGTI": 0.971,
+  "RGTI": 0.97,
   "BE": 1.105,
-  "MSTR": 0.843,
-  "CRWV": 1.0
+  "MSTR": 0.842,
+  "CRWV": 1.001
  },
  "correlazioni": {
   "MU": {
@@ -170,7 +170,7 @@
    "ORCL": 0.27,
    "WDC": 0.5,
    "MRVL": 1.0,
-   "RGTI": 0.41,
+   "RGTI": 0.4,
    "BE": 0.42,
    "MSTR": 0.21,
    "CRWV": 0.35
@@ -183,10 +183,10 @@
    "PLTR": 0.35,
    "ORCL": 0.45,
    "WDC": 0.36,
-   "MRVL": 0.41,
+   "MRVL": 0.4,
    "RGTI": 1.0,
    "BE": 0.44,
-   "MSTR": 0.48,
+   "MSTR": 0.47,
    "CRWV": 0.49
   },
   "BE": {
@@ -212,7 +212,7 @@
    "ORCL": 0.38,
    "WDC": 0.17,
    "MRVL": 0.21,
-   "RGTI": 0.48,
+   "RGTI": 0.47,
    "BE": 0.24,
    "MSTR": 1.0,
    "CRWV": 0.3
@@ -233,19 +233,19 @@
   }
  },
  "prezzi": {
-  "MU": 976.61,
-  "AMD": 545.46,
-  "NVDA": 219.68,
-  "GOOGL": 345.76,
-  "PLTR": 175.3,
-  "ORCL": 149.46,
-  "WDC": 424.06,
-  "MRVL": 241.03,
-  "RGTI": 16.09,
-  "BE": 278.88,
-  "SKHY": 184.03,
-  "MSTR": 132.68,
-  "CRWV": 80.03
+  "MU": 975.64,
+  "AMD": 544.48,
+  "NVDA": 219.4,
+  "GOOGL": 345.9,
+  "PLTR": 175.13,
+  "ORCL": 149.24,
+  "WDC": 424.22,
+  "MRVL": 240.78,
+  "RGTI": 16.04,
+  "BE": 278.77,
+  "SKHY": 183.98,
+  "MSTR": 132.0,
+  "CRWV": 79.87
  },
  "carico": {
   "MU": 87.63,
