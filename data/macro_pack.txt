@@ -1,4 +1,4 @@
-⟦ BUILD v458 · generato 18/09/2026 22:04 ⟧
+⟦ BUILD v458 · generato 18/09/2026 22:21 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 18/09/2026, 22:04:25 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 18:04, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,66% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,68% · Fut S&P +0,15% · BTC +6,35% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~63.4h); il "→ agg." incorpora già il gap after.
+DATI AL 18/09/2026, 22:21:55 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 18:21, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,66% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,68% · Fut S&P +0,15% · BTC +6,43% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~63.2h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 18/09/2026, 22:04:25, prossimo run 19/09/2026, 04:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-18.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 18/09/2026, 22:21:55, prossimo run 19/09/2026, 04:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-18.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-18) · Curva 10A-3M (2026-09-18) · Treasury USA 30A (2026-09-17) · Tasso reale 10A (TIPS) (2026-09-17) · Inflazione attesa 10A (breakeven) (2026-09-18) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -164,7 +164,7 @@ MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment
 - Will there be no change in Fed interest rates after the October 2026 meeting?: 44% [Δ7g —]
 - Will Bitcoin dip to $45,000 by December 31, 2026?: 6% [Δ7g —]
 - Will Bitcoin reach $85,000 in September?: 46% [Δ7g —]
-- Will Bitcoin reach $82,500 in September?: 80% [Δ7g —]
+- Will Bitcoin reach $82,500 in September?: 81% [Δ7g —]
 ⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
@@ -244,7 +244,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The S&P 500 Index ($SPX ) (SPY ) is down by -0.03% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down by -0.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.20%.  December E-mini S&P futures (ESZ26 ) are down -0.05%, and December E-mini...
   [MU] · [Nasdaq, 1h fa] Stocks Waver as Bond Yields Climb
       The S&P 500 Index ($SPX ) (SPY ) is down by -0.11% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down by -0.39%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.09%.  December E-mini S&P futures (ESZ26 ) are down -0.15%, and December E-mini...
-  [NVDA] · [Nasdaq, 0h fa] Jensen Huang Maintained His Prediction That AI Infrastructure Spending Will Hit $3 Trillion to $4 Trillion by 2030 -- the Same Forecast He Made a Year Ago to the Day. Is Nvidia Sti
+  [NVDA] · [Nasdaq, 1h fa] Jensen Huang Maintained His Prediction That AI Infrastructure Spending Will Hit $3 Trillion to $4 Trillion by 2030 -- the Same Forecast He Made a Year Ago to the Day. Is Nvidia Sti
       Key PointsNvidia doesn't just sell GPUs -- it also builds entire supercomputers for hyperscaler clients.
   [NVDA] · [Nasdaq, 2h fa] Prediction: This Much Nvidia (NVDA) Stock Bought Today Could Be Worth $28,560 by 2030
       Key PointsNvidia's stock has been growing like gangbusters in recent years.
