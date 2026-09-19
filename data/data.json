@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-19T17:38:01Z",
+ "updated_at": "2026-09-19T18:28:07Z",
  "eurusd": 1.149,
  "totals": {
   "usd_value": 0,
@@ -1774,7 +1774,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -6458,16 +6458,16 @@
    "earnings_date": "2026-10-28",
    "rating": {
     "key": "strong_buy",
-    "n": 53,
-    "target": 428.41,
-    "upside_pct": 22.6
+    "n": 54,
+    "target": 428.16,
+    "upside_pct": 22.5
    },
    "analisti": {
-    "eps_ora": 14.8645,
+    "eps_ora": 14.9061,
     "eps_90g_fa": 14.4584,
-    "eps_7g_fa": 14.8798,
-    "revisione_90g_pct": 2.81,
-    "revisione_7g_pct": -0.1,
+    "eps_7g_fa": 14.8982,
+    "revisione_90g_pct": 3.1,
+    "revisione_7g_pct": 0.05,
     "su_30g": 8,
     "giu_30g": 1,
     "eps_min": 13.673,
@@ -6475,7 +6475,7 @@
     "eps_n": 53,
     "target_min": 340.0,
     "target_max": 515.0,
-    "target_mediana": 430.0
+    "target_mediana": 429.0
    },
    "health": 71,
    "eps": 19.92,
@@ -6512,12 +6512,12 @@
     "debt_to_equity": 18.859,
     "dividend_yield": 0.0025,
     "price_to_book": 6.8677,
-    "target_mean": 428.4076,
+    "target_mean": 428.1593,
     "fcf": 22665000960.0,
     "gross_margin": 0.609,
     "enterprise_value": 4171214094336.0,
     "ev_ebitda": 24.088,
-    "peg": 1.23,
+    "peg": 1.27,
     "roa": 0.1296,
     "short_float": 0.0132,
     "buyback_yield": 0.0107,
@@ -8063,7 +8063,7 @@
     "gross_margin": 0.848,
     "enterprise_value": 417792294912.0,
     "ev_ebitda": 156.91,
-    "peg": 1.68,
+    "peg": 1.71,
     "roa": 0.1729,
     "short_float": 0.0303,
     "buyback_yield": 0.0002,
@@ -11816,7 +11816,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -13746,7 +13746,7 @@
     "gross_margin": 0.5222,
     "enterprise_value": 215536123904.0,
     "ev_ebitda": 75.619,
-    "peg": 1.22,
+    "peg": 1.3,
     "roa": 0.0413,
     "short_float": 0.0509,
     "buyback_yield": 0.0093,
@@ -16746,7 +16746,7 @@
     "gross_margin": 0.3165,
     "enterprise_value": 78362132480.0,
     "ev_ebitda": 187.254,
-    "peg": 0.61,
+    "peg": 0.6,
     "roa": 0.056,
     "short_float": 0.0743,
     "buyback_yield": -0.0008,
@@ -21947,28 +21947,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81472.22,
+   "price": 81414.65,
    "price_asof": "2026-09-19",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.71,
+   "change_pct": 0.63,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.4,
-   "sma200_dist_pct": 15.6,
+   "ath_dist_pct": -35.5,
+   "sma200_dist_pct": 15.5,
    "sma50_dist_pct": 11.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -35.4,
+   "w52_dist_pct": -35.5,
    "day_high": 81886.16,
    "day_low": 80837.05,
    "support": 74944.59,
    "resistance": 82262.21,
-   "rsi": 64.8,
-   "volume": 23679981568,
+   "rsi": 64.7,
+   "volume": 23029897216,
    "vol_ratio": 1.22,
    "atr_14": 2228.05,
-   "atr_pct": 2.73,
+   "atr_pct": 2.74,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21977,7 +21977,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81472.22
+     81414.65
     ],
     "m6": [
      77429.35,
@@ -22105,7 +22105,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81472.22
+     81414.65
     ],
     "all": [
      386.94,
@@ -22252,7 +22252,7 @@
      58558.86,
      62813.75,
      78548.63,
-     81472.22
+     81414.65
     ],
     "m1": [
      78245.81,
@@ -22276,7 +22276,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81472.22
+     81414.65
     ],
     "m3": [
      63789.28,
@@ -22344,7 +22344,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81472.22
+     81414.65
     ],
     "y1": [
      115688.86,
@@ -22420,7 +22420,7 @@
      79671.97,
      78259.52,
      78163.38,
-     81472.22
+     81414.65
     ],
     "d1": [
      80849.99,
@@ -22528,7 +22528,12 @@
      81779.99,
      81683.69,
      81523.94,
-     81525.99
+     81525.99,
+     81473.08,
+     81427.21,
+     81466.2,
+     81367.8,
+     81438.04
     ]
    },
    "earnings_date": null,
@@ -22538,11 +22543,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.74,
-   "sortino_1y": -1.0,
-   "sharpe_6m": 0.15,
+   "sortino_1y": -1.01,
+   "sharpe_6m": 0.14,
    "sortino_6m": 0.22,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81472.22,
+   "prezzo_limite_aggiustato": 81414.65,
    "risk_reward": "1:0.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22555,22 +22560,22 @@
     "w1": {
      "support": 74944.59,
      "resistance": 81886.16,
-     "change_pct": 7.75
+     "change_pct": 7.67
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 4.12
+     "change_pct": 4.05
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 27.72
+     "change_pct": 27.63
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.3
+     "change_pct": -10.36
     }
    },
    "financials": [],
@@ -22597,74 +22602,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81472.22,
+     "prezzo": 81414.65,
      "medie": {
       "sma10": {
-       "liv": 77655.42,
-       "dist_pct": 4.92
+       "liv": 77649.66,
+       "dist_pct": 4.85
       },
       "ema10": {
-       "liv": 78428.22,
-       "dist_pct": 3.88
+       "liv": 78417.76,
+       "dist_pct": 3.82
       },
       "sma20": {
-       "liv": 78336.93,
-       "dist_pct": 4.0
+       "liv": 78334.05,
+       "dist_pct": 3.93
       },
       "ema20": {
-       "liv": 77638.94,
-       "dist_pct": 4.94
+       "liv": 77633.46,
+       "dist_pct": 4.87
       },
       "sma30": {
-       "liv": 78349.02,
-       "dist_pct": 3.99
+       "liv": 78347.1,
+       "dist_pct": 3.92
       },
       "ema30": {
-       "liv": 76471.01,
-       "dist_pct": 6.54
+       "liv": 76467.3,
+       "dist_pct": 6.47
       },
       "sma50": {
-       "liv": 72845.87,
-       "dist_pct": 11.84
+       "liv": 72844.72,
+       "dist_pct": 11.76
       },
       "ema50": {
-       "liv": 74253.68,
-       "dist_pct": 9.72
+       "liv": 74251.42,
+       "dist_pct": 9.65
       },
       "sma100": {
-       "liv": 68115.73,
-       "dist_pct": 19.61
+       "liv": 68115.16,
+       "dist_pct": 19.53
       },
       "ema100": {
-       "liv": 71845.29,
-       "dist_pct": 13.4
+       "liv": 71844.15,
+       "dist_pct": 13.32
       },
       "sma200": {
-       "liv": 70463.35,
-       "dist_pct": 15.62
+       "liv": 70463.06,
+       "dist_pct": 15.54
       },
       "ema200": {
-       "liv": 73540.18,
-       "dist_pct": 10.79
+       "liv": 73539.6,
+       "dist_pct": 10.71
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 64.8,
+      "rsi14": 64.7,
       "macd": {
-       "linea": 1331.53,
-       "segnale": 1482.88,
-       "istogramma": -151.35
+       "linea": 1326.94,
+       "segnale": 1481.96,
+       "istogramma": -155.03
       },
-      "stoch_k": 94.0,
-      "stoch_d": 69.9,
-      "williams_r": -6.0,
-      "cci20": 83.1,
+      "stoch_k": 93.2,
+      "stoch_d": 69.7,
+      "williams_r": -6.8,
+      "cci20": 82.6,
       "adx14": 41.4,
       "di_su": 37.8,
       "di_giu": 12.5,
-      "momentum10": 3212.7
+      "momentum10": 3155.12
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23157,19 +23162,19 @@
       "o": 80877.27,
       "h": 81886.16,
       "l": 80837.05,
-      "c": 81472.22
+      "c": 81414.65
      }
     ],
     "performance": {
-     "s1": 4.23,
-     "m1": 4.68,
-     "m3": 25.9,
-     "m6": 4.28,
-     "a1": -9.86,
-     "ytd": -8.18,
-     "a3": 202.11,
-     "a5": 86.05,
-     "a10": 13261.91
+     "s1": 4.16,
+     "m1": 4.61,
+     "m3": 25.81,
+     "m6": 4.2,
+     "a1": -9.93,
+     "ytd": -8.25,
+     "a3": 201.89,
+     "a5": 85.92,
+     "a10": 13252.46
     },
     "stagionalita": [
      {
@@ -23246,7 +23251,7 @@
      },
      {
       "mese": 9,
-      "media": -1.36,
+      "media": -1.37,
       "mediana": -0.24,
       "positivi_pct": 50,
       "campione": 12,
@@ -23282,9 +23287,9 @@
      }
     ]
    },
-   "rs_1m": 4.9,
+   "rs_1m": 4.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 3.4,
+   "rs_ndx_1m": 3.3,
    "beta_ndx": 0.81,
    "avg_corr": 0.29,
    "max_corr": 0.8,
@@ -57996,6 +58001,13 @@
     ],
     "MRVL": [
      {
+      "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
+      "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T17:05:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-nvidia-backed-artificial-intelligence-ai-stock-could-10x-2033"
+     },
+     {
       "titolo": "Semiconductor Stocks to Buy and Hold Through 2030",
       "riassunto": "Key PointsNvidia grew revenue 106% year over year to $96.2 billion in its latest quarter, and management is forecasting about 70% revenue growth in fiscal 2028.",
       "fonte": "Nasdaq",
@@ -58029,13 +58041,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T15:19:00Z",
       "url": "https://www.nasdaq.com/articles/can-gfs-marvell-deal-sige-capacity-expansion-accelerate-growth"
-     },
-     {
-      "titolo": "SOXX, MRVL, TSM, AMAT: ETF Inflow Alert",
-      "riassunto": "Looking today at week-over-week shares outstanding changes among the universe of ETFs covered at ETF Channel, one standout is the iShares Semiconductor ETF (Symbol: SOXX) where we have detected an approximate $804.7 million dollar inflow -- that's a 1.9% increase week over week",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T14:56:43Z",
-      "url": "https://www.nasdaq.com/articles/soxx-mrvl-tsm-amat-etf-inflow-alert"
      }
     ],
     "MSTR": [
@@ -58043,7 +58048,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T16:17:42Z",
+      "quando": "2026-09-19T18:09:10Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58128,6 +58133,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
+      "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T17:05:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-nvidia-backed-artificial-intelligence-ai-stock-could-10x-2033"
+     },
+     {
       "titolo": "Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron",
       "riassunto": "Key PointsMicron may hold the short-term advantage, but Nvidia is better over the long haul.",
       "fonte": "Nasdaq",
@@ -58161,13 +58173,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-19T08:28:01Z",
       "url": "https://www.nasdaq.com/articles/these-15-words-amazons-andy-jassy-may-eliminate-nvidias-biggest-risk"
-     },
-     {
-      "titolo": "Q3 Earnings Season Preview: What Can Investors Expect?",
-      "riassunto": "S&P 500 earnings in Q3 are expected to increase by +24% from the same period last year, reflecting the 8th consecutive quarter of double-digit earnings growth for the index. Earnings revisions have been positive, sustaining the favorable trend in place for almost a year now.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T22:37:00Z",
-      "url": "https://www.nasdaq.com/articles/q3-earnings-season-preview-what-can-investors-expect"
      }
     ],
     "ORCL": [
@@ -58307,7 +58312,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T16:17:42Z",
+      "quando": "2026-09-19T18:09:10Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58370,7 +58375,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-19T17:38:01Z"
+   "letto_il": "2026-09-19T18:28:07Z"
   }
  },
  "broker": null,
@@ -58554,6 +58559,13 @@
    ],
    "MRVL": [
     {
+     "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
+     "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T17:05:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-nvidia-backed-artificial-intelligence-ai-stock-could-10x-2033"
+    },
+    {
      "titolo": "Semiconductor Stocks to Buy and Hold Through 2030",
      "riassunto": "Key PointsNvidia grew revenue 106% year over year to $96.2 billion in its latest quarter, and management is forecasting about 70% revenue growth in fiscal 2028.",
      "fonte": "Nasdaq",
@@ -58587,13 +58599,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T15:19:00Z",
      "url": "https://www.nasdaq.com/articles/can-gfs-marvell-deal-sige-capacity-expansion-accelerate-growth"
-    },
-    {
-     "titolo": "SOXX, MRVL, TSM, AMAT: ETF Inflow Alert",
-     "riassunto": "Looking today at week-over-week shares outstanding changes among the universe of ETFs covered at ETF Channel, one standout is the iShares Semiconductor ETF (Symbol: SOXX) where we have detected an approximate $804.7 million dollar inflow -- that's a 1.9% increase week over week",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T14:56:43Z",
-     "url": "https://www.nasdaq.com/articles/soxx-mrvl-tsm-amat-etf-inflow-alert"
     }
    ],
    "MSTR": [
@@ -58601,7 +58606,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T16:17:42Z",
+     "quando": "2026-09-19T18:09:10Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58686,6 +58691,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
+     "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T17:05:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-nvidia-backed-artificial-intelligence-ai-stock-could-10x-2033"
+    },
+    {
      "titolo": "Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron",
      "riassunto": "Key PointsMicron may hold the short-term advantage, but Nvidia is better over the long haul.",
      "fonte": "Nasdaq",
@@ -58719,13 +58731,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-19T08:28:01Z",
      "url": "https://www.nasdaq.com/articles/these-15-words-amazons-andy-jassy-may-eliminate-nvidias-biggest-risk"
-    },
-    {
-     "titolo": "Q3 Earnings Season Preview: What Can Investors Expect?",
-     "riassunto": "S&P 500 earnings in Q3 are expected to increase by +24% from the same period last year, reflecting the 8th consecutive quarter of double-digit earnings growth for the index. Earnings revisions have been positive, sustaining the favorable trend in place for almost a year now.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T22:37:00Z",
-     "url": "https://www.nasdaq.com/articles/q3-earnings-season-preview-what-can-investors-expect"
     }
    ],
    "ORCL": [
@@ -58865,7 +58870,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T16:17:42Z",
+     "quando": "2026-09-19T18:09:10Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58928,7 +58933,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-19T17:38:01Z"
+  "letto_il": "2026-09-19T18:28:07Z"
  },
  "predictions": [
   {
@@ -58943,7 +58948,7 @@
   },
   {
    "question": "Will Bitcoin reach $85,000 in September?",
-   "yes": 56,
+   "yes": 55,
    "link": "https://polymarket.com/event/will-bitcoin-reach-85k-in-september-2026"
   },
   {
@@ -79872,6 +79877,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-19T17:38:01Z"
+  "generated_at": "2026-09-19T18:28:08Z"
  }
 }
