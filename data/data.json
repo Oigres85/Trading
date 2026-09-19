@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-19T12:19:24Z",
+ "updated_at": "2026-09-19T12:48:03Z",
  "eurusd": 1.149,
  "totals": {
   "usd_value": 0,
@@ -1774,7 +1774,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -9011,7 +9011,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -1.98,
-   "pe": 23.6,
+   "pe": 23.1,
    "ath": 341.82,
    "ath_dist_pct": -56.8,
    "sma200_dist_pct": -10.8,
@@ -9865,7 +9865,7 @@
     "target_mediana": 240.0
    },
    "health": 61,
-   "eps": 6.26,
+   "eps": 6.38,
    "beta": 1.73,
    "sharpe_1y": -1.35,
    "sortino_1y": -1.85,
@@ -9886,9 +9886,9 @@
     "float_shares": 1856573904.0,
     "float_pct": 61.4,
     "avg_volume_30d": 33263861.0,
-    "pe_ttm": 23.5799,
+    "pe_ttm": 23.1364,
     "forward_pe": 13.4225,
-    "eps_ttm": 6.26,
+    "eps_ttm": 6.38,
     "eps_forward": 10.9972,
     "revenue_fy": 71776002048.0,
     "net_income_fy": 18736001024.0,
@@ -11802,7 +11802,7 @@
      106.68,
      131.07,
      115.21,
-     125.97,
+     125.96,
      129.19,
      149.93,
      162.66,
@@ -11816,7 +11816,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -21947,15 +21947,15 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81291.04,
+   "price": 81262.45,
    "price_asof": "2026-09-19",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.48,
+   "change_pct": 0.45,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -35.6,
-   "sma200_dist_pct": 15.4,
+   "sma200_dist_pct": 15.3,
    "sma50_dist_pct": 11.6,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
@@ -21965,7 +21965,7 @@
    "support": 74944.59,
    "resistance": 82262.21,
    "rsi": 64.4,
-   "volume": 34718314496,
+   "volume": 34752913408,
    "vol_ratio": 1.22,
    "atr_14": 2210.21,
    "atr_pct": 2.72,
@@ -21977,7 +21977,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81291.04
+     81262.45
     ],
     "m6": [
      77429.35,
@@ -22105,7 +22105,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81291.04
+     81262.45
     ],
     "all": [
      386.94,
@@ -22252,7 +22252,7 @@
      58558.86,
      62813.75,
      78548.63,
-     81291.04
+     81262.45
     ],
     "m1": [
      78245.81,
@@ -22276,7 +22276,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81291.04
+     81262.45
     ],
     "m3": [
      63789.28,
@@ -22344,7 +22344,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81291.04
+     81262.45
     ],
     "y1": [
      115688.86,
@@ -22420,7 +22420,7 @@
      79671.97,
      78259.52,
      78163.38,
-     81291.04
+     81262.45
     ],
     "d1": [
      80849.99,
@@ -22496,7 +22496,10 @@
      81263.81,
      81272.75,
      81290.7,
-     81326.54
+     81326.54,
+     81195.31,
+     81254.85,
+     81251.77
     ]
    },
    "earnings_date": null,
@@ -22510,7 +22513,7 @@
    "sharpe_6m": 0.13,
    "sortino_6m": 0.2,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81291.04,
+   "prezzo_limite_aggiustato": 81262.45,
    "risk_reward": "1:0.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22523,22 +22526,22 @@
     "w1": {
      "support": 74944.59,
      "resistance": 81636.38,
-     "change_pct": 7.51
+     "change_pct": 7.47
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 3.89
+     "change_pct": 3.86
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 27.44
+     "change_pct": 27.39
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.5
+     "change_pct": -10.53
     }
    },
    "financials": [],
@@ -22565,55 +22568,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81291.04,
+     "prezzo": 81262.45,
      "medie": {
       "sma10": {
-       "liv": 77637.3,
-       "dist_pct": 4.71
+       "liv": 77634.44,
+       "dist_pct": 4.67
       },
       "ema10": {
-       "liv": 78395.28,
-       "dist_pct": 3.69
+       "liv": 78390.09,
+       "dist_pct": 3.66
       },
       "sma20": {
-       "liv": 78327.87,
-       "dist_pct": 3.78
+       "liv": 78326.44,
+       "dist_pct": 3.75
       },
       "ema20": {
-       "liv": 77621.69,
-       "dist_pct": 4.73
+       "liv": 77618.96,
+       "dist_pct": 4.69
       },
       "sma30": {
-       "liv": 78342.98,
-       "dist_pct": 3.76
+       "liv": 78342.02,
+       "dist_pct": 3.73
       },
       "ema30": {
-       "liv": 76459.32,
-       "dist_pct": 6.32
+       "liv": 76457.48,
+       "dist_pct": 6.28
       },
       "sma50": {
-       "liv": 72842.25,
-       "dist_pct": 11.6
+       "liv": 72841.68,
+       "dist_pct": 11.56
       },
       "ema50": {
-       "liv": 74246.57,
-       "dist_pct": 9.49
+       "liv": 74245.45,
+       "dist_pct": 9.45
       },
       "sma100": {
-       "liv": 68113.92,
-       "dist_pct": 19.35
+       "liv": 68113.63,
+       "dist_pct": 19.3
       },
       "ema100": {
-       "liv": 71841.7,
-       "dist_pct": 13.15
+       "liv": 71841.13,
+       "dist_pct": 13.11
       },
       "sma200": {
-       "liv": 70462.44,
-       "dist_pct": 15.37
+       "liv": 70462.3,
+       "dist_pct": 15.33
       },
       "ema200": {
-       "liv": 73538.37,
-       "dist_pct": 10.54
+       "liv": 73538.09,
+       "dist_pct": 10.5
       }
      },
      "medie_battute": 12,
@@ -22621,18 +22624,18 @@
      "oscillatori": {
       "rsi14": 64.4,
       "macd": {
-       "linea": 1317.08,
-       "segnale": 1479.99,
-       "istogramma": -162.91
+       "linea": 1314.8,
+       "segnale": 1479.53,
+       "istogramma": -164.74
       },
-      "stoch_k": 94.8,
-      "stoch_d": 70.2,
-      "williams_r": -5.2,
-      "cci20": 79.6,
+      "stoch_k": 94.4,
+      "stoch_d": 70.1,
+      "williams_r": -5.6,
+      "cci20": 79.4,
       "adx14": 41.4,
       "di_su": 37.3,
       "di_giu": 12.6,
-      "momentum10": 3031.52
+      "momentum10": 3002.93
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23125,19 +23128,19 @@
       "o": 80877.27,
       "h": 81636.38,
       "l": 80837.05,
-      "c": 81291.04
+      "c": 81262.45
      }
     ],
     "performance": {
-     "s1": 4.0,
-     "m1": 4.45,
-     "m3": 25.62,
-     "m6": 4.04,
-     "a1": -10.06,
-     "ytd": -8.39,
-     "a3": 201.44,
-     "a5": 85.63,
-     "a10": 13232.19
+     "s1": 3.96,
+     "m1": 4.41,
+     "m3": 25.57,
+     "m6": 4.01,
+     "a1": -10.09,
+     "ytd": -8.42,
+     "a3": 201.33,
+     "a5": 85.57,
+     "a10": 13227.5
     },
     "stagionalita": [
      {
@@ -23252,7 +23255,7 @@
    },
    "rs_1m": 4.6,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 3.2,
+   "rs_ndx_1m": 3.1,
    "beta_ndx": 0.81,
    "avg_corr": 0.29,
    "max_corr": 0.8,
@@ -47830,13 +47833,6 @@
   "news": {
    "voci": [
     {
-     "titolo": "France Says 2027 Budget Plan Respects EU Spending Guidelines",
-     "riassunto": "France’s government said its draft 2027 budget bill will meet the European Union’s recommendations even as the debt burden is set to rise above 120% of economic output.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-19T11:47:27Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-19/france-says-2027-budget-plan-respects-eu-spending-guidelines"
-    },
-    {
      "titolo": "AI leaders want to ‘pace the frontier’ as part of a safety slowdown. But how?",
      "riassunto": "Tech giants are attempting to unite on AI safety, but they’re clashing over how an actual slowdown would work",
      "fonte": "MarketWatch",
@@ -47954,6 +47950,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-10T16:55:17Z",
      "url": "https://www.cnbc.com/2026/09/10/the-likelihood-of-a-fed-interest-rate-hike-next-week-just-got-a-lot-higher.html"
+    },
+    {
+     "titolo": "Wholesale prices rose 0.4% in August, as expected",
+     "riassunto": "The producer price index was expected to rise 0.4% in August, according to the Dow Jones consensus forecast.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-10T13:23:45Z",
+     "url": "https://www.cnbc.com/2026/09/10/ppi-inflation-report-august-2026.html"
     }
    ],
    "fonti": [
@@ -52845,7 +52848,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 55
+     "score": 54
     },
     {
      "label": "Treasury 10A",
@@ -57790,7 +57793,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T05:02:27Z",
+      "quando": "2026-09-19T12:16:04Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58010,7 +58013,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T05:02:27Z",
+      "quando": "2026-09-19T12:16:04Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58051,18 +58054,18 @@
     ],
     "MU": [
      {
+      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T12:16:04Z",
+      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
+     },
+     {
       "titolo": "Semiconductor Stocks to Buy and Hold Through 2030",
       "riassunto": "Key PointsNvidia grew revenue 106% year over year to $96.2 billion in its latest quarter, and management is forecasting about 70% revenue growth in fiscal 2028.",
       "fonte": "Nasdaq",
       "quando": "2026-09-19T09:37:01Z",
       "url": "https://www.nasdaq.com/articles/semiconductor-stocks-buy-and-hold-through-2030"
-     },
-     {
-      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T05:02:27Z",
-      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
       "titolo": "Stocks Waver as Bond Yields Climb",
@@ -58142,7 +58145,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T05:02:27Z",
+      "quando": "2026-09-19T12:16:04Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58274,7 +58277,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T05:02:27Z",
+      "quando": "2026-09-19T12:16:04Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58337,7 +58340,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-19T12:19:24Z"
+   "letto_il": "2026-09-19T12:48:03Z"
   }
  },
  "broker": null,
@@ -58348,7 +58351,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T05:02:27Z",
+     "quando": "2026-09-19T12:16:04Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58568,7 +58571,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T05:02:27Z",
+     "quando": "2026-09-19T12:16:04Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58609,18 +58612,18 @@
    ],
    "MU": [
     {
+     "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T12:16:04Z",
+     "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
+    },
+    {
      "titolo": "Semiconductor Stocks to Buy and Hold Through 2030",
      "riassunto": "Key PointsNvidia grew revenue 106% year over year to $96.2 billion in its latest quarter, and management is forecasting about 70% revenue growth in fiscal 2028.",
      "fonte": "Nasdaq",
      "quando": "2026-09-19T09:37:01Z",
      "url": "https://www.nasdaq.com/articles/semiconductor-stocks-buy-and-hold-through-2030"
-    },
-    {
-     "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T05:02:27Z",
-     "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
      "titolo": "Stocks Waver as Bond Yields Climb",
@@ -58700,7 +58703,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T05:02:27Z",
+     "quando": "2026-09-19T12:16:04Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58832,7 +58835,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T05:02:27Z",
+     "quando": "2026-09-19T12:16:04Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58895,7 +58898,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-19T12:19:24Z"
+  "letto_il": "2026-09-19T12:48:03Z"
  },
  "predictions": [
   {
@@ -58909,24 +58912,24 @@
    "link": "https://polymarket.com/event/will-bitcoin-reach-85k-in-september-2026"
   },
   {
-   "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
-   "yes": 56,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-october-2026-meeting-20260617190324032"
-  },
-  {
    "question": "Will the price of Bitcoin be above $80,000 on September 19?",
    "yes": 99,
    "link": "https://polymarket.com/event/bitcoin-above-80k-on-september-19-2026"
   },
   {
    "question": "Bitcoin Up or Down on September 19?",
-   "yes": 94,
+   "yes": 93,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-19-2026"
   },
   {
    "question": "Will the price of Bitcoin be above $76,000 on September 19?",
    "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-19-2026"
+  },
+  {
+   "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
+   "yes": 56,
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-october-2026-meeting-20260617190324032"
   }
  ],
  "options": {
@@ -79787,7 +79790,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -79839,6 +79842,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-19T12:19:24Z"
+  "generated_at": "2026-09-19T12:48:04Z"
  }
 }
