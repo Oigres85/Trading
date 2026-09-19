@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-19T18:28:07Z",
+ "updated_at": "2026-09-19T21:11:56Z",
  "eurusd": 1.149,
  "totals": {
   "usd_value": 0,
@@ -1774,7 +1774,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -4781,7 +4781,10 @@
     "short_float": 0.0129,
     "buyback_yield": 0.0075,
     "ps": 17.72,
-    "ev_s": 17.6
+    "ev_s": 17.6,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -9898,7 +9901,7 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0135,
-    "price_to_book": 7.2209,
+    "price_to_book": 11.3198,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
@@ -11893,12 +11896,7 @@
     ]
    },
    "earnings_date": "2026-11-05",
-   "rating": {
-    "key": "buy",
-    "n": 24,
-    "target": 664.92,
-    "upside_pct": 50.7
-   },
+   "rating": null,
    "analisti": {
     "eps_ora": 31.7495,
     "eps_90g_fa": 24.581,
@@ -11948,13 +11946,13 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": null,
+    "price_to_book": 21.1026,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
     "enterprise_value": 158740348928.0,
     "ev_ebitda": 31.735,
-    "peg": 0.79,
+    "peg": 0.84,
     "roa": 0.2076,
     "short_float": 0.0619,
     "buyback_yield": 0.0163,
@@ -13740,7 +13738,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.001,
-    "price_to_book": 11.7405,
+    "price_to_book": 11.5567,
     "target_mean": 289.0411,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -21947,28 +21945,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81414.65,
+   "price": 81042.44,
    "price_asof": "2026-09-19",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.63,
+   "change_pct": 0.17,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.5,
-   "sma200_dist_pct": 15.5,
-   "sma50_dist_pct": 11.8,
+   "ath_dist_pct": -35.8,
+   "sma200_dist_pct": 15.0,
+   "sma50_dist_pct": 11.3,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -35.5,
+   "w52_dist_pct": -35.8,
    "day_high": 81886.16,
    "day_low": 80837.05,
    "support": 74944.59,
    "resistance": 82262.21,
-   "rsi": 64.7,
-   "volume": 23029897216,
-   "vol_ratio": 1.22,
+   "rsi": 63.9,
+   "volume": 20817698816,
+   "vol_ratio": 0.63,
    "atr_14": 2228.05,
-   "atr_pct": 2.74,
+   "atr_pct": 2.75,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21977,7 +21975,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81414.65
+     81042.44
     ],
     "m6": [
      77429.35,
@@ -22105,7 +22103,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81414.65
+     81042.44
     ],
     "all": [
      386.94,
@@ -22252,7 +22250,7 @@
      58558.86,
      62813.75,
      78548.63,
-     81414.65
+     81042.44
     ],
     "m1": [
      78245.81,
@@ -22276,7 +22274,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81414.65
+     81042.44
     ],
     "m3": [
      63789.28,
@@ -22344,7 +22342,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81414.65
+     81042.44
     ],
     "y1": [
      115688.86,
@@ -22420,78 +22418,78 @@
      79671.97,
      78259.52,
      78163.38,
-     81414.65
+     81042.44
     ],
     "d1": [
      80849.99,
      80960.93,
-     81038.5,
-     81241.62,
-     81322.5,
-     81396.01,
-     81471.01,
+     81037.5,
+     81248.99,
+     81326.12,
+     81396.0,
+     81471.0,
      81260.5,
      81285.95,
-     81083.03,
+     81085.4,
      81149.22,
-     81317.62,
+     81306.41,
      81246.33,
      81353.99,
      81415.76,
      81344.3,
-     81292.02,
-     81260.56,
-     81367.89,
-     81259.13,
+     81291.01,
+     81260.58,
+     81380.0,
+     81259.14,
      81165.95,
-     81105.1,
+     81101.52,
      81154.49,
-     81156.59,
+     81147.63,
      81115.01,
      81181.98,
      81116.84,
-     80975.11,
-     80939.92,
+     80976.01,
+     80939.91,
      80979.37,
-     81035.99,
-     81017.55,
-     81062.36,
-     81066.85,
+     81040.61,
+     81015.26,
+     81062.37,
+     81066.86,
      81003.27,
-     81042.12,
+     81050.6,
      80999.58,
      80981.3,
      80923.69,
-     81038.74,
-     81038.22,
+     81038.04,
+     81038.23,
      81011.7,
      81047.42,
      81132.81,
      81075.25,
-     81083.03,
+     81085.07,
      81026.9,
      81106.88,
-     81045.26,
-     81212.87,
-     81250.64,
-     81304.0,
-     81288.37,
-     81270.01,
+     81045.27,
+     81212.88,
+     81251.59,
+     81303.99,
+     81288.38,
+     81295.58,
      81310.01,
-     81408.73,
+     81410.46,
      81474.47,
-     81286.87,
-     81241.22,
+     81286.17,
+     81241.23,
      81301.49,
-     81247.1,
+     81247.09,
      81274.69,
      81266.26,
      81231.61,
      81225.52,
-     81290.9,
+     81290.99,
      81261.22,
      81280.17,
-     81334.03,
+     81334.02,
      81221.43,
      81263.81,
      81272.75,
@@ -22501,54 +22499,71 @@
      81254.85,
      81251.77,
      81309.99,
-     81309.44,
-     81218.04,
+     81309.43,
+     81216.4,
      81245.83,
-     81239.19,
+     81241.52,
      81235.9,
-     81310.76,
+     81310.77,
      81349.98,
-     81356.83,
+     81356.82,
      81451.51,
      81513.87,
-     81498.4,
+     81498.41,
      81471.04,
-     81654.16,
-     81668.48,
-     81643.66,
+     81657.02,
+     81668.49,
+     81644.02,
      81617.58,
      81888.0,
-     81658.5,
-     81461.58,
+     81671.99,
+     81461.62,
      81732.53,
-     81831.2,
-     81849.89,
+     81831.21,
+     81850.44,
      81829.67,
      81815.95,
      81779.99,
-     81683.69,
-     81523.94,
+     81694.03,
+     81523.96,
      81525.99,
      81473.08,
-     81427.21,
+     81427.22,
      81466.2,
      81367.8,
-     81438.04
+     81438.04,
+     81435.76,
+     81457.26,
+     81408.71,
+     81428.27,
+     81359.43,
+     81395.98,
+     81362.18,
+     81305.01,
+     81336.84,
+     81374.99,
+     81398.52,
+     81310.15,
+     81228.28,
+     81271.62,
+     81096.47,
+     81163.1,
+     81042.44
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 78,
+   "health": 77,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.74,
-   "sortino_1y": -1.01,
-   "sharpe_6m": 0.14,
-   "sortino_6m": 0.22,
+   "sharpe_1y": -0.75,
+   "sortino_1y": -1.02,
+   "sharpe_6m": 0.12,
+   "sortino_6m": 0.18,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81414.65,
-   "risk_reward": "1:0.2",
+   "prezzo_limite_aggiustato": 81042.44,
+   "risk_reward": "1:0.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22560,22 +22575,22 @@
     "w1": {
      "support": 74944.59,
      "resistance": 81886.16,
-     "change_pct": 7.67
+     "change_pct": 7.18
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 4.05
+     "change_pct": 3.57
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 27.63
+     "change_pct": 27.05
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.36
+     "change_pct": -10.77
     }
    },
    "financials": [],
@@ -22592,7 +22607,7 @@
      "lo": 77079.16,
      "hi": 80837.05
     },
-    "liq_above": 82262.21,
+    "liq_above": 81235.03,
     "liq_below": 76909.35,
     "order_block": {
      "dir": "rialzista",
@@ -22602,74 +22617,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81414.65,
+     "prezzo": 81042.44,
      "medie": {
       "sma10": {
-       "liv": 77649.66,
-       "dist_pct": 4.85
+       "liv": 77612.44,
+       "dist_pct": 4.42
       },
       "ema10": {
-       "liv": 78417.76,
-       "dist_pct": 3.82
+       "liv": 78350.08,
+       "dist_pct": 3.44
       },
       "sma20": {
-       "liv": 78334.05,
-       "dist_pct": 3.93
+       "liv": 78315.44,
+       "dist_pct": 3.48
       },
       "ema20": {
-       "liv": 77633.46,
-       "dist_pct": 4.87
+       "liv": 77598.01,
+       "dist_pct": 4.44
       },
       "sma30": {
-       "liv": 78347.1,
-       "dist_pct": 3.92
+       "liv": 78334.69,
+       "dist_pct": 3.46
       },
       "ema30": {
-       "liv": 76467.3,
-       "dist_pct": 6.47
+       "liv": 76443.28,
+       "dist_pct": 6.02
       },
       "sma50": {
-       "liv": 72844.72,
-       "dist_pct": 11.76
+       "liv": 72837.28,
+       "dist_pct": 11.27
       },
       "ema50": {
-       "liv": 74251.42,
-       "dist_pct": 9.65
+       "liv": 74236.82,
+       "dist_pct": 9.17
       },
       "sma100": {
-       "liv": 68115.16,
-       "dist_pct": 19.53
+       "liv": 68111.43,
+       "dist_pct": 18.99
       },
       "ema100": {
-       "liv": 71844.15,
-       "dist_pct": 13.32
+       "liv": 71836.78,
+       "dist_pct": 12.81
       },
       "sma200": {
-       "liv": 70463.06,
-       "dist_pct": 15.54
+       "liv": 70461.2,
+       "dist_pct": 15.02
       },
       "ema200": {
-       "liv": 73539.6,
-       "dist_pct": 10.71
+       "liv": 73535.9,
+       "dist_pct": 10.21
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 64.7,
+      "rsi14": 63.9,
       "macd": {
-       "linea": 1326.94,
-       "segnale": 1481.96,
-       "istogramma": -155.03
+       "linea": 1297.24,
+       "segnale": 1476.02,
+       "istogramma": -178.78
       },
-      "stoch_k": 93.2,
-      "stoch_d": 69.7,
-      "williams_r": -6.8,
-      "cci20": 82.6,
+      "stoch_k": 87.8,
+      "stoch_d": 67.9,
+      "williams_r": -12.2,
+      "cci20": 79.6,
       "adx14": 41.4,
       "di_su": 37.8,
       "di_giu": 12.5,
-      "momentum10": 3155.12
+      "momentum10": 2782.91
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23162,19 +23177,19 @@
       "o": 80877.27,
       "h": 81886.16,
       "l": 80837.05,
-      "c": 81414.65
+      "c": 81042.44
      }
     ],
     "performance": {
-     "s1": 4.16,
-     "m1": 4.61,
-     "m3": 25.81,
-     "m6": 4.2,
-     "a1": -9.93,
-     "ytd": -8.25,
-     "a3": 201.89,
-     "a5": 85.92,
-     "a10": 13252.46
+     "s1": 3.68,
+     "m1": 4.13,
+     "m3": 25.23,
+     "m6": 3.73,
+     "a1": -10.34,
+     "ytd": -8.67,
+     "a3": 200.51,
+     "a5": 85.07,
+     "a10": 13191.42
     },
     "stagionalita": [
      {
@@ -23251,7 +23266,7 @@
      },
      {
       "mese": 9,
-      "media": -1.37,
+      "media": -1.41,
       "mediana": -0.24,
       "positivi_pct": 50,
       "campione": 12,
@@ -23287,9 +23302,9 @@
      }
     ]
    },
-   "rs_1m": 4.8,
+   "rs_1m": 4.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 3.3,
+   "rs_ndx_1m": 2.8,
    "beta_ndx": 0.81,
    "avg_corr": 0.29,
    "max_corr": 0.8,
@@ -37696,7 +37711,7 @@
     "gross_margin": 0.7551,
     "enterprise_value": 1742541815808.0,
     "ev_ebitda": 33.344,
-    "peg": 0.34,
+    "peg": 0.35,
     "roa": 0.1537,
     "short_float": 0.0108,
     "buyback_yield": 0.0036,
@@ -52883,7 +52898,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 57
+     "score": 52
     },
     {
      "label": "Treasury 10A",
@@ -53362,7 +53377,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-09-18",
     "price": 204.56,
     "d1": -1.21,
@@ -53528,7 +53543,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-09-18",
     "price": 168.39,
     "d1": -0.25,
@@ -53611,7 +53626,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-09-18",
     "price": 189.6,
     "d1": 0.82,
@@ -53917,7 +53932,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-09-18",
     "price": 573.0,
     "d1": 2.21,
@@ -54332,7 +54347,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-09-18",
     "price": 111.03,
     "d1": -0.32,
@@ -54415,7 +54430,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-09-18",
     "price": 80.27,
     "d1": -0.66,
@@ -57825,10 +57840,17 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Cathie Wood Sold Palantir and AMD, Then Poured $3.35 Million Into Archer Aviation. Is ARK Betting Big on Flying Taxis?",
+      "riassunto": "Key PointsCathie Wood's Ark Innovation ETF recently sold shares of Palantir and AMD and bought shares of Archer Aviation.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T20:25:00Z",
+      "url": "https://www.nasdaq.com/articles/cathie-wood-sold-palantir-and-amd-then-poured-335-million-archer-aviation-ark-betting-big"
+     },
+     {
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T16:17:42Z",
+      "quando": "2026-09-19T20:22:39Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -57858,13 +57880,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T15:43:16Z",
       "url": "https://www.nasdaq.com/articles/nations-stock-market-outperforming-all-others-year-should-you-invest"
-     },
-     {
-      "titolo": "The HBM Bottleneck: 3 Tech Companies Have Locked Up 85% of the Supply of AI's Scarcest Asset",
-      "riassunto": "Key PointsAccess to high bandwidth memory is becoming a big differentiator in the AI infrastructure market.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T13:33:00Z",
-      "url": "https://www.nasdaq.com/articles/hbm-bottleneck-3-tech-companies-have-locked-85-supply-ais-scarcest-asset"
      }
     ],
     "BE": [
@@ -57913,6 +57928,13 @@
     ],
     "CRWV": [
      {
+      "titolo": "The Unexpected Rival Threatening to Shake Up CoreWeave's Market",
+      "riassunto": "Key PointsIren is taking a thoughtful and gradual approach to grow AI infrastructure.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T17:47:00Z",
+      "url": "https://www.nasdaq.com/articles/unexpected-rival-threatening-shake-coreweaves-market"
+     },
+     {
       "titolo": "Stocks Settle Sharply Higher as Crude Oil and Bond Yields Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +1.14% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.61%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.73%.  September E-mini S&P futures (ESU26 ) rose +1.10%, and September E-mini...",
       "fonte": "Nasdaq",
@@ -57946,13 +57968,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-17T23:25:53Z",
       "url": "https://www.nasdaq.com/articles/stocks-push-higher-lower-crude-prices-and-bond-yields"
-     },
-     {
-      "titolo": "Stocks Rally as Crude Prices and Bond Yields Fall",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +0.91% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.45%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.31%.  E-mini S&P futures (ESU26 ) are up +0.91%, and September E-mini Nasdaq...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-17T23:19:32Z",
-      "url": "https://www.nasdaq.com/articles/stocks-rally-crude-prices-and-bond-yields-fall"
      }
     ],
     "GOOGL": [
@@ -58048,7 +58063,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T18:09:10Z",
+      "quando": "2026-09-19T20:22:39Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58092,7 +58107,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T16:17:42Z",
+      "quando": "2026-09-19T20:22:39Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58133,6 +58148,20 @@
     ],
     "NVDA": [
      {
+      "titolo": "Should Investors Be Worried About an AI Bubble? Here's What History Says.",
+      "riassunto": "Key PointsThe last big technology bubble was the dot-com mania at the turn of the century.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T20:35:00Z",
+      "url": "https://www.nasdaq.com/articles/should-investors-be-worried-about-ai-bubble-heres-what-history-says"
+     },
+     {
+      "titolo": "The Unexpected Rival Threatening to Shake Up CoreWeave's Market",
+      "riassunto": "Key PointsIren is taking a thoughtful and gradual approach to grow AI infrastructure.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T17:47:00Z",
+      "url": "https://www.nasdaq.com/articles/unexpected-rival-threatening-shake-coreweaves-market"
+     },
+     {
       "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
       "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
       "fonte": "Nasdaq",
@@ -58159,20 +58188,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-19T09:37:01Z",
       "url": "https://www.nasdaq.com/articles/semiconductor-stocks-buy-and-hold-through-2030"
-     },
-     {
-      "titolo": "Sam Altman Admits the AI Industry Has Done &quot;a Terrible Job&quot; Explaining Its Benefits Amid Growing Backlash. Should That Worry Nvidia and Microsoft Investors?",
-      "riassunto": "Key PointsMost people know what modern-day artificial intelligence is. They just don't understand why it matters to them.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T08:50:00Z",
-      "url": "https://www.nasdaq.com/articles/sam-altman-admits-ai-industry-has-done-terrible-job-explaining-its-benefits-amid-growing"
-     },
-     {
-      "titolo": "These 15 Words From Amazon’s Andy Jassy May Eliminate Nvidia’s Biggest Risk",
-      "riassunto": "Key PointsNvidia is the leading seller of AI chips, generating triple-digit revenue growth.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T08:28:01Z",
-      "url": "https://www.nasdaq.com/articles/these-15-words-amazons-andy-jassy-may-eliminate-nvidias-biggest-risk"
      }
     ],
     "ORCL": [
@@ -58180,7 +58195,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T16:17:42Z",
+      "quando": "2026-09-19T20:22:39Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58221,6 +58236,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "Cathie Wood Sold Palantir and AMD, Then Poured $3.35 Million Into Archer Aviation. Is ARK Betting Big on Flying Taxis?",
+      "riassunto": "Key PointsCathie Wood's Ark Innovation ETF recently sold shares of Palantir and AMD and bought shares of Archer Aviation.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T20:25:00Z",
+      "url": "https://www.nasdaq.com/articles/cathie-wood-sold-palantir-and-amd-then-poured-335-million-archer-aviation-ark-betting-big"
+     },
+     {
       "titolo": "Stocks Mixed as Crude Oil Prices and Bond Yields Rise",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -0.03% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down by -0.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.20%.  December E-mini S&P futures (ESZ26 ) are down -0.05%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -58254,13 +58276,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T11:26:01Z",
       "url": "https://www.nasdaq.com/articles/2-game-changing-ai-stocks-can-plunge-48-and-54-according-select-wall-street-analysts"
-     },
-     {
-      "titolo": "Prediction: This Will Be Palantir's Stock Price 1 Year From Now (Hint: It's a Bigger Move Than You Think)",
-      "riassunto": "Key PointsPalantir's commercial segment is on pace to eclipse the size of its legacy government business.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T08:50:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-will-be-palantirs-stock-price-1-year-now-hint-its-bigger-move-you-think"
      }
     ],
     "RGTI": [
@@ -58312,7 +58327,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-19T18:09:10Z",
+      "quando": "2026-09-19T20:22:39Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58375,7 +58390,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-19T18:28:07Z"
+   "letto_il": "2026-09-19T21:11:56Z"
   }
  },
  "broker": null,
@@ -58383,10 +58398,17 @@
   "per_titolo": {
    "AMD": [
     {
+     "titolo": "Cathie Wood Sold Palantir and AMD, Then Poured $3.35 Million Into Archer Aviation. Is ARK Betting Big on Flying Taxis?",
+     "riassunto": "Key PointsCathie Wood's Ark Innovation ETF recently sold shares of Palantir and AMD and bought shares of Archer Aviation.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T20:25:00Z",
+     "url": "https://www.nasdaq.com/articles/cathie-wood-sold-palantir-and-amd-then-poured-335-million-archer-aviation-ark-betting-big"
+    },
+    {
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T16:17:42Z",
+     "quando": "2026-09-19T20:22:39Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58416,13 +58438,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T15:43:16Z",
      "url": "https://www.nasdaq.com/articles/nations-stock-market-outperforming-all-others-year-should-you-invest"
-    },
-    {
-     "titolo": "The HBM Bottleneck: 3 Tech Companies Have Locked Up 85% of the Supply of AI's Scarcest Asset",
-     "riassunto": "Key PointsAccess to high bandwidth memory is becoming a big differentiator in the AI infrastructure market.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T13:33:00Z",
-     "url": "https://www.nasdaq.com/articles/hbm-bottleneck-3-tech-companies-have-locked-85-supply-ais-scarcest-asset"
     }
    ],
    "BE": [
@@ -58471,6 +58486,13 @@
    ],
    "CRWV": [
     {
+     "titolo": "The Unexpected Rival Threatening to Shake Up CoreWeave's Market",
+     "riassunto": "Key PointsIren is taking a thoughtful and gradual approach to grow AI infrastructure.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T17:47:00Z",
+     "url": "https://www.nasdaq.com/articles/unexpected-rival-threatening-shake-coreweaves-market"
+    },
+    {
      "titolo": "Stocks Settle Sharply Higher as Crude Oil and Bond Yields Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +1.14% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.61%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.73%.  September E-mini S&P futures (ESU26 ) rose +1.10%, and September E-mini...",
      "fonte": "Nasdaq",
@@ -58504,13 +58526,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-17T23:25:53Z",
      "url": "https://www.nasdaq.com/articles/stocks-push-higher-lower-crude-prices-and-bond-yields"
-    },
-    {
-     "titolo": "Stocks Rally as Crude Prices and Bond Yields Fall",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +0.91% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.45%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.31%.  E-mini S&P futures (ESU26 ) are up +0.91%, and September E-mini Nasdaq...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-17T23:19:32Z",
-     "url": "https://www.nasdaq.com/articles/stocks-rally-crude-prices-and-bond-yields-fall"
     }
    ],
    "GOOGL": [
@@ -58606,7 +58621,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T18:09:10Z",
+     "quando": "2026-09-19T20:22:39Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58650,7 +58665,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T16:17:42Z",
+     "quando": "2026-09-19T20:22:39Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58691,6 +58706,20 @@
    ],
    "NVDA": [
     {
+     "titolo": "Should Investors Be Worried About an AI Bubble? Here's What History Says.",
+     "riassunto": "Key PointsThe last big technology bubble was the dot-com mania at the turn of the century.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T20:35:00Z",
+     "url": "https://www.nasdaq.com/articles/should-investors-be-worried-about-ai-bubble-heres-what-history-says"
+    },
+    {
+     "titolo": "The Unexpected Rival Threatening to Shake Up CoreWeave's Market",
+     "riassunto": "Key PointsIren is taking a thoughtful and gradual approach to grow AI infrastructure.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T17:47:00Z",
+     "url": "https://www.nasdaq.com/articles/unexpected-rival-threatening-shake-coreweaves-market"
+    },
+    {
      "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
      "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
      "fonte": "Nasdaq",
@@ -58717,20 +58746,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-19T09:37:01Z",
      "url": "https://www.nasdaq.com/articles/semiconductor-stocks-buy-and-hold-through-2030"
-    },
-    {
-     "titolo": "Sam Altman Admits the AI Industry Has Done &quot;a Terrible Job&quot; Explaining Its Benefits Amid Growing Backlash. Should That Worry Nvidia and Microsoft Investors?",
-     "riassunto": "Key PointsMost people know what modern-day artificial intelligence is. They just don't understand why it matters to them.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T08:50:00Z",
-     "url": "https://www.nasdaq.com/articles/sam-altman-admits-ai-industry-has-done-terrible-job-explaining-its-benefits-amid-growing"
-    },
-    {
-     "titolo": "These 15 Words From Amazon’s Andy Jassy May Eliminate Nvidia’s Biggest Risk",
-     "riassunto": "Key PointsNvidia is the leading seller of AI chips, generating triple-digit revenue growth.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T08:28:01Z",
-     "url": "https://www.nasdaq.com/articles/these-15-words-amazons-andy-jassy-may-eliminate-nvidias-biggest-risk"
     }
    ],
    "ORCL": [
@@ -58738,7 +58753,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T16:17:42Z",
+     "quando": "2026-09-19T20:22:39Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58779,6 +58794,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "Cathie Wood Sold Palantir and AMD, Then Poured $3.35 Million Into Archer Aviation. Is ARK Betting Big on Flying Taxis?",
+     "riassunto": "Key PointsCathie Wood's Ark Innovation ETF recently sold shares of Palantir and AMD and bought shares of Archer Aviation.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T20:25:00Z",
+     "url": "https://www.nasdaq.com/articles/cathie-wood-sold-palantir-and-amd-then-poured-335-million-archer-aviation-ark-betting-big"
+    },
+    {
      "titolo": "Stocks Mixed as Crude Oil Prices and Bond Yields Rise",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -0.03% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down by -0.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.20%.  December E-mini S&P futures (ESZ26 ) are down -0.05%, and December E-mini...",
      "fonte": "Nasdaq",
@@ -58812,13 +58834,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T11:26:01Z",
      "url": "https://www.nasdaq.com/articles/2-game-changing-ai-stocks-can-plunge-48-and-54-according-select-wall-street-analysts"
-    },
-    {
-     "titolo": "Prediction: This Will Be Palantir's Stock Price 1 Year From Now (Hint: It's a Bigger Move Than You Think)",
-     "riassunto": "Key PointsPalantir's commercial segment is on pace to eclipse the size of its legacy government business.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T08:50:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-will-be-palantirs-stock-price-1-year-now-hint-its-bigger-move-you-think"
     }
    ],
    "RGTI": [
@@ -58870,7 +58885,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-19T18:09:10Z",
+     "quando": "2026-09-19T20:22:39Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58933,38 +58948,23 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-19T18:28:07Z"
+  "letto_il": "2026-09-19T21:11:56Z"
  },
  "predictions": [
   {
-   "question": "Bitcoin Up or Down on September 19?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-19-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $80,000 on September 19?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-80k-on-september-19-2026"
-  },
-  {
    "question": "Will Bitcoin reach $85,000 in September?",
-   "yes": 55,
+   "yes": 48,
    "link": "https://polymarket.com/event/will-bitcoin-reach-85k-in-september-2026"
   },
   {
-   "question": "Will the price of Bitcoin be above $68,000 on September 19?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-68k-on-september-19-2026"
+   "question": "Will Ethereum reach $3,200 in September?",
+   "yes": 8,
+   "link": "https://polymarket.com/event/will-ethereum-reach-3200-in-september-2026"
   },
   {
-   "question": "Ethereum Up or Down on September 19?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/ethereum-up-or-down-on-september-19-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $76,000 on September 19?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-19-2026"
+   "question": "Will Bitcoin reach $100,000 in September?",
+   "yes": 2,
+   "link": "https://polymarket.com/event/will-bitcoin-reach-100k-in-september-2026"
   }
  ],
  "options": {
@@ -79825,7 +79825,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 4 ore"
+    "note": "18 voci, la piu' recente di 7 ore"
    },
    {
     "key": "sec_calendario",
@@ -79877,6 +79877,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-19T18:28:08Z"
+  "generated_at": "2026-09-19T21:11:56Z"
  }
 }
