@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-19T22:09:11Z",
+ "updated_at": "2026-09-19T22:43:17Z",
  "eurusd": 1.149,
  "totals": {
   "usd_value": 0,
@@ -4781,7 +4781,10 @@
     "short_float": 0.0129,
     "buyback_yield": 0.0075,
     "ps": 17.72,
-    "ev_s": 17.6
+    "ev_s": 17.6,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -9898,7 +9901,7 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0135,
-    "price_to_book": 7.2209,
+    "price_to_book": 11.3198,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
@@ -11943,7 +11946,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": null,
+    "price_to_book": 21.1026,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13735,7 +13738,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.001,
-    "price_to_book": 11.7405,
+    "price_to_book": 11.5567,
     "target_mean": 289.0411,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -21942,28 +21945,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81008.08,
+   "price": 81173.68,
    "price_asof": "2026-09-19",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.13,
+   "change_pct": 0.34,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.8,
-   "sma200_dist_pct": 15.0,
-   "sma50_dist_pct": 11.2,
+   "ath_dist_pct": -35.7,
+   "sma200_dist_pct": 15.2,
+   "sma50_dist_pct": 11.4,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -35.8,
+   "w52_dist_pct": -35.7,
    "day_high": 81886.16,
    "day_low": 80837.05,
    "support": 74944.59,
    "resistance": 82262.21,
-   "rsi": 63.8,
-   "volume": 20869736448,
+   "rsi": 64.2,
+   "volume": 20811843584,
    "vol_ratio": 0.63,
    "atr_14": 2228.05,
-   "atr_pct": 2.75,
+   "atr_pct": 2.74,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21972,7 +21975,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81008.08
+     81173.68
     ],
     "m6": [
      77429.35,
@@ -22100,7 +22103,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81008.08
+     81173.68
     ],
     "all": [
      386.94,
@@ -22247,7 +22250,7 @@
      58558.86,
      62813.75,
      78548.63,
-     81008.08
+     81173.68
     ],
     "m1": [
      78245.81,
@@ -22271,7 +22274,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81008.08
+     81173.68
     ],
     "m3": [
      63789.28,
@@ -22339,7 +22342,7 @@
      76150.32,
      76403.77,
      80901.46,
-     81008.08
+     81173.68
     ],
     "y1": [
      115688.86,
@@ -22415,78 +22418,78 @@
      79671.97,
      78259.52,
      78163.38,
-     81008.08
+     81173.68
     ],
     "d1": [
      80849.99,
      80960.93,
-     81038.5,
-     81241.62,
-     81322.5,
-     81396.01,
-     81471.01,
+     81037.5,
+     81248.99,
+     81326.12,
+     81396.0,
+     81471.0,
      81260.5,
      81285.95,
-     81083.03,
+     81085.4,
      81149.22,
-     81317.62,
+     81306.41,
      81246.33,
      81353.99,
      81415.76,
      81344.3,
-     81292.02,
-     81260.56,
-     81367.89,
-     81259.13,
+     81291.01,
+     81260.58,
+     81380.0,
+     81259.14,
      81165.95,
-     81105.1,
+     81101.52,
      81154.49,
-     81156.59,
+     81147.63,
      81115.01,
      81181.98,
      81116.84,
-     80975.11,
-     80939.92,
+     80976.01,
+     80939.91,
      80979.37,
-     81035.99,
-     81017.55,
-     81062.36,
-     81066.85,
+     81040.61,
+     81015.26,
+     81062.37,
+     81066.86,
      81003.27,
-     81042.12,
+     81050.6,
      80999.58,
      80981.3,
      80923.69,
-     81038.74,
-     81038.22,
+     81038.04,
+     81038.23,
      81011.7,
      81047.42,
      81132.81,
      81075.25,
-     81083.03,
+     81085.07,
      81026.9,
      81106.88,
-     81045.26,
-     81212.87,
-     81250.64,
-     81304.0,
-     81288.37,
-     81270.01,
+     81045.27,
+     81212.88,
+     81251.59,
+     81303.99,
+     81288.38,
+     81295.58,
      81310.01,
-     81408.73,
+     81410.46,
      81474.47,
-     81286.87,
-     81241.22,
+     81286.17,
+     81241.23,
      81301.49,
-     81247.1,
+     81247.09,
      81274.69,
      81266.26,
      81231.61,
      81225.52,
-     81290.9,
+     81290.99,
      81261.22,
      81280.17,
-     81334.03,
+     81334.02,
      81221.43,
      81263.81,
      81272.75,
@@ -22496,44 +22499,44 @@
      81254.85,
      81251.77,
      81309.99,
-     81309.44,
-     81218.04,
+     81309.43,
+     81216.4,
      81245.83,
-     81239.19,
+     81241.52,
      81235.9,
-     81310.76,
+     81310.77,
      81349.98,
-     81356.83,
+     81356.82,
      81451.51,
      81513.87,
-     81498.4,
+     81498.41,
      81471.04,
-     81654.16,
-     81668.48,
-     81643.66,
+     81657.02,
+     81668.49,
+     81644.02,
      81617.58,
      81888.0,
-     81658.5,
-     81461.58,
+     81671.99,
+     81461.62,
      81732.53,
-     81831.2,
-     81849.89,
+     81831.21,
+     81850.44,
      81829.67,
      81815.95,
      81779.99,
-     81683.69,
-     81523.94,
+     81694.03,
+     81523.96,
      81525.99,
      81473.08,
-     81427.21,
+     81427.22,
      81466.2,
      81367.8,
      81438.04,
      81435.76,
-     81457.24,
+     81457.26,
      81408.71,
      81428.27,
-     81355.64,
+     81359.43,
      81395.98,
      81362.18,
      81305.01,
@@ -22550,22 +22553,26 @@
      80976.0,
      80997.49,
      81107.09,
-     80957.92
+     80957.92,
+     80975.99,
+     81038.98,
+     81082.82,
+     81173.68
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 77,
+   "health": 78,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.75,
-   "sortino_1y": -1.02,
-   "sharpe_6m": 0.11,
-   "sortino_6m": 0.17,
+   "sortino_1y": -1.01,
+   "sharpe_6m": 0.13,
+   "sortino_6m": 0.19,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81008.08,
-   "risk_reward": "1:0.3",
+   "prezzo_limite_aggiustato": 81173.68,
+   "risk_reward": "1:0.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22577,22 +22584,22 @@
     "w1": {
      "support": 74944.59,
      "resistance": 81886.16,
-     "change_pct": 7.14
+     "change_pct": 7.35
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 3.53
+     "change_pct": 3.74
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 26.99
+     "change_pct": 27.25
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.81
+     "change_pct": -10.63
     }
    },
    "financials": [],
@@ -22619,74 +22626,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81008.08,
+     "prezzo": 81173.68,
      "medie": {
       "sma10": {
-       "liv": 77609.01,
-       "dist_pct": 4.38
+       "liv": 77625.57,
+       "dist_pct": 4.57
       },
       "ema10": {
-       "liv": 78343.84,
-       "dist_pct": 3.4
+       "liv": 78373.94,
+       "dist_pct": 3.57
       },
       "sma20": {
-       "liv": 78313.72,
-       "dist_pct": 3.44
+       "liv": 78322.0,
+       "dist_pct": 3.64
       },
       "ema20": {
-       "liv": 77594.74,
-       "dist_pct": 4.4
+       "liv": 77610.51,
+       "dist_pct": 4.59
       },
       "sma30": {
-       "liv": 78333.54,
-       "dist_pct": 3.41
+       "liv": 78339.06,
+       "dist_pct": 3.62
       },
       "ema30": {
-       "liv": 76441.07,
-       "dist_pct": 5.97
+       "liv": 76451.75,
+       "dist_pct": 6.18
       },
       "sma50": {
-       "liv": 72836.59,
-       "dist_pct": 11.22
+       "liv": 72839.9,
+       "dist_pct": 11.44
       },
       "ema50": {
-       "liv": 74235.47,
-       "dist_pct": 9.12
+       "liv": 74241.97,
+       "dist_pct": 9.34
       },
       "sma100": {
-       "liv": 68111.09,
-       "dist_pct": 18.94
+       "liv": 68112.75,
+       "dist_pct": 19.18
       },
       "ema100": {
-       "liv": 71836.1,
-       "dist_pct": 12.77
+       "liv": 71839.37,
+       "dist_pct": 12.99
       },
       "sma200": {
-       "liv": 70461.03,
-       "dist_pct": 14.97
+       "liv": 70461.85,
+       "dist_pct": 15.2
       },
       "ema200": {
-       "liv": 73535.56,
-       "dist_pct": 10.16
+       "liv": 73537.2,
+       "dist_pct": 10.38
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.8,
+      "rsi14": 64.2,
       "macd": {
-       "linea": 1294.5,
-       "segnale": 1475.48,
-       "istogramma": -180.97
+       "linea": 1307.71,
+       "segnale": 1478.12,
+       "istogramma": -170.4
       },
-      "stoch_k": 87.4,
-      "stoch_d": 67.7,
-      "williams_r": -12.6,
-      "cci20": 79.3,
+      "stoch_k": 89.7,
+      "stoch_d": 68.5,
+      "williams_r": -10.3,
+      "cci20": 80.7,
       "adx14": 41.4,
       "di_su": 37.8,
       "di_giu": 12.5,
-      "momentum10": 2748.55
+      "momentum10": 2914.16
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23179,19 +23186,19 @@
       "o": 80877.27,
       "h": 81886.16,
       "l": 80837.05,
-      "c": 81008.08
+      "c": 81173.68
      }
     ],
     "performance": {
-     "s1": 3.64,
-     "m1": 4.08,
-     "m3": 25.18,
-     "m6": 3.68,
-     "a1": -10.38,
-     "ytd": -8.7,
-     "a3": 200.39,
-     "a5": 84.99,
-     "a10": 13185.78
+     "s1": 3.85,
+     "m1": 4.3,
+     "m3": 25.44,
+     "m6": 3.89,
+     "a1": -10.19,
+     "ytd": -8.52,
+     "a3": 201.0,
+     "a5": 85.37,
+     "a10": 13212.94
     },
     "stagionalita": [
      {
@@ -23268,7 +23275,7 @@
      },
      {
       "mese": 9,
-      "media": -1.41,
+      "media": -1.39,
       "mediana": -0.24,
       "positivi_pct": 50,
       "campione": 12,
@@ -23304,9 +23311,9 @@
      }
     ]
    },
-   "rs_1m": 4.3,
+   "rs_1m": 4.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 2.8,
+   "rs_ndx_1m": 3.0,
    "beta_ndx": 0.81,
    "avg_corr": 0.29,
    "max_corr": 0.8,
@@ -52883,7 +52890,7 @@
    "calls": 654481
   },
   "risk_sentiment": {
-   "score": 44,
+   "score": 45,
    "label": "Neutrale",
    "components": [
     {
@@ -52900,7 +52907,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 54
     },
     {
      "label": "Treasury 10A",
@@ -53379,7 +53386,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-09-18",
     "price": 204.56,
     "d1": -1.21,
@@ -53545,7 +53552,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-09-18",
     "price": 168.39,
     "d1": -0.25,
@@ -53628,7 +53635,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-09-18",
     "price": 189.6,
     "d1": 0.82,
@@ -53934,7 +53941,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-09-18",
     "price": 573.0,
     "d1": 2.21,
@@ -54349,7 +54356,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-09-18",
     "price": 111.03,
     "d1": -0.32,
@@ -54432,7 +54439,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-09-18",
     "price": 80.27,
     "d1": -0.66,
@@ -58194,6 +58201,13 @@
     ],
     "ORCL": [
      {
+      "titolo": "Could Oracle's Debt Load Derail Its AI Cloud Ambitions?",
+      "riassunto": "Key PointsOracle's debt load is nearly twice the company's book value.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-19T22:09:00Z",
+      "url": "https://www.nasdaq.com/articles/could-oracles-debt-load-derail-its-ai-cloud-ambitions"
+     },
+     {
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -58227,13 +58241,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T13:50:01Z",
       "url": "https://www.nasdaq.com/articles/heres-why-oracle-orcl-strong-momentum-stock"
-     },
-     {
-      "titolo": "Oracle (ORCL) Just Overtook the 20-Day Moving Average",
-      "riassunto": "Should investors be excited or worried when a stock crosses above the 20-day simple moving average?",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T13:35:01Z",
-      "url": "https://www.nasdaq.com/articles/oracle-orcl-just-overtook-20-day-moving-average"
      }
     ],
     "PLTR": [
@@ -58392,7 +58399,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-19T22:09:11Z"
+   "letto_il": "2026-09-19T22:43:17Z"
   }
  },
  "broker": null,
@@ -58752,6 +58759,13 @@
    ],
    "ORCL": [
     {
+     "titolo": "Could Oracle's Debt Load Derail Its AI Cloud Ambitions?",
+     "riassunto": "Key PointsOracle's debt load is nearly twice the company's book value.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-19T22:09:00Z",
+     "url": "https://www.nasdaq.com/articles/could-oracles-debt-load-derail-its-ai-cloud-ambitions"
+    },
+    {
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
@@ -58785,13 +58799,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T13:50:01Z",
      "url": "https://www.nasdaq.com/articles/heres-why-oracle-orcl-strong-momentum-stock"
-    },
-    {
-     "titolo": "Oracle (ORCL) Just Overtook the 20-Day Moving Average",
-     "riassunto": "Should investors be excited or worried when a stock crosses above the 20-day simple moving average?",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T13:35:01Z",
-     "url": "https://www.nasdaq.com/articles/oracle-orcl-just-overtook-20-day-moving-average"
     }
    ],
    "PLTR": [
@@ -58950,7 +58957,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-19T22:09:11Z"
+  "letto_il": "2026-09-19T22:43:17Z"
  },
  "predictions": [
   {
@@ -79697,7 +79704,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 29,
-    "risk_sentiment": 44,
+    "risk_sentiment": 45,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
@@ -79827,7 +79834,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 8 ore"
+    "note": "18 voci, la piu' recente di 9 ore"
    },
    {
     "key": "sec_calendario",
@@ -79879,6 +79886,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-19T22:09:11Z"
+  "generated_at": "2026-09-19T22:43:17Z"
  }
 }
