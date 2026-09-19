@@ -1,4 +1,4 @@
-⟦ BUILD v458 · generato 19/09/2026 16:39 ⟧
+⟦ BUILD v458 · generato 19/09/2026 17:23 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 19/09/2026, 16:39:08 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 12:39, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,66% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,47% · Fut S&P -0,72% · BTC +1,11% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~44.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 19/09/2026, 17:23:24 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 13:23, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,66% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,47% · Fut S&P -0,72% · BTC +0,94% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~44.1h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 19/09/2026, 16:39:08, prossimo run 19/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-18 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 19/09/2026, 17:23:24, prossimo run 19/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-18 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-18) · Curva 10A-3M (2026-09-18) · Treasury USA 30A (2026-09-17) · Tasso reale 10A (TIPS) (2026-09-17) · Inflazione attesa 10A (breakeven) (2026-09-18) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -98,9 +98,9 @@ QUADRO MACRO:
 - TITOLI MACRO — 3 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg · lette e senza voci macro in questo run: MarketWatch) · 3 pubblicate DOPO l'ultima chiusura USA del 2026-09-18, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Companies Avoid Selling the Bonds Investors Crave: Credit Weekly
       Investors are clamoring for the kind of debt companies are reluctant to sell now: longer-term bonds.
-    · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Diesel Prices Keep Pressure on Fed and Markets
+    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Diesel Prices Keep Pressure on Fed and Markets
       The Federal Reserve unanimously raised its benchmark rate by a quarter point as policymakers confront inflation that remains above target and uncertainty tied to geopolitical developments. Merrill and Bank of America Head of CIO Market Strategy Joe Quinlan tells Bloomberg This Weekend hosts David Gura and Christina Ruf
-    · [CNBC Economia, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Consumer sentiment is in the dumps despite a solid economy. Goldman Sachs blames 'lower happiness'
+    · [CNBC Economia, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Consumer sentiment is in the dumps despite a solid economy. Goldman Sachs blames 'lower happiness'
       Goldman economist Joseph Briggs said broader pessimism in society may be contributing to struggling consumer sentiment even as the economy chugs along.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-09-30 Inflazione PCE (a/a) (precedente 3.7%) · 2026-09-30 PIL USA (t/t ann.) (precedente 1.5%) · 2026-10-02 Non-Farm Payrolls (precedente +162K) · 2026-10-02 Disoccupazione (precedente 4.1%). ⚠ Per 3 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich), Curva 10A-2A, Treasury USA 30A): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 3 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-3M, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-09-30 MU. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -156,8 +156,8 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 - Tasso EFFETTIVO (EFFR) 3.63% (rilevazione 2026-08-01) — e' dove le banche si prestano DENTRO il target 3,50-3,75% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
-- Will Bitcoin reach $85,000 in September?: 55% [Δ7g —]
-⚠ 4 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
+- Will Bitcoin reach $85,000 in September?: 56% [Δ7g —]
+⚠ 5 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -220,31 +220,31 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (70,9% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 0h fa] Stocks Finish Mostly Higher as Crude Prices Fall
+  [AMD] · [Nasdaq, 1h fa] Stocks Finish Mostly Higher as Crude Prices Fall
       The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...
-  [AMD] · [Nasdaq, 20h fa] Top Research Reports for AMD, Linde & Amgen
+  [AMD] · [Nasdaq, 21h fa] Top Research Reports for AMD, Linde & Amgen
       AMD, Linde and Amgen highlight AI demand, contracted growth and drug launches, while supply, margin and pipeline risks remain key factors.
-  [CRWV] · [Nasdaq, 22h fa] Stocks Settle Sharply Higher as Crude Oil and Bond Yields Fall
+  [CRWV] · [Nasdaq, 23h fa] Stocks Settle Sharply Higher as Crude Oil and Bond Yields Fall
       The S&P 500 Index ($SPX ) (SPY ) closed up by +1.14% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.61%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.73%.  September E-mini S&P futures (ESU26 ) rose +1.10%, and September E-mini...
   [CRWV] · [Nasdaq, 28h fa] Can CoreWeave Turn Its $104.2B Backlog Into Sustained Growth?
       CRWV's $104.2B backlog and surging AI demand support strong growth visibility, but heavy capex, rising interest costs and execution remain key tests.
-  [MRVL] · [Nasdaq, 7h fa] Semiconductor Stocks to Buy and Hold Through 2030
+  [MRVL] · [Nasdaq, 8h fa] Semiconductor Stocks to Buy and Hold Through 2030
       Key PointsNvidia grew revenue 106% year over year to $96.2 billion in its latest quarter, and management is forecasting about 70% revenue growth in fiscal 2028.
-  [MRVL] · [Nasdaq, 21h fa] Bet on These Photonics ETFs to Exploit the Next Wave of AI Revolution
+  [MRVL] · [Nasdaq, 22h fa] Bet on These Photonics ETFs to Exploit the Next Wave of AI Revolution
       Photonics is emerging as a key AI infrastructure technology, with surging investments and growth projections fueling interest in ETFs.
-  [MU] · [Nasdaq, 0h fa] Stocks Finish Mostly Higher as Crude Prices Fall
+  [MU] · [Nasdaq, 1h fa] Stocks Finish Mostly Higher as Crude Prices Fall
       The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...
-  [MU] · [Nasdaq, 1h fa] Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron
+  [MU] · [Nasdaq, 2h fa] Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron
       Key PointsMicron may hold the short-term advantage, but Nvidia is better over the long haul.
-  [NVDA] · [Nasdaq, 1h fa] Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron
+  [NVDA] · [Nasdaq, 2h fa] Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron
       Key PointsMicron may hold the short-term advantage, but Nvidia is better over the long haul.
   [NVDA] · [Nasdaq, 6h fa] If You'd Invested $1,000 in Nvidia's 1999 IPO, Here's How Much You'd Have Today
       Key PointsNvidia debuted at a split-adjusted price of $0.025 per share.
-  [ORCL] · [Nasdaq, 0h fa] Stocks Finish Mostly Higher as Crude Prices Fall
+  [ORCL] · [Nasdaq, 1h fa] Stocks Finish Mostly Higher as Crude Prices Fall
       The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...
-  [ORCL] · [Nasdaq, 17h fa] Stocks Waver as Bond Yields Climb
+  [ORCL] · [Nasdaq, 18h fa] Stocks Waver as Bond Yields Climb
       The S&P 500 Index ($SPX ) (SPY ) is down by -0.11% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down by -0.39%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.09%.  December E-mini S&P futures (ESZ26 ) are down -0.15%, and December E-mini...
-  [RGTI] · [Nasdaq, 27h fa] Here's How Quantum Computing's EQC Approach Supports Growth
+  [RGTI] · [Nasdaq, 28h fa] Here's How Quantum Computing's EQC Approach Supports Growth
       QUBT is advancing quantum computing with its EQC approach, Dirac-3 platform and a new three-year HBKU agreement.
   [RGTI] · [Nasdaq, 43h fa] Prediction: This Quantum Computing Stock Is Going to Plummet Over the Next 12 Months
       Key PointsRigetti Computing developed some of the world's best quantum computing systems, but they still make too many errors to solve real-world problems.
