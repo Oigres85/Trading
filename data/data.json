@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-20T09:31:52Z",
+ "updated_at": "2026-09-20T12:55:26Z",
  "eurusd": 1.149,
  "totals": {
   "usd_value": 0,
@@ -1770,7 +1770,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -4747,7 +4747,7 @@
    "stats": {
     "market_cap": 5367153557504.0,
     "shares": 24147000000.0,
-    "float_shares": 23130698000.0,
+    "float_shares": 23131180000.0,
     "float_pct": 95.8,
     "avg_volume_30d": 129288142.0,
     "pe_ttm": 28.0999,
@@ -4773,10 +4773,7 @@
     "short_float": 0.0129,
     "buyback_yield": 0.0075,
     "ps": 17.72,
-    "ev_s": 17.6,
-    "altman_z": 13.22,
-    "altman_missing": 0,
-    "altman_model": "Z''"
+    "ev_s": 17.6
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -9866,7 +9863,7 @@
    "stats": {
     "market_cap": 446333681664.0,
     "shares": 3023736000.0,
-    "float_shares": 1856573904.0,
+    "float_shares": 1856513429.0,
     "float_pct": 61.4,
     "avg_volume_30d": 33263861.0,
     "pe_ttm": 23.1364,
@@ -9881,7 +9878,7 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0135,
-    "price_to_book": 11.3198,
+    "price_to_book": 7.2209,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
@@ -11795,7 +11792,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -11922,7 +11919,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": 21.1026,
+    "price_to_book": null,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13710,7 +13707,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.001,
-    "price_to_book": 11.5567,
+    "price_to_book": 11.7405,
     "target_mean": 289.0411,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -16687,7 +16684,7 @@
    "stats": {
     "market_cap": 78235303936.0,
     "shares": 294527346.0,
-    "float_shares": 289299486.0,
+    "float_shares": 289296540.0,
     "float_pct": 98.2,
     "avg_volume_30d": 16215558.0,
     "pe_ttm": 344.974,
@@ -21893,11 +21890,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 80345.7,
+   "price": 80373.12,
    "price_asof": "2026-09-20",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -1.09,
+   "change_pct": -1.06,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -36.3,
@@ -21910,11 +21907,11 @@
    "day_low": 80217.06,
    "support": 74944.59,
    "resistance": 82262.21,
-   "rsi": 60.8,
-   "volume": 22376470528,
+   "rsi": 60.9,
+   "volume": 21676752896,
    "vol_ratio": 0.62,
    "atr_14": 2149.51,
-   "atr_pct": 2.68,
+   "atr_pct": 2.67,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21923,7 +21920,7 @@
      76403.77,
      80901.46,
      81233.68,
-     80345.7
+     80373.12
     ],
     "m6": [
      76954.17,
@@ -22051,7 +22048,7 @@
      76403.77,
      80901.46,
      81233.68,
-     80345.7
+     80373.12
     ],
     "all": [
      386.94,
@@ -22198,7 +22195,7 @@
      58558.86,
      62813.75,
      78548.63,
-     80345.7
+     80373.12
     ],
     "m1": [
      77667.57,
@@ -22222,7 +22219,7 @@
      76403.77,
      80901.46,
      81233.68,
-     80345.7
+     80373.12
     ],
     "m3": [
      63899.46,
@@ -22290,7 +22287,7 @@
      76403.77,
      80901.46,
      81233.68,
-     80345.7
+     80373.12
     ],
     "y1": [
      115721.96,
@@ -22366,7 +22363,7 @@
      79823.87,
      76568.12,
      75612.51,
-     80345.7
+     80373.12
     ],
     "d1": [
      81185.72,
@@ -22375,7 +22372,7 @@
      81294.76,
      81300.71,
      81267.32,
-     81235.2,
+     81235.21,
      81106.07,
      81132.41,
      81043.4,
@@ -22386,37 +22383,37 @@
      80986.42,
      80871.98,
      80529.29,
-     80450.98,
-     80338.37,
+     80442.9,
+     80330.96,
      80215.86,
-     80440.49,
-     80353.1,
-     80358.2,
-     80475.66,
-     80478.94,
-     80395.35,
-     80407.2,
-     80409.64,
-     80356.69,
-     80404.43,
-     80446.59,
+     80449.99,
+     80341.02,
+     80361.79,
+     80450.81,
+     80479.27,
+     80405.0,
+     80394.91,
+     80411.35,
+     80353.61,
+     80404.44,
+     80445.6,
      80561.46,
-     80413.91,
-     80559.69,
-     80504.86,
-     80430.23,
-     80397.49,
+     80411.77,
+     80559.68,
+     80504.87,
+     80430.24,
+     80397.47,
      80485.22,
      80470.03,
      80422.07,
      80345.77,
-     80261.92,
-     80272.51,
-     80317.09,
+     80261.91,
+     80272.48,
+     80326.44,
      80355.91,
      80331.58,
-     80310.43,
-     80294.25,
+     80310.73,
+     80299.99,
      80421.49,
      80388.2,
      80361.04,
@@ -22425,7 +22422,28 @@
      80224.14,
      80266.0,
      80230.76,
-     80328.39
+     80328.39,
+     80467.27,
+     80512.83,
+     80421.67,
+     80458.28,
+     80360.96,
+     80306.93,
+     80351.45,
+     80322.9,
+     80335.51,
+     80286.94,
+     80334.11,
+     80330.09,
+     80395.79,
+     80426.99,
+     80493.33,
+     80439.49,
+     80451.0,
+     80351.22,
+     80319.32,
+     80320.53,
+     80372.48
     ]
    },
    "earnings_date": null,
@@ -22439,7 +22457,7 @@
    "sharpe_6m": 0.12,
    "sortino_6m": 0.18,
    "prepost": null,
-   "prezzo_limite_aggiustato": 80345.7,
+   "prezzo_limite_aggiustato": 80373.12,
    "risk_reward": "1:0.4",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22452,22 +22470,22 @@
     "w1": {
      "support": 74995.52,
      "resistance": 81911.14,
-     "change_pct": 5.51
+     "change_pct": 5.55
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 3.45
+     "change_pct": 3.48
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 25.74
+     "change_pct": 25.78
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -11.89
+     "change_pct": -11.86
     }
    },
    "financials": [],
@@ -22494,74 +22512,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 80345.7,
+     "prezzo": 80373.12,
      "medie": {
       "sma10": {
-       "liv": 78009.32,
-       "dist_pct": 2.99
+       "liv": 78012.07,
+       "dist_pct": 3.03
       },
       "ema10": {
-       "liv": 78741.37,
-       "dist_pct": 2.04
+       "liv": 78746.36,
+       "dist_pct": 2.07
       },
       "sma20": {
-       "liv": 78414.85,
-       "dist_pct": 2.46
+       "liv": 78416.22,
+       "dist_pct": 2.5
       },
       "ema20": {
-       "liv": 77876.17,
-       "dist_pct": 3.17
+       "liv": 77878.78,
+       "dist_pct": 3.2
       },
       "sma30": {
-       "liv": 78408.08,
-       "dist_pct": 2.47
+       "liv": 78409.0,
+       "dist_pct": 2.5
       },
       "ema30": {
-       "liv": 76706.59,
-       "dist_pct": 4.74
+       "liv": 76708.36,
+       "dist_pct": 4.78
       },
       "sma50": {
-       "liv": 73192.75,
-       "dist_pct": 9.77
+       "liv": 73193.3,
+       "dist_pct": 9.81
       },
       "ema50": {
-       "liv": 74483.59,
-       "dist_pct": 7.87
+       "liv": 74484.67,
+       "dist_pct": 7.91
       },
       "sma100": {
-       "liv": 68281.37,
-       "dist_pct": 17.67
+       "liv": 68281.65,
+       "dist_pct": 17.71
       },
       "ema100": {
-       "liv": 72009.0,
-       "dist_pct": 11.58
+       "liv": 72009.55,
+       "dist_pct": 11.61
       },
       "sma200": {
-       "liv": 70500.33,
-       "dist_pct": 13.97
+       "liv": 70500.47,
+       "dist_pct": 14.0
       },
       "ema200": {
-       "liv": 73606.39,
-       "dist_pct": 9.16
+       "liv": 73606.67,
+       "dist_pct": 9.19
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 60.8,
+      "rsi14": 60.9,
       "macd": {
-       "linea": 1382.01,
-       "segnale": 1459.66,
-       "istogramma": -77.65
+       "linea": 1384.19,
+       "segnale": 1460.1,
+       "istogramma": -75.9
       },
-      "stoch_k": 77.5,
-      "stoch_d": 87.0,
-      "williams_r": -22.5,
-      "cci20": 64.5,
+      "stoch_k": 77.9,
+      "stoch_d": 87.2,
+      "williams_r": -22.1,
+      "cci20": 64.7,
       "adx14": 41.6,
       "di_su": 36.4,
       "di_giu": 14.0,
-      "momentum10": 3777.58
+      "momentum10": 3804.99
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23054,19 +23072,19 @@
       "o": 81226.62,
       "h": 81301.8,
       "l": 80217.06,
-      "c": 80345.7
+      "c": 80373.12
      }
     ],
     "performance": {
-     "s1": 6.26,
-     "m1": 2.68,
-     "m3": 25.95,
-     "m6": 3.77,
-     "a1": -11.54,
-     "ytd": -9.45,
-     "a3": 197.93,
-     "a5": 83.48,
-     "a10": 13077.15
+     "s1": 6.3,
+     "m1": 2.72,
+     "m3": 26.0,
+     "m6": 3.8,
+     "a1": -11.51,
+     "ytd": -9.42,
+     "a3": 198.03,
+     "a5": 83.54,
+     "a10": 13081.65
     },
     "stagionalita": [
      {
@@ -23144,7 +23162,7 @@
      {
       "mese": 9,
       "media": -1.48,
-      "mediana": -0.4,
+      "mediana": -0.38,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
@@ -47439,6 +47457,27 @@
   "news": {
    "voci": [
     {
+     "titolo": "Qatar Airways Bets on Fleet and Cargo Growth",
+     "riassunto": "Joining Bloomberg This Weekend, Qatar Airways Group CEO Hamad Ali Al-Khater says passenger demand remains resilient despite regional conflict and sharply higher jet fuel costs, with travelers booking closer to departure and the carrier shifting capacity toward its most profitable routes. The airline plans to take deliv",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-20T12:39:35Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-20/qatar-airways-bets-on-fleet-and-cargo-growth-video"
+    },
+    {
+     "titolo": "EM Investors Are Favoring Local Bonds as Dollar Debt Lags",
+     "riassunto": "Emerging-market investors are for now sticking with local-currency sovereign debt as surging Treasury yields dim the appeal of dollar-denominated developing-nation bonds.",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-20T12:30:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-20/em-investors-are-favoring-local-bonds-as-dollar-debt-lags"
+    },
+    {
+     "titolo": "China is chasing SpaceX and setting its sights on the global space economy",
+     "riassunto": "Chinese space-technology players are closing in on Elon Musk’s company and looking to grow their reach, experts say.",
+     "fonte": "MarketWatch",
+     "quando": "2026-09-20T12:00:00Z",
+     "url": "https://www.marketwatch.com/story/china-is-chasing-spacex-and-setting-its-sights-on-the-global-space-economy-3b9e37ff?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "Yen Is Vulnerable With Japan on Holiday After BOJ Disappoints",
      "riassunto": "The yen is vulnerable to sharp moves and further declines over the next week, with a three-day holiday in Japan set to reduce trading liquidity and investors disappointed that the central bank didn’t offer stronger guidance on the pace of future interest rate hikes.",
      "fonte": "Bloomberg",
@@ -47472,13 +47511,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-09-19T14:00:00Z",
      "url": "https://www.bloomberg.com/news/articles/2026-09-19/companies-avoid-selling-the-bonds-investors-crave-credit-weekly"
-    },
-    {
-     "titolo": "Diesel Prices Keep Pressure on Fed and Markets",
-     "riassunto": "The Federal Reserve unanimously raised its benchmark rate by a quarter point as policymakers confront inflation that remains above target and uncertainty tied to geopolitical developments. Merrill and Bank of America Head of CIO Market Strategy Joe Quinlan tells Bloomberg This Weekend hosts David Gura and Christina Ruf",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-19T13:40:40Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-09-19/diesel-prices-keep-pressure-on-fed-and-markets-video"
     },
     {
      "titolo": "Consumer sentiment is in the dumps despite a solid economy. Goldman Sachs blames 'lower happiness'",
@@ -47549,29 +47581,14 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-12T12:49:15Z",
      "url": "https://www.cnbc.com/2026/09/12/inflation-is-outpacing-wage-growth-again-squeezing-americans-paychecks.html"
-    },
-    {
-     "titolo": "Consumer outlook plunges in September as inflation outlook worsens",
-     "riassunto": "The survey's headline index hit a level of 47.8, down 7.5% from the August reading and off 13.2% from a year ago.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-11T16:53:23Z",
-     "url": "https://www.cnbc.com/2026/09/11/consumer-outlook-plunges-in-september-as-inflation-outlook-worsens.html"
-    },
-    {
-     "titolo": "Record U.S. cyclosporiasis outbreak is over, CDC says",
-     "riassunto": "The largest outbreak, linked to shredded iceberg lettuce from Taylor Farms, sickened more than 12,000 people.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-11T15:36:45Z",
-     "url": "https://www.cnbc.com/2026/09/11/cdc-record-cyclosporiasis-outbreak-over.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
-    "Bloomberg"
-   ],
-   "fonti_mute": [
+    "Bloomberg",
     "MarketWatch"
    ],
+   "fonti_mute": [],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -52455,7 +52472,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 39
+     "score": 40
     },
     {
      "label": "Treasury 10A",
@@ -52934,7 +52951,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": 69700000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-18",
     "price": 204.56,
     "d1": -1.21,
@@ -53100,7 +53117,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-18",
     "price": 168.39,
     "d1": -0.25,
@@ -53183,7 +53200,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": 272056000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-18",
     "price": 189.6,
     "d1": 0.82,
@@ -53489,7 +53506,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-18",
     "price": 573.0,
     "d1": 2.21,
@@ -53904,7 +53921,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": 120253000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-18",
     "price": 111.03,
     "d1": -0.32,
@@ -53987,7 +54004,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-18",
     "price": 80.27,
     "d1": -0.66,
@@ -57397,6 +57414,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "3 AI Stocks to Buy Before the Next Fed Rate Decision",
+      "riassunto": "Key PointsQualcomm is expanding from mobile chips into AI PCs and hyperscale data centers.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T11:40:00Z",
+      "url": "https://www.nasdaq.com/articles/3-ai-stocks-buy-next-fed-rate-decision"
+     },
+     {
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -57430,13 +57454,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T18:52:31Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-crude-oil-and-bond-yields-fall"
-     },
-     {
-      "titolo": "2 Stocks Breaking Out Post-FOMC With One Thing in Common",
-      "riassunto": "The Federal Reserve delivered its interest rate decision on Wednesday, Sept. 16, and the market's response in the following session was telling. As stocks pushed higher on Thursday, Sept. 17, all but confirming a post-FOMC bear trap, two AI-related names in particular broke out",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T16:05:00Z",
-      "url": "https://www.nasdaq.com/articles/2-stocks-breaking-out-post-fomc-one-thing-common"
      }
     ],
     "BE": [
@@ -57529,6 +57546,27 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Greg Abel Recently Plowed $4.2 Billion Into Warren Buffett's Favorite Stock, and It Wasn't Apple",
+      "riassunto": "Key PointsBuffett guided the Berkshire Hathaway holding company to market-beating returns from 1965 to 2025.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T11:10:00Z",
+      "url": "https://www.nasdaq.com/articles/greg-abel-recently-plowed-42-billion-warren-buffetts-favorite-stock-and-it-wasnt-apple"
+     },
+     {
+      "titolo": "Prediction: Anthropic's IPO Will Be a Big Winner for Alphabet and Amazon Investors",
+      "riassunto": "Key PointsAmazon and Alphabet will both benefit from their early, large investments in Anthropic.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T09:35:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
+     },
+     {
+      "titolo": "The Stock Market Has Been Sending a Quiet Warning Signal for Years. Here's What History Says Comes Next.",
+      "riassunto": "Key PointsTech companies have soared in value, dominating major indexes.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T07:50:00Z",
+      "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
+     },
+     {
       "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
       "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
       "fonte": "Nasdaq",
@@ -57548,30 +57586,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-19T12:17:00Z",
       "url": "https://www.nasdaq.com/articles/ray-dalio-just-explained-why-hes-cautious-ai-stocks-heres-what-he-said"
-     },
-     {
-      "titolo": "Is Walt Disney Stock a Buy, Sell, or Hold 47% Below Its All-Time High?",
-      "riassunto": "Key PointsThe ongoing fall of the cable-TV industry has been a significant headwind that Disney continues to face.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T12:05:00Z",
-      "url": "https://www.nasdaq.com/articles/walt-disney-stock-buy-sell-or-hold-47-below-its-all-time-high"
-     },
-     {
-      "titolo": "Cathie Wood Is Selling 2 Magnificent Seven Stocks, but Piling Into Another",
-      "riassunto": "Key PointsIn recent days, Wood has sold shares of Alphabet and Amazon.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T09:25:00Z",
-      "url": "https://www.nasdaq.com/articles/cathie-wood-selling-2-magnificent-seven-stocks-piling-another"
-     },
-     {
-      "titolo": "Sam Altman Admits the AI Industry Has Done &quot;a Terrible Job&quot; Explaining Its Benefits Amid Growing Backlash. Should That Worry Nvidia and Microsoft Investors?",
-      "riassunto": "Key PointsMost people know what modern-day artificial intelligence is. They just don't understand why it matters to them.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T08:50:00Z",
-      "url": "https://www.nasdaq.com/articles/sam-altman-admits-ai-industry-has-done-terrible-job-explaining-its-benefits-amid-growing"
      }
     ],
     "MRVL": [
+     {
+      "titolo": "3 AI Stocks to Buy Before the Next Fed Rate Decision",
+      "riassunto": "Key PointsQualcomm is expanding from mobile chips into AI PCs and hyperscale data centers.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T11:40:00Z",
+      "url": "https://www.nasdaq.com/articles/3-ai-stocks-buy-next-fed-rate-decision"
+     },
      {
       "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
       "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
@@ -57606,16 +57630,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T17:14:00Z",
       "url": "https://www.nasdaq.com/articles/aphs-ai-datacom-strength-grows-can-it-challenge-tel-mrvl"
-     },
-     {
-      "titolo": "Can GFS' Marvell Deal for SiGe Capacity Expansion Accelerate Growth?",
-      "riassunto": "GlobalFoundries is boosting SiGe capacity for MRVL as AI and cloud data centers drive demand for high-speed optical connectivity.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T15:19:00Z",
-      "url": "https://www.nasdaq.com/articles/can-gfs-marvell-deal-sige-capacity-expansion-accelerate-growth"
      }
     ],
     "MSTR": [
+     {
+      "titolo": "Strategy Is Up 53% in the Past Month. Here's the Bull and Bear Case for One of Wall Street's Most Polarizing Stocks.",
+      "riassunto": "Key PointsAs they have done in the past, Strategy shares can outperform Bitcoin.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T10:50:00Z",
+      "url": "https://www.nasdaq.com/articles/strategy-53-past-month-heres-bull-and-bear-case-one-wall-streets-most-polarizing-stocks"
+     },
      {
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
@@ -57650,16 +57674,30 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T16:44:56Z",
       "url": "https://www.nasdaq.com/articles/fridays-etf-movers-blok-bug"
-     },
-     {
-      "titolo": "Nasdaq 100 Movers: NFLX, HONIV",
-      "riassunto": "In early trading on Friday, shares of Honeywell International topped the list of the day's best performing components of the Nasdaq 100 index, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing Nasdaq 100 component thus far",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T14:22:25Z",
-      "url": "https://www.nasdaq.com/articles/nasdaq-100-movers-nflx-honiv-0"
      }
     ],
     "MU": [
+     {
+      "titolo": "Should You Buy Micron Stock Before Its Next Earnings Report?",
+      "riassunto": "Key PointsWall Street expects Micron to report record earnings later this month.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T09:50:00Z",
+      "url": "https://www.nasdaq.com/articles/should-you-buy-micron-stock-its-next-earnings-report"
+     },
+     {
+      "titolo": "3 Stocks Bound to Ignore The September Effect",
+      "riassunto": "Key PointsNvidia and Broadcom see huge growth in the AI computing market.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T08:20:00Z",
+      "url": "https://www.nasdaq.com/articles/3-stocks-bound-ignore-september-effect"
+     },
+     {
+      "titolo": "The Stock Market Has Been Sending a Quiet Warning Signal for Years. Here's What History Says Comes Next.",
+      "riassunto": "Key PointsTech companies have soared in value, dominating major indexes.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T07:50:00Z",
+      "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
+     },
      {
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
@@ -57680,30 +57718,37 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-19T15:50:00Z",
       "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-ai-stock-pick-2027-nvidia-versus-micron"
-     },
-     {
-      "titolo": "Is Micron's 9% Dip a Warning Sign or Buying Opportunity?",
-      "riassunto": "Key PointsShares of Micron are still up approximately 485% in the past year.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T12:55:00Z",
-      "url": "https://www.nasdaq.com/articles/microns-9-dip-warning-sign-or-buying-opportunity"
-     },
-     {
-      "titolo": "Semiconductor Stocks to Buy and Hold Through 2030",
-      "riassunto": "Key PointsNvidia grew revenue 106% year over year to $96.2 billion in its latest quarter, and management is forecasting about 70% revenue growth in fiscal 2028.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T09:37:01Z",
-      "url": "https://www.nasdaq.com/articles/semiconductor-stocks-buy-and-hold-through-2030"
-     },
-     {
-      "titolo": "Stocks Waver as Bond Yields Climb",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -0.11% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down by -0.39%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.09%.  December E-mini S&P futures (ESZ26 ) are down -0.15%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T23:29:58Z",
-      "url": "https://www.nasdaq.com/articles/stocks-waver-bond-yields-climb"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Prediction: Anthropic's IPO Will Be a Big Winner for Alphabet and Amazon Investors",
+      "riassunto": "Key PointsAmazon and Alphabet will both benefit from their early, large investments in Anthropic.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T09:35:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
+     },
+     {
+      "titolo": "Nvidia Stock Hasn't Set a Record in 4 Months. History Says These Stalls Have Ended 2 Ways.",
+      "riassunto": "Key PointsNvidia's last record close was $235.74 on May 14, and shares sit about 9% below that level as of this writing.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T09:28:01Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-stock-hasnt-set-record-4-months-history-says-these-stalls-have-ended-2-ways"
+     },
+     {
+      "titolo": "3 Stocks Bound to Ignore The September Effect",
+      "riassunto": "Key PointsNvidia and Broadcom see huge growth in the AI computing market.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T08:20:00Z",
+      "url": "https://www.nasdaq.com/articles/3-stocks-bound-ignore-september-effect"
+     },
+     {
+      "titolo": "The Stock Market Has Been Sending a Quiet Warning Signal for Years. Here's What History Says Comes Next.",
+      "riassunto": "Key PointsTech companies have soared in value, dominating major indexes.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T07:50:00Z",
+      "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
+     },
      {
       "titolo": "Applied Materials vs. Nvidia: Which Tech Stock Is a Better Buy in 2026?",
       "riassunto": "Key PointsApplied Materials is a leading provider of engineering solutions for the global semiconductor industry.",
@@ -57717,34 +57762,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-19T23:26:00Z",
       "url": "https://www.nasdaq.com/articles/unpacking-stock-markets-coiled-spring-set"
-     },
-     {
-      "titolo": "Should Investors Be Worried About an AI Bubble? Here's What History Says.",
-      "riassunto": "Key PointsThe last big technology bubble was the dot-com mania at the turn of the century.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T20:35:00Z",
-      "url": "https://www.nasdaq.com/articles/should-investors-be-worried-about-ai-bubble-heres-what-history-says"
-     },
-     {
-      "titolo": "The Unexpected Rival Threatening to Shake Up CoreWeave's Market",
-      "riassunto": "Key PointsIren is taking a thoughtful and gradual approach to grow AI infrastructure.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T17:47:00Z",
-      "url": "https://www.nasdaq.com/articles/unexpected-rival-threatening-shake-coreweaves-market"
-     },
-     {
-      "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
-      "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T17:05:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-nvidia-backed-artificial-intelligence-ai-stock-could-10x-2033"
-     },
-     {
-      "titolo": "Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron",
-      "riassunto": "Key PointsMicron may hold the short-term advantage, but Nvidia is better over the long haul.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T15:50:00Z",
-      "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-ai-stock-pick-2027-nvidia-versus-micron"
      }
     ],
     "ORCL": [
@@ -57947,13 +57964,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-20T09:31:52Z"
+   "letto_il": "2026-09-20T12:55:26Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "3 AI Stocks to Buy Before the Next Fed Rate Decision",
+     "riassunto": "Key PointsQualcomm is expanding from mobile chips into AI PCs and hyperscale data centers.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T11:40:00Z",
+     "url": "https://www.nasdaq.com/articles/3-ai-stocks-buy-next-fed-rate-decision"
+    },
     {
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
@@ -57988,13 +58012,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T18:52:31Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-crude-oil-and-bond-yields-fall"
-    },
-    {
-     "titolo": "2 Stocks Breaking Out Post-FOMC With One Thing in Common",
-     "riassunto": "The Federal Reserve delivered its interest rate decision on Wednesday, Sept. 16, and the market's response in the following session was telling. As stocks pushed higher on Thursday, Sept. 17, all but confirming a post-FOMC bear trap, two AI-related names in particular broke out",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T16:05:00Z",
-     "url": "https://www.nasdaq.com/articles/2-stocks-breaking-out-post-fomc-one-thing-common"
     }
    ],
    "BE": [
@@ -58087,6 +58104,27 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Greg Abel Recently Plowed $4.2 Billion Into Warren Buffett's Favorite Stock, and It Wasn't Apple",
+     "riassunto": "Key PointsBuffett guided the Berkshire Hathaway holding company to market-beating returns from 1965 to 2025.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T11:10:00Z",
+     "url": "https://www.nasdaq.com/articles/greg-abel-recently-plowed-42-billion-warren-buffetts-favorite-stock-and-it-wasnt-apple"
+    },
+    {
+     "titolo": "Prediction: Anthropic's IPO Will Be a Big Winner for Alphabet and Amazon Investors",
+     "riassunto": "Key PointsAmazon and Alphabet will both benefit from their early, large investments in Anthropic.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T09:35:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
+    },
+    {
+     "titolo": "The Stock Market Has Been Sending a Quiet Warning Signal for Years. Here's What History Says Comes Next.",
+     "riassunto": "Key PointsTech companies have soared in value, dominating major indexes.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T07:50:00Z",
+     "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
+    },
+    {
      "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
      "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
      "fonte": "Nasdaq",
@@ -58106,30 +58144,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-19T12:17:00Z",
      "url": "https://www.nasdaq.com/articles/ray-dalio-just-explained-why-hes-cautious-ai-stocks-heres-what-he-said"
-    },
-    {
-     "titolo": "Is Walt Disney Stock a Buy, Sell, or Hold 47% Below Its All-Time High?",
-     "riassunto": "Key PointsThe ongoing fall of the cable-TV industry has been a significant headwind that Disney continues to face.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T12:05:00Z",
-     "url": "https://www.nasdaq.com/articles/walt-disney-stock-buy-sell-or-hold-47-below-its-all-time-high"
-    },
-    {
-     "titolo": "Cathie Wood Is Selling 2 Magnificent Seven Stocks, but Piling Into Another",
-     "riassunto": "Key PointsIn recent days, Wood has sold shares of Alphabet and Amazon.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T09:25:00Z",
-     "url": "https://www.nasdaq.com/articles/cathie-wood-selling-2-magnificent-seven-stocks-piling-another"
-    },
-    {
-     "titolo": "Sam Altman Admits the AI Industry Has Done &quot;a Terrible Job&quot; Explaining Its Benefits Amid Growing Backlash. Should That Worry Nvidia and Microsoft Investors?",
-     "riassunto": "Key PointsMost people know what modern-day artificial intelligence is. They just don't understand why it matters to them.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T08:50:00Z",
-     "url": "https://www.nasdaq.com/articles/sam-altman-admits-ai-industry-has-done-terrible-job-explaining-its-benefits-amid-growing"
     }
    ],
    "MRVL": [
+    {
+     "titolo": "3 AI Stocks to Buy Before the Next Fed Rate Decision",
+     "riassunto": "Key PointsQualcomm is expanding from mobile chips into AI PCs and hyperscale data centers.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T11:40:00Z",
+     "url": "https://www.nasdaq.com/articles/3-ai-stocks-buy-next-fed-rate-decision"
+    },
     {
      "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
      "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
@@ -58164,16 +58188,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T17:14:00Z",
      "url": "https://www.nasdaq.com/articles/aphs-ai-datacom-strength-grows-can-it-challenge-tel-mrvl"
-    },
-    {
-     "titolo": "Can GFS' Marvell Deal for SiGe Capacity Expansion Accelerate Growth?",
-     "riassunto": "GlobalFoundries is boosting SiGe capacity for MRVL as AI and cloud data centers drive demand for high-speed optical connectivity.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T15:19:00Z",
-     "url": "https://www.nasdaq.com/articles/can-gfs-marvell-deal-sige-capacity-expansion-accelerate-growth"
     }
    ],
    "MSTR": [
+    {
+     "titolo": "Strategy Is Up 53% in the Past Month. Here's the Bull and Bear Case for One of Wall Street's Most Polarizing Stocks.",
+     "riassunto": "Key PointsAs they have done in the past, Strategy shares can outperform Bitcoin.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T10:50:00Z",
+     "url": "https://www.nasdaq.com/articles/strategy-53-past-month-heres-bull-and-bear-case-one-wall-streets-most-polarizing-stocks"
+    },
     {
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
@@ -58208,16 +58232,30 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T16:44:56Z",
      "url": "https://www.nasdaq.com/articles/fridays-etf-movers-blok-bug"
-    },
-    {
-     "titolo": "Nasdaq 100 Movers: NFLX, HONIV",
-     "riassunto": "In early trading on Friday, shares of Honeywell International topped the list of the day's best performing components of the Nasdaq 100 index, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing Nasdaq 100 component thus far",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T14:22:25Z",
-     "url": "https://www.nasdaq.com/articles/nasdaq-100-movers-nflx-honiv-0"
     }
    ],
    "MU": [
+    {
+     "titolo": "Should You Buy Micron Stock Before Its Next Earnings Report?",
+     "riassunto": "Key PointsWall Street expects Micron to report record earnings later this month.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T09:50:00Z",
+     "url": "https://www.nasdaq.com/articles/should-you-buy-micron-stock-its-next-earnings-report"
+    },
+    {
+     "titolo": "3 Stocks Bound to Ignore The September Effect",
+     "riassunto": "Key PointsNvidia and Broadcom see huge growth in the AI computing market.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T08:20:00Z",
+     "url": "https://www.nasdaq.com/articles/3-stocks-bound-ignore-september-effect"
+    },
+    {
+     "titolo": "The Stock Market Has Been Sending a Quiet Warning Signal for Years. Here's What History Says Comes Next.",
+     "riassunto": "Key PointsTech companies have soared in value, dominating major indexes.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T07:50:00Z",
+     "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
+    },
     {
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
@@ -58238,30 +58276,37 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-19T15:50:00Z",
      "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-ai-stock-pick-2027-nvidia-versus-micron"
-    },
-    {
-     "titolo": "Is Micron's 9% Dip a Warning Sign or Buying Opportunity?",
-     "riassunto": "Key PointsShares of Micron are still up approximately 485% in the past year.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T12:55:00Z",
-     "url": "https://www.nasdaq.com/articles/microns-9-dip-warning-sign-or-buying-opportunity"
-    },
-    {
-     "titolo": "Semiconductor Stocks to Buy and Hold Through 2030",
-     "riassunto": "Key PointsNvidia grew revenue 106% year over year to $96.2 billion in its latest quarter, and management is forecasting about 70% revenue growth in fiscal 2028.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T09:37:01Z",
-     "url": "https://www.nasdaq.com/articles/semiconductor-stocks-buy-and-hold-through-2030"
-    },
-    {
-     "titolo": "Stocks Waver as Bond Yields Climb",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -0.11% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down by -0.39%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.09%.  December E-mini S&P futures (ESZ26 ) are down -0.15%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T23:29:58Z",
-     "url": "https://www.nasdaq.com/articles/stocks-waver-bond-yields-climb"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Prediction: Anthropic's IPO Will Be a Big Winner for Alphabet and Amazon Investors",
+     "riassunto": "Key PointsAmazon and Alphabet will both benefit from their early, large investments in Anthropic.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T09:35:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
+    },
+    {
+     "titolo": "Nvidia Stock Hasn't Set a Record in 4 Months. History Says These Stalls Have Ended 2 Ways.",
+     "riassunto": "Key PointsNvidia's last record close was $235.74 on May 14, and shares sit about 9% below that level as of this writing.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T09:28:01Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-stock-hasnt-set-record-4-months-history-says-these-stalls-have-ended-2-ways"
+    },
+    {
+     "titolo": "3 Stocks Bound to Ignore The September Effect",
+     "riassunto": "Key PointsNvidia and Broadcom see huge growth in the AI computing market.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T08:20:00Z",
+     "url": "https://www.nasdaq.com/articles/3-stocks-bound-ignore-september-effect"
+    },
+    {
+     "titolo": "The Stock Market Has Been Sending a Quiet Warning Signal for Years. Here's What History Says Comes Next.",
+     "riassunto": "Key PointsTech companies have soared in value, dominating major indexes.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T07:50:00Z",
+     "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
+    },
     {
      "titolo": "Applied Materials vs. Nvidia: Which Tech Stock Is a Better Buy in 2026?",
      "riassunto": "Key PointsApplied Materials is a leading provider of engineering solutions for the global semiconductor industry.",
@@ -58275,34 +58320,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-19T23:26:00Z",
      "url": "https://www.nasdaq.com/articles/unpacking-stock-markets-coiled-spring-set"
-    },
-    {
-     "titolo": "Should Investors Be Worried About an AI Bubble? Here's What History Says.",
-     "riassunto": "Key PointsThe last big technology bubble was the dot-com mania at the turn of the century.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T20:35:00Z",
-     "url": "https://www.nasdaq.com/articles/should-investors-be-worried-about-ai-bubble-heres-what-history-says"
-    },
-    {
-     "titolo": "The Unexpected Rival Threatening to Shake Up CoreWeave's Market",
-     "riassunto": "Key PointsIren is taking a thoughtful and gradual approach to grow AI infrastructure.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T17:47:00Z",
-     "url": "https://www.nasdaq.com/articles/unexpected-rival-threatening-shake-coreweaves-market"
-    },
-    {
-     "titolo": "Prediction: This Nvidia-Backed Artificial Intelligence (AI) Stock Could 10X by 2033",
-     "riassunto": "Key PointsNvidia CEO Jensen Huang has predicted that Marvell will be the next trillion-dollar stock.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T17:05:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-nvidia-backed-artificial-intelligence-ai-stock-could-10x-2033"
-    },
-    {
-     "titolo": "Better Artificial Intelligence (AI) Stock Pick for 2027: Nvidia versus Micron",
-     "riassunto": "Key PointsMicron may hold the short-term advantage, but Nvidia is better over the long haul.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T15:50:00Z",
-     "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-ai-stock-pick-2027-nvidia-versus-micron"
     }
    ],
    "ORCL": [
@@ -58505,33 +58522,13 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-20T09:31:52Z"
+  "letto_il": "2026-09-20T12:55:26Z"
  },
  "predictions": [
   {
    "question": "Will the price of Bitcoin be above $80,000 on September 20?",
-   "yes": 83,
+   "yes": 92,
    "link": "https://polymarket.com/event/bitcoin-above-80k-on-september-20-2026"
-  },
-  {
-   "question": "Bitcoin Up or Down on September 20?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-20-2026"
-  },
-  {
-   "question": "Will Bitcoin reach $85,000 in September?",
-   "yes": 34,
-   "link": "https://polymarket.com/event/will-bitcoin-reach-85k-in-september-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $76,000 on September 20?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-20-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $78,000 on September 20?",
-   "yes": 99,
-   "link": "https://polymarket.com/event/bitcoin-above-78k-on-september-20-2026"
   }
  ],
  "options": {
@@ -79426,7 +79423,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 2 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -79478,6 +79475,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-20T09:31:52Z"
+  "generated_at": "2026-09-20T12:55:27Z"
  }
 }
