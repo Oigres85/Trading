@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-20T17:51:18Z",
+ "updated_at": "2026-09-20T18:31:39Z",
  "eurusd": 1.149,
  "totals": {
   "usd_value": 0,
@@ -6162,7 +6162,7 @@
      60.78,
      61.01,
      59.79,
-     54.01,
+     54.02,
      54.96,
      51.76,
      55.76,
@@ -21893,11 +21893,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81300.0,
+   "price": 81272.58,
    "price_asof": "2026-09-20",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.08,
+   "change_pct": 0.05,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -35.6,
@@ -21906,14 +21906,14 @@
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -35.6,
-   "day_high": 81395.25,
+   "day_high": 81371.77,
    "day_low": 80217.06,
    "support": 74944.59,
    "resistance": 82262.21,
-   "rsi": 64.5,
-   "volume": 21472483328,
+   "rsi": 64.4,
+   "volume": 21515855872,
    "vol_ratio": 0.62,
-   "atr_14": 2156.18,
+   "atr_14": 2154.5,
    "atr_pct": 2.65,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -21923,7 +21923,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81300.0
+     81272.58
     ],
     "m6": [
      76954.17,
@@ -22051,7 +22051,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81300.0
+     81272.58
     ],
     "all": [
      386.94,
@@ -22198,7 +22198,7 @@
      58558.86,
      62813.75,
      78548.63,
-     81300.0
+     81272.58
     ],
     "m1": [
      77667.57,
@@ -22222,7 +22222,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81300.0
+     81272.58
     ],
     "m3": [
      63899.46,
@@ -22290,7 +22290,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81300.0
+     81272.58
     ],
     "y1": [
      115721.96,
@@ -22366,7 +22366,7 @@
      79823.87,
      76568.12,
      75612.51,
-     81300.0
+     81272.58
     ],
     "d1": [
      81185.72,
@@ -22475,7 +22475,12 @@
      81222.66,
      81228.0,
      81241.29,
-     81367.2
+     81367.2,
+     81115.29,
+     81070.72,
+     81083.91,
+     81163.78,
+     81272.58
     ]
    },
    "earnings_date": null,
@@ -22489,7 +22494,7 @@
    "sharpe_6m": 0.19,
    "sortino_6m": 0.29,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81300.0,
+   "prezzo_limite_aggiustato": 81272.58,
    "risk_reward": "1:0.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22502,22 +22507,22 @@
     "w1": {
      "support": 74995.52,
      "resistance": 81911.14,
-     "change_pct": 6.76
+     "change_pct": 6.73
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 4.68
+     "change_pct": 4.64
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 27.23
+     "change_pct": 27.19
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.85
+     "change_pct": -10.88
     }
    },
    "financials": [],
@@ -22544,74 +22549,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81300.0,
+     "prezzo": 81272.58,
      "medie": {
       "sma10": {
-       "liv": 78104.75,
-       "dist_pct": 4.09
+       "liv": 78102.01,
+       "dist_pct": 4.06
       },
       "ema10": {
-       "liv": 78914.88,
-       "dist_pct": 3.02
+       "liv": 78909.89,
+       "dist_pct": 2.99
       },
       "sma20": {
-       "liv": 78462.57,
-       "dist_pct": 3.62
+       "liv": 78461.2,
+       "dist_pct": 3.58
       },
       "ema20": {
-       "liv": 77967.06,
-       "dist_pct": 4.27
+       "liv": 77964.45,
+       "dist_pct": 4.24
       },
       "sma30": {
-       "liv": 78439.89,
-       "dist_pct": 3.65
+       "liv": 78438.98,
+       "dist_pct": 3.61
       },
       "ema30": {
-       "liv": 76768.16,
-       "dist_pct": 5.9
+       "liv": 76766.39,
+       "dist_pct": 5.87
       },
       "sma50": {
-       "liv": 73211.83,
-       "dist_pct": 11.05
+       "liv": 73211.29,
+       "dist_pct": 11.01
       },
       "ema50": {
-       "liv": 74521.01,
-       "dist_pct": 9.1
+       "liv": 74519.94,
+       "dist_pct": 9.06
       },
       "sma100": {
-       "liv": 68290.91,
-       "dist_pct": 19.05
+       "liv": 68290.64,
+       "dist_pct": 19.01
       },
       "ema100": {
-       "liv": 72027.9,
-       "dist_pct": 12.87
+       "liv": 72027.36,
+       "dist_pct": 12.84
       },
       "sma200": {
-       "liv": 70505.1,
-       "dist_pct": 15.31
+       "liv": 70504.96,
+       "dist_pct": 15.27
       },
       "ema200": {
-       "liv": 73615.89,
-       "dist_pct": 10.44
+       "liv": 73615.62,
+       "dist_pct": 10.4
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 64.5,
+      "rsi14": 64.4,
       "macd": {
-       "linea": 1458.13,
-       "segnale": 1474.89,
-       "istogramma": -16.75
+       "linea": 1455.95,
+       "segnale": 1474.45,
+       "istogramma": -18.5
       },
-      "stoch_k": 91.2,
-      "stoch_d": 91.6,
-      "williams_r": -8.8,
-      "cci20": 73.7,
+      "stoch_k": 90.8,
+      "stoch_d": 91.5,
+      "williams_r": -9.2,
+      "cci20": 73.2,
       "adx14": 41.6,
-      "di_su": 36.3,
+      "di_su": 36.4,
       "di_giu": 14.0,
-      "momentum10": 4731.88
+      "momentum10": 4704.45
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23102,21 +23107,21 @@
      {
       "d": "2026-09-20",
       "o": 81226.62,
-      "h": 81395.25,
+      "h": 81371.77,
       "l": 80217.06,
-      "c": 81300.0
+      "c": 81272.58
      }
     ],
     "performance": {
-     "s1": 7.52,
-     "m1": 3.9,
-     "m3": 27.45,
-     "m6": 5.0,
-     "a1": -10.49,
-     "ytd": -8.38,
-     "a3": 201.47,
-     "a5": 85.66,
-     "a10": 13233.66
+     "s1": 7.49,
+     "m1": 3.87,
+     "m3": 27.41,
+     "m6": 4.96,
+     "a1": -10.52,
+     "ytd": -8.41,
+     "a3": 201.37,
+     "a5": 85.59,
+     "a10": 13229.16
     },
     "stagionalita": [
      {
@@ -57669,7 +57674,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-20T12:56:49Z",
+      "quando": "2026-09-20T18:18:58Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -57710,6 +57715,13 @@
     ],
     "MU": [
      {
+      "titolo": "Prediction: Micron Will Earn More Profit Than Microsoft in Fiscal 2027",
+      "riassunto": "Key PointsMicron's fiscal fourth-quarter guidance of $30.73 in earnings per diluted share translates to about $35 billion of net income.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T17:37:01Z",
+      "url": "https://www.nasdaq.com/articles/prediction-micron-will-earn-more-profit-microsoft-fiscal-2027"
+     },
+     {
       "titolo": "Billionaire David Tepper Has 40% of His Fund in Just 3 AI Stocks. Are They Still Buys?",
       "riassunto": "Key PointsAmazon is seeing surging cloud computing growth with strong economics.",
       "fonte": "Nasdaq",
@@ -57743,13 +57755,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-20T07:50:00Z",
       "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
-     },
-     {
-      "titolo": "Unpacking the Stock Market's Coiled Spring Set Up",
-      "riassunto": "Surging corporate earnings, a robust GDP, and widespread pessimism are the perfect cocktail for an explosive upside move in equities.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-19T23:26:00Z",
-      "url": "https://www.nasdaq.com/articles/unpacking-stock-markets-coiled-spring-set"
      }
     ],
     "NVDA": [
@@ -57801,7 +57806,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-20T12:56:49Z",
+      "quando": "2026-09-20T18:06:17Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -57886,6 +57891,13 @@
     ],
     "RGTI": [
      {
+      "titolo": "Rigetti Turned $10,000 Into Over $81,000 in 3 Years -- and It's Still 73% Off Its High. Here's Why I Still Wouldn't Touch It.",
+      "riassunto": "Key PointsRigetti Computing recorded only $5.1 million in revenue in the second quarter.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T17:50:01Z",
+      "url": "https://www.nasdaq.com/articles/rigetti-turned-10000-over-81000-3-years-and-its-still-73-its-high-heres-why-i-still"
+     },
+     {
       "titolo": "Here's How Quantum Computing's EQC Approach Supports Growth",
       "riassunto": "QUBT is advancing quantum computing with its EQC approach, Dirac-3 platform and a new three-year HBKU agreement.",
       "fonte": "Nasdaq",
@@ -57919,13 +57931,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-16T13:13:00Z",
       "url": "https://www.nasdaq.com/articles/heres-how-d-wave-quantums-profitability-remains-under-pressure"
-     },
-     {
-      "titolo": "IonQ vs. Rigetti Computing: Which Pure-Play Quantum Stock Actually Has the Technology Edge?",
-      "riassunto": "Key PointsIonQ still appears to have the accuracy edge, while its connectivity and early progress on error-correction strengthen its advantage.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-16T10:41:00Z",
-      "url": "https://www.nasdaq.com/articles/ionq-vs-rigetti-computing-which-pure-play-quantum-stock-actually-has-technology-edge"
      }
     ],
     "WDC": [
@@ -57996,7 +58001,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-20T17:51:18Z"
+   "letto_il": "2026-09-20T18:31:39Z"
   }
  },
  "broker": null,
@@ -58227,7 +58232,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-20T12:56:49Z",
+     "quando": "2026-09-20T18:18:58Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58268,6 +58273,13 @@
    ],
    "MU": [
     {
+     "titolo": "Prediction: Micron Will Earn More Profit Than Microsoft in Fiscal 2027",
+     "riassunto": "Key PointsMicron's fiscal fourth-quarter guidance of $30.73 in earnings per diluted share translates to about $35 billion of net income.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T17:37:01Z",
+     "url": "https://www.nasdaq.com/articles/prediction-micron-will-earn-more-profit-microsoft-fiscal-2027"
+    },
+    {
      "titolo": "Billionaire David Tepper Has 40% of His Fund in Just 3 AI Stocks. Are They Still Buys?",
      "riassunto": "Key PointsAmazon is seeing surging cloud computing growth with strong economics.",
      "fonte": "Nasdaq",
@@ -58301,13 +58313,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-20T07:50:00Z",
      "url": "https://www.nasdaq.com/articles/stock-market-has-been-sending-quiet-warning-signal-years-heres-what-history-says-comes"
-    },
-    {
-     "titolo": "Unpacking the Stock Market's Coiled Spring Set Up",
-     "riassunto": "Surging corporate earnings, a robust GDP, and widespread pessimism are the perfect cocktail for an explosive upside move in equities.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-19T23:26:00Z",
-     "url": "https://www.nasdaq.com/articles/unpacking-stock-markets-coiled-spring-set"
     }
    ],
    "NVDA": [
@@ -58359,7 +58364,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-20T12:56:49Z",
+     "quando": "2026-09-20T18:06:17Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58444,6 +58449,13 @@
    ],
    "RGTI": [
     {
+     "titolo": "Rigetti Turned $10,000 Into Over $81,000 in 3 Years -- and It's Still 73% Off Its High. Here's Why I Still Wouldn't Touch It.",
+     "riassunto": "Key PointsRigetti Computing recorded only $5.1 million in revenue in the second quarter.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T17:50:01Z",
+     "url": "https://www.nasdaq.com/articles/rigetti-turned-10000-over-81000-3-years-and-its-still-73-its-high-heres-why-i-still"
+    },
+    {
      "titolo": "Here's How Quantum Computing's EQC Approach Supports Growth",
      "riassunto": "QUBT is advancing quantum computing with its EQC approach, Dirac-3 platform and a new three-year HBKU agreement.",
      "fonte": "Nasdaq",
@@ -58477,13 +58489,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-16T13:13:00Z",
      "url": "https://www.nasdaq.com/articles/heres-how-d-wave-quantums-profitability-remains-under-pressure"
-    },
-    {
-     "titolo": "IonQ vs. Rigetti Computing: Which Pure-Play Quantum Stock Actually Has the Technology Edge?",
-     "riassunto": "Key PointsIonQ still appears to have the accuracy edge, while its connectivity and early progress on error-correction strengthen its advantage.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-16T10:41:00Z",
-     "url": "https://www.nasdaq.com/articles/ionq-vs-rigetti-computing-which-pure-play-quantum-stock-actually-has-technology-edge"
     }
    ],
    "WDC": [
@@ -58554,7 +58559,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-20T17:51:18Z"
+  "letto_il": "2026-09-20T18:31:39Z"
  },
  "predictions": [],
  "options": {
@@ -80041,7 +80046,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -80093,6 +80098,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-20T17:51:19Z"
+  "generated_at": "2026-09-20T18:31:40Z"
  }
 }
