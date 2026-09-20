@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-09-20T18:31:39Z",
- "eurusd": 1.149,
+ "updated_at": "2026-09-20T21:09:02Z",
+ "eurusd": 1.1489,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -11795,7 +11795,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -21893,28 +21893,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81272.58,
+   "price": 80923.5,
    "price_asof": "2026-09-20",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.05,
+   "change_pct": -0.38,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.6,
-   "sma200_dist_pct": 15.3,
-   "sma50_dist_pct": 11.0,
+   "ath_dist_pct": -35.9,
+   "sma200_dist_pct": 14.8,
+   "sma50_dist_pct": 10.5,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -35.6,
+   "w52_dist_pct": -35.9,
    "day_high": 81371.77,
    "day_low": 80217.06,
    "support": 74944.59,
    "resistance": 82262.21,
-   "rsi": 64.4,
-   "volume": 21515855872,
-   "vol_ratio": 0.62,
+   "rsi": 63.0,
+   "volume": 21124855808,
+   "vol_ratio": 0.66,
    "atr_14": 2154.5,
-   "atr_pct": 2.65,
+   "atr_pct": 2.66,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21923,7 +21923,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81272.58
+     80923.5
     ],
     "m6": [
      76954.17,
@@ -22051,7 +22051,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81272.58
+     80923.5
     ],
     "all": [
      386.94,
@@ -22198,7 +22198,7 @@
      58558.86,
      62813.75,
      78548.63,
-     81272.58
+     80923.5
     ],
     "m1": [
      77667.57,
@@ -22222,7 +22222,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81272.58
+     80923.5
     ],
     "m3": [
      63899.46,
@@ -22290,7 +22290,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81272.58
+     80923.5
     ],
     "y1": [
      115721.96,
@@ -22366,7 +22366,7 @@
      79823.87,
      76568.12,
      75612.51,
-     81272.58
+     80923.5
     ],
     "d1": [
      81185.72,
@@ -22480,22 +22480,37 @@
      81070.72,
      81083.91,
      81163.78,
-     81272.58
+     81223.06,
+     81202.02,
+     81054.52,
+     81081.0,
+     81067.95,
+     81060.0,
+     81259.49,
+     81210.31,
+     81268.38,
+     81200.52,
+     81128.54,
+     81099.69,
+     81104.48,
+     81120.73,
+     81059.42,
+     80864.89
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 79,
+   "health": 78,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.75,
-   "sortino_1y": -1.01,
-   "sharpe_6m": 0.19,
-   "sortino_6m": 0.29,
+   "sharpe_1y": -0.76,
+   "sortino_1y": -1.02,
+   "sharpe_6m": 0.16,
+   "sortino_6m": 0.25,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81272.58,
-   "risk_reward": "1:0.2",
+   "prezzo_limite_aggiustato": 80923.5,
+   "risk_reward": "1:0.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22507,22 +22522,22 @@
     "w1": {
      "support": 74995.52,
      "resistance": 81911.14,
-     "change_pct": 6.73
+     "change_pct": 6.27
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 4.64
+     "change_pct": 4.19
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 27.19
+     "change_pct": 26.64
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.88
+     "change_pct": -11.26
     }
    },
    "financials": [],
@@ -22539,7 +22554,7 @@
      "lo": 77079.16,
      "hi": 80814.94
     },
-    "liq_above": 81346.95,
+    "liq_above": 81235.03,
     "liq_below": 76909.35,
     "order_block": {
      "dir": "rialzista",
@@ -22549,74 +22564,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81272.58,
+     "prezzo": 80923.5,
      "medie": {
       "sma10": {
-       "liv": 78102.01,
-       "dist_pct": 4.06
+       "liv": 78067.1,
+       "dist_pct": 3.66
       },
       "ema10": {
-       "liv": 78909.89,
-       "dist_pct": 2.99
+       "liv": 78846.43,
+       "dist_pct": 2.63
       },
       "sma20": {
-       "liv": 78461.2,
-       "dist_pct": 3.58
+       "liv": 78443.74,
+       "dist_pct": 3.16
       },
       "ema20": {
-       "liv": 77964.45,
-       "dist_pct": 4.24
+       "liv": 77931.2,
+       "dist_pct": 3.84
       },
       "sma30": {
-       "liv": 78438.98,
-       "dist_pct": 3.61
+       "liv": 78427.34,
+       "dist_pct": 3.18
       },
       "ema30": {
-       "liv": 76766.39,
-       "dist_pct": 5.87
+       "liv": 76743.87,
+       "dist_pct": 5.45
       },
       "sma50": {
-       "liv": 73211.29,
-       "dist_pct": 11.01
+       "liv": 73204.3,
+       "dist_pct": 10.54
       },
       "ema50": {
-       "liv": 74519.94,
-       "dist_pct": 9.06
+       "liv": 74506.25,
+       "dist_pct": 8.61
       },
       "sma100": {
-       "liv": 68290.64,
-       "dist_pct": 19.01
+       "liv": 68287.15,
+       "dist_pct": 18.5
       },
       "ema100": {
-       "liv": 72027.36,
-       "dist_pct": 12.84
+       "liv": 72020.44,
+       "dist_pct": 12.36
       },
       "sma200": {
-       "liv": 70504.96,
-       "dist_pct": 15.27
+       "liv": 70503.22,
+       "dist_pct": 14.78
       },
       "ema200": {
-       "liv": 73615.62,
-       "dist_pct": 10.4
+       "liv": 73612.14,
+       "dist_pct": 9.93
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 64.4,
+      "rsi14": 63.0,
       "macd": {
-       "linea": 1455.95,
-       "segnale": 1474.45,
-       "istogramma": -18.5
+       "linea": 1428.1,
+       "segnale": 1468.88,
+       "istogramma": -40.78
       },
-      "stoch_k": 90.8,
-      "stoch_d": 91.5,
-      "williams_r": -9.2,
-      "cci20": 73.2,
+      "stoch_k": 85.8,
+      "stoch_d": 89.8,
+      "williams_r": -14.2,
+      "cci20": 70.2,
       "adx14": 41.6,
       "di_su": 36.4,
       "di_giu": 14.0,
-      "momentum10": 4704.45
+      "momentum10": 4355.38
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23109,19 +23124,19 @@
       "o": 81226.62,
       "h": 81371.77,
       "l": 80217.06,
-      "c": 81272.58
+      "c": 80923.5
      }
     ],
     "performance": {
-     "s1": 7.49,
-     "m1": 3.87,
-     "m3": 27.41,
-     "m6": 4.96,
-     "a1": -10.52,
-     "ytd": -8.41,
-     "a3": 201.37,
-     "a5": 85.59,
-     "a10": 13229.16
+     "s1": 7.02,
+     "m1": 3.42,
+     "m3": 26.86,
+     "m6": 4.51,
+     "a1": -10.9,
+     "ytd": -8.8,
+     "a3": 200.07,
+     "a5": 84.8,
+     "a10": 13171.91
     },
     "stagionalita": [
      {
@@ -23198,7 +23213,7 @@
      },
      {
       "mese": 9,
-      "media": -1.38,
+      "media": -1.42,
       "mediana": -0.24,
       "positivi_pct": 50,
       "campione": 12,
@@ -23234,9 +23249,9 @@
      }
     ]
    },
-   "rs_1m": 5.4,
+   "rs_1m": 4.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 3.9,
+   "rs_ndx_1m": 3.5,
    "beta_ndx": 0.81,
    "avg_corr": 0.29,
    "max_corr": 0.8,
@@ -30732,10 +30747,10 @@
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
    "price": 1.15,
-   "price_asof": "2026-09-18",
+   "price_asof": "2026-09-20",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.18,
+   "change_pct": 0.11,
    "pe": null,
    "ath": 1.6,
    "ath_dist_pct": -28.3,
@@ -30748,16 +30763,16 @@
    "day_low": 1.15,
    "support": 1.15,
    "resistance": 1.17,
-   "rsi": 37.0,
+   "rsi": 36.9,
    "volume": 0,
    "vol_ratio": null,
-   "atr_14": 0.00514,
-   "atr_pct": 0.45,
+   "atr_14": 0.0049,
+   "atr_pct": 0.43,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
     "w1": [
-     1.16,
+     1.15,
      1.15,
      1.15,
      1.15,
@@ -30766,7 +30781,6 @@
     "m6": [
      1.15,
      1.15,
-     1.15,
      1.16,
      1.16,
      1.15,
@@ -30886,6 +30900,7 @@
      1.16,
      1.16,
      1.16,
+     1.15,
      1.15,
      1.15,
      1.15,
@@ -31174,7 +31189,6 @@
      1.17,
      1.17,
      1.17,
-     1.17,
      1.16,
      1.16,
      1.16,
@@ -31186,6 +31200,7 @@
      1.16,
      1.16,
      1.16,
+     1.15,
      1.15,
      1.15,
      1.15,
@@ -31193,7 +31208,6 @@
     ],
     "m3": [
      1.15,
-     1.15,
      1.14,
      1.14,
      1.14,
@@ -31254,6 +31268,7 @@
      1.16,
      1.16,
      1.16,
+     1.15,
      1.15,
      1.15,
      1.15,
@@ -31311,7 +31326,8 @@
      1.17,
      1.16,
      1.16,
-     1.16
+     1.16,
+     1.15
     ],
     "d1": [
      1.15,
@@ -31459,11 +31475,11 @@
    "beta": null,
    "sharpe_1y": -1.16,
    "sortino_1y": -1.64,
-   "sharpe_6m": -0.94,
-   "sortino_6m": -1.37,
+   "sharpe_6m": -0.86,
+   "sortino_6m": -1.25,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.15,
-   "risk_reward": "1:1.9",
+   "risk_reward": "1:1.8",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -31475,22 +31491,22 @@
     "w1": {
      "support": 1.15,
      "resistance": 1.16,
-     "change_pct": -0.89
+     "change_pct": -0.52
     },
     "m1": {
      "support": 1.15,
      "resistance": 1.17,
-     "change_pct": -1.57
+     "change_pct": -1.7
     },
     "m3": {
      "support": 1.13,
      "resistance": 1.17,
-     "change_pct": 0.28
+     "change_pct": 0.23
     },
     "y1": {
      "support": 1.13,
      "resistance": 1.2,
-     "change_pct": -2.06
+     "change_pct": -2.1
     }
    },
    "financials": [],
@@ -31521,39 +31537,39 @@
      "medie": {
       "sma10": {
        "liv": 1.16,
-       "dist_pct": -0.73
+       "dist_pct": -0.63
       },
       "ema10": {
-       "liv": 1.16,
-       "dist_pct": -0.56
+       "liv": 1.15,
+       "dist_pct": -0.45
       },
       "sma20": {
        "liv": 1.16,
-       "dist_pct": -0.99
+       "dist_pct": -0.91
       },
       "ema20": {
        "liv": 1.16,
-       "dist_pct": -0.73
+       "dist_pct": -0.66
       },
       "sma30": {
        "liv": 1.16,
-       "dist_pct": -0.92
+       "dist_pct": -0.91
       },
       "ema30": {
        "liv": 1.16,
-       "dist_pct": -0.7
+       "dist_pct": -0.66
       },
       "sma50": {
        "liv": 1.15,
-       "dist_pct": -0.41
+       "dist_pct": -0.44
       },
       "ema50": {
        "liv": 1.16,
-       "dist_pct": -0.62
+       "dist_pct": -0.6
       },
       "sma100": {
-       "liv": 1.16,
-       "dist_pct": -0.54
+       "liv": 1.15,
+       "dist_pct": -0.53
       },
       "ema100": {
        "liv": 1.16,
@@ -31571,31 +31587,24 @@
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 37.0,
+      "rsi14": 36.9,
       "macd": {
        "linea": -0.0,
        "segnale": 0.0,
        "istogramma": -0.0
       },
-      "stoch_k": 17.0,
-      "stoch_d": 11.4,
-      "williams_r": -83.0,
-      "cci20": -159.4,
-      "adx14": 24.7,
-      "di_su": 12.1,
-      "di_giu": 26.3,
+      "stoch_k": 16.9,
+      "stoch_d": 11.3,
+      "williams_r": -83.1,
+      "cci20": -140.4,
+      "adx14": 25.7,
+      "di_su": 11.8,
+      "di_giu": 25.8,
       "momentum10": -0.01
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
-     {
-      "d": "2026-06-15",
-      "o": 1.16,
-      "h": 1.16,
-      "l": 1.16,
-      "c": 1.16
-     },
      {
       "d": "2026-06-16",
       "o": 1.16,
@@ -32078,18 +32087,25 @@
       "h": 1.15,
       "l": 1.15,
       "c": 1.15
+     },
+     {
+      "d": "2026-09-20",
+      "o": 1.15,
+      "h": 1.15,
+      "l": 1.15,
+      "c": 1.15
      }
     ],
     "performance": {
-     "s1": -1.03,
-     "m1": -0.77,
-     "m3": -0.15,
-     "m6": -0.62,
-     "a1": -1.86,
-     "ytd": -2.21,
-     "a3": 8.53,
-     "a5": -0.96,
-     "a10": 2.41
+     "s1": -0.91,
+     "m1": -1.58,
+     "m3": 0.27,
+     "m6": -0.4,
+     "a1": -2.07,
+     "ytd": -2.23,
+     "a3": 8.51,
+     "a5": -0.97,
+     "a10": 2.4
     },
     "stagionalita": [
      {
@@ -45409,15 +45425,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1490",
-    "change_pct": 0.18,
+    "value": "1.1489",
+    "change_pct": 0.11,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "179.53",
-    "change_pct": 0.19,
+    "value": "179.93",
+    "change_pct": 0.41,
     "suffix": "%"
    }
   ],
@@ -47494,6 +47510,27 @@
   "news": {
    "voci": [
     {
+     "titolo": "Short-Term Treasuries Emerge as Popular Bet on Fed Inflation Win",
+     "riassunto": "Investors in the US Treasury market are shifting their focus to owning shorter-dated government bonds, a bet that the Federal Reserve will eventually emerge victorious in its fight against inflation.",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-20T19:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-09-20/short-term-treasuries-emerge-as-popular-bet-on-fed-inflation-win"
+    },
+    {
+     "titolo": "Pimco Likes Rates Where They Are, CEO Roman Says",
+     "riassunto": "Pimco CEO Emmanuel Roman says, “the moment that we get to a better outcome in the Middle East, you’ll see a release of the bond market and rates to go down.” Roman also sees inflation and the inflation shock as “somehow transitory” in relation to what’s happening in the Middle East. He speaks with David Gura at the 202",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-20T18:37:06Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-20/pimco-likes-rates-where-they-are-ceo-roman-says-video"
+    },
+    {
+     "titolo": "Qatar on Diplomacy and Global Growth",
+     "riassunto": "H.E. Sheikh Mohammed bin Abdulrahman bin Jassim Al Thani, Prime Minister & Minister of Foreign Affairs for the State of Qatar discusses diplomacy, capital and global growth with Bloomberg’s Mishal Husain at the Qatar Economic Forum UNGA Special Edition in New York in 2026. (Source: Bloomberg)",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-20T18:22:26Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-20/qatar-on-diplomacy-and-global-growth-video"
+    },
+    {
      "titolo": "I have $125,000 in credit-card debt. Will $17,000 a month in income, including disability, affect my bankruptcy?",
      "riassunto": "“I racked up this debt to cover my living expenses for two years without an income stream.”",
      "fonte": "MarketWatch",
@@ -47513,13 +47550,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-09-20T16:16:53Z",
      "url": "https://www.bloomberg.com/news/videos/2026-09-20/how-india-turned-cricket-into-a-billion-dollar-business-video"
-    },
-    {
-     "titolo": "Qatar Economic Forum UNGA Edition Opening",
-     "riassunto": "Michael R. Bloomberg, Founder of Bloomberg L.P. & Bloomberg Philanthropies welcomes leaders to discuss capital, risk and resilience at the Qatar Economic Forum UNGA Special Edition in New York in 2026. (Source: Bloomberg)",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-20T14:35:33Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-09-20/qatar-economic-forum-unga-edition-opening-video"
     },
     {
      "titolo": "China is chasing SpaceX and setting its sights on the global space economy",
@@ -47604,20 +47634,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-15T23:28:01Z",
      "url": "https://www.cnbc.com/2026/09/16/de-dollarization-brics-china-russia-trump.html"
-    },
-    {
-     "titolo": "Counting the votes: Warsh faces a tough battle as the Fed girds for expected interest rate hike",
-     "riassunto": "Traders were pricing in a better than 92% probability of a rate increase, as well as a more than 75% chance for another one in December.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-14T19:47:42Z",
-     "url": "https://www.cnbc.com/2026/09/14/counting-the-votes-warsh-faces-tough-battle-as-fed-girds-for-expected-rate-hike.html"
-    },
-    {
-     "titolo": "Inflation is outpacing wage growth again, squeezing Americans’ paychecks",
-     "riassunto": "In August, consumer prices rose 3.4% over the past year while wages increased just 3.1%.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-12T12:49:15Z",
-     "url": "https://www.cnbc.com/2026/09/12/inflation-is-outpacing-wage-growth-again-squeezing-americans-paychecks.html"
     }
    ],
    "fonti": [
@@ -52474,8 +52490,8 @@
    "us10": 5.0,
    "jp10": 2.99,
    "spread": 2.01,
-   "usdjpy": 156.85,
-   "usdjpy_chg_1m": -1.56,
+   "usdjpy": 156.79,
+   "usdjpy_chg_1m": -1.6,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -52509,7 +52525,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 46
     },
     {
      "label": "Treasury 10A",
@@ -57451,10 +57467,24 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Better Artificial Intelligence Stock: Advanced Micro Devices vs. SK Hynix",
+      "riassunto": "Key PointsAdvanced Micro Devices is a major player in processors and AI accelerators with high revenue growth.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T19:28:28Z",
+      "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-stock-advanced-micro-devices-vs-sk-hynix"
+     },
+     {
+      "titolo": "Why I'm Avoiding This Popular AI Stock Despite Its Growth Story",
+      "riassunto": "Key PointsIntel is posting strong financial results and benefitting from soaring demand for its products.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T19:26:00Z",
+      "url": "https://www.nasdaq.com/articles/why-im-avoiding-popular-ai-stock-despite-its-growth-story"
+     },
+     {
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-20T12:56:49Z",
+      "quando": "2026-09-20T19:12:50Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -57477,23 +57507,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-19T20:25:00Z",
       "url": "https://www.nasdaq.com/articles/cathie-wood-sold-palantir-and-amd-then-poured-335-million-archer-aviation-ark-betting-big"
-     },
-     {
-      "titolo": "Top Research Reports for AMD, Linde & Amgen",
-      "riassunto": "AMD, Linde and Amgen highlight AI demand, contracted growth and drug launches, while supply, margin and pipeline risks remain key factors.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T20:28:00Z",
-      "url": "https://www.nasdaq.com/articles/top-research-reports-amd-linde-amgen"
-     },
-     {
-      "titolo": "Stocks Settle Sharply Higher as Crude Oil and Bond Yields Fall",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +1.14% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.61%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.73%.  September E-mini S&P futures (ESU26 ) rose +1.10%, and September E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T18:52:31Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-crude-oil-and-bond-yields-fall"
      }
     ],
     "BE": [
+     {
+      "titolo": "Bloom Energy’s &quot;Time-to-Power&quot; Moat",
+      "riassunto": "In this episode of Motley Fool Hidden Gems Investing, Motley Fool contributors Jon Quast, Matt Frankel, and Rachel Warren discuss:",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T19:26:46Z",
+      "url": "https://www.nasdaq.com/articles/bloom-energys-time-power-moat"
+     },
+     {
+      "titolo": "The World's Top Energy Watchdog Made the Bull Case for AI Power Stocks. Here's the Number That Matters.",
+      "riassunto": "Key PointsThe International Energy Agency recently released a report about AI, noting that \"there is no AI without energy.\"",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T18:35:00Z",
+      "url": "https://www.nasdaq.com/articles/worlds-top-energy-watchdog-made-bull-case-ai-power-stocks-heres-number-matters"
+     },
      {
       "titolo": "Plug Power vs. Bloom Energy: Which Hydrogen-Adjacent Stock Actually Has a Real Business Model?",
       "riassunto": "Key PointsBooming electricity demand is creating new opportunities for clean energy companies.",
@@ -57521,20 +57551,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-18T13:40:03Z",
       "url": "https://www.nasdaq.com/articles/are-oils-energy-stocks-lagging-bloom-energy-be-year"
-     },
-     {
-      "titolo": "The Anthropic IPO Could Be Bigger Than SpaceX. Here's What That Means for Vistra, Bloom Energy, and Oklo.",
-      "riassunto": "Key PointsVistra sells direct energy solutions to data center builders.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-18T10:20:00Z",
-      "url": "https://www.nasdaq.com/articles/anthropic-ipo-could-be-bigger-spacex-heres-what-means-vistra-bloom-energy-and-oklo"
-     },
-     {
-      "titolo": "The Fed’s Rate Hike Could Backfire If Oil Prices Collapse",
-      "riassunto": "The FOMC confirmed market fears and hiked rates in September, the first hike in over three years. While another hike looks likely this year, investors should consider the duration of this cycle before making major moves.\nAs scary as inflation is, much of the current pressure is",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-17T16:30:00Z",
-      "url": "https://www.nasdaq.com/articles/feds-rate-hike-could-backfire-if-oil-prices-collapse"
      }
     ],
     "CRWV": [
@@ -57583,6 +57599,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "If the AI Bubble Bursts as the Dot-Com Did, History Says the QQQ Might Not Recover Until 2042",
+      "riassunto": "Key PointsIt took the Nasdaq 15 years to recover from the dot-com crash.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T20:20:01Z",
+      "url": "https://www.nasdaq.com/articles/if-ai-bubble-bursts-dot-com-did-history-says-qqq-might-not-recover-until-2042"
+     },
+     {
       "titolo": "Billionaire Bill Ackman Dumps Alphabet and Loads Up On a Mega-Cap Stock Down 15% From Its Peak",
       "riassunto": "Key PointsMeta Platforms' stock has been on a tear in September.",
       "fonte": "Nasdaq",
@@ -57616,13 +57639,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-20T13:11:00Z",
       "url": "https://www.nasdaq.com/articles/berkshire-hathaways-favorite-artificial-intelligence-ai-stock-looks-genius-buy-now"
-     },
-     {
-      "titolo": "Greg Abel Recently Plowed $4.2 Billion Into Warren Buffett's Favorite Stock, and It Wasn't Apple",
-      "riassunto": "Key PointsBuffett guided the Berkshire Hathaway holding company to market-beating returns from 1965 to 2025.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-20T11:10:00Z",
-      "url": "https://www.nasdaq.com/articles/greg-abel-recently-plowed-42-billion-warren-buffetts-favorite-stock-and-it-wasnt-apple"
      }
     ],
     "MRVL": [
@@ -57674,7 +57690,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-20T18:18:58Z",
+      "quando": "2026-09-20T19:12:50Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -57715,6 +57731,13 @@
     ],
     "MU": [
      {
+      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T19:12:50Z",
+      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
+     },
+     {
       "titolo": "Prediction: Micron Will Earn More Profit Than Microsoft in Fiscal 2027",
       "riassunto": "Key PointsMicron's fiscal fourth-quarter guidance of $30.73 in earnings per diluted share translates to about $35 billion of net income.",
       "fonte": "Nasdaq",
@@ -57727,13 +57750,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-20T13:02:00Z",
       "url": "https://www.nasdaq.com/articles/billionaire-david-tepper-has-40-his-fund-just-3-ai-stocks-are-they-still-buys"
-     },
-     {
-      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-20T12:56:49Z",
-      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
       "titolo": "Should You Buy Micron Stock Before Its Next Earnings Report?",
@@ -57758,6 +57774,13 @@
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Why I'm Avoiding This Popular AI Stock Despite Its Growth Story",
+      "riassunto": "Key PointsIntel is posting strong financial results and benefitting from soaring demand for its products.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T19:26:00Z",
+      "url": "https://www.nasdaq.com/articles/why-im-avoiding-popular-ai-stock-despite-its-growth-story"
+     },
      {
       "titolo": "Prediction: Even With the $1,999 Price Tag, Apple's Foldable iPhone Duo Will Be a Hit and Apple Will Join Nvidia in the $5 Trillion Club.",
       "riassunto": "Key PointsThe new Apple iPhone 18 hit the market on Friday, but it's saving a premium-priced surprise for next month.",
@@ -57792,13 +57815,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-20T09:35:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
-     },
-     {
-      "titolo": "Nvidia Stock Hasn't Set a Record in 4 Months. History Says These Stalls Have Ended 2 Ways.",
-      "riassunto": "Key PointsNvidia's last record close was $235.74 on May 14, and shares sit about 9% below that level as of this writing.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-20T09:28:01Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-stock-hasnt-set-record-4-months-history-says-these-stalls-have-ended-2-ways"
      }
     ],
     "ORCL": [
@@ -57806,7 +57822,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-20T18:06:17Z",
+      "quando": "2026-09-20T19:12:50Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -57938,7 +57954,7 @@
       "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-09-20T12:56:49Z",
+      "quando": "2026-09-20T19:12:50Z",
       "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
      },
      {
@@ -58001,7 +58017,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-20T18:31:39Z"
+   "letto_il": "2026-09-20T21:09:02Z"
   }
  },
  "broker": null,
@@ -58009,10 +58025,24 @@
   "per_titolo": {
    "AMD": [
     {
+     "titolo": "Better Artificial Intelligence Stock: Advanced Micro Devices vs. SK Hynix",
+     "riassunto": "Key PointsAdvanced Micro Devices is a major player in processors and AI accelerators with high revenue growth.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T19:28:28Z",
+     "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-stock-advanced-micro-devices-vs-sk-hynix"
+    },
+    {
+     "titolo": "Why I'm Avoiding This Popular AI Stock Despite Its Growth Story",
+     "riassunto": "Key PointsIntel is posting strong financial results and benefitting from soaring demand for its products.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T19:26:00Z",
+     "url": "https://www.nasdaq.com/articles/why-im-avoiding-popular-ai-stock-despite-its-growth-story"
+    },
+    {
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-20T12:56:49Z",
+     "quando": "2026-09-20T19:12:50Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58035,23 +58065,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-19T20:25:00Z",
      "url": "https://www.nasdaq.com/articles/cathie-wood-sold-palantir-and-amd-then-poured-335-million-archer-aviation-ark-betting-big"
-    },
-    {
-     "titolo": "Top Research Reports for AMD, Linde & Amgen",
-     "riassunto": "AMD, Linde and Amgen highlight AI demand, contracted growth and drug launches, while supply, margin and pipeline risks remain key factors.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T20:28:00Z",
-     "url": "https://www.nasdaq.com/articles/top-research-reports-amd-linde-amgen"
-    },
-    {
-     "titolo": "Stocks Settle Sharply Higher as Crude Oil and Bond Yields Fall",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +1.14% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.61%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.73%.  September E-mini S&P futures (ESU26 ) rose +1.10%, and September E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T18:52:31Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-crude-oil-and-bond-yields-fall"
     }
    ],
    "BE": [
+    {
+     "titolo": "Bloom Energy’s &quot;Time-to-Power&quot; Moat",
+     "riassunto": "In this episode of Motley Fool Hidden Gems Investing, Motley Fool contributors Jon Quast, Matt Frankel, and Rachel Warren discuss:",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T19:26:46Z",
+     "url": "https://www.nasdaq.com/articles/bloom-energys-time-power-moat"
+    },
+    {
+     "titolo": "The World's Top Energy Watchdog Made the Bull Case for AI Power Stocks. Here's the Number That Matters.",
+     "riassunto": "Key PointsThe International Energy Agency recently released a report about AI, noting that \"there is no AI without energy.\"",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T18:35:00Z",
+     "url": "https://www.nasdaq.com/articles/worlds-top-energy-watchdog-made-bull-case-ai-power-stocks-heres-number-matters"
+    },
     {
      "titolo": "Plug Power vs. Bloom Energy: Which Hydrogen-Adjacent Stock Actually Has a Real Business Model?",
      "riassunto": "Key PointsBooming electricity demand is creating new opportunities for clean energy companies.",
@@ -58079,20 +58109,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-18T13:40:03Z",
      "url": "https://www.nasdaq.com/articles/are-oils-energy-stocks-lagging-bloom-energy-be-year"
-    },
-    {
-     "titolo": "The Anthropic IPO Could Be Bigger Than SpaceX. Here's What That Means for Vistra, Bloom Energy, and Oklo.",
-     "riassunto": "Key PointsVistra sells direct energy solutions to data center builders.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-18T10:20:00Z",
-     "url": "https://www.nasdaq.com/articles/anthropic-ipo-could-be-bigger-spacex-heres-what-means-vistra-bloom-energy-and-oklo"
-    },
-    {
-     "titolo": "The Fed’s Rate Hike Could Backfire If Oil Prices Collapse",
-     "riassunto": "The FOMC confirmed market fears and hiked rates in September, the first hike in over three years. While another hike looks likely this year, investors should consider the duration of this cycle before making major moves.\nAs scary as inflation is, much of the current pressure is",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-17T16:30:00Z",
-     "url": "https://www.nasdaq.com/articles/feds-rate-hike-could-backfire-if-oil-prices-collapse"
     }
    ],
    "CRWV": [
@@ -58141,6 +58157,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "If the AI Bubble Bursts as the Dot-Com Did, History Says the QQQ Might Not Recover Until 2042",
+     "riassunto": "Key PointsIt took the Nasdaq 15 years to recover from the dot-com crash.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T20:20:01Z",
+     "url": "https://www.nasdaq.com/articles/if-ai-bubble-bursts-dot-com-did-history-says-qqq-might-not-recover-until-2042"
+    },
+    {
      "titolo": "Billionaire Bill Ackman Dumps Alphabet and Loads Up On a Mega-Cap Stock Down 15% From Its Peak",
      "riassunto": "Key PointsMeta Platforms' stock has been on a tear in September.",
      "fonte": "Nasdaq",
@@ -58174,13 +58197,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-20T13:11:00Z",
      "url": "https://www.nasdaq.com/articles/berkshire-hathaways-favorite-artificial-intelligence-ai-stock-looks-genius-buy-now"
-    },
-    {
-     "titolo": "Greg Abel Recently Plowed $4.2 Billion Into Warren Buffett's Favorite Stock, and It Wasn't Apple",
-     "riassunto": "Key PointsBuffett guided the Berkshire Hathaway holding company to market-beating returns from 1965 to 2025.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-20T11:10:00Z",
-     "url": "https://www.nasdaq.com/articles/greg-abel-recently-plowed-42-billion-warren-buffetts-favorite-stock-and-it-wasnt-apple"
     }
    ],
    "MRVL": [
@@ -58232,7 +58248,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-20T18:18:58Z",
+     "quando": "2026-09-20T19:12:50Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58273,6 +58289,13 @@
    ],
    "MU": [
     {
+     "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T19:12:50Z",
+     "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
+    },
+    {
      "titolo": "Prediction: Micron Will Earn More Profit Than Microsoft in Fiscal 2027",
      "riassunto": "Key PointsMicron's fiscal fourth-quarter guidance of $30.73 in earnings per diluted share translates to about $35 billion of net income.",
      "fonte": "Nasdaq",
@@ -58285,13 +58308,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-20T13:02:00Z",
      "url": "https://www.nasdaq.com/articles/billionaire-david-tepper-has-40-his-fund-just-3-ai-stocks-are-they-still-buys"
-    },
-    {
-     "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-20T12:56:49Z",
-     "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
      "titolo": "Should You Buy Micron Stock Before Its Next Earnings Report?",
@@ -58316,6 +58332,13 @@
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Why I'm Avoiding This Popular AI Stock Despite Its Growth Story",
+     "riassunto": "Key PointsIntel is posting strong financial results and benefitting from soaring demand for its products.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T19:26:00Z",
+     "url": "https://www.nasdaq.com/articles/why-im-avoiding-popular-ai-stock-despite-its-growth-story"
+    },
     {
      "titolo": "Prediction: Even With the $1,999 Price Tag, Apple's Foldable iPhone Duo Will Be a Hit and Apple Will Join Nvidia in the $5 Trillion Club.",
      "riassunto": "Key PointsThe new Apple iPhone 18 hit the market on Friday, but it's saving a premium-priced surprise for next month.",
@@ -58350,13 +58373,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-20T09:35:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
-    },
-    {
-     "titolo": "Nvidia Stock Hasn't Set a Record in 4 Months. History Says These Stalls Have Ended 2 Ways.",
-     "riassunto": "Key PointsNvidia's last record close was $235.74 on May 14, and shares sit about 9% below that level as of this writing.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-20T09:28:01Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-stock-hasnt-set-record-4-months-history-says-these-stalls-have-ended-2-ways"
     }
    ],
    "ORCL": [
@@ -58364,7 +58380,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-20T18:06:17Z",
+     "quando": "2026-09-20T19:12:50Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58496,7 +58512,7 @@
      "titolo": "Stocks Finish Mostly Higher as Crude Prices Fall",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-09-20T12:56:49Z",
+     "quando": "2026-09-20T19:12:50Z",
      "url": "https://www.nasdaq.com/articles/stocks-finish-mostly-higher-crude-prices-fall"
     },
     {
@@ -58559,7 +58575,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-20T18:31:39Z"
+  "letto_il": "2026-09-20T21:09:02Z"
  },
  "predictions": [],
  "options": {
@@ -80046,7 +80062,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -80098,6 +80114,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-20T18:31:40Z"
+  "generated_at": "2026-09-20T21:09:03Z"
  }
 }
