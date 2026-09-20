@@ -1,4 +1,4 @@
-⟦ BUILD v458 · generato 20/09/2026 17:36 ⟧
+⟦ BUILD v458 · generato 20/09/2026 17:51 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 20/09/2026, 17:36:10 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 13:36, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,66% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,55% · Fut S&P -0,01% · BTC +0,04% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 20/09/2026, 17:51:18 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 13:51, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,66% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,55% · Fut S&P -0,01% · BTC +0,08% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19.7h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 20/09/2026, 17:36:10, prossimo run 20/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-18 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 20/09/2026, 17:51:18, prossimo run 20/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-18 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-18) · Curva 10A-3M (2026-09-18) · Treasury USA 30A (2026-09-17) · Tasso reale 10A (TIPS) (2026-09-17) · Inflazione attesa 10A (breakeven) (2026-09-18) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -98,9 +98,9 @@ QUADRO MACRO:
 - TITOLI MACRO — 6 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 9 pubblicate DOPO l'ultima chiusura USA del 2026-09-18, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [MarketWatch, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] I have $125,000 in credit-card debt. Will $17,000 a month in income, including disability, affect my bankruptcy?
       “I racked up this debt to cover my living expenses for two years without an income stream.”
-    · [Bloomberg, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] IMF MD on the Global Economic Outlook
+    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] IMF MD on the Global Economic Outlook
       IMF Managing Director Kristalina Georgieva discusses the global economic outlook with Bloomberg’s Romaine Bostick at the Qatar Economic Forum UNGA Special Edition in New York in 2026. (Source: Bloomberg)
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] How India Turned Cricket Into A Billion Dollar Business
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] How India Turned Cricket Into A Billion Dollar Business
       India’s obsession with cricket has helped turn the Indian Premier League into one of the world’s most valuable sports leagues, attracting foreign investors like Blackstone. With only 10 teams serving a country of roughly 1.5 billion people, investors see scarcity, rising media consumption and India’s economic growth as
     · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Qatar Economic Forum UNGA Edition Opening
       Michael R. Bloomberg, Founder of Bloomberg L.P. & Bloomberg Philanthropies welcomes leaders to discuss capital, risk and resilience at the Qatar Economic Forum UNGA Special Edition in New York in 2026. (Source: Bloomberg)
@@ -250,9 +250,9 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsNvidia has generated enormous levels of earnings thanks to its AI chip business.
   [ORCL] · [Nasdaq, 5h fa] Stocks Finish Mostly Higher as Crude Prices Fall
       The S&P 500 Index ($SPX ) (SPY ) closed up by +0.17% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.67%.  December E-mini S&P futures (ESZ26 ) rose +0.20%, and December E-mini...
-  [ORCL] · [Nasdaq, 17h fa] Oracle Has Committed Hundreds of Billions to AI Data Centers. These 2 Industrial Stocks Will Power Them.
+  [ORCL] · [Nasdaq, 18h fa] Oracle Has Committed Hundreds of Billions to AI Data Centers. These 2 Industrial Stocks Will Power Them.
       Key PointsVertiv's sales jumped 24% as it expanded its manufacturing and liquid-cooling capacity to serve AI data centers.
-  [RGTI] · [Nasdaq, 52h fa] Here's How Quantum Computing's EQC Approach Supports Growth
+  [RGTI] · [Nasdaq, 53h fa] Here's How Quantum Computing's EQC Approach Supports Growth
       QUBT is advancing quantum computing with its EQC approach, Dirac-3 platform and a new three-year HBKU agreement.
   [RGTI] · [Nasdaq, 68h fa] Prediction: This Quantum Computing Stock Is Going to Plummet Over the Next 12 Months
       Key PointsRigetti Computing developed some of the world's best quantum computing systems, but they still make too many errors to solve real-world problems.

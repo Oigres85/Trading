@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-20T17:36:10Z",
+ "updated_at": "2026-09-20T17:51:18Z",
  "eurusd": 1.149,
  "totals": {
   "usd_value": 0,
@@ -4773,7 +4773,10 @@
     "short_float": 0.0129,
     "buyback_yield": 0.0075,
     "ps": 17.72,
-    "ev_s": 17.6
+    "ev_s": 17.6,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -6159,7 +6162,7 @@
      60.78,
      61.01,
      59.79,
-     54.02,
+     54.01,
      54.96,
      51.76,
      55.76,
@@ -9450,7 +9453,7 @@
      27.0,
      29.09,
      27.68,
-     26.62,
+     26.63,
      24.78,
      22.75,
      23.29,
@@ -9878,7 +9881,7 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0135,
-    "price_to_book": 7.2209,
+    "price_to_book": 11.3198,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
@@ -11919,7 +11922,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": null,
+    "price_to_book": 21.1026,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13707,7 +13710,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.001,
-    "price_to_book": 11.7405,
+    "price_to_book": 11.5567,
     "target_mean": 289.0411,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -21890,11 +21893,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81263.35,
+   "price": 81300.0,
    "price_asof": "2026-09-20",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.04,
+   "change_pct": 0.08,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -35.6,
@@ -21903,14 +21906,14 @@
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -35.6,
-   "day_high": 81362.92,
+   "day_high": 81395.25,
    "day_low": 80217.06,
    "support": 74944.59,
    "resistance": 82262.21,
-   "rsi": 64.4,
-   "volume": 21284837376,
+   "rsi": 64.5,
+   "volume": 21472483328,
    "vol_ratio": 0.62,
-   "atr_14": 2153.87,
+   "atr_14": 2156.18,
    "atr_pct": 2.65,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -21920,7 +21923,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81263.35
+     81300.0
     ],
     "m6": [
      76954.17,
@@ -22048,7 +22051,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81263.35
+     81300.0
     ],
     "all": [
      386.94,
@@ -22195,7 +22198,7 @@
      58558.86,
      62813.75,
      78548.63,
-     81263.35
+     81300.0
     ],
     "m1": [
      77667.57,
@@ -22219,7 +22222,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81263.35
+     81300.0
     ],
     "m3": [
      63899.46,
@@ -22287,7 +22290,7 @@
      76403.77,
      80901.46,
      81233.68,
-     81263.35
+     81300.0
     ],
     "y1": [
      115721.96,
@@ -22363,7 +22366,7 @@
      79823.87,
      76568.12,
      75612.51,
-     81263.35
+     81300.0
     ],
     "d1": [
      81185.72,
@@ -22372,7 +22375,7 @@
      81294.76,
      81300.71,
      81267.32,
-     81235.21,
+     81235.2,
      81106.07,
      81132.41,
      81043.4,
@@ -22383,37 +22386,37 @@
      80986.42,
      80871.98,
      80529.29,
-     80442.9,
-     80330.96,
+     80450.98,
+     80338.37,
      80215.86,
-     80449.99,
-     80341.02,
-     80361.79,
-     80450.81,
-     80479.27,
-     80405.0,
-     80394.91,
-     80411.35,
-     80353.61,
-     80404.44,
-     80445.6,
+     80440.49,
+     80353.1,
+     80358.2,
+     80475.66,
+     80478.94,
+     80395.35,
+     80407.2,
+     80409.64,
+     80356.69,
+     80404.43,
+     80446.59,
      80561.46,
-     80411.77,
-     80559.68,
-     80504.87,
-     80430.24,
-     80397.47,
+     80413.91,
+     80559.69,
+     80504.86,
+     80430.23,
+     80397.49,
      80485.22,
      80470.03,
      80422.07,
      80345.77,
-     80261.91,
-     80272.48,
-     80326.44,
+     80261.92,
+     80272.51,
+     80317.09,
      80355.91,
      80331.58,
-     80310.73,
-     80299.99,
+     80310.43,
+     80294.25,
      80421.49,
      80388.2,
      80361.04,
@@ -22424,10 +22427,10 @@
      80230.76,
      80328.39,
      80467.27,
-     80512.83,
-     80421.67,
+     80511.68,
+     80421.68,
      80458.28,
-     80360.96,
+     80360.95,
      80306.93,
      80351.45,
      80322.9,
@@ -22435,7 +22438,7 @@
      80286.94,
      80334.11,
      80330.09,
-     80395.79,
+     80401.79,
      80426.99,
      80493.33,
      80439.49,
@@ -22446,32 +22449,33 @@
      80421.56,
      80534.99,
      80530.05,
-     80487.54,
+     80500.39,
      80392.37,
      80529.35,
      80520.51,
      80674.35,
      80544.56,
      80475.68,
-     80525.94,
+     80523.57,
      80601.09,
      80664.48,
      80790.66,
-     80720.48,
+     80720.47,
      80777.2,
      80699.68,
      80806.16,
      80892.86,
      80839.49,
      81122.99,
-     81091.46,
-     81227.33,
-     81360.96,
-     81275.27,
-     81343.49,
-     81217.49,
-     81225.47,
-     81263.35
+     81091.64,
+     81222.56,
+     81345.13,
+     81275.15,
+     81345.58,
+     81222.66,
+     81228.0,
+     81241.29,
+     81367.2
     ]
    },
    "earnings_date": null,
@@ -22485,7 +22489,7 @@
    "sharpe_6m": 0.19,
    "sortino_6m": 0.29,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81263.35,
+   "prezzo_limite_aggiustato": 81300.0,
    "risk_reward": "1:0.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22498,22 +22502,22 @@
     "w1": {
      "support": 74995.52,
      "resistance": 81911.14,
-     "change_pct": 6.71
+     "change_pct": 6.76
     },
     "m1": {
      "support": 74944.59,
      "resistance": 82262.21,
-     "change_pct": 4.63
+     "change_pct": 4.68
     },
     "m3": {
      "support": 62226.58,
      "resistance": 82262.21,
-     "change_pct": 27.17
+     "change_pct": 27.23
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.89
+     "change_pct": -10.85
     }
    },
    "financials": [],
@@ -22540,74 +22544,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81263.35,
+     "prezzo": 81300.0,
      "medie": {
       "sma10": {
-       "liv": 78101.09,
-       "dist_pct": 4.05
+       "liv": 78104.75,
+       "dist_pct": 4.09
       },
       "ema10": {
-       "liv": 78908.22,
-       "dist_pct": 2.98
+       "liv": 78914.88,
+       "dist_pct": 3.02
       },
       "sma20": {
-       "liv": 78460.74,
-       "dist_pct": 3.57
+       "liv": 78462.57,
+       "dist_pct": 3.62
       },
       "ema20": {
-       "liv": 77963.57,
-       "dist_pct": 4.23
+       "liv": 77967.06,
+       "dist_pct": 4.27
       },
       "sma30": {
-       "liv": 78438.67,
-       "dist_pct": 3.6
+       "liv": 78439.89,
+       "dist_pct": 3.65
       },
       "ema30": {
-       "liv": 76765.8,
-       "dist_pct": 5.86
+       "liv": 76768.16,
+       "dist_pct": 5.9
       },
       "sma50": {
-       "liv": 73211.1,
-       "dist_pct": 11.0
+       "liv": 73211.83,
+       "dist_pct": 11.05
       },
       "ema50": {
-       "liv": 74519.58,
-       "dist_pct": 9.05
+       "liv": 74521.01,
+       "dist_pct": 9.1
       },
       "sma100": {
-       "liv": 68290.55,
-       "dist_pct": 19.0
+       "liv": 68290.91,
+       "dist_pct": 19.05
       },
       "ema100": {
-       "liv": 72027.17,
-       "dist_pct": 12.82
+       "liv": 72027.9,
+       "dist_pct": 12.87
       },
       "sma200": {
-       "liv": 70504.92,
-       "dist_pct": 15.26
+       "liv": 70505.1,
+       "dist_pct": 15.31
       },
       "ema200": {
-       "liv": 73615.52,
-       "dist_pct": 10.39
+       "liv": 73615.89,
+       "dist_pct": 10.44
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 64.4,
+      "rsi14": 64.5,
       "macd": {
-       "linea": 1455.21,
-       "segnale": 1474.3,
-       "istogramma": -19.09
+       "linea": 1458.13,
+       "segnale": 1474.89,
+       "istogramma": -16.75
       },
-      "stoch_k": 90.7,
-      "stoch_d": 91.4,
-      "williams_r": -9.3,
-      "cci20": 73.1,
+      "stoch_k": 91.2,
+      "stoch_d": 91.6,
+      "williams_r": -8.8,
+      "cci20": 73.7,
       "adx14": 41.6,
-      "di_su": 36.4,
+      "di_su": 36.3,
       "di_giu": 14.0,
-      "momentum10": 4695.23
+      "momentum10": 4731.88
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23098,21 +23102,21 @@
      {
       "d": "2026-09-20",
       "o": 81226.62,
-      "h": 81362.92,
+      "h": 81395.25,
       "l": 80217.06,
-      "c": 81263.35
+      "c": 81300.0
      }
     ],
     "performance": {
-     "s1": 7.47,
-     "m1": 3.86,
-     "m3": 27.39,
-     "m6": 4.95,
-     "a1": -10.53,
-     "ytd": -8.42,
-     "a3": 201.33,
-     "a5": 85.57,
-     "a10": 13227.65
+     "s1": 7.52,
+     "m1": 3.9,
+     "m3": 27.45,
+     "m6": 5.0,
+     "a1": -10.49,
+     "ytd": -8.38,
+     "a3": 201.47,
+     "a5": 85.66,
+     "a10": 13233.66
     },
     "stagionalita": [
      {
@@ -52500,7 +52504,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 50
+     "score": 51
     },
     {
      "label": "Treasury 10A",
@@ -52979,7 +52983,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-09-18",
     "price": 204.56,
     "d1": -1.21,
@@ -53145,7 +53149,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-09-18",
     "price": 168.39,
     "d1": -0.25,
@@ -53228,7 +53232,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-09-18",
     "price": 189.6,
     "d1": 0.82,
@@ -53534,7 +53538,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-09-18",
     "price": 573.0,
     "d1": 2.21,
@@ -53949,7 +53953,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-09-18",
     "price": 111.03,
     "d1": -0.32,
@@ -54032,7 +54036,7 @@
       "qqq": 97.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-09-18",
     "price": 80.27,
     "d1": -0.66,
@@ -57574,6 +57578,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Billionaire Bill Ackman Dumps Alphabet and Loads Up On a Mega-Cap Stock Down 15% From Its Peak",
+      "riassunto": "Key PointsMeta Platforms' stock has been on a tear in September.",
+      "fonte": "Nasdaq",
+      "quando": "2026-09-20T17:23:00Z",
+      "url": "https://www.nasdaq.com/articles/billionaire-bill-ackman-dumps-alphabet-and-loads-mega-cap-stock-down-15-its-peak"
+     },
+     {
       "titolo": "OpenAI Just Beat Google, Meta, and Amazon To This Key Milestone. Is It Bullish for AI Stocks.",
       "riassunto": "Key PointsOpenAI was able to scale an ad business to $1 billion in less than 200 days.",
       "fonte": "Nasdaq",
@@ -57607,13 +57618,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-20T11:10:00Z",
       "url": "https://www.nasdaq.com/articles/greg-abel-recently-plowed-42-billion-warren-buffetts-favorite-stock-and-it-wasnt-apple"
-     },
-     {
-      "titolo": "Prediction: Anthropic's IPO Will Be a Big Winner for Alphabet and Amazon Investors",
-      "riassunto": "Key PointsAmazon and Alphabet will both benefit from their early, large investments in Anthropic.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-20T09:35:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
      }
     ],
     "MRVL": [
@@ -57992,7 +57996,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-20T17:36:10Z"
+   "letto_il": "2026-09-20T17:51:18Z"
   }
  },
  "broker": null,
@@ -58132,6 +58136,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Billionaire Bill Ackman Dumps Alphabet and Loads Up On a Mega-Cap Stock Down 15% From Its Peak",
+     "riassunto": "Key PointsMeta Platforms' stock has been on a tear in September.",
+     "fonte": "Nasdaq",
+     "quando": "2026-09-20T17:23:00Z",
+     "url": "https://www.nasdaq.com/articles/billionaire-bill-ackman-dumps-alphabet-and-loads-mega-cap-stock-down-15-its-peak"
+    },
+    {
      "titolo": "OpenAI Just Beat Google, Meta, and Amazon To This Key Milestone. Is It Bullish for AI Stocks.",
      "riassunto": "Key PointsOpenAI was able to scale an ad business to $1 billion in less than 200 days.",
      "fonte": "Nasdaq",
@@ -58165,13 +58176,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-20T11:10:00Z",
      "url": "https://www.nasdaq.com/articles/greg-abel-recently-plowed-42-billion-warren-buffetts-favorite-stock-and-it-wasnt-apple"
-    },
-    {
-     "titolo": "Prediction: Anthropic's IPO Will Be a Big Winner for Alphabet and Amazon Investors",
-     "riassunto": "Key PointsAmazon and Alphabet will both benefit from their early, large investments in Anthropic.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-20T09:35:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-anthropics-ipo-will-be-big-winner-alphabet-and-amazon-investors"
     }
    ],
    "MRVL": [
@@ -58550,7 +58554,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-20T17:36:10Z"
+  "letto_il": "2026-09-20T17:51:18Z"
  },
  "predictions": [],
  "options": {
@@ -80089,6 +80093,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-20T17:36:11Z"
+  "generated_at": "2026-09-20T17:51:19Z"
  }
 }
