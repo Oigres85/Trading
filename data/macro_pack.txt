@@ -1,4 +1,4 @@
-⟦ BUILD v458 · generato 25/09/2026 23:41 ⟧
+⟦ BUILD v458 · generato 25/09/2026 23:53 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 25/09/2026, 23:41:54 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 19:41, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,9% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,43% · Fut S&P +0,54% · BTC -0,36% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~61.8h); il "→ agg." incorpora già il gap after.
+DATI AL 25/09/2026, 23:53:23 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 19:53, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,9% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,43% · Fut S&P +0,54% · BTC -0,37% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~61.6h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 25/09/2026, 23:41:54, prossimo run 26/09/2026, 04:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-25.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 25/09/2026, 23:53:23, prossimo run 26/09/2026, 04:00:00. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-09-25.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-09-01) · Curva 10A-2A (2026-09-25) · Curva 10A-3M (2026-09-25) · Treasury USA 30A (2026-09-24) · Tasso reale 10A (TIPS) (2026-09-24) · Inflazione attesa 10A (breakeven) (2026-09-25) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -229,19 +229,19 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       In this video, I will cover 4 stocks, including AMD, Palantir (NASDAQ: PLTR), Shopify, and Zeta Global, that I believe investors will regret not buying sooner. Watch the short video to learn more, consider subscribing, and click the special offer link below.
   [AMD] · [Nasdaq, 5h fa] Trump-Xi Meeting Puts These 5 Chinese AI Stocks in Focus
       As China's AI ecosystem continues to expand, these stocks provide investors with several different ways to monitor the country's accelerating AI buildout.
-  [CRWV] · [Nasdaq, 4h fa] Noteworthy Friday Option Activity: CRWV, AGO, DAL
+  [CRWV] · [Nasdaq, 5h fa] Noteworthy Friday Option Activity: CRWV, AGO, DAL
       Among the underlying components of the Russell 3000 index, we saw noteworthy options trading volume today in Coreweave Inc (Symbol: CRWV), where a total of 202,328 contracts have traded so far, representing approximately 20.2 million underlying shares.  That amounts to about 69.
   [CRWV] · [Nasdaq, 29h fa] Most Investors Are Chasing Flashy IPOs. CoreWeave Is the One I Predict Will Outperform by 2028.
       Key PointsCoreWeave is expanding beyond cloud rental into inference, agentic AI, and enterprise services through its Weights &amp; Biases integration and Physical AI Field Engineering program.
-  [MRVL] · [Nasdaq, 0h fa] Stocks Rise as Crude Prices Fall and Bond Yields Stabilize
-      The S&P 500 Index ($SPX ) (SPY ) is up by +0.26% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.45%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.34%.  December E-mini S&P futures (ESZ26 ) are up +0.24%, and December E-mini...
-  [MRVL] · [Nasdaq, 1h fa] Stocks Settle Higher as Crude Prices Fall on US-Iran Deal Hopes
+  [MRVL] · [Nasdaq, 0h fa] Stocks Settle Higher as Crude Prices Fall on US-Iran Deal Hopes
       The S&P 500 Index ($SPX ) (SPY ) closed up by +0.51% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.42%.  December E-mini S&P futures (ESZ26 ) rose +0.47%, and December E-mini...
-  [MU] · [Nasdaq, 0h fa] Stocks Rise as Crude Prices Fall and Bond Yields Stabilize
+  [MRVL] · [Nasdaq, 1h fa] Stocks Rise as Crude Prices Fall and Bond Yields Stabilize
+      The S&P 500 Index ($SPX ) (SPY ) is up by +0.26% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.45%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.34%.  December E-mini S&P futures (ESZ26 ) are up +0.24%, and December E-mini...
+  [MU] · [Nasdaq, 1h fa] Stocks Rise as Crude Prices Fall and Bond Yields Stabilize
       The S&P 500 Index ($SPX ) (SPY ) is up by +0.26% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.45%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.34%.  December E-mini S&P futures (ESZ26 ) are up +0.24%, and December E-mini...
   [MU] · [Nasdaq, 3h fa] What Will the Q3 Earnings Season Show?
       Earnings revisions have remained positive as we approach the Q3 earnings season, continuing the trend in place for a year now. Growth momentum remains broad-based, with 14 of the 16 Zacks sectors expected to see higher earnings relative to the same period last year.
-  [NVDA] · [Nasdaq, 0h fa] Is Super Micro Computer a Buy?
+  [NVDA] · [Nasdaq, 1h fa] Is Super Micro Computer a Buy?
       Key PointsSuper Micro Computer was an early winner from the AI boom.
   [NVDA] · [Nasdaq, 2h fa] This Stock May Be the Best Artificial Intelligence (AI) and Quantum Computing Investment
       Key PointsNvidia has launched several useful products for the quantum computing space.
@@ -249,9 +249,9 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Earnings revisions have remained positive as we approach the Q3 earnings season, continuing the trend in place for a year now. Growth momentum remains broad-based, with 14 of the 16 Zacks sectors expected to see higher earnings relative to the same period last year.
   [ORCL] · [Nasdaq, 6h fa] Noteworthy Friday Option Activity: ECHO, ORCL, CBOE
       Among the underlying components of the S&amp;P 500 index, we saw noteworthy options trading volume today in EchoStar Corp (Symbol: ECHO), where a total of 22,872 contracts have traded so far, representing approximately 2.3 million underlying shares.  That amounts to about 75.7%
-  [RGTI] · [Nasdaq, 2h fa] BigBear.ai vs. Rigetti Computing: Which Technology Stock Is a Better Buy in 2026?
+  [RGTI] · [Nasdaq, 3h fa] BigBear.ai vs. Rigetti Computing: Which Technology Stock Is a Better Buy in 2026?
       Key PointsBigBear.ai provides AI-driven decision intelligence with a heavy focus on the defense and public sectors.
-  [RGTI] · [Nasdaq, 4h fa] Rigetti, D-Wave, or IonQ: Which Quantum Stock Has the Best Shot at Survival?
+  [RGTI] · [Nasdaq, 5h fa] Rigetti, D-Wave, or IonQ: Which Quantum Stock Has the Best Shot at Survival?
       Key PointsIonQ's sales are rising quickly, and the company has plenty of cash to continue investing in its growth.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
