@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-26T17:55:47Z",
+ "updated_at": "2026-09-26T18:13:01Z",
  "eurusd": 1.1401,
  "totals": {
   "usd_value": 0,
@@ -11803,7 +11803,7 @@
      106.68,
      131.07,
      115.21,
-     125.97,
+     125.96,
      129.19,
      149.93,
      162.66,
@@ -21990,11 +21990,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 84097.95,
+   "price": 84095.03,
    "price_asof": "2026-09-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.08,
+   "change_pct": 0.07,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -33.4,
@@ -22008,7 +22008,7 @@
    "support": 74944.59,
    "resistance": 87363.76,
    "rsi": 64.3,
-   "volume": 15039580160,
+   "volume": 14953205760,
    "vol_ratio": 1.13,
    "atr_14": 2302.91,
    "atr_pct": 2.74,
@@ -22020,7 +22020,7 @@
      84383.01,
      84379.06,
      84034.92,
-     84097.95
+     84095.03
     ],
     "m6": [
      76981.12,
@@ -22148,7 +22148,7 @@
      84383.01,
      84379.06,
      84034.92,
-     84097.95
+     84095.03
     ],
     "all": [
      386.94,
@@ -22295,7 +22295,7 @@
      58558.86,
      62813.75,
      78548.63,
-     84097.95
+     84095.03
     ],
     "m1": [
      79823.87,
@@ -22319,7 +22319,7 @@
      84383.01,
      84379.06,
      84034.92,
-     84097.95
+     84095.03
     ],
     "m3": [
      65044.81,
@@ -22387,7 +22387,7 @@
      84383.01,
      84379.06,
      84034.92,
-     84097.95
+     84095.03
     ],
     "y1": [
      109712.83,
@@ -22463,7 +22463,7 @@
      77173.8,
      76150.32,
      86602.91,
-     84097.95
+     84095.03
     ],
     "d1": [
      84038.15,
@@ -22573,7 +22573,9 @@
      84047.02,
      84025.11,
      84095.09,
-     84097.95
+     84097.98,
+     84152.63,
+     84095.03
     ]
    },
    "earnings_date": null,
@@ -22587,7 +22589,7 @@
    "sharpe_6m": 0.45,
    "sortino_6m": 0.7,
    "prepost": null,
-   "prezzo_limite_aggiustato": 84097.95,
+   "prezzo_limite_aggiustato": 84095.03,
    "risk_reward": "1:0.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22615,7 +22617,7 @@
     "y1": {
      "support": 57747.77,
      "resistance": 95491.51,
-     "change_pct": -10.18
+     "change_pct": -10.19
     }
    },
    "financials": [],
@@ -22642,55 +22644,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 84097.95,
+     "prezzo": 84095.03,
      "medie": {
       "sma10": {
-       "liv": 82935.17,
+       "liv": 82934.87,
        "dist_pct": 1.4
       },
       "ema10": {
-       "liv": 82923.75,
-       "dist_pct": 1.42
+       "liv": 82923.22,
+       "dist_pct": 1.41
       },
       "sma20": {
-       "liv": 80147.12,
+       "liv": 80146.97,
        "dist_pct": 4.93
       },
       "ema20": {
-       "liv": 81040.32,
+       "liv": 81040.04,
        "dist_pct": 3.77
       },
       "sma30": {
-       "liv": 79701.88,
-       "dist_pct": 5.52
+       "liv": 79701.78,
+       "dist_pct": 5.51
       },
       "ema30": {
-       "liv": 79423.97,
+       "liv": 79423.78,
        "dist_pct": 5.88
       },
       "sma50": {
-       "liv": 75707.32,
+       "liv": 75707.26,
        "dist_pct": 11.08
       },
       "ema50": {
-       "liv": 76727.31,
-       "dist_pct": 9.61
+       "liv": 76727.19,
+       "dist_pct": 9.6
       },
       "sma100": {
-       "liv": 69492.67,
-       "dist_pct": 21.02
+       "liv": 69492.65,
+       "dist_pct": 21.01
       },
       "ema100": {
-       "liv": 73478.52,
+       "liv": 73478.47,
        "dist_pct": 14.45
       },
       "sma200": {
-       "liv": 70999.92,
-       "dist_pct": 18.45
+       "liv": 70999.9,
+       "dist_pct": 18.44
       },
       "ema200": {
-       "liv": 74122.72,
-       "dist_pct": 13.46
+       "liv": 74122.69,
+       "dist_pct": 13.45
       }
      },
      "medie_battute": 12,
@@ -22698,18 +22700,18 @@
      "oscillatori": {
       "rsi14": 64.3,
       "macd": {
-       "linea": 2442.02,
-       "segnale": 2156.57,
-       "istogramma": 285.45
+       "linea": 2441.79,
+       "segnale": 2156.52,
+       "istogramma": 285.27
       },
       "stoch_k": 73.7,
       "stoch_d": 74.3,
       "williams_r": -26.3,
-      "cci20": 102.1,
+      "cci20": 102.0,
       "adx14": 43.9,
       "di_su": 35.5,
       "di_giu": 14.2,
-      "momentum10": 7947.63
+      "momentum10": 7944.71
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23202,19 +23204,19 @@
       "o": 84081.91,
       "h": 84284.69,
       "l": 83799.75,
-      "c": 84097.95
+      "c": 84095.03
      }
     ],
     "performance": {
-     "s1": -2.89,
-     "m1": 5.56,
-     "m3": 27.23,
+     "s1": -2.9,
+     "m1": 5.55,
+     "m3": 27.22,
      "m6": 9.68,
      "a1": -11.57,
-     "ytd": -5.22,
-     "a3": 211.84,
+     "ytd": -5.23,
+     "a3": 211.83,
      "a5": 92.04,
-     "a10": 13692.54
+     "a10": 13692.06
     },
     "stagionalita": [
      {
@@ -47908,6 +47910,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "From $6 eggs to $50,000 cars, these charts show how inflation has defined the past 5 years",
+     "riassunto": "Rising prices have been crushing consumer confidence and biting at Americans’ wallets for more than five years now.",
+     "fonte": "MarketWatch",
+     "quando": "2026-09-26T17:54:00Z",
+     "url": "https://www.marketwatch.com/story/from-6-eggs-to-50-000-cars-these-charts-show-how-inflation-has-defined-the-past-5-years-3c7b9ab9?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "A 10% risk-free yield? For some, yes.",
      "riassunto": "This could be a bargain, especially for very high earners and those in high-tax locations.",
      "fonte": "MarketWatch",
@@ -48025,13 +48034,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-19T12:50:49Z",
      "url": "https://www.cnbc.com/2026/09/19/goldman-sachs-happiness-struggling-consumer-sentiment.html"
-    },
-    {
-     "titolo": "Bank of England defies Fed’s rate-hike lead, leaving rates unchanged",
-     "riassunto": "The Bank of England kept rates steady Thursday, even after U.K. inflation rose to 3.1% and energy costs put pressure on prices.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-17T12:27:10Z",
-     "url": "https://www.cnbc.com/2026/09/17/bank-of-england-interest-rate-decision-fed-rate-hike-uk-inflation.html"
     }
    ],
    "fonti": [
@@ -58412,7 +58414,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-26T17:55:47Z"
+   "letto_il": "2026-09-26T18:13:01Z"
   }
  },
  "broker": null,
@@ -58970,7 +58972,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-26T17:55:47Z"
+  "letto_il": "2026-09-26T18:13:01Z"
  },
  "predictions": [
   {
@@ -80675,7 +80677,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -80727,6 +80729,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-26T17:55:48Z"
+  "generated_at": "2026-09-26T18:13:02Z"
  }
 }
