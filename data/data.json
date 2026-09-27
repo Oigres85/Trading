@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-27T13:34:16Z",
+ "updated_at": "2026-09-27T14:26:20Z",
  "eurusd": 1.1401,
  "totals": {
   "usd_value": 0,
@@ -1742,7 +1742,7 @@
      "a1": 547.87,
      "a3": 1508.67,
      "a5": 1461.46,
-     "a10": 6142.27
+     "a10": 6142.26
     },
     "stagionalita": [
      {
@@ -11790,7 +11790,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -21935,28 +21935,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 85050.68,
+   "price": 84831.18,
    "price_asof": "2026-09-27",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.76,
+   "change_pct": 0.5,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -32.6,
-   "sma200_dist_pct": 19.7,
-   "sma50_dist_pct": 11.7,
+   "ath_dist_pct": -32.8,
+   "sma200_dist_pct": 19.4,
+   "sma50_dist_pct": 11.5,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -32.6,
-   "day_high": 85016.58,
+   "w52_dist_pct": -32.8,
+   "day_high": 85021.7,
    "day_low": 84245.75,
    "support": 74944.59,
    "resistance": 87363.76,
-   "rsi": 66.4,
-   "volume": 17634785280,
+   "rsi": 65.9,
+   "volume": 17830303744,
    "vol_ratio": 0.5,
-   "atr_14": 2203.9,
-   "atr_pct": 2.59,
+   "atr_14": 2204.27,
+   "atr_pct": 2.6,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -21965,7 +21965,7 @@
      84379.06,
      84034.92,
      84406.45,
-     85050.68
+     84831.18
     ],
     "m6": [
      77279.93,
@@ -22093,7 +22093,7 @@
      84379.06,
      84034.92,
      84406.45,
-     85050.68
+     84831.18
     ],
     "all": [
      386.94,
@@ -22240,7 +22240,7 @@
      58558.86,
      62813.75,
      78548.63,
-     85050.68
+     84831.18
     ],
     "m1": [
      80350.05,
@@ -22264,7 +22264,7 @@
      84379.06,
      84034.92,
      84406.45,
-     85050.68
+     84831.18
     ],
     "m3": [
      64098.5,
@@ -22332,7 +22332,7 @@
      84379.06,
      84034.92,
      84406.45,
-     85050.68
+     84831.18
     ],
     "y1": [
      109681.95,
@@ -22408,7 +22408,7 @@
      77270.47,
      76403.77,
      86172.28,
-     85050.68
+     84831.18
     ],
     "d1": [
      84337.36,
@@ -22492,22 +22492,27 @@
      84722.89,
      84636.71,
      84821.4,
-     85050.68
+     84987.5,
+     84780.13,
+     84881.66,
+     84907.4,
+     84986.27,
+     84819.16
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 82,
+   "health": 81,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.56,
-   "sortino_1y": -0.77,
-   "sharpe_6m": 0.49,
-   "sortino_6m": 0.77,
+   "sharpe_1y": -0.57,
+   "sortino_1y": -0.78,
+   "sharpe_6m": 0.47,
+   "sortino_6m": 0.75,
    "prepost": null,
-   "prezzo_limite_aggiustato": 85050.68,
-   "risk_reward": "1:0.5",
+   "prezzo_limite_aggiustato": 84831.18,
+   "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22519,22 +22524,22 @@
     "w1": {
      "support": 82906.62,
      "resistance": 87265.49,
-     "change_pct": 0.79
+     "change_pct": 0.53
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 5.85
+     "change_pct": 5.58
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 32.69
+     "change_pct": 32.35
     },
     "y1": {
      "support": 57747.77,
      "resistance": 93660.83,
-     "change_pct": -8.11
+     "change_pct": -8.34
     }
    },
    "financials": [],
@@ -22561,74 +22566,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 85050.68,
+     "prezzo": 84831.18,
      "medie": {
       "sma10": {
-       "liv": 83830.71,
-       "dist_pct": 1.46
+       "liv": 83808.76,
+       "dist_pct": 1.22
       },
       "ema10": {
-       "liv": 83356.36,
-       "dist_pct": 2.03
+       "liv": 83316.45,
+       "dist_pct": 1.82
       },
       "sma20": {
-       "liv": 80459.29,
-       "dist_pct": 5.71
+       "liv": 80448.31,
+       "dist_pct": 5.45
       },
       "ema20": {
-       "liv": 81448.84,
-       "dist_pct": 4.42
+       "liv": 81427.94,
+       "dist_pct": 4.18
       },
       "sma30": {
-       "liv": 79952.84,
-       "dist_pct": 6.38
+       "liv": 79945.53,
+       "dist_pct": 6.11
       },
       "ema30": {
-       "liv": 79805.6,
-       "dist_pct": 6.57
+       "liv": 79791.44,
+       "dist_pct": 6.32
       },
       "sma50": {
-       "liv": 76116.41,
-       "dist_pct": 11.74
+       "liv": 76112.02,
+       "dist_pct": 11.46
       },
       "ema50": {
-       "liv": 77065.34,
-       "dist_pct": 10.36
+       "liv": 77056.73,
+       "dist_pct": 10.09
       },
       "sma100": {
-       "liv": 69710.86,
-       "dist_pct": 22.0
+       "liv": 69708.66,
+       "dist_pct": 21.69
       },
       "ema100": {
-       "liv": 73713.64,
-       "dist_pct": 15.38
+       "liv": 73709.3,
+       "dist_pct": 15.09
       },
       "sma200": {
-       "liv": 71075.69,
-       "dist_pct": 19.66
+       "liv": 71074.59,
+       "dist_pct": 19.36
       },
       "ema200": {
-       "liv": 74233.7,
-       "dist_pct": 14.57
+       "liv": 74231.52,
+       "dist_pct": 14.28
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 66.4,
+      "rsi14": 65.9,
       "macd": {
-       "linea": 2483.86,
-       "segnale": 2225.97,
-       "istogramma": 257.9
+       "linea": 2466.35,
+       "segnale": 2222.47,
+       "istogramma": 243.89
       },
-      "stoch_k": 81.4,
-      "stoch_d": 76.9,
-      "williams_r": -18.6,
-      "cci20": 107.4,
+      "stoch_k": 79.6,
+      "stoch_d": 76.3,
+      "williams_r": -20.4,
+      "cci20": 105.8,
       "adx14": 44.0,
-      "di_su": 36.3,
+      "di_su": 36.4,
       "di_giu": 13.8,
-      "momentum10": 8646.91
+      "momentum10": 8427.41
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23119,21 +23124,21 @@
      {
       "d": "2026-09-27",
       "o": 84429.02,
-      "h": 85016.58,
+      "h": 85021.7,
       "l": 84245.75,
-      "c": 85050.68
+      "c": 84831.18
      }
     ],
     "performance": {
-     "s1": -1.3,
-     "m1": 6.55,
-     "m3": 30.76,
-     "m6": 10.48,
-     "a1": -9.17,
-     "ytd": -4.15,
-     "a3": 215.38,
-     "a5": 94.22,
-     "a10": 13848.79
+     "s1": -1.56,
+     "m1": 6.27,
+     "m3": 30.42,
+     "m6": 10.2,
+     "a1": -9.4,
+     "ytd": -4.4,
+     "a3": 214.56,
+     "a5": 93.72,
+     "a10": 13812.8
     },
     "stagionalita": [
      {
@@ -23210,12 +23215,12 @@
      },
      {
       "mese": 9,
-      "media": -0.98,
+      "media": -1.01,
       "mediana": -0.24,
       "positivi_pct": 50,
       "campione": 12,
       "peggio": -13.9,
-      "meglio": 8.3
+      "meglio": 8.0
      },
      {
       "mese": 10,
@@ -23246,9 +23251,9 @@
      }
     ]
    },
-   "rs_1m": 5.0,
+   "rs_1m": 4.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.1,
+   "rs_ndx_1m": 0.8,
    "beta_ndx": 0.86,
    "avg_corr": 0.3,
    "max_corr": 0.8,
@@ -47507,6 +47512,20 @@
   "news": {
    "voci": [
     {
+     "titolo": "Micron could dethrone Nvidia and become the biggest driver of S&P 500 profit growth",
+     "riassunto": "Micron is increasingly important to the S&P 500, and its earnings report has become “a market event in and of itself.”",
+     "fonte": "MarketWatch",
+     "quando": "2026-09-27T14:00:00Z",
+     "url": "https://www.marketwatch.com/story/micron-could-dethrone-nvidia-and-become-the-biggest-driver-of-s-p-500-profit-growth-d62e0e68?mod=mw_rss_topstories"
+    },
+    {
+     "titolo": "Inflation Keeps Pressure on the Fed",
+     "riassunto": "Renaissance Macro Research economist Neil Dutta tells Bloomberg This Weekend that the US labor market has stabilized while persistent inflation could force the Federal Reserve to raise interest rates at a faster pace than investors currently expect. Speaking with hosts David Gura and Christina Ruffini, Dutta says risin",
+     "fonte": "Bloomberg",
+     "quando": "2026-09-27T13:43:28Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-09-27/inflation-keeps-pressure-on-the-fed-video"
+    },
+    {
      "titolo": "Rubenstein on the Billion Dollar Sports Boom",
      "riassunto": "Baltimore Orioles owner, Carlyle Group co-founder and host of Bloomberg's Peer to Peer Conversations David Rubenstein tells David Gura that he bought his hometown team in part to help revitalize Baltimore and says sports owners tend to prioritize winning over operating profits. Rubenstein also discusses soaring franchi",
      "fonte": "Bloomberg",
@@ -47563,13 +47582,6 @@
      "url": "https://www.marketwatch.com/story/tax-free-bond-yields-are-in-a-sweet-spot-get-in-before-its-too-late-94b8adac?mod=mw_rss_topstories"
     },
     {
-     "titolo": "Trump-Xi Summit Yields Coal Pledge as Tariff Talks Extend",
-     "riassunto": "China agreed to import at least 10 million metric tons of coal from the US next year and again in 2028, according to the White House, in a sign of progress in easing trade frictions.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-26T04:52:45Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-26/us-says-china-to-buy-10-million-tons-of-coal-in-2027-and-2028"
-    },
-    {
      "titolo": "Here's what happens to the economy when Treasury yields soar like they are now",
      "riassunto": "Government debt costs leaped higher Wednesday, the product of multiple factors.",
      "fonte": "CNBC Economia",
@@ -47624,13 +47636,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-21T01:02:25Z",
      "url": "https://www.cnbc.com/2026/09/18/japan-rate-hike-stocks-rise-bond-yields-yen-fall.html"
-    },
-    {
-     "titolo": "France’s wine production nears a 70-year low, leaving winemakers with tough choices",
-     "riassunto": "As the French wine industry reaches a crisis point, key players are considering new markets, products and generations.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-09-20T05:00:01Z",
-     "url": "https://www.cnbc.com/2026/09/20/france-wine-production-70-year-low-heatwaves-drought.html"
     }
    ],
    "fonti": [
@@ -52522,7 +52527,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 58
+     "score": 55
     },
     {
      "label": "Treasury 10A",
@@ -58011,7 +58016,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-09-27T13:34:16Z"
+   "letto_il": "2026-09-27T14:26:20Z"
   }
  },
  "broker": null,
@@ -58569,12 +58574,12 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-09-27T13:34:16Z"
+  "letto_il": "2026-09-27T14:26:20Z"
  },
  "predictions": [
   {
    "question": "Will the price of Bitcoin be above $84,000 on September 27?",
-   "yes": 98,
+   "yes": 99,
    "link": "https://polymarket.com/event/bitcoin-above-84k-on-september-27-2026"
   },
   {
@@ -58588,9 +58593,9 @@
    "link": "https://polymarket.com/event/bitcoin-above-80k-on-september-27-2026"
   },
   {
-   "question": "Will the price of Bitcoin be above $86,000 on September 27?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/bitcoin-above-86k-on-september-27-2026"
+   "question": "Bitcoin Up or Down on September 27?",
+   "yes": 98,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-september-27-2026"
   }
  ],
  "options": {
@@ -80323,7 +80328,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -80375,6 +80380,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-27T13:34:16Z"
+  "generated_at": "2026-09-27T14:26:20Z"
  }
 }
