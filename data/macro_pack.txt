@@ -1,4 +1,4 @@
-⟦ BUILD v458 · generato 27/09/2026 18:37 ⟧
+⟦ BUILD v458 · generato 27/09/2026 18:49 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 27/09/2026, 18:37:22 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 14:37, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,9% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,32% · Fut S&P +0,52% · BTC +0,36% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~18.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 27/09/2026, 18:49:15 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 14:49, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,9% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,32% · Fut S&P +0,52% · BTC +0,39% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~18.7h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 27/09/2026, 18:37:22, prossimo run 27/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-25 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 27/09/2026, 18:49:15, prossimo run 27/09/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-09-25 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-08-01) · Disoccupazione (2026-08-01) · Fiducia consumatori (UMich) (2026-09-01) · Curva 10A-2A (2026-09-25) · Curva 10A-3M (2026-09-25) · Treasury USA 30A (2026-09-24) · Tasso reale 10A (TIPS) (2026-09-24) · Inflazione attesa 10A (breakeven) (2026-09-25) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -185,7 +185,7 @@ TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre
 - NVDA: medie: +1,54% dalla 20, +4,3% dalla 50, +13,03% dalla 200 · RSI 55,3 · -4,6% dal massimo 52s · forza relativa 1M -1,6 pp vs SOX · ampiezza tipica di seduta 2,6% · P/E prospettico 14,4× · ricavi +105,9% a/a · trimestrale fra 51 giorni
 - MSTR: medie: +12,42% dalla 20, +34,8% dalla 50, +16,16% dalla 200 · RSI 63,5 · -56,6% dal massimo 52s · forza relativa 1M +24 pp vs NDX · ampiezza tipica di seduta 5,6% · P/E prospettico 3,2× · ricavi +6,9% a/a · trimestrale fra 32 giorni
 - PLTR: medie: +6,32% dalla 20, +15,7% dalla 50, +24,76% dalla 200 · RSI 63,7 · -8,6% dal massimo 52s · forza relativa 1M +2,1 pp vs NDX · ampiezza tipica di seduta 3,6% · P/E prospettico 81,6× · ricavi +92,8% a/a · trimestrale fra 36 giorni
-- GOOGL: medie: +0,53% dalla 20, -0,06% dalla 50, +1,81% dalla 200 · RSI 49,8 · -15,7% dal massimo 52s · forza relativa 1M -4,1 pp vs NDX · ampiezza tipica di seduta 2,6% · P/E prospettico 23,1× · ricavi +24,2% a/a · trimestrale fra 31 giorni
+- GOOGL: medie: +0,53% dalla 20, -0,06% dalla 50, +1,81% dalla 200 · RSI 49,8 · -15,7% dal massimo 52s · forza relativa 1M -4,1 pp vs NDX · ampiezza tipica di seduta 2,6% · P/E prospettico 22,8× · ricavi +24,2% a/a · trimestrale fra 31 giorni
 - BE: medie: +12,56% dalla 20, +25,7% dalla 50, +42,25% dalla 200 · RSI 62,8 · -17,8% dal massimo 52s · forza relativa 1M +31,4 pp vs SP500 · ampiezza tipica di seduta 6,7% · P/E prospettico 58,6× · ricavi +165,5% a/a · trimestrale fra 30 giorni
 - WDC: medie: +1,51% dalla 20, -3,59% dalla 50, +16,22% dalla 200 · RSI 49,6 · -42,9% dal massimo 52s · forza relativa 1M -3,4 pp vs SP500 · ampiezza tipica di seduta 6% · P/E prospettico 14,4× · ricavi +43,8% a/a · trimestrale fra 39 giorni
 - MRVL: medie: +12,47% dalla 20, +18,76% dalla 50, +61,23% dalla 200 · RSI 63,1 · -20,6% dal massimo 52s · forza relativa 1M -2,2 pp vs SOX · ampiezza tipica di seduta 5,2% · P/E prospettico 38,8× · ricavi +36,5% a/a · trimestrale fra 65 giorni
@@ -245,7 +245,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsMicron's fiscal fourth-quarter guidance calls for a gross margin of about 86%.
   [MU] · [Nasdaq, 27h fa] Guess Which Group of Stocks Is Back at an All-Time High?
       Key PointsNvidia, Apple, and Meta have led the way.
-  [NVDA] · [Nasdaq, 5h fa] Does the S&P 500 Have a &quot;Magnificent Seven&quot; Problem? Here's What Investors Need to Know.
+  [NVDA] · [Nasdaq, 6h fa] Does the S&P 500 Have a &quot;Magnificent Seven&quot; Problem? Here's What Investors Need to Know.
       Key PointsThe "Magnificent Seven" stocks that have led the market higher now sport enormous market caps.
   [NVDA] · [Nasdaq, 7h fa] Breakfast News: The Sunday Edition
       SEPTEMBER 27, 2026
@@ -254,7 +254,7 @@ Last week, we brought in Team Llama to weigh in on who&rsquo;s right in the arti
       Key PointsPermits, power, and public protests are three barriers for any company that wants to build data centers.
   [ORCL] · [Nasdaq, 27h fa] Intuit vs. Oracle: Which Technology Stock Is a Better Buy in 2026?
       Key PointsIntuit maintains a dominant position in the personal tax and small business financial software markets.
-  [RGTI] · [Nasdaq, 45h fa] BigBear.ai vs. Rigetti Computing: Which Technology Stock Is a Better Buy in 2026?
+  [RGTI] · [Nasdaq, 46h fa] BigBear.ai vs. Rigetti Computing: Which Technology Stock Is a Better Buy in 2026?
       Key PointsBigBear.ai provides AI-driven decision intelligence with a heavy focus on the defense and public sectors.
   [RGTI] · [Nasdaq, 47h fa] Rigetti, D-Wave, or IonQ: Which Quantum Stock Has the Best Shot at Survival?
       Key PointsIonQ's sales are rising quickly, and the company has plenty of cash to continue investing in its growth.
