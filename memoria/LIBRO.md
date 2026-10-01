@@ -16,14 +16,19 @@
 | MU | 70 | 87,63 | USD | |
 | ORCL | 70 | 143,00 | USD | |
 | RGTI | 463 | 26,5048 | USD | |
-| GOOGL | 50 | 340,20 | USD | |
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
-| WDC | 25 | 458,00 | USD | |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 **Liquidità: 10.000 €** — confermata dal CEO l'08/09/2026.
+
+> ⚠ **USCITE DICHIARATE DAL CEO il 01/10/2026: GOOGL (50) e WDC (25) venduti per intero "la
+> settimana scorsa", con un guadagno di circa il 2% su entrambi.** Prezzi e data esatti NON
+> confermati: ~+2% sul PMC corrisponde a ~347 $ (GOOGL) e ~467 $ (WDC). Il ricavato, al netto
+> dell'imposta, è **liquidità o è stato reinvestito: da confermare**. Finché non lo è, la
+> liquidità qui sopra è SOTTOSTIMATA, e le misure del livello C sotto (fotografia del 07/09)
+> includono ancora i due titoli: pesi e contributo al rischio vanno ricalcolati.
 
 ⚠ Il sistema NON conosce: altri conti, altri strumenti, posizioni corte, margine, coperture,
 situazione fiscale. **Il divieto di dimensionare resta in piedi**: direzione, priorità e livelli
