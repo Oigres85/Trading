@@ -21,7 +21,8 @@
 | BE | 40 | 214,00 | USD | |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: 10.000 €** — confermata dal CEO l'08/09/2026.
+**Liquidità: ~50.000 €** — dichiarata dal CEO il 01/10/2026 ("circa"), dopo le uscite da GOOGL e WDC.
+Destinazione dichiarata: acquisti su storni e IPO di Anthropic.
 
 > ⚠ **USCITE DICHIARATE DAL CEO il 01/10/2026: GOOGL (50) e WDC (25) venduti per intero "la
 > settimana scorsa", con un guadagno di circa il 2% su entrambi.** Prezzi e data esatti NON
