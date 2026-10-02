@@ -45,6 +45,8 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 |---|---|
 | SMCI | Super Micro Computer — server AI. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
 | OKLO | Oklo — reattori nucleari modulari per datacenter. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
+| AMZN | Amazon — candidato d'ingresso (CEO, 02/10/2026). Diversifica in parte dal gruppo AI e porta ~15-20% di Anthropic. Livelli: acquisto 244-246 (supporto 244,30), uscita sotto SMA200 ~240. Trimestrale 29/10 |
+| STX | Seagate — candidato d'ingresso (CEO, 02/10/2026). Leader tecnologico dischi (HAMR), stesso ciclo di WDC. Livelli: ingresso vicino al supporto 758 solo se regge 2-3 sedute, o dopo la trimestrale 27-28/10; uscita sotto 758 |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
