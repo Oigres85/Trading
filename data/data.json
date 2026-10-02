@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-02T22:40:52Z",
+ "updated_at": "2026-10-02T23:35:18Z",
  "eurusd": 1.1257,
  "totals": {
   "usd_value": 0,
@@ -959,10 +959,10 @@
    "sortino_6m": 3.86,
    "prepost": {
     "label": "after",
-    "price": 1069.59,
-    "change_pct": -0.49
+    "price": 1070.8,
+    "change_pct": -0.38
    },
-   "prezzo_limite_aggiustato": 1069.59,
+   "prezzo_limite_aggiustato": 1070.8,
    "risk_reward": "1:0.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -988,14 +988,14 @@
     "target_mean": 1520.0217,
     "fcf": 27881250816.0,
     "gross_margin": 0.8072,
-    "enterprise_value": 1201795760128.0,
-    "ev_ebitda": 11.042,
+    "enterprise_value": 1176370675712.0,
+    "ev_ebitda": 10.808,
     "peg": 0.16,
     "roa": 0.4456,
     "short_float": 0.0245,
     "buyback_yield": -0.0,
     "ps": 9.11,
-    "ev_s": 9.02,
+    "ev_s": 8.83,
     "altman_z": 6.1,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -1775,7 +1775,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -2060,7 +2060,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.95,
-   "pe": 160.5,
+   "pe": 160.9,
    "ath": 645.46,
    "ath_dist_pct": -1.8,
    "sma200_dist_pct": 69.2,
@@ -2929,7 +2929,7 @@
     "target_mediana": 616.0
    },
    "health": 90,
-   "eps": 3.95,
+   "eps": 3.94,
    "beta": 2.48,
    "sharpe_1y": 1.84,
    "sortino_1y": 3.02,
@@ -2937,11 +2937,11 @@
    "sortino_6m": 4.96,
    "prepost": {
     "label": "after",
-    "price": 632.52,
-    "change_pct": -0.22
+    "price": 633.49,
+    "change_pct": -0.07
    },
-   "prezzo_limite_aggiustato": 632.52,
-   "risk_reward": "1:0.3",
+   "prezzo_limite_aggiustato": 633.49,
+   "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -2950,10 +2950,10 @@
     "float_shares": 1623529079.0,
     "float_pct": 99.5,
     "avg_volume_30d": 23752384.0,
-    "pe_ttm": 160.4835,
-    "forward_pe": 40.6919,
-    "eps_ttm": 3.95,
-    "eps_forward": 15.5783,
+    "pe_ttm": 160.8909,
+    "forward_pe": 40.6788,
+    "eps_ttm": 3.94,
+    "eps_forward": 15.5833,
     "revenue_fy": 41305001984.0,
     "net_income_fy": 6469000192.0,
     "revenue_growth": 0.501,
@@ -2966,14 +2966,14 @@
     "target_mean": 619.508,
     "fcf": 8841499648.0,
     "gross_margin": 0.5572,
-    "enterprise_value": 996328865792.0,
-    "ev_ebitda": 104.197,
+    "enterprise_value": 1026007236608.0,
+    "ev_ebitda": 107.3,
     "peg": 0.62,
     "roa": 0.0513,
     "short_float": 0.0246,
     "buyback_yield": 0.0019,
     "ps": 25.05,
-    "ev_s": 24.12,
+    "ev_s": 24.84,
     "altman_z": 6.9,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -4748,10 +4748,10 @@
    "sortino_6m": 2.07,
    "prepost": {
     "label": "after",
-    "price": 233.92,
-    "change_pct": -0.01
+    "price": 234.18,
+    "change_pct": 0.1
    },
-   "prezzo_limite_aggiustato": 233.92,
+   "prezzo_limite_aggiustato": 234.18,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -4777,17 +4777,14 @@
     "target_mean": 327.7,
     "fcf": 41809874944.0,
     "gross_margin": 0.7467,
-    "enterprise_value": 5540117217280.0,
-    "ev_ebitda": 27.526,
+    "enterprise_value": 5614586036224.0,
+    "ev_ebitda": 27.896,
     "peg": 0.28,
     "roa": 0.5357,
     "short_float": 0.0127,
     "buyback_yield": 0.0071,
     "ps": 18.65,
-    "ev_s": 18.29,
-    "altman_z": 13.22,
-    "altman_missing": 0,
-    "altman_model": "Z''"
+    "ev_s": 18.53
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -6493,10 +6490,10 @@
    "sortino_6m": 1.17,
    "prepost": {
     "label": "after",
-    "price": 342.96,
-    "change_pct": -0.16
+    "price": 343.08,
+    "change_pct": -0.12
    },
-   "prezzo_limite_aggiustato": 342.96,
+   "prezzo_limite_aggiustato": 343.08,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -6522,14 +6519,14 @@
     "target_mean": 429.363,
     "fcf": 22665000960.0,
     "gross_margin": 0.609,
-    "enterprise_value": 4033015185408.0,
-    "ev_ebitda": 23.29,
+    "enterprise_value": 4097345060864.0,
+    "ev_ebitda": 23.662,
     "peg": 1.21,
     "roa": 0.1296,
     "short_float": 0.0149,
     "buyback_yield": 0.0109,
     "ps": 9.42,
-    "ev_s": 9.05
+    "ev_s": 9.19
    },
    "combustione": {
     "cassa": 55911000000.0,
@@ -7591,7 +7588,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -0.68,
-   "pe": 161.3,
+   "pe": 160.0,
    "ath": 207.52,
    "ath_dist_pct": -9.0,
    "sma200_dist_pct": 24.1,
@@ -8032,7 +8029,7 @@
     "target_mediana": 205.05
    },
    "health": 87,
-   "eps": 1.17,
+   "eps": 1.18,
    "beta": 1.62,
    "sharpe_1y": 0.09,
    "sortino_1y": 0.13,
@@ -8040,10 +8037,10 @@
    "sortino_6m": 1.2,
    "prepost": {
     "label": "after",
-    "price": 188.54,
-    "change_pct": -0.11
+    "price": 188.8,
+    "change_pct": 0.03
    },
-   "prezzo_limite_aggiustato": 188.54,
+   "prezzo_limite_aggiustato": 188.8,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -8053,10 +8050,10 @@
     "float_shares": 2109957437.0,
     "float_pct": 91.7,
     "avg_volume_30d": 34829747.0,
-    "pe_ttm": 161.3248,
-    "forward_pe": 81.253,
-    "eps_ttm": 1.17,
-    "eps_forward": 2.323,
+    "pe_ttm": 159.9576,
+    "forward_pe": 81.1249,
+    "eps_ttm": 1.18,
+    "eps_forward": 2.3267,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
     "revenue_growth": 0.928,
@@ -8069,14 +8066,14 @@
     "target_mean": 195.5654,
     "fcf": 2159104512.0,
     "gross_margin": 0.848,
-    "enterprise_value": 447590236160.0,
-    "ev_ebitda": 168.101,
+    "enterprise_value": 444490285056.0,
+    "ev_ebitda": 166.937,
     "peg": 1.83,
     "roa": 0.1729,
     "short_float": 0.028,
     "buyback_yield": 0.0002,
     "ps": 73.68,
-    "ev_s": 72.71,
+    "ev_s": 72.21,
     "altman_z": 10.62,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -9882,10 +9879,10 @@
    "sortino_6m": -0.19,
    "prepost": {
     "label": "after",
-    "price": 142.2,
-    "change_pct": -0.07
+    "price": 142.4,
+    "change_pct": 0.07
    },
-   "prezzo_limite_aggiustato": 142.2,
+   "prezzo_limite_aggiustato": 142.4,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -9907,18 +9904,18 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0141,
-    "price_to_book": 10.9126,
+    "price_to_book": 6.9612,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
-    "enterprise_value": 554931257344.0,
-    "ev_ebitda": 16.116,
+    "enterprise_value": 567721656320.0,
+    "ev_ebitda": 16.488,
     "peg": 0.77,
     "roa": 0.0636,
     "short_float": 0.0273,
     "buyback_yield": -0.0144,
     "ps": 6.01,
-    "ev_s": 7.73,
+    "ev_s": 7.91,
     "altman_z": 0.89,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -11932,10 +11929,10 @@
    "sortino_6m": 1.11,
    "prepost": {
     "label": "after",
-    "price": 415.78,
-    "change_pct": 0.12
+    "price": 415.49,
+    "change_pct": 0.05
    },
-   "prezzo_limite_aggiustato": 415.78,
+   "prezzo_limite_aggiustato": 415.49,
    "risk_reward": "1:1.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -11957,18 +11954,18 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": 19.8561,
+    "price_to_book": null,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
-    "enterprise_value": 166383812608.0,
-    "ev_ebitda": 33.263,
+    "enterprise_value": 149341044736.0,
+    "ev_ebitda": 29.856,
     "peg": 0.88,
     "roa": 0.2076,
     "short_float": 0.0538,
     "buyback_yield": 0.0173,
     "ps": 11.59,
-    "ev_s": 12.88,
+    "ev_s": 11.56,
     "altman_z": 9.76,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -13033,7 +13030,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.57,
-   "pe": 89.6,
+   "pe": 89.9,
    "ath": 329.8,
    "ath_dist_pct": -17.4,
    "sma200_dist_pct": 63.2,
@@ -13717,7 +13714,7 @@
     "target_mediana": 284.0
    },
    "health": 88,
-   "eps": 3.04,
+   "eps": 3.03,
    "beta": 2.25,
    "sharpe_1y": 1.45,
    "sortino_1y": 2.29,
@@ -13725,10 +13722,10 @@
    "sortino_6m": 3.04,
    "prepost": {
     "label": "after",
-    "price": 273.11,
-    "change_pct": 0.3
+    "price": 273.15,
+    "change_pct": 0.32
    },
-   "prezzo_limite_aggiustato": 273.11,
+   "prezzo_limite_aggiustato": 273.15,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -13738,9 +13735,9 @@
     "float_shares": 873865926.0,
     "float_pct": 99.7,
     "avg_volume_30d": 22371112.0,
-    "pe_ttm": 89.5691,
+    "pe_ttm": 89.8647,
     "forward_pe": 40.3431,
-    "eps_ttm": 3.04,
+    "eps_ttm": 3.03,
     "eps_forward": 6.7494,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
@@ -13750,18 +13747,18 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0009,
-    "price_to_book": 12.8834,
+    "price_to_book": 13.0883,
     "target_mean": 290.9704,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
-    "enterprise_value": 236432654336.0,
-    "ev_ebitda": 82.95,
+    "enterprise_value": 240124395520.0,
+    "ev_ebitda": 84.245,
     "peg": 0.89,
     "roa": 0.0413,
     "short_float": 0.0418,
     "buyback_yield": 0.0083,
     "ps": 25.89,
-    "ev_s": 25.02,
+    "ev_s": 25.41,
     "altman_z": 4.02,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -15268,10 +15265,10 @@
    "sortino_6m": 0.18,
    "prepost": {
     "label": "after",
-    "price": 15.32,
-    "change_pct": 0.46
+    "price": 15.31,
+    "change_pct": 0.39
    },
-   "prezzo_limite_aggiustato": 15.32,
+   "prezzo_limite_aggiustato": 15.31,
    "risk_reward": "1:1.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -15282,9 +15279,9 @@
     "float_pct": 98.3,
     "avg_volume_30d": 18714736.0,
     "pe_ttm": null,
-    "forward_pe": -73.6715,
+    "forward_pe": -74.0291,
     "eps_ttm": -0.83,
-    "eps_forward": -0.207,
+    "eps_forward": -0.206,
     "revenue_fy": 13353000.0,
     "net_income_fy": -238672000.0,
     "revenue_growth": 1.853,
@@ -15297,14 +15294,14 @@
     "target_mean": 28.525,
     "fcf": 26453624.0,
     "gross_margin": 0.3461,
-    "enterprise_value": 4827459584.0,
+    "enterprise_value": 4703965184.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": -0.0945,
     "short_float": 0.1876,
     "buyback_yield": -0.075,
     "ps": 381.19,
-    "ev_s": 361.53,
+    "ev_s": 352.28,
     "altman_z": 3.17,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -16248,7 +16245,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 4.17,
-   "pe": 370.7,
+   "pe": 380.5,
    "ath": 351.28,
    "ath_dist_pct": -17.7,
    "sma200_dist_pct": 39.4,
@@ -16715,7 +16712,7 @@
     "target_mediana": 303.0
    },
    "health": 86,
-   "eps": 0.78,
+   "eps": 0.76,
    "beta": 3.81,
    "sharpe_1y": 1.01,
    "sortino_1y": 1.53,
@@ -16723,10 +16720,10 @@
    "sortino_6m": 2.13,
    "prepost": {
     "label": "after",
-    "price": 287.83,
-    "change_pct": -0.46
+    "price": 288.0,
+    "change_pct": -0.4
    },
-   "prezzo_limite_aggiustato": 287.83,
+   "prezzo_limite_aggiustato": 288.0,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -16736,10 +16733,10 @@
     "float_shares": 289296540.0,
     "float_pct": 98.2,
     "avg_volume_30d": 15686084.0,
-    "pe_ttm": 370.7051,
-    "forward_pe": 58.6665,
-    "eps_ttm": 0.78,
-    "eps_forward": 4.9287,
+    "pe_ttm": 380.4605,
+    "forward_pe": 58.5075,
+    "eps_ttm": 0.76,
+    "eps_forward": 4.9421,
     "revenue_fy": 3113149952.0,
     "net_income_fy": 244942000.0,
     "revenue_growth": 1.655,
@@ -16752,14 +16749,14 @@
     "target_mean": 282.8154,
     "fcf": 531637504.0,
     "gross_margin": 0.3165,
-    "enterprise_value": 81881735168.0,
-    "ev_ebitda": 195.665,
+    "enterprise_value": 85289418752.0,
+    "ev_ebitda": 203.808,
     "peg": 0.63,
     "roa": 0.056,
     "short_float": 0.0734,
     "buyback_yield": -0.0007,
     "ps": 27.36,
-    "ev_s": 26.3,
+    "ev_s": 27.4,
     "altman_z": 1.86,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -18093,10 +18090,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "after",
-    "price": 194.07,
-    "change_pct": -0.54
+    "price": 194.09,
+    "change_pct": -0.53
    },
-   "prezzo_limite_aggiustato": 194.07,
+   "prezzo_limite_aggiustato": 194.09,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -19567,10 +19564,10 @@
    "sortino_6m": 1.06,
    "prepost": {
     "label": "after",
-    "price": 160.0,
-    "change_pct": -0.01
+    "price": 160.12,
+    "change_pct": 0.07
    },
-   "prezzo_limite_aggiustato": 160.0,
+   "prezzo_limite_aggiustato": 160.12,
    "risk_reward": "1:0.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -19596,14 +19593,14 @@
     "target_mean": 229.8667,
     "fcf": -22587523072.0,
     "gross_margin": 0.676,
-    "enterprise_value": 80431923200.0,
+    "enterprise_value": 80243654656.0,
     "ev_ebitda": null,
     "peg": 2.85,
     "roa": -0.3873,
     "short_float": 0.0815,
     "buyback_yield": null,
     "ps": 128.03,
-    "ev_s": 161.4,
+    "ev_s": 161.02,
     "altman_z": 5.02,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -21061,10 +21058,10 @@
    "sortino_6m": 0.23,
    "prepost": {
     "label": "after",
-    "price": 89.33,
-    "change_pct": -0.32
+    "price": 89.49,
+    "change_pct": -0.15
    },
-   "prezzo_limite_aggiustato": 89.33,
+   "prezzo_limite_aggiustato": 89.49,
    "risk_reward": "1:1.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -21090,14 +21087,14 @@
     "target_mean": 141.5789,
     "fcf": -9088615424.0,
     "gross_margin": 0.6742,
-    "enterprise_value": 94923595776.0,
-    "ev_ebitda": 25.052,
+    "enterprise_value": 95502712832.0,
+    "ev_ebitda": 25.205,
     "peg": null,
     "roa": -0.0024,
     "short_float": 0.1764,
     "buyback_yield": -0.0301,
     "ps": 6.51,
-    "ev_s": 12.51,
+    "ev_s": 12.58,
     "altman_z": -1.29,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -22042,11 +22039,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 84534.55,
+   "price": 84509.07,
    "price_asof": "2026-10-02",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.38,
+   "change_pct": -0.41,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -33.0,
@@ -22059,9 +22056,9 @@
    "day_low": 83993.31,
    "support": 74944.59,
    "resistance": 87363.76,
-   "rsi": 63.1,
-   "volume": 46187696128,
-   "vol_ratio": 1.51,
+   "rsi": 63.0,
+   "volume": 46438023168,
+   "vol_ratio": 1.52,
    "atr_14": 2285.35,
    "atr_pct": 2.7,
    "signal": "Trend rialzista",
@@ -22072,7 +22069,7 @@
      83622.43,
      83553.85,
      84853.1,
-     84534.55
+     84509.07
     ],
     "m6": [
      73754.84,
@@ -22200,7 +22197,7 @@
      83622.43,
      83553.85,
      84853.1,
-     84534.55
+     84509.07
     ],
     "all": [
      386.94,
@@ -22348,7 +22345,7 @@
      62813.75,
      78548.63,
      83553.85,
-     84534.55
+     84509.07
     ],
     "m1": [
      77173.8,
@@ -22372,7 +22369,7 @@
      83622.43,
      83553.85,
      84853.1,
-     84534.55
+     84509.07
     ],
     "m3": [
      63908.17,
@@ -22440,7 +22437,7 @@
      83622.43,
      83553.85,
      84853.1,
-     84534.55
+     84509.07
     ],
     "y1": [
      120681.26,
@@ -22516,28 +22513,28 @@
      76403.77,
      86172.28,
      84458.09,
-     84534.55
+     84509.07
     ],
     "d1": [
      84745.0,
-     84864.84,
+     84858.62,
      84866.79,
      84727.07,
-     84801.72,
+     84801.73,
      84773.5,
      84710.23,
-     84633.76,
-     84617.88,
-     84572.46,
+     84631.55,
+     84617.92,
+     84572.45,
      84551.32,
-     84810.8,
-     84992.54,
+     84812.27,
+     84989.11,
      85054.75,
      84843.76,
-     84879.88,
+     84898.47,
      84952.72,
-     85066.19,
-     85366.37,
+     85067.24,
+     85366.36,
      85280.62,
      85206.24,
      85376.81,
@@ -22547,43 +22544,43 @@
      85451.82,
      86358.69,
      86494.56,
-     86536.91,
+     86536.9,
      86563.02,
      86527.48,
      86557.72,
      86359.0,
      86278.64,
-     86123.82,
+     86129.45,
      85948.99,
      86012.88,
      85885.28,
      86001.39,
      86032.56,
      85981.43,
-     86024.67,
+     86024.66,
      85884.48,
      85936.64,
      85903.83,
-     85860.08,
+     85860.07,
      85753.41,
      85980.85,
-     86249.24,
+     86258.52,
      86297.12,
      86363.99,
      86302.5,
      86309.7,
      86236.49,
-     86170.18,
+     86168.86,
      86207.65,
      86146.81,
-     86357.08,
+     86358.8,
      86334.21,
-     86401.46,
+     86401.47,
      86423.98,
-     86313.66,
+     86313.65,
      86165.76,
      86425.3,
-     86413.13,
+     86413.12,
      86350.98,
      86378.09,
      86449.99,
@@ -22592,69 +22589,75 @@
      86463.64,
      86487.76,
      86358.33,
-     86398.3,
-     86540.83,
-     86822.36,
-     86466.85,
-     86784.29,
-     86922.45,
-     86675.59,
-     86696.19,
-     86908.1,
-     86896.93,
-     86680.2,
-     86814.02,
-     86354.51,
-     86543.17,
-     85763.02,
-     85946.84,
-     85503.66,
-     85561.39,
+     86408.22,
+     86558.51,
+     86819.01,
+     86465.58,
+     86785.81,
+     86922.46,
+     86675.58,
+     86694.81,
+     86898.24,
+     86905.04,
+     86684.0,
+     86816.02,
+     86354.0,
+     86532.29,
+     85800.0,
+     85942.23,
+     85500.0,
+     85548.29,
      85622.48,
-     85350.91,
-     85414.1,
-     85330.17,
+     85350.92,
+     85416.14,
+     85323.89,
      85238.8,
-     85445.78,
+     85448.92,
      85193.74,
      85152.62,
-     85176.0,
-     85168.43,
-     85135.11,
+     85177.01,
+     85168.42,
+     85135.12,
      85166.58,
      84920.59,
-     84682.89,
-     84749.41,
+     84700.39,
+     84749.2,
      84591.75,
-     84764.59,
-     84862.11,
-     84885.54,
-     84603.63,
-     84501.01,
-     83997.97,
-     84172.54,
-     84218.26,
-     84112.83,
-     84144.44,
-     84147.0,
-     84174.67,
-     84189.92,
-     84358.03,
-     84361.19,
-     84504.42,
-     84430.33,
-     84221.92,
-     84410.93,
+     84772.78,
+     84861.43,
+     84889.37,
+     84601.52,
+     84506.43,
+     84003.45,
+     84184.57,
+     84218.03,
+     84111.69,
+     84144.45,
+     84146.55,
+     84173.21,
+     84180.16,
+     84357.41,
+     84363.39,
+     84504.43,
+     84430.27,
+     84221.91,
+     84410.94,
      84489.43,
-     84483.32,
-     84469.49,
-     84447.99,
+     84483.33,
+     84469.5,
+     84448.0,
      84497.45,
-     84503.3,
+     84503.33,
      84467.57,
      84525.94,
      84546.97,
-     84529.37
+     84538.4,
+     84490.88,
+     84525.55,
+     84529.88,
+     84473.16,
+     84489.56,
+     84509.07
     ]
    },
    "earnings_date": null,
@@ -22664,11 +22667,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.75,
-   "sortino_1y": -1.02,
+   "sortino_1y": -1.03,
    "sharpe_6m": 0.74,
-   "sortino_6m": 1.19,
+   "sortino_6m": 1.18,
    "prepost": null,
-   "prezzo_limite_aggiustato": 84534.55,
+   "prezzo_limite_aggiustato": 84509.07,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22681,22 +22684,22 @@
     "w1": {
      "support": 82570.72,
      "resistance": 87075.24,
-     "change_pct": 1.24
+     "change_pct": 1.21
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 9.54
+     "change_pct": 9.5
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 32.28
+     "change_pct": 32.24
     },
     "y1": {
      "support": 57747.77,
      "resistance": 90439.29,
-     "change_pct": -5.14
+     "change_pct": -5.16
     }
    },
    "financials": [],
@@ -22723,74 +22726,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 84534.55,
+     "prezzo": 84509.07,
      "medie": {
       "sma10": {
-       "liv": 84172.81,
-       "dist_pct": 0.43
+       "liv": 84170.26,
+       "dist_pct": 0.4
       },
       "ema10": {
-       "liv": 83816.18,
-       "dist_pct": 0.86
+       "liv": 83811.54,
+       "dist_pct": 0.83
       },
       "sma20": {
-       "liv": 82047.46,
-       "dist_pct": 3.03
+       "liv": 82046.18,
+       "dist_pct": 3.0
       },
       "ema20": {
-       "liv": 82450.33,
-       "dist_pct": 2.53
+       "liv": 82447.91,
+       "dist_pct": 2.5
       },
       "sma30": {
-       "liv": 80963.1,
-       "dist_pct": 4.41
-      },
-      "ema30": {
-       "liv": 80983.83,
+       "liv": 80962.25,
        "dist_pct": 4.38
       },
+      "ema30": {
+       "liv": 80982.19,
+       "dist_pct": 4.36
+      },
       "sma50": {
-       "liv": 78123.65,
-       "dist_pct": 8.21
+       "liv": 78123.14,
+       "dist_pct": 8.17
       },
       "ema50": {
-       "liv": 78310.71,
-       "dist_pct": 7.95
+       "liv": 78309.71,
+       "dist_pct": 7.92
       },
       "sma100": {
-       "liv": 70754.67,
-       "dist_pct": 19.48
+       "liv": 70754.42,
+       "dist_pct": 19.44
       },
       "ema100": {
-       "liv": 74691.47,
-       "dist_pct": 13.18
+       "liv": 74690.97,
+       "dist_pct": 13.14
       },
       "sma200": {
-       "liv": 71371.42,
-       "dist_pct": 18.44
+       "liv": 71371.3,
+       "dist_pct": 18.41
       },
       "ema200": {
-       "liv": 74983.21,
-       "dist_pct": 12.74
+       "liv": 74982.96,
+       "dist_pct": 12.7
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.1,
+      "rsi14": 63.0,
       "macd": {
-       "linea": 1994.19,
-       "segnale": 2132.65,
-       "istogramma": -138.46
+       "linea": 1992.16,
+       "segnale": 2132.25,
+       "istogramma": -140.09
       },
-      "stoch_k": 61.1,
-      "stoch_d": 68.4,
-      "williams_r": -38.9,
-      "cci20": 66.6,
+      "stoch_k": 60.7,
+      "stoch_d": 68.3,
+      "williams_r": -39.3,
+      "cci20": 66.4,
       "adx14": 41.7,
       "di_su": 33.1,
       "di_giu": 12.8,
-      "momentum10": -1637.73
+      "momentum10": -1663.21
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23283,19 +23286,19 @@
       "o": 84849.93,
       "h": 87075.24,
       "l": 83993.31,
-      "c": 84534.55
+      "c": 84509.07
      }
     ],
     "performance": {
-     "s1": 0.09,
-     "m1": 10.4,
-     "m3": 32.35,
-     "m6": 15.21,
-     "a1": -5.55,
-     "ytd": -4.73,
-     "a3": 143.84,
-     "a5": 37.86,
-     "a10": 11959.62
+     "s1": 0.06,
+     "m1": 10.37,
+     "m3": 32.31,
+     "m6": 15.18,
+     "a1": -5.58,
+     "ytd": -4.76,
+     "a3": 143.77,
+     "a5": 37.82,
+     "a10": 11955.98
     },
     "stagionalita": [
      {
@@ -37201,7 +37204,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 3.35,
-   "pe": 45.2,
+   "pe": 45.4,
    "ath": 494.1,
    "ath_dist_pct": -28.1,
    "sma200_dist_pct": -3.0,
@@ -37775,7 +37778,7 @@
     "target_mediana": 535.0
    },
    "health": 34,
-   "eps": 7.85,
+   "eps": 7.83,
    "beta": 1.46,
    "sharpe_1y": 0.04,
    "sortino_1y": 0.06,
@@ -37783,10 +37786,10 @@
    "sortino_6m": 0.61,
    "prepost": {
     "label": "after",
-    "price": 354.7,
-    "change_pct": -0.12
+    "price": 355.04,
+    "change_pct": -0.03
    },
-   "prezzo_limite_aggiustato": 354.7,
+   "prezzo_limite_aggiustato": 355.04,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -37796,10 +37799,10 @@
     "float_shares": 4715677998.0,
     "float_pct": 98.8,
     "avg_volume_30d": 22483517.0,
-    "pe_ttm": 45.2408,
-    "forward_pe": 18.3238,
-    "eps_ttm": 7.85,
-    "eps_forward": 19.3814,
+    "pe_ttm": 45.3563,
+    "forward_pe": 18.3214,
+    "eps_ttm": 7.83,
+    "eps_forward": 19.3839,
     "revenue_fy": 89103998976.0,
     "net_income_fy": 38264999936.0,
     "revenue_growth": 0.855,
@@ -37812,14 +37815,14 @@
     "target_mean": 531.3149,
     "fcf": 30596499456.0,
     "gross_margin": 0.7551,
-    "enterprise_value": 1675854217216.0,
-    "ev_ebitda": 32.068,
+    "enterprise_value": 1730750971904.0,
+    "ev_ebitda": 33.118,
     "peg": 0.34,
     "roa": 0.1537,
     "short_float": 0.0111,
     "buyback_yield": 0.0036,
     "ps": 19.03,
-    "ev_s": 18.81,
+    "ev_s": 19.42,
     "altman_z": 2.66,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -48042,13 +48045,6 @@
      "url": "https://www.bloomberg.com/news/videos/2026-10-02/treasury-yields-climb-add-to-weekly-gains-closing-bell-video"
     },
     {
-     "titolo": "Switching jobs to get higher pay works best in these industries",
-     "riassunto": "Finding a new job is one way to get a pay increase at a time when inflation has been outpacing wage growth.",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-02T20:24:00Z",
-     "url": "https://www.marketwatch.com/story/the-best-industry-to-change-jobs-to-get-paid-more-money-and-the-worst-ae33a3a7?mod=mw_rss_topstories"
-    },
-    {
      "titolo": "Men are losing ground in the labor market. Here's why",
      "riassunto": "Women outnumbered men in the workforce for eight straight months as of September, according to one analysis.",
      "fonte": "CNBC Economia",
@@ -48117,6 +48113,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-29T16:52:00Z",
      "url": "https://www.cnbc.com/2026/09/29/consumer-optimism-slides-sharply-as-fears-escalate-over-rising-prices-and-jobs.html"
+    },
+    {
+     "titolo": "America's Canadian import restrictions come into force. Here are the products barred from entry",
+     "riassunto": "President Donald Trump says he expects Ottawa to concede to its demands on trade in the coming weeks, but Canadian officials insist they won't sign a bad deal.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-29T15:57:43Z",
+     "url": "https://www.cnbc.com/2026/09/29/canada-import-ban-trade-war.html"
     }
    ],
    "fonti": [
@@ -53402,7 +53405,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 272056000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 199.81,
     "d1": 1.01,
@@ -53568,7 +53571,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 630.6,
     "d1": 2.07,
@@ -53651,7 +53654,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 69700000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 205.29,
     "d1": -0.33,
@@ -53734,7 +53737,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 166.18,
     "d1": -0.01,
@@ -54289,7 +54292,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 120253000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 110.04,
     "d1": 1.13,
@@ -54455,7 +54458,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 80.2,
     "d1": 1.47,
@@ -57945,18 +57948,18 @@
    "per_titolo": {
     "AMD": [
      {
-      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:18:38Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-     },
-     {
       "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
+      "quando": "2026-10-02T23:05:36Z",
       "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+     },
+     {
+      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-02T23:00:33Z",
+      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
       "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
@@ -58077,18 +58080,18 @@
     ],
     "GOOGL": [
      {
-      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-     },
-     {
       "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
+      "quando": "2026-10-02T23:05:36Z",
       "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+     },
+     {
+      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-02T23:00:33Z",
+      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
       "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
@@ -58124,7 +58127,7 @@
       "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
+      "quando": "2026-10-02T23:05:36Z",
       "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
      },
      {
@@ -58168,7 +58171,7 @@
       "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
+      "quando": "2026-10-02T23:05:36Z",
       "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
      },
      {
@@ -58253,18 +58256,18 @@
     ],
     "NVDA": [
      {
-      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:18:38Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-     },
-     {
       "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
+      "quando": "2026-10-02T23:05:36Z",
       "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+     },
+     {
+      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-02T23:00:33Z",
+      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
       "titolo": "Nvidia Stock Is Back at Its May Record. Its Quarterly Revenue Is 41% Higher.",
@@ -58429,18 +58432,25 @@
     ],
     "WDC": [
      {
-      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-     },
-     {
       "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-02T22:11:21Z",
+      "quando": "2026-10-02T23:05:36Z",
       "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+     },
+     {
+      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-02T23:00:33Z",
+      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+     },
+     {
+      "titolo": "Western Digital (WDC) Stock Sinks As Market Gains: Here's Why",
+      "riassunto": "Western Digital (WDC) concluded the recent trading session at $415.29, signifying a -10.22% move from its prior day's close.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-02T20:50:04Z",
+      "url": "https://www.nasdaq.com/articles/western-digital-wdc-stock-sinks-market-gains-heres-why"
      },
      {
       "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
@@ -58462,13 +58472,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-02T17:59:43Z",
       "url": "https://www.nasdaq.com/articles/nasdaq-100-movers-stx-honiv-0"
-     },
-     {
-      "titolo": "S&P 500 Movers: STX, HONIV",
-      "riassunto": "In early trading on Friday, shares of Honeywell International topped the list of the day's best performing components of the S&amp;P 500 index, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing S&amp;P 500 component thus fa",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T17:56:56Z",
-      "url": "https://www.nasdaq.com/articles/sp-500-movers-stx-honiv-0"
      }
     ]
    },
@@ -58495,7 +58498,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-02T22:40:52Z"
+   "letto_il": "2026-10-02T23:35:18Z"
   }
  },
  "broker": null,
@@ -58503,18 +58506,18 @@
   "per_titolo": {
    "AMD": [
     {
-     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:18:38Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-    },
-    {
      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
+     "quando": "2026-10-02T23:05:36Z",
      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+    },
+    {
+     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-02T23:00:33Z",
+     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
      "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
@@ -58635,18 +58638,18 @@
    ],
    "GOOGL": [
     {
-     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-    },
-    {
      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
+     "quando": "2026-10-02T23:05:36Z",
      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+    },
+    {
+     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-02T23:00:33Z",
+     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
      "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
@@ -58682,7 +58685,7 @@
      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
+     "quando": "2026-10-02T23:05:36Z",
      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
     },
     {
@@ -58726,7 +58729,7 @@
      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
+     "quando": "2026-10-02T23:05:36Z",
      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
     },
     {
@@ -58811,18 +58814,18 @@
    ],
    "NVDA": [
     {
-     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:18:38Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-    },
-    {
      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
+     "quando": "2026-10-02T23:05:36Z",
      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+    },
+    {
+     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-02T23:00:33Z",
+     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
      "titolo": "Nvidia Stock Is Back at Its May Record. Its Quarterly Revenue Is 41% Higher.",
@@ -58987,18 +58990,25 @@
    ],
    "WDC": [
     {
-     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-    },
-    {
      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-02T22:11:21Z",
+     "quando": "2026-10-02T23:05:36Z",
      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
+    },
+    {
+     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-02T23:00:33Z",
+     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+    },
+    {
+     "titolo": "Western Digital (WDC) Stock Sinks As Market Gains: Here's Why",
+     "riassunto": "Western Digital (WDC) concluded the recent trading session at $415.29, signifying a -10.22% move from its prior day's close.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-02T20:50:04Z",
+     "url": "https://www.nasdaq.com/articles/western-digital-wdc-stock-sinks-market-gains-heres-why"
     },
     {
      "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
@@ -59020,13 +59030,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-02T17:59:43Z",
      "url": "https://www.nasdaq.com/articles/nasdaq-100-movers-stx-honiv-0"
-    },
-    {
-     "titolo": "S&P 500 Movers: STX, HONIV",
-     "riassunto": "In early trading on Friday, shares of Honeywell International topped the list of the day's best performing components of the S&amp;P 500 index, trading up 7.5%.  Year to date, Honeywell International registers a 42.2% gain.\n\nAnd the worst performing S&amp;P 500 component thus fa",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T17:56:56Z",
-     "url": "https://www.nasdaq.com/articles/sp-500-movers-stx-honiv-0"
     }
    ]
   },
@@ -59053,7 +59056,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-02T22:40:52Z"
+  "letto_il": "2026-10-02T23:35:18Z"
  },
  "predictions": [
   {
@@ -59072,14 +59075,14 @@
    "link": "https://polymarket.com/event/will-bitcoin-reach-87pt5k-in-october-2026"
   },
   {
-   "question": "Will Bitcoin reach $88,000 September 28-October 4?",
-   "yes": 5,
-   "link": "https://polymarket.com/event/will-bitcoin-reach-88k-september-28-october-4-2026"
-  },
-  {
    "question": "Will the price of Bitcoin be above $76,000 on October 3?",
    "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-october-3-2026"
+  },
+  {
+   "question": "Will Bitcoin reach $88,000 September 28-October 4?",
+   "yes": 3,
+   "link": "https://polymarket.com/event/will-bitcoin-reach-88k-september-28-october-4-2026"
   },
   {
    "question": "Will the price of Bitcoin be above $74,000 on October 3?",
@@ -80395,7 +80398,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -80447,6 +80450,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-02T22:40:53Z"
+  "generated_at": "2026-10-02T23:35:18Z"
  }
 }
