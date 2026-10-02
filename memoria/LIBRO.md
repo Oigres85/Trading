@@ -47,6 +47,24 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | OKLO | Oklo — reattori nucleari modulari per datacenter. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
 | AMZN | Amazon — candidato d'ingresso (CEO, 02/10/2026). Diversifica in parte dal gruppo AI e porta ~15-20% di Anthropic. Livelli: acquisto 244-246 (supporto 244,30), uscita sotto SMA200 ~240. Trimestrale 29/10 |
 | STX | Seagate — candidato d'ingresso (CEO, 02/10/2026). Leader tecnologico dischi (HAMR), stesso ciclo di WDC. Livelli: ingresso vicino al supporto 758 solo se regge 2-3 sedute, o dopo la trimestrale 27-28/10; uscita sotto 758 |
+| GOOGL | Alphabet — uscito dal libro a ~+2% (fine settembre); rientro valutato sul supporto 327,74 o sopra 364 |
+| WDC | Western Digital — uscito dal libro a ~+2%; ciclo dischi in allentamento (Toshiba), indietro su HAMR |
+| TSM | TSMC — collo di bottiglia CoWoS; trimestrale 15/10 |
+| CBRS | Cerebras — quotata da maggio 2026; lock-up principale a meta' novembre, ~80% degli ordini da OpenAI |
+| INTC | Intel — in watchlist del CEO |
+| SPCX | SpaceX — in watchlist del CEO, quotata di recente (storia corta) |
+| TSLA | Tesla — in watchlist del CEO |
+| CEG | Constellation — nucleare esistente, correlazione bassa col libro (0,2-0,4); livelli 247 / ~270 |
+| NFLX | Netflix — in tendenza ribassista; ingresso solo sopra la SMA50 (~75,6) |
+| MSFT | Microsoft — in watchlist del CEO |
+| AAPL | Apple — in watchlist del CEO |
+| META | Meta — in watchlist del CEO |
+| CRM | Salesforce — software applicativo, pressione da agenti AI |
+| NOW | ServiceNow — software applicativo, pressione da agenti AI |
+| AVGO | Broadcom — chip su misura e reti per AI |
+| ASML | ASML — litografia, fornitore unico di EUV |
+| NKE | Nike — conti del 01/10 deboli, sotto il minimo a 52 settimane; non entrare |
+| MCD | McDonald's — difensivo vicino ai minimi; aspettare la fine della discesa |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'

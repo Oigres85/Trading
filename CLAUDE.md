@@ -5984,3 +5984,18 @@ Le due barre della liquidità hanno bisogno di **due** numeri: con uno solo il g
 ha il dato" e "ce l'ha e non te lo passa" si leggono uguali* (v406) — e il gate è **nei due
 versi**: con due numeri disegna, con uno solo dichiara. Entrambe le direzioni validate per
 iniezione.
+
+## 📅 v459 — LA DATA VENIVA DALLA BARRA, IL VALORE DALLA QUOTA
+
+Aggiungendo al brief i 22 titoli della watchlist del CEO, la riga dei mossi diceva *"STX seduta
+del 2026-10-01: chiusura -10,77%"* — un movimento del **02/10**, a seduta aperta. La variazione e
+l'escursione vengono dalla **quota** (`td`), la data dall'**ultima barra storica**, che durante la
+seduta è quella di ieri. Classe **v431**, sul VIX allora e sul brief adesso. Ora la data è quella
+che la quota dichiara, con ripiego sulla barra.
+
+⚠⚠ **E il gate del parser ha trovato un difetto MIO di un giorno prima**: scrivendo nel libro
+*"Liquidità: ~50.000 €"*, la tilde faceva fallire la lettura e **la liquidità spariva in silenzio
+dal brief**. Il check non lo aveva preso per la ragione sbagliata: pretendeva *13 azioni e 10.000
+€*, cioè i numeri di un giorno, ed è andato rosso perché il CEO aveva chiuso due posizioni. Ora
+confronta il parser con un **conteggio indipendente** dello stesso file e pretende che la
+liquidità venga letta in qualunque forma il CEO la scriva. Validati per iniezione entrambi.

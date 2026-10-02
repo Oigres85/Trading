@@ -1050,10 +1050,26 @@ check("v451 il brief dichiara il confine: livelli si', quantita' no",
 
 # Il libro si legge davvero: un modulo che importa non e' un parser che funziona.
 _pos, _cassa, _sorv = _bf.leggi_libro()
-check("v451 il parser del libro trova le 13 azioni, il BTP e la liquidita'",
-      len([p for p in _pos if p["valuta"] == "USD"]) == 13
-      and any(p["tk"].startswith("BTP") for p in _pos) and _cassa == 10000,
-      extra=f"{len(_pos)} righe, cassa={_cassa}")
+# ⚠ v459: il check pretendeva 13 azioni e 10.000 € — i numeri di UN giorno. Il CEO ha chiuso
+#   GOOGL e WDC e dichiarato ~50.000 €, e il check e' andato rosso su un parser corretto mentre
+#   il difetto vero (la tilde che faceva sparire la liquidita') gli passava accanto. Ora si
+#   confronta il parser con un CONTEGGIO INDIPENDENTE dello stesso file, e la liquidita' deve
+#   essere letta qualunque forma il CEO le dia (classe v233/v429: lo stato del giorno non e'
+#   una proprieta').
+_sez_pos, _usd_ind, _liq_ind = False, 0, None
+for _r in Path("memoria/LIBRO.md").read_text(encoding="utf-8").splitlines():
+    if _r.startswith("## "):
+        _sez_pos = "POSIZIONI" in _r.upper()
+    if _sez_pos and re.search(r"\|\s*USD\s*\|", _r):
+        _usd_ind += 1
+    _ml = re.search(r"Liquidit[^:]*:\D*([\d.]+)", _r)
+    if _ml and _liq_ind is None:
+        _liq_ind = float(_ml.group(1).replace(".", ""))
+check("v451 il parser del libro trova tutte le azioni, il BTP e la liquidita'",
+      _usd_ind > 0 and len([p for p in _pos if p["valuta"] == "USD"]) == _usd_ind
+      and any(p["tk"].startswith("BTP") for p in _pos)
+      and _cassa is not None and _cassa == _liq_ind,
+      extra=f"parser {len([p for p in _pos if p['valuta'] == 'USD'])} USD contro {_usd_ind}, cassa={_cassa} contro {_liq_ind}")
 check("v451 il PMC di NVDA e' quello confermato dal CEO, non quello vecchio",
       any(p["tk"] == "NVDA" and abs(p["pmc"] - 87.1667) < 0.001 for p in _pos))
 
@@ -1270,6 +1286,25 @@ check("v455 un sorvegliato fra i mossi e' marcato come tale",
 _DATI_V = dict(_DATI_F); _DATI_V["tecnica"] = [_riga_finta("AAA", 100.0)]
 check("v455 senza sorvegliati il blocco non compare affatto",
       "Sorvegliati" not in _bp.genera(_DATI_V))
+
+# ============================ v459 — LA SEDUTA DELLA QUOTA ============================
+# Variazione ed escursione vengono dalla QUOTA; la data stampata veniva dall'ultima barra
+# STORICA, che a seduta in corso e' quella di ieri: "seduta del 01/10" su un -10,8% del 02/10.
+# Classe v431 (l'etichetta da una fonte, il valore da un'altra). Lo stato si COSTRUISCE: barre
+# che finiscono ieri, quota che dichiara oggi — a qualunque ora giri la suite.
+_orig_b, _orig_q = _bf.barre, _bf.quota
+try:
+    _bf.barre = lambda tk: [{"t": f"2026-09-{g:02d}", "o": 100, "h": 101, "l": 99, "c": 100}
+                            for g in range(1, 31)] + [{"t": "2026-10-01", "o": 100, "h": 101, "l": 99, "c": 100}]
+    _bf.quota = lambda tk: {"p": 90.0, "cp": -10.0, "h": 101.0, "l": 89.0, "td": "2026-10-02", "ms": "open"}
+    _tq = _bf.tecnica("ZZZ")
+finally:
+    _bf.barre, _bf.quota = _orig_b, _orig_q
+check("v459 la tecnica porta la seduta dichiarata dalla QUOTA, distinta dall'ultima barra",
+      _tq.get("seduta_quota") == "2026-10-02" and _tq.get("seduta") == "2026-10-01",
+      extra=str({k: _tq.get(k) for k in ("seduta", "seduta_quota")}))
+check("v459 la riga dei mossi stampa la seduta della quota, non quella della barra",
+      "seduta del {r.get('seduta_quota') or r.get('seduta'" in _BRIEF_CODICE)
 
 
 _T = len(ESEGUITI)

@@ -107,7 +107,10 @@ def leggi_libro():
                 continue
             pos.append({"tk": tk, "qta": float(q.replace(".", "").replace(",", ".")),
                         "pmc": float(pmc.replace(".", "").replace(",", ".")), "valuta": val})
-        mc = re.search(r"Liquidit[aà]:\s*([\d.]+)\s*€", riga)
+        # ⚠ v459: il CEO dichiara anche cifre APPROSSIMATE ("~50.000 €"). La tilde faceva fallire
+        #   la lettura e la liquidita' spariva in silenzio dal brief: si accetta, e il valore
+        #   resta quello dichiarato.
+        mc = re.search(r"Liquidit[aà]:\s*\*{0,2}\s*~?\s*([\d.]+)\s*€", riga)
         if mc:
             cassa = float(mc.group(1).replace(".", ""))
     return pos, cassa, sorv
@@ -153,6 +156,11 @@ def tecnica(tk):
     atr = atr_wilder(d)
     r = {"tk": tk, "barre": len(d), "seduta": d[-1]["t"], "px": px,
          "chiusura_prec": d[-1]["c"], "var_pct": q.get("cp"), "stato_mercato": q.get("ms"),
+         # ⚠ La variazione e l'escursione vengono dalla QUOTA, non dall'ultima barra storica: la
+         #   seduta che descrivono e' quella dichiarata dalla quota (td). d[-1]["t"] e' la barra
+         #   precedente quando la seduta e' in corso — etichettarle con quella data e' la classe
+         #   v431 (l'etichetta da una fonte, il valore da un'altra).
+         "seduta_quota": q.get("td"),
          "esteso_px": q.get("ep"), "esteso_pct": q.get("ecp"), "esteso_fase": q.get("es"),
          "atr": atr, "atr_pct": (atr / px * 100) if (atr and px) else None}
     for n in (20, 50, 200):
@@ -452,7 +460,7 @@ def componi(modo, dati):
             # ⚠ Un'escursione ampia che chiude piatta dice che il prezzo e' andato lontano ed
             #   e' TORNATO: non afferma una direzione che il dato non porta (v405, v449).
             q.append(f"escursione {n2(r['escursione_pct'])}% = {n2(r['escursione_atr'],1)}x")
-        A(f"  {r['tk']:6} seduta del {r.get('seduta','n.d.')}: {' · '.join(q)}")
+        A(f"  {r['tk']:6} seduta del {r.get('seduta_quota') or r.get('seduta','n.d.')}: {' · '.join(q)}")
         A(f"         {riga_titolo(r, True).split(chr(10))[1].strip()}")
 
     # --- 1bis. TRIMESTRALI IN ARRIVO
