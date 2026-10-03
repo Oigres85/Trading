@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-03T14:06:05Z",
+ "updated_at": "2026-10-03T17:29:55Z",
  "eurusd": 1.1257,
  "totals": {
   "usd_value": 0,
@@ -2060,7 +2060,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.95,
-   "pe": 161.3,
+   "pe": 156.1,
    "ath": 645.46,
    "ath_dist_pct": -1.8,
    "sma200_dist_pct": 69.2,
@@ -2929,7 +2929,7 @@
     "target_mediana": 616.0
    },
    "health": 90,
-   "eps": 3.93,
+   "eps": 4.06,
    "beta": 2.48,
    "sharpe_1y": 1.84,
    "sortino_1y": 3.02,
@@ -2950,9 +2950,9 @@
     "float_shares": 1623529079.0,
     "float_pct": 99.5,
     "avg_volume_30d": 23691812.0,
-    "pe_ttm": 161.3003,
+    "pe_ttm": 156.1355,
     "forward_pe": 40.6788,
-    "eps_ttm": 3.93,
+    "eps_ttm": 4.06,
     "eps_forward": 15.5833,
     "revenue_fy": 41305001984.0,
     "net_income_fy": 6469000192.0,
@@ -4039,7 +4039,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.34,
-   "pe": 29.2,
+   "pe": 29.6,
    "ath": 237.88,
    "ath_dist_pct": -1.7,
    "sma200_dist_pct": 16.8,
@@ -4740,7 +4740,7 @@
     "target_mediana": 315.0
    },
    "health": 78,
-   "eps": 8.02,
+   "eps": 7.91,
    "beta": 2.22,
    "sharpe_1y": 0.5,
    "sortino_1y": 0.73,
@@ -4761,9 +4761,9 @@
     "float_shares": 23132626000.0,
     "float_pct": 95.8,
     "avg_volume_30d": 122619076.0,
-    "pe_ttm": 29.1708,
+    "pe_ttm": 29.5765,
     "forward_pe": 14.9059,
-    "eps_ttm": 8.02,
+    "eps_ttm": 7.91,
     "eps_forward": 15.6951,
     "revenue_fy": 302970011648.0,
     "net_income_fy": 192880001024.0,
@@ -4784,7 +4784,10 @@
     "short_float": 0.0127,
     "buyback_yield": 0.0071,
     "ps": 18.65,
-    "ev_s": 18.53
+    "ev_s": 18.53,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -8051,9 +8054,9 @@
     "float_pct": 91.7,
     "avg_volume_30d": 34564696.0,
     "pe_ttm": 161.3248,
-    "forward_pe": 80.5192,
+    "forward_pe": 81.253,
     "eps_ttm": 1.17,
-    "eps_forward": 2.3442,
+    "eps_forward": 2.323,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
     "revenue_growth": 0.928,
@@ -9904,7 +9907,7 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0141,
-    "price_to_book": 6.9612,
+    "price_to_book": 10.9126,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
@@ -11954,7 +11957,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": null,
+    "price_to_book": 19.8561,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13030,7 +13033,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.57,
-   "pe": 90.2,
+   "pe": 88.4,
    "ath": 329.8,
    "ath_dist_pct": -17.4,
    "sma200_dist_pct": 63.2,
@@ -13714,7 +13717,7 @@
     "target_mediana": 284.0
    },
    "health": 88,
-   "eps": 3.02,
+   "eps": 3.08,
    "beta": 2.25,
    "sharpe_1y": 1.45,
    "sortino_1y": 2.29,
@@ -13735,9 +13738,9 @@
     "float_shares": 873865926.0,
     "float_pct": 99.7,
     "avg_volume_30d": 22270032.0,
-    "pe_ttm": 90.1623,
+    "pe_ttm": 88.4058,
     "forward_pe": 40.3431,
-    "eps_ttm": 3.02,
+    "eps_ttm": 3.08,
     "eps_forward": 6.7494,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
@@ -13747,7 +13750,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0009,
-    "price_to_book": 13.0883,
+    "price_to_book": 12.8834,
     "target_mean": 293.8774,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -15257,7 +15260,7 @@
     "target_mediana": 30.0
    },
    "health": 42,
-   "eps": -0.81,
+   "eps": -0.83,
    "beta": 2.01,
    "sharpe_1y": -1.02,
    "sortino_1y": -1.46,
@@ -15280,7 +15283,7 @@
     "avg_volume_30d": 18636893.0,
     "pe_ttm": null,
     "forward_pe": -74.0291,
-    "eps_ttm": -0.81,
+    "eps_ttm": -0.83,
     "eps_forward": -0.206,
     "revenue_fy": 13353000.0,
     "net_income_fy": -238672000.0,
@@ -16245,7 +16248,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 4.17,
-   "pe": 357.0,
+   "pe": 370.7,
    "ath": 351.28,
    "ath_dist_pct": -17.7,
    "sma200_dist_pct": 39.4,
@@ -16712,7 +16715,7 @@
     "target_mediana": 303.0
    },
    "health": 86,
-   "eps": 0.81,
+   "eps": 0.78,
    "beta": 3.81,
    "sharpe_1y": 1.01,
    "sortino_1y": 1.53,
@@ -16733,10 +16736,10 @@
     "float_shares": 289296540.0,
     "float_pct": 98.2,
     "avg_volume_30d": 15642992.0,
-    "pe_ttm": 356.9753,
-    "forward_pe": 58.5075,
-    "eps_ttm": 0.81,
-    "eps_forward": 4.9421,
+    "pe_ttm": 370.7051,
+    "forward_pe": 58.6665,
+    "eps_ttm": 0.78,
+    "eps_forward": 4.9287,
     "revenue_fy": 3113149952.0,
     "net_income_fy": 244942000.0,
     "revenue_growth": 1.655,
@@ -22039,27 +22042,27 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 84785.86,
+   "price": 84886.29,
    "price_asof": "2026-10-03",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.34,
+   "change_pct": 0.46,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -32.8,
-   "sma200_dist_pct": 18.7,
-   "sma50_dist_pct": 7.9,
+   "ath_dist_pct": -32.7,
+   "sma200_dist_pct": 18.8,
+   "sma50_dist_pct": 8.1,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -32.8,
-   "day_high": 84899.27,
+   "w52_dist_pct": -32.7,
+   "day_high": 84918.76,
    "day_low": 84434.45,
    "support": 74944.59,
    "resistance": 87363.76,
-   "rsi": 63.8,
-   "volume": 27088441344,
+   "rsi": 64.1,
+   "volume": 19414237184,
    "vol_ratio": 1.52,
-   "atr_14": 2169.36,
+   "atr_14": 2170.75,
    "atr_pct": 2.56,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -22069,7 +22072,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84785.86
+     84886.29
     ],
     "m6": [
      73579.69,
@@ -22197,7 +22200,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84785.86
+     84886.29
     ],
     "all": [
      386.94,
@@ -22345,7 +22348,7 @@
      62813.75,
      78548.63,
      83553.85,
-     84785.86
+     84886.29
     ],
     "m1": [
      77270.47,
@@ -22369,7 +22372,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84785.86
+     84886.29
     ],
     "m3": [
      64725.31,
@@ -22437,7 +22440,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84785.86
+     84886.29
     ],
     "y1": [
      122266.53,
@@ -22513,31 +22516,31 @@
      80901.46,
      84383.01,
      83502.61,
-     84785.86
+     84886.29
     ],
     "d1": [
-     84461.0,
-     84509.21,
+     84461.01,
+     84509.22,
      84527.14,
-     84611.73,
-     84621.0,
+     84611.72,
+     84613.99,
      84662.01,
      84636.84,
-     84643.18,
-     84601.73,
+     84643.17,
+     84601.72,
      84618.57,
      84617.72,
-     84602.45,
-     84629.22,
+     84602.44,
+     84629.21,
      84604.68,
      84621.6,
-     84648.43,
+     84648.44,
      84666.82,
-     84618.12,
+     84618.11,
      84593.98,
      84518.08,
      84567.98,
-     84602.9,
+     84602.89,
      84644.1,
      84652.1,
      84705.21,
@@ -22547,7 +22550,7 @@
      84545.73,
      84569.99,
      84559.2,
-     84551.59,
+     84551.6,
      84599.43,
      84628.98,
      84615.99,
@@ -22555,26 +22558,26 @@
      84630.49,
      84614.0,
      84625.81,
-     84632.64,
+     84632.63,
      84628.45,
      84562.95,
-     84557.61,
+     84559.74,
      84598.72,
-     84586.11,
+     84586.1,
      84626.33,
      84557.61,
      84566.67,
      84588.33,
      84633.93,
-     84563.46,
+     84568.69,
      84563.64,
      84613.64,
      84627.89,
-     84628.42,
+     84628.41,
      84621.54,
      84591.61,
      84570.14,
-     84571.35,
+     84570.14,
      84571.34,
      84591.78,
      84568.91,
@@ -22582,39 +22585,59 @@
      84594.34,
      84593.94,
      84622.3,
-     84653.03,
+     84604.38,
      84619.91,
      84630.58,
      84648.64,
      84649.98,
      84675.79,
-     84684.0,
+     84683.99,
      84683.81,
-     84843.64,
+     84845.5,
      84842.64,
      84801.01,
      84876.99,
      84836.52,
      84845.32,
      84789.21,
-     84902.55,
+     84903.13,
      84822.09,
      84869.98,
-     84785.86
+     84790.0,
+     84785.37,
+     84815.72,
+     84780.7,
+     84747.05,
+     84821.68,
+     84788.99,
+     84824.51,
+     84836.82,
+     84801.0,
+     84847.73,
+     84853.57,
+     84846.55,
+     84821.14,
+     84776.8,
+     84811.02,
+     84819.36,
+     84844.12,
+     84863.42,
+     84871.57,
+     84935.36
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 87,
+   "health": 88,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.77,
    "sortino_1y": -1.05,
-   "sharpe_6m": 0.73,
-   "sortino_6m": 1.17,
+   "sharpe_6m": 0.74,
+   "sortino_6m": 1.18,
    "prepost": null,
-   "prezzo_limite_aggiustato": 84785.86,
+   "prezzo_limite_aggiustato": 84886.29,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22627,22 +22650,22 @@
     "w1": {
      "support": 82739.09,
      "resistance": 87146.35,
-     "change_pct": 1.39
+     "change_pct": 1.51
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 9.73
+     "change_pct": 9.86
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 30.99
+     "change_pct": 31.15
     },
     "y1": {
      "support": 57747.77,
      "resistance": 90439.29,
-     "change_pct": -2.06
+     "change_pct": -1.95
     }
    },
    "financials": [],
@@ -22669,74 +22692,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 84785.86,
+     "prezzo": 84886.29,
      "medie": {
       "sma10": {
-       "liv": 84209.36,
-       "dist_pct": 0.68
+       "liv": 84219.4,
+       "dist_pct": 0.79
       },
       "ema10": {
-       "liv": 83986.93,
-       "dist_pct": 0.95
+       "liv": 84005.19,
+       "dist_pct": 1.05
       },
       "sma20": {
-       "liv": 82442.98,
-       "dist_pct": 2.84
+       "liv": 82448.0,
+       "dist_pct": 2.96
       },
       "ema20": {
-       "liv": 82669.55,
-       "dist_pct": 2.56
+       "liv": 82679.11,
+       "dist_pct": 2.67
       },
       "sma30": {
-       "liv": 81079.0,
-       "dist_pct": 4.57
+       "liv": 81082.34,
+       "dist_pct": 4.69
       },
       "ema30": {
-       "liv": 81226.87,
-       "dist_pct": 4.38
+       "liv": 81233.35,
+       "dist_pct": 4.5
       },
       "sma50": {
-       "liv": 78559.1,
-       "dist_pct": 7.93
+       "liv": 78561.11,
+       "dist_pct": 8.05
       },
       "ema50": {
-       "liv": 78563.23,
-       "dist_pct": 7.92
+       "liv": 78567.17,
+       "dist_pct": 8.04
       },
       "sma100": {
-       "liv": 71004.94,
-       "dist_pct": 19.41
+       "liv": 71005.95,
+       "dist_pct": 19.55
       },
       "ema100": {
-       "liv": 74891.69,
-       "dist_pct": 13.21
+       "liv": 74893.68,
+       "dist_pct": 13.34
       },
       "sma200": {
-       "liv": 71425.55,
-       "dist_pct": 18.71
+       "liv": 71426.06,
+       "dist_pct": 18.84
       },
       "ema200": {
-       "liv": 75121.17,
-       "dist_pct": 12.87
+       "liv": 75122.17,
+       "dist_pct": 13.0
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.8,
+      "rsi14": 64.1,
       "macd": {
-       "linea": 1941.48,
-       "segnale": 2093.94,
-       "istogramma": -152.46
+       "linea": 1949.5,
+       "segnale": 2095.54,
+       "istogramma": -146.05
       },
-      "stoch_k": 64.5,
-      "stoch_d": 67.5,
-      "williams_r": -35.5,
-      "cci20": 48.0,
+      "stoch_k": 65.9,
+      "stoch_d": 68.0,
+      "williams_r": -34.1,
+      "cci20": 48.7,
       "adx14": 41.9,
       "di_su": 32.6,
       "di_giu": 12.5,
-      "momentum10": 402.85
+      "momentum10": 503.28
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23227,21 +23250,21 @@
      {
       "d": "2026-10-03",
       "o": 84506.34,
-      "h": 84899.27,
+      "h": 84918.76,
       "l": 84434.45,
-      "c": 84785.86
+      "c": 84886.29
      }
     ],
     "performance": {
-     "s1": 1.54,
-     "m1": 9.86,
-     "m3": 32.67,
-     "m6": 14.96,
-     "a1": -4.85,
-     "ytd": -4.45,
-     "a3": 144.57,
-     "a5": 38.27,
-     "a10": 11995.47
+     "s1": 1.66,
+     "m1": 9.99,
+     "m3": 32.83,
+     "m6": 15.09,
+     "a1": -4.74,
+     "ytd": -4.33,
+     "a3": 144.86,
+     "a5": 38.43,
+     "a10": 12009.8
     },
     "stagionalita": [
      {
@@ -23327,7 +23350,7 @@
      },
      {
       "mese": 10,
-      "media": 15.47,
+      "media": 15.48,
       "mediana": 10.92,
       "positivi_pct": 77,
       "campione": 13,
@@ -23354,9 +23377,9 @@
      }
     ]
    },
-   "rs_1m": 9.0,
+   "rs_1m": 9.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 4.0,
+   "rs_ndx_1m": 4.1,
    "beta_ndx": 0.84,
    "avg_corr": 0.3,
    "max_corr": 0.8,
@@ -37148,7 +37171,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 3.35,
-   "pe": 43.8,
+   "pe": 45.2,
    "ath": 494.1,
    "ath_dist_pct": -28.1,
    "sma200_dist_pct": -3.0,
@@ -37722,7 +37745,7 @@
     "target_mediana": 535.0
    },
    "health": 34,
-   "eps": 8.1,
+   "eps": 7.85,
    "beta": 1.46,
    "sharpe_1y": 0.04,
    "sortino_1y": 0.06,
@@ -37743,10 +37766,10 @@
     "float_shares": 4715677998.0,
     "float_pct": 98.8,
     "avg_volume_30d": 22518056.0,
-    "pe_ttm": 43.8444,
-    "forward_pe": 18.3214,
-    "eps_ttm": 8.1,
-    "eps_forward": 19.3839,
+    "pe_ttm": 45.2408,
+    "forward_pe": 18.3238,
+    "eps_ttm": 7.85,
+    "eps_forward": 19.3814,
     "revenue_fy": 89103998976.0,
     "net_income_fy": 38264999936.0,
     "revenue_growth": 0.855,
@@ -47928,11 +47951,32 @@
   "news": {
    "voci": [
     {
-     "titolo": "The U.S. jobs market just took a turn for the worse. Or did it?",
-     "riassunto": "The bottom didn’t drop out of the labor market after a poor September U.S. jobs report. But what it did show is hiring is slow and it’s a tough time to find work.",
+     "titolo": "Switching jobs to get higher pay works best in these industries",
+     "riassunto": "Finding a new job is one way to get a pay increase at a time when inflation has been outpacing wage growth.",
      "fonte": "MarketWatch",
-     "quando": "2026-10-03T13:00:00Z",
-     "url": "https://www.marketwatch.com/story/the-u-s-jobs-market-just-took-a-turn-for-the-worse-or-did-it-c44c371b?mod=mw_rss_topstories"
+     "quando": "2026-10-03T16:42:00Z",
+     "url": "https://www.marketwatch.com/story/the-best-industry-to-change-jobs-to-get-paid-more-money-and-the-worst-ae33a3a7?mod=mw_rss_topstories"
+    },
+    {
+     "titolo": "‘I’m never selling’: I’m 47 and buy bitcoin with every dollar I earn. Am I crazy?",
+     "riassunto": "“When my paycheck lands, it takes a detour through bitcoin.”",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-03T15:30:00Z",
+     "url": "https://www.marketwatch.com/story/im-never-selling-im-47-and-buy-bitcoin-with-every-dollar-i-earn-am-i-crazy-364d2a64?mod=mw_rss_topstories"
+    },
+    {
+     "titolo": "Fake Jobs Put Job Seekers at Risk of Identity Theft",
+     "riassunto": "Fraud investigator Jay Jones, known online as “The Profiler,” tells Bloomberg This Weekend that AI is helping scammers create increasingly convincing fake recruiters and job listings that can lead victims to surrender money and sensitive personal information. Speaking with hosts David Gura and Christina Ruffini, Jones ",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-03T15:15:35Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-10-03/fake-jobs-put-job-seekers-at-risk-of-identity-theft-video"
+    },
+    {
+     "titolo": "The Treasury Department started Trump accounts for 60 million kids — but families still have to take this step if they want one",
+     "riassunto": "Here’s what parents seeking the $1,000 seed money for their child need to know.",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-03T15:06:00Z",
+     "url": "https://www.marketwatch.com/story/the-treasury-department-started-trump-accounts-for-60-million-kids-but-families-still-have-to-take-this-step-if-they-want-one-003d9282?mod=mw_rss_topstories"
     },
     {
      "titolo": "Can AI Outrun America’s Deficit Problem?",
@@ -47940,13 +47984,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-10-03T12:03:55Z",
      "url": "https://www.bloomberg.com/news/videos/2026-10-03/can-ai-outrun-america-s-deficit-problem"
-    },
-    {
-     "titolo": "As Treasury yields touch generational highs, investors brace for the market fallout",
-     "riassunto": "The surge in bond yields to generational highs has investors around the world watching and worrying about what could crack, spiral or leave a trail of carnage in its path.",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-03T11:30:00Z",
-     "url": "https://www.marketwatch.com/story/as-treasury-yields-touch-generational-highs-investors-brace-for-the-market-fallout-0457e698?mod=mw_rss_topstories"
     },
     {
      "titolo": "Europe’s Stocks Are Straining Under Pressure From Bond Yields",
@@ -47975,27 +48012,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-10-02T22:17:57Z",
      "url": "https://www.bloomberg.com/news/videos/2026-10-02/former-cea-chair-on-jobs-report-gdp-growth-video"
-    },
-    {
-     "titolo": "EM Assets Find Relief as US Jobs Data Eases Rate Fears",
-     "riassunto": "An index tracking emerging-market currencies climbed to a session high after weaker-than-expected US jobs data prompted traders to scale back bets on another Federal Reserve interest-rate hike this month. Nonfarm payrolls increased by 29,000 in September after downward revisions to the prior two months, according to Bu",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-02T21:42:53Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-10-02/em-assets-find-relief-as-us-jobs-data-eases-rate-fears-video"
-    },
-    {
-     "titolo": "CEA Chairman: Inflation coming down sufficiently fast",
-     "riassunto": "Chris Phelan CEA Chairman, sees inflation clearly easing and thinks it's doing so quickly enough. He speaks with Romaine Bostick on \"The Close.\" (Source: Bloomberg)",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-02T21:40:32Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-10-02/cea-chairman-inflation-coming-down-sufficiently-fast-video"
-    },
-    {
-     "titolo": "Former Labor Secretary Rob Reich on Sept. Jobs Report",
-     "riassunto": "Robert Reich, former US Labor Secretary, discusses persistent inflation, very slow hiring, and wages that trail prices. He speaks with Romaine Bostick on Bloomberg's \"The Close.\" (Source: Bloomberg)",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-02T21:32:22Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-10-02/former-labor-secretary-rob-reich-on-sept-jobs-report-video"
     },
     {
      "titolo": "Men are losing ground in the labor market. Here's why",
@@ -48052,6 +48068,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-29T15:57:43Z",
      "url": "https://www.cnbc.com/2026/09/29/canada-import-ban-trade-war.html"
+    },
+    {
+     "titolo": "Australia says more hikes not off the table after raising rates to 15-year high",
+     "riassunto": "The hike of 25 basis points was in line with expectations by economists polled by Reuters.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-29T05:00:58Z",
+     "url": "https://www.cnbc.com/2026/09/29/australia-rates-inflation-monetary-policy.html"
     }
    ],
    "fonti": [
@@ -52941,7 +52964,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 53
+     "score": 55
     },
     {
      "label": "Treasury 10A",
@@ -53337,7 +53360,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-10-02",
     "price": 199.81,
     "d1": 1.01,
@@ -53503,7 +53526,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-10-02",
     "price": 630.6,
     "d1": 2.07,
@@ -53586,7 +53609,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-10-02",
     "price": 205.29,
     "d1": -0.33,
@@ -53669,7 +53692,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-10-02",
     "price": 166.18,
     "d1": -0.01,
@@ -54224,7 +54247,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-10-02",
     "price": 110.04,
     "d1": 1.13,
@@ -54390,7 +54413,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-10-02",
     "price": 80.2,
     "d1": 1.47,
@@ -57883,7 +57906,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-03T13:55:17Z",
+      "quando": "2026-10-03T14:49:26Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -57968,6 +57991,13 @@
     ],
     "CRWV": [
      {
+      "titolo": "Where Will CoreWeave Stock Be in 5 Years?",
+      "riassunto": "Key PointsCoreWeave&rsquo;s $104 billion revenue backlog shows strong demand for its AI computing capacity.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T15:03:00Z",
+      "url": "https://www.nasdaq.com/articles/where-will-coreweave-stock-be-5-years"
+     },
+     {
       "titolo": "CRWV's Vera Rubin Push: Can AI Infrastructure Fuel Its Growth Engine?",
       "riassunto": "CoreWeave expands beyond GPUs with NVIDIA Vera and Vera Rubin, targeting agentic AI and inference workloads while deepening its infrastructure strategy.",
       "fonte": "Nasdaq",
@@ -58001,16 +58031,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-01T13:36:00Z",
       "url": "https://www.nasdaq.com/articles/best-ipo-buy-2026-isnt-what-you-think-im-betting-coreweave"
-     },
-     {
-      "titolo": "Can CoreWeave's Partner Network and AI Deals Expand Its Reach?",
-      "riassunto": "CRWV expands its AI cloud ecosystem with a new Partner Network and Ennoble Care deployment for clinical AI inference workloads.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-01T11:39:00Z",
-      "url": "https://www.nasdaq.com/articles/can-coreweaves-partner-network-and-ai-deals-expand-its-reach"
      }
     ],
     "GOOGL": [
+     {
+      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T14:49:26Z",
+      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+     },
      {
       "titolo": "Breakfast News: The 20-Year Stock Challenge",
       "riassunto": "OCTOBER 3, 2026\nWarren Buffett once sat down with Coca-Cola&rsquo;s (NYSE: KO) annual report from 1896, which is a level of homework most investors will never attempt. He observed how the company sold 116,492 gallons of syrup that year. A century later, it sold 3.2 billion. Missed AI&rsquo;",
@@ -58024,13 +58054,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-03T05:41:17Z",
       "url": "https://www.nasdaq.com/articles/anthropic-delivers-massive-news-ai-stock-investors"
-     },
-     {
-      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-03T00:19:38Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
       "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
@@ -58144,6 +58167,13 @@
     ],
     "MU": [
      {
+      "titolo": "Micron Just Extended Its Forecast for the AI Build-Out to 2031. Its Stock Is Bound to Defy History.",
+      "riassunto": "Key PointsMicron expects memory supply in 2027 and 2028 to be tighter than it was in 2026.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T16:11:00Z",
+      "url": "https://www.nasdaq.com/articles/micron-just-extended-its-forecast-ai-build-out-2031-its-stock-bound-defy-history"
+     },
+     {
       "titolo": "The Memory Boom Helped Micron Deliver a Record Year. Here’s Where the Stock Will Be in 3 Years",
       "riassunto": "Key PointsMicron management expects memory supply to tighten over the next couple of years.",
       "fonte": "Nasdaq",
@@ -58177,16 +58207,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-03T03:03:01Z",
       "url": "https://www.nasdaq.com/articles/4-stocks-delivered-about-half-sp-500s-gain-year"
-     },
-     {
-      "titolo": "Micron's Last 5 Post-Earnings Dips Turned Into Gains. This Time, the Stock Rose Instead.",
-      "riassunto": "Key PointsMicron's revenue was a record $54.2 billion for its fiscal fourth quarter.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T21:37:01Z",
-      "url": "https://www.nasdaq.com/articles/microns-last-5-post-earnings-dips-turned-gains-time-stock-rose-instead"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T14:49:26Z",
+      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+     },
      {
       "titolo": "Where Will Intel Stock Be in 5 Years: Comeback Story or Cautionary Tale?",
       "riassunto": "Key PointsIntel has bought itself time with government and strategic investors, but that doesn&rsquo;t prove the underlying turnaround is working.",
@@ -58221,13 +58251,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-03T05:41:17Z",
       "url": "https://www.nasdaq.com/articles/anthropic-delivers-massive-news-ai-stock-investors"
-     },
-     {
-      "titolo": "Better Artificial Intelligence Stock: NVIDIA vs. SK Hynix",
-      "riassunto": "Key PointsNVIDIA maintains a dominant position in GPU-accelerated computing with exceptionally high net margins and strong revenue growth.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-03T03:15:07Z",
-      "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-stock-nvidia-vs-sk-hynix"
      }
     ],
     "ORCL": [
@@ -58367,7 +58390,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-03T13:55:17Z",
+      "quando": "2026-10-03T14:49:26Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -58430,7 +58453,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-03T14:06:05Z"
+   "letto_il": "2026-10-03T17:29:55Z"
   }
  },
  "broker": null,
@@ -58441,7 +58464,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-03T13:55:17Z",
+     "quando": "2026-10-03T14:49:26Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58526,6 +58549,13 @@
    ],
    "CRWV": [
     {
+     "titolo": "Where Will CoreWeave Stock Be in 5 Years?",
+     "riassunto": "Key PointsCoreWeave&rsquo;s $104 billion revenue backlog shows strong demand for its AI computing capacity.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T15:03:00Z",
+     "url": "https://www.nasdaq.com/articles/where-will-coreweave-stock-be-5-years"
+    },
+    {
      "titolo": "CRWV's Vera Rubin Push: Can AI Infrastructure Fuel Its Growth Engine?",
      "riassunto": "CoreWeave expands beyond GPUs with NVIDIA Vera and Vera Rubin, targeting agentic AI and inference workloads while deepening its infrastructure strategy.",
      "fonte": "Nasdaq",
@@ -58559,16 +58589,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-01T13:36:00Z",
      "url": "https://www.nasdaq.com/articles/best-ipo-buy-2026-isnt-what-you-think-im-betting-coreweave"
-    },
-    {
-     "titolo": "Can CoreWeave's Partner Network and AI Deals Expand Its Reach?",
-     "riassunto": "CRWV expands its AI cloud ecosystem with a new Partner Network and Ennoble Care deployment for clinical AI inference workloads.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-01T11:39:00Z",
-     "url": "https://www.nasdaq.com/articles/can-coreweaves-partner-network-and-ai-deals-expand-its-reach"
     }
    ],
    "GOOGL": [
+    {
+     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T14:49:26Z",
+     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+    },
     {
      "titolo": "Breakfast News: The 20-Year Stock Challenge",
      "riassunto": "OCTOBER 3, 2026\nWarren Buffett once sat down with Coca-Cola&rsquo;s (NYSE: KO) annual report from 1896, which is a level of homework most investors will never attempt. He observed how the company sold 116,492 gallons of syrup that year. A century later, it sold 3.2 billion. Missed AI&rsquo;",
@@ -58582,13 +58612,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-03T05:41:17Z",
      "url": "https://www.nasdaq.com/articles/anthropic-delivers-massive-news-ai-stock-investors"
-    },
-    {
-     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-03T00:19:38Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
@@ -58702,6 +58725,13 @@
    ],
    "MU": [
     {
+     "titolo": "Micron Just Extended Its Forecast for the AI Build-Out to 2031. Its Stock Is Bound to Defy History.",
+     "riassunto": "Key PointsMicron expects memory supply in 2027 and 2028 to be tighter than it was in 2026.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T16:11:00Z",
+     "url": "https://www.nasdaq.com/articles/micron-just-extended-its-forecast-ai-build-out-2031-its-stock-bound-defy-history"
+    },
+    {
      "titolo": "The Memory Boom Helped Micron Deliver a Record Year. Here’s Where the Stock Will Be in 3 Years",
      "riassunto": "Key PointsMicron management expects memory supply to tighten over the next couple of years.",
      "fonte": "Nasdaq",
@@ -58735,16 +58765,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-03T03:03:01Z",
      "url": "https://www.nasdaq.com/articles/4-stocks-delivered-about-half-sp-500s-gain-year"
-    },
-    {
-     "titolo": "Micron's Last 5 Post-Earnings Dips Turned Into Gains. This Time, the Stock Rose Instead.",
-     "riassunto": "Key PointsMicron's revenue was a record $54.2 billion for its fiscal fourth quarter.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T21:37:01Z",
-     "url": "https://www.nasdaq.com/articles/microns-last-5-post-earnings-dips-turned-gains-time-stock-rose-instead"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T14:49:26Z",
+     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+    },
     {
      "titolo": "Where Will Intel Stock Be in 5 Years: Comeback Story or Cautionary Tale?",
      "riassunto": "Key PointsIntel has bought itself time with government and strategic investors, but that doesn&rsquo;t prove the underlying turnaround is working.",
@@ -58779,13 +58809,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-03T05:41:17Z",
      "url": "https://www.nasdaq.com/articles/anthropic-delivers-massive-news-ai-stock-investors"
-    },
-    {
-     "titolo": "Better Artificial Intelligence Stock: NVIDIA vs. SK Hynix",
-     "riassunto": "Key PointsNVIDIA maintains a dominant position in GPU-accelerated computing with exceptionally high net margins and strong revenue growth.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-03T03:15:07Z",
-     "url": "https://www.nasdaq.com/articles/better-artificial-intelligence-stock-nvidia-vs-sk-hynix"
     }
    ],
    "ORCL": [
@@ -58925,7 +58948,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-03T13:55:17Z",
+     "quando": "2026-10-03T14:49:26Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58988,7 +59011,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-03T14:06:05Z"
+  "letto_il": "2026-10-03T17:29:55Z"
  },
  "predictions": [
   {
@@ -58997,29 +59020,9 @@
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-october-2026-meeting-20260617190324031"
   },
   {
-   "question": "Will the price of Bitcoin be above $74,000 on October 3?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-74k-on-october-3-2026"
-  },
-  {
-   "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
-   "yes": 18,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-october-2026-meeting-20260617190324032"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $76,000 on October 3?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-76k-on-october-3-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $84,000 on October 3?",
-   "yes": 99,
-   "link": "https://polymarket.com/event/bitcoin-above-84k-on-october-3-2026"
-  },
-  {
-   "question": "Bitcoin Up or Down on October 3?",
-   "yes": 4,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-3-2026"
+   "question": "Will Ethereum dip to $2,100 in October?",
+   "yes": 14,
+   "link": "https://polymarket.com/event/will-ethereum-dip-to-2100-in-october-2026"
   }
  ],
  "options": {
@@ -80416,6 +80419,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-03T14:06:05Z"
+  "generated_at": "2026-10-03T17:29:56Z"
  }
 }
