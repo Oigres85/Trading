@@ -1,4 +1,4 @@
-⟦ BUILD v458 · generato 03/10/2026 13:05 ⟧
+⟦ BUILD v458 · generato 03/10/2026 14:06 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 03/10/2026, 13:05:32 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 09:05, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,46% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,58% · Fut S&P +0,45% · BTC +0,42% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~48.4h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 03/10/2026, 14:06:05 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 10:06, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,46% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,58% · Fut S&P +0,45% · BTC +0,34% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~47.4h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 03/10/2026, 13:05:32, prossimo run 03/10/2026, 13:30:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-02 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 03/10/2026, 14:06:05, prossimo run 03/10/2026, 14:30:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-02 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-08-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-09-01) · Disoccupazione (2026-09-01) · Fiducia consumatori (UMich) (2026-09-01) · Curva 10A-2A (2026-10-02) · Curva 10A-3M (2026-10-02) · Treasury USA 30A (2026-10-01) · Tasso reale 10A (TIPS) (2026-10-01) · Inflazione attesa 10A (breakeven) (2026-10-02) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -96,25 +96,25 @@ QUADRO MACRO:
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): ottobre +3,94% negli anni di midterm contro +1,7% su tutti gli anni, 80% di mesi positivi, esiti da -8,7% a +18,9% · novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8% · dicembre -1,19% negli anni di midterm contro +1,69% su tutti gli anni, 30% di mesi positivi, esiti da -11,8% a +17,8%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
 - MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 13.137 (+2,4% nell'ultima seduta) — +99,5% in un anno, e sta al 82% dell'intervallo annuale 6352–14.635 · Rame 6,49 $/lb (+0,15% nell'ultima seduta) — +28,4% in un anno, e sta al 84% dell'intervallo annuale 4,85–6,8 · Petrolio WTI 91,11 $ (-1,9% nell'ultima seduta) — +49,7% in un anno, e sta al 62% dell'intervallo annuale 55,27–112,95 · Oro 4162 $/oz (-0,95% nell'ultima seduta) — +6,5% in un anno, e sta al 18% dell'intervallo annuale 3909–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
 - TITOLI MACRO — 4 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 10 pubblicate DOPO l'ultima chiusura USA del 2026-10-02, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
-    · [MarketWatch, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] The U.S. jobs market just took a turn for the worse. Or did it?
+    · [MarketWatch, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] The U.S. jobs market just took a turn for the worse. Or did it?
       The bottom didn’t drop out of the labor market after a poor September U.S. jobs report. But what it did show is hiring is slow and it’s a tough time to find work.
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Can AI Outrun America’s Deficit Problem?
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Can AI Outrun America’s Deficit Problem?
       National Economic Council Director Kevin Hassett argues that the economic benefits of AI may be greater than current data show, comparing today’s dynamics with the early internet era, when improvements in computing were difficult to capture in official statistics.  At the same time, Hassett says reducing the federal wo
-    · [MarketWatch, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] As Treasury yields touch generational highs, investors brace for the market fallout
+    · [MarketWatch, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] As Treasury yields touch generational highs, investors brace for the market fallout
       The surge in bond yields to generational highs has investors around the world watching and worrying about what could crack, spiral or leave a trail of carnage in its path.
-    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Europe’s Stocks Are Straining Under Pressure From Bond Yields
+    · [Bloomberg, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Europe’s Stocks Are Straining Under Pressure From Bond Yields
       A historic surge in global bond yields is becoming a bigger problem for European stocks as investors confront the possibility of stubborn inflation and mounting government debt.
-    · [Bloomberg, 12h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] IMF Approves Bolivia Loan Deal to Support Paz’s Economic Reforms
+    · [Bloomberg, 13h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] IMF Approves Bolivia Loan Deal to Support Paz’s Economic Reforms
       The International Monetary Fund approved a $1.9 billion financing program for Bolivia, including an immediate $214 million disbursement, in a package designed to help President Rodrigo Paz reverse a sharp economic slump.
-    · [Bloomberg, 13h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Stocks Rise As Jobs Report Eases Fed-Hike Worries
+    · [Bloomberg, 14h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Stocks Rise As Jobs Report Eases Fed-Hike Worries
       Bloomberg Television brings you the latest news and analysis leading up to the final minutes and seconds before and after the closing bell on Wall Street. Today's guests are Chris Phelan CEA Chairman, Robert Reich, Former US Labor Secretary, Alex Straton, Morgan Stanley Equity Research Managing Director,  Gary Marcus, 
-    · [Bloomberg, 15h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Former CEA Chair on Jobs Report, GDP Growth
+    · [Bloomberg, 16h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Former CEA Chair on Jobs Report, GDP Growth
       Former CEA Chair Cecilia Rouse believes that we may be 'entering a new normal' of the jobs report, with the break even potentially settling in around 50,000. She speaks with Romaine Bostick on Bloomberg's "The Close." (Source: Bloomberg)
-    · [Bloomberg, 15h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] EM Assets Find Relief as US Jobs Data Eases Rate Fears
+    · [Bloomberg, 16h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] EM Assets Find Relief as US Jobs Data Eases Rate Fears
       An index tracking emerging-market currencies climbed to a session high after weaker-than-expected US jobs data prompted traders to scale back bets on another Federal Reserve interest-rate hike this month. Nonfarm payrolls increased by 29,000 in September after downward revisions to the prior two months, according to Bu
-    · [Bloomberg, 15h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] CEA Chairman: Inflation coming down sufficiently fast
+    · [Bloomberg, 16h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] CEA Chairman: Inflation coming down sufficiently fast
       Chris Phelan CEA Chairman, sees inflation clearly easing and thinks it's doing so quickly enough. He speaks with Romaine Bostick on "The Close." (Source: Bloomberg)
-    · [Bloomberg, 16h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Former Labor Secretary Rob Reich on Sept. Jobs Report
+    · [Bloomberg, 17h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Former Labor Secretary Rob Reich on Sept. Jobs Report
       Robert Reich, former US Labor Secretary, discusses persistent inflation, very slow hiring, and wages that trail prices. He speaks with Romaine Bostick on Bloomberg's "The Close." (Source: Bloomberg)
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-10-14 Inflazione CPI (a/a) (precedente 3.4%) · 2026-10-15 Vendite al dettaglio (m/m) (precedente 1.1%) · 2026-10-15 Manifattura Philly Fed (al posto dell'ISM) (precedente +37.8). ⚠ Per 3 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich), Curva 10A-2A, Treasury USA 30A): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 3 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-3M, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-10-15 TSM. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -173,7 +173,7 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
 - Will there be no change in Fed interest rates after the October 2026 meeting?: 82% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the October 2026 meeting?: 18% [Δ7g —]
-- Porto 2: Henrique Rocha vs Jerome Kym: 50% [Δ7g —]
+- Bitcoin Up or Down on October 3?: 4% [Δ7g —]
 ⚠ 3 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
@@ -243,29 +243,29 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (69,6% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 3h fa] What Is the Stock Market? It's Not a Casino. Here's How I Filter Winners From Losers.
+  [AMD] · [Nasdaq, 0h fa] Stocks Settle Higher as Fed Rate Hike Concerns Ease
+      The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...
+  [AMD] · [Nasdaq, 4h fa] What Is the Stock Market? It's Not a Casino. Here's How I Filter Winners From Losers.
       Key PointsShort-term options that are far-out-of-the-money are the "casino corner" of the stock market, but long-term investing is different.
-  [AMD] · [Nasdaq, 4h fa] Intel Was Worth About 28 Times as Much as AMD 10 Years Ago. Now AMD Is Worth About 60% More.
-      Key PointsIn late September 2016, Intel's market value was around 28 times as big as AMD's.
-  [CRWV] · [Nasdaq, 25h fa] CRWV's Vera Rubin Push: Can AI Infrastructure Fuel Its Growth Engine?
+  [CRWV] · [Nasdaq, 26h fa] CRWV's Vera Rubin Push: Can AI Infrastructure Fuel Its Growth Engine?
       CoreWeave expands beyond GPUs with NVIDIA Vera and Vera Rubin, targeting agentic AI and inference workloads while deepening its infrastructure strategy.
-  [CRWV] · [Nasdaq, 26h fa] If a Bear Market Is Coming, These Are the 2 Stocks to Avoid -- and the 1 to Own
+  [CRWV] · [Nasdaq, 27h fa] If a Bear Market Is Coming, These Are the 2 Stocks to Avoid -- and the 1 to Own
       Key PointsIf a bear market is coming, an AI downturn will be a major factor.
-  [MRVL] · [Nasdaq, 5h fa] Marvell Stock Has More Than Tripled This Year. I Think It Can Double Again by 2031.
-      Key PointsMarvell's revenue growth has sped up for two straight quarters, and management sees faster growth ahead.
-  [MRVL] · [Nasdaq, 7h fa] Anthropic Delivers Massive News for AI Stock Investors
-      The AI pioneer is losing billions of dollars on the bottom line, but the headline figure looks worse than it actually is.
-  [MU] · [Nasdaq, 2h fa] The Memory Boom Helped Micron Deliver a Record Year. Here’s Where the Stock Will Be in 3 Years
+  [MRVL] · [Nasdaq, 1h fa] Intel vs. Marvell Technology: Which AI Chip Stock Is a Better Buy in 2026?
+      Key PointsIntel is trying to grow a foundry business that makes chips for other companies, while x86 processors for PCs and data centers remain its core products.
+  [MRVL] · [Nasdaq, 1h fa] Stock Market Pullback: 7 Best Stocks to Buy Now
+      Some great companies are now on sale, with many down 20%, 30%, or even more from their recent highs. That's not a reason to panic. For a long-term investor, it's a reason to make a shopping list. Here are seven quality stocks I'd buy on this pullback, all trading well below where
+  [MU] · [Nasdaq, 3h fa] The Memory Boom Helped Micron Deliver a Record Year. Here’s Where the Stock Will Be in 3 Years
       Key PointsMicron management expects memory supply to tighten over the next couple of years.
-  [MU] · [Nasdaq, 7h fa] Anthropic Delivers Massive News for AI Stock Investors
+  [MU] · [Nasdaq, 8h fa] Anthropic Delivers Massive News for AI Stock Investors
       The AI pioneer is losing billions of dollars on the bottom line, but the headline figure looks worse than it actually is.
-  [NVDA] · [Nasdaq, 2h fa] Where Will Intel Stock Be in 5 Years: Comeback Story or Cautionary Tale?
+  [NVDA] · [Nasdaq, 3h fa] Where Will Intel Stock Be in 5 Years: Comeback Story or Cautionary Tale?
       Key PointsIntel has bought itself time with government and strategic investors, but that doesn&rsquo;t prove the underlying turnaround is working.
-  [NVDA] · [Nasdaq, 3h fa] Anthropic Could Raise Up to $100 Billion in Its November IPO
+  [NVDA] · [Nasdaq, 4h fa] Anthropic Could Raise Up to $100 Billion in Its November IPO
       Key PointsAnthropic could raise up to $100 billion with its upcoming stock sale, yet that would cover only about 24% of its more fixed infrastructure commitments.
-  [ORCL] · [Nasdaq, 18h fa] Notable Friday Option Activity: ORCL, GS, RKLB
+  [ORCL] · [Nasdaq, 19h fa] Notable Friday Option Activity: ORCL, GS, RKLB
       Among the underlying components of the Russell 3000 index, we saw noteworthy options trading volume today in Oracle Corp (Symbol: ORCL), where a total of 369,221 contracts have traded so far, representing approximately 36.9 million underlying shares.  That amounts to about 103.2
-  [ORCL] · [Nasdaq, 19h fa] Friday 10/2 Insider Buying Report: UUU, ORCL
+  [ORCL] · [Nasdaq, 20h fa] Friday 10/2 Insider Buying Report: UUU, ORCL
       As the saying goes, there are many possible reasons for an insider to sell a stock, but only one reason to buy -- they expect to make money.  So let's look at two noteworthy recent insider buys.
 
 At Universal Safety Products, a filing with the SEC revealed that on Wednesday,  Mi

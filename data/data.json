@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-03T13:05:32Z",
+ "updated_at": "2026-10-03T14:06:05Z",
  "eurusd": 1.1257,
  "totals": {
   "usd_value": 0,
@@ -1775,7 +1775,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -13030,7 +13030,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.57,
-   "pe": 88.4,
+   "pe": 90.2,
    "ath": 329.8,
    "ath_dist_pct": -17.4,
    "sma200_dist_pct": 63.2,
@@ -13714,7 +13714,7 @@
     "target_mediana": 284.0
    },
    "health": 88,
-   "eps": 3.08,
+   "eps": 3.02,
    "beta": 2.25,
    "sharpe_1y": 1.45,
    "sortino_1y": 2.29,
@@ -13735,9 +13735,9 @@
     "float_shares": 873865926.0,
     "float_pct": 99.7,
     "avg_volume_30d": 22270032.0,
-    "pe_ttm": 88.4058,
+    "pe_ttm": 90.1623,
     "forward_pe": 40.3431,
-    "eps_ttm": 3.08,
+    "eps_ttm": 3.02,
     "eps_forward": 6.7494,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
@@ -22039,27 +22039,27 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 84851.1,
+   "price": 84785.86,
    "price_asof": "2026-10-03",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.42,
+   "change_pct": 0.34,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -32.8,
-   "sma200_dist_pct": 18.8,
-   "sma50_dist_pct": 8.0,
+   "sma200_dist_pct": 18.7,
+   "sma50_dist_pct": 7.9,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -32.8,
-   "day_high": 84889.28,
+   "day_high": 84899.27,
    "day_low": 84434.45,
    "support": 74944.59,
    "resistance": 87363.76,
-   "rsi": 64.0,
-   "volume": 29490241536,
+   "rsi": 63.8,
+   "volume": 27088441344,
    "vol_ratio": 1.52,
-   "atr_14": 2168.64,
+   "atr_14": 2169.36,
    "atr_pct": 2.56,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -22069,7 +22069,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84851.1
+     84785.86
     ],
     "m6": [
      73579.69,
@@ -22197,7 +22197,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84851.1
+     84785.86
     ],
     "all": [
      386.94,
@@ -22345,7 +22345,7 @@
      62813.75,
      78548.63,
      83553.85,
-     84851.1
+     84785.86
     ],
     "m1": [
      77270.47,
@@ -22369,7 +22369,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84851.1
+     84785.86
     ],
     "m3": [
      64725.31,
@@ -22437,7 +22437,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84851.1
+     84785.86
     ],
     "y1": [
      122266.53,
@@ -22513,7 +22513,7 @@
      80901.46,
      84383.01,
      83502.61,
-     84851.1
+     84785.86
     ],
     "d1": [
      84461.0,
@@ -22594,13 +22594,19 @@
      84842.64,
      84801.01,
      84876.99,
-     84851.1
+     84836.52,
+     84845.32,
+     84789.21,
+     84902.55,
+     84822.09,
+     84869.98,
+     84785.86
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 88,
+   "health": 87,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.77,
@@ -22608,7 +22614,7 @@
    "sharpe_6m": 0.73,
    "sortino_6m": 1.17,
    "prepost": null,
-   "prezzo_limite_aggiustato": 84851.1,
+   "prezzo_limite_aggiustato": 84785.86,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22621,22 +22627,22 @@
     "w1": {
      "support": 82739.09,
      "resistance": 87146.35,
-     "change_pct": 1.47
+     "change_pct": 1.39
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 9.81
+     "change_pct": 9.73
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 31.09
+     "change_pct": 30.99
     },
     "y1": {
      "support": 57747.77,
      "resistance": 90439.29,
-     "change_pct": -1.99
+     "change_pct": -2.06
     }
    },
    "financials": [],
@@ -22663,74 +22669,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 84851.1,
+     "prezzo": 84785.86,
      "medie": {
       "sma10": {
-       "liv": 84215.88,
-       "dist_pct": 0.75
+       "liv": 84209.36,
+       "dist_pct": 0.68
       },
       "ema10": {
-       "liv": 83998.79,
-       "dist_pct": 1.01
+       "liv": 83986.93,
+       "dist_pct": 0.95
       },
       "sma20": {
-       "liv": 82446.24,
-       "dist_pct": 2.92
+       "liv": 82442.98,
+       "dist_pct": 2.84
       },
       "ema20": {
-       "liv": 82675.76,
-       "dist_pct": 2.63
+       "liv": 82669.55,
+       "dist_pct": 2.56
       },
       "sma30": {
-       "liv": 81081.17,
-       "dist_pct": 4.65
+       "liv": 81079.0,
+       "dist_pct": 4.57
       },
       "ema30": {
-       "liv": 81231.08,
-       "dist_pct": 4.46
+       "liv": 81226.87,
+       "dist_pct": 4.38
       },
       "sma50": {
-       "liv": 78560.41,
-       "dist_pct": 8.01
+       "liv": 78559.1,
+       "dist_pct": 7.93
       },
       "ema50": {
-       "liv": 78565.79,
-       "dist_pct": 8.0
+       "liv": 78563.23,
+       "dist_pct": 7.92
       },
       "sma100": {
-       "liv": 71005.59,
-       "dist_pct": 19.5
+       "liv": 71004.94,
+       "dist_pct": 19.41
       },
       "ema100": {
-       "liv": 74892.98,
-       "dist_pct": 13.3
+       "liv": 74891.69,
+       "dist_pct": 13.21
       },
       "sma200": {
-       "liv": 71425.88,
-       "dist_pct": 18.8
+       "liv": 71425.55,
+       "dist_pct": 18.71
       },
       "ema200": {
-       "liv": 75121.82,
-       "dist_pct": 12.95
+       "liv": 75121.17,
+       "dist_pct": 12.87
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 64.0,
+      "rsi14": 63.8,
       "macd": {
-       "linea": 1946.69,
-       "segnale": 2094.98,
-       "istogramma": -148.29
+       "linea": 1941.48,
+       "segnale": 2093.94,
+       "istogramma": -152.46
       },
-      "stoch_k": 65.4,
-      "stoch_d": 67.8,
-      "williams_r": -34.6,
-      "cci20": 48.3,
+      "stoch_k": 64.5,
+      "stoch_d": 67.5,
+      "williams_r": -35.5,
+      "cci20": 48.0,
       "adx14": 41.9,
-      "di_su": 32.7,
+      "di_su": 32.6,
       "di_giu": 12.5,
-      "momentum10": 468.09
+      "momentum10": 402.85
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23221,21 +23227,21 @@
      {
       "d": "2026-10-03",
       "o": 84506.34,
-      "h": 84889.28,
+      "h": 84899.27,
       "l": 84434.45,
-      "c": 84851.1
+      "c": 84785.86
      }
     ],
     "performance": {
-     "s1": 1.61,
-     "m1": 9.95,
-     "m3": 32.77,
-     "m6": 15.04,
-     "a1": -4.78,
-     "ytd": -4.37,
-     "a3": 144.75,
-     "a5": 38.38,
-     "a10": 12004.78
+     "s1": 1.54,
+     "m1": 9.86,
+     "m3": 32.67,
+     "m6": 14.96,
+     "a1": -4.85,
+     "ytd": -4.45,
+     "a3": 144.57,
+     "a5": 38.27,
+     "a10": 11995.47
     },
     "stagionalita": [
      {
@@ -23348,9 +23354,9 @@
      }
     ]
    },
-   "rs_1m": 9.1,
+   "rs_1m": 9.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 4.1,
+   "rs_ndx_1m": 4.0,
    "beta_ndx": 0.84,
    "avg_corr": 0.3,
    "max_corr": 0.8,
@@ -52935,7 +52941,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 54
+     "score": 53
     },
     {
      "label": "Treasury 10A",
@@ -57874,6 +57880,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T13:55:17Z",
+      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+     },
+     {
       "titolo": "What Is the Stock Market? It's Not a Casino. Here's How I Filter Winners From Losers.",
       "riassunto": "Key PointsShort-term options that are far-out-of-the-money are the \"casino corner\" of the stock market, but long-term investing is different.",
       "fonte": "Nasdaq",
@@ -57907,13 +57920,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-03T00:50:02Z",
       "url": "https://www.nasdaq.com/articles/why-amd-stock-jumped-30-september"
-     },
-     {
-      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-03T00:19:38Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      }
     ],
     "BE": [
@@ -58006,6 +58012,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Breakfast News: The 20-Year Stock Challenge",
+      "riassunto": "OCTOBER 3, 2026\nWarren Buffett once sat down with Coca-Cola&rsquo;s (NYSE: KO) annual report from 1896, which is a level of homework most investors will never attempt. He observed how the company sold 116,492 gallons of syrup that year. A century later, it sold 3.2 billion. Missed AI&rsquo;",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T11:50:00Z",
+      "url": "https://www.nasdaq.com/articles/breakfast-news-20-year-stock-challenge"
+     },
+     {
       "titolo": "Anthropic Delivers Massive News for AI Stock Investors",
       "riassunto": "The AI pioneer is losing billions of dollars on the bottom line, but the headline figure looks worse than it actually is.",
       "fonte": "Nasdaq",
@@ -58039,16 +58052,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-02T20:18:14Z",
       "url": "https://www.nasdaq.com/articles/stocks-climb-weak-us-economic-news-eases-fed-rate-hike-concerns"
-     },
-     {
-      "titolo": "10 Top Stocks I'd Buy Right Now",
-      "riassunto": "The Fed just raised rates for the first time in three years. Many investors are asking the same question: What do I actually buy right now? With that in mind, I put together 10 top stocks I'd buy today. The list is a mix of safe compounders, dividend payers, and a couple of highe",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T18:42:00Z",
-      "url": "https://www.nasdaq.com/articles/10-top-stocks-id-buy-right-now"
      }
     ],
     "MRVL": [
+     {
+      "titolo": "Intel vs. Marvell Technology: Which AI Chip Stock Is a Better Buy in 2026?",
+      "riassunto": "Key PointsIntel is trying to grow a foundry business that makes chips for other companies, while x86 processors for PCs and data centers remain its core products.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T13:05:01Z",
+      "url": "https://www.nasdaq.com/articles/intel-vs-marvell-technology-which-ai-chip-stock-better-buy-2026"
+     },
+     {
+      "titolo": "Stock Market Pullback: 7 Best Stocks to Buy Now",
+      "riassunto": "Some great companies are now on sale, with many down 20%, 30%, or even more from their recent highs. That's not a reason to panic. For a long-term investor, it's a reason to make a shopping list. Here are seven quality stocks I'd buy on this pullback, all trading well below where",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T12:41:00Z",
+      "url": "https://www.nasdaq.com/articles/stock-market-pullback-7-best-stocks-buy-now"
+     },
      {
       "titolo": "Marvell Stock Has More Than Tripled This Year. I Think It Can Double Again by 2031.",
       "riassunto": "Key PointsMarvell's revenue growth has sped up for two straight quarters, and management sees faster growth ahead.",
@@ -58076,20 +58096,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-02T20:18:14Z",
       "url": "https://www.nasdaq.com/articles/stocks-climb-weak-us-economic-news-eases-fed-rate-hike-concerns"
-     },
-     {
-      "titolo": "Notable Friday Option Activity: MCRI, ESE, MRVL",
-      "riassunto": "Among the underlying components of the Russell 3000 index, we saw noteworthy options trading volume today in Monarch Casino &amp; Resort, Inc. (Symbol: MCRI), where a total of 1,995 contracts have traded so far, representing approximately 199,500 underlying shares.  That amounts",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T19:27:18Z",
-      "url": "https://www.nasdaq.com/articles/notable-friday-option-activity-mcri-ese-mrvl"
-     },
-     {
-      "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Make a Big Move in October (Hint: It’s Not Micron)",
-      "riassunto": "Key PointsMarvell Technology is expected to raise its guidance once again on Oct. 6.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T19:18:01Z",
-      "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-make-big-move-october-hint-its-not"
      }
     ],
     "MSTR": [
@@ -58270,6 +58276,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "Breakfast News: The 20-Year Stock Challenge",
+      "riassunto": "OCTOBER 3, 2026\nWarren Buffett once sat down with Coca-Cola&rsquo;s (NYSE: KO) annual report from 1896, which is a level of homework most investors will never attempt. He observed how the company sold 116,492 gallons of syrup that year. A century later, it sold 3.2 billion. Missed AI&rsquo;",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T11:50:00Z",
+      "url": "https://www.nasdaq.com/articles/breakfast-news-20-year-stock-challenge"
+     },
+     {
       "titolo": "Could $20,000 Invested in Palantir Help You Retire a Millionaire?",
       "riassunto": "Key PointsPalantir has seen tremendous revenue growth thanks to its AI platform.",
       "fonte": "Nasdaq",
@@ -58303,16 +58316,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-02T12:29:00Z",
       "url": "https://www.nasdaq.com/articles/guide-ai-etf-investment-0"
-     },
-     {
-      "titolo": "A Guide to AI ETF Investment",
-      "riassunto": "AI spending is expected to hit $2.7 trillion in 2026 as adoption accelerates. Explore four AI ETFs with year-to-date gains of up to 58.3%.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T12:19:00Z",
-      "url": "https://www.nasdaq.com/articles/guide-ai-etf-investment"
      }
     ],
     "RGTI": [
+     {
+      "titolo": "3 Millionaire-Maker Quantum Computing Stocks Wall Street Isn't Talking About",
+      "riassunto": "Key PointsIonQ's SkyWater acquisition gives it in-house semiconductor manufacturing capabilities.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T12:04:00Z",
+      "url": "https://www.nasdaq.com/articles/3-millionaire-maker-quantum-computing-stocks-wall-street-isnt-talking-about"
+     },
      {
       "titolo": "Rigetti Builds Commercial Momentum With Hybrid Quantum-HPC Strategy",
       "riassunto": "RGTI is advancing its hybrid quantum-HPC strategy with HPE and PSC while expanding commercial interest and scaling its superconducting roadmap.",
@@ -58347,13 +58360,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-09-25T21:16:28Z",
       "url": "https://www.nasdaq.com/articles/bigbearai-vs-rigetti-computing-which-technology-stock-better-buy-2026"
-     },
-     {
-      "titolo": "Rigetti, D-Wave, or IonQ: Which Quantum Stock Has the Best Shot at Survival?",
-      "riassunto": "Key PointsIonQ's sales are rising quickly, and the company has plenty of cash to continue investing in its growth.",
-      "fonte": "Nasdaq",
-      "quando": "2026-09-25T19:20:00Z",
-      "url": "https://www.nasdaq.com/articles/rigetti-d-wave-or-ionq-which-quantum-stock-has-best-shot-survival"
      }
     ],
     "WDC": [
@@ -58361,7 +58367,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-03T00:19:38Z",
+      "quando": "2026-10-03T13:55:17Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -58424,13 +58430,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-03T13:05:32Z"
+   "letto_il": "2026-10-03T14:06:05Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T13:55:17Z",
+     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
+    },
     {
      "titolo": "What Is the Stock Market? It's Not a Casino. Here's How I Filter Winners From Losers.",
      "riassunto": "Key PointsShort-term options that are far-out-of-the-money are the \"casino corner\" of the stock market, but long-term investing is different.",
@@ -58465,13 +58478,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-03T00:50:02Z",
      "url": "https://www.nasdaq.com/articles/why-amd-stock-jumped-30-september"
-    },
-    {
-     "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-03T00:19:38Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     }
    ],
    "BE": [
@@ -58564,6 +58570,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Breakfast News: The 20-Year Stock Challenge",
+     "riassunto": "OCTOBER 3, 2026\nWarren Buffett once sat down with Coca-Cola&rsquo;s (NYSE: KO) annual report from 1896, which is a level of homework most investors will never attempt. He observed how the company sold 116,492 gallons of syrup that year. A century later, it sold 3.2 billion. Missed AI&rsquo;",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T11:50:00Z",
+     "url": "https://www.nasdaq.com/articles/breakfast-news-20-year-stock-challenge"
+    },
+    {
      "titolo": "Anthropic Delivers Massive News for AI Stock Investors",
      "riassunto": "The AI pioneer is losing billions of dollars on the bottom line, but the headline figure looks worse than it actually is.",
      "fonte": "Nasdaq",
@@ -58597,16 +58610,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-02T20:18:14Z",
      "url": "https://www.nasdaq.com/articles/stocks-climb-weak-us-economic-news-eases-fed-rate-hike-concerns"
-    },
-    {
-     "titolo": "10 Top Stocks I'd Buy Right Now",
-     "riassunto": "The Fed just raised rates for the first time in three years. Many investors are asking the same question: What do I actually buy right now? With that in mind, I put together 10 top stocks I'd buy today. The list is a mix of safe compounders, dividend payers, and a couple of highe",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T18:42:00Z",
-     "url": "https://www.nasdaq.com/articles/10-top-stocks-id-buy-right-now"
     }
    ],
    "MRVL": [
+    {
+     "titolo": "Intel vs. Marvell Technology: Which AI Chip Stock Is a Better Buy in 2026?",
+     "riassunto": "Key PointsIntel is trying to grow a foundry business that makes chips for other companies, while x86 processors for PCs and data centers remain its core products.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T13:05:01Z",
+     "url": "https://www.nasdaq.com/articles/intel-vs-marvell-technology-which-ai-chip-stock-better-buy-2026"
+    },
+    {
+     "titolo": "Stock Market Pullback: 7 Best Stocks to Buy Now",
+     "riassunto": "Some great companies are now on sale, with many down 20%, 30%, or even more from their recent highs. That's not a reason to panic. For a long-term investor, it's a reason to make a shopping list. Here are seven quality stocks I'd buy on this pullback, all trading well below where",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T12:41:00Z",
+     "url": "https://www.nasdaq.com/articles/stock-market-pullback-7-best-stocks-buy-now"
+    },
     {
      "titolo": "Marvell Stock Has More Than Tripled This Year. I Think It Can Double Again by 2031.",
      "riassunto": "Key PointsMarvell's revenue growth has sped up for two straight quarters, and management sees faster growth ahead.",
@@ -58634,20 +58654,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-02T20:18:14Z",
      "url": "https://www.nasdaq.com/articles/stocks-climb-weak-us-economic-news-eases-fed-rate-hike-concerns"
-    },
-    {
-     "titolo": "Notable Friday Option Activity: MCRI, ESE, MRVL",
-     "riassunto": "Among the underlying components of the Russell 3000 index, we saw noteworthy options trading volume today in Monarch Casino &amp; Resort, Inc. (Symbol: MCRI), where a total of 1,995 contracts have traded so far, representing approximately 199,500 underlying shares.  That amounts",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T19:27:18Z",
-     "url": "https://www.nasdaq.com/articles/notable-friday-option-activity-mcri-ese-mrvl"
-    },
-    {
-     "titolo": "Prediction: This Artificial Intelligence (AI) Chip Stock Will Make a Big Move in October (Hint: It’s Not Micron)",
-     "riassunto": "Key PointsMarvell Technology is expected to raise its guidance once again on Oct. 6.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T19:18:01Z",
-     "url": "https://www.nasdaq.com/articles/prediction-artificial-intelligence-ai-chip-stock-will-make-big-move-october-hint-its-not"
     }
    ],
    "MSTR": [
@@ -58828,6 +58834,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "Breakfast News: The 20-Year Stock Challenge",
+     "riassunto": "OCTOBER 3, 2026\nWarren Buffett once sat down with Coca-Cola&rsquo;s (NYSE: KO) annual report from 1896, which is a level of homework most investors will never attempt. He observed how the company sold 116,492 gallons of syrup that year. A century later, it sold 3.2 billion. Missed AI&rsquo;",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T11:50:00Z",
+     "url": "https://www.nasdaq.com/articles/breakfast-news-20-year-stock-challenge"
+    },
+    {
      "titolo": "Could $20,000 Invested in Palantir Help You Retire a Millionaire?",
      "riassunto": "Key PointsPalantir has seen tremendous revenue growth thanks to its AI platform.",
      "fonte": "Nasdaq",
@@ -58861,16 +58874,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-02T12:29:00Z",
      "url": "https://www.nasdaq.com/articles/guide-ai-etf-investment-0"
-    },
-    {
-     "titolo": "A Guide to AI ETF Investment",
-     "riassunto": "AI spending is expected to hit $2.7 trillion in 2026 as adoption accelerates. Explore four AI ETFs with year-to-date gains of up to 58.3%.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T12:19:00Z",
-     "url": "https://www.nasdaq.com/articles/guide-ai-etf-investment"
     }
    ],
    "RGTI": [
+    {
+     "titolo": "3 Millionaire-Maker Quantum Computing Stocks Wall Street Isn't Talking About",
+     "riassunto": "Key PointsIonQ's SkyWater acquisition gives it in-house semiconductor manufacturing capabilities.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T12:04:00Z",
+     "url": "https://www.nasdaq.com/articles/3-millionaire-maker-quantum-computing-stocks-wall-street-isnt-talking-about"
+    },
     {
      "titolo": "Rigetti Builds Commercial Momentum With Hybrid Quantum-HPC Strategy",
      "riassunto": "RGTI is advancing its hybrid quantum-HPC strategy with HPE and PSC while expanding commercial interest and scaling its superconducting roadmap.",
@@ -58905,13 +58918,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-09-25T21:16:28Z",
      "url": "https://www.nasdaq.com/articles/bigbearai-vs-rigetti-computing-which-technology-stock-better-buy-2026"
-    },
-    {
-     "titolo": "Rigetti, D-Wave, or IonQ: Which Quantum Stock Has the Best Shot at Survival?",
-     "riassunto": "Key PointsIonQ's sales are rising quickly, and the company has plenty of cash to continue investing in its growth.",
-     "fonte": "Nasdaq",
-     "quando": "2026-09-25T19:20:00Z",
-     "url": "https://www.nasdaq.com/articles/rigetti-d-wave-or-ionq-which-quantum-stock-has-best-shot-survival"
     }
    ],
    "WDC": [
@@ -58919,7 +58925,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-03T00:19:38Z",
+     "quando": "2026-10-03T13:55:17Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58982,7 +58988,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-03T13:05:32Z"
+  "letto_il": "2026-10-03T14:06:05Z"
  },
  "predictions": [
   {
@@ -59006,14 +59012,14 @@
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-october-3-2026"
   },
   {
-   "question": "Porto 2: Henrique Rocha vs Jerome Kym",
-   "yes": 50,
-   "link": "https://polymarket.com/event/atp-rocha-kym-2026-10-03"
-  },
-  {
    "question": "Will the price of Bitcoin be above $84,000 on October 3?",
    "yes": 99,
    "link": "https://polymarket.com/event/bitcoin-above-84k-on-october-3-2026"
+  },
+  {
+   "question": "Bitcoin Up or Down on October 3?",
+   "yes": 4,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-3-2026"
   }
  ],
  "options": {
@@ -80358,7 +80364,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -80410,6 +80416,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-03T13:05:33Z"
+  "generated_at": "2026-10-03T14:06:05Z"
  }
 }
