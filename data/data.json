@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-03T09:43:44Z",
+ "updated_at": "2026-10-03T10:08:16Z",
  "eurusd": 1.1257,
  "totals": {
   "usd_value": 0,
@@ -22039,11 +22039,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 84570.14,
+   "price": 84586.59,
    "price_asof": "2026-10-03",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.09,
+   "change_pct": 0.11,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -33.0,
@@ -22056,8 +22056,8 @@
    "day_low": 84434.45,
    "support": 74944.59,
    "resistance": 87363.76,
-   "rsi": 63.1,
-   "volume": 33870307328,
+   "rsi": 63.2,
+   "volume": 33539371008,
    "vol_ratio": 1.52,
    "atr_14": 2156.1,
    "atr_pct": 2.55,
@@ -22069,7 +22069,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84570.14
+     84586.59
     ],
     "m6": [
      73579.69,
@@ -22197,7 +22197,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84570.14
+     84586.59
     ],
     "all": [
      386.94,
@@ -22345,7 +22345,7 @@
      62813.75,
      78548.63,
      83553.85,
-     84570.14
+     84586.59
     ],
     "m1": [
      77270.47,
@@ -22369,7 +22369,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84570.14
+     84586.59
     ],
     "m3": [
      64725.31,
@@ -22437,7 +22437,7 @@
      83553.85,
      84853.1,
      84497.21,
-     84570.14
+     84586.59
     ],
     "y1": [
      122266.53,
@@ -22513,7 +22513,7 @@
      80901.46,
      84383.01,
      83502.61,
-     84570.14
+     84586.59
     ],
     "d1": [
      84461.0,
@@ -22574,7 +22574,9 @@
      84621.54,
      84591.61,
      84570.14,
-     84570.14
+     84571.35,
+     84571.34,
+     84591.78
     ]
    },
    "earnings_date": null,
@@ -22583,12 +22585,12 @@
    "health": 87,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.78,
+   "sharpe_1y": -0.77,
    "sortino_1y": -1.06,
-   "sharpe_6m": 0.71,
+   "sharpe_6m": 0.72,
    "sortino_6m": 1.14,
    "prepost": null,
-   "prezzo_limite_aggiustato": 84570.14,
+   "prezzo_limite_aggiustato": 84586.59,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22601,22 +22603,22 @@
     "w1": {
      "support": 82739.09,
      "resistance": 87146.35,
-     "change_pct": 1.13
+     "change_pct": 1.15
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 9.45
+     "change_pct": 9.47
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 30.66
+     "change_pct": 30.69
     },
     "y1": {
      "support": 57747.77,
      "resistance": 90439.29,
-     "change_pct": -2.31
+     "change_pct": -2.29
     }
    },
    "financials": [],
@@ -22643,74 +22645,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 84570.14,
+     "prezzo": 84586.59,
      "medie": {
       "sma10": {
-       "liv": 84187.79,
-       "dist_pct": 0.45
+       "liv": 84189.43,
+       "dist_pct": 0.47
       },
       "ema10": {
-       "liv": 83947.71,
-       "dist_pct": 0.74
+       "liv": 83950.7,
+       "dist_pct": 0.76
       },
       "sma20": {
-       "liv": 82432.19,
-       "dist_pct": 2.59
+       "liv": 82433.01,
+       "dist_pct": 2.61
       },
       "ema20": {
-       "liv": 82649.0,
-       "dist_pct": 2.32
+       "liv": 82650.57,
+       "dist_pct": 2.34
       },
       "sma30": {
-       "liv": 81071.81,
-       "dist_pct": 4.32
+       "liv": 81072.35,
+       "dist_pct": 4.33
       },
       "ema30": {
-       "liv": 81212.95,
-       "dist_pct": 4.13
+       "liv": 81214.01,
+       "dist_pct": 4.15
       },
       "sma50": {
-       "liv": 78554.79,
-       "dist_pct": 7.66
+       "liv": 78555.12,
+       "dist_pct": 7.68
       },
       "ema50": {
-       "liv": 78554.77,
-       "dist_pct": 7.66
+       "liv": 78555.42,
+       "dist_pct": 7.68
       },
       "sma100": {
-       "liv": 71002.78,
-       "dist_pct": 19.11
+       "liv": 71002.95,
+       "dist_pct": 19.13
       },
       "ema100": {
-       "liv": 74887.42,
-       "dist_pct": 12.93
+       "liv": 74887.74,
+       "dist_pct": 12.95
       },
       "sma200": {
-       "liv": 71424.48,
-       "dist_pct": 18.4
+       "liv": 71424.56,
+       "dist_pct": 18.43
       },
       "ema200": {
-       "liv": 75119.03,
-       "dist_pct": 12.58
+       "liv": 75119.19,
+       "dist_pct": 12.6
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.1,
+      "rsi14": 63.2,
       "macd": {
-       "linea": 1924.28,
-       "segnale": 2090.5,
-       "istogramma": -166.22
+       "linea": 1925.59,
+       "segnale": 2090.76,
+       "istogramma": -165.17
       },
-      "stoch_k": 61.5,
-      "stoch_d": 66.5,
-      "williams_r": -38.5,
-      "cci20": 45.5,
+      "stoch_k": 61.8,
+      "stoch_d": 66.6,
+      "williams_r": -38.2,
+      "cci20": 45.6,
       "adx14": 41.9,
       "di_su": 32.8,
       "di_giu": 12.6,
-      "momentum10": 187.13
+      "momentum10": 203.59
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23203,19 +23205,19 @@
       "o": 84506.34,
       "h": 84713.72,
       "l": 84434.45,
-      "c": 84570.14
+      "c": 84586.59
      }
     ],
     "performance": {
-     "s1": 1.28,
-     "m1": 9.58,
-     "m3": 32.33,
-     "m6": 14.66,
-     "a1": -5.1,
-     "ytd": -4.69,
-     "a3": 143.94,
-     "a5": 37.92,
-     "a10": 11964.7
+     "s1": 1.3,
+     "m1": 9.61,
+     "m3": 32.36,
+     "m6": 14.69,
+     "a1": -5.08,
+     "ytd": -4.67,
+     "a3": 143.99,
+     "a5": 37.95,
+     "a10": 11967.04
     },
     "stagionalita": [
      {
@@ -23330,7 +23332,7 @@
    },
    "rs_1m": 8.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 3.7,
+   "rs_ndx_1m": 3.8,
    "beta_ndx": 0.84,
    "avg_corr": 0.3,
    "max_corr": 0.8,
@@ -32579,16 +32581,13 @@
     "all": [
      0.88,
      0.92,
-     0.85,
      0.84,
      0.85,
      0.85,
      0.81,
      0.76,
-     0.77,
      0.75,
      0.7,
-     0.68,
      0.68,
      0.65,
      0.62,
@@ -32602,16 +32601,13 @@
      0.77,
      0.68,
      0.69,
-     0.66,
      0.71,
      0.75,
-     0.7,
      0.79,
      0.77,
      0.71,
      0.73,
      0.78,
-     0.75,
      0.82,
      0.8,
      0.81,
@@ -32619,13 +32615,11 @@
      0.91,
      1.04,
      1.14,
-     1.34,
      1.36,
      1.21,
      1.28,
      1.21,
      1.31,
-     1.28,
      1.4,
      1.35,
      1.44,
@@ -32634,7 +32628,6 @@
      1.5,
      1.51,
      1.5,
-     1.5,
      1.55,
      1.69,
      1.7,
@@ -32642,7 +32635,6 @@
      1.9,
      2.08,
      2.16,
-     2.24,
      2.19,
      2.49,
      3.34,
@@ -32651,16 +32643,13 @@
      3.61,
      3.47,
      3.46,
-     3.34,
      3.17,
      2.85,
      2.58,
      2.73,
      3.14,
-     3.54,
      3.39,
      3.45,
-     3.65,
      3.41,
      3.63,
      3.47,
@@ -32671,7 +32660,6 @@
      3.86,
      3.93,
      3.63,
-     3.9,
      3.72,
      3.43,
      2.89,
@@ -32679,8 +32667,6 @@
      1.62,
      1.39,
      1.46,
-     1.53,
-     1.84,
      2.05,
      2.2,
      2.26,
@@ -32688,7 +32674,6 @@
      2.81,
      2.81,
      2.95,
-     3.15,
      3.33,
      3.05,
      3.27,
@@ -32697,7 +32682,6 @@
      3.1,
      2.94,
      3.31,
-     3.36,
      3.65,
      3.73,
      3.82,
@@ -32706,7 +32690,6 @@
      4.48,
      4.3,
      4.17,
-     4.17,
      4.27,
      4.47,
      4.19,
@@ -32714,13 +32697,10 @@
      3.63,
      3.56,
      3.43,
-     3.79,
      3.87,
      3.82,
-     3.83,
      3.36,
      3.49,
-     3.42,
      3.45,
      3.77,
      3.53,
@@ -32734,16 +32714,13 @@
      3.05,
      3.12,
      3.22,
-     3.32,
      3.29,
      3.23,
-     3.44,
      3.22,
      3.24,
      3.05,
      3.03,
      3.14,
-     3.19,
      3.22,
      3.13,
      3.01,
@@ -32751,8 +32728,6 @@
      2.86,
      2.84,
      2.53,
-     2.72,
-     2.75,
      2.89,
      2.76,
      2.62,
@@ -32760,13 +32735,11 @@
      2.34,
      2.35,
      2.31,
-     2.04,
      2.13,
      2.06,
      2.13,
      2.18,
      2.28,
-     2.1,
      2.19,
      2.22,
      2.07,
@@ -32774,7 +32747,6 @@
      2.2,
      2.62,
      2.5,
-     2.72,
      2.7,
      2.65,
      2.6,
@@ -32783,16 +32755,13 @@
      2.89,
      3.08,
      2.94,
-     3.09,
      3.04,
      3.28,
      3.18,
      3.11,
      3.02,
-     3.05,
      3.06,
      2.95,
-     2.82,
      2.65,
      2.79,
      2.66,
@@ -32806,13 +32775,10 @@
      2.71,
      2.66,
      2.53,
-     2.56,
      2.63,
      2.64,
-     2.79,
      2.52,
      2.55,
-     2.24,
      2.35,
      2.43,
      2.71,
@@ -32820,7 +32786,6 @@
      3.04,
      3.03,
      3.04,
-     3.42,
      3.51,
      3.57,
      4.09,
@@ -32829,7 +32794,6 @@
      4.68,
      4.3,
      4.48,
-     4.36,
      4.09,
      4.38,
      4.28,
@@ -32838,7 +32802,6 @@
      4.44,
      4.74,
      4.39,
-     4.3,
      3.71,
      3.58,
      3.52,
@@ -32846,7 +32809,6 @@
      3.41,
      3.73,
      3.81,
-     4.23,
      4.1,
      4.1,
      3.87,
@@ -32855,7 +32817,6 @@
      3.99,
      3.77,
      3.73,
-     3.64,
      3.83,
      3.88,
      3.9,
@@ -32866,16 +32827,13 @@
      4.39,
      4.16,
      4.14,
-     4.5,
      4.31,
      4.08,
-     3.99,
      4.26,
      4.51,
      5.02,
      4.56,
      4.65,
-     5.03,
      4.33,
      4.52,
      4.8,
@@ -32883,8 +32841,6 @@
      5.19,
      5.63,
      5.9,
-     6.0,
-     5.59,
      5.93,
      6.36,
      6.19,
@@ -33774,117 +33730,117 @@
      "m3": 4.84,
      "m6": 16.7,
      "ytd": 15.11,
-     "a1": 28.16,
-     "a3": 78.28,
-     "a5": 48.37,
-     "a10": 195.02
+     "a1": 43.68,
+     "a3": 67.75,
+     "a5": 81.67,
+     "a10": 156.8
     },
     "stagionalita": [
      {
       "mese": 1,
-      "media": 1.9,
-      "mediana": 1.98,
-      "positivi_pct": 65,
-      "campione": 26,
+      "media": 0.75,
+      "mediana": 0.41,
+      "positivi_pct": 59,
+      "campione": 22,
       "peggio": -10.9,
-      "meglio": 13.6
+      "meglio": 11.9
      },
      {
       "mese": 2,
-      "media": 2.93,
-      "mediana": 2.01,
-      "positivi_pct": 65,
-      "campione": 26,
+      "media": 3.58,
+      "mediana": 2.73,
+      "positivi_pct": 73,
+      "campione": 22,
       "peggio": -5.3,
-      "meglio": 17.5
+      "meglio": 17.1
      },
      {
       "mese": 3,
-      "media": 1.41,
+      "media": 2.35,
       "mediana": 0.23,
-      "positivi_pct": 54,
-      "campione": 26,
-      "peggio": -12.0,
-      "meglio": 20.5
+      "positivi_pct": 55,
+      "campione": 22,
+      "peggio": -8.1,
+      "meglio": 18.9
      },
      {
       "mese": 4,
-      "media": 2.1,
-      "mediana": 0.65,
-      "positivi_pct": 54,
-      "campione": 26,
+      "media": 2.69,
+      "mediana": -0.95,
+      "positivi_pct": 41,
+      "campione": 22,
       "peggio": -11.0,
-      "meglio": 34.1
+      "meglio": 40.4
      },
      {
       "mese": 5,
-      "media": -0.1,
-      "mediana": 0.33,
-      "positivi_pct": 58,
-      "campione": 26,
-      "peggio": -12.3,
+      "media": 0.98,
+      "mediana": 2.55,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -12.1,
       "meglio": 11.4
      },
      {
       "mese": 6,
-      "media": -0.57,
-      "mediana": 1.22,
-      "positivi_pct": 54,
-      "campione": 26,
-      "peggio": -13.5,
+      "media": -1.7,
+      "mediana": -3.06,
+      "positivi_pct": 45,
+      "campione": 22,
+      "peggio": -15.5,
       "meglio": 11.8
      },
      {
       "mese": 7,
-      "media": 1.57,
-      "mediana": 3.08,
-      "positivi_pct": 62,
-      "campione": 26,
-      "peggio": -13.9,
+      "media": 2.57,
+      "mediana": 4.1,
+      "positivi_pct": 73,
+      "campione": 22,
+      "peggio": -11.7,
       "meglio": 15.9
      },
      {
       "mese": 8,
-      "media": -0.98,
-      "mediana": -1.54,
-      "positivi_pct": 42,
-      "campione": 26,
-      "peggio": -7.7,
+      "media": -1.17,
+      "mediana": -1.25,
+      "positivi_pct": 35,
+      "campione": 23,
+      "peggio": -10.2,
       "meglio": 7.3
      },
      {
       "mese": 9,
-      "media": 0.24,
-      "mediana": 0.32,
-      "positivi_pct": 56,
-      "campione": 27,
+      "media": -0.23,
+      "mediana": 0.04,
+      "positivi_pct": 52,
+      "campione": 23,
       "peggio": -24.9,
-      "meglio": 9.3
+      "meglio": 10.3
      },
      {
       "mese": 10,
-      "media": -0.21,
-      "mediana": -0.15,
-      "positivi_pct": 44,
-      "campione": 27,
+      "media": 0.46,
+      "mediana": 1.85,
+      "positivi_pct": 57,
+      "campione": 23,
       "peggio": -36.1,
       "meglio": 15.4
      },
      {
       "mese": 11,
-      "media": 1.6,
-      "mediana": 1.36,
-      "positivi_pct": 54,
-      "campione": 26,
+      "media": 1.13,
+      "mediana": 2.37,
+      "positivi_pct": 57,
+      "campione": 23,
       "peggio": -12.0,
       "meglio": 19.1
      },
      {
       "mese": 12,
-      "media": 1.02,
-      "mediana": 1.69,
-      "positivi_pct": 62,
-      "campione": 26,
+      "media": 1.43,
+      "mediana": 1.0,
+      "positivi_pct": 59,
+      "campione": 22,
       "peggio": -14.1,
       "meglio": 16.1
      }
@@ -35355,7 +35311,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.96,
-   "pe": 34.2,
+   "pe": 35.3,
    "ath": 477.72,
    "ath_dist_pct": -1.0,
    "sma200_dist_pct": 22.7,
@@ -36066,7 +36022,7 @@
     "target_mediana": 538.5
    },
    "health": 91,
-   "eps": 13.81,
+   "eps": 13.38,
    "beta": 1.25,
    "sharpe_1y": 1.15,
    "sortino_1y": 1.71,
@@ -36087,9 +36043,9 @@
     "float_shares": 37843003812.0,
     "float_pct": null,
     "avg_volume_30d": 11533707.0,
-    "pe_ttm": 34.2346,
+    "pe_ttm": 35.3348,
     "forward_pe": 21.5634,
-    "eps_ttm": 13.81,
+    "eps_ttm": 13.38,
     "eps_forward": 21.9251,
     "revenue_fy": null,
     "net_income_fy": null,
@@ -57899,6 +57855,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Intel Was Worth About 28 Times as Much as AMD 10 Years Ago. Now AMD Is Worth About 60% More.",
+      "riassunto": "Key PointsIn late September 2016, Intel's market value was around 28 times as big as AMD's.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T09:32:01Z",
+      "url": "https://www.nasdaq.com/articles/intel-was-worth-about-28-times-much-amd-10-years-ago-now-amd-worth-about-60-more"
+     },
+     {
       "titolo": "Anthropic Delivers Massive News for AI Stock Investors",
       "riassunto": "The AI pioneer is losing billions of dollars on the bottom line, but the headline figure looks worse than it actually is.",
       "fonte": "Nasdaq",
@@ -57932,13 +57895,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-02T23:05:36Z",
       "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
-     },
-     {
-      "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +0.90% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.54%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.23%.  December E-mini S&P futures (ESZ26 ) are up +0.85%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T20:18:14Z",
-      "url": "https://www.nasdaq.com/articles/stocks-climb-weak-us-economic-news-eases-fed-rate-hike-concerns"
      }
     ],
     "BE": [
@@ -58207,6 +58163,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "What Is the Stock Market? It's Not a Casino. Here's How I Filter Winners From Losers.",
+      "riassunto": "Key PointsShort-term options that are far-out-of-the-money are the \"casino corner\" of the stock market, but long-term investing is different.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-03T09:50:00Z",
+      "url": "https://www.nasdaq.com/articles/what-stock-market-its-not-casino-heres-how-i-filter-winners-losers"
+     },
+     {
       "titolo": "Is a Microsoft Stock Split Coming After 23 Years?",
       "riassunto": "Key PointsMicrosoft's latest stock split was a 2-for-1 split in February 2003, its ninth since going public in 1986.",
       "fonte": "Nasdaq",
@@ -58240,13 +58203,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-03T00:19:38Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-     },
-     {
-      "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-02T23:05:36Z",
-      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
      }
     ],
     "ORCL": [
@@ -58449,13 +58405,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-03T09:43:44Z"
+   "letto_il": "2026-10-03T10:08:16Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Intel Was Worth About 28 Times as Much as AMD 10 Years Ago. Now AMD Is Worth About 60% More.",
+     "riassunto": "Key PointsIn late September 2016, Intel's market value was around 28 times as big as AMD's.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T09:32:01Z",
+     "url": "https://www.nasdaq.com/articles/intel-was-worth-about-28-times-much-amd-10-years-ago-now-amd-worth-about-60-more"
+    },
     {
      "titolo": "Anthropic Delivers Massive News for AI Stock Investors",
      "riassunto": "The AI pioneer is losing billions of dollars on the bottom line, but the headline figure looks worse than it actually is.",
@@ -58490,13 +58453,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-02T23:05:36Z",
      "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
-    },
-    {
-     "titolo": "Stocks Climb as Weak US Economic News Eases Fed Rate Hike Concerns",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +0.90% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.54%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.23%.  December E-mini S&P futures (ESZ26 ) are up +0.85%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T20:18:14Z",
-     "url": "https://www.nasdaq.com/articles/stocks-climb-weak-us-economic-news-eases-fed-rate-hike-concerns"
     }
    ],
    "BE": [
@@ -58765,6 +58721,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "What Is the Stock Market? It's Not a Casino. Here's How I Filter Winners From Losers.",
+     "riassunto": "Key PointsShort-term options that are far-out-of-the-money are the \"casino corner\" of the stock market, but long-term investing is different.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-03T09:50:00Z",
+     "url": "https://www.nasdaq.com/articles/what-stock-market-its-not-casino-heres-how-i-filter-winners-losers"
+    },
+    {
      "titolo": "Is a Microsoft Stock Split Coming After 23 Years?",
      "riassunto": "Key PointsMicrosoft's latest stock split was a 2-for-1 split in February 2003, its ninth since going public in 1986.",
      "fonte": "Nasdaq",
@@ -58798,13 +58761,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-03T00:19:38Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
-    },
-    {
-     "titolo": "Stocks Rally as a Weak US Payroll Report Reduces Fed Rate Hike Chances",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is up by +1.05% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.814%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.35%.  December E-mini S&P futures (ESZ26 ) are up +0.99%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-02T23:05:36Z",
-     "url": "https://www.nasdaq.com/articles/stocks-rally-weak-us-payroll-report-reduces-fed-rate-hike-chances"
     }
    ],
    "ORCL": [
@@ -59007,7 +58963,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-03T09:43:44Z"
+  "letto_il": "2026-10-03T10:08:16Z"
  },
  "predictions": [
   {
@@ -59036,9 +58992,9 @@
    "link": "https://polymarket.com/event/bitcoin-above-84k-on-october-3-2026"
   },
   {
-   "question": "Will Bitcoin reach $87,500 in October?",
-   "yes": 70,
-   "link": "https://polymarket.com/event/will-bitcoin-reach-87pt5k-in-october-2026"
+   "question": "Bitcoin Up or Down on October 3?",
+   "yes": 4,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-3-2026"
   }
  ],
  "options": {
@@ -80435,6 +80391,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-03T09:43:45Z"
+  "generated_at": "2026-10-03T10:08:16Z"
  }
 }
