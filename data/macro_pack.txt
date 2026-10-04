@@ -1,4 +1,4 @@
-⟦ BUILD v458 · generato 04/10/2026 18:19 ⟧
+⟦ BUILD v458 · generato 04/10/2026 18:31 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 04/10/2026, 18:19:29 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 14:19, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,46% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,58% · Fut S&P +0,45% · BTC +0,67% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 04/10/2026, 18:31:06 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 14:31, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,46% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,58% · Fut S&P +0,45% · BTC +0,65% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 04/10/2026, 18:19:29, prossimo run 04/10/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-02 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 04/10/2026, 18:31:06, prossimo run 04/10/2026, 19:00:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-02 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-08-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-09-01) · Disoccupazione (2026-09-01) · Fiducia consumatori (UMich) (2026-09-01) · Curva 10A-2A (2026-10-02) · Curva 10A-3M (2026-10-02) · Treasury USA 30A (2026-10-01) · Tasso reale 10A (TIPS) (2026-10-01) · Inflazione attesa 10A (breakeven) (2026-10-02) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -98,13 +98,13 @@ QUADRO MACRO:
 - TITOLI MACRO — 4 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 6 pubblicate DOPO l'ultima chiusura USA del 2026-10-02, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Jobs Slow but Inflation Keeps Fed on Alert
       Bloomberg Intelligence Chief US Interest Rate Strategist Ira Jersey tells Bloomberg This Weekend that softer September jobs data give the Federal Reserve room to hold rates steady in October, but persistent inflation could still lead policymakers to raise rates again in December and early next year. Speaking with hosts
-    · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Wall Street’s AI Party Is on Edge as Soaring Yields Raise Risks
+    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Wall Street’s AI Party Is on Edge as Soaring Yields Raise Risks
       Wall Street’s artificial intelligence fixation is so strong that it’s overwhelming all risks, including soaring interest rates, as investors continue to plow money into the market’s largest technology stocks and push equity indexes toward record highs.
-    · [MarketWatch, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Fed minutes coming this week could give markets important clues about future rate hikes
+    · [MarketWatch, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Fed minutes coming this week could give markets important clues about future rate hikes
       Minutes from the September meeting may provide extra context, as the real fed-funds rate is now surprisingly low.
     · [Bloomberg, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Whispers of Contagion Risk Are Returning to Europe’s Bond Market
       Traders are on the alert for signs of contagion in Europe’s government bond market after a selloff triggered memories of the region’s debt crisis 15 years ago.
-    · [MarketWatch, 18h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Falling wages, soaring energy prices and inflation: It’s beginning to look a lot like the 1970s
+    · [MarketWatch, 19h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Falling wages, soaring energy prices and inflation: It’s beginning to look a lot like the 1970s
       Is it time to dust off the financial playbook from that dismal decade?
     · [MarketWatch, 24h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] These bond strategies can help you get a safe 5% return on your cash
       With U.S. Treasury yields on the rise, financial planners say they’re seeing a growing interest in bonds, especially among investors looking to secure fixed income in retirement.
@@ -231,7 +231,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (69,6% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 0h fa] Stocks Settle Higher as Fed Rate Hike Concerns Ease
+  [AMD] · [Nasdaq, 1h fa] Stocks Settle Higher as Fed Rate Hike Concerns Ease
       The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...
   [AMD] · [Nasdaq, 4h fa] Is It Too Late to Buy Micron Technology Stock After Its 12-Month Gain of 500%?
       Key PointsArtificial intelligence (AI) workloads in data centers, smartphones, computers, and even cars require an increasing amount of memory capacity.
@@ -243,7 +243,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsIntel is trying to grow a foundry business that makes chips for other companies, while x86 processors for PCs and data centers remain its core products.
   [MRVL] · [Nasdaq, 30h fa] Stock Market Pullback: 7 Best Stocks to Buy Now
       Some great companies are now on sale, with many down 20%, 30%, or even more from their recent highs. That's not a reason to panic. For a long-term investor, it's a reason to make a shopping list. Here are seven quality stocks I'd buy on this pullback, all trading well below where
-  [MU] · [Nasdaq, 0h fa] You Can Do Better Than Tesla. Buy Micron Instead.
+  [MU] · [Nasdaq, 1h fa] You Can Do Better Than Tesla. Buy Micron Instead.
       Key PointsTesla is trading at a massive premium to its sector average P/E ratio, as well as to other megacap companies.
   [MU] · [Nasdaq, 2h fa] Investors Had a Tepid Reaction to Micron's Latest Earnings Report. An Overlooked Headwind May Explain Why.
       Key PointsMicron stock rose modestly following a phenomenal earnings report.
@@ -253,7 +253,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsIonQ is an obvious quantum computing stock with huge upside.
   [ORCL] · [Nasdaq, 47h fa] Notable Friday Option Activity: ORCL, GS, RKLB
       Among the underlying components of the Russell 3000 index, we saw noteworthy options trading volume today in Oracle Corp (Symbol: ORCL), where a total of 369,221 contracts have traded so far, representing approximately 36.9 million underlying shares.  That amounts to about 103.2
-  [ORCL] · [Nasdaq, 48h fa] Friday 10/2 Insider Buying Report: UUU, ORCL
+  [ORCL] · [Nasdaq, 49h fa] Friday 10/2 Insider Buying Report: UUU, ORCL
       As the saying goes, there are many possible reasons for an insider to sell a stock, but only one reason to buy -- they expect to make money.  So let's look at two noteworthy recent insider buys.
 
 At Universal Safety Products, a filing with the SEC revealed that on Wednesday,  Mi

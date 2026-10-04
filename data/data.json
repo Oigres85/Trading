@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-04T18:19:29Z",
+ "updated_at": "2026-10-04T18:31:06Z",
  "eurusd": 1.1257,
  "totals": {
   "usd_value": 0,
@@ -1771,7 +1771,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -11801,7 +11801,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -21987,11 +21987,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 85327.86,
+   "price": 85313.57,
    "price_asof": "2026-10-04",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.67,
+   "change_pct": 0.65,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -32.4,
@@ -22004,8 +22004,8 @@
    "day_low": 84707.32,
    "support": 74944.59,
    "resistance": 87363.76,
-   "rsi": 65.5,
-   "volume": 12129667072,
+   "rsi": 65.4,
+   "volume": 12130991104,
    "vol_ratio": 0.4,
    "atr_14": 2074.02,
    "atr_pct": 2.43,
@@ -22017,7 +22017,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85327.86
+     85313.57
     ],
     "m6": [
      71319.77,
@@ -22145,7 +22145,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85327.86
+     85313.57
     ],
     "all": [
      386.94,
@@ -22293,7 +22293,7 @@
      62813.75,
      78548.63,
      83553.85,
-     85327.86
+     85313.57
     ],
     "m1": [
      76838.16,
@@ -22317,7 +22317,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85327.86
+     85313.57
     ],
     "m3": [
      62813.75,
@@ -22385,7 +22385,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85327.86
+     85313.57
     ],
     "y1": [
      122425.43,
@@ -22461,7 +22461,7 @@
      81233.68,
      84379.06,
      83622.43,
-     85327.86
+     85313.57
     ],
     "d1": [
      84801.95,
@@ -22573,7 +22573,8 @@
      85418.01,
      85326.36,
      85322.56,
-     85317.2
+     85317.2,
+     85310.0
     ]
    },
    "earnings_date": null,
@@ -22587,7 +22588,7 @@
    "sharpe_6m": 0.78,
    "sortino_6m": 1.25,
    "prepost": null,
-   "prezzo_limite_aggiustato": 85327.86,
+   "prezzo_limite_aggiustato": 85313.57,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22600,22 +22601,22 @@
     "w1": {
      "support": 82927.88,
      "resistance": 87146.35,
-     "change_pct": 2.12
+     "change_pct": 2.11
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 11.05
+     "change_pct": 11.03
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 35.84
+     "change_pct": 35.82
     },
     "y1": {
      "support": 57747.77,
      "resistance": 90439.29,
-     "change_pct": -3.33
+     "change_pct": -3.35
     }
    },
    "financials": [],
@@ -22642,74 +22643,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 85327.86,
+     "prezzo": 85313.57,
      "medie": {
       "sma10": {
-       "liv": 84302.01,
-       "dist_pct": 1.22
+       "liv": 84300.58,
+       "dist_pct": 1.2
       },
       "ema10": {
-       "liv": 84227.42,
-       "dist_pct": 1.31
+       "liv": 84224.82,
+       "dist_pct": 1.29
       },
       "sma20": {
-       "liv": 82800.09,
-       "dist_pct": 3.05
+       "liv": 82799.37,
+       "dist_pct": 3.04
       },
       "ema20": {
-       "liv": 82920.8,
-       "dist_pct": 2.9
+       "liv": 82919.44,
+       "dist_pct": 2.89
       },
       "sma30": {
-       "liv": 81266.78,
-       "dist_pct": 5.0
+       "liv": 81266.31,
+       "dist_pct": 4.98
       },
       "ema30": {
-       "liv": 81490.1,
-       "dist_pct": 4.71
+       "liv": 81489.18,
+       "dist_pct": 4.69
       },
       "sma50": {
-       "liv": 79004.73,
-       "dist_pct": 8.0
+       "liv": 79004.44,
+       "dist_pct": 7.99
       },
       "ema50": {
-       "liv": 78827.67,
-       "dist_pct": 8.25
+       "liv": 78827.11,
+       "dist_pct": 8.23
       },
       "sma100": {
-       "liv": 71257.83,
-       "dist_pct": 19.75
+       "liv": 71257.69,
+       "dist_pct": 19.73
       },
       "ema100": {
-       "liv": 75098.02,
-       "dist_pct": 13.62
+       "liv": 75097.73,
+       "dist_pct": 13.6
       },
       "sma200": {
-       "liv": 71495.85,
-       "dist_pct": 19.35
+       "liv": 71495.78,
+       "dist_pct": 19.33
       },
       "ema200": {
-       "liv": 75226.6,
-       "dist_pct": 13.43
+       "liv": 75226.46,
+       "dist_pct": 13.41
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 65.5,
+      "rsi14": 65.4,
       "macd": {
-       "linea": 1922.26,
-       "segnale": 2059.32,
-       "istogramma": -137.06
+       "linea": 1921.12,
+       "segnale": 2059.09,
+       "istogramma": -137.97
       },
-      "stoch_k": 68.7,
-      "stoch_d": 64.5,
-      "williams_r": -31.3,
-      "cci20": 48.3,
+      "stoch_k": 68.4,
+      "stoch_d": 64.4,
+      "williams_r": -31.6,
+      "cci20": 48.2,
       "adx14": 42.2,
       "di_su": 33.1,
       "di_giu": 12.1,
-      "momentum10": 948.8
+      "momentum10": 934.51
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23202,19 +23203,19 @@
       "o": 84742.47,
       "h": 85426.0,
       "l": 84707.32,
-      "c": 85327.86
+      "c": 85313.57
      }
     ],
     "performance": {
-     "s1": 2.04,
-     "m1": 10.43,
-     "m3": 31.83,
-     "m6": 15.97,
-     "a1": -1.44,
-     "ytd": -3.84,
-     "a3": 146.13,
-     "a5": 39.15,
-     "a10": 12072.79
+     "s1": 2.02,
+     "m1": 10.41,
+     "m3": 31.81,
+     "m6": 15.95,
+     "a1": -1.45,
+     "ytd": -3.85,
+     "a3": 146.09,
+     "a5": 39.13,
+     "a10": 12070.75
     },
     "stagionalita": [
      {
@@ -57667,7 +57668,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-04T17:44:53Z",
+      "quando": "2026-10-04T17:57:49Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -57843,7 +57844,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-04T17:44:53Z",
+      "quando": "2026-10-04T17:57:49Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -58082,7 +58083,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-04T18:19:29Z"
+   "letto_il": "2026-10-04T18:31:06Z"
   }
  },
  "broker": null,
@@ -58225,7 +58226,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-04T17:44:53Z",
+     "quando": "2026-10-04T17:57:49Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58401,7 +58402,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-04T17:44:53Z",
+     "quando": "2026-10-04T17:57:49Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58640,7 +58641,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-04T18:19:29Z"
+  "letto_il": "2026-10-04T18:31:06Z"
  },
  "predictions": [],
  "options": {
@@ -80719,6 +80720,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-04T18:19:29Z"
+  "generated_at": "2026-10-04T18:31:06Z"
  }
 }
