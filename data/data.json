@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-04T13:44:35Z",
+ "updated_at": "2026-10-04T14:32:13Z",
  "eurusd": 1.1257,
  "totals": {
   "usd_value": 0,
@@ -4776,10 +4776,7 @@
     "short_float": 0.0127,
     "buyback_yield": 0.0071,
     "ps": 18.65,
-    "ev_s": 18.53,
-    "altman_z": 13.22,
-    "altman_missing": 0,
-    "altman_model": "Z''"
+    "ev_s": 18.53
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -8038,9 +8035,9 @@
     "float_pct": 91.7,
     "avg_volume_30d": 34564696.0,
     "pe_ttm": 161.3248,
-    "forward_pe": 81.253,
+    "forward_pe": 80.5192,
     "eps_ttm": 1.17,
-    "eps_forward": 2.323,
+    "eps_forward": 2.3442,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
     "revenue_growth": 0.928,
@@ -9887,7 +9884,7 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0141,
-    "price_to_book": 10.9126,
+    "price_to_book": 6.9612,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
@@ -11804,7 +11801,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -11933,7 +11930,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": 19.8561,
+    "price_to_book": null,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13722,7 +13719,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0009,
-    "price_to_book": 12.8834,
+    "price_to_book": 13.0883,
     "target_mean": 293.8774,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -16212,7 +16209,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 4.17,
-   "pe": 370.7,
+   "pe": 357.0,
    "ath": 351.28,
    "ath_dist_pct": -17.7,
    "sma200_dist_pct": 39.4,
@@ -16679,7 +16676,7 @@
     "target_mediana": 303.0
    },
    "health": 86,
-   "eps": 0.78,
+   "eps": 0.81,
    "beta": 3.81,
    "sharpe_1y": 1.01,
    "sortino_1y": 1.53,
@@ -16700,10 +16697,10 @@
     "float_shares": 289296540.0,
     "float_pct": 98.2,
     "avg_volume_30d": 15642992.0,
-    "pe_ttm": 370.7051,
-    "forward_pe": 58.6665,
-    "eps_ttm": 0.78,
-    "eps_forward": 4.9287,
+    "pe_ttm": 356.9753,
+    "forward_pe": 58.5075,
+    "eps_ttm": 0.81,
+    "eps_forward": 4.9421,
     "revenue_fy": 3113149952.0,
     "net_income_fy": 244942000.0,
     "revenue_growth": 1.655,
@@ -21990,16 +21987,16 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 85231.54,
+   "price": 85169.83,
    "price_asof": "2026-10-04",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.55,
+   "change_pct": 0.48,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -32.5,
-   "sma200_dist_pct": 19.2,
-   "sma50_dist_pct": 7.9,
+   "sma200_dist_pct": 19.1,
+   "sma50_dist_pct": 7.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -32.5,
@@ -22007,8 +22004,8 @@
    "day_low": 84707.32,
    "support": 74944.59,
    "resistance": 87363.76,
-   "rsi": 65.2,
-   "volume": 12551392256,
+   "rsi": 65.0,
+   "volume": 12569856000,
    "vol_ratio": 0.4,
    "atr_14": 2071.83,
    "atr_pct": 2.43,
@@ -22020,7 +22017,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85231.54
+     85169.83
     ],
     "m6": [
      71319.77,
@@ -22148,7 +22145,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85231.54
+     85169.83
     ],
     "all": [
      386.94,
@@ -22296,7 +22293,7 @@
      62813.75,
      78548.63,
      83553.85,
-     85231.54
+     85169.83
     ],
     "m1": [
      76838.16,
@@ -22320,7 +22317,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85231.54
+     85169.83
     ],
     "m3": [
      62813.75,
@@ -22388,7 +22385,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85231.54
+     85169.83
     ],
     "y1": [
      122425.43,
@@ -22464,49 +22461,49 @@
      81233.68,
      84379.06,
      83622.43,
-     85231.54
+     85169.83
     ],
     "d1": [
-     84811.58,
+     84801.95,
      84803.78,
-     84845.12,
-     84817.9,
-     84787.31,
-     84805.34,
-     84758.92,
-     84758.33,
+     84847.12,
+     84817.91,
+     84787.3,
+     84806.73,
+     84758.91,
+     84758.32,
      84724.62,
      84768.85,
      84767.4,
-     84792.0,
-     84837.99,
+     84792.01,
+     84837.55,
      84809.54,
-     84821.34,
+     84822.13,
      84812.35,
      84784.96,
      84780.55,
      84793.6,
-     84796.66,
+     84796.65,
      84813.64,
      84849.05,
      84861.87,
      84820.17,
-     84827.38,
-     84799.01,
-     84805.09,
+     84827.39,
+     84799.0,
+     84805.08,
      84807.31,
-     84801.99,
+     84802.0,
      84802.98,
      84826.21,
-     84813.6,
+     84813.59,
      84851.0,
      84863.99,
      84909.12,
      84919.3,
      84903.47,
      84896.43,
-     84946.51,
-     84997.52,
+     84946.52,
+     84997.51,
      84949.46,
      85052.17,
      85004.1,
@@ -22514,42 +22511,47 @@
      84979.12,
      84916.55,
      84960.53,
-     85029.37,
+     85029.38,
      85110.98,
      85124.13,
      85129.89,
-     85079.06,
+     85079.07,
      85066.75,
      85086.67,
-     85053.35,
-     85119.32,
-     85189.17,
+     85053.36,
+     85123.99,
+     85189.18,
      85214.99,
-     85264.13,
+     85267.58,
      85243.39,
      85262.61,
      85249.99,
      85365.32,
-     85324.45,
+     85324.46,
      85330.27,
-     85320.29,
-     85200.0,
+     85320.3,
+     85200.01,
      85251.0,
      85276.25,
-     85303.8,
+     85303.81,
      85266.43,
      85293.77,
      85329.03,
-     85228.01,
+     85228.02,
      85284.38,
-     85271.3,
-     85186.64,
+     85271.31,
+     85186.63,
      85132.07,
-     85125.21,
+     85126.24,
      85160.5,
      85196.46,
-     85246.81,
-     85225.99
+     85246.82,
+     85209.45,
+     85245.61,
+     85226.68,
+     85200.98,
+     85153.82,
+     85169.83
     ]
    },
    "earnings_date": null,
@@ -22560,10 +22562,10 @@
    "beta": null,
    "sharpe_1y": -0.76,
    "sortino_1y": -1.04,
-   "sharpe_6m": 0.78,
-   "sortino_6m": 1.24,
+   "sharpe_6m": 0.77,
+   "sortino_6m": 1.23,
    "prepost": null,
-   "prezzo_limite_aggiustato": 85231.54,
+   "prezzo_limite_aggiustato": 85169.83,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22576,22 +22578,22 @@
     "w1": {
      "support": 82927.88,
      "resistance": 87146.35,
-     "change_pct": 2.01
+     "change_pct": 1.93
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 10.92
+     "change_pct": 10.84
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 35.69
+     "change_pct": 35.59
     },
     "y1": {
      "support": 57747.77,
      "resistance": 90439.29,
-     "change_pct": -3.44
+     "change_pct": -3.51
     }
    },
    "financials": [],
@@ -22618,74 +22620,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 85231.54,
+     "prezzo": 85169.83,
      "medie": {
       "sma10": {
-       "liv": 84292.38,
-       "dist_pct": 1.11
+       "liv": 84286.21,
+       "dist_pct": 1.05
       },
       "ema10": {
-       "liv": 84209.91,
-       "dist_pct": 1.21
+       "liv": 84198.69,
+       "dist_pct": 1.15
       },
       "sma20": {
-       "liv": 82795.27,
-       "dist_pct": 2.94
+       "liv": 82792.18,
+       "dist_pct": 2.87
       },
       "ema20": {
-       "liv": 82911.63,
-       "dist_pct": 2.8
+       "liv": 82905.75,
+       "dist_pct": 2.73
       },
       "sma30": {
-       "liv": 81263.57,
-       "dist_pct": 4.88
+       "liv": 81261.52,
+       "dist_pct": 4.81
       },
       "ema30": {
-       "liv": 81483.89,
-       "dist_pct": 4.6
+       "liv": 81479.91,
+       "dist_pct": 4.53
       },
       "sma50": {
-       "liv": 79002.8,
-       "dist_pct": 7.88
+       "liv": 79001.57,
+       "dist_pct": 7.81
       },
       "ema50": {
-       "liv": 78823.89,
-       "dist_pct": 8.13
+       "liv": 78821.47,
+       "dist_pct": 8.05
       },
       "sma100": {
-       "liv": 71256.87,
-       "dist_pct": 19.61
+       "liv": 71256.25,
+       "dist_pct": 19.53
       },
       "ema100": {
-       "liv": 75096.11,
-       "dist_pct": 13.5
+       "liv": 75094.89,
+       "dist_pct": 13.42
       },
       "sma200": {
-       "liv": 71495.37,
-       "dist_pct": 19.21
+       "liv": 71495.06,
+       "dist_pct": 19.13
       },
       "ema200": {
-       "liv": 75225.64,
-       "dist_pct": 13.3
+       "liv": 75225.03,
+       "dist_pct": 13.22
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 65.2,
+      "rsi14": 65.0,
       "macd": {
-       "linea": 1914.58,
-       "segnale": 2057.78,
-       "istogramma": -143.21
+       "linea": 1909.66,
+       "segnale": 2056.8,
+       "istogramma": -147.14
       },
-      "stoch_k": 67.2,
-      "stoch_d": 64.0,
-      "williams_r": -32.8,
-      "cci20": 47.5,
+      "stoch_k": 66.2,
+      "stoch_d": 63.7,
+      "williams_r": -33.8,
+      "cci20": 47.2,
       "adx14": 42.2,
       "di_su": 33.0,
       "di_giu": 12.1,
-      "momentum10": 852.48
+      "momentum10": 790.77
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23178,19 +23180,19 @@
       "o": 84742.47,
       "h": 85395.3,
       "l": 84707.32,
-      "c": 85231.54
+      "c": 85169.83
      }
     ],
     "performance": {
-     "s1": 1.92,
-     "m1": 10.3,
-     "m3": 31.68,
-     "m6": 15.84,
-     "a1": -1.55,
-     "ytd": -3.94,
-     "a3": 145.85,
-     "a5": 39.0,
-     "a10": 12059.05
+     "s1": 1.85,
+     "m1": 10.22,
+     "m3": 31.59,
+     "m6": 15.75,
+     "a1": -1.62,
+     "ytd": -4.01,
+     "a3": 145.67,
+     "a5": 38.9,
+     "a10": 12050.25
     },
     "stagionalita": [
      {
@@ -23276,7 +23278,7 @@
      },
      {
       "mese": 10,
-      "media": 15.51,
+      "media": 15.5,
       "mediana": 10.92,
       "positivi_pct": 77,
       "campione": 13,
@@ -23303,9 +23305,9 @@
      }
     ]
    },
-   "rs_1m": 10.2,
+   "rs_1m": 10.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.2,
+   "rs_ndx_1m": 5.1,
    "beta_ndx": 0.84,
    "avg_corr": 0.3,
    "max_corr": 0.8,
@@ -36780,7 +36782,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 3.35,
-   "pe": 45.2,
+   "pe": 43.8,
    "ath": 494.1,
    "ath_dist_pct": -28.1,
    "sma200_dist_pct": -3.0,
@@ -37354,7 +37356,7 @@
     "target_mediana": 535.0
    },
    "health": 34,
-   "eps": 7.85,
+   "eps": 8.1,
    "beta": 1.46,
    "sharpe_1y": 0.04,
    "sortino_1y": 0.06,
@@ -37375,10 +37377,10 @@
     "float_shares": 4715677998.0,
     "float_pct": 98.8,
     "avg_volume_30d": 22518056.0,
-    "pe_ttm": 45.2408,
-    "forward_pe": 18.312,
-    "eps_ttm": 7.85,
-    "eps_forward": 19.3938,
+    "pe_ttm": 43.8444,
+    "forward_pe": 18.3214,
+    "eps_ttm": 8.1,
+    "eps_forward": 19.3839,
     "revenue_fy": 89103998976.0,
     "net_income_fy": 38264999936.0,
     "revenue_growth": 0.855,
@@ -47605,13 +47607,6 @@
      "url": "https://www.marketwatch.com/story/these-bond-strategies-can-help-you-get-a-safe-5-return-on-your-cash-5fa45ccd?mod=mw_rss_topstories"
     },
     {
-     "titolo": "Switching jobs to get higher pay works best in these industries",
-     "riassunto": "Finding a new job is one way to get a pay increase at a time when inflation has been outpacing wage growth.",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-03T16:42:00Z",
-     "url": "https://www.marketwatch.com/story/the-best-industry-to-change-jobs-to-get-paid-more-money-and-the-worst-ae33a3a7?mod=mw_rss_topstories"
-    },
-    {
      "titolo": "Men are losing ground in the labor market. Here's why",
      "riassunto": "Women outnumbered men in the workforce for eight straight months as of September, according to one analysis.",
      "fonte": "CNBC Economia",
@@ -47680,6 +47675,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-09-28T04:04:16Z",
      "url": "https://www.cnbc.com/2026/09/28/china-posts-weakest-industrial-profit-growth-this-year-expanding-4point2percent-in-august-.html"
+    },
+    {
+     "titolo": "Here's what happens to the economy when Treasury yields soar like they are now",
+     "riassunto": "Government debt costs leaped higher Wednesday, the product of multiple factors.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-09-25T13:48:19Z",
+     "url": "https://www.cnbc.com/2026/09/23/what-happens-to-the-economy-when-treasury-yields-soar.html"
     }
    ],
    "fonti": [
@@ -52965,7 +52967,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 272056000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 199.81,
     "d1": 1.01,
@@ -53131,7 +53133,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 630.6,
     "d1": 2.07,
@@ -53214,7 +53216,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 69700000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 205.29,
     "d1": -0.33,
@@ -53297,7 +53299,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 166.18,
     "d1": -0.01,
@@ -53852,7 +53854,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 120253000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 110.04,
     "d1": 1.13,
@@ -54018,7 +54020,7 @@
       "qqq": 108.5
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-10-02",
     "price": 80.2,
     "d1": 1.47,
@@ -57508,6 +57510,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "AMD Reaches a $1 Trillion Market Cap. Can It Finally Dethrone Nvidia?",
+      "riassunto": "Key PointsNvidia is growing faster and is larger than AMD.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-04T13:34:00Z",
+      "url": "https://www.nasdaq.com/articles/amd-reaches-1-trillion-market-cap-can-it-finally-dethrone-nvidia"
+     },
+     {
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -57541,13 +57550,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-03T03:03:01Z",
       "url": "https://www.nasdaq.com/articles/4-stocks-delivered-about-half-sp-500s-gain-year"
-     },
-     {
-      "titolo": "Why AMD Stock Jumped 30% in September",
-      "riassunto": "Key PointsRapid adoption of Meta's Muse was good news for AMD.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-03T00:50:02Z",
-      "url": "https://www.nasdaq.com/articles/why-amd-stock-jumped-30-september"
      }
     ],
     "BE": [
@@ -57772,6 +57774,13 @@
     ],
     "MU": [
      {
+      "titolo": "Micron or Sandisk: If I Could Only Own One for the Next 5 Years, It Would Be This One",
+      "riassunto": "Key PointsMicron makes both types of memory chips.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-04T13:16:00Z",
+      "url": "https://www.nasdaq.com/articles/micron-or-sandisk-if-i-could-only-own-one-next-5-years-it-would-be-one"
+     },
+     {
       "titolo": "Michael Burry Thinks the AI Bubble Will Burst Sooner Than Later, Including Big Drops in Micron and Nebius by Mid-2027",
       "riassunto": "Key PointsMichael Burry is now betting that the stock market's AI bubble will burst sooner than he previously expected.",
       "fonte": "Nasdaq",
@@ -57805,16 +57814,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-04T05:40:12Z",
       "url": "https://www.nasdaq.com/articles/micron-technology-vs-qualcomm-what-revenue-trends-tell-investors-about-these-tech"
-     },
-     {
-      "titolo": "3 No-Brainer Stocks to Buy If Data Center Expenditures Hit $3 Trillion by 2030",
-      "riassunto": "Key PointsNvidia holds the largest market share in the AI compute market.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-04T01:20:00Z",
-      "url": "https://www.nasdaq.com/articles/3-no-brainer-stocks-buy-if-data-center-expenditures-hit-3-trillion-2030"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "AMD Reaches a $1 Trillion Market Cap. Can It Finally Dethrone Nvidia?",
+      "riassunto": "Key PointsNvidia is growing faster and is larger than AMD.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-04T13:34:00Z",
+      "url": "https://www.nasdaq.com/articles/amd-reaches-1-trillion-market-cap-can-it-finally-dethrone-nvidia"
+     },
      {
       "titolo": "What a $10,000 Investment Split Between Nvidia and Broadcom Could Be Worth by 2030",
       "riassunto": "Key PointsNvidia's and Broadcom's computing units fill important niches.",
@@ -57849,13 +57858,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-04T08:15:00Z",
       "url": "https://www.nasdaq.com/articles/rare-market-signal-has-appeared-only-2-times-century-here-what-history-says-comes-next"
-     },
-     {
-      "titolo": "Nvidia CEO Jensen Huang Just Reaffirmed His Jaw-Dropping Projection for 2030",
-      "riassunto": "Key PointsNvidia's revenue could more than triple if its projection turns out.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-04T04:50:00Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-ceo-jensen-huang-just-reaffirmed-his-jaw-dropping-projection-2030"
      }
     ],
     "ORCL": [
@@ -58058,13 +58060,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-04T13:44:35Z"
+   "letto_il": "2026-10-04T14:32:13Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "AMD Reaches a $1 Trillion Market Cap. Can It Finally Dethrone Nvidia?",
+     "riassunto": "Key PointsNvidia is growing faster and is larger than AMD.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-04T13:34:00Z",
+     "url": "https://www.nasdaq.com/articles/amd-reaches-1-trillion-market-cap-can-it-finally-dethrone-nvidia"
+    },
     {
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
@@ -58099,13 +58108,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-03T03:03:01Z",
      "url": "https://www.nasdaq.com/articles/4-stocks-delivered-about-half-sp-500s-gain-year"
-    },
-    {
-     "titolo": "Why AMD Stock Jumped 30% in September",
-     "riassunto": "Key PointsRapid adoption of Meta's Muse was good news for AMD.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-03T00:50:02Z",
-     "url": "https://www.nasdaq.com/articles/why-amd-stock-jumped-30-september"
     }
    ],
    "BE": [
@@ -58330,6 +58332,13 @@
    ],
    "MU": [
     {
+     "titolo": "Micron or Sandisk: If I Could Only Own One for the Next 5 Years, It Would Be This One",
+     "riassunto": "Key PointsMicron makes both types of memory chips.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-04T13:16:00Z",
+     "url": "https://www.nasdaq.com/articles/micron-or-sandisk-if-i-could-only-own-one-next-5-years-it-would-be-one"
+    },
+    {
      "titolo": "Michael Burry Thinks the AI Bubble Will Burst Sooner Than Later, Including Big Drops in Micron and Nebius by Mid-2027",
      "riassunto": "Key PointsMichael Burry is now betting that the stock market's AI bubble will burst sooner than he previously expected.",
      "fonte": "Nasdaq",
@@ -58363,16 +58372,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-04T05:40:12Z",
      "url": "https://www.nasdaq.com/articles/micron-technology-vs-qualcomm-what-revenue-trends-tell-investors-about-these-tech"
-    },
-    {
-     "titolo": "3 No-Brainer Stocks to Buy If Data Center Expenditures Hit $3 Trillion by 2030",
-     "riassunto": "Key PointsNvidia holds the largest market share in the AI compute market.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-04T01:20:00Z",
-     "url": "https://www.nasdaq.com/articles/3-no-brainer-stocks-buy-if-data-center-expenditures-hit-3-trillion-2030"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "AMD Reaches a $1 Trillion Market Cap. Can It Finally Dethrone Nvidia?",
+     "riassunto": "Key PointsNvidia is growing faster and is larger than AMD.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-04T13:34:00Z",
+     "url": "https://www.nasdaq.com/articles/amd-reaches-1-trillion-market-cap-can-it-finally-dethrone-nvidia"
+    },
     {
      "titolo": "What a $10,000 Investment Split Between Nvidia and Broadcom Could Be Worth by 2030",
      "riassunto": "Key PointsNvidia's and Broadcom's computing units fill important niches.",
@@ -58407,13 +58416,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-04T08:15:00Z",
      "url": "https://www.nasdaq.com/articles/rare-market-signal-has-appeared-only-2-times-century-here-what-history-says-comes-next"
-    },
-    {
-     "titolo": "Nvidia CEO Jensen Huang Just Reaffirmed His Jaw-Dropping Projection for 2030",
-     "riassunto": "Key PointsNvidia's revenue could more than triple if its projection turns out.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-04T04:50:00Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-ceo-jensen-huang-just-reaffirmed-his-jaw-dropping-projection-2030"
     }
    ],
    "ORCL": [
@@ -58616,7 +58618,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-04T13:44:35Z"
+  "letto_il": "2026-10-04T14:32:13Z"
  },
  "predictions": [
   {
@@ -58626,7 +58628,7 @@
   },
   {
    "question": "Will Ethereum dip to $2,100 in October?",
-   "yes": 12,
+   "yes": 14,
    "link": "https://polymarket.com/event/will-ethereum-dip-to-2100-in-october-2026"
   },
   {
@@ -58638,6 +58640,11 @@
    "question": "Will the price of Bitcoin be above $84,000 on October 4?",
    "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-84k-on-october-4-2026"
+  },
+  {
+   "question": "Bitcoin Up or Down on October 4?",
+   "yes": 94,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-4-2026"
   }
  ],
  "options": {
@@ -80068,6 +80075,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-04T13:44:35Z"
+  "generated_at": "2026-10-04T14:32:14Z"
  }
 }
