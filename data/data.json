@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-04T17:45:13Z",
+ "updated_at": "2026-10-04T18:19:29Z",
  "eurusd": 1.1257,
  "totals": {
   "usd_value": 0,
@@ -1771,7 +1771,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -11801,7 +11801,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -21987,15 +21987,15 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 85357.99,
+   "price": 85327.86,
    "price_asof": "2026-10-04",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.7,
+   "change_pct": 0.67,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -32.4,
-   "sma200_dist_pct": 19.4,
+   "sma200_dist_pct": 19.3,
    "sma50_dist_pct": 8.0,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
@@ -22005,7 +22005,7 @@
    "support": 74944.59,
    "resistance": 87363.76,
    "rsi": 65.5,
-   "volume": 12339818496,
+   "volume": 12129667072,
    "vol_ratio": 0.4,
    "atr_14": 2074.02,
    "atr_pct": 2.43,
@@ -22017,7 +22017,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85357.99
+     85327.86
     ],
     "m6": [
      71319.77,
@@ -22145,7 +22145,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85357.99
+     85327.86
     ],
     "all": [
      386.94,
@@ -22293,7 +22293,7 @@
      62813.75,
      78548.63,
      83553.85,
-     85357.99
+     85327.86
     ],
     "m1": [
      76838.16,
@@ -22317,7 +22317,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85357.99
+     85327.86
     ],
     "m3": [
      62813.75,
@@ -22385,7 +22385,7 @@
      84853.1,
      84497.21,
      84763.58,
-     85357.99
+     85327.86
     ],
     "y1": [
      122425.43,
@@ -22461,7 +22461,7 @@
      81233.68,
      84379.06,
      83622.43,
-     85357.99
+     85327.86
     ],
     "d1": [
      84801.95,
@@ -22570,7 +22570,10 @@
      85307.97,
      85343.79,
      85357.07,
-     85357.99
+     85418.01,
+     85326.36,
+     85322.56,
+     85317.2
     ]
    },
    "earnings_date": null,
@@ -22584,7 +22587,7 @@
    "sharpe_6m": 0.78,
    "sortino_6m": 1.25,
    "prepost": null,
-   "prezzo_limite_aggiustato": 85357.99,
+   "prezzo_limite_aggiustato": 85327.86,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22597,22 +22600,22 @@
     "w1": {
      "support": 82927.88,
      "resistance": 87146.35,
-     "change_pct": 2.16
+     "change_pct": 2.12
     },
     "m1": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": 11.09
+     "change_pct": 11.05
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 35.89
+     "change_pct": 35.84
     },
     "y1": {
      "support": 57747.77,
      "resistance": 90439.29,
-     "change_pct": -3.3
+     "change_pct": -3.33
     }
    },
    "financials": [],
@@ -22639,55 +22642,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 85357.99,
+     "prezzo": 85327.86,
      "medie": {
       "sma10": {
-       "liv": 84305.02,
-       "dist_pct": 1.25
+       "liv": 84302.01,
+       "dist_pct": 1.22
       },
       "ema10": {
-       "liv": 84232.9,
-       "dist_pct": 1.34
+       "liv": 84227.42,
+       "dist_pct": 1.31
       },
       "sma20": {
-       "liv": 82801.59,
-       "dist_pct": 3.09
+       "liv": 82800.09,
+       "dist_pct": 3.05
       },
       "ema20": {
-       "liv": 82923.67,
-       "dist_pct": 2.94
+       "liv": 82920.8,
+       "dist_pct": 2.9
       },
       "sma30": {
-       "liv": 81267.79,
-       "dist_pct": 5.03
+       "liv": 81266.78,
+       "dist_pct": 5.0
       },
       "ema30": {
-       "liv": 81492.05,
-       "dist_pct": 4.74
+       "liv": 81490.1,
+       "dist_pct": 4.71
       },
       "sma50": {
-       "liv": 79005.33,
-       "dist_pct": 8.04
+       "liv": 79004.73,
+       "dist_pct": 8.0
       },
       "ema50": {
-       "liv": 78828.85,
-       "dist_pct": 8.28
+       "liv": 78827.67,
+       "dist_pct": 8.25
       },
       "sma100": {
-       "liv": 71258.13,
-       "dist_pct": 19.79
+       "liv": 71257.83,
+       "dist_pct": 19.75
       },
       "ema100": {
-       "liv": 75098.61,
-       "dist_pct": 13.66
+       "liv": 75098.02,
+       "dist_pct": 13.62
       },
       "sma200": {
-       "liv": 71496.0,
-       "dist_pct": 19.39
+       "liv": 71495.85,
+       "dist_pct": 19.35
       },
       "ema200": {
-       "liv": 75226.9,
-       "dist_pct": 13.47
+       "liv": 75226.6,
+       "dist_pct": 13.43
       }
      },
      "medie_battute": 12,
@@ -22695,18 +22698,18 @@
      "oscillatori": {
       "rsi14": 65.5,
       "macd": {
-       "linea": 1924.67,
-       "segnale": 2059.8,
-       "istogramma": -135.14
+       "linea": 1922.26,
+       "segnale": 2059.32,
+       "istogramma": -137.06
       },
-      "stoch_k": 69.1,
-      "stoch_d": 64.6,
-      "williams_r": -30.9,
-      "cci20": 48.5,
+      "stoch_k": 68.7,
+      "stoch_d": 64.5,
+      "williams_r": -31.3,
+      "cci20": 48.3,
       "adx14": 42.2,
       "di_su": 33.1,
       "di_giu": 12.1,
-      "momentum10": 978.93
+      "momentum10": 948.8
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -23199,19 +23202,19 @@
       "o": 84742.47,
       "h": 85426.0,
       "l": 84707.32,
-      "c": 85357.99
+      "c": 85327.86
      }
     ],
     "performance": {
-     "s1": 2.08,
-     "m1": 10.47,
-     "m3": 31.88,
-     "m6": 16.01,
-     "a1": -1.4,
-     "ytd": -3.8,
-     "a3": 146.22,
-     "a5": 39.2,
-     "a10": 12077.09
+     "s1": 2.04,
+     "m1": 10.43,
+     "m3": 31.83,
+     "m6": 15.97,
+     "a1": -1.44,
+     "ytd": -3.84,
+     "a3": 146.13,
+     "a5": 39.15,
+     "a10": 12072.79
     },
     "stagionalita": [
      {
@@ -23324,9 +23327,9 @@
      }
     ]
    },
-   "rs_1m": 10.4,
+   "rs_1m": 10.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.4,
+   "rs_ndx_1m": 5.3,
    "beta_ndx": 0.84,
    "avg_corr": 0.3,
    "max_corr": 0.8,
@@ -45499,8 +45502,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "177.25",
-    "change_pct": -0.21,
+    "value": "177.21",
+    "change_pct": -0.23,
     "suffix": "%"
    }
   ],
@@ -57532,7 +57535,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-04T17:25:51Z",
+      "quando": "2026-10-04T17:57:49Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -57664,7 +57667,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-04T17:07:16Z",
+      "quando": "2026-10-04T17:44:53Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -57793,6 +57796,13 @@
     ],
     "MU": [
      {
+      "titolo": "You Can Do Better Than Tesla. Buy Micron Instead.",
+      "riassunto": "Key PointsTesla is trading at a massive premium to its sector average P/E ratio, as well as to other megacap companies.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-04T17:50:00Z",
+      "url": "https://www.nasdaq.com/articles/you-can-do-better-tesla-buy-micron-instead"
+     },
+     {
       "titolo": "Investors Had a Tepid Reaction to Micron's Latest Earnings Report. An Overlooked Headwind May Explain Why.",
       "riassunto": "Key PointsMicron stock rose modestly following a phenomenal earnings report.",
       "fonte": "Nasdaq",
@@ -57826,13 +57836,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-04T09:59:00Z",
       "url": "https://www.nasdaq.com/articles/broadcom-vs-micron-which-semiconductor-stock-better-ai-buy-over-next-3-years"
-     },
-     {
-      "titolo": "This Under-the-Radar Supplier Could Be Nvidia's Secret Weapon",
-      "riassunto": "Key PointsNvidia locking up scarce HBM gives it a big advantage in the AI chip market.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-04T08:35:00Z",
-      "url": "https://www.nasdaq.com/articles/under-radar-supplier-could-be-nvidias-secret-weapon"
      }
     ],
     "NVDA": [
@@ -57840,7 +57843,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-04T17:25:51Z",
+      "quando": "2026-10-04T17:44:53Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -58016,7 +58019,7 @@
       "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-04T17:25:51Z",
+      "quando": "2026-10-04T17:57:49Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
      },
      {
@@ -58079,7 +58082,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-04T17:45:13Z"
+   "letto_il": "2026-10-04T18:19:29Z"
   }
  },
  "broker": null,
@@ -58090,7 +58093,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-04T17:25:51Z",
+     "quando": "2026-10-04T17:57:49Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58222,7 +58225,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-04T17:07:16Z",
+     "quando": "2026-10-04T17:44:53Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58351,6 +58354,13 @@
    ],
    "MU": [
     {
+     "titolo": "You Can Do Better Than Tesla. Buy Micron Instead.",
+     "riassunto": "Key PointsTesla is trading at a massive premium to its sector average P/E ratio, as well as to other megacap companies.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-04T17:50:00Z",
+     "url": "https://www.nasdaq.com/articles/you-can-do-better-tesla-buy-micron-instead"
+    },
+    {
      "titolo": "Investors Had a Tepid Reaction to Micron's Latest Earnings Report. An Overlooked Headwind May Explain Why.",
      "riassunto": "Key PointsMicron stock rose modestly following a phenomenal earnings report.",
      "fonte": "Nasdaq",
@@ -58384,13 +58394,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-04T09:59:00Z",
      "url": "https://www.nasdaq.com/articles/broadcom-vs-micron-which-semiconductor-stock-better-ai-buy-over-next-3-years"
-    },
-    {
-     "titolo": "This Under-the-Radar Supplier Could Be Nvidia's Secret Weapon",
-     "riassunto": "Key PointsNvidia locking up scarce HBM gives it a big advantage in the AI chip market.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-04T08:35:00Z",
-     "url": "https://www.nasdaq.com/articles/under-radar-supplier-could-be-nvidias-secret-weapon"
     }
    ],
    "NVDA": [
@@ -58398,7 +58401,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-04T17:25:51Z",
+     "quando": "2026-10-04T17:44:53Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58574,7 +58577,7 @@
      "titolo": "Stocks Settle Higher as Fed Rate Hike Concerns Ease",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up by +0.73% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up by +0.49%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.00%.  December E-mini S&P futures (ESZ26 ) rose +0.73%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-04T17:25:51Z",
+     "quando": "2026-10-04T17:57:49Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-higher-fed-rate-hike-concerns-ease"
     },
     {
@@ -58637,7 +58640,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-04T17:45:13Z"
+  "letto_il": "2026-10-04T18:19:29Z"
  },
  "predictions": [],
  "options": {
@@ -80716,6 +80719,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-04T17:45:13Z"
+  "generated_at": "2026-10-04T18:19:29Z"
  }
 }
