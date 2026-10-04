@@ -65,6 +65,9 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | ASML | ASML — litografia, fornitore unico di EUV |
 | NKE | Nike — conti del 01/10 deboli, sotto il minimo a 52 settimane; non entrare |
 | MCD | McDonald's — difensivo vicino ai minimi; aspettare la fine della discesa |
+| GEV | GE Vernova — turbine e rete per datacenter (CEO, 04/10/2026). Correlazione col libro 0,5-0,6 (SMH 0,62, BE 0,53): stesso tema. A 0,5 ATR dalla resistenza 1.006; supporto 868. Trimestrale 28/10 |
+| CCJ | Cameco — uranio (CEO, 04/10/2026). Sotto SMA50 e SMA200, −37% dal massimo a 52 settimane; a 0,4 ATR dal supporto 83,80. Correlazione col libro ~0,5. Trimestrale 04/11 |
+| TTWO | Take-Two — videogiochi (CEO, 04/10/2026). Unico con correlazione ~0 col libro (SMH 0,05, MU −0,02): diversifica davvero. Sotto le medie, a 0,5 ATR dal supporto 199,46. Trimestrale 05/11 |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
