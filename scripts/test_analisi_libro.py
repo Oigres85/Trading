@@ -1307,6 +1307,33 @@ check("v459 la riga dei mossi stampa la seduta della quota, non quella della bar
       "seduta del {r.get('seduta_quota') or r.get('seduta'" in _BRIEF_CODICE)
 
 
+# ============================ v460 — I NUMERI DELL'ANALISI GIORNALIERA ============================
+# Lo strumento dice al CEO quanto rischio porta ogni nome: invarianti che una formula sbagliata
+# non soddisfa per caso (v326), su dati COSTRUITI, perche' il fenomeno ci sia (v425).
+import numeri_libro as NL
+_rg = np.random.default_rng(11)
+_f = _rg.normal(0, 0.02, 300)
+_R = np.column_stack([_f * b + _rg.normal(0, 0.01, 300) for b in (1.8, 1.0, 0.4)])
+_w = np.array([0.5, 0.3, 0.2])
+_m = NL.misure_rischio(_R, _w)
+check("v460 il contributo al rischio somma a 1 (Euler)", abs(sum(_m["mcr"]) - 1) < 1e-9, str(_m["mcr"]))
+check("v460 la volatilita' coincide con sqrt(w'Sw) annualizzata",
+      abs(_m["vol_ann"] - math.sqrt(_w @ np.cov(_R, rowvar=False) @ _w * 252)) < 1e-12)
+_rho = np.corrcoef(_R, rowvar=False)[np.triu_indices(3, 1)].mean()
+check("v460 le scommesse effettive usano l'Herfindahl dei pesi VERI, non 1/k (v430)",
+      abs(_m["scommesse_eff"] - 1 / ((1 - _rho) * (_w ** 2).sum() + _rho)) < 1e-9
+      and abs(_m["scommesse_eff"] - 1 / (1 / 3 + 2 / 3 * _rho)) > 1e-3, f"{_m['scommesse_eff']}")
+check("v460 l'ES al 95% non e' minore del VaR al 95%", _m["es95"] >= _m["var95"] > 0)
+check("v460 il nome piu' sensibile al fattore porta piu' rischio del suo peso", _m["mcr"][0] > _w[0])
+_pnl, _ret = NL.attribuzione({"A": 10, "B": 5}, {"A": 100.0, "B": None}, {"A": 110.0, "B": 50.0})
+check("v460 un titolo senza prezzo iniziale e' un buco, non uno zero (v205)",
+      _pnl["B"] is None and _pnl["A"] == 100.0 and abs(_ret - 0.10) < 1e-12, str((_pnl, _ret)))
+_src_nl = Path(__file__).with_name("numeri_libro.py").read_text()
+check("v460 le posizioni vengono da LIBRO.md, mai dalla pipeline (v439)",
+      "leggi_libro()" in _src_nl and "data.json" not in _corpo_di(_src_nl, "calcola"))
+check("v460 chi e' fuori dalla matrice si NOMINA nella sintesi (v406)",
+      "esclusi_matrice" in _corpo_di(_src_nl, "sintesi") and "fuori matrice" in _src_nl)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

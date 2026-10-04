@@ -5999,3 +5999,20 @@ dal brief**. Il check non lo aveva preso per la ragione sbagliata: pretendeva *1
 €*, cioè i numeri di un giorno, ed è andato rosso perché il CEO aveva chiuso due posizioni. Ora
 confronta il parser con un **conteggio indipendente** dello stesso file e pretende che la
 liquidità venga letta in qualunque forma il CEO la scriva. Validati per iniezione entrambi.
+
+## 📊 v460 — I NUMERI DELL'ANALISI GIORNALIERA DIVENTANO UNO STRUMENTO
+
+Il CEO ha chiesto il rapporto «da comitato» del 02/10 e poi ha precisato che l'analisi la chiede
+**ogni giorno in chat**: una Routine settimanale sarebbe un doppione. I calcoli usati per quel
+rapporto vivevano in un file temporaneo e sarebbero spariti con la sessione: ora sono
+`scripts/numeri_libro.py` (`--sedute 1` di default, `5` per la settimana). Lo script calcola e
+basta; il formato della lettura sta in `memoria/FORMATO_ANALISI.md`.
+
+⚠ **Chi è fuori dalla matrice negli stress usa il beta del LIBRO, e si dichiara.** La prima
+stesura usava «il primo nome lungo», cioè un ordine di elenco travestito da scelta: SKHY
+risultava propagato col beta di chi capitava primo.
+
+⚠ Otto gate sulle proprietà, non sui valori (v326): Euler somma a 1, volatilità uguale a
+`sqrt(w'Sw)`, scommesse effettive con l'Herfindahl vero (iniettando la formula cieca ai pesi della
+v430 morde), ES ≥ VaR, buco ≠ zero, posizioni da `LIBRO.md`, esclusi nominati. Il censimento v387
+ha morso al primo giro, come previsto.
