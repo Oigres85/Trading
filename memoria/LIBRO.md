@@ -14,14 +14,17 @@
 | AMD | 100 | 153,916 | USD | |
 | PLTR | 100 | 113,50 | USD | |
 | MU | 70 | 87,63 | USD | |
-| ORCL | 70 | 143,00 | USD | |
 | RGTI | 463 | 26,5048 | USD | |
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: ~50.000 €** — dichiarata dal CEO il 01/10/2026 ("circa"), dopo le uscite da GOOGL e WDC.
+**Liquidità: ~59.000 €** — ~50.000 € dichiarati dal CEO il 01/10/2026 ("circa", dopo le uscite da
+GOOGL e WDC) **più l'incasso di ORCL del 05/10/2026**: 70 azioni vendute a **145,55 $** = 10.188,50 $
+(≈ 9.050 € a EUR/USD 1,1255; se restano in dollari sul conto, il controvalore in euro si muove col cambio).
+Plusvalenza ORCL: (145,55 − 143,00) × 70 = **+178,50 $**, imposta ~46 $ al 26% — il conto definitivo lo fa
+il broker in euro, col cambio di carico.
 Destinazione dichiarata: acquisti su storni e IPO di Anthropic.
 
 > ⚠ **USCITE DICHIARATE DAL CEO il 01/10/2026: GOOGL (50) e WDC (25) venduti per intero "la
@@ -64,6 +67,7 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | AVGO | Broadcom — chip su misura e reti per AI |
 | ASML | ASML — litografia, fornitore unico di EUV |
 | NKE | Nike — conti del 01/10 deboli, sotto il minimo a 52 settimane; non entrare |
+| ORCL | Oracle — **venduta il 05/10/2026 a 145,55 $** (70 azioni, carico 143). Rientro solo sopra la SMA200 (~163) o sul supporto 131,58 se regge |
 | MCD | McDonald's — difensivo vicino ai minimi; aspettare la fine della discesa |
 | GEV | GE Vernova — turbine e rete per datacenter (CEO, 04/10/2026). Correlazione col libro 0,5-0,6 (SMH 0,62, BE 0,53): stesso tema. A 0,5 ATR dalla resistenza 1.006; supporto 868. Trimestrale 28/10 |
 | CCJ | Cameco — uranio (CEO, 04/10/2026). Sotto SMA50 e SMA200, −37% dal massimo a 52 settimane; a 0,4 ATR dal supporto 83,80. Correlazione col libro ~0,5. Trimestrale 04/11 |
