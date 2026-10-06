@@ -76,6 +76,42 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
 gia' concentrato.
 
+## 1ter. SEMAFORO D'USCITA — deciso col CEO il 06/10/2026, si controlla a OGNI analisi
+
+Domanda del CEO: *"quando capire di dover uscire, onde evitare di subire in pieno un prossimo
+crollo"*, con la tesi che l'AI abbia margine di crescita fino al 2029. Il momento del crollo non
+si prevede: si decidono PRIMA i segnali e la reazione, poi si esegue senza ridiscuterla.
+Le soglie sono **convenzioni del mestiere scelte col CEO**, non dati del file (v240). I livelli
+dei prezzi si leggono **dal giorno**, mai da questa pagina: qui stanno le regole, non i numeri,
+perché un numero scritto a mano invecchia da solo (v410, v424).
+
+| Famiglia | Segnale | Dove si legge |
+|---|---|---|
+| **Prezzo** | SMH chiude sotto la propria media a 50 giorni; secondo gradino: sotto la media a 200 | `data.json` → `macro.tilt[SMH].medie` |
+| **Leader** | NVDA, AMD e MU chiudono **insieme** sotto la propria media a 50 giorni, con volumi alti | `brief.py` (distanza SMA50 in ATR) |
+| **Credito** | spread high yield (HY OAS) sopra 3,5; secondo gradino: sopra 4,0 | `brief.py` → macro |
+| **Tassi** | Treasury 10 anni sopra 5,4% | `brief.py` → macro |
+| **Fondamentali AI** | revisioni delle stime che girano al ribasso su NVDA/MU (più tagli che rialzi a 30 giorni), oppure un hyperscaler (MSFT, GOOGL, META, AMZN) che TAGLIA la guida sugli investimenti | `schede_progetto.py` + conti di fine ottobre |
+| **Leva** | il margin debt FINRA comincia a scendere dal picco (variazione mensile negativa) | `data.json` → `macro.margin_debt` |
+
+**Reazione a gradini** (la proporzione è una convenzione scelta col CEO, non un calcolo):
+- 🟢 **Verde** — nessun segnale: si opera normalmente.
+- 🟡 **Giallo** — un segnale: niente nuovi acquisti di semiconduttori; prese di profitto sui nomi più
+  tirati.
+- 🟠 **Arancione** — due segnali di **famiglie diverse**: riduzione dei semiconduttori di circa un
+  terzo, partendo da chi pesa di più nel rischio (oggi MU e AMD).
+- 🔴 **Rosso** — SMH sotto la media a 200 **e** (credito sopra 4,0 **oppure** taglio della guida
+  sugli investimenti AI): un altro terzo. Resta il nucleo per la tesi al 2029.
+
+⚠ Due segnali della **stessa** famiglia sono un segnale solo (B3): SMH sotto la 50 e NVDA sotto la
+50 nello stesso giorno sono il prezzo che parla due volte, non due prove.
+⚠ Le vendite a terzi dividono anche il conto fiscale sulle plusvalenze (26%): su MU e AMD è alto.
+
+**Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: SMH 638 (media 50 ≈ 573,
+200 ≈ 502) · HY OAS 3,1 · Treasury 10 anni 5,28% · margin debt 96,8% del massimo, +2,6% sul mese ·
+revisioni NVDA 46 su / 0 giù. **Stato: 🟢 verde**, con fragilità dichiarate (leva record, rialzo
+stretto: SPY +1,6% contro RSP −2,6% a un mese).
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da

@@ -23,6 +23,9 @@ alla misura di un giorno.
 4. Ricerca web sulle notizie che spiegano i movimenti, con fonte e data.
 
 ## Cosa contiene la risposta, in quest'ordine
+0. **Semaforo d'uscita** (decisione del CEO del 06/10): il colore di oggi in UNA riga, con i
+   segnali accesi nominati — regole in `memoria/LIBRO.md` §1ter. Se il colore cambia dal giorno
+   prima, va in cima alla risposta e prima di tutto il resto.
 1. **Sintesi in 3-5 punti** — cosa è successo, perché, cosa cambia per il libro.
 2. **Risultato contro i riferimenti** — libro contro QQQ, SMH, SPY, RSP; chi ha portato il risultato.
 3. **Rischio** — peso contro quota del rischio; beta sul Nasdaq col suo R²; segnalare solo se cambia.

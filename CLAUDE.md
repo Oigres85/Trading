@@ -6079,3 +6079,23 @@ detto in tre punti:
    gate DEVE prendere* (v389) — e la fixture deve contenerli nell'ordine che li rende visibili.
 
 GEV tolto dalla watchlist su richiesta del CEO (06/10).
+
+## 🚦 v463 — IL SEMAFORO D'USCITA, E TRE GATE CHE IL MIO ALLINEAMENTO HA SVEGLIATO
+
+Il CEO ha chiesto *"quando capire di dover uscire, onde evitare di subire in pieno un prossimo
+crollo"*. Il semaforo vive in `memoria/LIBRO.md` §1ter — sei famiglie (prezzo, leader, credito,
+tassi, fondamentali AI, leva) e reazione a gradini — e `FORMATO_ANALISI.md` lo mette in testa a
+ogni analisi. ⚠ Contiene REGOLE e non numeri: i livelli si leggono dal giorno, perché un numero
+scritto a mano invecchia da solo (v410, v424). La fotografia del 06/10 è marcata come tale.
+
+### I tre rossi, tutti conseguenza della v462 e nessuno un difetto del sistema
+Il primo run della pipeline con la watchlist allineata ha acceso tre gate:
+- **v348 Cerebras**: ora che CBRS è seguito, il diario la struttura su **CBRS** — giusto. Il gate
+  pretendeva che restasse prosa; l'invariante vero è *"non diventa un ALTRO titolo"*, e ora si
+  percorrono i due rami costruendoli (seguito → CBRS, non seguito → prosa). Nel farlo è emerso un
+  difetto vero: `quantita' 30` con l'apostrofo perdeva la quantità ("non annotata"). Corretto.
+- **v421**: la sonda era `[+] AMD =`, cioè l'ORDINE delle prime tre — il 06/10 è MU + AMD + NVDA.
+  Ancorata alla forma, non a un nome (v422).
+- **v406**: pretendeva il livello di liquidità SOPRA il prezzo, che il 06/10 sull'S&P non c'era.
+  L'invariante è che esca almeno un livello e mai il punteggio.
+Due iniezioni (alias inventato cerebras→SKHY, apostrofo tolto): mordono entrambe.

@@ -4262,7 +4262,15 @@ check("v348 diario: nessun alias inventato — Cerebras NON diventa SK hynix", c
   const p = buildPromptTicker("SKHY");
   /* il primo giro aveva cerebras:"SKHY" in tabella: il pacchetto pubblicava una vendita di
      SK hynix mai avvenuta. Un nome fuori dal libro resta prosa. */
-  return !/VENDITA 30 SKHY/.test(p) && /vendita Cerebras/.test(p)`));
+  /* ⚠ v462 — da quando la pipeline segue CBRS il nome E' mappabile: la voce si struttura su CBRS,
+     che e' il titolo giusto. L'invariante non era "resta prosa" ma "non diventa un ALTRO titolo",
+     e i due rami si percorrono costruendoli (v425): seguito -> CBRS, non seguito -> prosa. */
+  if (/VENDITA 30 SKHY/.test(p)) return false;
+  const conCbrs = /VENDITA 30 CBRS/.test(buildPromptTicker("CBRS"))
+    || /VENDITA 30 CBRS/.test(p);
+  DATA.watchlist = (DATA.watchlist || []).filter(r => r && r.ticker !== "CBRS");
+  const senza = buildPromptTicker("SKHY");
+  return !/VENDITA 30 SKHY/.test(senza) && /vendita Cerebras/.test(senza) && conCbrs;`));
 
 check("v348 diario: quantita' o prezzo mancanti non diventano 'null'", conDiario(`
   DIARIO_VOCI = [{ date: "2026-05-02", text: "Alleggerito micron 20 azioni" }];
@@ -7412,7 +7420,10 @@ check("v406 della struttura di prezzo escono i LIVELLI e non il punteggio 0-100"
   const i = p.indexOf("STRUTTURA DEL PREZZO SUGLI INDICI");
   if (i < 0) return false;
   const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
-  return riga.indexOf("liquidita' SOPRA il prezzo") >= 0
+  /* ⚠ v462 — il 06/10 l'S&P 500 non aveva liquidita' SOPRA il prezzo e il check pretendeva quel
+     ramo: rosso a calendario (v429). L'invariante e' che esca ALMENO un livello, in un verso o
+     nell'altro, e mai il punteggio. */
+  return (riga.indexOf("liquidita' SOPRA") >= 0 || riga.indexOf("liquidita' SOTTO") >= 0)
       && riga.indexOf("NON si pubblica il punteggio") >= 0;`));
 
 /* ⚠⚠ LA RIGA CHE CHIUDE IL BUCO STRUTTURALE: "il sistema non ha il dato" e "ce l'ha e non te lo
@@ -8815,7 +8826,9 @@ check("v421 il peso del gruppo correlato esce con lo stesso numero in ogni blocc
   ];
   const SEDI_TRE = [
     "le prime tre posizioni valgono il ([0-9]+(?:,[0-9]+)?)%",
-    "[+] AMD = ([0-9]+(?:,[0-9]+)?)%",
+    /* ⚠ v462 — era "[+] AMD =": l'ordine delle prime tre cambia coi prezzi (il 06/10 MU + AMD +
+       NVDA) e la sonda si addormentava. Si ancora alla FORMA, non a un nome (v422). */
+    "[+] [A-Z]{2,5} = ([0-9]+(?:,[0-9]+)?)%",
   ];
   const raccogli = (p, sedi) => {
     const vis = new Map();
