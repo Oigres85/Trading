@@ -122,7 +122,47 @@ def calcola(sedute=1):
                         "atr_pct", "dmax52_pct", "seduta_quota")}} for t in TK]
     out["calendario"] = brief.calendario_trimestrali(TK + [s["tk"] for s in sorv], giorni=45)
     out["macro"] = brief.macro_dalla_pipeline()
+    out["attesa"] = costo_attesa(tot, ris["vol_ann"], ris["var95"], ris["es95"], out["calendario"], TK)
     return out
+
+
+def costo_attesa(tot, vol_ann, var95, es95, calendario, nomi):
+    """Quanto costa ASPETTARE a decidere, e fino a quando si puo' (v464, decisione del CEO del 06/10).
+    Il costo e' il rischio del libro in dollari: oscillazione tipica di una seduta e di una
+    settimana, perdita di una seduta cattiva (VaR) e media delle sedute peggiori (ES).
+    ⚠ La settimana e' la seduta per radice di 5: CONVENZIONE (sedute indipendenti), e si dichiara.
+    La scadenza di ogni nome e' la sua PRIMA trimestrale dichiarata DALLA FONTE: nessuna data
+    proiettata (v396). Un nome senza data nella finestra si NOMINA (v406): 'nessuna uscita' e
+    'la fonte non la dichiara' si leggono uguali e sono cose diverse."""
+    sig = vol_ann / math.sqrt(252)
+    prime = {}
+    for e in (calendario or {}).get("attesi") or []:
+        if e["tk"] in nomi and e["tk"] not in prime:
+            prime[e["tk"]] = e
+    scad = sorted(prime.values(), key=lambda e: e["data"])
+    return {"seduta_1s": tot * sig, "settimana_1s": tot * sig * math.sqrt(5),
+            "var_usd": tot * var95, "es_usd": tot * es95,
+            "scadenze": [{"tk": e["tk"], "data": e["data"], "giorni": e.get("giorni")} for e in scad],
+            "senza_data": [t for t in nomi if t not in prime],
+            "prima": scad[0] if scad else None,
+            "finestra": (calendario or {}).get("finestra"),
+            "giorni_non_letti": (calendario or {}).get("giorni_non_letti") or []}
+
+
+def righe_attesa(a):
+    L = [f"COSTO DELL'ATTESA: seduta tipica ±{a['seduta_1s']:,.0f} $ · settimana tipica ±{a['settimana_1s']:,.0f} $"
+         f" (seduta x radice di 5, convenzione) · seduta cattiva (VaR95) -{a['var_usd']:,.0f} $ · media delle peggiori (ES95) -{a['es_usd']:,.0f} $"]
+    if a["scadenze"]:
+        L.append("SCADENZE (prima trimestrale dichiarata dalla fonte): "
+                 + " · ".join(f"{s['tk']} {s['data']} ({s['giorni']} g)" for s in a["scadenze"]))
+    else:
+        L.append(f"SCADENZE: nessuna trimestrale dichiarata dalla fonte nei prossimi {a['finestra']} giorni")
+    if a["senza_data"]:
+        L.append(f"  senza data nella finestra di {a['finestra']} giorni (la fonte non la dichiara, non 'nessuna uscita'): "
+                 + ", ".join(a["senza_data"]))
+    if a["giorni_non_letti"]:
+        L.append(f"  ⚠ {len(a['giorni_non_letti'])} giorni del calendario NON letti: le scadenze possono essere incomplete")
+    return L
 
 
 def sintesi(o):
@@ -144,6 +184,8 @@ def sintesi(o):
         L.append(f"Stress {k}: {v['pnl']:+,.0f} $ ({v['pct']*100:+.1f}%) · R² {v['r2']:.2f}")
     if o["esclusi_matrice"]:
         L.append(f"(stress: {', '.join(o['esclusi_matrice'])} senza storia sufficiente, propagati col beta del libro)")
+    if o.get("attesa"):
+        L.extend(righe_attesa(o["attesa"]))
     return "\n".join(L)
 
 

@@ -1372,6 +1372,32 @@ _src_sp = Path(__file__).with_name("schede_progetto.py").read_text()
 check("v462 i nomi vengono da LIBRO.md, mai dalla pipeline (v439)",
       "brief.leggi_libro()" in _corpo_di(_src_sp, "main"))
 
+# ============================ v464 — IL COSTO DELL'ATTESA ============================
+# Lo stato si COSTRUISCE (v425): un calendario con due date per lo stesso nome, un nome senza
+# data, un sorvegliato che non deve entrare fra le scadenze del libro.
+_cal = {"finestra": 45, "giorni_non_letti": ["2026-10-20"],
+        "attesi": [{"tk": "AAA", "data": "2026-10-27", "giorni": 21}, {"tk": "AAA", "data": "2026-11-30", "giorni": 55},
+                   {"tk": "BBB", "data": "2026-10-15", "giorni": 9}, {"tk": "ZZZ", "data": "2026-10-08", "giorni": 2}]}
+_a = NL.costo_attesa(100000.0, 0.504, 0.05, 0.07, _cal, ["AAA", "BBB", "CCC"])
+check("v464 il costo di una seduta e' il patrimonio per la volatilita' su radice di 252",
+      abs(_a["seduta_1s"] - 100000 * 0.504 / math.sqrt(252)) < 1e-6, str(_a["seduta_1s"]))
+check("v464 la settimana e' la seduta per radice di 5, e la convenzione si dichiara",
+      abs(_a["settimana_1s"] - _a["seduta_1s"] * math.sqrt(5)) < 1e-6
+      and "radice di 5" in " ".join(NL.righe_attesa(_a)))
+check("v464 VaR ed ES in dollari, e l'ES non e' minore del VaR",
+      abs(_a["var_usd"] - 5000) < 1e-6 and abs(_a["es_usd"] - 7000) < 1e-6 and _a["es_usd"] >= _a["var_usd"])
+check("v464 la scadenza e' la PRIMA trimestrale del nome, ordinata per data, solo per il libro",
+      [(s["tk"], s["data"]) for s in _a["scadenze"]] == [("BBB", "2026-10-15"), ("AAA", "2026-10-27")]
+      and _a["prima"]["tk"] == "BBB", str(_a["scadenze"]))
+_ra = "\n".join(NL.righe_attesa(_a))
+check("v464 un nome senza data si NOMINA e non si legge come 'nessuna uscita' (v406)",
+      _a["senza_data"] == ["CCC"] and "CCC" in _ra and "non 'nessuna uscita'" in _ra, _ra)
+check("v464 i giorni del calendario non letti si dichiarano", "NON letti" in _ra, _ra)
+_a0 = NL.costo_attesa(1.0, 0.1, 0.01, 0.02, {"finestra": 45, "attesi": []}, ["AAA"])
+check("v464 senza scadenze lo dice invece di tacere", "nessuna trimestrale dichiarata" in "\n".join(NL.righe_attesa(_a0)))
+check("v464 il costo dell'attesa entra nella sintesi giornaliera (collegamento, v399)",
+      "costo_attesa(" in _corpo_di(_src_nl, "calcola") and "righe_attesa(" in _corpo_di(_src_nl, "sintesi"))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

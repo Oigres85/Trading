@@ -6099,3 +6099,18 @@ Il primo run della pipeline con la watchlist allineata ha acceso tre gate:
 - **v406**: pretendeva il livello di liquidità SOPRA il prezzo, che il 06/10 sull'S&P non c'era.
   L'invariante è che esca almeno un livello e mai il punteggio.
 Due iniezioni (alias inventato cerebras→SKHY, apostrofo tolto): mordono entrambe.
+
+## ⏳ v464 — IL COSTO DELL'ATTESA DIVENTA UNO STRUMENTO, NON UN RICORDO
+
+Domanda del CEO: *"se attendo ancora un po' per queste operazioni è un forte azzardo?"*, e poi
+*"rendila strutturale"*. La risposta data a voce (costo in dollari del rischio del libro mentre si
+decide, scadenza = prima trimestrale di ogni nome coinvolto, protezioni subito e operazioni
+condizionate dopo) ora la calcola `numeri_libro.py` a ogni analisi: blocchi `COSTO DELL'ATTESA` e
+`SCADENZE` (`costo_attesa`, `righe_attesa`). Le regole stanno in `memoria/LIBRO.md` §1quater, e
+`FORMATO_ANALISI.md` le mette subito dopo il semaforo.
+
+⚠ La settimana è la seduta per radice di 5: **convenzione** (sedute indipendenti), dichiarata nella
+riga. ⚠ La scadenza è la data **dichiarata dalla fonte**, mai proiettata (v396); un nome senza data
+si nomina (v406), e i giorni di calendario non letti si dichiarano. Rifatti sui dati veri, i numeri
+coincidono con quelli dati a voce (±9.479 $ a seduta, ±21.196 $ a settimana, VaR −15.773 $,
+ES −20.035 $). Otto gate, quattro iniezioni: mordono tutte, collegamento compreso (v399).

@@ -26,6 +26,10 @@ alla misura di un giorno.
 0. **Semaforo d'uscita** (decisione del CEO del 06/10): il colore di oggi in UNA riga, con i
    segnali accesi nominati — regole in `memoria/LIBRO.md` §1ter. Se il colore cambia dal giorno
    prima, va in cima alla risposta e prima di tutto il resto.
+0bis. **Costo dell'attesa e scadenze** (decisione del CEO del 06/10, regole in `memoria/LIBRO.md`
+   §1quater): il blocco `COSTO DELL'ATTESA` / `SCADENZE` di `numeri_libro.py`, e per ogni
+   decisione aperta del piano la sua scadenza (prima trimestrale del nome) e i giorni che mancano.
+   Le protezioni non ancora messe si segnalano qui, ogni giorno, finché non lo sono.
 1. **Sintesi in 3-5 punti** — cosa è successo, perché, cosa cambia per il libro.
 2. **Risultato contro i riferimenti** — libro contro QQQ, SMH, SPY, RSP; chi ha portato il risultato.
 3. **Rischio** — peso contro quota del rischio; beta sul Nasdaq col suo R²; segnalare solo se cambia.

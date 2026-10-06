@@ -112,6 +112,40 @@ perché un numero scritto a mano invecchia da solo (v410, v424).
 revisioni NVDA 46 su / 0 giù. **Stato: 🟢 verde**, con fragilità dichiarate (leva record, rialzo
 stretto: SPY +1,6% contro RSP −2,6% a un mese).
 
+## 1quater. COSTO DELL'ATTESA E SCADENZE — deciso col CEO il 06/10/2026, si riporta a OGNI analisi
+
+Domanda del CEO: *"se attendo ancora un po' per queste operazioni è un forte azzardo?"*. Risposta
+diventata regola: **aspettare non è un azzardo se le protezioni sono già in piedi e ogni decisione
+ha una scadenza**. Diventa una scommessa binaria solo quando si lascia passare la trimestrale di un
+nome su cui la decisione era ancora aperta.
+
+**Le regole** (i numeri si leggono dal giorno, mai da qui — v410, v424):
+1. **Il costo dell'attesa è il rischio del libro in dollari**, calcolato da
+   `python3 scripts/numeri_libro.py` (blocco `COSTO DELL'ATTESA`): oscillazione tipica di una
+   seduta e di una settimana, seduta cattiva (VaR95), media delle sedute peggiori (ES95). È quanto
+   il libro può muoversi **mentre** si decide: va confrontato con il beneficio atteso dell'operazione.
+2. **La scadenza di ogni decisione aperta è la PRIMA trimestrale del nome coinvolto**, come la
+   dichiara la fonte (blocco `SCADENZE` dello stesso script). Nessuna data proiettata (v396): un
+   nome senza data nella finestra si nomina, e "la fonte non la dichiara" non è "nessuna uscita".
+   Gli eventi macro (verbali Fed, FOMC) e le trimestrali dei fornitori di settore (ASML, TSM) si
+   aggiungono dalla ricerca web, con fonte e data.
+3. **Le protezioni si mettono SUBITO, le operazioni condizionate possono aspettare.** Gli avvisi e
+   gli stop sui livelli già decisi (RGTI, CRWV, SMH, Treasury 10 anni, vedi §1ter e il piano in
+   `FORMATO_ANALISI.md`) non dipendono da nessuna scadenza: rimandarli è l'unico pezzo dell'attesa
+   che costa senza dare niente in cambio.
+4. **Oltre la scadenza, aspettare è una scommessa binaria**: la trimestrale riprezza il nome in una
+   seduta, spesso di più dell'oscillazione di una settimana intera. Una decisione ancora aperta il
+   giorno prima della trimestrale va presa o dichiarata rimandata **di proposito**, non lasciata
+   scadere.
+5. Il semaforo d'uscita (§1ter) **scavalca** le scadenze: se passa ad arancione o rosso, si agisce
+   secondo il gradino senza aspettare la data.
+
+**Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: seduta tipica ±9.500 $,
+settimana ±21.200 $, VaR95 −15.800 $, ES95 −20.000 $; scadenze BE 27/10 · MSTR 29/10 · PLTR 02/11 ·
+AMD 03/11 · CRWV e RGTI 09/11 · NVDA 18/11 (MU, SKHY, MRVL senza data nella finestra). Esterne:
+verbali Fed 07/10, ASML 14/10, TSM 15/10, FOMC 28/10. Lettura di quel giorno: attesa ragionevole
+fino a metà ottobre; BE da decidere entro il 27/10, AMD entro il 03/11.
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da
