@@ -6114,3 +6114,25 @@ riga. ⚠ La scadenza è la data **dichiarata dalla fonte**, mai proiettata (v39
 si nomina (v406), e i giorni di calendario non letti si dichiarano. Rifatti sui dati veri, i numeri
 coincidono con quelli dati a voce (±9.479 $ a seduta, ±21.196 $ a settimana, VaR −15.773 $,
 ES −20.035 $). Otto gate, quattro iniezioni: mordono tutte, collegamento compreso (v399).
+
+## 🟡 v465 — LO SPREAD CCC, E IL SEMAFORO PASSA A GIALLO
+
+Dal video di un canale di mercato che il CEO segue: *"il credito CCC si sta allargando"*. Verificato
+invece che preso per buono, su FRED (`BAMLH0A3HYC`, CSV pubblico raggiungibile anche da qui): **12,11%
+il 05/10/2026, massimo dei tre anni pubblicati, +2,4 punti sul minimo di 60 sedute** — mentre l'high
+yield aggregato resta al 3,1%, sotto la soglia gialla. La media nasconde la fascia peggiore, che è
+quella che cede per prima.
+
+`credito_ccc()` in pipeline pubblica `macro.credit_ccc` (livello, minimo di 60 sedute, salita, mese
+fa); `validate_macro` la sorveglia dal primo giorno (v390); `brief.py` la stampa con la salita
+accanto. Il segnale del semaforo è la **SALITA** (+1,5 punti, convenzione col CEO), non il livello:
+tre anni di storia non bastano a dire cosa sia un livello normale (v240).
+
+⚠ **Misurato prima di fissare la soglia, e il risultato è modesto**: 4 episodi in tre anni, uno solo
+ha anticipato un crollo (marzo 2025), uno era già dentro il crollo, uno è stato un falso allarme.
+Vale UN segnale della famiglia credito (B3), e lo dice `LIBRO.md` §1ter.
+
+⚠ Il primo gate sul minimo **non mordeva**: la fixture aveva lo spread in salita, e includere o no
+il valore di oggi nel minimo dava lo stesso risultato. Aggiunto il caso che discrimina — uno spread
+che scende sotto il minimo deve dare salita NEGATIVA, non zero. *Un'iniezione che non morde prova
+che il gate non contiene il fenomeno* (v430).

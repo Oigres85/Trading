@@ -1432,6 +1432,28 @@ check("v443 il blocco FedWatch non dipende da una chiave che il file scrive dopo
       + (" (tardive: %s)" % ", ".join(_tardive) if _tardive else ""),
       not _tardive or "fred_series(\"FEDFUNDS\"" in _blocco_effr)
 
+# ============================ v465 — SPREAD CCC ============================
+# Lo stato si COSTRUISCE (v425): una serie con un minimo noto 60 sedute indietro.
+_ser = [("2026-%03d" % i, 10.0) for i in range(80)]
+_ser[30] = (_ser[30][0], 9.5)
+_ser.append(("2026-999", 12.0))
+_c = ud.credito_ccc(_ser)
+check("v465 la salita CCC e' misurata dal minimo delle 60 sedute precedenti",
+      _c["valore"] == 12.0 and _c["min_60"] == 9.5 and _c["salita_60_pp"] == 2.5)
+_c2 = ud.credito_ccc([("a", 10.0)] * 30 + [("b", None), ("c", 11.0)])
+check("v465 con meno di 60 sedute la salita e' un buco, non uno zero (v205)",
+      _c2["salita_60_pp"] is None and _c2["min_60"] is None and _c2["valore"] == 11.0)
+_c3 = ud.credito_ccc([("d%d" % i, 10.0) for i in range(70)] + [("ult", 8.0)])
+check("v465 il minimo esclude il valore di oggi: uno spread che scende da' salita NEGATIVA",
+      _c3["salita_60_pp"] == -2.0 and _c3["min_60"] == 10.0)
+check("v465 serie vuota: nessun blocco, non un blocco finto", ud.credito_ccc([]) is None)
+_dqc = ud.validate_macro({})
+check("v465 senza spread CCC validate_macro alza 'missing' (la fonte nasce sorvegliata, v390)",
+      any(isinstance(x, dict) and x.get("key") == "credito_ccc" and x.get("status") == "missing"
+          for x in (_dqc.get("checks") or _dqc.get("items") or [])) or "credito_ccc" in str(_dqc))
+check("v465 collegamento: la pipeline scrive macro['credit_ccc'] da BAMLH0A3HYC (v399)",
+      'macro["credit_ccc"] = _ccc' in _SRC_UD_CODICE and 'fred_series("BAMLH0A3HYC"' in _SRC_UD_CODICE)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)

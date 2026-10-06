@@ -3659,6 +3659,14 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! credit: {e}", file=sys.stderr)
 
+    try:
+        _ccc = credito_ccc(fred_series("BAMLH0A3HYC", 260))
+        if _ccc:
+            macro["credit_ccc"] = _ccc
+        print(f"   credito CCC: {'ok' if _ccc else 'ko'}")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! credito CCC: {e}", file=sys.stderr)
+
     # ═══ v390 — CHI PRESTA, NON SOLO QUANTO COSTA ══════════════════════════════════════
     # Il canale credito e' quello che colpisce PRIMA le partecipate che non si autofinanziano,
     # e fino a qui il sistema lo misurava con il solo spread high yield. Uno spread e' un
@@ -4502,6 +4510,30 @@ def fetch_margin_debt(prev_md=None):
     }
 
 
+
+# ═══ v465 — LA CREPA SI APRE DALLA FASCIA PEGGIORE ═══════════════════════════════════════
+# Lo spread high yield AGGREGATO (BAMLH0A0HYM2) e' una media pesata dove le emittenti migliori
+# pesano di piu': quando il credito comincia a cedere, cede prima la fascia CCC, la piu'
+# rischiosa. Misurato il 06/10/2026: CCC 12,11% (massimo dei tre anni pubblicati, +2,4 pp sul
+# minimo di 60 sedute) con l'aggregato fermo al 3,1%.
+# ⚠ Il segnale e' la SALITA dal minimo recente, non il livello: il livello normale della CCC
+#   cambia col ciclo e il CSV pubblico di FRED porta solo ~3 anni (licenza ICE), quindi una
+#   soglia di livello sarebbe una tacca senza storia (v240). La soglia della salita e' una
+#   CONVENZIONE scelta col CEO (memoria/LIBRO.md §1ter), non un dato.
+def credito_ccc(serie):
+    """serie: [(data, valore)] in ordine cronologico. Un buco non e' uno zero (v205)."""
+    vals = [(d, v) for d, v in (serie or []) if v is not None]
+    if not vals:
+        return None
+    ult_d, ult = vals[-1]
+    finestra = [v for _, v in vals[-61:-1]]
+    minimo = min(finestra) if len(finestra) >= 60 else None
+    return {"valore": round(ult, 2), "data": ult_d, "serie": "BAMLH0A3HYC",
+            "min_60": round(minimo, 2) if minimo is not None else None,
+            "salita_60_pp": round(ult - minimo, 2) if minimo is not None else None,
+            "mese_fa": round(vals[-22][1], 2) if len(vals) >= 22 else None,
+            "sedute": len(vals)}
+
 def validate_macro(macro):
     """DATA ASSERTIONS (post-incidente margin debt congelato): valida il macro PRIMA che
     finisca nel payload AI. Due famiglie di regole:
@@ -4677,6 +4709,14 @@ def validate_macro(macro):
             _a = age_of(_v.get("data"))
             add(f"credito_{_k}", _v.get("data"), _max,
                 "ok" if (_a is not None and _a <= _max) else "stale")
+
+    # v465 — la fonte nasce sorvegliata (v390): giornaliera, 5 giorni coprono un ponte festivo
+    _cc = macro.get("credit_ccc")
+    if not _cc:
+        add("credito_ccc", None, 5, "missing", "spread CCC non disponibile in questo run")
+    else:
+        _a = age_of(_cc.get("data"))
+        add("credito_ccc", _cc.get("data"), 5, "ok" if (_a is not None and _a <= 5) else "stale")
 
     bce = macro.get("bce") or {}
     if not bce.get("tasso_rifinanziamento"):

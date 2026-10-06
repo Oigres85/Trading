@@ -376,6 +376,13 @@ def macro_dalla_pipeline():
     cr = m.get("credit") or {}
     if cr.get("spread_hy") is not None:
         out.append(riga("HY OAS (credito)", cr["spread_hy"], cr.get("date")))
+    cc = m.get("credit_ccc") or {}
+    if cc.get("valore") is not None:
+        # v465 — la salita dal minimo di 60 sedute e' il segnale del semaforo (LIBRO.md §1ter)
+        nota = (f"+{cc['salita_60_pp']:.2f} pp dal minimo di 60 sedute ({cc['min_60']})"
+                if cc.get("salita_60_pp") is not None else "storico insufficiente per la salita")
+        out.append(riga("Spread CCC (fascia peggiore)", cc["valore"], cc.get("data"),
+                        prec=cc.get("mese_fa"), nota=nota))
     cb = m.get("credito_banche") or {}
     nf = cb.get("nfci") or {}
     if nf.get("valore") is not None:

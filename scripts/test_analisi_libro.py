@@ -1398,6 +1398,25 @@ check("v464 senza scadenze lo dice invece di tacere", "nessuna trimestrale dichi
 check("v464 il costo dell'attesa entra nella sintesi giornaliera (collegamento, v399)",
       "costo_attesa(" in _corpo_di(_src_nl, "calcola") and "righe_attesa(" in _corpo_di(_src_nl, "sintesi"))
 
+# ============================ v465 — SPREAD CCC NEL BRIEF ============================
+import tempfile as _tf, json as _js, os as _os
+import brief
+_tmp = _tf.mkdtemp()
+_os.makedirs(_os.path.join(_tmp, "data"))
+_js.dump({"updated_at": "2026-10-06T10:00:00Z", "macro": {"credit_ccc": {
+    "valore": 12.11, "data": "2026-10-05", "min_60": 9.69, "salita_60_pp": 2.42, "mese_fa": 10.55}}},
+    open(_os.path.join(_tmp, "data", "data.json"), "w"))
+_rad = brief.RADICE
+brief.RADICE = _tmp
+try:
+    _mc = brief.macro_dalla_pipeline()
+finally:
+    brief.RADICE = _rad
+_rcc = [s for s in _mc["serie"] if s["nome"].startswith("Spread CCC")]
+check("v465 il brief porta lo spread CCC con la sua data e la salita dal minimo",
+      len(_rcc) == 1 and _rcc[0]["data"] == "2026-10-05" and "+2.42 pp" in (_rcc[0]["nota"] or ""),
+      str(_rcc))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

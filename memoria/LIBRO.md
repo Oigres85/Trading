@@ -89,7 +89,7 @@ perché un numero scritto a mano invecchia da solo (v410, v424).
 |---|---|---|
 | **Prezzo** | SMH chiude sotto la propria media a 50 giorni; secondo gradino: sotto la media a 200 | `data.json` → `macro.tilt[SMH].medie` |
 | **Leader** | NVDA, AMD e MU chiudono **insieme** sotto la propria media a 50 giorni, con volumi alti | `brief.py` (distanza SMA50 in ATR) |
-| **Credito** | spread high yield (HY OAS) sopra 3,5; secondo gradino: sopra 4,0 | `brief.py` → macro |
+| **Credito** | spread **CCC** (la fascia peggiore) salito di **1,5 punti o più** sul proprio minimo delle 60 sedute precedenti — è il segnale che arriva per primo (v465); poi spread high yield (HY OAS) sopra 3,5; secondo gradino: sopra 4,0 | `brief.py` → macro (riga «Spread CCC», con la salita accanto) |
 | **Tassi** | Treasury 10 anni sopra 5,4% | `brief.py` → macro |
 | **Fondamentali AI** | revisioni delle stime che girano al ribasso su NVDA/MU (più tagli che rialzi a 30 giorni), oppure un hyperscaler (MSFT, GOOGL, META, AMZN) che TAGLIA la guida sugli investimenti | `schede_progetto.py` + conti di fine ottobre |
 | **Leva** | il margin debt FINRA comincia a scendere dal picco (variazione mensile negativa) | `data.json` → `macro.margin_debt` |
@@ -105,11 +105,18 @@ perché un numero scritto a mano invecchia da solo (v410, v424).
 
 ⚠ Due segnali della **stessa** famiglia sono un segnale solo (B3): SMH sotto la 50 e NVDA sotto la
 50 nello stesso giorno sono il prezzo che parla due volte, non due prove.
+⚠ **Lo spread CCC: perché la salita e non il livello, e quanto vale (misurato il 06/10/2026).**
+Il livello normale della fascia CCC cambia col ciclo e FRED ne pubblica solo ~3 anni, quindi una
+soglia di livello non avrebbe storia (v240). La soglia di +1,5 punti è una **convenzione scelta col
+CEO**. Su tre anni si è accesa in 4 episodi distinti: agosto 2024 (crollo da yen, già in corso),
+marzo 2025 (circa tre settimane **prima** del crollo dei dazi di aprile), marzo 2026 (falso allarme:
+Nasdaq +17% il mese dopo) e settembre 2026. **Uno su tre ha anticipato**: è un campanello, non una
+sentenza — per questo vale UN segnale della famiglia credito, mai due, e da solo porta al giallo.
 ⚠ Le vendite a terzi dividono anche il conto fiscale sulle plusvalenze (26%): su MU e AMD è alto.
 
 **Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: SMH 638 (media 50 ≈ 573,
-200 ≈ 502) · HY OAS 3,1 · Treasury 10 anni 5,28% · margin debt 96,8% del massimo, +2,6% sul mese ·
-revisioni NVDA 46 su / 0 giù. **Stato: 🟢 verde**, con fragilità dichiarate (leva record, rialzo
+200 ≈ 502) · **spread CCC 12,11%, +2,4 punti sul minimo di 60 sedute (9,69) — SEGNALE ACCESO** · HY OAS 3,1 · Treasury 10 anni 5,28% · margin debt 96,8% del massimo, +2,6% sul mese ·
+revisioni NVDA 46 su / 0 giù. **Stato: 🟡 giallo dal 06/10 (era verde prima di aggiungere lo spread CCC)**: un segnale, famiglia credito. Prima ancora, fragilità dichiarate (leva record, rialzo
 stretto: SPY +1,6% contro RSP −2,6% a un mese).
 
 ## 1quater. COSTO DELL'ATTESA E SCADENZE — deciso col CEO il 06/10/2026, si riporta a OGNI analisi
