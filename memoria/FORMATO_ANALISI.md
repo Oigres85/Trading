@@ -5,6 +5,11 @@ doppione. Il formato è quello del rapporto «da comitato d'investimento» del 0
 alla misura di un giorno.
 
 ## Come si produce
+0. **Prima dell'apertura americana (prima delle 15:30 italiane) l'analisi parte dal PRE-MARKET**
+   (istruzione del CEO, 06/10/2026): `python3 scripts/numeri_libro.py --esteso` — risultato del
+   libro sul prezzo esteso, livelli ricalcolati su quel prezzo, titoli che fuori sessione stanno
+   già oltre resistenza o supporto. Dopo la chiusura lo stesso comando dà l'after-hours.
+   ⚠ Il pre-market ha volumi sottili: è un'indicazione dell'apertura, non un prezzo su cui decidere.
 1. `python3 scripts/numeri_libro.py` — l'ultima seduta (`--sedute 5` per la settimana).
    Lo script CALCOLA e basta; il giudizio lo scrive il modello.
 2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro.

@@ -1334,6 +1334,18 @@ check("v460 le posizioni vengono da LIBRO.md, mai dalla pipeline (v439)",
 check("v460 chi e' fuori dalla matrice si NOMINA nella sintesi (v406)",
       "esclusi_matrice" in _corpo_di(_src_nl, "sintesi") and "fuori matrice" in _src_nl)
 
+# ============================ v461 — PRE-MARKET ============================
+_rig = {"A": {"px": 100.0, "esteso_px": 103.0, "atr": 2.0, "resistenza20": 102.0, "supporto20": 90.0, "esteso_fase": "Pre-market"},
+        "B": {"px": 50.0, "esteso_px": None, "atr": 1.0, "resistenza20": 55.0, "supporto20": 45.0},
+        "C": {"px": 20.0, "esteso_px": 19.0, "atr": 0.5, "resistenza20": 25.0, "supporto20": 19.5}}
+_o, _p, _r = NL.movimento_esteso(_rig, {"A": 10, "B": 4})
+_d = {x["tk"]: x for x in _o}
+check("v461 il P&L esteso usa solo le posizioni e il prezzo esteso", abs(_p - 30.0) < 1e-9 and "pnl" not in _d["C"], str((_p, _d["C"])))
+check("v461 la base del rendimento esclude chi non e' quotato fuori sessione (buco, non zero)",
+      _d["B"]["esteso"] is None and abs(_r - 30.0 / 1000.0) < 1e-12, str((_d["B"], _r)))
+check("v461 un prezzo esteso oltre il livello lo dichiara, nei due versi",
+      _d["A"]["oltre"] == "SOPRA la resistenza" and _d["C"]["oltre"] == "SOTTO il supporto" and abs(_d["A"]["res_atr"] + 0.5) < 1e-9)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

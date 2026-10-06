@@ -147,11 +147,58 @@ def sintesi(o):
     return "\n".join(L)
 
 
+def movimento_esteso(righe, qty):
+    """Pre-market / after-hours: P&L e distanze dai livelli ricalcolati sul prezzo ESTESO.
+    righe: {tk: tecnica(tk)}. Un titolo senza prezzo esteso e' None, mai 0 (v205): 'fermo' e
+    'non quotato fuori sessione' si leggono uguali e sono cose diverse."""
+    out, pnl, base = [], 0.0, 0.0
+    for tk, x in righe.items():
+        ep, px, atr = x.get("esteso_px"), x.get("px"), x.get("atr")
+        if not ep or not px:
+            out.append({"tk": tk, "esteso": None}); continue
+        d = {"tk": tk, "esteso": ep, "pct": (ep / px - 1) * 100, "fase": x.get("esteso_fase")}
+        if atr:
+            d["res_atr"] = (x["resistenza20"] - ep) / atr
+            d["supp_atr"] = (ep - x["supporto20"]) / atr
+            d["oltre"] = ("SOPRA la resistenza" if ep > x["resistenza20"] else
+                          "SOTTO il supporto" if ep < x["supporto20"] else None)
+        if tk in qty:
+            d["pnl"] = qty[tk] * (ep - px); pnl += d["pnl"]; base += qty[tk] * px
+        out.append(d)
+    return out, pnl, (pnl / base if base else None)
+
+
+def esteso():
+    import brief
+    pos, _, sorv = brief.leggi_libro()
+    qty = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "USD"}
+    tks = list(qty) + [s["tk"] for s in sorv] + ["QQQ", "SMH", "SPY"]
+    with ThreadPoolExecutor(6) as ex:
+        righe = dict(zip(tks, ex.map(brief.tecnica, tks)))
+    out, pnl, ret = movimento_esteso(righe, qty)
+    L = [f"FUORI SESSIONE rispetto all'ultima chiusura · libro {pnl:+,.0f} $ ({ret*100:+.2f}%)" if ret is not None
+         else "FUORI SESSIONE: nessun prezzo esteso per le posizioni"]
+    for grp, sel in (("POSIZIONI", lambda d: d["tk"] in qty), ("RIFERIMENTI", lambda d: d["tk"] in ("QQQ", "SMH", "SPY")),
+                     ("SORVEGLIATI", lambda d: d["tk"] not in qty and d["tk"] not in ("QQQ", "SMH", "SPY"))):
+        L.append(grp)
+        for d in sorted([d for d in out if sel(d)], key=lambda d: -(abs(d.get("pct") or 0))):
+            if d["esteso"] is None:
+                L.append(f"  {d['tk']:5} non quotato fuori sessione"); continue
+            liv = f" · res {d['res_atr']:+.1f} ATR · supp {d['supp_atr']:+.1f} ATR" if "res_atr" in d else ""
+            L.append(f"  {d['tk']:5} {d['esteso']:>10,.2f} {d['pct']:+6.2f}%"
+                     + (f" {d['pnl']:+8,.0f} $" if "pnl" in d else "") + liv
+                     + (f"  ⚠ {d['oltre']}" if d.get("oltre") else ""))
+    return "\n".join(L)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--sedute", type=int, default=1)
     ap.add_argument("--json")
+    ap.add_argument("--esteso", action="store_true", help="pre-market / after-hours")
     a = ap.parse_args()
+    if a.esteso:
+        print(esteso()); sys.exit(0)
     o = calcola(a.sedute)
     if a.json:
         Path(a.json).write_text(json.dumps(o, default=str, indent=1))

@@ -6016,3 +6016,15 @@ risultava propagato col beta di chi capitava primo.
 `sqrt(w'Sw)`, scommesse effettive con l'Herfindahl vero (iniettando la formula cieca ai pesi della
 v430 morde), ES ≥ VaR, buco ≠ zero, posizioni da `LIBRO.md`, esclusi nominati. Il censimento v387
 ha morso al primo giro, come previsto.
+
+## 🌅 v461 — PRIMA DELL'APERTURA, IL PRE-MARKET
+
+Istruzione del CEO: *"analizza pre-market quando ti chiedo analisi prima dell'apertura"*. La
+risposta del 06/10 alle 10 italiane partiva dalla chiusura del giorno prima, mentre la fonte
+pubblicava già il prezzo esteso (`ep`, `ecp`, `es` della quota). Ora `numeri_libro.py --esteso`
+dà il risultato del libro sul prezzo esteso e ricalcola i livelli in ATR su quel prezzo,
+segnalando chi fuori sessione sta già oltre resistenza o supporto. La regola d'uso sta in
+`memoria/FORMATO_ANALISI.md`.
+
+⚠ **Un titolo non quotato fuori sessione è un buco, non uno zero** (v205): resta fuori dalla
+base del rendimento invece di pesare come "fermo". Tre gate sulle proprietà, lo stato costruito.
