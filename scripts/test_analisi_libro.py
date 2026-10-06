@@ -1346,6 +1346,32 @@ check("v461 la base del rendimento esclude chi non e' quotato fuori sessione (bu
 check("v461 un prezzo esteso oltre il livello lo dichiara, nei due versi",
       _d["A"]["oltre"] == "SOPRA la resistenza" and _d["C"]["oltre"] == "SOTTO il supporto" and abs(_d["A"]["res_atr"] + 0.5) < 1e-9)
 
+# ============================ v462 — LE SCHEDE DEL PROGETTO ============================
+# Lo stato si COSTRUISCE: i dati del giorno possono non contenere una perdita, un canale sotto
+# il rumore o un nome mancante, e il check sarebbe verde per assenza del fenomeno (v425, v429).
+import schede_progetto as SP
+_riga_perdita = SP.riga_revisioni({"eps_ora": -4.33, "eps_90g_fa": -3.37})
+check("v462 su una perdita la revisione si legge dalla DIFFERENZA, non dal rapporto (v400)",
+      "AMPLIATA" in _riga_perdita and "28" not in _riga_perdita and "salita" not in _riga_perdita, _riga_perdita)
+_riga_utile = SP.riga_revisioni({"eps_ora": 12.0, "eps_90g_fa": 10.0})
+check("v462 su un utile la revisione porta verso e percentuale", "in salita del 20,0%" in _riga_utile, _riga_utile)
+_f = SP.finestra({"beta": 1.42, "r2": 0.02, "r2_soglia": 0.065, "campione": 60})
+check("v462 un canale sotto il rumore non pubblica il beta (v316, v415)",
+      "non misurabile" in _f and "1,42" not in _f, _f)
+_rc = SP.riga_cassa({"combustione": {"fcf_ttm": -13655000000.0, "cashflow_al": "2026-06-30", "mesi_capex": 3.2,
+                                     "cassa": 5524000000.0, "debito": 51608000000.0},
+                     "credito": {"copertura": -0.03, "oneri_ttm": 1874199000.0}})
+check("v462 la cassa esce solo in rapporti, mai in importi (v404, v447)",
+      "3,2 mesi" in _rc and "2026-06-30" in _rc and not any(x in _rc for x in ("5524", "51608", "1874", "13655", "mld")), _rc)
+_dati = {"updated_at": "2026-10-06T11:36:10Z",
+         "watchlist": [{"ticker": "AAA", "name": "A", "price_asof": "2026-10-05"}], "macro": {}}
+_g = SP.genera(_dati, ["AAA"], ["ZZZ"])
+check("v462 un nome del libro assente dalla pipeline si NOMINA, non si salta (v406)",
+      "ZZZ [SORVEGLIATO] — NON E' NELLA PIPELINE" in _g and "1 nome senza dati" in _g, _g[-200:])
+_src_sp = Path(__file__).with_name("schede_progetto.py").read_text()
+check("v462 i nomi vengono da LIBRO.md, mai dalla pipeline (v439)",
+      "brief.leggi_libro()" in _corpo_di(_src_sp, "main"))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

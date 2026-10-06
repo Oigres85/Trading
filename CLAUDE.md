@@ -6028,3 +6028,54 @@ segnalando chi fuori sessione sta già oltre resistenza o supporto. La regola d'
 
 ⚠ **Un titolo non quotato fuori sessione è un buco, non uno zero** (v205): resta fuori dalla
 base del rendimento invece di pesare come "fermo". Tre gate sulle proprietà, lo stato costruito.
+
+## 🔗 v462 — LA PIPELINE SEGUIVA UN LIBRO CHE NON ESISTEVA PIÙ, E main ERA ROSSA DA STAMATTINA
+
+Il CEO ha chiesto se l'analisi usasse quanto più possibile della repo. **No**, e la misura l'ha
+detto in tre punti:
+
+1. **`main` era rossa dal push della v461** (587/592) e nessuno se n'era accorto: il push non
+   passa dal `pre-push` quando l'HEAD coincide già con la base, e la CI gira DOPO. Cinque check,
+   nessun difetto del sistema:
+   - **tre a OROLOGIO** (v333, v441 ×2): costruivano una riunione FOMC a settembre e il codice la
+     confronta con ADESSO. Passato il mese, lo stato costruito smetteva di esistere. Rimedio v402:
+     `suVeriAlle` ferma l'orologio dentro il vm. Validato: rimettendo la data di oggi mordono
+     tutti e tre. E v333 dipendeva anche dall'EFFR vero, cambiato col rialzo del 16/09: ora si
+     costruisce anche quello;
+   - **uno per COINCIDENZA** (v349): cercava `rilevazione AAAA-MM-GG`, che la v392 aveva tolto da
+     quella riga. Passava perché un'ALTRA serie aveva per caso la stessa data; è andato rosso il
+     giorno in cui le due si sono separate. Ora guarda la riga del retail, sullo stato costruito;
+   - **uno DORMIENTE** (v389): SKHY ha ormai abbastanza sedute e rientra nel calcolo, quindi il
+     check era verde per assenza del fenomeno — l'ha preso il meta-gate dei dormienti. Ora
+     l'escluso si costruisce.
+2. **La pipeline seguiva ancora ORCL, GOOGL e WDC come posizioni** (`config/posizioni.json`
+   fermo al 23/08) e nessuno dei 21 sorvegliati aggiunti dal CEO dopo. Allineati entrambi i file
+   a `memoria/LIBRO.md`: 10 posizioni, 26 sorvegliati, 9 riferimenti. ⚠ **Il costo va misurato
+   in CI**: ogni simbolo costa più chiamate Yahoo in fila (prezzi, analisti, opzioni), e la fonte
+   ha una quota per IP (v398-v399). Si verifica sul primo run, non si assume.
+3. **I blocchi per titolo della pipeline non entravano nell'analisi in chat** se non a memoria.
+   `scripts/schede_progetto.py` li mette in fila per ogni nome del libro: canali col loro R²
+   (un canale sotto il rumore NON pubblica il beta), revisioni dalla DIFFERENZA (v400), cassa in
+   soli rapporti (v404), short, deposito SEC; un nome assente dalla pipeline si NOMINA. Le opzioni
+   restano fuori: le loro guardie vivono in app.js, rifarle sarebbe la seconda derivazione.
+   Sei gate, tre validati per iniezione; il censimento v387 ha morso al primo giro.
+4. **E `coherence_check` era rosso sui dati di oggi, per due rami accesi per la prima volta**:
+   - **FedWatch dava una RAGIONE FALSA**: sulla riunione del 28/10 scriveva *"non cade nel mese
+     del contratto"* — ci cade. A scattare era la guardia di plausibilità (il conto dava ~5
+     movimenti), e la causa vera è la BASE: `fed_market.current_rate` è la media MENSILE di
+     FEDFUNDS di settembre, che mescola 15 giorni prima e 15 dopo il rialzo del 16/09 (3,75
+     contro un effettivo di oggi ~3,88). Con la base giusta il future prezza zero movimenti,
+     come Polymarket (80% fermo). Ora `movimentiImpliciti` restituisce il PERCHÉ di un null, la
+     riga dice quello vero e nomina i mercati di previsione **filtrati sul mese** (C14).
+     ⚠ **APERTO, non corretto**: la base va spostata sulla serie GIORNALIERA dell'EFFR nella
+     pipeline. Finché non lo è, a ogni riunione che segue un movimento la derivazione è fuori.
+   - **C9: tre imperativi nella coda** (`verificalo`, `Cerca`, `vedi`) nel ramo della tabella
+     dei trimestri ferma, acceso dal deposito 8-K di MU del 30/09. Riscritti come fatti.
+     `riporta` era un indicativo omografo: riformulato invece di allentare il detector.
+   ⚠ Il meta-gate dei backtick ha rifiutato `suVeriAlle(template, "data")`: il secondo
+   argomento dopo il template sembra un template spezzato. Da qui `suVeriOttobre`, con la data
+   dentro. E un'iniezione non mordeva perché la fixture metteva la quota del mese giusto PRIMA
+   di quella sbagliata: `find()` la prendeva comunque. *L'iniezione va scelta fra i casi che il
+   gate DEVE prendere* (v389) — e la fixture deve contenerli nell'ordine che li rende visibili.
+
+GEV tolto dalla watchlist su richiesta del CEO (06/10).

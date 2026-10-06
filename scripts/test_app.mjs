@@ -183,6 +183,18 @@ const suVeri = (code, cash = 28500) => run(`
   DATA = JSON.parse(JSON.stringify(REALE)); cashEur = ${cash}; recomputeTotals();
   try { ${code} } finally { DATA = _salva; cashEur = _cash; recomputeTotals(); }`);
 const suVeriEsito = (code) => { const r = suVeri(code); return r === true ? true : no(String(r)); };
+/* v462 — L'OROLOGIO SI FERMA DENTRO IL VM. Cinque check sono andati rossi il 06/10 su codice
+   corretto perche' costruivano una riunione FOMC a settembre e il codice la confronta con
+   ADESSO: passato il mese, la riunione non e' piu' prezzabile dal contratto e lo stato
+   costruito smette di esistere. E' la classe v402 — un ramo temporale che dipende dall'ora
+   in cui gira la suite va rosso da solo — e il rimedio e' lo stesso: l'ora la decide il
+   check, non il calendario. */
+const suVeriAlle = (code, iso = "2026-09-10T12:00:00Z") => suVeriEsito(`
+  const _DV = Date, _T = _DV.parse(${JSON.stringify(iso)});
+  Date = class extends _DV { constructor(...a) { if (a.length) super(...a); else super(_T); } static now() { return _T; } };
+  try { ${code} } finally { Date = _DV; }`);
+/* il 06/10/2026, il giorno in cui la base EFFR mensile conteneva gia' il rialzo del 16/09 */
+const suVeriOttobre = (code) => suVeriAlle(code, "2026-10-06T12:00:00Z");
 const suReale = suVeri;          // nome storico, stessa funzione
 
 /* ---------- checks ---------- */
@@ -3204,10 +3216,15 @@ check("v333 dueBarre: scala condivisa e soglia disegnata dove esiste", suVeri(`
    correzione applicata al pacchetto e non alla pagina (v412).
    Ora lo stato si COSTRUISCE nei due versi, e il check misura la PROPRIETA': prezzata -> i tre
    esiti sommano a 100 e la barra esiste; non prezzata -> nessuna barra e la riga lo dichiara. */
-check("v333 fedwatch: prezzata -> tre esiti a somma 100; non prezzata -> lo dichiara", suVeriEsito(`
+check("v333 fedwatch: prezzata -> tre esiti a somma 100; non prezzata -> lo dichiara", suVeriAlle(`
   const macro = DATA.macro || {};
   const base = { target_range: "3,50-3,75%", implied_rate: 3.79, next_fomc: "2026-09-16" };
   const guai = [];
+  /* ⚠ v462 — anche il tasso effettivo si COSTRUISCE: la scheda prende i movimenti dalla
+     riunione, il pacchetto li ricalcola dall'EFFR, e dopo il rialzo del 16/09 l'EFFR vero non
+     e' piu' 3,63. Lasciarlo ai dati del giorno faceva divergere le due superfici per una
+     ragione che col difetto sorvegliato non c'entra. */
+  macro.fed_market = Object.assign({}, macro.fed_market || {}, { current_rate: 3.63 });
   /* ramo A: la riunione E' prezzata dal contratto */
   macro.fedwatch = Object.assign({}, base, { meetings: [
     { date: "2026-09-16", cut_prob: null, hike_prob: 37, hold_prob: 63, mosse_25bp: 0.37, prezzata_dal_contratto: true },
@@ -4432,12 +4449,19 @@ check("v349 digest: il 10A resta ancorato alla SERIE anche se l'altra fonte dive
   return primo === String(sc.value).replace(".", ",");`));
 
 check("v349 liquidita': il dato mensile porta la sua data anche nel pacchetto", suVeri(`
-  const L = (DATA.macro || {}).liquidity_split || {};
-  if (L.retail_mmf_bln == null || !L.retail_date) return true;
-  const t = buildCIOText();
   /* la scheda in pagina lo dichiarava "non e' il dato di oggi", il pacchetto no: 84 giorni
-     presentati come scaricati al run di stamattina */
-  return t.includes("rilevazione " + L.retail_date) && /NON e' il dato di oggi/.test(t);`));
+     presentati come scaricati al run di stamattina.
+     ⚠ v462 — il check cercava la stringa "rilevazione AAAA-MM-GG", che la v392 ha tolto da
+     questa riga (il periodo si scrive per esteso). Passava perche' un'ALTRA serie del pacchetto
+     aveva per caso la stessa data: e' andato rosso il giorno in cui le due date si sono
+     separate. Ora lo stato si costruisce e si guarda la riga del retail, non tutto il pacchetto. */
+  const m = DATA.macro = DATA.macro || {};
+  m.liquidity_split = Object.assign({}, m.liquidity_split || {}, { retail_mmf_bln: 3000, retail_date: "2026-03-01" });
+  const t = buildCIOText();
+  const i = t.indexOf("Retail Cash:");
+  if (i < 0) return false;
+  const seg = t.slice(i, i + 400);
+  return seg.indexOf(meseEsteso("2026-03-01")) >= 0 && seg.indexOf("NON e' il dato di oggi") >= 0;`));
 
 check("v349 opzioni: nessuna frase mutilata arriva all'LLM", suVeri(`
   const p = buildPromptTicker("MU");
@@ -5112,7 +5136,7 @@ check("meta: nessun backtick dentro un template passato al vm", (() => {
   /* si isola ogni template passato a un helper del vm e si guarda se, PRIMA della chiusura,
      compare un backtick non escapato: se c'e', il template finisce li' e il resto del check
      diventa sintassi arbitraria — che e' come si e' rotta la suite tre volte oggi. */
-  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito|_LEVA)\(`/g;
+  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA)\(`/g;
   const guasti = [];
   for (const m of mio.matchAll(APERTURE)) {
     const da = m.index + m[0].length;
@@ -5145,7 +5169,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
      essi i backslash non raddoppiati davanti alle classi che contano. */
   const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
     /* ⚠⚠ v422 — LA CLASSE SI ALLARGA A n/r/t/0, e la ragione e' peggiore delle altre: dentro un
@@ -5165,7 +5189,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      un template. Non esiste nessuna ragione legittima di scriverla: il template l'ha gia'
      mangiata prima che il vm la veda, quindi la si cerca in TUTTI i template passati al vm, non
      solo in quelli che contengono una regex. Costata un giro di debug in v406. */
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     for (const b of t.matchAll(/(?<!\\)\\["']/g)) {
       sospetti.push("virgoletta sfuggita: " + t.slice(Math.max(0, b.index - 34), b.index + 12).replace(/\n/g, "⏎"));
@@ -6274,6 +6298,12 @@ check("v389 peso/rischio: le posizioni fuori dal calcolo vengono NOMINATE, non t
      abbastanza sedute in comune, quindi il suo peso non e' dentro i 100% e il nome deve
      comparire. Un check che legge il sorgente certifica cio' che c'e' scritto; uno che legge
      l'uscita certifica cio' che l'utente vede. */
+  /* ⚠ v462 — SKHY ha ormai abbastanza sedute e rientra nel calcolo: il check era diventato
+     DORMIENTE, verde per assenza del fenomeno. Ora l'escluso si COSTRUISCE togliendo il
+     contributo al rischio a una posizione vera (v425, v429). */
+  const _esc = (DATA.watchlist || []).find(r => r && r.qta > 0 && r.controvalore > 0);
+  if (!_esc) return false;
+  delete _esc.risk_contrib_pct;
   let html = "";
   const vero = document.querySelector;
   document.querySelector = (sel) => String(sel) === "#rischio-mappa"
@@ -6282,7 +6312,7 @@ check("v389 peso/rischio: le posizioni fuori dal calcolo vengono NOMINATE, non t
   try { renderRischio(); } finally { document.querySelector = vero; }
   const senzaMcr = (DATA.watchlist || []).filter(r => r && r.qta > 0 && r.controvalore > 0
     && !Number.isFinite(Number(r.risk_contrib_pct))).map(r => r.ticker);
-  if (!senzaMcr.length) return true;   /* niente esclusi: niente da dichiarare */
+  if (!senzaMcr.length) return false;  /* lo stato costruito non e' arrivato al render */
   return senzaMcr.every(t => html.includes(t)) && /non e' nel calcolo|non sono nel calcolo/.test(html);`));
 
 check("v389 collaudo: ENTRAMBI i pacchetti chiedono freschezza, congruita' e affidabilita'", suVeri(`
@@ -9583,7 +9613,7 @@ check("v441 · fuori dal mese del contratto non esce nessun numero",
    scavalcata — validato per iniezione, perche' un check che leggesse la forma nuova sarebbe
    verde per costruzione (v416, il gate circolare). */
 check("v441 · le probabilita' dello snapshot vecchio vengono scavalcate, non accettate",
-  suVeriEsito(`
+  suVeriAlle(`
     const fw = { implied_rate: 3.79, target_range: "3.50–3.75%",
                  meetings: [{ date: "2026-09-16", hike_prob: 66, cut_prob: 0, hold_prob: 34 }] };
     DATA.macro = DATA.macro || {};
@@ -9598,7 +9628,7 @@ check("v441 · le probabilita' dello snapshot vecchio vengono scavalcate, non ac
 /* ⚠ Dentro (0,1] invece la probabilita' ESISTE e va pubblicata: un check che provasse solo il
    ramo dei movimenti lascerebbe l'altro non esercitato (v190, v234). */
 check("v441 · sotto il movimento intero la probabilita' esce, e i tre rami con lei",
-  suVeriEsito(`
+  suVeriAlle(`
     const eff = 3.63, imp = eff + 0.5 * 0.25 * (14 / 30);   // mezzo movimento
     const fw = { implied_rate: imp, meetings: [{ date: "2026-09-16" }] };
     DATA.macro = DATA.macro || {};
@@ -9607,6 +9637,40 @@ check("v441 · sotto il movimento intero la probabilita' esce, e i tre rami con 
     if (mt.hike_prob == null) return "nessuna probabilita' dove ne esiste una";
     if (Math.abs(mt.hike_prob - 50) > 2) return "probabilita' " + mt.hike_prob + " invece di ~50";
     if (mt.hold_prob == null) return "il ramo invariato non viene pubblicato";
+    return true;`));
+
+/* ⚠⚠ v462 — LA RAGIONE DI UN NUMERO TACIUTO DEVE ESSERE QUELLA VERA. Il 06/10 il pacchetto
+   diceva che la riunione del 28/10 "non cade nel mese del contratto" — ci cadeva, e a scattare
+   era la guardia di plausibilita' (la base EFFR e' una media MENSILE che contiene il rialzo del
+   16/09). E non nominava la fonte alternativa (C14). Stato costruito a orologio fermo. */
+check("v462 · una riunione nel mese del contratto non viene spiegata con l'orizzonte",
+  suVeriOttobre(`
+    DATA.macro = DATA.macro || {};
+    DATA.macro.fedwatch = { implied_rate: 3.88, target_range: "3.75-4.00%", next_fomc: "2026-10-28",
+      meetings: [{ date: "2026-10-28" }, { date: "2026-12-09" }] };
+    DATA.macro.fed_market = { current_rate: 3.75, rate_date: "2026-09-01" };
+    /* la quota di un ALTRO mese sta PRIMA: senza il filtro sul mese, find() la prenderebbe */
+    DATA.predictions = [
+      { question: "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?", yes: 99 },
+      { question: "Will there be no change in Fed interest rates after the October 2026 meeting?", yes: 80 },
+      { question: "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?", yes: 20 } ];
+    const r = buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("- FedWatch") === 0) || "";
+    if (!r) return "la riga FedWatch non esce";
+    if (r.indexOf("non ci cade dentro") >= 0) return "spiega con l'orizzonte una riunione che cade nel mese";
+    if (r.indexOf("NON ATTRIBUIBILE") < 0) return "non dichiara la guardia di plausibilita'";
+    if (r.indexOf("INVARIATO 80%") < 0) return "non nomina la fonte alternativa coi suoi numeri";
+    if (r.indexOf("99%") >= 0) return "aggancia la quota di un ALTRO mese";
+    if (r.indexOf(" ? ") >= 0 || r.indexOf("i ? giorni") >= 0) return "stampa punti interrogativi al posto della ponderazione";
+    return true;`));
+
+check("v462 · una riunione fuori dal mese resta spiegata con l'orizzonte",
+  suVeriOttobre(`
+    DATA.macro = DATA.macro || {};
+    DATA.macro.fedwatch = { implied_rate: 3.88, target_range: "3.75-4.00%", next_fomc: "2026-11-04",
+      meetings: [{ date: "2026-11-04" }] };
+    DATA.macro.fed_market = { current_rate: 3.88, rate_date: "2026-10-01" };
+    const r = buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("- FedWatch") === 0) || "";
+    if (r.indexOf("non ci cade dentro") < 0) return "il ramo dell'orizzonte e' sparito: " + r.slice(0, 160);
     return true;`));
 
 /* ⚠⚠ E LA RAMPA INVENTATA NON DEVE RIENTRARE NEL PACCHETTO: pubblicava 78% a ottobre e 90% a

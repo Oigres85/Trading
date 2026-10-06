@@ -13,16 +13,26 @@ alla misura di un giorno.
 1. `python3 scripts/numeri_libro.py` — l'ultima seduta (`--sedute 5` per la settimana).
    Lo script CALCOLA e basta; il giudizio lo scrive il modello.
 2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro.
-3. Ricerca web sulle notizie che spiegano i movimenti, con fonte e data.
+3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
+   del libro i blocchi che la pipeline pubblica: sensibilità a mercato, comparto, tassi e
+   dollaro col loro R² (anno, trimestre, giornate forti), revisioni delle stime, autonomia di
+   cassa e copertura degli oneri per chi brucia cassa, short interest, ultimo deposito SEC.
+   Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
+   misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
+   NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
+4. Ricerca web sulle notizie che spiegano i movimenti, con fonte e data.
 
 ## Cosa contiene la risposta, in quest'ordine
 1. **Sintesi in 3-5 punti** — cosa è successo, perché, cosa cambia per il libro.
 2. **Risultato contro i riferimenti** — libro contro QQQ, SMH, SPY, RSP; chi ha portato il risultato.
 3. **Rischio** — peso contro quota del rischio; beta sul Nasdaq col suo R²; segnalare solo se cambia.
+   Più i CANALI accesi di ciascun nome (schede_progetto): da quale fattore arriva il rischio.
 4. **Tecnica** — solo i nomi vicini a resistenza o supporto (distanze in ATR), o sotto la SMA200.
-5. **Macro e catalizzatori** — soglie decise prima (spread credito alto rendimento 3,5;
+5. **Macro e catalizzatori** — e per le trimestrali vicine le revisioni delle stime e, per chi
+   brucia cassa, l'autonomia: sono le due cose che una trimestrale riprezza.
+   Soglie macro decise prima (spread credito alto rendimento 3,5;
    Treasury 10 anni 5,0 / 5,4), trimestrali e Fed nei prossimi giorni.
-6. **Piano con soglie** — stato di ciascuna condizione già decisa (ordine ORCL 143, BE 295-302,
+6. **Piano con soglie** — stato di ciascuna condizione già decisa (BE 295-302, AMD respinto a 645, RGTI sotto 14,41,
    MU 1.100-1.108 con la compensazione RGTI, i supporti di protezione).
 
 ## Regole

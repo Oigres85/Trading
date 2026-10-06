@@ -182,6 +182,11 @@ contributo al rischio, fattori, stress — e il formato della lettura sta in
 `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe una seconda resa delle stesse
 grandezze a quella del rapporto (classe v161/v207).
 
+`scripts/schede_progetto.py` resta **fuori** per la stessa ragione: porta nell'analisi in chat i
+blocchi per titolo che la pipeline pubblica (sensibilità ai canali col loro R², revisioni,
+autonomia di cassa, short, depositi SEC) per ogni nome di `memoria/LIBRO.md`. Il rapporto di
+questo comando li legge già per intero dal pacchetto.
+
 `scripts/modifica_sicura.py` non è un passo di questo comando: è la libreria che ogni modifica ai
 sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf.py` è la libreria
 che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed

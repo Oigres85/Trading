@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "458";
+const BUILD_VERSION = "462";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7355,25 +7355,29 @@ function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine =
    su cui il contratto settla davvero, ed e' un altro numero (3,63 contro 3,625).
    ⚠ Ritorna i MOVIMENTI da 25bp, non una probabilita': sopra il movimento intero non esiste
    una probabilita' — 1,37 vuol dire un rialzo pieno piu' il 37% di un secondo. */
-function movimentiImpliciti(implied, effr, riunione, meseContratto) {
-  if (!Number.isFinite(implied) || !Number.isFinite(effr) || !riunione) return null;
+/* ⚠ v462 — `esito` (facoltativo) riceve il PERCHE' di un null. Il pacchetto spiegava ogni
+   riunione non prezzata con "non cade nel mese del contratto", anche quando ci cadeva e a
+   scattare era la guardia di plausibilita': una ragione falsa nella riga che dichiara un limite. */
+function movimentiImpliciti(implied, effr, riunione, meseContratto, esito) {
+  const _no = (perche, grezzo) => { if (esito) { esito.motivo = perche; esito.grezzo = grezzo ?? null; } return null; };
+  if (!Number.isFinite(implied) || !Number.isFinite(effr) || !riunione) return _no("dati");
   const r = new Date(String(riunione) + "T00:00:00Z");
-  if (isNaN(r.getTime())) return null;
+  if (isNaN(r.getTime())) return _no("dati");
   // il front-month prezza SOLO il proprio mese: e' la regola v199 nella sua forma corretta —
   // il limite non e' "35 giorni" ma "lo stesso mese di calendario del contratto".
   if (r.getUTCFullYear() !== meseContratto.getUTCFullYear()
-      || r.getUTCMonth() !== meseContratto.getUTCMonth()) return null;
+      || r.getUTCMonth() !== meseContratto.getUTCMonth()) return _no("mese");
   const eff = new Date(r.getTime() + 86400000);          // annuncio a fine 2a giornata
   while (eff.getUTCDay() === 0 || eff.getUTCDay() === 6) eff.setUTCDate(eff.getUTCDate() + 1);
-  if (eff.getUTCMonth() !== r.getUTCMonth()) return null;
+  if (eff.getUTCMonth() !== r.getUTCMonth()) return _no("mese");
   const giorni = new Date(Date.UTC(r.getUTCFullYear(), r.getUTCMonth() + 1, 0)).getUTCDate();
   const n1 = eff.getUTCDate() - 1, n2 = giorni - n1;
-  if (n2 <= 0) return null;
+  if (n2 <= 0) return _no("mese");
   const rFine = (implied - (n1 / giorni) * effr) / (n2 / giorni);
   const mosse = (rFine - effr) / 0.25;
   // oltre tre movimenti su una riunione sola il numero non e' attribuibile a questa riunione:
   // molto piu' probabilmente il contratto letto non e' quello del mese corrente. Si dichiara.
-  if (Math.abs(mosse) > 3) return null;
+  if (Math.abs(mosse) > 3) return _no("plausibilita", Math.round(mosse * 100) / 100);
   return { mosse_25bp: Math.round(mosse * 100) / 100, giorni_vecchio: n1, giorni_nuovo: n2,
            giorni_mese: giorni, base_effr: effr };
 }
@@ -7454,10 +7458,13 @@ function ramiFedWatch(fw, riunione) {
      corretta). E' lo stesso ripiego dei rami FedWatch di v187, con l'aggiunta che il dato
      vecchio va scavalcato invece che accettato. */
   const daPipeline = fw && fw.movimenti && fw.movimenti.riunione === mt.date;
+  const _esito = {};
   const mv = daPipeline ? fw.movimenti
     : movimentiImpliciti(numero(fw && fw.implied_rate),
                          numero(((DATA.macro || {}).fed_market || {}).current_rate),
-                         mt.date, new Date());
+                         mt.date, new Date(), _esito);
+  mt.motivo = mv ? null : (_esito.motivo || null);
+  mt.mosse_grezze = mv ? null : (_esito.grezzo ?? null);
   mt.mosse_25bp = mv ? mv.mosse_25bp : null;
   mt.prezzata = !!mv;
   // ⚠ la ponderazione viaggia col numero: la riga del pacchetto la nomina, e senza questi campi
@@ -9932,6 +9939,19 @@ function buildPrompt(opz) {
         + (Math.abs(x) > 1 ? `, piu' il ${Math.round((Math.abs(x) - 1) * 100)}% di un secondo` : "")
         + `. NON e' una probabilita': oltre il movimento intero la grandezza che il contratto`
         + ` esprime e' quanti movimenti, non con che probabilita' uno`);
+    } else if (mt.motivo === "plausibilita") {
+      /* ⚠⚠ v462 — LA RIUNIONE CADE NEL MESE DEL CONTRATTO, quindi il limite non e'
+         l'orizzonte: e' che il conto esce fuori scala. La riga diceva il contrario. */
+      const fm = (DATA.macro || {}).fed_market || {};
+      rami.push(`NON ATTRIBUIBILE: il conto darebbe ${fmtNum.format(mt.mosse_grezze)} movimenti da 25bp`
+        + ` su una riunione sola, oltre la soglia di plausibilita' di tre. La riunione cade nel mese`
+        + ` del contratto, quindi il limite NON e' l'orizzonte: o il contratto letto non e' quello del`
+        + ` mese corrente, o la base EFFR (${fm.current_rate ?? "n.d."}%, serie MENSILE FEDFUNDS`
+        + ` rilevazione ${fm.rate_date || "n.d."}) non e' il tasso effettivo di oggi — una media`
+        + ` mensile che contiene una riunione mescola il tasso di prima e quello di dopo. Nessuna`
+        + ` delle due e' verificabile da qui; per questa riunione valgono i mercati di previsione`);
+    } else if (mt.motivo === "dati") {
+      rami.push("NON CALCOLABILE: manca il tasso implicito del future o la base EFFR in questo run");
     } else {
       rami.push("NON CALCOLABILE da questo contratto: il future Fed Funds a 30 giorni prezza la"
         + " media del MESE CORRENTE, e questa riunione non ci cade dentro");
@@ -9979,6 +9999,28 @@ function buildPrompt(opz) {
           + ` esprimono QUANTI movimenti sono prezzati (${fmtNum.format(mt.mosse_25bp)}), Polymarket con che`
           + ` PROBABILITA' se ne verifichi uno. Che le due letture divergano cosi' tanto e' esso`
           + ` stesso un fatto: una delle due sta prezzando qualcosa che l'altra non prezza`);
+    }
+    /* ⚠ v462 — QUANDO I FUTURES NON PREZZANO, LA FONTE ALTERNATIVA VA NOMINATA COI SUOI NUMERI
+       (C14). La ricerca si restringe al MESE della riunione: senza il filtro una quota di un
+       altro mese finirebbe accanto a questa data (classe di attesaPrevisione, v450). */
+    if (!pezzi.length && !mt.prezzata) {
+      const _d = new Date(String(mt.date) + "T00:00:00Z");
+      const _mese = isNaN(_d.getTime()) ? null : MESI_EN[_d.getUTCMonth()];
+      const _anno = isNaN(_d.getTime()) ? null : String(_d.getUTCFullYear());
+      const cercaMese = (re) => _mese ? (DATA.predictions || []).find(x => {
+        const q = String(x.question || "").toLowerCase();
+        return /\bfed\b/.test(q) && re.test(q) && q.indexOf(_mese) >= 0 && q.indexOf(_anno) >= 0;
+      }) : null;
+      const h = quota(cercaMese(/increase|hike|raise/)), k = quota(cercaMese(/no change|unchanged|hold/));
+      const c = quota(cercaMese(/decrease|cut|lower/));
+      const q = [];
+      if (h != null) q.push(`RIALZO ${h}%`);
+      if (k != null) q.push(`INVARIATO ${k}%`);
+      if (c != null) q.push(`TAGLIO ${c}%`);
+      const att = attesaPrevisione(mt.date);
+      pezzi.push(q.length
+        ? `${q.join(" · ")}${att != null ? ` (attesa ${fmtNum.format(att)} movimenti da 25bp)` : ""} — e' la quotazione da usare per questa riunione`
+        : `nessuna quotazione su questa riunione in questo run: la fonte che la prezza va cercata (CME FedWatch)`);
     }
     const conf = pezzi.length ? ` · POLYMARKET sulla stessa riunione: ${pezzi.join(" · ")}` : "";
     const pmPct = pmHike;
@@ -10029,7 +10071,7 @@ function buildPrompt(opz) {
       lines.push(`- FedWatch — NON CALCOLABILE per la riunione del ${mt.date}${quandoRiunione}: il tasso implicito ${m.fedwatch.implied_rate}% viene dal future Fed Funds a 30 giorni, che prezza il MESE IN CORSO e non una riunione così lontana. Le probabilità derivate da quel contratto non riguarderebbero quella data.`
         + (pmPct != null ? ` La fonte che quota proprio quella riunione è il mercato di previsione: rialzo ${pmPct}%.` : " Nessun mercato di previsione disponibile su quella riunione in questo payload."));
     } else {
-      lines.push(`- FedWatch prossima riunione ${mt.date}${quandoRiunione} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% — media attesa del mese — contro l'EFFR corrente ${mt.prezzata && mt.base_effr != null ? mt.base_effr : (((DATA.macro || {}).fed_market || {}).current_rate ?? "n.d.")}%, ponderando i ${mt.giorni_vecchio ?? "?"} giorni prima e i ${mt.giorni_nuovo ?? "?"} dopo l'entrata in vigore): ${rami.join(" · ")}${conf}${curva}`);
+      lines.push(`- FedWatch prossima riunione ${mt.date}${quandoRiunione} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% — media attesa del mese — contro l'EFFR corrente ${mt.prezzata && mt.base_effr != null ? mt.base_effr : (((DATA.macro || {}).fed_market || {}).current_rate ?? "n.d.")}%${mt.giorni_vecchio != null ? `, ponderando i ${mt.giorni_vecchio} giorni prima e i ${mt.giorni_nuovo} dopo l'entrata in vigore` : ""}): ${rami.join(" · ")}${conf}${curva}`);
     }
   }
   if ((m.tilt || []).length) {
@@ -13141,10 +13183,10 @@ function tvBlocchi(tk) {
       F.push(`⚠⚠ LA TABELLA DEI TRIMESTRI NON E' AGGIORNATA — E' UN FATTO, NON UN SOSPETTO: `
         + `l'ultimo trimestre qui sopra e' ${ultimoTrim}, ma questa societa' ha DEPOSITATO i propri `
         + `risultati il ${daDeposito.dep} (SEC EDGAR, 8-K con item 2.02), ${daDeposito.gg} giorni dopo `
-        + `la chiusura di quel trimestre: quel deposito riporta un trimestre SUCCESSIVO, che qui non `
+        + `la chiusura di quel trimestre: quel deposito contiene un trimestre SUCCESSIVO, che qui non `
         + `c'e'. ⚠ Quindi la direzione della crescita calcolata qui sotto NON e' affermabile — le manca `
         + `il dato piu' recente, che e' esattamente quello che conta — e i conti di questo blocco sono `
-        + `piu' vecchi dell'ultima comunicazione della societa'. Cerca quel trimestre alla fonte.`);
+        + `piu' vecchi dell'ultima comunicazione della societa'. Quel trimestre sta solo alla fonte, nel deposito su EDGAR.`);
     } else if (serieFerma) {
       F.push(`⚠⚠ LA TABELLA DEI TRIMESTRI POTREBBE NON ESSERE AGGIORNATA: l'ultimo trimestre qui sopra e' `
         + `${ultimoTrim} e la prossima uscita e' attesa il ${prossima}, cioe' ${mesiVuoti} mesi dopo — piu' di un `
@@ -13156,7 +13198,7 @@ function tvBlocchi(tk) {
     }
     if (validi.length >= 2) {
       const ora = validi[0], prima = validi[1];
-      const verso = serieFerma ? "NON AFFERMABILE (vedi l'avviso qui sopra)"
+      const verso = serieFerma ? "NON AFFERMABILE (per la ragione dell'avviso qui sopra)"
         : ora > prima + 0.5 ? "ACCELERA" : ora < prima - 0.5 ? "RALLENTA" : "stabile";
       /* ⚠ v357 — QUANTO COSTA LA CRESCITA, non solo quanto e' veloce. Richiesta di un PM
          growth, e i dati erano gia' tutti stampati: Δoperativo / Δricavi trimestre su
@@ -13814,8 +13856,8 @@ function datiNostriDelTitolo(tk) {
               ? `Il residuo di ${mld(t.ricaviFy - somma)} E' SPIEGATO: la tabella dei trimestri e' ferma al `
                 + `${t.ultimoTrim} e la societa' ha depositato risultati piu' recenti il ${ferma.dep} (SEC EDGAR, `
                 + `8-K item 2.02), quindi i dodici mesi dell'aggregatore comprendono un trimestre che qui non `
-                + `c'e'. ⚠ Usa il numero dell'aggregatore come piu' AGGIORNATO, non come discordante — ma `
-                + `verificalo alla fonte, perche' il trimestre mancante non e' in questo pacchetto`
+                + `c'e'. ⚠ Il numero dell'aggregatore e' quindi il piu' AGGIORNATO, non un discordante — e il `
+                + `trimestre che lo rende tale non e' in questo pacchetto: sta solo alla fonte`
               : `Il residuo di ${mld(t.ricaviFy - somma)} non e' spiegato dai dati qui presenti: o la tabella dei `
                 + `trimestri e' incompleta, o l'aggregatore misura un periodo diverso. NON usare i due numeri `
                 + `insieme senza aver verificato quale copre cosa`);
