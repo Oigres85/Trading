@@ -4768,7 +4768,10 @@
     "short_float": 0.0127,
     "buyback_yield": 0.0069,
     "ps": 19.04,
-    "ev_s": 18.93
+    "ev_s": 18.93,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -6478,7 +6481,7 @@
     "shares": 5867155790.0,
     "float_shares": 10879441100.0,
     "float_pct": null,
-    "avg_volume_30d": 27122764.0,
+    "avg_volume_30d": 27126049.0,
     "pe_ttm": 17.3843,
     "forward_pe": 22.9884,
     "eps_ttm": 19.93,
@@ -11906,7 +11909,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0014,
-    "price_to_book": null,
+    "price_to_book": 21.1159,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -13687,7 +13690,7 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0009,
-    "price_to_book": 13.0384,
+    "price_to_book": 12.8342,
     "target_mean": 293.8774,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
@@ -22486,7 +22489,7 @@
     ],
     "d1": [
      85792.02,
-     85812.48,
+     85818.28,
      85952.17,
      85838.13,
      85790.08,
@@ -32211,12 +32214,12 @@
    "price_asof": "2026-10-05",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 2.61,
+   "change_pct": 2.66,
    "pe": null,
    "ath": 6.83,
-   "ath_dist_pct": -2.5,
+   "ath_dist_pct": -2.4,
    "sma200_dist_pct": 8.8,
-   "sma50_dist_pct": 1.5,
+   "sma50_dist_pct": 1.6,
    "w52_high": 6.83,
    "w52_low": 4.83,
    "w52_dist_pct": -2.5,
@@ -32917,7 +32920,7 @@
    "sharpe_1y": 0.91,
    "sortino_1y": 1.32,
    "sharpe_6m": 1.26,
-   "sortino_6m": 1.8,
+   "sortino_6m": 1.81,
    "prepost": null,
    "prezzo_limite_aggiustato": 6.66,
    "risk_reward": "1:0.8",
@@ -32937,17 +32940,17 @@
     "m1": {
      "support": 6.28,
      "resistance": 6.83,
-     "change_pct": 1.28
+     "change_pct": 1.34
     },
     "m3": {
      "support": 6.02,
      "resistance": 6.83,
-     "change_pct": 8.95
+     "change_pct": 9.0
     },
     "y1": {
      "support": 4.83,
      "resistance": 6.83,
-     "change_pct": 33.58
+     "change_pct": 33.65
     }
    },
    "financials": [],
@@ -32974,57 +32977,57 @@
      "medie": {
       "sma10": {
        "liv": 6.62,
-       "dist_pct": 0.69
+       "dist_pct": 0.74
       },
       "ema10": {
        "liv": 6.58,
-       "dist_pct": 1.21
+       "dist_pct": 1.25
       },
       "sma20": {
        "liv": 6.58,
-       "dist_pct": 1.2
+       "dist_pct": 1.25
       },
       "ema20": {
        "liv": 6.58,
-       "dist_pct": 1.23
+       "dist_pct": 1.28
       },
       "sma30": {
        "liv": 6.58,
-       "dist_pct": 1.2
+       "dist_pct": 1.25
       },
       "ema30": {
        "liv": 6.57,
-       "dist_pct": 1.42
+       "dist_pct": 1.47
       },
       "sma50": {
        "liv": 6.56,
-       "dist_pct": 1.55
+       "dist_pct": 1.6
       },
       "ema50": {
        "liv": 6.53,
-       "dist_pct": 2.04
+       "dist_pct": 2.09
       },
       "sma100": {
        "liv": 6.43,
-       "dist_pct": 3.55
+       "dist_pct": 3.6
       },
       "ema100": {
        "liv": 6.39,
-       "dist_pct": 4.17
+       "dist_pct": 4.22
       },
       "sma200": {
        "liv": 6.12,
-       "dist_pct": 8.77
+       "dist_pct": 8.83
       },
       "ema200": {
        "liv": 6.13,
-       "dist_pct": 8.75
+       "dist_pct": 8.81
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 54.8,
+      "rsi14": 55.0,
       "macd": {
        "linea": 0.01,
        "segnale": 0.02,
@@ -33534,15 +33537,15 @@
      }
     ],
     "performance": {
-     "s1": 1.45,
-     "m1": 2.47,
-     "m3": 8.79,
-     "m6": 19.31,
-     "ytd": 18.11,
-     "a1": 47.43,
-     "a3": 72.13,
-     "a5": 86.41,
-     "a10": 163.51
+     "s1": 1.51,
+     "m1": 2.52,
+     "m3": 8.84,
+     "m6": 19.37,
+     "ytd": 18.17,
+     "a1": 47.5,
+     "a3": 72.22,
+     "a5": 86.51,
+     "a10": 163.65
     },
     "stagionalita": [
      {
@@ -33628,7 +33631,7 @@
      },
      {
       "mese": 10,
-      "media": 0.53,
+      "media": 0.54,
       "mediana": 1.85,
       "positivi_pct": 61,
       "campione": 23,
@@ -52709,8 +52712,8 @@
    "us10": 5.31,
    "jp10": 3.08,
    "spread": 2.23,
-   "usdjpy": 157.84,
-   "usdjpy_chg_1m": 1.05,
+   "usdjpy": 157.81,
+   "usdjpy_chg_1m": 1.03,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
