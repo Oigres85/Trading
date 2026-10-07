@@ -28,8 +28,8 @@ alla misura di un giorno.
    correlazione col libro. ⚠ Mai la tabella `macro.tilt` della pipeline per i numeri: è ferma
    al proprio run. Da lì viene solo la composizione degli ETF.
    Di default stampa SOLO i candidati per settore (v469, istruzione del CEO): medie 20/50/200
-   con livelli, distanza in ATR e pendenza, andamento a 1 e 3 mesi, RSI, volumi (ultima seduta
-   contro la media a 20, media a 20 contro quella a 60), supporto/resistenza e notizie del feed
+   con livelli, distanza in ATR e pendenza, andamento a 1 e 3 mesi, RSI, volumi come PERCENTILE
+   dell'anno 0-100 (v472: ultima seduta conclusa e media a 20; 0 = minimo, 50 = norma, 100 = massimo), supporto/resistenza e notizie del feed
    del simbolo. Da v471 ogni titolo porta anche target degli analisti (dalla pipeline, n.d. se
    non seguito), beta sull'S&P 500 col suo R², volatilità annua; e stampa la WATCHLIST del
    libro con le stesse misure. I volumi escludono la seduta in corso. `--tutti` dà la tabella completa. Per ogni settore con candidati la risposta

@@ -1723,6 +1723,32 @@ check("v471 la scheda riceve la serie dell'S&P 500 e i target, e la watchlist es
       'rendimenti_per_data(B["SPY"])' in _racc471 and "scheda(tk, B.get(tk), rlibro, rspy, target)" in _racc471
       and "righe_watchlist(o)" in _src_rot.split("if __name__")[-1] and "riga_target_beta(t)" in _corpo_di(_src_rot, "righe_candidati"))
 
+# ============================ v472 — VOLUMI COME PERCENTILE DELL'ANNO ============================
+# Il CEO: "non capisco il valore dei volumi (dammi una % da 0 a 100)". Lo stato si COSTRUISCE:
+# un anno di volumi crescenti 1..250, cosi' la posizione di ogni seduta e' nota per costruzione.
+_vp = [{"t": f"d{i:03d}", "c": 100, "v": 1000 + i} for i in range(250)]
+_vpo = ROT.volumi(_vp)
+check("v472 la seduta piu' scambiata dell'anno sta vicino a 100, e la media a 20 piu' alta anche",
+      _vpo["vol_pct_seduta"] > 99 and _vpo["vol_pct_20"] > 99 and _vpo["vol_campione"] == 250, str(_vpo))
+_vp_min = list(_vp); _vp_min[-1] = {"t": "d249", "c": 100, "v": 1}
+check("v472 la seduta meno scambiata dell'anno sta vicino a 0",
+      ROT.volumi(_vp_min)["vol_pct_seduta"] < 1, str(ROT.volumi(_vp_min)))
+_vp_mid = list(_vp); _vp_mid[-1] = {"t": "d249", "c": 100, "v": 1124.5}
+check("v472 una seduta a meta' dell'anno sta a 50, cioe' nella norma",
+      abs(ROT.volumi(_vp_mid)["vol_pct_seduta"] - 50) < 1, str(ROT.volumi(_vp_mid)["vol_pct_seduta"]))
+check("v472 midrank: un anno di volumi tutti uguali da' 50, non 0 ne' 100",
+      ROT.percentile_midrank(5, [5] * 100) == 50.0 and ROT.percentile_midrank(5, []) is None)
+_vp_buco = list(_vp); _vp_buco[100] = {"t": "d100", "c": 100, "v": None}
+_vpb = ROT.volumi(_vp_buco)
+check("v472 una seduta senza volume esce dal confronto: un buco non e' uno zero (v205)",
+      _vpb["vol_campione"] == 249 and _vpb["vol_pct_seduta"] > 99, str(_vpb))
+_rv = ROT.riga_volumi({"vol_seduta": "2026-10-06", "vol_pct_seduta": 12.3, "vol_pct_20": 71.0, "vol_campione": 250})
+check("v472 la riga dice cosa significano 0, 50 e 100, e porta i due percentili e il campione",
+      "0 = minimo dell'anno, 100 = massimo, 50 = norma" in _rv and "12/100" in _rv and "71/100" in _rv
+      and "250 sedute" in _rv and "x la media" not in _rv, _rv)
+check("v472 senza dato la riga dice n.d., non zero",
+      ROT.riga_volumi({}).count("n.d.") == 3, ROT.riga_volumi({}))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

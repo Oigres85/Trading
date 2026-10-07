@@ -205,8 +205,27 @@ def volumi(barre, adesso=None):
     m20p = sum(v[-21:-1]) / 20
     m20 = sum(v[-20:]) / 20
     m60 = sum(v[-80:-20]) / 60
+    # v472 — il CEO: "non capisco il valore dei volumi (dammi una % da 0 a 100)". Il rapporto
+    # "0,68x la media a 20" chiede di sapere quanto oscilla quel titolo; il PERCENTILE nell'anno
+    # no: 0 = la seduta meno scambiata dell'anno, 100 = la piu' scambiata, 50 = nella norma.
+    # Convenzione midrank (meta' dei pari), la stessa di dgPercentile. Le sedute senza volume
+    # escono dal confronto: un buco non e' uno zero (v205).
+    anno = [x for x in v[-SEDUTE_BETA:] if x is not None]
+    medie = [sum(v[i - 20:i]) / 20 for i in range(max(20, len(v) - SEDUTE_BETA + 1), len(v) + 1)
+             if all(x is not None for x in v[i - 20:i])]
     return {"vol_ultima_rel": v[-1] / m20p if m20p else None,
-            "vol_20_su_60": m20 / m60 if m60 else None, "vol_seduta": barre[-1]["t"]}
+            "vol_20_su_60": m20 / m60 if m60 else None, "vol_seduta": barre[-1]["t"],
+            "vol_pct_seduta": percentile_midrank(v[-1], anno),
+            "vol_pct_20": percentile_midrank(m20, medie), "vol_campione": len(anno)}
+
+
+def percentile_midrank(x, serie):
+    """Quota della serie sotto x, piu' meta' dei pari, x 100. Serie vuota = buco."""
+    if x is None or not serie:
+        return None
+    sotto = sum(1 for y in serie if y < x)
+    pari = sum(1 for y in serie if y == x)
+    return (sotto + pari / 2) / len(serie) * 100
 
 
 def scheda(tk, barre, rlibro, rspy=None, target=None):
@@ -338,10 +357,13 @@ def riga_target_beta(t):
 
 
 def riga_volumi(t):
-    vr, vt = t.get("vol_ultima_rel"), t.get("vol_20_su_60")
-    return (f"volumi: seduta conclusa del {t.get('vol_seduta') or 'n.d.'} "
-            f"{'n.d.' if vr is None else format(vr, '.2f').replace('.', ',') + 'x la media a 20'} · media 20 "
-            f"{'n.d.' if vt is None else format(vt, '.2f').replace('.', ',') + 'x la media a 60'}")
+    """v472: percentili nell'anno (0 = il minimo dell'anno, 100 = il massimo, ~50 = norma)."""
+    ps, p20 = t.get("vol_pct_seduta"), t.get("vol_pct_20")
+    def p(x):
+        return "n.d." if x is None else f"{x:.0f}/100"
+    return (f"volumi (0 = minimo dell'anno, 100 = massimo, 50 = norma): seduta conclusa del "
+            f"{t.get('vol_seduta') or 'n.d.'} {p(ps)} · media delle ultime 20 sedute {p(p20)}"
+            + (f" · su {t['vol_campione']} sedute" if t.get("vol_campione") else ""))
 
 
 def righe_watchlist(o):

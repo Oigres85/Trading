@@ -6294,3 +6294,13 @@ lo contiene per forza nella definizione. Ancoraggio aperto e gate che trova sé 
 stretto al blocco `__main__`, morde. L'iniezione del beta per posizione morde per **eccezione**
 (KeyError), non per un check: il difetto sarebbe rumoroso comunque.
 ⚠ Sei iniezioni, ripristino da snapshot verificato per hash (v430).
+
+## 📶 v472 — I VOLUMI COME PERCENTILE DELL'ANNO
+
+Il CEO: *"non capisco il valore dei volumi sui titoli candidati (dammi una % da 0 a 100)"*. Il
+rapporto "0,68x la media a 20" chiedeva di sapere quanto oscilla quel titolo per giudicarlo. Ora
+`rotazione.py` pubblica il **percentile** della seduta conclusa e della media a 20 fra le sedute
+dell'ultimo anno (midrank, come `dgPercentile`): 0 = la meno scambiata, 50 = norma, 100 = la più
+scambiata. La riga dichiara la scala e il campione; le sedute senza volume escono dal confronto
+(v205). I rapporti restano nel dato per i gate v469/v471. Sette gate sullo stato costruito,
+quattro iniezioni: mordono tutte, ripristino da snapshot verificato per hash.
