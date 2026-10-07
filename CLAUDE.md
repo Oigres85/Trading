@@ -6203,3 +6203,22 @@ dell'analisi ha un gate proprio.
 ⚠ E un'iniezione non mordeva perche' il buco della fixture cadeva FUORI dalla finestra delle
 ultime 60 date: il gate non conteneva il fenomeno (v430). Spostato dentro, morde.
 
+## 📋 v469 — I CANDIDATI DIRETTAMENTE, CON TECNICA, VOLUMI E NOTIZIE
+
+Istruzione del CEO: *"dammi direttamente candidati per settore con maggiori info su medie mobili
+ed altri tecnici es. andamento prezzo a un mese e volumi ed eventuali news (inserendo comunque
+info macro sul settore)"*. `rotazione.py` stampa ora di default solo i candidati: medie 20/50/200
+coi livelli, RSI (Wilder, seme della pipeline; sotto 100 barre è un buco, v436), volumi
+dell'ultima seduta CONCLUSA contro le 20 precedenti e media a 20 contro quella a 60, notizie del
+feed Nasdaq del simbolo con i tre esiti distinti (v389). Il contesto macro del settore è giudizio
+e ricerca web: lo scrive il modello, non lo script (v448).
+
+⚠⚠ **Un'iniezione è stata lasciata nel file, e l'ha trovata il gate.** Ho lanciato l'harness
+delle iniezioni con `| head -2`: `head` chiude la pipe, Python muore di SIGPIPE a metà ciclo e il
+ripristino dallo snapshot non avviene. `rotazione.py` è rimasto con il feed muto letto come
+"nessuna notizia", e la suite pulita è andata rossa proprio su quel check. Ripristinato dallo
+snapshot e verificato per hash. Classe v430/v436 (`$?` dopo una pipe): **un harness che modifica
+file non si manda mai in una pipe che può troncarlo** — l'uscita si filtra dopo, da un file.
+⚠ E una fixture incompleta faceva ESPLODERE la resa invece di farla fallire sul motivo giusto:
+un check che muore in eccezione racconta male (v407). Completata.
+

@@ -1501,6 +1501,38 @@ _fa = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md"
 check("v468 la rotazione e' nel formato dell'analisi giornaliera (collegamento, v399)",
       "rotazione.py" in _fa)
 
+# ============================ v469 — CANDIDATI CON TECNICA, VOLUMI E NOTIZIE ============================
+_up = [{"t": f"d{i:03d}", "c": 100 + i, "v": 1000} for i in range(150)]
+check("v469 RSI: serie che sale sempre vale 100 (perdita media zero, v316)", ROT.rsi_wilder(_up) == 100.0)
+check("v469 RSI sotto 100 barre e' un buco, non un numero (v436)", ROT.rsi_wilder(_up[:99]) is None)
+_alt = [{"t": f"d{i:03d}", "c": 100 + (1 if i % 2 else -1), "v": 1000} for i in range(150)]
+check("v469 RSI: rialzi e ribassi uguali stanno a 50", abs(ROT.rsi_wilder(_alt) - 50) < 2, str(ROT.rsi_wilder(_alt)))
+_vb = [{"t": f"d{i:03d}", "c": 100, "v": 1000} for i in range(100)]
+_vb[-1] = {"t": "d099", "c": 100, "v": 3000}
+_vo = ROT.volumi(_vb)
+check("v469 volume dell'ultima seduta contro la media delle 20 PRECEDENTI (3000/1000 = 3)",
+      abs(_vo["vol_ultima_rel"] - 3.0) < 1e-9 and _vo["vol_seduta"] == "d099", str(_vo))
+_vb2 = list(_vb); _vb2[-5] = {"t": "d095", "c": 100, "v": None}
+check("v469 una seduta senza volume rende il dato non misurabile, non zero (v205)",
+      ROT.volumi(_vb2)["vol_ultima_rel"] is None)
+_ocand = {"universo_assente": False, "settori": [{"etf": "XXX", "nome": "Prova", "stato": "IN TENDENZA",
+          "m1": 1.0, "m3": 5.0, "d50_atr": 1.0, "d200_atr": 2.0, "corr_libro": 0.1, "titoli": [
+          {"tk": "AAA", "stato": "CANDIDATO", "nel_libro": False, "px": 10.0, "m1": 1, "m3": 2, "dmax52": -3,
+           "rsi": 55, "atr_pct": 2, "sma20": 9.9, "d20_atr": 0.2, "sma50": 9.5, "d50_atr": 1.0, "pend50": 2,
+           "sma200": 9, "d200_atr": 2, "supp": 9.5, "supp_atr": 1, "res": 11, "res_atr": 2,
+           "vol_ultima_rel": 1.2, "vol_20_su_60": 1.1, "vol_seduta": "2026-10-06", "corr_libro": 0.1},
+          {"tk": "BBB", "stato": "ESTESO", "nel_libro": False},
+          {"tk": "CCC", "stato": "CANDIDATO", "nel_libro": True}]}]}
+# CCC ha i campi completi: se il filtro sul libro cadesse, deve comparire, non far esplodere la resa
+_ocand["settori"][0]["titoli"][2] = {**_ocand["settori"][0]["titoli"][0], "tk": "CCC", "nel_libro": True}
+_rc = "\n".join(ROT.righe_candidati(_ocand, {"AAA": {"stato": "HTTP 429", "voci": []}}))
+check("v469 si elencano SOLO i candidati fuori dal libro, e il settore dichiara quanti su quanti",
+      "AAA (" in _rc and "BBB" not in _rc and "CCC (" not in _rc and "candidati 1 su 3" in _rc, _rc)
+check("v469 feed non letto e nessuna notizia si leggono DIVERSI (v389)",
+      "NON letto" in _rc and "nessuna voce" in "\n".join(ROT.righe_candidati(_ocand, {"AAA": {"stato": "ok", "voci": []}})))
+check("v469 la vista dei candidati e' quella di default (collegamento, v399)",
+      "righe_candidati(o, notizie_candidati(o))" in _src_rot)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

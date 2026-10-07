@@ -26,6 +26,11 @@ alla misura di un giorno.
    ciascuno su prezzi DI OGGI, con distanza dalle medie in ATR, supporto/resistenza e
    correlazione col libro. ⚠ Mai la tabella `macro.tilt` della pipeline per i numeri: è ferma
    al proprio run. Da lì viene solo la composizione degli ETF.
+   Di default stampa SOLO i candidati per settore (v469, istruzione del CEO): medie 20/50/200
+   con livelli, distanza in ATR e pendenza, andamento a 1 e 3 mesi, RSI, volumi (ultima seduta
+   contro la media a 20, media a 20 contro quella a 60), supporto/resistenza e notizie del feed
+   del simbolo. `--tutti` dà la tabella completa. Per ogni settore con candidati la risposta
+   aggiunge il CONTESTO MACRO del settore da ricerca web, con fonte e data.
 
 ## Cosa contiene la risposta, in quest'ordine
 0. **Semaforo d'uscita** (decisione del CEO del 06/10): il colore di oggi in UNA riga, con i
