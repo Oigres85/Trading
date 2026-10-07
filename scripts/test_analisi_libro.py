@@ -1462,6 +1462,45 @@ finally:
 check("v467 la lettura dalla pipeline: segno del flusso e CCC dalle chiavi VERE (v196, v416)",
       _f == {"BBB": -3.0, "ZZZ": None} and _cc == {"salita_60_pp": 2.42}, str((_f, _cc)))
 
+# ============================ v468 — ROTAZIONE SU PREZZI DI OGGI ============================
+import rotazione as ROT
+check("v468 settore IN TENDENZA solo con prezzo sopra la 200 E media 50 in salita",
+      ROT.stato_settore(110, 100, 1.0) == "IN TENDENZA" and ROT.stato_settore(110, 100, -1.0) == "MISTO"
+      and ROT.stato_settore(90, 100, -1.0) == "IN RIBASSO" and ROT.stato_settore(None, 100, 1.0) == "NON MISURABILE")
+_st = lambda d50, corr, px=110, s200=100, p=1.0: ROT.stato_titolo(px, s200, p, d50, corr)
+check("v468 stato del titolo: ogni ramo raggiungibile (v234)",
+      _st(0.5, 0.1) == "CANDIDATO" and _st(3.5, 0.1) == "ESTESO" and _st(2.5, 0.1) == "TIRATO"
+      and _st(-1.5, 0.1) == "DEBOLE" and _st(0.5, 0.1, p=-0.5) == "DEBOLE"
+      and _st(0.5, 0.1, px=90) == "SOTTO LA 200" and _st(0.5, 0.7) == "LEGATO AL LIBRO"
+      and _st(None, 0.1) == "NON MISURABILE" and _st(0.5, None).startswith("CANDIDATO (correlazione non"))
+check("v468 un nome molto correlato al libro NON e' candidato: non aggiunge una scommessa (v410)",
+      _st(0.5, ROT.SOGLIA_CORR) == "LEGATO AL LIBRO" and _st(0.5, ROT.SOGLIA_CORR - 0.01) == "CANDIDATO")
+# correlazione allineata per DATA, mai per posizione (v207): stesse serie, una con un buco.
+import random as _rnd
+_r = _rnd.Random(7)
+_date = [f"2026-{m:02d}-{g:02d}" for m in range(1, 7) for g in range(1, 21)]
+_a = {t: _r.gauss(0, 0.01) for t in _date}
+_b = dict(_a); del _b[_date[100]]   # dentro la finestra delle ultime 60 date: fuori non discrimina
+check("v468 correlazione per DATA: un buco in una serie non sfasa le altre (identiche -> 1)",
+      abs(ROT.correlazione(_a, _b) - 1) < 1e-9, str(ROT.correlazione(_a, _b)))
+check("v468 sotto 30 date comuni la correlazione e' un buco, non un numero",
+      ROT.correlazione({t: _a[t] for t in _date[:20]}, _a) is None)
+_bp = {"AAA": [{"t": "d1", "c": 100}, {"t": "d2", "c": 110}, {"t": "d3", "c": 121}],
+       "BBB": [{"t": "d1", "c": 50}, {"t": "d3", "c": 50}]}
+_sl = ROT.serie_libro(_bp, {"AAA": 1, "BBB": 2})
+check("v468 serie del libro: un titolo senza la data esce da quella data, non vale zero (v205)",
+      abs(_sl["d2"] - math.log(1.1)) < 1e-9, str(_sl))
+check("v468 senza la composizione degli ETF lo dice, non tace (v406)",
+      "NON DISPONIBILE" in "\n".join(ROT.righe({"universo_assente": True})))
+check("v468 i prezzi si scrivono con la virgola decimale (v442)", ROT.prezzo(1045.56) == "1.045,56")
+_src_rot = Path(__file__).with_name("rotazione.py").read_text()
+check("v468 l'universo viene dalla composizione dichiarata (macro.tilt), non da un elenco a mano (C10)",
+      "tilt" in _corpo_di(_src_rot, "raccogli") and "prime" in _corpo_di(_src_rot, "raccogli"))
+check("v468 le posizioni vengono da LIBRO.md (v439)", "leggi_libro()" in _corpo_di(_src_rot, "raccogli"))
+_fa = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text()
+check("v468 la rotazione e' nel formato dell'analisi giornaliera (collegamento, v399)",
+      "rotazione.py" in _fa)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

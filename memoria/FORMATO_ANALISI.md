@@ -21,6 +21,11 @@ alla misura di un giorno.
    misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
    NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
 4. Ricerca web sulle notizie che spiegano i movimenti, con fonte e data.
+5. `python3 scripts/rotazione.py` (v468, istruzione del CEO del 07/10: *"questa analisi deve
+   essere strutturale e aggiunta sempre"*) — i 21 ETF settoriali e i primi cinque titoli di
+   ciascuno su prezzi DI OGGI, con distanza dalle medie in ATR, supporto/resistenza e
+   correlazione col libro. ⚠ Mai la tabella `macro.tilt` della pipeline per i numeri: è ferma
+   al proprio run. Da lì viene solo la composizione degli ETF.
 
 ## Cosa contiene la risposta, in quest'ordine
 0. **Semaforo d'uscita** (decisione del CEO del 06/10): il colore di oggi in UNA riga, con i
@@ -44,6 +49,12 @@ alla misura di un giorno.
    Treasury 10 anni 5,0 / 5,4), trimestrali e Fed nei prossimi giorni.
 6. **Piano con soglie** — stato di ciascuna condizione già decisa (BE 295-302, AMD respinto a 645, RGTI sotto 14,41,
    MU 1.100-1.108 con la compensazione RGTI, i supporti di protezione).
+
+7. **Watchlist e rotazione** (sempre, v468) — a) i settori IN TENDENZA con bassa correlazione
+   col libro (dove il denaro va senza replicare la nostra scommessa); b) per ciascuno i titoli
+   CANDIDATI di `rotazione.py`, coi livelli; c) i nomi già in watchlist: chi è nella propria
+   zona d'ingresso, chi è ESTESO (si aspetta), chi è sotto la 200 (non si entra). Il semaforo
+   decide cosa è ammesso: in giallo niente nuovi semiconduttori.
 
 ## Regole
 - Direzione, priorità e livelli sì; le quantità solo come aritmetica dichiarata (v439).

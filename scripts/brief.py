@@ -142,12 +142,16 @@ def sma(d, n):
     return sum(x["c"] for x in d[-n:]) / n if len(d) >= n else None
 
 
-def tecnica(tk):
-    """Tutto cio' che si puo' AFFERMARE su un titolo dalle sue barre vere. Niente altro."""
-    try:
-        d = barre(tk)
-    except Exception as e:
-        return {"tk": tk, "errore": str(e)[:80]}
+def tecnica(tk, d=None):
+    """Tutto cio' che si puo' AFFERMARE su un titolo dalle sue barre vere. Niente altro.
+    d: barre gia' scaricate (v468, rotazione.py) — evita di chiederle due volte alla fonte."""
+    if d is None:
+        try:
+            d = barre(tk)
+        except Exception as e:
+            return {"tk": tk, "errore": str(e)[:80]}
+    if not d:
+        return {"tk": tk, "errore": "nessuna barra"}
     try:
         q = quota(tk)
     except Exception:

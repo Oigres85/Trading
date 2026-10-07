@@ -76,6 +76,18 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | PANW | Palo Alto Networks — sicurezza informatica (CEO, 07/10/2026). Vicino al massimo, ~3 ATR sopra la SMA50 (~366): attendere un ritorno verso la SMA50 |
 | NET | Cloudflare — rete e sicurezza edge (CEO, 07/10/2026). ~3 ATR sopra la SMA50 (~311): attendere un ritorno verso la SMA50 |
 | DDOG | Datadog — monitoraggio cloud (CEO, 07/10/2026). ~3 ATR sopra la SMA50 (~246): attendere un ritorno verso la SMA50 |
+| XOM | Exxon Mobil — energia (rotazione, CEO 07/10/2026). Settore in tendenza e correlazione negativa col libro: copre lo scenario petrolio→inflazione→tassi. Supporto 20 sedute 155,85 |
+| CVX | Chevron — energia (rotazione, CEO 07/10/2026). Supporto 20 sedute 200,78 |
+| COP | ConocoPhillips — energia, produzione pura (rotazione, CEO 07/10/2026). Sulla SMA50; supporto 123,46 |
+| ABBV | AbbVie — salute (rotazione, CEO 07/10/2026). Sopra le medie, vicino alla resistenza 269,39: ingresso su ritorno verso la SMA50; supporto 246,77 |
+| MRK | Merck — salute (rotazione, CEO 07/10/2026). Sulla SMA50; supporto 138,80 |
+| GILD | Gilead — farmaceutico (rotazione, CEO 07/10/2026). Sulla SMA50, supporto 142,60 a 0,5 ATR |
+| AMGN | Amgen — farmaceutico (rotazione, CEO 07/10/2026). Poco sotto la SMA50; supporto 374,46 |
+| V | Visa — finanziari/pagamenti (rotazione, CEO 07/10/2026). Settore finanziario debole, Visa sopra le medie; supporto 356,75 |
+| MA | Mastercard — finanziari/pagamenti (rotazione, CEO 07/10/2026). Poco sotto la SMA50; supporto 545,40. Stessa scommessa di V: uno dei due, non entrambi |
+| PM | Philip Morris — consumi difensivi (rotazione, CEO 07/10/2026). Correlazione col libro la piu' negativa del gruppo; supporto 181,55 |
+| DE | Deere — industriali (rotazione, CEO 07/10/2026). Settore in ribasso, DE in tendenza propria; supporto 644,06 |
+| DIS | Disney — comunicazioni (rotazione, CEO 07/10/2026). Appena sopra la SMA200; supporto 101,15 |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'

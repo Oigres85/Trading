@@ -187,6 +187,11 @@ blocchi per titolo che la pipeline pubblica (sensibilità ai canali col loro R²
 autonomia di cassa, short, depositi SEC) per ogni nome di `memoria/LIBRO.md`. Il rapporto di
 questo comando li legge già per intero dal pacchetto.
 
+`scripts/rotazione.py` resta **fuori** per la stessa ragione di `numeri_libro.py`: è il blocco
+della rotazione settoriale e dei possibili ingressi che l'analisi in chat riporta sempre (v468),
+su prezzi di oggi; eseguirlo qui affiancherebbe una seconda resa della rotazione a quella del
+rapporto.
+
 `scripts/modifica_sicura.py` non è un passo di questo comando: è la libreria che ogni modifica ai
 sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf.py` è la libreria
 che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed

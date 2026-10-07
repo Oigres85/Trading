@@ -6175,3 +6175,31 @@ Quattro iniezioni (soglia diversa, ignoti fra gli autofinanziati, quota sul nume
 collegamento tolto): mordono tutte, ripristino da snapshot verificato per hash.
 Il 07/10: gruppo MSTR, CRWV, RGTI = 15,1% · 2 condizioni su 3 (CCC, rendimento peggiore) · spenta.
 
+## 🔄 v468 — LA ROTAZIONE SU PREZZI DI OGGI, E PER SINGOLI TITOLI
+
+Rilievo del CEO sulla prima versione dell'analisi di rotazione: *"Dati della pipeline alla
+chiusura del 05/10 → no, servono dati aggiornati"*, e poi *"questa analisi deve essere
+strutturale e aggiunta sempre"*. Aveva ragione: avevo letto `macro.tilt`, che è fermo al run.
+
+`scripts/rotazione.py`: una grandezza, un proprietario (v436). La **composizione** degli ETF (i
+primi cinque titoli per peso) viene da `macro.tilt` perché la dichiara l'emittente e cambia
+lentamente — un elenco di nomi scritto qui invecchierebbe da solo (C10). I **prezzi** vengono da
+stockanalysis.com, di oggi, come `brief.py`. Le posizioni da `LIBRO.md` (v439).
+
+⚠ Gli stati (IN TENDENZA, CANDIDATO, ESTESO, LEGATO AL LIBRO…) sono **convenzioni dichiarate**
+in testa allo script (v240), non punteggi: nessuna classifica (v200). Un candidato richiede
+correlazione col libro sotto 0,5 — un nome che si muove con i semiconduttori non è una
+rotazione, è la stessa scommessa (v410).
+
+⚠ `brief.tecnica` prende ora le barre già scaricate (`d=`): senza, ogni titolo le chiedeva due
+volte alla fonte. 21 ETF + ~95 titoli in 16 secondi.
+⚠ Le classi di azioni (`BRK-B`) la fonte le scrive col punto: si prova anche quella forma prima
+di dichiarare il titolo non letto. I titoli esteri (`.TA`) restano dichiarati non letti.
+⚠ Dodici nomi aggiunti alla watchlist su richiesta (energia, salute, farmaceutico, pagamenti,
+difensivi, industriali, comunicazioni): ⚠ **il costo in CI va misurato al primo run**, come per
+la v462 — ogni simbolo costa chiamate Yahoo e la quota è per IP.
+Il censimento v387 ha morso al primo giro, come previsto; il collegamento al formato
+dell'analisi ha un gate proprio.
+⚠ E un'iniezione non mordeva perche' il buco della fixture cadeva FUORI dalla finestra delle
+ultime 60 date: il gate non conteneva il fenomeno (v430). Spostato dentro, morde.
+
