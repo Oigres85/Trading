@@ -1665,6 +1665,64 @@ check("v470 la pagina rende le STESSE ore del testo, e dichiara il blocco mancan
       and "10 anni (riapertura)" in _h470 and "39 mld $" in _h470
       and "Aste non lette in questo run" in _pagmod470.genera(_pag470b))
 
+
+# ============================ v471 — TARGET, BETA, VOLATILITA', VOLUMI CONCLUSI ============================
+# Richiesta del CEO (07/10/2026): nella sezione 7 target, movimento a un mese, volumi e beta.
+# E il difetto dei volumi trovato lo stesso giorno: a borsa aperta la barra di OGGI e' in
+# formazione e dava 0,03-0,3x la media su tutti i titoli. Lo stato si COSTRUISCE (v425).
+from datetime import datetime as _dt471
+_NY = ROT.brief.NEW_YORK
+_vb471 = [{"t": f"2026-06-{(i % 28) + 1:02d}" if i < 99 else "x", "c": 100, "v": 1000} for i in range(101)]
+for _i in range(101):
+    _vb471[_i]["t"] = f"2026-{6 + _i // 30:02d}-{(_i % 30) + 1:02d}"
+_vb471[-1] = {"t": "2026-10-07", "c": 100, "v": 50}        # la barra di oggi, appena iniziata
+_vb471[-2] = {"t": "2026-10-06", "c": 100, "v": 3000}      # l'ultima seduta conclusa
+_alle11 = _dt471(2026, 10, 7, 11, 0, tzinfo=_NY)
+_alle17 = _dt471(2026, 10, 7, 17, 0, tzinfo=_NY)
+check("v471 a borsa aperta la barra di oggi e' in formazione, dopo la campana no",
+      ROT.seduta_in_corso(_vb471, _alle11) is True and ROT.seduta_in_corso(_vb471, _alle17) is False
+      and ROT.seduta_in_corso(_vb471, _dt471(2026, 10, 8, 11, 0, tzinfo=_NY)) is False)
+_v11 = ROT.volumi(_vb471, _alle11)
+check("v471 i volumi parlano dell'ultima seduta CONCLUSA, non di quella in corso",
+      _v11["vol_seduta"] == "2026-10-06" and abs(_v11["vol_ultima_rel"] - 3.0) < 1e-9, str(_v11))
+_v17 = ROT.volumi(_vb471, _alle17)
+check("v471 dopo la campana la seduta di oggi e' conclusa e conta",
+      _v17["vol_seduta"] == "2026-10-07" and _v17["vol_ultima_rel"] < 0.1, str(_v17))
+
+# Beta: un titolo che fa il doppio del mercato ha beta 2 e R2 1, anche con una data mancante
+# (allineamento per DATA, v207); sotto 60 date comuni non e' una misura.
+_rm = {f"d{i:03d}": ((i * 37) % 11 - 5) / 1000 for i in range(200)}
+_rt = {k: 2 * v for k, v in _rm.items() if k != "d100"}
+_b, _r2, _nb = ROT.beta_mercato(_rt, _rm)
+check("v471 beta sull'S&P 500 allineato per data, col suo R2",
+      _b is not None and abs(_b - 2) < 1e-9 and abs(_r2 - 1) < 1e-9 and _nb == 199, f"{_b} {_r2} {_nb}")
+check("v471 sotto 60 date comuni il beta e' un buco, non un numero",
+      ROT.beta_mercato({k: _rt[k] for k in list(_rt)[:40]}, _rm)[0] is None)
+_alt = {f"d{i:03d}": (0.01 if i % 2 else -0.01) for i in range(250)}
+check("v471 volatilita' annua = deviazione giornaliera x radice di 252",
+      abs(ROT.vol_annua(_alt) - 0.01 * (250 / 249) ** 0.5 * 252 ** 0.5 * 100) < 1e-6, str(ROT.vol_annua(_alt)))
+
+# Target: dalla pipeline, e se il titolo non e' seguito si DICHIARA (v396)
+_tg = ROT.target_pipeline({"watchlist": [{"ticker": "AAA", "analisti": {"target_mediana": 120, "target_min": 90,
+                                                                        "target_max": 150}},
+                                         {"ticker": "BBB", "analisti": {}}]})
+check("v471 il target viene dalla pipeline e chi non ce l'ha non riceve un numero",
+      _tg == {"AAA": {"mediana": 120, "min": 90, "max": 150}}, str(_tg))
+_rtb_si = ROT.riga_target_beta({"target": _tg["AAA"], "target_dist": 20.0, "beta_spy": 1.5, "r2_spy": 0.3,
+                                "sedute_beta": 250, "vol_annua": 40})
+_rtb_no = ROT.riga_target_beta({"target": None, "beta_spy": None})
+check("v471 la riga porta target con distanza, beta col suo R2 e campione, volatilita'",
+      "120,00 (+20,0% dal prezzo)" in _rtb_si and "beta S&P 500 1,50 (R2 0,30, 250 sedute)" in _rtb_si
+      and "40%" in _rtb_si, _rtb_si)
+check("v471 senza target e senza beta la riga lo dichiara",
+      "titolo non seguito dalla pipeline" in _rtb_no and "beta S&P 500 n.d." in _rtb_no, _rtb_no)
+
+# Collegamento, non controllo (v399, v443)
+_racc471 = _corpo_di(_src_rot, "raccogli")
+check("v471 la scheda riceve la serie dell'S&P 500 e i target, e la watchlist esce di default",
+      'rendimenti_per_data(B["SPY"])' in _racc471 and "scheda(tk, B.get(tk), rlibro, rspy, target)" in _racc471
+      and "righe_watchlist(o)" in _src_rot.split("if __name__")[-1] and "riga_target_beta(t)" in _corpo_di(_src_rot, "righe_candidati"))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

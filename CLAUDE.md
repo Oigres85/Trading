@@ -6270,3 +6270,27 @@ ora sotto un nome proprio. Due variabili omonime con tipi diversi: classe v393.
   cartella del repo). Non promettere di "guardare le sue schede" da qui.
 - **FMP** (connettore collegato): l'endpoint `economics` — il calendario macro con le attese —
   risponde *ACCESS DENIED*, richiede un piano a pagamento. Non riprovare.
+
+## 🎯 v471 — TARGET, BETA E VOLATILITÀ NELLA SEZIONE 7, E I VOLUMI DELLA SEDUTA IN CORSO
+
+Richiesta del CEO (07/10/2026): per watchlist e rotazione *"anche il target, la % di movimento
+nel mese del prezzo, i volumi ed il beta di volatilità"*. `rotazione.py` porta ora, per ogni
+candidato e per ogni sorvegliato di `LIBRO.md`:
+- **target** degli analisti dalla **pipeline** (`analisti.target_mediana/min/max`, con la data
+  del run): stockanalysis non lo espone (404 sui tre endpoint provati). Un titolo non seguito
+  dalla pipeline **dichiara** di non averlo invece di ricevere un numero (v396);
+- **beta sull'S&P 500** (SPY) su 250 sedute allineate **per data** (v207), **col suo R² e il
+  campione** (v316) — sotto 60 date comuni è un buco; più la **volatilità annua**;
+- i **volumi dell'ultima seduta CONCLUSA**.
+
+⚠⚠ **Il difetto dei volumi era mio, della v469**: l'etichetta diceva «ultima seduta CONCLUSA» e a
+borsa aperta il codice leggeva la barra di OGGI, in formazione — alle 09:46 di New York tutti i
+titoli risultavano a 0,03-0,3 volte la media, cioè un crollo d'interesse inesistente. Classe
+v431/v459: l'etichetta afferma più del dato. Ora `seduta_in_corso()` toglie quella barra, col fuso
+(v470), e la riga dice di quale seduta parla.
+
+⚠ Un'iniezione **non mordeva**: il collegamento cercava `righe_watchlist(o)` nel sorgente, che
+lo contiene per forza nella definizione. Ancoraggio aperto e gate che trova sé stesso insieme;
+stretto al blocco `__main__`, morde. L'iniezione del beta per posizione morde per **eccezione**
+(KeyError), non per un check: il difetto sarebbe rumoroso comunque.
+⚠ Sei iniezioni, ripristino da snapshot verificato per hash (v430).

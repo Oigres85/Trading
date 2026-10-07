@@ -24,6 +24,7 @@ Nessun punteggio, nessuna classifica: l'ordine dei settori e' il rendimento a 3 
 un fatto, e dentro un settore l'ordine e' quello del peso nell'ETF, dichiarato dall'emittente.
 """
 import argparse, json, math, os, sys
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -36,6 +37,57 @@ CAND_SOPRA_ATR = 2.0
 CAND_SOTTO_ATR = -1.0
 ESTESO_ATR = 3.0
 PENDENZA_SEDUTE = 20
+
+
+SEDUTE_BETA = 250
+
+
+def seduta_in_corso(barre, adesso=None):
+    """Vero se l'ultima barra e' quella di OGGI a New York e la campana delle 16:00 non e' ancora
+    suonata: quella barra e' in formazione (v439, v469). Il fuso, mai uno scarto a mano (v470)."""
+    if not barre:
+        return False
+    adesso = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
+    return barre[-1]["t"] == adesso.date().isoformat() and adesso.hour < 16
+
+
+def beta_mercato(rt, rm, n=SEDUTE_BETA):
+    """Beta del titolo sull'S&P 500 (SPY) e il suo R2, sulle ultime n date COMUNI (v207): quanto
+    il titolo amplifica il mercato. Un beta senza R2 e' mezzo numero (v316). Sotto 60 date
+    comuni non e' una misura: None."""
+    comuni = sorted(set(rt) & set(rm))[-n:]
+    if len(comuni) < 60:
+        return None, None, len(comuni)
+    x = [rm[t] for t in comuni]; y = [rt[t] for t in comuni]
+    mx, my = sum(x) / len(x), sum(y) / len(y)
+    vx = sum((v - mx) ** 2 for v in x); vy = sum((v - my) ** 2 for v in y)
+    if not vx or not vy:
+        return None, None, len(comuni)
+    cov = sum((a - mx) * (b - my) for a, b in zip(x, y))
+    return cov / vx, cov * cov / (vx * vy), len(comuni)
+
+
+def vol_annua(rt, n=SEDUTE_BETA):
+    """Volatilita' annualizzata in %: deviazione dei rendimenti giornalieri x radice di 252
+    (convenzione dichiarata: sedute indipendenti)."""
+    r = [rt[t] for t in sorted(rt)][-n:]
+    if len(r) < 60:
+        return None
+    m = sum(r) / len(r)
+    return math.sqrt(sum((v - m) ** 2 for v in r) / (len(r) - 1)) * math.sqrt(252) * 100
+
+
+def target_pipeline(dati):
+    """Prezzo obiettivo degli analisti dalla pipeline (data.json, analisti.target_*): e' la
+    fonte gia' sorvegliata, e porta la data del proprio run. Un titolo che la pipeline non segue
+    NON ha un target qui: si dichiara, non si inventa (v396)."""
+    out = {}
+    for r in (dati.get("watchlist") or []) + (dati.get("portfolio") or []):
+        a = r.get("analisti") or {}
+        if a.get("target_mediana") is not None:
+            out[r.get("ticker")] = {"mediana": a.get("target_mediana"), "min": a.get("target_min"),
+                                    "max": a.get("target_max")}
+    return out
 
 
 def rendimenti_per_data(barre):
@@ -138,10 +190,15 @@ def rsi_wilder(barre, n=14):
     return 100.0 if p == 0 else 100 - 100 / (1 + g / p)
 
 
-def volumi(barre):
+def volumi(barre, adesso=None):
     """Volume dell'ultima seduta CONCLUSA contro la media delle 20 precedenti, e media delle
     ultime 20 contro quella delle 60: la prima dice se l'ultima seduta e' stata partecipata,
-    la seconda se l'interesse sta crescendo. Sedute senza volume escono dal conto (v205)."""
+    la seconda se l'interesse sta crescendo. Sedute senza volume escono dal conto (v205).
+    ⚠ v471 — a borsa aperta l'ultima barra e' quella di OGGI, in formazione: il 07/10 alle 09:46
+    di New York dava 0,03-0,3x la media su tutti i titoli, cioe' un crollo d'interesse che non
+    c'era. Quella barra si toglie, e la riga dice di quale seduta parla."""
+    if seduta_in_corso(barre, adesso):
+        barre = barre[:-1]
     v = [x.get("v") for x in barre]
     if len(v) < 81 or any(x is None for x in v[-81:]):
         return {"vol_ultima_rel": None, "vol_20_su_60": None, "vol_seduta": None}
@@ -152,12 +209,16 @@ def volumi(barre):
             "vol_20_su_60": m20 / m60 if m60 else None, "vol_seduta": barre[-1]["t"]}
 
 
-def scheda(tk, barre, rlibro):
+def scheda(tk, barre, rlibro, rspy=None, target=None):
     t = brief.tecnica(tk, d=barre) if barre else {"tk": tk, "errore": "nessuna barra"}
     if t.get("errore"):
         return {"tk": tk, "errore": t["errore"]}
     pend = pendenza_sma50(barre)
-    corr = correlazione(rendimenti_per_data(barre), rlibro)
+    rt = rendimenti_per_data(barre)
+    corr = correlazione(rt, rlibro)
+    beta, r2, nb = beta_mercato(rt, rspy or {})
+    tg = (target or {}).get(tk)
+    tg_dist = (tg["mediana"] / t["px"] - 1) * 100 if tg and t.get("px") else None
     return {"tk": tk, "px": t["px"], "seduta": t.get("seduta_quota") or t["seduta"],
             "m1": variazione(barre, 21), "m3": variazione(barre, 63),
             "d50_atr": t["d50_atr"], "d200_atr": t["d200_atr"], "pend50": pend,
@@ -165,7 +226,8 @@ def scheda(tk, barre, rlibro):
             "res_atr": t["res_atr"], "dmax52": t["dmax52_pct"], "corr_libro": corr,
             "sma200": t["sma200"], "sma20": t["sma20"], "sma50": t["sma50"],
             "d20_atr": t["d20_atr"], "atr_pct": t["atr_pct"], "rsi": rsi_wilder(barre),
-            "max52": t["max52"], **volumi(barre)}
+            "max52": t["max52"], "beta_spy": beta, "r2_spy": r2, "sedute_beta": nb,
+            "vol_annua": vol_annua(rt), "target": tg, "target_dist": tg_dist, **volumi(barre)}
 
 
 def _barre_sicure(tk):
@@ -188,14 +250,17 @@ def raccogli():
         d = json.loads((Path(brief.RADICE) / "data" / "data.json").read_text(encoding="utf-8").replace("NaN", "null"))
         tilt = (d.get("macro") or {}).get("tilt") or []
     except (OSError, ValueError):
-        tilt = []
+        tilt, d = [], {}
+    target = target_pipeline(d)
+    asof_target = d.get("updated_at")
     nomi = sorted({p["tk"] for r in tilt for p in (r.get("prime") or [])})
-    tutti = sorted(set(qta) | {r["ticker"] for r in tilt} | set(nomi))
+    tutti = sorted(set(qta) | {r["ticker"] for r in tilt} | set(nomi) | {s["tk"] for s in sorv} | {"SPY"})
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
         B = dict(zip(tutti, ex.map(_barre_sicure, tutti)))
     rlibro = serie_libro({tk: B.get(tk) for tk in qta if B.get(tk)}, qta)
+    rspy = rendimenti_per_data(B["SPY"]) if B.get("SPY") else {}
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
-        S = dict(zip(tutti, ex.map(lambda tk: scheda(tk, B.get(tk), rlibro), tutti)))
+        S = dict(zip(tutti, ex.map(lambda tk: scheda(tk, B.get(tk), rlibro, rspy, target), tutti)))
     seguiti = set(qta) | {s["tk"] for s in sorv}
     settori = []
     for r in tilt:
@@ -210,8 +275,13 @@ def raccogli():
                                     "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"),
                                              x.get("pend50"), x.get("d50_atr"), x.get("corr_libro")))(S.get(p["tk"]) or {}))}
                                    for p in (r.get("prime") or [])]})
+    watch = [{**(S.get(s["tk"]) or {"tk": s["tk"], "errore": "non letto"}),
+              "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"), x.get("pend50"),
+                                                  x.get("d50_atr"), x.get("corr_libro")))(S.get(s["tk"]) or {}))}
+             for s in sorv]
     return {"settori": settori, "universo_assente": not tilt, "libro": sorted(qta),
-            "libro_sedute": len(rlibro)}
+            "libro_sedute": len(rlibro), "watchlist": watch, "asof_target": asof_target,
+            "spy_assente": not rspy}
 
 
 def n(x, d=1, s=""):
@@ -252,6 +322,46 @@ def righe(o):
     return L
 
 
+def riga_target_beta(t):
+    """Target, beta e volatilita' in una riga (v471, richiesta del CEO del 07/10/2026). Il beta
+    viaggia col suo R2 e il campione (v316); il target dice da dove viene, e se manca lo dice."""
+    tg = t.get("target")
+    if tg:
+        ttxt = (f"target analisti (pipeline) mediana {prezzo(tg['mediana'])} ({n(t.get('target_dist'),1,'%')} dal "
+                f"prezzo) · forchetta {prezzo(tg.get('min'))}-{prezzo(tg.get('max'))}")
+    else:
+        ttxt = "target: n.d. — titolo non seguito dalla pipeline, il sistema non ha la stima degli analisti"
+    b = t.get("beta_spy")
+    btxt = ("beta S&P 500 n.d. (storia comune insufficiente)" if b is None else
+            f"beta S&P 500 {piano(b, 2)} (R2 {piano(t.get('r2_spy'), 2)}, {t.get('sedute_beta')} sedute)")
+    return f"{ttxt} · {btxt} · volatilita' annua {piano(t.get('vol_annua'), 0)}%"
+
+
+def riga_volumi(t):
+    vr, vt = t.get("vol_ultima_rel"), t.get("vol_20_su_60")
+    return (f"volumi: seduta conclusa del {t.get('vol_seduta') or 'n.d.'} "
+            f"{'n.d.' if vr is None else format(vr, '.2f').replace('.', ',') + 'x la media a 20'} · media 20 "
+            f"{'n.d.' if vt is None else format(vt, '.2f').replace('.', ',') + 'x la media a 60'}")
+
+
+def righe_watchlist(o):
+    """I sorvegliati del libro (memoria/LIBRO.md) con la stessa misura dei candidati (v471): la
+    sezione 7 dell'analisi li riporta sempre."""
+    w = o.get("watchlist") or []
+    L = [f"WATCHLIST DEL LIBRO — {len(w)} nomi · target dalla pipeline (run {o.get('asof_target') or 'n.d.'}) · "
+         "beta e volatilita' su un anno di sedute (stockanalysis.com) · stati = convenzioni in testa allo script"]
+    if o.get("spy_assente"):
+        L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
+    for t in w:
+        if t.get("errore"):
+            L.append(f"   {t['tk']:6} non letto ({t['errore']})"); continue
+        L.append(f"   {t['tk']:6} {prezzo(t['px'])} · {t['stato']} · 1m {n(t['m1'],1,'%')} · 3m {n(t['m3'],1,'%')} · "
+                 f"media50 {n(t['d50_atr'],1)} ATR · supp {prezzo(t['supp'])} · res {prezzo(t['res'])}")
+        L.append(f"          {riga_target_beta(t)}")
+        L.append(f"          {riga_volumi(t)} · corr libro {n(t.get('corr_libro'),2)}")
+    return L
+
+
 def e_candidato(t):
     return str(t.get("stato", "")).startswith("CANDIDATO") and not t.get("nel_libro")
 
@@ -274,7 +384,7 @@ def righe_candidati(o, news, giorni=7):
     if o["universo_assente"]:
         return righe(o)[:1]
     L = ["CANDIDATI PER SETTORE — prezzi di oggi (stockanalysis.com) · stati = convenzioni in testa "
-         "allo script · volumi sull'ultima seduta CONCLUSA · notizie: feed Nasdaq del simbolo, ultimi "
+         "allo script · volumi sull'ultima seduta CONCLUSA (quella in corso esclusa) · notizie: feed Nasdaq del simbolo, ultimi "
          f"{giorni} giorni ([TK] = trovata nel feed di TK, non 'notizia su TK')"]
     for s in sorted(o["settori"], key=lambda s: -(s.get("m3") if s.get("m3") is not None else -1e9)):
         cand = [t for t in s["titoli"] if e_candidato(t)]
@@ -288,12 +398,10 @@ def righe_candidati(o, news, giorni=7):
             L.append(f"      medie: 20 {prezzo(t.get('sma20'))} ({n(t.get('d20_atr'),1)} ATR) · 50 {prezzo(t.get('sma50'))} "
                      f"({n(t['d50_atr'],1)} ATR, pendenza {n(t['pend50'],1,'%')} in 20 sedute) · 200 {prezzo(t['sma200'])} "
                      f"({n(t['d200_atr'],1)} ATR)")
-            vr, vt = t.get("vol_ultima_rel"), t.get("vol_20_su_60")
             L.append(f"      livelli: supporto 20s {prezzo(t['supp'])} ({n(t['supp_atr'],1)} ATR) · resistenza 20s "
-                     f"{prezzo(t['res'])} ({n(t['res_atr'],1)} ATR) · volumi: seduta del {t.get('vol_seduta') or 'n.d.'} "
-                     f"{'n.d.' if vr is None else format(vr, '.2f').replace('.', ',') + 'x la media a 20'} · media 20 "
-                     f"{'n.d.' if vt is None else format(vt, '.2f').replace('.', ',') + 'x la media a 60'} · "
+                     f"{prezzo(t['res'])} ({n(t['res_atr'],1)} ATR) · {riga_volumi(t)} · "
                      f"corr libro {n(t['corr_libro'],2)}")
+            L.append(f"      {riga_target_beta(t)}")
             nw = news.get(t["tk"]) or {"stato": "non richiesto", "voci": []}
             if nw["stato"] != "ok":
                 L.append(f"      notizie: feed NON letto ({nw['stato']}) — non vuol dire 'nessuna notizia'")
@@ -316,3 +424,5 @@ if __name__ == "__main__":
         print("\n".join(righe(o)))
     else:
         print("\n".join(righe_candidati(o, notizie_candidati(o))))
+        print()
+        print("\n".join(righe_watchlist(o)))
