@@ -62,8 +62,8 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | MSFT | Microsoft — in watchlist del CEO |
 | AAPL | Apple — in watchlist del CEO |
 | META | Meta — in watchlist del CEO |
-| CRM | Salesforce — software applicativo, pressione da agenti AI |
-| NOW | ServiceNow — software applicativo, pressione da agenti AI |
+| CRM | Salesforce — software applicativo, pressione da agenti AI. Zona d'ingresso 221-228 (supporto a 20 sedute 221,18), correlazione col libro 0-0,3 (CEO, 06/10/2026); uscita sotto il supporto |
+| NOW | ServiceNow — software applicativo, pressione da agenti AI. Zona d'ingresso 130-136 (supporto a 20 sedute 126,75), correlazione col libro 0-0,3 (CEO, 06/10/2026); uscita sotto il supporto |
 | AVGO | Broadcom — chip su misura e reti per AI |
 | ASML | ASML — litografia, fornitore unico di EUV |
 | NKE | Nike — conti del 01/10 deboli, sotto il minimo a 52 settimane; non entrare |
@@ -71,6 +71,11 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | MCD | McDonald's — difensivo vicino ai minimi; aspettare la fine della discesa |
 | CCJ | Cameco — uranio (CEO, 04/10/2026). Sotto SMA50 e SMA200, −37% dal massimo a 52 settimane; a 0,4 ATR dal supporto 83,80. Correlazione col libro ~0,5. Trimestrale 04/11 |
 | TTWO | Take-Two — videogiochi (CEO, 04/10/2026). Unico con correlazione ~0 col libro (SMH 0,05, MU −0,02): diversifica davvero. Sotto le medie, a 0,5 ATR dal supporto 199,46. Trimestrale 05/11 |
+| ANET | Arista — reti per datacenter AI (CEO, 07/10/2026). Al massimo a 52 settimane, ~3 ATR sopra la SMA50 (~195): ingresso solo su ritorno verso la SMA50, non all'inseguimento. Dentro il tema AI: non diversifica |
+| CRWD | CrowdStrike — sicurezza informatica (CEO, 07/10/2026). Vicino al massimo, ~5 ATR sopra la SMA50 (~224): troppo tirato, attendere un ritorno verso la SMA50 |
+| PANW | Palo Alto Networks — sicurezza informatica (CEO, 07/10/2026). Vicino al massimo, ~3 ATR sopra la SMA50 (~366): attendere un ritorno verso la SMA50 |
+| NET | Cloudflare — rete e sicurezza edge (CEO, 07/10/2026). ~3 ATR sopra la SMA50 (~311): attendere un ritorno verso la SMA50 |
+| DDOG | Datadog — monitoraggio cloud (CEO, 07/10/2026). ~3 ATR sopra la SMA50 (~246): attendere un ritorno verso la SMA50 |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'

@@ -7729,8 +7729,14 @@ check("v410 l'ordine di cercare NON scende nella coda: resta un'istruzione", suV
   if (coda.indexOf("L'UNIVERSO DA CUI IL SISTEMA POTREBBE PESCARE") < 0) {
     return "il fatto sul perimetro non e' nella coda: il check misura la regione sbagliata";
   }
-  for (const ordine of ["cerca tu", "proponi", "cercane", "individua"]) {
-    if (coda.toLowerCase().indexOf(ordine) >= 0) return "imperativo nella coda: " + ordine;
+  /* v466: si confrontano PAROLE intere. La sottostringa "individua" matchava "individuals" in un
+     titolo di Bloomberg: ancoraggio aperto, come mg-card/mg-card-head. */
+  const parole = coda.toLowerCase().split(/[^a-zàèéìòù']+/);
+  for (const ordine of ["proponi", "cercane", "individua"]) {
+    if (parole.indexOf(ordine) >= 0) return "imperativo nella coda: " + ordine;
+  }
+  for (let i = 0; i + 1 < parole.length; i++) {
+    if (parole[i] === "cerca" && parole[i + 1] === "tu") return "imperativo nella coda: cerca tu";
   }
   return true;`));
 

@@ -6136,3 +6136,20 @@ Vale UN segnale della famiglia credito (B3), e lo dice `LIBRO.md` §1ter.
 il valore di oggi nel minimo dava lo stesso risultato. Aggiunto il caso che discrimina — uno spread
 che scende sotto il minimo deve dare salita NEGATIVA, non zero. *Un'iniezione che non morde prova
 che il gate non contiene il fenomeno* (v430).
+
+## 🔎 v466 — WATCHLIST ALLARGATA, E DUE GATE CHE I DATI DI STANOTTE HANNO ACCESO
+
+Aggiunti alla watchlist su richiesta del CEO: **ANET, CRWD, PANW, NET, DDOG** (software, reti e
+sicurezza informatica), con livelli d'attesa in `LIBRO.md` §1bis; completati i livelli di CRM e NOW.
+
+Il pre-commit ha bloccato il commit, e nessuno dei due rossi era un difetto della watchlist:
+- **v410** cercava `individua` come SOTTOSTRINGA e l'ha trovata in *"individuals"*, dentro un
+  titolo di Bloomberg. **Nona incarnazione dell'ancoraggio aperto** (`mg-card`/`mg-card-head`).
+  Ora confronta PAROLE intere — senza backslash, perché il meta-gate li vieta nei template.
+  Validato reintroducendo due imperativi veri: morde su entrambi.
+- **coherence_check**: due rami della riga FedWatch scritta in v462, accesi dai dati del 07/10.
+  C2 leggeva *"il tasso effettivo di oggi —"* come una dichiarazione di freschezza (riformulato:
+  *"corrente:"*). **C14 aveva ragione a metà**: Polymarket quota un ramo solo (INVARIATO 84%) e la
+  riga taceva sul 16% restante — ora lo dichiara *"esito opposto, di direzione non quotata"*. C14
+  riconosce la forma `NON ATTRIBUIBILE` alle condizioni di `NON CALCOLABILE` più quella del
+  complemento. Validato togliendo la dichiarazione: morde.

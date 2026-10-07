@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "463";
+const BUILD_VERSION = "466";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9947,7 +9947,7 @@ function buildPrompt(opz) {
         + ` su una riunione sola, oltre la soglia di plausibilita' di tre. La riunione cade nel mese`
         + ` del contratto, quindi il limite NON e' l'orizzonte: o il contratto letto non e' quello del`
         + ` mese corrente, o la base EFFR (${fm.current_rate ?? "n.d."}%, serie MENSILE FEDFUNDS`
-        + ` rilevazione ${fm.rate_date || "n.d."}) non e' il tasso effettivo di oggi — una media`
+        + ` rilevazione ${fm.rate_date || "n.d."}) non e' il tasso effettivo corrente: una media`
         + ` mensile che contiene una riunione mescola il tasso di prima e quello di dopo. Nessuna`
         + ` delle due e' verificabile da qui; per questa riunione valgono i mercati di previsione`);
     } else if (mt.motivo === "dati") {
@@ -10017,6 +10017,12 @@ function buildPrompt(opz) {
       if (h != null) q.push(`RIALZO ${h}%`);
       if (k != null) q.push(`INVARIATO ${k}%`);
       if (c != null) q.push(`TAGLIO ${c}%`);
+      /* v466 — C14: con un ramo solo quotato, il complemento NON e' "nessun rischio": e' un
+         movimento di cui la fonte non dichiara il verso. Si dice, invece di lasciarlo dedurre. */
+      if (q.length === 1) {
+        const _v = h != null ? h : k != null ? k : c;
+        q.push(`il restante ${Math.max(0, 100 - _v)}% e' l'esito opposto, di direzione non quotata da questa fonte in questo run`);
+      }
       const att = attesaPrevisione(mt.date);
       pezzi.push(q.length
         ? `${q.join(" · ")}${att != null ? ` (attesa ${fmtNum.format(att)} movimenti da 25bp)` : ""} — e' la quotazione da usare per questa riunione`

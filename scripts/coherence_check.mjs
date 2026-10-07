@@ -481,6 +481,18 @@ function c14_codaAZero(t) {
   // rischio"; una riga che dice apertamente "questo contratto non prezza quella riunione, la
   // fonte che la prezza dice X" e' esattamente il comportamento voluto. Senza questa eccezione
   // il detector puniva la correzione che gli dava ragione.
+  /* v466: "NON ATTRIBUIBILE" (guardia di plausibilita' della v441) e' la stessa forma del limite
+     dichiarato, alla stessa condizione: nominare la fonte che quota la riunione. E se quella fonte
+     quota un ramo solo, la riga deve dire che il complemento ha direzione non quotata. */
+  if (/NON ATTRIBUIBILE/.test(riga)) {
+    const pm = (riga.split("POLYMARKET")[1] || "");
+    const nRami = (pm.match(/(RIALZO|INVARIATO|TAGLIO) \d+%/g) || []).length;
+    if (!pm) flag("C14 limite dichiarato senza alternativa", "la riga FedWatch dichiara il numero non attribuibile ma non nomina la fonte che quota quella riunione");
+    else if (nRami === 1 && !/direzione non quotata/.test(pm))
+      flag("C14 probabilità a senso unico", "Polymarket quota un solo ramo e la riga non dice che il complemento ha direzione non quotata");
+    else ok("C14 la riga FedWatch dichiara il limite e affianca la fonte che quota la riunione, con tutti i suoi rami o il complemento dichiarato");
+    return;
+  }
   if (/NON CALCOLABILE/.test(riga)) {
     if (/mercato di previsione|Nessun mercato di previsione/.test(riga))
       ok("C14 la riga FedWatch dichiara il limite di orizzonte e indica la fonte che quota davvero quella riunione");
