@@ -123,6 +123,8 @@ def calcola(sedute=1):
     out["calendario"] = brief.calendario_trimestrali(TK + [s["tk"] for s in sorv], giorni=45)
     out["macro"] = brief.macro_dalla_pipeline()
     out["attesa"] = costo_attesa(tot, ris["vol_ann"], ris["var95"], ris["es95"], out["calendario"], TK)
+    _fcf, _ccc = credito_dalla_pipeline(TK)
+    out["credito"] = dipendenti_credito([{**x, "valore": val[x["tk"]]} for x in out["titoli"]], out["tecnica"], _fcf, _ccc)
     return out
 
 
@@ -147,6 +149,86 @@ def costo_attesa(tot, vol_ann, var95, es95, calendario, nomi):
             "prima": scad[0] if scad else None,
             "finestra": (calendario or {}).get("finestra"),
             "giorni_non_letti": (calendario or {}).get("giorni_non_letti") or []}
+
+
+SOGLIA_CCC_PP = 1.5   # la stessa convenzione del semaforo (LIBRO.md §1ter), non una seconda
+
+
+def credito_dalla_pipeline(nomi):
+    """Da data.json: il SEGNO del flusso di cassa libero di ciascun nome (v404: solo segni e
+    rapporti, mai grandezze fra titoli — SKHY pubblica in won) e macro.credit_ccc.
+    None = la pipeline non lo ha; un file illeggibile da' None ovunque, mai un default."""
+    import brief
+    try:
+        d = json.loads((Path(brief.RADICE) / "data" / "data.json").read_text(encoding="utf-8").replace("NaN", "null"))
+    except (OSError, ValueError):
+        return {t: None for t in nomi}, None
+    righe = {r.get("ticker"): r for r in (d.get("portfolio") or []) + (d.get("watchlist") or [])}
+    return ({t: ((righe.get(t) or {}).get("combustione") or {}).get("fcf_ttm") for t in nomi},
+            (d.get("macro") or {}).get("credit_ccc"))
+
+
+def dipendenti_credito(titoli, tecnica, fcf, ccc):
+    """Il CCC dice se il credito peggiore si chiude NEL MERCATO; questo blocco dice se la chiusura
+    sta ARRIVANDO AL LIBRO (v467). Il gruppo e' chi ha flusso di cassa libero negativo, cioe' chi
+    deve finanziarsi fuori: il registro si muove col libro, non e' un elenco di nomi (C10).
+    ⚠ E' la STESSA famiglia del semaforo (credito): una conferma sul libro non e' un secondo
+    segnale (B3). Cambia la PRIORITA' delle protezioni su quei nomi, non il colore.
+    titoli: [{tk, peso, pnl_21}] · tecnica: [{tk, d50_atr}] · fcf: {tk: fcf o None} · ccc: macro.credit_ccc"""
+    d50 = {x["tk"]: x.get("d50_atr") for x in tecnica}
+    dip = [t for t in titoli if fcf.get(t["tk"]) is not None and fcf[t["tk"]] < 0]
+    aut = [t for t in titoli if fcf.get(t["tk"]) is not None and fcf[t["tk"]] >= 0]
+    ignoti = [t["tk"] for t in titoli if fcf.get(t["tk"]) is None]
+
+    def rend(gr):
+        # rendimento a 21 sedute del gruppo, pesato: P&L su valore iniziale (valore - P&L).
+        # Un nome senza P&L a 21 sedute e' un buco, non uno zero (v205): esce dalla base.
+        ok = [t for t in gr if t.get("pnl_21") is not None]
+        if not ok:
+            return None
+        pnl = sum(t["pnl_21"] for t in ok)
+        tot = sum(t["valore"] for t in ok)
+        return pnl / (tot - pnl) if tot - pnl else None
+
+    peso_dip = sum(t["peso"] for t in dip)
+    misurati = [t for t in dip if d50.get(t["tk"]) is not None]
+    sotto = [t for t in misurati if d50[t["tk"]] < 0]
+    quota_sotto = (sum(t["peso"] for t in sotto) / sum(t["peso"] for t in misurati)) if misurati else None
+    r_dip, r_aut = rend(dip), rend(aut)
+    salita = (ccc or {}).get("salita_60_pp")
+    cond = {"ccc": salita is not None and salita >= SOGLIA_CCC_PP,
+            "sotto_media": quota_sotto is not None and quota_sotto > 0.5,
+            "peggio": r_dip is not None and r_aut is not None and r_dip < r_aut}
+    misurabile = salita is not None and quota_sotto is not None and r_dip is not None and r_aut is not None
+    return {"dipendenti": [{"tk": t["tk"], "peso": t["peso"], "d50_atr": d50.get(t["tk"])} for t in dip],
+            "peso_dipendenti": peso_dip, "ignoti": ignoti, "quota_sotto_50": quota_sotto,
+            "ret21_dipendenti": r_dip, "ret21_autofinanziati": r_aut, "salita_ccc": salita,
+            "condizioni": cond, "misurabile": misurabile,
+            "arrivato_al_libro": misurabile and all(cond.values())}
+
+
+def righe_credito(c):
+    p = lambda x: "n.d." if x is None else f"{x*100:+.1f}%"
+    if not c["dipendenti"]:
+        L = ["CREDITO SUL LIBRO: nessuna posizione con flusso di cassa libero negativo"]
+    else:
+        L = [f"CREDITO SUL LIBRO — chi brucia cassa (flusso di cassa libero negativo, deve finanziarsi fuori): "
+             f"{c['peso_dipendenti']*100:.1f}% dell'azionario · "
+             + " · ".join(f"{d['tk']} {d['peso']*100:.1f}% ({'n.d.' if d['d50_atr'] is None else format(d['d50_atr'], '+.1f')} ATR dalla media 50)"
+                          for d in c["dipendenti"]),
+             f"  21 sedute: chi brucia cassa {p(c['ret21_dipendenti'])} · chi si autofinanzia {p(c['ret21_autofinanziati'])}"
+             f" · peso sotto la propria media 50: {'n.d.' if c['quota_sotto_50'] is None else format(c['quota_sotto_50']*100, '.0f') + '%'}"
+             f" · spread CCC {'n.d.' if c['salita_ccc'] is None else format(c['salita_ccc'], '+.2f') + ' pp dal minimo di 60 sedute'}"]
+        if not c["misurabile"]:
+            L.append("  conferma sul libro NON MISURABILE: manca uno dei tre ingressi (non vuol dire 'non arrivata')")
+        else:
+            si = [k for k, v in c["condizioni"].items() if v]
+            L.append(f"  conferma sul libro (CCC in salita + oltre meta' del peso sotto la media 50 + rendimento peggiore "
+                     f"di chi si autofinanzia): {'ACCESA' if c['arrivato_al_libro'] else 'spenta'} "
+                     f"({len(si)} condizioni su 3: {', '.join(si) or 'nessuna'}) · stessa famiglia del CCC, non un secondo segnale")
+    if c["ignoti"]:
+        L.append(f"  senza flusso di cassa nella pipeline (fuori dal conto, non 'si autofinanzia'): {', '.join(c['ignoti'])}")
+    return L
 
 
 def righe_attesa(a):
@@ -186,6 +268,8 @@ def sintesi(o):
         L.append(f"(stress: {', '.join(o['esclusi_matrice'])} senza storia sufficiente, propagati col beta del libro)")
     if o.get("attesa"):
         L.extend(righe_attesa(o["attesa"]))
+    if o.get("credito"):
+        L.extend(righe_credito(o["credito"]))
     return "\n".join(L)
 
 

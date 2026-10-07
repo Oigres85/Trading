@@ -1417,6 +1417,51 @@ check("v465 il brief porta lo spread CCC con la sua data e la salita dal minimo"
       len(_rcc) == 1 and _rcc[0]["data"] == "2026-10-05" and "+2.42 pp" in (_rcc[0]["nota"] or ""),
       str(_rcc))
 
+# ============================ v467 — IL CREDITO ARRIVA AL LIBRO? ============================
+# Lo stato si COSTRUISCE (v425, v429): domani il libro puo' non avere nessun nome che brucia cassa.
+_tit = [{"tk": "AAA", "peso": 0.5, "pnl_21": 100.0, "valore": 1100.0},     # si autofinanzia, +10%
+        {"tk": "BBB", "peso": 0.3, "pnl_21": -100.0, "valore": 900.0},     # brucia cassa, -10%
+        {"tk": "CCC", "peso": 0.1, "pnl_21": 0.0, "valore": 300.0},        # brucia cassa, 0%
+        {"tk": "DDD", "peso": 0.1, "pnl_21": 50.0, "valore": 300.0}]       # flusso ignoto
+_tec = [{"tk": "AAA", "d50_atr": 1.0}, {"tk": "BBB", "d50_atr": -0.5}, {"tk": "CCC", "d50_atr": 0.4},
+        {"tk": "DDD", "d50_atr": -2.0}]
+_fcf = {"AAA": 5.0, "BBB": -1.0, "CCC": -1.0, "DDD": None}
+_c = NL.dipendenti_credito(_tit, _tec, _fcf, {"salita_60_pp": 2.0})
+check("v467 il gruppo e' chi ha flusso di cassa NEGATIVO, letto dal segno (v404)",
+      [d["tk"] for d in _c["dipendenti"]] == ["BBB", "CCC"] and abs(_c["peso_dipendenti"] - 0.4) < 1e-9, str(_c["dipendenti"]))
+check("v467 un nome senza flusso di cassa NON finisce fra gli autofinanziati: si nomina (v406)",
+      _c["ignoti"] == ["DDD"] and "DDD" in "\n".join(NL.righe_credito(_c)), str(_c["ignoti"]))
+check("v467 rendimento del gruppo = P&L su valore INIZIALE (-100 su 1000 e 0 su 300 = -7,69%)",
+      abs(_c["ret21_dipendenti"] - (-100 / 1300)) < 1e-9 and abs(_c["ret21_autofinanziati"] - 100 / 1000) < 1e-9,
+      str((_c["ret21_dipendenti"], _c["ret21_autofinanziati"])))
+check("v467 la quota sotto la media 50 e' sul PESO del gruppo, non sul numero di nomi (0,3/0,4)",
+      abs(_c["quota_sotto_50"] - 0.75) < 1e-9, str(_c["quota_sotto_50"]))
+check("v467 tre condizioni vere -> conferma ACCESA, e dichiara di non essere un secondo segnale (B3)",
+      _c["arrivato_al_libro"] and "ACCESA" in "\n".join(NL.righe_credito(_c))
+      and "non un secondo segnale" in "\n".join(NL.righe_credito(_c)))
+_c2 = NL.dipendenti_credito(_tit, _tec, _fcf, {"salita_60_pp": 1.0})
+check("v467 con il CCC sotto la soglia del semaforo la conferma e' spenta (la soglia e' la STESSA, 1,5)",
+      not _c2["arrivato_al_libro"] and _c2["misurabile"] and NL.SOGLIA_CCC_PP == 1.5)
+_c3 = NL.dipendenti_credito(_tit, _tec, _fcf, None)
+check("v467 senza CCC la conferma e' NON MISURABILE, non 'spenta' (un buco non e' uno zero)",
+      not _c3["misurabile"] and "NON MISURABILE" in "\n".join(NL.righe_credito(_c3)))
+_c4 = NL.dipendenti_credito(_tit, _tec, {"AAA": 1.0, "BBB": 1.0, "CCC": 1.0, "DDD": 1.0}, {"salita_60_pp": 2.0})
+check("v467 senza nomi che bruciano cassa lo dice invece di tacere",
+      _c4["dipendenti"] == [] and "nessuna posizione" in "\n".join(NL.righe_credito(_c4)))
+check("v467 il blocco entra nella sintesi giornaliera (collegamento, v399)",
+      "dipendenti_credito(" in _corpo_di(_src_nl, "calcola") and "credito_dalla_pipeline(" in _corpo_di(_src_nl, "calcola")
+      and "righe_credito(" in _corpo_di(_src_nl, "sintesi"))
+_tmp2 = _tf.mkdtemp(); _os.makedirs(_os.path.join(_tmp2, "data"))
+_js.dump({"portfolio": [], "watchlist": [{"ticker": "BBB", "combustione": {"fcf_ttm": -3.0}}],
+          "macro": {"credit_ccc": {"salita_60_pp": 2.42}}}, open(_os.path.join(_tmp2, "data", "data.json"), "w"))
+brief.RADICE = _tmp2
+try:
+    _f, _cc = NL.credito_dalla_pipeline(["BBB", "ZZZ"])
+finally:
+    brief.RADICE = _rad
+check("v467 la lettura dalla pipeline: segno del flusso e CCC dalle chiavi VERE (v196, v416)",
+      _f == {"BBB": -3.0, "ZZZ": None} and _cc == {"salita_60_pp": 2.42}, str((_f, _cc)))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

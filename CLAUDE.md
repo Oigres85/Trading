@@ -6153,3 +6153,25 @@ Il pre-commit ha bloccato il commit, e nessuno dei due rossi era un difetto dell
   riga taceva sul 16% restante — ora lo dichiara *"esito opposto, di direzione non quotata"*. C14
   riconosce la forma `NON ATTRIBUIBILE` alle condizioni di `NON CALCOLABILE` più quella del
   complemento. Validato togliendo la dichiarazione: morde.
+
+## 🏦 v467 — IL CCC MISURA IL MERCATO; QUESTO BLOCCO MISURA SE LA STRETTA ARRIVA AL LIBRO
+
+Dopo una trascrizione con il dato JPMorgan sul debito tecnologico in difficoltà (39% del totale),
+il CEO ha chiesto di renderlo strutturale. Il rapporto non è una serie pubblica, quindi non entra:
+entra la domanda che pone — *la chiusura del credito sta toccando i nostri nomi che bruciano cassa?*
+
+`numeri_libro.py` → `dipendenti_credito` / `righe_credito`: il gruppo è chi ha flusso di cassa
+libero **negativo** (segno da `data.json`, v404 — mai grandezze fra titoli), quindi si muove col
+libro senza un elenco a mano (C10). Tre condizioni insieme accendono la **conferma sul libro**:
+CCC +1,5 punti (la STESSA costante del semaforo, un gate lo verifica), oltre metà del **peso** del
+gruppo sotto la media 50, rendimento a 21 sedute peggiore di chi si autofinanzia.
+
+⚠ **È la stessa famiglia del CCC (B3)**: cambia la priorità degli stop, non il colore.
+⚠ Un nome senza flusso di cassa si NOMINA e non finisce fra gli autofinanziati (v406); senza CCC
+la conferma è **non misurabile**, non spenta.
+⚠ Il mio primo gate era sbagliato nella sonda, non nel codice: avevo diviso per il valore finale
+(1.100) invece che per l'iniziale (1.300). *Un check rosso è prima di tutto una sonda da verificare.*
+Quattro iniezioni (soglia diversa, ignoti fra gli autofinanziati, quota sul numero di nomi,
+collegamento tolto): mordono tutte, ripristino da snapshot verificato per hash.
+Il 07/10: gruppo MSTR, CRWV, RGTI = 15,1% · 2 condizioni su 3 (CCC, rendimento peggiore) · spenta.
+

@@ -30,6 +30,9 @@ alla misura di un giorno.
    §1quater): il blocco `COSTO DELL'ATTESA` / `SCADENZE` di `numeri_libro.py`, e per ogni
    decisione aperta del piano la sua scadenza (prima trimestrale del nome) e i giorni che mancano.
    Le protezioni non ancora messe si segnalano qui, ogni giorno, finché non lo sono.
+0ter. **Credito sul libro** (v467, regola in `memoria/LIBRO.md` §1ter): il blocco `CREDITO SUL
+   LIBRO` di `numeri_libro.py` — chi brucia cassa, il suo peso, le tre condizioni. Se la conferma
+   è accesa, gli stop su quei nomi passano in cima alle decisioni. Non cambia il colore del semaforo.
 1. **Sintesi in 3-5 punti** — cosa è successo, perché, cosa cambia per il libro.
 2. **Risultato contro i riferimenti** — libro contro QQQ, SMH, SPY, RSP; chi ha portato il risultato.
 3. **Rischio** — peso contro quota del rischio; beta sul Nasdaq col suo R²; segnalare solo se cambia.

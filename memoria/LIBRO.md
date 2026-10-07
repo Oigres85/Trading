@@ -117,6 +117,17 @@ CEO**. Su tre anni si è accesa in 4 episodi distinti: agosto 2024 (crollo da ye
 marzo 2025 (circa tre settimane **prima** del crollo dei dazi di aprile), marzo 2026 (falso allarme:
 Nasdaq +17% il mese dopo) e settembre 2026. **Uno su tre ha anticipato**: è un campanello, non una
 sentenza — per questo vale UN segnale della famiglia credito, mai due, e da solo porta al giallo.
+⚠ **Il credito arriva al libro? (v467, deciso col CEO il 07/10/2026).** Il CCC misura il MERCATO;
+`numeri_libro.py` (blocco «CREDITO SUL LIBRO») misura se la stretta tocca i nostri nomi che
+bruciano cassa — chi ha flusso di cassa libero negativo, letto dalla pipeline a ogni run, non da un
+elenco scritto qui (C10). La **conferma sul libro** è accesa quando valgono insieme: CCC salito di
+1,5 punti o più (la stessa soglia di sopra) · oltre metà del peso di quel gruppo sotto la propria
+media a 50 · rendimento a 21 sedute del gruppo peggiore di chi si autofinanzia.
+**È la stessa famiglia del CCC: non cambia il colore** (B3). Cambia la **priorità**: con la
+conferma accesa, gli stop già decisi su quei nomi si eseguono senza aspettare la scadenza (§1quater)
+e su quei nomi non si apre nulla di nuovo. Le soglie sono convenzioni scelte col CEO (v240).
+⚠ Fonti esterne sul debito tecnologico in difficoltà (per esempio i rapporti di JPMorgan) si
+leggono come contesto: non sono una serie pubblica, quindi non entrano nel semaforo.
 ⚠ Le vendite a terzi dividono anche il conto fiscale sulle plusvalenze (26%): su MU e AMD è alto.
 
 **Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: SMH 638 (media 50 ≈ 573,
