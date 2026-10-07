@@ -1533,6 +1533,138 @@ check("v469 feed non letto e nessuna notizia si leggono DIVERSI (v389)",
 check("v469 la vista dei candidati e' quella di default (collegamento, v399)",
       "righe_candidati(o, notizie_candidati(o))" in _src_rot)
 
+
+# ============================ v470 — ASTE DEL TESORO USA ============================
+# Il 07/10/2026 l'analisi ha scritto tre volte "asta del decennale alle 17:00" presa da un
+# calendario web: era l'ora UTC, in Italia erano le 19:00. L'orario ora si legge dalla fonte
+# ufficiale (TreasuryDirect, ora di New York) e si converte col FUSO. Lo stato si COSTRUISCE
+# (v425, v429): una http finta, nessuna rete, nessuna dipendenza dal giorno in cui gira.
+from datetime import datetime as _dt470, timezone as _tz470
+_R = _bf.ROMA
+_casi_fuso = {("2026-10-07T00:00:00", "19:00"),   # entrambe in ora legale: 6 ore
+              ("2026-10-28T00:00:00", "18:00"),   # Roma gia' in ora solare, New York no: 5 ore
+              ("2026-11-10T00:00:00", "19:00"),   # entrambe in ora solare: 6 ore
+              ("2026-03-10T00:00:00", "18:00")}   # New York gia' in ora legale, Roma no: 5 ore
+_esiti_fuso = {(g, (_bf.ora_da_new_york(g, "01:00 PM") or _dt470(2000, 1, 1)).strftime("%H:%M"))
+               for g, _ in _casi_fuso}
+check("v470 l'ora di New York si converte col FUSO: un +6 o un +5 a mano sbagliano due casi su quattro",
+      _esiti_fuso == _casi_fuso, str(sorted(_esiti_fuso)))
+check("v470 un'ora illeggibile resta un buco, non un orario indovinato (v199)",
+      _bf.ora_da_new_york("2026-10-07T00:00:00", "") is None
+      and _bf.ora_da_new_york(None, "01:00 PM") is None)
+
+def _asta(term, orig, giorno, tipo="Note", ora="01:00 PM", mld=None, tips="No", frn="No",
+          rend=None, cop=None, cusip=None, rip="No"):
+    return {"securityType": tipo, "securityTerm": term, "originalSecurityTerm": orig,
+            "auctionDate": giorno + "T00:00:00", "closingTimeCompetitive": ora,
+            "offeringAmount": str(int(mld * 1e9)) if mld else "", "tips": tips, "floatingRate": frn,
+            "highYield": rend or "", "bidToCoverRatio": cop or "", "cusip": cusip or term + giorno,
+            "reopening": rip}
+
+_ANNUNCIATE = [
+    _asta("9-Year 10-Month", "10-Year", "2026-10-07", mld=39, cusip="C10", rip="Yes"),
+    _asta("29-Year 10-Month", "30-Year", "2026-10-08", tipo="Bond", mld=22, cusip="C30", rip="Yes"),
+    _asta("17-Week", "17-Week", "2026-10-07", tipo="Bill", ora="11:30 AM", mld=75),
+    _asta("2-Year", "2-Year", "2026-10-08", mld=28, frn="Yes"),
+    _asta("5-Year", "5-Year", "2026-10-09", mld=24, tips="Yes"),
+    _asta("20-Year", "20-Year", "2026-10-30", tipo="Bond", mld=13),          # fuori finestra
+]
+_NOTE = [
+    _asta("9-Year 11-Month", "10-Year", "2026-09-09", rend="4.8340", cop="2.710000"),
+    _asta("10-Year", "10-Year", "2026-08-12", rend="4.2000", cop="2.500000"),
+    _asta("3-Year", "3-Year", "2026-10-06", rend="4.9320", cop="2.620000"),
+    _asta("3-Year", "3-Year", "2026-09-08", rend="4.4740", cop="2.720000"),
+    _asta("5-Year", "5-Year", "2026-09-23", rend="5.0330", cop="2.210000"),  # NOMINALE, non TIPS
+]
+_BOND = [_asta("29-Year 11-Month", "30-Year", "2026-09-10", tipo="Bond", rend="5.3080", cop="2.610000")]
+
+def _http_finta(annunciate=_ANNUNCIATE, note=_NOTE, bond=_BOND, guasto=None):
+    def leggi(url, timeout=20):
+        if guasto and guasto in url:
+            raise RuntimeError("HTTP 503")
+        if "/upcoming" in url:
+            return annunciate
+        return note if "type=Note" in url else bond
+    return leggi
+
+_alle13 = _dt470(2026, 10, 7, 13, 0, tzinfo=_R)
+_a = _bf.aste_tesoro(adesso=_alle13, leggi=_http_finta())
+_sc = [x["scadenza"] for x in _a["prossime"]]
+check("v470 solo note e bond nella finestra: fuori bills, tasso variabile e aste oltre i 7 giorni",
+      _sc == ["10 anni", "30 anni", "5 anni indicizzato all'inflazione"], str(_sc))
+_d10 = _a["prossime"][0] if _a["prossime"] else {}
+check("v470 il decennale porta l'ora italiana DICHIARATA dalla fonte: 07/10 19:00, 39 mld, riapertura",
+      _d10.get("quando") == "07/10 19:00" and _d10.get("importo_mld") == 39 and _d10.get("riapertura") is True,
+      str(_d10))
+check("v470 la riapertura si confronta col PROPRIO titolo (termine originale) e con l'asta piu' recente",
+      (_d10.get("precedente") or {}).get("data") == "09/09"
+      and (_d10.get("precedente") or {}).get("rendimento") == 4.834, str(_d10.get("precedente")))
+_tips = [x for x in _a["prossime"] if "indicizzato" in x["scadenza"]]
+check("v470 un titolo indicizzato non si confronta con il nominale della stessa durata",
+      len(_tips) == 1 and _tips[0]["precedente"] is None, str(_tips))
+check("v470 gli esiti degli ultimi tre giorni escono con l'asta precedente accanto",
+      [(x["data"], x["scadenza"], (x["precedente"] or {}).get("data")) for x in _a["concluse"]]
+      == [("06/10", "3 anni", "08/09")], str(_a["concluse"]))
+
+_alle20 = _dt470(2026, 10, 7, 20, 0, tzinfo=_R)
+_b20 = _bf.aste_tesoro(adesso=_alle20, leggi=_http_finta())
+_ch = {x["scadenza"]: x["chiusa"] for x in _b20["prossime"]}
+_t20 = "\n".join(_bf.righe_aste(_b20))
+check("v470 passata l'ora di chiusura l'asta non si legge piu' come un appuntamento",
+      _ch.get("10 anni") is True and _ch.get("30 anni") is False and "CHIUSA" in _t20, str(_ch))
+_con_esito = _NOTE + [_asta("9-Year 10-Month", "10-Year", "2026-10-07", rend="5.2500",
+                            cop="2.400000", cusip="C10")]
+_c = _bf.aste_tesoro(adesso=_alle20, leggi=_http_finta(note=_con_esito))
+check("v470 un'asta con l'esito pubblicato sta fra gli esiti e NON anche fra le prossime",
+      "10 anni" not in [x["scadenza"] for x in _c["prossime"]]
+      and ("07/10", "10 anni") in [(x["data"], x["scadenza"]) for x in _c["concluse"]], str(_c))
+
+# Le tre sorti distinte, per ciascuna delle due letture (v389)
+_t_ko = "\n".join(_bf.righe_aste(_bf.aste_tesoro(adesso=_alle13, leggi=_http_finta(guasto="/upcoming"))))
+_t_vuoto = "\n".join(_bf.righe_aste(_bf.aste_tesoro(adesso=_alle13, leggi=_http_finta(annunciate=[]))))
+_t_esiti = "\n".join(_bf.righe_aste(_bf.aste_tesoro(adesso=_alle13, leggi=_http_finta(guasto="/auctioned"))))
+check("v470 calendario NON letto e nessuna asta si leggono DIVERSI",
+      "calendario NON letto" in _t_ko and "diverso da 'nessuna asta'" in _t_ko
+      and "nessuna asta annunciata" in _t_vuoto and "NON letto" not in _t_vuoto, _t_ko + " || " + _t_vuoto)
+check("v470 esiti non letti si dichiarano, e il calendario resta",
+      "esiti NON letti" in _t_esiti and "07/10 19:00 ora italiana" in _t_esiti, _t_esiti)
+check("v470 senza il blocco il brief lo dice invece di tacerlo",
+      "non lette in questo run" in "\n".join(_bf.righe_aste(None)))
+
+# Collegamento, non controllo (v399, v443): la fetch arriva nel brief e nella pagina
+check("v470 il brief chiama le aste e le passa alla resa (collegamento)",
+      "aste = aste_tesoro()" in _corpo_di(_BRIEF_CODICE, "main")
+      and '"aste": aste' in _corpo_di(_BRIEF_CODICE, "main")
+      and 'righe_aste(dati.get("aste"))' in _corpo_di(_BRIEF_CODICE, "componi"))
+_dati470 = {"ora": _alle13, "ora_utc": _alle13.astimezone(_tz470.utc), "modo": "pomeriggio",
+            "finestra_h": 8.0, "tecnica": [], "seduta_base": "2026-10-06", "aste": _a,
+            "trimestrali": {"attesi": [], "giorni_non_letti": [], "finestra": 21},
+            "news": {"per_titolo": [], "macro": [], "macro_scartate": 0, "titoli_non_letti": [],
+                     "titoli_muti": [], "macro_non_lette": [], "macro_mute": []},
+            "macro_fred": {"stato": "CHIAVE ASSENTE", "serie": []}}
+_testo470 = _bf.componi("pomeriggio", _dati470)
+check("v470 il testo del brief porta il blocco e l'ora italiana nell'intestazione",
+      "07/10 19:00 ora italiana · 10 anni" in _testo470
+      and _testo470.splitlines()[0].endswith("13:00 ora italiana"), _testo470[:300])
+
+# L'ora italiana dal FUSO anche per l'intestazione: il "+2 ore" a mano era giusto solo d'estate
+_main470 = _corpo_di(_BRIEF_CODICE, "main")
+check("v470 nessuno scarto orario scritto a mano, e nessun 'CEST' fisso nel brief o nella pagina",
+      "timedelta(hours=2)" not in _BRIEF_CODICE and "astimezone(ROMA)" in _main470
+      and "CEST" not in _BRIEF_CODICE and "CEST" not in _solo_codice_py(_PAGINA))
+
+# ⚠ un modulo proprio: il nome _bp e' stato riusato piu' sotto per un dizionario (v468)
+_sp470 = _ilu.spec_from_file_location("_bp470", "scripts/brief_pagina.py")
+_pagmod470 = _ilu.module_from_spec(_sp470); _sp470.loader.exec_module(_pagmod470)
+_pag470 = dict(_BASE); _pag470["trimestrali"] = {"attesi": [], "giorni_non_letti": [], "finestra": 21}
+_pag470["aste"] = _a
+_h470 = _pagmod470.genera(_pag470)
+_pag470b = dict(_pag470); _pag470b.pop("aste")
+check("v470 la pagina rende le STESSE ore del testo, e dichiara il blocco mancante",
+      "Aste del Tesoro USA" in _h470 and "07/10 19:00 ora italiana" in _h470
+      and "10 anni (riapertura)" in _h470 and "39 mld $" in _h470
+      and "Aste non lette in questo run" in _pagmod470.genera(_pag470b))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

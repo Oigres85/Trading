@@ -109,6 +109,52 @@ def genera(d):
                        f'{cal["finestra"]} giorni. Non è «nessuna trimestrale mai»: oltre quella '
                        'finestra il sistema non guarda.</p>')
 
+    # v470 — le aste del Tesoro. L'ora arriva GIA' convertita dal brief: la pagina la
+    # impagina e basta, cosi' testo e pagina non possono dire due orari diversi (v455).
+    xa = d.get("aste")
+    if not xa:
+        blocco_aste = ('<p class="mancante"><b>Aste non lette in questo run</b> '
+                       '(diverso da «nessuna asta»).</p>')
+    else:
+        def _pr(p):
+            if not p:
+                return " · asta precedente della stessa scadenza non trovata negli ultimi 60 giorni"
+            return (f' · precedente {e(p["data"])}: rendimento <span class="mono">{n2(p["rendimento"],3)}%</span>, '
+                    f'domanda/offerta <span class="mono">{n2(p["copertura"])}</span>')
+        li = ""
+        if xa["calendario"] != "ok":
+            blocco_aste = (f'<p class="mancante"><b>Calendario {e(xa["calendario"])}</b> '
+                           '(diverso da «nessuna asta»).</p>')
+        elif not xa["prossime"]:
+            blocco_aste = (f'<p class="quiete">Nessuna asta annunciata nei prossimi '
+                           f'{xa["finestra"]} giorni.</p>')
+        else:
+            blocco_aste = ""
+        for a in xa["prossime"]:
+            quando = (f'{a["quando"]} ora italiana' if a.get("quando")
+                      else f'{a["giorno"]} · ora non dichiarata')
+            imp = f'{n2(a["importo_mld"],0)} mld $' if a.get("importo_mld") else "importo n.d."
+            rip = " (riapertura)" if a.get("riapertura") else ""
+            chiusa = " — <b>chiusa</b>: esito non ancora pubblicato dalla fonte" if a.get("chiusa") else ""
+            li += (f'<li><span class="tk">{e(a["scadenza"])}{rip}</span>'
+                   f'<span class="mono quando">{e(quando)}</span>'
+                   f'<span class="dett">{imp}{chiusa}{_pr(a.get("precedente"))}</span></li>')
+        if li:
+            blocco_aste += f'<ul class="trim">{li}</ul>'
+        if xa["esiti"] != "ok":
+            blocco_aste += (f'<p class="mancante"><b>Esiti {e(xa["esiti"])}</b> '
+                            '(diverso da «nessuna asta conclusa»).</p>')
+        elif xa["concluse"]:
+            ec = ""
+            for a in xa["concluse"]:
+                ec += (f'<li><span class="tk">{e(a["scadenza"])}</span>'
+                       f'<span class="mono quando">{e(a["data"])} · conclusa</span>'
+                       f'<span class="dett">rendimento <span class="mono">{n2(a["rendimento"],3)}%</span>, '
+                       f'domanda/offerta <span class="mono">{n2(a["copertura"])}</span>{_pr(a.get("precedente"))}</span></li>')
+            blocco_aste += (f'<ul class="trim">{ec}</ul><p class="note-fonti">Domanda/offerta = quante '
+                            'volte le domande hanno coperto l&rsquo;importo. Lo scarto dal rendimento '
+                            'che il mercato si aspettava (tail) <b>non</b> è in questa fonte.</p>')
+
     if mossi:
         allerta = ""
         for r in mossi:
@@ -195,6 +241,7 @@ def genera(d):
         seduta=e(d["seduta_base"]), finestra=n2(d["finestra_h"], 0),
         nmossi=len(mossi), nvivi=len(vivi),
         allerta=blocco_allerta, trimestrali=blocco_trim, fintrim=cal["finestra"],
+        aste=blocco_aste,
         posizioni="".join(riga_posizione(r) for r in ordinati),
         sorvegliati=blocco_sorv,
         nvoci=len(nw["per_titolo"]), voci=voci or '<li class="quiete">Nessuna voce in finestra.</li>',
@@ -338,7 +385,7 @@ footer b {{ color:var(--muted); font-weight:600; }}
   <p class="eyebrow">Lettura {modo}</p>
   <h1>Brief del libro</h1>
   <div class="stato">
-    <span>{data} · <b>{oraora}</b> CEST</span>
+    <span>{data} · <b>{oraora}</b> ora italiana</span>
     <span>ultima barra <b>{seduta}</b></span>
     <span>finestra notizie <b>{finestra}h</b></span>
     <span>{nmossi} su {nvivi} oltre soglia</span>
@@ -359,6 +406,15 @@ footer b {{ color:var(--muted); font-weight:600; }}
   <p class="sub">Date dichiarate dalla fonte, non proiettate da noi. Una trimestrale a ridosso
   cambia il senso di uno stop già piazzato: non è una protezione, è un biglietto della lotteria.</p>
   {trimestrali}
+</section>
+
+<section>
+  <h2>Aste del Tesoro USA — note e bond</h2>
+  <p class="sub">Calendario, importo e ora di chiusura <b>dichiarati dal Tesoro</b>
+  (TreasuryDirect). L’ora di New York è convertita col fuso, mai con uno scarto scritto a mano:
+  due volte l’anno, per qualche settimana, New York e Roma distano cinque ore invece di sei.
+  È l’offerta che pesa sul rendimento a 10 anni del semaforo.</p>
+  {aste}
 </section>
 
 <section>

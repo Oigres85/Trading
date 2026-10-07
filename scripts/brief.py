@@ -2,8 +2,8 @@
 """BRIEF — il prodotto quotidiano (v451).
 
 Due letture al giorno, decise dal CEO il 12/09/2026:
-  --mattina    08:30 CEST — cosa e' successo stanotte e cosa guardare oggi
-  --pomeriggio 16:00 CEST — apertura USA appena avvenuta: chi si muove oltre la propria ampiezza
+  --mattina    08:30 ora italiana — cosa e' successo stanotte e cosa guardare oggi
+  --pomeriggio 16:00 ora italiana — apertura USA appena avvenuta: chi si muove oltre la propria ampiezza
 
 ⚠⚠ LO SCRIPT SELEZIONA, IL MODELLO GIUDICA (regola v448). Qui dentro c'e' solo la parte
 deterministica: finestra temporale, attribuzione dalla fonte, ampiezza in ATR, livelli.
@@ -20,6 +20,7 @@ Nessun elenco di parole decide se una notizia e' importante — quello invecchia
 import argparse, json, os, re, sys, time, urllib.request, urllib.error
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 from email.utils import parsedate_to_datetime
 from xml.etree import ElementTree
 
@@ -316,6 +317,129 @@ def calendario_trimestrali(tickers, giorni=21):
     return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni}
 
 
+# ---------------------------------------------------------------- aste del Tesoro USA
+# ⚠⚠ v470 — L'ORARIO DI UN EVENTO SI LEGGE DALLA FONTE UFFICIALE, NEL SUO FUSO, E SI CONVERTE
+# COL FUSO. Il 07/10/2026 l'analisi ha scritto tre volte "asta del decennale alle 17:00",
+# presa da un calendario web: 17:00 era l'ora UTC, in Italia erano le 19:00 — accanto ai
+# verbali della Fed "alle 20:00", che invece erano in ora italiana. Due orologi nella stessa
+# riga (classe v431). Il Tesoro pubblica calendario, importo e ora di chiusura su
+# TreasuryDirect, gratis e senza chiave: si legge di la'.
+#
+# ⚠ Mai uno scarto scritto a mano (v437, v439): fra l'ultima domenica di ottobre e la prima di
+# novembre, e fra la seconda domenica di marzo e l'ultima, New York e Roma distano 5 ore invece
+# di 6. Un +6 sbaglierebbe proprio quelle settimane, e senza rompere niente.
+#
+# ⚠ Solo note e bond: e' l'offerta che pesa sulla parte lunga della curva, cioe' sul 10 anni
+# del semaforo (famiglia tassi). I bills (sotto l'anno) sono gestione di cassa e i FRN hanno
+# tasso variabile: esclusi, e il blocco lo dichiara.
+TD = "https://www.treasurydirect.gov/TA_WS/securities"
+ROMA = ZoneInfo("Europe/Rome")
+NEW_YORK = ZoneInfo("America/New_York")
+
+
+def ora_da_new_york(giorno, hhmm):
+    """'2026-10-07T00:00:00' + '01:00 PM' (come li scrive il Tesoro, ora di New York) ->
+    datetime in ora italiana. None se uno dei due non si legge: un orario indovinato e'
+    peggio di nessun orario (v199)."""
+    try:
+        g = datetime.fromisoformat(str(giorno)[:10]).date()
+        t = datetime.strptime(str(hhmm).strip(), "%I:%M %p").time()
+    except (TypeError, ValueError):
+        return None
+    return datetime.combine(g, t, tzinfo=NEW_YORK).astimezone(ROMA)
+
+
+def _duration(a):
+    return a.get("securityType") in ("Note", "Bond") and a.get("floatingRate") != "Yes"
+
+
+def _scadenza(a):
+    """'10-Year' -> '10 anni'. Conta il termine ORIGINALE: una riapertura del decennale si
+    chiama '9-Year 10-Month' ed e' lo stesso titolo dell'asta originale."""
+    t = a.get("originalSecurityTerm") or a.get("securityTerm") or "scadenza n.d."
+    t = re.sub(r"(\d+)-Year", r"\1 anni", t)
+    t = re.sub(r"(\d+)-Month", r"\1 mesi", t)
+    return t + (" indicizzato all'inflazione" if a.get("tips") == "Yes" else "")
+
+
+def _num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return None
+
+
+def aste_tesoro(giorni=7, adesso=None, leggi=None):
+    """Aste di note e bond ANNUNCIATE dal Tesoro nei prossimi giorni, con l'ora di chiusura in
+    ora italiana, e gli esiti degli ultimi tre giorni accanto all'asta precedente della stessa
+    scadenza. Nessuna proiezione: un'asta non annunciata non c'e' (v396). Le due letture hanno
+    ciascuna tre sorti distinte — con voci, senza voci, NON letta (v389)."""
+    leggi = leggi or jget
+    adesso = adesso or datetime.now(ROMA)
+    oggi = adesso.astimezone(ROMA).date()
+    out = {"finestra": giorni, "calendario": "ok", "esiti": "ok", "prossime": [], "concluse": []}
+    try:
+        annunciate = [a for a in (leggi(f"{TD}/upcoming?format=json", 20) or []) if _duration(a)]
+    except Exception as ex:
+        annunciate = None
+        out["calendario"] = f"NON letto ({str(ex)[:40]})"
+    try:
+        fatte = []
+        for tipo in ("Note", "Bond"):
+            fatte += [a for a in (leggi(f"{TD}/auctioned?format=json&type={tipo}&days=60", 20) or [])
+                      if _duration(a) and _num(a.get("highYield")) is not None]
+    except Exception as ex:
+        fatte = None
+        out["esiti"] = f"NON letti ({str(ex)[:40]})"
+
+    def giorno(a):
+        try:
+            return datetime.fromisoformat(str(a.get("auctionDate", ""))[:10]).date()
+        except ValueError:
+            return None
+
+    def precedente(a):
+        # ⚠ La stessa scadenza ORIGINALE, e la stessa natura (nominale o indicizzata): una
+        #   riapertura si confronta col proprio titolo, non con un'altra scadenza.
+        chiave = (a.get("originalSecurityTerm"), a.get("tips"))
+        prima = [x for x in (fatte or []) if (x.get("originalSecurityTerm"), x.get("tips")) == chiave
+                 and giorno(x) and giorno(a) and giorno(x) < giorno(a)]
+        if not prima:
+            return None
+        p = max(prima, key=giorno)
+        return {"data": giorno(p).strftime("%d/%m"), "rendimento": _num(p.get("highYield")),
+                "copertura": _num(p.get("bidToCoverRatio"))}
+
+    concluse = {(x.get("cusip"), giorno(x)) for x in (fatte or [])}
+    for a in annunciate or []:
+        g = giorno(a)
+        # ⚠ Un'asta gia' conclusa esce fra gli esiti, non anche fra le prossime: la stessa asta
+        #   in due righe con due stati si legge come due aste.
+        if g is None or not (oggi <= g <= oggi + timedelta(days=giorni)) \
+           or (a.get("cusip"), g) in concluse:
+            continue
+        quando = ora_da_new_york(a.get("auctionDate"), a.get("closingTimeCompetitive"))
+        out["prossime"].append({
+            "giorno": g.isoformat(), "scadenza": _scadenza(a), "riapertura": a.get("reopening") == "Yes",
+            "importo_mld": ((_num(a.get("offeringAmount")) or 0) / 1e9) or None,
+            "quando": quando.strftime("%d/%m %H:%M") if quando else None,
+            # ⚠ Passata l'ora di chiusura l'asta NON e' piu' "in arrivo", anche se la fonte non ne
+            #   ha ancora pubblicato l'esito: la sera si leggerebbe "19:00" come un appuntamento.
+            "chiusa": bool(quando and quando <= adesso),
+            "precedente": precedente(a)})
+    for a in fatte or []:
+        g = giorno(a)
+        if g is None or not (oggi - timedelta(days=3) <= g <= oggi):
+            continue
+        out["concluse"].append({
+            "giorno": g.isoformat(), "data": g.strftime("%d/%m"), "scadenza": _scadenza(a),
+            "rendimento": _num(a.get("highYield")),
+            "copertura": _num(a.get("bidToCoverRatio")), "precedente": precedente(a)})
+    out["prossime"].sort(key=lambda x: (x["giorno"], x["quando"] or ""))
+    out["concluse"].sort(key=lambda x: x["giorno"], reverse=True)
+    return out
+
+
 # ---------------------------------------------------------------- macro dalla pipeline
 # ⚠⚠ LA CHIAVE FRED NON VIVE QUI, E NON VIVE DA NESSUNA PARTE. La pipeline
 # (scripts/update_data.py, GitHub Actions) ce l'ha nei secret e pubblica queste serie in
@@ -420,6 +544,42 @@ def sgn(x, d=2, suff="%"):
     return "n.d." if x is None else f"{'+' if x >= 0 else ''}{n2(x, d)}{suff}"
 
 
+def _prec(p):
+    if not p:
+        return " · asta precedente della stessa scadenza non trovata negli ultimi 60 giorni"
+    return f" · precedente {p['data']}: rendimento {n2(p['rendimento'], 3)}%, domanda/offerta {n2(p['copertura'])}"
+
+
+def righe_aste(x):
+    """Il blocco delle aste. L'ora arriva GIA' convertita da aste_tesoro: qui non si fa
+    nessun conto sugli orari, cosi' testo e pagina non possono divergere (v161, v207)."""
+    if not x:
+        return ["ASTE DEL TESORO USA", "  ⚠ non lette in questo run (diverso da 'nessuna asta')."]
+    R = [f"ASTE DEL TESORO USA — note e bond, prossimi {x['finestra']} giorni (TreasuryDirect)",
+         "  calendario, importo e ora DICHIARATI dal Tesoro; l'ora di New York e' convertita col",
+         "  fuso, mai con uno scarto a mano. Esclusi bills (sotto l'anno) e tasso variabile."]
+    if x["calendario"] != "ok":
+        R.append(f"  ⚠ calendario {x['calendario']} — diverso da 'nessuna asta'.")
+    elif not x["prossime"]:
+        R.append(f"  nessuna asta annunciata nei prossimi {x['finestra']} giorni.")
+    for a in x["prossime"]:
+        quando = f"{a['quando']} ora italiana" if a.get("quando") else f"{a['giorno']}, ora non dichiarata"
+        imp = f" · {n2(a['importo_mld'], 0)} mld $" if a.get("importo_mld") else ""
+        rip = " (riapertura)" if a.get("riapertura") else ""
+        chiusa = " — CHIUSA: esito non ancora pubblicato dalla fonte" if a.get("chiusa") else ""
+        R.append(f"  {quando} · {a['scadenza']}{rip}{imp}{chiusa}{_prec(a.get('precedente'))}")
+    if x["esiti"] != "ok":
+        R.append(f"  ⚠ esiti {x['esiti']} — diverso da 'nessuna asta conclusa'.")
+    elif x["concluse"]:
+        R.append("  esiti degli ultimi 3 giorni — domanda/offerta = quante volte le domande hanno")
+        R.append("  coperto l'importo:")
+        for a in x["concluse"]:
+            R.append(f"  {a['data']} {a['scadenza']}: rendimento {n2(a['rendimento'], 3)}%, "
+                     f"domanda/offerta {n2(a['copertura'])}{_prec(a.get('precedente'))}")
+        R.append("  ⚠ lo scarto dal rendimento che il mercato si aspettava (tail) NON e' in questa fonte.")
+    return R
+
+
 def riga_titolo(r, esteso=False):
     if r.get("errore"):
         return f"  {r['tk']:6} NON LETTO: {r['errore']}"
@@ -450,7 +610,7 @@ def componi(modo, dati):
     L = []
     A = L.append
     ora = dati["ora"]
-    A(f"BRIEF {'MATTINA' if modo=='mattina' else 'POMERIGGIO'} — {ora.strftime('%d/%m/%Y %H:%M')} CEST")
+    A(f"BRIEF {'MATTINA' if modo=='mattina' else 'POMERIGGIO'} — {ora.strftime('%d/%m/%Y %H:%M')} ora italiana")
     A("=" * 66)
 
     # --- 1. QUELLO CHE SI MUOVE
@@ -488,6 +648,11 @@ def componi(modo, dati):
         A(f"  {x['tk']:6} {x['data']} (fra {x['giorni']}g) · {q}{eps}")
     if cal["giorni_non_letti"]:
         A(f"  ⚠ giorni NON letti (diverso da 'nessuna uscita'): {len(cal['giorni_non_letti'])}")
+
+    # --- 1ter. ASTE DEL TESORO USA (v470)
+    A("")
+    for riga in righe_aste(dati.get("aste")):
+        A(riga)
 
     # --- 2. LIVELLI DEL LIBRO
     A("")
@@ -611,14 +776,17 @@ def main():
     da = ora_utc - timedelta(hours=finestra)
     nw = raccogli_news(tickers, da)
     cal = calendario_trimestrali(tickers)
+    aste = aste_tesoro()
     mf = macro_dalla_pipeline()
 
     sedute = [r["seduta"] for r in tec if r.get("seduta")]
     base = max(set(sedute), key=sedute.count) if sedute else "n.d."
 
-    dati = {"ora": ora_utc + timedelta(hours=2), "ora_utc": ora_utc, "modo": modo,
+    # ⚠ v470 — l'ora italiana dal FUSO: il "+2 ore" scritto a mano qui era giusto solo
+    #   d'estate, e dal 25/10 avrebbe datato ogni brief un'ora avanti (v437, v439).
+    dati = {"ora": ora_utc.astimezone(ROMA), "ora_utc": ora_utc, "modo": modo,
             "finestra_h": finestra, "tecnica": tec, "news": nw, "macro_fred": mf,
-            "trimestrali": cal,
+            "trimestrali": cal, "aste": aste,
             "seduta_base": base, "cassa_eur": cassa, "secondi": round(time.time() - t0, 1)}
     testo = componi(modo, dati)
     print(testo)

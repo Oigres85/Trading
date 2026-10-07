@@ -6222,3 +6222,51 @@ file non si manda mai in una pipe che può troncarlo** — l'uscita si filtra do
 ⚠ E una fixture incompleta faceva ESPLODERE la resa invece di farla fallire sul motivo giusto:
 un check che muore in eccezione racconta male (v407). Completata.
 
+
+## 🕐 v470 — L'ASTA ERA ALLE 19:00, E L'ANALISI HA SCRITTO TRE VOLTE 17:00
+
+Trovato mentre il CEO chiedeva se collegarsi al suo Chrome (investing.com e TradingView, già
+loggato) potesse servire. Verificando cosa ci avrei cercato, è uscito un errore MIO della
+mattina: *"asta del Treasury a 10 anni alle 17:00"*, scritto tre volte e preso da un calendario
+web. **17:00 era l'ora UTC: in Italia erano le 19:00** — accanto ai verbali della Fed *"alle
+20:00"*, che invece erano in ora italiana. Due orologi nella stessa riga, classe **v431**. E la
+lista delle priorità diceva *"prima dell'asta delle 17:00: gli stop su RGTI e CRWV"*.
+
+Ora `brief.py` legge **TreasuryDirect** (il Tesoro stesso, gratis, senza chiave): calendario,
+importo e ora di chiusura in ora di New York, convertita con `zoneinfo`. Verificato sulla fonte:
+decennale in riapertura, **39 miliardi** — il numero che l'analisi aveva marcato *"non
+verificato"* — chiusura 1:00 PM ET = **19:00**; domani trentennale, 22 miliardi, 19:00.
+
+⚠⚠ **Mai uno scarto scritto a mano** (v437, v439): fra l'ultima domenica di ottobre e la prima
+di novembre, e fra la seconda domenica di marzo e l'ultima, New York e Roma distano **5 ore**
+invece di 6. Il gate prova quattro date: un +6 fisso ne sbaglia due, un +5 le altre due.
+
+⚠⚠ **E il brief aveva lo stesso difetto in casa**: `ora_utc + timedelta(hours=2)` e "CEST"
+scritto fisso nell'intestazione del testo e della pagina. Giusto solo d'estate: dal 25/10 ogni
+brief sarebbe stato datato **un'ora avanti**, senza rompere niente. E il JSON dichiarava
+`+00:00` su un'ora di Roma. Ora l'ora viene dal fuso e l'etichetta è "ora italiana".
+
+Gli stati che il blocco distingue, ciascuno costruito in un gate:
+- un'asta **passata l'ora di chiusura** e senza esito pubblicato non si legge più come un
+  appuntamento (la sera "19:00" sembrerebbe ancora da venire);
+- un'asta con l'esito sta fra gli esiti **e non anche** fra le prossime;
+- la riapertura si confronta col **proprio** titolo (`originalSecurityTerm`: il decennale in
+  riapertura si chiama "9-Year 10-Month"), e un indicizzato mai col nominale della stessa durata;
+- calendario ed esiti hanno ciascuno **tre sorti** (con voci, senza, NON letto — v389);
+- lo scarto dal rendimento atteso dal mercato (*tail*) **non è in questa fonte**, e si dice;
+- solo note e bond: bills (gestione di cassa) e tasso variabile esclusi, e si dichiara.
+
+⚠ **La pagina rende le stesse ore del testo**: l'ora arriva già convertita da `aste_tesoro`, la
+pagina impagina e basta (v455: due rese della stessa domanda divergono).
+
+Sedici gate, **undici iniezioni, mordono tutte**, ripristino da snapshot verificato per hash.
+⚠ Due inciampi: `modifica_sicura` ha rifiutato una parentesi in più (file intatto), e nella
+suite il nome `_bp` era stato **riusato per un dizionario** dai gate v468 — la pagina si carica
+ora sotto un nome proprio. Due variabili omonime con tipi diversi: classe v393.
+
+### Cosa NON si raggiunge da una sessione cloud, misurato il 07/10/2026
+- **Claude in Chrome**: gli strumenti non esistono in una sessione cloud — l'estensione parla
+  con un Claude che gira sul computer del CEO (app Desktop, oppure `claude remote-control` nella
+  cartella del repo). Non promettere di "guardare le sue schede" da qui.
+- **FMP** (connettore collegato): l'endpoint `economics` — il calendario macro con le attese —
+  risponde *ACCESS DENIED*, richiede un piano a pagamento. Non riprovare.

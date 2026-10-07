@@ -12,7 +12,8 @@ alla misura di un giorno.
    ⚠ Il pre-market ha volumi sottili: è un'indicazione dell'apertura, non un prezzo su cui decidere.
 1. `python3 scripts/numeri_libro.py` — l'ultima seduta (`--sedute 5` per la settimana).
    Lo script CALCOLA e basta; il giudizio lo scrive il modello.
-2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro.
+2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro, e (v470) le aste di
+   note e bond del Tesoro USA dei prossimi 7 giorni con l'ora italiana e gli esiti recenti.
 3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
    del libro i blocchi che la pipeline pubblica: sensibilità a mercato, comparto, tassi e
    dollaro col loro R² (anno, trimestre, giornate forti), revisioni delle stime, autonomia di
@@ -51,7 +52,7 @@ alla misura di un giorno.
 5. **Macro e catalizzatori** — e per le trimestrali vicine le revisioni delle stime e, per chi
    brucia cassa, l'autonomia: sono le due cose che una trimestrale riprezza.
    Soglie macro decise prima (spread credito alto rendimento 3,5;
-   Treasury 10 anni 5,0 / 5,4), trimestrali e Fed nei prossimi giorni.
+   Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
 6. **Piano con soglie** — stato di ciascuna condizione già decisa (BE 295-302, AMD respinto a 645, RGTI sotto 14,41,
    MU 1.100-1.108 con la compensazione RGTI, i supporti di protezione).
 
@@ -64,5 +65,10 @@ alla misura di un giorno.
 ## Regole
 - Direzione, priorità e livelli sì; le quantità solo come aritmetica dichiarata (v439).
 - Ogni numero porta la sua data e il suo denominatore; ciò che manca si dichiara.
+- **Ogni orario di un evento si scrive in ora italiana, preso dalla fonte ufficiale nel suo
+  fuso e convertito col fuso** (v470): le aste dal blocco ASTE del brief (TreasuryDirect, ora
+  di New York); Fed e dati macro dal calendario dell'ente, che li dà in ora di New York. Un
+  orario letto su un calendario web senza fuso dichiarato non si pubblica: il 07/10 l'analisi
+  ha scritto «asta alle 17:00», che era l'ora UTC — in Italia erano le 19:00.
 - Su Anthropic e AMZN va dichiarato il conflitto di interessi.
 - Rapporto HTML solo se richiesto: costa token (decisione del CEO).
