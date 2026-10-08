@@ -88,6 +88,7 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | PM | Philip Morris — consumi difensivi (rotazione, CEO 07/10/2026). Correlazione col libro la piu' negativa del gruppo; supporto 181,55 |
 | DE | Deere — industriali (rotazione, CEO 07/10/2026). Settore in ribasso, DE in tendenza propria; supporto 644,06 |
 | DIS | Disney — comunicazioni (rotazione, CEO 07/10/2026). Appena sopra la SMA200; supporto 101,15 |
+| PFE | Pfizer — farmaceutico (CEO, 08/10/2026). Sopra la SMA50 e la SMA200, −5% dal massimo a 52 settimane; correlazione col libro ~−0,1: diversifica. Supporto 20 sedute 27,12, resistenza 28,95 |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
