@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-08T00:06:33Z",
+ "updated_at": "2026-10-08T00:47:52Z",
  "eurusd": 1.1206,
  "totals": {
   "usd_value": 0,
@@ -7977,9 +7977,9 @@
     "float_pct": 99.7,
     "avg_volume_30d": 22304987.0,
     "pe_ttm": 93.6447,
-    "forward_pe": 39.6231,
+    "forward_pe": 39.0895,
     "eps_ttm": 3.04,
-    "eps_forward": 7.1847,
+    "eps_forward": 7.2828,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
     "revenue_growth": 0.365,
@@ -10959,10 +10959,10 @@
    "sortino_6m": 2.19,
    "prepost": {
     "label": "after",
-    "price": 290.61,
-    "change_pct": -1.75
+    "price": 291.69,
+    "change_pct": -1.38
    },
-   "prezzo_limite_aggiustato": 290.61,
+   "prezzo_limite_aggiustato": 291.69,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -16358,28 +16358,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 83255.21,
+   "price": 83236.81,
    "price_asof": "2026-10-08",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -2.69,
+   "change_pct": -2.71,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -34.0,
-   "sma200_dist_pct": 16.1,
+   "sma200_dist_pct": 16.0,
    "sma50_dist_pct": 3.7,
    "w52_high": 124167.09,
    "w52_low": 57747.77,
-   "w52_dist_pct": -32.9,
-   "day_high": 85570.7,
-   "day_low": 82875.1,
+   "w52_dist_pct": -33.0,
+   "day_high": 83343.16,
+   "day_low": 83199.25,
    "support": 76228.33,
    "resistance": 87363.76,
-   "rsi": 52.8,
-   "volume": 38737707008,
+   "rsi": 52.7,
+   "volume": 39033962496,
    "vol_ratio": 0.84,
-   "atr_14": 2155.41,
-   "atr_pct": 2.59,
+   "atr_14": 2131.31,
+   "atr_pct": 2.56,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -16388,7 +16388,7 @@
      86480.3,
      85786.59,
      85557.56,
-     83255.21
+     83236.81
     ],
     "m6": [
      63801.57,
@@ -16516,7 +16516,7 @@
      86480.3,
      85786.59,
      85557.56,
-     83255.21
+     83236.81
     ],
     "all": [
      386.94,
@@ -16664,7 +16664,7 @@
      62813.75,
      78548.63,
      83553.85,
-     83255.21
+     83236.81
     ],
     "m1": [
      76150.32,
@@ -16688,7 +16688,7 @@
      86480.3,
      85786.59,
      85557.56,
-     83255.21
+     83236.81
     ],
     "m3": [
      63460.9,
@@ -16756,7 +16756,7 @@
      86480.3,
      85786.59,
      85557.56,
-     83255.21
+     83236.81
     ],
     "y1": [
      123354.87,
@@ -16833,7 +16833,13 @@
      83502.61,
      84763.58
     ],
-    "d1": []
+    "d1": [
+     83205.77,
+     83208.66,
+     83213.2,
+     83218.23,
+     83236.81
+    ]
    },
    "earnings_date": null,
    "rating": null,
@@ -16846,7 +16852,7 @@
    "sharpe_6m": 1.56,
    "sortino_6m": 2.79,
    "prepost": null,
-   "prezzo_limite_aggiustato": 83255.21,
+   "prezzo_limite_aggiustato": 83236.81,
    "risk_reward": "1:1.0",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -16857,39 +16863,39 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 82875.1,
+     "support": 83199.25,
      "resistance": 86971.78,
-     "change_pct": -1.78
+     "change_pct": -1.8
     },
     "m1": {
      "support": 74995.52,
      "resistance": 87363.76,
-     "change_pct": 9.33
+     "change_pct": 9.31
     },
     "m3": {
      "support": 62226.58,
      "resistance": 87363.76,
-     "change_pct": 31.19
+     "change_pct": 31.16
     },
     "y1": {
      "support": 57747.77,
      "resistance": 89200.78,
-     "change_pct": -1.54
+     "change_pct": -1.57
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 40,
+    "bias": 36,
     "label": "Lieve ribasso",
     "structure": "ribassista",
     "bos": null,
     "bull_fvg": 2,
-    "bear_fvg": 0,
+    "bear_fvg": 1,
     "last_fvg": {
-     "dir": "rialzista",
-     "lo": 81455.2,
-     "hi": 85098.01
+     "dir": "ribassista",
+     "lo": 83343.16,
+     "hi": 84971.87
     },
     "liq_above": 86971.78,
     "liq_below": 82906.62,
@@ -16901,74 +16907,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 83255.21,
+     "prezzo": 83236.81,
      "medie": {
       "sma10": {
-       "liv": 84587.25,
-       "dist_pct": -1.57
+       "liv": 84585.41,
+       "dist_pct": -1.59
       },
       "ema10": {
-       "liv": 84553.06,
-       "dist_pct": -1.53
+       "liv": 84549.72,
+       "dist_pct": -1.55
       },
       "sma20": {
-       "liv": 84179.35,
-       "dist_pct": -1.1
+       "liv": 84178.43,
+       "dist_pct": -1.12
       },
       "ema20": {
-       "liv": 83484.56,
-       "dist_pct": -0.27
+       "liv": 83482.81,
+       "dist_pct": -0.29
       },
       "sma30": {
-       "liv": 81815.52,
-       "dist_pct": 1.76
+       "liv": 81814.91,
+       "dist_pct": 1.74
       },
       "ema30": {
-       "liv": 82152.92,
-       "dist_pct": 1.34
+       "liv": 82151.73,
+       "dist_pct": 1.32
       },
       "sma50": {
-       "liv": 80279.65,
-       "dist_pct": 3.71
+       "liv": 80279.29,
+       "dist_pct": 3.68
       },
       "ema50": {
-       "liv": 79546.87,
-       "dist_pct": 4.66
+       "liv": 79546.14,
+       "dist_pct": 4.64
       },
       "sma100": {
-       "liv": 72019.24,
-       "dist_pct": 15.6
+       "liv": 72019.06,
+       "dist_pct": 15.58
       },
       "ema100": {
-       "liv": 75688.01,
-       "dist_pct": 10.0
+       "liv": 75687.64,
+       "dist_pct": 9.97
       },
       "sma200": {
-       "liv": 71728.88,
-       "dist_pct": 16.07
+       "liv": 71728.79,
+       "dist_pct": 16.04
       },
       "ema200": {
-       "liv": 75545.92,
-       "dist_pct": 10.2
+       "liv": 75545.74,
+       "dist_pct": 10.18
       }
      },
      "medie_battute": 8,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 52.8,
+      "rsi14": 52.7,
       "macd": {
-       "linea": 1687.55,
-       "segnale": 1966.59,
-       "istogramma": -279.04
+       "linea": 1686.08,
+       "segnale": 1966.29,
+       "istogramma": -280.21
       },
-      "stoch_k": 15.0,
-      "stoch_d": 49.0,
-      "williams_r": -85.0,
-      "cci20": -3.8,
-      "adx14": 42.7,
-      "di_su": 29.7,
-      "di_giu": 16.8,
-      "momentum10": -1202.88
+      "stoch_k": 14.6,
+      "stoch_d": 48.9,
+      "williams_r": -85.4,
+      "cci20": -15.7,
+      "adx14": 42.9,
+      "di_su": 30.0,
+      "di_giu": 15.9,
+      "momentum10": -1221.27
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17458,22 +17464,22 @@
      },
      {
       "d": "2026-10-08",
-      "o": 85546.23,
-      "h": 85570.7,
-      "l": 82875.1,
-      "c": 83255.21
+      "o": 83275.52,
+      "h": 83343.16,
+      "l": 83199.25,
+      "c": 83236.81
      }
     ],
     "performance": {
-     "s1": -1.47,
-     "m1": 10.11,
-     "m3": 31.15,
-     "m6": 30.06,
-     "a1": -6.65,
-     "ytd": -6.17,
-     "a3": 140.15,
-     "a5": 35.77,
-     "a10": 11777.11
+     "s1": -1.49,
+     "m1": 10.08,
+     "m3": 31.12,
+     "m6": 30.03,
+     "a1": -6.67,
+     "ytd": -6.19,
+     "a3": 140.1,
+     "a5": 35.74,
+     "a10": 11774.48
     },
     "stagionalita": [
      {
@@ -17586,7 +17592,7 @@
      }
     ]
    },
-   "rs_1m": 7.7,
+   "rs_1m": 7.6,
    "rs_bench": "sp500",
    "rs_ndx_1m": 3.7,
    "beta_ndx": 0.84,
@@ -19191,27 +19197,27 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 31437.75,
+   "price": 31392.75,
    "price_asof": "2026-10-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.14,
+   "change_pct": -0.29,
    "pe": null,
    "ath": 31616.5,
-   "ath_dist_pct": -0.6,
-   "sma200_dist_pct": 13.5,
-   "sma50_dist_pct": 5.6,
+   "ath_dist_pct": -0.7,
+   "sma200_dist_pct": 13.3,
+   "sma50_dist_pct": 5.4,
    "w52_high": 31616.5,
    "w52_low": 22961.5,
-   "w52_dist_pct": -0.6,
+   "w52_dist_pct": -0.7,
    "day_high": 31459.0,
-   "day_low": 31403.0,
+   "day_low": 31387.0,
    "support": 28763.75,
    "resistance": 31616.5,
-   "rsi": 69.6,
-   "volume": 8898,
-   "vol_ratio": 0.02,
-   "atr_14": 435.83,
+   "rsi": 68.5,
+   "volume": 14261,
+   "vol_ratio": 0.03,
+   "atr_14": 436.97,
    "atr_pct": 1.39,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -19221,7 +19227,7 @@
      31061.75,
      31317.75,
      31483.25,
-     31437.75
+     31392.75
     ],
     "m6": [
      25251.5,
@@ -19349,7 +19355,7 @@
      31061.75,
      31317.75,
      31483.25,
-     31437.75
+     31392.75
     ],
     "all": [
      3621.0,
@@ -19619,7 +19625,7 @@
      28404.25,
      29513.0,
      30698.75,
-     31437.75
+     31392.75
     ],
     "m1": [
      29538.75,
@@ -19643,7 +19649,7 @@
      31061.75,
      31317.75,
      31483.25,
-     31437.75
+     31392.75
     ],
     "m3": [
      29391.5,
@@ -19711,7 +19717,7 @@
      31061.75,
      31317.75,
      31483.25,
-     31437.75
+     31392.75
     ],
     "y1": [
      25039.25,
@@ -19879,22 +19885,26 @@
      31448.25,
      31447.5,
      31452.5,
-     31432.75
+     31432.75,
+     31430.0,
+     31409.0,
+     31414.5,
+     31392.0
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 84,
+   "health": 83,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.97,
-   "sortino_1y": 1.41,
-   "sharpe_6m": 1.97,
-   "sortino_6m": 3.05,
+   "sharpe_1y": 0.96,
+   "sortino_1y": 1.4,
+   "sharpe_6m": 1.96,
+   "sortino_6m": 3.02,
    "prepost": null,
-   "prezzo_limite_aggiustato": 31437.75,
-   "risk_reward": "1:0.2",
+   "prezzo_limite_aggiustato": 31392.75,
+   "risk_reward": "1:0.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -19906,22 +19916,22 @@
     "w1": {
      "support": 30529.25,
      "resistance": 31616.5,
-     "change_pct": 2.2
+     "change_pct": 2.06
     },
     "m1": {
      "support": 28763.75,
      "resistance": 31616.5,
-     "change_pct": 6.43
+     "change_pct": 6.28
     },
     "m3": {
      "support": 27201.5,
      "resistance": 31616.5,
-     "change_pct": 6.96
+     "change_pct": 6.81
     },
     "y1": {
      "support": 22961.5,
      "resistance": 31616.5,
-     "change_pct": 25.55
+     "change_pct": 25.37
     }
    },
    "financials": [],
@@ -19936,7 +19946,7 @@
     "last_fvg": {
      "dir": "rialzista",
      "lo": 31371.0,
-     "hi": 31403.0
+     "hi": 31387.0
     },
     "liq_above": null,
     "liq_below": 30356.75,
@@ -19948,74 +19958,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 31437.75,
+     "prezzo": 31392.75,
      "medie": {
       "sma10": {
-       "liv": 30959.53,
-       "dist_pct": 1.54
+       "liv": 30955.03,
+       "dist_pct": 1.41
       },
       "ema10": {
-       "liv": 30973.23,
-       "dist_pct": 1.5
+       "liv": 30965.05,
+       "dist_pct": 1.38
       },
       "sma20": {
-       "liv": 30341.33,
-       "dist_pct": 3.61
+       "liv": 30339.08,
+       "dist_pct": 3.47
       },
       "ema20": {
-       "liv": 30561.71,
-       "dist_pct": 2.87
+       "liv": 30557.42,
+       "dist_pct": 2.73
       },
       "sma30": {
-       "liv": 30040.2,
-       "dist_pct": 4.65
+       "liv": 30038.7,
+       "dist_pct": 4.51
       },
       "ema30": {
-       "liv": 30301.13,
-       "dist_pct": 3.75
+       "liv": 30298.23,
+       "dist_pct": 3.61
       },
       "sma50": {
-       "liv": 29773.9,
-       "dist_pct": 5.59
+       "liv": 29773.0,
+       "dist_pct": 5.44
       },
       "ema50": {
-       "liv": 29975.93,
-       "dist_pct": 4.88
+       "liv": 29974.16,
+       "dist_pct": 4.73
       },
       "sma100": {
-       "liv": 29685.34,
-       "dist_pct": 5.9
+       "liv": 29684.89,
+       "dist_pct": 5.75
       },
       "ema100": {
-       "liv": 29316.57,
-       "dist_pct": 7.24
+       "liv": 29315.68,
+       "dist_pct": 7.09
       },
       "sma200": {
-       "liv": 27699.84,
-       "dist_pct": 13.49
+       "liv": 27699.62,
+       "dist_pct": 13.33
       },
       "ema200": {
-       "liv": 28231.98,
-       "dist_pct": 11.36
+       "liv": 28231.53,
+       "dist_pct": 11.2
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 69.6,
+      "rsi14": 68.5,
       "macd": {
-       "linea": 483.89,
-       "segnale": 385.64,
-       "istogramma": 98.26
+       "linea": 480.3,
+       "segnale": 384.92,
+       "istogramma": 95.38
       },
-      "stoch_k": 92.1,
-      "stoch_d": 95.0,
-      "williams_r": -7.9,
-      "cci20": 96.0,
+      "stoch_k": 90.1,
+      "stoch_d": 94.4,
+      "williams_r": -9.9,
+      "cci20": 94.5,
       "adx14": 23.5,
-      "di_su": 30.2,
-      "di_giu": 13.4,
-      "momentum10": 673.0
+      "di_su": 30.1,
+      "di_giu": 13.3,
+      "momentum10": 628.0
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -20507,20 +20517,20 @@
       "d": "2026-10-07",
       "o": 31403.0,
       "h": 31459.0,
-      "l": 31403.0,
-      "c": 31437.75
+      "l": 31387.0,
+      "c": 31392.75
      }
     ],
     "performance": {
-     "s1": 2.41,
-     "m1": 6.33,
-     "m3": 5.0,
-     "m6": 25.38,
-     "ytd": 23.84,
-     "a1": 34.0,
-     "a3": 136.01,
-     "a5": 143.49,
-     "a10": 659.14
+     "s1": 2.26,
+     "m1": 6.18,
+     "m3": 4.85,
+     "m6": 25.2,
+     "ytd": 23.67,
+     "a1": 33.8,
+     "a3": 135.68,
+     "a5": 143.14,
+     "a10": 658.05
     },
     "stagionalita": [
      {
@@ -20633,9 +20643,9 @@
      }
     ]
    },
-   "rs_1m": 4.8,
+   "rs_1m": 4.6,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 0.8,
+   "rs_ndx_1m": 0.7,
    "beta_ndx": 0.98,
    "avg_corr": 0.61,
    "max_corr": 0.75,
@@ -20647,40 +20657,39 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 6803.9,
-   "price_asof": null,
+   "price": 6781.0,
+   "price_asof": "2026-10-08",
    "price_asof_arretrata_da": null,
-   "price_live": true,
-   "change_pct": -1.98,
+   "price_live": false,
+   "change_pct": -2.31,
    "pe": null,
    "ath": 9385.59,
-   "ath_dist_pct": -27.5,
-   "sma200_dist_pct": 7.3,
-   "sma50_dist_pct": 1.6,
+   "ath_dist_pct": -27.8,
+   "sma200_dist_pct": 6.8,
+   "sma50_dist_pct": 1.3,
    "w52_high": 9385.59,
    "w52_low": 3522.54,
-   "w52_dist_pct": -27.5,
-   "day_high": 7044.67,
-   "day_low": 6897.38,
+   "w52_dist_pct": -27.8,
+   "day_high": 6810.83,
+   "day_low": 6750.58,
    "support": 6582.2,
    "resistance": 7171.52,
-   "rsi": 52.5,
-   "volume": 269800,
+   "rsi": 47.0,
+   "volume": 44245,
    "vol_ratio": 0.92,
-   "atr_14": 195.11,
+   "atr_14": 194.8,
    "atr_pct": 2.87,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
     "w1": [
-     6870.81,
      6838.04,
      6971.35,
      7003.74,
-     6941.39
+     6941.39,
+     6781.0
     ],
     "m6": [
-     5478.7,
      5234.05,
      5377.3,
      5450.33,
@@ -20805,7 +20814,8 @@
      6838.04,
      6971.35,
      7003.74,
-     6941.39
+     6941.39,
+     6781.0
     ],
     "all": [
      651.22,
@@ -21166,10 +21176,9 @@
      6595.45,
      6820.02,
      6838.04,
-     6803.9
+     6781.0
     ],
     "m1": [
-     6562.72,
      6579.48,
      6687.21,
      6995.39,
@@ -21190,10 +21199,10 @@
      6838.04,
      6971.35,
      7003.74,
-     6941.39
+     6941.39,
+     6781.0
     ],
     "m3": [
-     8476.48,
      8303.41,
      7648.09,
      8088.34,
@@ -21258,7 +21267,8 @@
      6838.04,
      6971.35,
      7003.74,
-     6941.39
+     6941.39,
+     6781.0
     ],
     "y1": [
      3610.6,
@@ -21311,21 +21321,25 @@
      7080.92,
      7003.74
     ],
-    "d1": []
+    "d1": [
+     6782.84,
+     6755.28,
+     6781.0
+    ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 77,
+   "health": 71,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 1.18,
-   "sortino_1y": 1.65,
-   "sharpe_6m": 0.95,
-   "sortino_6m": 1.34,
+   "sharpe_1y": 1.13,
+   "sortino_1y": 1.58,
+   "sharpe_6m": 0.63,
+   "sortino_6m": 0.87,
    "prepost": null,
-   "prezzo_limite_aggiustato": 6803.9,
-   "risk_reward": "1:0.9",
+   "prezzo_limite_aggiustato": 6781.0,
+   "risk_reward": "1:1.0",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -21335,39 +21349,39 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 6765.06,
+     "support": 6750.58,
      "resistance": 7044.67,
-     "change_pct": 1.03
+     "change_pct": -0.83
     },
     "m1": {
      "support": 6439.49,
      "resistance": 7171.52,
-     "change_pct": 5.77
+     "change_pct": 3.06
     },
     "m3": {
      "support": 5262.77,
-     "resistance": 8667.73,
-     "change_pct": -18.11
+     "resistance": 8620.15,
+     "change_pct": -18.33
     },
     "y1": {
      "support": 3522.54,
      "resistance": 9385.59,
-     "change_pct": 92.25
+     "change_pct": 87.81
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 54,
+    "bias": 50,
     "label": "Neutro",
     "structure": "laterale",
     "bos": null,
     "bull_fvg": 1,
-    "bear_fvg": 0,
+    "bear_fvg": 1,
     "last_fvg": {
-     "dir": "rialzista",
-     "lo": 6717.97,
-     "hi": 6830.95
+     "dir": "ribassista",
+     "lo": 6810.83,
+     "hi": 6927.88
     },
     "liq_above": 6954.12,
     "liq_below": 6765.06,
@@ -21379,85 +21393,78 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 6941.39,
+     "prezzo": 6781.0,
      "medie": {
       "sma10": {
-       "liv": 6951.59,
-       "dist_pct": -0.15
+       "liv": 6940.26,
+       "dist_pct": -2.29
       },
       "ema10": {
-       "liv": 6924.79,
-       "dist_pct": 0.24
+       "liv": 6898.65,
+       "dist_pct": -1.71
       },
       "sma20": {
-       "liv": 6894.67,
-       "dist_pct": 0.68
+       "liv": 6899.36,
+       "dist_pct": -1.72
       },
       "ema20": {
-       "liv": 6886.11,
-       "dist_pct": 0.8
+       "liv": 6876.1,
+       "dist_pct": -1.38
       },
       "sma30": {
-       "liv": 6851.79,
-       "dist_pct": 1.31
+       "liv": 6847.39,
+       "dist_pct": -0.97
       },
       "ema30": {
-       "liv": 6871.48,
-       "dist_pct": 1.02
+       "liv": 6865.64,
+       "dist_pct": -1.23
       },
       "sma50": {
-       "liv": 6699.03,
-       "dist_pct": 3.62
+       "liv": 6692.72,
+       "dist_pct": 1.32
       },
       "ema50": {
-       "liv": 6897.84,
-       "dist_pct": 0.63
+       "liv": 6893.26,
+       "dist_pct": -1.63
       },
       "sma100": {
-       "liv": 7317.71,
-       "dist_pct": -5.14
+       "liv": 7307.3,
+       "dist_pct": -7.2
       },
       "ema100": {
-       "liv": 6841.56,
-       "dist_pct": 1.46
+       "liv": 6840.36,
+       "dist_pct": -0.87
       },
       "sma200": {
-       "liv": 6338.97,
-       "dist_pct": 9.5
+       "liv": 6352.16,
+       "dist_pct": 6.75
       },
       "ema200": {
-       "liv": 6333.48,
-       "dist_pct": 9.6
+       "liv": 6337.93,
+       "dist_pct": 6.99
       }
      },
-     "medie_battute": 10,
+     "medie_battute": 3,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 52.5,
+      "rsi14": 47.0,
       "macd": {
-       "linea": 42.79,
-       "segnale": 35.28,
-       "istogramma": 7.51
+       "linea": 28.82,
+       "segnale": 33.99,
+       "istogramma": -5.17
       },
-      "stoch_k": 61.0,
-      "stoch_d": 66.2,
-      "williams_r": -39.0,
-      "cci20": 34.8,
+      "stoch_k": 33.7,
+      "stoch_d": 55.4,
+      "williams_r": -66.3,
+      "cci20": -59.3,
       "adx14": 7.7,
-      "di_su": 26.7,
-      "di_giu": 25.6,
-      "momentum10": 225.98
+      "di_su": 24.8,
+      "di_giu": 29.2,
+      "momentum10": -113.23
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
-     {
-      "d": "2026-06-24",
-      "o": 8356.79,
-      "h": 8577.52,
-      "l": 8080.99,
-      "c": 8471.02
-     },
      {
       "d": "2026-06-25",
       "o": 8703.42,
@@ -21940,18 +21947,25 @@
       "h": 7044.67,
       "l": 6897.38,
       "c": 6941.39
+     },
+     {
+      "d": "2026-10-08",
+      "o": 6808.68,
+      "h": 6810.83,
+      "l": 6750.58,
+      "c": 6781.0
      }
     ],
     "performance": {
-     "s1": 0.75,
-     "m1": 1.54,
-     "m3": -17.31,
-     "m6": 37.39,
-     "ytd": 61.07,
-     "a1": 68.99,
-     "a3": 204.72,
-     "a5": 133.66,
-     "a10": 245.65
+     "s1": -1.31,
+     "m1": 3.33,
+     "m3": -20.0,
+     "m6": 23.77,
+     "ytd": 57.35,
+     "a1": 65.09,
+     "a3": 197.67,
+     "a5": 128.26,
+     "a10": 237.67
     },
     "stagionalita": [
      {
@@ -22037,7 +22051,7 @@
      },
      {
       "mese": 10,
-      "media": -0.43,
+      "media": -0.44,
       "mediana": -0.41,
       "positivi_pct": 43,
       "campione": 30,
@@ -22064,9 +22078,9 @@
      }
     ]
    },
-   "rs_1m": 4.1,
+   "rs_1m": 1.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 0.2,
+   "rs_ndx_1m": -2.5,
    "beta_ndx": 0.57
   },
   {
@@ -25163,11 +25177,11 @@
    "price_asof": "2026-10-08",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.45,
+   "change_pct": -0.47,
    "pe": null,
    "ath": 1.6,
    "ath_dist_pct": -30.1,
-   "sma200_dist_pct": -3.4,
+   "sma200_dist_pct": -3.5,
    "sma50_dist_pct": -2.7,
    "w52_high": 1.2,
    "w52_low": 1.12,
@@ -25176,10 +25190,10 @@
    "day_low": 1.12,
    "support": 1.12,
    "resistance": 1.16,
-   "rsi": 21.3,
+   "rsi": 21.2,
    "volume": 0,
    "vol_ratio": null,
-   "atr_14": 0.00646,
+   "atr_14": 0.00647,
    "atr_pct": 0.58,
    "signal": "Ipervenduto",
    "signal_class": "info",
@@ -25749,6 +25763,10 @@
      1.12,
      1.12,
      1.12,
+     1.12,
+     1.12,
+     1.12,
+     1.12,
      1.12
     ]
    },
@@ -25776,22 +25794,22 @@
     "w1": {
      "support": 1.12,
      "resistance": 1.13,
-     "change_pct": -0.41
+     "change_pct": -0.44
     },
     "m1": {
      "support": 1.12,
      "resistance": 1.17,
-     "change_pct": -3.65
+     "change_pct": -3.67
     },
     "m3": {
      "support": 1.12,
      "resistance": 1.17,
-     "change_pct": -1.92
+     "change_pct": -1.94
     },
     "y1": {
      "support": 1.12,
      "resistance": 1.2,
-     "change_pct": -3.9
+     "change_pct": -3.92
     }
    },
    "financials": [],
@@ -25822,69 +25840,69 @@
      "medie": {
       "sma10": {
        "liv": 1.13,
-       "dist_pct": -0.83
+       "dist_pct": -0.85
       },
       "ema10": {
        "liv": 1.13,
-       "dist_pct": -0.81
+       "dist_pct": -0.83
       },
       "sma20": {
        "liv": 1.14,
-       "dist_pct": -1.72
+       "dist_pct": -1.74
       },
       "ema20": {
        "liv": 1.14,
-       "dist_pct": -1.48
+       "dist_pct": -1.5
       },
       "sma30": {
        "liv": 1.15,
-       "dist_pct": -2.34
+       "dist_pct": -2.36
       },
       "ema30": {
        "liv": 1.14,
-       "dist_pct": -1.87
+       "dist_pct": -1.89
       },
       "sma50": {
        "liv": 1.15,
-       "dist_pct": -2.72
+       "dist_pct": -2.74
       },
       "ema50": {
        "liv": 1.15,
-       "dist_pct": -2.24
+       "dist_pct": -2.26
       },
       "sma100": {
        "liv": 1.15,
-       "dist_pct": -2.6
+       "dist_pct": -2.62
       },
       "ema100": {
        "liv": 1.15,
-       "dist_pct": -2.66
+       "dist_pct": -2.68
       },
       "sma200": {
        "liv": 1.16,
-       "dist_pct": -3.43
+       "dist_pct": -3.46
       },
       "ema200": {
        "liv": 1.16,
-       "dist_pct": -3.09
+       "dist_pct": -3.11
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 21.3,
+      "rsi14": 21.2,
       "macd": {
        "linea": -0.01,
        "segnale": -0.01,
        "istogramma": -0.0
       },
-      "stoch_k": 12.3,
-      "stoch_d": 18.7,
-      "williams_r": -87.7,
-      "cci20": -86.6,
+      "stoch_k": 11.6,
+      "stoch_d": 18.4,
+      "williams_r": -88.4,
+      "cci20": -87.2,
       "adx14": 48.4,
       "di_su": 6.2,
-      "di_giu": 32.9,
+      "di_giu": 32.8,
       "momentum10": -0.02
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
@@ -26382,15 +26400,15 @@
      }
     ],
     "performance": {
-     "s1": -1.09,
-     "m1": -3.65,
-     "m3": -1.76,
-     "m6": -5.05,
-     "a1": -4.24,
-     "ytd": -4.66,
-     "a3": 5.54,
-     "a5": -3.1,
-     "a10": 1.99
+     "s1": -1.12,
+     "m1": -3.67,
+     "m3": -1.78,
+     "m6": -5.07,
+     "a1": -4.26,
+     "ytd": -4.68,
+     "a3": 5.52,
+     "a5": -3.12,
+     "a10": 1.97
     },
     "stagionalita": [
      {
@@ -26517,28 +26535,28 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 6.64,
+   "price": 6.65,
    "price_asof": "2026-10-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.76,
+   "change_pct": 0.82,
    "pe": null,
    "ath": 6.83,
    "ath_dist_pct": -2.7,
    "sma200_dist_pct": 8.3,
-   "sma50_dist_pct": 1.1,
+   "sma50_dist_pct": 1.2,
    "w52_high": 6.83,
    "w52_low": 4.83,
    "w52_dist_pct": -2.7,
-   "day_high": 6.65,
+   "day_high": 6.66,
    "day_low": 6.64,
    "support": 6.28,
    "resistance": 6.83,
-   "rsi": 54.4,
-   "volume": 183,
-   "vol_ratio": 0.09,
-   "atr_14": 0.08965,
-   "atr_pct": 1.35,
+   "rsi": 54.7,
+   "volume": 1047,
+   "vol_ratio": 0.5,
+   "atr_14": 0.09082,
+   "atr_pct": 1.37,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -26547,7 +26565,7 @@
      6.49,
      6.59,
      6.59,
-     6.64
+     6.65
     ],
     "m6": [
      5.75,
@@ -26675,7 +26693,7 @@
      6.49,
      6.59,
      6.59,
-     6.64
+     6.65
     ],
     "all": [
      0.88,
@@ -26946,7 +26964,7 @@
      6.44,
      6.59,
      6.56,
-     6.64
+     6.65
     ],
     "m1": [
      6.74,
@@ -26970,7 +26988,7 @@
      6.49,
      6.59,
      6.59,
-     6.64
+     6.65
     ],
     "m3": [
      6.17,
@@ -27038,7 +27056,7 @@
      6.49,
      6.59,
      6.59,
-     6.64
+     6.65
     ],
     "y1": [
      5.05,
@@ -27206,7 +27224,11 @@
      6.65,
      6.65,
      6.65,
-     6.64
+     6.64,
+     6.66,
+     6.66,
+     6.65,
+     6.65
     ]
    },
    "earnings_date": null,
@@ -27217,11 +27239,11 @@
    "beta": null,
    "sharpe_1y": 0.86,
    "sortino_1y": 1.24,
-   "sharpe_6m": 1.02,
-   "sortino_6m": 1.42,
+   "sharpe_6m": 1.03,
+   "sortino_6m": 1.43,
    "prepost": null,
-   "prezzo_limite_aggiustato": 6.64,
-   "risk_reward": "1:1.1",
+   "prezzo_limite_aggiustato": 6.65,
+   "risk_reward": "1:1.0",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -27232,23 +27254,23 @@
    "tech_by_range": {
     "w1": {
      "support": 6.46,
-     "resistance": 6.65,
-     "change_pct": 2.51
+     "resistance": 6.66,
+     "change_pct": 2.57
     },
     "m1": {
      "support": 6.28,
      "resistance": 6.83,
-     "change_pct": -1.4
+     "change_pct": -1.34
     },
     "m3": {
      "support": 6.02,
      "resistance": 6.83,
-     "change_pct": 7.66
+     "change_pct": 7.73
     },
     "y1": {
      "support": 4.83,
      "resistance": 6.83,
-     "change_pct": 31.63
+     "change_pct": 31.71
     }
    },
    "financials": [],
@@ -27275,73 +27297,73 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 6.64,
+     "prezzo": 6.65,
      "medie": {
       "sma10": {
        "liv": 6.59,
-       "dist_pct": 0.86
+       "dist_pct": 0.91
       },
       "ema10": {
        "liv": 6.59,
-       "dist_pct": 0.89
+       "dist_pct": 0.94
       },
       "sma20": {
        "liv": 6.56,
-       "dist_pct": 1.23
+       "dist_pct": 1.29
       },
       "ema20": {
        "liv": 6.58,
-       "dist_pct": 0.95
+       "dist_pct": 1.01
       },
       "sma30": {
        "liv": 6.58,
-       "dist_pct": 1.01
+       "dist_pct": 1.07
       },
       "ema30": {
        "liv": 6.57,
-       "dist_pct": 1.13
+       "dist_pct": 1.18
       },
       "sma50": {
        "liv": 6.57,
-       "dist_pct": 1.13
+       "dist_pct": 1.19
       },
       "ema50": {
        "liv": 6.53,
-       "dist_pct": 1.71
+       "dist_pct": 1.77
       },
       "sma100": {
        "liv": 6.43,
-       "dist_pct": 3.29
+       "dist_pct": 3.35
       },
       "ema100": {
        "liv": 6.4,
-       "dist_pct": 3.78
+       "dist_pct": 3.84
       },
       "sma200": {
        "liv": 6.14,
-       "dist_pct": 8.28
+       "dist_pct": 8.34
       },
       "ema200": {
        "liv": 6.14,
-       "dist_pct": 8.22
+       "dist_pct": 8.29
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 54.4,
+      "rsi14": 54.7,
       "macd": {
        "linea": 0.01,
        "segnale": 0.01,
        "istogramma": -0.0
       },
-      "stoch_k": 49.9,
-      "stoch_d": 45.1,
-      "williams_r": -50.1,
-      "cci20": 54.6,
-      "adx14": 10.1,
-      "di_su": 31.2,
-      "di_giu": 31.3,
+      "stoch_k": 50.9,
+      "stoch_d": 45.5,
+      "williams_r": -49.1,
+      "cci20": 59.2,
+      "adx14": 10.2,
+      "di_su": 32.1,
+      "di_giu": 30.9,
       "momentum10": -0.03
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
@@ -27833,21 +27855,21 @@
      {
       "d": "2026-10-07",
       "o": 6.64,
-      "h": 6.65,
+      "h": 6.66,
       "l": 6.64,
-      "c": 6.64
+      "c": 6.65
      }
     ],
     "performance": {
-     "s1": 1.3,
-     "m1": 0.72,
-     "m3": 7.55,
-     "m6": 15.37,
-     "ytd": 17.81,
-     "a1": 47.05,
-     "a3": 71.69,
-     "a5": 85.94,
-     "a10": 162.84
+     "s1": 1.36,
+     "m1": 0.78,
+     "m3": 7.62,
+     "m6": 15.44,
+     "ytd": 17.88,
+     "a1": 47.14,
+     "a3": 71.8,
+     "a5": 86.05,
+     "a10": 162.99
     },
     "stagionalita": [
      {
@@ -27933,7 +27955,7 @@
      },
      {
       "mese": 10,
-      "media": 0.52,
+      "media": 0.53,
       "mediana": 1.85,
       "positivi_pct": 61,
       "campione": 23,
@@ -27960,9 +27982,9 @@
      }
     ]
    },
-   "rs_1m": -3.2,
+   "rs_1m": -3.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -7.1,
+   "rs_ndx_1m": -6.9,
    "beta_ndx": 0.7,
    "avg_corr": 0.41,
    "max_corr": 0.56,
@@ -27974,28 +27996,28 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 88.94,
+   "price": 89.06,
    "price_asof": "2026-10-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.56,
+   "change_pct": -0.42,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -39.6,
-   "sma200_dist_pct": 7.3,
-   "sma50_dist_pct": 0.0,
+   "ath_dist_pct": -39.5,
+   "sma200_dist_pct": 7.4,
+   "sma50_dist_pct": 0.2,
    "w52_high": 119.48,
    "w52_low": 54.98,
-   "w52_dist_pct": -25.6,
-   "day_high": 89.06,
+   "w52_dist_pct": -25.5,
+   "day_high": 89.18,
    "day_low": 88.77,
    "support": 86.86,
    "resistance": 106.75,
-   "rsi": 43.8,
-   "volume": 1788,
+   "rsi": 44.0,
+   "volume": 2987,
    "vol_ratio": 0.01,
    "atr_14": 4.21,
-   "atr_pct": 4.73,
+   "atr_pct": 4.72,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -28004,7 +28026,7 @@
      91.11,
      89.43,
      89.44,
-     88.94
+     89.06
     ],
     "m6": [
      97.87,
@@ -28132,7 +28154,7 @@
      91.11,
      89.43,
      89.44,
-     88.94
+     89.06
     ],
     "all": [
      33.1,
@@ -28403,7 +28425,7 @@
      84.67,
      85.76,
      90.42,
-     88.94
+     89.06
     ],
     "m1": [
      93.03,
@@ -28427,7 +28449,7 @@
      91.11,
      89.43,
      89.44,
-     88.94
+     89.06
     ],
     "m3": [
      70.44,
@@ -28495,7 +28517,7 @@
      91.11,
      89.43,
      89.44,
-     88.94
+     89.06
     ],
     "y1": [
      61.73,
@@ -28664,21 +28686,25 @@
      88.83,
      88.79,
      88.82,
-     88.94
+     88.97,
+     89.09,
+     89.02,
+     89.04,
+     89.06
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 57,
+   "health": 58,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.59,
+   "sharpe_1y": 0.6,
    "sortino_1y": 0.81,
    "sharpe_6m": -0.28,
-   "sortino_6m": -0.38,
+   "sortino_6m": -0.37,
    "prepost": null,
-   "prezzo_limite_aggiustato": 88.94,
+   "prezzo_limite_aggiustato": 89.06,
    "risk_reward": "1:2.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -28691,22 +28717,22 @@
     "w1": {
      "support": 86.86,
      "resistance": 93.68,
-     "change_pct": -4.23
+     "change_pct": -4.1
     },
     "m1": {
      "support": 86.86,
      "resistance": 106.75,
-     "change_pct": -4.4
+     "change_pct": -4.27
     },
     "m3": {
      "support": 68.58,
      "resistance": 106.75,
-     "change_pct": 26.26
+     "change_pct": 26.43
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 44.08
+     "change_pct": 44.27
     }
    },
    "financials": [],
@@ -28723,7 +28749,7 @@
      "lo": 97.42,
      "hi": 99.19
     },
-    "liq_above": 89.0,
+    "liq_above": 93.5,
     "liq_below": 88.72,
     "order_block": {
      "dir": "rialzista",
@@ -28733,74 +28759,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 88.94,
+     "prezzo": 89.06,
      "medie": {
       "sma10": {
-       "liv": 91.12,
-       "dist_pct": -2.39
+       "liv": 91.13,
+       "dist_pct": -2.27
       },
       "ema10": {
-       "liv": 91.24,
-       "dist_pct": -2.52
+       "liv": 91.26,
+       "dist_pct": -2.41
       },
       "sma20": {
        "liv": 95.41,
-       "dist_pct": -6.78
+       "dist_pct": -6.66
       },
       "ema20": {
-       "liv": 92.16,
-       "dist_pct": -3.49
+       "liv": 92.17,
+       "dist_pct": -3.38
       },
       "sma30": {
-       "liv": 93.2,
-       "dist_pct": -4.58
+       "liv": 93.21,
+       "dist_pct": -4.45
       },
       "ema30": {
-       "liv": 91.64,
-       "dist_pct": -2.95
+       "liv": 91.65,
+       "dist_pct": -2.82
       },
       "sma50": {
        "liv": 88.91,
-       "dist_pct": 0.04
+       "dist_pct": 0.17
       },
       "ema50": {
        "liv": 90.1,
-       "dist_pct": -1.29
+       "dist_pct": -1.16
       },
       "sma100": {
        "liv": 86.25,
-       "dist_pct": 3.12
+       "dist_pct": 3.26
       },
       "ema100": {
        "liv": 87.54,
-       "dist_pct": 1.6
+       "dist_pct": 1.74
       },
       "sma200": {
        "liv": 82.89,
-       "dist_pct": 7.3
+       "dist_pct": 7.45
       },
       "ema200": {
        "liv": 82.78,
-       "dist_pct": 7.44
+       "dist_pct": 7.59
       }
      },
      "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 43.8,
+      "rsi14": 44.0,
       "macd": {
-       "linea": -0.3,
+       "linea": -0.29,
        "segnale": 0.89,
        "istogramma": -1.19
       },
-      "stoch_k": 12.5,
-      "stoch_d": 11.9,
-      "williams_r": -87.5,
-      "cci20": -64.4,
+      "stoch_k": 13.2,
+      "stoch_d": 12.2,
+      "williams_r": -86.8,
+      "cci20": -63.6,
       "adx14": 18.3,
       "di_su": 19.0,
       "di_giu": 18.7,
-      "momentum10": -3.22
+      "momentum10": -3.1
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -29291,21 +29317,21 @@
      {
       "d": "2026-10-07",
       "o": 89.0,
-      "h": 89.06,
+      "h": 89.18,
       "l": 88.77,
-      "c": 88.94
+      "c": 89.06
      }
     ],
     "performance": {
-     "s1": -1.64,
-     "m1": -2.78,
-     "m3": 29.74,
-     "m6": -5.79,
-     "ytd": 55.16,
-     "a1": 38.95,
-     "a3": 15.84,
-     "a5": 70.38,
-     "a10": 84.37
+     "s1": -1.5,
+     "m1": -2.65,
+     "m3": 29.92,
+     "m6": -5.67,
+     "ytd": 55.37,
+     "a1": 39.13,
+     "a3": 15.99,
+     "a5": 70.61,
+     "a10": 84.62
     },
     "stagionalita": [
      {
@@ -29418,9 +29444,9 @@
      }
     ]
    },
-   "rs_1m": -6.1,
+   "rs_1m": -5.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -10.0,
+   "rs_ndx_1m": -9.9,
    "beta_ndx": -0.77,
    "avg_corr": -0.2,
    "max_corr": -0.01,
@@ -31598,9 +31624,9 @@
     "float_pct": 80.4,
     "avg_volume_30d": 9566429.0,
     "pe_ttm": null,
-    "forward_pe": -35.0617,
+    "forward_pe": -34.4737,
     "eps_ttm": -0.94,
-    "eps_forward": -1.0501,
+    "eps_forward": -1.0681,
     "revenue_fy": 1210000.0,
     "net_income_fy": -152768992.0,
     "revenue_growth": null,
@@ -44709,7 +44735,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -32.5,
-      "meglio": 24.6
+      "meglio": 24.5
      },
      {
       "mese": 11,
@@ -46600,7 +46626,47 @@
      380.12,
      354.81
     ],
-    "d1": []
+    "d1": [
+     379.75,
+     378.07,
+     377.61,
+     375.98,
+     375.45,
+     375.39,
+     376.17,
+     375.33,
+     375.43,
+     375.0,
+     375.35,
+     375.34,
+     374.97,
+     375.99,
+     375.99,
+     375.55,
+     375.66,
+     375.64,
+     375.83,
+     376.08,
+     375.69,
+     376.44,
+     376.42,
+     376.99,
+     376.71,
+     377.07,
+     377.04,
+     376.77,
+     376.24,
+     376.36,
+     376.77,
+     376.72,
+     377.4,
+     377.0,
+     377.4,
+     377.8,
+     377.25,
+     377.04,
+     377.87
+    ]
    },
    "earnings_date": "2026-10-21",
    "rating": {
@@ -58766,10 +58832,10 @@
    "sortino_6m": 1.26,
    "prepost": {
     "label": "after",
-    "price": 137.98,
+    "price": 137.99,
     "change_pct": 0.01
    },
-   "prezzo_limite_aggiustato": 137.98,
+   "prezzo_limite_aggiustato": 137.99,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -62264,8 +62330,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 16,
-    "target": 2101.44,
-    "upside_pct": 14.6
+    "target": 2100.73,
+    "upside_pct": 14.5
    },
    "analisti": {
     "eps_ora": 51.9239,
@@ -62278,9 +62344,9 @@
     "eps_min": 37.43,
     "eps_max": 59.1013,
     "eps_n": 33,
-    "target_min": 866.82,
-    "target_max": 2913.69,
-    "target_mediana": 2155.83
+    "target_min": 866.53,
+    "target_max": 2912.72,
+    "target_mediana": 2155.1
    },
    "health": 82,
    "eps": 30.81,
@@ -62317,7 +62383,7 @@
     "debt_to_equity": 9.092,
     "dividend_yield": 0.005,
     "price_to_book": null,
-    "target_mean": 2101.437,
+    "target_mean": 2100.731,
     "fcf": null,
     "gross_margin": 0.5273,
     "enterprise_value": null,
@@ -69997,9 +70063,9 @@
     "eps_min": 1.85,
     "eps_max": 4.1,
     "eps_n": 18,
-    "target_min": 83.07,
-    "target_max": 168.99,
-    "target_mediana": 130.76
+    "target_min": 83.06,
+    "target_max": 168.98,
+    "target_mediana": 130.75
    },
    "health": 28,
    "eps": 0.59,
@@ -70010,11 +70076,11 @@
    "sortino_6m": -1.08,
    "prepost": {
     "label": "after",
-    "price": 89.0,
-    "change_pct": -4.32
+    "price": 89.4,
+    "change_pct": -3.89
    },
-   "prezzo_limite_aggiustato": 89.0,
-   "risk_reward": "1:1.9",
+   "prezzo_limite_aggiustato": 89.4,
+   "risk_reward": "1:1.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
    "stats": {
@@ -70036,7 +70102,7 @@
     "debt_to_equity": 17.131,
     "dividend_yield": 0.0018,
     "price_to_book": null,
-    "target_mean": 126.7344,
+    "target_mean": 126.7255,
     "fcf": null,
     "gross_margin": 0.3511,
     "enterprise_value": null,
@@ -82220,7 +82286,7 @@
      {
       "mese": 6,
       "media": 0.53,
-      "mediana": 0.76,
+      "mediana": 0.77,
       "positivi_pct": 57,
       "campione": 42,
       "peggio": -10.8,
@@ -86674,7 +86740,7 @@
      69.47,
      68.41,
      84.07,
-     86.13,
+     86.14,
      83.34,
      87.62,
      88.01,
@@ -99579,9 +99645,9 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -101719,7 +101785,7 @@
      111.47,
      108.67,
      109.77,
-     114.98,
+     114.99,
      103.18,
      101.95,
      103.96,
@@ -109967,15 +110033,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1206",
-    "change_pct": -0.42,
+    "value": "1.1202",
+    "change_pct": -0.46,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "176.92",
-    "change_pct": -0.68,
+    "value": "176.54",
+    "change_pct": -0.9,
     "suffix": "%"
    }
   ],
@@ -110501,10 +110567,10 @@
     "symbol": "HG=F",
     "label": "Rame",
     "unita": "$/lb",
-    "value": 6.644,
-    "change_pct": 0.75,
-    "var_1y": 31.6,
-    "pos_range_1y": 91.8,
+    "value": 6.651,
+    "change_pct": 0.86,
+    "var_1y": 31.8,
+    "pos_range_1y": 92.2,
     "min_1y": 4.848,
     "max_1y": 6.804,
     "history": [
@@ -111014,7 +111080,7 @@
      },
      {
       "d": "2026-10-07",
-      "v": 6.644
+      "v": 6.651
      }
     ]
    },
@@ -111022,10 +111088,10 @@
     "symbol": "CL=F",
     "label": "Petrolio WTI",
     "unita": "$",
-    "value": 88.98,
-    "change_pct": -0.51,
-    "var_1y": 44.1,
-    "pos_range_1y": 58.4,
+    "value": 89.14,
+    "change_pct": -0.34,
+    "var_1y": 44.4,
+    "pos_range_1y": 58.7,
     "min_1y": 55.27,
     "max_1y": 112.95,
     "history": [
@@ -111535,7 +111601,7 @@
      },
      {
       "d": "2026-10-07",
-      "v": 88.98
+      "v": 89.14
      }
     ]
    },
@@ -111544,9 +111610,9 @@
     "label": "Oro",
     "unita": "$/oz",
     "value": 4134,
-    "change_pct": -1.27,
+    "change_pct": -1.28,
     "var_1y": 3.2,
-    "pos_range_1y": 12.8,
+    "pos_range_1y": 12.7,
     "min_1y": 3960,
     "max_1y": 5318,
     "history": [
@@ -112056,13 +112122,27 @@
      },
      {
       "d": "2026-10-07",
-      "v": 4133.8
+      "v": 4133.5
      }
     ]
    }
   },
   "news": {
    "voci": [
+    {
+     "titolo": "Japanese Stocks Fall as Inflation Fears Hit Cyclical Shares",
+     "riassunto": "Japanese stocks fell for a second day, tracking a Wall Street selloff as persistently high oil prices revived inflation concerns and weighed on equities near record highs.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-08T00:27:54Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-08/japanese-stocks-fall-as-inflation-fears-hit-cyclical-shares"
+    },
+    {
+     "titolo": "Worst-Performing Philippine Bonds Face Peso, Inflation Risks",
+     "riassunto": "Philippine bonds, the worst-performing in emerging markets since the Iran war began, are set for further losses as faster inflation, a sliding peso and softer auction demand weigh on sentiment, strategists say.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-08T00:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-08/worst-performing-philippine-bonds-face-peso-inflation-risks"
+    },
     {
      "titolo": "Gold Near Nine-Week Low on Prospects for Rate Hike by Year-End",
      "riassunto": "Gold traded near a nine-week low as fresh tensions in the Strait of Hormuz heightened war-driven inflation concerns and investors weighed prospects for at least one more US rate hike this year.",
@@ -112085,8 +112165,8 @@
      "url": "https://www.marketwatch.com/story/rising-yields-are-quietly-crashing-the-stock-markets-earlier-winners-of-2026-a29f2863?mod=mw_rss_topstories"
     },
     {
-     "titolo": "Asian Stocks to Dip as Oil Fuels Inflation Worries: Markets Wrap",
-     "riassunto": "Asian stocks were poised for declines, tracking moves on Wall Street, as elevated oil prices stoked inflation concerns.",
+     "titolo": "Asian Stocks Drop on Inflation Concerns, Oil Gains: Markets Wrap",
+     "riassunto": "Asian stocks declined, tracking moves on Wall Street, as elevated oil prices stoked inflation concerns and technology shares came under renewed pressure.",
      "fonte": "Bloomberg",
      "quando": "2026-10-07T22:03:17Z",
      "url": "https://www.bloomberg.com/news/articles/2026-10-07/stock-market-today-dow-s-p-live-updates"
@@ -112106,13 +112186,6 @@
      "url": "https://www.marketwatch.com/story/options-traders-are-betting-on-a-dramatic-drop-in-interest-rates-141066fb?mod=mw_rss_topstories"
     },
     {
-     "titolo": "Fed Minutes Show Hawkish Unity Behind September Rate Hike",
-     "riassunto": "Bloomberg's Mike McKee said that the Fed's decision to raise rates was unanimous among all nineteen members of the FOMC, including non-voting participants, according to minutes from the Fed's September meeting. McKee said the minutes showed that members feel that between inflation numbers, the geopolitical situation an",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-07T19:53:48Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-10-07/fed-minutes-show-hawkish-unity-behind-sept-rate-hike-video"
-    },
-    {
      "titolo": "Fed’s minutes show no appetite for a series of interest-rate hikes",
      "riassunto": "September’s rate hike was viewed by many officials as needed just in case inflation remains sticky.",
      "fonte": "MarketWatch",
@@ -112125,13 +112198,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-07T18:44:36Z",
      "url": "https://www.cnbc.com/2026/10/07/inflation-fears-on-the-rise-as-one-year-outlook-in-fed-survey-hits-highest-since-may-2023.html"
-    },
-    {
-     "titolo": "Lofty US Yields Lure Strong Investor Appetite at 10-Year Auction",
-     "riassunto": "US Treasuries were ending the day mixed after a strong auction of 10-year notes signaled that yields at multi-decade highs were fueling investor appetite.",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-07T17:32:18Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-07/us-bonds-rise-as-yields-at-2002-high-lures-buyers-at-auction"
     },
     {
      "titolo": "The ‘Magnificent Seven’ are now big enough to move the economy. Why that could be a problem.",
@@ -117213,10 +117279,10 @@
   },
   "carry": {
    "us10": 5.28,
-   "jp10": 3.1,
+   "jp10": 3.11,
    "spread": 2.17,
-   "usdjpy": 157.91,
-   "usdjpy_chg_1m": 2.64,
+   "usdjpy": 157.64,
+   "usdjpy_chg_1m": 2.46,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -117250,7 +117316,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 22
+     "score": 23
     },
     {
      "label": "Treasury 10A",
@@ -122107,7 +122173,7 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 102.25,
+   "value": 102.24,
    "chg_3m_pct": 1.26,
    "flag": null,
    "src": "DXY"
@@ -122130,14 +122196,14 @@
    "nasdaq": {
     "symbol": "NQ=F",
     "label": "Futures Nasdaq 100",
-    "price": 31430.75,
-    "change_pct": -0.16
+    "price": 31391.25,
+    "change_pct": -0.28
    },
    "sp500": {
     "symbol": "ES=F",
     "label": "Futures S&P 500",
-    "price": 7852.0,
-    "change_pct": -0.36
+    "price": 7847.75,
+    "change_pct": -0.42
    }
   },
   "froth": {
@@ -122197,6 +122263,19 @@
    "fonte": "modificato dalla dashboard",
    "non_seguite": [],
    "senza_prezzo": []
+  },
+  "shock_alert": {
+   "active": true,
+   "threshold": -2.0,
+   "sources": [
+    {
+     "src": "KOSPI (Asia)",
+     "chg": -2.31,
+     "basis": "candle"
+    }
+   ],
+   "worst_chg": -2.31,
+   "note": "Asia/futures Nasdaq oltre -2% con Wall Street chiusa: sospendere gli acquisti aggressivi, attendere l'assestamento della prima ora di scambi USA."
   },
   "_news_titoli": {
    "per_titolo": {
@@ -122381,7 +122460,7 @@
       "titolo": "Stocks Settle Lower on Higher Bond Yields",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.22% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.66%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.21%.  December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-07T23:39:39Z",
+      "quando": "2026-10-08T00:32:23Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-lower-higher-bond-yields"
      },
      {
@@ -122436,6 +122515,20 @@
       "url": "https://www.nasdaq.com/articles/stocks-pressured-rising-bond-yields-1"
      },
      {
+      "titolo": "Banks Under Pressure from Spiking Yields Ahead of Q3 Results",
+      "riassunto": "Higher interest rates are generally seen as beneficial for the likes of JPMorgan and Wells Fargo, but spiking yields of the type we have been experiencing are negative for these banks from several angles.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-07T22:10:00Z",
+      "url": "https://www.nasdaq.com/articles/banks-under-pressure-spiking-yields-ahead-q3-results"
+     },
+     {
+      "titolo": "Banks Under Pressure from Spiking Yields Ahead of Q3 Results",
+      "riassunto": "Higher interest rates are generally seen as beneficial for the likes of JPMorgan and Wells Fargo, but spiking yields of the type we have been experiencing are negative for these banks from several angles.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-07T22:05:00Z",
+      "url": "https://www.nasdaq.com/articles/banks-under-pressure-spiking-yields-ahead-q3-results-0"
+     },
+     {
       "titolo": "Memory Trade: Cyclical or Durable Growth?",
       "riassunto": "While skeptics continue to view the memory providers through a traditional cyclical lens, structural demand from the AI boom has transformed the industry landscape.",
       "fonte": "Nasdaq",
@@ -122448,23 +122541,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-07T19:35:00Z",
       "url": "https://www.nasdaq.com/articles/1069-micron-stock-going-split"
-     },
-     {
-      "titolo": "Prediction: Micron Will Have a Larger Market Cap Than Nvidia by 2030",
-      "riassunto": "Key PointsMicron's faster growth rates have helped it achieve higher profit margins than Nvidia while narrowing the gap between their quarterly sales.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-07T19:11:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-micron-will-have-larger-market-cap-nvidia-2030"
-     },
-     {
-      "titolo": "Micron Crushed Earnings and the Stock Barely Moved. Is the Market Wrong?",
-      "riassunto": "In this video, I will cover Micron's (NASDAQ: MU) latest earnings report and explain why the market is not rewarding the results and what it means for the stock going forward. Watch the short video to learn more, consider subscribing, and click the special offer link below.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-07T16:17:40Z",
-      "url": "https://www.nasdaq.com/articles/micron-crushed-earnings-and-stock-barely-moved-market-wrong"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Jensen Huang Said Nvidia Now Has &quot;a Lot Greater Visibility&quot; Into Demand, Letting It Forecast a Full Year Ahead for the First Time Ever. Does That Confidence Justify Nvidi",
+      "riassunto": "Key PointsNvidia stock trades at a forward P/E above 25, while the S&amp;P 500 has a forward P/E of roughly 19.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-08T00:20:00Z",
+      "url": "https://www.nasdaq.com/articles/jensen-huang-said-nvidia-now-has-lot-greater-visibility-demand-letting-it-forecast-full"
+     },
+     {
+      "titolo": "Think You Missed Out on Nvidia's Stock Rise? Think Again.",
+      "riassunto": "Key PointsNvidia stock looks undervalued relative to its growth guidance.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-07T23:59:00Z",
+      "url": "https://www.nasdaq.com/articles/think-you-missed-out-nvidias-stock-rise-think-again"
+     },
      {
       "titolo": "We Are Witnessing the Stock Market Do Something for Only the 3rd Time in 156 Years, and History Is Clear About What Comes Next",
       "riassunto": "Key PointsStocks have soared over the last few years as optimism around AI helps overshadow the many problems in the economy.",
@@ -122492,20 +122585,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-07T20:21:00Z",
       "url": "https://www.nasdaq.com/articles/what-5000-investment-nvidia-could-be-worth-2030"
-     },
-     {
-      "titolo": "At $1,069, Is Micron Stock Going to Split?",
-      "riassunto": "Key PointsMicron stock trades over $1,000 per share.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-07T19:35:00Z",
-      "url": "https://www.nasdaq.com/articles/1069-micron-stock-going-split"
-     },
-     {
-      "titolo": "Prediction: Micron Will Have a Larger Market Cap Than Nvidia by 2030",
-      "riassunto": "Key PointsMicron's faster growth rates have helped it achieve higher profit margins than Nvidia while narrowing the gap between their quarterly sales.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-07T19:11:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-micron-will-have-larger-market-cap-nvidia-2030"
      }
     ],
     "PLTR": [
@@ -122617,7 +122696,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-08T00:06:33Z"
+   "letto_il": "2026-10-08T00:47:52Z"
   }
  },
  "broker": null,
@@ -122804,7 +122883,7 @@
      "titolo": "Stocks Settle Lower on Higher Bond Yields",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.22% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.66%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.21%.  December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-07T23:39:39Z",
+     "quando": "2026-10-08T00:32:23Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-higher-bond-yields"
     },
     {
@@ -122859,6 +122938,20 @@
      "url": "https://www.nasdaq.com/articles/stocks-pressured-rising-bond-yields-1"
     },
     {
+     "titolo": "Banks Under Pressure from Spiking Yields Ahead of Q3 Results",
+     "riassunto": "Higher interest rates are generally seen as beneficial for the likes of JPMorgan and Wells Fargo, but spiking yields of the type we have been experiencing are negative for these banks from several angles.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-07T22:10:00Z",
+     "url": "https://www.nasdaq.com/articles/banks-under-pressure-spiking-yields-ahead-q3-results"
+    },
+    {
+     "titolo": "Banks Under Pressure from Spiking Yields Ahead of Q3 Results",
+     "riassunto": "Higher interest rates are generally seen as beneficial for the likes of JPMorgan and Wells Fargo, but spiking yields of the type we have been experiencing are negative for these banks from several angles.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-07T22:05:00Z",
+     "url": "https://www.nasdaq.com/articles/banks-under-pressure-spiking-yields-ahead-q3-results-0"
+    },
+    {
      "titolo": "Memory Trade: Cyclical or Durable Growth?",
      "riassunto": "While skeptics continue to view the memory providers through a traditional cyclical lens, structural demand from the AI boom has transformed the industry landscape.",
      "fonte": "Nasdaq",
@@ -122871,23 +122964,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-07T19:35:00Z",
      "url": "https://www.nasdaq.com/articles/1069-micron-stock-going-split"
-    },
-    {
-     "titolo": "Prediction: Micron Will Have a Larger Market Cap Than Nvidia by 2030",
-     "riassunto": "Key PointsMicron's faster growth rates have helped it achieve higher profit margins than Nvidia while narrowing the gap between their quarterly sales.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-07T19:11:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-micron-will-have-larger-market-cap-nvidia-2030"
-    },
-    {
-     "titolo": "Micron Crushed Earnings and the Stock Barely Moved. Is the Market Wrong?",
-     "riassunto": "In this video, I will cover Micron's (NASDAQ: MU) latest earnings report and explain why the market is not rewarding the results and what it means for the stock going forward. Watch the short video to learn more, consider subscribing, and click the special offer link below.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-07T16:17:40Z",
-     "url": "https://www.nasdaq.com/articles/micron-crushed-earnings-and-stock-barely-moved-market-wrong"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Jensen Huang Said Nvidia Now Has &quot;a Lot Greater Visibility&quot; Into Demand, Letting It Forecast a Full Year Ahead for the First Time Ever. Does That Confidence Justify Nvidi",
+     "riassunto": "Key PointsNvidia stock trades at a forward P/E above 25, while the S&amp;P 500 has a forward P/E of roughly 19.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-08T00:20:00Z",
+     "url": "https://www.nasdaq.com/articles/jensen-huang-said-nvidia-now-has-lot-greater-visibility-demand-letting-it-forecast-full"
+    },
+    {
+     "titolo": "Think You Missed Out on Nvidia's Stock Rise? Think Again.",
+     "riassunto": "Key PointsNvidia stock looks undervalued relative to its growth guidance.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-07T23:59:00Z",
+     "url": "https://www.nasdaq.com/articles/think-you-missed-out-nvidias-stock-rise-think-again"
+    },
     {
      "titolo": "We Are Witnessing the Stock Market Do Something for Only the 3rd Time in 156 Years, and History Is Clear About What Comes Next",
      "riassunto": "Key PointsStocks have soared over the last few years as optimism around AI helps overshadow the many problems in the economy.",
@@ -122915,20 +123008,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-07T20:21:00Z",
      "url": "https://www.nasdaq.com/articles/what-5000-investment-nvidia-could-be-worth-2030"
-    },
-    {
-     "titolo": "At $1,069, Is Micron Stock Going to Split?",
-     "riassunto": "Key PointsMicron stock trades over $1,000 per share.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-07T19:35:00Z",
-     "url": "https://www.nasdaq.com/articles/1069-micron-stock-going-split"
-    },
-    {
-     "titolo": "Prediction: Micron Will Have a Larger Market Cap Than Nvidia by 2030",
-     "riassunto": "Key PointsMicron's faster growth rates have helped it achieve higher profit margins than Nvidia while narrowing the gap between their quarterly sales.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-07T19:11:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-micron-will-have-larger-market-cap-nvidia-2030"
     }
    ],
    "PLTR": [
@@ -123040,14 +123119,9 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-08T00:06:33Z"
+  "letto_il": "2026-10-08T00:47:52Z"
  },
  "predictions": [
-  {
-   "question": "Bitcoin Up or Down on October 5?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-5-2026"
-  },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
    "yes": 16,
@@ -123070,8 +123144,13 @@
   },
   {
    "question": "Will the price of Bitcoin be above $80,000 on October 8?",
-   "yes": 98,
+   "yes": 97,
    "link": "https://polymarket.com/event/bitcoin-above-80k-on-october-8-2026"
+  },
+  {
+   "question": "Will Bitcoin dip to $62,500 in October?",
+   "yes": 2,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-62pt5k-in-october-2026"
   }
  ],
  "options": {
@@ -187738,6 +187817,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-08T00:06:34Z"
+  "generated_at": "2026-10-08T00:47:53Z"
  }
 }
