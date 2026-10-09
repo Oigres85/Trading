@@ -6304,3 +6304,60 @@ dell'ultimo anno (midrank, come `dgPercentile`): 0 = la meno scambiata, 50 = nor
 scambiata. La riga dichiara la scala e il campione; le sedute senza volume escono dal confronto
 (v205). I rapporti restano nel dato per i gate v469/v471. Sette gate sullo stato costruito,
 quattro iniezioni: mordono tutte, ripristino da snapshot verificato per hash.
+
+## 🚪 v473 — GLI INGRESSI DIVENTANO UN CALCOLO, E «AGGIORNA ANALISI» DIVENTA UN COMANDO
+
+Istruzione del CEO (09/10/2026): *"Rendi strutturale questa ultima analisi. Quando ti dico
+aggiorna analisi devi darmi tutte le informazioni che ti ho chiesto di rendere strutturali."*
+Due difetti, uno di prodotto e uno di metodo.
+
+**Il prodotto: gli ingressi sulla watchlist si facevano a mano**, con uno script nel
+scratchpad. Ora `rotazione.py` stampa la watchlist **per gruppi** — candidati · diversificano ma
+non ancora in zona · stessa scommessa del libro (correlazione da 0,5 in su, in qualunque stato) ·
+non misurabili — e per ogni nome il piano: zona d'ingresso, livello, primo segnale, stop, rischio
+dall'ingresso allo stop, base, trimestrale, revisioni, e la nota del CEO in `LIBRO.md` parola per
+parola accanto ai livelli di oggi.
+
+⚠⚠ **La zona non è una convenzione nuova: è la convenzione CANDIDATO tradotta in prezzi** (sopra
+la media a 200, fra 1 ATR sotto e 2 ATR sopra la media a 50). Due letture della stessa regola
+divergono al primo ritocco (v161, v207), quindi un gate le confronta su **3.000 stati casuali**:
+iniettando un bordo diverso, morde. Quando la 200 sta oltre la 50 + 2 ATR la zona è **vuota**, e
+si dice: nessun livello inventato, resta il **primo segnale** (la media più vicina sopra il
+prezzo), dichiarato *non un ingresso*.
+
+⚠ **La trimestrale ha una fonte sola**: il calendario Nasdaq, lo stesso delle SCADENZE di
+`numeri_libro`. La stima yfinance della pipeline compare solo se diversa o se Nasdaq tace, e si
+chiama stima (v396). Il calendario gira **mentre** si scaricano le barre: ~19 s nascosti.
+⚠ **Le revisioni passano da `schede_progetto.riga_revisioni`** (v400), con `con_target=False`:
+il target è già nella riga di `riga_target_beta`, e due rese dello stesso numero accanto sono la
+classe v415. Il default resta quello di prima, verificato.
+⚠ **Il settore non è nei dati** (nessun campo industria, e `rs_bench` mette RGTI fra i semi e
+SKHY no): il semaforo giallo — niente nuovi semiconduttori — si applica nell'analisi. La
+correlazione col libro invece è misurata, ed è quella che decide il gruppo.
+
+**Il metodo: il 09/10 alle 20:22 un «Aggiorna analisi» è uscito senza la sezione 7.** Gli
+strumenti c'erano, lanciati a mano in quattro processi. *Un difetto di metodo ripetuto si
+corregge cambiando lo strumento* (v230): `python3 scripts/analisi.py` esegue in parallelo i
+quattro strumenti, sceglie pre-market / seduta / after-hours **dal fuso di New York** (un gate
+prova la settimana a 5 ore di distanza di fine ottobre: un +6 a mano morde), dichiara lo
+strumento che fallisce ed esce 1 (v453), e chiude con la **CHECKLIST stampata da
+`FORMATO_ANALISI.md`**, non riscritta nel codice (v436). Un gate verifica nei due versi che gli
+strumenti del comando siano esattamente quelli del formato (v387).
+⚠ `FORMATO_ANALISI.md` ora dice: **«Analisi» e «Aggiorna analisi» = formato completo 0-7, ogni
+volta; una sezione senza novità si scrive in una riga, non si salta**. E porta il **registro
+delle richieste rese strutturali**, con la data: dopo una compattazione del contesto è lì che si
+ritrova cosa il CEO ha chiesto di avere sempre.
+⚠ **Il prezzo della completezza, misurato**: ~1.400 righe, ~188.000 caratteri, 56 secondi.
+
+### 🧪 Tre inciampi, tutti già scritti in questo file
+- un **ritorno anticipato senza i campi di default** (`KeyError: 'distanza_atr'`) sui due nomi
+  senza media a 200 (CBRS, SPCX): l'ha preso il **giro sui dati veri**, non la rilettura;
+- la **resistenza alla pari col prezzo** finiva fra i livelli *sotto*, a «+0,0%»: trovato
+  **leggendo l'uscita** (AMZN chiudeva sul massimo delle 20 sedute);
+- una **sonda sbagliata**: cercavo `calendario_sicuro(` e il codice scrive
+  `submit(calendario_sicuro, …)`. *Un check rosso è prima di tutto una sonda da verificare contro
+  il testo vero* (v433).
+Diciassette iniezioni, una alla volta, scritte con `modifica_sicura` e ripristinate da uno
+snapshot verificato per hash (v427, v430): **mordono tutte, ciascuna sul controllo giusto**.
+Pavimento di `test_analisi_libro.py` 160 → 275 (i punti di chiamata sono 292).
+`?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (regola v440).

@@ -192,6 +192,12 @@ della rotazione settoriale e dei possibili ingressi che l'analisi in chat riport
 su prezzi di oggi; eseguirlo qui affiancherebbe una seconda resa della rotazione a quella del
 rapporto.
 
+`scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
+e «Aggiorna analisi» del CEO — che esegue in parallelo `numeri_libro.py`, `brief.py`,
+`schede_progetto.py` e `rotazione.py`, già dichiarati fuori qui con la loro ragione, e chiude con
+la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
+resa delle stesse grandezze (classe v161/v207).
+
 `scripts/modifica_sicura.py` non è un passo di questo comando: è la libreria che ogni modifica ai
 sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf.py` è la libreria
 che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed

@@ -4,6 +4,19 @@ Il CEO chiede l'analisi **ogni giorno, in chat**. Nessuna Routine settimanale: s
 doppione. Il formato è quello del rapporto «da comitato d'investimento» del 02/10/2026, ridotto
 alla misura di un giorno.
 
+## Quando il CEO scrive «Analisi» o «Aggiorna analisi» (istruzione del 09/10/2026)
+*"Quando ti dico aggiorna analisi devi darmi tutte le informazioni che ti ho chiesto di rendere
+strutturali."* Quindi **«Analisi» e «Aggiorna analisi» = il formato COMPLETO, sezioni 0-7, ogni
+volta**, anche a un'ora dall'ultima. Una sezione senza novità si scrive in una riga («invariato:
+…»), **non si salta**. Solo «sintetizza» o «in poche righe» autorizzano la forma breve.
+Il 09/10 alle 20:22 un aggiornamento è uscito senza la sezione 7: da qui il comando unico.
+
+**Il comando: `python3 scripts/analisi.py`** (v473). Esegue in parallelo tutti gli strumenti
+qui sotto, sceglie da solo pre-market / seduta / after-hours dall'ora di New York, dichiara lo
+strumento che fallisce e chiude con la CHECKLIST — la sezione «Cosa contiene la risposta» di
+questo file, stampata parola per parola. Un gate verifica che gli strumenti del comando siano
+esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti e due i posti.
+
 ## Come si produce
 0. **Prima dell'apertura americana (prima delle 15:30 italiane) l'analisi parte dal PRE-MARKET**
    (istruzione del CEO, 06/10/2026): `python3 scripts/numeri_libro.py --esteso` — risultato del
@@ -32,7 +45,10 @@ alla misura di un giorno.
    dell'anno 0-100 (v472: ultima seduta conclusa e media a 20; 0 = minimo, 50 = norma, 100 = massimo), supporto/resistenza e notizie del feed
    del simbolo. Da v471 ogni titolo porta anche target degli analisti (dalla pipeline, n.d. se
    non seguito), beta sull'S&P 500 col suo R², volatilità annua; e stampa la WATCHLIST del
-   libro con le stesse misure. I volumi escludono la seduta in corso. `--tutti` dà la tabella completa. Per ogni settore con candidati la risposta
+   libro con le stesse misure. I volumi escludono la seduta in corso. Da v473 la watchlist esce
+   per gruppi (candidati · diversificano · stessa scommessa) col piano d'ingresso di ciascun nome:
+   zona, livello, primo segnale, stop, base, trimestrale, revisioni, nota del CEO.
+   `--tutti` dà la tabella completa. Per ogni settore con candidati la risposta
    aggiunge il CONTESTO MACRO del settore da ricerca web, con fonte e data.
 
 ## Cosa contiene la risposta, in quest'ordine
@@ -58,11 +74,29 @@ alla misura di un giorno.
 6. **Piano con soglie** — stato di ciascuna condizione già decisa (BE 295-302, AMD respinto a 645, RGTI sotto 14,41,
    MU 1.100-1.108 con la compensazione RGTI, i supporti di protezione).
 
-7. **Watchlist e rotazione** (sempre, v468) — a) i settori IN TENDENZA con bassa correlazione
-   col libro (dove il denaro va senza replicare la nostra scommessa); b) per ciascuno i titoli
-   CANDIDATI di `rotazione.py`, coi livelli; c) i nomi già in watchlist: chi è nella propria
-   zona d'ingresso, chi è ESTESO (si aspetta), chi è sotto la 200 (non si entra). Il semaforo
-   decide cosa è ammesso: in giallo niente nuovi semiconduttori.
+7. **Watchlist e rotazione** (sempre, v468) — il semaforo decide cosa è ammesso: in giallo
+   niente nuovi semiconduttori.
+   7a. i settori IN TENDENZA con bassa correlazione col libro (dove il denaro va senza replicare
+       la nostra scommessa), col CONTESTO MACRO del settore da ricerca web, fonte e data;
+   7b. per ciascuno i titoli CANDIDATI di `rotazione.py`, coi livelli, i volumi e le notizie;
+   7c. la WATCHLIST per gruppi (blocco «WATCHLIST DEL LIBRO E INGRESSI»): candidati ·
+       diversificano ma non ancora in zona · stessa scommessa del libro (correlazione da 0,5 in
+       su: aggiungono concentrazione) · non misurabili;
+   7d. **gli INGRESSI** (v473, istruzione del CEO del 09/10: *"rendi strutturale questa ultima
+       analisi"*) — per ogni nome che il CEO segue o chiede: il livello d'ingresso secondo la
+       convenzione (chiusura sopra il bordo della zona, con volume oltre la norma) o il ritorno
+       nella zona per chi è tirato, il primo segnale per chi non ha zona, lo stop (supporto 20
+       sedute) e il rischio dall'ingresso allo stop, la base (minimi crescenti o decrescenti,
+       sedute dal minimo dell'anno), la trimestrale dichiarata dalla fonte, le revisioni, e la
+       nota del CEO in `LIBRO.md` confrontata coi livelli di oggi. Chiusura: chi è operabile
+       ADESSO, chi ha un livello da mettere come avviso su Investing.com, chi no e perché.
+
+**Richieste del CEO rese strutturali — entrano TUTTE in ogni «Aggiorna analisi»**: semaforo
+d'uscita (06/10) · costo dell'attesa e scadenze (06/10) · pre-market prima dell'apertura (06/10) ·
+schede del progetto (06/10) · credito sul libro (07/10) · rotazione con candidati, tecnica,
+volumi e notizie (07/10) · target, beta e volatilità (07/10) · volumi come percentile 0-100
+(08/10) · aste del Tesoro in ora italiana (07/10) · ingressi sulla watchlist (09/10).
+Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole
 - Direzione, priorità e livelli sì; le quantità solo come aritmetica dichiarata (v439).

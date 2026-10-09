@@ -1749,6 +1749,223 @@ check("v472 la riga dice cosa significano 0, 50 e 100, e porta i due percentili 
 check("v472 senza dato la riga dice n.d., non zero",
       ROT.riga_volumi({}).count("n.d.") == 3, ROT.riga_volumi({}))
 
+# ============================ v473 — GLI INGRESSI SULLA WATCHLIST E IL COMANDO UNICO ============================
+# Il CEO (09/10/2026): "rendi strutturale questa ultima analisi. Quando ti dico aggiorna analisi
+# devi darmi tutte le informazioni che ti ho chiesto di rendere strutturali". Lo stato si
+# COSTRUISCE (v425, v429): nessuna rete, nessuna dipendenza dal giorno in cui gira la suite.
+import random as _rnd473
+_g473 = _rnd473.Random(473)
+_disaccordi = []
+for _ in range(3000):
+    _s50 = _g473.uniform(50, 150); _atr = _g473.uniform(0.5, 8)
+    _s200 = _s50 + _g473.uniform(-25, 25); _px = _s50 + _g473.uniform(-6, 6) * _atr
+    _pend = _g473.uniform(-3, 3); _corr = _g473.uniform(-0.5, 0.9)
+    _z = ROT.zona_ingresso({"px": _px, "sma50": _s50, "sma200": _s200, "atr": _atr})
+    _dentro = (not _z["vuota"]) and _z["basso"] <= _px <= _z["alto"]
+    _cand = ROT.stato_titolo(_px, _s200, _pend, (_px - _s50) / _atr, _corr) == "CANDIDATO"
+    if _cand != (_dentro and _pend > 0 and _corr < ROT.SOGLIA_CORR):
+        _disaccordi.append((round(_px, 2), round(_s50, 2), round(_s200, 2), round(_atr, 2)))
+check("v473 la zona d'ingresso e' la convenzione CANDIDATO tradotta in prezzi: le due letture non divergono",
+      not _disaccordi, f"{len(_disaccordi)} disaccordi su 3000, es. {_disaccordi[:3]}")
+
+_base473 = {"px": 100.0, "sma20": 97.0, "sma50": 105.0, "sma200": 110.0, "atr": 2.0, "pend50": -1.0,
+            "corr_libro": 0.2, "supp": 95.0, "res": 112.0}
+_p1 = ROT.piano_ingresso({**_base473, "sma200": 108.0})
+check("v473 sotto la zona il livello e' il bordo basso (qui la media a 200), con distanze in % e in ATR",
+      _p1["posizione"] == "sotto" and _p1["zona"]["quale"] == "media a 200"
+      and abs(_p1["livello"]["prezzo"] - 108) < 1e-9 and abs(_p1["livello"]["pct"] - 8) < 1e-9
+      and abs(_p1["livello"]["atr"] - 4) < 1e-9, str(_p1["livello"]))
+check("v473 il primo segnale e' la media piu' vicina sopra il prezzo se viene PRIMA del livello; "
+      "il rischio va dall'ingresso allo stop",
+      (_p1["primo_segnale"] or ("", {}))[0] == "media 50" and abs(_p1["primo_segnale"][1]["prezzo"] - 105) < 1e-9
+      and abs(_p1["rischio"]["pct"] - (95 / 108 - 1) * 100) < 1e-9 and abs(_p1["rischio"]["atr"] + 6.5) < 1e-9,
+      str(_p1))
+_pv = ROT.piano_ingresso(_base473)
+check("v473 zona VUOTA quando la 200 sta oltre 2 ATR sopra la 50: nessun livello inventato, resta il primo segnale",
+      _pv["posizione"] == "zona vuota" and _pv["livello"] is None and _pv["rischio"] is None
+      and (_pv["primo_segnale"] or ("",))[0] == "media 50", str(_pv))
+_p2 = ROT.piano_ingresso({**_base473, "sma200": 90.0})
+check("v473 con la 200 piu' in basso il bordo e' la media a 50 meno 1 ATR, e un primo segnale che viene DOPO il livello non esce",
+      _p2["posizione"] == "sotto" and _p2["zona"]["quale"] == "media a 50 meno 1 ATR"
+      and abs(_p2["livello"]["prezzo"] - 103) < 1e-9 and _p2["primo_segnale"] is None, str(_p2))
+_p3 = ROT.piano_ingresso({**_base473, "sma200": 90.0, "px": 112.0, "pend50": 1.0})
+check("v473 sopra la zona non si insegue: il livello e' il ritorno sotto la media 50 + 2 ATR",
+      _p3["posizione"] == "sopra" and abs(_p3["livello"]["prezzo"] - 109) < 1e-9
+      and abs(_p3["livello"]["atr"] + 1.5) < 1e-9 and abs(_p3["rischio"]["pct"] - (95 / 109 - 1) * 100) < 1e-9, str(_p3))
+check("v473 una resistenza alla pari col prezzo e' ancora da rompere: sta fra i livelli SOPRA",
+      [nm for nm, _ in _p3["sopra"]] == ["resistenza 20s"], str(_p3["sopra"]))
+_p4 = ROT.piano_ingresso({**_base473, "sma200": 90.0, "px": 106.0, "pend50": 1.0})
+check("v473 dentro la zona: niente livello e niente rischio ripetuto (lo stop e' gia' fra i livelli)",
+      _p4["posizione"] == "dentro" and _p4["livello"] is None and _p4["rischio"] is None
+      and _p4["distanza_atr"] == 0.0 and _p4["primo_segnale"] is None, str(_p4))
+check("v473 senza media a 200 o senza ATR il piano si dichiara non misurabile e non inventa un livello",
+      ROT.piano_ingresso({**_base473, "sma200": None})["posizione"] == "non misurabile"
+      and ROT.piano_ingresso({**_base473, "atr": None})["posizione"] == "non misurabile")
+check("v473 il gruppo lo decide la correlazione in qualunque stato: sotto la 200 ma legato al libro e' la stessa scommessa",
+      ROT.gruppo_watchlist({"stato": "SOTTO LA 200", "corr_libro": 0.66}) == "stessa"
+      and ROT.gruppo_watchlist({"stato": "SOTTO LA 200", "corr_libro": ROT.SOGLIA_CORR}) == "stessa"
+      and ROT.gruppo_watchlist({"stato": "DEBOLE", "corr_libro": ROT.SOGLIA_CORR - 0.01}) == "diversifica"
+      and ROT.gruppo_watchlist({"stato": "CANDIDATO", "corr_libro": 0.1}) == "candidato"
+      and ROT.gruppo_watchlist({"stato": "ESTESO", "corr_libro": None}) == "ignota")
+
+# La base: minimi crescenti o decrescenti, sulle sedute CONCLUSE (v471)
+_bm = [{"t": f"2026-09-{i + 1:02d}", "c": 100, "l": (90 if i == 3 else 92) if i < 10 else (95 if i == 15 else 97)}
+       for i in range(20)]
+_bm_oggi = _bm + [{"t": "2026-10-09", "c": 100, "l": 80}]
+_m11 = ROT.struttura_minimi(_bm_oggi, _dt471(2026, 10, 9, 11, 0, tzinfo=_NY))
+_m17 = ROT.struttura_minimi(_bm_oggi, _dt471(2026, 10, 9, 17, 0, tzinfo=_NY))
+check("v473 minimi crescenti/decrescenti sulle sedute CONCLUSE: il minimo della seduta in corso puo' ancora scendere",
+      ROT.struttura_minimi(_bm)["verso"] == "crescenti" and (_m11 or {}).get("verso") == "crescenti"
+      and (_m17 or {}).get("verso") == "decrescenti" and (_m17 or {}).get("ora") == 80, f"{_m11} {_m17}")
+check("v473 sotto 20 sedute, o con un minimo mancante, la struttura e' un buco e non un verdetto (v205)",
+      ROT.struttura_minimi(_bm[:19]) is None
+      and ROT.struttura_minimi(_bm[:-1] + [{"t": "2026-09-20", "c": 100, "l": None}]) is None)
+_dm473 = ROT.dal_minimo([{"t": "a", "l": 50}, {"t": "b", "l": 40}, {"t": "c", "l": 45}, {"t": "d", "l": 40},
+                         {"t": "e", "l": 48}], 44.0)
+check("v473 il minimo dell'anno: l'ULTIMA volta che e' stato toccato, le sedute dopo, e quanto il prezzo ne sta sopra",
+      _dm473["data"] == "d" and _dm473["sedute"] == 1 and abs(_dm473["sopra_pct"] - 10) < 1e-9, str(_dm473))
+
+# La trimestrale: Nasdaq per primo (la fonte delle SCADENZE), yfinance solo se diversa, tre esiti (v389)
+_tr473 = {"data": "2026-11-05", "giorni": 27}
+_rt1 = ROT.riga_trimestrale({"trimestrale": _tr473, "trimestrale_yf": "2026-11-05"}, {"finestra": 45})
+_rt2 = ROT.riga_trimestrale({"trimestrale": _tr473, "trimestrale_yf": "2026-11-09"}, {"finestra": 45})
+_rt3 = ROT.riga_trimestrale({"trimestrale_yf": "2026-12-02"}, {"finestra": 45, "giorni_non_letti": []})
+_rt4 = ROT.riga_trimestrale({}, {"errore": "HTTP 503"})
+_rt5 = ROT.riga_trimestrale({}, {"giorni_non_letti": ["2026-10-12", "2026-10-13"]})
+check("v473 trimestrale: Nasdaq per primo, la stima yfinance solo se diversa e chiamata col suo nome",
+      "2026-11-05 (27 g, calendario Nasdaq)" in _rt1 and "yfinance" not in _rt1
+      and "(yfinance) stima 2026-11-09" in _rt2, _rt1 + " || " + _rt2)
+check("v473 trimestrale: nessuna data, calendario NON letto e giorni mancanti si leggono DIVERSI (v389)",
+      "nessuna data nel calendario Nasdaq a 45 giorni" in _rt3 and "STIMA, non una data confermata" in _rt3
+      and "NON letto" in _rt4 and "non vuol dire 'nessuna uscita'" in _rt4
+      and "2 giorni del calendario Nasdaq NON letti" in _rt5, " || ".join((_rt3, _rt4, _rt5)))
+_orig_cal473 = ROT.brief.calendario_trimestrali
+try:
+    def _cal_rotto(*a, **k):
+        raise RuntimeError("rete giu'")
+    ROT.brief.calendario_trimestrali = _cal_rotto
+    _cs473 = ROT.calendario_sicuro(["AAA"])
+finally:
+    ROT.brief.calendario_trimestrali = _orig_cal473
+check("v473 un calendario che esplode non si porta via la watchlist: diventa 'NON letto'",
+      _cs473["attesi"] == [] and "rete" in _cs473.get("errore", "") and "NON letto" in ROT.riga_trimestrale({}, _cs473),
+      str(_cs473))
+
+# La resa: ogni nome in UN gruppo, i conteggi dichiarati, chi non e' letto nominato, la nota del CEO parola per parola
+def _w473(tk, **kw):
+    d = {"tk": tk, "px": 100.0, "stato": "SOTTO LA 200", "corr_libro": 0.2, "m1": -2.0, "m3": -5.0, "rsi": 45.0,
+         "atr_pct": 2.0, "sma20": 97.0, "sma50": 105.0, "sma200": 108.0, "atr": 2.0, "pend50": -1.0,
+         "res": 112.0, "supp": 95.0, "minimi": {"ora": 96.0, "prima": 94.0, "verso": "crescenti", "fino_a": "2026-10-08"},
+         "dal_minimo": {"minimo": 90.0, "data": "2026-09-01", "sedute": 27, "sopra_pct": 11.1},
+         "vol_seduta": "2026-10-08", "vol_pct_seduta": 60.0, "vol_pct_20": 40.0, "vol_campione": 250,
+         "target": None, "beta_spy": 1.1, "r2_spy": 0.3, "sedute_beta": 250, "vol_annua": 30.0,
+         "trimestrale": {"data": "2026-11-05", "giorni": 27}, "trimestrale_yf": "2026-11-05",
+         "analisti": {"eps_ora": 5.0, "eps_90g_fa": 5.5, "su_30g": 1, "giu_30g": 3, "target_mediana": 130.0},
+         "in_pipeline": True, "nota": f"regola del CEO su {tk}: niente sotto 95"}
+    d.update(kw)
+    return d
+_o473 = {"watchlist": [_w473("CAND", stato="CANDIDATO", sma200=90.0, px=106.0, pend50=1.0, corr_libro=0.1),
+                       _w473("DIVA"), _w473("STES", corr_libro=0.7), _w473("FUOR", in_pipeline=False),
+                       {"tk": "NOLE", "errore": "non letto"}],
+         "calendario": {"finestra": 45, "giorni_non_letti": []}, "asof_target": "2026-10-09T15:44:12Z"}
+_rw473 = ROT.righe_watchlist(_o473)
+_tw473 = "\n".join(_rw473)
+def _gruppo_di(tk):
+    g = None
+    for r in _rw473:
+        if r.startswith("■ "):
+            g = r
+        elif r.startswith(f"   {tk} "):
+            return g
+_nomi473 = [r.split()[0] for r in _rw473 if r.startswith("   ") and not r.startswith("    ") and r.split()[0].isupper()
+            and len(r.split()[0]) == 4]
+check("v473 ogni nome compare UNA volta, nel suo gruppo, e l'intestazione conta i gruppi",
+      sorted(_nomi473) == ["CAND", "DIVA", "FUOR", "STES"]
+      and "5 nomi: 1 candidati · 2 diversificano · 1 stessa scommessa · 0 correlazione non misurabile · 1 non letti" in _tw473
+      and _gruppo_di("CAND").startswith("■ CANDIDATI") and _gruppo_di("DIVA").startswith("■ DIVERSIFICANO")
+      and _gruppo_di("STES").startswith("■ STESSA SCOMMESSA"), _tw473[:600])
+check("v473 chi non e' letto si NOMINA, non sparisce (v406)", "■ NON LETTI — 1: NOLE" in _tw473)
+check("v473 il livello d'ingresso, il primo segnale e la base escono nella resa",
+      "CHIUSURA sopra media a 200 108,00 (+8,0%, +4,0 ATR)" in _tw473
+      and "primo segnale, NON un ingresso: chiusura sopra la media 50 105,00" in _tw473
+      and "minimi delle ultime 10 sedute concluse CRESCENTI" in _tw473, _tw473)
+check("v473 la nota del CEO in LIBRO.md esce parola per parola accanto ai livelli di oggi",
+      "«regola del CEO su DIVA: niente sotto 95»" in _tw473)
+check("v473 le revisioni passano dalla funzione di schede_progetto, senza ripetere il target, e chi non e' seguito lo dice",
+      "ultimi 30 giorni 1 su, 3 giu'" in _tw473 and "target mediano" not in _tw473
+      and "revisioni: titolo non seguito dalla pipeline" in _tw473
+      and "schede_progetto.riga_revisioni(t.get(\"analisti\"), con_target=False)" in _corpo_di(_src_rot, "righe_ingresso"))
+_a473 = {"eps_ora": 5.0, "eps_90g_fa": 5.5, "su_30g": 1, "giu_30g": 3, "target_mediana": 130.0,
+         "target_min": 100, "target_max": 150}
+check("v473 riga_revisioni: di default porta il target (schede invariate), con_target=False no, e il resto coincide",
+      "target mediano" in SP.riga_revisioni(_a473) and "target mediano" not in SP.riga_revisioni(_a473, con_target=False)
+      and SP.riga_revisioni(_a473).startswith(SP.riga_revisioni(_a473, con_target=False)))
+# Collegamento, non controllo (v399, v443): la raccolta porta nota, trimestrale e revisioni, e la scheda la base
+_src_rot473 = Path(__file__).with_name("rotazione.py").read_text()
+_racc473 = _corpo_di(_src_rot473, "raccogli")
+check("v473 la raccolta passa alla watchlist la nota del CEO, il calendario e le revisioni, e la scheda la base",
+      '"nota": s.get("nota")' in _racc473 and 'prima_trim.get(s["tk"])' in _racc473
+      and "submit(calendario_sicuro," in _racc473 and "cal = fut_cal.result()" in _racc473
+      and '"analisti":' in _racc473
+      and "struttura_minimi(barre)" in _corpo_di(_src_rot473, "scheda")
+      and "dal_minimo(barre" in _corpo_di(_src_rot473, "scheda"))
+
+# ---- il comando unico ----
+import analisi as AN
+from datetime import datetime as _dt473
+_ny473, _roma473 = AN.NEW_YORK, AN.ROMA
+check("v473 la fase dall'ora di New York col fuso: pre-market, seduta, after-hours, chiuso",
+      AN.fase(_dt473(2026, 10, 9, 9, 29, tzinfo=_ny473)) == "pre-market"
+      and AN.fase(_dt473(2026, 10, 9, 9, 30, tzinfo=_ny473)) == "seduta"
+      and AN.fase(_dt473(2026, 10, 9, 15, 59, tzinfo=_ny473)) == "seduta"
+      and AN.fase(_dt473(2026, 10, 9, 16, 0, tzinfo=_ny473)) == "after-hours"
+      and AN.fase(_dt473(2026, 10, 10, 12, 0, tzinfo=_ny473)) == "chiuso")
+# ⚠ dal 25/10 al 01/11 Roma e New York distano 5 ore invece di 6 (v470): un +6 a mano sbaglierebbe qui
+check("v473 nella settimana a 5 ore di distanza le 14:45 di Roma sono gia' seduta, le 14:25 no",
+      AN.fase(_dt473(2026, 10, 27, 14, 45, tzinfo=_roma473)) == "seduta"
+      and AN.fase(_dt473(2026, 10, 27, 14, 25, tzinfo=_roma473)) == "pre-market")
+_cm473 = {f: [a for _, a in AN.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+check("v473 fuori seduta numeri_libro gira due volte (ultima seduta E prezzo esteso), in seduta e a borse chiuse una",
+      ["numeri_libro.py", "--esteso"] in _cm473["pre-market"] and ["numeri_libro.py", "--esteso"] in _cm473["after-hours"]
+      and ["numeri_libro.py", "--esteso"] not in _cm473["seduta"] and ["numeri_libro.py", "--esteso"] not in _cm473["chiuso"]
+      and all(["numeri_libro.py", "--sedute", "1"] in v for v in _cm473.values()), str(_cm473))
+check("v473 il brief del pomeriggio solo da sessione aperta in poi",
+      ["brief.py", "--pomeriggio"] in _cm473["seduta"] and ["brief.py", "--pomeriggio"] in _cm473["after-hours"]
+      and ["brief.py"] in _cm473["pre-market"] and ["brief.py"] in _cm473["chiuso"])
+_fa473 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_usati473 = {a[0] for v in _cm473.values() for a in v}
+_nominati473 = set(re.findall(r"scripts/([a-z_]+\.py)", AN.sezione(_fa473, "## Come si produce") or ""))
+check("v473 gli strumenti del comando sono ESATTAMENTE quelli del formato, nei due versi (v387)",
+      _usati473 == set(AN.STRUMENTI) == _nominati473, f"comando {sorted(_usati473)} · formato {sorted(_nominati473)}")
+check("v473 il formato dice che «Aggiorna analisi» e' il formato COMPLETO e nomina il comando",
+      "python3 scripts/analisi.py" in _fa473 and "formato COMPLETO" in _fa473 and "non si salta" in _fa473)
+_cl473 = AN.checklist()
+check("v473 la checklist stampata e' quella del formato: sezione 7d degli ingressi, registro delle richieste, regole",
+      _cl473 is not None and _cl473.startswith(AN.TITOLO_CHECKLIST) and "7d." in _cl473 and "INGRESSI" in _cl473
+      and "ingressi sulla watchlist (09/10)" in _cl473 and AN.TITOLO_REGOLE in _cl473
+      and "conflitto di interessi" in _cl473)
+import tempfile as _tf473
+with _tf473.TemporaryDirectory() as _d473:
+    _f473 = Path(_d473) / "F.md"
+    _f473.write_text("# x\n\n## Cosa contiene la risposta, in quest'ordine\nMARCATORE-473\n\n## Regole\n- r\n",
+                     encoding="utf-8")
+    _cl_finta = AN.checklist(_f473)
+    _f473.write_text("# x\n\n## Altro\nniente\n", encoding="utf-8")
+    _cl_assente = AN.checklist(_f473)
+_t_ok473, _c_ok473 = AN.resa([], _cl_finta)
+_t_no473, _c_no473 = AN.resa([], _cl_assente)
+check("v473 la checklist si LEGGE dal file (collegamento): senza la sezione il comando lo dichiara ed esce 1",
+      "MARCATORE-473" in (_cl_finta or "") and _cl_assente is None and _c_ok473 == 0
+      and _c_no473 == 1 and "CHECKLIST NON TROVATA" in _t_no473, _t_no473[-300:])
+_es473 = AN.esegui([("FINTO OK", [sys.executable, "-c", "print('blocco buono')"]),
+                    ("FINTO KO", [sys.executable, "-c",
+                                  "import sys; print('mezzo'); sys.stderr.write('guasto-473'); sys.exit(3)"])])
+_t_es473, _c_es473 = AN.resa(_es473, "## Cosa contiene la risposta\nx")
+check("v473 uno strumento che fallisce si DICHIARA con l'errore, gli altri blocchi restano, e il comando esce 1 (v453)",
+      _c_es473 == 1 and "STRUMENTO FALLITO (uscita 3)" in _t_es473 and "guasto-473" in _t_es473
+      and "blocco buono" in _t_es473 and "mezzo" in _t_es473
+      and [e["etichetta"] for e in _es473] == ["FINTO OK", "FINTO KO"], _t_es473[-500:])
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

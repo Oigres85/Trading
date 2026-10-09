@@ -22,6 +22,23 @@ Lo script CALCOLA, il modello SCRIVE (v448). Gli stati sono CONVENZIONI dichiara
   titolo ESTESO        = oltre 3 ATR sopra la media a 50: si aspetta il ritorno
 Nessun punteggio, nessuna classifica: l'ordine dei settori e' il rendimento a 3 mesi, che e'
 un fatto, e dentro un settore l'ordine e' quello del peso nell'ETF, dichiarato dall'emittente.
+
+v473 — GLI INGRESSI SULLA WATCHLIST (istruzione del CEO del 09/10/2026: "rendi strutturale
+questa ultima analisi"). Per ogni sorvegliato di LIBRO.md, convenzioni dichiarate (v240):
+  ZONA D'INGRESSO      = la convenzione CANDIDATO tradotta in PREZZI con le medie di oggi: sopra
+                         la media a 200, fra 1 ATR sotto e 2 ATR sopra la media a 50. Se la 200
+                         sta oltre la 50 + 2 ATR la zona e' VUOTA: nessun prezzo la soddisfa
+                         finche' le medie non si avvicinano. Un gate verifica che zona e
+                         stato_titolo non divergano.
+  LIVELLO D'INGRESSO   = il bordo della zona dalla parte del prezzo: chiusura SOPRA il bordo
+                         basso per chi sta sotto, ritorno SOTTO il bordo alto per chi e' tirato.
+                         Conta la chiusura, con volume oltre il 50o percentile dell'anno.
+  STESSA SCOMMESSA     = correlazione col libro da 0,5 in su, in qualunque stato: non diversifica.
+  STRUTTURA DEI MINIMI = minimo delle ultime 10 sedute concluse contro quello delle 10 precedenti.
+  STOP                 = il supporto delle 20 sedute, lo stesso livello del brief.
+Le trimestrali vengono dal calendario Nasdaq (la fonte delle SCADENZE di numeri_libro); dove
+manca nella finestra resta la stima yfinance della pipeline, DICHIARATA come stima (v396). Le
+revisioni passano dalla stessa funzione di schede_progetto (v400: il verso dalla differenza).
 """
 import argparse, json, math, os, sys
 from datetime import datetime
@@ -30,6 +47,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import brief
+import schede_progetto
 
 SEDUTE_CORR = 60
 SOGLIA_CORR = 0.5
@@ -37,6 +55,9 @@ CAND_SOPRA_ATR = 2.0
 CAND_SOTTO_ATR = -1.0
 ESTESO_ATR = 3.0
 PENDENZA_SEDUTE = 20
+SEDUTE_MINIMI = 10          # v473: struttura dei minimi, 10 sedute concluse contro le 10 prima
+SOGLIA_VOL_CONFERMA = 50    # v473: la chiusura sul livello conta con volume oltre la norma dell'anno
+GIORNI_CALENDARIO = 45      # v473: la stessa finestra delle SCADENZE di numeri_libro
 
 
 SEDUTE_BETA = 250
@@ -228,6 +249,100 @@ def percentile_midrank(x, serie):
     return (sotto + pari / 2) / len(serie) * 100
 
 
+# ---------------------------------------------------------------- v473: ingressi sulla watchlist
+def struttura_minimi(barre, adesso=None, n=SEDUTE_MINIMI):
+    """Il minimo delle ultime n sedute CONCLUSE contro quello delle n precedenti (convenzione,
+    n=10): crescenti = la discesa ha smesso di fare nuovi minimi, decrescenti = li sta ancora
+    facendo. La seduta in corso si toglie: il suo minimo puo' ancora scendere (v471)."""
+    if seduta_in_corso(barre or [], adesso):
+        barre = barre[:-1]
+    if not barre or len(barre) < 2 * n:
+        return None
+    lo = [x.get("l") for x in barre[-2 * n:]]
+    if any(v is None for v in lo):
+        return None
+    ora, prima = min(lo[n:]), min(lo[:n])
+    verso = "crescenti" if ora > prima else ("decrescenti" if ora < prima else "pari")
+    return {"ora": ora, "prima": prima, "verso": verso, "fino_a": barre[-1]["t"]}
+
+
+def dal_minimo(barre, px):
+    """Il minimo dell'anno (le barre della fonte coprono un anno, come min52 del brief), quando e'
+    stato toccato l'ULTIMA volta, quante sedute fa e quanto il prezzo ne sta sopra."""
+    lo = [(i, x.get("l")) for i, x in enumerate(barre or []) if x.get("l") is not None]
+    if not lo or px is None:
+        return None
+    i, v = min(lo, key=lambda iv: (iv[1], -iv[0]))
+    return {"minimo": v, "data": barre[i]["t"], "sedute": len(barre) - 1 - i,
+            "sopra_pct": (px / v - 1) * 100 if v else None}
+
+
+def zona_ingresso(t):
+    """La convenzione CANDIDATO tradotta in prezzi con le medie di oggi: sopra la media a 200, fra
+    1 ATR sotto e 2 ATR sopra la media a 50. Le stesse costanti di stato_titolo: un gate verifica
+    che le due letture non divergano. Bordo basso >= bordo alto = zona VUOTA con le medie di oggi."""
+    s50, s200, atr = t.get("sma50"), t.get("sma200"), t.get("atr")
+    if s50 is None or s200 is None or not atr:
+        return None
+    sotto50 = s50 + CAND_SOTTO_ATR * atr
+    basso, quale = (s200, "media a 200") if s200 >= sotto50 else (sotto50, "media a 50 meno 1 ATR")
+    alto = s50 + CAND_SOPRA_ATR * atr
+    return {"basso": basso, "quale": quale, "alto": alto, "vuota": basso >= alto}
+
+
+def gruppo_libro(corr):
+    if corr is None:
+        return "CORRELAZIONE NON MISURABILE"
+    return "STESSA SCOMMESSA DEL LIBRO" if corr >= SOGLIA_CORR else "DIVERSIFICA"
+
+
+def piano_ingresso(t):
+    """Dove sta il prezzo rispetto alla zona, il livello che lo porterebbe dentro, la scala dei
+    livelli intorno al prezzo e lo stop. Solo fatti misurati: la frase la scrive la resa."""
+    px, atr, z = t.get("px"), t.get("atr"), zona_ingresso(t)
+    p = {"gruppo": gruppo_libro(t.get("corr_libro")), "zona": z, "livello": None, "posizione": None,
+         "sopra": [], "sotto": [], "stop": None, "rischio": None, "distanza_atr": float("inf"),
+         "primo_segnale": None}
+    if z is None or px is None or not atr:
+        p["posizione"] = "non misurabile"
+        return p
+    dist = lambda liv: {"prezzo": liv, "pct": (liv / px - 1) * 100, "atr": (liv - px) / atr}
+    if z["vuota"]:
+        p["posizione"] = "zona vuota"
+    elif px < z["basso"]:
+        p["posizione"], p["livello"] = "sotto", dist(z["basso"])
+    elif px > z["alto"]:
+        p["posizione"], p["livello"] = "sopra", dist(z["alto"])
+    else:
+        p["posizione"] = "dentro"
+    livelli = [("media 20", t.get("sma20")), ("media 50", t.get("sma50")), ("media 200", t.get("sma200")),
+               ("resistenza 20s", t.get("res")), ("supporto 20s", t.get("supp"))]
+    # una resistenza alla pari col prezzo e' ancora da rompere: sta sopra (il 09/10 AMZN chiudeva la
+    #   seduta proprio sul massimo delle 20 sedute, e finiva fra i livelli "sotto" a +0,0%)
+    su = lambda nm, v: v > px or (nm.startswith("resistenza") and v == px)
+    p["sopra"] = sorted(((nm, dist(v)) for nm, v in livelli if v is not None and su(nm, v)), key=lambda x: x[1]["prezzo"])
+    p["sotto"] = sorted(((nm, dist(v)) for nm, v in livelli if v is not None and not su(nm, v)), key=lambda x: -x[1]["prezzo"])
+    # il PRIMO SEGNALE: la media piu' vicina sopra il prezzo, quando viene prima del livello d'ingresso
+    #   o quando la zona e' vuota. Non e' un ingresso: e' la discesa che smette di scendere.
+    medie_su = sorted((v, nm) for nm, v in livelli[:3] if v is not None and v > px)
+    p["primo_segnale"] = None
+    if medie_su and (p["posizione"] == "zona vuota" or (p["posizione"] == "sotto" and medie_su[0][0] < z["basso"])):
+        p["primo_segnale"] = (medie_su[0][1], dist(medie_su[0][0]))
+    supp = t.get("supp")
+    p["stop"] = dist(supp) if supp is not None else None
+    # il rischio dall'ingresso allo stop solo se l'ingresso NON e' il prezzo di adesso: per chi e'
+    #   gia' dentro la zona coincide con la distanza dello stop, gia' scritta fra i livelli
+    ingresso = (p["livello"] or {}).get("prezzo") if p["posizione"] in ("sotto", "sopra") else None
+    if ingresso and supp is not None and supp < ingresso:
+        p["rischio"] = {"pct": (supp / ingresso - 1) * 100, "atr": (supp - ingresso) / atr, "da": ingresso}
+    else:
+        p["rischio"] = None
+    # distanza dalla zona in ATR, per ordinare la lista: un FATTO, non un giudizio (v200)
+    p["distanza_atr"] = 0.0 if p["posizione"] == "dentro" else (
+        abs(p["livello"]["atr"]) if p["livello"] else float("inf"))
+    return p
+
+
 def scheda(tk, barre, rlibro, rspy=None, target=None):
     t = brief.tecnica(tk, d=barre) if barre else {"tk": tk, "errore": "nessuna barra"}
     if t.get("errore"):
@@ -246,7 +361,10 @@ def scheda(tk, barre, rlibro, rspy=None, target=None):
             "sma200": t["sma200"], "sma20": t["sma20"], "sma50": t["sma50"],
             "d20_atr": t["d20_atr"], "atr_pct": t["atr_pct"], "rsi": rsi_wilder(barre),
             "max52": t["max52"], "beta_spy": beta, "r2_spy": r2, "sedute_beta": nb,
-            "vol_annua": vol_annua(rt), "target": tg, "target_dist": tg_dist, **volumi(barre)}
+            "vol_annua": vol_annua(rt), "target": tg, "target_dist": tg_dist, **volumi(barre),
+            # v473 — per il piano d'ingresso: l'ATR in prezzo (la zona si misura in ATR), la base
+            "atr": t.get("atr"), "min52": t.get("min52"), "minimi": struttura_minimi(barre),
+            "dal_minimo": dal_minimo(barre, t["px"])}
 
 
 def _barre_sicure(tk):
@@ -274,8 +392,13 @@ def raccogli():
     asof_target = d.get("updated_at")
     nomi = sorted({p["tk"] for r in tilt for p in (r.get("prime") or [])})
     tutti = sorted(set(qta) | {r["ticker"] for r in tilt} | set(nomi) | {s["tk"] for s in sorv} | {"SPY"})
-    with ThreadPoolExecutor(brief.PARALLELI) as ex:
-        B = dict(zip(tutti, ex.map(_barre_sicure, tutti)))
+    # v473 — il calendario delle trimestrali gira MENTRE si scaricano le barre: ~20 secondi di
+    #   richieste a Nasdaq che altrimenti si sommerebbero al resto.
+    with ThreadPoolExecutor(1) as ex_cal:
+        fut_cal = ex_cal.submit(calendario_sicuro, [s["tk"] for s in sorv])
+        with ThreadPoolExecutor(brief.PARALLELI) as ex:
+            B = dict(zip(tutti, ex.map(_barre_sicure, tutti)))
+        cal = fut_cal.result()
     rlibro = serie_libro({tk: B.get(tk) for tk in qta if B.get(tk)}, qta)
     rspy = rendimenti_per_data(B["SPY"]) if B.get("SPY") else {}
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
@@ -294,13 +417,30 @@ def raccogli():
                                     "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"),
                                              x.get("pend50"), x.get("d50_atr"), x.get("corr_libro")))(S.get(p["tk"]) or {}))}
                                    for p in (r.get("prime") or [])]})
+    pipe = {r.get("ticker"): r for r in (d.get("watchlist") or []) + (d.get("portfolio") or []) if isinstance(r, dict)}
+    prima_trim = {}
+    for a in cal.get("attesi") or []:
+        prima_trim.setdefault(a["tk"], a)          # gli attesi arrivano gia' in ordine di data
     watch = [{**(S.get(s["tk"]) or {"tk": s["tk"], "errore": "non letto"}),
               "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"), x.get("pend50"),
-                                                  x.get("d50_atr"), x.get("corr_libro")))(S.get(s["tk"]) or {}))}
+                                                  x.get("d50_atr"), x.get("corr_libro")))(S.get(s["tk"]) or {})),
+              # v473 — cio' che serve al piano d'ingresso e che la scheda non ha
+              "nota": s.get("nota"), "trimestrale": prima_trim.get(s["tk"]),
+              "trimestrale_yf": (pipe.get(s["tk"]) or {}).get("earnings_date"),
+              "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe}
              for s in sorv]
     return {"settori": settori, "universo_assente": not tilt, "libro": sorted(qta),
             "libro_sedute": len(rlibro), "watchlist": watch, "asof_target": asof_target,
-            "spy_assente": not rspy}
+            "spy_assente": not rspy, "calendario": {k: cal.get(k) for k in ("giorni_non_letti", "finestra", "errore")}}
+
+
+def calendario_sicuro(tks, giorni=GIORNI_CALENDARIO):
+    """Il calendario Nasdaq, con tre esiti distinti (v389): data trovata, nessuna data nella
+    finestra, calendario NON letto. Un'eccezione non deve portarsi via la watchlist intera."""
+    try:
+        return brief.calendario_trimestrali(tks, giorni=giorni)
+    except Exception as e:
+        return {"attesi": [], "giorni_non_letti": [], "finestra": giorni, "errore": str(e)[:80]}
 
 
 def n(x, d=1, s=""):
@@ -366,21 +506,132 @@ def riga_volumi(t):
             + (f" · su {t['vol_campione']} sedute" if t.get("vol_campione") else ""))
 
 
+def riga_trimestrale(t, cal=None):
+    """La prima trimestrale dal calendario Nasdaq (la fonte delle SCADENZE di numeri_libro). La
+    stima yfinance della pipeline si scrive solo se diversa o se Nasdaq tace, e si chiama STIMA.
+    Tre esiti distinti (v389): data trovata · nessuna data nella finestra · calendario NON letto."""
+    cal = cal or {}
+    tr, yf = t.get("trimestrale"), t.get("trimestrale_yf")
+    if tr:
+        s = f"trimestrale {tr['data']} ({tr['giorni']} g, calendario Nasdaq)"
+        return s + (f" — la pipeline (yfinance) stima {yf}" if yf and yf != tr["data"] else "")
+    if cal.get("errore"):
+        s = f"trimestrale: calendario Nasdaq NON letto ({cal['errore']}) — non vuol dire 'nessuna uscita'"
+    elif cal.get("giorni_non_letti"):
+        k = len(cal["giorni_non_letti"])
+        s = (f"trimestrale: nessuna data nei giorni letti, ma {k} {'giorno' if k == 1 else 'giorni'} del calendario "
+             "Nasdaq NON letti — non vuol dire 'nessuna uscita'")
+    else:
+        s = f"trimestrale: nessuna data nel calendario Nasdaq a {cal.get('finestra') or GIORNI_CALENDARIO} giorni"
+    return s + (f" · la pipeline (yfinance) stima {yf}: STIMA, non una data confermata" if yf else "")
+
+
+def righe_ingresso(t, cal=None):
+    """Le righe di un sorvegliato (v473): stato e gruppo, il livello d'ingresso secondo la
+    convenzione, la scala dei livelli con lo stop, la base, volumi/target/beta, trimestrale e
+    revisioni, e la nota del CEO in LIBRO.md parola per parola."""
+    p = piano_ingresso(t)
+    z = p["zona"]
+    liv = lambda nome, d: f"{nome} {prezzo(d['prezzo'])} ({n(d['pct'],1,'%')}, {n(d['atr'],1)} ATR)"
+    rsi = "n.d." if t.get("rsi") is None else format(t["rsi"], ".0f")
+    L = [f"   {t['tk']:6} {prezzo(t['px'])} · {t['stato']} · {p['gruppo']} (corr {n(t.get('corr_libro'),2)}) · "
+         f"1m {n(t.get('m1'),1,'%')} · 3m {n(t.get('m3'),1,'%')} · RSI14 {rsi} · ATR {piano(t.get('atr_pct'))}%"]
+    if p["posizione"] == "non misurabile":
+        ing = "ingresso: zona non misurabile (medie o ATR mancanti)"
+    elif p["posizione"] == "zona vuota":
+        ing = (f"ingresso: zona VUOTA con le medie di oggi — la media a 200 ({prezzo(t.get('sma200'))}) sta oltre "
+               f"2 ATR sopra la media a 50 ({prezzo(t.get('sma50'))}): nessun prezzo soddisfa la convenzione "
+               "finche' le medie non si avvicinano")
+    elif p["posizione"] == "sotto":
+        ing = (f"ingresso: CHIUSURA sopra {liv(z['quale'], p['livello'])}, con volume oltre il "
+               f"{SOGLIA_VOL_CONFERMA}o percentile dell'anno · zona {prezzo(z['basso'])}-{prezzo(z['alto'])}")
+    elif p["posizione"] == "sopra":
+        ing = (f"ingresso: prezzo SOPRA la zona, non si insegue — ritorno sotto "
+               f"{liv('media 50 + 2 ATR', p['livello'])} · zona {prezzo(z['basso'])}-{prezzo(z['alto'])}")
+    else:
+        ing = f"ingresso: prezzo DENTRO la zona {prezzo(z['basso'])}-{prezzo(z['alto'])}"
+    if p.get("primo_segnale"):
+        ing += (f" · primo segnale, NON un ingresso: chiusura sopra la {liv(*p['primo_segnale'])} — la discesa "
+                "che smette di scendere")
+    pend = t.get("pend50")
+    if p["posizione"] != "non misurabile":
+        ing += (" · pendenza della media a 50 n.d." if pend is None else
+                f" · media a 50 in DISCESA ({n(pend,1,'%')} in 20 sedute): la convenzione chiede anche che giri"
+                if pend <= 0 else f" · media a 50 in salita ({n(pend,1,'%')} in 20 sedute)")
+    L.append(f"      {ing}")
+    sopra = " · ".join(liv(nm, d) for nm, d in p.get("sopra") or []) or "nessuno"
+    sotto = " · ".join(liv(nm + (" = STOP" if nm == "supporto 20s" else ""), d) for nm, d in p.get("sotto") or []) or "nessuno"
+    rischio = p.get("rischio")
+    L.append(f"      livelli sopra: {sopra}")
+    L.append(f"      livelli sotto: {sotto}"
+             + (f" · dall'ingresso a {prezzo(rischio['da'])} allo stop {n(rischio['pct'],1,'%')} ({n(rischio['atr'],1)} ATR)"
+                if rischio else ""))
+    m, dm = t.get("minimi"), t.get("dal_minimo")
+    base = (f"base: minimi delle ultime {SEDUTE_MINIMI} sedute concluse {m['verso'].upper()} ({prezzo(m['ora'])} "
+            f"contro {prezzo(m['prima'])} delle {SEDUTE_MINIMI} prima)" if m else "base: struttura dei minimi n.d.")
+    if dm:
+        quando = ("nell'ultima barra" if dm["sedute"] == 0 else
+                  "1 seduta fa" if dm["sedute"] == 1 else f"{dm['sedute']} sedute fa")
+        base += (f" · minimo dell'anno {prezzo(dm['minimo'])} il {dm['data']}, {quando}, "
+                 f"prezzo {n(dm['sopra_pct'],1,'%')} sopra")
+    L.append(f"      {base}")
+    L.append(f"      {riga_volumi(t)} · {riga_target_beta(t)}")
+    rev = (schede_progetto.riga_revisioni(t.get("analisti"), con_target=False) if t.get("in_pipeline")
+           else "revisioni: titolo non seguito dalla pipeline")
+    L.append(f"      {riga_trimestrale(t, cal)} · {rev}")
+    if t.get("nota"):
+        L.append(f"      nota del CEO in LIBRO.md (i suoi livelli sono del giorno in cui e' scritta): «{t['nota']}»")
+    return L
+
+
+GRUPPI_WATCHLIST = (   # (titolo del gruppo, chiave, nome breve per il conteggio)
+    ("CANDIDATI — zona, pendenza e correlazione soddisfatte", "candidato", "candidati"),
+    ("DIVERSIFICANO (correlazione col libro sotto 0,5) — non ancora candidati", "diversifica", "diversificano"),
+    ("STESSA SCOMMESSA DEL LIBRO (correlazione da 0,5 in su) — aggiungono alla concentrazione, non la riducono",
+     "stessa", "stessa scommessa"),
+    ("CORRELAZIONE NON MISURABILE", "ignota", "correlazione non misurabile"),
+)
+
+
+def gruppo_watchlist(t):
+    """Un nome sta in UN gruppo solo: il candidato per primo, poi la correlazione decide."""
+    if str(t.get("stato", "")).startswith("CANDIDATO"):
+        return "candidato"
+    c = t.get("corr_libro")
+    return "ignota" if c is None else ("stessa" if c >= SOGLIA_CORR else "diversifica")
+
+
 def righe_watchlist(o):
-    """I sorvegliati del libro (memoria/LIBRO.md) con la stessa misura dei candidati (v471): la
-    sezione 7 dell'analisi li riporta sempre."""
+    """I sorvegliati del libro (memoria/LIBRO.md) con la stessa misura dei candidati (v471) e,
+    da v473, il piano d'ingresso di ciascuno: la sezione 7 dell'analisi li riporta sempre."""
     w = o.get("watchlist") or []
-    L = [f"WATCHLIST DEL LIBRO — {len(w)} nomi · target dalla pipeline (run {o.get('asof_target') or 'n.d.'}) · "
-         "beta e volatilita' su un anno di sedute (stockanalysis.com) · stati = convenzioni in testa allo script"]
+    cal = o.get("calendario") or {}
+    letti = [t for t in w if not t.get("errore")]
+    per = {k: sorted((t for t in letti if gruppo_watchlist(t) == k),
+                     key=lambda t: piano_ingresso(t)["distanza_atr"]) for _, k, _ in GRUPPI_WATCHLIST}
+    non_letti = [t["tk"] for t in w if t.get("errore")]
+    L = [f"WATCHLIST DEL LIBRO E INGRESSI — {len(w)} nomi: " + " · ".join(
+            f"{len(per[k])} {breve}" for _, k, breve in GRUPPI_WATCHLIST) + f" · {len(non_letti)} non letti",
+         f"   prezzi di oggi (stockanalysis.com) · target e revisioni dalla pipeline (run {o.get('asof_target') or 'n.d.'}) · "
+         f"trimestrali dal calendario Nasdaq ({cal.get('finestra') or GIORNI_CALENDARIO} giorni) · stati, zona e stop = "
+         "convenzioni in testa allo script, non giudizi",
+         "   zona d'ingresso = sopra la media a 200, fra 1 ATR sotto e 2 ATR sopra la media a 50 (le medie di oggi); "
+         "il candidato chiede in piu' media a 50 in salita e correlazione col libro sotto 0,5 · dentro ogni gruppo "
+         "l'ordine e' la distanza dalla zona in ATR, un fatto e non una classifica",
+         "   ⚠ il SEMAFORO decide cosa e' ammesso (LIBRO.md §1ter): il settore di un titolo NON e' in questi dati, "
+         "la correlazione col libro si'"]
     if o.get("spy_assente"):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
-    for t in w:
-        if t.get("errore"):
-            L.append(f"   {t['tk']:6} non letto ({t['errore']})"); continue
-        L.append(f"   {t['tk']:6} {prezzo(t['px'])} · {t['stato']} · 1m {n(t['m1'],1,'%')} · 3m {n(t['m3'],1,'%')} · "
-                 f"media50 {n(t['d50_atr'],1)} ATR · supp {prezzo(t['supp'])} · res {prezzo(t['res'])}")
-        L.append(f"          {riga_target_beta(t)}")
-        L.append(f"          {riga_volumi(t)} · corr libro {n(t.get('corr_libro'),2)}")
+    if cal.get("errore") or cal.get("giorni_non_letti"):
+        L.append("   ⚠ calendario delle trimestrali incompleto: una data mancante non vuol dire 'nessuna uscita'")
+    for etichetta, k, _ in GRUPPI_WATCHLIST:
+        if not per[k]:
+            continue
+        L.append(f"■ {etichetta} — {len(per[k])}")
+        for t in per[k]:
+            L.extend(righe_ingresso(t, cal))
+    if non_letti:
+        L.append(f"■ NON LETTI — {len(non_letti)}: {', '.join(non_letti)} (prezzi non arrivati: non e' 'nessun segnale')")
     return L
 
 

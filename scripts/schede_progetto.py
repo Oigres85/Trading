@@ -69,8 +69,10 @@ def riga_canale(nome, c):
             f" · giornate forti {finestra(c.get('evento'))}")
 
 
-def riga_revisioni(a):
-    """La direzione dalla DIFFERENZA (v400). La percentuale solo dove non e' ambigua."""
+def riga_revisioni(a, con_target=True):
+    """La direzione dalla DIFFERENZA (v400). La percentuale solo dove non e' ambigua.
+    con_target=False (v473): rotazione.py stampa il target nella propria riga, e due rese dello
+    stesso numero accanto sono la classe v415."""
     if not isinstance(a, dict) or a.get("eps_ora") is None or a.get("eps_90g_fa") is None:
         return "revisioni: n.d."
     ora, prima = float(a["eps_ora"]), float(a["eps_90g_fa"])
@@ -85,7 +87,7 @@ def riga_revisioni(a):
     s = f"revisioni: EPS atteso {_n(prima, 2)} → {_n(ora, 2)} a 90 giorni, {verso}"
     if a.get("su_30g") is not None or a.get("giu_30g") is not None:
         s += f" · ultimi 30 giorni {a.get('su_30g', 0)} su, {a.get('giu_30g', 0)} giu'"
-    if a.get("target_mediana") is not None:
+    if con_target and a.get("target_mediana") is not None:
         s += (f" · target mediano {_n(a['target_mediana'], 2)} (min {_n(a.get('target_min'), 2)}"
               f", max {_n(a.get('target_max'), 2)})")
     return s
