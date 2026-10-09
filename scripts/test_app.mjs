@@ -3479,7 +3479,14 @@ check("v340 schede: la scheda MacroQuant non stampa piu' punteggi, e non li usa 
      NUDI ("55", "26", "19") come etichetta della barra. Verificato iniettandolo — passava.
      Ora si contano i punteggi che compaiono come token isolato nel testo: uno puo' coincidere
      per caso con un altro numero della scheda, due no. */
-  const numeri = nudo.split(/[^0-9]+/).filter(Boolean);
+  /* ⚠ v474 — UN NUMERO DENTRO UN NOME NON E' UN PUNTEGGIO. Il 09/10 fra i punteggi dei componenti
+     c'erano 10 e 3, e la scheda contiene "Curva 10A-2A", "Curva 10A-3M", "Treasury USA 30A" e
+     l'entita' HTML dell'apostrofo di "dell'ISM": spezzando il testo su ogni cifra due punteggi
+     risultavano stampati senza che nessuno lo fosse, e il check e' andato rosso a calendario
+     (classe v429, v456). Contano solo i numeri ISOLATI: non attaccati a lettere, ne' preceduti
+     dal cancelletto o dalla e commerciale di un'entita'. Un punteggio stampato da solo, fra
+     parentesi o come 69/100 resta isolato, e il check continua a prenderlo. */
+  const numeri = nudo.match(/(?<![a-z0-9_&#])[0-9]+(?![a-z0-9_])/g) || [];
   const punteggi = (mq.components || []).map(c => c.score).filter(x => x != null).map(String);
   const trovati = punteggi.filter(x => numeri.indexOf(x) >= 0).length;
   if (trovati >= 2) return false;

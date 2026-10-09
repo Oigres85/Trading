@@ -6427,3 +6427,14 @@ da un gate: nessun gate legge le mie risposte. Ora `FORMATO_ANALISI.md` §6 scri
 Ventuno iniezioni, una alla volta, con `modifica_sicura` e ripristino da uno snapshot verificato per
 hash: **mordono tutte, ciascuna sul controllo giusto**. Pavimento di `test_analisi_libro.py`
 275 → 330 (i punti di chiamata sono 348). `?v=` e `BUILD_VERSION` non toccati (v440).
+
+### 🔢 E il `pre-push` ha fermato il push su un gate che contava le cifre dei NOMI
+Il rebase ha portato il run delle 20:38 e **v340** (la scheda MacroQuant non stampa punteggi) è andato
+rosso su codice che nessuno aveva toccato. Fra i punteggi dei componenti c'erano 10 e 3, e la scheda
+contiene *"Curva 10A-2A"*, *"Curva 10A-3M"*, *"Treasury USA 30A"* e l'entità HTML dell'apostrofo di
+*"dell'ISM"*: spezzando il testo su ogni cifra, due punteggi risultavano stampati senza che nessuno
+lo fosse. La classe v429/v456 — *un check che dipende da quanto valgono i numeri del giorno* — su una
+tolleranza ("uno può coincidere per caso, due no") che i nomi da soli bastavano a superare.
+Riagganciato ai **numeri isolati** (non attaccati a lettere, non dentro un'entità), senza
+backslash perché il template va al vm. Due iniezioni — il punteggio accanto al nome e nella colonna
+della lettura — **mordono entrambe**: un punteggio stampato resta un numero isolato.
