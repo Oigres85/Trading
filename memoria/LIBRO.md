@@ -4,6 +4,18 @@
 > Sostituisce `config/posizioni.json` + `config/portfolio_state.json` + il blocco di rischio
 > di `data/data.json`. Va aggiornato a mano quando il CEO opera.
 
+## 0. OBIETTIVO E RIFERIMENTO — deciso dal CEO il 09/10/2026
+
+Obiettivo dichiarato dal CEO: *"sovraperformare l'indice"*. Il riferimento è **QQQ (Nasdaq 100)**:
+è il confronto onesto per un libro growth e tecnologico, le cui azioni si muovono circa 2,2 volte
+quell'indice. Lo misura il **registro della performance** (`memoria/registro_performance.jsonl`,
+v474): una riga per seduta conclusa, scritta da `python3 scripts/numeri_libro.py --registra` (lo
+fa `scripts/analisi.py` a ogni «Aggiorna analisi» fuori dalla seduta), col libro azionario in
+dollari e il patrimonio intero in euro contro QQQ, a rendimento ponderato per il tempo. Parte
+dalla chiusura del 09/10/2026: nessun numero prima di quella data è nel registro.
+⚠ Sovraperformare con un beta di 2 vuol dire anche sottoperformare di più quando il Nasdaq scende:
+il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'uscita.
+
 ## 1. POSIZIONI — confermate dal CEO l'08/09/2026
 
 | Ticker | Quantità | PMC | Valuta | Note |
@@ -103,19 +115,30 @@ Le soglie sono **convenzioni del mestiere scelte col CEO**, non dati del file (v
 dei prezzi si leggono **dal giorno**, mai da questa pagina: qui stanno le regole, non i numeri,
 perché un numero scritto a mano invecchia da solo (v410, v424).
 
-| Famiglia | Segnale | Dove si legge |
+| Famiglia | Segnale | Come lo legge `numeri_libro.py` (v474) |
 |---|---|---|
-| **Prezzo** | SMH chiude sotto la propria media a 50 giorni; secondo gradino: sotto la media a 200 | `data.json` → `macro.tilt[SMH].medie` |
-| **Leader** | NVDA, AMD e MU chiudono **insieme** sotto la propria media a 50 giorni, con volumi alti | `brief.py` (distanza SMA50 in ATR) |
-| **Credito** | spread **CCC** (la fascia peggiore) salito di **1,5 punti o più** sul proprio minimo delle 60 sedute precedenti — è il segnale che arriva per primo (v465); poi spread high yield (HY OAS) sopra 3,5; secondo gradino: sopra 4,0 | `brief.py` → macro (riga «Spread CCC», con la salita accanto) |
-| **Tassi** | Treasury 10 anni sopra 5,4% | `brief.py` → macro |
-| **Fondamentali AI** | revisioni delle stime che girano al ribasso su NVDA/MU (più tagli che rialzi a 30 giorni), oppure un hyperscaler (MSFT, GOOGL, META, AMZN) che TAGLIA la guida sugli investimenti | `schede_progetto.py` + conti di fine ottobre |
-| **Leva** | il margin debt FINRA comincia a scendere dal picco (variazione mensile negativa) | `data.json` → `macro.margin_debt` |
+| **Prezzo** | SMH chiude sotto la propria media a 50 giorni; secondo gradino: sotto la media a 200 | ultima chiusura CONCLUSA di SMH contro le medie calcolate sulle barre di oggi (stockanalysis) |
+| **Leader** | NVDA, AMD e MU chiudono **insieme** sotto la propria media a 50 giorni, con volumi alti | ultima chiusura conclusa di ciascuno contro la media a 50; "volumi alti" = volume di quella seduta oltre il 50° percentile dell'anno per **tutti e tre** (convenzione v474, la stessa soglia della conferma d'ingresso v473) |
+| **Credito** | spread **CCC** (la fascia peggiore) salito di **1,5 punti o più** sul proprio minimo delle 60 sedute precedenti — è il segnale che arriva per primo (v465); poi spread high yield (HY OAS) sopra 3,5; secondo gradino: sopra 4,0 | `data.json` → `macro.credit_ccc` e `macro.credit.spread_hy`, con la loro data |
+| **Tassi** | Treasury 10 anni sopra 5,4% | `data.json` → `macro.tassi` (scadenza a 10 anni, con la sua data) |
+| **Fondamentali AI** | revisioni delle stime che girano al ribasso su NVDA/MU (più tagli che rialzi a 30 giorni), oppure un hyperscaler (MSFT, GOOGL, META, AMZN) che TAGLIA la guida sugli investimenti | revisioni da `data.json` → `analisti` (acceso se su ALMENO UNO dei due i tagli superano i rialzi); la guida sugli investimenti NON è calcolabile: ricerca web e conti di fine ottobre |
+| **Leva** | il margin debt FINRA comincia a scendere dal picco (variazione mensile negativa) | `data.json` → `macro.margin_debt.history`, ultimo mese contro il precedente |
+
+**Il colore lo calcola `numeri_libro.py`** (blocco «SEMAFORO D'USCITA», v474, decisione del CEO del
+09/10/2026). Della famiglia «Fondamentali AI» lo script calcola le revisioni; la guida sugli
+investimenti degli hyperscaler non è una serie e resta da ricerca web: se un hyperscaler l'ha
+tagliata, la famiglia è accesa anche con le revisioni spente. Una famiglia senza dati si dichiara
+**non misurabile**, mai spenta, e il colore diventa un minimo. Lo script legge la reazione qui sotto
+parola per parola: le regole stanno in un posto solo.
 
 **Reazione a gradini** (la proporzione è una convenzione scelta col CEO, non un calcolo):
 - 🟢 **Verde** — nessun segnale: si opera normalmente.
-- 🟡 **Giallo** — un segnale: niente nuovi acquisti di semiconduttori; prese di profitto sui nomi più
-  tirati.
+- 🟡 **Giallo** — un segnale: **nessun divieto d'ingresso** (decisione del CEO del 09/10/2026: *"se c'è
+  possibilità di ingresso non proibirli ma segnalane le conseguenze di rischio"*). Ogni ingresso
+  possibile porta accanto le sue conseguenze sul libro — volatilità, beta su QQQ, perdita allo stop
+  (`rotazione.py`, blocco «PIANO PER LA LIQUIDITÀ») — e chi è nella stessa scommessa del libro lo
+  dichiara. Prese di profitto sui nomi più tirati. Fino al 09/10 il giallo vietava i nuovi
+  semiconduttori.
 - 🟠 **Arancione** — due segnali di **famiglie diverse**: riduzione dei semiconduttori di circa un
   terzo, partendo da chi pesa di più nel rischio (oggi MU e AMD).
 - 🔴 **Rosso** — SMH sotto la media a 200 **e** (credito sopra 4,0 **oppure** taglio della guida
@@ -181,6 +204,29 @@ settimana ±21.200 $, VaR95 −15.800 $, ES95 −20.000 $; scadenze BE 27/10 · 
 AMD 03/11 · CRWV e RGTI 09/11 · NVDA 18/11 (MU, SKHY, MRVL senza data nella finestra). Esterne:
 verbali Fed 07/10, ASML 14/10, TSM 15/10, FOMC 28/10. Lettura di quel giorno: attesa ragionevole
 fino a metà ottobre; BE da decidere entro il 27/10, AMD entro il 03/11.
+
+## 1quinquies. DECISIONI APERTE — confermate dal CEO e non ancora eseguite (v474)
+
+Una decisione entra qui quando la sua condizione è **confermata in chiusura** e il CEO l'ha presa;
+esce quando è **eseguita** (si aggiornano posizioni e liquidità in §1) o **revocata di proposito**
+(Stato: «revocata il …», con la ragione). Le condizioni non ancora scattate restano nel piano di
+`FORMATO_ANALISI.md` §6.
+
+| Nome | Decisione | Quantità | Condizione | Livello | Confermata | Stato |
+|---|---|---|---|---|---|---|
+| RGTI | uscita | 463 | chiusura sotto | 14,41 | 2026-10-08 | aperta — non eseguita al 09/10 (CEO) |
+| AMD | alleggerimento | da decidere | respinto sotto | 645 | 2026-10-08 | aperta — non eseguita al 09/10 (CEO); riferimento del piano: verso il 12-14% del libro |
+
+`numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
+- il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non
+  scritta qui, perché un prezzo copiato a mano è un secondo dato che può divergere (v410);
+- il prezzo di adesso e **quanto l'attesa è costata o ha fatto guadagnare finora**: per una vendita
+  quantità × (prezzo di adesso − prezzo di conferma). Quando la quantità è da decidere il conto si
+  fa **per 10 azioni**: unità di calcolo, non una quantità consigliata;
+- le sedute trascorse, la **scadenza** (prima trimestrale del nome, §1quater) e se la condizione
+  vale ancora oggi. Una condizione rientrata non annulla la decisione: la rimette in discussione,
+  e lo si dice.
+⚠ È un conto a posteriori: misura il costo dell'attesa, non dice se aspettare fosse sbagliato.
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

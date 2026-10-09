@@ -1928,7 +1928,7 @@ _cm473 = {f: [a for _, a in AN.comandi(f)] for f in ("pre-market", "seduta", "af
 check("v473 fuori seduta numeri_libro gira due volte (ultima seduta E prezzo esteso), in seduta e a borse chiuse una",
       ["numeri_libro.py", "--esteso"] in _cm473["pre-market"] and ["numeri_libro.py", "--esteso"] in _cm473["after-hours"]
       and ["numeri_libro.py", "--esteso"] not in _cm473["seduta"] and ["numeri_libro.py", "--esteso"] not in _cm473["chiuso"]
-      and all(["numeri_libro.py", "--sedute", "1"] in v for v in _cm473.values()), str(_cm473))
+      and all(any(x[:3] == ["numeri_libro.py", "--sedute", "1"] for x in v) for v in _cm473.values()), str(_cm473))
 check("v473 il brief del pomeriggio solo da sessione aperta in poi",
       ["brief.py", "--pomeriggio"] in _cm473["seduta"] and ["brief.py", "--pomeriggio"] in _cm473["after-hours"]
       and ["brief.py"] in _cm473["pre-market"] and ["brief.py"] in _cm473["chiuso"])
@@ -1965,6 +1965,383 @@ check("v473 uno strumento che fallisce si DICHIARA con l'errore, gli altri blocc
       _c_es473 == 1 and "STRUMENTO FALLITO (uscita 3)" in _t_es473 and "guasto-473" in _t_es473
       and "blocco buono" in _t_es473 and "mezzo" in _t_es473
       and [e["etichetta"] for e in _es473] == ["FINTO OK", "FINTO KO"], _t_es473[-500:])
+
+# ============================ v474 — SEMAFORO CALCOLATO, DECISIONI APERTE, REGISTRO, PIANO ============================
+# Decisioni del CEO del 09/10/2026: riferimento QQQ; in giallo nessun divieto ma le conseguenze di rischio di ogni
+# ingresso; semaforo calcolato, costo delle decisioni aperte, registro della performance, piano per la liquidita'.
+# Lo stato si COSTRUISCE (v425, v429): nessuna rete, nessuna dipendenza dal giorno in cui gira la suite.
+from datetime import datetime as _dt474, timedelta as _td474, date as _giorno474
+import tempfile as _tf474, os as _os474, json as _js474
+_NY474 = ROT.brief.NEW_YORK
+
+def _giorni474(fine, n):
+    """n date lavorative che finiscono a `fine` (ISO), in ordine."""
+    g, out = _giorno474.fromisoformat(fine), []
+    while len(out) < n:
+        if g.weekday() < 5:
+            out.append(g.isoformat())
+        g -= _td474(days=1)
+    return out[::-1]
+
+def _barre474(chiusure, fine="2026-10-09", vol=None):
+    d = _giorni474(fine, len(chiusure))
+    v = vol or [1_000_000] * len(chiusure)
+    return [{"t": t, "o": c, "h": c * 1.01, "l": c * 0.99, "c": c, "v": vv} for t, c, vv in zip(d, chiusure, v)]
+
+_sale = [100 + i * 0.5 for i in range(250)]            # in salita: media 50 ~213, media 200 ~188
+_ALLE17, _ALLE11 = _dt474(2026, 10, 9, 17, 0, tzinfo=_NY474), _dt474(2026, 10, 9, 11, 0, tzinfo=_NY474)
+
+# --- le soglie del codice sono QUELLE scritte nel libro (una regola in due posti diverge, v161/v207) ---
+_lib474 = NL.testo_libro()
+_s1ter = _lib474[_lib474.find("## 1ter"):_lib474.find("\n## ", _lib474.find("## 1ter") + 1)]
+def _soglia474(rx):
+    m = re.search(rx, _s1ter)
+    return float(m.group(1).replace(",", ".")) if m else None
+_dal_libro = {"CCC": (_soglia474(r"salito di \*\*(\d+,\d) punti"), NL.SOGLIA_CCC_PP),
+              "HY": (_soglia474(r"\(HY OAS\) sopra (\d+,\d)"), NL.SOGLIA_HY),
+              "HY rosso": (_soglia474(r"secondo gradino: sopra (\d+,\d)"), NL.SOGLIA_HY_ROSSO),
+              "10 anni": (_soglia474(r"Treasury 10 anni sopra (\d+,\d)%"), NL.SOGLIA_T10),
+              "volumi": (_soglia474(r"oltre il (\d+)° percentile"), NL.SOGLIA_VOL_ALTI)}
+check("v474 le soglie del semaforo nel codice sono QUELLE di LIBRO.md §1ter, lette dal libro",
+      all(a is not None and abs(a - b) < 1e-9 for a, b in _dal_libro.values()), str(_dal_libro))
+
+# --- prezzo: SMH sotto la 50 o sotto la 200, sulle chiusure CONCLUSE ---
+_p_su = NL.famiglia_prezzo(_barre474(_sale), _ALLE17)
+_p_50 = NL.famiglia_prezzo(_barre474(_sale[:-1] + [205.0]), _ALLE17)
+_p_200 = NL.famiglia_prezzo(_barre474(_sale[:-1] + [150.0]), _ALLE17)
+check("v474 prezzo: spento sopra le medie, acceso sotto la 50, e sotto la 200 e' il gradino del rosso",
+      _p_su["stato"] == "spento" and not _p_su["sotto200"] and _p_50["stato"] == "acceso" and not _p_50["sotto200"]
+      and _p_200["stato"] == "acceso" and _p_200["sotto200"], str((_p_su["stato"], _p_50["stato"], _p_200["stato"])))
+# a seduta aperta l'ultima barra e' in formazione: il semaforo legge CHIUSURE (v471)
+_crollo_oggi = _barre474(_sale[:-1] + [150.0])
+check("v474 prezzo: la barra della seduta in corso NON accende il semaforo, la stessa barra a chiusura si'",
+      NL.famiglia_prezzo(_crollo_oggi, _ALLE11)["stato"] == "spento"
+      and NL.famiglia_prezzo(_crollo_oggi, _ALLE11)["seduta"] == "2026-10-08"
+      and NL.famiglia_prezzo(_crollo_oggi, _ALLE17)["stato"] == "acceso")
+check("v474 prezzo: con meno di 200 sedute concluse la famiglia e' NON MISURABILE, non spenta",
+      NL.famiglia_prezzo(_barre474(_sale[:150]), _ALLE17)["stato"] == "non misurabile")
+
+# --- leader: NVDA, AMD e MU INSIEME sotto la 50, con volumi alti per tutti e tre ---
+_giu = _sale[:-1] + [150.0]
+_alto = [1_000_000] * 249 + [3_000_000]
+_basso = [1_000_000] * 249 + [10]
+_L_acc = {"NVDA": _barre474(_giu, vol=_alto), "AMD": _barre474(_giu, vol=_alto), "MU": _barre474(_giu, vol=_alto)}
+_L_vol = {**_L_acc, "MU": _barre474(_giu, vol=_basso)}
+_L_su = {**_L_acc, "NVDA": _barre474(_sale, vol=_alto)}
+_L_buco = {**_L_acc, "MU": []}
+_L_buco_su = {**_L_su, "MU": []}
+_fl = {k: NL.famiglia_leader(v, _ALLE17) for k, v in
+       (("acc", _L_acc), ("vol", _L_vol), ("su", _L_su), ("buco", _L_buco), ("buco_su", _L_buco_su))}
+check("v474 leader: tutti e tre sotto con volumi alti = ACCESO; un volume basso = spento ma 'in osservazione'",
+      _fl["acc"]["stato"] == "acceso" and _fl["vol"]["stato"] == "spento" and _fl["vol"]["tutti_sotto"],
+      str({k: v["stato"] for k, v in _fl.items()}))
+check("v474 leader: uno sopra la media basta a dirla spenta; un nome NON misurato la rende non misurabile solo se "
+      "gli altri sono tutti sotto",
+      _fl["su"]["stato"] == "spento" and _fl["buco"]["stato"] == "non misurabile" and _fl["buco_su"]["stato"] == "spento",
+      str({k: v["stato"] for k, v in _fl.items()}))
+
+# --- credito, tassi, fondamentali, leva ---
+_cr = lambda ccc, hy: NL.famiglia_credito(None if ccc is None else {"salita_60_pp": ccc},
+                                          None if hy is None else {"valore": hy, "data": "2026-10-08"})
+check("v474 credito: CCC +1,5 o HY sopra 3,5 accendono; un dato mancante con l'altro spento e' NON MISURABILE; "
+      "HY sopra 4,0 e' il gradino del rosso",
+      _cr(1.5, 3.0)["stato"] == "acceso" and _cr(1.4, 3.6)["stato"] == "acceso" and _cr(1.4, 3.5)["stato"] == "spento"
+      and _cr(None, 3.0)["stato"] == "non misurabile" and _cr(2.0, None)["stato"] == "acceso"
+      and _cr(1.0, 4.1)["rosso"] and not _cr(1.0, 4.0)["rosso"])
+check("v474 tassi: strettamente sopra 5,4 accende; senza dato non misurabile",
+      NL.famiglia_tassi({"valore": 5.41})["stato"] == "acceso" and NL.famiglia_tassi({"valore": 5.4})["stato"] == "spento"
+      and NL.famiglia_tassi(None)["stato"] == "non misurabile")
+_fo = lambda n, m: NL.famiglia_fondamentali({"NVDA": n, "MU": m})["stato"]
+check("v474 fondamentali: piu' tagli che rialzi su ALMENO UNO fra NVDA e MU accende; un nome senza dato e' non misurabile",
+      _fo({"su_30g": 46, "giu_30g": 0}, {"su_30g": 1, "giu_30g": 4}) == "acceso"
+      and _fo({"su_30g": 46, "giu_30g": 0}, {"su_30g": 4, "giu_30g": 4}) == "spento"
+      and _fo({"su_30g": 46, "giu_30g": 0}, None) == "non misurabile"
+      and _fo({"su_30g": 0, "giu_30g": 2}, None) == "acceso")
+check("v474 leva: il margin debt che scende sul mese accende, dallo STORICO e non dal campo 'qoq' (v326)",
+      NL.famiglia_leva({"history": [100, 99], "qoq": 5.0})["stato"] == "acceso"
+      and NL.famiglia_leva({"history": [99, 100], "qoq": -5.0})["stato"] == "spento"
+      and NL.famiglia_leva({"history": [100]})["stato"] == "non misurabile")
+
+# --- il colore: prezzo e leader sono UNA famiglia (B3); il rosso chiede SMH sotto la 200 E credito sopra 4,0 ---
+def _fam474(**accesi):
+    f = {k: {"stato": "spento"} for k in ("prezzo", "leader", "credito", "tassi", "fondamentali", "leva")}
+    for k, v in accesi.items():
+        f[k] = v if isinstance(v, dict) else {"stato": v}
+    return f
+_c = NL.colore_semaforo
+check("v474 colore: una famiglia gialla; prezzo e leader insieme restano UNA (B3); due famiglie diverse arancione",
+      _c(_fam474(credito="acceso"))["colore"] == "giallo"
+      and _c(_fam474(prezzo="acceso", leader="acceso"))["colore"] == "giallo"
+      and _c(_fam474(credito="acceso", tassi="acceso"))["colore"] == "arancione"
+      and _c(_fam474())["colore"] == "verde")
+check("v474 colore: rosso solo con SMH sotto la 200 E HY sopra 4,0; senza il credito resta il dubbio della guida capex",
+      _c(_fam474(prezzo={"stato": "acceso", "sotto200": True}, credito={"stato": "acceso", "rosso": True}))["colore"] == "rosso"
+      and _c(_fam474(credito={"stato": "acceso", "rosso": True}))["colore"] == "giallo"
+      and _c(_fam474(prezzo={"stato": "acceso", "sotto200": True}))["rosso_possibile"])
+_cm = _c(_fam474(tassi="non misurabile"))
+check("v474 colore: una famiglia non misurabile rende il colore un MINIMO e si nomina, non diventa 'spenta'",
+      _cm["colore"] == "verde" and _cm["minimo"] and _cm["non_misurabili"] == ["tassi"])
+
+# --- la reazione si LEGGE dal libro (v436), e porta la regola nuova del giallo ---
+_rz = NL.reazioni_libro(_lib474)
+check("v474 la reazione di ogni colore si legge da LIBRO.md §1ter, e il giallo porta la decisione del CEO del 09/10",
+      set(_rz) == {"verde", "giallo", "arancione", "rosso"} and "nessun divieto d'ingresso" in _rz["giallo"]
+      and "conseguenze di rischio" in _rz["giallo"] and "niente nuovi acquisti di semiconduttori" not in _rz["giallo"],
+      str(_rz)[:400])
+check("v474 senza la sezione del semaforo nel libro le reazioni mancano, e la resa lo dichiara",
+      NL.reazioni_libro("# altro\n## 2. niente\n") == {})
+
+# --- la resa: colore cambiato in cima, invariato, minimo, rosso possibile, reazione non letta ---
+_seg474 = {"ccc": {"valore": 12.5, "data": "2026-10-08", "salita_60_pp": 2.8}, "hy": {"valore": 3.15, "data": "2026-10-08"},
+           "t10": {"valore": 5.28, "data": "2026-10-07"},
+           "analisti": {"NVDA": {"su_30g": 46, "giu_30g": 0}, "MU": {"su_30g": 4, "giu_30g": 1}},
+           "margin": {"history": [100, 102], "date": "2026-08-01"}}
+_sm474 = NL.semaforo(_barre474(_sale), {k: _barre474(_sale, vol=_alto) for k in NL.LEADER}, _seg474, _ALLE17)
+_sm474["reazioni"] = _rz
+_r_cambiato = "\n".join(NL.righe_semaforo(_sm474, {"seduta": "2026-10-08", "colore": "verde"}))
+_r_uguale = "\n".join(NL.righe_semaforo(_sm474, {"seduta": "2026-10-08", "colore": "giallo"}))
+_r_nessuno = "\n".join(NL.righe_semaforo(_sm474, None))
+check("v474 resa: giallo dal solo credito; COLORE CAMBIATO quando il registro dice un altro colore, 'invariato' quando no",
+      _sm474["colore"] == "giallo" and _sm474["accesi"] == ["credito"] and "COLORE CAMBIATO: da verde" in _r_cambiato
+      and "giallo → invariato" in _r_uguale and "n.d." in _r_nessuno.split("colore della seduta precedente")[1][:20],
+      _r_cambiato[:300])
+check("v474 resa: la reazione del colore esce parola per parola dal libro, e la guida capex si dichiara non calcolata",
+      "reazione del giallo (LIBRO.md §1ter, parola per parola)" in _r_uguale and "nessun divieto d'ingresso" in _r_uguale
+      and "hyperscaler NON è calcolata" in _r_uguale and "agosto 2026" in _r_uguale)
+_sm_min = NL.semaforo(_barre474(_sale), {k: _barre474(_sale, vol=_alto) for k in NL.LEADER}, {**_seg474, "t10": None}, _ALLE17)
+_sm_min["reazioni"] = {}
+_r_min = "\n".join(NL.righe_semaforo(_sm_min, None))
+check("v474 resa: un dato mancante rende il colore MINIMO nell'intestazione, e una reazione non letta si dichiara",
+      "(MINIMO)" in _r_min.splitlines()[0] and "colore MINIMO: tassi non misurabile" in _r_min and "NON letta da LIBRO.md" in _r_min)
+_sm_ar = NL.semaforo(_barre474(_sale[:-1] + [150.0]), {k: _barre474(_sale, vol=_alto) for k in NL.LEADER}, _seg474, _ALLE17)
+_sm_ar["reazioni"] = _rz
+_r_ar = "\n".join(NL.righe_semaforo(_sm_ar, None, {"MU": 0.35, "AMD": 0.25, "NVDA": 0.12}))
+check("v474 resa: SMH sotto la 200 + credito = arancione, il dubbio del rosso si dichiara e si nomina chi pesa nel rischio",
+      _sm_ar["colore"] == "arancione" and "il rosso scatta col credito sopra 4,0" in _r_ar and "MU 35,0%" in _r_ar,
+      _r_ar[-400:])
+
+# --- la pipeline si legge dalle chiavi VERE (v196, v416) ---
+_d474 = {"macro": {"credit_ccc": {"valore": 12.52, "salita_60_pp": 2.82}, "credit": {"spread_hy": 3.15, "date": "2026-10-08"},
+                   "tassi": {"scadenze": [{"key": "a2", "value": 4.0}, {"key": "a10", "value": 5.28, "observation_date": "2026-10-07"}]},
+                   "margin_debt": {"history": [1, 2], "date": "2026-08-01"}},
+         "watchlist": [{"ticker": "NVDA", "analisti": {"su_30g": 46, "giu_30g": 0}}],
+         "portfolio": [{"ticker": "MU", "analisti": {"su_30g": 4, "giu_30g": 1}}]}
+_sp474 = NL.segnali_pipeline(_d474)
+check("v474 segnali dalla pipeline: CCC, HY con la sua data, 10 anni con la sua data, revisioni da watchlist E portafoglio",
+      _sp474["hy"] == {"valore": 3.15, "data": "2026-10-08"} and _sp474["t10"] == {"valore": 5.28, "data": "2026-10-07"}
+      and _sp474["analisti"]["MU"]["su_30g"] == 4 and _sp474["analisti"]["NVDA"]["su_30g"] == 46
+      and _sp474["ccc"]["salita_60_pp"] == 2.82 and NL.segnali_pipeline(None)["hy"] is None, str(_sp474))
+
+# --- collegamento (v399, v443): il semaforo e' calcolato in calcola e stampato PER PRIMO ---
+_calc474 = _corpo_di(_src_nl := Path(__file__).with_name("numeri_libro.py").read_text(), "calcola")
+_sint474 = _corpo_di(_src_nl, "sintesi")
+check("v474 collegamento: calcola produce semaforo, reazioni, decisioni e registro; la sintesi apre col semaforo",
+      "semaforo(B[\"SMH\"]" in _calc474 and "reazioni_libro(testo_libro())" in _calc474
+      and "costo_decisioni(" in _calc474 and "aggiorna_registro(" in _calc474
+      and 0 <= _sint474.find("righe_semaforo(") < _sint474.find("Periodo")
+      and "righe_registro(" in _sint474 and "righe_decisioni(" in _sint474)
+
+# ---------------------------------------------------------------- le decisioni aperte
+_dec474 = NL.leggi_decisioni(_lib474)
+_dd = {d["tk"]: d for d in (_dec474 or [])}
+check("v474 la tabella DECISIONI APERTE del libro si legge: RGTI uscita 463, AMD alleggerimento da decidere, livelli e date",
+      set(_dd) >= {"RGTI", "AMD"} and _dd["RGTI"]["qta"] == 463 and _dd["RGTI"]["verso"] == "vendita"
+      and _dd["RGTI"]["livello"] == 14.41 and _dd["AMD"]["qta"] is None and not _dd["AMD"]["qta_illeggibile"]
+      and _dd["AMD"]["livello"] == 645.0 and _dd["RGTI"]["confermata"] == "2026-10-08" and _dd["AMD"]["aperta"],
+      str(_dec474))
+_tab474 = ("## 1quinquies. DECISIONI APERTE\n\n| Nome | Decisione | Quantità | Condizione | Livello | Confermata | Stato |\n"
+           "|---|---|---|---|---|---|---|\n")
+check("v474 sezione assente = None (si legge diversa da 'nessuna decisione'); sezione vuota = []; solo dentro il titolo (v454)",
+      NL.leggi_decisioni("## 1. POSIZIONI\n| RGTI | uscita | 463 | chiusura sotto | 14,41 | 2026-10-08 | aperta |\n") is None
+      and NL.leggi_decisioni(_tab474) == [] and NL.righe_decisioni(None)[0].startswith("DECISIONI APERTE: sezione NON trovata")
+      and NL.righe_decisioni([]) == ["DECISIONI APERTE: nessuna in LIBRO.md §1quinquies"])
+_righe_dec = _tab474 + ("| RGTI | uscita | 463 | chiusura sotto | 14,41 | 2026-10-08 | aperta |\n"
+                        "| AMD | alleggerimento | da decidere | respinto sotto | 645 | 2026-10-08 | aperta |\n"
+                        "| ZZZ | ingresso | 10 | chiusura sopra | 50 | 2026-10-08 | aperta |\n"
+                        "| OLD | uscita | 5 | chiusura sotto | 9 | 2026-10-01 | eseguita il 02/10 |\n"
+                        "| QQQ | uscita | circa 7 | chiusura sotto | 1 | 2026-10-08 | aperta |\n")
+_bd = {"RGTI": [{"t": "2026-10-07", "c": 14.5}, {"t": "2026-10-08", "c": 14.14}, {"t": "2026-10-09", "c": 14.03}],
+       "AMD": [{"t": "2026-10-08", "c": 620.68}, {"t": "2026-10-09", "c": 630.68}],
+       "ZZZ": [{"t": "2026-10-08", "c": 52.0}, {"t": "2026-10-09", "c": 51.0}]}
+_cal474 = {"finestra": 45, "attesi": [{"tk": "RGTI", "data": "2026-11-09", "giorni": 31}]}
+_cd = {x["tk"]: x for x in NL.costo_decisioni(NL.leggi_decisioni(_righe_dec), _bd,
+                                                {"RGTI": 14.03, "AMD": 630.68, "ZZZ": 51.0, "QQQ": 2.0}, _cal474, _ALLE17)}
+check("v474 vendita: effetto = quantita' x (adesso - conferma); RGTI 463 x (14,03 - 14,14) = -50,93 $; condizione valida; 1 seduta",
+      abs(_cd["RGTI"]["effetto"] - 463 * (14.03 - 14.14)) < 1e-9 and _cd["RGTI"]["conferma_px"] == 14.14
+      and _cd["RGTI"]["vale_ancora"] is True and _cd["RGTI"]["sedute"] == 1 and _cd["RGTI"]["scadenza"]["data"] == "2026-11-09",
+      str(_cd["RGTI"]))
+check("v474 quantita' da decidere: il conto e' per 10 azioni e lo dice; un acquisto ha il segno opposto",
+      _cd["AMD"]["per_unita"] and abs(_cd["AMD"]["effetto"] - 10 * 10.0) < 1e-9
+      and abs(_cd["ZZZ"]["effetto"] - 10 * (52.0 - 51.0)) < 1e-9 and "OLD" not in _cd)
+check("v474 una quantita' scritta male non diventa in silenzio 10 azioni: si dichiara ILLEGGIBILE",
+      _cd["QQQ"]["qta_illeggibile"] and "ILLEGGIBILE" in "\n".join(NL.righe_decisioni([_cd["QQQ"]])))
+_rd474 = "\n".join(NL.righe_decisioni(list(_cd.values())))
+check("v474 resa: COSTATA per un effetto negativo, FATTO GUADAGNARE per uno positivo, unita' dichiarata, nessuna data inventata",
+      "l'attesa è COSTATA 51 $" in _rd474 and "l'attesa ha FATTO GUADAGNARE 100 $" in _rd474
+      and "unità di calcolo, non una quantità consigliata" in _rd474 and "1 seduta conclusa dalla conferma" in _rd474
+      and "AMD alleggerimento" in _rd474 and "nessuna trimestrale dichiarata dalla fonte" in _rd474, _rd474)
+_cd_rientr = NL.costo_decisioni(NL.leggi_decisioni(_righe_dec), _bd, {"RGTI": 15.0}, _cal474, _ALLE17)
+_cd_r = {x["tk"]: x for x in _cd_rientr}
+check("v474 una condizione RIENTRATA si dice (la decisione resta, la premessa va ridiscussa); una conferma senza barra e' n.d.",
+      _cd_r["RGTI"]["vale_ancora"] is False and "RIENTRATA" in "\n".join(NL.righe_decisioni([_cd_r["RGTI"]]))
+      and "NON trovata nelle barre" in "\n".join(NL.righe_decisioni(NL.costo_decisioni(
+          NL.leggi_decisioni(_righe_dec)[:1], {"RGTI": [{"t": "2026-10-09", "c": 14.0}]}, {"RGTI": 14.0}, _cal474, _ALLE17))))
+_bd_oggi = {"RGTI": _bd["RGTI"] + [{"t": "2026-10-12", "c": 13.0}]}
+check("v474 le sedute trascorse sono CONCLUSE: la barra della seduta in corso non conta",
+      NL.costo_decisioni(NL.leggi_decisioni(_righe_dec)[:1], _bd_oggi, {"RGTI": 13.0}, _cal474,
+                         _dt474(2026, 10, 12, 11, 0, tzinfo=_NY474))[0]["sedute"] == 1
+      and NL.costo_decisioni(NL.leggi_decisioni(_righe_dec)[:1], _bd_oggi, {"RGTI": 13.0}, _cal474,
+                             _dt474(2026, 10, 12, 17, 0, tzinfo=_NY474))[0]["sedute"] == 2)
+
+# ---------------------------------------------------------------- il registro della performance
+_pat474 = (1.2, "pipeline, run x", {"BTP": (101.0, "pipeline")})
+_b1 = {"AAA": [{"t": "2026-10-09", "c": 100.0}], "BBB": [{"t": "2026-10-09", "c": 50.0}], "QQQ": [{"t": "2026-10-09", "c": 600.0}]}
+_b2 = {"AAA": [{"t": "2026-10-12", "c": 110.0}], "BBB": [{"t": "2026-10-12", "c": 45.0}], "QQQ": [{"t": "2026-10-12", "c": 606.0}]}
+_r1 = NL.nuova_riga("2026-10-09", {"AAA": 10, "BBB": 20}, {"BTP": 10000}, _b1, 5000.0, _pat474, "giallo", None, _ALLE17)
+# fra le due righe il CEO vende BBB e deposita 20.000 EUR: il TWR non deve vedere ne' l'uno ne' l'altro
+_r2 = NL.nuova_riga("2026-10-12", {"AAA": 10}, {"BTP": 10000}, _b2, 25000.0, (1.25, "x", {"BTP": (101.5, "pipeline")}),
+                    "arancione", _r1, _ALLE17)
+check("v474 la riga salva i prezzi delle posizioni di oggi E di quelle della riga prima (la venduta resta prezzata)",
+      _r2["prezzi"] == {"AAA": 110.0, "BBB": 45.0} and _r2["posizioni"] == {"AAA": 10} and _r2["qqq"] == 606.0
+      and _r2["semaforo"] == "arancione" and _r2["prezzi_obbligazioni"]["BTP"] == {"prezzo": 101.5, "fonte": "pipeline"})
+_tw = NL.twr([_r1, _r2])
+_p0 = 2000 / 1.2 + 5000 + 10000 * 101.0 / 100
+_p1 = 2000 / 1.25 + 5000 + 10000 * 101.5 / 100
+check("v474 TWR: l'intervallo usa le posizioni registrate al suo INIZIO (AAA +10% e BBB -10% a pesi 1:1 = 0), "
+      "non quelle di dopo (sarebbe +10%)",
+      abs(_tw["libro"]) < 1e-12 and abs(_tw["qqq"] - 0.01) < 1e-12, str(_tw))
+check("v474 TWR: il patrimonio usa la liquidita' di INIZIO intervallo: un deposito non e' rendimento; QQQ in euro col cambio",
+      abs(_tw["patrimonio"] - (_p1 / _p0 - 1)) < 1e-12
+      and abs(_tw["qqq_eur"] - ((606 / 1.25) / (600 / 1.2) - 1)) < 1e-12, str(_tw))
+_r3 = dict(_r2, seduta="2026-10-13", prezzi={"AAA": None}, qqq=612.0, posizioni={"AAA": 10})
+_r4 = dict(_r2, seduta="2026-10-14", prezzi={"AAA": 121.0}, qqq=618.0)
+_tw2 = NL.twr([_r1, _r2, _r3, _r4])
+check("v474 TWR: un prezzo mancante salta l'intervallo per il libro E per QQQ (stessi giorni), e lo si nomina",
+      _tw2["intervalli"] == 1 and len(_tw2["saltati"]) == 2 and "manca il prezzo di AAA" in _tw2["saltati"][0]
+      and abs(_tw2["qqq"] - 0.01) < 1e-12, str(_tw2))
+with _tf474.TemporaryDirectory() as _dr474:
+    _pr = _os474.path.join(_dr474, "reg.jsonl")
+    _e_seduta = NL.registra(_r1, _pr, _ALLE11)
+    _e_ok = NL.registra(_r1, _pr, _ALLE17)
+    _e_dopp = NL.registra(_r1, _pr, _ALLE17)
+    _e_vecchia = NL.registra(dict(_r1, seduta="2026-10-08"), _pr, _ALLE17)
+    _e_noqqq = NL.registra(dict(_r2, qqq=None), _pr, _ALLE17)
+    with open(_pr, "a", encoding="utf-8") as _fh:
+        _fh.write("{rotta\n")
+    _lr, _rotte = NL.leggi_registro(_pr)
+    _ag = NL.aggiorna_registro(_b2, {"AAA": 10}, {"BTP": 10000}, 25000.0, (1.25, "x", {"BTP": (101.5, "pipeline")}),
+                               "giallo", True, _dt474(2026, 10, 12, 18, 0, tzinfo=_NY474), _pr)
+    _ag2 = NL.aggiorna_registro(_b2, {"AAA": 10}, {"BTP": 10000}, 25000.0, (1.25, "x", {"BTP": (101.5, "pipeline")}),
+                                "giallo", True, _dt474(2026, 10, 12, 18, 5, tzinfo=_NY474), _pr)
+check("v474 il registro NON si scrive durante la seduta, ne' due volte, ne' all'indietro, ne' senza QQQ",
+      _e_seduta[0] is False and "seduta in corso" in _e_seduta[1] and _e_ok[0] is True and _e_dopp[0] is False
+      and _e_vecchia[0] is False and _e_noqqq[0] is False, str((_e_seduta, _e_ok, _e_dopp, _e_vecchia, _e_noqqq)))
+check("v474 una riga illeggibile si CONTA e si dichiara, non sparisce in silenzio",
+      _rotte == 1 and len(_lr) == 1 and "1 riga del registro illeggibile" in "\n".join(NL.righe_registro(_ag)))
+check("v474 aggiorna_registro scrive la seduta conclusa, confronta, e la seconda volta dice 'gia' registrata'",
+      _ag["esito"].startswith("scritto") and _ag["twr"]["righe"] == 2 and abs(_ag["twr"]["libro"]) < 1e-12
+      and "già registrata" in _ag2["esito"] and [u["semaforo"] for u in _ag["ultime"]] == ["giallo", "giallo"],
+      str(_ag["esito"]) + " " + str(_ag2["esito"]))
+check("v474 il colore precedente viene dal registro, dalla riga PRIMA della seduta di oggi",
+      NL.precedente_semaforo({"ultime": [{"seduta": "2026-10-08", "semaforo": "verde"}, {"seduta": "2026-10-09", "semaforo": "giallo"}]},
+                             "2026-10-09") == {"seduta": "2026-10-08", "colore": "verde"}
+      and NL.precedente_semaforo({"ultime": []}, "2026-10-09") is None)
+_rr474 = "\n".join(NL.righe_registro({"twr": _tw, "esito": None, "rotte": 0}))
+check("v474 resa del registro: libro e patrimonio contro QQQ con la differenza, e le convenzioni del TWR dichiarate",
+      "libro azionario in dollari 0,00% · QQQ +1,00% · differenza -1,00 punti" in _rr474
+      and "patrimonio intero in euro" in _rr474 and "posizioni registrate al suo inizio" in _rr474
+      and "1 intervallo," in _rr474, _rr474)
+check("v474 senza cambio il patrimonio e' n.d. e il libro si confronta lo stesso",
+      NL.twr([dict(_r1, eurusd=None), _r2])["patrimonio"] is None and NL.twr([dict(_r1, eurusd=None), _r2])["libro"] is not None)
+check("v474 patrimonio_pipeline: cambio e prezzo del BTP dalla pipeline; senza riga il BTP resta AL CARICO, dichiarato",
+      NL.patrimonio_pipeline({"updated_at": "x", "macro": {"markets": [{"key": "EURUSD=X", "value": "1.1204"}]},
+                              "portfolio": [{"ticker": "BTP", "price": 101.69}]}, {"BTP": 100.0, "ALT": 99.0})
+      == (1.1204, "pipeline, run x", {"BTP": (101.69, "pipeline"), "ALT": (99.0, "carico: la pipeline non ha il prezzo")})
+      and NL.patrimonio_pipeline(None, {"BTP": 100.0})[0] is None)
+
+# ---------------------------------------------------------------- il comando unico registra
+_cm474 = {f: [a for _, a in AN.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+check("v474 il giro principale di numeri_libro porta --registra in ogni fase; il prezzo esteso no",
+      all(any(x[0] == "numeri_libro.py" and "--sedute" in x and "--registra" in x for x in v) for v in _cm474.values())
+      and all("--registra" not in x for v in _cm474.values() for x in v if "--esteso" in x), str(_cm474))
+_t474, _ = AN.resa([], "## Cosa contiene la risposta\nx", registro_cambiato=True)
+_t474n, _ = AN.resa([], "## Cosa contiene la risposta\nx", registro_cambiato=False)
+check("v474 se il registro cambia il comando lo DICE (va committato), e se non cambia tace",
+      "REGISTRO DELLA PERFORMANCE AGGIORNATO" in _t474 and "REGISTRO DELLA PERFORMANCE AGGIORNATO" not in _t474n
+      and "impronta() != prima" in _corpo_di(Path(__file__).with_name("analisi.py").read_text(), "main"))
+
+# ---------------------------------------------------------------- il piano per la liquidita'
+import random as _rnd474
+_g474 = _rnd474.Random(474)
+_date474 = _giorni474("2026-10-09", 260)
+_rq = {t: _g474.gauss(0, 0.01) for t in _date474}
+_rl = {t: 2.0 * _rq[t] + _g474.gauss(0, 0.01) for t in _date474}
+_rx = {t: 0.5 * _rq[t] + _g474.gauss(0, 0.015) for t in _date474}
+_cs = ROT.conseguenze(_rl, _rl, _rq, 280000.0, 5600.0)
+_cx = ROT.conseguenze(_rx, _rl, _rq, 280000.0, 5600.0)
+_cn = ROT.conseguenze({t: -_rl[t] for t in _date474}, _rl, _rq, 280000.0, 5600.0)
+_bx = ROT.beta_mercato({t: _rx[t] for t in sorted(_rx)[-250:]}, _rq)[0]
+_bl = ROT.beta_mercato({t: _rl[t] for t in sorted(_rl)[-250:]}, _rq)[0]
+check("v474 conseguenze: aggiungere al libro il libro stesso non cambia volatilita' ne' beta",
+      abs(_cs["dvol"]) < 1e-9 and abs(_cs["dbeta"]) < 1e-9, str(_cs))
+check("v474 conseguenze: il beta e' lineare nei pesi — la variazione e' peso x (beta del titolo - beta del libro), esatta",
+      abs(_cx["dbeta"] - _cx["peso"] * (_bx - _bl)) < 1e-9 and abs(_cx["peso"] - 5600 / 285600) < 1e-12, str(_cx))
+check("v474 conseguenze: chi va contro il libro abbassa la volatilita' piu' di chi lo diversifica soltanto",
+      _cn["dvol"] < _cx["dvol"] < 0, f"{_cn['dvol']} {_cx['dvol']}")
+check("v474 conseguenze: sotto 60 date comuni, o senza cambio, non e' una misura (un buco, v205)",
+      ROT.conseguenze(dict(list(_rx.items())[:50]), _rl, _rq, 280000.0, 5600.0) is None
+      and ROT.conseguenze(_rx, _rl, _rq, 280000.0, None) is None)
+_vb = {"tk": "XX", "px": 100.0, "sma20": 99.0, "sma50": 98.0, "sma200": 90.0, "atr": 2.0, "pend50": 1.0, "corr_libro": 0.2,
+       "supp": 95.0, "res": 104.0, "stato": "CANDIDATO", "trimestrale": {"data": "2026-10-20", "giorni": 11}}
+_vd = ROT.voce_piano(_vb, "watchlist", _rx, _rl, _rq, 280000.0, 5600.0)
+_vs = ROT.voce_piano({**_vb, "px": 92.0, "pend50": -0.5}, "watchlist", _rx, _rl, _rq, 280000.0, 5600.0)
+_vv = ROT.voce_piano({**_vb, "sma200": 110.0}, "watchlist", _rx, _rl, _rq, 280000.0, 5600.0)
+_vstop = ROT.voce_piano({**_vb, "supp": 101.0}, "watchlist", _rx, _rl, _rq, 280000.0, 5600.0)
+check("v474 voce del piano: dentro la zona l'ingresso e' il prezzo di adesso, sotto e' il bordo della zona; "
+      "perdita allo stop = unita' x (stop / ingresso - 1)",
+      _vd["posizione"] == "dentro" and _vd["ingresso"] == 100.0 and abs(_vd["perdita_eur"] - 5000 * (95 / 100 - 1)) < 1e-9
+      and _vs["posizione"] == "sotto" and abs(_vs["ingresso"] - 96.0) < 1e-9
+      and abs(_vs["perdita_eur"] - 5000 * (95 / 96 - 1)) < 1e-9, str((_vd["ingresso"], _vs["ingresso"])))
+check("v474 voce del piano: zona vuota = nessun ingresso inventato; uno stop sopra l'ingresso non da' una perdita",
+      _vv["posizione"] == "zona vuota" and _vv["ingresso"] is None and _vv["perdita_eur"] is None
+      and _vstop["perdita_eur"] is None and _vstop["ingresso"] == 100.0)
+_pv474 = {"voci": [_vd, dict(_vd, tk="YY", gruppo="STESSA SCOMMESSA DEL LIBRO", corr=0.7,
+                              conseguenze=dict(_vd["conseguenze"], dvol=0.2), trimestrale={"data": "2026-11-20", "giorni": 42}),
+                   _vs, _vv],
+          "liquidita": 59000.0, "patrimonio": {"azionario": 256921.0, "liquidita": 59000.0, "obbligazioni": 40676.0,
+                                               "totale": 356597.0},
+          "cambio": 1.1204, "fonte_cambio": "pipeline, run x", "qqq_assente": False}
+_rp474 = ROT.righe_piano({"piano": _pv474})
+_tp474 = "\n".join(_rp474)
+_op = [r.split()[0] for r in _tp474.split("■ OPERABILI")[1].split("■ CON")[0].splitlines()[1:]]
+check("v474 resa del piano: quota della liquidita' sul patrimonio, unita' dichiarata NON quantita' consigliata, quota azionaria",
+      "59.000 € dichiarati in LIBRO.md, 16,5% del patrimonio" in _tp474 and "NON una quantità consigliata" in _tp474
+      and "da 72,0% a 73,5%" in _tp474, _tp474[:600])
+check("v474 resa del piano: operabili per riduzione della volatilita'; la stessa scommessa e' DICHIARATA, non vietata",
+      _op == ["XX", "YY"] and "STESSA SCOMMESSA del libro (corr +0,70)" in _tp474
+      and "nella stessa scommessa del libro (correlazione da 0,5 in su): YY" in _tp474, str(_op))
+check("v474 resa del piano: avvisi col loro livello, zona vuota fra i senza livello, trimestrale vicina segnalata (14 giorni)",
+      "avviso: CHIUSURA sopra 96,00" in _tp474 and "XX (zona vuota)" in _tp474
+      and "trimestrale 2026-10-20 (11 g) ⚠ entro 14 giorni" in _tp474 and "2026-11-20 (42 g) ⚠" not in _tp474)
+check("v474 resa del piano: senza cambio il patrimonio NON e' calcolabile e lo dice, invece di sommare dollari ed euro (v432)",
+      ROT.righe_piano({"piano": {**_pv474, "patrimonio": None, "cambio": None}})[0].startswith(
+          "PIANO PER LA LIQUIDITÀ — patrimonio NON calcolabile: cambio EUR/USD non letto"))
+_racc474 = _corpo_di(_src_rot474 := Path(__file__).with_name("rotazione.py").read_text(), "raccogli")
+check("v474 collegamento: la raccolta legge QQQ, il calendario di tutto l'universo, il patrimonio da numeri_libro, "
+      "e il piano si stampa",
+      '"QQQ"' in _racc474 and "submit(calendario_sicuro, tutti)" in _racc474
+      and "numeri_libro.patrimonio_pipeline(" in _racc474 and "numeri_libro.patrimonio_eur(" in _racc474
+      and "voce_piano(" in _racc474 and "righe_piano(o)" in _src_rot474.split("if __name__")[-1])
+
+# ---------------------------------------------------------------- il libro e il formato
+check("v474 il libro dichiara il riferimento QQQ e il registro; la regola nuova del giallo; la tabella delle decisioni",
+      "## 0. OBIETTIVO E RIFERIMENTO" in _lib474 and "**QQQ (Nasdaq 100)**" in _lib474
+      and "registro_performance.jsonl" in _lib474 and "## 1quinquies. DECISIONI APERTE" in _lib474)
+_cl474 = AN.checklist()
+check("v474 la checklist porta il piano per la liquidita' (7e), le decisioni aperte, il registro, e il giallo SENZA divieto",
+      "7e." in _cl474 and "PIANO PER LA LIQUIDITÀ" in _cl474 and "DECISIONI APERTE" in _cl474
+      and "registro della performance" in _cl474 and "nessun divieto" in _cl474.lower()
+      and "in giallo\n   niente nuovi semiconduttori" not in _cl474 and "piano per la liquidità (09/10)" in _cl474)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

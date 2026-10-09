@@ -22,10 +22,16 @@ strumento perche' non lo accetti piu'. Questo comando:
     di una sezione che manca in silenzio (v453).
 Non giudica e non riassume: esegue e mette in fila (v448). L'uscita di ogni strumento passa da
 un file su disco, non da una pipe che puo' troncarla (v443).
+
+v474 — il giro principale di numeri_libro porta --registra: fuori dalla seduta scrive la riga della
+seduta conclusa nel registro della performance contro QQQ (decisione del CEO del 09/10/2026). Il
+registro vive nel repo: se il file cambia, il comando lo DICE in fondo, perche' una riga non
+committata resta solo in questa sessione e il confronto con l'indice perde un giorno.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import subprocess
 import sys
 import tempfile
@@ -42,6 +48,7 @@ TITOLO_REGOLE = "## Regole"
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
 STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py")
+REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 LIMITE_SECONDI = 600
 
 
@@ -64,8 +71,9 @@ def comandi(f, sedute=1):
     if f == "pre-market":
         c.append(("PRE-MARKET — il libro sul prezzo esteso (volumi sottili: e' un'indicazione)",
                   ["numeri_libro.py", "--esteso"]))
-    c.append((f"NUMERI DEL LIBRO — {'ultima seduta' if sedute == 1 else f'ultime {sedute} sedute'}",
-              ["numeri_libro.py", "--sedute", str(sedute)]))
+    c.append((f"NUMERI DEL LIBRO — semaforo, {'ultima seduta' if sedute == 1 else f'ultime {sedute} sedute'}, "
+              "registro contro QQQ, decisioni aperte",
+              ["numeri_libro.py", "--sedute", str(sedute), "--registra"]))
     if f == "after-hours":
         c.append(("AFTER-HOURS — il libro sul prezzo esteso dopo la chiusura", ["numeri_libro.py", "--esteso"]))
     c.append(("BRIEF — notizie, mossi in ATR, macro, aste del Tesoro",
@@ -122,7 +130,15 @@ def checklist(percorso=FORMATO):
     return cl + "\n\n" + (regole or f"⚠ '{TITOLO_REGOLE}' non trovata in {percorso}: le regole della risposta non si leggono")
 
 
-def resa(esiti, cl, intestazione=""):
+def impronta(percorso=REGISTRO):
+    """L'impronta del file, o None se non c'e': serve solo a sapere se il giro l'ha cambiato."""
+    try:
+        return hashlib.sha256(Path(percorso).read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def resa(esiti, cl, intestazione="", registro_cambiato=False):
     L = [intestazione] if intestazione else []
     falliti = []
     for k, e in enumerate(esiti, 1):
@@ -142,6 +158,11 @@ def resa(esiti, cl, intestazione=""):
                  "richiesta': e' il formato che non si legge, e la risposta va scritta col formato completo 0-7.")
     else:
         L.append(cl)
+    if registro_cambiato:
+        L.append("")
+        L.append("⚠ REGISTRO DELLA PERFORMANCE AGGIORNATO: memoria/registro_performance.jsonl va committato e pushato su "
+                 "main (git add, git commit, git pull --rebase origin main, git push) — altrimenti la riga di oggi resta "
+                 "solo in questa sessione e il confronto con QQQ perde un giorno")
     if falliti:
         L.append("")
         L.append(f"⚠ {len(falliti)} strumento/i FALLITO/I: " + ", ".join(e["argv"][1].split("/")[-1] for e in falliti)
@@ -157,10 +178,11 @@ def main():
     f = fase(adesso)
     lista = [(et, [sys.executable, str(RADICE / "scripts" / argv[0])] + argv[1:]) for et, argv in comandi(f, a.sedute)]
     t0 = time.time()
+    prima = impronta()
     esiti = esegui(lista)
     testa = (f"ANALISI DEL LIBRO — {adesso.astimezone(ROMA):%d/%m/%Y %H:%M} ora italiana · New York "
              f"{adesso:%H:%M} · fase: {f.upper()} · {len(lista)} strumenti in parallelo, {round(time.time() - t0)} s")
-    testo, codice = resa(esiti, checklist(), testa)
+    testo, codice = resa(esiti, checklist(), testa, registro_cambiato=impronta() != prima)
     print(testo)
     sys.exit(codice)
 

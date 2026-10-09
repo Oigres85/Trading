@@ -39,6 +39,15 @@ questa ultima analisi"). Per ogni sorvegliato di LIBRO.md, convenzioni dichiarat
 Le trimestrali vengono dal calendario Nasdaq (la fonte delle SCADENZE di numeri_libro); dove
 manca nella finestra resta la stima yfinance della pipeline, DICHIARATA come stima (v396). Le
 revisioni passano dalla stessa funzione di schede_progetto (v400: il verso dalla differenza).
+
+v474 — IL PIANO PER LA LIQUIDITA' (decisione del CEO del 09/10/2026: in giallo "se c'e'
+possibilita' di ingresso non proibirli ma segnalane le conseguenze di rischio"). Per ogni ingresso
+possibile — i sorvegliati di LIBRO.md e i candidati di settore — cosa fa al LIBRO AZIONARIO
+un'unita' di 5.000 EUR (unita' di calcolo dichiarata, non una quantita' consigliata): variazione
+della volatilita' annua e del beta su QQQ, sulle stesse date comuni a libro, QQQ e titolo, e la
+perdita allo stop. Il patrimonio e la quota della liquidita' passano da numeri_libro (una grandezza,
+un proprietario: v436). Ordine dichiarato: gli operabili per riduzione della volatilita', gli
+avvisi per distanza dal livello in ATR.
 """
 import argparse, json, math, os, sys
 from datetime import datetime
@@ -58,6 +67,8 @@ PENDENZA_SEDUTE = 20
 SEDUTE_MINIMI = 10          # v473: struttura dei minimi, 10 sedute concluse contro le 10 prima
 SOGLIA_VOL_CONFERMA = 50    # v473: la chiusura sul livello conta con volume oltre la norma dell'anno
 GIORNI_CALENDARIO = 45      # v473: la stessa finestra delle SCADENZE di numeri_libro
+UNITA_EUR = 5000            # v474: unita' di calcolo delle conseguenze, NON una quantita' consigliata
+TRIMESTRALE_VICINA = 14     # v474: giorni; un ingresso prima dei conti e' una scommessa binaria (LIBRO.md §1quater)
 
 
 SEDUTE_BETA = 250
@@ -381,7 +392,7 @@ def _barre_sicure(tk):
 
 
 def raccogli():
-    pos, _, sorv = brief.leggi_libro()
+    pos, cassa, sorv = brief.leggi_libro()
     qta = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "USD"}
     try:
         d = json.loads((Path(brief.RADICE) / "data" / "data.json").read_text(encoding="utf-8").replace("NaN", "null"))
@@ -391,11 +402,13 @@ def raccogli():
     target = target_pipeline(d)
     asof_target = d.get("updated_at")
     nomi = sorted({p["tk"] for r in tilt for p in (r.get("prime") or [])})
-    tutti = sorted(set(qta) | {r["ticker"] for r in tilt} | set(nomi) | {s["tk"] for s in sorv} | {"SPY"})
+    tutti = sorted(set(qta) | {r["ticker"] for r in tilt} | set(nomi) | {s["tk"] for s in sorv} | {"SPY", "QQQ"})
     # v473 — il calendario delle trimestrali gira MENTRE si scaricano le barre: ~20 secondi di
     #   richieste a Nasdaq che altrimenti si sommerebbero al resto.
     with ThreadPoolExecutor(1) as ex_cal:
-        fut_cal = ex_cal.submit(calendario_sicuro, [s["tk"] for s in sorv])
+        # v474: tutto l'universo, non i soli sorvegliati — il calendario si legge per GIORNO e si
+        #   filtra dopo, quindi i candidati di settore hanno la loro trimestrale allo stesso costo
+        fut_cal = ex_cal.submit(calendario_sicuro, tutti)
         with ThreadPoolExecutor(brief.PARALLELI) as ex:
             B = dict(zip(tutti, ex.map(_barre_sicure, tutti)))
         cal = fut_cal.result()
@@ -429,9 +442,29 @@ def raccogli():
               "trimestrale_yf": (pipe.get(s["tk"]) or {}).get("earnings_date"),
               "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe}
              for s in sorv]
+    # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
+    import numeri_libro
+    eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
+    eur_nom = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "EUR"}
+    fx, fonte_fx, prezzi_eur = numeri_libro.patrimonio_pipeline(d, eur_pmc)
+    valore_libro = sum(qta[tk] * B[tk][-1]["c"] for tk in qta if B.get(tk))
+    pat = numeri_libro.patrimonio_eur(valore_libro, fx, cassa, [(eur_nom[t], prezzi_eur[t][0]) for t in eur_nom])
+    rqqq = rendimenti_per_data(B["QQQ"]) if B.get("QQQ") else {}
+    in_watch = {t["tk"] for t in watch}
+    possibili = [(t, "watchlist") for t in watch if not t.get("errore")]
+    possibili += [({**t, "trimestrale": prima_trim.get(t["tk"])}, f"candidato di settore, {s['etf']} {s.get('nome') or ''}".strip())
+                  for s in settori for t in s["titoli"] if e_candidato(t) and t["tk"] not in in_watch]
+    piano = []
+    for t, fonte in possibili:
+        if any(x["tk"] == t["tk"] for x in piano):
+            continue
+        piano.append(voce_piano(t, fonte, rendimenti_per_data(B.get(t["tk"]) or []), rlibro, rqqq,
+                                valore_libro, UNITA_EUR * fx if fx else None))
     return {"settori": settori, "universo_assente": not tilt, "libro": sorted(qta),
             "libro_sedute": len(rlibro), "watchlist": watch, "asof_target": asof_target,
-            "spy_assente": not rspy, "calendario": {k: cal.get(k) for k in ("giorni_non_letti", "finestra", "errore")}}
+            "spy_assente": not rspy, "calendario": {k: cal.get(k) for k in ("giorni_non_letti", "finestra", "errore")},
+            "piano": {"voci": piano, "liquidita": cassa, "patrimonio": pat, "cambio": fx, "fonte_cambio": fonte_fx,
+                      "qqq_assente": not rqqq, "obbligazioni": {t: prezzi_eur[t] for t in eur_nom}}}
 
 
 def calendario_sicuro(tks, giorni=GIORNI_CALENDARIO):
@@ -635,6 +668,130 @@ def righe_watchlist(o):
     return L
 
 
+# ---------------------------------------------------------------- v474: il piano per la liquidita'
+def conseguenze(rt, rlibro, rqqq, valore_libro, unita_usd, n=SEDUTE_BETA):
+    """Cosa fa al LIBRO AZIONARIO un ingresso di `unita_usd`: variazione della volatilita' annua e
+    del beta su QQQ, sulle STESSE date comuni a libro, QQQ e titolo (v207), con le stesse formule
+    della scheda (vol_annua, beta_mercato: una derivazione sola). Il libro e' quello di oggi
+    guardato all'indietro, la convenzione di serie_libro. Sotto 60 date comuni None: un buco."""
+    comuni = sorted(set(rt) & set(rlibro) & set(rqqq))[-n:]
+    if len(comuni) < 60 or not valore_libro or not unita_usd:
+        return None
+    w = unita_usd / (valore_libro + unita_usd)
+    prima = {t: rlibro[t] for t in comuni}
+    dopo = {t: (1 - w) * rlibro[t] + w * rt[t] for t in comuni}
+    q = {t: rqqq[t] for t in comuni}
+    bp, _, _ = beta_mercato(prima, q, n)
+    bd, _, _ = beta_mercato(dopo, q, n)
+    vp, vd = vol_annua(prima, n), vol_annua(dopo, n)
+    return {"dvol": None if vp is None or vd is None else vd - vp,
+            "dbeta": None if bp is None or bd is None else bd - bp,
+            "peso": w, "sedute": len(comuni)}
+
+
+def voce_piano(t, fonte, rt, rlibro, rqqq, valore_libro, unita_usd):
+    """Una voce del piano: dove sta il prezzo rispetto alla zona, l'ingresso secondo la convenzione
+    (il prezzo di adesso se e' dentro, il livello se e' fuori), lo stop, la perdita allo stop per
+    l'unita' e le conseguenze sul libro. Solo fatti misurati: la frase la scrive la resa."""
+    p = piano_ingresso(t)
+    ingresso = (p["livello"] or {}).get("prezzo") if p["posizione"] in ("sotto", "sopra") else (
+        t.get("px") if p["posizione"] == "dentro" else None)
+    stop = t.get("supp")
+    perdita = (UNITA_EUR * (stop / ingresso - 1), (stop / ingresso - 1) * 100) if (
+        ingresso and stop is not None and stop < ingresso) else (None, None)
+    return {"tk": t["tk"], "fonte": fonte, "px": t.get("px"), "posizione": p["posizione"], "livello": p["livello"],
+            "zona": p["zona"], "ingresso": ingresso, "stop": stop, "perdita_eur": perdita[0], "perdita_pct": perdita[1],
+            "gruppo": gruppo_libro(t.get("corr_libro")), "corr": t.get("corr_libro"), "pend50": t.get("pend50"),
+            "trimestrale": t.get("trimestrale"), "stato": t.get("stato"), "distanza_atr": p["distanza_atr"],
+            "conseguenze": conseguenze(rt, rlibro, rqqq, valore_libro, unita_usd)}
+
+
+def _euro(x):
+    return "n.d." if x is None else f"{x:,.0f}".replace(",", ".") + " €"
+
+
+def riga_piano(v):
+    c = v["conseguenze"]
+    gr = ("STESSA SCOMMESSA del libro" if v["gruppo"].startswith("STESSA") else
+          "correlazione col libro NON misurabile" if v["gruppo"].startswith("CORRELAZIONE") else "DIVERSIFICA")
+    L = f"    {v['tk']} ({v['fonte']}) {prezzo(v['px'])} · {gr} (corr {n(v['corr'], 2)})"
+    if v["posizione"] == "sotto":
+        L += f" · avviso: CHIUSURA sopra {prezzo(v['livello']['prezzo'])} ({n(v['livello']['pct'], 1, '%')}, {n(v['livello']['atr'], 1)} ATR) con volume oltre il {SOGLIA_VOL_CONFERMA}o percentile"
+    elif v["posizione"] == "sopra":
+        L += f" · avviso: ritorno SOTTO {prezzo(v['livello']['prezzo'])} ({n(v['livello']['pct'], 1, '%')}, {n(v['livello']['atr'], 1)} ATR): oggi è tirato"
+    if v["pend50"] is not None and v["pend50"] <= 0 and v["posizione"] in ("dentro", "sotto", "sopra"):
+        L += " · media a 50 in DISCESA: la convenzione del candidato non è soddisfatta"
+    if c is None:
+        L += " · conseguenze n.d. (meno di 60 sedute comuni col libro e con QQQ, o cambio mancante)"
+    else:
+        L += (f" · per {_euro(UNITA_EUR)}: volatilità del libro {n(c['dvol'], 2)} punti, beta su QQQ {n(c['dbeta'], 3)}"
+              f" ({c['sedute']} sedute)")
+    if v["perdita_eur"] is not None:
+        L += f" · allo stop {prezzo(v['stop'])} ({n(v['perdita_pct'], 1, '%')} dall'ingresso) si perdono {_euro(-v['perdita_eur'])}"
+    elif v["ingresso"] is not None:
+        L += " · stop n.d. (il supporto a 20 sedute non sta sotto l'ingresso)"
+    tr = v["trimestrale"]
+    if tr:
+        L += f" · trimestrale {tr['data']} ({tr['giorni']} g)"
+        if tr.get("giorni") is not None and tr["giorni"] <= TRIMESTRALE_VICINA:
+            L += f" ⚠ entro {TRIMESTRALE_VICINA} giorni: un ingresso prima dei conti è una scommessa binaria (LIBRO.md §1quater)"
+    return L
+
+
+def righe_piano(o):
+    """Il blocco PIANO PER LA LIQUIDITA' (v474): la liquidita' con la sua quota del patrimonio, e per
+    ogni ingresso possibile le conseguenze di rischio — anche per chi e' nella stessa scommessa del
+    libro, perche' in giallo non e' vietato ma va detto cosa comporta (decisione del CEO del 09/10)."""
+    pi = o.get("piano") or {}
+    pat, fx, liq = pi.get("patrimonio"), pi.get("cambio"), pi.get("liquidita")
+    voci = pi.get("voci") or []
+    if pat and liq is not None:
+        quota = liq / pat["totale"] * 100
+        az0 = pat["azionario"] / pat["totale"] * 100
+        az1 = (pat["azionario"] + UNITA_EUR) / pat["totale"] * 100
+        testa = (f"PIANO PER LA LIQUIDITÀ — {_euro(liq)} dichiarati in LIBRO.md, {piano(quota)}% del patrimonio "
+                 f"(azionario {_euro(pat['azionario'])}, obbligazioni {_euro(pat['obbligazioni'])}, totale {_euro(pat['totale'])}; "
+                 f"cambio EUR/USD {piano(fx, 4)}, {pi.get('fonte_cambio')})")
+        quota_txt = (f"ogni {_euro(UNITA_EUR)} spostati dalla liquidità all'azionario portano la quota azionaria del "
+                     f"patrimonio da {piano(az0)}% a {piano(az1)}%")
+    else:
+        testa = ("PIANO PER LA LIQUIDITÀ — patrimonio NON calcolabile: "
+                 + ("cambio EUR/USD non letto dalla pipeline" if not fx else "liquidità non letta da LIBRO.md")
+                 + " — non vuol dire 'niente da investire'")
+        quota_txt = None
+    L = [testa,
+         f"   conseguenze per {_euro(UNITA_EUR)}" + (f" (≈ {UNITA_EUR * fx:,.0f} $)".replace(",", ".") if fx else "")
+         + ": unità di calcolo, NON una quantità consigliata · volatilità e beta del LIBRO AZIONARIO sulle stesse date comuni "
+           "a libro, QQQ e titolo (fino a 250 sedute; il livello del libro è nel blocco NUMERI) · perdita allo stop = unità × "
+           "(stop / ingresso − 1)",
+         "   il SEMAFORO decide il gradino (numeri_libro.py, LIBRO.md §1ter): in giallo nessun divieto, ogni ingresso porta "
+         "le sue conseguenze; in arancione e rosso vale prima la riduzione del gradino"]
+    if quota_txt:
+        L.append(f"   {quota_txt}")
+    if pi.get("qqq_assente"):
+        L.append("   ⚠ serie di QQQ NON letta: le variazioni di beta e volatilità mancano tutte, non sono zero")
+    gruppi = (("OPERABILI ADESSO — prezzo dentro la zona d'ingresso · ordine: chi riduce di più la volatilità del libro",
+               lambda v: v["posizione"] == "dentro",
+               lambda v: (v["conseguenze"] or {}).get("dvol") if (v["conseguenze"] or {}).get("dvol") is not None else 1e9),
+              ("CON UN LIVELLO DA METTERE COME AVVISO (Investing.com) · ordine: distanza dal livello in ATR",
+               lambda v: v["posizione"] in ("sotto", "sopra"), lambda v: v["distanza_atr"]),
+              ("SENZA LIVELLO OGGI — zona vuota o non misurabile", lambda v: v["posizione"] in ("zona vuota", "non misurabile"),
+               lambda v: v["tk"]))
+    for titolo, scelta, ordine in gruppi:
+        sel = sorted((v for v in voci if scelta(v)), key=ordine)
+        L.append(f"■ {titolo} — {len(sel)}")
+        if titolo.startswith("SENZA"):
+            if sel:
+                L.append("    " + " · ".join(f"{v['tk']} ({v['posizione']})" for v in sel))
+            continue
+        L.extend(riga_piano(v) for v in sel)
+    stessa = [v["tk"] for v in voci if v["gruppo"].startswith("STESSA") and v["posizione"] in ("dentro", "sotto", "sopra")]
+    if stessa:
+        L.append(f"   ⚠ nella stessa scommessa del libro (correlazione da {piano(SOGLIA_CORR)} in su): {', '.join(stessa)} — "
+                 "un ingresso lì aggiunge alla concentrazione invece di ridurla, e la volatilità del libro lo mostra")
+    return L
+
+
 def e_candidato(t):
     return str(t.get("stato", "")).startswith("CANDIDATO") and not t.get("nel_libro")
 
@@ -699,3 +856,5 @@ if __name__ == "__main__":
         print("\n".join(righe_candidati(o, notizie_candidati(o))))
         print()
         print("\n".join(righe_watchlist(o)))
+        print()
+        print("\n".join(righe_piano(o)))

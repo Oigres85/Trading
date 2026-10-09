@@ -151,7 +151,8 @@ const SUITE = [
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 275, firma: /\d+\/\d+ CHECK OK/ },
+  /* v474: 348 punti di chiamata (55 check nuovi su semaforo, decisioni, registro e piano) -> pavimento 330 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 330, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

@@ -6361,3 +6361,69 @@ Diciassette iniezioni, una alla volta, scritte con `modifica_sicura` e ripristin
 snapshot verificato per hash (v427, v430): **mordono tutte, ciascuna sul controllo giusto**.
 Pavimento di `test_analisi_libro.py` 160 → 275 (i punti di chiamata sono 292).
 `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (regola v440).
+
+## 🧭 v474 — LE QUATTRO AGGIUNTE SCELTE DAL CEO, E UN ERRORE MIO DI TRE GIORNI
+
+Risposte del CEO del 09/10/2026 alle domande della v473: riferimento **QQQ**; RGTI e AMD **non
+eseguite**; in giallo *"se c'è possibilità di ingresso non proibirli ma segnalane le conseguenze di
+rischio"*; e tutte e quattro le aggiunte proposte. Sono tutte calcolate, nessuna è una frase.
+
+| aggiunta | dove | cosa calcola |
+|---|---|---|
+| **semaforo calcolato** | `numeri_libro.py`, blocco in testa | sei famiglie di `LIBRO.md` §1ter su chiusure CONCLUSE; colore, MINIMO se una famiglia manca, colore precedente dal registro |
+| **decisioni aperte** | `LIBRO.md` §1quinquies + `numeri_libro.py` | quanto l'attesa è costata o ha fatto guadagnare dalla chiusura della conferma; condizione ancora valida o RIENTRATA; scadenza |
+| **registro della performance** | `memoria/registro_performance.jsonl` | libro in dollari e patrimonio in euro contro QQQ, rendimento ponderato per il tempo; prima riga 09/10 |
+| **piano per la liquidità** | `rotazione.py`, blocco in coda | per ogni ingresso possibile cosa fa al libro un'unità di 5.000 €: volatilità, beta su QQQ, perdita allo stop |
+
+⚠⚠ **Le regole stanno in un posto solo.** Le soglie del semaforo il codice le deve confrontare,
+quindi stanno anche nel codice: un gate le **rilegge dal libro** con un'espressione regolare e
+pretende che coincidano, così una soglia cambiata in `LIBRO.md` fa andare rossa la suite invece di
+divergere in silenzio. La **reazione** di ogni colore invece non sta nel codice: si legge dal libro
+parola per parola (v436), ed è da lì che il giallo senza divieto arriva nell'analisi.
+
+⚠ **Il libro diceva sei famiglie e, due righe sotto, che prezzo e leader sono la stessa** (B3: *"SMH
+sotto la 50 e NVDA sotto la 50 sono il prezzo che parla due volte"*). Il codice segue la regola
+scritta: sei famiglie riportate, **cinque contate per il colore**, e la riga lo dichiara.
+
+⚠ **La guida sugli investimenti degli hyperscaler non è una serie**: la famiglia «Fondamentali AI»
+calcola solo le revisioni, e ogni resa dice che la guida va verificata in rete e che, se tagliata,
+accende la famiglia. *Un controllo che non può vedere un segnale deve dirlo ogni volta, non una.*
+
+⚠ **Il registro usa le posizioni di INIZIO intervallo** — vendite, acquisti e depositi non falsano il
+confronto — e per questo ogni riga salva i prezzi anche dei nomi venduti dopo la riga precedente. Non
+si scrive **mai durante la seduta** (`LIBRO.md` può già contenere le operazioni di oggi, e la riga
+di ieri scritta con le posizioni di oggi sarebbe falsa), né due volte, né all'indietro. Lo scrive
+`numeri_libro.py --registra`, che `analisi.py` passa da solo; se il file cambia, il comando lo dice:
+**una riga non committata resta in questa sessione**, e il confronto con l'indice perde un giorno.
+
+⚠ **Le conseguenze dell'ingresso usano le stesse formule della scheda** (`vol_annua`,
+`beta_mercato`) sulle stesse date comuni a libro, QQQ e titolo. Il gate verifica la proprietà che
+una formula sbagliata non soddisfa per caso (v326): **il beta è lineare nei pesi**, quindi la
+variazione deve essere esattamente peso × (beta del titolo − beta del libro), e aggiungere al libro
+il libro stesso non deve cambiare niente. L'unità di 5.000 € è un'unità di calcolo e lo dice in
+ogni resa: *"livelli e priorità, non quantità"* era la promessa fatta al CEO nella domanda.
+
+### ⚠⚠ L'errore mio: MU 1.100-1.108 era una VENDITA, e per tre giorni l'ho chiamata acquisto
+Il piano deciso col CEO diceva *"MU verso ~15%, nella fascia 1.100-1.108, compensando la
+plusvalenza con la minusvalenza di RGTI"*: un **alleggerimento**. Dalle analisi del 06/10 in poi ho
+scritto *"il rafforzamento di MU a 1.100-1.108 resta fermo finché il semaforo è giallo"* e *"aggiunta
+congelata dal giallo"*. Il giallo vietava gli acquisti: una vendita non è mai stata congelata.
+Trovato **rileggendo il registro della conversazione** per scrivere la tabella delle decisioni, non
+da un gate: nessun gate legge le mie risposte. Ora `FORMATO_ANALISI.md` §6 scrive *"è una VENDITA"*.
+> **Una decisione riassunta a memoria cambia verso senza rompere niente.** È la ragione per cui le
+> decisioni confermate ora vivono in una tabella del libro con un campo `Decisione`, e non nel testo
+> delle risposte del giorno prima.
+
+### 🧨 Tre inciampi, tutti già scritti in questo file
+- **Il gate v460 ha trovato il mio commento**: spiegando che `calcola` non apre `data.json`, il
+  commento conteneva la stringa che il gate vieta. Settima incarnazione del gate che trova sé stesso.
+- **Due variabili omonime con tipi diversi nella suite** (classe v393): l'alias della classe `date` e
+  il dizionario della pipeline finta si chiamavano uguali, e la suite è morta all'avvio —
+  rumorosamente, che è il comportamento progettato.
+- **Il gate v473 sul comando pinnava la lista esatta degli argomenti**: aggiungendo `--registra` è
+  andato rosso su codice corretto. Riagganciato al prefisso (`--sedute 1` in ogni fase), e un gate
+  v474 pretende `--registra` sul giro principale e non su quello esteso.
+
+Ventuno iniezioni, una alla volta, con `modifica_sicura` e ripristino da uno snapshot verificato per
+hash: **mordono tutte, ciascuna sul controllo giusto**. Pavimento di `test_analisi_libro.py`
+275 → 330 (i punti di chiamata sono 348). `?v=` e `BUILD_VERSION` non toccati (v440).

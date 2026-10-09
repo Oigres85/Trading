@@ -24,7 +24,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    già oltre resistenza o supporto. Dopo la chiusura lo stesso comando dà l'after-hours.
    ⚠ Il pre-market ha volumi sottili: è un'indicazione dell'apertura, non un prezzo su cui decidere.
 1. `python3 scripts/numeri_libro.py` — l'ultima seduta (`--sedute 5` per la settimana).
-   Lo script CALCOLA e basta; il giudizio lo scrive il modello.
+   Lo script CALCOLA e basta; il giudizio lo scrive il modello. Da v474 (decisioni del CEO del
+   09/10) apre col **SEMAFORO D'USCITA calcolato** (sei famiglie, la reazione letta da `LIBRO.md`
+   §1ter), porta il **REGISTRO DELLA PERFORMANCE** contro QQQ (`--registra` scrive la riga della
+   seduta conclusa, mai durante la seduta: lo passa il comando unico) e le **DECISIONI APERTE**
+   (`LIBRO.md` §1quinquies) col costo dell'attesa dalla conferma.
 2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro, e (v470) le aste di
    note e bond del Tesoro USA dei prossimi 7 giorni con l'ora italiana e gli esiti recenti.
 3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
@@ -50,20 +54,30 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    zona, livello, primo segnale, stop, base, trimestrale, revisioni, nota del CEO.
    `--tutti` dà la tabella completa. Per ogni settore con candidati la risposta
    aggiunge il CONTESTO MACRO del settore da ricerca web, con fonte e data.
+   Da v474 chiude col **PIANO PER LA LIQUIDITÀ**: la liquidità con la sua quota del patrimonio e,
+   per ogni ingresso possibile (sorvegliati e candidati di settore), cosa fa al libro un'unità di
+   5.000 € — volatilità, beta su QQQ, perdita allo stop — anche per chi è nella stessa scommessa.
 
 ## Cosa contiene la risposta, in quest'ordine
-0. **Semaforo d'uscita** (decisione del CEO del 06/10): il colore di oggi in UNA riga, con i
-   segnali accesi nominati — regole in `memoria/LIBRO.md` §1ter. Se il colore cambia dal giorno
-   prima, va in cima alla risposta e prima di tutto il resto.
+0. **Semaforo d'uscita** (decisione del CEO del 06/10; calcolato da v474): il colore di oggi in
+   UNA riga dal blocco `SEMAFORO D'USCITA` di `numeri_libro.py`, con i segnali accesi nominati —
+   regole in `memoria/LIBRO.md` §1ter. La guida sugli investimenti degli hyperscaler non è calcolata:
+   va verificata in rete. Se il blocco dice COLORE CAMBIATO, va in cima alla risposta e prima di tutto
+   il resto; se dice MINIMO, si nomina la famiglia che non si misura.
 0bis. **Costo dell'attesa e scadenze** (decisione del CEO del 06/10, regole in `memoria/LIBRO.md`
    §1quater): il blocco `COSTO DELL'ATTESA` / `SCADENZE` di `numeri_libro.py`, e per ogni
    decisione aperta del piano la sua scadenza (prima trimestrale del nome) e i giorni che mancano.
    Le protezioni non ancora messe si segnalano qui, ogni giorno, finché non lo sono.
+   Da v474 il blocco `DECISIONI APERTE` (tabella in `LIBRO.md` §1quinquies): per ogni decisione
+   confermata e non eseguita quanto l'attesa è costata o ha fatto guadagnare dalla chiusura della
+   conferma, se la condizione vale ancora e la scadenza. Una condizione RIENTRATA si dice.
 0ter. **Credito sul libro** (v467, regola in `memoria/LIBRO.md` §1ter): il blocco `CREDITO SUL
    LIBRO` di `numeri_libro.py` — chi brucia cassa, il suo peso, le tre condizioni. Se la conferma
    è accesa, gli stop su quei nomi passano in cima alle decisioni. Non cambia il colore del semaforo.
 1. **Sintesi in 3-5 punti** — cosa è successo, perché, cosa cambia per il libro.
 2. **Risultato contro i riferimenti** — libro contro QQQ, SMH, SPY, RSP; chi ha portato il risultato.
+   E il **registro della performance** (v474): libro in dollari e patrimonio in euro contro QQQ,
+   il riferimento scelto dal CEO il 09/10, dalla prima riga a oggi.
 3. **Rischio** — peso contro quota del rischio; beta sul Nasdaq col suo R²; segnalare solo se cambia.
    Più i CANALI accesi di ciascun nome (schede_progetto): da quale fattore arriva il rischio.
 4. **Tecnica** — solo i nomi vicini a resistenza o supporto (distanze in ATR), o sotto la SMA200.
@@ -71,11 +85,16 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    brucia cassa, l'autonomia: sono le due cose che una trimestrale riprezza.
    Soglie macro decise prima (spread credito alto rendimento 3,5;
    Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
-6. **Piano con soglie** — stato di ciascuna condizione già decisa (BE 295-302, AMD respinto a 645, RGTI sotto 14,41,
-   MU 1.100-1.108 con la compensazione RGTI, i supporti di protezione).
+6. **Piano con soglie** — le decisioni già confermate stanno nel blocco DECISIONI APERTE (sezione
+   0bis: oggi RGTI uscita e AMD alleggerimento). Qui lo stato delle condizioni NON ancora scattate:
+   BE vendita nella fascia 295-302 prima della trimestrale del 27/10; MU **alleggerimento** verso
+   ~15% del libro nella fascia 1.100-1.108, compensando la plusvalenza con la minusvalenza di RGTI
+   (è una VENDITA: il giallo non l'ha mai congelata); i supporti di protezione.
 
-7. **Watchlist e rotazione** (sempre, v468) — il semaforo decide cosa è ammesso: in giallo
-   niente nuovi semiconduttori.
+7. **Watchlist e rotazione** (sempre, v468) — il semaforo decide il gradino: in giallo NESSUN
+   divieto d'ingresso (decisione del CEO del 09/10), ma ogni ingresso porta le sue conseguenze di
+   rischio e chi è nella stessa scommessa del libro lo dichiara; in arancione e rosso prima la
+   riduzione del gradino.
    7a. i settori IN TENDENZA con bassa correlazione col libro (dove il denaro va senza replicare
        la nostra scommessa), col CONTESTO MACRO del settore da ricerca web, fonte e data;
    7b. per ciascuno i titoli CANDIDATI di `rotazione.py`, coi livelli, i volumi e le notizie;
@@ -90,12 +109,20 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        sedute dal minimo dell'anno), la trimestrale dichiarata dalla fonte, le revisioni, e la
        nota del CEO in `LIBRO.md` confrontata coi livelli di oggi. Chiusura: chi è operabile
        ADESSO, chi ha un livello da mettere come avviso su Investing.com, chi no e perché.
+   7e. **il PIANO PER LA LIQUIDITÀ** (v474, decisione del CEO del 09/10) — dal blocco omonimo di
+       `rotazione.py`: la liquidità e la sua quota del patrimonio; per gli operabili adesso e per
+       gli avvisi le conseguenze di un'unità di 5.000 € sul libro (volatilità, beta su QQQ, perdita
+       allo stop) e la trimestrale vicina; la stessa scommessa sempre dichiarata. Priorità e
+       livelli, mai la quantità da comprare: l'unità è un'unità di calcolo.
 
 **Richieste del CEO rese strutturali — entrano TUTTE in ogni «Aggiorna analisi»**: semaforo
 d'uscita (06/10) · costo dell'attesa e scadenze (06/10) · pre-market prima dell'apertura (06/10) ·
 schede del progetto (06/10) · credito sul libro (07/10) · rotazione con candidati, tecnica,
 volumi e notizie (07/10) · target, beta e volatilità (07/10) · volumi come percentile 0-100
-(08/10) · aste del Tesoro in ora italiana (07/10) · ingressi sulla watchlist (09/10).
+(08/10) · aste del Tesoro in ora italiana (07/10) · ingressi sulla watchlist (09/10) ·
+riferimento QQQ e registro della performance (09/10) · semaforo calcolato (09/10) · in giallo
+nessun divieto ma conseguenze di rischio di ogni ingresso (09/10) · costo delle decisioni aperte
+(09/10) · piano per la liquidità (09/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole
