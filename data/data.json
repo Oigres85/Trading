@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-10T18:50:29Z",
+ "updated_at": "2026-10-10T19:08:52Z",
  "eurusd": 1.1206,
  "totals": {
   "usd_value": 0,
@@ -988,14 +988,14 @@
     "target_mean": 1555.1304,
     "fcf": 29214251008.0,
     "gross_margin": 0.8072,
-    "enterprise_value": 1124515053568.0,
-    "ev_ebitda": 10.332,
+    "enterprise_value": 1191184957440.0,
+    "ev_ebitda": 10.944,
     "peg": 0.16,
     "roa": 0.4456,
-    "short_float": 0.0231,
+    "short_float": 0.0245,
     "buyback_yield": -0.0,
     "ps": 8.74,
-    "ev_s": 8.44,
+    "ev_s": 8.94,
     "altman_z": 6.1,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -1775,7 +1775,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -2915,10 +2915,10 @@
    },
    "analisti": {
     "eps_ora": 15.7219,
-    "eps_90g_fa": 13.2814,
-    "eps_7g_fa": 15.5833,
-    "revisione_90g_pct": 18.37,
-    "revisione_7g_pct": 0.89,
+    "eps_90g_fa": 13.1993,
+    "eps_7g_fa": 15.5783,
+    "revisione_90g_pct": 19.11,
+    "revisione_7g_pct": 0.92,
     "su_30g": 3,
     "giu_30g": 1,
     "eps_min": 9.6,
@@ -2966,14 +2966,14 @@
     "target_mean": 636.208,
     "fcf": 8841499648.0,
     "gross_margin": 0.5572,
-    "enterprise_value": 983873093632.0,
-    "ev_ebitda": 102.894,
-    "peg": 0.62,
+    "enterprise_value": 1045515337728.0,
+    "ev_ebitda": 109.341,
+    "peg": 0.66,
     "roa": 0.0513,
-    "short_float": 0.0242,
+    "short_float": 0.0246,
     "buyback_yield": 0.0019,
     "ps": 24.03,
-    "ev_s": 23.82,
+    "ev_s": 25.31,
     "altman_z": 6.9,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -4777,14 +4777,17 @@
     "target_mean": 328.7169,
     "fcf": 41809874944.0,
     "gross_margin": 0.7467,
-    "enterprise_value": 5502039228416.0,
-    "ev_ebitda": 27.337,
-    "peg": 0.28,
+    "enterprise_value": 5699417931776.0,
+    "ev_ebitda": 28.318,
+    "peg": 0.29,
     "roa": 0.5357,
-    "short_float": 0.0134,
+    "short_float": 0.0127,
     "buyback_yield": 0.0072,
     "ps": 18.27,
-    "ev_s": 18.16
+    "ev_s": 18.81,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -5535,7 +5538,7 @@
      "a1": 13.5,
      "a3": 463.92,
      "a5": 800.73,
-     "a10": 13033.55
+     "a10": 13033.56
     },
     "stagionalita": [
      {
@@ -6269,24 +6272,24 @@
    "earnings_date": "2026-11-02",
    "rating": {
     "key": "buy",
-    "n": 26,
-    "target": 203.35,
-    "upside_pct": -2.7
+    "n": 25,
+    "target": 199.84,
+    "upside_pct": -4.4
    },
    "analisti": {
-    "eps_ora": 2.3515,
+    "eps_ora": 2.3442,
     "eps_90g_fa": 2.0945,
-    "eps_7g_fa": 2.3442,
-    "revisione_90g_pct": 12.27,
-    "revisione_7g_pct": 0.31,
+    "eps_7g_fa": 2.3267,
+    "revisione_90g_pct": 11.92,
+    "revisione_7g_pct": 0.75,
     "su_30g": 3,
     "giu_30g": 0,
     "eps_min": 1.92,
     "eps_max": 2.9,
-    "eps_n": 29,
+    "eps_n": 28,
     "target_min": 80.0,
-    "target_max": 265.0,
-    "target_mediana": 215.0
+    "target_max": 255.0,
+    "target_mediana": 205.1
    },
    "health": 92,
    "eps": 1.16,
@@ -6311,9 +6314,9 @@
     "float_pct": 91.7,
     "avg_volume_30d": 33526821.0,
     "pe_ttm": 180.2155,
-    "forward_pe": 88.8992,
+    "forward_pe": 89.1791,
     "eps_ttm": 1.16,
-    "eps_forward": 2.3515,
+    "eps_forward": 2.3442,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
     "revenue_growth": 0.928,
@@ -6323,17 +6326,17 @@
     "debt_to_equity": 2.139,
     "dividend_yield": 0.0,
     "price_to_book": 51.3889,
-    "target_mean": 203.35,
+    "target_mean": 199.844,
     "fcf": 2159104512.0,
     "gross_margin": 0.848,
-    "enterprise_value": 493272367104.0,
-    "ev_ebitda": 185.258,
-    "peg": 1.72,
+    "enterprise_value": 457394716672.0,
+    "ev_ebitda": 171.783,
+    "peg": 1.66,
     "roa": 0.1729,
-    "short_float": 0.0259,
+    "short_float": 0.028,
     "buyback_yield": 0.0001,
     "ps": 81.61,
-    "ev_s": 80.13,
+    "ev_s": 74.3,
     "altman_z": 10.62,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -7276,7 +7279,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 0.25,
-   "pe": 90.3,
+   "pe": 90.6,
    "ath": 329.73,
    "ath_dist_pct": -16.5,
    "sma200_dist_pct": 60.3,
@@ -7947,9 +7950,9 @@
    "analisti": {
     "eps_ora": 7.2828,
     "eps_90g_fa": 6.1779,
-    "eps_7g_fa": 6.7713,
+    "eps_7g_fa": 6.7691,
     "revisione_90g_pct": 17.88,
-    "revisione_7g_pct": 7.55,
+    "revisione_7g_pct": 7.59,
     "su_30g": 35,
     "giu_30g": 1,
     "eps_min": 6.22,
@@ -7960,7 +7963,7 @@
     "target_mediana": 350.0
    },
    "health": 87,
-   "eps": 3.05,
+   "eps": 3.04,
    "beta": 2.26,
    "sharpe_1y": 1.48,
    "sortino_1y": 2.34,
@@ -7981,9 +7984,9 @@
     "float_shares": 873857157.0,
     "float_pct": 99.6,
     "avg_volume_30d": 22403439.0,
-    "pe_ttm": 90.2557,
+    "pe_ttm": 90.5526,
     "forward_pe": 37.7988,
-    "eps_ttm": 3.05,
+    "eps_ttm": 3.04,
     "eps_forward": 7.2828,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
@@ -7993,18 +7996,18 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0009,
-    "price_to_book": 13.2321,
+    "price_to_book": 13.0248,
     "target_mean": 337.9938,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
-    "enterprise_value": 242746327040.0,
-    "ev_ebitda": 85.165,
-    "peg": 0.75,
+    "enterprise_value": 250989199360.0,
+    "ev_ebitda": 88.057,
+    "peg": 0.96,
     "roa": 0.0413,
-    "short_float": 0.0321,
+    "short_float": 0.0418,
     "buyback_yield": 0.0082,
     "ps": 26.18,
-    "ev_s": 25.69,
+    "ev_s": 26.56,
     "altman_z": 4.02,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -9481,7 +9484,12 @@
     ]
    },
    "earnings_date": "2026-11-10",
-   "rating": null,
+   "rating": {
+    "key": "buy",
+    "n": 12,
+    "target": 28.52,
+    "upside_pct": 103.3
+   },
    "analisti": {
     "eps_ora": -0.206,
     "eps_90g_fa": -0.2011,
@@ -9498,7 +9506,7 @@
     "target_mediana": 30.0
    },
    "health": 22,
-   "eps": -0.79,
+   "eps": -0.8,
    "beta": 2.03,
    "sharpe_1y": -1.21,
    "sortino_1y": -1.72,
@@ -9521,7 +9529,7 @@
     "avg_volume_30d": 18128104.0,
     "pe_ttm": null,
     "forward_pe": -68.1068,
-    "eps_ttm": -0.79,
+    "eps_ttm": -0.8,
     "eps_forward": -0.206,
     "revenue_fy": 13353000.0,
     "net_income_fy": -238672000.0,
@@ -9535,14 +9543,14 @@
     "target_mean": 28.525,
     "fcf": 26453624.0,
     "gross_margin": 0.3461,
-    "enterprise_value": 4296767488.0,
+    "enterprise_value": 4483678208.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": -0.0945,
-    "short_float": 0.1976,
+    "short_float": 0.1876,
     "buyback_yield": -0.0815,
     "ps": 350.69,
-    "ev_s": 321.78,
+    "ev_s": 335.78,
     "altman_z": 3.17,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -10490,7 +10498,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.82,
-   "pe": 359.6,
+   "pe": 369.1,
    "ath": 351.28,
    "ath_dist_pct": -20.1,
    "sma200_dist_pct": 32.0,
@@ -10938,15 +10946,15 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 284.74,
-    "upside_pct": 1.5
+    "target": 283.78,
+    "upside_pct": 1.2
    },
    "analisti": {
-    "eps_ora": 4.926,
-    "eps_90g_fa": 4.4526,
-    "eps_7g_fa": 4.9421,
-    "revisione_90g_pct": 10.63,
-    "revisione_7g_pct": -0.33,
+    "eps_ora": 4.9421,
+    "eps_90g_fa": 4.403,
+    "eps_7g_fa": 4.9287,
+    "revisione_90g_pct": 12.24,
+    "revisione_7g_pct": 0.27,
     "su_30g": 2,
     "giu_30g": 1,
     "eps_min": 2.9548,
@@ -10957,7 +10965,7 @@
     "target_mediana": 303.0
    },
    "health": 82,
-   "eps": 0.78,
+   "eps": 0.76,
    "beta": 3.78,
    "sharpe_1y": 1.02,
    "sortino_1y": 1.54,
@@ -10978,10 +10986,10 @@
     "float_shares": 289302431.0,
     "float_pct": 98.2,
     "avg_volume_30d": 15449306.0,
-    "pe_ttm": 359.6154,
-    "forward_pe": 56.9424,
-    "eps_ttm": 0.78,
-    "eps_forward": 4.926,
+    "pe_ttm": 369.079,
+    "forward_pe": 56.7572,
+    "eps_ttm": 0.76,
+    "eps_forward": 4.9421,
     "revenue_fy": 3113149952.0,
     "net_income_fy": 244942000.0,
     "revenue_growth": 1.655,
@@ -10991,17 +10999,17 @@
     "debt_to_equity": 171.578,
     "dividend_yield": 0.0,
     "price_to_book": 51.0464,
-    "target_mean": 284.7385,
+    "target_mean": 283.7769,
     "fcf": 531637504.0,
     "gross_margin": 0.3165,
-    "enterprise_value": 82741755904.0,
-    "ev_ebitda": 197.72,
-    "peg": 0.62,
+    "enterprise_value": 85919711232.0,
+    "ev_ebitda": 205.314,
+    "peg": 0.67,
     "roa": 0.056,
-    "short_float": 0.0811,
+    "short_float": 0.0734,
     "buyback_yield": -0.0007,
     "ps": 26.54,
-    "ev_s": 26.58,
+    "ev_s": 27.6,
     "altman_z": 1.86,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -12377,7 +12385,7 @@
     "gross_margin": 0.7627,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.25,
+    "peg": 0.26,
     "roa": 0.3366,
     "short_float": null,
     "buyback_yield": -0.0541,
@@ -13891,21 +13899,21 @@
    "rating": {
     "key": "strong_buy",
     "n": 15,
-    "target": 237.8,
-    "upside_pct": 54.1
+    "target": 236.8,
+    "upside_pct": 53.4
    },
    "analisti": {
-    "eps_ora": 13.1746,
-    "eps_90g_fa": 8.7737,
+    "eps_ora": 13.4077,
+    "eps_90g_fa": 10.064,
     "eps_7g_fa": 13.1234,
-    "revisione_90g_pct": 50.16,
-    "revisione_7g_pct": 0.39,
+    "revisione_90g_pct": 33.22,
+    "revisione_7g_pct": 2.17,
     "su_30g": 2,
     "giu_30g": 1,
     "eps_min": -2.4163,
     "eps_max": 69.86,
     "eps_n": 8,
-    "target_min": 165.0,
+    "target_min": 160.0,
     "target_max": 435.0,
     "target_mediana": 215.0
    },
@@ -13944,17 +13952,17 @@
     "debt_to_equity": 14.938,
     "dividend_yield": 0.0,
     "price_to_book": 1.8569,
-    "target_mean": 237.8,
+    "target_mean": 236.8,
     "fcf": -22587523072.0,
     "gross_margin": 0.676,
-    "enterprise_value": 78065090560.0,
+    "enterprise_value": 77692395520.0,
     "ev_ebitda": null,
     "peg": 2.85,
     "roa": -0.3873,
-    "short_float": 0.0776,
+    "short_float": 0.0815,
     "buyback_yield": null,
     "ps": 123.49,
-    "ev_s": 156.65,
+    "ev_s": 155.9,
     "altman_z": 5.02,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -15441,14 +15449,14 @@
     "target_mean": 141.4737,
     "fcf": -9088615424.0,
     "gross_margin": 0.6742,
-    "enterprise_value": 91344125952.0,
-    "ev_ebitda": 24.108,
+    "enterprise_value": 94857412608.0,
+    "ev_ebitda": 25.035,
     "peg": null,
     "roa": -0.0024,
-    "short_float": 0.1924,
+    "short_float": 0.1764,
     "buyback_yield": -0.0329,
     "ps": 5.96,
-    "ev_s": 12.03,
+    "ev_s": 12.5,
     "altman_z": -1.29,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -16393,16 +16401,16 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 82963.15,
+   "price": 82950.81,
    "price_asof": "2026-10-10",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.5,
+   "change_pct": 0.49,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -34.3,
-   "sma200_dist_pct": 15.4,
-   "sma50_dist_pct": 2.7,
+   "sma200_dist_pct": 15.3,
+   "sma50_dist_pct": 2.6,
    "w52_high": 122509.66,
    "w52_low": 57747.77,
    "w52_dist_pct": -32.3,
@@ -16411,7 +16419,7 @@
    "support": 80336.91,
    "resistance": 87363.76,
    "rsi": 51.7,
-   "volume": 13966728192,
+   "volume": 13802844160,
    "vol_ratio": 0.79,
    "atr_14": 2092.13,
    "atr_pct": 2.52,
@@ -16423,7 +16431,7 @@
      83275.93,
      81676.34,
      82546.32,
-     82963.15
+     82950.81
     ],
     "m6": [
      63239.52,
@@ -16551,7 +16559,7 @@
      83275.93,
      81676.34,
      82546.32,
-     82963.15
+     82950.81
     ],
     "all": [
      386.94,
@@ -16699,7 +16707,7 @@
      62813.75,
      78548.63,
      83553.85,
-     82963.15
+     82950.81
     ],
     "m1": [
      81233.68,
@@ -16723,7 +16731,7 @@
      83275.93,
      81676.34,
      82546.32,
-     82963.15
+     82950.81
     ],
     "m3": [
      64262.11,
@@ -16791,7 +16799,7 @@
      83275.93,
      81676.34,
      82546.32,
-     82963.15
+     82950.81
     ],
     "y1": [
      113214.37,
@@ -16867,25 +16875,25 @@
      84034.92,
      83553.85,
      85786.59,
-     82963.15
+     82950.81
     ],
     "d1": [
      82515.03,
      82562.97,
-     82523.89,
+     82523.88,
      82501.55,
      82469.1,
      82509.81,
-     82507.16,
-     82608.49,
+     82511.83,
+     82608.5,
      82551.95,
      82533.0,
      82593.66,
-     82619.64,
+     82631.33,
      82606.67,
      82611.81,
      82546.49,
-     82558.57,
+     82533.91,
      82571.87,
      82553.98,
      82539.67,
@@ -16895,46 +16903,46 @@
      82482.04,
      82501.41,
      82608.52,
-     82624.41,
+     82624.08,
      82591.09,
      82578.03,
      82603.36,
-     82639.26,
-     82601.47,
-     82629.4,
+     82639.27,
+     82601.46,
+     82630.89,
      82605.21,
      82644.19,
-     82724.96,
+     82724.97,
      82708.95,
-     82715.1,
-     82690.21,
+     82716.2,
+     82690.22,
      82724.6,
      82714.24,
      82789.0,
-     82726.28,
+     82726.29,
      82656.32,
-     82599.3,
+     82599.31,
      82570.71,
-     82585.17,
+     82585.16,
      82677.84,
      82715.13,
      82751.11,
-     82764.86,
+     82764.85,
      82792.15,
-     82747.46,
+     82747.72,
      82724.03,
      82756.2,
      82778.6,
      82807.5,
      82807.49,
-     82817.22,
+     82817.24,
      82815.67,
      82773.37,
      82781.02,
      82758.46,
-     82721.14,
+     82734.97,
      82745.35,
-     82724.6,
+     82733.25,
      82773.89,
      82771.19,
      82727.04,
@@ -16943,46 +16951,48 @@
      82829.46,
      82826.12,
      82790.0,
-     82796.9,
+     82796.03,
      82774.9,
-     82776.16,
+     82776.17,
      82783.64,
      82728.13,
      82762.99,
-     82738.79,
-     82779.0,
+     82738.8,
+     82777.37,
      82774.96,
-     82718.55,
+     82718.54,
      82745.96,
      82705.27,
      82717.77,
-     82748.61,
+     82745.87,
      82900.0,
      82952.52,
-     82925.7,
-     82957.39,
+     82927.96,
+     82954.15,
      82892.39,
-     82887.42,
+     82887.43,
      82943.32,
-     82966.83,
-     82929.61,
+     82963.51,
+     82931.8,
      82972.7,
-     82949.65,
-     82949.94,
-     82964.93,
-     82970.2,
-     82954.03,
+     82949.25,
+     82948.65,
+     82964.94,
+     82967.33,
+     82955.08,
      82991.02,
      82986.65,
      82970.92,
      82986.87,
-     83055.2,
-     83071.92,
-     83008.5,
+     83055.21,
+     83076.71,
+     83008.51,
      82971.0,
      82928.36,
-     82954.86,
-     82941.53
+     82910.7,
+     82942.2,
+     82958.09,
+     82950.81
     ]
    },
    "earnings_date": null,
@@ -16996,7 +17006,7 @@
    "sharpe_6m": 1.9,
    "sortino_6m": 3.54,
    "prepost": null,
-   "prezzo_limite_aggiustato": 82963.15,
+   "prezzo_limite_aggiustato": 82950.81,
    "risk_reward": "1:1.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17009,22 +17019,22 @@
     "w1": {
      "support": 80336.91,
      "resistance": 86664.54,
-     "change_pct": -3.03
+     "change_pct": -3.05
     },
     "m1": {
      "support": 80098.77,
      "resistance": 87363.76,
-     "change_pct": 2.13
+     "change_pct": 2.11
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 29.1
+     "change_pct": 29.08
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 7.78
+     "change_pct": 7.76
     }
    },
    "financials": [],
@@ -17051,55 +17061,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 82963.15,
+     "prezzo": 82950.81,
      "medie": {
       "sma10": {
-       "liv": 84240.01,
-       "dist_pct": -1.52
+       "liv": 84238.77,
+       "dist_pct": -1.53
       },
       "ema10": {
-       "liv": 83617.39,
-       "dist_pct": -0.78
+       "liv": 83615.15,
+       "dist_pct": -0.79
       },
       "sma20": {
-       "liv": 84375.79,
-       "dist_pct": -1.67
+       "liv": 84375.17,
+       "dist_pct": -1.69
       },
       "ema20": {
-       "liv": 83214.55,
-       "dist_pct": -0.3
+       "liv": 83213.37,
+       "dist_pct": -0.32
       },
       "sma30": {
-       "liv": 82280.2,
-       "dist_pct": 0.83
+       "liv": 82279.78,
+       "dist_pct": 0.82
       },
       "ema30": {
-       "liv": 82203.12,
-       "dist_pct": 0.92
+       "liv": 82202.32,
+       "dist_pct": 0.91
       },
       "sma50": {
-       "liv": 80811.1,
-       "dist_pct": 2.66
+       "liv": 80810.85,
+       "dist_pct": 2.65
       },
       "ema50": {
-       "liv": 79871.65,
-       "dist_pct": 3.87
+       "liv": 79871.17,
+       "dist_pct": 3.86
       },
       "sma100": {
-       "liv": 72690.83,
-       "dist_pct": 14.13
+       "liv": 72690.71,
+       "dist_pct": 14.11
       },
       "ema100": {
-       "liv": 76072.81,
-       "dist_pct": 9.06
+       "liv": 76072.57,
+       "dist_pct": 9.04
       },
       "sma200": {
-       "liv": 71918.52,
-       "dist_pct": 15.36
+       "liv": 71918.46,
+       "dist_pct": 15.34
       },
       "ema200": {
-       "liv": 75488.17,
-       "dist_pct": 9.9
+       "liv": 75488.05,
+       "dist_pct": 9.89
       }
      },
      "medie_battute": 8,
@@ -17107,18 +17117,18 @@
      "oscillatori": {
       "rsi14": 51.7,
       "macd": {
-       "linea": 987.22,
-       "segnale": 1558.48,
-       "istogramma": -571.26
+       "linea": 986.23,
+       "segnale": 1558.28,
+       "istogramma": -572.05
       },
-      "stoch_k": 38.6,
+      "stoch_k": 38.4,
       "stoch_d": 30.2,
-      "williams_r": -61.4,
-      "cci20": -30.8,
+      "williams_r": -61.6,
+      "cci20": -30.9,
       "adx14": 35.5,
       "di_su": 24.5,
       "di_giu": 21.3,
-      "momentum10": -590.7
+      "momentum10": -603.04
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17611,19 +17621,19 @@
       "o": 82554.98,
       "h": 83069.38,
       "l": 82475.2,
-      "c": 82963.15
+      "c": 82950.81
      }
     ],
     "performance": {
-     "s1": -3.29,
-     "m1": 2.55,
-     "m3": 28.43,
-     "m6": 36.3,
-     "a1": 5.52,
-     "ytd": -6.5,
-     "a3": 139.31,
-     "a5": 35.3,
-     "a10": 11735.44
+     "s1": -3.31,
+     "m1": 2.53,
+     "m3": 28.41,
+     "m6": 36.28,
+     "a1": 5.51,
+     "ytd": -6.52,
+     "a3": 139.27,
+     "a5": 35.28,
+     "a10": 11733.68
     },
     "stagionalita": [
      {
@@ -19360,7 +19370,7 @@
    "resistance": 31616.5,
    "rsi": 61.3,
    "volume": 701251,
-   "vol_ratio": 1.36,
+   "vol_ratio": 1.35,
    "atr_14": 461.23,
    "atr_pct": 1.48,
    "signal": "Trend rialzista",
@@ -19934,13 +19944,13 @@
      31150.25,
      31190.75,
      31192.0,
-     31189.5,
+     31189.75,
      31219.75,
      31210.0,
      31236.25,
-     31223.0,
+     31224.25,
      31219.75,
-     31223.0,
+     31223.25,
      31234.25,
      31238.75,
      31230.0,
@@ -19973,35 +19983,35 @@
      31190.5,
      31199.75,
      31213.0,
-     31167.75,
-     31125.25,
-     31023.75,
+     31167.5,
+     31124.75,
+     31023.5,
      31036.75,
      31042.75,
-     31045.25,
+     31046.0,
      31059.25,
-     31052.75,
+     31053.0,
      31046.5,
-     31081.5,
+     31082.0,
      31032.0,
      31065.75,
-     31034.0,
-     31072.0,
-     31069.0,
+     31034.25,
+     31072.5,
+     31068.75,
      31063.25,
-     31094.5,
+     31094.25,
      31085.25,
      31090.75,
-     31079.75,
+     31079.25,
      31098.25,
      31086.25,
      31076.25,
      31074.5,
      31088.75,
      31087.5,
+     31094.5,
      31095.0,
-     31095.0,
-     31100.75,
+     31101.25,
      31104.75,
      31112.0,
      31107.75,
@@ -20010,9 +20020,9 @@
      31111.75,
      31124.5,
      31117.75,
-     31092.25,
+     31092.0,
      31098.0,
-     31112.25,
+     31111.75,
      31110.0,
      31112.5,
      31119.0,
@@ -26840,7 +26850,7 @@
    "resistance": 6.83,
    "rsi": 54.2,
    "volume": 1137,
-   "vol_ratio": 0.54,
+   "vol_ratio": 0.48,
    "atr_14": 0.09075,
    "atr_pct": 1.37,
    "signal": "Trend rialzista",
@@ -27454,7 +27464,7 @@
      6.67,
      6.68,
      6.71,
-     6.72,
+     6.71,
      6.7,
      6.7,
      6.71,
@@ -28286,7 +28296,7 @@
    "resistance": 106.75,
    "rsi": 50.1,
    "volume": 341641,
-   "vol_ratio": 1.1,
+   "vol_ratio": 1.09,
    "atr_14": 4.25,
    "atr_pct": 4.63,
    "signal": "Trend rialzista",
@@ -28870,7 +28880,7 @@
      90.6,
      90.65,
      90.18,
-     90.2,
+     90.22,
      90.51,
      90.26,
      90.22,
@@ -28895,10 +28905,10 @@
      90.5,
      90.73,
      90.59,
-     90.93,
+     90.92,
      91.17,
      91.62,
-     91.06,
+     91.05,
      90.83,
      90.73,
      91.01,
@@ -28911,7 +28921,7 @@
      91.54,
      91.67,
      91.93,
-     92.05,
+     92.07,
      91.88,
      92.1,
      91.98,
@@ -28923,11 +28933,11 @@
      91.16,
      91.26,
      91.14,
-     91.37,
-     91.56,
+     91.38,
+     91.57,
      91.65,
      91.86,
-     91.76,
+     91.75,
      92.07,
      91.9,
      91.89,
@@ -29718,7 +29728,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -2.13,
-   "pe": 12.8,
+   "pe": 13.1,
    "ath": 122.9,
    "ath_dist_pct": -65.9,
    "sma200_dist_pct": 29.5,
@@ -30302,8 +30312,8 @@
    "rating": {
     "key": "hold",
     "n": 15,
-    "target": 42.27,
-    "upside_pct": 1.0
+    "target": 41.87,
+    "upside_pct": 0.0
    },
    "analisti": {
     "eps_ora": 5.3259,
@@ -30321,7 +30331,7 @@
     "target_mediana": 43.0
    },
    "health": 85,
-   "eps": 3.26,
+   "eps": 3.19,
    "beta": 2.01,
    "sharpe_1y": -0.29,
    "sortino_1y": -0.38,
@@ -30337,14 +30347,14 @@
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
-    "market_cap": 27497285632.0,
-    "shares": 656965384.0,
+    "market_cap": 27074869248.0,
+    "shares": 646873027.0,
     "float_shares": 557625648.0,
-    "float_pct": 84.9,
+    "float_pct": 86.2,
     "avg_volume_30d": 44480679.0,
-    "pe_ttm": 12.839,
+    "pe_ttm": 13.1207,
     "forward_pe": 7.8587,
-    "eps_ttm": 3.26,
+    "eps_ttm": 3.19,
     "eps_forward": 5.3259,
     "revenue_fy": 39063072768.0,
     "net_income_fy": 2195842048.0,
@@ -30355,17 +30365,17 @@
     "debt_to_equity": 63.951,
     "dividend_yield": 0.0,
     "price_to_book": 2.6815,
-    "target_mean": 42.2667,
+    "target_mean": 41.8667,
     "fcf": -8248783872.0,
     "gross_margin": 0.1082,
-    "enterprise_value": 33439010816.0,
-    "ev_ebitda": 11.84,
+    "enterprise_value": 35465748480.0,
+    "ev_ebitda": 12.558,
     "peg": 0.91,
     "roa": 0.0788,
-    "short_float": 0.1482,
-    "buyback_yield": -0.205,
-    "ps": 0.7,
-    "ev_s": 0.86,
+    "short_float": 0.1614,
+    "buyback_yield": -0.2082,
+    "ps": 0.69,
+    "ev_s": 0.91,
     "altman_z": 6.77,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -30382,7 +30392,7 @@
     "fcf_ttm": -6971885000.0,
     "mesi_capex": 557.1,
     "mesi_operativi": 13.3,
-    "emissione_netta_pct": 20.5,
+    "emissione_netta_pct": 20.82,
     "debito_netto": 1239439000.0,
     "valuta": "USD"
    },
@@ -31896,14 +31906,14 @@
     "target_mean": 75.775,
     "fcf": -239324880.0,
     "gross_margin": 0.4041,
-    "enterprise_value": 3993800448.0,
+    "enterprise_value": 4388157952.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": -0.0665,
-    "short_float": 0.1999,
+    "short_float": 0.2052,
     "buyback_yield": -0.1958,
     "ps": 5334.56,
-    "ev_s": 3300.66,
+    "ev_s": 3626.58,
     "altman_fuori_scala": 33.81
    },
    "combustione": {
@@ -32817,7 +32827,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 3.29,
-   "pe": 21.1,
+   "pe": 20.4,
    "ath": 287.2,
    "ath_dist_pct": -8.6,
    "sma200_dist_pct": 8.4,
@@ -33525,9 +33535,9 @@
    "analisti": {
     "eps_ora": 10.5269,
     "eps_90g_fa": 9.9864,
-    "eps_7g_fa": 10.5149,
+    "eps_7g_fa": 10.5028,
     "revisione_90g_pct": 5.41,
-    "revisione_7g_pct": 0.11,
+    "revisione_7g_pct": 0.23,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 8.73,
@@ -33538,7 +33548,7 @@
     "target_mediana": 330.0
    },
    "health": 77,
-   "eps": 12.43,
+   "eps": 12.84,
    "beta": 1.46,
    "sharpe_1y": 0.47,
    "sortino_1y": 0.76,
@@ -33559,9 +33569,9 @@
     "float_shares": 9810583646.0,
     "float_pct": 91.0,
     "avg_volume_30d": 39235829.0,
-    "pe_ttm": 21.1126,
+    "pe_ttm": 20.4385,
     "forward_pe": 25.0735,
-    "eps_ttm": 12.43,
+    "eps_ttm": 12.84,
     "eps_forward": 10.4664,
     "revenue_fy": 775680032768.0,
     "net_income_fy": 135281000448.0,
@@ -33575,14 +33585,14 @@
     "target_mean": 331.53,
     "fcf": 3219124992.0,
     "gross_margin": 0.5077,
-    "enterprise_value": 2959299313664.0,
-    "ev_ebitda": 17.52,
-    "peg": 1.48,
+    "enterprise_value": 2932225605632.0,
+    "ev_ebitda": 17.359,
+    "peg": 1.52,
     "roa": 0.0659,
-    "short_float": 0.0088,
+    "short_float": 0.0083,
     "buyback_yield": -0.0,
     "ps": 3.65,
-    "ev_s": 3.82,
+    "ev_s": 3.78,
     "altman_z": 2.97,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -35274,18 +35284,18 @@
    "rating": {
     "key": "strong_buy",
     "n": 23,
-    "target": 1144.35,
-    "upside_pct": 46.1
+    "target": 1142.17,
+    "upside_pct": 45.9
    },
    "analisti": {
-    "eps_ora": 56.4198,
-    "eps_90g_fa": 43.4437,
+    "eps_ora": 55.3714,
+    "eps_90g_fa": 42.8987,
     "eps_7g_fa": 55.3714,
-    "revisione_90g_pct": 29.87,
-    "revisione_7g_pct": 1.89,
+    "revisione_90g_pct": 29.07,
+    "revisione_7g_pct": 0.0,
     "su_30g": 15,
     "giu_30g": 0,
-    "eps_min": 41.5,
+    "eps_min": 35.24,
     "eps_max": 80.11,
     "eps_n": 19,
     "target_min": 700.0,
@@ -35327,17 +35337,17 @@
     "debt_to_equity": 179.88,
     "dividend_yield": 0.0038,
     "price_to_book": 81.9466,
-    "target_mean": 1144.3478,
+    "target_mean": 1142.174,
     "fcf": 1943750016.0,
     "gross_margin": 0.4558,
-    "enterprise_value": 179656654848.0,
-    "ev_ebitda": 39.906,
-    "peg": 0.44,
+    "enterprise_value": 185225314304.0,
+    "ev_ebitda": 41.143,
+    "peg": 0.46,
     "roa": 0.2935,
-    "short_float": 0.0351,
+    "short_float": 0.0459,
     "buyback_yield": 0.001,
     "ps": 14.6,
-    "ev_s": 14.73,
+    "ev_s": 15.19,
     "altman_z": 2.41,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -37017,11 +37027,11 @@
     "upside_pct": 22.1
    },
    "analisti": {
-    "eps_ora": 14.9724,
-    "eps_90g_fa": 14.558,
-    "eps_7g_fa": 14.9532,
-    "revisione_90g_pct": 2.85,
-    "revisione_7g_pct": 0.13,
+    "eps_ora": 14.9496,
+    "eps_90g_fa": 14.5448,
+    "eps_7g_fa": 14.9559,
+    "revisione_90g_pct": 2.78,
+    "revisione_7g_pct": -0.04,
     "su_30g": 7,
     "giu_30g": 1,
     "eps_min": 13.67,
@@ -37054,9 +37064,9 @@
     "float_pct": null,
     "avg_volume_30d": 26968564.0,
     "pe_ttm": 17.6448,
-    "forward_pe": 23.3327,
+    "forward_pe": 23.1156,
     "eps_ttm": 19.93,
-    "eps_forward": 15.0715,
+    "eps_forward": 15.2131,
     "revenue_fy": 445865984000.0,
     "net_income_fy": 244118994944.0,
     "revenue_growth": 0.242,
@@ -37069,14 +37079,14 @@
     "target_mean": 429.4741,
     "fcf": 22665000960.0,
     "gross_margin": 0.609,
-    "enterprise_value": 4197141708800.0,
-    "ev_ebitda": 24.238,
-    "peg": 1.22,
+    "enterprise_value": 4182954999808.0,
+    "ev_ebitda": 24.156,
+    "peg": 1.24,
     "roa": 0.1296,
-    "short_float": 0.0137,
+    "short_float": 0.0149,
     "buyback_yield": 0.0106,
     "ps": 9.65,
-    "ev_s": 9.41
+    "ev_s": 9.38
    },
    "combustione": {
     "cassa": 55911000000.0,
@@ -38971,7 +38981,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -39054,15 +39064,15 @@
    "rating": {
     "key": "buy",
     "n": 24,
-    "target": 670.79,
-    "upside_pct": 68.8
+    "target": 673.5,
+    "upside_pct": 69.5
    },
    "analisti": {
-    "eps_ora": 32.0435,
-    "eps_90g_fa": 26.0841,
+    "eps_ora": 31.8276,
+    "eps_90g_fa": 25.6604,
     "eps_7g_fa": 31.7495,
-    "revisione_90g_pct": 22.85,
-    "revisione_7g_pct": 0.93,
+    "revisione_90g_pct": 24.03,
+    "revisione_7g_pct": 0.25,
     "su_30g": 10,
     "giu_30g": 0,
     "eps_min": 21.95,
@@ -39091,7 +39101,7 @@
    "stats": {
     "market_cap": 148711145472.0,
     "shares": 374323269.0,
-    "float_shares": 358164979.0,
+    "float_shares": 358074844.0,
     "float_pct": 95.7,
     "avg_volume_30d": 7724701.0,
     "pe_ttm": 14.7578,
@@ -39106,18 +39116,18 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0015,
-    "price_to_book": null,
-    "target_mean": 670.7917,
+    "price_to_book": 18.995,
+    "target_mean": 673.5,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
-    "enterprise_value": 142847705088.0,
-    "ev_ebitda": 28.558,
-    "peg": 0.75,
+    "enterprise_value": 145782505472.0,
+    "ev_ebitda": 29.145,
+    "peg": 0.78,
     "roa": 0.2076,
-    "short_float": 0.0546,
+    "short_float": 0.0538,
     "buyback_yield": 0.0174,
     "ps": 11.51,
-    "ev_s": 11.06,
+    "ev_s": 11.28,
     "altman_z": 9.76,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -40932,9 +40942,9 @@
     "gross_margin": 0.6423,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.87,
+    "peg": 0.92,
     "roa": 0.19,
-    "short_float": 0.0063,
+    "short_float": 0.0057,
     "buyback_yield": -0.0,
     "cross_currency": true,
     "ps": null,
@@ -42332,8 +42342,8 @@
    "stats": {
     "market_cap": 39000887296.0,
     "shares": 112247109.0,
-    "float_shares": 109904252.0,
-    "float_pct": 97.9,
+    "float_shares": 109963643.0,
+    "float_pct": 98.0,
     "avg_volume_30d": 7057195.0,
     "pe_ttm": null,
     "forward_pe": 128.8942,
@@ -42351,14 +42361,14 @@
     "target_mean": 291.6363,
     "fcf": null,
     "gross_margin": 0.349,
-    "enterprise_value": 32566413312.0,
+    "enterprise_value": 35151110144.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": null,
-    "short_float": 0.1258,
+    "short_float": 0.1141,
     "buyback_yield": -0.0272,
     "ps": 57.3,
-    "ev_s": 47.84,
+    "ev_s": 51.64,
     "altman_z": 0.42,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -44150,14 +44160,14 @@
     "target_mean": 118.0465,
     "fcf": 4866375168.0,
     "gross_margin": 0.3887,
-    "enterprise_value": 564517797888.0,
-    "ev_ebitda": 33.522,
+    "enterprise_value": 606988271616.0,
+    "ev_ebitda": 36.044,
     "peg": 1.36,
     "roa": 0.0141,
-    "short_float": 0.0316,
+    "short_float": 0.0301,
     "buyback_yield": -0.023,
     "ps": 9.7,
-    "ev_s": 9.9,
+    "ev_s": 10.64,
     "altman_z": 3.4,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -45003,7 +45013,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -32.5,
-      "meglio": 24.6
+      "meglio": 24.5
      },
      {
       "mese": 11,
@@ -45495,21 +45505,21 @@
    "earnings_date": "2026-11-03",
    "rating": {
     "key": "buy",
-    "n": 29,
-    "target": 221.07,
-    "upside_pct": 36.0
+    "n": 27,
+    "target": 224.56,
+    "upside_pct": 38.1
    },
    "analisti": {
-    "eps_ora": 2.0742,
+    "eps_ora": 2.0372,
     "eps_90g_fa": 0.6759,
     "eps_7g_fa": 1.9297,
-    "revisione_90g_pct": 206.87,
-    "revisione_7g_pct": 7.49,
+    "revisione_90g_pct": 201.4,
+    "revisione_7g_pct": 5.57,
     "su_30g": 3,
     "giu_30g": 0,
     "eps_min": -0.68,
     "eps_max": 3.96,
-    "eps_n": 21,
+    "eps_n": 20,
     "target_min": 118.0,
     "target_max": 450.0,
     "target_mediana": 225.0
@@ -45531,15 +45541,15 @@
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
    "stats": {
-    "market_cap": 2142962057216.0,
-    "shares": 7696293669.0,
+    "market_cap": 2141727621120.0,
+    "shares": 7571396888.0,
     "float_shares": 4333905610.0,
-    "float_pct": 56.3,
+    "float_pct": 57.2,
     "avg_volume_30d": 93704956.0,
     "pe_ttm": null,
-    "forward_pe": 83.2898,
+    "forward_pe": 84.4287,
     "eps_ttm": -1.1,
-    "eps_forward": 1.9519,
+    "eps_forward": 1.9255,
     "revenue_fy": 23043999744.0,
     "net_income_fy": -8888999936.0,
     "revenue_growth": 0.919,
@@ -45549,17 +45559,17 @@
     "debt_to_equity": 31.211,
     "dividend_yield": 0.0,
     "price_to_book": 16.8362,
-    "target_mean": 221.069,
+    "target_mean": 224.5556,
     "fcf": null,
     "gross_margin": 0.5188,
-    "enterprise_value": 4225622867968.0,
-    "ev_ebitda": 716.572,
+    "enterprise_value": 4358231556096.0,
+    "ev_ebitda": 739.059,
     "peg": null,
     "roa": null,
-    "short_float": 0.0271,
+    "short_float": 0.0243,
     "buyback_yield": -0.0083,
-    "ps": 92.99,
-    "ev_s": 183.37,
+    "ps": 92.94,
+    "ev_s": 189.13,
     "altman_z": 0.06,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -46944,24 +46954,24 @@
    "earnings_date": "2026-10-21",
    "rating": {
     "key": "buy",
-    "n": 38,
-    "target": 396.57,
-    "upside_pct": 3.6
+    "n": 37,
+    "target": 392.42,
+    "upside_pct": 2.5
    },
    "analisti": {
-    "eps_ora": 2.1824,
-    "eps_90g_fa": 2.5798,
-    "eps_7g_fa": 2.148,
-    "revisione_90g_pct": -15.4,
-    "revisione_7g_pct": 1.6,
+    "eps_ora": 2.1457,
+    "eps_90g_fa": 2.5746,
+    "eps_7g_fa": 2.163,
+    "revisione_90g_pct": -16.66,
+    "revisione_7g_pct": -0.8,
     "su_30g": 1,
     "giu_30g": 4,
     "eps_min": 1.3989,
-    "eps_max": 3.67,
+    "eps_max": 3.65,
     "eps_n": 31,
     "target_min": 128.11,
     "target_max": 600.0,
-    "target_mediana": 412.5
+    "target_mediana": 410.0
    },
    "health": 69,
    "eps": 1.08,
@@ -46998,17 +47008,17 @@
     "debt_to_equity": 18.373,
     "dividend_yield": 0.0,
     "price_to_book": 17.3994,
-    "target_mean": 396.5689,
+    "target_mean": 392.4221,
     "fcf": 4835999744.0,
     "gross_margin": 0.1885,
-    "enterprise_value": 1484708773888.0,
-    "ev_ebitda": 138.048,
-    "peg": 4.48,
+    "enterprise_value": 1465395445760.0,
+    "ev_ebitda": 136.252,
+    "peg": 4.55,
     "roa": 0.0193,
-    "short_float": 0.0201,
+    "short_float": 0.0195,
     "buyback_yield": 0.0,
     "ps": 14.59,
-    "ev_s": 14.33,
+    "ev_s": 14.14,
     "altman_z": 4.54,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -48069,7 +48079,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 4.56,
-   "pe": 27.9,
+   "pe": 29.1,
    "ath": 410.41,
    "ath_dist_pct": -27.4,
    "sma200_dist_pct": 4.4,
@@ -48433,7 +48443,7 @@
      290.55,
      295.0,
      291.45,
-     293.25,
+     293.29,
      293.15,
      294.65,
      294.42,
@@ -48494,7 +48504,7 @@
     "target_mediana": 345.5
    },
    "health": 68,
-   "eps": 10.7,
+   "eps": 10.23,
    "beta": 1.13,
    "sharpe_1y": -0.5,
    "sortino_1y": -0.68,
@@ -48515,9 +48525,9 @@
     "float_shares": 353148794.0,
     "float_pct": 99.7,
     "avg_volume_30d": 3121639.0,
-    "pe_ttm": 27.857,
+    "pe_ttm": 29.1369,
     "forward_pe": 22.3774,
-    "eps_ttm": 10.7,
+    "eps_ttm": 10.23,
     "eps_forward": 13.3202,
     "revenue_fy": 31270000640.0,
     "net_income_fy": 3464999936.0,
@@ -48531,14 +48541,14 @@
     "target_mean": 341.532,
     "fcf": -6625124864.0,
     "gross_margin": 0.2211,
-    "enterprise_value": 129956397056.0,
-    "ev_ebitda": 16.343,
+    "enterprise_value": 130494947328.0,
+    "ev_ebitda": 16.41,
     "peg": 3.74,
     "roa": 0.0389,
-    "short_float": 0.0374,
+    "short_float": 0.037,
     "buyback_yield": 0.0038,
     "ps": 3.38,
-    "ev_s": 4.16,
+    "ev_s": 4.17,
     "altman_z": 1.65,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -50185,14 +50195,14 @@
     "target_mean": 92.5489,
     "fcf": 25387552768.0,
     "gross_margin": 0.4912,
-    "enterprise_value": 300251709440.0,
-    "ev_ebitda": 20.388,
-    "peg": 1.22,
+    "enterprise_value": 297753346048.0,
+    "ev_ebitda": 20.218,
+    "peg": 1.17,
     "roa": 0.1608,
-    "short_float": 0.0199,
+    "short_float": 0.0228,
     "buyback_yield": 0.0289,
     "ps": 6.05,
-    "ev_s": 6.21,
+    "ev_s": 6.16,
     "altman_z": 5.32,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -51249,7 +51259,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.38,
-   "pe": 29.1,
+   "pe": 29.8,
    "ath": 550.01,
    "ath_dist_pct": -2.7,
    "sma200_dist_pct": 23.7,
@@ -51579,7 +51589,7 @@
      24.28,
      21.19,
      21.19,
-     18.31,
+     18.3,
      20.9,
      17.41,
      13.16,
@@ -52090,10 +52100,10 @@
    },
    "analisti": {
     "eps_ora": 23.6773,
-    "eps_90g_fa": 22.5874,
-    "eps_7g_fa": 23.6473,
-    "revisione_90g_pct": 4.83,
-    "revisione_7g_pct": 0.13,
+    "eps_90g_fa": 22.577,
+    "eps_7g_fa": 23.6759,
+    "revisione_90g_pct": 4.87,
+    "revisione_7g_pct": 0.01,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 22.08,
@@ -52104,7 +52114,7 @@
     "target_mediana": 586.0
    },
    "health": 87,
-   "eps": 18.38,
+   "eps": 17.95,
    "beta": 1.1,
    "sharpe_1y": 0.06,
    "sortino_1y": 0.09,
@@ -52125,9 +52135,9 @@
     "float_shares": 7414407173.0,
     "float_pct": 99.9,
     "avg_volume_30d": 27591040.0,
-    "pe_ttm": 29.1115,
+    "pe_ttm": 29.8089,
     "forward_pe": 22.5984,
-    "eps_ttm": 18.38,
+    "eps_ttm": 17.95,
     "eps_forward": 23.6773,
     "revenue_fy": 331839012864.0,
     "net_income_fy": 133748998144.0,
@@ -52141,14 +52151,14 @@
     "target_mean": 587.6338,
     "fcf": 16545500160.0,
     "gross_margin": 0.6794,
-    "enterprise_value": 4025156632576.0,
-    "ev_ebitda": 20.723,
-    "peg": 1.7,
+    "enterprise_value": 3985727029248.0,
+    "ev_ebitda": 20.52,
+    "peg": 1.72,
     "roa": 0.1409,
-    "short_float": 0.0082,
+    "short_float": 0.0091,
     "buyback_yield": 0.0051,
     "ps": 11.97,
-    "ev_s": 12.13,
+    "ev_s": 12.01,
     "altman_z": 4.71,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -54015,7 +54025,7 @@
     ],
     "d1": [
      332.34,
-     333.02,
+     333.0,
      332.3,
      332.41,
      333.09,
@@ -54063,11 +54073,11 @@
     "upside_pct": -2.5
    },
    "analisti": {
-    "eps_ora": 9.5804,
+    "eps_ora": 9.5758,
     "eps_90g_fa": 9.6826,
-    "eps_7g_fa": 9.5758,
-    "revisione_90g_pct": -1.06,
-    "revisione_7g_pct": 0.05,
+    "eps_7g_fa": 9.5783,
+    "revisione_90g_pct": -1.1,
+    "revisione_7g_pct": -0.03,
     "su_30g": 5,
     "giu_30g": 3,
     "eps_min": 8.69,
@@ -54115,11 +54125,11 @@
     "target_mean": 328.0938,
     "fcf": 107721875456.0,
     "gross_margin": 0.4865,
-    "enterprise_value": 4934930006016.0,
-    "ev_ebitda": 29.382,
-    "peg": 2.72,
+    "enterprise_value": 4935367786496.0,
+    "ev_ebitda": 29.384,
+    "peg": 2.67,
     "roa": 0.2708,
-    "short_float": 0.0083,
+    "short_float": 0.0088,
     "buyback_yield": 0.0185,
     "ps": 10.52,
     "ev_s": 10.57,
@@ -55678,7 +55688,7 @@
      721.06,
      717.69,
      719.95,
-     720.09,
+     720.08,
      719.48,
      718.23,
      717.44,
@@ -55700,15 +55710,15 @@
     "upside_pct": 11.2
    },
    "analisti": {
-    "eps_ora": 34.0747,
+    "eps_ora": 34.0839,
     "eps_90g_fa": 34.9937,
     "eps_7g_fa": 34.0681,
-    "revisione_90g_pct": -2.63,
-    "revisione_7g_pct": 0.02,
+    "revisione_90g_pct": -2.6,
+    "revisione_7g_pct": 0.05,
     "su_30g": 7,
     "giu_30g": 6,
     "eps_min": 28.7795,
-    "eps_max": 41.5,
+    "eps_max": 42.0,
     "eps_n": 54,
     "target_min": 580.0,
     "target_max": 1050.0,
@@ -55752,14 +55762,14 @@
     "target_mean": 799.34,
     "fcf": 21553625088.0,
     "gross_margin": 0.8175,
-    "enterprise_value": 1852874293248.0,
-    "ev_ebitda": 16.897,
-    "peg": 0.95,
+    "enterprise_value": 1859599728640.0,
+    "ev_ebitda": 16.959,
+    "peg": 0.98,
     "roa": 0.1459,
-    "short_float": 0.0152,
+    "short_float": 0.0141,
     "buyback_yield": 0.0143,
     "ps": 8.02,
-    "ev_s": 8.12,
+    "ev_s": 8.15,
     "altman_z": 5.41,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -57492,14 +57502,14 @@
     "target_mean": 283.3607,
     "fcf": 17731874816.0,
     "gross_margin": 0.7728,
-    "enterprise_value": 219546992640.0,
-    "ev_ebitda": 17.02,
-    "peg": 0.81,
+    "enterprise_value": 215785881600.0,
+    "ev_ebitda": 16.729,
+    "peg": 0.8,
     "roa": 0.057,
-    "short_float": 0.0462,
+    "short_float": 0.0454,
     "buyback_yield": 0.0668,
     "ps": 4.29,
-    "ev_s": 5.0,
+    "ev_s": 4.91,
     "altman_z": 1.83,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -58559,7 +58569,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 0.79,
-   "pe": 88.0,
+   "pe": 87.0,
    "ath": 239.62,
    "ath_dist_pct": -41.2,
    "sma200_dist_pct": 22.1,
@@ -59099,7 +59109,7 @@
     "target_mediana": 150.0
    },
    "health": 82,
-   "eps": 1.6,
+   "eps": 1.62,
    "beta": 0.99,
    "sharpe_1y": -0.47,
    "sortino_1y": -0.63,
@@ -59120,9 +59130,9 @@
     "float_shares": 1031298022.0,
     "float_pct": 99.8,
     "avg_volume_30d": 17648714.0,
-    "pe_ttm": 88.0375,
+    "pe_ttm": 86.9506,
     "forward_pe": 28.141,
-    "eps_ttm": 1.6,
+    "eps_ttm": 1.62,
     "eps_forward": 5.0055,
     "revenue_fy": 14732000256.0,
     "net_income_fy": 1670000000.0,
@@ -59136,14 +59146,14 @@
     "target_mean": 146.7317,
     "fcf": 5149374976.0,
     "gross_margin": 0.7477,
-    "enterprise_value": 149418803200.0,
-    "ev_ebitda": 51.577,
-    "peg": 1.01,
+    "enterprise_value": 146327552000.0,
+    "ev_ebitda": 50.51,
+    "peg": 0.99,
     "roa": 0.0425,
-    "short_float": 0.0287,
+    "short_float": 0.0279,
     "buyback_yield": 0.0126,
     "ps": 9.89,
-    "ev_s": 10.14,
+    "ev_s": 9.93,
     "altman_z": 2.29,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -60815,14 +60825,14 @@
     "target_mean": 531.3149,
     "fcf": 30596499456.0,
     "gross_margin": 0.7551,
-    "enterprise_value": 1761302151168.0,
-    "ev_ebitda": 33.703,
-    "peg": 0.36,
+    "enterprise_value": 1832763392000.0,
+    "ev_ebitda": 35.07,
+    "peg": 0.37,
     "roa": 0.1537,
-    "short_float": 0.0116,
+    "short_float": 0.0111,
     "buyback_yield": 0.0035,
     "ps": 19.37,
-    "ev_s": 19.77,
+    "ev_s": 20.57,
     "altman_z": 2.66,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -61667,7 +61677,7 @@
      {
       "mese": 11,
       "media": 5.26,
-      "mediana": 5.94,
+      "mediana": 5.95,
       "positivi_pct": 82,
       "campione": 17,
       "peggio": -11.4,
@@ -62607,26 +62617,26 @@
    "rating": {
     "key": "strong_buy",
     "n": 16,
-    "target": 2102.18,
-    "upside_pct": 18.1
+    "target": 2106.06,
+    "upside_pct": 18.3
    },
    "analisti": {
-    "eps_ora": 52.0336,
-    "eps_90g_fa": 43.6213,
+    "eps_ora": 51.9236,
+    "eps_90g_fa": 43.2931,
     "eps_7g_fa": 51.7319,
-    "revisione_90g_pct": 19.28,
-    "revisione_7g_pct": 0.58,
+    "revisione_90g_pct": 19.93,
+    "revisione_7g_pct": 0.37,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 37.43,
     "eps_max": 59.1013,
     "eps_n": 33,
     "target_min": 866.92,
-    "target_max": 2899.65,
+    "target_max": 2914.02,
     "target_mediana": 2156.07
    },
    "health": 77,
-   "eps": 30.81,
+   "eps": 30.99,
    "beta": 1.3,
    "sharpe_1y": 1.34,
    "sortino_1y": 2.03,
@@ -62648,9 +62658,9 @@
     "float_pct": null,
     "avg_volume_30d": 1487470.0,
     "pe_ttm": 57.7845,
-    "forward_pe": 30.5746,
-    "eps_ttm": 30.81,
-    "eps_forward": 58.2294,
+    "forward_pe": 30.6121,
+    "eps_ttm": 30.99,
+    "eps_forward": 58.158,
     "revenue_fy": null,
     "net_income_fy": null,
     "revenue_growth": 0.213,
@@ -62660,12 +62670,12 @@
     "debt_to_equity": 9.092,
     "dividend_yield": 0.0051,
     "price_to_book": null,
-    "target_mean": 2102.1812,
+    "target_mean": 2106.0593,
     "fcf": null,
     "gross_margin": 0.5273,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 1.1,
+    "peg": 1.14,
     "roa": 0.1645,
     "short_float": 0.0038,
     "buyback_yield": 0.0085,
@@ -64566,23 +64576,23 @@
    "rating": {
     "key": "hold",
     "n": 36,
-    "target": 38.04,
-    "upside_pct": 9.6
+    "target": 38.15,
+    "upside_pct": 9.9
    },
    "analisti": {
-    "eps_ora": 1.646,
+    "eps_ora": 1.6526,
     "eps_90g_fa": 2.2666,
-    "eps_7g_fa": 1.8294,
-    "revisione_90g_pct": -27.38,
-    "revisione_7g_pct": -10.02,
+    "eps_7g_fa": 2.1029,
+    "revisione_90g_pct": -27.09,
+    "revisione_7g_pct": -21.41,
     "su_30g": 1,
     "giu_30g": 8,
     "eps_min": 1.1,
     "eps_max": 3.22,
-    "eps_n": 39,
+    "eps_n": 38,
     "target_min": 19.0,
     "target_max": 94.0,
-    "target_mediana": 34.4
+    "target_mediana": 34.9
    },
    "health": 27,
    "eps": 2.08,
@@ -64619,17 +64629,17 @@
     "debt_to_equity": 73.095,
     "dividend_yield": 0.0472,
     "price_to_book": 3.4627,
-    "target_mean": 38.0417,
+    "target_mean": 38.1528,
     "fcf": 1766875008.0,
     "gross_margin": 0.4341,
-    "enterprise_value": 54312071168.0,
-    "ev_ebitda": 11.1,
-    "peg": 1.48,
+    "enterprise_value": 53792210944.0,
+    "ev_ebitda": 10.994,
+    "peg": 1.47,
     "roa": 0.0689,
-    "short_float": 0.1038,
+    "short_float": 0.0898,
     "buyback_yield": 0.0028,
     "ps": 1.12,
-    "ev_s": 1.18,
+    "ev_s": 1.17,
     "altman_z": 3.37,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -65405,7 +65415,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -66266,7 +66276,7 @@
      89.67,
      84.81,
      81.51,
-     76.13,
+     76.14,
      71.27,
      77.61,
      69.12,
@@ -66520,11 +66530,11 @@
     "upside_pct": 68.3
    },
    "analisti": {
-    "eps_ora": 10.999,
+    "eps_ora": 10.9972,
     "eps_90g_fa": 10.9216,
     "eps_7g_fa": 10.9972,
-    "revisione_90g_pct": 0.71,
-    "revisione_7g_pct": 0.02,
+    "revisione_90g_pct": 0.69,
+    "revisione_7g_pct": 0.0,
     "su_30g": 23,
     "giu_30g": 10,
     "eps_min": 9.0,
@@ -66568,18 +66578,18 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0141,
-    "price_to_book": 6.9171,
+    "price_to_book": 10.8436,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
-    "enterprise_value": 565000273920.0,
-    "ev_ebitda": 16.409,
-    "peg": 0.76,
+    "enterprise_value": 571531526144.0,
+    "ev_ebitda": 16.598,
+    "peg": 0.81,
     "roa": 0.0636,
-    "short_float": 0.0259,
+    "short_float": 0.0273,
     "buyback_yield": -0.0145,
     "ps": 5.97,
-    "ev_s": 7.87,
+    "ev_s": 7.96,
     "altman_z": 0.89,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -68491,23 +68501,23 @@
    "rating": {
     "key": "buy",
     "n": 29,
-    "target": 292.21,
-    "upside_pct": 24.2
+    "target": 293.76,
+    "upside_pct": 24.9
    },
    "analisti": {
-    "eps_ora": 13.7659,
+    "eps_ora": 13.7902,
     "eps_90g_fa": 14.2132,
-    "eps_7g_fa": 13.823,
-    "revisione_90g_pct": -3.15,
-    "revisione_7g_pct": -0.41,
+    "eps_7g_fa": 13.857,
+    "revisione_90g_pct": -2.98,
+    "revisione_7g_pct": -0.48,
     "su_30g": 2,
     "giu_30g": 15,
-    "eps_min": 12.81,
+    "eps_min": 12.86,
     "eps_max": 14.73,
     "eps_n": 32,
     "target_min": 230.0,
     "target_max": 390.0,
-    "target_mediana": 293.0
+    "target_mediana": 295.0
    },
    "health": 24,
    "eps": 12.31,
@@ -68544,17 +68554,17 @@
     "debt_to_equity": null,
     "dividend_yield": 0.0328,
     "price_to_book": null,
-    "target_mean": 292.2069,
+    "target_mean": 293.7586,
     "fcf": 6262374912.0,
     "gross_margin": 0.5738,
-    "enterprise_value": 220240510976.0,
-    "ev_ebitda": 14.752,
-    "peg": 2.5,
+    "enterprise_value": 217162268672.0,
+    "ev_ebitda": 14.545,
+    "peg": 2.45,
     "roa": 0.1325,
-    "short_float": 0.0217,
+    "short_float": 0.0192,
     "buyback_yield": 0.0124,
     "ps": 6.01,
-    "ev_s": 7.95,
+    "ev_s": 7.84,
     "altman_z": 5.21,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -70009,7 +70019,7 @@
      11.1,
      11.27,
      11.09,
-     11.07,
+     11.06,
      11.8,
      11.5,
      10.69,
@@ -70330,8 +70340,8 @@
    "rating": {
     "key": "buy",
     "n": 11,
-    "target": 126.99,
-    "upside_pct": 44.2
+    "target": 126.78,
+    "upside_pct": 44.0
    },
    "analisti": {
     "eps_ora": 2.5888,
@@ -70346,7 +70356,7 @@
     "eps_n": 18,
     "target_min": 83.1,
     "target_max": 169.05,
-    "target_mediana": 133.13
+    "target_mediana": 130.8
    },
    "health": 22,
    "eps": 0.59,
@@ -70383,7 +70393,7 @@
     "debt_to_equity": 17.131,
     "dividend_yield": 0.0019,
     "price_to_book": null,
-    "target_mean": 126.9908,
+    "target_mean": 126.7788,
     "fcf": null,
     "gross_margin": 0.3511,
     "enterprise_value": null,
@@ -70400,34 +70410,34 @@
     "altman_model": "Z''"
    },
    "combustione": {
-    "cassa": 1112718000.0,
-    "debito": 996750000.0,
-    "patrimonio": 7133771000.0,
-    "bilancio_al": "2026-06-30",
-    "ocf_ttm": 941798000.0,
-    "capex_ttm": -385877000.0,
+    "cassa": 1075117000.0,
+    "debito": 996549000.0,
+    "patrimonio": 7064532000.0,
+    "bilancio_al": "2026-03-31",
+    "ocf_ttm": 1275965000.0,
+    "capex_ttm": -354306000.0,
     "trimestri": 4,
-    "cashflow_al": "2026-06-30",
-    "fcf_ttm": 555921000.0,
-    "mesi_capex": 34.6,
+    "cashflow_al": "2026-03-31",
+    "fcf_ttm": 921659000.0,
+    "mesi_capex": 36.4,
     "emissione_netta_pct": 0.01,
-    "debito_netto": -115968000.0,
+    "debito_netto": -78568000.0,
     "valuta": "CAD"
    },
    "credito": {
-    "oneri_ttm": 102580000.0,
-    "ebit_ttm": 573543000.0,
+    "oneri_ttm": 102861000.0,
+    "ebit_ttm": 919867000.0,
     "trimestri": 4,
-    "conto_al": "2026-06-30",
-    "copertura": 5.59,
-    "oneri_var_4trim_pct": -4.5,
+    "conto_al": "2026-03-31",
+    "copertura": 8.94,
+    "oneri_var_4trim_pct": 79.4,
     "oneri_trim": [
+     12684000,
      12985000,
      54438000,
-     22754000,
-     12403000
+     22754000
     ],
-    "debito_lungo": 996750000.0,
+    "debito_lungo": 996549000.0,
     "valuta": "CAD"
    },
    "fuori_mercato": {
@@ -71390,14 +71400,6 @@
     },
     "conto_trim": [
      {
-      "trim": "2026-06-30",
-      "ricavi": 813772000,
-      "utile": 25219000,
-      "operativo": 74139000,
-      "margine": 3.1,
-      "margine_op": 9.1
-     },
-     {
       "trim": "2026-03-31",
       "ricavi": 845365000,
       "utile": 130751000,
@@ -71428,6 +71430,14 @@
       "operativo": 156260000,
       "margine": 36.6,
       "margine_op": 17.8
+     },
+     {
+      "trim": "2025-03-31",
+      "ricavi": 789432000,
+      "utile": 69764000,
+      "operativo": 188028000,
+      "margine": 8.8,
+      "margine_op": 23.8
      }
     ]
    },
@@ -72158,9 +72168,9 @@
    },
    "analisti": {
     "eps_ora": 5.2872,
-    "eps_90g_fa": 5.447,
+    "eps_90g_fa": 5.4736,
     "eps_7g_fa": 5.2872,
-    "revisione_90g_pct": -2.93,
+    "revisione_90g_pct": -3.41,
     "revisione_7g_pct": 0.0,
     "su_30g": 2,
     "giu_30g": 2,
@@ -72209,14 +72219,14 @@
     "target_mean": 286.4417,
     "fcf": 1256137472.0,
     "gross_margin": 0.5713,
-    "enterprise_value": 41027207168.0,
-    "ev_ebitda": 53.525,
-    "peg": 2.87,
+    "enterprise_value": 39263981568.0,
+    "ev_ebitda": 51.225,
+    "peg": 2.77,
     "roa": -0.0062,
-    "short_float": 0.05,
+    "short_float": 0.0445,
     "buyback_yield": -0.0313,
     "ps": 5.97,
-    "ev_s": 6.14,
+    "ev_s": 5.87,
     "altman_z": -1.53,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -72237,11 +72247,11 @@
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 69300000.0,
+    "oneri_ttm": 160600000.0,
     "ebit_ttm": -77000000.0,
-    "trimestri": 2,
+    "trimestri": 3,
     "conto_al": "2026-06-30",
-    "copertura": -1.11,
+    "copertura": -0.48,
     "debito_corrente": 629900000.0,
     "debito_lungo": 1889800000.0,
     "valuta": "USD"
@@ -73768,15 +73778,15 @@
    "rating": {
     "key": "strong_buy",
     "n": 29,
-    "target": 243.69,
-    "upside_pct": 12.4
+    "target": 242.55,
+    "upside_pct": 11.9
    },
    "analisti": {
-    "eps_ora": 5.2169,
+    "eps_ora": 5.202,
     "eps_90g_fa": 4.4543,
     "eps_7g_fa": 5.202,
-    "revisione_90g_pct": 17.12,
-    "revisione_7g_pct": 0.29,
+    "revisione_90g_pct": 16.78,
+    "revisione_7g_pct": 0.0,
     "su_30g": 1,
     "giu_30g": 0,
     "eps_min": 4.66,
@@ -73821,17 +73831,17 @@
     "debt_to_equity": null,
     "dividend_yield": 0.0,
     "price_to_book": 18.4727,
-    "target_mean": 243.69,
+    "target_mean": 242.5521,
     "fcf": 3891512576.0,
     "gross_margin": 0.63,
-    "enterprise_value": 260014522368.0,
-    "ev_ebitda": 56.042,
-    "peg": 1.58,
+    "enterprise_value": 258866823168.0,
+    "ev_ebitda": 55.795,
+    "peg": 1.61,
     "roa": 0.1412,
-    "short_float": 0.0114,
+    "short_float": 0.0127,
     "buyback_yield": 0.0059,
     "ps": 25.93,
-    "ev_s": 24.67,
+    "ev_s": 24.56,
     "altman_z": 8.46,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -75315,12 +75325,12 @@
    "rating": {
     "key": "buy",
     "n": 50,
-    "target": 240.17,
-    "upside_pct": -12.7
+    "target": 237.77,
+    "upside_pct": -13.6
    },
    "analisti": {
     "eps_ora": 1.6059,
-    "eps_90g_fa": 1.6277,
+    "eps_90g_fa": 1.6276,
     "eps_7g_fa": 1.6059,
     "revisione_90g_pct": -1.34,
     "revisione_7g_pct": 0.0,
@@ -75352,7 +75362,7 @@
    "stats": {
     "market_cap": 281623035904.0,
     "shares": 1023934842.0,
-    "float_shares": 1007551885.0,
+    "float_shares": 1007531406.0,
     "float_pct": 98.4,
     "avg_volume_30d": 9572175.0,
     "pe_ttm": 4584.0005,
@@ -75368,17 +75378,17 @@
     "debt_to_equity": 15.958,
     "dividend_yield": 0.0,
     "price_to_book": 55.1957,
-    "target_mean": 240.17,
+    "target_mean": 237.77,
     "fcf": 1995385472.0,
     "gross_margin": 0.7519,
-    "enterprise_value": 277467168768.0,
-    "ev_ebitda": 2596.524,
-    "peg": 6.79,
+    "enterprise_value": 267637391360.0,
+    "ev_ebitda": 2504.538,
+    "peg": 7.2,
     "roa": -0.0078,
-    "short_float": 0.026,
+    "short_float": 0.0277,
     "buyback_yield": 0.0,
     "ps": 52.19,
-    "ev_s": 51.42,
+    "ev_s": 49.6,
     "altman_z": 2.19,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -76903,14 +76913,14 @@
     "target_mean": 396.92,
     "fcf": 4240624896.0,
     "gross_margin": 0.7038,
-    "enterprise_value": 342058041344.0,
-    "ev_ebitda": 219.268,
-    "peg": 2.03,
+    "enterprise_value": 331252269056.0,
+    "ev_ebitda": 212.341,
+    "peg": 2.14,
     "roa": 0.014,
-    "short_float": 0.0266,
+    "short_float": 0.0269,
     "buyback_yield": 0.0029,
     "ps": 29.84,
-    "ev_s": 29.8,
+    "ev_s": 28.85,
     "altman_z": 1.47,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -78402,8 +78412,8 @@
    "rating": {
     "key": "buy",
     "n": 31,
-    "target": 341.32,
-    "upside_pct": -5.4
+    "target": 339.71,
+    "upside_pct": -5.9
    },
    "analisti": {
     "eps_ora": 1.6761,
@@ -78417,7 +78427,7 @@
     "eps_max": 1.98,
     "eps_n": 33,
     "target_min": 160.0,
-    "target_max": 430.0,
+    "target_max": 413.0,
     "target_mediana": 355.0
    },
    "health": 87,
@@ -78455,17 +78465,17 @@
     "debt_to_equity": 217.858,
     "dividend_yield": 0.0,
     "price_to_book": 79.2904,
-    "target_mean": 341.3226,
+    "target_mean": 339.7097,
     "fcf": 691946368.0,
     "gross_margin": 0.7258,
-    "enterprise_value": 127886401536.0,
+    "enterprise_value": 121491210240.0,
     "ev_ebitda": null,
     "peg": 2.38,
     "roa": -0.0204,
-    "short_float": 0.0269,
+    "short_float": 0.0271,
     "buyback_yield": -0.0,
     "ps": 51.16,
-    "ev_s": 50.9,
+    "ev_s": 48.36,
     "altman_z": 2.08,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -79849,15 +79859,15 @@
    "rating": {
     "key": "strong_buy",
     "n": 47,
-    "target": 287.83,
-    "upside_pct": -1.9
+    "target": 287.08,
+    "upside_pct": -2.1
    },
    "analisti": {
     "eps_ora": 2.9745,
-    "eps_90g_fa": 2.8795,
-    "eps_7g_fa": 2.9745,
-    "revisione_90g_pct": 3.3,
-    "revisione_7g_pct": 0.0,
+    "eps_90g_fa": 2.8554,
+    "eps_7g_fa": 2.9735,
+    "revisione_90g_pct": 4.17,
+    "revisione_7g_pct": 0.03,
     "su_30g": 3,
     "giu_30g": 0,
     "eps_min": 2.66,
@@ -79890,7 +79900,7 @@
     "float_pct": 99.4,
     "avg_volume_30d": 4024085.0,
     "pe_ttm": 586.52,
-    "forward_pe": 98.5927,
+    "forward_pe": 98.592,
     "eps_ttm": 0.5,
     "eps_forward": 2.9745,
     "revenue_fy": 3966725120.0,
@@ -79902,17 +79912,17 @@
     "debt_to_equity": 29.259,
     "dividend_yield": 0.0,
     "price_to_book": 24.1049,
-    "target_mean": 287.826,
+    "target_mean": 287.0813,
     "fcf": 1051412352.0,
     "gross_margin": 0.7954,
-    "enterprise_value": 101594701824.0,
-    "ev_ebitda": 1225.553,
-    "peg": 1.41,
+    "enterprise_value": 93723779072.0,
+    "ev_ebitda": 1130.605,
+    "peg": 1.44,
     "roa": 0.0018,
-    "short_float": 0.0326,
+    "short_float": 0.0353,
     "buyback_yield": -0.0,
     "ps": 26.55,
-    "ev_s": 25.61,
+    "ev_s": 23.63,
     "altman_z": 5.3,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -81715,11 +81725,11 @@
     "upside_pct": 2.8
    },
    "analisti": {
-    "eps_ora": 11.4598,
+    "eps_ora": 11.3916,
     "eps_90g_fa": 10.5308,
-    "eps_7g_fa": 11.1651,
-    "revisione_90g_pct": 8.82,
-    "revisione_7g_pct": 2.64,
+    "eps_7g_fa": 11.0969,
+    "revisione_90g_pct": 8.17,
+    "revisione_7g_pct": 2.66,
     "su_30g": 5,
     "giu_30g": 2,
     "eps_min": 7.562,
@@ -81767,14 +81777,14 @@
     "target_mean": 173.6363,
     "fcf": 20671000576.0,
     "gross_margin": 0.2977,
-    "enterprise_value": 733177380864.0,
-    "ev_ebitda": 10.792,
-    "peg": 1.49,
+    "enterprise_value": 713070149632.0,
+    "ev_ebitda": 10.496,
+    "peg": 1.45,
     "roa": 0.0552,
-    "short_float": 0.0107,
+    "short_float": 0.0108,
     "buyback_yield": 0.0292,
     "ps": 1.92,
-    "ev_s": 2.03,
+    "ev_s": 1.97,
     "altman_z": 5.83,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -83192,7 +83202,7 @@
      17.66,
      17.66,
      16.5,
-     17.23,
+     17.24,
      16.68,
      17.58,
      16.44,
@@ -83477,7 +83487,7 @@
      127.9,
      130.07,
      136.24,
-     144.28,
+     144.29,
      154.51,
      149.4,
      151.74,
@@ -83685,15 +83695,15 @@
    "rating": {
     "key": "buy",
     "n": 24,
-    "target": 226.04,
-    "upside_pct": 6.6
+    "target": 225.25,
+    "upside_pct": 6.3
    },
    "analisti": {
-    "eps_ora": 14.8501,
-    "eps_90g_fa": 12.5806,
-    "eps_7g_fa": 14.5967,
-    "revisione_90g_pct": 18.04,
-    "revisione_7g_pct": 1.74,
+    "eps_ora": 14.6434,
+    "eps_90g_fa": 12.5528,
+    "eps_7g_fa": 14.4348,
+    "revisione_90g_pct": 16.65,
+    "revisione_7g_pct": 1.45,
     "su_30g": 6,
     "giu_30g": 1,
     "eps_min": 10.46,
@@ -83701,7 +83711,7 @@
     "eps_n": 25,
     "target_min": 175.0,
     "target_max": 250.0,
-    "target_mediana": 228.0
+    "target_mediana": 227.5
    },
    "health": 69,
    "eps": 10.39,
@@ -83726,9 +83736,9 @@
     "float_pct": 95.3,
     "avg_volume_30d": 8275298.0,
     "pe_ttm": 20.4023,
-    "forward_pe": 14.4761,
+    "forward_pe": 14.3601,
     "eps_ttm": 10.39,
-    "eps_forward": 14.6434,
+    "eps_forward": 14.7618,
     "revenue_fy": 209383997440.0,
     "net_income_fy": 20590999552.0,
     "revenue_growth": 0.535,
@@ -83738,17 +83748,17 @@
     "debt_to_equity": 18.959,
     "dividend_yield": 0.0336,
     "price_to_book": 2.1899,
-    "target_mean": 226.0417,
+    "target_mean": 225.25,
     "fcf": 21934000128.0,
     "gross_margin": 0.4427,
-    "enterprise_value": 450040659968.0,
-    "ev_ebitda": 8.883,
-    "peg": 0.93,
+    "enterprise_value": 436642906112.0,
+    "ev_ebitda": 8.619,
+    "peg": 0.91,
     "roa": 0.0586,
-    "short_float": 0.0121,
+    "short_float": 0.0106,
     "buyback_yield": 0.029,
     "ps": 1.99,
-    "ev_s": 2.15,
+    "ev_s": 2.09,
     "altman_z": 4.14,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -85286,7 +85296,7 @@
      32.88,
      31.09,
      28.92,
-     32.13,
+     32.12,
      32.9,
      33.61,
      31.46,
@@ -85659,23 +85669,23 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 147.73,
-    "upside_pct": 10.2
+    "target": 146.88,
+    "upside_pct": 9.5
    },
    "analisti": {
-    "eps_ora": 10.0535,
-    "eps_90g_fa": 8.9003,
+    "eps_ora": 10.1158,
+    "eps_90g_fa": 8.9041,
     "eps_7g_fa": 9.6609,
-    "revisione_90g_pct": 12.96,
-    "revisione_7g_pct": 4.06,
+    "revisione_90g_pct": 13.61,
+    "revisione_7g_pct": 4.71,
     "su_30g": 5,
     "giu_30g": 0,
-    "eps_min": 7.287,
+    "eps_min": 7.1172,
     "eps_max": 13.4,
-    "eps_n": 26,
+    "eps_n": 25,
     "target_min": 126.0,
     "target_max": 189.0,
-    "target_mediana": 147.0
+    "target_mediana": 146.0
    },
    "health": 66,
    "eps": 7.55,
@@ -85700,9 +85710,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 6534345.0,
     "pe_ttm": 17.7616,
-    "forward_pe": 13.8642,
+    "forward_pe": 13.3387,
     "eps_ttm": 7.55,
-    "eps_forward": 9.6724,
+    "eps_forward": 10.0535,
     "revenue_fy": 64459001856.0,
     "net_income_fy": 9253000192.0,
     "revenue_growth": 0.355,
@@ -85712,17 +85722,17 @@
     "debt_to_equity": 35.639,
     "dividend_yield": 0.0251,
     "price_to_book": 2.4652,
-    "target_mean": 147.7308,
+    "target_mean": 146.8846,
     "fcf": 7691375104.0,
     "gross_margin": 0.4757,
-    "enterprise_value": 176697360384.0,
-    "ev_ebitda": 6.598,
-    "peg": 1.05,
+    "enterprise_value": 171579654144.0,
+    "ev_ebitda": 6.407,
+    "peg": 1.09,
     "roa": 0.0753,
-    "short_float": 0.0128,
+    "short_float": 0.0134,
     "buyback_yield": 0.0295,
     "ps": 2.5,
-    "ev_s": 2.74,
+    "ev_s": 2.66,
     "altman_z": 3.98,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -87034,7 +87044,7 @@
      69.47,
      68.41,
      84.07,
-     86.13,
+     86.14,
      83.34,
      87.62,
      88.01,
@@ -87297,23 +87307,23 @@
    "rating": {
     "key": "buy",
     "n": 28,
-    "target": 282.61,
-    "upside_pct": 2.2
+    "target": 280.79,
+    "upside_pct": 1.6
    },
    "analisti": {
-    "eps_ora": 16.251,
-    "eps_90g_fa": 16.2862,
+    "eps_ora": 16.2564,
+    "eps_90g_fa": 16.2747,
     "eps_7g_fa": 16.2589,
-    "revisione_90g_pct": -0.22,
-    "revisione_7g_pct": -0.05,
+    "revisione_90g_pct": -0.11,
+    "revisione_7g_pct": -0.02,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 15.1321,
     "eps_max": 17.59,
-    "eps_n": 26,
+    "eps_n": 27,
     "target_min": 200.0,
     "target_max": 328.0,
-    "target_mediana": 286.5
+    "target_mediana": 285.0
    },
    "health": 88,
    "eps": 3.54,
@@ -87338,9 +87348,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 4815323.0,
     "pe_ttm": 78.0989,
-    "forward_pe": 17.0125,
+    "forward_pe": 17.0042,
     "eps_ttm": 3.54,
-    "eps_forward": 16.251,
+    "eps_forward": 16.2589,
     "revenue_fy": 64385998848.0,
     "net_income_fy": 6270000128.0,
     "revenue_growth": 0.102,
@@ -87350,17 +87360,17 @@
     "debt_to_equity": null,
     "dividend_yield": 0.025,
     "price_to_book": null,
-    "target_mean": 282.6071,
+    "target_mean": 280.7857,
     "fcf": 16870250496.0,
     "gross_margin": 0.7279,
-    "enterprise_value": 552917925888.0,
-    "ev_ebitda": 17.973,
-    "peg": 0.56,
+    "enterprise_value": 543887949824.0,
+    "ev_ebitda": 17.68,
+    "peg": 0.55,
     "roa": 0.1051,
-    "short_float": 0.0102,
+    "short_float": 0.0123,
     "buyback_yield": 0.002,
     "ps": 7.59,
-    "ev_s": 8.59,
+    "ev_s": 8.45,
     "altman_z": -0.62,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -89271,23 +89281,23 @@
    "rating": {
     "key": "buy",
     "n": 25,
-    "target": 158.28,
-    "upside_pct": 8.7
+    "target": 156.28,
+    "upside_pct": 7.3
    },
    "analisti": {
-    "eps_ora": 9.3193,
-    "eps_90g_fa": 9.632,
+    "eps_ora": 9.4502,
+    "eps_90g_fa": 9.6544,
     "eps_7g_fa": 9.4885,
-    "revisione_90g_pct": -3.25,
-    "revisione_7g_pct": -1.78,
+    "revisione_90g_pct": -2.12,
+    "revisione_7g_pct": -0.4,
     "su_30g": 6,
     "giu_30g": 2,
     "eps_min": 8.41,
     "eps_max": 10.3611,
-    "eps_n": 25,
+    "eps_n": 23,
     "target_min": 105.0,
     "target_max": 186.0,
-    "target_mediana": 163.0
+    "target_mediana": 161.0
    },
    "health": 69,
    "eps": 1.26,
@@ -89312,9 +89322,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 9806603.0,
     "pe_ttm": 115.5556,
-    "forward_pe": 15.6235,
+    "forward_pe": 15.3761,
     "eps_ttm": 1.26,
-    "eps_forward": 9.3193,
+    "eps_forward": 9.4693,
     "revenue_fy": 66568998912.0,
     "net_income_fy": 3172999936.0,
     "revenue_growth": 0.051,
@@ -89324,17 +89334,17 @@
     "debt_to_equity": 128.408,
     "dividend_yield": 0.0234,
     "price_to_book": 8.5718,
-    "target_mean": 158.28,
+    "target_mean": 156.28,
     "fcf": 15171500032.0,
     "gross_margin": 0.759,
-    "enterprise_value": 406041198592.0,
-    "ev_ebitda": 14.064,
-    "peg": 2.6,
+    "enterprise_value": 399108440064.0,
+    "ev_ebitda": 13.824,
+    "peg": 2.59,
     "roa": 0.1187,
-    "short_float": 0.0115,
+    "short_float": 0.014,
     "buyback_yield": 0.0142,
     "ps": 5.4,
-    "ev_s": 6.1,
+    "ev_s": 6.0,
     "altman_z": 4.23,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -91157,21 +91167,21 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 159.38,
+    "target": 159.27,
     "upside_pct": 5.4
    },
    "analisti": {
-    "eps_ora": 9.9184,
-    "eps_90g_fa": 9.6617,
+    "eps_ora": 9.9085,
+    "eps_90g_fa": 9.648,
     "eps_7g_fa": 9.8891,
-    "revisione_90g_pct": 2.66,
-    "revisione_7g_pct": 0.3,
+    "revisione_90g_pct": 2.7,
+    "revisione_7g_pct": 0.2,
     "su_30g": 19,
     "giu_30g": 6,
     "eps_min": 9.185,
     "eps_max": 11.44,
     "eps_n": 26,
-    "target_min": 126.0,
+    "target_min": 123.0,
     "target_max": 180.0,
     "target_mediana": 164.0
    },
@@ -91198,9 +91208,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 5983914.0,
     "pe_ttm": null,
-    "forward_pe": 15.2865,
+    "forward_pe": 15.2413,
     "eps_ttm": -2.65,
-    "eps_forward": 9.8891,
+    "eps_forward": 9.9184,
     "revenue_fy": 30456999936.0,
     "net_income_fy": -3240000000.0,
     "revenue_growth": 0.102,
@@ -91210,17 +91220,17 @@
     "debt_to_equity": 223.465,
     "dividend_yield": 0.0217,
     "price_to_book": 15.8592,
-    "target_mean": 159.3846,
+    "target_mean": 159.2692,
     "fcf": 9768875008.0,
     "gross_margin": 0.796,
-    "enterprise_value": 208724017152.0,
-    "ev_ebitda": 14.295,
-    "peg": 2.19,
+    "enterprise_value": 203367415808.0,
+    "ev_ebitda": 13.928,
+    "peg": 2.14,
     "roa": 0.1409,
-    "short_float": 0.0176,
+    "short_float": 0.0148,
     "buyback_yield": 0.0081,
     "ps": 6.15,
-    "ev_s": 6.85,
+    "ev_s": 6.68,
     "altman_z": 3.37,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -93031,7 +93041,7 @@
     "y1": [
      282.3,
      290.74,
-     283.88,
+     283.89,
      290.37,
      311.56,
      327.65,
@@ -93127,15 +93137,15 @@
    "rating": {
     "key": "hold",
     "n": 29,
-    "target": 395.25,
-    "upside_pct": -4.7
+    "target": 391.46,
+    "upside_pct": -5.6
    },
    "analisti": {
-    "eps_ora": 24.4838,
-    "eps_90g_fa": 23.4518,
+    "eps_ora": 24.4732,
+    "eps_90g_fa": 23.4493,
     "eps_7g_fa": 24.449,
-    "revisione_90g_pct": 4.4,
-    "revisione_7g_pct": 0.14,
+    "revisione_90g_pct": 4.37,
+    "revisione_7g_pct": 0.1,
     "su_30g": 5,
     "giu_30g": 2,
     "eps_min": 22.88,
@@ -93143,7 +93153,7 @@
     "eps_n": 33,
     "target_min": 225.0,
     "target_max": 500.0,
-    "target_mediana": 405.0
+    "target_mediana": 400.0
    },
    "health": 82,
    "eps": 16.1,
@@ -93180,17 +93190,17 @@
     "debt_to_equity": 490.281,
     "dividend_yield": 0.0243,
     "price_to_book": 19.1892,
-    "target_mean": 395.2541,
+    "target_mean": 391.461,
     "fcf": 8645624832.0,
     "gross_margin": 0.7189,
-    "enterprise_value": 267606999040.0,
-    "ev_ebitda": 15.497,
-    "peg": 2.46,
+    "enterprise_value": 266639261696.0,
+    "ev_ebitda": 15.441,
+    "peg": 2.43,
     "roa": 0.0867,
     "short_float": 0.026,
     "buyback_yield": -0.0,
     "ps": 5.89,
-    "ev_s": 7.02,
+    "ev_s": 7.0,
     "altman_z": 0.34,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -94251,7 +94261,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.76,
-   "pe": 32.8,
+   "pe": 31.9,
    "ath": 386.84,
    "ath_dist_pct": -0.4,
    "sma200_dist_pct": 14.3,
@@ -94823,26 +94833,26 @@
    "rating": {
     "key": "strong_buy",
     "n": 37,
-    "target": 419.63,
-    "upside_pct": 8.9
+    "target": 419.36,
+    "upside_pct": 8.8
    },
    "analisti": {
-    "eps_ora": 15.0026,
-    "eps_90g_fa": 14.8711,
+    "eps_ora": 15.0043,
+    "eps_90g_fa": 14.8744,
     "eps_7g_fa": 15.0043,
-    "revisione_90g_pct": 0.88,
-    "revisione_7g_pct": -0.01,
+    "revisione_90g_pct": 0.87,
+    "revisione_7g_pct": 0.0,
     "su_30g": 28,
     "giu_30g": 4,
     "eps_min": 14.53,
-    "eps_max": 15.38,
+    "eps_max": 15.422,
     "eps_n": 40,
     "target_min": 330.0,
     "target_max": 466.0,
-    "target_mediana": 425.0
+    "target_mediana": 422.0
    },
    "health": 81,
-   "eps": 11.75,
+   "eps": 12.07,
    "beta": 0.77,
    "sharpe_1y": 0.4,
    "sortino_1y": 0.61,
@@ -94863,9 +94873,9 @@
     "float_shares": 1703469556.0,
     "float_pct": 100.0,
     "avg_volume_30d": 6538850.0,
-    "pe_ttm": 32.8043,
+    "pe_ttm": 31.9346,
     "forward_pe": 25.6923,
-    "eps_ttm": 11.75,
+    "eps_ttm": 12.07,
     "eps_forward": 15.0026,
     "revenue_fy": 44487999488.0,
     "net_income_fy": 22397999104.0,
@@ -94876,17 +94886,17 @@
     "debt_to_equity": 67.821,
     "dividend_yield": 0.007,
     "price_to_book": 20.4266,
-    "target_mean": 419.6319,
+    "target_mean": 419.3616,
     "fcf": 20404000768.0,
     "gross_margin": 0.9772,
-    "enterprise_value": 719026454528.0,
-    "ev_ebitda": 23.124,
-    "peg": 1.7,
+    "enterprise_value": 694489513984.0,
+    "ev_ebitda": 22.335,
+    "peg": 1.68,
     "roa": 0.1911,
-    "short_float": 0.0121,
+    "short_float": 0.0109,
     "buyback_yield": 0.0253,
     "ps": 16.27,
-    "ev_s": 16.16,
+    "ev_s": 15.61,
     "altman_z": 3.11,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -95947,7 +95957,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 2.66,
-   "pe": 31.6,
+   "pe": 32.4,
    "ath": 600.32,
    "ath_dist_pct": -1.9,
    "sma200_dist_pct": 11.1,
@@ -96281,7 +96291,7 @@
      344.76,
      305.88,
      342.21,
-     344.33,
+     344.34,
      369.93,
      349.13,
      353.5,
@@ -96541,26 +96551,26 @@
    "rating": {
     "key": "strong_buy",
     "n": 37,
-    "target": 668.07,
-    "upside_pct": 13.4
+    "target": 666.71,
+    "upside_pct": 13.2
    },
    "analisti": {
-    "eps_ora": 23.0345,
-    "eps_90g_fa": 22.7892,
+    "eps_ora": 23.0248,
+    "eps_90g_fa": 22.7869,
     "eps_7g_fa": 23.0248,
-    "revisione_90g_pct": 1.08,
-    "revisione_7g_pct": 0.04,
+    "revisione_90g_pct": 1.04,
+    "revisione_7g_pct": 0.0,
     "su_30g": 31,
     "giu_30g": 2,
-    "eps_min": 22.4181,
+    "eps_min": 22.28,
     "eps_max": 23.5583,
     "eps_n": 38,
     "target_min": 550.0,
     "target_max": 740.0,
-    "target_mediana": 670.0
+    "target_mediana": 668.0
    },
    "health": 79,
-   "eps": 18.64,
+   "eps": 18.18,
    "beta": 0.76,
    "sharpe_1y": 0.12,
    "sortino_1y": 0.17,
@@ -96581,9 +96591,9 @@
     "float_shares": 868301053.0,
     "float_pct": 99.9,
     "avg_volume_30d": 2852481.0,
-    "pe_ttm": 31.6062,
+    "pe_ttm": 32.4059,
     "forward_pe": 25.5764,
-    "eps_ttm": 18.64,
+    "eps_ttm": 18.18,
     "eps_forward": 23.0345,
     "revenue_fy": 35083001856.0,
     "net_income_fy": 16257000448.0,
@@ -96594,17 +96604,17 @@
     "debt_to_equity": 439.583,
     "dividend_yield": 0.0059,
     "price_to_book": 92.1107,
-    "target_mean": 668.0651,
+    "target_mean": 666.7138,
     "fcf": 16961250304.0,
     "gross_margin": 1.0,
-    "enterprise_value": 529121509376.0,
-    "ev_ebitda": 23.833,
-    "peg": 1.5,
+    "enterprise_value": 512407240704.0,
+    "ev_ebitda": 23.08,
+    "peg": 1.48,
     "roa": 0.2406,
-    "short_float": 0.0073,
+    "short_float": 0.0083,
     "buyback_yield": 0.0227,
     "ps": 14.71,
-    "ev_s": 15.08,
+    "ev_s": 14.61,
     "altman_z": 7.79,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -98237,11 +98247,11 @@
     "upside_pct": 3.5
    },
    "analisti": {
-    "eps_ora": 9.1817,
-    "eps_90g_fa": 9.1226,
+    "eps_ora": 9.1858,
+    "eps_90g_fa": 9.1212,
     "eps_7g_fa": 9.1908,
-    "revisione_90g_pct": 0.65,
-    "revisione_7g_pct": -0.1,
+    "revisione_90g_pct": 0.71,
+    "revisione_7g_pct": -0.05,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 8.78,
@@ -98289,14 +98299,14 @@
     "target_mean": 208.1333,
     "fcf": 9714374656.0,
     "gross_margin": 0.6748,
-    "enterprise_value": 358639435776.0,
-    "ev_ebitda": 19.908,
-    "peg": 2.41,
+    "enterprise_value": 345391235072.0,
+    "ev_ebitda": 19.172,
+    "peg": 2.29,
     "roa": 0.1459,
-    "short_float": 0.0114,
+    "short_float": 0.0089,
     "buyback_yield": -0.0,
     "ps": 7.37,
-    "ev_s": 8.43,
+    "ev_s": 8.12,
     "altman_z": 2.96,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -99357,7 +99367,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -4.85,
-   "pe": 34.5,
+   "pe": 36.3,
    "ath": 721.22,
    "ath_dist_pct": -13.9,
    "sma200_dist_pct": 5.3,
@@ -99949,7 +99959,7 @@
      324.5,
      348.61,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -100207,15 +100217,15 @@
    "rating": {
     "key": "buy",
     "n": 23,
-    "target": 693.57,
-    "upside_pct": 11.7
+    "target": 691.83,
+    "upside_pct": 11.4
    },
    "analisti": {
-    "eps_ora": 22.9873,
+    "eps_ora": 22.9275,
     "eps_90g_fa": 22.7015,
     "eps_7g_fa": 22.8276,
-    "revisione_90g_pct": 1.26,
-    "revisione_7g_pct": 0.7,
+    "revisione_90g_pct": 1.0,
+    "revisione_7g_pct": 0.44,
     "su_30g": 3,
     "giu_30g": 1,
     "eps_min": 19.93,
@@ -100226,7 +100236,7 @@
     "target_mediana": 728.0
    },
    "health": 31,
-   "eps": 17.99,
+   "eps": 17.12,
    "beta": 0.87,
    "sharpe_1y": 0.95,
    "sortino_1y": 1.52,
@@ -100247,9 +100257,9 @@
     "float_shares": 269080769.0,
     "float_pct": 99.8,
     "avg_volume_30d": 1226796.0,
-    "pe_ttm": 34.5153,
+    "pe_ttm": 36.2693,
     "forward_pe": 27.2658,
-    "eps_ttm": 17.99,
+    "eps_ttm": 17.12,
     "eps_forward": 22.7732,
     "revenue_fy": 47927001088.0,
     "net_income_fy": 4872999936.0,
@@ -100260,17 +100270,17 @@
     "debt_to_equity": 230.298,
     "dividend_yield": 0.0104,
     "price_to_book": 5.9814,
-    "target_mean": 693.5731,
+    "target_mean": 691.8339,
     "fcf": 4516250112.0,
     "gross_margin": 0.2518,
-    "enterprise_value": 225107509248.0,
-    "ev_ebitda": 26.175,
-    "peg": 1.51,
+    "enterprise_value": 234797842432.0,
+    "ev_ebitda": 27.302,
+    "peg": 1.58,
     "roa": 0.0376,
-    "short_float": 0.0213,
+    "short_float": 0.0208,
     "buyback_yield": 0.0064,
     "ps": 3.49,
-    "ev_s": 4.7,
+    "ev_s": 4.9,
     "altman_z": 5.4,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -102181,15 +102191,15 @@
    "rating": {
     "key": "strong_buy",
     "n": 32,
-    "target": 126.49,
-    "upside_pct": 17.1
+    "target": 126.46,
+    "upside_pct": 17.0
    },
    "analisti": {
-    "eps_ora": 7.473,
+    "eps_ora": 7.4751,
     "eps_90g_fa": 7.4846,
     "eps_7g_fa": 7.4855,
-    "revisione_90g_pct": -0.15,
-    "revisione_7g_pct": -0.17,
+    "revisione_90g_pct": -0.13,
+    "revisione_7g_pct": -0.14,
     "su_30g": 4,
     "giu_30g": 2,
     "eps_min": 7.09,
@@ -102222,9 +102232,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 9393573.0,
     "pe_ttm": 22.2783,
-    "forward_pe": 14.456,
+    "forward_pe": 14.4547,
     "eps_ttm": 4.85,
-    "eps_forward": 7.4744,
+    "eps_forward": 7.4751,
     "revenue_fy": 98860998656.0,
     "net_income_fy": 8600000512.0,
     "revenue_growth": 0.068,
@@ -102234,17 +102244,17 @@
     "debt_to_equity": 39.404,
     "dividend_yield": 0.0139,
     "price_to_book": 1.6988,
-    "target_mean": 126.4891,
+    "target_mean": 126.4578,
     "fcf": 4860375040.0,
     "gross_margin": 0.376,
-    "enterprise_value": 234234527744.0,
-    "ev_ebitda": 11.174,
-    "peg": 3.49,
+    "enterprise_value": 228536451072.0,
+    "ev_ebitda": 10.902,
+    "peg": 3.39,
     "roa": 0.0481,
-    "short_float": 0.0113,
+    "short_float": 0.0114,
     "buyback_yield": 0.0188,
     "ps": 1.89,
-    "ev_s": 2.37,
+    "ev_s": 2.31,
     "altman_z": 2.59,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -103301,7 +103311,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.65,
-   "pe": 36.7,
+   "pe": 37.2,
    "ath": 47.78,
    "ath_dist_pct": -40.8,
    "sma200_dist_pct": 9.2,
@@ -104151,26 +104161,26 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 29.26,
-    "upside_pct": 3.5
+    "target": 29.03,
+    "upside_pct": 2.6
    },
    "analisti": {
-    "eps_ora": 2.8981,
-    "eps_90g_fa": 2.8303,
+    "eps_ora": 2.8968,
+    "eps_90g_fa": 2.8263,
     "eps_7g_fa": 2.8968,
-    "revisione_90g_pct": 2.4,
-    "revisione_7g_pct": 0.04,
+    "revisione_90g_pct": 2.5,
+    "revisione_7g_pct": 0.0,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 2.52,
     "eps_max": 3.16,
     "eps_n": 25,
     "target_min": 25.0,
-    "target_max": 36.0,
-    "target_mediana": 28.5
+    "target_max": 35.75,
+    "target_mediana": 28.0
    },
    "health": 72,
-   "eps": 0.77,
+   "eps": 0.76,
    "beta": 0.28,
    "sharpe_1y": 0.8,
    "sortino_1y": 1.19,
@@ -104191,10 +104201,10 @@
     "float_shares": 5691979030.0,
     "float_pct": 99.9,
     "avg_volume_30d": 36112359.0,
-    "pe_ttm": 36.7273,
-    "forward_pe": 9.7624,
-    "eps_ttm": 0.77,
-    "eps_forward": 2.8968,
+    "pe_ttm": 37.2105,
+    "forward_pe": 9.7516,
+    "eps_ttm": 0.76,
+    "eps_forward": 2.9,
     "revenue_fy": 63695998976.0,
     "net_income_fy": 4338999808.0,
     "revenue_growth": 0.026,
@@ -104204,17 +104214,17 @@
     "debt_to_equity": 74.253,
     "dividend_yield": 0.0608,
     "price_to_book": 1.8919,
-    "target_mean": 29.2596,
+    "target_mean": 29.0288,
     "fcf": 12485624832.0,
     "gross_margin": 0.7472,
-    "enterprise_value": 213264777216.0,
-    "ev_ebitda": 8.402,
-    "peg": 12.73,
+    "enterprise_value": 211668860928.0,
+    "ev_ebitda": 8.339,
+    "peg": 12.58,
     "roa": 0.0578,
-    "short_float": 0.0264,
+    "short_float": 0.0272,
     "buyback_yield": -0.0,
     "ps": 2.53,
-    "ev_s": 3.35,
+    "ev_s": 3.32,
     "altman_z": 3.06,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -120070,7 +120080,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-10-09",
     "price": 198.78,
     "d1": 0.51,
@@ -120153,7 +120163,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-10-09",
     "price": 170.81,
     "d1": 1.58,
@@ -120236,7 +120246,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-10-09",
     "price": 603.33,
     "d1": -0.65,
@@ -120319,7 +120329,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-10-09",
     "price": 206.49,
     "d1": 3.0,
@@ -120625,7 +120635,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-10-09",
     "price": 112.85,
     "d1": 1.02,
@@ -121206,7 +121216,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-10-09",
     "price": 80.15,
     "d1": 0.26,
@@ -124090,7 +124100,7 @@
     }
    ],
    "label": "Sopravvalutazione",
-   "nasdaq_pe": 28.8,
+   "nasdaq_pe": 30.6,
    "source": "multpl",
    "kind": "trailing",
    "fetched_at": "2026-10-10"
@@ -124957,7 +124967,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-10T18:50:29Z"
+   "letto_il": "2026-10-10T19:08:52Z"
   }
  },
  "broker": null,
@@ -125380,13 +125390,18 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-10T18:50:29Z"
+  "letto_il": "2026-10-10T19:08:52Z"
  },
  "predictions": [
   {
    "question": "Will there be no change in Fed interest rates after the October 2026 meeting?",
    "yes": 84,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-october-2026-meeting-20260617190324031"
+  },
+  {
+   "question": "Will Bitcoin dip to $65,000 in October?",
+   "yes": 2,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-65k-in-october-2026"
   }
  ],
  "options": {
@@ -130978,14 +130993,6 @@
        "oi": 2756
       },
       {
-       "strike": 232.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 235.0,
        "bid": 0.41,
        "ask": 0.5,
@@ -130994,28 +131001,12 @@
        "oi": 782
       },
       {
-       "strike": 237.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 240.0,
        "bid": 0.21,
        "ask": 0.28,
        "iv": 44.3,
        "vol": 74,
        "oi": 1300
-      },
-      {
-       "strike": 242.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 245.0,
@@ -131032,6 +131023,30 @@
        "iv": 48.9,
        "vol": 12,
        "oi": 1152
+      },
+      {
+       "strike": 260.0,
+       "bid": 0.0,
+       "ask": 0.14,
+       "iv": 57.2,
+       "vol": 1,
+       "oi": 583
+      },
+      {
+       "strike": 270.0,
+       "bid": 0.0,
+       "ask": 0.45,
+       "iv": 79.3,
+       "vol": 14,
+       "oi": 484
+      },
+      {
+       "strike": 280.0,
+       "bid": 0.0,
+       "ask": 0.04,
+       "iv": 67.2,
+       "vol": 1,
+       "oi": 269
       }
      ],
      "puts": [
@@ -131926,6 +131941,22 @@
      "date": "2026-10-16",
      "calls": [
       {
+       "strike": 1675.0,
+       "bid": 115.8,
+       "ask": 131.4,
+       "iv": 58.5,
+       "vol": 0,
+       "oi": 2
+      },
+      {
+       "strike": 1680.0,
+       "bid": 112.3,
+       "ask": 127.5,
+       "iv": 58.6,
+       "vol": 1,
+       "oi": 251
+      },
+      {
        "strike": 1685.0,
        "bid": 110.7,
        "ask": 121.1,
@@ -131998,28 +132029,12 @@
        "oi": 219
       },
       {
-       "strike": 1750.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1760.0,
        "bid": 59.4,
        "ask": 70.3,
        "iv": 55.3,
        "vol": 9,
        "oi": 559
-      },
-      {
-       "strike": 1770.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 1780.0,
@@ -132030,44 +132045,12 @@
        "oi": 204
       },
       {
-       "strike": 1790.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1800.0,
        "bid": 40.8,
        "ask": 47.9,
        "iv": 54.2,
        "vol": 257,
        "oi": 455
-      },
-      {
-       "strike": 1805.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1810.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1815.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 1820.0,
@@ -132078,30 +132061,6 @@
        "oi": 302
       },
       {
-       "strike": 1825.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1830.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1835.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1840.0,
        "bid": 29.6,
        "ask": 32.9,
@@ -132110,23 +132069,103 @@
        "oi": 638
       },
       {
-       "strike": 1845.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 1860.0,
+       "bid": 24.0,
+       "ask": 27.0,
+       "iv": 56.3,
+       "vol": 16,
+       "oi": 655
       },
       {
-       "strike": 1850.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 1880.0,
+       "bid": 19.2,
+       "ask": 22.3,
+       "iv": 56.7,
+       "vol": 32,
+       "oi": 519
+      },
+      {
+       "strike": 1900.0,
+       "bid": 15.1,
+       "ask": 17.6,
+       "iv": 56.5,
+       "vol": 81,
+       "oi": 1026
+      },
+      {
+       "strike": 1920.0,
+       "bid": 11.8,
+       "ask": 15.0,
+       "iv": 57.3,
+       "vol": 8,
+       "oi": 273
+      },
+      {
+       "strike": 1940.0,
+       "bid": 9.6,
+       "ask": 11.8,
+       "iv": 57.7,
+       "vol": 18,
+       "oi": 464
+      },
+      {
+       "strike": 1960.0,
+       "bid": 7.6,
+       "ask": 9.1,
+       "iv": 57.8,
+       "vol": 8,
+       "oi": 1171
+      },
+      {
+       "strike": 1980.0,
+       "bid": 5.4,
+       "ask": 7.8,
+       "iv": 58.2,
+       "vol": 12,
+       "oi": 503
+      },
+      {
+       "strike": 2000.0,
+       "bid": 4.5,
+       "ask": 5.9,
+       "iv": 58.6,
+       "vol": 116,
+       "oi": 750
+      },
+      {
+       "strike": 2020.0,
+       "bid": 2.85,
+       "ask": 4.8,
+       "iv": 58.2,
+       "vol": 44,
+       "oi": 112
       }
      ],
      "puts": [
+      {
+       "strike": 1675.0,
+       "bid": 14.2,
+       "ask": 21.0,
+       "iv": 57.6,
+       "vol": 8,
+       "oi": 118
+      },
+      {
+       "strike": 1680.0,
+       "bid": 15.6,
+       "ask": 19.7,
+       "iv": 56.0,
+       "vol": 40,
+       "oi": 310
+      },
+      {
+       "strike": 1685.0,
+       "bid": 16.9,
+       "ask": 18.9,
+       "iv": 54.7,
+       "vol": 14,
+       "oi": 33
+      },
       {
        "strike": 1690.0,
        "bid": 17.4,
@@ -132184,28 +132223,12 @@
        "oi": 310
       },
       {
-       "strike": 1730.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1740.0,
        "bid": 33.2,
        "ask": 38.3,
        "iv": 55.1,
        "vol": 20,
        "oi": 267
-      },
-      {
-       "strike": 1750.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 1760.0,
@@ -132216,28 +132239,12 @@
        "oi": 301
       },
       {
-       "strike": 1770.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1780.0,
        "bid": 50.7,
        "ask": 55.5,
        "iv": 54.2,
        "vol": 93,
        "oi": 288
-      },
-      {
-       "strike": 1790.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 1800.0,
@@ -132248,60 +132255,12 @@
        "oi": 309
       },
       {
-       "strike": 1805.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1810.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1815.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1820.0,
        "bid": 73.5,
        "ask": 79.9,
        "iv": 54.9,
        "vol": 94,
        "oi": 155
-      },
-      {
-       "strike": 1825.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1830.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1835.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 1840.0,
@@ -132312,20 +132271,76 @@
        "oi": 166
       },
       {
-       "strike": 1845.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 1860.0,
+       "bid": 99.3,
+       "ask": 106.8,
+       "iv": 53.9,
+       "vol": 13,
+       "oi": 72
       },
       {
-       "strike": 1850.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 1880.0,
+       "bid": 114.3,
+       "ask": 123.5,
+       "iv": 54.8,
+       "vol": 24,
+       "oi": 79
+      },
+      {
+       "strike": 1900.0,
+       "bid": 130.6,
+       "ask": 140.8,
+       "iv": 56.1,
+       "vol": 8,
+       "oi": 81
+      },
+      {
+       "strike": 1920.0,
+       "bid": 144.8,
+       "ask": 158.2,
+       "iv": 54.9,
+       "vol": 1,
+       "oi": 41
+      },
+      {
+       "strike": 1940.0,
+       "bid": 162.1,
+       "ask": 177.9,
+       "iv": 57.1,
+       "vol": 1,
+       "oi": 54
+      },
+      {
+       "strike": 1960.0,
+       "bid": 179.7,
+       "ask": 193.2,
+       "iv": 54.5,
+       "vol": 1,
+       "oi": 51
+      },
+      {
+       "strike": 1980.0,
+       "bid": 196.7,
+       "ask": 211.5,
+       "iv": 52.7,
+       "vol": 2,
+       "oi": 27
+      },
+      {
+       "strike": 2000.0,
+       "bid": 216.5,
+       "ask": 230.0,
+       "iv": 53.9,
+       "vol": 1,
+       "oi": 93
+      },
+      {
+       "strike": 2020.0,
+       "bid": 235.0,
+       "ask": 248.9,
+       "iv": 52.5,
+       "vol": 2,
+       "oi": 13
       }
      ],
      "call_wall": 1960.0,
@@ -132850,14 +132865,6 @@
        "oi": 6
       },
       {
-       "strike": 1785.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1790.0,
        "bid": 65.0,
        "ask": 77.2,
@@ -132944,9 +132951,41 @@
        "iv": 47.0,
        "vol": 2,
        "oi": 24
+      },
+      {
+       "strike": 1845.0,
+       "bid": 42.9,
+       "ask": 57.0,
+       "iv": 49.3,
+       "vol": 1,
+       "oi": 3
       }
      ],
      "puts": [
+      {
+       "strike": 1700.0,
+       "bid": 33.6,
+       "ask": 45.0,
+       "iv": 47.3,
+       "vol": 6,
+       "oi": 25
+      },
+      {
+       "strike": 1705.0,
+       "bid": 33.9,
+       "ask": 46.9,
+       "iv": 47.4,
+       "vol": 1,
+       "oi": 1
+      },
+      {
+       "strike": 1710.0,
+       "bid": 36.6,
+       "ask": 48.3,
+       "iv": 47.0,
+       "vol": 1,
+       "oi": 9
+      },
       {
        "strike": 1720.0,
        "bid": 36.3,
@@ -133002,30 +133041,6 @@
        "iv": 46.0,
        "vol": 3,
        "oi": 60
-      },
-      {
-       "strike": 1755.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1760.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1765.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 1770.0,
@@ -133124,14 +133139,6 @@
        "oi": 2
       },
       {
-       "strike": 1830.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 1840.0,
        "bid": 103.0,
        "ask": 112.4,
@@ -133146,6 +133153,14 @@
        "iv": 45.8,
        "vol": 6,
        "oi": 30
+      },
+      {
+       "strike": 1850.0,
+       "bid": 109.6,
+       "ask": 122.7,
+       "iv": 48.0,
+       "vol": 2,
+       "oi": 14
       }
      ],
      "call_wall": 2200.0,
@@ -134526,14 +134541,6 @@
        "oi": 4897
       },
       {
-       "strike": 302.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 305.0,
        "bid": 2.34,
        "ask": 2.38,
@@ -134542,20 +134549,28 @@
        "oi": 593
       },
       {
-       "strike": 307.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 310.0,
        "bid": 1.68,
        "ask": 1.73,
        "iv": 64.1,
        "vol": 506,
        "oi": 4743
+      },
+      {
+       "strike": 315.0,
+       "bid": 1.2,
+       "ask": 1.25,
+       "iv": 64.7,
+       "vol": 484,
+       "oi": 1238
+      },
+      {
+       "strike": 320.0,
+       "bid": 0.85,
+       "ask": 0.9,
+       "iv": 65.3,
+       "vol": 560,
+       "oi": 3550
       }
      ],
      "puts": [
@@ -143994,11 +144009,19 @@
      ],
      "call_wall": 210.0,
      "put_wall": 190.0,
-     "opt_volume": 20500
+     "opt_volume": 20494
     },
     {
      "date": "2026-10-23",
      "calls": [
+      {
+       "strike": 115.0,
+       "bid": 95.55,
+       "ask": 98.15,
+       "iv": 189.0,
+       "vol": 1,
+       "oi": 1
+      },
       {
        "strike": 150.0,
        "bid": 60.6,
@@ -144048,28 +144071,12 @@
        "oi": 49
       },
       {
-       "strike": 197.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 200.0,
        "bid": 11.9,
        "ask": 13.5,
        "iv": 34.7,
        "vol": 18,
        "oi": 86
-      },
-      {
-       "strike": 202.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 205.0,
@@ -144080,28 +144087,12 @@
        "oi": 128
       },
       {
-       "strike": 207.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 210.0,
        "bid": 4.85,
        "ask": 5.7,
        "iv": 28.2,
        "vol": 56,
        "oi": 288
-      },
-      {
-       "strike": 212.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 215.0,
@@ -144112,14 +144103,6 @@
        "oi": 440
       },
       {
-       "strike": 217.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 220.0,
        "bid": 1.14,
        "ask": 1.46,
@@ -144128,28 +144111,12 @@
        "oi": 1266
       },
       {
-       "strike": 222.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 225.0,
        "bid": 0.4,
        "ask": 0.82,
        "iv": 27.8,
        "vol": 95,
        "oi": 1273
-      },
-      {
-       "strike": 227.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 230.0,
@@ -144198,9 +144165,57 @@
        "iv": 45.3,
        "vol": 0,
        "oi": 2
+      },
+      {
+       "strike": 265.0,
+       "bid": 0.0,
+       "ask": 2.13,
+       "iv": 76.5,
+       "vol": 1,
+       "oi": 2
+      },
+      {
+       "strike": 270.0,
+       "bid": 0.0,
+       "ask": 0.74,
+       "iv": 66.1,
+       "vol": 0,
+       "oi": 1
       }
      ],
      "puts": [
+      {
+       "strike": 115.0,
+       "bid": 0.0,
+       "ask": 2.13,
+       "iv": 185.4,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 165.0,
+       "bid": 0.0,
+       "ask": 1.03,
+       "iv": 75.6,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 170.0,
+       "bid": 0.0,
+       "ask": 0.85,
+       "iv": 65.6,
+       "vol": 1,
+       "oi": 14
+      },
+      {
+       "strike": 175.0,
+       "bid": 0.0,
+       "ask": 0.74,
+       "iv": 56.8,
+       "vol": 2,
+       "oi": 23
+      },
       {
        "strike": 180.0,
        "bid": 0.01,
@@ -144218,28 +144233,12 @@
        "oi": 106
       },
       {
-       "strike": 187.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 190.0,
        "bid": 0.1,
        "ask": 0.29,
        "iv": 34.2,
        "vol": 5,
        "oi": 850
-      },
-      {
-       "strike": 192.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 195.0,
@@ -144250,28 +144249,12 @@
        "oi": 2271
       },
       {
-       "strike": 197.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 200.0,
        "bid": 0.62,
        "ask": 0.69,
        "iv": 26.3,
        "vol": 82,
        "oi": 1423
-      },
-      {
-       "strike": 202.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 205.0,
@@ -144282,28 +144265,12 @@
        "oi": 219
       },
       {
-       "strike": 207.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 210.0,
        "bid": 3.0,
        "ask": 3.45,
        "iv": 26.5,
        "vol": 125,
        "oi": 123
-      },
-      {
-       "strike": 212.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 215.0,
@@ -144335,22 +144302,6 @@
        "ask": 24.2,
        "iv": 45.1,
        "vol": 1,
-       "oi": 0
-      },
-      {
-       "strike": 245.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 250.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
        "oi": 0
       }
      ],
@@ -149076,22 +149027,6 @@
        "oi": 638
       },
       {
-       "strike": 357.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 360.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 365.0,
        "bid": 12.3,
        "ask": 14.85,
@@ -149468,6 +149403,14 @@
        "iv": 28.3,
        "vol": 15,
        "oi": 119
+      },
+      {
+       "strike": 365.0,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       }
      ],
      "call_wall": 372.5,
@@ -149654,14 +149597,6 @@
        "oi": 67159
       },
       {
-       "strike": 377.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 380.0,
        "bid": 0.25,
        "ask": 0.32,
@@ -149676,6 +149611,14 @@
        "iv": 35.2,
        "vol": 2241,
        "oi": 7663
+      },
+      {
+       "strike": 390.0,
+       "bid": 0.13,
+       "ask": 0.16,
+       "iv": 37.3,
+       "vol": 1303,
+       "oi": 9592
       }
      ],
      "puts": [
@@ -151532,6 +151475,38 @@
      "date": "2026-10-23",
      "calls": [
       {
+       "strike": 515.0,
+       "bid": 74.4,
+       "ask": 78.5,
+       "iv": 51.2,
+       "vol": 2,
+       "oi": 2
+      },
+      {
+       "strike": 520.0,
+       "bid": 68.8,
+       "ask": 73.6,
+       "iv": 58.6,
+       "vol": 2,
+       "oi": 8
+      },
+      {
+       "strike": 540.0,
+       "bid": 49.6,
+       "ask": 53.8,
+       "iv": 46.6,
+       "vol": 19,
+       "oi": 19
+      },
+      {
+       "strike": 545.0,
+       "bid": 44.7,
+       "ask": 48.9,
+       "iv": 43.6,
+       "vol": 1,
+       "oi": 3
+      },
+      {
        "strike": 550.0,
        "bid": 39.9,
        "ask": 44.1,
@@ -151548,28 +151523,12 @@
        "oi": 4
       },
       {
-       "strike": 557.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 560.0,
        "bid": 30.5,
        "ask": 33.8,
        "iv": 33.2,
        "vol": 7,
        "oi": 31
-      },
-      {
-       "strike": 562.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 565.0,
@@ -151580,28 +151539,12 @@
        "oi": 11
       },
       {
-       "strike": 567.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 570.0,
        "bid": 21.8,
        "ask": 25.2,
        "iv": 29.9,
        "vol": 29,
        "oi": 19
-      },
-      {
-       "strike": 572.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 575.0,
@@ -151734,6 +151677,30 @@
      ],
      "puts": [
       {
+       "strike": 525.0,
+       "bid": 0.05,
+       "ask": 0.65,
+       "iv": 34.2,
+       "vol": 26,
+       "oi": 367
+      },
+      {
+       "strike": 530.0,
+       "bid": 0.15,
+       "ask": 0.7,
+       "iv": 32.4,
+       "vol": 97,
+       "oi": 549
+      },
+      {
+       "strike": 535.0,
+       "bid": 0.05,
+       "ask": 0.8,
+       "iv": 30.9,
+       "vol": 9,
+       "oi": 64
+      },
+      {
        "strike": 540.0,
        "bid": 0.05,
        "ask": 0.9,
@@ -151750,28 +151717,12 @@
        "oi": 49
       },
       {
-       "strike": 547.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 550.0,
        "bid": 0.5,
        "ask": 1.25,
        "iv": 26.4,
        "vol": 9,
        "oi": 84
-      },
-      {
-       "strike": 552.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 555.0,
@@ -151788,14 +151739,6 @@
        "iv": 23.9,
        "vol": 231,
        "oi": 33
-      },
-      {
-       "strike": 562.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 565.0,
@@ -153458,6 +153401,30 @@
      "date": "2026-10-12",
      "calls": [
       {
+       "strike": 680.0,
+       "bid": 37.35,
+       "ask": 40.95,
+       "iv": 54.5,
+       "vol": 19,
+       "oi": 27
+      },
+      {
+       "strike": 682.5,
+       "bid": 35.8,
+       "ask": 37.5,
+       "iv": 44.4,
+       "vol": 11,
+       "oi": 5
+      },
+      {
+       "strike": 685.0,
+       "bid": 33.4,
+       "ask": 34.05,
+       "iv": 31.4,
+       "vol": 25,
+       "oi": 33
+      },
+      {
        "strike": 687.5,
        "bid": 31.05,
        "ask": 31.5,
@@ -153474,28 +153441,12 @@
        "oi": 22
       },
       {
-       "strike": 692.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 695.0,
        "bid": 23.6,
        "ask": 24.45,
        "iv": 28.0,
        "vol": 27,
        "oi": 9
-      },
-      {
-       "strike": 697.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 700.0,
@@ -153536,14 +153487,6 @@
        "iv": 22.3,
        "vol": 713,
        "oi": 435
-      },
-      {
-       "strike": 712.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 715.0,
@@ -153868,12 +153811,20 @@
      "date": "2026-10-14",
      "calls": [
       {
-       "strike": 687.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
+       "strike": 682.5,
+       "bid": 35.95,
+       "ask": 39.55,
+       "iv": 45.9,
        "vol": 0,
-       "oi": 0
+       "oi": 2
+      },
+      {
+       "strike": 685.0,
+       "bid": 34.85,
+       "ask": 35.1,
+       "iv": 33.2,
+       "vol": 2,
+       "oi": 2
       },
       {
        "strike": 690.0,
@@ -153882,14 +153833,6 @@
        "iv": 32.4,
        "vol": 2,
        "oi": 9
-      },
-      {
-       "strike": 692.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 695.0,
@@ -154278,6 +154221,22 @@
      "date": "2026-10-16",
      "calls": [
       {
+       "strike": 682.5,
+       "bid": 38.5,
+       "ask": 38.8,
+       "iv": 35.6,
+       "vol": 5,
+       "oi": 93
+      },
+      {
+       "strike": 685.0,
+       "bid": 36.3,
+       "ask": 36.75,
+       "iv": 35.8,
+       "vol": 30,
+       "oi": 1160
+      },
+      {
        "strike": 687.5,
        "bid": 34.2,
        "ask": 34.45,
@@ -154342,28 +154301,12 @@
        "oi": 1432
       },
       {
-       "strike": 707.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 710.0,
        "bid": 17.65,
        "ask": 17.85,
        "iv": 33.1,
        "vol": 1012,
        "oi": 6039
-      },
-      {
-       "strike": 712.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 715.0,
@@ -154374,28 +154317,12 @@
        "oi": 1485
       },
       {
-       "strike": 717.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 720.0,
        "bid": 12.25,
        "ask": 12.35,
        "iv": 32.7,
        "vol": 2961,
        "oi": 5293
-      },
-      {
-       "strike": 722.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 725.0,
@@ -154406,28 +154333,12 @@
        "oi": 3814
       },
       {
-       "strike": 727.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 730.0,
        "bid": 8.1,
        "ask": 8.2,
        "iv": 32.7,
        "vol": 3219,
        "oi": 5553
-      },
-      {
-       "strike": 732.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 735.0,
@@ -154438,28 +154349,12 @@
        "oi": 2861
       },
       {
-       "strike": 737.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 740.0,
        "bid": 5.1,
        "ask": 5.2,
        "iv": 32.8,
        "vol": 3495,
        "oi": 4818
-      },
-      {
-       "strike": 742.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 745.0,
@@ -154470,12 +154365,60 @@
        "oi": 1419
       },
       {
-       "strike": 747.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 750.0,
+       "bid": 3.15,
+       "ask": 3.25,
+       "iv": 33.3,
+       "vol": 5383,
+       "oi": 15780
+      },
+      {
+       "strike": 755.0,
+       "bid": 2.44,
+       "ask": 2.47,
+       "iv": 33.3,
+       "vol": 1706,
+       "oi": 2229
+      },
+      {
+       "strike": 760.0,
+       "bid": 1.89,
+       "ask": 1.93,
+       "iv": 33.6,
+       "vol": 990,
+       "oi": 5489
+      },
+      {
+       "strike": 765.0,
+       "bid": 1.46,
+       "ask": 1.49,
+       "iv": 33.9,
+       "vol": 833,
+       "oi": 9344
+      },
+      {
+       "strike": 770.0,
+       "bid": 1.13,
+       "ask": 1.18,
+       "iv": 34.5,
+       "vol": 1049,
+       "oi": 5359
+      },
+      {
+       "strike": 775.0,
+       "bid": 0.88,
+       "ask": 0.9,
+       "iv": 34.8,
+       "vol": 1152,
+       "oi": 9535
+      },
+      {
+       "strike": 780.0,
+       "bid": 0.65,
+       "ask": 0.72,
+       "iv": 35.4,
+       "vol": 864,
+       "oi": 2915
       }
      ],
      "puts": [
@@ -154694,6 +154637,38 @@
      "date": "2026-10-16",
      "calls": [
       {
+       "strike": 115.0,
+       "bid": 29.55,
+       "ask": 31.95,
+       "iv": 87.1,
+       "vol": 1,
+       "oi": 7
+      },
+      {
+       "strike": 120.0,
+       "bid": 24.65,
+       "ask": 26.95,
+       "iv": 77.3,
+       "vol": 1,
+       "oi": 33
+      },
+      {
+       "strike": 125.0,
+       "bid": 19.6,
+       "ask": 22.15,
+       "iv": 67.7,
+       "vol": 29,
+       "oi": 40
+      },
+      {
+       "strike": 130.0,
+       "bid": 14.9,
+       "ask": 16.2,
+       "iv": 64.6,
+       "vol": 6,
+       "oi": 3302
+      },
+      {
        "strike": 133.0,
        "bid": 11.7,
        "ask": 14.4,
@@ -154702,36 +154677,12 @@
        "oi": 5
       },
       {
-       "strike": 134.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 135.0,
        "bid": 10.45,
        "ask": 11.25,
        "iv": 49.4,
        "vol": 5,
        "oi": 1950
-      },
-      {
-       "strike": 136.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 138.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 139.0,
@@ -154748,14 +154699,6 @@
        "iv": 35.5,
        "vol": 283,
        "oi": 1822
-      },
-      {
-       "strike": 141.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 142.0,
@@ -155938,12 +155881,28 @@
        "oi": 2389
       },
       {
+       "strike": 287.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 290.0,
        "bid": 3.35,
        "ask": 3.5,
        "iv": 57.1,
        "vol": 2815,
        "oi": 7836
+      },
+      {
+       "strike": 292.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 295.0,
@@ -155954,6 +155913,14 @@
        "oi": 1891
       },
       {
+       "strike": 297.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 300.0,
        "bid": 1.67,
        "ask": 1.68,
@@ -155962,44 +155929,20 @@
        "oi": 14911
       },
       {
+       "strike": 302.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 305.0,
        "bid": 1.11,
        "ask": 1.21,
        "iv": 58.6,
        "vol": 514,
        "oi": 1841
-      },
-      {
-       "strike": 310.0,
-       "bid": 0.76,
-       "ask": 0.8,
-       "iv": 59.1,
-       "vol": 540,
-       "oi": 4524
-      },
-      {
-       "strike": 320.0,
-       "bid": 0.36,
-       "ask": 0.4,
-       "iv": 61.2,
-       "vol": 439,
-       "oi": 2330
-      },
-      {
-       "strike": 330.0,
-       "bid": 0.15,
-       "ask": 0.19,
-       "iv": 62.4,
-       "vol": 315,
-       "oi": 13494
-      },
-      {
-       "strike": 340.0,
-       "bid": 0.08,
-       "ask": 0.12,
-       "iv": 66.0,
-       "vol": 1147,
-       "oi": 2695
       }
      ],
      "puts": [
@@ -156140,12 +156083,28 @@
        "oi": 479
       },
       {
+       "strike": 287.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 290.0,
        "bid": 17.4,
        "ask": 18.6,
        "iv": 56.0,
        "vol": 55,
        "oi": 1264
+      },
+      {
+       "strike": 292.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 295.0,
@@ -156156,6 +156115,14 @@
        "oi": 266
       },
       {
+       "strike": 297.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 300.0,
        "bid": 25.8,
        "ask": 27.5,
@@ -156164,44 +156131,20 @@
        "oi": 1461
       },
       {
+       "strike": 302.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 305.0,
        "bid": 30.3,
        "ask": 32.0,
        "iv": 62.2,
        "vol": 2,
        "oi": 77
-      },
-      {
-       "strike": 310.0,
-       "bid": 34.9,
-       "ask": 36.7,
-       "iv": 64.0,
-       "vol": 2,
-       "oi": 151
-      },
-      {
-       "strike": 320.0,
-       "bid": 44.5,
-       "ask": 46.3,
-       "iv": 68.7,
-       "vol": 2,
-       "oi": 93
-      },
-      {
-       "strike": 330.0,
-       "bid": 53.8,
-       "ask": 56.1,
-       "iv": 65.4,
-       "vol": 10,
-       "oi": 94
-      },
-      {
-       "strike": 340.0,
-       "bid": 64.15,
-       "ask": 66.0,
-       "iv": 79.5,
-       "vol": 2,
-       "oi": 30
       }
      ],
      "call_wall": 300.0,
@@ -159728,14 +159671,6 @@
      "date": "2026-10-14",
      "calls": [
       {
-       "strike": 965.0,
-       "bid": 65.85,
-       "ask": 69.1,
-       "iv": 54.0,
-       "vol": 1,
-       "oi": 5
-      },
-      {
        "strike": 970.0,
        "bid": 60.45,
        "ask": 64.55,
@@ -159806,6 +159741,14 @@
        "iv": 41.3,
        "vol": 55,
        "oi": 32
+      },
+      {
+       "strike": 1015.0,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 1020.0,
@@ -160484,12 +160427,28 @@
        "oi": 364
       },
       {
+       "strike": 1057.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 1060.0,
        "bid": 42.05,
        "ask": 43.5,
        "iv": 43.3,
        "vol": 1643,
        "oi": 805
+      },
+      {
+       "strike": 1062.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 1065.0,
@@ -160500,6 +160459,14 @@
        "oi": 561
       },
       {
+       "strike": 1067.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 1070.0,
        "bid": 48.5,
        "ask": 51.85,
@@ -160508,41 +160475,17 @@
        "oi": 1584
       },
       {
-       "strike": 1080.0,
-       "bid": 56.9,
-       "ask": 59.0,
-       "iv": 44.5,
-       "vol": 174,
-       "oi": 1094
-      },
-      {
-       "strike": 1090.0,
-       "bid": 64.1,
-       "ask": 68.3,
-       "iv": 47.5,
-       "vol": 138,
-       "oi": 575
-      },
-      {
-       "strike": 1100.0,
-       "bid": 73.05,
-       "ask": 76.05,
-       "iv": 45.7,
-       "vol": 223,
-       "oi": 4408
-      },
-      {
-       "strike": 1110.0,
-       "bid": 81.9,
-       "ask": 85.9,
-       "iv": 49.3,
-       "vol": 23,
-       "oi": 386
+       "strike": 1072.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       }
      ],
      "call_wall": 1300.0,
      "put_wall": 650.0,
-     "opt_volume": 177004
+     "opt_volume": 177022
     }
    ]
   },
@@ -160553,6 +160496,14 @@
     {
      "date": "2026-10-16",
      "calls": [
+      {
+       "strike": 325.0,
+       "bid": 34.85,
+       "ask": 38.4,
+       "iv": 50.4,
+       "vol": 1,
+       "oi": 6
+      },
       {
        "strike": 330.0,
        "bid": 30.75,
@@ -160576,14 +160527,6 @@
        "iv": 52.0,
        "vol": 5,
        "oi": 14
-      },
-      {
-       "strike": 337.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 340.0,
@@ -160730,14 +160673,6 @@
        "oi": 174
       },
       {
-       "strike": 387.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 390.0,
        "bid": 1.43,
        "ask": 2.25,
@@ -160746,15 +160681,31 @@
        "oi": 214
       },
       {
-       "strike": 392.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 400.0,
+       "bid": 0.74,
+       "ask": 0.9,
+       "iv": 50.3,
+       "vol": 159,
+       "oi": 1520
+      },
+      {
+       "strike": 410.0,
+       "bid": 0.09,
+       "ask": 0.54,
+       "iv": 54.4,
+       "vol": 11,
+       "oi": 271
       }
      ],
      "puts": [
+      {
+       "strike": 327.5,
+       "bid": 0.65,
+       "ask": 1.35,
+       "iv": 51.8,
+       "vol": 63,
+       "oi": 32
+      },
       {
        "strike": 330.0,
        "bid": 0.81,
@@ -160844,14 +160795,6 @@
        "oi": 109
       },
       {
-       "strike": 357.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 360.0,
        "bid": 8.85,
        "ask": 9.95,
@@ -160876,14 +160819,6 @@
        "oi": 5
       },
       {
-       "strike": 367.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 370.0,
        "bid": 13.85,
        "ask": 16.15,
@@ -160906,22 +160841,6 @@
        "iv": 58.9,
        "vol": 1,
        "oi": 5
-      },
-      {
-       "strike": 382.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 385.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 400.0,
@@ -160952,6 +160871,14 @@
        "bid": 77.7,
        "ask": 80.7,
        "iv": 62.5,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 450.0,
+       "bid": 88.2,
+       "ask": 90.7,
+       "iv": 79.8,
        "vol": 1,
        "oi": 0
       }
@@ -161726,12 +161653,12 @@
      "date": "2026-10-16",
      "calls": [
       {
-       "strike": 59.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 58.0,
+       "bid": 10.55,
+       "ask": 14.4,
+       "iv": 86.5,
+       "vol": 3,
+       "oi": 3
       },
       {
        "strike": 60.0,
@@ -162546,20 +162473,20 @@
      "date": "2026-10-30",
      "calls": [
       {
+       "strike": 50.0,
+       "bid": 19.0,
+       "ask": 22.6,
+       "iv": 100.2,
+       "vol": 10,
+       "oi": 32
+      },
+      {
        "strike": 58.0,
        "bid": 11.35,
        "ask": 14.4,
        "iv": 66.9,
        "vol": 1,
        "oi": 31
-      },
-      {
-       "strike": 59.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 60.0,
@@ -165748,36 +165675,12 @@
      "date": "2026-10-14",
      "calls": [
       {
-       "strike": 197.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 200.0,
        "bid": 28.0,
        "ask": 31.1,
        "iv": 66.7,
        "vol": 3,
        "oi": 30
-      },
-      {
-       "strike": 205.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 207.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 210.0,
@@ -165932,20 +165835,20 @@
        "oi": 1819
       },
       {
-       "strike": 257.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 260.0,
        "bid": 0.01,
        "ask": 0.02,
        "iv": 42.2,
        "vol": 68,
        "oi": 2649
+      },
+      {
+       "strike": 265.0,
+       "bid": 0.01,
+       "ask": 0.02,
+       "iv": 47.7,
+       "vol": 2,
+       "oi": 143
       }
      ],
      "puts": [
@@ -166558,12 +166461,28 @@
      "date": "2026-10-16",
      "calls": [
       {
-       "strike": 27.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 20.0,
+       "bid": 13.75,
+       "ask": 15.4,
+       "iv": 336.3,
+       "vol": 5,
+       "oi": 11
+      },
+      {
+       "strike": 22.5,
+       "bid": 11.3,
+       "ask": 12.9,
+       "iv": 278.9,
+       "vol": 1,
+       "oi": 4
+      },
+      {
+       "strike": 25.0,
+       "bid": 9.05,
+       "ask": 9.9,
+       "iv": 160.2,
+       "vol": 1,
+       "oi": 7
       },
       {
        "strike": 28.0,
@@ -166590,28 +166509,12 @@
        "oi": 318
       },
       {
-       "strike": 30.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 31.0,
        "bid": 3.45,
        "ask": 3.9,
        "iv": 70.9,
        "vol": 55,
        "oi": 40
-      },
-      {
-       "strike": 31.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 32.0,
@@ -166760,6 +166663,22 @@
      ],
      "puts": [
       {
+       "strike": 20.0,
+       "bid": 0.0,
+       "ask": 0.01,
+       "iv": 143.8,
+       "vol": 1,
+       "oi": 74
+      },
+      {
+       "strike": 22.5,
+       "bid": 0.0,
+       "ask": 0.02,
+       "iv": 125.0,
+       "vol": 3,
+       "oi": 6711
+      },
+      {
        "strike": 25.0,
        "bid": 0.0,
        "ask": 0.01,
@@ -166792,28 +166711,12 @@
        "oi": 5869
       },
       {
-       "strike": 30.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 31.0,
        "bid": 0.08,
        "ask": 0.23,
        "iv": 65.8,
        "vol": 142,
        "oi": 391
-      },
-      {
-       "strike": 31.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 32.0,
@@ -166968,14 +166871,6 @@
      "date": "2026-10-23",
      "calls": [
       {
-       "strike": 27.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 29.0,
        "bid": 5.2,
        "ask": 6.2,
@@ -166992,28 +166887,12 @@
        "oi": 86
       },
       {
-       "strike": 30.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 31.0,
        "bid": 3.95,
        "ask": 4.3,
        "iv": 64.7,
        "vol": 4,
        "oi": 22
-      },
-      {
-       "strike": 31.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 32.0,
@@ -167024,28 +166903,12 @@
        "oi": 13
       },
       {
-       "strike": 32.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 33.0,
        "bid": 2.43,
        "ask": 2.82,
        "iv": 61.9,
        "vol": 40,
        "oi": 290
-      },
-      {
-       "strike": 33.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 34.0,
@@ -167056,28 +166919,12 @@
        "oi": 131
       },
       {
-       "strike": 34.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 35.0,
        "bid": 1.38,
        "ask": 1.5,
        "iv": 58.3,
        "vol": 85,
        "oi": 192
-      },
-      {
-       "strike": 35.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 36.0,
@@ -167088,28 +166935,12 @@
        "oi": 227
       },
       {
-       "strike": 36.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 37.0,
        "bid": 0.7,
        "ask": 0.82,
        "iv": 59.4,
        "vol": 15,
        "oi": 401
-      },
-      {
-       "strike": 37.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 38.0,
@@ -167120,28 +166951,12 @@
        "oi": 223
       },
       {
-       "strike": 38.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 39.0,
        "bid": 0.36,
        "ask": 0.55,
        "iv": 65.0,
        "vol": 33,
        "oi": 250
-      },
-      {
-       "strike": 39.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 40.0,
@@ -167152,15 +166967,87 @@
        "oi": 593
       },
       {
-       "strike": 40.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 41.0,
+       "bid": 0.19,
+       "ask": 0.33,
+       "iv": 68.6,
+       "vol": 34,
+       "oi": 211
+      },
+      {
+       "strike": 42.0,
+       "bid": 0.15,
+       "ask": 0.27,
+       "iv": 71.3,
+       "vol": 19,
+       "oi": 211
+      },
+      {
+       "strike": 43.0,
+       "bid": 0.06,
+       "ask": 0.22,
+       "iv": 70.7,
+       "vol": 19,
+       "oi": 158
+      },
+      {
+       "strike": 44.0,
+       "bid": 0.09,
+       "ask": 0.11,
+       "iv": 71.5,
+       "vol": 14,
+       "oi": 182
+      },
+      {
+       "strike": 45.0,
+       "bid": 0.01,
+       "ask": 0.13,
+       "iv": 71.9,
+       "vol": 151,
+       "oi": 1502
+      },
+      {
+       "strike": 46.0,
+       "bid": 0.03,
+       "ask": 0.25,
+       "iv": 87.1,
+       "vol": 3,
+       "oi": 59
+      },
+      {
+       "strike": 47.0,
+       "bid": 0.0,
+       "ask": 0.26,
+       "iv": 91.0,
+       "vol": 1,
+       "oi": 100
       }
      ],
      "puts": [
+      {
+       "strike": 24.0,
+       "bid": 0.0,
+       "ask": 0.44,
+       "iv": 127.3,
+       "vol": 2,
+       "oi": 1
+      },
+      {
+       "strike": 25.0,
+       "bid": 0.0,
+       "ask": 0.17,
+       "iv": 94.9,
+       "vol": 1,
+       "oi": 126
+      },
+      {
+       "strike": 26.0,
+       "bid": 0.0,
+       "ask": 0.26,
+       "iv": 92.8,
+       "vol": 5,
+       "oi": 25
+      },
       {
        "strike": 27.0,
        "bid": 0.0,
@@ -167194,28 +167081,12 @@
        "oi": 247
       },
       {
-       "strike": 30.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 31.0,
        "bid": 0.32,
        "ask": 0.4,
        "iv": 60.8,
        "vol": 5,
        "oi": 120
-      },
-      {
-       "strike": 31.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 32.0,
@@ -167226,28 +167097,12 @@
        "oi": 170
       },
       {
-       "strike": 32.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 33.0,
        "bid": 0.73,
        "ask": 1.02,
        "iv": 59.9,
        "vol": 59,
        "oi": 315
-      },
-      {
-       "strike": 33.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 34.0,
@@ -167258,28 +167113,12 @@
        "oi": 303
       },
       {
-       "strike": 34.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 35.0,
        "bid": 1.72,
        "ask": 1.92,
        "iv": 61.2,
        "vol": 30,
        "oi": 263
-      },
-      {
-       "strike": 35.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 36.0,
@@ -167290,28 +167129,12 @@
        "oi": 149
       },
       {
-       "strike": 36.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 37.0,
        "bid": 3.0,
        "ask": 3.35,
        "iv": 64.2,
        "vol": 15,
        "oi": 244
-      },
-      {
-       "strike": 37.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 38.0,
@@ -167322,28 +167145,12 @@
        "oi": 271
       },
       {
-       "strike": 38.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 39.0,
        "bid": 4.6,
        "ask": 5.2,
        "iv": 72.4,
        "vol": 40,
        "oi": 88
-      },
-      {
-       "strike": 39.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 40.0,
@@ -167354,12 +167161,60 @@
        "oi": 1099
       },
       {
-       "strike": 40.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 41.0,
+       "bid": 6.4,
+       "ask": 7.0,
+       "iv": 77.9,
+       "vol": 24,
+       "oi": 154
+      },
+      {
+       "strike": 42.0,
+       "bid": 7.2,
+       "ask": 8.1,
+       "iv": 81.9,
+       "vol": 6,
+       "oi": 82
+      },
+      {
+       "strike": 43.0,
+       "bid": 8.05,
+       "ask": 9.1,
+       "iv": 83.1,
+       "vol": 5,
+       "oi": 93
+      },
+      {
+       "strike": 44.0,
+       "bid": 9.15,
+       "ask": 10.05,
+       "iv": 91.4,
+       "vol": 10,
+       "oi": 39
+      },
+      {
+       "strike": 45.0,
+       "bid": 10.15,
+       "ask": 11.4,
+       "iv": 110.4,
+       "vol": 16,
+       "oi": 27
+      },
+      {
+       "strike": 46.0,
+       "bid": 10.65,
+       "ask": 12.0,
+       "iv": 65.6,
+       "vol": 37,
+       "oi": 16
+      },
+      {
+       "strike": 47.0,
+       "bid": 12.1,
+       "ask": 13.0,
+       "iv": 104.5,
+       "vol": 32,
+       "oi": 81
       }
      ],
      "call_wall": 48.0,
@@ -167376,22 +167231,6 @@
        "iv": 92.4,
        "vol": 1,
        "oi": 3
-      },
-      {
-       "strike": 28.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 29.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 30.0,
@@ -169364,7 +169203,7 @@
        "bid": 156.65,
        "ask": 164.6,
        "iv": 432.6,
-       "vol": 3,
+       "vol": 0,
        "oi": 3
       },
       {
@@ -169386,7 +169225,7 @@
      ],
      "call_wall": 450.0,
      "put_wall": 320.0,
-     "opt_volume": 11085
+     "opt_volume": 11082
     },
     {
      "date": "2026-10-23",
@@ -170732,14 +170571,6 @@
        "oi": 40
       },
       {
-       "strike": 33.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 34.0,
        "bid": 0.0,
        "ask": 0.02,
@@ -170757,22 +170588,6 @@
       }
      ],
      "puts": [
-      {
-       "strike": 15.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 20.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
       {
        "strike": 23.5,
        "bid": 0.0,
@@ -171278,6 +171093,14 @@
      "date": "2026-10-16",
      "calls": [
       {
+       "strike": 177.5,
+       "bid": 31.55,
+       "ask": 32.15,
+       "iv": 67.9,
+       "vol": 31,
+       "oi": 806
+      },
+      {
        "strike": 180.0,
        "bid": 29.05,
        "ask": 29.45,
@@ -171350,14 +171173,6 @@
        "oi": 16883
       },
       {
-       "strike": 202.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 205.0,
        "bid": 7.1,
        "ask": 7.25,
@@ -171422,28 +171237,12 @@
        "oi": 5059
       },
       {
-       "strike": 235.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 240.0,
        "bid": 0.13,
        "ask": 0.15,
        "iv": 50.4,
        "vol": 850,
        "oi": 3149
-      },
-      {
-       "strike": 245.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 250.0,
@@ -171476,9 +171275,33 @@
        "iv": 67.2,
        "vol": 424,
        "oi": 2089
+      },
+      {
+       "strike": 290.0,
+       "bid": 0.0,
+       "ask": 0.01,
+       "iv": 75.0,
+       "vol": 9,
+       "oi": 119
+      },
+      {
+       "strike": 300.0,
+       "bid": 0.0,
+       "ask": 0.02,
+       "iv": 85.9,
+       "vol": 2,
+       "oi": 478
       }
      ],
      "puts": [
+      {
+       "strike": 177.5,
+       "bid": 0.12,
+       "ask": 0.25,
+       "iv": 62.3,
+       "vol": 629,
+       "oi": 1933
+      },
       {
        "strike": 180.0,
        "bid": 0.14,
@@ -171552,14 +171375,6 @@
        "oi": 1927
       },
       {
-       "strike": 202.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 205.0,
        "bid": 2.9,
        "ask": 3.05,
@@ -171624,28 +171439,12 @@
        "oi": 20
       },
       {
-       "strike": 235.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 240.0,
        "bid": 30.7,
        "ask": 31.3,
        "iv": 59.3,
        "vol": 13,
        "oi": 6
-      },
-      {
-       "strike": 245.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 250.0,
@@ -171677,6 +171476,22 @@
        "ask": 71.2,
        "iv": 102.6,
        "vol": 14,
+       "oi": 0
+      },
+      {
+       "strike": 290.0,
+       "bid": 80.8,
+       "ask": 81.2,
+       "iv": 92.2,
+       "vol": 12,
+       "oi": 1
+      },
+      {
+       "strike": 300.0,
+       "bid": 90.6,
+       "ask": 91.2,
+       "iv": 122.4,
+       "vol": 5,
        "oi": 0
       }
      ],
@@ -172484,20 +172299,20 @@
        "oi": 0
       },
       {
-       "strike": 265.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 275.0,
        "bid": 64.85,
        "ask": 67.05,
        "iv": 73.7,
        "vol": 11,
        "oi": 0
+      },
+      {
+       "strike": 280.0,
+       "bid": 69.8,
+       "ask": 72.85,
+       "iv": 63.2,
+       "vol": 2,
+       "oi": 1
       }
      ],
      "call_wall": 240.0,
@@ -172884,12 +172699,28 @@
        "oi": 22
       },
       {
+       "strike": 187.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 190.0,
        "bid": 11.0,
        "ask": 13.5,
        "iv": 42.0,
        "vol": 7,
        "oi": 49
+      },
+      {
+       "strike": 192.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 195.0,
@@ -172900,12 +172731,28 @@
        "oi": 230
       },
       {
+       "strike": 197.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 200.0,
        "bid": 5.4,
        "ask": 6.5,
        "iv": 37.6,
        "vol": 37,
        "oi": 343
+      },
+      {
+       "strike": 202.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 205.0,
@@ -172990,12 +172837,28 @@
        "oi": 45
       },
       {
+       "strike": 177.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 180.0,
        "bid": 0.3,
        "ask": 0.85,
        "iv": 45.4,
        "vol": 7,
        "oi": 188
+      },
+      {
+       "strike": 182.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 185.0,
@@ -173006,12 +172869,28 @@
        "oi": 107
       },
       {
+       "strike": 187.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 190.0,
        "bid": 0.95,
        "ask": 2.2,
        "iv": 41.1,
        "vol": 33,
        "oi": 362
+      },
+      {
+       "strike": 192.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 195.0,
@@ -173206,14 +173085,6 @@
        "iv": 36.2,
        "vol": 18,
        "oi": 1
-      },
-      {
-       "strike": 200.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 205.0,
@@ -173442,10 +173313,10 @@
       {
        "strike": 3.0,
        "bid": 0.0,
-       "ask": 0.0,
-       "iv": 50.0,
+       "ask": 0.64,
+       "iv": 864.1,
        "vol": 0,
-       "oi": 0
+       "oi": 60
       },
       {
        "strike": 5.0,
@@ -175198,28 +175069,12 @@
        "oi": 4
       },
       {
-       "strike": 157.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 160.0,
        "bid": 13.55,
        "ask": 14.6,
        "iv": 56.2,
        "vol": 36,
        "oi": 35
-      },
-      {
-       "strike": 162.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 165.0,
@@ -175968,6 +175823,46 @@
      "date": "2026-10-23",
      "calls": [
       {
+       "strike": 30.0,
+       "bid": 11.5,
+       "ask": 12.35,
+       "iv": 89.8,
+       "vol": 5,
+       "oi": 36
+      },
+      {
+       "strike": 31.0,
+       "bid": 10.05,
+       "ask": 11.65,
+       "iv": 147.3,
+       "vol": 3,
+       "oi": 41
+      },
+      {
+       "strike": 32.0,
+       "bid": 9.55,
+       "ask": 10.3,
+       "iv": 74.6,
+       "vol": 205,
+       "oi": 215
+      },
+      {
+       "strike": 33.0,
+       "bid": 8.1,
+       "ask": 9.7,
+       "iv": 62.5,
+       "vol": 2,
+       "oi": 32
+      },
+      {
+       "strike": 34.0,
+       "bid": 7.6,
+       "ask": 8.7,
+       "iv": 83.2,
+       "vol": 25,
+       "oi": 116
+      },
+      {
        "strike": 35.0,
        "bid": 6.75,
        "ask": 7.65,
@@ -175992,28 +175887,12 @@
        "oi": 88
       },
       {
-       "strike": 37.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 38.0,
        "bid": 4.35,
        "ask": 4.7,
        "iv": 65.6,
        "vol": 149,
        "oi": 181
-      },
-      {
-       "strike": 38.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 39.0,
@@ -176024,28 +175903,12 @@
        "oi": 298
       },
       {
-       "strike": 39.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 40.0,
        "bid": 2.97,
        "ask": 3.35,
        "iv": 65.8,
        "vol": 170,
        "oi": 1403
-      },
-      {
-       "strike": 40.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 41.0,
@@ -176056,28 +175919,12 @@
        "oi": 1400
       },
       {
-       "strike": 41.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 42.0,
        "bid": 1.98,
        "ask": 2.1,
        "iv": 64.5,
        "vol": 572,
        "oi": 1816
-      },
-      {
-       "strike": 42.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 43.0,
@@ -176088,28 +175935,12 @@
        "oi": 1352
       },
       {
-       "strike": 43.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 44.0,
        "bid": 1.16,
        "ask": 1.3,
        "iv": 63.7,
        "vol": 257,
        "oi": 1954
-      },
-      {
-       "strike": 44.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 45.0,
@@ -176120,28 +175951,12 @@
        "oi": 2053
       },
       {
-       "strike": 45.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 46.0,
        "bid": 0.68,
        "ask": 0.86,
        "iv": 66.1,
        "vol": 564,
        "oi": 1752
-      },
-      {
-       "strike": 46.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 47.0,
@@ -176152,23 +175967,103 @@
        "oi": 1225
       },
       {
-       "strike": 47.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 48.0,
        "bid": 0.35,
        "ask": 0.53,
        "iv": 66.5,
        "vol": 88,
        "oi": 1215
+      },
+      {
+       "strike": 49.0,
+       "bid": 0.3,
+       "ask": 0.4,
+       "iv": 68.1,
+       "vol": 314,
+       "oi": 785
+      },
+      {
+       "strike": 50.0,
+       "bid": 0.23,
+       "ask": 0.33,
+       "iv": 69.5,
+       "vol": 336,
+       "oi": 3267
+      },
+      {
+       "strike": 51.0,
+       "bid": 0.17,
+       "ask": 0.22,
+       "iv": 68.8,
+       "vol": 14,
+       "oi": 133
+      },
+      {
+       "strike": 52.0,
+       "bid": 0.12,
+       "ask": 0.17,
+       "iv": 69.1,
+       "vol": 60,
+       "oi": 348
+      },
+      {
+       "strike": 55.0,
+       "bid": 0.07,
+       "ask": 0.1,
+       "iv": 74.8,
+       "vol": 370,
+       "oi": 2207
+      },
+      {
+       "strike": 60.0,
+       "bid": 0.02,
+       "ask": 0.06,
+       "iv": 83.6,
+       "vol": 1,
+       "oi": 1090
       }
      ],
      "puts": [
+      {
+       "strike": 30.0,
+       "bid": 0.01,
+       "ask": 0.05,
+       "iv": 78.9,
+       "vol": 6,
+       "oi": 735
+      },
+      {
+       "strike": 31.0,
+       "bid": 0.02,
+       "ask": 0.05,
+       "iv": 73.4,
+       "vol": 5,
+       "oi": 2728
+      },
+      {
+       "strike": 32.0,
+       "bid": 0.04,
+       "ask": 0.07,
+       "iv": 71.9,
+       "vol": 13,
+       "oi": 1278
+      },
+      {
+       "strike": 33.0,
+       "bid": 0.07,
+       "ask": 0.12,
+       "iv": 71.5,
+       "vol": 8,
+       "oi": 578
+      },
+      {
+       "strike": 34.0,
+       "bid": 0.06,
+       "ask": 0.18,
+       "iv": 67.2,
+       "vol": 56,
+       "oi": 526
+      },
       {
        "strike": 35.0,
        "bid": 0.12,
@@ -176194,28 +176089,12 @@
        "oi": 1695
       },
       {
-       "strike": 37.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 38.0,
        "bid": 0.57,
        "ask": 0.66,
        "iv": 63.3,
        "vol": 174,
        "oi": 1014
-      },
-      {
-       "strike": 38.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 39.0,
@@ -176226,28 +176105,12 @@
        "oi": 1404
       },
       {
-       "strike": 39.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 40.0,
        "bid": 1.1,
        "ask": 1.27,
        "iv": 61.8,
        "vol": 294,
        "oi": 1974
-      },
-      {
-       "strike": 40.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 41.0,
@@ -176258,28 +176121,12 @@
        "oi": 2504
       },
       {
-       "strike": 41.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 42.0,
        "bid": 2.06,
        "ask": 2.26,
        "iv": 63.8,
        "vol": 190,
        "oi": 1276
-      },
-      {
-       "strike": 42.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 43.0,
@@ -176290,28 +176137,12 @@
        "oi": 1828
       },
       {
-       "strike": 43.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 44.0,
        "bid": 3.25,
        "ask": 3.65,
        "iv": 66.1,
        "vol": 72,
        "oi": 401
-      },
-      {
-       "strike": 44.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 45.0,
@@ -176322,28 +176153,12 @@
        "oi": 1240
       },
       {
-       "strike": 45.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 46.0,
        "bid": 4.55,
        "ask": 5.35,
        "iv": 67.4,
        "vol": 2,
        "oi": 107
-      },
-      {
-       "strike": 46.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 47.0,
@@ -176354,20 +176169,60 @@
        "oi": 143
       },
       {
-       "strike": 47.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 48.0,
        "bid": 6.35,
        "ask": 7.15,
        "iv": 74.3,
        "vol": 142,
        "oi": 21
+      },
+      {
+       "strike": 49.0,
+       "bid": 7.25,
+       "ask": 7.85,
+       "iv": 71.1,
+       "vol": 1,
+       "oi": 41
+      },
+      {
+       "strike": 50.0,
+       "bid": 7.7,
+       "ask": 9.15,
+       "iv": 69.5,
+       "vol": 20,
+       "oi": 68
+      },
+      {
+       "strike": 51.0,
+       "bid": 8.55,
+       "ask": 10.0,
+       "iv": 62.9,
+       "vol": 8,
+       "oi": 3
+      },
+      {
+       "strike": 60.0,
+       "bid": 17.5,
+       "ask": 18.95,
+       "iv": 92.6,
+       "vol": 14,
+       "oi": 7
+      },
+      {
+       "strike": 65.0,
+       "bid": 22.4,
+       "ask": 24.05,
+       "iv": 109.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 70.0,
+       "bid": 27.25,
+       "ask": 29.15,
+       "iv": 117.6,
+       "vol": 20,
+       "oi": 0
       }
      ],
      "call_wall": 50.0,
@@ -176791,392 +176646,6 @@
    "avg_volume": 95765250,
    "expiries": [
     {
-     "date": "2026-10-12",
-     "calls": [],
-     "puts": [
-      {
-       "strike": 125.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 130.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 135.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 140.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 145.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 148.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 149.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 150.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 152.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 155.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 157.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 160.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 162.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 165.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 167.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 170.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 172.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 175.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 177.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 180.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 182.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 185.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 187.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 190.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 192.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      }
-     ],
-     "call_wall": null,
-     "put_wall": null,
-     "opt_volume": 0
-    },
-    {
-     "date": "2026-10-14",
-     "calls": [],
-     "puts": [
-      {
-       "strike": 115.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 120.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 125.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 130.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 135.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 140.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 145.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 150.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 152.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 155.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 157.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 160.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 162.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 165.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 167.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 170.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 172.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 175.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 180.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 185.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 195.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      }
-     ],
-     "call_wall": null,
-     "put_wall": null,
-     "opt_volume": 0
-    },
-    {
      "date": "2026-10-16",
      "calls": [
       {
@@ -177585,6 +177054,826 @@
      "call_wall": 170.0,
      "put_wall": 100.0,
      "opt_volume": 207765
+    },
+    {
+     "date": "2026-10-23",
+     "calls": [
+      {
+       "strike": 143.0,
+       "bid": 19.15,
+       "ask": 21.45,
+       "iv": 51.2,
+       "vol": 3,
+       "oi": 65
+      },
+      {
+       "strike": 144.0,
+       "bid": 17.95,
+       "ask": 20.6,
+       "iv": 68.3,
+       "vol": 70,
+       "oi": 93
+      },
+      {
+       "strike": 145.0,
+       "bid": 17.4,
+       "ask": 19.45,
+       "iv": 63.9,
+       "vol": 20,
+       "oi": 580
+      },
+      {
+       "strike": 146.0,
+       "bid": 16.1,
+       "ask": 18.45,
+       "iv": 61.4,
+       "vol": 15,
+       "oi": 214
+      },
+      {
+       "strike": 147.0,
+       "bid": 14.8,
+       "ask": 17.55,
+       "iv": 60.1,
+       "vol": 16,
+       "oi": 151
+      },
+      {
+       "strike": 148.0,
+       "bid": 14.75,
+       "ask": 16.55,
+       "iv": 57.5,
+       "vol": 13,
+       "oi": 469
+      },
+      {
+       "strike": 149.0,
+       "bid": 12.45,
+       "ask": 17.1,
+       "iv": 71.4,
+       "vol": 1,
+       "oi": 286
+      },
+      {
+       "strike": 150.0,
+       "bid": 13.55,
+       "ask": 14.25,
+       "iv": 49.0,
+       "vol": 170,
+       "oi": 3286
+      },
+      {
+       "strike": 152.5,
+       "bid": 11.45,
+       "ask": 12.45,
+       "iv": 50.0,
+       "vol": 53,
+       "oi": 804
+      },
+      {
+       "strike": 155.0,
+       "bid": 10.0,
+       "ask": 10.25,
+       "iv": 45.8,
+       "vol": 212,
+       "oi": 2406
+      },
+      {
+       "strike": 157.5,
+       "bid": 8.1,
+       "ask": 9.15,
+       "iv": 50.3,
+       "vol": 247,
+       "oi": 1215
+      },
+      {
+       "strike": 160.0,
+       "bid": 6.8,
+       "ask": 7.0,
+       "iv": 44.6,
+       "vol": 849,
+       "oi": 1884
+      },
+      {
+       "strike": 162.5,
+       "bid": 5.55,
+       "ask": 5.7,
+       "iv": 44.6,
+       "vol": 2130,
+       "oi": 1069
+      },
+      {
+       "strike": 165.0,
+       "bid": 4.4,
+       "ask": 4.55,
+       "iv": 44.4,
+       "vol": 1506,
+       "oi": 1615
+      },
+      {
+       "strike": 167.5,
+       "bid": 3.45,
+       "ask": 3.6,
+       "iv": 44.5,
+       "vol": 1606,
+       "oi": 1131
+      },
+      {
+       "strike": 170.0,
+       "bid": 2.73,
+       "ask": 2.82,
+       "iv": 44.6,
+       "vol": 2011,
+       "oi": 2345
+      },
+      {
+       "strike": 172.5,
+       "bid": 2.06,
+       "ask": 2.21,
+       "iv": 45.0,
+       "vol": 205,
+       "oi": 1144
+      },
+      {
+       "strike": 175.0,
+       "bid": 1.65,
+       "ask": 1.69,
+       "iv": 45.2,
+       "vol": 1884,
+       "oi": 4150
+      },
+      {
+       "strike": 180.0,
+       "bid": 0.95,
+       "ask": 1.01,
+       "iv": 46.2,
+       "vol": 966,
+       "oi": 2265
+      },
+      {
+       "strike": 185.0,
+       "bid": 0.58,
+       "ask": 0.61,
+       "iv": 47.6,
+       "vol": 282,
+       "oi": 1375
+      },
+      {
+       "strike": 190.0,
+       "bid": 0.36,
+       "ask": 0.39,
+       "iv": 49.6,
+       "vol": 96,
+       "oi": 1109
+      },
+      {
+       "strike": 195.0,
+       "bid": 0.22,
+       "ask": 0.26,
+       "iv": 51.0,
+       "vol": 99,
+       "oi": 700
+      },
+      {
+       "strike": 200.0,
+       "bid": 0.16,
+       "ask": 0.18,
+       "iv": 53.5,
+       "vol": 206,
+       "oi": 1626
+      },
+      {
+       "strike": 205.0,
+       "bid": 0.11,
+       "ask": 0.14,
+       "iv": 56.1,
+       "vol": 67,
+       "oi": 1434
+      },
+      {
+       "strike": 210.0,
+       "bid": 0.09,
+       "ask": 0.11,
+       "iv": 59.0,
+       "vol": 41,
+       "oi": 1434
+      }
+     ],
+     "puts": [
+      {
+       "strike": 143.0,
+       "bid": 0.5,
+       "ask": 0.54,
+       "iv": 47.4,
+       "vol": 67,
+       "oi": 375
+      },
+      {
+       "strike": 144.0,
+       "bid": 0.57,
+       "ask": 0.6,
+       "iv": 46.7,
+       "vol": 74,
+       "oi": 303
+      },
+      {
+       "strike": 145.0,
+       "bid": 0.65,
+       "ask": 0.68,
+       "iv": 46.2,
+       "vol": 367,
+       "oi": 1327
+      },
+      {
+       "strike": 146.0,
+       "bid": 0.73,
+       "ask": 0.78,
+       "iv": 45.9,
+       "vol": 231,
+       "oi": 320
+      },
+      {
+       "strike": 147.0,
+       "bid": 0.84,
+       "ask": 0.89,
+       "iv": 45.5,
+       "vol": 160,
+       "oi": 459
+      },
+      {
+       "strike": 148.0,
+       "bid": 0.96,
+       "ask": 1.02,
+       "iv": 45.2,
+       "vol": 178,
+       "oi": 342
+      },
+      {
+       "strike": 149.0,
+       "bid": 1.09,
+       "ask": 1.15,
+       "iv": 44.8,
+       "vol": 226,
+       "oi": 530
+      },
+      {
+       "strike": 150.0,
+       "bid": 1.25,
+       "ask": 1.38,
+       "iv": 45.4,
+       "vol": 963,
+       "oi": 1540
+      },
+      {
+       "strike": 152.5,
+       "bid": 1.71,
+       "ask": 1.78,
+       "iv": 43.8,
+       "vol": 226,
+       "oi": 1142
+      },
+      {
+       "strike": 155.0,
+       "bid": 2.33,
+       "ask": 2.43,
+       "iv": 43.5,
+       "vol": 469,
+       "oi": 3490
+      },
+      {
+       "strike": 157.5,
+       "bid": 3.1,
+       "ask": 3.25,
+       "iv": 43.3,
+       "vol": 218,
+       "oi": 920
+      },
+      {
+       "strike": 160.0,
+       "bid": 4.1,
+       "ask": 4.25,
+       "iv": 43.2,
+       "vol": 502,
+       "oi": 1927
+      },
+      {
+       "strike": 162.5,
+       "bid": 5.25,
+       "ask": 5.45,
+       "iv": 43.2,
+       "vol": 528,
+       "oi": 532
+      },
+      {
+       "strike": 165.0,
+       "bid": 6.6,
+       "ask": 6.8,
+       "iv": 43.0,
+       "vol": 428,
+       "oi": 1764
+      },
+      {
+       "strike": 167.5,
+       "bid": 8.2,
+       "ask": 8.55,
+       "iv": 44.6,
+       "vol": 363,
+       "oi": 929
+      },
+      {
+       "strike": 170.0,
+       "bid": 9.7,
+       "ask": 10.85,
+       "iv": 49.8,
+       "vol": 356,
+       "oi": 617
+      },
+      {
+       "strike": 172.5,
+       "bid": 11.25,
+       "ask": 13.15,
+       "iv": 54.3,
+       "vol": 51,
+       "oi": 270
+      },
+      {
+       "strike": 175.0,
+       "bid": 12.85,
+       "ask": 15.05,
+       "iv": 54.6,
+       "vol": 35,
+       "oi": 362
+      },
+      {
+       "strike": 180.0,
+       "bid": 16.9,
+       "ask": 19.6,
+       "iv": 60.3,
+       "vol": 11,
+       "oi": 86
+      },
+      {
+       "strike": 185.0,
+       "bid": 20.55,
+       "ask": 25.6,
+       "iv": 80.5,
+       "vol": 2,
+       "oi": 27
+      },
+      {
+       "strike": 190.0,
+       "bid": 25.35,
+       "ask": 30.4,
+       "iv": 51.0,
+       "vol": 5,
+       "oi": 6
+      },
+      {
+       "strike": 195.0,
+       "bid": 30.25,
+       "ask": 35.3,
+       "iv": 54.6,
+       "vol": 20,
+       "oi": 20
+      },
+      {
+       "strike": 200.0,
+       "bid": 36.8,
+       "ask": 40.25,
+       "iv": 77.8,
+       "vol": 1,
+       "oi": 3
+      },
+      {
+       "strike": 205.0,
+       "bid": 41.75,
+       "ask": 45.2,
+       "iv": 83.4,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 220.0,
+       "bid": 55.1,
+       "ask": 60.15,
+       "iv": 74.7,
+       "vol": 1,
+       "oi": 1
+      }
+     ],
+     "call_wall": 175.0,
+     "put_wall": 140.0,
+     "opt_volume": 22887
+    },
+    {
+     "date": "2026-10-30",
+     "calls": [
+      {
+       "strike": 143.0,
+       "bid": 19.25,
+       "ask": 22.5,
+       "iv": 66.8,
+       "vol": 8,
+       "oi": 25
+      },
+      {
+       "strike": 144.0,
+       "bid": 17.4,
+       "ask": 22.35,
+       "iv": 72.2,
+       "vol": 6,
+       "oi": 37
+      },
+      {
+       "strike": 145.0,
+       "bid": 17.65,
+       "ask": 20.15,
+       "iv": 59.1,
+       "vol": 21,
+       "oi": 250
+      },
+      {
+       "strike": 146.0,
+       "bid": 15.85,
+       "ask": 20.6,
+       "iv": 69.6,
+       "vol": 9,
+       "oi": 129
+      },
+      {
+       "strike": 147.0,
+       "bid": 15.15,
+       "ask": 19.65,
+       "iv": 67.6,
+       "vol": 1,
+       "oi": 288
+      },
+      {
+       "strike": 148.0,
+       "bid": 15.9,
+       "ask": 17.8,
+       "iv": 58.2,
+       "vol": 1,
+       "oi": 291
+      },
+      {
+       "strike": 149.0,
+       "bid": 14.9,
+       "ask": 16.8,
+       "iv": 55.8,
+       "vol": 12,
+       "oi": 191
+      },
+      {
+       "strike": 150.0,
+       "bid": 14.8,
+       "ask": 15.25,
+       "iv": 48.9,
+       "vol": 138,
+       "oi": 1064
+      },
+      {
+       "strike": 152.5,
+       "bid": 12.7,
+       "ask": 13.85,
+       "iv": 51.8,
+       "vol": 27,
+       "oi": 876
+      },
+      {
+       "strike": 155.0,
+       "bid": 11.05,
+       "ask": 11.9,
+       "iv": 49.5,
+       "vol": 121,
+       "oi": 1662
+      },
+      {
+       "strike": 157.5,
+       "bid": 9.55,
+       "ask": 10.0,
+       "iv": 46.9,
+       "vol": 298,
+       "oi": 2426
+      },
+      {
+       "strike": 160.0,
+       "bid": 8.35,
+       "ask": 8.55,
+       "iv": 46.6,
+       "vol": 1534,
+       "oi": 3404
+      },
+      {
+       "strike": 162.5,
+       "bid": 7.0,
+       "ask": 7.25,
+       "iv": 46.4,
+       "vol": 1389,
+       "oi": 621
+      },
+      {
+       "strike": 165.0,
+       "bid": 5.9,
+       "ask": 6.05,
+       "iv": 46.0,
+       "vol": 1814,
+       "oi": 2215
+      },
+      {
+       "strike": 167.5,
+       "bid": 4.65,
+       "ask": 5.1,
+       "iv": 46.3,
+       "vol": 1053,
+       "oi": 1078
+      },
+      {
+       "strike": 170.0,
+       "bid": 4.1,
+       "ask": 4.2,
+       "iv": 46.0,
+       "vol": 1652,
+       "oi": 4748
+      },
+      {
+       "strike": 172.5,
+       "bid": 3.3,
+       "ask": 3.45,
+       "iv": 46.0,
+       "vol": 1251,
+       "oi": 14334
+      },
+      {
+       "strike": 175.0,
+       "bid": 2.74,
+       "ask": 2.86,
+       "iv": 46.4,
+       "vol": 892,
+       "oi": 3912
+      },
+      {
+       "strike": 180.0,
+       "bid": 1.83,
+       "ask": 1.89,
+       "iv": 46.7,
+       "vol": 800,
+       "oi": 6449
+      },
+      {
+       "strike": 185.0,
+       "bid": 1.21,
+       "ask": 1.28,
+       "iv": 47.7,
+       "vol": 405,
+       "oi": 2178
+      },
+      {
+       "strike": 190.0,
+       "bid": 0.83,
+       "ask": 0.86,
+       "iv": 48.6,
+       "vol": 1788,
+       "oi": 30569
+      },
+      {
+       "strike": 195.0,
+       "bid": 0.56,
+       "ask": 0.61,
+       "iv": 50.1,
+       "vol": 109,
+       "oi": 1093
+      },
+      {
+       "strike": 200.0,
+       "bid": 0.41,
+       "ask": 0.43,
+       "iv": 51.3,
+       "vol": 862,
+       "oi": 4226
+      },
+      {
+       "strike": 205.0,
+       "bid": 0.29,
+       "ask": 0.32,
+       "iv": 52.8,
+       "vol": 346,
+       "oi": 1385
+      },
+      {
+       "strike": 210.0,
+       "bid": 0.21,
+       "ask": 0.25,
+       "iv": 54.5,
+       "vol": 59,
+       "oi": 2383
+      }
+     ],
+     "puts": [
+      {
+       "strike": 143.0,
+       "bid": 0.86,
+       "ask": 1.29,
+       "iv": 49.5,
+       "vol": 61,
+       "oi": 631
+      },
+      {
+       "strike": 144.0,
+       "bid": 1.17,
+       "ask": 1.23,
+       "iv": 46.9,
+       "vol": 23,
+       "oi": 494
+      },
+      {
+       "strike": 145.0,
+       "bid": 1.31,
+       "ask": 1.34,
+       "iv": 46.3,
+       "vol": 2565,
+       "oi": 4253
+      },
+      {
+       "strike": 146.0,
+       "bid": 1.44,
+       "ask": 1.51,
+       "iv": 46.3,
+       "vol": 54,
+       "oi": 746
+      },
+      {
+       "strike": 147.0,
+       "bid": 1.6,
+       "ask": 1.67,
+       "iv": 46.0,
+       "vol": 65,
+       "oi": 804
+      },
+      {
+       "strike": 148.0,
+       "bid": 1.78,
+       "ask": 1.86,
+       "iv": 45.8,
+       "vol": 78,
+       "oi": 653
+      },
+      {
+       "strike": 149.0,
+       "bid": 1.97,
+       "ask": 2.05,
+       "iv": 45.6,
+       "vol": 69,
+       "oi": 921
+      },
+      {
+       "strike": 150.0,
+       "bid": 2.19,
+       "ask": 2.23,
+       "iv": 45.0,
+       "vol": 2491,
+       "oi": 4506
+      },
+      {
+       "strike": 152.5,
+       "bid": 2.8,
+       "ask": 2.9,
+       "iv": 45.0,
+       "vol": 315,
+       "oi": 1272
+      },
+      {
+       "strike": 155.0,
+       "bid": 3.55,
+       "ask": 3.7,
+       "iv": 45.0,
+       "vol": 497,
+       "oi": 2205
+      },
+      {
+       "strike": 157.5,
+       "bid": 4.45,
+       "ask": 4.6,
+       "iv": 44.7,
+       "vol": 258,
+       "oi": 603
+      },
+      {
+       "strike": 160.0,
+       "bid": 5.25,
+       "ask": 5.6,
+       "iv": 44.1,
+       "vol": 880,
+       "oi": 5082
+      },
+      {
+       "strike": 162.5,
+       "bid": 6.7,
+       "ask": 6.9,
+       "iv": 44.6,
+       "vol": 911,
+       "oi": 436
+      },
+      {
+       "strike": 165.0,
+       "bid": 8.0,
+       "ask": 8.25,
+       "iv": 44.5,
+       "vol": 452,
+       "oi": 2882
+      },
+      {
+       "strike": 167.5,
+       "bid": 9.0,
+       "ask": 10.35,
+       "iv": 48.4,
+       "vol": 45,
+       "oi": 654
+      },
+      {
+       "strike": 170.0,
+       "bid": 10.5,
+       "ask": 12.1,
+       "iv": 49.3,
+       "vol": 239,
+       "oi": 1179
+      },
+      {
+       "strike": 172.5,
+       "bid": 12.45,
+       "ask": 14.4,
+       "iv": 53.3,
+       "vol": 134,
+       "oi": 177
+      },
+      {
+       "strike": 175.0,
+       "bid": 14.05,
+       "ask": 16.45,
+       "iv": 55.1,
+       "vol": 55,
+       "oi": 640
+      },
+      {
+       "strike": 180.0,
+       "bid": 18.25,
+       "ask": 20.55,
+       "iv": 57.3,
+       "vol": 2,
+       "oi": 608
+      },
+      {
+       "strike": 185.0,
+       "bid": 21.2,
+       "ask": 25.0,
+       "iv": 60.5,
+       "vol": 1,
+       "oi": 25
+      },
+      {
+       "strike": 190.0,
+       "bid": 24.25,
+       "ask": 30.75,
+       "iv": 74.6,
+       "vol": 1,
+       "oi": 44
+      },
+      {
+       "strike": 200.0,
+       "bid": 35.3,
+       "ask": 40.35,
+       "iv": 50.7,
+       "vol": 1,
+       "oi": 40
+      },
+      {
+       "strike": 210.0,
+       "bid": 45.2,
+       "ask": 51.45,
+       "iv": 70.7,
+       "vol": 1,
+       "oi": 1
+      },
+      {
+       "strike": 215.0,
+       "bid": 50.15,
+       "ask": 56.4,
+       "iv": 74.6,
+       "vol": 6,
+       "oi": 0
+      },
+      {
+       "strike": 220.0,
+       "bid": 55.15,
+       "ask": 61.4,
+       "iv": 79.2,
+       "vol": 5,
+       "oi": 0
+      }
+     ],
+     "call_wall": 190.0,
+     "put_wall": 115.0,
+     "opt_volume": 30722
     }
    ]
   },
@@ -178000,7 +178289,7 @@
      ],
      "call_wall": 900.0,
      "put_wall": 540.0,
-     "opt_volume": 12628
+     "opt_volume": 12630
     },
     {
      "date": "2026-10-23",
@@ -180406,6 +180695,14 @@
      "date": "2026-10-23",
      "calls": [
       {
+       "strike": 395.0,
+       "bid": 57.8,
+       "ask": 60.1,
+       "iv": 52.3,
+       "vol": 8,
+       "oi": 25
+      },
+      {
        "strike": 400.0,
        "bid": 52.95,
        "ask": 55.7,
@@ -180486,28 +180783,12 @@
        "oi": 285
       },
       {
-       "strike": 447.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 450.0,
        "bid": 13.55,
        "ask": 14.1,
        "iv": 35.1,
        "vol": 300,
        "oi": 537
-      },
-      {
-       "strike": 452.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 455.0,
@@ -180518,28 +180799,12 @@
        "oi": 292
       },
       {
-       "strike": 457.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 460.0,
        "bid": 8.7,
        "ask": 9.3,
        "iv": 34.6,
        "vol": 285,
        "oi": 749
-      },
-      {
-       "strike": 462.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 465.0,
@@ -180550,28 +180815,12 @@
        "oi": 234
       },
       {
-       "strike": 467.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 470.0,
        "bid": 5.25,
        "ask": 5.8,
        "iv": 34.4,
        "vol": 369,
        "oi": 705
-      },
-      {
-       "strike": 472.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 475.0,
@@ -180582,14 +180831,6 @@
        "oi": 476
       },
       {
-       "strike": 477.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 480.0,
        "bid": 3.15,
        "ask": 3.5,
@@ -180598,12 +180839,60 @@
        "oi": 2671
       },
       {
-       "strike": 482.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
+       "strike": 485.0,
+       "bid": 2.45,
+       "ask": 2.66,
+       "iv": 34.6,
+       "vol": 136,
+       "oi": 482
+      },
+      {
+       "strike": 490.0,
+       "bid": 1.81,
+       "ask": 2.02,
+       "iv": 34.8,
+       "vol": 176,
+       "oi": 433
+      },
+      {
+       "strike": 495.0,
+       "bid": 1.34,
+       "ask": 1.8,
+       "iv": 36.6,
+       "vol": 133,
+       "oi": 573
+      },
+      {
+       "strike": 500.0,
+       "bid": 1.0,
+       "ask": 1.16,
+       "iv": 35.3,
+       "vol": 118,
+       "oi": 3267
+      },
+      {
+       "strike": 505.0,
+       "bid": 0.75,
+       "ask": 0.88,
+       "iv": 35.7,
+       "vol": 24,
+       "oi": 217
+      },
+      {
+       "strike": 510.0,
+       "bid": 0.54,
+       "ask": 0.84,
+       "iv": 37.8,
+       "vol": 44,
+       "oi": 1145
+      },
+      {
+       "strike": 515.0,
+       "bid": 0.4,
+       "ask": 0.51,
+       "iv": 36.5,
+       "vol": 9,
+       "oi": 192
       }
      ],
      "puts": [
@@ -181634,12 +181923,28 @@
        "oi": 66
       },
       {
+       "strike": 202.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 205.0,
        "bid": 10.9,
        "ask": 12.8,
        "iv": 48.2,
        "vol": 1,
        "oi": 269
+      },
+      {
+       "strike": 207.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 210.0,
@@ -181658,12 +181963,28 @@
        "oi": 46
       },
       {
+       "strike": 217.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 220.0,
        "bid": 3.6,
        "ask": 5.3,
        "iv": 48.2,
        "vol": 3,
        "oi": 509
+      },
+      {
+       "strike": 222.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 225.0,
@@ -181736,57 +182057,9 @@
        "iv": 93.1,
        "vol": 0,
        "oi": 73
-      },
-      {
-       "strike": 290.0,
-       "bid": 0.0,
-       "ask": 2.15,
-       "iv": 97.3,
-       "vol": 0,
-       "oi": 7
-      },
-      {
-       "strike": 300.0,
-       "bid": 0.0,
-       "ask": 2.15,
-       "iv": 105.4,
-       "vol": 4,
-       "oi": 5
       }
      ],
      "puts": [
-      {
-       "strike": 160.0,
-       "bid": 0.0,
-       "ask": 1.45,
-       "iv": 90.8,
-       "vol": 0,
-       "oi": 4
-      },
-      {
-       "strike": 165.0,
-       "bid": 0.0,
-       "ask": 0.55,
-       "iv": 68.9,
-       "vol": 0,
-       "oi": 4
-      },
-      {
-       "strike": 170.0,
-       "bid": 0.0,
-       "ask": 0.7,
-       "iv": 64.7,
-       "vol": 21,
-       "oi": 21
-      },
-      {
-       "strike": 175.0,
-       "bid": 0.0,
-       "ask": 0.7,
-       "iv": 57.8,
-       "vol": 10,
-       "oi": 11
-      },
       {
        "strike": 180.0,
        "bid": 0.0,
@@ -181804,12 +182077,28 @@
        "oi": 11455
       },
       {
+       "strike": 187.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 190.0,
        "bid": 0.0,
        "ask": 0.65,
        "iv": 43.0,
        "vol": 27,
        "oi": 72
+      },
+      {
+       "strike": 192.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 195.0,
@@ -181820,6 +182109,14 @@
        "oi": 59
       },
       {
+       "strike": 197.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 200.0,
        "bid": 1.15,
        "ask": 1.55,
@@ -181828,12 +182125,28 @@
        "oi": 99
       },
       {
+       "strike": 202.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 205.0,
        "bid": 2.05,
        "ask": 2.8,
        "iv": 37.4,
        "vol": 3,
        "oi": 17
+      },
+      {
+       "strike": 207.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 210.0,
@@ -182622,6 +182935,46 @@
      "date": "2026-10-23",
      "calls": [
       {
+       "strike": 320.0,
+       "bid": 65.1,
+       "ask": 67.95,
+       "iv": 61.0,
+       "vol": 5,
+       "oi": 4
+      },
+      {
+       "strike": 330.0,
+       "bid": 55.6,
+       "ask": 57.95,
+       "iv": 55.4,
+       "vol": 5,
+       "oi": 14
+      },
+      {
+       "strike": 335.0,
+       "bid": 50.15,
+       "ask": 52.85,
+       "iv": 60.0,
+       "vol": 2,
+       "oi": 1
+      },
+      {
+       "strike": 340.0,
+       "bid": 45.4,
+       "ask": 47.9,
+       "iv": 55.7,
+       "vol": 8,
+       "oi": 5
+      },
+      {
+       "strike": 345.0,
+       "bid": 40.25,
+       "ask": 43.05,
+       "iv": 52.0,
+       "vol": 2,
+       "oi": 5
+      },
+      {
        "strike": 350.0,
        "bid": 35.25,
        "ask": 38.0,
@@ -182646,28 +182999,12 @@
        "oi": 33
       },
       {
-       "strike": 362.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 365.0,
        "bid": 21.2,
        "ask": 23.55,
        "iv": 34.9,
        "vol": 4,
        "oi": 169
-      },
-      {
-       "strike": 367.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 370.0,
@@ -182678,14 +183015,6 @@
        "oi": 287
       },
       {
-       "strike": 372.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 375.0,
        "bid": 12.6,
        "ask": 14.75,
@@ -182694,28 +183023,12 @@
        "oi": 261
       },
       {
-       "strike": 377.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 380.0,
        "bid": 8.9,
        "ask": 10.5,
        "iv": 25.0,
        "vol": 171,
        "oi": 490
-      },
-      {
-       "strike": 382.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 385.0,
@@ -182824,20 +183137,52 @@
      ],
      "puts": [
       {
+       "strike": 325.0,
+       "bid": 0.0,
+       "ask": 2.14,
+       "iv": 56.8,
+       "vol": 6,
+       "oi": 45
+      },
+      {
+       "strike": 330.0,
+       "bid": 0.0,
+       "ask": 0.3,
+       "iv": 41.3,
+       "vol": 22,
+       "oi": 265
+      },
+      {
+       "strike": 335.0,
+       "bid": 0.05,
+       "ask": 0.37,
+       "iv": 39.3,
+       "vol": 27,
+       "oi": 224
+      },
+      {
+       "strike": 340.0,
+       "bid": 0.0,
+       "ask": 0.32,
+       "iv": 34.9,
+       "vol": 104,
+       "oi": 287
+      },
+      {
+       "strike": 345.0,
+       "bid": 0.0,
+       "ask": 0.16,
+       "iv": 28.0,
+       "vol": 42,
+       "oi": 345
+      },
+      {
        "strike": 350.0,
        "bid": 0.07,
        "ask": 0.4,
        "iv": 29.2,
        "vol": 51,
        "oi": 252
-      },
-      {
-       "strike": 352.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 355.0,
@@ -182848,28 +183193,12 @@
        "oi": 391
       },
       {
-       "strike": 357.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 360.0,
        "bid": 0.2,
        "ask": 0.64,
        "iv": 24.7,
        "vol": 31,
        "oi": 237
-      },
-      {
-       "strike": 362.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 365.0,
@@ -182880,28 +183209,12 @@
        "oi": 145
       },
       {
-       "strike": 367.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 370.0,
        "bid": 1.0,
        "ask": 1.47,
        "iv": 21.9,
        "vol": 65,
        "oi": 149
-      },
-      {
-       "strike": 372.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 375.0,
@@ -182920,26 +183233,10 @@
        "oi": 42
       },
       {
-       "strike": 385.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 390.0,
        "bid": 6.85,
        "ask": 8.25,
        "iv": 18.8,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 405.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
        "vol": 0,
        "oi": 0
       }
@@ -184871,9 +185168,9 @@
       },
       {
        "strike": 230.0,
-       "bid": 0.0,
-       "ask": 0.0,
-       "iv": null,
+       "bid": 86.85,
+       "ask": 89.9,
+       "iv": 487.1,
        "vol": 2,
        "oi": 0
       }
@@ -189375,7 +189672,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 6 ore"
+    "note": "18 voci, la piu' recente di 7 ore"
    },
    {
     "key": "sec_calendario",
@@ -189435,6 +189732,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-10T18:50:30Z"
+  "generated_at": "2026-10-10T19:08:52Z"
  }
 }
