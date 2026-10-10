@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-10T17:59:51Z",
+ "updated_at": "2026-10-10T18:50:29Z",
  "eurusd": 1.1206,
  "totals": {
   "usd_value": 0,
@@ -5535,7 +5535,7 @@
      "a1": 13.5,
      "a3": 463.92,
      "a5": 800.73,
-     "a10": 13033.56
+     "a10": 13033.55
     },
     "stagionalita": [
      {
@@ -16393,27 +16393,27 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 83041.59,
+   "price": 82963.15,
    "price_asof": "2026-10-10",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.6,
+   "change_pct": 0.5,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -34.2,
-   "sma200_dist_pct": 15.5,
-   "sma50_dist_pct": 2.8,
+   "ath_dist_pct": -34.3,
+   "sma200_dist_pct": 15.4,
+   "sma50_dist_pct": 2.7,
    "w52_high": 122509.66,
    "w52_low": 57747.77,
-   "w52_dist_pct": -32.2,
-   "day_high": 83072.59,
+   "w52_dist_pct": -32.3,
+   "day_high": 83069.38,
    "day_low": 82475.2,
    "support": 80336.91,
    "resistance": 87363.76,
-   "rsi": 52.0,
-   "volume": 14300556288,
+   "rsi": 51.7,
+   "volume": 13966728192,
    "vol_ratio": 0.79,
-   "atr_14": 2092.36,
+   "atr_14": 2092.13,
    "atr_pct": 2.52,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -16423,7 +16423,7 @@
      83275.93,
      81676.34,
      82546.32,
-     83041.59
+     82963.15
     ],
     "m6": [
      63239.52,
@@ -16551,7 +16551,7 @@
      83275.93,
      81676.34,
      82546.32,
-     83041.59
+     82963.15
     ],
     "all": [
      386.94,
@@ -16699,7 +16699,7 @@
      62813.75,
      78548.63,
      83553.85,
-     83041.59
+     82963.15
     ],
     "m1": [
      81233.68,
@@ -16723,7 +16723,7 @@
      83275.93,
      81676.34,
      82546.32,
-     83041.59
+     82963.15
     ],
     "m3": [
      64262.11,
@@ -16791,7 +16791,7 @@
      83275.93,
      81676.34,
      82546.32,
-     83041.59
+     82963.15
     ],
     "y1": [
      113214.37,
@@ -16867,7 +16867,7 @@
      84034.92,
      83553.85,
      85786.59,
-     83041.59
+     82963.15
     ],
     "d1": [
      82515.03,
@@ -16977,7 +16977,12 @@
      82970.92,
      82986.87,
      83055.2,
-     83071.92
+     83071.92,
+     83008.5,
+     82971.0,
+     82928.36,
+     82954.86,
+     82941.53
     ]
    },
    "earnings_date": null,
@@ -16986,13 +16991,13 @@
    "health": 71,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.67,
+   "sharpe_1y": -0.68,
    "sortino_1y": -0.93,
    "sharpe_6m": 1.9,
-   "sortino_6m": 3.55,
+   "sortino_6m": 3.54,
    "prepost": null,
-   "prezzo_limite_aggiustato": 83041.59,
-   "risk_reward": "1:1.0",
+   "prezzo_limite_aggiustato": 82963.15,
+   "risk_reward": "1:1.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -17004,22 +17009,22 @@
     "w1": {
      "support": 80336.91,
      "resistance": 86664.54,
-     "change_pct": -2.94
+     "change_pct": -3.03
     },
     "m1": {
      "support": 80098.77,
      "resistance": 87363.76,
-     "change_pct": 2.23
+     "change_pct": 2.13
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 29.22
+     "change_pct": 29.1
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 7.88
+     "change_pct": 7.78
     }
    },
    "financials": [],
@@ -17046,74 +17051,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 83041.59,
+     "prezzo": 82963.15,
      "medie": {
       "sma10": {
-       "liv": 84247.85,
-       "dist_pct": -1.43
+       "liv": 84240.01,
+       "dist_pct": -1.52
       },
       "ema10": {
-       "liv": 83631.65,
-       "dist_pct": -0.71
+       "liv": 83617.39,
+       "dist_pct": -0.78
       },
       "sma20": {
-       "liv": 84379.71,
-       "dist_pct": -1.59
+       "liv": 84375.79,
+       "dist_pct": -1.67
       },
       "ema20": {
-       "liv": 83222.02,
-       "dist_pct": -0.22
+       "liv": 83214.55,
+       "dist_pct": -0.3
       },
       "sma30": {
-       "liv": 82282.81,
-       "dist_pct": 0.92
+       "liv": 82280.2,
+       "dist_pct": 0.83
       },
       "ema30": {
-       "liv": 82208.18,
-       "dist_pct": 1.01
+       "liv": 82203.12,
+       "dist_pct": 0.92
       },
       "sma50": {
-       "liv": 80812.67,
-       "dist_pct": 2.76
+       "liv": 80811.1,
+       "dist_pct": 2.66
       },
       "ema50": {
-       "liv": 79874.73,
-       "dist_pct": 3.96
+       "liv": 79871.65,
+       "dist_pct": 3.87
       },
       "sma100": {
-       "liv": 72691.61,
-       "dist_pct": 14.24
+       "liv": 72690.83,
+       "dist_pct": 14.13
       },
       "ema100": {
-       "liv": 76074.37,
-       "dist_pct": 9.16
+       "liv": 76072.81,
+       "dist_pct": 9.06
       },
       "sma200": {
-       "liv": 71918.91,
-       "dist_pct": 15.47
+       "liv": 71918.52,
+       "dist_pct": 15.36
       },
       "ema200": {
-       "liv": 75488.95,
-       "dist_pct": 10.0
+       "liv": 75488.17,
+       "dist_pct": 9.9
       }
      },
      "medie_battute": 8,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 52.0,
+      "rsi14": 51.7,
       "macd": {
-       "linea": 993.47,
-       "segnale": 1559.73,
-       "istogramma": -566.26
+       "linea": 987.22,
+       "segnale": 1558.48,
+       "istogramma": -571.26
       },
-      "stoch_k": 39.7,
-      "stoch_d": 30.6,
-      "williams_r": -60.3,
-      "cci20": -30.3,
+      "stoch_k": 38.6,
+      "stoch_d": 30.2,
+      "williams_r": -61.4,
+      "cci20": -30.8,
       "adx14": 35.5,
       "di_su": 24.5,
       "di_giu": 21.3,
-      "momentum10": -512.26
+      "momentum10": -590.7
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17604,21 +17609,21 @@
      {
       "d": "2026-10-10",
       "o": 82554.98,
-      "h": 83072.59,
+      "h": 83069.38,
       "l": 82475.2,
-      "c": 83041.59
+      "c": 82963.15
      }
     ],
     "performance": {
-     "s1": -3.2,
-     "m1": 2.65,
-     "m3": 28.55,
-     "m6": 36.43,
-     "a1": 5.62,
-     "ytd": -6.41,
-     "a3": 139.54,
-     "a5": 35.43,
-     "a10": 11746.64
+     "s1": -3.29,
+     "m1": 2.55,
+     "m3": 28.43,
+     "m6": 36.3,
+     "a1": 5.52,
+     "ytd": -6.5,
+     "a3": 139.31,
+     "a5": 35.3,
+     "a10": 11735.44
     },
     "stagionalita": [
      {
@@ -17704,7 +17709,7 @@
      },
      {
       "mese": 10,
-      "media": 15.31,
+      "media": 15.3,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -17731,9 +17736,9 @@
      }
     ]
    },
-   "rs_1m": -0.7,
+   "rs_1m": -0.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -3.9,
+   "rs_ndx_1m": -4.0,
    "beta_ndx": 0.84,
    "avg_corr": 0.29,
    "max_corr": 0.8,
@@ -35056,7 +35061,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -44998,7 +45003,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -32.5,
-      "meglio": 24.5
+      "meglio": 24.6
      },
      {
       "mese": 11,
@@ -51574,7 +51579,7 @@
      24.28,
      21.19,
      21.19,
-     18.3,
+     18.31,
      20.9,
      17.41,
      13.16,
@@ -62399,7 +62404,7 @@
      961.76,
      1054.17,
      1054.93,
-     1064.75,
+     1064.74,
      1416.2,
      1445.53,
      1316.25,
@@ -83187,7 +83192,7 @@
      17.66,
      17.66,
      16.5,
-     17.24,
+     17.23,
      16.68,
      17.58,
      16.44,
@@ -83472,7 +83477,7 @@
      127.9,
      130.07,
      136.24,
-     144.29,
+     144.28,
      154.51,
      149.4,
      151.74,
@@ -86485,7 +86490,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -93040,7 +93045,7 @@
      322.37,
      340.11,
      336.06,
-     360.43,
+     360.42,
      358.86,
      369.78,
      383.01,
@@ -94542,7 +94547,7 @@
      171.99,
      163.61,
      170.13,
-     175.8,
+     175.79,
      179.02,
      189.57,
      173.43,
@@ -96276,7 +96281,7 @@
      344.76,
      305.88,
      342.21,
-     344.34,
+     344.33,
      369.93,
      349.13,
      353.5,
@@ -99942,7 +99947,7 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
      336.45,
      329.49,
@@ -119586,7 +119591,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 56
+     "score": 55
     },
     {
      "label": "Treasury 10A",
@@ -124537,6 +124542,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Advanced Micro Devices vs. Qualcomm: Which Technology Stock Is a Better Buy in 2026?",
+      "riassunto": "Key PointsAdvanced Micro Devices is leveraging strategic partnerships with industry leaders to expand its footprint in the high-performance data center market.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-10T17:03:01Z",
+      "url": "https://www.nasdaq.com/articles/advanced-micro-devices-vs-qualcomm-which-technology-stock-better-buy-2026-0"
+     },
+     {
       "titolo": "Like Meta's Muse AI Agents? 4 AI Semiconductor Stocks Set to Benefit From the Rise of AI Agents.",
       "riassunto": "Key PointsArm benefits from both its own CPUs and custom CPUs.",
       "fonte": "Nasdaq",
@@ -124570,13 +124582,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-09T16:52:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-will-be-amds-stock-price-1-year"
-     },
-     {
-      "titolo": "Nvidia and AMD Lead the AI Market. 1 Chip Stock Has Far Greater Upside.",
-      "riassunto": "Key PointsAMD's valuation has gotten a bit out of hand.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-09T15:37:00Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-and-amd-lead-ai-market-1-chip-stock-has-far-greater-upside"
      }
     ],
     "BE": [
@@ -124952,13 +124957,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-10T17:59:51Z"
+   "letto_il": "2026-10-10T18:50:29Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Advanced Micro Devices vs. Qualcomm: Which Technology Stock Is a Better Buy in 2026?",
+     "riassunto": "Key PointsAdvanced Micro Devices is leveraging strategic partnerships with industry leaders to expand its footprint in the high-performance data center market.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-10T17:03:01Z",
+     "url": "https://www.nasdaq.com/articles/advanced-micro-devices-vs-qualcomm-which-technology-stock-better-buy-2026-0"
+    },
     {
      "titolo": "Like Meta's Muse AI Agents? 4 AI Semiconductor Stocks Set to Benefit From the Rise of AI Agents.",
      "riassunto": "Key PointsArm benefits from both its own CPUs and custom CPUs.",
@@ -124993,13 +125005,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-09T16:52:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-will-be-amds-stock-price-1-year"
-    },
-    {
-     "titolo": "Nvidia and AMD Lead the AI Market. 1 Chip Stock Has Far Greater Upside.",
-     "riassunto": "Key PointsAMD's valuation has gotten a bit out of hand.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-09T15:37:00Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-and-amd-lead-ai-market-1-chip-stock-has-far-greater-upside"
     }
    ],
    "BE": [
@@ -125375,7 +125380,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-10T17:59:51Z"
+  "letto_il": "2026-10-10T18:50:29Z"
  },
  "predictions": [
   {
@@ -189370,7 +189375,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 5 ore"
+    "note": "18 voci, la piu' recente di 6 ore"
    },
    {
     "key": "sec_calendario",
@@ -189430,6 +189435,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-10T17:59:52Z"
+  "generated_at": "2026-10-10T18:50:30Z"
  }
 }
