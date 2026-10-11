@@ -1,4 +1,4 @@
-⟦ BUILD v466 · generato 11/10/2026 10:41 ⟧
+⟦ BUILD v466 · generato 11/10/2026 11:06 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 11/10/2026, 10:41:35 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 06:41, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -2,62% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P +0,26% · BTC -0,01% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~26.8h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 11/10/2026, 11:06:58 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 07:06, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -2,62% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,02% · Fut S&P +0,26% · BTC +0,04% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~26.4h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 11/10/2026, 10:41:35, prossimo run 11/10/2026, 13:30:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-09 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 11/10/2026, 11:06:58, prossimo run 11/10/2026, 13:30:00. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-09 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-08-01) · Inflazione PCE (a/a) (2026-08-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-08-01) · Non-Farm Payrolls (2026-09-01) · Disoccupazione (2026-09-01) · Fiducia consumatori (UMich) (2026-09-01) · Curva 10A-2A (2026-10-09) · Curva 10A-3M (2026-10-09) · Treasury USA 30A (2026-10-08) · Tasso reale 10A (TIPS) (2026-10-08) · Inflazione attesa 10A (breakeven) (2026-10-09) · Manifattura Philly Fed (al posto dell'ISM) (2026-09-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -104,19 +104,19 @@ QUADRO MACRO:
       It doesn’t matter if you are a Republican or Democrat. Math is math.
     · [Bloomberg, 16h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] AI Debt Issuance Defies Rising Yields as SpaceX, Broadcom Plan Major Deals
       When financing gets more expensive, companies usually slow down their bond sales. Tech companies have instead been ramping up this year, and talk this week of potential big financings from SpaceX and Broadcom Inc. only amplified investor fears about the wave of coming debt.
-    · [CNBC Economia, 39h fa] Americans' debt problems are flashing a warning not seen since the Great Recession
+    · [CNBC Economia, 40h fa] Americans' debt problems are flashing a warning not seen since the Great Recession
       Researchers found that while wealth disparities narrowed somewhat, the ability to meet debt payments deteriorated significantly.
     · [CNBC Economia, 46h fa] Treasury's Bessent hires Trump's controversial former Fed board pick, Judy Shelton, as advisor
       Shelton's controversial economic ideas led the Senate to block her nomination to the Fed. Now she's going to be a counselor to the Treasury secretary.
-    · [CNBC Economia, 65h fa] Inflation on many everyday items was entirely due to tariffs, NY Fed says
+    · [CNBC Economia, 66h fa] Inflation on many everyday items was entirely due to tariffs, NY Fed says
       Tariffs added 2.9 percentage points to inflation in 67 categories of goods by February 2026, researchers at the New York Federal Reserve found.
     · [CNBC Economia, 88h fa] Inflation fears on the rise as one-year outlook in Fed survey hits highest level since May 2023
       The Survey of Consumer Expectations indicated that the median outlook for inflation over the next 12 months rose to 3.9%.
-    · [CNBC Economia, 94h fa] ICE came to town and left behind weakened economies
+    · [CNBC Economia, 95h fa] ICE came to town and left behind weakened economies
       Research links ICE enforcement surges to lasting declines in local spending, foot traffic and jobs. In Minneapolis, businesses are still recovering.
     · [CNBC Economia, 95h fa] India’s central bank hikes rates for the first time since 2023 as inflation risks build
       HSBC and Goldman Sachs expect the RBI to raise interest rates in December as well.
-    · [CNBC Economia, 100h fa] Why AI is both the hope and the hazard for world leaders, according to IMF chief Georgieva
+    · [CNBC Economia, 101h fa] Why AI is both the hope and the hazard for world leaders, according to IMF chief Georgieva
       Kristalina Georgieva warns that the technology lifting growth hopes is also pushing up inflation and yields, just as public debt levels rose.
     · [CNBC Economia, 104h fa] World Bank warns of AI concentration risks as it lifts East Asia and Pacific growth outlook to 4.5%
       The World Bank now expects the region to grow 4.5% this year, but flagged that trade growth outside AI-related goods has been "weak or negative."
@@ -175,7 +175,7 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 - Tasso EFFETTIVO (EFFR) 3.75% (rilevazione 2026-09-01) — e' dove le banche si prestano DENTRO il target 3,50-3,75% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
-- Will the price of Bitcoin be above $82,000 on October 11?: 97% [Δ7g —]
+⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -235,19 +235,19 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (77,3% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 8h fa] Massive Update for AMD Stock Investors
+  [AMD] · [Nasdaq, 9h fa] Massive Update for AMD Stock Investors
       AMD (NASDAQ: AMD) has been one of the most volatile stocks in the market this year.
   [AMD] · [Nasdaq, 14h fa] VOO Doesn't Hold SpaceX, Taiwan Semiconductor, Samsung Electronics, SK Hynix, or ASML. Meet the Vanguard ETF That Does.
       Key PointsThe U.S. remains the global leader in technology.
-  [CRWV] · [Nasdaq, 11h fa] Can CoreWeave Unseat Amazon Web Services as the Top Cloud Provider?
+  [CRWV] · [Nasdaq, 12h fa] Can CoreWeave Unseat Amazon Web Services as the Top Cloud Provider?
       Key PointsIf both cloud businesses maintained their current growth rates, it would take seven years for CoreWeave to catch AWS.
-  [CRWV] · [Nasdaq, 38h fa] Here's What $1,000 Invested in Nebius Could Be Worth by 2030
+  [CRWV] · [Nasdaq, 39h fa] Here's What $1,000 Invested in Nebius Could Be Worth by 2030
       Key PointsNebius&rsquo; stock has soared over the past two years.
-  [MRVL] · [Nasdaq, 11h fa] Better Artificial Intelligence Stock: Arm vs. Marvell Technology
+  [MRVL] · [Nasdaq, 12h fa] Better Artificial Intelligence Stock: Arm vs. Marvell Technology
       Key PointsArm designs the power-efficient architecture found in over 99% of the world's smartphones.
-  [MRVL] · [Nasdaq, 14h fa] Where Will Credo Technology Be in 3 Years?
+  [MRVL] · [Nasdaq, 15h fa] Where Will Credo Technology Be in 3 Years?
       Key PointsNvidia&rsquo;s chips get the spotlight, but Credo&rsquo;s gear keeps AI clusters connected and running.
-  [MU] · [Nasdaq, 1h fa] Prediction: This Is How Much Micron Stock Will Be Worth By the End of 2027
+  [MU] · [Nasdaq, 2h fa] Prediction: This Is How Much Micron Stock Will Be Worth By the End of 2027
       Key PointsMicron is a maker of memory and storage, key elements involved in agentic AI.
   [MU] · [Nasdaq, 14h fa] VOO Doesn't Hold SpaceX, Taiwan Semiconductor, Samsung Electronics, SK Hynix, or ASML. Meet the Vanguard ETF That Does.
       Key PointsThe U.S. remains the global leader in technology.
