@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-12T11:44:38Z",
+ "updated_at": "2026-10-12T12:34:41Z",
  "eurusd": 1.1179,
  "totals": {
   "usd_value": 0,
@@ -943,7 +943,7 @@
     "revisione_7g_pct": 13.38,
     "su_30g": 4,
     "giu_30g": 1,
-    "eps_min": 136.0,
+    "eps_min": 161.0,
     "eps_max": 335.5,
     "eps_n": 36,
     "target_min": 361.0,
@@ -959,18 +959,18 @@
    "sortino_6m": 3.16,
    "prepost": {
     "label": "pre",
-    "price": 1004.01,
-    "change_pct": -2.43
+    "price": 1004.6,
+    "change_pct": -2.37
    },
-   "prezzo_limite_aggiustato": 1004.01,
+   "prezzo_limite_aggiustato": 1004.6,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 1164234457088.0,
     "shares": 1131423212.0,
-    "float_shares": 1127565059.0,
-    "float_pct": 99.7,
+    "float_shares": 1126135400.0,
+    "float_pct": 99.5,
     "avg_volume_30d": 32485792.0,
     "pe_ttm": 13.8437,
     "forward_pe": 4.9871,
@@ -979,23 +979,23 @@
     "revenue_fy": 133188001792.0,
     "net_income_fy": 84968996864.0,
     "revenue_growth": 3.793,
-    "earnings_growth": 10.595,
+    "earnings_growth": 10.601,
     "profit_margin": 0.638,
     "roe": 0.8826,
     "debt_to_equity": 3.743,
     "dividend_yield": 0.0006,
     "price_to_book": 11.5339,
     "target_mean": 1555.1304,
-    "fcf": 29140250624.0,
+    "fcf": 29214251008.0,
     "gross_margin": 0.8072,
-    "enterprise_value": 1125979521024.0,
-    "ev_ebitda": 10.345,
+    "enterprise_value": 1191184957440.0,
+    "ev_ebitda": 10.944,
     "peg": 0.16,
     "roa": 0.4456,
-    "short_float": 0.0231,
+    "short_float": 0.0245,
     "buyback_yield": -0.0,
     "ps": 8.74,
-    "ev_s": 8.45,
+    "ev_s": 8.94,
     "altman_z": 6.1,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -2907,10 +2907,10 @@
    },
    "analisti": {
     "eps_ora": 15.7219,
-    "eps_90g_fa": 13.2814,
-    "eps_7g_fa": 15.5833,
-    "revisione_90g_pct": 18.37,
-    "revisione_7g_pct": 0.89,
+    "eps_90g_fa": 13.1993,
+    "eps_7g_fa": 15.5783,
+    "revisione_90g_pct": 19.11,
+    "revisione_7g_pct": 0.92,
     "su_30g": 3,
     "giu_30g": 1,
     "eps_min": 9.6,
@@ -2929,10 +2929,10 @@
    "sortino_6m": 4.16,
    "prepost": {
     "label": "pre",
-    "price": 601.75,
-    "change_pct": -1.04
+    "price": 601.6,
+    "change_pct": -1.07
    },
-   "prezzo_limite_aggiustato": 601.75,
+   "prezzo_limite_aggiustato": 601.6,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -2958,14 +2958,14 @@
     "target_mean": 636.208,
     "fcf": 8841499648.0,
     "gross_margin": 0.5572,
-    "enterprise_value": 983873093632.0,
-    "ev_ebitda": 102.894,
-    "peg": 0.61,
+    "enterprise_value": 1045515337728.0,
+    "ev_ebitda": 109.341,
+    "peg": 0.66,
     "roa": 0.0513,
-    "short_float": 0.0242,
+    "short_float": 0.0246,
     "buyback_yield": 0.0019,
     "ps": 24.03,
-    "ev_s": 23.82,
+    "ev_s": 25.31,
     "altman_z": 6.9,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -4732,17 +4732,17 @@
    "sortino_6m": 1.4,
    "prepost": {
     "label": "pre",
-    "price": 228.7,
-    "change_pct": -0.25
+    "price": 228.18,
+    "change_pct": -0.48
    },
-   "prezzo_limite_aggiustato": 228.7,
+   "prezzo_limite_aggiustato": 228.18,
    "risk_reward": "1:1.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 5536424132608.0,
     "shares": 24147000000.0,
-    "float_shares": 23132867000.0,
+    "float_shares": 23132144000.0,
     "float_pct": 95.8,
     "avg_volume_30d": 120322753.0,
     "pe_ttm": 28.9861,
@@ -4761,14 +4761,17 @@
     "target_mean": 328.7169,
     "fcf": 41809874944.0,
     "gross_margin": 0.7467,
-    "enterprise_value": 5502039228416.0,
-    "ev_ebitda": 27.337,
-    "peg": 0.28,
+    "enterprise_value": 5699417931776.0,
+    "ev_ebitda": 28.318,
+    "peg": 0.29,
     "roa": 0.5357,
-    "short_float": 0.0134,
+    "short_float": 0.0127,
     "buyback_yield": 0.0072,
     "ps": 18.27,
-    "ev_s": 18.16
+    "ev_s": 18.81,
+    "altman_z": 13.22,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "combustione": {
     "cassa": 22443000000.0,
@@ -6245,23 +6248,23 @@
    "earnings_date": "2026-11-02",
    "rating": {
     "key": "buy",
-    "n": 26,
-    "target": 203.35,
-    "upside_pct": -2.7
+    "n": 25,
+    "target": 200.88,
+    "upside_pct": -3.9
    },
    "analisti": {
-    "eps_ora": 2.3515,
+    "eps_ora": 2.3485,
     "eps_90g_fa": 2.0945,
     "eps_7g_fa": 2.3442,
-    "revisione_90g_pct": 12.27,
-    "revisione_7g_pct": 0.31,
+    "revisione_90g_pct": 12.13,
+    "revisione_7g_pct": 0.18,
     "su_30g": 3,
     "giu_30g": 0,
     "eps_min": 1.92,
     "eps_max": 2.9,
-    "eps_n": 29,
+    "eps_n": 28,
     "target_min": 80.0,
-    "target_max": 265.0,
+    "target_max": 255.0,
     "target_mediana": 215.0
    },
    "health": 92,
@@ -6273,10 +6276,10 @@
    "sortino_6m": 2.76,
    "prepost": {
     "label": "pre",
-    "price": 208.42,
-    "change_pct": -0.3
+    "price": 208.44,
+    "change_pct": -0.29
    },
-   "prezzo_limite_aggiustato": 208.42,
+   "prezzo_limite_aggiustato": 208.44,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -6287,9 +6290,9 @@
     "float_pct": 91.7,
     "avg_volume_30d": 33526821.0,
     "pe_ttm": 180.2155,
-    "forward_pe": 88.8992,
+    "forward_pe": 89.1791,
     "eps_ttm": 1.16,
-    "eps_forward": 2.3515,
+    "eps_forward": 2.3442,
     "revenue_fy": 6155940864.0,
     "net_income_fy": 3016691968.0,
     "revenue_growth": 0.928,
@@ -6299,17 +6302,17 @@
     "debt_to_equity": 2.139,
     "dividend_yield": 0.0,
     "price_to_book": 51.3889,
-    "target_mean": 203.35,
+    "target_mean": 200.884,
     "fcf": 2159104512.0,
     "gross_margin": 0.848,
-    "enterprise_value": 493272367104.0,
-    "ev_ebitda": 185.258,
-    "peg": 1.81,
+    "enterprise_value": 457394716672.0,
+    "ev_ebitda": 171.783,
+    "peg": 1.68,
     "roa": 0.1729,
-    "short_float": 0.0259,
+    "short_float": 0.028,
     "buyback_yield": 0.0001,
     "ps": 81.61,
-    "ev_s": 80.13,
+    "ev_s": 74.3,
     "altman_z": 10.62,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -7916,10 +7919,10 @@
    "analisti": {
     "eps_ora": 7.2828,
     "eps_90g_fa": 6.1779,
-    "eps_7g_fa": 6.7713,
+    "eps_7g_fa": 6.7691,
     "revisione_90g_pct": 17.88,
-    "revisione_7g_pct": 7.55,
-    "su_30g": 4,
+    "revisione_7g_pct": 7.59,
+    "su_30g": 35,
     "giu_30g": 1,
     "eps_min": 6.22,
     "eps_max": 8.21,
@@ -7937,11 +7940,11 @@
    "sortino_6m": 2.46,
    "prepost": {
     "label": "pre",
-    "price": 270.2,
-    "change_pct": -1.85
+    "price": 271.46,
+    "change_pct": -1.39
    },
-   "prezzo_limite_aggiustato": 270.2,
-   "risk_reward": "1:1.1",
+   "prezzo_limite_aggiustato": 271.46,
+   "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -7962,18 +7965,18 @@
     "roe": 0.1652,
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0009,
-    "price_to_book": 13.2321,
+    "price_to_book": 13.0248,
     "target_mean": 337.9938,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
-    "enterprise_value": 242746327040.0,
-    "ev_ebitda": 85.165,
-    "peg": 0.68,
+    "enterprise_value": 250989199360.0,
+    "ev_ebitda": 88.057,
+    "peg": 0.95,
     "roa": 0.0413,
-    "short_float": 0.0321,
+    "short_float": 0.0418,
     "buyback_yield": 0.0082,
     "ps": 26.18,
-    "ev_s": 25.69,
+    "ev_s": 26.56,
     "altman_z": 4.02,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -9443,7 +9446,12 @@
     ]
    },
    "earnings_date": "2026-11-10",
-   "rating": null,
+   "rating": {
+    "key": "buy",
+    "n": 12,
+    "target": 28.52,
+    "upside_pct": 103.3
+   },
    "analisti": {
     "eps_ora": -0.206,
     "eps_90g_fa": -0.2011,
@@ -9468,11 +9476,11 @@
    "sortino_6m": -0.2,
    "prepost": {
     "label": "pre",
-    "price": 13.92,
-    "change_pct": -0.78
+    "price": 13.83,
+    "change_pct": -1.43
    },
-   "prezzo_limite_aggiustato": 13.92,
-   "risk_reward": "1:2.2",
+   "prezzo_limite_aggiustato": 13.83,
+   "risk_reward": "1:2.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -9497,14 +9505,14 @@
     "target_mean": 28.525,
     "fcf": 26453624.0,
     "gross_margin": 0.3461,
-    "enterprise_value": 4296767488.0,
+    "enterprise_value": 4483678208.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": -0.0945,
-    "short_float": 0.1976,
+    "short_float": 0.1876,
     "buyback_yield": -0.0815,
     "ps": 350.69,
-    "ev_s": 321.78,
+    "ev_s": 335.78,
     "altman_z": 3.17,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -10897,15 +10905,15 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 284.74,
-    "upside_pct": 1.5
+    "target": 283.78,
+    "upside_pct": 1.2
    },
    "analisti": {
-    "eps_ora": 4.926,
-    "eps_90g_fa": 4.4526,
-    "eps_7g_fa": 4.9421,
-    "revisione_90g_pct": 10.63,
-    "revisione_7g_pct": -0.33,
+    "eps_ora": 4.9421,
+    "eps_90g_fa": 4.403,
+    "eps_7g_fa": 4.9287,
+    "revisione_90g_pct": 12.24,
+    "revisione_7g_pct": 0.27,
     "su_30g": 2,
     "giu_30g": 1,
     "eps_min": 2.9548,
@@ -10924,10 +10932,10 @@
    "sortino_6m": 1.43,
    "prepost": {
     "label": "pre",
-    "price": 275.94,
-    "change_pct": -1.63
+    "price": 275.66,
+    "change_pct": -1.73
    },
-   "prezzo_limite_aggiustato": 275.94,
+   "prezzo_limite_aggiustato": 275.66,
    "risk_reward": "1:0.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -10938,9 +10946,9 @@
     "float_pct": 98.2,
     "avg_volume_30d": 15449306.0,
     "pe_ttm": 369.079,
-    "forward_pe": 56.9424,
+    "forward_pe": 56.7572,
     "eps_ttm": 0.76,
-    "eps_forward": 4.926,
+    "eps_forward": 4.9421,
     "revenue_fy": 3113149952.0,
     "net_income_fy": 244942000.0,
     "revenue_growth": 1.655,
@@ -10950,17 +10958,17 @@
     "debt_to_equity": 171.578,
     "dividend_yield": 0.0,
     "price_to_book": 51.0464,
-    "target_mean": 284.7385,
+    "target_mean": 283.7769,
     "fcf": 531637504.0,
     "gross_margin": 0.3165,
-    "enterprise_value": 82741755904.0,
-    "ev_ebitda": 197.72,
-    "peg": 0.63,
+    "enterprise_value": 85919711232.0,
+    "ev_ebitda": 205.314,
+    "peg": 0.66,
     "roa": 0.056,
-    "short_float": 0.0811,
+    "short_float": 0.0734,
     "buyback_yield": -0.0007,
     "ps": 26.54,
-    "ev_s": 26.58,
+    "ev_s": 27.6,
     "altman_z": 1.86,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -12298,10 +12306,10 @@
    "sortino_6m": -0.02,
    "prepost": {
     "label": "pre",
-    "price": 165.11,
-    "change_pct": -2.32
+    "price": 165.24,
+    "change_pct": -2.24
    },
-   "prezzo_limite_aggiustato": 165.11,
+   "prezzo_limite_aggiustato": 165.24,
    "risk_reward": "1:1.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -12329,7 +12337,7 @@
     "gross_margin": 0.7627,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.24,
+    "peg": 0.26,
     "roa": 0.3366,
     "short_float": null,
     "buyback_yield": -0.0541,
@@ -13867,10 +13875,10 @@
    "sortino_6m": 0.63,
    "prepost": {
     "label": "pre",
-    "price": 155.52,
-    "change_pct": 0.76
+    "price": 155.21,
+    "change_pct": 0.56
    },
-   "prezzo_limite_aggiustato": 155.52,
+   "prezzo_limite_aggiustato": 155.21,
    "risk_reward": "1:0.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -13896,14 +13904,14 @@
     "target_mean": 237.8,
     "fcf": -22587523072.0,
     "gross_margin": 0.676,
-    "enterprise_value": 78065090560.0,
+    "enterprise_value": 77692395520.0,
     "ev_ebitda": null,
     "peg": 2.85,
     "roa": -0.3873,
-    "short_float": 0.0776,
+    "short_float": 0.0815,
     "buyback_yield": null,
     "ps": 123.49,
-    "ev_s": 156.65,
+    "ev_s": 155.9,
     "altman_z": 5.02,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -15354,11 +15362,11 @@
    "sortino_6m": -0.78,
    "prepost": {
     "label": "pre",
-    "price": 80.84,
-    "change_pct": -1.51
+    "price": 80.62,
+    "change_pct": -1.78
    },
-   "prezzo_limite_aggiustato": 80.84,
-   "risk_reward": "1:1.2",
+   "prezzo_limite_aggiustato": 80.62,
+   "risk_reward": "1:1.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -15383,14 +15391,14 @@
     "target_mean": 141.4737,
     "fcf": -9088615424.0,
     "gross_margin": 0.6742,
-    "enterprise_value": 91344125952.0,
-    "ev_ebitda": 24.108,
+    "enterprise_value": 94857412608.0,
+    "ev_ebitda": 25.035,
     "peg": null,
     "roa": -0.0024,
-    "short_float": 0.1924,
+    "short_float": 0.1764,
     "buyback_yield": -0.0329,
     "ps": 5.96,
-    "ev_s": 12.03,
+    "ev_s": 12.5,
     "altman_z": -1.29,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -16327,28 +16335,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 83252.36,
+   "price": 83068.15,
    "price_asof": "2026-10-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.51,
+   "change_pct": -0.73,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -34.0,
-   "sma200_dist_pct": 15.5,
-   "sma50_dist_pct": 2.7,
+   "ath_dist_pct": -34.2,
+   "sma200_dist_pct": 15.3,
+   "sma50_dist_pct": 2.5,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
-   "w52_dist_pct": -28.4,
+   "w52_dist_pct": -28.6,
    "day_high": 84230.83,
-   "day_low": 83276.36,
+   "day_low": 83116.51,
    "support": 80336.91,
    "resistance": 87265.49,
-   "rsi": 52.5,
-   "volume": 20088125440,
+   "rsi": 51.8,
+   "volume": 20440678400,
    "vol_ratio": 0.41,
-   "atr_14": 1965.26,
-   "atr_pct": 2.36,
+   "atr_14": 1976.68,
+   "atr_pct": 2.38,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -16357,7 +16365,7 @@
      82546.32,
      82912.23,
      83679.47,
-     83252.36
+     83068.15
     ],
     "m6": [
      61643.78,
@@ -16485,7 +16493,7 @@
      82546.32,
      82912.23,
      83679.47,
-     83252.36
+     83068.15
     ],
     "all": [
      386.94,
@@ -16633,7 +16641,7 @@
      62813.75,
      78548.63,
      83553.85,
-     83252.36
+     83068.15
     ],
     "m1": [
      86602.91,
@@ -16657,7 +16665,7 @@
      82546.32,
      82912.23,
      83679.47,
-     83252.36
+     83068.15
     ],
     "m3": [
      64904.69,
@@ -16725,7 +16733,7 @@
      82546.32,
      82912.23,
      83679.47,
-     83252.36
+     83068.15
     ],
     "y1": [
      115169.77,
@@ -16801,31 +16809,31 @@
      84458.09,
      84497.21,
      83275.93,
-     83252.36
+     83068.15
     ],
     "d1": [
      83662.76,
-     83679.23,
+     83679.24,
      83704.87,
      83737.73,
      83758.83,
      83839.56,
-     83887.75,
-     83872.87,
+     83887.76,
+     83872.95,
      83776.99,
-     83664.56,
-     83582.46,
+     83666.25,
+     83580.48,
      83425.52,
      83603.36,
      83675.2,
-     83724.5,
-     83817.23,
-     83796.29,
+     83714.71,
+     83812.88,
+     83796.3,
      83745.43,
      83654.09,
      83596.79,
      83566.0,
-     83548.62,
+     83550.31,
      83488.09,
      83522.2,
      83476.08,
@@ -16838,17 +16846,17 @@
      84125.13,
      83988.89,
      83764.46,
-     83870.39,
+     83874.07,
      84015.51,
-     83809.27,
-     83756.46,
+     83815.08,
+     83767.05,
      83671.86,
      83921.45,
-     83894.78,
+     83894.74,
      84030.51,
-     84174.79,
+     84174.78,
      84239.0,
-     84036.24,
+     84036.17,
      83902.95,
      83874.0,
      83910.86,
@@ -16856,7 +16864,7 @@
      83625.24,
      83486.34,
      83680.07,
-     83520.76,
+     83522.44,
      83481.39,
      83448.33,
      83502.01,
@@ -16874,22 +16882,27 @@
      83320.91,
      83288.92,
      83319.27,
-     83251.0
+     83307.89,
+     83339.45,
+     83251.9,
+     83275.44,
+     83104.76,
+     83068.15
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 61,
+   "health": 60,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.71,
-   "sortino_1y": -0.97,
-   "sharpe_6m": 1.71,
-   "sortino_6m": 3.15,
+   "sortino_1y": -0.98,
+   "sharpe_6m": 1.69,
+   "sortino_6m": 3.12,
    "prepost": null,
-   "prezzo_limite_aggiustato": 83252.36,
-   "risk_reward": "1:1.0",
+   "prezzo_limite_aggiustato": 83068.15,
+   "risk_reward": "1:1.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -16901,22 +16914,22 @@
     "w1": {
      "support": 80336.91,
      "resistance": 84230.83,
-     "change_pct": 1.93
+     "change_pct": 1.7
     },
     "m1": {
      "support": 80336.91,
      "resistance": 87363.76,
-     "change_pct": -3.87
+     "change_pct": -4.08
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 28.27
+     "change_pct": 27.98
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 10.07
+     "change_pct": 9.83
     }
    },
    "financials": [],
@@ -16931,7 +16944,7 @@
     "last_fvg": {
      "dir": "rialzista",
      "lo": 83092.03,
-     "hi": 83276.36
+     "hi": 83116.51
     },
     "liq_above": 86971.78,
     "liq_below": 82906.62,
@@ -16943,74 +16956,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 83252.36,
+     "prezzo": 83068.15,
      "medie": {
       "sma10": {
-       "liv": 83993.07,
-       "dist_pct": -0.88
+       "liv": 83974.65,
+       "dist_pct": -1.08
       },
       "ema10": {
-       "liv": 83554.06,
-       "dist_pct": -0.36
+       "liv": 83520.57,
+       "dist_pct": -0.54
       },
       "sma20": {
-       "liv": 84081.07,
-       "dist_pct": -0.99
+       "liv": 84071.86,
+       "dist_pct": -1.19
       },
       "ema20": {
-       "liv": 83254.24,
-       "dist_pct": -0.0
+       "liv": 83236.7,
+       "dist_pct": -0.2
       },
       "sma30": {
-       "liv": 82694.75,
-       "dist_pct": 0.67
+       "liv": 82688.61,
+       "dist_pct": 0.46
       },
       "ema30": {
-       "liv": 82357.04,
-       "dist_pct": 1.09
+       "liv": 82345.16,
+       "dist_pct": 0.88
       },
       "sma50": {
-       "liv": 81051.95,
-       "dist_pct": 2.71
+       "liv": 81048.26,
+       "dist_pct": 2.49
       },
       "ema50": {
-       "liv": 80145.86,
-       "dist_pct": 3.88
+       "liv": 80138.64,
+       "dist_pct": 3.66
       },
       "sma100": {
-       "liv": 73103.31,
-       "dist_pct": 13.88
+       "liv": 73101.47,
+       "dist_pct": 13.63
       },
       "ema100": {
-       "liv": 76362.98,
-       "dist_pct": 9.02
+       "liv": 76359.34,
+       "dist_pct": 8.79
       },
       "sma200": {
-       "liv": 72052.42,
-       "dist_pct": 15.54
+       "liv": 72051.5,
+       "dist_pct": 15.29
       },
       "ema200": {
-       "liv": 75696.55,
-       "dist_pct": 9.98
+       "liv": 75694.72,
+       "dist_pct": 9.74
       }
      },
      "medie_battute": 8,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 52.5,
+      "rsi14": 51.8,
       "macd": {
-       "linea": 816.81,
-       "segnale": 1306.64,
-       "istogramma": -489.83
+       "linea": 802.11,
+       "segnale": 1303.7,
+       "istogramma": -501.59
       },
-      "stoch_k": 42.8,
-      "stoch_d": 43.2,
-      "williams_r": -57.2,
-      "cci20": -14.3,
+      "stoch_k": 40.1,
+      "stoch_d": 42.3,
+      "williams_r": -59.9,
+      "cci20": -16.9,
       "adx14": 32.6,
-      "di_su": 26.3,
-      "di_giu": 19.5,
-      "momentum10": -1244.85
+      "di_su": 26.2,
+      "di_giu": 19.4,
+      "momentum10": -1429.06
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17502,20 +17515,20 @@
       "d": "2026-10-12",
       "o": 83673.01,
       "h": 84230.83,
-      "l": 83276.36,
-      "c": 83252.36
+      "l": 83116.51,
+      "c": 83068.15
      }
     ],
     "performance": {
-     "s1": -0.03,
-     "m1": 2.6,
-     "m3": 28.32,
-     "m6": 31.96,
-     "a1": 5.8,
-     "ytd": -6.18,
-     "a3": 140.14,
-     "a5": 35.77,
-     "a10": 11776.7
+     "s1": -0.25,
+     "m1": 2.37,
+     "m3": 28.03,
+     "m6": 31.66,
+     "a1": 5.57,
+     "ytd": -6.38,
+     "a3": 139.61,
+     "a5": 35.47,
+     "a10": 11750.42
     },
     "stagionalita": [
      {
@@ -17601,7 +17614,7 @@
      },
      {
       "mese": 10,
-      "media": 15.33,
+      "media": 15.31,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -17628,9 +17641,9 @@
      }
     ]
    },
-   "rs_1m": -6.8,
+   "rs_1m": -7.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -10.0,
+   "rs_ndx_1m": -10.2,
    "beta_ndx": 0.83,
    "avg_corr": 0.29,
    "max_corr": 0.8,
@@ -17642,28 +17655,28 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 15.46,
+   "price": 15.4,
    "price_asof": "2026-10-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 4.18,
+   "change_pct": 3.77,
    "pe": null,
    "ath": 89.53,
-   "ath_dist_pct": -82.7,
-   "sma200_dist_pct": -14.5,
-   "sma50_dist_pct": -0.1,
+   "ath_dist_pct": -82.8,
+   "sma200_dist_pct": -14.8,
+   "sma50_dist_pct": -0.5,
    "w52_high": 35.3,
    "w52_low": 13.38,
-   "w52_dist_pct": -56.2,
+   "w52_dist_pct": -56.4,
    "day_high": 15.53,
    "day_low": 15.36,
    "support": 14.12,
    "resistance": 18.94,
-   "rsi": 49.4,
+   "rsi": 49.0,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 1.15,
-   "atr_pct": 7.42,
+   "atr_pct": 7.45,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -17672,7 +17685,7 @@
      15.08,
      15.41,
      14.84,
-     15.46
+     15.4
     ],
     "m6": [
      17.94,
@@ -17800,7 +17813,7 @@
      15.08,
      15.41,
      14.84,
-     15.46
+     15.4
     ],
     "all": [
      25.36,
@@ -18244,7 +18257,7 @@
      15.99,
      14.92,
      16.34,
-     15.46
+     15.4
     ],
     "m1": [
      15.84,
@@ -18268,7 +18281,7 @@
      15.08,
      15.41,
      14.84,
-     15.46
+     15.4
     ],
     "m3": [
      17.16,
@@ -18336,7 +18349,7 @@
      15.08,
      15.41,
      14.84,
-     15.46
+     15.4
     ],
     "y1": [
      19.03,
@@ -18417,21 +18430,26 @@
      15.47,
      15.5,
      15.46,
-     15.46
+     15.46,
+     15.47,
+     15.45,
+     15.47,
+     15.43,
+     15.4
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 36,
+   "health": 35,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.21,
-   "sortino_1y": -0.3,
-   "sharpe_6m": -0.34,
-   "sortino_6m": -0.52,
+   "sortino_1y": -0.31,
+   "sharpe_6m": -0.35,
+   "sortino_6m": -0.53,
    "prepost": null,
-   "prezzo_limite_aggiustato": 15.46,
+   "prezzo_limite_aggiustato": 15.4,
    "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -18444,22 +18462,22 @@
     "w1": {
      "support": 14.77,
      "resistance": 16.46,
-     "change_pct": 3.0
+     "change_pct": 2.6
     },
     "m1": {
      "support": 14.12,
      "resistance": 18.94,
-     "change_pct": -2.4
+     "change_pct": -2.78
     },
     "m3": {
      "support": 13.8,
      "resistance": 20.88,
-     "change_pct": -9.91
+     "change_pct": -10.26
     },
     "y1": {
      "support": 13.38,
      "resistance": 35.3,
-     "change_pct": -25.71
+     "change_pct": -26.0
     }
    },
    "financials": [],
@@ -18482,74 +18500,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 15.46,
+     "prezzo": 15.4,
      "medie": {
       "sma10": {
-       "liv": 15.54,
-       "dist_pct": -0.51
+       "liv": 15.53,
+       "dist_pct": -0.86
       },
       "ema10": {
-       "liv": 15.38,
-       "dist_pct": 0.51
+       "liv": 15.37,
+       "dist_pct": 0.19
       },
       "sma20": {
        "liv": 15.57,
-       "dist_pct": -0.72
+       "dist_pct": -1.08
       },
       "ema20": {
        "liv": 15.5,
-       "dist_pct": -0.27
+       "dist_pct": -0.62
       },
       "sma30": {
        "liv": 15.67,
-       "dist_pct": -1.34
+       "dist_pct": -1.71
       },
       "ema30": {
-       "liv": 15.59,
-       "dist_pct": -0.81
+       "liv": 15.58,
+       "dist_pct": -1.17
       },
       "sma50": {
        "liv": 15.48,
-       "dist_pct": -0.13
+       "dist_pct": -0.51
       },
       "ema50": {
        "liv": 15.81,
-       "dist_pct": -2.22
+       "dist_pct": -2.59
       },
       "sma100": {
        "liv": 16.42,
-       "dist_pct": -5.85
+       "dist_pct": -6.21
       },
       "ema100": {
        "liv": 16.5,
-       "dist_pct": -6.31
+       "dist_pct": -6.67
       },
       "sma200": {
        "liv": 18.08,
-       "dist_pct": -14.48
+       "dist_pct": -14.81
       },
       "ema200": {
        "liv": 17.38,
-       "dist_pct": -11.05
+       "dist_pct": -11.39
       }
      },
      "medie_battute": 1,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 49.4,
+      "rsi14": 49.0,
       "macd": {
        "linea": -0.14,
        "segnale": -0.09,
        "istogramma": -0.05
       },
-      "stoch_k": 38.6,
-      "stoch_d": 32.2,
-      "williams_r": -61.4,
-      "cci20": -26.7,
+      "stoch_k": 36.9,
+      "stoch_d": 31.6,
+      "williams_r": -63.1,
+      "cci20": -28.6,
       "adx14": 19.6,
       "di_su": 26.5,
       "di_giu": 18.5,
-      "momentum10": -0.61
+      "momentum10": -0.67
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19042,19 +19060,19 @@
       "o": 15.39,
       "h": 15.53,
       "l": 15.36,
-      "c": 15.46
+      "c": 15.4
      }
     ],
     "performance": {
-     "s1": -0.39,
-     "m1": -13.34,
-     "m3": 2.86,
-     "m6": -14.91,
-     "a1": -18.76,
-     "ytd": 6.55,
-     "a3": -14.77,
-     "a5": -4.92,
-     "a10": -9.38
+     "s1": -0.77,
+     "m1": -13.68,
+     "m3": 2.46,
+     "m6": -15.24,
+     "a1": -19.08,
+     "ytd": 6.13,
+     "a3": -15.1,
+     "a5": -5.29,
+     "a10": -9.73
     },
     "stagionalita": [
      {
@@ -19140,7 +19158,7 @@
      },
      {
       "mese": 10,
-      "media": 4.21,
+      "media": 4.2,
       "mediana": 3.19,
       "positivi_pct": 57,
       "campione": 37,
@@ -19167,9 +19185,9 @@
      }
     ]
    },
-   "rs_1m": -5.3,
+   "rs_1m": -5.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -8.5,
+   "rs_ndx_1m": -8.9,
    "beta_ndx": -4.44,
    "avg_corr": -0.37,
    "max_corr": 0.03,
@@ -19181,26 +19199,26 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 31052.0,
+   "price": 31080.0,
    "price_asof": "2026-10-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.18,
+   "change_pct": -0.09,
    "pe": null,
    "ath": 31616.5,
-   "ath_dist_pct": -1.8,
-   "sma200_dist_pct": 11.8,
+   "ath_dist_pct": -1.7,
+   "sma200_dist_pct": 11.9,
    "sma50_dist_pct": 3.7,
    "w52_high": 31616.5,
    "w52_low": 22961.5,
-   "w52_dist_pct": -1.8,
+   "w52_dist_pct": -1.7,
    "day_high": 31289.25,
    "day_low": 31030.0,
    "support": 28763.75,
    "resistance": 31616.5,
-   "rsi": 60.1,
-   "volume": 104583,
-   "vol_ratio": 1.36,
+   "rsi": 60.7,
+   "volume": 109963,
+   "vol_ratio": 1.35,
    "atr_14": 446.8,
    "atr_pct": 1.44,
    "signal": "Trend rialzista",
@@ -19211,7 +19229,7 @@
      31402.25,
      30969.5,
      31108.75,
-     31052.0
+     31080.0
     ],
     "m6": [
      25996.75,
@@ -19339,7 +19357,7 @@
      31402.25,
      30969.5,
      31108.75,
-     31052.0
+     31080.0
     ],
     "all": [
      3621.0,
@@ -19609,7 +19627,7 @@
      28404.25,
      29513.0,
      30698.75,
-     31052.0
+     31080.0
     ],
     "m1": [
      29387.0,
@@ -19633,7 +19651,7 @@
      31402.25,
      30969.5,
      31108.75,
-     31052.0
+     31080.0
     ],
     "m3": [
      30032.25,
@@ -19701,7 +19719,7 @@
      31402.25,
      30969.5,
      31108.75,
-     31052.0
+     31080.0
     ],
     "y1": [
      24922.25,
@@ -19754,24 +19772,24 @@
      30784.75,
      30566.25,
      31317.75,
-     31052.0
+     31080.0
     ],
     "d1": [
-     31226.75,
+     31225.75,
      31219.5,
      31213.75,
      31235.0,
      31246.5,
      31253.5,
      31242.25,
-     31247.0,
+     31247.5,
      31248.75,
      31242.0,
-     31200.5,
+     31199.75,
      31229.0,
      31183.75,
      31172.0,
-     31161.25,
+     31161.5,
      31179.75,
      31180.0,
      31167.25,
@@ -19779,12 +19797,12 @@
      31189.0,
      31183.5,
      31166.5,
-     31190.75,
+     31190.5,
      31207.0,
      31169.5,
-     31168.0,
+     31167.75,
      31157.0,
-     31144.75,
+     31145.75,
      31105.5,
      31072.5,
      31079.5,
@@ -19802,21 +19820,26 @@
      31047.25,
      31034.25,
      31059.5,
-     31052.0
+     31066.25,
+     31055.75,
+     31069.25,
+     31051.75,
+     31085.5,
+     31080.0
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 79,
+   "health": 80,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.95,
-   "sortino_1y": 1.4,
-   "sharpe_6m": 1.67,
-   "sortino_6m": 2.57,
+   "sharpe_1y": 0.96,
+   "sortino_1y": 1.41,
+   "sharpe_6m": 1.68,
+   "sortino_6m": 2.58,
    "prepost": null,
-   "prezzo_limite_aggiustato": 31052.0,
+   "prezzo_limite_aggiustato": 31080.0,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19829,22 +19852,22 @@
     "w1": {
      "support": 30792.0,
      "resistance": 31616.5,
-     "change_pct": -1.37
+     "change_pct": -1.28
     },
     "m1": {
      "support": 28763.75,
      "resistance": 31616.5,
-     "change_pct": 5.67
+     "change_pct": 5.76
     },
     "m3": {
      "support": 27201.5,
      "resistance": 31616.5,
-     "change_pct": 3.4
+     "change_pct": 3.49
     },
     "y1": {
      "support": 22961.5,
      "resistance": 31616.5,
-     "change_pct": 24.6
+     "change_pct": 24.71
     }
    },
    "financials": [],
@@ -19871,74 +19894,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 31052.0,
+     "prezzo": 31080.0,
      "medie": {
       "sma10": {
-       "liv": 31046.78,
-       "dist_pct": 0.02
+       "liv": 31049.58,
+       "dist_pct": 0.1
       },
       "ema10": {
-       "liv": 31003.73,
-       "dist_pct": 0.16
+       "liv": 31008.82,
+       "dist_pct": 0.23
       },
       "sma20": {
-       "liv": 30612.35,
-       "dist_pct": 1.44
+       "liv": 30613.75,
+       "dist_pct": 1.52
       },
       "ema20": {
-       "liv": 30684.83,
-       "dist_pct": 1.2
+       "liv": 30687.5,
+       "dist_pct": 1.28
       },
       "sma30": {
-       "liv": 30194.12,
-       "dist_pct": 2.84
+       "liv": 30195.06,
+       "dist_pct": 2.93
       },
       "ema30": {
-       "liv": 30434.18,
-       "dist_pct": 2.03
+       "liv": 30435.98,
+       "dist_pct": 2.12
       },
       "sma50": {
-       "liv": 29956.12,
-       "dist_pct": 3.66
+       "liv": 29956.68,
+       "dist_pct": 3.75
       },
       "ema50": {
-       "liv": 30095.54,
-       "dist_pct": 3.18
+       "liv": 30096.64,
+       "dist_pct": 3.27
       },
       "sma100": {
-       "liv": 29743.77,
-       "dist_pct": 4.4
+       "liv": 29744.05,
+       "dist_pct": 4.49
       },
       "ema100": {
-       "liv": 29415.75,
-       "dist_pct": 5.56
+       "liv": 29416.3,
+       "dist_pct": 5.66
       },
       "sma200": {
-       "liv": 27782.13,
-       "dist_pct": 11.77
+       "liv": 27782.27,
+       "dist_pct": 11.87
       },
       "ema200": {
-       "liv": 28305.31,
-       "dist_pct": 9.7
+       "liv": 28305.59,
+       "dist_pct": 9.8
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 60.1,
+      "rsi14": 60.7,
       "macd": {
-       "linea": 415.65,
-       "segnale": 408.32,
-       "istogramma": 7.33
+       "linea": 417.88,
+       "segnale": 408.76,
+       "istogramma": 9.12
       },
-      "stoch_k": 55.2,
-      "stoch_d": 59.0,
-      "williams_r": -44.8,
-      "cci20": 43.1,
+      "stoch_k": 57.4,
+      "stoch_d": 59.8,
+      "williams_r": -42.6,
+      "cci20": 43.8,
       "adx14": 21.4,
       "di_su": 23.9,
       "di_giu": 17.4,
-      "momentum10": 485.75
+      "momentum10": 513.75
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -20431,19 +20454,19 @@
       "o": 31145.5,
       "h": 31289.25,
       "l": 31030.0,
-      "c": 31052.0
+      "c": 31080.0
      }
     ],
     "performance": {
-     "s1": -0.85,
-     "m1": 6.58,
-     "m3": 3.72,
-     "m6": 21.57,
-     "ytd": 22.32,
-     "a1": 32.35,
-     "a3": 133.12,
-     "a5": 140.5,
-     "a10": 649.82
+     "s1": -0.76,
+     "m1": 6.67,
+     "m3": 3.82,
+     "m6": 21.67,
+     "ytd": 22.43,
+     "a1": 32.47,
+     "a3": 133.33,
+     "a5": 140.72,
+     "a10": 650.5
     },
     "stagionalita": [
      {
@@ -20556,7 +20579,7 @@
      }
     ]
    },
-   "rs_1m": 2.8,
+   "rs_1m": 2.9,
    "rs_bench": "sp500",
    "rs_ndx_1m": -0.4,
    "beta_ndx": 0.98,
@@ -25123,10 +25146,10 @@
    "price_asof": "2026-10-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.3,
+   "change_pct": -0.29,
    "pe": null,
    "ath": 1.6,
-   "ath_dist_pct": -30.3,
+   "ath_dist_pct": -30.2,
    "sma200_dist_pct": -3.6,
    "sma50_dist_pct": -2.8,
    "w52_high": 1.2,
@@ -25779,6 +25802,11 @@
      1.12,
      1.12,
      1.12,
+     1.12,
+     1.12,
+     1.12,
+     1.12,
+     1.12,
      1.12
     ]
    },
@@ -25791,7 +25819,7 @@
    "sharpe_1y": -1.32,
    "sortino_1y": -1.87,
    "sharpe_6m": -3.14,
-   "sortino_6m": -3.8,
+   "sortino_6m": -3.79,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.12,
    "risk_reward": "1:2.8",
@@ -25806,22 +25834,22 @@
     "w1": {
      "support": 1.12,
      "resistance": 1.13,
-     "change_pct": -0.34
+     "change_pct": -0.32
     },
     "m1": {
      "support": 1.12,
      "resistance": 1.16,
-     "change_pct": -3.71
+     "change_pct": -3.7
     },
     "m3": {
      "support": 1.12,
      "resistance": 1.17,
-     "change_pct": -1.97
+     "change_pct": -1.96
     },
     "y1": {
      "support": 1.12,
      "resistance": 1.2,
-     "change_pct": -3.63
+     "change_pct": -3.62
     }
    },
    "financials": [],
@@ -25852,51 +25880,51 @@
      "medie": {
       "sma10": {
        "liv": 1.13,
-       "dist_pct": -0.72
+       "dist_pct": -0.71
       },
       "ema10": {
        "liv": 1.13,
-       "dist_pct": -0.73
+       "dist_pct": -0.72
       },
       "sma20": {
        "liv": 1.14,
-       "dist_pct": -1.58
+       "dist_pct": -1.57
       },
       "ema20": {
        "liv": 1.13,
-       "dist_pct": -1.41
+       "dist_pct": -1.4
       },
       "sma30": {
        "liv": 1.14,
-       "dist_pct": -2.31
+       "dist_pct": -2.3
       },
       "ema30": {
        "liv": 1.14,
-       "dist_pct": -1.84
+       "dist_pct": -1.83
       },
       "sma50": {
        "liv": 1.15,
-       "dist_pct": -2.81
+       "dist_pct": -2.8
       },
       "ema50": {
        "liv": 1.14,
-       "dist_pct": -2.28
+       "dist_pct": -2.26
       },
       "sma100": {
        "liv": 1.15,
-       "dist_pct": -2.73
+       "dist_pct": -2.72
       },
       "ema100": {
        "liv": 1.15,
-       "dist_pct": -2.76
+       "dist_pct": -2.75
       },
       "sma200": {
        "liv": 1.16,
-       "dist_pct": -3.6
+       "dist_pct": -3.58
       },
       "ema200": {
        "liv": 1.15,
-       "dist_pct": -3.2
+       "dist_pct": -3.19
       }
      },
      "medie_battute": 0,
@@ -25908,10 +25936,10 @@
        "segnale": -0.01,
        "istogramma": -0.0
       },
-      "stoch_k": 5.9,
-      "stoch_d": 11.2,
-      "williams_r": -94.1,
-      "cci20": -68.6,
+      "stoch_k": 6.4,
+      "stoch_d": 11.3,
+      "williams_r": -93.6,
+      "cci20": -68.4,
       "adx14": 49.9,
       "di_su": 7.5,
       "di_giu": 30.2,
@@ -26412,15 +26440,15 @@
      }
     ],
     "performance": {
-     "s1": -0.67,
-     "m1": -3.91,
-     "m3": -2.22,
-     "m6": -5.12,
-     "a1": -3.99,
-     "ytd": -4.86,
-     "a3": 5.32,
-     "a5": -3.3,
-     "a10": 1.77
+     "s1": -0.66,
+     "m1": -3.9,
+     "m3": -2.21,
+     "m6": -5.11,
+     "a1": -3.98,
+     "ytd": -4.85,
+     "a3": 5.33,
+     "a5": -3.29,
+     "a10": 1.78
     },
     "stagionalita": [
      {
@@ -26506,7 +26534,7 @@
      },
      {
       "mese": 10,
-      "media": -0.34,
+      "media": -0.33,
       "mediana": -0.32,
       "positivi_pct": 48,
       "campione": 23,
@@ -26551,7 +26579,7 @@
    "price_asof": "2026-10-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 1.87,
+   "change_pct": 1.91,
    "pe": null,
    "ath": 6.83,
    "ath_dist_pct": -0.9,
@@ -26564,10 +26592,10 @@
    "day_low": 6.69,
    "support": 6.32,
    "resistance": 6.83,
-   "rsi": 60.2,
-   "volume": 12986,
-   "vol_ratio": 0.54,
-   "atr_14": 0.09412,
+   "rsi": 60.4,
+   "volume": 15256,
+   "vol_ratio": 0.48,
+   "atr_14": 0.0943,
    "atr_pct": 1.39,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -27169,6 +27197,11 @@
      6.77,
      6.77,
      6.77,
+     6.76,
+     6.78,
+     6.78,
+     6.77,
+     6.78,
      6.77
     ]
    },
@@ -27181,7 +27214,7 @@
    "sharpe_1y": 0.91,
    "sortino_1y": 1.32,
    "sharpe_6m": 0.87,
-   "sortino_6m": 1.2,
+   "sortino_6m": 1.21,
    "prepost": null,
    "prezzo_limite_aggiustato": 6.77,
    "risk_reward": "1:0.3",
@@ -27196,22 +27229,22 @@
     "w1": {
      "support": 6.52,
      "resistance": 6.78,
-     "change_pct": 2.61
+     "change_pct": 2.65
     },
     "m1": {
      "support": 6.28,
      "resistance": 6.83,
-     "change_pct": 4.59
+     "change_pct": 4.64
     },
     "m3": {
      "support": 6.15,
      "resistance": 6.83,
-     "change_pct": 8.55
+     "change_pct": 8.6
     },
     "y1": {
      "support": 4.9,
      "resistance": 6.83,
-     "change_pct": 32.66
+     "change_pct": 32.72
     }
    },
    "financials": [],
@@ -27242,69 +27275,69 @@
      "medie": {
       "sma10": {
        "liv": 6.58,
-       "dist_pct": 2.86
+       "dist_pct": 2.9
       },
       "ema10": {
        "liv": 6.61,
-       "dist_pct": 2.3
+       "dist_pct": 2.34
       },
       "sma20": {
        "liv": 6.59,
-       "dist_pct": 2.61
+       "dist_pct": 2.65
       },
       "ema20": {
        "liv": 6.6,
-       "dist_pct": 2.58
+       "dist_pct": 2.62
       },
       "sma30": {
        "liv": 6.58,
-       "dist_pct": 2.8
+       "dist_pct": 2.84
       },
       "ema30": {
        "liv": 6.58,
-       "dist_pct": 2.8
+       "dist_pct": 2.84
       },
       "sma50": {
        "liv": 6.58,
-       "dist_pct": 2.76
+       "dist_pct": 2.81
       },
       "ema50": {
        "liv": 6.54,
-       "dist_pct": 3.4
+       "dist_pct": 3.45
       },
       "sma100": {
        "liv": 6.44,
-       "dist_pct": 4.99
+       "dist_pct": 5.04
       },
       "ema100": {
        "liv": 6.42,
-       "dist_pct": 5.46
+       "dist_pct": 5.5
       },
       "sma200": {
        "liv": 6.15,
-       "dist_pct": 9.95
+       "dist_pct": 10.0
       },
       "ema200": {
        "liv": 6.16,
-       "dist_pct": 9.87
+       "dist_pct": 9.92
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 60.2,
+      "rsi14": 60.4,
       "macd": {
        "linea": 0.02,
        "segnale": 0.01,
        "istogramma": 0.01
       },
-      "stoch_k": 95.6,
-      "stoch_d": 53.6,
-      "williams_r": -4.4,
-      "cci20": 125.1,
-      "adx14": 10.6,
-      "di_su": 40.0,
-      "di_giu": 27.9,
+      "stoch_k": 95.8,
+      "stoch_d": 53.7,
+      "williams_r": -4.2,
+      "cci20": 126.4,
+      "adx14": 10.7,
+      "di_su": 40.1,
+      "di_giu": 27.8,
       "momentum10": 0.2
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
@@ -27802,15 +27835,15 @@
      }
     ],
     "performance": {
-     "s1": 2.75,
-     "m1": 4.63,
-     "m3": 8.87,
-     "m6": 13.23,
-     "ytd": 19.97,
-     "a1": 49.75,
-     "a3": 74.84,
-     "a5": 89.35,
-     "a10": 167.66
+     "s1": 2.79,
+     "m1": 4.68,
+     "m3": 8.92,
+     "m6": 13.28,
+     "ytd": 20.03,
+     "a1": 49.82,
+     "a3": 74.92,
+     "a5": 89.44,
+     "a10": 167.78
     },
     "stagionalita": [
      {
@@ -27896,7 +27929,7 @@
      },
      {
       "mese": 10,
-      "media": 0.6,
+      "media": 0.61,
       "mediana": 2.16,
       "positivi_pct": 61,
       "campione": 23,
@@ -27937,28 +27970,28 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 93.27,
+   "price": 93.05,
    "price_asof": "2026-10-12",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 1.55,
+   "change_pct": 1.31,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -36.7,
-   "sma200_dist_pct": 11.8,
-   "sma50_dist_pct": 4.4,
+   "ath_dist_pct": -36.8,
+   "sma200_dist_pct": 11.6,
+   "sma50_dist_pct": 4.1,
    "w52_high": 119.48,
    "w52_low": 54.98,
-   "w52_dist_pct": -21.9,
-   "day_high": 93.31,
+   "w52_dist_pct": -22.1,
+   "day_high": 93.33,
    "day_low": 89.61,
    "support": 86.86,
    "resistance": 106.75,
-   "rsi": 52.9,
-   "volume": 71034,
-   "vol_ratio": 1.1,
-   "atr_14": 4.21,
-   "atr_pct": 4.52,
+   "rsi": 52.5,
+   "volume": 77345,
+   "vol_ratio": 1.09,
+   "atr_14": 4.22,
+   "atr_pct": 4.53,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -27967,7 +28000,7 @@
      88.28,
      91.49,
      91.85,
-     93.27
+     93.05
     ],
     "m6": [
      91.28,
@@ -28095,7 +28128,7 @@
      88.28,
      91.49,
      91.85,
-     93.27
+     93.05
     ],
     "all": [
      33.1,
@@ -28366,7 +28399,7 @@
      84.67,
      85.76,
      90.42,
-     93.27
+     93.05
     ],
     "m1": [
      100.05,
@@ -28390,7 +28423,7 @@
      88.28,
      91.49,
      91.85,
-     93.27
+     93.05
     ],
     "m3": [
      71.41,
@@ -28458,7 +28491,7 @@
      88.28,
      91.49,
      91.85,
-     93.27
+     93.05
     ],
     "y1": [
      59.49,
@@ -28511,7 +28544,7 @@
      95.78,
      92.6,
      89.43,
-     93.27
+     93.05
     ],
     "d1": [
      90.35,
@@ -28523,7 +28556,7 @@
      90.42,
      90.51,
      90.52,
-     90.61,
+     90.62,
      90.71,
      90.69,
      90.79,
@@ -28538,14 +28571,14 @@
      91.18,
      91.03,
      91.15,
-     91.15,
+     91.14,
      91.73,
      91.34,
      91.5,
      91.82,
      92.14,
      92.5,
-     92.62,
+     92.6,
      92.42,
      92.5,
      92.99,
@@ -28559,7 +28592,12 @@
      92.9,
      93.01,
      93.0,
-     93.27
+     93.05,
+     93.13,
+     93.13,
+     93.28,
+     92.98,
+     93.05
     ]
    },
    "earnings_date": null,
@@ -28568,12 +28606,12 @@
    "health": 56,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.75,
-   "sortino_1y": 1.03,
-   "sharpe_6m": -0.28,
-   "sortino_6m": -0.38,
+   "sharpe_1y": 0.74,
+   "sortino_1y": 1.02,
+   "sharpe_6m": -0.29,
+   "sortino_6m": -0.39,
    "prepost": null,
-   "prezzo_limite_aggiustato": 93.27,
+   "prezzo_limite_aggiustato": 93.05,
    "risk_reward": "1:1.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -28585,23 +28623,23 @@
    "tech_by_range": {
     "w1": {
      "support": 86.86,
-     "resistance": 93.31,
-     "change_pct": 4.28
+     "resistance": 93.33,
+     "change_pct": 4.04
     },
     "m1": {
      "support": 86.86,
      "resistance": 106.75,
-     "change_pct": -6.78
+     "change_pct": -7.0
     },
     "m3": {
      "support": 70.77,
      "resistance": 106.75,
-     "change_pct": 30.61
+     "change_pct": 30.3
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 56.78
+     "change_pct": 56.41
     }
    },
    "financials": [],
@@ -28628,74 +28666,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 93.27,
+     "prezzo": 93.05,
      "medie": {
       "sma10": {
-       "liv": 90.75,
-       "dist_pct": 2.77
+       "liv": 90.73,
+       "dist_pct": 2.55
       },
       "ema10": {
-       "liv": 91.67,
-       "dist_pct": 1.75
+       "liv": 91.63,
+       "dist_pct": 1.56
       },
       "sma20": {
-       "liv": 94.01,
-       "dist_pct": -0.79
+       "liv": 94.0,
+       "dist_pct": -1.01
       },
       "ema20": {
-       "liv": 92.14,
-       "dist_pct": 1.23
+       "liv": 92.12,
+       "dist_pct": 1.01
       },
       "sma30": {
-       "liv": 94.1,
-       "dist_pct": -0.88
+       "liv": 94.09,
+       "dist_pct": -1.11
       },
       "ema30": {
-       "liv": 91.71,
-       "dist_pct": 1.7
+       "liv": 91.7,
+       "dist_pct": 1.47
       },
       "sma50": {
        "liv": 89.37,
-       "dist_pct": 4.36
+       "dist_pct": 4.12
       },
       "ema50": {
-       "liv": 90.32,
-       "dist_pct": 3.27
+       "liv": 90.31,
+       "dist_pct": 3.04
       },
       "sma100": {
        "liv": 85.79,
-       "dist_pct": 8.72
+       "dist_pct": 8.46
       },
       "ema100": {
        "liv": 87.78,
-       "dist_pct": 6.25
+       "dist_pct": 6.01
       },
       "sma200": {
        "liv": 83.4,
-       "dist_pct": 11.83
+       "dist_pct": 11.57
       },
       "ema200": {
        "liv": 82.87,
-       "dist_pct": 12.55
+       "dist_pct": 12.29
       }
      },
      "medie_battute": 10,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 52.9,
+      "rsi14": 52.5,
       "macd": {
-       "linea": -0.12,
-       "segnale": 0.34,
-       "istogramma": -0.46
+       "linea": -0.14,
+       "segnale": 0.33,
+       "istogramma": -0.48
       },
-      "stoch_k": 64.6,
-      "stoch_d": 48.1,
-      "williams_r": -35.4,
-      "cci20": -24.5,
+      "stoch_k": 62.4,
+      "stoch_d": 47.4,
+      "williams_r": -37.6,
+      "cci20": -25.3,
       "adx14": 17.9,
       "di_su": 21.6,
       "di_giu": 15.0,
-      "momentum10": 0.67
+      "momentum10": 0.45
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -29186,21 +29224,21 @@
      {
       "d": "2026-10-12",
       "o": 91.83,
-      "h": 93.31,
+      "h": 93.33,
       "l": 89.61,
-      "c": 93.27
+      "c": 93.05
      }
     ],
     "performance": {
-     "s1": 4.29,
-     "m1": -8.99,
-     "m3": 29.4,
-     "m6": -5.86,
-     "ytd": 62.72,
-     "a1": 45.71,
-     "a3": 21.48,
-     "a5": 78.68,
-     "a10": 93.35
+     "s1": 4.05,
+     "m1": -9.2,
+     "m3": 29.09,
+     "m6": -6.09,
+     "ytd": 62.33,
+     "a1": 45.37,
+     "a3": 21.19,
+     "a5": 78.26,
+     "a10": 92.89
     },
     "stagionalita": [
      {
@@ -29286,7 +29324,7 @@
      },
      {
       "mese": 10,
-      "media": -2.01,
+      "media": -2.02,
       "mediana": -2.23,
       "positivi_pct": 39,
       "campione": 23,
@@ -29313,9 +29351,9 @@
      }
     ]
    },
-   "rs_1m": -9.7,
+   "rs_1m": -9.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -12.9,
+   "rs_ndx_1m": -13.1,
    "beta_ndx": -0.86,
    "avg_corr": -0.2,
    "max_corr": -0.02,
@@ -29943,18 +29981,18 @@
    "sortino_6m": 1.44,
    "prepost": {
     "label": "pre",
-    "price": 41.24,
-    "change_pct": -1.48
+    "price": 41.1,
+    "change_pct": -1.82
    },
-   "prezzo_limite_aggiustato": 41.24,
+   "prezzo_limite_aggiustato": 41.1,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
-    "market_cap": 27497285632.0,
-    "shares": 656965384.0,
-    "float_shares": 557724193.0,
-    "float_pct": 84.9,
+    "market_cap": 27074869248.0,
+    "shares": 646873027.0,
+    "float_shares": 557625648.0,
+    "float_pct": 86.2,
     "avg_volume_30d": 44480679.0,
     "pe_ttm": 12.839,
     "forward_pe": 7.8587,
@@ -29972,14 +30010,14 @@
     "target_mean": 42.2667,
     "fcf": -8248783872.0,
     "gross_margin": 0.1082,
-    "enterprise_value": 33439010816.0,
-    "ev_ebitda": 11.84,
+    "enterprise_value": 35465748480.0,
+    "ev_ebitda": 12.558,
     "peg": 0.91,
     "roa": 0.0788,
-    "short_float": 0.1482,
-    "buyback_yield": -0.205,
-    "ps": 0.7,
-    "ev_s": 0.86,
+    "short_float": 0.1614,
+    "buyback_yield": -0.2082,
+    "ps": 0.69,
+    "ev_s": 0.91,
     "altman_z": 6.77,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -29996,7 +30034,7 @@
     "fcf_ttm": -6971885000.0,
     "mesi_capex": 557.1,
     "mesi_operativi": 13.3,
-    "emissione_netta_pct": 20.5,
+    "emissione_netta_pct": 20.82,
     "debito_netto": 1239439000.0,
     "valuta": "USD"
    },
@@ -31473,11 +31511,11 @@
    "sortino_6m": -1.24,
    "prepost": {
     "label": "pre",
-    "price": 34.41,
-    "change_pct": -0.84
+    "price": 34.3,
+    "change_pct": -1.15
    },
-   "prezzo_limite_aggiustato": 34.41,
-   "risk_reward": "1:1.5",
+   "prezzo_limite_aggiustato": 34.3,
+   "risk_reward": "1:1.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Utilities",
    "stats": {
@@ -31502,14 +31540,14 @@
     "target_mean": 75.775,
     "fcf": -239324880.0,
     "gross_margin": 0.4041,
-    "enterprise_value": 3993800448.0,
+    "enterprise_value": 4388157952.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": -0.0665,
-    "short_float": 0.1999,
+    "short_float": 0.2052,
     "buyback_yield": -0.1958,
     "ps": 5334.56,
-    "ev_s": 3300.66,
+    "ev_s": 3626.58,
     "altman_fuori_scala": 33.81
    },
    "combustione": {
@@ -33117,15 +33155,15 @@
    "rating": {
     "key": "strong_buy",
     "n": 58,
-    "target": 331.36,
+    "target": 331.53,
     "upside_pct": 26.3
    },
    "analisti": {
-    "eps_ora": 10.5273,
-    "eps_90g_fa": 9.9849,
-    "eps_7g_fa": 10.5149,
-    "revisione_90g_pct": 5.43,
-    "revisione_7g_pct": 0.12,
+    "eps_ora": 10.5269,
+    "eps_90g_fa": 9.9864,
+    "eps_7g_fa": 10.5028,
+    "revisione_90g_pct": 5.41,
+    "revisione_7g_pct": 0.23,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 8.73,
@@ -33144,10 +33182,10 @@
    "sortino_6m": 0.78,
    "prepost": {
     "label": "pre",
-    "price": 262.2,
-    "change_pct": -0.09
+    "price": 262.04,
+    "change_pct": -0.15
    },
-   "prezzo_limite_aggiustato": 262.2,
+   "prezzo_limite_aggiustato": 262.04,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -33158,9 +33196,9 @@
     "float_pct": 91.0,
     "avg_volume_30d": 39235829.0,
     "pe_ttm": 21.1126,
-    "forward_pe": 25.0446,
+    "forward_pe": 25.0735,
     "eps_ttm": 12.43,
-    "eps_forward": 10.4785,
+    "eps_forward": 10.4664,
     "revenue_fy": 775680032768.0,
     "net_income_fy": 135281000448.0,
     "revenue_growth": 0.196,
@@ -33170,17 +33208,17 @@
     "debt_to_equity": 45.617,
     "dividend_yield": 0.0,
     "price_to_book": 5.13,
-    "target_mean": 331.3576,
+    "target_mean": 331.53,
     "fcf": 3219124992.0,
     "gross_margin": 0.5077,
-    "enterprise_value": 2959299313664.0,
-    "ev_ebitda": 17.52,
-    "peg": 1.53,
+    "enterprise_value": 2932225605632.0,
+    "ev_ebitda": 17.359,
+    "peg": 1.52,
     "roa": 0.0659,
-    "short_float": 0.0088,
+    "short_float": 0.0083,
     "buyback_yield": -0.0,
     "ps": 3.65,
-    "ev_s": 3.82,
+    "ev_s": 3.78,
     "altman_z": 2.97,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -34890,10 +34928,10 @@
    "sortino_6m": 1.58,
    "prepost": {
     "label": "pre",
-    "price": 769.68,
-    "change_pct": -1.7
+    "price": 770.49,
+    "change_pct": -1.6
    },
-   "prezzo_limite_aggiustato": 769.68,
+   "prezzo_limite_aggiustato": 770.49,
    "risk_reward": "1:1.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -34919,14 +34957,14 @@
     "target_mean": 1144.3478,
     "fcf": 1943750016.0,
     "gross_margin": 0.4558,
-    "enterprise_value": 179656654848.0,
-    "ev_ebitda": 39.906,
-    "peg": 0.45,
+    "enterprise_value": 185225314304.0,
+    "ev_ebitda": 41.143,
+    "peg": 0.46,
     "roa": 0.2935,
-    "short_float": 0.0351,
+    "short_float": 0.0459,
     "buyback_yield": 0.001,
     "ps": 14.6,
-    "ev_s": 14.73,
+    "ev_s": 15.19,
     "altman_z": 2.41,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -36598,11 +36636,11 @@
     "upside_pct": 22.1
    },
    "analisti": {
-    "eps_ora": 14.9779,
-    "eps_90g_fa": 14.6138,
-    "eps_7g_fa": 14.9494,
-    "revisione_90g_pct": 2.49,
-    "revisione_7g_pct": 0.19,
+    "eps_ora": 14.9724,
+    "eps_90g_fa": 14.558,
+    "eps_7g_fa": 14.9532,
+    "revisione_90g_pct": 2.85,
+    "revisione_7g_pct": 0.13,
     "su_30g": 7,
     "giu_30g": 1,
     "eps_min": 13.67,
@@ -36621,10 +36659,10 @@
    "sortino_6m": 0.76,
    "prepost": {
     "label": "pre",
-    "price": 351.13,
-    "change_pct": -0.15
+    "price": 351.21,
+    "change_pct": -0.13
    },
-   "prezzo_limite_aggiustato": 351.13,
+   "prezzo_limite_aggiustato": 351.21,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -36650,14 +36688,14 @@
     "target_mean": 429.4741,
     "fcf": 22665000960.0,
     "gross_margin": 0.609,
-    "enterprise_value": 4197141708800.0,
-    "ev_ebitda": 24.238,
-    "peg": 1.23,
+    "enterprise_value": 4182954999808.0,
+    "ev_ebitda": 24.156,
+    "peg": 1.25,
     "roa": 0.1296,
-    "short_float": 0.0137,
+    "short_float": 0.0149,
     "buyback_yield": 0.0106,
     "ps": 9.65,
-    "ev_s": 9.41
+    "ev_s": 9.38
    },
    "combustione": {
     "cassa": 55911000000.0,
@@ -38627,15 +38665,15 @@
    "rating": {
     "key": "buy",
     "n": 24,
-    "target": 670.79,
-    "upside_pct": 68.8
+    "target": 673.5,
+    "upside_pct": 69.5
    },
    "analisti": {
-    "eps_ora": 32.0435,
-    "eps_90g_fa": 26.0841,
+    "eps_ora": 31.8276,
+    "eps_90g_fa": 25.6604,
     "eps_7g_fa": 31.7495,
-    "revisione_90g_pct": 22.85,
-    "revisione_7g_pct": 0.93,
+    "revisione_90g_pct": 24.03,
+    "revisione_7g_pct": 0.25,
     "su_30g": 10,
     "giu_30g": 0,
     "eps_min": 21.95,
@@ -38654,17 +38692,17 @@
    "sortino_6m": 0.43,
    "prepost": {
     "label": "pre",
-    "price": 391.5,
-    "change_pct": -1.45
+    "price": 390.76,
+    "change_pct": -1.64
    },
-   "prezzo_limite_aggiustato": 391.5,
+   "prezzo_limite_aggiustato": 390.76,
    "risk_reward": "1:1.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 148711145472.0,
     "shares": 374323269.0,
-    "float_shares": 358164979.0,
+    "float_shares": 358074844.0,
     "float_pct": 95.7,
     "avg_volume_30d": 7724701.0,
     "pe_ttm": 14.7578,
@@ -38679,18 +38717,18 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0015,
-    "price_to_book": null,
-    "target_mean": 670.7917,
+    "price_to_book": 18.995,
+    "target_mean": 673.5,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
-    "enterprise_value": 142847705088.0,
-    "ev_ebitda": 28.558,
-    "peg": 0.76,
+    "enterprise_value": 145782505472.0,
+    "ev_ebitda": 29.145,
+    "peg": 0.78,
     "roa": 0.2076,
-    "short_float": 0.0546,
+    "short_float": 0.0538,
     "buyback_yield": 0.0174,
     "ps": 11.51,
-    "ev_s": 11.06,
+    "ev_s": 11.28,
     "altman_z": 9.76,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -40439,22 +40477,22 @@
    "rating": {
     "key": "strong_buy",
     "n": 20,
-    "target": 578.22,
-    "upside_pct": 27.6
+    "target": 555.01,
+    "upside_pct": 22.4
    },
    "analisti": {
-    "eps_ora": 22.3048,
-    "eps_90g_fa": 20.2981,
+    "eps_ora": 22.0499,
+    "eps_90g_fa": 20.296,
     "eps_7g_fa": 21.9251,
-    "revisione_90g_pct": 9.89,
-    "revisione_7g_pct": 1.73,
+    "revisione_90g_pct": 8.64,
+    "revisione_7g_pct": 0.57,
     "su_30g": 2,
     "giu_30g": 0,
     "eps_min": 19.58,
-    "eps_max": 25.87,
+    "eps_max": 24.6244,
     "eps_n": 13,
     "target_min": 440.0,
-    "target_max": 1000.0,
+    "target_max": 700.0,
     "target_mediana": 538.5
    },
    "health": 78,
@@ -40466,10 +40504,10 @@
    "sortino_6m": 1.34,
    "prepost": {
     "label": "pre",
-    "price": 453.88,
-    "change_pct": 0.13
+    "price": 453.94,
+    "change_pct": 0.14
    },
-   "prezzo_limite_aggiustato": 453.88,
+   "prezzo_limite_aggiustato": 453.94,
    "risk_reward": "1:1.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -40480,9 +40518,9 @@
     "float_pct": null,
     "avg_volume_30d": 11337809.0,
     "pe_ttm": 32.944,
-    "forward_pe": 20.5978,
+    "forward_pe": 20.6754,
     "eps_ttm": 13.76,
-    "eps_forward": 22.0077,
+    "eps_forward": 21.9251,
     "revenue_fy": null,
     "net_income_fy": null,
     "revenue_growth": 0.36,
@@ -40492,14 +40530,14 @@
     "debt_to_equity": 16.504,
     "dividend_yield": 0.0083,
     "price_to_book": null,
-    "target_mean": 578.222,
+    "target_mean": 555.0094,
     "fcf": null,
     "gross_margin": 0.6423,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.86,
+    "peg": 0.92,
     "roa": 0.19,
-    "short_float": 0.0063,
+    "short_float": 0.0057,
     "buyback_yield": -0.0,
     "cross_currency": true,
     "ps": null,
@@ -41884,18 +41922,18 @@
    "sortino_6m": -1.98,
    "prepost": {
     "label": "pre",
-    "price": 161.06,
-    "change_pct": -1.89
+    "price": 161.74,
+    "change_pct": -1.48
    },
-   "prezzo_limite_aggiustato": 161.06,
+   "prezzo_limite_aggiustato": 161.74,
    "risk_reward": "1:2.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 39000887296.0,
     "shares": 112247109.0,
-    "float_shares": 109904252.0,
-    "float_pct": 97.9,
+    "float_shares": 109963643.0,
+    "float_pct": 98.0,
     "avg_volume_30d": 7057195.0,
     "pe_ttm": null,
     "forward_pe": 128.8942,
@@ -41913,14 +41951,14 @@
     "target_mean": 291.6363,
     "fcf": null,
     "gross_margin": 0.349,
-    "enterprise_value": 32566413312.0,
+    "enterprise_value": 35151110144.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": null,
-    "short_float": 0.1258,
+    "short_float": 0.1141,
     "buyback_yield": -0.0272,
     "ps": 57.3,
-    "ev_s": 47.84,
+    "ev_s": 51.64,
     "altman_z": 0.42,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -43680,10 +43718,10 @@
    "sortino_6m": 2.0,
    "prepost": {
     "label": "pre",
-    "price": 102.95,
-    "change_pct": -1.67
+    "price": 103.05,
+    "change_pct": -1.57
    },
-   "prezzo_limite_aggiustato": 102.95,
+   "prezzo_limite_aggiustato": 103.05,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -43709,14 +43747,14 @@
     "target_mean": 118.0465,
     "fcf": 4866375168.0,
     "gross_margin": 0.3887,
-    "enterprise_value": 564517797888.0,
-    "ev_ebitda": 33.522,
+    "enterprise_value": 606988271616.0,
+    "ev_ebitda": 36.044,
     "peg": 1.36,
     "roa": 0.0141,
-    "short_float": 0.0316,
+    "short_float": 0.0301,
     "buyback_yield": -0.023,
     "ps": 9.7,
-    "ev_s": 9.9,
+    "ev_s": 10.64,
     "altman_z": 3.4,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -44554,7 +44592,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -32.5,
-      "meglio": 24.5
+      "meglio": 24.6
      },
      {
       "mese": 11,
@@ -45046,21 +45084,21 @@
    "earnings_date": "2026-11-03",
    "rating": {
     "key": "buy",
-    "n": 30,
-    "target": 221.97,
-    "upside_pct": 36.5
+    "n": 27,
+    "target": 224.56,
+    "upside_pct": 38.1
    },
    "analisti": {
-    "eps_ora": 2.0799,
+    "eps_ora": 2.0372,
     "eps_90g_fa": 0.6759,
     "eps_7g_fa": 1.9297,
-    "revisione_90g_pct": 207.72,
-    "revisione_7g_pct": 7.78,
+    "revisione_90g_pct": 201.4,
+    "revisione_7g_pct": 5.57,
     "su_30g": 3,
     "giu_30g": 0,
     "eps_min": -0.68,
     "eps_max": 3.96,
-    "eps_n": 22,
+    "eps_n": 20,
     "target_min": 118.0,
     "target_max": 450.0,
     "target_mediana": 225.0
@@ -45074,18 +45112,18 @@
    "sortino_6m": -0.01,
    "prepost": {
     "label": "pre",
-    "price": 164.18,
-    "change_pct": 0.99
+    "price": 164.17,
+    "change_pct": 0.98
    },
-   "prezzo_limite_aggiustato": 164.18,
+   "prezzo_limite_aggiustato": 164.17,
    "risk_reward": "1:0.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
    "stats": {
-    "market_cap": 2142962057216.0,
-    "shares": 7696293669.0,
-    "float_shares": 4333641975.0,
-    "float_pct": 56.3,
+    "market_cap": 2141727621120.0,
+    "shares": 7571396888.0,
+    "float_shares": 4333905610.0,
+    "float_pct": 57.2,
     "avg_volume_30d": 93704956.0,
     "pe_ttm": null,
     "forward_pe": 81.7313,
@@ -45100,17 +45138,17 @@
     "debt_to_equity": 31.211,
     "dividend_yield": 0.0,
     "price_to_book": 16.8362,
-    "target_mean": 221.9667,
+    "target_mean": 224.5556,
     "fcf": null,
     "gross_margin": 0.5188,
-    "enterprise_value": 4225622867968.0,
-    "ev_ebitda": 716.572,
+    "enterprise_value": 4358231556096.0,
+    "ev_ebitda": 739.059,
     "peg": null,
     "roa": null,
-    "short_float": 0.0271,
+    "short_float": 0.0243,
     "buyback_yield": -0.0083,
-    "ps": 92.99,
-    "ev_s": 183.37,
+    "ps": 92.94,
+    "ev_s": 189.13,
     "altman_z": 0.06,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -46487,24 +46525,24 @@
    "earnings_date": "2026-10-21",
    "rating": {
     "key": "buy",
-    "n": 38,
-    "target": 397.88,
-    "upside_pct": 4.0
+    "n": 37,
+    "target": 392.42,
+    "upside_pct": 2.5
    },
    "analisti": {
-    "eps_ora": 2.1824,
-    "eps_90g_fa": 2.5798,
-    "eps_7g_fa": 2.148,
-    "revisione_90g_pct": -15.4,
-    "revisione_7g_pct": 1.6,
+    "eps_ora": 2.1457,
+    "eps_90g_fa": 2.5746,
+    "eps_7g_fa": 2.163,
+    "revisione_90g_pct": -16.66,
+    "revisione_7g_pct": -0.8,
     "su_30g": 1,
     "giu_30g": 4,
     "eps_min": 1.3989,
-    "eps_max": 3.67,
+    "eps_max": 3.65,
     "eps_n": 31,
     "target_min": 128.11,
     "target_max": 600.0,
-    "target_mediana": 412.5
+    "target_mediana": 410.0
    },
    "health": 69,
    "eps": 1.08,
@@ -46515,11 +46553,11 @@
    "sortino_6m": 0.4,
    "prepost": {
     "label": "pre",
-    "price": 383.03,
-    "change_pct": 0.09
+    "price": 382.62,
+    "change_pct": -0.02
    },
-   "prezzo_limite_aggiustato": 383.03,
-   "risk_reward": "1:0.2",
+   "prezzo_limite_aggiustato": 382.62,
+   "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
    "stats": {
@@ -46541,17 +46579,17 @@
     "debt_to_equity": 18.373,
     "dividend_yield": 0.0,
     "price_to_book": 17.3994,
-    "target_mean": 397.8847,
+    "target_mean": 392.4221,
     "fcf": 4835999744.0,
     "gross_margin": 0.1885,
-    "enterprise_value": 1484708773888.0,
-    "ev_ebitda": 138.048,
-    "peg": 4.58,
+    "enterprise_value": 1465395445760.0,
+    "ev_ebitda": 136.252,
+    "peg": 4.55,
     "roa": 0.0193,
-    "short_float": 0.0201,
+    "short_float": 0.0195,
     "buyback_yield": 0.0,
     "ps": 14.59,
-    "ev_s": 14.33,
+    "ev_s": 14.14,
     "altman_z": 4.54,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -47968,7 +48006,7 @@
      290.55,
      295.0,
      291.45,
-     293.25,
+     293.29,
      293.15,
      294.65,
      294.42,
@@ -48037,10 +48075,10 @@
    "sortino_6m": 0.16,
    "prepost": {
     "label": "pre",
-    "price": 302.31,
-    "change_pct": 1.42
+    "price": 302.46,
+    "change_pct": 1.47
    },
-   "prezzo_limite_aggiustato": 302.31,
+   "prezzo_limite_aggiustato": 302.46,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Utilities",
@@ -48066,14 +48104,14 @@
     "target_mean": 341.532,
     "fcf": -6625124864.0,
     "gross_margin": 0.2211,
-    "enterprise_value": 129956397056.0,
-    "ev_ebitda": 16.343,
+    "enterprise_value": 130494947328.0,
+    "ev_ebitda": 16.41,
     "peg": 3.74,
     "roa": 0.0389,
-    "short_float": 0.0374,
+    "short_float": 0.037,
     "buyback_yield": 0.0038,
     "ps": 3.38,
-    "ev_s": 4.16,
+    "ev_s": 4.17,
     "altman_z": 1.65,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -49683,11 +49721,11 @@
    "sortino_6m": -2.72,
    "prepost": {
     "label": "pre",
-    "price": 71.34,
-    "change_pct": 1.48
+    "price": 71.09,
+    "change_pct": 1.12
    },
-   "prezzo_limite_aggiustato": 71.34,
-   "risk_reward": "1:2.6",
+   "prezzo_limite_aggiustato": 71.09,
+   "risk_reward": "1:2.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
    "stats": {
@@ -49712,14 +49750,14 @@
     "target_mean": 92.5489,
     "fcf": 25387552768.0,
     "gross_margin": 0.4912,
-    "enterprise_value": 300251709440.0,
-    "ev_ebitda": 20.388,
-    "peg": 1.2,
+    "enterprise_value": 297753346048.0,
+    "ev_ebitda": 20.218,
+    "peg": 1.19,
     "roa": 0.1608,
-    "short_float": 0.0199,
+    "short_float": 0.0228,
     "buyback_yield": 0.0289,
     "ps": 6.05,
-    "ev_s": 6.21,
+    "ev_s": 6.16,
     "altman_z": 5.32,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -51099,7 +51137,7 @@
      24.28,
      21.19,
      21.19,
-     18.3,
+     18.31,
      20.9,
      17.41,
      13.16,
@@ -51610,10 +51648,10 @@
    },
    "analisti": {
     "eps_ora": 23.6773,
-    "eps_90g_fa": 22.5874,
-    "eps_7g_fa": 23.6473,
-    "revisione_90g_pct": 4.83,
-    "revisione_7g_pct": 0.13,
+    "eps_90g_fa": 22.577,
+    "eps_7g_fa": 23.6759,
+    "revisione_90g_pct": 4.87,
+    "revisione_7g_pct": 0.01,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 22.08,
@@ -51632,11 +51670,11 @@
    "sortino_6m": 3.59,
    "prepost": {
     "label": "pre",
-    "price": 537.53,
-    "change_pct": 0.46
+    "price": 537.03,
+    "change_pct": 0.37
    },
-   "prezzo_limite_aggiustato": 537.53,
-   "risk_reward": null,
+   "prezzo_limite_aggiustato": 537.03,
+   "risk_reward": "1:0.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -51661,14 +51699,14 @@
     "target_mean": 587.6338,
     "fcf": 16545500160.0,
     "gross_margin": 0.6794,
-    "enterprise_value": 4025156632576.0,
-    "ev_ebitda": 20.723,
-    "peg": 1.74,
+    "enterprise_value": 3985727029248.0,
+    "ev_ebitda": 20.52,
+    "peg": 1.72,
     "roa": 0.1409,
-    "short_float": 0.0082,
+    "short_float": 0.0091,
     "buyback_yield": 0.0051,
     "ps": 11.97,
-    "ev_s": 12.13,
+    "ev_s": 12.01,
     "altman_z": 4.71,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -53575,11 +53613,11 @@
     "upside_pct": -2.5
    },
    "analisti": {
-    "eps_ora": 9.5804,
-    "eps_90g_fa": 9.6864,
-    "eps_7g_fa": 9.5758,
-    "revisione_90g_pct": -1.09,
-    "revisione_7g_pct": 0.05,
+    "eps_ora": 9.5758,
+    "eps_90g_fa": 9.6826,
+    "eps_7g_fa": 9.5783,
+    "revisione_90g_pct": -1.1,
+    "revisione_7g_pct": -0.03,
     "su_30g": 5,
     "giu_30g": 3,
     "eps_min": 8.69,
@@ -53598,11 +53636,11 @@
    "sortino_6m": 2.51,
    "prepost": {
     "label": "pre",
-    "price": 337.23,
-    "change_pct": 0.18
+    "price": 337.94,
+    "change_pct": 0.39
    },
-   "prezzo_limite_aggiustato": 337.23,
-   "risk_reward": "1:0.6",
+   "prezzo_limite_aggiustato": 337.94,
+   "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -53627,11 +53665,11 @@
     "target_mean": 328.0938,
     "fcf": 107721875456.0,
     "gross_margin": 0.4865,
-    "enterprise_value": 4934930006016.0,
-    "ev_ebitda": 29.382,
-    "peg": 2.69,
+    "enterprise_value": 4935367786496.0,
+    "ev_ebitda": 29.384,
+    "peg": 2.67,
     "roa": 0.2708,
-    "short_float": 0.0083,
+    "short_float": 0.0088,
     "buyback_yield": 0.0185,
     "ps": 10.52,
     "ev_s": 10.57,
@@ -55181,7 +55219,7 @@
      721.06,
      717.69,
      719.95,
-     720.09,
+     720.08,
      719.48,
      718.23,
      717.44,
@@ -55199,19 +55237,19 @@
    "rating": {
     "key": "strong_buy",
     "n": 58,
-    "target": 799.0,
+    "target": 799.34,
     "upside_pct": 11.2
    },
    "analisti": {
-    "eps_ora": 34.0636,
-    "eps_90g_fa": 35.005,
-    "eps_7g_fa": 34.0653,
-    "revisione_90g_pct": -2.69,
-    "revisione_7g_pct": -0.01,
+    "eps_ora": 34.0839,
+    "eps_90g_fa": 34.9937,
+    "eps_7g_fa": 34.0681,
+    "revisione_90g_pct": -2.6,
+    "revisione_7g_pct": 0.05,
     "su_30g": 7,
     "giu_30g": 6,
-    "eps_min": 28.57,
-    "eps_max": 41.5,
+    "eps_min": 28.7795,
+    "eps_max": 42.0,
     "eps_n": 54,
     "target_min": 580.0,
     "target_max": 1050.0,
@@ -55226,11 +55264,11 @@
    "sortino_6m": 0.76,
    "prepost": {
     "label": "pre",
-    "price": 731.7,
-    "change_pct": 1.81
+    "price": 727.49,
+    "change_pct": 1.23
    },
-   "prezzo_limite_aggiustato": 731.7,
-   "risk_reward": "1:1.1",
+   "prezzo_limite_aggiustato": 727.49,
+   "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
    "stats": {
@@ -55252,17 +55290,17 @@
     "debt_to_equity": 42.997,
     "dividend_yield": 0.0029,
     "price_to_book": 7.01,
-    "target_mean": 798.9952,
+    "target_mean": 799.34,
     "fcf": 21553625088.0,
     "gross_margin": 0.8175,
-    "enterprise_value": 1852874293248.0,
-    "ev_ebitda": 16.897,
-    "peg": 0.95,
+    "enterprise_value": 1859599728640.0,
+    "ev_ebitda": 16.959,
+    "peg": 0.98,
     "roa": 0.1459,
-    "short_float": 0.0152,
+    "short_float": 0.0141,
     "buyback_yield": 0.0143,
     "ps": 8.02,
-    "ev_s": 8.12,
+    "ev_s": 8.15,
     "altman_z": 5.41,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -56714,7 +56752,7 @@
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -56959,11 +56997,11 @@
    "sortino_6m": 2.16,
    "prepost": {
     "label": "pre",
-    "price": 238.66,
-    "change_pct": 4.16
+    "price": 237.84,
+    "change_pct": 3.8
    },
-   "prezzo_limite_aggiustato": 238.66,
-   "risk_reward": "1:1.4",
+   "prezzo_limite_aggiustato": 237.84,
+   "risk_reward": "1:1.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -56988,14 +57026,14 @@
     "target_mean": 283.3607,
     "fcf": 17731874816.0,
     "gross_margin": 0.7728,
-    "enterprise_value": 219546992640.0,
-    "ev_ebitda": 17.02,
-    "peg": 0.82,
+    "enterprise_value": 215785881600.0,
+    "ev_ebitda": 16.729,
+    "peg": 0.8,
     "roa": 0.057,
-    "short_float": 0.0462,
+    "short_float": 0.0454,
     "buyback_yield": 0.0668,
     "ps": 4.29,
-    "ev_s": 5.0,
+    "ev_s": 4.91,
     "altman_z": 1.83,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -58568,14 +58606,14 @@
    "rating": {
     "key": "strong_buy",
     "n": 46,
-    "target": 147.73,
-    "upside_pct": 4.9
+    "target": 146.73,
+    "upside_pct": 4.2
    },
    "analisti": {
     "eps_ora": 5.0055,
-    "eps_90g_fa": 5.0253,
+    "eps_90g_fa": 5.0267,
     "eps_7g_fa": 5.0055,
-    "revisione_90g_pct": -0.39,
+    "revisione_90g_pct": -0.42,
     "revisione_7g_pct": 0.0,
     "su_30g": 17,
     "giu_30g": 19,
@@ -58595,10 +58633,10 @@
    "sortino_6m": 2.3,
    "prepost": {
     "label": "pre",
-    "price": 143.83,
-    "change_pct": 2.11
+    "price": 143.8,
+    "change_pct": 2.09
    },
-   "prezzo_limite_aggiustato": 143.83,
+   "prezzo_limite_aggiustato": 143.8,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -58621,17 +58659,17 @@
     "debt_to_equity": 67.538,
     "dividend_yield": 0.0,
     "price_to_book": 11.6356,
-    "target_mean": 147.7317,
+    "target_mean": 146.7317,
     "fcf": 5149374976.0,
     "gross_margin": 0.7477,
-    "enterprise_value": 149418803200.0,
-    "ev_ebitda": 51.577,
-    "peg": 1.01,
+    "enterprise_value": 146327552000.0,
+    "ev_ebitda": 50.51,
+    "peg": 0.99,
     "roa": 0.0425,
-    "short_float": 0.0287,
+    "short_float": 0.0279,
     "buyback_yield": 0.0126,
     "ps": 9.89,
-    "ev_s": 10.14,
+    "ev_s": 9.93,
     "altman_z": 2.29,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -60266,10 +60304,10 @@
    "sortino_6m": -0.23,
    "prepost": {
     "label": "pre",
-    "price": 358.81,
-    "change_pct": -0.75
+    "price": 358.68,
+    "change_pct": -0.79
    },
-   "prezzo_limite_aggiustato": 358.81,
+   "prezzo_limite_aggiustato": 358.68,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -60295,14 +60333,14 @@
     "target_mean": 531.3149,
     "fcf": 30596499456.0,
     "gross_margin": 0.7551,
-    "enterprise_value": 1761302151168.0,
-    "ev_ebitda": 33.703,
-    "peg": 0.36,
+    "enterprise_value": 1832763392000.0,
+    "ev_ebitda": 35.07,
+    "peg": 0.37,
     "roa": 0.1537,
-    "short_float": 0.0116,
+    "short_float": 0.0111,
     "buyback_yield": 0.0035,
     "ps": 19.37,
-    "ev_s": 19.77,
+    "ev_s": 20.57,
     "altman_z": 2.66,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -62079,23 +62117,23 @@
    "rating": {
     "key": "strong_buy",
     "n": 16,
-    "target": 2102.15,
-    "upside_pct": 18.1
+    "target": 2101.11,
+    "upside_pct": 18.0
    },
    "analisti": {
-    "eps_ora": 52.2179,
-    "eps_90g_fa": 44.0272,
+    "eps_ora": 51.9236,
+    "eps_90g_fa": 43.6213,
     "eps_7g_fa": 51.7319,
-    "revisione_90g_pct": 18.6,
-    "revisione_7g_pct": 0.94,
+    "revisione_90g_pct": 19.03,
+    "revisione_7g_pct": 0.37,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 37.43,
     "eps_max": 59.1013,
     "eps_n": 33,
     "target_min": 864.89,
-    "target_max": 2892.84,
-    "target_mediana": 2190.22
+    "target_max": 2907.18,
+    "target_mediana": 2151.01
    },
    "health": 77,
    "eps": 30.81,
@@ -62106,11 +62144,11 @@
    "sortino_6m": 1.01,
    "prepost": {
     "label": "pre",
-    "price": 1783.75,
-    "change_pct": 0.19
+    "price": 1787.05,
+    "change_pct": 0.38
    },
-   "prezzo_limite_aggiustato": 1783.75,
-   "risk_reward": "1:0.9",
+   "prezzo_limite_aggiustato": 1787.05,
+   "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -62120,9 +62158,9 @@
     "float_pct": null,
     "avg_volume_30d": 1487470.0,
     "pe_ttm": 57.7845,
-    "forward_pe": 30.5746,
+    "forward_pe": 30.4461,
     "eps_ttm": 30.81,
-    "eps_forward": 58.2294,
+    "eps_forward": 58.4752,
     "revenue_fy": null,
     "net_income_fy": null,
     "revenue_growth": 0.213,
@@ -62132,12 +62170,12 @@
     "debt_to_equity": 9.092,
     "dividend_yield": 0.0051,
     "price_to_book": null,
-    "target_mean": 2102.1472,
+    "target_mean": 2101.1147,
     "fcf": null,
     "gross_margin": 0.5273,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 1.11,
+    "peg": 1.12,
     "roa": 0.1645,
     "short_float": 0.0038,
     "buyback_yield": 0.0085,
@@ -62937,7 +62975,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.64,
+      "mediana": 1.63,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -64035,23 +64073,23 @@
    "rating": {
     "key": "hold",
     "n": 36,
-    "target": 38.04,
-    "upside_pct": 9.6
+    "target": 38.15,
+    "upside_pct": 9.9
    },
    "analisti": {
-    "eps_ora": 1.646,
+    "eps_ora": 1.6526,
     "eps_90g_fa": 2.2666,
-    "eps_7g_fa": 1.7802,
-    "revisione_90g_pct": -27.38,
-    "revisione_7g_pct": -7.54,
+    "eps_7g_fa": 2.1029,
+    "revisione_90g_pct": -27.09,
+    "revisione_7g_pct": -21.41,
     "su_30g": 1,
     "giu_30g": 8,
     "eps_min": 1.1,
     "eps_max": 3.22,
-    "eps_n": 39,
+    "eps_n": 38,
     "target_min": 19.0,
     "target_max": 94.0,
-    "target_mediana": 34.4
+    "target_mediana": 34.9
    },
    "health": 27,
    "eps": 2.08,
@@ -64062,10 +64100,10 @@
    "sortino_6m": -1.84,
    "prepost": {
     "label": "pre",
-    "price": 34.58,
-    "change_pct": -0.37
+    "price": 34.63,
+    "change_pct": -0.23
    },
-   "prezzo_limite_aggiustato": 34.58,
+   "prezzo_limite_aggiustato": 34.63,
    "risk_reward": "1:1.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -64088,17 +64126,17 @@
     "debt_to_equity": 73.095,
     "dividend_yield": 0.0472,
     "price_to_book": 3.4627,
-    "target_mean": 38.0417,
+    "target_mean": 38.1528,
     "fcf": 1766875008.0,
     "gross_margin": 0.4341,
-    "enterprise_value": 54312071168.0,
-    "ev_ebitda": 11.1,
+    "enterprise_value": 53792210944.0,
+    "ev_ebitda": 10.994,
     "peg": 1.47,
     "roa": 0.0689,
-    "short_float": 0.1038,
+    "short_float": 0.0898,
     "buyback_yield": 0.0028,
     "ps": 1.12,
-    "ev_s": 1.18,
+    "ev_s": 1.17,
     "altman_z": 3.37,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -65981,11 +66019,11 @@
     "upside_pct": 68.3
    },
    "analisti": {
-    "eps_ora": 10.999,
+    "eps_ora": 10.9972,
     "eps_90g_fa": 10.9216,
     "eps_7g_fa": 10.9972,
-    "revisione_90g_pct": 0.71,
-    "revisione_7g_pct": 0.02,
+    "revisione_90g_pct": 0.69,
+    "revisione_7g_pct": 0.0,
     "su_30g": 23,
     "giu_30g": 10,
     "eps_min": 9.0,
@@ -66004,11 +66042,11 @@
    "sortino_6m": 0.06,
    "prepost": {
     "label": "pre",
-    "price": 140.58,
-    "change_pct": -0.58
+    "price": 140.53,
+    "change_pct": -0.62
    },
-   "prezzo_limite_aggiustato": 140.58,
-   "risk_reward": "1:0.9",
+   "prezzo_limite_aggiustato": 140.53,
+   "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -66029,18 +66067,18 @@
     "roe": 0.4119,
     "debt_to_equity": 251.716,
     "dividend_yield": 0.0141,
-    "price_to_book": 6.9171,
+    "price_to_book": 10.8436,
     "target_mean": 237.9742,
     "fcf": -45853626368.0,
     "gross_margin": 0.6396,
-    "enterprise_value": 565000273920.0,
-    "ev_ebitda": 16.409,
-    "peg": 0.79,
+    "enterprise_value": 571531526144.0,
+    "ev_ebitda": 16.598,
+    "peg": 0.81,
     "roa": 0.0636,
-    "short_float": 0.0259,
+    "short_float": 0.0273,
     "buyback_yield": -0.0145,
     "ps": 5.97,
-    "ev_s": 7.87,
+    "ev_s": 7.96,
     "altman_z": 0.89,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -67643,7 +67681,7 @@
      124.63,
      129.28,
      126.62,
-     134.89,
+     134.88,
      139.8,
      139.92,
      139.13,
@@ -67971,10 +68009,10 @@
    "sortino_6m": -3.11,
    "prepost": {
     "label": "pre",
-    "price": 235.6,
-    "change_pct": 0.16
+    "price": 236.04,
+    "change_pct": 0.34
    },
-   "prezzo_limite_aggiustato": 235.6,
+   "prezzo_limite_aggiustato": 236.04,
    "risk_reward": "1:2.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -68000,14 +68038,14 @@
     "target_mean": 292.2069,
     "fcf": 6262374912.0,
     "gross_margin": 0.5738,
-    "enterprise_value": 220240510976.0,
-    "ev_ebitda": 14.752,
-    "peg": 2.48,
+    "enterprise_value": 217162268672.0,
+    "ev_ebitda": 14.545,
+    "peg": 2.44,
     "roa": 0.1325,
-    "short_float": 0.0217,
+    "short_float": 0.0192,
     "buyback_yield": 0.0124,
     "ps": 6.01,
-    "ev_s": 7.95,
+    "ev_s": 7.84,
     "altman_z": 5.21,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -69454,7 +69492,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -69775,8 +69813,8 @@
    "rating": {
     "key": "buy",
     "n": 11,
-    "target": 126.89,
-    "upside_pct": 44.1
+    "target": 126.68,
+    "upside_pct": 43.9
    },
    "analisti": {
     "eps_ora": 2.5888,
@@ -69790,8 +69828,8 @@
     "eps_max": 4.1,
     "eps_n": 18,
     "target_min": 83.03,
-    "target_max": 168.91,
-    "target_mediana": 133.03
+    "target_max": 168.92,
+    "target_mediana": 130.7
    },
    "health": 22,
    "eps": 0.59,
@@ -69802,10 +69840,10 @@
    "sortino_6m": -1.66,
    "prepost": {
     "label": "pre",
-    "price": 87.75,
-    "change_pct": -0.35
+    "price": 87.86,
+    "change_pct": -0.23
    },
-   "prezzo_limite_aggiustato": 87.75,
+   "prezzo_limite_aggiustato": 87.86,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -69828,7 +69866,7 @@
     "debt_to_equity": 17.131,
     "dividend_yield": 0.0019,
     "price_to_book": null,
-    "target_mean": 126.8911,
+    "target_mean": 126.6846,
     "fcf": null,
     "gross_margin": 0.3511,
     "enterprise_value": null,
@@ -69845,34 +69883,34 @@
     "altman_model": "Z''"
    },
    "combustione": {
-    "cassa": 1112718000.0,
-    "debito": 996750000.0,
-    "patrimonio": 7133771000.0,
-    "bilancio_al": "2026-06-30",
-    "ocf_ttm": 941798000.0,
-    "capex_ttm": -385877000.0,
+    "cassa": 1075117000.0,
+    "debito": 996549000.0,
+    "patrimonio": 7064532000.0,
+    "bilancio_al": "2026-03-31",
+    "ocf_ttm": 1275965000.0,
+    "capex_ttm": -354306000.0,
     "trimestri": 4,
-    "cashflow_al": "2026-06-30",
-    "fcf_ttm": 555921000.0,
-    "mesi_capex": 34.6,
+    "cashflow_al": "2026-03-31",
+    "fcf_ttm": 921659000.0,
+    "mesi_capex": 36.4,
     "emissione_netta_pct": 0.01,
-    "debito_netto": -115968000.0,
+    "debito_netto": -78568000.0,
     "valuta": "CAD"
    },
    "credito": {
-    "oneri_ttm": 102580000.0,
-    "ebit_ttm": 573543000.0,
+    "oneri_ttm": 102861000.0,
+    "ebit_ttm": 919867000.0,
     "trimestri": 4,
-    "conto_al": "2026-06-30",
-    "copertura": 5.59,
-    "oneri_var_4trim_pct": -4.5,
+    "conto_al": "2026-03-31",
+    "copertura": 8.94,
+    "oneri_var_4trim_pct": 79.4,
     "oneri_trim": [
+     12684000,
      12985000,
      54438000,
-     22754000,
-     12403000
+     22754000
     ],
-    "debito_lungo": 996750000.0,
+    "debito_lungo": 996549000.0,
     "valuta": "CAD"
    },
    "fuori_mercato": {
@@ -70832,14 +70870,6 @@
     },
     "conto_trim": [
      {
-      "trim": "2026-06-30",
-      "ricavi": 813772000,
-      "utile": 25219000,
-      "operativo": 74139000,
-      "margine": 3.1,
-      "margine_op": 9.1
-     },
-     {
       "trim": "2026-03-31",
       "ricavi": 845365000,
       "utile": 130751000,
@@ -70870,6 +70900,14 @@
       "operativo": 156260000,
       "margine": 36.6,
       "margine_op": 17.8
+     },
+     {
+      "trim": "2025-03-31",
+      "ricavi": 789432000,
+      "utile": 69764000,
+      "operativo": 188028000,
+      "margine": 8.8,
+      "margine_op": 23.8
      }
     ]
    },
@@ -71600,9 +71638,9 @@
    },
    "analisti": {
     "eps_ora": 5.2872,
-    "eps_90g_fa": 5.447,
+    "eps_90g_fa": 5.4736,
     "eps_7g_fa": 5.2872,
-    "revisione_90g_pct": -2.93,
+    "revisione_90g_pct": -3.41,
     "revisione_7g_pct": 0.0,
     "su_30g": 2,
     "giu_30g": 2,
@@ -71622,11 +71660,11 @@
    "sortino_6m": 0.56,
    "prepost": {
     "label": "pre",
-    "price": 213.28,
-    "change_pct": -0.07
+    "price": 213.79,
+    "change_pct": 0.16
    },
-   "prezzo_limite_aggiustato": 213.28,
-   "risk_reward": "1:0.9",
+   "prezzo_limite_aggiustato": 213.79,
+   "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
    "stats": {
@@ -71651,14 +71689,14 @@
     "target_mean": 286.4417,
     "fcf": 1256137472.0,
     "gross_margin": 0.5713,
-    "enterprise_value": 41027207168.0,
-    "ev_ebitda": 53.525,
-    "peg": 2.92,
+    "enterprise_value": 39263981568.0,
+    "ev_ebitda": 51.225,
+    "peg": 2.79,
     "roa": -0.0062,
-    "short_float": 0.05,
+    "short_float": 0.0445,
     "buyback_yield": -0.0313,
     "ps": 5.97,
-    "ev_s": 6.14,
+    "ev_s": 5.87,
     "altman_z": -1.53,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -71679,11 +71717,11 @@
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 69300000.0,
+    "oneri_ttm": 160600000.0,
     "ebit_ttm": -77000000.0,
-    "trimestri": 2,
+    "trimestri": 3,
     "conto_al": "2026-06-30",
-    "copertura": -1.11,
+    "copertura": -0.48,
     "debito_corrente": 629900000.0,
     "debito_lungo": 1889800000.0,
     "valuta": "USD"
@@ -73229,18 +73267,18 @@
    "sortino_6m": 1.9,
    "prepost": {
     "label": "pre",
-    "price": 216.2,
-    "change_pct": -0.25
+    "price": 215.0,
+    "change_pct": -0.8
    },
-   "prezzo_limite_aggiustato": 216.2,
-   "risk_reward": "1:0.1",
+   "prezzo_limite_aggiustato": 215.0,
+   "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 273357848576.0,
     "shares": 1261224648.0,
-    "float_shares": 1050322662.0,
-    "float_pct": 83.3,
+    "float_shares": 1049767724.0,
+    "float_pct": 83.2,
     "avg_volume_30d": 6126375.0,
     "pe_ttm": 68.3722,
     "forward_pe": 41.5461,
@@ -73258,14 +73296,14 @@
     "target_mean": 243.69,
     "fcf": 3891512576.0,
     "gross_margin": 0.63,
-    "enterprise_value": 260014522368.0,
-    "ev_ebitda": 56.042,
+    "enterprise_value": 258866823168.0,
+    "ev_ebitda": 55.795,
     "peg": 1.62,
     "roa": 0.1412,
-    "short_float": 0.0114,
+    "short_float": 0.0127,
     "buyback_yield": 0.0059,
     "ps": 25.93,
-    "ev_s": 24.67,
+    "ev_s": 24.56,
     "altman_z": 8.46,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -74741,8 +74779,8 @@
    "rating": {
     "key": "buy",
     "n": 50,
-    "target": 240.17,
-    "upside_pct": -12.7
+    "target": 238.97,
+    "upside_pct": -13.1
    },
    "analisti": {
     "eps_ora": 1.6059,
@@ -74768,17 +74806,17 @@
    "sortino_6m": 6.87,
    "prepost": {
     "label": "pre",
-    "price": 277.01,
-    "change_pct": 0.72
+    "price": 276.77,
+    "change_pct": 0.63
    },
-   "prezzo_limite_aggiustato": 277.01,
+   "prezzo_limite_aggiustato": 276.77,
    "risk_reward": "1:0.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 281623035904.0,
     "shares": 1023934842.0,
-    "float_shares": 1007572363.0,
+    "float_shares": 1007531406.0,
     "float_pct": 98.4,
     "avg_volume_30d": 9572175.0,
     "pe_ttm": 4584.0005,
@@ -74794,17 +74832,17 @@
     "debt_to_equity": 15.958,
     "dividend_yield": 0.0,
     "price_to_book": 55.1957,
-    "target_mean": 240.17,
+    "target_mean": 238.97,
     "fcf": 1995385472.0,
     "gross_margin": 0.7519,
-    "enterprise_value": 277467168768.0,
-    "ev_ebitda": 2596.524,
-    "peg": 7.1,
+    "enterprise_value": 267637391360.0,
+    "ev_ebitda": 2504.538,
+    "peg": 6.85,
     "roa": -0.0078,
-    "short_float": 0.026,
+    "short_float": 0.0277,
     "buyback_yield": 0.0,
     "ps": 52.19,
-    "ev_s": 51.42,
+    "ev_s": 49.6,
     "altman_z": 2.19,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -76292,17 +76330,17 @@
    "sortino_6m": 6.49,
    "prepost": {
     "label": "pre",
-    "price": 419.19,
-    "change_pct": 0.1
+    "price": 421.02,
+    "change_pct": 0.53
    },
-   "prezzo_limite_aggiustato": 419.19,
-   "risk_reward": "1:0.4",
+   "prezzo_limite_aggiustato": 421.02,
+   "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
     "market_cap": 342562045952.0,
     "shares": 818000000.0,
-    "float_shares": 811276040.0,
+    "float_shares": 811218780.0,
     "float_pct": 99.2,
     "avg_volume_30d": 6064003.0,
     "pe_ttm": 1046.95,
@@ -76321,14 +76359,14 @@
     "target_mean": 396.92,
     "fcf": 4240624896.0,
     "gross_margin": 0.7038,
-    "enterprise_value": 342058041344.0,
-    "ev_ebitda": 219.268,
-    "peg": 2.14,
+    "enterprise_value": 331252269056.0,
+    "ev_ebitda": 212.341,
+    "peg": 2.07,
     "roa": 0.014,
-    "short_float": 0.0266,
+    "short_float": 0.0269,
     "buyback_yield": 0.0029,
     "ps": 29.84,
-    "ev_s": 29.8,
+    "ev_s": 28.85,
     "altman_z": 1.47,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -77812,8 +77850,8 @@
    "rating": {
     "key": "buy",
     "n": 31,
-    "target": 342.77,
-    "upside_pct": -5.0
+    "target": 339.71,
+    "upside_pct": -5.9
    },
    "analisti": {
     "eps_ora": 1.6761,
@@ -77827,8 +77865,8 @@
     "eps_max": 1.98,
     "eps_n": 33,
     "target_min": 160.0,
-    "target_max": 430.0,
-    "target_mediana": 370.0
+    "target_max": 413.0,
+    "target_mediana": 355.0
    },
    "health": 87,
    "eps": -0.58,
@@ -77839,10 +77877,10 @@
    "sortino_6m": 3.09,
    "prepost": {
     "label": "pre",
-    "price": 361.58,
-    "change_pct": 0.18
+    "price": 362.15,
+    "change_pct": 0.34
    },
-   "prezzo_limite_aggiustato": 361.58,
+   "prezzo_limite_aggiustato": 362.15,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -77865,17 +77903,17 @@
     "debt_to_equity": 217.858,
     "dividend_yield": 0.0,
     "price_to_book": 79.2904,
-    "target_mean": 342.7742,
+    "target_mean": 339.7097,
     "fcf": 691946368.0,
     "gross_margin": 0.7258,
-    "enterprise_value": 127886401536.0,
+    "enterprise_value": 121491210240.0,
     "ev_ebitda": null,
     "peg": 2.38,
     "roa": -0.0204,
-    "short_float": 0.0269,
+    "short_float": 0.0271,
     "buyback_yield": -0.0,
     "ps": 51.16,
-    "ev_s": 50.9,
+    "ev_s": 48.36,
     "altman_z": 2.08,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -79251,15 +79289,15 @@
    "rating": {
     "key": "strong_buy",
     "n": 47,
-    "target": 288.68,
-    "upside_pct": -1.6
+    "target": 287.08,
+    "upside_pct": -2.1
    },
    "analisti": {
     "eps_ora": 2.9745,
-    "eps_90g_fa": 2.8795,
-    "eps_7g_fa": 2.9745,
-    "revisione_90g_pct": 3.3,
-    "revisione_7g_pct": 0.0,
+    "eps_90g_fa": 2.8554,
+    "eps_7g_fa": 2.9735,
+    "revisione_90g_pct": 4.17,
+    "revisione_7g_pct": 0.03,
     "su_30g": 3,
     "giu_30g": 0,
     "eps_min": 2.66,
@@ -79278,10 +79316,10 @@
    "sortino_6m": 4.94,
    "prepost": {
     "label": "pre",
-    "price": 295.28,
-    "change_pct": 0.69
+    "price": 295.11,
+    "change_pct": 0.63
    },
-   "prezzo_limite_aggiustato": 295.28,
+   "prezzo_limite_aggiustato": 295.11,
    "risk_reward": null,
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -79304,17 +79342,17 @@
     "debt_to_equity": 29.259,
     "dividend_yield": 0.0,
     "price_to_book": 24.1049,
-    "target_mean": 288.677,
+    "target_mean": 287.0813,
     "fcf": 1051412352.0,
     "gross_margin": 0.7954,
-    "enterprise_value": 101594701824.0,
-    "ev_ebitda": 1225.553,
-    "peg": 1.51,
+    "enterprise_value": 93723779072.0,
+    "ev_ebitda": 1130.605,
+    "peg": 1.4,
     "roa": 0.0018,
-    "short_float": 0.0326,
+    "short_float": 0.0353,
     "buyback_yield": -0.0,
     "ps": 26.55,
-    "ev_s": 25.61,
+    "ev_s": 23.63,
     "altman_z": 5.3,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -81109,11 +81147,11 @@
     "upside_pct": 2.8
    },
    "analisti": {
-    "eps_ora": 11.4598,
+    "eps_ora": 11.3916,
     "eps_90g_fa": 10.5308,
-    "eps_7g_fa": 11.1651,
-    "revisione_90g_pct": 8.82,
-    "revisione_7g_pct": 2.64,
+    "eps_7g_fa": 11.0969,
+    "revisione_90g_pct": 8.17,
+    "revisione_7g_pct": 2.66,
     "su_30g": 5,
     "giu_30g": 2,
     "eps_min": 7.562,
@@ -81132,10 +81170,10 @@
    "sortino_6m": 1.06,
    "prepost": {
     "label": "pre",
-    "price": 170.58,
-    "change_pct": 0.97
+    "price": 170.5,
+    "change_pct": 0.92
    },
-   "prezzo_limite_aggiustato": 170.58,
+   "prezzo_limite_aggiustato": 170.5,
    "risk_reward": null,
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -81161,14 +81199,14 @@
     "target_mean": 173.6363,
     "fcf": 20671000576.0,
     "gross_margin": 0.2977,
-    "enterprise_value": 733177380864.0,
-    "ev_ebitda": 10.792,
-    "peg": 1.49,
+    "enterprise_value": 713070149632.0,
+    "ev_ebitda": 10.496,
+    "peg": 1.45,
     "roa": 0.0552,
-    "short_float": 0.0107,
+    "short_float": 0.0108,
     "buyback_yield": 0.0292,
     "ps": 1.92,
-    "ev_s": 2.03,
+    "ev_s": 1.97,
     "altman_z": 5.83,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -82766,7 +82804,7 @@
      71.81,
      71.36,
      69.91,
-     70.48,
+     70.49,
      73.77,
      73.44,
      80.18,
@@ -83071,15 +83109,15 @@
    "rating": {
     "key": "buy",
     "n": 24,
-    "target": 226.46,
-    "upside_pct": 6.8
+    "target": 225.25,
+    "upside_pct": 6.3
    },
    "analisti": {
-    "eps_ora": 14.7406,
-    "eps_90g_fa": 12.5527,
-    "eps_7g_fa": 14.5967,
-    "revisione_90g_pct": 17.43,
-    "revisione_7g_pct": 0.99,
+    "eps_ora": 14.6434,
+    "eps_90g_fa": 12.5528,
+    "eps_7g_fa": 14.4348,
+    "revisione_90g_pct": 16.65,
+    "revisione_7g_pct": 1.45,
     "su_30g": 6,
     "giu_30g": 1,
     "eps_min": 10.46,
@@ -83087,7 +83125,7 @@
     "eps_n": 25,
     "target_min": 175.0,
     "target_max": 250.0,
-    "target_mediana": 229.0
+    "target_mediana": 227.5
    },
    "health": 69,
    "eps": 10.39,
@@ -83098,11 +83136,11 @@
    "sortino_6m": 1.36,
    "prepost": {
     "label": "pre",
-    "price": 213.81,
-    "change_pct": 0.86
+    "price": 213.98,
+    "change_pct": 0.94
    },
-   "prezzo_limite_aggiustato": 213.81,
-   "risk_reward": "1:0.5",
+   "prezzo_limite_aggiustato": 213.98,
+   "risk_reward": "1:0.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
    "stats": {
@@ -83112,9 +83150,9 @@
     "float_pct": 95.3,
     "avg_volume_30d": 8275298.0,
     "pe_ttm": 20.4023,
-    "forward_pe": 14.3807,
+    "forward_pe": 14.3601,
     "eps_ttm": 10.39,
-    "eps_forward": 14.7406,
+    "eps_forward": 14.7618,
     "revenue_fy": 209383997440.0,
     "net_income_fy": 20590999552.0,
     "revenue_growth": 0.535,
@@ -83124,17 +83162,17 @@
     "debt_to_equity": 18.959,
     "dividend_yield": 0.0336,
     "price_to_book": 2.1899,
-    "target_mean": 226.4583,
+    "target_mean": 225.25,
     "fcf": 21934000128.0,
     "gross_margin": 0.4427,
-    "enterprise_value": 450040659968.0,
-    "ev_ebitda": 8.883,
-    "peg": 0.93,
+    "enterprise_value": 436642906112.0,
+    "ev_ebitda": 8.619,
+    "peg": 0.91,
     "roa": 0.0586,
-    "short_float": 0.0121,
+    "short_float": 0.0106,
     "buyback_yield": 0.029,
     "ps": 1.99,
-    "ev_s": 2.15,
+    "ev_s": 2.09,
     "altman_z": 4.14,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -84664,7 +84702,7 @@
      32.88,
      31.09,
      28.92,
-     32.13,
+     32.12,
      32.9,
      33.61,
      31.46,
@@ -85041,11 +85079,11 @@
     "upside_pct": 10.2
    },
    "analisti": {
-    "eps_ora": 10.0476,
-    "eps_90g_fa": 8.9005,
-    "eps_7g_fa": 9.6108,
-    "revisione_90g_pct": 12.89,
-    "revisione_7g_pct": 4.55,
+    "eps_ora": 10.0535,
+    "eps_90g_fa": 8.9003,
+    "eps_7g_fa": 9.6609,
+    "revisione_90g_pct": 12.96,
+    "revisione_7g_pct": 4.06,
     "su_30g": 5,
     "giu_30g": 0,
     "eps_min": 7.287,
@@ -85064,10 +85102,10 @@
    "sortino_6m": 0.75,
    "prepost": {
     "label": "pre",
-    "price": 135.29,
-    "change_pct": 0.89
+    "price": 135.25,
+    "change_pct": 0.86
    },
-   "prezzo_limite_aggiustato": 135.29,
+   "prezzo_limite_aggiustato": 135.25,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -85093,14 +85131,14 @@
     "target_mean": 147.7308,
     "fcf": 7691375104.0,
     "gross_margin": 0.4757,
-    "enterprise_value": 176697360384.0,
-    "ev_ebitda": 6.598,
-    "peg": 1.05,
+    "enterprise_value": 171579654144.0,
+    "ev_ebitda": 6.407,
+    "peg": 1.1,
     "roa": 0.0753,
-    "short_float": 0.0128,
+    "short_float": 0.0134,
     "buyback_yield": 0.0295,
     "ps": 2.5,
-    "ev_s": 2.74,
+    "ev_s": 2.66,
     "altman_z": 3.98,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -85860,7 +85898,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -86667,23 +86705,23 @@
    "rating": {
     "key": "buy",
     "n": 28,
-    "target": 282.61,
-    "upside_pct": 2.2
+    "target": 280.79,
+    "upside_pct": 1.6
    },
    "analisti": {
-    "eps_ora": 16.251,
-    "eps_90g_fa": 16.2862,
+    "eps_ora": 16.2564,
+    "eps_90g_fa": 16.2747,
     "eps_7g_fa": 16.2589,
-    "revisione_90g_pct": -0.22,
-    "revisione_7g_pct": -0.05,
+    "revisione_90g_pct": -0.11,
+    "revisione_7g_pct": -0.02,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 15.1321,
     "eps_max": 17.59,
-    "eps_n": 26,
+    "eps_n": 27,
     "target_min": 200.0,
     "target_max": 328.0,
-    "target_mediana": 286.5
+    "target_mediana": 285.0
    },
    "health": 88,
    "eps": 3.54,
@@ -86694,10 +86732,10 @@
    "sortino_6m": 3.99,
    "prepost": {
     "label": "pre",
-    "price": 277.75,
-    "change_pct": 0.46
+    "price": 278.06,
+    "change_pct": 0.58
    },
-   "prezzo_limite_aggiustato": 277.75,
+   "prezzo_limite_aggiustato": 278.06,
    "risk_reward": null,
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
@@ -86708,9 +86746,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 4815323.0,
     "pe_ttm": 78.0989,
-    "forward_pe": 17.0125,
+    "forward_pe": 17.0042,
     "eps_ttm": 3.54,
-    "eps_forward": 16.251,
+    "eps_forward": 16.2589,
     "revenue_fy": 64385998848.0,
     "net_income_fy": 6270000128.0,
     "revenue_growth": 0.102,
@@ -86720,17 +86758,17 @@
     "debt_to_equity": null,
     "dividend_yield": 0.025,
     "price_to_book": null,
-    "target_mean": 282.6071,
+    "target_mean": 280.7857,
     "fcf": 16870250496.0,
     "gross_margin": 0.7279,
-    "enterprise_value": 552917925888.0,
-    "ev_ebitda": 17.973,
-    "peg": 0.56,
+    "enterprise_value": 543887949824.0,
+    "ev_ebitda": 17.68,
+    "peg": 0.55,
     "roa": 0.1051,
-    "short_float": 0.0102,
+    "short_float": 0.0123,
     "buyback_yield": 0.002,
     "ps": 7.59,
-    "ev_s": 8.59,
+    "ev_s": 8.45,
     "altman_z": -0.62,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -88633,23 +88671,23 @@
    "rating": {
     "key": "buy",
     "n": 25,
-    "target": 158.04,
-    "upside_pct": 8.5
+    "target": 156.28,
+    "upside_pct": 7.3
    },
    "analisti": {
-    "eps_ora": 9.3057,
-    "eps_90g_fa": 9.6455,
+    "eps_ora": 9.4502,
+    "eps_90g_fa": 9.6544,
     "eps_7g_fa": 9.4885,
-    "revisione_90g_pct": -3.52,
-    "revisione_7g_pct": -1.93,
+    "revisione_90g_pct": -2.12,
+    "revisione_7g_pct": -0.4,
     "su_30g": 6,
     "giu_30g": 2,
     "eps_min": 8.41,
     "eps_max": 10.3611,
-    "eps_n": 25,
+    "eps_n": 23,
     "target_min": 105.0,
     "target_max": 186.0,
-    "target_mediana": 163.0
+    "target_mediana": 161.0
    },
    "health": 69,
    "eps": 1.26,
@@ -88660,11 +88698,11 @@
    "sortino_6m": 1.97,
    "prepost": {
     "label": "pre",
-    "price": 145.99,
-    "change_pct": 0.27
+    "price": 146.15,
+    "change_pct": 0.38
    },
-   "prezzo_limite_aggiustato": 145.99,
-   "risk_reward": "1:1.1",
+   "prezzo_limite_aggiustato": 146.15,
+   "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
    "stats": {
@@ -88674,9 +88712,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 9806603.0,
     "pe_ttm": 115.5556,
-    "forward_pe": 15.6463,
+    "forward_pe": 15.6235,
     "eps_ttm": 1.26,
-    "eps_forward": 9.3057,
+    "eps_forward": 9.3193,
     "revenue_fy": 66568998912.0,
     "net_income_fy": 3172999936.0,
     "revenue_growth": 0.051,
@@ -88686,17 +88724,17 @@
     "debt_to_equity": 128.408,
     "dividend_yield": 0.0234,
     "price_to_book": 8.5718,
-    "target_mean": 158.04,
+    "target_mean": 156.28,
     "fcf": 15171500032.0,
     "gross_margin": 0.759,
-    "enterprise_value": 406041198592.0,
-    "ev_ebitda": 14.064,
-    "peg": 2.66,
+    "enterprise_value": 399108440064.0,
+    "ev_ebitda": 13.824,
+    "peg": 2.59,
     "roa": 0.1187,
-    "short_float": 0.0115,
+    "short_float": 0.014,
     "buyback_yield": 0.0142,
     "ps": 5.4,
-    "ev_s": 6.1,
+    "ev_s": 6.0,
     "altman_z": 4.23,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -90511,21 +90549,21 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 159.38,
+    "target": 159.27,
     "upside_pct": 5.4
    },
    "analisti": {
-    "eps_ora": 9.9184,
-    "eps_90g_fa": 9.6617,
+    "eps_ora": 9.9085,
+    "eps_90g_fa": 9.648,
     "eps_7g_fa": 9.8891,
-    "revisione_90g_pct": 2.66,
-    "revisione_7g_pct": 0.3,
+    "revisione_90g_pct": 2.7,
+    "revisione_7g_pct": 0.2,
     "su_30g": 19,
     "giu_30g": 6,
     "eps_min": 9.185,
     "eps_max": 11.44,
     "eps_n": 26,
-    "target_min": 126.0,
+    "target_min": 123.0,
     "target_max": 180.0,
     "target_mediana": 164.0
    },
@@ -90564,17 +90602,17 @@
     "debt_to_equity": 223.465,
     "dividend_yield": 0.0217,
     "price_to_book": 15.8592,
-    "target_mean": 159.3846,
+    "target_mean": 159.2692,
     "fcf": 9768875008.0,
     "gross_margin": 0.796,
-    "enterprise_value": 208724017152.0,
-    "ev_ebitda": 14.295,
-    "peg": 2.25,
+    "enterprise_value": 203367415808.0,
+    "ev_ebitda": 13.928,
+    "peg": 2.14,
     "roa": 0.1409,
-    "short_float": 0.0176,
+    "short_float": 0.0148,
     "buyback_yield": 0.0081,
     "ps": 6.15,
-    "ev_s": 6.85,
+    "ev_s": 6.68,
     "altman_z": 3.37,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -92391,7 +92429,7 @@
      322.37,
      340.11,
      336.06,
-     360.43,
+     360.42,
      358.86,
      369.78,
      383.01,
@@ -92473,15 +92511,15 @@
    "rating": {
     "key": "hold",
     "n": 29,
-    "target": 395.25,
-    "upside_pct": -4.7
+    "target": 392.5,
+    "upside_pct": -5.4
    },
    "analisti": {
-    "eps_ora": 24.4838,
-    "eps_90g_fa": 23.4518,
+    "eps_ora": 24.4778,
+    "eps_90g_fa": 23.4459,
     "eps_7g_fa": 24.449,
     "revisione_90g_pct": 4.4,
-    "revisione_7g_pct": 0.14,
+    "revisione_7g_pct": 0.12,
     "su_30g": 5,
     "giu_30g": 2,
     "eps_min": 22.88,
@@ -92489,7 +92527,7 @@
     "eps_n": 33,
     "target_min": 225.0,
     "target_max": 500.0,
-    "target_mediana": 405.0
+    "target_mediana": 400.0
    },
    "health": 82,
    "eps": 16.1,
@@ -92526,17 +92564,17 @@
     "debt_to_equity": 490.281,
     "dividend_yield": 0.0243,
     "price_to_book": 19.1892,
-    "target_mean": 395.2541,
+    "target_mean": 392.4955,
     "fcf": 8645624832.0,
     "gross_margin": 0.7189,
-    "enterprise_value": 267606999040.0,
-    "ev_ebitda": 15.497,
-    "peg": 2.5,
+    "enterprise_value": 266639261696.0,
+    "ev_ebitda": 15.441,
+    "peg": 2.49,
     "roa": 0.0867,
     "short_float": 0.026,
     "buyback_yield": -0.0,
     "ps": 5.89,
-    "ev_s": 7.02,
+    "ev_s": 7.0,
     "altman_z": 0.34,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -93885,7 +93923,7 @@
      171.99,
      163.61,
      170.13,
-     175.79,
+     175.8,
      179.02,
      189.57,
      173.43,
@@ -93944,7 +93982,7 @@
      261.2,
      272.27,
      270.87,
-     285.54,
+     285.55,
      310.99,
      311.94,
      337.36,
@@ -94161,23 +94199,23 @@
    "rating": {
     "key": "strong_buy",
     "n": 37,
-    "target": 419.63,
-    "upside_pct": 8.9
+    "target": 419.36,
+    "upside_pct": 8.8
    },
    "analisti": {
-    "eps_ora": 15.0026,
-    "eps_90g_fa": 14.8711,
+    "eps_ora": 15.0043,
+    "eps_90g_fa": 14.8744,
     "eps_7g_fa": 15.0043,
-    "revisione_90g_pct": 0.88,
-    "revisione_7g_pct": -0.01,
+    "revisione_90g_pct": 0.87,
+    "revisione_7g_pct": 0.0,
     "su_30g": 28,
     "giu_30g": 4,
     "eps_min": 14.53,
-    "eps_max": 15.38,
+    "eps_max": 15.422,
     "eps_n": 40,
     "target_min": 330.0,
     "target_max": 466.0,
-    "target_mediana": 425.0
+    "target_mediana": 422.0
    },
    "health": 81,
    "eps": 11.75,
@@ -94188,10 +94226,10 @@
    "sortino_6m": 3.8,
    "prepost": {
     "label": "pre",
-    "price": 385.2,
-    "change_pct": -0.06
+    "price": 385.85,
+    "change_pct": 0.1
    },
-   "prezzo_limite_aggiustato": 385.2,
+   "prezzo_limite_aggiustato": 385.85,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Financial Services",
@@ -94214,17 +94252,17 @@
     "debt_to_equity": 67.821,
     "dividend_yield": 0.007,
     "price_to_book": 20.4266,
-    "target_mean": 419.6319,
+    "target_mean": 419.3616,
     "fcf": 20404000768.0,
     "gross_margin": 0.9772,
-    "enterprise_value": 719026454528.0,
-    "ev_ebitda": 23.124,
-    "peg": 1.75,
+    "enterprise_value": 694489513984.0,
+    "ev_ebitda": 22.335,
+    "peg": 1.68,
     "roa": 0.1911,
-    "short_float": 0.0121,
+    "short_float": 0.0109,
     "buyback_yield": 0.0253,
     "ps": 16.27,
-    "ev_s": 16.16,
+    "ev_s": 15.61,
     "altman_z": 3.11,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -95611,7 +95649,7 @@
      344.76,
      305.88,
      342.21,
-     344.33,
+     344.34,
      369.93,
      349.13,
      353.5,
@@ -95871,23 +95909,23 @@
    "rating": {
     "key": "strong_buy",
     "n": 37,
-    "target": 668.07,
-    "upside_pct": 13.4
+    "target": 666.71,
+    "upside_pct": 13.2
    },
    "analisti": {
-    "eps_ora": 23.0345,
-    "eps_90g_fa": 22.7892,
+    "eps_ora": 23.0248,
+    "eps_90g_fa": 22.7869,
     "eps_7g_fa": 23.0248,
-    "revisione_90g_pct": 1.08,
-    "revisione_7g_pct": 0.04,
+    "revisione_90g_pct": 1.04,
+    "revisione_7g_pct": 0.0,
     "su_30g": 31,
     "giu_30g": 2,
-    "eps_min": 22.4181,
+    "eps_min": 22.28,
     "eps_max": 23.5583,
     "eps_n": 38,
     "target_min": 550.0,
     "target_max": 740.0,
-    "target_mediana": 670.0
+    "target_mediana": 668.0
    },
    "health": 79,
    "eps": 18.18,
@@ -95924,17 +95962,17 @@
     "debt_to_equity": 439.583,
     "dividend_yield": 0.0059,
     "price_to_book": 92.1107,
-    "target_mean": 668.0651,
+    "target_mean": 666.7138,
     "fcf": 16961250304.0,
     "gross_margin": 1.0,
-    "enterprise_value": 529121509376.0,
-    "ev_ebitda": 23.833,
-    "peg": 1.54,
+    "enterprise_value": 512407240704.0,
+    "ev_ebitda": 23.08,
+    "peg": 1.48,
     "roa": 0.2406,
-    "short_float": 0.0073,
+    "short_float": 0.0083,
     "buyback_yield": 0.0227,
     "ps": 14.71,
-    "ev_s": 15.08,
+    "ev_s": 14.61,
     "altman_z": 7.79,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -97559,11 +97597,11 @@
     "upside_pct": 3.5
    },
    "analisti": {
-    "eps_ora": 9.1817,
-    "eps_90g_fa": 9.1226,
+    "eps_ora": 9.1858,
+    "eps_90g_fa": 9.1212,
     "eps_7g_fa": 9.1908,
-    "revisione_90g_pct": 0.65,
-    "revisione_7g_pct": -0.1,
+    "revisione_90g_pct": 0.71,
+    "revisione_7g_pct": -0.05,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 8.78,
@@ -97582,10 +97620,10 @@
    "sortino_6m": 2.44,
    "prepost": {
     "label": "pre",
-    "price": 201.54,
-    "change_pct": 0.17
+    "price": 201.68,
+    "change_pct": 0.24
    },
-   "prezzo_limite_aggiustato": 201.54,
+   "prezzo_limite_aggiustato": 201.68,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Defensive",
@@ -97611,14 +97649,14 @@
     "target_mean": 208.1333,
     "fcf": 9714374656.0,
     "gross_margin": 0.6748,
-    "enterprise_value": 358639435776.0,
-    "ev_ebitda": 19.908,
-    "peg": 2.42,
+    "enterprise_value": 345391235072.0,
+    "ev_ebitda": 19.172,
+    "peg": 2.31,
     "roa": 0.1459,
-    "short_float": 0.0114,
+    "short_float": 0.0089,
     "buyback_yield": -0.0,
     "ps": 7.37,
-    "ev_s": 8.43,
+    "ev_s": 8.12,
     "altman_z": 2.96,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -99261,9 +99299,9 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -99521,15 +99559,15 @@
    "rating": {
     "key": "buy",
     "n": 23,
-    "target": 693.57,
-    "upside_pct": 11.7
+    "target": 691.83,
+    "upside_pct": 11.4
    },
    "analisti": {
-    "eps_ora": 22.9873,
+    "eps_ora": 22.9275,
     "eps_90g_fa": 22.7015,
     "eps_7g_fa": 22.8276,
-    "revisione_90g_pct": 1.26,
-    "revisione_7g_pct": 0.7,
+    "revisione_90g_pct": 1.0,
+    "revisione_7g_pct": 0.44,
     "su_30g": 3,
     "giu_30g": 1,
     "eps_min": 19.93,
@@ -99574,17 +99612,17 @@
     "debt_to_equity": 230.298,
     "dividend_yield": 0.0104,
     "price_to_book": 5.9814,
-    "target_mean": 693.5731,
+    "target_mean": 691.8339,
     "fcf": 4516250112.0,
     "gross_margin": 0.2518,
-    "enterprise_value": 225107509248.0,
-    "ev_ebitda": 26.175,
-    "peg": 1.44,
+    "enterprise_value": 234797842432.0,
+    "ev_ebitda": 27.302,
+    "peg": 1.58,
     "roa": 0.0376,
-    "short_float": 0.0213,
+    "short_float": 0.0208,
     "buyback_yield": 0.0064,
     "ps": 3.49,
-    "ev_s": 4.7,
+    "ev_s": 4.9,
     "altman_z": 5.4,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -101487,15 +101525,15 @@
    "rating": {
     "key": "strong_buy",
     "n": 32,
-    "target": 126.49,
-    "upside_pct": 17.1
+    "target": 126.46,
+    "upside_pct": 17.0
    },
    "analisti": {
-    "eps_ora": 7.473,
+    "eps_ora": 7.4751,
     "eps_90g_fa": 7.4846,
     "eps_7g_fa": 7.4855,
-    "revisione_90g_pct": -0.15,
-    "revisione_7g_pct": -0.17,
+    "revisione_90g_pct": -0.13,
+    "revisione_7g_pct": -0.14,
     "su_30g": 4,
     "giu_30g": 2,
     "eps_min": 7.09,
@@ -101514,11 +101552,11 @@
    "sortino_6m": 0.88,
    "prepost": {
     "label": "pre",
-    "price": 108.01,
-    "change_pct": -0.04
+    "price": 108.48,
+    "change_pct": 0.4
    },
-   "prezzo_limite_aggiustato": 108.01,
-   "risk_reward": "1:0.3",
+   "prezzo_limite_aggiustato": 108.48,
+   "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
    "stats": {
@@ -101540,17 +101578,17 @@
     "debt_to_equity": 39.404,
     "dividend_yield": 0.0139,
     "price_to_book": 1.6988,
-    "target_mean": 126.4891,
+    "target_mean": 126.4578,
     "fcf": 4860375040.0,
     "gross_margin": 0.376,
-    "enterprise_value": 234234527744.0,
-    "ev_ebitda": 11.174,
-    "peg": 3.52,
+    "enterprise_value": 228536451072.0,
+    "ev_ebitda": 10.902,
+    "peg": 3.41,
     "roa": 0.0481,
-    "short_float": 0.0113,
+    "short_float": 0.0114,
     "buyback_yield": 0.0188,
     "ps": 1.89,
-    "ev_s": 2.37,
+    "ev_s": 2.31,
     "altman_z": 2.59,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -103449,15 +103487,15 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 29.26,
-    "upside_pct": 3.5
+    "target": 29.11,
+    "upside_pct": 2.9
    },
    "analisti": {
-    "eps_ora": 2.8981,
-    "eps_90g_fa": 2.8303,
+    "eps_ora": 2.9012,
+    "eps_90g_fa": 2.8274,
     "eps_7g_fa": 2.8968,
-    "revisione_90g_pct": 2.4,
-    "revisione_7g_pct": 0.04,
+    "revisione_90g_pct": 2.61,
+    "revisione_7g_pct": 0.15,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 2.52,
@@ -103465,7 +103503,7 @@
     "eps_n": 25,
     "target_min": 25.0,
     "target_max": 36.0,
-    "target_mediana": 28.5
+    "target_mediana": 28.0
    },
    "health": 72,
    "eps": 0.76,
@@ -103476,10 +103514,10 @@
    "sortino_6m": 1.02,
    "prepost": {
     "label": "pre",
-    "price": 28.35,
-    "change_pct": 0.25
+    "price": 28.41,
+    "change_pct": 0.46
    },
-   "prezzo_limite_aggiustato": 28.35,
+   "prezzo_limite_aggiustato": 28.41,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
@@ -103490,9 +103528,9 @@
     "float_pct": 99.9,
     "avg_volume_30d": 36112359.0,
     "pe_ttm": 37.2105,
-    "forward_pe": 9.7581,
+    "forward_pe": 9.7516,
     "eps_ttm": 0.76,
-    "eps_forward": 2.8981,
+    "eps_forward": 2.9,
     "revenue_fy": 63695998976.0,
     "net_income_fy": 4338999808.0,
     "revenue_growth": 0.026,
@@ -103502,17 +103540,17 @@
     "debt_to_equity": 74.253,
     "dividend_yield": 0.0608,
     "price_to_book": 1.8919,
-    "target_mean": 29.2596,
+    "target_mean": 29.1058,
     "fcf": 12485624832.0,
     "gross_margin": 0.7472,
-    "enterprise_value": 213264777216.0,
-    "ev_ebitda": 8.402,
-    "peg": 12.94,
+    "enterprise_value": 211668860928.0,
+    "ev_ebitda": 8.339,
+    "peg": 12.81,
     "roa": 0.0578,
-    "short_float": 0.0264,
+    "short_float": 0.0272,
     "buyback_yield": -0.0,
     "ps": 2.53,
-    "ev_s": 3.35,
+    "ev_s": 3.32,
     "altman_z": 3.06,
     "altman_missing": 0,
     "altman_model": "Z''"
@@ -104610,8 +104648,8 @@
    "fomo_label": "FOMO moderata"
   },
   "vix": {
-   "value": 15.45,
-   "change_pct": 4.11,
+   "value": 15.42,
+   "change_pct": 3.91,
    "spark": [
     16.34,
     15.2,
@@ -104642,7 +104680,7 @@
     15.08,
     15.41,
     14.84,
-    15.45
+    15.42
    ],
    "asof": "2026-10-12"
   },
@@ -111601,8 +111639,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "177.27",
-    "change_pct": 0.02,
+    "value": "177.29",
+    "change_pct": 0.03,
     "suffix": "%"
    }
   ],
@@ -112128,10 +112166,10 @@
     "symbol": "HG=F",
     "label": "Rame",
     "unita": "$/lb",
-    "value": 6.766,
-    "change_pct": 1.87,
+    "value": 6.767,
+    "change_pct": 1.88,
     "var_1y": 32.7,
-    "pos_range_1y": 98.0,
+    "pos_range_1y": 98.1,
     "min_1y": 4.926,
     "max_1y": 6.804,
     "history": [
@@ -112637,7 +112675,7 @@
      },
      {
       "d": "2026-10-12",
-      "v": 6.766
+      "v": 6.767
      }
     ]
    },
@@ -112645,10 +112683,10 @@
     "symbol": "CL=F",
     "label": "Petrolio WTI",
     "unita": "$",
-    "value": 93.14,
-    "change_pct": 1.4,
-    "var_1y": 56.6,
-    "pos_range_1y": 65.7,
+    "value": 93.09,
+    "change_pct": 1.35,
+    "var_1y": 56.5,
+    "pos_range_1y": 65.6,
     "min_1y": 55.27,
     "max_1y": 112.95,
     "history": [
@@ -113154,7 +113192,7 @@
      },
      {
       "d": "2026-10-12",
-      "v": 93.14
+      "v": 93.09
      }
     ]
    },
@@ -113162,10 +113200,10 @@
     "symbol": "GC=F",
     "label": "Oro",
     "unita": "$/oz",
-    "value": 4196,
-    "change_pct": -0.47,
-    "var_1y": 1.5,
-    "pos_range_1y": 17.4,
+    "value": 4188,
+    "change_pct": -0.67,
+    "var_1y": 1.3,
+    "pos_range_1y": 16.8,
     "min_1y": 3960,
     "max_1y": 5318,
     "history": [
@@ -113671,13 +113709,20 @@
      },
      {
       "d": "2026-10-12",
-      "v": 4196.4
+      "v": 4188.0
      }
     ]
    }
   },
   "news": {
    "voci": [
+    {
+     "titolo": "Inside Bloomberg’s New Economy Forum Preparations",
+     "riassunto": "What does it take to get the Bloomberg New Economy Forum ready? Haslinda Amin goes behind the scenes in New Delhi as crews prepare the venue for global leaders and discussions on AI, trade, energy and the forces reshaping the world economy.\n\n (Source: Bloomberg)",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-12T12:01:30Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-10-12/inside-bloomberg-s-new-economy-forum-preparations-video"
+    },
     {
      "titolo": "Nobel prize in economics awarded to Robert E. Hall and Michael Woodford",
      "riassunto": "The U.S. economists were awarded for work that underpins the models used by central banks and governments to stabilize the economy.",
@@ -113728,13 +113773,6 @@
      "url": "https://www.bloomberg.com/news/articles/2026-10-12/credit-agricole-weighs-hedging-risky-debt-in-car-dealer-srt"
     },
     {
-     "titolo": "Morgan Stanley Traders Pitch Travelodge’s Unloved Bonds as a Buy",
-     "riassunto": "Morgan Stanley’s credit traders are recommending investors buy bonds issued by Travelodge Hotels Ltd. after a steep drop in the UK budget hotel chain’s debt this year.",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-12T09:54:30Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-12/morgan-stanley-traders-pitch-travelodge-s-unloved-bonds-as-a-buy"
-    },
-    {
      "titolo": "The bond market is doing the Fed’s job, and that could be good news for stocks, says Morgan Stanley strategist",
      "riassunto": "A stronger dollar, higher bond market yields and elevated gas prices are already tightening financial conditions in the U.S. to the point that Kevin Warsh may not even need to hike rates.",
      "fonte": "MarketWatch",
@@ -113754,13 +113792,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-10-12T04:02:08Z",
      "url": "https://www.bloomberg.com/news/articles/2026-10-12/copper-gains-on-easing-rate-hike-bets-and-chile-mine-avalanche"
-    },
-    {
-     "titolo": "Gold Edges Down as Traders Monitor Oil Prices, Fed Rate Outlook",
-     "riassunto": "Gold edged down from the highest in a week, as traders assessed swings in oil prices while waiting for economic data for clues on the US Federal Reserve’s interest-rate path.",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-12T00:38:27Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-12/gold-edges-up-as-traders-weigh-russia-ukraine-energy-ceasefire"
     },
     {
      "titolo": "Americans' debt problems are flashing a warning not seen since the Great Recession",
@@ -113803,6 +113834,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-07T11:55:36Z",
      "url": "https://www.cnbc.com/2026/10/07/india-rbi-interest-rates-inflation.html"
+    },
+    {
+     "titolo": "Why AI is both the hope and the hazard for world leaders, according to IMF chief Georgieva",
+     "riassunto": "Kristalina Georgieva warns that the technology lifting growth hopes is also pushing up inflation and yields, just as public debt levels rose.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-07T06:16:39Z",
+     "url": "https://www.cnbc.com/2026/10/07/economy-inflation-ai-trade-imf-iran-hormuz-trump-.html"
     }
    ],
    "fonti": [
@@ -118847,8 +118885,8 @@
    "us10": 5.24,
    "jp10": 3.09,
    "spread": 2.15,
-   "usdjpy": 158.6,
-   "usdjpy_chg_1m": 3.38,
+   "usdjpy": 158.63,
+   "usdjpy_chg_1m": 3.4,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -118865,7 +118903,7 @@
    "calls": 700869
   },
   "risk_sentiment": {
-   "score": 49,
+   "score": 48,
    "label": "Neutrale",
    "components": [
     {
@@ -118882,7 +118920,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 45
+     "score": 42
     },
     {
      "label": "Treasury 10A",
@@ -119361,7 +119399,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-10-09",
     "price": 198.78,
     "d1": 0.51,
@@ -119444,7 +119482,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-10-09",
     "price": 170.81,
     "d1": 1.58,
@@ -119527,7 +119565,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-10-09",
     "price": 603.33,
     "d1": -0.65,
@@ -119610,7 +119648,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-10-09",
     "price": 206.49,
     "d1": 3.0,
@@ -119916,7 +119954,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-10-09",
     "price": 112.85,
     "d1": 1.02,
@@ -120497,7 +120535,7 @@
       "qqq": 119.5
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-10-09",
     "price": 80.15,
     "d1": 0.26,
@@ -123381,7 +123419,7 @@
     }
    ],
    "label": "Sopravvalutazione",
-   "nasdaq_pe": 28.8,
+   "nasdaq_pe": 30.6,
    "source": "multpl",
    "kind": "trailing",
    "fetched_at": "2026-10-12"
@@ -123443,7 +123481,7 @@
    },
    "smc_avg": 65,
    "vix3m": 17.8,
-   "vix_term_ratio": 0.869,
+   "vix_term_ratio": 0.868,
    "ig_spread": 1.02,
    "hy_ig_ratio": 3.09,
    "divergence": -19,
@@ -123739,8 +123777,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 102.43,
-   "chg_3m_pct": 1.92,
+   "value": 102.41,
+   "chg_3m_pct": 1.9,
    "flag": null,
    "src": "DXY"
   },
@@ -123762,14 +123800,14 @@
    "nasdaq": {
     "symbol": "NQ=F",
     "label": "Futures Nasdaq 100",
-    "price": 31061.25,
-    "change_pct": -0.56
+    "price": 31073.5,
+    "change_pct": -0.52
    },
    "sp500": {
     "symbol": "ES=F",
     "label": "Futures S&P 500",
-    "price": 7863.5,
-    "change_pct": -0.27
+    "price": 7868.25,
+    "change_pct": -0.21
    }
   },
   "froth": {
@@ -124066,6 +124104,13 @@
     ],
     "MU": [
      {
+      "titolo": "Should You Buy Micron Stock in October?",
+      "riassunto": "Key PointsMicron's stock remains flat despite explosive earnings results.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-12T11:27:00Z",
+      "url": "https://www.nasdaq.com/articles/should-you-buy-micron-stock-october"
+     },
+     {
       "titolo": "Nvidia and Micron Technology Just Received Some Very Bad News From an Unlikely Place",
       "riassunto": "Key PointsData center company, Firmus, cancelled its initial public offering on the Australian Stock Exchange last week, citing weak investor demand.",
       "fonte": "Nasdaq",
@@ -124099,13 +124144,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-11T09:30:02Z",
       "url": "https://www.nasdaq.com/articles/prediction-how-much-micron-stock-will-be-worth-end-2027"
-     },
-     {
-      "titolo": "VOO Doesn't Hold SpaceX, Taiwan Semiconductor, Samsung Electronics, SK Hynix, or ASML. Meet the Vanguard ETF That Does.",
-      "riassunto": "Key PointsThe U.S. remains the global leader in technology.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-10T20:51:33Z",
-      "url": "https://www.nasdaq.com/articles/voo-doesnt-hold-spacex-taiwan-semiconductor-samsung-electronics-sk-hynix-or-asml-meet"
      }
     ],
     "NVDA": [
@@ -124261,7 +124299,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-12T11:44:38Z"
+   "letto_il": "2026-10-12T12:34:41Z"
   }
  },
  "broker": null,
@@ -124489,6 +124527,13 @@
    ],
    "MU": [
     {
+     "titolo": "Should You Buy Micron Stock in October?",
+     "riassunto": "Key PointsMicron's stock remains flat despite explosive earnings results.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-12T11:27:00Z",
+     "url": "https://www.nasdaq.com/articles/should-you-buy-micron-stock-october"
+    },
+    {
      "titolo": "Nvidia and Micron Technology Just Received Some Very Bad News From an Unlikely Place",
      "riassunto": "Key PointsData center company, Firmus, cancelled its initial public offering on the Australian Stock Exchange last week, citing weak investor demand.",
      "fonte": "Nasdaq",
@@ -124522,13 +124567,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-11T09:30:02Z",
      "url": "https://www.nasdaq.com/articles/prediction-how-much-micron-stock-will-be-worth-end-2027"
-    },
-    {
-     "titolo": "VOO Doesn't Hold SpaceX, Taiwan Semiconductor, Samsung Electronics, SK Hynix, or ASML. Meet the Vanguard ETF That Does.",
-     "riassunto": "Key PointsThe U.S. remains the global leader in technology.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-10T20:51:33Z",
-     "url": "https://www.nasdaq.com/articles/voo-doesnt-hold-spacex-taiwan-semiconductor-samsung-electronics-sk-hynix-or-asml-meet"
     }
    ],
    "NVDA": [
@@ -124684,12 +124722,12 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-12T11:44:38Z"
+  "letto_il": "2026-10-12T12:34:41Z"
  },
  "predictions": [
   {
    "question": "Will the price of Bitcoin be above $82,000 on October 12?",
-   "yes": 95,
+   "yes": 94,
    "link": "https://polymarket.com/event/bitcoin-above-82k-on-october-12-2026"
   },
   {
@@ -124709,12 +124747,12 @@
   },
   {
    "question": "Will the price of Bitcoin be above $80,000 on October 12?",
-   "yes": 99,
+   "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-80k-on-october-12-2026"
   },
   {
    "question": "Will the price of Ethereum be above $2,600 on October 12?",
-   "yes": 4,
+   "yes": 2,
    "link": "https://polymarket.com/event/ethereum-above-2600-on-october-12-2026"
   }
  ],
@@ -141526,7 +141564,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 1,
-       "oi": 0
+       "oi": 126
       },
       {
        "strike": 247.5,
@@ -141534,7 +141572,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 1
       },
       {
        "strike": 250.0,
@@ -141542,7 +141580,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 21,
-       "oi": 0
+       "oi": 88
       },
       {
        "strike": 252.5,
@@ -141550,7 +141588,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 25
       },
       {
        "strike": 255.0,
@@ -141558,7 +141596,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 13,
-       "oi": 0
+       "oi": 369
       },
       {
        "strike": 257.5,
@@ -141566,7 +141604,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 26
       },
       {
        "strike": 260.0,
@@ -141574,7 +141612,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 126,
-       "oi": 0
+       "oi": 312
       },
       {
        "strike": 262.5,
@@ -141582,7 +141620,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 17
       },
       {
        "strike": 265.0,
@@ -141590,7 +141628,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 109,
-       "oi": 0
+       "oi": 221
       },
       {
        "strike": 267.5,
@@ -141598,7 +141636,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 50
       },
       {
        "strike": 270.0,
@@ -141606,7 +141644,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 1095,
-       "oi": 0
+       "oi": 746
       },
       {
        "strike": 272.5,
@@ -141614,7 +141652,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 671
       },
       {
        "strike": 275.0,
@@ -141630,7 +141668,7 @@
        "ask": 0.0,
        "iv": 1.6,
        "vol": 0,
-       "oi": 0
+       "oi": 288
       },
       {
        "strike": 280.0,
@@ -141638,7 +141676,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 263,
-       "oi": 0
+       "oi": 677
       },
       {
        "strike": 282.5,
@@ -141646,7 +141684,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 0,
-       "oi": 0
+       "oi": 80
       },
       {
        "strike": 285.0,
@@ -141654,7 +141692,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 29,
-       "oi": 0
+       "oi": 244
       },
       {
        "strike": 287.5,
@@ -141662,7 +141700,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 129
       },
       {
        "strike": 290.0,
@@ -141670,7 +141708,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 101,
-       "oi": 0
+       "oi": 372
       },
       {
        "strike": 292.5,
@@ -141678,7 +141716,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 159
       },
       {
        "strike": 295.0,
@@ -141686,7 +141724,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 105,
-       "oi": 0
+       "oi": 284
       },
       {
        "strike": 297.5,
@@ -141694,7 +141732,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 0,
-       "oi": 0
+       "oi": 9
       },
       {
        "strike": 300.0,
@@ -141702,7 +141740,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 213,
-       "oi": 0
+       "oi": 583
       },
       {
        "strike": 302.5,
@@ -141710,7 +141748,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 0,
-       "oi": 0
+       "oi": 105
       },
       {
        "strike": 305.0,
@@ -141718,7 +141756,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 139,
-       "oi": 0
+       "oi": 259
       }
      ],
      "puts": [
@@ -141728,7 +141766,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 86,
-       "oi": 0
+       "oi": 666
       },
       {
        "strike": 247.5,
@@ -141736,7 +141774,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 0,
-       "oi": 0
+       "oi": 199
       },
       {
        "strike": 250.0,
@@ -141744,7 +141782,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 372,
-       "oi": 0
+       "oi": 632
       },
       {
        "strike": 252.5,
@@ -141752,7 +141790,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 0,
-       "oi": 0
+       "oi": 50
       },
       {
        "strike": 255.0,
@@ -141760,7 +141798,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 71,
-       "oi": 0
+       "oi": 308
       },
       {
        "strike": 257.5,
@@ -141768,7 +141806,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 40
       },
       {
        "strike": 260.0,
@@ -141776,7 +141814,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 197,
-       "oi": 0
+       "oi": 202
       },
       {
        "strike": 262.5,
@@ -141784,7 +141822,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 148
       },
       {
        "strike": 265.0,
@@ -141792,7 +141830,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 99,
-       "oi": 0
+       "oi": 134
       },
       {
        "strike": 267.5,
@@ -141800,7 +141838,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 0,
-       "oi": 0
+       "oi": 52
       },
       {
        "strike": 270.0,
@@ -141808,7 +141846,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 255,
-       "oi": 0
+       "oi": 307
       },
       {
        "strike": 272.5,
@@ -141816,7 +141854,7 @@
        "ask": 0.0,
        "iv": 1.6,
        "vol": 0,
-       "oi": 0
+       "oi": 188
       },
       {
        "strike": 275.0,
@@ -141824,7 +141862,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 15,
-       "oi": 0
+       "oi": 20
       },
       {
        "strike": 277.5,
@@ -141832,7 +141870,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 18
       },
       {
        "strike": 280.0,
@@ -141840,7 +141878,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 17,
-       "oi": 0
+       "oi": 29
       },
       {
        "strike": 282.5,
@@ -141848,7 +141886,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 33
       },
       {
        "strike": 285.0,
@@ -141856,7 +141894,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 26
       },
       {
        "strike": 287.5,
@@ -141864,7 +141902,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 5
       },
       {
        "strike": 290.0,
@@ -141872,7 +141910,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 1
       },
       {
        "strike": 292.5,
@@ -141880,7 +141918,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 3
       },
       {
        "strike": 295.0,
@@ -141888,7 +141926,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 3
       },
       {
        "strike": 300.0,
@@ -141896,7 +141934,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 2,
-       "oi": 0
+       "oi": 4
       },
       {
        "strike": 305.0,
@@ -141904,7 +141942,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 2
       },
       {
        "strike": 310.0,
@@ -141912,7 +141950,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 1,
-       "oi": 0
+       "oi": 10
       },
       {
        "strike": 320.0,
@@ -141920,11 +141958,11 @@
        "ask": 0.0,
        "iv": null,
        "vol": 2,
-       "oi": 0
+       "oi": 3
       }
      ],
-     "call_wall": 330.0,
-     "put_wall": 195.0,
+     "call_wall": 270.0,
+     "put_wall": 220.0,
      "opt_volume": 5463
     },
     {
@@ -152410,7 +152448,7 @@
      ],
      "call_wall": 300.0,
      "put_wall": 230.0,
-     "opt_volume": 8825
+     "opt_volume": 8826
     },
     {
      "date": "2026-10-23",
@@ -160036,7 +160074,7 @@
      ],
      "call_wall": 1300.0,
      "put_wall": 600.0,
-     "opt_volume": 177004
+     "opt_volume": 177022
     },
     {
      "date": "2026-10-19",
@@ -169386,7 +169424,7 @@
      ],
      "call_wall": 450.0,
      "put_wall": 320.0,
-     "opt_volume": 11085
+     "opt_volume": 11082
     },
     {
      "date": "2026-10-23",
@@ -169397,7 +169435,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 10
       },
       {
        "strike": 390.0,
@@ -169405,7 +169443,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 6,
-       "oi": 0
+       "oi": 45
       },
       {
        "strike": 395.0,
@@ -169413,7 +169451,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 2,
-       "oi": 0
+       "oi": 60
       },
       {
        "strike": 397.5,
@@ -169421,7 +169459,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 9
       },
       {
        "strike": 400.0,
@@ -169429,7 +169467,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 20,
-       "oi": 0
+       "oi": 105
       },
       {
        "strike": 402.5,
@@ -169437,7 +169475,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 3
       },
       {
        "strike": 405.0,
@@ -169445,7 +169483,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 2,
-       "oi": 0
+       "oi": 89
       },
       {
        "strike": 407.5,
@@ -169453,7 +169491,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 26
       },
       {
        "strike": 410.0,
@@ -169461,7 +169499,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 28,
-       "oi": 0
+       "oi": 104
       },
       {
        "strike": 412.5,
@@ -169469,7 +169507,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 13
       },
       {
        "strike": 415.0,
@@ -169477,7 +169515,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 50,
-       "oi": 0
+       "oi": 75
       },
       {
        "strike": 417.5,
@@ -169485,7 +169523,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 13
       },
       {
        "strike": 420.0,
@@ -169493,7 +169531,7 @@
        "ask": 0.0,
        "iv": 0.4,
        "vol": 34,
-       "oi": 0
+       "oi": 167
       },
       {
        "strike": 422.5,
@@ -169501,7 +169539,7 @@
        "ask": 0.0,
        "iv": 1.6,
        "vol": 0,
-       "oi": 0
+       "oi": 18
       },
       {
        "strike": 425.0,
@@ -169517,7 +169555,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 0,
-       "oi": 0
+       "oi": 9
       },
       {
        "strike": 430.0,
@@ -169525,7 +169563,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 45,
-       "oi": 0
+       "oi": 149
       },
       {
        "strike": 432.5,
@@ -169533,7 +169571,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 0,
-       "oi": 0
+       "oi": 11
       },
       {
        "strike": 435.0,
@@ -169541,7 +169579,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 25,
-       "oi": 0
+       "oi": 53
       },
       {
        "strike": 437.5,
@@ -169549,7 +169587,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 1
       },
       {
        "strike": 440.0,
@@ -169557,7 +169595,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 45,
-       "oi": 0
+       "oi": 373
       },
       {
        "strike": 442.5,
@@ -169565,7 +169603,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 14
       },
       {
        "strike": 445.0,
@@ -169573,7 +169611,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 40,
-       "oi": 0
+       "oi": 170
       },
       {
        "strike": 450.0,
@@ -169589,7 +169627,7 @@
        "ask": 0.0,
        "iv": 12.5,
        "vol": 64,
-       "oi": 0
+       "oi": 224
       }
      ],
      "puts": [
@@ -169599,7 +169637,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 11,
-       "oi": 0
+       "oi": 88
       },
       {
        "strike": 392.5,
@@ -169607,7 +169645,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 19
       },
       {
        "strike": 395.0,
@@ -169615,7 +169653,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 108,
-       "oi": 0
+       "oi": 125
       },
       {
        "strike": 397.5,
@@ -169623,7 +169661,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 8
       },
       {
        "strike": 400.0,
@@ -169631,7 +169669,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 57,
-       "oi": 0
+       "oi": 64
       },
       {
        "strike": 402.5,
@@ -169639,7 +169677,7 @@
        "ask": 0.0,
        "iv": 6.3,
        "vol": 0,
-       "oi": 0
+       "oi": 7
       },
       {
        "strike": 405.0,
@@ -169647,7 +169685,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 6,
-       "oi": 0
+       "oi": 28
       },
       {
        "strike": 407.5,
@@ -169655,7 +169693,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 0,
-       "oi": 0
+       "oi": 18
       },
       {
        "strike": 410.0,
@@ -169663,7 +169701,7 @@
        "ask": 0.0,
        "iv": 3.1,
        "vol": 127,
-       "oi": 0
+       "oi": 69
       },
       {
        "strike": 412.5,
@@ -169671,7 +169709,7 @@
        "ask": 0.0,
        "iv": 1.6,
        "vol": 0,
-       "oi": 0
+       "oi": 9
       },
       {
        "strike": 415.0,
@@ -169679,7 +169717,7 @@
        "ask": 0.0,
        "iv": 1.6,
        "vol": 76,
-       "oi": 0
+       "oi": 71
       },
       {
        "strike": 417.5,
@@ -169687,7 +169725,7 @@
        "ask": 0.0,
        "iv": 0.4,
        "vol": 0,
-       "oi": 0
+       "oi": 22
       },
       {
        "strike": 420.0,
@@ -169695,7 +169733,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 5,
-       "oi": 0
+       "oi": 13
       },
       {
        "strike": 422.5,
@@ -169703,7 +169741,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 4
       },
       {
        "strike": 425.0,
@@ -169711,7 +169749,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 1,
-       "oi": 0
+       "oi": 6
       },
       {
        "strike": 427.5,
@@ -169719,7 +169757,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 3
       },
       {
        "strike": 430.0,
@@ -169727,7 +169765,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 20,
-       "oi": 0
+       "oi": 20
       },
       {
        "strike": 435.0,
@@ -169735,7 +169773,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 10,
-       "oi": 0
+       "oi": 10
       },
       {
        "strike": 440.0,
@@ -169743,7 +169781,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 1
       },
       {
        "strike": 445.0,
@@ -169751,7 +169789,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 1
       },
       {
        "strike": 450.0,
@@ -169759,7 +169797,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 1,
-       "oi": 0
+       "oi": 3
       },
       {
        "strike": 455.0,
@@ -169767,7 +169805,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 43
       },
       {
        "strike": 460.0,
@@ -169775,7 +169813,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 13
       },
       {
        "strike": 470.0,
@@ -169783,7 +169821,7 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 9
       },
       {
        "strike": 480.0,
@@ -169791,11 +169829,11 @@
        "ask": 0.0,
        "iv": null,
        "vol": 0,
-       "oi": 0
+       "oi": 2
       }
      ],
-     "call_wall": 450.0,
-     "put_wall": 315.0,
+     "call_wall": 470.0,
+     "put_wall": 230.0,
      "opt_volume": 2190
     },
     {
@@ -173666,10 +173704,10 @@
       {
        "strike": 3.0,
        "bid": 0.0,
-       "ask": 0.0,
-       "iv": 50.0,
+       "ask": 0.64,
+       "iv": 1021.9,
        "vol": 0,
-       "oi": 0
+       "oi": 60
       },
       {
        "strike": 5.0,
@@ -178666,7 +178704,7 @@
      ],
      "call_wall": 900.0,
      "put_wall": 540.0,
-     "opt_volume": 12628
+     "opt_volume": 12630
     },
     {
      "date": "2026-10-23",
@@ -180312,7 +180350,7 @@
      ],
      "call_wall": 400.0,
      "put_wall": 200.0,
-     "opt_volume": 404854
+     "opt_volume": 404848
     },
     {
      "date": "2026-10-19",
@@ -183923,9 +183961,9 @@
       },
       {
        "strike": 405.0,
-       "bid": 0.09,
-       "ask": 2.59,
-       "iv": 25.8,
+       "bid": 0.0,
+       "ask": 0.0,
+       "iv": 6.3,
        "vol": 45,
        "oi": 1302
       },
@@ -185769,9 +185807,9 @@
       },
       {
        "strike": 230.0,
-       "bid": 0.0,
-       "ask": 0.0,
-       "iv": null,
+       "bid": 86.85,
+       "ask": 89.9,
+       "iv": 576.4,
        "vol": 2,
        "oi": 0
       }
@@ -190238,12 +190276,12 @@
    "sharpe": 1.01,
    "gain_pct": 1.75,
    "eur_value": 40698.64,
-   "vix": 15.45,
-   "vix_term": 0.869,
+   "vix": 15.42,
+   "vix_term": 0.868,
    "titles": {},
    "macro_scores": {
     "fear_greed": 45,
-    "risk_sentiment": 49,
+    "risk_sentiment": 48,
     "credit": 77,
     "systemic_risk": 60,
     "corp_profit": 53,
@@ -190373,7 +190411,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -190433,6 +190471,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-12T11:44:39Z"
+  "generated_at": "2026-10-12T12:34:42Z"
  }
 }
