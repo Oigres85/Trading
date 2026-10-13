@@ -5837,7 +5837,12 @@ check("v367 · una settimana pubblicata a meta' viene scartata e dichiarata, non
       { w: "2026-07-20", ats: 23.7e6, otc: 0, incompleta: true },
       { w: "2026-08-03", ats: 29e6, otc: 34.7e6 }], ultima: "2026-08-03", incomplete: 1 };
     const o2 = buildPromptTicker(r2.ticker);
-    if (/2026-07-20/.test(o2)) return "la settimana incompleta compare fra i numeri usabili";
+    /* v475: la data si cerca nella RIGA del flusso, non in tutto il pacchetto. Il 12/10/2026 la
+       finestra corta delle sensibilita' macro di CRWV cominciava proprio il 2026-07-20, e il
+       check e' andato rosso su codice corretto: una data scritta a mano compare per caso. */
+    const rigaFlusso = o2.split(String.fromCharCode(10)).find(l => l.indexOf("FLUSSO FUORI DAI MERCATI REGOLAMENTATI") >= 0) || "";
+    if (!rigaFlusso) return "il blocco del flusso fuori borsa non compare";
+    if (rigaFlusso.indexOf("2026-07-20") >= 0) return "la settimana incompleta compare fra i numeri usabili";
     if (!/pubblicato solo meta'/.test(o2)) return "lo scarto non e' dichiarato: sparisce una settimana senza dirlo";
     return true;`));
 

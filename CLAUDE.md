@@ -6438,3 +6438,22 @@ tolleranza ("uno può coincidere per caso, due no") che i nomi da soli bastavano
 Riagganciato ai **numeri isolati** (non attaccati a lettere, non dentro un'entità), senza
 backslash perché il template va al vm. Due iniezioni — il punteggio accanto al nome e nella colonna
 della lettura — **mordono entrambe**: un punteggio stampato resta un numero isolato.
+
+## 🗓️ v475 — UNA DATA SCRITTA A MANO NEL CHECK, E I DATI DEL GIORNO L'HANNO RESA VERA ALTROVE
+
+Il pre-commit ha bloccato la riga del registro della performance del 12/10: **v367** («una
+settimana pubblicata a metà viene scartata») è andato rosso su codice che nessuno aveva toccato.
+Il check inietta una settimana FINRA incompleta datata **2026-07-20** e pretendeva che quella
+data non comparisse **in tutto il pacchetto di CRWV**. Il 12/10 la finestra corta delle
+sensibilità macro (60 sedute) cominciava proprio il 2026-07-20: la data compariva quattro volte,
+in un blocco che col flusso fuori borsa non c'entra.
+
+> È la classe **v429/v431** (*un check che vale finché i dati lo concedono*) nella forma più
+> pura: la sonda era una data scritta a mano, e il calendario l'ha resa vera per coincidenza.
+> E insieme la lezione **v395**: chi cerca l'assenza di un dato guarda la **regione** in cui il
+> dato vivrebbe, non il pacchetto intero.
+
+Ora il check legge la **riga del flusso fuori dai mercati regolamentati** e cerca la data solo lì.
+Validato per iniezione (filtro delle settimane incomplete tolto in `app.js`, con `modifica_sicura`
+e ripristino da snapshot verificato per hash): morde, e solo lui. `?v=` e `BUILD_VERSION` non
+toccati: cambia solo `scripts/test_app.mjs` (regola v440).
