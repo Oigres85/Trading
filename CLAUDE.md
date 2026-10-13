@@ -6533,3 +6533,9 @@ iniezioni, tutte mordono — ma non alla prima:
   stesso (v213, v240, v393, v395, v418).
 ⚠ Pavimenti alzati: `test_app.mjs` 575, `test_update_data.py` 195 (e `N_CHECKS_MINIMO` da 112 a
 200: era fermo a metà suite), `test_analisi_libro.py` 340. `?v=` e `BUILD_VERSION` a 476.
+
+✅ **Verificato nel run del CI** (lanciato a mano dopo il push, 13/10 alle 14:26 UTC): **53 righe su
+53** con la liquidità e la base `aggregato`, numeri identici a quelli misurati in sviluppo (RGTI
+393,7 milioni, GOOGL 242,5 miliardi, SKHY in won), e tutti i gate che leggono i dati verdi sul
+`data.json` nuovo — compreso il v409 riagganciato, che ora vede «liquidità diviso» invece di
+«cassa diviso».
