@@ -93,9 +93,109 @@ def riga_revisioni(a, con_target=True):
     return s
 
 
+# ⚠ v476 — oltre i cinque anni un'autonomia non porta piu' informazione: "175,9 mesi" e'
+#   aritmeticamente giusto e comunicativamente falso (v389). E' la stessa soglia di app.js.
+MESI_CAP = 60
+
+
+def liquidita_societa(c):
+    """(valore, nome, dettaglio) — la LIQUIDITA' di una societa', la stessa lettura di
+    `liquiditaSocieta` in app.js (v476). La pipeline leggeva i soli contanti e lasciava fuori i
+    titoli a breve: su RGTI 27,8 milioni contro 393,7. Su uno snapshot precedente il campo nuovo
+    non c'e', e la cassa si usa DICENDO che sono i soli contanti (v406)."""
+    c = c or {}
+    if c.get("liquidita") is not None and c.get("liquidita_base"):
+        det = ("la fonte riporta solo i contanti" if c["liquidita_base"] == "solo_cassa"
+               else "contanti e titoli a breve termine")
+        return c["liquidita"], "liquidita'", det
+    if c.get("cassa") is not None:
+        return c["cassa"], "cassa", "soli contanti, senza i titoli a breve termine"
+    return None, None, None
+
+
+def _mesi(m):
+    return "oltre 5 anni" if m > MESI_CAP else f"{_n(m)} mesi"
+
+
+def scala_importi(valori):
+    """(formattatore, unita') scelti UNA volta sul blocco, dal valore piu' grande (v447): righe con
+    unita' diverse non si confrontano, e un "mld" fisso cancellava i numeri dei nomi piccoli."""
+    vv = [abs(float(v)) for v in valori if v is not None]
+    m = max(vv) if vv else 0
+    div, et = (1e9, "mld") if m >= 1e9 else (1e6, "mln") if m >= 1e6 else (1e3, "migliaia")
+    return (lambda v: "n.d." if v is None else _n(float(v) / div, 2)), et
+
+
+def _trimestre_a(q, data, giorni, tolleranza=20):
+    """Il trimestre che cade `giorni` prima di `data`: per DATA, mai per posizione (v207, v393)."""
+    from datetime import date
+    try:
+        d0 = date.fromisoformat(str(data)[:10])
+    except ValueError:
+        return None
+    for x in q:
+        try:
+            dx = date.fromisoformat(str(x.get("trim"))[:10])
+        except ValueError:
+            continue
+        if abs((d0 - dx).days - giorni) <= tolleranza:
+            return x
+    return None
+
+
+def riga_ricavi(r):
+    """v476 — i RICAVI per trimestre accanto all'ultimo esercizio chiuso.
+    Nasce da un mio errore: il 12/10 ho motivato l'uscita da RGTI con "ricavi -46% in tre anni",
+    letto sulla serie ANNUALE ferma al 2025, mentre i trimestri del 2026 dicevano il contrario
+    (1,8 milioni nel 2° trimestre 2025, 5,1 nel 2° trimestre 2026). Le schede non portavano i
+    ricavi affatto, e l'esercizio chiuso era l'unico a portata di mano. Solo variazioni, mai
+    importi: sono nella valuta di bilancio dell'emittente (v404, v447). Quando trimestri ed
+    esercizio puntano in versi opposti, la riga lo dice."""
+    q = [x for x in ((r.get("tv") or {}).get("conto_trim") or [])
+         if isinstance(x, dict) and x.get("ricavi") is not None and x.get("trim")]
+    q.sort(key=lambda x: str(x["trim"]), reverse=True)
+    pz, verso_trim, verso_anno = [], None, None
+    if q:
+        u = q[0]
+        anno = _trimestre_a(q, u["trim"], 365)
+        prec = _trimestre_a(q, u["trim"], 91)
+        parti = []
+        if anno and anno["ricavi"]:
+            verso_trim = (u["ricavi"] / anno["ricavi"] - 1) * 100
+            parti.append(f"{_segno(verso_trim)}% sullo stesso trimestre dell'anno prima")
+        if prec and prec["ricavi"]:
+            parti.append(f"{_segno((u['ricavi'] / prec['ricavi'] - 1) * 100)}% sul trimestre precedente")
+        pz.append(f"ultimo trimestre (al {str(u['trim'])[:10]}) "
+                  + (", ".join(parti) if parti else "senza un trimestre di confronto nel dato"))
+        a, b = u.get("operativo"), (anno or {}).get("operativo")
+        if a is not None and b is not None:
+            if a < 0 and b < 0:
+                pz.append(f"perdita operativa {'AMPLIATA' if a < b else 'RIDOTTA'} del {_n(abs(a / b - 1) * 100)}% sull'anno prima")
+            elif a >= 0 and b > 0:
+                pz.append(f"utile operativo {_segno((a / b - 1) * 100)}% sull'anno prima")
+            elif a >= 0 > b:
+                pz.append("da perdita a utile operativo sull'anno prima")
+            elif a < 0 <= b:
+                pz.append("da utile a perdita operativa sull'anno prima")
+    fin = sorted([x for x in (r.get("financials") or []) if isinstance(x, dict) and x.get("revenue") and x.get("year")],
+                 key=lambda x: x["year"])
+    if len(fin) >= 2:
+        verso_anno = (fin[-1]["revenue"] / fin[-2]["revenue"] - 1) * 100
+        pz.append(f"ultimo esercizio chiuso ({fin[-1]['year']}) {_segno(verso_anno)}% sul {fin[-2]['year']}")
+    if not pz:
+        return None
+    s = "ricavi: " + " · ".join(pz)
+    if verso_trim is not None and verso_anno is not None and (verso_trim > 0) != (verso_anno > 0):
+        s += (" ⚠ TRIMESTRI ED ESERCIZIO PUNTANO IN VERSI OPPOSTI: i trimestri sono piu' recenti "
+              "dell'esercizio chiuso")
+    return s
+
+
 def riga_cassa(r):
     """Solo rapporti, mai importi (v404). Esce solo per chi brucia cassa: per gli altri la
-    domanda 'quanto dura la cassa' non si pone."""
+    domanda 'quanto dura la cassa' non si pone.
+    ⚠ v476 — il numeratore e' la LIQUIDITA' con la sua base, i denominatori sono DUE quando ci
+    sono entrambi e non si confrontano (v409), e oltre cinque anni non si stampa il numero."""
     c = r.get("combustione") or {}
     k = r.get("credito") or {}
     if c.get("fcf_ttm") is None:
@@ -103,8 +203,15 @@ def riga_cassa(r):
     if c["fcf_ttm"] >= 0:
         return f"cassa: flusso di cassa libero POSITIVO su 12 mesi (bilancio al {c.get('cashflow_al', 'n.d.')}) — si autofinanzia"
     pz = [f"flusso di cassa libero NEGATIVO su 12 mesi (bilancio al {c.get('cashflow_al', 'n.d.')})"]
+    _, nome, det = liquidita_societa(c)
+    voci = []
+    if c.get("mesi_operativi") is not None:
+        voci.append(f"{_mesi(c['mesi_operativi'])} di perdita operativa")
     if c.get("mesi_capex") is not None:
-        pz.append(f"la cassa copre {_n(c['mesi_capex'])} mesi di investimenti")
+        voci.append(f"{_mesi(c['mesi_capex'])} di investimenti")
+    if voci and nome:
+        pz.append(f"la {nome} ({det}) copre " + " · ".join(voci)
+                  + (" — due denominatori diversi, non si confrontano" if len(voci) > 1 else ""))
     if c.get("emissione_netta_pct") is not None:
         pz.append(f"emissione netta di azioni {_segno(c['emissione_netta_pct'])}% su 12 mesi")
     if k.get("copertura") is not None:
@@ -149,7 +256,7 @@ def scheda(tk, ruolo, righe, sec):
     else:
         out.append("  sensibilita' macro: n.d.")
     out.append("  " + riga_revisioni(r.get("analisti")))
-    for f in (riga_cassa, riga_short):
+    for f in (riga_ricavi, riga_cassa, riga_short):
         x = f(r)
         if x:
             out.append("  " + x)

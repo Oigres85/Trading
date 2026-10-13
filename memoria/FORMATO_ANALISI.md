@@ -83,6 +83,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
 4. **Tecnica** — solo i nomi vicini a resistenza o supporto (distanze in ATR), o sotto la SMA200.
 5. **Macro e catalizzatori** — e per le trimestrali vicine le revisioni delle stime e, per chi
    brucia cassa, l'autonomia: sono le due cose che una trimestrale riprezza.
+   I ricavi si leggono dai TRIMESTRI (riga «ricavi» delle schede), mai dal solo esercizio chiuso,
+   e l'autonomia sulla LIQUIDITÀ (cassa e titoli a breve), mai sulla sola cassa (v476): il 12/10
+   l'esercizio fermo al 2025 mi ha fatto scrivere «ricavi in calo» su RGTI, che nel 2026 li ha
+   quasi triplicati, e i soli contanti coprivano 5,5 mesi di perdita operativa dove la liquidità
+   intera ne copre circa 78 (stesso denominatore: i due numeri si confrontano).
    Soglie macro decise prima (spread credito alto rendimento 3,5;
    Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
 6. **Piano con soglie** — le decisioni già confermate stanno nel blocco DECISIONI APERTE (sezione

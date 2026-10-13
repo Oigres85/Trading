@@ -6457,3 +6457,79 @@ Ora il check legge la **riga del flusso fuori dai mercati regolamentati** e cerc
 Validato per iniezione (filtro delle settimane incomplete tolto in `app.js`, con `modifica_sicura`
 e ripristino da snapshot verificato per hash): morde, e solo lui. `?v=` e `BUILD_VERSION` non
 toccati: cambia solo `scripts/test_app.mjs` (regola v440).
+
+## 💧 v476 — LA LIQUIDITÀ NON È SOLO LA CASSA, E I RICAVI NON SONO SOLO L'ESERCIZIO CHIUSO
+
+Istruzione del CEO, testuale: *"Correggi tutti i difetti che hai individuato"* — dopo che,
+rispondendo a *"mediare su Rigetti?"*, ho dovuto correggere due cose che gli avevo scritto il
+giorno prima per motivare l'uscita da RGTI.
+
+### 1. La pipeline contava i soli contanti
+`combustione()` cercava per prima la voce «Cash And Cash Equivalents» e usava quella che comprende
+i titoli a breve termine **solo come ripiego**: ogni volta che la cassa c'era, buoni del Tesoro e
+carta commerciale restavano fuori. Misurato sui bilanci veri (yfinance rispondeva dall'ambiente di
+sviluppo il 13/10, quindi la fetch è stata esercitata, non solo simulata — trappola v203 evitata
+misurando):
+
+| | cassa | liquidità | cosa cambiava |
+|---|---|---|---|
+| RGTI | 27,8 mln | 393,7 mln | autonomia sulla perdita operativa da **5,5 mesi a 77,8** |
+| GOOGL | 55,9 mld | 242,5 mld | debito netto da **+56,8 mld a −129,7** (liquidità netta) |
+| MSFT | 20,9 mld | 76,7 mld | debito netto da +35,9 mld a −19,8 |
+| AMZN | 101,8 mld | 143,1 mld | debito netto da 108,1 mld a 66,8 |
+
+> ⚠⚠ **Una catena di ripieghi è una scelta, non una disponibilità.** In `_riga_bilancio(df, A, B)`
+> la voce B entra solo se A manca: mettere per prima la voce STRETTA esclude in silenzio quella
+> LARGA ogni volta che la stretta esiste. Nessun errore, nessun gate rosso — solo un numero più
+> piccolo del vero su ogni società che tiene la liquidità in titoli.
+
+`cassa` resta quello che dice il nome; nascono `titoli_breve`, `liquidita` e `liquidita_base`
+(`aggregato` · `somma` · `solo_cassa`), e autonomia e debito netto si calcolano sulla liquidità.
+Un aggregato minore della cassa è un errore della fonte e si ripiega sulla somma. I consumatori
+leggono da **una funzione sola** per linguaggio (`liquiditaSocieta` in app.js, `liquidita_societa`
+in Python), e su uno snapshot precedente la riga **dichiara i soli contanti** invece di farli
+passare per la liquidità intera (v406, v441).
+
+### 2. Il mio errore: avevo letto solo l'esercizio chiuso
+Il 12/10 ho motivato l'uscita da RGTI con *"ricavi −46% in tre anni"*: era la serie ANNUALE ferma al
+2025, mentre i trimestri del 2026 dicevano il contrario (2° trimestre: 5,1 milioni contro 1,8,
++185%). **Le schede non portavano i ricavi affatto**, e l'esercizio chiuso era l'unico a portata di
+mano. Ora `riga_ricavi` (schede e rapporto): variazione sullo stesso trimestre dell'anno prima
+trovato **per data** (v207, v393), sul trimestre precedente, verso della perdita operativa, ultimo
+esercizio — e quando trimestri ed esercizio puntano in versi opposti la riga lo dice. La regola è
+anche in `FORMATO_ANALISI.md` §5, e la ragione corretta della decisione è in `LIBRO.md`
+§1quinquies: lo stop, non i ricavi.
+
+### 3. "0 mld": la classe v447 sopravvissuta in tre sedi
+COMBUSTIONE (mld fisso a una cifra) e FONDAMENTALI (mld intero) stampavano "0 mld" per cassa,
+flusso libero e ricavi di RGTI; il CONTO di `rapporto.py` "0.0 mld" quattro anni di fila. La v447
+aveva corretto il conto economico in app.js e non queste: classe v412. Ora la COMBUSTIONE usa la
+scala del blocco (`scalaCombustione`, su `scalaImporti`), e il rimando dei FONDAMENTALI al flusso
+libero usa **la stessa funzione**, così cita il numero nella stessa forma (v362, v368).
+
+### Trovati per strada, e corretti
+- ".." nella COMBUSTIONE: la nota dei due denominatori finiva col punto e il chiamante ne aggiungeva un altro;
+- la condizione d'ingresso del blocco guardava la sola `cassa`: con il solo aggregato in bilancio taceva;
+- le schede stampavano un solo denominatore, senza tetto oltre i cinque anni (la regola v409 non era arrivata lì);
+- `rapporto.py`: *"forbice pari al −73% della media"* — un'ampiezza col segno su una perdita (classe v400).
+
+### Annotato e NON corretto
+**MSTR: il "capex" di 21,7 miliardi sono acquisti di bitcoin**, che la fonte classifica come
+investimenti. *"La liquidità copre 1,4 mesi di investimenti"* descrive quindi un'allocazione
+discrezionale finanziata con emissioni, non un piano di costruzione. Distinguerlo richiede di sapere
+cosa c'è dentro quella voce, e la fonte non lo dice: decisione al CEO.
+
+### 🧪 I gate, e tre errori miei presi dalle iniezioni
+Otto check di pipeline, sette di pacchetto e dashboard, undici sugli strumenti; quattordici
+iniezioni, tutte mordono — ma non alla prima:
+- un check scritto con `suVeri` invece di `suVeriEsito`: falliva come **MALFORMATO**, cioè per il
+  motivo giusto raccontato male (v407);
+- la dichiarazione dei soli contanti si cercava nella riga intera, dove la trovava anche
+  l'autonomia: l'iniezione che la toglieva dalla composizione **non mordeva**. Ristretto alla
+  composizione…
+- …e ristretto, è andato **rosso sul codice giusto**: la parola «liquidità» compare *dentro* la
+  dichiarazione stessa («la liquidità vera può essere maggiore»). Il difetto da cercare è un
+  IMPORTO chiamato liquidità, cioè la parola seguita da una cifra. Variante del gate che trova sé
+  stesso (v213, v240, v393, v395, v418).
+⚠ Pavimenti alzati: `test_app.mjs` 575, `test_update_data.py` 195 (e `N_CHECKS_MINIMO` da 112 a
+200: era fermo a metà suite), `test_analisi_libro.py` 340. `?v=` e `BUILD_VERSION` a 476.

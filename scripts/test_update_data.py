@@ -373,7 +373,9 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 
 # v254 — la soglia minima resta come rete anti-regressione (se qualcuno cancella meta' suite
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
-N_CHECKS_MINIMO = 112  # +8 con le news per titolo v398 (sale, mai scende)
+# v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
+# verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
+N_CHECKS_MINIMO = 200  # +8 con le news per titolo v398, +8 con la liquidita' v476 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1453,6 +1455,64 @@ check("v465 senza spread CCC validate_macro alza 'missing' (la fonte nasce sorve
           for x in (_dqc.get("checks") or _dqc.get("items") or [])) or "credito_ccc" in str(_dqc))
 check("v465 collegamento: la pipeline scrive macro['credit_ccc'] da BAMLH0A3HYC (v399)",
       'macro["credit_ccc"] = _ccc' in _SRC_UD_CODICE and 'fred_series("BAMLH0A3HYC"' in _SRC_UD_CODICE)
+
+# ============================ v476 — LA LIQUIDITA' NON E' SOLO LA CASSA ============================
+# La cassa si leggeva da "Cash And Cash Equivalents" e la voce coi titoli a breve era il RIPIEGO:
+# su RGTI l'autonomia usciva 5,5 mesi con 393,7 milioni di liquidita' (27,8 di cassa + 366 di
+# titoli a breve). Lo stato si COSTRUISCE con bilanci finti dalla forma di yfinance (voci in riga,
+# trimestri in colonna, il piu' recente per primo): i dati del giorno possono non contenere il
+# caso, e un check che li aspetta e' verde per assenza del fenomeno (v425, v429).
+_c476 = [pd.Timestamp("2026-06-30"), pd.Timestamp("2026-03-31"), pd.Timestamp("2025-12-31"), pd.Timestamp("2025-09-30")]
+
+
+class _T476:
+    def __init__(self, bs, cf):
+        self.quarterly_balance_sheet = bs
+        self.quarterly_cashflow = cf
+
+
+def _bil476(voci):
+    return pd.DataFrame([v for v in voci.values()], index=list(voci.keys()), columns=_c476)
+
+
+_cf476 = _bil476({"Operating Cash Flow": [-15.2e6, -15.2e6, -15.2e6, -15.1e6],
+                  "Capital Expenditure": [-6.7e6, -6.7e6, -6.7e6, -6.8e6]})
+_agg = ud.combustione(_T476(_bil476({
+    "Cash And Cash Equivalents": [27.763e6, 48.15e6, 44.85e6, 26.13e6],
+    "Cash Cash Equivalents And Short Term Investments": [393.709e6, 418.25e6, 443.51e6, 446.98e6],
+    "Other Short Term Investments": [365.946e6, 370.1e6, 398.66e6, 420.85e6],
+    "Total Debt": [7.701e6, 6.78e6, 7.17e6, 7.6e6]}), _cf476), None, None)
+check("v476 con l'aggregato la liquidita' e' cassa + titoli a breve, e la cassa resta la cassa",
+      _agg["liquidita"] == 393.709e6 and _agg["cassa"] == 27.763e6
+      and abs(_agg["titoli_breve"] - (393.709e6 - 27.763e6)) < 1 and _agg["liquidita_base"] == "aggregato")
+check("v476 l'autonomia e il debito netto si calcolano sulla LIQUIDITA', non sulla cassa",
+      _agg["mesi_operativi"] == round(393.709e6 / (60.7e6 / 12.0), 1)
+      and _agg["mesi_capex"] == round(393.709e6 / (26.9e6 / 12.0), 1)
+      and abs(_agg["debito_netto"] - (7.701e6 - 393.709e6)) < 1)
+check("v476 il caso RGTI: l'autonomia operativa non e' piu' 5,5 mesi ma oltre sei anni",
+      _agg["mesi_operativi"] > 70 and round(27.763e6 / (60.7e6 / 12.0), 1) == 5.5)
+_som = ud.combustione(_T476(_bil476({
+    "Cash And Cash Equivalents": [100e6, 1, 1, 1],
+    "Other Short Term Investments": [50e6, 1, 1, 1]}), _cf476), None, None)
+check("v476 senza l'aggregato, la liquidita' e' la SOMMA delle due voci, e lo dichiara",
+      _som["liquidita"] == 150e6 and _som["titoli_breve"] == 50e6 and _som["liquidita_base"] == "somma")
+_sol = ud.combustione(_T476(_bil476({"Cash And Cash Equivalents": [100e6, 1, 1, 1]}), _cf476), None, None)
+check("v476 con la sola cassa la base e' dichiarata 'solo_cassa' e i titoli a breve sono un buco, non uno zero",
+      _sol["liquidita"] == 100e6 and _sol["liquidita_base"] == "solo_cassa" and "titoli_breve" not in _sol)
+_inc = ud.combustione(_T476(_bil476({
+    "Cash And Cash Equivalents": [100e6, 1, 1, 1],
+    "Cash Cash Equivalents And Short Term Investments": [80e6, 1, 1, 1],
+    "Other Short Term Investments": [30e6, 1, 1, 1]}), _cf476), None, None)
+check("v476 un aggregato MINORE della cassa e' un errore della fonte: si ripiega sulla somma",
+      _inc["liquidita"] == 130e6 and _inc["liquidita_base"] == "somma")
+_soloagg = ud.combustione(_T476(_bil476({
+    "Cash Cash Equivalents And Short Term Investments": [70e6, 1, 1, 1]}), _cf476), None, None)
+check("v476 con il solo aggregato la liquidita' c'e' e la cassa resta un buco",
+      _soloagg["liquidita"] == 70e6 and "cassa" not in _soloagg and _soloagg["liquidita_base"] == "aggregato"
+      and _soloagg["bilancio_al"] == "2026-06-30")
+check("v476 l'ordine non torna indietro: la cassa NON ha piu' l'aggregato come ripiego",
+      '_riga_bilancio(bs, "Cash And Cash Equivalents",\n' not in _SRC_UD
+      and '_riga_bilancio(bs, "Cash And Cash Equivalents")' in _SRC_UD_CODICE)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

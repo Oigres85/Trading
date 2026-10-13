@@ -5749,7 +5749,8 @@ check("v365 · combustione da INVESTIMENTI: la dice costruzione, e conta i mesi 
        fatto da difendere non e' la frase ma che l'autonomia sul CAPEX esca, e che esca col
        proprio denominatore accanto — senza il quale erano due numeri incomparabili. */
     if (!/mesi di INVESTIMENTI/.test(out)) return "manca l'autonomia sul capex, che qui e' la domanda vera";
-    if (!out.includes("cassa diviso il capex")) return "l'autonomia sul capex non dichiara il proprio denominatore";
+    if (!out.includes("cassa diviso il capex") && !out.includes("liquidita' diviso il capex"))
+      return "l'autonomia sul capex non dichiara il proprio denominatore";
     return true;`));
 
 check("v365 · combustione dalla GESTIONE: non la chiama costruzione",
@@ -7628,7 +7629,10 @@ check("v409 nessun numero di autonomia esce senza il proprio denominatore", suVe
     for (const riga of p.split(String.fromCharCode(10))) {
       /* si cercano le rese di autonomia: "N mesi di ..." oppure "oltre 5 anni di ..." */
       if (!/(mesi|oltre 5 anni) di (PERDITA OPERATIVA|INVESTIMENTI)/.test(riga)) continue;
-      if (riga.indexOf("cassa diviso") < 0) {
+      /* ⚠ v476 — il numeratore e' la LIQUIDITA' (cassa e titoli a breve); sugli snapshot
+         precedenti resta la cassa. L'invariante e' il denominatore dichiarato, non il nome del
+         numeratore: trentasettesima occasione di rompere un check ancorato a una stringa. */
+      if (riga.indexOf("cassa diviso") < 0 && riga.indexOf("liquidita' diviso") < 0) {
         /* ⚠ si mostra l'INTORNO del punto incriminato, non l'inizio della riga: su una riga
            lunga il messaggio finirebbe per descrivere tutt'altro, e un gate che fallisce per la
            ragione giusta e lo racconta male costa un giro di debug a chi viene dopo (v407). */
@@ -10021,6 +10025,111 @@ check("v457 leva: con tutti gli orizzonti in ritiro non si afferma nessuna espan
 /* e la preposizione si articola: "su l'anno" e' un refuso che il CEO legge */
 check("v457 leva: la preposizione e' articolata, mai 'su l' + articolo",
   typeof _concordi === "string" && !_concordi.includes("su l'") && !_concordi.includes("su il "));
+
+/* ═══ v476 — LA LIQUIDITA' NON E' SOLO LA CASSA ═══════════════════════════════════════════
+   La pipeline leggeva "contanti e equivalenti" e lasciava fuori i titoli a breve: su RGTI 27,8
+   milioni di cassa contro 393,7 di liquidita', e il pacchetto pubblicava 5,5 mesi di autonomia.
+   Lo stato si COSTRUISCE (v425, v429): i dati del giorno sono ancora quelli di prima della
+   correzione, e un check che li aspetta sarebbe verde per il caso invece che per la proprieta'. */
+const _COMB476 = { cassa: 27.763e6, titoli_breve: 365.946e6, liquidita: 393.709e6, liquidita_base: "aggregato",
+  debito: 7.701e6, debito_netto: -386.008e6, bilancio_al: "2026-06-30", ocf_ttm: -60.7e6, capex_ttm: -26.9e6,
+  fcf_ttm: -87.6e6, trimestri: 4, cashflow_al: "2026-06-30", mesi_operativi: 77.8, mesi_capex: 175.9 };
+
+check("v476 la combustione stampa la liquidita' con la sua composizione, e l'autonomia la usa come numeratore",
+  conCombEsito(_COMB476, {}, `
+    const riga = out.split(String.fromCharCode(10)).find(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0) || "";
+    if (!riga) return "il blocco non compare";
+    if (riga.indexOf("liquidita' 393") < 0) return "la liquidita' non c'e'";
+    if (riga.indexOf("(cassa 27") < 0 || riga.indexOf("+ titoli a breve termine 365") < 0) return "manca la composizione";
+    if (riga.indexOf("liquidita' diviso il flusso operativo negativo") < 0) return "l'autonomia non usa la liquidita' come numeratore";
+    if (riga.indexOf("di liquidita' netta") < 0) return "il debito netto non e' detto sulla liquidita'";
+    if (riga.indexOf("soli contanti") >= 0) return "dichiara i soli contanti su un dato che ha la liquidita' intera";
+    return true;`));
+
+check("v476 il debito in scadenza si confronta con la LIQUIDITA': con la sola cassa il verdetto si rovescerebbe",
+  conCombEsito({ cassa: 1e9, titoli_breve: 2e9, liquidita: 3e9, liquidita_base: "aggregato", debito: 5e9, debito_netto: 2e9 }, {}, `
+    r.credito = { oneri_ttm: 0.4e9, ebit_ttm: 1e9, trimestri: 4, conto_al: "2026-06-30", copertura: 2.5,
+      debito_corrente: 2e9, debito_lungo: 3e9 };
+    const o2 = buildPromptTicker(r.ticker);
+    const riga = o2.split(String.fromCharCode(10)).find(l => l.indexOf("- CREDITO") === 0) || "";
+    if (!riga) return "il blocco credito non compare";
+    if (riga.indexOf("INFERIORE al debito in scadenza") >= 0)
+      return "confronta il debito con la sola cassa: 1 mld di contanti contro 2 in scadenza, ma la liquidita' e' 3";
+    if (riga.indexOf("copre il debito in scadenza") < 0) return "non dice che la liquidita' copre il debito in scadenza";
+    return riga.indexOf("liquidita'") >= 0 || "non nomina la liquidita'";`));
+
+check("v476 snapshot precedente alla correzione: la cassa si dichiara come soli contanti",
+  conCombEsito({ cassa: 27.763e6, debito: 7.701e6, debito_netto: -20.062e6, bilancio_al: "2026-06-30",
+    ocf_ttm: -60.7e6, capex_ttm: -26.9e6, fcf_ttm: -87.6e6, trimestri: 4, mesi_operativi: 5.5, mesi_capex: 12.4 }, {}, `
+    const riga = out.split(String.fromCharCode(10)).find(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0) || "";
+    if (!riga) return "il blocco non compare";
+    /* ⚠ la dichiarazione si cerca nella COMPOSIZIONE, prima del debito: nella riga intera la
+       trovava anche l'autonomia, e l'iniezione che toglieva la dichiarazione dalla composizione
+       NON mordeva — un gate che guarda la regione sbagliata misura un'altra cosa (v395). */
+    const testa = riga.split(" · debito lordo")[0];
+    if (testa.indexOf("soli contanti") < 0) return "la sola cassa si presenta come la liquidita' intera: " + testa.slice(-90);
+    /* ⚠ "liquidita'" compare anche DENTRO la dichiarazione ("la liquidita' vera puo' essere
+       maggiore"): il difetto e' un IMPORTO chiamato liquidita', cioe' la parola seguita da una
+       cifra. La prima stesura cercava la parola e andava rossa sul codice giusto. */
+    const _iL = testa.indexOf("liquidita' ");
+    if (_iL >= 0 && "0123456789-".indexOf(testa.charAt(_iL + 11)) >= 0) return "chiama liquidita' la sola cassa";
+    if (riga.indexOf("contanti e titoli a breve") >= 0) return "afferma una composizione che il dato non ha";
+    return true;`));
+
+check("v476 se la fonte riporta solo i contanti, la riga lo dice invece di tacere i titoli a breve",
+  conCombEsito({ cassa: 5e9, liquidita: 5e9, liquidita_base: "solo_cassa", debito: 1e9, debito_netto: -4e9,
+    ocf_ttm: -1e9, capex_ttm: -0.5e9, fcf_ttm: -1.5e9, trimestri: 4, mesi_operativi: 60, mesi_capex: 120 }, {}, `
+    const riga = out.split(String.fromCharCode(10)).find(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0) || "";
+    return riga.indexOf("la fonte riporta solo i contanti") >= 0 || "la base solo_cassa non e' dichiarata";`));
+
+check("v476 la scala segue la grandezza: un nome piccolo non esce piu' a '0 mld'",
+  conCombEsito(_COMB476, { fcf: 26.45e6, revenue_fy: 13.353e6, market_cap: 4.42e9 }, `
+    const righe = out.split(String.fromCharCode(10)).filter(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0
+      || l.indexOf("- FONDAMENTALI GIA' NEL SISTEMA") === 0);
+    if (righe.length < 2) return "mancano le due righe da misurare";
+    const t = righe.join(" ");
+    if (t.indexOf(" 0 mld") >= 0 || t.indexOf("0,0 mld") >= 0) return "un importo e' stato cancellato dall'unita' fissa";
+    if (t.indexOf("flusso di cassa libero 26") < 0) return "il flusso libero dell'aggregatore non esce nella sua scala";
+    /* il rimando dei FONDAMENTALI cita il flusso libero del blocco nella STESSA forma (v362, v368) */
+    const dopo = t.split("NE CALCOLA UN ALTRO: ")[1] || "";
+    const fini = [" mln", " mld", " migliaia"].map(u => dopo.indexOf(u) < 0 ? -1 : dopo.indexOf(u) + u.length).filter(i => i > 0);
+    if (!fini.length) return "il rimando al blocco COMBUSTIONE non c'e': il caso costruito non ha acceso il ramo";
+    const cit = dopo.slice(0, Math.min(...fini));
+    const comb = righe.find(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0);
+    return comb.indexOf("flusso di cassa libero " + cit) >= 0 || "il rimando cita " + cit + " in una forma diversa dal blocco";`));
+
+/* ⚠ suVeriEsito, non suVeri: con suVeri un fallimento torna come stringa e check() lo marca
+   MALFORMATO, perdendo la ragione — trovato dall'iniezione, e un gate che fallisce per il motivo
+   giusto e lo racconta male costa un giro di debug a chi viene dopo (v407). */
+check("v476 tabella del credito: il debito che scade si confronta con la liquidita', e i soli contanti si dichiarano", suVeriEsito(`
+  const pos = (DATA.watchlist || []).filter(r => r && r.qta > 0 && numero(r.controvalore) > 0);
+  if (pos.length < 2) return "servono due posizioni per costruire i due casi";
+  const a = pos[0], b = pos[1];
+  a.credito = { copertura: 2.5, oneri_ttm: 0.4e9, debito_corrente: 2e9 };
+  a.combustione = { cassa: 1e9, titoli_breve: 2e9, liquidita: 3e9, liquidita_base: "aggregato" };
+  b.credito = { copertura: 3, oneri_ttm: 0.1e9, debito_corrente: 0.5e9 };
+  b.combustione = { cassa: 0.2e9 };
+  const presi = {};
+  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "" });
+  const q = document.querySelector;
+  document.querySelector = (s) => finto(s);
+  try { renderCredito(); } finally { document.querySelector = q; }
+  const t = finto("#credito-tabella").innerHTML, n = finto("#credito-note").innerHTML;
+  if (!t) return "la tabella non e' stata disegnata";
+  const frase = (t.split("meno liquidita' del debito")[1] || "").split("</div>")[0];
+  if (frase.indexOf(a.ticker + " (") >= 0) return a.ticker + " fra chi ha meno liquidita' del debito: confronta la sola cassa";
+  if (frase.indexOf(b.ticker + " (") < 0) return b.ticker + " (0,2 contro 0,5) non e' fra chi ha meno del debito che scade";
+  if (n.indexOf("soli contanti") < 0 || n.indexOf(b.ticker) < 0) return "la nota non nomina chi conta i soli contanti";
+  return t.indexOf("contro la liquidita'") >= 0 || "l'intestazione parla ancora di cassa";`));
+
+check("v476 una lettura sola della liquidita': definita una volta, e nessun consumatore legge la sola cassa", (() => {
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if ((codice.match(/^function liquiditaSocieta\(/gm) || []).length !== 1) return no("liquiditaSocieta non e' definita esattamente una volta");
+  const usi = (codice.match(/liquiditaSocieta\(/g) || []).length - 1;
+  if (usi < 5) return no("solo " + usi + " usi: qualche consumatore non passa dalla lettura unica");
+  const residui = ["t.comb.cassa", "combustione || {}).cassa", "t.comb && t.comb.cassa"].filter(x => codice.indexOf(x) >= 0);
+  return residui.length ? no("leggono ancora la sola cassa: " + residui.join(", ")) : true;
+})());
 
 let fail = 0;
 for (const [name, ok] of T) {

@@ -2343,6 +2343,61 @@ check("v474 la checklist porta il piano per la liquidita' (7e), le decisioni ape
       and "registro della performance" in _cl474 and "nessun divieto" in _cl474.lower()
       and "in giallo\n   niente nuovi semiconduttori" not in _cl474 and "piano per la liquidità (09/10)" in _cl474)
 
+# ============================ v476 — LIQUIDITA' E RICAVI NEGLI STRUMENTI ============================
+# Lo stato si COSTRUISCE: i dati del giorno sono quelli di prima della correzione, e un check che
+# li aspetta sarebbe verde per il caso invece che per la proprieta' (v425, v429).
+_c476n = {"fcf_ttm": -87.6e6, "cashflow_al": "2026-06-30", "cassa": 27.763e6, "titoli_breve": 365.946e6,
+          "liquidita": 393.709e6, "liquidita_base": "aggregato", "mesi_operativi": 77.8, "mesi_capex": 175.9}
+_rc476 = SP.riga_cassa({"combustione": _c476n, "credito": {}})
+check("v476 schede: l'autonomia ha la LIQUIDITA' come numeratore, con la sua base, e due denominatori dichiarati",
+      "la liquidita' (contanti e titoli a breve termine) copre" in _rc476 and "di perdita operativa" in _rc476
+      and "di investimenti" in _rc476 and "non si confrontano" in _rc476, _rc476)
+check("v476 schede: oltre cinque anni non si stampa il numero (v389), e nessun importo esce (v404)",
+      "oltre 5 anni" in _rc476 and "175" not in _rc476 and "77,8" not in _rc476
+      and not any(x in _rc476 for x in ("393", "27,7", "365", "mld", "mln")), _rc476)
+_rc476v = SP.riga_cassa({"combustione": {"fcf_ttm": -87.6e6, "cashflow_al": "2026-06-30", "cassa": 27.763e6,
+                                         "mesi_operativi": 5.5, "mesi_capex": 12.4}, "credito": {}})
+check("v476 schede: su uno snapshot precedente la cassa si dichiara come soli contanti",
+      "la cassa (soli contanti" in _rc476v and "5,5 mesi" in _rc476v, _rc476v)
+check("v476 la base 'solo_cassa' si dichiara, e senza nessun dato la liquidita' e' un buco",
+      SP.liquidita_societa({"liquidita": 5.0, "liquidita_base": "solo_cassa", "cassa": 5.0})[2] == "la fonte riporta solo i contanti"
+      and SP.liquidita_societa({}) == (None, None, None))
+_fmt476, _u476 = SP.scala_importi([13.102e6, 12.008e6, 10.79e6, 7.088e6])
+check("v476 la scala si sceglie sul blocco: i ricavi di RGTI non escono piu' '0,0 mld' (v447)",
+      _u476 == "mln" and _fmt476(7.088e6) == "7,09", (_u476, _fmt476(7.088e6)))
+
+# i ricavi: il caso RGTI — trimestri in salita, esercizio chiuso in calo
+_r476 = {"tv": {"conto_trim": [
+            {"trim": "2026-06-30", "ricavi": 5.138e6, "operativo": -28.062e6},
+            {"trim": "2026-03-31", "ricavi": 4.4e6, "operativo": -25.951e6},
+            {"trim": "2025-12-31", "ricavi": 1.868e6, "operativo": -22.597e6},
+            {"trim": "2025-09-30", "ricavi": 1.947e6, "operativo": -20.549e6},
+            {"trim": "2025-06-30", "ricavi": 1.801e6, "operativo": -19.882e6}]},
+         "financials": [{"year": 2024, "revenue": 10.79e6}, {"year": 2025, "revenue": 7.088e6}]}
+_rr476 = SP.riga_ricavi(_r476)
+check("v476 ricavi: la variazione e' sullo stesso trimestre dell'anno prima, trovato per DATA",
+      "+185,3% sullo stesso trimestre dell'anno prima" in _rr476 and "+16,8% sul trimestre precedente" in _rr476, _rr476)
+check("v476 ricavi: quando trimestri ed esercizio puntano in versi opposti, la riga lo dice",
+      "VERSI OPPOSTI" in _rr476 and "-34,3% sul 2024" in _rr476 and "perdita operativa AMPLIATA" in _rr476, _rr476)
+_r476c = {"tv": {"conto_trim": [{"trim": "2026-06-30", "ricavi": 12.0}, {"trim": "2025-06-30", "ricavi": 10.0}]},
+          "financials": [{"year": 2024, "revenue": 30.0}, {"year": 2025, "revenue": 40.0}]}
+check("v476 ricavi: quando concordano non grida un disaccordo che non c'e'",
+      "VERSI OPPOSTI" not in SP.riga_ricavi(_r476c) and "+20,0%" in SP.riga_ricavi(_r476c))
+# ⚠ per DATA, mai per posizione: manca un trimestre, e il quarto elemento NON e' l'anno prima
+_r476b = {"tv": {"conto_trim": [{"trim": "2026-06-30", "ricavi": 20.0}, {"trim": "2026-03-31", "ricavi": 18.0},
+                                {"trim": "2025-09-30", "ricavi": 15.0}, {"trim": "2025-06-30", "ricavi": 10.0}]}}
+check("v476 ricavi: con un trimestre mancante il confronto annuo resta sulla data giusta (v207, v393)",
+      "+100,0% sullo stesso trimestre dell'anno prima" in SP.riga_ricavi(_r476b), SP.riga_ricavi(_r476b))
+check("v476 ricavi: senza trimestri ne' esercizi la riga non esce, invece di uscire vuota",
+      SP.riga_ricavi({}) is None)
+_src_sp476 = Path(__file__).with_name("schede_progetto.py").read_text()
+_src_rp476 = Path(__file__).with_name("rapporto.py").read_text()
+_extra476 = _corpo_di(_src_rp476, "extra")
+check("v476 collegamento: le schede stampano i ricavi, e il rapporto usa liquidita' e ricavi dalla lettura unica",
+      "for f in (riga_ricavi, riga_cassa, riga_short):" in _corpo_di(_src_sp476, "scheda")
+      and "SP.liquidita_societa(cb)" in _extra476 and "SP.riga_ricavi(r)" in _extra476
+      and 'cb.get("cassa")' not in _extra476 and "/1e9:.1f} mld" not in _extra476)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

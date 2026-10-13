@@ -118,7 +118,10 @@ const scenarios = {
         ps: 6.27, ev_s: 12.34, altman_z: -1.29,
       });
       /* combustione con la gestione IN PERDITA: il ramo che dice "viene dal mestiere" */
-      r.combustione = { cassa: 1e9, debito: 35e9, debito_netto: 34e9, bilancio_al: "2026-03-31",
+      /* v476 — la forma che la pipeline pubblica ora: liquidita' con la sua base, e il debito
+         netto calcolato su di lei */
+      r.combustione = { cassa: 1e9, titoli_breve: 0, liquidita: 1e9, liquidita_base: "aggregato",
+        debito: 35e9, debito_netto: 34e9, bilancio_al: "2026-03-31",
         ocf_ttm: -2e9, capex_ttm: -0.2e9, fcf_ttm: -2.2e9, trimestri: 4,
         cashflow_al: "2026-03-31", mesi_operativi: 6, emissione_netta_pct: 3.13 };
     });

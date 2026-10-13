@@ -21,6 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
+import schede_progetto as SP  # noqa: E402 — v476: liquidita' e ricavi da una lettura sola
 
 
 def eta_ore(iso):
@@ -113,7 +114,9 @@ def extra(t, r, px):
     an = r.get("analisti") or {}
     if an.get("eps_min") is not None and an.get("eps_max") is not None:
         med = an.get("eps_ora")
-        amp = (an["eps_max"] - an["eps_min"]) / med * 100 if med else None
+        # ⚠ v476 — in VALORE ASSOLUTO: su una perdita la media e' negativa e la forbice usciva
+        #   "-73% della media", un'ampiezza col segno (la classe v400, il rapporto che inverte)
+        amp = abs((an["eps_max"] - an["eps_min"]) / med * 100) if med else None
         print(f"   CONSENSO+ stime utili da {an['eps_min']} a {an['eps_max']}"
               + (f" su {an['eps_n']} analisti" if an.get("eps_n") else "")
               + (f" — forbice pari al {amp:.0f}% della media" if amp else "")
@@ -125,9 +128,12 @@ def extra(t, r, px):
               + (f", mediana {an['target_mediana']}" if an.get("target_mediana") else "")
               + ("  ⚠ il minimo sta SOTTO il prezzo" if sotto else ""))
     cb = r.get("combustione") or {}
-    if cb.get("ocf_ttm") is not None or cb.get("cassa") is not None:
+    # ⚠ v476 — la LIQUIDITA' (cassa e titoli a breve) con la sua base, dalla stessa lettura delle
+    #   schede e di app.js: su RGTI la sola cassa era 27,8 milioni contro 393,7 di liquidita'.
+    _lv, _ln, _ld = SP.liquidita_societa(cb)
+    if cb.get("ocf_ttm") is not None or _lv is not None:
         pezzi = [x for x in (
-            f"cassa {mld(cb.get('cassa'))}" if cb.get("cassa") else None,
+            f"{_ln} {mld(_lv)} ({_ld})" if _lv is not None else None,
             f"debito netto {mld(cb.get('debito_netto'))}" if cb.get("debito_netto") is not None else None,
             f"flusso operativo {mld(cb.get('ocf_ttm'))}" if cb.get("ocf_ttm") is not None else None,
             f"investimenti {mld(cb.get('capex_ttm'))}" if cb.get("capex_ttm") is not None else None,
@@ -146,15 +152,23 @@ def extra(t, r, px):
         if cr.get("oneri_var_4trim_pct") is not None:
             v.append(f"{cr['oneri_var_4trim_pct']:+.0f}% in 4 trimestri")
         if cr.get("debito_corrente") is not None:
-            cassa = cb.get("cassa")
             v.append(f"in scadenza entro 12 mesi {mld(cr['debito_corrente'])}"
-                     + ("  ⚠ SOPRA la cassa" if cassa and cassa < cr["debito_corrente"] else ""))
+                     + (f"  ⚠ SOPRA la {_ln}" if _lv is not None and _lv < cr["debito_corrente"] else ""))
         print("   DEBITO   " + " · ".join(v))
     fin = r.get("financials") or []
     if len(fin) >= 2:
         ult = fin[-4:]
-        print("   CONTO    " + " · ".join(
-            f"{x['year']}: ricavi {x['revenue']/1e9:.1f} mld, margine {x['margin']:+.0f}%" for x in ult))
+        # ⚠ v476 — l'unita' sul BLOCCO e la valuta del bilancio (v447, corretta allora in app.js e
+        #   non qui): con "mld" fisso RGTI usciva "ricavi 0.0 mld" quattro anni di fila, e la
+        #   traiettoria spariva. Accanto, i TRIMESTRI: l'esercizio chiuso da solo mi ha fatto
+        #   scrivere "ricavi in calo" su una societa' che nel 2026 li ha quasi triplicati.
+        _fmt, _u = SP.scala_importi([x.get("revenue") for x in ult])
+        _val = r.get("valuta_bilancio")
+        print("   CONTO    " + (f"[{_val}] " if _val else "") + " · ".join(
+            f"{x['year']}: ricavi {_fmt(x['revenue'])} {_u}, margine {x['margin']:+.0f}%" for x in ult))
+    _rr = SP.riga_ricavi(r)
+    if _rr:
+        print("   RICAVI   " + _rr.split(": ", 1)[1])
     fm = r.get("fuori_mercato") or {}
     piene = [x for x in (fm.get("settimane") or []) if not x.get("incompleta")]
     if len(piene) >= 2:

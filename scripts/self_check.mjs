@@ -146,13 +146,15 @@ const SUITE = [
      da uno script). Alzati con margine su una crescita ordinaria, non incollati al numero
      di oggi — un pavimento uguale al conteggio va rosso al primo check tolto per una ragione
      legittima. Si alzano quando la suite cresce, mai si abbassano per far passare qualcosa. */
-  { file: "test_app.mjs",        cmd: "node",    minimo: 562, firma: /\d+\/\d+ check superati/ },
-  { file: "test_update_data.py", cmd: "python3", minimo: 188, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v476: 608 punti di chiamata in test_app (+7), 210 in test_update_data (+8): pavimenti su */
+  { file: "test_app.mjs",        cmd: "node",    minimo: 575, firma: /\d+\/\d+ check superati/ },
+  { file: "test_update_data.py", cmd: "python3", minimo: 195, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
   /* v474: 348 punti di chiamata (55 check nuovi su semaforo, decisioni, registro e piano) -> pavimento 330 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 330, firma: /\d+\/\d+ CHECK OK/ },
+  /* v476: 359 punti di chiamata (+11 su liquidita' e ricavi nelle schede e nel rapporto) -> 340 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 340, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

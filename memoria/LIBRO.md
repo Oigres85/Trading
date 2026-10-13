@@ -217,6 +217,15 @@ esce quando è **eseguita** (si aggiornano posizioni e liquidità in §1) o **re
 | RGTI | uscita | 463 | chiusura sotto | 14,41 | 2026-10-08 | aperta — non eseguita al 09/10 (CEO) |
 | AMD | alleggerimento | da decidere | respinto sotto | 645 | 2026-10-08 | aperta — non eseguita al 09/10 (CEO); riferimento del piano: verso il 12-14% del libro |
 
+⚠ **RGTI — la ragione dell'uscita, corretta il 13/10/2026.** La decisione poggia sullo **stop**
+(chiusura sotto 14,41, scattato l'08/10) e sulla tendenza, **non sui ricavi**. Il 12/10 l'avevo
+motivata con «ricavi −46% in tre anni»: era la serie ANNUALE ferma al 2025, mentre i trimestri del
+2026 dicono il contrario (2° trimestre 2026: 5,1 milioni $, +185% sull'anno prima). E la liquidità
+non è un problema: 393,7 milioni fra cassa e titoli a breve al 30/06, circa quattro anni al consumo
+di quel semestre — il sistema contava i soli contanti (27,8 milioni), corretto in v476. Restano veri:
+perdita operativa in aumento (+41% sull'anno), valutazione circa 330 volte i ricavi, tendenza al
+ribasso. Le schede portano ora i ricavi per trimestre accanto all'esercizio chiuso (v476).
+
 `numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
 - il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non
   scritta qui, perché un prezzo copiato a mano è un secondo dato che può divergere (v410);

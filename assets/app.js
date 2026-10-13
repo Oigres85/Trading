@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "466";
+const BUILD_VERSION = "476";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5515,7 +5515,9 @@ function renderCredito() {
       cop: r.credito.copertura, oneri: r.credito.oneri_ttm,
       var4: r.credito.oneri_var_4trim_pct,
       corrente: r.credito.debito_corrente,
-      cassa: (r.combustione || {}).cassa,
+      /* v476 — il debito che scade si confronta con la LIQUIDITA' (cassa e titoli a breve),
+         dalla stessa funzione del pacchetto: due letture divergerebbero al primo ritocco. */
+      liq: liquiditaSocieta(r.combustione),
       /* ⚠ v367 — LA VALUTA DEI BILANCI, non quella della quotazione. SK hynix riporta in won
          e quota come ADR in dollari: senza questa etichetta la tabella metteva "833,1 mld" di
          oneri accanto a "1,5 mld" invitando a confrontarli. Sono la stessa classe di guaio che
@@ -5535,7 +5537,8 @@ function renderCredito() {
   const M = (v) => v == null ? "—"
     : Math.abs(v) >= 1e9 ? `${pct1(v / 1e9)} mld` : `${fmtNum.format(Math.round(v / 1e6))} mln`;
   const scoperti = righe.filter((r) => r.cop != null && r.cop < 1);
-  const inSecca = righe.filter((r) => r.corrente != null && r.cassa != null && r.cassa < r.corrente);
+  const inSecca = righe.filter((r) => r.corrente != null && r.liq && r.liq.v < r.corrente);
+  const soloCassa = righe.filter((r) => r.liq && r.liq.nome === "cassa");
   const acceleranti = righe.filter((r) => r.var4 != null && r.var4 >= 25 && r.var4 < 1000 && r.conta)
     .sort((a, b) => b.var4 - a.var4);
   const frasi = [];
@@ -5546,8 +5549,8 @@ function renderCredito() {
     : `<b>Tutti i nomi del libro coprono gli interessi con la gestione operativa.</b> `
       + `La copertura piu' bassa e' ${pct1(Math.min(...righe.filter((r) => r.cop != null).map((r) => r.cop)))}×.`);
   if (inSecca.length)
-    frasi.push(`<b>${inSecca.length} ${inSecca.length === 1 ? "nome ha" : "nomi hanno"} meno cassa del debito che scade entro l'anno:</b> `
-      + `${inSecca.map((r) => `${esc(r.tk)} (${M(r.cassa)} contro ${M(r.corrente)})`).join(", ")}. `
+    frasi.push(`<b>${inSecca.length} ${inSecca.length === 1 ? "nome ha" : "nomi hanno"} meno liquidita' del debito che scade entro l'anno:</b> `
+      + `${inSecca.map((r) => `${esc(r.tk)} (${M(r.liq.v)} contro ${M(r.corrente)})`).join(", ")}. `
       + `Il rifinanziamento non e' un'ipotesi, e' un passaggio obbligato.`);
   if (acceleranti.length)
     frasi.push(`<b>Il costo del debito accelera su ${acceleranti.length} ${acceleranti.length === 1 ? "nome" : "nomi"}:</b> `
@@ -5561,18 +5564,22 @@ function renderCredito() {
         <th>quante volte l'EBIT<br><span class="muted">copre gli interessi</span></th>
         <th>oneri finanziari<br><span class="muted">ultimi 12 mesi</span></th>
         <th>come sta cambiando<br><span class="muted">in 4 trimestri</span></th>
-        <th>debito entro 12 mesi<br><span class="muted">contro la cassa</span></th>
+        <th>debito entro 12 mesi<br><span class="muted">contro la liquidita'</span></th>
       </tr></thead><tbody>`
     + righe.map((r) => `<tr>
         <td><b>${esc(r.tk)}</b> <span class="muted">${esc(r.nome.slice(0, 22))}</span></td>
         <td class="${r.cop != null && r.cop < 1 ? "neg" : ""}">${r.cop == null ? "—" : r.cop < 0 ? "non copre" : `${pct1(r.cop)}×`}</td>
         <td>${M(r.oneri)}${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
         <td class="${r.var4 != null && r.var4 >= 25 && r.conta ? "neg" : ""}">${r.var4 == null || r.var4 <= -100 ? "—" : signTxt(r.var4)}</td>
-        <td class="${r.corrente != null && r.cassa != null && r.cassa < r.corrente ? "neg" : ""}">${M(r.corrente)}<span class="muted"> vs ${M(r.cassa)}</span>${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
+        <td class="${r.corrente != null && r.liq && r.liq.v < r.corrente ? "neg" : ""}">${M(r.corrente)}<span class="muted"> vs ${M(r.liq ? r.liq.v : null)}</span>${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
       </tr>`).join("")
     + `</tbody></table>`;
   const altreValute = [...new Set(righe.filter((r) => r.val && r.val !== "USD").map((r) => r.val))];
-  if (nota) nota.innerHTML = (altreValute.length
+  if (nota) nota.innerHTML = (soloCassa.length
+      ? `<b>&#9888; Su ${soloCassa.map((r) => esc(r.tk)).join(", ")} il dato conta i soli contanti</b>: `
+        + `i titoli a breve termine non sono in questo snapshot, e la liquidita' vera puo' essere maggiore. `
+        + `Il prossimo aggiornamento della pipeline li porta.<br>`
+      : "") + (altreValute.length
       ? `<b>&#9888; Importi in valuta del bilancio, non del prezzo:</b> ${altreValute.map(esc).join(", ")} `
         + `su ${righe.filter((r) => r.val && r.val !== "USD").map((r) => esc(r.tk)).join(", ")} — `
         + `le cifre assolute di quelle righe NON si confrontano con le altre. I rapporti (copertura, `
@@ -10640,6 +10647,46 @@ function severitaCopertura(cop) {
   return `copertura degli interessi ${fmtNum.format(cop >= 10 ? Math.round(cop) : cop)}× — il servizio del debito non e' il vincolo, lo e' la dimensione del piano`;
 }
 
+/* ═══ v476 — LA LIQUIDITA' DI UNA SOCIETA' E' CASSA PIU' TITOLI A BREVE ══════════════════
+   La pipeline leggeva la sola voce "contanti e equivalenti" e lasciava fuori i titoli a breve
+   termine (buoni del Tesoro, carta commerciale), che per molte societa' sono la parte grossa
+   della liquidita'. Misurato su RGTI al 30/06/2026: cassa 27,8 milioni, liquidita' 393,7 — il
+   pacchetto pubblicava 5,5 mesi di autonomia su una societa' che ne ha circa quattro anni, e su
+   GOOGL un debito netto di 56,8 miliardi dove c'e' una liquidita' netta di 129,7.
+   ⚠ UNA risposta sola alla domanda "con quale liquidita' si confronta il debito, e con quale si
+   conta l'autonomia": tre punti di stampa con tre letture divergono al primo ritocco (v161,
+   v207, v316). E LA BASE SI DICHIARA: su uno snapshot precedente alla v476 il campo nuovo non
+   c'e', e allora si usa la cassa DICENDO che sono i soli contanti — "la liquidita' e' questa" e
+   "questa e' la parte che il dato riporta" si leggono uguali e sono cose diverse (v406, v441). */
+function liquiditaSocieta(cmb) {
+  const c = cmb || {};
+  const liq = numero(c.liquidita);
+  if (Number.isFinite(liq) && c.liquidita_base) {
+    return { v: liq, nome: "liquidita'", base: c.liquidita_base, cassa: numero(c.cassa),
+      breve: numero(c.titoli_breve),
+      dettaglio: c.liquidita_base === "solo_cassa"
+        ? "la fonte riporta solo i contanti, nessuna voce di titoli a breve"
+        : "contanti e titoli a breve termine" };
+  }
+  const cassa = numero(c.cassa);
+  if (Number.isFinite(cassa)) {
+    return { v: cassa, nome: "cassa", base: null, cassa, breve: null,
+      dettaglio: "soli contanti: i titoli a breve termine non sono in questo dato, la liquidita' vera puo' essere maggiore" };
+  }
+  return null;
+}
+
+/* v476 — LA SCALA DEL BLOCCO COMBUSTIONE, scelta una volta sui suoi valori (scalaImporti, v447).
+   Con "mld" fisso a una cifra la liquidita' di RGTI (27,8 milioni di cassa) usciva "0 mld": il
+   numero spariva proprio sul nome piccolo, che e' quello su cui l'autonomia conta. E il rimando
+   dei FONDAMENTALI al flusso libero di questo blocco deve citarlo nella STESSA forma (v362,
+   v368): per questo la scala e' una funzione, usata da tutti e due. */
+function scalaCombustione(cmb) {
+  const x = cmb || {};
+  return scalaImporti(["liquidita", "cassa", "titoli_breve", "debito", "debito_netto", "ocf_ttm", "capex_ttm", "fcf_ttm"]
+    .map((k) => numero(x[k])).filter(Number.isFinite));
+}
+
 /* ═══ v409 — L'AUTONOMIA DI CASSA HA DUE DENOMINATORI, E VANNO DETTI ENTRAMBI ════════════
    Trovato da un LLM reale che leggeva il pacchetto v408: "MSTR 0,9 mesi nel blocco tecnico e
    oltre 5 anni nella disciplina; RGTI 12,4 e 5,5. Questi numeri non possono essere
@@ -10675,24 +10722,30 @@ function autonomiaCassa(cmb) {
      `n1` e' un helper LOCALE di disciplinaRischio, non una funzione globale: usarlo qui
      faceva morire il render al primo titolo con combustione. L'arrotondamento si scrive qui. */
   const quanto = (m) => m > 60 ? "oltre 5 anni" : `${fmtNum.format(Math.round(m * 10) / 10)} mesi`;
+  /* ⚠ v476 — il numeratore e' la LIQUIDITA' (cassa e titoli a breve), e il suo nome si dice:
+     su uno snapshot vecchio e' la sola cassa, e la riga lo dichiara invece di farla passare
+     per la liquidita' intera. */
+  const lq = liquiditaSocieta(c);
+  const num = lq ? lq.nome : "cassa";
   const voci = [];
   if (Number.isFinite(mOp)) voci.push({ mesi: mOp, denominatore: "perdita operativa",
-    testo: `${quanto(mOp)} di PERDITA OPERATIVA (cassa diviso il flusso operativo negativo)` });
+    testo: `${quanto(mOp)} di PERDITA OPERATIVA (${num} diviso il flusso operativo negativo)` });
   if (Number.isFinite(mCx)) voci.push({ mesi: mCx, denominatore: "investimenti",
     /* ⚠ "al ritmo attuale" e' gia' implicito nel denominatore dichiarato fra parentesi, e i
        chiamanti la premettono: scritta due volte nella stessa frase e' la ridondanza v184. */
-    testo: `${quanto(mCx)} di INVESTIMENTI (cassa diviso il capex)` });
+    testo: `${quanto(mCx)} di INVESTIMENTI (${num} diviso il capex)` });
   if (!voci.length) return null;
   /* ⚠⚠ CON ENTRAMBE, IL FATTO CHE NON SIANO CONFRONTABILI E' PARTE DEL DATO. Senza questa riga
      due numeri lontanissimi sullo stesso nome si leggono come un errore del sistema, e chi legge
      smette di fidarsi anche di quello giusto. */
   const nota = voci.length > 1
-    ? " ⚠ I due numeri NON si confrontano: hanno denominatori diversi — uno divide la cassa per la "
+    ? ` ⚠ I due numeri NON si confrontano: hanno denominatori diversi — uno divide la ${num} per la `
       + "perdita operativa, l'altro per gli investimenti. Un valore alto sul primo e basso sul "
       + "secondo descrive una societa' che non brucia cassa dalla gestione ma sta costruendo molto."
     : "";
-  return { voci, al, nota,
-    testo: `la cassa copre ${voci.map(v => v.testo).join(" · ")}`
+  return { voci, al, nota, base: lq ? lq.base : null,
+    testo: `la ${num} (${!lq || lq.nome === "cassa" ? "soli contanti, senza i titoli a breve termine" : lq.dettaglio}) `
+      + `copre ${voci.map(v => v.testo).join(" · ")}`
       + (al ? ` (bilancio al ${al}: se un deposito piu' recente esiste, questo numero e' vecchio)` : "")
       + nota };
 }
@@ -13819,7 +13872,11 @@ function datiNostriDelTitolo(tk) {
       }
     }
     const perc = (v) => Number.isFinite(numero(v)) ? `${(numero(v) * 100).toFixed(1)}%` : null;
-    const mld = (v) => Number.isFinite(numero(v)) ? `${fmtNum.format(Math.round(numero(v) / 1e9))} mld` : null;
+    /* v476 — la scala segue la grandezza (scalaImporti, v447): "mld" intero cancellava i numeri
+       dei nomi piccoli — su RGTI ricavi a dodici mesi e flusso libero uscivano "0 mld" e la
+       capitalizzazione "4 mld". Ogni grandezza qui e' diversa dalle altre, quindi la scala e'
+       per grandezza; il blocco COMBUSTIONE, che e' una tabella in riga, ha la sua. */
+    const mld = (v) => Number.isFinite(numero(v)) ? scalaImporti([numero(v)])(numero(v)) : null;
     const fond = [
       /* v355 — le tre misure di crescita che il sistema aveva e taceva: sono il cuore di un
          mandato growth, ed erano in `stats` da sempre */
@@ -13835,7 +13892,7 @@ function datiNostriDelTitolo(tk) {
         if (scarto <= 10)
           return `flusso di cassa libero ${mld(t.fcf)} (verificato: coincide entro il ${scarto.toFixed(1)}% `
             + `con la somma dei quattro trimestri nel blocco COMBUSTIONE DI CASSA)`;
-        const comeLa = `${fmtNum.format(Math.round(q / 1e8) / 10)} mld`;
+        const comeLa = scalaCombustione(t.comb)(q);
         return `flusso di cassa libero ${mld(t.fcf)} secondo l'aggregatore — ⚠⚠ IL BLOCCO COMBUSTIONE DI `
           + `CASSA PIU' SOTTO NE CALCOLA UN ALTRO: ${comeLa}, sommando i quattro trimestri del rendiconto `
           + `finanziario, cioe' ${scarto.toFixed(1)}% di scarto. Non e' un errore di arrotondamento: i due `
@@ -13885,14 +13942,27 @@ function datiNostriDelTitolo(tk) {
       + ` (e il FORWARD P/E su una perdita cresce mentre la perdita peggiora, quindi non lo sostituisce).`
       + ` Il multiplo disponibile e' sui RICAVI: P/S ${fmtNum.format(t.ps)}×`
       + `${Number.isFinite(t.evS) ? `, EV/ricavi ${fmtNum.format(t.evS)}× — che include il debito, e su una societa' indebitata i due numeri divergono` : ""}.`);
-    if (t.comb && (t.comb.cassa != null || t.comb.ocf_ttm != null)) {
+    /* v476 — la condizione d'ingresso guarda la LIQUIDITA': con il solo aggregato in bilancio
+       la cassa e' un buco, e il blocco taceva pur avendo il dato che conta. */
+    if (t.comb && (liquiditaSocieta(t.comb) || t.comb.ocf_ttm != null)) {
       const c = t.comb;
-      const M = (v) => v == null ? null : `${fmtNum.format(Math.round(v / 1e8) / 10)} mld`;
+      const _scC = scalaCombustione(c);
+      const M = (v) => v == null ? null : _scC(v);
       const pezzi = [];
-      if (c.cassa != null) pezzi.push(`cassa ${M(c.cassa)}`);
+      /* ⚠ v476 — la LIQUIDITA' con la sua composizione, e il debito netto calcolato su di lei
+         dalla pipeline. Su uno snapshot precedente il campo non c'e': si stampa la cassa e si
+         dichiara che sono i soli contanti (liquiditaSocieta, una lettura sola). */
+      const _lq = liquiditaSocieta(c);
+      if (_lq && _lq.nome === "liquidita'") {
+        pezzi.push(`liquidita' ${M(_lq.v)}` + (_lq.base === "solo_cassa"
+          ? ` (${_lq.dettaglio})`
+          : Number.isFinite(_lq.cassa) && Number.isFinite(_lq.breve)
+            ? ` (cassa ${M(_lq.cassa)} + titoli a breve termine ${M(_lq.breve)})`
+            : ` (${_lq.dettaglio})`));
+      } else if (_lq) pezzi.push(`cassa ${M(_lq.v)} (${_lq.dettaglio})`);
       if (c.debito != null) pezzi.push(`debito lordo ${M(c.debito)}`);
       if (c.debito_netto != null) pezzi.push(c.debito_netto < 0
-        ? `debito netto NEGATIVO (${M(-c.debito_netto)} di cassa netta)`
+        ? `debito netto NEGATIVO (${M(-c.debito_netto)} di ${_lq ? _lq.nome : "cassa"} netta)`
         : `debito netto ${M(c.debito_netto)}`);
       const flussi = [];
       if (c.ocf_ttm != null) flussi.push(`flusso di cassa OPERATIVO ${M(c.ocf_ttm)}`);
@@ -13934,9 +14004,10 @@ function datiNostriDelTitolo(tk) {
          dello stesso numero. */
       const _aut = autonomiaCassa(c);
       if (_aut) {
-        quanto = ` Al ritmo attuale ${_aut.testo}.`
+        /* ⚠ v476 — la nota dei due denominatori finisce gia' col punto: ".." era un refuso */
+        quanto = ` Al ritmo attuale ${_aut.testo.replace(/[.]$/, "")}.`
           + (c.fcf_ttm != null && c.fcf_ttm < 0
-             ? ` Il resto e' finanziato da debito o da nuove azioni, non dalla cassa presente.` : "");
+             ? ` Il resto e' finanziato da debito o da nuove azioni, non dalla ${_lq ? _lq.nome : "cassa"} presente.` : "");
       }
       else if (c.fcf_ttm != null && c.fcf_ttm > 0)
         quanto = ` Gli investimenti sono coperti dalla gestione, quindi la cassa non deve finanziarli: `
@@ -13963,7 +14034,7 @@ function datiNostriDelTitolo(tk) {
         + (_fermaBil
             ? ` ⚠⚠ E QUESTO BILANCIO NON E' L'ULTIMO — E' UN FATTO, NON UN SOSPETTO: e' al `
               + `${c.bilancio_al}, ma la societa' ha depositato risultati il ${_fermaBil.dep} (SEC EDGAR, 8-K `
-              + `item 2.02), ${_fermaBil.gg} giorni dopo. Cassa, debito e autonomia qui sopra descrivono quel `
+              + `item 2.02), ${_fermaBil.gg} giorni dopo. Liquidita', debito e autonomia qui sopra descrivono quel `
               + `trimestre, non oggi, e su una societa' che costruisce a debito sono le voci che si muovono di `
               + `piu' fra un trimestre e l'altro: le conclusioni sull'autonomia NON sono affermabili senza il `
               + `deposito piu' recente. Cercalo alla fonte prima di usarle.`
@@ -14004,11 +14075,13 @@ function datiNostriDelTitolo(tk) {
       if (c.debito_corrente != null || c.debito_lungo != null) {
         scad = ` Scadenze: ${c.debito_corrente != null ? `entro 12 mesi ${M(c.debito_corrente)}` : "quota corrente n.d."}`
           + `${c.debito_lungo != null ? `, oltre ${M(c.debito_lungo)}` : ""}`;
-        const cassa = t.comb && t.comb.cassa;
-        if (c.debito_corrente != null && cassa != null)
-          scad += cassa < c.debito_corrente
-            ? `. La cassa (${M(cassa)}) e' INFERIORE al debito in scadenza entro l'anno.`
-            : `. La cassa (${M(cassa)}) copre il debito in scadenza entro l'anno.`;
+        /* v476 — contro la LIQUIDITA', con la stessa lettura della combustione */
+        const _lqc = liquiditaSocieta(t.comb);
+        const _Nome = _lqc ? (_lqc.nome === "cassa" ? "La cassa (soli contanti)" : "La liquidita'") : "";
+        if (c.debito_corrente != null && _lqc)
+          scad += _lqc.v < c.debito_corrente
+            ? `. ${_Nome} (${M(_lqc.v)}) e' INFERIORE al debito in scadenza entro l'anno.`
+            : `. ${_Nome} (${M(_lqc.v)}) copre il debito in scadenza entro l'anno.`;
         else scad += ".";
       }
       /* v400 — stesso avviso della COMBUSTIONE: la copertura degli interessi e le scadenze sono

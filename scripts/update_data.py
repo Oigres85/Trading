@@ -1232,17 +1232,44 @@ def combustione(t, mcap, buyback):
     except Exception:
         cf = None
 
-    cassa, d1 = _riga_bilancio(bs, "Cash And Cash Equivalents",
-                               "Cash Cash Equivalents And Short Term Investments")
+    # ⚠⚠ v476 — LA LIQUIDITA' NON E' SOLO LA CASSA. La voce cercata per prima era "Cash And
+    #   Cash Equivalents" e quella che comprende i titoli a breve termine era il RIPIEGO: ogni
+    #   volta che la cassa c'era, buoni del Tesoro e carta commerciale restavano fuori.
+    #   Misurato su RGTI al 30/06/2026 (bilancio su stockanalysis): cassa 27,8 milioni, titoli a
+    #   breve 366, liquidita' 393,7 — il sistema pubblicava 5,5 mesi di autonomia su una societa'
+    #   che, al consumo di quel semestre, ne ha circa quattro anni. E il debito netto di chi tiene
+    #   la liquidita' in titoli (GOOGL, MSFT, META) usciva gonfiato della stessa differenza.
+    #   `cassa` resta quello che dice il nome (contanti e equivalenti); autonomia e debito netto si
+    #   calcolano sulla LIQUIDITA', e la base si DICHIARA: "il dato non c'e'" e "il dato e' zero"
+    #   si leggono uguali (v406).
+    cassa, d1 = _riga_bilancio(bs, "Cash And Cash Equivalents")
+    aggregato, d1b = _riga_bilancio(bs, "Cash Cash Equivalents And Short Term Investments")
+    breve, _ = _riga_bilancio(bs, "Other Short Term Investments")
+    liquidita, base = None, None
+    # ⚠ un aggregato MINORE della cassa e' impossibile per definizione: e' un errore della fonte,
+    #   e si ripiega sulla somma delle voci invece di pubblicarlo.
+    if aggregato is not None and (cassa is None or aggregato >= cassa):
+        liquidita, base = aggregato, "aggregato"
+        if cassa is not None:
+            breve = aggregato - cassa    # una scomposizione sola, coerente con l'aggregato
+    elif cassa is not None and breve is not None:
+        liquidita, base = cassa + breve, "somma"
+    elif cassa is not None:
+        liquidita, base, breve = cassa, "solo_cassa", None
+    if d1 is None:
+        d1 = d1b
     debito, _ = _riga_bilancio(bs, "Total Debt")
     patrim, _ = _riga_bilancio(bs, "Stockholders Equity")
     ocf, n_ocf, d2 = _somma_trimestri(cf, "Operating Cash Flow")
     capex, n_cap, _ = _somma_trimestri(cf, "Capital Expenditure")
 
-    if cassa is None and ocf is None:
+    if liquidita is None and ocf is None:
         return None                      # niente da dire: meglio assente che vuoto
 
     out["cassa"] = cassa
+    out["titoli_breve"] = breve
+    out["liquidita"] = liquidita
+    out["liquidita_base"] = base
     out["debito"] = debito
     out["patrimonio"] = patrim
     out["bilancio_al"] = d1
@@ -1252,17 +1279,18 @@ def combustione(t, mcap, buyback):
     out["cashflow_al"] = d2
     if ocf is not None and capex is not None:
         out["fcf_ttm"] = ocf + capex     # capex e' gia' negativo in yfinance
-    # quanti mesi di COSTRUZIONE copre la cassa da sola, al ritmo attuale
-    if cassa is not None and capex is not None and capex < 0:
-        out["mesi_capex"] = round(cassa / (abs(capex) / 12.0), 1)
+    # quanti mesi di COSTRUZIONE copre la liquidita' da sola, al ritmo attuale (v476: la
+    # liquidita', non la sola cassa)
+    if liquidita is not None and capex is not None and capex < 0:
+        out["mesi_capex"] = round(liquidita / (abs(capex) / 12.0), 1)
     # quanti mesi di PERDITA di cassa copre, se il flusso operativo e' negativo
-    if cassa is not None and ocf is not None and ocf < 0:
-        out["mesi_operativi"] = round(cassa / (abs(ocf) / 12.0), 1)
+    if liquidita is not None and ocf is not None and ocf < 0:
+        out["mesi_operativi"] = round(liquidita / (abs(ocf) / 12.0), 1)
     # emissione netta di azioni: buyback_yield negativo = diluizione
     if buyback is not None and buyback < 0:
         out["emissione_netta_pct"] = round(abs(buyback) * 100, 2)
-    if debito is not None and cassa is not None:
-        out["debito_netto"] = debito - cassa
+    if debito is not None and liquidita is not None:
+        out["debito_netto"] = debito - liquidita
     return {k: v for k, v in out.items() if v is not None}
 
 
