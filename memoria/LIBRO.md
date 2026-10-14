@@ -26,13 +26,15 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | AMD | 100 | 153,916 | USD | |
 | PLTR | 100 | 113,50 | USD | |
 | MU | 70 | 87,63 | USD | |
-| RGTI | 463 | 26,5048 | USD | |
+| RGTI | 663 | 22,147 | USD | media del CEO del 14/10/2026: +200 azioni a ~12,06 $ (carico da 26,5048 a 22,147) |
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: ~59.000 €** — ~50.000 € dichiarati dal CEO il 01/10/2026 ("circa", dopo le uscite da
+**Liquidità: ~56.800 €** — ~59.000 € fino al 14/10/2026, **meno la media su RGTI** del 14/10: 200 azioni
+per ~2.412 $ (663 × 22,147 − 463 × 26,5048), ≈ 2.170 € a EUR/USD 1,112, commissioni escluse —
+**da confermare** col saldo del broker. I ~59.000 € erano ~50.000 € dichiarati dal CEO il 01/10/2026 ("circa", dopo le uscite da
 GOOGL e WDC) **più l'incasso di ORCL del 05/10/2026**: 70 azioni vendute a **145,55 $** = 10.188,50 $
 (≈ 9.050 € a EUR/USD 1,1255; se restano in dollari sul conto, il controvalore in euro si muove col cambio).
 Plusvalenza ORCL: (145,55 − 143,00) × 70 = **+178,50 $**, imposta ~46 $ al 26% — il conto definitivo lo fa
@@ -275,8 +277,10 @@ ribasso. Le schede portano ora i ricavi per trimestre accanto all'esercizio chiu
 media a 200, media a 50 sotto la 200), e RGTI brucia cassa con la famiglia credito accesa. A favore:
 ricavi del secondo trimestre quasi triplicati sull'anno prima, più rialzi che tagli delle stime a 30
 giorni, liquidità per oltre cinque anni di perdita operativa. Lo stop a 14,41 era una regola di
-prezzo, e la regola del 14/10 dice che per il prezzo non si vende. RGTI resta in portafoglio **senza
-media**: la proposta del 14/10 la sconsigliava, perché è il nome dove una media sposta meno il carico.
+prezzo, e la regola del 14/10 dice che per il prezzo non si vende. RGTI resta in portafoglio. La
+proposta del 14/10 sconsigliava la media, perché è il nome dove una media sposta meno il carico:
+**il CEO ha mediato lo stesso giorno** — +200 azioni a ~12,06 $, 663 in tutto, carico da 26,50 a
+22,147 (§1). La decisione è sua, e la scadenza resta quella del conflitto: i conti successivi.
 La mattina del 14/10 avevo scritto qui che la decisione reggeva anche con la regola: valeva per la
 prima versione (v481), che guardava solo le prove contro.
 
