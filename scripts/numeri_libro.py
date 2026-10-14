@@ -175,6 +175,7 @@ def calcola(sedute=1, registra=False, adesso=None):
              "rend": {t: rotazione.rendimenti_per_data(B[t]) for t in TK if B.get(t)}}
     out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
                                      decisioni, media)
+    out["rimandate"] = leggi_rimandate()          # v483 — le decisioni che aspettano un evento
     out["decisioni"] = (None if decisioni is None else
                         costo_decisioni(decisioni, B, {t: (TEC.get(t) or {}).get("px") for t in aperte},
                                         out["calendario"], adesso))
@@ -689,6 +690,58 @@ def righe_decisioni(dd, finestra=45):
                  + (f" a {_it(x['conferma_px'])}" if x["conferma_px"] is not None else "")
                  + f" · {eff} · {x['sedute']} {'seduta conclusa' if x['sedute'] == 1 else 'sedute concluse'} dalla conferma"
                  + f" · {scad}")
+    return L
+
+
+# ════════════════════════════════════════════════════════════════ v483 — RIMANDATE DI PROPOSITO
+# LIBRO.md §1quater, regola 4: una decisione che aspetta un evento si DICHIARA rimandata di proposito,
+# non si lascia scadere. Il 14/10/2026 il CEO, sulla media di CRWV: "per ora attendo i conti". Una
+# decisione cosi' vive in una riga del libro e, senza uno strumento che la riporti, esce dall'analisi
+# alla prima compattazione — il difetto del 09/10, quando un «Aggiorna analisi» e' uscito senza la
+# sezione 7 perche' gli strumenti c'erano ma nessuno li chiamava (v473). Qui la si riporta a ogni
+# analisi, con la prima trimestrale del nome dichiarata dalla fonte: nessuna data scritta a mano (v410).
+def leggi_rimandate(testo=None):
+    """Le righe «- TICKER — cosa si rimanda» sotto il titoletto «Rimandate di proposito», dentro la
+    sezione delle decisioni del libro (v454: si legge solo dentro il proprio titolo). None = sezione
+    delle decisioni assente, che si legge diverso da 'nessuna rimandata' (v406)."""
+    if testo is None:
+        testo = testo_libro()
+    out, sez, trovata, dentro = [], False, False, False
+    for riga in testo.splitlines():
+        if riga.startswith("## "):
+            sez = "DECISIONI APERTE" in riga.upper()
+            trovata, dentro = trovata or sez, False
+            continue
+        if not sez:
+            continue
+        if riga.startswith("**Rimandate di proposito**"):
+            dentro = True
+            continue
+        if dentro:
+            m = re.match(r"- ([A-Z][A-Z0-9.\-]*) — (.+)$", riga.strip())
+            if m:
+                out.append({"tk": m.group(1), "testo": m.group(2)})
+            elif not riga.strip() and out:
+                dentro = False
+    return out if trovata else None
+
+
+def righe_rimandate(rr, calendario, finestra=45):
+    """Ogni rimandata con la prima trimestrale del nome come la dichiara la fonte (§1quater, regola 2).
+    Nessuna data nella finestra si dice, e non e' 'nessuna uscita' (v396)."""
+    if rr is None:
+        return ["RIMANDATE DI PROPOSITO: sezione delle decisioni NON trovata in LIBRO.md"]
+    if not rr:
+        return []
+    prime = {}
+    for e in (calendario or {}).get("attesi") or []:
+        prime.setdefault(e["tk"], e)
+    L = ["RIMANDATE DI PROPOSITO (LIBRO.md §1quinquies, §1quater regola 4) — si riprendono all'evento, "
+         "non si lasciano scadere"]
+    for r in rr:
+        sc = prime.get(r["tk"])
+        L.append(f"  {r['tk']} — {r['testo']} · " + (f"prima trimestrale {sc['data']} ({sc['giorni']} g)" if sc else
+                 f"nessuna trimestrale dichiarata dalla fonte nei {finestra} giorni (non 'nessuna uscita')"))
     return L
 
 
@@ -1356,6 +1409,8 @@ def sintesi(o):
         L.extend(righe_attesa(o["attesa"]))
     if "decisioni" in o:
         L.extend(righe_decisioni(o["decisioni"], (o.get("calendario") or {}).get("finestra") or 45))
+    if "rimandate" in o:
+        L.extend(righe_rimandate(o["rimandate"], o.get("calendario"), (o.get("calendario") or {}).get("finestra") or 45))
     if o.get("credito"):
         L.extend(righe_credito(o["credito"]))
     if o.get("tenuta"):

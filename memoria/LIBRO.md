@@ -206,9 +206,11 @@ nome su cui la decisione era ancora aperta.
    Gli eventi macro (verbali Fed, FOMC) e le trimestrali dei fornitori di settore (ASML, TSM) si
    aggiungono dalla ricerca web, con fonte e data.
 3. **Le protezioni si mettono SUBITO, le operazioni condizionate possono aspettare.** Gli avvisi e
-   gli stop sui livelli già decisi (RGTI, CRWV, SMH, Treasury 10 anni, vedi §1ter e il piano in
+   gli stop sui livelli già decisi (SMH, Treasury 10 anni, vedi §1ter e il piano in
    `FORMATO_ANALISI.md`) non dipendono da nessuna scadenza: rimandarli è l'unico pezzo dell'attesa
-   che costa senza dare niente in cambio.
+   che costa senza dare niente in cambio. ⚠ Dal 14/10/2026 un livello di prezzo su una posizione è
+   un campanello che fa guardare la tenuta, non un'uscita (§1sexies): lo stop di RGTI è stato
+   revocato quel giorno dal CEO, e su CRWV la decisione aspetta i conti (§1quinquies).
 4. **Oltre la scadenza, aspettare è una scommessa binaria**: la trimestrale riprezza il nome in una
    seduta, spesso di più dell'oscillazione di una settimana intera. Una decisione ancora aperta il
    giorno prima della trimestrale va presa o dichiarata rimandata **di proposito**, non lasciata
@@ -235,7 +237,7 @@ esce quando è **eseguita** (si aggiornano posizioni e liquidità in §1) o **re
 
 | Nome | Decisione | Quantità | Condizione | Livello | Confermata | Stato |
 |---|---|---|---|---|---|---|
-| RGTI | uscita | 463 | chiusura sotto | 14,41 | 2026-10-08 | aperta — non eseguita al 09/10 (CEO) |
+| RGTI | uscita | 463 | chiusura sotto | 14,41 | 2026-10-08 | revocata il 14/10/2026 — decisione del CEO («tengo per ora»): con il bilancio dell'evidenza (§1sexies) RGTI è in CONFLITTO, e lo stop a 14,41 era una regola di prezzo |
 | AMD | alleggerimento | da decidere | respinto sotto | 645 | 2026-10-08 | revocata il 14/10/2026 — regola di tenuta §1sexies (decisione del CEO del 14/10): l'alleggerimento era per peso (verso il 12-14% del libro), e la tenuta non trova evidenza di vendita (tendenza intatta, stime in salita) |
 
 ⚠ **RGTI — la ragione dell'uscita, corretta il 13/10/2026.** La decisione poggia sullo **stop**
@@ -246,13 +248,23 @@ non è un problema: 393,7 milioni fra cassa e titoli a breve al 30/06, circa qua
 di quel semestre — il sistema contava i soli contanti (27,8 milioni), corretto in v476. Restano veri:
 perdita operativa in aumento (+41% sull'anno), valutazione circa 330 volte i ricavi, tendenza al
 ribasso. Le schede portano ora i ricavi per trimestre accanto all'esercizio chiuso (v476).
-⚠ **14/10/2026 — con il bilancio dell'evidenza (§1sexies, v482) la decisione è da RIDISCUTERE col
-CEO.** Contro: tendenza rotta (chiusura sotto la media a 200, media a 50 sotto la 200), e RGTI
-brucia cassa con la famiglia credito accesa. A favore: ricavi del secondo trimestre quasi
-triplicati sull'anno prima, più rialzi che tagli delle stime a 30 giorni, liquidità per oltre
-cinque anni di perdita operativa. Esito: **CONFLITTO — DA VALUTARE**. La mattina del 14/10 avevo
-scritto qui che la decisione reggeva anche con la regola: valeva per la prima versione (v481),
-che guardava solo le prove contro. Lo Stato resta «aperta» finché il CEO non decide: la revoca è sua.
+⚠ **14/10/2026 — decisione REVOCATA dal CEO: «tengo per ora».** Con il bilancio dell'evidenza
+(§1sexies, v482) RGTI è in **CONFLITTO — DA VALUTARE**. Contro: tendenza rotta (chiusura sotto la
+media a 200, media a 50 sotto la 200), e RGTI brucia cassa con la famiglia credito accesa. A favore:
+ricavi del secondo trimestre quasi triplicati sull'anno prima, più rialzi che tagli delle stime a 30
+giorni, liquidità per oltre cinque anni di perdita operativa. Lo stop a 14,41 era una regola di
+prezzo, e la regola del 14/10 dice che per il prezzo non si vende. RGTI resta in portafoglio **senza
+media**: la proposta del 14/10 la sconsigliava, perché è il nome dove una media sposta meno il carico.
+La mattina del 14/10 avevo scritto qui che la decisione reggeva anche con la regola: valeva per la
+prima versione (v481), che guardava solo le prove contro.
+
+**Rimandate di proposito** (§1quater, regola 4: una decisione che aspetta un evento si dichiara,
+non si lascia scadere). Una riga per decisione nella forma «- TICKER — cosa si rimanda»;
+`numeri_libro.py` la riporta a ogni analisi con la prima trimestrale del nome dichiarata dalla
+fonte (v483). La riga esce quando la decisione si prende.
+
+- CRWV — la media: si rivaluta dopo la trimestrale, coi conti e il bilancio dell'evidenza di quel giorno (decisione del CEO del 14/10/2026: «per ora attendo i conti»)
+
 
 `numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
 - il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non

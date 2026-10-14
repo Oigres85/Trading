@@ -78,6 +78,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Da v474 il blocco `DECISIONI APERTE` (tabella in `LIBRO.md` §1quinquies): per ogni decisione
    confermata e non eseguita quanto l'attesa è costata o ha fatto guadagnare dalla chiusura della
    conferma, se la condizione vale ancora e la scadenza. Una condizione RIENTRATA si dice.
+   Da v483 lo stesso blocco riporta le decisioni **RIMANDATE DI PROPOSITO** (`LIBRO.md`
+   §1quinquies, una riga «- TICKER — cosa si rimanda») con la prima trimestrale del nome: si
+   scrivono nella risposta finché la decisione non si prende (dal 14/10: la media di CRWV dopo i conti).
 0ter. **Credito sul libro** (v467, regola in `memoria/LIBRO.md` §1ter): il blocco `CREDITO SUL
    LIBRO` di `numeri_libro.py` — chi brucia cassa, il suo peso, le tre condizioni. Se la conferma
    è accesa, gli stop su quei nomi passano in cima alle decisioni. Non cambia il colore del semaforo.

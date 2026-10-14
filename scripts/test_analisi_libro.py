@@ -2825,10 +2825,45 @@ check("v481-v482 il piano (FORMATO §6) porta il bilancio dell'evidenza, la rice
       and "tenuta delle posizioni" in _fmt481.split("Richieste del CEO rese strutturali")[1][:2000]
       and "bilancio dell'evidenza" in _fmt481.split("Richieste del CEO rese strutturali")[1][:2500])
 _s5q482 = _lib474[_lib474.find("## 1quinquies"):_lib474.find("## 1sexies")]
-check("v482 il libro non afferma piu' che la vendita di RGTI 'regge anche con la regola': e' da ridiscutere col CEO, e la "
-      "revoca resta sua (lo Stato non e' toccato da qui)",
-      "regge anche con la regola di tenuta" not in _s5q482 and "RIDISCUTERE" in _s5q482
-      and _dd.get("RGTI", {}).get("aperta") is True)
+check("v482 il libro non afferma piu' che la vendita di RGTI 'regge anche con la regola' — e lo stato delle decisioni NON "
+      "si fissa qui: il 14/10 il CEO l'ha revocata, e un gate che pretendeva 'aperta' pinnava una decisione (v481)",
+      "regge anche con la regola di tenuta" not in _s5q482)
+
+# ============================ v483 — LE DECISIONI RIMANDATE DI PROPOSITO ============================
+# Decisione del CEO del 14/10/2026 sulla media di CRWV: "per ora attendo i conti". Una decisione che aspetta un
+# evento si dichiara (LIBRO.md §1quater, regola 4) e lo strumento la riporta a ogni analisi. Lo stato si COSTRUISCE:
+# le rimandate del libro cambiano, e un gate che pretendesse CRWV pinnerebbe una decisione (la lezione v481).
+_txt483 = (_tab474 + "\n**Rimandate di proposito** (§1quater): spiegazione\nche va a capo.\n\n"
+           "- CRWV — la media dopo i conti\n- SKHY — l'ingresso dopo la quotazione piena\n\naltro testo\n"
+           "- MU — fuori dalla lista\n## 2. ALTRO\n**Rimandate di proposito**\n- NVDA — fuori dalla sezione\n")
+_rr483 = NL.leggi_rimandate(_txt483)
+check("v483 le rimandate si leggono solo sotto il loro titoletto e dentro la sezione delle decisioni; la lista finisce alla "
+      "prima riga vuota; sezione assente = None, nessuna = []",
+      _rr483 == [{"tk": "CRWV", "testo": "la media dopo i conti"}, {"tk": "SKHY", "testo": "l'ingresso dopo la quotazione piena"}]
+      and NL.leggi_rimandate("## 1. POSIZIONI\n- CRWV — x\n") is None and NL.leggi_rimandate(_tab474) == [],
+      str(_rr483))
+_cal483 = {"attesi": [{"tk": "CRWV", "data": "2026-11-09", "giorni": 26}, {"tk": "CRWV", "data": "2026-12-01", "giorni": 48}]}
+_rrr483 = "\n".join(NL.righe_rimandate(_rr483, _cal483))
+check("v483 ogni rimandata esce con la PRIMA trimestrale dichiarata dalla fonte; senza data nella finestra lo dice e non e' "
+      "'nessuna uscita'; senza rimandate il blocco tace, senza sezione lo dichiara",
+      "CRWV — la media dopo i conti · prima trimestrale 2026-11-09 (26 g)" in _rrr483 and "2026-12-01" not in _rrr483
+      and "SKHY — l'ingresso dopo la quotazione piena · nessuna trimestrale dichiarata dalla fonte nei 45 giorni" in _rrr483
+      and NL.righe_rimandate([], _cal483) == [] and "NON trovata" in NL.righe_rimandate(None, _cal483)[0], _rrr483)
+_o483 = {"rischio": {"vol_ann": 0.4, "var95": 0.03, "es95": 0.04, "scommesse_eff": 2.0, "mcr": {}, "n_sedute": 250,
+                     "beta_libro": {"QQQ": (2.0, 0.8)}},
+         "bench": {"QQQ": 0.01, "SMH": 0.02, "SPY": 0.005, "RSP": 0.0}, "inizio": "2026-10-12", "fine": "2026-10-13",
+         "sedute": 1, "tot_usd": 270000.0, "ret_libro": 0.01, "pnl_libro": 2700.0, "ret_21": 0.05,
+         "bench_21": {"SMH": 0.03, "QQQ": 0.02}, "esclusi_matrice": [], "titoli": [], "stress": {},
+         "decisioni": [], "rimandate": _rr483, "calendario": _cal483}
+_sint483 = NL.sintesi(_o483)
+check("v483 collegamento: calcola legge le rimandate dal libro, e la sintesi le STAMPA — provato eseguendola, non "
+      "leggendo il sorgente: un ramo spento che contiene la chiamata passerebbe (v234)",
+      'out["rimandate"] = leggi_rimandate()' in _calc474 and "RIMANDATE DI PROPOSITO" in _sint483
+      and "CRWV — la media dopo i conti · prima trimestrale 2026-11-09" in _sint483, _sint483[-400:])
+_rr483_lib = NL.leggi_rimandate(_lib474)
+check("v483 il libro vero si legge: la sezione delle decisioni c'e', e ogni rimandata ha un ticker e un testo (lo stato "
+      "delle decisioni non si fissa qui: lo decide il CEO)",
+      _rr483_lib is not None and all(r["tk"].isupper() and len(r["testo"]) > 5 for r in _rr483_lib), str(_rr483_lib))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

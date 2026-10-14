@@ -6852,3 +6852,38 @@ sul controllo giusto**, ripristino verificato per impronta. Pavimento di `test_a
 acceso, il resto a favore), SKHY da lasciar correre ma provvisorio (66 sedute: la tendenza non si
 misura), MU, NVDA, AMD, PLTR, MRVL e BE da lasciar correre. Fra i sorvegliati: ORCL e TSLA in
 conflitto, CCJ, MCD, NFLX, NKE e OKLO in vendita per evidenza (cioè: un ingresso lì sarebbe contro).
+
+## 📌 v483 — LE DUE DECISIONI DEL CEO, E UNA DECISIONE CHE ASPETTA DIVENTA UNO STRUMENTO
+
+Risposte del CEO del 14/10/2026 alle due domande della v482, testuali: *"1 tengo per ora · 2 per
+ora attendo i conti"*.
+
+1. **RGTI — uscita REVOCATA.** In LIBRO.md §1quinquies lo Stato dice «revocata il 14/10/2026», con
+   la ragione: per il bilancio dell'evidenza RGTI è in CONFLITTO, e lo stop a 14,41 era una regola di
+   prezzo. Resta in portafoglio senza media. §1quater regola 3 non elenca più RGTI e CRWV fra gli
+   «stop già decisi»: dal 14/10 un livello di prezzo su una posizione è un campanello che fa
+   guardare la tenuta, non un'uscita.
+2. **CRWV — la media aspetta i conti.** È una decisione **rimandata di proposito** (§1quater, regola
+   4: una decisione che aspetta un evento si dichiara, non si lascia scadere).
+
+⚠⚠ **Una decisione che aspetta un evento, scritta solo in prosa, esce dall'analisi alla prima
+compattazione** — è il difetto del 09/10, quando un «Aggiorna analisi» è uscito senza la sezione 7
+perché gli strumenti c'erano e nessuno li chiamava (v473). Quindi è diventata un dato: le righe
+«- TICKER — cosa si rimanda» sotto il titoletto **Rimandate di proposito** in §1quinquies, che
+`leggi_rimandate` legge e il blocco DECISIONI APERTE riporta a ogni analisi con la prima trimestrale
+del nome dichiarata dalla fonte. Nessuna data scritta a mano (v410): il 14/10 il calendario Nasdaq
+dava il 09/11, e la riga lo dice da sé.
+
+### 🦴 Il gate della v482 PINNAVA una decisione, la stessa lezione di poche ore prima
+Il check sul libro pretendeva `RGTI aperta`: è andato rosso — correttamente — appena il CEO l'ha
+revocata. È **testualmente** l'errore annotato nella v481 sul gate della tabella (*"pinnava lo stato
+di una decisione che il CEO può cambiare quando vuole"*), rifatto la mattina dopo averlo scritto.
+Riagganciato all'invariante vero: la frase falsa («regge anche con la regola di tenuta») non torna.
+Lo stato delle decisioni non si fissa in un gate: lo decide il CEO.
+
+### 🎯 E un'iniezione non mordeva perché il gate leggeva il TESTO
+Il collegamento cercava la chiamata `righe_rimandate(` dentro `sintesi`: spegnendo il ramo con un
+`if False:` la chiamata restava nel sorgente e il gate restava verde. *Un ramo che non può essere
+raggiunto non è una protezione* (v234) — e un gate che cerca la chiamata invece di eseguirla non lo
+vede. Ora costruisce un risultato minimo, **esegue** `sintesi` e cerca la riga stampata. Cinque
+iniezioni, mordono tutte, ripristino verificato per impronta.
