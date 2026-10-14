@@ -56,9 +56,10 @@ per MU + SK hynix intorno al 20% del libro (12-13/10) è **respinta**: il peso d
 un limite, e SK hynix resta in portafoglio senza uno stop di prezzo. Il 14/10 le memorie pesano
 il 26,4% del libro e MU da sola porta il 34% del rischio: senza tetto, se salgono, quelle quote
 crescono da sole, e il blocco dei pesi di `numeri_libro.py` le mostra a ogni analisi.
-**Resta in vigore**, perché non è un tetto, il semaforo d'uscita (§1ter): in arancione la
-riduzione dei semiconduttori parte da chi pesa di più nel rischio — oggi MU — qualunque sia il
-peso delle memorie (l'ordine di quella riduzione è una domanda aperta dal 14/10, §1sexies).
+**Restano in vigore**, perché non sono tetti, il semaforo d'uscita e il salvavita (§1ter): in
+arancione, o col salvavita a −30%, la riduzione dei semiconduttori segue il rischio di ciascuno —
+MU, che porta più rischio di quanto pesa, si taglia di più di un terzo — qualunque sia il peso delle
+memorie (decisione del CEO del 14/10/2026).
 **Il piano di vendita di MU nella fascia 1.100-1.108 è REVOCATO il 14/10/2026** dalla regola di
 tenuta (§1sexies): era una presa di profitto a una fascia di prezzo, e il CEO ha deciso che si
 vende per evidenza, non per prezzo.
@@ -156,10 +157,31 @@ parola per parola: le regole stanno in un posto solo.
   CEO del 14/10/2026); fino al 14/10 il giallo prevedeva prese di profitto sui nomi più tirati.
   Fino al 09/10 il giallo vietava i nuovi semiconduttori.
 - 🟠 **Arancione** — due segnali di **famiglie diverse**: riduzione dei semiconduttori di circa un
-  terzo, partendo da chi pesa di più nel rischio (oggi MU e AMD) — l'ordine è una domanda aperta al
-  CEO dal 14/10 (§1sexies).
+  terzo, **in proporzione al rischio che ciascuno porta**: chi porta più rischio di quanto pesa si
+  taglia di più, chi ne porta meno di meno. Decisione del CEO del 14/10/2026: una via di mezzo fra il
+  togliere solo MU e AMD e il togliere un terzo di ciascuno. Azioni, imposta e rischio prima e dopo
+  li calcola `numeri_libro.py`, blocco «PIANO DI RIDUZIONE», a ogni analisi. Si vende, non ci si
+  copre: il CEO non opera con opzioni o ETF short, per ora.
 - 🔴 **Rosso** — SMH sotto la media a 200 **e** (credito sopra 4,0 **oppure** taglio della guida
-  sugli investimenti AI): un altro terzo. Resta il nucleo per la tesi al 2029.
+  sugli investimenti AI): un altro terzo, con lo stesso criterio. Resta il nucleo per la tesi al 2029.
+
+**I semiconduttori del libro** (arancione, rosso e salvavita): MU, NVDA, AMD, MRVL, SKHY.
+Il settore non è nei dati — la pipeline mette RGTI fra i semiconduttori e SK hynix no (v473) —
+quindi l'elenco sta qui, e un nome nuovo del comparto ci entra il giorno dell'acquisto. Le posizioni
+fuori dall'elenco si nominano a ogni analisi: un'omissione si vede.
+
+**Il salvavita sul patrimonio** (decisione del CEO del 14/10/2026). Il semaforo riconosce i crolli
+che conosce: un crollo dei soli titoli dell'intelligenza artificiale col credito calmo può lasciarlo
+giallo finché le stime non girano. Il salvavita stacca per qualunque causa, come quello di casa.
+- **Misura**: il calo dell'azionario dal suo massimo, in dollari, sul rendimento ponderato per il
+  tempo del registro della performance (§0): vendite, acquisti e depositi non lo falsano. Il massimo
+  si conta dalla prima riga del registro (09/10/2026).
+- **Soglia: −30%** — una convenzione scelta col CEO (v240), oltre il peggior calo dell'ultimo anno
+  del libro di oggi guardato all'indietro (−26%, misurato il 14/10/2026): non scatta sul rumore.
+- **Reazione**: il gradino dell'arancione — un terzo dei semiconduttori, in proporzione al rischio —
+  qualunque sia il colore del semaforo. Se in questa discesa quel gradino è già stato eseguito, il
+  salvavita non ne aggiunge un altro: vale il rosso. Scatta una volta per discesa e si riarma quando
+  l'azionario torna al massimo. Lo calcola `numeri_libro.py`, blocco «SALVAVITA».
 
 ⚠ Due segnali della **stessa** famiglia sono un segnale solo (B3): SMH sotto la 50 e NVDA sotto la
 50 nello stesso giorno sono il prezzo che parla due volte, non due prove.
@@ -265,6 +287,13 @@ fonte (v483). La riga esce quando la decisione si prende.
 
 - CRWV — la media: si rivaluta dopo la trimestrale, coi conti e il bilancio dell'evidenza di quel giorno (decisione del CEO del 14/10/2026: «per ora attendo i conti»)
 
+**Esami dei conflitti** (§1sexies, decisione del CEO del 14/10/2026). Una riga per nome in
+CONFLITTO nella forma «- TICKER — conti del AAAA-MM-GG · tenere se … · mediare se … · vendere se …»,
+scritta prima dei conti, mandata al CEO 7 giorni prima e confermata da lui. `numeri_libro.py` la
+riporta accanto al conflitto, e dopo i conti la si confronta coi risultati. La riga esce quando la
+decisione si prende.
+
+(nessun esame ancora)
 
 `numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
 - il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non
@@ -373,9 +402,25 @@ compensare.
 
 **Il semaforo resta la regola del libro.** In arancione e in rosso la sua reazione (§1ter) vale
 anche per i nomi che qui sono da lasciar correre: due famiglie diverse accese sono già evidenza
-tecnica e macro insieme. Dentro quella riduzione, l'ordine scritto in §1ter («partendo da chi
-pesa di più nel rischio») è una **domanda aperta al CEO dal 14/10**: con questa regola potrebbe
-partire da chi ha l'evidenza peggiore.
+tecnica e macro insieme. L'ordine della riduzione l'ha deciso il CEO il 14/10/2026: **in proporzione
+al rischio** di ciascun nome (§1ter), una via di mezzo fra il togliere solo MU e AMD e il togliere un
+terzo di ciascuno. Lo stesso gradino lo fa scattare il **salvavita** a −30% dal massimo
+dell'azionario (§1ter), qualunque sia il colore.
+
+**La scadenza di ogni conflitto** (decisione del CEO del 14/10/2026). Un «per ora» senza data
+diventa «per sempre»: ogni nome in CONFLITTO — DA VALUTARE si decide ai **conti trimestrali
+successivi**, con un **esame scritto prima** — cosa devono mostrare i conti per tenere, mediare o
+vendere — mandato al CEO **7 giorni prima** e confermato da lui. Così dopo i conti non si cercano
+ragioni. Se il conflitto nasce a meno di 7 giorni dai conti, l'esame si scrive subito. La data è
+quella dichiarata dalla fonte (calendario Nasdaq), mai proiettata (v396): se cambia, la scadenza si
+sposta con lei. Gli esami stanno in §1quinquies («Esami dei conflitti») e `numeri_libro.py` li
+riporta accanto al conflitto; dopo i conti l'esame si confronta coi risultati, e la decisione resta
+del CEO.
+
+**Il rallentamento della crescita non è una prova** — proposta del 14/10/2026, **respinta dal CEO**
+lo stesso giorno. Avrebbe distinto AMD a 170 da Zoom nel 2021 (ricavi passati da +191% a +54%
+sull'anno in un trimestre, col titolo già in tendenza rotta), ma la regola resta com'è: i ricavi
+contano a favore da +25% sull'anno, qualunque fosse la crescita del trimestre prima.
 
 **I nomi oggetto di analisi e la speculazione** (*"se ci sono margini di speculazione, ben
 venga"*). Lo stesso bilancio si calcola sui sorvegliati (`rotazione.py`, una riga per nome): dice

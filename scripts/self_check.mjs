@@ -154,7 +154,7 @@ const SUITE = [
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
   /* v474: 348 punti di chiamata (55 check nuovi su semaforo, decisioni, registro e piano) -> pavimento 330 */
   /* v476: 359 punti di chiamata (+11 su liquidita' e ricavi nelle schede e nel rapporto) -> 340 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 390, firma: /\d+\/\d+ CHECK OK/ },
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 410, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

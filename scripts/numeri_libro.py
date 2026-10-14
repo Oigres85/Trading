@@ -20,10 +20,18 @@ v474 (decisioni del CEO del 09/10/2026) — tre blocchi nuovi, tutti CALCOLATI q
                       e' costato o ha fatto guadagnare aspettare dalla chiusura della conferma;
   REGISTRO            il libro in dollari e il patrimonio in euro contro QQQ, il riferimento
                       scelto dal CEO, a rendimento ponderato per il tempo (LIBRO.md §0).
+
+v484 (decisioni del CEO del 14/10/2026, sera) — tre blocchi nuovi, anche questi CALCOLATI qui:
+  SALVAVITA           il calo dell'azionario dal suo massimo sul rendimento ponderato per il tempo del
+                      registro; a -30% scatta il gradino di riduzione, qualunque sia il colore;
+  PIANO DI RIDUZIONE  il gradino dell'arancione e del salvavita calcolato PRIMA: un terzo dei
+                      semiconduttori del libro, in proporzione al rischio di ciascuno — azioni intere,
+                      imposta, rischio in dollari prima e dopo;
+  SCADENZE            ogni CONFLITTO con i suoi conti successivi e l'esame scritto prima (§1quinquies).
 """
 import argparse, json, math, re, sys
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -176,11 +184,25 @@ def calcola(sedute=1, registra=False, adesso=None):
     out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
                                      decisioni, media)
     out["rimandate"] = leggi_rimandate()          # v483 — le decisioni che aspettano un evento
+    # v484 — ogni CONFLITTO con la sua scadenza (i conti successivi) e l'esame scritto prima (LIBRO.md §1sexies)
+    scad = {}
+    for a in out["calendario"].get("attesi") or []:
+        scad.setdefault(a["tk"], a)                       # gli attesi arrivano gia' in ordine di data
+    out["esami"] = leggi_esami()
+    out["tenuta"] = con_scadenze(out["tenuta"], scad, out["esami"], out["calendario"].get("finestra"), adesso)
     out["decisioni"] = (None if decisioni is None else
                         costo_decisioni(decisioni, B, {t: (TEC.get(t) or {}).get("px") for t in aperte},
                                         out["calendario"], adesso))
     out["registro"] = aggiorna_registro(B, {p["tk"]: p["qta"] for p in az}, {t: p["qta"] for t, p in eur.items()},
                                         cassa_eur, pat_pipe, out["semaforo"]["colore"], registra, adesso)
+    # v484 — il gradino di riduzione calcolato PRIMA, e il salvavita sul registro (con la seduta conclusa non
+    #   ancora registrata, costruita come una riga vera e non scritta)
+    out["piano"] = piano_riduzione(semiconduttori_libro(), val, qty, px, pmc, ris["mcr"], R, lunghi)
+    reg_ora, _ = leggi_registro()
+    conc = concluse(B.get("QQQ") or [], adesso)
+    out["salvavita"] = salvavita(reg_ora, nuova_riga(conc[-1]["t"], qty, {t: p["qta"] for t, p in eur.items()}, B,
+                                                     cassa_eur, pat_pipe, out["semaforo"]["colore"],
+                                                     reg_ora[-1] if reg_ora else None, adesso) if conc else None)
     return out
 
 
@@ -580,7 +602,7 @@ def righe_semaforo(s, precedente=None, mcr=None):
     L.append(f"  reazione {ARTICOLO[s['colore']]} (LIBRO.md §1ter, parola per parola): «{reaz}»" if reaz else
              f"  ⚠ reazione {ARTICOLO[s['colore']]} NON letta da LIBRO.md §1ter: la regola va riletta a mano")
     if s["colore"] in ("arancione", "rosso") and mcr:
-        L.append("  chi pesa di più nel rischio oggi (contributo di Euler; il settore non è nei dati): "
+        L.append("  chi pesa di più nel rischio oggi (contributo di Euler) — le azioni da vendere le ripartisce il blocco PIANO DI RIDUZIONE: "
                  + " · ".join(f"{t} {_it(v * 100, 1)}%" for t, v in sorted(mcr.items(), key=lambda x: -x[1])[:4]))
     return L
 
@@ -700,10 +722,11 @@ def righe_decisioni(dd, finestra=45):
 # alla prima compattazione — il difetto del 09/10, quando un «Aggiorna analisi» e' uscito senza la
 # sezione 7 perche' gli strumenti c'erano ma nessuno li chiamava (v473). Qui la si riporta a ogni
 # analisi, con la prima trimestrale del nome dichiarata dalla fonte: nessuna data scritta a mano (v410).
-def leggi_rimandate(testo=None):
-    """Le righe «- TICKER — cosa si rimanda» sotto il titoletto «Rimandate di proposito», dentro la
-    sezione delle decisioni del libro (v454: si legge solo dentro il proprio titolo). None = sezione
-    delle decisioni assente, che si legge diverso da 'nessuna rimandata' (v406)."""
+def _lista_sotto(testo, titoletto):
+    """Le righe «- TICKER — testo» sotto un titoletto in grassetto, dentro la sezione delle decisioni del
+    libro (v454: si legge solo dentro il proprio titolo). La lista finisce alla prima riga vuota dopo le
+    voci o al titoletto successivo. None = sezione delle decisioni assente (v406). Una funzione sola per
+    rimandate ed esami: due lettori della stessa forma divergono al primo ritocco (v161)."""
     if testo is None:
         testo = testo_libro()
     out, sez, trovata, dentro = [], False, False, False
@@ -714,8 +737,8 @@ def leggi_rimandate(testo=None):
             continue
         if not sez:
             continue
-        if riga.startswith("**Rimandate di proposito**"):
-            dentro = True
+        if riga.startswith("**"):
+            dentro = riga.startswith(titoletto)
             continue
         if dentro:
             m = re.match(r"- ([A-Z][A-Z0-9.\-]*) — (.+)$", riga.strip())
@@ -724,6 +747,24 @@ def leggi_rimandate(testo=None):
             elif not riga.strip() and out:
                 dentro = False
     return out if trovata else None
+
+
+def leggi_rimandate(testo=None):
+    """Le righe «- TICKER — cosa si rimanda» sotto il titoletto «Rimandate di proposito». None = sezione
+    delle decisioni assente, che si legge diverso da 'nessuna rimandata' (v406)."""
+    return _lista_sotto(testo, "**Rimandate di proposito**")
+
+
+def leggi_esami(testo=None):
+    """v484 — le righe «- TICKER — conti del AAAA-MM-GG · tenere se … · mediare se … · vendere se …» sotto
+    il titoletto «Esami dei conflitti» (decisione del CEO del 14/10/2026: ogni CONFLITTO si decide ai conti
+    successivi, con l'esame scritto prima). Un esame senza la data dei conti si legge lo stesso, e la resa
+    non lo confronta con l'uscita. None = sezione delle decisioni assente (v406)."""
+    rr = _lista_sotto(testo, "**Esami dei conflitti**")
+    for r in rr or []:
+        m = re.search(r"conti del (\d{4}-\d{2}-\d{2})", r["testo"])
+        r["conti"] = m.group(1) if m else None
+    return rr
 
 
 def righe_rimandate(rr, calendario, finestra=45):
@@ -1118,6 +1159,8 @@ def righe_tenuta(t):
             fuori.append(f"in perdita sul carico: minusvalenza ~{_it(fi['minus'], 0)} $, utile solo se ci sono "
                          "plusvalenze da compensare (il sistema non lo sa)")
         L.append(f"      fuori dal bilancio: {' · '.join(fuori)}")
+        if r["esito"] == CONFLITTO:
+            L.append("      " + testo_scadenza(r, t.get("oggi"), t.get("finestra")))
         m = r.get("media")
         if m and m.get("errore"):
             L.append(f"      media: non calcolabile — {m['errore']}")
@@ -1171,7 +1214,8 @@ def righe_tenuta(t):
     conf = [r["tk"] for r in t["righe"] if r["esito"] == CONFLITTO]
     if conf:
         L.append(f"  {CONFLITTO}: {', '.join(conf)} — prezzo e bilancio dicono cose opposte: la lettura la fanno le "
-                 "notizie, nei due versi, e la decisione è del CEO")
+                 "notizie, nei due versi, e la decisione è del CEO · ciascuno si decide ai propri conti, con l'esame "
+                 f"scritto prima e mandato al CEO {GIORNI_ESAME} giorni prima (LIBRO.md §1sexies)")
     senza = [f"{r['tk']} ({r['esito']})" for r in t["righe"] if r["vendita_aperta"] and r["esito"] != "VENDITA PER EVIDENZA"]
     if senza:
         L.append(f"  ⚠ vendita APERTA che la regola non sostiene da sola: {', '.join(senza)} — la premessa va ridiscussa "
@@ -1381,6 +1425,263 @@ def righe_registro(reg):
     return L
 
 
+# ════════════════════════════════════════════════════════════════ v484 — PIANO DI RIDUZIONE E SALVAVITA
+# Decisioni del CEO del 14/10/2026, sera, alle domande sulle logiche della tenuta (LIBRO.md §1ter, §1sexies):
+#  1 «tra b e c» — il gradino dell'arancione (e del rosso) toglie un terzo dei semiconduttori IN PROPORZIONE
+#    AL RISCHIO di ciascuno: una via di mezzo fra il togliere solo MU e AMD e il togliere un terzo di ciascuno.
+#    Chi porta piu' rischio di quanto pesa si taglia di piu' di un terzo, chi ne porta meno (oggi NVDA) di
+#    meno. Si vende, non ci si copre: il CEO non opera con opzioni o ETF short, per ora.
+#  2a — il SALVAVITA: a -30% dal massimo dell'azionario, sul rendimento ponderato per il tempo del registro
+#    (vendite, acquisti e depositi non lo falsano), lo stesso gradino, qualunque sia il colore del semaforo.
+#  3a — ogni CONFLITTO si decide ai conti successivi, con un ESAME scritto prima e mandato al CEO 7 giorni
+#    prima (righe «Esami dei conflitti» di LIBRO.md §1quinquies).
+#  4b — il rallentamento della crescita NON e' una prova: proposta respinta, nessun codice.
+# Il piano si calcola PRIMA (§1ter: "si decidono PRIMA i segnali e la reazione, poi si esegue senza
+# ridiscuterla"): il 14/10 SMH stava l'1,4% sopra la propria media a 50 col credito gia' acceso, cioe' a
+# una seduta normale dall'arancione. E' la regola del CEO applicata, non una raccomandazione (v439).
+QUOTA_GRADINO = 1 / 3        # «circa un terzo» (arancione), «un altro terzo» (rosso): LIBRO.md §1ter
+SOGLIA_SALVAVITA = -0.30     # convenzione scelta col CEO il 14/10 (v240): un gate la rilegge dal libro
+GIORNI_ESAME = 7             # l'esame di un conflitto si manda al CEO la settimana prima dei conti
+
+
+def semiconduttori_libro(testo=None):
+    """L'elenco di LIBRO.md §1ter, riga «**I semiconduttori del libro** (…): MU, NVDA, …». Il settore non
+    e' nei dati (la pipeline mette RGTI fra i semiconduttori e SK hynix no, v473): lo dichiara il libro, e
+    chi ne resta fuori si NOMINA a ogni analisi (v406). None = riga non trovata, che si dichiara."""
+    if testo is None:
+        testo = testo_libro()
+    i = testo.find("## 1ter")
+    if i < 0:
+        return None
+    j = testo.find("\n## ", i + 1)
+    for riga in testo[i:j if j > 0 else len(testo)].splitlines():
+        if riga.startswith("**I semiconduttori del libro**") and "):" in riga:
+            nomi = [x.strip() for x in riga.split("):", 1)[1].split(".")[0].split(",")]
+            return [x for x in nomi if re.fullmatch(r"[A-Z][A-Z0-9\-]*", x)]
+    return None
+
+
+def piano_riduzione(semi, val, qty, px, pmc, mcr, R=None, nomi_R=None, quota=QUOTA_GRADINO):
+    """Il gradino dell'arancione e del salvavita: `quota` dei semiconduttori del libro ripartita IN
+    PROPORZIONE AL RISCHIO (contributo di Euler, `mcr`). La frazione venduta di un nome e' quota x (sua parte
+    del rischio) / (sua parte del valore), fra i semiconduttori di cui il rischio si misura: oltre la quota
+    per chi porta piu' rischio di quanto pesa, sotto per chi ne porta meno. Un nome fuori matrice si taglia
+    per PESO, dichiarato; un contributo nullo o negativo non si vende (toglierlo non toglie rischio). Mai
+    oltre la posizione: l'eccedenza si ripartisce sugli altri, e quella che non trova posto si dichiara.
+    Azioni intere, le piu' vicine. R, nomi_R: rendimenti log giornalieri (sedute x nomi) per il rischio in
+    dollari prima e dopo; None = non calcolato, e la resa lo dice."""
+    import conseguenze
+    if semi is None:
+        return {"errore": "elenco dei semiconduttori NON trovato in LIBRO.md §1ter"}
+    presenti = [t for t in semi if (val.get(t) or 0) > 0]
+    out = {"presenti": presenti, "fuori_elenco": [t for t in semi if t not in presenti],
+           "fuori_piano": [t for t in val if t not in semi], "quota": quota,
+           "totale": sum(val[t] for t in presenti), "libro": sum(val.values())}
+    out["obiettivo"] = out["totale"] * quota
+    misurati = [t for t in presenti if mcr.get(t) is not None]
+    vend = {t: (0.0 if t in misurati else val[t] * quota) for t in presenti}
+    attivi = [t for t in misurati if mcr[t] > 0]
+    resto = quota * sum(val[t] for t in misurati)
+    while attivi and resto > 1e-6:
+        s = sum(mcr[t] for t in attivi)
+        parti = {t: resto * mcr[t] / s for t in attivi}
+        pieni = [t for t in attivi if parti[t] >= val[t] - vend[t] - 1e-9]
+        if not pieni:
+            for t in attivi:
+                vend[t] += parti[t]
+            resto = 0.0
+            break
+        for t in pieni:
+            resto -= val[t] - vend[t]
+            vend[t] = val[t]
+            attivi.remove(t)
+    out["non_ripartito"] = resto if resto > 1e-6 else 0.0
+    righe = []
+    for t in presenti:
+        n = qty[t] if vend[t] >= val[t] - 1e-6 else min(qty[t], int(round(vend[t] / px[t])))
+        guad = n * (px[t] - pmc[t]) if pmc.get(t) is not None else None
+        righe.append({"tk": t, "mcr": mcr.get(t), "peso": val[t] / out["libro"], "teorico": vend[t], "azioni": n,
+                      "venduto": n * px[t], "frazione": n / qty[t] if qty[t] else None,
+                      "per_peso": t not in misurati, "nullo": t in misurati and mcr[t] <= 0,
+                      "imposta": conseguenze.ALIQUOTA * guad if guad is not None and guad > 0 else 0.0,
+                      "minus": -guad if guad is not None and guad < 0 else 0.0})
+    out["righe"] = righe
+    out["venduto"] = sum(r["venduto"] for r in righe)
+    out["imposta"] = sum(r["imposta"] for r in righe)
+    out["minus"] = sum(r["minus"] for r in righe)
+    out["peso_semi_prima"] = out["totale"] / out["libro"] if out["libro"] else None
+    out["peso_semi_dopo"] = ((out["totale"] - out["venduto"]) / (out["libro"] - out["venduto"])
+                             if out["libro"] > out["venduto"] else None)
+    out["rischio"] = None
+    if R is not None and nomi_R:
+        C = np.atleast_2d(np.cov(np.asarray(R, float), rowvar=False)) * 252
+        venduto = {r["tk"]: r["venduto"] for r in righe}
+        v0 = np.array([val.get(t, 0.0) for t in nomi_R])
+        v1 = np.array([val.get(t, 0.0) - venduto.get(t, 0.0) for t in nomi_R])
+        out["rischio"] = {"prima": math.sqrt(float(v0 @ C @ v0)), "dopo": math.sqrt(float(v1 @ C @ v1)),
+                          "fuori": [t for t in val if t not in nomi_R]}
+    return out
+
+
+def righe_piano(p, colore=None, salv=None):
+    """Il piano in parole. Da eseguire solo con l'arancione (o il rosso, per il terzo successivo) o col
+    salvavita scattato: negli altri colori si stampa perche' la reazione si decide prima (§1ter)."""
+    if not p:
+        return []
+    if p.get("errore"):
+        return [f"PIANO DI RIDUZIONE: NON calcolato — {p['errore']}"]
+    pc = lambda x, d=1: "n.d." if x is None else _it(x * 100, d)
+    attivo = colore in ("arancione", "rosso") or bool((salv or {}).get("scattato_il"))
+    L = [("⚠⚠ " if attivo else "") + "PIANO DI RIDUZIONE — il gradino dell'arancione e del salvavita, calcolato prima "
+         "(LIBRO.md §1ter, decisione del CEO del 14/10/2026: un terzo dei semiconduttori, in proporzione al rischio di "
+         f"ciascuno) · semaforo {colore or 'n.d.'}"
+         + (" · DA ESEGUIRE: la sua condizione è accesa" if attivo else
+            " · si esegue SOLO con l'arancione o col salvavita scattato")]
+    if not p["presenti"]:
+        L.append("  nessun semiconduttore dell'elenco di LIBRO.md §1ter è in portafoglio: il gradino non ha niente da togliere")
+    else:
+        L.append(f"  semiconduttori del libro (elenco di LIBRO.md §1ter): {', '.join(p['presenti'])} = {_it(p['totale'], 0)} $ "
+                 f"({pc(p['peso_semi_prima'])}% dell'azionario) · un terzo = {_it(p['obiettivo'], 0)} $")
+        for r in sorted(p["righe"], key=lambda x: -x["venduto"]):
+            if r["per_peso"]:
+                perche = "fuori matrice: il suo rischio non si misura, si taglia per PESO"
+            elif r["nullo"]:
+                perche = f"contributo al rischio {pc(r['mcr'])}%: toglierlo non toglie rischio, non si vende"
+            else:
+                perche = f"rischio {pc(r['mcr'])}% del libro su un peso del {pc(r['peso'])}%"
+            fisco = (f"imposta ~{_it(r['imposta'], 0)} $" if r["imposta"] else
+                     f"minusvalenza ~{_it(r['minus'], 0)} $" if r["minus"] else "nessuna imposta")
+            L.append(f"  {r['tk']:5} vendere {r['azioni']} azioni = {_it(r['venduto'], 0)} $ "
+                     f"({pc(r['frazione'], 0)}% della posizione) · {perche} · {fisco}")
+        rs = p.get("rischio")
+        tot = (f"  totale {_it(p['venduto'], 0)} $ · imposta ~{_it(p['imposta'], 0)} $"
+               + (f" · minusvalenze ~{_it(p['minus'], 0)} $" if p["minus"] else "")
+               + (f" · i semiconduttori passano dal {pc(p['peso_semi_prima'])}% al {pc(p['peso_semi_dopo'])}% "
+                  "dell'azionario" if p.get("peso_semi_dopo") is not None else ""))
+        if rs and rs["prima"]:
+            tot += (f" · rischio del libro in dollari (una deviazione standard annua) da {_it(rs['prima'], 0)} $ a "
+                    f"{_it(rs['dopo'], 0)} $ ({_sg((rs['dopo'] / rs['prima'] - 1) * 100)}%)"
+                    + (f", senza {', '.join(rs['fuori'])} che è fuori matrice" if rs["fuori"] else ""))
+        else:
+            tot += " · rischio prima e dopo n.d."
+        L.append(tot)
+        if p.get("non_ripartito"):
+            L.append(f"  ⚠ {_it(p['non_ripartito'], 0)} $ del gradino non trovano posto: i nomi che possono venderli sono "
+                     "già venduti per intero, o il loro contributo al rischio è nullo — il gradino resta incompleto, e lo si dice")
+    if p["fuori_piano"]:
+        L.append(f"  fuori dal piano (non nell'elenco dei semiconduttori): {', '.join(p['fuori_piano'])} — se uno di loro "
+                 "è un semiconduttore, l'elenco va corretto in LIBRO.md §1ter")
+    if p["fuori_elenco"]:
+        L.append(f"  ⚠ nell'elenco dei semiconduttori ma non in portafoglio: {', '.join(p['fuori_elenco'])}")
+    L.append("  ⚠ è la regola del CEO applicata, non una raccomandazione · un terzo dei semiconduttori di OGGI: se il "
+             "gradino è già stato eseguito in questa discesa (annotato in §1quinquies), il prossimo è il rosso — un altro "
+             "terzo con lo stesso criterio · azioni intere, le più vicine · imposta in dollari al prezzo di oggi: il "
+             "conto vero lo fa il broker in euro col cambio di carico")
+    return L
+
+
+def salvavita(righe, provvisoria=None, soglia=SOGLIA_SALVAVITA):
+    """Il calo dell'azionario dal suo massimo sul rendimento ponderato per il tempo del registro: ogni
+    intervallo con le posizioni del suo INIZIO (intervallo(), la stessa funzione del confronto con QQQ, v161),
+    quindi vendite, acquisti e depositi non lo falsano. provvisoria = la riga della seduta conclusa non ancora
+    registrata (nuova_riga, non scritta). Scatta UNA volta per discesa — la data e' la prima seduta oltre la
+    soglia dopo l'ultimo massimo — e si riarma col massimo nuovo. Gli intervalli saltati si NOMINANO."""
+    rr = list(righe or [])
+    if provvisoria and (not rr or provvisoria["seduta"] > rr[-1]["seduta"]):
+        rr.append(provvisoria)
+    else:
+        provvisoria = None
+    if len(rr) < 2:
+        return {"stato": "non misurabile", "soglia": soglia,
+                "perche": "il registro della performance ha meno di due sedute: il calo si misura dalla seconda"}
+    liv = picco = 1.0
+    massimo, scattato, peggiore, n, saltati = rr[0]["seduta"], None, 0.0, 0, []
+    for a, b in zip(rr, rr[1:]):
+        r, perche = intervallo(a, b)
+        if r is None:
+            saltati.append(f"{a['seduta']}→{b['seduta']}: {perche}")
+            continue
+        liv *= 1 + r["libro"]
+        n += 1
+        if liv >= picco:
+            picco, massimo, scattato = liv, b["seduta"], None
+        calo = liv / picco - 1
+        peggiore = min(peggiore, calo)
+        if calo <= soglia and scattato is None:
+            scattato = b["seduta"]
+    if not n:
+        return {"stato": "non misurabile", "soglia": soglia, "saltati": saltati,
+                "perche": "nessun intervallo del registro ha tutti i prezzi"}
+    calo = liv / picco - 1
+    return {"stato": "misurato", "soglia": soglia, "dal": rr[0]["seduta"], "al": rr[-1]["seduta"], "intervalli": n,
+            "massimo": massimo, "calo": calo, "peggiore": peggiore, "scattato_il": scattato,
+            "ulteriore": (1 + soglia) / (1 + calo) - 1, "saltati": saltati, "provvisoria": provvisoria is not None}
+
+
+def righe_salvavita(s):
+    if not s:
+        return []
+    soglia = _it(s["soglia"] * 100, 0)
+    if s["stato"] != "misurato":
+        return [f"SALVAVITA (LIBRO.md §1ter, decisione del CEO del 14/10/2026: {soglia}% dal massimo dell'azionario) — "
+                f"NON MISURABILE: {s['perche']}"]
+    if s["scattato_il"]:
+        L = [f"⚠⚠ SALVAVITA SCATTATO il {s['scattato_il']}: l'azionario è {_sg(s['calo'] * 100, 2)}% dal massimo del "
+             f"{s['massimo']} (soglia {soglia}%) — la reazione è il gradino del blocco PIANO DI RIDUZIONE, qualunque sia "
+             "il colore del semaforo; se in questa discesa è già stato eseguito, vale il rosso (LIBRO.md §1ter) · va in "
+             "cima alla risposta, prima di tutto il resto"]
+    else:
+        L = [f"SALVAVITA (LIBRO.md §1ter, decisione del CEO del 14/10/2026) — azionario {_sg(s['calo'] * 100, 2)}% dal "
+             f"massimo del {s['massimo']} · scatta a {soglia}%, cioè con un altro {_sg(s['ulteriore'] * 100, 1)}% da qui · "
+             f"peggior calo dal {s['dal']}: {_sg(s['peggiore'] * 100, 2)}%"]
+    L.append(f"  misura: rendimento ponderato per il tempo del registro della performance, in dollari, dal {s['dal']} al "
+             f"{s['al']} ({_conta(s['intervalli'], 'intervallo', 'intervalli')}"
+             + (", l'ultimo fino alla chiusura non ancora registrata" if s["provvisoria"] else "")
+             + "): vendite, acquisti e depositi non lo falsano · il massimo si conta dalla prima riga del registro")
+    if s["saltati"]:
+        L.append(f"  ⚠ {_conta(len(s['saltati']), 'intervallo saltato', 'intervalli saltati')}: " + "; ".join(s["saltati"]))
+    return L
+
+
+def con_scadenze(t, scadenze, esami, finestra=None, adesso=None):
+    """Aggiunge a ogni riga della tenuta la prima trimestrale dichiarata dalla fonte e l'esame scritto in
+    LIBRO.md §1quinquies (decisione del CEO del 14/10/2026: ogni CONFLITTO si decide ai conti successivi, con
+    l'esame scritto prima). Separata da tenuta_posizioni: la tenuta pesa le prove, questa ne fissa la data."""
+    if not t or not t.get("righe"):
+        return t
+    per_tk = {e["tk"]: e for e in (esami or [])}
+    for r in t["righe"]:
+        r["scadenza"] = (scadenze or {}).get(r["tk"])
+        r["esame"] = per_tk.get(r["tk"])
+    t["finestra"] = finestra
+    t["oggi"] = (adesso or datetime.now(timezone.utc)).date().isoformat()
+    t["esami_letti"] = esami is not None
+    return t
+
+
+def testo_scadenza(r, oggi=None, finestra=None):
+    """La scadenza di un CONFLITTO: i conti successivi, con l'esame mandato al CEO 7 giorni prima. La data e'
+    quella dichiarata dalla fonte, mai proiettata (v396): se cambia, la scadenza si sposta con lei."""
+    pre = "scadenza (LIBRO.md §1sexies, decisione del CEO del 14/10/2026): "
+    if "scadenza" not in r:
+        return pre + "NON calcolata in questo giro"
+    es, sc = r.get("esame"), r.get("scadenza")
+    if es and es.get("conti") and oggi and es["conti"] <= oggi:
+        return pre + (f"conti del {es['conti']} USCITI — l'esame scritto (§1quinquies) si confronta coi risultati, e la "
+                      "decisione è del CEO")
+    if not sc:
+        return pre + (f"nessuna trimestrale dichiarata dalla fonte nei prossimi {finestra or 'n.d.'} giorni: il conflitto "
+                      "resta senza data, e lo si dice (non è 'nessuna uscita')"
+                      + (" · esame scritto (§1quinquies)" if es else ""))
+    s = pre + f"si decide coi conti del {sc['data']} ({sc['giorni']} g)"
+    if es:
+        return s + " · esame scritto (§1quinquies)"
+    if sc["giorni"] <= GIORNI_ESAME:
+        return s + f" · ⚠ esame DA SCRIVERE ORA e da mandare al CEO: i conti sono entro {GIORNI_ESAME} giorni"
+    dal = (datetime.fromisoformat(sc["data"]) - timedelta(days=GIORNI_ESAME)).date().isoformat()
+    return s + f" · esame da mandare al CEO dal {dal} (fra {sc['giorni'] - GIORNI_ESAME} g)"
+
+
 def sintesi(o):
     """Righe compatte per la chat: numeri, non frasi di giudizio."""
     r, b = o["rischio"], o["bench"]
@@ -1388,6 +1689,11 @@ def sintesi(o):
     # v474 — il semaforo per primo: e' la sezione 0 della risposta (FORMATO_ANALISI.md)
     L = (righe_semaforo(o["semaforo"], precedente_semaforo(o.get("registro"), o["semaforo"].get("seduta")), r["mcr"])
          if o.get("semaforo") else [])
+    # v484 — subito sotto il semaforo: il salvavita e il gradino di riduzione, decisi prima (LIBRO.md §1ter)
+    if o.get("salvavita"):
+        L.extend(righe_salvavita(o["salvavita"]))
+    if o.get("piano"):
+        L.extend(righe_piano(o["piano"], (o.get("semaforo") or {}).get("colore"), o.get("salvavita")))
     L += [f"Periodo {o['inizio']} -> {o['fine']} ({o['sedute']} sedute) · azionario {o['tot_usd']:,.0f} $",
          f"Libro {p(o['ret_libro'])} ({o['pnl_libro']:+,.0f} $) · QQQ {p(b['QQQ'])} · SMH {p(b['SMH'])} · SPY {p(b['SPY'])} · RSP {p(b['RSP'])}",
          f"21 sedute: libro {p(o['ret_21'],1)} · SMH {p(o['bench_21']['SMH'],1)} · QQQ {p(o['bench_21']['QQQ'],1)}"]

@@ -2865,6 +2865,175 @@ check("v483 il libro vero si legge: la sezione delle decisioni c'e', e ogni rima
       "delle decisioni non si fissa qui: lo decide il CEO)",
       _rr483_lib is not None and all(r["tk"].isupper() and len(r["testo"]) > 5 for r in _rr483_lib), str(_rr483_lib))
 
+
+# ============================ v484 — PIANO DI RIDUZIONE, SALVAVITA, SCADENZE DEI CONFLITTI ============================
+# Decisioni del CEO del 14/10/2026, sera: «1 tra b e c» (il gradino dell'arancione in proporzione al rischio), «2a»
+# (il salvavita a -30% dal massimo dell'azionario), «3a» (ogni CONFLITTO si decide ai conti, con l'esame scritto prima),
+# «4b» (il rallentamento della crescita non e' una prova: nessun codice). Lo stato si COSTRUISCE: libro, rischio e
+# registro di oggi cambiano, e un gate che leggesse i dati del giorno sarebbe verde per il caso (v429). Le proprieta'
+# sono quelle che una formula sbagliata non soddisfa per caso (v326): somma, proporzionalita', tetto, verso dell'imposta.
+import copy as _cp484
+
+# --- l'elenco dei semiconduttori si legge dal libro; senza la riga e' None, che si dichiara (v406) ---
+_semi484 = NL.semiconduttori_libro(_lib474)
+check("v484 l'elenco dei semiconduttori si legge da LIBRO.md §1ter (riga in grassetto, nomi dopo i due punti); senza la "
+      "riga e' None, non una lista vuota; la riga sta dentro §1ter e non altrove",
+      bool(_semi484) and all(re.fullmatch(r"[A-Z][A-Z0-9\-]*", t) for t in _semi484)
+      and NL.semiconduttori_libro("## 1ter. X\n**I semiconduttori del libro** (a, b): MU, NVDA. Altro.\n## 2. Y\n") == ["MU", "NVDA"]
+      and NL.semiconduttori_libro("## 1ter. X\nniente\n## 2. Y\n**I semiconduttori del libro** (a): MU.\n") is None,
+      str(_semi484))
+
+# --- il piano: un terzo, in proporzione al rischio; fuori matrice per peso; mai oltre la posizione ---
+_val484 = {"AAA": 600.0, "BBB": 300.0, "CCC": 100.0, "DDD": 50.0, "FUO": 400.0}
+_qty484 = {"AAA": 60, "BBB": 30, "CCC": 10, "DDD": 5, "FUO": 40}
+_px484 = {k: 10.0 for k in _val484}
+_pmc484 = {"AAA": 5.0, "BBB": 12.0, "CCC": 2.0, "DDD": 10.0, "FUO": 1.0}
+_mcr484 = {"AAA": 0.50, "BBB": 0.20, "CCC": 0.05, "FUO": 0.25}            # DDD fuori matrice: senza misura
+_p484 = NL.piano_riduzione(["AAA", "BBB", "CCC", "DDD"], _val484, _qty484, _px484, _pmc484, _mcr484)
+_r484 = {r["tk"]: r for r in _p484["righe"]}
+_quota_ok = abs(sum(r["teorico"] for r in _p484["righe"]) - (600 + 300 + 100 + 50) / 3) < 1e-6
+_prop_ok = all(abs(_r484[t]["teorico"] / _mcr484[t] - _r484["AAA"]["teorico"] / _mcr484["AAA"]) < 1e-6 for t in ("BBB", "CCC"))
+check("v484 piano: il gradino vale UN TERZO dei semiconduttori presenti; fra quelli misurati si ripartisce in PROPORZIONE "
+      "AL RISCHIO (venduto/contributo costante); chi e' fuori matrice si taglia per PESO; chi non e' nell'elenco resta fuori "
+      "e si nomina",
+      _quota_ok and _prop_ok and _r484["DDD"]["per_peso"] and abs(_r484["DDD"]["teorico"] - 50 / 3) < 1e-9
+      and _p484["fuori_piano"] == ["FUO"] and _p484["fuori_elenco"] == [],
+      str({t: round(r["teorico"], 3) for t, r in _r484.items()}))
+check("v484 piano «tra b e c»: chi porta piu' rischio di quanto pesa si taglia di PIU' di un terzo, chi ne porta meno di "
+      "MENO — fra i soli MU e AMD (b) e un terzo di ciascuno (c)",
+      _r484["AAA"]["teorico"] / _val484["AAA"] > 1 / 3 > _r484["BBB"]["teorico"] / _val484["BBB"]
+      and _r484["CCC"]["teorico"] / _val484["CCC"] < 1 / 3,
+      str({t: round(r["teorico"] / _val484[t], 3) for t, r in _r484.items()}))
+check("v484 piano: azioni INTERE, le piu' vicine; l'imposta solo sulla plusvalenza delle azioni vendute (aliquota di "
+      "conseguenze.py), una posizione in perdita porta la minusvalenza e nessuna imposta",
+      _r484["AAA"]["azioni"] == 22 and _r484["BBB"]["azioni"] == 9 and _r484["CCC"]["azioni"] == 2
+      and abs(_r484["AAA"]["imposta"] - _C.ALIQUOTA * 22 * 5) < 1e-9 and _r484["BBB"]["imposta"] == 0
+      and abs(_r484["BBB"]["minus"] - 18) < 1e-9 and abs(_p484["venduto"] - sum(r["azioni"] * 10 for r in _p484["righe"])) < 1e-9,
+      str({t: (r["azioni"], round(r["imposta"], 2), r["minus"]) for t, r in _r484.items()}))
+_cap484 = NL.piano_riduzione(["XXX", "YYY"], {"XXX": 30.0, "YYY": 970.0}, {"XXX": 3, "YYY": 97},
+                              {"XXX": 10.0, "YYY": 10.0}, {"XXX": 1.0, "YYY": 1.0}, {"XXX": 0.9, "YYY": 0.1})
+_rc484 = {r["tk"]: r for r in _cap484["righe"]}
+_nul484 = NL.piano_riduzione(["P", "Z"], {"P": 100.0, "Z": 500.0}, {"P": 10, "Z": 50}, {"P": 10.0, "Z": 10.0},
+                             {"P": 1.0, "Z": 1.0}, {"P": 0.5, "Z": -0.1})
+check("v484 piano: un nome non si vende OLTRE la posizione e l'eccedenza va agli altri; un contributo al rischio nullo o "
+      "negativo non si vende; quello che non trova posto si DICHIARA, non sparisce",
+      _rc484["XXX"]["azioni"] == 3 and abs(_rc484["YYY"]["teorico"] - (1000 / 3 - 30)) < 1e-6 and not _cap484["non_ripartito"]
+      and _nul484["righe"][1]["nullo"] and _nul484["righe"][1]["azioni"] == 0
+      and abs(_nul484["non_ripartito"] - 100) < 1e-6
+      and "non trovano posto" in "\n".join(NL.righe_piano(_nul484, "arancione")),
+      str((_rc484, _nul484["non_ripartito"])))
+_rng484 = np.random.default_rng(484)
+_R484 = _rng484.normal(0, 0.02, (250, 2))
+_pr484 = NL.piano_riduzione(["A1", "A2"], {"A1": 700.0, "A2": 300.0}, {"A1": 70, "A2": 30}, {"A1": 10.0, "A2": 10.0},
+                            {"A1": 5.0, "A2": 5.0}, {"A1": 0.6, "A2": 0.4}, _R484, ["A1", "A2"])
+_C484 = np.cov(_R484, rowvar=False) * 252
+_v0 = np.array([700.0, 300.0])
+check("v484 piano: il rischio prima e' sqrt(v'Cv) annuo sulla stessa matrice (rifatto qui in modo indipendente), e dopo "
+      "la vendita e' minore; senza rendimenti il rischio e' n.d. e la resa lo dice",
+      abs(_pr484["rischio"]["prima"] - math.sqrt(_v0 @ _C484 @ _v0)) < 1e-9
+      and _pr484["rischio"]["dopo"] < _pr484["rischio"]["prima"] and _p484["rischio"] is None
+      and "rischio prima e dopo n.d." in "\n".join(NL.righe_piano(_p484, "giallo")))
+_rg484 = "\n".join(NL.righe_piano(_p484, "giallo"))
+_ra484 = "\n".join(NL.righe_piano(_p484, "arancione"))
+_rs484 = "\n".join(NL.righe_piano(_p484, "giallo", {"scattato_il": "2026-10-20"}))
+check("v484 resa del piano: in giallo si esegue SOLO con l'arancione o col salvavita; in arancione, o col salvavita "
+      "scattato, DA ESEGUIRE; nome per nome con azioni e imposta; chi e' fuori dal piano si nomina; non e' una "
+      "raccomandazione; senza elenco si dichiara",
+      "si esegue SOLO con l'arancione o col salvavita scattato" in _rg484 and "DA ESEGUIRE" not in _rg484
+      and "DA ESEGUIRE" in _ra484 and "DA ESEGUIRE" in _rs484 and "AAA   vendere 22 azioni" in _rg484
+      and "fuori dal piano (non nell'elenco dei semiconduttori): FUO" in _rg484 and "non una raccomandazione" in _rg484
+      and "NON calcolato" in NL.righe_piano(NL.piano_riduzione(None, {}, {}, {}, {}, {}))[0], _rg484)
+_rz484 = NL.reazioni_libro(_lib474)
+check("v484 il gradino del codice e' QUELLO del libro: un terzo in arancione, un altro terzo in rosso, in proporzione al "
+      "rischio (LIBRO.md §1ter, letto dal libro come le soglie del v474)",
+      abs(NL.QUOTA_GRADINO - 1 / 3) < 1e-12 and "un terzo" in _rz484.get("arancione", "")
+      and "in proporzione al rischio" in _rz484.get("arancione", "") and "un altro terzo" in _rz484.get("rosso", ""),
+      str(_rz484.get("arancione", ""))[:300])
+
+# --- il salvavita: sul rendimento ponderato per il tempo, le operazioni non lo falsano; una volta per discesa ---
+def _rg484f(seduta, pos, px):
+    return {"seduta": seduta, "posizioni": pos, "prezzi": px, "qqq": 100.0}
+_reg484 = [_rg484f("2026-10-01", {"A": 10}, {"A": 100.0}), _rg484f("2026-10-02", {"A": 10}, {"A": 110.0}),
+           _rg484f("2026-10-05", {"A": 5}, {"A": 110.0}), _rg484f("2026-10-06", {"A": 5}, {"A": 75.0}),
+           _rg484f("2026-10-07", {"A": 5}, {"A": 80.0}), _rg484f("2026-10-08", {"A": 5}, {"A": 120.0})]
+_sv3 = NL.salvavita(_reg484[:3])
+_sv5 = NL.salvavita(_reg484[:5])
+_sv6 = NL.salvavita(_reg484)
+check("v484 salvavita: la VENDITA di meta' delle azioni a prezzo fermo non e' un calo (rendimento ponderato per il "
+      "tempo, posizioni dell'inizio di ogni intervallo) e il massimo e' l'ULTIMA seduta al livello piu' alto; oltre -30% "
+      "dal massimo scatta, e la data e' la PRIMA seduta oltre",
+      _sv3["calo"] == 0 and _sv3["massimo"] == "2026-10-05" and _sv3["scattato_il"] is None
+      and _sv5["scattato_il"] == "2026-10-06" and abs(_sv5["calo"] - (80 / 110 - 1)) < 1e-9
+      and abs(_sv5["peggiore"] - (75 / 110 - 1)) < 1e-9,
+      str((_sv3, _sv5)))
+check("v484 salvavita: scatta UNA volta per discesa (risalire sopra la soglia senza un massimo nuovo non lo riarma) e si "
+      "riarma col massimo nuovo; meno di due sedute non si misura; un intervallo senza prezzi si salta e si nomina",
+      _sv5["scattato_il"] == "2026-10-06" and _sv6["scattato_il"] is None and _sv6["massimo"] == "2026-10-08"
+      and NL.salvavita(_reg484[:1])["stato"] == "non misurabile"
+      and NL.salvavita([_reg484[0], _rg484f("2026-10-02", {"A": 10}, {"A": None}), _reg484[2]])["saltati"]
+      and NL.salvavita(_reg484[:2], _rg484f("2026-10-02", {"A": 10}, {"A": 50.0}))["provvisoria"] is False
+      and NL.salvavita(_reg484[:2], _rg484f("2026-10-05", {"A": 10}, {"A": 50.0}))["scattato_il"] == "2026-10-05",
+      str(_sv6))
+_m484 = re.search(r"\*\*Soglia: [−-](\d+)%\*\*", _lib474)
+check("v484 la soglia del salvavita nel codice e' QUELLA di LIBRO.md §1ter, letta dal libro (v474: una regola in due "
+      "posti diverge)",
+      _m484 is not None and abs(-int(_m484.group(1)) / 100 - NL.SOGLIA_SALVAVITA) < 1e-9,
+      str(_m484.group(0) if _m484 else None))
+_rsv5 = "\n".join(NL.righe_salvavita(_sv5))
+_rsv3 = "\n".join(NL.righe_salvavita(_sv3))
+check("v484 resa del salvavita: scattato va in cima con la data, il massimo e il gradino da eseguire; altrimenti dice "
+      "quanto manca da qui; non misurabile si dichiara",
+      "SALVAVITA SCATTATO il 2026-10-06" in _rsv5 and "PIANO DI RIDUZIONE" in _rsv5 and "va in cima alla risposta" in _rsv5
+      and "scatta a -30%" in _rsv3 and "un altro -30" in _rsv3
+      and "NON MISURABILE" in NL.righe_salvavita(NL.salvavita([]))[0], _rsv5 + "\n" + _rsv3)
+
+# --- la scadenza dei conflitti e gli esami scritti prima ---
+_txt484 = (_tab474 + "\n**Rimandate di proposito**\n\n- CRWV — la media\n\n**Esami dei conflitti** (§1sexies)\n"
+           "spiegazione.\n\n- RGTI — conti del 2026-11-09 · tenere se X · vendere se Y\n- ZZZ — senza data\n\n(altro)\n"
+           "- MU — fuori dalla lista\n")
+_es484 = NL.leggi_esami(_txt484)
+check("v484 gli esami si leggono sotto il loro titoletto con la data dei conti, e finiscono alla riga vuota; rimandate ed "
+      "esami non si mescolano; sezione delle decisioni assente = None",
+      [e["tk"] for e in _es484] == ["RGTI", "ZZZ"] and _es484[0]["conti"] == "2026-11-09" and _es484[1]["conti"] is None
+      and [r["tk"] for r in NL.leggi_rimandate(_txt484)] == ["CRWV"] and NL.leggi_esami("## 1. X\n- RGTI — y\n") is None,
+      str(_es484))
+_c484 = lambda **kw: {"tk": "X", "esito": NL.CONFLITTO, **kw}
+_ts484 = NL.testo_scadenza
+check("v484 la scadenza di un CONFLITTO: i conti dichiarati dalla fonte con l'esame da mandare 7 giorni prima; entro 7 "
+      "giorni DA SCRIVERE ORA; esame scritto si dice; conti usciti si confrontano; senza data si dichiara (non 'nessuna "
+      "uscita'); non calcolata si dice",
+      "esame da mandare al CEO dal 2026-11-02 (fra 19 g)" in _ts484(_c484(scadenza={"data": "2026-11-09", "giorni": 26}, esame=None))
+      and "DA SCRIVERE ORA" in _ts484(_c484(scadenza={"data": "2026-10-20", "giorni": 6}, esame=None))
+      and "esame scritto" in _ts484(_c484(scadenza={"data": "2026-10-20", "giorni": 6}, esame={"conti": "2026-10-20"}), "2026-10-14")
+      and "USCITI" in _ts484(_c484(scadenza=None, esame={"conti": "2026-10-20"}), "2026-10-21")
+      and "nessuna trimestrale dichiarata dalla fonte nei prossimi 45 giorni" in _ts484(_c484(scadenza=None, esame=None), "2026-10-14", 45)
+      and "NON calcolata" in _ts484({"tk": "X", "esito": NL.CONFLITTO}))
+_tn484 = NL.con_scadenze(_cp484.deepcopy(_tn481), {"EEE": {"tk": "EEE", "data": "2026-11-09", "giorni": 26}}, [], 45, _ALLE17)
+_rtn484 = "\n".join(NL.righe_tenuta(_tn484))
+check("v484 resa: la scadenza esce sotto ogni CONFLITTO e sotto nessun altro esito; la riga di chiusura dice che ciascuno "
+      "si decide ai propri conti con l'esame scritto prima",
+      _rtn484.count("scadenza (LIBRO.md §1sexies") == sum(1 for r in _tn484["righe"] if r["esito"] == NL.CONFLITTO) == 1
+      and "si decide coi conti del 2026-11-09 (26 g)" in _rtn484 and "con l'esame scritto prima" in _rtn484, _rtn484[-700:])
+
+# --- collegamento (v399, v443): calcola produce piano, salvavita ed esami; la sintesi li STAMPA sotto il semaforo ---
+_o484 = {**_o483, "salvavita": _sv5, "piano": _p484, "semaforo": None}
+_sint484 = NL.sintesi(_o484)
+check("v484 collegamento: calcola produce il piano dall'elenco del libro, il salvavita dal registro e le scadenze dei "
+      "conflitti; la sintesi stampa salvavita e piano PRIMA del resto — provato eseguendola, non leggendo il sorgente (v234)",
+      'out["piano"] = piano_riduzione(semiconduttori_libro(), val, qty, px, pmc, ris["mcr"], R, lunghi)' in _calc474 and 'out["salvavita"] = salvavita(' in _calc474
+      and 'out["esami"] = leggi_esami()' in _calc474 and 'con_scadenze(out["tenuta"], scad, out["esami"]' in _calc474
+      and "SALVAVITA SCATTATO" in _sint484 and "PIANO DI RIDUZIONE" in _sint484
+      and _sint484.find("SALVAVITA") < _sint484.find("PIANO DI RIDUZIONE") < _sint484.find("Periodo "), _sint484[:500])
+_s0_484 = _fmt481[_fmt481.find("0. **Semaforo d'uscita**"):_fmt481.find("0bis.")]
+check("v484 il formato porta salvavita e piano nella sezione 0, la scadenza e l'esame dei conflitti nella sezione 6, e il "
+      "registro delle richieste le elenca (analisi.py stampa la checklist da qui)",
+      "SALVAVITA" in _s0_484 and "PIANO DI RIDUZIONE" in _s0_484 and "esame scritto prima" in _s6_481
+      and "salvavita" in _fmt481.split("Richieste del CEO rese strutturali")[1][:3500])
+_es484_lib = NL.leggi_esami(_lib474)
+check("v484 il libro vero si legge: la sezione delle decisioni c'e', e ogni esame ha un ticker (lo stato degli esami non "
+      "si fissa qui: lo decide il CEO, v481)",
+      _es484_lib is not None and all(e["tk"].isupper() for e in _es484_lib), str(_es484_lib))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

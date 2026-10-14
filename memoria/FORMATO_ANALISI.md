@@ -71,6 +71,13 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    regole in `memoria/LIBRO.md` §1ter. La guida sugli investimenti degli hyperscaler non è calcolata:
    va verificata in rete. Se il blocco dice COLORE CAMBIATO, va in cima alla risposta e prima di tutto
    il resto; se dice MINIMO, si nomina la famiglia che non si misura.
+   Da v484, subito sotto (decisioni del CEO del 14/10 sera): il **SALVAVITA** — il calo dell'azionario
+   dal suo massimo sul registro della performance, soglia −30%; se il blocco dice SCATTATO va in cima
+   alla risposta, come un colore cambiato — e il **PIANO DI RIDUZIONE**: il gradino dell'arancione e
+   del salvavita calcolato prima (un terzo dei semiconduttori in proporzione al rischio: azioni,
+   imposta, rischio prima e dopo). In verde e in giallo si scrive in una riga — quanto si venderebbe
+   e l'imposta —; in arancione, in rosso o col salvavita scattato per intero, nome per nome. Si vende,
+   non ci si copre: il CEO non opera con opzioni o ETF short, per ora.
 0bis. **Costo dell'attesa e scadenze** (decisione del CEO del 06/10, regole in `memoria/LIBRO.md`
    §1quater): il blocco `COSTO DELL'ATTESA` / `SCADENZE` di `numeri_libro.py`, e per ogni
    decisione aperta del piano la sua scadenza (prima trimestrale del nome) e i giorni che mancano.
@@ -116,6 +123,12 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Le decisioni già confermate stanno nel blocco DECISIONI APERTE (sezione 0bis); una VENDITA PER
    EVIDENZA senza decisione aperta si **propone** al CEO, la decisione è sua; una vendita aperta che
    la regola non sostiene da sola si ridiscute col CEO.
+   Ogni CONFLITTO porta la sua **scadenza** (v484, decisione del CEO del 14/10): si decide ai conti
+   successivi, con un **esame scritto prima** — cosa devono mostrare i conti per tenere, mediare o
+   vendere — mandato al CEO 7 giorni prima. Quando il blocco dice «esame DA SCRIVERE ORA», o la data
+   d'invio è arrivata, l'esame si scrive nella risposta; confermato dal CEO, va in `LIBRO.md`
+   §1quinquies («Esami dei conflitti»), e dopo i conti si confronta coi risultati. Il rallentamento
+   della crescita NON è una prova: proposta respinta dal CEO il 14/10.
    **Niente vendite a fascia di prezzo né alleggerimenti per peso**: il 14/10 sono stati tolti MU
    1.100-1.108, BE prima della trimestrale, AMD verso il 12-14% del libro e le prese di profitto del
    giallo. Gli avvisi di prezzo su Investing.com restano campanelli: un avviso non è una vendita, fa
@@ -158,7 +171,10 @@ nessun divieto ma conseguenze di rischio di ogni ingresso (09/10) · costo delle
 (09/10) · piano per la liquidità (09/10) · nessun tetto alle memorie (14/10) · tenuta delle posizioni:
 si lascia correre, si vende per evidenza, col pareggio fiscale, anche sui sorvegliati (14/10) ·
 ingressi speculativi ammessi e dichiarati (14/10) · bilancio dell'evidenza nei due versi, il rialzo
-possibile valutato, l'aritmetica della media sulle posizioni in perdita (14/10).
+possibile valutato, l'aritmetica della media sulle posizioni in perdita (14/10) · le decisioni
+rimandate di proposito, riportate con la loro scadenza (14/10) · la riduzione in arancione in
+proporzione al rischio, il salvavita a −30% dal massimo, la scadenza e l'esame di ogni conflitto
+(14/10 sera).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

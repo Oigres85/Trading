@@ -6887,3 +6887,53 @@ Il collegamento cercava la chiamata `righe_rimandate(` dentro `sintesi`: spegnen
 raggiunto non è una protezione* (v234) — e un gate che cerca la chiamata invece di eseguirla non lo
 vede. Ora costruisce un risultato minimo, **esegue** `sintesi` e cerca la riga stampata. Cinque
 iniezioni, mordono tutte, ripristino verificato per impronta.
+
+## 🧯 v484 — LA REAZIONE SI CALCOLA PRIMA: PIANO DI RIDUZIONE, SALVAVITA, SCADENZA DEI CONFLITTI
+
+Il CEO ha chiesto *"Condividi queste logiche? Se ritieni fammi domande"*. Il parere è stato **sì sul
+principio, con tre riserve misurate**, e la più urgente era un incastro: il credito era già acceso e
+SMH stava **l'1,4% sopra la propria media a 50**, cioè a una seduta normale dall'arancione — e
+l'arancione, letto alla lettera («partendo da chi pesa di più nel rischio»), voleva dire vendere
+**quasi tutta MU** (+988%) con circa 16.200 $ d'imposta. Misurato sui tre anni in cui FRED pubblica
+il CCC, l'arancione (credito + prezzo) si è acceso in tre episodi — agosto 2024, marzo 2025,
+marzo-aprile 2026 — e **tre mesi dopo SMH era più in alto tutte e tre le volte**; ma nei dati non
+c'è un vero mercato orso (il 2022 è fuori), quindi la misura non dice che il freno è inutile: dice
+che vendere costa caro quando l'allarme è falso. Risposte del CEO, testuali: *"1 tra B e c (a no,
+non opero per ora con questi strumenti). 2a 3a 4b"*.
+
+| decisione | cosa fa il sistema |
+|---|---|
+| **1 «tra b e c»** | il gradino dell'arancione e del rosso toglie un terzo dei semiconduttori **in proporzione al rischio** di ciascuno: fra «solo MU e AMD» (b) e «un terzo di ciascuno» (c). Niente coperture: il CEO non opera con opzioni o ETF short, per ora |
+| **2a** | **salvavita**: a −30% dal massimo dell'azionario lo stesso gradino, qualunque sia il colore |
+| **3a** | ogni CONFLITTO si decide **ai conti successivi**, con un **esame scritto prima** e mandato al CEO 7 giorni prima |
+| **4b** | il rallentamento della crescita **non** è una prova: proposta respinta, nessun codice |
+
+### Il piano si calcola prima, perché la reazione si decide prima
+§1ter lo dice da sempre: *"si decidono PRIMA i segnali e la reazione, poi si esegue senza
+ridiscuterla"*. Il blocco **PIANO DI RIDUZIONE** di `numeri_libro.py` stampa a ogni analisi azioni
+intere, imposta e rischio in dollari prima e dopo. La frazione venduta di un nome è quota × (sua
+parte del rischio) / (sua parte del valore): sul libro del 14/10 MU 44%, AMD 38%, NVDA 17% (che pesa
+il 22% e porta il 12% del rischio), MRVL 33% → ~69.200 $, imposta ~13.400 $, rischio −27,9% — fra
+il −25,2% di (c) e il −31,4% di (b), come deve.
+⚠ **Il settore non è nei dati** (la pipeline mette RGTI fra i semiconduttori e SK hynix no, v473):
+l'elenco sta in LIBRO.md §1ter, e chi ne resta fuori si **nomina** a ogni analisi.
+⚠ Un nome fuori matrice (SKHY, 66 sedute) si taglia **per peso**, dichiarato; un contributo nullo o
+negativo non si vende; mai oltre la posizione, e l'eccedenza che non trova posto si dichiara.
+
+### Il salvavita misura il portafoglio, non il mercato
+Sul **rendimento ponderato per il tempo** del registro, con `intervallo()` — la stessa funzione del
+confronto con QQQ (v161) — quindi una vendita non è un calo. Scatta una volta per discesa e si
+riarma al massimo nuovo; il massimo è l'**ultima** seduta al livello più alto. La soglia si
+**rilegge dal libro** (la regola v474 delle soglie).
+
+### Due sviste prese dagli strumenti
+- Il collegamento al piano verificava solo l'inizio della chiamata: togliendole il contributo al
+  rischio restava verde, e il piano sarebbe tornato per peso in silenzio. Ora pretende la chiamata
+  intera — `calcola` non gira offline, quindi qui il testo è l'unica prova possibile.
+- Un mio controllo pretendeva il massimo alla **prima** seduta al livello più alto; il codice lo
+  data all'ultima, che è la lettura giusta («si riarma quando torna al massimo»). Corretto il
+  controllo, non il codice: *un check rosso è prima di tutto una sonda da verificare* (v433).
+
+Tredici iniezioni, una alla volta, ripristino verificato per impronta: **mordono tutte**. Pavimento
+di `test_analisi_libro.py` 390 → 410 (i punti di chiamata sono 425). `?v=` e `BUILD_VERSION` non
+toccati: nessun file servito al browser (v440).
