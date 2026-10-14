@@ -2469,6 +2469,27 @@ check("v479 la liquidita' della pagina (portfolio_state.json) coincide con quell
       and abs(_liq_pagina479 - _liq_libro479) < 0.5,
       f"pagina {_liq_pagina479} contro LIBRO.md {_liq_libro479}")
 
+# ============================ v480 — LA WATCHLIST HA DUE COPIE, E DEVONO DIRE GLI STESSI NOMI ============================
+# config/ui_watchlist.json decide cosa SEGUE la pipeline (prezzi, target, revisioni, notizie);
+# memoria/LIBRO.md §1bis decide cosa LEGGONO gli strumenti dell'analisi (brief, rotazione). Un nome
+# scritto in una sola delle due e' seguito e mai letto, oppure letto senza target ne' revisioni — e
+# non si rompe niente: la classe v479, una seconda copia che invecchia da sola. I riferimenti si
+# riconoscono dalla FORMA del simbolo (v410), non da un elenco; il pavimento sui nomi trovati
+# impedisce che il check passi perche' il parser non ha letto niente (v196).
+import re as _re480
+_ui480 = _json.loads((_ROOT / "config" / "ui_watchlist.json").read_text(encoding="utf-8"))
+_pos480, _, _sorv480 = _b479.leggi_libro()
+_posiz480 = {p["tk"] for p in _pos480}
+_sv480 = {s["tk"] for s in _sorv480}
+_resto480 = {t for t in _ui480
+             if not _re480.search(r"(^\^|=[XF]$|-(USD|USDT|EUR)$)", t) and t not in _posiz480}
+check("v480 ogni sorvegliato di LIBRO.md e' seguito dalla pipeline, e la pipeline non segue nomi che il libro non dichiara",
+      len(_sv480) > 0 and _sv480 == _resto480,
+      f"solo in ui_watchlist.json: {sorted(_resto480 - _sv480)} · solo in LIBRO.md: {sorted(_sv480 - _resto480)}")
+check("v480 ogni posizione di LIBRO.md e' seguita dalla pipeline",
+      len(_posiz480) > 0 and _posiz480 <= set(_ui480),
+      f"posizioni non seguite: {sorted(_posiz480 - set(_ui480))}")
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

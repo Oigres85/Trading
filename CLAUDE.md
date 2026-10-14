@@ -6686,3 +6686,25 @@ fotografia del 06/10 in `LIBRO.md` §1quater resta com'era, come documento di qu
 nota che è superata.
 
 `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (regola v440).
+
+## 🏦 v480 — GOLDMAN SACHS E JPMORGAN IN WATCHLIST, E LE DUE COPIE DELLA WATCHLIST ORA DEVONO COINCIDERE
+
+Richiesta del CEO (14/10/2026): *"Aggiungi goldman sachs e jp Morgan alla watchlist"*. Entrano in
+`config/ui_watchlist.json` (quello che la pipeline segue: prezzi, target, revisioni, notizie) e in
+`memoria/LIBRO.md` §1bis (quello che leggono `brief.py` e `rotazione.py`), con i livelli del giorno
+calcolati da `rotazione.py` e la trimestrale del 13/10 verificata in rete: GS sopra le attese e
+titolo quasi fermo, correlazione col libro ~0,64 (stessa scommessa); JPM sotto le attese,
+correlazione ~0,25 (diversifica); fra loro ~0,6.
+
+⚠⚠ **Le due liste sono due copie della stessa dichiarazione**, e nessun gate le confrontava: un nome
+scritto in una sola è seguito e mai letto, oppure letto senza target né revisioni, e non si rompe
+niente — la classe v479. Oggi coincidevano (43 sorvegliati in entrambe), quindi il gate nasce su
+uno stato vero: ogni sorvegliato del libro è seguito dalla pipeline e viceversa, e ogni posizione è
+seguita. I riferimenti si riconoscono dalla **forma del simbolo** (v410), non da un elenco; un
+pavimento sui nomi letti impedisce il verde per assenza di dati (v196). Tre iniezioni (un nome nella
+sola pipeline, un nome tolto dal solo libro, una posizione non seguita): mordono tutte, ciascuna sul
+check giusto, ripristino verificato per hash. ⚠ `tests.yml` non scatta sui file di `config/`: se il
+CEO aggiunge un nome dalla pagina, il gate morde al commit successivo, che è quando si allinea il libro.
+
+⚠ Il costo in CI di due simboli in più si vede al primo run (classe v462, v468); `?v=` e
+`BUILD_VERSION` non toccati: nessun file servito al browser (regola v440).

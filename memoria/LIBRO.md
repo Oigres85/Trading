@@ -101,6 +101,8 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | DE | Deere — industriali (rotazione, CEO 07/10/2026). Settore in ribasso, DE in tendenza propria; supporto 644,06 |
 | DIS | Disney — comunicazioni (rotazione, CEO 07/10/2026). Appena sopra la SMA200; supporto 101,15 |
 | PFE | Pfizer — farmaceutico (CEO, 08/10/2026). Sopra la SMA50 e la SMA200, −5% dal massimo a 52 settimane; correlazione col libro ~−0,1: diversifica. Supporto 20 sedute 27,12, resistenza 28,95 |
+| GS | Goldman Sachs — banca d'investimento (CEO, 14/10/2026). Trimestrale del 13/10 sopra le attese (utile per azione 17,01 $ contro 12,86), ma il titolo ha chiuso quasi fermo (891,91, −0,2%) su volumi al massimo dell'anno. Sotto la SMA200 (~960) con la SMA50 in discesa; supporto 20 sedute 868,52. Correlazione col libro ~0,64: si muove con la stessa scommessa, non diversifica |
+| JPM | JPMorgan Chase — banca universale (CEO, 14/10/2026). Trimestrale del 13/10 sotto le attese (utile rettificato per azione 5,75 $ contro 5,93). Sotto la SMA50 (~349), sopra la SMA200 (~322); supporto 20 sedute 325,07. Correlazione col libro ~0,25: diversifica. Con GS ~0,6: in buona parte la stessa scommessa, uno dei due |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
