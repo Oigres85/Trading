@@ -22,7 +22,7 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 |---|---|---|---|---|
 | NVDA | 270 | **87,1667** | USD | ⚠ confermato dal CEO: `portfolio_state.json` diceva 81,167 ed era sbagliato |
 | MSTR | 173 | 173,3045 | USD | |
-| CRWV | 105 | 97,199 | USD | |
+| CRWV | 155 | 87,07 | USD | media del CEO del 14/10/2026: +50 azioni a ~65,80 $ (carico da 97,199 a 87,07) |
 | AMD | 100 | 153,916 | USD | |
 | PLTR | 100 | 113,50 | USD | |
 | MU | 70 | 87,63 | USD | |
@@ -32,9 +32,9 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | BE | 40 | 214,00 | USD | |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: ~56.800 €** — ~59.000 € fino al 14/10/2026, **meno la media su RGTI** del 14/10: 200 azioni
-per ~2.412 $ (663 × 22,147 − 463 × 26,5048), ≈ 2.170 € a EUR/USD 1,112, commissioni escluse —
-**da confermare** col saldo del broker. I ~59.000 € erano ~50.000 € dichiarati dal CEO il 01/10/2026 ("circa", dopo le uscite da
+**Liquidità: ~53.870 €** — ~59.000 € fino al 14/10/2026, **meno le due medie** del 14/10: RGTI 200 azioni
+per ~2.412 $ (663 × 22,147 − 463 × 26,5048) e CRWV 50 azioni per ~3.290 $ (155 × 87,07 − 105 × 97,199),
+~5.702 $ in tutto, ≈ 5.126 € a EUR/USD 1,1123, commissioni escluse — **da confermare** col saldo del broker. I ~59.000 € erano ~50.000 € dichiarati dal CEO il 01/10/2026 ("circa", dopo le uscite da
 GOOGL e WDC) **più l'incasso di ORCL del 05/10/2026**: 70 azioni vendute a **145,55 $** = 10.188,50 $
 (≈ 9.050 € a EUR/USD 1,1255; se restano in dollari sul conto, il controvalore in euro si muove col cambio).
 Plusvalenza ORCL: (145,55 − 143,00) × 70 = **+178,50 $**, imposta ~46 $ al 26% — il conto definitivo lo fa
@@ -234,7 +234,7 @@ nome su cui la decisione era ancora aperta.
    `FORMATO_ANALISI.md`) non dipendono da nessuna scadenza: rimandarli è l'unico pezzo dell'attesa
    che costa senza dare niente in cambio. ⚠ Dal 14/10/2026 un livello di prezzo su una posizione è
    un campanello che fa guardare la tenuta, non un'uscita (§1sexies): lo stop di RGTI è stato
-   revocato quel giorno dal CEO, e su CRWV la decisione aspetta i conti (§1quinquies).
+   revocato quel giorno dal CEO, e su CRWV il CEO ha mediato il 14/10 invece di aspettare i conti (§1quinquies).
 4. **Oltre la scadenza, aspettare è una scommessa binaria**: la trimestrale riprezza il nome in una
    seduta, spesso di più dell'oscillazione di una settimana intera. Una decisione ancora aperta il
    giorno prima della trimestrale va presa o dichiarata rimandata **di proposito**, non lasciata
@@ -283,13 +283,18 @@ proposta del 14/10 sconsigliava la media, perché è il nome dove una media spos
 22,147 (§1). La decisione è sua, e la scadenza resta quella del conflitto: i conti successivi.
 La mattina del 14/10 avevo scritto qui che la decisione reggeva anche con la regola: valeva per la
 prima versione (v481), che guardava solo le prove contro.
+⚠ **CRWV — 14/10/2026: il CEO ha mediato prima dei conti.** +50 azioni a ~65,80 $, 155 in tutto,
+carico da 97,20 a 87,07 (§1). La proposta del 14/10 era di aspettare i conti del 09/11: quel giorno le
+obbligazioni di CoreWeave rendevano intorno al 15% e il titolo perdeva il 16%, e il programma di
+vendita di 35 milioni di azioni annunciato a settembre può partire da metà ottobre. La decisione è
+sua: la rimandata è chiusa, e resta la scadenza del conflitto — i conti, con l'esame scritto prima.
 
 **Rimandate di proposito** (§1quater, regola 4: una decisione che aspetta un evento si dichiara,
 non si lascia scadere). Una riga per decisione nella forma «- TICKER — cosa si rimanda»;
 `numeri_libro.py` la riporta a ogni analisi con la prima trimestrale del nome dichiarata dalla
 fonte (v483). La riga esce quando la decisione si prende.
 
-- CRWV — la media: si rivaluta dopo la trimestrale, coi conti e il bilancio dell'evidenza di quel giorno (decisione del CEO del 14/10/2026: «per ora attendo i conti»)
+(nessuna: la media di CRWV, rimandata ai conti il 14/10, il CEO l'ha fatta lo stesso giorno — vedi sotto)
 
 **Esami dei conflitti** (§1sexies, decisione del CEO del 14/10/2026). Una riga per nome in
 CONFLITTO nella forma «- TICKER — conti del AAAA-MM-GG · tenere se … · mediare se … · vendere se …»,
