@@ -246,9 +246,13 @@ non è un problema: 393,7 milioni fra cassa e titoli a breve al 30/06, circa qua
 di quel semestre — il sistema contava i soli contanti (27,8 milioni), corretto in v476. Restano veri:
 perdita operativa in aumento (+41% sull'anno), valutazione circa 330 volte i ricavi, tendenza al
 ribasso. Le schede portano ora i ricavi per trimestre accanto all'esercizio chiuso (v476).
-⚠ **14/10/2026 — la decisione regge anche con la regola di tenuta (§1sexies)**: la tendenza è
-rotta (chiusura sotto la media a 200, media a 50 sotto la 200) e RGTI brucia cassa con la
-famiglia credito accesa. È evidenza, non prezzo.
+⚠ **14/10/2026 — con il bilancio dell'evidenza (§1sexies, v482) la decisione è da RIDISCUTERE col
+CEO.** Contro: tendenza rotta (chiusura sotto la media a 200, media a 50 sotto la 200), e RGTI
+brucia cassa con la famiglia credito accesa. A favore: ricavi del secondo trimestre quasi
+triplicati sull'anno prima, più rialzi che tagli delle stime a 30 giorni, liquidità per oltre
+cinque anni di perdita operativa. Esito: **CONFLITTO — DA VALUTARE**. La mattina del 14/10 avevo
+scritto qui che la decisione reggeva anche con la regola: valeva per la prima versione (v481),
+che guardava solo le prove contro. Lo Stato resta «aperta» finché il CEO non decide: la revoca è sua.
 
 `numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
 - il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non
@@ -261,7 +265,7 @@ famiglia credito accesa. È evidenza, non prezzo.
   e lo si dice.
 ⚠ È un conto a posteriori: misura il costo dell'attesa, non dice se aspettare fosse sbagliato.
 
-## 1sexies. TENUTA DELLE POSIZIONI — si lascia correre, si vende per EVIDENZA (decisione del CEO del 14/10/2026)
+## 1sexies. TENUTA DELLE POSIZIONI — si lascia correre, si vende per EVIDENZA, e si valuta l'insieme (decisioni del CEO del 14/10/2026)
 
 Istruzione del CEO, testuale: *"Se ci sono parametri tali, per cui in ottica di lungo periodo,
 lasciar correre mu può portare a ottimi rendimenti, tenendo conto anche dell'interesse composto
@@ -270,40 +274,81 @@ portano effettivamente alla necessità di una vendita. Procediamo quest'ottica d
 tutte le azioni in portafoglio e oggetto di analisi il fondo ricordiamocelo è privato e growth e
 se ci sono margini di speculazione, ben venga"*.
 
+E lo stesso giorno, dopo il primo giro della regola, testuale: *"Anche per crwv vale la stessa
+logica; bisogna valutare l'insieme dei fattori macro news bilanci etc e non solo analisi tecnica
+per capire effettivamente la tendenza futura possibile. Questo vale per tutti: se crwv si ha la
+possibilità che esploda a rialzo per x fattori allora valutalo. Vedi caso amd che avevo in
+perdita a 170 l'anno scorso ed oggi dove si trova. Media perché le avevo a 240."*
+
 **La regola.** Una posizione **non si vende** per il prezzo raggiunto, per la plusvalenza
-accumulata o per il peso nel libro: si vende quando **l'evidenza** lo chiede — la tendenza del
-titolo si è rotta **e** almeno un'altra famiglia lo conferma. Tolte quindi il 14/10 le vendite a
-fascia di prezzo e gli alleggerimenti per peso del piano precedente: MU nella fascia 1.100-1.108,
-BE nella fascia 295-302 prima della trimestrale, AMD verso il 12-14% del libro (§1quinquies).
-Restano le uscite che sono già evidenza: il semaforo (§1ter) e le decisioni nate da una tendenza
-rotta (RGTI).
+accumulata o per il peso nel libro: si vende quando **l'evidenza** lo chiede. E l'evidenza si
+legge **nei due versi**: le prove CONTRO la tenuta e le prove A FAVORE, con la stessa soglia. La
+prima versione (v481) cercava solo prove contro — una tendenza rotta più una conferma bastavano a
+proporre una vendita, e la crescita del bilancio non poteva opporsi: su CRWV proponeva di vendere
+una società con i ricavi raddoppiati. Tolte il 14/10 le vendite a fascia di prezzo e gli
+alleggerimenti per peso del piano precedente: MU nella fascia 1.100-1.108, BE nella fascia 295-302
+prima della trimestrale, AMD verso il 12-14% del libro (§1quinquies).
 
-**Le famiglie della tenuta**, per ogni nome. Le calcola `numeri_libro.py` (blocco «TENUTA DELLE
-POSIZIONI», v481), tranne le notizie. Le soglie sono **convenzioni scelte il 14/10/2026**, non
-dati del file (v240), e un gate verifica che quelle del codice siano quelle scritte qui.
+**Il bilancio dell'evidenza**, per ogni nome. Lo calcola `numeri_libro.py` (blocco «TENUTA DELLE
+POSIZIONI», v481-v482). Le soglie sono **convenzioni scelte il 14/10/2026**, non dati del file
+(v240), e un gate verifica che quelle del codice siano quelle scritte qui.
 
-| Famiglia | Accesa quando | Da dove |
-|---|---|---|
-| **Tendenza** (tecnica) | **ROTTA**: ultima chiusura conclusa sotto la media a **200** sedute **e** media a **50** sotto quella a 200 (l'«incrocio della morte» col prezzo sotto). **In correzione**: chiusura sotto una delle due medie senza la rottura — NON è un segnale di vendita. Con meno di 200 sedute concluse: non misurabile | barre di oggi (stockanalysis), chiusure concluse |
-| **Fondamentali** | più tagli che rialzi delle stime a 30 giorni (la stessa convenzione del semaforo) · OPPURE stima dell'EPS a 90 giorni scesa di oltre il **5%** del proprio valore (il verso dalla differenza, v400: su una perdita, la perdita che si allarga) · OPPURE ricavi dell'ultimo trimestre in calo sullo stesso trimestre dell'anno prima | `data.json` → `analisti`, `tv.conto_trim` |
-| **Macro** | semaforo del libro arancione o rosso · OPPURE il nome **brucia cassa** (flusso di cassa libero negativo) e la famiglia credito del semaforo è accesa: è il canale da cui una stretta arriva a quel nome (v404, v467) | semaforo, `data.json` → `combustione` (solo il segno) |
-| **Notizie** | un fatto che rompe la tesi: guida tagliata, cliente perso, diluizione pesante, indagine, frode | **NON calcolata**: ricerca web per i nomi in vendita o in osservazione, con fonte e data |
+| Prova | CONTRO la tenuta | A FAVORE | Da dove |
+|---|---|---|---|
+| **Tendenza** (tecnica) | **ROTTA**: ultima chiusura conclusa sotto la media a **200** sedute **e** media a **50** sotto quella a 200 (l'«incrocio della morte» col prezzo sotto) | **intatta**: chiusura sopra entrambe le medie | barre di oggi (stockanalysis), chiusure concluse |
+| **Stime** | stima dell'EPS a 90 giorni mossa di oltre il **5%** del proprio valore verso il basso (il verso dalla differenza, v400: su una perdita, la perdita che si allarga) | mossa di oltre il 5% verso l'alto | `data.json` → `analisti` |
+| **Revisioni** | più tagli che rialzi delle stime a 30 giorni (la convenzione del semaforo) | più rialzi che tagli | `data.json` → `analisti` |
+| **Ricavi** | ultimo trimestre in calo sullo stesso trimestre dell'anno prima | da **+25%** sull'anno prima: crescita | `data.json` → `tv.conto_trim`, trimestre trovato per data |
+| **Bilancio** | **corto**: brucia cassa e la liquidità copre meno di **12** mesi del denominatore che vincola (perdita operativa, perdita più dividendi sulle privilegiate, investimenti — sui soli impianti se gli investimenti sono acquisti di attività immateriali) | **solido**: si autofinanzia (flusso di cassa libero positivo), oppure brucia cassa con un'autonomia da **24** mesi in su | `data.json` → `combustione`, solo rapporti |
+| **Macro** | semaforo arancione o rosso · OPPURE il nome brucia cassa e la famiglia credito è accesa (v404, v467) | — (un quadro calmo è l'assenza di un rischio, non una prova di crescita) | semaforo, segno del flusso di cassa |
 
-**Gli esiti**, in ordine di urgenza:
-- **VENDITA PER EVIDENZA** — tendenza ROTTA **e** almeno una conferma (fondamentali, macro, o una
-  notizia verificata in rete). Il prezzo ha già girato, e qualcos'altro dice perché.
-- **IN OSSERVAZIONE** — una sola delle due metà: tendenza rotta senza conferma, oppure una
-  conferma accesa con la tendenza non rotta. Non si vende: si guarda.
-- **NON MISURABILE** — la tendenza non si misura (meno di 200 sedute concluse). Le famiglie si
-  riportano lo stesso.
-- **LASCIAR CORRERE** — nessuna delle due metà. Una correzione sotto la media a 50 resta qui.
+In mezzo restano la tendenza **in correzione** (chiusura sotto una sola delle due medie: non è
+una rottura), le stime mosse meno del 5%, i ricavi fra 0 e +25%, un'autonomia fra 12 e 24 mesi.
+Due prove dello stesso canale si dichiarano tali: macro e bilancio su chi brucia cassa sono il
+mercato dei capitali visto da due lati (B3); stime e revisioni sono la stessa famiglia su due
+orizzonti, e quando si contraddicono il disaccordo è un fatto.
 
-Una famiglia senza dati si dichiara **non misurabile**, mai spenta, e l'esito diventa un
-**minimo**: il dato mancante può alzarlo, mai abbassarlo. Una notizia che rompe la tesi porta un
-IN OSSERVAZIONE a VENDITA PER EVIDENZA: la scrive il modello con la fonte, lo script non la vede.
+**Fuori dal bilancio, accanto** — perché non si calcolano o non sono prove:
+- **le notizie** — NON calcolate: per ogni nome in vendita, in conflitto o in osservazione si
+  cercano in rete **nei due versi**, con fonte e data: i catalizzatori che possono farlo salire
+  forte (contratti, guida alzata, ordini, clienti nuovi) e i fatti che rompono la tesi (guida
+  tagliata, cliente perso, diluizione pesante, indagine). Un fatto che rompe la tesi porta un
+  conflitto o un'osservazione verso la vendita; un catalizzatore verificato porta un conflitto
+  verso il tenere, o il mediare;
+- **il consenso degli analisti** — il target come distanza dalla chiusura, con la sua forchetta:
+  è un'opinione, non una prova, e su un titolo che scende arriva tardi. Si legge accanto perché
+  il CEO chiede di valutare anche il rialzo possibile.
+
+**Gli esiti**, in ordine di urgenza. Conta **quali** prove ci sono, non quante: nessun punteggio
+(v200).
+- **VENDITA PER EVIDENZA** — tendenza ROTTA **e** almeno un'altra prova contro **e nessuna prova
+  di crescita a favore** (stime, revisioni, ricavi). L'evidenza va tutta da una parte.
+- **CONFLITTO — DA VALUTARE** — tendenza ROTTA, ma la crescita è a favore: il prezzo e il bilancio
+  dicono cose opposte. È il caso di AMD a 170 nel 2025. Lo script non decide: decidono le notizie,
+  cercate nei due versi, e il CEO. Per una posizione in perdita il blocco stampa l'aritmetica
+  della media (sotto).
+- **IN OSSERVAZIONE** — la tendenza rotta da sola, oppure una prova contro con la tendenza non
+  rotta. Non si vende: si guarda.
+- **NON MISURABILE** — nessuna prova si misura.
+- **LASCIAR CORRERE** — nessuna prova contro.
+
+Una prova senza dati si dichiara **non misurata**, mai neutra, e l'esito diventa **provvisorio**
+quando il dato mancante potrebbe cambiarlo: la riga nomina gli esiti possibili (era il «minimo»
+della v481, che guardava un verso solo).
 ⚠ L'esito è la regola applicata, non un ordine: una VENDITA PER EVIDENZA su un nome senza
 decisione aperta si **propone** al CEO, e diventa una decisione (§1quinquies) solo quando lui la
-prende.
+prende. Una vendita aperta su un nome che la regola non sostiene da sola si ridiscute col CEO.
+
+**La media — il caso di AMD.** Il CEO aveva AMD a 240, l'ha vista in perdita a 170 e ha mediato:
+il carico di §1 è il risultato di quella media, e il prezzo di oggi sta nel blocco. Mediare abbassa il
+carico e accorcia il rialzo che serve per tornare in pari, ma aggiunge rischio a un nome che sta
+scendendo: ha senso **se la tesi regge**, e la tesi la dicono le prove a favore e le notizie, non
+il prezzo. Per ogni posizione in perdita il blocco stampa cosa fa **un'unità di calcolo da
+5.000 €** (la stessa degli ingressi, `rotazione.py`): azioni intere, carico nuovo, rialzo per
+tornare al carico prima e dopo, peso, volatilità e beta del libro. **Non è una quantità**: dice
+cosa comporta, non se farlo. Su una VENDITA PER EVIDENZA mediare è comprare contro l'evidenza:
+speculativo, ammesso e dichiarato. Con una vendita aperta sullo stesso nome, mediare e vendere
+non stanno insieme: la decisione va presa prima.
 
 **L'interesse composto, misurato.** Vendere un vincitore paga **subito** l'imposta del **26%**
 sulla plusvalenza, che tenendo resta investita e continua a comporre. Per ogni posizione in
@@ -321,10 +366,12 @@ pesa di più nel rischio») è una **domanda aperta al CEO dal 14/10**: con ques
 partire da chi ha l'evidenza peggiore.
 
 **I nomi oggetto di analisi e la speculazione** (*"se ci sono margini di speculazione, ben
-venga"*). La stessa tenuta si calcola sui sorvegliati (`rotazione.py`, una riga per nome): dice
+venga"*). Lo stesso bilancio si calcola sui sorvegliati (`rotazione.py`, una riga per nome): dice
 cosa direbbe la regola se il nome fosse in portafoglio. Un ingresso dove direbbe VENDITA PER
 EVIDENZA è una scommessa **contro** l'evidenza: ammessa, dichiarata come speculativa, con lo stop
-del piano e le conseguenze sul libro. Dopo l'ingresso vale la stessa tenuta di tutte le posizioni.
+del piano e le conseguenze sul libro. Un ingresso su un CONFLITTO è il caso AMD visto da fuori:
+può essere un'occasione o una trappola, e lo dicono le notizie. Dopo l'ingresso vale la stessa
+tenuta di tutte le posizioni.
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

@@ -448,8 +448,7 @@ def raccogli():
               "nota": s.get("nota"), "trimestrale": prima_trim.get(s["tk"]),
               "trimestrale_yf": (pipe.get(s["tk"]) or {}).get("earnings_date"),
               "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe,
-              "tenuta": numeri_libro.valuta_tenuta(B.get(s["tk"]), pipe.get(s["tk"]),
-                                                   numeri_libro.fcf_di(pipe.get(s["tk"])), sem)}
+              "tenuta": numeri_libro.valuta_tenuta(B.get(s["tk"]), pipe.get(s["tk"]), sem)}
              for s in sorv]
     # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
     eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
@@ -628,11 +627,13 @@ def righe_ingresso(t, cal=None):
     return L
 
 
-LETTURA_INGRESSO = {   # v481 — l'esito della tenuta letto da chi NON possiede il nome
+LETTURA_INGRESSO = {   # v481-v482 — l'esito della tenuta letto da chi NON possiede il nome
     "VENDITA PER EVIDENZA": "un ingresso qui e' speculativo, CONTRO l'evidenza: ammesso, e si dichiara tale",
-    "IN OSSERVAZIONE": "meta' dell'evidenza e' contraria",
+    "CONFLITTO — DA VALUTARE": ("prezzo e crescita dicono cose opposte: e' il caso in cui un ingresso puo' essere "
+                                "un'occasione (AMD, LIBRO.md §1sexies) o una trappola — decidono le notizie, nei due versi"),
+    "IN OSSERVAZIONE": "una parte dell'evidenza e' contraria",
     "LASCIAR CORRERE": "nessuna evidenza contraria: se entra, si lascia correre",
-    "NON MISURABILE": "la tendenza non si misura ancora",
+    "NON MISURABILE": "nessuna prova si misura ancora",
 }
 
 
@@ -640,8 +641,8 @@ def riga_tenuta(v):
     """La regola di tenuta del CEO (LIBRO.md §1sexies) applicata a un sorvegliato: cosa direbbe se
     il nome fosse in portafoglio. La resa delle famiglie e' quella delle posizioni (una sola, v161)."""
     import numeri_libro
-    return (f"tenuta se fosse in portafoglio (LIBRO.md §1sexies): {v['esito']}" + (" (MINIMO)" if v.get("minimo") else "")
-            + f" — {LETTURA_INGRESSO[v['esito']]} · {numeri_libro.testo_famiglie(v)}")
+    return (f"tenuta se fosse in portafoglio (LIBRO.md §1sexies): {numeri_libro.etichetta_esito(v)}"
+            + f" — {LETTURA_INGRESSO[v['esito']]} · {numeri_libro.riga_prove(v)}")
 
 
 GRUPPI_WATCHLIST = (   # (titolo del gruppo, chiave, nome breve per il conteggio)
@@ -684,8 +685,8 @@ def righe_watchlist(o):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
     sem = o.get("semaforo") or {}
     if sem:
-        L.append("   tenuta (LIBRO.md §1sexies, decisione del CEO del 14/10): per ogni nome cosa direbbe la regola se fosse "
-                 "in portafoglio — si lascia correre, si vende per evidenza · semaforo "
+        L.append("   tenuta (LIBRO.md §1sexies, decisioni del CEO del 14/10): per ogni nome cosa direbbe la regola se fosse "
+                 "in portafoglio — il bilancio dell'evidenza, contro e a favore, non la sola tecnica · semaforo "
                  + f"{sem.get('colore') or 'n.d.'}{' (MINIMO)' if sem.get('minimo') else ''} sugli stessi dati di numeri_libro")
     if cal.get("errore") or cal.get("giorni_non_letti"):
         L.append("   ⚠ calendario delle trimestrali incompleto: una data mancante non vuol dire 'nessuna uscita'")

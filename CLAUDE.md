@@ -6784,3 +6784,71 @@ punti di chiamata sono 392). `?v=` e `BUILD_VERSION` non toccati: nessun file se
 perdita attesa ampliata del 28,4% a 90 giorni, brucia cassa col credito acceso) — proposta al CEO;
 RGTI la conferma; MSTR in osservazione (brucia cassa col credito acceso, tendenza intatta); MU,
 NVDA, AMD, PLTR, MRVL, BE da lasciar correre; SKHY non misurabile (66 sedute).
+
+## ⚖️ v482 — LA TENUTA GUARDAVA UN VERSO SOLO: ORA È UN BILANCIO DELL'EVIDENZA
+
+Istruzione del CEO (14/10/2026), testuale, dopo il primo giro della v481: *"Anche per crwv vale la
+stessa logica; bisogna valutare l'insieme dei fattori macro news bilanci etc e non solo analisi
+tecnica per capire effettivamente la tendenza futura possibile. Questo vale per tutti: se crwv si ha
+la possibilità che esploda a rialzo per x fattori allora valutalo. Vedi caso amd che avevo in
+perdita a 170 l'anno scorso ed oggi dove si trova. Media perché le avevo a 240."*
+
+La v481, scritta la mattina stessa, cercava **solo prove CONTRO**: tendenza rotta più una conferma
+facevano VENDITA PER EVIDENZA. Al primo giro proponeva di vendere CRWV — ricavi **+112%** sull'anno —
+e dava per confermata l'uscita da RGTI — ricavi **+185%**, liquidità per oltre cinque anni. La
+crescita non poteva opporsi perché il codice non la leggeva.
+
+> **Una regola che conta le prove in un verso solo non pesa l'evidenza: la seleziona.**
+
+Ora ogni misura sta CONTRO, A FAVORE o in mezzo, **con la stessa soglia nei due versi**: stime a 90
+giorni (±5%, il verso dalla differenza, v400), revisioni a 30 giorni, ricavi del trimestre (in calo
+contro, da +25% a favore), bilancio (sotto 12 mesi del denominatore che vincola contro;
+autofinanziato o da 24 mesi a favore), tendenza (rotta contro, intatta a favore), macro (solo
+contro: un quadro calmo è l'assenza di un rischio, non una prova di crescita). **Nessun punteggio**
+(v200): l'esito dipende da QUALI prove ci sono, non da quante.
+- **CONFLITTO — DA VALUTARE** (esito nuovo): tendenza rotta con la crescita a favore. Lo script non
+  decide: decidono le notizie, cercate **nei due versi** (catalizzatori al rialzo e fatti che rompono
+  la tesi), e il CEO.
+- **VENDITA PER EVIDENZA** solo con l'evidenza tutta da una parte: rotta, un'altra prova contro,
+  **nessuna** prova di crescita a favore.
+
+⚠ **Un bilancio solido da solo non apre un conflitto**: la cassa non fa una tesi. Solo stime,
+revisioni e ricavi possono opporsi a una tendenza rotta.
+⚠ **Il MINIMO della v481 guardava un verso solo** — l'esito poteva solo salire. Con prove nei due
+versi un dato mancante può muovere l'esito in entrambe le direzioni: ora è **PROVVISORIO** e la riga
+nomina i possibili, calcolati enumerando i completamenti. Un gate verifica che siano ESATTAMENTE gli
+esiti di ogni completamento, mai uno in meno (v474).
+⚠ **Il consenso degli analisti resta fuori dal bilancio** — è un'opinione, e su un titolo che scende
+arriva tardi — e si stampa come DISTANZA dalla chiusura: i valori stanno già nelle schede, e due rese
+dello stesso numero sono la classe v415.
+⚠ Su chi compra attività immateriali (MSTR) l'autonomia conta i soli impianti (v477): col capex
+totale sarebbero 1,4 mesi, cioè un bilancio «corto» falso.
+⚠ Due prove dello stesso canale si dichiarano: macro e bilancio su chi brucia cassa sono il mercato
+dei capitali visto da due lati (B3); stime e revisioni in versi opposti sono la stessa famiglia che
+si contraddice fra due orizzonti — su CRWV la perdita attesa si è allargata a 90 giorni e a 30
+prevalgono i rialzi.
+
+**La media, resa aritmetica (il caso AMD).** Per ogni posizione in perdita: un'unità di calcolo
+(`rotazione.UNITA_EUR`, conseguenze con `rotazione.conseguenze` — una derivazione sola), azioni
+intere, carico nuovo, rialzo per tornare al carico prima e dopo, peso, volatilità e beta del libro.
+Mai una quantità. Avverte se c'è una vendita aperta sullo stesso nome o la trimestrale entro 14
+giorni. `ritmo_dividendi` è stato estratto dalle schede per servire anche qui: uscita delle schede
+**identica al byte** (606 righe), misurato prima e dopo.
+
+**Il mio errore, scritto qui**: la mattina del 14/10 avevo registrato in LIBRO.md che la vendita di
+RGTI *«regge anche con la regola di tenuta»*. Valeva per una regola che guardava un verso solo. Ora
+RGTI è CONFLITTO, la decisione è da ridiscutere col CEO, e lo Stato resta «aperta»: la revoca è sua.
+
+**I gate.** I v481 provavano funzioni che non esistono più (`fondamentali_nome`, `esito_tenuta`) o il
+contratto vecchio: riscritti, non zittiti — a ciascuno è stato riagganciato l'invariante. Nuovi: le
+proprietà su **tutte le 486 combinazioni** (CONFLITTO ⇔ rotta ∧ crescita a favore; VENDITA ⇔ rotta
+∧ un'altra contro ∧ nessuna crescita; LASCIAR CORRERE ⇔ nessuna contro; peggiorare una prova non
+toglie mai una vendita), il provvisorio esatto, l'aritmetica della media (azioni intere, media
+ponderata, le funzioni degli ingressi), le soglie rilette dal libro. **18 iniezioni, mordono tutte
+sul controllo giusto**, ripristino verificato per impronta. Pavimento di `test_analisi_libro.py`
+375 → 390 (i punti di chiamata sono 403).
+
+**Sui dati del 14/10**: CRWV e RGTI **CONFLITTO**, MSTR in osservazione (brucia cassa col credito
+acceso, il resto a favore), SKHY da lasciar correre ma provvisorio (66 sedute: la tendenza non si
+misura), MU, NVDA, AMD, PLTR, MRVL e BE da lasciar correre. Fra i sorvegliati: ORCL e TSLA in
+conflitto, CCJ, MCD, NFLX, NKE e OKLO in vendita per evidenza (cioè: un ingresso lì sarebbe contro).

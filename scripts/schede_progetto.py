@@ -113,6 +113,17 @@ def liquidita_societa(c):
     return None, None, None
 
 
+def ritmo_dividendi(c):
+    """Quante volte l'ultimo trimestre di dividendi sulle privilegiate vale la media trimestrale dei 12
+    mesi, quando supera 1,1 (v477): sul ritmo recente l'autonomia e' piu' corta. None altrimenti. Una
+    lettura sola per le schede e per la tenuta di numeri_libro (v161, v482)."""
+    ttm, ult = (c or {}).get("dividendi_privilegiate_ttm"), (c or {}).get("dividendi_privilegiate_ultimo_trim")
+    if not ttm or ult is None:
+        return None
+    volte = ult / (ttm / 4)
+    return volte if volte > 1.1 else None
+
+
 def _mesi(m):
     return "oltre 5 anni" if m > MESI_CAP else f"{_n(m)} mesi"
 
@@ -235,12 +246,10 @@ def riga_cassa(r):
     if c.get("mesi_obblighi") is not None:
         # ⚠⚠ v477 — i dividendi sulle privilegiate stanno fuori dal flusso operativo
         ob = f"{_mesi(c['mesi_obblighi'])} di perdita operativa piu' dividendi sulle privilegiate"
-        ttm, ult = c.get("dividendi_privilegiate_ttm"), c.get("dividendi_privilegiate_ultimo_trim")
-        if ttm and ult is not None:
-            volte = ult / (ttm / 4)
-            if volte > 1.1:
-                ob += (f" (l'ultimo trimestre di dividendi vale {_n(volte)} volte la media trimestrale:"
-                       " sul ritmo recente i mesi sono meno)")
+        volte = ritmo_dividendi(c)
+        if volte is not None:
+            ob += (f" (l'ultimo trimestre di dividendi vale {_n(volte)} volte la media trimestrale:"
+                   " sul ritmo recente i mesi sono meno)")
         voci.append(ob)
     if voci and nome:
         pz.append(f"la {nome} ({det}) copre " + " · ".join(voci)

@@ -29,9 +29,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    §1ter), porta il **REGISTRO DELLA PERFORMANCE** contro QQQ (`--registra` scrive la riga della
    seduta conclusa, mai durante la seduta: lo passa il comando unico) e le **DECISIONI APERTE**
    (`LIBRO.md` §1quinquies) col costo dell'attesa dalla conferma. Da v481 (decisione del CEO del
-   14/10) chiude con la **TENUTA DELLE POSIZIONI** (`LIBRO.md` §1sexies): per ogni posizione
-   l'esito della regola «si lascia correre, si vende per evidenza», le famiglie accese e il
-   pareggio fiscale.
+   14/10) chiude con la **TENUTA DELLE POSIZIONI** (`LIBRO.md` §1sexies): da v482 un bilancio
+   dell'evidenza — per ogni posizione le prove CONTRO e A FAVORE (tendenza, stime, revisioni,
+   ricavi, bilancio, macro), l'esito, il consenso degli analisti come opinione accanto, il pareggio
+   fiscale e, per chi è in perdita, l'aritmetica della media.
 2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro, e (v470) le aste di
    note e bond del Tesoro USA dei prossimi 7 giorni con l'ora italiana e gli esiti recenti.
 3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
@@ -58,7 +59,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    `--tutti` dà la tabella completa. Per ogni settore con candidati la risposta
    aggiunge il CONTESTO MACRO del settore da ricerca web, con fonte e data.
    Da v481 ogni sorvegliato porta la riga **«tenuta se fosse in portafoglio»**: la stessa regola
-   delle posizioni (`LIBRO.md` §1sexies), letta da chi il nome non lo possiede.
+   delle posizioni (`LIBRO.md` §1sexies), letta da chi il nome non lo possiede — da v482 con le
+   prove nei due versi.
    Da v474 chiude col **PIANO PER LA LIQUIDITÀ**: la liquidità con la sua quota del patrimonio e,
    per ogni ingresso possibile (sorvegliati e candidati di settore), cosa fa al libro un'unità di
    5.000 € — volatilità, beta su QQQ, perdita allo stop — anche per chi è nella stessa scommessa.
@@ -95,15 +97,22 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    intera ne copre circa 78 (stesso denominatore: i due numeri si confrontano).
    Soglie macro decise prima (spread credito alto rendimento 3,5;
    Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
-6. **Tenuta e piano** (decisione del CEO del 14/10/2026, regola in `memoria/LIBRO.md` §1sexies:
-   *si lascia correre, si vende per EVIDENZA*) — dal blocco `TENUTA DELLE POSIZIONI` di
-   `numeri_libro.py`, per ogni posizione l'esito (VENDITA PER EVIDENZA · IN OSSERVAZIONE · NON
-   MISURABILE · LASCIAR CORRERE), le famiglie accese e il **pareggio fiscale** — di quanto deve
-   scendere il titolo perché vendere oggi convenga, cioè l'interesse composto misurato.
-   Le **notizie** non sono calcolate: per ogni nome in VENDITA o IN OSSERVAZIONE la ricerca web è
-   obbligatoria, e una notizia che rompe la tesi si scrive con fonte e data come conferma.
+6. **Tenuta e piano** (decisioni del CEO del 14/10/2026, regola in `memoria/LIBRO.md` §1sexies:
+   *si lascia correre, si vende per EVIDENZA, e si valuta l'insieme — non la sola tecnica*) — dal
+   blocco `TENUTA DELLE POSIZIONI` di `numeri_libro.py`, per ogni posizione l'esito (VENDITA PER
+   EVIDENZA · CONFLITTO — DA VALUTARE · IN OSSERVAZIONE · NON MISURABILE · LASCIAR CORRERE), le
+   prove CONTRO e A FAVORE, il consenso degli analisti (un'opinione, accanto), il **pareggio
+   fiscale** — di quanto deve scendere il titolo perché vendere oggi convenga, cioè l'interesse
+   composto misurato — e per le posizioni in perdita **l'aritmetica della media** su un'unità di
+   5.000 € (il caso di AMD: una possibilità da valutare, non una quantità).
+   Le **notizie** non sono calcolate: per ogni nome in VENDITA, CONFLITTO o OSSERVAZIONE la ricerca
+   web è obbligatoria e va fatta **nei due versi** — i catalizzatori che possono farlo salire forte
+   (contratti, guida alzata, ordini, clienti nuovi) e i fatti che rompono la tesi — con fonte e
+   data. Su un CONFLITTO la risposta scrive la lettura dell'insieme (tendenza futura possibile,
+   rialzo possibile e rischio) e la lascia decidere al CEO: tenere, mediare o uscire.
    Le decisioni già confermate stanno nel blocco DECISIONI APERTE (sezione 0bis); una VENDITA PER
-   EVIDENZA senza decisione aperta si **propone** al CEO, la decisione è sua.
+   EVIDENZA senza decisione aperta si **propone** al CEO, la decisione è sua; una vendita aperta che
+   la regola non sostiene da sola si ridiscute col CEO.
    **Niente vendite a fascia di prezzo né alleggerimenti per peso**: il 14/10 sono stati tolti MU
    1.100-1.108, BE prima della trimestrale, AMD verso il 12-14% del libro e le prese di profitto del
    giallo. Gli avvisi di prezzo su Investing.com restano campanelli: un avviso non è una vendita, fa
@@ -114,7 +123,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    rischio e chi è nella stessa scommessa del libro lo dichiara; in arancione e rosso prima la
    riduzione del gradino. **Gli ingressi speculativi sono ammessi** (CEO, 14/10: *"se ci sono
    margini di speculazione, ben venga"*): dove la riga «tenuta se fosse in portafoglio» dice
-   VENDITA PER EVIDENZA, l'ingresso è una scommessa contro l'evidenza e si dichiara tale.
+   VENDITA PER EVIDENZA, l'ingresso è una scommessa contro l'evidenza e si dichiara tale; dove dice
+   CONFLITTO, è il caso AMD visto da fuori e lo leggono le notizie, nei due versi.
    7a. i settori IN TENDENZA con bassa correlazione col libro (dove il denaro va senza replicare
        la nostra scommessa), col CONTESTO MACRO del settore da ricerca web, fonte e data;
    7b. per ciascuno i titoli CANDIDATI di `rotazione.py`, coi livelli, i volumi e le notizie;
@@ -144,7 +154,8 @@ riferimento QQQ e registro della performance (09/10) · semaforo calcolato (09/1
 nessun divieto ma conseguenze di rischio di ogni ingresso (09/10) · costo delle decisioni aperte
 (09/10) · piano per la liquidità (09/10) · nessun tetto alle memorie (14/10) · tenuta delle posizioni:
 si lascia correre, si vende per evidenza, col pareggio fiscale, anche sui sorvegliati (14/10) ·
-ingressi speculativi ammessi e dichiarati (14/10).
+ingressi speculativi ammessi e dichiarati (14/10) · bilancio dell'evidenza nei due versi, il rialzo
+possibile valutato, l'aritmetica della media sulle posizioni in perdita (14/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

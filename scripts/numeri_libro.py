@@ -161,16 +161,25 @@ def calcola(sedute=1, registra=False, adesso=None):
     pipe = _carica_pipeline()
     out["semaforo"] = semaforo(B["SMH"], {t: B.get(t) for t in LEADER}, segnali_pipeline(pipe), adesso)
     out["semaforo"]["reazioni"] = reazioni_libro(testo_libro())
-    # v481 — la tenuta di ogni posizione (LIBRO.md §1sexies): la stessa funzione dei sorvegliati
-    out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), _fcf, out["semaforo"], px, pmc, qty, w, adesso,
-                                     decisioni)
+    # v481-v482 — la tenuta di ogni posizione (LIBRO.md §1sexies): la stessa funzione dei sorvegliati, e
+    #   per le posizioni in perdita l'aritmetica della media con le funzioni degli ingressi (v161)
+    import rotazione
+    eur = {p["tk"]: p for p in pos if p["valuta"] == "EUR"}
+    pat_pipe = patrimonio_pipeline(pipe, {t: p["pmc"] for t, p in eur.items()})
+    prima_trim = {}
+    for a in out["calendario"].get("attesi") or []:
+        prima_trim.setdefault(a["tk"], a.get("giorni"))       # gli attesi arrivano gia' in ordine di data
+    media = {"fx": pat_pipe[0], "valore": tot, "trim": prima_trim,
+             "rlibro": rotazione.serie_libro({t: B[t] for t in TK if B.get(t)}, qty),
+             "rqqq": rotazione.rendimenti_per_data(B["QQQ"]),
+             "rend": {t: rotazione.rendimenti_per_data(B[t]) for t in TK if B.get(t)}}
+    out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
+                                     decisioni, media)
     out["decisioni"] = (None if decisioni is None else
                         costo_decisioni(decisioni, B, {t: (TEC.get(t) or {}).get("px") for t in aperte},
                                         out["calendario"], adesso))
-    eur = {p["tk"]: p for p in pos if p["valuta"] == "EUR"}
     out["registro"] = aggiorna_registro(B, {p["tk"]: p["qta"] for p in az}, {t: p["qta"] for t, p in eur.items()},
-                                        cassa_eur, patrimonio_pipeline(pipe, {t: p["pmc"] for t, p in eur.items()}),
-                                        out["semaforo"]["colore"], registra, adesso)
+                                        cassa_eur, pat_pipe, out["semaforo"]["colore"], registra, adesso)
     return out
 
 
@@ -683,15 +692,27 @@ def righe_decisioni(dd, finestra=45):
     return L
 
 
-# ════════════════════════════════════════════════════════════════ v481 — TENUTA DELLE POSIZIONI
-# Decisione del CEO del 14/10/2026 (LIBRO.md §1sexies): si lascia correre, si vende per EVIDENZA —
-# tendenza rotta E almeno una conferma fra fondamentali, macro e notizie. Le soglie sono convenzioni
-# scelte quel giorno (v240): stanno qui perche' il codice le confronta, e un gate le rilegge dal
-# libro (v474). Le notizie non sono calcolabili e la resa lo dice ogni volta. L'esito e' la regola
-# applicata, non un ordine: una VENDITA PER EVIDENZA senza decisione aperta si PROPONE al CEO.
+# ════════════════════════════════════════════════════════════════ v481-v482 — TENUTA DELLE POSIZIONI
+# v481 — decisione del CEO del 14/10/2026 (LIBRO.md §1sexies): si lascia correre, si vende per EVIDENZA.
+# v482 — lo stesso giorno, dopo il primo giro: "bisogna valutare l'insieme dei fattori macro news
+#   bilanci etc e non solo analisi tecnica … se si ha la possibilita' che esploda a rialzo per x
+#   fattori allora valutalo". Il v481 cercava solo prove CONTRO: una tendenza rotta piu' una conferma
+#   bastavano, e la crescita del bilancio non poteva opporsi. Ora e' un BILANCIO DELL'EVIDENZA: ogni
+#   misura sta CONTRO la tenuta, A FAVORE o in mezzo, con la stessa soglia nei due versi, e quando il
+#   prezzo e la crescita dicono cose opposte l'esito e' CONFLITTO — decidono le notizie e il giudizio,
+#   non lo script. Nessun punteggio (v200): conta QUALI prove ci sono, non quante. Le soglie sono
+#   convenzioni (v240): stanno qui perche' il codice le confronta, e un gate le rilegge dal libro
+#   (v474). Notizie e consenso degli analisti restano FUORI dal bilancio — le prime non si calcolano,
+#   il secondo e' un'opinione — e si riportano accanto, dichiarati per cio' che sono.
 MEDIA_LUNGA, MEDIA_BREVE = 200, 50
-SOGLIA_EPS_90 = 5.0        # stima dell'EPS a 90 giorni scesa di oltre il 5% del proprio valore assoluto
-ESITI = ("VENDITA PER EVIDENZA", "IN OSSERVAZIONE", "NON MISURABILE", "LASCIAR CORRERE")   # ordine di urgenza
+SOGLIA_EPS_90 = 5.0          # stima dell'EPS a 90 giorni mossa di oltre il 5% del proprio valore, nei due versi
+SOGLIA_RICAVI = 25.0         # ricavi del trimestre sull'anno prima: da +25% sono una prova di CRESCITA
+AUTONOMIA_CORTA, AUTONOMIA_SOLIDA = 12, 24     # mesi: sotto 12 il bilancio e' corto, da 24 e' solido
+CONFLITTO = "CONFLITTO — DA VALUTARE"
+ESITI = ("VENDITA PER EVIDENZA", CONFLITTO, "IN OSSERVAZIONE", "NON MISURABILE", "LASCIAR CORRERE")  # urgenza
+PROVE = ("tendenza", "stime", "revisioni", "ricavi", "bilancio", "macro")
+CRESCITA = ("stime", "revisioni", "ricavi")    # le sole prove a favore che possono opporsi a una tendenza rotta
+VERSI_POSSIBILI = {**{p: ("contro", "neutro", "favore") for p in PROVE}, "macro": ("contro", "neutro")}
 
 
 def tendenza(barre, adesso=None):
@@ -710,13 +731,13 @@ def tendenza(barre, adesso=None):
             "d200_atr": (c - m200) / atr if atr else None}
 
 
-def fondamentali_nome(riga):
-    """Tre sotto-regole (LIBRO.md §1sexies), accesa se ne scatta UNA: piu' tagli che rialzi a 30
-    giorni (la convenzione del semaforo, una sola: v161) · stima dell'EPS a 90 giorni scesa di oltre
-    il 5% del proprio valore assoluto, col verso dalla DIFFERENZA (v400: su una perdita, la perdita
-    che si allarga) · ricavi dell'ultimo trimestre in calo sullo stesso trimestre dell'anno prima,
-    trovato per DATA dalla stessa funzione delle schede (v161, v207). Spenta solo se tutte e tre si
-    misurano: una sotto-regola senza dati la rende NON MISURABILE (v406)."""
+def prove_fondamentali(riga):
+    """Tre prove dalla pipeline, ciascuna nei DUE versi con la stessa soglia (LIBRO.md §1sexies):
+    le STIME (EPS a 90 giorni; il verso dalla DIFFERENZA, v400: su una perdita, la perdita che si
+    allarga e' contro), le REVISIONI a 30 giorni (piu' tagli che rialzi contro, piu' rialzi a favore:
+    la convenzione del semaforo, una sola, v161) e i RICAVI dell'ultimo trimestre sullo stesso
+    trimestre dell'anno prima, trovato per DATA dalla funzione delle schede (v161, v207).
+    Senza dato il verso e' None, mai 'neutro' (v406)."""
     import schede_progetto
     a = (riga or {}).get("analisti") or {}
     su, giu = a.get("su_30g"), a.get("giu_30g")
@@ -724,20 +745,53 @@ def fondamentali_nome(riga):
     var = (ora - prima) / abs(prima) * 100 if (ora is not None and prima is not None and abs(prima) > 1e-9) else None
     q = schede_progetto.ultimo_trimestre(riga or {}) or {}
     yoy = q.get("yoy")
-    sotto = {"revisioni": None if su is None or giu is None else giu > su,
-             "eps": None if var is None else var < -SOGLIA_EPS_90,
-             "ricavi": None if yoy is None else yoy < 0}
-    stato = ("acceso" if any(sotto.values()) else
-             "spento" if all(v is not None for v in sotto.values()) else "non misurabile")
-    return {"stato": stato, "sotto": sotto, "su": su, "giu": giu, "eps_ora": ora, "eps_prima": prima,
-            "eps_var": var, "ricavi_yoy": yoy, "trim": q.get("trim")}
+    due = lambda x, giu_, su_: None if x is None else "contro" if giu_ else "favore" if su_ else "neutro"
+    return {"stime": {"verso": due(var, var is not None and var < -SOGLIA_EPS_90, var is not None and var > SOGLIA_EPS_90),
+                      "ora": ora, "prima": prima, "var": var},
+            "revisioni": {"verso": None if su is None or giu is None else due(0, giu > su, su > giu), "su": su, "giu": giu},
+            "ricavi": {"verso": due(yoy, yoy is not None and yoy < 0, yoy is not None and yoy >= SOGLIA_RICAVI),
+                       "yoy": yoy, "trim": q.get("trim")}}
+
+
+def prova_bilancio(riga):
+    """L'autonomia della societa' (LIBRO.md §1sexies). Chi ha flusso di cassa libero positivo si
+    autofinanzia: SOLIDO. Chi brucia cassa si misura sul denominatore che VINCOLA, il piu' corto fra
+    perdita operativa, perdita piu' dividendi sulle privilegiate e investimenti — sui soli impianti
+    quando gli investimenti sono acquisti di attivita' immateriali (v477). Sotto 12 mesi e' CORTO: la
+    societa' dipende dal mercato dei capitali entro l'anno. Solo rapporti, mai importi (v404)."""
+    import schede_progetto
+    c = (riga or {}).get("combustione") or {}
+    fcf, al = c.get("fcf_ttm"), c.get("cashflow_al")
+    if fcf is None:
+        return {"verso": None, "perche": "flusso di cassa libero n.d."}
+    if fcf >= 0:
+        return {"verso": "favore", "autofinanzia": True, "al": al}
+    cand = []
+    if c.get("mesi_operativi") is not None:
+        cand.append((c["mesi_operativi"], "perdita operativa"))
+    if c.get("mesi_obblighi") is not None:
+        cand.append((c["mesi_obblighi"], "perdita operativa più dividendi sulle privilegiate"))
+    if c.get("investimenti_immateriali_prevalenti"):
+        if c.get("mesi_impianti") is not None:
+            cand.append((c["mesi_impianti"], "investimenti nei soli impianti"))
+    elif c.get("mesi_capex") is not None:
+        cand.append((c["mesi_capex"], "investimenti"))
+    if not cand:
+        return {"verso": None, "perche": "brucia cassa, autonomia n.d.", "al": al}
+    mesi, den = min(cand)
+    _, nome, _ = schede_progetto.liquidita_societa(c)
+    return {"verso": "contro" if mesi < AUTONOMIA_CORTA else "favore" if mesi >= AUTONOMIA_SOLIDA else "neutro",
+            "autofinanzia": False, "mesi": mesi, "denominatore": den, "al": al,
+            "numeratore": "cassa (soli contanti)" if nome == "cassa" else "liquidità",
+            "ritmo_dividendi": schede_progetto.ritmo_dividendi(c) if "dividendi" in den else None}
 
 
 def macro_nome(fcf, sem):
     """Il canale macro del nome (LIBRO.md §1sexies): semaforo del libro arancione o rosso, OPPURE il
     nome BRUCIA CASSA e la famiglia credito e' accesa — e' da li' che una stretta gli arriva (v404,
     v467). Solo il SEGNO del flusso: gli importi sono in valuta di bilancio (v404). Spenta solo se
-    ogni via che potrebbe accenderla si misura; un semaforo MINIMO puo' ancora salire (v474)."""
+    ogni via che potrebbe accenderla si misura; un semaforo MINIMO puo' ancora salire (v474). Non ha
+    un verso a favore: un quadro calmo e' l'assenza di un rischio, non una prova di crescita."""
     sem = sem or {}
     colore = sem.get("colore")
     cred = ((sem.get("famiglie") or {}).get("credito") or {}).get("stato")
@@ -758,21 +812,47 @@ def macro_nome(fcf, sem):
     return {"stato": "spento", "perche": "brucia cassa, credito spento" if brucia else "si autofinanzia", "brucia": brucia}
 
 
-def esito_tenuta(tend, fond, mac):
-    """VENDITA PER EVIDENZA = tendenza ROTTA + almeno una conferma; IN OSSERVAZIONE = una sola delle
-    due meta'; LASCIAR CORRERE = nessuna; NON MISURABILE = tendenza non misurata. MINIMO quando una
-    conferma non si misura e l'esito potrebbe ancora salire: mai il contrario (v474)."""
-    fam = (("fondamentali", fond), ("macro", mac))
-    conferme = [n for n, f in fam if f["stato"] == "acceso"]
-    ignote = [n for n, f in fam if f["stato"] == "non misurabile"]
-    if tend["stato"] == "non misurabile":
-        esito = "NON MISURABILE"
-    elif tend["stato"] == "rotta":
-        esito = "VENDITA PER EVIDENZA" if conferme else "IN OSSERVAZIONE"
-    else:
-        esito = "IN OSSERVAZIONE" if conferme else "LASCIAR CORRERE"
-    return {"esito": esito, "conferme": conferme, "ignote": ignote,
-            "minimo": bool(ignote) and not conferme and tend["stato"] != "non misurabile"}
+def regola_esito(versi):
+    """L'esito da QUALI prove ci sono (LIBRO.md §1sexies), mai da quante (v200). versi: {prova: verso}.
+    VENDITA = tendenza ROTTA + un'altra prova contro + nessuna prova di crescita a favore · CONFLITTO =
+    tendenza ROTTA con la crescita a favore (il prezzo e il bilancio dicono cose opposte) · IN
+    OSSERVAZIONE = la tendenza rotta da sola, o una prova contro con la tendenza non rotta ·
+    LASCIAR CORRERE = nessuna prova contro."""
+    rotta = versi.get("tendenza") == "contro"
+    altre = any(v == "contro" for k, v in versi.items() if k != "tendenza")
+    crescita = any(versi.get(k) == "favore" for k in CRESCITA)
+    if rotta:
+        return CONFLITTO if crescita else ("VENDITA PER EVIDENZA" if altre else "IN OSSERVAZIONE")
+    return "IN OSSERVAZIONE" if altre else "LASCIAR CORRERE"
+
+
+def esito_bilancio(prove):
+    """L'esito sulle prove MISURATE, e quelli possibili riempiendo le mancanti in ogni verso che possono
+    avere: se sono piu' d'uno l'esito e' PROVVISORIO e la resa nomina gli altri — mai un esito
+    dichiarato definitivo che un dato mancante potrebbe cambiare (v474, era il MINIMO del v481).
+    Nulla di misurato: NON MISURABILE."""
+    import itertools
+    noti = {k: p["verso"] for k, p in prove.items() if p.get("verso") is not None}
+    ignoti = [k for k in PROVE if (prove.get(k) or {}).get("verso") is None]
+    if not noti:
+        return {"esito": "NON MISURABILE", "possibili": [], "ignoti": ignoti, "provvisorio": False}
+    esito = regola_esito(noti)
+    possibili = {regola_esito({**noti, **dict(zip(ignoti, c))})
+                 for c in itertools.product(*(VERSI_POSSIBILI[k] for k in ignoti))}
+    altri = [e for e in ESITI if e in possibili and e != esito]
+    return {"esito": esito, "possibili": altri, "ignoti": ignoti, "provvisorio": bool(altri)}
+
+
+def consenso(riga, chiusura):
+    """Il target degli analisti come DISTANZA dalla chiusura: un'OPINIONE, non una prova — resta fuori
+    dal bilancio e si legge accanto, perche' il CEO chiede di valutare anche il rialzo possibile
+    (v482). I valori stanno gia' nelle schede (riga_revisioni): qui solo le distanze, per non scrivere
+    lo stesso numero in due rese (v415)."""
+    a = (riga or {}).get("analisti") or {}
+    if not chiusura or a.get("target_mediana") is None:
+        return None
+    pct = lambda x: None if x is None else (x / chiusura - 1) * 100
+    return {"mediana": pct(a["target_mediana"]), "min": pct(a.get("target_min")), "max": pct(a.get("target_max"))}
 
 
 def pareggio_fiscale(px, pmc, qta):
@@ -791,97 +871,241 @@ def pareggio_fiscale(px, pmc, qta):
     return {"plus": plus, "imposta": 0.0, "pareggio_pct": None, "minus": -plus}
 
 
-def valuta_tenuta(barre, riga, fcf, sem, adesso=None):
-    """Le famiglie e l'esito di UN nome: la stessa funzione per le posizioni (qui) e per i sorvegliati
+def media_aritmetica(px, pmc, qta, peso, valore_libro, fx, rt=None, rlibro=None, rqqq=None, giorni_trim=None):
+    """Cosa fa UN'UNITA' di calcolo (rotazione.UNITA_EUR) aggiunta a una posizione IN PERDITA — il caso
+    di AMD che il CEO ha mediato (LIBRO.md §1sexies): azioni INTERE (una frazione non si compra, v440),
+    carico nuovo, rialzo che serve per tornare al carico prima e dopo, peso, e conseguenze sul libro
+    con la funzione degli ingressi (rotazione.conseguenze: una derivazione sola, v161). Unita' di
+    calcolo, NON una quantita' consigliata (v474): dice cosa comporta, non se farlo."""
+    import rotazione
+    if not px or pmc is None or qta is None or px >= pmc:
+        return None
+    if not fx:
+        return {"errore": "cambio EUR/USD non letto dalla pipeline: l'unità in dollari non si calcola"}
+    usd = rotazione.UNITA_EUR * fx
+    n = int(usd // px)
+    if n < 1:
+        return {"errore": f"un'azione ({_it(px)} $) costa più dell'unità di calcolo ({_it(usd, 0)} $)"}
+    spesa = n * px
+    carico = (qta * pmc + spesa) / (qta + n)
+    return {"usd": usd, "px": px, "azioni": n, "spesa": spesa, "carico_prima": pmc, "carico_dopo": carico,
+            "rientro_prima": (pmc / px - 1) * 100, "rientro_dopo": (carico / px - 1) * 100,
+            "peso_prima": peso, "peso_dopo": (qta * px + spesa) / (valore_libro + spesa) if valore_libro else None,
+            "conseguenze": rotazione.conseguenze(rt or {}, rlibro or {}, rqqq or {}, valore_libro, spesa),
+            "giorni_trim": giorni_trim}
+
+
+def valuta_tenuta(barre, riga, sem, adesso=None):
+    """Le prove e l'esito di UN nome: la stessa funzione per le posizioni (qui) e per i sorvegliati
     (rotazione.py), perche' la regola del CEO vale per tutti i nomi oggetto di analisi (v481)."""
-    tend, fond, mac = tendenza(barre, adesso), fondamentali_nome(riga), macro_nome(fcf, sem)
-    return {"tendenza": tend, "fondamentali": fond, "macro": mac, **esito_tenuta(tend, fond, mac)}
+    t = tendenza(barre, adesso)
+    m = macro_nome(fcf_di(riga), sem)
+    prove = {"tendenza": {**t, "verso": {"rotta": "contro", "in correzione": "neutro", "intatta": "favore"}.get(t["stato"])},
+             **prove_fondamentali(riga), "bilancio": prova_bilancio(riga),
+             "macro": {**m, "verso": {"acceso": "contro", "spento": "neutro"}.get(m["stato"])}}
+    b = concluse(barre or [], adesso)
+    return {"prove": prove, "consenso": consenso(riga, b[-1]["c"] if b else None), **esito_bilancio(prove)}
 
 
-def tenuta_posizioni(tks, barre, righe, fcf, sem, prezzi, pmc, qta, pesi, adesso=None, decisioni=None):
+def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None, decisioni=None, media=None):
     """decisioni: la tabella di LIBRO.md §1quinquies. Una VENDITA PER EVIDENZA con una vendita gia'
-    aperta e' una decisione presa; senza, e' una PROPOSTA al CEO. E una vendita aperta su un nome che
-    la regola lascia correre e' una premessa da ridiscutere (il caso di AMD il 14/10)."""
+    aperta e' una decisione presa; senza, e' una PROPOSTA al CEO. Una vendita aperta su un nome che la
+    regola non sostiene da sola (CONFLITTO, OSSERVAZIONE, LASCIAR CORRERE) e' una premessa da
+    ridiscutere col CEO. media: cambio, valore del libro e serie per l'aritmetica della media sulle
+    posizioni in perdita (media_aritmetica); None = non calcolata, e la resa lo dice."""
     vendite = {d["tk"] for d in (decisioni or []) if d.get("aperta") and d.get("verso") == "vendita"}
+    md = media or {}
     out = []
     for t in tks:
-        v = valuta_tenuta(barre.get(t), righe.get(t), fcf.get(t), sem, adesso)
+        v = valuta_tenuta(barre.get(t), righe.get(t), sem, adesso)
+        mm = (None if media is None else
+              media_aritmetica(prezzi.get(t), pmc.get(t), qta.get(t), pesi.get(t), md.get("valore"), md.get("fx"),
+                               (md.get("rend") or {}).get(t), md.get("rlibro"), md.get("rqqq"),
+                               (md.get("trim") or {}).get(t)))
         out.append({"tk": t, "peso": pesi.get(t), **v, "vendita_aperta": t in vendite,
-                    "fisco": pareggio_fiscale(prezzi.get(t), pmc.get(t), qta.get(t))})
+                    "fisco": pareggio_fiscale(prezzi.get(t), pmc.get(t), qta.get(t)), "media": mm})
     out.sort(key=lambda x: (ESITI.index(x["esito"]), -(x["peso"] or 0)))
-    return {"righe": out, "seduta": max((x["tendenza"].get("seduta") or "" for x in out), default="") or None,
-            "colore": (sem or {}).get("colore"), "minimo_semaforo": bool((sem or {}).get("minimo"))}
+    return {"righe": out, "seduta": max((x["prove"]["tendenza"].get("seduta") or "" for x in out), default="") or None,
+            "colore": (sem or {}).get("colore"), "minimo_semaforo": bool((sem or {}).get("minimo")),
+            "media_calcolata": media is not None, "cambio": md.get("fx")}
 
 
-def testo_famiglie(v):
-    """Le famiglie di un nome in una riga: la stessa resa per posizioni e sorvegliati (una sola, v161)."""
-    t, f, m = v["tendenza"], v["fondamentali"], v["macro"]
-    if t["stato"] == "non misurabile":
-        tx = f"tendenza NON MISURABILE ({t['perche']})"
-    else:
-        nome = {"rotta": "ROTTA", "in correzione": "in correzione", "intatta": "intatta"}[t["stato"]]
-        tx = (f"tendenza {nome}: chiusura {_sg(t['d50_atr'])} ATR dalla media 50, {_sg(t['d200_atr'])} ATR dalla 200"
-              + (" · media 50 sotto la 200" if t["incrocio"] else ""))
-    s = f["sotto"]
-    pz = []
-    if s["revisioni"] is not None:
-        pz.append(f"30 giorni {f['su']} su, {f['giu']} giù" + (" (PIÙ TAGLI)" if s["revisioni"] else ""))
-    if s["eps"] is not None:
-        a, b = f["eps_prima"], f["eps_ora"]
+NOMI_PROVE = {"tendenza": "tendenza", "stime": "stime a 90 giorni", "revisioni": "revisioni a 30 giorni",
+              "ricavi": "ricavi del trimestre", "bilancio": "bilancio", "macro": "macro"}
+
+
+def testo_prova(k, p):
+    """Una prova in parole, col suo numero e la sua soglia: la stessa resa per posizioni e sorvegliati
+    (una sola, v161). Senza verso dice perche' manca."""
+    if k == "tendenza":
+        if p.get("verso") is None:
+            return f"tendenza NON MISURABILE ({p.get('perche')})"
+        nome = {"rotta": "ROTTA", "in correzione": "in correzione", "intatta": "intatta"}[p["stato"]]
+        return (f"tendenza {nome}: chiusura {_sg(p['d50_atr'])} ATR dalla media 50, {_sg(p['d200_atr'])} ATR dalla 200"
+                + (" · media 50 sotto la 200" if p["incrocio"] else ""))
+    if k == "stime":
+        if p.get("verso") is None:
+            return "stime a 90 giorni n.d."
+        a, b, soglia = p["prima"], p["ora"], f"{_it(SOGLIA_EPS_90, 0)}%"
         if a < 0 and b < 0:
-            ve = f"perdita attesa {'AMPLIATA' if b < a else 'ridotta'} del {_it(abs(f['eps_var']), 1)}%"
+            s = f"perdita attesa {'AMPLIATA' if b < a else 'RIDOTTA'} del {_it(abs(p['var']), 1)}% a 90 giorni"
         elif a > 0 > b:
-            ve = "stima passata da utile a PERDITA"
+            s = "stima a 90 giorni passata da utile a PERDITA"
         elif a < 0 < b:
-            ve = "stima passata da perdita a utile"
+            s = "stima a 90 giorni passata da perdita a UTILE"
         else:
-            ve = f"stima {_sg(f['eps_var'])}%"
-        soglia = f"{_it(SOGLIA_EPS_90, 0)}%"
-        pz.append(f"EPS a 90 giorni: {ve}" + (f" (OLTRE IL {soglia})" if s["eps"] and a > 0 and b > 0 else
-                                              f" (sotto la soglia del {soglia})" if not s["eps"] and f["eps_var"] < 0 else ""))
-    if s["ricavi"] is not None:
-        pz.append(f"ricavi {_sg(f['ricavi_yoy'])}% sullo stesso trimestre dell'anno prima (al {f['trim']})")
-    mancano = [k for k, x in (("revisioni a 30 giorni", s["revisioni"]), ("EPS a 90 giorni", s["eps"]),
-                              ("ricavi del trimestre", s["ricavi"])) if x is None]
-    st = {"acceso": "ACCESI", "spento": "spenti", "non misurabile": "NON MISURABILI"}[f["stato"]]
-    fx = f"fondamentali {st}" + (f": {' · '.join(pz)}" if pz else "") + (f" · manca: {', '.join(mancano)}" if mancano else "")
-    mx = f"macro {({'acceso': 'ACCESA', 'spento': 'spenta', 'non misurabile': 'NON MISURABILE'})[m['stato']]} ({m['perche']})"
-    return f"{tx} · {fx} · {mx}"
+            s = f"EPS atteso {_sg(p['var'])}% a 90 giorni"
+        return s + (f" (entro il {soglia})" if p["verso"] == "neutro" else "")
+    if k == "revisioni":
+        if p.get("verso") is None:
+            return "revisioni a 30 giorni n.d."
+        return f"revisioni a 30 giorni: {p['su']} su, {p['giu']} giù"
+    if k == "ricavi":
+        if p.get("verso") is None:
+            return "ricavi del trimestre n.d."
+        return (f"ricavi {_sg(p['yoy'])}% sullo stesso trimestre dell'anno prima (al {p['trim']})"
+                + (f" — sotto la soglia di crescita del {_it(SOGLIA_RICAVI, 0)}%" if p["verso"] == "neutro" else ""))
+    if k == "bilancio":
+        if p.get("verso") is None:
+            return f"bilancio n.d. ({p.get('perche')})"
+        if p.get("autofinanzia"):
+            return f"bilancio SOLIDO: si autofinanzia, flusso di cassa libero positivo su 12 mesi (al {p.get('al') or 'n.d.'})"
+        import schede_progetto
+        nome = {"contro": "CORTO", "favore": "SOLIDO", "neutro": "intermedio"}[p["verso"]]
+        s = (f"bilancio {nome}: brucia cassa, e la {p['numeratore']} copre {schede_progetto._mesi(p['mesi'])} di "
+             f"{p['denominatore']} (al {p.get('al') or 'n.d.'})")
+        if p.get("ritmo_dividendi"):
+            s += f" — ⚠ l'ultimo trimestre di dividendi vale {_it(p['ritmo_dividendi'], 1)} volte la media: sul ritmo recente i mesi sono meno"
+        return s + (" — dipende dal mercato dei capitali entro l'anno" if p["verso"] == "contro" else "")
+    if k == "macro":
+        if p.get("verso") is None:
+            return f"macro NON MISURABILE ({p.get('perche')})"
+        return f"macro {'ACCESA' if p['verso'] == 'contro' else 'spenta'} ({p.get('perche')})"
+    return k
+
+
+def testo_prove(v):
+    """{verso: [testi]} — contro, a favore, in mezzo, non misurate — e due note: quando macro e bilancio
+    sono lo stesso canale (il mercato dei capitali) visto da due lati, una prova in due righe non e' due
+    prove (B3); quando stime e revisioni puntano in versi opposti, e' la stessa famiglia (le stime degli
+    analisti) che si contraddice fra due orizzonti, e il disaccordo e' un fatto da leggere."""
+    pr = v["prove"]
+    out = {"contro": [], "favore": [], "neutro": [], None: []}
+    for k in PROVE:
+        out[pr[k].get("verso")].append(testo_prova(k, pr[k]))
+    canale = (pr["macro"].get("verso") == "contro" and pr["macro"].get("brucia") and pr["bilancio"].get("verso") == "contro"
+              and str(pr["macro"].get("perche", "")).startswith("brucia cassa"))
+    discordi = {pr["stime"].get("verso"), pr["revisioni"].get("verso")} == {"contro", "favore"}
+    return {"contro": out["contro"], "favore": out["favore"], "neutro": out["neutro"], "ignote": out[None],
+            "stesso_canale": canale, "analisti_discordi": discordi}
+
+
+NOTA_DISCORDI = ("stime a 90 giorni e revisioni a 30 giorni puntano in versi opposti: sono la stessa famiglia — le "
+                 "stime degli analisti — su due orizzonti, e le revisioni sono le più recenti")
+
+
+def riga_prove(v):
+    """Le prove di un nome in UNA riga: per i sorvegliati di rotazione.py."""
+    t = testo_prove(v)
+    pz = [f"contro: {' · '.join(t['contro']) if t['contro'] else 'nessuna prova'}",
+          f"a favore: {' · '.join(t['favore']) if t['favore'] else 'nessuna prova'}"]
+    if t["neutro"]:
+        pz.append(f"in mezzo: {' · '.join(t['neutro'])}")
+    if t["ignote"]:
+        pz.append(f"non misurate: {' · '.join(t['ignote'])}")
+    if t["stesso_canale"]:
+        pz.append("macro e bilancio sono lo stesso canale (il mercato dei capitali) visto da due lati")
+    if t["analisti_discordi"]:
+        pz.append(NOTA_DISCORDI)
+    return " ; ".join(pz)
+
+
+def etichetta_esito(v):
+    return v["esito"] + (f" (PROVVISORIO: con i dati mancanti può essere {' o '.join(v['possibili'])})"
+                         if v.get("provvisorio") else "")
 
 
 def righe_tenuta(t):
     if not t or not t.get("righe"):
         return ["TENUTA DELLE POSIZIONI: nessuna posizione azionaria"]
     col = t.get("colore")
-    L = [f"TENUTA DELLE POSIZIONI (LIBRO.md §1sexies, decisione del CEO del 14/10/2026: si lascia correre, si vende per "
-         f"EVIDENZA) · ultima chiusura {t.get('seduta') or 'n.d.'} · semaforo {col or 'n.d.'}"
-         + (" (MINIMO)" if t.get("minimo_semaforo") else ""),
-         "  regola: VENDITA PER EVIDENZA = tendenza ROTTA (chiusura sotto la media a 200 e media a 50 sotto la 200) + "
-         "almeno una conferma (fondamentali o macro calcolati qui, notizie verificate in rete) · IN OSSERVAZIONE = una "
-         "sola delle due metà · LASCIAR CORRERE = nessuna · soglie = convenzioni scelte col CEO (LIBRO.md §1sexies) · "
-         "l'esito è la regola applicata, non un ordine"]
+    L = [f"TENUTA DELLE POSIZIONI — bilancio dell'evidenza (LIBRO.md §1sexies, decisioni del CEO del 14/10/2026: si "
+         f"lascia correre, si vende per EVIDENZA, e si valuta l'insieme — non la sola tecnica) · ultima chiusura "
+         f"{t.get('seduta') or 'n.d.'} · semaforo {col or 'n.d.'}" + (" (MINIMO)" if t.get("minimo_semaforo") else ""),
+         "  regola: VENDITA PER EVIDENZA = tendenza ROTTA + un'altra prova CONTRO e nessuna prova di CRESCITA a favore · "
+         f"{CONFLITTO} = tendenza ROTTA con la crescita a favore (ricavi, stime o revisioni): il prezzo e il bilancio "
+         "dicono cose opposte, e decidono notizie e giudizio · IN OSSERVAZIONE = la tendenza rotta da sola, o una prova "
+         "contro con la tendenza non rotta · LASCIAR CORRERE = nessuna prova contro · conta QUALI prove ci sono, non "
+         "quante: nessun punteggio · soglie = convenzioni scelte col CEO (LIBRO.md §1sexies) · l'esito è la regola "
+         "applicata, non un ordine"]
     for r in t["righe"]:
+        tp = testo_prove(r)
+        L.append(f"  {r['tk']:5} {etichetta_esito(r)}" + (f" · peso {_it(r['peso'] * 100, 1)}%" if r.get("peso") is not None else ""))
+        L.append(f"      contro: {' · '.join(tp['contro']) if tp['contro'] else 'nessuna prova'}"
+                 + (" (macro e bilancio sono lo stesso canale — il mercato dei capitali — visto da due lati: "
+                    "una prova, non due)" if tp["stesso_canale"] else ""))
+        L.append(f"      a favore: {' · '.join(tp['favore']) if tp['favore'] else 'nessuna prova'}")
+        if tp["analisti_discordi"]:
+            L.append(f"      ⚠ {NOTA_DISCORDI}")
+        if tp["neutro"] or tp["ignote"]:
+            L.append("      " + " ; ".join(([f"in mezzo: {' · '.join(tp['neutro'])}"] if tp["neutro"] else [])
+                                         + ([f"non misurate: {' · '.join(tp['ignote'])}"] if tp["ignote"] else [])))
+        fuori = []
+        c = r.get("consenso")
+        if c:
+            fuori.append(f"consenso degli analisti (un'opinione, non una prova) mediana {_sg(c['mediana'])}% dalla "
+                         f"chiusura, forchetta da {_sg(c['min'])}% a {_sg(c['max'])}%")
         fi = r["fisco"]
         if fi is None:
-            fx = "pareggio fiscale n.d."
+            fuori.append("pareggio fiscale n.d.")
         elif fi["pareggio_pct"] is not None:
-            fx = (f"pareggio fiscale {_it(fi['pareggio_pct'], 1)}%: vendere oggi paga ~{_it(fi['imposta'], 0)} $ "
-                  "d'imposta, e conviene solo se poi il titolo scende di più")
+            fuori.append(f"pareggio fiscale {_it(fi['pareggio_pct'], 1)}%: vendere oggi paga ~{_it(fi['imposta'], 0)} $ "
+                         "d'imposta, e conviene solo se poi il titolo scende di più")
         else:
-            fx = (f"in perdita sul carico: minusvalenza ~{_it(fi['minus'], 0)} $, utile solo se ci sono plusvalenze "
-                  "da compensare (il sistema non lo sa)")
-        L.append(f"  {r['tk']:5} {r['esito']}" + (" (MINIMO)" if r["minimo"] else "")
-                 + (f" · peso {_it(r['peso'] * 100, 1)}%" if r.get("peso") is not None else "")
-                 + f" · {testo_famiglie(r)} · {fx}")
-    L.append("  notizie: NON calcolate — un fatto che rompe la tesi (guida tagliata, cliente perso, diluizione pesante, "
-             "indagine) si verifica in rete per ogni nome in vendita o in osservazione, e conta come conferma: porta un "
-             "IN OSSERVAZIONE a VENDITA PER EVIDENZA")
+            fuori.append(f"in perdita sul carico: minusvalenza ~{_it(fi['minus'], 0)} $, utile solo se ci sono "
+                         "plusvalenze da compensare (il sistema non lo sa)")
+        L.append(f"      fuori dal bilancio: {' · '.join(fuori)}")
+        m = r.get("media")
+        if m and m.get("errore"):
+            L.append(f"      media: non calcolabile — {m['errore']}")
+        elif m:
+            s = (f"      media (un'unità di calcolo, non una quantità): {m['azioni']} azioni a {_it(m['px'])} $ "
+                 f"({_it(m['spesa'], 0)} $) → carico da {_it(m['carico_prima'])} a {_it(m['carico_dopo'])}; per tornare al "
+                 f"carico serve {_sg(m['rientro_prima'])}% oggi, {_sg(m['rientro_dopo'])}% dopo")
+            if m.get("peso_prima") is not None and m.get("peso_dopo") is not None:
+                s += f" · peso da {_it(m['peso_prima'] * 100, 1)}% a {_it(m['peso_dopo'] * 100, 1)}%"
+            cq = m.get("conseguenze")
+            s += (" · conseguenze sul libro n.d." if cq is None else
+                  f" · volatilità del libro {_sg(cq['dvol'], 2)} punti, beta su QQQ {_sg(cq['dbeta'], 3)} ({cq['sedute']} sedute)")
+            import rotazione
+            if m.get("giorni_trim") is not None and m["giorni_trim"] <= rotazione.TRIMESTRALE_VICINA:
+                s += (f" · ⚠ trimestrale fra {m['giorni_trim']} giorni: mediare prima dei conti è una scommessa "
+                      "binaria (LIBRO.md §1quater)")
+            if r["esito"] == "VENDITA PER EVIDENZA":
+                s += " · ⚠ con questo esito mediare è comprare CONTRO l'evidenza: speculativo, ammesso e dichiarato"
+            if r["vendita_aperta"]:
+                s += " · ⚠ c'è una vendita APERTA su questo nome: mediare e vendere non stanno insieme, va decisa prima"
+            L.append(s)
+    L.append("  notizie: NON calcolate — per ogni nome in VENDITA, CONFLITTO o OSSERVAZIONE si cercano in rete NEI DUE "
+             "VERSI, con fonte e data: i catalizzatori che possono farlo salire forte (contratti, guida alzata, ordini, "
+             "clienti nuovi) e i fatti che rompono la tesi (guida tagliata, cliente perso, diluizione pesante, indagine). "
+             "Un fatto che rompe la tesi porta un CONFLITTO o un'OSSERVAZIONE verso la VENDITA; un catalizzatore "
+             "verificato porta un CONFLITTO verso il tenere — o il mediare")
+    L.append("  consenso: il target degli analisti è un'opinione e resta FUORI dal bilancio; i valori sono nelle schede")
+    if not t.get("media_calcolata"):
+        L.append("  media: aritmetica NON calcolata in questo giro")
+    elif any(r.get("media") for r in t["righe"]):
+        import rotazione
+        fx, u = t.get("cambio"), rotazione.UNITA_EUR
+        L.append(f"  media = un'unità di calcolo da {_it(u, 0)} €" + (f" (≈ {_it(u * fx, 0)} $ al cambio {_it(fx, 4)})"
+                 if fx else "") + " sulle sole posizioni in perdita, NON una quantità: dice cosa fa al carico e al "
+                 "libro, non se farlo. Mediare ha senso se la tesi regge — il caso di AMD (LIBRO.md §1sexies)")
     L.append("  ⚠ imposta e pareggio in dollari al prezzo di oggi: il conto vero lo fa il broker in euro col cambio di "
              "carico, e regime fiscale e minusvalenze pregresse non sono nel sistema")
-    minimi = [r["tk"] for r in t["righe"] if r["minimo"]]
-    if minimi:
-        L.append(f"  ⚠ esito MINIMO per {', '.join(minimi)}: una conferma non si misura, e col dato che manca l'esito "
-                 "può salire, mai scendere")
+    prov = [r["tk"] for r in t["righe"] if r.get("provvisorio")]
+    if prov:
+        L.append(f"  ⚠ esito PROVVISORIO per {', '.join(prov)}: una prova non si misura, e col dato che manca l'esito "
+                 "può cambiare nei versi indicati sulla riga")
     if col in ("arancione", "rosso"):
         L.append(f"  ⚠ semaforo {col}: la sua reazione (LIBRO.md §1ter) vale anche per i nomi da lasciar correre")
     vend = [r for r in t["righe"] if r["esito"] == "VENDITA PER EVIDENZA"]
@@ -891,9 +1115,14 @@ def righe_tenuta(t):
         L.append(f"  VENDITA PER EVIDENZA con la decisione già aperta (blocco DECISIONI APERTE): {', '.join(gia)}")
     if nuove:
         L.append(f"  VENDITA PER EVIDENZA SENZA decisione aperta: {', '.join(nuove)} — si PROPONE al CEO, la decisione è sua")
-    senza = [r["tk"] for r in t["righe"] if r["vendita_aperta"] and r["esito"] in ("LASCIAR CORRERE", "IN OSSERVAZIONE")]
+    conf = [r["tk"] for r in t["righe"] if r["esito"] == CONFLITTO]
+    if conf:
+        L.append(f"  {CONFLITTO}: {', '.join(conf)} — prezzo e bilancio dicono cose opposte: la lettura la fanno le "
+                 "notizie, nei due versi, e la decisione è del CEO")
+    senza = [f"{r['tk']} ({r['esito']})" for r in t["righe"] if r["vendita_aperta"] and r["esito"] != "VENDITA PER EVIDENZA"]
     if senza:
-        L.append(f"  ⚠ vendita APERTA senza evidenza per la regola: {', '.join(senza)} — la premessa va ridiscussa col CEO")
+        L.append(f"  ⚠ vendita APERTA che la regola non sostiene da sola: {', '.join(senza)} — la premessa va ridiscussa "
+                 "col CEO")
     return L
 
 
