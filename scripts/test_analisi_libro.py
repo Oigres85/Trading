@@ -2217,7 +2217,10 @@ check("v474 le sedute trascorse sono CONCLUSE: la barra della seduta in corso no
 # ---------------------------------------------------------------- il registro della performance
 _pat474 = (1.2, "pipeline, run x", {"BTP": (101.0, "pipeline")})
 _b1 = {"AAA": [{"t": "2026-10-09", "c": 100.0}], "BBB": [{"t": "2026-10-09", "c": 50.0}], "QQQ": [{"t": "2026-10-09", "c": 600.0}]}
-_b2 = {"AAA": [{"t": "2026-10-12", "c": 110.0}], "BBB": [{"t": "2026-10-12", "c": 45.0}], "QQQ": [{"t": "2026-10-12", "c": 606.0}]}
+# v485 — la seduta del 12/10 si registra la SERA stessa (18:00 NY): le barre portano la chiusura confermata dalla
+#   quotazione, come le produce brief.barre dopo la campana (il rifiuto delle non confermate e' nei gate v485)
+_b2 = {"AAA": [{"t": "2026-10-12", "c": 110.0, "ufficiale": True}], "BBB": [{"t": "2026-10-12", "c": 45.0, "ufficiale": True}],
+       "QQQ": [{"t": "2026-10-12", "c": 606.0, "ufficiale": True}]}
 _r1 = NL.nuova_riga("2026-10-09", {"AAA": 10, "BBB": 20}, {"BTP": 10000}, _b1, 5000.0, _pat474, "giallo", None, _ALLE17)
 # fra le due righe il CEO vende BBB e deposita 20.000 EUR: il TWR non deve vedere ne' l'uno ne' l'altro
 _r2 = NL.nuova_riga("2026-10-12", {"AAA": 10}, {"BTP": 10000}, _b2, 25000.0, (1.25, "x", {"BTP": (101.5, "pipeline")}),
@@ -3049,6 +3052,94 @@ _es484_lib = NL.leggi_esami(_lib474)
 check("v484 il libro vero si legge: la sezione delle decisioni c'e', e ogni esame ha un ticker (lo stato degli esami non "
       "si fissa qui: lo decide il CEO, v481)",
       _es484_lib is not None and all(e["tk"].isupper() for e in _es484_lib), str(_es484_lib))
+
+# ================================================================ v485 — la chiusura ufficiale dopo la campana
+# Misurato il 14/10/2026 alle 16:26 ET: lo storico dava NVDA 223,715 e MU 921,30 dove le chiusure ufficiali
+# erano 221,30 e 914,13, e --registra le aveva scritte nel registro. Lo stato si COSTRUISCE (v429): nessun
+# check aspetta che la fonte sia lenta proprio mentre gira la suite, e l'orologio si inietta (v402).
+import brief as _bf485
+from datetime import datetime as _dt485
+_NY485 = _bf485.NEW_YORK
+_d485 = [{"t": "2026-10-13", "o": 10.0, "h": 11.0, "l": 9.0, "c": 10.5, "v": 1000, "a": 10.5},
+         {"t": "2026-10-14", "o": 10.6, "h": 11.2, "l": 10.1, "c": 10.9, "v": 600, "a": 10.9}]
+_q485 = {"p": 10.4, "o": 10.6, "h": 11.3, "l": 10.0, "v": 1500, "cp": -0.95, "td": "2026-10-14", "ms": "closed"}
+_u485 = _bf485.chiusura_ufficiale(_d485, _q485)
+check("v485 dopo la campana l'ultima barra prende chiusura, apertura, massimo, minimo e volume dalla quotazione ed e' "
+      "marcata ufficiale; le barre prima restano identiche e l'ingresso non si modifica",
+      _u485[-1]["c"] == 10.4 and _u485[-1]["a"] == 10.4 and _u485[-1]["l"] == 10.0 and _u485[-1]["h"] == 11.3
+      and _u485[-1]["v"] == 1500 and _u485[-1].get("ufficiale") is True and _u485[0] == _d485[0]
+      and _d485[-1]["c"] == 10.9 and "ufficiale" not in _d485[-1], str(_u485))
+_aperta485 = _bf485.chiusura_ufficiale(_d485, dict(_q485, ms="open"))
+_altra485 = _bf485.chiusura_ufficiale(_d485, dict(_q485, td="2026-10-15"))
+_senza485 = _bf485.chiusura_ufficiale(_d485, dict(_q485, p=None))
+check("v485 senza conferma la barra resta com'e' e NON marcata: seduta ancora aperta, data diversa, chiusura assente",
+      all(x == _d485 and "ufficiale" not in x[-1] for x in (_aperta485, _altra485, _senza485)),
+      str((_aperta485[-1], _altra485[-1], _senza485[-1])))
+
+# --- collegamento (v399, v443): brief.barre la usa davvero, e solo la sera stessa (costo: una richiesta in piu') ---
+_url485 = []
+def _jget485(url, timeout=20):
+    _url485.append(url)
+    if "/history" in url:
+        return {"data": [dict(x) for x in _d485]}
+    if "/quotes/" in url:
+        return {"data": dict(_q485)}
+    raise AssertionError(url)
+def _jget_rotta485(url, timeout=20):
+    if "/quotes/" in url:
+        raise OSError("quotazione non raggiungibile")
+    return {"data": [dict(x) for x in _d485]}
+_jget_vero485 = _bf485.jget
+try:
+    _bf485.jget = _jget485
+    _sera485 = _bf485.barre("AAA", _dt485(2026, 10, 14, 16, 30, tzinfo=_NY485)); _n_sera485 = len(_url485); _url485.clear()
+    _giorno485 = _bf485.barre("AAA", _dt485(2026, 10, 14, 15, 30, tzinfo=_NY485)); _n_giorno485 = len(_url485); _url485.clear()
+    _domani485 = _bf485.barre("AAA", _dt485(2026, 10, 15, 8, 0, tzinfo=_NY485)); _n_domani485 = len(_url485); _url485.clear()
+    _bf485.jget = _jget_rotta485
+    _rotta485 = _bf485.barre("AAA", _dt485(2026, 10, 14, 16, 30, tzinfo=_NY485))
+finally:
+    _bf485.jget = _jget_vero485
+check("v485 collegamento: brief.barre la sera stessa chiede la quotazione e conferma la chiusura; durante la seduta e il "
+      "giorno dopo non la chiede e non tocca la barra; se la quotazione non risponde la barra resta NON marcata, senza eccezione",
+      _sera485[-1]["c"] == 10.4 and _sera485[-1].get("ufficiale") is True and _n_sera485 == 2
+      and _giorno485[-1]["c"] == 10.9 and _n_giorno485 == 1 and _domani485[-1]["c"] == 10.9 and _n_domani485 == 1
+      and _rotta485[-1]["c"] == 10.9 and "ufficiale" not in _rotta485[-1],
+      str((_n_sera485, _n_giorno485, _n_domani485, _sera485[-1], _rotta485[-1])))
+
+# --- una regola sola per l'ora della campana (v161): sullo stesso giorno 'dopo la campana' e 'seduta in corso' sono complementari ---
+_ore485 = [_dt485(2026, 10, 14, h, m, tzinfo=_NY485) for h in range(24) for m in (0, 59)]
+check("v485 sullo stesso giorno 'dopo la campana' e' esattamente il complemento di 'seduta in corso'; su un altro giorno "
+      "sono entrambi falsi",
+      all(_bf485.dopo_la_campana("2026-10-14", a) == (not ROT.seduta_in_corso([{"t": "2026-10-14", "c": 1.0}], a)) for a in _ore485)
+      and not any(_bf485.dopo_la_campana("2026-10-13", a) or ROT.seduta_in_corso([{"t": "2026-10-13", "c": 1.0}], a)
+                  for a in _ore485))
+
+# --- il registro: la sera stessa scrive solo chiusure confermate; il giorno dopo lo storico e' definitivo ---
+_b485 = {"AAA": [{"t": "2026-10-14", "c": 110.0, "ufficiale": True}], "BBB": [{"t": "2026-10-14", "c": 45.0}],
+         "QQQ": [{"t": "2026-10-14", "c": 606.0}]}
+_b485ok = {k: [dict(x, ufficiale=True) for x in v] for k, v in _b485.items()}
+_pat485 = (1.25, "x", {"BTP": (101.5, "pipeline")})
+_SERA485, _MATTINA485 = _dt485(2026, 10, 14, 16, 30, tzinfo=_NY485), _dt485(2026, 10, 15, 8, 0, tzinfo=_NY485)
+with _tf474.TemporaryDirectory() as _dr485:
+    _pr485 = _os474.path.join(_dr485, "reg.jsonl")
+    _no485 = NL.aggiorna_registro(_b485, {"AAA": 10, "BBB": 20}, {"BTP": 10000}, 25000.0, _pat485, "arancione", True,
+                                  _SERA485, _pr485)
+    _n_no485 = len(NL.leggi_registro(_pr485)[0])
+    _si485 = NL.aggiorna_registro(_b485ok, {"AAA": 10, "BBB": 20}, {"BTP": 10000}, 25000.0, _pat485, "arancione", True,
+                                  _SERA485, _pr485)
+    _riga485 = NL.leggi_registro(_pr485)[0]
+with _tf474.TemporaryDirectory() as _dr485b:
+    _pr485b = _os474.path.join(_dr485b, "reg.jsonl")
+    _mat485 = NL.aggiorna_registro(_b485, {"AAA": 10, "BBB": 20}, {"BTP": 10000}, 25000.0, _pat485, "arancione", True,
+                                   _MATTINA485, _pr485b)
+check("v485 la sera stessa il registro NON scrive chiusure non confermate e nomina quali, QQQ compreso (meglio una riga "
+      "in meno che una sbagliata, v396); confermate tutte, scrive",
+      _no485["esito"].startswith("non scritto") and "per BBB, QQQ —" in _no485["esito"] and _n_no485 == 0
+      and _si485["esito"].startswith("scritto") and len(_riga485) == 1 and _riga485[0]["prezzi"] == {"AAA": 110.0, "BBB": 45.0},
+      str((_no485["esito"], _si485["esito"])))
+check("v485 il giorno dopo la stessa seduta si scrive con lo storico, senza conferma: e' gia' definitivo (righe scritte 1,5 "
+      "e 12 ore dopo la campana: 11 prezzi su 11 coincidono con lo storico del giorno dopo)",
+      _mat485["esito"].startswith("scritto") and "2026-10-14" in _mat485["esito"], str(_mat485["esito"]))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

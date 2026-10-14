@@ -1298,7 +1298,24 @@ def nuova_riga(seduta, az, obb, barre, cassa_eur, pat, colore, precedente=None, 
             "prezzi_obbligazioni": {tk: {"prezzo": (prezzi_eur.get(tk) or (None, None))[0],
                                          "fonte": (prezzi_eur.get(tk) or (None, "n.d."))[1]} for tk in nomi_obb},
             "qqq": chiusura("QQQ"), "eurusd": fx, "fonte_cambio": fonte_fx, "cassa_eur": cassa_eur,
-            "semaforo": colore, "versione": 474}
+            "semaforo": colore, "versione": 485}
+
+
+def chiusure_non_confermate(seduta, nomi, barre, adesso=None):
+    """v485 — i nomi la cui barra della seduta `seduta` NON e' marcata 'ufficiale' (brief.chiusura_ufficiale),
+    quando la seduta e' OGGI a New York: la sera stessa della campana l'ultima barra dello storico puo' non
+    essere ancora la chiusura definitiva, e una riga del registro e' un fatto permanente. Per una seduta
+    passata lo storico e' gia' definitivo (misurato: v485) e la lista e' vuota. Un nome senza barra quel
+    giorno non e' qui: e' un prezzo mancante, che il TWR salta e nomina."""
+    import brief
+    if not brief.dopo_la_campana(seduta, adesso):
+        return []
+    out = []
+    for tk in nomi:
+        b = next((x for x in (barre.get(tk) or []) if x["t"] == seduta), None)
+        if b is not None and not b.get("ufficiale"):
+            out.append(tk)
+    return sorted(out)
 
 
 def registra(riga, percorso=None, adesso=None):
@@ -1375,10 +1392,17 @@ def aggiorna_registro(barre, az, obb, cassa_eur, pat, colore, scrivi, adesso=Non
             esito = "non scritto: barre di QQQ assenti"
         else:
             riga = nuova_riga(conc[-1]["t"], az, obb, barre, cassa_eur, pat, colore, righe[-1] if righe else None, adesso)
-            ok, perche = registra(riga, percorso, adesso)
-            esito = ("scritto: " if ok else "non scritto: ") + perche
-            if ok:
-                righe, rotte = leggi_registro(percorso)
+            manca = chiusure_non_confermate(riga["seduta"], sorted(riga["prezzi"]) + ["QQQ"], barre, adesso)
+            if manca:
+                # v485 — meglio una riga in meno che una riga sbagliata (istruzione permanente del CEO, v396)
+                esito = (f"non scritto: chiusure del {riga['seduta']} non ancora confermate dalla quotazione per "
+                         f"{', '.join(manca)} — la sera stessa della campana l'ultima barra dello storico può non essere "
+                         "quella definitiva (v485): si riprova più tardi")
+            else:
+                ok, perche = registra(riga, percorso, adesso)
+                esito = ("scritto: " if ok else "non scritto: ") + perche
+                if ok:
+                    righe, rotte = leggi_registro(percorso)
     return {"twr": twr(righe), "esito": esito, "rotte": rotte,
             "ultime": [{"seduta": r["seduta"], "semaforo": r.get("semaforo")} for r in righe[-5:]]}
 

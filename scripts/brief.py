@@ -118,9 +118,53 @@ def leggi_libro():
 
 
 # ---------------------------------------------------------------- prezzi e livelli
-def barre(tk):
-    d = jget(f"{SA}/symbol/s/{tk}/history?range=1Y&period=Daily")["data"]
-    return sorted(d, key=lambda x: x["t"])
+def dopo_la_campana(giorno, adesso=None):
+    """v485 — vero se `giorno` (ISO) e' OGGI a New York e la campana delle 16:00 e' gia' suonata: e' la
+    finestra in cui l'ultima barra dello storico puo' non essere ancora la chiusura ufficiale. Sullo
+    stesso giorno e' il complemento di rotazione.seduta_in_corso (un gate lo verifica: v161). Il fuso,
+    mai uno scarto a mano (v470)."""
+    adesso = (adesso or datetime.now(NEW_YORK)).astimezone(NEW_YORK)
+    return giorno == adesso.date().isoformat() and adesso.hour >= 16
+
+
+def chiusura_ufficiale(d, q):
+    """v485 — se la quotazione dichiara la seduta regolare CHIUSA (ms 'closed') sulla STESSA data
+    dell'ultima barra (td), quella barra prende apertura, massimo, minimo e chiusura della seduta
+    regolare dalla quotazione, ed e' marcata 'ufficiale': la CHIUSURA e' confermata. ⚠ Il volume della
+    quotazione invece cresce dopo la campana con gli scambi fuori orario (misurato il 14/10: NVDA da
+    116.058.310 a 116.359.994 in pochi minuti): e' piu' vicino al vero dei 70,7 milioni della barra
+    parziale, NON e' il solo volume della seduta regolare, e lo storico del giorno dopo lo sostituisce.
+    Senza conferma la barra resta com'e', NON marcata: chi registra un fatto permanente lo vede
+    (numeri_libro.aggiorna_registro). Non modifica `d`."""
+    if not d or not isinstance(q, dict):
+        return d
+    u = d[-1]
+    p = q.get("p")
+    if q.get("ms") != "closed" or q.get("td") != u.get("t") or not isinstance(p, (int, float)) or p <= 0:
+        return d
+    nuova = dict(u, c=p, a=p, ufficiale=True)
+    for k in ("o", "h", "l", "v"):
+        if isinstance(q.get(k), (int, float)) and q[k] > 0:
+            nuova[k] = q[k]
+    if isinstance(q.get("cp"), (int, float)):
+        nuova["ch"] = q["cp"]
+    return d[:-1] + [nuova]
+
+
+def barre(tk, adesso=None):
+    """Lo storico giornaliero, in ordine di data. ⚠⚠ v485 — DOPO LA CAMPANA l'ultima barra dello storico
+    NON e' ancora la chiusura ufficiale: misurato il 14/10/2026 alle 16:26 ET, NVDA 223,715 nello storico
+    contro 221,30 ufficiale, MU 921,30 contro 914,13, e il volume di NVDA a 70,7 milioni contro 116. La
+    sera stessa la conferma la quotazione (chiusura_ufficiale); il giorno dopo lo storico era gia'
+    definitivo (righe del registro scritte 1,5 e 12 ore dopo la campana: 11 prezzi su 11 coincidono)."""
+    d = sorted(jget(f"{SA}/symbol/s/{tk}/history?range=1Y&period=Daily")["data"], key=lambda x: x["t"])
+    if not d or not dopo_la_campana(d[-1]["t"], adesso):
+        return d
+    try:
+        q = quota(tk)
+    except Exception:
+        return d          # resta NON marcata: il registro non la scrive come una chiusura confermata
+    return chiusura_ufficiale(d, q)
 
 
 def quota(tk):

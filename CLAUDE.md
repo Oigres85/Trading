@@ -6946,3 +6946,56 @@ le correlazioni a **2 decimali**, e da quell'arrotondamento la ricostruzione pu�
 classe v429. Ora il limite si **ricava dall'arrotondamento dichiarato** (derivata prima, caso
 peggiore) e deve restare sotto mezzo punto; due iniezioni sulla formula (correlazioni ignorate,
 correlazioni scalate del 2%) mordono entrambe.
+
+## 🔔 v485 — DOPO LA CAMPANA L'ULTIMA BARRA NON È ANCORA LA CHIUSURA, E IL REGISTRO L'AVEVA SCRITTA
+
+Trovato eseguendo il check-in post-chiusura del 14/10, il primo con il semaforo arancione.
+`numeri_libro.py --registra`, lanciato alle 16:26 di New York, aveva scritto nel registro della
+performance prezzi che non erano le chiusure:
+
+| | storico alle 16:26 ET | chiusura ufficiale |
+|---|---|---|
+| NVDA | 223,715 | **221,30** |
+| MU | 921,30 | **914,13** |
+| AMD | 569,96 | **570,82** |
+| volume di NVDA | 70,7 milioni | ~116 milioni |
+
+Lo storico giornaliero della fonte, per la seduta appena chiusa, arriva da copie che si aggiornano in
+tempi diversi: lo stesso SMH valeva 564,58, poi 564,74, poi di nuovo 564,58 in tre letture di pochi
+minuti. **Le sedute passate invece sono definitive**: le righe del registro scritte 1,5 e 12 ore dopo
+la campana coincidono 11 prezzi su 11 con lo storico del giorno dopo (misurato, non assunto).
+
+> È la classe **v193/v234/v431** — *stato del mercato e freschezza del dato sono due cose diverse* —
+> dentro `concluse()`: la barra era «conclusa» per l'OROLOGIO, e la fonte non l'aveva ancora chiusa.
+
+⚠⚠ **Il colore non cambiava** (SMH 564,74 o 564,58: comunque 1 ATR sotto la media a 50), ma il
+registro è un fatto permanente e quella riga avrebbe spostato il confronto con QQQ di circa 0,3
+punti in un giorno. E i volumi dei leader nel semaforo uscivano 0, 4 e 8 su 100 invece di 19, 17 e
+26. *Meglio non avere dati che averli non corretti* (v396): la riga è stata tolta prima del commit
+e riscritta con le chiusure ufficiali.
+
+**La correzione, in due pezzi:**
+- **`brief.barre`** — la sera stessa (dalle 16:00 di New York, col fuso e non con uno scarto, v470)
+  l'ultima barra prende apertura, massimo, minimo e chiusura della seduta regolare dalla
+  quotazione, se questa dichiara la seduta chiusa sulla stessa data, ed è marcata `ufficiale`. Un
+  posto solo per brief, rotazione e numeri_libro (v436). ⚠ Il **volume** della quotazione cresce
+  dopo la campana con gli scambi fuori orario (NVDA da 116.058.310 a 116.359.994 in pochi minuti):
+  più vicino al vero della barra parziale, non il solo volume regolare, e la funzione lo dichiara.
+- **`numeri_libro.aggiorna_registro`** — la sera stessa scrive solo se tutte le chiusure (posizioni,
+  nomi della riga precedente, QQQ) sono confermate; altrimenti **non scrive e nomina i nomi**: «si
+  riprova più tardi». Il giorno dopo scrive con lo storico, che è già definitivo.
+
+⚠ **Il costo**: una richiesta in più per titolo, solo la sera (16:00-24:00 di New York); durante la
+seduta e il giorno dopo nessuna. Un gate conta le richieste.
+⚠ «Dopo la campana» e `rotazione.seduta_in_corso` rispondono sulla stessa ora: un gate verifica
+che sullo stesso giorno siano complementari su 48 orari (v161: una regola in due posti diverge).
+⚠ La fixture v474 che registrava la seduta del 12/10 alle 18:00 dello stesso giorno porta ora la
+conferma sulle barre, come le produce `brief.barre`: l'invariante di quel gate non cambia, e il
+rifiuto delle chiusure non confermate ha i suoi gate.
+
+Sette iniezioni, una alla volta, con `modifica_sicura` e ripristino da uno snapshot verificato per
+impronta (v427, v430): **mordono tutte e sette, ciascuna sul controllo atteso** — la conferma non
+applicata, lo stato della seduta ignorato, il volume dimenticato, il registro che non guarda la
+conferma, la quotazione chiesta anche di giorno, la campana alle 17, la conferma pretesa anche il
+giorno dopo. Pavimento di `test_analisi_libro.py` 410 → 415 (i punti di chiamata sono 432). `?v=` e
+`BUILD_VERSION` non toccati: nessun file servito al browser (v440).
