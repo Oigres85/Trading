@@ -4317,7 +4317,7 @@ check("v348 valutazione: se c'e' il P/E forward si pubblica, etichettato", suVer
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && (x.stats || {}).forward_pe);
   if (!r) return true;
   const p = buildPromptTicker("MU");
-  return /P\\/E PROSPETTICO: [\\d.]+×/.test(p) && /trailing/i.test(p);`));
+  return /P\\/E PROSPETTICO: [0-9]+(,[0-9])?×/.test(p) && /trailing/i.test(p);`));
 
 /* ══ v348 — LE SEGNALAZIONI AL SISTEMA ═════════════════════════════════════════════════════
    Il CEO: "una conferma, tramite ricerca online, dei dati che possono sembrare incongrui e
@@ -4739,7 +4739,10 @@ check("v354 inventario: cio' che data.json ha NON sta fra le cose da cercare onl
   const daCercare = p.slice(p.indexOf("QUELLO CHE IL SISTEMA NON HA"), p.indexOf("Prezzo di riferimento"));
   const ok = [];
   if ((r.rating || {}).target != null) ok.push(p.includes(fmtNum.format(r.rating.target)) && !/target medio, revisioni/.test(daCercare));
-  if ((r.stats || {}).gross_margin != null) ok.push(/margine lordo [\\d.]+%/.test(p));
+  /* v477 — la sonda pretendeva il PUNTO inglese ("[\\d.]+%"), cioe' la resa che il pacchetto non
+     deve avere: trentasettesima rottura di un check ancorato alla forma, della specie che pinna
+     il difetto (v326). Ora pretende la convenzione del pacchetto. */
+  if ((r.stats || {}).gross_margin != null) ok.push(/margine lordo [0-9]+(,[0-9])?%/.test(p));
   if ((r.stats || {}).short_float != null) ok.push(/short float/.test(p));
   if ((r.stats || {}).fcf != null) ok.push(/flusso di cassa libero \\d/.test(p));
   return ok.length > 0 && ok.every(Boolean);`));
@@ -4834,7 +4837,7 @@ check("v355 evento: i livelli si rileggono in sigma implicite", suVeri(`
   if (!/MOVIMENTO IMPLICITO DALLE OPZIONI/.test(p)) return true;
   /* la resistenza a +6,1% sta a UNA sigma implicita esatta: senza questa riga si legge come un
      livello lontano, con questa si legge come un testa-o-croce entro la scadenza */
-  return /I LIVELLI IN SIGMA IMPLICITE/.test(p) && /resistenza [\\d.]+σ/.test(p);`));
+  return /I LIVELLI IN SIGMA IMPLICITE/.test(p) && /resistenza [0-9]+(,[0-9])?σ/.test(p);`));
 
 check("v355 rischio: il contributo al rischio e' pubblicato accanto al peso", suVeri(`
   const conMcr = (DATA.watchlist || []).filter(x => x && numero(x.qta) > 0 && Number.isFinite(numero(x.risk_contrib_pct)));
@@ -4891,8 +4894,10 @@ check("v355 crescita: crescita a/a, utili e PEG escono dai dati che c'erano gia'
   if (st.revenue_growth == null && st.peg == null) return true;
   const p = buildPromptTicker("NVDA");
   const ok = [];
-  if (st.revenue_growth != null) ok.push(/crescita ricavi a\\/a [\\d.]+%/.test(p));
-  if (st.earnings_growth != null) ok.push(/crescita utili a\\/a [\\d.]+%/.test(p));
+  /* v477 — le sonde pretendevano il punto inglese, e non ammettevano il segno: una crescita
+     negativa le faceva fallire su codice giusto. Ora la convenzione del pacchetto, col segno. */
+  if (st.revenue_growth != null) ok.push(/crescita ricavi a\\/a -?[0-9]+(,[0-9])?%/.test(p));
+  if (st.earnings_growth != null) ok.push(/crescita utili a\\/a -?[0-9]+(,[0-9])?%/.test(p));
   if (st.peg != null) ok.push(/PEG [\\d,]+/.test(p));
   return ok.length > 0 && ok.every(Boolean);`));
 
@@ -4998,7 +5003,7 @@ check("v357 multipli: su un titolo con utili il P/E prospettico resta", suVeri(`
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
   if (!r || !((r.stats || {}).eps_forward > 0)) return true;
   /* la correzione non deve rovesciare il caso normale */
-  return /P\\/E PROSPETTICO: [\\d.]+×/.test(buildPromptTicker("NVDA"));`));
+  return /P\\/E PROSPETTICO: [0-9]+(,[0-9])?×/.test(buildPromptTicker("NVDA"));`));
 
 check("v357 futures: un solo verdetto, e legge il segno", (() => {
   const i = src.indexOf("function statoFutures");
@@ -9608,120 +9613,138 @@ check("v432 la quota dell'azionario sul patrimonio e' calcolata in una valuta so
   return guai.length ? guai.join(" · ") : true;`));
 
 
-/* ═══ v441 — LA METODOLOGIA CME, e le due derivazioni che devono coincidere ═══════════════
-   ⚠ Lo stato si COSTRUISCE: `implied_rate` cambia a ogni run del CI e un check che lo
-   aspettasse andrebbe rosso a calendario (v429, v431, v435). */
-check("v441 · un rialzo pieno da meta' mese vale UN movimento, non mezzo",
-  suVeriEsito(`
-    const eff = 3.63, imp = eff + 0.25 * (14 / 30);
-    const r = movimentiImpliciti(imp, eff, "2026-09-16", new Date("2026-09-10T00:00:00Z"));
-    if (!r) return "nessun risultato su uno stato che il conto deve saper leggere";
-    if (Math.abs(r.mosse_25bp - 1) > 0.01) return "movimenti " + r.mosse_25bp + " invece di 1";
-    if (r.giorni_vecchio !== 16 || r.giorni_nuovo !== 14 || r.giorni_mese !== 30)
-      return "ponderazione sbagliata: " + JSON.stringify(r);
-    return true;`));
+/* ═══ v441 → v477 — LA CATENA VIVE NELLA PIPELINE, E LA PAGINA LA LEGGE ═══════════════════
+   I gate della v441 provavano il gemello JS del conto (movimentiImpliciti), che ricalcolava da
+   `implied_rate` — il continuo ZQ=F — e da `fed_market.current_rate` — FEDFUNDS, media
+   MENSILE. Verificato il 13/10/2026 che erano sbagliati ENTRAMBI gli ingressi: il continuo
+   rotola sul mese dopo prima della fine del mese, e la media mensile di un mese con una
+   riunione mescola il tasso di prima e quello di dopo. Il gemello e' stato tolto (una
+   derivazione sola, v161/v207); la sua aritmetica resta provata in Python, dove vive.
+   Questi gate sono la RICEVUTA DELLA RIMOZIONE e i nuovi invarianti: lo stato si COSTRUISCE
+   (v425, v429), perche' i prezzi dei contratti cambiano a ogni run. */
+const _FW477 = (meetings, extra) => `
+  DATA.macro = DATA.macro || {};
+  DATA.macro.fedwatch = Object.assign({ target_range: "3.75–4.00%", implied_rate: 3.885, next_fomc: "2026-10-28",
+    base_effr: 3.88, effr: { valore: 3.88, data: "2026-10-09", fonte: "NY Fed" },
+    contratti: [{ mese: "2026-10", simbolo: "ZQV26.CBT", prezzo: 96.115, tasso: 3.885 },
+                { mese: "2026-11", simbolo: "ZQX26.CBT", prezzo: 96.06, tasso: 3.94 },
+                { mese: "2026-12", simbolo: "ZQZ26.CBT", prezzo: 95.915, tasso: 4.085 }],
+    meetings: ${JSON.stringify(meetings)} }, ${JSON.stringify(extra || {})});
+  DATA.predictions = [
+    { question: "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?", yes: 99 },
+    { question: "Will there be no change in Fed interest rates after the October 2026 meeting?", yes: 80 },
+    { question: "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?", yes: 20 } ];
+  const _riga = () => buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("- FedWatch") === 0) || "";
+  const _succ = () => { const p = buildPrompt(); const i = p.indexOf("RIUNIONI SUCCESSIVE");
+    return i < 0 ? "" : p.slice(i, p.indexOf(String.fromCharCode(10), i)); };`;
+const _OTT477 = { date: "2026-10-28", riunione: "2026-10-28", prezzata_dal_contratto: true, metodo: "mese_dopo",
+  mosse_25bp: 0.24, mosse_cumulate: 0.24, tasso_atteso_fine_mese: 3.94, base_effr: 3.88, contratto: "ZQX26.CBT",
+  tasso_contratto: 3.94, cut_prob: null, hike_prob: 24, hold_prob: 76 };
+const _DIC477 = { date: "2026-12-09", riunione: "2026-12-09", prezzata_dal_contratto: true, metodo: "mese_riunione",
+  giorni_vecchio: 9, giorni_nuovo: 22, giorni_mese: 31, mosse_25bp: 0.87, mosse_cumulate: 1.09,
+  tasso_atteso_fine_mese: 4.153, base_effr: 3.94, contratto: "ZQZ26.CBT", tasso_contratto: 4.085,
+  cut_prob: null, hike_prob: 87, hold_prob: 13 };
 
-/* ⚠⚠ IL RIPIEGO DEVE DARE LO STESSO NUMERO DELLA PIPELINE. Sono due implementazioni della
-   stessa domanda in due linguaggi, ed e' la classe che questo progetto ha pagato tre volte
-   (v161, v207, v316). Il valore atteso qui e' quello che `movimenti_impliciti_fomc` produce
-   sugli stessi ingressi, verificato dalla suite Python sullo stesso stato costruito. */
-check("v441 · il ripiego JS riproduce la pipeline sullo stesso stato",
-  suVeriEsito(`
-    const r = movimentiImpliciti(3.79, 3.63, "2026-09-16", new Date("2026-09-10T00:00:00Z"));
-    if (!r) return "il ripiego non calcola cio' che la pipeline calcola";
-    if (Math.abs(r.mosse_25bp - 1.37) > 0.01)
-      return "il ripiego da' " + r.mosse_25bp + ", la pipeline 1.37";
-    return true;`));
+check("v477 · la pagina non ricalcola piu' i movimenti: il gemello JS e' tolto e nessuno lo cita", (() => {
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if (/function movimentiImpliciti\b/.test(codice)) return no("il gemello JS del conto e' ancora definito");
+  if (/movimentiImpliciti\(/.test(codice)) return no("qualcuno chiama ancora il gemello rimosso");
+  const corpo = bloccoDa(codice, "function ramiFedWatch(");
+  if (corpo.indexOf("fed_market") >= 0) return no("ramiFedWatch legge ancora la media mensile FEDFUNDS");
+  if (corpo.indexOf("implied_rate") >= 0) return no("ramiFedWatch legge ancora il future continuo");
+  return true;
+})());
 
-/* ⚠ Una riunione fuori dal mese del contratto non si prezza: e' la v199 nella sua forma
-   corretta — il limite non e' "35 giorni" ma "lo stesso mese di calendario". */
-check("v441 · fuori dal mese del contratto non esce nessun numero",
-  suVeriEsito(`
-    const d = new Date("2026-09-10T00:00:00Z");
-    if (movimentiImpliciti(3.79, 3.63, "2026-10-28", d)) return "ottobre viene prezzato da settembre";
-    if (movimentiImpliciti(5.0, 3.63, "2026-09-16", d)) return "un implied assurdo produce un numero";
-    return true;`));
-
-/* ⚠⚠ E IL RIPIEGO NON SI FIDA DELLO SNAPSHOT VECCHIO. Finche' il CI non rigenera, data.json
-   porta le probabilita' della formula sbagliata (66%): se ramiFedWatch le accettasse, la
-   pagina continuerebbe a pubblicarle. Il check inietta la forma VECCHIA e pretende che venga
-   scavalcata — validato per iniezione, perche' un check che leggesse la forma nuova sarebbe
-   verde per costruzione (v416, il gate circolare). */
-check("v441 · le probabilita' dello snapshot vecchio vengono scavalcate, non accettate",
-  suVeriAlle(`
-    const fw = { implied_rate: 3.79, target_range: "3.50–3.75%",
-                 meetings: [{ date: "2026-09-16", hike_prob: 66, cut_prob: 0, hold_prob: 34 }] };
-    DATA.macro = DATA.macro || {};
-    DATA.macro.fed_market = { current_rate: 3.63, rate_date: "2026-08-01" };
-    const mt = ramiFedWatch(fw, fw.meetings[0]);
-    if (mt.hike_prob === 66) return "il 66% della formula vecchia e' sopravvissuto";
-    if (mt.mosse_25bp == null) return "il ripiego non ha ricalcolato i movimenti";
-    if (Math.abs(mt.mosse_25bp - 1.37) > 0.01) return "movimenti " + mt.mosse_25bp;
-    if (mt.hike_prob != null) return "sopra il movimento intero non deve uscire una probabilita'";
-    return true;`));
-
-/* ⚠ Dentro (0,1] invece la probabilita' ESISTE e va pubblicata: un check che provasse solo il
-   ramo dei movimenti lascerebbe l'altro non esercitato (v190, v234). */
-check("v441 · sotto il movimento intero la probabilita' esce, e i tre rami con lei",
-  suVeriAlle(`
-    const eff = 3.63, imp = eff + 0.5 * 0.25 * (14 / 30);   // mezzo movimento
-    const fw = { implied_rate: imp, meetings: [{ date: "2026-09-16" }] };
-    DATA.macro = DATA.macro || {};
-    DATA.macro.fed_market = { current_rate: eff };
-    const mt = ramiFedWatch(fw, fw.meetings[0]);
-    if (mt.hike_prob == null) return "nessuna probabilita' dove ne esiste una";
-    if (Math.abs(mt.hike_prob - 50) > 2) return "probabilita' " + mt.hike_prob + " invece di ~50";
-    if (mt.hold_prob == null) return "il ramo invariato non viene pubblicato";
-    return true;`));
-
-/* ⚠⚠ v462 — LA RAGIONE DI UN NUMERO TACIUTO DEVE ESSERE QUELLA VERA. Il 06/10 il pacchetto
-   diceva che la riunione del 28/10 "non cade nel mese del contratto" — ci cadeva, e a scattare
-   era la guardia di plausibilita' (la base EFFR e' una media MENSILE che contiene il rialzo del
-   16/09). E non nominava la fonte alternativa (C14). Stato costruito a orologio fermo. */
-check("v462 · una riunione nel mese del contratto non viene spiegata con l'orizzonte",
+check("v477 · lo snapshot vecchio: le sue probabilita' non sopravvivono e il conto non viene rifatto male",
   suVeriOttobre(`
     DATA.macro = DATA.macro || {};
-    DATA.macro.fedwatch = { implied_rate: 3.88, target_range: "3.75-4.00%", next_fomc: "2026-10-28",
-      meetings: [{ date: "2026-10-28" }, { date: "2026-12-09" }] };
+    const fw = { implied_rate: 3.94, target_range: "3.75–4.00%",
+                 meetings: [{ date: "2026-10-28", hike_prob: 66, cut_prob: 0, hold_prob: 34 }] };
+    DATA.macro.fedwatch = fw;
     DATA.macro.fed_market = { current_rate: 3.75, rate_date: "2026-09-01" };
-    /* la quota di un ALTRO mese sta PRIMA: senza il filtro sul mese, find() la prenderebbe */
-    DATA.predictions = [
-      { question: "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?", yes: 99 },
-      { question: "Will there be no change in Fed interest rates after the October 2026 meeting?", yes: 80 },
-      { question: "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?", yes: 20 } ];
+    DATA.predictions = [{ question: "Will there be no change in Fed interest rates after the October 2026 meeting?", yes: 80 },
+                        { question: "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?", yes: 20 }];
+    const mt = ramiFedWatch(fw, fw.meetings[0]);
+    if (mt.hike_prob === 66) return "il 66% dello snapshot vecchio e' sopravvissuto";
+    if (mt.prezzata || mt.mosse_25bp != null) return "ha ricavato un numero da un continuo e una media mensile";
+    if (mt.motivo !== "snapshot") return "motivo " + mt.motivo + " invece di snapshot";
     const r = buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("- FedWatch") === 0) || "";
-    if (!r) return "la riga FedWatch non esce";
-    if (r.indexOf("non ci cade dentro") >= 0) return "spiega con l'orizzonte una riunione che cade nel mese";
-    if (r.indexOf("NON ATTRIBUIBILE") < 0) return "non dichiara la guardia di plausibilita'";
+    if (r.indexOf("NON CALCOLABILE") < 0 || r.indexOf("precedente alla correzione v477") < 0)
+      return "la riga non dichiara che lo snapshot non permette il conto: " + r.slice(0, 160);
+    return r.indexOf("INVARIATO 80%") >= 0 || "non nomina la fonte che quota la riunione";`));
+
+check("v477 · sotto il movimento intero la probabilita' esce dalla catena, coi tre rami",
+  suVeriOttobre(_FW477([_OTT477]) + `
+    const mt = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);
+    if (mt.hike_prob !== 24 || mt.hold_prob !== 76) return "rami " + mt.hike_prob + "/" + mt.hold_prob;
+    const r = _riga();
+    if (r.indexOf("RIALZO 24%") < 0 || r.indexOf("invariato 76%") < 0 || r.indexOf("taglio 0%") < 0)
+      return "la riga non pubblica i tre rami: " + r.slice(0, 200);
+    return true;`));
+
+check("v477 · la riga dice da QUALE contratto viene il numero, col metodo vero",
+  suVeriOttobre(_FW477([_OTT477, _DIC477]) + `
+    const r = _riga();
+    if (r.indexOf("novembre 2026 (ZQX26.CBT), mese SENZA riunioni") < 0) return "non nomina il contratto del mese dopo";
+    if (r.indexOf("E' il tasso atteso dopo questa riunione") < 0) return "non dice cosa significa il tasso di quel mese";
+    if (r.indexOf("EFFR del 09/10/2026 3,88%") < 0) return "la base non e' l'EFFR del giorno con la sua data";
+    if (r.indexOf("media attesa del mese") >= 0) return "chiama media del mese un tasso che non lo e'";
+    const s = _succ();
+    if (s.indexOf("09/12: +0,87 movimenti da 25bp a quella riunione (+1,09 cumulati da oggi)") < 0)
+      return "la riunione successiva non esce dalla catena: " + s.slice(0, 200);
+    return true;`));
+
+check("v477 · un conto fuori scala si dichiara con la ragione vera, non con le cause gia' chiuse (v462)",
+  suVeriOttobre(_FW477([{ date: "2026-10-28", riunione: "2026-10-28", prezzata_dal_contratto: false,
+    motivo: "plausibilita", mosse_grezze: 4.28, contratto: "ZQX26.CBT", metodo: "mese_dopo" },
+    { date: "2026-12-09", riunione: "2026-12-09", prezzata_dal_contratto: false, motivo: "catena" }]) + `
+    const r = _riga();
+    if (r.indexOf("NON ATTRIBUIBILE") < 0 || r.indexOf("4,28 movimenti") < 0) return "non dichiara il conto fuori scala";
+    if (r.indexOf("FEDFUNDS") >= 0 || r.indexOf("serie MENSILE") >= 0) return "accusa la base mensile, che non si usa piu'";
     if (r.indexOf("INVARIATO 80%") < 0) return "non nomina la fonte alternativa coi suoi numeri";
     if (r.indexOf("99%") >= 0) return "aggancia la quota di un ALTRO mese";
-    if (r.indexOf(" ? ") >= 0 || r.indexOf("i ? giorni") >= 0) return "stampa punti interrogativi al posto della ponderazione";
-    return true;`));
+    if (r.indexOf(" ? ") >= 0) return "punti interrogativi al posto dei numeri";
+    return _succ().indexOf("09/12 NON prezzata — la riunione precedente non e' prezzata") >= 0
+      || "la riunione dopo non dichiara di dipendere dalla precedente";`));
 
-check("v462 · una riunione fuori dal mese resta spiegata con l'orizzonte",
-  suVeriOttobre(`
-    DATA.macro = DATA.macro || {};
-    DATA.macro.fedwatch = { implied_rate: 3.88, target_range: "3.75-4.00%", next_fomc: "2026-11-04",
-      meetings: [{ date: "2026-11-04" }] };
-    DATA.macro.fed_market = { current_rate: 3.88, rate_date: "2026-10-01" };
-    const r = buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("- FedWatch") === 0) || "";
-    if (r.indexOf("non ci cade dentro") < 0) return "il ramo dell'orizzonte e' sparito: " + r.slice(0, 160);
-    return true;`));
+check("v477 · un contratto non letto si dichiara col suo simbolo, e non diventa uno zero",
+  suVeriOttobre(_FW477([{ date: "2026-10-28", riunione: "2026-10-28", prezzata_dal_contratto: false,
+    motivo: "contratto", contratto: "ZQX26.CBT" },
+    { date: "2026-12-09", riunione: "2026-12-09", prezzata_dal_contratto: false, motivo: "catena" }]) + `
+    const r = _riga();
+    if (r.indexOf("NON CALCOLABILE: contratto ZQX26.CBT non letto in questo run") < 0) return "non nomina il contratto mancante: " + r.slice(0, 200);
+    if (r.indexOf("non e' zero") < 0) return "non dice che il buco non e' uno zero";
+    const s = _succ();
+    if (/(rialzo|invariato|taglio) 0%/i.test(s)) return "stampa zeri sulle riunioni non prezzate";
+    const mt = ramiFedWatch(DATA.macro.fedwatch, DATA.macro.fedwatch.meetings[0]);
+    const riga = rigaFedWatch(mt), t = indicatoriClassifica().find(x => x && x.k === "fedwatch") || {};
+    if (riga.indexOf("ZQX26.CBT non letto") < 0) return "il popup non dice il perche' della pipeline";
+    return String(t.sub).indexOf("ZQX26.CBT non letto") >= 0 || "la tessera non dice il perche' della pipeline";`));
 
-/* ⚠⚠ E LA RAMPA INVENTATA NON DEVE RIENTRARE NEL PACCHETTO: pubblicava 78% a ottobre e 90% a
-   dicembre, numeri che nessun mercato ha quotato. Ora quelle riunioni si DICHIARANO non
-   prezzate — e "0%" sarebbe l'opposto, non l'assenza (v389, v406). */
-check("v441 · il pacchetto dichiara le riunioni non prezzate invece di stampare zeri",
-  suVeriEsito(`
-    const p = buildPrompt();
-    const i = p.indexOf("RIUNIONI SUCCESSIVE");
-    if (i < 0) return "la riga delle riunioni successive non c'e' piu' del tutto";
-    const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
-    if (riga.indexOf("NON le prezza") < 0) return "non dichiara di non prezzarle";
-    if (/invariato 0% . rialzo 0%/.test(riga)) return "stampa ancora zeri al posto della dichiarazione";
-    if (p.indexOf("STRUTTURA A TERMINE DELLE ATTESE FED") >= 0)
-      return "la curva costruita sulla rampa inventata e' tornata";
-    return true;`));
+check("v477 · le riunioni successive escono tutte nominate, ciascuna con uno stato, mai con zeri", suVeriEsito(`
+  /* l'invariante del v345 e del v441, sui TRE stati: catena prezzata, catena interrotta,
+     snapshot precedente — un gate che ne esercita due non vede il terzo (v419, v420) */
+  const NL = String.fromCharCode(10);
+  const succ = () => { const p = buildPrompt(); const i = p.indexOf("RIUNIONI SUCCESSIVE");
+    return i < 0 ? "" : p.slice(i, p.indexOf(NL, i)); };
+  const base = { target_range: "3.75–4.00%", implied_rate: 3.885, next_fomc: "2026-10-28",
+    effr: { valore: 3.88, data: "2026-10-09", fonte: "NY Fed" }, contratti: [] };
+  DATA.macro = DATA.macro || {};
+  const stati = [
+    ["prezzata", Object.assign({}, base, { meetings: [${JSON.stringify(_OTT477)}, ${JSON.stringify(_DIC477)}] }), "+0,87 movimenti"],
+    ["interrotta", Object.assign({}, base, { meetings: [{ date: "2026-10-28", prezzata_dal_contratto: false, motivo: "contratto" },
+      { date: "2026-12-09", prezzata_dal_contratto: false, motivo: "catena" }] }), "NON prezzata"],
+    ["snapshot", { target_range: "3.75–4.00%", implied_rate: 3.94, meetings: [{ date: "2026-10-28" }, { date: "2026-12-09" }] }, "NON prezzata"] ];
+  const guai = [];
+  for (const [nome, fw, atteso] of stati) {
+    DATA.macro.fedwatch = fw;
+    const s = succ();
+    if (!s) { guai.push(nome + ": la riga delle riunioni successive e' sparita"); continue; }
+    if (s.indexOf("09/12") < 0) guai.push(nome + ": la riunione del 09/12 non e' nominata");
+    if (s.indexOf(atteso) < 0) guai.push(nome + ": manca lo stato (" + atteso + ")");
+    if (/(rialzo|invariato|taglio) 0%/i.test(s)) guai.push(nome + ": stampa zeri");
+  }
+  return guai.length ? guai.join(" · ") : true;`));
 
 /* ═══ v442 — LA GUARDIA STRUTTURALE SUL FORMATTATORE ══════════════════════════════════════
    ⚠⚠ Il check v370 qui sopra confronta i due numeri COME SONO STAMPATI, quindi vede il difetto
@@ -10129,6 +10152,73 @@ check("v476 una lettura sola della liquidita': definita una volta, e nessun cons
   if (usi < 5) return no("solo " + usi + " usi: qualche consumatore non passa dalla lettura unica");
   const residui = ["t.comb.cassa", "combustione || {}).cassa", "t.comb && t.comb.cassa"].filter(x => codice.indexOf(x) >= 0);
   return residui.length ? no("leggono ancora la sola cassa: " + residui.join(", ")) : true;
+})());
+
+/* ═══ v477 — GLI INVESTIMENTI NON SONO SEMPRE COSTRUZIONE, E GLI OBBLIGHI NON SONO SOLO OPERATIVI
+   Su MSTR il 99,9% del capex sono acquisti di ATTIVITA' IMMATERIALI (21,7 mld contro 21 milioni
+   di impianti) e il pacchetto scriveva "la liquidita' copre 1,4 mesi di INVESTIMENTI", cioe' un
+   cantiere che resta a meta'; i dividendi sulle privilegiate (952 milioni in 12 mesi contro 20 di
+   perdita operativa) non entravano in nessun denominatore. Lo stato si COSTRUISCE con i numeri
+   del rendiconto al 30/06/2026 (v425, v429): lo snapshot del giorno puo' non avere i campi. */
+const _COMB477 = { cassa: 1711.8e6, titoli_breve: 736.2e6, liquidita: 2448e6, liquidita_base: "aggregato",
+  debito: 6770.8e6, debito_netto: 4322.8e6, bilancio_al: "2026-06-30", ocf_ttm: -20e6, capex_ttm: -21729.4e6,
+  fcf_ttm: -21749.4e6, trimestri: 4, cashflow_al: "2026-06-30", mesi_operativi: 1468.8, mesi_capex: 1.4,
+  capex_impianti_ttm: -21.2e6, capex_immateriali_ttm: -21708.2e6, quota_immateriali_pct: 99.9,
+  investimenti_immateriali_prevalenti: true, mesi_impianti: 1385.7, dividendi_privilegiate_ttm: -952.3e6,
+  dividendi_privilegiate_trimestri: 4, dividendi_privilegiate_ultimo_trim: -399.6e6, mesi_obblighi: 30.2 };
+
+check("v477 il capex fatto di attivita' immateriali si DICHIARA, con l'autonomia sui soli impianti accanto",
+  conCombEsito(_COMB477, {}, `
+    const riga = out.split(String.fromCharCode(10)).find(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0) || "";
+    if (!riga) return "il blocco non compare";
+    if (riga.indexOf("acquisti di attivita' immateriali") < 0 || riga.indexOf("(99,9%)") < 0 || riga.indexOf("e impianti") < 0)
+      return "manca la composizione del capex dichiarata dalla fonte";
+    if (riga.indexOf("ATTIVITA' IMMATERIALI, non di impianti") < 0) return "l'autonomia sul capex non dice cosa misura";
+    if (riga.indexOf("sui soli impianti la liquidita' copre oltre 5 anni") < 0) return "manca l'autonomia sui soli impianti";
+    if (riga.indexOf("sta costruendo molto") >= 0) return "dice 'sta costruendo molto' di una societa' che non costruisce";
+    return true;`));
+
+check("v477 i dividendi sulle privilegiate entrano: uscita fuori dal flusso operativo, autonomia sulle due uscite, ritmo",
+  conCombEsito(_COMB477, {}, `
+    const riga = out.split(String.fromCharCode(10)).find(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0) || "";
+    if (riga.indexOf("dividendi sulle azioni privilegiate") < 0) return "i dividendi non sono fra i flussi";
+    if (riga.indexOf("30,2 mesi di perdita operativa PIU' DIVIDENDI SULLE AZIONI PRIVILEGIATE") < 0)
+      return "manca l'autonomia sulle due uscite insieme";
+    if (riga.indexOf("1,7 volte la media trimestrale") < 0) return "il ritmo in salita dei dividendi non e' dichiarato";
+    return riga.indexOf("I tre numeri NON si confrontano") >= 0 || "tre denominatori e nessuna riga che lo dichiari";`));
+
+check("v477 snapshot precedente alla correzione: senza i campi nuovi la riga resta quella di prima",
+  conCombEsito({ cassa: 1711.8e6, titoli_breve: 736.2e6, liquidita: 2448e6, liquidita_base: "aggregato",
+    debito: 6770.8e6, debito_netto: 4322.8e6, bilancio_al: "2026-06-30", ocf_ttm: -20e6, capex_ttm: -21729.4e6,
+    fcf_ttm: -21749.4e6, trimestri: 4, mesi_operativi: 1468.8, mesi_capex: 1.4 }, {}, `
+    const riga = out.split(String.fromCharCode(10)).find(l => l.indexOf("- COMBUSTIONE DI CASSA") === 0) || "";
+    if (riga.indexOf("IMMATERIALI") >= 0 || riga.indexOf("PRIVILEGIATE") >= 0) return "afferma una composizione che il dato non ha";
+    if (riga.indexOf("I due numeri NON si confrontano") < 0) return "la nota dei due denominatori e' sparita";
+    return riga.indexOf("sta costruendo molto") >= 0 || "la chiave di lettura degli impianti e' sparita dove vale";`));
+
+check("v477 la qualifica arriva a tutte le sedi dell'autonomia, e la congiunzione non fonde due durate", suVeriEsito(`
+  const r = (DATA.watchlist || []).find(x => x && x.qta > 0 && numero(x.controvalore) > 0 && x.ticker !== "BTP");
+  if (!r) return "nessuna posizione su cui costruire il caso";
+  r.combustione = ${JSON.stringify(_COMB477)};
+  const p = buildCIOText();
+  const n = p.split("ATTIVITA' IMMATERIALI, non di impianti").length - 1;
+  if (n < 2) return "la qualifica esce in " + n + " sedi su almeno due (disciplina e approfondimento)";
+  if (p.indexOf("oltre 5 anni e 30,2 mesi") >= 0) return "la congiunzione 'e' fonde due denominatori in una durata sola";
+  return true;`));
+
+check("v477 le percentuali del pacchetto del titolo escono con la virgola, non col punto inglese",
+  conCombEsito(_COMB477, { gross_margin: 0.6765, revenue_growth: 0.069, earnings_growth: 0.123, short_float: 0.078 }, `
+    const riga = out.split(String.fromCharCode(10)).find(l => l.indexOf("- FONDAMENTALI GIA' NEL SISTEMA") === 0) || "";
+    if (!riga) return "la riga dei fondamentali non compare";
+    if (riga.indexOf("margine lordo 67,7%") < 0) return "il margine lordo non esce nella convenzione del pacchetto";
+    const punto = riga.match(/[0-9][.][0-9]+%/);
+    return !punto || "percentuale col punto inglese: " + punto[0];`));
+
+check("v477 nel pacchetto del titolo nessuna percentuale passa da toFixed (v442, v443)", (() => {
+  const corpo = ["function datiNostriDelTitolo(", "function buildPromptTicker("].map(a => bloccoDa(src, a)).join(" ").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  /* percentuali, multipli e sigma: tutti con una cifra decimale, tutti dal formattatore unico */
+  const resti = corpo.match(/toFixed\([12]\)/g) || [];
+  return resti.length === 0 || no(resti.length + " numeri decimali passano ancora da toFixed (punto inglese)");
 })());
 
 let fail = 0;

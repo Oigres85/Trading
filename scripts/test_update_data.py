@@ -1409,8 +1409,12 @@ check("v441 il ciclo delle riunioni non ha un indice, quindi non puo' proiettare
 # --- 8. il collegamento, non solo il controllo (v399) ---
 # Togliendo la riga che aggancia la funzione al blocco FedWatch, i sette check qui sopra
 # restano tutti verdi e la pipeline torna a pubblicare la formula vecchia.
+# ⚠ v477 — il collegamento passa dalla CATENA: il blocco chiama catena_fedwatch con l'EFFR del
+#   giorno, e la catena chiama movimenti_impliciti_fomc per le riunioni prezzate nel loro mese.
+#   Riagganciato al fatto (la funzione e' raggiunta dalla produzione), non alla vecchia chiamata.
 check("v441 il blocco FedWatch e' agganciato a movimenti_impliciti_fomc, non solo definita",
-      "movimenti_impliciti_fomc(implied, effr_corrente" in _cod_fw
+      "catena_fedwatch(effr_corrente" in _cod_fw
+      and "movimenti_impliciti_fomc(tassi_mese[(a, m)], pre" in _cod_fw
       and "quarti = (mid - implied)" not in _cod_fw)
 
 # ══ v443 — IL COLLEGAMENTO ERA ROTTO DALL'ORDINE DI SCRITTURA, e i sei gate della v441 non
@@ -1433,6 +1437,101 @@ _tardive = sorted(k for k in _letture
 check("v443 il blocco FedWatch non dipende da una chiave che il file scrive dopo di lui"
       + (" (tardive: %s)" % ", ".join(_tardive) if _tardive else ""),
       not _tardive or "fred_series(\"FEDFUNDS\"" in _blocco_effr)
+
+# ═══ v477 — IL CONTRATTO CONTINUO ROTOLA A META' MESE, E LA BASE ERA UNA MEDIA MENSILE ═══════
+# Verificato il 13/10/2026: `ZQ=F` serviva ZQX26 (novembre) mentre la riunione era il 28/10, e
+# la base era FEDFUNDS di settembre (3,75, meta' prima e meta' dopo il rialzo del 16/09) contro
+# un EFFR di 3,88. Lo stato si COSTRUISCE (v425, v429): i prezzi dei contratti cambiano a ogni
+# run, e un check che li aspettasse sarebbe verde per il caso.
+check("v477 il contratto si nomina PER ESTESO: ZQ + codice del mese + anno",
+      ud.simbolo_fed_funds(2026, 10) == "ZQV26.CBT" and ud.simbolo_fed_funds(2026, 11) == "ZQX26.CBT"
+      and ud.simbolo_fed_funds(2026, 12) == "ZQZ26.CBT" and ud.simbolo_fed_funds(2027, 1) == "ZQF27.CBT")
+check("v477 i mesi da leggere: il mese DOPO se e' noto e senza riunioni, sempre quello della riunione",
+      ud.mesi_contratti_fomc(["2026-10-28", "2026-12-09"]) == [(2026, 11), (2026, 10), (2026, 12)])
+
+_cat = ud.catena_fedwatch(3.88, ["2026-10-28", "2026-12-09"],
+                          {(2026, 10): 3.885, (2026, 11): 3.94, (2026, 12): 4.085})
+check("v477 riunione di fine mese col mese dopo senza riunioni: il tasso medio di quel mese E' il tasso deciso",
+      _cat[0].get("prezzata_dal_contratto") and _cat[0].get("metodo") == "mese_dopo"
+      and _cat[0].get("contratto") == "ZQX26.CBT" and _cat[0].get("mosse_25bp") == 0.24
+      and _cat[0].get("base_effr") == 3.88 and _cat[0].get("tasso_atteso_fine_mese") == 3.94)
+_post_dic = (31 * 4.085 - 9 * 3.94) / 22
+check("v477 la riunione dopo parte dall'esito della precedente, nel proprio mese, coi giorni ponderati",
+      _cat[1].get("metodo") == "mese_riunione" and _cat[1].get("base_effr") == 3.94
+      and (_cat[1].get("giorni_vecchio"), _cat[1].get("giorni_nuovo"), _cat[1].get("giorni_mese")) == (9, 22, 31)
+      and _cat[1].get("mosse_25bp") == round((_post_dic - 3.94) / 0.25, 2)
+      and _cat[1].get("mosse_cumulate") == round((_post_dic - 3.88) / 0.25, 2))
+# ⚠⚠ IL DIFETTO DELLA v450, in miniatura: un rialzo pieno il 16/09 (ottobre tutto al tasso nuovo)
+#   letto con il contratto di OTTOBRE al posto di quello di settembre dava ~2 movimenti. Con la
+#   chiave del mese la riunione di settembre si prezza col SUO contratto, e il numero torna 1.
+_sett = ud.catena_fedwatch(3.63, ["2026-09-16", "2026-10-28"],
+                           {(2026, 9): 3.63 + 0.25 * 14 / 30, (2026, 10): 3.88, (2026, 11): 3.88})
+_letto_male = ud.movimenti_impliciti_fomc(3.88, 3.63, "2026-09-16", ud.datetime(2026, 9, 1).date())
+check("v477 settembre si prezza col contratto di SETTEMBRE (1 movimento), non con quello del mese dopo (~2)",
+      _sett[0].get("mosse_25bp") == 1.0 and _sett[0].get("contratto") == "ZQU26.CBT"
+      and _letto_male is not None and _letto_male["mosse_25bp"] > 1.9
+      and _sett[1].get("mosse_25bp") == 0.0 and _sett[1].get("mosse_cumulate") == 1.0)
+_buco = ud.catena_fedwatch(3.88, ["2026-10-28", "2026-12-09"], {(2026, 12): 4.085})
+check("v477 un contratto non letto si DICHIARA col suo simbolo, e la riunione dopo non si calcola su una base mancante",
+      # ⚠ .get, non l'indice: l'iniezione che lascia proseguire la catena faceva MORIRE la suite
+      #   con un KeyError invece di farla fallire su questo check — mordeva, ma raccontava male (v407)
+      _buco[0].get("prezzata_dal_contratto") is False and _buco[0].get("motivo") == "contratto"
+      and _buco[0].get("contratto") == "ZQX26.CBT" and _buco[1].get("motivo") == "catena"
+      and "mosse_25bp" not in _buco[1])
+_fuori = ud.catena_fedwatch(3.88, ["2026-10-28"], {(2026, 11): 4.95})
+check("v477 oltre tre movimenti su una riunione sola si dichiara fuori scala, col numero grezzo",
+      _fuori[0].get("motivo") == "plausibilita" and _fuori[0].get("mosse_grezze") == 4.28
+      and "mosse_25bp" not in _fuori[0])
+check("v477 senza EFFR del giorno nessuna riunione si calcola, e si dice perche'",
+      all(v.get("motivo") == "dati" for v in ud.catena_fedwatch(None, ["2026-10-28", "2026-12-09"],
+                                                             {(2026, 11): 3.94, (2026, 12): 4.085})))
+_gen = ud.catena_fedwatch(3.88, ["2026-12-09"], {(2026, 12): 4.085, (2027, 1): 4.16})
+check("v477 un mese fuori dal calendario noto (gennaio 2027) non si assume senza riunioni",
+      _gen[0].get("metodo") == "mese_riunione" and _gen[0].get("contratto") == "ZQZ26.CBT")
+
+# l'EFFR del giorno: NY Fed, poi FRED EFFR — MAI FEDFUNDS, la media mensile
+class _RispNYF:
+    def json(self):
+        return {"refRates": [{"effectiveDate": "2026-10-09", "percentRate": 3.88}]}
+_vg477, _vf477 = ud.http_get, ud.fred_series
+try:
+    ud.http_get = lambda *a, **k: _RispNYF()
+    _e1 = ud.effr_giornaliero()
+    def _no_rete(*a, **k):
+        raise RuntimeError("rete")
+    ud.http_get = _no_rete
+    ud.fred_series = lambda sid, n=1, *a, **k: [("2026-10-08", 3.87)] if sid == "EFFR" else [("2026-09-01", 3.75)]
+    _e2 = ud.effr_giornaliero()
+    ud.fred_series = _no_rete
+    _e3 = ud.effr_giornaliero()
+finally:
+    ud.http_get, ud.fred_series = _vg477, _vf477
+check("v477 l'EFFR viene dalla NY Fed col suo giorno, poi da FRED EFFR, e senza entrambi e' un buco",
+      _e1 == {"valore": 3.88, "data": "2026-10-09", "fonte": "NY Fed"}
+      and _e2 == {"valore": 3.87, "data": "2026-10-08", "fonte": "FRED EFFR"} and _e3 is None)
+# ⚠ _SRC_UD_CODICE non ha commenti: l'ancora del blocco e' una riga di CODICE, non il titolo
+_i477 = _SRC_UD_CODICE.index("def effr_giornaliero(")
+_fn_effr = _SRC_UD_CODICE[_i477:_SRC_UD_CODICE.index("\ndef ", _i477 + 10)]
+_i477b = _SRC_UD_CODICE.index('macro["fedwatch"] = {')
+_blocco477 = _SRC_UD_CODICE[_SRC_UD_CODICE.rindex("_mesi_fw = ", 0, _i477b):_i477b]
+check("v477 collegamento: il blocco legge i contratti PER ESTESO e l'EFFR del giorno, mai il continuo ne' FEDFUNDS",
+      "simbolo_fed_funds(" in _blocco477 and "effr_giornaliero()" in _blocco477
+      and "catena_fedwatch(effr_corrente" in _blocco477
+      # ⚠ la sonda e' la CHIAMATA, non la parola: la docstring di effr_giornaliero nomina FEDFUNDS
+      #   per spiegare perche' non si usa, e la prima stesura la contava (il gate che trova se' stesso)
+      and '"ZQ=F"' not in _blocco477 and 'fred_series("FEDFUNDS"' not in _blocco477
+      and 'fred_series("FEDFUNDS"' not in _fn_effr and 'fred_series("EFFR"' in _fn_effr)
+# la fonte nuova nasce sorvegliata (v390)
+_dq477 = ud.validate_macro({})
+_dq477b = ud.validate_macro({"fedwatch": {"effr": {"valore": 3.88, "data": "2026-01-02"}, "contratti": []}})
+_dq477c = ud.validate_macro({"fedwatch": {"effr": {"valore": 3.88, "data": ud.datetime.now(ud.timezone.utc).date().isoformat()},
+                                          "contratti": [{"simbolo": "ZQX26.CBT", "prezzo": None}]}})
+_dq477d = ud.validate_macro({"fedwatch": {"effr": {"valore": 3.88, "data": ud.datetime.now(ud.timezone.utc).date().isoformat()},
+                                          "contratti": [{"simbolo": "ZQX26.CBT", "prezzo": 96.06}]}})
+_st = lambda dq: [c["status"] for c in dq["checks"] if c["key"] == "fedwatch"]
+check("v477 FedWatch sorvegliato: assente -> missing, EFFR vecchio o contratto non letto -> stale, sano -> ok",
+      _st(_dq477) == ["missing"] and _st(_dq477b) == ["stale"] and _st(_dq477c) == ["stale"]
+      and any("ZQX26.CBT" in a for a in _dq477c["alerts"]) and _st(_dq477d) == ["ok"])
 
 # ============================ v465 — SPREAD CCC ============================
 # Lo stato si COSTRUISCE (v425): una serie con un minimo noto 60 sedute indietro.
@@ -1513,6 +1612,61 @@ check("v476 con il solo aggregato la liquidita' c'e' e la cassa resta un buco",
 check("v476 l'ordine non torna indietro: la cassa NON ha piu' l'aggregato come ripiego",
       '_riga_bilancio(bs, "Cash And Cash Equivalents",\n' not in _SRC_UD
       and '_riga_bilancio(bs, "Cash And Cash Equivalents")' in _SRC_UD_CODICE)
+
+# ============================ v477 — GLI INVESTIMENTI NON SONO SEMPRE COSTRUZIONE ============================
+# Su MSTR il 99,9% del capex sono acquisti di ATTIVITA' IMMATERIALI (21,7 mld contro 21 milioni di
+# impianti) e il pacchetto scriveva "la liquidita' copre 1,4 mesi di INVESTIMENTI"; i dividendi
+# sulle privilegiate (952 milioni in 12 mesi) stavano fuori da ogni denominatore. Lo stato si
+# COSTRUISCE coi numeri veri del rendiconto di MSTR al 30/06/2026 (v425, v429).
+_bs477 = _bil476({"Cash Cash Equivalents And Short Term Investments": [2448e6, 2207e6, 2301e6, 54e6],
+                  "Cash And Cash Equivalents": [1712e6, 2207e6, 2301e6, 54e6]})
+_cf477 = _bil476({"Operating Cash Flow": [-4.1e6, 14.0e6, -21.6e6, -8.3e6],
+                  "Capital Expenditure": [-6422.7e6, -7252.1e6, -3094.7e6, -4959.9e6],
+                  "Purchase Of PPE": [-1.8e6, -1.0e6, -10.6e6, -7.8e6],
+                  "Purchase Of Intangibles": [-6420.9e6, -7251.1e6, -3084.1e6, -4952.1e6],
+                  "Preferred Stock Dividend Paid": [-399.6e6, -229.5e6, -183.4e6, -139.8e6]})
+_m477 = ud.combustione(_T476(_bs477, _cf477), None, None)
+_imp477, _imm477 = -21.2e6, -21708.2e6
+check("v477 la scomposizione impianti/immateriali esce quando SOMMA al totale, con la quota dichiarata",
+      abs(_m477.get("capex_impianti_ttm", 0) - _imp477) < 1 and abs(_m477.get("capex_immateriali_ttm", 0) - _imm477) < 1
+      and _m477.get("quota_immateriali_pct") == 99.9 and _m477.get("investimenti_immateriali_prevalenti") is True)
+check("v477 con gli immateriali prevalenti c'e' l'autonomia sui soli IMPIANTI, accanto a quella sul capex",
+      _m477.get("mesi_impianti") == round(2448e6 / (21.2e6 / 12.0), 1)
+      and _m477.get("mesi_capex") == round(2448e6 / (21729.4e6 / 12.0), 1))
+check("v477 capex e flusso libero NON cambiano definizione: il segno decide chi dipende dal credito (v404)",
+      abs(_m477["capex_ttm"] - (-21729.4e6)) < 1 and abs(_m477["fcf_ttm"] - (-20.0e6 - 21729.4e6)) < 1)
+check("v477 i dividendi sulle privilegiate escono col loro ultimo trimestre, e l'autonomia sulle DUE uscite",
+      abs(_m477.get("dividendi_privilegiate_ttm", 0) - (-952.3e6)) < 1
+      and _m477.get("dividendi_privilegiate_ultimo_trim") == -399.6e6
+      and _m477.get("dividendi_privilegiate_trimestri") == 4
+      and _m477.get("mesi_obblighi") == round(2448e6 / ((952.3e6 + 20.0e6) / 12.0), 1))
+_nt477 = ud.combustione(_T476(_bs477, _bil476({
+    "Operating Cash Flow": [10e6] * 4, "Capital Expenditure": [-100e6] * 4,
+    "Purchase Of PPE": [-10e6] * 4, "Purchase Of Intangibles": [-50e6] * 4})), None, None)
+check("v477 una scomposizione che NON somma al totale si tace: due voci che non tornano si contraddicono",
+      "capex_impianti_ttm" not in _nt477 and "quota_immateriali_pct" not in _nt477
+      and "investimenti_immateriali_prevalenti" not in _nt477)
+_mr477 = ud.combustione(_T476(_bs477, _bil476({
+    "Operating Cash Flow": [550e6] * 4, "Capital Expenditure": [-119.375e6] * 4,
+    "Purchase Of PPE": [-117.55e6] * 4, "Purchase Of Intangibles": [-1.825e6] * 4})), None, None)
+check("v477 sotto la meta' gli immateriali si dichiarano ma la lettura non cambia (il caso MRVL, 1,5%)",
+      _mr477.get("quota_immateriali_pct") == 1.5 and "investimenti_immateriali_prevalenti" not in _mr477
+      and "mesi_impianti" not in _mr477)
+_cr477 = ud.combustione(_T476(_bs477, _bil476({
+    "Operating Cash Flow": [1.7e9] * 4, "Capital Expenditure": [-5e9] * 4, "Purchase Of PPE": [-5e9] * 4})), None, None)
+check("v477 senza la voce degli immateriali (quasi tutto il libro) nessuna scomposizione e nessun campo nuovo",
+      not any(k in _cr477 for k in ("capex_impianti_ttm", "capex_immateriali_ttm", "quota_immateriali_pct",
+                                    "mesi_impianti", "dividendi_privilegiate_ttm", "mesi_obblighi")))
+_wd477 = ud.combustione(_T476(_bs477, _bil476({
+    "Operating Cash Flow": [1e9] * 4, "Capital Expenditure": [-100e6] * 4,
+    "Preferred Stock Dividend Paid": [-2.5e6] * 4})), None, None)
+check("v477 se la gestione copre i dividendi, i dividendi si pubblicano e l'autonomia sulle due uscite no",
+      _wd477.get("dividendi_privilegiate_ttm") == -10e6 and "mesi_obblighi" not in _wd477)
+_tr477 = ud.combustione(_T476(_bs477, _bil476({
+    "Operating Cash Flow": [-5e6, -5e6, -5e6, -5e6], "Capital Expenditure": [-1e6] * 4,
+    "Preferred Stock Dividend Paid": [-100e6, -80e6, None, None]})), None, None)
+check("v477 con meno di quattro trimestri di dividendi il totale dichiara quanti sono e l'autonomia tace",
+      _tr477.get("dividendi_privilegiate_trimestri") == 2 and "mesi_obblighi" not in _tr477)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

@@ -208,10 +208,30 @@ def riga_cassa(r):
     if c.get("mesi_operativi") is not None:
         voci.append(f"{_mesi(c['mesi_operativi'])} di perdita operativa")
     if c.get("mesi_capex") is not None:
-        voci.append(f"{_mesi(c['mesi_capex'])} di investimenti")
+        # ⚠⚠ v477 — gli investimenti non sono sempre costruzione: su MSTR il 99,9% del capex sono
+        #   acquisti di attivita' immateriali, e "1,4 mesi di investimenti" si leggeva come un
+        #   cantiere che resta a meta'. Stessa qualifica di autonomiaCassa in app.js.
+        inv = f"{_mesi(c['mesi_capex'])} di investimenti"
+        if c.get("investimenti_immateriali_prevalenti") and c.get("quota_immateriali_pct") is not None:
+            inv += (f" (⚠ il {_n(c['quota_immateriali_pct'])}% sono acquisti di attivita' immateriali,"
+                    " non impianti: non e' un piano di costruzione"
+                    + (f"; sui soli impianti {_mesi(c['mesi_impianti'])}"
+                       if c.get("mesi_impianti") is not None else "") + ")")
+        voci.append(inv)
+    if c.get("mesi_obblighi") is not None:
+        # ⚠⚠ v477 — i dividendi sulle privilegiate stanno fuori dal flusso operativo
+        ob = f"{_mesi(c['mesi_obblighi'])} di perdita operativa piu' dividendi sulle privilegiate"
+        ttm, ult = c.get("dividendi_privilegiate_ttm"), c.get("dividendi_privilegiate_ultimo_trim")
+        if ttm and ult is not None:
+            volte = ult / (ttm / 4)
+            if volte > 1.1:
+                ob += (f" (l'ultimo trimestre di dividendi vale {_n(volte)} volte la media trimestrale:"
+                       " sul ritmo recente i mesi sono meno)")
+        voci.append(ob)
     if voci and nome:
         pz.append(f"la {nome} ({det}) copre " + " · ".join(voci)
-                  + (" — due denominatori diversi, non si confrontano" if len(voci) > 1 else ""))
+                  + (f" — {('due' if len(voci) == 2 else 'tre')} denominatori diversi, non si confrontano"
+                     if len(voci) > 1 else ""))
     if c.get("emissione_netta_pct") is not None:
         pz.append(f"emissione netta di azioni {_segno(c['emissione_netta_pct'])}% su 12 mesi")
     if k.get("copertura") is not None:

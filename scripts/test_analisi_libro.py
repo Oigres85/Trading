@@ -2398,6 +2398,31 @@ check("v476 collegamento: le schede stampano i ricavi, e il rapporto usa liquidi
       and "SP.liquidita_societa(cb)" in _extra476 and "SP.riga_ricavi(r)" in _extra476
       and 'cb.get("cassa")' not in _extra476 and "/1e9:.1f} mld" not in _extra476)
 
+# ============================ v477 — INVESTIMENTI NON SEMPRE COSTRUZIONE, E GLI OBBLIGHI ============================
+_c477 = {"fcf_ttm": -21749.4e6, "cashflow_al": "2026-06-30", "cassa": 1711.8e6, "titoli_breve": 736.2e6,
+         "liquidita": 2448e6, "liquidita_base": "aggregato", "mesi_operativi": 1468.8, "mesi_capex": 1.4,
+         "capex_impianti_ttm": -21.2e6, "capex_immateriali_ttm": -21708.2e6, "quota_immateriali_pct": 99.9,
+         "investimenti_immateriali_prevalenti": True, "mesi_impianti": 1385.7,
+         "dividendi_privilegiate_ttm": -952.3e6, "dividendi_privilegiate_ultimo_trim": -399.6e6,
+         "dividendi_privilegiate_trimestri": 4, "mesi_obblighi": 30.2}
+_rc477 = SP.riga_cassa({"combustione": _c477, "credito": {}})
+check("v477 schede: gli investimenti fatti di attivita' immateriali si dichiarano, con l'autonomia sui soli impianti",
+      "1,4 mesi di investimenti (⚠ il 99,9% sono acquisti di attivita' immateriali" in _rc477
+      and "non e' un piano di costruzione" in _rc477 and "sui soli impianti oltre 5 anni" in _rc477, _rc477)
+check("v477 schede: l'autonomia sulle due uscite (perdita piu' dividendi sulle privilegiate) col ritmo in salita",
+      "30,2 mesi di perdita operativa piu' dividendi sulle privilegiate" in _rc477
+      and "1,7 volte la media trimestrale" in _rc477 and "tre denominatori diversi, non si confrontano" in _rc477
+      and not any(x in _rc477 for x in ("952", "399", "mld", "mln")), _rc477)
+_rc477v = SP.riga_cassa({"combustione": {k: v for k, v in _c477.items() if k in (
+    "fcf_ttm", "cashflow_al", "cassa", "titoli_breve", "liquidita", "liquidita_base", "mesi_operativi", "mesi_capex")},
+    "credito": {}})
+check("v477 schede: senza i campi nuovi la riga resta quella di prima, e non afferma una composizione",
+      "immateriali" not in _rc477v and "privilegiate" not in _rc477v and "due denominatori diversi" in _rc477v, _rc477v)
+_extra477 = _corpo_di(Path(__file__).with_name("rapporto.py").read_text(), "extra")
+check("v477 rapporto: la composizione del capex e i dividendi sulle privilegiate sono nella riga CASSA",
+      "capex_immateriali_ttm" in _extra477 and "dividendi_privilegiate_ttm" in _extra477
+      and "investimenti_immateriali_prevalenti" in _extra477)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

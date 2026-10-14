@@ -6539,3 +6539,87 @@ iniezioni, tutte mordono — ma non alla prima:
 393,7 milioni, GOOGL 242,5 miliardi, SKHY in won), e tutti i gate che leggono i dati verdi sul
 `data.json` nuovo — compreso il v409 riagganciato, che ora vede «liquidità diviso» invece di
 «cassa diviso».
+
+## 🏦 v477 — IL CONTRATTO CONTINUO ROTOLAVA A METÀ MESE, E GLI «INVESTIMENTI» DI MSTR NON ERANO COSTRUZIONE
+
+Istruzione del CEO, testuale: *"Correggi tutto"*. Due difetti lasciati aperti (il capex di MSTR,
+annotato in v476; la base FedWatch, «APERTO» dalla v462) più un residuo della classe v442/v443.
+
+### 1. FedWatch: `ZQ=F` serviva NOVEMBRE, e la base era una media mensile
+**Verificato invece che dichiarato non verificabile** (la v441 lo aveva messo fra i limiti, trappola
+v203): il 13/10/2026 `yf.Ticker("ZQ=F").info` riportava `underlyingSymbol: ZQX26.CBT` — il contratto
+di **novembre** — col prezzo 96,06 identico a ZQX26, mentre fino al 12/10 portava quello di ottobre
+(96,1175 = ZQV26). **Il continuo rotola sul mese dopo prima della fine del mese.**
+
+> Spiega a posteriori la divergenza della v450 (l'11/09: 1,97 movimenti contro 0,82 di Polymarket):
+> il contratto di ottobre — tutto il mese al tasso nuovo — letto come se fosse settembre, con 14
+> giorni su 30 di leva. Il gate lo riproduce in miniatura: un rialzo pieno letto col contratto
+> sbagliato dà 2,14 movimenti, col contratto giusto 1,0.
+
+E la base era `FEDFUNDS`, la media **mensile**: a settembre 3,75, metà mese prima e metà dopo il
+rialzo del 16/09, contro un EFFR del giorno di 3,88.
+
+**Ora la metodologia CME per intero** (la strada b scelta dal CEO in v441, che senza i contratti dei
+singoli mesi non si poteva applicare): `catena_fedwatch` in `update_data.py`.
+- i contratti si leggono **per esteso**, mese per mese (`ZQ` + codice del mese + anno + `.CBT`);
+- la base è l'**EFFR del giorno** dalla NY Fed (ripiego FRED `EFFR`, **mai** `FEDFUNDS`), con la data;
+- il tasso dopo una riunione si legge dal contratto del **mese dopo** quando quel mese è noto e senza
+  riunioni — è ciò che CME fa per le riunioni di fine mese, dove il mese della riunione ha 3 giorni su
+  31 al tasso nuovo e il conto avrebbe leva 10 — altrimenti dal mese della riunione ponderando i giorni;
+- ogni riunione parte dall'esito della precedente: **movimenti in più** e **cumulati da oggi**. Una
+  riunione che non si ricava interrompe la catena e le successive lo dichiarano.
+
+Misurato il 13/10 sui contratti veri: **28/10 +0,22 movimenti** (RIALZO 22% · invariato 78%, Polymarket
+20/80) · **09/12 +0,87 in più, +1,09 cumulati**.
+⚠ **Gennaio 2027 non è nel calendario noto**, quindi non si assume senza riunioni: dicembre si prezza
+nel proprio mese. Un mese assunto vuoto sarebbe una tacca inventata (v240).
+⚠ **Il gemello JS del conto è stato TOLTO**: ricalcolava da `implied_rate` (il continuo) e da
+`fed_market.current_rate` (la media mensile), cioè da due ingressi sbagliati e non correggibili dalla
+pagina. La pagina legge la catena; uno snapshot precedente dichiara di non permettere il conto invece
+di rifarlo male (v396). Il ramo «fuori orizzonte» del pacchetto è stato **tolto, non spento**: un
+`false` davanti a un ramo è un commento che sembra codice (v234).
+⚠ La fonte nuova **nasce sorvegliata** (v390): `validate_macro` alza `fedwatch` missing/stale e nomina
+i contratti non letti.
+
+### 2. MSTR: il capex era al 99,9% attività immateriali
+`Capital Expenditure` di yfinance somma **impianti** (`Purchase Of PPE`) e **attività immateriali**
+(`Purchase Of Intangibles`). Su MSTR: 21,71 miliardi di immateriali contro 21 milioni di impianti, e il
+pacchetto scriveva *"la liquidità copre 1,4 mesi di INVESTIMENTI"* — un cantiere che resta a metà se
+il mercato chiude. Un acquisto fermato non lascia opere a metà. Ora la composizione **dichiarata dalla
+fonte** esce accanto, con l'autonomia sui soli impianti; cosa siano quelle attività la fonte non lo dice
+e il pacchetto non lo afferma. E la chiave di lettura *"sta costruendo molto"* era **falsa proprio sul
+nome per cui la riga esiste**: ora vale solo dove gli investimenti sono impianti.
+⚠ **E i dividendi sulle privilegiate non stavano in nessun denominatore**: 952 milioni in 12 mesi contro
+20 di perdita operativa, ultimo trimestre 400 milioni (1,7 volte la media). Terzo denominatore:
+*perdita operativa più dividendi sulle privilegiate*, **30,2 mesi**, con il ritmo dichiarato come fatto
+(l'ultimo trimestre), non annualizzato (v396). Solo quando la gestione non li copre: WDC (10 milioni
+contro 3,9 miliardi di flusso operativo) non lo riceve.
+⚠ `capex_ttm` e `fcf_ttm` **non cambiano definizione**: il segno del flusso libero decide chi dipende dal
+mercato dei capitali (v404, v467), e su MSTR resta negativo comunque. La scomposizione esce solo se
+**somma al totale** entro l'1% (v415); la soglia del 50% è una convenzione dichiarata (v240).
+⚠ La congiunzione «e» della disciplina fondeva due durate (*"sui soli impianti copre oltre 5 anni e
+30,2 mesi di…"*): ora il separatore è quello delle altre sedi.
+
+### 3. Il punto inglese nel pacchetto del titolo, e i gate che lo pretendevano
+`crescita ricavi a/a 6.9%`, `margine lordo 67.6%`, `coincide entro il 3.7%`, `P/E PROSPETTICO 38.2×`,
+i sigma e le distanze degli strike, la fascia `3.75–4.00%`: la classe v442/v443 sopravvissuta in
+`datiNostriDelTitolo`. Un gate guarda il CODICE delle due funzioni del pacchetto: nessun `toFixed` con
+decimali. ⚠ **Cinque gate PRETENDEVANO il punto** (`[\d.]+%`, `[\d.]+×`, `[\d.]+σ`): dalla
+trentasettesima alla quarantunesima rottura di un check ancorato alla forma, tutte della specie che
+pinna il difetto (v326) — e quello sulla crescita non ammetteva nemmeno il segno, quindi sarebbe
+andato rosso su una crescita negativa.
+
+### 🦴 Otto gate FedWatch sono andati rossi, e nessuno è stato zittito
+I cinque v441 e i due v462 provavano il gemello rimosso, o lo stato dello snapshot vecchio come se
+fosse quello giusto: ora sono la **ricevuta della rimozione** più sette invarianti sui tre stati
+(catena prezzata · interrotta · snapshot precedente). In Python il collegamento v441 è riagganciato
+alla catena — quarantaduesima rottura di un check ancorato a una stringa.
+⚠ **Ottava incarnazione del gate che trova sé stesso**: la sonda «niente FEDFUNDS» trovava la
+docstring di `effr_giornaliero`, che lo nomina per spiegare perché non si usa. Si cerca la CHIAMATA.
+
+### 🧪 Diciannove iniezioni, e una mordeva raccontando male
+Tutte con `modifica_sicura` e ripristino verificato per hash da uno snapshot preso prima (v427, v430),
+una alla volta: **mordono tutte e diciannove**. Una — la catena che non si interrompe su un contratto
+mancante — mordeva **per eccezione**: la suite moriva con un `KeyError` sull'indice del dizionario
+invece di fallire sul check, cioè il difetto veniva preso ma la diagnosi si perdeva (v407, v471). I
+check della catena leggono ora con `.get`, e la stessa iniezione fa cadere il check col suo nome.

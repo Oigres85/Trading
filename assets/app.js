@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "476";
+const BUILD_VERSION = "477";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3924,7 +3924,7 @@ function indicatoriClassifica() {
           ? `rialzo ${rf.hike_prob ?? 0}% · invariato ${rf.hold_prob ?? 0}% · taglio ${rf.cut_prob ?? 0}%`
           : rf.mosse_25bp != null
             ? `${fmtNum.format(rf.mosse_25bp)} movimenti da 25bp impliciti — oltre il movimento intero non e' una probabilita'`
-            : "questo contratto non prezza la riunione: il future a 30 giorni copre il mese corrente" });
+            : `non prezzata: ${motivoFedWatch(rf)}` });
   }
   if (m.witching?.days != null) orf.push({ k: "witching", nome: "Prossima scadenza tecnica",
     score: m.witching.days <= 5 ? 30 : m.witching.days <= 15 ? 45 : 62,
@@ -4838,16 +4838,16 @@ const FORMA_INDICATORE = {
       + `una probabilita', e il contratto non ne esprime una</div>`).join("");
     if (!rr.length && inMosse.length) return {
       g: `<div class="muted" style="font-size:11px;line-height:1.5">${rigaMosse}`
-        + `${nonPrezzate.length ? `<div>Non prezzate da questo contratto, che copre solo il `
-            + `proprio mese: ${nonPrezzate.join(", ")}.</div>` : ""}</div>`,
+        + `${nonPrezzate.length ? `<div>Non prezzate in questo run: ${nonPrezzate.join(", ")}`
+            + ` (il perche' e' nel popup e nel pacchetto).</div>` : ""}</div>`,
       score: null,
       n: `${inMosse.map(x => x.d + ": " + mosse2(x.n) + " movimenti da 25bp "
             + (x.n > 0 ? "al rialzo" : "al taglio")).join(" · ")}`
         + ` — non e' una probabilita': sopra il movimento intero il contratto non ne esprime una` };
-    if (!rr.length) return { g: `<div class="muted" style="font-size:11px;line-height:1.5">Il future sui Fed Funds a 30 giorni prezza `
-      + `solo il proprio mese: nessuna delle riunioni in elenco (${nonPrezzate.join(", ")}) `
-      + `e' prezzata da questo contratto.</div>`, score: null,
-      n: `nessuna riunione prezzata da questo contratto — non e' "nessun movimento atteso"` };
+    if (!rr.length) return { g: `<div class="muted" style="font-size:11px;line-height:1.5">Nessuna delle riunioni `
+      + `in elenco (${nonPrezzate.join(", ")}) e' prezzata in questo run: il conto viene dai contratti `
+      + `Fed Funds dei singoli mesi e dall'EFFR del giorno, e qui uno dei due manca.</div>`, score: null,
+      n: `nessuna riunione prezzata in questo run — non e' "nessun movimento atteso"` };
     const W = 320, RH = 30, H = rr.length * RH + 18, L = 44, R = W - 8;
     const righe = rr.map((x, i) => {
       const y = 12 + i * RH;
@@ -7354,40 +7354,16 @@ function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine =
    usata da entrambi. Stessa lezione di v161 (usRegularSessionOpen derivata da usSessionInfo).
    La derivazione dal tasso implicito serve per compatibilità all'indietro: finché il CI non
    rigenera, i `meetings` possono non avere hike_prob. */
-/* v441 — LA METODOLOGIA CME, e il gemello di movimenti_impliciti_fomc() della pipeline.
-   Il future Fed Funds a 30 giorni settla sulla MEDIA dell'EFFR sul mese di CALENDARIO: con il
-   FOMC a meta' mese solo una parte dei giorni porta il tasso nuovo. La formula precedente
-   trattava quella media come il tasso POST-riunione e sottostimava di quasi il doppio.
-   ⚠ Si confronta con l'EFFR (fed_market.current_rate), non col punto medio del range: e' cio'
-   su cui il contratto settla davvero, ed e' un altro numero (3,63 contro 3,625).
-   ⚠ Ritorna i MOVIMENTI da 25bp, non una probabilita': sopra il movimento intero non esiste
-   una probabilita' — 1,37 vuol dire un rialzo pieno piu' il 37% di un secondo. */
-/* ⚠ v462 — `esito` (facoltativo) riceve il PERCHE' di un null. Il pacchetto spiegava ogni
-   riunione non prezzata con "non cade nel mese del contratto", anche quando ci cadeva e a
-   scattare era la guardia di plausibilita': una ragione falsa nella riga che dichiara un limite. */
-function movimentiImpliciti(implied, effr, riunione, meseContratto, esito) {
-  const _no = (perche, grezzo) => { if (esito) { esito.motivo = perche; esito.grezzo = grezzo ?? null; } return null; };
-  if (!Number.isFinite(implied) || !Number.isFinite(effr) || !riunione) return _no("dati");
-  const r = new Date(String(riunione) + "T00:00:00Z");
-  if (isNaN(r.getTime())) return _no("dati");
-  // il front-month prezza SOLO il proprio mese: e' la regola v199 nella sua forma corretta —
-  // il limite non e' "35 giorni" ma "lo stesso mese di calendario del contratto".
-  if (r.getUTCFullYear() !== meseContratto.getUTCFullYear()
-      || r.getUTCMonth() !== meseContratto.getUTCMonth()) return _no("mese");
-  const eff = new Date(r.getTime() + 86400000);          // annuncio a fine 2a giornata
-  while (eff.getUTCDay() === 0 || eff.getUTCDay() === 6) eff.setUTCDate(eff.getUTCDate() + 1);
-  if (eff.getUTCMonth() !== r.getUTCMonth()) return _no("mese");
-  const giorni = new Date(Date.UTC(r.getUTCFullYear(), r.getUTCMonth() + 1, 0)).getUTCDate();
-  const n1 = eff.getUTCDate() - 1, n2 = giorni - n1;
-  if (n2 <= 0) return _no("mese");
-  const rFine = (implied - (n1 / giorni) * effr) / (n2 / giorni);
-  const mosse = (rFine - effr) / 0.25;
-  // oltre tre movimenti su una riunione sola il numero non e' attribuibile a questa riunione:
-  // molto piu' probabilmente il contratto letto non e' quello del mese corrente. Si dichiara.
-  if (Math.abs(mosse) > 3) return _no("plausibilita", Math.round(mosse * 100) / 100);
-  return { mosse_25bp: Math.round(mosse * 100) / 100, giorni_vecchio: n1, giorni_nuovo: n2,
-           giorni_mese: giorni, base_effr: effr };
-}
+/* ═══ v477 — IL GEMELLO JS DEL CONTO E' STATO RIMOSSO, e la ragione e' misurata ═══════════
+   Ricalcolava i movimenti da `implied_rate` (il future CONTINUO ZQ=F) e da
+   `fed_market.current_rate` (FEDFUNDS, media MENSILE). Verificato il 13/10/2026: il continuo
+   ROTOLA sul mese dopo prima della fine del mese (quel giorno era ZQX26, novembre), e la media
+   mensile di un mese con una riunione mescola il tasso di prima e quello di dopo. Erano
+   sbagliati entrambi gli ingressi, e nessuno dei due e' correggibile dalla pagina: servono i
+   contratti dei singoli mesi, che legge la pipeline. Quindi la catena vive in UN posto solo
+   (catena_fedwatch in update_data.py) e la pagina la LEGGE — su uno snapshot precedente la
+   dichiara non disponibile invece di rifarla male (v396). Due derivazioni della stessa
+   grandezza divergono al primo ritocco (v161, v207, v316): qui una delle due era sbagliata. */
 
 /* ⚠⚠ v450 — IL CONTROLLO INCROCIATO, PERCHE' IL CONTRATTO NON E' VERIFICABILE DA QUI.
    La v441 ha dichiarato di non poter verificare QUALE contratto Yahoo serva come `ZQ=F`
@@ -7446,10 +7422,59 @@ function divergenzaFedWatch(mt) {
     + ` due letture non descrivono lo stesso mondo e il nostro numero NON e' attribuibile`;
 }
 
+/* v477 — IL PERCHE' DI UNA RIUNIONE NON PREZZATA, in un posto solo: popup, tessera, scheda e
+   pacchetto lo dicono con le stesse parole (v161, v207, v443). "Non prezzata" senza il perche'
+   si legge come un fatto sul mercato, e quasi sempre e' un fatto sul dato (v389, v406). */
+function motivoFedWatch(r) {
+  const m = r && r.motivo;
+  if (m === "plausibilita") return `conto fuori scala (${r.mosse_grezze != null ? fmtNum.format(r.mosse_grezze) : "n.d."} movimenti da 25bp su una riunione sola, oltre la soglia di plausibilita' di tre)`;
+  if (m === "contratto") return `contratto${r.contratto ? " " + r.contratto : ""} non letto in questo run`;
+  if (m === "catena") return "la riunione precedente non e' prezzata, e il conto di questa parte dal suo esito";
+  if (m === "dati") return "manca l'EFFR del giorno in questo run";
+  if (m === "mese") return "la riunione cade a cavallo del mese e il suo contratto non ha giorni al tasso nuovo";
+  if (m === "snapshot") return "snapshot precedente alla correzione v477 (contratto continuo e base mensile): il conto si ricava al prossimo run della pipeline";
+  return "non prezzata in questo run";
+}
+
+/* v477 — DA DOVE VIENE IL NUMERO, detto per il metodo vero. La riga diceva sempre "tasso
+   implicito X% — media attesa del mese" anche quando il numero veniva dal mese DOPO (dove il
+   tasso medio E' il tasso deciso), e "EFFR corrente" accanto a una media mensile. */
+function fonteFedWatch(fw, mt) {
+  const ef = (fw && fw.effr) || {};
+  const nomeMese = (sym) => {
+    const c = ((fw && fw.contratti) || []).find(x => x && x.simbolo === sym);
+    if (!c || !c.mese) return sym || "n.d.";
+    const d = new Date(c.mese + "-01T00:00:00Z");
+    return isNaN(d.getTime()) ? sym : `${d.toLocaleDateString("it-IT", { month: "long", year: "numeric", timeZone: "UTC" })} (${sym})`;
+  };
+  const effrTxt = ef.valore != null
+    ? `EFFR del ${String(ef.data || "").split("-").reverse().join("/")} ${fmtNum.format(ef.valore)}% (${ef.fonte || "n.d."})`
+    : "EFFR del giorno non disponibile";
+  if (mt.prezzata && mt.metodo === "mese_dopo") {
+    return `dal future Fed Funds di ${nomeMese(mt.contratto)}, mese SENZA riunioni: il suo tasso medio`
+      + ` ${fmtNum.format(mt.tasso_post)}% E' il tasso atteso dopo questa riunione, contro l'${effrTxt}`;
+  }
+  if (mt.prezzata && mt.metodo === "mese_riunione") {
+    return `dal future Fed Funds di ${nomeMese(mt.contratto)}, il mese della riunione: media attesa`
+      + ` ${mt.tasso_contratto != null ? fmtNum.format(mt.tasso_contratto) : "n.d."}%, ponderando i ${mt.giorni_vecchio} giorni`
+      + ` prima e i ${mt.giorni_nuovo} dopo l'entrata in vigore, con base ${mt.base_effr != null ? fmtNum.format(mt.base_effr) : "n.d."}%`
+      + ` (l'${effrTxt})`;
+  }
+  if (mt.prezzata) {
+    /* la forma della v441-v476: un solo contratto, ponderato sul mese */
+    return `dai futures sui Fed Funds a 30 giorni: tasso implicito ${fmtNum.format(fw.implied_rate)}% — media attesa`
+      + ` del mese — contro l'EFFR ${mt.base_effr != null ? fmtNum.format(mt.base_effr) : "n.d."}%`
+      + (mt.giorni_vecchio != null ? `, ponderando i ${mt.giorni_vecchio} giorni prima e i ${mt.giorni_nuovo} dopo l'entrata in vigore` : "");
+  }
+  return Array.isArray(fw && fw.contratti)
+    ? `dai future Fed Funds dei singoli mesi e dall'${effrTxt}`
+    : `dai futures sui Fed Funds a 30 giorni, snapshot precedente alla correzione v477`;
+}
+
 /* La riga che il popup mostra per una riunione: tre stati, gli stessi del pacchetto e della
    scheda a barre (v446) — PROBABILITA' · MOVIMENTI · NON PREZZATA — piu' la disputa. */
 function rigaFedWatch(r) {
-  if (!r || !r.prezzata) return `<span class="muted">non prezzata da questo contratto</span>`;
+  if (!r || !r.prezzata) return `<span class="muted">non prezzata: ${esc(motivoFedWatch(r))}</span>`;
   if (r.sospetta) return `<span class="neg">${fmtNum.format(r.mosse_25bp)} movimenti</span> ⚠ contro ${fmtNum.format(r.attesa_previsione)} dei mercati di previsione — derivazione non attribuibile`;
   if (r.hike_prob != null || r.cut_prob != null)
     return `<span class="neg">rialzo ${r.hike_prob ?? 0}%</span> · invariato ${r.hold_prob ?? 0}% · <span class="pos">taglio ${r.cut_prob ?? 0}%</span>`;
@@ -7464,14 +7489,27 @@ function ramiFedWatch(fw, riunione) {
      salvo che lo snapshot porti gia' il campo nuovo `movimenti` (cioe' venga dalla pipeline
      corretta). E' lo stesso ripiego dei rami FedWatch di v187, con l'aggiunta che il dato
      vecchio va scavalcato invece che accettato. */
-  const daPipeline = fw && fw.movimenti && fw.movimenti.riunione === mt.date;
-  const _esito = {};
-  const mv = daPipeline ? fw.movimenti
-    : movimentiImpliciti(numero(fw && fw.implied_rate),
-                         numero(((DATA.macro || {}).fed_market || {}).current_rate),
-                         mt.date, new Date(), _esito);
-  mt.motivo = mv ? null : (_esito.motivo || null);
-  mt.mosse_grezze = mv ? null : (_esito.grezzo ?? null);
+  /* ⚠⚠ v477 — LA PAGINA LEGGE LA CATENA, NON LA RIFA'. Ogni riunione porta i propri
+     movimenti dalla pipeline (contratto del proprio mese o del mese dopo, EFFR del giorno); la
+     prima puo' arrivare anche in `fw.movimenti`, come dalla v441. Senza ne' l'una ne' l'altra
+     la riunione NON e' prezzata, e il perche' viene dalla pipeline — o, su uno snapshot
+     precedente alla v477, si dichiara che lo snapshot non permette il conto. */
+  const v477 = !!(fw && Array.isArray(fw.contratti));
+  const prezzataQui = !!(riunione && riunione.prezzata_dal_contratto === true
+                         && Number.isFinite(numero(riunione.mosse_25bp)));
+  const daPipeline = !prezzataQui && fw && fw.movimenti && fw.movimenti.riunione === mt.date;
+  const mv = prezzataQui
+    ? { mosse_25bp: numero(riunione.mosse_25bp), giorni_vecchio: riunione.giorni_vecchio ?? null,
+        giorni_nuovo: riunione.giorni_nuovo ?? null, giorni_mese: riunione.giorni_mese ?? null,
+        base_effr: riunione.base_effr ?? null }
+    : daPipeline ? fw.movimenti : null;
+  mt.motivo = mv ? null : (v477 ? ((riunione && riunione.motivo) || "contratto") : "snapshot");
+  mt.mosse_grezze = mv ? null : ((riunione && riunione.mosse_grezze) ?? null);
+  mt.metodo = mv ? ((prezzataQui ? riunione.metodo : (fw.movimenti || {}).metodo) || null) : null;
+  mt.contratto = (riunione && riunione.contratto) || (daPipeline ? (fw.movimenti || {}).contratto : null) || null;
+  mt.tasso_contratto = mv ? numero((prezzataQui ? riunione : fw.movimenti || {}).tasso_contratto) : null;
+  mt.tasso_post = mv ? numero((prezzataQui ? riunione : fw.movimenti || {}).tasso_atteso_fine_mese) : null;
+  mt.mosse_cumulate = mv ? numero((prezzataQui ? riunione : fw.movimenti || {}).mosse_cumulate) : null;
   mt.mosse_25bp = mv ? mv.mosse_25bp : null;
   mt.prezzata = !!mv;
   // ⚠ la ponderazione viaggia col numero: la riga del pacchetto la nomina, e senza questi campi
@@ -7944,7 +7982,7 @@ function openMacroInfo(key) {
     // una sola direzione e' informazione mancante travestita da informazione presente), corretta
     // nel payload in v187 e sopravvissuta qui per due versioni.
     const primo = ramiFedWatch(fw, (fw.meetings || [])[0]);
-    extra = `<div class="info-line"><b>Range attuale:</b> ${fw.target_range} · implicito ${fmtNum.format(fw.implied_rate)}%</div>
+    extra = `<div class="info-line"><b>Range attuale:</b> ${String(fw.target_range || "n.d.").replace(/[.]/g, ",")} · implicito ${fmtNum.format(fw.implied_rate)}%</div>
       <div class="info-line"><b>Prossima riunione:</b> ${rigaFedWatch(primo)}</div>`;
     if ((fw.meetings || []).length) {
       extra += `<table class="info-table"><thead><tr><th>Riunione FOMC</th><th>Rialzo</th><th>Invariato</th><th>Taglio</th></tr></thead><tbody>`
@@ -8909,7 +8947,10 @@ function buildPrompt(opz) {
     lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? `oggi — rilevazione odierna${vixFontData}` : `nell'ultima seduta ${vixAsof} — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario`})`);
   }
   else if (m.vix) lines.push("- VIX: n.d. (valore scartato dal sanity check)");
-  if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${m.fedwatch.target_range} · tasso implicito futures ${m.fedwatch.implied_rate}%${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
+  /* v477 — la fascia con la virgola (la pipeline la scrive col punto: classe v442/v443), e il
+     tasso implicito dice di QUALE contratto e': dalla v477 il mese in corso letto per esteso,
+     prima il continuo ZQ=F, che a meta' mese puo' gia' essere il mese dopo */
+  if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${String(m.fedwatch.target_range || "n.d.").replace(/[.]/g, ",")} · tasso implicito futures ${Number.isFinite(numero(m.fedwatch.implied_rate)) ? fmtNum.format(numero(m.fedwatch.implied_rate)) : "n.d."}% ${Array.isArray(m.fedwatch.contratti) ? "(media attesa del mese in corso, dal suo contratto)" : "(future continuo ZQ=F: a meta' mese puo' essere gia' il contratto del mese dopo)"}${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
   if (m.carry) {
     let cl = `- Carry USA-Giappone: spread tassi 10A ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)${m.carry.boj_rate != null
         ? `, tasso BoJ ${m.carry.boj_rate}%`
@@ -9932,9 +9973,13 @@ function buildPrompt(opz) {
          si legge e' quella (v391). Il numero non sparisce — sparirebbe l'unica prova che la
          divergenza esiste (v406) — ma smette di presentarsi come misura. */
       rami.push(`⚠⚠ DERIVAZIONE NON ATTRIBUIBILE A QUESTA RIUNIONE: ${divergenzaFedWatch(mt)}.`
-        + ` La causa piu' probabile e' che il contratto letto come front-month non sia quello del`
-        + ` mese corrente — un limite che il sistema dichiara di non poter verificare. Per questa`
-        + ` riunione vale la quotazione dei mercati di previsione qui sotto, non la nostra`);
+        + (Array.isArray(m.fedwatch.contratti)
+          ? ` Il contratto e' letto per esteso (${mt.contratto || "n.d."}) e la base e' l'EFFR del giorno:`
+            + ` la causa non e' nota al sistema, e va verificata alla fonte (CME FedWatch). Per questa`
+            + ` riunione vale il mercato di previsione qui sotto, non il nostro numero`
+          : ` La causa piu' probabile e' che il contratto letto come front-month non sia quello del`
+            + ` mese corrente (verificato il 13/10/2026: il continuo ZQ=F rotola sul mese dopo prima della`
+            + ` fine del mese). Per questa riunione vale il mercato di previsione qui sotto, non il nostro numero`));
     } else if (mt.prezzata && mt.mosse_25bp != null) {
       const x = mt.mosse_25bp, su = x > 0;
       /* ⚠ v446 — UNA RESA SOLA. `toFixed(2)` stampa "1.37" col punto decimale inglese dentro
@@ -9947,21 +9992,19 @@ function buildPrompt(opz) {
         + `. NON e' una probabilita': oltre il movimento intero la grandezza che il contratto`
         + ` esprime e' quanti movimenti, non con che probabilita' uno`);
     } else if (mt.motivo === "plausibilita") {
-      /* ⚠⚠ v462 — LA RIUNIONE CADE NEL MESE DEL CONTRATTO, quindi il limite non e'
-         l'orizzonte: e' che il conto esce fuori scala. La riga diceva il contrario. */
-      const fm = (DATA.macro || {}).fed_market || {};
+      /* ⚠⚠ v462 — il limite NON e' l'orizzonte: e' che il conto esce fuori scala.
+         ⚠⚠ v477 — e con contratto letto per esteso e EFFR del giorno le due cause note (il
+         continuo che rotola, la base mensile) sono chiuse: resta un dato fuori scala che il
+         sistema non sa spiegare, e la riga lo dice cosi' invece di accusare una causa vecchia. */
       rami.push(`NON ATTRIBUIBILE: il conto darebbe ${fmtNum.format(mt.mosse_grezze)} movimenti da 25bp`
-        + ` su una riunione sola, oltre la soglia di plausibilita' di tre. La riunione cade nel mese`
-        + ` del contratto, quindi il limite NON e' l'orizzonte: o il contratto letto non e' quello del`
-        + ` mese corrente, o la base EFFR (${fm.current_rate ?? "n.d."}%, serie MENSILE FEDFUNDS`
-        + ` rilevazione ${fm.rate_date || "n.d."}) non e' il tasso effettivo corrente: una media`
-        + ` mensile che contiene una riunione mescola il tasso di prima e quello di dopo. Nessuna`
-        + ` delle due e' verificabile da qui; per questa riunione valgono i mercati di previsione`);
-    } else if (mt.motivo === "dati") {
-      rami.push("NON CALCOLABILE: manca il tasso implicito del future o la base EFFR in questo run");
+        + ` su una riunione sola, oltre la soglia di plausibilita' di tre, col contratto ${mt.contratto || "n.d."}`
+        + ` letto per esteso e la base dall'EFFR del giorno: un valore fuori scala che il sistema non sa`
+        + ` spiegare. Per questa riunione vale il mercato di previsione`);
     } else {
-      rami.push("NON CALCOLABILE da questo contratto: il future Fed Funds a 30 giorni prezza la"
-        + " media del MESE CORRENTE, e questa riunione non ci cade dentro");
+      /* v477 — il perche' dalla funzione unica (motivoFedWatch): contratto non letto, catena
+         interrotta, EFFR mancante, snapshot precedente alla correzione */
+      rami.push(`NON CALCOLABILE: ${motivoFedWatch(mt)} — il numero non c'e', e non e' zero.`
+        + ` Per questa riunione vale il mercato di previsione`);
     }
     // stessa riunione quotata su Polymarket? (i mercati di previsione sono già nel payload)
     const cerca = (re) => (DATA.predictions || []).find(x => /\bfed\b/i.test(x.question || "") && re.test(x.question || ""));
@@ -10036,7 +10079,6 @@ function buildPrompt(opz) {
         : `nessuna quotazione su questa riunione in questo run: la fonte che la prezza va cercata (CME FedWatch)`);
     }
     const conf = pezzi.length ? ` · POLYMARKET sulla stessa riunione: ${pezzi.join(" · ")}` : "";
-    const pmPct = pmHike;
     /* ⚠ v345 — LA CURVA DELLE ATTESE, non solo il primo punto. `meetings` porta le riunioni
        successive con le loro probabilita': e' la FORMA a dire cosa prezza il mercato. Sulla
        prossima riunione la Fed sembra ferma; tre riunioni piu' in la' il rialzo e' quotato
@@ -10050,13 +10092,25 @@ function buildPrompt(opz) {
        dei loro mesi, che il sistema non scarica. Quindi si DICHIARA di non prezzarle e si
        indica la fonte che lo fa (v199, v406) — invece di stampare zeri, che si leggerebbero
        come "il mercato non prezza nulla". */
-    const altre = ((m.fedwatch || {}).meetings || []).slice(1, 4).filter(x => x && x.date)
-      .map(x => `${x.date.slice(8, 10)}/${x.date.slice(5, 7)}`);
-    const curva = altre.length
-      ? `\n- RIUNIONI SUCCESSIVE (${altre.join(", ")}): questo contratto NON le prezza — il future`
-        + ` Fed Funds a 30 giorni copre la media del mese corrente, e servirebbero i contratti dei`
-        + ` rispettivi mesi, che il sistema non scarica. Il numero non c'e', e non e' zero:`
-        + ` i mercati di previsione in coda quotano alcune di quelle riunioni.`
+    /* ⚠⚠ v477 — LE RIUNIONI SUCCESSIVE SI PREZZANO COI LORO CONTRATTI. Prima il sistema non li
+       scaricava e la riga lo dichiarava; ora la catena legge il contratto di ogni mese, quindi
+       ogni riunione esce coi movimenti IN PIU' rispetto alla precedente e coi cumulati da oggi,
+       oppure col perche' non e' prezzata. Mai zeri: "0" sarebbe l'opposto dell'assenza (v389). */
+    const altreR = ((m.fedwatch || {}).meetings || []).slice(1, 4).filter(x => x && x.date);
+    const ddmm = (d) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
+    const curva = altreR.length
+      ? `\n- RIUNIONI SUCCESSIVE (${altreR.map(x => ddmm(x.date)).join(", ")}), dalla catena dei contratti mensili: `
+        + altreR.map(x => {
+          const r2 = ramiFedWatch(m.fedwatch, x);
+          if (!r2.prezzata) return `${ddmm(x.date)} NON prezzata — ${motivoFedWatch(r2)}`;
+          const mo = r2.mosse_25bp, cu = r2.mosse_cumulate;
+          return `${ddmm(x.date)}: ${mo > 0 ? "+" : ""}${fmtNum.format(mo)} movimenti da 25bp a quella riunione`
+            + (Number.isFinite(cu) ? ` (${cu > 0 ? "+" : ""}${fmtNum.format(cu)} cumulati da oggi)` : "")
+            + (r2.hike_prob != null ? `, cioe' RIALZO ${r2.hike_prob}% su quella riunione`
+              : r2.cut_prob != null ? `, cioe' TAGLIO ${r2.cut_prob}% su quella riunione` : "");
+        }).join(" · ")
+        + `. ⚠ I movimenti di ogni riunione sono quelli IN PIU' rispetto alla precedente; sopra il`
+        + ` movimento intero non e' una probabilita'. Il numero di una riunione non prezzata non c'e', e non e' zero.`
       : "";
     // ═══ v199 — IL CONTRATTO NON PREZZA QUELLA RIUNIONE. ZQ=F e' il future Fed Funds a 30
     // giorni sul MESE CORRENTE: prezza la media del mese in corso, non una riunione fra sei
@@ -10079,13 +10133,11 @@ function buildPrompt(opz) {
       : giorniAllaRiunione === 1 ? " (DOMANI)"
       : giorniAllaRiunione < 0 ? " (gia' avvenuta, " + Math.abs(giorniAllaRiunione) + " giorni fa)"
       : " (fra " + giorniAllaRiunione + " giorni)";
-    const fuoriOrizzonte = giorniAllaRiunione != null && giorniAllaRiunione > 35;
-    if (fuoriOrizzonte) {
-      lines.push(`- FedWatch — NON CALCOLABILE per la riunione del ${mt.date}${quandoRiunione}: il tasso implicito ${m.fedwatch.implied_rate}% viene dal future Fed Funds a 30 giorni, che prezza il MESE IN CORSO e non una riunione così lontana. Le probabilità derivate da quel contratto non riguarderebbero quella data.`
-        + (pmPct != null ? ` La fonte che quota proprio quella riunione è il mercato di previsione: rialzo ${pmPct}%.` : " Nessun mercato di previsione disponibile su quella riunione in questo payload."));
-    } else {
-      lines.push(`- FedWatch prossima riunione ${mt.date}${quandoRiunione} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% — media attesa del mese — contro l'EFFR corrente ${mt.prezzata && mt.base_effr != null ? mt.base_effr : (((DATA.macro || {}).fed_market || {}).current_rate ?? "n.d.")}%${mt.giorni_vecchio != null ? `, ponderando i ${mt.giorni_vecchio} giorni prima e i ${mt.giorni_nuovo} dopo l'entrata in vigore` : ""}): ${rami.join(" · ")}${conf}${curva}`);
-    }
+    /* ⚠ v477 — IL RAMO "FUORI ORIZZONTE" E' STATO TOLTO, non spento: l'orizzonte era il limite
+       del contratto CONTINUO, e con i contratti dei singoli mesi non lo e' piu'. Lasciarlo dietro
+       un `false` sarebbe un ramo irraggiungibile, cioe' un commento che sembra codice (v234).
+       La riga dice cosa la catena ha ricavato, o perche' non l'ha fatto (motivoFedWatch). */
+    lines.push(`- FedWatch prossima riunione ${mt.date}${quandoRiunione} (${fonteFedWatch(m.fedwatch, mt)}): ${rami.join(" · ")}${conf}${curva}`);
   }
   if ((m.tilt || []).length) {
     lines.push("");
@@ -10683,7 +10735,8 @@ function liquiditaSocieta(cmb) {
    v368): per questo la scala e' una funzione, usata da tutti e due. */
 function scalaCombustione(cmb) {
   const x = cmb || {};
-  return scalaImporti(["liquidita", "cassa", "titoli_breve", "debito", "debito_netto", "ocf_ttm", "capex_ttm", "fcf_ttm"]
+  return scalaImporti(["liquidita", "cassa", "titoli_breve", "debito", "debito_netto", "ocf_ttm", "capex_ttm", "fcf_ttm",
+    "capex_impianti_ttm", "capex_immateriali_ttm", "dividendi_privilegiate_ttm"]
     .map((k) => numero(x[k])).filter(Number.isFinite));
 }
 
@@ -10711,6 +10764,12 @@ function scalaCombustione(cmb) {
 function autonomiaCassa(cmb) {
   const c = cmb || {};
   const mOp = numero(c.mesi_operativi), mCx = numero(c.mesi_capex);
+  /* v477 — il terzo denominatore (gli obblighi verso i privilegiati) e la composizione degli
+     investimenti, entrambi dalla pipeline: su uno snapshot precedente non ci sono, e la riga
+     resta quella di prima invece di inventarli. */
+  const mImp = numero(c.mesi_impianti), mOb = numero(c.mesi_obblighi);
+  const qImm = numero(c.quota_immateriali_pct);
+  const immPrev = c.investimenti_immateriali_prevalenti === true && Number.isFinite(qImm);
   const al = String(c.bilancio_al || c.cashflow_al || "").slice(0, 10);
   /* ⚠ oltre i cinque anni il numero non porta piu' informazione — dice solo "non e' un problema
      di cassa" — e stampato per esteso ("1022,6 mesi") fa dubitare di tutto il blocco invece che
@@ -10733,15 +10792,59 @@ function autonomiaCassa(cmb) {
   if (Number.isFinite(mCx)) voci.push({ mesi: mCx, denominatore: "investimenti",
     /* ⚠ "al ritmo attuale" e' gia' implicito nel denominatore dichiarato fra parentesi, e i
        chiamanti la premettono: scritta due volte nella stessa frase e' la ridondanza v184. */
-    testo: `${quanto(mCx)} di INVESTIMENTI (${num} diviso il capex)` });
+    /* ⚠⚠ v477 — GLI INVESTIMENTI NON SONO SEMPRE COSTRUZIONE. Su MSTR il 99,9% del capex sono
+       acquisti di ATTIVITA' IMMATERIALI (21,7 mld contro 21 milioni di impianti), e "la
+       liquidita' copre 1,4 mesi di INVESTIMENTI" si leggeva come un cantiere che resta a meta'
+       se il mercato dei capitali chiude. Un acquisto fermato non lascia opere a meta': il numero
+       resta — e' aritmetica vera — ma dice cosa misura, e accanto c'e' quello sui soli impianti.
+       Cosa siano quelle attivita' la fonte non lo dice, e il pacchetto non lo afferma. */
+    testo: `${quanto(mCx)} di INVESTIMENTI (${num} diviso il capex)`
+      + (immPrev
+        ? ` — ⚠ ma il ${pct1(qImm)}% di quel capex sono acquisti di ATTIVITA' IMMATERIALI, non di`
+          + ` impianti (composizione dichiarata dalla fonte): un acquisto fermato non lascia un`
+          + ` cantiere a meta', quindi questo numero non misura un piano di costruzione`
+          + (Number.isFinite(mImp) ? `; sui soli impianti la ${num} copre ${quanto(mImp)}` : "")
+        : "") });
+  /* ⚠⚠ v477 — L'OBBLIGO CHE IL FLUSSO OPERATIVO NON VEDE. I dividendi sulle azioni privilegiate
+     sono un'uscita di FINANZIAMENTO: su MSTR 952 milioni in 12 mesi contro 20 di perdita
+     operativa, e la riga diceva soltanto "oltre 5 anni di perdita operativa". La pipeline
+     pubblica l'autonomia sulle due uscite insieme solo quando la gestione non le copre.
+     ⚠ E il ritmo si dichiara: l'ultimo trimestre accanto alla media dei 12 mesi e' un FATTO,
+     un annualizzato sarebbe una proiezione (v396). */
+  if (Number.isFinite(mOb)) {
+    const ttm = numero(c.dividendi_privilegiate_ttm), ult = numero(c.dividendi_privilegiate_ultimo_trim);
+    const volte = Number.isFinite(ttm) && Number.isFinite(ult) && ttm !== 0 ? ult / (ttm / 4) : null;
+    voci.push({ mesi: mOb, denominatore: "obblighi",
+      testo: `${quanto(mOb)} di perdita operativa PIU' DIVIDENDI SULLE AZIONI PRIVILEGIATE`
+        + ` (${num} diviso le due uscite insieme: i dividendi sono un'uscita di finanziamento e il`
+        + ` flusso operativo non li contiene)`
+        + (Number.isFinite(volte) && volte > 1.1
+          ? ` — e l'ultimo trimestre di dividendi vale ${fmtNum.format(Math.round(volte * 10) / 10)} volte`
+            + ` la media trimestrale dei 12 mesi: calcolati sul ritmo dei 12 mesi, questi mesi sono PIU'`
+            + ` di quelli che il ritmo dell'ultimo trimestre concede`
+          : Number.isFinite(volte) && volte < 0.9
+            ? ` — e l'ultimo trimestre di dividendi vale ${fmtNum.format(Math.round(volte * 10) / 10)} volte`
+              + ` la media trimestrale dei 12 mesi: il ritmo recente e' piu' basso di quello dei 12 mesi`
+            : "") });
+  }
   if (!voci.length) return null;
-  /* ⚠⚠ CON ENTRAMBE, IL FATTO CHE NON SIANO CONFRONTABILI E' PARTE DEL DATO. Senza questa riga
-     due numeri lontanissimi sullo stesso nome si leggono come un errore del sistema, e chi legge
-     smette di fidarsi anche di quello giusto. */
+  /* ⚠⚠ CON PIU' DENOMINATORI, IL FATTO CHE NON SIANO CONFRONTABILI E' PARTE DEL DATO. Senza
+     questa riga numeri lontanissimi sullo stesso nome si leggono come un errore del sistema, e
+     chi legge smette di fidarsi anche di quello giusto.
+     ⚠ v477 — la chiave di lettura "sta costruendo molto" era FALSA sul nome per cui la riga
+     esiste (MSTR non costruisce): ora vale solo dove gli investimenti sono impianti. */
+  const DEN = { "perdita operativa": "la perdita operativa", investimenti: "gli investimenti",
+                obblighi: "la perdita operativa piu' i dividendi sulle privilegiate" };
   const nota = voci.length > 1
-    ? ` ⚠ I due numeri NON si confrontano: hanno denominatori diversi — uno divide la ${num} per la `
-      + "perdita operativa, l'altro per gli investimenti. Un valore alto sul primo e basso sul "
-      + "secondo descrive una societa' che non brucia cassa dalla gestione ma sta costruendo molto."
+    ? ` ⚠ I ${voci.length === 2 ? "due" : "tre"} numeri NON si confrontano: hanno denominatori`
+      + ` diversi — dividono la ${num} per ${voci.map(v => DEN[v.denominatore]).join(", per ")}.`
+      + (Number.isFinite(mOp) && Number.isFinite(mCx)
+        ? (immPrev
+          ? " Un valore alto sul primo e basso sul secondo, qui, descrive una societa' che non brucia"
+            + " cassa dalla gestione ma spende molto in acquisti che non sono impianti."
+          : " Un valore alto sul primo e basso sul secondo descrive una societa' che non brucia"
+            + " cassa dalla gestione ma sta costruendo molto.")
+        : "")
     : "";
   return { voci, al, nota, base: lq ? lq.base : null,
     testo: `la ${num} (${!lq || lq.nome === "cassa" ? "soli contanti, senza i titoli a breve termine" : lq.dettaglio}) `
@@ -11040,7 +11143,10 @@ function disciplinaRischio() {
        stesso nome. Ora passa dalla funzione unica, che il denominatore lo nomina sempre. */
     const autonomia = (cmb) => {
       const a = autonomiaCassa(cmb);
-      return a ? `, ${a.voci.map(v => v.testo).join(" e ")}` : "";
+      /* ⚠ v477 — con la qualifica sugli impianti dentro una voce, la congiunzione "e" fondeva due
+         numeri: "sui soli impianti copre oltre 5 anni e 30,2 mesi di…" si leggeva come una durata
+         sola. Il separatore e' quello delle altre sedi. */
+      return a ? `, ${a.voci.map(v => v.testo).join(" · ")}` : "";
     };
     /* ⚠⚠ v414 — LA SOGLIA STAMPATA E LO STATO CALCOLATO MISURAVANO DUE COSE DIVERSE.
        La riga dichiarava "nessuna posizione con flusso di cassa libero negativo E interessi non
@@ -13688,7 +13794,7 @@ function datiNostriDelTitolo(tk) {
       /* i livelli gia' pubblicati, riespressi nell'unita' che conta a questo orizzonte */
       const sigma = rif.pct;
       const inSigma = (v, nome) => Number.isFinite(numero(v)) && Number.isFinite(f.prezzo) && sigma
-        ? `${nome} ${(Math.abs(numero(v) / f.prezzo - 1) * 100 / sigma).toFixed(1)}σ` : null;
+        ? `${nome} ${pct1(Math.abs(numero(v) / f.prezzo - 1) * 100 / sigma)}σ` : null;
       const inS = [inSigma(t.resistenza, "resistenza"), inSigma(t.supporto, "supporto"),
                    inSigma(t.w52hi, "massimo 52s"), inSigma(t.w52lo, "minimo 52s")].filter(Boolean);
       if (inS.length) L.push(`- I LIVELLI IN SIGMA IMPLICITE (distanza dal riferimento divisa per il movimento atteso ±${sigma}% sulla scadenza ${rif.data}): `
@@ -13697,8 +13803,10 @@ function datiNostriDelTitolo(tk) {
         + `La distanza in percentuale da sola non distingue i due casi.`);
       if (rif.putVicino || rif.callVicino) {
         const b3 = [];
-        if (rif.callVicino) b3.push(`call ${rif.callVicino.strike} (${((rif.callVicino.strike / f.prezzo - 1) * 100).toFixed(1)}%, ${fmtNum.format(rif.callVicino.oi)} contratti)`);
-        if (rif.putVicino) b3.push(`put ${rif.putVicino.strike} (${((rif.putVicino.strike / f.prezzo - 1) * 100).toFixed(1)}%, ${fmtNum.format(rif.putVicino.oi)} contratti)`);
+        /* v477 — la distanza col segno e la virgola (signTxt su pct1): toFixed scriveva il punto
+           inglese, la classe v442/v443 rimasta nel pacchetto del titolo */
+        if (rif.callVicino) b3.push(`call ${rif.callVicino.strike} (${signTxt(Math.round((rif.callVicino.strike / f.prezzo - 1) * 1000) / 10)}, ${fmtNum.format(rif.callVicino.oi)} contratti)`);
+        if (rif.putVicino) b3.push(`put ${rif.putVicino.strike} (${signTxt(Math.round((rif.putVicino.strike / f.prezzo - 1) * 1000) / 10)}, ${fmtNum.format(rif.putVicino.oi)} contratti)`);
         L.push(`- MASSIMO OPEN INTEREST DENTRO IL MOVIMENTO IMPLICITO (scadenza ${rif.data}): ${b3.join(" · ")}. `
           + `Sono gli strike raggiungibili entro la scadenza con piu' posizioni aperte — a differenza dei "muri" assoluti, `
           + `che possono stare a distanze che il titolo non percorre.`);
@@ -13871,7 +13979,9 @@ function datiNostriDelTitolo(tk) {
               ? ` ⚠ La MEDIANA e' sotto la MEDIA: pochi target molto alti stanno tirando su l'aritmetica.` : ""));
       }
     }
-    const perc = (v) => Number.isFinite(numero(v)) ? `${(numero(v) * 100).toFixed(1)}%` : null;
+    /* v477 — pct1, il formattatore unico: toFixed(1) scriveva "6.9%" col punto inglese dentro un
+       pacchetto che ovunque usa la virgola (v442, v443) */
+    const perc = (v) => Number.isFinite(numero(v)) ? `${pct1(numero(v) * 100)}%` : null;
     /* v476 — la scala segue la grandezza (scalaImporti, v447): "mld" intero cancellava i numeri
        dei nomi piccoli — su RGTI ricavi a dodici mesi e flusso libero uscivano "0 mld" e la
        capitalizzazione "4 mld". Ogni grandezza qui e' diversa dalle altre, quindi la scala e'
@@ -13890,12 +14000,12 @@ function datiNostriDelTitolo(tk) {
           return `flusso di cassa libero ${mld(t.fcf)}`;
         const scarto = Math.abs(q / numero(t.fcf) - 1) * 100;
         if (scarto <= 10)
-          return `flusso di cassa libero ${mld(t.fcf)} (verificato: coincide entro il ${scarto.toFixed(1)}% `
+          return `flusso di cassa libero ${mld(t.fcf)} (verificato: coincide entro il ${pct1(scarto)}% `
             + `con la somma dei quattro trimestri nel blocco COMBUSTIONE DI CASSA)`;
         const comeLa = scalaCombustione(t.comb)(q);
         return `flusso di cassa libero ${mld(t.fcf)} secondo l'aggregatore — ⚠⚠ IL BLOCCO COMBUSTIONE DI `
           + `CASSA PIU' SOTTO NE CALCOLA UN ALTRO: ${comeLa}, sommando i quattro trimestri del rendiconto `
-          + `finanziario, cioe' ${scarto.toFixed(1)}% di scarto. Non e' un errore di arrotondamento: i due `
+          + `finanziario, cioe' ${pct1(scarto)}% di scarto. Non e' un errore di arrotondamento: i due `
           + `coprono periodi diversi, o l'aggregatore include voci che il rendiconto tiene fuori. NON usare `
           + `i due numeri insieme senza aver verificato quale copre cosa`;
       })() : null,
@@ -13903,7 +14013,7 @@ function datiNostriDelTitolo(tk) {
         const somma = t.sommaTrim;
         const scarto = (Number.isFinite(somma) && somma > 0) ? Math.abs(t.ricaviFy / somma - 1) * 100 : null;
         if (scarto == null) return `ricavi su dodici mesi ${mld(t.ricaviFy)} (dall'aggregatore; il sistema non ha i trimestri per verificarlo)`;
-        if (scarto <= 2) return `ricavi ultimi 12 mesi ${mld(t.ricaviFy)} (verificato: coincide con la somma dei quattro trimestri qui sotto entro il ${scarto.toFixed(1)}%; NON e' l'esercizio fiscale, che e' un'altra grandezza)`;
+        if (scarto <= 2) return `ricavi ultimi 12 mesi ${mld(t.ricaviFy)} (verificato: coincide con la somma dei quattro trimestri qui sotto entro il ${pct1(scarto)}%; NON e' l'esercizio fiscale, che e' un'altra grandezza)`;
         /* ⚠⚠ v400 — IL PACCHETTO CONOSCEVA LA CAUSA E LA PRESENTAVA COME MISTERO. Misurato su
            CRWV: i dodici mesi dell'aggregatore valgono 8 mld, i quattro trimestri stampati ne
            sommano 6,2, e quaranta righe piu' sotto lo stesso pacchetto dichiara — dal deposito
@@ -13914,7 +14024,7 @@ function datiNostriDelTitolo(tk) {
            congettura solo se il fatto non c'e'. */
         const ferma = depositoOltreLaTabella(tk, t.ultimoTrim);
         return `ricavi su dodici mesi ${mld(t.ricaviFy)} — ⚠⚠ NON QUADRA CON I TRIMESTRI DI QUESTO PACCHETTO: `
-          + `i quattro trimestri stampati piu' sotto sommano ${mld(somma)}, cioe' ${scarto.toFixed(1)}% in meno. `
+          + `i quattro trimestri stampati piu' sotto sommano ${mld(somma)}, cioe' ${pct1(scarto)}% in meno. `
           + (ferma
               ? `Il residuo di ${mld(t.ricaviFy - somma)} E' SPIEGATO: la tabella dei trimestri e' ferma al `
                 + `${t.ultimoTrim} e la societa' ha depositato risultati piu' recenti il ${ferma.dep} (SEC EDGAR, `
@@ -13966,8 +14076,21 @@ function datiNostriDelTitolo(tk) {
         : `debito netto ${M(c.debito_netto)}`);
       const flussi = [];
       if (c.ocf_ttm != null) flussi.push(`flusso di cassa OPERATIVO ${M(c.ocf_ttm)}`);
-      if (c.capex_ttm != null) flussi.push(`investimenti (capex) ${M(c.capex_ttm)}`);
+      /* v477 — la composizione che la fonte dichiara, solo quando somma al totale (la pipeline
+         la pubblica soltanto allora): impianti contro attivita' immateriali */
+      const _qI = numero(c.quota_immateriali_pct);
+      if (c.capex_ttm != null) flussi.push(`investimenti (capex) ${M(c.capex_ttm)}`
+        + (c.capex_impianti_ttm != null && c.capex_immateriali_ttm != null && Number.isFinite(_qI)
+          ? `: acquisti di attivita' immateriali ${M(c.capex_immateriali_ttm)} (${pct1(_qI)}%)`
+            + ` e impianti ${M(c.capex_impianti_ttm)}`
+          : ""));
       if (c.fcf_ttm != null) flussi.push(`flusso di cassa libero ${M(c.fcf_ttm)}`);
+      /* v477 — i dividendi sulle privilegiate: un'uscita che il flusso operativo non contiene */
+      if (c.dividendi_privilegiate_ttm != null) flussi.push(`dividendi sulle azioni privilegiate `
+        + `${M(c.dividendi_privilegiate_ttm)} su ${c.dividendi_privilegiate_trimestri || "?"} trimestri`
+        + (c.dividendi_privilegiate_ultimo_trim != null
+          ? ` (ultimo trimestre ${M(c.dividendi_privilegiate_ultimo_trim)})` : "")
+        + ` — uscita di finanziamento, fuori dal flusso operativo`);
       /* la frase che cambia la lettura: da dove viene la combustione */
       let origine = "";
       if (c.ocf_ttm != null && c.fcf_ttm != null) {
@@ -14166,12 +14289,14 @@ function datiNostriDelTitolo(tk) {
       L.push(`- UTILE PER AZIONE ATTESO: ${fmtNum.format(t.epsFwd)} — il consenso degli analisti si aspetta una `
         + `PERDITA sul prossimo esercizio fiscale.${_dueEps} ⚠ IL P/E PROSPETTICO NON ESISTE E NON VIENE PUBBLICATO: `
         + `prezzo diviso un utile negativo da' un numero che MIGLIORA quando i conti peggiorano `
-        + `(a ${fmtNum.format(t.epsFwd)} sarebbe ${(f.prezzo / t.epsFwd).toFixed(1)}×, a `
-        + `${fmtNum.format(t.epsFwd * 2)} diventerebbe ${(f.prezzo / (t.epsFwd * 2)).toFixed(1)}×, cioe' `
+        + `(a ${fmtNum.format(t.epsFwd)} sarebbe ${pct1(f.prezzo / t.epsFwd)}×, a `
+        + `${fmtNum.format(t.epsFwd * 2)} diventerebbe ${pct1(f.prezzo / (t.epsFwd * 2))}×, cioe' `
         + `apparentemente piu' economico). Su una societa' in perdita il multiplo utile e' un altro: `
         + `prezzo su ricavi, o valore d'impresa su ricavi, che il sistema non calcola.`);
     } else if (Number.isFinite(t.peFwd) || Number.isFinite(t.epsFwd)) {
-      L.push(`- P/E PROSPETTICO: ${Number.isFinite(t.peFwd) ? t.peFwd.toFixed(1) + "×" : "n.d."}`
+      /* v477 — i multipli con la virgola, dal formattatore unico: toFixed scriveva il punto
+         inglese accanto a "P/S 124,36×" nello stesso pacchetto (classe v442/v443) */
+      L.push(`- P/E PROSPETTICO: ${Number.isFinite(t.peFwd) ? pct1(t.peFwd) + "×" : "n.d."}`
         + `${Number.isFinite(t.epsFwd) ? ` (utile per azione atteso ${fmtNum.format(t.epsFwd)})` : ""}`
         + ` — e' il CONSENSO DEGLI ANALISTI sul PROSSIMO ESERCIZIO FISCALE (convenzione di yfinance \`forwardEps\`), non una guidance della societa'`
         /* ⚠ v414 — la dichiarazione dei due utili attesi vale su ENTRAMBI i rami: la prima
@@ -14179,7 +14304,7 @@ function datiNostriDelTitolo(tk) {
            lo stesso scarto con l'utile atteso positivo. E' la classe v412 — una correzione
            applicata a un ramo e non all'altro — presa dal check invece che da una rilettura. */
         + _dueEps
-        + `${Number.isFinite(t.pe) && Number.isFinite(t.peFwd) && t.pe > 0 ? ` e non un tasso di crescita: ${(t.pe / t.peFwd).toFixed(1)}× di scarto fra i due multipli misura quanto utile in piu' il consenso si aspetta, non quanto il titolo sia caro` : ""}.`
+        + `${Number.isFinite(t.pe) && Number.isFinite(t.peFwd) && t.pe > 0 ? ` e non un tasso di crescita: ${pct1(t.pe / t.peFwd)}× di scarto fra i due multipli misura quanto utile in piu' il consenso si aspetta, non quanto il titolo sia caro` : ""}.`
         + ` ⚠⚠ PRIMA DI CONFRONTARLO CON UN FORWARD P/E TROVATO ONLINE, GUARDA A CHE ESERCIZIO SI RIFERISCE: per una societa' `
         + `con anno fiscale sfasato "il prossimo esercizio" puo' essere un anno piu' avanti di quello che quotano i siti di `
         + `mercato, e i due multipli non sono confrontabili. Misurato su NVDA il 23/08/2026: qui 16,5×, su stockanalysis.com `

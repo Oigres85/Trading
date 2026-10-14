@@ -205,7 +205,7 @@ FOMC_2026 = ["2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
              "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09"]
 
 
-def movimenti_impliciti_fomc(implied, effr, riunione, mese_contratto):
+def movimenti_impliciti_fomc(implied, effr, riunione, mese_contratto, esito=None):
     """La metodologia CME FedWatch, invece della nostra approssimazione (v441).
 
     ⚠⚠ IL CONTRATTO E' UNA MEDIA DI MESE, NON UN TASSO DI FINE MESE. Il future Fed Funds a 30
@@ -229,40 +229,188 @@ def movimenti_impliciti_fomc(implied, effr, riunione, mese_contratto):
     significa niente (v199): fuori dal mese del contratto, o con un implied cosi' lontano da
     non essere attribuibile alla riunione di questo mese.
     """
-    if implied is None or effr is None or not riunione:
+    # v477 — `esito` (facoltativo) riceve il PERCHE' di un None, come il gemello JS della v462:
+    #   "fuori dal mese" e "fuori scala" sono due diagnosi diverse, e la riga ne dice una sola.
+    def _no(perche, grezzo=None):
+        if esito is not None:
+            esito["motivo"], esito["grezzo"] = perche, grezzo
         return None
+    if implied is None or effr is None or not riunione:
+        return _no("dati")
     try:
         r = datetime.strptime(riunione, "%Y-%m-%d").date()
     except Exception:  # noqa: BLE001
-        return None
+        return _no("dati")
     # ⚠ Il front-month prezza SOLO il proprio mese: una riunione di ottobre non e' dentro il
     #   contratto di settembre. E' la regola v199 nella sua forma corretta — il limite non e'
     #   "35 giorni" ma "lo stesso mese di calendario del contratto".
     if (r.year, r.month) != (mese_contratto.year, mese_contratto.month):
-        return None
+        return _no("mese")
     # il FOMC annuncia a fine seconda giornata: il target nuovo vale dal giorno LAVORATIVO dopo
     eff = r + timedelta(days=1)
     while eff.weekday() >= 5:
         eff += timedelta(days=1)
     if eff.month != r.month:               # riunione a cavallo del mese: nessun giorno residuo
-        return None
+        return _no("mese")
     giorni = calendar.monthrange(r.year, r.month)[1]
     n1 = eff.day - 1                       # giorni al tasso VECCHIO
     n2 = giorni - n1                       # giorni al tasso NUOVO
     if n2 <= 0:
-        return None
+        return _no("mese")
     r_fine = (implied - (n1 / giorni) * effr) / (n2 / giorni)
     mosse = (r_fine - effr) / 0.25
     # ⚠ Guardia di plausibilita': oltre tre movimenti da 25bp su una riunione sola il numero non
-    #   e' attribuibile a questa riunione — molto piu' probabilmente il contratto letto non e'
-    #   quello del mese corrente. Si dichiara invece di pubblicare (v396: meglio non avere dati
-    #   che averli non corretti). Non e' una soglia sul mercato: e' il confine oltre il quale la
-    #   nostra ipotesi sul contratto smette di reggere.
-    if abs(mosse) > 3:
-        return None
+    #   e' attribuibile a questa riunione. Si dichiara invece di pubblicare (v396: meglio non
+    #   avere dati che averli non corretti). Non e' una soglia sul mercato: e' il confine oltre
+    #   il quale la nostra ipotesi sul contratto smette di reggere.
+    if abs(mosse) > SOGLIA_PLAUSIBILITA_FOMC:
+        return _no("plausibilita", round(mosse, 2))
     return {"mosse_25bp": round(mosse, 2), "tasso_atteso_fine_mese": round(r_fine, 3),
             "giorni_vecchio": n1, "giorni_nuovo": n2, "giorni_mese": giorni,
             "base_effr": effr, "riunione": riunione}
+
+
+# oltre questo numero di movimenti da 25bp su una riunione sola il conto non e' attribuibile
+SOGLIA_PLAUSIBILITA_FOMC = 3
+
+# ═══ v477 — IL CONTRATTO CONTINUO CAMBIA MESE A META' MESE, E LO ABBIAMO MISURATO ══════════════
+# La v441 dichiarava di non poter verificare QUALE contratto Yahoo serva come `ZQ=F` (trappola
+# v203). Verificato il 13/10/2026: `ZQ=F` riportava `underlyingSymbol: ZQX26.CBT`, cioe'
+# NOVEMBRE, con prezzo 96,06 identico a ZQX26 — mentre fino al 12/10 aveva il prezzo di ottobre
+# (96,1175 = ZQV26). Il continuo ROTOLA prima della fine del mese, e il sistema leggeva il mese
+# dopo come se fosse quello della riunione: l'11/09 dava 1,97 movimenti sul FOMC del 16/09 (CME
+# ~0,7, Polymarket 0,82) — l'ottobre letto come settembre, con 14 giorni su 30 di leva.
+# E la base era la media MENSILE di FEDFUNDS (3,75 a settembre, che mescola 15 giorni prima e 15
+# dopo il rialzo del 16/09) invece dell'EFFR giornaliero (3,88): a ogni riunione che segue un
+# movimento il conto usciva fuori scala (il "APERTO" della v462).
+# ⚠ Ora i contratti si leggono PER ESTESO, mese per mese (ZQ + codice mese + anno), e la base e'
+#   l'EFFR del giorno pubblicato dalla NY Fed. E' la metodologia CME per intero, che la v441 ha
+#   scelto (strada b) e non poteva applicare senza i contratti dei singoli mesi.
+_MESI_CME = "FGHJKMNQUVXZ"
+
+
+def simbolo_fed_funds(anno, mese):
+    """Il future Fed Funds a 30 giorni di QUEL mese, per esteso: ZQX26.CBT = novembre 2026."""
+    return f"ZQ{_MESI_CME[mese - 1]}{anno % 100:02d}.CBT"
+
+
+def _mese_dopo(anno, mese):
+    return (anno + 1, 1) if mese == 12 else (anno, mese + 1)
+
+
+def mesi_contratti_fomc(riunioni, calendario=None):
+    """I mesi i cui contratti servono alla catena: per ogni riunione il mese DOPO, se e' noto e
+    senza riunioni (il suo tasso medio E' il tasso deciso), altrimenti il mese della riunione."""
+    cal = calendario if calendario is not None else FOMC_2026
+    con_riunione = {(int(d[:4]), int(d[5:7])) for d in cal}
+    anni = {int(d[:4]) for d in cal}
+    mesi = []
+    for d in riunioni:
+        a, m = int(d[:4]), int(d[5:7])
+        dopo = _mese_dopo(a, m)
+        for x in ((dopo,) if (dopo[0] in anni and dopo not in con_riunione) else ()) + ((a, m),):
+            if x not in mesi:
+                mesi.append(x)
+    return mesi
+
+
+def catena_fedwatch(effr, riunioni, tassi_mese, calendario=None):
+    """La catena CME: il tasso atteso DOPO ogni riunione, riunione per riunione.
+
+    · `effr`: l'EFFR giornaliero di oggi — il tasso in vigore fino alla prossima decisione;
+    · `riunioni`: le prossime date di decisione, in ordine;
+    · `tassi_mese`: {(anno, mese): 100 - prezzo} dei contratti letti per esteso;
+    · `calendario`: le date FOMC note (per sapere quali mesi NON hanno riunioni).
+
+    Per ogni riunione il tasso DOPO si legge, nell'ordine:
+      1. dal contratto del MESE DOPO, se quel mese e' noto e senza riunioni: la sua media E' il
+         tasso deciso, senza ponderazioni — e' cio' che CME fa per le riunioni di fine mese, dove
+         il mese della riunione ha pochi giorni al tasso nuovo e il conto avrebbe leva 10;
+      2. altrimenti dal contratto del MESE DELLA RIUNIONE, ponderando i giorni prima e dopo
+         (movimenti_impliciti_fomc, la v441), con base il tasso dopo la riunione precedente.
+    I movimenti di ogni riunione sono quelli IN PIU' rispetto alla precedente; i cumulati si
+    contano da oggi. Una riunione che non si ricava interrompe la catena: le successive
+    dipendono da lei, e si dichiarano invece di essere calcolate su una base mancante."""
+    cal = calendario if calendario is not None else FOMC_2026
+    con_riunione = {(int(d[:4]), int(d[5:7])) for d in cal}
+    anni = {int(d[:4]) for d in cal}
+    out, pre, rotta = [], effr, None
+    for d in riunioni:
+        voce = {"date": d, "riunione": d, "prezzata_dal_contratto": False}
+        out.append(voce)
+        if effr is None:
+            voce["motivo"] = "dati"
+            continue
+        if rotta:
+            voce["motivo"] = "catena"
+            continue
+        a, m = int(d[:4]), int(d[5:7])
+        dopo = _mese_dopo(a, m)
+        if dopo[0] in anni and dopo not in con_riunione and tassi_mese.get(dopo) is not None:
+            post, contr, tasso_c = tassi_mese[dopo], simbolo_fed_funds(*dopo), tassi_mese[dopo]
+            voce["metodo"] = "mese_dopo"
+            mosse = (post - pre) / 0.25
+            if abs(mosse) > SOGLIA_PLAUSIBILITA_FOMC:
+                voce.update(motivo="plausibilita", mosse_grezze=round(mosse, 2), contratto=contr)
+                rotta = "plausibilita"
+                continue
+        elif tassi_mese.get((a, m)) is not None:
+            es = {}
+            mv = movimenti_impliciti_fomc(tassi_mese[(a, m)], pre, d, datetime(a, m, 1).date(), esito=es)
+            contr, tasso_c = simbolo_fed_funds(a, m), tassi_mese[(a, m)]
+            if mv is None:
+                voce.update(motivo=es.get("motivo") or "dati", mosse_grezze=es.get("grezzo"), contratto=contr)
+                rotta = voce["motivo"]
+                continue
+            post, mosse = mv["tasso_atteso_fine_mese"], mv["mosse_25bp"]
+            voce.update(metodo="mese_riunione", giorni_vecchio=mv["giorni_vecchio"],
+                        giorni_nuovo=mv["giorni_nuovo"], giorni_mese=mv["giorni_mese"])
+        else:
+            voce.update(motivo="contratto", contratto=simbolo_fed_funds(*(
+                dopo if (dopo[0] in anni and dopo not in con_riunione) else (a, m))))
+            rotta = "contratto"
+            continue
+        voce.update(prezzata_dal_contratto=True, mosse_25bp=round(mosse, 2),
+                    mosse_cumulate=round((post - effr) / 0.25, 2), tasso_atteso_fine_mese=round(post, 3),
+                    base_effr=round(pre, 3), contratto=contr, tasso_contratto=round(tasso_c, 3))
+        pre = post
+    return out
+
+
+def effr_giornaliero():
+    """L'EFFR del giorno: NY Fed (la fonte primaria, gratis e senza chiave), poi FRED `EFFR`.
+    ⚠ MAI `FEDFUNDS`: e' la media MENSILE, e un mese che contiene una riunione mescola il tasso
+    di prima e quello di dopo (v462). Senza EFFR giornaliero la catena non si calcola."""
+    try:
+        rr = http_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json").json()["refRates"][0]
+        return {"valore": float(rr["percentRate"]), "data": str(rr["effectiveDate"])[:10], "fonte": "NY Fed"}
+    except Exception as e:  # noqa: BLE001
+        print(f"!! fedwatch: EFFR NY Fed non letto: {e}", file=sys.stderr)
+    try:
+        s = fred_series("EFFR", 10)
+        if s:
+            return {"valore": float(s[-1][1]), "data": str(s[-1][0])[:10], "fonte": "FRED EFFR"}
+    except Exception as e:  # noqa: BLE001
+        print(f"!! fedwatch: EFFR FRED non letto: {e}", file=sys.stderr)
+    return None
+
+
+def _prezzo_contratto(simbolo):
+    """Ultimo prezzo di un contratto per esteso. None se Yahoo non risponde: un contratto non
+    letto si DICHIARA nella catena, non si sostituisce col continuo."""
+    try:
+        p = yf.Ticker(simbolo).fast_info.last_price
+        if p is not None and float(p) > 0:
+            return float(p)
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        h = yf.Ticker(simbolo).history(period="5d")["Close"].dropna()
+        if len(h):
+            return float(h.iloc[-1])
+    except Exception:  # noqa: BLE001
+        pass
+    return None
 
 
 def next_fomc_date():
@@ -1291,6 +1439,60 @@ def combustione(t, mcap, buyback):
         out["emissione_netta_pct"] = round(abs(buyback) * 100, 2)
     if debito is not None and liquidita is not None:
         out["debito_netto"] = debito - liquidita
+    # ⚠⚠ v477 — GLI "INVESTIMENTI" NON SONO SEMPRE COSTRUZIONE. "Capital Expenditure" di
+    #   yfinance somma gli acquisti di IMPIANTI ("Purchase Of PPE") e quelli di ATTIVITA'
+    #   IMMATERIALI ("Purchase Of Intangibles"). Su quasi tutto il libro la seconda voce manca o
+    #   e' minima; su MSTR e' il 99,9%: 21,7 mld di "investimenti" di cui 21 milioni in impianti.
+    #   Il pacchetto scriveva "la liquidita' copre 1,4 mesi di INVESTIMENTI" — aritmeticamente
+    #   vero e comunicativamente falso: un cantiere fermato lascia opere a meta' e contratti non
+    #   onorati, un acquisto fermato no. La fonte non dice COSA siano quelle attivita' (che su
+    #   MSTR siano bitcoin lo sa il registro pubblico, non questo file): si pubblica la
+    #   composizione che la fonte DICHIARA, non un'interpretazione.
+    #   ⚠ La scomposizione esce solo se SOMMA al totale entro l'1%: due voci che non tornano col
+    #   totale sono due numeri che si contraddicono (classe v415), e allora si tace.
+    #   ⚠ `capex_ttm` e `fcf_ttm` NON cambiano definizione: il segno del flusso libero decide chi
+    #   dipende dal mercato dei capitali (v404, v467), e su MSTR resta negativo comunque —
+    #   anche coi soli impianti la gestione non si autofinanzia.
+    imp, n_imp, _ = _somma_trimestri(cf, "Purchase Of PPE")
+    imm, n_imm, _ = _somma_trimestri(cf, "Purchase Of Intangibles")
+    if (capex is not None and capex < 0 and imp is not None and imm is not None and imm < 0
+            and n_imp == n_cap and n_imm == n_cap
+            and abs((imp + imm) - capex) <= 0.01 * abs(capex)):
+        out["capex_impianti_ttm"] = imp
+        out["capex_immateriali_ttm"] = imm
+        quota = imm / capex * 100
+        out["quota_immateriali_pct"] = round(quota, 1)
+        # oltre la meta' il denominatore "investimenti" non descrive piu' un piano di
+        # costruzione. CONVENZIONE dichiarata (v240): la maggioranza, non una soglia di mercato.
+        if quota >= 50:
+            out["investimenti_immateriali_prevalenti"] = True
+            if liquidita is not None and imp < 0:
+                out["mesi_impianti"] = round(liquidita / (abs(imp) / 12.0), 1)
+    # ⚠⚠ v477 — L'OBBLIGO CHE IL FLUSSO OPERATIVO NON VEDE. I dividendi sulle azioni
+    #   privilegiate sono un'uscita di FINANZIAMENTO: stanno fuori dal flusso operativo, quindi
+    #   fuori da `mesi_operativi`. Su MSTR valgono 952 milioni in 12 mesi contro 20 di perdita
+    #   operativa, e il pacchetto scriveva "la liquidita' copre oltre 5 anni di perdita
+    #   operativa" — vero, e lontanissimo da cio' che la liquidita' deve davvero coprire.
+    #   Si pubblicano i dividendi e, quando la gestione NON li copre, l'autonomia sulle due
+    #   uscite insieme. Con la gestione che li copre la domanda non si pone (WDC: 10 milioni di
+    #   dividendi contro 3,9 mld di flusso operativo).
+    #   ⚠ L'ultimo trimestre viaggia col totale: su MSTR e' passato da 49 a 400 milioni in un
+    #   anno, e un'autonomia calcolata sui 12 mesi sottostima il ritmo di oggi. Si pubblica il
+    #   FATTO (il trimestre), non un annualizzato: annualizzare sarebbe una proiezione (v396).
+    pref, n_pref, _ = _somma_trimestri(cf, "Preferred Stock Dividend Paid")
+    if pref is not None and pref < 0:
+        out["dividendi_privilegiate_ttm"] = pref
+        out["dividendi_privilegiate_trimestri"] = n_pref
+        try:
+            _ult = cf.loc["Preferred Stock Dividend Paid"].dropna()
+            if len(_ult):
+                out["dividendi_privilegiate_ultimo_trim"] = float(_ult.iloc[0])
+        except Exception:  # noqa: BLE001
+            pass
+        _perdita = abs(ocf) if (ocf is not None and ocf < 0) else 0.0
+        _copre = ocf is not None and ocf >= abs(pref)
+        if liquidita is not None and not _copre and n_pref == 4:
+            out["mesi_obblighi"] = round(liquidita / ((abs(pref) + _perdita) / 12.0), 1)
     return {k: v for k, v in out.items() if v is not None}
 
 
@@ -2712,8 +2914,25 @@ def fetch_macro():
 
     # FedWatch (tassi impliciti dai futures Fed Funds 30-day)
     try:
-        zq = yf.Ticker("ZQ=F").fast_info.last_price
-        implied = round(100 - float(zq), 2)
+        # ⚠⚠ v477 — i contratti PER ESTESO, mese per mese, non il continuo `ZQ=F`, che rotola sul
+        #   mese dopo prima della fine del mese (verificato il 13/10/2026). `implied` e' la media
+        #   attesa del MESE IN CORSO, dal suo contratto: e' cio' che il pacchetto dice che sia.
+        oggi_utc = datetime.now(timezone.utc).date()
+        fomc = [d for d in FOMC_2026
+                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
+        _mesi_fw = [(oggi_utc.year, oggi_utc.month)] + [
+            x for x in mesi_contratti_fomc(fomc[:4]) if x != (oggi_utc.year, oggi_utc.month)]
+        contratti, tassi_mese = [], {}
+        for (_a, _m) in _mesi_fw:
+            _s = simbolo_fed_funds(_a, _m)
+            _p = _prezzo_contratto(_s)
+            contratti.append({"mese": f"{_a}-{_m:02d}", "simbolo": _s, "prezzo": _p,
+                              "tasso": round(100 - _p, 4) if _p is not None else None})
+            if _p is not None:
+                tassi_mese[(_a, _m)] = 100 - _p
+        if tassi_mese.get((oggi_utc.year, oggi_utc.month)) is None:
+            raise RuntimeError(f"contratto del mese in corso non letto ({simbolo_fed_funds(oggi_utc.year, oggi_utc.month)})")
+        implied = round(tassi_mese[(oggi_utc.year, oggi_utc.month)], 3)
         target = target_low = None
         try:                                        # 1) FRED
             target = fred_series("DFEDTARU", 1)[-1][1]
@@ -2726,10 +2945,6 @@ def fetch_macro():
                 target_low = math.floor(implied / 0.25) * 0.25
                 target = target_low + 0.25
         mid = (target + target_low) / 2
-        # prossime riunioni FOMC 2026 con probabilità taglio implicita dai futures
-        # (stesso calendario FOMC_2026: mai più due liste divergenti nel prompt)
-        fomc = [d for d in FOMC_2026
-                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
         # v186 — IL SEGNO CONTA, ED ERA BUTTATO VIA.
         # (mid - implied)/0.25 e' la distanza dal punto medio del range in "quarti di punto":
         # POSITIVA quando i futures prezzano un tasso PIU BASSO (taglio atteso), NEGATIVA quando
@@ -2750,7 +2965,8 @@ def fetch_macro():
         # ~57%, e la metodologia corretta sul NOSTRO implied da' 1,37 movimenti da 25bp.
         # ⚠ Il front-month prezza SOLO il proprio mese: le riunioni successive non si proiettano
         #   piu' — si dichiara che questo contratto non le prezza (v199).
-        oggi_utc = datetime.now(timezone.utc).date()
+        #   ⚠ v477: ora ogni riunione si prezza col contratto del PROPRIO mese (o del mese dopo,
+        #   se senza riunioni) — la catena qui sotto. Proiettare resta vietato: si legge.
         # ⚠⚠ v443 — QUESTA LETTURA TORNAVA SEMPRE None, E IL BLOCCO NON PUBBLICAVA NULLA.
         #   `macro["fed_market"]` viene scritto MILLE RIGHE PIU' SOTTO: qui la chiave non esiste
         #   ancora, quindi `effr_corrente` era None, `mov` era None, e ogni riunione usciva
@@ -2760,41 +2976,36 @@ def fetch_macro():
         #   E' la lezione v399 nella sua forma piu' pura: i sei gate della v441 provavano il
         #   CONTROLLO (la funzione, chiamata a mano) e non il COLLEGAMENTO (da dove arriva il suo
         #   ingresso in produzione).
-        # ⚠ La stessa serie di `fed_market`, non una seconda derivazione: l'ultima osservazione
-        #   di FEDFUNDS e' la stessa in entrambe le chiamate, quindi i due numeri coincidono per
-        #   costruzione invece che per fortuna (v161, v207).
+        # ⚠⚠ v477 — LA BASE E' L'EFFR DEL GIORNO, non la media mensile FEDFUNDS: il 06/10 la
+        #   media di settembre valeva 3,75 (meta' mese prima del rialzo del 16/09, meta' dopo)
+        #   contro un EFFR di 3,88, e ogni riunione che segue un movimento usciva fuori scala.
+        #   Nessuna lettura da `macro`: la chiave fed_market si scrive mille righe piu' sotto (v443).
         effr_corrente = None
-        try:
-            fm = macro.get("fed_market") or {}
-            if isinstance(fm.get("current_rate"), (int, float)):
-                effr_corrente = float(fm["current_rate"])
-            else:
-                _ff = fred_series("FEDFUNDS", 2)
-                if _ff:
-                    effr_corrente = round(float(_ff[-1][1]), 2)
-        except Exception as e:  # noqa: BLE001
-            print(f"!! fedwatch: EFFR non risolto: {e}", file=sys.stderr)
-        mov = movimenti_impliciti_fomc(implied, effr_corrente, fomc[0] if fomc else None, oggi_utc)
-        cut_prob = hike_prob = None
-        if mov:
-            m25 = mov["mosse_25bp"]
+        _effr = effr_giornaliero()
+        if _effr:
+            effr_corrente = _effr["valore"]
+        catena = catena_fedwatch(effr_corrente, fomc[:4], tassi_mese)
+        meetings = []
+        for voce in catena:
             # ⚠ Una PROBABILITA' esiste solo dentro (0, 1]: sopra, il movimento intero e' gia'
             #   prezzato e il resto e' la quota di un secondo. Schiacciare a 100 perderebbe il
-            #   fatto, scrivere 137% sarebbe una probabilita' impossibile (v400).
-            if 0 < m25 <= 1:
-                hike_prob = round(m25 * 100)
-            elif -1 <= m25 < 0:
-                cut_prob = round(-m25 * 100)
-        meetings = []
-        for d in fomc[:4]:
-            dentro = mov is not None and d == mov["riunione"]
-            meetings.append({"date": d, "cut_prob": cut_prob if dentro else None,
-                             "hike_prob": hike_prob if dentro else None,
-                             "hold_prob": (max(0, 100 - (cut_prob or 0) - (hike_prob or 0))
-                                           if dentro and (cut_prob is not None or hike_prob is not None)
-                                           else None),
-                             "mosse_25bp": mov["mosse_25bp"] if dentro else None,
-                             "prezzata_dal_contratto": dentro})
+            #   fatto, scrivere 137% sarebbe una probabilita' impossibile (v400). Vale per ogni
+            #   riunione sui movimenti IN PIU' rispetto alla precedente.
+            voce["cut_prob"] = voce["hike_prob"] = voce["hold_prob"] = None
+            if voce.get("prezzata_dal_contratto"):
+                m25 = voce["mosse_25bp"]
+                if 0 < m25 <= 1:
+                    voce["hike_prob"] = round(m25 * 100)
+                elif -1 <= m25 < 0:
+                    voce["cut_prob"] = round(-m25 * 100)
+                if voce["hike_prob"] is not None or voce["cut_prob"] is not None:
+                    voce["hold_prob"] = max(0, 100 - (voce["cut_prob"] or 0) - (voce["hike_prob"] or 0))
+                elif m25 == 0:
+                    voce["hold_prob"] = 100
+            meetings.append(voce)
+        mov = meetings[0] if meetings and meetings[0].get("prezzata_dal_contratto") else None
+        cut_prob = mov["cut_prob"] if mov else None
+        hike_prob = mov["hike_prob"] if mov else None
         macro["fedwatch"] = {
             "target_range": f"{target_low:.2f}–{target:.2f}%",
             "implied_rate": implied,
@@ -2805,6 +3016,10 @@ def fetch_macro():
             # solo dove e' tale. `None` significa "questo contratto non prezza quella riunione".
             "movimenti": mov,
             "base_effr": effr_corrente,
+            # v477 — l'EFFR del giorno con la sua data e la fonte, e i contratti per esteso letti
+            #   in questo run: la catena si ricostruisce da qui, e un contratto non letto si vede
+            "effr": _effr,
+            "contratti": contratti,
             "next_fomc": next_fomc_date(),   # data esplicita della prossima riunione FOMC
             "meetings": meetings,
             # Dot Plot: mediana SEP (Summary of Economic Projections) — da aggiornare a ogni SEP
@@ -4655,6 +4870,23 @@ def validate_macro(macro):
         add("fedfunds", fm.get("rate_date"), 60, "implausible", f"tasso {r}% fuori range, nullato")
     else:
         add("fedfunds", fm.get("rate_date"), 60, "ok")
+
+    # --- v477 — FedWatch: la catena poggia sull'EFFR del GIORNO e sui contratti per esteso ---
+    # Una fonte nuova nasce sorvegliata (v390): senza questo check un contratto che Yahoo smette
+    # di servire lascerebbe le riunioni "non prezzate" per sempre, e "non prezzata" si legge
+    # come un fatto sul mercato invece che come un guasto (v389).
+    fwq = macro.get("fedwatch")
+    if not fwq:
+        add("fedwatch", None, 5, "missing", "blocco assente: contratto del mese in corso non letto")
+    else:
+        efq = fwq.get("effr") or {}
+        persi = [c.get("simbolo") for c in (fwq.get("contratti") or []) if c.get("prezzo") is None]
+        if efq.get("valore") is None:
+            add("fedwatch", None, 5, "missing", "EFFR giornaliero non letto (NY Fed e FRED): la catena non si calcola")
+        else:
+            aq = age_of(efq.get("data"))
+            add("fedwatch", efq.get("data"), 5, "ok" if (aq is not None and aq <= 5 and not persi) else "stale",
+                ("contratti non letti: " + ", ".join(str(x) for x in persi)) if persi else "")
 
     # --- valutazione mercato (forward P/E, S&P P/E): se mancano il quadro leva è monco ---
     for k, obj in (("forward_pe", macro.get("forward_pe")), ("sp500_pe", macro.get("sp500_pe"))):

@@ -136,13 +136,26 @@ def extra(t, r, px):
             f"{_ln} {mld(_lv)} ({_ld})" if _lv is not None else None,
             f"debito netto {mld(cb.get('debito_netto'))}" if cb.get("debito_netto") is not None else None,
             f"flusso operativo {mld(cb.get('ocf_ttm'))}" if cb.get("ocf_ttm") is not None else None,
-            f"investimenti {mld(cb.get('capex_ttm'))}" if cb.get("capex_ttm") is not None else None,
-            f"flusso libero {mld(cb.get('fcf_ttm'))}" if cb.get("fcf_ttm") is not None else None) if x]
+            f"investimenti {mld(cb.get('capex_ttm'))}"
+            # v477 — la composizione che la fonte dichiara: impianti contro attivita' immateriali
+            + (f" (immateriali {mld(cb['capex_immateriali_ttm'])} = {SP._n(cb['quota_immateriali_pct'])}%,"
+               f" impianti {mld(cb['capex_impianti_ttm'])})"
+               if cb.get("quota_immateriali_pct") is not None else "")
+            if cb.get("capex_ttm") is not None else None,
+            f"flusso libero {mld(cb.get('fcf_ttm'))}" if cb.get("fcf_ttm") is not None else None,
+            # v477 — i dividendi sulle privilegiate, un'uscita che il flusso operativo non contiene
+            f"dividendi privilegiate {mld(cb.get('dividendi_privilegiate_ttm'))}"
+            + (f" (ultimo trimestre {mld(cb['dividendi_privilegiate_ultimo_trim'])})"
+               if cb.get("dividendi_privilegiate_ultimo_trim") is not None else "")
+            if cb.get("dividendi_privilegiate_ttm") is not None else None) if x]
         origine = ""
         if cb.get("ocf_ttm") is not None and cb.get("fcf_ttm") is not None:
             origine = ("  → la gestione genera cassa, il flusso libero e' negativo per gli INVESTIMENTI"
                        if cb["ocf_ttm"] > 0 and cb["fcf_ttm"] < 0 else
                        "  → la gestione ASSORBE cassa" if cb["ocf_ttm"] <= 0 else "")
+        if cb.get("investimenti_immateriali_prevalenti"):
+            origine += ("  ⚠ gli investimenti sono in maggioranza attivita' IMMATERIALI, non impianti:"
+                        " un acquisto fermato non lascia un cantiere a meta'")
         print("   CASSA    " + " · ".join(pezzi) + origine)
         if cb.get("emissione_netta_pct"):
             print(f"            emissione netta di azioni {cb['emissione_netta_pct']:+.2f}% in un anno (diluizione)")
