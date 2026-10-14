@@ -50,6 +50,18 @@ Destinazione dichiarata: acquisti su storni e IPO di Anthropic.
 situazione fiscale. **Il divieto di dimensionare resta in piedi**: direzione, priorità e livelli
 di prezzo sì; quantità no.
 
+⚠ **NESSUN TETTO ALLE MEMORIE — decisione del CEO del 14/10/2026**, testuale: *"Nessuna regola di
+tetto per memorie, se possono dare frutti possono superare il 26,4%"*. La proposta di un tetto
+per MU + SK hynix intorno al 20% del libro (12-13/10) è **respinta**: il peso delle memorie non ha
+un limite, e SK hynix resta in portafoglio senza uno stop di prezzo. Il 14/10 le memorie pesano
+il 26,4% del libro e MU da sola porta il 34% del rischio: senza tetto, se salgono, quelle quote
+crescono da sole, e il blocco dei pesi di `numeri_libro.py` le mostra a ogni analisi.
+**Restano in vigore**, perché non sono tetti:
+- il semaforo d'uscita (§1ter): in arancione la riduzione dei semiconduttori parte da chi pesa
+  di più nel rischio — oggi MU — qualunque sia il peso delle memorie;
+- il piano di vendita di MU nella fascia 1.100-1.108 (`FORMATO_ANALISI.md` §6), una presa di
+  profitto decisa il 06/10 — finché il CEO non la revoca.
+
 ## 1bis. SORVEGLIATI — non in posizione, monitorati come i titoli del libro
 
 Il CEO li segue per una rotazione possibile. **Non sono posizioni**: non entrano nel patrimonio,
