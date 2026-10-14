@@ -6708,3 +6708,79 @@ CEO aggiunge un nome dalla pagina, il gate morde al commit successivo, che è qu
 
 ⚠ Il costo in CI di due simboli in più si vede al primo run (classe v462, v468); `?v=` e
 `BUILD_VERSION` non toccati: nessun file servito al browser (regola v440).
+
+## 🌱 v481 — SI LASCIA CORRERE, SI VENDE PER EVIDENZA: LA REGOLA DEL CEO DIVENTA UN CALCOLO
+
+Decisione del CEO (14/10/2026), testuale: *"Se ci sono parametri tali, per cui in ottica di lungo
+periodo, lasciar correre mu può portare a ottimi rendimenti, tenendo conto anche dell'interesse
+composto non si vende se invece ci sono ed emergono parametri tra analisi tecnica, macro e notizie
+che portano effettivamente alla necessità di una vendita. Procediamo quest'ottica deve valere per
+tutte le azioni in portafoglio e oggetto di analisi il fondo ricordiamocelo è privato e growth e se
+ci sono margini di speculazione, ben venga"*. Regola in `memoria/LIBRO.md` §1sexies.
+
+**Il blocco «TENUTA DELLE POSIZIONI»** di `numeri_libro.py`: per ogni posizione quattro famiglie e
+un esito. **VENDITA PER EVIDENZA** = tendenza ROTTA (chiusura conclusa sotto la media a 200 **e**
+media a 50 sotto la 200) + almeno una conferma — fondamentali (più tagli che rialzi a 30 giorni ·
+EPS atteso a 90 giorni giù oltre il 5% del proprio valore, verso dalla DIFFERENZA, v400 · ricavi del
+trimestre in calo sull'anno) o macro (semaforo arancione/rosso, oppure il nome brucia cassa col
+credito acceso, v404/v467). Le **notizie non sono calcolate** e la resa lo dice ogni volta: la
+ricerca web sui nomi in vendita o in osservazione è obbligatoria (FORMATO §6). **IN OSSERVAZIONE** =
+una sola metà; **LASCIAR CORRERE** = nessuna; **NON MISURABILE** = meno di 200 sedute (SKHY).
+Le soglie sono convenzioni del 14/10 (v240) e un gate le rilegge dal libro.
+
+⚠⚠ **La pendenza della media a 50 è stata scartata MISURANDO, non a gusto.** La prima idea era
+"rotta = sotto la 200 e media a 50 in discesa". Sui dati veri RGTI stava −6,3 ATR sotto la 200 e
+CRWV −3,1, cioè in discesa evidente, e la loro media a 50 era ancora **in salita** (16,06 contro
+16,03 venti sedute prima): la 50 porta con sé il rialzo di due mesi fa. Il criterio dell'incrocio
+(50 sotto la 200, col prezzo sotto) li riconosce entrambi e non accende MU, che sta sotto la 50 ma
++5,2 ATR sopra la 200: è una correzione, e una correzione non è una rottura.
+
+**L'interesse composto, misurato.** Il CEO l'aveva nominato, e c'è un numero che lo traduce: il
+**pareggio fiscale** — di quanto deve scendere un titolo perché venderlo oggi e ricomprarlo dopo
+ridia le stesse azioni, cioè aliquota × (prezzo − carico) / prezzo. Su MU il 14/10: **23,6%**. È il
+calo che un'evidenza di vendita deve giustificare. L'aliquota vive in `conseguenze.py` (un fatto,
+un posto) e un gate vieta la copia del numero; il conto è in dollari e la riga dichiara che quello
+vero lo fa il broker in euro col cambio di carico.
+
+**Cosa è stato tolto, perché erano vendite per prezzo o per peso**: MU nella fascia 1.100-1.108, BE
+nella fascia 295-302, AMD «verso il 12-14% del libro» (revocata nella tabella delle decisioni, con
+la ragione) e — trovata leggendo l'uscita del semaforo — **la presa di profitto «sui nomi più
+tirati» della reazione del giallo**, che nessuno aveva nominato ma era la stessa cosa. Restano le
+uscite che sono già evidenza: il semaforo (in arancione la sua riduzione vale anche per chi si
+lascia correre; l'ORDINE di quella riduzione è una domanda aperta al CEO) e RGTI.
+
+⚠ **L'esito è la regola applicata, non un ordine.** Una VENDITA PER EVIDENZA con una vendita già
+aperta in §1quinquies è una decisione presa; senza, il blocco la **propone** al CEO. E il caso
+inverso — una vendita aperta su un nome che la regola lascia correre — si dichiara come premessa
+da ridiscutere: è esattamente ciò che era AMD.
+
+**«Oggetto di analisi» = anche la watchlist.** `rotazione.py` calcola la stessa tenuta su ogni
+sorvegliato con la **stessa funzione** e la **stessa resa** (`valuta_tenuta`, `testo_famiglie`), e
+il semaforo sugli stessi dati: «tenuta se fosse in portafoglio». Dove direbbe VENDITA PER EVIDENZA,
+un ingresso è speculativo **contro** l'evidenza — ammesso (*"se ci sono margini di speculazione, ben
+venga"*) e dichiarato. Una regola che vale per le posizioni e non per i nomi da comprare sarebbe
+la classe v412: una correzione applicata a un ramo e non all'altro.
+
+**Una derivazione sola, tre volte.** `schede_progetto.ultimo_trimestre()` è estratta da
+`riga_ricavi` perché la tenuta usa la stessa variazione sull'anno (uscita delle schede **identica
+al byte** su 591 righe, misurato prima e dopo); `righe_pipeline()` e `fcf_di()` sono una
+costruzione sola per semaforo, credito sul libro e tenuta (v161).
+
+### 🦴 Un gate pinnava una DECISIONE, non una proprietà
+Il v474 sulla tabella delle decisioni pretendeva `AMD aperta`: lo stato di una decisione che il
+CEO può cambiare quando vuole, ed è andato rosso appena l'ha cambiata. È la classe v429 (*un check
+che vale finché i dati lo concedono*) sui dati del libro invece che su quelli di mercato.
+Riagganciato alla proprietà del parser: lo stato aperto **segue la colonna Stato**.
+
+### 🧪 Venti iniezioni, tutte mordono sul controllo giusto
+Stati costruiti (salita, discesa, correzione, crollo di una seduta, risalita sopra la 200, barra in
+formazione, perdita che si allarga, da utile a perdita, ricavi in calo, dati mancanti, semaforo
+MINIMO), ripristino da snapshot verificato per impronta (v427, v430). Un controllo che col difetto
+dentro sarebbe **morto per eccezione** (`abs(None − x)`) è stato reso robusto prima di validarlo:
+deve fallire col proprio nome (v407, v471). Pavimento di `test_analisi_libro.py` 340 → 375 (i
+punti di chiamata sono 392). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser.
+
+**Il primo giro, 14/10 sui dati veri**: CRWV **VENDITA PER EVIDENZA senza decisione aperta** (rotta,
+perdita attesa ampliata del 28,4% a 90 giorni, brucia cassa col credito acceso) — proposta al CEO;
+RGTI la conferma; MSTR in osservazione (brucia cassa col credito acceso, tendenza intatta); MU,
+NVDA, AMD, PLTR, MRVL, BE da lasciar correre; SKHY non misurabile (66 sedute).

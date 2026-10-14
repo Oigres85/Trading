@@ -143,6 +143,24 @@ def _trimestre_a(q, data, giorni, tolleranza=20):
     return None
 
 
+def ultimo_trimestre(r):
+    """v481 — l'ultimo trimestre coi suoi due confronti, trovati per DATA (v207, v393):
+    {u, anno, prec, trim, yoy, qoq} oppure None. Una derivazione sola per la riga «ricavi» di
+    queste schede e per la TENUTA di numeri_libro.py: due rese della stessa variazione divergono
+    al primo ritocco (v161, v207)."""
+    q = [x for x in ((r.get("tv") or {}).get("conto_trim") or [])
+         if isinstance(x, dict) and x.get("ricavi") is not None and x.get("trim")]
+    if not q:
+        return None
+    q.sort(key=lambda x: str(x["trim"]), reverse=True)
+    u = q[0]
+    anno = _trimestre_a(q, u["trim"], 365)
+    prec = _trimestre_a(q, u["trim"], 91)
+    return {"u": u, "anno": anno, "prec": prec, "trim": str(u["trim"])[:10],
+            "yoy": (u["ricavi"] / anno["ricavi"] - 1) * 100 if anno and anno["ricavi"] else None,
+            "qoq": (u["ricavi"] / prec["ricavi"] - 1) * 100 if prec and prec["ricavi"] else None}
+
+
 def riga_ricavi(r):
     """v476 — i RICAVI per trimestre accanto all'ultimo esercizio chiuso.
     Nasce da un mio errore: il 12/10 ho motivato l'uscita da RGTI con "ricavi -46% in tre anni",
@@ -151,21 +169,17 @@ def riga_ricavi(r):
     ricavi affatto, e l'esercizio chiuso era l'unico a portata di mano. Solo variazioni, mai
     importi: sono nella valuta di bilancio dell'emittente (v404, v447). Quando trimestri ed
     esercizio puntano in versi opposti, la riga lo dice."""
-    q = [x for x in ((r.get("tv") or {}).get("conto_trim") or [])
-         if isinstance(x, dict) and x.get("ricavi") is not None and x.get("trim")]
-    q.sort(key=lambda x: str(x["trim"]), reverse=True)
+    t = ultimo_trimestre(r)
     pz, verso_trim, verso_anno = [], None, None
-    if q:
-        u = q[0]
-        anno = _trimestre_a(q, u["trim"], 365)
-        prec = _trimestre_a(q, u["trim"], 91)
+    if t:
+        u, anno = t["u"], t["anno"]
         parti = []
-        if anno and anno["ricavi"]:
-            verso_trim = (u["ricavi"] / anno["ricavi"] - 1) * 100
+        if t["yoy"] is not None:
+            verso_trim = t["yoy"]
             parti.append(f"{_segno(verso_trim)}% sullo stesso trimestre dell'anno prima")
-        if prec and prec["ricavi"]:
-            parti.append(f"{_segno((u['ricavi'] / prec['ricavi'] - 1) * 100)}% sul trimestre precedente")
-        pz.append(f"ultimo trimestre (al {str(u['trim'])[:10]}) "
+        if t["qoq"] is not None:
+            parti.append(f"{_segno(t['qoq'])}% sul trimestre precedente")
+        pz.append(f"ultimo trimestre (al {t['trim']}) "
                   + (", ".join(parti) if parti else "senza un trimestre di confronto nel dato"))
         a, b = u.get("operativo"), (anno or {}).get("operativo")
         if a is not None and b is not None:

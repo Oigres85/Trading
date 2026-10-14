@@ -2150,7 +2150,9 @@ _dd = {d["tk"]: d for d in (_dec474 or [])}
 check("v474 la tabella DECISIONI APERTE del libro si legge: RGTI uscita 463, AMD alleggerimento da decidere, livelli e date",
       set(_dd) >= {"RGTI", "AMD"} and _dd["RGTI"]["qta"] == 463 and _dd["RGTI"]["verso"] == "vendita"
       and _dd["RGTI"]["livello"] == 14.41 and _dd["AMD"]["qta"] is None and not _dd["AMD"]["qta_illeggibile"]
-      and _dd["AMD"]["livello"] == 645.0 and _dd["RGTI"]["confermata"] == "2026-10-08" and _dd["AMD"]["aperta"],
+      and _dd["AMD"]["livello"] == 645.0 and _dd["RGTI"]["confermata"] == "2026-10-08"
+      # v481 — AMD revocata il 14/10 (regola di tenuta): lo stato APERTA segue la colonna Stato, non e' fissato qui
+      and all(d["aperta"] == d["stato"].lower().startswith("aperta") for d in _dec474),
       str(_dec474))
 _tab474 = ("## 1quinquies. DECISIONI APERTE\n\n| Nome | Decisione | Quantità | Condizione | Livello | Confermata | Stato |\n"
            "|---|---|---|---|---|---|---|\n")
@@ -2489,6 +2491,184 @@ check("v480 ogni sorvegliato di LIBRO.md e' seguito dalla pipeline, e la pipelin
 check("v480 ogni posizione di LIBRO.md e' seguita dalla pipeline",
       len(_posiz480) > 0 and _posiz480 <= set(_ui480),
       f"posizioni non seguite: {sorted(_posiz480 - set(_ui480))}")
+
+# ============================ v481 — TENUTA DELLE POSIZIONI: SI LASCIA CORRERE, SI VENDE PER EVIDENZA ============================
+# Decisione del CEO del 14/10/2026 (LIBRO.md §1sexies): una posizione non si vende per prezzo, plusvalenza o peso,
+# ma quando la tendenza e' ROTTA e almeno un'altra famiglia lo conferma. Lo stato si COSTRUISCE (v425, v429): oggi
+# i nomi cadono in certi esiti, domani in altri, e un check sui dati del giorno sarebbe verde per il caso (v456).
+import conseguenze as _C481
+_s1sex = _lib474[_lib474.find("## 1sexies"):_lib474.find("\n## ", _lib474.find("## 1sexies") + 1)]
+def _num481(rx):
+    m = re.search(rx, _s1sex)
+    return float(m.group(1).replace(",", ".")) if m else None
+_dal_libro481 = {"media lunga": (_num481(r"sotto la media a \*\*(\d+)\*\* sedute"), NL.MEDIA_LUNGA),
+                 "media breve": (_num481(r"media a \*\*(\d+)\*\* sotto quella a 200"), NL.MEDIA_BREVE),
+                 "EPS a 90 giorni": (_num481(r"scesa di oltre il \*\*(\d+)%\*\*"), NL.SOGLIA_EPS_90),
+                 "aliquota": (_num481(r"imposta del \*\*(\d+)%\*\*"), _C481.ALIQUOTA * 100)}
+check("v481 le soglie della tenuta nel codice sono QUELLE di LIBRO.md §1sexies, lette dal libro",
+      len(_s1sex) > 500 and all(a is not None and abs(a - b) < 1e-9 for a, b in _dal_libro481.values()),
+      str(_dal_libro481))
+check("v481 ogni esito del codice e' nominato nel libro, e il libro porta la decisione del CEO parola per parola",
+      all(f"**{e}**" in _s1sex for e in NL.ESITI) and "lasciar correre mu può portare a ottimi rendimenti" in _s1sex
+      and "se ci sono margini di speculazione, ben venga" in _s1sex)
+
+# --- tendenza: ROTTA = chiusura sotto la 200 E media 50 sotto la 200; la correzione non e' una rottura ---
+_scende = [225 - i * 0.5 for i in range(250)]          # in discesa: media 50 ~113, media 200 ~150
+_tz481 = {k: NL.tendenza(_barre474(v), _ALLE17) for k, v in (
+    ("sale", _sale), ("sotto50", _sale[:-1] + [205.0]), ("sotto200", _sale[:-1] + [150.0]),
+    ("scende", _scende), ("risale", _scende[:-1] + [160.0]), ("fra", _scende[:-1] + [130.0]),
+    ("corta", _sale[:150]))}
+check("v481 tendenza: intatta in salita, IN CORREZIONE sotto la 50, e un crollo sotto la 200 con la 50 sopra NON e' rotta",
+      _tz481["sale"]["stato"] == "intatta" and _tz481["sotto50"]["stato"] == "in correzione"
+      and _tz481["sotto200"]["stato"] == "in correzione" and not _tz481["sotto200"]["incrocio"],
+      str({k: v["stato"] for k, v in _tz481.items()}))
+check("v481 tendenza: ROTTA con la 50 sotto la 200 e la chiusura sotto la 200 (anche sopra la 50); sopra la 200 torna "
+      "intatta e dichiara l'incrocio; sotto 200 sedute e' NON MISURABILE",
+      _tz481["scende"]["stato"] == "rotta" and _tz481["fra"]["stato"] == "rotta" and _tz481["risale"]["stato"] == "intatta"
+      and _tz481["risale"]["incrocio"] and _tz481["corta"]["stato"] == "non misurabile",
+      str({k: v["stato"] for k, v in _tz481.items()}))
+_oggi481 = _barre474(_scende[:-1] + [160.0, 120.0])
+check("v481 tendenza: la barra della seduta in corso NON rompe la tendenza, la stessa barra a chiusura si'",
+      NL.tendenza(_oggi481, _ALLE11)["stato"] == "intatta" and NL.tendenza(_oggi481, _ALLE11)["seduta"] == "2026-10-08"
+      and NL.tendenza(_oggi481, _ALLE17)["stato"] == "rotta")
+
+# --- fondamentali: tre sotto-regole, il verso dell'EPS dalla DIFFERENZA (v400), i ricavi per DATA dalle schede ---
+def _riga481(su=5, giu=1, ora=2.0, prima=1.8, ric=(120.0, 100.0)):
+    r = {"analisti": {"su_30g": su, "giu_30g": giu, "eps_ora": ora, "eps_90g_fa": prima}}
+    if ric:
+        r["tv"] = {"conto_trim": [{"trim": "2026-06-30", "ricavi": ric[0]}, {"trim": "2025-06-30", "ricavi": ric[1]}]}
+    return r
+_fn481 = lambda **k: NL.fondamentali_nome(_riga481(**k))["stato"]
+check("v481 fondamentali: spenti se nessuna sotto-regola scatta; piu' tagli che rialzi li accendono; ricavi in calo li accendono",
+      _fn481() == "spento" and _fn481(su=1, giu=3) == "acceso" and _fn481(ric=(90.0, 100.0)) == "acceso"
+      and _fn481(su=2, giu=2) == "spento")
+check("v481 fondamentali: la perdita attesa che si ALLARGA oltre il 5% accende (CRWV -3,37 -> -4,33), sotto no "
+      "(RGTI -0,2011 -> -0,206); un utile atteso giu' del 7% accende, del 4% no; da utile a perdita accende",
+      _fn481(ora=-4.33, prima=-3.37) == "acceso" and _fn481(ora=-0.206, prima=-0.2011) == "spento"
+      and _fn481(ora=0.93, prima=1.0) == "acceso" and _fn481(ora=0.96, prima=1.0) == "spento"
+      and _fn481(ora=-0.2, prima=0.5) == "acceso" and _fn481(ora=-0.3, prima=-0.5) == "spento")
+check("v481 fondamentali: una sotto-regola senza dati li rende NON MISURABILI, mai spenti; ma una accesa basta",
+      _fn481(prima=None) == "non misurabile" and _fn481(ric=None) == "non misurabile"
+      and _fn481(prima=None, su=0, giu=2) == "acceso")
+_r481 = _riga481(ric=(130.0, 100.0))
+_yoy481 = NL.fondamentali_nome(_r481)["ricavi_yoy"]
+check("v481 i ricavi della tenuta sono QUELLI delle schede: una funzione sola per la variazione sull'anno (v161)",
+      _yoy481 is not None and abs(_yoy481 - SP.ultimo_trimestre(_r481)["yoy"]) < 1e-12
+      and "+30,0% sullo stesso trimestre dell'anno prima" in SP.riga_ricavi(_r481)
+      and "schede_progetto.ultimo_trimestre(" in _corpo_di(_src_nl, "fondamentali_nome")
+      and "ultimo_trimestre(r)" in _corpo_di(Path(__file__).with_name("schede_progetto.py").read_text(), "riga_ricavi"))
+
+# --- macro del nome: semaforo arancione/rosso, oppure chi brucia cassa col credito acceso ---
+_sem481 = lambda col="giallo", cred="acceso", minimo=False: {"colore": col, "minimo": minimo,
+                                                             "famiglie": {"credito": {"stato": cred}}}
+_mn481 = lambda fcf, sem: NL.macro_nome(fcf, sem)["stato"]
+check("v481 macro: chi brucia cassa col credito acceso e' ACCESA, chi si autofinanzia no; in arancione o rosso e' accesa "
+      "per tutti",
+      _mn481(-1.0, _sem481()) == "acceso" and _mn481(1.0, _sem481()) == "spento"
+      and _mn481(1.0, _sem481("arancione", "spento")) == "acceso" and _mn481(1.0, _sem481("rosso", "spento")) == "acceso"
+      and _mn481(-1.0, _sem481(cred="spento")) == "spento")
+check("v481 macro: flusso di cassa ignoto col credito acceso, credito non misurato, semaforo MINIMO o assente = NON "
+      "MISURABILE, mai spenta",
+      _mn481(None, _sem481()) == "non misurabile" and _mn481(-1.0, _sem481(cred="non misurabile")) == "non misurabile"
+      and _mn481(1.0, _sem481(minimo=True)) == "non misurabile" and _mn481(1.0, None) == "non misurabile"
+      and _mn481(None, _sem481(cred="spento")) == "spento")
+
+# --- l'esito: VENDITA = rotta + una conferma; OSSERVAZIONE = una meta'; LASCIAR CORRERE = nessuna ---
+_st481 = lambda s: {"stato": s}
+_es481 = lambda t, f="spento", m="spento": NL.esito_tenuta(_st481(t), _st481(f), _st481(m))
+check("v481 esito: rotta + fondamentali o rotta + macro = VENDITA PER EVIDENZA; rotta sola = IN OSSERVAZIONE; una "
+      "conferma con la tendenza non rotta = IN OSSERVAZIONE; nulla = LASCIAR CORRERE, anche in correzione",
+      _es481("rotta", f="acceso")["esito"] == "VENDITA PER EVIDENZA" and _es481("rotta", m="acceso")["esito"] == "VENDITA PER EVIDENZA"
+      and _es481("rotta")["esito"] == "IN OSSERVAZIONE" and _es481("intatta", m="acceso")["esito"] == "IN OSSERVAZIONE"
+      and _es481("intatta")["esito"] == "LASCIAR CORRERE" and _es481("in correzione")["esito"] == "LASCIAR CORRERE"
+      and _es481("non misurabile", f="acceso")["esito"] == "NON MISURABILE")
+check("v481 esito MINIMO solo dove il dato mancante puo' ancora alzarlo: mai su una vendita, mai con una conferma accesa",
+      _es481("rotta", f="non misurabile")["minimo"] and _es481("intatta", m="non misurabile")["minimo"]
+      and not _es481("rotta", f="acceso", m="non misurabile")["minimo"]
+      and not _es481("intatta", f="acceso", m="non misurabile")["minimo"]
+      and not _es481("non misurabile", f="non misurabile")["minimo"])
+
+# --- l'interesse composto: il pareggio fiscale e' il calo che ridà le stesse azioni dopo l'imposta ---
+_pf481 = NL.pareggio_fiscale(953.19, 87.63, 70)
+_netto481 = 953.19 - _C481.ALIQUOTA * (953.19 - 87.63)
+check("v481 pareggio fiscale: vendere e ricomprare dopo un calo pari al pareggio ridà le STESSE azioni; imposta = "
+      "aliquota x plusvalenza; in perdita nessun pareggio e la minusvalenza si dichiara",
+      abs(_netto481 / (953.19 * (1 - _pf481["pareggio_pct"] / 100)) - 1) < 1e-12
+      and abs(_pf481["imposta"] - _C481.ALIQUOTA * 70 * (953.19 - 87.63)) < 1e-9 and 23.5 < _pf481["pareggio_pct"] < 23.7
+      and NL.pareggio_fiscale(77.81, 97.199, 105)["pareggio_pct"] is None
+      and abs(NL.pareggio_fiscale(77.81, 97.199, 105)["minus"] - 105 * (97.199 - 77.81)) < 1e-9
+      and NL.pareggio_fiscale(None, 10.0, 5) is None)
+check("v481 l'aliquota e' un FATTO che vive in conseguenze.py: nessuna copia del numero in numeri_libro",
+      "conseguenze.ALIQUOTA" in _corpo_di(_src_nl, "pareggio_fiscale") and "0.26" not in _src_nl)
+
+# --- il blocco: ordine per urgenza, decisioni gia' prese contro proposte, vendite aperte senza evidenza ---
+_bt481 = {"AAA": _barre474(_scende), "BBB": _barre474(_sale), "CCC": _barre474(_sale), "DDD": _barre474(_scende)}
+_rt481 = {"AAA": _riga481(su=0, giu=4), "BBB": _riga481(), "CCC": _riga481(), "DDD": _riga481(su=0, giu=4)}
+_dec481 = [{"tk": "AAA", "aperta": True, "verso": "vendita"}, {"tk": "CCC", "aperta": True, "verso": "vendita"},
+           {"tk": "BBB", "aperta": False, "verso": "vendita"}]
+_tn481 = NL.tenuta_posizioni(["BBB", "CCC", "AAA", "DDD"], _bt481, _rt481, {k: 1.0 for k in _bt481}, _sem481(),
+                             {k: 100.0 for k in _bt481}, {k: 50.0 for k in _bt481}, {k: 10 for k in _bt481},
+                             {"AAA": 0.1, "BBB": 0.2, "CCC": 0.5, "DDD": 0.2}, _ALLE17, _dec481)
+_rtn481 = "\n".join(NL.righe_tenuta(_tn481))
+check("v481 blocco: in ordine di URGENZA e poi di peso; una vendita gia' aperta si distingue da una da PROPORRE al CEO",
+      [r["tk"] for r in _tn481["righe"]] == ["DDD", "AAA", "CCC", "BBB"]
+      and "con la decisione già aperta (blocco DECISIONI APERTE): AAA" in _rtn481
+      and "VENDITA PER EVIDENZA SENZA decisione aperta: DDD — si PROPONE al CEO" in _rtn481, _rtn481[-700:])
+check("v481 blocco: una vendita APERTA su un nome che la regola lascia correre e' una premessa da ridiscutere (il caso AMD); "
+      "una decisione chiusa non conta",
+      "vendita APERTA senza evidenza per la regola: CCC" in _rtn481 and "BBB —" not in _rtn481.split("senza evidenza")[-1])
+check("v481 resa: le notizie si dichiarano NON calcolate ogni volta, e imposta e pareggio dichiarano dollari e cambio di carico",
+      "notizie: NON calcolate" in _rtn481 and "porta un IN OSSERVAZIONE a VENDITA PER EVIDENZA" in _rtn481
+      and "il conto vero lo fa il broker in euro col cambio di carico" in _rtn481
+      and "pareggio fiscale 13,0%" in _rtn481 and "§1sexies" in _rtn481.splitlines()[0])
+_tn481_ar = NL.tenuta_posizioni(["BBB"], _bt481, _rt481, {"BBB": None}, _sem481("arancione"), {"BBB": 100.0},
+                                {"BBB": 120.0}, {"BBB": 10}, {"BBB": 1.0}, _ALLE17, None)
+_rar481 = "\n".join(NL.righe_tenuta(_tn481_ar))
+check("v481 resa: in arancione la reazione del semaforo vale anche per chi si lascia correre; in perdita si dichiara la "
+      "minusvalenza invece del pareggio; un libro vuoto lo dice",
+      "semaforo arancione: la sua reazione (LIBRO.md §1ter) vale anche per i nomi da lasciar correre" in _rar481
+      and "minusvalenza ~200 $" in _rar481 and _tn481_ar["righe"][0]["esito"] == "IN OSSERVAZIONE"
+      and NL.righe_tenuta({"righe": []}) == ["TENUTA DELLE POSIZIONI: nessuna posizione azionaria"], _rar481)
+_tn481_min = NL.tenuta_posizioni(["BBB"], _bt481, {"BBB": _riga481(prima=None)}, {"BBB": 1.0}, _sem481(),
+                                 {"BBB": 100.0}, {"BBB": 50.0}, {"BBB": 10}, {"BBB": 1.0}, _ALLE17, None)
+check("v481 resa: un esito MINIMO si marca sulla riga e si spiega in fondo",
+      _tn481_min["righe"][0]["minimo"] and "LASCIAR CORRERE (MINIMO)" in "\n".join(NL.righe_tenuta(_tn481_min))
+      and "esito MINIMO per BBB" in "\n".join(NL.righe_tenuta(_tn481_min)))
+
+# --- collegamento (v399, v443): calcola produce la tenuta con le decisioni, la sintesi la stampa ---
+check("v481 collegamento: calcola produce la tenuta di TUTTE le posizioni con le decisioni del libro, la sintesi la stampa",
+      "tenuta_posizioni(TK, B, righe_pipeline(pipe), _fcf, out[\"semaforo\"]" in _calc474
+      and "decisioni)" in _calc474.split("tenuta_posizioni(")[1][:200]
+      and "righe_tenuta(o[\"tenuta\"])" in _corpo_di(_src_nl, "sintesi"))
+
+# --- la stessa regola sui sorvegliati: rotazione usa la STESSA funzione e la STESSA resa (v161) ---
+_src_rot481 = Path(__file__).with_name("rotazione.py").read_text()
+_racc481 = _corpo_di(_src_rot481, "raccogli")
+check("v481 collegamento: la raccolta calcola il semaforo sugli stessi dati e la tenuta di ogni sorvegliato con la "
+      "funzione delle posizioni; SMH e i leader si scaricano sempre",
+      '"tenuta": numeri_libro.valuta_tenuta(' in _racc481 and "numeri_libro.semaforo(B.get(\"SMH\")" in _racc481
+      and '"SMH"}' in _racc481 and "set(numeri_libro.LEADER)" in _racc481
+      and "riga_tenuta(t['tenuta'])" in _corpo_di(_src_rot481, "righe_ingresso")
+      and "numeri_libro.testo_famiglie(v)" in _corpo_di(_src_rot481, "riga_tenuta"))
+_v481 = NL.valuta_tenuta(_barre474(_scende), _riga481(su=0, giu=4), 1.0, _sem481(), _ALLE17)
+_o481 = {"watchlist": [_w473("SPEC", tenuta=_v481)], "calendario": {"finestra": 45, "giorni_non_letti": []},
+         "asof_target": "2026-10-09T15:44:12Z", "semaforo": {"colore": "giallo", "minimo": False}}
+_rw481 = "\n".join(ROT.righe_watchlist(_o481))
+check("v481 resa dei sorvegliati: la regola letta da chi non possiede il nome — CONTRO l'evidenza e' speculativo, "
+      "ammesso e dichiarato; l'intestazione porta il semaforo",
+      "tenuta se fosse in portafoglio (LIBRO.md §1sexies): VENDITA PER EVIDENZA — un ingresso qui e' speculativo, "
+      "CONTRO l'evidenza" in _rw481 and "tendenza ROTTA" in _rw481 and "semaforo giallo sugli stessi dati" in _rw481
+      and set(ROT.LETTURA_INGRESSO) == set(NL.ESITI), _rw481[-900:])
+
+# --- le vendite per prezzo sono uscite dal piano e dalla reazione del giallo, e la checklist porta la tenuta ---
+_fmt481 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_s6_481 = _fmt481[_fmt481.find("6. **Tenuta e piano**"):_fmt481.find("7. **Watchlist e rotazione**")]
+check("v481 il piano (FORMATO §6) porta la tenuta e NON ha piu' vendite a fascia di prezzo; il giallo non prende "
+      "profitti per prezzo; il registro delle richieste porta la regola",
+      "TENUTA DELLE POSIZIONI" in _s6_481 and "Niente vendite a fascia di prezzo" in _s6_481
+      and "compensando la plusvalenza" not in _s6_481
+      and "Nessuna presa di profitto per prezzo" in NL.reazioni_libro(_lib474).get("giallo", "")
+      and "tenuta delle posizioni" in _fmt481.split("Richieste del CEO rese strutturali")[1][:2000])
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

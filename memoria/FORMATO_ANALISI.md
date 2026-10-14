@@ -28,7 +28,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    09/10) apre col **SEMAFORO D'USCITA calcolato** (sei famiglie, la reazione letta da `LIBRO.md`
    §1ter), porta il **REGISTRO DELLA PERFORMANCE** contro QQQ (`--registra` scrive la riga della
    seduta conclusa, mai durante la seduta: lo passa il comando unico) e le **DECISIONI APERTE**
-   (`LIBRO.md` §1quinquies) col costo dell'attesa dalla conferma.
+   (`LIBRO.md` §1quinquies) col costo dell'attesa dalla conferma. Da v481 (decisione del CEO del
+   14/10) chiude con la **TENUTA DELLE POSIZIONI** (`LIBRO.md` §1sexies): per ogni posizione
+   l'esito della regola «si lascia correre, si vende per evidenza», le famiglie accese e il
+   pareggio fiscale.
 2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro, e (v470) le aste di
    note e bond del Tesoro USA dei prossimi 7 giorni con l'ora italiana e gli esiti recenti.
 3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
@@ -54,6 +57,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    zona, livello, primo segnale, stop, base, trimestrale, revisioni, nota del CEO.
    `--tutti` dà la tabella completa. Per ogni settore con candidati la risposta
    aggiunge il CONTESTO MACRO del settore da ricerca web, con fonte e data.
+   Da v481 ogni sorvegliato porta la riga **«tenuta se fosse in portafoglio»**: la stessa regola
+   delle posizioni (`LIBRO.md` §1sexies), letta da chi il nome non lo possiede.
    Da v474 chiude col **PIANO PER LA LIQUIDITÀ**: la liquidità con la sua quota del patrimonio e,
    per ogni ingresso possibile (sorvegliati e candidati di settore), cosa fa al libro un'unità di
    5.000 € — volatilità, beta su QQQ, perdita allo stop — anche per chi è nella stessa scommessa.
@@ -90,18 +95,26 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    intera ne copre circa 78 (stesso denominatore: i due numeri si confrontano).
    Soglie macro decise prima (spread credito alto rendimento 3,5;
    Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
-6. **Piano con soglie** — le decisioni già confermate stanno nel blocco DECISIONI APERTE (sezione
-   0bis: oggi RGTI uscita e AMD alleggerimento). Qui lo stato delle condizioni NON ancora scattate:
-   BE vendita nella fascia 295-302 prima della sua trimestrale (la data si legge dal blocco
-   SCADENZE, mai da qui: era scritta a mano «27/10» e la fonte la dichiara cinque giorni prima,
-   v479); MU **alleggerimento** verso
-   ~15% del libro nella fascia 1.100-1.108, compensando la plusvalenza con la minusvalenza di RGTI
-   (è una VENDITA: il giallo non l'ha mai congelata); i supporti di protezione.
+6. **Tenuta e piano** (decisione del CEO del 14/10/2026, regola in `memoria/LIBRO.md` §1sexies:
+   *si lascia correre, si vende per EVIDENZA*) — dal blocco `TENUTA DELLE POSIZIONI` di
+   `numeri_libro.py`, per ogni posizione l'esito (VENDITA PER EVIDENZA · IN OSSERVAZIONE · NON
+   MISURABILE · LASCIAR CORRERE), le famiglie accese e il **pareggio fiscale** — di quanto deve
+   scendere il titolo perché vendere oggi convenga, cioè l'interesse composto misurato.
+   Le **notizie** non sono calcolate: per ogni nome in VENDITA o IN OSSERVAZIONE la ricerca web è
+   obbligatoria, e una notizia che rompe la tesi si scrive con fonte e data come conferma.
+   Le decisioni già confermate stanno nel blocco DECISIONI APERTE (sezione 0bis); una VENDITA PER
+   EVIDENZA senza decisione aperta si **propone** al CEO, la decisione è sua.
+   **Niente vendite a fascia di prezzo né alleggerimenti per peso**: il 14/10 sono stati tolti MU
+   1.100-1.108, BE prima della trimestrale, AMD verso il 12-14% del libro e le prese di profitto del
+   giallo. Gli avvisi di prezzo su Investing.com restano campanelli: un avviso non è una vendita, fa
+   guardare la tenuta.
 
 7. **Watchlist e rotazione** (sempre, v468) — il semaforo decide il gradino: in giallo NESSUN
    divieto d'ingresso (decisione del CEO del 09/10), ma ogni ingresso porta le sue conseguenze di
    rischio e chi è nella stessa scommessa del libro lo dichiara; in arancione e rosso prima la
-   riduzione del gradino.
+   riduzione del gradino. **Gli ingressi speculativi sono ammessi** (CEO, 14/10: *"se ci sono
+   margini di speculazione, ben venga"*): dove la riga «tenuta se fosse in portafoglio» dice
+   VENDITA PER EVIDENZA, l'ingresso è una scommessa contro l'evidenza e si dichiara tale.
    7a. i settori IN TENDENZA con bassa correlazione col libro (dove il denaro va senza replicare
        la nostra scommessa), col CONTESTO MACRO del settore da ricerca web, fonte e data;
    7b. per ciascuno i titoli CANDIDATI di `rotazione.py`, coi livelli, i volumi e le notizie;
@@ -129,7 +142,9 @@ volumi e notizie (07/10) · target, beta e volatilità (07/10) · volumi come pe
 (08/10) · aste del Tesoro in ora italiana (07/10) · ingressi sulla watchlist (09/10) ·
 riferimento QQQ e registro della performance (09/10) · semaforo calcolato (09/10) · in giallo
 nessun divieto ma conseguenze di rischio di ogni ingresso (09/10) · costo delle decisioni aperte
-(09/10) · piano per la liquidità (09/10).
+(09/10) · piano per la liquidità (09/10) · nessun tetto alle memorie (14/10) · tenuta delle posizioni:
+si lascia correre, si vende per evidenza, col pareggio fiscale, anche sui sorvegliati (14/10) ·
+ingressi speculativi ammessi e dichiarati (14/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

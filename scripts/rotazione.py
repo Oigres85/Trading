@@ -402,7 +402,10 @@ def raccogli():
     target = target_pipeline(d)
     asof_target = d.get("updated_at")
     nomi = sorted({p["tk"] for r in tilt for p in (r.get("prime") or [])})
-    tutti = sorted(set(qta) | {r["ticker"] for r in tilt} | set(nomi) | {s["tk"] for s in sorv} | {"SPY", "QQQ"})
+    import numeri_libro
+    # v481 — SMH e i leader del semaforo sempre: la tenuta dei sorvegliati ne legge il colore
+    tutti = sorted(set(qta) | {r["ticker"] for r in tilt} | set(nomi) | {s["tk"] for s in sorv} | {"SPY", "QQQ", "SMH"}
+                   | set(numeri_libro.LEADER))
     # v473 — il calendario delle trimestrali gira MENTRE si scaricano le barre: ~20 secondi di
     #   richieste a Nasdaq che altrimenti si sommerebbero al resto.
     with ThreadPoolExecutor(1) as ex_cal:
@@ -434,16 +437,21 @@ def raccogli():
     prima_trim = {}
     for a in cal.get("attesi") or []:
         prima_trim.setdefault(a["tk"], a)          # gli attesi arrivano gia' in ordine di data
+    # v481 — la regola di tenuta del CEO (LIBRO.md §1sexies) vale anche per i nomi oggetto di analisi:
+    #   la STESSA funzione delle posizioni, col semaforo calcolato sugli stessi dati (un'implementazione).
+    sem = numeri_libro.semaforo(B.get("SMH"), {t: B.get(t) for t in numeri_libro.LEADER},
+                                numeri_libro.segnali_pipeline(d))
     watch = [{**(S.get(s["tk"]) or {"tk": s["tk"], "errore": "non letto"}),
               "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"), x.get("pend50"),
                                                   x.get("d50_atr"), x.get("corr_libro")))(S.get(s["tk"]) or {})),
               # v473 — cio' che serve al piano d'ingresso e che la scheda non ha
               "nota": s.get("nota"), "trimestrale": prima_trim.get(s["tk"]),
               "trimestrale_yf": (pipe.get(s["tk"]) or {}).get("earnings_date"),
-              "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe}
+              "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe,
+              "tenuta": numeri_libro.valuta_tenuta(B.get(s["tk"]), pipe.get(s["tk"]),
+                                                   numeri_libro.fcf_di(pipe.get(s["tk"])), sem)}
              for s in sorv]
     # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
-    import numeri_libro
     eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
     eur_nom = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "EUR"}
     fx, fonte_fx, prezzi_eur = numeri_libro.patrimonio_pipeline(d, eur_pmc)
@@ -461,6 +469,7 @@ def raccogli():
         piano.append(voce_piano(t, fonte, rendimenti_per_data(B.get(t["tk"]) or []), rlibro, rqqq,
                                 valore_libro, UNITA_EUR * fx if fx else None))
     return {"settori": settori, "universo_assente": not tilt, "libro": sorted(qta),
+            "semaforo": {k: sem.get(k) for k in ("colore", "minimo", "accesi")},
             "libro_sedute": len(rlibro), "watchlist": watch, "asof_target": asof_target,
             "spy_assente": not rspy, "calendario": {k: cal.get(k) for k in ("giorni_non_letti", "finestra", "errore")},
             "piano": {"voci": piano, "liquidita": cassa, "patrimonio": pat, "cambio": fx, "fonte_cambio": fonte_fx,
@@ -612,9 +621,27 @@ def righe_ingresso(t, cal=None):
     rev = (schede_progetto.riga_revisioni(t.get("analisti"), con_target=False) if t.get("in_pipeline")
            else "revisioni: titolo non seguito dalla pipeline")
     L.append(f"      {riga_trimestrale(t, cal)} · {rev}")
+    if t.get("tenuta"):
+        L.append(f"      {riga_tenuta(t['tenuta'])}")
     if t.get("nota"):
         L.append(f"      nota del CEO in LIBRO.md (i suoi livelli sono del giorno in cui e' scritta): «{t['nota']}»")
     return L
+
+
+LETTURA_INGRESSO = {   # v481 — l'esito della tenuta letto da chi NON possiede il nome
+    "VENDITA PER EVIDENZA": "un ingresso qui e' speculativo, CONTRO l'evidenza: ammesso, e si dichiara tale",
+    "IN OSSERVAZIONE": "meta' dell'evidenza e' contraria",
+    "LASCIAR CORRERE": "nessuna evidenza contraria: se entra, si lascia correre",
+    "NON MISURABILE": "la tendenza non si misura ancora",
+}
+
+
+def riga_tenuta(v):
+    """La regola di tenuta del CEO (LIBRO.md §1sexies) applicata a un sorvegliato: cosa direbbe se
+    il nome fosse in portafoglio. La resa delle famiglie e' quella delle posizioni (una sola, v161)."""
+    import numeri_libro
+    return (f"tenuta se fosse in portafoglio (LIBRO.md §1sexies): {v['esito']}" + (" (MINIMO)" if v.get("minimo") else "")
+            + f" — {LETTURA_INGRESSO[v['esito']]} · {numeri_libro.testo_famiglie(v)}")
 
 
 GRUPPI_WATCHLIST = (   # (titolo del gruppo, chiave, nome breve per il conteggio)
@@ -655,6 +682,11 @@ def righe_watchlist(o):
          "la correlazione col libro si'"]
     if o.get("spy_assente"):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
+    sem = o.get("semaforo") or {}
+    if sem:
+        L.append("   tenuta (LIBRO.md §1sexies, decisione del CEO del 14/10): per ogni nome cosa direbbe la regola se fosse "
+                 "in portafoglio — si lascia correre, si vende per evidenza · semaforo "
+                 + f"{sem.get('colore') or 'n.d.'}{' (MINIMO)' if sem.get('minimo') else ''} sugli stessi dati di numeri_libro")
     if cal.get("errore") or cal.get("giorni_non_letti"):
         L.append("   ⚠ calendario delle trimestrali incompleto: una data mancante non vuol dire 'nessuna uscita'")
     for etichetta, k, _ in GRUPPI_WATCHLIST:

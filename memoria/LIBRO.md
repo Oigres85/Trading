@@ -56,11 +56,12 @@ per MU + SK hynix intorno al 20% del libro (12-13/10) è **respinta**: il peso d
 un limite, e SK hynix resta in portafoglio senza uno stop di prezzo. Il 14/10 le memorie pesano
 il 26,4% del libro e MU da sola porta il 34% del rischio: senza tetto, se salgono, quelle quote
 crescono da sole, e il blocco dei pesi di `numeri_libro.py` le mostra a ogni analisi.
-**Restano in vigore**, perché non sono tetti:
-- il semaforo d'uscita (§1ter): in arancione la riduzione dei semiconduttori parte da chi pesa
-  di più nel rischio — oggi MU — qualunque sia il peso delle memorie;
-- il piano di vendita di MU nella fascia 1.100-1.108 (`FORMATO_ANALISI.md` §6), una presa di
-  profitto decisa il 06/10 — finché il CEO non la revoca.
+**Resta in vigore**, perché non è un tetto, il semaforo d'uscita (§1ter): in arancione la
+riduzione dei semiconduttori parte da chi pesa di più nel rischio — oggi MU — qualunque sia il
+peso delle memorie (l'ordine di quella riduzione è una domanda aperta dal 14/10, §1sexies).
+**Il piano di vendita di MU nella fascia 1.100-1.108 è REVOCATO il 14/10/2026** dalla regola di
+tenuta (§1sexies): era una presa di profitto a una fascia di prezzo, e il CEO ha deciso che si
+vende per evidenza, non per prezzo.
 
 ## 1bis. SORVEGLIATI — non in posizione, monitorati come i titoli del libro
 
@@ -151,10 +152,12 @@ parola per parola: le regole stanno in un posto solo.
   possibilità di ingresso non proibirli ma segnalane le conseguenze di rischio"*). Ogni ingresso
   possibile porta accanto le sue conseguenze sul libro — volatilità, beta su QQQ, perdita allo stop
   (`rotazione.py`, blocco «PIANO PER LA LIQUIDITÀ») — e chi è nella stessa scommessa del libro lo
-  dichiara. Prese di profitto sui nomi più tirati. Fino al 09/10 il giallo vietava i nuovi
-  semiconduttori.
+  dichiara. **Nessuna presa di profitto per prezzo**: si vende per evidenza (§1sexies, decisione del
+  CEO del 14/10/2026); fino al 14/10 il giallo prevedeva prese di profitto sui nomi più tirati.
+  Fino al 09/10 il giallo vietava i nuovi semiconduttori.
 - 🟠 **Arancione** — due segnali di **famiglie diverse**: riduzione dei semiconduttori di circa un
-  terzo, partendo da chi pesa di più nel rischio (oggi MU e AMD).
+  terzo, partendo da chi pesa di più nel rischio (oggi MU e AMD) — l'ordine è una domanda aperta al
+  CEO dal 14/10 (§1sexies).
 - 🔴 **Rosso** — SMH sotto la media a 200 **e** (credito sopra 4,0 **oppure** taglio della guida
   sugli investimenti AI): un altro terzo. Resta il nucleo per la tesi al 2029.
 
@@ -233,7 +236,7 @@ esce quando è **eseguita** (si aggiornano posizioni e liquidità in §1) o **re
 | Nome | Decisione | Quantità | Condizione | Livello | Confermata | Stato |
 |---|---|---|---|---|---|---|
 | RGTI | uscita | 463 | chiusura sotto | 14,41 | 2026-10-08 | aperta — non eseguita al 09/10 (CEO) |
-| AMD | alleggerimento | da decidere | respinto sotto | 645 | 2026-10-08 | aperta — non eseguita al 09/10 (CEO); riferimento del piano: verso il 12-14% del libro |
+| AMD | alleggerimento | da decidere | respinto sotto | 645 | 2026-10-08 | revocata il 14/10/2026 — regola di tenuta §1sexies (decisione del CEO del 14/10): l'alleggerimento era per peso (verso il 12-14% del libro), e la tenuta non trova evidenza di vendita (tendenza intatta, stime in salita) |
 
 ⚠ **RGTI — la ragione dell'uscita, corretta il 13/10/2026.** La decisione poggia sullo **stop**
 (chiusura sotto 14,41, scattato l'08/10) e sulla tendenza, **non sui ricavi**. Il 12/10 l'avevo
@@ -243,6 +246,9 @@ non è un problema: 393,7 milioni fra cassa e titoli a breve al 30/06, circa qua
 di quel semestre — il sistema contava i soli contanti (27,8 milioni), corretto in v476. Restano veri:
 perdita operativa in aumento (+41% sull'anno), valutazione circa 330 volte i ricavi, tendenza al
 ribasso. Le schede portano ora i ricavi per trimestre accanto all'esercizio chiuso (v476).
+⚠ **14/10/2026 — la decisione regge anche con la regola di tenuta (§1sexies)**: la tendenza è
+rotta (chiusura sotto la media a 200, media a 50 sotto la 200) e RGTI brucia cassa con la
+famiglia credito accesa. È evidenza, non prezzo.
 
 `numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
 - il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non
@@ -254,6 +260,71 @@ ribasso. Le schede portano ora i ricavi per trimestre accanto all'esercizio chiu
   vale ancora oggi. Una condizione rientrata non annulla la decisione: la rimette in discussione,
   e lo si dice.
 ⚠ È un conto a posteriori: misura il costo dell'attesa, non dice se aspettare fosse sbagliato.
+
+## 1sexies. TENUTA DELLE POSIZIONI — si lascia correre, si vende per EVIDENZA (decisione del CEO del 14/10/2026)
+
+Istruzione del CEO, testuale: *"Se ci sono parametri tali, per cui in ottica di lungo periodo,
+lasciar correre mu può portare a ottimi rendimenti, tenendo conto anche dell'interesse composto
+non si vende se invece ci sono ed emergono parametri tra analisi tecnica, macro e notizie che
+portano effettivamente alla necessità di una vendita. Procediamo quest'ottica deve valere per
+tutte le azioni in portafoglio e oggetto di analisi il fondo ricordiamocelo è privato e growth e
+se ci sono margini di speculazione, ben venga"*.
+
+**La regola.** Una posizione **non si vende** per il prezzo raggiunto, per la plusvalenza
+accumulata o per il peso nel libro: si vende quando **l'evidenza** lo chiede — la tendenza del
+titolo si è rotta **e** almeno un'altra famiglia lo conferma. Tolte quindi il 14/10 le vendite a
+fascia di prezzo e gli alleggerimenti per peso del piano precedente: MU nella fascia 1.100-1.108,
+BE nella fascia 295-302 prima della trimestrale, AMD verso il 12-14% del libro (§1quinquies).
+Restano le uscite che sono già evidenza: il semaforo (§1ter) e le decisioni nate da una tendenza
+rotta (RGTI).
+
+**Le famiglie della tenuta**, per ogni nome. Le calcola `numeri_libro.py` (blocco «TENUTA DELLE
+POSIZIONI», v481), tranne le notizie. Le soglie sono **convenzioni scelte il 14/10/2026**, non
+dati del file (v240), e un gate verifica che quelle del codice siano quelle scritte qui.
+
+| Famiglia | Accesa quando | Da dove |
+|---|---|---|
+| **Tendenza** (tecnica) | **ROTTA**: ultima chiusura conclusa sotto la media a **200** sedute **e** media a **50** sotto quella a 200 (l'«incrocio della morte» col prezzo sotto). **In correzione**: chiusura sotto una delle due medie senza la rottura — NON è un segnale di vendita. Con meno di 200 sedute concluse: non misurabile | barre di oggi (stockanalysis), chiusure concluse |
+| **Fondamentali** | più tagli che rialzi delle stime a 30 giorni (la stessa convenzione del semaforo) · OPPURE stima dell'EPS a 90 giorni scesa di oltre il **5%** del proprio valore (il verso dalla differenza, v400: su una perdita, la perdita che si allarga) · OPPURE ricavi dell'ultimo trimestre in calo sullo stesso trimestre dell'anno prima | `data.json` → `analisti`, `tv.conto_trim` |
+| **Macro** | semaforo del libro arancione o rosso · OPPURE il nome **brucia cassa** (flusso di cassa libero negativo) e la famiglia credito del semaforo è accesa: è il canale da cui una stretta arriva a quel nome (v404, v467) | semaforo, `data.json` → `combustione` (solo il segno) |
+| **Notizie** | un fatto che rompe la tesi: guida tagliata, cliente perso, diluizione pesante, indagine, frode | **NON calcolata**: ricerca web per i nomi in vendita o in osservazione, con fonte e data |
+
+**Gli esiti**, in ordine di urgenza:
+- **VENDITA PER EVIDENZA** — tendenza ROTTA **e** almeno una conferma (fondamentali, macro, o una
+  notizia verificata in rete). Il prezzo ha già girato, e qualcos'altro dice perché.
+- **IN OSSERVAZIONE** — una sola delle due metà: tendenza rotta senza conferma, oppure una
+  conferma accesa con la tendenza non rotta. Non si vende: si guarda.
+- **NON MISURABILE** — la tendenza non si misura (meno di 200 sedute concluse). Le famiglie si
+  riportano lo stesso.
+- **LASCIAR CORRERE** — nessuna delle due metà. Una correzione sotto la media a 50 resta qui.
+
+Una famiglia senza dati si dichiara **non misurabile**, mai spenta, e l'esito diventa un
+**minimo**: il dato mancante può alzarlo, mai abbassarlo. Una notizia che rompe la tesi porta un
+IN OSSERVAZIONE a VENDITA PER EVIDENZA: la scrive il modello con la fonte, lo script non la vede.
+⚠ L'esito è la regola applicata, non un ordine: una VENDITA PER EVIDENZA su un nome senza
+decisione aperta si **propone** al CEO, e diventa una decisione (§1quinquies) solo quando lui la
+prende.
+
+**L'interesse composto, misurato.** Vendere un vincitore paga **subito** l'imposta del **26%**
+sulla plusvalenza, che tenendo resta investita e continua a comporre. Per ogni posizione in
+guadagno il blocco stampa il **pareggio fiscale**: di quanto deve scendere il titolo perché
+vendere oggi e ricomprare dopo ridia le stesse azioni — 26% × (prezzo − carico) / prezzo. È il
+calo che un'evidenza di vendita deve giustificare. ⚠ In dollari al prezzo di oggi: il conto vero
+lo fa il broker in euro col cambio di carico, e regime fiscale e minusvalenze pregresse non sono
+nel sistema. Per una posizione in perdita la minusvalenza vale solo se ci sono plusvalenze da
+compensare.
+
+**Il semaforo resta la regola del libro.** In arancione e in rosso la sua reazione (§1ter) vale
+anche per i nomi che qui sono da lasciar correre: due famiglie diverse accese sono già evidenza
+tecnica e macro insieme. Dentro quella riduzione, l'ordine scritto in §1ter («partendo da chi
+pesa di più nel rischio») è una **domanda aperta al CEO dal 14/10**: con questa regola potrebbe
+partire da chi ha l'evidenza peggiore.
+
+**I nomi oggetto di analisi e la speculazione** (*"se ci sono margini di speculazione, ben
+venga"*). La stessa tenuta si calcola sui sorvegliati (`rotazione.py`, una riga per nome): dice
+cosa direbbe la regola se il nome fosse in portafoglio. Un ingresso dove direbbe VENDITA PER
+EVIDENZA è una scommessa **contro** l'evidenza: ammessa, dichiarata come speculativa, con lo stop
+del piano e le conseguenze sul libro. Dopo l'ingresso vale la stessa tenuta di tutte le posizioni.
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
