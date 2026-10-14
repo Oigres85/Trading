@@ -651,9 +651,25 @@ sys.path.insert(0, str(_ROOT / "scripts"))
 import conseguenze as _C
 _v0 = _C.vol_libro(_lib["pesi"], _lib["correlazioni"], _lib["volatilita_nome"])
 _s0 = _C.scommesse(_lib["pesi"], _lib["correlazioni"])
-check("v440 la volatilita' ricostruita dalla matrice riproduce quella pubblicata",
-      _v0 is not None and abs(_v0 - _lib["volatilita"]) < 0.0005,
-      extra=f"ricostruita {_v0}, pubblicata {_lib['volatilita']}")
+# ⚠ v484 — la tolleranza viene dall'ARROTONDAMENTO PUBBLICATO, non da una costante: libro.json scrive le
+#   correlazioni a 2 decimali, le volatilita' a 3 e i pesi a 4, e da quegli arrotondamenti la ricostruzione puo'
+#   scostarsi fino al limite qui sotto (derivata prima, caso peggiore). Il 09/09 lo scarto era 0,000 pp e la
+#   tolleranza fissa a 0,05 pp reggeva; il 14/10, con SKHY nella matrice su 67 sedute, lo scarto e' 0,054 pp —
+#   dentro un limite di ~0,19 pp — e il check e' andato rosso su codice corretto (la classe v429: un check che
+#   vale finche' i dati lo concedono). Una formula sbagliata sbaglia di punti interi, non di decimi.
+def _limite_arrotondamento(pesi, corr, vol_nome, vol):
+    t = [k for k in pesi if k in vol_nome and k in corr]
+    w = {k: pesi[k] for k in t}; s = {k: vol_nome[k] for k in t}
+    dv2 = sum(2 * w[i] * w[j] * s[i] * s[j] * 0.005 for a, i in enumerate(t) for j in t[a + 1:])
+    for k in t:
+        m = abs(sum(w[j] * s[j] * (corr[k].get(j) if corr[k].get(j) is not None else 0) for j in t))
+        dv2 += 2 * w[k] * m * 0.0005 + 2 * s[k] * m * 0.00005
+    return dv2 / (2 * vol) + 0.00005
+_lim440 = _limite_arrotondamento(_lib["pesi"], _lib["correlazioni"], _lib["volatilita_nome"], _lib["volatilita"])
+check("v440 la volatilita' ricostruita dalla matrice riproduce quella pubblicata, entro l'errore che l'arrotondamento "
+      "pubblicato consente (e il limite stesso resta piccolo: sotto mezzo punto)",
+      _v0 is not None and abs(_v0 - _lib["volatilita"]) <= _lim440 and _lim440 < 0.005,
+      extra=f"ricostruita {_v0}, pubblicata {_lib['volatilita']}, limite {_lim440:.5f}")
 check("v440 le scommesse effettive ricostruite riproducono quelle pubblicate",
       _s0 is not None and abs(_s0 - _lib["scommesse_effettive"]) < 0.01,
       extra=f"ricostruite {_s0}, pubblicate {_lib['scommesse_effettive']}")

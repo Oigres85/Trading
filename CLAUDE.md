@@ -6937,3 +6937,12 @@ riarma al massimo nuovo; il massimo è l'**ultima** seduta al livello più alto.
 Tredici iniezioni, una alla volta, ripristino verificato per impronta: **mordono tutte**. Pavimento
 di `test_analisi_libro.py` 390 → 410 (i punti di chiamata sono 425). `?v=` e `BUILD_VERSION` non
 toccati: nessun file servito al browser (v440).
+
+### 🧪 E il `pre-push` ha fermato il push su una tolleranza fissa
+Il rebase ha portato il run delle 14:16 e **v440** è andato rosso: la volatilità ricostruita dalla
+matrice pubblicata dava 49,18% contro il 49,13% pubblicato. Non era un difetto: `libro.json` scrive
+le correlazioni a **2 decimali**, e da quell'arrotondamento la ricostruzione può scostarsi fino a
+~0,19 punti. La tolleranza fissa di 0,05 punti reggeva solo perché il 09/09 lo scarto era zero — la
+classe v429. Ora il limite si **ricava dall'arrotondamento dichiarato** (derivata prima, caso
+peggiore) e deve restare sotto mezzo punto; due iniezioni sulla formula (correlazioni ignorate,
+correlazioni scalate del 2%) mordono entrambe.
