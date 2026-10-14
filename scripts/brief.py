@@ -523,11 +523,25 @@ def macro_dalla_pipeline():
                         prec=sl.get("precedente"),
                         nota="negativo = le banche allentano"))
     fm = m.get("fed_market") or {}
-    if fm.get("current_rate") is not None:
-        # ⚠ Il file NON porta una data per questo campo: si dichiara invece di prendere
-        #   quella del run, che sarebbe la data di un'altra cosa (classe v431).
-        out.append(riga("Fed Funds effettivo", fm["current_rate"], None,
-                        nota="il file non dichiara la rilevazione di questo campo"))
+    ef = (m.get("fedwatch") or {}).get("effr") or {}
+    if ef.get("valore") is not None:
+        # ⚠⚠ v478 — L'EFFR DEL GIORNO, con la sua data e la fonte: la stessa base della catena
+        #   FedWatch (v477). Questa riga leggeva `fed_market.current_rate`, che e' FEDFUNDS, la
+        #   media MENSILE: il 13/10 scriveva "Fed Funds effettivo 3,75" con l'EFFR a 3,88 — la
+        #   media di settembre mescola i quindici giorni prima del rialzo del 16/09 e i quindici dopo.
+        out.append(riga("Fed Funds effettivo (EFFR del giorno)", ef["valore"], ef.get("data"),
+                        nota=f"fonte {ef.get('fonte') or 'n.d.'}"))
+    elif fm.get("current_rate") is not None:
+        # ⚠ Senza l'EFFR del giorno resta la media mensile, e si NOMINA per quello che e', col
+        #   suo mese (v392: un dato mensile descrive un mese, non un giorno) — mai "effettivo".
+        _mesi = ("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio",
+                 "agosto", "settembre", "ottobre", "novembre", "dicembre")
+        _rd = str(fm.get("rate_date") or "")
+        _mese = (f"{_mesi[int(_rd[5:7]) - 1]} {_rd[:4]}"
+                 if len(_rd) >= 7 and _rd[5:7].isdigit() and 1 <= int(_rd[5:7]) <= 12 else "mese non dichiarato")
+        out.append(riga("Fed Funds, media MENSILE (FEDFUNDS)", fm["current_rate"], None,
+                        nota=f"media di {_mese}, non il tasso di oggi: un mese con una riunione "
+                             "mescola il tasso di prima e quello di dopo"))
     eur = next((x for x in (m.get("markets") or []) if x.get("key") == "EURUSD=X"), None)
     if eur:
         out.append(riga("EUR/USD", eur.get("value"), None,

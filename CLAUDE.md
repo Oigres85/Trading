@@ -6623,3 +6623,33 @@ una alla volta: **mordono tutte e diciannove**. Una — la catena che non si int
 mancante — mordeva **per eccezione**: la suite moriva con un `KeyError` sull'indice del dizionario
 invece di fallire sul check, cioè il difetto veniva preso ma la diagnosi si perdeva (v407, v471). I
 check della catena leggono ora con `.get`, e la stessa iniezione fa cadere il check col suo nome.
+
+
+## 🏛️ v478 — IL «TASSO EFFETTIVO» ERA LA MEDIA MENSILE, IN QUATTRO SEDI, E IL TARGET ERA SCRITTO A MANO
+
+Trovato rileggendo il brief del mattino dopo la v477: *"Fed Funds effettivo 3,75"* con l'EFFR del
+giorno a **3,88**. `fed_market.current_rate` è FEDFUNDS, la media **mensile** (settembre: metà mese
+prima del rialzo del 16/09 e metà dopo), ed era chiamata «effettivo» nel brief, nel pacchetto,
+nella tessera e nel popup. È la stessa base sbagliata che la v477 ha tolto da FedWatch,
+sopravvissuta in quattro sedi: la classe v412, una correzione applicata a un ramo e non agli altri.
+
+⚠⚠ **E il pacchetto la riconciliava con un target SCRITTO A MANO**: *"DENTRO il target 3,50-3,75%"*,
+fermo a prima del rialzo del 16/09 — la riga affermava che un tasso stava dentro una fascia che non
+esisteva più. Il conteggio fisso che invecchia da solo (v410, v411, v424), qui su un livello di
+politica monetaria.
+
+Ora una funzione sola per il JS (`tassoEffettivoFed`) e la stessa logica nel brief: l'**EFFR del
+giorno** pubblicato dalla pipeline con la catena (`fedwatch.effr`: NY Fed, con la data); in sua
+assenza la media mensile **dichiarata come tale, col suo mese** (v392) e mai chiamata «effettivo».
+Il target viene da `fedwatch.target_range`, con la virgola.
+
+⚠ **Il gate v452 pinnava la nota della vecchia riga** (*"il file non dichiara la rilevazione di questo
+campo"*): la riga ha ora una data vera. Riagganciato all'invariante, sulla riga che una data davvero
+non ce l'ha (il cambio dello snapshot) — un'altra rottura di un check ancorato a una stringa.
+⚠ Cinque iniezioni, una alla volta, ripristino verificato per hash: mordono tutte e cinque.
+
+✅ **Verificato nel run del CI della v477** (lanciato a mano il 14/10 alle 04:46 UTC): EFFR 3,88 del
+09/10 dalla NY Fed, tre contratti letti per esteso (ZQV26, ZQX26, ZQZ26); **28/10: +0,20 movimenti,
+RIALZO 20% · INVARIATO 80%** — gli stessi numeri di Polymarket; 09/12: +0,87 in più, +1,07 cumulati;
+`data_quality` fedwatch ok. MSTR: 99,9% immateriali, 30,2 mesi su perdita più dividendi; WDC: i suoi
+10 milioni di dividendi pubblicati senza l'autonomia (la gestione li copre); MRVL 1,5%, sotto soglia.

@@ -10221,6 +10221,45 @@ check("v477 nel pacchetto del titolo nessuna percentuale passa da toFixed (v442,
   return resti.length === 0 || no(resti.length + " numeri decimali passano ancora da toFixed (punto inglese)");
 })());
 
+/* ═══ v478 — IL TASSO EFFETTIVO DI OGGI, E IL TARGET SCRITTO A MANO ════════════════════════
+   `fed_market.current_rate` e' la media MENSILE FEDFUNDS (3,75 a settembre) e pacchetto, tessera
+   e popup la chiamavano "effettivo"/"attuale" con l'EFFR del giorno a 3,88; il pacchetto la
+   riconciliava con un target SCRITTO A MANO (3,50-3,75), fermo a prima del rialzo del 16/09.
+   Lo stato si COSTRUISCE nei due versi (con e senza l'EFFR del giorno). */
+const _EFF478 = (conEffr) => `
+  DATA.macro = DATA.macro || {};
+  DATA.macro.fed_market = Object.assign({}, DATA.macro.fed_market || {}, { current_rate: 3.75, rate_date: "2026-09-01" });
+  DATA.macro.fedwatch = Object.assign({}, DATA.macro.fedwatch || {}, { target_range: "3.75–4.00%" });
+  if (${conEffr ? "true" : "false"}) DATA.macro.fedwatch.effr = { valore: 3.88, data: "2026-10-09", fonte: "NY Fed" };
+  else delete DATA.macro.fedwatch.effr;
+  const _riga = buildPrompt().split(String.fromCharCode(10)).find(l => l.indexOf("Tasso EFFETTIVO") >= 0) || "";
+  const _tess = (indicatoriClassifica() || []).find(x => x && x.k === "fed_market") || {};`;
+
+check("v478 con l'EFFR del giorno il pacchetto pubblica QUELLO, con data e fonte, dentro il target vero",
+  suVeriEsito(_EFF478(true) + `
+    if (_riga.indexOf("Tasso EFFETTIVO (EFFR) 3,88% del 09/10/2026 (NY Fed)") < 0) return "la riga non porta l'EFFR del giorno: " + _riga.slice(0, 160);
+    if (_riga.indexOf("DENTRO il target 3,75–4,00%") < 0) return "il target non e' quello della pipeline";
+    if (_riga.indexOf("3,50-3,75") >= 0) return "e' tornato il target scritto a mano";
+    if (String(_tess.sub).indexOf("3,88% (EFFR del giorno)") < 0) return "la tessera non usa il tasso di oggi: " + _tess.sub;
+    return true;`));
+
+check("v478 senza l'EFFR del giorno la media mensile si dichiara col suo mese, e non si chiama effettivo",
+  suVeriEsito(_EFF478(false) + `
+    if (_riga.indexOf("NON disponibile") < 0 || _riga.indexOf("media MENSILE FEDFUNDS di settembre 2026, 3,75%") < 0)
+      return "la riga non dichiara la media mensile: " + _riga.slice(0, 160);
+    if (_riga.indexOf("(EFFR) 3,75") >= 0) return "chiama EFFR una media mensile";
+    if (String(_tess.sub).indexOf("media mensile FEDFUNDS di settembre 2026") < 0) return "la tessera non dichiara la media mensile: " + _tess.sub;
+    return true;`));
+
+check("v478 nessun target della Fed scritto a mano nel codice, e il tasso di oggi passa da una funzione sola", (() => {
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if (/3,50-3,75|3\.50-3\.75/.test(codice)) return no("un target della Fed e' scritto a mano nel codice");
+  if ((codice.match(/^function tassoEffettivoFed\(/gm) || []).length !== 1) return no("tassoEffettivoFed non e' definita una volta");
+  const usi = (codice.match(/tassoEffettivoFed\(/g) || []).length - 1;
+  if (usi < 3) return no("solo " + usi + " usi: pacchetto, tessera e popup devono passarci tutti e tre");
+  return /current_rate\}%/.test(codice) ? no("qualcuno stampa ancora current_rate grezzo") : true;
+})());
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

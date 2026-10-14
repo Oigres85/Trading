@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "477";
+const BUILD_VERSION = "478";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3881,9 +3881,11 @@ function indicatoriClassifica() {
   if (m.dollar_ruler?.value != null) orf.push({ k: "dollar", nome: "Righello dollaro (DXY)",
     score: cl(50 - (m.dollar_ruler.chg_3m_pct ?? 0) * 6),
     sub: `${fmtNum.format(m.dollar_ruler.value)} · 3 mesi ${signTxt(m.dollar_ruler.chg_3m_pct ?? 0)}` });
-  if (m.fed_market?.current_rate != null) orf.push({ k: "fed_market", nome: "Tasso Fed Funds",
-    score: cl(100 - (m.fed_market.current_rate - 1) * 20),
-    sub: `${fmtNum.format(m.fed_market.current_rate)}% — sopra il 4% comprime i multipli` });
+  /* v478 — il tasso di OGGI (EFFR del giorno), non la media mensile FEDFUNDS: tassoEffettivoFed */
+  const _teT = tassoEffettivoFed(m);
+  if (_teT) orf.push({ k: "fed_market", nome: "Tasso Fed Funds",
+    score: cl(100 - (_teT.v - 1) * 20),
+    sub: `${fmtNum.format(_teT.v)}% ${_teT.giornaliero ? "(EFFR del giorno)" : `(media mensile FEDFUNDS di ${_teT.mese}, non il tasso di oggi)`} — sopra il 4% comprime i multipli` });
   /* ⚠⚠ v321 — QUESTA TESSERA NON E' MAI NATA. Leggeva `yield_recession.current`, ma il campo
      che la pipeline pubblica si chiama `current_curve`: la condizione era sempre falsa, la
      tessera non veniva creata, la fusione dichiarata non scattava, e `was_inverted_24m` — cioe'
@@ -7422,6 +7424,31 @@ function divergenzaFedWatch(mt) {
     + ` due letture non descrivono lo stesso mondo e il nostro numero NON e' attribuibile`;
 }
 
+/* ═══ v478 — IL TASSO EFFETTIVO DI OGGI, IN UN POSTO SOLO ══════════════════════════════════
+   `fed_market.current_rate` e' FEDFUNDS, la media MENSILE: il 13/10/2026 valeva 3,75 (settembre,
+   meta' mese prima del rialzo del 16/09 e meta' dopo) mentre l'EFFR del giorno era 3,88.
+   Pacchetto, tessera, popup e brief lo chiamavano "effettivo" o "attuale", e il pacchetto lo
+   riconciliava con un target SCRITTO A MANO (3,50-3,75) fermo a prima del rialzo — il numero
+   fisso che invecchia da solo (v410, v424). E' la stessa base sbagliata che la v477 ha tolto
+   da FedWatch, sopravvissuta in quattro sedi (classe v412).
+   Ora: l'EFFR del giorno pubblicato dalla pipeline con la catena (fedwatch.effr: NY Fed, con la
+   data); in sua assenza la media mensile, DICHIARATA come tale, col suo mese (v392). */
+function tassoEffettivoFed(m) {
+  const ef = ((m || {}).fedwatch || {}).effr || {};
+  if (Number.isFinite(numero(ef.valore))) {
+    return { v: numero(ef.valore), giornaliero: true, data: ef.data || null, fonte: ef.fonte || "n.d.", mese: null };
+  }
+  const fm = (m || {}).fed_market || {};
+  if (Number.isFinite(numero(fm.current_rate))) {
+    const d = new Date(String(fm.rate_date || "") + "T00:00:00Z");
+    const mese = isNaN(d.getTime()) ? "mese non dichiarato"
+      : d.toLocaleDateString("it-IT", { month: "long", year: "numeric", timeZone: "UTC" });
+    return { v: numero(fm.current_rate), giornaliero: false, data: fm.rate_date || null,
+             fonte: "FEDFUNDS, media mensile", mese };
+  }
+  return null;
+}
+
 /* v477 — IL PERCHE' DI UNA RIUNIONE NON PREZZATA, in un posto solo: popup, tessera, scheda e
    pacchetto lo dicono con le stesse parole (v161, v207, v443). "Non prezzata" senza il perche'
    si legge come un fatto sul mercato, e quasi sempre e' un fatto sul dato (v389, v406). */
@@ -8285,9 +8312,11 @@ function openMacroInfo(key) {
       </div>`;
   } else if (key === "fed_market" && m.fed_market) {
     const fm = m.fed_market;
-    const rateCol = fm.current_rate > 4.5 ? "var(--red)" : fm.current_rate > 2.5 ? "var(--yellow)" : "var(--green)";
-    extra = `<div class="info-line"><b>Fed Funds Rate attuale:</b> <span style="color:${rateCol}">${fm.current_rate}%</span>
-        <span class="muted"> · rilevazione ${fm.rate_date}</span></div>
+    /* v478 — "attuale" era la media mensile FEDFUNDS: il tasso di oggi e' l'EFFR del giorno */
+    const _teP = tassoEffettivoFed(m) || { v: numero(fm.current_rate), giornaliero: false, mese: "n.d." };
+    const rateCol = _teP.v > 4.5 ? "var(--red)" : _teP.v > 2.5 ? "var(--yellow)" : "var(--green)";
+    extra = `<div class="info-line"><b>${_teP.giornaliero ? "Tasso effettivo (EFFR del giorno)" : "Fed Funds, media mensile"}:</b> <span style="color:${rateCol}">${fmtNum.format(_teP.v)}%</span>
+        <span class="muted"> · ${_teP.giornaliero ? `rilevazione ${esc(_teP.data)} (${esc(_teP.fonte)})` : `media di ${esc(_teP.mese)}, non il tasso di oggi`}</span></div>
       <div class="info-line muted" style="font-size:11px;margin:6px 0">
         Il grafico mostra la correlazione storica tra il ciclo dei tassi Fed (rosso) e l'andamento dell'S&amp;P 500 (blu).
         I rialzi comprimono i multipli P/E; i tagli innescano rally. Le scale sono normalizzate per sovrapposizione visiva.
@@ -10199,7 +10228,7 @@ function buildPrompt(opz) {
     cpBp += ` — ${m.corp_profit.label} (soglia di lettura: gap>40 pp = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.`;
     lines.push(cpBp);
   }
-  if (m.fed_market) /* ⚠ v264 — DICEVA "Fed Funds Rate" PER LA SECONDA VOLTA, CON UN NUMERO DIVERSO. In QUADRO
+  if (m.fed_market || m.fedwatch) /* ⚠ v264 — DICEVA "Fed Funds Rate" PER LA SECONDA VOLTA, CON UN NUMERO DIVERSO. In QUADRO
        MACRO: "range ATTUALE 3.50-3.75%". Cinquanta righe dopo: "Fed Funds Rate attuale: 3.63%".
        Sono due grandezze diverse — il TARGET che decide il FOMC e il tasso EFFETTIVO a cui le
        banche si prestano dentro quel target — ma si chiamavano uguale e non si riconciliavano.
@@ -10207,7 +10236,14 @@ function buildPrompt(opz) {
        usa il numero giusto per caso. Classe "stessa grandezza, valori diversi", trovata a mano
        perche' i due nomi non sono identici al carattere. E stava dentro ROTAZIONE SETTORIALE,
        dove un tasso non c'entra niente. */
-    lines.push(`- Tasso EFFETTIVO (EFFR) ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}) — e' dove le banche si prestano DENTRO il target 3,50-3,75% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.`);
+    { /* ⚠ v478 — l'EFFR del GIORNO e il target dalla pipeline: il target era scritto a mano
+         (3,50-3,75, fermo a prima del rialzo del 16/09) e il tasso era la media mensile FEDFUNDS
+         chiamata "effettivo". Senza l'EFFR del giorno la riga lo dichiara e nomina il mese. */
+      const _te = tassoEffettivoFed(m);
+      const _tr = String(((m.fedwatch || {}).target_range) || "n.d.").replace(/[.]/g, ",");
+      if (_te) lines.push(_te.giornaliero
+        ? `- Tasso EFFETTIVO (EFFR) ${fmtNum.format(_te.v)}% del ${String(_te.data || "").split("-").reverse().join("/")} (${_te.fonte}) — e' dove le banche si prestano DENTRO il target ${_tr} dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.`
+        : `- Tasso EFFETTIVO del giorno NON disponibile in questo run: c'e' solo la media MENSILE FEDFUNDS di ${_te.mese}, ${fmtNum.format(_te.v)}% — non il tasso di oggi, e un mese che contiene una riunione mescola il tasso di prima e quello di dopo, quindi non si riconcilia DENTRO il target ${_tr} dichiarato in QUADRO MACRO. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.`); }
   // 4 streghe SOLO se imminenti (v138): a >30 giorni è rumore senza valore operativo
   if (m.witching && m.witching.days != null && m.witching.days < 30) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)`);
   /* v256 — QUATTRO BLOCCHI RELATIVI AL PORTAFOGLIO TOLTI DAL QUADRO MACRO: salute del

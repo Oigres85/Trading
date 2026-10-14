@@ -1035,9 +1035,12 @@ check("v452 nessuna chiamata diretta a FRED e nessuna chiave nel brief",
       and "api_key" not in _BRIEF_CODICE)
 # ⚠ Una riga che non porta la data lo DICHIARA invece di prendere quella del run, che sarebbe
 #   la data di un'altra cosa (classe v431: l'etichetta dall'orologio e il valore dai dati).
+# ⚠ v478 — riagganciato: la frase pretesa era la nota della riga dei Fed Funds, che ora porta
+#   la data dell'EFFR del giorno (o il mese della media mensile). L'invariante resta e vale per
+#   la riga che una data non ce l'ha davvero: il cambio dello snapshot.
 check("v452 una serie senza rilevazione lo dichiara, non eredita la data del run",
       "rilevazione non dichiarata" in _BRIEF
-      and "il file non dichiara la rilevazione di questo campo" in _BRIEF)
+      and "quotazione dello snapshot, non una serie datata" in _BRIEF)
 
 check("v451 l'etichetta del feed dichiara la PROVENIENZA, non l'attribuzione",
       "NON 'notizia su TK'" in _BRIEF and "in_feed" in _BRIEF_CODICE)
@@ -2422,6 +2425,32 @@ _extra477 = _corpo_di(Path(__file__).with_name("rapporto.py").read_text(), "extr
 check("v477 rapporto: la composizione del capex e i dividendi sulle privilegiate sono nella riga CASSA",
       "capex_immateriali_ttm" in _extra477 and "dividendi_privilegiate_ttm" in _extra477
       and "investimenti_immateriali_prevalenti" in _extra477)
+
+# ============================ v478 — IL TASSO EFFETTIVO DI OGGI NEL BRIEF ============================
+# `fed_market.current_rate` e' la media MENSILE FEDFUNDS (3,75 a settembre) e il brief la chiamava
+# "Fed Funds effettivo" con l'EFFR del giorno a 3,88. Lo stato si COSTRUISCE nei due versi.
+def _mc478(macro):
+    _t = _tf.mkdtemp()
+    _os.makedirs(_os.path.join(_t, "data"))
+    _js.dump({"updated_at": "2026-10-14T00:00:00Z", "macro": macro},
+             open(_os.path.join(_t, "data", "data.json"), "w"))
+    _r = brief.RADICE
+    brief.RADICE = _t
+    try:
+        return brief.macro_dalla_pipeline()["serie"]
+    finally:
+        brief.RADICE = _r
+_s478 = _mc478({"fed_market": {"current_rate": 3.75, "rate_date": "2026-09-01"},
+                "fedwatch": {"effr": {"valore": 3.88, "data": "2026-10-09", "fonte": "NY Fed"}}})
+_f478 = [s for s in _s478 if s["nome"].startswith("Fed Funds")]
+check("v478 brief: con l'EFFR del giorno la riga e' quella, con la sua data e la fonte, e la media mensile non c'e'",
+      len(_f478) == 1 and _f478[0]["valore"] == 3.88 and _f478[0]["data"] == "2026-10-09"
+      and "EFFR del giorno" in _f478[0]["nome"] and "NY Fed" in (_f478[0]["nota"] or ""), str(_f478))
+_s478b = _mc478({"fed_market": {"current_rate": 3.75, "rate_date": "2026-09-01"}})
+_f478b = [s for s in _s478b if s["nome"].startswith("Fed Funds")]
+check("v478 brief: senza l'EFFR la media mensile si NOMINA col suo mese e non si chiama effettivo",
+      len(_f478b) == 1 and "MENSILE" in _f478b[0]["nome"] and "effettivo" not in _f478b[0]["nome"]
+      and "settembre 2026" in (_f478b[0]["nota"] or "") and _f478b[0]["data"] is None, str(_f478b))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
