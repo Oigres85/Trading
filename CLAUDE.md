@@ -6653,3 +6653,36 @@ non ce l'ha (il cambio dello snapshot) — un'altra rottura di un check ancorato
 RIALZO 20% · INVARIATO 80%** — gli stessi numeri di Polymarket; 09/12: +0,87 in più, +1,07 cumulati;
 `data_quality` fedwatch ok. MSTR: 99,9% immateriali, 30,2 mesi su perdita più dividendi; WDC: i suoi
 10 milioni di dividendi pubblicati senza l'autonomia (la gestione li copre); MRVL 1,5%, sotto soglia.
+
+## 💧 v479 — LA LIQUIDITÀ AVEVA DUE COPIE, E LA PAGINA LEGGEVA QUELLA DI AGOSTO
+
+Trovato preparando l'analisi su rientri e mediazioni del 14/10: `conseguenze.py` stampava
+*"in archivio: 10.000 € al 2026-08-08"* mentre `memoria/LIBRO.md` dichiara **~59.000 €** (circa
+50.000 € il 01/10 più l'incasso di ORCL del 05/10).
+
+| legge `config/portfolio_state.json` (10.000 €, 08/08) | legge `memoria/LIBRO.md` (~59.000 €) |
+|---|---|
+| pagina e pacchetto (`fuoriAzionarioEur`), `analisi_libro.stato_patrimoniale` (rapporto, scenari, soglie), `conseguenze.py` | `numeri_libro.py`, `rotazione.py`, `brief.py` |
+
+⚠⚠ **Non era un'etichetta: è il denominatore della quota azionaria**, cioè il moltiplicatore con
+cui VaR, ES e drawdown passano dall'azionario al patrimonio (v432). Sugli stessi valori del 14/10
+la pagina dava **83,1%**, la liquidità dichiarata dà **71,4%**.
+
+È la classe **v439** — una seconda copia del libro che invecchia da sola — sopravvissuta sulla
+sola voce che v439 aveva lasciato in quel file. La copia resta, perché la pagina persiste lì ed è
+il file che il CEO aggiorna dalla UI, ma ora un gate in `test_analisi_libro.py` pretende che
+coincida con LIBRO.md: se se ne aggiorna una, il commit successivo va rosso finché non si allinea
+l'altra. ⚠ `tests.yml` non scatta sui file di `config/`, quindi un salvataggio dalla pagina non
+accende la CI: il gate morde al commit successivo, che è il momento in cui si allinea. Validato per
+iniezione nei due versi (pagina tornata a 10.000; libro aggiornato e pagina no): morde in entrambi,
+e solo lui, con ripristino verificato per hash.
+
+### 📅 E una data scritta a mano nel piano era sbagliata di cinque giorni
+`FORMATO_ANALISI.md` §6 diceva *"BE vendita … prima della trimestrale del 27/10"*; la fonte la
+dichiara il **22/10**. È la classe v410/v424 — il numero fisso che invecchia da solo — su una DATA,
+nel piano che si legge per decidere: chi avesse aspettato il 27 avrebbe lasciato passare i conti.
+Non si è aggiornata la data, la si è tolta (regola v415): il piano rimanda al blocco `SCADENZE`. La
+fotografia del 06/10 in `LIBRO.md` §1quater resta com'era, come documento di quel giorno, con la
+nota che è superata.
+
+`?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (regola v440).

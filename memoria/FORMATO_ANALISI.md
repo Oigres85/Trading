@@ -92,7 +92,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
 6. **Piano con soglie** — le decisioni già confermate stanno nel blocco DECISIONI APERTE (sezione
    0bis: oggi RGTI uscita e AMD alleggerimento). Qui lo stato delle condizioni NON ancora scattate:
-   BE vendita nella fascia 295-302 prima della trimestrale del 27/10; MU **alleggerimento** verso
+   BE vendita nella fascia 295-302 prima della sua trimestrale (la data si legge dal blocco
+   SCADENZE, mai da qui: era scritta a mano «27/10» e la fonte la dichiara cinque giorni prima,
+   v479); MU **alleggerimento** verso
    ~15% del libro nella fascia 1.100-1.108, compensando la plusvalenza con la minusvalenza di RGTI
    (è una VENDITA: il giallo non l'ha mai congelata); i supporti di protezione.
 

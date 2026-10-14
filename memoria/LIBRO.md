@@ -204,6 +204,10 @@ settimana ±21.200 $, VaR95 −15.800 $, ES95 −20.000 $; scadenze BE 27/10 · 
 AMD 03/11 · CRWV e RGTI 09/11 · NVDA 18/11 (MU, SKHY, MRVL senza data nella finestra). Esterne:
 verbali Fed 07/10, ASML 14/10, TSM 15/10, FOMC 28/10. Lettura di quel giorno: attesa ragionevole
 fino a metà ottobre; BE da decidere entro il 27/10, AMD entro il 03/11.
+⚠ v479 — su BE quella fotografia è superata: la fonte ha poi dichiarato la trimestrale **cinque
+giorni prima** del 27/10. La fotografia resta com'era, come documento di quel giorno; la scadenza
+vera si legge SEMPRE dal blocco `SCADENZE`, ed è la ragione per cui le regole qui sopra non
+portano date.
 
 ## 1quinquies. DECISIONI APERTE — confermate dal CEO e non ancora eseguite (v474)
 

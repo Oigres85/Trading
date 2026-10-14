@@ -2452,6 +2452,23 @@ check("v478 brief: senza l'EFFR la media mensile si NOMINA col suo mese e non si
       len(_f478b) == 1 and "MENSILE" in _f478b[0]["nome"] and "effettivo" not in _f478b[0]["nome"]
       and "settembre 2026" in (_f478b[0]["nota"] or "") and _f478b[0]["data"] is None, str(_f478b))
 
+# ============================ v479 — LA LIQUIDITA' DELLA PAGINA E' QUELLA DEL LIBRO ============================
+# config/portfolio_state.json (letto da pagina, pacchetto, conseguenze.py e stato_patrimoniale) e
+# memoria/LIBRO.md §1 (letto da numeri_libro.py, rotazione.py e brief.py) annotano la STESSA
+# dichiarazione del CEO. La prima e' rimasta a 10.000 € dell'08/08 mentre la seconda diceva
+# ~59.000 €: la quota azionaria della pagina usciva circa 84% contro il 71% vero, cioe' il
+# moltiplicatore che porta VaR, ES e drawdown dall'azionario al patrimonio (v432). Due copie dello
+# stesso numero divergono in silenzio (v410, v439): il gate pretende che coincidano, e se il CEO ne
+# aggiorna una il prossimo commit va rosso finche' non si allinea l'altra.
+import brief as _b479
+_liq_libro479 = _b479.leggi_libro()[1]
+_liq_pagina479 = (_json.loads((_ROOT / "config" / "portfolio_state.json").read_text(encoding="utf-8"))
+                  .get("cash") or {}).get("v")
+check("v479 la liquidita' della pagina (portfolio_state.json) coincide con quella di LIBRO.md",
+      isinstance(_liq_libro479, (int, float)) and isinstance(_liq_pagina479, (int, float))
+      and abs(_liq_pagina479 - _liq_libro479) < 0.5,
+      f"pagina {_liq_pagina479} contro LIBRO.md {_liq_libro479}")
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
