@@ -236,4 +236,8 @@ Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno stru
   il 02/02/2026. Le notizie su Anthropic stessa si riportano come le riportano le fonti, dichiarando
   il conflitto. Fino al 15/10/2026 la regola nominava solo Amazon: NVIDIA, che pesa un quinto del
   libro, mancava; SpaceX è stata aggiunta lo stesso giorno, quando è entrata nell'analisi.
+  Fra gli investitori dei round di Anthropic ci sono anche fondi affiliati di **BlackRock** e la
+  divisione Growth Equity di **Goldman Sachs Alternatives** (Series F, settembre 2025) e **Salesforce
+  Ventures** (Series C, maggio 2023): BLK, GS e CRM portano la stessa dichiarazione. Aggiunti il
+  15/10/2026 sera, quando banche e software sono entrati nella valutazione della rotazione.
 - Rapporto HTML solo se richiesto: costa token (decisione del CEO).
