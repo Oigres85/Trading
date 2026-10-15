@@ -73,10 +73,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    il resto; se dice MINIMO, si nomina la famiglia che non si misura.
    Da v484, subito sotto (decisioni del CEO del 14/10 sera): il **SALVAVITA** — il calo dell'azionario
    dal suo massimo sul registro della performance, soglia −30%; se il blocco dice SCATTATO va in cima
-   alla risposta, come un colore cambiato — e il **PIANO DI RIDUZIONE**: il gradino dell'arancione e
-   del salvavita calcolato prima (un terzo dei semiconduttori in proporzione al rischio: azioni,
-   imposta, rischio prima e dopo). In verde e in giallo si scrive in una riga — quanto si venderebbe
-   e l'imposta —; in arancione, in rosso o col salvavita scattato per intero, nome per nome. Si vende,
+   alla risposta, come un colore cambiato — e il **PIANO DI RIDUZIONE**: il gradino del salvavita
+   calcolato prima (un terzo dei semiconduttori in proporzione al rischio: azioni, imposta, rischio
+   prima e dopo). Dal 15/10 (decisione del CEO: *"non vendi sui ribassi ma sui massimi"*) arancione e
+   rosso NON vendono: il colore si scrive come segnale, e il piano in una riga in ogni colore — quanto
+   si venderebbe e l'imposta —; per intero, nome per nome, solo col salvavita scattato. Si vende,
    non ci si copre: il CEO non opera con opzioni o ETF short, per ora.
 0bis. **Costo dell'attesa e scadenze** (decisione del CEO del 06/10, regole in `memoria/LIBRO.md`
    §1quater): il blocco `COSTO DELL'ATTESA` / `SCADENZE` di `numeri_libro.py`, e per ogni
@@ -134,10 +135,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    giallo. Gli avvisi di prezzo su Investing.com restano campanelli: un avviso non è una vendita, fa
    guardare la tenuta.
 
-7. **Watchlist e rotazione** (sempre, v468) — il semaforo decide il gradino: in giallo NESSUN
-   divieto d'ingresso (decisione del CEO del 09/10), ma ogni ingresso porta le sue conseguenze di
-   rischio e chi è nella stessa scommessa del libro lo dichiara; in arancione e rosso prima la
-   riduzione del gradino. **Gli ingressi speculativi sono ammessi** (CEO, 14/10: *"se ci sono
+7. **Watchlist e rotazione** (sempre, v468) — in giallo, arancione e rosso NESSUN divieto
+   d'ingresso (decisioni del CEO del 09/10 e del 15/10), ma ogni ingresso porta le sue conseguenze di
+   rischio e chi è nella stessa scommessa del libro lo dichiara; col salvavita scattato prima il suo
+   gradino. **Gli ingressi speculativi sono ammessi** (CEO, 14/10: *"se ci sono
    margini di speculazione, ben venga"*): dove la riga «tenuta se fosse in portafoglio» dice
    VENDITA PER EVIDENZA, l'ingresso è una scommessa contro l'evidenza e si dichiara tale; dove dice
    CONFLITTO, è il caso AMD visto da fuori e lo leggono le notizie, nei due versi.
@@ -172,9 +173,10 @@ nessun divieto ma conseguenze di rischio di ogni ingresso (09/10) · costo delle
 si lascia correre, si vende per evidenza, col pareggio fiscale, anche sui sorvegliati (14/10) ·
 ingressi speculativi ammessi e dichiarati (14/10) · bilancio dell'evidenza nei due versi, il rialzo
 possibile valutato, l'aritmetica della media sulle posizioni in perdita (14/10) · le decisioni
-rimandate di proposito, riportate con la loro scadenza (14/10) · la riduzione in arancione in
-proporzione al rischio, il salvavita a −30% dal massimo, la scadenza e l'esame di ogni conflitto
-(14/10 sera).
+rimandate di proposito, riportate con la loro scadenza (14/10) · la riduzione in proporzione al
+rischio, il salvavita a −30% dal massimo, la scadenza e l'esame di ogni conflitto (14/10 sera) ·
+non si vende sui ribassi: arancione e rosso sono un segnale, l'unica vendita automatica è il
+salvavita, e nessuna presa di profitto ai massimi (15/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

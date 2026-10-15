@@ -58,10 +58,10 @@ per MU + SK hynix intorno al 20% del libro (12-13/10) è **respinta**: il peso d
 un limite, e SK hynix resta in portafoglio senza uno stop di prezzo. Il 14/10 le memorie pesano
 il 26,4% del libro e MU da sola porta il 34% del rischio: senza tetto, se salgono, quelle quote
 crescono da sole, e il blocco dei pesi di `numeri_libro.py` le mostra a ogni analisi.
-**Restano in vigore**, perché non sono tetti, il semaforo d'uscita e il salvavita (§1ter): in
-arancione, o col salvavita a −30%, la riduzione dei semiconduttori segue il rischio di ciascuno —
-MU, che porta più rischio di quanto pesa, si taglia di più di un terzo — qualunque sia il peso delle
-memorie (decisione del CEO del 14/10/2026).
+**Resta in vigore**, perché non è un tetto, il salvavita (§1ter): a −30% dal massimo
+dell'azionario la riduzione dei semiconduttori segue il rischio di ciascuno — MU, che porta più
+rischio di quanto pesa, si taglia di più di un terzo — qualunque sia il peso delle memorie
+(decisione del CEO del 14/10/2026). Dal 15/10/2026 arancione e rosso non vendono più (§1ter).
 **Il piano di vendita di MU nella fascia 1.100-1.108 è REVOCATO il 14/10/2026** dalla regola di
 tenuta (§1sexies): era una presa di profitto a una fascia di prezzo, e il CEO ha deciso che si
 vende per evidenza, non per prezzo.
@@ -158,16 +158,31 @@ parola per parola: le regole stanno in un posto solo.
   dichiara. **Nessuna presa di profitto per prezzo**: si vende per evidenza (§1sexies, decisione del
   CEO del 14/10/2026); fino al 14/10 il giallo prevedeva prese di profitto sui nomi più tirati.
   Fino al 09/10 il giallo vietava i nuovi semiconduttori.
-- 🟠 **Arancione** — due segnali di **famiglie diverse**: riduzione dei semiconduttori di circa un
-  terzo, **in proporzione al rischio che ciascuno porta**: chi porta più rischio di quanto pesa si
-  taglia di più, chi ne porta meno di meno. Decisione del CEO del 14/10/2026: una via di mezzo fra il
-  togliere solo MU e AMD e il togliere un terzo di ciascuno. Azioni, imposta e rischio prima e dopo
-  li calcola `numeri_libro.py`, blocco «PIANO DI RIDUZIONE», a ogni analisi. Si vende, non ci si
-  copre: il CEO non opera con opzioni o ETF short, per ora.
+- 🟠 **Arancione** — due segnali di **famiglie diverse**: **nessuna vendita** — decisione del CEO
+  del 15/10/2026, testuale: "non vendi sui ribassi ma sui massimi". Come in giallo, nessun divieto
+  d'ingresso: ogni ingresso porta accanto le sue conseguenze sul libro. Il colore resta una prova
+  CONTRO per ogni nome nella tenuta (§1sexies, famiglia macro), e l'unica vendita automatica del
+  libro è il salvavita qui sotto. Fino al 15/10 l'arancione toglieva un terzo dei semiconduttori in
+  proporzione al rischio: al suo primo arancione il CEO non l'ha eseguito e ha cambiato la regola.
 - 🔴 **Rosso** — SMH sotto la media a 200 **e** (credito sopra 4,0 **oppure** taglio della guida
-  sugli investimenti AI): un altro terzo, con lo stesso criterio. Resta il nucleo per la tesi al 2029.
+  sugli investimenti AI): **nessuna vendita**, come l'arancione (decisione del CEO del 15/10/2026).
+  Fino al 15/10 toglieva un altro terzo dei semiconduttori.
 
-**I semiconduttori del libro** (arancione, rosso e salvavita): MU, NVDA, AMD, MRVL, SKHY.
+⚠ **15/10/2026 — al primo arancione il gradino NON è stato eseguito, e la regola è cambiata.** Il
+colore era passato ad arancione alla chiusura del 14/10 (SMH sotto la media a 50, spread CCC acceso)
+e il piano del giorno vendeva 65.856 $ di semiconduttori (31 MU, 38 AMD, 46 NVDA, 14 MRVL, 15 SKHY)
+con ~12.532 $ d'imposta. Il CEO, testuale: *"mantenere le posizioni di Mu e amd e gli altri. Non
+vendi sui ribassi ma sui massimi"*; poi, alle due domande: **«Solo il salvavita»** (arancione e rosso
+diventano informazione) e **«Solo col semaforo acceso»** (nessuna presa di profitto ai massimi: resta
+la regola del 14/10, §1sexies — e il semaforo non vende più). La frase dell'analisi che ha aperto la
+decisione metteva un costo preciso contro un beneficio vago; i numeri dati prima delle due risposte:
+vendere e ricomprare le stesse azioni conveniva solo con un altro −19% circa (imposta / venduto); in
+una correzione normale tenere batte vendere — le tre volte che l'arancione si è acceso in tre anni,
+tre mesi dopo SMH era più in alto —; in un mercato orso come il 2022 (semiconduttori circa −46%) il
+gradino avrebbe evitato circa 30.000 $ di perdite su quella parte. ⚠ Senza gradino l'esposizione è
+quella del libro intero: il 14/10 un Nasdaq −10% valeva −21,9% (−59.174 $).
+
+**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY.
 Il settore non è nei dati — la pipeline mette RGTI fra i semiconduttori e SK hynix no (v473) —
 quindi l'elenco sta qui, e un nome nuovo del comparto ci entra il giorno dell'acquisto. Le posizioni
 fuori dall'elenco si nominano a ogni analisi: un'omissione si vede.
@@ -180,10 +195,14 @@ giallo finché le stime non girano. Il salvavita stacca per qualunque causa, com
   si conta dalla prima riga del registro (09/10/2026).
 - **Soglia: −30%** — una convenzione scelta col CEO (v240), oltre il peggior calo dell'ultimo anno
   del libro di oggi guardato all'indietro (−26%, misurato il 14/10/2026): non scatta sul rumore.
-- **Reazione**: il gradino dell'arancione — un terzo dei semiconduttori, in proporzione al rischio —
-  qualunque sia il colore del semaforo. Se in questa discesa quel gradino è già stato eseguito, il
-  salvavita non ne aggiunge un altro: vale il rosso. Scatta una volta per discesa e si riarma quando
-  l'azionario torna al massimo. Lo calcola `numeri_libro.py`, blocco «SALVAVITA».
+- **Reazione**: un terzo dei semiconduttori, **in proporzione al rischio** di ciascuno — chi porta
+  più rischio di quanto pesa si taglia di più, chi ne porta meno di meno (decisione del CEO del
+  14/10/2026) — qualunque sia il colore del semaforo. Azioni, imposta e rischio prima e dopo li
+  calcola `numeri_libro.py`, blocco «PIANO DI RIDUZIONE», a ogni analisi. Si vende, non ci si copre:
+  il CEO non opera con opzioni o ETF short, per ora. Dal 15/10/2026 è l'**unica vendita automatica**
+  del libro (arancione e rosso non vendono): scatta una volta per discesa, senza un secondo gradino
+  dopo, e si riarma quando l'azionario torna al massimo. Lo calcola `numeri_libro.py`, blocco
+  «SALVAVITA».
 
 ⚠ Due segnali della **stessa** famiglia sono un segnale solo (B3): SMH sotto la 50 e NVDA sotto la
 50 nello stesso giorno sono il prezzo che parla due volte, non due prove.
@@ -239,8 +258,9 @@ nome su cui la decisione era ancora aperta.
    seduta, spesso di più dell'oscillazione di una settimana intera. Una decisione ancora aperta il
    giorno prima della trimestrale va presa o dichiarata rimandata **di proposito**, non lasciata
    scadere.
-5. Il semaforo d'uscita (§1ter) **scavalca** le scadenze: se passa ad arancione o rosso, si agisce
-   secondo il gradino senza aspettare la data.
+5. Il salvavita (§1ter) **scavalca** le scadenze: se scatta, si agisce secondo il suo gradino senza
+   aspettare la data. Dal 15/10/2026 arancione e rosso non portano vendite (decisione del CEO):
+   restano un segnale, non un'azione.
 
 **Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: seduta tipica ±9.500 $,
 settimana ±21.200 $, VaR95 −15.800 $, ES95 −20.000 $; scadenze BE 27/10 · MSTR 29/10 · PLTR 02/11 ·
@@ -288,6 +308,9 @@ carico da 97,20 a 87,07 (§1). La proposta del 14/10 era di aspettare i conti de
 obbligazioni di CoreWeave rendevano intorno al 15% e il titolo perdeva il 16%, e il programma di
 vendita di 35 milioni di azioni annunciato a settembre può partire da metà ottobre. La decisione è
 sua: la rimandata è chiusa, e resta la scadenza del conflitto — i conti, con l'esame scritto prima.
+⚠ **15/10/2026 — il gradino dell'arancione del 14/10 NON è stato eseguito**, per decisione del CEO
+(«mantenere le posizioni di Mu e amd e gli altri»), e la regola è cambiata lo stesso giorno:
+arancione e rosso non vendono più, resta il salvavita a −30% (§1ter).
 
 **Rimandate di proposito** (§1quater, regola 4: una decisione che aspetta un evento si dichiara,
 non si lascia scadere). Una riga per decisione nella forma «- TICKER — cosa si rimanda»;
@@ -409,12 +432,14 @@ lo fa il broker in euro col cambio di carico, e regime fiscale e minusvalenze pr
 nel sistema. Per una posizione in perdita la minusvalenza vale solo se ci sono plusvalenze da
 compensare.
 
-**Il semaforo resta la regola del libro.** In arancione e in rosso la sua reazione (§1ter) vale
-anche per i nomi che qui sono da lasciar correre: due famiglie diverse accese sono già evidenza
-tecnica e macro insieme. L'ordine della riduzione l'ha deciso il CEO il 14/10/2026: **in proporzione
-al rischio** di ciascun nome (§1ter), una via di mezzo fra il togliere solo MU e AMD e il togliere un
-terzo di ciascuno. Lo stesso gradino lo fa scattare il **salvavita** a −30% dal massimo
-dell'azionario (§1ter), qualunque sia il colore.
+**Il semaforo resta un segnale del libro; la sua sola vendita automatica è il salvavita**
+(decisione del CEO del 15/10/2026: «non vendi sui ribassi ma sui massimi»). In arancione e in rosso
+il colore entra qui come prova CONTRO per ogni nome (famiglia macro), non come vendita. L'unico
+gradino automatico è il **salvavita** a −30% dal massimo dell'azionario (§1ter), qualunque sia il
+colore: un terzo dei semiconduttori **in proporzione al rischio** di ciascun nome, una via di mezzo
+fra il togliere solo MU e AMD e il togliere un terzo di ciascuno (decisione del CEO del 14/10/2026).
+Nessuna presa di profitto ai massimi (risposta del CEO del 15/10: «solo col semaforo acceso», e il
+semaforo non vende più): si lascia correre e si vende per evidenza.
 
 **La scadenza di ogni conflitto** (decisione del CEO del 14/10/2026). Un «per ora» senza data
 diventa «per sempre»: ogni nome in CONFLITTO — DA VALUTARE si decide ai **conti trimestrali

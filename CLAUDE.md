@@ -6999,3 +6999,41 @@ applicata, lo stato della seduta ignorato, il volume dimenticato, il registro ch
 conferma, la quotazione chiesta anche di giorno, la campana alle 17, la conferma pretesa anche il
 giorno dopo. Pavimento di `test_analisi_libro.py` 410 → 415 (i punti di chiamata sono 432). `?v=` e
 `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🛑 v486 — AL PRIMO ARANCIONE IL CEO NON HA VENDUTO, E LA REGOLA È CAMBIATA: RESTA SOLO IL SALVAVITA
+
+Il semaforo è passato ad arancione alla chiusura del 14/10 (SMH sotto la media a 50, spread CCC
+acceso) e il piano del 15/10 vendeva 65.856 $ di semiconduttori con ~12.532 $ d'imposta. Il CEO,
+testuale: *"mantenere le posizioni di Mu e amd e gli altri. Non vendi sui ribassi ma sui massimi"*;
+poi, alle due domande: **«Solo il salvavita»** e **«Solo col semaforo acceso»**.
+
+**Cosa è cambiato.** Arancione e rosso restano COLORI — un segnale, e una prova CONTRO nella tenuta
+(§1sexies, famiglia macro) — ma **non vendono più**. L'unica vendita automatica è il **salvavita** a
+−30% dal massimo: lo stesso gradino (un terzo dei semiconduttori in proporzione al rischio), una volta
+per discesa, senza un secondo gradino dopo. Nessuna presa di profitto ai massimi: resta la regola del
+14/10, si lascia correre e si vende per evidenza. Gli ingressi seguono la regola del giallo in ogni
+colore: nessun divieto, conseguenze dichiarate. `righe_piano` scrive DA ESEGUIRE **solo** col
+salvavita scattato; in arancione e rosso dice che il colore è un segnale, non una vendita.
+
+⚠⚠ **La frase dell'analisi che ha aperto la decisione era sbilanciata, ed era mia.** Diceva *"se
+l'allarme è falso costa circa 12.500 $ di imposta; se è vero, toglie il 27% del rischio"*: un costo
+preciso contro un beneficio vago. In dollari: l'imposta è **anticipata, non persa** (si paga comunque
+alla vendita, a meno di non vendere mai); vendere e ricomprare le stesse azioni conveniva solo con un
+altro **−19%** circa (imposta / venduto); in una correzione tenere batte vendere, in un mercato orso
+come il 2022 (semiconduttori circa −46%) il gradino avrebbe evitato circa 30.000 $. I numeri giusti
+sono arrivati prima delle due risposte, e il libro li registra accanto alla decisione.
+> **Una frase dell'analisi è una leva, non un riassunto.** Un costo in dollari accanto a un beneficio in
+> percentuale non è un confronto: si mettono le due cose nella stessa unità, o non si mettono.
+
+⚠ **Un gate passava leggendo la storia invece della regola.** v484 pretendeva «un terzo» nella reazione
+dell'arancione: dopo il cambio il libro dice *"Fino al 15/10 l'arancione toglieva un terzo…"*, e il
+check restava verde sulla frase che RACCONTA la regola tolta. Ottava incarnazione del gate che trova la
+prosa che lo spiega (v213, v240, v393, v395, v418). Riagganciato: il gradino si cerca nella reazione
+del SALVAVITA, e arancione e rosso devono dire «nessuna vendita».
+
+**I gate.** Tre riagganciati e nessuno zittito (v481 resa della tenuta, v484 resa del piano, v484
+gradino dal libro), tre nuovi (semaforo in arancione, rotazione, decisione nel libro). L'invariante del
+piano si percorre su **15 stati** — cinque colori per tre stati del salvavita — e non su quello comodo
+(v419, v420). Nove iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per
+impronta: mordono tutte e nove, ciascuna sul controllo atteso. Pavimento di `test_analisi_libro.py`
+415 → 420. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

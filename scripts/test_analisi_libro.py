@@ -2786,9 +2786,14 @@ check("v482 resa: stime e revisioni in versi opposti sono la stessa famiglia e s
 _tn481_ar = NL.tenuta_posizioni(["BBB"], _bt481, _rt481, _sem481("arancione"), {"BBB": 100.0},
                                 {"BBB": 120.0}, {"BBB": 10}, {"BBB": 1.0}, _ALLE17, None)
 _rar481 = "\n".join(NL.righe_tenuta(_tn481_ar))
-check("v481 resa: in arancione la reazione del semaforo vale anche per chi si lascia correre; in perdita si dichiara la "
+# v486 — RIAGGANCIATO, non zittito: pretendeva che in arancione «la sua reazione vale anche per i nomi da lasciar
+#   correre», cioe' la regola che il CEO ha cambiato il 15/10 («non vendi sui ribassi ma sui massimi»). L'invariante
+#   che resta e' il resto della riga: in arancione il colore entra nella tenuta come prova CONTRO, e si dice che non
+#   e' una vendita — un colore che compare senza dire cosa comporta si legge come un ordine.
+check("v481 resa: in arancione il colore e' una prova CONTRO e NON una vendita (v486); in perdita si dichiara la "
       "minusvalenza invece del pareggio; un libro vuoto lo dice",
-      "semaforo arancione: la sua reazione (LIBRO.md §1ter) vale anche per i nomi da lasciar correre" in _rar481
+      "semaforo arancione: è una prova CONTRO per ogni nome (famiglia macro), non una vendita" in _rar481
+      and "vale anche per i nomi da lasciar correre" not in _rar481
       and "minusvalenza ~200 $" in _rar481 and _tn481_ar["righe"][0]["esito"] == "IN OSSERVAZIONE"
       and NL.righe_tenuta({"righe": []}) == ["TENUTA DELLE POSIZIONI: nessuna posizione azionaria"], _rar481)
 _tn482_pv = NL.tenuta_posizioni(["GGG"], {"GGG": _barre474(_sale[:120])}, {"GGG": _riga481(prima=None)}, _sem481(),
@@ -2955,19 +2960,58 @@ check("v484 piano: il rischio prima e' sqrt(v'Cv) annuo sulla stessa matrice (ri
 _rg484 = "\n".join(NL.righe_piano(_p484, "giallo"))
 _ra484 = "\n".join(NL.righe_piano(_p484, "arancione"))
 _rs484 = "\n".join(NL.righe_piano(_p484, "giallo", {"scattato_il": "2026-10-20"}))
-check("v484 resa del piano: in giallo si esegue SOLO con l'arancione o col salvavita; in arancione, o col salvavita "
-      "scattato, DA ESEGUIRE; nome per nome con azioni e imposta; chi e' fuori dal piano si nomina; non e' una "
-      "raccomandazione; senza elenco si dichiara",
-      "si esegue SOLO con l'arancione o col salvavita scattato" in _rg484 and "DA ESEGUIRE" not in _rg484
-      and "DA ESEGUIRE" in _ra484 and "DA ESEGUIRE" in _rs484 and "AAA   vendere 22 azioni" in _rg484
+# v486 — RIAGGANCIATO, non zittito: pretendeva «DA ESEGUIRE» in arancione, cioe' la regola che il CEO ha cambiato il
+#   15/10 alle due domande («Solo il salvavita», «Solo col semaforo acceso»). L'invariante nuovo si percorre su TUTTI
+#   gli stati, non su quello comodo (v419, v420): DA ESEGUIRE se e solo se il salvavita e' scattato, in ogni colore —
+#   un salvavita scattato in giallo vende, un arancione senza salvavita no, e lo dice.
+_stati486 = [(c, s) for c in ("verde", "giallo", "arancione", "rosso", None)
+             for s in (None, {"scattato_il": None}, {"scattato_il": "2026-10-20"})]
+_sbagliati486 = []
+for _c486, _s486 in _stati486:
+    if ("DA ESEGUIRE" in "\n".join(NL.righe_piano(_p484, _c486, _s486))) != bool((_s486 or {}).get("scattato_il")):
+        _sbagliati486.append(f"{_c486}/{_s486}")
+_rr486 = "\n".join(NL.righe_piano(_p484, "rosso"))
+check("v486 resa del piano: DA ESEGUIRE se e solo se il salvavita e' scattato, in OGNI colore (15 stati); arancione e "
+      "rosso senza salvavita dicono di essere un segnale e non una vendita; nome per nome con azioni e imposta; chi e' "
+      "fuori dal piano si nomina; non e' una raccomandazione; senza elenco si dichiara",
+      not _sbagliati486 and "si esegue SOLO col salvavita scattato" in _rg484
+      and "il semaforo arancione è un segnale, non una vendita" in _ra484 and "DA ESEGUIRE: il salvavita è scattato" in _rs484
+      and "il semaforo rosso è un segnale, non una vendita" in _rr486
+      and "un segnale, non una vendita" not in _rg484 and "il prossimo è il rosso" not in _ra484
+      and "AAA   vendere 22 azioni" in _rg484
       and "fuori dal piano (non nell'elenco dei semiconduttori): FUO" in _rg484 and "non una raccomandazione" in _rg484
-      and "NON calcolato" in NL.righe_piano(NL.piano_riduzione(None, {}, {}, {}, {}, {}))[0], _rg484)
+      and "NON calcolato" in NL.righe_piano(NL.piano_riduzione(None, {}, {}, {}, {}, {}))[0],
+      "stati sbagliati: " + ", ".join(_sbagliati486) + "\n" + _ra484)
 _rz484 = NL.reazioni_libro(_lib474)
-check("v484 il gradino del codice e' QUELLO del libro: un terzo in arancione, un altro terzo in rosso, in proporzione al "
-      "rischio (LIBRO.md §1ter, letto dal libro come le soglie del v474)",
-      abs(NL.QUOTA_GRADINO - 1 / 3) < 1e-12 and "un terzo" in _rz484.get("arancione", "")
-      and "in proporzione al rischio" in _rz484.get("arancione", "") and "un altro terzo" in _rz484.get("rosso", ""),
-      str(_rz484.get("arancione", ""))[:300])
+
+
+def _reazione_salvavita486(testo):
+    """La riga «- **Reazione**» del salvavita in LIBRO.md §1ter, con le sue righe di continuazione."""
+    i = testo.find("**Il salvavita sul patrimonio**")
+    j = testo.find("- **Reazione**", i) if i >= 0 else -1
+    if j < 0:
+        return ""
+    out = []
+    for riga in testo[j:].splitlines():
+        if out and not riga.startswith("  "):
+            break
+        out.append(riga.strip())
+    return " ".join(out).replace("**", "")
+
+
+_rsv486 = _reazione_salvavita486(_lib474)
+# v486 — RIAGGANCIATO, non zittito: pretendeva «un terzo» nella reazione dell'arancione e «un altro terzo» in quella
+#   del rosso. Dopo il 15/10 quelle parole restano nel libro solo come STORIA («Fino al 15/10 l'arancione toglieva un
+#   terzo…»), e il check vecchio passava ancora leggendo la storia invece della regola: l'ottava volta che un gate
+#   trova la prosa che spiega il cambiamento (v213, v240, v393, v395, v418). Il gradino oggi vive nella reazione del
+#   SALVAVITA; arancione e rosso devono dire «nessuna vendita».
+check("v486 il gradino del codice e' QUELLO del libro: un terzo dei semiconduttori in proporzione al rischio, nella "
+      "reazione del SALVAVITA, che e' l'unica vendita automatica; arancione e rosso dicono «nessuna vendita» "
+      "(LIBRO.md §1ter, letto dal libro come le soglie del v474)",
+      abs(NL.QUOTA_GRADINO - 1 / 3) < 1e-12 and "un terzo dei semiconduttori" in _rsv486
+      and "in proporzione al rischio" in _rsv486 and "unica vendita automatica" in _rsv486
+      and "nessuna vendita" in _rz484.get("arancione", "") and "nessuna vendita" in _rz484.get("rosso", ""),
+      _rsv486[:300] + " | " + str(_rz484.get("arancione", ""))[:200])
 
 # --- il salvavita: sul rendimento ponderato per il tempo, le operazioni non lo falsano; una volta per discesa ---
 def _rg484f(seduta, pos, px):
@@ -3140,6 +3184,28 @@ check("v485 la sera stessa il registro NON scrive chiusure non confermate e nomi
 check("v485 il giorno dopo la stessa seduta si scrive con lo storico, senza conferma: e' gia' definitivo (righe scritte 1,5 "
       "e 12 ore dopo la campana: 11 prezzi su 11 coincidono con lo storico del giorno dopo)",
       _mat485["esito"].startswith("scritto") and "2026-10-14" in _mat485["esito"], str(_mat485["esito"]))
+
+# ================================================================ v486 — arancione e rosso non vendono, resta il salvavita
+# Decisione del CEO del 15/10/2026, al primo arancione, testuale: «mantenere le posizioni di Mu e amd e gli altri.
+# Non vendi sui ribassi ma sui massimi»; poi, alle due domande: «Solo il salvavita» e «Solo col semaforo acceso».
+# I colori restano (un segnale, e una prova CONTRO nella tenuta), il gradino si esegue solo col salvavita scattato,
+# e nessuna resa deve ancora presentare arancione o rosso come una vendita: un colore letto come un ordine e' la
+# classe delle etichette che affermano piu' del dato (v240, v405).
+check("v486 semaforo in arancione: la reazione letta dal libro dice «nessuna vendita» e chi pesa nel rischio esce "
+      "come informazione, non come le azioni da vendere",
+      "nessuna vendita" in _r_ar and "un'informazione, non una vendita" in _r_ar and "le azioni da vendere" not in _r_ar,
+      _r_ar[-600:])
+check("v486 rotazione: il piano della liquidita' e la watchlist dicono che il semaforo non vieta ingressi in nessun "
+      "colore, e non rimandano piu' alla riduzione del gradino in arancione e rosso",
+      "il SEMAFORO non vieta ingressi" in _tp474 and "vale prima la riduzione del gradino" not in _tp474
+      and "il SEMAFORO non vieta ingressi in nessun colore" in _rw481 and "decide cosa e' ammesso" not in _rw481,
+      _tp474[:400])
+_q1486 = _lib474[_lib474.find("## 1quinquies"):_lib474.find("\n## ", _lib474.find("## 1quinquies") + 1)]
+check("v486 la decisione del 15/10 e' nel libro, con le parole del CEO: nella reazione dell'arancione e fra le "
+      "decisioni (§1quinquies) — una decisione riassunta a memoria cambia verso senza rompere niente (v474)",
+      "non vendi sui ribassi ma sui massimi" in _rz484.get("arancione", "") and "15/10/2026" in _rz484.get("arancione", "")
+      and "NON è stato eseguito" in _q1486 and "15/10/2026" in _q1486 and "una volta per discesa" in _rsv486,
+      _q1486[-500:])
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

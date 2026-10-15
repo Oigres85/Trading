@@ -24,10 +24,14 @@ v474 (decisioni del CEO del 09/10/2026) — tre blocchi nuovi, tutti CALCOLATI q
 v484 (decisioni del CEO del 14/10/2026, sera) — tre blocchi nuovi, anche questi CALCOLATI qui:
   SALVAVITA           il calo dell'azionario dal suo massimo sul rendimento ponderato per il tempo del
                       registro; a -30% scatta il gradino di riduzione, qualunque sia il colore;
-  PIANO DI RIDUZIONE  il gradino dell'arancione e del salvavita calcolato PRIMA: un terzo dei
-                      semiconduttori del libro, in proporzione al rischio di ciascuno — azioni intere,
-                      imposta, rischio in dollari prima e dopo;
+  PIANO DI RIDUZIONE  il gradino del salvavita calcolato PRIMA: un terzo dei semiconduttori del
+                      libro, in proporzione al rischio di ciascuno — azioni intere, imposta, rischio
+                      in dollari prima e dopo;
   SCADENZE            ogni CONFLITTO con i suoi conti successivi e l'esame scritto prima (§1quinquies).
+
+v486 (decisione del CEO del 15/10/2026, «non vendi sui ribassi ma sui massimi») — al primo arancione
+il gradino non e' stato eseguito e la regola e' cambiata: arancione e rosso restano COLORI (un segnale,
+e una prova CONTRO nella tenuta) ma non vendono piu'. Il piano si esegue solo col salvavita scattato.
 """
 import argparse, json, math, re, sys
 from concurrent.futures import ThreadPoolExecutor
@@ -560,7 +564,7 @@ def righe_semaforo(s, precedente=None, mcr=None):
     else:
         L.append(f"  prezzo: SMH chiusura {_it(p['chiusura'])} · media 50 {_it(p['sma50'])} ({_sg(p['d50_atr'])} ATR) · "
                  f"media 200 {_it(p['sma200'])} ({_sg(p['d200_atr'])} ATR) — {st(p)}"
-                 + (" · SOTTO LA MEDIA A 200, il gradino del rosso" if p.get("sotto200") else ""))
+                 + (" · SOTTO LA MEDIA A 200, il livello del rosso" if p.get("sotto200") else ""))
     ld = f["leader"]
     parti = [(f"{r['tk']} {_sg(r['d50_atr'])} ATR dalla media 50, volume "
               + ("n.d." if r["vol_pct"] is None else f"{r['vol_pct']:.0f}/100")) if r["misurato"] else f"{r['tk']} n.d."
@@ -602,7 +606,8 @@ def righe_semaforo(s, precedente=None, mcr=None):
     L.append(f"  reazione {ARTICOLO[s['colore']]} (LIBRO.md §1ter, parola per parola): «{reaz}»" if reaz else
              f"  ⚠ reazione {ARTICOLO[s['colore']]} NON letta da LIBRO.md §1ter: la regola va riletta a mano")
     if s["colore"] in ("arancione", "rosso") and mcr:
-        L.append("  chi pesa di più nel rischio oggi (contributo di Euler) — le azioni da vendere le ripartisce il blocco PIANO DI RIDUZIONE: "
+        L.append("  chi pesa di più nel rischio oggi (contributo di Euler) — un'informazione, non una vendita: dal "
+                 "15/10/2026 arancione e rosso non vendono, l'unica vendita automatica è il salvavita (LIBRO.md §1ter): "
                  + " · ".join(f"{t} {_it(v * 100, 1)}%" for t, v in sorted(mcr.items(), key=lambda x: -x[1])[:4]))
     return L
 
@@ -1203,7 +1208,8 @@ def righe_tenuta(t):
         L.append(f"  ⚠ esito PROVVISORIO per {', '.join(prov)}: una prova non si misura, e col dato che manca l'esito "
                  "può cambiare nei versi indicati sulla riga")
     if col in ("arancione", "rosso"):
-        L.append(f"  ⚠ semaforo {col}: la sua reazione (LIBRO.md §1ter) vale anche per i nomi da lasciar correre")
+        L.append(f"  ⚠ semaforo {col}: è una prova CONTRO per ogni nome (famiglia macro), non una vendita — dal 15/10/2026 "
+                 "arancione e rosso non vendono, l'unica vendita automatica è il salvavita (LIBRO.md §1ter)")
     vend = [r for r in t["righe"] if r["esito"] == "VENDITA PER EVIDENZA"]
     gia = [r["tk"] for r in vend if r["vendita_aperta"]]
     nuove = [r["tk"] for r in vend if not r["vendita_aperta"]]
@@ -1463,7 +1469,10 @@ def righe_registro(reg):
 # Il piano si calcola PRIMA (§1ter: "si decidono PRIMA i segnali e la reazione, poi si esegue senza
 # ridiscuterla"): il 14/10 SMH stava l'1,4% sopra la propria media a 50 col credito gia' acceso, cioe' a
 # una seduta normale dall'arancione. E' la regola del CEO applicata, non una raccomandazione (v439).
-QUOTA_GRADINO = 1 / 3        # «circa un terzo» (arancione), «un altro terzo» (rosso): LIBRO.md §1ter
+# v486 — 15/10/2026: l'arancione e' arrivato e il CEO non ha eseguito il gradino («non vendi sui ribassi ma
+# sui massimi»); alle due domande ha risposto «Solo il salvavita» e «Solo col semaforo acceso». Quindi il
+# gradino resta, calcolato ogni giorno, ma si esegue SOLO col salvavita scattato: arancione e rosso no.
+QUOTA_GRADINO = 1 / 3        # «un terzo dei semiconduttori», il gradino del salvavita: LIBRO.md §1ter
 SOGLIA_SALVAVITA = -0.30     # convenzione scelta col CEO il 14/10 (v240): un gate la rilegge dal libro
 GIORNI_ESAME = 7             # l'esame di un conflitto si manda al CEO la settimana prima dei conti
 
@@ -1548,19 +1557,21 @@ def piano_riduzione(semi, val, qty, px, pmc, mcr, R=None, nomi_R=None, quota=QUO
 
 
 def righe_piano(p, colore=None, salv=None):
-    """Il piano in parole. Da eseguire solo con l'arancione (o il rosso, per il terzo successivo) o col
-    salvavita scattato: negli altri colori si stampa perche' la reazione si decide prima (§1ter)."""
+    """Il piano in parole. Da eseguire SOLO col salvavita scattato (v486, decisione del CEO del 15/10/2026:
+    arancione e rosso non vendono piu'): in ogni altro caso si stampa perche' la reazione si decide prima
+    (§1ter), e il colore si nomina perche' chi legge non lo scambi per un ordine."""
     if not p:
         return []
     if p.get("errore"):
         return [f"PIANO DI RIDUZIONE: NON calcolato — {p['errore']}"]
     pc = lambda x, d=1: "n.d." if x is None else _it(x * 100, d)
-    attivo = colore in ("arancione", "rosso") or bool((salv or {}).get("scattato_il"))
-    L = [("⚠⚠ " if attivo else "") + "PIANO DI RIDUZIONE — il gradino dell'arancione e del salvavita, calcolato prima "
-         "(LIBRO.md §1ter, decisione del CEO del 14/10/2026: un terzo dei semiconduttori, in proporzione al rischio di "
-         f"ciascuno) · semaforo {colore or 'n.d.'}"
-         + (" · DA ESEGUIRE: la sua condizione è accesa" if attivo else
-            " · si esegue SOLO con l'arancione o col salvavita scattato")]
+    attivo = bool((salv or {}).get("scattato_il"))
+    L = [("⚠⚠ " if attivo else "") + "PIANO DI RIDUZIONE — il gradino del salvavita, calcolato prima "
+         "(LIBRO.md §1ter, decisioni del CEO del 14/10/2026: un terzo dei semiconduttori, in proporzione al rischio di "
+         f"ciascuno; e del 15/10/2026: arancione e rosso non vendono) · semaforo {colore or 'n.d.'}"
+         + (" · DA ESEGUIRE: il salvavita è scattato" if attivo else
+            " · si esegue SOLO col salvavita scattato"
+            + (f" — il semaforo {colore} è un segnale, non una vendita" if colore in ("arancione", "rosso") else ""))]
     if not p["presenti"]:
         L.append("  nessun semiconduttore dell'elenco di LIBRO.md §1ter è in portafoglio: il gradino non ha niente da togliere")
     else:
@@ -1597,9 +1608,9 @@ def righe_piano(p, colore=None, salv=None):
                  "è un semiconduttore, l'elenco va corretto in LIBRO.md §1ter")
     if p["fuori_elenco"]:
         L.append(f"  ⚠ nell'elenco dei semiconduttori ma non in portafoglio: {', '.join(p['fuori_elenco'])}")
-    L.append("  ⚠ è la regola del CEO applicata, non una raccomandazione · un terzo dei semiconduttori di OGGI: se il "
-             "gradino è già stato eseguito in questa discesa (annotato in §1quinquies), il prossimo è il rosso — un altro "
-             "terzo con lo stesso criterio · azioni intere, le più vicine · imposta in dollari al prezzo di oggi: il "
+    L.append("  ⚠ è la regola del CEO applicata, non una raccomandazione · un terzo dei semiconduttori di OGGI · il "
+             "salvavita scatta una volta per discesa, e dopo il suo gradino non ce n'è un secondo automatico (decisione "
+             "del CEO del 15/10/2026) · azioni intere, le più vicine · imposta in dollari al prezzo di oggi: il "
              "conto vero lo fa il broker in euro col cambio di carico")
     return L
 
@@ -1652,8 +1663,8 @@ def righe_salvavita(s):
     if s["scattato_il"]:
         L = [f"⚠⚠ SALVAVITA SCATTATO il {s['scattato_il']}: l'azionario è {_sg(s['calo'] * 100, 2)}% dal massimo del "
              f"{s['massimo']} (soglia {soglia}%) — la reazione è il gradino del blocco PIANO DI RIDUZIONE, qualunque sia "
-             "il colore del semaforo; se in questa discesa è già stato eseguito, vale il rosso (LIBRO.md §1ter) · va in "
-             "cima alla risposta, prima di tutto il resto"]
+             "il colore del semaforo: è l'unica vendita automatica del libro, una volta per discesa (LIBRO.md §1ter, "
+             "decisione del CEO del 15/10/2026) · va in cima alla risposta, prima di tutto il resto"]
     else:
         L = [f"SALVAVITA (LIBRO.md §1ter, decisione del CEO del 14/10/2026) — azionario {_sg(s['calo'] * 100, 2)}% dal "
              f"massimo del {s['massimo']} · scatta a {soglia}%, cioè con un altro {_sg(s['ulteriore'] * 100, 1)}% da qui · "

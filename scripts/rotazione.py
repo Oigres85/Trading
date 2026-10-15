@@ -679,8 +679,9 @@ def righe_watchlist(o):
          "   zona d'ingresso = sopra la media a 200, fra 1 ATR sotto e 2 ATR sopra la media a 50 (le medie di oggi); "
          "il candidato chiede in piu' media a 50 in salita e correlazione col libro sotto 0,5 · dentro ogni gruppo "
          "l'ordine e' la distanza dalla zona in ATR, un fatto e non una classifica",
-         "   ⚠ il SEMAFORO decide cosa e' ammesso (LIBRO.md §1ter): il settore di un titolo NON e' in questi dati, "
-         "la correlazione col libro si'"]
+         "   ⚠ il SEMAFORO non vieta ingressi in nessun colore (LIBRO.md §1ter, decisioni del CEO del 09/10 e del "
+         "15/10): il settore di un titolo NON e' in questi dati, la correlazione col libro si' — chi e' nella stessa "
+         "scommessa lo dichiara"]
     if o.get("spy_assente"):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
     sem = o.get("semaforo") or {}
@@ -797,8 +798,9 @@ def righe_piano(o):
          + ": unità di calcolo, NON una quantità consigliata · volatilità e beta del LIBRO AZIONARIO sulle stesse date comuni "
            "a libro, QQQ e titolo (fino a 250 sedute; il livello del libro è nel blocco NUMERI) · perdita allo stop = unità × "
            "(stop / ingresso − 1)",
-         "   il SEMAFORO decide il gradino (numeri_libro.py, LIBRO.md §1ter): in giallo nessun divieto, ogni ingresso porta "
-         "le sue conseguenze; in arancione e rosso vale prima la riduzione del gradino"]
+         "   il SEMAFORO non vieta ingressi (numeri_libro.py, LIBRO.md §1ter): in giallo, arancione e rosso ogni ingresso "
+         "porta le sue conseguenze — dal 15/10/2026 arancione e rosso non vendono; col salvavita scattato vale prima il "
+         "suo gradino"]
     if quota_txt:
         L.append(f"   {quota_txt}")
     if pi.get("qqq_assente"):
