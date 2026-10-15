@@ -7170,3 +7170,37 @@ pavimenti.
 giorno, quando SPCX è entrata nell'analisi.
 Pavimento di `test_analisi_libro.py` 435 → 460 (i punti di chiamata sono 473). `?v=` e `BUILD_VERSION` non
 toccati: nessun file servito al browser (v440).
+
+## ⏱️ v490 — L'ORDINE GIORNALIERO FINISCE CON LA SUA SEDUTA, E LA LIQUIDITÀ SI SCRIVE IN TUTTO
+
+Il CEO, 15/10/2026 sera, testuale: *"Ordini giornalieri per ora"* e *"Liquidità è 56.600 euro senza contare la
+liquidità bloccata per gli ordini non ancora eseguiti"*. Due fatti, e il primo il sistema non poteva rappresentarlo:
+la tabella degli ordini (v489) non aveva una validità, quindi l'analisi del mattino dopo avrebbe mostrato **ancora
+attivi** tre ordini scaduti alle 22:00 della sera prima — e ne avrebbe contato la spesa come liquidità bloccata. Un
+registro che invecchia da solo (v410), dentro il blocco nato il giorno stesso per tenere onesti gli ordini.
+
+- **La validità sta nell'ultima colonna** di `LIBRO.md` §1septies (`giornaliero` · `fino a revoca`): in CODA, così le
+  prime sei non si spostano (v208). Una validità non dichiarata **non si indovina**: l'ordine resta attivo e la resa
+  lo dice; un testo non riconosciuto si conserva com'è scritto.
+- **Dopo la campana della sua seduta** (la regola di `brief.dopo_la_campana`, v485 — una regola, un posto) un ordine
+  giornaliero esce dagli attivi e va fra gli **ESEGUITI o SCADUTI**, col minimo di QUELLA seduta accanto al limite:
+  al limite o sotto = *può essere stato eseguito*; sopra = *scaduto senza esecuzione*. Lo sa il conto, non il
+  calcolo: la risposta lo chiede al CEO. La barra della seduta vince sulla quota; senza barra decide la quota della
+  stessa seduta.
+- **La campana in ora italiana viene dal fuso** (v470): 22:00 di solito, 21:00 nelle settimane di fine ottobre e di
+  marzo in cui le due ore legali non coincidono. Un +6 scritto a mano ne sbaglia due su quattro, e il gate lo prova.
+- **La liquidità di §1 si scrive IN TUTTO, bloccata compresa**: un ordine non eseguito non ha speso niente. Se si
+  esegue, si toglie la sua spesa e entra la posizione; se scade, il numero non cambia. La **libera** la calcola il
+  blocco ORDINI APERTI togliendo gli ordini ancora attivi — anche quelli non valutabili, che il broker blocca lo
+  stesso. Sui dati veri: 79.400 € in tutto, bloccati ≈ 22.802 €, **libera ≈ 56.598 €**: il blocco ritrova da solo la
+  cifra dichiarata dal CEO, che è la prova che la premessa è giusta.
+- ⚠ **Il totale è salito di ~25.500 € rispetto alla stima precedente** (~53.870 €), che non era una dichiarazione ma
+  un conto: il libro la diceva già sottostimata finché il ricavato di GOOGL e WDC non fosse confermato. La quota
+  azionaria del patrimonio scende da circa 71,5% a circa 66,4% — è il moltiplicatore con cui VaR, ES e drawdown
+  passano al patrimonio (v432). `config/portfolio_state.json` allineato (gate v479).
+
+Dieci iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: **mordono tutte, ciascuna
+sul controllo atteso** — il ramo dei chiusi spento, la campana ignorata, l'ora italiana scritta a mano, il tocco al
+rovescio, la barra ignorata, la bloccata che conta i chiusi, il collegamento in `calcola`, la colonna sbagliata, la
+testa senza validità, la libera sommata. Pavimento di `test_analisi_libro.py` 460 → 470 (i check sono 493). `?v=` e
+`BUILD_VERSION` non toccati: nessun file servito al browser (v440).

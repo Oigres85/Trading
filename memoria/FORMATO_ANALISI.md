@@ -103,6 +103,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    volume della seduta; e l'insieme degli ordini sul libro. La risposta dice ordine per ordine:
    lasciarlo, spostarlo (a quale prezzo) o toglierlo. Un ordine eseguito si registra in §1 e
    lascia la tabella.
+   Da v490 ogni ordine porta la sua **validità** (ultima colonna di §1septies): un ordine **giornaliero**, dopo la
+   campana della sua seduta, non è più attivo — il blocco lo mette fra gli ESEGUITI o SCADUTI col minimo della
+   seduta accanto al limite, e la risposta chiede al CEO quale dei due. L'INSIEME dice la **liquidità bloccata**
+   dagli ordini attivi e la **libera** (`LIBRO.md` §1 scrive la liquidità in tutto, bloccata compresa).
    Le date dei conti vengono dal calendario Nasdaq e, per chi non c'è, da quelle **dichiarate
    dall'emittente** (`LIBRO.md` §1octies, v489): il 15/10 SK hynix mancava dal calendario.
 0ter. **Credito sul libro** (v467, regola in `memoria/LIBRO.md` §1ter): il blocco `CREDITO SUL
@@ -218,7 +222,8 @@ salvavita, e nessuna presa di profitto ai massimi (15/10) · ingressi sui minimi
 watchlist, con ordine, stop e perdita per 5.000 € (15/10) · gli ordini aperti seguiti a ogni analisi, con storno o
 discesa e il rischio di alzare il limite (15/10) · i pavimenti delle posizioni e la media sui pavimenti sotto il
 carico (15/10) · i volumi, anche della seduta in corso col tempo trascorso (15/10) · le date dei conti dichiarate
-dall'emittente (15/10) · gli ingressi in ordine d'interesse, con prezzi e motivazioni (15/10).
+dall'emittente (15/10) · gli ingressi in ordine d'interesse, con prezzi e motivazioni (15/10) · gli ordini
+giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

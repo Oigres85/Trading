@@ -3622,6 +3622,99 @@ check("v489 il formato porta gli ordini aperti, la media sui pavimenti, i volumi
       and "gli ordini aperti seguiti a ogni analisi" in _cl489f and "le date dei conti dichiarate" in _cl489f)
 
 
+# ================================================================ v490 — gli ordini giornalieri e la liquidità bloccata
+# Il CEO, 15/10/2026 sera: «Ordini giornalieri per ora» e «Liquidità è 56.600 euro senza contare la liquidità bloccata
+# per gli ordini non ancora eseguiti». Un ordine giornaliero, dopo la campana della sua seduta, non è più attivo: è
+# ESEGUITO o SCADUTO, e lo sa il conto. Senza questo l'analisi del mattino dopo lo mostrava ancora attivo e ne contava la
+# spesa come liquidità bloccata (un registro che invecchia da solo, v410). Ogni stato si COSTRUISCE (v425, v429): orari
+# fissi, barre sintetiche.
+_lib490 = ("## 1septies. ORDINI APERTI — x\n\n| Nome | Verso | Quantità | Limite | Inserito | Stato | Validità |\n"
+           "|---|---|---|---|---|---|---|\n| AAA | acquisto | 100 | 105,00 | 2026-10-09 | attivo | giornaliero |\n"
+           "| BBB | acquisto | 100 | 95,00 | 2026-10-09 | attivo | Fino a revoca |\n"
+           "| CCC | acquisto | 100 | 100,00 | 2026-10-09 | attivo |\n"
+           "| DDD | acquisto | 10 | 50,00 | 2026-10-09 | attivo | GTD 20/10 |\n"
+           "| EEE | acquisto | 10 | 50,00 | ieri | attivo | giornaliera |\n")
+_or490 = NL.leggi_ordini(_lib490)
+check("v490 la validità si legge dall'ultima colonna senza spostare le prime sei: giornaliero, fino a revoca, non "
+      "dichiarata (None), un testo non riconosciuto resta com'è scritto",
+      [o["validita"] for o in _or490] == ["giornaliero", "fino a revoca", None, "gtd 20/10", "giornaliero"]
+      and [o["tk"] for o in _or490] == ["AAA", "BBB", "CCC", "DDD", "EEE"] and _or490[1]["limite"] == 95.0
+      and all(o["attivo"] for o in _or490) and _or490[3]["validita_testo"] == "GTD 20/10"
+      and _or490[0]["inserito"] == "2026-10-09", str(_or490))
+
+_bA490 = _barre474(_sale, fine="2026-10-09")              # la barra del 09/10 ha il minimo a ~222: non tocca 105
+_bA490t = [dict(x) for x in _bA490]
+_bA490t[-1]["l"] = 104.0                                   # qui la seduta del 09/10 ha toccato il limite (105)
+def _vo490(adesso, barre_a=None, cassa=100000.0):
+    b = {"AAA": barre_a or _bA490, "BBB": _b489["BBB"], "CCC": _b489["CCC"]}
+    t = {"AAA": _tec489(), "BBB": _tec489(lo=96.0), "CCC": _tec489()}
+    return NL.valuta_ordini(_or490, b, t, {k: _lu489 for k in b}, _cal489, {}, _sem481(), _rl489, _rq489,
+                            100000.0, 1.12, adesso, cassa_eur=cassa)
+_in490 = _vo490(_ny489)                                                    # 09/10 alle 11:00: seduta aperta
+_ch490 = _vo490(_dt474(2026, 10, 9, 16, 30, tzinfo=_NY474))               # lo stesso giorno, dopo la campana
+_lu490 = _vo490(_dt474(2026, 10, 12, 10, 0, tzinfo=_NY474), _bA490t)       # il lunedì dopo
+_qu490 = _vo490(_dt474(2026, 10, 9, 16, 30, tzinfo=_NY474), _b489["AAA"])  # senza la barra del 09/10: decide la quota
+def _tk490(o):
+    return [x["tk"] for x in o["righe"]]
+check("v490 un ordine giornaliero è attivo durante la sua seduta e non più dopo la campana — lo stesso giorno e i giorni "
+      "dopo; fino a revoca e senza validità dichiarata restano attivi; una data illeggibile non si decide",
+      _tk490(_in490) == ["AAA", "BBB", "CCC", "DDD", "EEE"] and _tk490(_ch490) == ["BBB", "CCC", "DDD", "EEE"]
+      and _tk490(_lu490) == ["BBB", "CCC", "DDD", "EEE"] and _in490["chiusi"] == []
+      and [o["tk"] for o in _ch490["chiusi"]] == ["AAA"] and [o["tk"] for o in _lu490["chiusi"]] == ["AAA"],
+      str((_tk490(_in490), _tk490(_ch490), _tk490(_lu490), [o["tk"] for o in _ch490.get("chiusi", [])])))
+_c490 = [((o.get("chiusi") or [{}])[0]).get("toccato") for o in (_ch490, _lu490, _qu490)]
+check("v490 eseguito o scaduto dal minimo di QUELLA seduta: sopra il limite = scaduto, al limite o sotto = può essere "
+      "eseguito; la barra della seduta vince sulla quota, e senza barra decide la quota della stessa seduta",
+      _c490 == [False, True, True] and abs(_ch490["chiusi"][0]["minimo_seduta"] - 224.5 * 0.99) < 1e-9
+      and _qu490["chiusi"][0]["minimo_seduta"] == 104.0, str(_c490))
+_imp490 = 100 * 105 + 100 * 95 + 100 * 100 + 10 * 50 + 10 * 50          # gli acquisti attivi, anche i non valutabili
+check("v490 la liquidità bloccata è la spesa ai limiti degli ordini ATTIVI (anche di quelli non valutabili: il broker la "
+      "blocca lo stesso), in euro al cambio; la libera è la liquidità di LIBRO.md §1 meno la bloccata; dopo la campana "
+      "l'ordine giornaliero non blocca più niente",
+      abs(_in490["insieme"]["impegnata_usd"] - _imp490) < 1e-6
+      and abs(_in490["insieme"]["impegnata_eur"] - _imp490 / 1.12) < 1e-6
+      and abs(_in490["insieme"]["libera_eur"] - (100000.0 - _imp490 / 1.12)) < 1e-6
+      and abs(_ch490["insieme"]["impegnata_usd"] - (_imp490 - 100 * 105)) < 1e-6,
+      str((_in490["insieme"].get("impegnata_usd"), _ch490["insieme"].get("impegnata_usd"))))
+_r490 = "\n".join(NL.righe_ordini(_in490))
+check("v490 resa: la testa porta la validità — la scadenza giornaliera in ora italiana, fino a revoca, non dichiarata o "
+      "non riconosciuta, la data illeggibile; l'INSIEME porta la liquidità bloccata e la libera",
+      "giornaliero: scade alla campana delle 22:00 italiane del 09/10, se non eseguito" in _r490
+      and "BBB acquisto 100 a 95,00 (inserito 2026-10-09) · fino a revoca" in _r490
+      and "CCC acquisto 100 a 100,00 (inserito 2026-10-09) · validità non dichiarata" in _r490
+      and "validità «GTD 20/10» non riconosciuta" in _r490 and "la data d'inserimento non si legge" in _r490
+      and f"liquidità bloccata dagli ordini attivi ≈ {NL._it(_imp490 / 1.12, 0)} €" in _r490
+      and f"libera ≈ {NL._it(100000.0 - _imp490 / 1.12, 0)} € sui 100.000 € di LIBRO.md §1" in _r490, _r490[:2500])
+_rc490 = "\n".join(NL.righe_ordini(_lu490))
+_rx490 = "\n".join(NL.righe_ordini(_ch490))
+check("v490 resa degli ordini chiusi: fuori dagli attivi, nominati con la loro seduta e col minimo accanto al limite — "
+      "ESEGUITO possibile o SCADUTO senza esecuzione",
+      "ordini GIORNALIERI di sedute già chiuse: ESEGUITI o SCADUTI" in _rc490
+      and ("AAA acquisto 100 a 105,00 (seduta del 2026-10-09) · il minimo della seduta (104,00) ha raggiunto il limite: "
+           "può essere stato ESEGUITO") in _rc490
+      and f"({NL._it(224.5 * 0.99)}) non ha raggiunto il limite: SCADUTO senza esecuzione" in _rx490
+      and "\n  AAA acquisto" not in _rc490 and "\n  AAA acquisto" not in _rx490, _rc490[-1500:])
+_nc490 = "\n".join(NL.righe_ordini(_vo490(_ny489, cassa=None)))
+check("v490 senza la liquidità di LIBRO.md la libera non si calcola, e lo si dice invece di stamparne una",
+      "la liquidità di LIBRO.md §1 non si legge: la libera non si calcola" in _nc490 and "libera ≈" not in _nc490,
+      _nc490[-700:])
+_dst490 = [NL.chiusura_seduta(g) for g in ("2026-10-15", "2026-10-27", "2026-11-03", "2026-03-10")]
+check("v490 la campana in ora italiana viene dal fuso, mai da uno scarto a mano: 22:00 di solito, 21:00 nelle settimane "
+      "in cui le due ore legali non coincidono (fine ottobre, marzo); un giorno illeggibile non ha campana",
+      [x.hour if x else None for x in _dst490] == [22, 21, 22, 21] and NL.chiusura_seduta("ieri") is None, str(_dst490))
+check("v490 la seduta di un giorno finisce alla campana delle 16:00 di New York (la regola di brief.dopo_la_campana, "
+      "v485): alle 15:59 no, alle 16:00 sì, il giorno dopo sì, il giorno prima no",
+      [NL.seduta_finita("2026-10-09", _dt474(2026, 10, 9, h, m, tzinfo=_NY474)) for h, m in ((15, 59), (16, 0))]
+      == [False, True] and NL.seduta_finita("2026-10-09", _dt474(2026, 10, 10, 9, 0, tzinfo=_NY474)) is True
+      and NL.seduta_finita("2026-10-09", _dt474(2026, 10, 8, 18, 0, tzinfo=_NY474)) is False)
+check("v490 collegamento in calcola: la liquidità di LIBRO.md arriva agli ordini aperti",
+      "cassa_eur=cassa_eur" in _calc474.split("valuta_ordini(")[1][:300], _calc474.split("valuta_ordini(")[1][:300])
+_lv490 = NL.testo_libro()
+_s1_490 = _lv490[_lv490.find("## 1. POSIZIONI"):_lv490.find("\n## 1bis")]
+check("v490 LIBRO.md §1 dichiara la liquidità IN TUTTO, bloccata compresa: è la premessa su cui la libera si calcola "
+      "togliendo gli ordini attivi",
+      any("Liquidità:" in r and "bloccata compresa" in r for r in _s1_490.splitlines()), _s1_490[:300])
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

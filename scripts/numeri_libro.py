@@ -197,7 +197,7 @@ def calcola(sedute=1, registra=False, adesso=None):
     out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
                                      decisioni, media, pav)
     out["ordini"] = valuta_ordini(ordini, B, TEC, BL, out["calendario"], righe_pipeline(pipe), out["semaforo"],
-                                  media["rlibro"], media["rqqq"], tot, media["fx"], adesso)
+                                  media["rlibro"], media["rqqq"], tot, media["fx"], adesso, cassa_eur=cassa_eur)
     out["rimandate"] = leggi_rimandate()          # v483 — le decisioni che aspettano un evento
     # v484 — ogni CONFLITTO con la sua scadenza (i conti successivi) e l'esame scritto prima (LIBRO.md §1sexies)
     scad = {}
@@ -820,6 +820,44 @@ def righe_rimandate(rr, calendario, finestra=45):
 # a decidere se lasciarlo, spostarlo o toglierlo. Solo fatti misurati: la frase la scrive la resa (v448).
 NATURA = {"intatta": "STORNO", "in correzione": "STORNO", "rotta": "DISCESA"}
 
+# v490 — la VALIDITA' dell'ordine (CEO, 15/10/2026 sera, testuale: "Ordini giornalieri per ora"). Un ordine
+#   giornaliero finisce con la propria seduta: dopo la campana non e' piu' "attivo", e' ESEGUITO o SCADUTO, e lo
+#   sa solo il conto. Senza questa distinzione l'analisi del mattino dopo lo mostrava ancora attivo — un registro
+#   che invecchia da solo (v410), dentro il blocco nato per tenere onesti gli ordini — e contava la sua spesa
+#   come liquidita' ancora impegnata. La campana e' quella di brief.dopo_la_campana (v485): una regola, un posto
+#   (v161). Una validita' non dichiarata NON si indovina: l'ordine resta attivo, e la resa lo dice.
+VALIDITA = {"giornaliero": ("giornalier", "giorno", "day"), "fino a revoca": ("fino a revoca", "revoca", "gtc")}
+
+
+def validita_ordine(testo):
+    """'giornaliero' · 'fino a revoca' · None (non dichiarata) · il testo stesso, se non si riconosce."""
+    t = (testo or "").strip().lower()
+    if not t:
+        return None
+    return next((v for v, parole in VALIDITA.items() if t.startswith(parole)), t)
+
+
+def chiusura_seduta(giorno):
+    """La campana delle 16:00 di New York del `giorno` (ISO) in ora italiana: 22:00 di solito, 21:00 nelle
+    settimane in cui le due ore legali non coincidono — dal fuso, mai uno scarto a mano (v470). None se il giorno
+    non si legge."""
+    import brief
+    if not re.match(r"\d{4}-\d{2}-\d{2}$", str(giorno or "")[:10]) or len(str(giorno)) < 10:
+        return None
+    g = datetime.fromisoformat(str(giorno)[:10])
+    return datetime(g.year, g.month, g.day, 16, 0, tzinfo=brief.NEW_YORK).astimezone(brief.ROMA)
+
+
+def seduta_finita(giorno, adesso=None):
+    """Vero se la seduta regolare del `giorno` (ISO) e' chiusa: un giorno gia' passato a New York, o lo stesso
+    giorno dopo la campana (brief.dopo_la_campana, v485). None se il giorno non si legge: non si decide."""
+    import brief
+    if chiusura_seduta(giorno) is None:
+        return None
+    ny = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
+    g = str(giorno)[:10]
+    return g < ny.date().isoformat() or brief.dopo_la_campana(g, ny)
+
 
 def leggi_ordini(testo=None):
     """La tabella ORDINI APERTI di LIBRO.md (§1septies): ordini con limite inseriti dal CEO e non ancora
@@ -839,13 +877,16 @@ def leggi_ordini(testo=None):
         if len(celle) < 6 or celle[0] in ("Nome", "") or set(celle[0]) <= set("-: "):
             continue
         tk, verso, q, lim, ins, stato = celle[:6]
+        val = celle[6] if len(celle) > 6 else ""        # v490 — la validita' sta IN CODA: le prime sei non si spostano
         out.append({"tk": tk.upper(), "verso_testo": verso, "qta": _num_it(q), "limite": _num_it(lim),
                     "verso": next((v for v, parole in VERSI.items() if verso.lower().startswith(parole)), None),
-                    "inserito": ins, "stato": stato, "attivo": stato.lower().startswith(("attivo", "aperto"))})
+                    "inserito": ins, "stato": stato, "attivo": stato.lower().startswith(("attivo", "aperto")),
+                    "validita": validita_ordine(val), "validita_testo": val})
     return out if trovata else None
 
 
-def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rqqq, valore_libro, fx, adesso=None):
+def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rqqq, valore_libro, fx, adesso=None,
+                  cassa_eur=None):
     """Per ogni ordine d'ACQUISTO attivo: la distanza dal prezzo; se il minimo della seduta di OGGI ha toccato il
     limite (l'ordine può essere già eseguito: si verifica sul conto); STORNO o DISCESA dalla tendenza della tenuta
     (§1sexies) e se alzare il limite è coerente con la regola dei minimi (§1bis); il pavimento SOTTO IL LIMITE con
@@ -860,14 +901,29 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
     prime = {}
     for e in (calendario or {}).get("attesi") or []:
         prime.setdefault(e["tk"], e)                       # gli attesi arrivano gia' in ordine di data
-    out, spese, rend = [], {}, {}
+    out, spese, rend, chiusi = [], {}, {}, []
     for o in ordini:
         if not o["attivo"]:
+            continue
+        if o.get("validita") == "giornaliero" and seduta_finita(o["inserito"], ny):
+            # v490 — la sua seduta e' chiusa: ESEGUITO o SCADUTO, non piu' attivo. Il minimo (o il massimo, per una
+            #   vendita) di QUELLA seduta dice se il limite e' stato raggiunto: un acquisto con limite non si esegue
+            #   sopra il limite. Dalla barra della seduta; la sera stessa, se la barra non c'e', dalla quota
+            g, t = str(o["inserito"])[:10], tec.get(o["tk"]) or {}
+            bar = next((x for x in (barre.get(o["tk"]) or []) if str(x.get("t"))[:10] == g), None)
+            lo, hi = (bar or {}).get("l"), (bar or {}).get("h")
+            if bar is None and t.get("seduta_quota") == g:
+                lo, hi = t.get("minimo_oggi"), t.get("massimo_oggi")
+            lim = o.get("limite")
+            toccato = (None if not lim else lo <= lim if (o["verso"] == "acquisto" and lo is not None)
+                       else hi >= lim if (o["verso"] == "vendita" and hi is not None) else None)
+            chiusi.append({**o, "minimo_seduta": lo, "massimo_seduta": hi, "toccato": toccato})
             continue
         t, b = tec.get(o["tk"]) or {}, barre.get(o["tk"]) or []
         px, lim, q, atr = t.get("px"), o["limite"], o["qta"], t.get("atr")
         r = {**o, "px": px, "var_pct": t.get("var_pct"), "seduta_quota": t.get("seduta_quota"),
-             "minimo_oggi": t.get("minimo_oggi"), "quota_ora": t.get("quota_ora")}
+             "minimo_oggi": t.get("minimo_oggi"), "quota_ora": t.get("quota_ora"),
+             "scade": chiusura_seduta(o["inserito"]) if o.get("validita") == "giornaliero" else None}
         if o["verso"] != "acquisto":
             out.append({**r, "errore": f"verso «{o['verso_testo']}»: il blocco valuta gli ordini d'acquisto"})
             continue
@@ -914,10 +970,16 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
         serie = {d: sum(spese[k] * rend[k][d] for k in spese) / tot for d in comuni}
         valutati = [x for x in out if not x.get("errore")]
         rv = [x["rischio"] for x in valutati if x.get("rischio") is not None]
+        # v490 — la liquidita' che gli ordini ATTIVI tengono bloccata sul conto: ogni acquisto con limite, anche
+        #   quello non valutabile qui (il broker lo blocca lo stesso). LIBRO.md §1 dichiara la liquidita' IN TUTTO,
+        #   bloccata compresa: un ordine non eseguito non ha speso niente. La libera e' la differenza
+        imp = sum(x["qta"] * x["limite"] for x in out if x.get("verso") == "acquisto" and x.get("qta") and x.get("limite"))
         insieme = {"spesa": tot, "nomi": len(spese), "fx": fx, "rischio": sum(rv) if rv else None,
                    "rischio_completo": len(rv) == len(valutati),
-                   "conseguenze": rotazione.conseguenze(serie, rlibro or {}, rqqq or {}, valore_libro, tot)}
-    return {"righe": out, "insieme": insieme, "inattivi": [o for o in ordini if not o["attivo"]]}
+                   "conseguenze": rotazione.conseguenze(serie, rlibro or {}, rqqq or {}, valore_libro, tot),
+                   "impegnata_usd": imp, "impegnata_eur": imp / fx if fx else None, "cassa_eur": cassa_eur,
+                   "libera_eur": (cassa_eur - imp / fx) if (fx and cassa_eur is not None) else None}
+    return {"righe": out, "insieme": insieme, "inattivi": [o for o in ordini if not o["attivo"]], "chiusi": chiusi}
 
 
 def righe_ordini(oo, finestra=45):
@@ -934,7 +996,8 @@ def righe_ordini(oo, finestra=45):
                  "pavimento · lo stop resta quello del pavimento sotto il limite: alzare il limite allunga la distanza "
                  "dallo stop, e il rischio in più si scrive in dollari")
     for x in oo["righe"]:
-        testa = f"  {x['tk']} {x['verso_testo']} {_it(x['qta'], 0)} a {_it(x['limite'])} (inserito {x['inserito']})"
+        testa = (f"  {x['tk']} {x['verso_testo']} {_it(x['qta'], 0)} a {_it(x['limite'])} (inserito {x['inserito']})"
+                 + testo_validita(x))
         if x.get("errore"):
             L.append(testa + f" · {x['errore']}")
             continue
@@ -1007,10 +1070,47 @@ def righe_ordini(oo, finestra=45):
                   + (f" ≈ {_it(ins['rischio'] / ins['fx'], 0)} €" if ins.get("fx") else "")
                   + ("" if ins["rischio_completo"] else " (parziale: uno o più ordini senza stop)"))
         L.append(s)
+        if ins.get("impegnata_eur") is not None:
+            L.append(f"  liquidità bloccata dagli ordini attivi ≈ {_it(ins['impegnata_eur'], 0)} € ({_it(ins['impegnata_usd'], 0)} $ "
+                     "ai limiti, al cambio di oggi)"
+                     + (f" · libera ≈ {_it(ins['libera_eur'], 0)} € sui {_it(ins['cassa_eur'], 0)} € di LIBRO.md §1, che "
+                        "dichiara la liquidità in tutto, bloccata compresa" if ins.get("libera_eur") is not None else
+                        " · la liquidità di LIBRO.md §1 non si legge: la libera non si calcola"))
+    if oo.get("chiusi"):
+        L.append("  ordini GIORNALIERI di sedute già chiuse: ESEGUITI o SCADUTI — lo sa il conto, non questo calcolo; si "
+                 "verifica e si aggiorna il libro (§1 se eseguito, §1septies in ogni caso)")
+        for o in oo["chiusi"]:
+            q = f"    {o['tk']} {o['verso_testo']} {_it(o['qta'], 0)} a {_it(o['limite'])} (seduta del {o['inserito']})"
+            vendita = o.get("verso") == "vendita"
+            estremo, nome = (o.get("massimo_seduta"), "massimo") if vendita else (o.get("minimo_seduta"), "minimo")
+            if o.get("toccato") is True:
+                q += (f" · il {nome} della seduta ({_it(estremo)}) ha raggiunto il limite: può essere stato ESEGUITO, "
+                      "se l'ordine era già sul conto in quel momento")
+            elif o.get("toccato") is False:
+                q += (f" · il {nome} della seduta ({_it(estremo)}) non ha raggiunto il limite: SCADUTO senza esecuzione, "
+                      "salvo un ordine valido anche fuori dalla seduta regolare")
+            else:
+                q += f" · {nome} della seduta n.d.: eseguito o scaduto non si ricava dai prezzi"
+            L.append(q)
     if oo.get("inattivi"):
         L.append("  in tabella ma non attivi (si tolgono quando eseguiti o revocati, §1septies): "
                  + ", ".join(f"{o['tk']} ({o['stato']})" for o in oo["inattivi"]))
     return L
+
+
+def testo_validita(x):
+    """v490 — la validita' dell'ordine nella sua testa: la scadenza in ora italiana se giornaliero; dichiarato se
+    manca, invece di indovinarla."""
+    v = x.get("validita")
+    if v == "giornaliero":
+        sc = x.get("scade")
+        return (f" · giornaliero: scade alla campana delle {sc:%H:%M} italiane del {sc:%d/%m}, se non eseguito" if sc else
+                " · giornaliero, ma la data d'inserimento non si legge: la scadenza non si calcola")
+    if v == "fino a revoca":
+        return " · fino a revoca"
+    if v is None:
+        return " · validità non dichiarata in §1septies (giornaliero o fino a revoca?)"
+    return f" · validità «{x.get('validita_testo')}» non riconosciuta: vale quella del broker"
 
 
 

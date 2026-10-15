@@ -32,7 +32,15 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | BE | 40 | 214,00 | USD | |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: ~53.870 €** — ~59.000 € fino al 14/10/2026, **meno le due medie** del 14/10: RGTI 200 azioni
+**Liquidità: ~79.400 €** IN TUTTO, bloccata compresa — dichiarata dal CEO il 15/10/2026 sera, testuale: *"Liquidità è
+56.600 euro senza contare la liquidità bloccata per gli ordini non ancora eseguiti"*: **56.600 € liberi** più la parte
+bloccata dai tre ordini giornalieri di §1septies, 25.577,50 $ ai limiti ≈ **22.800 €** al cambio del 15/10 (1,1217) — il
+controvalore esatto lo fissa il broker. La liquidità si scrive in tutto perché un ordine non eseguito non ha speso niente:
+se si esegue, qui si toglie la sua spesa e in alto entra la posizione; se scade, questo numero non cambia. La libera la
+calcola `numeri_libro.py` (blocco «ORDINI APERTI») togliendo gli ordini ancora attivi (v490).
+⚠ È ~25.500 € più della stima precedente, ~53.870 €, che non era una dichiarazione ma un conto: la nota sulle uscite
+da GOOGL e WDC qui sotto la diceva sottostimata. Vale la dichiarazione del CEO.
+Storia della stima precedente: ~59.000 € fino al 14/10/2026, **meno le due medie** del 14/10: RGTI 200 azioni
 per ~2.412 $ (663 × 22,147 − 463 × 26,5048) e CRWV 50 azioni per ~3.290 $ (155 × 87,07 − 105 × 97,199),
 ~5.702 $ in tutto, ≈ 5.126 € a EUR/USD 1,1123, commissioni escluse — **da confermare** col saldo del broker. I ~59.000 € erano ~50.000 € dichiarati dal CEO il 01/10/2026 ("circa", dopo le uscite da
 GOOGL e WDC) **più l'incasso di ORCL del 05/10/2026**: 70 azioni vendute a **145,55 $** = 10.188,50 $
@@ -47,6 +55,8 @@ Destinazione dichiarata: acquisti su storni e IPO di Anthropic.
 > dell'imposta, è **liquidità o è stato reinvestito: da confermare**. Finché non lo è, la
 > liquidità qui sopra è SOTTOSTIMATA, e le misure del livello C sotto (fotografia del 07/09)
 > includono ancora i due titoli: pesi e contributo al rischio vanno ricalcolati.
+> Dal 15/10/2026 sera la liquidità qui sopra è quella **dichiarata dal CEO**, non più un conto: il dubbio sul
+> ricavato di GOOGL e WDC non pesa più su quel numero. Resta valido per la fotografia del 07/09.
 
 ⚠ Il sistema NON conosce: altri conti, altri strumenti, posizioni corte, margine, coperture,
 situazione fiscale. **Il divieto di dimensionare resta in piedi**: direzione, priorità e livelli
@@ -508,14 +518,18 @@ tenuta di tutte le posizioni.
 ## 1septies. ORDINI APERTI — con limite, inseriti dal CEO e non ancora eseguiti (v489)
 
 Un ordine entra qui quando il CEO lo inserisce sul conto e lo dice; esce quando è **eseguito** (si aggiornano
-posizioni e liquidità in §1) o **revocato**. La validità (giornaliera o fino a revoca) è quella del broker: se
-l'ordine scade a fine seduta, lo Stato lo dice. Stato «attivo» = in attesa sul conto.
+posizioni e liquidità in §1) o **revocato**. Stato «attivo» = in attesa sul conto. La **validità** sta nell'ultima
+colonna — `giornaliero` o `fino a revoca` (CEO, 15/10/2026 sera: *"Ordini giornalieri per ora"*): un ordine
+giornaliero, dopo la campana della sua seduta (16:00 di New York, 22:00 italiane di solito), non è più attivo anche se
+la tabella dice «attivo» — `numeri_libro.py` lo sposta fra gli ordini **ESEGUITI o SCADUTI** da verificare sul conto,
+col minimo di quella seduta accanto al limite, e non conta più la sua spesa come liquidità bloccata (v490). Senza
+validità dichiarata l'ordine resta attivo, e la resa lo dice invece di indovinarla.
 
-| Nome | Verso | Quantità | Limite | Inserito | Stato |
-|---|---|---|---|---|---|
-| ORCL | acquisto | 65 | 129,50 | 2026-10-15 | attivo |
-| OKLO | acquisto | 260 | 28,50 | 2026-10-15 | attivo |
-| SMCI | acquisto | 300 | 32,50 | 2026-10-15 | attivo |
+| Nome | Verso | Quantità | Limite | Inserito | Stato | Validità |
+|---|---|---|---|---|---|---|
+| ORCL | acquisto | 65 | 129,50 | 2026-10-15 | attivo | giornaliero |
+| OKLO | acquisto | 260 | 28,50 | 2026-10-15 | attivo | giornaliero |
+| SMCI | acquisto | 300 | 32,50 | 2026-10-15 | attivo | giornaliero |
 
 `numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
 minimo della seduta di oggi ha toccato il limite — l'ordine può essere già eseguito, e si verifica sul conto —;
@@ -524,9 +538,9 @@ fino allo stop, col limite e col prezzo di adesso; dove sta il limite rispetto a
 non è un ingresso sui minimi); la tenuta se fosse in portafoglio; la correlazione col libro; i conti dentro la
 vita dell'ordine; il volume della seduta; e l'effetto dell'insieme degli ordini sul libro, col rischio totale
 fino agli stop.
-⚠ Il 15/10 alle 18:02 il conto titoli in euro mostrava «Disp. 1.127,33» con questi tre ordini prenotati (circa
-22.800 € ai limiti), mentre §1 dichiara circa 53.870 € in tutto: la differenza può stare su un altro conto, ed è
-da confermare col CEO.
+Il 15/10 alle 18:02 il conto titoli in euro mostrava «Disp. 1.127,33» con questi tre ordini prenotati; la sera il
+CEO ha dichiarato la liquidità: **56.600 € liberi**, esclusa quella bloccata da questi ordini (circa 22.800 € ai
+limiti). §1 la scrive in tutto, ~79.400 €.
 
 ## 1octies. CONTI DICHIARATI DALL'EMITTENTE — date che il calendario Nasdaq non porta (v489)
 
