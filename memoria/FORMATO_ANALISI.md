@@ -187,5 +187,9 @@ Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno stru
   di New York); Fed e dati macro dal calendario dell'ente, che li dà in ora di New York. Un
   orario letto su un calendario web senza fuso dichiarato non si pubblica: il 07/10 l'analisi
   ha scritto «asta alle 17:00», che era l'ora UTC — in Italia erano le 19:00.
-- Su Anthropic e AMZN va dichiarato il conflitto di interessi.
+- Va dichiarato il conflitto di interessi su Anthropic, che ha creato il modello che scrive l'analisi, e
+  sui suoi azionisti quando compaiono: NVIDIA e Microsoft (impegni d'investimento annunciati il
+  18/11/2025), Alphabet e Amazon. OpenAI, concorrente di Anthropic, è il cliente principale di
+  CoreWeave, Oracle e Cerebras. Fino al 15/10/2026 la regola nominava solo Amazon: NVIDIA, che pesa
+  un quinto del libro, mancava.
 - Rapporto HTML solo se richiesto: costa token (decisione del CEO).
