@@ -33,6 +33,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    dell'evidenza — per ogni posizione le prove CONTRO e A FAVORE (tendenza, stime, revisioni,
    ricavi, bilancio, macro), l'esito, il consenso degli analisti come opinione accanto, il pareggio
    fiscale e, per chi è in perdita, l'aritmetica della media.
+   Da v489 (conversazione del CEO del 15/10, *"rendi questa conversazione di oggi parte strutturale
+   dell'analisi globale"*) porta anche gli **ORDINI APERTI** (`LIBRO.md` §1septies) e, per ogni
+   posizione, i **pavimenti** con la **media sui pavimenti** sotto il carico.
 2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro, e (v470) le aste di
    note e bond del Tesoro USA dei prossimi 7 giorni con l'ora italiana e gli esiti recenti.
 3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
@@ -91,6 +94,17 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Da v483 lo stesso blocco riporta le decisioni **RIMANDATE DI PROPOSITO** (`LIBRO.md`
    §1quinquies, una riga «- TICKER — cosa si rimanda») con la prima trimestrale del nome: si
    scrivono nella risposta finché la decisione non si prende.
+   Da v489 il blocco **ORDINI APERTI** (`LIBRO.md` §1septies, gli ordini con limite che il CEO ha
+   inserito): per ciascuno la distanza dal prezzo; se il minimo della seduta ha toccato il limite
+   (può essere già eseguito: chiederlo al CEO); **STORNO o DISCESA** e se alzare il limite è
+   coerente (`LIBRO.md` §1bis: si alza solo su uno storno, con il titolo in calo nella seduta); il
+   pavimento sotto il limite, lo stop e il rischio fino allo stop col limite e col prezzo di adesso;
+   la tenuta se fosse in portafoglio, la correlazione, i conti dentro la vita dell'ordine, il
+   volume della seduta; e l'insieme degli ordini sul libro. La risposta dice ordine per ordine:
+   lasciarlo, spostarlo (a quale prezzo) o toglierlo. Un ordine eseguito si registra in §1 e
+   lascia la tabella.
+   Le date dei conti vengono dal calendario Nasdaq e, per chi non c'è, da quelle **dichiarate
+   dall'emittente** (`LIBRO.md` §1octies, v489): il 15/10 SK hynix mancava dal calendario.
 0ter. **Credito sul libro** (v467, regola in `memoria/LIBRO.md` §1ter): il blocco `CREDITO SUL
    LIBRO` di `numeri_libro.py` — chi brucia cassa, il suo peso, le tre condizioni. Se la conferma
    è accesa, gli stop su quei nomi passano in cima alle decisioni. Non cambia il colore del semaforo.
@@ -118,6 +132,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    fiscale** — di quanto deve scendere il titolo perché vendere oggi convenga, cioè l'interesse
    composto misurato — e per le posizioni in perdita **l'aritmetica della media** su un'unità di
    5.000 € (il caso di AMD: una possibilità da valutare, non una quantità).
+   Da v489 (CEO, 15/10: *"valuta anche mediazione su SK hynix"*) ogni posizione porta i suoi
+   **pavimenti** e la **media sui pavimenti**: l'aritmetica della media su ogni pavimento SOTTO IL
+   CARICO, con lo stop. Comprare sopra il carico alza il carico: è un incremento, non una media, e
+   la risposta lo chiama così.
    Le **notizie** non sono calcolate: per ogni nome in VENDITA, CONFLITTO o OSSERVAZIONE la ricerca
    web è obbligatoria e va fatta **nei due versi** — i catalizzatori che possono farlo salire forte
    (contratti, guida alzata, ordini, clienti nuovi) e i fatti che rompono la tesi — con fonte e
@@ -164,6 +182,18 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        `LIBRO.md` §1bis), e nel piano per la liquidità il gruppo **SUI PAVIMENTI**: l'ordine sul pavimento
        più vicino di ogni nome. La chiusura della risposta dice quali ordini sui pavimenti mettere, e per chi
        ha i conti vicini se tenerli aperti durante i conti.
+       Con i pavimenti, i **volumi** (CEO, 15/10: *"fornisci anche volumi"*): il percentile dell'ultima
+       seduta conclusa e della media a 20, quello del giorno di ogni tocco, e a seduta aperta (v489) il
+       volume **della seduta in corso** con il tempo trascorso accanto — «N azioni finora = X% di una
+       seduta media, in M minuti su 390». Non è una stima della giornata: si confronta fra i nomi.
+   7d-ter. **gli ingressi in ordine d'interesse** (CEO, 15/10: *"ponili in ordine dal più interessante,
+       risposta secca con prezzi e motivazioni"*) — il prezzo d'ingresso (l'ordine sul pavimento), lo stop
+       con la perdita, il secondo prezzo, e una motivazione per nome. L'ordine è un GIUDIZIO dell'analisi,
+       non un punteggio del sistema (v200), e si fa sempre con gli stessi criteri, in quest'ordine: 1) la
+       tenuta se fosse in portafoglio (chi la regola venderebbe va in fondo); 2) cosa fa al libro (chi
+       diversifica o abbassa la volatilità sale); 3) il pavimento (vicinanza, tocchi, ampiezza dello stop);
+       4) gli eventi dentro la vita dell'ordine (conti entro 14 giorni, scadenze di lock-up). Chi ha i conti
+       vicini si rimanda a dopo i conti, e si dice.
    7e. **il PIANO PER LA LIQUIDITÀ** (v474, decisione del CEO del 09/10) — dal blocco omonimo di
        `rotazione.py`: la liquidità e la sua quota del patrimonio; per gli operabili adesso e per
        gli avvisi le conseguenze di un'unità di 5.000 € sul libro (volatilità, beta su QQQ, perdita
@@ -185,7 +215,10 @@ rimandate di proposito, riportate con la loro scadenza (14/10) · la riduzione i
 rischio, il salvavita a −30% dal massimo, la scadenza e l'esame di ogni conflitto (14/10 sera) ·
 non si vende sui ribassi: arancione e rosso sono un segnale, l'unica vendita automatica è il
 salvavita, e nessuna presa di profitto ai massimi (15/10) · ingressi sui minimi: i pavimenti di ogni nome della
-watchlist, con ordine, stop e perdita per 5.000 € (15/10).
+watchlist, con ordine, stop e perdita per 5.000 € (15/10) · gli ordini aperti seguiti a ogni analisi, con storno o
+discesa e il rischio di alzare il limite (15/10) · i pavimenti delle posizioni e la media sui pavimenti sotto il
+carico (15/10) · i volumi, anche della seduta in corso col tempo trascorso (15/10) · le date dei conti dichiarate
+dall'emittente (15/10) · gli ingressi in ordine d'interesse, con prezzi e motivazioni (15/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

@@ -7104,3 +7104,69 @@ riletto dal gate). Ne restano 10, tutte vicine — OKLO compreso.
 ⚠ È la stessa lezione di v419-v420: **una regola provata sul caso che l'ha fatta nascere non è provata.** Il
 gate della v487 costruiva solo il caso OKLO; ora costruisce anche la base lontana (12 ATR) e pretende che non
 rientri. Due iniezioni — la coda cercata in tutta la finestra, la soglia cambiata nel solo codice — mordono.
+
+## 📌 v489 — LA CONVERSAZIONE DEL 15/10 DIVENTA STRUTTURA: ORDINI APERTI, STORNO O DISCESA, MEDIA SUI PAVIMENTI
+
+Istruzione del CEO (15/10/2026), testuale: *"Rendi questa conversazione di oggi parte strutturale dell'analisi
+globale che ti chiedo."* Quel giorno: i pavimenti di ogni titolo, sei nomi messi a fuoco coi volumi, la media su
+SK hynix, tre ordini con limite inseriti (ORCL 65 a 129,50, OKLO 260 a 28,50, SMCI 300 a 32,50) e due volte la
+domanda se alzarli.
+
+| richiesta del giorno | cosa è diventata |
+|---|---|
+| tre ordini con limite e «posso alzare il limite?» | blocco **ORDINI APERTI** di `numeri_libro.py`, da `LIBRO.md` §1septies |
+| «valuta mediazione su SK hynix» | per ogni posizione i **pavimenti** e la **media sui pavimenti** sotto il carico |
+| «fornisci anche volumi» | il **volume della seduta in corso** col tempo trascorso (`rotazione.volume_seduta`) |
+| i conti di SK hynix che il calendario non aveva | le **date dichiarate dall'emittente** (`LIBRO.md` §1octies) nel calendario |
+| «ponili in ordine dal più interessante» | FORMATO 7d-ter: l'ordine d'interesse, un giudizio con quattro criteri fissi |
+
+### ⚠⚠ La prima risposta sul limite era sbagliata nella forma, e il CEO l'ha presa
+Alla prima domanda ho risposto «non alzare» per tutti e tre, e ho indicato come alternativa la conferma — una
+chiusura sopra un livello. Il CEO: *"Perché entrare su qualche punto più caro quando posso acquistare bene su
+questo storno?"*. Aveva ragione sul punto: la conferma costa di più, e pagarla ha senso solo per comprare una
+PROVA. La risposta giusta dipendeva dal titolo, non dal prezzo, ed è arrivata solo alla seconda domanda:
+**STORNO** (tendenza non rotta) → alzare il limite è coerente se nella seduta il titolo scende; **DISCESA**
+(tendenza rotta) → lo sconto è il rischio, il limite resta sul pavimento. Ora la calcola lo strumento, con la
+tendenza della tenuta (`NATURA` mappa gli stati di `tendenza()`: una derivazione sola, v161).
+
+### Lo stop è quello del pavimento SOTTO IL LIMITE, non di quello più vicino al prezzo
+Un limite sotto il pavimento più vicino si regge sul pavimento successivo: lo stop è il suo. Il gate costruisce
+le tre posizioni (sopra, sul, sotto il pavimento vicino) e l'iniezione «stop dal pavimento più vicino al prezzo»
+morde. Il rischio fino allo stop si scrive col limite e col prezzo di adesso: alzare il limite allunga la
+distanza, e lo si vede in dollari (SMCI 300 azioni: 1.497 $ a 32,50, 1.947 $ a 34).
+
+### La media sui pavimenti, e un peso che scendeva comprando
+Sopra il carico comprare ALZA il carico: è un incremento, non una media (SK hynix era a 140,84 su un carico di
+139). La media vera si fa sotto il carico, cioè sui pavimenti: per ciascuno l'aritmetica di `media_aritmetica`,
+la stessa della media al prezzo di adesso. ⚠ La prima stesura valutava la posizione al prezzo del pavimento e il
+libro a quello di oggi: su MSTR il peso **scendeva** dopo un acquisto (9,7% → 9,6%). Una frase falsa da un
+denominatore con due date dentro — la classe v432. Ora il peso dopo è al valore di oggi.
+
+### Il volume della seduta in corso, e una barra che a metà seduta entra nello storico
+v471 escludeva la barra in formazione perché, confrontata con sedute intere, si legge come un crollo
+d'interesse. Qui si pubblica col tempo trascorso accanto — «N azioni finora = X% di una seduta media, in M minuti
+su 390» —, due frazioni che si leggono insieme, e la media resta sulle 20 sedute CONCLUSE.
+⚠ **Misurato il 15/10: alle 09:40 di New York lo storico della fonte non aveva la barra del giorno, alle 13:50
+sì.** La tecnica (ATR e medie) la include quando c'è, quindi gli stop dei pavimenti si muovono di poco durante
+la seduta (ORCL 111,74 → 111,78). È precedente a questa versione e non è corretto qui: annotato.
+
+### Le date dei conti dichiarate dall'emittente
+SK hynix aveva dichiarato i conti del 28/10 con un 6-K del 14/10, e il calendario Nasdaq non li portava: la
+posizione restava senza scadenza e senza l'avviso dei 14 giorni. Ora `LIBRO.md` §1octies tiene **solo date
+scritte dalla società, col documento**; `brief.calendario_trimestrali` le aggiunge nella sua finestra, vince
+l'emittente e la data di Nasdaq resta accanto; ogni voce porta la sua fonte e le scadenze la dichiarano. Una data
+passata esce da sé. Leggerle automaticamente dai 6-K su EDGAR è il passo successivo, proposto come attività.
+
+### 🧪 Il metodo
+⚠ Ventisei controlli nuovi, sedici iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per
+impronta: **mordono tutte, ciascuna sul controllo atteso**. Una mordeva facendo morire la suite (`KeyError`) invece
+di fallire col suo nome: il controllo legge ora con `.get` (v407, v471).
+⚠ Due mie sonde sbagliate, prese prima di accusare il codice (v433): la spesa attesa 30.500 dove l'aritmetica dava
+30.000, e un blocco spezzato su «a capo + due spazi», che le righe interne (sei spazi) contengono tutte.
+⚠ Il gate v481 pretendeva `decisioni, media)` alla lettera: con il parametro nuovo è andato rosso su codice
+giusto. Riagganciato all'invariante — la chiamata passa decisioni e media — e un controllo v489 pretende i
+pavimenti.
+⚠ Il conflitto d'interessi su SpaceX (possiede xAI, concorrente di Anthropic) è entrato nella regola dello stesso
+giorno, quando SPCX è entrata nell'analisi.
+Pavimento di `test_analisi_libro.py` 435 → 460 (i punti di chiamata sono 473). `?v=` e `BUILD_VERSION` non
+toccati: nessun file servito al browser (v440).

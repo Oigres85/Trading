@@ -283,6 +283,41 @@ def volumi(barre, adesso=None):
             "vol_pct_20": percentile_midrank(m20, medie), "vol_campione": len(anno)}
 
 
+SEDUTA_MINUTI = 390        # la seduta regolare di New York, 09:30-16:00
+
+
+def volume_seduta(t, barre, adesso=None):
+    """v489 — il volume della seduta IN CORSO (richiesta del CEO del 15/10/2026: «fornisci anche volumi», a
+    seduta aperta). volumi() la esclude di proposito: una barra in formazione confrontata con sedute intere
+    si legge come un crollo d'interesse (v471). Qui si pubblica col tempo trascorso ACCANTO — N azioni finora
+    = X% di una seduta media, in M minuti su 390 — due frazioni che si leggono insieme, senza proiettare la
+    giornata (v396). Il 15/10 alle 09:46 di New York SK hynix aveva scambiato il 47% di una seduta media in 16
+    minuti, gli altri sei nomi guardati fra il 16 e il 19%: e' il confronto fra nomi che parla. La media e'
+    sulle ultime 20 sedute CONCLUSE. Solo a seduta aperta e con la quota di OGGI; altrimenti None."""
+    adesso = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
+    minuti = adesso.hour * 60 + adesso.minute - (9 * 60 + 30)
+    if (adesso.weekday() >= 5 or not 0 < minuti < SEDUTA_MINUTI or not barre
+            or t.get("seduta_quota") != adesso.date().isoformat() or not t.get("vol_oggi")):
+        return None
+    b = barre[:-1] if seduta_in_corso(barre, adesso) else barre
+    v = [x.get("v") for x in b[-20:]]
+    if len(v) < 20 or any(not x for x in v):
+        return None
+    m20 = sum(v) / 20
+    return {"azioni": t["vol_oggi"], "pct_media": t["vol_oggi"] / m20 * 100, "minuti": minuti,
+            "pct_tempo": minuti / SEDUTA_MINUTI * 100, "ora": t.get("quota_ora")}
+
+
+def testo_volume_seduta(vs):
+    """La frase del volume in corso, una sola per watchlist e ordini aperti (v161)."""
+    if not vs:
+        return None
+    az = vs["azioni"]
+    q = (f"{az / 1e6:.1f} mln".replace(".", ",") if az >= 1e6 else f"{az / 1e3:.0f} mila")
+    return (f"seduta IN CORSO: {q} azioni finora = {vs['pct_media']:.0f}% di una seduta media, in {vs['minuti']} "
+            f"minuti su {SEDUTA_MINUTI} ({vs['pct_tempo']:.0f}% del tempo)")
+
+
 def percentile_midrank(x, serie):
     """Quota della serie sotto x, piu' meta' dei pari, x 100. Serie vuota = buco."""
     if x is None or not serie:
@@ -339,6 +374,16 @@ def gruppo_libro(corr):
     return "STESSA SCOMMESSA DEL LIBRO" if corr >= SOGLIA_CORR else "DIVERSIFICA"
 
 
+def prima_media_sopra(t):
+    """La media (20, 50, 200) piu' vicina SOPRA il prezzo, come (nome, valore): il PRIMO SEGNALE che la discesa
+    smette di scendere (v473). Una funzione sola per il piano d'ingresso e per gli ordini aperti di
+    numeri_libro (v489): due letture della stessa regola divergono al primo ritocco (v161). None = nessuna."""
+    px = t.get("px")
+    su = sorted((t.get(f"sma{n}"), f"media {n}") for n in (20, 50, 200)
+                if px is not None and t.get(f"sma{n}") is not None and t.get(f"sma{n}") > px)
+    return (su[0][1], su[0][0]) if su else None
+
+
 def piano_ingresso(t):
     """Dove sta il prezzo rispetto alla zona, il livello che lo porterebbe dentro, la scala dei
     livelli intorno al prezzo e lo stop. Solo fatti misurati: la frase la scrive la resa."""
@@ -367,10 +412,10 @@ def piano_ingresso(t):
     p["sotto"] = sorted(((nm, dist(v)) for nm, v in livelli if v is not None and not su(nm, v)), key=lambda x: -x[1]["prezzo"])
     # il PRIMO SEGNALE: la media piu' vicina sopra il prezzo, quando viene prima del livello d'ingresso
     #   o quando la zona e' vuota. Non e' un ingresso: e' la discesa che smette di scendere.
-    medie_su = sorted((v, nm) for nm, v in livelli[:3] if v is not None and v > px)
+    ms = prima_media_sopra(t)
     p["primo_segnale"] = None
-    if medie_su and (p["posizione"] == "zona vuota" or (p["posizione"] == "sotto" and medie_su[0][0] < z["basso"])):
-        p["primo_segnale"] = (medie_su[0][1], dist(medie_su[0][0]))
+    if ms and (p["posizione"] == "zona vuota" or (p["posizione"] == "sotto" and ms[1] < z["basso"])):
+        p["primo_segnale"] = (ms[0], dist(ms[1]))
     supp = t.get("supp")
     p["stop"] = dist(supp) if supp is not None else None
     # il rischio dall'ingresso allo stop solo se l'ingresso NON e' il prezzo di adesso: per chi e'
@@ -514,7 +559,9 @@ def scheda(tk, barre, rlibro, rspy=None, target=None):
             "vol_annua": vol_annua(rt), "target": tg, "target_dist": tg_dist, **volumi(barre),
             # v473 — per il piano d'ingresso: l'ATR in prezzo (la zona si misura in ATR), la base
             "atr": t.get("atr"), "min52": t.get("min52"), "minimi": struttura_minimi(barre),
-            "dal_minimo": dal_minimo(barre, t["px"])}
+            "dal_minimo": dal_minimo(barre, t["px"]),
+            # v489 — il volume della seduta in corso, col tempo trascorso (None fuori dalla seduta)
+            "vol_seduta_corso": volume_seduta(t, barre)}
 
 
 def _barre_sicure(tk):
@@ -687,9 +734,10 @@ def riga_volumi(t):
     ps, p20 = t.get("vol_pct_seduta"), t.get("vol_pct_20")
     def p(x):
         return "n.d." if x is None else f"{x:.0f}/100"
+    vs = testo_volume_seduta(t.get("vol_seduta_corso"))
     return (f"volumi (0 = minimo dell'anno, 100 = massimo, 50 = norma): seduta conclusa del "
             f"{t.get('vol_seduta') or 'n.d.'} {p(ps)} · media delle ultime 20 sedute {p(p20)}"
-            + (f" · su {t['vol_campione']} sedute" if t.get("vol_campione") else ""))
+            + (f" · su {t['vol_campione']} sedute" if t.get("vol_campione") else "") + (f" · {vs}" if vs else ""))
 
 
 def riga_trimestrale(t, cal=None):
@@ -699,7 +747,11 @@ def riga_trimestrale(t, cal=None):
     cal = cal or {}
     tr, yf = t.get("trimestrale"), t.get("trimestrale_yf")
     if tr:
-        s = f"trimestrale {tr['data']} ({tr['giorni']} g, calendario Nasdaq)"
+        # v489 — la fonte e' scritta sulla voce: il calendario Nasdaq, o la data dichiarata dall'emittente
+        #   (LIBRO.md §1octies) per chi il calendario non porta
+        s = f"trimestrale {tr['data']} ({tr['giorni']} g, {tr.get('fonte') or 'calendario Nasdaq'})"
+        if tr.get("nasdaq"):
+            s += f" — il calendario Nasdaq dice {tr['nasdaq']}"
         return s + (f" — la pipeline (yfinance) stima {yf}" if yf and yf != tr["data"] else "")
     if cal.get("errore"):
         s = f"trimestrale: calendario Nasdaq NON letto ({cal['errore']}) — non vuol dire 'nessuna uscita'"

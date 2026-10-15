@@ -149,6 +149,22 @@ Convenzioni scelte da Claude e dichiarate come tali (v240), rilette dal codice d
 - I livelli della zona d'ingresso (v473) restano accanto: sono la lettura di chi entra sulla risalita, che il
   CEO non vuole, e servono come segnale che la discesa è finita.
 
+**Storno o discesa — quando alzare un limite** (15/10/2026). Con tre ordini con limite inseriti (§1septies) il
+CEO ha chiesto: *"Perché entrare su qualche punto più caro quando posso acquistare bene su questo storno? … posso
+alzare il prezzo limite e approfittare di questi storni"*. La risposta dipende dal titolo, non dal prezzo, e la
+tendenza è quella della tenuta (§1sexies):
+- **STORNO** = una pausa dentro una salita: tendenza intatta o in correzione (la chiusura non sta sotto la media a
+  200 con la media a 50 sotto la 200). Alzare il limite è coerente con la regola dei minimi **se nella seduta il
+  titolo scende**: si compra lo storno, non la risalita. Il 15/10 era SMCI: sopra la media a 200, media a 50 in
+  salita, stime in rialzo, −4,7% nella seduta.
+- **DISCESA** = tendenza rotta (chiusura sotto la media a 200 e media a 50 sotto la 200): lo sconto è il rischio,
+  non l'occasione. Il limite resta sul pavimento; che la discesa smetta di scendere lo dice una chiusura sopra la
+  media più vicina sopra il prezzo, che non è ancora un ingresso. Il 15/10 erano ORCL e OKLO, ed entrambi
+  risalivano nella seduta.
+- In tutti e due i casi **lo stop resta quello del pavimento sotto il limite**: alzare il limite allunga la
+  distanza dallo stop, e il rischio in più si scrive in dollari (SMCI, 300 azioni: 1.497 $ col limite a 32,50,
+  1.947 $ a 34). `numeri_libro.py` (blocco «ORDINI APERTI») lo calcola per ogni ordine a ogni analisi.
+
 ## 1ter. SEMAFORO D'USCITA — deciso col CEO il 06/10/2026, si controlla a OGNI analisi
 
 Domanda del CEO: *"quando capire di dover uscire, onde evitare di subire in pieno un prossimo
@@ -488,6 +504,41 @@ EVIDENZA è una scommessa **contro** l'evidenza: ammessa, dichiarata come specul
 del piano e le conseguenze sul libro. Un ingresso su un CONFLITTO è il caso AMD visto da fuori:
 può essere un'occasione o una trappola, e lo dicono le notizie. Dopo l'ingresso vale la stessa
 tenuta di tutte le posizioni.
+
+## 1septies. ORDINI APERTI — con limite, inseriti dal CEO e non ancora eseguiti (v489)
+
+Un ordine entra qui quando il CEO lo inserisce sul conto e lo dice; esce quando è **eseguito** (si aggiornano
+posizioni e liquidità in §1) o **revocato**. La validità (giornaliera o fino a revoca) è quella del broker: se
+l'ordine scade a fine seduta, lo Stato lo dice. Stato «attivo» = in attesa sul conto.
+
+| Nome | Verso | Quantità | Limite | Inserito | Stato |
+|---|---|---|---|---|---|
+| ORCL | acquisto | 65 | 129,50 | 2026-10-15 | attivo |
+| OKLO | acquisto | 260 | 28,50 | 2026-10-15 | attivo |
+| SMCI | acquisto | 300 | 32,50 | 2026-10-15 | attivo |
+
+`numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
+minimo della seduta di oggi ha toccato il limite — l'ordine può essere già eseguito, e si verifica sul conto —;
+STORNO o DISCESA e se alzare il limite è coerente (§1bis); il pavimento sotto il limite con lo stop e il rischio
+fino allo stop, col limite e col prezzo di adesso; dove sta il limite rispetto al pavimento più vicino (sopra =
+non è un ingresso sui minimi); la tenuta se fosse in portafoglio; la correlazione col libro; i conti dentro la
+vita dell'ordine; il volume della seduta; e l'effetto dell'insieme degli ordini sul libro, col rischio totale
+fino agli stop.
+⚠ Il 15/10 alle 18:02 il conto titoli in euro mostrava «Disp. 1.127,33» con questi tre ordini prenotati (circa
+22.800 € ai limiti), mentre §1 dichiara circa 53.870 € in tutto: la differenza può stare su un altro conto, ed è
+da confermare col CEO.
+
+## 1octies. CONTI DICHIARATI DALL'EMITTENTE — date che il calendario Nasdaq non porta (v489)
+
+Il calendario delle trimestrali viene da Nasdaq, che non porta tutti gli emittenti esteri: il 15/10/2026 SK
+hynix aveva dichiarato i conti del 28/10 con un 6-K del 14/10, e l'analisi non li vedeva — la posizione restava
+senza scadenza e senza l'avviso dei 14 giorni. Qui va **solo una data scritta dalla società**, col documento che
+la contiene: non una stima (v396). `brief.calendario_trimestrali` la aggiunge nella sua finestra, e se Nasdaq
+dice un'altra data vince l'emittente, con quella di Nasdaq scritta accanto. Una data passata esce da sé.
+
+| Nome | Conti | Fonte | Depositato |
+|---|---|---|---|
+| SKHY | 2026-10-28 | 6-K su SEC EDGAR: teleconferenza alle 9:00 di Seul, la sera del 27/10 a New York | 2026-10-14 |
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

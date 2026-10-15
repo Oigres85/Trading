@@ -2808,7 +2808,7 @@ check("v482 resa: un esito PROVVISORIO si marca sulla riga coi possibili e si sp
 check("v481-v482 collegamento: calcola produce la tenuta di TUTTE le posizioni con le decisioni del libro e la media sulle "
       "serie degli ingressi; il cambio si legge una volta sola per tenuta e registro; la sintesi la stampa",
       "tenuta_posizioni(TK, B, righe_pipeline(pipe), out[\"semaforo\"]" in _calc474
-      and "decisioni, media)" in _calc474.split("tenuta_posizioni(")[1][:200]
+      and "decisioni, media" in _calc474.split("tenuta_posizioni(")[1][:200]   # v489: segue «, pav)»
       and "rotazione.serie_libro(" in _calc474 and "rotazione.rendimenti_per_data(B[\"QQQ\"])" in _calc474
       and _calc474.count("patrimonio_pipeline(") == 1 and "cassa_eur, pat_pipe," in _calc474
       and "righe_tenuta(o[\"tenuta\"])" in _corpo_di(_src_nl, "sintesi"))
@@ -3374,6 +3374,252 @@ _cl487 = AN.checklist() or ""
 check("v487 il formato porta i pavimenti nella sezione 7 e nel registro delle richieste rese strutturali",
       "7d-bis. **i PAVIMENTI**" in _cl487 and "ingressi sui minimi: i pavimenti di ogni nome" in _cl487
       and "SUI PAVIMENTI" in _cl487)
+
+
+# ================================================================ v489 — la conversazione del 15/10 resa strutturale
+# Il CEO, testuale: «Rendi questa conversazione di oggi parte strutturale dell'analisi globale che ti chiedo». Quel
+# giorno: tre ordini con limite inseriti (ORCL, OKLO, SMCI) e la domanda se alzarli per prendere lo storno; la media
+# su SK hynix valutata sui pavimenti; i volumi a seduta aperta; i conti di SK hynix che il calendario non portava.
+# Ogni stato si COSTRUISCE (v425, v429): la seduta aperta e' un orario fisso, i pavimenti una serie sintetica.
+_ny489 = _dt474(2026, 10, 9, 11, 0, tzinfo=_NY474)            # seduta aperta da 90 minuti
+_lib489 = ("## 1septies. ORDINI APERTI — x\n\n| Nome | Verso | Quantità | Limite | Inserito | Stato |\n"
+           "|---|---|---|---|---|---|\n| AAA | acquisto | 100 | 105,00 | 2026-10-09 | attivo |\n"
+           "| BBB | acquisto | 100 | 95,00 | 2026-10-09 | attivo |\n| CCC | acquisto | 100 | 100,00 | 2026-10-09 | attivo |\n"
+           "| DDD | acquisto | 50 | 1.200,50 | 2026-10-08 | eseguito il 09/10 |\n## 2. ALTRO\n"
+           "| EEE | acquisto | 1 | 1 | x | attivo |\n")
+_or489 = NL.leggi_ordini(_lib489)
+check("v489 gli ordini aperti si leggono solo dentro il loro titolo: quantità e limite con la virgola e il punto delle "
+      "migliaia, lo stato decide se l'ordine è attivo; sezione assente = None, che non è 'nessun ordine'",
+      [o["tk"] for o in _or489] == ["AAA", "BBB", "CCC", "DDD"] and _or489[3]["limite"] == 1200.5
+      and [o["attivo"] for o in _or489] == [True, True, True, False] and _or489[0]["verso"] == "acquisto"
+      and NL.leggi_ordini("## 1. POSIZIONI\n| AAA | acquisto | 1 | 1 | x | attivo |\n") is None, str(_or489))
+
+# --- un pavimento a 100 e uno a 90 sotto il prezzo 110 (ATR 2): il limite sopra, sul e sotto il pavimento vicino ---
+_lu489 = _serie487([120] * 6 + _V487(90) + [120] * 6 + _V487(100) + [120] * 15)
+_pv489 = ROT.pavimenti(_lu489, 110.0, 2.0)
+def _tec489(vp=-2.0, lo=104.0, quota="2026-10-09", px=110.0):
+    return {"px": px, "atr": 2.0, "var_pct": vp, "seduta_quota": quota, "minimo_oggi": lo, "vol_oggi": 300_000,
+            "quota_ora": "Oct 9, 2026, 11:00 AM EDT", "sma20": 112.0, "sma50": 115.0, "sma200": 118.0}
+_b489 = {"AAA": _barre474(_sale, fine="2026-10-08"), "BBB": _barre474(_scende, fine="2026-10-08"),
+         "CCC": _barre474(_sale[:150], fine="2026-10-08")}
+_rl489 = ROT.rendimenti_per_data(_barre474([100 + i * 0.3 + (i % 7) for i in range(250)], fine="2026-10-08"))
+_rq489 = ROT.rendimenti_per_data(_barre474([100 + i * 0.2 + (i % 5) for i in range(250)], fine="2026-10-08"))
+_cal489 = {"attesi": [{"tk": "AAA", "data": "2026-10-16", "giorni": 7, "fonte": "calendario Nasdaq"},
+                      {"tk": "BBB", "data": "2026-11-20", "giorni": 42,
+                       "fonte": "dichiarata dall'emittente: 6-K, depositato il 2026-10-01"}]}
+def _vo489(tec=None, ordini=None):
+    t = {"AAA": _tec489(), "BBB": _tec489(lo=96.0), "CCC": _tec489()}
+    t.update(tec or {})
+    return NL.valuta_ordini(_or489 if ordini is None else ordini, _b489, t, {k: _lu489 for k in _b489}, _cal489, {},
+                            _sem481(), _rl489, _rq489, 100000.0, 1.12, _ny489)
+_o489 = _vo489()
+_x489 = {x["tk"]: x for x in _o489["righe"]}
+check("v489 STORNO o DISCESA dalla tendenza della tenuta: intatta o in correzione = STORNO, rotta = DISCESA, sotto 200 "
+      "sedute NON MISURABILE — e la regola la mappa in un posto solo",
+      _x489["AAA"]["natura"] == "STORNO" and _x489["BBB"]["natura"] == "DISCESA"
+      and _x489["CCC"]["natura"] == "NON MISURABILE"
+      and NL.NATURA == {"intatta": "STORNO", "in correzione": "STORNO", "rotta": "DISCESA"},
+      str({k: (v.get("natura"), v.get("tendenza", {}).get("stato")) for k, v in _x489.items()}))
+_ri489 = NL.valuta_ordini(_or489[:1], _b489, {"AAA": _tec489(vp=1.0)}, {"AAA": _lu489}, _cal489, {}, _sem481(),
+                          _rl489, _rq489, 100000.0, 1.12, _ny489)["righe"][0]
+check("v489 alzare il limite è COERENTE solo su uno STORNO con il titolo in calo nella seduta; su uno storno che sale è "
+      "comprare la risalita; su una DISCESA non lo è mai",
+      _x489["AAA"]["alzare"] == "coerente" and _ri489["alzare"] == "risalita" and _x489["BBB"]["alzare"] == "discesa"
+      and _x489["CCC"]["alzare"] == "non misurabile", str((_x489["AAA"]["alzare"], _ri489["alzare"], _x489["BBB"]["alzare"])))
+check("v489 lo stop è quello del pavimento SOTTO IL LIMITE, non del pavimento più vicino al prezzo: limite sopra il "
+      "pavimento a 100 → stop 98; sul pavimento → stop 98; sotto (95) → il pavimento a 90, stop 88",
+      (_x489["AAA"]["posizione"], _x489["CCC"]["posizione"], _x489["BBB"]["posizione"]) == ("sopra", "sul", "sotto")
+      and abs(_x489["AAA"]["stop"] - 98) < 1e-9 and abs(_x489["CCC"]["stop"] - 98) < 1e-9
+      and abs(_x489["BBB"]["stop"] - 88) < 1e-9 and _x489["BBB"]["pavimento_vicino"]["alto"] == 100,
+      str({k: (v.get("posizione"), v.get("stop")) for k, v in _x489.items()}))
+check("v489 il rischio fino allo stop si conta dal limite, e col limite alzato al prezzo di adesso è maggiore: alzare il "
+      "limite allunga la distanza dallo stop (AAA 700 $ → 1.200 $, BBB 700 $ → 2.200 $)",
+      abs(_x489["AAA"]["rischio"] - 700) < 1e-6 and abs(_x489["AAA"]["rischio_mercato"] - 1200) < 1e-6
+      and abs(_x489["BBB"]["rischio"] - 700) < 1e-6 and abs(_x489["BBB"]["rischio_mercato"] - 2200) < 1e-6
+      and abs(_x489["CCC"]["rischio"] - 200) < 1e-6
+      and all(x["rischio_mercato"] > x["rischio"] for x in _x489.values()),
+      str({k: (v.get("rischio"), v.get("rischio_mercato")) for k, v in _x489.items()}))
+_tc489 = [NL.valuta_ordini(_or489[:1], _b489, {"AAA": t}, {"AAA": _lu489}, _cal489, {}, _sem481(), _rl489, _rq489,
+                           100000.0, 1.12, _ny489)["righe"][0]["toccato_oggi"]
+          for t in (_tec489(lo=104.0), _tec489(lo=104.0, quota="2026-10-08"), _tec489(lo=106.0))]
+check("v489 «il minimo di oggi ha toccato il limite» solo se la quota è DI OGGI e il minimo sta sotto il limite: una "
+      "quota di ieri non dice niente sulla seduta di oggi",
+      _tc489 == [True, False, False], str(_tc489))
+check("v489 i conti entro 14 giorni accendono l'avviso dell'ordine attivo durante i conti; la fonte della data viaggia "
+      "con la voce; il volume della seduta col tempo trascorso; gli ordini non attivi si nominano",
+      _x489["AAA"]["conti_vicini"] and not _x489["BBB"]["conti_vicini"]
+      and abs(_x489["AAA"]["volume"]["pct_media"] - 30) < 1e-9 and _x489["AAA"]["volume"]["minuti"] == 90
+      and [o["tk"] for o in _o489["inattivi"]] == ["DDD"], str((_x489["AAA"]["volume"], _o489["inattivi"])))
+_sp489 = {"AAA": 100 * 105.0, "BBB": 100 * 95.0, "CCC": 100 * 100.0}
+_rt489 = {k: ROT.rendimenti_per_data(_b489[k]) for k in _sp489}
+_cm489 = set.intersection(*[set(v) for v in _rt489.values()])
+_atteso489 = ROT.conseguenze({d: sum(_sp489[k] * _rt489[k][d] for k in _sp489) / sum(_sp489.values()) for d in _cm489},
+                             _rl489, _rq489, 100000.0, sum(_sp489.values()))
+check("v489 l'INSIEME degli ordini: la spesa ai limiti, il rischio totale fino agli stop, e le conseguenze sul libro "
+      "della serie COMBINATA — le stesse di rotazione.conseguenze (una derivazione, v161)",
+      abs(_o489["insieme"]["spesa"] - 30000) < 1e-6 and abs(_o489["insieme"]["rischio"] - 1600) < 1e-6
+      and _o489["insieme"]["rischio_completo"] and _o489["insieme"]["conseguenze"] == _atteso489
+      and _atteso489 is not None, str(_o489["insieme"]))
+_err489 = NL.valuta_ordini([{**_or489[0], "verso": "vendita", "verso_testo": "vendita"}, {**_or489[1], "tk": "ZZZ"}],
+                           _b489, {"AAA": _tec489()}, {}, _cal489, {}, _sem481(), _rl489, _rq489, 100000.0, 1.12, _ny489)
+check("v489 un ordine di vendita, o senza prezzo, si dichiara non valutabile invece di sparire; senza sezione il blocco "
+      "dice None",
+      [("errore" in x) for x in _err489["righe"]] == [True, True] and _err489["insieme"] is None
+      and NL.valuta_ordini(None, {}, {}, {}, {}, {}, None, {}, {}, 1.0, 1.0, _ny489) is None, str(_err489["righe"])[:300])
+
+# --- la resa degli ordini: tre esiti, la regola, l'avviso del tocco solo dove serve, l'insieme ---
+_ro489 = "\n".join(NL.righe_ordini(_o489))
+# il blocco di un ordine va dalla sua testa alla testa successiva (due spazi e un ticker): le righe interne
+#   hanno sei spazi, quindi la divisione su "a capo + due spazi" le spezzava tutte (la prima stesura)
+_blk489 = {tk: re.split(r"\n  (?=[A-Z])", _ro489.split(f"\n  {tk} acquisto")[1])[0] for tk in ("AAA", "BBB", "CCC")}
+check("v489 resa degli ordini: STORNO coerente, DISCESA col primo segnale (la media più vicina sopra il prezzo), il "
+      "limite sopra/sul/sotto il pavimento, l'avviso del tocco e dei conti solo dove valgono, il volume, l'insieme",
+      "STORNO" in _blk489["AAA"] and "alzare il limite è COERENTE" in _blk489["AAA"]
+      and "DISCESA" in _blk489["BBB"] and "NON è coerente" in _blk489["BBB"] and "media 20 (112,00)" in _blk489["BBB"]
+      and "SOPRA il pavimento più vicino" in _blk489["AAA"] and "SUL pavimento più vicino" in _blk489["CCC"]
+      and "SOTTO il pavimento più vicino" in _blk489["BBB"] and "il minimo di oggi" in _blk489["AAA"]
+      and "il minimo di oggi" not in _blk489["BBB"] and "conti entro 14 giorni" in _blk489["AAA"]
+      and "conti entro 14 giorni" not in _blk489["BBB"] and "dichiarata dall'emittente" in _blk489["BBB"]
+      and "seduta IN CORSO: 300 mila azioni finora = 30% di una seduta media, in 90 minuti su 390" in _blk489["AAA"]
+      and "INSIEME, se eseguiti tutti ai limiti: 30.000 $ su 3 nomi" in _ro489 and "fino agli stop 1.600 $" in _ro489
+      and "DDD (eseguito il 09/10)" in _ro489 and "lo stop resta quello del pavimento sotto il limite" in _ro489,
+      _ro489[:1500])
+check("v489 resa: senza sezione il blocco lo dichiara; senza ordini attivi lo dice; un ordine non valutabile resta scritto",
+      "NON trovata" in NL.righe_ordini(None)[0]
+      and "nessuno attivo" in NL.righe_ordini({"righe": [], "insieme": None, "inattivi": []})[0]
+      and "non valutabile" in "\n".join(NL.righe_ordini(_err489)))
+
+# --- la media sui pavimenti: solo sotto il carico, con la funzione della media, e il peso al valore di oggi ---
+_md489 = {"fx": 1.12, "valore": 100000.0, "trim": {}, "rlibro": {}, "rqqq": {}, "rend": {}}
+_mp489 = NL.media_pavimenti(_pv489, 105.0, 10, 0.05, _md489, "PPP", 110.0)
+_mpn489 = NL.media_pavimenti(_pv489, 95.0, 10, 0.05, _md489, "PPP", 110.0)
+_m100 = NL.media_aritmetica(100.0, 105.0, 10, 0.05, 100000.0, 1.12)
+check("v489 la media sui pavimenti prende SOLO i pavimenti sotto il carico, con media_aritmetica (la stessa funzione "
+      "della media al prezzo di adesso, v161), e il peso dopo al valore di OGGI (posizione e libro alla stessa data)",
+      [x["pavimento"]["alto"] for x in _mp489] == [100, 90] and [x["pavimento"]["alto"] for x in _mpn489] == [90]
+      and NL.media_pavimenti(_pv489, 85.0, 10, 0.05, _md489, "PPP", 110.0) == []
+      and _mp489[0]["media"]["carico_dopo"] == _m100["carico_dopo"] and _mp489[0]["media"]["azioni"] == _m100["azioni"]
+      and abs(_mp489[0]["media"]["peso_dopo"] - (10 * 110.0 + _m100["spesa"]) / (100000.0 + _m100["spesa"])) < 1e-12,
+      str(_mp489)[:400])
+_tn489 = NL.tenuta_posizioni(["PPP", "RRR"], {"PPP": _b489["AAA"], "RRR": _b489["AAA"]}, {"PPP": _riga481(), "RRR": _riga481()},
+                             _sem481(), {"PPP": 110.0, "RRR": 110.0}, {"PPP": 105.0, "RRR": 50.0}, {"PPP": 10, "RRR": 10},
+                             {"PPP": 0.05, "RRR": 0.05}, _ny489, [], _md489, {"PPP": _pv489, "RRR": _pv489})
+_rt489r = "\n".join(NL.righe_tenuta(_tn489))
+_tn489_no = NL.tenuta_posizioni(["PPP"], {"PPP": _b489["AAA"]}, {"PPP": _riga481()}, _sem481(), {"PPP": 110.0},
+                                {"PPP": 105.0}, {"PPP": 10}, {"PPP": 0.05}, _ny489, [], _md489)
+check("v489 resa della tenuta: ogni posizione porta i pavimenti; sotto il carico la media sui pavimenti con lo stop; chi "
+      "ha tutti i pavimenti sopra il carico si nomina una volta in fondo (è un incremento, non una media); senza "
+      "pavimenti calcolati la resa tace",
+      "pavimenti: 100,00 (-9,1%, 1 tocco) stop 98,00 · 90,00 (-18,2%, 1 tocco) stop 88,00" in _rt489r
+      and "media sui pavimenti (sotto il carico 105,00" in _rt489r and "a 100,00 →" in _rt489r and "a 90,00 →" in _rt489r
+      and "nessun pavimento sotto il carico per RRR" in _rt489r
+      and "pavimenti:" not in "\n".join(NL.righe_tenuta(_tn489_no)), _rt489r[-1800:])
+
+# --- il volume della seduta in corso: solo a seduta aperta, con la quota di oggi, e la media senza la barra in formazione ---
+_vb489 = _barre474(_sale, fine="2026-10-08")
+_vs489 = lambda t, adesso, b=_vb489: ROT.volume_seduta(t, b, adesso)
+_ts489 = {"seduta_quota": "2026-10-09", "vol_oggi": 300_000}
+_inc489 = _barre474(_sale, fine="2026-10-09", vol=[1_000_000] * 249 + [5_000_000])
+check("v489 il volume della seduta in corso: a seduta aperta, con la quota di oggi, sulle 20 sedute CONCLUSE (la barra in "
+      "formazione esce dalla media); prima dell'apertura, dopo la campana, nel fine settimana o con la quota di un altro "
+      "giorno è None",
+      abs(_vs489(_ts489, _ny489)["pct_media"] - 30) < 1e-9 and _vs489(_ts489, _ny489)["minuti"] == 90
+      and abs(_vs489(_ts489, _ny489, _inc489)["pct_media"] - 30) < 1e-9
+      and _vs489(_ts489, _dt474(2026, 10, 9, 9, 0, tzinfo=_NY474)) is None
+      and _vs489(_ts489, _dt474(2026, 10, 9, 16, 5, tzinfo=_NY474)) is None
+      and _vs489({**_ts489, "seduta_quota": "2026-10-10"}, _dt474(2026, 10, 10, 11, 0, tzinfo=_NY474)) is None
+      and _vs489({**_ts489, "seduta_quota": "2026-10-08"}, _ny489) is None, str(_vs489(_ts489, _ny489)))
+check("v489 la riga dei volumi aggiunge la seduta in corso solo quando c'è",
+      "seduta IN CORSO: 300 mila azioni finora = 30%" in ROT.riga_volumi({"vol_seduta_corso": _vs489(_ts489, _ny489)})
+      and "IN CORSO" not in ROT.riga_volumi({}))
+
+# --- le date dei conti dichiarate dall'emittente ---
+from datetime import date as _gd489, timedelta as _tdd489
+_cd489 = ROT.brief.leggi_conti_dichiarati("## 1octies. CONTI DICHIARATI DALL'EMITTENTE\n| Nome | Conti | Fonte | Depositato |\n"
+                                          "|---|---|---|---|\n| SKHY | 2026-10-28 | 6-K | 2026-10-14 |\n| XXX | n.d. | x | y |\n"
+                                          "## 2. ALTRO\n| ZZZ | 2026-10-29 | a | b |\n")
+_cc489 = ROT.brief.con_conti_dichiarati(
+    [{"tk": "SKHY", "data": "2026-10-27", "giorni": 12}, {"tk": "MU", "data": "2026-10-20", "giorni": 5}],
+    {"SKHY", "MU", "OLD", "FAR"}, _gd489(2026, 10, 15), 45,
+    [{"tk": "SKHY", "data": "2026-10-28", "fonte": "6-K", "depositato": "2026-10-14"},
+     {"tk": "OLD", "data": "2026-10-10", "fonte": "x", "depositato": "y"},
+     {"tk": "FAR", "data": "2026-12-31", "fonte": "x", "depositato": "y"},
+     {"tk": "NON", "data": "2026-10-20", "fonte": "x", "depositato": "y"}])
+check("v489 le date dichiarate dall'emittente: si leggono solo dentro il loro titolo e solo con una data vera; vince "
+      "l'emittente e la data di Nasdaq resta accanto; una data passata, oltre la finestra o di un nome non cercato non "
+      "entra; ogni voce porta la sua fonte e l'elenco resta in ordine di data",
+      _cd489 == [{"tk": "SKHY", "data": "2026-10-28", "fonte": "6-K", "depositato": "2026-10-14"}]
+      and ROT.brief.leggi_conti_dichiarati("## 1. POSIZIONI\n") is None
+      and [(c["tk"], c["data"]) for c in _cc489] == [("MU", "2026-10-20"), ("SKHY", "2026-10-28")]
+      and _cc489[1]["nasdaq"] == "2026-10-27" and _cc489[1]["giorni"] == 13 and "dichiarata dall'emittente" in _cc489[1]["fonte"]
+      and _cc489[0]["fonte"] == "calendario Nasdaq", str(_cc489))
+_or_tg, _or_lc = ROT.brief._trim_giorno, ROT.brief.leggi_conti_dichiarati
+_dd489 = (_dt474.now(_tz.utc).date() + _tdd489(days=3)).isoformat()
+try:
+    ROT.brief._trim_giorno = lambda g: (g, [], None)
+    ROT.brief.leggi_conti_dichiarati = lambda testo=None: [{"tk": "SKHY", "data": _dd489, "fonte": "6-K", "depositato": "x"}]
+    _ct489 = ROT.brief.calendario_trimestrali(["SKHY"], giorni=10)
+finally:
+    ROT.brief._trim_giorno, ROT.brief.leggi_conti_dichiarati = _or_tg, _or_lc
+check("v489 collegamento: il calendario delle trimestrali aggiunge davvero le date dichiarate dall'emittente — provato "
+      "eseguendolo con Nasdaq muto, non leggendo il sorgente",
+      [(a["tk"], a["data"]) for a in _ct489["attesi"]] == [("SKHY", _dd489)], str(_ct489))
+check("v489 la trimestrale dice da quale fonte viene, e se Nasdaq dice un'altra data la scrive accanto; la scadenza del "
+      "libro marca la data dell'emittente",
+      "(13 g, dichiarata dall'emittente: 6-K" in ROT.riga_trimestrale({"trimestrale": _cc489[1]})
+      and "il calendario Nasdaq dice 2026-10-27" in ROT.riga_trimestrale({"trimestrale": _cc489[1]})
+      and "(5 g, calendario Nasdaq)" in ROT.riga_trimestrale({"trimestrale": {"data": "2026-10-20", "giorni": 5}})
+      and "SKHY 2026-10-28 (13 g, dichiarata dall'emittente)" in "\n".join(NL.righe_attesa(NL.costo_attesa(
+          100000.0, 0.4, 0.03, 0.04, {"attesi": _cc489, "finestra": 45}, ["SKHY", "MU"])))
+      and "MU 2026-10-20 (5 g)" in "\n".join(NL.righe_attesa(NL.costo_attesa(
+          100000.0, 0.4, 0.03, 0.04, {"attesi": _cc489, "finestra": 45}, ["SKHY", "MU"]))))
+
+# --- collegamenti: la quota porta la seduta, calcola e sintesi portano ordini e pavimenti ---
+_oq489 = ROT.brief.quota
+try:
+    ROT.brief.quota = lambda tk: {"p": 110.0, "cp": -1.0, "v": 123456, "l": 104.5, "h": 112.0, "td": "2026-10-09",
+                                  "u": "Oct 9, 2026, 11:00 AM EDT", "ms": "open"}
+    _tq489 = ROT.brief.tecnica("AAA", d=_barre474(_sale, fine="2026-10-08"))
+finally:
+    ROT.brief.quota = _oq489
+check("v489 la tecnica porta dalla quota il volume, il minimo e il massimo della seduta e l'ora dell'aggiornamento",
+      tuple(_tq489.get(k) for k in ("vol_oggi", "minimo_oggi", "massimo_oggi", "quota_ora"))
+      == (123456, 104.5, 112.0, "Oct 9, 2026, 11:00 AM EDT"), str(_tq489)[:300])
+check("v489 collegamento in calcola: gli ordini si leggono dal libro, i loro nomi si scaricano, i pavimenti delle posizioni "
+      "vanno alla tenuta e gli ordini si valutano; la scheda dei sorvegliati porta il volume della seduta",
+      "ordini = leggi_ordini()" in _calc474 and "set(in_ordine)" in _calc474 and "aperte + in_ordine" in _calc474
+      and "decisioni, media, pav)" in _calc474 and 'out["ordini"] = valuta_ordini(ordini, B, TEC, BL,' in _calc474
+      and '"vol_seduta_corso": volume_seduta(t, barre)' in _corpo_di(Path(ROT.__file__).read_text(), "scheda"))
+_o489s = {**_o483, "ordini": _o489}
+check("v489 collegamento: la sintesi STAMPA il blocco degli ordini — provato eseguendola",
+      "ORDINI APERTI (LIBRO.md §1septies" in NL.sintesi(_o489s) and "AAA acquisto 100 a 105,00" in NL.sintesi(_o489s))
+_ma489 = ROT.piano_ingresso({"px": 100.0, "atr": 2.0, "sma20": 104.0, "sma50": 110.0, "sma200": 150.0, "pend50": -1.0})
+check("v489 il primo segnale del piano d'ingresso e quello degli ordini vengono dalla stessa funzione: la media più vicina "
+      "sopra il prezzo",
+      ROT.prima_media_sopra({"px": 100.0, "sma20": 104.0, "sma50": 110.0, "sma200": 150.0}) == ("media 20", 104.0)
+      and ROT.prima_media_sopra({"px": 200.0, "sma20": 104.0}) is None
+      and (_ma489["primo_segnale"] is None or _ma489["primo_segnale"][0] == "media 20"), str(_ma489.get("primo_segnale")))
+
+# --- il libro e il formato: le sezioni ci sono, si leggono, e le regole coincidono col codice ---
+_ol489 = NL.leggi_ordini(_lib474)
+_cl489 = ROT.brief.leggi_conti_dichiarati(_lib474)
+check("v489 il libro vero si legge: la sezione degli ordini c'è e ogni riga ha quantità, limite e verso leggibili (lo stato "
+      "degli ordini non si fissa qui: lo decide il CEO); i conti dichiarati hanno una data e una fonte",
+      _ol489 is not None and all(o["qta"] and o["limite"] and o["verso"] for o in _ol489)
+      and _cl489 is not None and all(re.match(r"\d{4}-\d{2}-\d{2}$", c["data"]) and len(c["fonte"]) > 3 for c in _cl489),
+      str((_ol489, _cl489))[:400])
+_sb489 = _lib474[_lib474.find("**Storno o discesa"):_lib474.find("## 1quinquies")]
+check("v489 la regola storno/discesa sta in LIBRO.md §1bis con le definizioni del codice: STORNO = tendenza intatta o in "
+      "correzione, DISCESA = tendenza rotta, lo stop resta quello del pavimento sotto il limite",
+      "**STORNO**" in _sb489 and "intatta o in correzione" in _sb489 and "**DISCESA**" in _sb489
+      and "tendenza rotta" in _sb489 and "lo stop resta quello del pavimento sotto il limite" in _sb489
+      and "se nella seduta il" in _sb489, _sb489[:300])
+_cl489f = AN.checklist() or ""
+check("v489 il formato porta gli ordini aperti, la media sui pavimenti, i volumi della seduta, l'ordine d'interesse coi suoi "
+      "criteri, e il registro delle richieste del 15/10",
+      "il blocco **ORDINI APERTI**" in _cl489f and "**media sui pavimenti**" in _cl489f and "seduta in corso" in _cl489f
+      and "7d-ter. **gli ingressi in ordine d'interesse**" in _cl489f and "non un punteggio del sistema" in _cl489f
+      and "gli ordini aperti seguiti a ogni analisi" in _cl489f and "le date dei conti dichiarate" in _cl489f)
 
 
 _T = len(ESEGUITI)

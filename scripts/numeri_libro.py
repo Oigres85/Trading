@@ -105,15 +105,17 @@ def calcola(sedute=1, registra=False, adesso=None):
     az = [p for p in pos if p["valuta"] == "USD"]
     TK = [p["tk"] for p in az]
     decisioni = leggi_decisioni()
+    ordini = leggi_ordini()               # v489 — gli ordini con limite aperti (LIBRO.md §1septies)
     reg_righe, _ = leggi_registro()
     aperte = [d["tk"] for d in (decisioni or []) if d["aperta"]]
-    extra = sorted((set(aperte) | set(LEADER) | set((reg_righe[-1].get("posizioni") or {}) if reg_righe else ()))
-                   - set(TK) - set(FATTORI))
+    in_ordine = list(dict.fromkeys(o["tk"] for o in (ordini or []) if o["attivo"]))
+    extra = sorted((set(aperte) | set(in_ordine) | set(LEADER)
+                    | set((reg_righe[-1].get("posizioni") or {}) if reg_righe else ())) - set(TK) - set(FATTORI))
     with ThreadPoolExecutor(6) as ex:
         B = dict(zip(TK + FATTORI, ex.map(brief.barre, TK + FATTORI)))
         B.update(zip(extra, ex.map(_barre_o_vuoto, extra)))
         TEC = dict(zip(TK, ex.map(brief.tecnica, TK)))
-        fuori = [t for t in aperte if t not in TK]
+        fuori = [t for t in dict.fromkeys(aperte + in_ordine) if t not in TK]
         TEC.update(zip(fuori, ex.map(lambda t: brief.tecnica(t, d=B.get(t) or None), fuori)))
     S = {t: {x["t"]: (x.get("a") or x["c"]) for x in B[t]} for t in TK + FATTORI}
     dq = [x["t"] for x in B["QQQ"]]
@@ -185,8 +187,17 @@ def calcola(sedute=1, registra=False, adesso=None):
              "rlibro": rotazione.serie_libro({t: B[t] for t in TK if B.get(t)}, qty),
              "rqqq": rotazione.rendimenti_per_data(B["QQQ"]),
              "rend": {t: rotazione.rendimenti_per_data(B[t]) for t in TK if B.get(t)}}
+    # v489 — i pavimenti delle posizioni (la media sui pavimenti) e dei nomi con un ordine aperto, sullo
+    #   storico di cinque anni e sul prezzo di adesso, come quelli dei sorvegliati (rotazione.py)
+    con_pav = list(dict.fromkeys(TK + in_ordine))
+    with ThreadPoolExecutor(6) as ex:
+        BL = dict(zip(con_pav, ex.map(rotazione.barre_lunghe, con_pav)))
+    pav = {t: rotazione.pavimenti(BL.get(t), (TEC.get(t) or {}).get("px"), (TEC.get(t) or {}).get("atr"), adesso)
+           for t in TK}
     out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
-                                     decisioni, media)
+                                     decisioni, media, pav)
+    out["ordini"] = valuta_ordini(ordini, B, TEC, BL, out["calendario"], righe_pipeline(pipe), out["semaforo"],
+                                  media["rlibro"], media["rqqq"], tot, media["fx"], adesso)
     out["rimandate"] = leggi_rimandate()          # v483 — le decisioni che aspettano un evento
     # v484 — ogni CONFLITTO con la sua scadenza (i conti successivi) e l'esame scritto prima (LIBRO.md §1sexies)
     scad = {}
@@ -210,6 +221,13 @@ def calcola(sedute=1, registra=False, adesso=None):
     return out
 
 
+def _da_emittente(e):
+    """v489 — ', dichiarata dall'emittente' quando la data viene da LIBRO.md §1octies e non dal calendario
+    Nasdaq: chi legge la scadenza deve sapere da dove viene. Vuoto per Nasdaq e per le voci senza fonte."""
+    f = (e or {}).get("fonte") or "calendario Nasdaq"
+    return "" if f == "calendario Nasdaq" else ", dichiarata dall'emittente"
+
+
 def costo_attesa(tot, vol_ann, var95, es95, calendario, nomi):
     """Quanto costa ASPETTARE a decidere, e fino a quando si puo' (v464, decisione del CEO del 06/10).
     Il costo e' il rischio del libro in dollari: oscillazione tipica di una seduta e di una
@@ -226,7 +244,8 @@ def costo_attesa(tot, vol_ann, var95, es95, calendario, nomi):
     scad = sorted(prime.values(), key=lambda e: e["data"])
     return {"seduta_1s": tot * sig, "settimana_1s": tot * sig * math.sqrt(5),
             "var_usd": tot * var95, "es_usd": tot * es95,
-            "scadenze": [{"tk": e["tk"], "data": e["data"], "giorni": e.get("giorni")} for e in scad],
+            "scadenze": [{"tk": e["tk"], "data": e["data"], "giorni": e.get("giorni"), "fonte": e.get("fonte")}
+                         for e in scad],
             "senza_data": [t for t in nomi if t not in prime],
             "prima": scad[0] if scad else None,
             "finestra": (calendario or {}).get("finestra"),
@@ -332,7 +351,7 @@ def righe_attesa(a):
          f" (seduta x radice di 5, convenzione) · seduta cattiva (VaR95) -{a['var_usd']:,.0f} $ · media delle peggiori (ES95) -{a['es_usd']:,.0f} $"]
     if a["scadenze"]:
         L.append("SCADENZE (prima trimestrale dichiarata dalla fonte): "
-                 + " · ".join(f"{s['tk']} {s['data']} ({s['giorni']} g)" for s in a["scadenze"]))
+                 + " · ".join(f"{s['tk']} {s['data']} ({s['giorni']} g{_da_emittente(s)})" for s in a["scadenze"]))
     else:
         L.append(f"SCADENZE: nessuna trimestrale dichiarata dalla fonte nei prossimi {a['finestra']} giorni")
     if a["senza_data"]:
@@ -711,7 +730,7 @@ def righe_decisioni(dd, finestra=45):
                     f"l'attesa ha FATTO GUADAGNARE {_it(e, 0)} $" if e > 0 else "effetto nullo")
                    + f" finora (prezzo {_sg(x['prezzo_pct'])}% dalla conferma)")
         sc = x["scadenza"]
-        scad = (f"scadenza: trimestrale {sc['data']} ({sc['giorni']} g)" if sc else
+        scad = (f"scadenza: trimestrale {sc['data']} ({sc['giorni']} g{_da_emittente(sc)})" if sc else
                 f"scadenza: nessuna trimestrale dichiarata dalla fonte nei {finestra} giorni (non 'nessuna uscita')")
         L.append(f"  {x['tk']} {x['decisione']}, {qt} · condizione {cond} · confermata il {x['confermata']}"
                  + (f" a {_it(x['conferma_px'])}" if x["conferma_px"] is not None else "")
@@ -786,9 +805,213 @@ def righe_rimandate(rr, calendario, finestra=45):
          "non si lasciano scadere"]
     for r in rr:
         sc = prime.get(r["tk"])
-        L.append(f"  {r['tk']} — {r['testo']} · " + (f"prima trimestrale {sc['data']} ({sc['giorni']} g)" if sc else
+        L.append(f"  {r['tk']} — {r['testo']} · " + (f"prima trimestrale {sc['data']} ({sc['giorni']} g{_da_emittente(sc)})" if sc else
                  f"nessuna trimestrale dichiarata dalla fonte nei {finestra} giorni (non 'nessuna uscita')"))
     return L
+
+# ════════════════════════════════════════════════════════════════ v489 — ORDINI APERTI
+# Il 15/10/2026 il CEO ha inserito tre ordini con limite (ORCL 65 a 129,50, OKLO 260 a 28,50, SMCI 300 a
+# 32,50) e ha chiesto due volte se alzare i limiti per prendere lo storno: "perché entrare su qualche punto
+# più caro quando posso acquistare bene su questo storno?". La risposta dipendeva dal TITOLO, non dal
+# prezzo: uno STORNO è una pausa dentro una salita, una DISCESA no (LIBRO.md §1bis). Poi: "Rendi questa
+# conversazione di oggi parte strutturale dell'analisi globale". Un ordine scritto solo in chat esce
+# dall'analisi alla prima compattazione — il difetto delle rimandate (v483) — e un ordine non seguito può
+# eseguirsi senza che l'analisi lo sappia. Qui ogni ordine aperto torna a ogni analisi coi fatti che servono
+# a decidere se lasciarlo, spostarlo o toglierlo. Solo fatti misurati: la frase la scrive la resa (v448).
+NATURA = {"intatta": "STORNO", "in correzione": "STORNO", "rotta": "DISCESA"}
+
+
+def leggi_ordini(testo=None):
+    """La tabella ORDINI APERTI di LIBRO.md (§1septies): ordini con limite inseriti dal CEO e non ancora
+    eseguiti. None = sezione ASSENTE, che si legge diverso da 'nessun ordine' (v389, v406). Si legge solo
+    dentro il proprio titolo (v454)."""
+    if testo is None:
+        testo = testo_libro()
+    out, sez, trovata = [], False, False
+    for riga in testo.splitlines():
+        if riga.startswith("## "):
+            sez = "ORDINI APERTI" in riga.upper()
+            trovata = trovata or sez
+            continue
+        if not sez or not riga.startswith("|"):
+            continue
+        celle = [x.strip() for x in riga.strip().strip("|").split("|")]
+        if len(celle) < 6 or celle[0] in ("Nome", "") or set(celle[0]) <= set("-: "):
+            continue
+        tk, verso, q, lim, ins, stato = celle[:6]
+        out.append({"tk": tk.upper(), "verso_testo": verso, "qta": _num_it(q), "limite": _num_it(lim),
+                    "verso": next((v for v, parole in VERSI.items() if verso.lower().startswith(parole)), None),
+                    "inserito": ins, "stato": stato, "attivo": stato.lower().startswith(("attivo", "aperto"))})
+    return out if trovata else None
+
+
+def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rqqq, valore_libro, fx, adesso=None):
+    """Per ogni ordine d'ACQUISTO attivo: la distanza dal prezzo; se il minimo della seduta di OGGI ha toccato il
+    limite (l'ordine può essere già eseguito: si verifica sul conto); STORNO o DISCESA dalla tendenza della tenuta
+    (§1sexies) e se alzare il limite è coerente con la regola dei minimi (§1bis); il pavimento SOTTO IL LIMITE con
+    lo stop e il rischio fino allo stop — col limite e col prezzo di adesso, perché alzare il limite allunga la
+    distanza dallo stop —; dove sta il limite rispetto al pavimento più vicino al prezzo; la tenuta se fosse in
+    portafoglio; la correlazione col libro; i conti dentro la vita dell'ordine; il volume della seduta; e
+    l'effetto dell'INSIEME degli ordini sul libro. None = sezione assente (v406)."""
+    if ordini is None:
+        return None
+    import brief, rotazione
+    ny = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
+    prime = {}
+    for e in (calendario or {}).get("attesi") or []:
+        prime.setdefault(e["tk"], e)                       # gli attesi arrivano gia' in ordine di data
+    out, spese, rend = [], {}, {}
+    for o in ordini:
+        if not o["attivo"]:
+            continue
+        t, b = tec.get(o["tk"]) or {}, barre.get(o["tk"]) or []
+        px, lim, q, atr = t.get("px"), o["limite"], o["qta"], t.get("atr")
+        r = {**o, "px": px, "var_pct": t.get("var_pct"), "seduta_quota": t.get("seduta_quota"),
+             "minimo_oggi": t.get("minimo_oggi"), "quota_ora": t.get("quota_ora")}
+        if o["verso"] != "acquisto":
+            out.append({**r, "errore": f"verso «{o['verso_testo']}»: il blocco valuta gli ordini d'acquisto"})
+            continue
+        if not (px and lim and q and atr):
+            out.append({**r, "errore": "prezzo, limite, quantità o ATR mancanti: ordine non valutabile"})
+            continue
+        tend = tendenza(b, adesso)
+        natura = NATURA.get(tend["stato"], "NON MISURABILE")
+        bl = lunghe.get(o["tk"])
+        pv_px = rotazione.pavimenti(bl, px, atr, adesso)
+        # i pavimenti SOTTO IL LIMITE: quello piu' vicino regge l'ordine, e il suo stop e' lo stop dell'ordine.
+        #   Il ritocco minimo fa entrare anche un minimo che coincide col limite (un ordine SUL pavimento)
+        pv_lim = rotazione.pavimenti(bl, lim * (1 + 1e-9), atr, adesso)
+        primo = ((pv_px or {}).get("minimi") or [None])[0]
+        sotto = ((pv_lim or {}).get("minimi") or [None])[0]
+        stop = sotto["stop"] if sotto else None
+        posizione = (None if primo is None else "sopra" if lim > primo["alto"] else
+                     "sul" if lim >= primo["fondo"] else "sotto")
+        vp = t.get("var_pct")
+        alzare = ("non misurabile" if natura == "NON MISURABILE" else "discesa" if natura == "DISCESA"
+                  else "coerente" if (vp is not None and vp < 0) else "risalita")
+        rt = rotazione.rendimenti_per_data(b)
+        sc = prime.get(o["tk"])
+        out.append({**r, "distanza_pct": (lim / px - 1) * 100, "sopra_prezzo": lim >= px,
+                    "toccato_oggi": (t.get("seduta_quota") == ny.date().isoformat()
+                                     and t.get("minimo_oggi") is not None and t["minimo_oggi"] <= lim),
+                    "tendenza": tend, "natura": natura, "alzare": alzare, "media_sopra": rotazione.prima_media_sopra(t),
+                    "pavimenti_letti": pv_px is not None, "pavimento_vicino": primo, "pavimento_sotto": sotto,
+                    "posizione": posizione, "stop": stop,
+                    "rischio": q * (lim - stop) if (stop is not None and stop < lim) else None,
+                    "rischio_pct": (stop / lim - 1) * 100 if (stop is not None and stop < lim) else None,
+                    "rischio_mercato": q * (px - stop) if (stop is not None and stop < px) else None,
+                    "rischio_mercato_pct": (stop / px - 1) * 100 if (stop is not None and stop < px) else None,
+                    "tenuta": valuta_tenuta(b, (righe or {}).get(o["tk"]), sem, adesso),
+                    "corr_libro": rotazione.correlazione(rt, rlibro or {}),
+                    "conti": sc, "conti_vicini": bool(sc and sc.get("giorni") is not None
+                                                     and sc["giorni"] <= rotazione.TRIMESTRALE_VICINA),
+                    "volume": rotazione.volume_seduta(t, b, adesso)})
+        spese[o["tk"]] = spese.get(o["tk"], 0) + q * lim
+        rend[o["tk"]] = rt
+    insieme, tot = None, sum(spese.values())
+    if tot:
+        comuni = set.intersection(*[set(v) for v in rend.values()])
+        serie = {d: sum(spese[k] * rend[k][d] for k in spese) / tot for d in comuni}
+        valutati = [x for x in out if not x.get("errore")]
+        rv = [x["rischio"] for x in valutati if x.get("rischio") is not None]
+        insieme = {"spesa": tot, "nomi": len(spese), "fx": fx, "rischio": sum(rv) if rv else None,
+                   "rischio_completo": len(rv) == len(valutati),
+                   "conseguenze": rotazione.conseguenze(serie, rlibro or {}, rqqq or {}, valore_libro, tot)}
+    return {"righe": out, "insieme": insieme, "inattivi": [o for o in ordini if not o["attivo"]]}
+
+
+def righe_ordini(oo, finestra=45):
+    import rotazione
+    if oo is None:
+        return ["ORDINI APERTI: sezione NON trovata in LIBRO.md — non vuol dire 'nessun ordine aperto'"]
+    L = []
+    if not oo["righe"]:
+        L.append("ORDINI APERTI: nessuno attivo in LIBRO.md §1septies")
+    else:
+        L.append("ORDINI APERTI (LIBRO.md §1septies, inseriti dal CEO e non ancora eseguiti) · regola (§1bis, 15/10/2026): "
+                 "STORNO = tendenza non rotta: alzare il limite è coerente se nella seduta il titolo scende — si compra "
+                 "lo storno, non la risalita · DISCESA = tendenza rotta: lo sconto è il rischio e il limite resta sul "
+                 "pavimento · lo stop resta quello del pavimento sotto il limite: alzare il limite allunga la distanza "
+                 "dallo stop, e il rischio in più si scrive in dollari")
+    for x in oo["righe"]:
+        testa = f"  {x['tk']} {x['verso_testo']} {_it(x['qta'], 0)} a {_it(x['limite'])} (inserito {x['inserito']})"
+        if x.get("errore"):
+            L.append(testa + f" · {x['errore']}")
+            continue
+        vp = x.get("var_pct")
+        L.append(testa + f" · ora {_it(x['px'])}"
+                 + (f" ({_sg(vp)}% nella seduta del {x['seduta_quota']})" if vp is not None else "")
+                 + (" · ⚠ il limite sta SOPRA il prezzo: si esegue subito" if x["sopra_prezzo"] else
+                    f" · il limite è il {_it(-x['distanza_pct'], 1)}% sotto il prezzo"))
+        if x["toccato_oggi"]:
+            L.append(f"      ⚠ il minimo di oggi ({_it(x['minimo_oggi'])}) ha toccato il limite: se l'ordine era già attivo "
+                     "in quel momento può essere ESEGUITO — si verifica sul conto, e se lo è si aggiorna il libro (§1)")
+        td, ms = x["tendenza"], x.get("media_sopra")
+        if x["natura"] == "NON MISURABILE":
+            nat = f"tendenza NON MISURABILE ({td.get('perche')}): la regola storno/discesa non si applica, e lo si dice"
+        else:
+            nat = (f"{x['natura']} — tendenza {td['stato']}: chiusura {_sg(td['d50_atr'])} ATR dalla media 50, "
+                   f"{_sg(td['d200_atr'])} dalla 200" + (", media 50 sotto la 200" if td["incrocio"] else ""))
+        alz = {"coerente": "alzare il limite è COERENTE con la regola: è uno storno e nella seduta il titolo scende",
+               "risalita": "alzare il limite NON è coerente adesso: è uno storno, ma nella seduta il titolo sale — sarebbe "
+                           "comprare la risalita",
+               "discesa": "alzare il limite NON è coerente: lo sconto è il rischio, il limite resta sul pavimento"
+                          + (f"; la discesa smette di scendere con una chiusura sopra la {ms[0]} ({_it(ms[1])}), che non è "
+                             "ancora un ingresso" if ms else ""),
+               "non misurabile": "alzare il limite: non valutabile con la regola"}[x["alzare"]]
+        L.append(f"      {nat} · {alz}")
+        pv = x["pavimento_vicino"]
+        if not x["pavimenti_letti"]:
+            pav = "pavimenti: storico NON letto — non vuol dire 'nessun pavimento'"
+        elif pv is None:
+            pav = "pavimenti: nessun minimo di oscillazione sotto il prezzo nei due anni — lo stop non ha dove appoggiarsi"
+        else:
+            rif = (f"{_it(pv['fondo'])}–{_it(pv['alto'])}" if pv["fondo"] != pv["alto"] else _it(pv["alto"])) + \
+                  f", {_conta(len(pv['tocchi']), 'tocco', 'tocchi')}"
+            pav = {"sopra": f"il limite sta SOPRA il pavimento più vicino ({rif}): si esegue prima di arrivarci, non è un "
+                            "ingresso sui minimi",
+                   "sul": f"il limite sta SUL pavimento più vicino ({rif})",
+                   "sotto": f"il limite sta SOTTO il pavimento più vicino ({rif}): si esegue solo se quel pavimento cede"
+                   }[x["posizione"]]
+        if x["rischio"] is not None:
+            pav += (f" · stop del pavimento sotto il limite {_it(x['stop'])} (chiusura sotto) → fino allo stop "
+                    f"{_it(x['rischio'], 0)} $ ({_sg(x['rischio_pct'])}%)")
+            if x["rischio_mercato"] is not None and not x["sopra_prezzo"]:
+                pav += (f"; col limite alzato al prezzo di adesso {_it(x['rischio_mercato'], 0)} $ "
+                        f"({_sg(x['rischio_mercato_pct'])}%)")
+        elif x["pavimenti_letti"] and pv is not None:
+            pav += " · nessun pavimento sotto il limite: stop n.d."
+        L.append("      " + pav)
+        c, sc = x["corr_libro"], x["conti"]
+        parti = [f"tenuta se fosse in portafoglio: {etichetta_esito(x['tenuta'])}",
+                 "correlazione col libro n.d." if c is None else
+                 f"correlazione col libro {_sg(c, 2)}" + (" (stessa scommessa)" if c >= rotazione.SOGLIA_CORR else " (diversifica)"),
+                 (f"conti {sc['data']} ({sc['giorni']} g, {sc.get('fonte') or 'calendario Nasdaq'})" if sc else
+                  f"conti: nessuna data dichiarata nei {finestra} giorni (non 'nessuna uscita')")]
+        L.append("      " + " · ".join(parti))
+        if x["conti_vicini"]:
+            L.append(f"      ⚠ conti entro {rotazione.TRIMESTRALE_VICINA} giorni: un ordine lasciato attivo durante i conti può "
+                     "eseguirsi all'apertura dopo, anche sotto il pavimento — si decide prima se tenerlo aperto")
+        vs = rotazione.testo_volume_seduta(x["volume"])
+        if vs:
+            L.append(f"      volumi: {vs}")
+    ins = oo.get("insieme")
+    if ins:
+        c = ins["conseguenze"]
+        s = (f"  INSIEME, se eseguiti tutti ai limiti: {_it(ins['spesa'], 0)} $ su {_conta(ins['nomi'], 'nome', 'nomi')}"
+             + (" · conseguenze sul libro n.d." if c is None else
+                f" · {_it(c['peso'] * 100, 1)}% dell'azionario dopo · volatilità del libro {_sg(c['dvol'], 2)} punti, "
+                f"beta su QQQ {_sg(c['dbeta'], 3)} ({c['sedute']} sedute)"))
+        if ins["rischio"] is not None:
+            s += (f" · fino agli stop {_it(ins['rischio'], 0)} $"
+                  + (f" ≈ {_it(ins['rischio'] / ins['fx'], 0)} €" if ins.get("fx") else "")
+                  + ("" if ins["rischio_completo"] else " (parziale: uno o più ordini senza stop)"))
+        L.append(s)
+    if oo.get("inattivi"):
+        L.append("  in tabella ma non attivi (si tolgono quando eseguiti o revocati, §1septies): "
+                 + ", ".join(f"{o['tk']} ({o['stato']})" for o in oo["inattivi"]))
+    return L
+
 
 
 # ════════════════════════════════════════════════════════════════ v481-v482 — TENUTA DELLE POSIZIONI
@@ -994,6 +1217,46 @@ def media_aritmetica(px, pmc, qta, peso, valore_libro, fx, rt=None, rlibro=None,
             "giorni_trim": giorni_trim}
 
 
+def media_pavimenti(pv, pmc, qta, peso, md, tk, px=None):
+    """v489 — la media sui PAVIMENTI (CEO, 15/10/2026: «valuta anche mediazione su SK hynix», con SK hynix un
+    soffio sopra il carico). Comprare sopra il carico ALZA il carico: è un incremento, non una media. La media vera
+    si fa sotto il carico, e la regola dei minimi (LIBRO.md §1bis) dice dove: sui pavimenti. Per ogni pavimento
+    sotto il carico l'aritmetica di media_aritmetica — la stessa funzione della media al prezzo di adesso (v161) —
+    accanto allo stop del pavimento. Un'unità di calcolo, non una quantità (v474).
+    ⚠ Il peso dopo si conta al valore di OGGI (px), come il libro a cui l'unità si aggiunge: valutare la
+    posizione al prezzo del pavimento e il libro a quello di oggi mescola due date nello stesso rapporto, e su
+    MSTR faceva scendere il peso dopo un acquisto (9,7% → 9,6%) — una frase falsa da un denominatore doppio."""
+    if not pv or not pv.get("minimi") or pmc is None:
+        return []
+    md = md or {}
+    out = []
+    for z in pv["minimi"]:
+        if z["ordine"] >= pmc:
+            continue
+        m = media_aritmetica(z["ordine"], pmc, qta, peso, md.get("valore"), md.get("fx"),
+                             (md.get("rend") or {}).get(tk), md.get("rlibro"), md.get("rqqq"),
+                             (md.get("trim") or {}).get(tk))
+        if m and not m.get("errore"):
+            if px and qta is not None and md.get("valore"):
+                m["peso_dopo"] = (qta * px + m["spesa"]) / (md["valore"] + m["spesa"])
+            out.append({"pavimento": z, "media": m})
+    return out
+
+
+def riga_pavimenti_posizione(pv):
+    """I pavimenti di una posizione in una riga: prezzo dell'ordine, distanza, tocchi e stop. La versione estesa,
+    con rimbalzi e volumi, è quella dei sorvegliati (rotazione.righe_pavimenti)."""
+    if pv is None:
+        return "pavimenti: storico o prezzo NON letti — non vuol dire 'nessun pavimento'"
+    if not pv.get("minimi"):
+        ms = pv.get("minimo_serie")
+        return ("pavimenti: nessuno sotto il prezzo nella finestra"
+                + (f" (minimo della serie {_it(ms['minimo'])} del {ms['data']})" if ms else ""))
+    return "pavimenti: " + " · ".join(
+        f"{'★ ' if z.get('piu_toccato') else ''}{_it(z['ordine'])} ({_sg(z['pct'])}%, "
+        f"{_conta(len(z['tocchi']), 'tocco', 'tocchi')}) stop {_it(z['stop'])}" for z in pv["minimi"])
+
+
 def valuta_tenuta(barre, riga, sem, adesso=None):
     """Le prove e l'esito di UN nome: la stessa funzione per le posizioni (qui) e per i sorvegliati
     (rotazione.py), perche' la regola del CEO vale per tutti i nomi oggetto di analisi (v481)."""
@@ -1006,12 +1269,15 @@ def valuta_tenuta(barre, riga, sem, adesso=None):
     return {"prove": prove, "consenso": consenso(riga, b[-1]["c"] if b else None), **esito_bilancio(prove)}
 
 
-def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None, decisioni=None, media=None):
+def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None, decisioni=None, media=None,
+                     pav=None):
     """decisioni: la tabella di LIBRO.md §1quinquies. Una VENDITA PER EVIDENZA con una vendita gia'
     aperta e' una decisione presa; senza, e' una PROPOSTA al CEO. Una vendita aperta su un nome che la
     regola non sostiene da sola (CONFLITTO, OSSERVAZIONE, LASCIAR CORRERE) e' una premessa da
     ridiscutere col CEO. media: cambio, valore del libro e serie per l'aritmetica della media sulle
-    posizioni in perdita (media_aritmetica); None = non calcolata, e la resa lo dice."""
+    posizioni in perdita (media_aritmetica); None = non calcolata, e la resa lo dice. pav: {tk: pavimenti} di
+    rotazione.pavimenti sul prezzo di adesso (v489), per la media sui pavimenti sotto il carico; None = non
+    calcolati, e la resa tace."""
     vendite = {d["tk"] for d in (decisioni or []) if d.get("aperta") and d.get("verso") == "vendita"}
     md = media or {}
     out = []
@@ -1021,12 +1287,16 @@ def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None
               media_aritmetica(prezzi.get(t), pmc.get(t), qta.get(t), pesi.get(t), md.get("valore"), md.get("fx"),
                                (md.get("rend") or {}).get(t), md.get("rlibro"), md.get("rqqq"),
                                (md.get("trim") or {}).get(t)))
+        pv = (pav or {}).get(t)
         out.append({"tk": t, "peso": pesi.get(t), **v, "vendita_aperta": t in vendite,
-                    "fisco": pareggio_fiscale(prezzi.get(t), pmc.get(t), qta.get(t)), "media": mm})
+                    "fisco": pareggio_fiscale(prezzi.get(t), pmc.get(t), qta.get(t)), "media": mm,
+                    "carico": pmc.get(t), "pavimenti": pv,
+                    "media_pavimenti": None if pav is None else media_pavimenti(pv, pmc.get(t), qta.get(t), pesi.get(t), md, t,
+                                                                                 prezzi.get(t))})
     out.sort(key=lambda x: (ESITI.index(x["esito"]), -(x["peso"] or 0)))
     return {"righe": out, "seduta": max((x["prove"]["tendenza"].get("seduta") or "" for x in out), default="") or None,
             "colore": (sem or {}).get("colore"), "minimo_semaforo": bool((sem or {}).get("minimo")),
-            "media_calcolata": media is not None, "cambio": md.get("fx")}
+            "media_calcolata": media is not None, "cambio": md.get("fx"), "pav_calcolati": pav is not None}
 
 
 NOMI_PROVE = {"tendenza": "tendenza", "stime": "stime a 90 giorni", "revisioni": "revisioni a 30 giorni",
@@ -1187,6 +1457,29 @@ def righe_tenuta(t):
             if r["vendita_aperta"]:
                 s += " · ⚠ c'è una vendita APERTA su questo nome: mediare e vendere non stanno insieme, va decisa prima"
             L.append(s)
+        if t.get("pav_calcolati"):
+            L.append("      " + riga_pavimenti_posizione(r.get("pavimenti")))
+            mp = r.get("media_pavimenti") or []
+            if mp:
+                cq = mp[0]["media"].get("conseguenze")
+                s = (f"      media sui pavimenti (sotto il carico {_it(r['carico'])}; un'unità di calcolo, non una quantità): "
+                     + " · ".join(f"a {_it(x['pavimento']['ordine'])} → {x['media']['azioni']} azioni, carico "
+                                  f"{_it(x['media']['carico_dopo'])}, per tornare al carico {_sg(x['media']['rientro_prima'])}% "
+                                  f"→ {_sg(x['media']['rientro_dopo'])}%"
+                                  + (f", peso {_it(x['media']['peso_prima'] * 100, 1)}% → {_it(x['media']['peso_dopo'] * 100, 1)}%"
+                                     if x["media"].get("peso_dopo") is not None and x["media"].get("peso_prima") is not None else "")
+                                  + f", stop {_it(x['pavimento']['stop'])} ({_it(-x['pavimento']['perdita_eur'], 0)} € ogni 5.000 €)"
+                                  for x in mp)
+                     + ("" if cq is None else f" · volatilità del libro {_sg(cq['dvol'], 2)} punti, beta su QQQ "
+                        f"{_sg(cq['dbeta'], 3)} ({cq['sedute']} sedute)"))
+                import rotazione
+                gt = mp[0]["media"].get("giorni_trim")
+                if gt is not None and gt <= rotazione.TRIMESTRALE_VICINA:
+                    s += (f" · ⚠ conti fra {gt} giorni: un ordine sul pavimento attivo durante i conti può eseguirsi "
+                          "all'apertura dopo, anche sotto")
+                if r["esito"] == "VENDITA PER EVIDENZA":
+                    s += " · ⚠ con questo esito mediare è comprare CONTRO l'evidenza: speculativo, ammesso e dichiarato"
+                L.append(s)
     L.append("  notizie: NON calcolate — per ogni nome in VENDITA, CONFLITTO o OSSERVAZIONE si cercano in rete NEI DUE "
              "VERSI, con fonte e data: i catalizzatori che possono farlo salire forte (contratti, guida alzata, ordini, "
              "clienti nuovi) e i fatti che rompono la tesi (guida tagliata, cliente perso, diluizione pesante, indagine). "
@@ -1201,6 +1494,12 @@ def righe_tenuta(t):
         L.append(f"  media = un'unità di calcolo da {_it(u, 0)} €" + (f" (≈ {_it(u * fx, 0)} $ al cambio {_it(fx, 4)})"
                  if fx else "") + " sulle sole posizioni in perdita, NON una quantità: dice cosa fa al carico e al "
                  "libro, non se farlo. Mediare ha senso se la tesi regge — il caso di AMD (LIBRO.md §1sexies)")
+    if t.get("pav_calcolati"):
+        sopra = [r["tk"] for r in t["righe"] if r.get("pavimenti") and r["pavimenti"].get("minimi")
+                 and not r.get("media_pavimenti")]
+        if sopra:
+            L.append(f"  media sui pavimenti: nessun pavimento sotto il carico per {', '.join(sopra)} — lì comprare sui "
+                     "pavimenti è un incremento (il carico sale), non una media (v489, LIBRO.md §1bis)")
     L.append("  ⚠ imposta e pareggio in dollari al prezzo di oggi: il conto vero lo fa il broker in euro col cambio di "
              "carico, e regime fiscale e minusvalenze pregresse non sono nel sistema")
     prov = [r["tk"] for r in t["righe"] if r.get("provvisorio")]
@@ -1708,7 +2007,7 @@ def testo_scadenza(r, oggi=None, finestra=None):
         return pre + (f"nessuna trimestrale dichiarata dalla fonte nei prossimi {finestra or 'n.d.'} giorni: il conflitto "
                       "resta senza data, e lo si dice (non è 'nessuna uscita')"
                       + (" · esame scritto (§1quinquies)" if es else ""))
-    s = pre + f"si decide coi conti del {sc['data']} ({sc['giorni']} g)"
+    s = pre + f"si decide coi conti del {sc['data']} ({sc['giorni']} g{_da_emittente(sc)})"
     if es:
         return s + " · esame scritto (§1quinquies)"
     if sc["giorni"] <= GIORNI_ESAME:
@@ -1752,6 +2051,8 @@ def sintesi(o):
         L.extend(righe_decisioni(o["decisioni"], (o.get("calendario") or {}).get("finestra") or 45))
     if "rimandate" in o:
         L.extend(righe_rimandate(o["rimandate"], o.get("calendario"), (o.get("calendario") or {}).get("finestra") or 45))
+    if "ordini" in o:                     # v489
+        L.extend(righe_ordini(o["ordini"], (o.get("calendario") or {}).get("finestra") or 45))
     if o.get("credito"):
         L.extend(righe_credito(o["credito"]))
     if o.get("tenuta"):

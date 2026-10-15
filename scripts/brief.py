@@ -211,6 +211,10 @@ def tecnica(tk, d=None):
          #   v431 (l'etichetta da una fonte, il valore da un'altra).
          "seduta_quota": q.get("td"),
          "esteso_px": q.get("ep"), "esteso_pct": q.get("ecp"), "esteso_fase": q.get("es"),
+         # v489 — la seduta come la dichiara la quota: volume finora, minimo e massimo, ora
+         #   dell'aggiornamento. Servono agli ordini aperti (il minimo ha toccato il limite?) e ai
+         #   volumi della seduta in corso (rotazione.volume_seduta), che si leggono con l'ora accanto.
+         "vol_oggi": q.get("v"), "minimo_oggi": q.get("l"), "massimo_oggi": q.get("h"), "quota_ora": q.get("u"),
          "atr": atr, "atr_pct": (atr / px * 100) if (atr and px) else None}
     for n in (20, 50, 200):
         m = sma(d, n)
@@ -336,9 +340,63 @@ def _trim_giorno(giorno):
     return giorno, righe, None
 
 
+def leggi_conti_dichiarati(testo=None):
+    """v489 — LIBRO.md §1octies: le date dei conti DICHIARATE DALL'EMITTENTE con un documento (un 6-K, un
+    comunicato) per chi il calendario Nasdaq non porta. Il 15/10/2026 SK hynix aveva dichiarato con un 6-K
+    del 14/10 i conti del 28/10 e il calendario non li aveva: la posizione restava senza scadenza e senza
+    l'avviso dei 14 giorni. Non e' una stima: e' una data che la societa' ha scritto, con la fonte accanto
+    (v396). Si legge solo dentro il proprio titolo (v454). None = sezione assente (v406)."""
+    if testo is None:
+        try:
+            with open(os.path.join(RADICE, "memoria", "LIBRO.md"), encoding="utf-8") as f:
+                testo = f.read()
+        except OSError:
+            return None
+    out, sez, trovata = [], False, False
+    for riga in testo.splitlines():
+        if riga.startswith("## "):
+            sez = "CONTI DICHIARATI" in riga.upper()
+            trovata = trovata or sez
+            continue
+        if not sez or not riga.startswith("|"):
+            continue
+        celle = [x.strip() for x in riga.strip().strip("|").split("|")]
+        if len(celle) < 4 or not re.match(r"\d{4}-\d{2}-\d{2}$", celle[1]):
+            continue
+        out.append({"tk": celle[0].upper(), "data": celle[1], "fonte": celle[2], "depositato": celle[3]})
+    return out if trovata else None
+
+
+def con_conti_dichiarati(attesi, cercati, oggi, giorni, dichiarati):
+    """Le date dell'emittente entrano nella finestra accanto a quelle di Nasdaq. Dove ci sono entrambe e
+    divergono vince l'emittente — e' la fonte primaria — e la data di Nasdaq resta scritta accanto. Una data
+    gia' passata o fuori dalla finestra non entra: l'evento e' avvenuto, o il sistema non guarda cosi'
+    lontano (stessa finestra di Nasdaq). Ogni voce porta la sua fonte."""
+    out = [{**a, "fonte": a.get("fonte") or "calendario Nasdaq"} for a in attesi]
+    for c in dichiarati or []:
+        if c["tk"] not in cercati:
+            continue
+        try:
+            g = (datetime.fromisoformat(c["data"]).date() - oggi).days
+        except ValueError:
+            continue
+        if g < 0 or g >= giorni:
+            continue
+        nasdaq = sorted(a["data"] for a in out if a["tk"] == c["tk"])
+        voce = {"tk": c["tk"], "data": c["data"], "quando": "", "eps_atteso": None, "trimestre": None, "giorni": g,
+                "fonte": f"dichiarata dall'emittente: {c['fonte']}, depositato il {c['depositato']}"}
+        if nasdaq and nasdaq[0] != c["data"]:
+            voce["nasdaq"] = nasdaq[0]
+        out = [a for a in out if a["tk"] != c["tk"]] + [voce]
+    out.sort(key=lambda x: x["data"])
+    return out
+
+
 def calendario_trimestrali(tickers, giorni=21):
     """Le uscite dichiarate DALLA FONTE nei prossimi giorni. Nessuna proiezione nostra: se
-    una data non c'e', si dice che non c'e' (istruzione permanente del CEO, v396)."""
+    una data non c'e', si dice che non c'e' (istruzione permanente del CEO, v396).
+    v489 — le fonti sono due: il calendario Nasdaq e, per chi non c'e', la data che l'emittente ha
+    dichiarato con un documento (LIBRO.md §1octies). Ogni voce dice da quale viene."""
     oggi = datetime.now(timezone.utc).date()
     date = []
     for i in range(giorni):
@@ -358,6 +416,7 @@ def calendario_trimestrali(tickers, giorni=21):
                                    "trimestre": r.get("fiscalQuarterEnding"),
                                    "giorni": (datetime.fromisoformat(giorno).date() - oggi).days})
     attesi.sort(key=lambda x: x["data"])
+    attesi = con_conti_dichiarati(attesi, cercati, oggi, giorni, leggi_conti_dichiarati())
     return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni}
 
 
@@ -703,7 +762,8 @@ def componi(modo, dati):
         q = {"time-pre-market": "prima della campana", "time-after-hours": "dopo la campana"}.get(
             x["quando"], x["quando"] or "orario non dichiarato")
         eps = f" · consenso {x['eps_atteso']}" if x.get("eps_atteso") else ""
-        A(f"  {x['tk']:6} {x['data']} (fra {x['giorni']}g) · {q}{eps}")
+        fonte = "" if x.get("fonte", "calendario Nasdaq") == "calendario Nasdaq" else f" · {x['fonte']}"
+        A(f"  {x['tk']:6} {x['data']} (fra {x['giorni']}g) · {q}{eps}{fonte}")
     if cal["giorni_non_letti"]:
         A(f"  ⚠ giorni NON letti (diverso da 'nessuna uscita'): {len(cal['giorni_non_letti'])}")
 
