@@ -199,6 +199,8 @@ Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno stru
 - Va dichiarato il conflitto di interessi su Anthropic, che ha creato il modello che scrive l'analisi, e
   sui suoi azionisti quando compaiono: NVIDIA e Microsoft (impegni d'investimento annunciati il
   18/11/2025), Alphabet e Amazon. OpenAI, concorrente di Anthropic, è il cliente principale di
-  CoreWeave, Oracle e Cerebras. Fino al 15/10/2026 la regola nominava solo Amazon: NVIDIA, che pesa
-  un quinto del libro, mancava.
+  CoreWeave, Oracle e Cerebras. SpaceX possiede xAI (Grok), concorrente di Anthropic: fusione chiusa
+  il 02/02/2026. Le notizie su Anthropic stessa si riportano come le riportano le fonti, dichiarando
+  il conflitto. Fino al 15/10/2026 la regola nominava solo Amazon: NVIDIA, che pesa un quinto del
+  libro, mancava; SpaceX è stata aggiunta lo stesso giorno, quando è entrata nell'analisi.
 - Rapporto HTML solo se richiesto: costa token (decisione del CEO).
