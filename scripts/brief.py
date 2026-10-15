@@ -171,6 +171,32 @@ def quota(tk):
     return jget(f"{SA}/quotes/s/{tk}")["data"]
 
 
+def barre_5min(tk):
+    """v491 — Le barre a 5 minuti delle ultime cinque sedute REGOLARI (stockanalysis.com, 5D/c), con l'ora di
+    New York. Servono a una domanda sola: il prezzo DOPO un certo momento della seduta (numeri_libro, ordini
+    aperti — un ordine visto ancora attivo alle 18:02 non puo' essersi eseguito sul minimo delle 15:30).
+    ⚠⚠ L'ora e' quella di PARETE di New York scritta come se fosse UTC: misurato il 15/10/2026, cosi' letta ogni
+    giornata comincia alle 09:30, e i minimi e massimi delle barre riproducono lo storico giornaliero di ORCL,
+    OKLO e SMCI entro lo 0,064% sulle sedute concluse. La lettura si VERIFICA a ogni chiamata — ogni giornata deve
+    cominciare alle 09:30 —: se la fonte cambiasse codifica l'ora sbaglierebbe di 4-5 ore, e un prezzo di prima
+    diventerebbe un prezzo di dopo. Meglio un dato dichiarato illeggibile che uno sbagliato (v396)."""
+    out = []
+    for b in jget(f"{SA}/charts/s/{tk}/5D/c")["data"]:
+        if b.get("t") is None or b.get("l") is None or b.get("h") is None:
+            continue
+        dt = datetime.fromtimestamp(b["t"], timezone.utc).replace(tzinfo=NEW_YORK)
+        out.append({"dt": dt, "o": b.get("o"), "h": b["h"], "l": b["l"], "c": b.get("c"), "v": b.get("v")})
+    out.sort(key=lambda x: x["dt"])
+    primo = {}
+    for b in out:
+        primo.setdefault(b["dt"].date(), b["dt"])
+    storti = [f"{g:%d/%m} alle {t:%H:%M}" for g, t in primo.items() if (t.hour, t.minute) != (9, 30)]
+    if storti:
+        raise ValueError("ore delle barre a 5 minuti non verificabili: la giornata comincia " + ", ".join(storti)
+                         + " invece che alle 09:30")
+    return out
+
+
 def atr_wilder(d, n=14):
     """⚠ WILDER, non la media semplice. Verificato contro data.json su 8 titoli su 8."""
     if len(d) < n + 1:

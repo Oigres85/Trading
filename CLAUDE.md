@@ -7204,3 +7204,41 @@ sul controllo atteso** — il ramo dei chiusi spento, la campana ignorata, l'ora
 rovescio, la barra ignorata, la bloccata che conta i chiusi, il collegamento in `calcola`, la colonna sbagliata, la
 testa senza validità, la libera sommata. Pavimento di `test_analisi_libro.py` 460 → 470 (i check sono 493). `?v=` e
 `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🕔 v491 — IL MINIMO DELLA SEDUTA DICE SE IL LIMITE È STATO RAGGIUNTO, NON QUANDO
+
+Trovato rispondendo al CEO la sera del 15/10 (*"I prezzi relativi ai tre ingressi stanno risalendo in chiusura"*). I
+tre ordini giornalieri — ORCL 129,50, OKLO 28,50, SMCI 32,50 — avevano tutti il limite sopra il minimo della seduta
+(127,60, 27,52, 32,38), e la resa della v490 avrebbe scritto per tutti e tre *"può essere stato ESEGUITO, se l'ordine
+era già sul conto in quel momento"*. Vero, e incapace di distinguere: i minimi erano arrivati fra le 15:30 e le 15:54
+italiane, lo screenshot del conto delle 18:02 mostrava i tre ordini ancora attivi, e dopo le 18:02 nessuno è più sceso
+al limite (ORCL 132,54, OKLO 28,94, SMCI 33,87). Nessuno è stato eseguito — l'ha confermato il CEO.
+
+- **La colonna «Attivo alle»** in §1septies (ora italiana, in coda come la validità: le altre non si spostano): l'ultimo
+  momento in cui il conto mostrava l'ordine attivo e non eseguito. Prima di quell'ora nessuna esecuzione è possibile, e
+  il calcolo guarda solo i prezzi DOPO.
+- **`brief.barre_5min`**: le barre a 5 minuti delle ultime cinque sedute (stockanalysis, 5D/c). ⚠⚠ L'ora è quella di
+  PARETE di New York scritta come se fosse UTC — misurato il 15/10, e **verificato a ogni chiamata**: ogni giornata deve
+  cominciare alle 09:30, altrimenti la lettura si dichiara illeggibile. Con la codifica cambiata l'ora sbaglierebbe di
+  4-5 ore, e un prezzo di prima diventerebbe un prezzo di dopo.
+- Il minimo delle barre a 5 minuti si scosta da quello dello storico giornaliero al massimo dello **0,064%** (sedute
+  concluse di ORCL, OKLO, SMCI): a meno dello 0,1% dal limite non si decide («soffio», convenzione dichiarata, v240).
+  La barra che contiene l'ora della verifica non decide («cavallo»), e l'ora annotata vale per tutto il suo minuto.
+- Le barre si chiedono **solo quando servono** — un limite raggiunto e un'ora annotata — e una volta per nome.
+- Quando non si può dire si dice perché, **mai uno «scaduto» dedotto da un dato che manca**.
+
+⚠ **Il mio primo racconto al CEO era sbagliato**: ho scritto che i minimi erano arrivati *"prima che inserissi gli
+ordini alle 18:02"*. Le 18:02 erano l'ora dello screenshot, non dell'inserimento: l'app del broker non mostra l'ora
+degli ordini. Corretto nella risposta successiva, e la colonna si chiama «Attivo alle» e non «Inserito alle» per
+questo: si annota ciò che si sa, non ciò che si suppone (v396). La conclusione reggeva lo stesso — alle 18:02 erano
+attivi, dopo non sono stati toccati — ma reggeva per la ragione giusta solo dopo la correzione.
+
+⚠ **Il grafico a 5 anni di OKLO comincia con la società veicolo della quotazione** (AltC, ~10 $, fino a maggio 2024):
+una media a 200 settimane, lì, mescola due società. I pavimenti non ne soffrono (finestra di due anni, tutta dopo la
+quotazione); una lettura a 5 anni sì, e va dichiarato ogni volta.
+
+⚠ Dodici iniezioni, una alla volta, ripristino verificato per impronta: mordono tutte, ciascuna sul controllo
+atteso. Una sembrava non mordere: il mio confronto tagliava il nome del check a 110 caratteri, e la parola cercata
+stava dopo. *Un'iniezione che "non morde" può essere la sonda che non guarda* (v433). Pavimento di
+`test_analisi_libro.py` 470 → 480 (i punti di chiamata sono 496). `?v=` e `BUILD_VERSION` non toccati: nessun file
+servito al browser (v440).

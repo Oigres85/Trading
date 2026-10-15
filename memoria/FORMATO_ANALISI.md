@@ -103,10 +103,14 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    volume della seduta; e l'insieme degli ordini sul libro. La risposta dice ordine per ordine:
    lasciarlo, spostarlo (a quale prezzo) o toglierlo. Un ordine eseguito si registra in §1 e
    lascia la tabella.
-   Da v490 ogni ordine porta la sua **validità** (ultima colonna di §1septies): un ordine **giornaliero**, dopo la
+   Da v490 ogni ordine porta la sua **validità** (colonna «Validità» di §1septies): un ordine **giornaliero**, dopo la
    campana della sua seduta, non è più attivo — il blocco lo mette fra gli ESEGUITI o SCADUTI col minimo della
    seduta accanto al limite, e la risposta chiede al CEO quale dei due. L'INSIEME dice la **liquidità bloccata**
    dagli ordini attivi e la **libera** (`LIBRO.md` §1 scrive la liquidità in tutto, bloccata compresa).
+   Da v491 l'ultima colonna è **Attivo alle**: l'ora italiana in cui il conto mostrava l'ordine ancora attivo e non
+   eseguito. Quando il CEO manda lo screenshot degli ordini, l'ora dello screenshot va lì — non è l'ora
+   d'inserimento, e non si scrive come tale. Il blocco guarda solo i prezzi DOPO quell'ora, dalle barre a 5 minuti
+   delle ultime cinque sedute: il minimo della seduta dice se il limite è stato raggiunto, non quando.
    Le date dei conti vengono dal calendario Nasdaq e, per chi non c'è, da quelle **dichiarate
    dall'emittente** (`LIBRO.md` §1octies, v489): il 15/10 SK hynix mancava dal calendario.
 0ter. **Credito sul libro** (v467, regola in `memoria/LIBRO.md` §1ter): il blocco `CREDITO SUL

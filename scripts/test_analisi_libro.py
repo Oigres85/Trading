@@ -3715,6 +3715,185 @@ check("v490 LIBRO.md §1 dichiara la liquidità IN TUTTO, bloccata compresa: è 
       "togliendo gli ordini attivi",
       any("Liquidità:" in r and "bloccata compresa" in r for r in _s1_490.splitlines()), _s1_490[:300])
 
+# ================================================================ v491 — dopo l'ultima verifica, dalle barre a 5 minuti
+# Il 15/10/2026 ORCL, OKLO e SMCI hanno toccato i loro limiti fra le 15:30 e le 15:54 italiane; alle 18:02 il conto li
+# mostrava ancora attivi e non eseguiti; dopo, nessuno è più sceso al limite. La resa della v490 diceva «può essere
+# stato ESEGUITO, se l'ordine era già sul conto in quel momento»: vera, e incapace di distinguere. L'ultima verifica
+# (colonna «Attivo alle») separa il prima dal dopo. Ogni stato si COSTRUISCE (v425, v429): barre sintetiche, orari fissi.
+from datetime import timezone as _tz491
+def _b5_491(giorno, minimi=None, massimi=None, fino="16:00", base=106.0):
+    """Barre a 5 minuti sintetiche di una seduta (ora di New York): minimo `base`, massimo base+1, salvo le eccezioni."""
+    g = _giorno474.fromisoformat(giorno)
+    t = _dt474(g.year, g.month, g.day, 9, 30, tzinfo=_NY474)
+    hh, mm = map(int, fino.split(":"))
+    stop = _dt474(g.year, g.month, g.day, hh, mm, tzinfo=_NY474)
+    out = []
+    while t < stop:
+        k = t.strftime("%H:%M")
+        lo = (minimi or {}).get(k, base)
+        hi = (massimi or {}).get(k, base + 1.0)
+        out.append({"dt": t, "o": base, "h": max(hi, lo), "l": lo, "c": base, "v": 1000})
+        t += _td474(minutes=5)
+    return out
+def _ord491(alle="18:02", lim=100.0, verso="acquisto", giorno="2026-10-15"):
+    return {"tk": "AAA", "verso": verso, "verso_testo": verso, "limite": lim, "qta": 100, "inserito": giorno,
+            "attivo_alle": NL.ora_attivo(alle, giorno), "attivo_alle_testo": alle}
+_DV491 = lambda o, **k: NL.dopo_verifica(o, _b5_491(o["inserito"], **k))
+
+_oa491 = [NL.ora_attivo(a, g) for a, g in (("18:02", "2026-10-15"), ("15:40", "2026-10-27"), ("15:40", "2026-11-03"))]
+check("v491 «Attivo alle» è ORA ITALIANA e diventa ora di New York dal fuso, mai da uno scarto a mano: 18:02 del 15/10 "
+      "= 12:02, 15:40 del 27/10 (la settimana in cui le due ore legali non coincidono) = 10:40, 15:40 del 03/11 = "
+      "09:40; un giorno esplicito vince su quello d'inserimento; vuoto, illeggibile o fuori scala = None",
+      [x.astimezone(_NY474).strftime("%H:%M") for x in _oa491] == ["12:02", "10:40", "09:40"]
+      and NL.ora_attivo("2026-10-14 9.30", "2026-10-15").strftime("%Y-%m-%d %H:%M") == "2026-10-14 09:30"
+      and [NL.ora_attivo(a, "2026-10-15") for a in ("", "ieri", "25:00", "18:75")] == [None] * 4,
+      str([x.isoformat() for x in _oa491]))
+
+_lib491 = ("## 1septies. ORDINI APERTI — x\n\n| Nome | Verso | Quantità | Limite | Inserito | Stato | Validità | Attivo alle |\n"
+           "|---|---|---|---|---|---|---|---|\n| AAA | acquisto | 100 | 105,00 | 2026-10-09 | attivo | giornaliero | 18:02 |\n"
+           "| BBB | acquisto | 100 | 105,00 | 2026-10-09 | attivo | giornaliero |  |\n"
+           "| CCC | acquisto | 100 | 105,00 | 2026-10-09 | attivo | giornaliero | ieri |\n"
+           "| DDD | acquisto | 100 | 95,00 | 2026-10-09 | attivo | giornaliero | 18:02 |\n")
+_or491 = NL.leggi_ordini(_lib491)
+check("v491 la colonna «Attivo alle» si legge in CODA, dopo la validità, senza spostare le altre: un'ora, una cella "
+      "vuota, un testo illeggibile (che resta com'è scritto, per la resa)",
+      [o["tk"] for o in _or491] == ["AAA", "BBB", "CCC", "DDD"] and [o["validita"] for o in _or491] == ["giornaliero"] * 4
+      and _or491[0]["attivo_alle"].strftime("%Y-%m-%d %H:%M") == "2026-10-09 18:02"
+      and _or491[1]["attivo_alle"] is None and _or491[2]["attivo_alle"] is None
+      and _or491[2]["attivo_alle_testo"] == "ieri" and _or491[0]["limite"] == 105.0, str(_or491))
+
+_v491 = {"prima": _DV491(_ord491(), minimi={"10:00": 99.0}),
+         "dopo": _DV491(_ord491(), minimi={"10:00": 99.0, "13:00": 99.5}),
+         "cavallo": _DV491(_ord491(), minimi={"12:00": 99.0}),
+         "minuto_dopo": _DV491(_ord491("18:04"), minimi={"12:05": 99.0}),
+         "minuto_cavallo": _DV491(_ord491("18:05"), minimi={"12:05": 99.0}),
+         "soffio": _DV491(_ord491(), minimi={"13:00": 100.05}),
+         "fuori_margine": _DV491(_ord491(), minimi={"13:00": 100.2}),
+         "in_arrivo": _DV491(_ord491(), minimi={"10:00": 99.0}, fino="13:00"),
+         "dopo_campana": _DV491(_ord491("22:30"), minimi={"10:00": 99.0}),
+         "vendita_si": _DV491(_ord491(lim=110.0, verso="vendita"), massimi={"14:00": 111.0}),
+         "vendita_no": _DV491(_ord491(lim=110.0, verso="vendita"), minimi={"14:00": 50.0})}
+_e491 = {k: (v.get("letto"), v.get("toccato"), v.get("motivo")) for k, v in _v491.items()}
+check("v491 dopo l'ultima verifica: un minimo PRIMA non esegue niente (il conto diceva «attivo»), uno DOPO sì; la barra "
+      "che contiene l'ora della verifica non decide («cavallo»); l'ora annotata vale per tutto il suo minuto; a meno "
+      "di MARGINE_5MIN dal limite non si decide («soffio»), oltre sì; se le barre non arrivano alla campana è «in "
+      "arrivo»; dopo la campana non c'è più niente da eseguire; una vendita si esegue sul MASSIMO",
+      _e491 == {"prima": (True, False, None), "dopo": (True, True, None), "cavallo": (True, None, "cavallo"),
+                "minuto_dopo": (True, True, None), "minuto_cavallo": (True, None, "cavallo"),
+                "soffio": (True, None, "soffio"), "fuori_margine": (True, False, None),
+                "in_arrivo": (True, None, "in arrivo"), "dopo_campana": (True, False, None),
+                "vendita_si": (True, True, None), "vendita_no": (True, False, None)}
+      and _v491["prima"]["estremo"] == 106.0 and _v491["dopo"]["estremo"] == 99.5
+      and _v491["vendita_si"]["nome"] == "massimo" and _v491["vendita_si"]["estremo"] == 111.0
+      and _v491["in_arrivo"]["fino"].strftime("%H:%M") == "13:00", str(_e491))
+_nl491 = [NL.dopo_verifica(_ord491(alle=""), _b5_491("2026-10-15")),
+          NL.dopo_verifica(_ord491(alle="ieri"), _b5_491("2026-10-15")),
+          NL.dopo_verifica(_ord491(), "barre a 5 minuti NON lette (prova)"),
+          NL.dopo_verifica(_ord491(giorno="2026-10-20"), _b5_491("2026-10-15"))]
+check("v491 quando non si può dire, si dice perché — mai un esito: ora non annotata, ora illeggibile, barre non lette, "
+      "seduta fuori dai cinque giorni della fonte",
+      [x["letto"] for x in _nl491] == [False] * 4 and "non è annotata" in _nl491[0]["perche"]
+      and "«ieri» non si legge" in _nl491[1]["perche"] and _nl491[2]["perche"] == "barre a 5 minuti NON lette (prova)"
+      and "non è nelle barre a 5 minuti" in _nl491[3]["perche"] and all("toccato" not in x for x in _nl491),
+      str([x.get("perche") for x in _nl491]))
+
+_vera491 = ROT.brief.jget
+def _sa491(reale):
+    out = []
+    for g in ("2026-10-14", "2026-10-15"):
+        y, m, d = map(int, g.split("-"))
+        base = _dt474(y, m, d, 9, 30, tzinfo=(_NY474 if reale else _tz491.utc))
+        out += [{"t": int(base.timestamp()) + 300 * i, "o": 1.0, "h": 2.0, "l": 0.5, "c": 1.0, "v": 10} for i in range(78)]
+    return {"status": 200, "data": out}
+try:
+    ROT.brief.jget = lambda url, timeout=20: _sa491(False)
+    _bb491 = ROT.brief.barre_5min("AAA")
+    ROT.brief.jget = lambda url, timeout=20: _sa491(True)
+    try:
+        ROT.brief.barre_5min("AAA")
+        _err491 = None
+    except ValueError as e:
+        _err491 = str(e)
+finally:
+    ROT.brief.jget = _vera491
+check("v491 le barre a 5 minuti portano l'ora di PARETE di New York scritta come UTC, e la lettura si VERIFICA: ogni "
+      "giornata deve cominciare alle 09:30; con la codifica cambiata l'ora sbaglierebbe di 4-5 ore e un prezzo di prima "
+      "diventerebbe un prezzo di dopo — quindi si dichiara illeggibile, non si usa",
+      len(_bb491) == 156 and _bb491[0]["dt"].strftime("%Y-%m-%d %H:%M") == "2026-10-14 09:30"
+      and _bb491[0]["dt"].tzinfo is _NY474 and _bb491[-1]["dt"].strftime("%H:%M") == "15:55"
+      and _err491 is not None and "09:30" in _err491 and "13:30" in _err491, str((len(_bb491), _err491)))
+
+_chiam491 = []
+def _intra491(minimi=None, fino="16:00", errore=None):
+    def f(tk):
+        _chiam491.append(tk)
+        if errore:
+            raise RuntimeError(errore)
+        return _b5_491("2026-10-09", minimi=minimi, fino=fino)
+    return f
+def _vo491(adesso, intraday, ordini=None):
+    b = {k: _bA490t for k in ("AAA", "BBB", "CCC", "DDD")}          # la seduta del 09/10 ha il minimo a 104
+    t = {k: _tec489() for k in b}                                     # la quota del 09/10: minimo di oggi 104
+    return NL.valuta_ordini(_or491 if ordini is None else ordini, b, t, {k: _lu489 for k in b}, _cal489, {},
+                            _sem481(), _rl489, _rq489, 100000.0, 1.12, adesso, cassa_eur=100000.0, intraday=intraday)
+_LUN491 = _dt474(2026, 10, 12, 10, 0, tzinfo=_NY474)
+_chiam491.clear()
+_s491 = _vo491(_LUN491, _intra491(minimi={"10:00": 104.0}))
+_cs491 = {o["tk"]: o for o in _s491["chiusi"]}
+_rs491 = "\n".join(NL.righe_ordini(_s491))
+check("v491 le barre a 5 minuti si chiedono SOLO quando servono: un limite raggiunto nella seduta E un'ora di verifica "
+      "annotata — e una volta per nome; un ordine non toccato (DDD) o senza ora (BBB, CCC) non costa una richiesta",
+      _chiam491 == ["AAA"] and _cs491["DDD"]["verifica"] is None and _cs491["DDD"]["toccato"] is False
+      and _cs491["AAA"]["verifica"]["toccato"] is False, str(_chiam491))
+check("v491 resa degli ordini chiusi: il limite raggiunto PRIMA della verifica e non dopo = SCADUTO, col minimo dopo e "
+      "la distanza dal limite; senza ora, o con un'ora illeggibile, resta la frase della v490 e si dice il perché",
+      ("AAA acquisto 100 a 105,00 (seduta del 2026-10-09) · il minimo della seduta (104,00) ha raggiunto il limite, ma "
+       "prima delle 18:02 italiane, quando l'ordine risultava ancora attivo e non eseguito: dopo, il minimo è stato "
+       "106,00 (+1,0% dal limite) → SCADUTO senza esecuzione") in _rs491
+      and ("BBB acquisto 100 a 105,00 (seduta del 2026-10-09) · il minimo della seduta (104,00) ha raggiunto il limite: "
+           "può essere stato ESEGUITO, se l'ordine era già sul conto in quel momento · l'ora dell'ultima verifica non è "
+           "annotata") in _rs491
+      and "«Attivo alle» «ieri» non si legge" in _rs491
+      and "DDD acquisto 100 a 95,00 (seduta del 2026-10-09) · il minimo della seduta (104,00) non ha raggiunto il limite: "
+          "SCADUTO" in _rs491, _rs491[-1600:])
+_t491 = "\n".join(NL.righe_ordini(_vo491(_LUN491, _intra491(minimi={"10:00": 104.0, "13:00": 104.5}))))
+_x491 = "\n".join(NL.righe_ordini(_vo491(_LUN491, _intra491(errore="rete giù"))))
+check("v491 il limite raggiunto anche DOPO la verifica = può essere stato ESEGUITO; barre non lette = la frase della "
+      "v490 col perché, MAI uno SCADUTO dedotto da un dato che manca",
+      ("il minimo della seduta (104,00) ha raggiunto il limite, e anche DOPO le 18:02 italiane, quando l'ordine "
+       "risultava ancora attivo e non eseguito (minimo dopo: 104,50): può essere stato ESEGUITO") in _t491
+      and "barre a 5 minuti NON lette (rete giù)" in _x491
+      and "AAA acquisto 100 a 105,00 (seduta del 2026-10-09) · il minimo della seduta (104,00) ha raggiunto il limite: " \
+          "può essere stato ESEGUITO" in _x491 and "\n    AAA" in _x491
+      and "SCADUTO" not in [r for r in _x491.splitlines() if r.strip().startswith("AAA")][0], _x491[-900:])
+_or491b = NL.leggi_ordini(_lib491.replace("| giornaliero | 18:02 |\n| BBB", "| giornaliero | 2026-10-08 18:02 |\n| BBB"))
+_ab491 = {o["tk"]: o for o in _vo491(_LUN491, _intra491(), _or491b)["chiusi"]}["AAA"]
+check("v491 un'ultima verifica di un altro giorno non separa il prima dal dopo di QUESTA seduta: si dichiara",
+      _ab491["verifica"]["letto"] is False and "non è della seduta del 2026-10-09" in _ab491["verifica"]["perche"],
+      str(_ab491.get("verifica")))
+_ALLE14_491 = _dt474(2026, 10, 9, 14, 0, tzinfo=_NY474)              # seduta aperta: l'ordine è ancora attivo
+_at491 = NL.valuta_ordini(_or491[:1], {"AAA": _bA490t}, {"AAA": _tec489()}, {"AAA": _lu489}, _cal489, {}, _sem481(),
+                          _rl489, _rq489, 100000.0, 1.12, _ALLE14_491, cassa_eur=100000.0,
+                          intraday=_intra491(minimi={"10:00": 104.0}, fino="14:00"))
+_ra491 = "\n".join(NL.righe_ordini(_at491))
+check("v491 durante la seduta: la testa porta l'ultima verifica, e «il minimo di oggi ha toccato il limite» dice se è "
+      "successo prima o dopo — finora, fino all'ultima barra letta, in ora italiana",
+      _at491["righe"][0]["toccato_oggi"] is True
+      and "AAA acquisto 100 a 105,00 (inserito 2026-10-09, attivo e non eseguito alle 18:02 italiane)" in _ra491
+      and ("il minimo di oggi (104,00) ha raggiunto il limite, ma prima delle 18:02 italiane, quando l'ordine risultava "
+           "ancora attivo e non eseguito: dopo, il minimo è stato 106,00 (+1,0% dal limite), fino alle 20:00 → finora "
+           "non eseguito") in _ra491
+      and "se l'ordine era già attivo in quel momento" not in _ra491, _ra491[:1400])
+check("v491 collegamento in calcola: le barre a 5 minuti arrivano agli ordini aperti",
+      "intraday=brief.barre_5min" in _calc474.split("valuta_ordini(")[1][:400], _calc474.split("valuta_ordini(")[1][:400])
+_lv491 = NL.testo_libro()
+_s7_491 = _lv491[_lv491.find("## 1septies"):_lv491.find("\n## 1octies")]
+check("v491 LIBRO.md §1septies ha la colonna «Attivo alle» in coda e ogni ora scritta si legge: un'ora illeggibile "
+      "farebbe tornare la resa al dubbio della v490 senza che nessuno se ne accorga",
+      "| Validità | Attivo alle |" in _s7_491
+      and all(o["attivo_alle"] is not None or not o["attivo_alle_testo"].strip() for o in (NL.leggi_ordini() or [])),
+      _s7_491[:400])
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

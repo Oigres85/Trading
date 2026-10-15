@@ -156,7 +156,8 @@ const SUITE = [
   /* v476: 359 punti di chiamata (+11 su liquidita' e ricavi nelle schede e nel rapporto) -> 340 */
   /* v487: 447 punti di chiamata (+13 sui pavimenti della watchlist) -> 435 */
   /* v489: 473 punti di chiamata (+26 su ordini aperti, media sui pavimenti, volumi della seduta, conti dichiarati) -> 460 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 470, firma: /\d+\/\d+ CHECK OK/ },
+  /* v491: 496 punti di chiamata (+12 sull'ultima verifica degli ordini e le barre a 5 minuti) -> 480 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 480, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

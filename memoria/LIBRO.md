@@ -38,6 +38,8 @@ bloccata dai tre ordini giornalieri di §1septies, 25.577,50 $ ai limiti ≈ **2
 controvalore esatto lo fissa il broker. La liquidità si scrive in tutto perché un ordine non eseguito non ha speso niente:
 se si esegue, qui si toglie la sua spesa e in alto entra la posizione; se scade, questo numero non cambia. La libera la
 calcola `numeri_libro.py` (blocco «ORDINI APERTI») togliendo gli ordini ancora attivi (v490).
+Il 15/10 alle 22:00 i tre ordini sono **scaduti senza esecuzione** — il CEO, testuale: *"Nessun ordine è passato"* —:
+da allora non c'è niente di bloccato e la liquidità libera è tutta, ~79.400 € (il broker la ricalcola col proprio cambio).
 ⚠ È ~25.500 € più della stima precedente, ~53.870 €, che non era una dichiarazione ma un conto: la nota sulle uscite
 da GOOGL e WDC qui sotto la diceva sottostimata. Vale la dichiarazione del CEO.
 Storia della stima precedente: ~59.000 € fino al 14/10/2026, **meno le due medie** del 14/10: RGTI 200 azioni
@@ -518,29 +520,36 @@ tenuta di tutte le posizioni.
 ## 1septies. ORDINI APERTI — con limite, inseriti dal CEO e non ancora eseguiti (v489)
 
 Un ordine entra qui quando il CEO lo inserisce sul conto e lo dice; esce quando è **eseguito** (si aggiornano
-posizioni e liquidità in §1) o **revocato**. Stato «attivo» = in attesa sul conto. La **validità** sta nell'ultima
-colonna — `giornaliero` o `fino a revoca` (CEO, 15/10/2026 sera: *"Ordini giornalieri per ora"*): un ordine
+posizioni e liquidità in §1) o **revocato**. Stato «attivo» = in attesa sul conto. La **validità** sta nella colonna
+«Validità» — `giornaliero` o `fino a revoca` (CEO, 15/10/2026 sera: *"Ordini giornalieri per ora"*): un ordine
 giornaliero, dopo la campana della sua seduta (16:00 di New York, 22:00 italiane di solito), non è più attivo anche se
 la tabella dice «attivo» — `numeri_libro.py` lo sposta fra gli ordini **ESEGUITI o SCADUTI** da verificare sul conto,
 col minimo di quella seduta accanto al limite, e non conta più la sua spesa come liquidità bloccata (v490). Senza
 validità dichiarata l'ordine resta attivo, e la resa lo dice invece di indovinarla.
+La colonna **Attivo alle** (ora italiana: `HH:MM` per il giorno d'inserimento, oppure `AAAA-MM-GG HH:MM`) è l'ultimo
+momento in cui il conto mostrava l'ordine **attivo e non eseguito** — uno screenshot o la parola del CEO; l'ora
+d'inserimento vale lo stesso. Prima di quell'ora nessuna esecuzione è possibile, quindi il calcolo guarda solo i prezzi
+DOPO, dalle barre a 5 minuti delle ultime cinque sedute (v491): il minimo della seduta dice SE il limite è stato
+raggiunto, non QUANDO. Senza quest'ora la resa lo dichiara, e il dubbio resta al conto.
 
-| Nome | Verso | Quantità | Limite | Inserito | Stato | Validità |
-|---|---|---|---|---|---|---|
-| ORCL | acquisto | 65 | 129,50 | 2026-10-15 | attivo | giornaliero |
-| OKLO | acquisto | 260 | 28,50 | 2026-10-15 | attivo | giornaliero |
-| SMCI | acquisto | 300 | 32,50 | 2026-10-15 | attivo | giornaliero |
+| Nome | Verso | Quantità | Limite | Inserito | Stato | Validità | Attivo alle |
+|---|---|---|---|---|---|---|---|
 
 `numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
-minimo della seduta di oggi ha toccato il limite — l'ordine può essere già eseguito, e si verifica sul conto —;
+minimo della seduta di oggi ha toccato il limite DOPO l'ultima ora annotata in «Attivo alle» — allora l'ordine può
+essere già eseguito, e si verifica sul conto —;
 STORNO o DISCESA e se alzare il limite è coerente (§1bis); il pavimento sotto il limite con lo stop e il rischio
 fino allo stop, col limite e col prezzo di adesso; dove sta il limite rispetto al pavimento più vicino (sopra =
 non è un ingresso sui minimi); la tenuta se fosse in portafoglio; la correlazione col libro; i conti dentro la
 vita dell'ordine; il volume della seduta; e l'effetto dell'insieme degli ordini sul libro, col rischio totale
 fino agli stop.
-Il 15/10 alle 18:02 il conto titoli in euro mostrava «Disp. 1.127,33» con questi tre ordini prenotati; la sera il
+Storico. Il 15/10/2026 il CEO ha inserito tre ordini d'acquisto giornalieri: ORCL 65 a 129,50, OKLO 260 a 28,50,
+SMCI 300 a 32,50. Alle 18:02 il conto titoli in euro li mostrava attivi e non eseguiti, con «Disp. 1.127,33»; la sera il
 CEO ha dichiarato la liquidità: **56.600 € liberi**, esclusa quella bloccata da questi ordini (circa 22.800 € ai
-limiti). §1 la scrive in tutto, ~79.400 €.
+limiti). §1 la scrive in tutto, ~79.400 €. Alle 22:00 sono **scaduti senza esecuzione** (CEO: *"Nessun ordine è
+passato"*): i minimi della seduta — ORCL 127,60, OKLO 27,52, SMCI 32,38 — erano arrivati fra le 15:30 e le 15:54
+italiane, prima delle 18:02, e dopo le 18:02 nessuno è più sceso al limite (minimi dopo, dalle barre a 5 minuti: ORCL
+132,54, OKLO 28,94, SMCI 33,87). È il caso da cui nasce la colonna «Attivo alle» (v491).
 
 ## 1octies. CONTI DICHIARATI DALL'EMITTENTE — date che il calendario Nasdaq non porta (v489)
 

@@ -197,7 +197,8 @@ def calcola(sedute=1, registra=False, adesso=None):
     out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
                                      decisioni, media, pav)
     out["ordini"] = valuta_ordini(ordini, B, TEC, BL, out["calendario"], righe_pipeline(pipe), out["semaforo"],
-                                  media["rlibro"], media["rqqq"], tot, media["fx"], adesso, cassa_eur=cassa_eur)
+                                  media["rlibro"], media["rqqq"], tot, media["fx"], adesso, cassa_eur=cassa_eur,
+                                  intraday=brief.barre_5min)
     out["rimandate"] = leggi_rimandate()          # v483 — le decisioni che aspettano un evento
     # v484 — ogni CONFLITTO con la sua scadenza (i conti successivi) e l'esame scritto prima (LIBRO.md §1sexies)
     scad = {}
@@ -837,6 +838,125 @@ def validita_ordine(testo):
     return next((v for v, parole in VALIDITA.items() if t.startswith(parole)), t)
 
 
+# v491 — DOPO L'ULTIMA VERIFICA. Il minimo della seduta dice SE il limite e' stato raggiunto, non QUANDO. Il 15/10/2026
+#   ORCL, OKLO e SMCI hanno toccato i loro limiti fra le 15:30 e le 15:54 italiane; alle 18:02 il conto li mostrava
+#   ancora attivi e non eseguiti, e dopo le 18:02 nessuno e' piu' sceso al limite (minimi dopo: ORCL 132,54, OKLO
+#   28,94, SMCI 33,87). La resa della v490 diceva "puo' essere stato ESEGUITO, se l'ordine era gia' sul conto in quel
+#   momento": vero, e incapace di distinguere. Ora l'ULTIMA VERIFICA — colonna «Attivo alle» di §1septies, in ora
+#   italiana: lo screenshot del conto o la parola del CEO — separa il prima dal dopo, e il dopo si legge dalle barre a
+#   5 minuti delle ultime cinque sedute (brief.barre_5min). Prima della verifica nessuna esecuzione e' possibile: il
+#   conto diceva «attivo». L'ora d'inserimento, se nota, vale lo stesso: e' un momento in cui l'ordine non era eseguito.
+# ⚠ Le barre a 5 minuti possono non vedere una stampa isolata: misurato il 15/10 sulle sedute concluse di ORCL, OKLO e
+#   SMCI, il loro minimo si scosta da quello dello storico giornaliero al massimo dello 0,064%. A meno di
+#   MARGINE_5MIN dal limite il calcolo non decide: convenzione dichiarata (v240).
+MARGINE_5MIN = 0.1      # %
+
+
+def ora_attivo(testo, giorno):
+    """v491 — la colonna «Attivo alle» di §1septies: l'ultimo momento, in ORA ITALIANA, in cui l'ordine risultava
+    attivo e non eseguito. 'HH:MM' vale per il giorno d'inserimento, 'AAAA-MM-GG HH:MM' per un giorno esplicito.
+    L'ora italiana viene dal fuso, mai da uno scarto a mano (v470). None se manca o non si legge: la resa lo dice."""
+    import brief
+    m = re.match(r"\s*(?:(\d{4}-\d{2}-\d{2})\s+)?(\d{1,2})[:.](\d{2})\s*$", str(testo or ""))
+    if not m:
+        return None
+    g = m.group(1) or str(giorno or "")[:10]
+    h, mi = int(m.group(2)), int(m.group(3))
+    if not re.match(r"\d{4}-\d{2}-\d{2}$", g) or h > 23 or mi > 59:
+        return None
+    d = datetime.fromisoformat(g)
+    return datetime(d.year, d.month, d.day, h, mi, tzinfo=brief.ROMA)
+
+
+def dopo_verifica(o, b5):
+    """v491 — il prezzo DOPO l'ultima verifica in cui l'ordine risultava attivo e non eseguito, dalle barre a 5 minuti
+    (brief.barre_5min) della seduta di quella verifica. Un acquisto si esegue se il prezzo scende al limite, una
+    vendita se sale. toccato: True (dopo la verifica il limite e' stato raggiunto: puo' essere eseguito) · False (no)
+    · None col motivo — «cavallo»: raggiunto solo dentro la barra che contiene l'ora della verifica, prima o dopo non
+    si distingue · «soffio»: a meno di MARGINE_5MIN dal limite · «in arrivo»: le barre non arrivano ancora alla
+    campana. letto False con la ragione quando non si puo' dire. b5: la lista delle barre, o il testo di un errore."""
+    import brief
+    q = o.get("attivo_alle")
+    if q is None:
+        t = (o.get("attivo_alle_testo") or "").strip()
+        return {"letto": False, "perche": (f"«Attivo alle» «{t}» non si legge (si scrive HH:MM, in ora italiana)" if t else
+                                           "l'ora dell'ultima verifica non è annotata in §1septies (colonna «Attivo alle»)")}
+    if isinstance(b5, str):
+        return {"letto": False, "perche": b5}
+    ny = q.astimezone(brief.NEW_YORK)
+    giorno = ny.date()
+    del_giorno = [b for b in (b5 or []) if b["dt"].date() == giorno]
+    if not del_giorno:
+        return {"letto": False, "perche": f"la seduta del {giorno:%d/%m} non è nelle barre a 5 minuti della fonte, che "
+                                          "coprono le ultime cinque sedute"}
+    inizio = ny.replace(second=0, microsecond=0)
+    fine = inizio + timedelta(minutes=1)            # l'ora annotata vale per tutto il suo minuto
+    dopo = [b for b in del_giorno if b["dt"] >= fine]
+    cavallo = [b for b in del_giorno if b["dt"] < fine and b["dt"] + timedelta(minutes=5) > inizio]
+    vendita = o.get("verso") == "vendita"
+    k, est = ("h", max) if vendita else ("l", min)
+    e_dopo = est(b[k] for b in dopo) if dopo else None
+    e_cav = est(b[k] for b in cavallo) if cavallo else None
+    ultima = del_giorno[-1]["dt"] + timedelta(minutes=5)
+    r = {"letto": True, "quando": q, "estremo": e_dopo, "cavallo": e_cav, "nome": "massimo" if vendita else "minimo",
+         "motivo": None, "fino": ultima}
+    lim = o.get("limite")
+    if not lim:
+        return {**r, "toccato": None, "motivo": "senza limite"}
+    tocca = (lambda v: v >= lim) if vendita else (lambda v: v <= lim)
+    if e_dopo is not None and tocca(e_dopo):
+        return {**r, "toccato": True}
+    if e_cav is not None and tocca(e_cav):
+        return {**r, "toccato": None, "motivo": "cavallo"}
+    if any(v is not None and abs(v / lim - 1) * 100 < MARGINE_5MIN for v in (e_dopo, e_cav)):
+        return {**r, "toccato": None, "motivo": "soffio"}
+    campana = datetime(giorno.year, giorno.month, giorno.day, 16, 0, tzinfo=brief.NEW_YORK)
+    if ultima < campana and fine < campana:
+        return {**r, "toccato": None, "motivo": "in arrivo"}
+    return {**r, "toccato": False}
+
+
+def testo_verifica(o, ver, estremo, chiuso):
+    """v491 — la frase sul PRIMA e sul DOPO l'ultima verifica (dopo_verifica), per un ordine il cui limite e' stato
+    raggiunto nella seduta. Prima della verifica nessuna esecuzione e' possibile: il conto diceva «attivo»."""
+    import brief
+    hm = f"{ver['quando']:%H:%M}"
+    nome, e, c, t = ver["nome"], ver.get("estremo"), ver.get("cavallo"), ver.get("toccato")
+    pre = f"il {nome} {'della seduta' if chiuso else 'di oggi'} ({_it(estremo)}) ha raggiunto il limite"
+    if t is True:
+        return (f"⚠ {pre}, e anche DOPO le {hm} italiane, quando l'ordine risultava ancora attivo e non eseguito ({nome} "
+                f"dopo: {_it(e)}): può essere {'stato ' if chiuso else ''}ESEGUITO — lo sa il conto, e se lo è si aggiorna "
+                "il libro (§1)")
+    if t is False or ver.get("motivo") == "in arrivo":
+        dopo = (f"dopo, il {nome} è stato {_it(e)} ({_sg((e / o['limite'] - 1) * 100)}% dal limite)" if e is not None
+                else "dopo, nessuna barra della seduta")
+        if t is False:
+            coda = (" → SCADUTO senza esecuzione, salvo un ordine valido anche fuori dalla seduta regolare" if chiuso
+                    else " → non eseguito")
+        else:
+            fino = f", fino alle {ver['fino'].astimezone(brief.ROMA):%H:%M}"
+            coda = fino + (" → il resto della seduta non è nelle barre: eseguito o scaduto lo sa il conto" if chiuso
+                           else " → finora non eseguito")
+        return f"{pre}, ma prima delle {hm} italiane, quando l'ordine risultava ancora attivo e non eseguito: {dopo}{coda}"
+    if ver.get("motivo") == "cavallo":
+        return (f"⚠ {pre}, e dopo le {hm} solo dentro la barra di 5 minuti che contiene l'ora della verifica ({nome} "
+                f"{_it(c)}): prima o dopo non si distingue — lo sa il conto")
+    if ver.get("motivo") == "soffio":
+        v = e if e is not None else c
+        return (f"⚠ {pre}; dopo le {hm} il {nome} è stato {_it(v)}, a meno dello {_it(MARGINE_5MIN, 1)}% dal limite: le "
+                "barre a 5 minuti possono non vedere una stampa isolata — lo sa il conto")
+    return f"⚠ {pre}: dopo le {hm} non si decide ({ver.get('motivo') or 'n.d.'})"
+
+
+def testo_attivo_alle(x):
+    """v491 — l'ultima verifica nella testa dell'ordine, se annotata."""
+    q = x.get("attivo_alle")
+    if q is None:
+        return ""
+    return (f", attivo e non eseguito alle {q:%H:%M} italiane" if q.strftime("%Y-%m-%d") == str(x.get("inserito"))[:10]
+            else f", attivo e non eseguito il {q:%d/%m} alle {q:%H:%M} italiane")
+
+
 def chiusura_seduta(giorno):
     """La campana delle 16:00 di New York del `giorno` (ISO) in ora italiana: 22:00 di solito, 21:00 nelle
     settimane in cui le due ore legali non coincidono — dal fuso, mai uno scarto a mano (v470). None se il giorno
@@ -878,15 +998,17 @@ def leggi_ordini(testo=None):
             continue
         tk, verso, q, lim, ins, stato = celle[:6]
         val = celle[6] if len(celle) > 6 else ""        # v490 — la validita' sta IN CODA: le prime sei non si spostano
+        att = celle[7] if len(celle) > 7 else ""        # v491 — l'ultima verifica, IN CODA come la validita'
         out.append({"tk": tk.upper(), "verso_testo": verso, "qta": _num_it(q), "limite": _num_it(lim),
                     "verso": next((v for v, parole in VERSI.items() if verso.lower().startswith(parole)), None),
                     "inserito": ins, "stato": stato, "attivo": stato.lower().startswith(("attivo", "aperto")),
-                    "validita": validita_ordine(val), "validita_testo": val})
+                    "validita": validita_ordine(val), "validita_testo": val,
+                    "attivo_alle": ora_attivo(att, ins), "attivo_alle_testo": att})
     return out if trovata else None
 
 
 def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rqqq, valore_libro, fx, adesso=None,
-                  cassa_eur=None):
+                  cassa_eur=None, intraday=None):
     """Per ogni ordine d'ACQUISTO attivo: la distanza dal prezzo; se il minimo della seduta di OGGI ha toccato il
     limite (l'ordine può essere già eseguito: si verifica sul conto); STORNO o DISCESA dalla tendenza della tenuta
     (§1sexies) e se alzare il limite è coerente con la regola dei minimi (§1bis); il pavimento SOTTO IL LIMITE con
@@ -902,6 +1024,25 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
     for e in (calendario or {}).get("attesi") or []:
         prime.setdefault(e["tk"], e)                       # gli attesi arrivano gia' in ordine di data
     out, spese, rend, chiusi = [], {}, {}, []
+    # v491 — le barre a 5 minuti si chiedono SOLO quando servono — un limite raggiunto nella seduta e un'ultima
+    #   verifica annotata —, e una volta per nome
+    cache5 = {}
+
+    def _b5(tk):
+        if intraday is None:
+            return "barre a 5 minuti non richieste a questo calcolo"
+        if tk not in cache5:
+            try:
+                cache5[tk] = intraday(tk)
+            except Exception as e:
+                cache5[tk] = f"barre a 5 minuti NON lette ({str(e)[:90]})"
+        return cache5[tk]
+
+    def _verifica(o, giorno):
+        q = o.get("attivo_alle")
+        if q is not None and q.astimezone(brief.NEW_YORK).date().isoformat() != giorno:
+            return {"letto": False, "perche": f"l'ultima verifica annotata ({q:%d/%m %H:%M}) non è della seduta del {giorno}"}
+        return dopo_verifica(o, None if q is None else _b5(o["tk"]))
     for o in ordini:
         if not o["attivo"]:
             continue
@@ -917,7 +1058,8 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
             lim = o.get("limite")
             toccato = (None if not lim else lo <= lim if (o["verso"] == "acquisto" and lo is not None)
                        else hi >= lim if (o["verso"] == "vendita" and hi is not None) else None)
-            chiusi.append({**o, "minimo_seduta": lo, "massimo_seduta": hi, "toccato": toccato})
+            chiusi.append({**o, "minimo_seduta": lo, "massimo_seduta": hi, "toccato": toccato,
+                           "verifica": _verifica(o, g) if toccato is True else None})
             continue
         t, b = tec.get(o["tk"]) or {}, barre.get(o["tk"]) or []
         px, lim, q, atr = t.get("px"), o["limite"], o["qta"], t.get("atr")
@@ -947,9 +1089,10 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
                   else "coerente" if (vp is not None and vp < 0) else "risalita")
         rt = rotazione.rendimenti_per_data(b)
         sc = prime.get(o["tk"])
+        oggi = ny.date().isoformat()
+        tocc = t.get("seduta_quota") == oggi and t.get("minimo_oggi") is not None and t["minimo_oggi"] <= lim
         out.append({**r, "distanza_pct": (lim / px - 1) * 100, "sopra_prezzo": lim >= px,
-                    "toccato_oggi": (t.get("seduta_quota") == ny.date().isoformat()
-                                     and t.get("minimo_oggi") is not None and t["minimo_oggi"] <= lim),
+                    "toccato_oggi": tocc, "verifica": _verifica(o, oggi) if tocc else None,
                     "tendenza": tend, "natura": natura, "alzare": alzare, "media_sopra": rotazione.prima_media_sopra(t),
                     "pavimenti_letti": pv_px is not None, "pavimento_vicino": primo, "pavimento_sotto": sotto,
                     "posizione": posizione, "stop": stop,
@@ -996,8 +1139,8 @@ def righe_ordini(oo, finestra=45):
                  "pavimento · lo stop resta quello del pavimento sotto il limite: alzare il limite allunga la distanza "
                  "dallo stop, e il rischio in più si scrive in dollari")
     for x in oo["righe"]:
-        testa = (f"  {x['tk']} {x['verso_testo']} {_it(x['qta'], 0)} a {_it(x['limite'])} (inserito {x['inserito']})"
-                 + testo_validita(x))
+        testa = (f"  {x['tk']} {x['verso_testo']} {_it(x['qta'], 0)} a {_it(x['limite'])} (inserito {x['inserito']}"
+                 + testo_attivo_alle(x) + ")" + testo_validita(x))
         if x.get("errore"):
             L.append(testa + f" · {x['errore']}")
             continue
@@ -1007,8 +1150,13 @@ def righe_ordini(oo, finestra=45):
                  + (" · ⚠ il limite sta SOPRA il prezzo: si esegue subito" if x["sopra_prezzo"] else
                     f" · il limite è il {_it(-x['distanza_pct'], 1)}% sotto il prezzo"))
         if x["toccato_oggi"]:
-            L.append(f"      ⚠ il minimo di oggi ({_it(x['minimo_oggi'])}) ha toccato il limite: se l'ordine era già attivo "
-                     "in quel momento può essere ESEGUITO — si verifica sul conto, e se lo è si aggiorna il libro (§1)")
+            ver = x.get("verifica") or {}
+            if ver.get("letto"):
+                L.append("      " + testo_verifica(x, ver, x["minimo_oggi"], chiuso=False))
+            else:
+                L.append(f"      ⚠ il minimo di oggi ({_it(x['minimo_oggi'])}) ha toccato il limite: se l'ordine era già "
+                         "attivo in quel momento può essere ESEGUITO — si verifica sul conto, e se lo è si aggiorna il libro "
+                         "(§1)" + (f" · {ver['perche']}" if ver.get("perche") else ""))
         td, ms = x["tendenza"], x.get("media_sopra")
         if x["natura"] == "NON MISURABILE":
             nat = f"tendenza NON MISURABILE ({td.get('perche')}): la regola storno/discesa non si applica, e lo si dice"
@@ -1083,9 +1231,12 @@ def righe_ordini(oo, finestra=45):
             q = f"    {o['tk']} {o['verso_testo']} {_it(o['qta'], 0)} a {_it(o['limite'])} (seduta del {o['inserito']})"
             vendita = o.get("verso") == "vendita"
             estremo, nome = (o.get("massimo_seduta"), "massimo") if vendita else (o.get("minimo_seduta"), "minimo")
-            if o.get("toccato") is True:
+            ver = o.get("verifica") or {}
+            if o.get("toccato") is True and ver.get("letto"):
+                q += " · " + testo_verifica(o, ver, estremo, chiuso=True)
+            elif o.get("toccato") is True:
                 q += (f" · il {nome} della seduta ({_it(estremo)}) ha raggiunto il limite: può essere stato ESEGUITO, "
-                      "se l'ordine era già sul conto in quel momento")
+                      "se l'ordine era già sul conto in quel momento" + (f" · {ver['perche']}" if ver.get("perche") else ""))
             elif o.get("toccato") is False:
                 q += (f" · il {nome} della seduta ({_it(estremo)}) non ha raggiunto il limite: SCADUTO senza esecuzione, "
                       "salvo un ordine valido anche fuori dalla seduta regolare")
