@@ -100,6 +100,7 @@ PAV_RIMBALZO = 20           # il rimbalzo dopo un minimo si misura sulle 20 sedu
 PAV_SALTO = 0.03            # un salto oltre il 3% del rapporto rettificato/grezzo in un giorno: operazione societaria
 PAV_MOSTRA = 3              # i pavimenti piu' vicini sotto il prezzo
 PAV_VUOTI = 2               # i vuoti di prezzo piu' vicini sotto il prezzo
+PAV_CODA_ATR = 2.0          # v488: il piu' toccato in coda solo entro 2 ATR sotto l'ultimo pavimento mostrato
 
 
 SEDUTE_BETA = 250
@@ -478,9 +479,13 @@ def pavimenti(barre, px, atr, adesso=None, anni=ANNI_PAVIMENTI):
     # i piu' vicini, e in coda il PIU' TOCCATO quando sta piu' in basso e ha piu' tocchi di tutti quelli mostrati:
     #   su OKLO i tre piu' vicini sono minimi singoli, e il triplo minimo a 17 restava fuori (misurato il 15/10)
     scelte = zone[:PAV_MOSTRA]
-    if scelte:
-        forte = max(zone, key=lambda z: (len(z["tocchi"]), z["alto"]))
-        if forte not in scelte and len(forte["tocchi"]) > max(len(z["tocchi"]) for z in scelte):
+    # v488 — solo SUBITO SOTTO i tre mostrati (entro PAV_CODA_ATR dall'ultimo): la prima stesura pescava il piu'
+    #   toccato in tutta la finestra e su MU portava 118 (-87%), la base di due anni fa da cui il titolo e' partito:
+    #   un fatto vero e inutile per entrare (misurato il 15/10: 33 code su 56 titoli, ne restano 10, tutte vicine)
+    vicine = [z for z in zone[PAV_MOSTRA:] if scelte and scelte[-1]["fondo"] - z["alto"] <= PAV_CODA_ATR * atr]
+    if vicine:
+        forte = max(vicine, key=lambda z: (len(z["tocchi"]), z["alto"]))
+        if len(forte["tocchi"]) > max(len(z["tocchi"]) for z in scelte):
             scelte = scelte + [dict(forte, piu_toccato=True)]
     return {"minimi": [_con_ordine(z, px, atr) for z in scelte],
             "vuoti": [_con_ordine(v, px, atr) for v in sorted(vuoti, key=lambda v: -v["alto"])[:PAV_VUOTI]],
@@ -798,7 +803,7 @@ def righe_pavimenti(pv):
                  f"{len(tocchi)} {'tocco' if len(tocchi) == 1 else 'tocchi'}, l'ultimo il {tocchi[-1]['data']} · "
                  f"rimbalzo nelle {PAV_RIMBALZO} sedute dopo: "
                  + ", ".join(n(m["rimbalzo_pct"], 0, "%") for m in tocchi)
-                 + (" · il pavimento con PIU' TOCCHI nella finestra" if z.get("piu_toccato") else "")
+                 + (" · il pavimento con PIU' TOCCHI subito sotto i piu' vicini" if z.get("piu_toccato") else "")
                  + (f" · volumi fino a {vol:.0f}/100" if vol is not None else "")
                  + f" → ordine con limite {prezzo(z['ordine'])} · {stop}")
     if pv["vuoti"]:

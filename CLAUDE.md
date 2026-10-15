@@ -7089,3 +7089,18 @@ nei tre esiti (v389), il piano, il collegamento ESEGUITO (v399, v483), le soglie
 atteso. ⚠ Una mia sonda era sbagliata: pretendeva che il testo «storico NON letto» non contenesse le parole
 «nessun pavimento», che invece contiene apposta per dire che non sono la stessa cosa (v433: *un check rosso è
 prima di tutto una sonda da verificare*). Pavimento di `test_analisi_libro.py` 420 → 435.
+
+## 🎯 v488 — IL PAVIMENTO «PIÙ TOCCATO» PESCAVA LA BASE DA CUI IL TITOLO ERA PARTITO
+
+Trovato preparando la tabella completa dei pavimenti per il CEO, un'ora dopo la v487: la coda «il pavimento con
+più tocchi» si cercava in tutta la finestra di due anni, e sui titoli saliti di cinque o dieci volte portava la
+base di partenza — **MU 118,06 (−87%, 10 tocchi)**, BE 24,04 (−90%), AMD 199,80 (−65%), INTC 19,31 (−80%).
+Fatti veri, e inutili per entrare: 33 code su 56 titoli.
+
+La coda era nata per OKLO, dove un triplo minimo stava **subito oltre** i tre pavimenti più vicini (1,1 ATR). Ora
+si cerca solo lì: entro **2 ATR** sotto l'ultimo pavimento mostrato (`PAV_CODA_ATR`, scritto in LIBRO.md §1bis e
+riletto dal gate). Ne restano 10, tutte vicine — OKLO compreso.
+
+⚠ È la stessa lezione di v419-v420: **una regola provata sul caso che l'ha fatta nascere non è provata.** Il
+gate della v487 costruiva solo il caso OKLO; ora costruisce anche la base lontana (12 ATR) e pretende che non
+rientri. Due iniezioni — la coda cercata in tutta la finestra, la soglia cambiata nel solo codice — mordono.

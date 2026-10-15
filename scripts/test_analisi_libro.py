@@ -3293,18 +3293,23 @@ check("v487 durante la seduta l'ultima barra e' in formazione e non conferma un 
       not _in487["minimi"] and [z["alto"] for z in _fu487["minimi"]] == [90])
 
 # --- i tre piu' vicini, e in coda il piu' toccato se sta piu' in basso e ha piu' tocchi di tutti (il triplo minimo di OKLO) ---
-_pt487 = [105] * 6
-for _f487 in (99, 97, 95):
-    _pt487 += _V487(_f487) + [105] * 6
-for _f487 in (85, 85.3, 85.6):
-    _pt487 += _V487(_f487) + [105] * 6
-_pm487 = ROT.pavimenti(_serie487(_pt487), 110.0, 2.0)["minimi"]
-_pm487b = ROT.pavimenti(_serie487([105] * 6 + _V487(99) + [105] * 6 + _V487(97) + [105] * 6 + _V487(95) + [105] * 6
-                                  + _V487(85) + [105] * 6), 110.0, 2.0)["minimi"]
-check("v487 si mostrano i tre pavimenti piu' vicini e, in coda, quello con PIU' TOCCHI quando sta piu' in basso; a pari "
-      "tocchi non si aggiunge niente",
-      [z["alto"] for z in _pm487] == [99, 97, 95, 85.6] and _pm487[-1].get("piu_toccato") and len(_pm487[-1]["tocchi"]) == 3
-      and [z["alto"] for z in _pm487b] == [99, 97, 95], str([z["alto"] for z in _pm487]))
+def _coda487(triplo, singolo=None):
+    s = [105] * 6
+    for f in (99, 97, 95):
+        s += _V487(f) + [105] * 6
+    for f in triplo:
+        s += _V487(f) + [105] * 6
+    if singolo is not None:
+        s += _V487(singolo) + [105] * 6
+    return ROT.pavimenti(_serie487(s), 110.0, 2.0)["minimi"]
+_pm487 = _coda487((91.4, 91.7, 92.0))            # subito sotto: 95 - 92 = 3, cioe' 1,5 ATR
+_pm487b = _coda487((), singolo=92.0)             # un solo tocco: non e' piu' forte dei mostrati
+_pm487c = _coda487((70.0, 70.3, 70.6))           # la base lontana: 95 - 70,6 = 24,4, cioe' 12 ATR (MU a 118, -87%)
+check("v487-v488 si mostrano i tre pavimenti piu' vicini e, in coda, quello con PIU' TOCCHI se sta SUBITO SOTTO "
+      "(entro 2 ATR dall'ultimo mostrato); a pari tocchi niente; la base lontana di due anni fa non rientra",
+      [z["alto"] for z in _pm487] == [99, 97, 95, 92.0] and _pm487[-1].get("piu_toccato") and len(_pm487[-1]["tocchi"]) == 3
+      and [z["alto"] for z in _pm487b] == [99, 97, 95] and [z["alto"] for z in _pm487c] == [99, 97, 95],
+      str(([z["alto"] for z in _pm487], [z["alto"] for z in _pm487b], [z["alto"] for z in _pm487c])))
 
 # --- la resa: tre esiti distinti (v389) e i vuoti dichiarati come convenzione ---
 _r487 = "\n".join(ROT.righe_pavimenti(_pv487))
@@ -3354,14 +3359,16 @@ check("v487 collegamento: la raccolta legge lo storico lungo dei sorvegliati e n
 _sez487 = _lib474[_lib474.find("**Ingressi sui minimi: i PAVIMENTI**"):_lib474.find("## 1ter")]
 _m487 = {"anni": re.search(r"ultimi \*\*(\d+) anni\*\*", _sez487), "salto": re.search(r"oltre il\s+\*\*(\d+)%\*\*", _sez487),
          "lato": re.search(r"\*\*(\d+) sedute prima e (\d+) dopo\*\*", _sez487),
-         "stop": re.search(r"meno \*\*(\d+) ATR\*\*", _sez487)}
+         "stop": re.search(r"meno \*\*(\d+) ATR\*\*", _sez487),
+         "coda": re.search(r"entro \*\*(\d+) ATR\*\* dall'ultimo mostrato", _sez487)}
 check("v487 le soglie dei pavimenti si rileggono da LIBRO.md §1bis e coincidono col codice: due anni, salto del 3%, "
       "5 sedute per lato, mezzo ATR, stop 1 ATR sotto il fondo",
       all(_m487.values()) and int(_m487["anni"].group(1)) == ROT.ANNI_PAVIMENTI
       and int(_m487["salto"].group(1)) / 100 == ROT.PAV_SALTO
       and int(_m487["lato"].group(1)) == int(_m487["lato"].group(2)) == ROT.PAV_LATO
       and "entro **mezzo ATR**" in _sez487 and ROT.PAV_LARGHEZZA_ATR == 0.5
-      and int(_m487["stop"].group(1)) == ROT.PAV_STOP_ATR and "Non voglio entrare" in _sez487,
+      and int(_m487["stop"].group(1)) == ROT.PAV_STOP_ATR and int(_m487["coda"].group(1)) == ROT.PAV_CODA_ATR
+      and "Non voglio entrare" in _sez487,
       str({k: (v.group(0) if v else None) for k, v in _m487.items()}))
 _cl487 = AN.checklist() or ""
 check("v487 il formato porta i pavimenti nella sezione 7 e nel registro delle richieste rese strutturali",

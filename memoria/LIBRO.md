@@ -135,7 +135,8 @@ Convenzioni scelte da Claude e dichiarate come tali (v240), rilette dal codice d
 - **Pavimento**: un minimo di oscillazione sotto il prezzo, il più basso di **5 sedute prima e 5 dopo**;
   minimi entro **mezzo ATR** sono lo stesso pavimento. Per ciascuno: quante volte il prezzo ci è tornato,
   quando l'ultima, quanto è rimbalzato nelle 20 sedute dopo, con quali volumi. Si mostrano i tre più vicini
-  e, se sta più in basso, quello con più tocchi.
+  e, subito sotto (entro **2 ATR** dall'ultimo mostrato), quello con più tocchi: un pavimento più forte appena
+  oltre, non la base di due anni fa da cui il titolo è partito (v488: su MU compariva 118, a −87%).
 - **Ordine**: con limite al bordo alto del pavimento — si esegue solo se il prezzo scende fin lì, quindi mai
   sulla risalita.
 - **Stop**: una chiusura sotto il fondo del pavimento meno **1 ATR**.
