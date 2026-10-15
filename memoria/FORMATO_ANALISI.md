@@ -61,6 +61,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Da v481 ogni sorvegliato porta la riga **«tenuta se fosse in portafoglio»**: la stessa regola
    delle posizioni (`LIBRO.md` §1sexies), letta da chi il nome non lo possiede — da v482 con le
    prove nei due versi.
+   Da v487 ogni sorvegliato porta i suoi **PAVIMENTI** (decisione del CEO del 15/10: entrare sui minimi,
+   non sulla risalita), e il piano per la liquidità il gruppo **SUI PAVIMENTI**.
    Da v474 chiude col **PIANO PER LA LIQUIDITÀ**: la liquidità con la sua quota del patrimonio e,
    per ogni ingresso possibile (sorvegliati e candidati di settore), cosa fa al libro un'unità di
    5.000 € — volatilità, beta su QQQ, perdita allo stop — anche per chi è nella stessa scommessa.
@@ -156,6 +158,12 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        sedute dal minimo dell'anno), la trimestrale dichiarata dalla fonte, le revisioni, e la
        nota del CEO in `LIBRO.md` confrontata coi livelli di oggi. Chiusura: chi è operabile
        ADESSO, chi ha un livello da mettere come avviso su Investing.com, chi no e perché.
+   7d-bis. **i PAVIMENTI** (v487, decisione del CEO del 15/10: *"Non voglio entrare quando risalgono, ma
+       voglio entrare sui minimi"*) — per ogni nome i minimi degli ultimi due anni dove il titolo ha smesso
+       di scendere, con l'ordine con limite al bordo alto, lo stop e la perdita per 5.000 € (regole in
+       `LIBRO.md` §1bis), e nel piano per la liquidità il gruppo **SUI PAVIMENTI**: l'ordine sul pavimento
+       più vicino di ogni nome. La chiusura della risposta dice quali ordini sui pavimenti mettere, e per chi
+       ha i conti vicini se tenerli aperti durante i conti.
    7e. **il PIANO PER LA LIQUIDITÀ** (v474, decisione del CEO del 09/10) — dal blocco omonimo di
        `rotazione.py`: la liquidità e la sua quota del patrimonio; per gli operabili adesso e per
        gli avvisi le conseguenze di un'unità di 5.000 € sul libro (volatilità, beta su QQQ, perdita
@@ -176,7 +184,8 @@ possibile valutato, l'aritmetica della media sulle posizioni in perdita (14/10) 
 rimandate di proposito, riportate con la loro scadenza (14/10) · la riduzione in proporzione al
 rischio, il salvavita a −30% dal massimo, la scadenza e l'esame di ogni conflitto (14/10 sera) ·
 non si vende sui ribassi: arancione e rosso sono un segnale, l'unica vendita automatica è il
-salvavita, e nessuna presa di profitto ai massimi (15/10).
+salvavita, e nessuna presa di profitto ai massimi (15/10) · ingressi sui minimi: i pavimenti di ogni nome della
+watchlist, con ordine, stop e perdita per 5.000 € (15/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

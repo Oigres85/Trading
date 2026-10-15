@@ -7037,3 +7037,55 @@ piano si percorre su **15 stati** — cinque colori per tre stati del salvavita 
 (v419, v420). Nove iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per
 impronta: mordono tutte e nove, ciascuna sul controllo atteso. Pavimento di `test_analisi_libro.py`
 415 → 420. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🪜 v487 — ENTRARE SUI MINIMI: I PAVIMENTI DIVENTANO UN CALCOLO
+
+Decisione del CEO (15/10/2026), testuale: *"Di questi tre possibili ingressi, dammi gli eventuali pavimenti.
+Non voglio entrare quando risalgono, ma voglio entrare sui minimi"*; poi *"Si"* a renderli un calcolo con le
+stesse regole per tutti i titoli. Fino a ieri la watchlist dava solo livelli di RISALITA («chiusura sopra …»,
+v473): la lettura di chi compra la discesa finita, cioè esattamente quella che il CEO non vuole.
+
+`rotazione.py` → `pavimenti` per ogni sorvegliato, e nel piano per la liquidità il gruppo **SUI PAVIMENTI**:
+l'ordine con limite sul pavimento più vicino di ogni nome, con stop, perdita per 5.000 € e volatilità del libro.
+Regole in `LIBRO.md` §1bis, rilette dal codice da un gate (v474: un numero, un posto):
+
+| convenzione | valore |
+|---|---|
+| finestra | 2 anni di sedute, per DATA (v207) |
+| pavimento | minimo di oscillazione: il più basso di 5 sedute prima e 5 dopo, e il primo a toccare quel prezzo |
+| raggruppamento | minimi entro mezzo ATR sono lo stesso pavimento — largo al massimo mezzo ATR, non a catena |
+| ordine | con limite al bordo alto: si esegue solo se il prezzo scende fin lì, mai sulla risalita |
+| stop | chiusura sotto il fondo meno 1 ATR |
+| quali | i tre più vicini e, in coda, quello con più tocchi se sta più in basso (il triplo minimo di OKLO a 17 restava fuori) |
+
+⚠⚠ **LA SERIE SI TAGLIA ALL'ULTIMA OPERAZIONE SOCIETARIA.** I prezzi grezzi di prima di uno scorporo non sono
+confrontabili con quelli di oggi: WDC il 24/02/2025 (Sandisk) passa da 68,70 a 49,02 di chiusura grezza e il
+rapporto fra prezzo rettificato e grezzo salta da 0,75 a 1,00. Misurato senza il taglio: in coda a WDC compariva
+come «pavimento con più tocchi» la fascia 61,82–73,14 (−80%), fatta di prezzi di PRIMA dello scorporo. *Meglio non
+avere il dato che averlo sbagliato* (v396). Un salto oltre il 3% in
+un giorno taglia; i dividendi ordinari no. NVDA (frazionamento del 2024) non salta: la fonte rettifica già i
+prezzi grezzi per i frazionamenti — misurato, non assunto.
+
+⚠ **I VUOTI DI PREZZO SI SCRIVONO A PARTE e non diventano mai un pavimento.** Che il prezzo torni a riempire una
+fascia saltata è una convenzione di lettura dei grafici, non una misura di compratori (v240): la resa lo dice
+ogni volta. Del vuoto si pubblica la sola parte MAI scambiata, dal massimo del giorno prima al minimo toccato da
+allora.
+
+⚠ **Un ordine lasciato attivo durante i conti può eseguirsi all'apertura dopo, anche sotto il pavimento**: per
+chi ha i conti entro 14 giorni la riga lo dice, e si decide prima se tenerlo aperto.
+
+⚠ **La fonte non ha l'intervallo di due anni**: misurato, «2Y» e «3Y» restituiscono 252 sedute come «1Y». Si
+legge «5Y» (1.231 sedute) solo per i sorvegliati, in parallelo, e le schede restano sull'anno della fonte. Costo
+misurato: nessuno visibile (40,7 secondi contro 41).
+
+⚠ **Un tratto piatto non è una fila di pavimenti**: la prima stesura contava un «tocco» per ogni seduta uguale.
+Ora conta il primo a toccare il prezzo — validato iniettando il ritorno all'uguaglianza semplice: mordono quattro
+check.
+
+Tredici gate sugli stati costruiti (v425, v429): minimo confermato e non, sopra il prezzo, raggruppamento e
+catena, vuoti aperti e richiusi, taglio societario, finestra per data, seduta in corso, il più toccato, la resa
+nei tre esiti (v389), il piano, il collegamento ESEGUITO (v399, v483), le soglie rilette dal libro, il formato.
+**Dodici iniezioni, una alla volta, ripristino verificato per impronta: mordono tutte**, ciascuna sul controllo
+atteso. ⚠ Una mia sonda era sbagliata: pretendeva che il testo «storico NON letto» non contenesse le parole
+«nessun pavimento», che invece contiene apposta per dire che non sono la stessa cosa (v433: *un check rosso è
+prima di tutto una sonda da verificare*). Pavimento di `test_analisi_libro.py` 420 → 435.

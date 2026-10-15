@@ -48,6 +48,27 @@ della volatilita' annua e del beta su QQQ, sulle stesse date comuni a libro, QQQ
 perdita allo stop. Il patrimonio e la quota della liquidita' passano da numeri_libro (una grandezza,
 un proprietario: v436). Ordine dichiarato: gli operabili per riduzione della volatilita', gli
 avvisi per distanza dal livello in ATR.
+
+v487 — I PAVIMENTI (decisione del CEO del 15/10/2026, testuale: "Non voglio entrare quando
+risalgono, ma voglio entrare sui minimi"; poi "Si" a renderli un calcolo con le stesse regole per
+tutti i titoli). Per ogni sorvegliato, convenzioni dichiarate (v240), scritte anche in LIBRO.md §1bis
+e rilette da un gate:
+  FINESTRA             = due anni di sedute, per DATA (v207), dall'ultima operazione societaria in poi:
+                         un salto oltre il 3% in un giorno del rapporto fra prezzo rettificato e grezzo
+                         (uno scorporo, un dividendo straordinario) rende i prezzi di prima non
+                         confrontabili — WDC il 24/02/2025, lo scorporo di Sandisk.
+  PAVIMENTO            = un minimo di oscillazione sotto il prezzo: il piu' basso di 5 sedute prima e 5
+                         dopo. Minimi entro mezzo ATR sono lo stesso pavimento (largo al massimo mezzo
+                         ATR). Per ciascuno: quante volte il prezzo ci e' tornato, quando l'ultima, quanto
+                         e' rimbalzato nelle 20 sedute dopo, con quali volumi.
+  ORDINE               = con limite al bordo alto del pavimento: si esegue solo se il prezzo scende fin
+                         li', quindi mai sulla risalita.
+  STOP                 = una chiusura sotto il fondo del pavimento meno 1 ATR.
+  VUOTO DI PREZZO      = la fascia saltata da un rialzo e mai piu' scambiata. Che il prezzo torni a
+                         riempirla e' una convenzione di lettura dei grafici, NON una misura: si
+                         scrive a parte, e non diventa mai un pavimento.
+I livelli della zona d'ingresso (v473) restano accanto: sono la lettura di chi entra sulla risalita,
+che il CEO non vuole, e servono come segnale che la discesa e' finita.
 """
 import argparse, json, math, os, sys
 from datetime import datetime
@@ -69,6 +90,16 @@ SOGLIA_VOL_CONFERMA = 50    # v473: la chiusura sul livello conta con volume olt
 GIORNI_CALENDARIO = 45      # v473: la stessa finestra delle SCADENZE di numeri_libro
 UNITA_EUR = 5000            # v474: unita' di calcolo delle conseguenze, NON una quantita' consigliata
 TRIMESTRALE_VICINA = 14     # v474: giorni; un ingresso prima dei conti e' una scommessa binaria (LIBRO.md §1quater)
+# v487 — i pavimenti (decisione del CEO del 15/10/2026: entrare sui minimi). Convenzioni scritte anche in
+#   LIBRO.md §1bis e rilette da un gate: un numero, un posto.
+ANNI_PAVIMENTI = 2          # la finestra: due anni di sedute, per data
+PAV_LATO = 5                # un minimo di oscillazione e' il piu' basso di 5 sedute prima e 5 dopo
+PAV_LARGHEZZA_ATR = 0.5     # minimi entro mezzo ATR sono lo stesso pavimento
+PAV_STOP_ATR = 1.0          # lo stop: una chiusura sotto il fondo del pavimento meno 1 ATR
+PAV_RIMBALZO = 20           # il rimbalzo dopo un minimo si misura sulle 20 sedute successive
+PAV_SALTO = 0.03            # un salto oltre il 3% del rapporto rettificato/grezzo in un giorno: operazione societaria
+PAV_MOSTRA = 3              # i pavimenti piu' vicini sotto il prezzo
+PAV_VUOTI = 2               # i vuoti di prezzo piu' vicini sotto il prezzo
 
 
 SEDUTE_BETA = 250
@@ -354,6 +385,109 @@ def piano_ingresso(t):
     return p
 
 
+
+# ---------------------------------------------------------------- v487: i pavimenti — entrare sui minimi
+def barre_lunghe(tk):
+    """Cinque anni di storico giornaliero, per i pavimenti (v487). La fonte non ha l'intervallo di due anni:
+    misurato il 15/10/2026, "2Y" e "3Y" restituiscono 252 sedute come "1Y", "5Y" ne restituisce 1.231. Le
+    classi di azioni anche nella forma col punto, come _barre_sicure. None = storico NON letto, che la resa
+    distingue da 'nessun pavimento' (v389)."""
+    for forma in dict.fromkeys([tk, tk.replace("-", ".")]):
+        try:
+            d = sorted(brief.jget(f"{brief.SA}/symbol/s/{forma}/history?range=5Y&period=Daily")["data"],
+                       key=lambda x: x["t"])
+            if d:
+                return d
+        except Exception:
+            pass
+    return None
+
+
+def serie_omogenea(barre, salto=PAV_SALTO):
+    """La serie dall'ULTIMA operazione societaria in poi, e la data del taglio (None se non ce n'e'). I prezzi
+    grezzi di prima di uno scorporo non sono confrontabili con quelli di oggi: WDC il 24/02/2025 (Sandisk)
+    passa da 68,70 a 49,02 di chiusura grezza, e il rapporto fra prezzo rettificato e grezzo salta da 0,75 a
+    1,00. Un minimo di allora sarebbe un pavimento inventato: meglio non avere il dato che averlo sbagliato
+    (v396). I dividendi ordinari spostano quel rapporto di poco e non tagliano."""
+    taglio = 0
+    for i in range(1, len(barre)):
+        a0, c0, a1, c1 = barre[i - 1].get("a"), barre[i - 1].get("c"), barre[i].get("a"), barre[i].get("c")
+        if a0 and c0 and a1 and c1 and abs((a1 / c1) / (a0 / c0) - 1) > salto:
+            taglio = i
+    return barre[taglio:], (barre[taglio]["t"] if taglio else None)
+
+
+def _con_ordine(z, px, atr):
+    """Ordine con limite al bordo alto, stop una chiusura sotto il fondo meno PAV_STOP_ATR, e la perdita allo
+    stop per l'unita' di calcolo: la stessa aritmetica per pavimenti e vuoti."""
+    stop = z["fondo"] - PAV_STOP_ATR * atr
+    stop = stop if stop > 0 else None
+    z.update({"ordine": z["alto"], "stop": stop, "pct": (z["alto"] / px - 1) * 100, "atr": (z["alto"] - px) / atr,
+              "perdita_pct": (stop / z["alto"] - 1) * 100 if stop else None,
+              "perdita_eur": UNITA_EUR * (stop / z["alto"] - 1) if stop else None})
+    return z
+
+
+def pavimenti(barre, px, atr, adesso=None, anni=ANNI_PAVIMENTI):
+    """v487 — i PAVIMENTI sotto il prezzo (decisione del CEO del 15/10/2026: «entrare sui minimi», non sulla
+    risalita): dove negli ultimi due anni il titolo ha smesso di scendere ed e' risalito — minimi di
+    oscillazione raggruppati entro mezzo ATR — e, a parte, i vuoti di prezzo mai richiusi. Per ciascuno
+    l'ordine con limite al bordo alto, lo stop e la perdita allo stop per l'unita' di calcolo. Solo fatti delle
+    barre: la frase la scrive la resa (v448). La seduta in corso si toglie: il suo minimo puo' ancora scendere
+    (v471). None = storico non letto o prezzo/ATR mancanti, che NON e' 'nessun pavimento'."""
+    if not barre or px is None or not atr:
+        return None
+    if seduta_in_corso(barre, adesso):
+        barre = barre[:-1]
+    serie, taglio = serie_omogenea(barre)
+    if not serie:
+        return None
+    fine = datetime.fromisoformat(serie[-1]["t"]).date()
+    inizio = fine.replace(year=fine.year - anni, day=min(fine.day, 28) if fine.month == 2 else fine.day).isoformat()
+    serie = [b for b in serie if b["t"] >= inizio]
+    vols = [b["v"] for b in serie if b.get("v")]
+    minimi = []
+    for i in range(PAV_LATO, len(serie) - PAV_LATO):
+        fin = [b.get("l") for b in serie[i - PAV_LATO:i + PAV_LATO + 1]]
+        lo = serie[i].get("l")
+        # il piu' basso della finestra E il primo a toccare quel prezzo: un tratto piatto da' un pavimento solo,
+        #   al suo inizio, invece di un 'tocco' per ogni seduta uguale
+        if lo is None or any(v is None for v in fin) or lo != min(fin) or fin.index(lo) != PAV_LATO or lo >= px:
+            continue
+        dopo = [b["h"] for b in serie[i + 1:i + 1 + PAV_RIMBALZO] if b.get("h") is not None]
+        minimi.append({"data": serie[i]["t"], "minimo": lo,
+                       "rimbalzo_pct": (max(dopo) / lo - 1) * 100 if dopo else None,
+                       "volume_pct": percentile_midrank(serie[i].get("v"), vols)})
+    zone = []
+    for m in sorted(minimi, key=lambda m: (-m["minimo"], m["data"])):
+        if zone and zone[-1]["alto"] - m["minimo"] <= PAV_LARGHEZZA_ATR * atr:
+            zone[-1]["fondo"] = m["minimo"]
+            zone[-1]["tocchi"].append(m)
+        else:
+            zone.append({"alto": m["minimo"], "fondo": m["minimo"], "tocchi": [m]})
+    vuoti = []
+    for i in range(1, len(serie)):
+        su, giu = serie[i - 1].get("h"), serie[i].get("l")
+        if su is None or giu is None or giu <= su:
+            continue
+        # la parte MAI scambiata: fra il massimo del giorno prima e il minimo toccato da allora
+        resta = min(b["l"] for b in serie[i:] if b.get("l") is not None)
+        if su < resta < px:
+            vuoti.append({"data": serie[i]["t"], "fondo": su, "alto": resta})
+    lo_serie = min((b for b in serie if b.get("l") is not None), key=lambda b: b["l"], default=None)
+    # i piu' vicini, e in coda il PIU' TOCCATO quando sta piu' in basso e ha piu' tocchi di tutti quelli mostrati:
+    #   su OKLO i tre piu' vicini sono minimi singoli, e il triplo minimo a 17 restava fuori (misurato il 15/10)
+    scelte = zone[:PAV_MOSTRA]
+    if scelte:
+        forte = max(zone, key=lambda z: (len(z["tocchi"]), z["alto"]))
+        if forte not in scelte and len(forte["tocchi"]) > max(len(z["tocchi"]) for z in scelte):
+            scelte = scelte + [dict(forte, piu_toccato=True)]
+    return {"minimi": [_con_ordine(z, px, atr) for z in scelte],
+            "vuoti": [_con_ordine(v, px, atr) for v in sorted(vuoti, key=lambda v: -v["alto"])[:PAV_VUOTI]],
+            "da": serie[0]["t"], "fino_a": serie[-1]["t"], "sedute": len(serie), "taglio": taglio,
+            "minimo_serie": {"minimo": lo_serie["l"], "data": lo_serie["t"]} if lo_serie else None}
+
+
 def scheda(tk, barre, rlibro, rspy=None, target=None):
     t = brief.tecnica(tk, d=barre) if barre else {"tk": tk, "errore": "nessuna barra"}
     if t.get("errore"):
@@ -450,6 +584,12 @@ def raccogli():
               "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe,
               "tenuta": numeri_libro.valuta_tenuta(B.get(s["tk"]), pipe.get(s["tk"]), sem)}
              for s in sorv]
+    # v487 — i pavimenti (decisione del CEO del 15/10/2026: entrare sui minimi). Lo storico di cinque anni
+    #   SOLO per i sorvegliati, in parallelo: le schede restano sull'anno della fonte, i pavimenti guardano due anni
+    with ThreadPoolExecutor(brief.PARALLELI) as ex:
+        BL = dict(zip([t["tk"] for t in watch], ex.map(barre_lunghe, [t["tk"] for t in watch])))
+    for t in watch:
+        t["pavimenti"] = pavimenti(BL.get(t["tk"]), t.get("px"), t.get("atr"))
     # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
     eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
     eur_nom = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "EUR"}
@@ -616,6 +756,8 @@ def righe_ingresso(t, cal=None):
         base += (f" · minimo dell'anno {prezzo(dm['minimo'])} il {dm['data']}, {quando}, "
                  f"prezzo {n(dm['sopra_pct'],1,'%')} sopra")
     L.append(f"      {base}")
+    if "pavimenti" in t:          # v487 — solo i sorvegliati: il calcolo vive in raccogli
+        L.extend(f"      {r}" for r in righe_pavimenti(t["pavimenti"]))
     L.append(f"      {riga_volumi(t)} · {riga_target_beta(t)}")
     rev = (schede_progetto.riga_revisioni(t.get("analisti"), con_target=False) if t.get("in_pipeline")
            else "revisioni: titolo non seguito dalla pipeline")
@@ -624,6 +766,45 @@ def righe_ingresso(t, cal=None):
         L.append(f"      {riga_tenuta(t['tenuta'])}")
     if t.get("nota"):
         L.append(f"      nota del CEO in LIBRO.md (i suoi livelli sono del giorno in cui e' scritta): «{t['nota']}»")
+    return L
+
+
+def _fascia(z):
+    return prezzo(z["alto"]) if z["fondo"] == z["alto"] else f"{prezzo(z['fondo'])}–{prezzo(z['alto'])}"
+
+
+def righe_pavimenti(pv):
+    """v487 — i pavimenti di un sorvegliato, con la convenzione in testa allo script e in LIBRO.md §1bis: la
+    stessa per tutti i titoli. Tre esiti distinti (v389): pavimenti trovati · nessun pavimento sotto il prezzo
+    nella finestra (si dice dove sta il minimo della serie) · storico NON letto."""
+    if pv is None:
+        return ["pavimenti: storico NON letto (o prezzo e ATR mancanti) — non vuol dire 'nessun pavimento'"]
+    taglio = (f" · la serie parte dal {pv['taglio']}: un'operazione societaria (salto oltre il {PAV_SALTO * 100:.0f}% "
+              "del rapporto fra prezzo rettificato e grezzo) rende i prezzi di prima non confrontabili") if pv["taglio"] else ""
+    L = [f"pavimenti (LIBRO.md §1bis, decisione del CEO del 15/10/2026: entrare sui minimi, non sulla risalita) — "
+         f"minimi di oscillazione delle {pv['sedute']} sedute dal {pv['da']}{taglio}"]
+    if not pv["minimi"]:
+        ms = pv.get("minimo_serie")
+        L.append("   nessun pavimento sotto il prezzo nella finestra"
+                 + (f": il minimo della serie e' {prezzo(ms['minimo'])} del {ms['data']}" if ms else "")
+                 + " — un ingresso qui non ha un pavimento misurato sotto, e lo stop non ha dove appoggiarsi")
+    for k, z in enumerate(pv["minimi"], 1):
+        tocchi = sorted(z["tocchi"], key=lambda m: m["data"])
+        vol = max((m["volume_pct"] for m in tocchi if m.get("volume_pct") is not None), default=None)
+        stop = ("stop n.d." if z["stop"] is None else
+                f"stop {prezzo(z['stop'])}, chiusura sotto il fondo meno {piano(PAV_STOP_ATR, 0)} ATR "
+                f"({n(z['perdita_pct'], 1, '%')}: {_euro(-z['perdita_eur'])} ogni {_euro(UNITA_EUR)})")
+        L.append(f"   {k}) {_fascia(z)} ({n(z['pct'], 1, '%')}, {n(z['atr'], 1)} ATR) · "
+                 f"{len(tocchi)} {'tocco' if len(tocchi) == 1 else 'tocchi'}, l'ultimo il {tocchi[-1]['data']} · "
+                 f"rimbalzo nelle {PAV_RIMBALZO} sedute dopo: "
+                 + ", ".join(n(m["rimbalzo_pct"], 0, "%") for m in tocchi)
+                 + (" · il pavimento con PIU' TOCCHI nella finestra" if z.get("piu_toccato") else "")
+                 + (f" · volumi fino a {vol:.0f}/100" if vol is not None else "")
+                 + f" → ordine con limite {prezzo(z['ordine'])} · {stop}")
+    if pv["vuoti"]:
+        L.append("   vuoti di prezzo mai richiusi (convenzione di lettura dei grafici, NON una misura di compratori): "
+                 + " · ".join(f"{prezzo(v['fondo'])}–{prezzo(v['alto'])} dal {v['data']} ({n(v['pct'], 1, '%')})"
+                              for v in pv["vuoti"]))
     return L
 
 
@@ -737,7 +918,9 @@ def voce_piano(t, fonte, rt, rlibro, rqqq, valore_libro, unita_usd):
             "zona": p["zona"], "ingresso": ingresso, "stop": stop, "perdita_eur": perdita[0], "perdita_pct": perdita[1],
             "gruppo": gruppo_libro(t.get("corr_libro")), "corr": t.get("corr_libro"), "pend50": t.get("pend50"),
             "trimestrale": t.get("trimestrale"), "stato": t.get("stato"), "distanza_atr": p["distanza_atr"],
-            "conseguenze": conseguenze(rt, rlibro, rqqq, valore_libro, unita_usd)}
+            "conseguenze": conseguenze(rt, rlibro, rqqq, valore_libro, unita_usd),
+            # v487 — i pavimenti viaggiano con la voce: solo i sorvegliati li hanno (la chiave manca ai candidati)
+            "pavimenti": t.get("pavimenti"), "ha_pavimenti": "pavimenti" in t}
 
 
 def _euro(x):
@@ -769,6 +952,45 @@ def riga_piano(v):
         L += f" · trimestrale {tr['data']} ({tr['giorni']} g)"
         if tr.get("giorni") is not None and tr["giorni"] <= TRIMESTRALE_VICINA:
             L += f" ⚠ entro {TRIMESTRALE_VICINA} giorni: un ingresso prima dei conti è una scommessa binaria (LIBRO.md §1quater)"
+    return L
+
+
+def righe_piano_pavimenti(voci):
+    """v487 — il gruppo SUI PAVIMENTI del piano: per ogni sorvegliato l'ordine con limite sul pavimento piu'
+    vicino, lo stop, la perdita allo stop e la volatilita' del libro per l'unita' di calcolo; chi non ha un
+    pavimento sotto il prezzo e chi non ha lo storico si NOMINANO (v406). Ordine: la distanza in ATR, un fatto."""
+    w = [v for v in voci if v.get("ha_pavimenti")]
+    if not w:
+        return []
+    con = sorted((v for v in w if v["pavimenti"] and v["pavimenti"]["minimi"]),
+                 key=lambda v: abs(v["pavimenti"]["minimi"][0]["atr"]))
+    senza = [v["tk"] for v in w if v["pavimenti"] and not v["pavimenti"]["minimi"]]
+    non_letti = [v["tk"] for v in w if v["pavimenti"] is None]
+    L = [f"■ SUI PAVIMENTI — ordini con limite sul pavimento più vicino (decisione del CEO del 15/10/2026: entrare sui "
+         f"minimi, non sulla risalita) · si eseguono solo se il prezzo scende fin lì · ordine: distanza in ATR — {len(con)}"]
+    for v in con:
+        z, c = v["pavimenti"]["minimi"][0], v["conseguenze"]
+        gr = ("STESSA SCOMMESSA del libro" if v["gruppo"].startswith("STESSA") else
+              "correlazione col libro NON misurabile" if v["gruppo"].startswith("CORRELAZIONE") else "DIVERSIFICA")
+        r = (f"    {v['tk']} {prezzo(v['px'])} · {gr} (corr {n(v['corr'], 2)}) · ordine con limite {prezzo(z['ordine'])} "
+             f"({n(z['pct'], 1, '%')}, {n(z['atr'], 1)} ATR) sul pavimento {_fascia(z)} ({len(z['tocchi'])} "
+             f"{'tocco' if len(z['tocchi']) == 1 else 'tocchi'})")
+        r += (" · stop n.d." if z["stop"] is None else
+              f" · stop {prezzo(z['stop'])}: {_euro(-z['perdita_eur'])} ogni {_euro(UNITA_EUR)}")
+        if c and c.get("dvol") is not None:
+            r += f" · volatilità del libro {n(c['dvol'], 2)} punti"
+        tr = v.get("trimestrale")
+        if tr:
+            r += f" · trimestrale {tr['data']} ({tr['giorni']} g)"
+            if tr.get("giorni") is not None and tr["giorni"] <= TRIMESTRALE_VICINA:
+                r += (" ⚠ un ordine lasciato attivo durante i conti può eseguirsi all'apertura dopo, anche sotto il "
+                      "pavimento: si decide prima se tenerlo aperto")
+        L.append(r)
+    if senza:
+        L.append(f"    senza un pavimento sotto il prezzo nei {ANNI_PAVIMENTI} anni (nessun minimo di oscillazione sotto): "
+                 + ", ".join(senza))
+    if non_letti:
+        L.append("    storico NON letto (non vuol dire 'nessun pavimento'): " + ", ".join(non_letti))
     return L
 
 
@@ -820,6 +1042,7 @@ def righe_piano(o):
                 L.append("    " + " · ".join(f"{v['tk']} ({v['posizione']})" for v in sel))
             continue
         L.extend(riga_piano(v) for v in sel)
+    L.extend(righe_piano_pavimenti(voci))
     stessa = [v["tk"] for v in voci if v["gruppo"].startswith("STESSA") and v["posizione"] in ("dentro", "sotto", "sopra")]
     if stessa:
         L.append(f"   ⚠ nella stessa scommessa del libro (correlazione da {piano(SOGLIA_CORR)} in su): {', '.join(stessa)} — "

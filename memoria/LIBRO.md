@@ -125,6 +125,29 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
 gia' concentrato.
 
+**Ingressi sui minimi: i PAVIMENTI** (decisione del CEO del 15/10/2026, testuale: *"Non voglio entrare
+quando risalgono, ma voglio entrare sui minimi"*; poi *"Sì"* a renderli un calcolo con le stesse regole per
+tutti i titoli). `rotazione.py` li calcola per ogni sorvegliato e li porta nella sezione 7 di ogni analisi.
+Convenzioni scelte da Claude e dichiarate come tali (v240), rilette dal codice da un gate:
+- **Finestra**: gli ultimi **2 anni** di sedute, dall'ultima operazione societaria in poi: un salto oltre il
+  **3%** in un giorno del rapporto fra prezzo rettificato e grezzo (uno scorporo, un dividendo straordinario)
+  rende i prezzi di prima non confrontabili — WDC il 24/02/2025, lo scorporo di Sandisk.
+- **Pavimento**: un minimo di oscillazione sotto il prezzo, il più basso di **5 sedute prima e 5 dopo**;
+  minimi entro **mezzo ATR** sono lo stesso pavimento. Per ciascuno: quante volte il prezzo ci è tornato,
+  quando l'ultima, quanto è rimbalzato nelle 20 sedute dopo, con quali volumi. Si mostrano i tre più vicini
+  e, se sta più in basso, quello con più tocchi.
+- **Ordine**: con limite al bordo alto del pavimento — si esegue solo se il prezzo scende fin lì, quindi mai
+  sulla risalita.
+- **Stop**: una chiusura sotto il fondo del pavimento meno **1 ATR**.
+- **Vuoti di prezzo**: le fasce saltate da un rialzo e mai più scambiate si scrivono a parte. Che il prezzo
+  torni a riempirle è una convenzione di lettura dei grafici, non una misura di compratori: non diventano mai
+  un pavimento.
+- I pavimenti dicono dove il titolo si è fermato le volte scorse, non dove si fermerà: per questo ogni ordine
+  ha il suo stop. Un ordine lasciato attivo durante i conti può eseguirsi all'apertura dopo, anche sotto il
+  pavimento: si decide prima se tenerlo aperto.
+- I livelli della zona d'ingresso (v473) restano accanto: sono la lettura di chi entra sulla risalita, che il
+  CEO non vuole, e servono come segnale che la discesa è finita.
+
 ## 1ter. SEMAFORO D'USCITA — deciso col CEO il 06/10/2026, si controlla a OGNI analisi
 
 Domanda del CEO: *"quando capire di dover uscire, onde evitare di subire in pieno un prossimo

@@ -3207,6 +3207,168 @@ check("v486 la decisione del 15/10 e' nel libro, con le parole del CEO: nella re
       and "NON è stato eseguito" in _q1486 and "15/10/2026" in _q1486 and "una volta per discesa" in _rsv486,
       _q1486[-500:])
 
+# ================================================================ v487 — i pavimenti: entrare sui minimi
+# Decisione del CEO del 15/10/2026, testuale: «Non voglio entrare quando risalgono, ma voglio entrare sui minimi»;
+# poi «Si» a renderli un calcolo con le stesse regole per tutti i titoli (LIBRO.md §1bis). Ogni stato si COSTRUISCE
+# (v425, v429): una serie sintetica dove il fenomeno c'e' per costruzione, a qualunque data giri la suite.
+from datetime import date as _d487, timedelta as _td487, datetime as _dt487
+def _serie487(lows, inizio="2025-01-06", a=None, alto=6.0):
+    """Barre sintetiche: minimo dato, massimo = minimo + alto (6 > ogni passo, quindi nessun vuoto non voluto),
+    chiusura a meta', volume crescente. `a` = rapporto rettificato/grezzo per barra (default 1)."""
+    out, g = [], _d487.fromisoformat(inizio)
+    for i, lo in enumerate(lows):
+        while g.weekday() >= 5:
+            g += _td487(days=1)
+        c = lo + alto / 2
+        out.append({"t": g.isoformat(), "o": c, "h": lo + alto, "l": lo, "c": c,
+                    "a": c * (1.0 if a is None else a[i]), "v": 1000 + i})
+        g += _td487(days=1)
+    return out
+def _V487(fondo):
+    return [fondo + 5, fondo + 4, fondo + 3, fondo + 2, fondo + 1, fondo, fondo + 1, fondo + 2, fondo + 3, fondo + 4, fondo + 5]
+
+# --- un minimo di oscillazione sotto il prezzo e' un pavimento; ordine al bordo alto, stop 1 ATR sotto il fondo ---
+_s487 = _serie487([100] * 6 + _V487(90) + [100] * 15)
+_pv487 = ROT.pavimenti(_s487, 110.0, 2.0)
+_z487 = (_pv487 or {}).get("minimi") or [{}]
+check("v487 un minimo di oscillazione sotto il prezzo e' un pavimento: un tocco, il rimbalzo nelle 20 sedute dopo, "
+      "l'ordine con limite al bordo alto e lo stop una chiusura sotto il fondo meno 1 ATR, con la perdita per 5.000 €",
+      len(_pv487["minimi"]) == 1 and _z487[0]["alto"] == 90 and _z487[0]["fondo"] == 90 and len(_z487[0]["tocchi"]) == 1
+      and _z487[0]["tocchi"][0]["data"] == _s487[11]["t"] and abs(_z487[0]["tocchi"][0]["rimbalzo_pct"] - (106 / 90 - 1) * 100) < 1e-9
+      and _z487[0]["ordine"] == 90 and abs(_z487[0]["stop"] - 88.0) < 1e-9
+      and abs(_z487[0]["perdita_eur"] - 5000 * (88 / 90 - 1)) < 1e-9 and not _pv487["vuoti"], str(_z487[0])[:400])
+check("v487 un minimo non ancora confermato (meno di 5 sedute dopo) o sopra il prezzo NON e' un pavimento; un tratto "
+      "piatto ne da' uno solo, non un tocco per seduta",
+      not ROT.pavimenti(_serie487([100] * 20 + [95, 90, 95, 96]), 110.0, 2.0)["minimi"]
+      and not ROT.pavimenti(_s487, 85.0, 2.0)["minimi"]
+      and len(ROT.pavimenti(_serie487([104] * 8 + [100] * 12 + [104] * 8), 110.0, 2.0)["minimi"]) == 1)
+
+# --- raggruppati entro mezzo ATR: un pavimento e' largo al massimo mezzo ATR ---
+_g1 = ROT.pavimenti(_serie487([100] * 6 + _V487(90) + [100] * 6 + _V487(90.8) + [100] * 10), 110.0, 2.0)["minimi"]
+_g2 = ROT.pavimenti(_serie487([100] * 6 + _V487(90) + [100] * 6 + _V487(91.2) + [100] * 10), 110.0, 2.0)["minimi"]
+_g3 = ROT.pavimenti(_serie487([100] * 6 + _V487(92) + [100] * 6 + _V487(91.4) + [100] * 6 + _V487(90.8) + [100] * 10),
+                    110.0, 2.0)["minimi"]
+check("v487 minimi entro mezzo ATR sono lo stesso pavimento (due tocchi, ordine al piu' alto, stop sotto il piu' basso); "
+      "oltre mezzo ATR sono due pavimenti, il piu' vicino per primo; e la catena non allarga un pavimento oltre mezzo ATR",
+      len(_g1) == 1 and len(_g1[0]["tocchi"]) == 2 and _g1[0]["alto"] == 90.8 and _g1[0]["fondo"] == 90
+      and abs(_g1[0]["stop"] - 88.0) < 1e-9 and len(_g2) == 2 and _g2[0]["alto"] == 91.2 and _g2[1]["alto"] == 90
+      and [(z["alto"], z["fondo"]) for z in _g3] == [(92, 91.4), (90.8, 90.8)],
+      str((_g1, _g2, [(z["alto"], z["fondo"]) for z in _g3]))[:400])
+
+# --- i vuoti di prezzo: a parte, e solo quelli mai richiusi; la parte ancora libera ---
+_vu487 = ROT.pavimenti(_serie487([100] * 10 + [110] * 10 + [108] * 5), 120.0, 2.0)
+_vu487b = ROT.pavimenti(_serie487([100] * 10 + [110] * 10 + [105] * 5), 120.0, 2.0)
+check("v487 un vuoto di prezzo mai richiuso si scrive a parte con la sola parte mai scambiata (dal massimo del giorno "
+      "prima al minimo toccato da allora); richiuso, sparisce; un vuoto non diventa mai un pavimento",
+      len(_vu487["vuoti"]) == 1 and _vu487["vuoti"][0]["fondo"] == 106 and _vu487["vuoti"][0]["alto"] == 108
+      and not _vu487["minimi"] and not _vu487b["vuoti"], str((_vu487["vuoti"], _vu487b["vuoti"])))
+
+# --- un'operazione societaria taglia la serie: prima di li' i prezzi non sono confrontabili (WDC, Sandisk) ---
+_lw487 = [70] * 6 + _V487(60) + [70] * 13 + [100] * 6 + _V487(90) + [100] * 10
+_aw487 = [0.75] * 30 + [1.0] * (len(_lw487) - 30)
+_ws487 = _serie487(_lw487, a=_aw487)
+_wp487 = ROT.pavimenti(_ws487, 110.0, 2.0)
+_wp487s = ROT.pavimenti(_serie487(_lw487), 110.0, 2.0)
+check("v487 un salto oltre il 3% del rapporto fra prezzo rettificato e grezzo (uno scorporo) taglia la serie: il minimo "
+      "di prima sparisce e la data del taglio si dichiara; senza salto lo stesso minimo e' un pavimento",
+      _wp487["taglio"] == _ws487[30]["t"] and [z["alto"] for z in _wp487["minimi"]] == [90]
+      and _wp487s["taglio"] is None and 60 in [z["alto"] for z in _wp487s["minimi"]],
+      str((_wp487["taglio"], [z["alto"] for z in _wp487["minimi"]], [z["alto"] for z in _wp487s["minimi"]])))
+
+# --- la finestra e' di due anni, per DATA (v207) ---
+_lunga487 = _serie487([100] * 6 + _V487(80) + [100] * 700 + _V487(90) + [100] * 10)
+_lp487 = ROT.pavimenti(_lunga487, 110.0, 2.0)
+check("v487 la finestra e' di due anni per DATA: un minimo di tre anni fa non e' un pavimento, e la serie parte "
+      "esattamente due anni prima dell'ultima seduta",
+      [z["alto"] for z in _lp487["minimi"]] == [90] and _lp487["da"] >= (_d487.fromisoformat(_lunga487[-1]["t"])
+          .replace(year=_d487.fromisoformat(_lunga487[-1]["t"]).year - 2)).isoformat()
+      and _lp487["minimo_serie"]["minimo"] == 90, str(([z["alto"] for z in _lp487["minimi"]], _lp487["da"])))
+
+# --- la seduta in corso si toglie: il suo minimo puo' ancora scendere (v471) ---
+_sc487 = _serie487([100] * 10 + [95, 94, 93, 92, 91, 90, 91, 92, 93, 94, 95])
+_g487 = _d487.fromisoformat(_sc487[-1]["t"])
+_in487 = ROT.pavimenti(_sc487, 110.0, 2.0, adesso=_dt487(_g487.year, _g487.month, _g487.day, 11, 0, tzinfo=brief.NEW_YORK))
+_fu487 = ROT.pavimenti(_sc487, 110.0, 2.0, adesso=_dt487(_g487.year, _g487.month, _g487.day, 17, 0, tzinfo=brief.NEW_YORK))
+check("v487 durante la seduta l'ultima barra e' in formazione e non conferma un minimo; dopo la campana si",
+      not _in487["minimi"] and [z["alto"] for z in _fu487["minimi"]] == [90])
+
+# --- i tre piu' vicini, e in coda il piu' toccato se sta piu' in basso e ha piu' tocchi di tutti (il triplo minimo di OKLO) ---
+_pt487 = [105] * 6
+for _f487 in (99, 97, 95):
+    _pt487 += _V487(_f487) + [105] * 6
+for _f487 in (85, 85.3, 85.6):
+    _pt487 += _V487(_f487) + [105] * 6
+_pm487 = ROT.pavimenti(_serie487(_pt487), 110.0, 2.0)["minimi"]
+_pm487b = ROT.pavimenti(_serie487([105] * 6 + _V487(99) + [105] * 6 + _V487(97) + [105] * 6 + _V487(95) + [105] * 6
+                                  + _V487(85) + [105] * 6), 110.0, 2.0)["minimi"]
+check("v487 si mostrano i tre pavimenti piu' vicini e, in coda, quello con PIU' TOCCHI quando sta piu' in basso; a pari "
+      "tocchi non si aggiunge niente",
+      [z["alto"] for z in _pm487] == [99, 97, 95, 85.6] and _pm487[-1].get("piu_toccato") and len(_pm487[-1]["tocchi"]) == 3
+      and [z["alto"] for z in _pm487b] == [99, 97, 95], str([z["alto"] for z in _pm487]))
+
+# --- la resa: tre esiti distinti (v389) e i vuoti dichiarati come convenzione ---
+_r487 = "\n".join(ROT.righe_pavimenti(_pv487))
+_rv487 = "\n".join(ROT.righe_pavimenti(_vu487))
+check("v487 resa: pavimento con ordine, stop e perdita per 5.000 €; 'nessun pavimento' dice dove sta il minimo della "
+      "serie; storico non letto NON e' 'nessun pavimento'; il vuoto e' una convenzione, non una misura",
+      "1) 90,00 (" in _r487 and "ordine con limite 90,00" in _r487 and "stop 88,00" in _r487 and "111 € ogni 5.000 €" in _r487
+      and "nessun pavimento sotto il prezzo nella finestra: il minimo della serie e' 100,00" in _rv487
+      and "convenzione di lettura dei grafici, NON una misura" in _rv487
+      and "storico NON letto" in ROT.righe_pavimenti(None)[0]
+      and "nessun pavimento sotto il prezzo" not in ROT.righe_pavimenti(None)[0],
+      _r487 + "\n" + _rv487)
+
+# --- il piano: SUI PAVIMENTI, per distanza; chi non ha un pavimento e chi non ha lo storico si nominano (v406) ---
+def _vp487(tk, atr_dist, giorni=None, pv="ok", ha=True):
+    z = {"alto": 90.0, "fondo": 89.0, "tocchi": [{"data": "2026-03-01"}], "ordine": 90.0, "stop": 87.0, "pct": -5.0,
+         "atr": atr_dist, "perdita_pct": -3.3, "perdita_eur": -167.0}
+    p = None if pv is None else {"minimi": [] if pv == "vuoto" else [z], "vuoti": []}
+    return {"tk": tk, "px": 95.0, "gruppo": "DIVERSIFICA", "corr": 0.1, "conseguenze": {"dvol": -0.8},
+            "trimestrale": {"data": "2026-10-25", "giorni": giorni} if giorni is not None else None,
+            "pavimenti": p, "ha_pavimenti": ha}
+_rpp487 = "\n".join(ROT.righe_piano_pavimenti([_vp487("LONT", -2.0, 30), _vp487("VICI", -0.5, 5), _vp487("SENZ", -1.0, pv="vuoto"),
+                                                _vp487("NOLE", -1.0, pv=None), _vp487("CAND", -0.1, ha=False)]))
+check("v487 piano: il gruppo SUI PAVIMENTI ordina per distanza in ATR, avvisa sui conti vicini, nomina chi non ha un "
+      "pavimento e chi non ha lo storico, e lascia fuori i candidati di settore (la decisione riguarda la watchlist)",
+      "■ SUI PAVIMENTI" in _rpp487 and _rpp487.find("    VICI") < _rpp487.find("    LONT")
+      and "ordine con limite 90,00" in _rpp487 and "stop 87,00: 167 € ogni 5.000 €" in _rpp487
+      and "si decide prima se tenerlo aperto" in _rpp487.split("    VICI")[1].split("\n")[0]
+      and "si decide prima" not in _rpp487.split("    LONT")[1].split("\n")[0]
+      and "nei 2 anni (nessun minimo di oscillazione sotto): SENZ" in _rpp487
+      and "storico NON letto (non vuol dire 'nessun pavimento'): NOLE" in _rpp487 and "CAND" not in _rpp487, _rpp487)
+
+# --- il collegamento, ESEGUITO e non letto nel testo (v399, v483) ---
+_rac487 = _corpo_di(Path(__file__).with_name("rotazione.py").read_text(), "raccogli")
+_ri487 = "\n".join(ROT.righe_ingresso(_w473("PAVX", pavimenti=_pv487), {"finestra": 45}))
+_vo487 = ROT.voce_piano({**_vb, "pavimenti": _pv487}, "watchlist", _rx, _rl, _rq, 280000.0, 5600.0)
+_vc487 = ROT.voce_piano(_vb, "candidato di settore", _rx, _rl, _rq, 280000.0, 5600.0)
+_rpl487 = "\n".join(ROT.righe_piano({"piano": {**_pv474, "voci": _pv474["voci"] + [_vo487]}}))
+check("v487 collegamento: la raccolta legge lo storico lungo dei sorvegliati e ne calcola i pavimenti; la riga del "
+      "sorvegliato li stampa; la voce del piano li porta e il piano stampa il gruppo SUI PAVIMENTI",
+      "ex.map(barre_lunghe" in _rac487 and "pavimenti(BL.get(" in _rac487
+      and "pavimenti (LIBRO.md §1bis" in _ri487 and "1) 90,00" in _ri487
+      and _vo487["ha_pavimenti"] and not _vc487["ha_pavimenti"] and "■ SUI PAVIMENTI" in _rpl487
+      and "    XX " in _rpl487.split("■ SUI PAVIMENTI")[1], _rpl487[-700:])
+
+# --- le soglie stanno nel libro e il codice le rilegge (v474: un numero, un posto) ---
+_sez487 = _lib474[_lib474.find("**Ingressi sui minimi: i PAVIMENTI**"):_lib474.find("## 1ter")]
+_m487 = {"anni": re.search(r"ultimi \*\*(\d+) anni\*\*", _sez487), "salto": re.search(r"oltre il\s+\*\*(\d+)%\*\*", _sez487),
+         "lato": re.search(r"\*\*(\d+) sedute prima e (\d+) dopo\*\*", _sez487),
+         "stop": re.search(r"meno \*\*(\d+) ATR\*\*", _sez487)}
+check("v487 le soglie dei pavimenti si rileggono da LIBRO.md §1bis e coincidono col codice: due anni, salto del 3%, "
+      "5 sedute per lato, mezzo ATR, stop 1 ATR sotto il fondo",
+      all(_m487.values()) and int(_m487["anni"].group(1)) == ROT.ANNI_PAVIMENTI
+      and int(_m487["salto"].group(1)) / 100 == ROT.PAV_SALTO
+      and int(_m487["lato"].group(1)) == int(_m487["lato"].group(2)) == ROT.PAV_LATO
+      and "entro **mezzo ATR**" in _sez487 and ROT.PAV_LARGHEZZA_ATR == 0.5
+      and int(_m487["stop"].group(1)) == ROT.PAV_STOP_ATR and "Non voglio entrare" in _sez487,
+      str({k: (v.group(0) if v else None) for k, v in _m487.items()}))
+_cl487 = AN.checklist() or ""
+check("v487 il formato porta i pavimenti nella sezione 7 e nel registro delle richieste rese strutturali",
+      "7d-bis. **i PAVIMENTI**" in _cl487 and "ingressi sui minimi: i pavimenti di ogni nome" in _cl487
+      and "SUI PAVIMENTI" in _cl487)
+
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
