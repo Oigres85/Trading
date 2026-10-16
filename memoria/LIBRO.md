@@ -535,7 +535,7 @@ raggiunto, non QUANDO. Senza quest'ora la resa lo dichiara, e il dubbio resta al
 | Nome | Verso | Quantità | Limite | Inserito | Stato | Validità | Attivo alle |
 |---|---|---|---|---|---|---|---|
 | OKLO | acquisto | 300 | 24,00 | 2026-10-16 | attivo | giornaliero | 19:02 |
-| SMCI | acquisto | 250 | 31,50 | 2026-10-16 | attivo | giornaliero | 19:02 |
+| SMCI | acquisto | 250 | 31,60 | 2026-10-16 | attivo | giornaliero | 19:57 |
 | ORCL | acquisto | 65 | 122,00 | 2026-10-16 | attivo | giornaliero | 19:02 |
 
 `numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
@@ -558,7 +558,9 @@ dopo l'analisi delle 18:00 li ha modificati: **OKLO a 24 e ORCL a 122**, poco so
 l'analisi indicava (23,26 e 121,23), e **SMCI alzato a 31,50**, mezzo dollaro sopra il pavimento 29,90–31,03. ⚠ Alle
 18:21 li avevo registrati a 23,26 e 121,23 dando per scontato che fossero i numeri dell'analisi: i limiti veri li ha
 detti il CEO alle 19:02 (*"Oklo 24 … Smci inserito a 31.5 … Oracle 122"*), e alle 19:02 erano tutti e tre attivi e non
-eseguiti; i minimi della seduta fino ad allora stavano sopra tutti i limiti.
+eseguiti; i minimi della seduta fino ad allora stavano sopra tutti i limiti. Alle 19:57 il CEO ha alzato SMCI a 31,60
+(*"Modifico solo Smci a 31.6 il resto lascio tutto invariato"*): ORCL e OKLO restano com'erano, con l'ultima conferma
+delle 19:02.
 
 ## 1octies. CONTI DICHIARATI DALL'EMITTENTE — date che il calendario Nasdaq non porta (v489)
 
