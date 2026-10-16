@@ -30,9 +30,12 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
+| SMCI | 250 | 31,60 | USD | Super Micro Computer — server AI. Acquistata il 16/10/2026 con l'ordine giornaliero a 31,60 (§1septies); candidato di rotazione da CRWV dal 14/09/2026 |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: ~79.400 €** IN TUTTO, bloccata compresa — dichiarata dal CEO il 15/10/2026 sera, testuale: *"Liquidità è
+**Liquidità: ~72.360 €** IN TUTTO, bloccata compresa — i ~79.400 € del 15/10 **meno l'acquisto di SMCI del 16/10/2026**:
+250 azioni a 31,60 $ = 7.900 $ ≈ 7.040 € al cambio del 16/10 (1,1222); controvalore esatto e commissioni li fissa il
+broker, **da confermare col saldo**. I ~79.400 € li ha dichiarati il CEO il 15/10/2026 sera, testuale: *"Liquidità è
 56.600 euro senza contare la liquidità bloccata per gli ordini non ancora eseguiti"*: **56.600 € liberi** più la parte
 bloccata dai tre ordini giornalieri di §1septies, 25.577,50 $ ai limiti ≈ **22.800 €** al cambio del 15/10 (1,1217) — il
 controvalore esatto lo fissa il broker. La liquidità si scrive in tutto perché un ordine non eseguito non ha speso niente:
@@ -86,7 +89,6 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 
 | Ticker | Nota |
 |---|---|
-| SMCI | Super Micro Computer — server AI. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
 | OKLO | Oklo — reattori nucleari modulari per datacenter. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
 | AMZN | Amazon — candidato d'ingresso (CEO, 02/10/2026). Diversifica in parte dal gruppo AI e porta ~15-20% di Anthropic. Livelli: acquisto 244-246 (supporto 244,30), uscita sotto SMA200 ~240. Trimestrale 29/10 |
 | STX | Seagate — candidato d'ingresso (CEO, 02/10/2026). Leader tecnologico dischi (HAMR), stesso ciclo di WDC. Livelli: ingresso vicino al supporto 758 solo se regge 2-3 sedute, o dopo la trimestrale 27-28/10; uscita sotto 758 |
@@ -535,7 +537,6 @@ raggiunto, non QUANDO. Senza quest'ora la resa lo dichiara, e il dubbio resta al
 | Nome | Verso | Quantità | Limite | Inserito | Stato | Validità | Attivo alle |
 |---|---|---|---|---|---|---|---|
 | OKLO | acquisto | 300 | 24,00 | 2026-10-16 | attivo | giornaliero | 19:02 |
-| SMCI | acquisto | 250 | 31,60 | 2026-10-16 | attivo | giornaliero | 19:57 |
 | ORCL | acquisto | 65 | 122,00 | 2026-10-16 | attivo | giornaliero | 19:02 |
 
 `numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
@@ -560,7 +561,8 @@ l'analisi indicava (23,26 e 121,23), e **SMCI alzato a 31,50**, mezzo dollaro so
 detti il CEO alle 19:02 (*"Oklo 24 … Smci inserito a 31.5 … Oracle 122"*), e alle 19:02 erano tutti e tre attivi e non
 eseguiti; i minimi della seduta fino ad allora stavano sopra tutti i limiti. Alle 19:57 il CEO ha alzato SMCI a 31,60
 (*"Modifico solo Smci a 31.6 il resto lascio tutto invariato"*): ORCL e OKLO restano com'erano, con l'ultima conferma
-delle 19:02.
+delle 19:02. Alle 20:03 il CEO ha confermato l'esecuzione: *"Smci 250 azioni entrato ad 31.6"* — la riga è uscita dalla
+tabella ed è entrata fra le posizioni (§1), e la spesa (7.900 $) è stata tolta dalla liquidità.
 
 ## 1octies. CONTI DICHIARATI DALL'EMITTENTE — date che il calendario Nasdaq non porta (v489)
 
