@@ -7242,3 +7242,54 @@ atteso. Una sembrava non mordere: il mio confronto tagliava il nome del check a 
 stava dopo. *Un'iniezione che "non morde" può essere la sonda che non guarda* (v433). Pavimento di
 `test_analisi_libro.py` 470 → 480 (i punti di chiamata sono 496). `?v=` e `BUILD_VERSION` non toccati: nessun file
 servito al browser (v440).
+
+## 🗓️ v492 — LA LETTURA A 5 ANNI E IL P/E IN OGNI INGRESSO, E IL VEICOLO DI QUOTAZIONE TAGLIATO DAL REGISTRO SEC
+
+Decisione del CEO (16/10/2026), testuale: *"Si, inoltre inserisci anche il fattore P/e come metrica di analisi delle
+azioni"* — il «Si» rispondeva alla domanda se la lettura a 5 anni (medie a 30, 50 e 200 settimane, massimi e minimi,
+posizione nell'intervallo) dovesse entrare sempre nelle analisi degli ingressi.
+
+- **`rotazione.lettura_5anni`** — medie settimanali sulle settimane CONCLUSE (dalle 16:00 di New York del venerdì, col
+  fuso: v470), pendenza su 13 settimane, massimo e minimo con la data, posizione nell'intervallo, quota del rialzo
+  restituita. Una media senza abbastanza settimane è n.d., mai calcolata su meno. Entra nei sorvegliati, nei candidati
+  di settore (anche quelli già in watchlist), negli ordini aperti e nella media delle posizioni in perdita: tutti
+  ingressi.
+- **Il P/E** (`schede_progetto.riga_valutazione`, una resa sola per schede e ingressi) — i multipli dell'aggregatore,
+  mai ricalcolati (v161). Un utile negativo non dà un P/E basso, non dà un P/E, e al suo posto esce prezzo/ricavi (v365);
+  i due utili attesi diversi si dichiarano (v414); un trailing almeno 2 volte il prospettico si dichiara (convenzione
+  v193); il PEG con la sua riserva. Il riferimento dell'S&P 500 sta una volta per blocco, con fonte e data; la «media
+  storica 16,5» (senza provenienza, v240) e il P/E del Nasdaq (trailing o prospettico senza dire quale) restano fuori.
+  ⚠ È una METRICA, non una prova della tenuta: un growth costa caro per costruzione.
+
+### ⚠⚠ Il veicolo di quotazione: lo storico di OKLO comincia con AltC
+Misurato: sotto il simbolo OKLO lo storico a 5 anni della fonte comincia il 15/10/2021 con **AltC Acquisition Corp.**,
+il veicolo (SPAC) che l'ha portato in borsa — un prezzo fermo intorno a 10 $ fino al 09/05/2024. Una media a 200
+settimane che ne comprende 75 disegnava un livello a 34,84, vicino al prezzo e mai difeso da nessuno, **proprio sul nome
+che il CEO stava comprando**. Come Oklo la società ha 127 settimane: la media a 200 non esiste.
+- **Non si indovina dal prezzo** (un tratto piatto a 10 $ è un'euristica, v399, v448): si legge il FATTO, l'8-K con item
+  5.06 «Change in Shell Company Status». OKLO: chiusura 09/05/2024, deposito 13/05, primo giorno come Oklo il 10/05
+  (misurato sulle barre). RGTI: 01/03/2022.
+- **Lo legge la pipeline** (`update_data.storia_quotazione`), dentro il giro EDGAR che già esisteva: la SEC risponde 403
+  a una richiesta senza contatto (misurato), e rotazione.py non manda dati personali a nessun servizio nuovo.
+- Tre esiti (v389): veicolo con la data · verificato senza (i depositi letti coprono i 5 anni, o nella parte non coperta
+  non cade nessun cambio di nome — chi esce da un veicolo cambia nome) · NON verificabile (un cambio di nome prima dei
+  depositi letti; un emittente estero senza 8-K). Un nome non verificato lo DICHIARA invece di passare per «nessun
+  veicolo» (v406).
+- Una regola sola per pavimenti e lettura a 5 anni: `serie_della_societa` (v161).
+- ⚠ Fino al primo run della pipeline col codice nuovo ogni nome dice «storia della quotazione NON verificata»: è vero.
+
+### 🩹 Due stop per lo stesso pavimento, trovato sull'ordine SMCI del 16/10
+Ordine 250 a 31,00, dentro il pavimento 29,90–31,03: la watchlist dava stop **27,46**, il blocco ORDINI **26,34**.
+Ricalcolando le zone sul limite, il minimo a 31,03 usciva e il raggruppamento ripartiva da 29,90 inghiottendo metà della
+zona sotto. Ora il pavimento dell'ordine si legge fra le zone costruite sul prezzo — le stesse della watchlist — e si
+ricalcola sul limite solo quando è sotto tutte. Classe v161: una zona, due derivazioni.
+
+### 🧪 Metodo
+- 30 check in `test_analisi_libro.py`, 5 in `test_update_data.py`; **14 iniezioni**, una alla volta, ripristino
+  verificato per impronta: mordono tutte, ciascuna sul controllo atteso. Pavimenti 480 → 510 e 195 → 225.
+- ⚠ Due sonde mie sbagliate, prese prima di accusare il codice (v433): un blocco spezzato su «a capo + due spazi» —
+  la stessa svista della v489, rifatta — e un controllo scritto `A and B or C`, verde per C da solo.
+- ⚠ Il gate v489 pinnava `decisioni, media, pav)` con la parentesi chiusa: riagganciato all'invariante.
+- ⚠ Tre processi in background con la variabile del percorso assegnata nel primo: gli altri due hanno scritto nella
+  radice del filesystem, e per un momento ho letto un file del 07/10 nello scratchpad credendolo di oggi (prezzi di
+  ORCL a 141). **La variabile si assegna PRIMA della riga che manda i processi in background.**

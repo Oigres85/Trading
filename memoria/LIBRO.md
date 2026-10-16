@@ -534,6 +534,9 @@ raggiunto, non QUANDO. Senza quest'ora la resa lo dichiara, e il dubbio resta al
 
 | Nome | Verso | Quantità | Limite | Inserito | Stato | Validità | Attivo alle |
 |---|---|---|---|---|---|---|---|
+| OKLO | acquisto | 300 | 26,00 | 2026-10-16 | attivo | giornaliero | |
+| SMCI | acquisto | 250 | 31,00 | 2026-10-16 | attivo | giornaliero | |
+| ORCL | acquisto | 65 | 127,00 | 2026-10-16 | attivo | giornaliero | |
 
 `numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
 minimo della seduta di oggi ha toccato il limite DOPO l'ultima ora annotata in «Attivo alle» — allora l'ordine può

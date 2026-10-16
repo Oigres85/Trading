@@ -41,7 +41,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
 3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
    del libro i blocchi che la pipeline pubblica: sensibilità a mercato, comparto, tassi e
    dollaro col loro R² (anno, trimestre, giornate forti), revisioni delle stime, autonomia di
-   cassa e copertura degli oneri per chi brucia cassa, short interest, ultimo deposito SEC.
+   cassa e copertura degli oneri per chi brucia cassa, short interest, ultimo deposito SEC, e da
+   v492 (CEO, 16/10: *"inserisci anche il fattore P/e come metrica di analisi delle azioni"*) la riga
+   **valutazione**: P/E degli ultimi 12 mesi e prospettico con l'utile per azione, la perdita detta
+   come perdita (nessun P/E, e prezzo/ricavi al suo posto), i due utili attesi quando differiscono,
+   il PEG con la sua riserva; il riferimento dell'S&P 500 una volta in testa, con fonte e data.
    Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
    misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
    NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
@@ -66,6 +70,12 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    prove nei due versi.
    Da v487 ogni sorvegliato porta i suoi **PAVIMENTI** (decisione del CEO del 15/10: entrare sui minimi,
    non sulla risalita), e il piano per la liquidità il gruppo **SUI PAVIMENTI**.
+   Da v492 (CEO, 16/10: "Si" alla lettura a 5 anni in ogni ingresso, e il P/E come metrica) ogni
+   sorvegliato e ogni candidato porta la **LETTURA A 5 ANNI** — medie a 30, 50 e 200 settimane con la
+   pendenza, massimo e minimo con la data, posizione nell'intervallo, quota del rialzo restituita, sulla
+   serie della società di oggi (anche il veicolo di quotazione si taglia, dal registro SEC) — e la riga
+   **valutazione** col P/E. Gli ordini aperti e la media delle posizioni in perdita (`numeri_libro.py`)
+   portano la stessa lettura a 5 anni: anche quelli sono ingressi.
    Da v474 chiude col **PIANO PER LA LIQUIDITÀ**: la liquidità con la sua quota del patrimonio e,
    per ogni ingresso possibile (sorvegliati e candidati di settore), cosa fa al libro un'unità di
    5.000 € — volatilità, beta su QQQ, perdita allo stop — anche per chi è nella stessa scommessa.
@@ -194,6 +204,13 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        seduta conclusa e della media a 20, quello del giorno di ogni tocco, e a seduta aperta (v489) il
        volume **della seduta in corso** con il tempo trascorso accanto — «N azioni finora = X% di una
        seduta media, in M minuti su 390». Non è una stima della giornata: si confronta fra i nomi.
+   7d-quater. **la LETTURA A 5 ANNI e il P/E** (v492, CEO, 16/10) — per ogni ingresso, accanto ai
+       pavimenti: dove sta il prezzo nell'intervallo dei cinque anni, sopra o sotto le medie a 30, 50 e
+       200 settimane e dove vanno, quanto del rialzo ha già restituito; e il P/E (trailing e prospettico,
+       o la perdita detta come tale) contro il riferimento dell'S&P 500, dichiarato indicativo. Una media
+       n.d. si dice n.d. (storia troppo corta), e un titolo con la storia della quotazione NON verificata
+       lo dichiara: su un nato da un veicolo (OKLO, da AltC) medie e massimi mescolano due società. Il P/E
+       è una metrica, non una prova della tenuta: un growth costa caro per costruzione.
    7d-ter. **gli ingressi in ordine d'interesse** (CEO, 15/10: *"ponili in ordine dal più interessante,
        risposta secca con prezzi e motivazioni"*) — il prezzo d'ingresso (l'ordine sul pavimento), lo stop
        con la perdita, il secondo prezzo, e una motivazione per nome. L'ordine è un GIUDIZIO dell'analisi,
@@ -227,7 +244,8 @@ watchlist, con ordine, stop e perdita per 5.000 € (15/10) · gli ordini aperti
 discesa e il rischio di alzare il limite (15/10) · i pavimenti delle posizioni e la media sui pavimenti sotto il
 carico (15/10) · i volumi, anche della seduta in corso col tempo trascorso (15/10) · le date dei conti dichiarate
 dall'emittente (15/10) · gli ingressi in ordine d'interesse, con prezzi e motivazioni (15/10) · gli ordini
-giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera).
+giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera) · la lettura
+a 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

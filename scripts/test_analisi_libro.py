@@ -3588,7 +3588,9 @@ check("v489 la tecnica porta dalla quota il volume, il minimo e il massimo della
 check("v489 collegamento in calcola: gli ordini si leggono dal libro, i loro nomi si scaricano, i pavimenti delle posizioni "
       "vanno alla tenuta e gli ordini si valutano; la scheda dei sorvegliati porta il volume della seduta",
       "ordini = leggi_ordini()" in _calc474 and "set(in_ordine)" in _calc474 and "aperte + in_ordine" in _calc474
-      and "decisioni, media, pav)" in _calc474 and 'out["ordini"] = valuta_ordini(ordini, B, TEC, BL,' in _calc474
+      # v492 — riagganciato all'invariante: la chiamata passa i pavimenti dopo decisioni e media (prima pretendeva la
+      #   parentesi chiusa subito dopo, e i due argomenti nuovi della lettura a 5 anni lo hanno fatto andare rosso)
+      and "decisioni, media, pav" in _calc474 and 'out["ordini"] = valuta_ordini(ordini, B, TEC, BL,' in _calc474
       and '"vol_seduta_corso": volume_seduta(t, barre)' in _corpo_di(Path(ROT.__file__).read_text(), "scheda"))
 _o489s = {**_o483, "ordini": _o489}
 check("v489 collegamento: la sintesi STAMPA il blocco degli ordini — provato eseguendola",
@@ -3893,6 +3895,255 @@ check("v491 LIBRO.md §1septies ha la colonna «Attivo alle» in coda e ogni ora
       "| Validità | Attivo alle |" in _s7_491
       and all(o["attivo_alle"] is not None or not o["attivo_alle_testo"].strip() for o in (NL.leggi_ordini() or [])),
       _s7_491[:400])
+
+# ================================================================ v492 — lettura a 5 anni, veicolo di quotazione, P/E
+# Decisione del CEO del 16/10/2026: "Si" alla lettura a 5 anni in ogni ingresso, "inoltre inserisci anche il fattore P/e
+# come metrica di analisi delle azioni". Gli stati si COSTRUISCONO (v425, v429): oggi OKLO ha il veicolo nello storico e
+# SKHY e' quotato da 13 settimane, domani potrebbero non esserci piu' nomi cosi'.
+_d492 = _giorno474
+def _giorni492(n, inizio="2021-10-18"):
+    g, out = _d492.fromisoformat(inizio), []
+    while len(out) < n:
+        if g.weekday() < 5:
+            out.append(g.isoformat())
+        g += _td474(days=1)
+    return out
+def _serie492(chiusure, inizio="2021-10-18", lo=None, hi=None):
+    """Barre giornaliere col minimo e il massimo dati (default chiusura -/+ 1%)."""
+    return [{"t": t, "o": c, "h": (hi[i] if hi else c * 1.01), "l": (lo[i] if lo else c * 0.99), "c": c, "a": c, "v": 1000}
+            for i, (t, c) in enumerate(zip(_giorni492(len(chiusure), inizio), chiusure))]
+# un sabato a mezzogiorno di New York: tutte le settimane della serie sono concluse
+_DOPO492 = _dt474(2026, 10, 17, 12, 0, tzinfo=_NY474)
+
+# --- le chiusure settimanali: l'ultima seduta della settimana, e la settimana in corso NON entra fino al venerdi' 16:00 ---
+_sw492 = _serie492([10 + i for i in range(10)], inizio="2026-10-05")       # due settimane: lun 05/10 - ven 16/10
+_venerdi_prima = ROT.settimane_concluse(_sw492, _dt474(2026, 10, 16, 15, 59, tzinfo=_NY474))
+_venerdi_dopo = ROT.settimane_concluse(_sw492, _dt474(2026, 10, 16, 16, 0, tzinfo=_NY474))
+check("v492 chiusure settimanali: l'ultima seduta della settimana, per data; la settimana in corso entra solo dalle 16:00 "
+      "di New York del suo venerdi' — col fuso, non con uno scarto",
+      _venerdi_prima == [("2026-10-09", 14)] and _venerdi_dopo == [("2026-10-09", 14), ("2026-10-16", 19)],
+      str((_venerdi_prima, _venerdi_dopo)))
+_sv492 = _serie492([10, 11, 12, 13], inizio="2026-03-30")                   # lun 30/03 - gio 02/04, venerdi' santo chiuso
+check("v492 una settimana senza la seduta del venerdi' (festiva) si chiude lo stesso dopo le 16:00 di quel venerdi', con la "
+      "chiusura del giovedi': un giorno di ritardo dichiarato, non un prezzo inventato",
+      ROT.settimane_concluse(_sv492, _dt474(2026, 4, 2, 17, 0, tzinfo=_NY474)) == []
+      and ROT.settimane_concluse(_sv492, _dt474(2026, 4, 3, 16, 0, tzinfo=_NY474)) == [("2026-04-02", 13)])
+
+# --- le medie a 30, 50 e 200 settimane: la media delle ultime k chiusure, la pendenza su 13, mai su meno settimane ---
+_c492 = [50.0 + (i % 7) * 0.5 + i * 0.01 for i in range(1300)]                 # ~260 settimane
+_s492 = _serie492(_c492)
+_l492 = ROT.lettura_5anni(_s492, 60.0, _DOPO492)
+_w492 = [c for _, c in ROT.settimane_concluse(_s492, _DOPO492)]
+_att492 = {k: sum(_w492[-k:]) / k for k in (30, 50, 200)}
+_pen492 = {k: (sum(_w492[-k:]) / k) / (sum(_w492[-k - 13:-13]) / k) - 1 for k in (30, 50, 200)}
+check("v492 le medie settimanali sono la media delle ultime k chiusure settimanali concluse, con la distanza del prezzo e la "
+      "pendenza su 13 settimane — ricalcolate qui, a mano, sulle stesse settimane",
+      _l492 is not None and all(abs(_l492["medie"][k]["valore"] - _att492[k]) < 1e-9
+                                and abs(_l492["medie"][k]["dist_pct"] - (60.0 / _att492[k] - 1) * 100) < 1e-9
+                                and abs(_l492["medie"][k]["pend_pct"] - _pen492[k] * 100) < 1e-9 for k in (30, 50, 200)),
+      str(_l492 and _l492["medie"]))
+_cor492 = ROT.lettura_5anni(_serie492(_c492[:400]), 60.0, _DOPO492)                # ~80 settimane, come CRWV
+check("v492 con meno settimane della media, la media e' n.d. e la riga dice quante ne servono e quante ce ne sono — mai "
+      "una media calcolata su meno",
+      _cor492["medie"][200] is None and _cor492["medie"][50] is not None and _cor492["breve"] is True
+      and "200 n.d. (servono 200 settimane, ce ne sono 80)" in "\n".join(ROT.righe_5anni(_cor492)),
+      "\n".join(ROT.righe_5anni(_cor492))[:500])
+
+# --- massimo, minimo, posizione e rialzo restituito, su un percorso costruito: da 10 a 100, poi giu' a 40 ---
+_p492 = [10.0] * 50 + [10.0 + 90.0 * i / 400 for i in range(1, 401)] + [100.0 - 60.0 * i / 300 for i in range(1, 301)]
+_m492 = ROT.lettura_5anni(_serie492(_p492, lo=_p492, hi=_p492), 40.0, _DOPO492)
+check("v492 massimo e minimo con la data, posizione nell'intervallo (0 = minimo, 100 = massimo) e quota del rialzo — dal "
+      "minimo che precede il massimo al massimo — che il prezzo ha gia' restituito: da 10 a 100 e giu' a 40 = 33/100 e 67%",
+      _m492["massimo"]["prezzo"] == 100.0 and _m492["minimo"]["prezzo"] == 10.0
+      and abs(_m492["posizione"] - 100 / 3) < 1e-9 and abs(_m492["rialzo"]["restituito_pct"] - 200 / 3) < 1e-9
+      and _m492["rialzo"]["da"] == 10.0 and abs(_m492["dmax_pct"] + 60.0) < 1e-9
+      and "posizione nell'intervallo 33/100" in "\n".join(ROT.righe_5anni(_m492))
+      and "ne ha restituito il 67%" in "\n".join(ROT.righe_5anni(_m492)), str(_m492 and {k: _m492[k] for k in ("posizione", "rialzo")}))
+_r492 = "\n".join(ROT.righe_5anni(ROT.lettura_5anni(_serie492(_p492, lo=_p492, hi=_p492), 120.0, _DOPO492)))
+_g492 = "\n".join(ROT.righe_5anni(ROT.lettura_5anni(_serie492(_p492, lo=_p492, hi=_p492), 5.0, _DOPO492)))
+check("v492 un prezzo oltre gli estremi lo dice in parole, non con una posizione fuori scala: SOPRA il massimo (e nessun "
+      "rialzo restituito), SOTTO il minimo (tutto restituito, e oltre)",
+      "SOPRA il massimo" in _r492 and "non ha restituito nulla" in _r492
+      and "SOTTO il minimo" in _g492 and "oltre il punto di partenza" in _g492, _r492[-400:] + " || " + _g492[-400:])
+_disc492 = [100.0 - 90.0 * i / 1299 for i in range(1300)]
+check("v492 se il massimo sta all'inizio della serie non c'e' un rialzo da misurare, e si dice",
+      "nessun rialzo da misurare" in "\n".join(ROT.righe_5anni(ROT.lettura_5anni(_serie492(_disc492), 10.0, _DOPO492))))
+_in492 = _serie492([20.0] * 1299 + [20.0], lo=[19.8] * 1299 + [2.0])
+_in492[-1]["t"] = "2026-10-16"
+check("v492 la seduta IN CORSO non entra: il suo minimo puo' ancora scendere, e un minimo di cinque anni non si scrive su "
+      "una barra in formazione (v471)",
+      ROT.lettura_5anni(_in492, 20.0, _dt474(2026, 10, 16, 12, 0, tzinfo=_NY474))["minimo"]["prezzo"] == 19.8
+      and ROT.lettura_5anni(_in492, 20.0, _dt474(2026, 10, 16, 17, 0, tzinfo=_NY474))["minimo"]["prezzo"] == 2.0)
+
+# --- il veicolo di quotazione (SPAC): la serie della societa' di oggi comincia il giorno dopo la sua fine ---
+_vg492 = [10.0] * 650 + [30.0 + (i % 5) for i in range(650)]                     # 130 settimane di veicolo, poi la societa'
+_sv492b = _serie492(_vg492)
+_fine492 = _sv492b[649]["t"]
+_V492 = {"verificato": True, "fine": _fine492, "deposito": "2024-05-13"}
+_con492 = ROT.lettura_5anni(_sv492b, 31.0, _DOPO492, veicolo=_V492)
+_senza492 = ROT.lettura_5anni(_sv492b, 31.0, _DOPO492, veicolo={"verificato": False, "perche": "prova"})
+check("v492 VEICOLO DI QUOTAZIONE verificato sul registro SEC: la serie parte dal giorno dopo la sua fine, la media a 200 "
+      "settimane non esiste (la societa' ne ha 130) e il minimo non e' quello del veicolo — il caso OKLO, da AltC",
+      _con492["da"] > _fine492 and _con492["motivo"] == "veicolo" and _con492["medie"][200] is None
+      and _con492["minimo"]["prezzo"] > 20 and _senza492["medie"][200] is not None and _senza492["minimo"]["prezzo"] < 11,
+      str((_con492 and _con492["da"], _con492 and _con492["medie"][200], _senza492 and _senza492["minimo"])))
+_rv492 = "\n".join(ROT.righe_5anni(_con492, _V492))
+_rn492 = "\n".join(ROT.righe_5anni(_senza492, {"verificato": False, "perche": "la pipeline non pubblica ancora il dato del registro SEC"}))
+_rok492 = "\n".join(ROT.righe_5anni(_senza492, {"verificato": True, "fine": None, "deposito": None}))
+check("v492 la resa dice da dove parte la serie e perche' (8-K con item 5.06 e la sua data); un titolo NON verificato lo "
+      "dichiara invece di passare per 'nessun veicolo'; uno verificato senza veicolo non porta l'avviso",
+      "VEICOLO DI QUOTAZIONE" in _rv492 and "8-K del 2024-05-13 con item 5.06" in _rv492
+      and "storia della quotazione NON verificata — la pipeline non pubblica ancora" in _rn492
+      and "NON verificata" not in _rok492 and "VEICOLO" not in _rok492, _rv492[:400])
+check("v492 tre esiti distinti: storico NON letto (None) non e' 'nessun livello'",
+      ROT.righe_5anni(None) == ["lettura a 5 anni: storico NON letto (o prezzo mancante) — non vuol dire 'nessun livello'"]
+      and ROT.lettura_5anni(None, 10.0) is None and ROT.lettura_5anni(_s492, None) is None)
+_pv492 = ROT.pavimenti(_serie487([10.5] * 6 + _V487(9.6) + [10.5] * 6 + _V487(30) + [42] * 15), 40.0, 1.0,
+                       veicolo={"verificato": True, "fine": _serie487([10.5] * 6 + _V487(9.6) + [10.5] * 6)[-1]["t"],
+                                "deposito": "x"})
+check("v492 i PAVIMENTI usano la stessa serie della societa': un minimo del veicolo non diventa un pavimento, e la resa "
+      "dice che la serie parte dopo il veicolo (una regola sola per pavimenti e lettura a 5 anni, v161)",
+      _pv492 is not None and _pv492["taglio_motivo"] == "veicolo"
+      and all(z["fondo"] > 20 for z in _pv492["minimi"]) and "VEICOLO DI QUOTAZIONE" in "\n".join(ROT.righe_pavimenti(_pv492)),
+      str(_pv492 and [(z["fondo"], z["alto"]) for z in _pv492["minimi"]]))
+_a492 = [c * (1.0 if i < 600 else 0.75) for i, c in enumerate([20.0] * 1300)]
+_sc492 = [dict(b, a=a) for b, a in zip(_serie492([20.0] * 1300), _a492)]
+_both492 = ROT.serie_della_societa(_sc492, {"verificato": True, "fine": _sc492[300]["t"]})
+check("v492 lo scorporo dopo la fine del veicolo vince (la serie parte dal piu' recente dei due tagli); senza verifica il "
+      "veicolo non taglia niente",
+      _both492[2] == "societaria" and _both492[1] == _sc492[600]["t"]
+      and ROT.serie_della_societa(_sv492b, {"verificato": False, "fine": _fine492})[2] is None
+      and ROT.serie_della_societa(_sv492b, None)[0] == _sv492b, str(_both492[1:]))
+
+# --- la storia della quotazione arriva dalla pipeline: quattro stati, e nessuno passa per 'nessun veicolo' ---
+_dq492 = {"macro": {"sec_calendario": {"storia_quotazione": {"per_titolo": {
+    "OKL": {"fine_veicolo": "2024-05-09", "deposito": "2024-05-13"}, "MUU": {"fine_veicolo": None, "verificato_dal": "2017-09-06"},
+    "EST": {"non_verificabile": "nessun 8-K fra i depositi letti"}}}}}}
+check("v492 veicolo_pipeline: verificato con veicolo · verificato senza · non verificabile (con la ragione) · non letto · "
+      "pipeline che non lo pubblica ancora",
+      ROT.veicolo_pipeline(_dq492, "OKL") == {"verificato": True, "fine": "2024-05-09", "deposito": "2024-05-13"}
+      and ROT.veicolo_pipeline(_dq492, "MUU") == {"verificato": True, "fine": None, "deposito": None}
+      and ROT.veicolo_pipeline(_dq492, "EST") == {"verificato": False, "perche": "nessun 8-K fra i depositi letti"}
+      and ROT.veicolo_pipeline(_dq492, "ZZZ")["perche"] == "SEC EDGAR non letto per questo nome"
+      and "non pubblica ancora" in ROT.veicolo_pipeline({}, "OKL")["perche"])
+
+# --- il P/E come metrica: i multipli dell'aggregatore, la perdita detta come perdita, i due utili attesi ---
+_pe492 = lambda st, an=None: SP.riga_valutazione({"stats": st, "analisti": an or {}})
+_p_ok = _pe492({"pe_ttm": 13.06, "forward_pe": 4.55, "eps_ttm": 71.28, "eps_forward": 204.47, "peg": 0.16},
+               {"eps_ora": 204.47})
+check("v492 P/E: trailing e prospettico con l'utile per azione; un trailing almeno 2 volte il prospettico si dichiara (le due "
+      "letture non si distinguono da qui); il PEG con la sua riserva; nessun avviso dei due utili quando coincidono",
+      "P/E ultimi 12 mesi 13,1× (EPS 71,28)" in _p_ok and "P/E prospettico 4,5× (EPS atteso 204,47)" in _p_ok
+      and "il trailing e' 2,9 volte il prospettico" in _p_ok and "PEG 0,16" in _p_ok and "⚠" not in _p_ok, _p_ok)
+_p_loss = _pe492({"pe_ttm": None, "forward_pe": -37.5, "eps_ttm": -3.12, "eps_forward": -1.86, "ps": 5.06},
+                 {"eps_ora": -4.33})
+check("v492 un utile NEGATIVO non da' un P/E basso, non da' un P/E: niente multiplo stampato, prezzo/ricavi al suo posto, e "
+      "i due utili attesi diversi si dichiarano (v414)",
+      "NEGATIVO (EPS -3,12): nessun P/E" in _p_loss and "nessun P/E prospettico" in _p_loss and "-37" not in _p_loss
+      and "prezzo/ricavi: 5,06×" in _p_loss and "un altro utile atteso (-4,33)" in _p_loss, _p_loss)
+_p_mix = _pe492({"pe_ttm": None, "forward_pe": 3.06, "eps_ttm": -93.26, "eps_forward": 49.49, "ps": 128.5}, {"eps_ora": 13.17})
+_p_giu = _pe492({"pe_ttm": 20.0, "forward_pe": 30.0, "eps_ttm": 3.0, "eps_forward": 2.0})
+_p_vic = _pe492({"pe_ttm": 30.0, "forward_pe": 20.0, "eps_ttm": 2.0, "eps_forward": 3.0}, {"eps_ora": 3.1})
+check("v492 utile passato negativo e atteso positivo: il prospettico esce, il confronto fra i due no; prospettico piu' alto "
+      "= utile atteso PIU' BASSO; sotto la soglia del 2 e con utili vicini entro il 5% nessun avviso",
+      "P/E prospettico 3,1×" in _p_mix and "volte il prospettico" not in _p_mix and "un altro utile atteso (13,17)" in _p_mix
+      and "PIU' BASSO" in _p_giu and "volte il prospettico" not in _p_vic and "⚠" not in _p_vic,
+      _p_mix + " || " + _p_giu + " || " + _p_vic)
+check("v492 senza utili ne' multipli il P/E e' n.d. e lo si dice; un trailing mancante con l'utile positivo resta n.d.: "
+      "il multiplo non si ricalcola qui (v161)",
+      "P/E n.d." in _pe492({}) and "P/E ultimi 12 mesi n.d." in _pe492({"eps_ttm": 2.0, "forward_pe": 10.0}))
+_rif492 = SP.riferimento_valutazione({"forward_pe": {"value": 19.6, "avg_hist": 16.5, "source": "WSJ (estimate)",
+                                                     "fetched_at": "2026-10-15"},
+                                      "sp500_pe": {"current": 26.4, "nasdaq_pe": 27.9, "source": "multpl",
+                                                   "fetched_at": "2026-10-15"}})
+check("v492 il riferimento dell'S&P 500 ha fonte e data; la media storica senza provenienza e il P/E del Nasdaq senza base "
+      "dichiarata restano fuori; senza dati lo si dice",
+      "prospettico 19,6× [WSJ (estimate), 2026-10-15]" in _rif492 and "ultimi 12 mesi 26,4× [multpl, 2026-10-15]" in _rif492
+      and "16,5" not in _rif492 and "27,9" not in _rif492 and "indicativo" in _rif492
+      and "n.d. (la pipeline non lo pubblica)" in SP.riferimento_valutazione({}), _rif492)
+check("v492 il P/E degli ingressi e' la resa delle schede (una sola, v161); fuori dalla pipeline si dichiara n.d. invece di "
+      "cercare il multiplo altrove",
+      ROT.riga_valutazione({"in_pipeline": True, "stats": {"pe_ttm": 20.0, "eps_ttm": 2.0}, "analisti": {}})
+      == SP.riga_valutazione({"stats": {"pe_ttm": 20.0, "eps_ttm": 2.0}, "analisti": {}})
+      and "titolo non seguito dalla pipeline" in ROT.riga_valutazione({"in_pipeline": False}))
+
+# --- collegamenti, ESEGUITI dove si puo' (v399, v483): schede, watchlist, candidati, ordini, tenuta ---
+_rsch492 = SP.genera({"watchlist": [{"ticker": "AAA", "name": "A", "stats": {"pe_ttm": 20.0, "eps_ttm": 2.0}},
+                                    {"ticker": "BBB", "name": "B", "stats": {"eps_ttm": -1.0}}],
+                      "macro": {"forward_pe": {"value": 19.6, "source": "WSJ", "fetched_at": "2026-10-15"}}}, ["AAA"], ["BBB"])
+check("v492 collegamento: le schede stampano la riga «valutazione» di ogni nome e il riferimento UNA volta in testa",
+      _rsch492.count("valutazione (decisione del CEO del 16/10/2026") == 1 and _rsch492.count("  valutazione: ") == 2
+      and "P/E ultimi 12 mesi 20,0×" in _rsch492, _rsch492[:600])
+_ri492 = "\n".join(ROT.righe_ingresso(_w473("FIVE", cinque_anni=_m492, veicolo=_V492,
+                                            stats={"pe_ttm": 20.0, "eps_ttm": 2.0}), {"finestra": 45}))
+check("v492 collegamento: ogni sorvegliato porta la lettura a 5 anni e la riga «valutazione» — provato eseguendo la resa",
+      "lettura a 5 anni" in _ri492 and "posizione nell'intervallo 33/100" in _ri492 and "valutazione: P/E ultimi 12 mesi 20,0×" in _ri492,
+      _ri492[-1500:])
+_oc492 = {**_ocand, "settori": [{**_ocand["settori"][0], "titoli": [
+    {**_ocand["settori"][0]["titoli"][0], "cinque_anni": _m492, "veicolo": _V492, "in_pipeline": True,
+     "stats": {"pe_ttm": 20.0, "eps_ttm": 2.0}}]}]}
+_rc492 = "\n".join(ROT.righe_candidati(_oc492, {"AAA": {"stato": "ok", "voci": []}}))
+_rw492 = "\n".join(ROT.righe_watchlist({**_o473, "valutazione_rif": "valutazione (prova del riferimento)"}))
+check("v492 collegamento: i candidati di settore portano lettura a 5 anni e P/E, e l'intestazione della watchlist dichiara "
+      "le convenzioni a 5 anni e il riferimento dei multipli una volta",
+      "lettura a 5 anni" in _rc492 and "valutazione: P/E ultimi 12 mesi 20,0×" in _rc492
+      and _rw492.count("lettura a 5 anni (decisione del CEO del 16/10/2026)") == 1
+      and _rw492.count("valutazione (prova del riferimento)") == 1, _rc492[-800:])
+_src_rac492 = _corpo_di(Path(ROT.__file__).read_text(), "raccogli")
+check("v492 collegamento in raccogli: la lettura a 5 anni su sorvegliati E candidati (anche quelli in watchlist), i "
+      "pavimenti e la lettura con la storia della quotazione dalla pipeline, il riferimento dei multipli nel risultato",
+      'cand = [t for s in settori for t in s["titoli"] if e_candidato(t)]' in _src_rac492
+      and 't["cinque_anni"] = lettura_5anni(BL.get(t["tk"]), t.get("px"), veicolo=t["veicolo"])' in _src_rac492
+      and 'veicolo=t["veicolo"])' in _src_rac492.split('t["pavimenti"] = pavimenti(')[1][:120]
+      and '"veicolo": veicolo_pipeline(d, s["tk"])' in _src_rac492
+      and '"valutazione_rif": schede_progetto.riferimento_valutazione(d.get("macro"))' in _src_rac492)
+check("v492 collegamento in calcola: la storia della quotazione va a pavimenti, lettura a 5 anni, tenuta e ordini",
+      "storia = {t: rotazione.veicolo_pipeline(pipe, t) for t in con_pav}" in _calc474
+      and "cinque=cinque, storia=storia)" in _calc474 and "intraday=brief.barre_5min, storia=storia)" in _calc474
+      and "veicolo=storia.get(t))" in _calc474)
+
+# --- gli ordini: la lettura a 5 anni di ogni ordine, e lo STOP del pavimento uguale a quello della watchlist ---
+_smc492 = _serie487([40] * 6 + _V487(31.03) + [40] * 6 + _V487(29.90) + [40] * 6 + _V487(29.68) + [40] * 6
+                    + _V487(29.0) + [40] * 6 + _V487(28.64) + [40] * 15)
+_pz492 = ROT.pavimenti(_smc492, 32.2, 2.44)
+_or492 = [{"tk": "SMX", "verso": "acquisto", "verso_testo": "acquisto", "qta": 250.0, "limite": 31.0, "inserito": "2026-10-09",
+           "attivo": True, "stato": "attivo", "validita": "fino a revoca", "attivo_alle": None, "attivo_alle_testo": ""}]
+_vo492 = NL.valuta_ordini(_or492, {"SMX": _b489["AAA"]}, {"SMX": _tec489(px=32.2) | {"atr": 2.44}}, {"SMX": _smc492},
+                          _cal489, {}, _sem481(), _rl489, _rq489, 100000.0, 1.12, _ny489)["righe"][0]
+check("v492 lo stop di un ordine col limite DENTRO il pavimento e' lo stop di quel pavimento, lo stesso della watchlist: il "
+      "16/10 su SMCI il raggruppamento rifatto sul limite dava 26,34 nell'ordine e 27,46 nella watchlist (v161)",
+      _vo492.get("posizione") == "sul" and abs(_vo492["stop"] - _pz492["minimi"][0]["stop"]) < 1e-9
+      and abs(_vo492["stop"] - (29.90 - 2.44)) < 1e-9, str((_vo492.get("posizione"), _vo492.get("stop"), _pz492["minimi"][:2])))
+_vo492s = NL.valuta_ordini([dict(_or492[0], limite=28.0)], {"SMX": _b489["AAA"]}, {"SMX": _tec489(px=32.2) | {"atr": 2.44}},
+                           {"SMX": _smc492}, _cal489, {}, _sem481(), _rl489, _rq489, 100000.0, 1.12, _ny489)["righe"][0]
+check("v492 col limite sotto tutte le zone mostrate il pavimento si cerca sotto il limite (ricalcolato li': qui non ce n'e', "
+      "e lo stop e' n.d. invece di prendere quello di una zona sopra il limite), e la riga porta la lettura a 5 anni",
+      _vo492s.get("posizione") == "sotto" and _vo492s.get("stop") is None and _vo492s.get("cinque_anni") is not None,
+      str((_vo492s.get("posizione"), _vo492s.get("stop"))))
+_ro492 = "\n".join(NL.righe_ordini({"righe": [dict(_vo492, cinque_anni=_m492, veicolo=_V492)], "insieme": None,
+                                    "inattivi": []}))
+check("v492 collegamento: la resa degli ordini stampa la lettura a 5 anni di ciascuno",
+      "lettura a 5 anni" in _ro492 and "posizione nell'intervallo 33/100" in _ro492, _ro492[-900:])
+_tm492 = NL.tenuta_posizioni(["AAA", "BBB"], {"AAA": _b489["AAA"], "BBB": _b489["BBB"]}, {}, _sem481(),
+                             {"AAA": 100.0, "BBB": 100.0}, {"AAA": 150.0, "BBB": 50.0}, {"AAA": 10, "BBB": 10},
+                             {"AAA": 0.5, "BBB": 0.5}, _ny489, None,
+                             {"fx": 1.12, "valore": 2000.0, "trim": {}, "rlibro": _rl489, "rqqq": _rq489, "rend": {}},
+                             None, cinque={"AAA": _m492, "BBB": _m492}, storia={"AAA": _V492, "BBB": _V492})
+_rtm492 = "\n".join(NL.righe_tenuta(_tm492))
+# ⚠ si spezza solo sulle righe di TESTA (due spazi e il nome): le righe interne cominciano con sei spazi, e spezzando
+#   su "a capo + due spazi" ogni blocco andava in frantumi (la sonda sbagliata della v489, rifatta)
+_blocchi492 = {r.split()[0]: r for r in re.split(r"\n  (?=[A-Z]{3} )", _rtm492) if r[:3] in ("AAA", "BBB")}
+check("v492 nella tenuta la lettura a 5 anni accompagna la MEDIA, cioe' le sole posizioni in perdita: AAA (carico 150, "
+      "prezzo 100) la porta, BBB (in guadagno) no",
+      "lettura a 5 anni" in _blocchi492.get("AAA", "") and "lettura a 5 anni" not in _blocchi492.get("BBB", "x"),
+      _rtm492[:1500])
+
+# --- il formato: la richiesta e' registrata, e la sezione 7 la chiede ---
+_fmt492 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v492 FORMATO_ANALISI: la lettura a 5 anni e il P/E sono nel registro delle richieste del 16/10 e nella sezione 7",
+      "7d-quater. **la LETTURA A 5 ANNI e il P/E**" in _fmt492
+      and "la lettura\na 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10)"
+      in _fmt492)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

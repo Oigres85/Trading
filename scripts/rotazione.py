@@ -69,6 +69,25 @@ e rilette da un gate:
                          scrive a parte, e non diventa mai un pavimento.
 I livelli della zona d'ingresso (v473) restano accanto: sono la lettura di chi entra sulla risalita,
 che il CEO non vuole, e servono come segnale che la discesa e' finita.
+
+v492 — LA LETTURA A 5 ANNI e IL P/E (decisione del CEO del 16/10/2026: "Si" a far entrare sempre negli
+ingressi la lettura a 5 anni, "inoltre inserisci anche il fattore P/e come metrica di analisi delle
+azioni"). Per ogni ingresso — sorvegliati, candidati di settore, e in numeri_libro gli ordini aperti e le
+posizioni in perdita da mediare —, convenzioni di LETTURA dei grafici e non soglie di decisione (v240):
+  MEDIE SETTIMANALI    = a 30, 50 e 200 settimane, sulle chiusure delle settimane CONCLUSE (la settimana in
+                         corso non entra: la sua chiusura non esiste ancora), con la pendenza su 13 settimane.
+                         Senza abbastanza settimane la media e' n.d., mai calcolata su meno.
+  MASSIMO E MINIMO     = delle sedute concluse dei cinque anni, con la data; la POSIZIONE NELL'INTERVALLO e'
+                         0 al minimo e 100 al massimo; il RIALZO RESTITUITO e' la quota del rialzo dal minimo
+                         che precede il massimo fino al massimo, che il prezzo ha gia' riperso.
+  LA SERIE             = quella della societa' di oggi, la stessa dei pavimenti: dall'ultima operazione
+                         societaria, e per chi e' nato da un VEICOLO DI QUOTAZIONE (SPAC) dal giorno dopo la sua
+                         fine dichiarata sul registro SEC (8-K con item 5.06, letto dalla pipeline). Su OKLO lo
+                         storico della fonte comincia con AltC Acquisition Corp. — un prezzo fermo intorno a 10 $
+                         fino al 09/05/2024 — e una media a 200 settimane che lo comprende disegna un supporto che
+                         nessuno ha mai difeso. Un titolo non verificato lo DICHIARA (v406).
+Il P/E viene da schede_progetto.riga_valutazione (una resa sola per schede e ingressi, v161): i multipli
+dell'aggregatore, mai ricalcolati qui.
 """
 import argparse, json, math, os, sys
 from datetime import datetime
@@ -101,6 +120,10 @@ PAV_SALTO = 0.03            # un salto oltre il 3% del rapporto rettificato/grez
 PAV_MOSTRA = 3              # i pavimenti piu' vicini sotto il prezzo
 PAV_VUOTI = 2               # i vuoti di prezzo piu' vicini sotto il prezzo
 PAV_CODA_ATR = 2.0          # v488: il piu' toccato in coda solo entro 2 ATR sotto l'ultimo pavimento mostrato
+# v492 — la lettura a 5 anni: convenzioni di LETTURA, scritte in testa allo script (v240)
+ANNI_LETTURA = 5
+SETTIMANE_MEDIE = (30, 50, 200)
+SETTIMANE_PENDENZA = 13     # la pendenza di una media settimanale: su un trimestre
 
 
 SEDUTE_BETA = 250
@@ -463,6 +486,36 @@ def serie_omogenea(barre, salto=PAV_SALTO):
     return barre[taglio:], (barre[taglio]["t"] if taglio else None)
 
 
+def veicolo_pipeline(d, tk):
+    """v492 — la storia della quotazione di `tk`, letta dalla pipeline (SEC EDGAR, 8-K con item 5.06:
+    update_data.storia_quotazione). {"verificato": True, "fine": data|None, "deposito": data|None} oppure
+    {"verificato": False, "perche": ...}: un titolo non verificato si DICHIARA, non si tratta come uno senza
+    veicolo (v406). Qui niente rete: la SEC chiede un contatto nella richiesta, e la pipeline ce l'ha gia'."""
+    sq = (((d or {}).get("macro") or {}).get("sec_calendario") or {}).get("storia_quotazione")
+    if not isinstance(sq, dict):
+        return {"verificato": False, "perche": "la pipeline non pubblica ancora il dato del registro SEC"}
+    v = (sq.get("per_titolo") or {}).get(tk)
+    if v is None:
+        return {"verificato": False, "perche": "SEC EDGAR non letto per questo nome"}
+    if v.get("non_verificabile"):
+        return {"verificato": False, "perche": v["non_verificabile"]}
+    return {"verificato": True, "fine": v.get("fine_veicolo"), "deposito": v.get("deposito")}
+
+
+def serie_della_societa(barre, veicolo=None, salto=PAV_SALTO):
+    """(serie, taglio, motivo) — la serie della SOCIETA' DI OGGI: dall'ultima operazione societaria (serie_omogenea)
+    e, per chi e' nato da un veicolo di quotazione VERIFICATO sul registro SEC, dal giorno dopo la sua fine (v492):
+    il primo giorno di OKLO come Oklo e' il 10/05/2024, la fine dichiarata il 09/05 (misurato). motivo:
+    "veicolo", "societaria" o None. Una regola sola per pavimenti e lettura a 5 anni (v161)."""
+    serie, taglio = serie_omogenea(barre, salto)
+    v = veicolo or {}
+    fine = v.get("fine") if v.get("verificato") else None
+    if fine and serie and str(serie[0]["t"])[:10] <= fine:
+        dopo = [b for b in serie if str(b["t"])[:10] > fine]
+        return dopo, (dopo[0]["t"] if dopo else None), "veicolo"
+    return serie, taglio, ("societaria" if taglio else None)
+
+
 def _con_ordine(z, px, atr):
     """Ordine con limite al bordo alto, stop una chiusura sotto il fondo meno PAV_STOP_ATR, e la perdita allo
     stop per l'unita' di calcolo: la stessa aritmetica per pavimenti e vuoti."""
@@ -474,7 +527,7 @@ def _con_ordine(z, px, atr):
     return z
 
 
-def pavimenti(barre, px, atr, adesso=None, anni=ANNI_PAVIMENTI):
+def pavimenti(barre, px, atr, adesso=None, anni=ANNI_PAVIMENTI, veicolo=None):
     """v487 — i PAVIMENTI sotto il prezzo (decisione del CEO del 15/10/2026: «entrare sui minimi», non sulla
     risalita): dove negli ultimi due anni il titolo ha smesso di scendere ed e' risalito — minimi di
     oscillazione raggruppati entro mezzo ATR — e, a parte, i vuoti di prezzo mai richiusi. Per ciascuno
@@ -485,7 +538,8 @@ def pavimenti(barre, px, atr, adesso=None, anni=ANNI_PAVIMENTI):
         return None
     if seduta_in_corso(barre, adesso):
         barre = barre[:-1]
-    serie, taglio = serie_omogenea(barre)
+    # v492 — la serie della societa' di oggi: anche il veicolo di quotazione si taglia, non solo lo scorporo
+    serie, taglio, motivo = serie_della_societa(barre, veicolo)
     if not serie:
         return None
     fine = datetime.fromisoformat(serie[-1]["t"]).date()
@@ -535,7 +589,74 @@ def pavimenti(barre, px, atr, adesso=None, anni=ANNI_PAVIMENTI):
     return {"minimi": [_con_ordine(z, px, atr) for z in scelte],
             "vuoti": [_con_ordine(v, px, atr) for v in sorted(vuoti, key=lambda v: -v["alto"])[:PAV_VUOTI]],
             "da": serie[0]["t"], "fino_a": serie[-1]["t"], "sedute": len(serie), "taglio": taglio,
+            "taglio_motivo": motivo,
             "minimo_serie": {"minimo": lo_serie["l"], "data": lo_serie["t"]} if lo_serie else None}
+
+
+def settimane_concluse(barre, adesso=None):
+    """[(data dell'ultima seduta della settimana, chiusura)] delle settimane CONCLUSE, per data (v207). Una
+    settimana e' conclusa dalle 16:00 di New York del suo venerdi': prima la sua chiusura non esiste ancora — la
+    regola della seduta in corso (v471), col fuso e non con uno scarto (v470). Un venerdi' festivo la chiude un
+    giorno dopo: un ritardo dichiarato, non un prezzo inventato."""
+    from datetime import date as _data, time as _ora, timedelta as _td
+    ny = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
+    sett = {}
+    for b in barre or []:
+        if b.get("c") is None or not b.get("t"):
+            continue
+        g = _data.fromisoformat(str(b["t"])[:10])
+        sett[g - _td(days=g.weekday())] = (str(b["t"])[:10], b["c"])     # in ordine di data: vince l'ultima seduta
+    return [sett[lun] for lun in sorted(sett)
+            if datetime.combine(lun + _td(days=4), _ora(16, 0), tzinfo=brief.NEW_YORK) <= ny]
+
+
+def lettura_5anni(barre, px, adesso=None, veicolo=None, anni=ANNI_LETTURA):
+    """v492 — LA LETTURA A 5 ANNI di un titolo (decisione del CEO del 16/10/2026): medie a 30, 50 e 200 settimane
+    con la loro pendenza, massimo e minimo con la data, posizione nell'intervallo e quota del rialzo gia'
+    restituita. Solo fatti delle barre, la frase la scrive la resa (v448). La serie e' quella dei pavimenti
+    (serie_della_societa: una regola sola, v161) e la seduta in corso si toglie (v471). Una media senza abbastanza
+    settimane e' None, mai calcolata su meno. None = storico non letto o prezzo mancante, che NON e' 'nessun
+    livello' (v389)."""
+    from datetime import date as _data, timedelta as _td
+    if not barre or px is None:
+        return None
+    if seduta_in_corso(barre, adesso):
+        barre = barre[:-1]
+    serie, taglio, motivo = serie_della_societa(barre, veicolo)
+    if not serie:
+        return None
+    fine = _data.fromisoformat(str(serie[-1]["t"])[:10])
+    inizio = fine.replace(year=fine.year - anni, day=min(fine.day, 28) if fine.month == 2 else fine.day).isoformat()
+    serie = [b for b in serie if str(b["t"])[:10] >= inizio]
+    con_h = [b for b in serie if b.get("h") is not None]
+    con_l = [b for b in serie if b.get("l") is not None]
+    if not con_h or not con_l:
+        return None
+    chiusure = [c for _, c in settimane_concluse(serie, adesso)]
+    medie = {}
+    for k in SETTIMANE_MEDIE:
+        if len(chiusure) < k:
+            medie[k] = None
+            continue
+        m = sum(chiusure[-k:]) / k
+        prima = (sum(chiusure[-k - SETTIMANE_PENDENZA:-SETTIMANE_PENDENZA]) / k
+                 if len(chiusure) >= k + SETTIMANE_PENDENZA else None)
+        medie[k] = {"valore": m, "dist_pct": (px / m - 1) * 100, "pend_pct": (m / prima - 1) * 100 if prima else None}
+    hi = max(con_h, key=lambda b: b["h"])                 # a parita', il primo giorno in cui e' stato toccato
+    lo = min(con_l, key=lambda b: b["l"])
+    prima_hi = [b for b in con_l if b["t"] < hi["t"]]
+    base = min(prima_hi, key=lambda b: b["l"]) if prima_hi else None
+    amp = hi["h"] - lo["l"]
+    return {"da": str(serie[0]["t"])[:10], "fino_a": str(serie[-1]["t"])[:10], "inizio_finestra": inizio,
+            "breve": str(serie[0]["t"])[:10] > (_data.fromisoformat(inizio) + _td(days=14)).isoformat(),
+            "settimane": len(chiusure), "taglio": taglio, "motivo": motivo, "medie": medie, "px": px,
+            "massimo": {"prezzo": hi["h"], "data": str(hi["t"])[:10]},
+            "minimo": {"prezzo": lo["l"], "data": str(lo["t"])[:10]},
+            "dmax_pct": (px / hi["h"] - 1) * 100, "dmin_pct": (px / lo["l"] - 1) * 100 if lo["l"] > 0 else None,
+            "posizione": (px - lo["l"]) / amp * 100 if amp > 0 else None,
+            "rialzo": ({"da": base["l"], "data": str(base["t"])[:10],
+                        "restituito_pct": (hi["h"] - px) / (hi["h"] - base["l"]) * 100}
+                       if base and hi["h"] > base["l"] else None)}
 
 
 def scheda(tk, barre, rlibro, rspy=None, target=None):
@@ -606,6 +727,7 @@ def raccogli():
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
         S = dict(zip(tutti, ex.map(lambda tk: scheda(tk, B.get(tk), rlibro, rspy, target), tutti)))
     seguiti = set(qta) | {s["tk"] for s in sorv}
+    pipe = {r.get("ticker"): r for r in (d.get("watchlist") or []) + (d.get("portfolio") or []) if isinstance(r, dict)}
     settori = []
     for r in tilt:
         e = S.get(r["ticker"]) or {}
@@ -616,10 +738,12 @@ def raccogli():
                         "titoli": [{**(S.get(p["tk"]) or {"tk": p["tk"], "errore": "non letto"}),
                                     "peso_etf": p.get("peso"), "nome": p.get("nome"),
                                     "nel_libro": p["tk"] in qta, "seguito": p["tk"] in seguiti,
+                                    # v492 — il P/E dei candidati: solo chi la pipeline segue ha i multipli
+                                    "in_pipeline": p["tk"] in pipe, "stats": (pipe.get(p["tk"]) or {}).get("stats"),
+                                    "analisti": (pipe.get(p["tk"]) or {}).get("analisti"),
                                     "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"),
                                              x.get("pend50"), x.get("d50_atr"), x.get("corr_libro")))(S.get(p["tk"]) or {}))}
                                    for p in (r.get("prime") or [])]})
-    pipe = {r.get("ticker"): r for r in (d.get("watchlist") or []) + (d.get("portfolio") or []) if isinstance(r, dict)}
     prima_trim = {}
     for a in cal.get("attesi") or []:
         prima_trim.setdefault(a["tk"], a)          # gli attesi arrivano gia' in ordine di data
@@ -634,14 +758,22 @@ def raccogli():
               "nota": s.get("nota"), "trimestrale": prima_trim.get(s["tk"]),
               "trimestrale_yf": (pipe.get(s["tk"]) or {}).get("earnings_date"),
               "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe,
+              # v492 — i multipli per il P/E, e la storia della quotazione (veicolo, SEC EDGAR) dalla pipeline
+              "stats": (pipe.get(s["tk"]) or {}).get("stats"), "veicolo": veicolo_pipeline(d, s["tk"]),
               "tenuta": numeri_libro.valuta_tenuta(B.get(s["tk"]), pipe.get(s["tk"]), sem)}
              for s in sorv]
     # v487 — i pavimenti (decisione del CEO del 15/10/2026: entrare sui minimi). Lo storico di cinque anni
     #   SOLO per i sorvegliati, in parallelo: le schede restano sull'anno della fonte, i pavimenti guardano due anni
+    # v492 — e anche per i CANDIDATI di settore: la lettura a 5 anni entra in ogni ingresso
+    cand = [t for s in settori for t in s["titoli"] if e_candidato(t)]      # anche chi e' in watchlist: stessa lettura
+    lunghi = list(dict.fromkeys([t["tk"] for t in watch] + [t["tk"] for t in cand]))
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
-        BL = dict(zip([t["tk"] for t in watch], ex.map(barre_lunghe, [t["tk"] for t in watch])))
+        BL = dict(zip(lunghi, ex.map(barre_lunghe, lunghi)))
     for t in watch:
-        t["pavimenti"] = pavimenti(BL.get(t["tk"]), t.get("px"), t.get("atr"))
+        t["pavimenti"] = pavimenti(BL.get(t["tk"]), t.get("px"), t.get("atr"), veicolo=t["veicolo"])
+    for t in watch + cand:
+        t.setdefault("veicolo", veicolo_pipeline(d, t["tk"]))
+        t["cinque_anni"] = lettura_5anni(BL.get(t["tk"]), t.get("px"), veicolo=t["veicolo"])
     # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
     eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
     eur_nom = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "EUR"}
@@ -662,6 +794,8 @@ def raccogli():
     return {"settori": settori, "universo_assente": not tilt, "libro": sorted(qta),
             "semaforo": {k: sem.get(k) for k in ("colore", "minimo", "accesi")},
             "libro_sedute": len(rlibro), "watchlist": watch, "asof_target": asof_target,
+            # v492 — l'intestazione dei multipli col riferimento dell'S&P 500, una volta per blocco (v407)
+            "valutazione_rif": schede_progetto.riferimento_valutazione(d.get("macro")),
             "spy_assente": not rspy, "calendario": {k: cal.get(k) for k in ("giorni_non_letti", "finestra", "errore")},
             "piano": {"voci": piano, "liquidita": cassa, "patrimonio": pat, "cambio": fx, "fonte_cambio": fonte_fx,
                       "qqq_assente": not rqqq, "obbligazioni": {t: prezzi_eur[t] for t in eur_nom}}}
@@ -815,10 +949,13 @@ def righe_ingresso(t, cal=None):
     L.append(f"      {base}")
     if "pavimenti" in t:          # v487 — solo i sorvegliati: il calcolo vive in raccogli
         L.extend(f"      {r}" for r in righe_pavimenti(t["pavimenti"]))
+    if "cinque_anni" in t:        # v492 — la lettura a 5 anni: il calcolo vive in raccogli
+        L.extend(f"      {r}" for r in righe_5anni(t["cinque_anni"], t.get("veicolo")))
     L.append(f"      {riga_volumi(t)} · {riga_target_beta(t)}")
     rev = (schede_progetto.riga_revisioni(t.get("analisti"), con_target=False) if t.get("in_pipeline")
            else "revisioni: titolo non seguito dalla pipeline")
     L.append(f"      {riga_trimestrale(t, cal)} · {rev}")
+    L.append(f"      {riga_valutazione(t)}")
     if t.get("tenuta"):
         L.append(f"      {riga_tenuta(t['tenuta'])}")
     if t.get("nota"):
@@ -836,8 +973,11 @@ def righe_pavimenti(pv):
     nella finestra (si dice dove sta il minimo della serie) · storico NON letto."""
     if pv is None:
         return ["pavimenti: storico NON letto (o prezzo e ATR mancanti) — non vuol dire 'nessun pavimento'"]
-    taglio = (f" · la serie parte dal {pv['taglio']}: un'operazione societaria (salto oltre il {PAV_SALTO * 100:.0f}% "
-              "del rapporto fra prezzo rettificato e grezzo) rende i prezzi di prima non confrontabili") if pv["taglio"] else ""
+    taglio = ((f" · la serie parte dal {pv['taglio']}: prima il titolo era il VEICOLO DI QUOTAZIONE (SPAC) da cui e' "
+               "nato — registro SEC, 8-K con item 5.06 — e quei prezzi sono di un'altra societa'")
+              if pv.get("taglio_motivo") == "veicolo" else
+              (f" · la serie parte dal {pv['taglio']}: un'operazione societaria (salto oltre il {PAV_SALTO * 100:.0f}% "
+               "del rapporto fra prezzo rettificato e grezzo) rende i prezzi di prima non confrontabili") if pv["taglio"] else "")
     L = [f"pavimenti (LIBRO.md §1bis, decisione del CEO del 15/10/2026: entrare sui minimi, non sulla risalita) — "
          f"minimi di oscillazione delle {pv['sedute']} sedute dal {pv['da']}{taglio}"]
     if not pv["minimi"]:
@@ -863,6 +1003,69 @@ def righe_pavimenti(pv):
                  + " · ".join(f"{prezzo(v['fondo'])}–{prezzo(v['alto'])} dal {v['data']} ({n(v['pct'], 1, '%')})"
                               for v in pv["vuoti"]))
     return L
+
+
+def righe_5anni(l, veicolo=None):
+    """v492 — la lettura a 5 anni in due righe, tre con l'avviso; le convenzioni sono in testa allo script e nel
+    blocco. Tre esiti distinti (v389): letta · storico NON letto · storia della quotazione NON verificata, che si
+    dichiara invece di passare per 'nessun veicolo' (v406)."""
+    if l is None:
+        return ["lettura a 5 anni: storico NON letto (o prezzo mancante) — non vuol dire 'nessun livello'"]
+    if l["motivo"] == "veicolo":
+        v = veicolo or {}
+        orig = (f"la serie parte dal {l['da']}: fino al {v.get('fine') or 'n.d.'} il titolo era il VEICOLO DI QUOTAZIONE "
+                f"(SPAC) — registro SEC, 8-K del {v.get('deposito') or 'n.d.'} con item 5.06 — e quei prezzi sono di "
+                "un'altra societa'")
+    elif l["motivo"] == "societaria":
+        orig = (f"la serie parte dal {l['da']}: un'operazione societaria (salto oltre il {PAV_SALTO * 100:.0f}% del "
+                "rapporto fra prezzo rettificato e grezzo) rende i prezzi di prima non confrontabili")
+    elif l["breve"]:
+        orig = f"quotato dal {l['da']}: la storia e' piu' corta di {ANNI_LETTURA} anni"
+    else:
+        orig = f"dal {l['da']}"
+
+    def media(k):
+        x = l["medie"].get(k)
+        if x is None:
+            return f"{k} n.d. (servono {k} settimane, ce ne sono {l['settimane']})"
+        p = x["pend_pct"]
+        verso = ("pendenza n.d." if p is None else
+                 f"{'in salita' if p > 0 else 'in discesa' if p < 0 else 'ferma'} {n(p, 1, '%')} in "
+                 f"{SETTIMANE_PENDENZA} settimane")
+        return f"{k} {prezzo(x['valore'])} (il prezzo ne dista {n(x['dist_pct'], 1, '%')}, {verso})"
+    L = [f"lettura a {ANNI_LETTURA} anni — {orig} · {l['settimane']} settimane concluse · medie settimanali: "
+         + " · ".join(media(k) for k in SETTIMANE_MEDIE)]
+    mx, mn, pos, r = l["massimo"], l["minimo"], l["posizione"], l["rialzo"]
+    if pos is None:
+        ptxt = "posizione nell'intervallo n.d."
+    elif pos < 0:
+        ptxt = "prezzo SOTTO il minimo delle sedute concluse"
+    elif pos > 100:
+        ptxt = "prezzo SOPRA il massimo delle sedute concluse"
+    else:
+        ptxt = f"posizione nell'intervallo {piano(pos, 0)}/100 (0 = il minimo, 100 = il massimo)"
+    if r is None:
+        rtxt = "rialzo restituito n.d. (il massimo sta all'inizio della serie: nessun rialzo da misurare)"
+    elif r["restituito_pct"] <= 0:
+        rtxt = f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo non ha restituito nulla"
+    else:
+        rtxt = (f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo ne ha restituito il "
+                f"{piano(r['restituito_pct'], 0)}%" + (" — tutto, e oltre il punto di partenza"
+                                                       if r["restituito_pct"] > 100 else ""))
+    L.append(f"   massimo {prezzo(mx['prezzo'])} del {mx['data']} (il prezzo ne dista {n(l['dmax_pct'], 1, '%')}) · "
+             f"minimo {prezzo(mn['prezzo'])} del {mn['data']} (il prezzo ne dista {n(l['dmin_pct'], 1, '%')}) · {ptxt} · {rtxt}")
+    v = veicolo or {}
+    if veicolo is not None and not v.get("verificato"):
+        L.append(f"   ⚠ storia della quotazione NON verificata — {v.get('perche') or 'motivo n.d.'}: se il titolo e' nato "
+                 "da un veicolo di quotazione (SPAC), medie e massimi mescolano i prezzi di un'altra societa'")
+    return L
+
+
+def riga_valutazione(t):
+    """v492 — il P/E di un ingresso: la resa delle schede (una sola, v161). Fuori dalla pipeline i multipli
+    non ci sono, e si dice invece di cercarli altrove: due fonti per lo stesso multiplo divergono."""
+    return (schede_progetto.riga_valutazione(t) if t.get("in_pipeline") else
+            "valutazione: P/E n.d. — titolo non seguito dalla pipeline, il sistema non ha i multipli dell'aggregatore")
 
 
 LETTURA_INGRESSO = {   # v481-v482 — l'esito della tenuta letto da chi NON possiede il nome
@@ -919,7 +1122,12 @@ def righe_watchlist(o):
          "l'ordine e' la distanza dalla zona in ATR, un fatto e non una classifica",
          "   ⚠ il SEMAFORO non vieta ingressi in nessun colore (LIBRO.md §1ter, decisioni del CEO del 09/10 e del "
          "15/10): il settore di un titolo NON e' in questi dati, la correlazione col libro si' — chi e' nella stessa "
-         "scommessa lo dichiara"]
+         "scommessa lo dichiara",
+         f"   lettura a {ANNI_LETTURA} anni (decisione del CEO del 16/10/2026) = convenzioni di lettura, non soglie: medie "
+         f"a {', '.join(str(k) for k in SETTIMANE_MEDIE)} settimane sulle chiusure delle settimane CONCLUSE, pendenza su "
+         f"{SETTIMANE_PENDENZA} settimane, massimo e minimo delle sedute concluse · la serie e' quella della societa' di "
+         "oggi: dall'ultima operazione societaria e dalla fine del veicolo di quotazione (SPAC) dichiarata sul registro SEC",
+         "   " + (o.get("valutazione_rif") or "valutazione: riferimento n.d.")]
     if o.get("spy_assente"):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
     sem = o.get("semaforo") or {}
@@ -1130,7 +1338,8 @@ def righe_candidati(o, news, giorni=7):
         return righe(o)[:1]
     L = ["CANDIDATI PER SETTORE — prezzi di oggi (stockanalysis.com) · stati = convenzioni in testa "
          "allo script · volumi sull'ultima seduta CONCLUSA (quella in corso esclusa) · notizie: feed Nasdaq del simbolo, ultimi "
-         f"{giorni} giorni ([TK] = trovata nel feed di TK, non 'notizia su TK')"]
+         f"{giorni} giorni ([TK] = trovata nel feed di TK, non 'notizia su TK') · lettura a {ANNI_LETTURA} anni e P/E: "
+         "convenzioni e riferimento dell'S&P 500 in testa al blocco WATCHLIST"]
     for s in sorted(o["settori"], key=lambda s: -(s.get("m3") if s.get("m3") is not None else -1e9)):
         cand = [t for t in s["titoli"] if e_candidato(t)]
         L.append(f"■ {s['etf']} {s['nome']} — {s['stato']} · 1m {n(s.get('m1'),1,'%')} · 3m {n(s.get('m3'),1,'%')} · "
@@ -1147,6 +1356,9 @@ def righe_candidati(o, news, giorni=7):
                      f"{prezzo(t['res'])} ({n(t['res_atr'],1)} ATR) · {riga_volumi(t)} · "
                      f"corr libro {n(t['corr_libro'],2)}")
             L.append(f"      {riga_target_beta(t)}")
+            L.append(f"      {riga_valutazione(t)}")
+            if "cinque_anni" in t:        # v492
+                L.extend(f"      {r}" for r in righe_5anni(t["cinque_anni"], t.get("veicolo")))
             nw = news.get(t["tk"]) or {"stato": "non richiesto", "voci": []}
             if nw["stato"] != "ok":
                 L.append(f"      notizie: feed NON letto ({nw['stato']}) — non vuol dire 'nessuna notizia'")

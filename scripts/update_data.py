@@ -691,6 +691,56 @@ def scrub_cross_currency_stats(stats, financial_currency, quote_currency):
     return stats
 
 
+def storia_quotazione(sub, oggi=None, anni=5):
+    """v492 — QUANDO IL TITOLO HA SMESSO DI ESSERE UN VEICOLO DI QUOTAZIONE (SPAC), dal registro SEC.
+
+    Chiesta dal CEO la lettura a 5 anni (medie a 30, 50 e 200 settimane), su OKLO lo storico della
+    fonte comincia con AltC Acquisition Corp., il veicolo che l'ha portato in borsa: dal 2021 al
+    09/05/2024 un prezzo fermo intorno a 10 $ che non e' Oklo. Una media a 200 settimane che ne
+    comprende 75 del veicolo disegna un "supporto" vicino al prezzo che nessuno ha mai difeso.
+    ⚠ Non si indovina dal prezzo (un tratto piatto intorno a 10 $ e' un'euristica, v399, v448): si
+    legge il FATTO che il registrante deposita — l'8-K con item 5.06, "Change in Shell Company
+    Status", con cui una societa' dichiara di aver smesso di essere un veicolo. Su OKLO: 8-K del
+    13/05/2024, chiusura del 09/05; il primo giorno di scambi come Oklo e' il 10/05 (misurato).
+    Tre esiti distinti (v389):
+      {"fine_veicolo": data, "deposito": data}  — c'e' un 8-K 5.06: i prezzi fino a quella data
+                                                   sono del veicolo;
+      {"fine_veicolo": None, "verificato_dal": d} — nessun 5.06, e i depositi letti coprono la
+                                                   finestra, oppure nella parte non coperta non
+                                                   cade nessun cambio di nome (chi esce da un
+                                                   veicolo cambia nome: AltC -> Oklo);
+      {"non_verificabile": perche}                — un cambio di nome cade prima dei depositi letti
+                                                   (EDGAR ne da' al massimo un migliaio nella
+                                                   pagina recente), o nessun 8-K fra i depositi:
+                                                   un emittente estero deposita 6-K e 20-F, che
+                                                   non hanno l'item 5.06.
+    Nessuna rete qui dentro: riceve la risposta di EDGAR gia' letta dal giro del calendario."""
+    rec = ((sub or {}).get("filings") or {}).get("recent") or {}
+    forme = rec.get("form") or []
+    if not forme:
+        return {"non_verificabile": "nessun deposito letto su SEC EDGAR"}
+    date_dep = rec.get("filingDate") or [""] * len(forme)
+    voci = rec.get("items") or [""] * len(forme)
+    rif = rec.get("reportDate") or [""] * len(forme)
+    for f, d, it, r in zip(forme, date_dep, voci, rif):     # la pagina recente va dal piu' recente
+        if str(f).startswith("8-K") and "5.06" in str(it or ""):
+            return {"fine_veicolo": str(r or d)[:10], "deposito": str(d)[:10]}
+    if not any(str(f).startswith("8-K") for f in forme):
+        return {"non_verificabile": "nessun 8-K fra i depositi letti: un emittente estero deposita 6-K e 20-F, "
+                                    "che non hanno l'item 5.06"}
+    dal = min(str(d)[:10] for d in date_dep if d)
+    oggi = oggi or datetime.now(timezone.utc).date()
+    inizio = oggi.replace(year=oggi.year - anni, day=min(oggi.day, 28) if oggi.month == 2 else oggi.day).isoformat()
+    if dal > inizio:
+        scoperti = [x for x in (sub.get("formerNames") or [])
+                    if inizio <= str(x.get("to") or "")[:10] < dal]
+        if scoperti:
+            x = scoperti[0]
+            return {"non_verificabile": f"un cambio di nome ({x.get('name')}, fino al {str(x.get('to'))[:10]}) cade "
+                                        f"prima dei depositi letti (dal {dal}): un veicolo di quotazione non si esclude"}
+    return {"fine_veicolo": None, "verificato_dal": dal}
+
+
 def risk_ratios(daily_ret):
     """Sharpe e Sortino ANNUALIZZATI da una serie di LOG-rendimenti giornalieri (≥60 oss.,
     altrimenti (None, None)). Estratto in helper (v112) per calcolare la stessa identica
@@ -3517,6 +3567,7 @@ def fetch_macro():
         _r.raise_for_status()
         _mappa = {v["ticker"].upper(): v["cik_str"] for v in _r.json().values()}
         sec_cal, senza_cik, esteri = {}, [], []
+        storia = {}           # v492 — la fine del veicolo di quotazione (8-K item 5.06), vedi storia_quotazione
         # la lista viene dalla stessa fonte della pipeline (config/ui_watchlist.json), non
         # da un elenco scritto a mano che invecchierebbe da solo: un titolo nuovo entra qui
         # senza che nessuno se ne ricordi. Indici, cambi e future non sono societa' e finiscono
@@ -3534,7 +3585,10 @@ def fetch_macro():
                 _s = requests.get(f"https://data.sec.gov/submissions/CIK{_cik:010d}.json",
                                   headers=SEC_UA, timeout=25)
                 _s.raise_for_status()
-                _rec = _s.json().get("filings", {}).get("recent", {})
+                _sub = _s.json()
+                # v492 — PRIMA del filtro degli esteri: la storia della quotazione si dichiara per tutti
+                storia[_tk] = storia_quotazione(_sub)
+                _rec = _sub.get("filings", {}).get("recent", {})
                 _forme = _rec.get("form", [])
                 _items = _rec.get("items", [""] * len(_forme))
                 _dep = [d for f, d, it in zip(_forme, _rec.get("filingDate", []), _items)
@@ -3562,8 +3616,13 @@ def fetch_macro():
             except Exception as e:  # noqa: BLE001
                 print(f"!! SEC EDGAR {_tk}: {e}", file=sys.stderr)
             time.sleep(0.12)          # SEC chiede meno di 10 richieste al secondo
-        if sec_cal or esteri:
+        if sec_cal or esteri or storia:
             macro["sec_calendario"] = {
+                # v492 — per ogni titolo letto: quando ha smesso di essere un veicolo di quotazione
+                #   (SPAC). Chi legge lo storico lungo taglia li': i prezzi di prima sono di un'altra
+                #   societa'. Un titolo assente qui non e' verificato, e lo dichiara chi legge
+                "storia_quotazione": {"per_titolo": storia, "finestra_anni": 5,
+                                      "fonte": "SEC EDGAR, 8-K con item 5.06 (Change in Shell Company Status)"},
                 "per_titolo": sec_cal,
                 "senza_8k": esteri,          # emittenti esteri: 6-K/20-F, nessun item 2.02
                 "senza_cik": senza_cik,      # indici, cambi, materie prime: non sono societa'

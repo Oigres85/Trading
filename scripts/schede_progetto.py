@@ -93,6 +93,85 @@ def riga_revisioni(a, con_target=True):
     return s
 
 
+# ⚠ v492 — un trailing almeno 2 volte il prospettico si DICHIARA (convenzione del pacchetto, v193): il
+#   consenso si aspetta un utile molto piu' alto di quello degli ultimi 12 mesi, oppure le due basi non
+#   coincidono — e da qui le due letture non si distinguono.
+SCARTO_PE = 2.0
+
+
+def riferimento_valutazione(macro):
+    """v492 — l'intestazione dei multipli, scritta UNA volta per blocco (v407): da dove vengono, cosa non dicono,
+    e il P/E dell'S&P 500 come riferimento con la sua fonte e la sua data. La media storica che la pipeline porta
+    accanto al prospettico (16,5) non ha una provenienza dichiarata e resta fuori (v240); il P/E del Nasdaq
+    pure, perche' la pipeline lo prende trailing o prospettico senza dire quale."""
+    m = macro or {}
+    fp, tp = m.get("forward_pe") or {}, m.get("sp500_pe") or {}
+    rif = []
+    if fp.get("value") is not None:
+        rif.append(f"prospettico {_n(fp['value'])}× [{fp.get('source') or 'fonte n.d.'}, {fp.get('fetched_at') or 'data n.d.'}]")
+    if tp.get("current") is not None:
+        rif.append(f"ultimi 12 mesi {_n(tp['current'])}× [{tp.get('source') or 'fonte n.d.'}, {tp.get('fetched_at') or 'data n.d.'}]")
+    return ("valutazione (decisione del CEO del 16/10/2026: il P/E come metrica di analisi) — multipli dell'aggregatore "
+            "(yfinance) al prezzo del run della pipeline, mai ricalcolati qui · P/E prospettico = consenso degli analisti "
+            "sul prossimo esercizio fiscale, e la fonte NON dichiara quale esercizio · un utile negativo non da' un P/E "
+            "basso: non da' un P/E, e su chi e' in perdita il multiplo e' prezzo/ricavi · un trailing almeno "
+            f"{_n(SCARTO_PE, 0)} volte il prospettico (convenzione) si dichiara · riferimento S&P 500: "
+            + (" · ".join(rif) if rif else "n.d. (la pipeline non lo pubblica)")
+            + " — fonti e basi diverse da quelle dei titoli (orizzonte, definizione dell'utile): un confronto "
+            "indicativo, non una misura · il P/E e' una METRICA, non una prova della tenuta (§1sexies)")
+
+
+def riga_valutazione(r):
+    """v492 — il P/E come metrica di analisi delle azioni (decisione del CEO del 16/10/2026: «inserisci anche il
+    fattore P/e come metrica di analisi delle azioni»). Solo i multipli che l'aggregatore pubblica (v161):
+    - utile NEGATIVO: nessun P/E, si dice che non e' un P/E basso (v185, v389), e il multiplo diventa prezzo/ricavi
+      (v365);
+    - i due utili attesi: `stats.eps_forward` e `analisti.eps_ora` (quello delle revisioni) sono due campi distinti
+      e non e' stabilito che descrivano lo stesso esercizio — si dichiara quando differiscono oltre il 5% (v414);
+    - trailing e prospettico: il rapporto dice quanto utile in piu' il consenso si aspetta, o una base diversa
+      (utile contabile contro stima rettificata); si dichiara da SCARTO_PE in su, e quando l'utile atteso e' piu'
+      basso di quello degli ultimi 12 mesi;
+    - il PEG dell'aggregatore con la sua riserva: la crescita su cui e' calcolato non e' dichiarata.
+    r: una riga della pipeline, o un dizionario con le sue chiavi "stats" e "analisti"."""
+    st = (r or {}).get("stats") or {}
+    a = (r or {}).get("analisti") or {}
+    et, ef, pt, pf = st.get("eps_ttm"), st.get("eps_forward"), st.get("pe_ttm"), st.get("forward_pe")
+    if all(x is None for x in (et, ef, pt, pf)):
+        return "valutazione: P/E n.d. — l'aggregatore non pubblica ne' utili ne' multipli per questo nome"
+    pz = []
+    perdita = (et is not None and et <= 0) or (ef is not None and ef <= 0)
+    if et is not None and et <= 0:
+        pz.append(f"utile degli ultimi 12 mesi NEGATIVO (EPS {_n(et, 2)}): nessun P/E, che non e' un P/E basso")
+    elif pt is not None and pt > 0:
+        pz.append(f"P/E ultimi 12 mesi {_n(pt)}×" + (f" (EPS {_n(et, 2)})" if et is not None else ""))
+    else:
+        pz.append("P/E ultimi 12 mesi n.d.")
+    if ef is not None and ef <= 0:
+        pz.append(f"utile atteso NEGATIVO (EPS {_n(ef, 2)}): nessun P/E prospettico")
+    elif pf is not None and pf > 0:
+        pz.append(f"P/E prospettico {_n(pf)}×" + (f" (EPS atteso {_n(ef, 2)})" if ef is not None else ""))
+    else:
+        pz.append("P/E prospettico n.d.")
+    if pt and pf and pt > 0 and pf > 0 and not perdita:
+        if pt / pf >= SCARTO_PE:
+            pz.append(f"il trailing e' {_n(pt / pf)} volte il prospettico: il consenso si aspetta un utile molto piu' "
+                      "alto di quello degli ultimi 12 mesi, oppure le due basi non coincidono (utile contabile contro "
+                      "stima rettificata)")
+        elif pf > pt:
+            pz.append("il prospettico e' piu' alto del trailing: il consenso si aspetta un utile PIU' BASSO di quello "
+                      "degli ultimi 12 mesi")
+    if perdita:
+        pz.append(f"su chi e' in perdita il multiplo e' prezzo/ricavi: {_n(st['ps'], 2)}×" if st.get("ps") is not None
+                  else "prezzo/ricavi n.d.")
+    eo = a.get("eps_ora")
+    if eo is not None and ef is not None and abs(eo - ef) > max(0.05, abs(ef) * 0.05):
+        pz.append(f"⚠ la riga delle revisioni porta un altro utile atteso ({_n(eo, 2)}): due campi distinti "
+                  "dell'aggregatore, e non e' stabilito che descrivano lo stesso esercizio")
+    if st.get("peg") is not None:
+        pz.append(f"PEG {_n(st['peg'], 2)} (dell'aggregatore: la crescita su cui e' calcolato non e' dichiarata)")
+    return "valutazione: " + " · ".join(pz)
+
+
 # ⚠ v476 — oltre i cinque anni un'autonomia non porta piu' informazione: "175,9 mesi" e'
 #   aritmeticamente giusto e comunicativamente falso (v389). E' la stessa soglia di app.js.
 MESI_CAP = 60
@@ -299,6 +378,7 @@ def scheda(tk, ruolo, righe, sec):
     else:
         out.append("  sensibilita' macro: n.d.")
     out.append("  " + riga_revisioni(r.get("analisti")))
+    out.append("  " + riga_valutazione(r))          # v492 — il P/E come metrica
     for f in (riga_ricavi, riga_cassa, riga_short):
         x = f(r)
         if x:
@@ -318,6 +398,7 @@ def genera(dati, pos, sorv, filtro=None):
         except ValueError:
             out.append(f"Dati del progetto: run della pipeline {agg}.")
     out.append("Opzioni: non qui — le guardie di plausibilita' vivono nel pacchetto titolo della dashboard.")
+    out.append(riferimento_valutazione(dati.get("macro")))      # v492 — una volta per blocco (v407)
     mancanti = []
     for gruppo, ruolo in ((pos, "POSIZIONE"), (sorv, "SORVEGLIATO")):
         for tk in gruppo:

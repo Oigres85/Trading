@@ -148,7 +148,8 @@ const SUITE = [
      legittima. Si alzano quando la suite cresce, mai si abbassano per far passare qualcosa. */
   /* v476: 608 punti di chiamata in test_app (+7), 210 in test_update_data (+8): pavimenti su */
   { file: "test_app.mjs",        cmd: "node",    minimo: 575, firma: /\d+\/\d+ check superati/ },
-  { file: "test_update_data.py", cmd: "python3", minimo: 195, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v492: 236 punti di chiamata in test_update_data (+5 sulla fine del veicolo di quotazione, dal registro SEC) -> 225 */
+  { file: "test_update_data.py", cmd: "python3", minimo: 225, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -157,7 +158,8 @@ const SUITE = [
   /* v487: 447 punti di chiamata (+13 sui pavimenti della watchlist) -> 435 */
   /* v489: 473 punti di chiamata (+26 su ordini aperti, media sui pavimenti, volumi della seduta, conti dichiarati) -> 460 */
   /* v491: 496 punti di chiamata (+12 sull'ultima verifica degli ordini e le barre a 5 minuti) -> 480 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 480, firma: /\d+\/\d+ CHECK OK/ },
+  /* v492: 526 punti di chiamata (+30 su lettura a 5 anni, veicolo di quotazione, P/E e stop degli ordini) -> 510 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 510, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

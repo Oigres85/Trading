@@ -375,7 +375,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 200  # +8 con le news per titolo v398, +8 con la liquidita' v476 (sale, mai scende)
+N_CHECKS_MINIMO = 235  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1667,6 +1667,50 @@ _tr477 = ud.combustione(_T476(_bs477, _bil476({
     "Preferred Stock Dividend Paid": [-100e6, -80e6, None, None]})), None, None)
 check("v477 con meno di quattro trimestri di dividendi il totale dichiara quanti sono e l'autonomia tace",
       _tr477.get("dividendi_privilegiate_trimestri") == 2 and "mesi_obblighi" not in _tr477)
+
+# ═══ v492 — LA FINE DEL VEICOLO DI QUOTAZIONE (SPAC), DAL REGISTRO SEC ════════════════════════════════════════
+# La lettura a 5 anni chiesta dal CEO taglia la serie dove il titolo ha smesso di essere un veicolo: su OKLO lo storico
+# della fonte comincia con AltC Acquisition Corp. Il fatto viene dall'8-K con item 5.06 ("Change in Shell Company Status"),
+# non da un'euristica sul prezzo. Gli stati si costruiscono: nessuna rete.
+from datetime import date as _date492
+_o492 = {"formerNames": [{"name": "AltC Acquisition Corp.", "to": "2024-05-08T00:00:00.000Z"}],
+         "filings": {"recent": {"form": ["10-Q", "8-K", "8-K", "S-1"],
+                                "filingDate": ["2026-08-10", "2024-05-13", "2023-07-11", "2021-03-15"],
+                                "reportDate": ["2026-06-30", "2024-05-09", "2023-07-11", ""],
+                                "items": ["", "1.01,2.01,3.03,5.06,9.01", "8.01", ""]}}}
+check("v492 storia della quotazione: l'8-K con item 5.06 da' la fine del veicolo (la data del fatto) e la data del deposito",
+      ud.storia_quotazione(_o492, oggi=_date492(2026, 10, 16)) == {"fine_veicolo": "2024-05-09", "deposito": "2024-05-13"})
+_due492 = {"filings": {"recent": {"form": ["8-K", "8-K"], "filingDate": ["2025-02-03", "2022-03-07"],
+                                  "reportDate": ["2025-02-01", "2022-03-01"], "items": ["5.06", "5.06"]}}}
+check("v492 con due 8-K 5.06 vince il piu' recente: la pagina recente di EDGAR va dal piu' recente al piu' vecchio",
+      ud.storia_quotazione(_due492, oggi=_date492(2026, 10, 16))["fine_veicolo"] == "2025-02-01")
+_mu492 = {"formerNames": [], "filings": {"recent": {"form": ["8-K", "10-K"], "filingDate": ["2026-09-30", "2017-09-06"],
+                                                    "reportDate": ["", ""], "items": ["2.02", ""]}}}
+_jo492 = {"formerNames": [{"name": "Reinvent Technology Partners", "to": "2022-08-06T00:00:00.000Z"}],
+          "filings": {"recent": {"form": ["8-K", "4"], "filingDate": ["2026-09-30", "2023-07-06"],
+                                 "reportDate": ["", ""], "items": ["2.02", ""]}}}
+_mr492 = {"formerNames": [{"name": "MICROSTRATEGY INC", "to": "2025-08-11T00:00:00.000Z"}],
+          "filings": {"recent": {"form": ["8-K", "4"], "filingDate": ["2026-09-30", "2023-07-06"],
+                                 "reportDate": ["", ""], "items": ["2.02", ""]}}}
+check("v492 senza 5.06: verificato se i depositi letti coprono i cinque anni, o se nessun cambio di nome cade nella parte "
+      "non coperta (un cambio dopo i depositi letti e' coperto); NON verificabile se un cambio di nome cade prima dei "
+      "depositi letti — chi esce da un veicolo cambia nome, e li' un 5.06 non si escluderebbe",
+      ud.storia_quotazione(_mu492, oggi=_date492(2026, 10, 16)) == {"fine_veicolo": None, "verificato_dal": "2017-09-06"}
+      and "non_verificabile" in ud.storia_quotazione(_jo492, oggi=_date492(2026, 10, 16))
+      and ud.storia_quotazione(_mr492, oggi=_date492(2026, 10, 16)) == {"fine_veicolo": None, "verificato_dal": "2023-07-06"})
+check("v492 un emittente estero (6-K e 20-F, nessun 8-K) e una risposta vuota si dichiarano non verificabili, non "
+      "'nessun veicolo'",
+      "6-K e 20-F" in ud.storia_quotazione({"filings": {"recent": {"form": ["6-K", "20-F"],
+                                                                     "filingDate": ["2026-09-30", "2026-03-24"]}}}
+                                            , oggi=_date492(2026, 10, 16)).get("non_verificabile", "")
+      and "non_verificabile" in ud.storia_quotazione({}, oggi=_date492(2026, 10, 16)))
+_sec492 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
+_sec492 = _sec492[:_sec492.find("calendario_uscite_fred(STORICO_IND)")]
+check("v492 collegamento: il giro del calendario EDGAR passa ogni risposta letta a storia_quotazione PRIMA del filtro degli "
+      "esteri, e la pubblica in sec_calendario.storia_quotazione anche quando non ci sono trimestrali",
+      "storia[_tk] = storia_quotazione(_sub)" in _sec492
+      and _sec492.find("storia[_tk] = storia_quotazione(_sub)") < _sec492.find("esteri.append(_tk)")
+      and '"storia_quotazione": {"per_titolo": storia' in _sec492 and "if sec_cal or esteri or storia:" in _sec492)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

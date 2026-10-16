@@ -192,13 +192,20 @@ def calcola(sedute=1, registra=False, adesso=None):
     con_pav = list(dict.fromkeys(TK + in_ordine))
     with ThreadPoolExecutor(6) as ex:
         BL = dict(zip(con_pav, ex.map(rotazione.barre_lunghe, con_pav)))
-    pav = {t: rotazione.pavimenti(BL.get(t), (TEC.get(t) or {}).get("px"), (TEC.get(t) or {}).get("atr"), adesso)
+    # v492 — la serie della societa' di oggi: il veicolo di quotazione (SPAC) si taglia, dal registro SEC letto
+    #   dalla pipeline (rotazione.veicolo_pipeline); un nome non verificato lo dichiara
+    storia = {t: rotazione.veicolo_pipeline(pipe, t) for t in con_pav}
+    pav = {t: rotazione.pavimenti(BL.get(t), (TEC.get(t) or {}).get("px"), (TEC.get(t) or {}).get("atr"), adesso,
+                                  veicolo=storia.get(t))
            for t in TK}
+    # v492 — la lettura a 5 anni accompagna ogni INGRESSO: qui la media sulle posizioni in perdita
+    cinque = {t: rotazione.lettura_5anni(BL.get(t), (TEC.get(t) or {}).get("px"), adesso, veicolo=storia.get(t))
+              for t in TK}
     out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
-                                     decisioni, media, pav)
+                                     decisioni, media, pav, cinque=cinque, storia=storia)
     out["ordini"] = valuta_ordini(ordini, B, TEC, BL, out["calendario"], righe_pipeline(pipe), out["semaforo"],
                                   media["rlibro"], media["rqqq"], tot, media["fx"], adesso, cassa_eur=cassa_eur,
-                                  intraday=brief.barre_5min)
+                                  intraday=brief.barre_5min, storia=storia)
     out["rimandate"] = leggi_rimandate()          # v483 — le decisioni che aspettano un evento
     # v484 — ogni CONFLITTO con la sua scadenza (i conti successivi) e l'esame scritto prima (LIBRO.md §1sexies)
     scad = {}
@@ -1008,7 +1015,7 @@ def leggi_ordini(testo=None):
 
 
 def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rqqq, valore_libro, fx, adesso=None,
-                  cassa_eur=None, intraday=None):
+                  cassa_eur=None, intraday=None, storia=None):
     """Per ogni ordine d'ACQUISTO attivo: la distanza dal prezzo; se il minimo della seduta di OGGI ha toccato il
     limite (l'ordine può essere già eseguito: si verifica sul conto); STORNO o DISCESA dalla tendenza della tenuta
     (§1sexies) e se alzare il limite è coerente con la regola dei minimi (§1bis); il pavimento SOTTO IL LIMITE con
@@ -1075,12 +1082,20 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
         tend = tendenza(b, adesso)
         natura = NATURA.get(tend["stato"], "NON MISURABILE")
         bl = lunghe.get(o["tk"])
-        pv_px = rotazione.pavimenti(bl, px, atr, adesso)
+        vei = (storia or {}).get(o["tk"])          # v492 — la storia della quotazione: None = non chiesta
+        pv_px = rotazione.pavimenti(bl, px, atr, adesso, veicolo=vei)
         # i pavimenti SOTTO IL LIMITE: quello piu' vicino regge l'ordine, e il suo stop e' lo stop dell'ordine.
         #   Il ritocco minimo fa entrare anche un minimo che coincide col limite (un ordine SUL pavimento)
-        pv_lim = rotazione.pavimenti(bl, lim * (1 + 1e-9), atr, adesso)
+        pv_lim = rotazione.pavimenti(bl, lim * (1 + 1e-9), atr, adesso, veicolo=vei)
         primo = ((pv_px or {}).get("minimi") or [None])[0]
-        sotto = ((pv_lim or {}).get("minimi") or [None])[0]
+        # ⚠ v492 — il pavimento dell'ordine si legge fra le zone COSTRUITE SUL PREZZO, le stesse della watchlist: la
+        #   prima che arriva sotto il limite (quella che lo contiene, o la prima tutta sotto). Ricalcolarle sul limite
+        #   cambia il raggruppamento: il 16/10 su SMCI, limite 31,00 dentro 29,90–31,03, il minimo a 31,03 usciva e la
+        #   zona ripartiva da 29,90 inghiottendo meta' della 28,64–29,68 — stop 26,34 nell'ordine e 27,46 nella
+        #   watchlist, due stop per lo stesso pavimento (v161). Sul limite si ricalcola solo se e' sotto tutte le zone
+        sotto = next((z for z in ((pv_px or {}).get("minimi") or []) if z["fondo"] <= lim), None)
+        if sotto is None:
+            sotto = ((pv_lim or {}).get("minimi") or [None])[0]
         stop = sotto["stop"] if sotto else None
         posizione = (None if primo is None else "sopra" if lim > primo["alto"] else
                      "sul" if lim >= primo["fondo"] else "sotto")
@@ -1104,7 +1119,9 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
                     "corr_libro": rotazione.correlazione(rt, rlibro or {}),
                     "conti": sc, "conti_vicini": bool(sc and sc.get("giorni") is not None
                                                      and sc["giorni"] <= rotazione.TRIMESTRALE_VICINA),
-                    "volume": rotazione.volume_seduta(t, b, adesso)})
+                    "volume": rotazione.volume_seduta(t, b, adesso),
+                    # v492 — la lettura a 5 anni: un ordine e' un ingresso
+                    "cinque_anni": rotazione.lettura_5anni(bl, px, adesso, veicolo=vei), "veicolo": vei})
         spese[o["tk"]] = spese.get(o["tk"], 0) + q * lim
         rend[o["tk"]] = rt
     insieme, tot = None, sum(spese.values())
@@ -1206,6 +1223,8 @@ def righe_ordini(oo, finestra=45):
         vs = rotazione.testo_volume_seduta(x["volume"])
         if vs:
             L.append(f"      volumi: {vs}")
+        if "cinque_anni" in x:        # v492 — la lettura a 5 anni di ogni ordine
+            L.extend(f"      {r}" for r in rotazione.righe_5anni(x["cinque_anni"], x.get("veicolo")))
     ins = oo.get("insieme")
     if ins:
         c = ins["conseguenze"]
@@ -1521,7 +1540,7 @@ def valuta_tenuta(barre, riga, sem, adesso=None):
 
 
 def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None, decisioni=None, media=None,
-                     pav=None):
+                     pav=None, cinque=None, storia=None):
     """decisioni: la tabella di LIBRO.md §1quinquies. Una VENDITA PER EVIDENZA con una vendita gia'
     aperta e' una decisione presa; senza, e' una PROPOSTA al CEO. Una vendita aperta su un nome che la
     regola non sostiene da sola (CONFLITTO, OSSERVAZIONE, LASCIAR CORRERE) e' una premessa da
@@ -1542,6 +1561,8 @@ def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None
         out.append({"tk": t, "peso": pesi.get(t), **v, "vendita_aperta": t in vendite,
                     "fisco": pareggio_fiscale(prezzi.get(t), pmc.get(t), qta.get(t)), "media": mm,
                     "carico": pmc.get(t), "pavimenti": pv,
+                    # v492 — la lettura a 5 anni (rotazione.lettura_5anni); None nel dizionario = non calcolata
+                    **({"cinque_anni": cinque.get(t), "veicolo": (storia or {}).get(t)} if cinque is not None else {}),
                     "media_pavimenti": None if pav is None else media_pavimenti(pv, pmc.get(t), qta.get(t), pesi.get(t), md, t,
                                                                                  prezzi.get(t))})
     out.sort(key=lambda x: (ESITI.index(x["esito"]), -(x["peso"] or 0)))
@@ -1708,6 +1729,9 @@ def righe_tenuta(t):
             if r["vendita_aperta"]:
                 s += " · ⚠ c'è una vendita APERTA su questo nome: mediare e vendere non stanno insieme, va decisa prima"
             L.append(s)
+            if "cinque_anni" in r:    # v492 — mediare e' un ingresso: la lettura a 5 anni lo accompagna
+                import rotazione
+                L.extend(f"      {x}" for x in rotazione.righe_5anni(r["cinque_anni"], r.get("veicolo")))
         if t.get("pav_calcolati"):
             L.append("      " + riga_pavimenti_posizione(r.get("pavimenti")))
             mp = r.get("media_pavimenti") or []
