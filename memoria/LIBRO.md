@@ -534,9 +534,9 @@ raggiunto, non QUANDO. Senza quest'ora la resa lo dichiara, e il dubbio resta al
 
 | Nome | Verso | Quantità | Limite | Inserito | Stato | Validità | Attivo alle |
 |---|---|---|---|---|---|---|---|
-| OKLO | acquisto | 300 | 26,00 | 2026-10-16 | attivo | giornaliero | |
-| SMCI | acquisto | 250 | 31,00 | 2026-10-16 | attivo | giornaliero | |
-| ORCL | acquisto | 65 | 127,00 | 2026-10-16 | attivo | giornaliero | |
+| OKLO | acquisto | 300 | 23,26 | 2026-10-16 | attivo | giornaliero | 18:21 |
+| SMCI | acquisto | 250 | 31,00 | 2026-10-16 | attivo | giornaliero | 18:21 |
+| ORCL | acquisto | 65 | 121,23 | 2026-10-16 | attivo | giornaliero | 18:21 |
 
 `numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
 minimo della seduta di oggi ha toccato il limite DOPO l'ultima ora annotata in «Attivo alle» — allora l'ordine può
@@ -553,6 +553,10 @@ limiti). §1 la scrive in tutto, ~79.400 €. Alle 22:00 sono **scaduti senza es
 passato"*): i minimi della seduta — ORCL 127,60, OKLO 27,52, SMCI 32,38 — erano arrivati fra le 15:30 e le 15:54
 italiane, prima delle 18:02, e dopo le 18:02 nessuno è più sceso al limite (minimi dopo, dalle barre a 5 minuti: ORCL
 132,54, OKLO 28,94, SMCI 33,87). È il caso da cui nasce la colonna «Attivo alle» (v491).
+Il 16/10/2026 il CEO ha inserito tre nuovi ordini giornalieri — OKLO 300 a 26, SMCI 250 a 31, ORCL 65 a 127 — e
+alle 18:21, dopo l'analisi, ha abbassato ORCL a 121,23 e OKLO a 23,26: i bordi alti dei pavimenti, perché in DISCESA
+il limite resta sul pavimento (§1bis). SMCI a 31 sta già sul pavimento 29,90–31,03 ed è rimasto. Alle 18:21 tutti e
+tre attivi e non eseguiti (parola del CEO); i minimi della seduta fino ad allora erano sopra tutti i limiti.
 
 ## 1octies. CONTI DICHIARATI DALL'EMITTENTE — date che il calendario Nasdaq non porta (v489)
 
