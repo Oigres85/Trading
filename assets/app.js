@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "478";
+const BUILD_VERSION = "493";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2316,7 +2316,7 @@ function openMarginDebtModal() {
     `<div class="info-line" style="margin-bottom:8px"><b>Cos'è:</b> il debito che gli investitori contraggono presso i broker per comprare titoli a leva. Quando è vicino ai massimi storici indica euforia e fragilità: nelle discese forza vendite a catena (margin call), amplificando i crolli.</div>
      <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
        <div style="font-size:13px">Attuale: <b>${bn(md.value)}</b> · <b style="color:${risk.c}">${md.pct_of_peak}% del picco storico</b> · leva <b style="color:${risk.c}">${risk.t}</b></div>
-       <div class="muted" style="font-size:12px;margin-top:3px">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""}${md.qoq != null ? ` · ultimo mese ${signTxt(md.qoq)}` : ""} · picco storico ${bn(md.peak)} · agg. ${md.date}</div>
+       <div class="muted" style="font-size:12px;margin-top:3px">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : "YoY n.d."}${md.qoq != null ? ` · ultimo mese ${signTxt(md.qoq)}` : ""} · picco storico ${bn(md.peak)} · agg. ${md.date}</div>
      </div>
      <h4 style="margin:8px 0 4px">Storico (ultimi trimestri)</h4>
      <div class="psp-spark">${sparkline(md.history || [])}</div>
@@ -4601,7 +4601,7 @@ const FORMA_INDICATORE = {
       n: `<b>${mld(md.value / 1000)} miliardi di dollari</b> presi a prestito dagli operatori per comprare `
         + `azioni — il <b>${fmtNum.format(md.pct_of_peak)}%</b> del massimo storico`
         + (md.qoq != null ? `, ma <b class="${md.qoq < 0 ? "neg" : "pos"}">${signTxt(md.qoq)}</b> nell'ultimo mese` : "")
-        + (md.yoy != null ? ` e ${signTxt(md.yoy)} sull'anno` : "") + `.`
+        + ` e ${annoLeva(md)}` + `.`
         + (st ? ` <b style="color:${st.col}">${esc(st.labelShort)}</b>.` : "")
         + (rapp != null
             ? `<div class="leva-soglia"><b>Sopra o sotto soglia:</b> vale il <b>${fmtNum.format(pil)}% del PIL</b> `
@@ -8617,6 +8617,19 @@ async function loadPromptHeaderCloud() {
    ⚠ IL PARAMETRO STORICO E' IL RAPPORTO SUL PIL, non il "% del picco": quest'ultimo e' SATURO
    in un mercato al rialzo (13 mesi su 13 sopra il 95%), cioe' un allarme permanente, che e'
    potere discriminante zero. Il rapporto sul PIL ha una mediana storica vera nel file. */
+/* ⚠ v493 — L'ORIZZONTE DELL'ANNO NON SPARISCE IN SILENZIO. Il 16/10/2026 FINRA ha pubblicato
+   settembre e la tabella letta si e' accorciata a 12 mesi: il mese di un anno fa non c'e', la
+   pipeline non calcola la variazione annua, e la riga la toglieva senza dirlo — mentre la frase
+   sui versi spiega che il verso dipende dall'orizzonte. "Il sistema non ha il dato" e "ce l'ha e
+   non te lo passa" si leggono uguali (v406). Una resa sola per il pacchetto e la scheda (v161). */
+function annoLeva(md) {
+  if (md && md.yoy != null && Number.isFinite(Number(md.yoy))) return `${signTxt(md.yoy)} sull'anno`;
+  const n = ((md && md.history) || []).filter((v) => v != null).length;
+  return n < 13
+    ? `sull'anno non calcolabile (lo storico letto copre ${n} mesi: il mese di un anno fa non c'e')`
+    : `sull'anno non calcolabile (la fonte non la pubblica)`;
+}
+
 function rigaLeva(m) {
   const md = (m || {}).margin_debt;
   if (!md || md.value == null) return null;
@@ -8632,7 +8645,7 @@ function rigaLeva(m) {
   return `- LEVA DEGLI OPERATORI (debito a margine dei conti retail e istituzionali presso i broker): `
     + `${mld(md.value)} miliardi di dollari, il ${fmtNum.format(md.pct_of_peak)}% del massimo storico `
     + `(${mld(md.peak)} mld, toccato ${md.peak_date ? dataBreve(md.peak_date) : "n.d."})`
-    + (md.yoy != null ? ` · ${signTxt(md.yoy)} sull'anno` : "")
+    + ` · ${annoLeva(md)}`
     /* ⚠⚠ v326 — `qoq` CONTIENE LA VARIAZIONE MENSILE, non trimestrale: il commento della
        pipeline lo dichiara ("la chiave si chiama qoq per ragioni storiche ma contiene il mom")
        e in v320 l'ho stampata come "sul trimestre" fondandoci sopra il verdetto. Il trimestre

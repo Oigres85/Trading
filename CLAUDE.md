@@ -7293,3 +7293,24 @@ ricalcola sul limite solo quando è sotto tutte. Classe v161: una zona, due deri
 - ⚠ Tre processi in background con la variabile del percorso assegnata nel primo: gli altri due hanno scritto nella
   radice del filesystem, e per un momento ho letto un file del 07/10 nello scratchpad credendolo di oggi (prezzi di
   ORCL a 141). **La variabile si assegna PRIMA della riga che manda i processi in background.**
+
+## 📉 v493 — FINRA HA ACCORCIATO LA TABELLA, E LA VARIAZIONE ANNUA DELLA LEVA SPARIVA IN SILENZIO
+
+Preso dal pre-commit mentre registravo gli ordini del 16/10: **v320** è andato rosso su codice che nessuno aveva
+toccato. Il run delle 16:26 UTC ha letto da FINRA il dato di **settembre**, e la tabella della fonte si è
+accorciata a **12 mesi**: il mese di un anno fa non c'è, la pipeline (correttamente) non calcola la variazione
+annua, e la riga della leva la **toglieva senza dirlo** — proprio la riga che spiega che il verso dipende
+dall'orizzonte. *"Il sistema non ha il dato"* e *"ce l'ha e non te lo passa"* si leggono uguali (v406).
+
+Ora `annoLeva()` — una resa sola per pacchetto e scheda (v161) — scrive *"sull'anno non calcolabile (lo storico
+letto copre 12 mesi: il mese di un anno fa non c'e')"*, e la frase sui versi non nomina un orizzonte che non ha
+(v457). Il semaforo non ne soffre: la famiglia della leva usa la variazione mensile dallo storico.
+⚠ **Recuperarla dal run precedente non si fa**: lo storico in `data.json` non ha date, e attaccare due tabelle
+per posizione è la classe v207/v393. Una serie datata sarebbe il rimedio vero: annotato, non fatto.
+
+⚠ Il gate v320 è stato riagganciato all'invariante — **pubblicato o dichiarato** — e due check nuovi
+**costruiscono** i due stati (v429): fra un mese la tabella potrebbe tornare a 13 righe e il v320 smetterebbe di
+vederlo. ⚠ E il meta-gate dei template ha dichiarato **cieco** un rilevatore che vedeva benissimo: la sua classe
+`[a-zA-Z_$|]+` non comprendeva le **cifre**, e l'helper `_LEVA493` spezzava la cattura. È la svista della v457
+(lì l'underscore) sull'altra metà dell'alfabeto di un identificatore. Quattro iniezioni, ripristino per
+impronta: mordono tutte, ciascuna sul controllo atteso. `?v=` e `BUILD_VERSION` a 493: cambia `assets/app.js`.

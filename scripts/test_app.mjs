@@ -2891,6 +2891,10 @@ check("v320 leva: nessuna direzione affermata contro la fonte, e i tre orizzonti
      che il verso dipende dalla finestra, ed e' l'informazione vera. */
   const riga = p.split(String.fromCharCode(10)).find(r => r.indexOf("LEVA DEGLI OPERATORI") === 2);
   if (!riga) return "la riga LEVA DEGLI OPERATORI non compare: senza i numeri il verso non e' verificabile";
+  /* ⚠ v493 — l'invariante e' PUBBLICATO O DICHIARATO: il 16/10/2026 lo storico FINRA letto e'
+     sceso a 12 mesi, la variazione annua non esiste, e la riga la toglieva in silenzio. Ora la
+     dichiara, e la dichiarazione nomina l'orizzonte; i due stati li distinguono i check v493,
+     che li costruiscono invece di aspettare i dati del giorno (v429). */
   for (const orizzonte of ["sull'anno", "nell'ultimo mese", "sul trimestre"]) {
     if (riga.indexOf(orizzonte) < 0) return "manca l'orizzonte: " + orizzonte;
   }
@@ -5156,7 +5160,7 @@ check("meta: nessun backtick dentro un template passato al vm", (() => {
   /* si isola ogni template passato a un helper del vm e si guarda se, PRIMA della chiusura,
      compare un backtick non escapato: se c'e', il template finisce li' e il resto del check
      diventa sintassi arbitraria — che e' come si e' rotta la suite tre volte oggi. */
-  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA)\(`/g;
+  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493)\(`/g;
   const guasti = [];
   for (const m of mio.matchAll(APERTURE)) {
     const da = m.index + m[0].length;
@@ -5189,7 +5193,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
      essi i backslash non raddoppiati davanti alle classi che contano. */
   const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
     /* ⚠⚠ v422 — LA CLASSE SI ALLARGA A n/r/t/0, e la ragione e' peggiore delle altre: dentro un
@@ -5209,7 +5213,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      un template. Non esiste nessuna ragione legittima di scriverla: il template l'ha gia'
      mangiata prima che il vm la veda, quindi la si cerca in TUTTI i template passati al vm, non
      solo in quelli che contengono una regex. Costata un giro di debug in v406. */
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     for (const b of t.matchAll(/(?<!\\)\\["']/g)) {
       sospetti.push("virgoletta sfuggita: " + t.slice(Math.max(0, b.index - 34), b.index + 12).replace(/\n/g, "⏎"));
@@ -5951,8 +5955,11 @@ check("meta: il rilevatore dei backslash copre ogni helper che passa un template
   /* ⚠ v457 — la classe era [a-zA-Z|]+ e NON comprendeva l'underscore: con un helper chiamato
      _LEVA l'estrazione si fermava prima e il meta-gate si dichiarava scoperto su codice
      corretto. Un identificatore JS puo' contenere _ e $: la sonda deve leggere l'alfabeto
-     vero, non quello che l'autore aveva in mente (v422). */
-  const scanner = mio.match(/matchAll\(\/\(\?:([a-zA-Z_$|]+)\)\\\(`/);
+     vero, non quello che l'autore aveva in mente (v422).
+     ⚠ v493 — e nemmeno le CIFRE: con un helper chiamato _LEVA493 la cattura si fermava al 4,
+     la regex non trovava la parentesi e il meta-gate dichiarava cieco un rilevatore che vedeva
+     benissimo. Stessa svista della v457, sull'altra meta' dell'alfabeto di un identificatore. */
+  const scanner = mio.match(/matchAll\(\/\(\?:([a-zA-Z0-9_$|]+)\)\\\(`/);
   if (!scanner) return no("non trovo piu' l'elenco degli helper nel rilevatore: e' cieco");
   const coperti = new Set(scanner[1].split("|"));
   /* gli helper sono quelli definiti come `const X = (...) => run(` / `=> suVeri(` */
@@ -10048,6 +10055,30 @@ check("v457 leva: con tutti gli orizzonti in ritiro non si afferma nessuna espan
 /* e la preposizione si articola: "su l'anno" e' un refuso che il CEO legge */
 check("v457 leva: la preposizione e' articolata, mai 'su l' + articolo",
   typeof _concordi === "string" && !_concordi.includes("su l'") && !_concordi.includes("su il "));
+
+/* ═══ v493 — L'ORIZZONTE DELL'ANNO NON SPARISCE IN SILENZIO ══════════════════════════════
+   Il 16/10/2026 FINRA ha pubblicato settembre e lo storico letto e' sceso a 12 mesi: senza il
+   mese di un anno fa la pipeline non calcola la variazione annua, e la riga la toglieva senza
+   dirlo (v406). Il gate v320 l'ha preso sui dati del giorno; questi due COSTRUISCONO i due stati,
+   perche' fra un mese lo storico potrebbe tornare a 13 e il v320 smetterebbe di vederlo (v429). */
+const _LEVA493 = (yoy, n) => suVeri(`
+  const m = DATA.macro || {};
+  const h = [];
+  for (let i = 0; i < ${n}; i++) h.push(1000000 + i * 1000);
+  m.margin_debt = Object.assign({}, m.margin_debt || {}, { yoy: ${yoy}, qoq: 1.8, history: h });
+  const r = buildPrompt().split(String.fromCharCode(10))
+    .find(x => x.trimStart().indexOf("- LEVA DEGLI OPERATORI") === 0);
+  return r || "riga della leva assente";`);
+const _senzaAnno493 = _LEVA493("null", 12);
+check("v493 leva: senza variazione annua la riga lo dichiara coi mesi coperti, e i versi non nominano l'anno",
+  typeof _senzaAnno493 === "string" && _senzaAnno493.includes("sull'anno non calcolabile")
+  && _senzaAnno493.includes("12 mesi")
+  && _senzaAnno493.indexOf("LIVELLO E VERSO") > 0
+  && !_senzaAnno493.slice(_senzaAnno493.indexOf("LIVELLO E VERSO")).includes("anno"));
+const _conAnno493 = _LEVA493("37.2", 13);
+check("v493 leva: con la variazione annua la riga pubblica il numero, non la dichiarazione",
+  typeof _conAnno493 === "string" && _conAnno493.includes("+37,2% sull'anno")
+  && !_conAnno493.includes("non calcolabile"));
 
 /* ═══ v476 — LA LIQUIDITA' NON E' SOLO LA CASSA ═══════════════════════════════════════════
    La pipeline leggeva "contanti e equivalenti" e lasciava fuori i titoli a breve: su RGTI 27,8
