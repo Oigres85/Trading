@@ -1347,9 +1347,10 @@ MEDIA_LUNGA, MEDIA_BREVE = 200, 50
 SOGLIA_EPS_90 = 5.0          # stima dell'EPS a 90 giorni mossa di oltre il 5% del proprio valore, nei due versi
 SOGLIA_RICAVI = 25.0         # ricavi del trimestre sull'anno prima: da +25% sono una prova di CRESCITA
 AUTONOMIA_CORTA, AUTONOMIA_SOLIDA = 12, 24     # mesi: sotto 12 il bilancio e' corto, da 24 e' solido
+SOGLIA_CDS = 20.0            # v498 — il CDS del nome oltre l'indice CDX della stessa cedola, in un mese, nei due versi
 CONFLITTO = "CONFLITTO — DA VALUTARE"
 ESITI = ("VENDITA PER EVIDENZA", CONFLITTO, "IN OSSERVAZIONE", "NON MISURABILE", "LASCIAR CORRERE")  # urgenza
-PROVE = ("tendenza", "stime", "revisioni", "ricavi", "bilancio", "macro")
+PROVE = ("tendenza", "stime", "revisioni", "ricavi", "bilancio", "macro", "cds")
 CRESCITA = ("stime", "revisioni", "ricavi")    # le sole prove a favore che possono opporsi a una tendenza rotta
 VERSI_POSSIBILI = {**{p: ("contro", "neutro", "favore") for p in PROVE}, "macro": ("contro", "neutro")}
 
@@ -1451,6 +1452,78 @@ def macro_nome(fcf, sem):
     return {"stato": "spento", "perche": "brucia cassa, credito spento" if brucia else "si autofinanzia", "brucia": brucia}
 
 
+NOTA_CDS_CANALE = ("CDS e bilancio sono lo stesso canale — il mercato dei capitali — visto da due lati: il CDS e' il "
+                   "prezzo che il mercato da' al rischio che il bilancio misura")
+
+
+def prova_cds(riga):
+    """v498 — la prova del CDS (decisione del CEO del 17/10/2026, LIBRO.md §1sexies). La MISURA la fa la pipeline
+    (update_data.finestra_cds: un mese di compensazione, al netto dell'indice CDX della stessa cedola, perche' se si
+    allarga tutto il credito e' il semaforo a dirlo, B3); qui solo la soglia, la stessa nei due versi (v482). Il
+    restringimento sta a favore ma NON e' crescita: non apre un conflitto.
+    Tre casi senza verso, e non sono la stessa cosa (v406):
+    - il nome non ha un CDS compensato a ICE: la prova NON SI APPLICA, e l'esito non diventa provvisorio — non
+      e' un dato che manca, e' un mercato che non c'e';
+    - lo storico raccolto non basta ancora: la prova NON E' ANCORA IN FUNZIONE (uno storico gratuito non esiste,
+      lo raccoglie la pipeline dal 16/10/2026), e la riga della regola lo dice una volta per blocco;
+    - il dato manca (snapshot senza CDS, nome non classificato o non quotato, finestra a cavallo di una rotazione
+      della scadenza o di un cambio di serie dell'indice): l'esito diventa provvisorio, come per ogni prova."""
+    if riga is None:
+        return {"verso": None, "cds_stato": None, "perche": "nome non seguito dalla pipeline"}
+    c = riga.get("cds")
+    if not c:
+        return {"verso": None, "cds_stato": None, "perche": "il run della pipeline non porta i CDS su questo nome"}
+    st = c.get("stato")
+    if st == "assente":
+        return {"verso": None, "applicabile": False, "cds_stato": st, "perche": "nessun CDS compensato a ICE"}
+    if st == "non classificato":
+        return {"verso": None, "cds_stato": st, "perche": "nome non classificato in config/cds_entita.json"}
+    if st != "quotato":
+        return {"verso": None, "cds_stato": st, "perche": "abbinato a ICE ma non quotato nell'ultimo giorno raccolto"}
+    f = c.get("finestra")
+    if not f:
+        return {"verso": None, "cds_stato": st,
+                "perche": "la pipeline non ha pubblicato la misura di un mese (snapshot precedente alla v498)"}
+    if f.get("stato") == "storico corto":
+        return {"verso": None, "applicabile": False, "in_attesa": True, "cds_stato": st, **f,
+                "perche": f"storico raccolto di {f.get('giorni')} giorni su {f.get('servono')}"}
+    if f.get("stato") != "misurato":
+        return {"verso": None, "cds_stato": st, **f, "perche": f.get("perche") or f.get("stato")}
+    e = f["eccesso_pct"]
+    return {"verso": "contro" if e > SOGLIA_CDS else "favore" if e < -SOGLIA_CDS else "neutro",
+            "cds_stato": st, "indicativo": bool(c.get("indicativo")), **f}
+
+
+def riga_regola_cds(voci):
+    """v498 — la prova del CDS una volta per blocco (v407): la regola con la sua soglia, chi ha un CDS compensato e chi
+    no, e se la prova e' gia' in funzione. I giorni li conta la pipeline: nessuna data proiettata (v396).
+    voci: [(ticker, prova_cds)]."""
+    voci = [(tk, p or {}) for tk, p in voci]
+    mappati = ("quotato", "non quotato oggi")
+    con = sorted(tk for tk, p in voci if p.get("cds_stato") in mappati)
+    senza = sorted(tk for tk, p in voci if p.get("cds_stato") == "assente")
+    ignoti = sorted(tk for tk, p in voci if p.get("cds_stato") not in mappati + ("assente",))
+    n = next((p.get("n") for _, p in voci if p.get("n")), None)
+    s = (f"CDS (decisione del CEO del 17/10/2026): lo spread del nome che in {f'{n} giorni' if n else 'un mese'} di "
+         f"compensazione cresce di oltre il {_it(SOGLIA_CDS, 0)}% PIU' dell'indice CDX della stessa cedola e' una prova "
+         "CONTRO; che scende oltre la stessa soglia e' A FAVORE, ma non e' crescita e non apre un conflitto · conta la "
+         "parte del nome: se si allarga tutto il credito lo dice il semaforo (famiglia credito)")
+    s += f" · con un CDS compensato a ICE: {', '.join(con) if con else 'nessuno'}"
+    if senza:
+        s += f" · senza, e la prova non si applica: {', '.join(senza)}"
+    if ignoti:
+        s += f" · stato del CDS non noto: {', '.join(ignoti)}"
+    attesa = next((p for _, p in voci if p.get("in_attesa")), None)
+    if attesa:
+        try:
+            dal = datetime.fromisoformat(str(attesa.get("dal"))).strftime("%d/%m/%Y")
+        except ValueError:
+            dal = "n.d."
+        s += (f" · NON ANCORA IN FUNZIONE: servono {attesa.get('servono')} giorni di compensazione raccolti, oggi "
+              f"{attesa.get('giorni')} (dal {dal}) — uno storico gratuito non esiste, lo raccoglie la pipeline")
+    return s
+
+
 def regola_esito(versi):
     """L'esito da QUALI prove ci sono (LIBRO.md §1sexies), mai da quante (v200). versi: {prova: verso}.
     VENDITA = tendenza ROTTA + un'altra prova contro + nessuna prova di crescita a favore · CONFLITTO =
@@ -1472,7 +1545,10 @@ def esito_bilancio(prove):
     Nulla di misurato: NON MISURABILE."""
     import itertools
     noti = {k: p["verso"] for k, p in prove.items() if p.get("verso") is not None}
-    ignoti = [k for k in PROVE if (prove.get(k) or {}).get("verso") is None]
+    # v498 — una prova che NON SI APPLICA (il CDS di un nome che non ne ha) o non e' ancora in funzione non e' un dato
+    #   mancante: non entra fra gli ignoti, e non rende provvisorio un esito che nessun dato potrebbe cambiare
+    ignoti = [k for k in PROVE if (prove.get(k) or {}).get("verso") is None
+              and (prove.get(k) or {}).get("applicabile", True)]
     if not noti:
         return {"esito": "NON MISURABILE", "possibili": [], "ignoti": ignoti, "provvisorio": False}
     esito = regola_esito(noti)
@@ -1581,7 +1657,8 @@ def valuta_tenuta(barre, riga, sem, adesso=None):
     m = macro_nome(fcf_di(riga), sem)
     prove = {"tendenza": {**t, "verso": {"rotta": "contro", "in correzione": "neutro", "intatta": "favore"}.get(t["stato"])},
              **prove_fondamentali(riga), "bilancio": prova_bilancio(riga),
-             "macro": {**m, "verso": {"acceso": "contro", "spento": "neutro"}.get(m["stato"])}}
+             "macro": {**m, "verso": {"acceso": "contro", "spento": "neutro"}.get(m["stato"])},
+             "cds": prova_cds(riga)}
     b = concluse(barre or [], adesso)
     return {"prove": prove, "consenso": consenso(riga, b[-1]["c"] if b else None), **esito_bilancio(prove)}
 
@@ -1658,7 +1735,7 @@ def segnali_libro(tenuta, ordini):
 
 
 NOMI_PROVE = {"tendenza": "tendenza", "stime": "stime a 90 giorni", "revisioni": "revisioni a 30 giorni",
-              "ricavi": "ricavi del trimestre", "bilancio": "bilancio", "macro": "macro"}
+              "ricavi": "ricavi del trimestre", "bilancio": "bilancio", "macro": "macro", "cds": "CDS"}
 
 
 def testo_prova(k, p):
@@ -1708,6 +1785,18 @@ def testo_prova(k, p):
         if p.get("verso") is None:
             return f"macro NON MISURABILE ({p.get('perche')})"
         return f"macro {'ACCESA' if p['verso'] == 'contro' else 'spenta'} ({p.get('perche')})"
+    if k == "cds":
+        if p.get("verso") is None:
+            return f"CDS: {p.get('perche') or 'n.d.'}"
+        da = str(p.get("da") or "")
+        s = (f"CDS {_sg(p['nome_pct'])}% in {p['n']} giorni di compensazione ({_it(p['pb_da'], 0)} → {_it(p['pb_a'], 0)} pb "
+             f"dal {da[8:10]}/{da[5:7]}) contro {_sg(p['indice_pct'])}% dell'indice CDX {p['indice']}: "
+             f"{_sg(p['eccesso_pct'])}% rispetto all'indice")
+        if p["verso"] == "neutro":
+            s += f" (entro il ±{_it(SOGLIA_CDS, 0)}%)"
+        if p.get("indicativo"):
+            s += " · spread indicativo: oltre 30 punti anticipati dipende dal recupero assunto"
+        return s
     return k
 
 
@@ -1719,12 +1808,15 @@ def testo_prove(v):
     pr = v["prove"]
     out = {"contro": [], "favore": [], "neutro": [], None: []}
     for k in PROVE:
-        out[pr[k].get("verso")].append(testo_prova(k, pr[k]))
+        p = pr.get(k) or {"verso": None, "perche": "non calcolata"}
+        if p.get("applicabile", True):          # v498 — chi non ha un CDS non porta una riga vuota per ogni nome
+            out[p.get("verso")].append(testo_prova(k, p))
     canale = (pr["macro"].get("verso") == "contro" and pr["macro"].get("brucia") and pr["bilancio"].get("verso") == "contro"
               and str(pr["macro"].get("perche", "")).startswith("brucia cassa"))
     discordi = {pr["stime"].get("verso"), pr["revisioni"].get("verso")} == {"contro", "favore"}
+    cds_canale = (pr.get("cds") or {}).get("verso") == "contro" and pr["bilancio"].get("verso") == "contro"
     return {"contro": out["contro"], "favore": out["favore"], "neutro": out["neutro"], "ignote": out[None],
-            "stesso_canale": canale, "analisti_discordi": discordi}
+            "stesso_canale": canale, "analisti_discordi": discordi, "cds_canale": cds_canale}
 
 
 NOTA_DISCORDI = ("stime a 90 giorni e revisioni a 30 giorni puntano in versi opposti: sono la stessa famiglia — le "
@@ -1744,6 +1836,8 @@ def riga_prove(v):
         pz.append("macro e bilancio sono lo stesso canale (il mercato dei capitali) visto da due lati")
     if t["analisti_discordi"]:
         pz.append(NOTA_DISCORDI)
+    if t["cds_canale"]:
+        pz.append(NOTA_CDS_CANALE)
     return " ; ".join(pz)
 
 
@@ -1765,6 +1859,7 @@ def righe_tenuta(t):
          "contro con la tendenza non rotta · LASCIAR CORRERE = nessuna prova contro · conta QUALI prove ci sono, non "
          "quante: nessun punteggio · soglie = convenzioni scelte col CEO (LIBRO.md §1sexies) · l'esito è la regola "
          "applicata, non un ordine"]
+    L.append("  " + riga_regola_cds([(r["tk"], (r.get("prove") or {}).get("cds")) for r in t["righe"]]))
     if any("struttura" in r for r in t["righe"]):
         import rotazione
         L.append("  " + rotazione.INTESTAZIONE_STRUTTURA + " — e non vende: dal 15/10 non si vende sui ribassi "
@@ -1778,6 +1873,8 @@ def righe_tenuta(t):
         L.append(f"      a favore: {' · '.join(tp['favore']) if tp['favore'] else 'nessuna prova'}")
         if tp["analisti_discordi"]:
             L.append(f"      ⚠ {NOTA_DISCORDI}")
+        if tp["cds_canale"]:
+            L.append(f"      ⚠ {NOTA_CDS_CANALE}")
         if tp["neutro"] or tp["ignote"]:
             L.append("      " + " ; ".join(([f"in mezzo: {' · '.join(tp['neutro'])}"] if tp["neutro"] else [])
                                          + ([f"non misurate: {' · '.join(tp['ignote'])}"] if tp["ignote"] else [])))

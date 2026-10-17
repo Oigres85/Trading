@@ -164,10 +164,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    **I CDS a 5 anni** (v497, schede): per ogni nome quotato il livello in punti base, il verso (5, 21 e 63 giorni,
    appena lo storico raccolto li copre) e quante volte vale l'indice CDX della sua cedola; un allargamento si dice
    ACCANTO alle notizie e al bilancio del nome, perché il CDS è il prezzo che il mercato chiede per assicurarsi
-   contro un default che il bilancio da solo non quota. È INFORMAZIONE: non è una prova della tenuta né un colore
-   del semaforo — se il CEO vorrà farne un segnale, lo deciderà lui. Lo storico gratuito non esiste (ICE pubblica
-   solo l'ultimo giorno): lo raccoglie la pipeline dal 16/10/2026, e finché i giorni non bastano la variazione si
-   cerca in rete, con fonte e data.
+   contro un default che il bilancio da solo non quota. Dal 17/10 sera (v498, decisione del CEO) il suo
+   allargamento OLTRE quello dell'indice in un mese è una **prova della tenuta** (§6, `LIBRO.md` §1sexies), in
+   funzione quando lo storico raccolto basta; non è un colore del semaforo. Lo storico gratuito non esiste (ICE
+   pubblica solo l'ultimo giorno, DTCC risponde 403 anche dai server di GitHub): lo raccoglie la pipeline dal
+   16/10/2026, e finché i giorni non bastano la variazione si cerca in rete, con fonte e data.
 5bis. **Posizionamento** (v496, CEO, 17/10) — dal blocco di `posizionamento.py`: il put/call di mercato col
    suo percentile (alto = domanda di protezione: convenzione del mestiere, non una misura); le scadenze delle opzioni
    — una mensile o una trimestrale («tre streghe») entro cinque giorni si dice in cima alla sezione, perché alla
@@ -190,6 +191,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    **pavimenti** e la **media sui pavimenti**: l'aritmetica della media su ogni pavimento SOTTO IL
    CARICO, con lo stop. Comprare sopra il carico alza il carico: è un incremento, non una media, e
    la risposta lo chiama così.
+   Da v498 (CEO, 17/10) la tenuta ha una prova in più, il **CDS**: lo spread del nome che in un mese cresce di
+   oltre il 20% PIÙ dell'indice della sua cedola è CONTRO, che scende oltre la stessa soglia è A FAVORE (non è
+   crescita: non apre un conflitto); la riga della regola in testa al blocco dice chi ha un CDS, chi no e se la
+   prova è già in funzione, e quanti giorni di storico ha.
    Le **notizie** non sono calcolate: per ogni nome in VENDITA, CONFLITTO o OSSERVAZIONE la ricerca
    web è obbligatoria e va fatta **nei due versi** — i catalizzatori che possono farlo salire forte
    (contratti, guida alzata, ordini, clienti nuovi) e i fatti che rompono la tesi — con fonte e
@@ -305,7 +310,8 @@ struttura «solo informazione», non una prova nella tenuta (decisione del CEO d
 annua della leva dal file storico FINRA, col suo percentile; put e call di mercato e di ogni posizione, le scadenze
 delle opzioni (mensile e «tre streghe»), le posizioni dei grandi operatori (CFTC) e il bitcoin dall'ultima chiusura
 USA su MSTR — informazione, non prove (17/10) · i CDS a 5 anni di posizioni e sorvegliati, con gli indici CDX e
-l'Italia per il BTP — informazione, non prove (17/10).
+l'Italia per il BTP (17/10) — e dalla sera stessa il loro allargamento oltre l'indice come prova della tenuta, in
+funzione quando lo storico raccolto basta (17/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

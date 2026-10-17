@@ -2675,7 +2675,11 @@ for _v in _tutte482:
 check("v482 esito su TUTTE le " + str(len(_tutte482)) + " combinazioni: CONFLITTO se e solo se rotta con crescita a favore; "
       "VENDITA se e solo se rotta, un'altra contro e nessuna crescita; LASCIAR CORRERE se e solo se nessuna contro; e "
       "peggiorare una prova non toglie mai una vendita",
-      len(_tutte482) == 486 and not _viol482, str(_viol482[:3]))
+      # v498 — RIAGGANCIATO, non zittito: pretendeva 486 (3^5 x 2), cioe' il NUMERO delle famiglie di oggi, ed e'
+      #   andato rosso quando il CEO ha aggiunto il CDS (3^6 x 2 = 1458). L'invariante e' che le combinazioni siano
+      #   TUTTE: il prodotto dei versi possibili di ogni prova, qualunque sia il numero delle prove
+      len(_tutte482) == math.prod(len(NL.VERSI_POSSIBILI[k]) for k in NL.PROVE) and len(_tutte482) >= 486
+      and not _viol482, str(_viol482[:3]))
 
 # --- PROVVISORIO: un dato mancante che potrebbe cambiare l'esito si dichiara, coi possibili (era il MINIMO v481) ---
 _eb482 = lambda **v: NL.esito_bilancio({k: {"verso": v.get(k)} for k in NL.PROVE})
@@ -2684,8 +2688,9 @@ check("v482 provvisorio: la tendenza non misurata (SKHY, 66 sedute) con la cresc
       "che col dato potrebbe essere CONFLITTO; tutto misurato non e' provvisorio; nulla misurato e' NON MISURABILE",
       _skhy482["esito"] == "LASCIAR CORRERE" and _skhy482["provvisorio"] and NL.CONFLITTO in _skhy482["possibili"]
       and "tendenza" in _skhy482["ignoti"]
+      # v498 — «tutto misurato» comprende il CDS: la prova che il CEO ha aggiunto il 17/10/2026
       and not _eb482(tendenza="favore", stime="favore", revisioni="favore", ricavi="favore", bilancio="favore",
-                     macro="neutro")["provvisorio"]
+                     macro="neutro", cds="neutro")["provvisorio"]
       and _eb482()["esito"] == "NON MISURABILE", str(_skhy482))
 _viol482p = []
 for _v in _tutte482[::7]:
@@ -4858,6 +4863,114 @@ check("v497 collegamento eseguito: genera() stampa l'intestazione dei CDS una vo
       "del BTP sul sovrano",
       _g497.count("CDS a 5 anni (richiesta del CEO") == 1 and _g497.count("CDS 5 anni") == 3
       and "BTP-V28 [POSIZIONE, titolo di Stato] — CDS 5 anni 63 pb" in _g497, _g497[:400])
+
+# ============================ v498 — LA PROVA DEL CDS NELLA TENUTA ============================
+# Decisione del CEO del 17/10/2026: l'allargamento del CDS diventa una prova della tenuta. La MISURA la fa la pipeline
+# (finestra_cds, provata in test_update_data.py); qui la soglia, gli stati, l'esito e la resa. Lo stato si COSTRUISCE
+# (v425, v429): lo storico vero ha un giorno, e ogni prova su un mese sarebbe verde per assenza del fenomeno (v196).
+def _cds498(eccesso=30.0, stato="misurato", cds_stato="quotato", nome=30.0, indice=0.0):
+    if cds_stato != "quotato":
+        return {"cds": {"stato": cds_stato}}
+    if stato == "storico corto":
+        f = {"stato": "storico corto", "n": 21, "giorni": 1, "servono": 22, "dal": "2026-10-16"}
+    elif stato != "misurato":
+        f = {"stato": stato, "n": 21, "da": "2026-09-16", "a": "2026-10-16", "indice": "IG",
+             "perche": "il nome non e' quotato il 2026-09-16"}
+    else:
+        f = {"stato": "misurato", "n": 21, "da": "2026-09-16", "a": "2026-10-16", "indice": "IG", "pb_da": 100.0,
+             "pb_a": 100.0 * (1 + nome / 100), "indice_da": 60.0, "indice_a": 60.0 * (1 + indice / 100),
+             "nome_pct": nome, "indice_pct": indice, "eccesso_pct": eccesso}
+    return {"cds": {"stato": "quotato", "pb": f.get("pb_a"), "indicativo": False, "finestra": f}}
+_s498 = NL.SOGLIA_CDS
+_vc498 = lambda e: NL.prova_cds(_cds498(eccesso=e))["verso"]
+check("v498 soglia del CDS nei DUE versi con la stessa soglia (v482): oltre la soglia rispetto all'indice CONTRO, oltre "
+      "la stessa all'ingiu' A FAVORE, il bordo stesso in mezzo (il numero deciso e' quello stampato, v496)",
+      _vc498(_s498 + 0.1) == "contro" and _vc498(_s498) == "neutro" and _vc498(-_s498 - 0.1) == "favore"
+      and _vc498(-_s498) == "neutro" and _vc498(0.0) == "neutro")
+_p498 = {k: NL.prova_cds(v) for k, v in {
+    "assente": _cds498(cds_stato="assente"), "corto": _cds498(stato="storico corto"), "buco": _cds498(stato="buco"),
+    "nonclass": _cds498(cds_stato="non classificato"), "nonquot": _cds498(cds_stato="non quotato oggi"),
+    "senza": {"analisti": {}}, "vecchio": {"cds": {"stato": "quotato", "pb": 100.0}}}.items()}
+_p498["nessuna"] = NL.prova_cds(None)
+check("v498 tre casi senza verso e non sono la stessa cosa (v406): chi non ha un CDS e lo storico ancora corto NON SI "
+      "APPLICANO; il dato che manca — buco, nome non classificato o non quotato, snapshot senza CDS o senza la misura, "
+      "nome non seguito — si', e dice perche'",
+      all(p["verso"] is None for p in _p498.values())
+      and _p498["assente"].get("applicabile") is False and _p498["corto"].get("applicabile") is False
+      and _p498["corto"].get("in_attesa") is True and _p498["corto"].get("giorni") == 1
+      and all(_p498[k].get("applicabile", True) is True for k in ("buco", "nonclass", "nonquot", "senza", "vecchio", "nessuna"))
+      and "2026-09-16" in _p498["buco"]["perche"] and "v498" in _p498["vecchio"]["perche"]
+      and "non classificato" in _p498["nonclass"]["perche"], str(_p498))
+_tutto498 = dict(tendenza="favore", stime="favore", revisioni="favore", ricavi="favore", bilancio="favore", macro="neutro")
+_eb498 = lambda c: NL.esito_bilancio({**{k: {"verso": v} for k, v in _tutto498.items()}, "cds": c})
+_e498 = {k: _eb498(_p498[k]) for k in ("assente", "corto", "buco")}
+check("v498 esito: senza CDS o con lo storico ancora corto il nome lascia correre SENZA diventare provvisorio (non e' "
+      "un dato che manca); col CDS mancante per un buco e' provvisorio e nomina IN OSSERVAZIONE",
+      all(_e498[k]["esito"] == "LASCIAR CORRERE" and not _e498[k]["provvisorio"] and "cds" not in _e498[k]["ignoti"]
+          for k in ("assente", "corto"))
+      and _e498["buco"]["provvisorio"] and "IN OSSERVAZIONE" in _e498["buco"]["possibili"] and "cds" in _e498["buco"]["ignoti"],
+      str(_e498))
+check("v498 regola: tendenza rotta + CDS contro senza crescita = VENDITA PER EVIDENZA; il CDS a favore NON e' crescita e "
+      "non apre un conflitto; il CDS contro con la tendenza intatta mette in osservazione",
+      NL.regola_esito({"tendenza": "contro", "cds": "contro"}) == "VENDITA PER EVIDENZA"
+      and NL.regola_esito({"tendenza": "contro", "cds": "favore"}) == "IN OSSERVAZIONE"
+      and NL.regola_esito({"tendenza": "favore", "cds": "contro"}) == "IN OSSERVAZIONE"
+      and "cds" in NL.PROVE and "cds" not in NL.CRESCITA and NL.VERSI_POSSIBILI["cds"] == ("contro", "neutro", "favore"))
+_vt498 = NL.valuta_tenuta(_barre474(_sale), {**_riga481(), **_cds498(eccesso=_s498 + 5)}, _sem481(), _ALLE17)
+check("v498 collegamento eseguito: valuta_tenuta legge il CDS dalla riga della pipeline, e la sua prova entra nell'esito "
+      "(LASCIAR CORRERE diventa IN OSSERVAZIONE)",
+      _vt498["prove"]["cds"]["verso"] == "contro" and _vt498["esito"] == "IN OSSERVAZIONE"
+      and NL.valuta_tenuta(_barre474(_sale), {**_riga481(), **_cds498(cds_stato="assente")}, _sem481(), _ALLE17)["esito"]
+      == "LASCIAR CORRERE", str(_vt498["prove"]["cds"]))
+_soglie498 = {"soglia": (_num481(r"di oltre il \*\*(\d+)%\*\* PIÙ"), NL.SOGLIA_CDS),
+              "giorni": (_num481(r"in \*\*(\d+)\*\* giorni di compensazione"), UD.CDS_SEDUTE_PROVA)}
+check("v498 la soglia e la finestra del CDS nel codice sono QUELLE di LIBRO.md §1sexies, lette dal libro (v474), e il "
+      "libro porta la risposta del CEO parola per parola e la misura dello storico che non c'e'",
+      all(a is not None and abs(a - b) < 1e-9 for a, b in _soglie498.values())
+      and "Si, se poi riesci già a trovare dati storici per iniziarlo già a misurare adesso meglio" in _s1sex.replace("\n", " ")
+      and "risponde 403 sia da questo ambiente sia" in _s1sex.replace("\n", " "), str(_soglie498))
+# --- la resa nel blocco delle posizioni: la regola una volta, la prova misurata fra le prove, chi non ce l'ha in silenzio
+_rt498 = {**_rt481, "AAA": {**_rt481["AAA"], **_cds498(eccesso=30.0)}, "BBB": {**_rt481["BBB"], **_cds498(cds_stato="assente")},
+          "CCC": {**_rt481["CCC"], **_cds498(stato="storico corto")}, "EEE": {**_rt481["EEE"], **_cds498(eccesso=30.0)}}
+_tn498 = NL.tenuta_posizioni(["BBB", "CCC", "AAA", "DDD", "EEE"], _bt481, _rt498, _sem481(), _px481,
+                             {**{k: 50.0 for k in _bt481}, "EEE": 120.0}, {k: 10 for k in _bt481},
+                             {"AAA": 0.1, "BBB": 0.2, "CCC": 0.4, "DDD": 0.2, "EEE": 0.1}, _ALLE17, _dec481,
+                             {"fx": 1.12, "valore": 5000.0, "rlibro": {}, "rqqq": {}, "rend": {}, "trim": {"EEE": 5}})
+_rtn498 = "\n".join(NL.righe_tenuta(_tn498))
+def _blk498(tk):
+    # il blocco di una posizione: dalla sua riga d'esito alla riga successiva che non e' rientrata
+    i = _rtn498.find(f"\n  {tk:5} ")
+    if i < 0:
+        return ""
+    m = re.search(r"\n  \S", _rtn498[i + 1:])
+    return _rtn498[i + 1:i + 1 + m.start()] if m else _rtn498[i + 1:]
+check("v498 resa: la regola del CDS sta UNA volta in testa al blocco, con chi ha un CDS, chi no, chi non si sa, e quanti "
+      "giorni di storico mancano (dalla pipeline, nessuna data proiettata)",
+      _rtn498.count("CDS (decisione del CEO del 17/10/2026)") == 1
+      and "con un CDS compensato a ICE: AAA, CCC, EEE" in _rtn498 and "senza, e la prova non si applica: BBB" in _rtn498
+      and "stato del CDS non noto: DDD" in _rtn498
+      and "NON ANCORA IN FUNZIONE: servono 22 giorni di compensazione raccolti, oggi 1 (dal 16/10/2026)" in _rtn498,
+      _rtn498[:1500])
+check("v498 resa: la prova misurata sta fra le prove contro coi suoi numeri e l'indice; il nome senza CDS non porta una "
+      "riga CDS; CDS e bilancio contro insieme si dichiarano lo stesso canale (B3)",
+      "CDS +30,0% in 21 giorni di compensazione (100 → 130 pb dal 16/09) contro 0,0% dell'indice CDX IG: +30,0% "
+      "rispetto all'indice" in _blk498("AAA") and "CDS" not in _blk498("BBB").replace("CDS compensato", "")
+      and NL.NOTA_CDS_CANALE in _blk498("EEE") and NL.NOTA_CDS_CANALE not in _blk498("AAA")
+      and "CDS: il run della pipeline non porta i CDS" in _blk498("DDD"), _blk498("AAA") + " || " + _blk498("BBB"))
+_o498 = {**_o481, "watchlist": [_w473("SPEC", tenuta=NL.valuta_tenuta(_barre474(_sale), {**_riga481(), **_cds498(cds_stato="assente")},
+                                                                      _sem481(), _ALLE17)),
+                                _w473("OCCA", tenuta=NL.valuta_tenuta(_barre474(_sale), {**_riga481(), **_cds498(eccesso=-30.0, nome=-30.0)},
+                                                                      _sem481(), _ALLE17))]}
+_rw498 = "\n".join(ROT.righe_watchlist(_o498))
+check("v498 sorvegliati (eseguito, v483): la stessa riga della regola in testa alla watchlist, e la prova del nome nella "
+      "sua riga di tenuta — il restringimento a favore",
+      _rw498.count("CDS (decisione del CEO del 17/10/2026)") == 1 and "con un CDS compensato a ICE: OCCA" in _rw498
+      and "senza, e la prova non si applica: SPEC" in _rw498
+      and "a favore: tendenza intatta" in _rw498 and "-30,0% rispetto all'indice" in _rw498, _rw498[-1500:])
+check("v498 il formato porta la prova del CDS in §5 e §6 e nel registro delle richieste: non piu' «solo informazione»",
+      "è una **prova della tenuta**" in _fa496 and "la tenuta ha una prova in più, il **CDS**" in _fa496
+      and "come prova della tenuta, in\nfunzione quando lo storico raccolto basta (17/10)" in _fa496
+      and "È INFORMAZIONE: non è una prova della tenuta" not in _fa496)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

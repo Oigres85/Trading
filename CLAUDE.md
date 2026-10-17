@@ -7545,3 +7545,65 @@ tenuta ne' un colore del semaforo — se il CEO vorra' farne un segnale, lo deci
   spento quando ICE non risponde, la frase della v367 rimessa nel pacchetto.
 - Pavimenti: `test_app.mjs` 600 → 605, `test_update_data.py` 240 → 255 (N_CHECKS_MINIMO 250 → 270),
   `test_analisi_libro.py` 575 → 585. `?v=` e `BUILD_VERSION` a 497: cambia `assets/app.js`.
+
+## ⚖️ v498 — IL CDS DIVENTA UNA PROVA DELLA TENUTA, E LO STORICO GRATUITO NON ESISTE (MISURATO DA DUE RETI)
+
+Risposta del CEO (17/10/2026) alla domanda se un allargamento del CDS dovesse entrare nella tenuta, testuale:
+*"Si, se poi riesci già a trovare dati storici per iniziarlo già a misurare adesso meglio"*.
+
+### Lo storico: cercato prima di scrivere, e non c'è
+| fonte | esito il 17/10/2026 |
+|---|---|
+| ICE, l'API pubblica della v497 | ignora le date chieste (`clearingDate`, `date`, `asOfDate`, `businessDate`): sempre l'ultimo giorno |
+| DTCC, diffusione SEC delle operazioni sui CDS (pubblica dal 2022) | **403 (Akamai) da questo ambiente E dai runner di GitHub**: misurato con una sonda su un ramo usa e getta |
+| archivio web | due fotografie dell'elenco di ICE, maggio e luglio 2024 (lette dai runner: da qui la connessione si chiude) |
+| siti pubblici | CDS sovrani (Investing.com, Macrosynergy), non societari; il resto a pagamento (S&P, LSEG) |
+
+⚠ **Una fonte bloccata da un ambiente va provata dall'altro prima di dichiararla morta**: la pipeline non gira qui,
+gira sui runner di GitHub, e la v497 aveva misurato DTCC solo da qui. Stavolta la risposta è la stessa, ma è una misura.
+⚠ I log dei job non si leggono da questo ambiente (il `gh` interno rifiuta il reindirizzamento allo storage): la sonda
+scrive l'esito in un file del proprio ramo, e quello si legge con l'API dei contenuti.
+⚠ **Il ramo `sonda-cds-storico` resta su GitHub**: da qui né `git push --delete` né l'API possono cancellare un ramo
+(il proxy lo rifiuta). Non tocca `main` e non gira più; il CEO lo può togliere dalla pagina dei rami.
+
+### La misura: un mese, al netto del mercato
+`update_data.finestra_cds`: lo spread del nome in **21** giorni di compensazione RACCOLTI accanto a quello dell'indice
+CDX della **stessa cedola** (100 → investment grade, 500 → high yield) negli STESSI due giorni; l'**eccesso** è il
+rapporto fra le due crescite meno uno. Conta la parte del nome: se si allarga tutto il credito, è il semaforo a dirlo
+(famiglia credito), e contarlo anche qui sarebbe lo stesso segnale due volte (B3).
+- La pipeline **misura**, `numeri_libro.prova_cds` **decide**: la soglia (±**20%**, convenzione del 17/10, v240)
+  vive col codice della regola e un gate la rilegge da `LIBRO.md` §1sexies insieme ai 21 giorni (v474).
+- **Nei due versi** (v482): il restringimento oltre la soglia sta a favore, ma **non è crescita** e non apre un
+  conflitto, come un bilancio solido.
+- Il numero deciso è quello stampato: l'eccesso si arrotonda una volta sola, in pipeline (v496).
+
+### Tre assenze, e non sono la stessa cosa (v406)
+- **nessun CDS compensato** → la prova NON SI APPLICA: l'esito non diventa provvisorio;
+- **storico corto** (meno di 22 giorni raccolti) → NON ANCORA IN FUNZIONE: lo dice una riga per blocco, coi giorni
+  contati dalla pipeline — nessuna data proiettata (v396);
+- **dato mancante** (un buco, la scadenza standard che rotola il 20/03 e il 20/09, l'indice che cambia serie o
+  versione, uno snapshot precedente) → provvisorio, come ogni prova.
+⚠⚠ **`applicabile` è il campo che separa la prima e la seconda dalla terza.** Senza, ogni nome senza CDS — sette
+posizioni su dieci — sarebbe diventato PROVVISORIO il giorno stesso, e i quattro con un CDS per un mese intero:
+un'assenza strutturale letta come un dato che manca.
+⚠ Un nome **non classificato** in `config/cds_entita.json` resta un dato che manca, non un'assenza: il sistema non
+sa se un CDS c'è.
+⚠ **Due volte l'anno la prova manca per un mese**: ICE pubblica solo la scadenza standard corrente, e una variazione a
+cavallo del 20 marzo o del 20 settembre mescolerebbe due scadenze. Si dichiara, non si compensa.
+⚠ **Annotato e NON corretto**: le variazioni in punti base della v497 (5, 21 e 63 giorni, nelle schede) a cavallo della
+rotazione portano dentro lo stesso effetto. Sono informazione e la prima rotazione è a marzo 2027: va guardato prima.
+
+### Un fossile svegliato e riagganciato
+**v482 pinnava 486 combinazioni**, cioè 3^5 × 2: il NUMERO delle famiglie di oggi. Aggiunto il CDS sono 1458 ed è
+andato rosso. L'invariante era che le combinazioni siano TUTTE: ora è il prodotto dei versi possibili di ogni prova.
+E «tutto misurato non è provvisorio» comprende il CDS.
+
+### I gate
+- Pipeline: la base è il giorno 21 posizioni indietro (non il primo dello storico); nome e indice che si allargano
+  insieme danno un eccesso vicino a zero (la proprietà che una formula senza l'indice non soddisfa, v326); gli stati
+  costruiti (storico corto, buco, rotazione, cambio di serie o versione, cedola senza indice); il collegamento in
+  `cds_dei_titoli` coi suoi argomenti.
+- Analisi: la soglia nei due versi col bordo, i tre casi senza verso, l'esito non provvisorio per chi non ha la prova,
+  la regola, il collegamento ESEGUITO in `valuta_tenuta` e nella watchlist (v483), la resa, il libro e il formato.
+- **16 iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**, ciascuna sul controllo atteso — fra queste l'eccesso calcolato senza l'indice (lo prende solo la proprieta' «nome e mercato insieme fanno zero»), la base presa dal primo giorno dello storico, la rotazione della scadenza ignorata, la versione dell'indice ignorata, la cedola sbagliata nel collegamento, la soglia con l'uguale, l'assenza strutturale contata come dato mancante, il CDS contato fra la crescita, la riga della regola tolta dalla watchlist, la soglia cambiata nel solo libro.
+- Pavimenti: `test_update_data.py` 255 → 265 (N_CHECKS_MINIMO 270 → 285), `test_analisi_libro.py` 585 → 600. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

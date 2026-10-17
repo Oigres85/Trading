@@ -1523,6 +1523,10 @@ def righe_watchlist(o):
         L.append("   tenuta (LIBRO.md §1sexies, decisioni del CEO del 14/10): per ogni nome cosa direbbe la regola se fosse "
                  "in portafoglio — il bilancio dell'evidenza, contro e a favore, non la sola tecnica · semaforo "
                  + f"{sem.get('colore') or 'n.d.'}{' (MINIMO)' if sem.get('minimo') else ''} sugli stessi dati di numeri_libro")
+        # v498 — la prova del CDS una volta per blocco: la stessa riga delle posizioni (una resa, v161)
+        import numeri_libro
+        L.append("   " + numeri_libro.riga_regola_cds([(t["tk"], ((t.get("tenuta") or {}).get("prove") or {}).get("cds"))
+                                                       for t in w]))
     if cal.get("errore") or cal.get("giorni_non_letti"):
         L.append("   ⚠ calendario delle trimestrali incompleto: una data mancante non vuol dire 'nessuna uscita'")
     for etichetta, k, _ in GRUPPI_WATCHLIST:

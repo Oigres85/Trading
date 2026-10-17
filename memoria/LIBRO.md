@@ -473,12 +473,40 @@ POSIZIONI», v481-v482). Le soglie sono **convenzioni scelte il 14/10/2026**, no
 | **Ricavi** | ultimo trimestre in calo sullo stesso trimestre dell'anno prima | da **+25%** sull'anno prima: crescita | `data.json` → `tv.conto_trim`, trimestre trovato per data |
 | **Bilancio** | **corto**: brucia cassa e la liquidità copre meno di **12** mesi del denominatore che vincola (perdita operativa, perdita più dividendi sulle privilegiate, investimenti — sui soli impianti se gli investimenti sono acquisti di attività immateriali) | **solido**: si autofinanzia (flusso di cassa libero positivo), oppure brucia cassa con un'autonomia da **24** mesi in su | `data.json` → `combustione`, solo rapporti |
 | **Macro** | semaforo arancione o rosso · OPPURE il nome brucia cassa e la famiglia credito è accesa (v404, v467) | — (un quadro calmo è l'assenza di un rischio, non una prova di crescita) | semaforo, segno del flusso di cassa |
+| **CDS** (il mercato del credito sul nome, v498) | lo spread del CDS a 5 anni cresce in **21** giorni di compensazione di oltre il **20%** PIÙ di quello dell'indice CDX della stessa cedola (investment grade sulla cedola 100, high yield sulla 500) | scende di oltre il 20% più dell'indice — ma non è crescita: non apre un conflitto | `data.json` → `cds.finestra`: prezzi di ICE Clear Credit, storico raccolto dalla pipeline |
 
 In mezzo restano la tendenza **in correzione** (chiusura sotto una sola delle due medie: non è
-una rottura), le stime mosse meno del 5%, i ricavi fra 0 e +25%, un'autonomia fra 12 e 24 mesi.
+una rottura), le stime mosse meno del 5%, i ricavi fra 0 e +25%, un'autonomia fra 12 e 24 mesi, il
+CDS che si muove entro il 20% da quello dell'indice.
 Due prove dello stesso canale si dichiarano tali: macro e bilancio su chi brucia cassa sono il
-mercato dei capitali visto da due lati (B3); stime e revisioni sono la stessa famiglia su due
-orizzonti, e quando si contraddicono il disaccordo è un fatto.
+mercato dei capitali visto da due lati (B3), e così CDS e bilancio quando sono contro insieme — il
+CDS è il prezzo che il mercato dà al rischio che il bilancio misura; stime e revisioni sono la
+stessa famiglia su due orizzonti, e quando si contraddicono il disaccordo è un fatto.
+
+**Il CDS** (v498) — risposta del CEO del 17/10/2026 alla domanda se un allargamento del CDS dovesse
+diventare una prova della tenuta, testuale: *"Si, se poi riesci già a trovare dati storici per
+iniziarlo già a misurare adesso meglio"*.
+- **Conta la parte del nome.** Lo spread si confronta con quello dell'indice CDX della stessa cedola
+  negli stessi due giorni: se si allarga tutto il credito lo dice il semaforo (famiglia credito), e
+  contarlo anche qui sarebbe lo stesso segnale due volte (B3).
+- **Nei due versi, con la stessa soglia** (v482): il restringimento oltre il 20% sta a favore, ma
+  non è crescita e non apre un conflitto, come un bilancio solido.
+- **Chi non ha un CDS compensato a ICE non ha questa prova**: non è un dato che manca, è un mercato
+  che non c'è, e l'esito non diventa provvisorio. Quali nomi lo hanno lo dice a ogni analisi la riga
+  della regola in testa al blocco, non un elenco scritto qui (invecchierebbe da solo, v410).
+- **Non è ancora in funzione.** Servono 22 giorni di compensazione raccolti, e uno storico gratuito
+  non esiste — misurato il 17/10/2026: ICE pubblica solo l'ultimo giorno e ignora le date chieste;
+  la diffusione pubblica SEC delle operazioni sui CDS (DTCC) risponde 403 sia da questo ambiente sia
+  dai server di GitHub da cui gira la pipeline; l'archivio web ha due sole fotografie dell'elenco di
+  ICE, di maggio e luglio 2024. Lo storico lo raccoglie la pipeline dal 16/10/2026, e la riga della
+  regola dice a ogni analisi quanti giorni ha: fino ad allora la prova non c'è, e non rende
+  provvisorio nessun esito.
+- **Due volte l'anno non si misura per un mese**: il 20 marzo e il 20 settembre la scadenza standard
+  a 5 anni rotola e l'indice cambia serie, ICE pubblica solo la scadenza nuova, e una variazione a
+  cavallo mescolerebbe due scadenze. In quelle settimane la prova manca, e l'esito dei nomi con un
+  CDS diventa provvisorio.
+- La soglia del **20%** in un mese è una **convenzione scelta il 17/10/2026**, non una misura (v240):
+  lo storico per misurarla non esiste ancora. Si rimisura sullo storico raccolto dopo sei mesi.
 
 **Fuori dal bilancio, accanto** — perché non si calcolano o non sono prove:
 - **le notizie** — NON calcolate: per ogni nome in vendita, in conflitto o in osservazione si

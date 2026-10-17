@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 270  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282 (sale, mai scende)
+N_CHECKS_MINIMO = 285  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -2065,6 +2065,97 @@ check("v497 sorveglianza: i CDS mancano → missing; vecchi di 9 giorni → stal
 check("v497 il collegamento (v399, v443): main() passa a aggiorna_cds le righe seguite E il BTP, e il riepilogo finisce "
       "in macro['cds'] — che e' la chiave che la sorveglianza legge",
       'macro["cds"] = aggiorna_cds(watchlist + ([btp]' in _SRC_UD_CODICE and '_cds = macro.get("cds")' in _SRC_UD_CODICE)
+
+# ======================== v498 — LA PROVA DEL CDS NELLA TENUTA: UN MESE, AL NETTO DELL'INDICE ========================
+# Decisione del CEO del 17/10/2026. Lo storico vero ha UN giorno: una misura su un mese controllata sui dati del
+# giorno sarebbe verde per assenza del fenomeno (v196, v229). Lo stato si COSTRUISCE (v425, v429): prezzi scelti
+# per dare gli spread voluti, invertendo la conversione (monotona, v497) per bisezione.
+def _prezzo498(pb, cedola, d):
+    t0, lo, hi = _dt497.fromisoformat(d).date(), 1.0, 140.0
+    for _ in range(90):
+        mid = (lo + hi) / 2
+        s = ud.spread_cds(mid, cedola, t0, _m497, 0.0388)
+        if s is not None and s > pb:
+            lo = mid          # spread troppo alto: il prezzo deve salire
+        else:
+            hi = mid          # troppo basso, o oltre il dominio (prezzo sopra il massimo): deve scendere
+    return round((lo + hi) / 2, 6)
+_giorni498 = [(_dt497(2026, 9, 1) + _td497(days=k)).date().isoformat() for k in range(30)]
+def _storia498(nome, indice, n=30, cedola=100, fam="IG", serie_base=47, versione_base=1, m_base="2031-12-20",
+               manca=None):
+    """n righe; il nome e l'indice vanno in linea retta dal primo all'ultimo valore (in pb)."""
+    out = []
+    for k, d in enumerate(_giorni498[:n]):
+        x = k / max(n - 1, 1)
+        p = {} if d == manca else {"TESTCO": [cedola, _prezzo498(nome[0] + (nome[1] - nome[0]) * x, cedola, d)]}
+        ic = 100 if fam == "IG" else 500
+        i = {fam: [serie_base if k == 0 else 47, versione_base if k == 0 else 1, ic,
+                   _prezzo498(indice[0] + (indice[1] - indice[0]) * x, ic, d)]}
+        out.append({"d": d, "m": m_base if k == 0 else "2031-12-20", "r": 3.88, "p": p, "i": i})
+    return out
+# la base e' il giorno n posizioni indietro: con 30 righe e n=21 la finestra va dalla nona all'ultima
+_s498a = _storia498((100, 130), (60, 60))
+_f498a = ud.finestra_cds(_s498a, "TESTCO", 100)
+_pb498 = lambda r, v: ud._cds_pb_riga(r, v)
+_atteso498 = ((_pb498(_s498a[-1], _s498a[-1]["p"]["TESTCO"]) / _pb498(_s498a[-22], _s498a[-22]["p"]["TESTCO"]))
+              / (_pb498(_s498a[-1], _s498a[-1]["i"]["IG"][2:]) / _pb498(_s498a[-22], _s498a[-22]["i"]["IG"][2:])) - 1) * 100
+check("v498 finestra del CDS: la base e' il giorno 21 posizioni indietro nei giorni RACCOLTI (non il primo dello "
+      "storico), e l'eccesso e' il rapporto fra le due crescite meno uno — la formula ricalcolata dagli spread del "
+      "giorno: " + str(_f498a),
+      _f498a["stato"] == "misurato" and _f498a["da"] == _s498a[-22]["d"] and _f498a["a"] == _s498a[-1]["d"]
+      and _f498a["n"] == ud.CDS_SEDUTE_PROVA == 21 and _f498a["indice"] == "IG"
+      and abs(_f498a["eccesso_pct"] - _atteso498) < 0.051 and _f498a["nome_pct"] > 15)
+# ⚠ la proprieta' che una misura sbagliata non soddisfa per caso (v326): se il nome e il mercato si allargano INSIEME
+#   e nella stessa proporzione, la parte del nome e' zero — e' il semaforo a parlare (B3). Una formula che ignorasse
+#   l'indice qui darebbe +30%.
+_f498b = ud.finestra_cds(_storia498((100, 130), (60, 78)), "TESTCO", 100)
+_f498c = ud.finestra_cds(_storia498((100, 125), (60, 50)), "TESTCO", 100)
+check("v498 finestra: nome e indice che si allargano insieme danno un eccesso vicino a zero; il nome che si allarga "
+      "mentre l'indice si stringe lo da' piu' grande della propria variazione: " + str((_f498b.get("eccesso_pct"),
+                                                                                     _f498c.get("eccesso_pct"))),
+      abs(_f498b["eccesso_pct"]) < 1.5 and _f498b["nome_pct"] > 15 and _f498b["indice_pct"] > 15
+      and _f498c["eccesso_pct"] > _f498c["nome_pct"] + 10 and _f498c["indice_pct"] < 0)
+_f498d = ud.finestra_cds(_s498a[:21], "TESTCO", 100)
+check("v498 finestra: con 21 giorni raccolti la prova NON E' ANCORA IN FUNZIONE, e lo dice coi giorni che ha e quelli "
+      "che servono, e da quando raccoglie — nessuna data proiettata (v396)",
+      _f498d == {"stato": "storico corto", "n": 21, "giorni": 21, "servono": 22, "dal": _giorni498[0]}
+      and ud.finestra_cds([], "TESTCO", 100)["giorni"] == 0 and ud.finestra_cds([], "TESTCO", 100)["dal"] is None)
+_f498e = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, manca=_giorni498[0]), "TESTCO", 100)
+_f498e2 = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, manca=_giorni498[21]), "TESTCO", 100)
+_f498f = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, m_base="2031-06-20"), "TESTCO", 100)
+_f498g = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, serie_base=46), "TESTCO", 100)
+_f498g2 = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, versione_base=2), "TESTCO", 100)
+check("v498 finestra: un giorno senza il nome e' un BUCO (v205), la scadenza standard che rotola nella finestra e "
+      "l'indice che cambia serie o versione rendono la misura non calcolabile, e ogni stato dice perche' — nessuno "
+      "porta un eccesso",
+      _f498e["stato"] == "buco" and _giorni498[0] in _f498e["perche"] and _f498e2["stato"] == "buco"
+      and _giorni498[21] in _f498e2["perche"]
+      and _f498f["stato"] == "cambio di scadenza" and "2031-06-20" in _f498f["perche"]
+      and _f498g["stato"] == "cambio di serie" and "46" in _f498g["perche"]
+      and _f498g2["stato"] == "cambio di serie"
+      and all("eccesso_pct" not in f for f in (_f498e, _f498e2, _f498f, _f498g, _f498g2)))
+_f498h = ud.finestra_cds(_storia498((1000, 1300), (350, 350), n=22, cedola=500, fam="HY"), "TESTCO", 500)
+_f498i = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22), "TESTCO", 250)
+check("v498 finestra: la cedola sceglie l'indice — 500 pb contro il CDX high yield, 100 contro l'investment grade; "
+      "una cedola senza indice della stessa cedola lo dichiara",
+      _f498h["stato"] == "misurato" and _f498h["indice"] == "HY" and abs(_f498h["eccesso_pct"] - 30) < 2
+      and _f498i["stato"] == "indice n.d." and "250" in _f498i["perche"]
+      and ud.CDS_FAMIGLIA == {100: "IG", 500: "HY"})
+# --- il collegamento (v399, v443): cds_dei_titoli attacca la finestra a ogni quotato, coi suoi argomenti
+_prima498 = [{"d": d, "m": "2031-12-20", "r": 3.88, "p": {"ORCLE": [100, _prezzo498(150 + k, 100, d)]},
+              "i": {"IG": [47, 1, 100, _prezzo498(60, 100, d)]}} for k, d in enumerate(_giorni498[:21])]
+_storia498r = _prima498 + [ud.riga_storia_cds(_l497, 3.88)]
+_righe498 = [dict(r) for r in _righe497]
+ud.cds_dei_titoli(_righe498, _l497, _storia498r, _mappa497)
+_c498 = {r["ticker"]: r.get("cds") for r in _righe498}
+check("v498 collegamento: ogni titolo quotato porta la finestra calcolata sui SUOI argomenti (codice e cedola del "
+      "contratto standard) e la famiglia dell'indice; l'assente e il non classificato no",
+      _c498["ORCL"].get("finestra") == ud.finestra_cds(_storia498r, "ORCLE", _c498["ORCL"]["cedola_pb"])
+      and _c498["ORCL"]["finestra"]["stato"] == "misurato" and _c498["ORCL"]["indice"] == "IG"
+      and _c498["CRWV"]["finestra"]["stato"] == "buco" and _c498["CRWV"]["indice"] == "HY"
+      and _c498["CRWV"]["finestra"].get("indice") == "HY"
+      and "finestra" not in _c498["MU"] and "finestra" not in _c498["NUOVO"]
+      and _c497r["ORCL"]["finestra"]["stato"] == "storico corto")
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

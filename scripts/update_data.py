@@ -5028,6 +5028,9 @@ def credito_ccc(serie):
 # ⚠ L'ABBINAMENTO TITOLO → ENTITA' E' SCRITTO, NON INDOVINATO (config/cds_entita.json): per nome
 #   un algoritmo dava Super Micro → SUPERVALU e BlackRock → Black & Decker (classe v399, v448).
 # ⚠ La diffusione pubblica SEC dei CDS (DTCC) risponde 403 dall'ambiente di sviluppo: non e' la fonte.
+#   v498 — e 403 anche dai runner di GitHub (misurato il 17/10/2026 con una sonda su un ramo usa e getta),
+#   mentre l'archivio web ha solo due fotografie dell'API di ICE (maggio e luglio 2024): uno storico GRATUITO
+#   dei CDS su singolo nome non e' raggiungibile, e quello che serve alla tenuta lo raccoglie questa pipeline.
 ICE_CDS_NOMI = "https://www.ice.com/api/cds-settlement-prices/icc-single-names"
 ICE_CDS_INDICI = "https://www.ice.com/api/cds-settlement-prices/icc-indexes"
 CDS_STORIA = ROOT / "data" / "cds_storia.jsonl"
@@ -5036,6 +5039,8 @@ CDS_RECUPERO = 0.40       # convenzione di mercato per il debito senior non gara
 CDS_PUNTI_MAX = 30.0      # oltre, lo spread equivalente dipende dal recupero assunto: vale il prezzo
 CDS_STORIA_MAX = 520      # circa due anni di giorni di compensazione
 CDS_SEDUTE_VAR = (5, 21, 63)
+CDS_SEDUTE_PROVA = 21     # v498 — la finestra della prova di tenuta: un mese di giorni di compensazione RACCOLTI
+CDS_FAMIGLIA = {100: "IG", 500: "HY"}   # la cedola dice in che fascia il mercato tratta il nome
 CDS_STORIA_MINMAX = 20    # sotto, minimo e massimo dello storico raccolto non dicono niente
 CDS_DOC_PREF = ("XR14", "CR14", "MR14", "MM14", "XR", "CR", "MR", "MM")
 
@@ -5286,6 +5291,57 @@ def variazioni_cds(storia, serie, sedute=CDS_SEDUTE_VAR):
     return out
 
 
+def finestra_cds(storia, codice, cedola, n=CDS_SEDUTE_PROVA):
+    """v498 — la misura della prova di tenuta sul CDS (decisione del CEO del 17/10/2026, LIBRO.md §1sexies):
+    la variazione dello spread del nome in n giorni di compensazione RACCOLTI, accanto a quella dell'indice
+    CDX della stessa cedola sugli STESSI due giorni, e l'ECCESSO del nome sull'indice — il rapporto fra le
+    due crescite meno uno. Conta la parte del nome: se si allarga tutto il mercato del credito, e' il semaforo
+    a parlare (famiglia credito), e contarlo anche qui sarebbe lo stesso segnale due volte (B3).
+    Ogni stato si dichiara, e solo 'misurato' porta i numeri (v406):
+    - storico corto: meno di n+1 giorni raccolti — la prova non e' ancora in funzione (lo storico gratuito non
+      esiste, lo raccoglie questa pipeline dal primo giorno);
+    - buco: il nome non e' quotato in uno dei due giorni (un buco, non uno zero: v205);
+    - cambio di scadenza: la scadenza standard a 5 anni rotola il 20 marzo e il 20 settembre, e ICE pubblica
+      solo quella corrente — una variazione a cavallo mescolerebbe due scadenze;
+    - indice n.d. o cambio di serie: senza lo stesso indice, nella stessa serie e versione, nei due giorni, la
+      parte del mercato non si toglie (al cambio di serie cambia il paniere);
+    - spread n.d.: prezzo o tasso fuori dal dominio della conversione."""
+    st = storia or []
+    if len(st) <= n:
+        return {"stato": "storico corto", "n": n, "giorni": len(st), "servono": n + 1,
+                "dal": st[0]["d"] if st else None}
+    rb, ra = st[-1 - n], st[-1]
+    fam = CDS_FAMIGLIA.get(cedola)
+    out = {"n": n, "da": rb["d"], "a": ra["d"], "indice": fam}
+    vb, va = (rb.get("p") or {}).get(codice), (ra.get("p") or {}).get(codice)
+    if vb is None or va is None:
+        return {**out, "stato": "buco", "perche": f"il nome non e' quotato il {rb['d'] if vb is None else ra['d']}"}
+    mb, ma = (vb[2] if len(vb) > 2 else rb.get("m")), (va[2] if len(va) > 2 else ra.get("m"))
+    if mb != ma:
+        return {**out, "stato": "cambio di scadenza",
+                "perche": f"la scadenza standard passa dal {mb} al {ma} (rotazione semestrale): la variazione "
+                          "mescolerebbe due scadenze"}
+    if fam is None:
+        return {**out, "stato": "indice n.d.", "perche": f"cedola di {cedola} pb: nessun indice CDX della stessa cedola"}
+    ib, ia = (rb.get("i") or {}).get(fam), (ra.get("i") or {}).get(fam)
+    if not ib or not ia:
+        return {**out, "stato": "indice n.d.", "perche": f"indice CDX {fam} non raccolto il {rb['d'] if not ib else ra['d']}"}
+    if (ib[0], ib[1]) != (ia[0], ia[1]):
+        return {**out, "stato": "cambio di serie",
+                "perche": f"l'indice CDX {fam} passa dalla serie {ib[0]} versione {ib[1]} alla {ia[0]} versione "
+                          f"{ia[1]}: cambia il paniere"}
+    nb, na = _cds_pb_riga(rb, vb), _cds_pb_riga(ra, va)
+    xb, xa = _cds_pb_riga(rb, [ib[2], ib[3]]), _cds_pb_riga(ra, [ia[2], ia[3]])
+    if None in (nb, na, xb, xa) or nb <= 0 or xb <= 0:
+        return {**out, "stato": "spread n.d.", "perche": "spread non calcolabile in uno dei due giorni (tasso o prezzo)"}
+    nome, ind = na / nb - 1, xa / xb - 1
+    return {**out, "stato": "misurato", "pb_da": round(nb, 1), "pb_a": round(na, 1),
+            "indice_da": round(xb, 1), "indice_a": round(xa, 1),
+            "nome_pct": round(nome * 100, 1), "indice_pct": round(ind * 100, 1),
+            # ⚠ un arrotondamento solo (v496): la tenuta decide su questo numero, ed e' quello che si stampa
+            "eccesso_pct": round(((1 + nome) / (1 + ind) - 1) * 100, 1)}
+
+
 def _cds_primo_nome(nome):
     t = re.sub(r"[^a-z0-9]+", " ", str(nome or "").lower().replace("'", "")).split()
     t = [w for w in t if w != "the"]
@@ -5350,7 +5406,9 @@ def cds_dei_titoli(righe, lettura, storia, mappa):
              "prezzo": c["prezzo"], "punti": punti, "pb": round(pb, 1) if pb is not None else None,
              "indicativo": abs(punti) > CDS_PUNTI_MAX, "data": lettura["data"],
              "scadenza": c["scadenza"].isoformat(), "var": variazioni_cds(storia, ser),
-             "storia": _cds_storia_entita(storia, ser)}
+             "storia": _cds_storia_entita(storia, ser), "indice": CDS_FAMIGLIA.get(c["cedola"]),
+             # v498 — la misura della prova di tenuta: un mese, al netto dell'indice della stessa cedola
+             "finestra": finestra_cds(storia, cod, c["cedola"])}
         if note.get(tk):
             x["nota"] = note[tk]
         r["cds"] = x
