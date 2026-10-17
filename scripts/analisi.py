@@ -47,8 +47,10 @@ TITOLO_CHECKLIST = "## Cosa contiene la risposta"
 TITOLO_REGOLE = "## Regole"
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py")
+STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py")
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
+# v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
+MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzioni_titoli.jsonl")
 LIMITE_SECONDI = 600
 
 
@@ -81,6 +83,8 @@ def comandi(f, sedute=1):
     c.append(("SCHEDE DEL PROGETTO — canali col loro R², revisioni, cassa, short, depositi SEC",
               ["schede_progetto.py"]))
     c.append(("ROTAZIONE, CANDIDATI PER SETTORE E WATCHLIST CON GLI INGRESSI", ["rotazione.py"]))
+    c.append(("POSIZIONAMENTO — put/call, scadenze delle opzioni, grandi operatori (CFTC), bitcoin dall'ultima "
+              "chiusura USA", ["posizionamento.py"]))
     return c
 
 
@@ -138,7 +142,7 @@ def impronta(percorso=REGISTRO):
         return None
 
 
-def resa(esiti, cl, intestazione="", registro_cambiato=False):
+def resa(esiti, cl, intestazione="", registro_cambiato=False, memorie_cambiate=()):
     L = [intestazione] if intestazione else []
     falliti = []
     for k, e in enumerate(esiti, 1):
@@ -163,6 +167,11 @@ def resa(esiti, cl, intestazione="", registro_cambiato=False):
         L.append("⚠ REGISTRO DELLA PERFORMANCE AGGIORNATO: memoria/registro_performance.jsonl va committato e pushato su "
                  "main (git add, git commit, git pull --rebase origin main, git push) — altrimenti la riga di oggi resta "
                  "solo in questa sessione e il confronto con QQQ perde un giorno")
+    if memorie_cambiate:
+        L.append("")
+        L.append("⚠ MEMORIA AGGIORNATA: " + ", ".join(f"memoria/{Path(p).name}" for p in memorie_cambiate)
+                 + " va committata e pushata su main insieme al registro — sono sedute lette una volta sola (v496), "
+                 "e una riga non committata resta solo in questa sessione")
     if falliti:
         L.append("")
         L.append(f"⚠ {len(falliti)} strumento/i FALLITO/I: " + ", ".join(e["argv"][1].split("/")[-1] for e in falliti)
@@ -179,10 +188,12 @@ def main():
     lista = [(et, [sys.executable, str(RADICE / "scripts" / argv[0])] + argv[1:]) for et, argv in comandi(f, a.sedute)]
     t0 = time.time()
     prima = impronta()
+    prima_mem = {p: impronta(p) for p in MEMORIE}
     esiti = esegui(lista)
     testa = (f"ANALISI DEL LIBRO — {adesso.astimezone(ROMA):%d/%m/%Y %H:%M} ora italiana · New York "
              f"{adesso:%H:%M} · fase: {f.upper()} · {len(lista)} strumenti in parallelo, {round(time.time() - t0)} s")
-    testo, codice = resa(esiti, checklist(), testa, registro_cambiato=impronta() != prima)
+    testo, codice = resa(esiti, checklist(), testa, registro_cambiato=impronta() != prima,
+                         memorie_cambiate=[p for p in MEMORIE if impronta(p) != prima_mem[p]])
     print(testo)
     sys.exit(codice)
 

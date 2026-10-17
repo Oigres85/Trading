@@ -140,7 +140,9 @@ check("v224 macro_scores: chi non ha un punteggio non entra (niente chiavi vuote
 import update_data as ud
 from datetime import datetime, timezone, timedelta
 _orig_scrape = ud._finra_scrape
+_orig_storico = ud._finra_storico      # v496: i canali FINRA sono due, e cadono insieme qui
 ud._finra_scrape = lambda url: (_ for _ in ()).throw(RuntimeError("403 simulato"))
+ud._finra_storico = lambda url: (_ for _ in ()).throw(RuntimeError("403 simulato"))
 recent = (datetime.now(timezone.utc) - timedelta(days=40)).strftime("%Y-%m-01")
 prev_ok = {"series": "FINRA debit balances (mensile)", "date": recent, "value": 1415557,
            "peak": 1415557, "pct_of_peak": 100.0, "history": []}
@@ -152,6 +154,7 @@ md_old = ud.fetch_margin_debt(old)
 check("margin debt: prev troppo vecchio (120g) NON riportato avanti (Z.1 flaggato o None)",
       md_old is None or md_old.get("unreliable") is True)
 ud._finra_scrape = _orig_scrape
+ud._finra_storico = _orig_storico
 
 
 # ---------- Fix estrazione dati (v104.2): has_fundamentals ----------
@@ -375,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 235  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti (sale, mai scende)
+N_CHECKS_MINIMO = 250  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1711,6 +1714,169 @@ check("v492 collegamento: il giro del calendario EDGAR passa ogni risposta letta
       "storia[_tk] = storia_quotazione(_sub)" in _sec492
       and _sec492.find("storia[_tk] = storia_quotazione(_sub)") < _sec492.find("esteri.append(_tk)")
       and '"storia_quotazione": {"per_titolo": storia' in _sec492 and "if sec_cal or esteri or storia:" in _sec492)
+
+# ======================== v496 — LA VARIAZIONE ANNUA DELLA LEVA DAL FILE STORICO FINRA ========================
+# Il CEO, 17/10/2026: «Recupera altrove dati variazione annua della leva». La tabella della pagina FINRA si e'
+# accorciata a 12 mesi (v493) e il mese di un anno fa non c'era piu'. Il file storico che la pagina linka
+# (xlsx, dal 1997) lo ha: la serie diventa DATATA e ogni confronto si fa per data (v207, v393).
+import zipfile as _zf496, io as _io496
+from datetime import date as _d496
+
+
+def _xlsx496(righe, condivise=None):
+    """Un xlsx minimale: righe = [[(colonna, valore, tipo)]], tipo 'is' in linea, 's' condivisa, 'n' numero."""
+    buf = _io496.BytesIO()
+    with _zf496.ZipFile(buf, "w") as z:
+        z.writestr("[Content_Types].xml", "<Types/>")
+        xr = []
+        for i, celle in enumerate(righe, start=1):
+            cs = []
+            for col, v, t in celle:
+                if t == "is":
+                    cs.append(f'<c r="{col}{i}" s="2" t="inlineStr"><is><t>{v}</t></is></c>')
+                elif t == "s":
+                    cs.append(f'<c r="{col}{i}" t="s"><v>{v}</v></c>')
+                else:
+                    cs.append(f'<c r="{col}{i}" s="5"><v>{v}</v></c>')
+            xr.append(f'<row outlineLevel="0" r="{i}">' + "".join(cs) + "</row>")
+        z.writestr("xl/worksheets/sheet1.xml", "<worksheet><sheetData>" + "".join(xr) + "</sheetData></worksheet>")
+        if condivise is not None:
+            z.writestr("xl/sharedStrings.xml", "<sst>" + "".join(f"<si><t>{s}</t></si>" for s in condivise) + "</sst>")
+    return buf.getvalue()
+
+
+_hdr496 = [("A", "Free Credit Balances in Customers' Cash Accounts", "is"), ("B", "Year-Month", "is"),
+           ("D", "Debit Balances in Customers' Securities Margin Accounts", "is")]
+_x496 = _xlsx496([_hdr496, [("A", "215328", "n"), ("B", "2026-09", "is"), ("D", "1480054", "n")],
+                  [("A", "207641", "n"), ("B", "2026-08", "is"), ("D", "1453832", "n")]])
+check("v496 il file storico FINRA si legge per INTESTAZIONE: con le colonne riordinate (mese in B, debito in D) la "
+      "serie e' quella del debito, in ordine di data, mai la colonna che sta in seconda posizione",
+      ud._finra_xlsx_righe(_x496) == [("2026-08-01", 1453832.0), ("2026-09-01", 1480054.0)])
+_ser496 = (_d496(2026, 9, 1) - _d496(1899, 12, 30)).days
+_xs496 = _xlsx496([[("A", "0", "s"), ("B", "1", "s")], [("A", str(_ser496), "n"), ("B", "1480054", "n")]],
+                  condivise=["Year-Month", "Debit Balances in Customers' Securities Margin Accounts"])
+check("v496 il parser regge stringhe CONDIVISE e un mese scritto come data seriale Excel",
+      ud._finra_xlsx_righe(_xs496) == [("2026-09-01", 1480054.0)])
+_senza496 = _xlsx496([[("A", "Mese", "is"), ("B", "Valore", "is")], [("A", "2026-09", "is"), ("B", "1", "n")]])
+try:
+    ud._finra_xlsx_righe(_senza496)
+    _err496 = None
+except ValueError as _e496:
+    _err496 = str(_e496)
+check("v496 senza le intestazioni attese il parser si FERMA e lo dice: una colonna indovinata sarebbe un numero "
+      "plausibile e falso", _err496 is not None and "intestazioni" in _err496)
+
+# una serie con un BUCO a marzo 2026, FRA la base e il mese corrente: per posizione il «mese di un anno fa»
+# sarebbe agosto 2025 (un buco prima della base non sposta niente, e il check non discriminerebbe)
+_mesi496 = [ud._mese_spostato("2024-01-01", i) for i in range(33)]          # 2024-01 … 2026-09
+_fs496 = [(m, 1_000_000.0 + 10_000 * i) for i, m in enumerate(_mesi496) if m != "2026-03-01"]
+_gdp496 = ud._margin_vs_gdp
+ud._margin_vs_gdp = lambda cur: (None, None, None)
+_md496 = ud._margin_da_serie(_fs496, {"mesi_storico": len(_fs496)}, "file")
+_dz496 = dict(_fs496)
+check("v496 la variazione ANNUA si calcola per DATA: settembre 2026 contro settembre 2025, anche con un mese mancante "
+      "nello storico (per posizione sarebbe agosto 2025: la classe v393 dell'inflazione su 13 mesi)",
+      _md496["yoy"] == round((_dz496["2026-09-01"] / _dz496["2025-09-01"] - 1) * 100, 1)
+      and _md496["yoy"] != round((_fs496[-1][1] / _fs496[-13][1] - 1) * 100, 1)
+      and _md496["yoy_base"] == {"date": "2025-09-01", "value": round(_dz496["2025-09-01"])})
+_fsb496 = [(m, v) for m, v in _fs496 if m != "2026-08-01"]
+_mdb496 = ud._margin_da_serie(_fsb496, {}, "file")
+check("v496 la variazione MENSILE per data: senza il mese prima e' un buco, non il confronto con due mesi fa",
+      _mdb496["qoq"] is None and _md496["qoq"] == round((_dz496["2026-09-01"] / _dz496["2026-08-01"] - 1) * 100, 1))
+_annue496 = [(v / _dz496[ud._mese_spostato(d, -12)] - 1) * 100 for d, v in _fs496 if ud._mese_spostato(d, -12) in _dz496]
+check("v496 il percentile della variazione annua e' calcolato su TUTTE le variazioni annue dello storico (per data), e "
+      "il campione e' dichiarato col suo inizio e la sua fine",
+      _md496["yoy_rango"] == int(ud._rango_midrank(_annue496[-1], _annue496) + 0.5)
+      and _md496["yoy_campione"] == {"n": len(_annue496), "dal": "2025-01-01", "al": "2026-09-01"}
+      and _md496["yoy_max"]["date"] in _dz496)
+import rotazione as _rot496
+_griglia496 = [3.0, 1.0, 2.0, 2.0, 5.0, -1.0, 2.0]
+check("v496 il percentile della pipeline usa la convenzione midrank di rotazione.percentile_midrank (e di dgPercentile): "
+      "due implementazioni della stessa formula non possono divergere (v161)",
+      all(abs(ud._rango_midrank(x, _griglia496) - _rot496.percentile_midrank(x, _griglia496)) < 1e-9
+          for x in (-2.0, -1.0, 0.5, 2.0, 2.5, 5.0, 9.0)))
+_lunga496 = [(ud._mese_spostato("2010-01-01", i), 500_000.0 + i) for i in range(131)]
+_lunga496[60] = (_lunga496[60][0], 900_000.0)        # sotto il pavimento documentato: e' il caso che discrimina
+_mdl496 = ud._margin_da_serie(_lunga496, {}, "file")
+_corta496 = [(ud._mese_spostato("2025-10-01", i), 900_000.0 + i) for i in range(12)]
+_mdc496 = ud._margin_da_serie(_corta496, {}, None)
+check("v496 con lo storico lungo il massimo si LEGGE dallo storico (data e valore); con la sola tabella di 12 mesi resta "
+      "il pavimento documentato di ottobre 2021",
+      _mdl496["peak"] == 900_000 and _mdl496["peak_date"] == _lunga496[60][0]
+      and _mdc496["peak"] == 935904 and _mdc496["peak_date"] == "2021-10-01" and _mdc496["storico_mesi"] == 12)
+_un496, _info496 = ud._unisci_finra([("2026-07-01", 10.0), ("2026-08-01", 20.0)],
+                                    [("2026-08-01", 21.0), ("2026-09-01", 30.0)])
+check("v496 file e tabella si uniscono per data: la tabella (cio' che la pagina mostra adesso) vale sui mesi in comune e "
+      "completa quelli che il file non ha ancora; un mese in cui discordano si CONTA",
+      _un496 == [("2026-07-01", 10.0), ("2026-08-01", 21.0), ("2026-09-01", 30.0)]
+      and _info496["discordi"] == ["2026-08-01"] and _info496["dalla_tabella"] == ["2026-09-01"])
+
+# i tre esiti della catena, con le fonti finte (la rete non entra nei test)
+_scr496, _sto496 = ud._finra_scrape, ud._finra_storico
+_ko496 = lambda url: (_ for _ in ()).throw(RuntimeError("403 simulato"))
+# una distribuzione che discrimina: vent'anni di crescita forte (+3% al mese), poi otto di crescita lenta, poi un anno
+# a +1,5% al mese. Sull'intero storico l'ultima variazione annua sta a meta'; sugli ultimi dieci anni starebbe in cima.
+_v496, _lungo496 = 1_000_000.0, []
+for _i496 in range(357):
+    _lungo496.append((ud._mese_spostato("1997-01-01", _i496), _v496))
+    _v496 *= 1.03 if _i496 < 200 else (1.004 if _i496 < 344 else 1.015)
+ud._finra_scrape, ud._finra_storico = _ko496, (lambda url: (_lungo496, "https://www.finra.org/x.xlsx"))
+_solo_file496 = ud.fetch_margin_debt(None)
+ud._finra_scrape, ud._finra_storico = (lambda url: _lungo496[-12:]), _ko496
+_solo_tab496 = ud._margin_da_serie(*ud._unisci_finra([], _lungo496[-12:]), None)
+_solo_tab496b = ud.fetch_margin_debt(None)
+ud._finra_scrape, ud._finra_storico = _scr496, _sto496
+ud._margin_vs_gdp = _gdp496
+check("v496 se la tabella della pagina non risponde ma il file storico si', la leva e' quella del file — FINRA, non un "
+      "dato riportato dal run precedente — e la variazione annua c'e'",
+      _solo_file496 is not None and not _solo_file496.get("carried") and _solo_file496.get("yoy") is not None
+      and _solo_file496.get("fonte_storico") == "https://www.finra.org/x.xlsx" and _solo_file496["storico_mesi"] == 357)
+_dzl496 = dict(_lungo496)
+_annl496 = [(v / _dzl496[ud._mese_spostato(d, -12)] - 1) * 100 for d, v in _lungo496 if ud._mese_spostato(d, -12) in _dzl496]
+check("v496 il percentile della variazione annua sta sull'INTERO storico del file (345 variazioni dal 1998), non su "
+      "una finestra recente: sugli ultimi dieci anni la stessa lettura starebbe in cima alla distribuzione",
+      _solo_file496["yoy_campione"]["n"] == 345 == len(_annl496)
+      and _solo_file496["yoy_rango"] == int(ud._rango_midrank(_annl496[-1], _annl496) + 0.5)
+      and abs(_solo_file496["yoy_rango"] - ud._rango_midrank(_annl496[-1], _annl496[-120:])) > 20)
+_vm496 = ud.validate_macro({"margin_debt": _solo_tab496b})
+_vmok496 = ud.validate_macro({"margin_debt": _solo_file496})
+_c496 = lambda v: next((c for c in v["checks"] if c["key"] == "margin_debt_storico"), {})
+check("v496 senza il file storico (la sola tabella di 12 mesi) la variazione annua e' un buco e il gate SUONA "
+      "(margin_debt_storico missing → avviso nel CI): un canale che muore in silenzio e' la classe v389",
+      _solo_tab496b is not None and _solo_tab496b.get("yoy") is None and _c496(_vm496).get("status") == "missing"
+      and any(a.startswith("margin_debt_storico") for a in _vm496["alerts"])
+      and _c496(_vmok496).get("status") == "ok")
+
+# il link al file si legge DALLA PAGINA: e' la fonte a dire dove sta (il percorso noto e' la riserva)
+_get496 = ud.requests.get
+class _R496:
+    def __init__(self, testo=None, contenuto=b""):
+        self.text, self.content = testo, contenuto
+    def raise_for_status(self):
+        return None
+_chieste496 = []
+def _fake496(url, headers=None, timeout=None):
+    _chieste496.append(url)
+    if url.endswith(".xlsx"):
+        return _R496(contenuto=_x496)
+    return _R496(testo='<a class="download-margin-statistics" href="/sites/default/files/2027-01/margin-statistics.xlsx">x</a>')
+ud.requests.get = _fake496
+try:
+    _st496, _u496 = ud._finra_storico("https://www.finra.org/pagina")
+    ud.requests.get = lambda url, headers=None, timeout=None: (_chieste496.append(url) or
+                                                               (_R496(contenuto=_x496) if url.endswith(".xlsx")
+                                                                else _R496(testo="<p>nessun link</p>")))
+    _st496b, _u496b = ud._finra_storico("https://www.finra.org/pagina")
+finally:
+    ud.requests.get = _get496
+check("v496 il file si scarica dal link che la PAGINA dichiara; senza link, dal percorso noto dichiarato come riserva; "
+      "lo stesso UA della tabella (l'Akamai di finra.org)",
+      _u496 == "https://www.finra.org/sites/default/files/2027-01/margin-statistics.xlsx"
+      and _u496b == ud.FINRA_XLSX_RISERVA and len(_st496) == 2 and _st496b == _st496)
+_corpo496 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("def _finra_storico("):]
+_corpo496 = _corpo496[:_corpo496.find("\ndef ", 10)]
+check("v496 il file storico usa lo stesso UA della tabella (FINRA_UA): un UA da browser con Accept prende 403 dall'Akamai",
+      _corpo496.count("headers=FINRA_UA") == 2 and '"Accept"' not in _corpo496)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

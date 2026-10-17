@@ -4701,8 +4701,7 @@ def _finra_scrape(url):
     a un UA generico SENZA Accept — era QUESTA la causa dei fallimenti, anche in CI."""
     MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
               "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
-    finra_ua = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
-    html = requests.get(url, headers=finra_ua, timeout=25).text
+    html = requests.get(url, headers=FINRA_UA, timeout=25).text
     rows = re.findall(r"<td[^>]*>\s*([A-Z][a-z]{2})-(\d{2})\s*</td>\s*<td[^>]*>\s*\$?([\d,]+)", html)
     fs = []
     for mon, yy, val in rows:
@@ -4737,47 +4736,210 @@ def _punteggio_da_bande(v, bande):
     return clamp(bande[-1][3])
 
 
+FINRA_UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+FINRA_PAGINE = ("https://www.finra.org/investors/learn-to-invest/advanced-investing/margin-statistics",
+                "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics")
+# il percorso che la pagina linkava il 17/10/2026: si usa SOLO se la pagina non ne dichiara uno
+FINRA_XLSX_RISERVA = "https://www.finra.org/sites/default/files/2021-03/margin-statistics.xlsx"
+
+
+def _mese_spostato(iso, mesi):
+    """'AAAA-MM-01' spostato di `mesi` mesi di calendario (negativi = indietro). Per DATA, mai per
+    posizione in una lista (v207, v393): un mese mancante resta un buco, non sposta il confronto."""
+    t = int(iso[:4]) * 12 + int(iso[5:7]) - 1 + mesi
+    return f"{t // 12:04d}-{t % 12 + 1:02d}-01"
+
+
+def _rango_midrank(x, serie):
+    """Percentile 'midrank': quota della serie sotto x piu' meta' dei pari, x 100. E' la convenzione di
+    dgPercentile (assets/app.js) e di rotazione.percentile_midrank: un gate le confronta (v161)."""
+    if x is None or not serie:
+        return None
+    sotto = sum(1 for y in serie if y < x)
+    pari = sum(1 for y in serie if y == x)
+    return (sotto + pari / 2) / len(serie) * 100
+
+
+def _finra_xlsx_righe(contenuto):
+    """v496 — Le righe del file storico FINRA (margin-statistics.xlsx): [(iso_date, debit balances $ mln)].
+    Un xlsx e' uno zip di XML: si legge con la libreria standard, senza dipendenze nuove (openpyxl nel CI
+    non c'e'). Le colonne si trovano per INTESTAZIONE ('Year-Month', 'Debit Balances…'), mai per
+    posizione: se FINRA le riordina, il parser segue invece di leggere la colonna sbagliata in silenzio
+    (C10). Stringhe in linea, condivise o numeri; un mese scritto come data seriale Excel si converte."""
+    import zipfile
+    z = zipfile.ZipFile(io.BytesIO(contenuto))
+    nomi = z.namelist()
+    condivise = []
+    if "xl/sharedStrings.xml" in nomi:
+        ss = z.read("xl/sharedStrings.xml").decode("utf-8")
+        condivise = [html.unescape(re.sub(r"<[^>]+>", "", si)) for si in re.findall(r"<si>(.*?)</si>", ss, re.S)]
+    fogli = sorted(n for n in nomi if re.match(r"xl/worksheets/sheet\d+\.xml$", n))
+    if not fogli:
+        raise ValueError("xlsx FINRA senza fogli di lavoro")
+    xml = z.read(fogli[0]).decode("utf-8")
+    tabella = []
+    for riga in re.findall(r"<row\b[^>]*>(.*?)</row>", xml, re.S):
+        celle = {}
+        for attr, corpo in re.findall(r"<c\b([^>]*?)(?:/>|>(.*?)</c>)", riga, re.S):
+            mr = re.search(r'\br="([A-Z]+)\d+"', attr)
+            if not mr:
+                continue
+            if 't="inlineStr"' in attr:
+                v = html.unescape(re.sub(r"<[^>]+>", "", corpo or ""))
+            elif 't="s"' in attr:
+                mv = re.search(r"<v>(\d+)</v>", corpo or "")
+                v = condivise[int(mv.group(1))] if mv and int(mv.group(1)) < len(condivise) else None
+            else:
+                mv = re.search(r"<v>([^<]*)</v>", corpo or "")
+                v = mv.group(1) if mv else None
+            celle[mr.group(1)] = v.strip() if isinstance(v, str) else v
+        tabella.append(celle)
+    col_mese = col_debito = None
+    for i, celle in enumerate(tabella):
+        for col, v in celle.items():
+            if isinstance(v, str) and v.lower().startswith("year-month"):
+                col_mese = col
+            if isinstance(v, str) and v.lower().startswith("debit balances"):
+                col_debito = col
+        if col_mese and col_debito:
+            corpo = tabella[i + 1:]
+            break
+    else:
+        raise ValueError("xlsx FINRA: intestazioni 'Year-Month' / 'Debit Balances' non trovate")
+    out = {}
+    for celle in corpo:
+        m, d = celle.get(col_mese), celle.get(col_debito)
+        if m is None or d is None:
+            continue
+        mm = re.match(r"(\d{4})-(\d{2})$", m)
+        if mm:
+            iso = f"{mm.group(1)}-{mm.group(2)}-01"
+        elif re.match(r"\d{4,6}(\.0+)?$", m):           # data seriale Excel (giorni dal 30/12/1899)
+            g = datetime(1899, 12, 30) + timedelta(days=int(float(m)))
+            iso = f"{g.year:04d}-{g.month:02d}-01"
+        else:
+            continue
+        try:
+            out[iso] = float(d)
+        except ValueError:
+            continue
+    return sorted(out.items())
+
+
+def _finra_storico(url_pagina):
+    """v496 — Lo STORICO DATATO del margin debt: il file che la pagina FINRA linka, dal 1997. La tabella
+    della pagina si e' accorciata a 12 mesi nell'ottobre 2026, e con 12 mesi il mese di un anno fa non
+    c'e': la variazione annua spariva (v493). Il link si legge DALLA PAGINA — e' la fonte a dichiarare
+    dove sta il file —, il percorso noto e' solo la riserva. Stesso UA della tabella: l'Akamai di
+    finra.org risponde 403 a un UA da browser con Accept (gotcha gia' documentato)."""
+    pagina = requests.get(url_pagina, headers=FINRA_UA, timeout=25).text
+    m = (re.search(r'href="([^"]*margin-statistics[^"]*\.xlsx)"', pagina)
+         or re.search(r'href="([^"]+\.xlsx)"', pagina))
+    url = urllib.parse.urljoin("https://www.finra.org/", html.unescape(m.group(1))) if m else FINRA_XLSX_RISERVA
+    r = requests.get(url, headers=FINRA_UA, timeout=30)
+    r.raise_for_status()
+    return _finra_xlsx_righe(r.content), url
+
+
+def _unisci_finra(storico, tabella):
+    """Una serie per DATA: lo storico del file, e sopra la tabella della pagina (e' cio' che FINRA
+    mostra adesso: se il file e' indietro di un mese, la tabella lo completa). I mesi in comune che
+    non coincidono si CONTANO e si dichiarano, mai si nascondono (v406)."""
+    serie = dict(storico or [])
+    discordi = sorted(d for d, v in (tabella or []) if d in serie and abs(serie[d] - v) > 0.5)
+    aggiunti = sorted(d for d, _ in (tabella or []) if d not in serie)
+    serie.update(dict(tabella or []))
+    return sorted(serie.items()), {"mesi_storico": len(storico or []), "mesi_tabella": len(tabella or []),
+                                   "dalla_tabella": aggiunti, "discordi": discordi}
+
+
+def _margin_da_serie(fs, unione, url_storico):
+    """Il blocco margin_debt da una serie DATATA [(iso, $ mln)]. Ogni confronto per DATA (v393): la
+    variazione annua col mese di un anno prima, la mensile col mese prima — se il mese non c'e' e' un
+    buco dichiarato, mai la posizione precedente della lista. Il percentile della variazione annua si
+    calcola su tutte le variazioni annue dello storico: senza una distribuzione «+31%» non si colloca."""
+    dz = dict(fs)
+    data, cur = fs[-1]
+    base_a, base_m = _mese_spostato(data, -12), _mese_spostato(data, -1)
+    yoy = round((cur / dz[base_a] - 1) * 100, 1) if dz.get(base_a) else None
+    mom = round((cur / dz[base_m] - 1) * 100, 1) if dz.get(base_m) else None
+    annue = [(d, (v / dz[_mese_spostato(d, -12)] - 1) * 100) for d, v in fs if dz.get(_mese_spostato(d, -12))]
+    lunga = len(fs) >= 120          # dieci anni: il massimo si legge dallo storico, non da un pavimento
+    if lunga:
+        peak_date, peak = max(fs, key=lambda t: t[1])
+    else:
+        HIST_ATH_FLOOR = 935904.0                   # ATH pre-2026 documentato (ott 2021)
+        vals = [v for _, v in fs]
+        peak = max(max(vals), HIST_ATH_FLOOR)
+        peak_date = max(fs, key=lambda t: t[1])[0] if max(vals) >= HIST_ATH_FLOOR else "2021-10-01"
+    rango = _rango_midrank((cur / dz[base_a] - 1) * 100, [y for _, y in annue]) if yoy is not None else None
+    mx = max(annue, key=lambda t: t[1]) if annue else None
+    _md_gdp = _margin_vs_gdp(cur)     # una sola chiamata: la serie PIL si scarica una volta
+    return {
+        "value": round(cur), "peak": round(peak),
+        "pct_of_peak": round(cur / peak * 100, 1),
+        # ⚠ la chiave si chiama "qoq" per ragioni storiche ma contiene la variazione
+        # MENSILE (mom): la UI la etichettava "trim." — corretto in v175. Non rinominata
+        # per non rompere i data.json già pubblicati che la CI usa in carry-forward.
+        "yoy": yoy, "qoq": mom, "date": data, "peak_date": peak_date,
+        # v188: leva rapportata al PIL — l'unica delle due che non sia satura
+        "pct_of_gdp": _md_gdp[0], "gdp_median_ref": _md_gdp[1],
+        "series": "FINRA debit balances (mensile)",
+        "history": [round(v) for _, v in fs[-24:]],
+        # v496 — lo storico DATATO e la variazione annua con la sua distribuzione
+        "storia": [[d, round(v)] for d, v in fs[-36:]],
+        "yoy_base": {"date": base_a, "value": round(dz[base_a])} if yoy is not None else None,
+        # un arrotondamento solo, dal valore pieno e per eccesso sul mezzo come Math.round di dgPercentile:
+        # arrotondare a un decimale e poi all'intero da' 82 in Python e 83 in JS sullo stesso 82,46 (v415)
+        "yoy_rango": math.floor(rango + 0.5) if rango is not None else None,
+        "yoy_campione": ({"n": len(annue), "dal": annue[0][0], "al": annue[-1][0]} if annue else None),
+        "yoy_max": {"value": round(mx[1], 1), "date": mx[0]} if mx else None,
+        "storico_mesi": len(fs), "storico_dal": fs[0][0],
+        "fonte_storico": url_storico, "unione": unione,
+        "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+    }
+
+
 def fetch_margin_debt(prev_md=None):
     """Margin Debt: leva a credito reale sui conti titoli. CATENA DI FONTI (post-incidente
     "widget congelato a $622 mld Z.1 mentre FINRA stampava $1,42T"):
-    1. scrape FINRA su DUE URL (pagina investors + canonical rules-guidance) — è la serie vera;
+    1. FINRA, due canali sulla stessa serie: il FILE STORICO (xlsx, dal 1997, v496) che la pagina
+       linka, e la TABELLA della pagina (12 mesi dall'ottobre 2026), su DUE URL; si uniscono per data.
        NB: finra.org è dietro Akamai e da IP datacenter (GitHub Actions) può rispondere con
        challenge → per questo esiste il passo 2;
-    2. CARRY-FORWARD: se lo scrape fallisce ma il run PRECEDENTE aveva un dato FINRA con
+    2. CARRY-FORWARD: se FINRA non risponde ma il run PRECEDENTE aveva un dato FINRA con
        reference date ≤ 90 giorni, quel dato è ANCORA VALIDO (serie mensile con ~1 mese di
        lag di pubblicazione): lo riporto avanti marcato carried=True. Un dato mensile vero
        di 2 mesi batte una serie sbagliata di oggi;
     3. Fed Z.1 (misura DIVERSA e più piccola: conti a margine broker-dealer) SOLO come ultima
        spiaggia, marcata unreliable=True: validate_macro e la UI la trattano come inaffidabile.
     Plausibilità 2026: un valore FINRA < $800 mld = spazzatura → scartato a monte."""
-    for url in ("https://www.finra.org/investors/learn-to-invest/advanced-investing/margin-statistics",
-                "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics"):
+    tabella, storico, url_storico = [], [], None
+    for url in FINRA_PAGINE:
         try:
             fs = _finra_scrape(url)
             if len(fs) >= 6 and fs[-1][1] >= 800_000:      # threshold plausibilità 2026 ($ mln)
-                vals = [v for _, v in fs]
-                cur = vals[-1]
-                HIST_ATH_FLOOR = 935904.0                   # ATH pre-2026 documentato (ott 2021)
-                peak = max(max(vals), HIST_ATH_FLOOR)
-                peak_date = max(fs, key=lambda t: t[1])[0] if max(vals) >= HIST_ATH_FLOOR else "2021-10-01"
-                yoy = round((cur / vals[-13] - 1) * 100, 1) if len(vals) >= 13 and vals[-13] else None
-                mom = round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None
-                _md_gdp = _margin_vs_gdp(cur)     # una sola chiamata: la serie PIL si scarica una volta
-                return {
-                    "value": round(cur), "peak": round(peak),
-                    "pct_of_peak": round(cur / peak * 100, 1),
-                    # ⚠ la chiave si chiama "qoq" per ragioni storiche ma contiene la variazione
-                    # MENSILE (mom): la UI la etichettava "trim." — corretto in v175. Non rinominata
-                    # per non rompere i data.json già pubblicati che la CI usa in carry-forward.
-                    "yoy": yoy, "qoq": mom, "date": fs[-1][0], "peak_date": peak_date,
-                    # v188: leva rapportata al PIL — l'unica delle due che non sia satura
-                    "pct_of_gdp": _md_gdp[0], "gdp_median_ref": _md_gdp[1],
-                    "series": "FINRA debit balances (mensile)",
-                    "history": [round(v) for v in vals[-24:]],
-                    "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                }
+                tabella = fs
+                break
         except Exception as e:  # noqa: BLE001
             print(f"!! margin debt FINRA scrape ({url.split('/')[-2]}): {e}", file=sys.stderr)
+    for url in FINRA_PAGINE:
+        try:
+            st, u = _finra_storico(url)
+            if len(st) >= 25 and st[-1][1] >= 800_000:
+                storico, url_storico = st, u
+                break
+            print(f"!! margin debt FINRA storico ({url.split('/')[-2]}): {len(st)} mesi, ultimo "
+                  f"{st[-1] if st else None} — scartato", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001
+            print(f"!! margin debt FINRA storico ({url.split('/')[-2]}): {e}", file=sys.stderr)
+    if tabella or storico:
+        fs, unione = _unisci_finra(storico, tabella)
+        if len(fs) >= 6 and fs[-1][1] >= 800_000:
+            if unione["discordi"]:
+                print(f"·· margin debt: file e tabella FINRA discordano su {', '.join(unione['discordi'])} "
+                      "— vale la tabella, che e' cio' che la pagina mostra adesso", file=sys.stderr)
+            return _margin_da_serie(fs, unione, url_storico)
 
     # 2) carry-forward dell'ultimo FINRA valido (serie mensile: resta attuale ~90 giorni)
     if prev_md and "FINRA" in str(prev_md.get("series", "")) and prev_md.get("date") and prev_md.get("value", 0) >= 800_000:
@@ -4876,6 +5038,12 @@ def validate_macro(macro):
         add("margin_debt", md.get("date"), 90,
             "ok" if (a is not None and a <= 90) else "stale",
             "carry-forward dal run precedente (scrape FINRA ko)" if md.get("carried") else "")
+        # v496 — la variazione annua e la sua distribuzione vengono dal FILE STORICO FINRA (xlsx): la
+        # tabella della pagina copre 12 mesi e non le permette. Se il file non e' stato letto il buco
+        # deve suonare, non sparire (v389: un try/except per-fonte spegne una funzionalita' in silenzio).
+        _st_ok = md.get("yoy") is not None and md.get("yoy_rango") is not None
+        add("margin_debt_storico", md.get("date"), 90, "ok" if _st_ok else "missing",
+            "" if _st_ok else "variazione annua o sua distribuzione non calcolabili: storico FINRA (xlsx) non letto")
 
     # --- indicatori mensili/trimestrali: età massima per cadenza (reference date) ---
     # SOGLIE CALIBRATE SUL CALENDARIO DI PUBBLICAZIONE REALE (v137 — fix "banner che grida al

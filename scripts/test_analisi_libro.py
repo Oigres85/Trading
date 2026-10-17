@@ -4487,6 +4487,311 @@ check("v495 la struttura e' «solo informazione» (CEO, 17/10): esito, prove e i
       and {r["esito"] for r in _var495["senza"]["righe"]} >= {"VENDITA PER EVIDENZA", NL.CONFLITTO, "LASCIAR CORRERE"},
       str({n: [(r["tk"], r["esito"]) for r in v["righe"]] for n, v in _var495.items()}))
 
+# ============================== v496 — POSIZIONAMENTO: PUT E CALL, SCADENZE, GRANDI OPERATORI, BITCOIN ==============================
+# Il CEO, 17/10/2026: «Effettua anche analisi su put e call e sui grandi movimenti che vengono effettuati il week end … Rendi
+# sempre tutto strutturale»; alla domanda su quali movimenti: «Scadenza delle opzioni, Posizioni dei grandi operatori, Bitcoin
+# nel weekend». E: «Recupera altrove dati variazione annua della leva». Lo stato si COSTRUISCE (v425, v429): nessuna rete.
+import posizionamento as PZ
+import urllib.error as _ue496
+from datetime import date as _d496, datetime as _dt496, timedelta as _td496
+
+
+def _opz496(tk, scad, tipo, strike, oi, vol, bid, ask, ultimo=None):
+    return {"option": f"{tk}{scad[2:4]}{scad[5:7]}{scad[8:10]}{tipo}{int(round(strike * 1000)):08d}",
+            "open_interest": oi, "volume": vol, "bid": bid, "ask": ask, "last_trade_price": ultimo}
+
+
+_O496 = []
+for _s496 in ("2026-10-16", "2026-10-23", "2026-11-20", "2026-12-18"):
+    for _k496 in (90, 95, 100, 105, 110):
+        _O496.append(_opz496("XYZ", _s496, "C", _k496, 10, 1, max(0.05, 100 - _k496) + 2.0, max(0.05, 100 - _k496) + 2.2))
+        _O496.append(_opz496("XYZ", _s496, "P", _k496, 10, 1, max(0.05, _k496 - 100) + 1.8, max(0.05, _k496 - 100) + 2.0))
+# la mensile di novembre: open interest costruito perche' il max pain sia 100 (2500 a 95 e a 105, 1000 a 100)
+for _x496 in _O496:
+    if "XYZ261120" in _x496["option"]:
+        _x496["open_interest"] = {"C00095000": 100, "C00100000": 300, "P00100000": 300, "P00105000": 100}.get(
+            _x496["option"][9:], 0)
+# i piu' scambiati: la scadenza della seduta (16/10) ha il volume maggiore ma non conta; fuori dal denaro vincono
+# call 110 del 23/10 e put 90 del 20/11
+for _x496 in _O496:
+    _x496["volume"] = {"XYZ261016C00110000": 9000, "XYZ261016P00090000": 9000, "XYZ261023C00110000": 700,
+                       "XYZ261120C00105000": 300, "XYZ261120P00090000": 800, "XYZ261023P00095000": 500,
+                       "XYZ261023C00090000": 5000}.get(_x496["option"], _x496["volume"])
+_O496.append(_opz496("XYZ1", "2026-11-20", "C", 50, 99999, 99999, 50, 51))       # radice rettificata: fuori
+# ⚠ una radice di sole LETTERE diversa dal simbolo: la regex la legge, e solo il controllo della radice la toglie (la
+#   prima stesura aveva solo XYZ1, che la regex scarta da se': l'iniezione del controllo tolto non mordeva)
+_O496.append(_opz496("XYZQ", "2026-11-20", "P", 60, 88888, 88888, 40, 41))
+_CAT496 = {"data": {"current_price": 101.0, "close": 100.0, "iv30": 50.0, "last_trade_time": "2026-10-16T15:59:59",
+                    "options": _O496}}
+_OGGI496 = _d496(2026, 10, 17)
+_ct496 = PZ.contratti(_CAT496, "XYZ")
+check("v496 la catena CBOE si legge per radice del simbolo: i contratti di un'altra radice (XYZ1, XYZQ) restano fuori, "
+      "scadenza, tipo e strike dal simbolo dell'opzione",
+      len(_ct496) == 40 and all(c["strike"] not in (50, 60) for c in _ct496)
+      and {"scad": "2026-11-20", "tipo": "P", "strike": 105.0} in [{k: c[k] for k in ("scad", "tipo", "strike")} for c in _ct496])
+check("v496 il terzo venerdi' del mese, col calendario (ottobre 2026 il 16, novembre il 20, dicembre il 18)",
+      [PZ.terzo_venerdi(2026, m) for m in (10, 11, 12)] == [_d496(2026, 10, 16), _d496(2026, 11, 20), _d496(2026, 12, 18)])
+_mens496 = PZ.scadenze_mensili(["2026-10-16", "2026-10-23", "2026-11-20", "2026-12-18"], _OGGI496)
+check("v496 le scadenze MENSILI si scelgono fra quelle LISTATE, dopo oggi: novembre a 34 giorni, dicembre trimestrale "
+      "(«tre streghe»); una scadenza passata e una settimanale no",
+      _mens496 == [{"data": "2026-11-20", "trimestrale": False, "giorni": 34},
+                   {"data": "2026-12-18", "trimestrale": True, "giorni": 62}], str(_mens496))
+_gf496 = PZ.scadenze_mensili(["2025-04-11", "2025-04-17", "2025-04-25", "2025-05-16"], _d496(2025, 4, 1))
+_gf496b = PZ.scadenze_mensili(["2025-04-17", "2025-04-18", "2025-05-16"], _d496(2025, 4, 1))
+check("v496 col venerdi' festivo (Venerdi' Santo, 18/04/2025) la mensile e' il giovedi' listato; se il venerdi' e' listato "
+      "vince il venerdi', e il giovedi' prima e' una scadenza qualunque",
+      [m["data"] for m in _gf496] == ["2025-04-17", "2025-05-16"] and [m["data"] for m in _gf496b] == ["2025-04-18", "2025-05-16"])
+check("v496 il max pain e' lo strike a cui il valore delle opzioni in scadenza e' MINIMO (qui 100: 1.000 contro 2.500 a 95 "
+      "e a 105), fra gli strike plausibili attorno al prezzo",
+      PZ.max_pain(_ct496, "2026-11-20", 100.0) == 100 and PZ.max_pain(_ct496, "2026-11-20", 300.0) is None)
+_conti496 = lambda q: PZ.scadenza_dei_conti(["2026-10-23", "2026-11-20"], {"data": "2026-10-23", "quando": q}, _OGGI496)
+check("v496 la scadenza che comprende i conti: lo stesso giorno solo se escono prima dell'apertura; dopo la chiusura, o "
+      "senza ora dichiarata, la successiva (il verso prudente)",
+      _conti496("time-pre-market") == "2026-10-23" and _conti496("time-after-hours") == "2026-11-20"
+      and _conti496("time-not-supplied") == "2026-11-20" and PZ.scadenza_dei_conti(["2026-10-23"], None, _OGGI496) is None)
+_ps496 = PZ.piu_scambiati(_ct496, 100.0, "2026-10-16")
+check("v496 le piu' scambiate: solo FUORI dal denaro (call sopra il prezzo, put sotto), esclusa la scadenza della seduta "
+      "(9.000 contratti il 16/10 non contano) e in contratti, non in premio (la call 90 del 23/10 e' nel denaro)",
+      (_ps496["C"]["strike"], _ps496["C"]["scad"]) == (110.0, "2026-10-23")
+      and (_ps496["P"]["strike"], _ps496["P"]["scad"]) == (90.0, "2026-11-20"), str(_ps496))
+_rie496 = PZ.riepilogo(_CAT496, "XYZ", _OGGI496, {"data": "2026-10-23", "quando": "time-after-hours"}, in_seduta=False)
+_ries496 = PZ.riepilogo(_CAT496, "XYZ", _OGGI496, None, in_seduta=True)
+check("v496 il riepilogo: prezzo di CHIUSURA fuori seduta e quello corrente in seduta; la mensile appena scaduta (16/10) che "
+      "l'istantanea porta ancora; la quota d'open interest che scade alla mensile; la seduta dei volumi",
+      _rie496["spot"] == 100.0 and _ries496["spot"] == 101.0 and _rie496["mensile_scaduta"] == "2026-10-16"
+      and _rie496["mensile"]["data"] == "2026-11-20" and abs(_rie496["mensile"]["quota_oi"] - 800 / (800 + 20 * 10) * 100) < 1e-9
+      and _rie496["seduta"] == "2026-10-16" and _rie496["scadenza_conti"] == "2026-11-20" and _rie496["distacco_conti"] == 28)
+check("v496 put/call dei VOLUMI su tutta la seduta (compresa la scadenza del giorno), dell'OPEN INTEREST sulle sole scadenze "
+      "vive",
+      abs(_rie496["pc_vol"] - sum(c["vol"] for c in _ct496 if c["tipo"] == "P") / sum(c["vol"] for c in _ct496 if c["tipo"] == "C")) < 1e-12
+      and abs(_rie496["pc_oi"] - sum(c["oi"] for c in _ct496 if c["tipo"] == "P" and c["scad"] >= "2026-10-17")
+              / sum(c["oi"] for c in _ct496 if c["tipo"] == "C" and c["scad"] >= "2026-10-17")) < 1e-12)
+
+# --- il movimento implicito e' LO STESSO di app.js: le due lingue sulla stessa catena (v161, il contratto v323) ---
+_JS496 = r"""
+const fs = require("fs"), vm = require("vm");
+const src = fs.readFileSync(process.argv[2], "utf8");
+const el = () => ({addEventListener(){}, classList:{add(){},remove(){},toggle(){},contains:()=>false}, style:{}, dataset:{},
+  hidden:true, querySelector:()=>el(), querySelectorAll:()=>[], closest:()=>null});
+const ctx = {console:{log(){},warn(){},error(){}}, document:{querySelector:()=>el(), querySelectorAll:()=>[],
+  getElementById:()=>el(), createElement:()=>el(), addEventListener(){}, body:el()},
+  localStorage:{getItem:()=>null, setItem(){}, removeItem(){}}, window:{addEventListener(){}, matchMedia:()=>({matches:false})},
+  navigator:{clipboard:{}}, fetch:()=>Promise.reject(new Error("offline")), setInterval:()=>0, clearInterval(){},
+  setTimeout:()=>0, clearTimeout(){}, Event:class{}, MutationObserver:class{observe(){}}};
+vm.createContext(ctx); vm.runInContext(src, ctx, {filename: "app.js"});
+const casi = JSON.parse(fs.readFileSync(process.argv[3], "utf8"));
+process.stdout.write(JSON.stringify(casi.map(o => vm.runInContext("movimentoImplicito(" + JSON.stringify(o) + ")", ctx))));
+"""
+def _casojs496(spot, scad):
+    cs = [c for c in _ct496 if c["scad"] == scad]
+    riga = lambda c: {"strike": c["strike"], "bid": c["bid"], "ask": c["ask"], "iv": 50, "vol": c["vol"], "oi": c["oi"]}
+    return {"spot": spot, "expiries": [{"date": scad, "calls": [riga(c) for c in sorted(cs, key=lambda c: c["strike"]) if c["tipo"] == "C"],
+                                         "puts": [riga(c) for c in sorted(cs, key=lambda c: c["strike"]) if c["tipo"] == "P"]}]}
+_casi496 = [(100.0, "2026-11-20"), (102.5, "2026-11-20"), (97.0, "2026-12-18"), (100.0, "2026-10-23")]
+with tempfile.TemporaryDirectory() as _td496d:
+    _jsf496, _inf496 = Path(_td496d) / "mi.js", Path(_td496d) / "casi.json"
+    _jsf496.write_text(_JS496, encoding="utf-8")
+    _inf496.write_text(_json.dumps([_casojs496(s, d) for s, d in _casi496]), encoding="utf-8")
+    _rj496 = subprocess.run(["node", str(_jsf496), str(Path(__file__).resolve().parent.parent / "assets" / "app.js"),
+                             str(_inf496)], capture_output=True, text=True, timeout=120)
+try:
+    _js496 = _json.loads(_rj496.stdout)
+except ValueError:
+    _js496 = None
+_py496 = [PZ.movimento_implicito(_ct496, s, d) for s, d in _casi496]
+_conf496 = lambda j, p: (j is not None and p is not None and j["scadenze"][0]["strike"] == p["strike"]
+                         and abs(j["scadenze"][0]["pct"] - p["pct"]) < 1e-9 and abs(j["scadenze"][0]["straddle"] - p["straddle"]) < 1e-9
+                         and (j["scadenze"][0]["putVicino"] or {}).get("strike") == (p["put_vicino"] or {}).get("strike")
+                         and (j["scadenze"][0]["callVicino"] or {}).get("strike") == (p["call_vicino"] or {}).get("strike"))
+check("v496 il movimento implicito della catena CBOE e' LA STESSA definizione di movimentoImplicito in app.js: stesso strike "
+      "(a parita' di distanza il piu' basso), stesso straddle, stessa percentuale, stesso open interest dentro il movimento — "
+      "eseguite le due lingue sugli stessi quattro casi",
+      _js496 is not None and len(_js496) == 4 and all(_conf496(j, p) for j, p in zip(_js496, _py496)),
+      f"js {str(_js496)[:300]} · py {str(_py496)[:300]} · err {_rj496.stderr[-300:]}")
+
+# --- il put/call di mercato: la memoria delle sedute, tre esiti per giorno (v389) ---
+_pcj496 = {"ratios": [{"name": "TOTAL PUT/CALL RATIO", "value": "0.92"}, {"name": "EQUITY PUT/CALL RATIO", "value": "0.65"},
+                      {"name": "INDEX PUT/CALL RATIO", "value": "1.05"}, {"name": "SPX + SPXW PUT/CALL RATIO", "value": "1.46"},
+                      {"name": "CBOE VOLATILITY INDEX (VIX) PUT/CALL RATIO", "value": "0.32"}],
+           "EQUITY OPTIONS": [{"name": "VOLUME", "call": 3284761, "put": 2130650, "total": 5415411}]}
+check("v496 il file CBOE di una seduta: i rapporti PUBBLICATI dalla borsa (non ricalcolati dai volumi: v415) e i volumi "
+      "delle azioni",
+      PZ.leggi_pc(_pcj496, "2026-10-16") == {"data": "2026-10-16", "totale": 0.92, "azioni": 0.65, "indici": 1.05, "spx": 1.46,
+                                             "vix": 0.32, "azioni_put": 2130650, "azioni_call": 3284761})
+
+
+def _leggi496(url):
+    d = url.split("/")[-1][:10]
+    if d == "2026-10-15":
+        raise _ue496.URLError("rete")
+    if d in ("2026-10-16", "2026-09-07"):
+        raise _ue496.HTTPError(url, 403, "Forbidden", {}, None)
+    return _json.dumps({"ratios": [{"name": "EQUITY PUT/CALL RATIO", "value": "0.60"}]}).encode()
+
+
+_mem496 = {}
+_ag496 = PZ.aggiorna_pc(_OGGI496, _mem496, leggi=_leggi496, paralleli=2)
+check("v496 la memoria del put/call: un 403 VECCHIO e' una borsa chiusa e si registra (non si chiede piu'), un 403 di ieri e' "
+      "un file non ancora pubblicato e NON si registra, un errore di rete non e' un'assenza e si conta fra le NON lette",
+      _mem496.get("2026-09-07") == {"data": "2026-09-07", "assente": 403} and "2026-10-16" not in _mem496
+      and "2026-10-15" not in _mem496 and _ag496["non_lette"] == ["2026-10-15"]
+      and _ag496["non_ancora_pubblicate"] == ["2026-10-16"] and _mem496.get("2026-10-14", {}).get("azioni") == 0.60
+      and "2026-10-17" not in PZ.giorni_mancanti(_OGGI496, {}) and "2026-10-11" not in PZ.giorni_mancanti(_OGGI496, {}),
+      str(_ag496))
+_memst496 = {f"2026-09-{g:02d}": {"data": f"2026-09-{g:02d}", "azioni": a, "totale": a + 0.3}
+             for g, a in zip(range(1, 31), [0.5 + (i % 7) * 0.05 for i in range(30)])}
+_memst496["2026-09-15"] = {"data": "2026-09-15", "assente": 403}
+_st496 = PZ.stato_pc(_memst496)
+_az496 = [r["azioni"] for k, r in sorted(_memst496.items()) if r.get("azioni") is not None]
+_me496 = [sum(_az496[i - 9:i + 1]) / 10 for i in range(9, len(_az496))]
+check("v496 lo stato del put/call: percentile midrank dell'ultima seduta fra tutte, media di 10 sedute col suo percentile "
+      "fra le medie, le assenze fuori dalla distribuzione",
+      _st496["n"] == 29 and _st496["rango"] == int(ROT.percentile_midrank(_az496[-1], _az496) + 0.5)
+      and abs(_st496["media"] - _me496[-1]) < 1e-12 and _st496["n_medie"] == 20
+      and _st496["rango_media"] == int(ROT.percentile_midrank(_me496[-1], _me496) + 0.5), str(_st496)[:300])
+
+# --- la storia per titolo: si registra solo a seduta conclusa, una volta sola ---
+_NY496 = PZ.NEW_YORK
+_rr496 = {"XYZ": {"seduta": "2026-10-16", "pc_vol": 0.8, "pc_oi": 1.1, "iv30": 50.0}, "VUO": None}
+_reg496 = lambda fase, h, m, mem: PZ.registra_titoli(_rr496, mem, fase, _dt496(2026, 10, 16, h, m, tzinfo=_NY496))
+_m1, _m2, _m3, _m4 = [], [], [], []
+check("v496 la storia delle opzioni per titolo si scrive solo a seduta CONCLUSA — a borsa chiusa o dalle 16:30 di New York "
+      "(dati differiti di 15 minuti) — e una volta sola per seduta",
+      _reg496("seduta", 14, 0, _m1) == 0 and _reg496("after-hours", 16, 20, _m2) == 0 and _reg496("after-hours", 16, 40, _m3) == 1
+      and _reg496("chiuso", 12, 0, _m4) == 1 and _reg496("chiuso", 12, 0, _m4) == 0 and _m4[0]["data"] == "2026-10-16")
+_sto496 = [{"data": f"2026-08-{g:02d}", "tk": "XYZ", "pc_vol": 0.5 + g / 100, "pc_oi": 1.0, "iv30": 40 + g} for g in range(1, 26)]
+_testo496 = PZ.storia_titolo(_sto496, "XYZ")
+check("v496 sotto 20 sedute registrate la storia DICE quante ce ne sono invece di pubblicare un percentile; da 20 il "
+      "percentile dell'ultima seduta fra le registrate",
+      "in costruzione: 5 sedute registrate" in PZ.storia_titolo(_sto496[:5], "XYZ")
+      and "put/call dei volumi al 98° percentile" in _testo496 and "sulle 25 sedute registrate" in _testo496, _testo496)
+
+# --- i grandi operatori (CFTC): per CODICE, la settimana prima per DATA ---
+_hdr496 = ("Market_and_Exchange_Names,Report_Date_as_YYYY-MM-DD,CFTC_Contract_Market_Code,Open_Interest_All,"
+           "Dealer_Positions_Long_All,Dealer_Positions_Short_All,Asset_Mgr_Positions_Long_All,Asset_Mgr_Positions_Short_All,"
+           "Lev_Money_Positions_Long_All,Lev_Money_Positions_Short_All")
+_righe496 = [_hdr496,
+             "NASDAQ-100 Consolidated - CME,2026-10-13,20974+,1000,100,300,400,100,50,150",
+             "NASDAQ-100 Consolidated - CME,2026-09-29,20974+,1000,100,300,400,100,50,250",
+             "NASDAQ-100 Consolidated - CME,2026-10-06,20974+,1000,100,300,400,100,50,200",
+             "ALTRO MERCATO,2026-10-13,999999,1000,1,1,1,1,1,1"]
+_cot496 = PZ.cot_stato(PZ.cot_righe("\n".join(_righe496)))
+_nq496 = _cot496["20974+"]["categorie"]["lev"]
+check("v496 CFTC: i mercati per CODICE del regolatore; netto = lunghe meno corte in % dell'open interest; la variazione sulla "
+      "rilevazione PRECEDENTE PER DATA (le righe arrivano in disordine); un codice assente si dichiara, non sparisce",
+      abs(_nq496["pct"] - (-10.0)) < 1e-9 and abs(_nq496["var_pct"] - 5.0) < 1e-9 and _nq496["n"] == 3
+      and _nq496["rango"] == int(ROT.percentile_midrank(-10.0, [-20.0, -15.0, -10.0]) + 0.5)
+      and _cot496["20974+"]["precedente"] == "2026-10-06" and _cot496.get("13874+", {}).get("assente") is True,
+      str(_cot496)[:400])
+_rcot496 = "\n".join(PZ.righe_cot(_cot496, ["2023 (URLError)"]))
+check("v496 la resa CFTC dichiara la data del MARTEDI' e la pubblicazione del venerdi', gli archivi non letti, il codice non "
+      "trovato, la definizione del percentile e la base su Treasury e bitcoin",
+      "martedi' 13/10/2026" in _rcot496 and "archivi NON letti: 2023" in _rcot496 and "codice 13874+ NON trovato" in _rcot496
+      and "un corto al 100° percentile e' il MENO corto" in _rcot496 and "operazione sulla BASE" in _rcot496, _rcot496[:600])
+
+# --- il bitcoin dall'ultima chiusura USA ---
+_cand496 = PZ.candele_btc([[1792008000, 1, 1, 1, 81000.0, 1], [1792004400, 1, 1, 1, 80000.0, 1], ["x"]])
+_camp496 = _dt496(2026, 10, 16, 16, 0, tzinfo=_NY496)          # 20:00 UTC: candela che inizia alle 19:00 UTC
+_cand496b = PZ.candele_btc([[int(_camp496.timestamp()) - 3600, 1, 1, 1, 80000.0, 1],
+                            [int(_camp496.timestamp()), 1, 1, 1, 80500.0, 1],
+                            [int(_camp496.timestamp()) + 60 * 3600, 1, 1, 1, 84000.0, 1]])
+check("v496 le candele del bitcoin in ordine di tempo; il prezzo alla campana e' la chiusura della candela che FINISCE alle "
+      "16:00 di New York, e una candela mancante e' un buco, non la vicina (v207)",
+      [c["t"] for c in _cand496] == [1792004400, 1792008000] and PZ.prezzo_alle(_cand496b, _camp496) == 80000.0
+      and PZ.prezzo_alle(_cand496b, _camp496 + _td496(hours=5)) is None)
+_bsab496 = _barre474([100.0] * 5, fine="2026-10-16")
+_bgio496 = _barre474([100.0] * 5, fine="2026-10-15") + [{"t": "2026-10-16", "o": 1, "h": 1, "l": 1, "c": 1, "v": 1}]
+check("v496 l'ultima chiusura USA CONCLUSA: di sabato e' venerdi' alle 16:00 di New York; durante la seduta e' quella di ieri",
+      PZ.ultima_chiusura_usa(_bsab496, _dt496(2026, 10, 17, 9, 0, tzinfo=_NY496)) == (_d496(2026, 10, 16), _camp496)
+      and PZ.ultima_chiusura_usa(_bgio496, _dt496(2026, 10, 16, 11, 0, tzinfo=_NY496))[0] == _d496(2026, 10, 15))
+_ib496 = [100.0]
+for _i496 in range(120):
+    _ib496.append(_ib496[-1] * (1 + (0.02 if _i496 % 3 == 0 else -0.01)))
+_ms496 = [50.0]
+for _a496, _b496 in zip(_ib496, _ib496[1:]):
+    _ms496.append(_ms496[-1] * math.exp(2 * math.log(_b496 / _a496)))
+_btc496 = PZ.bitcoin(_cand496b, _barre474(_ms496, fine="2026-10-16"), _barre474(_ib496, fine="2026-10-16"), 100,
+                     _dt496(2026, 10, 19, 6, 0, tzinfo=_NY496))
+check("v496 MSTR sul bitcoin: beta e R² MISURATI su IBIT per data (qui costruiti a 2 e 1), il movimento del bitcoin dalla "
+      "campana di venerdi' ad adesso, il livello delle 17:00 (future CME) e l'equivalente in dollari sulla posizione",
+      _btc496 is not None and abs(_btc496["beta"] - 2.0) < 1e-9 and abs(_btc496["r2"] - 1.0) < 1e-9
+      and abs(_btc496["var"] - 5.0) < 1e-9 and _btc496["venerdi"] and _btc496["cme"] == 80500.0
+      and abs(_btc496["mstr_equivalente"] - 10.0) < 1e-9
+      and abs(_btc496["dollari"] - 0.10 * _ms496[-1] * 100) < 1e-6, str(_btc496)[:400])
+_rbtc496 = "\n".join(PZ.righe_btc(_btc496))
+check("v496 la resa del bitcoin dice che e' un conto su una relazione misurata, non una previsione dell'apertura, e che il "
+      "salto del future CME e' una convenzione di lettura",
+      "NON una previsione dell'apertura" in _rbtc496 and "convenzione di lettura" in _rbtc496 and "R² 1,00" in _rbtc496, _rbtc496)
+
+# --- i tre esiti delle rese: senza dati si dice, non si salta (v389) ---
+check("v496 senza dati ogni blocco lo DICHIARA: put/call, CFTC, bitcoin, catene, scadenze",
+      "NON DISPONIBILE" in "\n".join(PZ.righe_pc(None, {"non_lette": []}))
+      and "NON DISPONIBILE" in "\n".join(PZ.righe_cot({}, []))
+      and "NON DISPONIBILE: rete giu'" in "\n".join(PZ.righe_btc(None, "rete giu'"))
+      and "catena NON letta" in "\n".join(PZ.righe_opzioni({"XYZ": None}, {"XYZ": 10}))
+      and "NON DISPONIBILE" in "\n".join(PZ.righe_scadenze({}, _OGGI496)))
+_rop496 = "\n".join(PZ.righe_opzioni({"XYZ": _rie496}, {"XYZ": 10}, {"XYZ": "storia delle opzioni in costruzione: 1 seduta registrata"}))
+check("v496 la resa delle opzioni: la seduta dei volumi, il movimento implicito fino ai conti col distacco dichiarato quando la "
+      "scadenza listata cade oltre una settimana dopo, le piu' scambiate col verso dichiarato ignoto, la storia",
+      "seduta del 16/10/2026" in _rop496 and "cade 28 giorni dopo i conti" in _rop496
+      and "il verso, comprate o vendute, non e' nei dati" in _rop496 and "1 seduta registrata" in _rop496
+      and "volatilita' implicita a 30 giorni 50,0%" in _rop496 and "punti)" not in _rop496.split("XYZ —")[1].split("\n")[0], _rop496[:900])
+_rsc496 = "\n".join(PZ.righe_scadenze({"SPY": _rie496}, _OGGI496))
+check("v496 la resa delle scadenze: la mensile appena SCADUTA, la prossima mensile e la trimestrale coi giorni",
+      "la mensile del 16/10/2026 e' SCADUTA" in _rsc496 and "prossima mensile: 20/11/2026 (fra 34 giorni)" in _rsc496
+      and "prossima trimestrale: 18/12/2026 (fra 62 giorni)" in _rsc496, _rsc496)
+check("v496 il segno non resta su un movimento che si arrotonda a zero («-0,0%» si legge come un calo)",
+      PZ._sg(-0.04) == "0,0" and PZ._sg(0.04) == "0,0" and PZ._sg(0.06) == "+0,1" and PZ._sg(None) == "n.d.")
+
+# --- i collegamenti: il comando unico, il formato, le memorie ---
+_cm496 = {f: [a for _, a in AN.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+check("v496 il comando unico esegue posizionamento.py in ogni fase, e lo dichiara fra gli strumenti",
+      all(["posizionamento.py"] in v for v in _cm496.values()) and "posizionamento.py" in AN.STRUMENTI)
+_tm496, _ = AN.resa([], "## Cosa contiene la risposta\nx", memorie_cambiate=[AN.MEMORIE[0]])
+_tn496, _ = AN.resa([], "## Cosa contiene la risposta\nx", memorie_cambiate=[])
+check("v496 se le memorie del posizionamento cambiano il comando lo DICE (vanno committate col registro), altrimenti tace; e "
+      "main le confronta prima e dopo il giro",
+      "MEMORIA AGGIORNATA: memoria/cboe_putcall.jsonl" in _tm496 and "MEMORIA AGGIORNATA" not in _tn496
+      and "memorie_cambiate=[p for p in MEMORIE if impronta(p) != prima_mem[p]]"
+      in _corpo_di(Path(__file__).with_name("analisi.py").read_text(), "main"))
+_fa496 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_cl496 = AN.checklist() or ""
+check("v496 il formato porta la sezione 5bis del posizionamento — informazione, non prove — e la richiesta del 17/10 nel registro "
+      "delle richieste rese strutturali; la checklist la stampa",
+      "5bis. **Posizionamento**" in _cl496 and "È tutto INFORMAZIONE" in _cl496 and "grandi operatori (CFTC)" in _cl496
+      and "variazione\nannua della leva" in _fa496 and "un'uscita accesa (17/10)" in _fa496)
+check("v496 il posizionamento e' dichiarato nel censimento di /aggiorna con la sua ragione (v387)",
+      "`scripts/posizionamento.py` resta **fuori**" in (Path(__file__).resolve().parent.parent / ".claude" / "commands" / "aggiorna.md")
+      .read_text(encoding="utf-8"))
+_main496 = _corpo_di(Path(__file__).with_name("posizionamento.py").read_text(), "main")
+check("v496 collegamento in main: le catene delle posizioni E di SPY e QQQ, quattro archivi CFTC, le candele del bitcoin, MSTR "
+      "e IBIT, il calendario dei conti; le memorie scritte solo senza --no-memoria",
+      'simboli = sorted(qta) + ["SPY", "QQQ"]' in _main496 and "range(ANNI_COT + 1)" in _main496
+      and 'brief.barre, "IBIT"' in _main496 and "brief.calendario_trimestrali" in _main496
+      and "if not a.no_memoria:\n        scrivi_memoria_pc(memoria)" in _main496 and "righe_opzioni(rie, qta, storia)" in _main496)
+
+# --- la leva: la variazione annua accanto al semaforo, per data ---
+_lv496 = NL.famiglia_leva({"storia": [["2026-08-01", 1453832], ["2026-09-01", 1480054]], "yoy": 31.4, "yoy_rango": 82,
+                           "yoy_campione": {"n": 345, "dal": "1998-01-01", "al": "2026-09-01"},
+                           "yoy_max": {"value": 80.5, "date": "2000-03-01"}, "history": [9, 1]})
+check("v496 leva: il mese prima si cerca per DATA nello storico datato (la lista posizionale direbbe un calo che non c'e'), "
+      "e un mese mancante e' non misurabile",
+      _lv496["stato"] == "spento" and abs(_lv496["var_mese"] - (1480054 / 1453832 - 1)) < 1e-12
+      and NL.famiglia_leva({"storia": [["2026-07-01", 1], ["2026-09-01", 2]]})["stato"] == "non misurabile"
+      and NL.famiglia_leva({"history": [100, 102], "date": "2026-08-01"})["stato"] == "spento")
+check("v496 leva: la variazione annua col suo percentile e il massimo storico, dichiarata contesto e non colore; senza lo "
+      "storico FINRA il buco si dice",
+      NL.resa_anno_leva(_lv496) == ("sull'anno +31,4% (82° percentile delle 345 variazioni annue da gennaio 1998; massimo "
+                                    "+80,5% a marzo 2000) — contesto, non entra nel colore")
+      and "NON calcolabile" in NL.resa_anno_leva(NL.famiglia_leva({"history": [1, 2]})))
+_seg496 = {**_seg474, "margin": {"storia": [["2026-08-01", 1453832], ["2026-09-01", 1480054]], "yoy": 31.4, "yoy_rango": 82,
+                                 "yoy_campione": {"n": 345, "dal": "1998-01-01", "al": "2026-09-01"}}}
+_sm496 = NL.semaforo(_barre474(_sale), {k: _barre474(_sale, vol=_alto) for k in NL.LEADER}, _seg496, _ALLE17)
+_sm496["reazioni"] = _rz
+_rl496 = [r for r in NL.righe_semaforo(_sm496, None) if r.strip().startswith("leva:")]
+check("v496 collegamento: la riga della leva nel semaforo porta la variazione annua col percentile",
+      len(_rl496) == 1 and "sull'anno +31,4% (82° percentile delle 345" in _rl496[0] and "settembre 2026" in _rl496[0], str(_rl496))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "493";
+const BUILD_VERSION = "496";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8623,7 +8623,15 @@ async function loadPromptHeaderCloud() {
    sui versi spiega che il verso dipende dall'orizzonte. "Il sistema non ha il dato" e "ce l'ha e
    non te lo passa" si leggono uguali (v406). Una resa sola per il pacchetto e la scheda (v161). */
 function annoLeva(md) {
-  if (md && md.yoy != null && Number.isFinite(Number(md.yoy))) return `${signTxt(md.yoy)} sull'anno`;
+  /* v496 — la variazione annua viene dal FILE STORICO FINRA (dal 1997), letta per data, col suo percentile
+     sull'intero storico: senza una distribuzione «+31%» non si colloca. Il percentile arriva gia' intero
+     dalla pipeline: un arrotondamento solo, dal valore pieno (v415). */
+  if (md && md.yoy != null && Number.isFinite(Number(md.yoy))) {
+    const c = md.yoy_campione || {};
+    const rango = (md.yoy_rango != null && c.n && c.dal)
+      ? ` (${md.yoy_rango}° percentile delle ${c.n} variazioni annue da ${meseEsteso(c.dal)})` : "";
+    return `${signTxt(md.yoy)} sull'anno${rango}`;
+  }
   const n = ((md && md.history) || []).filter((v) => v != null).length;
   return n < 13
     ? `sull'anno non calcolabile (lo storico letto copre ${n} mesi: il mese di un anno fa non c'e')`

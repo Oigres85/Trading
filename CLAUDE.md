@@ -7396,3 +7396,85 @@ Risposte del CEO del 17/10/2026, testuali: *"1 si"* e *"2 solo informazione"*.
 ⚠ La prima stesura del registro in FORMATO spezzava con un punto e virgola la frase *"un'uscita accesa (17/10)"*, a cui
 il gate v494 è ancorato: corretta la stesura, che diceva la stessa cosa, invece di riagganciare un gate per una virgola.
 `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🧭 v496 — PUT E CALL, SCADENZE, GRANDI OPERATORI, BITCOIN NEL WEEKEND; LA LEVA ANNUA DAL FILE STORICO; LIQUIDITÀ 45.000 €
+
+Il CEO, 17/10/2026, testuale: *"Recupera altrove dati variazione annua della leva. Effettua anche analisi su put e call
+e sui grandi movimenti che vengono effettuati il week end (non ricordo nome tecnico). Rendi sempre tutto strutturale. La
+liquiditita è di 45k"*; alla domanda su quali movimenti: *"Scadenza delle opzioni, Posizioni dei grandi operatori,
+Bitcoin nel weekend"*.
+
+### 💧 La liquidità, e una «prova» che era circolare
+45.000 € dichiarati: la stima scritta nel libro era **72.360 €, 27.360 € di troppo**, ed era un conto mio — ai 56.600 €
+dichiarati il 15/10 avevo **sommato** la parte bloccata dagli ordini, leggendo i 56.600 come la sola libera. Misurata
+contro la dichiarazione, quella lettura è la più lontana delle tre possibili (la stima del 14/10 meno SMCI dava 46.830).
+⚠⚠ **E la verifica della v490 — il blocco ORDINI APERTI che «ritrovava da solo» i 56.600 € — era circolare**: il totale
+era costruito sommando la bloccata ai 56.600, e la libera è il totale meno la bloccata. *Una verifica che ricostruisce
+il proprio ingresso non prova niente* (classe v393, il gate circolare). Corretta anche la riga del 16/10 del registro
+della performance (`nota_cassa`): la cassa è la costante dell'intervallo che parte da lì.
+
+### 📈 La leva annua: la tabella si era accorciata, il file storico no
+La tabella della pagina FINRA copre 12 mesi (v493); la pagina **linka** un xlsx con la serie dal 1997. Ora la pipeline
+legge **tutti e due i canali** e li unisce **per data** (la tabella vale sui mesi in comune: è ciò che la pagina mostra
+adesso), e pubblica la variazione annua col mese di un anno prima trovato per DATA, col suo **percentile** su tutte le
+variazioni annue dello storico: il 17/10 **+31,4%, 82° percentile di 345** (massimo +80,5% a marzo 2000). Il massimo
+storico si legge dallo storico (via il pavimento scritto a mano di ottobre 2021, che resta solo per la tabella corta).
+- ⚠ **Il link si legge dalla pagina**: è la fonte a dichiarare dove sta il file; il percorso noto è la riserva.
+- ⚠ **Un xlsx è uno zip di XML**: letto con la libreria standard (openpyxl nel CI non c'è), colonne per INTESTAZIONE.
+- ⚠ **Il canale storico nasce sorvegliato** (v390): `margin_debt_storico` in `validate_macro` suona se l'anno manca.
+- ⚠⚠ **Un arrotondamento solo**: 82,46 arrotondato a un decimale (82,5) e poi all'intero dà **82 in Python e 83 in JS**
+  (banker's rounding contro Math.round). Il percentile esce intero dalla pipeline, per eccesso sul mezzo, dal valore pieno.
+- ⚠ `qoq` (mensile, v326) e `famiglia_leva` del semaforo si calcolano ora **per data** quando c'è lo storico datato.
+
+### 🎯 Tre iniezioni non mordevano, e ogni volta il difetto era la FIXTURE
+- La serie col buco aveva il buco **prima** del mese base: per posizione e per data davano lo stesso mese. *Un buco
+  prima della base non sposta niente*: il caso che discrimina ha il buco fra la base e il mese corrente.
+- Il percentile calcolato sugli ultimi 120 mesi invece che su tutto lo storico non mordeva: la fixture aveva **21**
+  variazioni annue. Ora vent'anni di crescita forte e otto lenti: la stessa lettura sta a metà o in cima.
+- Il pavimento di ottobre 2021 al posto del massimo letto non mordeva: il massimo della fixture **superava** il pavimento.
+- E una radice di contratto rettificato «XYZ1» la scartava già la regex: il controllo della radice tolto non mordeva.
+  Ora c'è anche «XYZQ», che la regex legge e solo il controllo toglie. *Un'iniezione che non morde prova che il gate non
+  contiene il fenomeno* (v430) — quattro volte in una versione.
+
+### 🔎 Le fonti, misurate prima di scrivere
+| fonte | cosa dà |
+|---|---|
+| CBOE, statistiche giornaliere (`cdn.cboe.com/data/us/options/market_statistics/daily/AAAA-MM-GG_daily_options`) | i rapporti put/call PUBBLICATI — azioni, indici, totale, SPX, VIX — un file per seduta; 403 a borsa chiusa |
+| CBOE, catene complete (`cdn.cboe.com/api/global/delayed_quotes/options/TK.json`, compresse: MU 5,3 MB → 0,5) | tutte le scadenze e gli strike, open interest, volumi, denaro/lettera, volatilità implicita a 30 giorni |
+| CFTC, Traders in Financial Futures (`fut_fin_txt_AAAA.zip`) | fondi a leva, gestori, dealer: posizioni del MARTEDÌ, pubblicate il venerdì |
+| Coinbase Exchange (candele orarie) | il bitcoin anche nel weekend |
+⚠ Il vecchio CSV storico di CBOE è fermo al **2019** e l'API giornaliera di www.cboe.com risponde 403: una fonte morta
+che risponde è la trappola del WSJ (v451). La catena della pipeline (Yahoo) porta 3 scadenze e 25 strike: la mensile e
+la scadenza dei conti non ci sono.
+
+### 🧰 `scripts/posizionamento.py` — lo script seleziona, il modello giudica (v448)
+Put/call di mercato col percentile su 252 sedute (memoria `memoria/cboe_putcall.jsonl`: i file sono immutabili, si legge
+solo ciò che manca; un 403 vecchio è una borsa chiusa e si registra, uno di ieri è un file non ancora pubblicato, un
+errore di rete si conta fra le NON lette — tre esiti, v389) · scadenze **dalle date listate** (terzo venerdì, il giovedì
+se il venerdì non è listato; trimestrale = «tre streghe»; la mensile appena scaduta che l'istantanea porta ancora) ·
+per posizione: put/call di volumi e open interest, volatilità implicita, movimento implicito alla prima scadenza, alla
+mensile e fino alla scadenza che comprende i conti (lo stesso giorno solo se escono prima dell'apertura; il distacco si
+dichiara oltre una settimana), max pain (convenzione), massimo open interest dentro il movimento, le più scambiate fuori
+dal denaro · la storia per titolo (`memoria/opzioni_titoli.jsonl`, solo a seduta conclusa, percentili da 20 sedute) ·
+CFTC per **codice** del regolatore, variazione sulla settimana per data, percentile su tre anni · bitcoin dalla campana
+dell'ultima seduta USA conclusa, il livello delle 17:00 (future CME), e su MSTR la sensibilità **misurata** su IBIT
+(beta 1,52, R² 0,73 il 17/10). Le due memorie si committano col registro: `analisi.py` lo dice.
+- ⚠⚠ **Il movimento implicito è LA STESSA definizione di `movimentoImplicito` in app.js**, e un gate esegue **le due
+  lingue** sugli stessi casi (node con app.js nel vm, da dentro la suite Python): stesso strike a parità di distanza,
+  stesso arrotondamento (Math.round, non il round di Python). È il contratto della v323 fra due lingue.
+- ⚠⚠ **La prima stesura ordinava gli scambi per PREMIO** (volume × prezzo di fine giornata): in cima finivano i contratti
+  profondamente nel denaro — MSTR call 45 col titolo a 137, «60 milioni» — e i put del giorno stesso, valutati
+  all'intrinseco di fine seduta. Il premio pagato non è nei dati: ora si contano i **contratti**, solo **fuori dal
+  denaro**, senza la scadenza della seduta. Trovato leggendo l'uscita come il destinatario, non dai gate.
+- ⚠ **La variazione della volatilità implicita non si pubblica**: valeva esattamente 0,0 su tre catene su undici — un
+  campo che la fonte non aggiorna si legge come «ferma» (v396).
+- ⚠ **Un percentile di un netto corto va spiegato**: il corto dei fondi a leva sul bitcoin al 100° percentile è il MENO
+  corto di tre anni. E su Treasury e bitcoin quel corto è in buona parte la **base** (lunghi sull'ETF o sul titolo, corti
+  sul future): non una scommessa al ribasso — il rapporto non distingue le due cose, e la resa lo dice.
+- ⚠ **L'ultima candela del bitcoin è quella in corso**: la sua fine sta nel futuro, e «adesso (14:00)» alle 13:03 era
+  un orario inventato. E «-0,0%» non si stampa: il segno si mette sul valore già arrotondato.
+- ⚠ Una check che moriva per **eccezione** (`KeyError` su un mercato tolto) invece di fallire col suo nome: riscritta
+  con `.get` (v407, v471). E il meta-gate dei backslash ha voluto il nuovo helper `_LEVA496` nel suo elenco.
+
+**È tutto INFORMAZIONE** (FORMATO 5bis): nessuna di queste misure è una prova della tenuta, un colore del semaforo o
+una vendita. Se il CEO vorrà farne un segnale, lo deciderà lui.

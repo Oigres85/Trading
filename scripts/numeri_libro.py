@@ -498,14 +498,46 @@ def famiglia_fondamentali(analisti):
             "righe": righe}
 
 
+def _mese_dopo(iso):
+    a, m = int(str(iso)[:4]), int(str(iso)[5:7])
+    return f"{a + m // 12:04d}-{m % 12 + 1:02d}-01"
+
+
 def famiglia_leva(md):
     """Margin debt FINRA: l'ultimo mese contro il precedente. ⚠ Il campo 'qoq' della pipeline e' la
-    variazione MENSILE nonostante il nome (v326): qui si ricalcola dallo storico, che e' il dato."""
-    h = (md or {}).get("history") or []
+    variazione MENSILE nonostante il nome (v326): qui si ricalcola dallo storico, che e' il dato.
+    v496 — con lo storico DATATO (`storia`) il mese prima si cerca per DATA: un mese mancante e' un buco,
+    non il confronto con due mesi fa (v393). Senza `storia` (snapshot precedente) resta la lista.
+    La variazione ANNUA e il suo percentile viaggiano accanto come contesto: la regola del colore
+    resta quella di §1ter (il mese che scende), e una lettura in piu' non e' una prova in piu' (B3)."""
+    md = md or {}
+    contesto = {k: md.get(k) for k in ("yoy", "yoy_rango", "yoy_campione", "yoy_max", "storico_dal")}
+    st = md.get("storia") or []
+    if len(st) >= 2:
+        (d0, v0), (d1, v1) = st[-2], st[-1]
+        if _mese_dopo(d0) != d1 or not v0:
+            return {"stato": "non misurabile", "perche": f"nello storico FINRA manca il mese prima di {_mese(d1)}",
+                    **contesto}
+        return {"stato": "acceso" if v1 < v0 else "spento", "var_mese": v1 / v0 - 1, "mese": d1, **contesto}
+    h = md.get("history") or []
     if len(h) < 2 or not h[-2] or h[-1] is None:
-        return {"stato": "non misurabile", "perche": "storico del margin debt assente o troppo corto"}
+        return {"stato": "non misurabile", "perche": "storico del margin debt assente o troppo corto", **contesto}
     var = h[-1] / h[-2] - 1
-    return {"stato": "acceso" if var < 0 else "spento", "var_mese": var, "mese": (md or {}).get("date")}
+    return {"stato": "acceso" if var < 0 else "spento", "var_mese": var, "mese": md.get("date"), **contesto}
+
+
+def resa_anno_leva(lv):
+    """v496 — la variazione annua del margin debt col suo percentile, o il buco dichiarato (v406)."""
+    if lv.get("yoy") is None:
+        return ("sull'anno NON calcolabile: lo storico FINRA (il file xlsx che la pagina linka) non è stato "
+                "letto, e la tabella della pagina copre 12 mesi")
+    c = lv.get("yoy_campione") or {}
+    mx = lv.get("yoy_max") or {}
+    return (f"sull'anno {_sg(lv['yoy'])}%"
+            + (f" ({_it(lv['yoy_rango'], 0)}° percentile delle {c.get('n')} variazioni annue da {_mese(c.get('dal'))}"
+               + (f"; massimo {_sg(mx.get('value'))}% a {_mese(mx.get('date'))}" if mx.get("value") is not None else "")
+               + ")" if lv.get("yoy_rango") is not None and c.get("n") else " (distribuzione non pubblicata)")
+            + " — contesto, non entra nel colore")
 
 
 def colore_semaforo(fam):
@@ -623,8 +655,9 @@ def righe_semaforo(s, precedente=None, mcr=None):
     L.append(f"  fondamentali AI: revisioni a 30 giorni {rev} — {st(fo)} · la guida sugli investimenti degli "
              "hyperscaler NON è calcolata: va verificata in rete, e se un hyperscaler l'ha tagliata la famiglia è accesa")
     lv = f["leva"]
-    L.append(f"  leva: margin debt FINRA di {_mese(lv['mese'])} {_sg(lv['var_mese'] * 100)}% sul mese precedente — {st(lv)}"
-             if lv["stato"] != "non misurabile" else f"  leva: NON MISURABILE — {lv['perche']}")
+    L.append((f"  leva: margin debt FINRA di {_mese(lv['mese'])} {_sg(lv['var_mese'] * 100)}% sul mese precedente — {st(lv)}"
+              if lv["stato"] != "non misurabile" else f"  leva: NON MISURABILE — {lv['perche']}")
+             + f" · {resa_anno_leva(lv)}")
     if s["rosso_possibile"]:
         L.append("  ⚠ SMH sotto la media a 200: il rosso scatta col credito sopra 4,0 OPPURE con un taglio della guida "
                  "sugli investimenti AI, che lo script non vede — va verificato in rete prima di tutto il resto")

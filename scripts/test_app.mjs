@@ -5160,7 +5160,7 @@ check("meta: nessun backtick dentro un template passato al vm", (() => {
   /* si isola ogni template passato a un helper del vm e si guarda se, PRIMA della chiusura,
      compare un backtick non escapato: se c'e', il template finisce li' e il resto del check
      diventa sintassi arbitraria — che e' come si e' rotta la suite tre volte oggi. */
-  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493)\(`/g;
+  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`/g;
   const guasti = [];
   for (const m of mio.matchAll(APERTURE)) {
     const da = m.index + m[0].length;
@@ -5193,7 +5193,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
      essi i backslash non raddoppiati davanti alle classi che contano. */
   const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
     /* ⚠⚠ v422 — LA CLASSE SI ALLARGA A n/r/t/0, e la ragione e' peggiore delle altre: dentro un
@@ -5213,7 +5213,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      un template. Non esiste nessuna ragione legittima di scriverla: il template l'ha gia'
      mangiata prima che il vm la veda, quindi la si cerca in TUTTI i template passati al vm, non
      solo in quelli che contengono una regex. Costata un giro di debug in v406. */
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     for (const b of t.matchAll(/(?<!\\)\\["']/g)) {
       sospetti.push("virgoletta sfuggita: " + t.slice(Math.max(0, b.index - 34), b.index + 12).replace(/\n/g, "⏎"));
@@ -10079,6 +10079,34 @@ const _conAnno493 = _LEVA493("37.2", 13);
 check("v493 leva: con la variazione annua la riga pubblica il numero, non la dichiarazione",
   typeof _conAnno493 === "string" && _conAnno493.includes("+37,2% sull'anno")
   && !_conAnno493.includes("non calcolabile"));
+
+/* ═══ v496 — LA VARIAZIONE ANNUA TORNA DAL FILE STORICO FINRA, COL SUO PERCENTILE ═════════
+   Il CEO, 17/10/2026: «Recupera altrove dati variazione annua della leva». La pipeline legge ora il
+   file storico che la pagina FINRA linka (dal 1997) e pubblica la variazione annua per data, col suo
+   percentile sull'intero storico: «+31%» senza una distribuzione non si colloca. Lo stato si COSTRUISCE
+   (v429): con e senza la distribuzione, perche' uno snapshot precedente porta solo il numero. */
+const _LEVA496 = (extra) => suVeri(`
+  const m = DATA.macro || {};
+  const h = [];
+  for (let i = 0; i < 12; i++) h.push(1000000 + i * 1000);
+  m.margin_debt = Object.assign({}, m.margin_debt || {}, { yoy: 31.4, qoq: 1.8, history: h }, ${extra});
+  const r = buildPrompt().split(String.fromCharCode(10))
+    .find(x => x.trimStart().indexOf("- LEVA DEGLI OPERATORI") === 0);
+  return r || "riga della leva assente";`);
+const _conRango496 = _LEVA496('{ yoy_rango: 82, yoy_campione: { n: 345, dal: "1998-01-01", al: "2026-09-01" } }');
+check("v496 leva: la variazione annua esce col suo percentile, il campione e da quando — il numero come la pipeline "
+  + "lo pubblica, intero, senza un secondo arrotondamento",
+  typeof _conRango496 === "string"
+  && _conRango496.includes("+31,4% sull'anno (82° percentile delle 345 variazioni annue da gennaio 1998)"));
+const _senzaRango496 = _LEVA496("{ yoy_rango: null, yoy_campione: null }");
+/* ⚠ un percentile SENZA il suo campione: la prima stesura del check non conteneva questo caso, e l'iniezione che toglieva
+   la condizione sul campione non mordeva — avrebbe stampato «percentile delle undefined variazioni» */
+const _senzaCampione496 = _LEVA496("{ yoy_rango: 82, yoy_campione: null }");
+check("v496 leva: senza la distribuzione (snapshot precedente) esce il solo numero, e nessun percentile senza campione",
+  typeof _senzaRango496 === "string" && _senzaRango496.includes("+31,4% sull'anno")
+  && !_senzaRango496.includes("percentile delle") && !_senzaRango496.includes("non calcolabile")
+  && typeof _senzaCampione496 === "string" && _senzaCampione496.includes("+31,4% sull'anno")
+  && !_senzaCampione496.includes("percentile") && !_senzaCampione496.includes("undefined"));
 
 /* ═══ v476 — LA LIQUIDITA' NON E' SOLO LA CASSA ═══════════════════════════════════════════
    La pipeline leggeva "contanti e equivalenti" e lasciava fuori i titoli a breve: su RGTI 27,8

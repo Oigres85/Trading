@@ -79,6 +79,18 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Da v474 chiude col **PIANO PER LA LIQUIDITÀ**: la liquidità con la sua quota del patrimonio e,
    per ogni ingresso possibile (sorvegliati e candidati di settore), cosa fa al libro un'unità di
    5.000 € — volatilità, beta su QQQ, perdita allo stop — anche per chi è nella stessa scommessa.
+6. `python3 scripts/posizionamento.py` (v496, CEO, 17/10: *"Effettua anche analisi su put e call e sui grandi
+   movimenti che vengono effettuati il week end … Rendi sempre tutto strutturale"*; i movimenti scelti: scadenza delle
+   opzioni, posizioni dei grandi operatori, bitcoin nel weekend) — il **put/call di mercato** pubblicato da CBOE col
+   suo percentile sull'anno (le sedute lette restano in `memoria/cboe_putcall.jsonl`); le **scadenze delle opzioni**
+   dalle date che la borsa lista: la prossima mensile, la trimestrale («tre streghe»), la mensile appena scaduta, e
+   per SPY e QQQ quanta parte dell'open interest scade; per ogni posizione le **opzioni**: put/call dei volumi e
+   dell'open interest, volatilità implicita a 30 giorni, movimento implicito alla prima scadenza, alla mensile e fino
+   alla scadenza che comprende i conti, il massimo open interest dentro il movimento, le più scambiate fuori dal
+   denaro e la loro storia (`memoria/opzioni_titoli.jsonl`: i percentili da 20 sedute registrate); i **grandi
+   operatori** dal rapporto settimanale della CFTC — fondi a leva, gestori istituzionali, dealer su Nasdaq-100, S&P
+   500, VIX, bitcoin e Treasury 10 anni — col percentile su tre anni; il **bitcoin dall'ultima chiusura USA** e
+   quanto vale su MSTR con la sensibilità misurata. Le due memorie si committano col registro.
 
 ## Cosa contiene la risposta, in quest'ordine
 0. **Semaforo d'uscita** (decisione del CEO del 06/10; calcolato da v474): il colore di oggi in
@@ -144,6 +156,16 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    intera ne copre circa 78 (stesso denominatore: i due numeri si confrontano).
    Soglie macro decise prima (spread credito alto rendimento 3,5;
    Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
+5bis. **Posizionamento** (v496, CEO, 17/10) — dal blocco di `posizionamento.py`: il put/call di mercato col
+   suo percentile (alto = domanda di protezione: convenzione del mestiere, non una misura); le scadenze delle opzioni
+   — una mensile o una trimestrale («tre streghe») entro cinque giorni si dice in cima alla sezione, perché alla
+   scadenza le coperture legate alle opzioni si chiudono; per ogni posizione il movimento implicito che il mercato
+   paga fino ai conti, l'open interest che li accompagna e le opzioni più scambiate fuori dal denaro (il verso,
+   comprate o vendute, non è nei dati); i grandi operatori della CFTC, con la data del martedì della fotografia; il
+   bitcoin dall'ultima chiusura USA e quanto vale su MSTR — il lunedì, e dopo un fine settimana in cui il bitcoin si
+   è mosso, è la prima cosa da dire su MSTR. La leva porta la **variazione annua col suo percentile** dal file storico
+   FINRA nella riga del semaforo (sezione 0). È tutto INFORMAZIONE accanto al semaforo e alla tenuta: nessuna di
+   queste misure è una prova della tenuta, un colore o una vendita — se il CEO vorrà farne un segnale, lo deciderà lui.
 6. **Tenuta e piano** (decisioni del CEO del 14/10/2026, regola in `memoria/LIBRO.md` §1sexies:
    *si lascia correre, si vende per EVIDENZA, e si valuta l'insieme — non la sola tecnica*) — dal
    blocco `TENUTA DELLE POSIZIONI` di `numeri_libro.py`, per ogni posizione l'esito (VENDITA PER
@@ -267,7 +289,10 @@ giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordi
 a 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10) · la
 struttura delle oscillazioni — massimi e minimi crescenti o decrescenti, rotture, doppi, divergenze — in ogni ingresso
 e su ogni posizione, e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10) — la
-struttura «solo informazione», non una prova nella tenuta (decisione del CEO dello stesso giorno).
+struttura «solo informazione», non una prova nella tenuta (decisione del CEO dello stesso giorno) · la variazione
+annua della leva dal file storico FINRA, col suo percentile; put e call di mercato e di ogni posizione, le scadenze
+delle opzioni (mensile e «tre streghe»), le posizioni dei grandi operatori (CFTC) e il bitcoin dall'ultima chiusura
+USA su MSTR — informazione, non prove (17/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole
