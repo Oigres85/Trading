@@ -123,6 +123,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    delle ultime cinque sedute: il minimo della seduta dice se il limite è stato raggiunto, non quando.
    Le date dei conti vengono dal calendario Nasdaq e, per chi non c'è, da quelle **dichiarate
    dall'emittente** (`LIBRO.md` §1octies, v489): il 15/10 SK hynix mancava dal calendario.
+   Da v494 ogni ordine attivo porta anche la **struttura delle oscillazioni** (un ordine è un ingresso) e le sue
+   ultimissime notizie stanno nel blocco NOTIZIE ULTIMISSIME di `numeri_libro.py`.
 0ter. **Credito sul libro** (v467, regola in `memoria/LIBRO.md` §1ter): il blocco `CREDITO SUL
    LIBRO` di `numeri_libro.py` — chi brucia cassa, il suo peso, le tre condizioni. Se la conferma
    è accesa, gli stop su quei nomi passano in cima alle decisioni. Non cambia il colore del semaforo.
@@ -172,6 +174,15 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    1.100-1.108, BE prima della trimestrale, AMD verso il 12-14% del libro e le prese di profitto del
    giallo. Gli avvisi di prezzo su Investing.com restano campanelli: un avviso non è una vendita, fa
    guardare la tenuta.
+   Da v494 (CEO, 17/10: *"analizza anche massimi e minimi decrescenti … tecnicamente i grafici quando si
+   presenta la possibilità di ingresso o si attivano i parametri di uscita fermo restando che anche le
+   ultimissime news sono importanti"*) ogni posizione porta la **STRUTTURA DELLE OSCILLAZIONI** (regole in
+   `LIBRO.md` §1bis): massimi e minimi crescenti o decrescenti, se la chiusura ha già rotto l'ultimo minimo, i
+   doppi massimi e minimi, la divergenza dell'RSI. È la famiglia del prezzo, la stessa della tendenza: la
+   risposta la legge accanto alla tenuta come un'informazione, non come una prova in più, e non vende. E il
+   blocco **NOTIZIE ULTIMISSIME** di `numeri_libro.py` porta, per ogni posizione con un parametro d'uscita acceso e
+   ogni ordine attivo, il perché e le voci del feed delle ultime 72 ore (la cronaca di mercato una volta sola, in
+   fondo): la risposta le cita con data e fonte, insieme alla ricerca web delle stesse ore.
 
 7. **Watchlist e rotazione** (sempre, v468) — in giallo, arancione e rosso NESSUN divieto
    d'ingresso (decisioni del CEO del 09/10 e del 15/10), ma ogni ingresso porta le sue conseguenze di
@@ -211,6 +222,13 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        n.d. si dice n.d. (storia troppo corta), e un titolo con la storia della quotazione NON verificata
        lo dichiara: su un nato da un veicolo (OKLO, da AltC) medie e massimi mescolano due società. Il P/E
        è una metrica, non una prova della tenuta: un growth costa caro per costruzione.
+   7d-quinquies. **la STRUTTURA e le ULTIMISSIME NOTIZIE** (v494, CEO, 17/10) — per ogni ingresso la riga della
+       struttura delle oscillazioni: un ingresso sul pavimento con i minimi ancora DECRESCENTI, o con la chiusura
+       già sotto l'ultimo minimo, compra una discesa che non ha smesso di scendere, e la risposta lo dice; un doppio
+       minimo o una divergenza rialzista sul pavimento la rendono più credibile. Il blocco **NOTIZIE ULTIMISSIME —
+       SORVEGLIATI CON UN INGRESSO POSSIBILE** di `rotazione.py` (pavimento entro 1 ATR, candidato, prezzo nella
+       zona) porta le voci del feed delle ultime 72 ore; la risposta le cita con data e fonte, insieme alla ricerca
+       web delle stesse ore, e una notizia che rompe la tesi toglie l'ingresso anche dal pavimento migliore.
    7d-ter. **gli ingressi in ordine d'interesse** (CEO, 15/10: *"ponili in ordine dal più interessante,
        risposta secca con prezzi e motivazioni"*) — il prezzo d'ingresso (l'ordine sul pavimento), lo stop
        con la perdita, il secondo prezzo, e una motivazione per nome. L'ordine è un GIUDIZIO dell'analisi,
@@ -245,7 +263,9 @@ discesa e il rischio di alzare il limite (15/10) · i pavimenti delle posizioni 
 carico (15/10) · i volumi, anche della seduta in corso col tempo trascorso (15/10) · le date dei conti dichiarate
 dall'emittente (15/10) · gli ingressi in ordine d'interesse, con prezzi e motivazioni (15/10) · gli ordini
 giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera) · la lettura
-a 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10).
+a 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10) · la
+struttura delle oscillazioni — massimi e minimi crescenti o decrescenti, rotture, doppi, divergenze — in ogni ingresso
+e su ogni posizione, e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

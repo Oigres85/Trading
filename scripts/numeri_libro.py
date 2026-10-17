@@ -201,8 +201,13 @@ def calcola(sedute=1, registra=False, adesso=None):
     # v492 — la lettura a 5 anni accompagna ogni INGRESSO: qui la media sulle posizioni in perdita
     cinque = {t: rotazione.lettura_5anni(BL.get(t), (TEC.get(t) or {}).get("px"), adesso, veicolo=storia.get(t))
               for t in TK}
+    # v494 — la struttura delle oscillazioni di ogni posizione (richiesta del CEO del 17/10/2026): sulla stessa serie
+    #   della societa' dei pavimenti, un'informazione accanto alla tenuta e non una prova in piu' (B3)
+    strutt = {t: rotazione.struttura(BL.get(t), (TEC.get(t) or {}).get("px"), (TEC.get(t) or {}).get("atr"), adesso,
+                                     veicolo=storia.get(t))
+              for t in TK}
     out["tenuta"] = tenuta_posizioni(TK, B, righe_pipeline(pipe), out["semaforo"], px, pmc, qty, w, adesso,
-                                     decisioni, media, pav, cinque=cinque, storia=storia)
+                                     decisioni, media, pav, cinque=cinque, storia=storia, struttura=strutt)
     out["ordini"] = valuta_ordini(ordini, B, TEC, BL, out["calendario"], righe_pipeline(pipe), out["semaforo"],
                                   media["rlibro"], media["rqqq"], tot, media["fx"], adesso, cassa_eur=cassa_eur,
                                   intraday=brief.barre_5min, storia=storia)
@@ -213,6 +218,10 @@ def calcola(sedute=1, registra=False, adesso=None):
         scad.setdefault(a["tk"], a)                       # gli attesi arrivano gia' in ordine di data
     out["esami"] = leggi_esami()
     out["tenuta"] = con_scadenze(out["tenuta"], scad, out["esami"], out["calendario"].get("finestra"), adesso)
+    # v494 — le ULTIMISSIME notizie dei nomi con un parametro d'uscita acceso o un ordine d'acquisto attivo (CEO,
+    #   17/10/2026: «fermo restando che anche le ultimissime news sono importanti»)
+    out["segnali"] = segnali_libro(out["tenuta"], out["ordini"])
+    out["notizie"] = rotazione.notizie_recenti(list(out["segnali"]), adesso=adesso)
     out["decisioni"] = (None if decisioni is None else
                         costo_decisioni(decisioni, B, {t: (TEC.get(t) or {}).get("px") for t in aperte},
                                         out["calendario"], adesso))
@@ -1121,7 +1130,9 @@ def valuta_ordini(ordini, barre, tec, lunghe, calendario, righe, sem, rlibro, rq
                                                      and sc["giorni"] <= rotazione.TRIMESTRALE_VICINA),
                     "volume": rotazione.volume_seduta(t, b, adesso),
                     # v492 — la lettura a 5 anni: un ordine e' un ingresso
-                    "cinque_anni": rotazione.lettura_5anni(bl, px, adesso, veicolo=vei), "veicolo": vei})
+                    "cinque_anni": rotazione.lettura_5anni(bl, px, adesso, veicolo=vei), "veicolo": vei,
+                    # v494 — e la struttura delle oscillazioni, sulla stessa serie
+                    "struttura": rotazione.struttura(bl, px, atr, adesso, veicolo=vei)})
         spese[o["tk"]] = spese.get(o["tk"], 0) + q * lim
         rend[o["tk"]] = rt
     insieme, tot = None, sum(spese.values())
@@ -1154,7 +1165,8 @@ def righe_ordini(oo, finestra=45):
                  "STORNO = tendenza non rotta: alzare il limite è coerente se nella seduta il titolo scende — si compra "
                  "lo storno, non la risalita · DISCESA = tendenza rotta: lo sconto è il rischio e il limite resta sul "
                  "pavimento · lo stop resta quello del pavimento sotto il limite: alzare il limite allunga la distanza "
-                 "dallo stop, e il rischio in più si scrive in dollari")
+                 "dallo stop, e il rischio in più si scrive in dollari · struttura delle oscillazioni: convenzioni nel "
+                 "blocco TENUTA DELLE POSIZIONI")
     for x in oo["righe"]:
         testa = (f"  {x['tk']} {x['verso_testo']} {_it(x['qta'], 0)} a {_it(x['limite'])} (inserito {x['inserito']}"
                  + testo_attivo_alle(x) + ")" + testo_validita(x))
@@ -1210,6 +1222,8 @@ def righe_ordini(oo, finestra=45):
         elif x["pavimenti_letti"] and pv is not None:
             pav += " · nessun pavimento sotto il limite: stop n.d."
         L.append("      " + pav)
+        if "struttura" in x:          # v494 — un ordine e' un ingresso: la struttura delle oscillazioni lo accompagna
+            L.extend(f"      {r}" for r in rotazione.righe_struttura(x["struttura"]))
         c, sc = x["corr_libro"], x["conti"]
         parti = [f"tenuta se fosse in portafoglio: {etichetta_esito(x['tenuta'])}",
                  "correlazione col libro n.d." if c is None else
@@ -1540,7 +1554,7 @@ def valuta_tenuta(barre, riga, sem, adesso=None):
 
 
 def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None, decisioni=None, media=None,
-                     pav=None, cinque=None, storia=None):
+                     pav=None, cinque=None, storia=None, struttura=None):
     """decisioni: la tabella di LIBRO.md §1quinquies. Una VENDITA PER EVIDENZA con una vendita gia'
     aperta e' una decisione presa; senza, e' una PROPOSTA al CEO. Una vendita aperta su un nome che la
     regola non sostiene da sola (CONFLITTO, OSSERVAZIONE, LASCIAR CORRERE) e' una premessa da
@@ -1563,12 +1577,51 @@ def tenuta_posizioni(tks, barre, righe, sem, prezzi, pmc, qta, pesi, adesso=None
                     "carico": pmc.get(t), "pavimenti": pv,
                     # v492 — la lettura a 5 anni (rotazione.lettura_5anni); None nel dizionario = non calcolata
                     **({"cinque_anni": cinque.get(t), "veicolo": (storia or {}).get(t)} if cinque is not None else {}),
+                    # v494 — la struttura delle oscillazioni (rotazione.struttura); assente dal dizionario = non calcolata
+                    **({"struttura": struttura.get(t)} if struttura is not None else {}),
                     "media_pavimenti": None if pav is None else media_pavimenti(pv, pmc.get(t), qta.get(t), pesi.get(t), md, t,
                                                                                  prezzi.get(t))})
     out.sort(key=lambda x: (ESITI.index(x["esito"]), -(x["peso"] or 0)))
     return {"righe": out, "seduta": max((x["prove"]["tendenza"].get("seduta") or "" for x in out), default="") or None,
             "colore": (sem or {}).get("colore"), "minimo_semaforo": bool((sem or {}).get("minimo")),
             "media_calcolata": media is not None, "cambio": md.get("fx"), "pav_calcolati": pav is not None}
+
+
+def segnali_uscita(r):
+    """v494 — perche' una posizione ha un PARAMETRO D'USCITA acceso: l'esito della tenuta che non e' 'lasciar correre'
+    (§1sexies), la struttura delle oscillazioni rotta al ribasso o ribassista, un doppio massimo sotto il collo da poco.
+    La struttura e' la famiglia del PREZZO, la stessa della tendenza (B3): un motivo per leggere le notizie e guardare
+    la tenuta, non una prova in piu' e non una vendita — dal 15/10 non si vende sui ribassi (LIBRO.md §1ter).
+    Lista vuota = nessuno."""
+    import rotazione
+    s = []
+    if r.get("esito") in ("VENDITA PER EVIDENZA", CONFLITTO, "IN OSSERVAZIONE"):
+        s.append(f"tenuta: {r['esito']}")
+    st = r.get("struttura") or {}
+    if st.get("rottura") == "ribasso":
+        s.append("chiusura sotto l'ultimo minimo di oscillazione")
+    if st.get("stato") == "RIBASSISTA":
+        s.append("massimi e minimi decrescenti")
+    for d in st.get("doppi") or []:
+        if d["tipo"] == "massimo" and d["esito"] == "confermato" and d.get("sedute_dal") is not None \
+                and d["sedute_dal"] <= rotazione.STR_RECENTE:
+            s.append(f"doppio massimo sotto il collo dal {d['dal']}")
+    return s
+
+
+def segnali_libro(tenuta, ordini):
+    """v494 — {tk: motivi}: le posizioni con un parametro d'uscita acceso, poi i nomi con un ordine d'acquisto ATTIVO
+    (un ordine e' un ingresso possibile per definizione). Un ordine scaduto o eseguito non c'e': non e' piu' un ingresso
+    possibile, e il blocco ORDINI APERTI lo chiede al CEO."""
+    seg = {}
+    for r in (tenuta or {}).get("righe") or []:
+        m = segnali_uscita(r)
+        if m:
+            seg[r["tk"]] = m
+    for x in (ordini or {}).get("righe") or []:
+        if x.get("verso") == "acquisto":
+            seg.setdefault(x["tk"], []).append(f"ordine d'acquisto attivo a {_it(x['limite'])}")
+    return seg
 
 
 NOMI_PROVE = {"tendenza": "tendenza", "stime": "stime a 90 giorni", "revisioni": "revisioni a 30 giorni",
@@ -1679,6 +1732,10 @@ def righe_tenuta(t):
          "contro con la tendenza non rotta · LASCIAR CORRERE = nessuna prova contro · conta QUALI prove ci sono, non "
          "quante: nessun punteggio · soglie = convenzioni scelte col CEO (LIBRO.md §1sexies) · l'esito è la regola "
          "applicata, non un ordine"]
+    if any("struttura" in r for r in t["righe"]):
+        import rotazione
+        L.append("  " + rotazione.INTESTAZIONE_STRUTTURA + " — e non vende: dal 15/10 non si vende sui ribassi "
+                 "(LIBRO.md §1ter), si guardano la tenuta e le notizie")
     for r in t["righe"]:
         tp = testo_prove(r)
         L.append(f"  {r['tk']:5} {etichetta_esito(r)}" + (f" · peso {_it(r['peso'] * 100, 1)}%" if r.get("peso") is not None else ""))
@@ -1691,6 +1748,9 @@ def righe_tenuta(t):
         if tp["neutro"] or tp["ignote"]:
             L.append("      " + " ; ".join(([f"in mezzo: {' · '.join(tp['neutro'])}"] if tp["neutro"] else [])
                                          + ([f"non misurate: {' · '.join(tp['ignote'])}"] if tp["ignote"] else [])))
+        if "struttura" in r:          # v494 — la struttura delle oscillazioni accanto alla tendenza: la stessa famiglia
+            import rotazione
+            L.extend(f"      {x}" for x in rotazione.righe_struttura(r["struttura"]))
         fuori = []
         c = r.get("consenso")
         if c:
@@ -2332,6 +2392,10 @@ def sintesi(o):
         L.extend(righe_credito(o["credito"]))
     if o.get("tenuta"):
         L.extend(righe_tenuta(o["tenuta"]))
+    if "segnali" in o:                    # v494
+        import rotazione
+        L.extend(rotazione.righe_notizie("NOTIZIE ULTIMISSIME — POSIZIONI CON UN PARAMETRO D'USCITA ACCESO E ORDINI "
+                                         "D'ACQUISTO ATTIVI", o["segnali"], o.get("notizie") or {}))
     return "\n".join(L)
 
 

@@ -4097,9 +4097,12 @@ check("v492 collegamento in raccogli: la lettura a 5 anni su sorvegliati E candi
       and 'veicolo=t["veicolo"])' in _src_rac492.split('t["pavimenti"] = pavimenti(')[1][:120]
       and '"veicolo": veicolo_pipeline(d, s["tk"])' in _src_rac492
       and '"valutazione_rif": schede_progetto.riferimento_valutazione(d.get("macro"))' in _src_rac492)
+# ⚠ v494 — pinnava la parentesi chiusa dopo storia=storia, e la v494 ha aggiunto la struttura alla stessa chiamata:
+#   l'invariante e' che la tenuta riceva cinque anni e storia, non che siano gli ultimi argomenti (la svista della v489,
+#   che pinnava «decisioni, media)» e poi «media, pav)»)
 check("v492 collegamento in calcola: la storia della quotazione va a pavimenti, lettura a 5 anni, tenuta e ordini",
       "storia = {t: rotazione.veicolo_pipeline(pipe, t) for t in con_pav}" in _calc474
-      and "cinque=cinque, storia=storia)" in _calc474 and "intraday=brief.barre_5min, storia=storia)" in _calc474
+      and "cinque=cinque, storia=storia" in _calc474 and "intraday=brief.barre_5min, storia=storia)" in _calc474
       and "veicolo=storia.get(t))" in _calc474)
 
 # --- gli ordini: la lettura a 5 anni di ogni ordine, e lo STOP del pavimento uguale a quello della watchlist ---
@@ -4144,6 +4147,319 @@ check("v492 FORMATO_ANALISI: la lettura a 5 anni e il P/E sono nel registro dell
       "7d-quater. **la LETTURA A 5 ANNI e il P/E**" in _fmt492
       and "la lettura\na 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10)"
       in _fmt492)
+
+
+# ================================================================ v494 — la STRUTTURA DELLE OSCILLAZIONI e le notizie
+# Il CEO, testuale (17/10/2026): «In generale analizza anche massimi e minimi decrescenti oltre, se possibile,
+#   tecnicamente i grafici quando si presenta la possibilità di ingresso o si attivano i parametri di uscita fermo
+#   restando che anche le ultimissime news sono importanti». Lo stato si COSTRUISCE (v425, v429, v435): il 16/10 sei
+#   nomi avevano chiuso sotto l'ultimo minimo di oscillazione, domani forse nessuno, e un check che leggesse i dati del
+#   giorno sarebbe verde per caso.
+from datetime import date as _d494, timedelta as _td494, timezone as _tz494
+
+
+def _giorni494(n, inizio="2025-06-02"):
+    d, out = _d494.fromisoformat(inizio), []
+    while len(out) < n:
+        if d.weekday() < 5:
+            out.append(d.isoformat())
+        d += _td494(days=1)
+    return out
+
+
+def _zz494(punti, passo=7, inizio="2025-06-02", vol=None):
+    """Una serie a zig-zag fra i punti dati (chiusure), `passo` sedute per gamba; massimo e minimo all'1% dalla chiusura,
+    cosi' i punti di svolta SONO i punti di oscillazione. vol(chiusura di ieri, di oggi) -> volume."""
+    c = [float(punti[0])]
+    for a, b in zip(punti, punti[1:]):
+        c += [a + (b - a) * k / passo for k in range(1, passo + 1)]
+    out = []
+    for i, (t, x) in enumerate(zip(_giorni494(len(c), inizio), c)):
+        out.append({"t": t, "o": x, "h": x * 1.01, "l": x * 0.99, "c": x, "a": x,
+                    "v": vol(c[i - 1] if i else x, x) if vol else 1000})
+    return out
+
+
+_ad494 = _dt471(2026, 10, 17, 12, 0, tzinfo=_NY)       # un sabato: nessuna seduta in corso
+_st494 = lambda punti, **kw: ROT.struttura(_zz494(punti), punti[-1], 1.0, _ad494, **kw)
+
+# --- i punti: la regola dei pavimenti, una sola (v161) ---
+_l494 = [10, 9, 8, 7, 6, 5, 5, 5, 6, 7, 8, 9, 10, 11, 12]
+check("v494 perni: il piu' basso di 5 sedute prima e 5 dopo e il PRIMO a toccarlo — un tratto piatto da' un punto solo, "
+      "al suo inizio; coi massimi lo stesso a specchio; un buco nella finestra non da' un punto (v205)",
+      ROT.perni([{"l": x} for x in _l494], "l") == [5]
+      and ROT.perni([{"h": -x} for x in _l494], "h", massimi=True) == [5]
+      and ROT.perni([{"l": (None if i == 3 else x)} for i, x in enumerate(_l494)], "l") == [],
+      str(ROT.perni([{"l": x} for x in _l494], "l")))
+_zzp494 = _zz494([100, 90, 98, 86, 94, 82, 90, 84])
+_pvp494 = ROT.pavimenti(_zzp494, 200.0, 1.0, _ad494)
+check("v494 collegamento: i pavimenti nascono dai punti di perni — eseguiti, non letti: le date dei tocchi sono "
+      "ESATTAMENTE quelle dei minimi di oscillazione",
+      'perni(serie, "l")' in _corpo_di(_src_rot473, "pavimenti")
+      and sorted(m["data"] for z in _pvp494["minimi"] for m in z["tocchi"])
+      == sorted(_zzp494[i]["t"] for i in ROT.perni(_zzp494, "l"))[-len([m for z in _pvp494["minimi"] for m in z["tocchi"]]):]
+      and len(ROT.perni(_zzp494, "l")) == 3, str(_pvp494["minimi"]))
+_rr494 = [100 + 7 * math.sin(i / 4) + i * 0.05 for i in range(160)]
+check("v494 rsi_serie: l'ultimo valore e' rsi_wilder, una derivazione sola (v161); None prima di 14 variazioni",
+      abs(ROT.rsi_serie(_rr494)[-1] - ROT.rsi_wilder([{"c": x} for x in _rr494])) < 1e-12
+      and ROT.rsi_serie(_rr494)[13] is None and ROT.rsi_serie(_rr494)[14] is not None)
+
+# --- lo stato: il verso degli ultimi due, e quanti di fila ---
+_rib494 = _st494([100, 90, 98, 86, 94, 82, 90, 84])
+check("v494 massimi e minimi DECRESCENTI = RIBASSISTA, con quanti punti di fila e i due livelli che cambiano la sequenza",
+      _rib494["stato"] == "RIBASSISTA" and _rib494["verso_massimi"] == _rib494["verso_minimi"] == "decrescenti"
+      and _rib494["fila_massimi"] == 3 and _rib494["fila_minimi"] == 3 and _rib494["rottura"] is None
+      and abs(_rib494["su"]["prezzo"] - 90 * 1.01) < 1e-9 and abs(_rib494["giu"]["prezzo"] - 82 * 0.99) < 1e-9
+      and [round(x["prezzo"], 2) for x in _rib494["massimi"]] == [98.98, 94.94, 90.9], str(_rib494)[:600])
+check("v494 crescenti = RIALZISTA · massimi giu' e minimi su = IN COMPRESSIONE · il contrario = IN ESPANSIONE",
+      _st494([80, 90, 84, 94, 88, 98, 92, 96])["stato"] == "RIALZISTA"
+      and _st494([80, 100, 82, 96, 84, 92, 86, 90])["stato"] == "IN COMPRESSIONE"
+      and _st494([90, 94, 86, 98, 82, 102, 78, 90])["stato"] == "IN ESPANSIONE")
+_fila494 = _st494([100, 90, 120, 86, 116, 82, 112, 84])        # massimi: 120 -> 116 -> 112, il primo dopo un minimo
+check("v494 «di fila» conta i punti che seguono lo stesso verso, non tutti quelli dell'anno",
+      _fila494["fila_massimi"] == 3 and _st494([100, 90, 98, 94, 99, 82, 90, 84])["fila_minimi"] == 2,
+      str((_fila494["fila_massimi"], _st494([100, 90, 98, 94, 99, 82, 90, 84])["fila_minimi"])))
+
+# --- alla pari: la regola dei pavimenti, mezzo ATR — e i doppi col loro collo ---
+_dm494 = _st494([90, 100, 80, 95, 80.2, 88, 84])
+_dmc494 = _st494([90, 100, 80, 95, 80.2, 97])
+_dmr494 = _st494([90, 100, 80, 95, 80.2, 88, 77])
+_d0 = lambda s, tipo: next((d for d in s["doppi"] if d["tipo"] == tipo), {})
+check("v494 due minimi entro mezzo ATR sono ALLA PARI (LATERALE) e fanno un doppio minimo: il collo e' il massimo FRA i "
+      "due; l'esito si legge dalla chiusura conclusa — da confermare, confermato sopra il collo, rotto sotto i due minimi",
+      _dm494["verso_minimi"] == "alla pari" and _dm494["stato"] == "LATERALE"
+      and abs(_d0(_dm494, "minimo").get("collo", 0) - 95 * 1.01) < 1e-9
+      and _d0(_dm494, "minimo").get("esito") == "da confermare" and _d0(_dmc494, "minimo").get("esito") == "confermato"
+      and _d0(_dmr494, "minimo").get("esito") == "rotto" and _d0(_dmc494, "minimo").get("sedute_dal") == 0,
+      str((_dm494["doppi"], _dmc494["doppi"], _dmr494["doppi"])))
+check("v494 oltre mezzo ATR due minimi NON sono alla pari: nessun doppio, e il verso e' quello vero",
+      not [d for d in _st494([90, 100, 80, 95, 80.7, 88, 84])["doppi"] if d["tipo"] == "minimo"]
+      and _st494([90, 100, 80, 95, 80.7, 88, 84])["verso_minimi"] == "crescenti")
+_dx494 = _st494([100, 80, 95, 82, 95.2, 78])
+check("v494 doppio massimo: il collo e' il minimo FRA i due, confermato con la chiusura sotto il collo, e da quando — "
+      "un doppio confermato a fine agosto e' storia, uno confermato ieri e' un segnale",
+      _d0(_dx494, "massimo").get("esito") == "confermato" and abs(_d0(_dx494, "massimo")["collo"] - 82 * 0.99) < 1e-9
+      and _d0(_dx494, "massimo").get("sedute_dal") == 1, str(_dx494["doppi"]))
+
+# --- la rottura: la chiusura conclusa oltre l'ultimo punto, prima che un punto nuovo la confermi ---
+check("v494 ROTTA AL RIBASSO: la chiusura sotto l'ultimo minimo, l'estremo toccato da allora e quante sedute fa",
+      _dmr494["rottura"] == "ribasso" and abs(_dmr494["estremo"]["prezzo"] - 77 * 0.99) < 1e-9
+      and _dmr494["estremo"]["sedute_dopo"] == 0 and _dmc494["rottura"] == "rialzo" and _dm494["rottura"] is None,
+      str((_dmr494["rottura"], _dmr494["estremo"])))
+_bo494 = _zz494([100, 90, 98, 86, 94, 82, 90, 84])
+_oggi494 = _d494.fromisoformat(_bo494[-1]["t"]) + _td494(days=3 if _d494.fromisoformat(_bo494[-1]["t"]).weekday() == 4 else 1)
+_bo494 = _bo494 + [{"t": _oggi494.isoformat(), "o": 84, "h": 84.5, "l": 78, "c": 79, "a": 79, "v": 1000}]
+_s11 = ROT.struttura(_bo494, 79.0, 1.0, _dt471(_oggi494.year, _oggi494.month, _oggi494.day, 11, 0, tzinfo=_NY))
+_s17 = ROT.struttura(_bo494, 79.0, 1.0, _dt471(_oggi494.year, _oggi494.month, _oggi494.day, 17, 0, tzinfo=_NY))
+check("v494 la seduta IN CORSO non rompe la struttura: il suo minimo puo' ancora scendere e la sua chiusura non esiste "
+      "(v471); dopo la campana si'",
+      _s11["rottura"] is None and _s17["rottura"] == "ribasso", str((_s11["rottura"], _s17["rottura"])))
+
+# --- la divergenza dell'RSI: costruita, e misurata con la definizione stessa ---
+def _div494(prima, rimbalzo, seconda, base=120):
+    """Un'oscillazione di base, poi due discese al primo e al secondo minimo, ciascuna (passo, sedute), e un rimbalzo
+    finale che conferma il secondo minimo."""
+    c = [100 + 2 * math.sin(i / 3) for i in range(base)]
+    for passo, n in (prima, rimbalzo, seconda, (1.5, 7)):
+        c += [c[-1] + passo * k for k in range(1, n + 1)]
+    return [{"t": t, "o": x, "h": x * 1.005, "l": x * 0.995, "c": x, "a": x, "v": 1000}
+            for t, x in zip(_giorni494(len(c), "2025-03-03"), c)]
+_bdv494 = _div494((-3, 8), (2, 6), (-0.9, 14))          # prima discesa ripida, seconda lenta: l'RSI risale (9 -> 24)
+_bdn494 = _div494((-1, 12), (1, 5), (-3, 6))            # l'RSI sale di poco (14,0 -> 15,2): sotto i 3 punti e' rumore
+_bdc494 = _div494((-3, 8), (2, 6), (-0.9, 14), base=20)  # poche chiusure prima: l'RSI dei punti non c'e'
+_dv494 = ROT.struttura(_bdv494, _bdv494[-1]["c"], 1.0, _ad494)
+_dvn494 = ROT.struttura(_bdn494, _bdn494[-1]["c"], 1.0, _ad494)
+_dvc494 = ROT.struttura(_bdc494, _bdc494[-1]["c"], 1.0, _ad494)
+def _atteso494(s):
+    a, b = s["minimi"][-2], s["minimi"][-1]
+    return (a["rsi"] is not None and b["rsi"] is not None and b["prezzo"] < a["prezzo"] - ROT.PAV_LARGHEZZA_ATR
+            and b["rsi"] - a["rsi"] >= ROT.STR_RSI)
+check("v494 divergenza RIALZISTA: minimo piu' basso con RSI piu' alto di almeno 3 punti — c'e' quando la definizione lo "
+      "dice e solo allora; senza 100 chiusure prima del punto l'RSI non c'e' e la divergenza nemmeno (v436)",
+      [d["tipo"] for d in _dv494["divergenze"]] == ["rialzista"] and _atteso494(_dv494)
+      and not _dvn494["divergenze"] and not _atteso494(_dvn494)
+      and _dvc494["minimi"][-2]["rsi"] is None and not _dvc494["divergenze"],
+      str((_dv494["minimi"], _dvn494["minimi"], _dv494["divergenze"])))
+
+# --- i volumi in salita e in discesa ---
+_vv494 = _zz494([100, 90, 98, 86, 94, 82, 90, 84], vol=lambda a, b: 200 if b > a else 100)
+_sv494 = ROT.struttura(_vv494, 84.0, 1.0, _ad494)
+_su494 = sum(1 for a, b in zip(_vv494[-21:], _vv494[-20:]) if b["c"] > a["c"])
+_vb494 = [dict(b) for b in _vv494]
+_vb494[-3]["v"] = None
+check("v494 le ultime 20 sedute concluse: quante in salita e in discesa, e il volume medio delle une contro le altre; un "
+      "volume mancante e' un buco, non uno zero (v205)",
+      _sv494["volumi"]["su"] == _su494 and _sv494["volumi"]["giu"] == 20 - _su494
+      and abs(_sv494["volumi"]["rapporto"] - 2.0) < 1e-9 and ROT.struttura(_vb494, 84.0, 1.0, _ad494)["volumi"] is None,
+      str(_sv494["volumi"]))
+
+# --- la finestra, il taglio, i buchi ---
+_lunga494 = _zz494([100, 90, 98, 86, 94, 82, 90, 84] * 7, inizio="2024-03-04")
+_sl494 = ROT.struttura(_lunga494, 84.0, 1.0, _ad494)
+_fv494 = _sl494["fino_a"][:4] + "-" + _sl494["fino_a"][5:]
+_vei494 = {"verificato": True, "fine": _lunga494[-60]["t"]}
+_sv494v = ROT.struttura(_lunga494, 84.0, 1.0, _ad494, veicolo=_vei494)
+check("v494 l'ultimo anno PER DATA (v207): nessun punto prima dell'inizio della finestra; e un veicolo di quotazione "
+      "dentro la finestra la taglia e lo dichiara (v492)",
+      _sl494["da"] >= _sl494["inizio_finestra"] and all(x["data"] >= _sl494["inizio_finestra"]
+                                                        for x in _sl494["massimi"] + _sl494["minimi"])
+      and _sl494["taglio"] is None and _sv494v["motivo"] == "veicolo" and _sv494v["da"] > _vei494["fine"]
+      and _sv494v["taglio"] is not None, str((_sl494["da"], _sl494["inizio_finestra"], _sv494v["da"])))
+check("v494 senza barre, prezzo o ATR la struttura e' None — storico non letto, non 'nessuna struttura' (v389); con un "
+      "punto solo per verso e' NON MISURABILE",
+      ROT.struttura(None, 1.0, 1.0) is None and ROT.struttura(_zzp494, None, 1.0) is None
+      and ROT.struttura(_zzp494, 84.0, None) is None
+      and _st494([100, 90, 98, 92])["stato"] == "NON MISURABILE")
+
+# --- la resa ---
+_rs494 = "\n".join(ROT.righe_struttura(_rib494))
+_rsr494 = "\n".join(ROT.righe_struttura(_dmr494))
+check("v494 la resa: lo stato, la sequenza coi punti di fila, i due livelli, e la lettura dei grafici DICHIARATA "
+      "convenzione di lettura, non misura (v240)",
+      "— RIBASSISTA: massimi DECRESCENTI, gli ultimi 3 di fila" in _rs494 and "una chiusura sopra 90,90" in _rs494
+      and "una chiusura sotto 81,18" in _rs494 and "lettura dei grafici (convenzioni di lettura, non misure)" in _rs494, _rs494)
+check("v494 la resa della ROTTURA: la chiusura, l'ultimo minimo, l'estremo e quante sedute mancano perche' diventi un "
+      "punto; il livello gia' rotto non si ripete come se fosse da rompere; il doppio minimo che non ha tenuto",
+      "⚠ ROTTA AL RIBASSO" in _rsr494 and "sta sotto l'ultimo minimo di oscillazione" in _rsr494
+      and "nelle prossime 5 sedute concluse" in _rsr494 and "una chiusura sotto" not in _rsr494
+      and "il doppio minimo NON ha tenuto" in _rsr494, _rsr494)
+check("v494 la resa dei tre esiti (v389): storico NON letto · NON MISURABILE con un punto solo · letta",
+      "storico NON letto" in ROT.righe_struttura(None)[0]
+      and "NON MISURABILE" in ROT.righe_struttura(_st494([100, 90, 98, 92]))[0]
+      and "un punto solo" in ROT.righe_struttura(_st494([100, 90, 98, 92]))[0])
+
+# --- i segnali: ingresso possibile, uscita accesa ---
+_ti494 = lambda **kw: {"tk": "AAA", "stato": "SOTTO LA 200", **kw}
+check("v494 INGRESSO POSSIBILE = un pavimento entro 1 ATR (la decisione del CEO del 15/10), un candidato, il prezzo nella "
+      "zona; la RISALITA no — una chiusura sopra l'ultimo massimo o sopra il collo di un doppio minimo resta un segnale, "
+      "e il CEO non la compra",
+      ROT.segnali_ingresso(_ti494(pavimenti={"minimi": [{"atr": -0.8, "ordine": 95.0}]}))
+      == ["pavimento entro 1 ATR (ordine 95,00)"]
+      and ROT.segnali_ingresso(_ti494(pavimenti={"minimi": [{"atr": -1.2, "ordine": 95.0}]})) == []
+      and ROT.segnali_ingresso(_ti494(stato="CANDIDATO")) == ["candidato"]
+      and ROT.segnali_ingresso(_ti494(struttura={"rottura": "rialzo", "doppi": [
+          {"tipo": "minimo", "esito": "confermato", "sedute_dal": 0, "dal": "2026-10-16"}]})) == []
+      and ROT.segnali_ingresso({"tk": "X", "errore": "non letto"}) == [])
+_doppiom494 = lambda k: {"doppi": [{"tipo": "massimo", "esito": "confermato", "sedute_dal": k, "dal": "2026-10-08"}]}
+check("v494 USCITA ACCESA = la tenuta che non lascia correre, la chiusura sotto l'ultimo minimo, massimi e minimi "
+      "decrescenti, un doppio massimo sotto il collo da non piu' di 10 sedute — e niente se non c'e' niente",
+      NL.segnali_uscita({"esito": "LASCIAR CORRERE", "struttura": None}) == []
+      and NL.segnali_uscita({"esito": NL.CONFLITTO}) == [f"tenuta: {NL.CONFLITTO}"]
+      and NL.segnali_uscita({"esito": "LASCIAR CORRERE", "struttura": {"rottura": "ribasso"}})
+      == ["chiusura sotto l'ultimo minimo di oscillazione"]
+      and NL.segnali_uscita({"esito": "LASCIAR CORRERE", "struttura": {"stato": "RIBASSISTA"}})
+      == ["massimi e minimi decrescenti"]
+      and NL.segnali_uscita({"esito": "LASCIAR CORRERE", "struttura": _doppiom494(3)})
+      == ["doppio massimo sotto il collo dal 2026-10-08"]
+      and NL.segnali_uscita({"esito": "LASCIAR CORRERE", "struttura": _doppiom494(ROT.STR_RECENTE + 1)}) == [])
+_sl494b = NL.segnali_libro({"righe": [{"tk": "AAA", "esito": "IN OSSERVAZIONE"}, {"tk": "BBB", "esito": "LASCIAR CORRERE"}]},
+                           {"righe": [{"tk": "CCC", "verso": "acquisto", "limite": 24.0},
+                                      {"tk": "DDD", "verso": "vendita", "limite": 50.0}]})
+check("v494 i segnali del libro: le posizioni con un'uscita accesa, poi gli ordini d'ACQUISTO attivi (un ordine e' un "
+      "ingresso possibile per definizione)",
+      _sl494b == {"AAA": ["tenuta: IN OSSERVAZIONE"], "CCC": ["ordine d'acquisto attivo a 24,00"]}, str(_sl494b))
+
+# --- le ultimissime notizie: la finestra, i tre esiti, la copertura del feed ---
+_ora494 = _dt471(2026, 10, 17, 10, 0, tzinfo=_tz494.utc)
+_chiamate494 = []
+def _feed494(tk):
+    _chiamate494.append(tk)
+    v = lambda ore, tit: {"titolo": tit, "quando": _ora494 - _td494(hours=ore)}
+    return {"AAA": (tk, "ok", [v(1, "uno"), v(50, "due"), v(100, "vecchia"), {"titolo": "senza data", "quando": None}]),
+            "BBB": (tk, "ok", [v(1, "b1"), v(2, "b2")]), "CCC": (tk, "HTTP 429", []),
+            "DDD": (tk, "ok", [])}[tk]
+_nr494 = ROT.notizie_recenti(["AAA", "BBB", "CCC", "DDD", "AAA"], adesso=_ora494, leggi=_feed494)
+check("v494 notizie: le ultime 72 ore dalla piu' recente, una voce senza data fuori, tre esiti distinti (v389), una "
+      "lettura per nome; se il feed restituisce voci tutte dentro la finestra, si dichiara fin dove arriva",
+      [v["titolo"] for v in _nr494["AAA"]["voci"]] == ["uno", "due"] and _nr494["AAA"]["copre_da"] is None
+      and _nr494["BBB"]["copre_da"] == _ora494 - _td494(hours=2) and _nr494["CCC"]["stato"] == "HTTP 429"
+      and _nr494["DDD"] == {"stato": "ok", "lette": 0, "copre_da": None, "voci": []}
+      and sorted(_chiamate494) == ["AAA", "BBB", "CCC", "DDD"], str(_nr494))
+_vv = lambda ore, tit: {"titolo": tit, "quando": _ora494 - _td494(hours=ore)}
+_news494 = {"AAA": {"stato": "ok", "voci": [_vv(1, "Stocks Plunge")] + [_vv(2 + k, f"AAA propria {k}") for k in range(8)],
+                    "copre_da": _ora494 - _td494(hours=9), "lette": 9},
+            "BBB": {"stato": "ok", "voci": [_vv(1, "stocks plunge ")], "copre_da": None, "lette": 15},
+            "CCC": {"stato": "HTTP 429", "voci": []}, "DDD": {"stato": "ok", "voci": [], "copre_da": None, "lette": 0}}
+_rn494 = "\n".join(ROT.righe_notizie("NOTIZIE ULTIMISSIME — PROVA", {"AAA": ["x"], "BBB": ["y"], "CCC": ["z"],
+                                                                     "DDD": ["w"], "EEE": ["v"]}, _news494,
+                                     altrove={"EEE": "CANDIDATI"}))
+check("v494 la resa delle notizie: la STESSA voce nel feed di piu' nomi e' cronaca di mercato, scritta una volta in "
+      "fondo (v451); le voci proprie per nome, quelle oltre il tetto CONTATE (v393); feed non letto e nessuna voce "
+      "DIVERSI (v389); la copertura del feed dichiarata; chi ha le notizie altrove lo dice",
+      _rn494.count("Stocks Plunge") == 1 and "(nel feed di AAA, BBB)" in _rn494 and "[AAA] " in _rn494
+      and "… e altre 2 voci nelle stesse ore, non mostrate" in _rn494 and "+ 1 voce di cronaca di mercato" in _rn494
+      and "nessuna voce propria: le 1 del feed sono cronaca di mercato" in _rn494
+      and "feed NON letto (HTTP 429)" in _rn494 and "feed letto, nessuna voce nelle ultime 72 ore" in _rn494
+      and "arriva solo fino al" in _rn494 and "notizie: nel blocco CANDIDATI" in _rn494
+      and ROT.righe_notizie("T", {}, {}) == ["T: nessun nome con un segnale in questo giro"], _rn494)
+
+# --- collegamenti: eseguiti dove si puo', letti dove la rete serve (v399, v483) ---
+_racc494 = _corpo_di(_src_rot473, "raccogli")
+_ciclo494 = _racc494[_racc494.find("for t in watch + cand:"):_racc494.find("# v474 — il piano per la liquidita'")]
+check("v494 collegamento: la raccolta calcola la struttura per sorvegliati e candidati, sulle stesse barre lunghe dei "
+      "pavimenti, e il comando stampa le notizie dei sorvegliati con un ingresso possibile",
+      't["struttura"] = struttura(BL.get(t["tk"]), t.get("px"), t.get("atr"), veicolo=t["veicolo"])' in _ciclo494
+      and "segnali_watchlist(o)" in _src_rot473.split("if __name__")[-1]
+      and "righe_notizie(" in _src_rot473.split("if __name__")[-1])
+_ti494r = "\n".join(ROT.righe_ingresso(_w473("STRU", struttura=_rib494)))
+_ti494n = "\n".join(ROT.righe_ingresso(_w473("NOST")))
+check("v494 collegamento ESEGUITO: la riga di un sorvegliato porta la struttura quando c'e', e tace quando non e' "
+      "calcolata; l'intestazione della watchlist la dichiara una volta",
+      "struttura delle oscillazioni (ultimo anno" in _ti494r and "struttura delle oscillazioni" not in _ti494n
+      and ROT.INTESTAZIONE_STRUTTURA in _tw473, _ti494r[-900:])
+_oc494 = {**_ocand, "settori": [{**_ocand["settori"][0], "titoli": [dict(_ocand["settori"][0]["titoli"][0],
+                                                                          struttura=_dmr494)]}]}
+check("v494 collegamento ESEGUITO: anche i candidati di settore portano la struttura",
+      "ROTTA AL RIBASSO" in "\n".join(ROT.righe_candidati(_oc494, {"AAA": {"stato": "ok", "voci": []}})))
+_calc494 = _corpo_di(Path(__file__).with_name("numeri_libro.py").read_text(), "calcola")
+check("v494 collegamento: calcola passa la struttura alla tenuta, e i segnali con le loro notizie al risultato",
+      "rotazione.struttura(BL.get(t)" in _calc494 and "struttura=strutt" in _calc494
+      and 'out["segnali"] = segnali_libro(out["tenuta"], out["ordini"])' in _calc494
+      and 'rotazione.notizie_recenti(list(out["segnali"])' in _calc494)
+check("v494 collegamento ESEGUITO: valuta_ordini da' a ogni ordine la sua struttura (un ordine e' un ingresso), e la "
+      "resa degli ordini la stampa",
+      "struttura" in _vo492 and "struttura delle oscillazioni" in "\n".join(
+          NL.righe_ordini({"righe": [dict(_vo492, struttura=_rib494)], "insieme": None, "inattivi": []})))
+_tm494 = NL.tenuta_posizioni(["AAA"], {"AAA": _b489["AAA"]}, {}, _sem481(), {"AAA": 100.0}, {"AAA": 50.0}, {"AAA": 10},
+                             {"AAA": 1.0}, _ny489, struttura={"AAA": _dmr494})
+_rtm494 = "\n".join(NL.righe_tenuta(_tm494))
+_rtm494n = "\n".join(NL.righe_tenuta(NL.tenuta_posizioni(["AAA"], {"AAA": _b489["AAA"]}, {}, _sem481(), {"AAA": 100.0},
+                                                         {"AAA": 50.0}, {"AAA": 10}, {"AAA": 1.0}, _ny489)))
+check("v494 collegamento ESEGUITO: la tenuta porta la struttura di ogni posizione e la dichiara informazione, non prova "
+      "e non vendita; senza struttura calcolata non dice niente",
+      "ROTTA AL RIBASSO" in _rtm494 and "non una prova in piu' (B3) — e non vende" in _rtm494
+      and "struttura delle oscillazioni" not in _rtm494n, _rtm494[:1200])
+_sint494 = NL.sintesi({**_o483, "segnali": {"AAA": ["tenuta: IN OSSERVAZIONE"]},
+                       "notizie": {"AAA": {"stato": "ok", "voci": [_vv(3, "AAA wins a contract")], "copre_da": None,
+                                           "lette": 15}}})
+check("v494 collegamento ESEGUITO: la sintesi stampa il blocco delle ultimissime notizie con il perche' di ogni nome",
+      "NOTIZIE ULTIMISSIME — POSIZIONI CON UN PARAMETRO D'USCITA ACCESO" in _sint494
+      and "AAA — tenuta: IN OSSERVAZIONE" in _sint494 and "AAA wins a contract" in _sint494
+      and "NOTIZIE ULTIMISSIME" not in NL.sintesi(_o483), _sint494[-600:])
+
+# --- le soglie stanno nel libro e il codice le rilegge (v474: un numero, un posto) ---
+_lib494 = (Path(__file__).resolve().parent.parent / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_sez494 = _lib494[_lib494.find("**Massimi e minimi: la STRUTTURA DELLE OSCILLAZIONI**"):_lib494.find("## 1ter")]
+_m494 = {"anno": re.search(r"nell'\*\*ultimo anno\*\*", _sez494), "mostra": re.search(r"Si mostrano gli \*\*ultimi (\d+)\*\*", _sez494),
+         "rsi": re.search(r"almeno \*\*(\d+) punti\*\* di RSI", _sez494), "vol": re.search(r"le ultime (\d+) concluse", _sez494),
+         "vicino": re.search(r"entro \*\*(\d+) ATR\*\* dal prezzo", _sez494),
+         "recente": re.search(r"da non più di \*\*(\d+) sedute\*\*", _sez494), "ore": re.search(r"ultime \*\*(\d+) ore\*\*", _sez494),
+         "lato": re.search(r"(\d+) sedute prima e (\d+) dopo", _sez494)}
+check("v494 le soglie della struttura si rileggono da LIBRO.md §1bis e coincidono col codice: un anno, 3 punti per verso, "
+      "3 punti di RSI, 20 sedute, 1 ATR, 10 sedute, 72 ore, 5 sedute per lato, alla pari entro mezzo ATR",
+      all(_m494.values()) and ROT.ANNI_STRUTTURA == 1 and int(_m494["mostra"].group(1)) == ROT.STR_MOSTRA
+      and int(_m494["rsi"].group(1)) == ROT.STR_RSI and int(_m494["vol"].group(1)) == ROT.STR_VOLUMI
+      and int(_m494["vicino"].group(1)) == ROT.VICINO_ATR and int(_m494["recente"].group(1)) == ROT.STR_RECENTE
+      and int(_m494["ore"].group(1)) == ROT.NOTIZIE_ORE
+      and int(_m494["lato"].group(1)) == int(_m494["lato"].group(2)) == ROT.PAV_LATO
+      and "entro mezzo ATR" in _sez494 and ROT.PAV_LARGHEZZA_ATR == 0.5 and "massimi e minimi decrescenti" in _sez494,
+      str({k: (v.group(0) if v else None) for k, v in _m494.items()}))
+_fmt494 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v494 FORMATO_ANALISI: la struttura e le ultimissime notizie nella sezione 6 e negli ingressi (7d-quinquies), e la "
+      "richiesta nel registro del 17/10",
+      "7d-quinquies. **la STRUTTURA e le ULTIMISSIME NOTIZIE**" in _fmt494 and "**STRUTTURA DELLE OSCILLAZIONI**" in _fmt494
+      and "NOTIZIE ULTIMISSIME** di `numeri_libro.py`" in _fmt494
+      and "e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10)" in _fmt494)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

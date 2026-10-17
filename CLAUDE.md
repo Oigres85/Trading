@@ -7314,3 +7314,64 @@ vederlo. ⚠ E il meta-gate dei template ha dichiarato **cieco** un rilevatore c
 `[a-zA-Z_$|]+` non comprendeva le **cifre**, e l'helper `_LEVA493` spezzava la cattura. È la svista della v457
 (lì l'underscore) sull'altra metà dell'alfabeto di un identificatore. Quattro iniezioni, ripristino per
 impronta: mordono tutte, ciascuna sul controllo atteso. `?v=` e `BUILD_VERSION` a 493: cambia `assets/app.js`.
+
+## 📈 v494 — MASSIMI E MINIMI DECRESCENTI: LA STRUTTURA DELLE OSCILLAZIONI, E LE ULTIMISSIME NOTIZIE
+
+Richiesta del CEO (17/10/2026), testuale: *"In generale analizza anche massimi e minimi decrescenti oltre, se
+possibile, tecnicamente i grafici quando si presenta la possibilità di ingresso o si attivano i parametri di uscita
+fermo restando che anche le ultimissime news sono importanti"*.
+
+**La struttura** (`rotazione.struttura`): i punti di oscillazione dell'ultimo anno, il verso degli ultimi due massimi e
+degli ultimi due minimi e quanti di fila, lo stato (RIALZISTA · RIBASSISTA · IN COMPRESSIONE · IN ESPANSIONE · LATERALE),
+la **rottura** — la chiusura conclusa oltre l'ultimo punto prima che un punto nuovo la confermi, con l'estremo toccato da
+allora —, i doppi minimi e massimi col loro collo e da quando, la divergenza dell'RSI, le sedute in salita e in discesa.
+Esce per ogni sorvegliato e candidato (`rotazione.py`), per ogni posizione e ogni ordine attivo (`numeri_libro.py`).
+Convenzioni in `LIBRO.md` §1bis, rilette da un gate.
+
+⚠⚠ **I PUNTI SONO QUELLI DEI PAVIMENTI, E UNA REGOLA SOLA LI TROVA.** Il ciclo dei pavimenti è diventato `perni()`, che
+serve i pavimenti e la struttura: due implementazioni di "il più basso di 5 sedute prima e 5 dopo, il primo a toccarlo"
+divergerebbero al primo ritocco (v161). Anche «alla pari» è la loro regola — mezzo ATR —: due minimi alla pari sono lo
+stesso pavimento. ⚠ Il refactor è stato **misurato identico al byte**: pavimenti e RSI su 24 titoli, a due prezzi ciascuno,
+prima e dopo. E `rsi_wilder` è ora l'ultimo valore di `rsi_serie`, la serie che serve alla divergenza.
+
+**Il 16/10 sei nomi avevano chiuso sotto il loro ultimo minimo di oscillazione**: MU, CRWV, RGTI, SMCI, ORCL, OKLO.
+È il segnale che il CEO chiedeva, e il suo stato LATERALE sui punti confermati lo nascondeva: per questo la rottura sta
+nella testa della riga e non in una nota sotto.
+
+⚠ **La struttura è la famiglia del PREZZO, la stessa della tendenza della tenuta**: un'informazione accanto alla tenuta,
+**non una prova in più (B3) e non una vendita** — dal 15/10 non si vende sui ribassi. Se debba entrare nella regola di
+tenuta è una domanda posta al CEO, non una scelta fatta qui.
+
+⚠ **La risalita non è un ingresso possibile.** La prima stesura contava come «ingresso possibile» anche la chiusura sopra
+l'ultimo massimo e sopra il collo di un doppio minimo: 35 nomi su 45, e 10 lo erano SOLO per la risalita — energia,
+farmaceutica, pagamenti, consumo: la rotazione fuori dalla tecnologia.
+Il CEO entra sui minimi (*"Non voglio entrare quando risalgono"*): restano un pavimento entro 1 ATR, un candidato, il
+prezzo nella zona. La risalita resta nella riga della struttura come segnale che la discesa è finita, come la zona (v487).
+
+⚠ **La base a 10 sedute della v473 resta**, e non è una seconda derivazione della stessa domanda: confronta due finestre
+di due settimane, la struttura una sequenza di punti di oscillazione. Ciascuna dichiara il proprio orizzonte nella riga.
+
+**Un doppio confermato a fine agosto è storia, uno confermato ieri è un segnale.** Misurato su AMD: il doppio minimo di
+agosto risultava «confermato» con la chiusura del 16/10, ventotto sedute dopo. Ora l'esito porta **da quando** regge, e
+un segnale d'uscita conta solo entro 10 sedute.
+
+### 📰 Le ultimissime notizie, e la cronaca di mercato che copriva quelle vere
+Per ogni nome con un ingresso possibile, un'uscita accesa o un ordine attivo, il feed Nasdaq del simbolo nelle ultime
+**72 ore** (il lunedì mattina comprende il venerdì), coi tre esiti distinti (v389) e il perché di ogni nome.
+
+⚠⚠ **Il 17/10 «Stock Indexes Finish Sharply Lower as Tech Stocks Plunge» stava in cima al feed di cinque posizioni** e
+copriva *"Why Is CoreWeave Stock Falling Today?"* e *"Nvidia Lost $200 Billion in Value After OpenAI's Revenue Run Rate
+Came Up $18 Billion Below Expectations"*. La regola del brief (v451) — la stessa voce in più feed è cronaca di mercato,
+non si toglie: si conta e si scrive una volta — vale anche qui, e la cronaca va in fondo al blocco.
+
+⚠ **Il feed restituisce le sue ultime 15 voci**, misurate: su CRWV, MU, NVDA e AMD cadevano tutte nelle 72 ore. Quando
+succede la riga dice fin dove il feed arriva: *"nessuna voce prima"* e *"il feed non ci arriva"* si leggono uguali (v406).
+
+### 🧪 I gate
+Trentuno controlli sugli stati costruiti (v425, v429): le sequenze a zig-zag, i doppi nei tre esiti, la rottura, la
+seduta in corso, la divergenza misurata con la sua stessa definizione e nei due versi, i volumi, la finestra per data e
+il veicolo, i segnali, le notizie, i collegamenti **eseguiti** dove si può (v483). **Diciotto iniezioni, una alla volta,
+ripristino verificato per impronta: mordono tutte**, ciascuna sul controllo atteso. Pavimento della suite 510 → 540.
+⚠ **Il gate v492 pinnava la parentesi chiusa** dopo `storia=storia`: la v494 ha aggiunto un argomento alla stessa chiamata
+ed è andato rosso su codice giusto. È la svista della v489 (`decisioni, media)`, poi `media, pav)`) per la terza volta:
+si àncora all'argomento, mai alla parentesi. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

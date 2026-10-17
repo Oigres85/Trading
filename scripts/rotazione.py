@@ -124,6 +124,20 @@ PAV_CODA_ATR = 2.0          # v488: il piu' toccato in coda solo entro 2 ATR sot
 ANNI_LETTURA = 5
 SETTIMANE_MEDIE = (30, 50, 200)
 SETTIMANE_PENDENZA = 13     # la pendenza di una media settimanale: su un trimestre
+# v494 — la struttura delle oscillazioni (richiesta del CEO del 17/10/2026: "analizza anche massimi e minimi
+#   decrescenti ... tecnicamente i grafici quando si presenta la possibilita' di ingresso o si attivano i parametri di
+#   uscita"). I punti di oscillazione sono quelli dei pavimenti (PAV_LATO) e "alla pari" e' la loro stessa regola
+#   (PAV_LARGHEZZA_ATR): due minimi alla pari sono lo stesso pavimento. Convenzioni scritte anche in LIBRO.md §1bis
+#   e rilette da un gate (v474: un numero, un posto).
+ANNI_STRUTTURA = 1          # la finestra: l'ultimo anno di sedute concluse, per data
+STR_MOSTRA = 3              # gli ultimi tre massimi e gli ultimi tre minimi di oscillazione
+STR_RSI = 3.0               # una divergenza chiede almeno 3 punti di RSI fra i due punti: sotto e' rumore
+STR_VOLUMI = 20             # sedute in salita contro sedute in discesa: le ultime 20 concluse
+STR_RECENTE = 10            # una chiusura oltre il collo di un doppio e' un segnale NUOVO per 10 sedute concluse
+VICINO_ATR = 1.0            # un pavimento entro 1 ATR dal prezzo si raggiunge in una seduta ordinaria
+NOTIZIE_ORE = 72            # le ultimissime notizie: 72 ore, cosi' il lunedi' mattina comprende il venerdi'
+STATI_STRUTTURA = {("crescenti", "crescenti"): "RIALZISTA", ("decrescenti", "decrescenti"): "RIBASSISTA",
+                   ("decrescenti", "crescenti"): "IN COMPRESSIONE", ("crescenti", "decrescenti"): "IN ESPANSIONE"}
 
 
 SEDUTE_BETA = 250
@@ -261,20 +275,33 @@ def stato_titolo(px, sma200, pend50, d50_atr, corr):
     return "CANDIDATO"
 
 
+def rsi_serie(chiusure, n=14):
+    """v494 — l'RSI di Wilder su TUTTA la serie, allineato alle chiusure (None prima di n variazioni): seme = media
+    delle prime n variazioni, la convenzione della pipeline (v436). Serve alla divergenza fra due punti di
+    oscillazione; rsi_wilder ne prende l'ultimo valore: una derivazione sola (v161)."""
+    out = [None] * len(chiusure)
+    if len(chiusure) <= n:
+        return out
+    d = [b - a for a, b in zip(chiusure, chiusure[1:])]
+    g = sum(max(x, 0) for x in d[:n]) / n
+    p = sum(max(-x, 0) for x in d[:n]) / n
+    out[n] = 100.0 if p == 0 else 100 - 100 / (1 + g / p)
+    for k, x in enumerate(d[n:], start=n + 1):
+        g = (g * (n - 1) + max(x, 0)) / n
+        p = (p * (n - 1) + max(-x, 0)) / n
+        out[k] = 100.0 if p == 0 else 100 - 100 / (1 + g / p)
+    return out
+
+
 def rsi_wilder(barre, n=14):
     """RSI a smorzamento di Wilder, seme = media delle prime n variazioni (la convenzione della
     pipeline, verificata in v436). Sotto 100 barre il valore dipende dalla convenzione piu' che
-    dal mercato (v436, SKHY 58-75 secondo il seme): None, un buco e non un numero."""
+    dal mercato (v436, SKHY 58-75 secondo il seme): None, un buco e non un numero.
+    v494: e' l'ultimo valore di rsi_serie, una derivazione sola (v161)."""
     c = [x["c"] for x in barre]
     if len(c) < 100:
         return None
-    d = [b - a for a, b in zip(c, c[1:])]
-    g = sum(max(x, 0) for x in d[:n]) / n
-    p = sum(max(-x, 0) for x in d[:n]) / n
-    for x in d[n:]:
-        g = (g * (n - 1) + max(x, 0)) / n
-        p = (p * (n - 1) + max(-x, 0)) / n
-    return 100.0 if p == 0 else 100 - 100 / (1 + g / p)
+    return rsi_serie(c, n)[-1]
 
 
 def volumi(barre, adesso=None):
@@ -516,6 +543,22 @@ def serie_della_societa(barre, veicolo=None, salto=PAV_SALTO):
     return serie, taglio, ("societaria" if taglio else None)
 
 
+def perni(serie, campo="l", massimi=False, lato=PAV_LATO):
+    """v494 — gli indici dei PUNTI DI OSCILLAZIONE di una serie: il piu' basso (o il piu' alto, con massimi=True) di
+    `lato` sedute prima e `lato` dopo, e il PRIMO a toccare quel prezzo: un tratto piatto da' un punto solo, al suo
+    inizio (v487). Una regola sola per pavimenti e struttura (v161). Un buco nella finestra non da' un punto (v205), e
+    le ultime `lato` sedute non possono darne: manca ancora chi lo conferma."""
+    scegli = max if massimi else min
+    out = []
+    for i in range(lato, len(serie) - lato):
+        fin = [b.get(campo) for b in serie[i - lato:i + lato + 1]]
+        v = serie[i].get(campo)
+        if v is None or any(x is None for x in fin) or v != scegli(fin) or fin.index(v) != lato:
+            continue
+        out.append(i)
+    return out
+
+
 def _con_ordine(z, px, atr):
     """Ordine con limite al bordo alto, stop una chiusura sotto il fondo meno PAV_STOP_ATR, e la perdita allo
     stop per l'unita' di calcolo: la stessa aritmetica per pavimenti e vuoti."""
@@ -547,12 +590,11 @@ def pavimenti(barre, px, atr, adesso=None, anni=ANNI_PAVIMENTI, veicolo=None):
     serie = [b for b in serie if b["t"] >= inizio]
     vols = [b["v"] for b in serie if b.get("v")]
     minimi = []
-    for i in range(PAV_LATO, len(serie) - PAV_LATO):
-        fin = [b.get("l") for b in serie[i - PAV_LATO:i + PAV_LATO + 1]]
-        lo = serie[i].get("l")
-        # il piu' basso della finestra E il primo a toccare quel prezzo: un tratto piatto da' un pavimento solo,
-        #   al suo inizio, invece di un 'tocco' per ogni seduta uguale
-        if lo is None or any(v is None for v in fin) or lo != min(fin) or fin.index(lo) != PAV_LATO or lo >= px:
+    # il piu' basso della finestra E il primo a toccare quel prezzo: un tratto piatto da' un pavimento solo, al suo
+    #   inizio, invece di un 'tocco' per ogni seduta uguale — la regola di perni, la stessa della struttura (v494)
+    for i in perni(serie, "l"):
+        lo = serie[i]["l"]
+        if lo >= px:
             continue
         dopo = [b["h"] for b in serie[i + 1:i + 1 + PAV_RIMBALZO] if b.get("h") is not None]
         minimi.append({"data": serie[i]["t"], "minimo": lo,
@@ -657,6 +699,139 @@ def lettura_5anni(barre, px, adesso=None, veicolo=None, anni=ANNI_LETTURA):
             "rialzo": ({"da": base["l"], "data": str(base["t"])[:10],
                         "restituito_pct": (hi["h"] - px) / (hi["h"] - base["l"]) * 100}
                        if base and hi["h"] > base["l"] else None)}
+
+
+def struttura(barre, px, atr, adesso=None, veicolo=None, anni=ANNI_STRUTTURA):
+    """v494 — LA STRUTTURA DELLE OSCILLAZIONI (richiesta del CEO del 17/10/2026: «analizza anche massimi e minimi
+    decrescenti … quando si presenta la possibilità di ingresso o si attivano i parametri di uscita»): i punti di
+    oscillazione dell'ultimo anno con la regola dei pavimenti (perni); il verso degli ultimi due massimi e degli
+    ultimi due minimi — ALLA PARI entro mezzo ATR, la regola per cui due minimi sono lo stesso pavimento — e quanti
+    di fila; la chiusura conclusa OLTRE l'ultimo punto, cioè la sequenza rotta prima che un punto nuovo la confermi,
+    con l'estremo toccato da allora; i doppi minimi e doppi massimi col loro collo; la divergenza dell'RSI; le sedute
+    in salita e in discesa. Solo fatti delle barre: la frase la scrive la resa (v448). La serie è quella della società
+    di oggi (serie_della_societa, v492) e la seduta in corso si toglie (v471). L'RSI si calcola su tutta la serie e un
+    punto con meno di 100 chiusure prima non ne ha (v436). None = storico non letto o prezzo/ATR mancanti, che NON è
+    'nessuna struttura' (v389)."""
+    from datetime import date as _data
+    if not barre or px is None or not atr:
+        return None
+    if seduta_in_corso(barre, adesso):
+        barre = barre[:-1]
+    piena, taglio, motivo = serie_della_societa(barre, veicolo)
+    if not piena:
+        return None
+    fine = _data.fromisoformat(str(piena[-1]["t"])[:10])
+    inizio = fine.replace(year=fine.year - anni, day=min(fine.day, 28) if fine.month == 2 else fine.day).isoformat()
+    s0 = next((k for k, b in enumerate(piena) if str(b["t"])[:10] >= inizio), len(piena))
+    serie = piena[s0:]
+    chiusure = [b.get("c") for b in piena]
+    rsi = rsi_serie(chiusure) if all(c is not None for c in chiusure) else [None] * len(piena)
+
+    def punto(i, campo):
+        k = s0 + i
+        return {"data": str(serie[i]["t"])[:10], "prezzo": serie[i][campo], "i": i,
+                "rsi": rsi[k] if k >= 99 else None}
+    massimi = [punto(i, "h") for i in perni(serie, "h", massimi=True)]
+    minimi = [punto(i, "l") for i in perni(serie, "l")]
+
+    def verso(a, b):
+        if abs(b - a) <= PAV_LARGHEZZA_ATR * atr:
+            return "alla pari"
+        return "crescenti" if b > a else "decrescenti"
+
+    def di_fila(P):
+        """Il verso degli ultimi due punti e quanti punti di fila lo seguono (2 = solo gli ultimi due)."""
+        if len(P) < 2:
+            return None, len(P)
+        v, k = verso(P[-2]["prezzo"], P[-1]["prezzo"]), 2
+        for j in range(len(P) - 2, 0, -1):
+            if verso(P[j - 1]["prezzo"], P[j]["prezzo"]) != v:
+                break
+            k += 1
+        return v, k
+    vm, km = di_fila(massimi)
+    vn, kn = di_fila(minimi)
+    stato = "NON MISURABILE" if vm is None or vn is None else STATI_STRUTTURA.get((vm, vn), "LATERALE")
+    c = serie[-1].get("c")
+    dist = lambda v: {"pct": (v / px - 1) * 100, "atr": (v - px) / atr}
+    su, giu = (massimi[-1] if massimi else None), (minimi[-1] if minimi else None)
+    sotto = bool(giu and c is not None and c < giu["prezzo"])
+    sopra = bool(su and c is not None and c > su["prezzo"])
+    if sotto and sopra:          # solo se l'ultimo massimo sta sotto l'ultimo minimo: decide il punto piu' recente
+        sotto, sopra = giu["i"] > su["i"], su["i"] > giu["i"]
+    rottura = "ribasso" if sotto else ("rialzo" if sopra else None)
+    estremo = None
+    if rottura:
+        rif, campo = (giu, "l") if rottura == "ribasso" else (su, "h")
+        dopo = [(i, b[campo]) for i, b in enumerate(serie) if i > rif["i"] and b.get(campo) is not None]
+        if dopo:
+            # il primo a toccare l'estremo, come per i punti di oscillazione
+            i, v = (min if rottura == "ribasso" else max)(dopo, key=lambda iv: iv[1])
+            estremo = {"prezzo": v, "data": str(serie[i]["t"])[:10], "i": i, "sedute_dopo": len(serie) - 1 - i,
+                       "rsi": rsi[s0 + i] if s0 + i >= 99 else None}
+    doppi = []
+    for P, tipo, campo in ((minimi, "minimo", "h"), (massimi, "massimo", "l")):
+        if len(P) < 2 or verso(P[-2]["prezzo"], P[-1]["prezzo"]) != "alla pari" or c is None:
+            continue
+        a, b = P[-2], P[-1]
+        mezzo = [x[campo] for x in serie[a["i"] + 1:b["i"]] if x.get(campo) is not None]
+        if not mezzo:
+            continue
+        collo = max(mezzo) if tipo == "minimo" else min(mezzo)
+        basso, alto = min(a["prezzo"], b["prezzo"]), max(a["prezzo"], b["prezzo"])
+        if tipo == "minimo":
+            esito = "confermato" if c > collo else ("rotto" if c < basso else "da confermare")
+        else:
+            esito = "confermato" if c < collo else ("superato" if c > alto else "da confermare")
+        # da quando l'esito di oggi regge: l'inizio della fila di chiusure, dopo il secondo punto, tutte oltre il
+        #   livello — un doppio minimo confermato a fine agosto e' storia, uno confermato ieri e' un segnale
+        oltre = {("minimo", "confermato"): lambda x: x > collo, ("minimo", "rotto"): lambda x: x < basso,
+                 ("massimo", "confermato"): lambda x: x < collo, ("massimo", "superato"): lambda x: x > alto
+                 }.get((tipo, esito))
+        dal = None
+        if oltre:
+            k = len(serie) - 1
+            while k > b["i"] and serie[k].get("c") is not None and oltre(serie[k]["c"]):
+                k -= 1
+            dal = k + 1
+        doppi.append({"tipo": tipo, "basso": basso, "alto": alto, "date": (a["data"], b["data"]), "collo": collo,
+                      "esito": esito, **dist(collo),
+                      "dal": None if dal is None else str(serie[dal]["t"])[:10],
+                      "sedute_dal": None if dal is None else len(serie) - 1 - dal})
+    divergenze = []
+
+    def _div(a, b, tipo, formazione):
+        if a.get("rsi") is None or b.get("rsi") is None:
+            return
+        v = verso(a["prezzo"], b["prezzo"])
+        if (tipo == "rialzista" and v == "decrescenti" and b["rsi"] - a["rsi"] >= STR_RSI) or \
+           (tipo == "ribassista" and v == "crescenti" and a["rsi"] - b["rsi"] >= STR_RSI):
+            divergenze.append({"tipo": tipo, "in_formazione": formazione, "prezzi": (a["prezzo"], b["prezzo"]),
+                               "rsi": (a["rsi"], b["rsi"]), "date": (a["data"], b["data"])})
+    if len(minimi) >= 2:
+        _div(minimi[-2], minimi[-1], "rialzista", False)
+    if len(massimi) >= 2:
+        _div(massimi[-2], massimi[-1], "ribassista", False)
+    if estremo and rottura == "ribasso":
+        _div(giu, estremo, "rialzista", True)
+    if estremo and rottura == "rialzo":
+        _div(su, estremo, "ribassista", True)
+    ult = serie[-(STR_VOLUMI + 1):]
+    volumi = None
+    if len(ult) == STR_VOLUMI + 1 and all(x.get("v") is not None and x.get("c") is not None for x in ult):
+        in_su = [b["v"] for a, b in zip(ult, ult[1:]) if b["c"] > a["c"]]
+        in_giu = [b["v"] for a, b in zip(ult, ult[1:]) if b["c"] < a["c"]]
+        volumi = {"su": len(in_su), "giu": len(in_giu),
+                  "rapporto": ((sum(in_su) / len(in_su)) / (sum(in_giu) / len(in_giu))
+                               if in_su and in_giu and sum(in_giu) else None)}
+    return {"da": str(serie[0]["t"])[:10], "fino_a": str(serie[-1]["t"])[:10], "inizio_finestra": inizio,
+            "sedute": len(serie), "taglio": taglio if taglio and str(taglio)[:10] > inizio else None, "motivo": motivo,
+            "chiusura": c, "seduta": str(serie[-1]["t"])[:10], "stato": stato,
+            "massimi": massimi[-STR_MOSTRA:], "minimi": minimi[-STR_MOSTRA:],
+            "verso_massimi": vm, "fila_massimi": km, "verso_minimi": vn, "fila_minimi": kn,
+            "su": None if su is None else {**su, **dist(su["prezzo"])},
+            "giu": None if giu is None else {**giu, **dist(giu["prezzo"])},
+            "rottura": rottura, "estremo": estremo, "doppi": doppi, "divergenze": divergenze, "volumi": volumi}
 
 
 def scheda(tk, barre, rlibro, rspy=None, target=None):
@@ -774,6 +949,8 @@ def raccogli():
     for t in watch + cand:
         t.setdefault("veicolo", veicolo_pipeline(d, t["tk"]))
         t["cinque_anni"] = lettura_5anni(BL.get(t["tk"]), t.get("px"), veicolo=t["veicolo"])
+        # v494 — la struttura delle oscillazioni accompagna ogni ingresso, sulla stessa serie della societa'
+        t["struttura"] = struttura(BL.get(t["tk"]), t.get("px"), t.get("atr"), veicolo=t["veicolo"])
     # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
     eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
     eur_nom = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "EUR"}
@@ -947,6 +1124,8 @@ def righe_ingresso(t, cal=None):
         base += (f" · minimo dell'anno {prezzo(dm['minimo'])} il {dm['data']}, {quando}, "
                  f"prezzo {n(dm['sopra_pct'],1,'%')} sopra")
     L.append(f"      {base}")
+    if "struttura" in t:          # v494 — la struttura delle oscillazioni: il calcolo vive in raccogli
+        L.extend(f"      {r}" for r in righe_struttura(t["struttura"]))
     if "pavimenti" in t:          # v487 — solo i sorvegliati: il calcolo vive in raccogli
         L.extend(f"      {r}" for r in righe_pavimenti(t["pavimenti"]))
     if "cinque_anni" in t:        # v492 — la lettura a 5 anni: il calcolo vive in raccogli
@@ -1061,6 +1240,214 @@ def righe_5anni(l, veicolo=None):
     return L
 
 
+def _punti(P):
+    return " → ".join(f"{prezzo(x['prezzo'])} il {x['data']}" for x in P)
+
+
+def _sequenza(P, verso, fila, nome):
+    if not P:
+        return f"{nome}: nessun punto di oscillazione nella finestra"
+    if verso is None:
+        return f"{nome}: un punto solo ({_punti(P)}), nessun verso"
+    di_fila = "" if verso == "alla pari" else f", gli ultimi {fila} di fila"
+    return f"{nome} {verso.upper()}{di_fila} ({_punti(P)})"
+
+
+TESTO_DOPPIO = {   # v494 — l'esito di oggi di un doppio minimo o massimo, letto dalla chiusura conclusa
+    ("minimo", "confermato"): "la chiusura sta SOPRA il collo: confermato",
+    ("minimo", "rotto"): "la chiusura sta SOTTO i due minimi: il doppio minimo NON ha tenuto",
+    ("minimo", "da confermare"): "si conferma con una chiusura sopra il collo",
+    ("massimo", "confermato"): "la chiusura sta SOTTO il collo: confermato",
+    ("massimo", "superato"): "la chiusura sta SOPRA i due massimi: superato",
+    ("massimo", "da confermare"): "si conferma con una chiusura sotto il collo",
+}
+
+
+def righe_struttura(st):
+    """v494 — la struttura delle oscillazioni di un nome: la sequenza, i due livelli che la cambiano o la rottura gia'
+    in corso, e la lettura dei grafici. Le convenzioni sono dichiarate UNA volta nell'intestazione del blocco che la
+    porta (v407) e in LIBRO.md §1bis. Tre esiti distinti (v389): letta · storico NON letto · meno di due punti per
+    verso, che e' NON MISURABILE e lo dice."""
+    if st is None:
+        return ["struttura delle oscillazioni: storico NON letto (o prezzo e ATR mancanti) — non vuol dire 'nessuna struttura'"]
+    origine = (f"dal {st['da']}: la serie parte da un taglio — "
+               + ("la fine del veicolo di quotazione (SPAC)" if st.get("motivo") == "veicolo" else "un'operazione societaria")
+               if st.get("taglio") else f"ultimo anno, dal {st['da']}")
+    rott = st.get("rottura")
+    testa = (f"struttura delle oscillazioni ({origine}, {st['sedute']} sedute concluse) — {st['stato']}"
+             + (" sui punti confermati, ⚠ ROTTA AL " + ("RIBASSO" if rott == "ribasso" else "RIALZO") if rott else "")
+             + ": " + _sequenza(st["massimi"], st["verso_massimi"], st["fila_massimi"], "massimi") + " · "
+             + _sequenza(st["minimi"], st["verso_minimi"], st["fila_minimi"], "minimi"))
+    L = [testa]
+    if rott:
+        rif, e = (st["giu"], st["estremo"]) if rott == "ribasso" else (st["su"], st["estremo"])
+        quale, verso_s = ("minimo", "sotto") if rott == "ribasso" else ("massimo", "sopra")
+        s = (f"   ⚠ la chiusura del {st['seduta']} ({prezzo(st['chiusura'])}) sta {verso_s} l'ultimo {quale} di oscillazione "
+             f"({prezzo(rif['prezzo'])} del {rif['data']}): la sequenza si e' rotta prima che un punto nuovo la confermi")
+        if e:
+            mancano = max(PAV_LATO - e["sedute_dopo"], 1)
+            s += (f" — il {quale} toccato da allora, {prezzo(e['prezzo'])} il {e['data']}, diventa un punto di oscillazione "
+                  f"se nelle prossime {mancano} {'seduta' if mancano == 1 else 'sedute'} concluse il prezzo non va "
+                  + ("sotto" if rott == "ribasso" else "sopra"))
+        L.append(s)
+    liv = []
+    if st.get("su") and rott != "rialzo":
+        liv.append(f"una chiusura sopra {prezzo(st['su']['prezzo'])} (l'ultimo massimo, {n(st['su']['pct'], 1, '%')}, "
+                   f"{n(st['su']['atr'], 1)} ATR) fa un massimo crescente")
+    if st.get("giu") and rott != "ribasso":
+        liv.append(f"una chiusura sotto {prezzo(st['giu']['prezzo'])} (l'ultimo minimo, {n(st['giu']['pct'], 1, '%')}, "
+                   f"{n(st['giu']['atr'], 1)} ATR) fa un minimo decrescente")
+    if liv:
+        L.append("   " + " · ".join(liv))
+    let = []
+    for d in st.get("doppi") or []:
+        fascia = prezzo(d["alto"]) if d["basso"] == d["alto"] else f"{prezzo(d['basso'])}–{prezzo(d['alto'])}"
+        let.append(f"doppio {d['tipo']} {fascia} ({d['date'][0]} e {d['date'][1]}), collo {prezzo(d['collo'])} "
+                   f"({n(d['pct'], 1, '%')}): {TESTO_DOPPIO[(d['tipo'], d['esito'])]}"
+                   + (f" dal {d['dal']}" if d.get("dal") else ""))
+    for d in st.get("divergenze") or []:
+        a, b = d["prezzi"]
+        ra, rb = d["rsi"]
+        let.append(f"divergenza {d['tipo'].upper()} dell'RSI" + (" IN FORMAZIONE (il secondo punto non e' ancora confermato)"
+                                                                 if d["in_formazione"] else "")
+                   + (f": minimo piu' basso ({prezzo(a)} → {prezzo(b)}) con RSI piu' alto ({ra:.0f} → {rb:.0f})"
+                      if d["tipo"] == "rialzista" else
+                      f": massimo piu' alto ({prezzo(a)} → {prezzo(b)}) con RSI piu' basso ({ra:.0f} → {rb:.0f})"))
+    v = st.get("volumi")
+    let.append("sedute in salita e in discesa n.d. (volumi mancanti)" if v is None else
+               f"ultime {STR_VOLUMI} sedute concluse: {v['su']} in salita e {v['giu']} in discesa, volume medio in salita "
+               + ("n.d." if v["rapporto"] is None else f"{piano(v['rapporto'], 2)} volte") + " quello in discesa")
+    L.append("   lettura dei grafici (convenzioni di lettura, non misure): " + " · ".join(let))
+    return L
+
+
+INTESTAZIONE_STRUTTURA = (   # v494 — dichiarata una volta per blocco (v407), e in LIBRO.md §1bis
+    f"struttura delle oscillazioni (richiesta del CEO del 17/10/2026) = i punti di oscillazione dell'ultimo anno con le "
+    f"regole dei pavimenti — il piu' basso o il piu' alto di {PAV_LATO} sedute prima e {PAV_LATO} dopo, alla pari entro "
+    "mezzo ATR — e il verso degli ultimi due: RIALZISTA = massimi e minimi crescenti · RIBASSISTA = massimi e minimi "
+    "decrescenti · IN COMPRESSIONE = massimi decrescenti e minimi crescenti · IN ESPANSIONE = il contrario · LATERALE = "
+    "uno dei due alla pari · ROTTA = la chiusura conclusa oltre l'ultimo punto, prima che un punto nuovo lo confermi · "
+    "doppi, divergenze dell'RSI e sedute in salita o in discesa = convenzioni di lettura dei grafici, non misure · e' la "
+    "famiglia del PREZZO, la stessa della tendenza della tenuta: un'informazione in piu', non una prova in piu' (B3)")
+
+
+def segnali_ingresso(t):
+    """v494 — perche' un nome ha un INGRESSO POSSIBILE adesso: un pavimento entro 1 ATR — l'ingresso sui minimi deciso
+    dal CEO il 15/10 —, o le convenzioni d'ingresso del sistema (candidato, prezzo dentro la zona). Lista vuota =
+    nessuno. Servono a scegliere su quali nomi le ULTIMISSIME notizie si leggono (CEO, 17/10/2026).
+    ⚠ Una chiusura sopra l'ultimo massimo di oscillazione o sopra il collo di un doppio minimo NON e' un ingresso
+    possibile: e' la risalita, che il CEO non compra («Non voglio entrare quando risalgono»). Resta nella riga della
+    struttura come segnale che la discesa e' finita, come i livelli della zona (v487)."""
+    if t.get("errore"):
+        return []
+    s = []
+    z = (((t.get("pavimenti") or {}).get("minimi")) or [None])[0]
+    if z and z.get("atr") is not None and z["atr"] >= -VICINO_ATR:
+        s.append(f"pavimento entro {piano(VICINO_ATR, 0)} ATR (ordine {prezzo(z['ordine'])})")
+    if str(t.get("stato", "")).startswith("CANDIDATO"):
+        s.append("candidato")
+    if piano_ingresso(t)["posizione"] == "dentro":
+        s.append("prezzo dentro la zona d'ingresso")
+    return s
+
+
+def leggi_feed(tks, leggi=None):
+    """{tk: (stato, voci)} dal feed Nasdaq del simbolo, in parallelo e una volta per nome. leggi: la funzione di
+    lettura (brief.news_titolo), sostituibile nei gate. Un 429 non si ritenta (v398): e' una quota, non un intoppo."""
+    leggi = leggi or brief.news_titolo
+    tks = list(dict.fromkeys(tks))
+    if not tks:
+        return {}
+    with ThreadPoolExecutor(brief.PARALLELI) as ex:
+        return {tk: (st, v) for tk, st, v in ex.map(leggi, tks)}
+
+
+def notizie_recenti(tks, ore=NOTIZIE_ORE, adesso=None, leggi=None):
+    """v494 — le ULTIMISSIME notizie (richiesta del CEO del 17/10/2026: «fermo restando che anche le ultimissime news
+    sono importanti») dal feed Nasdaq del simbolo: l'attribuzione viene dalla FONTE (v399). {tk: {"stato", "voci"}},
+    le voci delle ultime `ore` dalla piu' recente. Tre esiti distinti (v389): con voci · feed letto e nessuna voce
+    nella finestra · feed NON letto. Una voce senza data non entra: non si colloca nella finestra."""
+    from datetime import timedelta, timezone
+    adesso = (adesso or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    da = adesso - timedelta(hours=ore)
+    letti = leggi_feed(tks, leggi)
+    out = {}
+    for tk in dict.fromkeys(tks):
+        st, voci = letti.get(tk) or ("non letto", [])
+        datate = [v for v in voci or [] if v.get("quando")]
+        # il feed restituisce le sue ULTIME voci (15, misurate il 17/10): se cadono TUTTE nella finestra, non si sa
+        #   cosa ci sia prima della piu' vecchia — la finestra e' coperta solo fin li', e si dichiara
+        copre = min(v["quando"] for v in datate) if datate and min(v["quando"] for v in datate) >= da else None
+        out[tk] = {"stato": st, "lette": len(voci or []), "copre_da": copre,
+                   "voci": sorted((v for v in datate if v["quando"] >= da), key=lambda v: v["quando"], reverse=True)}
+    return out
+
+
+NOTIZIE_MOSTRA = 6
+
+
+def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
+    """v494 — il blocco delle ultimissime notizie dei nomi con un segnale: uno solo per rotazione.py e numeri_libro.py
+    (v161). Per ogni nome PERCHE' e' qui (i segnali), poi le voci con data e ora italiana. Tre esiti distinti (v389).
+    Le voci oltre NOTIZIE_MOSTRA si contano e si dichiarano, non si nascondono (v393). altrove: {tk: dove} per i nomi
+    le cui notizie stanno gia' in un altro blocco dello stesso strumento."""
+    altrove = altrove or {}
+    if not segnali:
+        return [f"{titolo}: nessun nome con un segnale in questo giro"]
+    chiave = lambda v: v["titolo"].strip().lower()
+    quando = lambda v: f"{v['quando'].astimezone(brief.ROMA):%d/%m %H:%M}"
+    # la STESSA voce nel feed di piu' nomi del blocco e' cronaca di mercato, non una notizia sul nome (v451): non si
+    #   toglie, si conta e si scrive una volta sola, in fondo. Il 17/10 «Stock Indexes Finish Sharply Lower» stava
+    #   in cima al feed di cinque posizioni e copriva «Why Is CoreWeave Stock Falling Today?»
+    chi = {}
+    for tk in segnali:
+        nw = news.get(tk) or {}
+        if tk not in altrove and nw.get("stato") == "ok":
+            for v in nw.get("voci") or []:
+                chi.setdefault(chiave(v), {"voce": v, "tk": set()})["tk"].add(tk)
+    comuni = {k: x for k, x in chi.items() if len(x["tk"]) >= 2}
+
+    def non_mostrate(k):
+        return f"… e {'un' + chr(39) + 'altra voce' if k == 1 else f'altre {k} voci'} nelle stesse ore, non mostrate"
+    L = [f"{titolo} — feed Nasdaq del simbolo, ultime {ore} ore, ora italiana · [TK] = trovata nel feed di TK, non "
+         "'notizia su TK' (v415) · la voce che sta nel feed di piu' nomi del blocco e' cronaca di mercato: una volta, in "
+         "fondo · il feed e' UNA fonte: la ricerca web nelle stesse ore resta obbligatoria, con fonte e data "
+         "(FORMATO_ANALISI.md)"]
+    for tk, motivi in segnali.items():
+        L.append(f"  {tk} — " + " · ".join(motivi))
+        if tk in altrove:
+            L.append(f"      notizie: nel blocco {altrove[tk]}")
+            continue
+        nw = news.get(tk) or {"stato": "non richiesto", "voci": []}
+        if nw["stato"] != "ok":
+            L.append(f"      feed NON letto ({nw['stato']}) — non vuol dire 'nessuna notizia'")
+            continue
+        proprie = [v for v in nw["voci"] if chiave(v) not in comuni]
+        k_com = len(nw["voci"]) - len(proprie)
+        if not nw["voci"]:
+            L.append(f"      feed letto, nessuna voce nelle ultime {ore} ore")
+        elif not proprie:
+            L.append(f"      nessuna voce propria: le {k_com} del feed sono cronaca di mercato, in fondo al blocco")
+        for v in proprie[:NOTIZIE_MOSTRA]:
+            L.append(f"      [{tk}] {quando(v)} {v['titolo'][:110]}")
+        if len(proprie) > NOTIZIE_MOSTRA:
+            L.append("      " + non_mostrate(len(proprie) - NOTIZIE_MOSTRA))
+        if proprie and k_com:
+            L.append(f"      + {k_com} {'voce' if k_com == 1 else 'voci'} di cronaca di mercato, in fondo al blocco")
+        if nw.get("copre_da"):
+            L.append(f"      ⚠ il feed ha restituito {nw.get('lette')} voci e cadono tutte nelle ultime {ore} ore: arriva "
+                     f"solo fino al {nw['copre_da'].astimezone(brief.ROMA):%d/%m %H:%M}, e prima la finestra puo' averne altre")
+    if comuni:
+        L.append(f"  CRONACA DI MERCATO — {len(comuni)} {'voce' if len(comuni) == 1 else 'voci'} nel feed di piu' nomi "
+                 "di questo blocco: e' il mercato, non il nome")
+        ordinate = sorted(comuni.values(), key=lambda x: x["voce"]["quando"], reverse=True)
+        for x in ordinate[:NOTIZIE_MOSTRA]:
+            L.append(f"      {quando(x['voce'])} {x['voce']['titolo'][:110]} (nel feed di {', '.join(sorted(x['tk']))})")
+        if len(ordinate) > NOTIZIE_MOSTRA:
+            L.append("      " + non_mostrate(len(ordinate) - NOTIZIE_MOSTRA))
+    return L
+
+
 def riga_valutazione(t):
     """v492 — il P/E di un ingresso: la resa delle schede (una sola, v161). Fuori dalla pipeline i multipli
     non ci sono, e si dice invece di cercarli altrove: due fonti per lo stesso multiplo divergono."""
@@ -1127,7 +1514,8 @@ def righe_watchlist(o):
          f"a {', '.join(str(k) for k in SETTIMANE_MEDIE)} settimane sulle chiusure delle settimane CONCLUSE, pendenza su "
          f"{SETTIMANE_PENDENZA} settimane, massimo e minimo delle sedute concluse · la serie e' quella della societa' di "
          "oggi: dall'ultima operazione societaria e dalla fine del veicolo di quotazione (SPAC) dichiarata sul registro SEC",
-         "   " + (o.get("valutazione_rif") or "valutazione: riferimento n.d.")]
+         "   " + (o.get("valutazione_rif") or "valutazione: riferimento n.d."),
+         "   " + INTESTAZIONE_STRUTTURA]
     if o.get("spy_assente"):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
     sem = o.get("semaforo") or {}
@@ -1319,6 +1707,19 @@ def e_candidato(t):
     return str(t.get("stato", "")).startswith("CANDIDATO") and not t.get("nel_libro")
 
 
+def segnali_watchlist(o):
+    """v494 — {tk: motivi} dei sorvegliati con un INGRESSO POSSIBILE, nell'ordine di LIBRO.md; e {tk: blocco} per chi
+    ha gia' le notizie nel blocco dei CANDIDATI (un candidato di settore, feed letto a 7 giorni): la stessa fonte non
+    si chiede due volte, e la stessa voce non si scrive in due blocchi."""
+    seg = {}
+    for t in o.get("watchlist") or []:
+        m = segnali_ingresso(t)
+        if m:
+            seg[t["tk"]] = m
+    cand = {t["tk"] for s in o.get("settori") or [] for t in s["titoli"] if e_candidato(t)}
+    return seg, {tk: "CANDIDATI PER SETTORE (ultimi 7 giorni)" for tk in seg if tk in cand}
+
+
 def notizie_candidati(o, giorni=7):
     """Notizie dal feed Nasdaq PER SIMBOLO, solo per i candidati (v398-v399: l'attribuzione viene
     dalla fonte). Tre esiti distinti: con voci, senza voci, NON letto (v389)."""
@@ -1338,8 +1739,8 @@ def righe_candidati(o, news, giorni=7):
         return righe(o)[:1]
     L = ["CANDIDATI PER SETTORE — prezzi di oggi (stockanalysis.com) · stati = convenzioni in testa "
          "allo script · volumi sull'ultima seduta CONCLUSA (quella in corso esclusa) · notizie: feed Nasdaq del simbolo, ultimi "
-         f"{giorni} giorni ([TK] = trovata nel feed di TK, non 'notizia su TK') · lettura a {ANNI_LETTURA} anni e P/E: "
-         "convenzioni e riferimento dell'S&P 500 in testa al blocco WATCHLIST"]
+         f"{giorni} giorni ([TK] = trovata nel feed di TK, non 'notizia su TK') · lettura a {ANNI_LETTURA} anni, P/E e "
+         "struttura delle oscillazioni: convenzioni e riferimento dell'S&P 500 in testa al blocco WATCHLIST"]
     for s in sorted(o["settori"], key=lambda s: -(s.get("m3") if s.get("m3") is not None else -1e9)):
         cand = [t for t in s["titoli"] if e_candidato(t)]
         L.append(f"■ {s['etf']} {s['nome']} — {s['stato']} · 1m {n(s.get('m1'),1,'%')} · 3m {n(s.get('m3'),1,'%')} · "
@@ -1359,6 +1760,8 @@ def righe_candidati(o, news, giorni=7):
             L.append(f"      {riga_valutazione(t)}")
             if "cinque_anni" in t:        # v492
                 L.extend(f"      {r}" for r in righe_5anni(t["cinque_anni"], t.get("veicolo")))
+            if "struttura" in t:          # v494
+                L.extend(f"      {r}" for r in righe_struttura(t["struttura"]))
             nw = news.get(t["tk"]) or {"stato": "non richiesto", "voci": []}
             if nw["stato"] != "ok":
                 L.append(f"      notizie: feed NON letto ({nw['stato']}) — non vuol dire 'nessuna notizia'")
@@ -1383,5 +1786,10 @@ if __name__ == "__main__":
         print("\n".join(righe_candidati(o, notizie_candidati(o))))
         print()
         print("\n".join(righe_watchlist(o)))
+        print()
+        # v494 — le ultimissime notizie dei sorvegliati con un ingresso possibile (CEO, 17/10/2026)
+        seg, altrove = segnali_watchlist(o)
+        print("\n".join(righe_notizie("NOTIZIE ULTIMISSIME — SORVEGLIATI CON UN INGRESSO POSSIBILE", seg,
+                                      notizie_recenti([tk for tk in seg if tk not in altrove]), altrove=altrove)))
         print()
         print("\n".join(righe_piano(o)))

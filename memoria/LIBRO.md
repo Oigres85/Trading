@@ -179,6 +179,36 @@ tendenza è quella della tenuta (§1sexies):
   distanza dallo stop, e il rischio in più si scrive in dollari (SMCI, 300 azioni: 1.497 $ col limite a 32,50,
   1.947 $ a 34). `numeri_libro.py` (blocco «ORDINI APERTI») lo calcola per ogni ordine a ogni analisi.
 
+**Massimi e minimi: la STRUTTURA DELLE OSCILLAZIONI** (richiesta del CEO del 17/10/2026, testuale: *"In generale
+analizza anche massimi e minimi decrescenti oltre, se possibile, tecnicamente i grafici quando si presenta la
+possibilità di ingresso o si attivano i parametri di uscita fermo restando che anche le ultimissime news sono
+importanti"*). `rotazione.py` la calcola per ogni sorvegliato e candidato, `numeri_libro.py` per ogni posizione e ogni
+ordine attivo. Convenzioni di lettura scelte da Claude e dichiarate come tali (v240), rilette dal codice da un gate:
+- **I punti** sono quelli dei pavimenti — il più basso (o il più alto) di 5 sedute prima e 5 dopo, il primo a
+  toccarlo — nell'**ultimo anno** di sedute concluse; due punti entro mezzo ATR sono **alla pari**: due minimi alla
+  pari sono lo stesso pavimento. Si mostrano gli **ultimi 3** massimi e gli ultimi 3 minimi.
+- **Lo stato** viene dal verso degli ultimi due: **RIALZISTA** = massimi e minimi crescenti · **RIBASSISTA** =
+  massimi e minimi decrescenti · **IN COMPRESSIONE** = massimi decrescenti e minimi crescenti · **IN ESPANSIONE** =
+  il contrario · **LATERALE** = uno dei due alla pari. Accanto, quanti punti di fila seguono lo stesso verso.
+- **Rotta**: la chiusura conclusa oltre l'ultimo punto — sotto l'ultimo minimo o sopra l'ultimo massimo — prima che
+  un punto nuovo lo confermi; si scrive l'estremo toccato da allora e quante sedute mancano perché diventi un punto.
+  Il 16/10 MU, CRWV, RGTI, SMCI, ORCL e OKLO avevano tutti chiuso sotto il loro ultimo minimo di oscillazione.
+- **Lettura dei grafici** (convenzioni di lettura, non misure): il **doppio minimo** e il **doppio massimo** — gli
+  ultimi due punti alla pari — col loro collo e da quando la chiusura sta oltre; la **divergenza dell'RSI** — un minimo
+  più basso con l'RSI più alto, o un massimo più alto con l'RSI più basso — con almeno **3 punti** di RSI fra i due;
+  le sedute in salita e in discesa delle ultime 20 concluse col loro volume medio.
+- **Ingresso possibile** (per leggere le ultimissime notizie): un pavimento entro **1 ATR** dal prezzo, oppure un
+  candidato o un prezzo dentro la zona. Una chiusura sopra l'ultimo massimo, o sopra il collo di un doppio minimo, NON
+  è un ingresso possibile: è la risalita, che il CEO non compra; resta come segnale che la discesa è finita.
+- **Uscita accesa**: la tenuta che non è «lasciar correre» (§1sexies), la struttura rotta al ribasso o ribassista, un
+  doppio massimo sotto il collo da non più di **10 sedute**. È la famiglia del PREZZO, la stessa della tendenza della
+  tenuta: un'informazione e un motivo per leggere le notizie, **non una prova in più (B3) e non una vendita** — dal
+  15/10 non si vende sui ribassi (§1ter).
+- **Le ultimissime notizie**: per ogni nome con un ingresso possibile, un'uscita accesa o un ordine attivo, il feed
+  Nasdaq del simbolo nelle ultime **72 ore** — così il lunedì mattina comprende il venerdì —, con la stessa voce nel feed
+  di più nomi scritta una volta come cronaca di mercato. Il feed è UNA fonte: la ricerca web nelle stesse ore resta
+  obbligatoria, e la risposta cita fonte e data.
+
 ## 1ter. SEMAFORO D'USCITA — deciso col CEO il 06/10/2026, si controlla a OGNI analisi
 
 Domanda del CEO: *"quando capire di dover uscire, onde evitare di subire in pieno un prossimo
