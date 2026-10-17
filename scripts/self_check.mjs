@@ -164,7 +164,7 @@ const SUITE = [
   /* v492: 526 punti di chiamata (+30 su lettura a 5 anni, veicolo di quotazione, P/E e stop degli ordini) -> 510 */
   /* v496: 592 punti di chiamata (+33 su put/call, scadenze, CFTC, bitcoin e la leva annua nel semaforo) -> 575 */
   /* v498: 609 punti di chiamata (+10 sulla prova del CDS nella tenuta: soglia, stati, esito, resa) -> 600 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 600, firma: /\d+\/\d+ CHECK OK/ },
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 640, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

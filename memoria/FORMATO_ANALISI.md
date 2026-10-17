@@ -96,6 +96,22 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    operatori** dal rapporto settimanale della CFTC — fondi a leva, gestori istituzionali, dealer su Nasdaq-100, S&P
    500, VIX, bitcoin e Treasury 10 anni — col percentile su tre anni; il **bitcoin dall'ultima chiusura USA** e
    quanto vale su MSTR con la sensibilità misurata. Le due memorie si committano col registro.
+   Da v499 (CEO, 17/10 sera: *"Valuta se puoi inserimento dei movimenti del darkpool"*, con un video che usa i
+   livelli GEX) anche la **GAMMA DEI DEALER** stimata dalle catene complete di CBOE — gamma netta e regime
+   (positiva smorza i movimenti, negativa li amplifica), cambio di regime, call wall e put wall — per le posizioni e
+   per SPY, QQQ e IWM; e il **DARK POOL**: il rapporto delle vendite allo scoperto fuori borsa (FINRA, ogni sera)
+   per posizioni, sorvegliati e ETF degli indici, col percentile dell'anno e la media a 10 sedute
+   (`memoria/dark_pool.jsonl`), più il DIX e la GEX dell'S&P 500 di SqueezeMetrics. Due convenzioni, dichiarate:
+   chi detiene le opzioni non si osserva, e leggere come acquisto un rapporto alto è il modello di SqueezeMetrics.
+7. `python3 scripts/indici.py` (v499, CEO, 17/10 sera: *"Monitora anche Nasdaq e sep ed il relativo pe e altri
+   parametri di analisi che ritieni utili"*) — S&P 500 e Nasdaq-100: il **P/E con la storia della sua fonte**
+   (prospettico dell'S&P 500 da FactSet con le sue medie a 5 e 10 anni; ultimi 12 mesi e CAPE da multpl con le
+   mediane a 5, 10 e 20 anni calcolate sulla stessa serie; Nasdaq-100 dal WSJ, la cui storia si raccoglie in
+   `memoria/indici.jsonl`), il premio sul Tesoro (convenzione), la **stagione delle trimestrali** dell'S&P 500
+   (FactSet: quante hanno riportato, quante battono le attese, la crescita degli utili), la **volatilità
+   implicita** (VIX, VXN, VIX3M e la struttura a termine), la **concentrazione** (quanto pesano i primi dieci
+   titoli, e quali sono nel libro), l'**ampiezza** (pesi uguali contro capitalizzazione) e la **tendenza** di SPY e
+   QQQ con le regole dei titoli. Il valore di una fonte non si confronta mai con la media di un'altra.
 
 ## Cosa contiene la risposta, in quest'ordine
 0. **Semaforo d'uscita** (decisione del CEO del 06/10; calcolato da v474): il colore di oggi in
@@ -179,6 +195,17 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    è mosso, è la prima cosa da dire su MSTR. La leva porta la **variazione annua col suo percentile** dal file storico
    FINRA nella riga del semaforo (sezione 0). È tutto INFORMAZIONE accanto al semaforo e alla tenuta: nessuna di
    queste misure è una prova della tenuta, un colore o una vendita — se il CEO vorrà farne un segnale, lo deciderà lui.
+   Da v499 la **gamma dei dealer** (regime, cambio di regime, call wall e put wall delle posizioni e di SPY, QQQ e
+   IWM: livelli dove il prezzo si è fermato più spesso, non dove si fermerà) e il **dark pool** (DPI di ogni nome
+   col percentile dell'anno e la media a 10 sedute, DIX e GEX dell'S&P 500): stessa natura, informazione.
+5ter. **Indici** (v499, CEO, 17/10 sera) — dal blocco di `indici.py`: il P/E dell'S&P 500 prospettico contro le
+   medie della STESSA FactSet, gli ultimi 12 mesi e il CAPE contro le mediane della stessa serie di multpl, il
+   Nasdaq-100 dal WSJ col valore di un anno prima — mai il valore di una fonte contro la media di un'altra, perché
+   fonti diverse usano utili diversi; il premio sul Tesoro (convenzione); la stagione delle trimestrali (quante
+   battono le attese contro le medie di FactSet, la crescita «blended»); VIX e VXN col loro percentile e la
+   struttura a termine (sopra 1 è invertita: la forma dello stress); quanto pesano i primi dieci titoli e quali
+   sono nel libro; l'ampiezza; la tendenza di SPY e QQQ. È INFORMAZIONE: nessuna prova della tenuta, nessun
+   colore, nessuna vendita. Il riferimento accanto ai multipli dei titoli (schede) resta quello della pipeline.
 6. **Tenuta e piano** (decisioni del CEO del 14/10/2026, regola in `memoria/LIBRO.md` §1sexies:
    *si lascia correre, si vende per EVIDENZA, e si valuta l'insieme — non la sola tecnica*) — dal
    blocco `TENUTA DELLE POSIZIONI` di `numeri_libro.py`, per ogni posizione l'esito (VENDITA PER
@@ -223,6 +250,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    blocco **NOTIZIE ULTIMISSIME** di `numeri_libro.py` porta, per ogni posizione con un parametro d'uscita acceso e
    ogni ordine attivo, il perché e le voci del feed delle ultime 72 ore (la cronaca di mercato una volta sola, in
    fondo): la risposta le cita con data e fonte, insieme alla ricerca web delle stesse ore.
+   Da v499 (CEO, 17/10 sera: *"non so se mi avresti fornito l'ultima trovata di Mask sull'auto volante tra le
+   News"*) le notizie sono di **TUTTE** le posizioni: chi ha un segnale viene prima col suo perché e fino a 6 voci,
+   chi non ne ha porta le 3 più recenti — un evento non aspetta un segnale. Un feed **VUOTO** o **FERMO** (l'ultima
+   voce oltre 14 giorni prima) si dichiara: per quel nome la fonte non porta le notizie e la ricerca in rete è
+   obbligatoria (il 17/10 il feed di SpaceX aveva tre voci, l'ultima del 01/07).
 
 7. **Watchlist e rotazione** (sempre, v468) — in giallo, arancione e rosso NESSUN divieto
    d'ingresso (decisioni del CEO del 09/10 e del 15/10), ma ogni ingresso porta le sue conseguenze di
@@ -269,6 +301,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        SORVEGLIATI CON UN INGRESSO POSSIBILE** di `rotazione.py` (pavimento entro 1 ATR, candidato, prezzo nella
        zona) porta le voci del feed delle ultime 72 ore; la risposta le cita con data e fonte, insieme alla ricerca
        web delle stesse ore, e una notizia che rompe la tesi toglie l'ingresso anche dal pavimento migliore.
+       Da v499 il blocco è **NOTIZIE ULTIMISSIME — TUTTI I SORVEGLIATI**: chi ha un ingresso possibile viene prima
+       col perché, gli altri con le 3 voci più recenti; un feed vuoto o fermo si dichiara e si cerca in rete.
    7d-ter. **gli ingressi in ordine d'interesse** (CEO, 15/10: *"ponili in ordine dal più interessante,
        risposta secca con prezzi e motivazioni"*) — il prezzo d'ingresso (l'ordine sul pavimento), lo stop
        con la perdita, il secondo prezzo, e una motivazione per nome. L'ordine è un GIUDIZIO dell'analisi,
@@ -311,7 +345,10 @@ annua della leva dal file storico FINRA, col suo percentile; put e call di merca
 delle opzioni (mensile e «tre streghe»), le posizioni dei grandi operatori (CFTC) e il bitcoin dall'ultima chiusura
 USA su MSTR — informazione, non prove (17/10) · i CDS a 5 anni di posizioni e sorvegliati, con gli indici CDX e
 l'Italia per il BTP (17/10) — e dalla sera stessa il loro allargamento oltre l'indice come prova della tenuta, in
-funzione quando lo storico raccolto basta (17/10).
+funzione quando lo storico raccolto basta (17/10) · le notizie di TUTTE le posizioni e di TUTTI i sorvegliati, coi
+segnali davanti, e il feed vuoto o fermo dichiarato; il dark pool (FINRA, DIX) e la gamma dei dealer (call wall, put
+wall, cambio di regime); gli indici S&P 500 e Nasdaq-100 — P/E con la storia della sua fonte, stagione delle
+trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza — informazione, non prove (17/10 sera).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

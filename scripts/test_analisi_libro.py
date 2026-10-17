@@ -4378,7 +4378,9 @@ check("v494 notizie: le ultime 72 ore dalla piu' recente, una voce senza data fu
       "lettura per nome; se il feed restituisce voci tutte dentro la finestra, si dichiara fin dove arriva",
       [v["titolo"] for v in _nr494["AAA"]["voci"]] == ["uno", "due"] and _nr494["AAA"]["copre_da"] is None
       and _nr494["BBB"]["copre_da"] == _ora494 - _td494(hours=2) and _nr494["CCC"]["stato"] == "HTTP 429"
-      and _nr494["DDD"] == {"stato": "ok", "lette": 0, "copre_da": None, "voci": []}
+      # v499 — RIAGGANCIATO: il feed letto senza nessuna voce ora si dichiara VUOTO (la fonte non serve il nome), che e'
+      #   un quarto esito e non «nessuna voce nella finestra»
+      and _nr494["DDD"] == {"stato": "ok", "lette": 0, "copre_da": None, "voci": [], "vuoto": True}
       and sorted(_chiamate494) == ["AAA", "BBB", "CCC", "DDD"], str(_nr494))
 _vv = lambda ore, tit: {"titolo": tit, "quando": _ora494 - _td494(hours=ore)}
 _news494 = {"AAA": {"stato": "ok", "voci": [_vv(1, "Stocks Plunge")] + [_vv(2 + k, f"AAA propria {k}") for k in range(8)],
@@ -4420,7 +4422,9 @@ _calc494 = _corpo_di(Path(__file__).with_name("numeri_libro.py").read_text(), "c
 check("v494 collegamento: calcola passa la struttura alla tenuta, e i segnali con le loro notizie al risultato",
       "rotazione.struttura(BL.get(t)" in _calc494 and "struttura=strutt" in _calc494
       and 'out["segnali"] = segnali_libro(out["tenuta"], out["ordini"])' in _calc494
-      and 'rotazione.notizie_recenti(list(out["segnali"])' in _calc494)
+      # v499 — RIAGGANCIATO: le notizie si leggono per TUTTE le posizioni, coi segnali davanti (nomi_notizie)
+      and 'out["nomi_notizie"] = rotazione.nomi_notizie(out["segnali"], TK)' in _calc494
+      and 'rotazione.notizie_recenti(list(out["nomi_notizie"])' in _calc494)
 check("v494 collegamento ESEGUITO: valuta_ordini da' a ogni ordine la sua struttura (un ordine e' un ingresso), e la "
       "resa degli ordini la stampa",
       "struttura" in _vo492 and "struttura delle oscillazioni" in "\n".join(
@@ -4438,7 +4442,7 @@ _sint494 = NL.sintesi({**_o483, "segnali": {"AAA": ["tenuta: IN OSSERVAZIONE"]},
                        "notizie": {"AAA": {"stato": "ok", "voci": [_vv(3, "AAA wins a contract")], "copre_da": None,
                                            "lette": 15}}})
 check("v494 collegamento ESEGUITO: la sintesi stampa il blocco delle ultimissime notizie con il perche' di ogni nome",
-      "NOTIZIE ULTIMISSIME — POSIZIONI CON UN PARAMETRO D'USCITA ACCESO" in _sint494
+      "NOTIZIE ULTIMISSIME — TUTTE LE POSIZIONI" in _sint494          # v499 — riagganciato: tutte, non solo i segnali
       and "AAA — tenuta: IN OSSERVAZIONE" in _sint494 and "AAA wins a contract" in _sint494
       and "NOTIZIE ULTIMISSIME" not in NL.sintesi(_o483), _sint494[-600:])
 
@@ -4771,7 +4775,10 @@ check("v496 il posizionamento e' dichiarato nel censimento di /aggiorna con la s
 _main496 = _corpo_di(Path(__file__).with_name("posizionamento.py").read_text(), "main")
 check("v496 collegamento in main: le catene delle posizioni E di SPY e QQQ, quattro archivi CFTC, le candele del bitcoin, MSTR "
       "e IBIT, il calendario dei conti; le memorie scritte solo senza --no-memoria",
-      'simboli = sorted(qta) + ["SPY", "QQQ"]' in _main496 and "range(ANNI_COT + 1)" in _main496
+      # v499 — RIAGGANCIATO: la riga pretendeva la lista scritta ["SPY", "QQQ"]; la gamma dei dealer aggiunge IWM, e la
+      #   proprieta' e' che gli ETF degli indici ci siano TUTTI accanto alle posizioni, non la forma della lista
+      'simboli = sorted(qta) + [t for t in INDICI_GEX if t not in qta]' in _main496 and {"SPY", "QQQ"} <= set(PZ.INDICI_GEX)
+      and "range(ANNI_COT + 1)" in _main496
       and 'brief.barre, "IBIT"' in _main496 and "brief.calendario_trimestrali" in _main496
       and "if not a.no_memoria:\n        scrivi_memoria_pc(memoria)" in _main496 and "righe_opzioni(rie, qta, storia)" in _main496)
 
@@ -4971,6 +4978,458 @@ check("v498 il formato porta la prova del CDS in §5 e §6 e nel registro delle 
       "è una **prova della tenuta**" in _fa496 and "la tenuta ha una prova in più, il **CDS**" in _fa496
       and "come prova della tenuta, in\nfunzione quando lo storico raccolto basta (17/10)" in _fa496
       and "È INFORMAZIONE: non è una prova della tenuta" not in _fa496)
+
+# ============================ v499 — NOTIZIE PER TUTTI, DARK POOL, GAMMA DEI DEALER, INDICI ============================
+# Il CEO, 17/10/2026 sera: «Controlla anche che tesla e SpaceX siano in watchlist (per esempio nell'analisi non so se mi
+# avresti fornito l'ultima trovata di Mask sull'auto volante tra le News). Valuta se puoi inserimento dei movimenti del
+# darkpool. Monitora anche Nasdaq e sep ed il relativo pe e altri parametri di analisi che ritieni utili. Rendi tutt'e
+# questi nuovi inserimenti strutturali». Lo stato si COSTRUISCE (v425, v429): nessuna rete.
+import indici as IX
+import math as _m499
+import statistics as _st499
+import zlib as _zl499
+from datetime import timezone as _tz499
+
+# --- le notizie di TUTTI i nomi, coi segnali davanti ---
+_nn499 = ROT.nomi_notizie({"BBB": ["perche'"]}, ["AAA", "BBB", "CCC"])
+check("v499 notizie: TUTTI i nomi entrano, chi ha un segnale per primo col suo perche', gli altri con la lista vuota",
+      list(_nn499) == ["BBB", "AAA", "CCC"] and _nn499["BBB"] == ["perche'"] and _nn499["AAA"] == [] and _nn499["CCC"] == [],
+      str(_nn499))
+_ora499 = _dt496(2026, 10, 17, 10, 0, tzinfo=_tz499.utc)
+
+
+def _feed499(tk):
+    v = lambda giorni, tit: {"titolo": tit, "quando": _ora499 - _td496(days=giorni)}  # noqa: E731
+    return {"VUO": (tk, "ok", []), "FER": (tk, "ok", [v(20, "f1"), v(40, "f2")]), "VIV": (tk, "ok", [v(1, "v1")]),
+            "ERR": (tk, "HTTP 429", []), "LIM": (tk, "ok", [v(13, "l1")])}[tk]
+
+
+_nf499 = ROT.notizie_recenti(["VUO", "FER", "VIV", "ERR", "LIM"], adesso=_ora499, leggi=_feed499)
+check("v499 notizie: un feed letto e VUOTO, e uno FERMO (l'ultima voce oltre 14 giorni prima), si dichiarano — sono «la fonte "
+      "non serve il nome», non «niente da dire»; un feed NON letto resta un altro esito (v389); 13 giorni non sono fermo",
+      _nf499["VUO"].get("vuoto") is True and "fermo_dal" not in _nf499["VUO"]
+      and _nf499["FER"].get("fermo_dal") == _ora499 - _td496(days=20) and not _nf499["FER"].get("vuoto")
+      and "vuoto" not in _nf499["VIV"] and "fermo_dal" not in _nf499["VIV"]
+      and "vuoto" not in _nf499["ERR"] and "fermo_dal" not in _nf499["ERR"] and "fermo_dal" not in _nf499["LIM"], str(_nf499))
+_vq499 = lambda ore, tit: {"titolo": tit, "quando": _ora499 - _td496(hours=ore)}  # noqa: E731
+_rn499 = "\n".join(ROT.righe_notizie(
+    "NOTIZIE ULTIMISSIME — PROVA", {"SEG": ["ingresso possibile"], "NOS": [], "VUO": [], "FER": []},
+    {"SEG": {"stato": "ok", "voci": [_vq499(k + 1, f"seg {k}") for k in range(7)], "copre_da": None, "lette": 15},
+     "NOS": {"stato": "ok", "voci": [_vq499(k + 1, f"nos {k}") for k in range(5)], "copre_da": None, "lette": 15},
+     "VUO": {"stato": "ok", "voci": [], "copre_da": None, "lette": 0, "vuoto": True},
+     "FER": {"stato": "ok", "voci": [], "copre_da": None, "lette": 3,
+             "fermo_dal": _dt496(2026, 7, 1, 12, 0, tzinfo=_tz499.utc)}}))
+check("v499 resa delle notizie: chi ha un segnale fino a 6 voci col perche', chi non ne ha le 3 piu' recenti (le altre CONTATE, "
+      "v393); il feed VUOTO e quello FERMO detti con la data, e la ricerca in rete richiesta",
+      _rn499.count("[SEG] ") == 6 and _rn499.count("[NOS] ") == 3 and "un'altra voce nelle stesse ore" in _rn499
+      and "altre 2 voci nelle stesse ore" in _rn499 and "NOS — nessun segnale: le voci piu' recenti" in _rn499
+      and "il feed del simbolo e' VUOTO" in _rn499 and "il feed del simbolo e' FERMO: l'ultima voce e' del 01/07/2026" in _rn499
+      and "SEG — ingresso possibile" in _rn499, _rn499)
+_rot499 = Path(__file__).with_name("rotazione.py").read_text(encoding="utf-8")
+_mainrot499 = _rot499[_rot499.find('if __name__ == "__main__":'):]
+check("v499 rotazione: le notizie di TUTTI i sorvegliati (collegamento, v399) — nomi_notizie sull'intera watchlist, coi segnali "
+      "davanti, e il blocco porta il nome nuovo",
+      'nomi = nomi_notizie(seg, [t["tk"] for t in o.get("watchlist") or []])' in _mainrot499
+      and "notizie_recenti([tk for tk in nomi if tk not in altrove])" in _mainrot499
+      and "NOTIZIE ULTIMISSIME — TUTTI I SORVEGLIATI" in _mainrot499)
+
+# --- il dark pool (FINRA) e il DIX ---
+_dpt499 = ("Date|Symbol|ShortVolume|ShortExemptVolume|TotalVolume|Market\n20261016|NVDA|1000.4|0|2500|B,Q,N\n"
+           "20261016|BRK.B|300|0|1000|Q\n20261016|ZZZ|1|0|0|Q\n20261016|OUT|5|0|10|Q\nriga rotta\n")
+_ld499 = PZ.leggi_dp(_dpt499, "2026-10-16", ["NVDA", "BRK-B", "ZZZ", "MANCA"])
+check("v499 dark pool: dal file FINRA solo i nomi dell'universo, le classi col punto riportate al trattino, un volume totale "
+      "nullo fuori; l'universo CHIESTO resta registrato",
+      _ld499 == {"data": "2026-10-16", "u": ["BRK-B", "MANCA", "NVDA", "ZZZ"],
+                 "v": {"NVDA": [1000, 2500], "BRK-B": [300, 1000]}}, str(_ld499))
+_mem499 = {"2026-10-15": {"data": "2026-10-15", "u": ["NVDA"], "v": {}},
+           "2026-10-14": {"data": "2026-10-14", "assente": 403},
+           "2026-10-13": {"data": "2026-10-13", "u": ["AMD", "NVDA"], "v": {}}}
+check("v499 dark pool: si leggono i giorni che mancano e quelli letti per un universo senza un nome di oggi (il nome nuovo si "
+      "riempie all'indietro); una borsa chiusa registrata non si richiede, il fine settimana nemmeno",
+      PZ.giorni_dp(_d496(2026, 10, 18), _mem499, ["NVDA", "AMD"], giorni=7) == ["2026-10-16", "2026-10-15", "2026-10-12"],
+      str(PZ.giorni_dp(_d496(2026, 10, 18), _mem499, ["NVDA", "AMD"], giorni=7)))
+_oggi499 = _d496(2026, 10, 16)
+_pre499 = {d: {"data": d, "assente": 404} for d in PZ.giorni_dp(_oggi499, {}, ["AAA"])
+           if d not in ("2026-10-16", "2026-10-15", "2026-10-01", "2026-10-02")}
+
+
+def _leggi_dp499(url):
+    d = url[-12:-4]
+    if d in ("20261016", "20261001"):
+        raise _ue496.HTTPError(url, 403, "x", None, None)
+    if d == "20261002":
+        raise _ue496.URLError("rete")
+    return ("Date|Symbol|ShortVolume|ShortExemptVolume|TotalVolume|Market\n" + d + "|AAA|10|0|40|Q\n").encode()
+
+
+_ag499 = PZ.aggiorna_dp(_oggi499, _pre499, ["AAA"], leggi=_leggi_dp499)
+check("v499 dark pool: un 403 vecchio e' una borsa chiusa e si registra, uno di oggi un file non ancora pubblicato, un errore "
+      "di rete una lettura NON riuscita (v389); i file letti entrano in memoria",
+      _ag499 == {"nuove": 1, "assenti": 1, "non_lette": ["2026-10-02"], "non_ancora_pubblicate": ["2026-10-16"]}
+      and _pre499["2026-10-15"]["v"] == {"AAA": [10, 40]} and _pre499["2026-10-01"] == {"data": "2026-10-01", "assente": 403}
+      and "2026-10-16" not in _pre499, str(_ag499))
+_ms499 = {}
+for _i499 in range(25):
+    _g499 = (_d496(2026, 9, 1) + _td496(days=_i499)).isoformat()
+    _ms499[_g499] = {"data": _g499, "u": ["AAA"], "v": {"AAA": ([90, 100] if _i499 % 2 == 0 else [100, 1000])}}
+_sd499 = PZ.stato_dp(_ms499, "AAA")
+_u10_499 = [_ms499[d]["v"]["AAA"] for d in sorted(_ms499)][-10:]
+_pond499 = sum(c for c, t in _u10_499) / sum(t for c, t in _u10_499) * 100
+_semp499 = sum(c / t * 100 for c, t in _u10_499) / 10
+check("v499 dark pool: la media di 10 sedute e' PONDERATA sui volumi (un giorno sottile non pesa come uno pieno: il caso "
+      "costruito separa le due medie di oltre 30 punti), l'ultima seduta e' il suo rapporto, il percentile solo da 20 sedute",
+      abs(_sd499["media"] - _pond499) < 1e-9 and abs(_pond499 - _semp499) > 30 and _sd499["dpi"] == 90.0 and _sd499["n"] == 25
+      and _sd499.get("rango") is not None and PZ.stato_dp(_ms499, "AAA", minimo=30).get("rango") is None
+      and PZ.stato_dp(_ms499, "NONC") is None, str(_sd499))
+_dix499 = PZ.leggi_dix("date,price,dix,gex\n2026-10-15,6000,0.45,1000000000\n2026-10-16,6010,0.47,-500000000\nrotta,,,\n")
+_sx499 = PZ.stato_dix(_dix499)
+check("v499 DIX: in percentuale, la GEX della fonte col suo segno, le sedute negative contate; una riga rotta fuori",
+      [r["dix"] for r in _dix499] == [45.0, 47.0] and _sx499["gex"] == -500000000.0 and _sx499["gex_negativi"] == 1
+      and _sx499["data"] == "2026-10-16" and _sx499["n"] == 2, str(_sx499))
+_rd499 = "\n".join(PZ.righe_dp({"AAA": _sd499, "BBB": None, "CCC": PZ.stato_dp(_ms499, "AAA", minimo=30)},
+                               {"nuove": 0, "assenti": 0, "non_lette": ["2026-10-02"], "non_ancora_pubblicate": []},
+                               None, "HTTP 503"))
+check("v499 resa del dark pool: la convenzione dichiarata (la lettura come acquisto e' il modello di SqueezeMetrics), le sedute "
+      "non lette dette, un nome senza memoria NON e' «nessuno scambio», un percentile senza storia n.d., il DIX non letto detto",
+      "convenzione, non misura" in _rd499 and "1 seduta NON letta per errore di rete: 02/10" in _rd499
+      and "BBB: nessuna seduta nella memoria — non vuol dire 'nessuno scambio fuori borsa'" in _rd499
+      and "percentile n.d." in _rd499 and "DIX dell'S&P 500: NON letto (HTTP 503)" in _rd499, _rd499)
+_rdx499 = "\n".join(PZ.righe_dp({}, {"nuove": 0, "assenti": 0, "non_lette": [], "non_ancora_pubblicate": []}, _sx499))
+check("v499 resa del DIX con la storia corta: il percentile della media si dichiara n.d., non «None°»",
+      "None" not in _rdx499 and "percentile n.d.: servono 10 sedute per una media" in _rdx499, _rdx499)
+# ⚠ la riga della GEX di SqueezeMetrics rimandava alla stima sulle catene «qui sotto»: la v499 ha messo la gamma PRIMA del
+#   dark pool, e il rimando e' diventato falso. Un rimando di POSIZIONE invecchia quando cambia l'ordine dei blocchi (C10):
+#   si rimanda per NOME, e i due segni si dichiarano possibilmente diversi
+_rgx499 = [r for r in _rdx499.splitlines() if "GEX dell'S&P 500" in r]
+check("v499 la GEX di SqueezeMetrics rimanda al blocco della gamma per NOME, non per posizione, e dichiara che le due stime "
+      "possono avere segni diversi",
+      len(_rgx499) == 1 and "GAMMA DEI DEALER" in _rgx499[0] and "qui sotto" not in _rgx499[0] and "qui sopra" not in _rgx499[0]
+      and "i due segni possono differire" in _rgx499[0], str(_rgx499))
+
+# --- la gamma dei dealer ---
+def _esp499(S, K, T, iv, oi, segno):
+    """Il conto di Black-Scholes fatto a parte (tasso zero, senza dividendi): dollari per 1% di movimento."""
+    d1 = (_m499.log(S / K) + 0.5 * iv * iv * T) / (iv * _m499.sqrt(T))
+    g = _m499.exp(-0.5 * d1 * d1) / (_m499.sqrt(2 * _m499.pi) * S * iv * _m499.sqrt(T))
+    return segno * g * oi * 100 * S * S * 0.01
+
+
+_adesso499 = _dt496(2026, 10, 16, 12, 0, tzinfo=PZ.NEW_YORK)
+_T499 = PZ.anni_alla_scadenza("2026-11-20", _adesso499)
+_c499 = lambda tipo, k, oi, iv=0.30, scad="2026-11-20": {"scad": scad, "tipo": tipo, "strike": k, "oi": oi, "iv": iv}  # noqa: E731
+_g1_499 = PZ.gamma_dealer([_c499("C", 110, 100)], 100.0, _adesso499)
+_gp499 = PZ.gamma_dealer([_c499("P", 90, 100)], 100.0, _adesso499)
+check("v499 gamma: la convenzione dei dealer LUNGHI le call e CORTI le put — una call sola da' gamma netta POSITIVA uguale al "
+      "conto di Black-Scholes fatto a parte, una put sola NEGATIVA; i muri sono i loro strike, nessun cambio di regime",
+      _g1_499 and _g1_499["netta"] > 0 and abs(_g1_499["netta"] - _esp499(100.0, 110, _T499, 0.30, 100, 1)) < 1e-6 * _g1_499["netta"]
+      and _g1_499["call_wall"] == 110 and _g1_499["put_wall"] is None and _g1_499["flip"] is None
+      and _gp499["netta"] < 0 and _gp499["put_wall"] == 90 and _gp499["call_wall"] is None, f"{_g1_499} · {_gp499}")
+_cp499 = [_c499("P", 90, 100), _c499("C", 110, 100)]
+_g2_499 = PZ.gamma_dealer(_cp499, 100.0, _adesso499)
+_f2_499 = _g2_499["flip"]
+_sotto499 = PZ.gamma_dealer(_cp499, _f2_499 * 0.99, _adesso499)["netta"] if _f2_499 else None
+_sopra499 = PZ.gamma_dealer(_cp499, _f2_499 * 1.01, _adesso499)["netta"] if _f2_499 else None
+check("v499 gamma: put sotto e call sopra — il cambio di regime sta FRA i due strike, la gamma netta e' negativa appena sotto e "
+      "positiva appena sopra (la definizione, non un numero atteso: v326)",
+      _f2_499 is not None and 90 < _f2_499 < 110 and _sotto499 < 0 < _sopra499, f"{_f2_499} · {_sotto499} · {_sopra499}")
+_cw499 = [_c499("C", 110, 100), _c499("C", 112, 70, scad="2026-11-20"), _c499("C", 112, 70, scad="2026-11-27")]
+_righe499 = {(c["strike"], c["scad"]): abs(_esp499(100.0, c["strike"], PZ.anni_alla_scadenza(c["scad"], _adesso499), c["iv"],
+                                                    c["oi"], 1)) for c in _cw499}
+_per_riga499 = max(_righe499, key=_righe499.get)[0]
+_per_strike499 = {}
+for (_k499, _s499), _v499 in _righe499.items():
+    _per_strike499[_k499] = _per_strike499.get(_k499, 0) + _v499
+_somma499 = max(_per_strike499, key=_per_strike499.get)
+check("v499 gamma: la call wall SOMMA tutte le scadenze dello stesso strike (il caso costruito discrimina: per riga vincerebbe "
+      "un altro strike)", _per_riga499 != _somma499
+      and PZ.gamma_dealer(_cw499, 100.0, _adesso499)["call_wall"] == _somma499, f"{_per_riga499} {_somma499}")
+_g4_499 = PZ.gamma_dealer([_c499("C", 110, 100), _c499("C", 105, 0), _c499("P", 95, 50, iv=0), _c499("P", 95, 50, iv=None),
+                           _c499("C", 100, 50, scad="2026-10-09")], 100.0, _adesso499)
+check("v499 gamma: fuori i contratti senza open interest, senza volatilita' implicita, gia' scaduti; senza contratti utili o "
+      "senza prezzo nessuna gamma (None, non una gamma nulla)",
+      _g4_499["contratti"] == 1 and PZ.gamma_dealer([_c499("C", 110, 0)], 100.0, _adesso499) is None
+      and PZ.gamma_dealer([_c499("C", 110, 100)], None, _adesso499) is None, str(_g4_499))
+check("v499 gamma: il tempo alla scadenza arriva alle 16:00 di New York del giorno di scadenza; dopo e' zero",
+      abs(PZ.anni_alla_scadenza("2026-11-20", _dt496(2026, 11, 20, 15, 0, tzinfo=PZ.NEW_YORK)) * 365.25 * 24 - 1) < 1e-9
+      and PZ.anni_alla_scadenza("2026-11-20", _dt496(2026, 11, 20, 16, 30, tzinfo=PZ.NEW_YORK)) == 0.0)
+check("v499 gamma: dollari per 1% nella scala giusta — mai «0 mln $» accanto a un regime (la prima stesura, su RGTI)",
+      PZ._miliardi(2.3e9) == "+2,30 mld $" and PZ._miliardi(-4.2e6) == "-4,2 mln $" and PZ._miliardi(94e6) == "+94 mln $"
+      and PZ._miliardi(-54321) == "-54 mila $" and PZ._miliardi(-987) == "-987 $" and PZ._miliardi(None) == "n.d.")
+_rg499 = "\n".join(PZ.righe_gex({"AAA": None, "BBB": {**_g1_499, "netta": 0.0}, "CCC": _g2_499}, {"AAA": "HTTP 403"}))
+check("v499 resa della gamma: la convenzione dichiarata, il NON letto con l'errore, un regime nullo detto NULLA, l'assenza del "
+      "cambio di regime detta col suo intervallo",
+      "convenzione, non misura" in _rg499 and "AAA: gamma n.d. — HTTP 403" in _rg499 and "(NULLA)" in _rg499
+      and "nessun cambio di regime entro ±20%" in _rg499 and "cambio di regime " in _rg499.split("CCC")[1], _rg499)
+_mp499 = _corpo_di(Path(__file__).with_name("posizionamento.py").read_text(encoding="utf-8"), "main")
+check("v499 collegamento del posizionamento: la gamma su ogni catena letta al prezzo del riepilogo, il dark pool di posizioni, "
+      "sorvegliati e ETF degli indici, la memoria scritta solo senza --no-memoria, i due blocchi nella resa",
+      'gex[tk] = gamma_dealer(contratti(j, tk), (rie[tk] or {}).get("spot"), adesso)' in _mp499
+      and 'universo_dp = list(dict.fromkeys(sorted(qta) + [s["tk"] for s in sorv] + list(INDICI_DP)))' in _mp499
+      and "if not a.no_memoria:\n        scrivi_memoria_pc(memoria)\n        scrivi_memoria_pc(memoria_dp, CACHE_DP)" in _mp499
+      and "L += righe_gex(gex, errori_cat)" in _mp499 and "L += righe_dp(stati_dp, agg_dp, dix, err_dix)" in _mp499)
+
+# --- gli indici: il testo di un PDF con la sola libreria standard ---
+def _pdf499(*contenuti):
+    out = b"%PDF-1.7\n"
+    for n, c in enumerate(contenuti, 1):
+        z = _zl499.compress(c)
+        out += f"{n} 0 obj\n<< /Length {len(z)} /Filter /FlateDecode >>\nstream\n".encode() + z + b"\nendstream\nendobj\n"
+    return out + b"9 0 obj\n<< /Length 4 >>\nstream\nJUNK\nendstream\nendobj\n%%EOF"
+
+
+_tp499 = IX.testo_pdf(_pdf499(
+    b"BT /F1 9 Tf 1 0 0 1 72 700 Tm [(For Q3 2026, the blended \\(year-over-year\\) earnings growth rate for the S&P 500 "
+    b"is 2)] TJ ET\nBT /F1 9 Tf 1 0 0 1 400 700 Tm [(9.0%.)] TJ ET\n"
+    b"BT /F1 9 Tf 1 0 0 1 72 688 Tm (seconda riga \\050ok\\051 \\\\ fine) Tj ET\n"))
+check("v499 PDF: i blocchi sulla STESSA riga di base si uniscono senza spazio — «2» e «9.0%» tornano «29.0%», con uno spazio "
+      "sarebbero due numeri —, un cambio di riga e' un a capo, le sequenze di escape (anche ottali) si leggono, un flusso non "
+      "compresso si salta", "for the S&P 500 is 29.0%." in _tp499 and "\nseconda riga (ok) \\ fine" in _tp499
+      and "JUNK" not in _tp499, repr(_tp499))
+_fs_a499 = IX.leggi_factset(
+    "EARNINGS INSIGHT October 16, 2026 Key Metrics Earnings Scorecard: For Q3 2026 (with 9% of S&P 500 companies reporting "
+    "actual results), 84% of S&P 500 companies have reported a positive EPS surprise and 67% of S&P 500 companies has reported "
+    "a positive revenue surprise. Earnings Growth: For Q3 2026, the blended (year-over-year) earnings growth rate for the\n"
+    "S&P 500 is 29.0%. Valuation: The forward 12-month P/E ratio for the S&P 500 is 19.0. This P/E ratio is below the 5-year "
+    "average (19.8) but equal to the 10-year average (19.1). Of these companies, 84% have reported actual EPS above estimates, "
+    "which is above the 5-year average of 78% and above the 10-year average of 77%. In aggregate, companies are reporting "
+    "earnings that are 2.6% below estimates, which is below the 5-year average of 7.5% and below the 10-year average of 8.0%. "
+    "The forward 12-month P/E ratio is 19.0 (based on Wednesdays closing price and forward EPS)")
+check("v499 FactSet in stagione: ogni misura dalla SUA frase — P/E con le medie della stessa FactSet («and» e «but»), la "
+      "pagella in percentuale, la crescita «blended», chi batte le attese con le medie, la sorpresa SOTTO le attese col segno "
+      "meno, il giorno del prezzo; una frase che va a capo si legge lo stesso",
+      # .get e non []: una frase che il parser perde deve far FALLIRE questo controllo col suo nome, non fermare la suite
+      #   con un KeyError (v407, v471) — l'iniezione che toglie «but» dalla regola del P/E lo ha mostrato
+      _fs_a499.get("data") == "2026-10-16" and _fs_a499.get("pe") == {"valore": 19.0, "media5": 19.8, "media10": 19.1}
+      and _fs_a499.get("giorno_prezzo") == "mercoledi'"
+      and _fs_a499.get("pagella") == {"trimestre": "Q3 2026", "riportato": 9, "in_percentuale": True, "utile_sopra": 84,
+                                      "ricavi_sopra": 67}
+      and _fs_a499.get("crescita") == {"trimestre": "Q3 2026", "tipo": "blended", "valore": 29.0}
+      and _fs_a499.get("battono") == {"valore": 84, "media5": 78, "media10": 77}
+      and _fs_a499.get("sorpresa") == {"valore": -2.6, "media5": 7.5, "media10": 8.0} and _fs_a499.get("mancano") == [],
+      str(_fs_a499))
+_fs_b499 = IX.leggi_factset(
+    "EARNINGS INSIGHT October 2, 2026 For Q3 2026 (with 19 S&P 500 companies reporting actual results), 16 S&P 500 companies "
+    "have reported a positive EPS surprise and 14 S&P 500 companies has reported a positive revenue surprise. For Q3 2026, the "
+    "estimated (year-over-year) earnings decline for the S&P 500 is -2.1%.")
+check("v499 FactSet a inizio stagione: i CONTEGGI al posto delle percentuali, la crescita solo «estimated» (anche un calo), e "
+      "la frase del P/E che manca DICHIARATA fra le mancanti — mai un numero indovinato (v396)",
+      (_fs_b499.get("pagella") or {}).get("in_percentuale") is False and (_fs_b499.get("pagella") or {}).get("riportato") == 19
+      and _fs_b499.get("crescita") == {"trimestre": "Q3 2026", "tipo": "estimated", "valore": -2.1}
+      and "pe" not in _fs_b499 and "battono" not in _fs_b499 and _fs_b499.get("mancano") == ["P/E prospettico"], str(_fs_b499))
+_url499 = []
+
+
+def _fs_leggi499(url):
+    d = url[-10:-4]
+    _url499.append(d)
+    if d == "101626":
+        return b"%PDF-1.7 a"
+    if d == "101426":
+        raise _ue496.URLError("rete")
+    if d == "101326":
+        return b"<html>non e' un pdf"
+    if d == "100926":
+        return b"%PDF-1.7 b"
+    raise _ue496.HTTPError(url, 404, "x", None, None)
+
+
+_tr499, _er499 = IX.cerca_factset(_d496(2026, 10, 18), _fs_leggi499)
+check("v499 FactSet: i due rapporti piu' recenti dai giorni feriali all'indietro (mai il fine settimana), l'indirizzo con la "
+      "data MMGGAA, un 404 e' «quel giorno non c'e'», un errore di rete o una risposta che non e' un PDF si CONTANO (v389); "
+      "trovati i due ci si ferma",
+      [d for d, _ in _tr499] == ["2026-10-16", "2026-10-09"] and "101826" not in _url499 and "101726" not in _url499
+      and any("14/10" in e for e in _er499) and any("13/10" in e and "PDF" in e for e in _er499)
+      and not any("15/10" in e for e in _er499) and "100826" not in _url499, f"{_url499} {_er499}")
+
+# --- multpl: la storia della STESSA serie, con le mediane ---
+_mesi499 = []
+_g499 = _d496(2001, 10, 1)
+while _g499 <= _d496(2026, 10, 1):
+    _mesi499.append(_g499)
+    _g499 = _d496(_g499.year + (_g499.month // 12), _g499.month % 12 + 1, 1)
+_val499 = {g: (120.0 if g == _d496(2009, 5, 1) else 20.0 + (i % 7) * 0.1) for i, g in enumerate(_mesi499)}
+_lab499 = lambda g: f"{g.strftime('%b')} {g.day}, {g.year}"  # noqa: E731
+_html499 = "".join(f"<tr><td>{_lab499(g)}</td><td>" + ("<abbr title='Estimate'>†</abbr>\n" if g >= _d496(2026, 7, 1) else "")
+                   + f"{_val499[g]}</td></tr>" for g in reversed(_mesi499))
+_html499 = (f"<tr><td>{_lab499(_d496(2026, 10, 16))}</td><td><abbr>†</abbr>\n26.12</td></tr>" + _html499
+            + "<tr><td>non una data</td><td>1</td></tr>")
+_lm499 = IX.leggi_multpl(_html499)
+_sm499 = IX.stato_mensile(_lm499)
+_v20_499 = [_val499[g] for g in _mesi499[-240:]]
+check("v499 multpl: le MEDIANE della stessa serie mensile (un mese a 120 nel 2009 sposta la media di oltre mezzo punto e la "
+      "mediana no), la riga del giorno fuori dalla serie, i mesi stimati dalla fonte (†) contati, percentili e massimo",
+      len(_lm499) == len(_mesi499) + 1 and _sm499["data"] == "2026-10-16" and _sm499["valore"] == 26.12 and _sm499["stima"]
+      and abs(_sm499["medie"][20]["valore"] - _st499.median(_v20_499)) < 1e-12
+      and abs(_st499.mean(_v20_499) - _st499.median(_v20_499)) > 0.3
+      and abs(_sm499["medie"][5]["valore"] - _st499.median([_val499[g] for g in _mesi499[-60:]])) < 1e-12
+      and _sm499["medie"][5]["stime"] == 4 and _sm499["medie"][20]["dal"] == _mesi499[-240].isoformat()
+      and _sm499["rango20"] == PZ._rango(ROT.percentile_midrank(26.12, _v20_499))
+      and _sm499["rango_tutto"] == PZ._rango(ROT.percentile_midrank(26.12, list(_val499.values())))
+      and _sm499["massimo"] == {"data": "2009-05-01", "valore": 120.0} and IX.stato_mensile([]) is None, str(_sm499)[:600])
+
+# --- WSJ e la storia raccolta del Nasdaq-100 ---
+_wt499 = ('{"tradeDate":"2026-10-15T00:00:00","instruments":[{"instrumentId":"1","name":"Russell 2000 Index",'
+          '"priceEarningsRatio":"34.62"}]} {"tradeDate":"2026-10-16T00:00:00","instruments":[{"instrumentId":"343343",'
+          '"name":"NASDAQ 100 Index","priceEarningsRatio":"30.27","priceEarningsRatioEstimate":"21.45",'
+          '"priceEarningsRatio52WeekAgo":"--","ticker":"RIXF"}]}')
+_lw499 = IX.leggi_wsj(_wt499)
+check("v499 WSJ: il record dell'indice e la seduta del SUO blocco (l'ultima dichiarata prima del record), un campo non numerico "
+      "e' un buco (v205), un indice che non c'e' e' None",
+      _lw499 == {"data": "2026-10-16", "pe": 30.27, "fwd": 21.45, "pe_52s": None} and IX.leggi_wsj("<html></html>") is None,
+      str(_lw499))
+_mw499 = {}
+_c1_499 = IX.aggiungi_memoria(_mw499, _lw499)
+_c2_499 = IX.aggiungi_memoria(_mw499, {**_lw499, "fwd": 99.0})
+_c3_499 = IX.aggiungi_memoria(_mw499, {**_lw499, "data": None})
+check("v499 memoria degli indici: una riga per SEDUTA del WSJ e mai riscritta (la prima lettura resta), niente senza la seduta "
+      "dichiarata — una data indovinata sarebbe una storia falsa (v396)",
+      _c1_499 and not _c2_499 and not _c3_499 and _mw499 == {"2026-10-16": {"data": "2026-10-16", "ndx_pe": 30.27,
+                                                                          "ndx_fwd": 21.45}}, str(_mw499))
+_m3_499 = {f"2026-10-{k:02d}": {"data": f"2026-10-{k:02d}", "ndx_fwd": 20.0 + k} for k in (14, 15, 16)}
+_s3_499 = IX.storia_raccolta(_m3_499)
+_mlunga499 = {f"r{k:04d}": {"data": f"r{k:04d}", "ndx_fwd": float(k)} for k in range(IX.MIN_STORIA)}
+check("v499 storia raccolta: quante sedute, da quando, la precedente; il percentile solo da un anno di sedute",
+      _s3_499["n"] == 3 and _s3_499["dal"] == "2026-10-14" and _s3_499["prec"] == ("2026-10-15", 35.0)
+      and "rango" not in _s3_499 and IX.storia_raccolta(_mlunga499).get("rango") is not None
+      and IX.storia_raccolta({}) == {"n": 0}, str(_s3_499))
+
+# --- volatilita', concentrazione, ampiezza, tassi, premio ---
+_v499 = IX.leggi_vol("DATE,OPEN,HIGH,LOW,CLOSE\n10/14/2026,1,1,1,16.0\n10/15/2026,1,1,1,16.46\n10/16/2026,1,1,1,19.99\n"
+                     "bad,1,1,1,x\n")
+_sv499 = IX.stato_vol(_v499)
+_ts499 = IX.struttura_termine(_v499, IX.leggi_vol("DATE,OPEN,HIGH,LOW,CLOSE\n10/14/2026,1,1,1,20.0\n10/16/2026,1,1,1,20.5\n"))
+check("v499 volatilita': lo storico CBOE in ordine di data, la variazione sulla seduta prima, il percentile; la struttura a "
+      "termine sulle STESSE date (il 15/10 manca al VIX3M e non entra: v207)",
+      _v499 == [("2026-10-14", 16.0), ("2026-10-15", 16.46), ("2026-10-16", 19.99)]
+      and abs(_sv499["var"] - (19.99 / 16.46 - 1) * 100) < 1e-9 and _sv499["rango"] == 83
+      and _ts499["data"] == "2026-10-16" and abs(_ts499["rapporto"] - 19.99 / 20.5) < 1e-12 and _ts499["n"] == 2
+      and IX.struttura_termine(_v499, []) is None, str(_ts499))
+_ct499 = ('<div>Top 10 Percentage <div class="mt-0.5 text-lg">38.55%</div></div> lastUpdated:"Oct 15, 2026",'
+          + ",".join(f'{{no:{i},s:"${tk}",n:"Nome {i}",holdingWeight:{w},holdingShares:1}}' for i, (tk, w) in
+                     enumerate([("NVDA", 7.86), ("BRK.B", 1.5)] + [(f"T{k}", 1.0) for k in range(3, 12)], 1)))
+_cp499b = IX.leggi_composizione(_ct499)
+check("v499 concentrazione: la quota dei primi dieci come la pubblica la pagina, la data dei dati dell'emittente, i primi dieci "
+      "nomi (l'undicesimo fuori) con le classi riportate al trattino; una pagina senza dati e' None",
+      _cp499b["top10"] == 38.55 and _cp499b["data"] == "2026-10-15" and len(_cp499b["primi"]) == 10
+      and _cp499b["primi"][1]["tk"] == "BRK-B" and IX.leggi_composizione("<html></html>") is None, str(_cp499b))
+_ba499 = [{"t": f"2026-09-{k:02d}", "c": 100 + k} for k in range(1, 31)]
+_bb499 = [{"t": f"2026-09-{k:02d}", "c": 200 + 2 * k} for k in range(1, 31) if k != 29]
+_vc499 = IX.variazione_comune(_ba499, _bb499, 21)
+check("v499 ampiezza: le due variazioni sulle STESSE sedute, per data (v207) — una seduta che manca a un ETF non sposta la "
+      "base dell'altro; storia comune troppo corta → None",
+      _vc499 is not None and _vc499["da"] == "2026-09-08" and _vc499["a"] == "2026-09-30"
+      and abs(_vc499["uguale"] - (130 / 108 - 1) * 100) < 1e-9 and abs(_vc499["cap"] - (260 / 216 - 1) * 100) < 1e-9
+      and IX.variazione_comune(_ba499[:10], _bb499[:10], 21) is None, str(_vc499))
+_by499 = [{"t": "2025-12-30", "c": 90}, {"t": "2025-12-31", "c": 100}, {"t": "2026-01-02", "c": 101}, {"t": "2026-10-16", "c": 110}]
+check("v499 da inizio anno: dalla chiusura dell'ultima seduta dell'anno prima; senza quella seduta None",
+      abs(IX.da_inizio_anno(_by499) - 10.0) < 1e-9 and IX.da_inizio_anno(_by499[2:]) is None)
+_tq499 = {"macro": {"tassi": {"scadenze": [{"key": "a2", "value": 4.0, "observation_date": "2026-10-15"},
+                                           {"key": "a10", "value": 5.1, "observation_date": "2026-10-15"}]},
+                    "indicators": [{"key": "altro", "label": "Tasso reale 10A (TIPS)", "value": "9.99%", "date": "x"},
+                                   {"key": "real10", "label": "un altro nome", "value": "2.78%", "date": "2026-10-15"}]}}
+check("v499 tassi: dalla pipeline per CHIAVE, non per il nome che si legge (v196), con le loro date; il testo «2.78%» si legge",
+      IX.tassi_pipeline(_tq499) == {"nominale": 5.1, "data_nominale": "2026-10-15", "reale": 2.78, "data_reale": "2026-10-15"}
+      and IX.tassi_pipeline({}) == {"nominale": None, "data_nominale": None, "reale": None, "data_reale": None})
+check("v499 premio sul Tesoro: 100 / P/E prospettico meno i due rendimenti a 10 anni; senza P/E nessun premio",
+      IX.premio(20.0, {"nominale": 4.5, "reale": 2.0}) == {"rendimento": 5.0, "nominale": 0.5, "reale": 3.0}
+      and IX.premio(None, {}) is None and IX.premio(20.0, {"nominale": None, "reale": 2.0})["nominale"] is None)
+
+# --- la resa: ogni multiplo con la storia della SUA fonte, e i tre esiti ---
+_fs2_499 = {"rapporti": [_fs_a499, {**_fs_b499, "data": "2026-10-09", "pe": {"valore": 19.1, "media5": 19.8, "media10": 19.1}}],
+            "errori": []}
+_rv499 = IX.righe_valutazione(_fs2_499, {"pe": _sm499, "cape": _sm499}, _lw499, _m3_499,
+                              {"nominale": 5.1, "data_nominale": "2026-10-15", "reale": 2.78, "data_reale": "2026-10-15"}, {})
+_ndx499 = next(r for r in _rv499 if "Nasdaq-100" in r)
+check("v499 valutazione: il prospettico contro le medie della STESSA FactSet, gli ultimi 12 mesi contro le mediane della stessa "
+      "serie di multpl coi mesi stimati, il Nasdaq-100 SENZA nessuna media (la sua storia e' solo quella raccolta), il premio "
+      "dichiarato convenzione",
+      any("19,0× · media 5 anni 19,8× · media 10 anni 19,1× — medie della stessa FactSet" in r for r in _rv499)
+      and any("mediane della stessa serie mensile: 5 anni" in r and "sono stime della fonte, †" in r for r in _rv499)
+      and "media" not in _ndx499.replace("memoria", "") and "52 settimane prima" in _ndx499
+      and "storia raccolta: 3 sedute dal 14/10/2026" in _ndx499
+      and any("premio sul Tesoro (CONVENZIONE" in r and "= +0,16 punti" in r for r in _rv499), "\n".join(_rv499))
+_rvn499 = "\n".join(IX.righe_valutazione({"rapporti": [], "errori": ["14/10 URLError"]}, {"pe": None, "cape": None}, None, {}, {},
+                                         {"wsj": "HTTP 403", "multpl_pe": "URLError"}))
+_rvf499 = "\n".join(IX.righe_valutazione({"rapporti": [_fs_b499], "errori": []}, {}, None, {}, {}, {}))
+check("v499 valutazione, i tre esiti (v389): FactSet NON letto con gli errori, la frase del P/E NON trovata, multpl e WSJ NON "
+      "letti — mai «nessun valore» — e senza P/E prospettico nessun premio",
+      "rapporto FactSet NON letto nelle ultime tre settimane (14/10 URLError)" in _rvn499
+      and "multpl NON letto (URLError)" in _rvn499 and "WSJ NON letto (HTTP 403)" in _rvn499
+      and "premio sul Tesoro: n.d." in _rvn499 and "la frase del P/E NON trovata nel rapporto FactSet del 02/10/2026" in _rvf499,
+      _rvn499 + "\n" + _rvf499)
+_rs499 = "\n".join(IX.righe_stagione(_fs2_499))
+_rsb499 = "\n".join(IX.righe_stagione({"rapporti": [_fs_b499]}))
+check("v499 stagione: in percentuale con le medie di FactSet e la sorpresa col segno, la crescita «blended» detta per quello che "
+      "e' e il rapporto della settimana prima accanto; a inizio stagione i conteggi, e le frasi mancanti dichiarate",
+      "hanno riportato il 9% delle societa' · utile sopra le attese: 84% (media 5 anni 78%, 10 anni 77%)" in _rs499
+      and "sorpresa aggregata sugli utili -2,6%" in _rs499 and "«blended»: effettivi di chi ha riportato" in _rs499
+      and "nel rapporto del 09/10/2026: -2,1% («estimated»), P/E prospettico 19,1×" in _rs499
+      and "hanno riportato 19 societa'" in _rsb499 and "utile sopra le attese 16 su 19" in _rsb499
+      and "frasi non trovate nel rapporto: P/E prospettico" in _rsb499, _rs499 + "\n" + _rsb499)
+_rvv499 = "\n".join(IX.righe_volatilita({"VIX": _sv499, "VXN": None, "VIX3M": _sv499}, _ts499, {"vol_VXN": "HTTP 403"}))
+_rc499 = "\n".join(IX.righe_concentrazione({"SPY": _cp499b, "QQQ": None}, ["NVDA", "MU"], {"comp_QQQ": "URLError"}))
+_ra499 = "\n".join(IX.righe_ampiezza({}))
+_rt499 = "\n".join(IX.righe_tendenza({"SPY": {"tk": "SPY", "errore": "nessuna barra"}, "QQQ": None}))
+check("v499 resa: un indice di volatilita' non letto detto con l'errore, la struttura a termine col suo percentile; i titoli "
+      "del libro fra i primi dieci nominati; ampiezza e tendenza senza dati dette n.d. e NON lette",
+      "VXN: NON letto (HTTP 403)" in _rvv499 and "struttura a termine VIX / VIX3M: 0,98" in _rvv499
+      and "nel libro: NVDA" in _rc499 and "Nasdaq-100 (QQQ): composizione NON letta (URLError)" in _rc499
+      and _ra499.count("n.d. (storia comune piu' corta)") == 4 and _rt499.count("prezzi NON letti") == 2,
+      "\n".join([_rvv499, _rc499, _ra499, _rt499]))
+_sn499 = "\n".join(IX.sintesi({"factset": _fs2_499, "multpl": {"pe": _sm499, "cape": _sm499}, "wsj": _lw499, "memoria": _m3_499,
+                               "tassi": {}, "vol": {"VIX": _sv499}, "termine": _ts499, "composizione": {"SPY": _cp499b},
+                               "libro": ["NVDA"], "barre": {}, "schede": {}, "errori": {}}))
+check("v499 sintesi: i sei blocchi in fila — valutazione, stagione, volatilita', concentrazione, ampiezza, tendenza — e la "
+      "dichiarazione che e' INFORMAZIONE, non una prova",
+      all(x in _sn499 for x in ("VALUTAZIONE —", "STAGIONE DELLE TRIMESTRALI", "VOLATILITA' IMPLICITA", "CONCENTRAZIONE —",
+                                "AMPIEZZA —", "TENDENZA —"))
+      and "INFORMAZIONE: nessuna di queste misure e' una prova della tenuta" in _sn499, _sn499[:600])
+
+# --- la tendenza di SPY e QQQ con le regole dei titoli (la quota si toglie: nessuna rete) ---
+_oq499 = IX.brief.quota
+IX.brief.quota = lambda tk: (_ for _ in ()).throw(OSError("niente rete nei gate"))
+try:
+    _bt499, _g499 = [], _d496(2023, 1, 2)
+    for _i499 in range(800):
+        while _g499.weekday() >= 5:
+            _g499 += _td496(days=1)
+        _c499v = 100 + 10 * _m499.sin(_i499 / 20) + _i499 * 0.05
+        _bt499.append({"t": _g499.isoformat(), "o": _c499v, "h": _c499v + 1, "l": _c499v - 1, "c": _c499v, "v": 1e6 + _i499})
+        _g499 += _td496(days=1)
+    _si499 = IX.scheda_indice("SPY", _bt499[-252:], _bt499, _dt496(2026, 10, 17, 12, 0, tzinfo=PZ.NEW_YORK))
+    _si0_499 = IX.scheda_indice("SPY", _bt499[-252:], None, _dt496(2026, 10, 17, 12, 0, tzinfo=PZ.NEW_YORK))
+finally:
+    IX.brief.quota = _oq499
+check("v499 tendenza: le stesse funzioni dei titoli (prezzo dalla barra se la quota non c'e', variazioni, medie in ATR, RSI, "
+      "volumi, lettura a 5 anni e struttura dalle barre lunghe); senza barre lunghe le due letture sono None, non inventate",
+      _si499["px"] == _bt499[-1]["c"] and abs(_si499["s21"] - ROT.variazione(_bt499[-252:], 21)) < 1e-12
+      and _si499.get("d50_atr") is not None and _si499.get("rsi") is not None and _si499.get("vol_pct_20") is not None
+      and _si499["cinque_anni"] is not None and _si499["struttura"] is not None
+      and _si0_499["cinque_anni"] is None and _si0_499["struttura"] is None, str({k: _si499.get(k) for k in ("px", "s21", "anno")}))
+
+# --- i collegamenti: lo strumento nuovo, le memorie, il formato, il censimento ---
+_ixsrc499 = Path(__file__).with_name("indici.py").read_text(encoding="utf-8")
+_ixmain499, _ixcalc499 = _corpo_di(_ixsrc499, "main"), _corpo_di(_ixsrc499, "calcola")
+check("v499 collegamento degli indici (v399): ogni fonte entra in calcola — FactSet, multpl, WSJ, CBOE, composizione, barre di "
+      "oggi e a 5 anni, i tassi della pipeline, la memoria — e la memoria si scrive solo senza --no-memoria",
+      all(x in _ixcalc499 for x in ("stato_factset, oggi", "URL_MULTPL.items()", "_testo, URL_WSJ", "URL_VOL.format(s=s)",
+                                     "URL_COMPOSIZIONE.format(tk=tk.lower())", "brief.barre, tk", "rotazione.barre_lunghe, tk",
+                                     "tassi_pipeline(d)", "aggiungi_memoria(mem, wsj)"))
+      and 'if not a.no_memoria and o["memoria_cambiata"]:\n        scrivi_memoria(mem)' in _ixmain499)
+_cm499 = {f: [a for _, a in AN.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+check("v499 il comando unico esegue indici.py in ogni fase, lo dichiara fra gli strumenti, e conta fra le memorie da committare "
+      "il dark pool e la storia degli indici",
+      all(["indici.py"] in v for v in _cm499.values()) and "indici.py" in AN.STRUMENTI
+      and {"dark_pool.jsonl", "indici.jsonl"} <= {p.name for p in AN.MEMORIE} and AN.MEMORIE[0].name == "cboe_putcall.jsonl")
+_fa499 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_cl499 = AN.checklist() or ""
+check("v499 il formato: la sezione 5ter degli indici e la gamma e il dark pool in 5bis nella checklist, le notizie di TUTTI i nomi, "
+      "e le richieste del 17/10 sera nel registro; /aggiorna dichiara indici.py fuori con la sua ragione (v387)",
+      "5ter. **Indici**" in _cl499 and "la **gamma dei dealer**" in _cl499 and "il **dark pool**" in _cl499
+      and "le notizie sono di **TUTTE** le posizioni" in _cl499 and "NOTIZIE ULTIMISSIME — TUTTI I SORVEGLIATI" in _cl499
+      and "gli indici S&P 500 e Nasdaq-100" in _fa499.split("Richieste del CEO rese strutturali")[1]
+      and "`scripts/indici.py` resta **fuori**" in (Path(__file__).resolve().parent.parent / ".claude" / "commands"
+                                                   / "aggiorna.md").read_text(encoding="utf-8"))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

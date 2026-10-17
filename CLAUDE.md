@@ -7607,3 +7607,98 @@ E «tutto misurato non è provvisorio» comprende il CDS.
   la regola, il collegamento ESEGUITO in `valuta_tenuta` e nella watchlist (v483), la resa, il libro e il formato.
 - **16 iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**, ciascuna sul controllo atteso — fra queste l'eccesso calcolato senza l'indice (lo prende solo la proprieta' «nome e mercato insieme fanno zero»), la base presa dal primo giorno dello storico, la rotazione della scadenza ignorata, la versione dell'indice ignorata, la cedola sbagliata nel collegamento, la soglia con l'uguale, l'assenza strutturale contata come dato mancante, il CDS contato fra la crescita, la riga della regola tolta dalla watchlist, la soglia cambiata nel solo libro.
 - Pavimenti: `test_update_data.py` 255 → 265 (N_CHECKS_MINIMO 270 → 285), `test_analisi_libro.py` 585 → 600. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 📈 v499 — NOTIZIE PER TUTTI I NOMI, DARK POOL, GAMMA DEI DEALER, E GLI INDICI COL P/E DELLA LORO FONTE
+
+Il CEO, 17/10/2026 sera, testuale: *"Controlla anche che tesla e SpaceX siano in watchlist (per esempio nell'analisi non
+so se mi avresti fornito l'ultima trovata di Mask sull'auto volante tra le News). Valuta se puoi inserimento dei
+movimenti del darkpool. Monitora anche Nasdaq e sep ed il relativo pe e altri parametri di analisi che ritieni utili.
+Rendi tutt'e questi nuovi inserimenti strutturali"*, con la trascrizione di un video (livelli GEX, indice del dark pool
+con la media a 10 sedute, P/E prospettico dell'S&P 500 contro la media decennale, concentrazione dei primi dieci titoli).
+
+### 1. Le notizie arrivavano solo a chi aveva un segnale
+TSLA e SPCX erano in watchlist, ma il blocco NOTIZIE ULTIMISSIME (v494) leggeva i feed dei soli nomi con un ingresso
+possibile o un'uscita accesa: la Roadster di Tesla, presentata il 16/10 con i propulsori di SpaceX, **sarebbe rimasta
+fuori dall'analisi** perché quel giorno TSLA non aveva un pavimento vicino. *Un evento non aspetta un segnale.*
+Ora `rotazione.nomi_notizie` — una costruzione sola per posizioni e sorvegliati (v161) — mette TUTTI i nomi: chi ha un
+segnale per primo col suo perché e fino a 6 voci, gli altri con le 3 più recenti.
+⚠ **E il feed di SpaceX era FERMO**: tre voci, l'ultima del 01/07. «Nessuna voce nelle ultime 72 ore» si sarebbe letto
+«niente da dire su SpaceX» il giorno in cui SpaceX era nei feed di mezzo mercato. Un feed letto e **vuoto**, o la cui
+ultima voce supera i **14 giorni** (convenzione, v240), si dichiara: per quel nome la fonte non porta le notizie e la
+ricerca in rete è obbligatoria. È un quarto esito accanto ai tre della v389, e il gate v494 che pinnava il dizionario
+del feed vuoto è stato riagganciato, non allentato.
+
+### 2. Il dark pool: il rapporto delle vendite allo scoperto fuori borsa, e la sua lettura è una convenzione
+Le singole operazioni fuori borsa non sono pubbliche in tempo utile. Si pubblica, ogni sera e gratis, il file
+consolidato di FINRA: per ogni titolo il volume venduto allo scoperto e il volume totale riportati fuori borsa.
+`posizionamento.py` ne fa il **DPI** di posizioni, sorvegliati ed ETF degli indici, col percentile dell'anno e la media a
+10 sedute **ponderata sui volumi** (un giorno sottile non pesa come uno pieno: il gate costruisce il caso in cui le due
+medie distano oltre 30 punti), più il **DIX** e la **GEX** dell'S&P 500 di SqueezeMetrics.
+⚠ Leggere come ACQUISTO un rapporto alto è il modello di SqueezeMetrics (chi compra fuori borsa riceve spesso azioni che
+il market maker gli vende allo scoperto), non una misura: la riga lo dichiara ogni volta.
+⚠ Memoria `memoria/dark_pool.jsonl` (i file FINRA sono immutabili, si legge solo ciò che manca); un nome aggiunto alla
+watchlist **fa rileggere all'indietro** i giorni letti per un universo che non lo comprendeva.
+
+### 3. La gamma dei dealer (GEX), dalle catene complete di CBOE
+Per ogni opzione con open interest e volatilità implicita: gamma di Black-Scholes (tasso zero, senza dividendi) ×
+open interest × 100 × prezzo² × 1% = dollari che i dealer comprano o vendono per un movimento dell'1%. La NETTA dice il
+regime (positiva smorza i movimenti, negativa li amplifica), la stessa somma su una griglia di ±20% trova il **cambio
+di regime**, call wall e put wall sono gli strike con più gamma sul proprio lato, **sommata su tutte le scadenze**.
+⚠ La convenzione — dealer LUNGHI le call, CORTI le put — è un'ipotesi: chi detiene le opzioni non si osserva.
+⚠ Il gate confronta la netta con un **conto di Black-Scholes fatto a parte**, e il cambio di regime con la sua
+DEFINIZIONE (negativa appena sotto, positiva appena sopra) invece che con un numero atteso (v326).
+⚠ **La prima stesura stampava «0 mln $ (NEGATIVA)» su RGTI**: un regime dichiarato accanto a uno zero. Ora la scala
+scende a migliaia e dollari.
+
+### 4. Gli indici: ogni multiplo con la storia DELLA SUA fonte
+`scripts/indici.py`, strumento nuovo del comando unico. Il P/E «degli ultimi 12 mesi» dell'S&P 500 il 16/10 valeva
+**26,1 per multpl, 23,5 per il WSJ e 23,9 per worldperatio**: tre definizioni dell'utile, tre numeri veri.
+Confrontare il valore di una fonte con la media di un'altra è la classe dei denominatori non dichiarati (v240). Quindi:
+
+| misura | fonte | storia |
+|---|---|---|
+| S&P 500 prospettico | **FactSet**, Earnings Insight (PDF del venerdì) | le medie a 5 e 10 anni della STESSA FactSet |
+| S&P 500 ultimi 12 mesi, CAPE | **multpl** (serie di Shiller, mensile dal 1871) | mediane a 5/10/20 anni calcolate qui sulla stessa serie |
+| Nasdaq-100 ultimi 12 mesi e prospettico | **WSJ** | solo il valore di 52 settimane prima: il resto si raccoglie (`memoria/indici.jsonl`) |
+
+Più il premio sul Tesoro (convenzione, il «modello Fed», col Treasury e il TIPS della pipeline), la **stagione delle
+trimestrali** di FactSet (quante hanno riportato, quante battono le attese contro le medie di FactSet, la crescita
+«blended»), **VIX, VXN, VIX3M** e la struttura a termine dallo storico di CBOE, la **concentrazione** (quota dei primi
+dieci e quali sono nel libro: il 17/10 NVDA, MU e AMD stavano fra i primi dieci del Nasdaq-100), l'**ampiezza** (pesi
+uguali contro capitalizzazione, sulle stesse sedute) e la **tendenza** di SPY e QQQ con le funzioni dei titoli.
+Esclusi con la ragione: worldperatio (terza definizione, e il 16/10 stava a −3,7 deviazioni dalla media del proprio
+anno: un salto che da qui non si verifica) e la «media storica 16,5» della pipeline, senza provenienza (v240).
+
+⚠⚠ **LA MEDIA DEL P/E A 20 ANNI ERA GONFIATA DAL 2009, e l'ho trovato leggendo l'uscita come il destinatario.** Media
+25,6, mediana 22,7: i mesi in cui gli utili crollarono portarono il P/E sopra 100. Con la media il valore di oggi si
+leggeva «in linea con la storia» mentre stava al 76° percentile. Le storie di multpl sono ora **mediane** — il 50°
+percentile, la stessa misura del percentile accanto, che quei mesi non spostano.
+
+⚠ **Il PDF di FactSet si legge con la sola libreria standard.** Word scrive il testo in blocchi posizionati spezzati
+anche DENTRO un numero («2» «9.0%»): i blocchi sulla stessa riga di base si uniscono senza spazio, un cambio di riga è
+un a capo. Unire con uno spazio darebbe «2 9.0%», due numeri. Provato su tre rapporti; le frasi cambiano con la
+stagione (conteggi prima delle percentuali, «estimated» prima di «blended») e una frase non trovata si DICHIARA.
+⚠ multpl a una cifra decimale, come la pipeline: le schede stampano lo stesso valore come riferimento, e due rese dello
+stesso numero dalla stessa fonte sono la classe v415.
+⚠ **Fonti misurate da QUESTO ambiente**: lo strumento gira nella sessione dell'analisi, non nel CI.
+
+### 🧪 Il metodo
+- Il gate v496 sul collegamento del posizionamento pinnava la lista `["SPY", "QQQ"]`: con IWM è andato rosso su codice
+  giusto. Riagganciato alla proprietà (gli ETF degli indici ci sono tutti), non alla forma della lista.
+- 43 controlli nuovi su stati costruiti, nessuna rete (la quota si toglie anche dalla tendenza: un gate che dipende dalla
+  rete va rosso a seconda di dove gira). **41 iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato
+  per impronta: mordono tutte**, ciascuna sul controllo atteso.
+- ⚠ **Un rimando di POSIZIONE è invecchiato nella stessa versione che lo ha reso falso.** La riga della GEX di
+  SqueezeMetrics rimandava alla stima sulle catene «qui sotto»; la v499 ha messo la gamma PRIMA del dark pool. Trovato
+  leggendo l'uscita del comando vero, non dai gate: ora si rimanda per NOME del blocco (classe C10), e la riga dichiara
+  che le due stime — quella di SqueezeMetrics, con un metodo proprio, e la nostra sulle catene dell'ETF SPY — possono avere
+  segni diversi: il
+  16/10 la prima era positiva e la seconda negativa. Correggendola avevo scritto quella data e quei segni DENTRO il
+  codice: un fatto del giorno in una riga che si stampa ogni giorno (v410, v424), tolto prima del commit.
+- ⚠ **Due iniezioni fermavano la suite invece di far cadere il controllo.** La prima perché il controllo di FactSet
+  leggeva i campi con le parentesi quadre: togliendo «but» dalla regola del P/E il campo spariva e la suite moriva con un
+  KeyError — ora `.get`, e il controllo cade col suo nome (v407, v471). La seconda perché l'iniezione era scritta a metà
+  (un allineamento per posizione che moriva nel codice iniettato): riscritta coerente, morde. *Un'iniezione che non morde
+  può essere il controllo che racconta male, o l'iniezione che rompe altro — va guardato quale, prima di concludere.*
+- Pavimento di `test_analisi_libro.py` 600 → 640. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al
+  browser (v440).

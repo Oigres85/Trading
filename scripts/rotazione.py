@@ -1380,10 +1380,20 @@ def notizie_recenti(tks, ore=NOTIZIE_ORE, adesso=None, leggi=None):
         copre = min(v["quando"] for v in datate) if datate and min(v["quando"] for v in datate) >= da else None
         out[tk] = {"stato": st, "lette": len(voci or []), "copre_da": copre,
                    "voci": sorted((v for v in datate if v["quando"] >= da), key=lambda v: v["quando"], reverse=True)}
+        # v499 — un feed VUOTO o FERMO non porta le notizie del nome, e va detto: il 17/10 quello di SpaceX aveva tre voci,
+        #   l'ultima del 01/07, mentre la Roadster di Tesla con i propulsori di SpaceX era nei feed di mezzo mercato.
+        #   «Nessuna voce nelle ultime 72 ore» si sarebbe letto come «niente da dire su SpaceX» (v389, v406)
+        ultima = max((v["quando"] for v in datate), default=None)
+        if st == "ok" and not voci:
+            out[tk]["vuoto"] = True
+        elif st == "ok" and ultima is not None and ultima < adesso - timedelta(days=FEED_FERMO_GIORNI):
+            out[tk]["fermo_dal"] = ultima
     return out
 
 
 NOTIZIE_MOSTRA = 6
+NOTIZIE_MOSTRA_SENZA = 3     # v499 — i nomi SENZA un segnale: le voci piu' recenti, perche' un evento non aspetta un segnale
+FEED_FERMO_GIORNI = 14       # v499 — un feed la cui ultima voce e' piu' vecchia di cosi' e' FERMO (convenzione, v240)
 
 
 def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
@@ -1412,9 +1422,11 @@ def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
     L = [f"{titolo} — feed Nasdaq del simbolo, ultime {ore} ore, ora italiana · [TK] = trovata nel feed di TK, non "
          "'notizia su TK' (v415) · la voce che sta nel feed di piu' nomi del blocco e' cronaca di mercato: una volta, in "
          "fondo · il feed e' UNA fonte: la ricerca web nelle stesse ore resta obbligatoria, con fonte e data "
-         "(FORMATO_ANALISI.md)"]
+         f"(FORMATO_ANALISI.md) · chi ha un segnale porta il perche' e fino a {NOTIZIE_MOSTRA} voci proprie, chi non ne ha "
+         f"le {NOTIZIE_MOSTRA_SENZA} piu' recenti (v499)"]
     for tk, motivi in segnali.items():
-        L.append(f"  {tk} — " + " · ".join(motivi))
+        L.append(f"  {tk} — " + (" · ".join(motivi) if motivi else
+                                 "nessun segnale: le voci piu' recenti, perche' un evento non aspetta un segnale"))
         if tk in altrove:
             L.append(f"      notizie: nel blocco {altrove[tk]}")
             continue
@@ -1424,14 +1436,20 @@ def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
             continue
         proprie = [v for v in nw["voci"] if chiave(v) not in comuni]
         k_com = len(nw["voci"]) - len(proprie)
-        if not nw["voci"]:
+        tetto = NOTIZIE_MOSTRA if motivi else NOTIZIE_MOSTRA_SENZA
+        if nw.get("vuoto"):
+            L.append("      ⚠ il feed del simbolo e' VUOTO: questa fonte non serve il nome — le notizie vanno cercate in rete")
+        elif nw.get("fermo_dal"):
+            L.append(f"      ⚠ il feed del simbolo e' FERMO: l'ultima voce e' del {nw['fermo_dal'].astimezone(brief.ROMA):%d/%m/%Y} "
+                     "— per questo nome la fonte non porta le notizie, vanno cercate in rete")
+        elif not nw["voci"]:
             L.append(f"      feed letto, nessuna voce nelle ultime {ore} ore")
         elif not proprie:
             L.append(f"      nessuna voce propria: le {k_com} del feed sono cronaca di mercato, in fondo al blocco")
-        for v in proprie[:NOTIZIE_MOSTRA]:
+        for v in proprie[:tetto]:
             L.append(f"      [{tk}] {quando(v)} {v['titolo'][:110]}")
-        if len(proprie) > NOTIZIE_MOSTRA:
-            L.append("      " + non_mostrate(len(proprie) - NOTIZIE_MOSTRA))
+        if len(proprie) > tetto:
+            L.append("      " + non_mostrate(len(proprie) - tetto))
         if proprie and k_com:
             L.append(f"      + {k_com} {'voce' if k_com == 1 else 'voci'} di cronaca di mercato, in fondo al blocco")
         if nw.get("copre_da"):
@@ -1724,6 +1742,12 @@ def segnali_watchlist(o):
     return seg, {tk: "CANDIDATI PER SETTORE (ultimi 7 giorni)" for tk in seg if tk in cand}
 
 
+def nomi_notizie(segnali, tutti):
+    """v499 — {tk: motivi} per il blocco delle notizie: prima i nomi con un segnale (il perche' accanto), poi TUTTI gli
+    altri con la lista vuota. Una sola costruzione per sorvegliati (qui) e posizioni (numeri_libro, v161)."""
+    return {**{tk: m for tk, m in segnali.items()}, **{tk: [] for tk in tutti if tk not in segnali}}
+
+
 def notizie_candidati(o, giorni=7):
     """Notizie dal feed Nasdaq PER SIMBOLO, solo per i candidati (v398-v399: l'attribuzione viene
     dalla fonte). Tre esiti distinti: con voci, senza voci, NON letto (v389)."""
@@ -1791,9 +1815,13 @@ if __name__ == "__main__":
         print()
         print("\n".join(righe_watchlist(o)))
         print()
-        # v494 — le ultimissime notizie dei sorvegliati con un ingresso possibile (CEO, 17/10/2026)
+        # v494 — le ultimissime notizie dei sorvegliati (CEO, 17/10/2026)
+        # v499 — di TUTTI i sorvegliati, non solo di quelli con un ingresso possibile: la Roadster di Tesla (16/10) sarebbe
+        #   rimasta fuori se TSLA non avesse avuto un pavimento vicino. Chi ha un segnale viene prima, col suo perche'
         seg, altrove = segnali_watchlist(o)
-        print("\n".join(righe_notizie("NOTIZIE ULTIMISSIME — SORVEGLIATI CON UN INGRESSO POSSIBILE", seg,
-                                      notizie_recenti([tk for tk in seg if tk not in altrove]), altrove=altrove)))
+        nomi = nomi_notizie(seg, [t["tk"] for t in o.get("watchlist") or []])
+        print("\n".join(righe_notizie("NOTIZIE ULTIMISSIME — TUTTI I SORVEGLIATI (il perche' accanto a chi ha un ingresso "
+                                      "possibile)", nomi, notizie_recenti([tk for tk in nomi if tk not in altrove]),
+                                      altrove=altrove)))
         print()
         print("\n".join(righe_piano(o)))

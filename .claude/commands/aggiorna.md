@@ -196,11 +196,17 @@ rapporto.
 blocco del posizionamento che l'analisi in chat riporta sempre — put/call di mercato e delle posizioni,
 scadenze delle opzioni, grandi operatori della CFTC, bitcoin dall'ultima chiusura USA — e scrive due
 memorie in `memoria/` (le sedute del put/call e la storia delle opzioni per titolo): questo comando
-legge, non scrive.
+legge, non scrive. Da v499 porta anche la gamma dei dealer e il dark pool, e scrive una terza memoria
+(`memoria/dark_pool.jsonl`).
+
+`scripts/indici.py` resta **fuori** per la stessa ragione di `numeri_libro.py` (v499): è il blocco degli
+indici S&P 500 e Nasdaq-100 che l'analisi in chat riporta sempre — P/E con la storia della sua fonte, stagione
+delle trimestrali, volatilità implicita, concentrazione, ampiezza, tendenza — e scrive una memoria
+(`memoria/indici.jsonl`, la storia raccolta del P/E del Nasdaq-100): questo comando legge, non scrive.
 
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
 e «Aggiorna analisi» del CEO — che esegue in parallelo `numeri_libro.py`, `brief.py`,
-`schede_progetto.py`, `rotazione.py` e `posizionamento.py`, già dichiarati fuori qui con la loro ragione, e chiude con
+`schede_progetto.py`, `rotazione.py`, `posizionamento.py` e `indici.py`, già dichiarati fuori qui con la loro ragione, e chiude con
 la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 

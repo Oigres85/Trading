@@ -30,6 +30,20 @@ significano l'opposto (v389).
 - Coinbase Exchange (candele orarie del bitcoin, senza chiave): il bitcoin scambia anche nel fine settimana.
 - stockanalysis (via brief.barre): MSTR e IBIT, per la sensibilita' MISURATA del titolo al bitcoin.
 
+═══ v499 — DARK POOL E GAMMA DEI DEALER (richiesta del CEO del 17/10/2026, sera) ═══════════════
+Il CEO: «Valuta se puoi inserimento dei movimenti del darkpool», con un video che usa i livelli «GEX» (call wall,
+put wall, cambio di regime della gamma) e un indice del dark pool con la sua media a 10 sedute. Misurato prima:
+- FINRA, file giornaliero consolidato delle vendite allo scoperto fuori borsa (cdn.finra.org, ~0,5 MB, ogni sera,
+  gratis): per ogni titolo il volume venduto allo scoperto e il volume totale riportati a FINRA. Una seduta senza
+  file risponde 403 (fine settimana, festivi, o non ancora pubblicato). Memoria: memoria/dark_pool.jsonl.
+- SqueezeMetrics, DIX.csv (~0,2 MB): l'indice del dark pool dell'S&P 500 ponderato in dollari (DIX) e la loro stima
+  della gamma dei dealer sull'S&P 500 (GEX), una riga per seduta dal 2011.
+- CBOE, le stesse catene complete di sopra: per ogni opzione l'open interest e la volatilita' implicita, da cui la
+  gamma si ricalcola su una griglia di prezzi per trovare il CAMBIO DI REGIME.
+⚠ Le singole operazioni fuori borsa NON sono pubbliche in tempo utile: «movimenti del dark pool» qui vuol dire il
+  rapporto delle vendite allo scoperto, e la sua lettura come acquisto e' una CONVENZIONE (SqueezeMetrics), non una
+  misura. Lo stesso vale per la gamma: chi detiene le opzioni non si osserva, e il segno dei dealer e' un'ipotesi.
+
 ⚠ Un'opzione su un sottostante con piu' di una radice (contratti rettificati dopo un'operazione societaria)
 si tiene SOLO se la radice e' il simbolo: la classe degli strike-relitto che la pipeline filtra dal v104.
 """
@@ -260,7 +274,8 @@ def contratti(j, tk):
             continue
         out.append({"scad": f"20{m.group(2)}-{m.group(3)}-{m.group(4)}", "tipo": m.group(5),
                     "strike": int(m.group(6)) / 1000, "oi": o.get("open_interest") or 0, "vol": o.get("volume") or 0,
-                    "bid": o.get("bid"), "ask": o.get("ask"), "ultimo": o.get("last_trade_price")})
+                    "bid": o.get("bid"), "ask": o.get("ask"), "ultimo": o.get("last_trade_price"),
+                    "iv": o.get("iv")})                                     # v499 — per la gamma dei dealer
     return out
 
 
@@ -767,6 +782,251 @@ def righe_btc(b, errore=None):
     return L
 
 
+# ══════════════════════════════════════ v499 — DARK POOL (FINRA) E DIX (SqueezeMetrics) ══════════════════════════════
+URL_DP = "https://cdn.finra.org/equity/regsho/daily/CNMSshvol{d}.txt"
+URL_DIX = "https://squeezemetrics.com/monitor/static/DIX.csv"
+CACHE_DP = RADICE / "memoria" / "dark_pool.jsonl"
+INDICI_DP = ("SPY", "QQQ", "IWM")       # gli ETF degli indici accanto ai nomi del libro
+SEDUTE_DP = 252                          # la distribuzione: un anno di sedute
+MEDIA_DP = 10                            # la media di 10 sedute (quella del video): un giorno solo e' rumore
+
+
+def leggi_dp(testo, d, universo):
+    """Il file FINRA di una seduta → una riga di memoria: per ogni nome dell'universo [volume allo scoperto, volume
+    totale riportato], interi. 'u' registra l'universo CHIESTO: un nome aggiunto dopo fa rileggere il giorno; uno che
+    quel giorno non scambiava (una quotazione recente) resta assente, e non si richiede."""
+    voluti = {tk.replace("-", "."): tk for tk in universo}      # FINRA scrive le classi col punto (BRK.B)
+    v = {}
+    for riga in testo.splitlines()[1:]:
+        p = riga.split("|")
+        if len(p) < 5 or p[1] not in voluti:
+            continue
+        try:
+            corto, tot = float(p[2]), float(p[4])
+        except ValueError:
+            continue
+        if tot > 0:
+            v[voluti[p[1]]] = [int(round(corto)), int(round(tot))]
+    return {"data": d, "u": sorted(set(universo)), "v": v}
+
+
+def giorni_dp(oggi, memoria, universo, giorni=GIORNI_PC):
+    """I giorni feriali della finestra da leggere: quelli che la memoria non ha, e quelli letti per un universo che non
+    comprendeva un nome di oggi (il nome nuovo si riempie all'indietro, una volta)."""
+    u, out = set(universo), []
+    for g in (oggi - timedelta(days=k) for k in range(giorni)):
+        if g.weekday() >= 5:
+            continue
+        r = memoria.get(g.isoformat())
+        if r is None or (not r.get("assente") and not u <= set(r.get("u") or [])):
+            out.append(g.isoformat())
+    return out
+
+
+def aggiorna_dp(oggi, memoria, universo, leggi=scarica, paralleli=PARALLELI):
+    """Come aggiorna_pc: un 403/404 vecchio e' una borsa chiusa e si registra, uno recente e' un file non ancora
+    pubblicato; un errore di rete si conta fra le NON lette (v389). I file sono immutabili: si legge solo cio' che manca."""
+    def uno(d):
+        try:
+            return d, leggi_dp(leggi(URL_DP.format(d=d.replace("-", ""))).decode("latin-1"), d, universo), None
+        except urllib.error.HTTPError as e:
+            return d, None, e.code
+        except Exception as e:  # noqa: BLE001
+            return d, None, type(e).__name__
+
+    nuove, assenti, non_lette, attese = 0, 0, [], []
+    with ThreadPoolExecutor(paralleli) as ex:
+        for d, r, err in ex.map(uno, giorni_dp(oggi, memoria, universo)):
+            if r is not None:
+                memoria[d] = r
+                nuove += 1
+            elif err in (403, 404):
+                if (oggi - date.fromisoformat(d)).days > MARGINE_ASSENTE:
+                    memoria[d] = {"data": d, "assente": err}
+                    assenti += 1
+                else:
+                    attese.append(d)
+            else:
+                non_lette.append(d)
+    return {"nuove": nuove, "assenti": assenti, "non_lette": non_lette, "non_ancora_pubblicate": attese}
+
+
+def stato_dp(memoria, tk, n=SEDUTE_DP, m=MEDIA_DP, minimo=MIN_STORIA):
+    """Il rapporto delle vendite allo scoperto fuori borsa di UN nome: l'ultima seduta, la media di m sedute PONDERATA
+    sui volumi (somma dello scoperto su somma del totale: un giorno sottile non pesa come uno pieno) e i percentili
+    dell'anno. Sotto `minimo` sedute il percentile non si pubblica (convenzione)."""
+    righe = [(d, memoria[d]["v"][tk]) for d in sorted(memoria) if tk in (memoria[d].get("v") or {})][-n:]
+    if not righe:
+        return None
+    dpi = [c / t * 100 for _, (c, t) in righe]
+    medie = [sum(c for _, (c, _t) in righe[i - m + 1:i + 1]) / sum(t for _, (_c, t) in righe[i - m + 1:i + 1]) * 100
+             for i in range(m - 1, len(righe))]
+    out = {"tk": tk, "data": righe[-1][0], "dpi": dpi[-1], "n": len(righe), "dal": righe[0][0],
+           "media": medie[-1] if medie else None, "n_medie": len(medie)}
+    if len(dpi) >= minimo:
+        out["rango"] = _rango(_pct_rank(dpi[-1], dpi))
+    if len(medie) >= minimo:
+        out["rango_media"] = _rango(_pct_rank(medie[-1], medie))
+    return out
+
+
+def leggi_dix(testo):
+    """DIX.csv → [{data, dix (in %), gex ($ per 1% di movimento dell'S&P 500, la stima della fonte)}]."""
+    out = []
+    for r in csv.DictReader(io.StringIO(testo)):
+        try:
+            out.append({"data": str(r["date"])[:10], "dix": float(r["dix"]) * 100, "gex": float(r["gex"])})
+        except (KeyError, TypeError, ValueError):
+            continue
+    return sorted(out, key=lambda x: x["data"])
+
+
+def stato_dix(righe, n=SEDUTE_DP, m=MEDIA_DP):
+    if not righe:
+        return None
+    anno, ult = righe[-n:], righe[-1]
+    dix, gex = [r["dix"] for r in anno], [r["gex"] for r in anno]
+    return {"data": ult["data"], "dix": ult["dix"], "rango": _rango(_pct_rank(ult["dix"], dix)),
+            "media": sum(dix[-m:]) / len(dix[-m:]), "rango_media": _rango(_pct_rank(sum(dix[-m:]) / len(dix[-m:]),
+                                                                                  [sum(dix[i - m + 1:i + 1]) / m
+                                                                                   for i in range(m - 1, len(dix))])),
+            "gex": ult["gex"], "rango_gex": _rango(_pct_rank(ult["gex"], gex)),
+            "gex_negativi": sum(1 for x in gex if x < 0), "n": len(anno), "dal_storia": righe[0]["data"]}
+
+
+def _miliardi(x):
+    """Dollari per 1% di movimento, col segno: miliardi da uno in su, milioni da uno in su, migliaia sotto, dollari
+    sotto il migliaio. Su un titolo piccolo la gamma netta vale decine di migliaia di dollari: in milioni la prima
+    stesura stampava «0 mln $ (NEGATIVA)», un regime dichiarato accanto a uno zero (v499)."""
+    if x is None:
+        return "n.d."
+    if abs(x) >= 1e9:
+        return f"{_sg(x / 1e9, 2)} mld $"
+    if abs(x) >= 1e6:
+        return f"{_sg(x / 1e6, 1 if abs(x) < 1e7 else 0)} mln $"
+    if abs(x) >= 1e3:
+        return f"{_sg(x / 1e3, 0)} mila $"
+    return f"{_sg(x, 0)} $"
+
+
+def righe_dp(stati, agg, dix, err_dix=None):
+    L = ["DARK POOL — vendite allo scoperto sui mercati fuori borsa (FINRA, file giornaliero consolidato) · DPI = "
+         "volume venduto allo scoperto / volume totale riportato a FINRA, per titolo",
+         "  ⚠ convenzione, non misura (v240): chi compra fuori borsa riceve spesso azioni che il market maker gli vende "
+         "allo scoperto e ricopre dopo, quindi un DPI ALTO si LEGGE come acquisto e uno basso come vendita — e' il "
+         "modello di SqueezeMetrics, che con lo stesso dato costruisce il DIX; chi compra davvero non si osserva · conta "
+         f"il confronto col proprio anno, non il livello: un ETF ha rapporti strutturalmente diversi da un'azione · media "
+         f"di {MEDIA_DP} sedute ponderata sui volumi"]
+    if agg.get("non_lette"):
+        L.append(f"  ⚠ {NL._conta(len(agg['non_lette']), 'seduta NON letta', 'sedute NON lette')} per errore di rete: "
+                 f"{', '.join(_gm(d) for d in agg['non_lette'][:6])}")
+    if agg.get("non_ancora_pubblicate"):
+        L.append(f"  non ancora pubblicate da FINRA: {', '.join(_gm(d) for d in agg['non_ancora_pubblicate'])}")
+    for tk, s in stati.items():
+        if s is None:
+            L.append(f"  {tk}: nessuna seduta nella memoria — non vuol dire 'nessuno scambio fuori borsa'")
+            continue
+        r = f" ({s['rango']}° percentile dell'anno)" if s.get("rango") is not None else f" (storia di {s['n']} sedute: percentile n.d.)"
+        rm = f" ({s['rango_media']}°)" if s.get("rango_media") is not None else ""
+        L.append(f"  {tk}: DPI {_it(s['dpi'], 1)}% il {_gm(s['data'])}{r} · media {MEDIA_DP} sedute "
+                 + (f"{_it(s['media'], 1)}%{rm}" if s.get("media") is not None else "n.d."))
+    if dix is None:
+        L.append(f"  DIX dell'S&P 500: NON letto ({err_dix or 'motivo n.d.'}) — non vuol dire 'nessun segnale'")
+    else:
+        L.append(f"  DIX dell'S&P 500 (SqueezeMetrics, ponderato in dollari sui titoli dell'indice): {_it(dix['dix'], 1)}% il "
+                 f"{_gma(dix['data'])} ({dix['rango']}° percentile dell'anno) · media {MEDIA_DP} sedute {_it(dix['media'], 1)}% "
+                 + (f"({dix['rango_media']}°)" if dix.get("rango_media") is not None
+                    else f"(percentile n.d.: servono {MEDIA_DP} sedute per una media)"))
+        L.append(f"  GEX dell'S&P 500 (stima di SqueezeMetrics, dollari che i dealer comprano o vendono per 1% di "
+                 f"movimento): {_miliardi(dix['gex'])} ({'POSITIVA' if dix['gex'] > 0 else 'NEGATIVA'}, "
+                 f"{dix['rango_gex']}° percentile dell'anno; negativa in {dix['gex_negativi']} sedute su {dix['n']}) — la "
+                 "loro stima, con un metodo proprio: il blocco GAMMA DEI DEALER la ricava dalle catene dell'ETF SPY — strumenti e "
+                 "metodi diversi, e i due segni possono differire")
+    return L
+
+
+# ══════════════════════════════════════ v499 — GAMMA DEI DEALER (GEX), STIMATA DALLE CATENE ══════════════════════
+GEX_GRIGLIA = 0.20       # il cambio di regime si cerca entro ±20% dal prezzo (convenzione)
+GEX_PASSO = 0.0025       # un quarto di punto percentuale: la risoluzione del livello
+INDICI_GEX = ("SPY", "QQQ", "IWM")
+
+
+def anni_alla_scadenza(scad, adesso):
+    """Dalla data e ora di adesso alla chiusura del giorno di scadenza (16:00 di New York), in anni."""
+    fine = datetime(int(scad[:4]), int(scad[5:7]), int(scad[8:10]), 16, 0, tzinfo=NEW_YORK)
+    return max((fine - adesso).total_seconds(), 0.0) / (365.25 * 86400)
+
+
+def gamma_dealer(contr, spot, adesso, griglia=GEX_GRIGLIA, passo=GEX_PASSO):
+    """La gamma dei dealer stimata da una catena (convenzione dichiarata: dealer LUNGHI le call, CORTI le put).
+    Per ogni contratto vivo con open interest e volatilita' implicita: gamma di Black-Scholes (tasso zero, senza
+    dividendi) × open interest × 100 azioni × prezzo² × 1% = dollari che i dealer comprano o vendono per un movimento
+    dell'1%. La NETTA al prezzo di oggi dice il regime; la stessa somma su una griglia di prezzi trova il prezzo a cui
+    passa per zero (il cambio di regime, interpolato fra i due punti); call wall e put wall sono gli strike sopra e
+    sotto il prezzo con piu' gamma sul proprio lato, sommata su tutte le scadenze."""
+    import numpy as np
+    usa = [(c["strike"], anni_alla_scadenza(c["scad"], adesso), float(c.get("iv") or 0), float(c.get("oi") or 0), c["tipo"])
+           for c in contr]
+    usa = [u for u in usa if u[0] > 0 and u[1] > 0 and u[2] > 0 and u[3] > 0]
+    if not usa or not spot or spot <= 0:
+        return None
+    K = np.array([u[0] for u in usa])
+    T = np.array([u[1] for u in usa])
+    IV = np.array([u[2] for u in usa])
+    OI = np.array([u[3] for u in usa])
+    SG = np.array([1.0 if u[4] == "C" else -1.0 for u in usa])
+    den = IV * np.sqrt(T)
+
+    def esposizioni(S):
+        S = np.atleast_1d(np.asarray(S, dtype=float))[:, None]
+        d1 = (np.log(S / K) + 0.5 * IV * IV * T) / den
+        g = np.exp(-0.5 * d1 * d1) / (np.sqrt(2 * np.pi) * S * den)
+        return SG * g * OI * 100.0 * S * S * 0.01
+
+    e0 = esposizioni(spot)[0]
+    prezzi = spot * (1.0 + np.arange(-griglia, griglia + passo / 2, passo))
+    curva = esposizioni(prezzi).sum(axis=1)
+    flip = None
+    for i in range(len(prezzi) - 1):
+        a, b = float(curva[i]), float(curva[i + 1])
+        if a == 0 or (a < 0) != (b < 0):
+            x = float(prezzi[i]) if a == 0 else float(prezzi[i] + (prezzi[i + 1] - prezzi[i]) * (-a) / (b - a))
+            if flip is None or abs(x - spot) < abs(flip - spot):
+                flip = x
+    lato = {}
+    for (k, _t, _iv, _oi, tipo), e in zip(usa, e0):
+        lato[(tipo, k)] = lato.get((tipo, k), 0.0) + abs(float(e))
+    cw = max(((k, v) for (tp, k), v in lato.items() if tp == "C" and k >= spot), key=lambda kv: kv[1], default=None)
+    pw = max(((k, v) for (tp, k), v in lato.items() if tp == "P" and k <= spot), key=lambda kv: kv[1], default=None)
+    return {"spot": spot, "netta": float(e0.sum()), "flip": flip, "call_wall": cw[0] if cw else None,
+            "put_wall": pw[0] if pw else None, "contratti": len(usa), "griglia": griglia}
+
+
+def righe_gex(g, errori=None):
+    L = ["GAMMA DEI DEALER (GEX) — stima dalle catene complete di CBOE (open interest della sera prima, volatilita' "
+         "implicita della fonte; gamma di Black-Scholes a tasso zero e senza dividendi; contratti senza volatilita' "
+         "implicita esclusi)",
+         "  ⚠ convenzione, non misura (v240): si assume che i dealer siano LUNGHI le call (le vendono i clienti) e CORTI "
+         "le put (le comprano i clienti); chi detiene davvero cosa non si osserva · gamma netta POSITIVA: le coperture "
+         "dei dealer smorzano i movimenti (comprano i ribassi, vendono i rialzi); NEGATIVA: li amplificano · call wall = "
+         "lo strike SOPRA il prezzo con piu' gamma sulle call (spesso un tetto) · put wall = SOTTO il prezzo con piu' "
+         "gamma sulle put (spesso un supporto) · cambio di regime = il prezzo a cui la gamma netta passa per zero, "
+         f"cercato entro ±{_it(GEX_GRIGLIA * 100, 0)}% · sono livelli dove il prezzo SI E' FERMATO piu' spesso, non "
+         "dove si fermera'"]
+    for tk, x in g.items():
+        if x is None:
+            L.append(f"  {tk}: gamma n.d. — " + ((errori or {}).get(tk) or "catena senza contratti utili"))
+            continue
+        s = x["spot"]
+        d = lambda v: f"{_strike(v)} ({_sg((v / s - 1) * 100)}%)" if v is not None else "n.d."  # noqa: E731
+        reg = ("POSITIVA" if x["netta"] > 0 else "NEGATIVA") if x["netta"] != 0 else "NULLA"
+        cambio = (f"cambio di regime {_it(x['flip'], 2)} ({_sg((x['flip'] / s - 1) * 100)}%)" if x["flip"] is not None
+                  else f"nessun cambio di regime entro ±{_it(x['griglia'] * 100, 0)}%")
+        L.append(f"  {tk} {_it(s, 2)} · gamma netta {_miliardi(x['netta'])} per 1% ({reg}) · {cambio} · call wall "
+                 f"{d(x['call_wall'])} · put wall {d(x['put_wall'])}")
+    return L
+
+
 # ══════════════════════════════════════ ESECUZIONE ══════════════════════════════════════
 def _catena(tk):
     try:
@@ -794,12 +1054,16 @@ def main():
     oggi = adesso.date()
     import analisi
     in_seduta = analisi.fase(adesso) == "seduta"
-    pos, _, _ = brief.leggi_libro()
+    pos, _, sorv = brief.leggi_libro()
     qta = {p["tk"]: p["qta"] for p in pos if p.get("valuta") == "USD"}
-    simboli = sorted(qta) + ["SPY", "QQQ"]
+    simboli = sorted(qta) + [t for t in INDICI_GEX if t not in qta]     # v499 — IWM accanto a SPY e QQQ
     memoria = leggi_memoria_pc()
     memoria_tit = leggi_memoria_titoli()
+    # v499 — il dark pool di posizioni, sorvegliati e indici: un file FINRA per seduta li porta tutti
+    universo_dp = list(dict.fromkeys(sorted(qta) + [s["tk"] for s in sorv] + list(INDICI_DP)))
+    memoria_dp = leggi_memoria_pc(CACHE_DP)
     with ThreadPoolExecutor(PARALLELI) as ex:
+        f_dix = ex.submit(lambda: leggi_dix(scarica(URL_DIX).decode("utf-8", "replace")))
         f_cat = [ex.submit(_catena, tk) for tk in simboli]
         f_cot = [ex.submit(_cot, oggi.year - k) for k in range(ANNI_COT + 1)]
         f_btc = ex.submit(lambda: candele_btc(json.loads(scarica(URL_BTC))))
@@ -807,8 +1071,15 @@ def main():
         f_ibit = ex.submit(brief.barre, "IBIT")
         f_conti = ex.submit(brief.calendario_trimestrali, sorted(qta), GIORNI_CONTI)
         agg = aggiorna_pc(oggi, memoria)
+        agg_dp = aggiorna_dp(oggi, memoria_dp, universo_dp)
     if not a.no_memoria:
         scrivi_memoria_pc(memoria)
+        scrivi_memoria_pc(memoria_dp, CACHE_DP)
+    try:
+        dix, err_dix = stato_dix(f_dix.result()), None
+    except Exception as e:  # noqa: BLE001
+        dix, err_dix = None, f"{type(e).__name__}: {str(e)[:80]}"
+    stati_dp = {tk: stato_dp(memoria_dp, tk) for tk in universo_dp}
     try:
         conti_cal = f_conti.result()
     except Exception:  # noqa: BLE001
@@ -816,13 +1087,16 @@ def main():
     conti = {}
     for c in conti_cal.get("attesi") or []:
         conti.setdefault(c["tk"], c)
-    rie, errori_cat = {}, {}
+    rie, errori_cat, gex = {}, {}, {}
     for f in f_cat:
         tk, j, err = f.result()
         if j is None:
             errori_cat[tk] = err
+            gex[tk] = None
             continue
         rie[tk] = riepilogo(j, tk, oggi, conti.get(tk), in_seduta)
+        # v499 — la gamma dei dealer sullo stesso prezzo del riepilogo (in seduta l'ultimo, fuori la chiusura)
+        gex[tk] = gamma_dealer(contratti(j, tk), (rie[tk] or {}).get("spot"), adesso) if rie[tk] else None
     nuove_tit = registra_titoli(rie, memoria_tit, analisi.fase(adesso), adesso)
     if not a.no_memoria and nuove_tit:
         scrivi_memoria_titoli(memoria_tit)
@@ -841,7 +1115,8 @@ def main():
     L = [f"POSIZIONAMENTO — {adesso.astimezone(ROMA):%d/%m/%Y %H:%M} ora italiana · New York {adesso:%H:%M} · "
          f"fase: {analisi.fase(adesso).upper()}",
          "  fonti: CBOE (statistiche giornaliere e catene complete delle opzioni, differite di 15 minuti), CFTC (rapporto "
-         "settimanale Traders in Financial Futures), Coinbase Exchange (bitcoin, candele orarie), stockanalysis (MSTR e IBIT)",
+         "settimanale Traders in Financial Futures), Coinbase Exchange (bitcoin, candele orarie), stockanalysis (MSTR e IBIT), "
+         "FINRA (vendite allo scoperto fuori borsa, file giornaliero) e SqueezeMetrics (DIX e GEX dell'S&P 500)",
          ""]
     L += righe_pc(stato_pc(memoria), agg)
     L.append("")
@@ -851,6 +1126,10 @@ def main():
         L.append("⚠ catene NON lette: " + ", ".join(f"{k} ({v})" for k, v in sorted(errori_cat.items())))
     L += righe_opzioni(rie, qta, storia)
     L.append("")
+    L += righe_gex(gex, errori_cat)                 # v499
+    L.append("")
+    L += righe_dp(stati_dp, agg_dp, dix, err_dix)   # v499
+    L.append("")
     L += righe_cot(cot_stato(righe_c), err_cot)
     L.append("")
     L += righe_btc(btc, err_btc)
@@ -858,6 +1137,8 @@ def main():
     L.append(f"  memoria del put/call: {sum(1 for r in memoria.values() if r.get('azioni') is not None)} sedute, "
              f"{agg['nuove']} lette ora, {agg['assenti']} giorni di borsa chiusa registrati"
              + ("" if not a.no_memoria else " — NON scritta (--no-memoria)"))
+    L.append(f"  memoria del dark pool: {sum(1 for r in memoria_dp.values() if r.get('v'))} sedute, {agg_dp['nuove']} lette ora, "
+             f"{agg_dp['assenti']} giorni senza file registrati" + ("" if not a.no_memoria else " — NON scritta (--no-memoria)"))
     L.append(f"  memoria delle opzioni per titolo: {len(memoria_tit)} righe, {nuove_tit} nuove"
              + (" (si registra solo a borsa chiusa o dalle 16:30 di New York)" if not nuove_tit else "")
              + ("" if not a.no_memoria else " — NON scritta (--no-memoria)"))

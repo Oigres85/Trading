@@ -27,6 +27,10 @@ v474 — il giro principale di numeri_libro porta --registra: fuori dalla seduta
 seduta conclusa nel registro della performance contro QQQ (decisione del CEO del 09/10/2026). Il
 registro vive nel repo: se il file cambia, il comando lo DICE in fondo, perche' una riga non
 committata resta solo in questa sessione e il confronto con l'indice perde un giorno.
+
+v499 — uno strumento in piu', indici.py (S&P 500 e Nasdaq-100: P/E con la storia della sua fonte, stagione delle
+trimestrali, volatilita' implicita, concentrazione, ampiezza, tendenza), e due memorie in piu': il dark pool di
+posizionamento.py e la storia raccolta del P/E del Nasdaq-100 di indici.py (decisione del CEO del 17/10/2026, sera).
 """
 from __future__ import annotations
 
@@ -47,10 +51,12 @@ TITOLO_CHECKLIST = "## Cosa contiene la risposta"
 TITOLO_REGOLE = "## Regole"
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py")
+STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py", "indici.py")
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 # v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
-MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzioni_titoli.jsonl")
+# v499 — e il dark pool (posizionamento.py) e la storia del P/E del Nasdaq-100 (indici.py): stesse ragioni
+MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzioni_titoli.jsonl",
+           RADICE / "memoria" / "dark_pool.jsonl", RADICE / "memoria" / "indici.jsonl")
 LIMITE_SECONDI = 600
 
 
@@ -83,8 +89,10 @@ def comandi(f, sedute=1):
     c.append(("SCHEDE DEL PROGETTO — canali col loro R², revisioni, cassa, short, depositi SEC",
               ["schede_progetto.py"]))
     c.append(("ROTAZIONE, CANDIDATI PER SETTORE E WATCHLIST CON GLI INGRESSI", ["rotazione.py"]))
-    c.append(("POSIZIONAMENTO — put/call, scadenze delle opzioni, grandi operatori (CFTC), bitcoin dall'ultima "
-              "chiusura USA", ["posizionamento.py"]))
+    c.append(("POSIZIONAMENTO — put/call, scadenze delle opzioni, gamma dei dealer, dark pool, grandi operatori (CFTC), "
+              "bitcoin dall'ultima chiusura USA", ["posizionamento.py"]))
+    c.append(("INDICI — S&P 500 e Nasdaq-100: P/E con la storia della sua fonte, stagione delle trimestrali, volatilita', "
+              "concentrazione, ampiezza, tendenza", ["indici.py"]))
     return c
 
 

@@ -221,7 +221,10 @@ def calcola(sedute=1, registra=False, adesso=None):
     # v494 — le ULTIMISSIME notizie dei nomi con un parametro d'uscita acceso o un ordine d'acquisto attivo (CEO,
     #   17/10/2026: «fermo restando che anche le ultimissime news sono importanti»)
     out["segnali"] = segnali_libro(out["tenuta"], out["ordini"])
-    out["notizie"] = rotazione.notizie_recenti(list(out["segnali"]), adesso=adesso)
+    # v499 — le notizie di TUTTE le posizioni (e degli ordini attivi), non solo di chi ha un segnale: con il semaforo
+    #   verde una posizione da lasciar correre non avrebbe avuto notizie, e un evento non aspetta un segnale
+    out["nomi_notizie"] = rotazione.nomi_notizie(out["segnali"], TK)
+    out["notizie"] = rotazione.notizie_recenti(list(out["nomi_notizie"]), adesso=adesso)
     out["decisioni"] = (None if decisioni is None else
                         costo_decisioni(decisioni, B, {t: (TEC.get(t) or {}).get("px") for t in aperte},
                                         out["calendario"], adesso))
@@ -2524,8 +2527,9 @@ def sintesi(o):
         L.extend(righe_tenuta(o["tenuta"]))
     if "segnali" in o:                    # v494
         import rotazione
-        L.extend(rotazione.righe_notizie("NOTIZIE ULTIMISSIME — POSIZIONI CON UN PARAMETRO D'USCITA ACCESO E ORDINI "
-                                         "D'ACQUISTO ATTIVI", o["segnali"], o.get("notizie") or {}))
+        L.extend(rotazione.righe_notizie("NOTIZIE ULTIMISSIME — TUTTE LE POSIZIONI E GLI ORDINI D'ACQUISTO ATTIVI (il "
+                                         "perche' accanto a chi ha un parametro d'uscita acceso o un ordine)",
+                                         o.get("nomi_notizie") or o["segnali"], o.get("notizie") or {}))
     return "\n".join(L)
 
 
