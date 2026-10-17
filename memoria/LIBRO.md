@@ -33,21 +33,29 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | SMCI | 250 | 31,60 | USD | Super Micro Computer — server AI. Acquistata il 16/10/2026 con l'ordine giornaliero a 31,60 (§1septies); candidato di rotazione da CRWV dal 14/09/2026 |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: ~72.360 €** IN TUTTO, bloccata compresa — i ~79.400 € del 15/10 **meno l'acquisto di SMCI del 16/10/2026**:
-250 azioni a 31,60 $ = 7.900 $ ≈ 7.040 € al cambio del 16/10 (1,1222); controvalore esatto e commissioni li fissa il
-broker, **da confermare col saldo**. I ~79.400 € li ha dichiarati il CEO il 15/10/2026 sera, testuale: *"Liquidità è
-56.600 euro senza contare la liquidità bloccata per gli ordini non ancora eseguiti"*: **56.600 € liberi** più la parte
-bloccata dai tre ordini giornalieri di §1septies, 25.577,50 $ ai limiti ≈ **22.800 €** al cambio del 15/10 (1,1217) — il
-controvalore esatto lo fissa il broker. La liquidità si scrive in tutto perché un ordine non eseguito non ha speso niente:
-se si esegue, qui si toglie la sua spesa e in alto entra la posizione; se scade, questo numero non cambia. La libera la
-calcola `numeri_libro.py` (blocco «ORDINI APERTI») togliendo gli ordini ancora attivi (v490).
-Il 15/10 alle 22:00 i tre ordini sono **scaduti senza esecuzione** — il CEO, testuale: *"Nessun ordine è passato"* —
-e la libera è tornata tutta, ~79.400 €. Il 16/10 ne ha inseriti tre nuovi: SMCI eseguito (qui sopra), ORCL e OKLO
-**scaduti senza esecuzione** alle 22:00 — il minimo della seduta, 127,36 e 27,59, non è mai sceso ai limiti, 122 e 24 —
-e tolti dalla tabella il 17/10 su conferma del CEO (§1septies). **Da allora non c'è niente di bloccato: la libera è
-tutta, ~72.360 €** (il broker la ricalcola col proprio cambio).
-⚠ È ~25.500 € più della stima precedente, ~53.870 €, che non era una dichiarazione ma un conto: la nota sulle uscite
-da GOOGL e WDC qui sotto la diceva sottostimata. Vale la dichiarazione del CEO.
+**Liquidità: 45.000 €** IN TUTTO, bloccata compresa — dichiarata dal CEO il 17/10/2026, testuale: *"La liquiditita è di
+45k"*. Nessun ordine è aperto (§1septies): oggi è tutta libera. La liquidità si scrive in tutto perché un ordine non
+eseguito non ha speso niente: se si esegue, qui si toglie la sua spesa e in alto entra la posizione; se scade, questo
+numero non cambia. La libera la calcola `numeri_libro.py` (blocco «ORDINI APERTI») togliendo gli ordini ancora attivi (v490).
+⚠⚠ **Fino al 17/10 mattina qui c'era scritto ~72.360 €: 27.360 € di troppo, ed era un conto mio.** Il 15/10 sera il CEO
+aveva scritto *"Liquidità è 56.600 euro senza contare la liquidità bloccata per gli ordini non ancora eseguiti"* e io
+avevo letto i 56.600 € come la sola parte libera, **sommandoci** la parte bloccata dai tre ordini di quel giorno
+(25.577,50 $ ai limiti ≈ 22.800 €): ~79.400 €, meno l'acquisto di SMCI del 16/10 (250 a 31,60 $ = 7.900 $ ≈ 7.040 €).
+Misurata contro la dichiarazione di oggi, quella lettura è la più lontana delle tre possibili:
+
+| lettura | 16/10 sera | scarto da 45.000 € |
+|---|---|---|
+| i 56.600 € erano la sola libera, più ~22.800 € bloccati (la mia) | ~72.360 € | +27.360 € |
+| i 56.600 € erano già il totale | ~49.560 € | +4.560 € |
+| la stima del 14/10 (~53.870 €, un conto) meno SMCI | ~46.830 € | +1.830 € |
+
+Lo scarto residuo **non è spiegato dai dati qui presenti** (commissioni, cambio, altri movimenti): non si indovina, vale
+la dichiarazione. ⚠ E la verifica scritta il 15/10 — il blocco ORDINI APERTI che «ritrovava da solo» i 56.600 € (v490) —
+era **circolare**: il totale era costruito sommando la bloccata ai 56.600, e la libera è il totale meno la bloccata,
+quindi ritrovava il proprio ingresso e non provava niente.
+Ordini dal 15/10: i tre del 15/10 **scaduti senza esecuzione** alle 22:00 (il CEO, testuale: *"Nessun ordine è
+passato"*); dei tre del 16/10 SMCI eseguito (qui sopra), ORCL e OKLO **scaduti senza esecuzione** — il minimo della
+seduta, 127,36 e 27,59, non è mai sceso ai limiti, 122 e 24 — e tolti dalla tabella il 17/10 su conferma del CEO (§1septies).
 Storia della stima precedente: ~59.000 € fino al 14/10/2026, **meno le due medie** del 14/10: RGTI 200 azioni
 per ~2.412 $ (663 × 22,147 − 463 × 26,5048) e CRWV 50 azioni per ~3.290 $ (155 × 87,07 − 105 × 97,199),
 ~5.702 $ in tutto, ≈ 5.126 € a EUR/USD 1,1123, commissioni escluse — **da confermare** col saldo del broker. I ~59.000 € erano ~50.000 € dichiarati dal CEO il 01/10/2026 ("circa", dopo le uscite da
