@@ -179,7 +179,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    ultimissime news sono importanti"*) ogni posizione porta la **STRUTTURA DELLE OSCILLAZIONI** (regole in
    `LIBRO.md` §1bis): massimi e minimi crescenti o decrescenti, se la chiusura ha già rotto l'ultimo minimo, i
    doppi massimi e minimi, la divergenza dell'RSI. È la famiglia del prezzo, la stessa della tendenza: la
-   risposta la legge accanto alla tenuta come un'informazione, non come una prova in più, e non vende. E il
+   risposta la legge accanto alla tenuta come un'informazione, non come una prova in più, e non vende — decisione
+   del CEO del 17/10, testuale: *"solo informazione"*; l'esito della tenuta non cambia con lei. E il
    blocco **NOTIZIE ULTIMISSIME** di `numeri_libro.py` porta, per ogni posizione con un parametro d'uscita acceso e
    ogni ordine attivo, il perché e le voci del feed delle ultime 72 ore (la cronaca di mercato una volta sola, in
    fondo): la risposta le cita con data e fonte, insieme alla ricerca web delle stesse ore.
@@ -265,7 +266,8 @@ dall'emittente (15/10) · gli ingressi in ordine d'interesse, con prezzi e motiv
 giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera) · la lettura
 a 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10) · la
 struttura delle oscillazioni — massimi e minimi crescenti o decrescenti, rotture, doppi, divergenze — in ogni ingresso
-e su ogni posizione, e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10).
+e su ogni posizione, e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10) — la
+struttura «solo informazione», non una prova nella tenuta (decisione del CEO dello stesso giorno).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

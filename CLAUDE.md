@@ -7339,8 +7339,8 @@ prima e dopo. E `rsi_wilder` è ora l'ultimo valore di `rsi_serie`, la serie che
 nella testa della riga e non in una nota sotto.
 
 ⚠ **La struttura è la famiglia del PREZZO, la stessa della tendenza della tenuta**: un'informazione accanto alla tenuta,
-**non una prova in più (B3) e non una vendita** — dal 15/10 non si vende sui ribassi. Se debba entrare nella regola di
-tenuta è una domanda posta al CEO, non una scelta fatta qui.
+**non una prova in più (B3) e non una vendita** — dal 15/10 non si vende sui ribassi. Se dovesse entrare nella regola
+di tenuta l'ho chiesto al CEO invece di sceglierlo: il 17/10 ha risposto *"solo informazione"* (v495).
 
 ⚠ **La risalita non è un ingresso possibile.** La prima stesura contava come «ingresso possibile» anche la chiusura sopra
 l'ultimo massimo e sopra il collo di un doppio minimo: 35 nomi su 45, e 10 lo erano SOLO per la risalita — energia,
@@ -7375,3 +7375,24 @@ ripristino verificato per impronta: mordono tutte**, ciascuna sul controllo atte
 ⚠ **Il gate v492 pinnava la parentesi chiusa** dopo `storia=storia`: la v494 ha aggiunto un argomento alla stessa chiamata
 ed è andato rosso su codice giusto. È la svista della v489 (`decisioni, media)`, poi `media, pav)`) per la terza volta:
 si àncora all'argomento, mai alla parentesi. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🧾 v495 — DUE ORDINI SCADUTI TOLTI, E LA STRUTTURA RESTA «SOLO INFORMAZIONE» PER COSTRUZIONE
+
+Risposte del CEO del 17/10/2026, testuali: *"1 si"* e *"2 solo informazione"*.
+
+1. **ORCL 65 a 122 e OKLO 300 a 24**, ordini giornalieri del 16/10, sono **scaduti senza esecuzione**: il minimo della
+   seduta (127,36 e 27,59, riletti sulle barre) non è mai sceso ai limiti, quindi la verifica a 5 minuti della v491 qui
+   non serviva. Tolti da `LIBRO.md` §1septies con lo storico; la tabella resta con la sola intestazione e il blocco
+   ORDINI APERTI dice «nessuno attivo». La liquidità in tutto non cambia (~72.360 €): un ordine scaduto non ha speso
+   niente, e la libera torna tutta.
+2. **La struttura delle oscillazioni resta fuori dal bilancio dell'evidenza.** Il gate v495 lo verifica sulla
+   proprietà, non sul testo: la riga della tenuta — esito, prove, esiti possibili, media, fisco — è identica con una
+   struttura ribassista, rotta al ribasso, rialzista o assente, su nomi che coprono i tre esiti (vendita, conflitto,
+   lasciar correre: un gate che ne guarda uno non vede gli altri, v419-v420).
+   ⚠ **Un gate d'invarianza va reso non vacuo**: deve pretendere che la struttura sia davvero accanto alla riga,
+   altrimenti confronterebbe righe uguali per assenza del fenomeno (v196, v229). Tre iniezioni — l'esito spostato dalla
+   struttura, l'esito reso provvisorio da una rottura, la struttura staccata dalla riga — mordono tutte, la terza anche
+   sul v494. Ripristino verificato per impronta.
+⚠ La prima stesura del registro in FORMATO spezzava con un punto e virgola la frase *"un'uscita accesa (17/10)"*, a cui
+il gate v494 è ancorato: corretta la stesura, che diceva la stessa cosa, invece di riagganciare un gate per una virgola.
+`?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

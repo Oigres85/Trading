@@ -4461,6 +4461,32 @@ check("v494 FORMATO_ANALISI: la struttura e le ultimissime notizie nella sezione
       and "NOTIZIE ULTIMISSIME** di `numeri_libro.py`" in _fmt494
       and "e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10)" in _fmt494)
 
+# ================================================================ v495 — la struttura e' «solo informazione»
+# Decisione del CEO del 17/10/2026, alla domanda se la struttura delle oscillazioni dovesse entrare come prova nel bilancio
+# dell'evidenza (LIBRO.md §1sexies), testuale: "solo informazione". La proprieta' che la decisione impone: la riga della
+# tenuta — esito, prove, esiti possibili, media, fisco — e' la STESSA con qualunque struttura accanto, o senza. La
+# struttura e' la famiglia del prezzo, la stessa della tendenza: contarla accanto alla tendenza sarebbe il prezzo che parla
+# due volte (B3). Le strutture si costruiscono nei tre versi che contano — ribassista, rotta al ribasso, rialzista — e i
+# nomi coprono i tre esiti del bilancio, perche' un gate che guarda un esito solo non vede gli altri (v419, v420).
+_tk495 = ["BBB", "CCC", "AAA", "DDD", "EEE"]
+def _tn495(st):
+    return NL.tenuta_posizioni(_tk495, _bt481, _rt481, _sem481(), _px481, {**{k: 50.0 for k in _bt481}, "EEE": 120.0},
+                               {k: 10 for k in _bt481}, {"AAA": 0.1, "BBB": 0.2, "CCC": 0.4, "DDD": 0.2, "EEE": 0.1},
+                               _ALLE17, _dec481, {"fx": 1.12, "valore": 5000.0, "rlibro": {}, "rqqq": {}, "rend": {},
+                                                  "trim": {"EEE": 5}},
+                               struttura=None if st is None else {k: st for k in _tk495})
+_senza495 = lambda tn: _json.dumps([{k: v for k, v in r.items() if k != "struttura"} for r in tn["righe"]],
+                                   sort_keys=True, default=str)
+_ril495 = _st494([80, 90, 84, 94, 88, 98, 92, 96])
+_var495 = {n: _tn495(st) for n, st in (("senza", None), ("ribassista", _rib494), ("rotta", _dmr494), ("rialzista", _ril495))}
+check("v495 la struttura e' «solo informazione» (CEO, 17/10): esito, prove e il resto della riga della tenuta sono gli "
+      "stessi con una struttura ribassista, rotta al ribasso, rialzista o assente — e la struttura c'e' davvero accanto",
+      _rib494["stato"] == "RIBASSISTA" and _dmr494["rottura"] == "ribasso" and _ril495["stato"] == "RIALZISTA"
+      and all(_senza495(v) == _senza495(_var495["senza"]) for v in _var495.values())
+      and all("struttura" in r for n, v in _var495.items() if n != "senza" for r in v["righe"])
+      and {r["esito"] for r in _var495["senza"]["righe"]} >= {"VENDITA PER EVIDENZA", NL.CONFLITTO, "LASCIAR CORRERE"},
+      str({n: [(r["tk"], r["esito"]) for r in v["righe"]] for n, v in _var495.items()}))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

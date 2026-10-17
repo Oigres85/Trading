@@ -41,8 +41,11 @@ bloccata dai tre ordini giornalieri di §1septies, 25.577,50 $ ai limiti ≈ **2
 controvalore esatto lo fissa il broker. La liquidità si scrive in tutto perché un ordine non eseguito non ha speso niente:
 se si esegue, qui si toglie la sua spesa e in alto entra la posizione; se scade, questo numero non cambia. La libera la
 calcola `numeri_libro.py` (blocco «ORDINI APERTI») togliendo gli ordini ancora attivi (v490).
-Il 15/10 alle 22:00 i tre ordini sono **scaduti senza esecuzione** — il CEO, testuale: *"Nessun ordine è passato"* —:
-da allora non c'è niente di bloccato e la liquidità libera è tutta, ~79.400 € (il broker la ricalcola col proprio cambio).
+Il 15/10 alle 22:00 i tre ordini sono **scaduti senza esecuzione** — il CEO, testuale: *"Nessun ordine è passato"* —
+e la libera è tornata tutta, ~79.400 €. Il 16/10 ne ha inseriti tre nuovi: SMCI eseguito (qui sopra), ORCL e OKLO
+**scaduti senza esecuzione** alle 22:00 — il minimo della seduta, 127,36 e 27,59, non è mai sceso ai limiti, 122 e 24 —
+e tolti dalla tabella il 17/10 su conferma del CEO (§1septies). **Da allora non c'è niente di bloccato: la libera è
+tutta, ~72.360 €** (il broker la ricalcola col proprio cambio).
 ⚠ È ~25.500 € più della stima precedente, ~53.870 €, che non era una dichiarazione ma un conto: la nota sulle uscite
 da GOOGL e WDC qui sotto la diceva sottostimata. Vale la dichiarazione del CEO.
 Storia della stima precedente: ~59.000 € fino al 14/10/2026, **meno le due medie** del 14/10: RGTI 200 azioni
@@ -203,7 +206,9 @@ ordine attivo. Convenzioni di lettura scelte da Claude e dichiarate come tali (v
 - **Uscita accesa**: la tenuta che non è «lasciar correre» (§1sexies), la struttura rotta al ribasso o ribassista, un
   doppio massimo sotto il collo da non più di **10 sedute**. È la famiglia del PREZZO, la stessa della tendenza della
   tenuta: un'informazione e un motivo per leggere le notizie, **non una prova in più (B3) e non una vendita** — dal
-  15/10 non si vende sui ribassi (§1ter).
+  15/10 non si vende sui ribassi (§1ter). **Decisione del CEO del 17/10/2026**, alla domanda se la struttura dovesse
+  entrare come prova nel bilancio dell'evidenza (§1sexies), testuale: *"solo informazione"*. Resta accanto alla
+  tenuta e non ne cambia l'esito, e un gate lo verifica.
 - **Le ultimissime notizie**: per ogni nome con un ingresso possibile, un'uscita accesa o un ordine attivo, il feed
   Nasdaq del simbolo nelle ultime **72 ore** — così il lunedì mattina comprende il venerdì —, con la stessa voce nel feed
   di più nomi scritta una volta come cronaca di mercato. Il feed è UNA fonte: la ricerca web nelle stesse ore resta
@@ -475,7 +480,11 @@ orizzonti, e quando si contraddicono il disaccordo è un fatto.
   verso il tenere, o il mediare;
 - **il consenso degli analisti** — il target come distanza dalla chiusura, con la sua forchetta:
   è un'opinione, non una prova, e su un titolo che scende arriva tardi. Si legge accanto perché
-  il CEO chiede di valutare anche il rialzo possibile.
+  il CEO chiede di valutare anche il rialzo possibile;
+- **la struttura delle oscillazioni** (§1bis, v494) — massimi e minimi crescenti o decrescenti,
+  rottura, doppi, divergenze: è la famiglia del prezzo, la stessa della tendenza, e contarla
+  accanto alla tendenza sarebbe il prezzo che parla due volte (B3). Decisione del CEO del
+  17/10/2026, testuale: *"solo informazione"*.
 
 **Gli esiti**, in ordine di urgenza. Conta **quali** prove ci sono, non quante: nessun punteggio
 (v200).
@@ -566,8 +575,6 @@ raggiunto, non QUANDO. Senza quest'ora la resa lo dichiara, e il dubbio resta al
 
 | Nome | Verso | Quantità | Limite | Inserito | Stato | Validità | Attivo alle |
 |---|---|---|---|---|---|---|---|
-| OKLO | acquisto | 300 | 24,00 | 2026-10-16 | attivo | giornaliero | 19:02 |
-| ORCL | acquisto | 65 | 122,00 | 2026-10-16 | attivo | giornaliero | 19:02 |
 
 `numeri_libro.py` (blocco «ORDINI APERTI») calcola per ciascuno, a ogni analisi: la distanza dal prezzo; se il
 minimo della seduta di oggi ha toccato il limite DOPO l'ultima ora annotata in «Attivo alle» — allora l'ordine può
@@ -592,7 +599,10 @@ detti il CEO alle 19:02 (*"Oklo 24 … Smci inserito a 31.5 … Oracle 122"*), e
 eseguiti; i minimi della seduta fino ad allora stavano sopra tutti i limiti. Alle 19:57 il CEO ha alzato SMCI a 31,60
 (*"Modifico solo Smci a 31.6 il resto lascio tutto invariato"*): ORCL e OKLO restano com'erano, con l'ultima conferma
 delle 19:02. Alle 20:03 il CEO ha confermato l'esecuzione: *"Smci 250 azioni entrato ad 31.6"* — la riga è uscita dalla
-tabella ed è entrata fra le posizioni (§1), e la spesa (7.900 $) è stata tolta dalla liquidità.
+tabella ed è entrata fra le posizioni (§1), e la spesa (7.900 $) è stata tolta dalla liquidità. Alle 22:00 ORCL e OKLO
+sono **scaduti senza esecuzione**: il minimo della seduta del 16/10, 127,36 e 27,59, non è mai sceso ai limiti, 122 e 24 —
+qui l'ora non serviva, il limite non è stato toccato in nessun momento. Il 17/10 il CEO ha confermato di toglierli
+(*"1 si"*), e la tabella è rimasta vuota.
 
 ## 1octies. CONTI DICHIARATI DALL'EMITTENTE — date che il calendario Nasdaq non porta (v489)
 
