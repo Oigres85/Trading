@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-17T13:55:00Z",
+ "updated_at": "2026-10-17T16:03:27Z",
  "eurusd": 1.1242,
  "totals": {
   "usd_value": 0,
@@ -67,7 +67,26 @@
    "financials": [],
    "fin_health": null,
    "qta": 40000,
-   "gain_pct_pos": 1.74
+   "gain_pct_pos": 1.74,
+   "cds": {
+    "stato": "quotato",
+    "codice": "ITALY",
+    "entita": "Rep Italy",
+    "contratto": "SNRFOR.USD.CR14",
+    "cedola_pb": 100,
+    "prezzo": 101.671,
+    "punti": -1.67,
+    "pb": 63.7,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "nota": "il BTP e' un titolo della Repubblica Italiana: il suo CDS e' quello sovrano (Rep Italy), non quello di una societa'"
+   }
   }
  ],
  "watchlist": [
@@ -430,7 +449,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -1778,7 +1797,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -2046,6 +2065,10 @@
    "pmc": 87.63,
    "controvalore": 61518.8,
    "gain_pct_pos": 902.9,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.66,
    "avg_corr": 0.58,
    "max_corr": 0.82,
@@ -2971,7 +2994,7 @@
     "gross_margin": 0.5572,
     "enterprise_value": 854336208896.0,
     "ev_ebitda": 89.347,
-    "peg": 0.57,
+    "peg": 0.53,
     "roa": 0.0513,
     "short_float": 0.0242,
     "buyback_yield": 0.0022,
@@ -4028,6 +4051,24 @@
    "pmc": 153.916,
    "controvalore": 52875.0,
    "gain_pct_pos": 243.53,
+   "cds": {
+    "stato": "quotato",
+    "codice": "AMD",
+    "entita": "Advanced Micro Devices Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 99.7893,
+    "punti": 0.21,
+    "pb": 104.7,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 2.53,
    "avg_corr": 0.56,
    "max_corr": 0.76,
@@ -4785,7 +4826,7 @@
     "gross_margin": 0.7467,
     "enterprise_value": 5136924016640.0,
     "ev_ebitda": 25.523,
-    "peg": 0.27,
+    "peg": 0.26,
     "roa": 0.5357,
     "short_float": 0.0134,
     "buyback_yield": 0.0078,
@@ -5839,6 +5880,24 @@
    "pmc": 87.1667,
    "controvalore": 57815.1,
    "gain_pct_pos": 145.66,
+   "cds": {
+    "stato": "quotato",
+    "codice": "NVIDIA",
+    "entita": "NVIDIA Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 100.1318,
+    "punti": -0.13,
+    "pb": 97.1,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 1.3,
    "avg_corr": 0.42,
    "max_corr": 0.55,
@@ -6284,9 +6343,9 @@
    "analisti": {
     "eps_ora": 2.3505,
     "eps_90g_fa": 2.0945,
-    "eps_7g_fa": 2.3442,
+    "eps_7g_fa": 2.3515,
     "revisione_90g_pct": 12.22,
-    "revisione_7g_pct": 0.27,
+    "revisione_7g_pct": -0.04,
     "su_30g": 2,
     "giu_30g": 1,
     "eps_min": 1.92,
@@ -6336,7 +6395,7 @@
     "gross_margin": 0.848,
     "enterprise_value": 437953953792.0,
     "ev_ebitda": 164.482,
-    "peg": 1.74,
+    "peg": 1.61,
     "roa": 0.1729,
     "short_float": 0.0259,
     "buyback_yield": 0.0002,
@@ -7270,6 +7329,10 @@
    "pmc": 113.5,
    "controvalore": 18603.0,
    "gain_pct_pos": 63.9,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 1.76,
    "avg_corr": 0.22,
    "max_corr": 0.41,
@@ -8010,7 +8073,7 @@
     "gross_margin": 0.5222,
     "enterprise_value": 201137422336.0,
     "ev_ebitda": 70.567,
-    "peg": 0.6,
+    "peg": 0.56,
     "roa": 0.0413,
     "short_float": 0.0321,
     "buyback_yield": 0.01,
@@ -9069,6 +9132,10 @@
    "pmc": 214.08,
    "controvalore": 9568.86,
    "gain_pct_pos": 6.42,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.93,
    "avg_corr": 0.58,
    "max_corr": 0.74,
@@ -10493,6 +10560,10 @@
    "pmc": 22.147,
    "controvalore": 7823.4,
    "gain_pct_pos": -46.72,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 3.07,
    "avg_corr": 0.53,
    "max_corr": 0.63,
@@ -11016,7 +11087,7 @@
     "gross_margin": 0.3165,
     "enterprise_value": 65308684288.0,
     "ev_ebitda": 156.062,
-    "peg": 0.53,
+    "peg": 0.5,
     "roa": 0.056,
     "short_float": 0.0811,
     "buyback_yield": -0.0009,
@@ -12073,6 +12144,10 @@
    "pmc": 214.0,
    "controvalore": 8852.4,
    "gain_pct_pos": 3.42,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 3.4,
    "avg_corr": 0.51,
    "max_corr": 0.71,
@@ -13257,6 +13332,24 @@
    "pmc": 139.0,
    "controvalore": 6142.05,
    "gain_pct_pos": -1.81,
+   "cds": {
+    "stato": "quotato",
+    "codice": "SKHYN",
+    "entita": "SK hynix Inc",
+    "contratto": "SNRFOR.USD.CR14",
+    "cedola_pb": 100,
+    "prezzo": 101.8901,
+    "punti": -1.89,
+    "pb": 59.1,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 3.19,
    "avg_corr": 0.53,
    "max_corr": 0.82,
@@ -15088,6 +15181,10 @@
    "pmc": 173.3045,
    "controvalore": 23671.59,
    "gain_pct_pos": -21.05,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.34,
    "avg_corr": 0.33,
    "max_corr": 0.46,
@@ -16476,6 +16573,24 @@
    "pmc": 87.07,
    "controvalore": 9515.45,
    "gain_pct_pos": -29.49,
+   "cds": {
+    "stato": "quotato",
+    "codice": "COREWEI",
+    "entita": "COREWEAVE INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 500,
+    "prezzo": 80.9439,
+    "punti": 19.06,
+    "pb": 1121.1,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 3.71,
    "avg_corr": 0.54,
    "max_corr": 0.71,
@@ -16488,37 +16603,37 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81388.81,
+   "price": 81242.49,
    "price_asof": "2026-10-17",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.14,
+   "change_pct": -0.32,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.5,
-   "sma200_dist_pct": 12.4,
-   "sma50_dist_pct": 0.1,
+   "ath_dist_pct": -35.6,
+   "sma200_dist_pct": 12.2,
+   "sma50_dist_pct": -0.1,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
-   "w52_dist_pct": -30.0,
+   "w52_dist_pct": -30.1,
    "day_high": 81627.66,
-   "day_low": 81302.65,
+   "day_low": 81271.68,
    "support": 79735.86,
    "resistance": 87146.35,
-   "rsi": 46.1,
-   "volume": 19180021760,
+   "rsi": 45.6,
+   "volume": 16442030080,
    "vol_ratio": 0.87,
-   "atr_14": 2090.74,
-   "atr_pct": 2.57,
-   "signal": "Trend rialzista",
-   "signal_class": "good",
+   "atr_14": 2092.95,
+   "atr_pct": 2.58,
+   "signal": "Neutrale",
+   "signal_class": "neutral",
    "sparks": {
     "w1": [
      83095.12,
      81562.49,
      82141.46,
      81500.8,
-     81388.81
+     81242.49
     ],
     "m6": [
      65710.4,
@@ -16646,7 +16761,7 @@
      81562.49,
      82141.46,
      81500.8,
-     81388.81
+     81242.49
     ],
     "all": [
      386.94,
@@ -16794,7 +16909,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81388.8
+     81242.49
     ],
     "m1": [
      84406.45,
@@ -16818,7 +16933,7 @@
      81562.49,
      82141.46,
      81500.8,
-     81388.81
+     81242.49
     ],
     "m3": [
      63402.17,
@@ -16886,7 +17001,7 @@
      81562.49,
      82141.46,
      81500.8,
-     81388.81
+     81242.49
     ],
     "y1": [
      106467.79,
@@ -16962,7 +17077,7 @@
      84497.21,
      83275.93,
      81762.56,
-     81388.81
+     81242.49
     ],
     "d1": [
      81487.43,
@@ -17048,21 +17163,33 @@
      81394.38,
      81396.55,
      81375.0,
-     81388.8
+     81399.34,
+     81386.36,
+     81371.36,
+     81414.99,
+     81491.56,
+     81464.06,
+     81472.0,
+     81447.37,
+     81482.06,
+     81386.94,
+     81425.06,
+     81356.05,
+     81213.67
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 59,
+   "health": 42,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.6,
    "sortino_1y": -0.83,
-   "sharpe_6m": 1.43,
-   "sortino_6m": 2.58,
+   "sharpe_6m": 1.42,
+   "sortino_6m": 2.56,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81388.81,
+   "prezzo_limite_aggiustato": 81242.49,
    "risk_reward": "1:1.4",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17075,22 +17202,22 @@
     "w1": {
      "support": 79735.86,
      "resistance": 84061.09,
-     "change_pct": -2.05
+     "change_pct": -2.23
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -3.58
+     "change_pct": -3.75
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 28.37
+     "change_pct": 28.14
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 15.83
+     "change_pct": 15.62
     }
    },
    "financials": [],
@@ -17107,7 +17234,7 @@
      "lo": 83474.96,
      "hi": 85119.55
     },
-    "liq_above": 82262.21,
+    "liq_above": 81346.95,
     "liq_below": 80336.91,
     "order_block": {
      "dir": "rialzista",
@@ -17117,74 +17244,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81388.81,
+     "prezzo": 81242.49,
      "medie": {
       "sma10": {
-       "liv": 82226.56,
-       "dist_pct": -1.02
+       "liv": 82211.93,
+       "dist_pct": -1.18
       },
       "ema10": {
-       "liv": 82347.97,
-       "dist_pct": -1.16
+       "liv": 82321.37,
+       "dist_pct": -1.31
       },
       "sma20": {
-       "liv": 83407.94,
-       "dist_pct": -2.42
+       "liv": 83400.62,
+       "dist_pct": -2.59
       },
       "ema20": {
-       "liv": 82623.23,
-       "dist_pct": -1.49
+       "liv": 82609.3,
+       "dist_pct": -1.65
       },
       "sma30": {
-       "liv": 83529.11,
-       "dist_pct": -2.56
+       "liv": 83524.23,
+       "dist_pct": -2.73
       },
       "ema30": {
-       "liv": 82156.37,
-       "dist_pct": -0.93
+       "liv": 82146.93,
+       "dist_pct": -1.1
       },
       "sma50": {
-       "liv": 81323.03,
-       "dist_pct": 0.08
+       "liv": 81320.1,
+       "dist_pct": -0.1
       },
       "ema50": {
-       "liv": 80417.89,
-       "dist_pct": 1.21
+       "liv": 80412.15,
+       "dist_pct": 1.03
       },
       "sma100": {
-       "liv": 74022.39,
-       "dist_pct": 9.95
+       "liv": 74020.93,
+       "dist_pct": 9.76
       },
       "ema100": {
-       "liv": 76859.91,
-       "dist_pct": 5.89
+       "liv": 76857.01,
+       "dist_pct": 5.71
       },
       "sma200": {
-       "liv": 72425.72,
-       "dist_pct": 12.38
+       "liv": 72424.99,
+       "dist_pct": 12.17
       },
       "ema200": {
-       "liv": 75765.98,
-       "dist_pct": 7.42
+       "liv": 75764.52,
+       "dist_pct": 7.23
       }
      },
-     "medie_battute": 6,
+     "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 46.1,
+      "rsi14": 45.6,
       "macd": {
-       "linea": 82.04,
-       "segnale": 608.39,
-       "istogramma": -526.35
+       "linea": 70.37,
+       "segnale": 606.05,
+       "istogramma": -535.69
       },
-      "stoch_k": 22.8,
-      "stoch_d": 26.6,
-      "williams_r": -77.2,
-      "cci20": -64.7,
+      "stoch_k": 20.8,
+      "stoch_d": 25.9,
+      "williams_r": -79.2,
+      "cci20": -66.4,
       "adx14": 24.3,
       "di_su": 17.7,
       "di_giu": 21.7,
-      "momentum10": -1887.12
+      "momentum10": -2033.44
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17676,20 +17803,20 @@
       "d": "2026-10-17",
       "o": 81501.61,
       "h": 81627.66,
-      "l": 81302.65,
-      "c": 81388.81
+      "l": 81271.68,
+      "c": 81242.49
      }
     ],
     "performance": {
-     "s1": -0.46,
-     "m1": -3.15,
-     "m3": 28.37,
-     "m6": 26.34,
-     "a1": 17.47,
-     "ytd": -8.28,
-     "a3": 134.77,
-     "a5": 32.73,
-     "a10": 11510.85
+     "s1": -0.64,
+     "m1": -3.32,
+     "m3": 28.14,
+     "m6": 26.11,
+     "a1": 17.26,
+     "ytd": -8.44,
+     "a3": 134.35,
+     "a5": 32.49,
+     "a10": 11489.98
     },
     "stagionalita": [
      {
@@ -17775,7 +17902,7 @@
      },
      {
       "mese": 10,
-      "media": 15.16,
+      "media": 15.14,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -17802,9 +17929,9 @@
      }
     ]
    },
-   "rs_1m": -3.9,
+   "rs_1m": -4.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.7,
+   "rs_ndx_1m": -2.9,
    "beta_ndx": 0.66,
    "avg_corr": 0.3,
    "max_corr": 0.78,
@@ -30380,9 +30507,9 @@
    },
    "analisti": {
     "eps_ora": 5.3259,
-    "eps_90g_fa": 3.7091,
+    "eps_90g_fa": 3.6357,
     "eps_7g_fa": 5.3259,
-    "revisione_90g_pct": 43.59,
+    "revisione_90g_pct": 46.49,
     "revisione_7g_pct": 0.0,
     "su_30g": 8,
     "giu_30g": 0,
@@ -31491,6 +31618,10 @@
    "pmc": 31.6,
    "controvalore": 7907.5,
    "gain_pct_pos": 0.09,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.93,
    "avg_corr": 0.5,
    "max_corr": 0.65,
@@ -32884,6 +33015,10 @@
    "rs_1m": -28.6,
    "rs_bench": "ndx",
    "rs_ndx_1m": -28.6,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.79,
    "avg_corr": 0.53,
    "max_corr": 0.75,
@@ -33660,7 +33795,7 @@
     "gross_margin": 0.5077,
     "enterprise_value": 2825225502720.0,
     "ev_ebitda": 16.726,
-    "peg": 1.48,
+    "peg": 1.45,
     "roa": 0.0659,
     "short_float": 0.0088,
     "buyback_yield": -0.0,
@@ -34712,6 +34847,24 @@
    "rs_1m": 0.4,
    "rs_bench": "ndx",
    "rs_ndx_1m": 0.4,
+   "cds": {
+    "stato": "quotato",
+    "codice": "AMZN",
+    "entita": "Amazon Com Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 101.0292,
+    "punti": -1.03,
+    "pb": 77.5,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.82,
    "avg_corr": 0.11,
    "max_corr": 0.18,
@@ -35421,7 +35574,7 @@
     "gross_margin": 0.4558,
     "enterprise_value": 147022118912.0,
     "ev_ebitda": 32.657,
-    "peg": 0.4,
+    "peg": 0.37,
     "roa": 0.2935,
     "short_float": 0.0307,
     "buyback_yield": 0.0012,
@@ -36474,6 +36627,10 @@
    "rs_1m": -20.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": -19.5,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.03,
    "avg_corr": 0.45,
    "max_corr": 0.69,
@@ -37163,7 +37320,7 @@
     "gross_margin": 0.609,
     "enterprise_value": 4061755604992.0,
     "ev_ebitda": 23.456,
-    "peg": 1.23,
+    "peg": 1.2,
     "roa": 0.1296,
     "short_float": 0.0137,
     "buyback_yield": 0.011,
@@ -38208,6 +38365,24 @@
    "rs_1m": -1.1,
    "rs_bench": "ndx",
    "rs_ndx_1m": -1.1,
+   "cds": {
+    "stato": "quotato",
+    "codice": "ALPHINC",
+    "entita": "Alphabet Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 101.0963,
+    "punti": -1.1,
+    "pb": 76.1,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.76,
    "avg_corr": 0.08,
    "max_corr": 0.24,
@@ -39207,7 +39382,7 @@
     "gross_margin": 0.4885,
     "enterprise_value": 119311589376.0,
     "ev_ebitda": 23.853,
-    "peg": 0.68,
+    "peg": 0.63,
     "roa": 0.2076,
     "short_float": 0.049,
     "buyback_yield": 0.0209,
@@ -40262,6 +40437,10 @@
    "rs_1m": -22.0,
    "rs_bench": "sp500",
    "rs_ndx_1m": -20.8,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.4,
    "avg_corr": 0.45,
    "max_corr": 0.71,
@@ -40979,16 +41158,16 @@
     "upside_pct": 41.6
    },
    "analisti": {
-    "eps_ora": 23.1074,
+    "eps_ora": 23.3853,
     "eps_90g_fa": 21.2294,
     "eps_7g_fa": 22.0437,
-    "revisione_90g_pct": 8.85,
-    "revisione_7g_pct": 4.83,
+    "revisione_90g_pct": 10.16,
+    "revisione_7g_pct": 6.09,
     "su_30g": 3,
     "giu_30g": 0,
-    "eps_min": 19.495,
+    "eps_min": 21.45,
     "eps_max": 25.87,
-    "eps_n": 14,
+    "eps_n": 13,
     "target_min": 440.0,
     "target_max": 1000.0,
     "target_mediana": 557.5
@@ -41033,7 +41212,7 @@
     "gross_margin": 0.6585,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.8,
+    "peg": 0.75,
     "roa": 0.2058,
     "short_float": 0.0063,
     "buyback_yield": -0.0,
@@ -42085,6 +42264,24 @@
    "rs_1m": -4.4,
    "rs_bench": "sp500",
    "rs_ndx_1m": -3.2,
+   "cds": {
+    "stato": "quotato",
+    "codice": "TAISEM",
+    "entita": "Taiwan Semicon Mfg Co Ltd",
+    "contratto": "SNRFOR.USD.CR14",
+    "cedola_pb": 100,
+    "prezzo": 101.7167,
+    "punti": -1.72,
+    "pb": 62.8,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 1.51,
    "avg_corr": 0.6,
    "max_corr": 0.77,
@@ -43344,6 +43541,10 @@
    "rs_1m": -33.6,
    "rs_bench": "ndx",
    "rs_ndx_1m": -33.6,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 2.14,
    "avg_corr": 0.48,
    "max_corr": 0.67,
@@ -45121,7 +45322,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -32.5,
-      "meglio": 24.5
+      "meglio": 24.6
      },
      {
       "mese": 11,
@@ -45322,6 +45523,24 @@
    "rs_1m": -13.4,
    "rs_bench": "sox",
    "rs_ndx_1m": -16.5,
+   "cds": {
+    "stato": "quotato",
+    "codice": "INTC",
+    "entita": "Intel Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 100.6103,
+    "punti": -0.61,
+    "pb": 86.6,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 2.52,
    "avg_corr": 0.61,
    "max_corr": 0.81,
@@ -46511,6 +46730,24 @@
    "rs_1m": -4.8,
    "rs_bench": "ndx",
    "rs_ndx_1m": -4.8,
+   "cds": {
+    "stato": "quotato",
+    "codice": "SPACEXP",
+    "entita": "SPACE EXPL TECH CORP",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 94.9642,
+    "punti": 5.04,
+    "pb": 216.4,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 1.64,
    "avg_corr": 0.28,
    "max_corr": 0.41,
@@ -47130,7 +47367,7 @@
     "gross_margin": 0.1885,
     "enterprise_value": 1374200397824.0,
     "ev_ebitda": 127.773,
-    "peg": 3.69,
+    "peg": 3.61,
     "roa": 0.0193,
     "short_float": 0.0201,
     "buyback_yield": 0.0,
@@ -48183,6 +48420,24 @@
    "rs_1m": -2.3,
    "rs_bench": "ndx",
    "rs_ndx_1m": -2.3,
+   "cds": {
+    "stato": "quotato",
+    "codice": "TESLINC",
+    "entita": "Tesla Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 96.2354,
+    "punti": 3.76,
+    "pb": 185.9,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 1.5,
    "avg_corr": 0.31,
    "max_corr": 0.45,
@@ -49604,6 +49859,25 @@
    "rs_1m": 3.0,
    "rs_bench": "sp500",
    "rs_ndx_1m": 4.1,
+   "cds": {
+    "stato": "quotato",
+    "codice": "CONSENAG",
+    "entita": "Constellation Energy Generation LLC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 100.9804,
+    "punti": -0.98,
+    "pb": 78.6,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "nota": "il CDS e' sulla controllata operativa Constellation Energy Generation LLC, che e' l'emittente del debito: non sulla capogruppo quotata"
+   },
    "beta_ndx": 0.94,
    "avg_corr": 0.3,
    "max_corr": 0.46,
@@ -50266,7 +50540,7 @@
     "upside_pct": 29.6
    },
    "analisti": {
-    "eps_ora": 3.7949,
+    "eps_ora": 3.795,
     "eps_90g_fa": 3.8114,
     "eps_7g_fa": 3.8013,
     "revisione_90g_pct": -0.43,
@@ -50275,7 +50549,7 @@
     "giu_30g": 7,
     "eps_min": 3.48,
     "eps_max": 4.05,
-    "eps_n": 43,
+    "eps_n": 44,
     "target_min": 57.0,
     "target_max": 126.0,
     "target_mediana": 90.0
@@ -50320,7 +50594,7 @@
     "gross_margin": 0.4912,
     "enterprise_value": 301209419776.0,
     "ev_ebitda": 20.453,
-    "peg": 1.25,
+    "peg": 1.21,
     "roa": 0.1608,
     "short_float": 0.0199,
     "buyback_yield": 0.0288,
@@ -51373,6 +51647,24 @@
    "rs_1m": -6.6,
    "rs_bench": "sp500",
    "rs_ndx_1m": -5.5,
+   "cds": {
+    "stato": "quotato",
+    "codice": "NFLX",
+    "entita": "Netflix Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.0701,
+    "punti": -2.07,
+    "pb": 55.2,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.1,
    "avg_corr": -0.11,
    "max_corr": 0.12,
@@ -52283,7 +52575,7 @@
     "gross_margin": 0.6794,
     "enterprise_value": 3980454789120.0,
     "ev_ebitda": 20.493,
-    "peg": 1.75,
+    "peg": 1.72,
     "roa": 0.1409,
     "short_float": 0.0082,
     "buyback_yield": 0.0052,
@@ -53336,6 +53628,24 @@
    "rs_1m": 7.2,
    "rs_bench": "ndx",
    "rs_ndx_1m": 7.2,
+   "cds": {
+    "stato": "quotato",
+    "codice": "MSFT",
+    "entita": "Microsoft Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.139,
+    "punti": -2.14,
+    "pb": 53.8,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.56,
    "avg_corr": 0.21,
    "max_corr": 0.33,
@@ -54208,9 +54518,9 @@
    "analisti": {
     "eps_ora": 9.5706,
     "eps_90g_fa": 9.7106,
-    "eps_7g_fa": 9.5758,
+    "eps_7g_fa": 9.5804,
     "revisione_90g_pct": -1.44,
-    "revisione_7g_pct": -0.05,
+    "revisione_7g_pct": -0.1,
     "su_30g": 5,
     "giu_30g": 3,
     "eps_min": 8.5,
@@ -54260,7 +54570,7 @@
     "gross_margin": 0.4865,
     "enterprise_value": 5034461888512.0,
     "ev_ebitda": 29.974,
-    "peg": 2.74,
+    "peg": 2.75,
     "roa": 0.2708,
     "short_float": 0.0083,
     "buyback_yield": 0.0181,
@@ -55147,7 +55457,7 @@
       },
       "evento": {
        "beta": 0.29,
-       "r2": 0.162,
+       "r2": 0.163,
        "corr": 0.4,
        "campione": 50,
        "da": "2025-10-27",
@@ -55303,6 +55613,24 @@
    "rs_1m": 2.8,
    "rs_bench": "ndx",
    "rs_ndx_1m": 2.8,
+   "cds": {
+    "stato": "quotato",
+    "codice": "APLINC",
+    "entita": "Apple Inc.",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.5386,
+    "punti": -2.54,
+    "pb": 45.3,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.26,
    "avg_corr": -0.18,
    "max_corr": 0.1,
@@ -55899,7 +56227,7 @@
     "gross_margin": 0.8175,
     "enterprise_value": 1829067816960.0,
     "ev_ebitda": 16.68,
-    "peg": 0.97,
+    "peg": 0.94,
     "roa": 0.1459,
     "short_float": 0.0152,
     "buyback_yield": 0.0145,
@@ -56951,6 +57279,24 @@
    "rs_1m": 4.9,
    "rs_bench": "ndx",
    "rs_ndx_1m": 4.9,
+   "cds": {
+    "stato": "quotato",
+    "codice": "METAPL",
+    "entita": "META PLATFORMS INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 99.7536,
+    "punti": 0.25,
+    "pb": 105.4,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.84,
    "avg_corr": 0.09,
    "max_corr": 0.2,
@@ -57366,7 +57712,7 @@
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -57642,7 +57988,7 @@
     "gross_margin": 0.7728,
     "enterprise_value": 229069094912.0,
     "ev_ebitda": 17.759,
-    "peg": 0.88,
+    "peg": 0.86,
     "roa": 0.057,
     "short_float": 0.0462,
     "buyback_yield": 0.0636,
@@ -58694,6 +59040,10 @@
    "rs_1m": -1.2,
    "rs_bench": "sp500",
    "rs_ndx_1m": -0.0,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.13,
    "avg_corr": -0.11,
    "max_corr": 0.37,
@@ -59289,7 +59639,7 @@
     "gross_margin": 0.7477,
     "enterprise_value": 150566387712.0,
     "ev_ebitda": 51.973,
-    "peg": 1.07,
+    "peg": 1.02,
     "roa": 0.0425,
     "short_float": 0.0287,
     "buyback_yield": 0.0125,
@@ -60345,6 +60695,10 @@
    "rs_1m": 2.2,
    "rs_bench": "sp500",
    "rs_ndx_1m": 3.4,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.25,
    "avg_corr": -0.12,
    "max_corr": 0.47,
@@ -60974,7 +61328,7 @@
     "gross_margin": 0.7551,
     "enterprise_value": 1604774789120.0,
     "ev_ebitda": 30.708,
-    "peg": 0.34,
+    "peg": 0.33,
     "roa": 0.1537,
     "short_float": 0.0116,
     "buyback_yield": 0.0039,
@@ -62027,6 +62381,24 @@
    "rs_1m": -1.2,
    "rs_bench": "sox",
    "rs_ndx_1m": -4.3,
+   "cds": {
+    "stato": "quotato",
+    "codice": "BROINC",
+    "entita": "BROADCOM INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 98.0629,
+    "punti": 1.94,
+    "pb": 143.5,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 1.58,
    "avg_corr": 0.48,
    "max_corr": 0.57,
@@ -62568,7 +62940,7 @@
      961.76,
      1054.17,
      1054.93,
-     1064.75,
+     1064.74,
      1416.2,
      1445.53,
      1316.25,
@@ -62829,7 +63201,7 @@
     "gross_margin": 0.5434,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.96,
+    "peg": 0.95,
     "roa": 0.1828,
     "short_float": 0.0038,
     "buyback_yield": 0.0092,
@@ -63870,6 +64242,10 @@
    "rs_1m": 0.4,
    "rs_bench": "sp500",
    "rs_ndx_1m": 1.6,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 1.63,
    "avg_corr": 0.5,
    "max_corr": 0.69,
@@ -65578,7 +65954,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -65837,6 +66213,10 @@
    "rs_1m": 1.8,
    "rs_bench": "sp500",
    "rs_ndx_1m": 3.0,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.13,
    "avg_corr": -0.24,
    "max_corr": 0.06,
@@ -66747,7 +67127,7 @@
     "gross_margin": 0.6396,
     "enterprise_value": 525177651200.0,
     "ev_ebitda": 15.252,
-    "peg": 0.75,
+    "peg": 0.72,
     "roa": 0.0636,
     "short_float": 0.026,
     "buyback_yield": -0.0159,
@@ -67801,6 +68181,25 @@
    "rs_1m": -14.8,
    "rs_bench": "sp500",
    "rs_ndx_1m": -13.7,
+   "cds": {
+    "stato": "quotato",
+    "codice": "ORCLE",
+    "entita": "Oracle Cop",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 91.758,
+    "punti": 8.24,
+    "pb": 296.8,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "nota": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation"
+   },
    "beta_ndx": 1.52,
    "avg_corr": 0.47,
    "max_corr": 0.67,
@@ -69777,6 +70176,24 @@
    "rs_1m": -2.5,
    "rs_bench": "sp500",
    "rs_ndx_1m": -1.3,
+   "cds": {
+    "stato": "quotato",
+    "codice": "MCD",
+    "entita": "McDONALDS Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.4788,
+    "punti": -3.48,
+    "pb": 25.7,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": -0.16,
    "avg_corr": -0.23,
    "max_corr": 0.02,
@@ -71616,6 +72033,10 @@
    "rs_1m": -12.4,
    "rs_bench": "sp500",
    "rs_ndx_1m": -11.3,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 1.5,
    "avg_corr": 0.5,
    "max_corr": 0.7,
@@ -72393,7 +72814,7 @@
     "gross_margin": 0.5713,
     "enterprise_value": 39501447168.0,
     "ev_ebitda": 51.535,
-    "peg": 2.87,
+    "peg": 2.81,
     "roa": -0.0062,
     "short_float": 0.05,
     "buyback_yield": -0.0325,
@@ -73436,6 +73857,10 @@
    "rs_1m": -2.8,
    "rs_bench": "sp500",
    "rs_ndx_1m": -1.7,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.35,
    "avg_corr": -0.09,
    "max_corr": 0.18,
@@ -74007,7 +74432,7 @@
     "gross_margin": 0.63,
     "enterprise_value": 209868242944.0,
     "ev_ebitda": 45.234,
-    "peg": 1.39,
+    "peg": 1.32,
     "roa": 0.1412,
     "short_float": 0.0114,
     "buyback_yield": 0.0072,
@@ -75046,6 +75471,10 @@
    "rs_1m": -11.6,
    "rs_bench": "sp500",
    "rs_ndx_1m": -10.4,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 1.54,
    "avg_corr": 0.47,
    "max_corr": 0.63,
@@ -75557,7 +75986,7 @@
     "gross_margin": 0.7519,
     "enterprise_value": 228676681728.0,
     "ev_ebitda": 2139.945,
-    "peg": 6.31,
+    "peg": 5.87,
     "roa": -0.0078,
     "short_float": 0.026,
     "buyback_yield": 0.0,
@@ -76498,6 +76927,10 @@
    "rs_1m": -7.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": -6.6,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 1.13,
    "avg_corr": 0.21,
    "max_corr": 0.44,
@@ -77092,7 +77525,7 @@
     "gross_margin": 0.7038,
     "enterprise_value": 279252008960.0,
     "ev_ebitda": 179.008,
-    "peg": 1.89,
+    "peg": 1.75,
     "roa": 0.014,
     "short_float": 0.0266,
     "buyback_yield": 0.0036,
@@ -78142,6 +78575,10 @@
    "rs_1m": -9.1,
    "rs_bench": "sp500",
    "rs_ndx_1m": -7.9,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.9,
    "avg_corr": 0.2,
    "max_corr": 0.47,
@@ -79592,6 +80029,10 @@
    "rs_1m": -11.6,
    "rs_bench": "sp500",
    "rs_ndx_1m": -10.4,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 1.07,
    "avg_corr": 0.31,
    "max_corr": 0.56,
@@ -80100,7 +80541,7 @@
     "gross_margin": 0.7954,
     "enterprise_value": 85023391744.0,
     "ev_ebitda": 1025.651,
-    "peg": 1.38,
+    "peg": 1.28,
     "roa": 0.0018,
     "short_float": 0.0326,
     "buyback_yield": -0.0,
@@ -81041,6 +81482,10 @@
    "rs_1m": 4.4,
    "rs_bench": "sp500",
    "rs_ndx_1m": 5.6,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.89,
    "avg_corr": 0.16,
    "max_corr": 0.46,
@@ -81907,18 +82352,18 @@
    "rating": {
     "key": "buy",
     "n": 22,
-    "target": 175.41,
-    "upside_pct": -2.0
+    "target": 175.64,
+    "upside_pct": -1.9
    },
    "analisti": {
-    "eps_ora": 11.844,
+    "eps_ora": 11.8611,
     "eps_90g_fa": 10.3917,
     "eps_7g_fa": 11.4598,
-    "revisione_90g_pct": 13.98,
-    "revisione_7g_pct": 3.35,
+    "revisione_90g_pct": 14.14,
+    "revisione_7g_pct": 3.5,
     "su_30g": 8,
     "giu_30g": 0,
-    "eps_min": 7.562,
+    "eps_min": 7.83,
     "eps_max": 16.65,
     "eps_n": 22,
     "target_min": 142.0,
@@ -81960,12 +82405,12 @@
     "debt_to_equity": 15.921,
     "dividend_yield": 0.023,
     "price_to_book": 2.8373,
-    "target_mean": 175.4091,
+    "target_mean": 175.6363,
     "fcf": 20671000576.0,
     "gross_margin": 0.2977,
     "enterprise_value": 774460997632.0,
     "ev_ebitda": 11.4,
-    "peg": 1.51,
+    "peg": 1.55,
     "roa": 0.0552,
     "short_float": 0.0107,
     "buyback_yield": 0.0275,
@@ -83018,6 +83463,25 @@
    "rs_1m": 9.3,
    "rs_bench": "sp500",
    "rs_ndx_1m": 10.5,
+   "cds": {
+    "stato": "quotato",
+    "codice": "XOM",
+    "entita": "Exxon Mobil Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.8063,
+    "punti": -2.81,
+    "pb": 39.7,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "nota": "l'entita' di riferimento e' Exxon Mobil Corp; il nome della societa' quotata nella pipeline e' ExxonMobil Holdings Corporation"
+   },
    "beta_ndx": -0.48,
    "avg_corr": -0.27,
    "max_corr": -0.13,
@@ -83579,7 +84043,7 @@
      71.81,
      71.36,
      69.91,
-     70.49,
+     70.48,
      73.77,
      73.44,
      80.18,
@@ -83676,7 +84140,7 @@
      127.9,
      130.07,
      136.24,
-     144.28,
+     144.29,
      154.51,
      149.4,
      151.74,
@@ -83942,7 +84406,7 @@
     "gross_margin": 0.4427,
     "enterprise_value": 475561132032.0,
     "ev_ebitda": 9.387,
-    "peg": 0.95,
+    "peg": 0.97,
     "roa": 0.0586,
     "short_float": 0.0121,
     "buyback_yield": 0.0274,
@@ -84995,6 +85459,24 @@
    "rs_1m": 6.1,
    "rs_bench": "sp500",
    "rs_ndx_1m": 7.2,
+   "cds": {
+    "stato": "quotato",
+    "codice": "CVX",
+    "entita": "Chevron Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.8473,
+    "punti": -2.85,
+    "pb": 38.8,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": -0.46,
    "avg_corr": -0.29,
    "max_corr": -0.14,
@@ -85488,7 +85970,7 @@
      32.88,
      31.09,
      28.92,
-     32.12,
+     32.13,
      32.9,
      33.61,
      31.46,
@@ -85919,7 +86401,7 @@
     "gross_margin": 0.4757,
     "enterprise_value": 191605948416.0,
     "ev_ebitda": 7.155,
-    "peg": 1.1,
+    "peg": 1.14,
     "roa": 0.0753,
     "short_float": 0.0128,
     "buyback_yield": 0.027,
@@ -86972,6 +87454,24 @@
    "rs_1m": 9.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": 10.9,
+   "cds": {
+    "stato": "quotato",
+    "codice": "COP",
+    "entita": "ConocoPhillips",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.237,
+    "punti": -3.24,
+    "pb": 30.7,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": -0.5,
    "avg_corr": -0.21,
    "max_corr": -0.11,
@@ -87261,7 +87761,7 @@
      123.58,
      115.79,
      115.57,
-     127.35,
+     127.36,
      140.21,
      140.59,
      129.75,
@@ -88613,6 +89113,24 @@
    "rs_1m": 8.5,
    "rs_bench": "sp500",
    "rs_ndx_1m": 9.6,
+   "cds": {
+    "stato": "quotato",
+    "codice": "ABBVINC",
+    "entita": "ABBVIE INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.1637,
+    "punti": -3.16,
+    "pb": 32.2,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": -0.23,
    "avg_corr": -0.35,
    "max_corr": -0.1,
@@ -89537,7 +90055,7 @@
     "gross_margin": 0.759,
     "enterprise_value": 406904700928.0,
     "ev_ebitda": 14.094,
-    "peg": 2.71,
+    "peg": 2.73,
     "roa": 0.1187,
     "short_float": 0.0115,
     "buyback_yield": 0.0141,
@@ -90586,6 +91104,10 @@
    "rs_1m": -1.1,
    "rs_bench": "sp500",
    "rs_ndx_1m": 0.1,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": -0.11,
    "avg_corr": -0.03,
    "max_corr": 0.08,
@@ -91374,9 +91896,9 @@
    "analisti": {
     "eps_ora": 9.9431,
     "eps_90g_fa": 9.7125,
-    "eps_7g_fa": 9.92,
+    "eps_7g_fa": 9.9184,
     "revisione_90g_pct": 2.37,
-    "revisione_7g_pct": 0.23,
+    "revisione_7g_pct": 0.25,
     "su_30g": 5,
     "giu_30g": 2,
     "eps_min": 9.185,
@@ -91426,7 +91948,7 @@
     "gross_margin": 0.796,
     "enterprise_value": 214948593664.0,
     "ev_ebitda": 14.721,
-    "peg": 2.34,
+    "peg": 2.32,
     "roa": 0.1409,
     "short_float": 0.0176,
     "buyback_yield": 0.0078,
@@ -92479,6 +93001,10 @@
    "rs_1m": 3.2,
    "rs_bench": "sp500",
    "rs_ndx_1m": 4.4,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.06,
    "avg_corr": -0.09,
    "max_corr": 0.27,
@@ -93262,7 +93788,7 @@
      322.37,
      340.11,
      336.06,
-     360.43,
+     360.42,
      358.86,
      369.78,
      383.01,
@@ -93403,7 +93929,7 @@
     "gross_margin": 0.7189,
     "enterprise_value": 277132935168.0,
     "ev_ebitda": 16.049,
-    "peg": 2.59,
+    "peg": 2.58,
     "roa": 0.0867,
     "short_float": 0.026,
     "buyback_yield": -0.0,
@@ -94456,6 +94982,24 @@
    "rs_1m": 13.6,
    "rs_bench": "sp500",
    "rs_ndx_1m": 14.8,
+   "cds": {
+    "stato": "quotato",
+    "codice": "AMGN",
+    "entita": "Amgen Inc.",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.1685,
+    "punti": -3.17,
+    "pb": 32.1,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.13,
    "avg_corr": -0.1,
    "max_corr": 0.12,
@@ -94764,7 +95308,7 @@
      155.94,
      153.23,
      164.84,
-     169.07,
+     169.06,
      171.99,
      163.61,
      170.13,
@@ -94827,7 +95371,7 @@
      261.2,
      272.27,
      270.87,
-     285.55,
+     285.54,
      310.99,
      311.94,
      337.36,
@@ -95102,7 +95646,7 @@
     "gross_margin": 0.9772,
     "enterprise_value": 750566047744.0,
     "ev_ebitda": 24.139,
-    "peg": 1.81,
+    "peg": 1.82,
     "roa": 0.1911,
     "short_float": 0.0121,
     "buyback_yield": 0.0242,
@@ -96151,6 +96695,10 @@
    "rs_1m": 8.6,
    "rs_bench": "sp500",
    "rs_ndx_1m": 9.7,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.01,
    "avg_corr": -0.23,
    "max_corr": 0.13,
@@ -96501,7 +97049,7 @@
      344.76,
      305.88,
      342.21,
-     344.34,
+     344.33,
      369.93,
      349.13,
      353.5,
@@ -97872,6 +98420,10 @@
    "rs_1m": 9.0,
    "rs_bench": "sp500",
    "rs_ndx_1m": 10.2,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": -0.02,
    "avg_corr": -0.21,
    "max_corr": 0.02,
@@ -98518,7 +99070,7 @@
     "gross_margin": 0.6748,
     "enterprise_value": 364889473024.0,
     "ev_ebitda": 20.255,
-    "peg": 2.4,
+    "peg": 2.46,
     "roa": 0.1459,
     "short_float": 0.0114,
     "buyback_yield": -0.0,
@@ -99571,6 +100123,10 @@
    "rs_1m": 8.4,
    "rs_bench": "sp500",
    "rs_ndx_1m": 9.5,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": -0.33,
    "avg_corr": -0.41,
    "max_corr": -0.16,
@@ -100495,7 +101051,7 @@
     "gross_margin": 0.2518,
     "enterprise_value": 230750765056.0,
     "ev_ebitda": 26.831,
-    "peg": 1.51,
+    "peg": 1.49,
     "roa": 0.0376,
     "short_float": 0.0213,
     "buyback_yield": 0.0062,
@@ -101548,6 +102104,24 @@
    "rs_1m": -6.4,
    "rs_bench": "sp500",
    "rs_ndx_1m": -5.3,
+   "cds": {
+    "stato": "quotato",
+    "codice": "DE",
+    "entita": "Deere & Co",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.4987,
+    "punti": -3.5,
+    "pb": 25.3,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.19,
    "avg_corr": 0.0,
    "max_corr": 0.11,
@@ -103521,6 +104095,24 @@
    "rs_1m": 4.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": 5.9,
+   "cds": {
+    "stato": "quotato",
+    "codice": "THWALT",
+    "entita": "Walt Disney Co.",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.9211,
+    "punti": -2.92,
+    "pb": 37.3,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.19,
    "avg_corr": -0.23,
    "max_corr": -0.03,
@@ -104445,7 +105037,7 @@
     "gross_margin": 0.7472,
     "enterprise_value": 220674342912.0,
     "ev_ebitda": 8.694,
-    "peg": 13.49,
+    "peg": 13.55,
     "roa": 0.0578,
     "short_float": 0.0264,
     "buyback_yield": -0.0,
@@ -105498,6 +106090,24 @@
    "rs_1m": 6.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": 7.9,
+   "cds": {
+    "stato": "quotato",
+    "codice": "PFE",
+    "entita": "Pfizer Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.1865,
+    "punti": -3.19,
+    "pb": 31.8,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.02,
    "avg_corr": -0.16,
    "max_corr": 0.11,
@@ -105743,7 +106353,7 @@
      78.41,
      76.31,
      69.67,
-     72.91,
+     72.9,
      76.98,
      79.63,
      87.08,
@@ -105798,7 +106408,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -105849,7 +106459,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -105955,7 +106565,7 @@
      352.96,
      313.87,
      334.37,
-     321.42,
+     321.43,
      301.14,
      316.17,
      300.45,
@@ -106250,7 +106860,7 @@
     "gross_margin": 0.8129,
     "enterprise_value": 105719087104.0,
     "ev_ebitda": null,
-    "peg": 1.12,
+    "peg": 1.11,
     "roa": 0.0111,
     "short_float": 0.023,
     "buyback_yield": 0.0408,
@@ -107302,6 +107912,24 @@
    "rs_1m": -7.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": -6.5,
+   "cds": {
+    "stato": "quotato",
+    "codice": "GS",
+    "entita": "Goldman Sachs Gp Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 101.5906,
+    "punti": -1.59,
+    "pb": 65.5,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.94,
    "avg_corr": 0.46,
    "max_corr": 0.61,
@@ -108226,7 +108854,7 @@
     "gross_margin": 0.0,
     "enterprise_value": 367981428736.0,
     "ev_ebitda": null,
-    "peg": 1.43,
+    "peg": 1.45,
     "roa": 0.0137,
     "short_float": 0.0091,
     "buyback_yield": 0.035,
@@ -109275,6 +109903,24 @@
    "rs_1m": -2.5,
    "rs_bench": "sp500",
    "rs_ndx_1m": -1.4,
+   "cds": {
+    "stato": "quotato",
+    "codice": "JPM",
+    "entita": "JPMorgan Chase & Co",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.4283,
+    "punti": -2.43,
+    "pb": 47.7,
+    "indicativo": false,
+    "data": "2026-10-16",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    }
+   },
    "beta_ndx": 0.27,
    "avg_corr": 0.16,
    "max_corr": 0.26,
@@ -109543,7 +110189,7 @@
      99.51,
      97.2,
      108.68,
-     129.69,
+     129.7,
      124.73,
      136.32,
      138.59,
@@ -109720,7 +110366,7 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
@@ -109970,7 +110616,7 @@
    "analisti": {
     "eps_ora": 64.6554,
     "eps_90g_fa": 63.8964,
-    "eps_7g_fa": 64.1188,
+    "eps_7g_fa": 64.1183,
     "revisione_90g_pct": 1.19,
     "revisione_7g_pct": 0.84,
     "su_30g": 1,
@@ -110022,7 +110668,7 @@
     "gross_margin": 0.4828,
     "enterprise_value": 183427153920.0,
     "ev_ebitda": 15.278,
-    "peg": 0.94,
+    "peg": 0.95,
     "roa": null,
     "short_float": 0.0134,
     "buyback_yield": 0.0106,
@@ -111074,6 +111720,10 @@
    "rs_1m": 7.3,
    "rs_bench": "sp500",
    "rs_ndx_1m": 8.5,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": 0.53,
    "avg_corr": 0.05,
    "max_corr": 0.24,
@@ -111998,7 +112648,7 @@
     "gross_margin": 0.834,
     "enterprise_value": 1166420606976.0,
     "ev_ebitda": 27.967,
-    "peg": 1.21,
+    "peg": 1.22,
     "roa": 0.2036,
     "short_float": 0.0079,
     "buyback_yield": 0.0037,
@@ -113047,6 +113697,10 @@
    "rs_1m": 8.8,
    "rs_bench": "sp500",
    "rs_ndx_1m": 10.0,
+   "cds": {
+    "stato": "assente",
+    "verificato": "2026-10-17"
+   },
    "beta_ndx": -0.05,
    "avg_corr": -0.24,
    "max_corr": -0.06,
@@ -122224,6 +122878,20 @@
   "news": {
    "voci": [
     {
+     "titolo": "CoreWeave Woes Risk Shutting Down AI Junk Market: Credit Weekly",
+     "riassunto": "Junk bond buyers are increasingly freezing out tech startups looking for financing, as CoreWeave Inc.’s pain raises bigger questions about how artificial intelligence companies will fund themselves.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-17T14:27:13Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-17/coreweave-woes-risk-shutting-down-ai-junk-market-credit-weekly"
+    },
+    {
+     "titolo": "Can the Fed Fight Inflation Without Hurting Farmers?",
+     "riassunto": "Chicago Fed President Austan Goolsbee traveled to rural Illinois to hear directly from farmers facing lower crop prices and rising costs for fuel, fertilizer and other inputs. Those conversations offer the Fed a ground-level view of inflation pressures that may emerge before they are fully reflected in national data. (",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-17T14:03:13Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-10-17/can-the-fed-fight-inflation-without-hurting-farmers-video"
+    },
+    {
      "titolo": "‘Some people did everything right’: I lost my home in the Great Recession. I rent in my 50s. Why is that judged as failure?",
      "riassunto": "”I earn $110,000 a year.”",
      "fonte": "MarketWatch",
@@ -122250,13 +122918,6 @@
      "fonte": "MarketWatch",
      "quando": "2026-10-17T11:00:00Z",
      "url": "https://www.marketwatch.com/story/fed-interest-rate-decision-this-month-is-a-closer-call-than-markets-think-f96ccf95?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "Vietnam Prime Minister Targets 2027 GDP Growth of at Least 10%",
-     "riassunto": "Vietnam’s Prime Minister Le Minh Hung projected gross domestic product will expand at least 10% next year as he outlined the nation’s economic targets in a speech to parliament.",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-17T03:03:57Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-17/vietnam-prime-minister-targets-2027-gdp-growth-of-at-least-10"
     },
     {
      "titolo": "U.S. budget deficit swells to almost $2 trillion for fiscal 2026, up 12% in a single year",
@@ -122341,13 +123002,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-14T13:53:28Z",
      "url": "https://www.cnbc.com/2026/10/14/cpi-inflation-report-september-2026.html"
-    },
-    {
-     "titolo": "'Godzilla El Niño' is wreaking havoc with Philippine central bank's inflation forecasts",
-     "riassunto": "The Philippine central bank is running policy scenarios for a severe El Niño on top of the oil shock, with inflation at a three-year high.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-14T04:24:28Z",
-     "url": "https://www.cnbc.com/2026/10/14/godzilla-el-nino-asia-inflation-philippines.html"
     }
    ],
    "fonti": [
@@ -127659,7 +128313,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 49
+     "score": 48
     },
     {
      "label": "Treasury 10A",
@@ -132786,6 +133440,104 @@
    "non_seguite": [],
    "senza_prezzo": []
   },
+  "cds": {
+   "fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
+   "url": "https://www.ice.com/api/cds-settlement-prices/icc-single-names",
+   "letto": true,
+   "errore": null,
+   "data": "2026-10-16",
+   "scadenza": "2031-12-20",
+   "entita_ice": 690,
+   "tasso_pct": 3.88,
+   "tasso_fonte": "EFFR del 2026-10-15 (NY Fed), proxy della curva SOFR della convenzione ISDA",
+   "recupero": 0.4,
+   "punti_max": 30.0,
+   "indici": {
+    "HY": {
+     "serie": 47,
+     "versione": 1,
+     "prezzo": 105.8411,
+     "cedola": 500,
+     "pb": 357.1,
+     "var": {}
+    },
+    "IG": {
+     "serie": 47,
+     "versione": 1,
+     "prezzo": 101.7081,
+     "cedola": 100,
+     "pb": 62.9,
+     "var": {}
+    }
+   },
+   "storia": {
+    "giorni": 1,
+    "dal": "2026-10-16"
+   },
+   "verificato": "2026-10-17",
+   "assenti": [
+    "ANET",
+    "ASML",
+    "BE",
+    "BLK",
+    "CBRS",
+    "CCJ",
+    "CRM",
+    "CRWD",
+    "DDOG",
+    "GILD",
+    "LLY",
+    "MA",
+    "MRK",
+    "MRVL",
+    "MSTR",
+    "MU",
+    "NET",
+    "NKE",
+    "NOW",
+    "OKLO",
+    "PANW",
+    "PLTR",
+    "PM",
+    "RGTI",
+    "SMCI",
+    "STX",
+    "TTWO",
+    "V",
+    "WDC"
+   ],
+   "quotati": [
+    "AAPL",
+    "ABBV",
+    "AMD",
+    "AMGN",
+    "AMZN",
+    "AVGO",
+    "BTP-V28",
+    "CEG",
+    "COP",
+    "CRWV",
+    "CVX",
+    "DE",
+    "DIS",
+    "GOOGL",
+    "GS",
+    "INTC",
+    "JPM",
+    "MCD",
+    "META",
+    "MSFT",
+    "NFLX",
+    "NVDA",
+    "ORCL",
+    "PFE",
+    "SKHY",
+    "SPCX",
+    "TSLA",
+    "TSM",
+    "XOM"
+   ]
+  },
   "shock_alert": {
    "active": true,
    "threshold": -2.0,
@@ -132803,18 +133555,18 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-17T14:51:22Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+     },
+     {
       "titolo": "The Nasdaq-100's 6 Best Stocks This Year, and Whether They Can Keep Going",
       "riassunto": "Key PointsIt comes as no surprise that artificial intelligence plays a key role in most of these performances.",
       "fonte": "Nasdaq",
       "quando": "2026-10-17T13:05:00Z",
       "url": "https://www.nasdaq.com/articles/nasdaq-100s-6-best-stocks-year-and-whether-they-can-keep-going"
-     },
-     {
-      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T06:10:24Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
       "titolo": "Taiwan Semiconductor Posts Record Q3 Results: Time to Buy the Dip?",
@@ -132894,7 +133646,7 @@
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-17T13:37:47Z",
+      "quando": "2026-10-17T16:01:56Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
@@ -132935,18 +133687,18 @@
     ],
     "MRVL": [
      {
+      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-17T14:51:22Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+     },
+     {
       "titolo": "The Nasdaq-100's 6 Best Stocks This Year, and Whether They Can Keep Going",
       "riassunto": "Key PointsIt comes as no surprise that artificial intelligence plays a key role in most of these performances.",
       "fonte": "Nasdaq",
       "quando": "2026-10-17T13:05:00Z",
       "url": "https://www.nasdaq.com/articles/nasdaq-100s-6-best-stocks-year-and-whether-they-can-keep-going"
-     },
-     {
-      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T06:10:24Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
       "titolo": "Stock Indexes Mostly Lower as Chipmaker Weakness Persists",
@@ -133023,6 +133775,13 @@
     ],
     "MU": [
      {
+      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-17T14:51:22Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+     },
+     {
       "titolo": "The Nasdaq-100's 6 Best Stocks This Year, and Whether They Can Keep Going",
       "riassunto": "Key PointsIt comes as no surprise that artificial intelligence plays a key role in most of these performances.",
       "fonte": "Nasdaq",
@@ -133044,13 +133803,6 @@
       "url": "https://www.nasdaq.com/articles/think-its-too-late-buy-micron-heres-1-reason-why-theres-still-time"
      },
      {
-      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T06:10:24Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
-     },
-     {
       "titolo": "Missed Out On Micron and Sandisk? Make Sure You Don't Miss Out On This Memory Stock.",
       "riassunto": "Key PointsPenguin Solutions' memory segment more than doubled year over year, and six new customers suggest that the growth can continue.",
       "fonte": "Nasdaq",
@@ -133070,7 +133822,7 @@
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-17T13:37:47Z",
+      "quando": "2026-10-17T14:51:22Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
@@ -133139,18 +133891,18 @@
       "url": "https://www.nasdaq.com/articles/5-stock-ideas-your-short-list"
      },
      {
+      "titolo": "Palantir's Potential Next Catalyst After Retail Profit-Taking",
+      "riassunto": "Are retail investors bailing on Palantir Technologies (NASDAQ: PLTR)? At least one group of shareholders was selling. In its August 2026 Schwab Trading Activity Index report, Charles Schwab reported that PLTR was one of several high-beta technology stocks that its clients net so",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-16T14:50:00Z",
+      "url": "https://www.nasdaq.com/articles/palantirs-potential-next-catalyst-after-retail-profit-taking"
+     },
+     {
       "titolo": "Ondas and Palantir Launch Regna AI to Expand Sovereign AI Capabilities",
       "riassunto": "ONDS and Palantir launch Regna AI to deliver sovereign AI solutions for defense and enterprise missions, advancing autonomous operations and data control.",
       "fonte": "Nasdaq",
       "quando": "2026-10-16T12:36:00Z",
       "url": "https://www.nasdaq.com/articles/ondas-and-palantir-launch-regna-ai-expand-sovereign-ai-capabilities"
-     },
-     {
-      "titolo": "Palantir Technologies Inc. (PLTR) is Attracting Investor Attention: Here is What You Should Know",
-      "riassunto": "Palantir Technologies (PLTR) has been one of the stocks most watched by Zacks.com users lately. So, it is worth exploring what lies ahead for the stock.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T12:00:06Z",
-      "url": "https://www.nasdaq.com/articles/palantir-technologies-inc-pltr-attracting-investor-attention-here-what-you-should-know"
      }
     ],
     "RGTI": [
@@ -133263,7 +134015,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-17T13:55:00Z"
+   "letto_il": "2026-10-17T16:03:27Z"
   }
  },
  "broker": null,
@@ -133271,18 +134023,18 @@
   "per_titolo": {
    "AMD": [
     {
+     "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-17T14:51:22Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+    },
+    {
      "titolo": "The Nasdaq-100's 6 Best Stocks This Year, and Whether They Can Keep Going",
      "riassunto": "Key PointsIt comes as no surprise that artificial intelligence plays a key role in most of these performances.",
      "fonte": "Nasdaq",
      "quando": "2026-10-17T13:05:00Z",
      "url": "https://www.nasdaq.com/articles/nasdaq-100s-6-best-stocks-year-and-whether-they-can-keep-going"
-    },
-    {
-     "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T06:10:24Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
      "titolo": "Taiwan Semiconductor Posts Record Q3 Results: Time to Buy the Dip?",
@@ -133362,7 +134114,7 @@
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-17T13:37:47Z",
+     "quando": "2026-10-17T16:01:56Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
@@ -133403,18 +134155,18 @@
    ],
    "MRVL": [
     {
+     "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-17T14:51:22Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+    },
+    {
      "titolo": "The Nasdaq-100's 6 Best Stocks This Year, and Whether They Can Keep Going",
      "riassunto": "Key PointsIt comes as no surprise that artificial intelligence plays a key role in most of these performances.",
      "fonte": "Nasdaq",
      "quando": "2026-10-17T13:05:00Z",
      "url": "https://www.nasdaq.com/articles/nasdaq-100s-6-best-stocks-year-and-whether-they-can-keep-going"
-    },
-    {
-     "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T06:10:24Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
      "titolo": "Stock Indexes Mostly Lower as Chipmaker Weakness Persists",
@@ -133491,6 +134243,13 @@
    ],
    "MU": [
     {
+     "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-17T14:51:22Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+    },
+    {
      "titolo": "The Nasdaq-100's 6 Best Stocks This Year, and Whether They Can Keep Going",
      "riassunto": "Key PointsIt comes as no surprise that artificial intelligence plays a key role in most of these performances.",
      "fonte": "Nasdaq",
@@ -133512,13 +134271,6 @@
      "url": "https://www.nasdaq.com/articles/think-its-too-late-buy-micron-heres-1-reason-why-theres-still-time"
     },
     {
-     "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T06:10:24Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
-    },
-    {
      "titolo": "Missed Out On Micron and Sandisk? Make Sure You Don't Miss Out On This Memory Stock.",
      "riassunto": "Key PointsPenguin Solutions' memory segment more than doubled year over year, and six new customers suggest that the growth can continue.",
      "fonte": "Nasdaq",
@@ -133538,7 +134290,7 @@
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-17T13:37:47Z",
+     "quando": "2026-10-17T14:51:22Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
@@ -133607,18 +134359,18 @@
      "url": "https://www.nasdaq.com/articles/5-stock-ideas-your-short-list"
     },
     {
+     "titolo": "Palantir's Potential Next Catalyst After Retail Profit-Taking",
+     "riassunto": "Are retail investors bailing on Palantir Technologies (NASDAQ: PLTR)? At least one group of shareholders was selling. In its August 2026 Schwab Trading Activity Index report, Charles Schwab reported that PLTR was one of several high-beta technology stocks that its clients net so",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-16T14:50:00Z",
+     "url": "https://www.nasdaq.com/articles/palantirs-potential-next-catalyst-after-retail-profit-taking"
+    },
+    {
      "titolo": "Ondas and Palantir Launch Regna AI to Expand Sovereign AI Capabilities",
      "riassunto": "ONDS and Palantir launch Regna AI to deliver sovereign AI solutions for defense and enterprise missions, advancing autonomous operations and data control.",
      "fonte": "Nasdaq",
      "quando": "2026-10-16T12:36:00Z",
      "url": "https://www.nasdaq.com/articles/ondas-and-palantir-launch-regna-ai-expand-sovereign-ai-capabilities"
-    },
-    {
-     "titolo": "Palantir Technologies Inc. (PLTR) is Attracting Investor Attention: Here is What You Should Know",
-     "riassunto": "Palantir Technologies (PLTR) has been one of the stocks most watched by Zacks.com users lately. So, it is worth exploring what lies ahead for the stock.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T12:00:06Z",
-     "url": "https://www.nasdaq.com/articles/palantir-technologies-inc-pltr-attracting-investor-attention-here-what-you-should-know"
     }
    ],
    "RGTI": [
@@ -133731,7 +134483,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-17T13:55:00Z"
+  "letto_il": "2026-10-17T16:03:27Z"
  },
  "predictions": [
   {
@@ -133740,9 +134492,9 @@
    "link": "https://polymarket.com/event/will-the-tesla-roadsters-0-60-time-be-less-than-1-second"
   },
   {
-   "question": "Will there be no change in Fed interest rates after the October 2026 meeting?",
-   "yes": 86,
-   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-october-2026-meeting-20260617190324031"
+   "question": "Bitcoin Up or Down on October 17?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-17-2026"
   },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
@@ -133750,9 +134502,9 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-october-2026-meeting-20260617190324032"
   },
   {
-   "question": "Bitcoin Up or Down on October 17?",
-   "yes": 83,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-17-2026"
+   "question": "Will there be no change in Fed interest rates after the October 2026 meeting?",
+   "yes": 86,
+   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-october-2026-meeting-20260617190324031"
   },
   {
    "question": "Will the price of Bitcoin be above $78,000 on October 17?",
@@ -200742,7 +201494,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -200777,6 +201529,14 @@
     "note": ""
    },
    {
+    "key": "cds_ice",
+    "date": "2026-10-16",
+    "age_days": 1,
+    "max_age": 5,
+    "status": "ok",
+    "note": ""
+   },
+   {
     "key": "bce",
     "date": "2026-10-17",
     "age_days": 0,
@@ -200802,6 +201562,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-17T13:55:00Z"
+  "generated_at": "2026-10-17T16:03:28Z"
  }
 }
