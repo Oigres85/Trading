@@ -1,14 +1,25 @@
 # Sonda TEMPORANEA (17/10/2026): misura se i runner di GitHub raggiungono lo storico pubblico
 # dei CDS (DTCC, diffusione SEC; archivio web di ICE). Vive solo sul ramo sonda-cds-storico,
-# che si cancella dopo la lettura del log: non entra mai in main.
+# che si cancella dopo la lettura del risultato: non entra mai in main.
 name: sonda-cds
 on:
   push:
     branches: [sonda-cds-storico]
+    paths: [".github/sonda/sonda.py", ".github/workflows/sonda-cds.yml"]
+permissions:
+  contents: write
 jobs:
   sonda:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
-      - run: python3 .github/sonda/sonda.py
+        with:
+          persist-credentials: true
+      - run: python3 .github/sonda/sonda.py > .github/sonda/esito.txt 2>&1 || true
+      - run: |
+          git config user.name "sonda"
+          git config user.email "sonda@users.noreply.github.com"
+          git add .github/sonda/esito.txt
+          git commit -m "esito della sonda"
+          git push
