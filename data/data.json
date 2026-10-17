@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-17T16:37:14Z",
+ "updated_at": "2026-10-17T17:24:30Z",
  "eurusd": 1.1242,
  "totals": {
   "usd_value": 0,
@@ -83,6 +83,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     },
     "nota": "il BTP e' un titolo della Repubblica Italiana: il suo CDS e' quello sovrano (Rep Italy), non quello di una societa'"
@@ -1797,7 +1805,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -4067,6 +4075,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 2.53,
@@ -5898,6 +5914,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -13351,6 +13375,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 3.19,
@@ -16592,6 +16624,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "HY",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 3.71,
@@ -16606,28 +16646,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81174.22,
+   "price": 81147.83,
    "price_asof": "2026-10-17",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.4,
+   "change_pct": -0.43,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -35.7,
-   "sma200_dist_pct": 12.1,
+   "sma200_dist_pct": 12.0,
    "sma50_dist_pct": -0.2,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
    "w52_dist_pct": -30.2,
    "day_high": 81627.66,
-   "day_low": 81195.39,
+   "day_low": 81086.7,
    "support": 79735.86,
    "resistance": 87146.35,
-   "rsi": 45.4,
-   "volume": 15509919744,
+   "rsi": 45.3,
+   "volume": 14838926336,
    "vol_ratio": 0.87,
-   "atr_14": 2098.4,
-   "atr_pct": 2.59,
+   "atr_14": 2106.16,
+   "atr_pct": 2.6,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -16636,7 +16676,7 @@
      81562.49,
      82141.46,
      81500.8,
-     81174.22
+     81147.83
     ],
     "m6": [
      65710.4,
@@ -16764,7 +16804,7 @@
      81562.49,
      82141.46,
      81500.8,
-     81174.22
+     81147.83
     ],
     "all": [
      386.94,
@@ -16912,7 +16952,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81174.22
+     81147.83
     ],
     "m1": [
      84406.45,
@@ -16936,7 +16976,7 @@
      81562.49,
      82141.46,
      81500.8,
-     81174.22
+     81147.83
     ],
     "m3": [
      63402.17,
@@ -17004,7 +17044,7 @@
      81562.49,
      82141.46,
      81500.8,
-     81174.22
+     81147.83
     ],
     "y1": [
      106467.79,
@@ -17080,7 +17120,7 @@
      84497.21,
      83275.93,
      81762.56,
-     81174.22
+     81147.83
     ],
     "d1": [
      81487.43,
@@ -17182,7 +17222,12 @@
      81297.84,
      81271.54,
      81182.17,
-     81174.22
+     81193.37,
+     81193.75,
+     81113.81,
+     81077.27,
+     81170.4,
+     81147.83
     ]
    },
    "earnings_date": null,
@@ -17192,11 +17237,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.61,
-   "sortino_1y": -0.83,
+   "sortino_1y": -0.84,
    "sharpe_6m": 1.41,
    "sortino_6m": 2.55,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81174.22,
+   "prezzo_limite_aggiustato": 81147.83,
    "risk_reward": "1:1.4",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17209,22 +17254,22 @@
     "w1": {
      "support": 79735.86,
      "resistance": 84061.09,
-     "change_pct": -2.31
+     "change_pct": -2.34
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -3.83
+     "change_pct": -3.86
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 28.03
+     "change_pct": 27.99
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 15.53
+     "change_pct": 15.49
     }
    },
    "financials": [],
@@ -17251,74 +17296,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81174.22,
+     "prezzo": 81147.83,
      "medie": {
       "sma10": {
-       "liv": 82205.1,
-       "dist_pct": -1.25
+       "liv": 82202.46,
+       "dist_pct": -1.28
       },
       "ema10": {
-       "liv": 82308.95,
-       "dist_pct": -1.38
+       "liv": 82304.15,
+       "dist_pct": -1.4
       },
       "sma20": {
-       "liv": 83397.21,
-       "dist_pct": -2.67
+       "liv": 83395.89,
+       "dist_pct": -2.7
       },
       "ema20": {
-       "liv": 82602.79,
-       "dist_pct": -1.73
+       "liv": 82600.28,
+       "dist_pct": -1.76
       },
       "sma30": {
-       "liv": 83521.96,
-       "dist_pct": -2.81
+       "liv": 83521.08,
+       "dist_pct": -2.84
       },
       "ema30": {
-       "liv": 82142.52,
-       "dist_pct": -1.18
+       "liv": 82140.82,
+       "dist_pct": -1.21
       },
       "sma50": {
-       "liv": 81318.74,
-       "dist_pct": -0.18
+       "liv": 81318.21,
+       "dist_pct": -0.21
       },
       "ema50": {
-       "liv": 80409.47,
-       "dist_pct": 0.95
+       "liv": 80408.44,
+       "dist_pct": 0.92
       },
       "sma100": {
-       "liv": 74020.25,
-       "dist_pct": 9.66
+       "liv": 74019.98,
+       "dist_pct": 9.63
       },
       "ema100": {
-       "liv": 76855.66,
-       "dist_pct": 5.62
+       "liv": 76855.14,
+       "dist_pct": 5.59
       },
       "sma200": {
-       "liv": 72424.65,
-       "dist_pct": 12.08
+       "liv": 72424.52,
+       "dist_pct": 12.04
       },
       "ema200": {
-       "liv": 75763.84,
-       "dist_pct": 7.14
+       "liv": 75763.58,
+       "dist_pct": 7.11
       }
      },
      "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 45.4,
+      "rsi14": 45.3,
       "macd": {
-       "linea": 64.92,
-       "segnale": 604.97,
-       "istogramma": -540.04
+       "linea": 62.82,
+       "segnale": 604.54,
+       "istogramma": -541.73
       },
-      "stoch_k": 19.9,
-      "stoch_d": 25.6,
-      "williams_r": -80.1,
-      "cci20": -67.7,
+      "stoch_k": 19.5,
+      "stoch_d": 25.5,
+      "williams_r": -80.5,
+      "cci20": -69.0,
       "adx14": 24.3,
-      "di_su": 17.6,
-      "di_giu": 21.6,
-      "momentum10": -2101.71
+      "di_su": 17.5,
+      "di_giu": 21.5,
+      "momentum10": -2128.1
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17810,20 +17855,20 @@
       "d": "2026-10-17",
       "o": 81501.61,
       "h": 81627.66,
-      "l": 81195.39,
-      "c": 81174.22
+      "l": 81086.7,
+      "c": 81147.83
      }
     ],
     "performance": {
-     "s1": -0.72,
-     "m1": -3.4,
-     "m3": 28.03,
-     "m6": 26.01,
-     "a1": 17.17,
-     "ytd": -8.52,
-     "a3": 134.15,
-     "a5": 32.38,
-     "a10": 11480.24
+     "s1": -0.75,
+     "m1": -3.44,
+     "m3": 27.99,
+     "m6": 25.96,
+     "a1": 17.13,
+     "ytd": -8.55,
+     "a3": 134.07,
+     "a5": 32.34,
+     "a10": 11476.47
     },
     "stagionalita": [
      {
@@ -17909,7 +17954,7 @@
      },
      {
       "mese": 10,
-      "media": 15.14,
+      "media": 15.13,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -17938,7 +17983,7 @@
    },
    "rs_1m": -4.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.9,
+   "rs_ndx_1m": -3.0,
    "beta_ndx": 0.66,
    "avg_corr": 0.3,
    "max_corr": 0.78,
@@ -34870,6 +34915,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 0.82,
@@ -35310,7 +35363,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -38387,6 +38440,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -42287,6 +42348,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 1.51,
@@ -45546,6 +45615,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 2.52,
@@ -46752,6 +46829,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -48443,6 +48528,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 1.5,
@@ -49881,6 +49974,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     },
     "nota": "il CDS e' sulla controllata operativa Constellation Energy Generation LLC, che e' l'emittente del debito: non sulla capogruppo quotata"
@@ -51669,6 +51770,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -53651,6 +53760,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 0.56,
@@ -55464,7 +55581,7 @@
       },
       "evento": {
        "beta": 0.29,
-       "r2": 0.162,
+       "r2": 0.163,
        "corr": 0.4,
        "campione": 50,
        "da": "2025-10-27",
@@ -55635,6 +55752,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -57302,6 +57427,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 0.84,
@@ -57719,7 +57852,7 @@
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -62404,6 +62537,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 1.58,
@@ -65961,7 +66102,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -66826,7 +66967,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -68203,6 +68344,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     },
     "nota": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation"
@@ -70198,6 +70347,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -83487,6 +83644,14 @@
      "giorni": 1,
      "dal": "2026-10-16"
     },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
     "nota": "l'entita' di riferimento e' Exxon Mobil Corp; il nome della societa' quotata nella pipeline e' ExxonMobil Holdings Corporation"
    },
    "beta_ndx": -0.48,
@@ -84050,7 +84215,7 @@
      71.81,
      71.36,
      69.91,
-     70.48,
+     70.49,
      73.77,
      73.44,
      80.18,
@@ -85481,6 +85646,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -87184,7 +87357,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -87476,6 +87649,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -89135,6 +89316,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -93795,7 +93984,7 @@
      322.37,
      340.11,
      336.06,
-     360.43,
+     360.42,
      358.86,
      369.78,
      383.01,
@@ -95005,6 +95194,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 0.13,
@@ -95319,7 +95516,7 @@
      171.99,
      163.61,
      170.13,
-     175.8,
+     175.79,
      179.02,
      189.57,
      173.43,
@@ -95378,7 +95575,7 @@
      261.2,
      272.27,
      270.87,
-     285.54,
+     285.55,
      310.99,
      311.94,
      337.36,
@@ -97056,7 +97253,7 @@
      344.76,
      305.88,
      342.21,
-     344.33,
+     344.34,
      369.93,
      349.13,
      353.5,
@@ -100740,7 +100937,7 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
      336.45,
      329.49,
@@ -101844,7 +102041,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -102126,6 +102323,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -104117,6 +104322,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -106113,6 +106326,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 0.02,
@@ -106466,7 +106687,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -106480,7 +106701,7 @@
      149.48,
      156.2,
      164.48,
-     166.55,
+     166.56,
      163.59,
      150.97,
      139.09,
@@ -106547,7 +106768,7 @@
      164.55,
      200.71,
      230.8,
-     237.33,
+     237.32,
      279.61,
      287.31,
      306.16,
@@ -107934,6 +108155,14 @@
     "var": {},
     "storia": {
      "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
      "dal": "2026-10-16"
     }
    },
@@ -109926,6 +110155,14 @@
     "storia": {
      "giorni": 1,
      "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 1,
+     "servono": 22,
+     "dal": "2026-10-16"
     }
    },
    "beta_ndx": 0.27,
@@ -110178,7 +110415,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -110196,7 +110433,7 @@
      99.51,
      97.2,
      108.68,
-     129.7,
+     129.69,
      124.73,
      136.32,
      138.59,
@@ -122885,6 +123122,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "‘Some people did everything right’: I lost my home in the Great Recession. I rent in my 50s. Why is that judged as failure?",
+     "riassunto": "”I earn $110,000 a year.”",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-17T16:47:00Z",
+     "url": "https://www.marketwatch.com/story/i-earn-110-000-a-year-i-lost-my-home-in-the-great-recession-im-renting-in-my-50s-why-is-that-judged-as-failure-d1371d67?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "CoreWeave Woes Risk Shutting Down AI Junk Market: Credit Weekly",
      "riassunto": "Junk bond buyers are increasingly freezing out tech startups looking for financing, as CoreWeave Inc.’s pain raises bigger questions about how artificial intelligence companies will fund themselves.",
      "fonte": "Bloomberg",
@@ -122897,13 +123141,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-10-17T14:03:13Z",
      "url": "https://www.bloomberg.com/news/videos/2026-10-17/can-the-fed-fight-inflation-without-hurting-farmers-video"
-    },
-    {
-     "titolo": "‘Some people did everything right’: I lost my home in the Great Recession. I rent in my 50s. Why is that judged as failure?",
-     "riassunto": "”I earn $110,000 a year.”",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-17T13:00:00Z",
-     "url": "https://www.marketwatch.com/story/i-earn-110-000-a-year-i-lost-my-home-in-the-great-recession-im-renting-in-my-50s-why-is-that-judged-as-failure-d1371d67?mod=mw_rss_topstories"
     },
     {
      "titolo": "Meet the home buyers totally unfazed by 7% mortgage rates",
@@ -133562,6 +133799,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
+      "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-17T16:37:00Z",
+      "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
+     },
+     {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -133595,13 +133839,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-16T21:29:33Z",
       "url": "https://www.nasdaq.com/articles/stocks-are-mixed-rotation-out-chipmakers-and-ai-stocks"
-     },
-     {
-      "titolo": "Prediction: $1,000 Invested in Taiwan Semi (TSMC) Today Will Be Worth This Much by 2030.",
-      "riassunto": "Key PointsTSMC still has a wide moat against its smaller competitors.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T21:25:00Z",
-      "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semi-tsmc-today-will-be-worth-much-2030"
      }
     ],
     "BE": [
@@ -133782,6 +134019,20 @@
     ],
     "MU": [
      {
+      "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
+      "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-17T16:37:00Z",
+      "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
+     },
+     {
+      "titolo": "Billionaire David Tepper's Appaloosa Management Returned 32% Through the First Half of the Year. Here Are His Top 3 Stocks.",
+      "riassunto": "Key PointsTepper maintains a highly concentrated portfolio of stocks, with a big focus on the AI trend.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-17T16:35:00Z",
+      "url": "https://www.nasdaq.com/articles/billionaire-david-teppers-appaloosa-management-returned-32-through-first-half-year-here"
+     },
+     {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -133808,23 +134059,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-17T11:35:00Z",
       "url": "https://www.nasdaq.com/articles/think-its-too-late-buy-micron-heres-1-reason-why-theres-still-time"
-     },
-     {
-      "titolo": "Missed Out On Micron and Sandisk? Make Sure You Don't Miss Out On This Memory Stock.",
-      "riassunto": "Key PointsPenguin Solutions' memory segment more than doubled year over year, and six new customers suggest that the growth can continue.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T05:50:00Z",
-      "url": "https://www.nasdaq.com/articles/missed-out-micron-and-sandisk-make-sure-you-dont-miss-out-memory-stock"
-     },
-     {
-      "titolo": "Micron and Sandisk Have a History of Cyclicality. Is This Time Different?",
-      "riassunto": "Key PointsMicron and Sandisk are getting many of their large customers to sign long-term agreements locking in price floors for years.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T22:25:00Z",
-      "url": "https://www.nasdaq.com/articles/micron-and-sandisk-have-history-cyclicality-time-different"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
+      "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-17T16:37:00Z",
+      "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
+     },
      {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
@@ -133859,13 +134103,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-17T03:17:01Z",
       "url": "https://www.nasdaq.com/articles/tsmc-says-ai-chip-demand-still-far-above-what-it-can-supply-thats-why-id-buy-nvidia-stock"
-     },
-     {
-      "titolo": "1 Obvious Metric That Makes Nvidia a Top Stock to Buy Now",
-      "riassunto": "Key PointsNone of 2027's expected growth has been priced into Nvidia's stock.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T23:04:00Z",
-      "url": "https://www.nasdaq.com/articles/1-obvious-metric-makes-nvidia-top-stock-buy-now"
      }
     ],
     "PLTR": [
@@ -134022,13 +134259,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-17T16:37:14Z"
+   "letto_il": "2026-10-17T17:24:30Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
+     "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-17T16:37:00Z",
+     "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
+    },
     {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
@@ -134063,13 +134307,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-16T21:29:33Z",
      "url": "https://www.nasdaq.com/articles/stocks-are-mixed-rotation-out-chipmakers-and-ai-stocks"
-    },
-    {
-     "titolo": "Prediction: $1,000 Invested in Taiwan Semi (TSMC) Today Will Be Worth This Much by 2030.",
-     "riassunto": "Key PointsTSMC still has a wide moat against its smaller competitors.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T21:25:00Z",
-     "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semi-tsmc-today-will-be-worth-much-2030"
     }
    ],
    "BE": [
@@ -134250,6 +134487,20 @@
    ],
    "MU": [
     {
+     "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
+     "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-17T16:37:00Z",
+     "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
+    },
+    {
+     "titolo": "Billionaire David Tepper's Appaloosa Management Returned 32% Through the First Half of the Year. Here Are His Top 3 Stocks.",
+     "riassunto": "Key PointsTepper maintains a highly concentrated portfolio of stocks, with a big focus on the AI trend.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-17T16:35:00Z",
+     "url": "https://www.nasdaq.com/articles/billionaire-david-teppers-appaloosa-management-returned-32-through-first-half-year-here"
+    },
+    {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
@@ -134276,23 +134527,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-17T11:35:00Z",
      "url": "https://www.nasdaq.com/articles/think-its-too-late-buy-micron-heres-1-reason-why-theres-still-time"
-    },
-    {
-     "titolo": "Missed Out On Micron and Sandisk? Make Sure You Don't Miss Out On This Memory Stock.",
-     "riassunto": "Key PointsPenguin Solutions' memory segment more than doubled year over year, and six new customers suggest that the growth can continue.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T05:50:00Z",
-     "url": "https://www.nasdaq.com/articles/missed-out-micron-and-sandisk-make-sure-you-dont-miss-out-memory-stock"
-    },
-    {
-     "titolo": "Micron and Sandisk Have a History of Cyclicality. Is This Time Different?",
-     "riassunto": "Key PointsMicron and Sandisk are getting many of their large customers to sign long-term agreements locking in price floors for years.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T22:25:00Z",
-     "url": "https://www.nasdaq.com/articles/micron-and-sandisk-have-history-cyclicality-time-different"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
+     "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-17T16:37:00Z",
+     "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
+    },
     {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
@@ -134327,13 +134571,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-17T03:17:01Z",
      "url": "https://www.nasdaq.com/articles/tsmc-says-ai-chip-demand-still-far-above-what-it-can-supply-thats-why-id-buy-nvidia-stock"
-    },
-    {
-     "titolo": "1 Obvious Metric That Makes Nvidia a Top Stock to Buy Now",
-     "riassunto": "Key PointsNone of 2027's expected growth has been priced into Nvidia's stock.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T23:04:00Z",
-     "url": "https://www.nasdaq.com/articles/1-obvious-metric-makes-nvidia-top-stock-buy-now"
     }
    ],
    "PLTR": [
@@ -134490,18 +134727,13 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-17T16:37:14Z"
+  "letto_il": "2026-10-17T17:24:30Z"
  },
  "predictions": [
   {
    "question": "Will the Tesla Roadster's 0-60 time be less than 1 second?",
    "yes": 100,
    "link": "https://polymarket.com/event/will-the-tesla-roadsters-0-60-time-be-less-than-1-second"
-  },
-  {
-   "question": "Bitcoin Up or Down on October 17?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-17-2026"
   },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
@@ -201491,7 +201723,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 2 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -201559,6 +201791,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-17T16:37:14Z"
+  "generated_at": "2026-10-17T17:24:31Z"
  }
 }
