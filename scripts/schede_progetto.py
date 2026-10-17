@@ -364,7 +364,123 @@ def riga_trimestrale(r, sec):
     return ("calendario: " + " · ".join(pz)) if pz else "calendario: nessuna data nel progetto"
 
 
-def scheda(tk, ruolo, righe, sec):
+# ═══ v497 — CDS A 5 ANNI ═════════════════════════════════════════════════════════════════════
+# La pipeline legge da ICE Clear Credit i prezzi di fine giornata dei CDS a 5 anni e li converte in punti
+# base (update_data.aggiorna_cds). Qui si rendono e basta: una seconda conversione divergerebbe al primo
+# ritocco (v161). Il FATTO e' il prezzo; lo spread e' una conversione dichiarata.
+
+def _data_breve(d):
+    try:
+        return datetime.fromisoformat(str(d)[:10]).strftime("%d/%m")
+    except ValueError:
+        return str(d or "n.d.")
+
+
+def _pb(x):
+    """Punti base interi, col separatore delle migliaia: 1.139 pb, non 1139 (convenzione delle altre rese)."""
+    try:
+        return f"{round(float(x)):,}".replace(",", ".")
+    except (TypeError, ValueError):
+        return "n.d."
+
+
+def _var_cds(var):
+    """Le variazioni per data (5, 21, 63 giorni raccolti) con la base accanto; un buco si dichiara."""
+    pz = []
+    for n in ("5", "21", "63"):
+        v = (var or {}).get(n)
+        if not v:
+            continue
+        if v.get("pb") is None:
+            pz.append(f"{n} giorni n.d. ({v.get('nota') or 'il ' + _data_breve(v.get('da')) + ' non era quotato'})")
+        else:
+            pz.append(f"{n} giorni {'+' if v['pb'] > 0 else ''}{_pb(v['pb'])} pb (dal {_data_breve(v['da'])})")
+    return pz
+
+
+def _punti_cds(p):
+    try:
+        p = float(p)
+    except (TypeError, ValueError):
+        return "punti n.d."
+    if abs(p) < 0.005:
+        return "alla pari"
+    return f"{_n(abs(p), 2)} punti {'pagati' if p > 0 else 'ricevuti'} in anticipo"
+
+
+def riferimento_cds(macro):
+    """L'intestazione dei CDS, una volta per blocco (v407): fonte, giorno, cosa e' fatto e cosa e' conversione,
+    gli indici e lo storico raccolto. Senza il blocco nel run lo dice: 'nessun CDS' e 'il dato manca' si
+    leggono uguali e sono cose diverse (v406)."""
+    c = (macro or {}).get("cds")
+    if not c:
+        return ("CDS a 5 anni: il run della pipeline non li porta — non e' 'nessun CDS', e' il dato che manca")
+    pz = [f"CDS a 5 anni (richiesta del CEO del 17/10/2026: monitorare i CDS di posizioni e sorvegliati) — {c.get('fonte')}, "
+          f"giorno di compensazione {_data_breve(c.get('data'))}"]
+    if not c.get("letto"):
+        pz.append(f"⚠ ICE NON letto nell'ultimo run ({c.get('errore') or 'motivo n.d.'}): valgono i prezzi dell'ultimo "
+                  f"giorno raccolto, il {_data_breve(c.get('data'))}")
+    pz.append("il FATTO e' il prezzo (100 meno i punti pagati in anticipo sulla cedola fissa); i punti base sono una "
+              f"CONVERSIONE con la convenzione di mercato semplificata (recupero {_n((c.get('recupero') or 0) * 100, 0)}%, "
+              f"tasso piatto {_n(c.get('tasso_pct'), 2)}%: {c.get('tasso_fonte')}) — misurata sulle societa' quotate con "
+              "due cedole: stesso spread entro 3 pb di mediana; oltre "
+              f"{_n(c.get('punti_max'), 0)} punti anticipati lo spread dipende dal recupero assunto e vale il prezzo")
+    ri = []
+    for fam, nome in (("IG", "CDX investment grade"), ("HY", "CDX high yield")):
+        v = (c.get("indici") or {}).get(fam)
+        if v:
+            ri.append(" ".join([f"{nome} serie {v.get('serie')} {_pb(v.get('pb'))} pb"] + _var_cds(v.get("var"))))
+    if ri:
+        pz.append("indici: " + " · ".join(ri))
+    st = c.get("storia") or {}
+    g = st.get("giorni") or 0
+    pz.append(f"storico raccolto dalla pipeline dal {_data_breve(st.get('dal'))}: {g} {'giorno' if g == 1 else 'giorni'} "
+              "— ICE non pubblica lo storico gratis, e le variazioni compaiono quando i giorni raccolti bastano")
+    if c.get("non_classificati"):
+        pz.append(f"⚠ NON CLASSIFICATI in config/cds_entita.json: {', '.join(c['non_classificati'])} — vanno abbinati a mano")
+    return " · ".join(pz)
+
+
+def riga_cds(r, meta=None):
+    """Il CDS a 5 anni del nome, nei quattro stati che la pipeline distingue (v406)."""
+    c = (r or {}).get("cds")
+    if not c:
+        return "CDS 5 anni: n.d. — il run della pipeline non porta i CDS su questo nome"
+    st = c.get("stato")
+    if st == "assente":
+        s = (f"CDS 5 anni: NESSUN CDS compensato a ICE su questo nome (elenco ICE controllato il {_data_breve(c.get('verificato'))}) — "
+             "il mercato non lo quota in forma pubblica; restano i fatti di bilancio (cassa, oneri)")
+        if c.get("candidati"):
+            s += f" · ⚠ ICE compensa ora {', '.join(c['candidati'])}: stesso primo nome, abbinamento non ancora deciso"
+        return s
+    if st == "non quotato oggi":
+        return (f"CDS 5 anni: abbinato a ICE ({c.get('codice')}) ma assente dalla pubblicazione del giorno — non e' uno "
+                "spread a zero, e' il dato che manca")
+    if st != "quotato":
+        return "CDS 5 anni: NON CLASSIFICATO — il nome non e' in config/cds_entita.json, va abbinato a mano"
+    pz = [f"CDS 5 anni {_pb(c['pb'])} pb" if c.get("pb") is not None
+          else "CDS 5 anni: spread n.d. (nel run mancava il tasso; resta il prezzo)"]
+    pz.append(f"prezzo {_n(c.get('prezzo'), 2)} su cedola {c.get('cedola_pb')} ({_punti_cds(c.get('punti'))}), "
+              f"{c.get('entita')} [{c.get('contratto')}], {_data_breve(c.get('data'))}")
+    if c.get("indicativo"):
+        pz.append(f"⚠ oltre {_n((meta or {}).get('punti_max'), 0)} punti anticipati lo spread dipende dal recupero "
+                  "assunto: vale il prezzo")
+    # la cedola dice in che fascia il mercato tratta il nome: 100 pb come investment grade, 500 pb come high yield
+    fam = {100: "IG", 500: "HY"}.get(c.get("cedola_pb"))
+    ind = ((meta or {}).get("indici") or {}).get(fam) if fam else None
+    if ind and ind.get("pb") and c.get("pb") is not None:
+        pz.append(f"{_n(c['pb'] / ind['pb'], 1)} volte l'indice CDX {fam} della stessa cedola ({_pb(ind['pb'])} pb)")
+    pz.extend(_var_cds(c.get("var")))
+    sto = c.get("storia") or {}
+    if sto.get("min_pb") is not None:
+        pz.append(f"nello storico raccolto ({sto.get('giorni')} giorni) minimo {_pb(sto['min_pb'])} pb il "
+                  f"{_data_breve(sto.get('min_data'))}, massimo {_pb(sto['max_pb'])} pb il {_data_breve(sto.get('max_data'))}")
+    if c.get("nota"):
+        pz.append(c["nota"])
+    return " · ".join(pz)
+
+
+def scheda(tk, ruolo, righe, sec, meta_cds=None):
     r = righe.get(tk)
     if r is None:
         return [f"{tk} [{ruolo}] — NON E' NELLA PIPELINE: nessun dato del progetto su questo nome "
@@ -383,6 +499,7 @@ def scheda(tk, ruolo, righe, sec):
         x = f(r)
         if x:
             out.append("  " + x)
+    out.append("  " + riga_cds(r, meta_cds))       # v497 — il credito prezzato dal mercato, nome per nome
     return out
 
 
@@ -399,6 +516,12 @@ def genera(dati, pos, sorv, filtro=None):
             out.append(f"Dati del progetto: run della pipeline {agg}.")
     out.append("Opzioni: non qui — le guardie di plausibilita' vivono nel pacchetto titolo della dashboard.")
     out.append(riferimento_valutazione(dati.get("macro")))      # v492 — una volta per blocco (v407)
+    meta_cds = (dati.get("macro") or {}).get("cds")
+    out.append(riferimento_cds(dati.get("macro")))              # v497 — una volta per blocco (v407)
+    # il BTP non ha una scheda (e' in euro): il suo CDS e' quello sovrano, e sta qui
+    for b in (dati.get("portfolio") or []):
+        if isinstance(b, dict) and b.get("cds"):
+            out.append(f"{b.get('ticker')} [POSIZIONE, titolo di Stato] — " + riga_cds(b, meta_cds))
     mancanti = []
     for gruppo, ruolo in ((pos, "POSIZIONE"), (sorv, "SORVEGLIATO")):
         for tk in gruppo:
@@ -407,7 +530,7 @@ def genera(dati, pos, sorv, filtro=None):
             if tk not in righe:
                 mancanti.append(tk)
             out.append("")
-            out.extend(scheda(tk, ruolo, righe, sec))
+            out.extend(scheda(tk, ruolo, righe, sec, meta_cds))
     if mancanti:
         out.append("")
         out.append(f"⚠ {len(mancanti)} {'nome' if len(mancanti) == 1 else 'nomi'} senza dati del progetto: {', '.join(mancanti)}")

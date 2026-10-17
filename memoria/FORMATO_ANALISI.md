@@ -46,6 +46,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    **valutazione**: P/E degli ultimi 12 mesi e prospettico con l'utile per azione, la perdita detta
    come perdita (nessun P/E, e prezzo/ricavi al suo posto), i due utili attesi quando differiscono,
    il PEG con la sua riserva; il riferimento dell'S&P 500 una volta in testa, con fonte e data.
+   Da v497 (CEO, 17/10: *"Monitora anche per le azioni in portafoglio e quelle in watchlist l'andamento dei
+   Credit default swap"*) la riga **CDS 5 anni** di ogni nome: lo spread a 5 anni dal prezzo di fine giornata che
+   ICE Clear Credit pubblica gratis, la variazione a 5, 21 e 63 giorni quando lo storico raccolto li copre, il
+   multiplo dell'indice CDX della stessa cedola; «nessun CDS compensato» per chi il mercato non quota; in testa gli
+   indici CDX e la Repubblica Italiana per il BTP. Il FATTO è il prezzo, i punti base sono una conversione.
    Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
    misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
    NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
@@ -156,6 +161,13 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    intera ne copre circa 78 (stesso denominatore: i due numeri si confrontano).
    Soglie macro decise prima (spread credito alto rendimento 3,5;
    Treasury 10 anni 5,0 / 5,4), trimestrali, Fed e aste del Tesoro nei prossimi giorni.
+   **I CDS a 5 anni** (v497, schede): per ogni nome quotato il livello in punti base, il verso (5, 21 e 63 giorni,
+   appena lo storico raccolto li copre) e quante volte vale l'indice CDX della sua cedola; un allargamento si dice
+   ACCANTO alle notizie e al bilancio del nome, perché il CDS è il prezzo che il mercato chiede per assicurarsi
+   contro un default che il bilancio da solo non quota. È INFORMAZIONE: non è una prova della tenuta né un colore
+   del semaforo — se il CEO vorrà farne un segnale, lo deciderà lui. Lo storico gratuito non esiste (ICE pubblica
+   solo l'ultimo giorno): lo raccoglie la pipeline dal 16/10/2026, e finché i giorni non bastano la variazione si
+   cerca in rete, con fonte e data.
 5bis. **Posizionamento** (v496, CEO, 17/10) — dal blocco di `posizionamento.py`: il put/call di mercato col
    suo percentile (alto = domanda di protezione: convenzione del mestiere, non una misura); le scadenze delle opzioni
    — una mensile o una trimestrale («tre streghe») entro cinque giorni si dice in cima alla sezione, perché alla
@@ -292,7 +304,8 @@ e su ogni posizione, e le ultimissime notizie dei nomi con un ingresso possibile
 struttura «solo informazione», non una prova nella tenuta (decisione del CEO dello stesso giorno) · la variazione
 annua della leva dal file storico FINRA, col suo percentile; put e call di mercato e di ogni posizione, le scadenze
 delle opzioni (mensile e «tre streghe»), le posizioni dei grandi operatori (CFTC) e il bitcoin dall'ultima chiusura
-USA su MSTR — informazione, non prove (17/10).
+USA su MSTR — informazione, non prove (17/10) · i CDS a 5 anni di posizioni e sorvegliati, con gli indici CDX e
+l'Italia per il BTP — informazione, non prove (17/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

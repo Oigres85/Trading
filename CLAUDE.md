@@ -7478,3 +7478,70 @@ dell'ultima seduta USA conclusa, il livello delle 17:00 (future CME), e su MSTR 
 
 **È tutto INFORMAZIONE** (FORMATO 5bis): nessuna di queste misure è una prova della tenuta, un colore del semaforo o
 una vendita. Se il CEO vorrà farne un segnale, lo deciderà lui.
+
+## 📉 v497 — I CDS A 5 ANNI SONO GRATIS DA ICE, E LA v367 LI DICHIARAVA A PAGAMENTO
+
+Richiesta del CEO (17/10/2026), testuale: *"Se non lo hai fatto, Monitora anche per le azioni in portafoglio e quelle
+in watchlist l'andamento dei Credit default swap"*. Non l'avevo fatto, e la ragione scritta era la v367: *"i CDS
+single-name sono Markit/ICE, a pagamento"*. **Rimisurato invece che ricordato:**
+
+| fonte | esito il 17/10/2026 |
+|---|---|
+| ICE Clear Credit, prezzi di fine giornata (`www.ice.com/api/cds-settlement-prices/icc-single-names` e `icc-indexes`) | ✅ **gratis per dichiarazione di ICE**: 690 entita' compensate, 5 anni, l'ultimo giorno |
+| DTCC, diffusione pubblica SEC dei CDS su singolo nome | ❌ 403 (Akamai) dall'ambiente di sviluppo |
+| DTCC, attivita' trimestrale per entita' | ✅ ma sono VOLUMI, non prezzi, ed e' ferma al 2° trimestre |
+| storico dei prezzi, insieme completo Markit | ❌ a licenza |
+
+> ⚠⚠ **La v367 aveva ragione su cosa costa (lo storico, l'insieme completo) e torto su cosa no (il 5 anni del
+> giorno).** E la frase stava nel pacchetto come un fatto: *"lo spread CDS su singolo nome e' un dato a pagamento e
+> non e' in questo sistema"*. Una conclusione "non disponibile" si rimisura quando la domanda torna: le fonti
+> cambiano, e la memoria di una misura non e' una misura.
+
+Copertura: 4 posizioni (AMD, NVDA, CRWV, SK hynix), 22 sorvegliati, la Repubblica Italiana per il BTP, gli indici
+CDX IG e HY. Senza CDS compensato: MU, PLTR, MRVL, RGTI, BE, MSTR, SMCI e gli altri sorvegliati — **dichiarati nome
+per nome**, perche' "nessun CDS" e "il dato manca" si leggono uguali (v406).
+
+### Il fatto e' il prezzo; lo spread e' una conversione, e il suo tasso e' stato MISURATO
+ICE pubblica il prezzo: 100 meno i punti pagati in anticipo su una cedola fissa (100 o 500 pb). I punti base escono da
+una conversione ISDA semplificata (recupero 40%, intensita' di default costante, tasso piatto), dichiarata ovunque.
+⚠⚠ **La prova non circolare**: ICE quota molte societa' con DUE cedole, e la stessa societa' deve uscire allo stesso
+spread. Col Treasury a 5 anni (4,91%) — la mia prima scelta — lo scarto mediano fra le due cedole era 6,9 pb sui 150
+contratti in dollari; con l'EFFR (3,88%), proxy della curva SOFR su cui sconta la convenzione, 2,7 pb (Tesla 0,8). Un
+tasso sbagliato da' due spread per una societa', ed e' il gate.
+⚠ Controllo esterno: Oracle 297 pb il 16/10 contro 288 riportati da S&P/LSEG il 15/10; CoreWeave 1.121 pb contro
+1.038–1.194 citati il 15/10 da CNBC e Bloomberg.
+⚠ Oltre 30 punti anticipati (nomi in dissesto) lo spread dipende dal recupero assunto — scarti fino a 350 pb fra cedole
+— e li' vale il prezzo: la riga lo dice.
+
+### Lo storico gratis non esiste: lo raccoglie la pipeline
+ICE pubblica solo l'ultimo giorno. `data/cds_storia.jsonl`: una riga per giorno di compensazione, col contratto standard
+di TUTTE le entita' in dollari (~430, 10 KB al giorno), cosi' un nome aggiunto domani alla watchlist trova lo storico
+gia' raccolto. Sta nella pipeline (14-15 run al giorno) e non in uno strumento di sessione perche' **un giorno non letto
+e' perso per sempre**. Le variazioni (5, 21, 63 giorni) si misurano per DATA, con la base accanto; un giorno senza il
+nome e' un buco (v205); a cavallo del cambio di serie di un indice CDX non esistono.
+
+### L'abbinamento e' SCRITTO, perche' indovinarlo dava Super Micro → SUPERVALU
+`config/cds_entita.json`: ticker → codice ICE, o null, con la data della verifica. L'abbinamento per nome, provato
+prima di scriverlo, dava Super Micro → SUPERVALU, BlackRock → Black & Decker, Cloudflare → Cloud Software Group, Eli
+Lilly → «Eli» (classe v399, v448). Un gate lo confronta con `config/ui_watchlist.json` nei DUE versi (v480): un nome
+nuovo va classificato. E un'assenza dichiarata non invecchia in silenzio: se ICE comincia a compensare un nome con lo
+stesso PRIMO nome esatto (almeno 4 lettere), la riga lo segnala senza abbinarlo.
+
+### Quattro stati, ciascuno detto (v406), e la sorveglianza dal primo giorno (v390)
+quotato · nessun CDS compensato · abbinato ma assente dal giorno · non classificato. Se ICE non risponde vale l'ultimo
+giorno raccolto, dichiarato con l'errore; `validate_macro` misura l'eta' (`cds_ice`) e i titoli da classificare
+(`cds_abbinamenti`). Dove esce: schede dell'analisi (posizioni e sorvegliati, con gli indici e l'Italia in testa),
+pagina (colonna nella tabella del credito), pacchetto del titolo e macro. **E' informazione**: non e' una prova della
+tenuta ne' un colore del semaforo — se il CEO vorra' farne un segnale, lo decidera' lui.
+
+### 🧪 Il metodo
+- ⚠ **C9 ha preso un mio omografo**: «verifica del 17/10» (sostantivo) si legge come l'imperativo. Riformulato invece di
+  allentare il detector (v414, v418, v430).
+- ⚠ **Il coherence_check non poteva vedere le righe nuove** — il campo arriva col prossimo run della pipeline, la classe
+  v404 — quindi e' stato eseguito su un `data.json` con i CDS, poi ripristinato e verificato per impronta.
+- **27 iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**, ciascuna sul
+  controllo atteso — fra queste il rateo tolto dalla conversione (lo prende solo la coerenza fra cedole), il tasso del
+  Treasury al posto dell'EFFR, la variazione per posizione invece che per data, BlackRock abbinato per prefisso, il ripiego
+  spento quando ICE non risponde, la frase della v367 rimessa nel pacchetto.
+- Pavimenti: `test_app.mjs` 600 → 605, `test_update_data.py` 240 → 255 (N_CHECKS_MINIMO 250 → 270),
+  `test_analisi_libro.py` 575 → 585. `?v=` e `BUILD_VERSION` a 497: cambia `assets/app.js`.

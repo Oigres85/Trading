@@ -83,5 +83,9 @@ Non per leggere l'analisi: per **scrivere le posizioni**. È l'unico punto in cu
 ## Le fonti, tutte gratuite e verificate
 
 yfinance (prezzi, bilanci, conto economico, consenso) · FRED (macro, richiede chiave su CI) ·
-FINRA (ATS/dark pool e volume short, senza autenticazione) · SEC EDGAR (filing, senza chiave).
-**Non ottenibili gratis**: CDS su singolo nome (Markit/ICE), TRACE (401 senza credenziali).
+FINRA (ATS/dark pool e volume short, senza autenticazione) · SEC EDGAR (filing, senza chiave) ·
+ICE Clear Credit (dal 17/10/2026, v497: prezzi di fine giornata dei CDS a 5 anni compensati, su singolo nome
+e sugli indici CDX, senza autenticazione).
+**Non ottenibili gratis**: lo STORICO dei CDS e l'insieme completo dei prezzi Markit (a licenza: la pipeline
+raccoglie lo storico da sé, un giorno alla volta), la diffusione pubblica SEC dei CDS su DTCC (403 dall'ambiente
+di sviluppo), TRACE (401 senza credenziali).

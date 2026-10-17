@@ -10319,6 +10319,85 @@ check("v478 nessun target della Fed scritto a mano nel codice, e il tasso di ogg
   return /current_rate\}%/.test(codice) ? no("qualcuno stampa ancora current_rate grezzo") : true;
 })());
 
+/* ═══ v497 — I CDS A 5 ANNI NEL PACCHETTO E NELLA PAGINA ═══════════════════════════════════
+   La pipeline legge i prezzi che ICE Clear Credit pubblica gratis e li converte; app.js li rende e
+   basta. Lo stato si COSTRUISCE (v425): oggi i dati non hanno ancora il blocco, domani si'. E la
+   frase della v367 ("il CDS e' a pagamento e non e' in questo sistema") era diventata falsa. */
+check("v497 pacchetto del titolo: la riga CDS A 5 ANNI col fatto, la conversione e il multiplo dell'indice; il CREDITO resta 'NON e' un CDS' e non dice piu' che il CDS e' a pagamento",
+  suVeriEsito(`
+    const r = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+    r.credito = { oneri_ttm: 1.5e9, ebit_ttm: -1.01e8, trimestri: 4, conto_al: "2026-03-31", copertura: -0.07 };
+    DATA.macro.cds = { fonte: "ICE", letto: true, data: "2026-10-16", tasso_pct: 3.88, recupero: 0.4, punti_max: 30,
+      storia: { giorni: 1, dal: "2026-10-16" }, indici: { IG: { serie: 47, pb: 62 }, HY: { serie: 47, pb: 354 } } };
+    r.cds = { stato: "quotato", codice: "COREWEI", entita: "COREWEAVE INC", contratto: "SNRFOR.USD.XR14", cedola_pb: 500,
+      prezzo: 80.9439, punti: 19.06, pb: 1139.1, indicativo: false, data: "2026-10-16", var: {}, storia: { giorni: 1 } };
+    const righe = buildPromptTicker(r.ticker).split(String.fromCharCode(10));
+    const riga = righe.find(l => l.indexOf("- CDS A 5 ANNI [ICE Clear Credit") === 0) || "";
+    if (!riga) return "manca la riga CDS A 5 ANNI";
+    for (const p of ["1139 pb", "prezzo 80,94 su cedola 500", "19,06 punti pagati in anticipo", "3,2 volte l'indice CDX HY", "recupero 40%", "tasso piatto 3,88%"])
+      if (riga.indexOf(p) < 0) return "nella riga manca: " + p + " — " + riga.slice(0, 200);
+    const cred = righe.find(l => l.indexOf("- CREDITO") === 0) || "";
+    if (!cred) return "manca la riga del credito";
+    if (cred.indexOf("NON e' un CDS") < 0) return "il credito non dichiara piu' di non essere un CDS";
+    return cred.indexOf("a pagamento") < 0 || "il credito dice ancora che il CDS e' a pagamento";`));
+
+check("v497 pacchetto del titolo: senza CDS compensato lo dice; senza il blocco nella pipeline non inventa una riga",
+  suVeriEsito(`
+    const r = DATA.watchlist.find(x => x.ticker === "MU") || DATA.watchlist[0];
+    DATA.macro.cds = { letto: true, data: "2026-10-16", tasso_pct: 3.88, recupero: 0.4, indici: {} };
+    r.cds = { stato: "assente", verificato: "2026-10-17" };
+    const riga = buildPromptTicker(r.ticker).split(String.fromCharCode(10)).find(l => l.indexOf("- CDS A 5 ANNI") === 0) || "";
+    if (riga.indexOf("nessun CDS compensato a ICE su questo nome") < 0) return "l'assenza non e' dichiarata: " + riga.slice(0, 160);
+    delete r.cds; delete DATA.macro.cds;
+    return buildPromptTicker(r.ticker).indexOf("- CDS A 5 ANNI") < 0 || "senza dati della pipeline compare comunque una riga CDS";`));
+
+check("v497 pacchetto macro: gli indici CDX, le posizioni quotate con la variazione, quelle senza CDS e la Repubblica Italiana per il BTP",
+  suVeriEsito(`
+    const pos = DATA.watchlist.filter(x => x && x.qta > 0);
+    if (pos.length < 2) return "servono due posizioni";
+    DATA.watchlist.forEach(x => { delete x.cds; });
+    pos[0].cds = { stato: "quotato", pb: 97.0, var: { "5": { da: "2026-10-09", pb: 4.2 } } };
+    pos[1].cds = { stato: "assente" };
+    const btp = (DATA.portfolio || [])[0];
+    if (btp) btp.cds = { stato: "quotato", pb: 62.8 };
+    DATA.macro.cds = { letto: true, data: "2026-10-16", tasso_pct: 3.88, recupero: 0.4, storia: { giorni: 1, dal: "2026-10-16" },
+      indici: { IG: { serie: 47, pb: 62 }, HY: { serie: 47, pb: 354 } } };
+    const riga = buildPrompt().split(String.fromCharCode(10)).find(l => l.indexOf("- CDS a 5 anni [ICE Clear Credit") === 0) || "";
+    if (!riga) return "manca la riga dei CDS nel macro";
+    const att = ["CDX investment grade serie 47 62 pb", "CDX high yield serie 47 354 pb", pos[0].ticker + " 97 pb (+4 in 5 giorni)",
+      "senza CDS compensato a ICE: " + pos[1].ticker, "(1 giorno)"];
+    if (btp) att.push("Repubblica Italiana (emittente del BTP) 63 pb");
+    for (const p of att) if (riga.indexOf(p) < 0) return "nella riga manca: " + p + " — " + riga.slice(0, 240);
+    return true;`));
+
+check("v497 pagina: la tabella del credito ha la colonna dei CDS, coi punti base per chi e' quotato e 'nessun CDS' per chi no, e la nota lo spiega",
+  suVeriEsito(`
+    const pos = (DATA.watchlist || []).filter(r => r && r.qta > 0 && numero(r.controvalore) > 0);
+    if (pos.length < 2) return "servono due posizioni";
+    const a = pos[0], b = pos[1];
+    a.credito = { copertura: 2.5, oneri_ttm: 0.4e9, debito_corrente: 2e9 };
+    b.credito = { copertura: 3, oneri_ttm: 0.1e9, debito_corrente: 0.5e9 };
+    a.cds = { stato: "quotato", pb: 1139.1, var: {} };
+    b.cds = { stato: "assente" };
+    const presi = {};
+    const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "" });
+    const q = document.querySelector;
+    document.querySelector = (s) => finto(s);
+    try { renderCredito(); } finally { document.querySelector = q; }
+    const t = finto("#credito-tabella").innerHTML, n = finto("#credito-note").innerHTML;
+    if (t.indexOf("CDS a 5 anni") < 0) return "manca la colonna";
+    if (t.indexOf("1139 pb") < 0) return "il quotato non porta i punti base";
+    if (t.indexOf("nessun CDS") < 0) return "l'assente non e' dichiarato";
+    if (n.indexOf("a pagamento") >= 0) return "la nota dice ancora che il CDS e' a pagamento";
+    return n.indexOf("nessun CDS") >= 0 || "la nota non spiega cosa vuol dire nessun CDS";`));
+
+check("v497 nel codice nessuna frase dice piu' che il CDS e' un dato a pagamento, e la riga del nome si scrive in un posto solo", (() => {
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if (codice.indexOf("dato a pagamento") >= 0) return no("una frase dice ancora che il CDS e' un dato a pagamento");
+  if ((codice.match(/^function rigaCds\(/gm) || []).length !== 1) return no("rigaCds non e' definita una volta");
+  return (codice.match(/rigaCds\(/g) || []).length >= 2 || no("rigaCds non e' usata dal pacchetto del titolo");
+})());
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

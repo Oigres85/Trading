@@ -148,10 +148,10 @@ const SUITE = [
      legittima. Si alzano quando la suite cresce, mai si abbassano per far passare qualcosa. */
   /* v476: 608 punti di chiamata in test_app (+7), 210 in test_update_data (+8): pavimenti su */
   /* v496: 620 punti di chiamata in test_app (+3 sulla variazione annua della leva col percentile) -> 600 */
-  { file: "test_app.mjs",        cmd: "node",    minimo: 600, firma: /\d+\/\d+ check superati/ },
+  { file: "test_app.mjs",        cmd: "node",    minimo: 605, firma: /\d+\/\d+ check superati/ },
   /* v492: 236 punti di chiamata in test_update_data (+5 sulla fine del veicolo di quotazione, dal registro SEC) -> 225 */
   /* v496: 250 punti di chiamata (+14 sul file storico FINRA: variazione annua per data, percentile, i due canali) -> 240 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 240, firma: /CHECK OK|CHECK FALLITI/ },
+  { file: "test_update_data.py", cmd: "python3", minimo: 255, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -162,7 +162,7 @@ const SUITE = [
   /* v491: 496 punti di chiamata (+12 sull'ultima verifica degli ordini e le barre a 5 minuti) -> 480 */
   /* v492: 526 punti di chiamata (+30 su lettura a 5 anni, veicolo di quotazione, P/E e stop degli ordini) -> 510 */
   /* v496: 592 punti di chiamata (+33 su put/call, scadenze, CFTC, bitcoin e la leva annua nel semaforo) -> 575 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 575, firma: /\d+\/\d+ CHECK OK/ },
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 585, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

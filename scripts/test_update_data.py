@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 250  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263 (sale, mai scende)
+N_CHECKS_MINIMO = 270  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1877,6 +1877,194 @@ _corpo496 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("def _finra_storico("):]
 _corpo496 = _corpo496[:_corpo496.find("\ndef ", 10)]
 check("v496 il file storico usa lo stesso UA della tabella (FINRA_UA): un UA da browser con Accept prende 403 dall'Akamai",
       _corpo496.count("headers=FINRA_UA") == 2 and '"Accept"' not in _corpo496)
+
+
+# ======================== v497 — CDS A 5 ANNI DA ICE CLEAR CREDIT ========================
+# La conversione prezzo → spread si prova sulla PROPRIETA' che una formula o un tasso sbagliati non
+# soddisfano per caso (v326): la stessa societa' quotata con due cedole diverse deve uscire allo stesso
+# spread. I prezzi sono quelli VERI pubblicati da ICE il 16/10/2026: non una fixture costruita dal
+# modello stesso, che sarebbe circolare.
+from datetime import datetime as _dt497, timedelta as _td497
+import json as _json497
+import tempfile as _tmp497
+_t0_497, _m497 = _dt497(2026, 10, 16).date(), _dt497(2031, 12, 20).date()
+_veri497 = {"TESLINC": (96.2354, 113.7985), "AMD": (99.7893, 117.8253), "NFLX": (102.0701, 120.3902),
+            "CONSENAG": (100.9804, 119.1786)}
+_scarti497 = {k: abs(ud.spread_cds(a, 100, _t0_497, _m497, 0.0388) - ud.spread_cds(b, 500, _t0_497, _m497, 0.0388))
+              for k, (a, b) in _veri497.items()}
+check("v497 la stessa societa' con due cedole esce allo stesso spread (prezzi veri ICE del 16/10, entro 5 pb): "
+      "se modello o tasso fossero sbagliati, le due cedole darebbero due spread " + str({k: round(v, 1) for k, v in _scarti497.items()}),
+      all(v <= 5 for v in _scarti497.values()))
+check("v497 a prezzo 100 lo spread E' la cedola (cedola 100 e 500): il prezzo pubblicato e' pulito",
+      abs(ud.spread_cds(100, 100, _t0_497, _m497, 0.0388) - 100) < 0.01
+      and abs(ud.spread_cds(100, 500, _t0_497, _m497, 0.0388) - 500) < 0.01)
+_mono497 = [ud.spread_cds(p, 100, _t0_497, _m497, 0.0388) for p in (104, 102, 100, 97, 92, 85)]
+check("v497 piu' basso il prezzo, piu' alto lo spread (monotono): " + str([round(x) for x in _mono497]),
+      all(a < b for a, b in zip(_mono497, _mono497[1:])))
+check("v497 fuori dal dominio del modello lo spread e' None, non un numero: un prezzo che nessuna intensita' di default "
+      "riproduce, un tasso mancante, una scadenza passata",
+      ud.spread_cds(20, 500, _t0_497, _m497, 0.0388) is None and ud.spread_cds(99, 100, _t0_497, _m497, None) is None
+      and ud.spread_cds(99, 100, _t0_497, _t0_497, 0.0388) is None and ud.spread_cds("x", 100, _t0_497, _m497, 0.0388) is None)
+
+# --- il contratto standard: una scelta dichiarata, verificata sui casi che la distinguono
+def _c497(cod, liv, val, cl, ced, pz):
+    return {"codice": cod, "livello": liv, "valuta": val, "clausola": cl, "cedola": ced, "prezzo": pz, "scadenza": _m497}
+_sc497 = ud.contratto_standard([_c497("X", "SNRFOR", "USD", "CR14", 100, 99.0), _c497("X", "SNRFOR", "USD", "XR14", 100, 98.0),
+                                _c497("X", "SNRFOR", "EUR", "MM14", 100, 100.0), _c497("X", "SUBLT2", "USD", "XR14", 100, 100.0)])
+_it497 = ud.contratto_standard([_c497("I", "SNRFOR", "USD", "CR", 100, 103.18), _c497("I", "SNRFOR", "USD", "CR", 25, 99.72),
+                                _c497("I", "SNRFOR", "USD", "CR14", 100, 101.67), _c497("I", "SNRFOR", "USD", "CR14", 25, 98.25)])
+_te497 = ud.contratto_standard([_c497("T", "SNRFOR", "USD", "XR14", 100, 96.2354), _c497("T", "SNRFOR", "USD", "XR14", 500, 113.7985)])
+check("v497 contratto standard: senior in dollari, XR14 prima di CR14, definizioni 2014 prima delle 2003, e la cedola "
+      "col prezzo piu' vicino a 100 — mai l'euro, mai il subordinato",
+      _sc497["clausola"] == "XR14" and _sc497["valuta"] == "USD" and _sc497["livello"] == "SNRFOR"
+      and _it497["clausola"] == "CR14" and _it497["cedola"] == 100 and _te497["cedola"] == 100
+      and ud.contratto_standard([_c497("E", "SNRFOR", "EUR", "MM14", 100, 100.0)]) is None)
+_s497 = ud._cds_strumento("ORCLE.SNRFOR.USD.XR14.100.2031-12-20")
+check("v497 il nome dello strumento si legge dalla FORMA: codice, livello, valuta, clausola, cedola, scadenza; una forma "
+      "diversa e' None, non un contratto inventato",
+      _s497 == {"codice": "ORCLE", "livello": "SNRFOR", "valuta": "USD", "clausola": "XR14", "cedola": 100, "scadenza": _m497}
+      and ud._cds_strumento("CDX-NAIGS47V1-5Y") is None and ud._cds_strumento("A.B.C.D.cento.2031-12-20") is None)
+
+# --- la lettura di ICE con una get finta: un giorno solo, gli indici in corso dalla forma del nome
+class _R497:
+    def __init__(self, dati):
+        self._d = dati
+    def json(self):
+        return self._d
+_nomi497 = [
+    {"clearingDate": "2026-10-16", "eodPrice": "91.7580", "instrumentName": "ORCLE.SNRFOR.USD.XR14.100.2031-12-20", "name": "Oracle Cop"},
+    {"clearingDate": "2026-10-16", "eodPrice": "80.9439", "instrumentName": "COREWEI.SNRFOR.USD.XR14.500.2031-12-20", "name": "COREWEAVE INC"},
+    {"clearingDate": "2026-10-16", "eodPrice": "101.6710", "instrumentName": "ITALY.SNRFOR.USD.CR14.100.2031-12-20", "name": "Rep Italy"},
+    {"clearingDate": "2026-10-16", "eodPrice": "99.1000", "instrumentName": "MICRONT.SNRFOR.USD.XR14.100.2031-12-20", "name": "Micron Technology Inc"},
+    {"clearingDate": "2026-10-16", "eodPrice": "98.0000", "instrumentName": "BDK.SNRFOR.USD.XR14.100.2031-12-20", "name": "Black & Decker Corp"},
+    {"clearingDate": "2026-10-15", "eodPrice": "50.0000", "instrumentName": "VECCHIO.SNRFOR.USD.XR14.100.2031-12-20", "name": "Giorno prima"},
+]
+_idx497 = [
+    {"clearingDate": "2026-10-16", "eodPrice": "101.6004", "instrumentName": "CDX-NAIGS46V1-5Y"},
+    {"clearingDate": "2026-10-16", "eodPrice": "101.7081", "instrumentName": "CDX-NAIGS47V1-5Y"},
+    {"clearingDate": "2026-10-16", "eodPrice": "101.7335", "instrumentName": "CDX-NAIGS47V1-3Y"},
+    {"clearingDate": "2026-10-16", "eodPrice": "105.8411", "instrumentName": "CDX-NAHYS47V1-5Y"},
+    {"clearingDate": "2026-10-16", "eodPrice": "105.0000", "instrumentName": "CDX-NAHYS46V3-5Y"},
+    {"clearingDate": "2026-10-16", "eodPrice": "99.0000", "instrumentName": "CDX-EMHYS46V1-5Y"},
+]
+_get497 = lambda u: _R497(_nomi497 if u == ud.ICE_CDS_NOMI else _idx497)
+_l497 = ud.leggi_cds_ice(_get497)
+check("v497 la lettura tiene UN giorno solo (il piu' recente): un contratto di un altro giorno non entra nella "
+      "fotografia, e si conta come scartato",
+      _l497["data"] == "2026-10-16" and "VECCHIO" not in _l497["entita"] and _l497["scartati"] == 1
+      and _l497["scadenza"] == _m497 and _l497["entita"]["ORCLE"]["nome"] == "Oracle Cop")
+check("v497 gli indici in corso si scelgono dalla FORMA del nome (serie e versione piu' alte, solo 5 anni, solo Nord "
+      "America), con la cedola del contratto: 100 l'IG, 500 l'HY",
+      _l497["indici"].get("IG", {}).get("serie") == 47 and _l497["indici"]["IG"]["prezzo"] == 101.7081
+      and _l497["indici"].get("HY", {}).get("serie") == 47 and _l497["indici"]["HY"]["prezzo"] == 105.8411
+      and _l497["indici"]["IG"]["cedola"] == 100 and _l497["indici"]["HY"]["cedola"] == 500 and set(_l497["indici"]) == {"IG", "HY"})
+
+# --- lo storico: un giorno per riga, mai riscritto, mai all'indietro, con un tetto
+def _riga497(d, p, r=3.88, i=None):
+    return {"d": d, "m": "2031-12-20", "r": r, "p": p, "i": i or {}}
+_st497, _n1 = ud.aggiungi_storia_cds([], _riga497("2026-10-15", {"ORCLE": [100, 92.5]}))
+_st497, _n2 = ud.aggiungi_storia_cds(_st497, _riga497("2026-10-15", {"ORCLE": [100, 90.0]}))
+_st497, _n3 = ud.aggiungi_storia_cds(_st497, _riga497("2026-10-14", {"ORCLE": [100, 93.0]}))
+_st497, _n4 = ud.aggiungi_storia_cds(_st497, _riga497("2026-10-16", {"ORCLE": [100, 91.758]}))
+_cap497 = []
+for _g in range(10):
+    _cap497, _ = ud.aggiungi_storia_cds(_cap497, _riga497(f"2026-09-{10 + _g:02d}", {}), massimo=4)
+check("v497 storico: lo stesso giorno non si riscrive (e' la stessa pubblicazione), un giorno piu' vecchio "
+      "dell'ultimo non entra, e il tetto tiene gli ultimi",
+      _n1 and not _n2 and not _n3 and _n4 and [r["d"] for r in _st497] == ["2026-10-15", "2026-10-16"]
+      and _st497[0]["p"]["ORCLE"][1] == 92.5 and len(_cap497) == 4 and _cap497[-1]["d"] == "2026-09-19")
+with _tmp497.TemporaryDirectory() as _dir497:
+    _f497 = Path(_dir497) / "cds.jsonl"
+    ud.scrivi_storia_cds(_st497, _f497)
+    _rl497 = ud.leggi_storia_cds(_f497)
+    _f497.write_text(_f497.read_text() + "riga rotta\n")
+    _rl497b = ud.leggi_storia_cds(_f497)
+check("v497 storico su file: andata e ritorno identici, una riga illeggibile si salta senza perdere le altre, "
+      "un file che non c'e' e' uno storico vuoto",
+      _rl497 == _st497 and _rl497b == _st497 and ud.leggi_storia_cds(Path("/non/esiste.jsonl")) == [])
+
+# --- le variazioni per DATA: la base e' un giorno, e un giorno senza il nome e' un buco (v205, v207)
+_lin497 = [_riga497("2026-10-0" + str(g), {"ORCLE": [100, 95.0 - g * 0.5]} if g != 3 else {"ALTRO": [100, 100.0]})
+           for g in range(1, 8)]
+_ser497 = ud.serie_cds(_lin497, "ORCLE")
+_var497 = ud.variazioni_cds(_lin497, _ser497, sedute=(1, 4, 5))
+check("v497 la variazione si misura per DATA: 1 giorno ha la sua base, 4 giorni cade sul giorno in cui il nome manca "
+      "e resta un buco, non uno zero; la base viaggia col numero",
+      [d for d, _ in _ser497] == ["2026-10-01", "2026-10-02", "2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07"]
+      and _var497["1"]["pb"] is not None and _var497["1"]["pb"] > 0 and _var497["1"]["da"] == "2026-10-06"
+      and _var497["4"] == {"da": "2026-10-03", "pb": None} and _var497["5"]["da"] == "2026-10-02")
+_ind497 = [_riga497("2026-09-1" + str(g), {}, i={"IG": [46 if g < 3 else 47, 1, 100, 101.0 + g * 0.1]}) for g in range(5)]
+_vi497 = ud.variazioni_cds(_ind497, ud.serie_indice_cds(_ind497, "IG"), sedute=(1, 3))
+check("v497 un indice a cavallo del cambio di serie non ha una variazione: il paniere e' cambiato",
+      _vi497["1"]["pb"] is not None and _vi497["3"]["pb"] is None and "serie" in _vi497["3"].get("nota", ""))
+
+# --- i quattro stati, ciascuno dichiarato (v406), e l'abbinamento SCRITTO
+_mappa497 = {"verificato": "2026-10-17", "entita": {"ORCL": "ORCLE", "CRWV": "COREWEI", "MU": None, "BLK": None,
+                                                    "SPCX": "SPACEXP", "BTP-V28": "ITALY"},
+             "note": {"ORCL": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation"}}
+_righe497 = [{"ticker": "ORCL", "name": "Oracle Corporation"}, {"ticker": "CRWV", "name": "CoreWeave, Inc."},
+             {"ticker": "MU", "name": "Micron Technology, Inc."}, {"ticker": "BLK", "name": "BlackRock, Inc."},
+             {"ticker": "SPCX", "name": "Space Exploration Technologies Corp."}, {"ticker": "NUOVO", "name": "Nuova Spa"},
+             {"ticker": "BTP-V28", "name": "BTP Valore Ott 2028"}, {"ticker": "^VIX"}, {"ticker": "EURUSD=X"},
+             {"ticker": "BTC-USD"}]
+_storia497 = [ud.riga_storia_cds(_l497, 3.88)]
+_stati497, _indici497 = ud.cds_dei_titoli(_righe497, _l497, _storia497, _mappa497)
+_c497r = {r["ticker"]: r.get("cds") for r in _righe497}
+check("v497 quattro stati: quotato (ORCL, CRWV, il BTP sulla Repubblica Italiana), assente (MU, BLK), non quotato "
+      "oggi (SPCX abbinato ma assente dal giorno), NON CLASSIFICATO (un titolo che l'abbinamento non nomina); i "
+      "riferimenti (indici, cambi, criptovalute) si saltano dalla forma del simbolo",
+      _c497r["ORCL"]["stato"] == "quotato" and _c497r["CRWV"]["stato"] == "quotato" and _c497r["BTP-V28"]["stato"] == "quotato"
+      and _c497r["MU"]["stato"] == "assente" and _c497r["BLK"]["stato"] == "assente"
+      and _c497r["SPCX"]["stato"] == "non quotato oggi" and _c497r["NUOVO"]["stato"] == "non classificato"
+      and _c497r["^VIX"] is None and _c497r["EURUSD=X"] is None and _c497r["BTC-USD"] is None
+      and _stati497.get("non_classificati") == ["NUOVO"] and _stati497.get("assenti") == ["BLK", "MU"])
+check("v497 un'assenza dichiarata non invecchia in silenzio: se ICE compensa un nome con lo stesso PRIMO nome esatto "
+      "(almeno 4 lettere) lo segnala, SENZA abbinarlo — e BlackRock non diventa Black & Decker",
+      _c497r["MU"].get("candidati") == ["Micron Technology Inc"] and "candidati" not in _c497r["BLK"])
+_o497 = _c497r["ORCL"]
+check("v497 il quotato porta il fatto (prezzo, cedola, punti, contratto, entita' di ICE) e la conversione, con la nota "
+      "dell'abbinamento; CRWV sotto i 30 punti non e' indicativo",
+      _o497["prezzo"] == 91.758 and _o497["cedola_pb"] == 100 and _o497["punti"] == 8.24
+      and _o497["contratto"] == "SNRFOR.USD.XR14" and _o497["entita"] == "Oracle Cop" and 280 < _o497["pb"] < 320
+      and _o497["nota"].startswith("ICE scrive") and _o497["indicativo"] is False and _c497r["CRWV"]["indicativo"] is False
+      and _indici497["IG"]["pb"] is not None and _indici497["HY"]["pb"] > _indici497["IG"]["pb"])
+
+# --- il tasso della conversione: l'EFFR, misurato; senza, il giorno prima dichiarato; senza nemmeno quello, niente
+_t497a = ud.tasso_cds({"fedwatch": {"effr": {"valore": 3.88, "data": "2026-10-15", "fonte": "NY Fed"}},
+                       "tassi": {"scadenze": [{"key": "a5", "value": 4.91}]}}, [])
+_t497b = ud.tasso_cds({}, [_riga497("2026-10-15", {}, r=3.9)])
+_t497c = ud.tasso_cds({}, [])
+check("v497 il tasso e' l'EFFR (non il Treasury a 5 anni, che rendeva incoerenti le due cedole); senza, quello del "
+      "giorno raccolto prima, dichiarato; senza nessuno dei due, nessuno spread",
+      _t497a[0] == 3.88 and "EFFR" in _t497a[1] and _t497b[0] == 3.9 and "mancava" in _t497b[1] and _t497c[0] is None)
+
+# --- il ripiego quando ICE non risponde, e la sorveglianza (v390)
+with _tmp497.TemporaryDirectory() as _dir497:
+    _fs497, _fm497 = Path(_dir497) / "s.jsonl", Path(_dir497) / "m.json"
+    _fm497.write_text(_json497.dumps(_mappa497))
+    _ok497 = ud.aggiorna_cds([dict(r) for r in _righe497], {"fedwatch": {"effr": {"valore": 3.88}}}, get=_get497,
+                             percorso_storia=_fs497, percorso_mappa=_fm497)
+    _righe_giu497 = [dict(r) for r in _righe497]
+    def _giu497(u):
+        raise RuntimeError("HTTP 503")
+    _ko497 = ud.aggiorna_cds(_righe_giu497, {}, get=_giu497, percorso_storia=_fs497, percorso_mappa=_fm497)
+    _righe_storia497 = len(_fs497.read_text().splitlines())
+check("v497 ICE giu': i titoli si leggono dall'ULTIMO giorno raccolto, il riepilogo dice 'non letto' con l'errore, e lo "
+      "storico non si sporca",
+      _ok497["letto"] and not _ko497["letto"] and "503" in (_ko497["errore"] or "") and _ko497["data"] == "2026-10-16"
+      and next(r for r in _righe_giu497 if r["ticker"] == "ORCL")["cds"]["stato"] == "quotato" and _righe_storia497 == 1)
+_vq497 = lambda c: next((x for x in ud.validate_macro({"cds": c})["checks"] if x["key"] == "cds_ice"), {})
+_oggi497 = _dt497.now().date().isoformat()
+_vecchio497 = (_dt497.now().date() - _td497(days=9)).isoformat()
+_vm497 = ud.validate_macro({"cds": {"data": _oggi497, "letto": True, "non_classificati": ["NUOVO"]}})
+check("v497 sorveglianza: i CDS mancano → missing; vecchi di 9 giorni → stale; di oggi → ok; e un titolo non "
+      "classificato alza il proprio allarme",
+      _vq497({}).get("status") == "missing" and _vq497({"data": _vecchio497, "letto": False, "errore": "x"}).get("status") == "stale"
+      and _vq497({"data": _oggi497, "letto": True}).get("status") == "ok"
+      and any(a.startswith("cds_abbinamenti") and "NUOVO" in a for a in _vm497["alerts"]))
+check("v497 il collegamento (v399, v443): main() passa a aggiorna_cds le righe seguite E il BTP, e il riepilogo finisce "
+      "in macro['cds'] — che e' la chiave che la sorveglianza legge",
+      'macro["cds"] = aggiorna_cds(watchlist + ([btp]' in _SRC_UD_CODICE and '_cds = macro.get("cds")' in _SRC_UD_CODICE)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "496";
+const BUILD_VERSION = "497";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5501,10 +5501,101 @@ function notaConDettaglio(nota, cadenza) {
    grandezze hanno unita' vere (percentuali, sedute, conteggi) e si leggono meglio nude.
    ⚠ La colonna "Il tuo libro" e' evidenziata: fra sei righe di numeri simili, sapere quale sia
    la propria richiede un colpo d'occhio, non una lettura. */
+/* ═══ v497 — CDS A 5 ANNI, NOME PER NOME ═══════════════════════════════════════════════════
+   Il CEO ha chiesto (17/10/2026) di monitorare i CDS di posizioni e sorvegliati. La v367 li aveva
+   dichiarati a pagamento: vero per lo storico e per l'insieme completo dei prezzi Markit, non per
+   il 5 anni, che ICE Clear Credit pubblica GRATIS a fine giornata. La pipeline li legge e li converte
+   in punti base (update_data.aggiorna_cds); qui si rendono e basta, perche' una seconda conversione
+   divergerebbe al primo ritocco (v161). Il FATTO e' il prezzo, lo spread e' una conversione
+   dichiarata. Quattro stati, ciascuno detto (v406): "nessun CDS" e "il dato manca" si leggono uguali
+   e non lo sono. */
+const pbTxt = (x) => (x == null || !Number.isFinite(Number(x))) ? "n.d." : fmtNum.format(Math.round(Number(x)));
+const dataBreveCds = (d) => {
+  const s = String(d || "").slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? `${s.slice(8, 10)}/${s.slice(5, 7)}` : (s || "n.d.");
+};
+function variazioniCds(v) {
+  const out = [];
+  for (const n of ["5", "21", "63"]) {
+    const x = (v || {})[n];
+    if (!x) continue;
+    out.push(x.pb == null
+      ? `${n} giorni n.d. (${x.nota || `il ${dataBreveCds(x.da)} non era quotato`})`
+      : `${n} giorni ${x.pb > 0 ? "+" : ""}${pbTxt(x.pb)} pb (dal ${dataBreveCds(x.da)})`);
+  }
+  return out;
+}
+function rigaCds(c, meta) {
+  if (!c) return null;
+  if (c.stato === "assente")
+    return `nessun CDS compensato a ICE su questo nome (elenco ICE controllato il ${dataBreveCds(c.verificato)}): il mercato non `
+      + `lo quota in forma pubblica, e restano i fatti di bilancio`
+      + (Array.isArray(c.candidati) && c.candidati.length
+        ? ` ⚠ ICE compensa ora ${c.candidati.join(", ")}: stesso primo nome, abbinamento non ancora deciso` : "");
+  if (c.stato === "non quotato oggi")
+    return `abbinato a ICE (${c.codice}) ma assente dalla pubblicazione del giorno: non e' uno spread a zero, `
+      + `e' il dato che manca`;
+  if (c.stato !== "quotato") return "NON CLASSIFICATO in config/cds_entita.json: l'abbinamento manca";
+  const p = Number(c.punti);
+  const punti = !Number.isFinite(p) ? "punti n.d." : Math.abs(p) < 0.005 ? "alla pari"
+    : `${fmtNum.format(Math.round(Math.abs(p) * 100) / 100)} punti ${p > 0 ? "pagati" : "ricevuti"} in anticipo`;
+  const pz = [c.pb != null ? `${pbTxt(c.pb)} pb` : "spread n.d. (nel run mancava il tasso: resta il prezzo)",
+    `prezzo ${fmtNum.format(Math.round(Number(c.prezzo) * 100) / 100)} su cedola ${c.cedola_pb} (${punti}), `
+      + `${c.entita} [${c.contratto}], ${dataBreveCds(c.data)}`];
+  if (c.indicativo)
+    pz.push(`⚠ oltre ${pbTxt((meta || {}).punti_max)} punti anticipati lo spread dipende dal recupero assunto: vale il prezzo`);
+  /* la cedola dice in che fascia il mercato tratta il nome: 100 pb come investment grade, 500 come high yield */
+  const fam = c.cedola_pb === 100 ? "IG" : c.cedola_pb === 500 ? "HY" : null;
+  const ind = fam ? (((meta || {}).indici) || {})[fam] : null;
+  if (ind && ind.pb && c.pb != null)
+    pz.push(`${pct1(c.pb / ind.pb)} volte l'indice CDX ${fam} della stessa cedola (${pbTxt(ind.pb)} pb)`);
+  pz.push(...variazioniCds(c.var));
+  const s = c.storia || {};
+  if (s.min_pb != null)
+    pz.push(`nello storico raccolto (${s.giorni} giorni) minimo ${pbTxt(s.min_pb)} pb il ${dataBreveCds(s.min_data)}, `
+      + `massimo ${pbTxt(s.max_pb)} pb il ${dataBreveCds(s.max_data)}`);
+  if (c.nota) pz.push(c.nota);
+  return pz.join(" · ");
+}
+/* la convenzione della conversione, una volta per riga che la usa */
+const convenzioneCds = (m) => !m ? "" : `lo spread e' una conversione: recupero ${pct1((m.recupero || 0) * 100)}%, `
+  + `tasso piatto ${m.tasso_pct != null ? fmtNum.format(m.tasso_pct) + "%" : "n.d."}`
+  + (m.letto ? "" : ` — ⚠ ICE non letto nell'ultimo run: vale l'ultimo giorno raccolto, il ${dataBreveCds(m.data)}`);
+/* Il macro porta una riga sola: gli indici e le POSIZIONI del libro (i sorvegliati sono nei pacchetti
+   per titolo e nelle schede dell'analisi), piu' la Repubblica Italiana per il BTP. */
+function rigaCdsMacro(m) {
+  if (!m) return null;
+  const ind = m.indici || {};
+  const pzI = ["IG", "HY"].filter((f) => ind[f]).map((f) => {
+    const v = variazioniCds(ind[f].var);
+    return `CDX ${f === "IG" ? "investment grade" : "high yield"} serie ${ind[f].serie} ${pbTxt(ind[f].pb)} pb`
+      + (v.length ? ` (${v.join(", ")})` : "");
+  });
+  const pos = ((DATA && DATA.watchlist) || []).filter((r) => r && r.cds && numero(r.qta) > 0);
+  const q = pos.filter((r) => r.cds.stato === "quotato").map((r) => {
+    const v5 = (r.cds.var || {})["5"];
+    return `${r.ticker} ${pbTxt(r.cds.pb)} pb`
+      + (v5 && v5.pb != null ? ` (${v5.pb > 0 ? "+" : ""}${pbTxt(v5.pb)} in 5 giorni)` : "");
+  });
+  const a = pos.filter((r) => r.cds.stato === "assente").map((r) => r.ticker);
+  const altri = pos.filter((r) => !["quotato", "assente"].includes(r.cds.stato)).map((r) => `${r.ticker} (${r.cds.stato})`);
+  const btp = ((DATA && DATA.portfolio) || []).find((r) => r && r.cds && r.cds.stato === "quotato");
+  const st = m.storia || {};
+  return `- CDS a 5 anni [ICE Clear Credit, prezzi pubblici di fine giornata del ${dataBreveCds(m.data)}; ${convenzioneCds(m)}]: `
+    + `indici ${pzI.join(" · ") || "n.d."}. Posizioni del libro quotate: ${q.join(" · ") || "nessuna"}`
+    + (a.length ? `; senza CDS compensato a ICE: ${a.join(", ")}` : "")
+    + (altri.length ? `; ${altri.join(", ")}` : "")
+    + (btp ? `. Repubblica Italiana (emittente del BTP) ${pbTxt(btp.cds.pb)} pb` : "")
+    + `. Storico raccolto dalla pipeline dal ${dataBreveCds(st.dal)} (${st.giorni || 0} ${st.giorni === 1 ? "giorno" : "giorni"}): ICE non pubblica lo `
+    + `storico gratis, e le variazioni compaiono quando i giorni raccolti bastano.`;
+}
+
 /* ═══ v367 — IL DEBITO DEL LIBRO ═══════════════════════════════════════════════════════════
    Il CEO ha chiesto i CDS sul debito che le societa' accendono per investire. I CDS single-name
    sono a pagamento (TRACE risponde 401 senza credenziali) e un proxy travestito da quotazione
    sarebbe peggio di non averlo. Qui ci sono le righe di bilancio che quello spread misura.
+   ⚠ v497: il CDS a 5 anni dei nomi compensati da ICE e' pubblico, e da allora e' nella colonna CDS
+   accanto a queste righe — lo storico e l'insieme completo Markit restano a pagamento.
    ⚠ Forma di v363, che il CEO aveva respinto nella prima stesura: PRIMA le conclusioni
    calcolate, POI la tabella come prova. Una tabella nuda e' materiale grezzo, non informazione. */
 function renderCredito() {
@@ -5528,6 +5619,7 @@ function renderCredito() {
       /* materialita': un costo del debito che raddoppia non e' una notizia se il debito e'
          irrilevante per l'azienda. GOOGL apriva la frase con +793,7% avendo copertura 134×. */
       conta: r.credito.copertura == null || Math.abs(r.credito.copertura) < 10,
+      cds: r.cds || null,      // v497
     }))
     .filter((r) => r.cop != null || r.oneri);
   if (!righe.length) {
@@ -5567,6 +5659,7 @@ function renderCredito() {
         <th>oneri finanziari<br><span class="muted">ultimi 12 mesi</span></th>
         <th>come sta cambiando<br><span class="muted">in 4 trimestri</span></th>
         <th>debito entro 12 mesi<br><span class="muted">contro la liquidita'</span></th>
+        <th>CDS a 5 anni<br><span class="muted">prezzato dal mercato</span></th>
       </tr></thead><tbody>`
     + righe.map((r) => `<tr>
         <td><b>${esc(r.tk)}</b> <span class="muted">${esc(r.nome.slice(0, 22))}</span></td>
@@ -5574,6 +5667,7 @@ function renderCredito() {
         <td>${M(r.oneri)}${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
         <td class="${r.var4 != null && r.var4 >= 25 && r.conta ? "neg" : ""}">${r.var4 == null || r.var4 <= -100 ? "—" : signTxt(r.var4)}</td>
         <td class="${r.corrente != null && r.liq && r.liq.v < r.corrente ? "neg" : ""}">${M(r.corrente)}<span class="muted"> vs ${M(r.liq ? r.liq.v : null)}</span>${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
+        <td>${!r.cds ? `<span class="muted">n.d.</span>` : r.cds.stato === "quotato" ? `${pbTxt(r.cds.pb)} pb${(r.cds.var || {})["5"] && r.cds.var["5"].pb != null ? `<span class="muted"> · ${r.cds.var["5"].pb > 0 ? "+" : ""}${pbTxt(r.cds.var["5"].pb)} in 5 giorni</span>` : ""}` : r.cds.stato === "assente" ? `<span class="muted">nessun CDS</span>` : `<span class="muted">${esc(r.cds.stato)}</span>`}</td>
       </tr>`).join("")
     + `</tbody></table>`;
   const altreValute = [...new Set(righe.filter((r) => r.val && r.val !== "USD").map((r) => r.val))];
@@ -5587,8 +5681,10 @@ function renderCredito() {
         + `le cifre assolute di quelle righe NON si confrontano con le altre. I rapporti (copertura, `
         + `variazione) si confrontano, perche' numeratore e denominatore stanno nella stessa valuta.<br>`
       : "") + `Voci di conto economico e stato patrimoniale trimestrali, di fonte aggregatore: `
-    + `per il bilancio che conta vale il deposito della societa'. <b>Non e' un CDS</b> — lo spread su singolo `
-    + `nome e' un dato a pagamento. La copertura e' EBIT diviso oneri finanziari: sotto 1 la gestione non basta, `
+    + `per il bilancio che conta vale il deposito della societa'. <b>Le voci di bilancio non sono un CDS</b>: la colonna `
+    + `CDS porta lo spread a 5 anni che il mercato prezza (ICE Clear Credit, prezzi pubblici di fine giornata; la conversione `
+    + `in punti base usa recupero 40% e un tasso piatto), e "nessun CDS" vuol dire che ICE non compensa contratti su quel nome. `
+    + `La copertura e' EBIT diviso oneri finanziari: sotto 1 la gestione non basta, `
     + `sotto 0 non copre nulla. &#9888; Sono fatti sul passato: non dicono se il rifinanziamento avverra' e a che prezzo.`;
 }
 
@@ -9940,6 +10036,8 @@ function buildPrompt(opz) {
        quindi non chiede la dichiarazione che la v406 impone alle assenze. */
     lines.push(`- Rischio Sistemico & Credito (proxy CDS) — cio' che la riga Rischio Credito qui sopra non porta, sullo STESSO spread e senza ripeterne il livello ne' l'etichetta: IG OAS ${sr.ig_oas ?? "—"}% (ICE BofA US Corporate, indice IG AMPIO · ${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""}. ⚠ Il rapporto HY/IG dice come si distribuisce il compenso per il rischio fra le due qualita': sale quando il mercato chiede molto piu' compenso sul debito peggiore, ed e' un'informazione che nessuno dei due livelli da' da solo.`);
   }
+  /* v497 — i CDS a 5 anni: gli indici e le posizioni del libro, accanto agli spread del credito */
+  if (m.cds) { const _rc = rigaCdsMacro(m.cds); if (_rc) lines.push(_rc); }
   /* v259 — "Istituzionali VS Retail" fuori dal payload: stessa ragione del sentiment
      globale — e' una media di SMC indici, VIX term, HY/IG e put/call, tutti gia' pubblicati. */
   if (perTitolo && m.decouple?.sp500?.length && m.decouple?.gdp?.length) potati.push("il disaccoppiamento pluriennale fra S&P 500 e PIL reale");
@@ -12673,6 +12771,7 @@ function fattiTitolo(tk) {
                       evS: numero((riga.stats || {}).ev_s),
                       comb: riga.combustione || null,
                       cred: riga.credito || null,
+                      cds: riga.cds || null,          // v497 — CDS a 5 anni (ICE)
                       fuoriMercato: riga.fuori_mercato || null,
                       shortFlusso: riga.short_flusso || null,
                       debtEquity: numero((riga.stats || {}).debt_to_equity),
@@ -14225,6 +14324,8 @@ function datiNostriDelTitolo(tk) {
        Il CEO ha chiesto i CDS sul debito acceso per investire. Verificato: i single-name sono
        Markit/ICE a pagamento, e TRACE risponde 401 senza credenziali. Non c'e' un CDS gratuito,
        e un proxy travestito da quotazione sarebbe peggio di non averlo — il pacchetto lo dice.
+       ⚠ v497: SUPERATO PER IL 5 ANNI — ICE Clear Credit ne pubblica gratis il prezzo di fine giornata,
+       e il pacchetto lo porta nella riga CDS A 5 ANNI qui sotto; questa resta la riga dei fatti di bilancio.
        Quello che si puo' dare sono le righe di bilancio che quello spread misura, e su un nome
        che costruisce a debito parlano da sole: su CRWV oneri finanziari passati da 267 a 536
        milioni per trimestre in un anno, 1,5 miliardi su dodici mesi, contro un EBIT di -101. */
@@ -14270,14 +14371,21 @@ function datiNostriDelTitolo(tk) {
          Un rapporto di copertura vecchio di un trimestre non e' un dettaglio: e' la grandezza. */
       const _fermaCred = depositoOltreLaTabella(tk, c.conto_al);
       L.push(`- CREDITO [conto economico al ${c.conto_al || "n.d."}]: ${pezzi.join(" · ")}.${cop}${verso}${scad}`
-        + ` ⚠ NON e' un CDS: lo spread CDS su singolo nome e' un dato a pagamento e non e' in questo`
-        + ` sistema. Queste sono le righe di bilancio che quello spread misura, di fonte aggregatore.`
+        + ` ⚠ NON e' un CDS: sono le righe di bilancio che lo spread di un CDS misura, di fonte aggregatore. Il CDS`
+        + ` del nome, se il mercato lo quota, e' nella riga CDS A 5 ANNI.`
         + (_fermaCred
             ? ` ⚠⚠ E QUESTO CONTO ECONOMICO NON E' L'ULTIMO — E' UN FATTO: e' al ${c.conto_al}, e la societa'`
               + ` ha depositato risultati il ${_fermaCred.dep} (SEC EDGAR, 8-K item 2.02), ${_fermaCred.gg} giorni`
               + ` dopo. Oneri finanziari e copertura qui sopra sono di quel trimestre: su un bilancio che cresce a`
               + ` debito sono proprio le voci che cambiano piu' in fretta. Prendile dal deposito piu' recente.`
             : ""));
+    }
+
+    /* v497 — il CDS a 5 anni del nome, dopo il CREDITO che porta i fatti di bilancio che lo spread prezza */
+    {
+      const _cdsMeta = ((DATA && DATA.macro) || {}).cds || null;
+      const _cdsRiga = rigaCds(t.cds, _cdsMeta);
+      if (_cdsRiga) L.push(`- CDS A 5 ANNI [ICE Clear Credit, prezzo pubblico di fine giornata; ${convenzioneCds(_cdsMeta)}]: ${_cdsRiga}.`);
     }
 
     /* ⚠⚠ v367 — FLUSSO FUORI DAI MERCATI REGOLAMENTATI (FINRA), chiesto come "dark pool".

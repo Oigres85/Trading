@@ -4792,6 +4792,73 @@ _rl496 = [r for r in NL.righe_semaforo(_sm496, None) if r.strip().startswith("le
 check("v496 collegamento: la riga della leva nel semaforo porta la variazione annua col percentile",
       len(_rl496) == 1 and "sull'anno +31,4% (82° percentile delle 345" in _rl496[0] and "settembre 2026" in _rl496[0], str(_rl496))
 
+
+# ============================ v497 — I CDS A 5 ANNI NELLE SCHEDE, E L'ABBINAMENTO NEI DUE VERSI ============================
+# L'abbinamento titolo → entita' di ICE e' SCRITTO in config/cds_entita.json (un algoritmo per nome dava Super Micro →
+# SUPERVALU). Una terza lista accanto a ui_watchlist.json e LIBRO.md e' un registro che invecchia da solo (C10, v479,
+# v480) se nessuno la confronta: qui si confronta nei DUE versi. I riferimenti si riconoscono dalla FORMA (v410).
+_cds497 = _json.loads((_ROOT / "config" / "cds_entita.json").read_text(encoding="utf-8"))
+_ent497 = _cds497.get("entita") or {}
+_azioni497 = {t for t in _ui480 if not _re480.search(r"(^\^|=[XF]$|-(USD|USDT|EUR)$)", t) and t != "BTP-V28"}
+_chiavi497 = {t for t in _ent497 if t != "BTP-V28"}
+check("v497 ogni azione seguita dalla pipeline e' classificata in config/cds_entita.json (codice ICE o null), e "
+      "l'abbinamento non nomina titoli che nessuno segue",
+      len(_azioni497) > 20 and _azioni497 == _chiavi497,
+      f"non classificate: {sorted(_azioni497 - _chiavi497)} · classificate e non seguite: {sorted(_chiavi497 - _azioni497)}")
+check("v497 l'abbinamento ha la data della verifica, ogni valore e' un codice o null, e il BTP punta al sovrano",
+      bool(_cds497.get("verificato")) and all(v is None or (isinstance(v, str) and v.strip() == v and v) for v in _ent497.values())
+      and _ent497.get("BTP-V28") == "ITALY", str({k: v for k, v in _ent497.items() if not (v is None or isinstance(v, str))}))
+
+# --- la resa nelle schede: lo stato si COSTRUISCE (v425): oggi lo storico ha un giorno, domani ne avra' 60
+_meta497 = {"fonte": "ICE Clear Credit", "letto": True, "data": "2026-10-16", "tasso_pct": 3.88, "tasso_fonte": "EFFR del 2026-10-15",
+            "recupero": 0.4, "punti_max": 30.0, "storia": {"giorni": 63, "dal": "2026-07-15"},
+            "indici": {"IG": {"serie": 47, "pb": 62.0, "var": {"5": {"da": "2026-10-09", "pb": 3.0}}},
+                       "HY": {"serie": 47, "pb": 354.0, "var": {}}}}
+_q497 = {"ticker": "CRWV", "cds": {"stato": "quotato", "codice": "COREWEI", "entita": "COREWEAVE INC", "contratto": "SNRFOR.USD.XR14",
+                                   "cedola_pb": 500, "prezzo": 80.9439, "punti": 19.06, "pb": 1139.1, "indicativo": False,
+                                   "data": "2026-10-16", "var": {"5": {"da": "2026-10-09", "pb": 101.4}, "21": {"da": "2026-09-17", "pb": None},
+                                                                 "63": {"da": "2026-07-15", "pb": -12.0}},
+                                   "storia": {"giorni": 63, "dal": "2026-07-15", "min_pb": 640.2, "min_data": "2026-07-20",
+                                              "max_pb": 1139.1, "max_data": "2026-10-16"}}}
+_rq497 = SP.riga_cds(_q497, _meta497)
+check("v497 la riga del nome quotato: punti base con le migliaia, il fatto (prezzo su cedola, punti pagati), il contratto, "
+      "il multiplo dell'indice DELLA STESSA CEDOLA, le variazioni per data con la base, il buco detto, minimo e massimo",
+      "1.139 pb" in _rq497 and "prezzo 80,94 su cedola 500 (19,06 punti pagati in anticipo)" in _rq497
+      and "[SNRFOR.USD.XR14]" in _rq497 and "3,2 volte l'indice CDX HY" in _rq497 and "5 giorni +101 pb (dal 09/10)" in _rq497
+      and "21 giorni n.d. (il 17/09 non era quotato)" in _rq497 and "63 giorni -12 pb (dal 15/07)" in _rq497
+      and "minimo 640 pb il 20/07" in _rq497, _rq497)
+_neg497 = SP.riga_cds({"cds": {**_q497["cds"], "cedola_pb": 100, "prezzo": 101.03, "punti": -1.03, "pb": 77.0, "var": {}, "storia": {}}}, _meta497)
+_ind497 = SP.riga_cds({"cds": {**_q497["cds"], "punti": 41.5, "indicativo": True}}, _meta497)
+check("v497 punti ricevuti quando il prezzo e' sopra 100, l'indice IG per la cedola 100, e oltre 30 punti l'avviso che "
+      "vale il prezzo",
+      "1,03 punti ricevuti in anticipo" in _neg497 and "l'indice CDX IG" in _neg497
+      and "oltre 30 punti anticipati lo spread dipende dal recupero" in _ind497, _neg497 + " | " + _ind497)
+_ass497 = SP.riga_cds({"cds": {"stato": "assente", "verificato": "2026-10-17", "candidati": ["Micron Technology Inc"]}}, _meta497)
+_nq497 = SP.riga_cds({"cds": {"stato": "non quotato oggi", "codice": "SPACEXP"}}, _meta497)
+_nc497 = SP.riga_cds({"cds": {"stato": "non classificato"}}, _meta497)
+_nd497 = SP.riga_cds({"ticker": "X"}, _meta497)
+check("v497 gli altri tre stati e il buco della pipeline si dicono, ciascuno col suo nome (v406): nessun CDS e' una "
+      "cosa, il dato che manca un'altra",
+      "NESSUN CDS compensato a ICE" in _ass497 and "Micron Technology Inc" in _ass497 and "abbinamento non ancora deciso" in _ass497
+      and "assente dalla pubblicazione del giorno" in _nq497 and "dato che manca" in _nq497
+      and "NON CLASSIFICATO" in _nc497 and "non porta i CDS" in _nd497)
+_testa497 = SP.riferimento_cds({"cds": {**_meta497, "letto": False, "errore": "HTTP 503", "non_classificati": ["NUOVO"]}})
+check("v497 l'intestazione dice fonte, giorno, che il fatto e' il prezzo e la convenzione della conversione, gli indici, "
+      "lo storico raccolto; se ICE non e' stato letto lo dice, e nomina i titoli da classificare",
+      "il FATTO e' il prezzo" in _testa497 and "tasso piatto 3,88%" in _testa497 and "CDX investment grade serie 47 62 pb 5 giorni +3 pb" in _testa497
+      and "63 giorni" in _testa497 and "ICE NON letto" in _testa497 and "HTTP 503" in _testa497 and "NUOVO" in _testa497
+      and "il dato che manca" in SP.riferimento_cds({}), _testa497)
+# il collegamento ESEGUITO (v483): genera() mette la testa una volta, la riga per ogni nome e quella del BTP
+_dati497 = {"macro": {"cds": _meta497}, "watchlist": [{"ticker": "CRWV", "name": "CoreWeave", "price_asof": "2026-10-16", **_q497},
+                                                      {"ticker": "MU", "name": "Micron", "price_asof": "2026-10-16",
+                                                       "cds": {"stato": "assente", "verificato": "2026-10-17"}}],
+            "portfolio": [{"ticker": "BTP-V28", "cds": {**_q497["cds"], "entita": "Rep Italy", "cedola_pb": 100, "pb": 63.0, "var": {}, "storia": {}}}]}
+_g497 = SP.genera(_dati497, ["CRWV", "MU"], [])
+check("v497 collegamento eseguito: genera() stampa l'intestazione dei CDS una volta, la riga CDS di ogni nome e quella "
+      "del BTP sul sovrano",
+      _g497.count("CDS a 5 anni (richiesta del CEO") == 1 and _g497.count("CDS 5 anni") == 3
+      and "BTP-V28 [POSIZIONE, titolo di Stato] — CDS 5 anni 63 pb" in _g497, _g497[:400])
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

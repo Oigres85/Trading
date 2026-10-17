@@ -14,6 +14,7 @@ Fonti (tutte gratuite):
   Investing.com, Google News
 """
 import calendar
+import collections
 import csv
 # ⚠ v389 — `html` MANCAVA, e le news erano morte da quando sono nate (v304).
 # Ogni run del CI stampava tre righe identiche — `!! news CNBC Economia: name 'html' is not
@@ -1223,6 +1224,9 @@ def _live_is_informative(lp, last_close):
 #     senza credenziali. Non c'e' modo gratuito di avere uno spread CDS, e inventarne un proxy
 #     travestito da quotazione sarebbe peggio di non averlo.
 #     Quello che si puo' avere sono i FATTI CHE IL CDS PREZZA, e sono tutti in bilancio.
+#     ⚠ SUPERATO IN PARTE DALLA v497: ICE Clear Credit pubblica GRATIS il prezzo di fine giornata
+#     dei CDS a 5 anni compensati (aggiorna_cds). A pagamento restano lo storico e l'insieme
+#     completo Markit; i fatti di bilancio restano, accanto allo spread e non al suo posto.
 #   · Dark pool: FINRA pubblica ATS e OTC non-ATS per simbolo, settimanali, GRATIS e senza
 #     autenticazione. Piu' il volume short giornaliero, sempre gratis.
 
@@ -4998,6 +5002,430 @@ def credito_ccc(serie):
             "mese_fa": round(vals[-22][1], 2) if len(vals) >= 22 else None,
             "sedute": len(vals)}
 
+# ═══ v497 — CDS A 5 ANNI: IL CREDITO PREZZATO DAL MERCATO, NOME PER NOME ═══════════════════
+# Il CEO ha chiesto (17/10/2026) di monitorare l'andamento dei CDS sulle azioni in portafoglio e
+# in watchlist. La v367 aveva risposto che i CDS su singolo nome sono a pagamento — vero per lo
+# STORICO e per l'insieme completo dei prezzi Markit — e aveva messo al loro posto i fatti di
+# bilancio che lo spread misura. Rimisurato: ICE Clear Credit, la camera di compensazione dei
+# CDS, dichiara di pubblicare GRATIS i prezzi di fine giornata dei CDS A 5 ANNI su singolo nome
+# e sugli indici. Il 16/10/2026: 690 entita' compensate; dei nostri nomi 4 posizioni (AMD, NVDA,
+# CRWV, SK hynix) e 22 sorvegliati, piu' la Repubblica Italiana, emittente del BTP.
+# ⚠ IL FATTO E' IL PREZZO: 100 meno i punti pagati in anticipo su una cedola fissa (100 o 500
+#   pb). Lo spread in punti base e' una CONVERSIONE, con la convenzione di mercato in forma
+#   semplificata (recupero 40%, intensita' di default costante, tasso piatto all'EFFR, proxy
+#   della curva SOFR), ed e' dichiarata come tale. Misurata sui 150 contratti in dollari che ICE
+#   quota con due cedole: la stessa societa' esce allo stesso spread entro 2,7 pb di mediana. Se
+#   il modello o il tasso fossero sbagliati, due cedole darebbero due spread — col Treasury a 5
+#   anni lo scarto saliva a 6,9 pb, ed e' per questo che il tasso e' l'EFFR (tasso_cds). Oltre
+#   ~30 punti anticipati lo spread dipende dal recupero assunto (scarti da 200 pb sui nomi in
+#   dissesto): li' vale il prezzo.
+# ⚠ NON C'E' STORICO GRATUITO: ICE pubblica solo l'ultimo giorno e lo storico Markit e' a
+#   licenza. La pipeline lo ACCUMULA in data/cds_storia.jsonl, una riga per giorno di
+#   compensazione con il contratto standard di ogni entita' in dollari: un giorno non letto e'
+#   perso per sempre, ed e' per questo che sta qui, che gira 14-15 volte al giorno, e non in uno
+#   strumento di sessione. Tutte le entita' e non solo le nostre: un nome aggiunto domani alla
+#   watchlist trova lo storico gia' raccolto.
+# ⚠ L'ABBINAMENTO TITOLO → ENTITA' E' SCRITTO, NON INDOVINATO (config/cds_entita.json): per nome
+#   un algoritmo dava Super Micro → SUPERVALU e BlackRock → Black & Decker (classe v399, v448).
+# ⚠ La diffusione pubblica SEC dei CDS (DTCC) risponde 403 dall'ambiente di sviluppo: non e' la fonte.
+ICE_CDS_NOMI = "https://www.ice.com/api/cds-settlement-prices/icc-single-names"
+ICE_CDS_INDICI = "https://www.ice.com/api/cds-settlement-prices/icc-indexes"
+CDS_STORIA = ROOT / "data" / "cds_storia.jsonl"
+CDS_ENTITA = ROOT / "config" / "cds_entita.json"
+CDS_RECUPERO = 0.40       # convenzione di mercato per il debito senior non garantito
+CDS_PUNTI_MAX = 30.0      # oltre, lo spread equivalente dipende dal recupero assunto: vale il prezzo
+CDS_STORIA_MAX = 520      # circa due anni di giorni di compensazione
+CDS_SEDUTE_VAR = (5, 21, 63)
+CDS_STORIA_MINMAX = 20    # sotto, minimo e massimo dello storico raccolto non dicono niente
+CDS_DOC_PREF = ("XR14", "CR14", "MR14", "MM14", "XR", "CR", "MR", "MM")
+
+
+def _cds_date_standard(t0, scadenza):
+    """Le date dei CDS standard (20 marzo, giugno, settembre, dicembre) dalla precedente a t0
+    fino alla scadenza. Senza aggiustamento per i festivi: uno o due giorni su cinque anni."""
+    out, anno = [], t0.year - 1
+    while True:
+        for mese in (3, 6, 9, 12):
+            d = datetime(anno, mese, 20).date()
+            if d > scadenza:
+                return out
+            out.append(d)
+        anno += 1
+
+
+def _cds_gambe(lam, t0, scadenza, tasso, recupero=CDS_RECUPERO):
+    """(valore della protezione, annualita' rischiosa PULITA) per un'intensita' di default lam.
+    Pulita = meno il rateo dalla data standard precedente al giorno dopo t0: il prezzo che ICE
+    pubblica e' pulito, quindi a prezzo 100 lo spread coincide con la cedola."""
+    passo = t0 + timedelta(days=1)
+    date_std = _cds_date_standard(t0, scadenza)
+    prima = [d for d in date_std if d <= t0]
+    if not prima:
+        return None
+    inizio = prima[-1]
+
+    def anni(d):
+        return (d - t0).days / 365.0
+
+    ann, prec = 0.0, inizio
+    for d in (x for x in date_std if x > t0):
+        fraz = (d - prec).days / 360.0
+        ti, tp = anni(d), max(anni(prec), 0.0)
+        qi, qp = math.exp(-lam * ti), math.exp(-lam * tp)
+        sc = math.exp(-tasso * ti)
+        ann += fraz * sc * qi + 0.5 * fraz * sc * (qp - qi)    # rateo pagato al default, a meta' periodo
+        prec = d
+    ann -= (passo - inizio).days / 360.0
+    k = lam + tasso
+    prot = (1 - recupero) * lam / k * (math.exp(-k * anni(passo)) - math.exp(-k * anni(scadenza)))
+    return prot, ann
+
+
+def spread_cds(prezzo, cedola_pb, t0, scadenza, tasso, recupero=CDS_RECUPERO):
+    """Lo spread equivalente in pb dal prezzo pubblicato (tasso in decimali). None fuori dal
+    dominio del modello: un prezzo che nessuna intensita' di default riproduce non e' uno spread."""
+    try:
+        prezzo, c = float(prezzo), float(cedola_pb) / 1e4
+    except (TypeError, ValueError):
+        return None
+    if tasso is None or not (0 < prezzo < 200) or scadenza <= t0 + timedelta(days=1):
+        return None
+    u = (100.0 - prezzo) / 100.0
+
+    def f(lam):
+        g = _cds_gambe(lam, t0, scadenza, tasso, recupero)
+        return g[0] - c * g[1] - u
+
+    lo, hi = 1e-9, 5.0
+    try:
+        if f(lo) > 0 or f(hi) < 0:
+            return None
+    except (TypeError, OverflowError):
+        return None
+    for _ in range(100):
+        mid = (lo + hi) / 2
+        if f(mid) < 0:
+            lo = mid
+        else:
+            hi = mid
+    prot, ann = _cds_gambe((lo + hi) / 2, t0, scadenza, tasso, recupero)
+    return prot / ann * 1e4 if ann > 0 else None
+
+
+def _cds_strumento(nome):
+    """'ORCLE.SNRFOR.USD.XR14.100.2031-12-20' → dict; None se la forma non e' quella attesa."""
+    p = str(nome or "").split(".")
+    if len(p) < 6:
+        return None
+    try:
+        return {"codice": ".".join(p[:-5]), "livello": p[-5], "valuta": p[-4], "clausola": p[-3],
+                "cedola": int(p[-2]), "scadenza": datetime.fromisoformat(p[-1]).date()}
+    except ValueError:
+        return None
+
+
+def contratto_standard(contratti):
+    """Fra i contratti di una entita' quello che il mercato tratta come standard: senior non
+    garantito, in dollari, definizioni ISDA del 2014 prima delle precedenti, e fra le cedole
+    quella col prezzo piu' vicino a 100, cioe' quella che corrisponde al merito di credito del
+    nome. E' una scelta dichiarata, non un dato (v240)."""
+    c = [x for x in (contratti or []) if x.get("livello") == "SNRFOR" and x.get("valuta") == "USD"
+         and x.get("clausola") in CDS_DOC_PREF and x.get("prezzo") is not None]
+    if not c:
+        return None
+    pref = min(CDS_DOC_PREF.index(x["clausola"]) for x in c)
+    c = [x for x in c if CDS_DOC_PREF.index(x["clausola"]) == pref]
+    return min(c, key=lambda x: (abs(100.0 - x["prezzo"]), x["cedola"]))
+
+
+def leggi_cds_ice(get=None):
+    """Una lettura di ICE: {'data', 'scadenza', 'entita': {codice: {'nome', 'contratti'}},
+    'indici', 'scartati'}. Un errore di rete si PROPAGA al chiamante, che lo dichiara: 'nessun
+    prezzo' e 'ICE non ha risposto' si leggono uguali e significano l'opposto (v389)."""
+    get = get or (lambda u: http_get(u, tries=2, timeout=40))
+    righe = get(ICE_CDS_NOMI).json()
+    contr = []
+    for x in righe or []:
+        s = _cds_strumento(x.get("instrumentName"))
+        try:
+            pz = float(x.get("eodPrice"))
+        except (TypeError, ValueError):
+            continue
+        if s:
+            s.update(prezzo=pz, data=str(x.get("clearingDate") or "")[:10], nome=x.get("name"))
+            contr.append(s)
+    if not contr:
+        return {"data": None, "scadenza": None, "entita": {}, "indici": {}, "scartati": 0}
+    data = max(s["data"] for s in contr)
+    # ⚠ un giorno solo: un contratto con una data diversa non e' dello stesso giorno, e mescolarli
+    #   farebbe una fotografia mai esistita (classe v186)
+    oggi = [s for s in contr if s["data"] == data]
+    entita = {}
+    for s in oggi:
+        entita.setdefault(s["codice"], {"nome": s["nome"], "contratti": []})["contratti"].append(s)
+    scad = collections.Counter(s["scadenza"] for s in oggi).most_common(1)[0][0]
+    indici = {}
+    try:
+        for x in get(ICE_CDS_INDICI).json() or []:
+            m = re.match(r"^CDX-NA(IG|HY)S(\d+)V(\d+)-5Y$", str(x.get("instrumentName") or ""))
+            if not m or str(x.get("clearingDate") or "")[:10] != data:
+                continue
+            fam, ser, ver = m.group(1), int(m.group(2)), int(m.group(3))
+            try:
+                pz = float(x.get("eodPrice"))
+            except (TypeError, ValueError):
+                continue
+            # ⚠ in corso = la serie piu' alta, e dentro la serie la versione piu' alta: la
+            #   regola sta nella FORMA del nome, non in un numero di serie scritto qui (v410)
+            if fam not in indici or (ser, ver) > (indici[fam]["serie"], indici[fam]["versione"]):
+                # cedola del contratto: 100 pb sull'IG, 500 pb sull'HY (specifica dell'indice)
+                indici[fam] = {"serie": ser, "versione": ver, "prezzo": pz, "cedola": 100 if fam == "IG" else 500}
+    except Exception as e:  # noqa: BLE001 — gli indici sono un contorno: il loro buco si dichiara
+        print(f"!! indici CDX non letti: {e}", file=sys.stderr)
+    return {"data": data, "scadenza": scad, "entita": entita, "indici": indici,
+            "scartati": len(contr) - len(oggi)}
+
+
+def riga_storia_cds(lettura, tasso_pct):
+    """La riga di un giorno: per ogni entita' il contratto standard come [cedola, prezzo]
+    (piu' la scadenza se diversa da quella del giorno), e gli indici in corso."""
+    if not lettura or not lettura.get("data"):
+        return None
+    scad = lettura["scadenza"]
+    p = {}
+    for cod, e in sorted(lettura["entita"].items()):
+        c = contratto_standard(e["contratti"])
+        if c:
+            p[cod] = [c["cedola"], c["prezzo"]] + ([c["scadenza"].isoformat()] if c["scadenza"] != scad else [])
+    i = {f: [v["serie"], v["versione"], v["cedola"], v["prezzo"]] for f, v in sorted(lettura["indici"].items())}
+    return {"d": lettura["data"], "m": scad.isoformat(), "r": tasso_pct, "p": p, "i": i}
+
+
+def leggi_storia_cds(percorso=CDS_STORIA):
+    righe = []
+    try:
+        testo = percorso.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return []
+    for l in testo.splitlines():
+        try:
+            r = json.loads(l)
+        except ValueError:
+            continue
+        if isinstance(r, dict) and r.get("d"):
+            righe.append(r)
+    return sorted(righe, key=lambda r: r["d"])
+
+
+def aggiungi_storia_cds(storia, riga, massimo=CDS_STORIA_MAX):
+    """Una riga per giorno di compensazione. Un giorno gia' raccolto non si riscrive: le letture
+    successive dello stesso giorno sono la stessa pubblicazione. Un giorno PIU' VECCHIO
+    dell'ultimo non entra: sarebbe una risposta fuori ordine, e lo storico si legge per data."""
+    if not riga or not riga.get("d") or (storia and riga["d"] <= storia[-1]["d"]):
+        return storia, False
+    return (storia + [riga])[-massimo:], True
+
+
+def scrivi_storia_cds(storia, percorso=CDS_STORIA):
+    percorso.parent.mkdir(parents=True, exist_ok=True)
+    tmp = percorso.with_suffix(".tmp")
+    tmp.write_text("".join(json.dumps(r, ensure_ascii=False, separators=(",", ":")) + "\n" for r in storia),
+                   encoding="utf-8")
+    tmp.replace(percorso)
+
+
+def _cds_pb_riga(r, v):
+    t0 = datetime.fromisoformat(r["d"]).date()
+    scad = datetime.fromisoformat(v[2] if len(v) > 2 else r["m"]).date()
+    tasso = r.get("r")
+    return spread_cds(v[1], v[0], t0, scad, tasso / 100 if tasso is not None else None)
+
+
+def serie_cds(storia, codice):
+    """[(data, pb)] di una entita', dal prezzo e dal tasso di QUEL giorno. Un giorno in cui
+    l'entita' manca e' un buco, non uno zero (v205)."""
+    out = []
+    for r in storia:
+        v = (r.get("p") or {}).get(codice)
+        if v:
+            out.append((r["d"], _cds_pb_riga(r, v)))
+    return out
+
+
+def serie_indice_cds(storia, fam):
+    """[(data, pb, serie)] di un indice CDX: la serie viaggia col numero perche' al cambio di
+    serie (marzo e settembre) cambia il paniere, e una variazione a cavallo non e' una variazione."""
+    out = []
+    for r in storia:
+        v = (r.get("i") or {}).get(fam)
+        if v:
+            out.append((r["d"], _cds_pb_riga(r, [v[2], v[3]]), v[0]))
+    return out
+
+
+def variazioni_cds(storia, serie, sedute=CDS_SEDUTE_VAR):
+    """Variazione in pb su n giorni di compensazione RACCOLTI, per DATA (v207): la base e' il
+    giorno n posizioni indietro nell'elenco dei giorni, e se l'entita' quel giorno manca la
+    variazione e' un buco. La data della base viaggia col numero."""
+    giorni = [r["d"] for r in storia]
+    per_data = {x[0]: x for x in serie}
+    if not giorni or giorni[-1] not in per_data or per_data[giorni[-1]][1] is None:
+        return {}
+    ult = per_data[giorni[-1]]
+    out = {}
+    for n in sedute:
+        if len(giorni) <= n:
+            continue
+        b = per_data.get(giorni[-1 - n])
+        if b is None or b[1] is None:
+            out[str(n)] = {"da": giorni[-1 - n], "pb": None}
+        elif len(b) > 2 and b[2] != ult[2]:
+            out[str(n)] = {"da": giorni[-1 - n], "pb": None, "nota": "cambio di serie dell'indice"}
+        else:
+            out[str(n)] = {"da": giorni[-1 - n], "pb": round(ult[1] - b[1], 1)}
+    return out
+
+
+def _cds_primo_nome(nome):
+    t = re.sub(r"[^a-z0-9]+", " ", str(nome or "").lower().replace("'", "")).split()
+    t = [w for w in t if w != "the"]
+    return t[0] if t else ""
+
+
+def _cds_storia_entita(storia, serie):
+    vals = [(d, pb) for d, pb in serie if pb is not None]
+    out = {"giorni": len(vals), "dal": vals[0][0] if vals else None}
+    if len(vals) >= CDS_STORIA_MINMAX:
+        mn, mx = min(vals, key=lambda x: x[1]), max(vals, key=lambda x: x[1])
+        out.update(min_pb=round(mn[1], 1), min_data=mn[0], max_pb=round(mx[1], 1), max_data=mx[0])
+    return out
+
+
+def cds_dei_titoli(righe, lettura, storia, mappa):
+    """Attacca r['cds'] a ogni titolo seguito e restituisce il riepilogo per macro['cds'].
+    Quattro stati, ciascuno dichiarato (v406): quotato · ASSENTE (nessun CDS compensato a ICE alla
+    data della verifica) · non quotato oggi (abbinato, ma ICE oggi non lo pubblica) · NON
+    CLASSIFICATO (il titolo manca da config/cds_entita.json: va classificato, non indovinato)."""
+    entita_map = (mappa or {}).get("entita") or {}
+    note = (mappa or {}).get("note") or {}
+    ent = (lettura or {}).get("entita") or {}
+    ult = storia[-1] if storia else None
+    stati = collections.defaultdict(list)
+    for r in righe:
+        if not isinstance(r, dict):
+            continue
+        tk = str(r.get("ticker") or "")
+        # i riferimenti (indici, cambi, futures, criptovalute) si riconoscono dalla FORMA (v410)
+        if not tk or tk.startswith("^") or "=" in tk or tk.endswith("-USD"):
+            continue
+        if tk not in entita_map:
+            r["cds"] = {"stato": "non classificato"}
+            stati["non_classificati"].append(tk)
+            continue
+        cod = entita_map[tk]
+        if cod is None:
+            x = {"stato": "assente", "verificato": (mappa or {}).get("verificato")}
+            # ⚠ un'assenza dichiarata invecchia: se ICE comincia a compensare un nome con lo
+            #   stesso PRIMO nome (esatto, almeno 4 lettere) lo si segnala da verificare, senza
+            #   abbinarlo — l'abbinamento resta una scelta scritta
+            pn = _cds_primo_nome(r.get("name"))
+            if len(pn) >= 4:
+                cand = sorted({e["nome"] for e in ent.values() if _cds_primo_nome(e["nome"]) == pn})
+                if cand:
+                    x["candidati"] = cand[:3]
+            r["cds"] = x
+            stati["assenti"].append(tk)
+            continue
+        e = ent.get(cod)
+        c = contratto_standard(e["contratti"]) if e else None
+        if not c or not ult or ult.get("d") != lettura.get("data"):
+            r["cds"] = {"stato": "non quotato oggi", "codice": cod}
+            stati["non_quotati_oggi"].append(tk)
+            continue
+        ser = serie_cds(storia, cod)
+        pb = ser[-1][1] if ser and ser[-1][0] == ult["d"] else None
+        punti = round(100.0 - c["prezzo"], 2)
+        x = {"stato": "quotato", "codice": cod, "entita": e["nome"],
+             "contratto": f'{c["livello"]}.{c["valuta"]}.{c["clausola"]}', "cedola_pb": c["cedola"],
+             "prezzo": c["prezzo"], "punti": punti, "pb": round(pb, 1) if pb is not None else None,
+             "indicativo": abs(punti) > CDS_PUNTI_MAX, "data": lettura["data"],
+             "scadenza": c["scadenza"].isoformat(), "var": variazioni_cds(storia, ser),
+             "storia": _cds_storia_entita(storia, ser)}
+        if note.get(tk):
+            x["nota"] = note[tk]
+        r["cds"] = x
+        stati["quotati"].append(tk)
+    indici = {}
+    for fam, v in sorted(((lettura or {}).get("indici") or {}).items()):
+        si = serie_indice_cds(storia, fam)
+        pb = si[-1][1] if si and ult and si[-1][0] == ult["d"] else None
+        indici[fam] = {**v, "pb": round(pb, 1) if pb is not None else None,
+                       "var": variazioni_cds(storia, si)}
+    return {k: sorted(v) for k, v in stati.items()}, indici
+
+
+def tasso_cds(macro, storia):
+    """Il tasso piatto della conversione: l'EFFR del giorno (NY Fed, pubblicato dalla pipeline con
+    FedWatch), proxy della curva SOFR su cui sconta la convenzione ISDA. NON il Treasury a 5 anni, e
+    la ragione e' MISURATA (17/10/2026) sui 150 contratti in dollari che ICE quota con due cedole:
+    col Treasury (4,91%) la stessa societa' usciva con due spread distanti 6,9 pb di mediana, con
+    l'EFFR (3,88%) 2,7 pb. Se il tasso e' quello sbagliato, due cedole danno due spread.
+    Senza EFFR, quello del giorno raccolto prima, DICHIARATO; senza nemmeno quello, niente spread (i
+    prezzi restano: il fatto e' il prezzo)."""
+    e = (((macro or {}).get("fedwatch") or {}).get("effr")) or {}
+    if e.get("valore") is not None:
+        return float(e["valore"]), (f"EFFR del {e.get('data') or 'n.d.'} ({e.get('fonte') or 'fonte n.d.'}), "
+                                    "proxy della curva SOFR della convenzione ISDA")
+    for r in reversed(storia or []):
+        if r.get("r") is not None:
+            return float(r["r"]), f"tasso del giorno raccolto prima ({r['d']}): nel run mancava l'EFFR"
+    return None, "nessun tasso disponibile: spread non calcolati, restano i prezzi"
+
+
+def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_mappa=CDS_ENTITA):
+    """Lettura → storico → titoli. Se ICE non risponde, i titoli si leggono dall'ULTIMO giorno
+    raccolto, e il riepilogo lo dichiara con la data: un dato vecchio e detto e' meglio di un
+    buco muto, e la sorveglianza (validate_macro) ne misura l'eta'."""
+    storia = leggi_storia_cds(percorso_storia)
+    try:
+        mappa = json.loads(Path(percorso_mappa).read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        mappa = {}
+        print(f"!! CDS: abbinamenti non letti ({e})", file=sys.stderr)
+    tasso, tasso_fonte = tasso_cds(macro, storia)
+    lettura, errore = None, None
+    try:
+        lettura = leggi_cds_ice(get)
+    except Exception as e:  # noqa: BLE001
+        errore = str(e)[:160]
+    letto = bool(lettura and lettura.get("data"))
+    if letto:
+        storia, nuova = aggiungi_storia_cds(storia, riga_storia_cds(lettura, tasso))
+        if nuova:
+            scrivi_storia_cds(storia, percorso_storia)
+    elif storia:
+        # ⚠ ripiego dichiarato: la fotografia e' quella dell'ultimo giorno raccolto, coi nomi delle
+        #   entita' che lo storico non porta (resta il codice)
+        u = storia[-1]
+        lettura = {"data": u["d"], "scadenza": datetime.fromisoformat(u["m"]).date(), "scartati": 0,
+                   "entita": {c: {"nome": c, "contratti": [{"livello": "SNRFOR", "valuta": "USD",
+                                                            "clausola": "XR14", "cedola": v[0], "prezzo": v[1],
+                                                            "scadenza": datetime.fromisoformat(v[2] if len(v) > 2 else u["m"]).date()}]}
+                              for c, v in (u.get("p") or {}).items()},
+                   "indici": {f: {"serie": v[0], "versione": v[1], "cedola": v[2], "prezzo": v[3]}
+                              for f, v in (u.get("i") or {}).items()}}
+    stati, indici = cds_dei_titoli(righe, lettura or {}, storia, mappa)
+    return {"fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
+            "url": ICE_CDS_NOMI, "letto": letto, "errore": errore,
+            "data": (lettura or {}).get("data"),
+            "scadenza": (lettura or {}).get("scadenza").isoformat() if (lettura or {}).get("scadenza") else None,
+            "entita_ice": len((lettura or {}).get("entita") or {}) if letto else None,
+            "tasso_pct": tasso, "tasso_fonte": tasso_fonte, "recupero": CDS_RECUPERO,
+            "punti_max": CDS_PUNTI_MAX, "indici": indici,
+            "storia": {"giorni": len(storia), "dal": storia[0]["d"] if storia else None},
+            "verificato": mappa.get("verificato"), **stati}
+
+
 def validate_macro(macro):
     """DATA ASSERTIONS (post-incidente margin debt congelato): valida il macro PRIMA che
     finisca nel payload AI. Due famiglie di regole:
@@ -5204,6 +5632,22 @@ def validate_macro(macro):
     else:
         _a = age_of(_cc.get("data"))
         add("credito_ccc", _cc.get("data"), 5, "ok" if (_a is not None and _a <= 5) else "stale")
+
+    # v497 — i CDS nascono sorvegliati (v390): giornalieri, 5 giorni coprono un ponte festivo.
+    # ⚠ "letto" separa il dato di oggi da quello dell'ultimo giorno raccolto: il secondo e' un
+    #   ripiego dichiarato, e se ICE smette di rispondere la sua eta' cresce fino a suonare.
+    _cds = macro.get("cds") or {}
+    if not _cds.get("data"):
+        add("cds_ice", None, 5, "missing", "prezzi dei CDS a 5 anni (ICE) non letti e nessuno storico raccolto")
+    else:
+        _a = age_of(_cds.get("data"))
+        _ok = _a is not None and _a <= 5
+        add("cds_ice", _cds.get("data"), 5, "ok" if _ok else "stale",
+            "" if _cds.get("letto") else f"ICE non letto in questo run ({_cds.get('errore') or 'motivo n.d.'}): "
+                                          f"vale l'ultimo giorno raccolto")
+    if _cds.get("non_classificati"):
+        add("cds_abbinamenti", _cds.get("data"), 5, "missing",
+            f"titoli seguiti senza classificazione in config/cds_entita.json: {', '.join(_cds['non_classificati'])}")
 
     bce = macro.get("bce") or {}
     if not bce.get("tasso_rifinanziamento"):
@@ -6113,6 +6557,18 @@ def main():
                      f"{sorted(senza_prezzo)}" if senza_prezzo else ""))
     except Exception as e:  # noqa: BLE001
         print(f"!! posizioni: {e}", file=sys.stderr)
+
+    # v497 — CDS a 5 anni da ICE: dopo le posizioni, perche' le righe sono tutte qui (posizioni e
+    # sorvegliati), e prima del riepilogo dei rischi. Il BTP sta nella sua funzione: entra a parte.
+    try:
+        macro["cds"] = aggiorna_cds(watchlist + ([btp] if isinstance(btp, dict) else []), macro)
+        _c = macro["cds"]
+        print(f"   CDS (ICE): {'letto' if _c['letto'] else 'NON letto — ' + str(_c.get('errore'))} · giorno "
+              f"{_c.get('data')} · {len(_c.get('quotati') or [])} quotati, {len(_c.get('assenti') or [])} senza CDS"
+              + (f", NON CLASSIFICATI: {_c['non_classificati']}" if _c.get("non_classificati") else "")
+              + f" · storico {_c['storia']['giorni']} giorni")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! CDS: {e}", file=sys.stderr)
 
     # MACRO SHOCK ALERT v125: incrocia futures Nasdaq (macro) e KOSPI live (watchlist) → flag panico
     shock = compute_shock_alert(macro, watchlist)
