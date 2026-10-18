@@ -173,6 +173,17 @@ def altman_rischio(r):
     return out
 
 
+def utili_negativi_penalizzano(a):
+    """v503 — utili non distribuiti NEGATIVI con un EBIT positivo, fuori dalla zona di sicurezza: il punteggio penalizza
+    piu' del credito di oggi. ⚠ La causa puo' essere doppia — perdite accumulate negli anni (Palantir, Bloom) o
+    riacquisti di azioni (Oracle, Dell) — e la fonte non dice quale: la v501 scriveva «il segno tipico di chi ha
+    riacquistato», e lo scriveva anche su chi non riacquista. In zona di sicurezza non cambia niente, e non si dice.
+    Una regola sola per la riga di Altman e per il confronto coi concorrenti (v161)."""
+    d = (a or {}).get("debole") or {}
+    return bool(d and d.get("termine") == TERMINI_ALTMAN[1] and (d.get("rapporto") or 0) < 0
+                and ((a or {}).get("ebit_attivo") or 0) > 0 and (a or {}).get("zona") != "SICUREZZA")
+
+
 def riga_altman(a):
     """Lo Z'' in UNA riga: zona, base e data del bilancio, rating equivalente, frequenze storiche per orizzonte, la
     finestra in cui il rischio si concentra, il termine piu' debole."""
@@ -208,9 +219,9 @@ def riga_altman(a):
     if a.get("debole"):
         d = a["debole"]
         s += f" · termine piu' debole: {d['termine']} ({_n(d['rapporto'], 3)}, contributo {_sg(d['contributo'], 2)})"
-        if d["termine"] == TERMINI_ALTMAN[1] and d["rapporto"] < 0 and (a.get("ebit_attivo") or 0) > 0:
-            s += (" — utili non distribuiti NEGATIVI con un EBIT positivo: e' il segno tipico di chi ha riacquistato "
-                  "molte azioni, e il punteggio lo penalizza piu' del suo credito reale")
+        if utili_negativi_penalizzano(a):
+            s += (" — utili non distribuiti NEGATIVI con un EBIT positivo: vengono da perdite accumulate in passato o da "
+                  "riacquisti di azioni (la fonte non dice quale), e il punteggio penalizza piu' del credito di oggi")
     return s
 
 

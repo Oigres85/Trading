@@ -739,8 +739,10 @@ Le soglie sono **convenzioni del 18/10/2026** (v240), stanno in `scripts/credito
   più alto e l'anno entro cui cade metà delle insolvenze dei primi dieci. **Non è una previsione sul nome**: è cosa è
   successo alle obbligazioni con quel rating. AAA/AA+ si legge sulla riga AA (scelta prudente); CC/D non ha una riga.
 - **Altman non si applica** agli intermediari finanziari (settore della pipeline "Financial Services": banche,
-  gestori, e — perché il campo è il settore intero — anche Visa e Mastercard, che banche non sono). Penalizza chi
-  riacquista molte azioni (utili non distribuiti negativi con un EBIT positivo: la riga lo dice).
+  gestori, e — perché il campo è il settore intero — anche Visa e Mastercard, che banche non sono). Penalizza chi ha
+  utili non distribuiti negativi con un EBIT positivo — perdite accumulate in passato o riacquisti di azioni, la fonte
+  non dice quale: la riga lo dice quando la penalità cade fuori dalla zona di sicurezza (v503; la v501 attribuiva
+  tutto ai riacquisti, anche su chi non ne fa).
 - **Le probabilità implicite nel CDS** sono neutrali al rischio (recupero 40%, intensità costante): più alte della
   frequenza storica, si leggono nel tempo e non contro Altman.
 - **Obbligazioni sul secondario, asset swap spread e Z-spread: non disponibili gratis in forma automatizzabile.**

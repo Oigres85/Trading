@@ -1,0 +1,416 @@
+{
+  "_regole": "v503 — richiesta del CEO del 18/10/2026: i concorrenti di ogni nome e le loro quote di mercato, e se sono piu' sani. Le QUOTE vengono da fonti terze, con mercato dichiarato (v400: una quota senza il suo mercato non si legge), misura, periodo, fonte, link e data di pubblicazione; 'tipo' = misura (un tracker di settore), stima (analisti, spesso di seconda mano) o nessuna (non esiste una quota pubblica verificabile: si dice, non si inventa — v396). La SALUTE dei concorrenti quotati la calcola scripts/concorrenti.py con le stesse formule per tutti. Si aggiorna quando la fonte pubblica il trimestre nuovo; oltre 120 giorni dalla pubblicazione lo strumento dichiara la quota da riverificare. 'pubblicato' e' AAAA-MM-GG, oppure AAAA-MM quando la fonte dichiara solo il mese (l'eta' si conta dal primo del mese: per eccesso). 'mercati_condivisi' rimanda ai mercati di un altro nome, senza copiarli.",
+  "nomi": {
+    "SMCI": {
+      "nome": "Super Micro Computer",
+      "mercati": [
+        {
+          "mercato": "server nel mondo",
+          "misura": "quota dei ricavi dei fornitori",
+          "periodo": "2° trimestre 2026",
+          "tipo": "misura",
+          "fonte": "IDC, Worldwide Quarterly Server Tracker (via EMSNow, 17/09/2026)",
+          "url": "https://www.emsnow.com/idc-posts-worldwide-server-market-revenue-for-q2-2026/",
+          "pubblicato": "2026-09-10",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "Dell Technologies",
+              "ticker": "DELL",
+              "quota_pct": 13.4,
+              "un_anno_prima_pct": 7.7
+            },
+            {
+              "nome": "Supermicro",
+              "ticker": "SMCI",
+              "quota_pct": 6.1,
+              "un_anno_prima_pct": 4.7
+            },
+            {
+              "nome": "Lenovo",
+              "ticker": "0992.HK",
+              "quota_pct": 5.1,
+              "un_anno_prima_pct": 3.9
+            },
+            {
+              "nome": "Hewlett Packard Enterprise",
+              "ticker": "HPE",
+              "quota_pct": 3.5,
+              "un_anno_prima_pct": 3.7
+            },
+            {
+              "nome": "IEIT Systems (Inspur)",
+              "ticker": "000977.SZ",
+              "quota_pct": 2.4,
+              "un_anno_prima_pct": 4.0
+            },
+            {
+              "nome": "ODM diretti (categoria: Foxconn, Quanta, Wiwynn e altri)",
+              "quota_pct": 53.9,
+              "un_anno_prima_pct": 60.6,
+              "categoria": true
+            }
+          ],
+          "nota": "mercato totale 166,3 miliardi $ (+52% sull'anno); nel 1° trimestre 2026 Dell era al 16,5% e Supermicro al 7,6% (Electronics Weekly)"
+        }
+      ],
+      "concorrenti_quotati": [
+        "DELL",
+        "HPE",
+        "0992.HK",
+        "000977.SZ",
+        "2382.TW",
+        "6669.TW",
+        "2317.TW"
+      ],
+      "concorrenti_non_quotati": []
+    },
+    "MU": {
+      "nome": "Micron Technology",
+      "mercati": [
+        {
+          "mercato": "memorie DRAM nel mondo",
+          "misura": "quota dei ricavi",
+          "periodo": "2° trimestre 2026",
+          "tipo": "misura",
+          "fonte": "TrendForce, comunicato del 07/09/2026",
+          "url": "https://www.trendforce.com/presscenter/news/20260907-13219.html",
+          "pubblicato": "2026-09-07",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "Samsung Electronics",
+              "ticker": "005930.KS",
+              "quota_pct": 39.4
+            },
+            {
+              "nome": "SK hynix",
+              "ticker": "SKHY",
+              "quota_pct": 24.9
+            },
+            {
+              "nome": "Micron",
+              "ticker": "MU",
+              "quota_pct": 23.3
+            }
+          ],
+          "nota": "mercato totale 154,7 miliardi $ (+59,5% sul trimestre); Counterpoint sullo stesso trimestre da' 39 / 26 / 25 con un altro metodo"
+        },
+        {
+          "mercato": "memorie HBM (per l'AI)",
+          "misura": "quota dei ricavi",
+          "periodo": "2° trimestre 2026",
+          "tipo": "misura",
+          "fonte": "Counterpoint Research (via Seoul Economic Daily, 03/09/2026)",
+          "url": "https://en.sedaily.com/finance/2026/09/03/samsung-doubles-hbm-market-share-to-33-percent-narrowing",
+          "pubblicato": "2026-09-03",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "SK hynix",
+              "ticker": "SKHY",
+              "quota_pct": 50
+            },
+            {
+              "nome": "Samsung Electronics",
+              "ticker": "005930.KS",
+              "quota_pct": 33
+            },
+            {
+              "nome": "Micron",
+              "ticker": "MU",
+              "quota_pct": 18
+            }
+          ],
+          "nota": "un trimestre prima: SK hynix 58, Samsung 21, Micron 21 (ricavati dalle variazioni dell'articolo)"
+        }
+      ],
+      "concorrenti_quotati": [
+        "005930.KS",
+        "SKHY"
+      ],
+      "concorrenti_non_quotati": [
+        "CXMT (Cina)"
+      ]
+    },
+    "SKHY": {
+      "nome": "SK hynix",
+      "concorrenti_quotati": [
+        "005930.KS",
+        "MU"
+      ],
+      "concorrenti_non_quotati": [
+        "CXMT (Cina)"
+      ],
+      "mercati_condivisi": [
+        {
+          "da": "MU"
+        }
+      ]
+    },
+    "NVDA": {
+      "nome": "NVIDIA",
+      "mercati": [
+        {
+          "mercato": "acceleratori per l'AI nei data center",
+          "misura": "quota dei ricavi",
+          "periodo": "2026",
+          "tipo": "stima",
+          "fonte": "stime di analisti riportate di seconda mano (Morgan Stanley ~85% a marzo 2026; Bloomberg Intelligence 70-75% fino al 2030) e la crescita degli ASIC personalizzati (+44,6% contro +16,1% delle GPU, TrendForce, maggio 2026)",
+          "url": "https://siliconanalysts.com/analysis/nvidia-ai-accelerator-market-share-2024-2026",
+          "pubblicato": "2026-05",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "NVIDIA",
+              "ticker": "NVDA",
+              "quota_min_pct": 70,
+              "quota_max_pct": 85
+            },
+            {
+              "nome": "ASIC personalizzati (Google, Amazon, Meta, Microsoft, OpenAI; progettati con Broadcom e Marvell)",
+              "quota_min_pct": 12,
+              "quota_max_pct": 20,
+              "categoria": true
+            },
+            {
+              "nome": "AMD",
+              "ticker": "AMD",
+              "quota_min_pct": 5,
+              "quota_max_pct": 8
+            }
+          ],
+          "nota": "le stime differiscono per metodo (ricavi o unita') e fonte: un intervallo, non un numero"
+        }
+      ],
+      "concorrenti_quotati": [
+        "AMD",
+        "AVGO",
+        "MRVL",
+        "INTC"
+      ],
+      "concorrenti_non_quotati": []
+    },
+    "AMD": {
+      "nome": "Advanced Micro Devices",
+      "mercati": [
+        {
+          "mercato": "processori x86 per server",
+          "misura": "quota delle unita' spedite",
+          "periodo": "2° trimestre 2026",
+          "tipo": "misura",
+          "fonte": "Mercury Research (via The Register, 21/08/2026)",
+          "url": "https://www.theregister.com/systems/2026/08/21/amd-grabs-more-cpu-share-while-pricier-pcs-punish-desktop-demand/5291053",
+          "pubblicato": "2026-08-21",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "Intel",
+              "ticker": "INTC",
+              "quota_pct": 65.5
+            },
+            {
+              "nome": "AMD",
+              "ticker": "AMD",
+              "quota_pct": 34.5,
+              "un_anno_prima_pct": 27.3
+            }
+          ],
+          "nota": "solo x86: i processori Arm per server (AWS Graviton, NVIDIA Grace) sono fuori da questo conto; contando solo EPYC contro Xeon, AMD arriva al 46,4%"
+        }
+      ],
+      "concorrenti_quotati": [
+        "INTC",
+        "NVDA",
+        "AVGO"
+      ],
+      "concorrenti_non_quotati": [],
+      "mercati_condivisi": [
+        {
+          "da": "NVDA",
+          "mercato": "acceleratori per l'AI nei data center"
+        }
+      ]
+    },
+    "MRVL": {
+      "nome": "Marvell Technology",
+      "mercati": [
+        {
+          "mercato": "chip AI personalizzati (ASIC) progettati per i grandi cloud",
+          "misura": "quota del mercato",
+          "periodo": "2026",
+          "tipo": "stima",
+          "fonte": "Bloomberg Intelligence, rapporto di gennaio 2026 (riportato da comunicato e stampa)",
+          "url": "https://www.bloomberg.com/company/press/ai-accelerator-market-looks-set-to-exceed-600-billion-by-2033-driven-by-hyperscale-spending-and-asic-adoption-according-to-bloomberg-intelligence/",
+          "pubblicato": "2026-01",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "Broadcom",
+              "ticker": "AVGO",
+              "quota_min_pct": 60,
+              "quota_max_pct": 80
+            },
+            {
+              "nome": "Marvell",
+              "ticker": "MRVL",
+              "quota_min_pct": 20,
+              "quota_max_pct": 25
+            }
+          ],
+          "nota": "stime di seconda mano piu' recenti mettono Broadcom intorno al 70%: fonte originale non trovata"
+        }
+      ],
+      "concorrenti_quotati": [
+        "AVGO",
+        "3661.TW"
+      ],
+      "concorrenti_non_quotati": []
+    },
+    "CRWV": {
+      "nome": "CoreWeave",
+      "mercati": [
+        {
+          "mercato": "infrastruttura cloud nel mondo",
+          "misura": "quota della spesa",
+          "periodo": "2° trimestre 2026",
+          "tipo": "misura",
+          "fonte": "Synergy Research Group, 30/07/2026",
+          "url": "https://www.srgresearch.com/articles/q2-cloud-market-passes-143-billion-highest-growth-rate-in-eight-years",
+          "pubblicato": "2026-07-30",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "Amazon (AWS)",
+              "ticker": "AMZN",
+              "quota_pct": 28
+            },
+            {
+              "nome": "Microsoft (Azure)",
+              "ticker": "MSFT",
+              "quota_pct": 20
+            },
+            {
+              "nome": "Google Cloud",
+              "ticker": "GOOGL",
+              "quota_pct": 15
+            }
+          ],
+          "nota": "la fonte NON pubblica la quota di CoreWeave ne' di Oracle: li nomina fra i fornitori di secondo livello con la crescita piu' alta, e conta nove 'neocloud' fra i primi 40 fornitori. Mercato totale ~143 miliardi $ nel trimestre"
+        }
+      ],
+      "concorrenti_quotati": [
+        "AMZN",
+        "MSFT",
+        "GOOGL",
+        "ORCL",
+        "NBIS"
+      ],
+      "concorrenti_non_quotati": [
+        "Lambda",
+        "Crusoe"
+      ]
+    },
+    "ORCL": {
+      "nome": "Oracle",
+      "concorrenti_quotati": [
+        "AMZN",
+        "MSFT",
+        "GOOGL",
+        "CRWV"
+      ],
+      "concorrenti_non_quotati": [],
+      "mercati_condivisi": [
+        {
+          "da": "CRWV"
+        }
+      ]
+    },
+    "MSTR": {
+      "nome": "Strategy",
+      "mercati": [
+        {
+          "mercato": "bitcoin detenuti dalle societa' quotate",
+          "misura": "quota dei bitcoin detenuti",
+          "periodo": "3° trimestre 2026",
+          "tipo": "misura",
+          "fonte": "BitcoinTreasuries, Q3 2026 Corporate Adoption Report (circa due terzi) e pagina della societa' (848.250 BTC al 12/10/2026)",
+          "url": "https://bitcointreasuries.net/",
+          "pubblicato": "2026-10",
+          "verificato_il": "2026-10-18",
+          "quote": [
+            {
+              "nome": "Strategy",
+              "ticker": "MSTR",
+              "quota_pct": 66
+            }
+          ],
+          "nota": "848.250 BTC al 12/10/2026 (dichiarazione della societa': 848.000 al 04/10), circa il 4% dei 21 milioni che esisteranno; seguono Metaplanet (44.000 BTC), Twenty One (43.514), Strive (35.595). Non e' un mercato di prodotti: misura quanto della scommessa quotata sul bitcoin passa da un titolo solo"
+        }
+      ],
+      "concorrenti_quotati": [
+        "3350.T",
+        "MARA"
+      ],
+      "concorrenti_non_quotati": []
+    },
+    "PLTR": {
+      "nome": "Palantir Technologies",
+      "mercati": [
+        {
+          "mercato": "piattaforme di dati e di AI per aziende e governi",
+          "tipo": "nessuna",
+          "fonte": "nessuna fonte pubblica con una quota verificabile: non esiste un tracker unico di questo mercato",
+          "verificato_il": "2026-10-18",
+          "quote": []
+        }
+      ],
+      "concorrenti_quotati": [
+        "SNOW",
+        "AI"
+      ],
+      "concorrenti_non_quotati": [
+        "Databricks"
+      ]
+    },
+    "BE": {
+      "nome": "Bloom Energy",
+      "mercati": [
+        {
+          "mercato": "energia prodotta sul posto per i data center (celle a combustibile, turbine, generatori)",
+          "tipo": "nessuna",
+          "fonte": "nessuna fonte pubblica con una quota verificabile",
+          "verificato_il": "2026-10-18",
+          "quote": []
+        }
+      ],
+      "concorrenti_quotati": [
+        "FCEL",
+        "GEV",
+        "CAT"
+      ],
+      "concorrenti_non_quotati": []
+    },
+    "RGTI": {
+      "nome": "Rigetti Computing",
+      "mercati": [
+        {
+          "mercato": "computer quantistici",
+          "tipo": "nessuna",
+          "fonte": "nessuna quota pubblica significativa: il mercato e' ancora pre-commerciale, con ricavi di poche decine di milioni per societa'",
+          "verificato_il": "2026-10-18",
+          "quote": []
+        }
+      ],
+      "concorrenti_quotati": [
+        "IONQ",
+        "QBTS",
+        "IBM"
+      ],
+      "concorrenti_non_quotati": [
+        "Quantinuum",
+        "Google (divisione)"
+      ]
+    }
+  }
+}

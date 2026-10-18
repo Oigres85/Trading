@@ -122,6 +122,19 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    implicita** (VIX, VXN, VIX3M e la struttura a termine), la **concentrazione** (quanto pesano i primi dieci
    titoli, e quali sono nel libro), l'**ampiezza** (pesi uguali contro capitalizzazione) e la **tendenza** di SPY e
    QQQ con le regole dei titoli. Il valore di una fonte non si confronta mai con la media di un'altra.
+8. `python3 scripts/concorrenti.py` (v503, CEO, 18/10 sera: *"Smci però ha quote di mercato molto bassa rispetto ai
+   competitor che sono effettivamente più sani. Analizza anche questo per gli altri e rendilo strutturale"*) — per
+   ogni posizione, e per i sorvegliati che hanno un registro, i **concorrenti e le loro quote di mercato** dal registro
+   `memoria/concorrenti.json` (mercato dichiarato, misura, periodo, fonte, link, data: una quota senza il suo mercato
+   non si legge; una STIMA di analisti si dice tale; dove una quota pubblica verificabile non esiste, si dice), e la
+   **salute a confronto** misurata con le funzioni della pipeline, uguali per il nome e per ogni concorrente: crescita
+   dei ricavi sullo stesso trimestre dell'anno prima, margine lordo, margine operativo e cassa libera degli ultimi 4
+   trimestri, Altman Z'' con zona e rating equivalente, liquidità sul debito a breve — solo rapporti, e per ogni
+   misura il posto del nome nel gruppo, senza punteggio. Le letture stanno in `memoria/concorrenti_dati.json` e si
+   rifanno dopo 7 giorni, 15 per giro; una quota oltre 120 giorni dalla pubblicazione si dichiara da riverificare.
+   I conti trimestrali di una società possono fermarsi prima del trimestre che la stessa fonte dichiara chiuso
+   (il 18/10: Amazon, Micron, Lenovo): un trimestre di ritardo si dichiara nella riga, oltre uno la società descrive
+   un altro periodo e resta fuori dai posti, nominata.
 
 ## Cosa contiene la risposta, in quest'ordine
 0. **Semaforo d'uscita** (decisione del CEO del 06/10; calcolato da v474): il colore di oggi in
@@ -224,6 +237,12 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    struttura a termine (sopra 1 è invertita: la forma dello stress); quanto pesano i primi dieci titoli e quali
    sono nel libro; l'ampiezza; la tendenza di SPY e QQQ. È INFORMAZIONE: nessuna prova della tenuta, nessun
    colore, nessuna vendita. Il riferimento accanto ai multipli dei titoli (schede) resta quello della pipeline.
+5quater. **Concorrenti e quote di mercato** (v503, CEO, 18/10 sera) — dal blocco di `concorrenti.py`, per ogni
+   posizione: il mercato, la quota del nome e dei concorrenti con la fonte e la data (e se la quota è vecchia, che va
+   riverificata), poi chi è più sano su ogni misura — crescita, margini, cassa libera, Altman, liquidità sul debito a
+   breve. La risposta distingue le due domande: **quanto mercato** (la quota) e **quanto è solida** (la salute), che
+   possono dire cose opposte — SMCI ha la metà della quota di Dell e il bilancio più solido del gruppo. È
+   INFORMAZIONE: nessuna prova della tenuta, nessun colore, nessuna vendita. Un nome senza registro si nomina.
 6. **Tenuta e piano** (decisioni del CEO del 14/10/2026, regola in `memoria/LIBRO.md` §1sexies:
    *si lascia correre, si vende per EVIDENZA, e si valuta l'insieme — non la sola tecnica*) — dal
    blocco `TENUTA DELLE POSIZIONI` di `numeri_libro.py`, per ogni posizione l'esito (VENDITA PER
@@ -335,6 +354,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        diversifica o abbassa la volatilità sale); 3) il pavimento (vicinanza, tocchi, ampiezza dello stop);
        4) gli eventi dentro la vita dell'ordine (conti entro 14 giorni, scadenze di lock-up). Chi ha i conti
        vicini si rimanda a dopo i conti, e si dice.
+       Da v503 (CEO, 18/10 sera): un sorvegliato che diventa un ingresso riceve PRIMA la sua voce nel registro dei
+       concorrenti (`memoria/concorrenti.json`: mercato, quote, fonte e data cercati in rete), così l'ingresso porta
+       accanto la sua quota di mercato e la salute dei concorrenti come ogni posizione.
    7e. **il PIANO PER LA LIQUIDITÀ** (v474, decisione del CEO del 09/10) — dal blocco omonimo di
        `rotazione.py`: la liquidità e la sua quota del patrimonio; per gli operabili adesso e per
        gli avvisi le conseguenze di un'unità di 5.000 € sul libro (volatilità, beta su QQQ, perdita
@@ -376,7 +398,9 @@ trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza — info
 VWAP dall'ultima trimestrale accanto ai pavimenti di ogni titolo; i segnali di mercato misurati e lasciati come
 informazione (18/10) · la salute del credito di ogni nome — CDS con rincaro improvviso, allargamento e divergenza
 dal titolo, Altman con la frequenza storica d'insolvenza per orizzonte, il debito dai bilanci depositati — e gli
-eventi del CDS nel brief delle due letture del giorno (18/10).
+eventi del CDS nel brief delle due letture del giorno (18/10) · i concorrenti e le quote di mercato di ogni posizione
+con fonte e data, e la salute di ciascuno misurata con le stesse formule — e per i sorvegliati che diventano un
+ingresso, prima dell'ingresso (18/10 sera).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

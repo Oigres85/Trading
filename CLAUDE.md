@@ -7912,3 +7912,69 @@ segnalare come difetto un campo che c'era.
   il gate non contiene il fenomeno* (v430, v489): aggiunto, morde.
 Pavimenti: `test_update_data.py` 280 → 285 (295 punti di chiamata) e N_CHECKS_MINIMO 300 → 303 (308 eseguiti),
 `test_analisi_libro.py` 705 → 710 (724). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🏁 v503 — I CONCORRENTI E LE QUOTE DI MERCATO: DUE DOMANDE, DUE PROPRIETARI
+
+Il CEO, 18/10/2026 sera, testuale: *"Smci però ha quote di mercato molto bassa rispetto ai competitor che sono
+effettivamente più sani. Analizza anche questo per gli altri e rendilo strutturale, ovvero i competitor e delle
+relative quote di mercato. Spero che comunque le vecchie richieste per esempio relative ai bilanci e alla situazione
+finanziaria siano rimaste strutturali."*
+
+**Le vecchie richieste lo sono, e la risposta viene dal controllo, non dalla memoria**: il registro delle richieste in
+`FORMATO_ANALISI.md` le elenca tutte, `analisi.py` esegue `schede_progetto.py` e dentro c'è il blocco SALUTE DEL CREDITO
+(v501-v502). Una conferma a voce su un sistema che cambia ogni giorno è la frase che invecchia da sola.
+
+### Quanto mercato e quanto è solida: si misurano in modi diversi, e possono dire cose opposte
+`scripts/concorrenti.py`, nel comando unico (`analisi.py`), sezione 5quater del formato.
+- **LE QUOTE** non hanno una fonte gratuita automatizzabile (IDC, TrendForce, Counterpoint, Mercury, Synergy sono a
+  pagamento o in comunicati): vivono in un **registro scritto a mano**, `memoria/concorrenti.json`, con il MERCATO
+  dichiarato (una quota senza il suo mercato non si legge, v400), la misura, il periodo, la fonte, il link, la data di
+  pubblicazione e il tipo — `misura` di un tracker, `stima` di analisti (spesso di seconda mano), `nessuna` dove una
+  quota pubblica verificabile non esiste (Palantir, Bloom, Rigetti: si dice, v396). Oltre **120 giorni** dalla
+  pubblicazione la quota si dichiara DA RIVERIFICARE (convenzione, v240); una data a mese conta l'età dal primo del
+  mese. Se la fonte non pubblica la quota del nome, la riga lo dice (Synergy non pubblica CoreWeave né Oracle).
+  I mercati condivisi si **leggono** dal nome che li dichiara, mai copiati (SK hynix da Micron, Oracle da CoreWeave,
+  l'AMD degli acceleratori da NVIDIA): una quota aggiornata vale per tutti e due (v161).
+- **LA SALUTE** la misura lo strumento con le **funzioni della pipeline**, le stesse per il nome e per ogni concorrente
+  (v161): crescita sullo stesso trimestre dell'anno prima trovato per data (`schede_progetto.ultimo_trimestre`),
+  margine lordo, margine operativo e cassa libera degli ultimi 4 trimestri, Altman Z'' con zona e rating, liquidità sul
+  debito a breve. **Solo rapporti** (Samsung in won, Quanta in dollari taiwanesi: v404, v447). Per ogni misura il
+  **posto** del nome fra chi ha il dato, **nessun punteggio d'insieme** (v200).
+- yfinance risponde da questo ambiente anche per Taiwan, Hong Kong, Shenzhen, Seul e Tokyo (~1,5 s a titolo, misurato);
+  l'API di stockanalysis non ha i bilanci. Le letture stanno in `memoria/concorrenti_dati.json`, si rifanno dopo 7
+  giorni, 15 per giro (quota per IP, v398), con **una versione dal primo giorno** — la lezione v502 applicata subito.
+- L'abbinamento è per **ticker scritto nel registro**, mai per nome: la v497 aveva misurato Super Micro → SUPERVALU.
+
+**La premessa del CEO era giusta a metà, e la misura l'ha detto**: SMCI ha **6,1%** dei server contro **13,4%** di Dell
+(IDC, 2° trimestre 2026) e margini sottili (lordo 10,8% contro 19,9% di Dell e 36,6% di HPE; cassa libera −17,8% dei
+ricavi), ma il **bilancio più solido del gruppo**: Altman 6,77 contro Dell 0,89 e HPE 0,99, in zona di pericolo
+(Lenovo anche, ma con conti fermi a tre trimestri fa: vedi sotto). Quota e salute sono due domande, e il formato chiede di tenerle distinte.
+
+### Tre difetti trovati costruendolo, e nessuno dai gate
+1. ⚠⚠ **La v501 attribuiva ai riacquisti di azioni gli utili non distribuiti negativi** — anche su chi non riacquista:
+   Palantir, Bloom e Metaplanet li hanno negativi per **perdite accumulate**. Ora la riga dice *"perdite accumulate in
+   passato o riacquisti di azioni (la fonte non dice quale)"*, e solo fuori dalla zona di sicurezza, dove la penalità
+   pesa: una regola sola (`credito.utili_negativi_penalizzano`) per la riga di Altman e per il confronto. Trovato
+   mettendo dieci bilanci uno accanto all'altro: una frase vera su Oracle era falsa su metà degli altri.
+2. ⚠⚠ **I conti trimestrali della fonte possono fermarsi prima del trimestre che la stessa fonte dichiara chiuso**
+   (`mostRecentQuarter`): Amazon fermo al 31/03 col 30/06 dichiarato (i ricavi del trimestre sono vuoti in yfinance),
+   Micron al 31/05 col 03/09, **Lenovo al 30/09/2025 col 30/06/2026** — tre trimestri — e Lenovo entrava nei posti di
+   SMCI accanto a società al 2026, davanti a lei sulla liquidità. Trovato **leggendo l'uscita come il destinatario**.
+   Ora un trimestre di ritardo si dichiara nella riga; oltre uno la società descrive un altro periodo, resta fuori dai
+   posti e si **nomina** (v406). È la v502 su un'altra fonte: un dato vecchio pubblicato come corrente.
+3. Il messaggio di un difetto del registro stampava *"sommano 101.5%"*: il punto inglese, la classe v442/v443, preso
+   scrivendo il gate.
+
+### I gate
+Ventisette controlli sugli stati costruiti (v425): il registro vero senza difetti e **ogni posizione con la sua voce** —
+come la v480 per la watchlist, morde al commit dopo che il CEO compra un nome nuovo, che è quando la voce si scrive
+(FORMATO 7d-ter: un sorvegliato la riceve **prima** di diventare un ingresso) —; ogni difetto del registro nominato col
+suo motivo; la data a mese; i mercati condivisi come stesso oggetto; la resa della quota col bordo dei 120 giorni; la
+salute con le funzioni della pipeline sostituite (il collegamento **eseguito**, v483) nei tre esiti (v389); la memoria
+(chi manca prima, la versione, l'errore che non cancella la lettura buona); i posti; il ritardo dei conti; `calcola`
+eseguita sul libro vero con registro e memoria costruiti; i collegamenti col comando unico e col formato.
+**Ventisei iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**,
+ciascuna sul controllo atteso. Una non era applicata al primo giro: l'avevo scritta io con una parentesi in più, e
+`modifica_sicura` l'ha rifiutata lasciando il file intatto — riscritta, morde.
+Pavimento di `test_analisi_libro.py` 710 → 735 (751 punti di chiamata). `?v=` e `BUILD_VERSION` non toccati: nessun
+file servito al browser (v440).

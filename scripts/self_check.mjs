@@ -170,7 +170,8 @@ const SUITE = [
   /* v500: 699 punti di chiamata (+45 su VWAP dai conti, debug del 18/10, misura dei segnali) -> 685 */
   /* v501: 721 punti di chiamata (+22 sulla salute del credito: Altman, CDS, debito, segnali, brief) -> 705 */
   /* v502: 724 punti di chiamata (+3 sulle voci SEC vecchie dichiarate e la versione della lettura) -> 710 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 710, firma: /\d+\/\d+ CHECK OK/ },
+  /* v503: 751 punti di chiamata (+27 su concorrenti e quote di mercato: registro, salute, memoria, posti) -> 735 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 735, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

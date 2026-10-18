@@ -31,6 +31,10 @@ committata resta solo in questa sessione e il confronto con l'indice perde un gi
 v499 — uno strumento in piu', indici.py (S&P 500 e Nasdaq-100: P/E con la storia della sua fonte, stagione delle
 trimestrali, volatilita' implicita, concentrazione, ampiezza, tendenza), e due memorie in piu': il dark pool di
 posizionamento.py e la storia raccolta del P/E del Nasdaq-100 di indici.py (decisione del CEO del 17/10/2026, sera).
+
+v503 — concorrenti.py: i concorrenti di ogni posizione con le quote di mercato (dal registro, con fonte e data) e la
+salute misurata con le stesse formule per tutti; la sua memoria delle letture (memoria/concorrenti_dati.json) va
+committata come le altre (CEO, 18/10/2026).
 """
 from __future__ import annotations
 
@@ -51,12 +55,14 @@ TITOLO_CHECKLIST = "## Cosa contiene la risposta"
 TITOLO_REGOLE = "## Regole"
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py", "indici.py")
+STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py", "indici.py",
+             "concorrenti.py")
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 # v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
 # v499 — e il dark pool (posizionamento.py) e la storia del P/E del Nasdaq-100 (indici.py): stesse ragioni
 MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzioni_titoli.jsonl",
-           RADICE / "memoria" / "dark_pool.jsonl", RADICE / "memoria" / "indici.jsonl")
+           RADICE / "memoria" / "dark_pool.jsonl", RADICE / "memoria" / "indici.jsonl",
+           RADICE / "memoria" / "concorrenti_dati.json")
 LIMITE_SECONDI = 600
 
 
@@ -93,6 +99,8 @@ def comandi(f, sedute=1):
               "bitcoin dall'ultima chiusura USA", ["posizionamento.py"]))
     c.append(("INDICI — S&P 500 e Nasdaq-100: P/E con la storia della sua fonte, stagione delle trimestrali, volatilita', "
               "concentrazione, ampiezza, tendenza", ["indici.py"]))
+    c.append(("CONCORRENTI E QUOTE DI MERCATO — chi sono, quanta parte del mercato hanno (fonte e data), e la salute "
+              "con le stesse formule per tutti", ["concorrenti.py"]))
     return c
 
 

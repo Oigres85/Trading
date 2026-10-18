@@ -6177,6 +6177,333 @@ check("v502 collegamento ESEGUITO (v483): le schede passano alla riga del debito
       "pipeline — una cache rimasta indietro si dichiara, una allineata no",
       "precedente alla regola dell'eta'" in _sc502[502] and "precedente alla regola dell'eta'" not in _sc502[501])
 
+# ═══ v503 — i concorrenti e le quote di mercato: il registro, la salute con le stesse formule, i posti ═════════
+import concorrenti as KO
+import tempfile as _tf503, hashlib as _hl503
+from datetime import date as _d503, timedelta as _td503
+
+_reg503 = KO.carica_registro()
+_dif503 = KO.controlla_registro(_reg503)
+check("v503 il registro VERO dei concorrenti non ha difetti: " + " · ".join(_dif503), not _dif503 and len(_reg503) >= 5)
+_pos503 = [p["tk"] for p in brief.leggi_libro()[0] if p.get("valuta") == "USD"]
+check("v503 ogni posizione del libro ha la sua voce nel registro dei concorrenti (FORMATO 7d-ter: un ingresso la riceve "
+      "PRIMA) — mancano: " + (", ".join(t for t in _pos503 if t not in _reg503) or "nessuna"),
+      len(_pos503) >= 3 and all(t in _reg503 for t in _pos503))
+
+# --- il registro: ogni dichiarazione mancante o incoerente si NOMINA, una voce completa non ha difetti ---
+def _m503(**k):
+    base = {"mercato": "M", "misura": "quota dei ricavi", "periodo": "2° trimestre 2026", "fonte": "F",
+            "url": "https://x", "pubblicato": "2026-09-10", "verificato_il": "2026-10-18", "tipo": "misura",
+            "quote": [{"nome": "A", "ticker": "A", "quota_pct": 40}, {"nome": "B", "ticker": "B", "quota_pct": 30}]}
+    base.update(k)
+    return base
+_casi503 = {
+    "senza url": ({"A": {"mercati": [_m503(url="")]}}, "manca 'url'"),
+    "data illeggibile": ({"A": {"mercati": [_m503(pubblicato="2026/09")]}}, "data di pubblicazione assente o illeggibile"),
+    "somma oltre": ({"A": {"mercati": [_m503(quote=[{"nome": "A", "ticker": "A", "quota_pct": 51},
+                                                    {"nome": "B", "quota_pct": 51}])]}}, "sommano 102,0"),
+    "rimando assente": ({"A": {"mercati": [_m503()], "mercati_condivisi": [{"da": "Z"}]}}, "rimanda ai mercati di Z"),
+    "nessuna con quote": ({"A": {"mercati": [_m503(tipo="nessuna")]}}, "'nessuna' quota dichiarata ma con quote"),
+    "tipo ignoto": ({"A": {"mercati": [_m503(tipo="forse")]}}, "tipo 'forse' non fra"),
+    "nessun mercato": ({"A": {"mercati": []}}, "nessun mercato (ne' suo ne' condiviso)"),
+}
+_es503 = {k: KO.controlla_registro(v) for k, (v, _) in _casi503.items()}
+check("v503 il registro: ogni difetto si NOMINA col suo motivo — link, data leggibile, quote oltre il 100%, rimando a un "
+      "nome assente, 'nessuna' con delle quote, tipo ignoto, nessun mercato",
+      all(any(_casi503[k][1] in d for d in _es503[k]) for k in _casi503), str(_es503))
+_pulito503 = {"A": {"mercati": [_m503()]}, "B": {"mercati_condivisi": [{"da": "A"}]}}
+_arr503 = {"A": {"mercati": [_m503(quote=[{"nome": "A", "ticker": "A", "quota_pct": 62}, {"nome": "B", "quota_pct": 33},
+                                          {"nome": "C", "quota_pct": 6}])]}}
+_due503 = {"A": {"mercati": [_m503(quote=[{"nome": "A", "ticker": "A", "quota_pct": 51},
+                                          {"nome": "B", "quota_pct": 50.5}])]}}
+check("v503 una voce completa non ha difetti, anche un nome che condivide i mercati di un altro; tre quote arrotondate "
+      "dalla fonte possono sommare 101 (mezzo punto per quota), due quote a 101,5 no",
+      not KO.controlla_registro(_pulito503) and not KO.controlla_registro(_arr503)
+      and any("sommano 101,5" in d for d in KO.controlla_registro(_due503)),
+      str([KO.controlla_registro(_pulito503), KO.controlla_registro(_arr503), KO.controlla_registro(_due503)]))
+check("v503 la data di pubblicazione: giorno pieno, solo il mese (l'eta' dal primo del mese, per eccesso), e None — mai "
+      "un'eta' inventata — su un formato diverso, una data impossibile o l'assenza",
+      KO.data_pubblicazione("2026-09-10") == _d503(2026, 9, 10) and KO.data_pubblicazione("2026-05") == _d503(2026, 5, 1)
+      and KO.data_pubblicazione("2026/05") is None and KO.data_pubblicazione(None) is None
+      and KO.data_pubblicazione("2026-13") is None and KO.data_pubblicazione("2026-02-30") is None)
+
+# --- i mercati condivisi si LEGGONO dal nome che li dichiara (v161), mai copiati ---
+_rc503 = {"A": {"mercati": [_m503(mercato="M1"), _m503(mercato="M2")]},
+          "B": {"mercati": [_m503(mercato="M3")], "mercati_condivisi": [{"da": "A", "mercato": "M2"}]},
+          "C": {"mercati_condivisi": [{"da": "A"}]}}
+check("v503 i mercati condivisi si leggono dal nome che li dichiara, anche filtrati per mercato, e sono LO STESSO oggetto "
+      "(letto, non copiato: un aggiornamento della quota vale per tutti e due i nomi)",
+      [m["mercato"] for m in KO.mercati_di("B", _rc503)] == ["M3", "M2"]
+      and [m["mercato"] for m in KO.mercati_di("C", _rc503)] == ["M1", "M2"]
+      and KO.mercati_di("C", _rc503)[0] is _rc503["A"]["mercati"][0])
+
+# --- la resa di una quota: mercato, misura, fonte, data, eta'; il nome marcato; cio' che la fonte non pubblica, detto ---
+_mm503 = _m503(mercato="server nel mondo", misura="quota dei ricavi dei fornitori", fonte="IDC",
+               quote=[{"nome": "Dell", "ticker": "DELL", "quota_pct": 13.4, "un_anno_prima_pct": 7.7},
+                      {"nome": "Supermicro", "ticker": "SMCI", "quota_pct": 6.1},
+                      {"nome": "ODM", "categoria": True, "quota_pct": 47.8}])
+_pub503 = _d503(2026, 9, 10)
+_rm503 = {g: "\n".join(KO.righe_mercato(_mm503, "SMCI", _pub503 + _td503(days=g))) for g in (38, 120, 121)}
+_rh503 = "\n".join(KO.righe_mercato(_mm503, "HPE", _pub503 + _td503(days=38)))
+check("v503 una quota si legge col suo mercato, la misura, la fonte, la data e l'eta'; il nome in esame e' marcato, la "
+      "categoria si dichiara, e la somma delle quote elencate e' detta (il resto e' di altri): " + _rm503[38],
+      "server nel mondo — quota dei ricavi dei fornitori, 2° trimestre 2026" in _rm503[38]
+      and "fonte IDC, pubblicata il 10/09/2026, 38 giorni fa" in _rm503[38] and "Supermicro ◀ 6,1%" in _rm503[38]
+      and "Dell 13,4% (un anno prima 7,7%)" in _rm503[38] and "ODM 47,8% [categoria, non una societa']" in _rm503[38]
+      and "le quote elencate sommano 67,3%" in _rm503[38] and "link: https://x" in _rm503[38]
+      and "NON e' pubblicata" not in _rm503[38])
+check("v503 oltre 120 giorni dalla pubblicazione la quota si dichiara DA RIVERIFICARE, a 120 no",
+      "DA RIVERIFICARE" not in _rm503[38] and "DA RIVERIFICARE" not in _rm503[120] and "DA RIVERIFICARE" in _rm503[121]
+      and "121 giorni fa" in _rm503[121])
+check("v503 se la fonte non pubblica la quota del nome in esame lo dice, e non marca nessuno",
+      "la quota di HPE NON e' pubblicata da questa fonte" in _rh503 and "◀" not in _rh503)
+_ms503 = _m503(tipo="stima", pubblicato="2026-05",
+               quote=[{"nome": "Nvidia", "ticker": "NVDA", "quota_min_pct": 70, "quota_max_pct": 85}])
+_rs503m = "\n".join(KO.righe_mercato(_ms503, "NVDA", _d503(2026, 6, 15)))
+_mn503 = {"mercato": "software di analisi", "tipo": "nessuna", "fonte": "nessun tracker pubblica le quote",
+          "verificato_il": "2026-10-18"}
+_rn503 = KO.righe_mercato(_mn503, "PLTR", _d503(2026, 10, 18))
+check("v503 una STIMA di analisti si dice tale, con l'intervallo e la data a mese dichiarata (l'eta' dal primo del mese) e "
+      "senza la somma delle quote; dove una quota pubblica non esiste, una riga sola lo dice con la data della verifica",
+      "STIMA di analisti, non una misura di un tracker" in _rs503m and "2026-05 (la fonte dichiara solo il mese)" in _rs503m
+      and "45 giorni fa" in _rs503m and "Nvidia ◀ 70-85%" in _rs503m and "sommano" not in _rs503m
+      and len(_rn503) == 1 and "NESSUNA QUOTA PUBBLICA VERIFICABILE" in _rn503[0] and "18/10/2026" in _rn503[0])
+
+# --- la salute con le funzioni della pipeline: collegamento ESEGUITO (v483), lo stato COSTRUITO ---
+_ud503 = KO._ud()
+_nomi_ud503 = ("conto_trimestrale", "credito", "combustione", "altman_voci", "altman_zpp")
+_orig503 = {k: getattr(_ud503, k) for k in _nomi_ud503}
+
+
+class _T503:
+    def __init__(self, settore="Technology"):
+        self.info = {"shortName": "Test Co", "financialCurrency": "USD", "grossMargins": 0.4567, "sector": settore}
+
+
+# cinque trimestri: la crescita sull'anno e' sul trimestre di 365 giorni prima (200 contro 100: +100%), il margine
+# operativo e la cassa libera sugli ULTIMI QUATTRO (ricavi 690, operativo 70) — il trimestre solo darebbe 15%, cinque 9,5%
+_conto503 = [{"trim": "2026-06-30", "ricavi": 200, "operativo": 30}, {"trim": "2026-03-31", "ricavi": 180, "operativo": 20},
+             {"trim": "2025-12-31", "ricavi": 160, "operativo": 10}, {"trim": "2025-09-30", "ricavi": 150, "operativo": 10},
+             {"trim": "2025-06-30", "ricavi": 100, "operativo": 5}]
+try:
+    _ud503.conto_trimestrale = lambda t: _conto503
+    _ud503.credito = lambda t: {"debito_corrente": 100, "ebit_ttm": 70, "trimestri": 4}
+    _ud503.combustione = lambda t, m, b: {"fcf_ttm": 69, "trimestri": 4, "liquidita": 250,
+                                          "investimenti_immateriali_prevalenti": True, "quota_immateriali_pct": 99.9}
+    _ud503.altman_voci = lambda t, c: (1, 2, 3, 4, 5, 6, None, None)
+    _ud503.altman_zpp = lambda *a: {"altman_z": 0.5, "altman_x": [0.05, -0.2, 0.1, 0.3]}
+    _sa503 = KO.salute("TST", ticker=_T503(), oggi="2026-10-18")
+    # senza debito a breve, tre trimestri di cassa e un intermediario finanziario
+    _ud503.credito = lambda t: {"debito_corrente": 0, "ebit_ttm": 70, "trimestri": 4}
+    _ud503.combustione = lambda t, m, b: {"fcf_ttm": 69, "trimestri": 3, "liquidita": 250}
+    _sb503 = KO.salute("TSF", ticker=_T503("Financial Services"), oggi="2026-10-18")
+
+    def _rompi503(t):
+        raise RuntimeError("HTTP 429")
+    _ud503.conto_trimestrale = _rompi503
+    _sn503 = KO.salute("TSN", ticker=_T503(), oggi="2026-10-18")
+    _ud503.conto_trimestrale = lambda t: []
+    _ud503.credito = lambda t: {}
+    _ud503.combustione = lambda t, m, b: {}
+    _sv503 = KO.salute("TSV", ticker=_T503(), oggi="2026-10-18")
+finally:
+    for _k503, _v503 in _orig503.items():
+        setattr(_ud503, _k503, _v503)
+check("v503 la salute esce dalle funzioni della pipeline: crescita sul trimestre di un anno prima trovato per data, "
+      "margine operativo e cassa libera sugli ultimi QUATTRO trimestri, margine lordo dalla voce di yfinance, liquidita' "
+      "sul debito a breve, Altman con zona e rating, gli utili negativi che penalizzano, la quota di immateriali, la "
+      "versione: " + str(_sa503),
+      _sa503.get("stato") == "letto" and _sa503.get("versione") == KO.VERSIONE and _sa503.get("trim") == "2026-06-30"
+      and _sa503.get("ricavi_yoy") == 100.0 and _sa503.get("margine_op_12m") == round(70 / 690 * 100, 1)
+      and _sa503.get("fcf_12m_pct") == round(69 / 690 * 100, 1) and _sa503.get("margine_lordo") == 45.7
+      and _sa503.get("liq_su_breve") == 2.5 and _sa503.get("altman_z") == 0.5
+      and _sa503.get("altman_zona") == "PERICOLO" and isinstance(_sa503.get("altman_rating"), str)
+      and _sa503.get("altman_utili_negativi") is True and _sa503.get("immateriali_pct") == 99.9
+      and _sa503.get("nome") == "Test Co" and _sa503.get("valuta") == "USD")
+check("v503 senza debito a breve lo si dice (non un rapporto infinito), con meno di quattro trimestri di cassa la cassa "
+      "libera non si calcola, e su un intermediario finanziario Altman non si applica: " + str(_sb503),
+      _sb503.get("senza_debito_breve") is True and "liq_su_breve" not in _sb503 and "fcf_12m_pct" not in _sb503
+      and _sb503.get("altman_na") == "Financial Services" and "altman_z" not in _sb503)
+check("v503 tre esiti distinti (v389): un errore e' NON letto col suo testo, una fonte senza conti e' vuoto — mai un "
+      "'letto' senza misure",
+      _sn503.get("stato") == "NON letto" and "HTTP 429" in str(_sn503.get("errore")) and _sv503.get("stato") == "vuoto"
+      and "versione" not in _sn503 and "versione" not in _sv503)
+
+# --- la memoria delle letture: chi manca prima, poi i piu' vecchi; il budget; la versione; l'errore che non cancella ---
+_mem503 = {"A": {"tk": "A", "stato": "letto", "letto_il": "2026-10-15", "versione": KO.VERSIONE},
+           "B": {"tk": "B", "stato": "letto", "letto_il": "2026-10-01", "versione": KO.VERSIONE},
+           "C": {"tk": "C", "stato": "letto", "letto_il": "2026-10-16", "versione": KO.VERSIONE - 1},
+           "D": {"tk": "D", "stato": "letto", "letto_il": "2026-10-05", "versione": KO.VERSIONE, "x": 1}}
+
+
+def _lett503(t, oggi=None):
+    if t in ("D", "E"):
+        return {"tk": t, "stato": "NON letto", "errore": "HTTP 429", "letto_il": oggi}
+    return {"tk": t, "stato": "letto", "letto_il": oggi, "versione": KO.VERSIONE}
+
+
+_ma503, _la503, _aa503, _ea503 = KO.aggiorna_dati(["A", "B", "C", "D", "E", "F"],
+                                                  {k: dict(v) for k, v in _mem503.items()}, "2026-10-18", budget=3,
+                                                  lettore=_lett503, pausa=0)
+check("v503 la memoria: si rilegge chi manca, poi il piu' vecchio, al massimo il budget del giro; una lettura di un'altra "
+      "versione si rifa' anche se recente; chi resta indietro si dichiara in attesa; un errore su un nome mai letto resta "
+      "NON letto — mai un 'letto': " + str((_la503, _aa503, sorted(_ea503))),
+      _la503 == ["F", "B"] and _aa503 == ["D", "C"] and set(_ea503) == {"E"}
+      and _ma503["E"].get("stato") == "NON letto" and _ma503["A"]["letto_il"] == "2026-10-15")
+_mb503, _lb503, _ab503, _eb503 = KO.aggiorna_dati(["A", "B", "C", "D", "E", "F"],
+                                                  {k: dict(v) for k, v in _mem503.items()}, "2026-10-18", tutti=True,
+                                                  lettore=_lett503, pausa=0)
+check("v503 con --tutti si rilegge anche il fresco, e una rilettura fallita LASCIA la lettura buona precedente, dichiarata "
+      "con l'errore e la data: " + str(_mb503.get("D")),
+      "A" in _lb503 and "D" not in _lb503 and not _ab503 and set(_eb503) == {"D", "E"}
+      and _mb503["D"].get("x") == 1 and _mb503["D"].get("letto_il") == "2026-10-05"
+      and _mb503["D"].get("errore_ultimo") == {"il": "2026-10-18", "errore": "HTTP 429"})
+
+# --- il posto per misura, senza punteggio (v200); chi non e' letto non entra nel confronto ---
+_dati503 = {"X": {"stato": "letto", "ricavi_yoy": 20, "margine_lordo": 30, "altman_z": 2.0},
+            "Y": {"stato": "letto", "ricavi_yoy": 50, "margine_lordo": 20},
+            "Z": {"stato": "letto", "ricavi_yoy": 10, "margine_lordo": 40, "altman_z": 1.0},
+            "W": {"stato": "NON letto", "ricavi_yoy": 99, "margine_lordo": 99}}
+_po503 = KO.posti("X", ["X", "Y", "Z", "W"], _dati503)
+check("v503 il posto del nome per ogni misura fra chi ha il dato (1 = il piu' alto), n.d. dove manca, chi NON e' letto "
+      "fuori dal confronto, nessun punteggio d'insieme: " + " · ".join(_po503),
+      _po503 == ["crescita dei ricavi sull'anno 2° su 3", "margine lordo 2° su 3", "margine operativo 12 mesi: n.d.",
+                 "cassa libera 12 mesi sui ricavi: n.d.", "Altman Z'' 1° su 2", "liquidita' sul debito a breve: n.d."])
+
+# --- la resa di una societa' ---
+_rr503 = KO.riga_salute({"tk": "MSTR", "stato": "letto", "letto_il": "2026-10-18", "trim": "2026-06-30",
+                         "nome": "Strategy", "ricavi_yoy": -5.0, "fcf_12m_pct": -4364.0, "immateriali_pct": 99.9,
+                         "liq_su_breve": 0.05, "altman_na": "Financial Services",
+                         "errore_ultimo": {"il": "2026-10-17", "errore": "x"}}, "MSTR")
+check("v503 la riga di una societa': il nome marcato, la crescita col segno, la cassa libera di chi compra attivita' "
+      "immateriali dichiarata, la liquidita' minima, Altman che non si applica, le date del trimestre e della lettura, la "
+      "rilettura fallita: " + _rr503,
+      _rr503.startswith("MSTR ◀ Strategy:") and "-5,0%" in _rr503 and "attivita' immateriali" in _rr503
+      and "meno di 0,1×" in _rr503 and "settore finanziario" in _rr503 and "trimestre al 30/06/2026" in _rr503
+      and "letto il 18/10/2026" in _rr503 and "ultima rilettura fallita il 17/10/2026" in _rr503)
+check("v503 una societa' non letta lo dice col suo motivo, e non e' 'nessun dato'",
+      KO.riga_salute({"tk": "BBB", "stato": "NON letto", "errore": "HTTP 429"}, "AAA")
+      == "BBB: NON letto (HTTP 429) — non e' 'nessun dato', e' la lettura che manca"
+      and KO.riga_salute({"tk": "CCC"}, "AAA").startswith("CCC: NON letto (nessuna lettura)"))
+
+# --- Altman: gli utili negativi che penalizzano, con la causa che la fonte non dice (v503 corregge la v501) ---
+def _al503(zona, termine=1, ebit=0.1):
+    return {"stato": "ok", "zona": zona, "debole": {"termine": CR.TERMINI_ALTMAN[termine], "rapporto": -0.2},
+            "ebit_attivo": ebit}
+
+
+check("v503 gli utili non distribuiti negativi con un EBIT positivo penalizzano Altman fuori dalla zona di sicurezza; "
+      "dentro no, e nemmeno con un EBIT negativo o con un altro termine piu' debole",
+      CR.utili_negativi_penalizzano(_al503("PERICOLO")) and CR.utili_negativi_penalizzano(_al503("GRIGIA"))
+      and not CR.utili_negativi_penalizzano(_al503("SICUREZZA"))
+      and not CR.utili_negativi_penalizzano(_al503("PERICOLO", ebit=-0.1))
+      and not CR.utili_negativi_penalizzano(_al503("PERICOLO", termine=2))
+      and not CR.utili_negativi_penalizzano(None))
+_ra503 = CR.riga_altman(CR.altman_rischio({"stats": {"altman_z": 0.5, "altman_x": [0.05, -0.2, 0.1, 0.3]},
+                                           "sector": "Technology"}))
+_rb503 = CR.riga_altman(CR.altman_rischio({"stats": {"altman_z": 3.0, "altman_x": [0.05, -0.2, 0.1, 0.3]},
+                                           "sector": "Technology"}))
+check("v503 la riga di Altman dice che gli utili negativi vengono da perdite passate O da riacquisti — la fonte non dice "
+      "quale (la v501 li attribuiva tutti ai riacquisti) — e in zona di sicurezza tace: " + _ra503,
+      "perdite accumulate in passato o da riacquisti di azioni (la fonte non dice quale)" in _ra503
+      and "il segno tipico" not in _ra503 and "perdite accumulate" not in _rb503)
+
+# --- la sintesi: i difetti, chi e' senza registro, i rimandi e gli errori ---
+_o503 = {"oggi": "2026-10-18", "posizioni": ["AAA", "QQQ1"], "sorvegliati": ["SSS"], "in_esame": ["AAA"],
+         "nomi": {"AAA": {"nome": "Alfa", "concorrenti_quotati": ["BBB"],
+                          "mercati": [_m503(quote=[{"nome": "Alfa", "ticker": "AAA", "quota_pct": 10}])]}},
+         "dati": {"AAA": {"tk": "AAA", "stato": "letto", "letto_il": "2026-10-18", "ricavi_yoy": 5.0}},
+         "letti": ["AAA"], "attesa": ["CCC"], "errori": {"BBB": "HTTP 429"}, "difetti": ["XYZ: manca 'url'"]}
+_si503 = "\n".join(KO.sintesi(_o503))
+check("v503 la sintesi: i difetti del registro in testa, il nome col suo ruolo, un concorrente senza lettura nominato "
+      "come tale, chi e' senza registro (posizioni e sorvegliati), le letture rimandate e quelle fallite: " + _si503[-600:],
+      "⚠ REGISTRO CON DIFETTI" in _si503 and "XYZ: manca 'url'" in _si503 and "AAA [POSIZIONE] Alfa" in _si503
+      and "BBB: NON letto (nessuna lettura)" in _si503 and "posizioni QQQ1" in _si503 and "sorvegliati 1: SSS" in _si503
+      and "rimandate al prossimo" in _si503 and "CCC" in _si503 and "NON lette: BBB (HTTP 429)" in _si503)
+
+# --- calcola ESEGUITA (v483) sul libro vero con un registro e una memoria costruiti: posizioni prima, nessuna lettura ---
+_pl503, _, _sl503 = brief.leggi_libro()
+_p0503 = next(p["tk"] for p in _pl503 if p.get("valuta") == "USD")
+_s0503 = next(s["tk"] for s in _sl503 if s["tk"] not in {p["tk"] for p in _pl503})
+_dir503 = Path(_tf503.mkdtemp())
+(_dir503 / "reg.json").write_text(_json.dumps({"nomi": {
+    _s0503: {"nome": "S", "mercati": [_m503()], "concorrenti_quotati": ["ZZZ2"]},
+    _p0503: {"nome": "P", "mercati": [_m503()], "concorrenti_quotati": ["ZZZ1"]}}}), encoding="utf-8")
+(_dir503 / "mem.json").write_text(_json.dumps({t: {"tk": t, "stato": "letto", "letto_il": "2026-10-18",
+                                                   "versione": KO.VERSIONE}
+                                               for t in (_p0503, "ZZZ1", _s0503, "ZZZ2")}), encoding="utf-8")
+_imp503 = _hl503.sha256((_dir503 / "mem.json").read_bytes()).hexdigest()
+_oc503 = KO.calcola(oggi="2026-10-18", percorso_memoria=_dir503 / "mem.json", registro=_dir503 / "reg.json")
+_sc503 = "\n".join(KO.sintesi(_oc503))
+check("v503 calcola ESEGUITA: le posizioni del libro prima dei sorvegliati (qualunque sia l'ordine del registro), ciascuna "
+      "col suo ruolo, nessuna lettura con la memoria fresca e la memoria non riscritta, le altre posizioni nominate fra "
+      "quelle senza registro",
+      _oc503["in_esame"] == [_p0503, _s0503] and not _oc503["letti"] and not _oc503["attesa"]
+      and f"{_p0503} [POSIZIONE] P" in _sc503 and f"{_s0503} [SORVEGLIATO] S" in _sc503
+      and _hl503.sha256((_dir503 / "mem.json").read_bytes()).hexdigest() == _imp503
+      and all(t in _sc503.split("SENZA REGISTRO")[1] for t in _pos503 if t != _p0503))
+
+# --- i collegamenti: il comando unico, la memoria, il formato, /aggiorna ---
+_cm503 = {f: [a for _, a in AN.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+check("v503 il comando unico esegue concorrenti.py in ogni fase, lo dichiara fra gli strumenti, e conta la memoria delle "
+      "letture fra quelle da committare",
+      all(["concorrenti.py"] in v for v in _cm503.values()) and "concorrenti.py" in AN.STRUMENTI
+      and "concorrenti_dati.json" in {p.name for p in AN.MEMORIE})
+_fa503 = " ".join((Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8").split())
+_cl503 = " ".join((AN.checklist() or "").split())
+_ag503 = (Path(__file__).resolve().parent.parent / ".claude" / "commands" / "aggiorna.md").read_text(encoding="utf-8")
+check("v503 il formato: 5quater nella checklist, il passo in «Come si produce», la voce del registro PRIMA di un ingresso "
+      "in 7d-ter, la richiesta del 18/10 sera nel registro delle richieste; /aggiorna dichiara concorrenti.py fuori con la "
+      "sua ragione (v387)",
+      "5quater. **Concorrenti e quote di mercato**" in _cl503
+      and "python3 scripts/concorrenti.py" in (AN.sezione((Path(__file__).resolve().parent.parent / "memoria"
+                                                            / "FORMATO_ANALISI.md").read_text(encoding="utf-8"),
+                                                           "## Come si produce") or "")
+      and "riceve PRIMA la sua voce nel registro dei concorrenti" in _fa503
+      and "i concorrenti e le quote di mercato di ogni posizione" in _fa503.split("Richieste del CEO rese strutturali")[1]
+      and "`scripts/concorrenti.py` resta **fuori**" in _ag503)
+
+# --- i conti trimestrali indietro rispetto al trimestre che la STESSA fonte dichiara chiuso (trovato leggendo l'uscita:
+#     Lenovo fermo al 30/09/2025 entrava nei posti accanto a societa' al 2026) ---
+from datetime import datetime as _dt503b, timezone as _tz503b
+check("v503 i trimestri di ritardo si contano dalla data che la fonte dichiara (91 giorni a trimestre, almeno uno oltre la "
+      "tolleranza di 20 giorni), e senza una delle due date non si indovina",
+      KO.trimestri_indietro({"trim": "2026-05-31", "trim_dichiarato": "2026-09-03"}) == 1
+      and KO.trimestri_indietro({"trim": "2025-09-30", "trim_dichiarato": "2026-06-30"}) == 3
+      and KO.trimestri_indietro({"trim": "2026-06-30", "trim_dichiarato": "2026-07-15"}) == 0
+      and KO.trimestri_indietro({"trim": "2026-06-30", "trim_dichiarato": "2026-06-28"}) == 0
+      and KO.trimestri_indietro({"trim": "2026-06-30"}) == 0 and KO.trimestri_indietro({"trim_dichiarato": "2026-06-30"}) == 0)
+_orig503b = {k: getattr(_ud503, k) for k in _nomi_ud503}
+try:
+    _ud503.conto_trimestrale = lambda t: _conto503
+    _ud503.credito = lambda t: {"debito_corrente": 100, "ebit_ttm": 70, "trimestri": 4}
+    _ud503.combustione = lambda t, m, b: {"fcf_ttm": 69, "trimestri": 4, "liquidita": 250}
+    _ud503.altman_voci = lambda t, c: (1, 2, 3, 4, 5, 6, None, None)
+    _ud503.altman_zpp = lambda *a: {}
+    _tq503 = _T503()
+    _tq503.info["mostRecentQuarter"] = int(_dt503b(2026, 9, 30, tzinfo=_tz503b.utc).timestamp())
+    _sq503 = KO.salute("TSQ", ticker=_tq503, oggi="2026-10-18")
+finally:
+    for _k503, _v503 in _orig503b.items():
+        setattr(_ud503, _k503, _v503)
+check("v503 la salute porta il trimestre che la fonte dichiara chiuso (mostRecentQuarter, in UTC), e la riga dice il ritardo "
+      "dei conti: " + str(_sq503.get("trim_dichiarato")),
+      _sq503.get("trim_dichiarato") == "2026-09-30" and _sq503.get("trim") == "2026-06-30"
+      and "⚠ conti trimestrali indietro di 1 trimestre: la fonte dichiara chiuso il trimestre al 30/09/2026"
+      in KO.riga_salute(_sq503, "TSQ"))
+_g503 = {"X": {"stato": "letto", "tk": "X", "ricavi_yoy": 20, "trim": "2026-06-30", "trim_dichiarato": "2026-06-30"},
+         "U": {"stato": "letto", "tk": "U", "ricavi_yoy": 30, "trim": "2026-03-31", "trim_dichiarato": "2026-06-30"},
+         "V": {"stato": "letto", "tk": "V", "ricavi_yoy": 90, "trim": "2025-09-30", "trim_dichiarato": "2026-06-30"}}
+_pg503 = KO.posti("X", ["X", "U", "V"], _g503)
+_pv503 = KO.posti("V", ["X", "U", "V"], _g503)
+_rg503 = "\n".join(KO.righe_nome("X", {"X": {"nome": "Ics", "concorrenti_quotati": ["U", "V"]}}, _g503,
+                                 _d503(2026, 10, 18), "POSIZIONE"))
+check("v503 un trimestre di ritardo resta nel confronto (dichiarato), oltre uno no — un altro periodo — e chi ne resta fuori "
+      "si NOMINA; se e' il nome in esame, i suoi posti non si calcolano: " + _pg503[0] + " · " + _pv503[0],
+      _pg503[0] == "crescita dei ricavi sull'anno 2° su 2" and _pv503[0] == "crescita dei ricavi sull'anno: n.d."
+      and "fuori dal confronto perche' i loro conti sono indietro di oltre 1 trimestre (un altro periodo): V" in _rg503
+      and "indietro di 3 trimestri" in _rg503 and "indietro di 1 trimestre" in _rg503)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
