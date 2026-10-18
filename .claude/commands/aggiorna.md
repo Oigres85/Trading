@@ -204,6 +204,11 @@ indici S&P 500 e Nasdaq-100 che l'analisi in chat riporta sempre — P/E con la 
 delle trimestrali, volatilità implicita, concentrazione, ampiezza, tendenza — e scrive una memoria
 (`memoria/indici.jsonl`, la storia raccolta del P/E del Nasdaq-100): questo comando legge, non scrive.
 
+`scripts/misura_segnali_mercato.py` resta **fuori** (v500): non è un passo dell'analisi ma una MISURA da rieseguire
+quando lo storico cresce, come i due backtest — se i segnali di mercato (curva della volatilità, gamma dei dealer, dark
+pool, put/call, grandi operatori, multipli) avrebbero anticipato i cali. Il primo giro legge da fonti esterne circa
+1.600 file e il risultato non cambia da un giorno all'altro: la conclusione sta in `memoria/LIBRO.md` §1ter.
+
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
 e «Aggiorna analisi» del CEO — che esegue in parallelo `numeri_libro.py`, `brief.py`,
 `schede_progetto.py`, `rotazione.py`, `posizionamento.py` e `indici.py`, già dichiarati fuori qui con la loro ragione, e chiude con

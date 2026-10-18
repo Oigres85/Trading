@@ -692,6 +692,39 @@ def scrub_cross_currency_stats(stats, financial_currency, quote_currency):
     return stats
 
 
+def ore_depositi(sub, oggi=None, giorni=130, massimo=30):
+    """v500 — L'ORA IN CUI EDGAR HA ACCETTATO I DEPOSITI DEI RISULTATI. Decisione del CEO del 18/10/2026: il VWAP
+    calcolato dall'ultima trimestrale accanto ai pavimenti di ogni titolo. Il VWAP parte dalla prima seduta DOPO il
+    comunicato, e quale sia lo dice l'ora: prima dell'apertura muove la seduta stessa, dopo la chiusura la successiva.
+    La data del comunicato la dichiara un'altra fonte (Nasdaq, letta dall'analisi): qui c'e' solo l'ora, per gli
+    8-K con item 2.02 e, per gli emittenti esteri, per tutti i 6-K — che non hanno item: quale sia il comunicato dei
+    conti si decide accanto alla data dichiarata, mai indovinandolo da qui (v399, v448).
+    ⚠ L'ora si pubblica come EDGAR la scrive (acceptanceDateTime, troncata ai secondi) e si legge come ora di New
+    York, l'orologio di EDGAR. Anche se la 'Z' della fonte fosse un vero UTC, prima dell'apertura e dopo la chiusura
+    resterebbero tali: cambierebbe solo un comunicato a seduta aperta dopo mezzogiorno, che e' raro.
+    Nessuna rete qui dentro: riceve la risposta di EDGAR gia' letta dal giro del calendario."""
+    rec = ((sub or {}).get("filings") or {}).get("recent") or {}
+    forme = rec.get("form") or []
+    oggi = oggi or datetime.now(timezone.utc).date()
+    voci = rec.get("items") or [""] * len(forme)
+    acc = rec.get("acceptanceDateTime") or [""] * len(forme)
+    date_dep = rec.get("filingDate") or [""] * len(forme)
+    out = []
+    for f, it, a, d in zip(forme, voci, acc, date_dep):     # la pagina recente va dal piu' recente
+        if not ((f == "8-K" and "2.02" in str(it or "")) or f in ("6-K", "6-K/A")):
+            continue
+        try:
+            eta = (oggi - datetime.fromisoformat(str(d)[:10]).date()).days
+        except ValueError:
+            continue
+        if eta > giorni or not a:
+            continue
+        out.append({"forma": f, "data": str(d)[:10], "accettato": str(a)[:19]})
+        if len(out) >= massimo:
+            break
+    return out
+
+
 def storia_quotazione(sub, oggi=None, anni=5):
     """v492 — QUANDO IL TITOLO HA SMESSO DI ESSERE UN VEICOLO DI QUOTAZIONE (SPAC), dal registro SEC.
 
@@ -3572,6 +3605,7 @@ def fetch_macro():
         _mappa = {v["ticker"].upper(): v["cik_str"] for v in _r.json().values()}
         sec_cal, senza_cik, esteri = {}, [], []
         storia = {}           # v492 — la fine del veicolo di quotazione (8-K item 5.06), vedi storia_quotazione
+        ore = {}              # v500 — l'ora dei depositi dei risultati (8-K 2.02, 6-K), vedi ore_depositi
         # la lista viene dalla stessa fonte della pipeline (config/ui_watchlist.json), non
         # da un elenco scritto a mano che invecchierebbe da solo: un titolo nuovo entra qui
         # senza che nessuno se ne ricordi. Indici, cambi e future non sono societa' e finiscono
@@ -3592,6 +3626,7 @@ def fetch_macro():
                 _sub = _s.json()
                 # v492 — PRIMA del filtro degli esteri: la storia della quotazione si dichiara per tutti
                 storia[_tk] = storia_quotazione(_sub)
+                ore[_tk] = ore_depositi(_sub)     # v500 — PRIMA del filtro degli esteri: i 6-K servono a loro
                 _rec = _sub.get("filings", {}).get("recent", {})
                 _forme = _rec.get("form", [])
                 _items = _rec.get("items", [""] * len(_forme))
@@ -3620,8 +3655,13 @@ def fetch_macro():
             except Exception as e:  # noqa: BLE001
                 print(f"!! SEC EDGAR {_tk}: {e}", file=sys.stderr)
             time.sleep(0.12)          # SEC chiede meno di 10 richieste al secondo
-        if sec_cal or esteri or storia:
+        if sec_cal or esteri or storia or ore:
             macro["sec_calendario"] = {
+                # v500 — l'ora di accettazione dei depositi dei risultati degli ultimi 130 giorni: da quale seduta parte
+                #   il VWAP ancorato ai conti (l'analisi la abbina alla data del comunicato dichiarata da Nasdaq)
+                "ore_depositi": {"per_titolo": ore, "giorni": 130,
+                                 "fonte": "SEC EDGAR, acceptanceDateTime degli 8-K con item 2.02 e dei 6-K",
+                                 "orologio": "America/New_York"},
                 # v492 — per ogni titolo letto: quando ha smesso di essere un veicolo di quotazione
                 #   (SPAC). Chi legge lo storico lungo taglia li': i prezzi di prima sono di un'altra
                 #   societa'. Un titolo assente qui non e' verificato, e lo dichiara chi legge

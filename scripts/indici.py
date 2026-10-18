@@ -372,13 +372,14 @@ def storia_raccolta(memoria, chiave="ndx_fwd", minimo=MIN_STORIA):
 
 
 # ══════════════════════════════════════ CBOE — VOLATILITA' IMPLICITA DEGLI INDICI ══════════════════════════════
-def leggi_vol(testo):
-    """Lo storico di CBOE → [(data ISO, chiusura)] in ordine di data."""
+def leggi_vol(testo, colonna="CLOSE"):
+    """Lo storico di CBOE → [(data ISO, chiusura)] in ordine di data. v500 — `colonna`: lo storico dell'SPX non ha
+    CLOSE ma una colonna col nome dell'indice, e la misura dei segnali lo legge con questo stesso lettore (v161)."""
     out = []
     for r in csv.DictReader(io.StringIO(testo)):
         try:
             g = datetime.strptime(str(r["DATE"]).strip(), "%m/%d/%Y").date()
-            out.append((g.isoformat(), float(r["CLOSE"])))
+            out.append((g.isoformat(), float(r[colonna])))
         except (KeyError, TypeError, ValueError):
             continue
     return sorted(out)

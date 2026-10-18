@@ -7702,3 +7702,63 @@ stesso numero dalla stessa fonte sono la classe v415.
   può essere il controllo che racconta male, o l'iniezione che rompe altro — va guardato quale, prima di concludere.*
 - Pavimento di `test_analisi_libro.py` 600 → 640. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al
   browser (v440).
+
+## 🔧 v500 — IL DEBUG DEL 18/10, IL VWAP DAI CONTI, E I SEGNALI DI MERCATO MISURATI
+
+Il CEO, 18/10/2026, testuale: *"1 ok tua proposta · 2ok · Dopo fai debug approfondito per controllare che tutto
+funzioni ed eventualmente valuta modifiche ed implementazioni"*.
+
+### 1. Il debug: leggendo l'analisi di domenica come il destinatario
+Quindici reperti, nessuno trovato dai gate. I principali:
+
+| reperto | cosa diceva | cosa era vero |
+|---|---|---|
+| **numeri_libro all'inglese** | credito, costo dell'attesa, sintesi, stress e il pre-market con «1,234» e «0.53%» | la convenzione del pacchetto (v442, v443) non era mai arrivata agli strumenti in Python. Il blocco del pre-market l'ha trovato il **gate sul codice** scritto per questo, non la lettura |
+| **la tabella dei trimestri ferma** | negli strumenti Python MU non la dichiarava; nel pacchetto TSLA e ABBV dicevano *"E' UN FATTO"* | la soglia di app.js era 60 giorni: il deposito delle consegne di Tesla (02/10) sembrava un trimestre nuovo. Ora **una regola in due lingue**: oltre **101 giorni** (91 del trimestre dopo + 10), e chi deposita 8-K fuori ciclo lo dice *dedotto dalla data*, non un fatto. Un gate esegue le due lingue sugli stessi casi |
+| **le notizie in due feed** | *"6.3x Gross Leverage Ratio"* di CoreWeave finiva fra la cronaca, sotto *"è il mercato, non il nome"* | la cronaca comincia da **tre** feed; con due la voce resta con ciascuno e dice dove altro compare |
+| **TSLA «DIVERSIFICA (corr +0,50)»** | la regola dice *stessa scommessa da 0,5* | decideva lo 0,4996: la correlazione si arrotonda dove nasce (v498, *il numero deciso è quello stampato*) |
+| **la base a 10 sedute di CRM** | DECRESCENTI (220,29 contro 221,18) | due righe sotto la struttura li chiamava ALLA PARI: ora una regola sola, mezzo ATR |
+| **il brief** | «time-not-supplied» grezzo, «$0.82», la CPI *"al 2026-09-01"* | orario e consenso tradotti una volta per testo e pagina (v455), la mensile detta come mese (v392) |
+| **MSTR** | *"tendenza intatta · media 50 sotto la 200"* fra le prove A FAVORE | il prezzo è tornato sopra le medie, l'incrocio no: si dice come avviso |
+
+### 2. Il VWAP dall'ultima trimestrale, accanto ai pavimenti (decisione 2)
+Convenzioni in `LIBRO.md` §1bis. La **data** del comunicato la dichiara Nasdaq (le trimestrali riportate), l'**ora**
+la pubblica la pipeline dai depositi SEC (`update_data.ore_depositi`, acceptanceDateTime degli 8-K con item 2.02 e dei
+6-K): prima delle 09:30 di New York muove la seduta stessa, dalle 16:00 la successiva. Senza l'ora, la seduta più
+scambiata fra il giorno dei conti e il dopo, **dichiarato col perché** — e il perché distingue la pipeline che non
+pubblica le ore (snapshot precedente) da quella che le pubblica senza una nella finestra (v406).
+⚠ L'8-K da solo non basta per la data: Tesla ne ha depositato uno con le consegne il 02/10.
+
+⚠⚠ **Due difetti miei, entrambi presi da un gate e non dalla rilettura:**
+- l'ancora si cercava sulla serie **già tagliata** all'ultima operazione societaria, quindi un taglio caduto *dopo* i
+  conti spostava l'ancora in silenzio al giorno del taglio, e il controllo scritto per quel caso non poteva scattare
+  mai — trovato **scrivendo il gate** che costruiva lo stato (v234: un ramo irraggiungibile non è una protezione);
+- inserendo la riga del VWAP in `righe_tenuta` avevo agganciato alla sua condizione la **media sui pavimenti**, che
+  sarebbe uscita solo col VWAP: l'ha preso il gate **v489**, scritto tre giorni prima per tutt'altro.
+
+### 3. I segnali di mercato misurati (decisione 1): restano informazione
+`scripts/misura_segnali_mercato.py` — non un gate né un passo dell'analisi: una misura da rieseguire quando lo storico
+cresce, dichiarata fuori in `/aggiorna`. Metodo del CCC (v465), risultati in `LIBRO.md` §1ter. **Nessun segnale
+anticipa i cali più del caso**: su 24 confronti con la frequenza di base uno solo supera due errori standard, e il
+caso ne produce circa 1,1 — lo strumento lo conta da sé (`righe_prove`, erfc a due code).
+- VIX/VIX3M ≥ 1 dal 2009: 17% di cali ulteriori di almeno il 10% contro 12% di base, e dopo l'inversione il mercato
+  nella mediana sale — *un termometro dello stress in corso, non un anticipatore*. Stessa forma per la GEX negativa.
+- Il DIX alto si accompagna a **più** cali, non meno (dal 5% al 16% per quinto): l'opposto della lettura di moda.
+- Il dark pool per titolo (un anno, 56 titoli): nessun segnale.
+⚠ **I lettori sono quelli del sistema** (CBOE e CFTC da `posizionamento.py`, gli storici da `indici.py`, le medie
+del DPI e del put/call estratte in `medie_dp`/`medie_semplici` e usate da entrambi, output identico misurato):
+una misura che legge i dati in un altro modo misura un'altra cosa.
+⚠ **FRED chiude la connessione a un browser**: con «Mozilla/5.0» nessuna risposta dopo 31 secondi, due volte su due;
+con l'intestazione onesta della pipeline (`UA_ONESTO`, v-lontana) 0,4 secondi. Un gate tiene le due uguali.
+⚠ **Senza raccolta, «la misureremo» è una promessa senza modo di mantenerla**: la nostra gamma sulle catene non era
+salvata da nessuna parte. Ora `registra_titoli` la scrive in `memoria/opzioni_titoli.jsonl`.
+⚠ Nessun segnale si valuta con un dato non ancora pubblico: percentili sulla sola storia fino a quel giorno, la CFTC
+dal venerdì, il P/E mensile dal mese dopo.
+
+### 🧪 Il metodo
+Trenta iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta. **Ventotto hanno morso
+al primo giro; due no, ed entrambe per un difetto del controllo**: uno non conteneva il caso che discrimina (le ore
+pubblicate ma vuote per quel nome, `[]` contro `None`), l'altro moriva per eccezione su un campo mancante invece di
+cadere col suo nome (v407, v471). Stretti, mordono.
+Pavimenti: `test_analisi_libro.py` 640 → 685 (699 punti di chiamata), `test_update_data.py` 265 → 270 (278) e
+N_CHECKS_MINIMO 285 → 288. `?v=` e `BUILD_VERSION` a 500: cambia `assets/app.js`.

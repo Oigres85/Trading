@@ -9,6 +9,7 @@ Legge il JSON prodotto da brief.py e scrive un file HTML.
 grandezza divergono al primo ritocco (v161, v207, v421, v443), quindi tutto viene dal JSON.
 """
 import json, sys, html
+import brief  # v500 — orario e consenso: una traduzione sola, quella di brief.py (v455)
 from datetime import datetime
 
 def n2(x, d=2):
@@ -97,9 +98,10 @@ def genera(d):
     if cal["attesi"]:
         tr = ""
         for x in cal["attesi"]:
-            q = {"time-pre-market": "prima della campana",
-                 "time-after-hours": "dopo la campana"}.get(x["quando"], x["quando"] or "orario n.d.")
-            eps = f' · consenso <span class="mono">{e(x["eps_atteso"])}</span>' if x.get("eps_atteso") else ""
+            # v500 — orario e consenso resi da brief.py una volta, per il testo e per la pagina (v455)
+            q = x.get("orario") or brief.orario_trimestrale(x.get("quando"))
+            _cons = x.get("consenso") or brief.consenso_testo(x.get("eps_atteso"))
+            eps = f' · consenso <span class="mono">{e(_cons)}</span>' if _cons else ""
             tr += (f'<li><span class="tk">{e(x["tk"])}</span>'
                    f'<span class="mono quando">{e(x["data"])} · fra {x["giorni"]}g</span>'
                    f'<span class="dett">{e(q)}{eps}</span></li>')
@@ -207,13 +209,14 @@ def genera(d):
                    'Ogni riga porta la <b>propria</b> rilevazione, che &egrave; un&rsquo;altra data.</p>')
         righe = ""
         for s in mf["serie"]:
-            quando = (f'<td class="data mono">{e(s["data"])}</td>' if s.get("data")
+            # v500 — il periodo descritto (mese, indagine) o il giorno, reso da brief.py (v392, v455)
+            quando = (f'<td class="data mono">{e(s.get("quando_testo") or s["data"])}</td>' if s.get("data")
                       else '<td class="data ko">non dichiarata</td>')
             prec = (f'<td class="mono num">{n2(s["prec"])}</td>'
                     if isinstance(s.get("prec"), (int, float)) else '<td class="num data">&mdash;</td>')
             nota = f'<div class="note">{e(s["nota"])}</div>' if s.get("nota") else ""
             righe += (f'<tr><td>{e(s["nome"])}{nota}</td>'
-                      f'<td class="mono num"><b>{e(s["valore"])}</b></td>{prec}{quando}</tr>')
+                      f'<td class="mono num"><b>{e(s.get("valore_testo") or s["valore"])}</b></td>{prec}{quando}</tr>')
         serie = (cap + '<table class="fred"><thead><tr><th>serie</th><th class="num">valore</th>'
                  '<th class="num">prima</th><th>rilevazione</th></tr></thead>'
                  f'<tbody>{righe}</tbody></table>')

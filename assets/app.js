@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "497";
+const BUILD_VERSION = "500";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -13384,7 +13384,16 @@ function buildCIOText() {
    una copertura degli interessi calcolati sullo stesso trimestre vecchio.
    ⚠ Riscriverla nei tre punti sarebbe la classe v161/v207: due implementazioni della stessa
    domanda divergono al primo ritocco. Sta qui, e la chiamano tutti e tre. */
-function depositoOltreLaTabella(tk, ultimoTrim, giorni = 60) {
+/* ⚠⚠ v500 — LA SOGLIA E' LA FINE DEL TRIMESTRE SUCCESSIVO PIU' DIECI GIORNI (convenzione, v240): un trimestre dura
+   ~91 giorni e nessuna societa' pubblica i conti di un trimestre nei primi dieci giorni dopo la sua chiusura (le
+   banche, le piu' veloci, ne impiegano 13-14). Con i 60 giorni di prima un 8-K con item 2.02 depositato FUORI dal
+   ciclo si leggeva come la tabella ferma, dichiarata "un fatto": il 18/10 su TESLA (il 02/10 sono le consegne del
+   trimestre, i conti il 21/10) e su ABBVIE (un deposito del 05/10, i conti il 30/10). Falso su entrambi.
+   La stessa regola vive in scripts/schede_progetto.py (deposito_oltre_la_tabella): un gate esegue le due lingue
+   sugli stessi casi, perche' una regola in due posti diverge al primo ritocco (v161, v496). */
+const GIORNI_DEPOSITO_OLTRE = 101;
+
+function depositoOltreLaTabella(tk, ultimoTrim, giorni = GIORNI_DEPOSITO_OLTRE) {
   if (!tk || !ultimoTrim) return null;
   const per = ((((DATA || {}).macro || {}).sec_calendario || {}).per_titolo || {})[String(tk).toUpperCase()];
   const dep = per && per.ultimo_deposito ? String(per.ultimo_deposito).slice(0, 10) : null;
@@ -13392,7 +13401,25 @@ function depositoOltreLaTabella(tk, ultimoTrim, giorni = 60) {
   /* un deposito arriva settimane DOPO la fine del trimestre che riporta: oltre la soglia, quel
      deposito parla di un trimestre SUCCESSIVO all'ultimo che la tabella contiene. */
   const gg = Math.round((new Date(dep) - new Date(String(ultimoTrim).slice(0, 10))) / 86400000);
-  return gg > giorni ? { dep, gg } : null;
+  /* v500 — chi deposita 8-K con risultati anche fuori dal ciclo (cadenza irregolare) lo dichiara: li' che quel
+     deposito contenga un trimestre resta una deduzione dalla data, e la frase non lo chiama un fatto */
+  return gg > giorni ? { dep, gg, irregolare: !!(per && per.cadenza_irregolare_gg) } : null;
+}
+
+/* v500 — quanto e' certa la diagnosi della tabella ferma: un fatto per chi deposita col ciclo trimestrale, una
+   deduzione dalla data per chi deposita anche fuori ciclo. Una frase sola per i tre blocchi (v161). */
+function certezzaDeposito(f) {
+  return f && f.irregolare
+    ? "DEDOTTO DALLA DATA DI UN DEPOSITO: questa societa' deposita 8-K con risultati anche fuori dal ciclo trimestrale"
+    : "E' UN FATTO, NON UN SOSPETTO";
+}
+
+/* v500 — l'ultimo trimestre della tabella dei conti, letto come lo leggono i blocchi che la stampano */
+function ultimoTrimestreTabella(tk) {
+  const r = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
+    .find(x => x && String(x.ticker).toUpperCase() === String(tk).toUpperCase());
+  const ct = r && r.tv && Array.isArray(r.tv.conto_trim) ? r.tv.conto_trim : [];
+  return ct[0] && ct[0].trim ? String(ct[0].trim).slice(0, 10) : null;
 }
 
 function tvBlocchi(tk) {
@@ -13501,7 +13528,7 @@ function tvBlocchi(tk) {
       ? Math.round((new Date(prossima) - new Date(ultimoTrim)) / 86400000 / 30.4) : null;
     const serieFerma = !!daDeposito || (Number.isFinite(mesiVuoti) && mesiVuoti > 5);
     if (daDeposito) {
-      F.push(`⚠⚠ LA TABELLA DEI TRIMESTRI NON E' AGGIORNATA — E' UN FATTO, NON UN SOSPETTO: `
+      F.push(`⚠⚠ LA TABELLA DEI TRIMESTRI NON E' AGGIORNATA — ${certezzaDeposito(daDeposito)}: `
         + `l'ultimo trimestre qui sopra e' ${ultimoTrim}, ma questa societa' ha DEPOSITATO i propri `
         + `risultati il ${daDeposito.dep} (SEC EDGAR, 8-K con item 2.02), ${daDeposito.gg} giorni dopo `
         + `la chiusura di quel trimestre: quel deposito contiene un trimestre SUCCESSIVO, che qui non `
@@ -14311,7 +14338,7 @@ function datiNostriDelTitolo(tk) {
         + `${flussi.length ? `. Su dodici mesi: ${flussi.join(" · ")}` : ""}.${origine}${quanto}${dil}`
         + ` ⚠ Voci di bilancio dall'aggregatore, non dal filing: per il bilancio che conta vale il deposito della societa'.`
         + (_fermaBil
-            ? ` ⚠⚠ E QUESTO BILANCIO NON E' L'ULTIMO — E' UN FATTO, NON UN SOSPETTO: e' al `
+            ? ` ⚠⚠ E QUESTO BILANCIO NON E' L'ULTIMO — ${certezzaDeposito(_fermaBil)}: e' al `
               + `${c.bilancio_al}, ma la societa' ha depositato risultati il ${_fermaBil.dep} (SEC EDGAR, 8-K `
               + `item 2.02), ${_fermaBil.gg} giorni dopo. Liquidita', debito e autonomia qui sopra descrivono quel `
               + `trimestre, non oggi, e su una societa' che costruisce a debito sono le voci che si muovono di `
@@ -14374,7 +14401,7 @@ function datiNostriDelTitolo(tk) {
         + ` ⚠ NON e' un CDS: sono le righe di bilancio che lo spread di un CDS misura, di fonte aggregatore. Il CDS`
         + ` del nome, se il mercato lo quota, e' nella riga CDS A 5 ANNI.`
         + (_fermaCred
-            ? ` ⚠⚠ E QUESTO CONTO ECONOMICO NON E' L'ULTIMO — E' UN FATTO: e' al ${c.conto_al}, e la societa'`
+            ? ` ⚠⚠ E QUESTO CONTO ECONOMICO NON E' L'ULTIMO — ${certezzaDeposito(_fermaCred)}: e' al ${c.conto_al}, e la societa'`
               + ` ha depositato risultati il ${_fermaCred.dep} (SEC EDGAR, 8-K item 2.02), ${_fermaCred.gg} giorni`
               + ` dopo. Oneri finanziari e copertura qui sopra sono di quel trimestre: su un bilancio che cresce a`
               + ` debito sono proprio le voci che cambiano piu' in fretta. Prendile dal deposito piu' recente.`
@@ -14512,9 +14539,19 @@ function datiNostriDelTitolo(tk) {
     if (_sec && _sec.ultimo_deposito) {
       const _dd = new Date(String(_sec.ultimo_deposito) + "T12:00:00");
       const _gg = isNaN(_dd) ? null : Math.round((Date.now() - _dd.getTime()) / 86400000);
+      /* ⚠ v500 — "i conti qui sopra sono quelli comunicati allora" e' vero solo se quel deposito e' il comunicato del
+         trimestre della tabella: il 18/10 su TESLA era il deposito delle consegne. Si dice cosa il deposito e' rispetto
+         alla tabella, con la stessa regola dei blocchi che la dichiarano ferma (depositoOltreLaTabella). */
+      const _oltre = depositoOltreLaTabella(tk, ultimoTrimestreTabella(tk));
       let r = `- ULTIMO DEPOSITO DEI RISULTATI (SEC EDGAR, 8-K item 2.02 — e' un FATTO, non una stima): `
         + `${_sec.ultimo_deposito}${_gg != null ? `, ${_gg} giorni fa` : ""}. `
-        + `I conti che leggi qui sopra sono quelli comunicati allora.`;
+        + (_oltre
+            ? `Cade ${_oltre.gg} giorni dopo l'ultimo trimestre della tabella dei conti (${ultimoTrimestreTabella(tk)}), `
+              + `oltre la fine del trimestre successivo: e' il deposito di un trimestre che qui non c'e'.`
+            : _sec.cadenza_irregolare_gg
+              ? `Se e' il comunicato dei conti, i conti che leggi qui sopra sono quelli comunicati allora: questa `
+                + `societa' deposita 8-K con risultati anche fuori dal ciclo trimestrale (vedi sotto).`
+              : `I conti che leggi qui sopra sono quelli comunicati allora.`);
       if (_sec.cadenza_gg) {
         /* ⚠ v396 — qui c'era una SECONDA STIMA della prossima uscita, calcolata da noi come
            ultimo deposito + cadenza mediana, e il confronto fra le due. Era una proiezione

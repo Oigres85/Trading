@@ -218,6 +218,20 @@ def calcola(sedute=1, registra=False, adesso=None):
         scad.setdefault(a["tk"], a)                       # gli attesi arrivano gia' in ordine di data
     out["esami"] = leggi_esami()
     out["tenuta"] = con_scadenze(out["tenuta"], scad, out["esami"], out["calendario"].get("finestra"), adesso)
+    # v500 — il VWAP dall'ultima trimestrale (decisione del CEO del 18/10/2026) accanto ai pavimenti di ogni posizione
+    #   e di ogni ordine: la data del comunicato da Nasdaq, l'ora dai depositi SEC che la pipeline pubblica, la serie
+    #   della societa' dei pavimenti (rotazione.vwap_conti, una funzione per i tre blocchi: v161)
+    ultime = rotazione.ultime_sicure(con_pav)
+    ore_sec = rotazione.ore_depositi_pipeline(pipe)
+    vw = {t: rotazione.vwap_conti(BL.get(t), ultime.get(t), None if ore_sec is None else ore_sec.get(t, []),
+                                  (TEC.get(t) or {}).get("px"), (TEC.get(t) or {}).get("atr"), adesso,
+                                  veicolo=storia.get(t))
+          for t in con_pav}
+    for r in (out["tenuta"] or {}).get("righe") or []:
+        r["vwap"] = vw.get(r["tk"])
+    for x in (out["ordini"] or {}).get("righe") or []:
+        if not x.get("errore"):
+            x["vwap"] = vw.get(x["tk"])
     # v494 — le ULTIMISSIME notizie dei nomi con un parametro d'uscita acceso o un ordine d'acquisto attivo (CEO,
     #   17/10/2026: «fermo restando che anche le ultimissime news sono importanti»)
     out["segnali"] = segnali_libro(out["tenuta"], out["ordini"])
@@ -343,17 +357,19 @@ def dipendenti_credito(titoli, tecnica, fcf, ccc):
 
 
 def righe_credito(c):
-    p = lambda x: "n.d." if x is None else f"{x*100:+.1f}%"
+    # v500 — i numeri nella convenzione del resto dell'uscita (virgola decimale, punto per le migliaia,
+    #   v442, v443): accanto a "62.640 $" un "8,205 $" all'inglese si legge 8 dollari
+    p = lambda x: "n.d." if x is None else _sg(x * 100, 1) + "%"
     if not c["dipendenti"]:
         L = ["CREDITO SUL LIBRO: nessuna posizione con flusso di cassa libero negativo"]
     else:
         L = [f"CREDITO SUL LIBRO — chi brucia cassa (flusso di cassa libero negativo, deve finanziarsi fuori): "
-             f"{c['peso_dipendenti']*100:.1f}% dell'azionario · "
-             + " · ".join(f"{d['tk']} {d['peso']*100:.1f}% ({'n.d.' if d['d50_atr'] is None else format(d['d50_atr'], '+.1f')} ATR dalla media 50)"
+             f"{_it(c['peso_dipendenti'] * 100, 1)}% dell'azionario · "
+             + " · ".join(f"{d['tk']} {_it(d['peso'] * 100, 1)}% ({_sg(d['d50_atr'], 1)} ATR dalla media 50)"
                           for d in c["dipendenti"]),
              f"  21 sedute: chi brucia cassa {p(c['ret21_dipendenti'])} · chi si autofinanzia {p(c['ret21_autofinanziati'])}"
-             f" · peso sotto la propria media 50: {'n.d.' if c['quota_sotto_50'] is None else format(c['quota_sotto_50']*100, '.0f') + '%'}"
-             f" · spread CCC {'n.d.' if c['salita_ccc'] is None else format(c['salita_ccc'], '+.2f') + ' pp dal minimo di 60 sedute'}"]
+             f" · peso sotto la propria media 50: {'n.d.' if c['quota_sotto_50'] is None else _it(c['quota_sotto_50'] * 100, 0) + '%'}"
+             f" · spread CCC {'n.d.' if c['salita_ccc'] is None else _sg(c['salita_ccc'], 2) + ' pp dal minimo di 60 sedute'}"]
         if not c["misurabile"]:
             L.append("  conferma sul libro NON MISURABILE: manca uno dei tre ingressi (non vuol dire 'non arrivata')")
         else:
@@ -367,8 +383,8 @@ def righe_credito(c):
 
 
 def righe_attesa(a):
-    L = [f"COSTO DELL'ATTESA: seduta tipica ±{a['seduta_1s']:,.0f} $ · settimana tipica ±{a['settimana_1s']:,.0f} $"
-         f" (seduta x radice di 5, convenzione) · seduta cattiva (VaR95) -{a['var_usd']:,.0f} $ · media delle peggiori (ES95) -{a['es_usd']:,.0f} $"]
+    L = [f"COSTO DELL'ATTESA: seduta tipica ±{_it(a['seduta_1s'], 0)} $ · settimana tipica ±{_it(a['settimana_1s'], 0)} $"
+         f" (seduta x radice di 5, convenzione) · seduta cattiva (VaR95) -{_it(a['var_usd'], 0)} $ · media delle peggiori (ES95) -{_it(a['es_usd'], 0)} $"]
     if a["scadenze"]:
         L.append("SCADENZE (prima trimestrale dichiarata dalla fonte): "
                  + " · ".join(f"{s['tk']} {s['data']} ({s['giorni']} g{_da_emittente(s)})" for s in a["scadenze"]))
@@ -409,7 +425,14 @@ def _it(x, d=2):
 
 
 def _sg(x, d=1):
-    return "n.d." if x is None else ("+" if x > 0 else "") + _it(x, d)
+    """Il segno si mette sul valore GIA' arrotondato (v496): -0,04 a una cifra e' 0,0, non "-0,0"."""
+    if x is None:
+        return "n.d."
+    s = _it(x, d)
+    nullo = not any(ch in "123456789" for ch in s)
+    if nullo:
+        s = s.lstrip("-")
+    return ("+" if x > 0 and not nullo else "") + s
 
 
 def _conta(n, uno, molti):
@@ -565,9 +588,13 @@ def colore_semaforo(fam):
 
 def righe_pipeline(d):
     """{ticker: riga} da portafoglio E watchlist della pipeline: una costruzione sola per il semaforo,
-    il credito sul libro e la tenuta (v161). Un file assente da' {}, mai un default (v396)."""
-    return {r.get("ticker"): r for r in ((d or {}).get("portfolio") or []) + ((d or {}).get("watchlist") or [])
-            if isinstance(r, dict)}
+    il credito sul libro e la tenuta (v161). Un file assente da' {}, mai un default (v396).
+    v500 — ogni riga porta anche il proprio deposito SEC (`_sec`, da macro.sec_calendario.per_titolo): serve a
+    dire se la tabella dei trimestri e' ferma (schede_progetto.deposito_oltre_la_tabella), e la pipeline lo tiene
+    fuori dalla riga. Anche rotazione.py costruisce le righe da qui, non una seconda volta."""
+    sec = (((d or {}).get("macro") or {}).get("sec_calendario") or {}).get("per_titolo") or {}
+    return {r.get("ticker"): {**r, "_sec": sec.get(str(r.get("ticker") or "").upper())}
+            for r in ((d or {}).get("portfolio") or []) + ((d or {}).get("watchlist") or []) if isinstance(r, dict)}
 
 
 def segnali_pipeline(d):
@@ -1260,6 +1287,8 @@ def righe_ordini(oo, finestra=45):
         L.append("      " + pav)
         if "struttura" in x:          # v494 — un ordine e' un ingresso: la struttura delle oscillazioni lo accompagna
             L.extend(f"      {r}" for r in rotazione.righe_struttura(x["struttura"]))
+        if "vwap" in x:               # v500 — il VWAP dall'ultima trimestrale accanto al pavimento dell'ordine
+            L.append("      " + rotazione.riga_vwap(x["vwap"]))
         c, sc = x["corr_libro"], x["conti"]
         parti = [f"tenuta se fosse in portafoglio: {etichetta_esito(x['tenuta'])}",
                  "correlazione col libro n.d." if c is None else
@@ -1393,7 +1422,10 @@ def prove_fondamentali(riga):
                       "ora": ora, "prima": prima, "var": var},
             "revisioni": {"verso": None if su is None or giu is None else due(0, giu > su, su > giu), "su": su, "giu": giu},
             "ricavi": {"verso": due(yoy, yoy is not None and yoy < 0, yoy is not None and yoy >= SOGLIA_RICAVI),
-                       "yoy": yoy, "trim": q.get("trim")}}
+                       "yoy": yoy, "trim": q.get("trim"),
+                       # v500 — la tabella puo' essere ferma a un trimestre gia' superato da un deposito: il verso
+                       #   resta (e' il dato che c'e'), ma la resa lo dichiara
+                       "ferma": schede_progetto.deposito_oltre_la_tabella(riga or {})}}
 
 
 def prova_bilancio(riga):
@@ -1748,8 +1780,14 @@ def testo_prova(k, p):
         if p.get("verso") is None:
             return f"tendenza NON MISURABILE ({p.get('perche')})"
         nome = {"rotta": "ROTTA", "in correzione": "in correzione", "intatta": "intatta"}[p["stato"]]
+        # v500 — sulla riga A FAVORE "intatta · media 50 sotto la 200" si leggeva come un fatto favorevole (MSTR, 18/10):
+        #   il prezzo e' tornato sopra entrambe le medie, l'incrocio delle medie non ancora, e si dice cosi'
+        incr = ""
+        if p["incrocio"]:
+            incr = (" · ⚠ la media 50 resta sotto la 200: il prezzo e' tornato sopra entrambe, le medie no"
+                    if p["stato"] == "intatta" else " · media 50 sotto la 200")
         return (f"tendenza {nome}: chiusura {_sg(p['d50_atr'])} ATR dalla media 50, {_sg(p['d200_atr'])} ATR dalla 200"
-                + (" · media 50 sotto la 200" if p["incrocio"] else ""))
+                + incr)
     if k == "stime":
         if p.get("verso") is None:
             return "stime a 90 giorni n.d."
@@ -1818,8 +1856,11 @@ def testo_prove(v):
               and str(pr["macro"].get("perche", "")).startswith("brucia cassa"))
     discordi = {pr["stime"].get("verso"), pr["revisioni"].get("verso")} == {"contro", "favore"}
     cds_canale = (pr.get("cds") or {}).get("verso") == "contro" and pr["bilancio"].get("verso") == "contro"
+    import schede_progetto
+    ferma = (pr.get("ricavi") or {}).get("ferma")
     return {"contro": out["contro"], "favore": out["favore"], "neutro": out["neutro"], "ignote": out[None],
-            "stesso_canale": canale, "analisti_discordi": discordi, "cds_canale": cds_canale}
+            "stesso_canale": canale, "analisti_discordi": discordi, "cds_canale": cds_canale,
+            "tabella_ferma": schede_progetto.testo_tabella_ferma(ferma) if ferma else None}       # v500
 
 
 NOTA_DISCORDI = ("stime a 90 giorni e revisioni a 30 giorni puntano in versi opposti: sono la stessa famiglia — le "
@@ -1841,6 +1882,8 @@ def riga_prove(v):
         pz.append(NOTA_DISCORDI)
     if t["cds_canale"]:
         pz.append(NOTA_CDS_CANALE)
+    if t.get("tabella_ferma"):                      # v500
+        pz.append(t["tabella_ferma"])
     return " ; ".join(pz)
 
 
@@ -1878,6 +1921,8 @@ def righe_tenuta(t):
             L.append(f"      ⚠ {NOTA_DISCORDI}")
         if tp["cds_canale"]:
             L.append(f"      ⚠ {NOTA_CDS_CANALE}")
+        if tp.get("tabella_ferma"):                 # v500 — ricavi e bilancio delle prove sono di un trimestre prima
+            L.append(f"      {tp['tabella_ferma']}")
         if tp["neutro"] or tp["ignote"]:
             L.append("      " + " ; ".join(([f"in mezzo: {' · '.join(tp['neutro'])}"] if tp["neutro"] else [])
                                          + ([f"non misurate: {' · '.join(tp['ignote'])}"] if tp["ignote"] else [])))
@@ -1948,6 +1993,10 @@ def righe_tenuta(t):
                 if r["esito"] == "VENDITA PER EVIDENZA":
                     s += " · ⚠ con questo esito mediare è comprare CONTRO l'evidenza: speculativo, ammesso e dichiarato"
                 L.append(s)
+        if "vwap" in r:                 # v500 — il VWAP dall'ultima trimestrale, accanto ai pavimenti (v500: fuori dal
+            #   blocco dei pavimenti — la prima stesura vi aveva agganciato la media, che usciva solo col VWAP)
+            import rotazione
+            L.append("      " + rotazione.riga_vwap(r["vwap"]))
     L.append("  notizie: NON calcolate — per ogni nome in VENDITA, CONFLITTO o OSSERVAZIONE si cercano in rete NEI DUE "
              "VERSI, con fonte e data: i catalizzatori che possono farlo salire forte (contratti, guida alzata, ordini, "
              "clienti nuovi) e i fatti che rompono la tesi (guida tagliata, cliente perso, diluizione pesante, indagine). "
@@ -2487,7 +2536,7 @@ def testo_scadenza(r, oggi=None, finestra=None):
 def sintesi(o):
     """Righe compatte per la chat: numeri, non frasi di giudizio."""
     r, b = o["rischio"], o["bench"]
-    p = lambda x, d=2: "n.d." if x is None else f"{x*100:+.{d}f}%"
+    p = lambda x, d=2: "n.d." if x is None else _sg(x * 100, d) + "%"      # v500 — virgola decimale (v442)
     # v474 — il semaforo per primo: e' la sezione 0 della risposta (FORMATO_ANALISI.md)
     L = (righe_semaforo(o["semaforo"], precedente_semaforo(o.get("registro"), o["semaforo"].get("seduta")), r["mcr"])
          if o.get("semaforo") else [])
@@ -2496,21 +2545,22 @@ def sintesi(o):
         L.extend(righe_salvavita(o["salvavita"]))
     if o.get("piano"):
         L.extend(righe_piano(o["piano"], (o.get("semaforo") or {}).get("colore"), o.get("salvavita")))
-    L += [f"Periodo {o['inizio']} -> {o['fine']} ({o['sedute']} sedute) · azionario {o['tot_usd']:,.0f} $",
-         f"Libro {p(o['ret_libro'])} ({o['pnl_libro']:+,.0f} $) · QQQ {p(b['QQQ'])} · SMH {p(b['SMH'])} · SPY {p(b['SPY'])} · RSP {p(b['RSP'])}",
+    L += [f"Periodo {o['inizio']} -> {o['fine']} ({_conta(o['sedute'], 'seduta', 'sedute')}) · azionario {_it(o['tot_usd'], 0)} $",
+         f"Libro {p(o['ret_libro'])} ({_sg(o['pnl_libro'], 0)} $) · QQQ {p(b['QQQ'])} · SMH {p(b['SMH'])} · SPY {p(b['SPY'])} · RSP {p(b['RSP'])}",
          f"21 sedute: libro {p(o['ret_21'],1)} · SMH {p(o['bench_21']['SMH'],1)} · QQQ {p(o['bench_21']['QQQ'],1)}"]
     if o.get("registro"):
         L.extend(righe_registro(o["registro"]))
-    L += [f"Vol {r['vol_ann']*100:.1f}% · VaR95 {r['var95']*100:.2f}% · ES95 {r['es95']*100:.2f}% · scommesse eff. {r['scommesse_eff']:.2f}"
+    L += [f"Vol {_it(r['vol_ann'] * 100, 1)}% · VaR95 {_it(r['var95'] * 100, 2)}% · ES95 {_it(r['es95'] * 100, 2)}% · scommesse eff. {_it(r['scommesse_eff'], 2)}"
          f" su {len(r['mcr'])} nomi (fuori matrice: {', '.join(o['esclusi_matrice']) or 'nessuno'}) · {r['n_sedute']} sedute",
-         "Beta libro: " + " · ".join(f"{f} {bb:.2f} (R² {r2:.2f})" for f, (bb, r2) in r["beta_libro"].items())]
+         "Beta libro: " + " · ".join(f"{f} {_it(bb, 2)} (R² {_it(r2, 2)})" for f, (bb, r2) in r["beta_libro"].items())]
     for t in sorted(o["titoli"], key=lambda x: -(x["pnl"] or 0)):
         m = r["mcr"].get(t["tk"])
-        ris_s = "n.d." if m is None else f"{m*100:5.1f}%"
-        pnl_s = "n.d." if t["pnl"] is None else f"{t['pnl']:+,.0f} $"
-        L.append(f"  {t['tk']:5} peso {t['peso']*100:5.1f}% rischio {ris_s}  periodo {pnl_s}  vs carico {t['vs_pmc']*100:+.0f}%")
+        ris_s = "n.d." if m is None else (_it(m * 100, 1) + "%").rjust(6)
+        pnl_s = "n.d." if t["pnl"] is None else f"{_sg(t['pnl'], 0)} $"
+        L.append(f"  {t['tk']:5} peso {(_it(t['peso'] * 100, 1) + '%').rjust(6)} rischio {ris_s}  periodo {pnl_s}  "
+                 f"vs carico {_sg(t['vs_pmc'] * 100, 0)}%")
     for k, v in o["stress"].items():
-        L.append(f"Stress {k}: {v['pnl']:+,.0f} $ ({v['pct']*100:+.1f}%) · R² {v['r2']:.2f}")
+        L.append(f"Stress {k}: {_sg(v['pnl'], 0)} $ ({_sg(v['pct'] * 100, 1)}%) · R² {_it(v['r2'], 2)}")
     if o["esclusi_matrice"]:
         L.append(f"(stress: {', '.join(o['esclusi_matrice'])} senza storia sufficiente, propagati col beta del libro)")
     if o.get("attesa"):
@@ -2562,7 +2612,9 @@ def esteso():
     with ThreadPoolExecutor(6) as ex:
         righe = dict(zip(tks, ex.map(brief.tecnica, tks)))
     out, pnl, ret = movimento_esteso(righe, qty)
-    L = [f"FUORI SESSIONE rispetto all'ultima chiusura · libro {pnl:+,.0f} $ ({ret*100:+.2f}%)" if ret is not None
+    # v500 — la convenzione del resto dell'uscita (v442, v443): questo blocco, il pre-market che il CEO legge prima
+    #   dell'apertura, era rimasto all'inglese («+1,234 $», «+0.53%») e l'ha trovato il gate sul codice
+    L = [f"FUORI SESSIONE rispetto all'ultima chiusura · libro {_sg(pnl, 0)} $ ({_sg(ret * 100, 2)}%)" if ret is not None
          else "FUORI SESSIONE: nessun prezzo esteso per le posizioni"]
     for grp, sel in (("POSIZIONI", lambda d: d["tk"] in qty), ("RIFERIMENTI", lambda d: d["tk"] in ("QQQ", "SMH", "SPY")),
                      ("SORVEGLIATI", lambda d: d["tk"] not in qty and d["tk"] not in ("QQQ", "SMH", "SPY"))):
@@ -2570,9 +2622,9 @@ def esteso():
         for d in sorted([d for d in out if sel(d)], key=lambda d: -(abs(d.get("pct") or 0))):
             if d["esteso"] is None:
                 L.append(f"  {d['tk']:5} non quotato fuori sessione"); continue
-            liv = f" · res {d['res_atr']:+.1f} ATR · supp {d['supp_atr']:+.1f} ATR" if "res_atr" in d else ""
-            L.append(f"  {d['tk']:5} {d['esteso']:>10,.2f} {d['pct']:+6.2f}%"
-                     + (f" {d['pnl']:+8,.0f} $" if "pnl" in d else "") + liv
+            liv = f" · res {_sg(d['res_atr'])} ATR · supp {_sg(d['supp_atr'])} ATR" if "res_atr" in d else ""
+            L.append(f"  {d['tk']:5} {_it(d['esteso'], 2):>10} {_sg(d['pct'], 2) + '%':>7}"
+                     + (f" {_sg(d['pnl'], 0):>8} $" if "pnl" in d else "") + liv
                      + (f"  ⚠ {d['oltre']}" if d.get("oltre") else ""))
     return "\n".join(L)
 

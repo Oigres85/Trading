@@ -1135,7 +1135,9 @@ _pieno["trimestrali"] = {"finestra": 21, "giorni_non_letti": [],
 _html2 = _bp.genera(_pieno)
 check("v451 con una trimestrale la pagina la pubblica con data, orario e consenso",
       "2026-09-30" in _html2 and "dopo la campana" in _html2
-      and "31.17" in _html2 and "fra 18g" in _html2)
+      # v500 — RIAGGANCIATO: pretendeva "31.17", cioe' il punto inglese che la v442 ha tolto dall'uscita; il JSON
+      #   di prima (senza il campo `orario`) si traduce lo stesso, con la funzione di brief.py
+      and "31,17" in _html2 and "31.17" not in _html2 and "fra 18g" in _html2)
 
 check("v451 senza chiave FRED la pagina dichiara il buco, non lo tace",
       "Serie macro assenti" in _html and "e' il dato che manca".replace("e'", "\u00e8") in _html
@@ -1433,7 +1435,8 @@ finally:
     brief.RADICE = _rad
 _rcc = [s for s in _mc["serie"] if s["nome"].startswith("Spread CCC")]
 check("v465 il brief porta lo spread CCC con la sua data e la salita dal minimo",
-      len(_rcc) == 1 and _rcc[0]["data"] == "2026-10-05" and "+2.42 pp" in (_rcc[0]["nota"] or ""),
+      # v500 — RIAGGANCIATO: pretendeva "+2.42 pp" col punto inglese; la nota ora e' nella convenzione dell'uscita
+      len(_rcc) == 1 and _rcc[0]["data"] == "2026-10-05" and "+2,42 pp" in (_rcc[0]["nota"] or ""),
       str(_rcc))
 
 # ============================ v467 — IL CREDITO ARRIVA AL LIBRO? ============================
@@ -1926,7 +1929,8 @@ check("v473 la raccolta passa alla watchlist la nota del CEO, il calendario e le
       '"nota": s.get("nota")' in _racc473 and 'prima_trim.get(s["tk"])' in _racc473
       and "submit(calendario_sicuro," in _racc473 and "cal = fut_cal.result()" in _racc473
       and '"analisti":' in _racc473
-      and "struttura_minimi(barre)" in _corpo_di(_src_rot473, "scheda")
+      # v500 — RIAGGANCIATO all'argomento, mai alla parentesi (la svista di v489, v492, v494): la base riceve l'ATR
+      and "struttura_minimi(barre" in _corpo_di(_src_rot473, "scheda")
       and "dal_minimo(barre" in _corpo_di(_src_rot473, "scheda"))
 
 # ---- il comando unico ----
@@ -4386,14 +4390,17 @@ _vv = lambda ore, tit: {"titolo": tit, "quando": _ora494 - _td494(hours=ore)}
 _news494 = {"AAA": {"stato": "ok", "voci": [_vv(1, "Stocks Plunge")] + [_vv(2 + k, f"AAA propria {k}") for k in range(8)],
                     "copre_da": _ora494 - _td494(hours=9), "lette": 9},
             "BBB": {"stato": "ok", "voci": [_vv(1, "stocks plunge ")], "copre_da": None, "lette": 15},
-            "CCC": {"stato": "HTTP 429", "voci": []}, "DDD": {"stato": "ok", "voci": [], "copre_da": None, "lette": 0}}
+            "CCC": {"stato": "HTTP 429", "voci": []}, "DDD": {"stato": "ok", "voci": [], "copre_da": None, "lette": 0},
+            # v500 — RIAGGANCIATO: la cronaca di mercato comincia da TRE feed (SOGLIA_CRONACA, convenzione); il caso a
+            #   due feed ha il suo gate qui sotto
+            "FFF": {"stato": "ok", "voci": [_vv(1, "STOCKS PLUNGE")], "copre_da": None, "lette": 15}}
 _rn494 = "\n".join(ROT.righe_notizie("NOTIZIE ULTIMISSIME — PROVA", {"AAA": ["x"], "BBB": ["y"], "CCC": ["z"],
-                                                                     "DDD": ["w"], "EEE": ["v"]}, _news494,
+                                                                     "DDD": ["w"], "EEE": ["v"], "FFF": ["u"]}, _news494,
                                      altrove={"EEE": "CANDIDATI"}))
 check("v494 la resa delle notizie: la STESSA voce nel feed di piu' nomi e' cronaca di mercato, scritta una volta in "
       "fondo (v451); le voci proprie per nome, quelle oltre il tetto CONTATE (v393); feed non letto e nessuna voce "
       "DIVERSI (v389); la copertura del feed dichiarata; chi ha le notizie altrove lo dice",
-      _rn494.count("Stocks Plunge") == 1 and "(nel feed di AAA, BBB)" in _rn494 and "[AAA] " in _rn494
+      _rn494.count("Stocks Plunge") == 1 and "(nel feed di AAA, BBB, FFF)" in _rn494 and "[AAA] " in _rn494
       and "… e altre 2 voci nelle stesse ore, non mostrate" in _rn494 and "+ 1 voce di cronaca di mercato" in _rn494
       and "nessuna voce propria: le 1 del feed sono cronaca di mercato" in _rn494
       and "feed NON letto (HTTP 429)" in _rn494 and "feed letto, nessuna voce nelle ultime 72 ore" in _rn494
@@ -5430,6 +5437,449 @@ check("v499 il formato: la sezione 5ter degli indici e la gamma e il dark pool i
       and "gli indici S&P 500 e Nasdaq-100" in _fa499.split("Richieste del CEO rese strutturali")[1]
       and "`scripts/indici.py` resta **fuori**" in (Path(__file__).resolve().parent.parent / ".claude" / "commands"
                                                    / "aggiorna.md").read_text(encoding="utf-8"))
+
+# ═══ v500 — DEBUG DEL 18/10, IL VWAP DAI CONTI, LA MISURA DEI SEGNALI DI MERCATO ════════════════════════════════
+# Il CEO, 18/10/2026: «1 ok tua proposta · 2ok · Dopo fai debug approfondito per controllare che tutto funzioni». Gli
+# stati si costruiscono (v425, v429): nessuna rete, nessun dato del giorno.
+import copy as _cp500, random as _rnd500
+from datetime import datetime as _dt500, date as _d500, timedelta as _td500
+import misura_segnali_mercato as MS
+import indici as _ix500
+
+# --- il brief: le serie nella convenzione del pacchetto, il periodo detto come periodo, orario e consenso tradotti ---
+check("v500 le serie della pipeline nella convenzione del pacchetto: virgola decimale con le cifre della fonte, il testo "
+      "della pipeline col solo separatore cambiato, None e i booleani n.d.",
+      brief.valore_serie(5.1) == "5,1" and brief.valore_serie(1.1242) == "1,1242" and brief.valore_serie(4) == "4,0"
+      and brief.valore_serie(12345.6) == "12.345,6" and brief.valore_serie(3.88, "%") == "3,88%"
+      and brief.valore_serie("3.7%") == "3,7%" and brief.valore_serie("+0.35 pp") == "+0,35 pp"
+      and brief.valore_serie(None) == "n.d." and brief.valore_serie(True) == "n.d.")
+check("v500 il periodo detto come periodo (v392): una mensile «riferito a settembre 2026», un'indagine «indagine di luglio "
+      "2026», una giornaliera il giorno, e senza data lo si dice",
+      brief.quando_serie("2026-09-01", "mese") == "riferito a settembre 2026"
+      and brief.quando_serie("2026-07-01", "indagine") == "indagine di luglio 2026"
+      and brief.quando_serie("2026-10-15") == "al 2026-10-15" and brief.quando_serie(None) == "rilevazione non dichiarata")
+check("v500 orario della trimestrale e consenso tradotti UNA volta per testo e pagina (v455): «time-not-supplied» non esce "
+      "grezzo, un codice nuovo si mostra dichiarato, «$0.82» diventa «0,82 $»",
+      brief.orario_trimestrale("time-not-supplied") == "orario non dichiarato"
+      and brief.orario_trimestrale("time-pre-market") == "prima della campana"
+      and brief.orario_trimestrale(None) == "orario non dichiarato"
+      and "(codice della fonte)" in brief.orario_trimestrale("time-xyz")
+      and brief.consenso_testo("$0.82") == "0,82 $" and brief.consenso_testo("-$1.25") == "-1,25 $"
+      and brief.consenso_testo(None) is None and brief.consenso_testo("N/A") == "N/A")
+_bsrc500 = Path(__file__).with_name("brief.py").read_text(encoding="utf-8")
+_bpsrc500 = Path(__file__).with_name("brief_pagina.py").read_text(encoding="utf-8")
+check("v500 collegamento: il calendario delle trimestrali attacca orario e consenso tradotti, il testo e la pagina li "
+      "leggono di li' con lo stesso ripiego, e la tabella macro della pagina usa le rese del brief",
+      'x["orario"] = orario_trimestrale(x.get("quando"))' in _bsrc500
+      and 'x["consenso"] = consenso_testo(x.get("eps_atteso"))' in _bsrc500
+      and 'x.get("orario") or brief.orario_trimestrale(x.get("quando"))' in _bpsrc500
+      and 'x.get("consenso") or brief.consenso_testo(x.get("eps_atteso"))' in _bpsrc500
+      and 's.get("valore_testo") or s["valore"]' in _bpsrc500 and 's.get("quando_testo") or s["data"]' in _bpsrc500)
+_mp500 = brief.macro_dalla_pipeline()
+_ser500 = _mp500.get("serie") or []
+_ingl500 = [s.get("valore_testo") for s in _ser500 if re.search(r"[0-9][.]([0-9]{1,2}|[0-9]{4,})(?![0-9])", str(s.get("valore_testo") or ""))]
+check("v500 il blocco macro del brief sui dati veri: nessun valore col punto decimale inglese, e le serie mensili (CPI, "
+      "disoccupazione, posti di lavoro) dicono il MESE",
+      len(_ser500) >= 5 and not _ingl500
+      and sum(1 for s in _ser500 if str(s.get("quando_testo", "")).startswith("riferito a ")) >= 2,
+      str(_ingl500) + " " + str([(s.get("nome"), s.get("quando_testo")) for s in _ser500]))
+
+# --- l'ultima trimestrale riportata (Nasdaq): il lettore e i tre esiti ---
+_es500 = {"data": {"earningsSurpriseTable": {"rows": [
+    {"fiscalQtrEnd": "May 2026", "dateReported": "6/24/2026", "eps": "1.91", "consensusForecast": "1.60", "percentageSurprise": "19.38"},
+    {"fiscalQtrEnd": "Aug 2026", "dateReported": "9/30/2026", "eps": "33.19", "consensusForecast": "31.41", "percentageSurprise": "5.67"},
+    {"fiscalQtrEnd": "Feb 2026", "dateReported": "non una data", "eps": "1.0", "consensusForecast": "1.0", "percentageSurprise": "0"},
+    {"fiscalQtrEnd": "Nov 2025", "dateReported": "12/17/2025", "eps": "N/A", "consensusForecast": "--", "percentageSurprise": ""}]}}}
+_lt500 = brief.leggi_ultima_trimestrale(_es500)
+check("v500 l'ultima trimestrale RIPORTATA: la piu' recente per data anche se la fonte non le ordina, il trimestre in "
+      "italiano, EPS e consenso come numeri, una data illeggibile saltata, una risposta vuota detta «senza righe»",
+      _lt500 == {"stato": "ok", "data": "2026-09-30", "trimestre": "agosto 2026", "eps": 33.19, "consenso": 31.41,
+                 "sorpresa_pct": 5.67}
+      and brief.leggi_ultima_trimestrale({"data": {"earningsSurpriseTable": {"rows": []}}}) == {"stato": "senza righe"}
+      and brief.leggi_ultima_trimestrale(None) == {"stato": "senza righe"}, str(_lt500))
+_oj500 = brief.jget
+def _jget500(url, timeout=20):
+    if "/AAA/" in url:
+        return _es500
+    if "/CCC/" in url:
+        return {"data": None}
+    raise OSError("rifiutata")
+brief.jget = _jget500
+try:
+    _ut500 = brief.ultime_trimestrali(["aaa", "BBB", "CCC", "AAA", None])
+finally:
+    brief.jget = _oj500
+check("v500 tre esiti per nome (v389): letta, «senza righe», NON letta con la causa; un nome chiesto due volte si legge "
+      "una volta, in maiuscolo",
+      sorted(_ut500) == ["AAA", "BBB", "CCC"] and _ut500["AAA"]["stato"] == "ok"
+      and _ut500["CCC"] == {"stato": "senza righe"} and _ut500["BBB"]["stato"].startswith("NON letto (")
+      and "rifiutata" in _ut500["BBB"]["stato"], str(_ut500))
+
+# --- il VWAP dai conti: l'ancora e i suoi stati, costruiti ---
+_g500 = [d for d in (_d500(2026, 9, 25) + _td500(days=k) for k in range(22)) if d.weekday() < 5]
+def _bar500(vol=None, a_da=None):
+    out = []
+    for k, g in enumerate(_g500):
+        c = 100.0 + k
+        rap = 0.9 if (a_da and g.isoformat() < a_da) else 1.0
+        out.append({"t": g.isoformat(), "o": c, "h": c + 2, "l": c - 1, "c": c, "a": c * rap,
+                    "v": (vol or {}).get(g.isoformat(), 1000 + k)})
+    return out
+_B500 = _bar500()
+_DOM500 = _dt500(2026, 10, 18, 12, 0, tzinfo=brief.NEW_YORK)
+_TR500 = {"stato": "ok", "data": "2026-09-30", "trimestre": "agosto 2026", "eps": 33.19, "consenso": 31.41,
+          "sorpresa_pct": 5.67}
+def _anc500(acc, forma="8-K", tr=None, b=None, adesso=None, dep=True):
+    d = None if not dep else ([{"forma": forma, "data": acc[:10], "accettato": acc}] if isinstance(acc, str) else acc)
+    return ROT.ancora_conti(tr or _TR500, d, b or _B500, adesso or _DOM500)
+_a1, _a2, _a3 = _anc500("2026-09-30T16:05:00"), _anc500("2026-09-30T07:00:00"), _anc500("2026-09-30T12:00:00")
+_a4 = _anc500("2026-09-29T16:30:00")
+_a5 = _anc500("2026-10-03T10:00:00", tr={**_TR500, "data": "2026-10-03"})
+check("v500 l'ancora dall'ORA del deposito: dopo le 16:00 di New York la seduta successiva, prima delle 09:30 la stessa, "
+      "in mezzo la stessa dichiarata a seduta aperta; il deposito della sera prima muove la seduta del comunicato; un "
+      "deposito nel fine settimana muove il lunedi'",
+      (_a1["seduta"], _a1["quando"], _a1["ora"], _a1["da_volumi"]) == ("2026-10-01", "dopo la chiusura", "16:05", False)
+      and (_a2["seduta"], _a2["quando"]) == ("2026-09-30", "prima dell'apertura")
+      and _a3["seduta"] == "2026-09-30" and _a3["quando"].startswith("a seduta aperta")
+      and (_a4["seduta"], _a4["quando"]) == ("2026-09-30", "dopo la chiusura")
+      and (_a5["seduta"], _a5["quando"]) == ("2026-10-05", "prima dell'apertura"), str([_a1, _a2, _a3, _a4, _a5]))
+_a6 = _anc500([{"forma": "6-K", "accettato": "2026-09-30T20:00:00"}, {"forma": "6-K", "accettato": "2026-09-30T06:00:00"}])
+_a7 = _anc500([{"forma": "6-K", "accettato": "2026-09-30T06:00:00"}, {"forma": "8-K", "accettato": "2026-09-30T16:05:00"}])
+check("v500 l'ancora: un emittente estero prende il PRIMO 6-K della finestra; con un 8-K e un 6-K vince l'8-K, anche se "
+      "accettato dopo",
+      (_a6["seduta"], _a6["forma"], _a6["ora"]) == ("2026-09-30", "6-K", "06:00")
+      and (_a7["seduta"], _a7["forma"]) == ("2026-10-01", "8-K"), str([_a6, _a7]))
+_a8 = _anc500("2026-09-25T16:05:00")
+_a9 = _anc500(None, dep=False, b=_bar500({"2026-09-30": 500, "2026-10-01": 9000}))
+_a10 = _anc500(None, dep=False, b=_bar500({"2026-09-30": 9000, "2026-10-01": 500}))
+_a10v = ROT.ancora_conti(_TR500, [], _B500, _DOM500)      # la pipeline pubblica le ore, ma non per questo nome
+check("v500 senza l'ora la seduta PIU' SCAMBIATA fra il giorno del comunicato e il successivo, e il perche' distingue la "
+      "pipeline che non pubblica le ore (None) da quella che le pubblica ma non ne ha nella finestra (v406)",
+      _a8["da_volumi"] and _a8["perche"] == "nessun deposito SEC con l'ora fra il giorno prima e il giorno dopo il comunicato"
+      and _a9["da_volumi"] and _a9["seduta"] == "2026-10-01"
+      and _a9["perche"] == "la pipeline non pubblica ancora l'ora dei depositi SEC"
+      and _a10["seduta"] == "2026-09-30"
+      and _a10v["perche"] == "nessun deposito SEC con l'ora fra il giorno prima e il giorno dopo il comunicato",
+      str([_a8, _a9, _a10, _a10v]))
+_a11 = _anc500("2026-09-30T16:05:00", tr={"stato": "NON letto (HTTP 403)"})
+_a12 = ROT.ancora_conti({**_TR500, "data": "2026-10-15"}, [{"forma": "8-K", "accettato": "2026-10-15T16:05:00"}], _B500,
+                        _dt500(2026, 10, 16, 12, 0, tzinfo=brief.NEW_YORK))
+check("v500 l'ancora: una data NON letta lo dice e non vuol dire «nessuna trimestrale»; la seduta in corso non decide "
+      "niente — il comunicato di ieri sera ha la prima seduta ancora aperta, e lo si dice",
+      "NON letta" in _a11["errore"] and "non vuol dire 'nessuna trimestrale'" in _a11["errore"]
+      and "non e' ancora conclusa" in _a12.get("errore", ""), str([_a11, _a12]))
+_v500 = ROT.vwap_conti(_B500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}], 120.0, 2.0, _DOM500)
+_sel500 = [b for b in _B500 if b["t"] >= "2026-10-01"]
+_vw500 = sum((b["h"] + b["l"] + b["c"]) / 3 * b["v"] for b in _sel500) / sum(b["v"] for b in _sel500)
+check("v500 il VWAP: prezzo tipico (massimo+minimo+chiusura)/3 pesato sui volumi dalla seduta d'ancora all'ultima "
+      "conclusa, e la distanza del prezzo in % e in ATR",
+      abs(_v500["vwap"] - _vw500) < 1e-9 and _v500["sedute"] == len(_sel500) and _v500["fino_a"] == "2026-10-16"
+      and abs(_v500["dist_pct"] - (120.0 / _vw500 - 1) * 100) < 1e-9 and abs(_v500["dist_atr"] - (120.0 - _vw500) / 2.0) < 1e-9,
+      str(_v500))
+_bh500 = _cp500.deepcopy(_B500)
+_bh500[10]["v"] = None
+_bz500 = [{**b, "v": 0} for b in _B500]
+_vh500 = ROT.vwap_conti(_bh500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}], 120.0, 2.0, _DOM500)
+_vz500 = ROT.vwap_conti(_bz500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}], 120.0, 2.0, _DOM500)
+_vs500 = ROT.vwap_conti(_bar500(a_da="2026-10-08"), _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}],
+                        120.0, 2.0, _DOM500)
+check("v500 il VWAP non si calcola su un buco (v205), su volumi nulli, ne' a cavallo di un'operazione societaria caduta "
+      "DOPO i conti — che prima spostava in silenzio l'ancora al giorno del taglio",
+      "buco" in _vh500.get("errore", "") and "volumi nulli" in _vz500.get("errore", "")
+      and "operazione societaria" in _vs500.get("errore", "") and "vwap" not in _vs500, str([_vh500, _vz500, _vs500]))
+_rv500 = ROT.riga_vwap(_v500)
+check("v500 la riga del VWAP: il prezzo, i conti col risultato contro le attese (l'EPS senza segno), il deposito con l'ora "
+      "di New York e la seduta d'ancora, le sedute, la distanza e la lettura; gli errori e il «non calcolato» detti",
+      _rv500.startswith("VWAP dai conti ") and "conti del 30/09/2026 (agosto 2026: EPS 33,19 contro 31,41 attesi, +5,7%)" in _rv500
+      and "comunicato alle 16:05 di New York del 30/09/2026 (8-K su SEC EDGAR), dopo la chiusura → dalla seduta del 01/10/2026" in _rv500
+      and f"{len(_sel500)} sedute" in _rv500 and "chi ha comprato dopo i conti e' in media in guadagno" in _rv500
+      and ROT.riga_vwap(_vs500).startswith("VWAP dai conti: non calcolabile — un'operazione societaria")
+      and ROT.riga_vwap(None) == "VWAP dai conti: non calcolato"
+      and "perche' la pipeline non pubblica ancora l'ora dei depositi SEC" in ROT.riga_vwap(
+          ROT.vwap_conti(_B500, _TR500, None, 120.0, 2.0, _DOM500)), _rv500)
+check("v500 le ore della pipeline: None quando non le pubblica (snapshot precedente), {} quando le pubblica senza nomi — "
+      "due stati diversi; e una lettura di Nasdaq che si rompe non si porta via la watchlist",
+      ROT.ore_depositi_pipeline({"macro": {"sec_calendario": {"ore_depositi": {"per_titolo": {"MU": [1]}}}}}) == {"MU": [1]}
+      and ROT.ore_depositi_pipeline({"macro": {"sec_calendario": {}}}) is None
+      and ROT.ore_depositi_pipeline({"macro": {"sec_calendario": {"ore_depositi": {}}}}) == {})
+_out500 = brief.ultime_trimestrali
+brief.ultime_trimestrali = lambda tks: (_ for _ in ()).throw(OSError("giu'"))
+try:
+    _us500 = ROT.ultime_sicure(["MU", "AMD"])
+finally:
+    brief.ultime_trimestrali = _out500
+check("v500 ultime_sicure: con la fonte giu' ogni nome dice NON letto, invece di far cadere il blocco",
+      sorted(_us500) == ["AMD", "MU"] and all(v["stato"].startswith("NON letto") for v in _us500.values()), str(_us500))
+_rac500 = _corpo_di(_src_rot473, "raccogli")
+_nlsrc500 = Path(__file__).with_name("numeri_libro.py").read_text(encoding="utf-8")
+_calc500 = _corpo_di(_nlsrc500, "calcola")
+check("v500 collegamento: la raccolta legge le ultime trimestrali INSIEME al calendario, prende le ore dalla pipeline e "
+      "calcola il VWAP di ogni sorvegliato sulle barre lunghe dei pavimenti; numeri_libro fa lo stesso per posizioni e "
+      "ordini, con la stessa funzione",
+      "ex_cal.submit(ultime_sicure" in _rac500 and "ore_sec = ore_depositi_pipeline(d)" in _rac500
+      and 't["vwap"] = vwap_conti(BL.get(t["tk"]), ultime.get(t["tk"]), None if ore_sec is None else ore_sec.get(t["tk"], [])' in _rac500
+      and "rotazione.ultime_sicure(con_pav)" in _calc500 and "rotazione.ore_depositi_pipeline(pipe)" in _calc500
+      and "rotazione.vwap_conti(BL.get(t), ultime.get(t), None if ore_sec is None else ore_sec.get(t, [])" in _calc500
+      and 'r["vwap"] = vw.get(r["tk"])' in _calc500 and 'x["vwap"] = vw.get(x["tk"])' in _calc500)
+_tnv500 = _cp500.deepcopy(_tn481)
+_tnv500["righe"][0]["vwap"] = _v500
+_ov500 = _cp500.deepcopy(_o489)
+_ok500 = next(x for x in _ov500["righe"] if not x.get("errore"))
+_ok500["vwap"] = _vs500
+_ti500 = "\n".join(ROT.righe_ingresso(_w473("VWAP", vwap=_v500)))
+check("v500 collegamento ESEGUITO: la riga del VWAP esce sotto la posizione, sotto l'ordine e sotto il sorvegliato quando "
+      "c'e', e non esce quando non e' calcolata",
+      _rv500 in "\n".join(NL.righe_tenuta(_tnv500)) and ROT.riga_vwap(_vs500) in "\n".join(NL.righe_ordini(_ov500))
+      and _rv500 in _ti500 and "VWAP dai conti" not in "\n".join(ROT.righe_ingresso(_w473("SENZA"))))
+
+# --- le notizie: due feed restano col nome, tre sono cronaca ---
+_news500 = {"AAA": {"stato": "ok", "voci": [_vv(1, "CoreWeave Is Projected to Have a 6.3x Gross Leverage Ratio")],
+                    "copre_da": None, "lette": 15},
+            "BBB": {"stato": "ok", "voci": [_vv(1, "coreweave is projected to have a 6.3x gross leverage ratio")],
+                    "copre_da": None, "lette": 15},
+            "CCC": {"stato": "ok", "voci": [_vv(2, "Altro")], "copre_da": None, "lette": 15}}
+_rn500 = "\n".join(ROT.righe_notizie("PROVA", {"AAA": ["x"], "BBB": ["y"], "CCC": ["z"]}, _news500))
+check("v500 la voce nel feed di DUE nomi resta con ciascuno e dice dove altro compare: cronaca di mercato e' solo quella "
+      "nel feed di almeno tre (il 18/10 «6.3x Gross Leverage» su CoreWeave finiva sotto «e' il mercato, non il nome»)",
+      ROT.SOGLIA_CRONACA == 3 and "CRONACA DI MERCATO" not in _rn500
+      and "(anche nel feed di BBB)" in _rn500 and "(anche nel feed di AAA)" in _rn500, _rn500)
+
+# --- correlazione, base, struttura: il numero deciso e' quello stampato, una regola per «alla pari» ---
+_r500 = _rnd500.Random(5)
+_ra500 = {f"d{k:03d}": _r500.gauss(0, 1) for k in range(80)}
+_rb500 = {k: 0.5 * v + _r500.gauss(0, 1) for k, v in _ra500.items()}
+_c500 = ROT.correlazione(_ra500, _rb500)
+check("v500 la correlazione esce arrotondata a due cifre dove nasce, cosi' decide lo stesso numero che si stampa (il "
+      "18/10 TSLA era «DIVERSIFICA (corr +0,50)»), e 0,50 e' la stessa scommessa",
+      _c500 is not None and abs(_c500 * 100 - round(_c500 * 100)) < 1e-9 and ROT.SOGLIA_CORR == 0.5
+      and "corr >= SOGLIA_CORR" in _src_rot473, str(_c500))
+_bm500 = [{"t": f"2026-09-{k + 1:02d}", "l": (100.0 if k < 10 else 99.6), "h": 105.0, "c": 102.0} for k in range(20)]
+check("v500 la base a 10 sedute usa la regola dei pavimenti per «alla pari» (mezzo ATR): due minimi a 0,4 con ATR 1 sono "
+      "alla pari, senza ATR decrescenti, con ATR 0,5 decrescenti",
+      ROT.struttura_minimi(_bm500, _DOM500, atr=1.0)["verso"] == "alla pari"
+      and ROT.struttura_minimi(_bm500, _DOM500)["verso"] == "decrescenti"
+      and ROT.struttura_minimi(_bm500, _DOM500, atr=0.5)["verso"] == "decrescenti"
+      and "struttura_minimi(barre" in _src_rot473 and "atr=t.get(\"atr\")" in _src_rot473)
+check("v500 i candidati per settore dicono nell'uscita cosa sono gli stati (IN TENDENZA anche coi rendimenti negativi)",
+      "settore IN TENDENZA = prezzo " in _src_rot473 and "sopra la media a 200 e media a 50 in salita su 20 sedute" in _src_rot473
+      and "anche coi rendimenti a 1 e 3 mesi negativi" in _src_rot473 and "IN RIBASSO = sotto la 200" in _src_rot473)
+
+# --- numeri_libro: la convenzione italiana in tutte le rese, e la tendenza che non si legge al rovescio ---
+# una specifica di formato DENTRO le graffe (le migliaia «,» o i decimali «.Nf»), non uno slicing come «R[:, i]»
+_fmt500 = [l for l in _nlsrc500.splitlines() if re.search(r"[{][^{}]*:[^{}]*(,|[.][1-9])[^{}]*f[}]", l)
+           and 'f"{x:,.{d}f}"' not in l]
+check("v500 numeri_libro non scrive piu' numeri all'inglese: nessuna formattazione con le migliaia o i decimali fuori "
+      "dal formattatore unico, e il segno sul valore gia' arrotondato",
+      not _fmt500 and NL._sg(-0.04, 1) == "0,0" and NL._sg(1234.6, 0) == "+1.235" and NL._sg(-2.345, 2) == "-2,35"
+      and NL._it(12345.678, 1) == "12.345,7", str(_fmt500))
+check("v500 la tendenza intatta con la media 50 ancora sotto la 200 lo dice come un avviso, non come un fatto favorevole "
+      "(MSTR, 18/10)",
+      "la media 50 resta sotto la 200: il prezzo e' tornato sopra entrambe, le medie no" in _nlsrc500)
+
+# --- la tabella dei trimestri ferma: una regola, due lingue, e la diagnosi detta con la certezza che ha ---
+_rt500 = {"tv": {"conto_trim": [{"trim": "2026-06-30"}, {"trim": "2026-03-31"}]}}
+_casi500 = [("2026-10-09", None), ("2026-10-10", None), ("2026-10-10", 67), (None, None), ("2026-08-11", None)]
+_py500 = [SP.deposito_oltre_la_tabella(_rt500, ({"ultimo_deposito": d, "cadenza_irregolare_gg": irr} if d else {}))
+          for d, irr in _casi500]
+check("v500 la tabella dei trimestri e' FERMA solo oltre 101 giorni dall'ultimo trimestre (91 del trimestre dopo + 10): "
+      "101 no, 102 si'; un deposito fuori ciclo lo dichiara; senza deposito, o a 42 giorni, nessuna diagnosi",
+      _py500[0] is None and _py500[1] == {"dep": "2026-10-10", "gg": 102, "trim": "2026-06-30", "irregolare": False}
+      and _py500[2]["irregolare"] is True and _py500[3] is None and _py500[4] is None and SP.GIORNI_DEPOSITO_OLTRE == 101, str(_py500))
+_tf500 = SP.testo_tabella_ferma(_py500[2])
+check("v500 la frase della tabella ferma: un fatto per chi deposita col ciclo, una deduzione dalla data per chi deposita "
+      "anche fuori ciclo — e la tenuta la porta (le prove di ricavi e bilancio sono di un trimestre prima)",
+      "tabella dei trimestri FERMA al 2026-06-30" in _tf500 and "una deduzione dalla data, non un fatto" in _tf500
+      and "deduzione" not in SP.testo_tabella_ferma(_py500[1])
+      and '"tabella_ferma": schede_progetto.testo_tabella_ferma(ferma) if ferma else None' in _nlsrc500)
+_JS500 = r"""
+const fs = require("fs"), vm = require("vm");
+const src = fs.readFileSync(process.argv[2], "utf8");
+const el = () => ({addEventListener(){}, classList:{add(){},remove(){},toggle(){},contains:()=>false}, style:{}, dataset:{},
+  hidden:true, querySelector:()=>el(), querySelectorAll:()=>[], closest:()=>null});
+const ctx = {console:{log(){},warn(){},error(){}}, document:{querySelector:()=>el(), querySelectorAll:()=>[],
+  getElementById:()=>el(), createElement:()=>el(), addEventListener(){}, body:el()},
+  localStorage:{getItem:()=>null, setItem(){}, removeItem(){}}, window:{addEventListener(){}, matchMedia:()=>({matches:false})},
+  navigator:{clipboard:{}}, fetch:()=>Promise.reject(new Error("offline")), setInterval:()=>0, clearInterval(){},
+  setTimeout:()=>0, clearTimeout(){}, Event:class{}, MutationObserver:class{observe(){}}};
+vm.createContext(ctx); vm.runInContext(src, ctx, {filename: "app.js"});
+const casi = JSON.parse(fs.readFileSync(process.argv[3], "utf8"));
+const out = casi.map(c => { vm.runInContext("DATA = " + JSON.stringify({macro: {sec_calendario: {per_titolo: c.per}}}), ctx);
+  const f = vm.runInContext("depositoOltreLaTabella('XYZ', '2026-06-30')", ctx);
+  return {f: f, certezza: vm.runInContext("certezzaDeposito(" + JSON.stringify(f) + ")", ctx)}; });
+process.stdout.write(JSON.stringify(out));
+"""
+with tempfile.TemporaryDirectory() as _td500d:
+    _jsf500, _inf500 = Path(_td500d) / "dep.js", Path(_td500d) / "casi.json"
+    _jsf500.write_text(_JS500, encoding="utf-8")
+    _inf500.write_text(_json.dumps([{"per": ({"XYZ": {"ultimo_deposito": d, "cadenza_irregolare_gg": irr}} if d else {})}
+                                    for d, irr in _casi500]), encoding="utf-8")
+    _rj500 = subprocess.run(["node", str(_jsf500), str(Path(__file__).resolve().parent.parent / "assets" / "app.js"),
+                             str(_inf500)], capture_output=True, text=True, timeout=120)
+try:
+    _js500 = _json.loads(_rj500.stdout)
+except ValueError:
+    _js500 = None
+check("v500 la regola della tabella ferma e' LA STESSA in Python e in app.js (v161, il contratto v323): stessi casi, stesse "
+      "diagnosi e stessa certezza dichiarata",
+      _js500 is not None and len(_js500) == len(_py500)
+      and all((j["f"] is None) == (p is None) and (p is None or (j["f"]["gg"] == p["gg"] and j["f"]["dep"] == p["dep"]
+                                                                 and j["f"]["irregolare"] == p["irregolare"]))
+              for j, p in zip(_js500, _py500))
+      and _js500[2]["certezza"].startswith("DEDOTTO DALLA DATA") and _js500[1]["certezza"] == "E' UN FATTO, NON UN SOSPETTO",
+      (_rj500.stderr or "")[:300] + str(_js500))
+
+# --- schede: i rimandi al posto della seconda resa ---
+_spsrc500 = Path(__file__).with_name("schede_progetto.py").read_text(encoding="utf-8")
+check("v500 le schede rimandano invece di ripetere: la data della trimestrale stimata dalla pipeline punta alle SCADENZE e "
+      "alle TRIMESTRALI (la fonte e' Nasdaq), l'8-K dice che e' dei risultati, il prospettico di FactSet sta negli INDICI",
+      "fonte e' nelle SCADENZE e nelle TRIMESTRALI, calendario Nasdaq)" in _spsrc500
+      and "ultimo 8-K con item 2.02 (risultati) su EDGAR" in _spsrc500 and "il blocco INDICI porta il prospettico di FactSet" in _spsrc500)
+
+# --- posizionamento: le medie in un posto solo, e la nostra gamma raccolta per misurarla quando potra' ---
+_md500 = PZ.medie_dp([("2026-10-01", [10, 100]), ("2026-10-02", [30, 100]), ("2026-10-05", [90, 300])], m=2)
+_pzsrc500 = Path(__file__).with_name("posizionamento.py").read_text(encoding="utf-8")
+check("v500 il DPI medio e' PONDERATO sui volumi (somma dello scoperto su somma del totale) e la media semplice del put/call "
+      "e' una funzione sola: le usano lo stato pubblicato e la misura",
+      _md500 == [("2026-10-02", 20.0), ("2026-10-05", 30.0)] and PZ.medie_semplici([1, 2, 3, 4], 2) == [1.5, 2.5, 3.5]
+      and "medie = [v for _, v in medie_dp(righe, m)]" in _corpo_di(_pzsrc500, "stato_dp")
+      and "medie = medie_semplici(az, m)" in _corpo_di(_pzsrc500, "stato_pc"))
+_rie500 = {"AAA": {"seduta": "2026-10-16", "pc_vol": 0.81234, "pc_oi": 1.12, "iv30": 55.0},
+           "BBB": {"seduta": "2026-10-16", "pc_vol": 0.5, "pc_oi": 0.6, "iv30": 30.0}}
+_mt500 = []
+_nr500 = PZ.registra_titoli(_rie500, _mt500, "chiuso", _DOM500,
+                            {"AAA": {"spot": 101.234567, "netta": -1234567.8, "flip": 105.55557}, "BBB": None})
+_mt0_500 = []
+PZ.registra_titoli(_rie500, _mt0_500, "chiuso", _DOM500)
+check("v500 la memoria delle opzioni raccoglie anche la NOSTRA gamma (netta, cambio di regime, il prezzo su cui e' "
+      "calcolata): senza, «la misureremo quando la storia lo permette» sarebbe una promessa senza modo di mantenerla; un "
+      "titolo senza gamma resta com'era",
+      # .get: un campo che manca deve far cadere il controllo col suo nome, non la suite (v407, v471)
+      _nr500 == 2 and _mt500[0].get("gex_netta") == -1234568 and _mt500[0].get("gex_spot") == 101.2346
+      and _mt500[0].get("gex_flip") == 105.5556 and "gex_netta" not in _mt500[1] and "gex_netta" not in _mt0_500[0]
+      and "registra_titoli(rie, memoria_tit, analisi.fase(adesso), adesso, gex)" in _pzsrc500, str(_mt500))
+check("v500 il lettore degli storici CBOE legge anche l'SPX, che non ha CLOSE ma una colonna col proprio nome — lo stesso "
+      "lettore per la volatilita' e per la misura",
+      _ix500.leggi_vol("DATE,SPX\n01/02/1975,70.230000\n", "SPX") == [("1975-01-02", 70.23)]
+      and _ix500.leggi_vol("DATE,OPEN,HIGH,LOW,CLOSE\n09/18/2009,1,2,0.5,1.5\n") == [("2009-09-18", 1.5)])
+
+# --- la misura dei segnali: le funzioni pure, sugli stati costruiti ---
+check("v500 misura: un episodio e' il PRIMO giorno di un tratto acceso dopo almeno GAP sedute spente; un giorno non "
+      "calcolabile (None) conta come spento",
+      MS.episodi([False, True, True, False, True], gap=1) == [1, 4] and MS.episodi([False, True, True, False, True], gap=2) == [1]
+      and MS.episodi([None, True], gap=1) == [1] and MS.GAP == 20)
+_px500 = [100.0, 110.0, 90.0, 95.0]
+_do500 = MS.dopo(_px500, 0, avanti=(1, 2), finestra=2, anno=3)
+_do3_500 = MS.dopo(_px500, 3, avanti=(1, 2), finestra=2, anno=3)
+check("v500 misura: dopo il segnale il rendimento a ogni orizzonte, il calo massimo SOLO con la finestra completa (su meta' "
+      "finestra sarebbe piu' piccolo del vero), la distanza dal massimo dell'anno",
+      abs(_do500["r1"] - 0.1) < 1e-12 and abs(_do500["r2"] + 0.1) < 1e-12 and abs(_do500["calo"] + 0.1) < 1e-12
+      and _do500["gia"] == 0 and _do3_500["r1"] is None and _do3_500["calo"] is None
+      and abs(_do3_500["gia"] - (95.0 / 110.0 - 1)) < 1e-12, str([_do500, _do3_500]))
+_pxc500 = [100.0] * 70 + [85.0] * 130
+_acc500 = [False] * 200
+_acc500[60] = True
+_cf500 = MS.confronto(_pxc500, _acc500)
+_b10_500 = sum(1 for i in range(200 - 63) if min(_pxc500[i:i + 64]) / _pxc500[i] - 1 <= -0.10) / (200 - 63)
+check("v500 misura: la frequenza di base su tutti i giorni con la finestra completa, lo scarto in errori standard "
+      "binomiali della base sul numero di episodi, e la lettura con la soglia dichiarata",
+      _cf500["n"] == 1 and _cf500["completi"] == 1 and _cf500["calo10"]["quota"] == 1.0
+      and abs(_cf500["calo10"]["base"] - _b10_500) < 1e-12
+      and abs(_cf500["calo10"]["se"] - math.sqrt(_b10_500 * (1 - _b10_500) / 1)) < 1e-12
+      and abs(_cf500["calo10"]["scarti"] - (1.0 - _b10_500) / _cf500["calo10"]["se"]) < 1e-12
+      and MS.lettura({"scarti": 1.9}).endswith("DENTRO IL RUMORE") and MS.lettura({"scarti": 2.1}).endswith("SOPRA la base")
+      and MS.lettura({"scarti": -2.5}).endswith("SOTTO la base") and MS.lettura({"scarti": None}) == "non misurabile"
+      and MS.RUMORE == 2.0, str(_cf500["calo10"]))
+_cali500 = MS.cali([100, 105, 94, 90, 106, 100, 95])
+check("v500 misura: un calo finisce quando il prezzo torna sopra il massimo da cui era partito; quello aperto a fine serie "
+      "resta, col minimo toccato fin li'",
+      [(a, b) for a, b, _c in _cali500] == [(1, 3), (4, 6)] and abs(_cali500[0][2] - (90 / 105 - 1)) < 1e-12, str(_cali500))
+_pxa500 = [100, 105, 104, 101, 99, 94, 90, 106]
+_ca500 = MS.cali(_pxa500)
+def _an500(*accesi_in, nulli=()):
+    a = [i in accesi_in for i in range(len(_pxa500))]
+    for i in nulli:
+        a[i] = None
+    return MS.anticipo(_pxa500, _ca500, a)[0]
+check("v500 misura: un calo «anticipato» se il segnale si accende entro il giorno in cui tocca il -5% (anche prima del "
+      "massimo), «dentro» dopo, «mai» se non si accende; con un giorno non calcolabile nella finestra non si giudica",
+      _an500(3)["esito"] == "entro" and abs(_an500(3)["calo_al_segnale"] - (101 / 105 - 1)) < 1e-12
+      and _an500(0)["esito"] == "entro" and _an500(0)["calo_al_segnale"] is None
+      and _an500(5)["esito"] == "dentro" and _an500()["esito"] == "mai"
+      and _an500(3, nulli=(2,))["esito"] == "non calcolabile", str([_an500(3), _an500(5)]))
+_pm500 = MS.percentile_mobile([1, 2, 3, 4, 5], n=3, minimo=2)
+_pm2_500 = MS.percentile_mobile([1, 2, 3, 4, 50], n=3, minimo=2)
+check("v500 misura: il percentile mobile usa solo la storia fino a quel giorno (lui compreso) — cambiare il futuro non "
+      "cambia il passato — e sotto il minimo di valori non c'e'",
+      _pm500[0] is None and abs(_pm500[1] - 75.0) < 1e-12 and abs(_pm500[2] - 250 / 3) < 1e-9 and _pm500[:4] == _pm2_500[:4],
+      str(_pm500))
+check("v500 misura: un valore pubblicato vale dal giorno in cui e' USCITO, non da quello che fotografa",
+      MS.su_sedute(["2026-01-05", "2026-01-06", "2026-01-09", "2026-01-12"], [("2026-01-06", 10), ("2026-01-09", 20)])
+      == [None, 10, 20, 20])
+_cs500 = [((_d500(2020, 1, 7) + _td500(weeks=k)).isoformat(), float(k)) for k in range(209)]
+_cp500v = MS.cot_percentili(_cs500)
+_fin500 = [v for d, v in _cs500 if d > (_d500.fromisoformat(_cs500[-1][0]) - _td500(days=365 * 3)).isoformat()]
+check("v500 misura: il percentile dei grandi operatori sulla finestra di cot_stato (gli ultimi 3 anni, per data), dal "
+      "venerdi' in cui il rapporto esce, e nessun percentile prima di due anni di rapporti",
+      _cp500v[0] == ((_d500(2020, 1, 7) + _td500(days=3)).isoformat(), None) and _cp500v[102][1] is None
+      and _cp500v[103][1] is not None
+      and abs(_cp500v[-1][1] - ROT.percentile_midrank(208.0, _fin500)) < 1e-12 and len(_fin500) < 209,
+      str(_cp500v[-1]) + " " + str(len(_fin500)))
+_mv500 = MS.mesi_valutazione([("2000-11-01", 10.0, False), ("2000-12-01", 20.0, False), ("2000-12-15", 99.0, False)], mesi=2)
+check("v500 misura: il P/E di un mese vale dal mese dopo (la media dei prezzi del mese si conosce a mese chiuso, anche a "
+      "cavallo dell'anno), la riga del giorno resta fuori, e sotto la finestra intera nessun percentile",
+      _mv500 == [("2000-12-01", None), ("2001-01-01", 75.0)], str(_mv500))
+check("v500 misura: il CSV di FRED senza i giorni vuoti («.»), e FRED si legge con l'intestazione onesta della pipeline "
+      "(un «Mozilla» resta senza risposta)",
+      MS.leggi_fred("observation_date,NASDAQ100\n2026-01-02,21000.5\n2026-01-05,.\n") == {"2026-01-02": 21000.5}
+      and MS.UA_FRED == {"User-Agent": "Trading-dashboard/1.0 (+https://github.com/Oigres85/Trading)", "Accept": "*/*"}
+      and 'UA_ONESTO = {"User-Agent": "Trading-dashboard/1.0 (+https://github.com/Oigres85/Trading)",' in
+      Path(__file__).with_name("update_data.py").read_text(encoding="utf-8"))
+_q500 = MS.quinti([100.0 + k for k in range(130)], [None] * 5 + [float(k % 101) for k in range(125)])
+check("v500 misura: i quinti contano i giorni con la finestra completa, il 100 sta nel quinto alto e i None fuori",
+      sum(q["n"] for q in _q500) == 130 - 63 - 5 and all(q["calo10"] == 0 for q in _q500 if q["n"]), str(_q500))
+_dps500 = [((_d500(2026, 1, 1) + _td500(days=k)).isoformat()) for k in range(200)]
+_dpr500 = [(d, [k % 7 + 1, 10]) for k, d in enumerate(_dps500)]
+_dpp500 = {d: 100.0 * (1.01 ** k) for k, d in enumerate(_dps500)}
+_dpsp500 = {d: 100.0 for d in _dps500}
+_os500 = MS.osservazioni_dpi(_dpr500, _dpp500, _dpsp500)
+check("v500 misura: il dark pool per titolo usa la media del sistema (POS.medie_dp) e il percentile delle medie dell'anno, "
+      "e misura il rendimento in eccesso su SPY nelle 21 sedute dopo",
+      len(_os500) == 200 - 9 - 59 - 21 and all(abs(e - (1.01 ** 21 - 1)) < 1e-9 for _r, e, _d in _os500)
+      and all(0 <= r <= 100 for r, _e, _d in _os500), str(_os500[:2]))
+_pr500 = MS.righe_prove([("a", 0.1, 2.3)] + [("b", 0.05, 0.4)] * 23)
+check("v500 misura: il conto dei confronti chiude il rapporto — quanti oltre due errori standard e quanti il caso ne "
+      "produce (4,55% a due code): 1 su 24 e' il caso",
+      len(_pr500) == 1 and "24 confronti con la base, 1 oltre 2 errori standard" in _pr500[0]
+      and "circa 1,1" in _pr500[0] and MS.righe_prove([]) == [], str(_pr500))
+_olt500, _oli500 = PZ.leggi_memoria_titoli, _ix500.leggi_memoria
+PZ.leggi_memoria_titoli = lambda: [{"data": "2026-10-16", "tk": "MU"}, {"data": "2026-10-17", "tk": "MU", "gex_netta": 5},
+                                   {"data": "2026-10-16", "tk": "AMD"}]
+_ix500.leggi_memoria = lambda: {"2026-10-16": {"ndx_fwd": 21.4}, "2026-10-17": {"ndx_fwd": None}}
+try:
+    _ph500 = "\n".join(MS.parte_h({}, {}, False))
+finally:
+    PZ.leggi_memoria_titoli, _ix500.leggi_memoria = _olt500, _oli500
+check("v500 misura: cio' che non ha storia si dichiara con quanta ne e' stata raccolta — la nostra gamma, le opzioni per "
+      "titolo, il P/E del Nasdaq-100 — e cosa non si misura perche' non e' un segnale",
+      "la nostra gamma dei dealer sulle catene (posizionamento.py): 1 seduta registrata dal 17/10/2026" in _ph500
+      and "fino a 2 sedute registrate per titolo" in _ph500 and "1 rilevazione raccolta dal 16/10/2026" in _ph500
+      and "non c'e' niente da misurare" in _ph500, _ph500)
+_mssrc500 = Path(__file__).with_name("misura_segnali_mercato.py").read_text(encoding="utf-8")
+check("v500 misura, collegamento: ogni parte ha la sua funzione e le sue fonti, i lettori sono quelli del sistema (CBOE e "
+      "CFTC da posizionamento, gli storici da indici), il conto dei confronti chiude, e /aggiorna la dichiara fuori",
+      set(MS.ESEGUI) == set(MS.PARTI) == set(MS.SERVE) and "L += righe_prove(PROVE)" in _corpo_di(_mssrc500, "main")
+      and "POS.leggi_pc(" in _mssrc500 and "POS._cot(anno)" in _mssrc500 and "IND.leggi_vol(" in _mssrc500
+      and "IND.leggi_multpl(" in _mssrc500
+      and "`scripts/misura_segnali_mercato.py` resta **fuori**" in (Path(__file__).resolve().parent.parent / ".claude"
+                                                                  / "commands" / "aggiorna.md").read_text(encoding="utf-8"))
+_lb500 = (Path(__file__).resolve().parent.parent / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_fa500 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v500 il libro e il formato: le due decisioni del 18/10 con le parole del CEO, il VWAP con le sue convenzioni, la "
+      "misura con la conclusione (informazione), la cronaca da tre feed, e il registro delle richieste",
+      "*\"1 ok tua proposta\"*" in _lb500 and "*\"2ok\"*" in _lb500 and "**Il VWAP dall'ultima trimestrale, accanto ai pavimenti**" in _lb500
+      and "`scripts/misura_segnali_mercato.py`" in _lb500 and "di almeno **tre** nomi scritta una volta come cronaca" in _lb500
+      and "il VWAP dall'ultima trimestrale" in " ".join(_fa500.split("Richieste del CEO rese strutturali")[1].split())
+      and "VWAP dall'ultima trimestrale" in (AN.checklist() or ""))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

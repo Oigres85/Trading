@@ -118,7 +118,11 @@ def riferimento_valutazione(macro):
             f"{_n(SCARTO_PE, 0)} volte il prospettico (convenzione) si dichiara · riferimento S&P 500: "
             + (" · ".join(rif) if rif else "n.d. (la pipeline non lo pubblica)")
             + " — fonti e basi diverse da quelle dei titoli (orizzonte, definizione dell'utile): un confronto "
-            "indicativo, non una misura · il P/E e' una METRICA, non una prova della tenuta (§1sexies)")
+            "indicativo, non una misura · il P/E e' una METRICA, non una prova della tenuta (§1sexies)"
+            # v500 — il 18/10 l'uscita portava "prospettico 19,2× [WSJ]" qui e "19,0× (FactSet)" nel blocco INDICI: due
+            #   valori per lo stesso nome di grandezza. Sono due definizioni dell'utile atteso, e si dice (v499)
+            + " · il blocco INDICI porta il prospettico di FactSet e la storia di ciascuna fonte: utili attesi "
+            "definiti in modo diverso, quindi i due prospettici non si confrontano fra loro")
 
 
 def riga_valutazione(r):
@@ -295,6 +299,50 @@ def riga_ricavi(r):
     return s
 
 
+# ⚠⚠ v500 — LA TABELLA DEI TRIMESTRI FERMA. Il 18/10 la tenuta di MU portava "ricavi +345,7% (al 2026-05-31)"
+#   mentre la societa' aveva depositato il trimestre successivo il 30/09: la pagina lo dichiarava dalla v400, gli
+#   strumenti dell'analisi no — e la tenuta e' quella su cui si decide. Quel giorno erano sei nomi (MU, AMZN, JPM,
+#   GS, BLK, NKE); con la soglia di prima anche TSLA e ABBV, per un deposito fuori ciclo.
+#   La soglia e' la fine del trimestre SUCCESSIVO all'ultimo della tabella (91 giorni) piu' dieci giorni: nessuna
+#   societa' pubblica i conti di un trimestre nei primi dieci giorni dopo la chiusura (le banche, le piu' veloci, ne
+#   impiegano 13-14). Convenzione (v240), la STESSA di depositoOltreLaTabella in assets/app.js: un gate esegue le due
+#   lingue sugli stessi casi (v161, v496). Con 60 giorni un 8-K item 2.02 fuori ciclo — le consegne di Tesla del
+#   02/10 — si leggeva come un trimestre nuovo.
+GIORNI_DEPOSITO_OLTRE = 101
+
+
+def deposito_oltre_la_tabella(r, sec=None):
+    """{dep, gg, trim, irregolare} se l'ultimo 8-K con item 2.02 cade oltre la soglia dopo l'ultimo trimestre della
+    tabella dei conti, altrimenti None. sec: la voce di macro.sec_calendario.per_titolo del nome; senza, quella che
+    numeri_libro.righe_pipeline attacca alla riga (`_sec`)."""
+    ct = [x for x in ((r or {}).get("tv") or {}).get("conto_trim") or [] if isinstance(x, dict) and x.get("trim")]
+    if not ct:
+        return None
+    trim = str(ct[0]["trim"])[:10]          # il primo, come lo legge la pagina (la pipeline li scrive dal piu' recente)
+    per = sec if sec is not None else ((r or {}).get("_sec") or {})
+    dep = str((per or {}).get("ultimo_deposito") or "")[:10]
+    if not dep:
+        return None
+    try:
+        gg = (datetime.fromisoformat(dep).date() - datetime.fromisoformat(trim).date()).days
+    except ValueError:
+        return None
+    if gg <= GIORNI_DEPOSITO_OLTRE:
+        return None
+    return {"dep": dep, "gg": gg, "trim": trim, "irregolare": bool((per or {}).get("cadenza_irregolare_gg"))}
+
+
+def testo_tabella_ferma(f):
+    """La frase, una sola per le schede e per la tenuta (v161)."""
+    s = (f"⚠ tabella dei trimestri FERMA al {f['trim']}: la societa' ha depositato risultati il {f['dep']} (SEC EDGAR, "
+         f"8-K item 2.02), {f['gg']} giorni dopo — oltre la fine del trimestre successivo: ricavi, utili e bilancio "
+         "qui sono di un trimestre prima dell'ultimo comunicato, che sta alla fonte")
+    if f.get("irregolare"):
+        s += (" · ⚠ deposita 8-K con risultati anche fuori dal ciclo trimestrale: che questo deposito contenga un "
+              "trimestre e' una deduzione dalla data, non un fatto")
+    return s
+
+
 def riga_cassa(r):
     """Solo rapporti, mai importi (v404). Esce solo per chi brucia cassa: per gli altri la
     domanda 'quanto dura la cassa' non si pone.
@@ -357,10 +405,14 @@ def riga_short(r):
 def riga_trimestrale(r, sec):
     pz = []
     if r.get("earnings_date"):
-        pz.append(f"trimestrale {r['earnings_date']} (STIMA yfinance, non una data confermata)")
+        # v500 — due date per lo stesso evento nella stessa uscita si leggono come un disaccordo (v413): la data
+        #   dichiarata dalla fonte e' nel blocco SCADENZE e nelle TRIMESTRALI del brief (calendario Nasdaq, v473)
+        pz.append(f"trimestrale {r['earnings_date']} (STIMA yfinance, non una data confermata: quella dichiarata dalla "
+                  "fonte e' nelle SCADENZE e nelle TRIMESTRALI, calendario Nasdaq)")
     s = (sec or {}).get(r["ticker"]) or {}
     if s.get("ultimo_deposito"):
-        pz.append(f"ultimo 8-K risultati su EDGAR {s['ultimo_deposito']}")
+        # v500 — e' un 8-K con item 2.02, non per forza il comunicato dei conti: Tesla ci deposita le consegne
+        pz.append(f"ultimo 8-K con item 2.02 (risultati) su EDGAR {s['ultimo_deposito']}")
     return ("calendario: " + " · ".join(pz)) if pz else "calendario: nessuna data nel progetto"
 
 
@@ -499,6 +551,9 @@ def scheda(tk, ruolo, righe, sec, meta_cds=None):
         x = f(r)
         if x:
             out.append("  " + x)
+    ferma = deposito_oltre_la_tabella(r, (sec or {}).get(tk) or {})       # v500
+    if ferma:
+        out.append("  " + testo_tabella_ferma(ferma))
     out.append("  " + riga_cds(r, meta_cds))       # v497 — il credito prezzato dal mercato, nome per nome
     return out
 

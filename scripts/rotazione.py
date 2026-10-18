@@ -34,7 +34,8 @@ questa ultima analisi"). Per ogni sorvegliato di LIBRO.md, convenzioni dichiarat
                          basso per chi sta sotto, ritorno SOTTO il bordo alto per chi e' tirato.
                          Conta la chiusura, con volume oltre il 50o percentile dell'anno.
   STESSA SCOMMESSA     = correlazione col libro da 0,5 in su, in qualunque stato: non diversifica.
-  STRUTTURA DEI MINIMI = minimo delle ultime 10 sedute concluse contro quello delle 10 precedenti.
+  STRUTTURA DEI MINIMI = minimo delle ultime 10 sedute concluse contro quello delle 10 precedenti;
+                         entro mezzo ATR sono ALLA PARI, la regola dei pavimenti (v500).
   STOP                 = il supporto delle 20 sedute, lo stesso livello del brief.
 Le trimestrali vengono dal calendario Nasdaq (la fonte delle SCADENZE di numeri_libro); dove
 manca nella finestra resta la stima yfinance della pipeline, DICHIARATA come stima (v396). Le
@@ -90,7 +91,7 @@ Il P/E viene da schede_progetto.riga_valutazione (una resa sola per schede e ing
 dell'aggregatore, mai ricalcolati qui.
 """
 import argparse, json, math, os, sys
-from datetime import datetime
+from datetime import datetime, timedelta, time as dtime
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -211,7 +212,9 @@ def correlazione(ra, rb, n=SEDUTE_CORR):
     sx = math.sqrt(sum((v - mx) ** 2 for v in x)); sy = math.sqrt(sum((v - my) ** 2 for v in y))
     if not sx or not sy:
         return None
-    return sum((a - mx) * (b - my) for a, b in zip(x, y)) / (sx * sy)
+    # v500 — il numero deciso e' quello stampato (v498): arrotondata qui, una volta. Il 18/10 TSLA usciva
+    #   "DIVERSIFICA (corr +0,50)" con la regola "stessa scommessa da 0,5 in su": decideva lo 0,4996
+    return round(sum((a - mx) * (b - my) for a, b in zip(x, y)) / (sx * sy), 2)
 
 
 def serie_libro(barre_pos, qta):
@@ -378,10 +381,13 @@ def percentile_midrank(x, serie):
 
 
 # ---------------------------------------------------------------- v473: ingressi sulla watchlist
-def struttura_minimi(barre, adesso=None, n=SEDUTE_MINIMI):
+def struttura_minimi(barre, adesso=None, n=SEDUTE_MINIMI, atr=None):
     """Il minimo delle ultime n sedute CONCLUSE contro quello delle n precedenti (convenzione,
     n=10): crescenti = la discesa ha smesso di fare nuovi minimi, decrescenti = li sta ancora
-    facendo. La seduta in corso si toglie: il suo minimo puo' ancora scendere (v471)."""
+    facendo. La seduta in corso si toglie: il suo minimo puo' ancora scendere (v471).
+    v500 — entro mezzo ATR i due minimi sono ALLA PARI, la regola dei pavimenti e della struttura (v494): il
+    18/10 la base di CRM diceva DECRESCENTI (220,29 contro 221,18) e due righe sotto la struttura chiamava gli
+    stessi due minimi ALLA PARI. Una regola sola per "stesso livello"."""
     if seduta_in_corso(barre or [], adesso):
         barre = barre[:-1]
     if not barre or len(barre) < 2 * n:
@@ -390,7 +396,10 @@ def struttura_minimi(barre, adesso=None, n=SEDUTE_MINIMI):
     if any(v is None for v in lo):
         return None
     ora, prima = min(lo[n:]), min(lo[:n])
-    verso = "crescenti" if ora > prima else ("decrescenti" if ora < prima else "pari")
+    if atr and abs(ora - prima) <= PAV_LARGHEZZA_ATR * atr:
+        verso = "alla pari"
+    else:
+        verso = "crescenti" if ora > prima else ("decrescenti" if ora < prima else "alla pari")
     return {"ora": ora, "prima": prima, "verso": verso, "fino_a": barre[-1]["t"]}
 
 
@@ -854,7 +863,7 @@ def scheda(tk, barre, rlibro, rspy=None, target=None):
             "max52": t["max52"], "beta_spy": beta, "r2_spy": r2, "sedute_beta": nb,
             "vol_annua": vol_annua(rt), "target": tg, "target_dist": tg_dist, **volumi(barre),
             # v473 — per il piano d'ingresso: l'ATR in prezzo (la zona si misura in ATR), la base
-            "atr": t.get("atr"), "min52": t.get("min52"), "minimi": struttura_minimi(barre),
+            "atr": t.get("atr"), "min52": t.get("min52"), "minimi": struttura_minimi(barre, atr=t.get("atr")),
             "dal_minimo": dal_minimo(barre, t["px"]),
             # v489 — il volume della seduta in corso, col tempo trascorso (None fuori dalla seduta)
             "vol_seduta_corso": volume_seduta(t, barre)}
@@ -890,19 +899,26 @@ def raccogli():
                    | set(numeri_libro.LEADER))
     # v473 — il calendario delle trimestrali gira MENTRE si scaricano le barre: ~20 secondi di
     #   richieste a Nasdaq che altrimenti si sommerebbero al resto.
-    with ThreadPoolExecutor(1) as ex_cal:
+    with ThreadPoolExecutor(2) as ex_cal:
         # v474: tutto l'universo, non i soli sorvegliati — il calendario si legge per GIORNO e si
         #   filtra dopo, quindi i candidati di settore hanno la loro trimestrale allo stesso costo
         fut_cal = ex_cal.submit(calendario_sicuro, tutti)
+        # v500 — l'ultima trimestrale riportata dei sorvegliati (Nasdaq), ACCANTO al calendario e mentre si scaricano
+        #   le barre. In coda al calendario costava 24 secondi in piu' a ogni giro; misurato il 18/10: 46 nomi in
+        #   15 secondi con otto richieste insieme verso la stessa fonte, nessun rifiuto. Se la fonte rifiuta, ogni
+        #   nome lo dichiara (NON letto) invece di sparire (v389)
+        fut_ut = ex_cal.submit(ultime_sicure, [s["tk"] for s in sorv])
         with ThreadPoolExecutor(brief.PARALLELI) as ex:
             B = dict(zip(tutti, ex.map(_barre_sicure, tutti)))
         cal = fut_cal.result()
+        ultime = fut_ut.result()
     rlibro = serie_libro({tk: B.get(tk) for tk in qta if B.get(tk)}, qta)
     rspy = rendimenti_per_data(B["SPY"]) if B.get("SPY") else {}
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
         S = dict(zip(tutti, ex.map(lambda tk: scheda(tk, B.get(tk), rlibro, rspy, target), tutti)))
     seguiti = set(qta) | {s["tk"] for s in sorv}
-    pipe = {r.get("ticker"): r for r in (d.get("watchlist") or []) + (d.get("portfolio") or []) if isinstance(r, dict)}
+    # v500 — le righe della pipeline si costruiscono in un posto solo (v161), con il deposito SEC attaccato
+    pipe = numeri_libro.righe_pipeline(d)
     settori = []
     for r in tilt:
         e = S.get(r["ticker"]) or {}
@@ -944,8 +960,12 @@ def raccogli():
     lunghi = list(dict.fromkeys([t["tk"] for t in watch] + [t["tk"] for t in cand]))
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
         BL = dict(zip(lunghi, ex.map(barre_lunghe, lunghi)))
+    ore_sec = ore_depositi_pipeline(d)
     for t in watch:
         t["pavimenti"] = pavimenti(BL.get(t["tk"]), t.get("px"), t.get("atr"), veicolo=t["veicolo"])
+        # v500 — il VWAP dall'ultima trimestrale, accanto ai pavimenti e sulla stessa serie della societa'
+        t["vwap"] = vwap_conti(BL.get(t["tk"]), ultime.get(t["tk"]), None if ore_sec is None else ore_sec.get(t["tk"], []),
+                               t.get("px"), t.get("atr"), veicolo=t["veicolo"])
     for t in watch + cand:
         t.setdefault("veicolo", veicolo_pipeline(d, t["tk"]))
         t["cinque_anni"] = lettura_5anni(BL.get(t["tk"]), t.get("px"), veicolo=t["veicolo"])
@@ -1128,6 +1148,8 @@ def righe_ingresso(t, cal=None):
         L.extend(f"      {r}" for r in righe_struttura(t["struttura"]))
     if "pavimenti" in t:          # v487 — solo i sorvegliati: il calcolo vive in raccogli
         L.extend(f"      {r}" for r in righe_pavimenti(t["pavimenti"]))
+    if "vwap" in t:               # v500 — il VWAP dall'ultima trimestrale, accanto ai pavimenti
+        L.append(f"      {riga_vwap(t['vwap'])}")
     if "cinque_anni" in t:        # v492 — la lettura a 5 anni: il calcolo vive in raccogli
         L.extend(f"      {r}" for r in righe_5anni(t["cinque_anni"], t.get("veicolo")))
     L.append(f"      {riga_volumi(t)} · {riga_target_beta(t)}")
@@ -1144,6 +1166,164 @@ def righe_ingresso(t, cal=None):
 
 def _fascia(z):
     return prezzo(z["alto"]) if z["fondo"] == z["alto"] else f"{prezzo(z['fondo'])}–{prezzo(z['alto'])}"
+
+
+# ---------------------------------------------------------------- v500: VWAP ancorato all'ultima trimestrale
+# Decisione del CEO del 18/10/2026 («2ok»): accanto ai pavimenti di ogni titolo il VWAP calcolato dall'ultima
+# trimestrale, cioe' il prezzo medio pagato da chi ha comprato dopo i conti. Convenzioni dichiarate (v240):
+#   ANCORA  = la prima seduta dopo il comunicato. La DATA la dichiara Nasdaq (brief.ultime_trimestrali: le
+#             trimestrali riportate, non le stime). L'ORA viene dal deposito su SEC EDGAR accettato fra le 16:00 di
+#             New York del giorno prima e la fine del giorno dopo — l'8-K con item 2.02, o il primo 6-K per un
+#             emittente estero —: prima delle 09:30 muove la seduta stessa, dalle 16:00 la successiva, in mezzo la
+#             seduta stessa (a seduta aperta: la sua barra mescola il prima e il dopo). Senza l'ora, la seduta piu'
+#             scambiata fra il giorno del comunicato e il successivo, DICHIARATO (la reazione ai conti e' quasi
+#             sempre la seduta piu' scambiata del trimestre).
+#   VWAP    = dalle barre GIORNALIERE: prezzo tipico (massimo + minimo + chiusura) / 3 pesato sui volumi, dall'ancora
+#             all'ultima seduta CONCLUSA, sulla serie della societa' (serie_della_societa: un'operazione societaria
+#             nel mezzo mescolerebbe due societa'). E' un'approssimazione del VWAP dei grafici, che usa barre di
+#             pochi minuti: i due numeri possono differire di poco.
+#   LETTURA = convenzione: sopra il VWAP chi ha comprato dopo i conti e' in media in guadagno, sotto in perdita. E'
+#             un livello accanto ai pavimenti — non una prova della tenuta, non un ordine.
+VWAP_APERTURA = (9, 30)
+VWAP_CHIUSURA = (16, 0)
+INTESTAZIONE_VWAP = ("il VWAP dai conti (decisione del CEO del 18/10/2026) = il prezzo medio pagato da chi ha comprato "
+                     "dopo l'ultima trimestrale: prezzo tipico (massimo+minimo+chiusura)/3 delle barre GIORNALIERE "
+                     "pesato sui volumi, dalla prima seduta dopo il comunicato all'ultima conclusa — un'approssimazione "
+                     "di quello dei grafici, che usa barre di pochi minuti · data del comunicato da Nasdaq, ora dal "
+                     "deposito su SEC EDGAR (prima delle 09:30 di New York muove la seduta stessa, dalle 16:00 la "
+                     "successiva); senza l'ora, la seduta piu' scambiata fra il giorno dei conti e il successivo, "
+                     "dichiarato · sopra il VWAP chi ha comprato dopo i conti e' in media in guadagno, sotto in perdita "
+                     "(lettura convenzionale): un livello, non una prova della tenuta")
+
+
+def ancora_conti(trim, depositi, barre, adesso=None):
+    """La seduta d'ancora del VWAP. trim: brief.ultime_trimestrali()[tk]. depositi: le ore della pipeline per il nome
+    (macro.sec_calendario.ore_depositi.per_titolo[tk]); None = la pipeline non le pubblica ancora, che e' diverso da
+    "nessun deposito" (v406). barre: giornaliere, in ordine di data."""
+    if not trim or trim.get("stato") != "ok" or not trim.get("data"):
+        return {"errore": f"data dell'ultima trimestrale NON letta (Nasdaq: {(trim or {}).get('stato') or 'non richiesta'}) "
+                          "— non vuol dire 'nessuna trimestrale'"}
+    b = [x for x in (barre or []) if x.get("t")]
+    if seduta_in_corso(b, adesso):
+        b = b[:-1]                     # la seduta in corso non decide niente: il suo volume e' a meta' (v471)
+    sedute = [str(x["t"])[:10] for x in b]
+    D = str(trim["data"])[:10]
+    i0 = next((i for i, s in enumerate(sedute) if s >= D), None)
+    g = datetime.fromisoformat(D).date()
+    inizio = datetime.combine(g - timedelta(days=1), dtime(16, 0), tzinfo=brief.NEW_YORK)
+    fine = datetime.combine(g + timedelta(days=1), dtime(23, 59), tzinfo=brief.NEW_YORK)
+    cand = []
+    for x in depositi or []:
+        try:
+            t = datetime.fromisoformat(str(x.get("accettato") or "")[:19]).replace(tzinfo=brief.NEW_YORK)
+        except ValueError:
+            continue
+        if inizio <= t <= fine:
+            cand.append((0 if str(x.get("forma", "")).startswith("8-K") else 1, t, x))
+    if cand:
+        _, t, x = min(cand, key=lambda c: (c[0], c[1]))
+        giorno, hm = t.date().isoformat(), (t.hour, t.minute)
+        if hm >= VWAP_CHIUSURA:
+            seduta, quando = next((s for s in sedute if s > giorno), None), "dopo la chiusura"
+        else:
+            seduta = next((s for s in sedute if s >= giorno), None)
+            quando = ("prima dell'apertura" if hm < VWAP_APERTURA or seduta != giorno else
+                      "a seduta aperta: la barra di quella seduta mescola il prima e il dopo")
+        if seduta is None:
+            return {"errore": f"la prima seduta dopo i conti del {D} non e' ancora conclusa", "comunicato": D}
+        return {"seduta": seduta, "comunicato": D, "ora": f"{t:%H:%M}", "giorno_deposito": giorno,
+                "quando": quando, "forma": x.get("forma"), "da_volumi": False}
+    if i0 is None:
+        return {"errore": f"la prima seduta dopo i conti del {D} non e' ancora conclusa", "comunicato": D}
+    perche = ("la pipeline non pubblica ancora l'ora dei depositi SEC" if depositi is None else
+              "nessun deposito SEC con l'ora fra il giorno prima e il giorno dopo il comunicato")
+    if sedute[i0] > D or i0 + 1 >= len(sedute):
+        return {"seduta": sedute[i0], "comunicato": D, "ora": None, "da_volumi": True, "perche": perche,
+                "quando": "prima seduta dalla data del comunicato"}
+    v0, v1 = b[i0].get("v") or 0, b[i0 + 1].get("v") or 0
+    seduta = sedute[i0 + 1] if v1 > v0 else sedute[i0]
+    return {"seduta": seduta, "comunicato": D, "ora": None, "da_volumi": True, "perche": perche,
+            "quando": "la seduta piu' scambiata fra il giorno del comunicato e il successivo"}
+
+
+def vwap_conti(barre, trim, depositi, px, atr, adesso=None, veicolo=None):
+    """{ancora..., vwap, sedute, fino_a, dist_pct, dist_atr, trimestrale} oppure {errore, ...}: il VWAP dall'ultima
+    trimestrale (convenzioni in testa al blocco). Sulla serie della societa' di oggi, come pavimenti e struttura."""
+    serie, taglio, motivo = serie_della_societa(barre or [], veicolo)
+    # l'ancora si cerca sulla serie INTERA: su quella gia' tagliata, un'operazione societaria caduta DOPO i conti
+    #   spostava l'ancora in silenzio al giorno del taglio, e il controllo qui sotto non poteva scattare mai (trovato
+    #   scrivendo il gate v500: un ramo che non puo' essere raggiunto non e' una protezione, v234)
+    a = ancora_conti(trim, depositi, barre or [], adesso)
+    if a.get("errore"):
+        return {**a, "trimestrale": trim}
+    b = list(serie)
+    if seduta_in_corso(b, adesso):
+        b = b[:-1]
+    if taglio and str(taglio)[:10] > a["seduta"]:
+        return {**a, "trimestrale": trim,
+                "errore": f"un'operazione societaria del {str(taglio)[:10]} cade dopo i conti: il VWAP mescolerebbe due societa'"}
+    sel = [x for x in b if str(x.get("t"))[:10] >= a["seduta"]]
+    if not sel:
+        return {**a, "trimestrale": trim, "errore": "la prima seduta dopo i conti non e' ancora conclusa"}
+    buchi = [str(x.get("t"))[:10] for x in sel if any(x.get(k) is None for k in ("h", "l", "c", "v"))]
+    if buchi:
+        return {**a, "trimestrale": trim,
+                "errore": f"{len(buchi)} barre senza massimo, minimo, chiusura o volume dal {buchi[0]}: un buco non e' uno zero (v205)"}
+    vol = sum(x["v"] for x in sel)
+    if vol <= 0:
+        return {**a, "trimestrale": trim, "errore": "volumi nulli dalla seduta d'ancora"}
+    vw = sum((x["h"] + x["l"] + x["c"]) / 3 * x["v"] for x in sel) / vol
+    return {**a, "trimestrale": trim, "vwap": vw, "sedute": len(sel), "fino_a": str(sel[-1]["t"])[:10],
+            "dist_pct": (px / vw - 1) * 100 if px else None,
+            "dist_atr": (px - vw) / atr if (px and atr) else None}
+
+
+def riga_vwap(v):
+    """Il VWAP dai conti in UNA riga, la stessa per sorvegliati, posizioni e ordini (v161)."""
+    if not v:
+        return "VWAP dai conti: non calcolato"
+    tr = v.get("trimestrale") or {}
+    conti = f"conti del {_data_it(v.get('comunicato') or tr.get('data'))}"
+    if tr.get("trimestre"):
+        conti += f" ({tr['trimestre']}"
+        if tr.get("eps") is not None and tr.get("consenso") is not None:
+            # un utile per azione non ha un verso: niente "+" davanti, il "-" resta su una perdita (v430)
+            conti += (f": EPS {piano(tr['eps'], 2)} contro {piano(tr['consenso'], 2)} attesi"
+                      + (f", {n(tr['sorpresa_pct'], 1, '%')}" if tr.get("sorpresa_pct") is not None else ""))
+        conti += ")"
+    if v.get("errore"):
+        return f"VWAP dai conti: non calcolabile — {v['errore']}" + (f" · {conti}" if v.get("comunicato") or tr.get("data") else "")
+    if v.get("da_volumi"):
+        ancora = f"dalla seduta del {_data_it(v['seduta'])} — {v['quando']}, perche' {v['perche']}"
+    else:
+        ancora = (f"comunicato alle {v['ora']} di New York del {_data_it(v['giorno_deposito'])} ({v.get('forma')} su "
+                  f"SEC EDGAR), {v['quando']} → dalla seduta del {_data_it(v['seduta'])}")
+    s = f"VWAP dai conti {prezzo(v['vwap'])} — {conti} · {ancora}, {v['sedute']} {'seduta' if v['sedute'] == 1 else 'sedute'}"
+    if v.get("dist_pct") is not None:
+        s += (f" · il prezzo ne dista {n(v['dist_pct'], 1, '%')}"
+              + (f" ({n(v['dist_atr'], 1)} ATR)" if v.get("dist_atr") is not None else "")
+              + (": chi ha comprato dopo i conti e' in media in guadagno" if v["dist_pct"] > 0 else
+                 ": chi ha comprato dopo i conti e' in media in perdita" if v["dist_pct"] < 0 else ""))
+    return s
+
+
+def _data_it(iso):
+    s = str(iso or "")[:10]
+    return f"{s[8:10]}/{s[5:7]}/{s[:4]}" if len(s) == 10 else (s or "n.d.")
+
+
+def ore_depositi_pipeline(d):
+    """{tk: [depositi con l'ora]} dalla pipeline, o None se la pipeline non le pubblica ancora (v406)."""
+    od = (((d or {}).get("macro") or {}).get("sec_calendario") or {}).get("ore_depositi")
+    return None if od is None else (od.get("per_titolo") or {})
+
+
+def ultime_sicure(tks):
+    """brief.ultime_trimestrali con un'eccezione che non si porta via la watchlist (v389)."""
+    try:
+        return brief.ultime_trimestrali(tks)
+    except Exception as e:
+        return {t: {"stato": f"NON letto ({str(e)[:40]})"} for t in tks}
 
 
 def righe_pavimenti(pv):
@@ -1394,6 +1574,12 @@ def notizie_recenti(tks, ore=NOTIZIE_ORE, adesso=None, leggi=None):
 NOTIZIE_MOSTRA = 6
 NOTIZIE_MOSTRA_SENZA = 3     # v499 — i nomi SENZA un segnale: le voci piu' recenti, perche' un evento non aspetta un segnale
 FEED_FERMO_GIORNI = 14       # v499 — un feed la cui ultima voce e' piu' vecchia di cosi' e' FERMO (convenzione, v240)
+# v500 — la voce nel feed di ALMENO tanti nomi del blocco e' cronaca di mercato (convenzione, v240). Con due il
+#   conteggio non discrimina: il 18/10 «CoreWeave Is Projected to Have a 6.3x Gross Leverage Ratio» (feed di CRWV e
+#   NVDA) e «1 Red Flag That AMD Investors Should Be Aware Of» (AMD e NVDA) finivano in fondo sotto "e' il mercato,
+#   non il nome" — notizie su un nome che compaiono anche nel feed di un secondo. La v451 aveva misurato 12 feed
+#   contro 1, non 2 contro 1.
+SOGLIA_CRONACA = 3
 
 
 def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
@@ -1415,13 +1601,16 @@ def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
         if tk not in altrove and nw.get("stato") == "ok":
             for v in nw.get("voci") or []:
                 chi.setdefault(chiave(v), {"voce": v, "tk": set()})["tk"].add(tk)
-    comuni = {k: x for k, x in chi.items() if len(x["tk"]) >= 2}
+    comuni = {k: x for k, x in chi.items() if len(x["tk"]) >= SOGLIA_CRONACA}
+    # nel feed di due nomi: resta con ciascuno, e dice dove altro compare — e' il titolo a dire di chi parla (v415)
+    anche = {k: sorted(x["tk"]) for k, x in chi.items() if 2 <= len(x["tk"]) < SOGLIA_CRONACA}
 
     def non_mostrate(k):
         return f"… e {'un' + chr(39) + 'altra voce' if k == 1 else f'altre {k} voci'} nelle stesse ore, non mostrate"
     L = [f"{titolo} — feed Nasdaq del simbolo, ultime {ore} ore, ora italiana · [TK] = trovata nel feed di TK, non "
-         "'notizia su TK' (v415) · la voce che sta nel feed di piu' nomi del blocco e' cronaca di mercato: una volta, in "
-         "fondo · il feed e' UNA fonte: la ricerca web nelle stesse ore resta obbligatoria, con fonte e data "
+         f"'notizia su TK' (v415) · la voce che sta nel feed di almeno {SOGLIA_CRONACA} nomi del blocco e' cronaca di "
+         "mercato: una volta, in fondo; quella nel feed di due resta con ciascuno, e dice dove altro compare (v500) "
+         "· il feed e' UNA fonte: la ricerca web nelle stesse ore resta obbligatoria, con fonte e data "
          f"(FORMATO_ANALISI.md) · chi ha un segnale porta il perche' e fino a {NOTIZIE_MOSTRA} voci proprie, chi non ne ha "
          f"le {NOTIZIE_MOSTRA_SENZA} piu' recenti (v499)"]
     for tk, motivi in segnali.items():
@@ -1447,7 +1636,9 @@ def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
         elif not proprie:
             L.append(f"      nessuna voce propria: le {k_com} del feed sono cronaca di mercato, in fondo al blocco")
         for v in proprie[:tetto]:
-            L.append(f"      [{tk}] {quando(v)} {v['titolo'][:110]}")
+            altri = [x for x in anche.get(chiave(v), []) if x != tk]
+            L.append(f"      [{tk}] {quando(v)} {v['titolo'][:110]}"
+                     + (f" (anche nel feed di {', '.join(altri)})" if altri else ""))
         if len(proprie) > tetto:
             L.append("      " + non_mostrate(len(proprie) - tetto))
         if proprie and k_com:
@@ -1456,8 +1647,9 @@ def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
             L.append(f"      ⚠ il feed ha restituito {nw.get('lette')} voci e cadono tutte nelle ultime {ore} ore: arriva "
                      f"solo fino al {nw['copre_da'].astimezone(brief.ROMA):%d/%m %H:%M}, e prima la finestra puo' averne altre")
     if comuni:
-        L.append(f"  CRONACA DI MERCATO — {len(comuni)} {'voce' if len(comuni) == 1 else 'voci'} nel feed di piu' nomi "
-                 "di questo blocco: e' il mercato, non il nome")
+        L.append(f"  CRONACA DI MERCATO — {len(comuni)} {'voce' if len(comuni) == 1 else 'voci'} nel feed di almeno "
+                 f"{SOGLIA_CRONACA} nomi di questo blocco: per lo piu' il mercato, non il nome — il titolo dice se parla "
+                 "di uno di loro")
         ordinate = sorted(comuni.values(), key=lambda x: x["voce"]["quando"], reverse=True)
         for x in ordinate[:NOTIZIE_MOSTRA]:
             L.append(f"      {quando(x['voce'])} {x['voce']['titolo'][:110]} (nel feed di {', '.join(sorted(x['tk']))})")
@@ -1533,7 +1725,8 @@ def righe_watchlist(o):
          f"{SETTIMANE_PENDENZA} settimane, massimo e minimo delle sedute concluse · la serie e' quella della societa' di "
          "oggi: dall'ultima operazione societaria e dalla fine del veicolo di quotazione (SPAC) dichiarata sul registro SEC",
          "   " + (o.get("valutazione_rif") or "valutazione: riferimento n.d."),
-         "   " + INTESTAZIONE_STRUTTURA]
+         "   " + INTESTAZIONE_STRUTTURA,
+         "   " + INTESTAZIONE_VWAP]          # v500 — una volta per blocco (v407)
     if o.get("spy_assente"):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")
     sem = o.get("semaforo") or {}
@@ -1765,8 +1958,12 @@ def righe_candidati(o, news, giorni=7):
     suoi numeri, e solo i titoli CANDIDATI con tutta la tecnica e le notizie."""
     if o["universo_assente"]:
         return righe(o)[:1]
-    L = ["CANDIDATI PER SETTORE — prezzi di oggi (stockanalysis.com) · stati = convenzioni in testa "
-         "allo script · volumi sull'ultima seduta CONCLUSA (quella in corso esclusa) · notizie: feed Nasdaq del simbolo, ultimi "
+    # v500 — gli stati si definiscono NELL'USCITA: il 18/10 SMH era "IN TENDENZA" con 1m -3,7% e 3m -3,4%, e la
+    #   definizione stava solo in testa allo script, che chi legge non vede (v406)
+    L = ["CANDIDATI PER SETTORE — prezzi di oggi (stockanalysis.com) · stati = convenzioni: settore IN TENDENZA = prezzo "
+         "sopra la media a 200 e media a 50 in salita su 20 sedute (anche coi rendimenti a 1 e 3 mesi negativi: la media a "
+         "50 porta con se' il rialzo dei mesi prima), IN RIBASSO = sotto la 200 e media a 50 in discesa, MISTO = il resto "
+         "· volumi sull'ultima seduta CONCLUSA (quella in corso esclusa) · notizie: feed Nasdaq del simbolo, ultimi "
          f"{giorni} giorni ([TK] = trovata nel feed di TK, non 'notizia su TK') · lettura a {ANNI_LETTURA} anni, P/E e "
          "struttura delle oscillazioni: convenzioni e riferimento dell'S&P 500 in testa al blocco WATCHLIST"]
     for s in sorted(o["settori"], key=lambda s: -(s.get("m3") if s.get("m3") is not None else -1e9)):

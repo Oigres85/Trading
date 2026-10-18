@@ -218,12 +218,18 @@ def aggiorna_pc(oggi, memoria, leggi=scarica, paralleli=PARALLELI):
     return {"nuove": nuove, "assenti": assenti, "non_lette": non_lette, "non_ancora_pubblicate": attese}
 
 
+def medie_semplici(valori, m=MEDIA_PC):
+    """La media di m sedute, per ogni seduta da m in poi. Una funzione sola: la usano il put/call pubblicato e la
+    misura del suo valore predittivo (misura_segnali_mercato.py, v500) — due medie scritte due volte divergono."""
+    return [sum(valori[i - m + 1:i + 1]) / m for i in range(m - 1, len(valori))]
+
+
 def stato_pc(memoria, n=SEDUTE_PC, m=MEDIA_PC):
     righe = [memoria[d] for d in sorted(memoria) if memoria[d].get("azioni") is not None][-n:]
     if not righe:
         return None
     az = [r["azioni"] for r in righe]
-    medie = [sum(az[i - m + 1:i + 1]) / m for i in range(m - 1, len(az))]
+    medie = medie_semplici(az, m)
     ult = righe[-1]
     tot = [r["totale"] for r in righe if r.get("totale") is not None]
     return {"ultima": ult, "n": len(righe), "dal": righe[0]["data"],
@@ -561,8 +567,11 @@ def scrivi_memoria_titoli(righe, p=CACHE_TIT):
                                for r in sorted(righe, key=lambda r: (r["data"], r["tk"]))), encoding="utf-8")
 
 
-def registra_titoli(rie, memoria, fase, adesso):
+def registra_titoli(rie, memoria, fase, adesso, gex=None):
     """Una riga per titolo e per seduta CONCLUSA: put/call dei volumi e dell'open interest, volatilita' implicita.
+    v500 — e la NOSTRA gamma dei dealer (netta, cambio di regime, il prezzo su cui e' calcolata): nessuna fonte
+    gratuita ne pubblica la storia, e senza raccoglierla «la si misura quando lo storico lo permette» (decisione
+    del CEO del 18/10/2026) sarebbe una promessa senza un modo di mantenerla.
     Solo a borsa chiusa (weekend) o dalle 16:30 di New York (i dati sono differiti di 15 minuti): in seduta i
     volumi sono parziali, e prima dell'apertura l'istantanea puo' gia' portare la data di oggi sui volumi di ieri.
     La seduta e' quella che l'istantanea dichiara (ultimo scambio del sottostante)."""
@@ -576,8 +585,13 @@ def registra_titoli(rie, memoria, fase, adesso):
             continue
         if (r["seduta"], tk) in presenti:
             continue
-        memoria.append({"data": r["seduta"], "tk": tk, "pc_vol": round(r["pc_vol"], 4),
-                        "pc_oi": round(r["pc_oi"], 4), "iv30": r.get("iv30")})
+        riga = {"data": r["seduta"], "tk": tk, "pc_vol": round(r["pc_vol"], 4),
+                "pc_oi": round(r["pc_oi"], 4), "iv30": r.get("iv30")}
+        g = (gex or {}).get(tk)
+        if g and g.get("netta") is not None and g.get("spot"):
+            riga.update({"gex_netta": round(g["netta"]), "gex_spot": round(g["spot"], 4),
+                         "gex_flip": None if g.get("flip") is None else round(g["flip"], 4)})
+        memoria.append(riga)
         nuove += 1
     return nuove
 
@@ -851,6 +865,14 @@ def aggiorna_dp(oggi, memoria, universo, leggi=scarica, paralleli=PARALLELI):
     return {"nuove": nuove, "assenti": assenti, "non_lette": non_lette, "non_ancora_pubblicate": attese}
 
 
+def medie_dp(righe, m=MEDIA_DP):
+    """[(data, media di m sedute PONDERATA sui volumi, in %)] da righe [(data, [scoperto, totale])]: somma dello
+    scoperto su somma del totale, cosi' un giorno sottile non pesa come uno pieno. Una funzione sola per il dato
+    pubblicato e per la misura del suo valore predittivo (v500)."""
+    return [(righe[i][0], sum(c for _, (c, _t) in righe[i - m + 1:i + 1])
+             / sum(t for _, (_c, t) in righe[i - m + 1:i + 1]) * 100) for i in range(m - 1, len(righe))]
+
+
 def stato_dp(memoria, tk, n=SEDUTE_DP, m=MEDIA_DP, minimo=MIN_STORIA):
     """Il rapporto delle vendite allo scoperto fuori borsa di UN nome: l'ultima seduta, la media di m sedute PONDERATA
     sui volumi (somma dello scoperto su somma del totale: un giorno sottile non pesa come uno pieno) e i percentili
@@ -859,8 +881,7 @@ def stato_dp(memoria, tk, n=SEDUTE_DP, m=MEDIA_DP, minimo=MIN_STORIA):
     if not righe:
         return None
     dpi = [c / t * 100 for _, (c, t) in righe]
-    medie = [sum(c for _, (c, _t) in righe[i - m + 1:i + 1]) / sum(t for _, (_c, t) in righe[i - m + 1:i + 1]) * 100
-             for i in range(m - 1, len(righe))]
+    medie = [v for _, v in medie_dp(righe, m)]
     out = {"tk": tk, "data": righe[-1][0], "dpi": dpi[-1], "n": len(righe), "dal": righe[0][0],
            "media": medie[-1] if medie else None, "n_medie": len(medie)}
     if len(dpi) >= minimo:
@@ -1097,7 +1118,7 @@ def main():
         rie[tk] = riepilogo(j, tk, oggi, conti.get(tk), in_seduta)
         # v499 — la gamma dei dealer sullo stesso prezzo del riepilogo (in seduta l'ultimo, fuori la chiusura)
         gex[tk] = gamma_dealer(contratti(j, tk), (rie[tk] or {}).get("spot"), adesso) if rie[tk] else None
-    nuove_tit = registra_titoli(rie, memoria_tit, analisi.fase(adesso), adesso)
+    nuove_tit = registra_titoli(rie, memoria_tit, analisi.fase(adesso), adesso, gex)     # v500 — anche la gamma
     if not a.no_memoria and nuove_tit:
         scrivi_memoria_titoli(memoria_tit)
     storia = {tk: storia_titolo(memoria_tit, tk) for tk in qta}

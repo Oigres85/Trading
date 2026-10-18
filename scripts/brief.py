@@ -443,7 +443,57 @@ def calendario_trimestrali(tickers, giorni=21):
                                    "giorni": (datetime.fromisoformat(giorno).date() - oggi).days})
     attesi.sort(key=lambda x: x["data"])
     attesi = con_conti_dichiarati(attesi, cercati, oggi, giorni, leggi_conti_dichiarati())
+    for x in attesi:                     # v500 — resi una volta per il testo e per la pagina (v455)
+        x["orario"] = orario_trimestrale(x.get("quando"))
+        x["consenso"] = consenso_testo(x.get("eps_atteso"))
     return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni}
+
+
+# ---------------------------------------------------------------- v500: l'ultima trimestrale riportata
+MESI_NASDAQ = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9,
+               "Oct": 10, "Nov": 11, "Dec": 12}
+
+
+def leggi_ultima_trimestrale(d):
+    """La risposta di Nasdaq (earnings-surprise) -> l'ultima trimestrale RIPORTATA: {stato, data, trimestre,
+    eps, consenso, sorpresa_pct}. Nessuna rete qui: la riceve gia' letta (cosi' un gate la prova sul testo)."""
+    righe = ((((d or {}).get("data") or {}).get("earningsSurpriseTable") or {}).get("rows")) or []
+    voci = []
+    for r in righe:
+        try:
+            m, g, a = str(r.get("dateReported") or "").split("/")
+            data = f"{int(a):04d}-{int(m):02d}-{int(g):02d}"
+        except ValueError:
+            continue
+        num = lambda x: None if x in (None, "", "N/A", "--") else float(str(x).replace(",", ""))
+        try:
+            eps, cons, sorp = num(r.get("eps")), num(r.get("consensusForecast")), num(r.get("percentageSurprise"))
+        except ValueError:
+            eps = cons = sorp = None
+        tq = str(r.get("fiscalQtrEnd") or "").split()
+        trim = (f"{MESI_IT[MESI_NASDAQ[tq[0]] - 1]} {tq[1]}" if len(tq) == 2 and tq[0] in MESI_NASDAQ else
+                (r.get("fiscalQtrEnd") or None))
+        voci.append({"data": data, "trimestre": trim, "eps": eps, "consenso": cons, "sorpresa_pct": sorp})
+    if not voci:
+        return {"stato": "senza righe"}
+    voci.sort(key=lambda x: x["data"], reverse=True)
+    return {"stato": "ok", **voci[0]}
+
+
+def ultime_trimestrali(tickers):
+    """v500 — L'ULTIMA TRIMESTRALE GIA' RIPORTATA, dichiarata dalla fonte: Nasdaq pubblica per ogni titolo le ultime
+    quattro, col trimestre fiscale, la data del comunicato, l'EPS riportato e il consenso. E' il FATTO da cui parte il
+    VWAP ancorato ai conti (decisione del CEO del 18/10/2026). L'8-K con item 2.02 non basta: una societa' ne deposita
+    anche fuori dal ciclo — il 02/10 Tesla ci ha depositato le consegne del trimestre — e gli emittenti esteri non lo
+    hanno. Tre esiti per nome (v389): {"stato": "ok", ...} · {"stato": "senza righe"} · {"stato": "NON letto (...)"}."""
+    def uno(tk):
+        try:
+            return tk, leggi_ultima_trimestrale(jget(f"https://api.nasdaq.com/api/company/{tk}/earnings-surprise", 15))
+        except Exception as ex:
+            return tk, {"stato": f"NON letto ({str(ex)[:40]})"}
+    nomi = list(dict.fromkeys(t.upper() for t in tickers if t))
+    with ThreadPoolExecutor(max_workers=PARALLELI) as ex:
+        return dict(ex.map(uno, nomi))
 
 
 # ---------------------------------------------------------------- aste del Tesoro USA
@@ -613,33 +663,38 @@ def macro_dalla_pipeline():
         except Exception:
             pass
 
-    def riga(nome, valore, data, prec=None, nota=None):
-        return {"nome": nome, "valore": valore, "data": data, "prec": prec, "nota": nota}
+    def riga(nome, valore, data, prec=None, nota=None, periodo=None, unita=""):
+        # v500 — la resa si fa QUI, una volta, per il testo e per la pagina (v455): virgola decimale come il
+        #   resto dell'uscita (v442) e, su una serie mensile, il MESE descritto invece di un giorno (v392)
+        return {"nome": nome, "valore": valore, "data": data, "prec": prec, "nota": nota,
+                "valore_testo": valore_serie(valore, unita), "quando_testo": quando_serie(data, periodo)}
 
     out = []
     # tassi: la scadenza a 10 anni, con la data che la pipeline dichiara sulla scadenza stessa
     a10 = next((s for s in ((m.get("tassi") or {}).get("scadenze") or [])
                 if s.get("key") == "a10"), None)
     if a10:
-        out.append(riga("Treasury 10A", a10.get("value"), a10.get("observation_date")))
-    for key, nome in (("curve", "Curva 10A-2A"), ("cpi", "Inflazione CPI (a/a)"),
-                      ("unemp", "Disoccupazione"), ("nfp", "Non-Farm Payrolls"),
-                      ("real10", "Tasso reale 10A (TIPS)")):
+        out.append(riga("Treasury 10A", a10.get("value"), a10.get("observation_date"), unita="%"))
+    # v500 — CPI, disoccupazione e posti di lavoro descrivono un MESE: "al 2026-09-01" si legge come una
+    #   data di 47 giorni prima, ed e' la lettura che ha fatto scrivere a un LLM reale due correzioni false (v392)
+    for key, nome, periodo in (("curve", "Curva 10A-2A", None), ("cpi", "Inflazione CPI (a/a)", "mese"),
+                               ("unemp", "Disoccupazione", "mese"), ("nfp", "Non-Farm Payrolls", "mese"),
+                               ("real10", "Tasso reale 10A (TIPS)", None)):
         x = _ind(m, key)
         if x:
             # ⚠ il campo e' "date": provato sul file vero, non indovinato dal nome della
             #   chiave usata da `tassi.scadenze`, che invece scrive "observation_date".
-            out.append(riga(nome, x.get("value"), x.get("date")))
+            out.append(riga(nome, x.get("value"), x.get("date"), periodo=periodo))
     cr = m.get("credit") or {}
     if cr.get("spread_hy") is not None:
-        out.append(riga("HY OAS (credito)", cr["spread_hy"], cr.get("date")))
+        out.append(riga("HY OAS (credito)", cr["spread_hy"], cr.get("date"), unita="%"))
     cc = m.get("credit_ccc") or {}
     if cc.get("valore") is not None:
         # v465 — la salita dal minimo di 60 sedute e' il segnale del semaforo (LIBRO.md §1ter)
-        nota = (f"+{cc['salita_60_pp']:.2f} pp dal minimo di 60 sedute ({cc['min_60']})"
+        nota = (f"{sgn(cc['salita_60_pp'], 2, ' pp')} dal minimo di 60 sedute ({n2(cc.get('min_60'), 2)}%)"
                 if cc.get("salita_60_pp") is not None else "storico insufficiente per la salita")
         out.append(riga("Spread CCC (fascia peggiore)", cc["valore"], cc.get("data"),
-                        prec=cc.get("mese_fa"), nota=nota))
+                        prec=cc.get("mese_fa"), nota=nota, unita="%"))
     cb = m.get("credito_banche") or {}
     nf = cb.get("nfci") or {}
     if nf.get("valore") is not None:
@@ -650,7 +705,7 @@ def macro_dalla_pipeline():
         # ⚠ IL SEGNO DI SLOOS NON E' INTUITIVO (v390): negativo = banche che ALLENTANO.
         out.append(riga("SLOOS (banche)", sl["valore"], sl.get("data"),
                         prec=sl.get("precedente"),
-                        nota="negativo = le banche allentano"))
+                        nota="negativo = le banche allentano", periodo="indagine"))
     fm = m.get("fed_market") or {}
     ef = (m.get("fedwatch") or {}).get("effr") or {}
     if ef.get("valore") is not None:
@@ -659,7 +714,7 @@ def macro_dalla_pipeline():
         #   media MENSILE: il 13/10 scriveva "Fed Funds effettivo 3,75" con l'EFFR a 3,88 — la
         #   media di settembre mescola i quindici giorni prima del rialzo del 16/09 e i quindici dopo.
         out.append(riga("Fed Funds effettivo (EFFR del giorno)", ef["valore"], ef.get("data"),
-                        nota=f"fonte {ef.get('fonte') or 'n.d.'}"))
+                        nota=f"fonte {ef.get('fonte') or 'n.d.'}", unita="%"))
     elif fm.get("current_rate") is not None:
         # ⚠ Senza l'EFFR del giorno resta la media mensile, e si NOMINA per quello che e', col
         #   suo mese (v392: un dato mensile descrive un mese, non un giorno) — mai "effettivo".
@@ -670,7 +725,7 @@ def macro_dalla_pipeline():
                  if len(_rd) >= 7 and _rd[5:7].isdigit() and 1 <= int(_rd[5:7]) <= 12 else "mese non dichiarato")
         out.append(riga("Fed Funds, media MENSILE (FEDFUNDS)", fm["current_rate"], None,
                         nota=f"media di {_mese}, non il tasso di oggi: un mese con una riunione "
-                             "mescola il tasso di prima e quello di dopo"))
+                             "mescola il tasso di prima e quello di dopo", unita="%"))
     eur = next((x for x in (m.get("markets") or []) if x.get("key") == "EURUSD=X"), None)
     if eur:
         out.append(riga("EUR/USD", eur.get("value"), None,
@@ -685,6 +740,59 @@ def n2(x, d=2):
 
 def sgn(x, d=2, suff="%"):
     return "n.d." if x is None else f"{'+' if x >= 0 else ''}{n2(x, d)}{suff}"
+
+
+MESI_IT = ("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",
+           "settembre", "ottobre", "novembre", "dicembre")
+
+
+def valore_serie(v, unita=""):
+    """v500 — una serie della pipeline nella convenzione del resto dell'uscita (v442, v443), con le cifre
+    che la fonte pubblica: 5.1 resta a una cifra, 1.1242 a quattro. I valori che la pipeline scrive gia'
+    come testo ("3.7%", "+0.35 pp") cambiano solo il separatore decimale, mai il numero."""
+    if v is None or isinstance(v, bool):
+        return "n.d."
+    if isinstance(v, (int, float)):
+        s = repr(float(v))
+        dec = 0 if ("e" in s or "." not in s) else len(s.split(".")[1].rstrip("0"))
+        return n2(float(v), max(1, dec)) + unita
+    return re.sub(r"(?<=[0-9])[.](?=[0-9])", ",", str(v)) + ("" if str(v).endswith(unita) else unita)
+
+
+def quando_serie(data, periodo=None):
+    """v500 — una serie mensile descrive un MESE, un'indagine trimestrale il mese in cui si e' svolta:
+    scriverli come un giorno invita a leggerli vecchi di settimane (v392). Le serie giornaliere e
+    settimanali portano il giorno della rilevazione."""
+    if not data:
+        return "rilevazione non dichiarata"
+    d = str(data)[:10]
+    if periodo in ("mese", "indagine") and len(d) >= 7 and d[5:7].isdigit() and 1 <= int(d[5:7]) <= 12:
+        mese = f"{MESI_IT[int(d[5:7]) - 1]} {d[:4]}"
+        return f"riferito a {mese}" if periodo == "mese" else f"indagine di {mese}"
+    return f"al {d}"
+
+
+ORARI_TRIMESTRALE = {"time-pre-market": "prima della campana", "time-after-hours": "dopo la campana",
+                     "time-not-supplied": "orario non dichiarato"}
+
+
+def orario_trimestrale(codice):
+    """v500 — una traduzione sola per il testo e per la pagina (v455). Il 18/10 "time-not-supplied" usciva
+    grezzo accanto a "orario non dichiarato": due rese dello stesso stato. Un codice nuovo della fonte si
+    mostra com'e', dichiarato, invece di sparire."""
+    if not codice:
+        return "orario non dichiarato"
+    return ORARI_TRIMESTRALE.get(codice) or f"orario «{codice}» (codice della fonte)"
+
+
+def consenso_testo(eps):
+    """"$0.82" della fonte → "0,82 $"; un valore che non si legge resta com'e'."""
+    if eps in (None, ""):
+        return None
+    try:
+        return n2(float(str(eps).replace("$", "").replace(",", "").strip()), 2) + " $"
+    except ValueError:
+        return str(eps)
 
 
 def _prec(p):
@@ -785,9 +893,9 @@ def componi(modo, dati):
         A("  nessuna. ⚠ Non e' 'nessuna trimestrale mai': e' che nella finestra la fonte non")
         A("  ne dichiara. Oltre la finestra il sistema non guarda.")
     for x in cal["attesi"]:
-        q = {"time-pre-market": "prima della campana", "time-after-hours": "dopo la campana"}.get(
-            x["quando"], x["quando"] or "orario non dichiarato")
-        eps = f" · consenso {x['eps_atteso']}" if x.get("eps_atteso") else ""
+        q = x.get("orario") or orario_trimestrale(x.get("quando"))
+        _cons = x.get("consenso") or consenso_testo(x.get("eps_atteso"))
+        eps = f" · consenso {_cons}" if _cons else ""
         fonte = "" if x.get("fonte", "calendario Nasdaq") == "calendario Nasdaq" else f" · {x['fonte']}"
         A(f"  {x['tk']:6} {x['data']} (fra {x['giorni']}g) · {q}{eps}{fonte}")
     if cal["giorni_non_letti"]:
@@ -868,12 +976,12 @@ def componi(modo, dati):
         else:
             A(f"  dalla pipeline, run di {n2(eta,1)} ore fa — ogni riga porta la PROPRIA rilevazione")
         for s in mf["serie"]:
-            quando = f"al {s['data']}" if s.get("data") else "rilevazione non dichiarata"
+            quando = s.get("quando_testo") or quando_serie(s.get("data"))
             prec = ""
             if s.get("prec") is not None and isinstance(s.get("valore"), (int, float)):
-                prec = f"   (prima {n2(s['prec'],2)})"
+                prec = f"   (prima {valore_serie(s['prec'])})"
             nota = f"   — {s['nota']}" if s.get("nota") else ""
-            A(f"  {s['nome']:24} {str(s['valore']):>10}   {quando}{prec}{nota}")
+            A(f"  {s['nome']:24} {(s.get('valore_testo') or valore_serie(s.get('valore'))):>10}   {quando}{prec}{nota}")
 
     A("")
     A("-" * 66)

@@ -35,7 +35,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    fiscale e, per chi è in perdita, l'aritmetica della media.
    Da v489 (conversazione del CEO del 15/10, *"rendi questa conversazione di oggi parte strutturale
    dell'analisi globale"*) porta anche gli **ORDINI APERTI** (`LIBRO.md` §1septies) e, per ogni
-   posizione, i **pavimenti** con la **media sui pavimenti** sotto il carico.
+   posizione, i **pavimenti** con la **media sui pavimenti** sotto il carico. Da v500 (CEO, 18/10)
+   accanto ai pavimenti di ogni posizione e di ogni ordine il **VWAP dall'ultima trimestrale**.
 2. `python3 scripts/brief.py` — notizie, mossi in ATR, livelli, macro, e (v470) le aste di
    note e bond del Tesoro USA dei prossimi 7 giorni con l'ora italiana e gli esiti recenti.
 3. `python3 scripts/schede_progetto.py` (v462, su richiesta del CEO del 06/10) — per ogni nome
@@ -198,6 +199,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Da v499 la **gamma dei dealer** (regime, cambio di regime, call wall e put wall delle posizioni e di SPY, QQQ e
    IWM: livelli dove il prezzo si è fermato più spesso, non dove si fermerà) e il **dark pool** (DPI di ogni nome
    col percentile dell'anno e la media a 10 sedute, DIX e GEX dell'S&P 500): stessa natura, informazione.
+   Da v500 (CEO, 18/10: *"1 ok tua proposta"*) è anche **misurato** (`LIBRO.md` §1ter): nessuno di questi segnali,
+   né la curva della volatilità degli indici, anticipa i cali più del caso. La risposta li legge come termometri
+   dello stress in corso, non come avvisi di un calo che deve ancora venire.
 5ter. **Indici** (v499, CEO, 17/10 sera) — dal blocco di `indici.py`: il P/E dell'S&P 500 prospettico contro le
    medie della STESSA FactSet, gli ultimi 12 mesi e il CAPE contro le mediane della stessa serie di multpl, il
    Nasdaq-100 dal WSJ col valore di un anno prima — mai il valore di una fonte contro la media di un'altra, perché
@@ -249,7 +253,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    del CEO del 17/10, testuale: *"solo informazione"*; l'esito della tenuta non cambia con lei. E il
    blocco **NOTIZIE ULTIMISSIME** di `numeri_libro.py` porta, per ogni posizione con un parametro d'uscita acceso e
    ogni ordine attivo, il perché e le voci del feed delle ultime 72 ore (la cronaca di mercato una volta sola, in
-   fondo): la risposta le cita con data e fonte, insieme alla ricerca web delle stesse ore.
+   fondo — da v500 è cronaca la voce nel feed di almeno tre nomi; quella nel feed di due resta con ciascuno e dice
+   dove altro compare): la risposta le cita con data e fonte, insieme alla ricerca web delle stesse ore.
    Da v499 (CEO, 17/10 sera: *"non so se mi avresti fornito l'ultima trovata di Mask sull'auto volante tra le
    News"*) le notizie sono di **TUTTE** le posizioni: chi ha un segnale viene prima col suo perché e fino a 6 voci,
    chi non ne ha porta le 3 più recenti — un evento non aspetta un segnale. Un feed **VUOTO** o **FERMO** (l'ultima
@@ -294,6 +299,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        n.d. si dice n.d. (storia troppo corta), e un titolo con la storia della quotazione NON verificata
        lo dichiara: su un nato da un veicolo (OKLO, da AltC) medie e massimi mescolano due società. Il P/E
        è una metrica, non una prova della tenuta: un growth costa caro per costruzione.
+       Da v500 (CEO, 18/10: *"2ok"*) accanto ai pavimenti il **VWAP dall'ultima trimestrale** — il prezzo medio
+       pagato da chi ha comprato dopo i conti, con la seduta d'ancora e il perché (ora del deposito su SEC EDGAR,
+       o la seduta più scambiata se l'ora manca), e il risultato dei conti contro le attese: un pavimento sotto il
+       VWAP compra dove chi è entrato dopo i conti perde in media, uno sopra dove guadagna. È un livello, non una
+       prova della tenuta né un ordine (regole in `LIBRO.md` §1bis).
    7d-quinquies. **la STRUTTURA e le ULTIMISSIME NOTIZIE** (v494, CEO, 17/10) — per ogni ingresso la riga della
        struttura delle oscillazioni: un ingresso sul pavimento con i minimi ancora DECRESCENTI, o con la chiusura
        già sotto l'ultimo minimo, compra una discesa che non ha smesso di scendere, e la risposta lo dice; un doppio
@@ -348,7 +358,9 @@ l'Italia per il BTP (17/10) — e dalla sera stessa il loro allargamento oltre l
 funzione quando lo storico raccolto basta (17/10) · le notizie di TUTTE le posizioni e di TUTTI i sorvegliati, coi
 segnali davanti, e il feed vuoto o fermo dichiarato; il dark pool (FINRA, DIX) e la gamma dei dealer (call wall, put
 wall, cambio di regime); gli indici S&P 500 e Nasdaq-100 — P/E con la storia della sua fonte, stagione delle
-trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza — informazione, non prove (17/10 sera).
+trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza — informazione, non prove (17/10 sera) · il
+VWAP dall'ultima trimestrale accanto ai pavimenti di ogni titolo; i segnali di mercato misurati e lasciati come
+informazione (18/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

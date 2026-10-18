@@ -5057,7 +5057,9 @@ const _TABELLA_FERMA = `
        di testa: e' esattamente la forma reale del difetto che questi gate sorvegliano. */
     if (r && r.tv && Array.isArray(r.tv.conto_trim) && r.tv.conto_trim.length > 4) r.tv.conto_trim.shift();
     const base = String((r && r.combustione && r.combustione.bilancio_al) || "2026-06-30").slice(0, 10);
-    const dep = new Date(new Date(base + "T00:00:00").getTime() + 100 * 86400000).toISOString().slice(0, 10);
+    /* v500 — 120 giorni, non 100: la soglia e' ora la fine del trimestre successivo piu' dieci giorni (101), e un
+       deposito a 100 giorni dal bilancio e' per costruzione ancora dentro il ciclo di quel trimestre */
+    const dep = new Date(new Date(base + "T00:00:00").getTime() + 120 * 86400000).toISOString().slice(0, 10);
     DATA.macro.sec_calendario = DATA.macro.sec_calendario || {};
     DATA.macro.sec_calendario.per_titolo = DATA.macro.sec_calendario.per_titolo || {};
     DATA.macro.sec_calendario.per_titolo.CRWV =

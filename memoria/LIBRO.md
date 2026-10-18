@@ -220,8 +220,27 @@ ordine attivo. Convenzioni di lettura scelte da Claude e dichiarate come tali (v
   tenuta e non ne cambia l'esito, e un gate lo verifica.
 - **Le ultimissime notizie**: per ogni nome con un ingresso possibile, un'uscita accesa o un ordine attivo, il feed
   Nasdaq del simbolo nelle ultime **72 ore** — così il lunedì mattina comprende il venerdì —, con la stessa voce nel feed
-  di più nomi scritta una volta come cronaca di mercato. Il feed è UNA fonte: la ricerca web nelle stesse ore resta
-  obbligatoria, e la risposta cita fonte e data.
+  di almeno **tre** nomi scritta una volta come cronaca di mercato; quella nel feed di due resta con ciascuno e dice dove
+  altro compare (v500: con due, «CoreWeave Is Projected to Have a 6.3x Gross Leverage Ratio» finiva fra la cronaca, cioè
+  sotto «è il mercato, non il nome»). Il feed è UNA fonte: la ricerca web nelle stesse ore resta obbligatoria, e la
+  risposta cita fonte e data.
+
+**Il VWAP dall'ultima trimestrale, accanto ai pavimenti** (decisione del CEO del 18/10/2026, testuale: *"2ok"* alla
+proposta di *"i livelli VWAP calcolati dall'ultima trimestrale — il prezzo medio pagato da chi ha comprato dopo i conti —
+accanto ai pavimenti di ogni titolo"*). `rotazione.py` lo calcola per ogni sorvegliato, `numeri_libro.py` per ogni
+posizione e ogni ordine attivo. Convenzioni scelte da Claude e dichiarate come tali (v240):
+- **Ancora**: la prima seduta dopo il comunicato. La **data** la dichiara Nasdaq (le trimestrali riportate, non le
+  stime): l'8-K con item 2.02 da solo non basta, perché una società ne deposita anche fuori dal ciclo (il 02/10/2026
+  Tesla ci ha depositato le consegne) e gli emittenti esteri non lo hanno. L'**ora** viene dal deposito su SEC EDGAR
+  accettato fra le 16:00 di New York del giorno prima e la fine del giorno dopo (l'8-K, o il primo 6-K di un emittente
+  estero), letta dalla pipeline: **prima delle 09:30 muove la seduta stessa, dalle 16:00 la successiva**, in mezzo la
+  seduta stessa (a seduta aperta: la sua barra mescola il prima e il dopo). Senza l'ora, la seduta più scambiata fra il
+  giorno del comunicato e il successivo — dichiarato ogni volta, col perché.
+- **VWAP**: dalle barre giornaliere, prezzo tipico (massimo + minimo + chiusura) / 3 pesato sui volumi, dall'ancora
+  all'ultima seduta conclusa, sulla serie della società dei pavimenti. È un'**approssimazione** del VWAP dei grafici,
+  che usa barre di pochi minuti: i due numeri possono differire di poco.
+- **Lettura** (convenzione): sopra il VWAP chi ha comprato dopo i conti è in media in guadagno, sotto in perdita. È un
+  livello accanto ai pavimenti, **non una prova della tenuta e non un ordine**.
 
 ## 1ter. SEMAFORO D'USCITA — deciso col CEO il 06/10/2026, si controlla a OGNI analisi
 
@@ -324,6 +343,38 @@ e su quei nomi non si apre nulla di nuovo. Le soglie sono convenzioni scelte col
 ⚠ Fonti esterne sul debito tecnologico in difficoltà (per esempio i rapporti di JPMorgan) si
 leggono come contesto: non sono una serie pubblica, quindi non entrano nel semaforo.
 ⚠ Le vendite a terzi dividono anche il conto fiscale sulle plusvalenze (26%): su MU e AMD è alto.
+
+⚠ **Posizionamento e indici restano INFORMAZIONE, e dove lo storico c'è sono stati misurati (decisione del CEO del
+18/10/2026, testuale: *"1 ok tua proposta"*).** Le misure della v496-v499 — curva della volatilità, gamma dei dealer,
+dark pool, put/call, grandi operatori, multipli degli indici — non entrano nel colore. Misurate il 18/10 con lo stesso
+metodo del CCC (`scripts/misura_segnali_mercato.py`: un episodio è il primo giorno acceso dopo almeno 20 sedute spente;
+un calo di almeno il 10% è «anticipato» se il segnale si accende entro il giorno in cui il calo tocca il −5%):
+- **VIX/VIX3M ≥ 1** (curva della volatilità invertita), dal 2009: sull'S&P 500 42 episodi, un calo ulteriore di almeno
+  il 10% entro 63 sedute nel **17%** dei casi contro il **12%** di un giorno qualunque (+0,9 errori standard: dentro il
+  rumore), e dopo l'inversione il mercato nella mediana **sale** (+2,8% a 21 sedute contro +1,5%). Degli 8 cali di
+  almeno il 10% si è accesa entro il −5% in 6, ma prima del massimo una volta sola: **è un termometro dello stress in
+  corso, non un anticipatore**. Sul Nasdaq-100 la stessa forma (19% contro 16%); su SMH (5 anni) 4 cali su 8 senza
+  accendersi mai.
+- **GEX dell'S&P 500 negativa** (SqueezeMetrics, dal 2011): 36 episodi, 17% contro 12%, e nel 47% dei casi il mercato
+  era già oltre il −5% dal massimo dell'anno.
+- **DIX** per quinto del proprio anno: più alto il DIX, più frequenti i cali di almeno il 10% nei tre mesi dopo (dal 5%
+  al 16%) — l'opposto della lettura «DIX alto = acquisto», ma su giorni sovrapposti e con un DIX salito negli anni: si
+  legge come un mercato già agitato, non come un segnale.
+- **Put/call delle azioni** (media di 10 sedute, CBOE dal 2019): nella coda alta del proprio anno 18% contro 15%, nella
+  bassa 7% contro 15% — 11 e 14 episodi, dentro il rumore.
+- **Grandi operatori** (CFTC, fondi a leva su S&P 500 e Nasdaq-100, dal 2013): una prova su quattro oltre due errori
+  standard (S&P 500, coda lunga: 33% contro 12%, 12 episodi, ma accesa dentro il calo in 4 casi su 6). Su 24 confronti
+  in tutto il caso ne produce circa uno: **non si promuove**.
+- **Multipli** (multpl, dal 1975): il CAPE in coda alta non anticipa i cali entro un anno (33% contro 31%) e l'anno dopo
+  il mercato nella mediana sale del 23%; il P/E degli ultimi 12 mesi in coda alta 62% contro 31% (+1,9 errori
+  standard), ma metà degli episodi scatta a mercato già sceso (2001, 2002, 2008, 2020): il P/E sale perché crollano gli
+  utili, cioè dentro la crisi.
+- **Dark pool per titolo** (la memoria del sistema, un anno, 56 titoli): per quinto del proprio anno il rendimento in
+  eccesso su SPY a un mese non cambia in ordine (da −0,8% a +0,9%) e i cali di almeno il 10% stanno fra il 15% e il 18%
+  in ogni quinto: nessun segnale.
+- **Da misurare quando la storia raccolta lo permette** (almeno un anno): la nostra gamma sulle catene (raccolta dalla
+  v500), put/call e volatilità implicita per titolo, il P/E del Nasdaq-100. Con la stessa misura: se non anticipano,
+  restano informazione.
 
 **Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: SMH 638 (media 50 ≈ 573,
 200 ≈ 502) · **spread CCC 12,11%, +2,4 punti sul minimo di 60 sedute (9,69) — SEGNALE ACCESO** · HY OAS 3,1 · Treasury 10 anni 5,28% · margin debt 96,8% del massimo, +2,6% sul mese ·

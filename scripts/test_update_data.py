@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 285  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288 (sale, mai scende)
+N_CHECKS_MINIMO = 288  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1713,7 +1713,8 @@ check("v492 collegamento: il giro del calendario EDGAR passa ogni risposta letta
       "esteri, e la pubblica in sec_calendario.storia_quotazione anche quando non ci sono trimestrali",
       "storia[_tk] = storia_quotazione(_sub)" in _sec492
       and _sec492.find("storia[_tk] = storia_quotazione(_sub)") < _sec492.find("esteri.append(_tk)")
-      and '"storia_quotazione": {"per_titolo": storia' in _sec492 and "if sec_cal or esteri or storia:" in _sec492)
+      # v500 — RIAGGANCIATO all'argomento, non ai due punti: la condizione ora comprende anche le ore dei depositi
+      and '"storia_quotazione": {"per_titolo": storia' in _sec492 and "if sec_cal or esteri or storia" in _sec492)
 
 # ======================== v496 — LA VARIAZIONE ANNUA DELLA LEVA DAL FILE STORICO FINRA ========================
 # Il CEO, 17/10/2026: «Recupera altrove dati variazione annua della leva». La tabella della pagina FINRA si e'
@@ -2156,6 +2157,40 @@ check("v498 collegamento: ogni titolo quotato porta la finestra calcolata sui SU
       and _c498["CRWV"]["finestra"].get("indice") == "HY"
       and "finestra" not in _c498["MU"] and "finestra" not in _c498["NUOVO"]
       and _c497r["ORCL"]["finestra"]["stato"] == "storico corto")
+
+# ═══ v500 — L'ORA DEI DEPOSITI DEI RISULTATI (SEC EDGAR, acceptanceDateTime) ══════════════════════════════════
+# Il VWAP ancorato ai conti (decisione del CEO del 18/10/2026) parte dalla prima seduta DOPO il comunicato, e quale sia
+# lo dice l'ora: la pipeline la legge dalla stessa risposta di EDGAR del calendario. Gli stati si costruiscono.
+from datetime import date as _date500
+_sub500 = {"filings": {"recent": {
+    "form": ["8-K", "8-K", "10-Q", "6-K", "8-K", "8-K", "8-K"],
+    "filingDate": ["2026-10-02", "2026-09-30", "2026-09-29", "2026-09-15", "2026-06-25", "2026-06-20", "2026-03-01"],
+    "items": ["8.01", "2.02,9.01", "", "", "2.02", "2.02", "2.02"],
+    "acceptanceDateTime": ["2026-10-02T08:05:00.000Z", "2026-09-30T16:02:11.000Z", "2026-09-29T17:00:00.000Z",
+                           "2026-09-15T06:30:00.000Z", "2026-06-25T16:05:00.000Z", "", "2026-03-01T16:05:00.000Z"]}}}
+_od500 = ud.ore_depositi(_sub500, oggi=_date500(2026, 10, 18))
+check("v500 ore dei depositi: solo gli 8-K con item 2.02 e i 6-K degli ultimi 130 giorni, con l'ora come EDGAR la "
+      "scrive troncata ai secondi; un 8-K senza 2.02 (le consegne di Tesla del 02/10), un 10-Q, un deposito senza ora "
+      "e uno oltre i 130 giorni restano fuori",
+      _od500 == [{"forma": "8-K", "data": "2026-09-30", "accettato": "2026-09-30T16:02:11"},
+                 {"forma": "6-K", "data": "2026-09-15", "accettato": "2026-09-15T06:30:00"},
+                 {"forma": "8-K", "data": "2026-06-25", "accettato": "2026-06-25T16:05:00"}])
+check("v500 ore dei depositi: il tetto di voci si rispetta (dal piu' recente), una risposta vuota e una senza 'items' "
+      "danno un elenco vuoto — senza 'items' un 8-K non si puo' dire dei risultati",
+      [x["data"] for x in ud.ore_depositi(_sub500, oggi=_date500(2026, 10, 18), massimo=2)] == ["2026-09-30", "2026-09-15"]
+      and ud.ore_depositi({}, oggi=_date500(2026, 10, 18)) == []
+      and ud.ore_depositi({"filings": {"recent": {"form": ["8-K"], "filingDate": ["2026-10-01"],
+                                                    "acceptanceDateTime": ["2026-10-01T16:05:00.000Z"]}}},
+                          oggi=_date500(2026, 10, 18)) == [])
+_sec500 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
+_sec500 = _sec500[:_sec500.find("calendario_uscite_fred(STORICO_IND)")]
+check("v500 collegamento: il giro del calendario EDGAR passa ogni risposta letta a ore_depositi PRIMA del filtro degli "
+      "esteri (i 6-K servono a loro), e le pubblica in sec_calendario.ore_depositi con l'orologio dichiarato, anche "
+      "quando non ci sono trimestrali",
+      "ore[_tk] = ore_depositi(_sub)" in _sec500
+      and _sec500.find("ore[_tk] = ore_depositi(_sub)") < _sec500.find("esteri.append(_tk)")
+      and '"ore_depositi": {"per_titolo": ore' in _sec500 and '"orologio": "America/New_York"' in _sec500
+      and "if sec_cal or esteri or storia or ore" in _sec500)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
