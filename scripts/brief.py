@@ -733,6 +733,56 @@ def macro_dalla_pipeline():
     return {"stato": "ok", "serie": out, "eta_ore": eta, "run": run}
 
 
+# ---------------------------------------------------------------- v501: gli eventi del credito dalla pipeline
+def credito_dalla_pipeline(tickers, percorso=None):
+    """Gli EVENTI del credito dei nomi del brief — il CDS che si allarga di colpo (settimana) o per un mese, e la
+    divergenza col titolo — letti da data.json e valutati da scripts/credito.py: una lettura, un proprietario (v436).
+    Richiesta del CEO del 18/10/2026: «avvisami se il costo per assicurarsi contro il default subisce rincari anomali
+    o improvvisi». Le CONDIZIONI di bilancio (Altman, scadenze oltre la liquidita') restano nell'analisi: cambiano coi
+    trimestri, e un avviso che suona tutte le mattine non avvisa (v421, v427)."""
+    import credito
+    p = percorso or os.path.join(RADICE, "data", "data.json")
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+    except Exception as e:
+        return {"stato": f"data.json non leggibile ({str(e)[:40]})", "eventi": []}
+    righe = {r.get("ticker"): r for r in (d.get("watchlist") or []) if isinstance(r, dict)}
+    giorni = (((d.get("macro") or {}).get("cds") or {}).get("storia") or {}).get("giorni")
+    eventi, con_cds, servono = [], [], {}
+    for tk in tickers:
+        r = righe.get(tk)
+        c = (r or {}).get("cds") or {}
+        if c.get("stato") != "quotato":
+            continue
+        con_cds.append(tk)
+        for chiave in ("finestra5", "finestra"):
+            f = c.get(chiave) or {}
+            if f.get("n") is not None:
+                servono.setdefault(chiave, f.get("servono") or f["n"] + 1)
+        eventi.extend((tk, testo) for tipo, testo in credito.segnali(r) if tipo == "evento")
+    return {"stato": "ok", "eventi": eventi, "con_cds": con_cds, "giorni": giorni, "servono": servono}
+
+
+def righe_credito(cr):
+    """Il blocco del credito, una resa sola per il testo (la pagina impagina gli stessi dati: v455)."""
+    out = ["CREDITO — i CDS dei tuoi nomi: rincaro improvviso (settimana), allargamento (mese), divergenza col titolo"]
+    if (cr or {}).get("stato") != "ok":
+        out.append(f"  ⚠ {(cr or {}).get('stato') or 'non letto'} — non e' 'nessun evento', e' il dato che manca")
+        return out
+    for tk, t in cr["eventi"]:
+        out.append(f"  {tk:6} {t}")
+    if not cr["eventi"]:
+        out.append(f"  nessun evento sui {len(cr['con_cds'])} nomi con un CDS compensato a ICE.")
+    sv = cr.get("servono") or {}
+    g = cr.get("giorni")
+    if g is not None and sv and g < max(sv.values()):
+        parti = [f"{nome} si misura da {sv[k]} giorni" if k in sv else f"{nome}: la pipeline non la pubblica ancora"
+                 for k, nome in (("finestra5", "la settimana"), ("finestra", "il mese"))]
+        out.append(f"  storico dei CDS raccolto: {g} {'giorno' if g == 1 else 'giorni'} — {', '.join(parti)}: prima, il "
+                   "silenzio qui NON vuol dire 'nessun rincaro'")
+    return out
+
+
 # ---------------------------------------------------------------- resa
 def n2(x, d=2):
     return "n.d." if x is None else f"{x:,.{d}f}".replace(",", "@").replace(".", ",").replace("@", ".")
@@ -906,6 +956,11 @@ def componi(modo, dati):
     for riga in righe_aste(dati.get("aste")):
         A(riga)
 
+    # --- 1quater. CREDITO (v501)
+    A("")
+    for riga in righe_credito(dati.get("credito")):
+        A(riga)
+
     # --- 2. LIVELLI DEL LIBRO
     A("")
     A("DOVE STA OGNI POSIZIONE (livelli misurati — la decisione resta sul tuo grafico)")
@@ -1030,6 +1085,7 @@ def main():
     cal = calendario_trimestrali(tickers)
     aste = aste_tesoro()
     mf = macro_dalla_pipeline()
+    cr = credito_dalla_pipeline(tickers)       # v501
 
     sedute = [r["seduta"] for r in tec if r.get("seduta")]
     base = max(set(sedute), key=sedute.count) if sedute else "n.d."
@@ -1038,7 +1094,7 @@ def main():
     #   d'estate, e dal 25/10 avrebbe datato ogni brief un'ora avanti (v437, v439).
     dati = {"ora": ora_utc.astimezone(ROMA), "ora_utc": ora_utc, "modo": modo,
             "finestra_h": finestra, "tecnica": tec, "news": nw, "macro_fred": mf,
-            "trimestrali": cal, "aste": aste,
+            "trimestrali": cal, "aste": aste, "credito": cr,
             "seduta_base": base, "cassa_eur": cassa, "secondi": round(time.time() - t0, 1)}
     testo = componi(modo, dati)
     print(testo)

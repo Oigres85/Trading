@@ -7762,3 +7762,103 @@ pubblicate ma vuote per quel nome, `[]` contro `None`), l'altro moriva per eccez
 cadere col suo nome (v407, v471). Stretti, mordono.
 Pavimenti: `test_analisi_libro.py` 640 → 685 (699 punti di chiamata), `test_update_data.py` 265 → 270 (278) e
 N_CHECKS_MINIMO 285 → 288. `?v=` e `BUILD_VERSION` a 500: cambia `assets/app.js`.
+
+
+## 🏦 v501 — LA SALUTE DEL CREDITO DI OGNI NOME, ALTMAN CON LA SUA FINESTRA, E L'ORA DI EDGAR CHE ERA UTC
+
+Richieste del CEO del 18/10/2026, testuali: *"Analizza e monitora la salute finanziaria delle aziende presenti nel mio
+portafoglio e nella mia watchlist … per anticipare eventuali impatti negativi sulle azioni"* — rendimenti e spread delle
+obbligazioni sul secondario, asset swap e Z-spread, CDS a 5 anni con un avviso sui *"rincari anomali o improvvisi"*, il
+debito dai 10-Q e 10-K (totale, costo, scadenze a breve, derivati sui tassi) — *"e rendilo strutturale per individuare
+ogni volta che rilevi una divergenza in cui il mercato obbligazionario o dei CDS prezza un rischio … che non si è ancora
+riflesso nel prezzo delle azioni"*; e *"Monitora anche Altman Z-Score fornendo la % di rischio del parametro ed il range
+temporale entro il quale può avvenire il potenziale default"*. Regole in `memoria/LIBRO.md` §1novies.
+
+### Cosa si poteva avere gratis, misurato prima di scrivere
+| richiesto | esito |
+|---|---|
+| rendimenti delle obbligazioni sul secondario, ASW, Z-spread | **NO**: TRACE di FINRA li ha, ma l'API risponde 401 senza credenziali e il dato di fine giornata vuole un contratto; il sito di FINRA li mostra per la consultazione. Si DICE ogni volta (v406) |
+| CDS a 5 anni | sì, dalla v497 (ICE, 26 nomi): ora con la **settimana** oltre al mese, il **rango** contro le settimane del nome e il **titolo sugli stessi giorni** |
+| debito dai 10-Q/10-K | sì, dai fatti **XBRL** (`companyfacts`): scadenze anno per anno, il tasso dichiarato (col nome della SUA voce), **valore di mercato del debito contro il carico** (il prezzo delle obbligazioni che la società stessa dichiara, trimestrale), linee di credito, carta commerciale, derivati sui tassi |
+| Altman con la % e la finestra | sì: Z'' → rating equivalente → frequenze storiche d'insolvenza per orizzonte, dalle tabelle pubblicate da Altman |
+
+⚠ **SEC risponde 403 da questo ambiente** e `companyfacts` pesa megabyte (Oracle 4 MB): la lettura vive nella pipeline,
+si fa solo dopo un 10-Q/10-K nuovo, al massimo 10 per run con le posizioni per prime, e la cache sta nel repo
+(`data/debito_sec.json`). La fetch è esercitata da un `get` finto nei gate e si verifica nel run del CI (trappola v203,
+dichiarata prima). Gli emittenti esteri (20-F, 6-K, IFRS) non sono letti, e si dice.
+⚠ `companyfacts` porta solo i fatti NON dimensionali: le cedole per obbligazione e i nozionali degli swap per tipo qui
+non si vedono, e la loro assenza non dice che non ci siano.
+
+### ⚠⚠ L'ora di EDGAR era UTC, e la v500 la leggeva come New York
+Trovato preparando questa versione: il JSON di EDGAR scrive `2026-09-10T20:16:50.000Z` per l'8-K di Oracle, e l'indice
+dello stesso deposito dice **"Accepted 2026-09-10 16:16:50"** — ora di New York. La `Z` è un UTC vero. La v500 la
+dichiarava ora di New York (`"orologio": "America/New_York"`) e la sua docstring si rassicurava che *"prima
+dell'apertura e dopo la chiusura resterebbero tali"*: falso — le consegne di Tesla (13:04Z, cioè 09:04) si leggevano
+**a seduta aperta**, e un deposito fra mezzogiorno e le 16:00 finiva sulla seduta **successiva**. Ora si converte col
+fuso (v470) e la pipeline dichiara `UTC`.
+> ⚠ **E la fixture della v500 codificava l'assunzione sbagliata**: le ore erano scritte come New York. Un gate costruito
+> sull'ipotesi del codice conferma l'ipotesi (v326). I casi sono gli stessi, le ore sono quelle vere, e un caso nuovo
+> d'inverno (5 ore di scarto) prende anche uno scarto scritto a mano.
+
+### Altman: il punteggio sul bilancio PIÙ RECENTE, e la finestra dalle tabelle di Altman
+- **Lo Z'' della pipeline leggeva il bilancio ANNUALE**: su CRWV il 31/12/2025, con un trimestrale al 30/06/2026. Un
+  monitor su un bilancio di un anno fa non monitora: ora stato patrimoniale trimestrale con l'EBIT dei quattro trimestri
+  che `credito()` ha già sommato (una derivazione sola), l'annuale solo come ripiego DICHIARATO, e le quattro componenti
+  pubblicate — chi legge vede QUALE termine tiene giù il punteggio.
+- **La % e il range temporale** (`scripts/credito.py`): Z'' + 3,25 = punteggio per i mercati emergenti → la mediana per
+  rating più vicina (Altman, presentazione del 6/2/2019, colonna più recente) → la riga di quel rating nei **tassi di
+  mortalità per rating all'emissione** (S&P 1971-2018, 3.454 emissioni): frequenza storica a 1, 3, 5, 10 anni, l'anno col
+  rischio annuo più alto e l'anno entro cui cade metà delle insolvenze dei primi dieci. **Non è una previsione sul
+  nome**, e la riga lo dice; gli intermediari finanziari non si leggono; i riacquisti di azioni penalizzano e la riga lo
+  dice quando succede.
+- ⚠⚠ **I tassi CUMULATI trascritti si verificano contro i MARGINALI che la fonte pubblica accanto**: un cumulato
+  trascritto male rompe due marginali, e il gate li confronta riga per riga entro l'arrotondamento della tabella. Una
+  tabella copiata a mano è un dato senza provenienza finché qualcosa non la controlla da un'altra strada.
+
+### CDS: la settimana, il rango, il titolo sugli stessi giorni — e le misure restano pulite
+La pipeline misura (`finestra5`, `rango5`, `azione`), l'analisi decide (`credito.py`), come per la prova di tenuta
+(v498). **Rincaro improvviso**: oltre il 15% in 5 giorni al netto dell'indice della stessa cedola; **allargamento**:
+oltre il 20% in 21 (la soglia della tenuta — ora vive in `credito.py` e `numeri_libro` la importa: una soglia, un posto);
+**anomalo**: dal 95° percentile delle settimane del nome, da quando ne bastano 60; **DIVERGENZA**: un rincaro mentre il
+titolo, negli STESSI giorni, non fa peggio di QQQ — il credito prezza un rischio che l'azione non sconta ancora.
+⚠ **La prima stesura scriveva il lato azionario DENTRO la finestra**, e il gate v498 — che confronta la finestra con
+`finestra_cds` ricalcolata — sarebbe andato rosso su codice giusto. Le misure restano il risultato della loro funzione;
+quello che si aggiunge sta accanto.
+
+### Il debito: due basi diverse, e il costo da una sola data
+- **Il "Total Debt" della fonte comprende i leasing** (CRWV 51,6 miliardi contro 35,1 di finanziamenti): come base di
+  quota corrente e costo valgono i FINANZIAMENTI, e i leasing si dicono a parte.
+- **Gli oneri di dodici mesi su un debito di fine periodo mentivano** quando il debito era cambiato molto nell'anno:
+  MU 7,5% (ha rimborsato quasi tutto), CRWV 5,3% (è raddoppiato). Ora l'ultimo trimestre annualizzato, stessa data al
+  numeratore e al denominatore; un trimestre senza oneri è un dato che manca, non un costo zero (v205).
+- Trovati entrambi **leggendo l'uscita come il destinatario**, non dai gate (v412, v413).
+
+### Dove esce
+Il blocco **SALUTE DEL CREDITO** di `schede_progetto.py`: i SEGNALI di tutti i nomi in testa — eventi (si muovono coi
+prezzi) e condizioni (cambiano coi bilanci) — poi nome per nome CDS, Altman, debito. Nel **brief** delle due letture
+solo gli EVENTI del CDS: le condizioni di bilancio cambiano coi trimestri, e un avviso che suona tutte le mattine non
+avvisa (v421, v427). Finché lo storico non basta il brief dice che il silenzio NON è "nessun rincaro".
+**È informazione**: nessun colore, nessuna vendita, nessuna prova nuova della tenuta (il CDS del mese lo era già).
+
+### 🧪 Il metodo
+- **47 iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**, ciascuna
+  sul controllo atteso — fra queste i cumulati di Altman trascritti male (li prende solo il confronto coi marginali), la
+  mediana per rating spostata, la conversione dell'ora con uno scarto fisso (la prende solo il caso d'inverno), il lato
+  azionario misurato dal giorno sbagliato, il rango pubblicato prima di avere 60 settimane, le scadenze XBRL prese da
+  date diverse, il budget che non mette le posizioni per prime, un nome riletto senza un deposito nuovo, la lettura
+  precedente persa quando la rilettura fallisce.
+- ⚠ **Una non mordeva al primo giro, e il difetto era il CONTROLLO**: il check del deposito nuovo leggeva i campi con le
+  parentesi quadre, e col difetto dentro la suite moriva con un `KeyError` invece di cadere col suo nome (v407, v471).
+  Ora `.get`, e la stessa iniezione morde sul check giusto.
+- ⚠ **Le iniezioni della pipeline sono girate su una COPIA del repo**, in parallelo a quelle dell'analisi: due harness
+  sugli stessi file si sporcano lo snapshot a vicenda (v430), due su copie separate no. La copia si verifica identica
+  (`cmp` dei sorgenti) prima di rieseguire un'iniezione dopo una correzione.
+- ⚠ **L'etichetta del tasso affermava una media che una voce non porta.** Delle tre voci XBRL lette, la terza
+  (`DebtInstrumentInterestRateEffectivePercentage`) è il tasso effettivo di UNO strumento, e un fatto non dimensionale
+  non dice quale: la riga lo chiamava comunque «tasso medio ponderato». Classe v240/v405, trovata rileggendo la propria
+  tabella delle voci prima del commit. Ora l'etichetta segue la voce (`credito.riga_tasso`), e il gate la percorre su
+  tutte e tre più quella assente; tre iniezioni mordono.
+- ⚠ **La fetch di SEC non è esercitabile da qui** (403 senza contatto): logica provata con un `get` finto, numeri veri
+  dal run del CI — la trappola v203, dichiarata prima.
+- Pavimenti: `test_update_data.py` 270 → 280 (292 punti di chiamata) e N_CHECKS_MINIMO 288 → 300 (305 eseguiti),
+  `test_analisi_libro.py` 685 → 705 (721). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

@@ -52,6 +52,15 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    ICE Clear Credit pubblica gratis, la variazione a 5, 21 e 63 giorni quando lo storico raccolto li copre, il
    multiplo dell'indice CDX della stessa cedola; «nessun CDS compensato» per chi il mercato non quota; in testa gli
    indici CDX e la Repubblica Italiana per il BTP. Il FATTO è il prezzo, i punti base sono una conversione.
+   Da v501 (CEO, 18/10: *"Analizza e monitora la salute finanziaria delle aziende … Monitora anche Altman Z-Score"*)
+   il blocco **SALUTE DEL CREDITO**: in testa i SEGNALI di tutti i nomi — eventi del CDS (rincaro improvviso in una
+   settimana, allargamento in un mese, rincaro anomalo per il nome, DIVERGENZA quando il titolo negli stessi giorni
+   non fa peggio di QQQ) e condizioni di bilancio (Altman in zona di pericolo, quota corrente oltre la liquidità) —
+   poi per ogni nome la probabilità d'insolvenza implicita nel CDS, lo Z'' di Altman con il rating equivalente, la
+   frequenza storica d'insolvenza a 1, 3, 5 e 10 anni e l'anno in cui il rischio si concentra, e il debito: totale,
+   quota a 12 mesi contro la liquidità, costo approssimato, copertura degli oneri e, dai 10-Q e 10-K, scadenze per
+   anno, tasso medio, valore di mercato del debito, linee di credito, derivati sui tassi (regole in `LIBRO.md`
+   §1novies). Rendimenti delle obbligazioni, asset swap spread e Z-spread non sono disponibili gratis: si dice.
    Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
    misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
    NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
@@ -186,6 +195,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    funzione quando lo storico raccolto basta; non è un colore del semaforo. Lo storico gratuito non esiste (ICE
    pubblica solo l'ultimo giorno, DTCC risponde 403 anche dai server di GitHub): lo raccoglie la pipeline dal
    16/10/2026, e finché i giorni non bastano la variazione si cerca in rete, con fonte e data.
+   **La salute del credito** (v501, schede, `LIBRO.md` §1novies): i SEGNALI in testa al blocco si dicono qui per
+   primi — una DIVERGENZA (il CDS peggiora e il titolo non lo sconta) è la cosa che il CEO ha chiesto di non perdere;
+   per i nomi in posizione o con un ingresso possibile anche Altman con la sua finestra temporale, detto per ciò che
+   è (frequenza storica delle obbligazioni con quel rating, non una previsione) e la quota del debito a 12 mesi
+   contro la liquidità. È INFORMAZIONE: non una prova della tenuta (il CDS del mese lo è già), non un colore.
 5bis. **Posizionamento** (v496, CEO, 17/10) — dal blocco di `posizionamento.py`: il put/call di mercato col
    suo percentile (alto = domanda di protezione: convenzione del mestiere, non una misura); le scadenze delle opzioni
    — una mensile o una trimestrale («tre streghe») entro cinque giorni si dice in cima alla sezione, perché alla
@@ -360,7 +374,9 @@ segnali davanti, e il feed vuoto o fermo dichiarato; il dark pool (FINRA, DIX) e
 wall, cambio di regime); gli indici S&P 500 e Nasdaq-100 — P/E con la storia della sua fonte, stagione delle
 trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza — informazione, non prove (17/10 sera) · il
 VWAP dall'ultima trimestrale accanto ai pavimenti di ogni titolo; i segnali di mercato misurati e lasciati come
-informazione (18/10).
+informazione (18/10) · la salute del credito di ogni nome — CDS con rincaro improvviso, allargamento e divergenza
+dal titolo, Altman con la frequenza storica d'insolvenza per orizzonte, il debito dai bilanci depositati — e gli
+eventi del CDS nel brief delle due letture del giorno (18/10).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

@@ -189,6 +189,15 @@ def genera(d):
                   f'<span class="eta mono">{eta:.1f}h</span></div>'
                   f'<a href="{e(v["link"])}" target="_blank" rel="noopener">{e(v["titolo"])}</a></li>')
 
+    # v501 — gli eventi del credito: le stesse righe del testo, rese da brief.righe_credito (v455: una resa sola)
+    _cr = d.get("credito") or {}
+    _rc = brief.righe_credito(_cr)
+    _ev = [x for x in _rc[1:] if x.startswith("  ") and _cr.get("eventi") and x.strip().split(" ")[0] in
+           {tk for tk, _ in _cr["eventi"]}]
+    blocco_credito = (f'<ul class="trim">{"".join(f"<li>{e(x.strip())}</li>" for x in _ev)}</ul>' if _ev else "")
+    blocco_credito += "".join(f'<p class="{"mancante" if ("⚠" in x or "NON" in x) else "quiete"}">{e(x.strip())}</p>'
+                              for x in _rc[1:] if x not in _ev)
+
     mf = d["macro_fred"]
     if mf["stato"] != "ok":
         serie = (f'<p class="mancante"><b>Serie macro assenti — {e(mf["stato"])}.</b> '
@@ -244,7 +253,7 @@ def genera(d):
         seduta=e(d["seduta_base"]), finestra=n2(d["finestra_h"], 0),
         nmossi=len(mossi), nvivi=len(vivi),
         allerta=blocco_allerta, trimestrali=blocco_trim, fintrim=cal["finestra"],
-        aste=blocco_aste,
+        aste=blocco_aste, credito=blocco_credito,
         posizioni="".join(riga_posizione(r) for r in ordinati),
         sorvegliati=blocco_sorv,
         nvoci=len(nw["per_titolo"]), voci=voci or '<li class="quiete">Nessuna voce in finestra.</li>',
@@ -418,6 +427,14 @@ footer b {{ color:var(--muted); font-weight:600; }}
   due volte l’anno, per qualche settimana, New York e Roma distano cinque ore invece di sei.
   È l’offerta che pesa sul rendimento a 10 anni del semaforo.</p>
   {aste}
+</section>
+
+<section>
+  <h2>Credito — i CDS dei tuoi nomi</h2>
+  <p class="sub">Il costo per assicurarsi contro l&rsquo;insolvenza, al netto dell&rsquo;indice della stessa
+  fascia: un rincaro improvviso in una settimana, un allargamento in un mese, e la divergenza quando il titolo
+  negli stessi giorni non fa peggio del mercato. Bilanci e Altman stanno nell&rsquo;analisi: cambiano coi trimestri.</p>
+  {credito}
 </section>
 
 <section>

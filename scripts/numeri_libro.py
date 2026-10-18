@@ -1379,7 +1379,9 @@ MEDIA_LUNGA, MEDIA_BREVE = 200, 50
 SOGLIA_EPS_90 = 5.0          # stima dell'EPS a 90 giorni mossa di oltre il 5% del proprio valore, nei due versi
 SOGLIA_RICAVI = 25.0         # ricavi del trimestre sull'anno prima: da +25% sono una prova di CRESCITA
 AUTONOMIA_CORTA, AUTONOMIA_SOLIDA = 12, 24     # mesi: sotto 12 il bilancio e' corto, da 24 e' solido
-SOGLIA_CDS = 20.0            # v498 — il CDS del nome oltre l'indice CDX della stessa cedola, in un mese, nei due versi
+# v498 — il CDS del nome oltre l'indice CDX della stessa cedola, in un mese, nei due versi. Dalla v501 la soglia vive in
+#   scripts/credito.py, che la usa anche per l'ALLARGAMENTO del monitor del credito: una soglia, un posto (v161)
+from credito import SOGLIA_MESE as SOGLIA_CDS  # noqa: E402
 CONFLITTO = "CONFLITTO — DA VALUTARE"
 ESITI = ("VENDITA PER EVIDENZA", CONFLITTO, "IN OSSERVAZIONE", "NON MISURABILE", "LASCIAR CORRERE")  # urgenza
 PROVE = ("tendenza", "stime", "revisioni", "ricavi", "bilancio", "macro", "cds")

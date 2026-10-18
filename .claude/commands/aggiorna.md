@@ -215,6 +215,11 @@ e «Aggiorna analisi» del CEO — che esegue in parallelo `numeri_libro.py`, `b
 la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 
+`scripts/credito.py` non è un passo di questo comando (v501): è la libreria della salute del credito — soglie e
+mappature dichiarate del monitor (CDS, Altman, debito dai bilanci) — e la usano `schede_progetto.py`, `brief.py` e
+`numeri_libro.py`, che sono già dichiarati qui. Una libreria sola perché la soglia del CDS è la stessa per la tenuta e
+per il monitor, e due copie divergerebbero al primo ritocco.
+
 `scripts/modifica_sicura.py` non è un passo di questo comando: è la libreria che ogni modifica ai
 sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf.py` è la libreria
 che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed

@@ -5516,6 +5516,9 @@ check("v500 tre esiti per nome (v389): letta, «senza righe», NON letta con la 
       and "rifiutata" in _ut500["BBB"]["stato"], str(_ut500))
 
 # --- il VWAP dai conti: l'ancora e i suoi stati, costruiti ---
+# ⚠ v501 — le ore sono UTC, come EDGAR le scrive: la v500 le aveva scritte come ora di New York, cioe' la fixture
+#   codificava l'assunzione sbagliata del codice (misurato su Oracle: indice 16:16:50, JSON 20:16:50Z). Stessi casi,
+#   stesse attese: le ore di New York lette dalla riga sono quelle di prima.
 _g500 = [d for d in (_d500(2026, 9, 25) + _td500(days=k) for k in range(22)) if d.weekday() < 5]
 def _bar500(vol=None, a_da=None):
     out = []
@@ -5532,9 +5535,9 @@ _TR500 = {"stato": "ok", "data": "2026-09-30", "trimestre": "agosto 2026", "eps"
 def _anc500(acc, forma="8-K", tr=None, b=None, adesso=None, dep=True):
     d = None if not dep else ([{"forma": forma, "data": acc[:10], "accettato": acc}] if isinstance(acc, str) else acc)
     return ROT.ancora_conti(tr or _TR500, d, b or _B500, adesso or _DOM500)
-_a1, _a2, _a3 = _anc500("2026-09-30T16:05:00"), _anc500("2026-09-30T07:00:00"), _anc500("2026-09-30T12:00:00")
-_a4 = _anc500("2026-09-29T16:30:00")
-_a5 = _anc500("2026-10-03T10:00:00", tr={**_TR500, "data": "2026-10-03"})
+_a1, _a2, _a3 = _anc500("2026-09-30T20:05:00"), _anc500("2026-09-30T11:00:00"), _anc500("2026-09-30T16:00:00")
+_a4 = _anc500("2026-09-29T20:30:00")
+_a5 = _anc500("2026-10-03T14:00:00", tr={**_TR500, "data": "2026-10-03"})
 check("v500 l'ancora dall'ORA del deposito: dopo le 16:00 di New York la seduta successiva, prima delle 09:30 la stessa, "
       "in mezzo la stessa dichiarata a seduta aperta; il deposito della sera prima muove la seduta del comunicato; un "
       "deposito nel fine settimana muove il lunedi'",
@@ -5543,13 +5546,13 @@ check("v500 l'ancora dall'ORA del deposito: dopo le 16:00 di New York la seduta 
       and _a3["seduta"] == "2026-09-30" and _a3["quando"].startswith("a seduta aperta")
       and (_a4["seduta"], _a4["quando"]) == ("2026-09-30", "dopo la chiusura")
       and (_a5["seduta"], _a5["quando"]) == ("2026-10-05", "prima dell'apertura"), str([_a1, _a2, _a3, _a4, _a5]))
-_a6 = _anc500([{"forma": "6-K", "accettato": "2026-09-30T20:00:00"}, {"forma": "6-K", "accettato": "2026-09-30T06:00:00"}])
-_a7 = _anc500([{"forma": "6-K", "accettato": "2026-09-30T06:00:00"}, {"forma": "8-K", "accettato": "2026-09-30T16:05:00"}])
+_a6 = _anc500([{"forma": "6-K", "accettato": "2026-10-01T00:00:00"}, {"forma": "6-K", "accettato": "2026-09-30T10:00:00"}])
+_a7 = _anc500([{"forma": "6-K", "accettato": "2026-09-30T10:00:00"}, {"forma": "8-K", "accettato": "2026-09-30T20:05:00"}])
 check("v500 l'ancora: un emittente estero prende il PRIMO 6-K della finestra; con un 8-K e un 6-K vince l'8-K, anche se "
       "accettato dopo",
       (_a6["seduta"], _a6["forma"], _a6["ora"]) == ("2026-09-30", "6-K", "06:00")
       and (_a7["seduta"], _a7["forma"]) == ("2026-10-01", "8-K"), str([_a6, _a7]))
-_a8 = _anc500("2026-09-25T16:05:00")
+_a8 = _anc500("2026-09-25T20:05:00")
 _a9 = _anc500(None, dep=False, b=_bar500({"2026-09-30": 500, "2026-10-01": 9000}))
 _a10 = _anc500(None, dep=False, b=_bar500({"2026-09-30": 9000, "2026-10-01": 500}))
 _a10v = ROT.ancora_conti(_TR500, [], _B500, _DOM500)      # la pipeline pubblica le ore, ma non per questo nome
@@ -5561,14 +5564,14 @@ check("v500 senza l'ora la seduta PIU' SCAMBIATA fra il giorno del comunicato e 
       and _a10["seduta"] == "2026-09-30"
       and _a10v["perche"] == "nessun deposito SEC con l'ora fra il giorno prima e il giorno dopo il comunicato",
       str([_a8, _a9, _a10, _a10v]))
-_a11 = _anc500("2026-09-30T16:05:00", tr={"stato": "NON letto (HTTP 403)"})
-_a12 = ROT.ancora_conti({**_TR500, "data": "2026-10-15"}, [{"forma": "8-K", "accettato": "2026-10-15T16:05:00"}], _B500,
+_a11 = _anc500("2026-09-30T20:05:00", tr={"stato": "NON letto (HTTP 403)"})
+_a12 = ROT.ancora_conti({**_TR500, "data": "2026-10-15"}, [{"forma": "8-K", "accettato": "2026-10-15T20:05:00"}], _B500,
                         _dt500(2026, 10, 16, 12, 0, tzinfo=brief.NEW_YORK))
 check("v500 l'ancora: una data NON letta lo dice e non vuol dire «nessuna trimestrale»; la seduta in corso non decide "
       "niente — il comunicato di ieri sera ha la prima seduta ancora aperta, e lo si dice",
       "NON letta" in _a11["errore"] and "non vuol dire 'nessuna trimestrale'" in _a11["errore"]
       and "non e' ancora conclusa" in _a12.get("errore", ""), str([_a11, _a12]))
-_v500 = ROT.vwap_conti(_B500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}], 120.0, 2.0, _DOM500)
+_v500 = ROT.vwap_conti(_B500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T20:05:00"}], 120.0, 2.0, _DOM500)
 _sel500 = [b for b in _B500 if b["t"] >= "2026-10-01"]
 _vw500 = sum((b["h"] + b["l"] + b["c"]) / 3 * b["v"] for b in _sel500) / sum(b["v"] for b in _sel500)
 check("v500 il VWAP: prezzo tipico (massimo+minimo+chiusura)/3 pesato sui volumi dalla seduta d'ancora all'ultima "
@@ -5579,9 +5582,9 @@ check("v500 il VWAP: prezzo tipico (massimo+minimo+chiusura)/3 pesato sui volumi
 _bh500 = _cp500.deepcopy(_B500)
 _bh500[10]["v"] = None
 _bz500 = [{**b, "v": 0} for b in _B500]
-_vh500 = ROT.vwap_conti(_bh500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}], 120.0, 2.0, _DOM500)
-_vz500 = ROT.vwap_conti(_bz500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}], 120.0, 2.0, _DOM500)
-_vs500 = ROT.vwap_conti(_bar500(a_da="2026-10-08"), _TR500, [{"forma": "8-K", "accettato": "2026-09-30T16:05:00"}],
+_vh500 = ROT.vwap_conti(_bh500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T20:05:00"}], 120.0, 2.0, _DOM500)
+_vz500 = ROT.vwap_conti(_bz500, _TR500, [{"forma": "8-K", "accettato": "2026-09-30T20:05:00"}], 120.0, 2.0, _DOM500)
+_vs500 = ROT.vwap_conti(_bar500(a_da="2026-10-08"), _TR500, [{"forma": "8-K", "accettato": "2026-09-30T20:05:00"}],
                         120.0, 2.0, _DOM500)
 check("v500 il VWAP non si calcola su un buco (v205), su volumi nulli, ne' a cavallo di un'operazione societaria caduta "
       "DOPO i conti — che prima spostava in silenzio l'ancora al giorno del taglio",
@@ -5880,6 +5883,266 @@ check("v500 il libro e il formato: le due decisioni del 18/10 con le parole del 
       and "`scripts/misura_segnali_mercato.py`" in _lb500 and "di almeno **tre** nomi scritta una volta come cronaca" in _lb500
       and "il VWAP dall'ultima trimestrale" in " ".join(_fa500.split("Richieste del CEO rese strutturali")[1].split())
       and "VWAP dall'ultima trimestrale" in (AN.checklist() or ""))
+
+# ============================ v501 — LA SALUTE DEL CREDITO (richieste del CEO del 18/10/2026) ============================
+# CDS con rincaro improvviso, allargamento e divergenza dal titolo; Altman con la frequenza storica d'insolvenza per
+# orizzonte; il debito dai bilanci. E il difetto della v500 trovato per strada: l'ora di EDGAR e' UTC. Gli stati si
+# COSTRUISCONO (v425, v429): lo storico vero dei CDS ha pochi giorni e i companyfacts si leggono solo dal CI.
+import credito as CR
+
+# --- l'ora di EDGAR e' UTC (misurato il 18/10 su Oracle: JSON 20:16:50Z, indice "Accepted 16:16:50") ---
+_o501 = _anc500("2026-09-30T20:16:50")              # 16:16 di New York: dopo la chiusura
+_p501 = _anc500("2026-09-30T13:04:26")              # 09:04: prima dell'apertura (le consegne di Tesla)
+_i501 = _anc500("2026-09-30T17:30:00")              # 13:30: a seduta aperta — letta come New York finiva sulla successiva
+_m501 = _anc500("2026-10-01T00:02:22")              # 20:02 del 30/09: dopo la chiusura, il giorno del deposito e' il 30
+check("v501 l'ora di EDGAR e' UTC e si converte col fuso: 20:16Z e' dopo la chiusura (16:16), 13:04Z prima "
+      "dell'apertura (09:04), 17:30Z a seduta aperta (13:30) — non la seduta dopo — e 00:02Z del 01/10 e' la sera del 30",
+      (_o501["ora"], _o501["quando"], _o501["seduta"]) == ("16:16", "dopo la chiusura", "2026-10-01")
+      and (_p501["ora"], _p501["quando"], _p501["seduta"]) == ("09:04", "prima dell'apertura", "2026-09-30")
+      and _i501["ora"] == "13:30" and _i501["quando"].startswith("a seduta aperta") and _i501["seduta"] == "2026-09-30"
+      and (_m501["ora"], _m501["giorno_deposito"], _m501["seduta"]) == ("20:02", "2026-09-30", "2026-10-01"),
+      str([_o501, _p501, _i501, _m501]))
+_gn501 = [d for d in (_d500(2026, 11, 2) + _td500(days=k) for k in range(12)) if d.weekday() < 5]
+_bn501 = [{"t": g.isoformat(), "o": 10.0, "h": 11.0, "l": 9.0, "c": 10.0, "a": 10.0, "v": 1000} for g in _gn501]
+_dn501 = _dt500(2026, 11, 14, 12, 0, tzinfo=brief.NEW_YORK)
+_trn501 = {**_TR500, "data": "2026-11-05"}
+_w1 = ROT.ancora_conti(_trn501, [{"forma": "8-K", "accettato": "2026-11-05T21:05:00"}], _bn501, _dn501)
+_w2 = ROT.ancora_conti(_trn501, [{"forma": "8-K", "accettato": "2026-11-05T20:30:00"}], _bn501, _dn501)
+check("v501 l'ora di EDGAR d'inverno: col fuso New York e' a 5 ore — 21:05Z sono le 16:05 (dopo la chiusura), 20:30Z "
+      "le 15:30 (a seduta aperta): uno scarto di 4 ore scritto a mano sbaglierebbe il secondo (v470)",
+      (_w1["ora"], _w1["quando"], _w1["seduta"]) == ("16:05", "dopo la chiusura", "2026-11-06")
+      and _w2["ora"] == "15:30" and _w2["quando"].startswith("a seduta aperta") and _w2["seduta"] == "2026-11-05",
+      str([_w1, _w2]))
+
+# --- Altman: le tabelle trascritte, verificate contro quelle che la fonte pubblica accanto ---
+_marg501 = {"AAA": (0.00, 0.00, 0.00, 0.00, 0.01, 0.02, 0.01, 0.00, 0.00, 0.00),
+            "AA": (0.00, 0.00, 0.18, 0.05, 0.02, 0.01, 0.03, 0.04, 0.03, 0.04),
+            "A": (0.01, 0.02, 0.09, 0.10, 0.07, 0.04, 0.02, 0.22, 0.05, 0.03),
+            "BBB": (0.29, 2.26, 1.20, 0.95, 0.46, 0.20, 0.21, 0.15, 0.15, 0.31),
+            "BB": (0.89, 2.01, 3.79, 1.95, 2.38, 1.52, 1.41, 1.07, 1.38, 3.07),
+            "B": (2.84, 7.62, 7.71, 7.73, 5.71, 4.44, 3.58, 2.03, 1.70, 0.71),
+            "CCC": (8.05, 12.36, 17.66, 16.21, 4.87, 11.58, 5.38, 4.76, 0.61, 4.21)}
+_sc501 = {r: max(abs(a - b) for a, b in zip(CR.marginali(CR.MORTALITA[r]), _marg501[r])) for r in _marg501}
+check("v501 Altman: i tassi CUMULATI trascritti ridanno, riga per riga, i tassi MARGINALI che la fonte pubblica accanto "
+      "(entro 0,02 punti, l'arrotondamento della tabella) — un cumulato trascritto male ne rompe due: " + str(_sc501),
+      max(_sc501.values()) <= 0.02 and set(CR.MORTALITA) == set(_marg501)
+      and all(list(c) == sorted(c) for c in CR.MORTALITA.values()))
+_med501 = [m for _, m in CR.BRE]
+check("v501 Altman: le mediane per rating scendono dal migliore al peggiore, ogni rating ha la sua riga di mortalita' (o "
+      "nessuna per CC/D), e il rating equivalente e' la mediana piu' vicina",
+      _med501 == sorted(_med501, reverse=True) and set(CR.RIGA_MORTALITA) == {r for r, _ in CR.BRE}
+      and CR.RIGA_MORTALITA["CC/D"] is None and CR.RIGA_MORTALITA["AAA/AA+"] == "AA"
+      and CR.rating_equivalente(4.14)[0] == "B" and CR.rating_equivalente(1.96)[0] == "CCC-"
+      and CR.rating_equivalente(9.35)[0] == "AAA/AA+" and CR.rating_equivalente(-0.5)[0] == "CC/D"
+      and CR.rating_equivalente(5.725)[0] in ("BBB", "BBB-"))
+_fw501 = {r: CR.finestra_altman(r) for r in ("BBB", "BB", "B", "CCC")}
+_meta_ok = all(CR.MORTALITA[r][f["meta_entro"] - 1] >= CR.MORTALITA[r][-1] / 2
+               and (f["meta_entro"] == 1 or CR.MORTALITA[r][f["meta_entro"] - 2] < CR.MORTALITA[r][-1] / 2)
+               for r, f in _fw501.items())
+check("v501 Altman, il range temporale: l'anno col rischio annuo piu' alto (dai marginali) e il primo anno in cui il "
+      "cumulato arriva a meta' di quello a dieci anni: B 4° e 4°, CCC 3° e 3°, BB 3° e 5°, BBB 2° e 3°: " + str(_fw501),
+      (_fw501["B"]["picco_anno"], _fw501["B"]["meta_entro"]) == (4, 4)
+      and (_fw501["CCC"]["picco_anno"], _fw501["CCC"]["meta_entro"]) == (3, 3)
+      and (_fw501["BB"]["picco_anno"], _fw501["BB"]["meta_entro"]) == (3, 5)
+      and (_fw501["BBB"]["picco_anno"], _fw501["BBB"]["meta_entro"]) == (2, 3) and _meta_ok)
+def _ra501(z=None, settore="Technology", **st):
+    s = dict(st)
+    if z is not None:
+        s["altman_z"] = z
+    return {"ticker": "TST", "sector": settore, "stats": s}
+_a501 = CR.altman_rischio(_ra501(0.89, altman_al="2026-08-31", altman_base="trimestrale: x",
+                                 altman_x=[0.01, -0.05, 0.08, 0.20]))
+check("v501 Altman: Z'' 0,89 → zona di PERICOLO, rating equivalente B, frequenze 2,84 / 17,16 / 27,93 / 36,50 a 1, 3, 5 "
+      "e 10 anni; gli intermediari non si leggono; senza punteggio n.d.; fuori scala detto: " + str(_a501),
+      _a501["zona"] == "PERICOLO" and _a501["bre"] == "B" and _a501["riga"] == "B"
+      and _a501["pd"] == {1: 2.84, 3: 17.16, 5: 27.93, 10: 36.50} and abs(_a501["em"] - 4.14) < 1e-9
+      and _a501["debole"]["termine"] == CR.TERMINI_ALTMAN[1]
+      and CR.altman_rischio(_ra501(0.89, settore="Financial Services"))["stato"] == "non applicabile"
+      and CR.altman_rischio(_ra501())["stato"] == "n.d."
+      and CR.altman_rischio(_ra501(altman_fuori_scala=33.81))["stato"] == "fuori scala"
+      and CR.altman_rischio(_ra501(2.0))["zona"] == "GRIGIA" and CR.altman_rischio(_ra501(2.7))["zona"] == "SICUREZZA"
+      and CR.altman_rischio(_ra501(1.1))["zona"] == "GRIGIA")
+_ra1 = CR.riga_altman(_a501)
+_ra2 = CR.riga_altman(CR.altman_rischio(_ra501(6.1)))
+_ra3 = CR.riga_altman(CR.altman_rischio(_ra501(-4.0)))
+check("v501 la riga di Altman: zona, base, rating equivalente, frequenze per orizzonte, la finestra del rischio, il "
+      "termine piu' debole — e sui riacquisti di azioni la penalizzazione detta; il rischio trascurabile e CC/D senza riga "
+      "si dicono; la base mancante si dice",
+      "zona di PERICOLO (sotto 1,1)" in _ra1 and "trimestrale: x" in _ra1 and "rating equivalente B " in _ra1
+      and "2,8% a 1 anno, 17,2% a 3, 27,9% a 5, 36,5% a 10" in _ra1
+      and "rischio annuo massimo nel 4° anno" in _ra1 and "entro il 4° anno" in _ra1
+      and "utili non distribuiti NEGATIVI con un EBIT positivo" in _ra1
+      and "TRASCURABILE" in _ra2 and "base del bilancio non dichiarata" in _ra2
+      and "gia' in procedura" in _ra3 and "rating equivalente CC/D" in _ra3, " || ".join([_ra1, _ra2, _ra3]))
+
+# --- CDS: probabilita' implicite e finestre ---
+_pd501 = CR.pd_cds(1121, 0.4)
+_lam501 = 0.1121 / 0.6
+check("v501 CDS: l'insolvenza implicita neutrale al rischio e' 1 - e^(-lambda·t) con lambda = spread/(1 - recupero); "
+      "cresce con l'orizzonte; dati fuori dominio non danno numeri",
+      all(abs(_pd501[t] - (1 - math.exp(-_lam501 * t)) * 100) < 1e-9 for t in (1, 3, 5))
+      and _pd501[1] < _pd501[3] < _pd501[5] and abs(_pd501[1] - 17.04) < 0.01
+      and CR.pd_cds(None, 0.4) is None and CR.pd_cds(100, 1.0) is None and CR.pd_cds(-5, 0.4) is None)
+def _fin501(e, n=5, stato="misurato"):
+    return {"stato": stato, "n": n, "da": "2026-10-19", "a": "2026-10-26", "eccesso_pct": e, "nome_pct": e,
+            "indice_pct": 0.0, "indice": "HY"}
+_az_ok = {"stato": "misurato", "mercato": "QQQ", "titolo_pct": 1.0, "mercato_pct": 0.5, "eccesso_pct": 0.5}
+_az_giu = {"stato": "misurato", "mercato": "QQQ", "titolo_pct": -4.0, "mercato_pct": 0.5, "eccesso_pct": -4.5}
+_vf = lambda *a, **k: CR.valuta_finestra(*a, **k)
+check("v501 la finestra: OLTRE la soglia (stretto, come la prova di tenuta) e' RINCARO, oltre la soglia in giu' CALO; "
+      "DIVERGENZA se il titolo negli stessi giorni non fa peggio di QQQ, 'concordano' se ha fatto peggio; anomalo dal 95° "
+      "percentile del nome anche sotto la soglia; storico corto e buco detti",
+      _vf(_fin501(15.1), 15.0, _az_ok)["verso"] == "RINCARO" and _vf(_fin501(15.0), 15.0)["verso"] == "entro"
+      and _vf(_fin501(-15.1), 15.0)["verso"] == "CALO"
+      and _vf(_fin501(16.0), 15.0, _az_ok)["divergenza"] == "DIVERGENZA"
+      and _vf(_fin501(16.0), 15.0, _az_giu)["divergenza"] == "concordano"
+      and _vf(_fin501(16.0), 15.0)["divergenza"] == "non misurabile"
+      and "divergenza" not in _vf(_fin501(5.0), 15.0, _az_ok)
+      and _vf(_fin501(5.0), 15.0, _az_ok, {"finestre": 70, "percentile": 96})["anomalo"] is True
+      and _vf(_fin501(5.0), 15.0, _az_ok, {"finestre": 70, "percentile": 96})["divergenza"] == "DIVERGENZA"
+      and _vf(_fin501(-5.0), 15.0, None, {"finestre": 70, "percentile": 96})["anomalo"] is False
+      and _vf({"stato": "storico corto", "giorni": 3, "servono": 6, "n": 5}, 15.0)["stato"] == "non ancora in funzione"
+      and _vf({"stato": "buco", "perche": "x", "n": 5}, 15.0)["stato"] == "non misurabile"
+      and _vf(None, 15.0)["stato"] == "n.d.")
+_cq501 = {"stato": "quotato", "pb": 1121.0, "indicativo": False, "finestra5": _fin501(18.0), "finestra": _fin501(25.0, 21),
+          "azione": {"finestra5": _az_ok, "finestra": _az_giu}, "rango5": {"finestre": 12, "minimo": 60}}
+_v501 = CR.valuta_cds(_cq501)
+check("v501 valuta_cds: la settimana con la soglia rapida e il suo lato azionario, il mese con la soglia di tenuta e il "
+      "suo — ciascuna finestra coi SUOI giorni; un nome non quotato non ha valutazione",
+      _v501["rapida"]["soglia"] == CR.SOGLIA_RAPIDA and _v501["mese"]["soglia"] == CR.SOGLIA_MESE
+      and _v501["rapida"]["divergenza"] == "DIVERGENZA" and _v501["mese"]["divergenza"] == "concordano"
+      and CR.valuta_cds({"stato": "assente"}) is None and CR.valuta_cds(None) is None)
+_rc501 = CR.riga_credito_cds({"cds": _cq501}, {"recupero": 0.4})
+check("v501 la riga del CDS: insolvenza implicita per orizzonte, la settimana e il mese con nome, indice, eccesso e il "
+      "titolo contro QQQ, e la DIVERGENZA detta; 'non ancora in funzione' coi giorni (singolare e plurale): " + _rc501,
+      "17,0% a 1 anno, 42,9% a 3, 60,7% a 5" in _rc501 and "RINCARO IMPROVVISO" in _rc501
+      and "ALLARGAMENTO" in _rc501 and "⚠ DIVERGENZA" in _rc501 and "concordano" in _rc501
+      and "titolo +1,0% contro QQQ +0,5%" in _rc501
+      and "(1 giorno raccolto su 22)" in CR.riga_credito_cds({"cds": {**_cq501, "finestra": {"stato": "storico corto",
+                                                            "giorni": 1, "servono": 22, "n": 21}}}, {"recupero": 0.4})
+      and CR.riga_credito_cds({"cds": {"stato": "assente"}}) is None)
+
+# --- debito ---
+_rd501 = {"ticker": "TST", "sector": "Technology",
+          "combustione": {"debito": 51.6e9, "valuta": "USD", "bilancio_al": "2026-06-30"},
+          "credito": {"debito_corrente": 7.5e9, "debito_lungo": 27.6e9, "oneri_trim": [310e6, 387e6, 536e6, 640e6],
+                      "copertura": -0.03, "oneri_var_4trim_pct": 106.1, "valuta": "USD"}}
+_x501 = {"deposito": {"forma": "10-Q", "data": "2026-08-12"},
+         "scadenze": {"al": "2026-06-30", "forma": "10-Q", "valuta": "USD",
+                      "voci": {"resto_esercizio": 2e9, "anno_2": 6e9, "anno_3": 8e9, "oltre_5": 4e9}},
+         "tasso": {"valore_pct": 9.1, "al": "2026-06-30", "voce": "LongTermDebtWeightedAverageInterestRate"},
+         "equo": {"rapporto_pct": 92.5, "al": "2026-06-30"}, "derivati_tassi": {"voci": [], "n": 0}}
+_db501 = CR.riga_debito(_rd501, _x501, (5.5e9, "liquidita'", "x"), ())
+check("v501 la riga del debito: i FINANZIAMENTI (senza leasing) come base di quota corrente e costo, i leasing detti a "
+      "parte; la quota corrente contro la liquidita'; il costo dall'ULTIMO trimestre annualizzato; dai 10-Q le scadenze in "
+      "quote, il tasso, il valore di mercato, i derivati (anche quando non ci sono): " + _db501,
+      "debito finanziario 35,1 mld USD (a breve 7,5 mld USD, a lungo 27,6 mld USD" in _db501
+      and "con i leasing 51,6 mld USD" in _db501 and "21,4% dei finanziamenti" in _db501
+      and "NON copre la quota corrente" in _db501 and f"costo APPROSSIMATO {CR._n(640e6 * 4 / 35.1e9 * 100, 1)}%" in _db501
+      and "10% nel resto dell'esercizio, 30% nel 2° anno, 40% nel 3°, 20% oltre il 5°" in _db501
+      and "tasso medio ponderato dichiarato 9,10%" in _db501 and "il 92,5% del valore di carico" in _db501
+      and "nessuna voce XBRL non dimensionale li nomina" in _db501)
+_rt501 = {v: CR.riga_tasso({"valore_pct": 4.25, "al": "2026-06-30", "voce": v}) for v in
+          ("LongTermDebtWeightedAverageInterestRate", "DebtWeightedAverageInterestRate",
+           "DebtInstrumentInterestRateEffectivePercentage", None)}
+check("v501 l'etichetta del tasso segue la VOCE (v240, v405): le due medie ponderate si chiamano media e dicono di quale "
+      "debito; il tasso effettivo di uno strumento NON si chiama media e dice che la voce non nomina lo strumento; senza "
+      "voce non si afferma una media; senza tasso lo si dice: " + str(_rt501),
+      _rt501["LongTermDebtWeightedAverageInterestRate"].startswith("tasso medio ponderato dichiarato 4,25% (debito a lungo")
+      and _rt501["DebtWeightedAverageInterestRate"].startswith("tasso medio ponderato dichiarato 4,25% (debito complessivo")
+      and "medio" not in _rt501["DebtInstrumentInterestRateEffectivePercentage"]
+      and "UNO strumento" in _rt501["DebtInstrumentInterestRateEffectivePercentage"]
+      and "non e' la media del debito" in _rt501["DebtInstrumentInterestRateEffectivePercentage"]
+      and "medio" not in _rt501[None] and "non e' detto che sia la media" in _rt501[None]
+      and all("30/06/2026" in v for v in _rt501.values())
+      and CR.riga_tasso(None).startswith("tasso medio ponderato non dichiarato")
+      # il collegamento ESEGUITO (v483): la riga del debito stampa l'etichetta della voce, non una sua
+      and "tasso effettivo di UNO strumento dichiarato 4,25%" in CR.riga_debito(
+          _rd501, {**_x501, "tasso": {"valore_pct": 4.25, "al": "2026-06-30",
+                                      "voce": "DebtInstrumentInterestRateEffectivePercentage"}},
+          (5.5e9, "liquidita'", "x"), ()))
+_db501b = CR.riga_debito({**_rd501, "credito": {**_rd501["credito"], "debito_corrente": None,
+                                                "oneri_trim": [124e6, 74e6, 32e6, 0]}}, None, (1e9, "liquidita'", "x"), ())
+check("v501 la riga del debito: un trimestre senza oneri non e' un costo zero, una quota a breve assente non e' zero, i "
+      "bilanci SEC non ancora letti e gli emittenti esteri si dicono, un intermediario non si legge",
+      "costo n.d." in _db501b and "a breve n.d." in _db501b and "non ancora letti" in _db501b
+      and "emittente estero" in CR.riga_debito({**_rd501, "ticker": "SKHY"}, None, None, ("SKHY",))
+      and "non significativa" in CR.riga_debito({**_rd501, "sector": "Financial Services"}))
+
+# --- segnali e sintesi ---
+_rs501 = {**_rd501, "cds": _cq501, "stats": {"altman_z": 0.5}}
+_sg501 = CR.segnali(_rs501, None, (5.5e9, "liquidita'", "x"))
+check("v501 i segnali: EVENTI (rincaro della settimana, allargamento del mese, la divergenza dove c'e') e CONDIZIONI "
+      "(Altman in pericolo, quota corrente oltre la liquidita'); la sintesi li elenca col ruolo, e il vuoto lo dice",
+      [t for t, _ in _sg501].count("evento") == 3 and [t for t, _ in _sg501].count("condizione") == 2
+      and any("DIVERGENZA credito-azione (settimana)" in x for _, x in _sg501)
+      and not any("DIVERGENZA credito-azione (mese)" in x for _, x in _sg501)
+      and CR.sintesi([]) == ["SEGNALI DEL CREDITO — eventi (si muovono coi prezzi): nessuno",
+                             "SEGNALI DEL CREDITO — condizioni (cambiano coi bilanci): nessuna"]
+      and "TST [POSIZIONE] RINCARO IMPROVVISO" in CR.sintesi([("TST", "POSIZIONE", _sg501)])[0]
+      and CR.segnali({**_rs501, "sector": "Financial Services"}, None, (5.5e9, "liquidita'", "x"))[-1][0] == "evento")
+
+# --- collegamenti ESEGUITI (v483): schede, brief, pagina ---
+_dati501 = {"updated_at": "2026-10-18T12:00:00Z",
+            "macro": {"cds": {"recupero": 0.4, "storia": {"giorni": 30}, "data": "2026-10-26"},
+                      "debito_sec": {"per_titolo": {"TST": _x501}, "in_attesa": [], "errori": {}, "budget": 10,
+                                     "senza_10q": []}},
+            "watchlist": [_rs501]}
+_out501 = SP.genera(_dati501, ["TST"], [])
+check("v501 collegamento: le schede ESEGUITE portano l'intestazione della salute del credito, i SEGNALI in testa e per il "
+      "nome le righe del CDS, di Altman e del debito coi dati dei bilanci SEC",
+      "SALUTE DEL CREDITO" in _out501 and "SEGNALI DEL CREDITO — eventi" in _out501
+      and "TST [POSIZIONE] RINCARO IMPROVVISO" in _out501
+      and "  credito (CDS): " in _out501 and "  Altman Z'' 0,50" in _out501 and "  debito: debito finanziario" in _out501
+      and "dal 10-Q depositato il 12/08/2026" in _out501
+      and 0 <= _out501.find("SEGNALI DEL CREDITO") < _out501.find("\nTST [POSIZIONE] "), _out501[:600])
+_tmpd501 = Path(_tf.mkdtemp()) / "data.json"
+_tmpd501.write_text(_json.dumps(_dati501), encoding="utf-8")
+_cr501 = _bf.credito_dalla_pipeline(["TST", "ALTRO"], percorso=str(_tmpd501))
+_cr501ko = _bf.credito_dalla_pipeline(["TST"], percorso=str(_tmpd501) + ".manca")
+check("v501 il brief: gli EVENTI del credito (non le condizioni di bilancio, che cambiano coi trimestri) dei nomi del "
+      "brief, coi nomi che hanno un CDS; un data.json che manca si dice",
+      [tk for tk, _ in _cr501["eventi"]] == ["TST", "TST", "TST"] and _cr501["con_cds"] == ["TST"]
+      and not any("Altman" in t for _, t in _cr501["eventi"]) and _cr501ko["stato"].startswith("data.json non leggibile")
+      and "non e' 'nessun evento'" in "\n".join(_bf.righe_credito(_cr501ko)))
+_dati501b = dict(_dati470); _dati501b["credito"] = _cr501
+_t501 = _bf.componi("pomeriggio", _dati501b)
+_pag501 = dict(_pag470); _pag501["credito"] = _cr501
+_h501 = _pagmod470.genera(_pag501)
+check("v501 collegamento: main passa il credito alla resa, e il testo del brief e la pagina portano lo STESSO blocco",
+      "cr = credito_dalla_pipeline(tickers)" in _corpo_di(_BRIEF_CODICE, "main")
+      and '"credito": cr' in _corpo_di(_BRIEF_CODICE, "main")
+      and "CREDITO — i CDS dei tuoi nomi" in _t501 and "TST    RINCARO IMPROVVISO" in _t501
+      and "Credito — i CDS dei tuoi nomi" in _h501 and "RINCARO IMPROVVISO del CDS (settimana)" in _h501)
+_stb501 = _bf.righe_credito({"stato": "ok", "eventi": [], "con_cds": ["A"], "giorni": 3,
+                             "servono": {"finestra5": 6, "finestra": 22}})
+check("v501 il brief senza eventi: lo dice, e finche' lo storico non basta dice che il silenzio NON e' 'nessun rincaro'",
+      "nessun evento sui 1 nomi" in "\n".join(_stb501) and "la settimana si misura da 6 giorni" in "\n".join(_stb501)
+      and "NON vuol dire 'nessun rincaro'" in "\n".join(_stb501))
+
+# --- una soglia, un posto; le convenzioni rilette dal libro ---
+_lb501 = (Path(__file__).resolve().parent.parent / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_sez501 = _lb501.split("## 1novies.")[1].split("\n## ")[0] if "## 1novies." in _lb501 else ""
+_num501 = lambda pat: float(re.search(pat, _sez501).group(1).replace(",", ".")) if re.search(pat, _sez501) else None
+check("v501 una soglia, un posto: la prova di tenuta usa la soglia del mese di credito.py, e il codice non ne riscrive il "
+      "numero",
+      NL.SOGLIA_CDS is CR.SOGLIA_MESE and "SOGLIA_CDS = 20" not in Path("scripts/numeri_libro.py").read_text(encoding="utf-8"))
+check("v501 le convenzioni del monitor rilette da LIBRO.md §1novies: 5 giorni oltre il 15%, 21 oltre il 20%, il 95° "
+      "percentile da 60 settimane, Altman 1,1 / 2,6 / +3,25",
+      _num501(r"in \*\*5\*\* giorni di compensazione raccolti di oltre il \*\*(\d+)%\*\*") == CR.SOGLIA_RAPIDA
+      and _num501(r"in \*\*21\*\* giorni oltre il \*\*(\d+)%\*\*") == CR.SOGLIA_MESE
+      and _num501(r"dal \*\*(\d+)°\*\* percentile") == CR.PERCENTILE_ANOMALO
+      and _num501(r"da quando ne bastano (\d+)") == UD.CDS_RANGO_MIN
+      and _num501(r"zona di pericolo sotto \*\*(\d,\d)\*\*") == CR.ALTMAN_PERICOLO
+      and _num501(r"di sicurezza sopra \*\*(\d,\d)\*\*") == CR.ALTMAN_SICUREZZA
+      and _num501(r"\*\*\+(\d,\d+)\*\* = punteggio") == CR.ALTMAN_COSTANTE_EM)
+_fa501 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v501 il formato e il censimento: il blocco SALUTE DEL CREDITO nelle schede e nella risposta, il registro delle "
+      "richieste, e la libreria dichiarata in /aggiorna",
+      "**SALUTE DEL CREDITO**" in _fa501 and "**La salute del credito**" in _fa501
+      and "la salute del credito di ogni nome" in " ".join(_fa501.split("Richieste del CEO rese strutturali")[1].split())
+      and "`scripts/credito.py` non è un passo di questo comando" in (Path(__file__).resolve().parent.parent / ".claude"
+                                                                      / "commands" / "aggiorna.md").read_text(encoding="utf-8"))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

@@ -233,7 +233,10 @@ posizione e ogni ordine attivo. Convenzioni scelte da Claude e dichiarate come t
   stime): l'8-K con item 2.02 da solo non basta, perché una società ne deposita anche fuori dal ciclo (il 02/10/2026
   Tesla ci ha depositato le consegne) e gli emittenti esteri non lo hanno. L'**ora** viene dal deposito su SEC EDGAR
   accettato fra le 16:00 di New York del giorno prima e la fine del giorno dopo (l'8-K, o il primo 6-K di un emittente
-  estero), letta dalla pipeline: **prima delle 09:30 muove la seduta stessa, dalle 16:00 la successiva**, in mezzo la
+  estero), letta dalla pipeline. ⚠ EDGAR scrive quell'ora in **UTC** (misurato il 18/10 su Oracle: 20:16:50Z
+  nell'archivio, «Accepted 16:16:50» nell'indice del deposito) e si converte col fuso di New York, mai con uno scarto
+  scritto a mano (v501: la v500 la leggeva come ora di New York). **Prima delle 09:30 muove la seduta stessa, dalle
+  16:00 la successiva**, in mezzo la
   seduta stessa (a seduta aperta: la sua barra mescola il prima e il dopo). Senza l'ora, la seduta più scambiata fra il
   giorno del comunicato e il successivo — dichiarato ogni volta, col perché.
 - **VWAP**: dalle barre giornaliere, prezzo tipico (massimo + minimo + chiusura) / 3 pesato sui volumi, dall'ancora
@@ -703,6 +706,56 @@ dice un'altra data vince l'emittente, con quella di Nasdaq scritta accanto. Una 
 | Nome | Conti | Fonte | Depositato |
 |---|---|---|---|
 | SKHY | 2026-10-28 | 6-K su SEC EDGAR: teleconferenza alle 9:00 di Seul, la sera del 27/10 a New York | 2026-10-14 |
+
+## 1novies. SALUTE DEL CREDITO — monitor deciso dal CEO il 18/10/2026 (v501)
+
+Richieste del CEO, testuali: *"Analizza e monitora la salute finanziaria delle aziende presenti nel mio portafoglio e
+nella mia watchlist … per anticipare eventuali impatti negativi sulle azioni"* — rendimenti e spread delle obbligazioni,
+CDS a 5 anni con un avviso sui *"rincari anomali o improvvisi"*, il debito dai 10-Q e 10-K — *"e rendilo strutturale per
+individuare ogni volta che rilevi una divergenza in cui il mercato obbligazionario o dei CDS prezza un rischio di
+liquidità, rifinanziamento o fallimento che non si è ancora riflesso nel prezzo delle azioni"*; e *"Monitora anche
+Altman Z-Score fornendo la % di rischio del parametro ed il range temporale entro il quale può avvenire il potenziale
+default"*.
+
+**È INFORMAZIONE**: nessuna di queste letture è un colore del semaforo o una vendita. Il CDS del mese era già una
+prova della tenuta (§1sexies) e resta tale, con la stessa soglia. Se una divergenza debba diventare una prova lo
+decide il CEO.
+
+Le soglie sono **convenzioni del 18/10/2026** (v240), stanno in `scripts/credito.py` e un gate le rilegge da qui:
+
+| Lettura | Regola | Misura |
+|---|---|---|
+| **Rincaro improvviso** | lo spread del CDS cresce in **5** giorni di compensazione raccolti di oltre il **15%** PIÙ dell'indice CDX della stessa cedola | `cds.finestra5` (pipeline) |
+| **Allargamento** | in **21** giorni oltre il **20%** — la stessa soglia della prova di tenuta, una soglia, un posto | `cds.finestra` |
+| **Rincaro anomalo** | sotto la soglia, ma dal **95°** percentile delle settimane già raccolte del nome stesso — da quando ne bastano 60 | `cds.rango5` |
+| **Divergenza** | un rincaro (o un allargamento) mentre il titolo, negli STESSI giorni, non fa peggio di QQQ: il credito prezza un rischio che l'azione non sconta ancora | `cds.azione` |
+| **Altman** | Z'' della pipeline sul bilancio più recente (trimestrale, con l'EBIT degli ultimi 4 trimestri), **+3,25** = punteggio per i mercati emergenti; zona di pericolo sotto **1,1**, di sicurezza sopra **2,6** | `stats.altman_*` |
+| **Scadenze oltre la liquidità** | la quota corrente dei finanziamenti supera la liquidità: quel debito va rinnovato o rimborsato col flusso di cassa | `credito`, `combustione` |
+
+- **La % di rischio e il range temporale di Altman** vengono dalle tabelle pubblicate da Altman (presentazione del
+  6/2/2019, CFA Society India): il punteggio si confronta con le **mediane per rating** (colonna più recente: la riga
+  CC/D sui 94 fallimenti del 2010-2013), e la riga di quel rating nei **tassi di mortalità per rating all'emissione**
+  (S&P, 1971-2018, 3.454 emissioni) dà la frequenza storica d'insolvenza a 1, 3, 5 e 10 anni, l'anno col rischio annuo
+  più alto e l'anno entro cui cade metà delle insolvenze dei primi dieci. **Non è una previsione sul nome**: è cosa è
+  successo alle obbligazioni con quel rating. AAA/AA+ si legge sulla riga AA (scelta prudente); CC/D non ha una riga.
+- **Altman non si applica** agli intermediari finanziari (settore della pipeline "Financial Services": banche,
+  gestori, e — perché il campo è il settore intero — anche Visa e Mastercard, che banche non sono). Penalizza chi
+  riacquista molte azioni (utili non distribuiti negativi con un EBIT positivo: la riga lo dice).
+- **Le probabilità implicite nel CDS** sono neutrali al rischio (recupero 40%, intensità costante): più alte della
+  frequenza storica, si leggono nel tempo e non contro Altman.
+- **Obbligazioni sul secondario, asset swap spread e Z-spread: non disponibili gratis in forma automatizzabile.**
+  TRACE di FINRA li ha, ma l'API vuole credenziali e il dato di fine giornata un contratto; il sito di FINRA li mostra
+  per la consultazione. Al loro posto il CDS dove esiste, e il **valore di mercato del debito** che la società
+  dichiara nei 10-Q e 10-K (fatti XBRL, `data/debito_sec.json`): sotto 100 il mercato chiede più delle cedole, e il dato
+  non separa i tassi saliti dal credito peggiorato.
+- **Il debito dai bilanci SEC** (fatti XBRL non dimensionali): scadenze del capitale anno per anno, tasso medio
+  ponderato dichiarato, valore di mercato contro carico, linee di credito non utilizzate, carta commerciale, derivati
+  sui tassi. Si legge solo dopo un 10-Q o un 10-K nuovo, al massimo 10 per run; gli emittenti esteri (20-F, 6-K) non
+  sono letti, e si dice. Le cedole per obbligazione e i nozionali degli swap per tipo sono dichiarati per strumento:
+  qui non si vedono, e la loro assenza non dice che non ci siano.
+- **Dove esce**: il blocco SALUTE DEL CREDITO di `schede_progetto.py` (segnali in testa, poi nome per nome) e gli
+  EVENTI del CDS nel brief delle due letture del giorno; le condizioni di bilancio restano nell'analisi, perché
+  cambiano coi trimestri e un avviso che suona tutte le mattine non avvisa.
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

@@ -34,6 +34,7 @@ from pathlib import Path
 RADICE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RADICE / "scripts"))
 import brief  # noqa: E402
+import credito  # noqa: E402  — v501: la salute del credito (Altman, CDS, debito dai bilanci)
 
 CANALI = (("mercato", "mercato"), ("settore", "comparto"), ("tassi", "tassi"), ("dollaro", "dollaro"))
 
@@ -532,7 +533,22 @@ def riga_cds(r, meta=None):
     return " · ".join(pz)
 
 
-def scheda(tk, ruolo, righe, sec, meta_cds=None):
+def righe_credito(r, meta_cds=None, dsec=None):
+    """v501 — la salute del credito del nome (richiesta del CEO del 18/10/2026): CDS oltre il livello, Altman con la
+    frequenza storica per orizzonte, debito dai bilanci. La lettura vive in scripts/credito.py; qui si mette in fila."""
+    tk = r.get("ticker")
+    ds = dsec or {}
+    x = (ds.get("per_titolo") or {}).get(tk)
+    out = []
+    cc = credito.riga_credito_cds(r, meta_cds)
+    if cc:
+        out.append(cc)
+    out.append(credito.riga_altman(credito.altman_rischio(r)))
+    out.append(credito.riga_debito(r, x, liquidita_societa(r.get("combustione")), ds.get("senza_10q") or ()))
+    return out
+
+
+def scheda(tk, ruolo, righe, sec, meta_cds=None, dsec=None):
     r = righe.get(tk)
     if r is None:
         return [f"{tk} [{ruolo}] — NON E' NELLA PIPELINE: nessun dato del progetto su questo nome "
@@ -555,6 +571,7 @@ def scheda(tk, ruolo, righe, sec, meta_cds=None):
     if ferma:
         out.append("  " + testo_tabella_ferma(ferma))
     out.append("  " + riga_cds(r, meta_cds))       # v497 — il credito prezzato dal mercato, nome per nome
+    out.extend("  " + x for x in righe_credito(r, meta_cds, dsec))     # v501 — la salute del credito
     return out
 
 
@@ -573,6 +590,19 @@ def genera(dati, pos, sorv, filtro=None):
     out.append(riferimento_valutazione(dati.get("macro")))      # v492 — una volta per blocco (v407)
     meta_cds = (dati.get("macro") or {}).get("cds")
     out.append(riferimento_cds(dati.get("macro")))              # v497 — una volta per blocco (v407)
+    # v501 — la salute del credito: l'intestazione una volta, e in testa i SEGNALI di tutti i nomi, perche' un rincaro
+    #   improvviso o una divergenza non devono aspettare di essere trovati scorrendo sessanta schede
+    dsec = (dati.get("macro") or {}).get("debito_sec")
+    out.append(credito.riferimento_credito(dati.get("macro")))
+    _voci = []
+    for _gr, _ru in ((pos, "POSIZIONE"), (sorv, "SORVEGLIATO")):
+        for _tk in _gr:
+            if (filtro and _tk not in filtro) or _tk not in righe:
+                continue
+            _r = righe[_tk]
+            _x = ((dsec or {}).get("per_titolo") or {}).get(_tk)
+            _voci.append((_tk, _ru, credito.segnali(_r, _x, liquidita_societa(_r.get("combustione")))))
+    out.extend(credito.sintesi(_voci))
     # il BTP non ha una scheda (e' in euro): il suo CDS e' quello sovrano, e sta qui
     for b in (dati.get("portfolio") or []):
         if isinstance(b, dict) and b.get("cds"):
@@ -585,7 +615,7 @@ def genera(dati, pos, sorv, filtro=None):
             if tk not in righe:
                 mancanti.append(tk)
             out.append("")
-            out.extend(scheda(tk, ruolo, righe, sec, meta_cds))
+            out.extend(scheda(tk, ruolo, righe, sec, meta_cds, dsec))
     if mancanti:
         out.append("")
         out.append(f"⚠ {len(mancanti)} {'nome' if len(mancanti) == 1 else 'nomi'} senza dati del progetto: {', '.join(mancanti)}")

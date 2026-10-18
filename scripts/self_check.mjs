@@ -153,7 +153,8 @@ const SUITE = [
   /* v496: 250 punti di chiamata (+14 sul file storico FINRA: variazione annua per data, percentile, i due canali) -> 240 */
   /* v498: 275 punti di chiamata (+6 sulla finestra di un mese del CDS, al netto dell'indice) -> 265 */
   /* v500: 278 punti di chiamata (+3 sull'ora dei depositi dei risultati: forme, finestra, collegamento) -> 270 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 270, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v501: 292 punti di chiamata (+14 su Altman trimestrale, CDS della settimana col lato azionario, debito XBRL) -> 280 */
+  { file: "test_update_data.py", cmd: "python3", minimo: 280, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -166,7 +167,8 @@ const SUITE = [
   /* v496: 592 punti di chiamata (+33 su put/call, scadenze, CFTC, bitcoin e la leva annua nel semaforo) -> 575 */
   /* v498: 609 punti di chiamata (+10 sulla prova del CDS nella tenuta: soglia, stati, esito, resa) -> 600 */
   /* v500: 699 punti di chiamata (+45 su VWAP dai conti, debug del 18/10, misura dei segnali) -> 685 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 685, firma: /\d+\/\d+ CHECK OK/ },
+  /* v501: 721 punti di chiamata (+22 sulla salute del credito: Altman, CDS, debito, segnali, brief) -> 705 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 705, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

@@ -699,9 +699,11 @@ def ore_depositi(sub, oggi=None, giorni=130, massimo=30):
     La data del comunicato la dichiara un'altra fonte (Nasdaq, letta dall'analisi): qui c'e' solo l'ora, per gli
     8-K con item 2.02 e, per gli emittenti esteri, per tutti i 6-K — che non hanno item: quale sia il comunicato dei
     conti si decide accanto alla data dichiarata, mai indovinandolo da qui (v399, v448).
-    ⚠ L'ora si pubblica come EDGAR la scrive (acceptanceDateTime, troncata ai secondi) e si legge come ora di New
-    York, l'orologio di EDGAR. Anche se la 'Z' della fonte fosse un vero UTC, prima dell'apertura e dopo la chiusura
-    resterebbero tali: cambierebbe solo un comunicato a seduta aperta dopo mezzogiorno, che e' raro.
+    ⚠⚠ v501 — L'ora si pubblica come EDGAR la scrive (acceptanceDateTime, troncata ai secondi), ed e' UTC: la 'Z'
+    della fonte e' un UTC VERO. Misurato il 18/10/2026 sull'8-K di Oracle del 10/09: il JSON scrive 20:16:50Z, l'indice
+    del deposito "Accepted 2026-09-10 16:16:50" (ora di New York). La v500 la dichiarava ora di New York, e questa
+    docstring si rassicurava che "prima dell'apertura e dopo la chiusura resterebbero tali": falso — un deposito alle
+    09:04 di New York (13:04Z) si leggeva a seduta aperta. Chi legge converte col fuso (rotazione.ancora_conti).
     Nessuna rete qui dentro: riceve la risposta di EDGAR gia' letta dal giro del calendario."""
     rec = ((sub or {}).get("filings") or {}).get("recent") or {}
     forme = rec.get("form") or []
@@ -1443,6 +1445,265 @@ def _somma_trimestri(df, voce, n=4):
     return float(usati.sum()), len(usati), str(df.columns[0])[:10]
 
 
+
+
+# ═══ v501 — IL DEBITO DAI BILANCI DEPOSITATI (SEC EDGAR, XBRL) ═════════════════════════════════════════════════════
+# Richiesta del CEO del 18/10/2026: per ogni societa' «il debito totale in essere, il costo effettivo del debito (tassi
+# delle cedole contrattuali), le scadenze principali a breve termine e l'eventuale uso di derivati per coprirsi dal
+# rischio tassi», dai 10-Q e 10-K. Debito totale, quota corrente e oneri li porta gia' yfinance (combustione, credito);
+# qui si leggono dai fatti XBRL DEPOSITATI le voci che yfinance non ha: le scadenze del capitale anno per anno, il
+# tasso dichiarato (una media ponderata del debito, o in mancanza il tasso effettivo di UNO strumento: la voce si
+# pubblica accanto al valore e la resa la nomina, credito.riga_tasso), il valore di mercato del debito contro il suo
+# valore di carico, le linee di credito non utilizzate, la carta commerciale, i derivati sui tassi.
+# ⚠ companyfacts porta solo i fatti NON dimensionali: una voce dichiarata per strumento (una cedola per obbligazione, i
+#   nozionali degli swap per tipo) qui non si vede, e la sua assenza NON dice che la societa' non ce l'ha (v406).
+# ⚠ Un companyfacts pesa qualche megabyte (Oracle 4 MB): si legge SOLO quando la societa' ha depositato un 10-Q o un
+#   10-K nuovo, e al massimo XBRL_PER_RUN per run; il resto aspetta il run dopo, dichiarato. La cache sta nel repo
+#   (data/debito_sec.json) come lo storico dei CDS: chi entra in watchlist la trova al giro dopo.
+# ⚠ Gli emittenti esteri (20-F, 6-K) non depositano 10-Q/10-K e usano un'altra tassonomia (IFRS): dichiarati, non letti.
+DEBITO_SEC = ROOT / "data" / "debito_sec.json"
+XBRL_PER_RUN = 10
+XBRL_FORME = ("10-K", "10-Q", "10-K/A", "10-Q/A")
+XBRL_SCADENZE = (
+    ("entro_12_mesi", "LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths"),
+    ("resto_esercizio", "LongTermDebtMaturitiesRepaymentsOfPrincipalRemainderOfFiscalYear"),
+    ("anno_2", "LongTermDebtMaturitiesRepaymentsOfPrincipalInYearTwo"),
+    ("anno_3", "LongTermDebtMaturitiesRepaymentsOfPrincipalInYearThree"),
+    ("anno_4", "LongTermDebtMaturitiesRepaymentsOfPrincipalInYearFour"),
+    ("anno_5", "LongTermDebtMaturitiesRepaymentsOfPrincipalInYearFive"),
+    ("oltre_5", "LongTermDebtMaturitiesRepaymentsOfPrincipalAfterYearFive"),
+)
+XBRL_TASSO = ("LongTermDebtWeightedAverageInterestRate", "DebtWeightedAverageInterestRate",
+              "DebtInstrumentInterestRateEffectivePercentage")
+# il valore di mercato del debito si confronta SOLO col carico della stessa voce e della stessa data (v207)
+XBRL_EQUO = (("LongTermDebtFairValue", ("LongTermDebt", "DebtInstrumentCarryingAmount")),
+             ("DebtInstrumentFairValue", ("DebtInstrumentCarryingAmount", "LongTermDebt")))
+XBRL_DERIVATI = re.compile(r"InterestRate.*(Derivative|Swap|Hedg)|(Derivative|Swap|Hedg).*InterestRate")
+
+
+def _elem(rec, chiave, i):
+    v = (rec or {}).get(chiave) or []
+    return v[i] if i < len(v) else None
+
+
+def ultimo_bilancio_sec(sub):
+    """Il 10-Q o 10-K piu' recente nella pagina 'recent' di EDGAR: {forma, data, accn, periodo}, o None per chi non
+    li deposita (gli emittenti esteri: 20-F e 6-K)."""
+    rec = ((sub or {}).get("filings") or {}).get("recent") or {}
+    for i, f in enumerate(rec.get("form") or []):
+        if f in XBRL_FORME:
+            return {"forma": f, "data": _elem(rec, "filingDate", i), "accn": _elem(rec, "accessionNumber", i),
+                    "periodo": _elem(rec, "reportDate", i)}
+    return None
+
+
+def _fatti_xbrl(facts, tag, unita=None):
+    """[(fatto, unita')] della voce us-gaap nei 10-Q/10-K: le altre forme (8-K, registrazioni) non sono bilanci."""
+    t = (((facts or {}).get("facts") or {}).get("us-gaap") or {}).get(tag) or {}
+    out = []
+    for u, lista in (t.get("units") or {}).items():
+        if unita is not None and u != unita:
+            continue
+        for f in lista or []:
+            if f.get("form") in XBRL_FORME and f.get("end") and f.get("val") is not None:
+                out.append((f, u))
+    return out
+
+
+def _piu_recente(fatti):
+    return max(fatti, key=lambda x: (str(x[0].get("end")), str(x[0].get("filed")))) if fatti else None
+
+
+def _importi(facts, tag):
+    """I fatti in valuta: in dollari se ci sono, altrimenti nell'unica valuta dichiarata (con la valuta accanto)."""
+    tutti = [x for x in _fatti_xbrl(facts, tag) if x[1] != "pure" and "/" not in x[1]]
+    usd = [x for x in tutti if x[1] == "USD"]
+    return usd or tutti
+
+
+def debito_xbrl(facts):
+    """Le voci del debito dai fatti XBRL depositati (companyfacts). Ogni voce porta la data a cui si riferisce e il
+    deposito da cui viene; una voce che la societa' non dichiara in forma non dimensionale manca, e si dice."""
+    out = {}
+    # le scadenze del capitale: tutte alla STESSA data, quella piu' recente in cui la societa' le ha dichiarate
+    sc = {k: _importi(facts, tag) for k, tag in XBRL_SCADENZE}
+    fine = max((str(f.get("end")) for v in sc.values() for f, _ in v), default=None)
+    if fine:
+        voci, dep, valuta = {}, None, None
+        for k, v in sc.items():
+            alla = [x for x in v if str(x[0].get("end")) == fine]
+            if alla:
+                f, u = max(alla, key=lambda x: str(x[0].get("filed")))
+                voci[k] = float(f["val"])
+                dep = dep or {"forma": f.get("form"), "depositato": f.get("filed")}
+                valuta = valuta or u
+        out["scadenze"] = {"al": fine, **(dep or {}), "valuta": valuta, "voci": voci}
+    for tag in XBRL_TASSO:
+        x = _piu_recente(_fatti_xbrl(facts, tag, "pure"))
+        if x and 0 < float(x[0]["val"]) < 0.3:
+            out["tasso"] = {"valore_pct": round(float(x[0]["val"]) * 100, 2), "al": str(x[0]["end"]), "voce": tag,
+                            "forma": x[0].get("form"), "depositato": x[0].get("filed")}
+            break
+    for equo, carichi in XBRL_EQUO:
+        x = _piu_recente(_importi(facts, equo))
+        if not x:
+            continue
+        for car in carichi:
+            alla = [y for y in _importi(facts, car) if str(y[0].get("end")) == str(x[0]["end"]) and y[1] == x[1]]
+            if alla:
+                y = max(alla, key=lambda z: str(z[0].get("filed")))
+                if float(y[0]["val"]) > 0:
+                    r = float(x[0]["val"]) / float(y[0]["val"])
+                    v = {"al": str(x[0]["end"]), "voci": [equo, car], "forma": x[0].get("form"),
+                         "depositato": x[0].get("filed")}
+                    # un rapporto fuori da 0,3-1,5 e' quasi certamente un confronto fra basi diverse: non si pubblica
+                    out["equo"] = ({**v, "rapporto_pct": round(r * 100, 1)} if 0.3 <= r <= 1.5
+                                   else {**v, "fuori_scala": round(r, 3)})
+                break
+        if "equo" in out:
+            break
+    x = _piu_recente(_importi(facts, "LineOfCreditFacilityRemainingBorrowingCapacity"))
+    if x:
+        out["linee_disponibili"] = {"valore": float(x[0]["val"]), "valuta": x[1], "al": str(x[0]["end"])}
+    x = _piu_recente(_importi(facts, "CommercialPaper"))
+    if x:
+        out["carta_commerciale"] = {"valore": float(x[0]["val"]), "valuta": x[1], "al": str(x[0]["end"])}
+    # i derivati sui tassi: le voci che li NOMINANO, dichiarate nell'ultimo anno di depositi
+    usg = ((facts or {}).get("facts") or {}).get("us-gaap") or {}
+    ultimo = max((str(f.get("filed")) for t in usg.values() for lista in (t.get("units") or {}).values()
+                  for f in (lista or []) if f.get("form") in XBRL_FORME), default=None)
+    der = []
+    if ultimo:
+        soglia = (datetime.fromisoformat(ultimo[:10]) - timedelta(days=400)).date().isoformat()
+        for tag, t in sorted(usg.items()):
+            if not XBRL_DERIVATI.search(tag):
+                continue
+            if any(f.get("form") in XBRL_FORME and str(f.get("filed")) >= soglia
+                   for lista in (t.get("units") or {}).values() for f in (lista or [])):
+                der.append(tag)
+    out["derivati_tassi"] = {"voci": der[:6], "n": len(der)}
+    return out
+
+
+def aggiorna_debito_sec(bilanci, get=None, percorso=DEBITO_SEC, budget=XBRL_PER_RUN, priorita=(), ua=None,
+                        oggi=None, pausa=0.15):
+    """bilanci: {tk: (cik, ultimo_bilancio_sec)} dei nomi seguiti che depositano 10-Q/10-K. Si legge companyfacts solo
+    per chi ha un deposito diverso da quello in cache, con le posizioni per prime, al massimo `budget` per run.
+    Un errore lascia la voce vecchia (dichiarata) e il nome resta da leggere al run dopo."""
+    get = get or requests.get
+    oggi = oggi or datetime.now(timezone.utc).date().isoformat()
+    try:
+        cache = json.loads(Path(percorso).read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        cache = {}
+    per = dict(cache.get("per_titolo") or {})
+    pr = {t: i for i, t in enumerate(priorita)}
+    da_leggere = [tk for tk, (_, ub) in bilanci.items()
+                  if ((per.get(tk) or {}).get("deposito") or {}).get("accn") != (ub or {}).get("accn")]
+    da_leggere.sort(key=lambda tk: (pr.get(tk, len(pr)), tk in per, tk))
+    letti, errori = [], {}
+    for tk in da_leggere[:budget]:
+        cik, ub = bilanci[tk]
+        try:
+            r = get(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json", headers=ua or {}, timeout=40)
+            r.raise_for_status()
+            per[tk] = {"cik": int(cik), "deposito": ub, "letto_il": oggi, **debito_xbrl(r.json())}
+            letti.append(tk)
+        except Exception as e:  # noqa: BLE001
+            errori[tk] = str(e)[:120]
+            if tk in per:
+                per[tk] = {**per[tk], "errore_ultimo": {"il": oggi, "errore": errori[tk]}}
+        if pausa:
+            time.sleep(pausa)          # SEC chiede meno di 10 richieste al secondo
+    if letti or errori:
+        try:
+            Path(percorso).write_text(json.dumps({"aggiornato": oggi, "per_titolo": per}, ensure_ascii=False,
+                                                 indent=1, sort_keys=True), encoding="utf-8")
+        except Exception as e:  # noqa: BLE001
+            print(f"!! debito SEC: cache non scritta ({e})", file=sys.stderr)
+    attesa = sorted(set(da_leggere[budget:]) | set(errori))
+    return {"fonte": "SEC EDGAR, fatti XBRL dei 10-Q e 10-K (companyfacts): solo fatti non dimensionali",
+            "per_titolo": {tk: per[tk] for tk in sorted(bilanci) if tk in per},
+            "letti_ora": letti, "in_attesa": attesa, "errori": errori, "budget": budget}
+
+
+# ═══ v501 — ALTMAN Z'' SUL BILANCIO PIU' RECENTE ════════════════════════════════════════════════════════════════
+# Richiesta del CEO del 18/10/2026: «Monitora anche Altman Z-Score fornendo la % di rischio del parametro ed il range
+# temporale entro il quale puo' avvenire il potenziale default». La probabilita' e la finestra si leggono nell'analisi
+# (scripts/credito.py: rating equivalente e frequenze storiche di Altman); qui si calcola il punteggio, una volta.
+
+def altman_voci(t, cred=None):
+    """(ta, tl, ca, cl, re, ebit, al, base) per altman_zpp. Dallo stato patrimoniale TRIMESTRALE piu' recente con
+    l'EBIT degli ultimi quattro trimestri — lo stesso di credito(), una derivazione sola (v161) — quando ci sono tutti
+    e quattro; altrimenti dal bilancio ANNUALE, come prima della v501, e la base lo dichiara."""
+    try:
+        bsq = t.quarterly_balance_sheet
+    except Exception:  # noqa: BLE001
+        bsq = None
+    ta, al = _riga_bilancio(bsq, "Total Assets")
+    tl, _ = _riga_bilancio(bsq, "Total Liabilities Net Minority Interest", "Total Liab")
+    c = cred or {}
+    if ta and tl and c.get("ebit_ttm") is not None and c.get("trimestri") == 4:
+        ca, _ = _riga_bilancio(bsq, "Current Assets", "Total Current Assets")
+        cl, _ = _riga_bilancio(bsq, "Current Liabilities", "Total Current Liabilities")
+        re_, _ = _riga_bilancio(bsq, "Retained Earnings")
+        return (ta, tl, ca, cl, re_, c["ebit_ttm"], al,
+                f"trimestrale: stato patrimoniale al {al}, EBIT degli ultimi 4 trimestri (conto al {c.get('conto_al')})")
+    try:
+        bs = t.balance_sheet
+    except Exception:  # noqa: BLE001
+        bs = None
+    ta, al = _riga_bilancio(bs, "Total Assets")
+    tl, _ = _riga_bilancio(bs, "Total Liabilities Net Minority Interest", "Total Liab")
+    ca, _ = _riga_bilancio(bs, "Current Assets", "Total Current Assets")
+    cl, _ = _riga_bilancio(bs, "Current Liabilities", "Total Current Liabilities")
+    re_, _ = _riga_bilancio(bs, "Retained Earnings")
+    try:
+        inc = t.income_stmt
+    except Exception:  # noqa: BLE001
+        inc = None
+    ebit, _ = _riga_bilancio(inc, "EBIT", "Operating Income", "Pretax Income")
+    return (ta, tl, ca, cl, re_, ebit, al,
+            f"annuale: bilancio dell'esercizio al {al} (i quattro trimestri non erano tutti disponibili)")
+
+
+def altman_zpp(ta_, tl_, ca_, cl_, re_, ebit, al=None, base=None):
+    """Z'' (variante NON-MANIFATTURIERI/servizi, Altman 1995 — corretta per tech/software asset-light):
+    Z'' = 6.56·WC/TA + 3.26·RE/TA + 6.72·EBIT/TA + 1.05·PATRIMONIO/TL, senza la costante 3,25 del modello per i
+    mercati emergenti (la aggiunge chi legge per il rating equivalente: scripts/credito.py).
+    NIENTE termine Sales/TA: la formula classica penalizzava a sproposito i business con pochi asset e alto
+    multiplo. Proxy fedele: tollera al massimo 1 componente mancante (pesata 0, conteggiata in altman_missing); se
+    mancano di piu' → nessun campo. Restituisce i campi delle stats, con la data del bilancio, la base e le quattro
+    componenti (v501: chi legge deve vedere QUALE termine tiene giu' il punteggio)."""
+    if not (ta_ and ta_ > 0 and tl_ and tl_ > 0):
+        return {}
+    wc = (ca_ - cl_) if (ca_ is not None and cl_ is not None) else None
+    # ⚠ X4 dello Z'' e' PATRIMONIO NETTO CONTABILE / passivita' totali (coeff. 1,05).
+    # Con `market_cap` al numeratore — che appartiene allo Z-score ORIGINALE, dove
+    # pero' il coefficiente e' 0,6 — il quarto termine domina e il punteggio misura
+    # quanto il mercato ama il titolo invece della solidita' del bilancio:
+    # misurato PLTR 326,52 · NVDA 120,18 contro uno Z'' plausibile fra -5 e +10.
+    book = ta_ - tl_
+    comp = [
+        (6.56, wc / ta_ if wc is not None else None),
+        (3.26, re_ / ta_ if re_ is not None else None),
+        (6.72, ebit / ta_ if ebit is not None else None),
+        (1.05, book / tl_),
+    ]
+    missing = sum(1 for _, x in comp if x is None)
+    if missing > 1:
+        return {}
+    z_ = round(sum(w_ * (x or 0.0) for w_, x in comp), 2)
+    meta = {"altman_al": al, "altman_base": base}
+    # lo Z'' vive fra circa -10 e +15: i cutoff sono 1,1 e 2,6. Fuori da questa
+    # banda il numero non e' "molto solido", e' un calcolo sbagliato — e non
+    # deve arrivare in pagina con un flag di rischio attaccato.
+    if -15 <= z_ <= 20:
+        return {"altman_z": z_, "altman_missing": missing, "altman_model": "Z''", **meta,
+                "altman_x": [None if x is None else round(x, 4) for _, x in comp]}
+    return {"altman_fuori_scala": z_, **meta}
+
+
 def combustione(t, mcap, buyback):
     """⚠⚠ IL RIQUADRO DELLA COMBUSTIONE — chiesto per un libro growth con nomi in perdita, dove
     conta piu' del P/E. Cassa, debito, flusso operativo, capex: da yfinance, GRATIS.
@@ -2142,66 +2403,18 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             if stats.get(_k) is not None and stats[_k] <= 0:
                 stats[_k] = None
 
-        # Altman Z''-Score (variante NON-MANIFATTURIERI/servizi, Altman 1993 — corretta per
-        # tech/software asset-light): Z'' = 6.56·WC/TA + 3.26·RE/TA + 6.72·EBIT/TA + 1.05·MVE/TL.
-        # NIENTE termine Sales/TA: la formula classica penalizzava a sproposito i business
-        # con pochi asset e alto multiplo. Proxy fedele: tollera al massimo 1 componente
-        # mancante (pesata 0, conteggiata in altman_missing); se mancano di più → n.d.
+        # Altman Z''-Score (variante NON-MANIFATTURIERI/servizi): vedi altman_zpp e altman_voci.
         # Flag di distress del mandato: < 1.81 → [RISCHIO DEFAULT] (nota: i cutoff canonici
         # dello Z'' sono 1.1/2.6, quindi 1.81 è un flag PRUDENZIALE dentro la zona grigia).
+        # ⚠⚠ v501 — dal bilancio TRIMESTRALE piu' recente, non dall'annuale: un monitor su un bilancio
+        #   vecchio di un anno non monitora niente (CRWV: l'annuale era al 31/12, il trimestrale al 30/06).
         try:
-            bs = t.balance_sheet
-            def bs_row(*names):
-                for nm in names:
-                    if nm in bs.index:
-                        v = bs.loc[nm].iloc[0]   # colonna più recente
-                        if v is not None and not pd.isna(v):
-                            return float(v)
-                return None
-            ta_ = bs_row("Total Assets")
-            tl_ = bs_row("Total Liabilities Net Minority Interest", "Total Liab")
-            ca_ = bs_row("Current Assets", "Total Current Assets")
-            cl_ = bs_row("Current Liabilities", "Total Current Liabilities")
-            re_ = bs_row("Retained Earnings")
-            ebit = None
-            try:
-                inc_z = t.income_stmt
-                for nm in ("EBIT", "Operating Income", "Pretax Income"):
-                    if nm in inc_z.index:
-                        v = inc_z.loc[nm].iloc[0]
-                        if v is not None and not pd.isna(v):
-                            ebit = float(v)
-                            break
-            except Exception:  # noqa: BLE001
-                pass
-            if ta_ and ta_ > 0 and tl_ and tl_ > 0:
-                wc = (ca_ - cl_) if (ca_ is not None and cl_ is not None) else None
-                # ⚠ X4 dello Z'' e' PATRIMONIO NETTO CONTABILE / passivita' totali (coeff. 1,05).
-                # Con `market_cap` al numeratore — che appartiene allo Z-score ORIGINALE, dove
-                # pero' il coefficiente e' 0,6 — il quarto termine domina e il punteggio misura
-                # quanto il mercato ama il titolo invece della solidita' del bilancio:
-                # misurato PLTR 326,52 · NVDA 120,18 contro uno Z'' plausibile fra -5 e +10.
-                book = ta_ - tl_
-                comp = [
-                    (6.56, wc / ta_ if wc is not None else None),
-                    (3.26, re_ / ta_ if re_ is not None else None),
-                    (6.72, ebit / ta_ if ebit is not None else None),
-                    (1.05, book / tl_),
-                ]
-                missing = sum(1 for _, x in comp if x is None)
-                if missing <= 1:
-                    z_ = round(sum(w_ * (x or 0.0) for w_, x in comp), 2)
-                    # lo Z'' vive fra circa -10 e +15: i cutoff sono 1,1 e 2,6. Fuori da questa
-                    # banda il numero non e' "molto solido", e' un calcolo sbagliato — e non
-                    # deve arrivare in pagina con un flag di rischio attaccato.
-                    if -15 <= z_ <= 20:
-                        stats["altman_z"] = z_
-                        stats["altman_missing"] = missing
-                        stats["altman_model"] = "Z''"
-                    else:
-                        stats["altman_fuori_scala"] = z_
-                        print(f"!! altman {ticker}: Z''={z_} fuori dalla banda plausibile, non pubblicato",
-                              file=sys.stderr)
+            _az = altman_zpp(*altman_voci(t, _cred))
+            stats.update({k: v for k, v in _az.items() if k != "altman_fuori_scala"})
+            if "altman_fuori_scala" in _az:
+                stats["altman_fuori_scala"] = _az["altman_fuori_scala"]
+                print(f"!! altman {ticker}: Z''={_az['altman_fuori_scala']} fuori dalla banda plausibile, non pubblicato",
+                      file=sys.stderr)
         except Exception as e:  # noqa: BLE001
             print(f"!! altman {ticker}: {e}", file=sys.stderr)
 
@@ -3606,6 +3819,7 @@ def fetch_macro():
         sec_cal, senza_cik, esteri = {}, [], []
         storia = {}           # v492 — la fine del veicolo di quotazione (8-K item 5.06), vedi storia_quotazione
         ore = {}              # v500 — l'ora dei depositi dei risultati (8-K 2.02, 6-K), vedi ore_depositi
+        bilanci_xbrl, senza_10q = {}, []   # v501 — il debito dai bilanci depositati, vedi aggiorna_debito_sec
         # la lista viene dalla stessa fonte della pipeline (config/ui_watchlist.json), non
         # da un elenco scritto a mano che invecchierebbe da solo: un titolo nuovo entra qui
         # senza che nessuno se ne ricordi. Indici, cambi e future non sono societa' e finiscono
@@ -3627,6 +3841,11 @@ def fetch_macro():
                 # v492 — PRIMA del filtro degli esteri: la storia della quotazione si dichiara per tutti
                 storia[_tk] = storia_quotazione(_sub)
                 ore[_tk] = ore_depositi(_sub)     # v500 — PRIMA del filtro degli esteri: i 6-K servono a loro
+                _ub = ultimo_bilancio_sec(_sub)    # v501 — il 10-Q/10-K piu' recente: da li' il debito XBRL
+                if _ub:
+                    bilanci_xbrl[_tk] = (_cik, _ub)
+                else:
+                    senza_10q.append(_tk)
                 _rec = _sub.get("filings", {}).get("recent", {})
                 _forme = _rec.get("form", [])
                 _items = _rec.get("items", [""] * len(_forme))
@@ -3661,7 +3880,8 @@ def fetch_macro():
                 #   il VWAP ancorato ai conti (l'analisi la abbina alla data del comunicato dichiarata da Nasdaq)
                 "ore_depositi": {"per_titolo": ore, "giorni": 130,
                                  "fonte": "SEC EDGAR, acceptanceDateTime degli 8-K con item 2.02 e dei 6-K",
-                                 "orologio": "America/New_York"},
+                                 # ⚠ v501 — UTC, misurato: vedi ore_depositi
+                                 "orologio": "UTC"},
                 # v492 — per ogni titolo letto: quando ha smesso di essere un veicolo di quotazione
                 #   (SPAC). Chi legge lo storico lungo taglia li': i prezzi di prima sono di un'altra
                 #   societa'. Un titolo assente qui non e' verificato, e lo dichiara chi legge
@@ -3674,6 +3894,22 @@ def fetch_macro():
             }
             print(f"   SEC EDGAR: {len(sec_cal)} titoli con deposito trimestrale, "
                   f"{len(esteri)} emittenti senza 8-K")
+        # v501 — il debito dai bilanci depositati: dopo il giro, con le posizioni per prime
+        try:
+            try:
+                _pos_x = [str(p.get("ticker") or p.get("tk") or "").upper() for p in
+                          (json.loads((ROOT / "config" / "posizioni.json").read_text(encoding="utf-8")).get("posizioni") or [])]
+            except Exception:  # noqa: BLE001
+                _pos_x = []
+            _ds = aggiorna_debito_sec(bilanci_xbrl, ua=SEC_UA, priorita=_pos_x)
+            _ds["senza_10q"] = sorted(senza_10q)
+            macro["debito_sec"] = _ds
+            print(f"   debito SEC (XBRL): {len(_ds['per_titolo'])} titoli in archivio, letti ora {len(_ds['letti_ora'])}"
+                  + (f", in attesa {len(_ds['in_attesa'])}" if _ds["in_attesa"] else "")
+                  + (f", ERRORI {sorted(_ds['errori'])}" if _ds["errori"] else "")
+                  + (f", esteri senza 10-Q/10-K {sorted(senza_10q)}" if senza_10q else ""))
+        except Exception as e:  # noqa: BLE001
+            print(f"!! debito SEC (XBRL): {e}", file=sys.stderr)
     except Exception as e:  # noqa: BLE001
         print(f"!! SEC EDGAR: {e}", file=sys.stderr)
 
@@ -5080,6 +5316,8 @@ CDS_PUNTI_MAX = 30.0      # oltre, lo spread equivalente dipende dal recupero as
 CDS_STORIA_MAX = 520      # circa due anni di giorni di compensazione
 CDS_SEDUTE_VAR = (5, 21, 63)
 CDS_SEDUTE_PROVA = 21     # v498 — la finestra della prova di tenuta: un mese di giorni di compensazione RACCOLTI
+CDS_SEDUTE_RAPIDA = 5     # v501 — la finestra del rincaro IMPROVVISO (richiesta del CEO del 18/10/2026): una settimana
+CDS_RANGO_MIN = 60        # v501 — sotto, il percentile della settimana fra quelle del nome stesso non dice niente
 CDS_FAMIGLIA = {100: "IG", 500: "HY"}   # la cedola dice in che fascia il mercato tratta il nome
 CDS_STORIA_MINMAX = 20    # sotto, minimo e massimo dello storico raccolto non dicono niente
 CDS_DOC_PREF = ("XR14", "CR14", "MR14", "MM14", "XR", "CR", "MR", "MM")
@@ -5382,6 +5620,61 @@ def finestra_cds(storia, codice, cedola, n=CDS_SEDUTE_PROVA):
             "eccesso_pct": round(((1 + nome) / (1 + ind) - 1) * 100, 1)}
 
 
+def rango_cds(storia, codice, cedola, n=CDS_SEDUTE_RAPIDA, minimo=CDS_RANGO_MIN):
+    """v501 — IL RINCARO CONTRO LE SETTIMANE DEL NOME STESSO. Il CEO chiede un avviso sui rincari "anomali": una soglia
+    fissa e' una convenzione (v240), il percentile fra le finestre gia' raccolte del nome e' una misura. Si calcola
+    l'eccesso sull'indice di OGNI finestra di n giorni misurabile nello storico (sovrapposte: dichiarato) e la posizione
+    (midrank) di quella di oggi. Sotto `minimo` finestre si pubblica solo quante sono: un percentile su poche finestre
+    e' una tacca inventata."""
+    st = storia or []
+    vals = []
+    for k in range(n + 1, len(st) + 1):
+        f = finestra_cds(st[:k], codice, cedola, n)
+        if f.get("stato") == "misurato":
+            vals.append(f["eccesso_pct"])
+    oggi = finestra_cds(st, codice, cedola, n)
+    out = {"finestre": len(vals), "minimo": minimo}
+    if len(vals) < minimo or oggi.get("stato") != "misurato":
+        return out
+    e = oggi["eccesso_pct"]
+    sotto = sum(1 for v in vals if v < e)
+    pari = sum(1 for v in vals if v == e)
+    return {**out, "percentile": round((sotto + 0.5 * pari) / len(vals) * 100)}
+
+
+def lato_azione(fin, rendimenti, date_rend, mercato, nome_mercato="QQQ"):
+    """v501 — IL TITOLO SUGLI STESSI DUE GIORNI DELLA FINESTRA DEL CDS. Richiesta del CEO del 18/10/2026: individuare
+    quando il mercato dei CDS prezza un rischio che non si e' ancora riflesso nel prezzo dell'azione. Qui si MISURA il
+    lato azionario della domanda; la decisione (divergenza, concordanza) la prende l'analisi (scripts/credito.py), come
+    per la prova di tenuta (v498: la pipeline misura, l'analisi decide).
+    Il rendimento del titolo e quello del mercato (QQQ, il riferimento del CEO: v474) dalla chiusura del primo giorno
+    della finestra a quella dell'ultimo, per DATA (v207), e l'ECCESSO del titolo sul mercato — al netto del mercato come
+    il CDS e' al netto dell'indice CDX. rendimenti: i log-rendimenti giornalieri della riga (_ret_series), date_rend le
+    loro date; mercato: {data: chiusura}. Ogni assenza si dichiara (v406)."""
+    if not fin or fin.get("stato") != "misurato":
+        return None
+    da, a = fin.get("da"), fin.get("a")
+    if not rendimenti or not date_rend or len(rendimenti) != len(date_rend):
+        return {"stato": "n.d.", "perche": "serie dei rendimenti del titolo non disponibile in questo run"}
+    pos = {d: i for i, d in enumerate(date_rend)}
+    if da not in pos or a not in pos:
+        return {"stato": "buco", "perche": f"il titolo non ha una chiusura il {da if da not in pos else a}"}
+    i0, i1 = pos[da], pos[a]
+    if i1 <= i0:
+        return {"stato": "n.d.", "perche": "date della finestra non in ordine"}
+    if mercato is None:
+        return {"stato": "n.d.", "perche": f"serie di {nome_mercato} non disponibile in questo run"}
+    m = mercato
+    if not m.get(da) or m.get(a) is None:
+        return {"stato": "buco", "perche": f"{nome_mercato} non ha una chiusura il {da if not m.get(da) else a}"}
+    tit = math.exp(sum(rendimenti[i0 + 1:i1 + 1])) - 1
+    mkt = m[a] / m[da] - 1
+    return {"stato": "misurato", "mercato": nome_mercato, "titolo_pct": round(tit * 100, 1),
+            "mercato_pct": round(mkt * 100, 1),
+            # un arrotondamento solo (v496): l'analisi decide su questo numero, ed e' quello che si stampa
+            "eccesso_pct": round(((1 + tit) / (1 + mkt) - 1) * 100, 1)}
+
+
 def _cds_primo_nome(nome):
     t = re.sub(r"[^a-z0-9]+", " ", str(nome or "").lower().replace("'", "")).split()
     t = [w for w in t if w != "the"]
@@ -5397,7 +5690,7 @@ def _cds_storia_entita(storia, serie):
     return out
 
 
-def cds_dei_titoli(righe, lettura, storia, mappa):
+def cds_dei_titoli(righe, lettura, storia, mappa, mercato=None):
     """Attacca r['cds'] a ogni titolo seguito e restituisce il riepilogo per macro['cds'].
     Quattro stati, ciascuno dichiarato (v406): quotato · ASSENTE (nessun CDS compensato a ICE alla
     data della verifica) · non quotato oggi (abbinato, ma ICE oggi non lo pubblica) · NON
@@ -5448,7 +5741,21 @@ def cds_dei_titoli(righe, lettura, storia, mappa):
              "scadenza": c["scadenza"].isoformat(), "var": variazioni_cds(storia, ser),
              "storia": _cds_storia_entita(storia, ser), "indice": CDS_FAMIGLIA.get(c["cedola"]),
              # v498 — la misura della prova di tenuta: un mese, al netto dell'indice della stessa cedola
-             "finestra": finestra_cds(storia, cod, c["cedola"])}
+             "finestra": finestra_cds(storia, cod, c["cedola"]),
+             # v501 — il rincaro IMPROVVISO: una settimana, con la stessa misura
+             "finestra5": finestra_cds(storia, cod, c["cedola"], n=CDS_SEDUTE_RAPIDA)}
+        # v501 — accanto alle misure, MAI dentro: la finestra resta il risultato di finestra_cds, e chi la ricalcola la
+        #   ritrova uguale (il gate v498 lo confronta). Il rango della settimana fra quelle del nome, e il lato azionario
+        #   sugli stessi due giorni di ciascuna finestra (la divergenza la decide l'analisi)
+        if x["finestra5"].get("stato") == "misurato":
+            x["rango5"] = rango_cds(storia, cod, c["cedola"])
+        _az = {}
+        for _f in ("finestra", "finestra5"):
+            _la = lato_azione(x[_f], r.get("_ret_series"), r.get("_ret_dates"), mercato)
+            if _la is not None:
+                _az[_f] = _la
+        if _az:
+            x["azione"] = _az
         if note.get(tk):
             x["nota"] = note[tk]
         r["cds"] = x
@@ -5480,7 +5787,7 @@ def tasso_cds(macro, storia):
     return None, "nessun tasso disponibile: spread non calcolati, restano i prezzi"
 
 
-def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_mappa=CDS_ENTITA):
+def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_mappa=CDS_ENTITA, mercato=None):
     """Lettura → storico → titoli. Se ICE non risponde, i titoli si leggono dall'ULTIMO giorno
     raccolto, e il riepilogo lo dichiara con la data: un dato vecchio e detto e' meglio di un
     buco muto, e la sorveglianza (validate_macro) ne misura l'eta'."""
@@ -5512,7 +5819,7 @@ def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_ma
                               for c, v in (u.get("p") or {}).items()},
                    "indici": {f: {"serie": v[0], "versione": v[1], "cedola": v[2], "prezzo": v[3]}
                               for f, v in (u.get("i") or {}).items()}}
-    stati, indici = cds_dei_titoli(righe, lettura or {}, storia, mappa)
+    stati, indici = cds_dei_titoli(righe, lettura or {}, storia, mappa, mercato)
     return {"fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
             "url": ICE_CDS_NOMI, "letto": letto, "errore": errore,
             "data": (lettura or {}).get("data"),
@@ -5746,6 +6053,22 @@ def validate_macro(macro):
     if _cds.get("non_classificati"):
         add("cds_abbinamenti", _cds.get("data"), 5, "missing",
             f"titoli seguiti senza classificazione in config/cds_entita.json: {', '.join(_cds['non_classificati'])}")
+
+    # v501 — il debito dai bilanci SEC nasce sorvegliato (v390). L'eta' non e' il segnale giusto (un 10-Q esce ogni
+    # tre mesi): lo sono l'ASSENZA del blocco, un archivio vuoto e gli errori di lettura di questo run. I nomi in attesa
+    # del budget non suonano: e' il riempimento previsto, e lo dice la nota.
+    _dsec = macro.get("debito_sec")
+    if not _dsec:
+        add("debito_sec", None, 7, "missing", "debito dai bilanci SEC (XBRL) non letto in questo run")
+    elif not _dsec.get("per_titolo"):
+        add("debito_sec", None, 7, "missing", "archivio del debito SEC vuoto"
+            + (f" — errori: {', '.join(sorted(_dsec.get('errori') or {}))}" if _dsec.get("errori") else ""))
+    else:
+        _er = sorted(_dsec.get("errori") or {})
+        add("debito_sec", datetime.now(timezone.utc).date().isoformat(), 7, "stale" if _er else "ok",
+            (f"companyfacts non letto per {', '.join(_er)}: vale la lettura precedente, se c'e'" if _er else "")
+            + (f"{' · ' if _er else ''}{len(_dsec.get('in_attesa') or [])} nomi in attesa del budget per run"
+               if _dsec.get("in_attesa") else ""))
 
     bce = macro.get("bce") or {}
     if not bce.get("tasso_rifinanziamento"):
@@ -6659,7 +6982,16 @@ def main():
     # v497 — CDS a 5 anni da ICE: dopo le posizioni, perche' le righe sono tutte qui (posizioni e
     # sorvegliati), e prima del riepilogo dei rischi. Il BTP sta nella sua funzione: entra a parte.
     try:
-        macro["cds"] = aggiorna_cds(watchlist + ([btp] if isinstance(btp, dict) else []), macro)
+        # v501 — QQQ con le sue date, per il lato azionario della divergenza: lo stesso strumento del canale
+        #   'mercato' delle sensibilita' (canali_macro), gia' scaricato dal giro dei titoli
+        _qqq = None
+        try:
+            _m = (canali_macro() or {}).get("mercato")
+            if _m and _m[2] is not None and len(_m[2]):
+                _qqq = {d.strftime("%Y-%m-%d"): float(v) for d, v in _m[2].items() if v == v}
+        except Exception as e:  # noqa: BLE001
+            print(f"!! CDS: serie di QQQ per il lato azionario non disponibile ({e})", file=sys.stderr)
+        macro["cds"] = aggiorna_cds(watchlist + ([btp] if isinstance(btp, dict) else []), macro, mercato=_qqq)
         _c = macro["cds"]
         print(f"   CDS (ICE): {'letto' if _c['letto'] else 'NON letto — ' + str(_c.get('errore'))} · giorno "
               f"{_c.get('data')} · {len(_c.get('quotati') or [])} quotati, {len(_c.get('assenti') or [])} senza CDS"

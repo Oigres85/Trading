@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 288  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291 (sale, mai scende)
+N_CHECKS_MINIMO = 300  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -2185,12 +2185,237 @@ check("v500 ore dei depositi: il tetto di voci si rispetta (dal piu' recente), u
 _sec500 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
 _sec500 = _sec500[:_sec500.find("calendario_uscite_fred(STORICO_IND)")]
 check("v500 collegamento: il giro del calendario EDGAR passa ogni risposta letta a ore_depositi PRIMA del filtro degli "
-      "esteri (i 6-K servono a loro), e le pubblica in sec_calendario.ore_depositi con l'orologio dichiarato, anche "
-      "quando non ci sono trimestrali",
+      "esteri (i 6-K servono a loro), e le pubblica in sec_calendario.ore_depositi con l'orologio dichiarato — UTC, "
+      "come EDGAR lo scrive (misurato in v501: la v500 lo dichiarava ora di New York), anche quando non ci sono trimestrali",
       "ore[_tk] = ore_depositi(_sub)" in _sec500
       and _sec500.find("ore[_tk] = ore_depositi(_sub)") < _sec500.find("esteri.append(_tk)")
-      and '"ore_depositi": {"per_titolo": ore' in _sec500 and '"orologio": "America/New_York"' in _sec500
+      and '"ore_depositi": {"per_titolo": ore' in _sec500 and '"orologio": "UTC"' in _sec500
       and "if sec_cal or esteri or storia or ore" in _sec500)
+
+# ═══ v501 — IL MONITOR DEL CREDITO: ALTMAN SUL BILANCIO PIU' RECENTE, CDS A 5 GIORNI, LATO AZIONARIO, DEBITO XBRL ══════
+# Richieste del CEO del 18/10/2026. La pipeline MISURA, l'analisi decide (scripts/credito.py). Lo storico vero dei CDS ha
+# pochi giorni e i companyfacts non si leggono da qui (SEC risponde 403): gli stati si COSTRUISCONO (v425, v429).
+_z501 = ud.altman_zpp(100.0, 60.0, 50.0, 30.0, 20.0, 10.0, "2026-06-30", "trimestrale: x")
+check("v501 Altman: la formula Z'' col bilancio, la base e le quattro componenti; due componenti mancanti non danno "
+      "niente; fuori dalla banda resta solo altman_fuori_scala (con data e base): " + str(_z501),
+      _z501.get("altman_z") == round(6.56 * 0.2 + 3.26 * 0.2 + 6.72 * 0.1 + 1.05 * (40 / 60), 2)
+      and _z501.get("altman_x") == [0.2, 0.2, 0.1, 0.6667] and _z501.get("altman_al") == "2026-06-30"
+      and str(_z501.get("altman_base")).startswith("trimestrale") and _z501.get("altman_missing") == 0
+      and ud.altman_zpp(100.0, 60.0, None, 30.0, None, 10.0) == {}
+      and set(ud.altman_zpp(100.0, 1.0, 50.0, 30.0, 20.0, 10.0)) == {"altman_fuori_scala", "altman_al", "altman_base"}
+      and ud.altman_zpp(0, 60.0, 1.0, 1.0, 1.0, 1.0) == {})
+class _T501:
+    def __init__(self, bsq=None, bsa=None, inc=None):
+        self.quarterly_balance_sheet, self.balance_sheet, self.income_stmt = bsq, bsa, inc
+def _df501(data, valori):
+    return pd.DataFrame({pd.Timestamp(data): valori})
+_bsq501 = _df501("2026-06-30", {"Total Assets": 100.0, "Total Liabilities Net Minority Interest": 60.0,
+                                 "Current Assets": 50.0, "Current Liabilities": 30.0, "Retained Earnings": 20.0})
+_bsa501 = _df501("2025-12-31", {"Total Assets": 90.0, "Total Liabilities Net Minority Interest": 50.0,
+                                 "Current Assets": 40.0, "Current Liabilities": 30.0, "Retained Earnings": 15.0})
+_inc501 = _df501("2025-12-31", {"EBIT": 8.0})
+_v501q = ud.altman_voci(_T501(_bsq501, _bsa501, _inc501), {"ebit_ttm": 12.0, "trimestri": 4, "conto_al": "2026-06-30"})
+_v501a = ud.altman_voci(_T501(_bsq501, _bsa501, _inc501), {"ebit_ttm": 12.0, "trimestri": 3})
+_v501n = ud.altman_voci(_T501(None, _bsa501, _inc501), {"ebit_ttm": 12.0, "trimestri": 4})
+check("v501 Altman sul bilancio PIU' RECENTE: il trimestrale con l'EBIT dei quattro trimestri di credito(), l'annuale "
+      "con la base dichiarata se i trimestri non sono quattro o se il trimestrale manca: " + str([_v501q, _v501a, _v501n]),
+      _v501q[:7] == (100.0, 60.0, 50.0, 30.0, 20.0, 12.0, "2026-06-30") and _v501q[7].startswith("trimestrale")
+      and _v501a[:7] == (90.0, 50.0, 40.0, 30.0, 15.0, 8.0, "2025-12-31") and _v501a[7].startswith("annuale")
+      and _v501n[5] == 8.0 and _v501n[7].startswith("annuale"))
+_alt501 = _SRC_UD_CODICE.find("_az = altman_zpp(*altman_voci(t, _cred))")
+check("v501 collegamento: il giro dei titoli calcola lo Z'' con altman_voci sul credito GIA' letto (dopo credito(t)) e "
+      "pubblica data, base e componenti; il vecchio calcolo sull'annuale non e' rimasto in linea",
+      _alt501 > 0 and 0 < _SRC_UD_CODICE.find("_cred = credito(t)") < _alt501
+      and "bs = t.balance_sheet\n            def bs_row" not in _SRC_UD)
+
+_fin501 = {"stato": "misurato", "da": "2026-10-01", "a": "2026-10-08"}
+_dr501 = ["2026-09-30", "2026-10-01", "2026-10-02", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08"]
+_rs501 = [0.0, 0.01, 0.02, -0.01, 0.0, 0.01, 0.02]
+_m501 = {"2026-10-01": 100.0, "2026-10-08": 101.0}
+_la501 = ud.lato_azione(_fin501, _rs501, _dr501, _m501)
+_tit501 = ud.math.exp(0.02 - 0.01 + 0.0 + 0.01 + 0.02) - 1
+check("v501 lato azionario: il titolo dalla chiusura del primo giorno della finestra a quella dell'ultimo (i "
+      "log-rendimenti DOPO il primo giorno), QQQ sugli stessi giorni e l'eccesso; senza QQQ, senza la serie o con un "
+      "giorno mancante lo dice; una finestra non misurata non ha lato azionario: " + str(_la501),
+      _la501 == {"stato": "misurato", "mercato": "QQQ", "titolo_pct": round(_tit501 * 100, 1), "mercato_pct": 1.0,
+                 "eccesso_pct": round(((1 + _tit501) / 1.01 - 1) * 100, 1)}
+      and ud.lato_azione(_fin501, _rs501, _dr501, None)["stato"] == "n.d."
+      and ud.lato_azione(_fin501, _rs501[:3], _dr501, _m501)["stato"] == "n.d."
+      and ud.lato_azione({**_fin501, "da": "2026-10-03"}, _rs501, _dr501, _m501)["stato"] == "buco"
+      and "2026-10-03" in ud.lato_azione({**_fin501, "da": "2026-10-03"}, _rs501, _dr501, _m501)["perche"]
+      and ud.lato_azione(_fin501, _rs501, _dr501, {"2026-10-01": 100.0})["stato"] == "buco"
+      and ud.lato_azione({"stato": "storico corto"}, _rs501, _dr501, _m501) is None)
+
+def _storia501(nomi, indici):
+    out = []
+    for k, (nn, ii) in enumerate(zip(nomi, indici)):
+        d = _giorni498[k]
+        out.append({"d": d, "m": "2031-12-20", "r": 3.88, "p": {"TESTCO": [100, _prezzo498(nn, 100, d)]},
+                    "i": {"IG": [47, 1, 100, _prezzo498(ii, 100, d)]}})
+    return out
+_s501 = _storia501([100.0 + (k % 3) for k in range(25)] + [102.0, 110.0, 120.0, 135.0, 150.0], [60.0] * 30)
+_r501 = ud.rango_cds(_s501, "TESTCO", 100, n=5, minimo=10)
+_r501m = ud.rango_cds(_s501, "TESTCO", 100)
+_r501x = ud.rango_cds(_s501[:-1] + [{**_s501[-1], "p": {}}], "TESTCO", 100, n=5, minimo=10)
+check("v501 rango della settimana: il percentile (midrank) dell'eccesso di oggi fra TUTTE le finestre di 5 giorni "
+      "misurabili del nome; sotto il minimo (60) solo il conteggio; oggi non misurato, niente percentile: "
+      + str([_r501, _r501m, _r501x]),
+      _r501.get("finestre") == 25 and (_r501.get("percentile") or 0) >= 95
+      and _r501m == {"finestre": 25, "minimo": ud.CDS_RANGO_MIN} and ud.CDS_RANGO_MIN == 60
+      and "percentile" not in _r501x and ud.CDS_SEDUTE_RAPIDA == 5)
+
+_righe501 = [dict(r) for r in _righe497]
+_gs501 = [x["d"] for x in _storia498r]
+for _r in _righe501:
+    if _r["ticker"] == "ORCL":
+        _r["_ret_dates"] = _gs501
+        _r["_ret_series"] = [0.0] + [0.001] * (len(_gs501) - 1)
+_mb501 = {d: 100.0 + k for k, d in enumerate(_gs501)}
+ud.cds_dei_titoli(_righe501, _l497, _storia498r, _mappa497, _mb501)
+_c501 = {r["ticker"]: r.get("cds") for r in _righe501}
+_o501 = _c501["ORCL"] or {}
+check("v501 collegamento: ogni quotato porta la finestra di 5 giorni (stesso calcolo, n=5), il rango della settimana e "
+      "il lato azionario delle finestre misurate — ACCANTO alle misure, che restano il risultato di finestra_cds",
+      _o501.get("finestra5") == ud.finestra_cds(_storia498r, "ORCLE", _o501.get("cedola_pb"), n=5)
+      and _o501.get("finestra") == ud.finestra_cds(_storia498r, "ORCLE", _o501.get("cedola_pb"))
+      and (_o501.get("rango5") or {}).get("finestre", 0) >= 1
+      and ((_o501.get("azione") or {}).get("finestra") or {}).get("stato") == "misurato"
+      and ((_o501.get("azione") or {}).get("finestra5") or {}).get("stato") == "misurato"
+      and _o501["azione"]["finestra"]["mercato_pct"]
+          == round((_mb501[_o501["finestra"]["a"]] / _mb501[_o501["finestra"]["da"]] - 1) * 100, 1)
+      and "azione" not in (_c501["CRWV"] or {}) and "finestra5" not in (_c501["MU"] or {}))
+check("v501 collegamento: main passa a aggiorna_cds la serie di QQQ con le sue date (canali_macro, il canale "
+      "'mercato'), e aggiorna_cds la consegna a cds_dei_titoli",
+      "mercato=_qqq" in _SRC_UD_CODICE and '(canali_macro() or {}).get("mercato")' in _SRC_UD_CODICE
+      and "cds_dei_titoli(righe, lettura or {}, storia, mappa, mercato)" in _SRC_UD_CODICE)
+
+_sub501 = {"filings": {"recent": {"form": ["8-K", "10-Q", "4", "10-K"],
+                                  "filingDate": ["2026-10-01", "2026-09-12", "2026-09-01", "2026-06-20"],
+                                  "accessionNumber": ["a1", "a2", "a3", "a4"],
+                                  "reportDate": ["", "2026-08-31", "", "2026-05-31"]}}}
+check("v501 ultimo bilancio SEC: il 10-Q o 10-K piu' recente con data, numero e periodo; chi deposita solo 20-F e 6-K "
+      "(emittente estero) non ne ha",
+      ud.ultimo_bilancio_sec(_sub501) == {"forma": "10-Q", "data": "2026-09-12", "accn": "a2", "periodo": "2026-08-31"}
+      and ud.ultimo_bilancio_sec({"filings": {"recent": {"form": ["6-K", "20-F"],
+                                                           "filingDate": ["2026-10-01", "2026-04-01"]}}}) is None
+      and ud.ultimo_bilancio_sec({}) is None)
+
+def _f501(end, val, form="10-Q", filed="2026-09-12"):
+    return {"end": end, "val": val, "form": form, "filed": filed}
+_facts501 = {"facts": {"us-gaap": {
+    "LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths": {"units": {"USD": [
+        _f501("2025-05-31", 5e9, "10-K", "2025-06-20"), _f501("2026-05-31", 7e9, "10-K", "2026-06-20"),
+        _f501("2026-08-31", 99e9, "8-K", "2026-09-10")]}},
+    "LongTermDebtMaturitiesRepaymentsOfPrincipalInYearTwo": {"units": {"USD": [
+        _f501("2026-05-31", 9e9, "10-K", "2026-06-20")]}},
+    "LongTermDebtMaturitiesRepaymentsOfPrincipalInYearThree": {"units": {"USD": [
+        _f501("2025-05-31", 4e9, "10-K", "2025-06-20")]}},
+    "LongTermDebtMaturitiesRepaymentsOfPrincipalAfterYearFive": {"units": {"USD": [
+        _f501("2026-05-31", 84e9, "10-K", "2026-06-20")]}},
+    "LongTermDebtWeightedAverageInterestRate": {"units": {"pure": [_f501("2026-05-31", 0.0431, "10-K", "2026-06-20")]}},
+    "LongTermDebtFairValue": {"units": {"USD": [_f501("2026-08-31", 95e9)]}},
+    "LongTermDebt": {"units": {"USD": [_f501("2026-08-31", 110e9), _f501("2026-05-31", 100e9, "10-K", "2026-06-20")]}},
+    "LineOfCreditFacilityRemainingBorrowingCapacity": {"units": {"USD": [_f501("2026-08-31", 1.5e10)]}},
+    "CommercialPaper": {"units": {"EUR": [_f501("2026-08-31", 2e9)]}},
+    "InterestRateDerivativesAtFairValueNet": {"units": {"USD": [_f501("2026-08-31", -2e8)]}},
+    "InterestRateCashFlowHedgeGainLossToBeReclassifiedDuringNext12MonthsNet": {"units": {"USD": [
+        _f501("2024-05-31", 1e7, "10-K", "2024-06-20")]}},
+    "AccumulatedOtherComprehensiveIncomeLossCumulativeChangesInNetGainLossFromCashFlowHedgesEffectNetOfTax": {
+        "units": {"USD": [_f501("2026-08-31", 3e8)]}},
+}}}
+_x501 = ud.debito_xbrl(_facts501)
+check("v501 debito XBRL: le scadenze tutte alla STESSA data, la piu' recente dichiarata in un 10-Q/10-K (un 8-K non e' "
+      "un bilancio, una voce ferma alla data prima resta fuori); tasso medio; valore di mercato contro carico della "
+      "stessa data; linee, carta commerciale nella sua valuta; derivati sui tassi dalle voci che li NOMINANO "
+      "nell'ultimo anno di depositi: " + str(_x501),
+      _x501.get("scadenze") == {"al": "2026-05-31", "forma": "10-K", "depositato": "2026-06-20", "valuta": "USD",
+                                "voci": {"entro_12_mesi": 7e9, "anno_2": 9e9, "oltre_5": 84e9}}
+      and (_x501.get("tasso") or {}).get("valore_pct") == 4.31
+      and (_x501.get("equo") or {}).get("rapporto_pct") == round(95 / 110 * 100, 1)
+      and (_x501.get("equo") or {}).get("voci") == ["LongTermDebtFairValue", "LongTermDebt"]
+      and _x501.get("linee_disponibili") == {"valore": 1.5e10, "valuta": "USD", "al": "2026-08-31"}
+      and _x501.get("carta_commerciale") == {"valore": 2e9, "valuta": "EUR", "al": "2026-08-31"}
+      and _x501.get("derivati_tassi") == {"voci": ["InterestRateDerivativesAtFairValueNet"], "n": 1})
+_xf501 = ud.debito_xbrl({"facts": {"us-gaap": {
+    "LongTermDebtFairValue": {"units": {"USD": [_f501("2026-08-31", 300e9)]}},
+    "LongTermDebt": {"units": {"USD": [_f501("2026-08-31", 100e9)]}}}}})
+check("v501 debito XBRL: un valore di mercato fuori da 0,3-1,5 volte il carico e' un confronto fra basi diverse — non si "
+      "pubblica il rapporto; senza fatti, niente scadenze ne' tasso e i derivati dichiarati assenti",
+      "rapporto_pct" not in _xf501.get("equo", {}) and _xf501["equo"].get("fuori_scala") == 3.0
+      and ud.debito_xbrl({}) == {"derivati_tassi": {"voci": [], "n": 0}})
+
+class _R501:
+    def __init__(self, js=None, err=None):
+        self._js, self._err = js, err
+    def raise_for_status(self):
+        if self._err:
+            raise RuntimeError(self._err)
+    def json(self):
+        return self._js
+_url501, _rotti501 = [], set()
+def _get501(url, headers=None, timeout=None):
+    _url501.append((url, (headers or {}).get("User-Agent")))
+    if any(f"CIK{c:010d}" in url for c in _rotti501):
+        return _R501(err="HTTP 503")
+    return _R501(_facts501)
+_dir501 = Path(_tmp497.mkdtemp())
+_p501 = _dir501 / "debito_sec.json"
+_b501 = {"AAA": (1, {"forma": "10-Q", "data": "2026-09-12", "accn": "x1"}),
+         "BBB": (2, {"forma": "10-Q", "data": "2026-09-12", "accn": "x2"}),
+         "CCC": (3, {"forma": "10-K", "data": "2026-06-20", "accn": "x3"}),
+         "DDD": (4, {"forma": "10-Q", "data": "2026-09-12", "accn": "x4"})}
+_rotti501.add(3)
+_d501a = ud.aggiorna_debito_sec(_b501, get=_get501, percorso=_p501, budget=2, priorita=["DDD"], ua={"User-Agent": "ua"},
+                                oggi="2026-10-18", pausa=0)
+_d501b = ud.aggiorna_debito_sec(_b501, get=_get501, percorso=_p501, budget=2, priorita=["DDD"], ua={"User-Agent": "ua"},
+                                oggi="2026-10-19", pausa=0)
+_n501 = len(_url501)
+_d501c = ud.aggiorna_debito_sec(_b501, get=_get501, percorso=_p501, budget=2, priorita=["DDD"], ua={"User-Agent": "ua"},
+                                oggi="2026-10-20", pausa=0)
+check("v501 debito SEC: al massimo `budget` letture per run, le POSIZIONI per prime; la cache si scrive; un nome con lo "
+      "stesso deposito non si rilegge; un errore resta da leggere e lo dice; chi resta oltre il budget e' in attesa: "
+      + str([_d501a.get("letti_ora"), _d501a.get("in_attesa"), _d501b.get("letti_ora"), _d501b.get("errori"),
+             _d501c.get("letti_ora")]),
+      _d501a["letti_ora"] == ["DDD", "AAA"] and _d501a["in_attesa"] == ["BBB", "CCC"]
+      and sorted(_d501a["per_titolo"]) == ["AAA", "DDD"] and _p501.exists()
+      and _d501b["letti_ora"] == ["BBB"] and set(_d501b["errori"]) == {"CCC"} and _d501b["in_attesa"] == ["CCC"]
+      and sorted(_d501b["per_titolo"]) == ["AAA", "BBB", "DDD"]
+      and _d501c["letti_ora"] == [] and set(_d501c["errori"]) == {"CCC"} and len(_url501) == _n501 + 1
+      and all(ua == "ua" for _, ua in _url501)
+      and _d501b["per_titolo"]["BBB"]["letto_il"] == "2026-10-19" and _d501b["per_titolo"]["BBB"]["cik"] == 2
+      and _d501b["per_titolo"]["BBB"]["scadenze"]["voci"]["entro_12_mesi"] == 7e9)
+_b501n = {**_b501, "AAA": (1, {"forma": "10-Q", "data": "2026-10-15", "accn": "x1b"})}
+_rotti501.add(2)
+_b501n["BBB"] = (2, {"forma": "10-Q", "data": "2026-10-16", "accn": "x2b"})
+_d501d = ud.aggiorna_debito_sec(_b501n, get=_get501, percorso=_p501, budget=3, priorita=[], ua={"User-Agent": "ua"},
+                                oggi="2026-10-21", pausa=0)
+check("v501 debito SEC: un deposito NUOVO fa rileggere il nome; se la rilettura fallisce resta la lettura precedente, "
+      "DICHIARATA con l'errore, e il nome resta da leggere",
+      # .get e non le parentesi quadre: col difetto dentro il check deve cadere col suo nome, non far morire la
+      # suite con un KeyError (v407, v471 — l'iniezione che toglie la lettura precedente lo ha mostrato)
+      "AAA" in _d501d.get("letti_ora", [])
+      and ((_d501d.get("per_titolo") or {}).get("AAA") or {}).get("deposito", {}).get("accn") == "x1b"
+      and set(_d501d.get("errori") or {}) == {"BBB", "CCC"}
+      and ((_d501d.get("per_titolo") or {}).get("BBB") or {}).get("deposito", {}).get("accn") == "x2"
+      and (((_d501d.get("per_titolo") or {}).get("BBB") or {}).get("errore_ultimo") or {}).get("il") == "2026-10-21"
+      and "BBB" in (_d501d.get("in_attesa") or []))
+_sec501 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
+_sec501 = _sec501[:_sec501.find("calendario_uscite_fred(STORICO_IND)")]
+check("v501 collegamento: il giro EDGAR prende l'ultimo 10-Q/10-K di ogni risposta letta PRIMA del filtro degli esteri, "
+      "e dopo il giro legge il debito con lo stesso User-Agent, le posizioni per prime, e lo pubblica in macro",
+      "_ub = ultimo_bilancio_sec(_sub)" in _sec501
+      and _sec501.find("_ub = ultimo_bilancio_sec(_sub)") < _sec501.find("esteri.append(_tk)")
+      and "aggiorna_debito_sec(bilanci_xbrl, ua=SEC_UA, priorita=_pos_x)" in _sec501
+      and 'macro["debito_sec"] = _ds' in _sec501 and '"orologio": "UTC"' in _sec501
+      and "America/New_York" not in _sec501)
+_vm501 = lambda m: next((c for c in ud.validate_macro(m)["checks"] if c["key"] == "debito_sec"), None)
+check("v501 sorveglianza del debito SEC (nasce sorvegliato, v390): assente → missing; archivio vuoto → missing; errori "
+      "di lettura → stale coi nomi; i nomi in attesa del budget non suonano",
+      _vm501({})["status"] == "missing"
+      and _vm501({"debito_sec": {"per_titolo": {}, "errori": {}}})["status"] == "missing"
+      and _vm501({"debito_sec": {"per_titolo": {"A": {}}, "errori": {"B": "HTTP 503"}}})["status"] == "stale"
+      and "B" in _vm501({"debito_sec": {"per_titolo": {"A": {}}, "errori": {"B": "HTTP 503"}}})["note"]
+      and _vm501({"debito_sec": {"per_titolo": {"A": {}}, "errori": {}, "in_attesa": ["C"]}})["status"] == "ok")
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

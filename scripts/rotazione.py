@@ -91,7 +91,7 @@ Il P/E viene da schede_progetto.riga_valutazione (una resa sola per schede e ing
 dell'aggregatore, mai ricalcolati qui.
 """
 import argparse, json, math, os, sys
-from datetime import datetime, timedelta, time as dtime
+from datetime import datetime, timedelta, time as dtime, timezone
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -1214,8 +1214,13 @@ def ancora_conti(trim, depositi, barre, adesso=None):
     fine = datetime.combine(g + timedelta(days=1), dtime(23, 59), tzinfo=brief.NEW_YORK)
     cand = []
     for x in depositi or []:
+        # ⚠⚠ v501 — l'ora di EDGAR e' UTC: la 'Z' della fonte e' un UTC VERO. Misurato il 18/10/2026 sull'8-K di Oracle
+        #   del 10/09: il JSON scrive 20:16:50Z, l'indice del deposito "Accepted 2026-09-10 16:16:50" (ora di New York).
+        #   La v500 la leggeva come ora di New York: un deposito alle 09:04 (le consegne di Tesla) diventava "a seduta
+        #   aperta", e uno fra mezzogiorno e le 16:00 finiva sulla seduta SUCCESSIVA. Si converte col fuso (v470).
         try:
-            t = datetime.fromisoformat(str(x.get("accettato") or "")[:19]).replace(tzinfo=brief.NEW_YORK)
+            t = (datetime.fromisoformat(str(x.get("accettato") or "")[:19]).replace(tzinfo=timezone.utc)
+                 .astimezone(brief.NEW_YORK))
         except ValueError:
             continue
         if inizio <= t <= fine:
