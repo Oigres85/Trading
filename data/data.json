@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-18T09:15:50Z",
+ "updated_at": "2026-10-18T12:31:57Z",
  "eurusd": 1.1242,
  "totals": {
   "usd_value": 0,
@@ -996,7 +996,7 @@
    "stats": {
     "market_cap": 994340044800.0,
     "shares": 1131423212.0,
-    "float_shares": 1127621630.0,
+    "float_shares": 1127610316.0,
     "float_pct": 99.7,
     "avg_volume_30d": 31224765.0,
     "pe_ttm": 11.8235,
@@ -1801,7 +1801,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -8063,7 +8063,7 @@
    "stats": {
     "market_cap": 204751880192.0,
     "shares": 876926613.0,
-    "float_shares": 873830850.0,
+    "float_shares": 873822081.0,
     "float_pct": 99.6,
     "avg_volume_30d": 21954564.0,
     "pe_ttm": 72.327,
@@ -16606,28 +16606,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81851.01,
+   "price": 81937.02,
    "price_asof": "2026-10-18",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.58,
+   "change_pct": 0.68,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -35.1,
-   "sma200_dist_pct": 12.9,
-   "sma50_dist_pct": 0.6,
+   "sma200_dist_pct": 13.0,
+   "sma50_dist_pct": 0.7,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
-   "w52_dist_pct": -29.6,
-   "day_high": 81893.33,
+   "w52_dist_pct": -29.5,
+   "day_high": 82143.93,
    "day_low": 81302.48,
    "support": 79735.86,
    "resistance": 87146.35,
-   "rsi": 48.1,
-   "volume": 12583841792,
+   "rsi": 48.4,
+   "volume": 13477163008,
    "vol_ratio": 0.38,
-   "atr_14": 2023.09,
-   "atr_pct": 2.47,
+   "atr_14": 2040.99,
+   "atr_pct": 2.49,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -16636,7 +16636,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81851.01
+     81937.02
     ],
     "m6": [
      66289.5,
@@ -16764,7 +16764,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81851.01
+     81937.02
     ],
     "all": [
      386.94,
@@ -16912,7 +16912,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81851.01
+     81937.02
     ],
     "m1": [
      84458.09,
@@ -16936,7 +16936,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81851.01
+     81937.02
     ],
     "m3": [
      62975.59,
@@ -17004,7 +17004,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81851.01
+     81937.02
     ],
     "y1": [
      107198.27,
@@ -17080,7 +17080,7 @@
      84763.58,
      81676.34,
      83095.12,
-     81851.01
+     81937.02
     ],
     "d1": [
      81300.0,
@@ -17138,7 +17138,26 @@
      81610.3,
      81621.77,
      81674.79,
-     81851.01
+     81863.63,
+     81809.79,
+     82055.25,
+     82079.83,
+     82137.03,
+     82067.98,
+     82101.48,
+     82108.8,
+     82102.12,
+     82074.59,
+     82017.33,
+     81994.73,
+     81990.45,
+     81987.72,
+     81919.67,
+     81914.11,
+     81908.9,
+     81968.36,
+     81945.53,
+     81939.79
     ]
    },
    "earnings_date": null,
@@ -17149,10 +17168,10 @@
    "beta": null,
    "sharpe_1y": -0.6,
    "sortino_1y": -0.83,
-   "sharpe_6m": 1.34,
-   "sortino_6m": 2.41,
+   "sharpe_6m": 1.35,
+   "sortino_6m": 2.43,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81851.01,
+   "prezzo_limite_aggiustato": 81937.02,
    "risk_reward": "1:1.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17165,22 +17184,22 @@
     "w1": {
      "support": 79735.86,
      "resistance": 84049.06,
-     "change_pct": 0.35
+     "change_pct": 0.46
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -3.09
+     "change_pct": -2.98
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 29.97
+     "change_pct": 30.11
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 16.73
+     "change_pct": 16.85
     }
    },
    "financials": [],
@@ -17207,74 +17226,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81851.01,
+     "prezzo": 81937.02,
      "medie": {
       "sma10": {
-       "liv": 82243.36,
-       "dist_pct": -0.48
+       "liv": 82251.96,
+       "dist_pct": -0.38
       },
       "ema10": {
-       "liv": 82256.62,
-       "dist_pct": -0.49
+       "liv": 82272.26,
+       "dist_pct": -0.41
       },
       "sma20": {
-       "liv": 83325.03,
-       "dist_pct": -1.77
+       "liv": 83329.33,
+       "dist_pct": -1.67
       },
       "ema20": {
-       "liv": 82549.11,
-       "dist_pct": -0.85
+       "liv": 82557.3,
+       "dist_pct": -0.75
       },
       "sma30": {
-       "liv": 83560.54,
-       "dist_pct": -2.05
+       "liv": 83563.41,
+       "dist_pct": -1.95
       },
       "ema30": {
-       "liv": 82136.26,
-       "dist_pct": -0.35
+       "liv": 82141.81,
+       "dist_pct": -0.25
       },
       "sma50": {
-       "liv": 81395.0,
-       "dist_pct": 0.56
+       "liv": 81396.72,
+       "dist_pct": 0.66
       },
       "ema50": {
-       "liv": 80473.84,
-       "dist_pct": 1.71
+       "liv": 80477.21,
+       "dist_pct": 1.81
       },
       "sma100": {
-       "liv": 74199.56,
-       "dist_pct": 10.31
+       "liv": 74200.42,
+       "dist_pct": 10.43
       },
       "ema100": {
-       "liv": 76959.1,
-       "dist_pct": 6.36
+       "liv": 76960.8,
+       "dist_pct": 6.47
       },
       "sma200": {
-       "liv": 72494.55,
-       "dist_pct": 12.91
+       "liv": 72494.98,
+       "dist_pct": 13.02
       },
       "ema200": {
-       "liv": 75845.25,
-       "dist_pct": 7.92
+       "liv": 75846.11,
+       "dist_pct": 8.03
       }
      },
      "medie_battute": 6,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 48.1,
+      "rsi14": 48.4,
       "macd": {
-       "linea": 24.96,
-       "segnale": 491.62,
-       "istogramma": -466.66
+       "linea": 31.82,
+       "segnale": 492.99,
+       "istogramma": -461.17
       },
-      "stoch_k": 29.2,
-      "stoch_d": 25.5,
-      "williams_r": -70.8,
-      "cci20": -55.2,
-      "adx14": 23.1,
-      "di_su": 17.8,
-      "di_giu": 20.8,
-      "momentum10": 174.67
+      "stoch_k": 30.4,
+      "stoch_d": 25.9,
+      "williams_r": -69.6,
+      "cci20": -51.9,
+      "adx14": 22.9,
+      "di_su": 18.5,
+      "di_giu": 20.6,
+      "momentum10": 260.69
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17765,21 +17784,21 @@
      {
       "d": "2026-10-18",
       "o": 81383.29,
-      "h": 81893.33,
+      "h": 82143.93,
       "l": 81302.48,
-      "c": 81851.01
+      "c": 81937.02
      }
     ],
     "performance": {
-     "s1": -1.5,
-     "m1": -3.03,
-     "m3": 29.1,
-     "m6": 24.56,
-     "a1": 16.49,
-     "ytd": -7.75,
-     "a3": 136.1,
-     "a5": 33.48,
-     "a10": 11576.79
+     "s1": -1.39,
+     "m1": -2.93,
+     "m3": 29.23,
+     "m6": 24.69,
+     "a1": 16.61,
+     "ytd": -7.66,
+     "a3": 136.35,
+     "a5": 33.62,
+     "a10": 11589.06
     },
     "stagionalita": [
      {
@@ -17865,7 +17884,7 @@
      },
      {
       "mese": 10,
-      "media": 15.2,
+      "media": 15.21,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -17892,9 +17911,9 @@
      }
     ]
    },
-   "rs_1m": -3.4,
+   "rs_1m": -3.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.2,
+   "rs_ndx_1m": -2.1,
    "beta_ndx": 0.66,
    "avg_corr": 0.3,
    "max_corr": 0.78,
@@ -34947,7 +34966,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -36939,7 +36958,7 @@
    "stats": {
     "market_cap": 4165393448960.0,
     "shares": 5867155790.0,
-    "float_shares": 10879318800.0,
+    "float_shares": 10879808000.0,
     "float_pct": null,
     "avg_volume_30d": 26759270.0,
     "pe_ttm": 17.0893,
@@ -38884,7 +38903,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -39785,7 +39804,7 @@
      "a1": 121.44,
      "a3": 999.35,
      "a5": 744.12,
-     "a10": 749.03
+     "a10": 749.04
     },
     "stagionalita": [
      {
@@ -53867,7 +53886,7 @@
      25.4,
      26.62,
      27.89,
-     31.63,
+     31.62,
      33.16,
      33.16,
      35.41,
@@ -57377,7 +57396,7 @@
      247.18,
      258.21,
      275.82,
-     303.03,
+     303.04,
      295.92,
      264.25,
      230.35,
@@ -62713,7 +62732,7 @@
      1641.52
     ],
     "y1": [
-     1022.54,
+     1022.53,
      1026.34,
      1054.17,
      1012.1,
@@ -65614,7 +65633,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -70273,7 +70292,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -75621,7 +75640,7 @@
    "stats": {
     "market_cap": 232832548864.0,
     "shares": 1023934842.0,
-    "float_shares": 1007592842.0,
+    "float_shares": 1007613321.0,
     "float_pct": 98.4,
     "avg_volume_30d": 9566598.0,
     "pe_ttm": 3789.8335,
@@ -81431,7 +81450,7 @@
      7.48,
      7.84,
      7.76,
-     7.76,
+     7.75,
      7.95,
      8.29,
      8.35,
@@ -83687,7 +83706,7 @@
      71.81,
      71.36,
      69.91,
-     70.48,
+     70.49,
      73.77,
      73.44,
      80.18,
@@ -83784,7 +83803,7 @@
      127.9,
      130.07,
      136.24,
-     144.29,
+     144.28,
      154.51,
      149.4,
      151.74,
@@ -86821,7 +86840,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -93422,7 +93441,7 @@
     ],
     "y1": [
      290.74,
-     283.89,
+     283.88,
      290.37,
      311.56,
      327.65,
@@ -94960,11 +94979,11 @@
      155.94,
      153.23,
      164.84,
-     169.06,
+     169.07,
      171.99,
      163.61,
      170.13,
-     175.8,
+     175.79,
      179.02,
      189.57,
      173.43,
@@ -96697,7 +96716,7 @@
      344.76,
      305.88,
      342.21,
-     344.34,
+     344.33,
      369.93,
      349.13,
      353.5,
@@ -100375,7 +100394,7 @@
      324.5,
      348.61,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -101473,7 +101492,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -106060,7 +106079,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -106111,7 +106130,7 @@
      128.42,
      130.68,
      128.64,
-     125.47,
+     125.48,
      125.9,
      131.91,
      136.18,
@@ -109938,7 +109957,7 @@
      267.46,
      254.7,
      277.82,
-     275.26,
+     275.25,
      273.83,
      275.21,
      261.91,
@@ -109998,7 +110017,7 @@
      427.74,
      448.72,
      393.97,
-     377.21,
+     377.2,
      430.42,
      453.23,
      469.58,
@@ -113053,7 +113072,7 @@
      "m1": 10.48,
      "m3": 8.84,
      "m6": 36.03,
-     "ytd": 16.92,
+     "ytd": 16.91,
      "a1": 46.6,
      "a3": 131.65,
      "a5": 416.33,
@@ -133207,6 +133226,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Prediction: $1,000 Invested in Taiwan Semiconductor Today Will Be Worth This Much by 2030",
+      "riassunto": "Key PointsTSMC is a leader in chip manufacturing, and the AI boom has driven tremendous growth.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T09:30:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
+     },
+     {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -133240,13 +133266,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-16T22:36:00Z",
       "url": "https://www.nasdaq.com/articles/taiwan-semiconductor-posts-record-q3-results-time-buy-dip"
-     },
-     {
-      "titolo": "Stock Indexes Mostly Lower as Chipmaker Weakness Persists",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -0.06% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.44%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.96%.  December E-mini S&P futures (ESZ26 ) are down -0.10%, and December E-mini...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T21:29:34Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-mostly-lower-chipmaker-weakness-persists"
      }
     ],
     "BE": [
@@ -133427,6 +133446,20 @@
     ],
     "MU": [
      {
+      "titolo": "Micron Technology (MU) Stock Is Down 24% From Its Peak. History Says $10,000 Invested Right Now Could Be Worth This Much by 2030",
+      "riassunto": "Key PointsMicron Technology's stock is down around 24% from its all-time high.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T10:10:00Z",
+      "url": "https://www.nasdaq.com/articles/micron-technology-mu-stock-down-24-its-peak-history-says-10000-invested-right-now-could-be"
+     },
+     {
+      "titolo": "President Trump Sells Micron Stock and Buys Another Mega-Cap Artificial Intelligence (AI) Stock",
+      "riassunto": "Key PointsPresident Trump&rsquo;s recent disclosures indicate that his accounts sold shares of Micron and bought shares of Meta Platforms in August.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T09:08:01Z",
+      "url": "https://www.nasdaq.com/articles/president-trump-sells-micron-stock-and-buys-another-mega-cap-artificial-intelligence-ai"
+     },
+     {
       "titolo": "Elon Musk Says Optimus Is Tesla's Most Important Product. These 3 Suppliers Get Paid Before Tesla Does.",
       "riassunto": "Key PointsMusk has called Taiwan Semiconductor one of Tesla's most important partners.",
       "fonte": "Nasdaq",
@@ -133453,23 +133486,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-17T19:27:00Z",
       "url": "https://www.nasdaq.com/articles/microns-incredible-run-about-end"
-     },
-     {
-      "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
-      "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T16:37:00Z",
-      "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
-     },
-     {
-      "titolo": "Billionaire David Tepper's Appaloosa Management Returned 32% Through the First Half of the Year. Here Are His Top 3 Stocks.",
-      "riassunto": "Key PointsTepper maintains a highly concentrated portfolio of stocks, with a big focus on the AI trend.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T16:35:00Z",
-      "url": "https://www.nasdaq.com/articles/billionaire-david-teppers-appaloosa-management-returned-32-through-first-half-year-here"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Prediction: $1,000 Invested in Taiwan Semiconductor Today Will Be Worth This Much by 2030",
+      "riassunto": "Key PointsTSMC is a leader in chip manufacturing, and the AI boom has driven tremendous growth.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T09:30:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
+     },
      {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
@@ -133504,13 +133530,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-17T21:50:00Z",
       "url": "https://www.nasdaq.com/articles/coreweave-projected-have-63x-gross-leverage-ratio-year-end-market-worried-about-neoclouds"
-     },
-     {
-      "titolo": "1 Red Flag That AMD Investors Should Be Aware Of Now",
-      "riassunto": "Key PointsThe chipmaker is still growing at a slower rate than Nvidia.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T16:50:00Z",
-      "url": "https://www.nasdaq.com/articles/1-red-flag-amd-investors-should-be-aware-now"
      }
     ],
     "PLTR": [
@@ -133667,13 +133686,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-18T09:15:50Z"
+   "letto_il": "2026-10-18T12:31:57Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Prediction: $1,000 Invested in Taiwan Semiconductor Today Will Be Worth This Much by 2030",
+     "riassunto": "Key PointsTSMC is a leader in chip manufacturing, and the AI boom has driven tremendous growth.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T09:30:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
+    },
     {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
@@ -133708,13 +133734,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-16T22:36:00Z",
      "url": "https://www.nasdaq.com/articles/taiwan-semiconductor-posts-record-q3-results-time-buy-dip"
-    },
-    {
-     "titolo": "Stock Indexes Mostly Lower as Chipmaker Weakness Persists",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -0.06% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up by +0.44%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.96%.  December E-mini S&P futures (ESZ26 ) are down -0.10%, and December E-mini...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T21:29:34Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-mostly-lower-chipmaker-weakness-persists"
     }
    ],
    "BE": [
@@ -133895,6 +133914,20 @@
    ],
    "MU": [
     {
+     "titolo": "Micron Technology (MU) Stock Is Down 24% From Its Peak. History Says $10,000 Invested Right Now Could Be Worth This Much by 2030",
+     "riassunto": "Key PointsMicron Technology's stock is down around 24% from its all-time high.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T10:10:00Z",
+     "url": "https://www.nasdaq.com/articles/micron-technology-mu-stock-down-24-its-peak-history-says-10000-invested-right-now-could-be"
+    },
+    {
+     "titolo": "President Trump Sells Micron Stock and Buys Another Mega-Cap Artificial Intelligence (AI) Stock",
+     "riassunto": "Key PointsPresident Trump&rsquo;s recent disclosures indicate that his accounts sold shares of Micron and bought shares of Meta Platforms in August.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T09:08:01Z",
+     "url": "https://www.nasdaq.com/articles/president-trump-sells-micron-stock-and-buys-another-mega-cap-artificial-intelligence-ai"
+    },
+    {
      "titolo": "Elon Musk Says Optimus Is Tesla's Most Important Product. These 3 Suppliers Get Paid Before Tesla Does.",
      "riassunto": "Key PointsMusk has called Taiwan Semiconductor one of Tesla's most important partners.",
      "fonte": "Nasdaq",
@@ -133921,23 +133954,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-17T19:27:00Z",
      "url": "https://www.nasdaq.com/articles/microns-incredible-run-about-end"
-    },
-    {
-     "titolo": "Tech Stock Sell-Off: 1 Unstoppable ETF to Buy on the Dip in 2026",
-     "riassunto": "Key PointsQQQ has beaten the market over the past decade.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T16:37:00Z",
-     "url": "https://www.nasdaq.com/articles/tech-stock-sell-1-unstoppable-etf-buy-dip-2026"
-    },
-    {
-     "titolo": "Billionaire David Tepper's Appaloosa Management Returned 32% Through the First Half of the Year. Here Are His Top 3 Stocks.",
-     "riassunto": "Key PointsTepper maintains a highly concentrated portfolio of stocks, with a big focus on the AI trend.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T16:35:00Z",
-     "url": "https://www.nasdaq.com/articles/billionaire-david-teppers-appaloosa-management-returned-32-through-first-half-year-here"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Prediction: $1,000 Invested in Taiwan Semiconductor Today Will Be Worth This Much by 2030",
+     "riassunto": "Key PointsTSMC is a leader in chip manufacturing, and the AI boom has driven tremendous growth.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T09:30:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
+    },
     {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
@@ -133972,13 +133998,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-17T21:50:00Z",
      "url": "https://www.nasdaq.com/articles/coreweave-projected-have-63x-gross-leverage-ratio-year-end-market-worried-about-neoclouds"
-    },
-    {
-     "titolo": "1 Red Flag That AMD Investors Should Be Aware Of Now",
-     "riassunto": "Key PointsThe chipmaker is still growing at a slower rate than Nvidia.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T16:50:00Z",
-     "url": "https://www.nasdaq.com/articles/1-red-flag-amd-investors-should-be-aware-now"
     }
    ],
    "PLTR": [
@@ -134135,7 +134154,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-18T09:15:50Z"
+  "letto_il": "2026-10-18T12:31:57Z"
  },
  "predictions": [
   {
@@ -134145,18 +134164,23 @@
   },
   {
    "question": "Bitcoin Up or Down on October 18?",
-   "yes": 88,
+   "yes": 92,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-18-2026"
+  },
+  {
+   "question": "Will Bitcoin reach $84,000 October 12-18?",
+   "yes": 5,
+   "link": "https://polymarket.com/event/will-bitcoin-reach-84k-october-12-18-2026-from-october-14"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $80,000 on October 18?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-80k-on-october-18-2026"
   },
   {
    "question": "Will there be no change in Fed interest rates after the October 2026 meeting?",
    "yes": 86,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-october-2026-meeting-20260617190324031"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $80,000 on October 18?",
-   "yes": 99,
-   "link": "https://polymarket.com/event/bitcoin-above-80k-on-october-18-2026"
   }
  ],
  "options": {
@@ -201170,7 +201194,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 9 ore"
+    "note": "18 voci, la piu' recente di 13 ore"
    },
    {
     "key": "sec_calendario",
@@ -201238,6 +201262,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-18T09:15:51Z"
+  "generated_at": "2026-10-18T12:31:58Z"
  }
 }
