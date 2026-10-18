@@ -1,0 +1,327 @@
+{
+ "aggiornato": "2026-10-18",
+ "per_titolo": {
+  "AMD": {
+   "cik": 2488,
+   "deposito": {
+    "accn": "0000002488-26-000123",
+    "data": "2026-08-05",
+    "forma": "10-Q",
+    "periodo": "2026-06-27"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "linee_disponibili": {
+    "al": "2016-09-24",
+    "valore": 395000000.0,
+    "valuta": "USD"
+   },
+   "scadenze": {
+    "al": "2025-12-27",
+    "depositato": "2026-02-04",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_3": 625000000.0,
+     "anno_4": 0.0,
+     "anno_5": 750000000.0,
+     "entro_12_mesi": 875000000.0,
+     "oltre_5": 1000000000.0
+    }
+   }
+  },
+  "BE": {
+   "cik": 1664703,
+   "deposito": {
+    "accn": "0001628280-26-050325",
+    "data": "2026-07-29",
+    "forma": "10-Q/A",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "linee_disponibili": {
+    "al": "2023-03-31",
+    "valore": 409191000.0,
+    "valuta": "USD"
+   },
+   "scadenze": {
+    "al": "2026-03-31",
+    "depositato": "2026-04-29",
+    "forma": "10-Q",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 81236000.0,
+     "anno_3": 75125000.0,
+     "anno_4": 2500000000.0,
+     "anno_5": 0.0,
+     "entro_12_mesi": 0.0,
+     "oltre_5": 0.0,
+     "resto_esercizio": 3959000.0
+    }
+   }
+  },
+  "CRWV": {
+   "cik": 1769628,
+   "deposito": {
+    "accn": "0001769628-26-000366",
+    "data": "2026-08-12",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2026-06-30",
+    "depositato": "2026-08-12",
+    "forma": "10-Q",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 4416000000.0,
+     "anno_3": 2421000000.0,
+     "anno_4": 3221000000.0,
+     "entro_12_mesi": 6184000000.0,
+     "resto_esercizio": 4413000000.0
+    }
+   }
+  },
+  "MRVL": {
+   "cik": 1835632,
+   "deposito": {
+    "accn": "0001835632-26-000025",
+    "data": "2026-08-28",
+    "forma": "10-Q",
+    "periodo": "2026-08-01"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2026-08-01",
+    "depositato": "2026-08-28",
+    "forma": "10-Q",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 1249900000.0,
+     "anno_3": 500000000.0,
+     "anno_4": 500000000.0,
+     "entro_12_mesi": 0.0,
+     "resto_esercizio": 0.0
+    }
+   },
+   "tasso": {
+    "al": "2025-05-03",
+    "depositato": "2025-05-30",
+    "forma": "10-Q",
+    "valore_pct": 4.15,
+    "voce": "DebtWeightedAverageInterestRate"
+   }
+  },
+  "MSTR": {
+   "cik": 1050446,
+   "deposito": {
+    "accn": "0001050446-26-000044",
+    "data": "2026-08-03",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "equo": {
+    "al": "2021-03-31",
+    "depositato": "2021-04-29",
+    "forma": "10-Q",
+    "rapporto_pct": 123.9,
+    "voci": [
+     "DebtInstrumentFairValue",
+     "LongTermDebt"
+    ]
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2026-06-30",
+    "depositato": "2026-08-03",
+    "forma": "10-Q",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 4510000000.0,
+     "anno_3": 2203659000.0,
+     "entro_12_mesi": 40044000.0
+    }
+   }
+  },
+  "MU": {
+   "cik": 723125,
+   "deposito": {
+    "accn": "0000723125-26-000023",
+    "data": "2026-10-09",
+    "forma": "10-K",
+    "periodo": "2026-09-03"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2026-09-03",
+    "depositato": "2026-10-09",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 0.0,
+     "anno_3": 0.0,
+     "anno_4": 0.0,
+     "anno_5": 0.0,
+     "entro_12_mesi": 0.0,
+     "oltre_5": 2808000000.0
+    }
+   }
+  },
+  "NVDA": {
+   "carta_commerciale": {
+    "al": "2025-01-26",
+    "valore": 0.0,
+    "valuta": "USD"
+   },
+   "cik": 1045810,
+   "deposito": {
+    "accn": "0001045810-26-000075",
+    "data": "2026-08-26",
+    "forma": "10-Q",
+    "periodo": "2026-07-26"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "equo": {
+    "al": "2026-07-26",
+    "depositato": "2026-08-26",
+    "forma": "10-Q",
+    "rapporto_pct": 94.1,
+    "voci": [
+     "LongTermDebtFairValue",
+     "LongTermDebt"
+    ]
+   },
+   "letto_il": "2026-10-18",
+   "tasso": {
+    "al": "2018-01-28",
+    "depositato": "2018-02-28",
+    "forma": "10-K",
+    "valore_pct": 3.15,
+    "voce": "DebtInstrumentInterestRateEffectivePercentage"
+   }
+  },
+  "PLTR": {
+   "cik": 1321655,
+   "deposito": {
+    "accn": "0001321655-26-000041",
+    "data": "2026-08-04",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2020-12-31",
+    "depositato": "2021-02-26",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 0.0,
+     "anno_3": 200000000.0,
+     "entro_12_mesi": 0.0
+    }
+   }
+  },
+  "RGTI": {
+   "cik": 1838359,
+   "deposito": {
+    "accn": "0001104659-26-091993",
+    "data": "2026-08-06",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2022-09-30",
+    "depositato": "2022-11-22",
+    "forma": "10-Q",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 9273000.0,
+     "anno_3": 12914000.0,
+     "anno_4": 8734000.0,
+     "anno_5": 377000.0,
+     "entro_12_mesi": 702000.0
+    }
+   },
+   "tasso": {
+    "al": "2024-09-30",
+    "depositato": "2024-11-12",
+    "forma": "10-Q",
+    "valore_pct": 23.1,
+    "voce": "DebtInstrumentInterestRateEffectivePercentage"
+   }
+  },
+  "SMCI": {
+   "cik": 1375365,
+   "deposito": {
+    "accn": "0001375365-26-000022",
+    "data": "2026-08-31",
+    "forma": "10-K",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "equo": {
+    "al": "2013-06-30",
+    "depositato": "2013-09-11",
+    "forma": "10-K",
+    "rapporto_pct": 100.0,
+    "voci": [
+     "DebtInstrumentFairValue",
+     "LongTermDebt"
+    ]
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2026-06-30",
+    "depositato": "2026-08-31",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 6061000.0,
+     "anno_3": 5381000.0,
+     "anno_4": 4932000.0,
+     "anno_5": 2000000000.0,
+     "entro_12_mesi": 2039774000.0
+    }
+   }
+  }
+ }
+}
