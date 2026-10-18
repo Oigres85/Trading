@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-18T17:32:32Z",
+ "updated_at": "2026-10-18T17:46:41Z",
  "eurusd": 1.1242,
  "totals": {
   "usd_value": 0,
@@ -464,7 +464,7 @@
      33.88,
      30.71,
      34.61,
-     44.63,
+     44.62,
      33.36,
      40.49,
      44.24,
@@ -16721,11 +16721,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81064.79,
+   "price": 81039.93,
    "price_asof": "2026-10-18",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.39,
+   "change_pct": -0.42,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -35.8,
@@ -16738,8 +16738,8 @@
    "day_low": 80954.69,
    "support": 79735.86,
    "resistance": 87146.35,
-   "rsi": 44.9,
-   "volume": 15785826304,
+   "rsi": 44.8,
+   "volume": 15851450368,
    "vol_ratio": 0.38,
    "atr_14": 2065.83,
    "atr_pct": 2.55,
@@ -16751,7 +16751,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81064.79
+     81039.93
     ],
     "m6": [
      66289.5,
@@ -16879,7 +16879,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81064.79
+     81039.93
     ],
     "all": [
      386.94,
@@ -17027,7 +17027,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81064.79
+     81039.93
     ],
     "m1": [
      84458.09,
@@ -17051,7 +17051,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81064.79
+     81039.93
     ],
     "m3": [
      62975.59,
@@ -17119,7 +17119,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81064.79
+     81039.93
     ],
     "y1": [
      107198.27,
@@ -17195,7 +17195,7 @@
      84763.58,
      81676.34,
      83095.12,
-     81064.79
+     81039.93
     ],
     "d1": [
      81300.0,
@@ -17302,7 +17302,9 @@
      80955.5,
      81116.21,
      81074.92,
-     81101.63
+     81101.63,
+     81067.96,
+     81040.21
     ]
    },
    "earnings_date": null,
@@ -17313,10 +17315,10 @@
    "beta": null,
    "sharpe_1y": -0.62,
    "sortino_1y": -0.86,
-   "sharpe_6m": 1.28,
-   "sortino_6m": 2.3,
+   "sharpe_6m": 1.27,
+   "sortino_6m": 2.29,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81064.79,
+   "prezzo_limite_aggiustato": 81039.93,
    "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17329,22 +17331,22 @@
     "w1": {
      "support": 79735.86,
      "resistance": 84049.06,
-     "change_pct": -0.61
+     "change_pct": -0.64
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -4.02
+     "change_pct": -4.05
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 28.72
+     "change_pct": 28.68
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 15.61
+     "change_pct": 15.57
     }
    },
    "financials": [],
@@ -17371,74 +17373,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81064.79,
+     "prezzo": 81039.93,
      "medie": {
       "sma10": {
-       "liv": 82164.74,
-       "dist_pct": -1.34
+       "liv": 82162.25,
+       "dist_pct": -1.37
       },
       "ema10": {
-       "liv": 82113.67,
-       "dist_pct": -1.28
+       "liv": 82109.15,
+       "dist_pct": -1.3
       },
       "sma20": {
-       "liv": 83285.71,
-       "dist_pct": -2.67
+       "liv": 83284.47,
+       "dist_pct": -2.7
       },
       "ema20": {
-       "liv": 82474.23,
-       "dist_pct": -1.71
+       "liv": 82471.87,
+       "dist_pct": -1.74
       },
       "sma30": {
-       "liv": 83534.33,
-       "dist_pct": -2.96
+       "liv": 83533.5,
+       "dist_pct": -2.99
       },
       "ema30": {
-       "liv": 82085.54,
-       "dist_pct": -1.24
+       "liv": 82083.94,
+       "dist_pct": -1.27
       },
       "sma50": {
-       "liv": 81379.28,
-       "dist_pct": -0.39
+       "liv": 81378.78,
+       "dist_pct": -0.42
       },
       "ema50": {
-       "liv": 80443.0,
-       "dist_pct": 0.77
+       "liv": 80442.03,
+       "dist_pct": 0.74
       },
       "sma100": {
-       "liv": 74191.7,
-       "dist_pct": 9.26
+       "liv": 74191.45,
+       "dist_pct": 9.23
       },
       "ema100": {
-       "liv": 76943.53,
-       "dist_pct": 5.36
+       "liv": 76943.04,
+       "dist_pct": 5.32
       },
       "sma200": {
-       "liv": 72490.62,
-       "dist_pct": 11.83
+       "liv": 72490.5,
+       "dist_pct": 11.79
       },
       "ema200": {
-       "liv": 75837.43,
-       "dist_pct": 6.89
+       "liv": 75837.18,
+       "dist_pct": 6.86
       }
      },
      "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 44.9,
+      "rsi14": 44.8,
       "macd": {
-       "linea": -37.76,
-       "segnale": 479.08,
-       "istogramma": -516.83
+       "linea": -39.74,
+       "segnale": 478.68,
+       "istogramma": -518.42
       },
-      "stoch_k": 18.4,
-      "stoch_d": 21.8,
-      "williams_r": -81.6,
-      "cci20": -63.8,
+      "stoch_k": 18.0,
+      "stoch_d": 21.7,
+      "williams_r": -82.0,
+      "cci20": -64.0,
       "adx14": 22.9,
       "di_su": 18.3,
       "di_giu": 20.4,
-      "momentum10": -611.55
+      "momentum10": -636.41
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17931,19 +17933,19 @@
       "o": 81383.29,
       "h": 82143.93,
       "l": 80954.69,
-      "c": 81064.79
+      "c": 81039.93
      }
     ],
     "performance": {
-     "s1": -2.44,
-     "m1": -3.96,
-     "m3": 27.86,
-     "m6": 23.37,
-     "a1": 15.37,
-     "ytd": -8.64,
-     "a3": 133.83,
-     "a5": 32.2,
-     "a10": 11464.63
+     "s1": -2.47,
+     "m1": -3.99,
+     "m3": 27.82,
+     "m6": 23.33,
+     "a1": 15.34,
+     "ytd": -8.67,
+     "a3": 133.76,
+     "a5": 32.16,
+     "a10": 11461.08
     },
     "stagionalita": [
      {
@@ -18029,7 +18031,7 @@
      },
      {
       "mese": 10,
-      "media": 15.13,
+      "media": 15.12,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -18058,7 +18060,7 @@
    },
    "rs_1m": -4.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -3.1,
+   "rs_ndx_1m": -3.2,
    "beta_ndx": 0.66,
    "avg_corr": 0.3,
    "max_corr": 0.78,
@@ -55461,7 +55463,7 @@
       },
       "evento": {
        "beta": 0.29,
-       "r2": 0.163,
+       "r2": 0.162,
        "corr": 0.4,
        "campione": 50,
        "da": "2025-10-27",
@@ -57743,7 +57745,7 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
@@ -63005,7 +63007,7 @@
      961.76,
      1054.17,
      1054.93,
-     1064.75,
+     1064.74,
      1416.2,
      1445.53,
      1316.25,
@@ -63110,7 +63112,7 @@
      1641.52
     ],
     "y1": [
-     1022.54,
+     1022.53,
      1026.34,
      1054.17,
      1012.1,
@@ -70716,7 +70718,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -84067,7 +84069,7 @@
      26.8,
      25.7,
      26.38,
-     27.76,
+     27.77,
      27.44,
      28.48,
      30.19,
@@ -84201,7 +84203,7 @@
      71.81,
      71.36,
      69.91,
-     70.49,
+     70.48,
      73.77,
      73.44,
      80.18,
@@ -93997,7 +93999,7 @@
     ],
     "y1": [
      290.74,
-     283.89,
+     283.88,
      290.37,
      311.56,
      327.65,
@@ -94011,7 +94013,7 @@
      322.37,
      340.11,
      336.06,
-     360.42,
+     360.43,
      358.86,
      369.78,
      383.01,
@@ -100989,7 +100991,7 @@
      324.5,
      348.6,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -106664,7 +106666,7 @@
      78.41,
      76.31,
      69.67,
-     72.9,
+     72.91,
      76.98,
      79.63,
      87.08,
@@ -106770,7 +106772,7 @@
      128.42,
      130.68,
      128.64,
-     125.47,
+     125.48,
      125.9,
      131.91,
      136.18,
@@ -110487,7 +110489,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -110520,7 +110522,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -110715,13 +110717,13 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
      650.8,
      648.54,
-     694.84,
+     694.83,
      630.97,
      616.82,
      618.74,
@@ -124560,64 +124562,64 @@
    "fonte": "SEC EDGAR, fatti XBRL dei 10-Q e 10-K (companyfacts): solo fatti non dimensionali",
    "per_titolo": {
     "AAPL": {
+     "carta_commerciale": {
+      "al": "2026-06-27",
+      "valore": 1997000000.0,
+      "valuta": "USD"
+     },
      "cik": 320193,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-07-31",
       "accn": "0000320193-26-000020",
+      "data": "2026-07-31",
+      "forma": "10-Q",
       "periodo": "2026-06-27"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2025-09-27",
-      "forma": "10-K",
       "depositato": "2025-10-31",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 12393000000.0,
        "anno_2": 10078000000.0,
        "anno_3": 9300000000.0,
        "anno_4": 5235000000.0,
        "anno_5": 4972000000.0,
+       "entro_12_mesi": 12393000000.0,
        "oltre_5": 49303000000.0
       }
-     },
-     "carta_commerciale": {
-      "valore": 1997000000.0,
-      "valuta": "USD",
-      "al": "2026-06-27"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     },
     "ABBV": {
      "cik": 1551152,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-03",
       "accn": "0001551152-26-000026",
+      "data": "2026-08-03",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2025-12-31",
-      "forma": "10-K",
       "depositato": "2026-02-20",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 6000000000.0,
        "anno_2": 5130000000.0,
        "anno_3": 4466000000.0,
        "anno_4": 8645000000.0,
        "anno_5": 1000000000.0,
+       "entro_12_mesi": 6000000000.0,
        "oltre_5": 39262000000.0
       }
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     },
     "AMD": {
@@ -124653,120 +124655,120 @@
      }
     },
     "AMGN": {
+     "carta_commerciale": {
+      "al": "2025-12-31",
+      "valore": 0.0,
+      "valuta": "USD"
+     },
      "cik": 318154,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-05",
       "accn": "0000318154-26-000126",
+      "data": "2026-08-05",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2025-12-31",
-      "forma": "10-K",
       "depositato": "2026-02-13",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 4571000000.0,
        "anno_2": 2724000000.0,
        "anno_3": 4984000000.0,
        "anno_4": 2943000000.0,
        "anno_5": 4000000000.0,
+       "entro_12_mesi": 4571000000.0,
        "oltre_5": 36822000000.0
       }
-     },
-     "carta_commerciale": {
-      "valore": 0.0,
-      "valuta": "USD",
-      "al": "2025-12-31"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     },
     "AMZN": {
      "cik": 1018724,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-07-31",
       "accn": "0001018724-26-000026",
+      "data": "2026-07-31",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "equo": {
+      "al": "2017-03-31",
+      "depositato": "2017-04-28",
+      "forma": "10-Q",
+      "rapporto_pct": 98.6,
+      "voci": [
+       "LongTermDebtFairValue",
+       "LongTermDebt"
+      ]
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2025-12-31",
-      "forma": "10-K",
       "depositato": "2026-02-06",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 2752000000.0,
        "anno_2": 8832000000.0,
        "anno_3": 4752000000.0,
        "anno_4": 3000000000.0,
        "anno_5": 4500000000.0,
+       "entro_12_mesi": 2752000000.0,
        "oltre_5": 45000000000.0
       }
-     },
-     "equo": {
-      "al": "2017-03-31",
-      "voci": [
-       "LongTermDebtFairValue",
-       "LongTermDebt"
-      ],
-      "forma": "10-Q",
-      "depositato": "2017-04-28",
-      "rapporto_pct": 98.6
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     },
     "ANET": {
      "cik": 1596532,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-05",
       "accn": "0001596532-26-000175",
+      "data": "2026-08-05",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
-     "letto_il": "2026-10-18",
      "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18"
     },
     "AVGO": {
+     "carta_commerciale": {
+      "al": "2025-08-03",
+      "valore": 496000000.0,
+      "valuta": "USD"
+     },
      "cik": 1730168,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-09-10",
       "accn": "0001730168-26-000080",
+      "data": "2026-09-10",
+      "forma": "10-Q",
       "periodo": "2026-08-02"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2026-08-02",
-      "forma": "10-Q",
       "depositato": "2026-09-10",
+      "forma": "10-Q",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 0.0,
-       "resto_esercizio": 2252000000.0,
        "anno_2": 5127000000.0,
        "anno_3": 2405000000.0,
-       "anno_4": 6406000000.0
+       "anno_4": 6406000000.0,
+       "entro_12_mesi": 0.0,
+       "resto_esercizio": 2252000000.0
       }
-     },
-     "carta_commerciale": {
-      "valore": 496000000.0,
-      "valuta": "USD",
-      "al": "2025-08-03"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     },
     "BE": {
@@ -124806,126 +124808,167 @@
     "BLK": {
      "cik": 2012383,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-06",
       "accn": "0001193125-26-337177",
+      "data": "2026-08-06",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
-     "letto_il": "2026-10-18",
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
      "equo": {
       "al": "2026-06-30",
+      "depositato": "2026-08-06",
+      "forma": "10-Q",
+      "rapporto_pct": 96.9,
       "voci": [
        "LongTermDebtFairValue",
        "LongTermDebt"
-      ],
-      "forma": "10-Q",
-      "depositato": "2026-08-06",
-      "rapporto_pct": 96.9
+      ]
      },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "letto_il": "2026-10-18"
     },
     "CBRS": {
      "cik": 2021728,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-12",
       "accn": "0001628280-26-056357",
+      "data": "2026-08-12",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
-     "letto_il": "2026-10-18",
      "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18"
     },
     "CEG": {
+     "carta_commerciale": {
+      "al": "2022-09-30",
+      "valore": 493000000.0,
+      "valuta": "USD"
+     },
      "cik": 1868275,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-06",
       "accn": "0001868275-26-000104",
+      "data": "2026-08-06",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "equo": {
+      "al": "2022-12-31",
+      "depositato": "2023-02-16",
+      "forma": "10-K",
+      "fuori_scala": 0.0,
+      "voci": [
+       "DebtInstrumentFairValue",
+       "DebtInstrumentCarryingAmount"
+      ]
+     },
      "letto_il": "2026-10-18",
+     "linee_disponibili": {
+      "al": "2026-06-30",
+      "valore": 2586000000.0,
+      "valuta": "USD"
+     },
      "scadenze": {
       "al": "2025-12-31",
-      "forma": "10-K",
       "depositato": "2026-02-24",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 92000000.0,
        "anno_2": 666000000.0,
        "anno_3": 828000000.0,
        "anno_4": 157000000.0,
        "anno_5": 99000000.0,
+       "entro_12_mesi": 92000000.0,
        "oltre_5": 5561000000.0
       }
-     },
-     "equo": {
-      "al": "2022-12-31",
-      "voci": [
-       "DebtInstrumentFairValue",
-       "DebtInstrumentCarryingAmount"
-      ],
-      "forma": "10-K",
-      "depositato": "2023-02-16",
-      "fuori_scala": 0.0
-     },
-     "linee_disponibili": {
-      "valore": 2586000000.0,
-      "valuta": "USD",
-      "al": "2026-06-30"
-     },
+     }
+    },
+    "COP": {
      "carta_commerciale": {
-      "valore": 493000000.0,
+      "al": "2013-12-31",
+      "valore": 961000000.0,
+      "valuta": "USD"
+     },
+     "cik": 1163165,
+     "deposito": {
+      "accn": "0001163165-26-000032",
+      "data": "2026-08-06",
+      "forma": "10-Q",
+      "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 1,
+      "voci": [
+       "PercentageOfDebtHedgedByInterestRateDerivatives"
+      ]
+     },
+     "letto_il": "2026-10-18",
+     "linee_disponibili": {
+      "al": "2016-12-31",
+      "valore": 6750000000.0,
+      "valuta": "USD"
+     },
+     "scadenze": {
+      "al": "2025-12-31",
+      "depositato": "2026-02-17",
+      "forma": "10-K",
       "valuta": "USD",
-      "al": "2022-09-30"
+      "voci": {
+       "anno_2": 786000000.0,
+       "anno_3": 670000000.0,
+       "anno_4": 992000000.0,
+       "anno_5": 1599000000.0,
+       "entro_12_mesi": 713000000.0
+      }
+     }
+    },
+    "CRM": {
+     "cik": 1108524,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-27",
+      "accn": "0001108524-26-000190",
+      "periodo": "2026-07-31"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2026-07-31",
+      "forma": "10-Q",
+      "depositato": "2026-08-27",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 0.0,
+       "resto_esercizio": 0.0,
+       "anno_2": 6000000000.0,
+       "anno_3": 4250000000.0,
+       "anno_4": 0.0
+      }
      },
      "derivati_tassi": {
       "voci": [],
       "n": 0
      }
     },
-    "COP": {
-     "cik": 1163165,
+    "CRWD": {
+     "cik": 1535527,
      "deposito": {
       "forma": "10-Q",
-      "data": "2026-08-06",
-      "accn": "0001163165-26-000032",
-      "periodo": "2026-06-30"
+      "data": "2026-08-27",
+      "accn": "0001535527-26-000031",
+      "periodo": "2026-07-31"
      },
      "letto_il": "2026-10-18",
-     "scadenze": {
-      "al": "2025-12-31",
-      "forma": "10-K",
-      "depositato": "2026-02-17",
-      "valuta": "USD",
-      "voci": {
-       "entro_12_mesi": 713000000.0,
-       "anno_2": 786000000.0,
-       "anno_3": 670000000.0,
-       "anno_4": 992000000.0,
-       "anno_5": 1599000000.0
-      }
-     },
-     "linee_disponibili": {
-      "valore": 6750000000.0,
-      "valuta": "USD",
-      "al": "2016-12-31"
-     },
-     "carta_commerciale": {
-      "valore": 961000000.0,
-      "valuta": "USD",
-      "al": "2013-12-31"
-     },
      "derivati_tassi": {
-      "voci": [
-       "PercentageOfDebtHedgedByInterestRateDerivatives"
-      ],
-      "n": 1
+      "voci": [],
+      "n": 0
      }
     },
     "CRWV": {
@@ -124953,6 +124996,287 @@
        "entro_12_mesi": 6184000000.0,
        "resto_esercizio": 4413000000.0
       }
+     }
+    },
+    "CVX": {
+     "cik": 93410,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-06",
+      "accn": "0000093410-26-000167",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-24",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 2345000000.0,
+       "anno_2": 5723000000.0,
+       "anno_3": 4752000000.0,
+       "anno_4": 1567000000.0,
+       "anno_5": 5350000000.0,
+       "oltre_5": 11185000000.0
+      }
+     },
+     "tasso": {
+      "valore_pct": 0.15,
+      "al": "2020-12-31",
+      "voce": "DebtInstrumentInterestRateEffectivePercentage",
+      "forma": "10-K",
+      "depositato": "2022-02-24"
+     },
+     "equo": {
+      "al": "2025-12-31",
+      "voci": [
+       "LongTermDebtFairValue",
+       "DebtInstrumentCarryingAmount"
+      ],
+      "forma": "10-K",
+      "depositato": "2026-02-24",
+      "fuori_scala": 0.021
+     },
+     "carta_commerciale": {
+      "valore": 4642000000.0,
+      "valuta": "USD",
+      "al": "2025-12-31"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "DDOG": {
+     "cik": 1561550,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-06",
+      "accn": "0001628280-26-054458",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "DE": {
+     "cik": 315189,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-27",
+      "accn": "0001104659-26-102213",
+      "periodo": "2026-08-02"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-11-02",
+      "forma": "10-K",
+      "depositato": "2025-12-18",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 8921000000.0,
+       "anno_2": 8935000000.0,
+       "anno_3": 9220000000.0,
+       "anno_4": 6556000000.0,
+       "anno_5": 4615000000.0
+      }
+     },
+     "linee_disponibili": {
+      "valore": 7300000000.0,
+      "valuta": "USD",
+      "al": "2025-11-02"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "DIS": {
+     "cik": 1744489,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-05",
+      "accn": "0001744489-26-000057",
+      "periodo": "2026-06-27"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-09-27",
+      "forma": "10-K",
+      "depositato": "2025-11-13",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 6751000000.0,
+       "anno_2": 2985000000.0,
+       "anno_3": 1750000000.0,
+       "anno_4": 2391000000.0,
+       "anno_5": 1502000000.0,
+       "oltre_5": 25872000000.0
+      }
+     },
+     "linee_disponibili": {
+      "valore": 12250000000.0,
+      "valuta": "USD",
+      "al": "2026-06-27"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "GILD": {
+     "cik": 882095,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-06",
+      "accn": "0000882095-26-000031",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2020-12-31",
+      "forma": "10-K",
+      "depositato": "2021-02-25",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 2750000000.0,
+       "anno_2": 1500000000.0,
+       "anno_3": 4250000000.0,
+       "anno_4": 1750000000.0,
+       "anno_5": 1750000000.0,
+       "oltre_5": 18500000000.0
+      }
+     },
+     "linee_disponibili": {
+      "valore": 1250000000.0,
+      "valuta": "USD",
+      "al": "2010-09-30"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "GOOGL": {
+     "cik": 1652044,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-07-23",
+      "accn": "0001652044-26-000071",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-05",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 2000000000.0,
+       "anno_2": 1000000000.0,
+       "anno_3": 2676000000.0,
+       "anno_4": 1764000000.0,
+       "anno_5": 5500000000.0,
+       "oltre_5": 36145000000.0
+      }
+     },
+     "equo": {
+      "al": "2026-06-30",
+      "voci": [
+       "LongTermDebtFairValue",
+       "DebtInstrumentCarryingAmount"
+      ],
+      "forma": "10-Q",
+      "depositato": "2026-07-23",
+      "rapporto_pct": 93.9
+     },
+     "carta_commerciale": {
+      "valore": 0.0,
+      "valuta": "USD",
+      "al": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "GS": {
+     "cik": 886982,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-03",
+      "accn": "0000886982-26-000297",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "tasso": {
+      "valore_pct": 5.62,
+      "al": "2026-06-30",
+      "voce": "DebtWeightedAverageInterestRate",
+      "forma": "10-Q",
+      "depositato": "2026-08-03"
+     },
+     "carta_commerciale": {
+      "valore": 0.0,
+      "valuta": "USD",
+      "al": "2024-12-31"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "INTC": {
+     "cik": 50863,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-07-24",
+      "accn": "0000050863-26-000157",
+      "periodo": "2026-06-27"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-27",
+      "forma": "10-K",
+      "depositato": "2026-01-23",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 2500000000.0,
+       "anno_2": 3826000000.0,
+       "anno_3": 3173000000.0,
+       "anno_4": 3288000000.0,
+       "anno_5": 2750000000.0,
+       "oltre_5": 31698000000.0
+      }
+     },
+     "tasso": {
+      "valore_pct": 3.42,
+      "al": "2019-12-28",
+      "voce": "DebtInstrumentInterestRateEffectivePercentage",
+      "forma": "10-K",
+      "depositato": "2020-01-24"
+     },
+     "equo": {
+      "al": "2025-12-27",
+      "voci": [
+       "LongTermDebtFairValue",
+       "LongTermDebt"
+      ],
+      "forma": "10-K",
+      "depositato": "2026-01-23",
+      "rapporto_pct": 89.7
+     },
+     "carta_commerciale": {
+      "valore": 0.0,
+      "valuta": "USD",
+      "al": "2025-12-27"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
      }
     },
     "MRVL": {
@@ -125186,18 +125510,6 @@
     }
    },
    "letti_ora": [
-    "AAPL",
-    "ABBV",
-    "AMGN",
-    "AMZN",
-    "ANET",
-    "AVGO",
-    "BLK",
-    "CBRS",
-    "CEG",
-    "COP"
-   ],
-   "in_attesa": [
     "CRM",
     "CRWD",
     "CVX",
@@ -125207,7 +125519,9 @@
     "GILD",
     "GOOGL",
     "GS",
-    "INTC",
+    "INTC"
+   ],
+   "in_attesa": [
     "JPM",
     "LLY",
     "MA",
@@ -135743,7 +136057,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-18T17:32:32Z"
+   "letto_il": "2026-10-18T17:46:41Z"
   }
  },
  "broker": null,
@@ -136211,7 +136525,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-18T17:32:32Z"
+  "letto_il": "2026-10-18T17:46:41Z"
  },
  "predictions": [
   {
@@ -136226,7 +136540,7 @@
   },
   {
    "question": "Will Bitcoin dip to $80,000 October 12-18?",
-   "yes": 22,
+   "yes": 21,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-80k-october-12-18-2026-from-october-15"
   },
   {
@@ -198323,12 +198637,28 @@
        "oi": 436
       },
       {
+       "strike": 412.5,
+       "bid": 1.04,
+       "ask": 1.2,
+       "iv": 21.7,
+       "vol": 91,
+       "oi": 78
+      },
+      {
        "strike": 415.0,
        "bid": 0.64,
        "ask": 0.79,
        "iv": 21.6,
        "vol": 286,
        "oi": 80
+      },
+      {
+       "strike": 417.5,
+       "bid": 0.39,
+       "ask": 0.5,
+       "iv": 21.6,
+       "vol": 128,
+       "oi": 5
       },
       {
        "strike": 420.0,
@@ -198339,12 +198669,28 @@
        "oi": 123
       },
       {
+       "strike": 422.5,
+       "bid": 0.07,
+       "ask": 0.73,
+       "iv": 29.3,
+       "vol": 29,
+       "oi": 41
+      },
+      {
        "strike": 425.0,
        "bid": 0.04,
        "ask": 0.1,
        "iv": 21.3,
        "vol": 75,
        "oi": 115
+      },
+      {
+       "strike": 427.5,
+       "bid": 0.0,
+       "ask": 0.22,
+       "iv": 26.5,
+       "vol": 2,
+       "oi": 0
       },
       {
        "strike": 430.0,
@@ -198361,38 +198707,6 @@
        "iv": 27.8,
        "vol": 1,
        "oi": 9
-      },
-      {
-       "strike": 440.0,
-       "bid": 0.0,
-       "ask": 0.48,
-       "iv": 42.2,
-       "vol": 2,
-       "oi": 12
-      },
-      {
-       "strike": 445.0,
-       "bid": 0.0,
-       "ask": 0.95,
-       "iv": 53.7,
-       "vol": 1,
-       "oi": 7
-      },
-      {
-       "strike": 450.0,
-       "bid": 0.0,
-       "ask": 0.95,
-       "iv": 50.4,
-       "vol": 3,
-       "oi": 55
-      },
-      {
-       "strike": 455.0,
-       "bid": 0.0,
-       "ask": 0.77,
-       "iv": 52.3,
-       "vol": 1,
-       "oi": 11
       }
      ],
      "puts": [
@@ -198509,12 +198823,36 @@
        "oi": 40
       },
       {
+       "strike": 407.5,
+       "bid": 7.0,
+       "ask": 7.25,
+       "iv": 21.1,
+       "vol": 9,
+       "oi": 9
+      },
+      {
        "strike": 410.0,
        "bid": 8.6,
        "ask": 9.1,
        "iv": 21.5,
        "vol": 10,
        "oi": 0
+      },
+      {
+       "strike": 412.5,
+       "bid": 10.55,
+       "ask": 11.0,
+       "iv": 21.1,
+       "vol": 24,
+       "oi": 0
+      },
+      {
+       "strike": 415.0,
+       "bid": 12.65,
+       "ask": 13.15,
+       "iv": 21.4,
+       "vol": 3,
+       "oi": 15
       },
       {
        "strike": 420.0,
@@ -198527,18 +198865,18 @@
      ],
      "call_wall": 395.0,
      "put_wall": 372.5,
-     "opt_volume": 9430
+     "opt_volume": 9718
     },
     {
      "date": "2026-10-30",
      "calls": [
       {
-       "strike": 370.0,
-       "bid": 32.8,
-       "ask": 35.15,
-       "iv": 43.8,
+       "strike": 372.5,
+       "bid": 30.3,
+       "ask": 32.95,
+       "iv": 43.0,
        "vol": 2,
-       "oi": 220
+       "oi": 0
       },
       {
        "strike": 375.0,
@@ -198661,12 +198999,28 @@
        "oi": 164
       },
       {
+       "strike": 412.5,
+       "bid": 3.9,
+       "ask": 5.95,
+       "iv": 33.0,
+       "vol": 7,
+       "oi": 0
+      },
+      {
        "strike": 415.0,
        "bid": 3.2,
        "ask": 5.15,
        "iv": 33.0,
        "vol": 12,
        "oi": 29
+      },
+      {
+       "strike": 417.5,
+       "bid": 2.72,
+       "ask": 3.9,
+       "iv": 31.0,
+       "vol": 2,
+       "oi": 10
       },
       {
        "strike": 420.0,
@@ -198715,33 +199069,9 @@
        "iv": 33.4,
        "vol": 7,
        "oi": 65
-      },
-      {
-       "strike": 450.0,
-       "bid": 0.02,
-       "ask": 0.5,
-       "iv": 34.6,
-       "vol": 1,
-       "oi": 15
-      },
-      {
-       "strike": 455.0,
-       "bid": 0.0,
-       "ask": 0.75,
-       "iv": 40.4,
-       "vol": 0,
-       "oi": 4
       }
      ],
      "puts": [
-      {
-       "strike": 370.0,
-       "bid": 0.78,
-       "ask": 3.0,
-       "iv": 46.4,
-       "vol": 1,
-       "oi": 288
-      },
       {
        "strike": 372.5,
        "bid": 0.64,
@@ -198839,12 +199169,44 @@
        "oi": 92
       },
       {
+       "strike": 402.5,
+       "bid": 8.0,
+       "ask": 8.65,
+       "iv": 28.7,
+       "vol": 17,
+       "oi": 4
+      },
+      {
+       "strike": 405.0,
+       "bid": 9.2,
+       "ask": 11.25,
+       "iv": 32.9,
+       "vol": 13,
+       "oi": 13
+      },
+      {
+       "strike": 407.5,
+       "bid": 10.2,
+       "ask": 12.6,
+       "iv": 32.7,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 410.0,
        "bid": 11.7,
        "ask": 13.9,
        "iv": 31.9,
        "vol": 16,
        "oi": 2
+      },
+      {
+       "strike": 412.5,
+       "bid": 13.05,
+       "ask": 15.6,
+       "iv": 32.2,
+       "vol": 5,
+       "oi": 0
       },
       {
        "strike": 415.0,
@@ -198865,7 +199227,7 @@
      ],
      "call_wall": 405.0,
      "put_wall": 340.0,
-     "opt_volume": 1443
+     "opt_volume": 1490
     },
     {
      "date": "2026-11-06",
@@ -199145,6 +199507,22 @@
        "oi": 6
       },
       {
+       "strike": 410.0,
+       "bid": 12.4,
+       "ask": 14.7,
+       "iv": 27.9,
+       "vol": 17,
+       "oi": 17
+      },
+      {
+       "strike": 415.0,
+       "bid": 15.75,
+       "ask": 17.95,
+       "iv": 27.8,
+       "vol": 0,
+       "oi": 10
+      },
+      {
        "strike": 425.0,
        "bid": 22.4,
        "ask": 25.7,
@@ -199163,7 +199541,7 @@
      ],
      "call_wall": 385.0,
      "put_wall": 370.0,
-     "opt_volume": 588
+     "opt_volume": 605
     }
    ]
   },
@@ -199175,12 +199553,20 @@
      "date": "2026-10-23",
      "calls": [
       {
-       "strike": 250.0,
-       "bid": 80.8,
-       "ask": 89.2,
-       "iv": 172.5,
-       "vol": 1,
-       "oi": 1
+       "strike": 275.0,
+       "bid": 56.7,
+       "ask": 65.4,
+       "iv": 139.5,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 280.0,
+       "bid": 52.95,
+       "ask": 60.8,
+       "iv": 138.6,
+       "vol": 0,
+       "oi": 2
       },
       {
        "strike": 290.0,
@@ -199207,12 +199593,52 @@
        "oi": 4
       },
       {
+       "strike": 310.0,
+       "bid": 28.2,
+       "ask": 35.85,
+       "iv": 116.1,
+       "vol": 0,
+       "oi": 2
+      },
+      {
+       "strike": 312.5,
+       "bid": 27.0,
+       "ask": 32.3,
+       "iv": 111.0,
+       "vol": 0,
+       "oi": 4
+      },
+      {
+       "strike": 315.0,
+       "bid": 24.0,
+       "ask": 31.9,
+       "iv": 110.1,
+       "vol": 1,
+       "oi": 5
+      },
+      {
        "strike": 320.0,
        "bid": 22.45,
        "ask": 24.95,
        "iv": 102.2,
        "vol": 15,
        "oi": 27
+      },
+      {
+       "strike": 322.5,
+       "bid": 19.2,
+       "ask": 25.35,
+       "iv": 102.3,
+       "vol": 2,
+       "oi": 700
+      },
+      {
+       "strike": 325.0,
+       "bid": 19.75,
+       "ask": 25.15,
+       "iv": 111.6,
+       "vol": 8,
+       "oi": 701
       },
       {
        "strike": 330.0,
@@ -199223,12 +199649,28 @@
        "oi": 142
       },
       {
+       "strike": 332.5,
+       "bid": 15.75,
+       "ask": 20.65,
+       "iv": 108.6,
+       "vol": 10,
+       "oi": 2
+      },
+      {
        "strike": 335.0,
        "bid": 14.55,
        "ask": 17.05,
        "iv": 101.2,
        "vol": 64,
        "oi": 53
+      },
+      {
+       "strike": 337.5,
+       "bid": 13.95,
+       "ask": 16.0,
+       "iv": 102.8,
+       "vol": 143,
+       "oi": 13
       },
       {
        "strike": 340.0,
@@ -199239,12 +199681,28 @@
        "oi": 90
       },
       {
+       "strike": 342.5,
+       "bid": 11.65,
+       "ask": 13.45,
+       "iv": 100.3,
+       "vol": 21,
+       "oi": 17
+      },
+      {
        "strike": 345.0,
        "bid": 10.65,
        "ask": 12.4,
        "iv": 99.7,
        "vol": 112,
        "oi": 95
+      },
+      {
+       "strike": 347.5,
+       "bid": 10.5,
+       "ask": 11.5,
+       "iv": 101.8,
+       "vol": 34,
+       "oi": 34
       },
       {
        "strike": 350.0,
@@ -199293,48 +199751,16 @@
        "iv": 100.3,
        "vol": 25,
        "oi": 7
-      },
-      {
-       "strike": 365.0,
-       "bid": 5.45,
-       "ask": 7.05,
-       "iv": 102.1,
-       "vol": 54,
-       "oi": 123
-      },
-      {
-       "strike": 367.5,
-       "bid": 2.03,
-       "ask": 9.35,
-       "iv": 101.8,
-       "vol": 4,
-       "oi": 60
-      },
-      {
-       "strike": 370.0,
-       "bid": 4.55,
-       "ask": 5.45,
-       "iv": 100.2,
-       "vol": 165,
-       "oi": 562
       }
      ],
      "puts": [
       {
-       "strike": 295.0,
-       "bid": 4.0,
-       "ask": 4.8,
-       "iv": 105.0,
-       "vol": 102,
-       "oi": 31
-      },
-      {
-       "strike": 300.0,
-       "bid": 4.5,
-       "ask": 5.7,
-       "iv": 101.4,
-       "vol": 845,
-       "oi": 211
+       "strike": 302.5,
+       "bid": 5.45,
+       "ask": 6.4,
+       "iv": 103.0,
+       "vol": 61,
+       "oi": 36
       },
       {
        "strike": 305.0,
@@ -199391,6 +199817,14 @@
        "iv": 102.5,
        "vol": 143,
        "oi": 399
+      },
+      {
+       "strike": 322.5,
+       "bid": 11.8,
+       "ask": 14.3,
+       "iv": 104.0,
+       "vol": 120,
+       "oi": 67
       },
       {
        "strike": 325.0,
@@ -199523,7 +199957,7 @@
      ],
      "call_wall": 360.0,
      "put_wall": 280.0,
-     "opt_volume": 15011
+     "opt_volume": 15653
     },
     {
      "date": "2026-10-30",
@@ -199545,6 +199979,14 @@
        "oi": 14
       },
       {
+       "strike": 302.5,
+       "bid": 38.05,
+       "ask": 47.1,
+       "iv": 105.4,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 310.0,
        "bid": 33.25,
        "ask": 41.05,
@@ -199559,6 +200001,14 @@
        "iv": 95.2,
        "vol": 1,
        "oi": 1
+      },
+      {
+       "strike": 327.5,
+       "bid": 23.85,
+       "ask": 29.2,
+       "iv": 97.6,
+       "vol": 3,
+       "oi": 0
       },
       {
        "strike": 330.0,
@@ -199577,12 +200027,28 @@
        "oi": 6
       },
       {
+       "strike": 337.5,
+       "bid": 19.15,
+       "ask": 20.85,
+       "iv": 90.0,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 340.0,
        "bid": 18.15,
        "ask": 19.7,
        "iv": 89.8,
        "vol": 39,
        "oi": 10
+      },
+      {
+       "strike": 342.5,
+       "bid": 16.85,
+       "ask": 21.6,
+       "iv": 95.1,
+       "vol": 5,
+       "oi": 0
       },
       {
        "strike": 345.0,
@@ -199609,12 +200075,28 @@
        "oi": 56
       },
       {
+       "strike": 352.5,
+       "bid": 13.0,
+       "ask": 18.2,
+       "iv": 95.2,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 355.0,
        "bid": 12.25,
        "ask": 13.85,
        "iv": 88.0,
        "vol": 302,
        "oi": 26
+      },
+      {
+       "strike": 357.5,
+       "bid": 11.55,
+       "ask": 13.05,
+       "iv": 88.1,
+       "vol": 4,
+       "oi": 3
       },
       {
        "strike": 360.0,
@@ -199631,96 +200113,32 @@
        "iv": 94.7,
        "vol": 4,
        "oi": 1
-      },
-      {
-       "strike": 365.0,
-       "bid": 9.25,
-       "ask": 14.5,
-       "iv": 95.4,
-       "vol": 2,
-       "oi": 37
-      },
-      {
-       "strike": 367.5,
-       "bid": 8.7,
-       "ask": 12.75,
-       "iv": 93.2,
-       "vol": 6,
-       "oi": 5
-      },
-      {
-       "strike": 370.0,
-       "bid": 7.05,
-       "ask": 12.0,
-       "iv": 90.5,
-       "vol": 30,
-       "oi": 547
-      },
-      {
-       "strike": 372.5,
-       "bid": 4.75,
-       "ask": 11.7,
-       "iv": 87.0,
-       "vol": 4,
-       "oi": 8
       }
      ],
      "puts": [
       {
-       "strike": 250.0,
-       "bid": 0.76,
-       "ask": 2.37,
-       "iv": 99.8,
-       "vol": 21,
-       "oi": 59
+       "strike": 302.5,
+       "bid": 6.5,
+       "ask": 12.65,
+       "iv": 88.6,
+       "vol": 3,
+       "oi": 13
       },
       {
-       "strike": 260.0,
-       "bid": 1.04,
-       "ask": 3.05,
-       "iv": 94.5,
-       "vol": 17,
-       "oi": 63
-      },
-      {
-       "strike": 270.0,
-       "bid": 1.79,
-       "ask": 4.9,
-       "iv": 95.3,
-       "vol": 131,
-       "oi": 30
-      },
-      {
-       "strike": 280.0,
-       "bid": 1.87,
-       "ask": 6.95,
-       "iv": 90.9,
-       "vol": 7,
-       "oi": 37
-      },
-      {
-       "strike": 290.0,
-       "bid": 5.9,
-       "ask": 7.05,
-       "iv": 90.7,
-       "vol": 56,
-       "oi": 79
-      },
-      {
-       "strike": 295.0,
-       "bid": 5.05,
-       "ask": 9.95,
-       "iv": 89.3,
-       "vol": 15,
+       "strike": 305.0,
+       "bid": 9.65,
+       "ask": 11.3,
+       "iv": 89.0,
+       "vol": 34,
        "oi": 3
       },
       {
-       "strike": 300.0,
-       "bid": 8.55,
-       "ask": 11.2,
-       "iv": 94.0,
-       "vol": 74,
-       "oi": 352
+       "strike": 307.5,
+       "bid": 7.75,
+       "ask": 12.2,
+       "iv": 82.7,
+       "vol": 0,
+       "oi": 27
       },
       {
        "strike": 310.0,
@@ -199729,6 +200147,30 @@
        "iv": 84.4,
        "vol": 107,
        "oi": 162
+      },
+      {
+       "strike": 312.5,
+       "bid": 9.7,
+       "ask": 16.2,
+       "iv": 87.9,
+       "vol": 0,
+       "oi": 10
+      },
+      {
+       "strike": 315.0,
+       "bid": 13.15,
+       "ask": 14.8,
+       "iv": 88.0,
+       "vol": 33,
+       "oi": 6
+      },
+      {
+       "strike": 317.5,
+       "bid": 10.95,
+       "ask": 17.7,
+       "iv": 85.1,
+       "vol": 0,
+       "oi": 2
       },
       {
        "strike": 320.0,
@@ -199747,12 +200189,36 @@
        "oi": 4
       },
       {
+       "strike": 325.0,
+       "bid": 14.65,
+       "ask": 19.45,
+       "iv": 82.4,
+       "vol": 4,
+       "oi": 8
+      },
+      {
+       "strike": 327.5,
+       "bid": 15.8,
+       "ask": 20.3,
+       "iv": 81.5,
+       "vol": 7,
+       "oi": 2
+      },
+      {
        "strike": 330.0,
        "bid": 19.65,
        "ask": 21.2,
        "iv": 86.0,
        "vol": 145,
        "oi": 308
+      },
+      {
+       "strike": 332.5,
+       "bid": 20.9,
+       "ask": 23.25,
+       "iv": 87.3,
+       "vol": 13,
+       "oi": 2
       },
       {
        "strike": 335.0,
@@ -199779,12 +200245,28 @@
        "oi": 308
       },
       {
+       "strike": 342.5,
+       "bid": 24.75,
+       "ask": 30.85,
+       "iv": 87.4,
+       "vol": 28,
+       "oi": 22
+      },
+      {
        "strike": 345.0,
        "bid": 24.95,
        "ask": 29.85,
        "iv": 79.5,
        "vol": 82,
        "oi": 331
+      },
+      {
+       "strike": 347.5,
+       "bid": 29.4,
+       "ask": 31.8,
+       "iv": 86.1,
+       "vol": 32,
+       "oi": 8
       },
       {
        "strike": 350.0,
@@ -199833,27 +200315,11 @@
        "iv": 75.5,
        "vol": 4,
        "oi": 14
-      },
-      {
-       "strike": 365.0,
-       "bid": 40.8,
-       "ask": 43.4,
-       "iv": 83.0,
-       "vol": 36,
-       "oi": 172
-      },
-      {
-       "strike": 367.5,
-       "bid": 38.75,
-       "ask": 46.05,
-       "iv": 75.3,
-       "vol": 14,
-       "oi": 52
       }
      ],
      "call_wall": 400.0,
      "put_wall": 300.0,
-     "opt_volume": 4823
+     "opt_volume": 5321
     },
     {
      "date": "2026-11-06",
@@ -199867,11 +200333,27 @@
        "oi": 10
       },
       {
+       "strike": 270.0,
+       "bid": 64.8,
+       "ask": 73.5,
+       "iv": 99.6,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 300.0,
        "bid": 42.6,
        "ask": 51.15,
        "iv": 95.2,
        "vol": 3,
+       "oi": 1
+      },
+      {
+       "strike": 310.0,
+       "bid": 36.3,
+       "ask": 44.15,
+       "iv": 93.1,
+       "vol": 0,
        "oi": 1
       },
       {
@@ -199881,6 +200363,14 @@
        "iv": 91.0,
        "vol": 2,
        "oi": 2
+      },
+      {
+       "strike": 330.0,
+       "bid": 26.15,
+       "ask": 29.5,
+       "iv": 86.9,
+       "vol": 2670,
+       "oi": 1000
       },
       {
        "strike": 335.0,
@@ -199977,33 +200467,9 @@
        "iv": 84.5,
        "vol": 1,
        "oi": 92
-      },
-      {
-       "strike": 395.0,
-       "bid": 4.0,
-       "ask": 9.7,
-       "iv": 81.8,
-       "vol": 18,
-       "oi": 28
       }
      ],
      "puts": [
-      {
-       "strike": 200.0,
-       "bid": null,
-       "ask": 4.8,
-       "iv": 169.3,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 210.0,
-       "bid": null,
-       "ask": 4.75,
-       "iv": 155.7,
-       "vol": 0,
-       "oi": 1
-      },
       {
        "strike": 250.0,
        "bid": 1.2,
@@ -200045,12 +200511,28 @@
        "oi": 47
       },
       {
+       "strike": 295.0,
+       "bid": 5.85,
+       "ask": 12.15,
+       "iv": 78.4,
+       "vol": 4,
+       "oi": 6
+      },
+      {
        "strike": 300.0,
        "bid": 7.95,
        "ask": 14.7,
        "iv": 81.6,
        "vol": 24,
        "oi": 168
+      },
+      {
+       "strike": 305.0,
+       "bid": 10.8,
+       "ask": 15.45,
+       "iv": 81.8,
+       "vol": 13,
+       "oi": 9
       },
       {
        "strike": 310.0,
@@ -200061,12 +200543,28 @@
        "oi": 323
       },
       {
+       "strike": 315.0,
+       "bid": 14.0,
+       "ask": 18.95,
+       "iv": 79.7,
+       "vol": 5,
+       "oi": 30
+      },
+      {
        "strike": 320.0,
        "bid": 15.0,
        "ask": 21.4,
        "iv": 78.0,
        "vol": 278,
        "oi": 4015
+      },
+      {
+       "strike": 325.0,
+       "bid": 17.4,
+       "ask": 23.4,
+       "iv": 77.5,
+       "vol": 16,
+       "oi": 5
       },
       {
        "strike": 330.0,
@@ -200173,9 +200671,9 @@
        "oi": 255
       }
      ],
-     "call_wall": 500.0,
+     "call_wall": 330.0,
      "put_wall": 320.0,
-     "opt_volume": 2210
+     "opt_volume": 4925
     }
    ]
   },
@@ -200372,17 +200870,17 @@
       },
       {
        "strike": 215.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 0.05,
-       "iv": 61.1,
+       "iv": 56.3,
        "vol": 0,
        "oi": 1
       },
       {
        "strike": 220.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 2.13,
-       "iv": 138.5,
+       "iv": 114.8,
        "vol": 0,
        "oi": 3
       }
@@ -200515,11 +201013,19 @@
        "iv": 59.6,
        "vol": 31,
        "oi": 7
+      },
+      {
+       "strike": 190.0,
+       "bid": 9.9,
+       "ask": 13.2,
+       "iv": 65.6,
+       "vol": 3,
+       "oi": 0
       }
      ],
      "call_wall": 175.0,
      "put_wall": 157.5,
-     "opt_volume": 29395
+     "opt_volume": 29398
     },
     {
      "date": "2026-10-30",
@@ -200677,6 +201183,14 @@
        "oi": 127
       },
       {
+       "strike": 197.5,
+       "bid": 0.24,
+       "ask": 0.58,
+       "iv": 39.0,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 200.0,
        "bid": 0.15,
        "ask": 0.56,
@@ -200831,6 +201345,14 @@
        "oi": 56
       },
       {
+       "strike": 185.0,
+       "bid": 7.2,
+       "ask": 9.9,
+       "iv": 47.1,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 187.5,
        "bid": 8.35,
        "ask": 11.75,
@@ -200865,7 +201387,7 @@
      ],
      "call_wall": 180.0,
      "put_wall": 150.0,
-     "opt_volume": 6469
+     "opt_volume": 6475
     },
     {
      "date": "2026-11-06",
@@ -201023,10 +201545,18 @@
        "oi": 111
       },
       {
+       "strike": 225.0,
+       "bid": 0.01,
+       "ask": 0.35,
+       "iv": 54.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 235.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 2.14,
-       "iv": 91.8,
+       "iv": 77.3,
        "vol": 0,
        "oi": 1
       }
@@ -201143,11 +201673,19 @@
        "iv": 41.5,
        "vol": 3,
        "oi": 2
+      },
+      {
+       "strike": 185.0,
+       "bid": 6.95,
+       "ask": 10.45,
+       "iv": 41.4,
+       "vol": 1,
+       "oi": 0
       }
      ],
      "call_wall": 180.0,
      "put_wall": 150.0,
-     "opt_volume": 2303
+     "opt_volume": 2305
     }
    ]
   }
@@ -205254,7 +205792,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -205302,7 +205840,7 @@
     "age_days": 0,
     "max_age": 7,
     "status": "ok",
-    "note": "33 nomi in attesa del budget per run"
+    "note": "23 nomi in attesa del budget per run"
    },
    {
     "key": "bce",
@@ -205330,6 +205868,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-18T17:32:33Z"
+  "generated_at": "2026-10-18T17:46:42Z"
  }
 }
