@@ -75,11 +75,6 @@
     "voci": []
    },
    "letto_il": "2026-10-18",
-   "linee_disponibili": {
-    "al": "2016-09-24",
-    "valore": 395000000.0,
-    "valuta": "USD"
-   },
    "scadenze": {
     "al": "2025-12-27",
     "depositato": "2026-02-04",
@@ -92,7 +87,12 @@
      "entro_12_mesi": 875000000.0,
      "oltre_5": 1000000000.0
     }
-   }
+   },
+   "stantii": {
+    "equo": "2015-07-30",
+    "linee_disponibili": "2016-10-26"
+   },
+   "versione": 502
   },
   "AMGN": {
    "carta_commerciale": {
@@ -224,11 +224,6 @@
     "voci": []
    },
    "letto_il": "2026-10-18",
-   "linee_disponibili": {
-    "al": "2023-03-31",
-    "valore": 409191000.0,
-    "valuta": "USD"
-   },
    "scadenze": {
     "al": "2026-03-31",
     "depositato": "2026-04-29",
@@ -243,7 +238,11 @@
      "oltre_5": 0.0,
      "resto_esercizio": 3959000.0
     }
-   }
+   },
+   "stantii": {
+    "linee_disponibili": "2023-05-09"
+   },
+   "versione": 502
   },
   "BLK": {
    "cik": 2012383,
@@ -436,7 +435,8 @@
      "entro_12_mesi": 6184000000.0,
      "resto_esercizio": 4413000000.0
     }
-   }
+   },
+   "versione": 502
   },
   "CVX": {
    "carta_commerciale": {
@@ -745,13 +745,10 @@
      "resto_esercizio": 0.0
     }
    },
-   "tasso": {
-    "al": "2025-05-03",
-    "depositato": "2025-05-30",
-    "forma": "10-Q",
-    "valore_pct": 4.15,
-    "voce": "DebtWeightedAverageInterestRate"
-   }
+   "stantii": {
+    "tasso": "2025-05-30"
+   },
+   "versione": 502
   },
   "MSTR": {
    "cik": 1050446,
@@ -765,16 +762,6 @@
     "n": 0,
     "voci": []
    },
-   "equo": {
-    "al": "2021-03-31",
-    "depositato": "2021-04-29",
-    "forma": "10-Q",
-    "rapporto_pct": 123.9,
-    "voci": [
-     "DebtInstrumentFairValue",
-     "LongTermDebt"
-    ]
-   },
    "letto_il": "2026-10-18",
    "scadenze": {
     "al": "2026-06-30",
@@ -786,7 +773,11 @@
      "anno_3": 2203659000.0,
      "entro_12_mesi": 40044000.0
     }
-   }
+   },
+   "stantii": {
+    "equo": "2021-04-29"
+   },
+   "versione": 502
   },
   "MU": {
    "cik": 723125,
@@ -814,14 +805,10 @@
      "entro_12_mesi": 0.0,
      "oltre_5": 2808000000.0
     }
-   }
+   },
+   "versione": 502
   },
   "NVDA": {
-   "carta_commerciale": {
-    "al": "2025-01-26",
-    "valore": 0.0,
-    "valuta": "USD"
-   },
    "cik": 1045810,
    "deposito": {
     "accn": "0001045810-26-000075",
@@ -844,13 +831,11 @@
     ]
    },
    "letto_il": "2026-10-18",
-   "tasso": {
-    "al": "2018-01-28",
-    "depositato": "2018-02-28",
-    "forma": "10-K",
-    "valore_pct": 3.15,
-    "voce": "DebtInstrumentInterestRateEffectivePercentage"
-   }
+   "stantii": {
+    "carta_commerciale": "2025-02-26",
+    "tasso": "2018-02-28"
+   },
+   "versione": 502
   },
   "PLTR": {
    "cik": 1321655,
@@ -865,17 +850,10 @@
     "voci": []
    },
    "letto_il": "2026-10-18",
-   "scadenze": {
-    "al": "2020-12-31",
-    "depositato": "2021-02-26",
-    "forma": "10-K",
-    "valuta": "USD",
-    "voci": {
-     "anno_2": 0.0,
-     "anno_3": 200000000.0,
-     "entro_12_mesi": 0.0
-    }
-   }
+   "stantii": {
+    "scadenze": "2021-02-26"
+   },
+   "versione": 502
   },
   "RGTI": {
    "cik": 1838359,
@@ -890,26 +868,11 @@
     "voci": []
    },
    "letto_il": "2026-10-18",
-   "scadenze": {
-    "al": "2022-09-30",
-    "depositato": "2022-11-22",
-    "forma": "10-Q",
-    "valuta": "USD",
-    "voci": {
-     "anno_2": 9273000.0,
-     "anno_3": 12914000.0,
-     "anno_4": 8734000.0,
-     "anno_5": 377000.0,
-     "entro_12_mesi": 702000.0
-    }
+   "stantii": {
+    "scadenze": "2022-11-30",
+    "tasso": "2024-11-12"
    },
-   "tasso": {
-    "al": "2024-09-30",
-    "depositato": "2024-11-12",
-    "forma": "10-Q",
-    "valore_pct": 23.1,
-    "voce": "DebtInstrumentInterestRateEffectivePercentage"
-   }
+   "versione": 502
   },
   "SMCI": {
    "cik": 1375365,
@@ -922,16 +885,6 @@
    "derivati_tassi": {
     "n": 0,
     "voci": []
-   },
-   "equo": {
-    "al": "2013-06-30",
-    "depositato": "2013-09-11",
-    "forma": "10-K",
-    "rapporto_pct": 100.0,
-    "voci": [
-     "DebtInstrumentFairValue",
-     "LongTermDebt"
-    ]
    },
    "letto_il": "2026-10-18",
    "scadenze": {
@@ -946,7 +899,11 @@
      "anno_5": 2000000000.0,
      "entro_12_mesi": 2039774000.0
     }
-   }
+   },
+   "stantii": {
+    "equo": "2013-09-11"
+   },
+   "versione": 502
   }
  }
 }
