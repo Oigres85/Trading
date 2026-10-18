@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-18T17:19:04Z",
+ "updated_at": "2026-10-18T17:32:32Z",
  "eurusd": 1.1242,
  "totals": {
   "usd_value": 0,
@@ -464,7 +464,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -16721,16 +16721,16 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81099.99,
+   "price": 81064.79,
    "price_asof": "2026-10-18",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.35,
+   "change_pct": -0.39,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.7,
-   "sma200_dist_pct": 11.9,
-   "sma50_dist_pct": -0.3,
+   "ath_dist_pct": -35.8,
+   "sma200_dist_pct": 11.8,
+   "sma50_dist_pct": -0.4,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
    "w52_dist_pct": -30.3,
@@ -16738,8 +16738,8 @@
    "day_low": 80954.69,
    "support": 79735.86,
    "resistance": 87146.35,
-   "rsi": 45.0,
-   "volume": 15831192576,
+   "rsi": 44.9,
+   "volume": 15785826304,
    "vol_ratio": 0.38,
    "atr_14": 2065.83,
    "atr_pct": 2.55,
@@ -16751,7 +16751,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81099.99
+     81064.79
     ],
     "m6": [
      66289.5,
@@ -16879,7 +16879,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81099.99
+     81064.79
     ],
     "all": [
      386.94,
@@ -17027,7 +17027,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81099.99
+     81064.79
     ],
     "m1": [
      84458.09,
@@ -17051,7 +17051,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81099.99
+     81064.79
     ],
     "m3": [
      62975.59,
@@ -17119,7 +17119,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81099.99
+     81064.79
     ],
     "y1": [
      107198.27,
@@ -17195,7 +17195,7 @@
      84763.58,
      81676.34,
      83095.12,
-     81099.99
+     81064.79
     ],
     "d1": [
      81300.0,
@@ -17301,7 +17301,8 @@
      81003.44,
      80955.5,
      81116.21,
-     81074.92
+     81074.92,
+     81101.63
     ]
    },
    "earnings_date": null,
@@ -17311,11 +17312,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.62,
-   "sortino_1y": -0.85,
+   "sortino_1y": -0.86,
    "sharpe_6m": 1.28,
    "sortino_6m": 2.3,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81099.99,
+   "prezzo_limite_aggiustato": 81064.79,
    "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17328,22 +17329,22 @@
     "w1": {
      "support": 79735.86,
      "resistance": 84049.06,
-     "change_pct": -0.57
+     "change_pct": -0.61
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -3.98
+     "change_pct": -4.02
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 28.78
+     "change_pct": 28.72
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 15.66
+     "change_pct": 15.61
     }
    },
    "financials": [],
@@ -17370,74 +17371,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81099.99,
+     "prezzo": 81064.79,
      "medie": {
       "sma10": {
-       "liv": 82168.26,
-       "dist_pct": -1.3
+       "liv": 82164.74,
+       "dist_pct": -1.34
       },
       "ema10": {
-       "liv": 82120.07,
-       "dist_pct": -1.24
+       "liv": 82113.67,
+       "dist_pct": -1.28
       },
       "sma20": {
-       "liv": 83287.48,
-       "dist_pct": -2.63
+       "liv": 83285.71,
+       "dist_pct": -2.67
       },
       "ema20": {
-       "liv": 82477.59,
-       "dist_pct": -1.67
+       "liv": 82474.23,
+       "dist_pct": -1.71
       },
       "sma30": {
-       "liv": 83535.5,
-       "dist_pct": -2.92
+       "liv": 83534.33,
+       "dist_pct": -2.96
       },
       "ema30": {
-       "liv": 82087.81,
-       "dist_pct": -1.2
+       "liv": 82085.54,
+       "dist_pct": -1.24
       },
       "sma50": {
-       "liv": 81379.98,
-       "dist_pct": -0.34
+       "liv": 81379.28,
+       "dist_pct": -0.39
       },
       "ema50": {
-       "liv": 80444.38,
-       "dist_pct": 0.81
+       "liv": 80443.0,
+       "dist_pct": 0.77
       },
       "sma100": {
-       "liv": 74192.05,
-       "dist_pct": 9.31
+       "liv": 74191.7,
+       "dist_pct": 9.26
       },
       "ema100": {
-       "liv": 76944.23,
-       "dist_pct": 5.4
+       "liv": 76943.53,
+       "dist_pct": 5.36
       },
       "sma200": {
-       "liv": 72490.8,
-       "dist_pct": 11.88
+       "liv": 72490.62,
+       "dist_pct": 11.83
       },
       "ema200": {
-       "liv": 75837.78,
-       "dist_pct": 6.94
+       "liv": 75837.43,
+       "dist_pct": 6.89
       }
      },
      "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 45.0,
+      "rsi14": 44.9,
       "macd": {
-       "linea": -34.95,
-       "segnale": 479.64,
-       "istogramma": -514.58
+       "linea": -37.76,
+       "segnale": 479.08,
+       "istogramma": -516.83
       },
-      "stoch_k": 18.9,
-      "stoch_d": 22.0,
-      "williams_r": -81.1,
-      "cci20": -63.4,
+      "stoch_k": 18.4,
+      "stoch_d": 21.8,
+      "williams_r": -81.6,
+      "cci20": -63.8,
       "adx14": 22.9,
       "di_su": 18.3,
       "di_giu": 20.4,
-      "momentum10": -576.34
+      "momentum10": -611.55
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17930,19 +17931,19 @@
       "o": 81383.29,
       "h": 82143.93,
       "l": 80954.69,
-      "c": 81099.99
+      "c": 81064.79
      }
     ],
     "performance": {
-     "s1": -2.4,
-     "m1": -3.92,
-     "m3": 27.91,
-     "m6": 23.42,
-     "a1": 15.42,
-     "ytd": -8.6,
-     "a3": 133.93,
-     "a5": 32.26,
-     "a10": 11469.65
+     "s1": -2.44,
+     "m1": -3.96,
+     "m3": 27.86,
+     "m6": 23.37,
+     "a1": 15.37,
+     "ytd": -8.64,
+     "a3": 133.83,
+     "a5": 32.2,
+     "a10": 11464.63
     },
     "stagionalita": [
      {
@@ -39098,7 +39099,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -40007,7 +40008,7 @@
      "a1": 121.44,
      "a3": 999.35,
      "a5": 744.12,
-     "a10": 749.04
+     "a10": 749.03
     },
     "stagionalita": [
      {
@@ -55460,7 +55461,7 @@
       },
       "evento": {
        "beta": 0.29,
-       "r2": 0.162,
+       "r2": 0.163,
        "corr": 0.4,
        "campione": 50,
        "da": "2025-10-27",
@@ -66026,7 +66027,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -66891,7 +66892,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -93996,7 +93997,7 @@
     ],
     "y1": [
      290.74,
-     283.88,
+     283.89,
      290.37,
      311.56,
      327.65,
@@ -100986,9 +100987,9 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -106718,7 +106719,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -106769,7 +106770,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -106905,7 +106906,7 @@
      585.73,
      690.4,
      705.85,
-     730.88,
+     730.87,
      780.99,
      774.14,
      810.11,
@@ -110486,7 +110487,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -110714,13 +110715,13 @@
      559.58,
      599.35,
      549.48,
-     603.73,
+     603.74,
      601.22,
      500.17,
      587.09,
      650.8,
      648.54,
-     694.83,
+     694.84,
      630.97,
      616.82,
      618.74,
@@ -124558,32 +124559,210 @@
   "debito_sec": {
    "fonte": "SEC EDGAR, fatti XBRL dei 10-Q e 10-K (companyfacts): solo fatti non dimensionali",
    "per_titolo": {
-    "AMD": {
-     "cik": 2488,
+    "AAPL": {
+     "cik": 320193,
      "deposito": {
       "forma": "10-Q",
-      "data": "2026-08-05",
-      "accn": "0000002488-26-000123",
+      "data": "2026-07-31",
+      "accn": "0000320193-26-000020",
       "periodo": "2026-06-27"
      },
      "letto_il": "2026-10-18",
      "scadenze": {
-      "al": "2025-12-27",
+      "al": "2025-09-27",
       "forma": "10-K",
-      "depositato": "2026-02-04",
+      "depositato": "2025-10-31",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 875000000.0,
+       "entro_12_mesi": 12393000000.0,
+       "anno_2": 10078000000.0,
+       "anno_3": 9300000000.0,
+       "anno_4": 5235000000.0,
+       "anno_5": 4972000000.0,
+       "oltre_5": 49303000000.0
+      }
+     },
+     "carta_commerciale": {
+      "valore": 1997000000.0,
+      "valuta": "USD",
+      "al": "2026-06-27"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "ABBV": {
+     "cik": 1551152,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-03",
+      "accn": "0001551152-26-000026",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-20",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 6000000000.0,
+       "anno_2": 5130000000.0,
+       "anno_3": 4466000000.0,
+       "anno_4": 8645000000.0,
+       "anno_5": 1000000000.0,
+       "oltre_5": 39262000000.0
+      }
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "AMD": {
+     "cik": 2488,
+     "deposito": {
+      "accn": "0000002488-26-000123",
+      "data": "2026-08-05",
+      "forma": "10-Q",
+      "periodo": "2026-06-27"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18",
+     "linee_disponibili": {
+      "al": "2016-09-24",
+      "valore": 395000000.0,
+      "valuta": "USD"
+     },
+     "scadenze": {
+      "al": "2025-12-27",
+      "depositato": "2026-02-04",
+      "forma": "10-K",
+      "valuta": "USD",
+      "voci": {
        "anno_3": 625000000.0,
        "anno_4": 0.0,
        "anno_5": 750000000.0,
+       "entro_12_mesi": 875000000.0,
        "oltre_5": 1000000000.0
       }
+     }
+    },
+    "AMGN": {
+     "cik": 318154,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-05",
+      "accn": "0000318154-26-000126",
+      "periodo": "2026-06-30"
      },
-     "linee_disponibili": {
-      "valore": 395000000.0,
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-13",
       "valuta": "USD",
-      "al": "2016-09-24"
+      "voci": {
+       "entro_12_mesi": 4571000000.0,
+       "anno_2": 2724000000.0,
+       "anno_3": 4984000000.0,
+       "anno_4": 2943000000.0,
+       "anno_5": 4000000000.0,
+       "oltre_5": 36822000000.0
+      }
+     },
+     "carta_commerciale": {
+      "valore": 0.0,
+      "valuta": "USD",
+      "al": "2025-12-31"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "AMZN": {
+     "cik": 1018724,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-07-31",
+      "accn": "0001018724-26-000026",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-06",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 2752000000.0,
+       "anno_2": 8832000000.0,
+       "anno_3": 4752000000.0,
+       "anno_4": 3000000000.0,
+       "anno_5": 4500000000.0,
+       "oltre_5": 45000000000.0
+      }
+     },
+     "equo": {
+      "al": "2017-03-31",
+      "voci": [
+       "LongTermDebtFairValue",
+       "LongTermDebt"
+      ],
+      "forma": "10-Q",
+      "depositato": "2017-04-28",
+      "rapporto_pct": 98.6
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "ANET": {
+     "cik": 1596532,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-05",
+      "accn": "0001596532-26-000175",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "AVGO": {
+     "cik": 1730168,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-09-10",
+      "accn": "0001730168-26-000080",
+      "periodo": "2026-08-02"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2026-08-02",
+      "forma": "10-Q",
+      "depositato": "2026-09-10",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 0.0,
+       "resto_esercizio": 2252000000.0,
+       "anno_2": 5127000000.0,
+       "anno_3": 2405000000.0,
+       "anno_4": 6406000000.0
+      }
+     },
+     "carta_commerciale": {
+      "valore": 496000000.0,
+      "valuta": "USD",
+      "al": "2025-08-03"
      },
      "derivati_tassi": {
       "voci": [],
@@ -124593,307 +124772,420 @@
     "BE": {
      "cik": 1664703,
      "deposito": {
-      "forma": "10-Q/A",
-      "data": "2026-07-29",
       "accn": "0001628280-26-050325",
+      "data": "2026-07-29",
+      "forma": "10-Q/A",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
      "letto_il": "2026-10-18",
+     "linee_disponibili": {
+      "al": "2023-03-31",
+      "valore": 409191000.0,
+      "valuta": "USD"
+     },
      "scadenze": {
       "al": "2026-03-31",
-      "forma": "10-Q",
       "depositato": "2026-04-29",
+      "forma": "10-Q",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 0.0,
-       "resto_esercizio": 3959000.0,
        "anno_2": 81236000.0,
        "anno_3": 75125000.0,
        "anno_4": 2500000000.0,
        "anno_5": 0.0,
-       "oltre_5": 0.0
+       "entro_12_mesi": 0.0,
+       "oltre_5": 0.0,
+       "resto_esercizio": 3959000.0
       }
-     },
-     "linee_disponibili": {
-      "valore": 409191000.0,
-      "valuta": "USD",
-      "al": "2023-03-31"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     },
-    "CRWV": {
-     "cik": 1769628,
+    "BLK": {
+     "cik": 2012383,
      "deposito": {
       "forma": "10-Q",
-      "data": "2026-08-12",
-      "accn": "0001769628-26-000366",
+      "data": "2026-08-06",
+      "accn": "0001193125-26-337177",
       "periodo": "2026-06-30"
      },
      "letto_il": "2026-10-18",
-     "scadenze": {
-      "al": "2026-06-30",
-      "forma": "10-Q",
-      "depositato": "2026-08-12",
-      "valuta": "USD",
-      "voci": {
-       "entro_12_mesi": 6184000000.0,
-       "resto_esercizio": 4413000000.0,
-       "anno_2": 4416000000.0,
-       "anno_3": 2421000000.0,
-       "anno_4": 3221000000.0
-      }
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
-    },
-    "MRVL": {
-     "cik": 1835632,
-     "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-28",
-      "accn": "0001835632-26-000025",
-      "periodo": "2026-08-01"
-     },
-     "letto_il": "2026-10-18",
-     "scadenze": {
-      "al": "2026-08-01",
-      "forma": "10-Q",
-      "depositato": "2026-08-28",
-      "valuta": "USD",
-      "voci": {
-       "entro_12_mesi": 0.0,
-       "resto_esercizio": 0.0,
-       "anno_2": 1249900000.0,
-       "anno_3": 500000000.0,
-       "anno_4": 500000000.0
-      }
-     },
-     "tasso": {
-      "valore_pct": 4.15,
-      "al": "2025-05-03",
-      "voce": "DebtWeightedAverageInterestRate",
-      "forma": "10-Q",
-      "depositato": "2025-05-30"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
-    },
-    "MSTR": {
-     "cik": 1050446,
-     "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-03",
-      "accn": "0001050446-26-000044",
-      "periodo": "2026-06-30"
-     },
-     "letto_il": "2026-10-18",
-     "scadenze": {
-      "al": "2026-06-30",
-      "forma": "10-Q",
-      "depositato": "2026-08-03",
-      "valuta": "USD",
-      "voci": {
-       "entro_12_mesi": 40044000.0,
-       "anno_2": 4510000000.0,
-       "anno_3": 2203659000.0
-      }
-     },
      "equo": {
-      "al": "2021-03-31",
-      "voci": [
-       "DebtInstrumentFairValue",
-       "LongTermDebt"
-      ],
-      "forma": "10-Q",
-      "depositato": "2021-04-29",
-      "rapporto_pct": 123.9
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
-    },
-    "MU": {
-     "cik": 723125,
-     "deposito": {
-      "forma": "10-K",
-      "data": "2026-10-09",
-      "accn": "0000723125-26-000023",
-      "periodo": "2026-09-03"
-     },
-     "letto_il": "2026-10-18",
-     "scadenze": {
-      "al": "2026-09-03",
-      "forma": "10-K",
-      "depositato": "2026-10-09",
-      "valuta": "USD",
-      "voci": {
-       "entro_12_mesi": 0.0,
-       "anno_2": 0.0,
-       "anno_3": 0.0,
-       "anno_4": 0.0,
-       "anno_5": 0.0,
-       "oltre_5": 2808000000.0
-      }
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
-    },
-    "NVDA": {
-     "cik": 1045810,
-     "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-26",
-      "accn": "0001045810-26-000075",
-      "periodo": "2026-07-26"
-     },
-     "letto_il": "2026-10-18",
-     "tasso": {
-      "valore_pct": 3.15,
-      "al": "2018-01-28",
-      "voce": "DebtInstrumentInterestRateEffectivePercentage",
-      "forma": "10-K",
-      "depositato": "2018-02-28"
-     },
-     "equo": {
-      "al": "2026-07-26",
+      "al": "2026-06-30",
       "voci": [
        "LongTermDebtFairValue",
        "LongTermDebt"
       ],
       "forma": "10-Q",
-      "depositato": "2026-08-26",
-      "rapporto_pct": 94.1
-     },
-     "carta_commerciale": {
-      "valore": 0.0,
-      "valuta": "USD",
-      "al": "2025-01-26"
+      "depositato": "2026-08-06",
+      "rapporto_pct": 96.9
      },
      "derivati_tassi": {
       "voci": [],
       "n": 0
+     }
+    },
+    "CBRS": {
+     "cik": 2021728,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-12",
+      "accn": "0001628280-26-056357",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "CEG": {
+     "cik": 1868275,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-06",
+      "accn": "0001868275-26-000104",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-24",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 92000000.0,
+       "anno_2": 666000000.0,
+       "anno_3": 828000000.0,
+       "anno_4": 157000000.0,
+       "anno_5": 99000000.0,
+       "oltre_5": 5561000000.0
+      }
+     },
+     "equo": {
+      "al": "2022-12-31",
+      "voci": [
+       "DebtInstrumentFairValue",
+       "DebtInstrumentCarryingAmount"
+      ],
+      "forma": "10-K",
+      "depositato": "2023-02-16",
+      "fuori_scala": 0.0
+     },
+     "linee_disponibili": {
+      "valore": 2586000000.0,
+      "valuta": "USD",
+      "al": "2026-06-30"
+     },
+     "carta_commerciale": {
+      "valore": 493000000.0,
+      "valuta": "USD",
+      "al": "2022-09-30"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "COP": {
+     "cik": 1163165,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-06",
+      "accn": "0001163165-26-000032",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-17",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 713000000.0,
+       "anno_2": 786000000.0,
+       "anno_3": 670000000.0,
+       "anno_4": 992000000.0,
+       "anno_5": 1599000000.0
+      }
+     },
+     "linee_disponibili": {
+      "valore": 6750000000.0,
+      "valuta": "USD",
+      "al": "2016-12-31"
+     },
+     "carta_commerciale": {
+      "valore": 961000000.0,
+      "valuta": "USD",
+      "al": "2013-12-31"
+     },
+     "derivati_tassi": {
+      "voci": [
+       "PercentageOfDebtHedgedByInterestRateDerivatives"
+      ],
+      "n": 1
+     }
+    },
+    "CRWV": {
+     "cik": 1769628,
+     "deposito": {
+      "accn": "0001769628-26-000366",
+      "data": "2026-08-12",
+      "forma": "10-Q",
+      "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2026-06-30",
+      "depositato": "2026-08-12",
+      "forma": "10-Q",
+      "valuta": "USD",
+      "voci": {
+       "anno_2": 4416000000.0,
+       "anno_3": 2421000000.0,
+       "anno_4": 3221000000.0,
+       "entro_12_mesi": 6184000000.0,
+       "resto_esercizio": 4413000000.0
+      }
+     }
+    },
+    "MRVL": {
+     "cik": 1835632,
+     "deposito": {
+      "accn": "0001835632-26-000025",
+      "data": "2026-08-28",
+      "forma": "10-Q",
+      "periodo": "2026-08-01"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2026-08-01",
+      "depositato": "2026-08-28",
+      "forma": "10-Q",
+      "valuta": "USD",
+      "voci": {
+       "anno_2": 1249900000.0,
+       "anno_3": 500000000.0,
+       "anno_4": 500000000.0,
+       "entro_12_mesi": 0.0,
+       "resto_esercizio": 0.0
+      }
+     },
+     "tasso": {
+      "al": "2025-05-03",
+      "depositato": "2025-05-30",
+      "forma": "10-Q",
+      "valore_pct": 4.15,
+      "voce": "DebtWeightedAverageInterestRate"
+     }
+    },
+    "MSTR": {
+     "cik": 1050446,
+     "deposito": {
+      "accn": "0001050446-26-000044",
+      "data": "2026-08-03",
+      "forma": "10-Q",
+      "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "equo": {
+      "al": "2021-03-31",
+      "depositato": "2021-04-29",
+      "forma": "10-Q",
+      "rapporto_pct": 123.9,
+      "voci": [
+       "DebtInstrumentFairValue",
+       "LongTermDebt"
+      ]
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2026-06-30",
+      "depositato": "2026-08-03",
+      "forma": "10-Q",
+      "valuta": "USD",
+      "voci": {
+       "anno_2": 4510000000.0,
+       "anno_3": 2203659000.0,
+       "entro_12_mesi": 40044000.0
+      }
+     }
+    },
+    "MU": {
+     "cik": 723125,
+     "deposito": {
+      "accn": "0000723125-26-000023",
+      "data": "2026-10-09",
+      "forma": "10-K",
+      "periodo": "2026-09-03"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18",
+     "scadenze": {
+      "al": "2026-09-03",
+      "depositato": "2026-10-09",
+      "forma": "10-K",
+      "valuta": "USD",
+      "voci": {
+       "anno_2": 0.0,
+       "anno_3": 0.0,
+       "anno_4": 0.0,
+       "anno_5": 0.0,
+       "entro_12_mesi": 0.0,
+       "oltre_5": 2808000000.0
+      }
+     }
+    },
+    "NVDA": {
+     "carta_commerciale": {
+      "al": "2025-01-26",
+      "valore": 0.0,
+      "valuta": "USD"
+     },
+     "cik": 1045810,
+     "deposito": {
+      "accn": "0001045810-26-000075",
+      "data": "2026-08-26",
+      "forma": "10-Q",
+      "periodo": "2026-07-26"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "equo": {
+      "al": "2026-07-26",
+      "depositato": "2026-08-26",
+      "forma": "10-Q",
+      "rapporto_pct": 94.1,
+      "voci": [
+       "LongTermDebtFairValue",
+       "LongTermDebt"
+      ]
+     },
+     "letto_il": "2026-10-18",
+     "tasso": {
+      "al": "2018-01-28",
+      "depositato": "2018-02-28",
+      "forma": "10-K",
+      "valore_pct": 3.15,
+      "voce": "DebtInstrumentInterestRateEffectivePercentage"
      }
     },
     "PLTR": {
      "cik": 1321655,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-04",
       "accn": "0001321655-26-000041",
+      "data": "2026-08-04",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2020-12-31",
-      "forma": "10-K",
       "depositato": "2021-02-26",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 0.0,
        "anno_2": 0.0,
-       "anno_3": 200000000.0
+       "anno_3": 200000000.0,
+       "entro_12_mesi": 0.0
       }
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     },
     "RGTI": {
      "cik": 1838359,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-06",
       "accn": "0001104659-26-091993",
+      "data": "2026-08-06",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2022-09-30",
-      "forma": "10-Q",
       "depositato": "2022-11-22",
+      "forma": "10-Q",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 702000.0,
        "anno_2": 9273000.0,
        "anno_3": 12914000.0,
        "anno_4": 8734000.0,
-       "anno_5": 377000.0
+       "anno_5": 377000.0,
+       "entro_12_mesi": 702000.0
       }
      },
      "tasso": {
-      "valore_pct": 23.1,
       "al": "2024-09-30",
-      "voce": "DebtInstrumentInterestRateEffectivePercentage",
+      "depositato": "2024-11-12",
       "forma": "10-Q",
-      "depositato": "2024-11-12"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
+      "valore_pct": 23.1,
+      "voce": "DebtInstrumentInterestRateEffectivePercentage"
      }
     },
     "SMCI": {
      "cik": 1375365,
      "deposito": {
-      "forma": "10-K",
-      "data": "2026-08-31",
       "accn": "0001375365-26-000022",
+      "data": "2026-08-31",
+      "forma": "10-K",
       "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "equo": {
+      "al": "2013-06-30",
+      "depositato": "2013-09-11",
+      "forma": "10-K",
+      "rapporto_pct": 100.0,
+      "voci": [
+       "DebtInstrumentFairValue",
+       "LongTermDebt"
+      ]
      },
      "letto_il": "2026-10-18",
      "scadenze": {
       "al": "2026-06-30",
-      "forma": "10-K",
       "depositato": "2026-08-31",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 2039774000.0,
        "anno_2": 6061000.0,
        "anno_3": 5381000.0,
        "anno_4": 4932000.0,
-       "anno_5": 2000000000.0
+       "anno_5": 2000000000.0,
+       "entro_12_mesi": 2039774000.0
       }
-     },
-     "equo": {
-      "al": "2013-06-30",
-      "voci": [
-       "DebtInstrumentFairValue",
-       "LongTermDebt"
-      ],
-      "forma": "10-K",
-      "depositato": "2013-09-11",
-      "rapporto_pct": 100.0
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
      }
     }
    },
    "letti_ora": [
-    "MU",
-    "AMD",
-    "NVDA",
-    "PLTR",
-    "MRVL",
-    "RGTI",
-    "BE",
-    "SMCI",
-    "MSTR",
-    "CRWV"
-   ],
-   "in_attesa": [
     "AAPL",
     "ABBV",
     "AMGN",
@@ -124903,7 +125195,9 @@
     "BLK",
     "CBRS",
     "CEG",
-    "COP",
+    "COP"
+   ],
+   "in_attesa": [
     "CRM",
     "CRWD",
     "CVX",
@@ -129726,8 +130020,8 @@
    "symbol": "SPY",
    "name": "S&P 500 ETF",
    "ratio": 1.27,
-   "puts": 1226599,
-   "calls": 965706
+   "puts": 1227653,
+   "calls": 965738
   },
   "risk_sentiment": {
    "score": 35,
@@ -129747,7 +130041,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 47
+     "score": 46
     },
     {
      "label": "Treasury 10A",
@@ -135449,7 +135743,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-18T17:19:04Z"
+   "letto_il": "2026-10-18T17:32:32Z"
   }
  },
  "broker": null,
@@ -135917,7 +136211,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-18T17:19:04Z"
+  "letto_il": "2026-10-18T17:32:32Z"
  },
  "predictions": [
   {
@@ -135932,13 +136226,8 @@
   },
   {
    "question": "Will Bitcoin dip to $80,000 October 12-18?",
-   "yes": 23,
+   "yes": 22,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-80k-october-12-18-2026-from-october-15"
-  },
-  {
-   "question": "Will Bitcoin reach $84,000 October 12-18?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/will-bitcoin-reach-84k-october-12-18-2026-from-october-14"
   },
   {
    "question": "Will there be no change in Fed interest rates after the October 2026 meeting?",
@@ -159756,7 +160045,7 @@
        "ask": 17.25,
        "iv": 50.6,
        "vol": 2,
-       "oi": 0
+       "oi": 1
       },
       {
        "strike": 142.0,
@@ -160017,6 +160306,14 @@
        "oi": 8
       },
       {
+       "strike": 155.0,
+       "bid": 1.35,
+       "ask": 2.98,
+       "iv": 44.5,
+       "vol": 15,
+       "oi": 166
+      },
+      {
        "strike": 157.5,
        "bid": 2.12,
        "ask": 4.75,
@@ -160031,11 +160328,19 @@
        "iv": 59.5,
        "vol": 11,
        "oi": 28
+      },
+      {
+       "strike": 172.5,
+       "bid": 14.6,
+       "ask": 18.15,
+       "iv": 86.5,
+       "vol": 4,
+       "oi": 0
       }
      ],
      "call_wall": 162.5,
      "put_wall": 135.0,
-     "opt_volume": 7558
+     "opt_volume": 7591
     },
     {
      "date": "2026-10-30",
@@ -160207,6 +160512,14 @@
        "iv": 49.8,
        "vol": 83,
        "oi": 1
+      },
+      {
+       "strike": 177.5,
+       "bid": 0.0,
+       "ask": 0.65,
+       "iv": 50.3,
+       "vol": 23,
+       "oi": 1
       }
      ],
      "puts": [
@@ -160307,6 +160620,14 @@
        "oi": 80
       },
       {
+       "strike": 155.0,
+       "bid": 3.8,
+       "ask": 6.4,
+       "iv": 59.6,
+       "vol": 11,
+       "oi": 0
+      },
+      {
        "strike": 157.5,
        "bid": 4.35,
        "ask": 7.65,
@@ -160325,7 +160646,7 @@
      ],
      "call_wall": 160.0,
      "put_wall": 135.0,
-     "opt_volume": 961
+     "opt_volume": 995
     },
     {
      "date": "2026-11-06",
@@ -160475,39 +160796,47 @@
        "oi": 5
       },
       {
+       "strike": 175.0,
+       "bid": 0.12,
+       "ask": 1.3,
+       "iv": 45.7,
+       "vol": 50,
+       "oi": 0
+      },
+      {
+       "strike": 177.5,
+       "bid": 0.0,
+       "ask": 1.39,
+       "iv": 50.4,
+       "vol": 4,
+       "oi": 0
+      },
+      {
        "strike": 180.0,
        "bid": 0.03,
        "ask": 1.18,
        "iv": 51.4,
        "vol": 2,
        "oi": 9
+      },
+      {
+       "strike": 185.0,
+       "bid": 0.0,
+       "ask": 2.39,
+       "iv": 58.3,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 190.0,
+       "bid": 0.0,
+       "ask": 1.75,
+       "iv": 59.7,
+       "vol": 12,
+       "oi": 0
       }
      ],
      "puts": [
-      {
-       "strike": 137.0,
-       "bid": 0.1,
-       "ask": 1.78,
-       "iv": 58.2,
-       "vol": 4,
-       "oi": 54
-      },
-      {
-       "strike": 138.0,
-       "bid": 0.45,
-       "ask": 1.87,
-       "iv": 57.1,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 139.0,
-       "bid": 0.11,
-       "ask": 2.11,
-       "iv": 57.4,
-       "vol": 0,
-       "oi": 171
-      },
       {
        "strike": 140.0,
        "bid": 0.9,
@@ -160557,6 +160886,14 @@
        "oi": 9
       },
       {
+       "strike": 146.0,
+       "bid": 0.8,
+       "ask": 4.2,
+       "iv": 59.0,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 147.0,
        "bid": 1.09,
        "ask": 3.9,
@@ -160573,12 +160910,36 @@
        "oi": 28
       },
       {
+       "strike": 149.0,
+       "bid": 0.93,
+       "ask": 4.85,
+       "iv": 55.7,
+       "vol": 0,
+       "oi": 3
+      },
+      {
        "strike": 150.0,
        "bid": 1.6,
        "ask": 5.05,
        "iv": 54.3,
        "vol": 0,
        "oi": 1
+      },
+      {
+       "strike": 152.5,
+       "bid": 2.04,
+       "ask": 6.05,
+       "iv": 53.8,
+       "vol": 4,
+       "oi": 17
+      },
+      {
+       "strike": 155.0,
+       "bid": 3.15,
+       "ask": 6.45,
+       "iv": 48.4,
+       "vol": 5,
+       "oi": 0
       },
       {
        "strike": 157.5,
@@ -160615,7 +160976,7 @@
      ],
      "call_wall": 170.0,
      "put_wall": 139.0,
-     "opt_volume": 124
+     "opt_volume": 201
     }
    ]
   },
@@ -161013,25 +161374,25 @@
        "oi": 20
       },
       {
+       "strike": 370.0,
+       "bid": 27.75,
+       "ask": 31.1,
+       "iv": 99.2,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 375.0,
        "bid": 32.75,
        "ask": 36.1,
        "iv": 110.0,
        "vol": 2,
        "oi": 0
-      },
-      {
-       "strike": 405.0,
-       "bid": 62.6,
-       "ask": 66.5,
-       "iv": 106.1,
-       "vol": 2,
-       "oi": 0
       }
      ],
      "call_wall": 360.0,
      "put_wall": 330.0,
-     "opt_volume": 43428
+     "opt_volume": 43520
     },
     {
      "date": "2026-10-21",
@@ -161441,7 +161802,7 @@
      ],
      "call_wall": 352.5,
      "put_wall": 347.5,
-     "opt_volume": 18717
+     "opt_volume": 18718
     },
     {
      "date": "2026-10-23",
@@ -161851,7 +162212,7 @@
      ],
      "call_wall": 370.0,
      "put_wall": 300.0,
-     "opt_volume": 89243
+     "opt_volume": 89314
     }
    ]
   },
@@ -162267,7 +162628,7 @@
      ],
      "call_wall": 920.0,
      "put_wall": 800.0,
-     "opt_volume": 9266
+     "opt_volume": 9267
     },
     {
      "date": "2026-10-30",
@@ -162677,7 +163038,7 @@
      ],
      "call_wall": 1000.0,
      "put_wall": 870.0,
-     "opt_volume": 5181
+     "opt_volume": 5204
     },
     {
      "date": "2026-11-06",
@@ -163087,7 +163448,7 @@
      ],
      "call_wall": 970.0,
      "put_wall": 780.0,
-     "opt_volume": 2398
+     "opt_volume": 2418
     }
    ]
   },
@@ -163520,7 +163881,7 @@
      ],
      "call_wall": 115.0,
      "put_wall": 60.0,
-     "opt_volume": 296720
+     "opt_volume": 300094
     },
     {
      "date": "2026-10-30",
@@ -164346,7 +164707,7 @@
      ],
      "call_wall": 350.0,
      "put_wall": 325.0,
-     "opt_volume": 18773
+     "opt_volume": 18969
     },
     {
      "date": "2026-10-30",
@@ -164907,9 +165268,9 @@
       },
       {
        "strike": 410.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 2.13,
-       "iv": 59.6,
+       "iv": 50.7,
        "vol": 0,
        "oi": 1
       }
@@ -165486,7 +165847,7 @@
      ],
      "call_wall": 1600.0,
      "put_wall": 1045.0,
-     "opt_volume": 9811
+     "opt_volume": 9833
     },
     {
      "date": "2026-10-30",
@@ -165854,6 +166215,14 @@
        "oi": 1
       },
       {
+       "strike": 1295.0,
+       "bid": 63.45,
+       "ask": 73.9,
+       "iv": 54.9,
+       "vol": 12,
+       "oi": 3
+      },
+      {
        "strike": 1300.0,
        "bid": 65.9,
        "ask": 77.1,
@@ -165878,25 +166247,17 @@
        "oi": 11
       },
       {
-       "strike": 1320.0,
-       "bid": 79.55,
-       "ask": 90.3,
-       "iv": 54.6,
-       "vol": 15,
-       "oi": 13
-      },
-      {
-       "strike": 1325.0,
-       "bid": 81.0,
-       "ask": 96.0,
-       "iv": 57.2,
-       "vol": 4,
-       "oi": 10
+       "strike": 1315.0,
+       "bid": 75.25,
+       "ask": 89.85,
+       "iv": 58.1,
+       "vol": 0,
+       "oi": 5
       }
      ],
      "call_wall": 1400.0,
      "put_wall": 660.0,
-     "opt_volume": 2705
+     "opt_volume": 2719
     },
     {
      "date": "2026-11-06",
@@ -166264,6 +166625,14 @@
        "oi": 2
       },
       {
+       "strike": 1295.0,
+       "bid": 67.2,
+       "ask": 80.2,
+       "iv": 49.8,
+       "vol": 6,
+       "oi": 0
+      },
+      {
        "strike": 1300.0,
        "bid": 71.2,
        "ask": 82.4,
@@ -166272,25 +166641,33 @@
        "oi": 5
       },
       {
-       "strike": 1320.0,
-       "bid": 84.4,
-       "ask": 97.85,
-       "iv": 51.0,
-       "vol": 3,
-       "oi": 2
+       "strike": 1305.0,
+       "bid": 74.6,
+       "ask": 85.45,
+       "iv": 48.8,
+       "vol": 23,
+       "oi": 3
       },
       {
-       "strike": 1340.0,
-       "bid": 97.35,
-       "ask": 110.55,
-       "iv": 49.7,
-       "vol": 10,
-       "oi": 1
+       "strike": 1310.0,
+       "bid": 78.0,
+       "ask": 89.3,
+       "iv": 49.3,
+       "vol": 1,
+       "oi": 24
+      },
+      {
+       "strike": 1315.0,
+       "bid": 82.1,
+       "ask": 92.05,
+       "iv": 48.8,
+       "vol": 79,
+       "oi": 2
       }
      ],
      "call_wall": 1240.0,
      "put_wall": 985.0,
-     "opt_volume": 3620
+     "opt_volume": 3796
     }
    ]
   },
@@ -166301,38 +166678,6 @@
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 575.0,
-       "bid": 39.0,
-       "ask": 46.2,
-       "iv": 56.8,
-       "vol": 3,
-       "oi": 51
-      },
-      {
-       "strike": 580.0,
-       "bid": 34.1,
-       "ask": 41.2,
-       "iv": 52.2,
-       "vol": 6,
-       "oi": 61
-      },
-      {
-       "strike": 582.5,
-       "bid": 31.6,
-       "ask": 38.8,
-       "iv": 50.4,
-       "vol": 1,
-       "oi": 2
-      },
-      {
-       "strike": 585.0,
-       "bid": 29.8,
-       "ask": 34.3,
-       "iv": 37.4,
-       "vol": 11,
-       "oi": 67
-      },
       {
        "strike": 587.5,
        "bid": 27.4,
@@ -166366,12 +166711,28 @@
        "oi": 28
       },
       {
+       "strike": 597.5,
+       "bid": 18.2,
+       "ask": 22.8,
+       "iv": 31.5,
+       "vol": 1,
+       "oi": 1
+      },
+      {
        "strike": 600.0,
        "bid": 16.1,
        "ask": 20.1,
        "iv": 28.2,
        "vol": 15,
        "oi": 197
+      },
+      {
+       "strike": 602.5,
+       "bid": 14.0,
+       "ask": 18.5,
+       "iv": 29.4,
+       "vol": 16,
+       "oi": 0
       },
       {
        "strike": 605.0,
@@ -166382,12 +166743,28 @@
        "oi": 128
       },
       {
+       "strike": 607.5,
+       "bid": 10.9,
+       "ask": 14.2,
+       "iv": 26.5,
+       "vol": 18,
+       "oi": 104
+      },
+      {
        "strike": 610.0,
        "bid": 9.3,
        "ask": 12.8,
        "iv": 27.3,
        "vol": 41,
        "oi": 44
+      },
+      {
+       "strike": 612.5,
+       "bid": 6.6,
+       "ask": 11.7,
+       "iv": 28.7,
+       "vol": 0,
+       "oi": 4
       },
       {
        "strike": 615.0,
@@ -166414,12 +166791,28 @@
        "oi": 79
       },
       {
+       "strike": 622.5,
+       "bid": 3.7,
+       "ask": 5.3,
+       "iv": 23.9,
+       "vol": 19,
+       "oi": 1
+      },
+      {
        "strike": 625.0,
        "bid": 2.9,
        "ask": 4.2,
        "iv": 23.2,
        "vol": 32,
        "oi": 147
+      },
+      {
+       "strike": 627.5,
+       "bid": 2.15,
+       "ask": 3.3,
+       "iv": 22.8,
+       "vol": 16,
+       "oi": 12
       },
       {
        "strike": 630.0,
@@ -166430,6 +166823,14 @@
        "oi": 72
       },
       {
+       "strike": 632.5,
+       "bid": 1.05,
+       "ask": 2.1,
+       "iv": 22.8,
+       "vol": 39,
+       "oi": 19
+      },
+      {
        "strike": 635.0,
        "bid": 0.95,
        "ask": 1.6,
@@ -166438,94 +166839,54 @@
        "oi": 25
       },
       {
+       "strike": 637.5,
+       "bid": 0.5,
+       "ask": 1.3,
+       "iv": 23.0,
+       "vol": 24,
+       "oi": 13
+      },
+      {
+       "strike": 640.0,
+       "bid": 0.25,
+       "ask": 1.05,
+       "iv": 23.3,
+       "vol": 7,
+       "oi": 2
+      },
+      {
+       "strike": 642.5,
+       "bid": 0.15,
+       "ask": 1.3,
+       "iv": 26.7,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 645.0,
+       "bid": 0.3,
+       "ask": 1.15,
+       "iv": 27.5,
+       "vol": 3,
+       "oi": 2
+      },
+      {
        "strike": 650.0,
        "bid": 0.0,
        "ask": 4.9,
        "iv": 50.2,
        "vol": 1,
        "oi": 3
-      },
-      {
-       "strike": 655.0,
-       "bid": 0.0,
-       "ask": 1.1,
-       "iv": 33.8,
-       "vol": 13,
-       "oi": 14
-      },
-      {
-       "strike": 660.0,
-       "bid": 0.0,
-       "ask": 1.7,
-       "iv": 41.5,
-       "vol": 1,
-       "oi": 3
-      },
-      {
-       "strike": 670.0,
-       "bid": 0.0,
-       "ask": 8.6,
-       "iv": 63.4,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 680.0,
-       "bid": null,
-       "ask": 8.6,
-       "iv": 90.8,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 700.0,
-       "bid": null,
-       "ask": 1.65,
-       "iv": 65.6,
-       "vol": 1,
-       "oi": 1
       }
      ],
      "puts": [
       {
-       "strike": 575.0,
-       "bid": 0.0,
-       "ask": 2.5,
-       "iv": 49.6,
-       "vol": 1,
-       "oi": 148
-      },
-      {
-       "strike": 577.5,
-       "bid": 0.0,
-       "ask": 4.9,
-       "iv": 60.1,
-       "vol": 1,
-       "oi": 51
-      },
-      {
-       "strike": 580.0,
-       "bid": 0.0,
-       "ask": 1.05,
-       "iv": 35.4,
-       "vol": 51,
-       "oi": 53
-      },
-      {
-       "strike": 582.5,
+       "strike": 587.5,
        "bid": 0.05,
-       "ask": 1.9,
-       "iv": 39.6,
-       "vol": 1,
-       "oi": 25
-      },
-      {
-       "strike": 585.0,
-       "bid": 0.05,
-       "ask": 3.1,
-       "iv": 44.2,
-       "vol": 1,
-       "oi": 35
+       "ask": 1.7,
+       "iv": 34.2,
+       "vol": 65,
+       "oi": 5
       },
       {
        "strike": 590.0,
@@ -166534,6 +166895,14 @@
        "iv": 29.3,
        "vol": 220,
        "oi": 32
+      },
+      {
+       "strike": 592.5,
+       "bid": 0.4,
+       "ask": 1.4,
+       "iv": 28.3,
+       "vol": 12,
+       "oi": 0
       },
       {
        "strike": 595.0,
@@ -166576,12 +166945,28 @@
        "oi": 52
       },
       {
+       "strike": 607.5,
+       "bid": 2.65,
+       "ask": 4.8,
+       "iv": 28.4,
+       "vol": 11,
+       "oi": 0
+      },
+      {
        "strike": 610.0,
        "bid": 3.3,
        "ask": 4.8,
        "iv": 25.4,
        "vol": 21,
        "oi": 7
+      },
+      {
+       "strike": 612.5,
+       "bid": 4.0,
+       "ask": 7.2,
+       "iv": 30.1,
+       "vol": 4,
+       "oi": 15
       },
       {
        "strike": 615.0,
@@ -166592,12 +166977,28 @@
        "oi": 18
       },
       {
+       "strike": 617.5,
+       "bid": 5.4,
+       "ask": 10.5,
+       "iv": 33.1,
+       "vol": 19,
+       "oi": 58
+      },
+      {
        "strike": 620.0,
        "bid": 6.5,
        "ask": 11.6,
        "iv": 32.4,
        "vol": 58,
        "oi": 37
+      },
+      {
+       "strike": 622.5,
+       "bid": 8.0,
+       "ask": 13.0,
+       "iv": 32.4,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 625.0,
@@ -166622,11 +167023,27 @@
        "iv": null,
        "vol": 0,
        "oi": 0
+      },
+      {
+       "strike": 690.0,
+       "bid": 71.3,
+       "ask": 77.2,
+       "iv": 60.0,
+       "vol": 5,
+       "oi": 0
+      },
+      {
+       "strike": 700.0,
+       "bid": 80.6,
+       "ask": 86.7,
+       "iv": 59.8,
+       "vol": 28,
+       "oi": 16
       }
      ],
      "call_wall": 600.0,
      "put_wall": 520.0,
-     "opt_volume": 1286
+     "opt_volume": 1595
     },
     {
      "date": "2026-10-30",
@@ -166834,20 +167251,20 @@
      ],
      "puts": [
       {
-       "strike": 567.5,
-       "bid": 0.85,
-       "ask": 9.3,
-       "iv": 61.3,
-       "vol": 0,
-       "oi": 1
-      },
-      {
        "strike": 570.0,
        "bid": 0.05,
        "ask": 8.1,
        "iv": 55.9,
        "vol": 1,
        "oi": 41
+      },
+      {
+       "strike": 572.5,
+       "bid": 0.35,
+       "ask": 5.5,
+       "iv": 46.1,
+       "vol": 0,
+       "oi": 6
       },
       {
        "strike": 575.0,
@@ -166930,6 +167347,14 @@
        "oi": 13
       },
       {
+       "strike": 615.0,
+       "bid": 9.5,
+       "ask": 17.0,
+       "iv": 39.2,
+       "vol": 5,
+       "oi": 0
+      },
+      {
        "strike": 620.0,
        "bid": 11.7,
        "ask": 19.4,
@@ -166944,11 +167369,27 @@
        "iv": 35.4,
        "vol": 3,
        "oi": 2
+      },
+      {
+       "strike": 630.0,
+       "bid": 19.2,
+       "ask": 24.1,
+       "iv": 36.4,
+       "vol": 0,
+       "oi": 2
+      },
+      {
+       "strike": 640.0,
+       "bid": 24.0,
+       "ask": 31.6,
+       "iv": 38.3,
+       "vol": 1,
+       "oi": 0
       }
      ],
      "call_wall": 590.0,
      "put_wall": 510.0,
-     "opt_volume": 790
+     "opt_volume": 796
     },
     {
      "date": "2026-11-06",
@@ -167132,14 +167573,6 @@
      ],
      "puts": [
       {
-       "strike": 550.0,
-       "bid": 0.0,
-       "ask": 9.3,
-       "iv": 59.7,
-       "vol": 10,
-       "oi": 78
-      },
-      {
        "strike": 555.0,
        "bid": 0.0,
        "ask": 4.9,
@@ -167228,6 +167661,22 @@
        "oi": 2
       },
       {
+       "strike": 610.0,
+       "bid": 10.9,
+       "ask": 15.1,
+       "iv": 32.4,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 615.0,
+       "bid": 12.1,
+       "ask": 16.6,
+       "iv": 30.9,
+       "vol": 8,
+       "oi": 1
+      },
+      {
        "strike": 620.0,
        "bid": 15.8,
        "ask": 18.5,
@@ -167242,6 +167691,14 @@
        "iv": 33.8,
        "vol": 3,
        "oi": 33
+      },
+      {
+       "strike": 630.0,
+       "bid": 21.6,
+       "ask": 24.8,
+       "iv": 30.6,
+       "vol": 2,
+       "oi": 0
       },
       {
        "strike": 640.0,
@@ -167270,7 +167727,7 @@
      ],
      "call_wall": 640.0,
      "put_wall": 595.0,
-     "opt_volume": 203
+     "opt_volume": 213
     }
    ]
   },
@@ -167281,14 +167738,6 @@
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 200.0,
-       "bid": 41.9,
-       "ask": 44.2,
-       "iv": 67.4,
-       "vol": 0,
-       "oi": 1
-      },
       {
        "strike": 210.0,
        "bid": 32.1,
@@ -167320,6 +167769,14 @@
        "iv": 60.1,
        "vol": 83,
        "oi": 88
+      },
+      {
+       "strike": 222.5,
+       "bid": 19.45,
+       "ask": 21.5,
+       "iv": 58.4,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 225.0,
@@ -167442,6 +167899,14 @@
        "oi": 685
       },
       {
+       "strike": 262.5,
+       "bid": 0.01,
+       "ask": 0.1,
+       "iv": 31.1,
+       "vol": 17,
+       "oi": 6
+      },
+      {
        "strike": 265.0,
        "bid": 0.01,
        "ask": 0.04,
@@ -167472,14 +167937,6 @@
        "iv": 59.8,
        "vol": 1,
        "oi": 85
-      },
-      {
-       "strike": 285.0,
-       "bid": 0.0,
-       "ask": 0.65,
-       "iv": 68.8,
-       "vol": 1,
-       "oi": 19
       }
      ],
      "puts": [
@@ -167580,12 +168037,28 @@
        "oi": 380
       },
       {
+       "strike": 242.5,
+       "bid": 2.47,
+       "ask": 2.77,
+       "iv": 24.2,
+       "vol": 464,
+       "oi": 28
+      },
+      {
        "strike": 245.0,
        "bid": 3.55,
        "ask": 4.4,
        "iv": 26.3,
        "vol": 44,
        "oi": 358
+      },
+      {
+       "strike": 247.5,
+       "bid": 4.95,
+       "ask": 6.4,
+       "iv": 29.5,
+       "vol": 28,
+       "oi": 0
       },
       {
        "strike": 250.0,
@@ -167610,6 +168083,14 @@
        "iv": 37.3,
        "vol": 6,
        "oi": 11
+      },
+      {
+       "strike": 257.5,
+       "bid": 13.75,
+       "ask": 15.45,
+       "iv": 41.4,
+       "vol": 3,
+       "oi": 0
       },
       {
        "strike": 260.0,
@@ -167658,27 +168139,11 @@
        "iv": 91.3,
        "vol": 15,
        "oi": 0
-      },
-      {
-       "strike": 290.0,
-       "bid": 0.0,
-       "ask": 0.0,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 310.0,
-       "bid": 65.7,
-       "ask": 68.25,
-       "iv": 124.8,
-       "vol": 0,
-       "oi": 0
       }
      ],
      "call_wall": 250.0,
      "put_wall": 230.0,
-     "opt_volume": 9096
+     "opt_volume": 9608
     },
     {
      "date": "2026-10-30",
@@ -167887,7 +168352,7 @@
      "puts": [
       {
        "strike": 212.5,
-       "bid": null,
+       "bid": 0.0,
        "ask": 0.53,
        "iv": 46.1,
        "vol": 3,
@@ -168072,7 +168537,7 @@
      ],
      "call_wall": 250.0,
      "put_wall": 225.0,
-     "opt_volume": 6730
+     "opt_volume": 6733
     },
     {
      "date": "2026-11-06",
@@ -168842,7 +169307,7 @@
      ],
      "call_wall": 800.0,
      "put_wall": 700.0,
-     "opt_volume": 126806
+     "opt_volume": 126863
     },
     {
      "date": "2026-10-21",
@@ -169258,30 +169723,6 @@
      "date": "2026-10-23",
      "calls": [
       {
-       "strike": 672.5,
-       "bid": 46.75,
-       "ask": 49.65,
-       "iv": 72.8,
-       "vol": 13,
-       "oi": 2
-      },
-      {
-       "strike": 675.0,
-       "bid": 45.45,
-       "ask": 47.7,
-       "iv": 73.1,
-       "vol": 23,
-       "oi": 176
-      },
-      {
-       "strike": 677.5,
-       "bid": 43.6,
-       "ask": 46.25,
-       "iv": 73.3,
-       "vol": 15,
-       "oi": 2
-      },
-      {
        "strike": 680.0,
        "bid": 41.8,
        "ask": 44.15,
@@ -169290,12 +169731,28 @@
        "oi": 406
       },
       {
+       "strike": 682.5,
+       "bid": 40.35,
+       "ask": 42.7,
+       "iv": 72.9,
+       "vol": 4,
+       "oi": 0
+      },
+      {
        "strike": 685.0,
        "bid": 38.9,
        "ask": 41.1,
        "iv": 73.1,
        "vol": 31,
        "oi": 107
+      },
+      {
+       "strike": 687.5,
+       "bid": 37.75,
+       "ask": 39.4,
+       "iv": 73.5,
+       "vol": 1,
+       "oi": 1
       },
       {
        "strike": 690.0,
@@ -169336,6 +169793,14 @@
        "iv": 72.3,
        "vol": 511,
        "oi": 1367
+      },
+      {
+       "strike": 702.5,
+       "bid": 29.05,
+       "ask": 30.1,
+       "iv": 72.1,
+       "vol": 65,
+       "oi": 3
       },
       {
        "strike": 705.0,
@@ -169662,7 +170127,7 @@
      ],
      "call_wall": 800.0,
      "put_wall": 580.0,
-     "opt_volume": 90139
+     "opt_volume": 90884
     }
    ]
   },
@@ -170034,31 +170499,23 @@
        "iv": 66.9,
        "vol": 0,
        "oi": 1
+      },
+      {
+       "strike": 162.5,
+       "bid": 14.95,
+       "ask": 17.45,
+       "iv": 73.0,
+       "vol": 1,
+       "oi": 0
       }
      ],
      "call_wall": 146.0,
      "put_wall": 130.0,
-     "opt_volume": 6797
+     "opt_volume": 6798
     },
     {
      "date": "2026-10-30",
      "calls": [
-      {
-       "strike": 125.0,
-       "bid": 20.3,
-       "ask": 23.15,
-       "iv": 64.1,
-       "vol": 0,
-       "oi": 10
-      },
-      {
-       "strike": 130.0,
-       "bid": 16.25,
-       "ask": 18.65,
-       "iv": 64.0,
-       "vol": 10,
-       "oi": 19
-      },
       {
        "strike": 132.0,
        "bid": 13.7,
@@ -170074,6 +170531,22 @@
        "iv": 54.9,
        "vol": 1,
        "oi": 15
+      },
+      {
+       "strike": 136.0,
+       "bid": 10.8,
+       "ask": 12.9,
+       "iv": 51.9,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 137.0,
+       "bid": 10.0,
+       "ask": 12.15,
+       "iv": 51.4,
+       "vol": 10,
+       "oi": 0
       },
       {
        "strike": 138.0,
@@ -170416,7 +170889,7 @@
      ],
      "call_wall": 147.0,
      "put_wall": 140.0,
-     "opt_volume": 2907
+     "opt_volume": 2917
     },
     {
      "date": "2026-11-06",
@@ -170750,6 +171223,14 @@
        "iv": 43.5,
        "vol": 25,
        "oi": 31
+      },
+      {
+       "strike": 160.0,
+       "bid": 13.6,
+       "ask": 16.0,
+       "iv": 47.5,
+       "vol": 0,
+       "oi": 5
       }
      ],
      "call_wall": 155.0,
@@ -170765,14 +171246,6 @@
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 175.0,
-       "bid": 52.55,
-       "ask": 54.25,
-       "iv": 121.2,
-       "vol": 6,
-       "oi": 7
-      },
       {
        "strike": 180.0,
        "bid": 47.6,
@@ -170838,6 +171311,14 @@
        "oi": 95
       },
       {
+       "strike": 217.5,
+       "bid": 14.75,
+       "ask": 15.55,
+       "iv": 79.6,
+       "vol": 50,
+       "oi": 19
+      },
+      {
        "strike": 220.0,
        "bid": 13.1,
        "ask": 13.9,
@@ -170876,6 +171357,14 @@
        "iv": 71.7,
        "vol": 311,
        "oi": 112
+      },
+      {
+       "strike": 232.5,
+       "bid": 6.15,
+       "ask": 6.95,
+       "iv": 73.8,
+       "vol": 231,
+       "oi": 101
       },
       {
        "strike": 235.0,
@@ -170956,14 +171445,6 @@
        "iv": 70.1,
        "vol": 358,
        "oi": 202
-      },
-      {
-       "strike": 260.0,
-       "bid": 0.65,
-       "ask": 0.74,
-       "iv": 70.3,
-       "vol": 1105,
-       "oi": 1345
       }
      ],
      "puts": [
@@ -171170,7 +171651,7 @@
      ],
      "call_wall": 300.0,
      "put_wall": 170.0,
-     "opt_volume": 38310
+     "opt_volume": 38591
     },
     {
      "date": "2026-10-30",
@@ -171272,12 +171753,28 @@
        "oi": 46
       },
       {
+       "strike": 227.5,
+       "bid": 11.8,
+       "ask": 12.9,
+       "iv": 71.1,
+       "vol": 482,
+       "oi": 21
+      },
+      {
        "strike": 230.0,
        "bid": 10.75,
        "ask": 11.45,
        "iv": 70.6,
        "vol": 97,
        "oi": 728
+      },
+      {
+       "strike": 232.5,
+       "bid": 9.7,
+       "ask": 10.55,
+       "iv": 71.1,
+       "vol": 75,
+       "oi": 45
       },
       {
        "strike": 235.0,
@@ -171288,12 +171785,28 @@
        "oi": 205
       },
       {
+       "strike": 237.5,
+       "bid": 7.6,
+       "ask": 8.45,
+       "iv": 70.0,
+       "vol": 55,
+       "oi": 18
+      },
+      {
        "strike": 240.0,
        "bid": 6.8,
        "ask": 7.4,
        "iv": 69.5,
        "vol": 1228,
        "oi": 255
+      },
+      {
+       "strike": 242.5,
+       "bid": 5.75,
+       "ask": 6.8,
+       "iv": 69.2,
+       "vol": 36,
+       "oi": 19
       },
       {
        "strike": 245.0,
@@ -171342,38 +171855,6 @@
        "iv": 66.8,
        "vol": 108,
        "oi": 125
-      },
-      {
-       "strike": 260.0,
-       "bid": 2.25,
-       "ask": 2.47,
-       "iv": 67.1,
-       "vol": 885,
-       "oi": 1483
-      },
-      {
-       "strike": 262.5,
-       "bid": 1.79,
-       "ask": 2.16,
-       "iv": 66.4,
-       "vol": 141,
-       "oi": 126
-      },
-      {
-       "strike": 265.0,
-       "bid": 1.57,
-       "ask": 1.86,
-       "iv": 66.5,
-       "vol": 436,
-       "oi": 3926
-      },
-      {
-       "strike": 267.5,
-       "bid": 1.33,
-       "ask": 1.59,
-       "iv": 66.3,
-       "vol": 189,
-       "oi": 280
       }
      ],
      "puts": [
@@ -171474,12 +171955,28 @@
        "oi": 1128
       },
       {
+       "strike": 227.5,
+       "bid": 10.8,
+       "ask": 12.45,
+       "iv": 68.8,
+       "vol": 222,
+       "oi": 31
+      },
+      {
        "strike": 230.0,
        "bid": 12.25,
        "ask": 13.2,
        "iv": 67.4,
        "vol": 457,
        "oi": 691
+      },
+      {
+       "strike": 232.5,
+       "bid": 13.35,
+       "ask": 14.7,
+       "iv": 66.6,
+       "vol": 38,
+       "oi": 410
       },
       {
        "strike": 235.0,
@@ -171490,12 +171987,28 @@
        "oi": 1272
       },
       {
+       "strike": 237.5,
+       "bid": 16.3,
+       "ask": 17.7,
+       "iv": 65.8,
+       "vol": 28,
+       "oi": 30
+      },
+      {
        "strike": 240.0,
        "bid": 18.2,
        "ask": 19.15,
        "iv": 65.9,
        "vol": 2036,
        "oi": 684
+      },
+      {
+       "strike": 242.5,
+       "bid": 19.9,
+       "ask": 21.0,
+       "iv": 66.0,
+       "vol": 34,
+       "oi": 10
       },
       {
        "strike": 245.0,
@@ -171544,43 +172057,11 @@
        "iv": 66.6,
        "vol": 20,
        "oi": 53
-      },
-      {
-       "strike": 260.0,
-       "bid": 33.4,
-       "ask": 35.05,
-       "iv": 64.2,
-       "vol": 156,
-       "oi": 1215
-      },
-      {
-       "strike": 262.5,
-       "bid": 34.85,
-       "ask": 36.8,
-       "iv": 57.0,
-       "vol": 6,
-       "oi": 97
-      },
-      {
-       "strike": 265.0,
-       "bid": 37.1,
-       "ask": 39.8,
-       "iv": 61.4,
-       "vol": 11,
-       "oi": 532
-      },
-      {
-       "strike": 267.5,
-       "bid": 39.35,
-       "ask": 41.35,
-       "iv": 55.1,
-       "vol": 3,
-       "oi": 23
       }
      ],
      "call_wall": 265.0,
      "put_wall": 165.0,
-     "opt_volume": 17069
+     "opt_volume": 18039
     },
     {
      "date": "2026-11-06",
@@ -172806,17 +173287,17 @@
        "oi": 5
       },
       {
-       "strike": 562.5,
-       "bid": 31.7,
-       "ask": 34.65,
-       "iv": 45.3,
-       "vol": 8,
-       "oi": 5
+       "strike": 560.0,
+       "bid": 29.4,
+       "ask": 32.2,
+       "iv": 43.4,
+       "vol": 1,
+       "oi": 1
       }
      ],
      "call_wall": 545.0,
      "put_wall": 510.0,
-     "opt_volume": 21189
+     "opt_volume": 21198
     },
     {
      "date": "2026-10-23",
@@ -173226,7 +173707,7 @@
      ],
      "call_wall": 570.0,
      "put_wall": 500.0,
-     "opt_volume": 83825
+     "opt_volume": 83994
     }
    ]
   },
@@ -173642,7 +174123,7 @@
      ],
      "call_wall": 160.0,
      "put_wall": 100.0,
-     "opt_volume": 340296
+     "opt_volume": 346928
     },
     {
      "date": "2026-10-30",
@@ -174052,7 +174533,7 @@
      ],
      "call_wall": 210.0,
      "put_wall": 125.0,
-     "opt_volume": 35525
+     "opt_volume": 35532
     },
     {
      "date": "2026-11-06",
@@ -174458,28 +174939,28 @@
      "date": "2026-10-19",
      "calls": [
       {
-       "strike": 795.0,
-       "bid": 83.2,
-       "ask": 86.4,
-       "iv": 80.7,
-       "vol": 1,
-       "oi": 40
+       "strike": 820.0,
+       "bid": 57.25,
+       "ask": 61.2,
+       "iv": 50.2,
+       "vol": 2,
+       "oi": 0
       },
       {
-       "strike": 800.0,
-       "bid": 76.6,
-       "ask": 80.4,
-       "iv": 84.9,
-       "vol": 51,
-       "oi": 44
+       "strike": 825.0,
+       "bid": 52.85,
+       "ask": 56.5,
+       "iv": 54.1,
+       "vol": 6,
+       "oi": 7
       },
       {
-       "strike": 815.0,
-       "bid": 61.8,
-       "ask": 66.05,
-       "iv": 78.1,
-       "vol": 1,
-       "oi": 4
+       "strike": 830.0,
+       "bid": 50.0,
+       "ask": 52.4,
+       "iv": 65.0,
+       "vol": 6,
+       "oi": 7
       },
       {
        "strike": 835.0,
@@ -174862,7 +175343,7 @@
      ],
      "call_wall": 960.0,
      "put_wall": 860.0,
-     "opt_volume": 189124
+     "opt_volume": 189149
     },
     {
      "date": "2026-10-21",
@@ -175272,19 +175753,11 @@
      ],
      "call_wall": 1080.0,
      "put_wall": 800.0,
-     "opt_volume": 46184
+     "opt_volume": 46286
     },
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 815.0,
-       "bid": 71.75,
-       "ask": 72.5,
-       "iv": 69.3,
-       "vol": 22,
-       "oi": 1
-      },
       {
        "strike": 820.0,
        "bid": 67.4,
@@ -175324,6 +175797,14 @@
        "iv": 66.5,
        "vol": 166,
        "oi": 57
+      },
+      {
+       "strike": 845.0,
+       "bid": 48.95,
+       "ask": 49.15,
+       "iv": 65.9,
+       "vol": 33,
+       "oi": 5
       },
       {
        "strike": 850.0,
@@ -175682,7 +176163,7 @@
      ],
      "call_wall": 1000.0,
      "put_wall": 900.0,
-     "opt_volume": 145899
+     "opt_volume": 187879
     }
    ]
   },
@@ -175693,14 +176174,6 @@
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 235.0,
-       "bid": 59.65,
-       "ask": 63.2,
-       "iv": 81.3,
-       "vol": 1,
-       "oi": 4
-      },
       {
        "strike": 240.0,
        "bid": 54.8,
@@ -175798,6 +176271,14 @@
        "oi": 9
       },
       {
+       "strike": 297.5,
+       "bid": 9.55,
+       "ask": 10.8,
+       "iv": 70.9,
+       "vol": 292,
+       "oi": 0
+      },
+      {
        "strike": 300.0,
        "bid": 8.5,
        "ask": 9.75,
@@ -175806,12 +176287,28 @@
        "oi": 5
       },
       {
+       "strike": 302.5,
+       "bid": 7.6,
+       "ask": 8.6,
+       "iv": 71.3,
+       "vol": 12,
+       "oi": 1
+      },
+      {
        "strike": 305.0,
        "bid": 6.4,
        "ask": 7.3,
        "iv": 69.2,
        "vol": 245,
        "oi": 10
+      },
+      {
+       "strike": 307.5,
+       "bid": 5.7,
+       "ask": 7.0,
+       "iv": 71.7,
+       "vol": 17,
+       "oi": 5
       },
       {
        "strike": 310.0,
@@ -175854,6 +176351,14 @@
        "oi": 65
       },
       {
+       "strike": 322.5,
+       "bid": 1.99,
+       "ask": 2.89,
+       "iv": 68.7,
+       "vol": 48,
+       "oi": 3
+      },
+      {
        "strike": 325.0,
        "bid": 1.5,
        "ask": 2.9,
@@ -175868,41 +176373,9 @@
        "iv": 68.5,
        "vol": 51,
        "oi": 3
-      },
-      {
-       "strike": 330.0,
-       "bid": 1.06,
-       "ask": 2.0,
-       "iv": 69.5,
-       "vol": 676,
-       "oi": 76
-      },
-      {
-       "strike": 332.5,
-       "bid": 0.95,
-       "ask": 1.55,
-       "iv": 68.9,
-       "vol": 9,
-       "oi": 55
-      },
-      {
-       "strike": 335.0,
-       "bid": 0.66,
-       "ask": 1.48,
-       "iv": 69.3,
-       "vol": 61,
-       "oi": 20
       }
      ],
      "puts": [
-      {
-       "strike": 235.0,
-       "bid": 0.0,
-       "ask": 0.91,
-       "iv": 99.3,
-       "vol": 12,
-       "oi": 137
-      },
       {
        "strike": 240.0,
        "bid": 0.0,
@@ -175998,6 +176471,14 @@
        "iv": 71.7,
        "vol": 233,
        "oi": 30
+      },
+      {
+       "strike": 297.5,
+       "bid": 10.4,
+       "ask": 13.15,
+       "iv": 73.5,
+       "vol": 45,
+       "oi": 15
       },
       {
        "strike": 300.0,
@@ -176098,7 +176579,7 @@
      ],
      "call_wall": 375.0,
      "put_wall": 310.0,
-     "opt_volume": 8346
+     "opt_volume": 8769
     },
     {
      "date": "2026-10-30",
@@ -176224,6 +176705,14 @@
        "oi": 14
       },
       {
+       "strike": 307.5,
+       "bid": 8.8,
+       "ask": 10.95,
+       "iv": 65.2,
+       "vol": 14,
+       "oi": 0
+      },
+      {
        "strike": 310.0,
        "bid": 8.0,
        "ask": 9.9,
@@ -176232,12 +176721,28 @@
        "oi": 10
       },
       {
+       "strike": 312.5,
+       "bid": 6.75,
+       "ask": 9.15,
+       "iv": 64.0,
+       "vol": 1,
+       "oi": 1
+      },
+      {
        "strike": 315.0,
        "bid": 6.35,
        "ask": 8.4,
        "iv": 64.8,
        "vol": 25,
        "oi": 12
+      },
+      {
+       "strike": 317.5,
+       "bid": 5.3,
+       "ask": 7.55,
+       "iv": 63.5,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 320.0,
@@ -176264,44 +176769,20 @@
        "oi": 48
       },
       {
+       "strike": 332.5,
+       "bid": 2.53,
+       "ask": 4.3,
+       "iv": 63.8,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 335.0,
        "bid": 2.25,
        "ask": 4.75,
        "iv": 67.0,
        "vol": 4,
        "oi": 92
-      },
-      {
-       "strike": 337.5,
-       "bid": 2.0,
-       "ask": 3.5,
-       "iv": 64.1,
-       "vol": 10,
-       "oi": 6
-      },
-      {
-       "strike": 340.0,
-       "bid": 1.9,
-       "ask": 4.1,
-       "iv": 68.4,
-       "vol": 34,
-       "oi": 71
-      },
-      {
-       "strike": 342.5,
-       "bid": 1.38,
-       "ask": 2.89,
-       "iv": 63.8,
-       "vol": 3,
-       "oi": 5
-      },
-      {
-       "strike": 345.0,
-       "bid": 1.4,
-       "ask": 3.65,
-       "iv": 69.3,
-       "vol": 1,
-       "oi": 81
       }
      ],
      "puts": [
@@ -176426,6 +176907,14 @@
        "oi": 69
       },
       {
+       "strike": 307.5,
+       "bid": 19.75,
+       "ask": 22.95,
+       "iv": 66.5,
+       "vol": 7,
+       "oi": 3
+      },
+      {
        "strike": 310.0,
        "bid": 21.25,
        "ask": 24.6,
@@ -176442,12 +176931,28 @@
        "oi": 31
       },
       {
+       "strike": 317.5,
+       "bid": 26.25,
+       "ask": 29.8,
+       "iv": 65.5,
+       "vol": 1,
+       "oi": 1
+      },
+      {
        "strike": 320.0,
        "bid": 28.35,
        "ask": 31.75,
        "iv": 66.4,
        "vol": 27,
        "oi": 251
+      },
+      {
+       "strike": 322.5,
+       "bid": 30.35,
+       "ask": 33.6,
+       "iv": 66.5,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 325.0,
@@ -176474,41 +176979,17 @@
        "oi": 51
       },
       {
-       "strike": 335.0,
-       "bid": 40.45,
-       "ask": 43.7,
-       "iv": 66.1,
-       "vol": 7,
-       "oi": 110
-      },
-      {
-       "strike": 340.0,
-       "bid": 44.7,
-       "ask": 48.2,
-       "iv": 66.5,
+       "strike": 332.5,
+       "bid": 38.1,
+       "ask": 41.7,
+       "iv": 65.7,
        "vol": 1,
-       "oi": 111
-      },
-      {
-       "strike": 342.5,
-       "bid": 46.7,
-       "ask": 50.45,
-       "iv": 65.8,
-       "vol": 1,
-       "oi": 4
-      },
-      {
-       "strike": 345.0,
-       "bid": 49.2,
-       "ask": 52.7,
-       "iv": 67.0,
-       "vol": 1,
-       "oi": 57
+       "oi": 1
       }
      ],
      "call_wall": 385.0,
      "put_wall": 245.0,
-     "opt_volume": 1881
+     "opt_volume": 1962
     },
     {
      "date": "2026-11-06",
@@ -176918,7 +177399,7 @@
      ],
      "call_wall": 330.0,
      "put_wall": 300.0,
-     "opt_volume": 726
+     "opt_volume": 736
     }
    ]
   },
@@ -177744,7 +178225,7 @@
      ],
      "call_wall": 70.0,
      "put_wall": 66.0,
-     "opt_volume": 23537
+     "opt_volume": 23562
     },
     {
      "date": "2026-11-06",
@@ -178154,7 +178635,7 @@
      ],
      "call_wall": 73.0,
      "put_wall": 60.0,
-     "opt_volume": 5919
+     "opt_volume": 5922
     }
    ]
   },
@@ -178787,9 +179268,9 @@
       },
       {
        "strike": 31.5,
-       "bid": null,
+       "bid": 0.0,
        "ask": 0.46,
-       "iv": 86.6,
+       "iv": 69.9,
        "vol": 0,
        "oi": 44
       },
@@ -178980,7 +179461,7 @@
      ],
      "call_wall": 40.0,
      "put_wall": 31.0,
-     "opt_volume": 14871
+     "opt_volume": 14872
     },
     {
      "date": "2026-11-06",
@@ -180126,6 +180607,14 @@
        "oi": 1
       },
       {
+       "strike": 155.0,
+       "bid": 16.6,
+       "ask": 18.25,
+       "iv": 85.4,
+       "vol": 1,
+       "oi": 2
+      },
+      {
        "strike": 157.5,
        "bid": 18.4,
        "ask": 20.05,
@@ -180140,19 +180629,11 @@
        "iv": 85.9,
        "vol": 1,
        "oi": 12
-      },
-      {
-       "strike": 162.5,
-       "bid": 22.5,
-       "ask": 24.25,
-       "iv": 86.6,
-       "vol": 22,
-       "oi": 48
       }
      ],
      "call_wall": 150.0,
      "put_wall": 130.0,
-     "opt_volume": 8488
+     "opt_volume": 8489
     },
     {
      "date": "2026-11-06",
@@ -180562,7 +181043,7 @@
      ],
      "call_wall": 155.0,
      "put_wall": 140.0,
-     "opt_volume": 3021
+     "opt_volume": 3024
     }
    ]
   },
@@ -180978,7 +181459,7 @@
      ],
      "call_wall": 225.0,
      "put_wall": 180.0,
-     "opt_volume": 451417
+     "opt_volume": 451454
     },
     {
      "date": "2026-10-21",
@@ -181388,19 +181869,11 @@
      ],
      "call_wall": 240.0,
      "put_wall": 220.0,
-     "opt_volume": 113077
+     "opt_volume": 113751
     },
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 170.0,
-       "bid": 43.2,
-       "ask": 45.0,
-       "iv": 120.4,
-       "vol": 78,
-       "oi": 33
-      },
       {
        "strike": 175.0,
        "bid": 38.4,
@@ -181440,6 +181913,14 @@
        "iv": 53.9,
        "vol": 1900,
        "oi": 180
+      },
+      {
+       "strike": 197.5,
+       "bid": 17.1,
+       "ask": 17.55,
+       "iv": 50.9,
+       "vol": 2725,
+       "oi": 116
       },
       {
        "strike": 200.0,
@@ -181596,14 +182077,6 @@
      ],
      "puts": [
       {
-       "strike": 170.0,
-       "bid": 0.1,
-       "ask": 0.12,
-       "iv": 83.2,
-       "vol": 669,
-       "oi": 1939
-      },
-      {
        "strike": 175.0,
        "bid": 0.12,
        "ask": 0.14,
@@ -181642,6 +182115,14 @@
        "iv": 51.5,
        "vol": 5247,
        "oi": 4355
+      },
+      {
+       "strike": 197.5,
+       "bid": 0.6,
+       "ask": 0.62,
+       "iv": 49.3,
+       "vol": 1657,
+       "oi": 549
       },
       {
        "strike": 200.0,
@@ -181798,7 +182279,7 @@
      ],
      "call_wall": 240.0,
      "put_wall": 125.0,
-     "opt_volume": 574911
+     "opt_volume": 579299
     }
    ]
   },
@@ -181809,6 +182290,30 @@
     {
      "date": "2026-10-23",
      "calls": [
+      {
+       "strike": 20.0,
+       "bid": 7.4,
+       "ask": 8.65,
+       "iv": 142.2,
+       "vol": 2,
+       "oi": 2
+      },
+      {
+       "strike": 22.0,
+       "bid": 5.45,
+       "ask": 6.8,
+       "iv": 133.6,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 23.0,
+       "bid": 4.35,
+       "ask": 5.8,
+       "iv": 103.5,
+       "vol": 3,
+       "oi": 1
+      },
       {
        "strike": 24.0,
        "bid": 3.7,
@@ -181848,6 +182353,14 @@
        "iv": 80.8,
        "vol": 16,
        "oi": 82
+      },
+      {
+       "strike": 27.5,
+       "bid": 1.32,
+       "ask": 1.45,
+       "iv": 80.1,
+       "vol": 124,
+       "oi": 7
       },
       {
        "strike": 28.0,
@@ -181955,6 +182468,30 @@
       }
      ],
      "puts": [
+      {
+       "strike": 20.0,
+       "bid": 0.0,
+       "ask": 0.25,
+       "iv": 166.4,
+       "vol": 0,
+       "oi": 13
+      },
+      {
+       "strike": 22.0,
+       "bid": 0.03,
+       "ask": 0.07,
+       "iv": 105.5,
+       "vol": 4,
+       "oi": 0
+      },
+      {
+       "strike": 23.0,
+       "bid": 0.02,
+       "ask": 0.11,
+       "iv": 93.4,
+       "vol": 13,
+       "oi": 0
+      },
       {
        "strike": 24.0,
        "bid": 0.12,
@@ -182110,11 +182647,27 @@
      ],
      "call_wall": 48.0,
      "put_wall": 25.0,
-     "opt_volume": 10145
+     "opt_volume": 10292
     },
     {
      "date": "2026-10-30",
      "calls": [
+      {
+       "strike": 22.0,
+       "bid": 5.65,
+       "ask": 6.35,
+       "iv": 65.6,
+       "vol": 59,
+       "oi": 0
+      },
+      {
+       "strike": 23.0,
+       "bid": 4.8,
+       "ask": 5.4,
+       "iv": 74.0,
+       "vol": 56,
+       "oi": 0
+      },
       {
        "strike": 24.0,
        "bid": 3.9,
@@ -182254,6 +182807,38 @@
      ],
      "puts": [
       {
+       "strike": 20.0,
+       "bid": 0.0,
+       "ask": 0.25,
+       "iv": 113.3,
+       "vol": 10,
+       "oi": 0
+      },
+      {
+       "strike": 21.0,
+       "bid": 0.0,
+       "ask": 0.42,
+       "iv": 112.5,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 22.0,
+       "bid": 0.05,
+       "ask": 0.17,
+       "iv": 83.8,
+       "vol": 5213,
+       "oi": 3
+      },
+      {
+       "strike": 23.0,
+       "bid": 0.18,
+       "ask": 0.27,
+       "iv": 85.7,
+       "vol": 45,
+       "oi": 2
+      },
+      {
        "strike": 24.0,
        "bid": 0.33,
        "ask": 0.4,
@@ -182392,11 +182977,27 @@
      ],
      "call_wall": 45.0,
      "put_wall": 29.0,
-     "opt_volume": 4475
+     "opt_volume": 9859
     },
     {
      "date": "2026-11-06",
      "calls": [
+      {
+       "strike": 23.0,
+       "bid": 5.25,
+       "ask": 5.7,
+       "iv": 89.8,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 24.0,
+       "bid": 4.25,
+       "ask": 4.8,
+       "iv": 79.5,
+       "vol": 2,
+       "oi": 25
+      },
       {
        "strike": 25.0,
        "bid": 3.55,
@@ -182520,6 +183121,38 @@
      ],
      "puts": [
       {
+       "strike": 20.0,
+       "bid": 0.01,
+       "ask": 0.25,
+       "iv": 92.0,
+       "vol": 31,
+       "oi": 6
+      },
+      {
+       "strike": 21.0,
+       "bid": 0.01,
+       "ask": 0.46,
+       "iv": 93.4,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 22.0,
+       "bid": 0.15,
+       "ask": 0.35,
+       "iv": 83.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 23.0,
+       "bid": 0.35,
+       "ask": 0.47,
+       "iv": 83.4,
+       "vol": 11,
+       "oi": 1
+      },
+      {
        "strike": 24.0,
        "bid": 0.55,
        "ask": 0.67,
@@ -182534,6 +183167,14 @@
        "iv": 83.7,
        "vol": 163,
        "oi": 485
+      },
+      {
+       "strike": 26.0,
+       "bid": 1.05,
+       "ask": 1.27,
+       "iv": 79.2,
+       "vol": 26,
+       "oi": 71
       },
       {
        "strike": 27.0,
@@ -182650,7 +183291,7 @@
      ],
      "call_wall": 40.0,
      "put_wall": 25.0,
-     "opt_volume": 1979
+     "opt_volume": 2052
     }
    ]
   },
@@ -182662,36 +183303,36 @@
      "date": "2026-10-23",
      "calls": [
       {
-       "strike": 100.0,
-       "bid": 28.05,
-       "ask": 29.2,
-       "iv": 120.4,
-       "vol": 54,
-       "oi": 60
-      },
-      {
-       "strike": 105.0,
-       "bid": 23.05,
-       "ask": 24.2,
-       "iv": 100.8,
-       "vol": 18,
-       "oi": 45
-      },
-      {
-       "strike": 110.0,
-       "bid": 18.45,
-       "ask": 19.2,
-       "iv": 90.3,
-       "vol": 327,
-       "oi": 106
-      },
-      {
        "strike": 115.0,
        "bid": 13.5,
        "ask": 14.5,
        "iv": 75.6,
        "vol": 50,
        "oi": 45
+      },
+      {
+       "strike": 117.0,
+       "bid": 11.65,
+       "ask": 12.5,
+       "iv": 69.1,
+       "vol": 4,
+       "oi": 1
+      },
+      {
+       "strike": 118.0,
+       "bid": 10.75,
+       "ask": 11.65,
+       "iv": 67.9,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 119.0,
+       "bid": 9.9,
+       "ask": 11.0,
+       "iv": 69.1,
+       "vol": 6,
+       "oi": 0
       },
       {
        "strike": 120.0,
@@ -182864,36 +183505,36 @@
      ],
      "puts": [
       {
-       "strike": 100.0,
-       "bid": 0.07,
-       "ask": 0.14,
-       "iv": 95.1,
-       "vol": 311,
-       "oi": 668
-      },
-      {
-       "strike": 105.0,
-       "bid": 0.11,
-       "ask": 0.14,
-       "iv": 81.1,
-       "vol": 178,
-       "oi": 184
-      },
-      {
-       "strike": 110.0,
-       "bid": 0.22,
-       "ask": 0.3,
-       "iv": 74.5,
-       "vol": 2226,
-       "oi": 1951
-      },
-      {
        "strike": 115.0,
        "bid": 0.48,
        "ask": 0.5,
        "iv": 66.3,
        "vol": 3264,
        "oi": 1925
+      },
+      {
+       "strike": 117.0,
+       "bid": 0.63,
+       "ask": 0.7,
+       "iv": 64.0,
+       "vol": 1402,
+       "oi": 86
+      },
+      {
+       "strike": 118.0,
+       "bid": 0.74,
+       "ask": 0.83,
+       "iv": 63.1,
+       "vol": 800,
+       "oi": 100
+      },
+      {
+       "strike": 119.0,
+       "bid": 0.89,
+       "ask": 0.98,
+       "iv": 62.5,
+       "vol": 876,
+       "oi": 35
       },
       {
        "strike": 120.0,
@@ -183066,51 +183707,11 @@
      ],
      "call_wall": 160.0,
      "put_wall": 130.0,
-     "opt_volume": 119269
+     "opt_volume": 122358
     },
     {
      "date": "2026-10-30",
      "calls": [
-      {
-       "strike": 85.0,
-       "bid": 42.9,
-       "ask": 44.45,
-       "iv": 127.3,
-       "vol": 2,
-       "oi": 2
-      },
-      {
-       "strike": 90.0,
-       "bid": 37.95,
-       "ask": 39.5,
-       "iv": 114.7,
-       "vol": 8,
-       "oi": 2
-      },
-      {
-       "strike": 95.0,
-       "bid": 33.05,
-       "ask": 34.6,
-       "iv": 104.1,
-       "vol": 6,
-       "oi": 7
-      },
-      {
-       "strike": 100.0,
-       "bid": 28.35,
-       "ask": 29.75,
-       "iv": 96.7,
-       "vol": 124,
-       "oi": 56
-      },
-      {
-       "strike": 105.0,
-       "bid": 23.4,
-       "ask": 25.05,
-       "iv": 86.2,
-       "vol": 58,
-       "oi": 58
-      },
       {
        "strike": 110.0,
        "bid": 19.1,
@@ -183128,12 +183729,52 @@
        "oi": 98
       },
       {
+       "strike": 118.0,
+       "bid": 12.35,
+       "ask": 14.05,
+       "iv": 74.7,
+       "vol": 52,
+       "oi": 0
+      },
+      {
+       "strike": 119.0,
+       "bid": 11.7,
+       "ask": 13.3,
+       "iv": 74.5,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 120.0,
        "bid": 10.9,
        "ask": 12.55,
        "iv": 73.2,
        "vol": 19,
        "oi": 118
+      },
+      {
+       "strike": 121.0,
+       "bid": 10.2,
+       "ask": 11.9,
+       "iv": 72.9,
+       "vol": 20,
+       "oi": 1
+      },
+      {
+       "strike": 122.0,
+       "bid": 9.85,
+       "ask": 11.25,
+       "iv": 74.4,
+       "vol": 9,
+       "oi": 1
+      },
+      {
+       "strike": 123.0,
+       "bid": 9.4,
+       "ask": 10.05,
+       "iv": 71.9,
+       "vol": 83,
+       "oi": 0
       },
       {
        "strike": 124.0,
@@ -183274,54 +183915,6 @@
      ],
      "puts": [
       {
-       "strike": 85.0,
-       "bid": 0.03,
-       "ask": 0.37,
-       "iv": 110.5,
-       "vol": 4,
-       "oi": 53
-      },
-      {
-       "strike": 90.0,
-       "bid": 0.11,
-       "ask": 0.33,
-       "iv": 98.6,
-       "vol": 41,
-       "oi": 107
-      },
-      {
-       "strike": 95.0,
-       "bid": 0.18,
-       "ask": 0.25,
-       "iv": 85.3,
-       "vol": 16,
-       "oi": 263
-      },
-      {
-       "strike": 100.0,
-       "bid": 0.25,
-       "ask": 0.38,
-       "iv": 78.1,
-       "vol": 81,
-       "oi": 1346
-      },
-      {
-       "strike": 105.0,
-       "bid": 0.54,
-       "ask": 0.7,
-       "iv": 76.1,
-       "vol": 342,
-       "oi": 1754
-      },
-      {
-       "strike": 110.0,
-       "bid": 1.05,
-       "ask": 1.16,
-       "iv": 73.3,
-       "vol": 1542,
-       "oi": 13622
-      },
-      {
        "strike": 115.0,
        "bid": 1.79,
        "ask": 1.92,
@@ -183330,12 +183923,60 @@
        "oi": 13337
       },
       {
+       "strike": 117.0,
+       "bid": 2.24,
+       "ask": 2.41,
+       "iv": 69.9,
+       "vol": 511,
+       "oi": 42
+      },
+      {
+       "strike": 118.0,
+       "bid": 2.35,
+       "ask": 2.87,
+       "iv": 70.0,
+       "vol": 717,
+       "oi": 20
+      },
+      {
+       "strike": 119.0,
+       "bid": 2.72,
+       "ask": 2.93,
+       "iv": 69.0,
+       "vol": 233,
+       "oi": 79
+      },
+      {
        "strike": 120.0,
        "bid": 3.0,
        "ask": 3.25,
        "iv": 68.8,
        "vol": 1211,
        "oi": 7493
+      },
+      {
+       "strike": 121.0,
+       "bid": 3.2,
+       "ask": 3.65,
+       "iv": 68.3,
+       "vol": 314,
+       "oi": 35
+      },
+      {
+       "strike": 122.0,
+       "bid": 3.35,
+       "ask": 4.45,
+       "iv": 69.6,
+       "vol": 212,
+       "oi": 170
+      },
+      {
+       "strike": 123.0,
+       "bid": 3.85,
+       "ask": 4.4,
+       "iv": 67.8,
+       "vol": 159,
+       "oi": 63
       },
       {
        "strike": 124.0,
@@ -183476,51 +184117,11 @@
      ],
      "call_wall": 145.0,
      "put_wall": 110.0,
-     "opt_volume": 49332
+     "opt_volume": 51644
     },
     {
      "date": "2026-11-06",
      "calls": [
-      {
-       "strike": 85.0,
-       "bid": 42.65,
-       "ask": 45.1,
-       "iv": 110.7,
-       "vol": 6,
-       "oi": 8
-      },
-      {
-       "strike": 90.0,
-       "bid": 38.6,
-       "ask": 39.1,
-       "iv": 97.0,
-       "vol": 1,
-       "oi": 15
-      },
-      {
-       "strike": 95.0,
-       "bid": 33.6,
-       "ask": 34.25,
-       "iv": 86.9,
-       "vol": 1,
-       "oi": 5
-      },
-      {
-       "strike": 100.0,
-       "bid": 28.9,
-       "ask": 29.5,
-       "iv": 81.4,
-       "vol": 1,
-       "oi": 61
-      },
-      {
-       "strike": 105.0,
-       "bid": 24.25,
-       "ask": 24.9,
-       "iv": 75.9,
-       "vol": 2,
-       "oi": 55
-      },
       {
        "strike": 110.0,
        "bid": 20.0,
@@ -183538,12 +184139,52 @@
        "oi": 78
       },
       {
+       "strike": 117.0,
+       "bid": 14.55,
+       "ask": 15.05,
+       "iv": 69.6,
+       "vol": 2,
+       "oi": 7
+      },
+      {
+       "strike": 118.0,
+       "bid": 13.85,
+       "ask": 14.35,
+       "iv": 69.4,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 119.0,
+       "bid": 13.05,
+       "ask": 13.65,
+       "iv": 68.5,
+       "vol": 0,
+       "oi": 3
+      },
+      {
        "strike": 120.0,
        "bid": 12.45,
        "ask": 13.0,
        "iv": 68.6,
        "vol": 3,
        "oi": 72
+      },
+      {
+       "strike": 122.0,
+       "bid": 11.15,
+       "ask": 11.7,
+       "iv": 67.9,
+       "vol": 0,
+       "oi": 6
+      },
+      {
+       "strike": 123.0,
+       "bid": 10.55,
+       "ask": 11.05,
+       "iv": 67.5,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 124.0,
@@ -183684,54 +184325,6 @@
      ],
      "puts": [
       {
-       "strike": 85.0,
-       "bid": 0.04,
-       "ask": 0.36,
-       "iv": 89.3,
-       "vol": 28,
-       "oi": 28
-      },
-      {
-       "strike": 90.0,
-       "bid": 0.11,
-       "ask": 0.44,
-       "iv": 82.7,
-       "vol": 79,
-       "oi": 162
-      },
-      {
-       "strike": 95.0,
-       "bid": 0.21,
-       "ask": 0.4,
-       "iv": 73.2,
-       "vol": 98,
-       "oi": 163
-      },
-      {
-       "strike": 100.0,
-       "bid": 0.49,
-       "ask": 0.67,
-       "iv": 71.7,
-       "vol": 41,
-       "oi": 2991
-      },
-      {
-       "strike": 105.0,
-       "bid": 0.86,
-       "ask": 1.1,
-       "iv": 69.2,
-       "vol": 115,
-       "oi": 803
-      },
-      {
-       "strike": 110.0,
-       "bid": 1.46,
-       "ask": 1.7,
-       "iv": 66.5,
-       "vol": 180,
-       "oi": 11834
-      },
-      {
        "strike": 115.0,
        "bid": 2.43,
        "ask": 2.8,
@@ -183740,12 +184333,60 @@
        "oi": 8995
       },
       {
+       "strike": 117.0,
+       "bid": 2.9,
+       "ask": 3.35,
+       "iv": 65.0,
+       "vol": 137,
+       "oi": 96
+      },
+      {
+       "strike": 118.0,
+       "bid": 3.1,
+       "ask": 3.65,
+       "iv": 64.4,
+       "vol": 48,
+       "oi": 64
+      },
+      {
+       "strike": 119.0,
+       "bid": 3.35,
+       "ask": 3.95,
+       "iv": 63.9,
+       "vol": 48,
+       "oi": 44
+      },
+      {
        "strike": 120.0,
        "bid": 3.7,
        "ask": 4.2,
        "iv": 63.4,
        "vol": 195,
        "oi": 1473
+      },
+      {
+       "strike": 121.0,
+       "bid": 4.0,
+       "ask": 4.6,
+       "iv": 63.3,
+       "vol": 35,
+       "oi": 8
+      },
+      {
+       "strike": 122.0,
+       "bid": 4.4,
+       "ask": 5.0,
+       "iv": 63.4,
+       "vol": 47,
+       "oi": 9
+      },
+      {
+       "strike": 123.0,
+       "bid": 4.75,
+       "ask": 5.4,
+       "iv": 63.1,
+       "vol": 28,
+       "oi": 8
       },
       {
        "strike": 124.0,
@@ -183886,7 +184527,7 @@
      ],
      "call_wall": 150.0,
      "put_wall": 110.0,
-     "opt_volume": 5957
+     "opt_volume": 6304
     }
    ]
   },
@@ -183898,28 +184539,20 @@
      "date": "2026-10-23",
      "calls": [
       {
-       "strike": 270.0,
-       "bid": 68.45,
-       "ask": 76.2,
-       "iv": 93.2,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 280.0,
-       "bid": 58.6,
-       "ask": 66.3,
-       "iv": 85.4,
-       "vol": 7,
-       "oi": 3
-      },
-      {
        "strike": 285.0,
        "bid": 53.3,
        "ask": 61.4,
        "iv": 75.5,
        "vol": 7,
        "oi": 1
+      },
+      {
+       "strike": 290.0,
+       "bid": 49.2,
+       "ask": 56.55,
+       "iv": 83.0,
+       "vol": 6,
+       "oi": 4
       },
       {
        "strike": 295.0,
@@ -183936,6 +184569,14 @@
        "iv": 74.2,
        "vol": 14,
        "oi": 16
+      },
+      {
+       "strike": 305.0,
+       "bid": 34.4,
+       "ask": 42.5,
+       "iv": 70.8,
+       "vol": 1,
+       "oi": 8
       },
       {
        "strike": 310.0,
@@ -184302,34 +184943,26 @@
      ],
      "call_wall": 470.0,
      "put_wall": 330.0,
-     "opt_volume": 13599
+     "opt_volume": 13774
     },
     {
      "date": "2026-10-30",
      "calls": [
       {
-       "strike": 210.0,
-       "bid": 128.6,
-       "ask": 136.35,
-       "iv": 126.2,
-       "vol": 1,
-       "oi": 6
+       "strike": 270.0,
+       "bid": 69.35,
+       "ask": 77.1,
+       "iv": 81.1,
+       "vol": 0,
+       "oi": 2
       },
       {
-       "strike": 220.0,
-       "bid": 118.65,
-       "ask": 126.4,
-       "iv": 117.4,
-       "vol": 6,
-       "oi": 8
-      },
-      {
-       "strike": 255.0,
-       "bid": 83.95,
-       "ask": 91.75,
-       "iv": 89.9,
-       "vol": 2,
-       "oi": 4
+       "strike": 275.0,
+       "bid": 64.5,
+       "ask": 72.3,
+       "iv": 78.3,
+       "vol": 0,
+       "oi": 2
       },
       {
        "strike": 280.0,
@@ -184338,6 +184971,14 @@
        "iv": 76.1,
        "vol": 1,
        "oi": 11
+      },
+      {
+       "strike": 285.0,
+       "bid": 55.05,
+       "ask": 62.75,
+       "iv": 73.4,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 290.0,
@@ -184436,12 +185077,28 @@
        "oi": 14
       },
       {
+       "strike": 357.5,
+       "bid": 8.05,
+       "ask": 10.2,
+       "iv": 59.5,
+       "vol": 48,
+       "oi": 5
+      },
+      {
        "strike": 360.0,
        "bid": 5.45,
        "ask": 11.25,
        "iv": 59.6,
        "vol": 22,
        "oi": 65
+      },
+      {
+       "strike": 362.5,
+       "bid": 4.65,
+       "ask": 10.1,
+       "iv": 58.6,
+       "vol": 1,
+       "oi": 32
       },
       {
        "strike": 365.0,
@@ -184452,12 +185109,28 @@
        "oi": 54
       },
       {
+       "strike": 367.5,
+       "bid": 3.2,
+       "ask": 8.55,
+       "iv": 57.6,
+       "vol": 1,
+       "oi": 21
+      },
+      {
        "strike": 370.0,
        "bid": 4.65,
        "ask": 5.8,
        "iv": 57.2,
        "vol": 56,
        "oi": 148
+      },
+      {
+       "strike": 372.5,
+       "bid": 3.6,
+       "ask": 7.6,
+       "iv": 61.7,
+       "vol": 12,
+       "oi": 0
       },
       {
        "strike": 375.0,
@@ -184468,44 +185141,12 @@
        "oi": 60
       },
       {
-       "strike": 380.0,
-       "bid": 2.77,
-       "ask": 3.65,
-       "iv": 56.1,
-       "vol": 53,
-       "oi": 166
-      },
-      {
-       "strike": 385.0,
-       "bid": 2.02,
-       "ask": 3.45,
-       "iv": 57.4,
-       "vol": 22,
-       "oi": 51
-      },
-      {
-       "strike": 387.5,
-       "bid": 0.65,
-       "ask": 4.3,
-       "iv": 57.7,
-       "vol": 37,
-       "oi": 49
-      },
-      {
-       "strike": 390.0,
-       "bid": 0.59,
-       "ask": 3.7,
-       "iv": 57.3,
-       "vol": 41,
-       "oi": 101
-      },
-      {
-       "strike": 395.0,
-       "bid": 0.8,
-       "ask": 2.51,
-       "iv": 57.0,
-       "vol": 46,
-       "oi": 180
+       "strike": 377.5,
+       "bid": 2.89,
+       "ask": 6.0,
+       "iv": 60.8,
+       "vol": 38,
+       "oi": 1
       }
      ],
      "puts": [
@@ -184638,12 +185279,28 @@
        "oi": 210
       },
       {
+       "strike": 357.5,
+       "bid": 20.7,
+       "ask": 26.15,
+       "iv": 54.6,
+       "vol": 6,
+       "oi": 44
+      },
+      {
        "strike": 360.0,
        "bid": 22.15,
        "ask": 28.65,
        "iv": 55.6,
        "vol": 63,
        "oi": 124
+      },
+      {
+       "strike": 362.5,
+       "bid": 23.65,
+       "ask": 29.65,
+       "iv": 53.2,
+       "vol": 13,
+       "oi": 58
       },
       {
        "strike": 365.0,
@@ -184654,12 +185311,28 @@
        "oi": 109
       },
       {
+       "strike": 367.5,
+       "bid": 27.6,
+       "ask": 33.3,
+       "iv": 53.2,
+       "vol": 21,
+       "oi": 21
+      },
+      {
        "strike": 370.0,
        "bid": 30.85,
        "ask": 34.95,
        "iv": 55.6,
        "vol": 70,
        "oi": 465
+      },
+      {
+       "strike": 372.5,
+       "bid": 31.35,
+       "ask": 37.75,
+       "iv": 53.8,
+       "vol": 1,
+       "oi": 4
       },
       {
        "strike": 375.0,
@@ -184670,49 +185343,17 @@
        "oi": 113
       },
       {
-       "strike": 380.0,
-       "bid": 36.65,
-       "ask": 42.3,
-       "iv": 62.4,
-       "vol": 285,
-       "oi": 320
-      },
-      {
-       "strike": 385.0,
-       "bid": 41.0,
-       "ask": 46.95,
-       "iv": 65.0,
-       "vol": 4,
-       "oi": 56
-      },
-      {
-       "strike": 387.5,
-       "bid": 43.2,
-       "ask": 51.6,
-       "iv": 53.4,
-       "vol": 3,
-       "oi": 8
-      },
-      {
-       "strike": 390.0,
-       "bid": 45.45,
-       "ask": 52.0,
-       "iv": 69.7,
-       "vol": 26,
-       "oi": 1620
-      },
-      {
-       "strike": 392.5,
-       "bid": 49.15,
-       "ask": 54.6,
-       "iv": 52.7,
-       "vol": 5,
-       "oi": 1
+       "strike": 377.5,
+       "bid": 34.5,
+       "ask": 42.6,
+       "iv": 52.9,
+       "vol": 1,
+       "oi": 2
       }
      ],
      "call_wall": 440.0,
      "put_wall": 350.0,
-     "opt_volume": 6283
+     "opt_volume": 6444
     },
     {
      "date": "2026-11-06",
@@ -184740,6 +185381,14 @@
        "iv": 93.2,
        "vol": 0,
        "oi": 1
+      },
+      {
+       "strike": 285.0,
+       "bid": 55.8,
+       "ask": 64.05,
+       "iv": 66.8,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 290.0,
@@ -184788,6 +185437,14 @@
        "iv": 55.7,
        "vol": 7,
        "oi": 16
+      },
+      {
+       "strike": 345.0,
+       "bid": 14.65,
+       "ask": 20.65,
+       "iv": 59.6,
+       "vol": 13,
+       "oi": 0
       },
       {
        "strike": 350.0,
@@ -184876,14 +185533,6 @@
        "iv": 57.1,
        "vol": 32,
        "oi": 39
-      },
-      {
-       "strike": 405.0,
-       "bid": 0.63,
-       "ask": 4.35,
-       "iv": 57.4,
-       "vol": 14,
-       "oi": 37
       }
      ],
      "puts": [
@@ -185090,7 +185739,7 @@
      ],
      "call_wall": 440.0,
      "put_wall": 345.0,
-     "opt_volume": 1812
+     "opt_volume": 1844
     }
    ]
   },
@@ -185287,17 +185936,17 @@
       },
       {
        "strike": 36.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 0.35,
-       "iv": 133.8,
+       "iv": 110.5,
        "vol": 7,
        "oi": 3
       },
       {
        "strike": 37.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 0.34,
-       "iv": 144.9,
+       "iv": 120.7,
        "vol": 4,
        "oi": 1
       }
@@ -185482,18 +186131,18 @@
      ],
      "call_wall": 29.0,
      "put_wall": 27.0,
-     "opt_volume": 11728
+     "opt_volume": 11734
     },
     {
      "date": "2026-10-30",
      "calls": [
       {
-       "strike": 23.0,
-       "bid": 5.8,
-       "ask": 6.8,
-       "iv": 101.6,
-       "vol": 5,
-       "oi": 21
+       "strike": 23.5,
+       "bid": 5.95,
+       "ask": 6.25,
+       "iv": 58.6,
+       "vol": 4,
+       "oi": 0
       },
       {
        "strike": 24.0,
@@ -185670,6 +186319,14 @@
        "iv": 43.8,
        "vol": 19,
        "oi": 629
+      },
+      {
+       "strike": 36.0,
+       "bid": 0.0,
+       "ask": 0.2,
+       "iv": 66.0,
+       "vol": 2,
+       "oi": 0
       },
       {
        "strike": 37.0,
@@ -185860,7 +186517,7 @@
      ],
      "call_wall": 30.0,
      "put_wall": 27.5,
-     "opt_volume": 6108
+     "opt_volume": 6117
     },
     {
      "date": "2026-11-06",
@@ -186043,11 +186700,19 @@
       },
       {
        "strike": 35.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 0.81,
-       "iv": 89.8,
+       "iv": 69.3,
        "vol": 0,
        "oi": 4
+      },
+      {
+       "strike": 39.0,
+       "bid": 0.0,
+       "ask": 0.96,
+       "iv": 101.2,
+       "vol": 0,
+       "oi": 1
       }
      ],
      "puts": [
@@ -186646,7 +187311,7 @@
      ],
      "call_wall": 210.0,
      "put_wall": 125.0,
-     "opt_volume": 241892
+     "opt_volume": 241920
     },
     {
      "date": "2026-10-30",
@@ -187056,7 +187721,7 @@
      ],
      "call_wall": 205.0,
      "put_wall": 190.0,
-     "opt_volume": 58079
+     "opt_volume": 58082
     },
     {
      "date": "2026-11-06",
@@ -187466,7 +188131,7 @@
      ],
      "call_wall": 215.0,
      "put_wall": 190.0,
-     "opt_volume": 15297
+     "opt_volume": 15321
     }
    ]
   },
@@ -187630,6 +188295,14 @@
        "oi": 251
       },
       {
+       "strike": 222.5,
+       "bid": 0.45,
+       "ask": 2.65,
+       "iv": 64.8,
+       "vol": 58,
+       "oi": 0
+      },
+      {
        "strike": 225.0,
        "bid": 0.3,
        "ask": 0.85,
@@ -187774,11 +188447,19 @@
        "iv": 66.3,
        "vol": 3,
        "oi": 6
+      },
+      {
+       "strike": 212.5,
+       "bid": 8.3,
+       "ask": 11.5,
+       "iv": 51.5,
+       "vol": 0,
+       "oi": 5
       }
      ],
      "call_wall": 210.0,
      "put_wall": 190.0,
-     "opt_volume": 1552
+     "opt_volume": 1610
     },
     {
      "date": "2026-10-30",
@@ -187824,6 +188505,14 @@
        "oi": 5
       },
       {
+       "strike": 187.5,
+       "bid": 16.6,
+       "ask": 20.8,
+       "iv": 63.8,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 190.0,
        "bid": 14.4,
        "ask": 18.5,
@@ -187846,6 +188535,14 @@
        "iv": 54.5,
        "vol": 4,
        "oi": 491
+      },
+      {
+       "strike": 197.5,
+       "bid": 8.6,
+       "ask": 12.4,
+       "iv": 52.6,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 200.0,
@@ -187888,6 +188585,14 @@
        "oi": 252
       },
       {
+       "strike": 212.5,
+       "bid": 1.25,
+       "ask": 4.9,
+       "iv": 51.1,
+       "vol": 0,
+       "oi": 8
+      },
+      {
        "strike": 215.0,
        "bid": 0.5,
        "ask": 4.2,
@@ -187928,6 +188633,14 @@
        "oi": 84
       },
       {
+       "strike": 227.5,
+       "bid": 0.2,
+       "ask": 2.65,
+       "iv": 50.1,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 230.0,
        "bid": 0.1,
        "ask": 2.55,
@@ -187945,30 +188658,6 @@
       }
      ],
      "puts": [
-      {
-       "strike": 155.0,
-       "bid": 0.0,
-       "ask": 1.65,
-       "iv": 95.5,
-       "vol": 2,
-       "oi": 3
-      },
-      {
-       "strike": 160.0,
-       "bid": 0.0,
-       "ask": 2.25,
-       "iv": 93.1,
-       "vol": 3,
-       "oi": 4
-      },
-      {
-       "strike": 165.0,
-       "bid": 0.05,
-       "ask": 2.3,
-       "iv": 84.9,
-       "vol": 6,
-       "oi": 13
-      },
       {
        "strike": 170.0,
        "bid": 0.0,
@@ -188010,6 +188699,14 @@
        "oi": 239
       },
       {
+       "strike": 187.5,
+       "bid": 0.0,
+       "ask": 3.2,
+       "iv": 64.7,
+       "vol": 3,
+       "oi": 13
+      },
+      {
        "strike": 190.0,
        "bid": 0.0,
        "ask": 2.0,
@@ -188018,12 +188715,28 @@
        "oi": 189
       },
       {
+       "strike": 192.5,
+       "bid": 0.0,
+       "ask": 3.9,
+       "iv": 59.1,
+       "vol": 7,
+       "oi": 0
+      },
+      {
        "strike": 195.0,
        "bid": 0.15,
        "ask": 3.1,
        "iv": 46.9,
        "vol": 10,
        "oi": 20
+      },
+      {
+       "strike": 197.5,
+       "bid": 1.6,
+       "ask": 4.9,
+       "iv": 54.0,
+       "vol": 1,
+       "oi": 11
       },
       {
        "strike": 200.0,
@@ -188052,7 +188765,7 @@
      ],
      "call_wall": 195.0,
      "put_wall": 185.0,
-     "opt_volume": 551
+     "opt_volume": 564
     },
     {
      "date": "2026-11-06",
@@ -188220,6 +188933,14 @@
        "oi": 33
       },
       {
+       "strike": 205.0,
+       "bid": 5.8,
+       "ask": 8.7,
+       "iv": 46.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 250.0,
        "bid": 43.1,
        "ask": 47.2,
@@ -188230,7 +188951,7 @@
      ],
      "call_wall": 210.0,
      "put_wall": 175.0,
-     "opt_volume": 174
+     "opt_volume": 175
     }
    ]
   },
@@ -188247,6 +188968,14 @@
        "ask": 8.35,
        "iv": 695.3,
        "vol": 1,
+       "oi": 2
+      },
+      {
+       "strike": 7.0,
+       "bid": 4.2,
+       "ask": 6.35,
+       "iv": 438.3,
+       "vol": 0,
        "oi": 2
       },
       {
@@ -188272,6 +189001,14 @@
        "iv": 196.9,
        "vol": 3,
        "oi": 13
+      },
+      {
+       "strike": 10.5,
+       "bid": 0.88,
+       "ask": 2.17,
+       "iv": 121.1,
+       "vol": 5,
+       "oi": 0
       },
       {
        "strike": 11.0,
@@ -188405,9 +189142,9 @@
       },
       {
        "strike": 8.0,
-       "bid": null,
+       "bid": 0.0,
        "ask": 0.95,
-       "iv": 484.4,
+       "iv": 354.7,
        "vol": 0,
        "oi": 1
       },
@@ -188558,11 +189295,35 @@
      ],
      "call_wall": 20.0,
      "put_wall": 12.0,
-     "opt_volume": 7427
+     "opt_volume": 7432
     },
     {
      "date": "2026-10-30",
      "calls": [
+      {
+       "strike": 5.0,
+       "bid": 6.15,
+       "ask": 8.25,
+       "iv": 416.4,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 7.0,
+       "bid": 4.35,
+       "ask": 6.3,
+       "iv": 309.4,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 8.0,
+       "bid": 3.65,
+       "ask": 5.1,
+       "iv": 260.9,
+       "vol": 0,
+       "oi": 0
+      },
       {
        "strike": 9.0,
        "bid": 2.06,
@@ -188710,6 +189471,14 @@
      ],
      "puts": [
       {
+       "strike": 9.0,
+       "bid": 0.0,
+       "ask": 0.75,
+       "iv": 171.9,
+       "vol": 0,
+       "oi": 46
+      },
+      {
        "strike": 10.0,
        "bid": 0.0,
        "ask": 0.37,
@@ -188853,6 +189622,30 @@
     {
      "date": "2026-11-06",
      "calls": [
+      {
+       "strike": 7.0,
+       "bid": 4.25,
+       "ask": 6.55,
+       "iv": 262.9,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 7.5,
+       "bid": 3.8,
+       "ask": 6.05,
+       "iv": 241.8,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 8.0,
+       "bid": 3.0,
+       "ask": 5.4,
+       "iv": 181.8,
+       "vol": 0,
+       "oi": 25
+      },
       {
        "strike": 9.0,
        "bid": 2.35,
@@ -189142,22 +189935,6 @@
      "date": "2026-10-23",
      "calls": [
       {
-       "strike": 25.0,
-       "bid": 107.15,
-       "ask": 116.0,
-       "iv": 535.9,
-       "vol": 3,
-       "oi": 37
-      },
-      {
-       "strike": 80.0,
-       "bid": 52.9,
-       "ask": 60.75,
-       "iv": 220.7,
-       "vol": 1,
-       "oi": 1
-      },
-      {
        "strike": 100.0,
        "bid": 32.95,
        "ask": 40.85,
@@ -189172,6 +189949,14 @@
        "iv": 113.1,
        "vol": 2,
        "oi": 2
+      },
+      {
+       "strike": 115.0,
+       "bid": 18.2,
+       "ask": 26.1,
+       "iv": 99.4,
+       "vol": 7,
+       "oi": 0
       },
       {
        "strike": 120.0,
@@ -189190,12 +189975,52 @@
        "oi": 7
       },
       {
+       "strike": 128.0,
+       "bid": 10.0,
+       "ask": 10.55,
+       "iv": 72.6,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 130.0,
        "bid": 8.7,
        "ask": 8.8,
        "iv": 70.8,
        "vol": 256,
        "oi": 5
+      },
+      {
+       "strike": 131.0,
+       "bid": 7.95,
+       "ask": 8.1,
+       "iv": 70.0,
+       "vol": 32,
+       "oi": 1
+      },
+      {
+       "strike": 132.0,
+       "bid": 7.3,
+       "ask": 7.4,
+       "iv": 69.5,
+       "vol": 50,
+       "oi": 0
+      },
+      {
+       "strike": 133.0,
+       "bid": 6.65,
+       "ask": 6.75,
+       "iv": 69.0,
+       "vol": 30,
+       "oi": 0
+      },
+      {
+       "strike": 134.0,
+       "bid": 6.0,
+       "ask": 6.15,
+       "iv": 68.3,
+       "vol": 11,
+       "oi": 0
       },
       {
        "strike": 135.0,
@@ -189206,12 +190031,52 @@
        "oi": 27
       },
       {
+       "strike": 136.0,
+       "bid": 4.95,
+       "ask": 5.0,
+       "iv": 67.8,
+       "vol": 164,
+       "oi": 1
+      },
+      {
+       "strike": 137.0,
+       "bid": 4.4,
+       "ask": 4.5,
+       "iv": 67.2,
+       "vol": 157,
+       "oi": 1
+      },
+      {
+       "strike": 138.0,
+       "bid": 3.95,
+       "ask": 4.05,
+       "iv": 67.2,
+       "vol": 664,
+       "oi": 2
+      },
+      {
+       "strike": 139.0,
+       "bid": 3.5,
+       "ask": 3.6,
+       "iv": 66.7,
+       "vol": 372,
+       "oi": 50
+      },
+      {
        "strike": 140.0,
        "bid": 3.1,
        "ask": 3.2,
        "iv": 66.5,
        "vol": 2291,
        "oi": 811
+      },
+      {
+       "strike": 141.0,
+       "bid": 2.73,
+       "ask": 2.86,
+       "iv": 66.4,
+       "vol": 663,
+       "oi": 209
       },
       {
        "strike": 142.0,
@@ -189246,6 +190111,14 @@
        "oi": 987
       },
       {
+       "strike": 146.0,
+       "bid": 1.46,
+       "ask": 1.53,
+       "iv": 66.9,
+       "vol": 943,
+       "oi": 584
+      },
+      {
        "strike": 147.0,
        "bid": 1.27,
        "ask": 1.3,
@@ -189260,65 +190133,9 @@
        "iv": 66.6,
        "vol": 530,
        "oi": 287
-      },
-      {
-       "strike": 149.0,
-       "bid": 0.95,
-       "ask": 0.98,
-       "iv": 66.7,
-       "vol": 863,
-       "oi": 44
-      },
-      {
-       "strike": 150.0,
-       "bid": 0.83,
-       "ask": 0.89,
-       "iv": 67.4,
-       "vol": 4369,
-       "oi": 1432
-      },
-      {
-       "strike": 152.5,
-       "bid": 0.56,
-       "ask": 0.63,
-       "iv": 67.6,
-       "vol": 847,
-       "oi": 323
-      },
-      {
-       "strike": 155.0,
-       "bid": 0.41,
-       "ask": 0.42,
-       "iv": 68.3,
-       "vol": 2687,
-       "oi": 3674
-      },
-      {
-       "strike": 157.5,
-       "bid": 0.29,
-       "ask": 0.3,
-       "iv": 69.3,
-       "vol": 426,
-       "oi": 348
       }
      ],
      "puts": [
-      {
-       "strike": 110.0,
-       "bid": 0.09,
-       "ask": 0.2,
-       "iv": 87.7,
-       "vol": 60,
-       "oi": 497
-      },
-      {
-       "strike": 115.0,
-       "bid": 0.12,
-       "ask": 0.33,
-       "iv": 78.2,
-       "vol": 397,
-       "oi": 198
-      },
       {
        "strike": 120.0,
        "bid": 0.56,
@@ -189374,6 +190191,22 @@
        "iv": 69.5,
        "vol": 2648,
        "oi": 470
+      },
+      {
+       "strike": 131.0,
+       "bid": 2.44,
+       "ask": 2.52,
+       "iv": 69.1,
+       "vol": 286,
+       "oi": 268
+      },
+      {
+       "strike": 132.0,
+       "bid": 2.76,
+       "ask": 2.82,
+       "iv": 68.5,
+       "vol": 268,
+       "oi": 33
       },
       {
        "strike": 133.0,
@@ -189506,27 +190339,11 @@
      ],
      "call_wall": 160.0,
      "put_wall": 135.0,
-     "opt_volume": 47789
+     "opt_volume": 51456
     },
     {
      "date": "2026-10-30",
      "calls": [
-      {
-       "strike": 80.0,
-       "bid": 53.05,
-       "ask": 60.9,
-       "iv": 160.2,
-       "vol": 0,
-       "oi": 3
-      },
-      {
-       "strike": 90.0,
-       "bid": 43.1,
-       "ask": 50.95,
-       "iv": 131.8,
-       "vol": 2,
-       "oi": 16
-      },
       {
        "strike": 100.0,
        "bid": 33.2,
@@ -189534,6 +190351,14 @@
        "iv": 107.2,
        "vol": 0,
        "oi": 11
+      },
+      {
+       "strike": 110.0,
+       "bid": 23.55,
+       "ask": 31.45,
+       "iv": 90.1,
+       "vol": 1,
+       "oi": 1
       },
       {
        "strike": 120.0,
@@ -189544,12 +190369,44 @@
        "oi": 1
       },
       {
+       "strike": 122.0,
+       "bid": 12.85,
+       "ask": 21.0,
+       "iv": 78.0,
+       "vol": 10,
+       "oi": 0
+      },
+      {
+       "strike": 124.0,
+       "bid": 12.8,
+       "ask": 18.15,
+       "iv": 78.3,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 125.0,
        "bid": 12.1,
        "ask": 17.35,
        "iv": 77.8,
        "vol": 1,
        "oi": 4
+      },
+      {
+       "strike": 127.0,
+       "bid": 10.35,
+       "ask": 16.15,
+       "iv": 76.5,
+       "vol": 10,
+       "oi": 0
+      },
+      {
+       "strike": 129.0,
+       "bid": 9.2,
+       "ask": 14.5,
+       "iv": 75.3,
+       "vol": 1,
+       "oi": 1
       },
       {
        "strike": 130.0,
@@ -189568,12 +190425,52 @@
        "oi": 1
       },
       {
+       "strike": 134.0,
+       "bid": 6.2,
+       "ask": 11.4,
+       "iv": 73.6,
+       "vol": 10,
+       "oi": 0
+      },
+      {
        "strike": 135.0,
        "bid": 6.35,
        "ask": 9.75,
        "iv": 71.3,
        "vol": 150,
        "oi": 4
+      },
+      {
+       "strike": 136.0,
+       "bid": 5.5,
+       "ask": 10.4,
+       "iv": 75.1,
+       "vol": 6,
+       "oi": 1
+      },
+      {
+       "strike": 137.0,
+       "bid": 6.8,
+       "ask": 7.4,
+       "iv": 71.5,
+       "vol": 41,
+       "oi": 1
+      },
+      {
+       "strike": 138.0,
+       "bid": 6.0,
+       "ask": 7.8,
+       "iv": 73.9,
+       "vol": 42,
+       "oi": 82
+      },
+      {
+       "strike": 139.0,
+       "bid": 5.8,
+       "ask": 6.9,
+       "iv": 72.8,
+       "vol": 116,
+       "oi": 5
       },
       {
        "strike": 140.0,
@@ -189584,6 +190481,38 @@
        "oi": 196
       },
       {
+       "strike": 141.0,
+       "bid": 4.85,
+       "ask": 5.95,
+       "iv": 71.3,
+       "vol": 228,
+       "oi": 97
+      },
+      {
+       "strike": 142.0,
+       "bid": 3.6,
+       "ask": 7.05,
+       "iv": 74.2,
+       "vol": 15,
+       "oi": 38
+      },
+      {
+       "strike": 143.0,
+       "bid": 2.1,
+       "ask": 6.95,
+       "iv": 69.7,
+       "vol": 5,
+       "oi": 43
+      },
+      {
+       "strike": 144.0,
+       "bid": 4.0,
+       "ask": 5.3,
+       "iv": 74.3,
+       "vol": 95,
+       "oi": 242
+      },
+      {
        "strike": 145.0,
        "bid": 3.5,
        "ask": 4.85,
@@ -189592,126 +190521,38 @@
        "oi": 191
       },
       {
+       "strike": 146.0,
+       "bid": 2.99,
+       "ask": 4.85,
+       "iv": 73.1,
+       "vol": 5,
+       "oi": 14
+      },
+      {
+       "strike": 147.0,
+       "bid": 2.05,
+       "ask": 5.55,
+       "iv": 74.9,
+       "vol": 3,
+       "oi": 4
+      },
+      {
        "strike": 148.0,
        "bid": 2.69,
        "ask": 3.7,
        "iv": 71.1,
        "vol": 41,
        "oi": 32
-      },
-      {
-       "strike": 149.0,
-       "bid": 1.44,
-       "ask": 5.05,
-       "iv": 74.5,
-       "vol": 5,
-       "oi": 12
-      },
-      {
-       "strike": 150.0,
-       "bid": 2.58,
-       "ask": 2.82,
-       "iv": 70.8,
-       "vol": 600,
-       "oi": 1751
-      },
-      {
-       "strike": 152.5,
-       "bid": 0.92,
-       "ask": 2.67,
-       "iv": 65.5,
-       "vol": 85,
-       "oi": 115
-      },
-      {
-       "strike": 155.0,
-       "bid": 1.44,
-       "ask": 1.9,
-       "iv": 69.3,
-       "vol": 295,
-       "oi": 2283
-      },
-      {
-       "strike": 157.5,
-       "bid": 0.96,
-       "ask": 1.62,
-       "iv": 68.7,
-       "vol": 92,
-       "oi": 111
-      },
-      {
-       "strike": 160.0,
-       "bid": 0.99,
-       "ask": 1.25,
-       "iv": 70.6,
-       "vol": 464,
-       "oi": 1455
-      },
-      {
-       "strike": 162.5,
-       "bid": 0.27,
-       "ask": 1.2,
-       "iv": 67.3,
-       "vol": 213,
-       "oi": 253
-      },
-      {
-       "strike": 165.0,
-       "bid": 0.64,
-       "ask": 0.8,
-       "iv": 71.2,
-       "vol": 782,
-       "oi": 1989
-      },
-      {
-       "strike": 167.5,
-       "bid": 0.29,
-       "ask": 1.18,
-       "iv": 75.7,
-       "vol": 32,
-       "oi": 73
       }
      ],
      "puts": [
       {
-       "strike": 100.0,
-       "bid": 0.14,
-       "ask": 0.31,
-       "iv": 87.7,
-       "vol": 107,
-       "oi": 14
-      },
-      {
-       "strike": 105.0,
-       "bid": 0.18,
-       "ask": 0.44,
-       "iv": 80.5,
-       "vol": 42,
-       "oi": 1853
-      },
-      {
-       "strike": 110.0,
-       "bid": 0.17,
-       "ask": 0.7,
-       "iv": 73.4,
-       "vol": 4,
-       "oi": 333
-      },
-      {
-       "strike": 115.0,
-       "bid": 0.28,
-       "ask": 1.54,
-       "iv": 73.6,
-       "vol": 15,
-       "oi": 74
-      },
-      {
-       "strike": 120.0,
-       "bid": 1.26,
-       "ask": 1.85,
-       "iv": 71.3,
-       "vol": 83,
-       "oi": 1080
+       "strike": 124.0,
+       "bid": 1.19,
+       "ask": 3.75,
+       "iv": 71.7,
+       "vol": 1,
+       "oi": 24
       },
       {
        "strike": 125.0,
@@ -189720,6 +190561,14 @@
        "iv": 71.3,
        "vol": 228,
        "oi": 227
+      },
+      {
+       "strike": 126.0,
+       "bid": 1.45,
+       "ask": 3.5,
+       "iv": 64.8,
+       "vol": 5,
+       "oi": 25
       },
       {
        "strike": 127.0,
@@ -189754,6 +190603,22 @@
        "oi": 690
       },
       {
+       "strike": 131.0,
+       "bid": 3.0,
+       "ask": 6.5,
+       "iv": 71.2,
+       "vol": 6,
+       "oi": 5
+      },
+      {
+       "strike": 132.0,
+       "bid": 2.83,
+       "ask": 5.5,
+       "iv": 60.9,
+       "vol": 4,
+       "oi": 11
+      },
+      {
        "strike": 133.0,
        "bid": 3.8,
        "ask": 6.45,
@@ -189778,6 +190643,22 @@
        "oi": 495
       },
       {
+       "strike": 136.0,
+       "bid": 4.3,
+       "ask": 9.3,
+       "iv": 68.7,
+       "vol": 26,
+       "oi": 15
+      },
+      {
+       "strike": 137.0,
+       "bid": 5.4,
+       "ask": 9.45,
+       "iv": 69.7,
+       "vol": 279,
+       "oi": 7
+      },
+      {
        "strike": 138.0,
        "bid": 6.8,
        "ask": 9.7,
@@ -189800,6 +190681,14 @@
        "iv": 67.6,
        "vol": 655,
        "oi": 1082
+      },
+      {
+       "strike": 141.0,
+       "bid": 7.1,
+       "ask": 11.0,
+       "iv": 62.7,
+       "vol": 0,
+       "oi": 4
       },
       {
        "strike": 142.0,
@@ -189856,27 +190745,11 @@
        "iv": 63.3,
        "vol": 4,
        "oi": 5
-      },
-      {
-       "strike": 149.0,
-       "bid": 12.35,
-       "ask": 17.4,
-       "iv": 64.2,
-       "vol": 1,
-       "oi": 11
-      },
-      {
-       "strike": 150.0,
-       "bid": 15.45,
-       "ask": 16.4,
-       "iv": 67.4,
-       "vol": 59,
-       "oi": 1177
       }
      ],
      "call_wall": 175.0,
      "put_wall": 105.0,
-     "opt_volume": 7914
+     "opt_volume": 8988
     },
     {
      "date": "2026-11-06",
@@ -189922,12 +190795,68 @@
        "oi": 32
       },
       {
+       "strike": 137.0,
+       "bid": 8.0,
+       "ask": 11.45,
+       "iv": 78.2,
+       "vol": 4,
+       "oi": 0
+      },
+      {
+       "strike": 138.0,
+       "bid": 6.45,
+       "ask": 11.1,
+       "iv": 74.3,
+       "vol": 21,
+       "oi": 4
+      },
+      {
+       "strike": 139.0,
+       "bid": 6.6,
+       "ask": 9.7,
+       "iv": 72.8,
+       "vol": 21,
+       "oi": 7
+      },
+      {
        "strike": 140.0,
        "bid": 7.0,
        "ask": 7.9,
        "iv": 70.6,
        "vol": 837,
        "oi": 642
+      },
+      {
+       "strike": 141.0,
+       "bid": 6.0,
+       "ask": 7.55,
+       "iv": 68.4,
+       "vol": 25,
+       "oi": 3
+      },
+      {
+       "strike": 142.0,
+       "bid": 5.45,
+       "ask": 9.0,
+       "iv": 75.0,
+       "vol": 46,
+       "oi": 35
+      },
+      {
+       "strike": 143.0,
+       "bid": 3.7,
+       "ask": 8.65,
+       "iv": 69.5,
+       "vol": 4,
+       "oi": 0
+      },
+      {
+       "strike": 144.0,
+       "bid": 3.25,
+       "ask": 8.05,
+       "iv": 68.1,
+       "vol": 0,
+       "oi": 3
       },
       {
        "strike": 145.0,
@@ -189938,95 +190867,39 @@
        "oi": 219
       },
       {
+       "strike": 146.0,
+       "bid": 4.5,
+       "ask": 6.5,
+       "iv": 72.2,
+       "vol": 0,
+       "oi": 10
+      },
+      {
+       "strike": 147.0,
+       "bid": 2.56,
+       "ask": 6.65,
+       "iv": 67.2,
+       "vol": 1,
+       "oi": 7
+      },
+      {
+       "strike": 148.0,
+       "bid": 2.44,
+       "ask": 7.4,
+       "iv": 72.4,
+       "vol": 0,
+       "oi": 9
+      },
+      {
        "strike": 150.0,
        "bid": 3.25,
        "ask": 4.3,
        "iv": 67.1,
        "vol": 245,
        "oi": 209
-      },
-      {
-       "strike": 155.0,
-       "bid": 2.01,
-       "ask": 3.05,
-       "iv": 65.4,
-       "vol": 65,
-       "oi": 232
-      },
-      {
-       "strike": 160.0,
-       "bid": 1.9,
-       "ask": 2.21,
-       "iv": 69.1,
-       "vol": 307,
-       "oi": 516
-      },
-      {
-       "strike": 162.5,
-       "bid": 0.8,
-       "ask": 2.05,
-       "iv": 65.1,
-       "vol": 5,
-       "oi": 538
-      },
-      {
-       "strike": 165.0,
-       "bid": 1.24,
-       "ask": 1.67,
-       "iv": 69.4,
-       "vol": 373,
-       "oi": 893
-      },
-      {
-       "strike": 167.5,
-       "bid": 0.74,
-       "ask": 1.83,
-       "iv": 70.5,
-       "vol": 27,
-       "oi": 421
-      },
-      {
-       "strike": 170.0,
-       "bid": 0.9,
-       "ask": 1.32,
-       "iv": 71.2,
-       "vol": 199,
-       "oi": 779
-      },
-      {
-       "strike": 172.5,
-       "bid": 0.8,
-       "ask": 1.08,
-       "iv": 71.5,
-       "vol": 2,
-       "oi": 68
-      },
-      {
-       "strike": 175.0,
-       "bid": 0.7,
-       "ask": 0.9,
-       "iv": 71.9,
-       "vol": 104,
-       "oi": 616
-      },
-      {
-       "strike": 177.5,
-       "bid": 0.27,
-       "ask": 1.04,
-       "iv": 71.6,
-       "vol": 26,
-       "oi": 412
       }
      ],
      "puts": [
-      {
-       "strike": 75.0,
-       "bid": 0.03,
-       "ask": 0.97,
-       "iv": 143.5,
-       "vol": 0,
-       "oi": 4
-      },
       {
        "strike": 80.0,
        "bid": 0.03,
@@ -190124,12 +190997,76 @@
        "oi": 408
       },
       {
+       "strike": 136.0,
+       "bid": 6.9,
+       "ask": 9.3,
+       "iv": 65.6,
+       "vol": 2,
+       "oi": 1
+      },
+      {
+       "strike": 137.0,
+       "bid": 6.55,
+       "ask": 9.2,
+       "iv": 59.7,
+       "vol": 2,
+       "oi": 5
+      },
+      {
+       "strike": 138.0,
+       "bid": 7.1,
+       "ask": 11.45,
+       "iv": 66.4,
+       "vol": 5,
+       "oi": 45
+      },
+      {
+       "strike": 139.0,
+       "bid": 7.75,
+       "ask": 10.5,
+       "iv": 60.7,
+       "vol": 21,
+       "oi": 33
+      },
+      {
        "strike": 140.0,
        "bid": 8.55,
        "ask": 10.9,
        "iv": 60.8,
        "vol": 79,
        "oi": 453
+      },
+      {
+       "strike": 141.0,
+       "bid": 8.3,
+       "ask": 12.6,
+       "iv": 61.8,
+       "vol": 2,
+       "oi": 4
+      },
+      {
+       "strike": 142.0,
+       "bid": 9.85,
+       "ask": 12.0,
+       "iv": 60.5,
+       "vol": 5,
+       "oi": 2
+      },
+      {
+       "strike": 143.0,
+       "bid": 10.65,
+       "ask": 13.75,
+       "iv": 65.6,
+       "vol": 9,
+       "oi": 24
+      },
+      {
+       "strike": 144.0,
+       "bid": 10.05,
+       "ask": 15.1,
+       "iv": 63.3,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 145.0,
@@ -190140,89 +191077,33 @@
        "oi": 659
       },
       {
-       "strike": 150.0,
-       "bid": 15.9,
-       "ask": 18.1,
-       "iv": 64.5,
-       "vol": 23,
-       "oi": 982
-      },
-      {
-       "strike": 155.0,
-       "bid": 19.25,
-       "ask": 22.2,
-       "iv": 62.1,
-       "vol": 68,
-       "oi": 9140
-      },
-      {
-       "strike": 160.0,
-       "bid": 20.85,
-       "ask": 26.2,
-       "iv": 76.3,
-       "vol": 28,
-       "oi": 642
-      },
-      {
-       "strike": 162.5,
-       "bid": 23.0,
-       "ask": 28.4,
-       "iv": 77.2,
+       "strike": 146.0,
+       "bid": 11.9,
+       "ask": 15.45,
+       "iv": 61.0,
        "vol": 3,
-       "oi": 138
+       "oi": 0
       },
       {
-       "strike": 165.0,
-       "bid": 28.05,
-       "ask": 30.15,
-       "iv": 54.8,
-       "vol": 21,
-       "oi": 900
+       "strike": 147.0,
+       "bid": 11.85,
+       "ask": 17.3,
+       "iv": 62.6,
+       "vol": 1,
+       "oi": 5
       },
       {
-       "strike": 167.5,
-       "bid": 31.4,
-       "ask": 35.75,
-       "iv": 87.4,
-       "vol": 11,
-       "oi": 172
-      },
-      {
-       "strike": 170.0,
-       "bid": 31.0,
-       "ask": 38.4,
-       "iv": 72.5,
-       "vol": 72,
-       "oi": 670
-      },
-      {
-       "strike": 172.5,
-       "bid": 33.5,
-       "ask": 40.95,
-       "iv": 76.3,
-       "vol": 13,
-       "oi": 401
-      },
-      {
-       "strike": 175.0,
-       "bid": 34.1,
-       "ask": 43.0,
-       "iv": 120.4,
-       "vol": 13,
-       "oi": 380
-      },
-      {
-       "strike": 177.5,
-       "bid": 37.15,
-       "ask": 45.7,
-       "iv": 65.3,
-       "vol": 3,
-       "oi": 572
+       "strike": 148.0,
+       "bid": 12.45,
+       "ask": 17.95,
+       "iv": 61.7,
+       "vol": 1,
+       "oi": 3
       }
      ],
      "call_wall": 165.0,
      "put_wall": 130.0,
-     "opt_volume": 4080
+     "opt_volume": 4316
     }
    ]
   },
@@ -190652,6 +191533,14 @@
        "oi": 23
       },
       {
+       "strike": 26.0,
+       "bid": 5.3,
+       "ask": 6.45,
+       "iv": 85.0,
+       "vol": 13,
+       "oi": 1
+      },
+      {
        "strike": 27.0,
        "bid": 4.95,
        "ask": 5.6,
@@ -190822,6 +191711,14 @@
        "oi": 81
       },
       {
+       "strike": 26.0,
+       "bid": 0.35,
+       "ask": 0.4,
+       "iv": 96.5,
+       "vol": 831,
+       "oi": 167
+      },
+      {
        "strike": 27.0,
        "bid": 0.48,
        "ask": 0.55,
@@ -190968,7 +191865,7 @@
      ],
      "call_wall": 47.0,
      "put_wall": 32.0,
-     "opt_volume": 31917
+     "opt_volume": 32761
     },
     {
      "date": "2026-11-06",
@@ -191152,6 +192049,22 @@
        "oi": 171
       },
       {
+       "strike": 26.0,
+       "bid": 0.76,
+       "ask": 0.83,
+       "iv": 102.2,
+       "vol": 555,
+       "oi": 60
+      },
+      {
+       "strike": 27.0,
+       "bid": 0.97,
+       "ask": 1.05,
+       "iv": 99.8,
+       "vol": 152,
+       "oi": 290
+      },
+      {
        "strike": 28.0,
        "bid": 1.21,
        "ask": 1.36,
@@ -191290,7 +192203,7 @@
      ],
      "call_wall": 44.0,
      "put_wall": 30.0,
-     "opt_volume": 9685
+     "opt_volume": 10392
     }
    ]
   },
@@ -191301,6 +192214,14 @@
     {
      "date": "2026-10-19",
      "calls": [
+      {
+       "strike": 110.0,
+       "bid": 33.55,
+       "ask": 38.6,
+       "iv": 161.7,
+       "vol": 7,
+       "oi": 0
+      },
       {
        "strike": 115.0,
        "bid": 28.5,
@@ -191698,7 +192619,7 @@
      ],
      "call_wall": 170.0,
      "put_wall": 148.0,
-     "opt_volume": 238463
+     "opt_volume": 240360
     },
     {
      "date": "2026-10-21",
@@ -191710,6 +192631,14 @@
        "iv": 184.9,
        "vol": 6,
        "oi": 60
+      },
+      {
+       "strike": 125.0,
+       "bid": 18.55,
+       "ask": 23.65,
+       "iv": 71.5,
+       "vol": 37,
+       "oi": 1
       },
       {
        "strike": 130.0,
@@ -191726,6 +192655,14 @@
        "iv": 102.1,
        "vol": 189,
        "oi": 6
+      },
+      {
+       "strike": 138.0,
+       "bid": 10.6,
+       "ask": 11.05,
+       "iv": 100.7,
+       "vol": 212,
+       "oi": 5
       },
       {
        "strike": 139.0,
@@ -192092,7 +193029,7 @@
      ],
      "call_wall": 170.0,
      "put_wall": 147.0,
-     "opt_volume": 96549
+     "opt_volume": 96846
     },
     {
      "date": "2026-10-23",
@@ -192502,7 +193439,7 @@
      ],
      "call_wall": 165.0,
      "put_wall": 140.0,
-     "opt_volume": 203224
+     "opt_volume": 203227
     }
    ]
   },
@@ -192514,68 +193451,20 @@
      "date": "2026-10-23",
      "calls": [
       {
-       "strike": 530.0,
-       "bid": 103.9,
-       "ask": 120.0,
-       "iv": 105.0,
-       "vol": 1,
-       "oi": 2
-      },
-      {
-       "strike": 545.0,
-       "bid": 89.3,
-       "ask": 106.5,
-       "iv": 100.0,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 550.0,
-       "bid": 86.8,
-       "ask": 97.3,
-       "iv": 89.4,
-       "vol": 4,
-       "oi": 31
-      },
-      {
-       "strike": 570.0,
-       "bid": 66.8,
-       "ask": 84.0,
-       "iv": 92.5,
-       "vol": 2,
-       "oi": 2
-      },
-      {
-       "strike": 580.0,
-       "bid": 60.3,
-       "ask": 70.4,
-       "iv": 82.8,
-       "vol": 1,
-       "oi": 2
-      },
-      {
-       "strike": 585.0,
-       "bid": 0.0,
-       "ask": 0.0,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 590.0,
-       "bid": 50.7,
-       "ask": 67.3,
-       "iv": 88.9,
-       "vol": 0,
-       "oi": 1
-      },
-      {
        "strike": 595.0,
        "bid": 49.3,
        "ask": 63.7,
        "iv": 93.3,
        "vol": 4,
-       "oi": 0
+       "oi": 1
+      },
+      {
+       "strike": 597.5,
+       "bid": 45.0,
+       "ask": 60.8,
+       "iv": 86.3,
+       "vol": 0,
+       "oi": 10
       },
       {
        "strike": 600.0,
@@ -192586,6 +193475,30 @@
        "oi": 1
       },
       {
+       "strike": 602.5,
+       "bid": 43.3,
+       "ask": 57.0,
+       "iv": 88.9,
+       "vol": 8,
+       "oi": 0
+      },
+      {
+       "strike": 610.0,
+       "bid": 38.7,
+       "ask": 47.7,
+       "iv": 82.0,
+       "vol": 0,
+       "oi": 4
+      },
+      {
+       "strike": 612.5,
+       "bid": 37.8,
+       "ask": 46.2,
+       "iv": 83.4,
+       "vol": 4,
+       "oi": 0
+      },
+      {
        "strike": 615.0,
        "bid": 35.5,
        "ask": 44.6,
@@ -192594,11 +193507,35 @@
        "oi": 1
       },
       {
+       "strike": 620.0,
+       "bid": 30.9,
+       "ask": 41.9,
+       "iv": 80.1,
+       "vol": 0,
+       "oi": 5
+      },
+      {
        "strike": 625.0,
        "bid": 0.0,
        "ask": 0.0,
        "iv": null,
        "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 630.0,
+       "bid": 27.4,
+       "ask": 38.7,
+       "iv": 87.3,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 632.5,
+       "bid": 25.3,
+       "ask": 36.6,
+       "iv": 84.8,
+       "vol": 3,
        "oi": 0
       },
       {
@@ -192618,12 +193555,28 @@
        "oi": 2
       },
       {
+       "strike": 642.5,
+       "bid": 24.5,
+       "ask": 28.2,
+       "iv": 85.7,
+       "vol": 6,
+       "oi": 0
+      },
+      {
        "strike": 645.0,
        "bid": 21.8,
        "ask": 26.6,
        "iv": 82.5,
        "vol": 44,
        "oi": 17
+      },
+      {
+       "strike": 647.5,
+       "bid": 20.5,
+       "ask": 25.8,
+       "iv": 82.7,
+       "vol": 5,
+       "oi": 0
       },
       {
        "strike": 650.0,
@@ -192650,12 +193603,28 @@
        "oi": 5
       },
       {
+       "strike": 657.5,
+       "bid": 16.7,
+       "ask": 20.6,
+       "iv": 81.1,
+       "vol": 15,
+       "oi": 1
+      },
+      {
        "strike": 660.0,
        "bid": 16.9,
        "ask": 20.4,
        "iv": 84.0,
        "vol": 26,
        "oi": 11
+      },
+      {
+       "strike": 662.5,
+       "bid": 14.8,
+       "ask": 19.7,
+       "iv": 82.4,
+       "vol": 13,
+       "oi": 3
       },
       {
        "strike": 665.0,
@@ -192666,52 +193635,20 @@
        "oi": 11
       },
       {
+       "strike": 667.5,
+       "bid": 13.1,
+       "ask": 18.3,
+       "iv": 82.8,
+       "vol": 15,
+       "oi": 6
+      },
+      {
        "strike": 670.0,
        "bid": 13.4,
        "ask": 15.3,
        "iv": 80.9,
        "vol": 561,
        "oi": 26
-      },
-      {
-       "strike": 675.0,
-       "bid": 11.0,
-       "ask": 15.0,
-       "iv": 81.3,
-       "vol": 21,
-       "oi": 101
-      },
-      {
-       "strike": 680.0,
-       "bid": 7.9,
-       "ask": 14.7,
-       "iv": 80.1,
-       "vol": 77,
-       "oi": 59
-      },
-      {
-       "strike": 685.0,
-       "bid": 9.5,
-       "ask": 14.1,
-       "iv": 86.4,
-       "vol": 99,
-       "oi": 25
-      },
-      {
-       "strike": 690.0,
-       "bid": 7.5,
-       "ask": 9.8,
-       "iv": 78.8,
-       "vol": 59,
-       "oi": 61
-      },
-      {
-       "strike": 695.0,
-       "bid": 7.2,
-       "ask": 9.1,
-       "iv": 80.9,
-       "vol": 31,
-       "oi": 46
       }
      ],
      "puts": [
@@ -192852,12 +193789,28 @@
        "oi": 144
       },
       {
+       "strike": 652.5,
+       "bid": 27.9,
+       "ask": 38.4,
+       "iv": 78.3,
+       "vol": 151,
+       "oi": 10
+      },
+      {
        "strike": 655.0,
        "bid": 29.4,
        "ask": 39.4,
        "iv": 77.4,
        "vol": 23,
        "oi": 256
+      },
+      {
+       "strike": 657.5,
+       "bid": 31.8,
+       "ask": 44.5,
+       "iv": 84.3,
+       "vol": 3,
+       "oi": 13
       },
       {
        "strike": 660.0,
@@ -192868,6 +193821,14 @@
        "oi": 81
       },
       {
+       "strike": 662.5,
+       "bid": 35.0,
+       "ask": 47.4,
+       "iv": 83.9,
+       "vol": 12,
+       "oi": 6
+      },
+      {
        "strike": 665.0,
        "bid": 34.0,
        "ask": 47.4,
@@ -192876,69 +193837,29 @@
        "oi": 49
       },
       {
+       "strike": 667.5,
+       "bid": 38.3,
+       "ask": 51.3,
+       "iv": 84.8,
+       "vol": 6,
+       "oi": 15
+      },
+      {
        "strike": 670.0,
        "bid": 40.2,
        "ask": 49.8,
        "iv": 79.8,
        "vol": 87,
        "oi": 229
-      },
-      {
-       "strike": 675.0,
-       "bid": 44.1,
-       "ask": 54.2,
-       "iv": 81.9,
-       "vol": 17,
-       "oi": 166
-      },
-      {
-       "strike": 677.5,
-       "bid": 45.3,
-       "ask": 55.9,
-       "iv": 80.6,
-       "vol": 4,
-       "oi": 7
-      },
-      {
-       "strike": 680.0,
-       "bid": 49.3,
-       "ask": 56.6,
-       "iv": 82.4,
-       "vol": 27,
-       "oi": 186
-      },
-      {
-       "strike": 685.0,
-       "bid": 50.8,
-       "ask": 61.4,
-       "iv": 80.2,
-       "vol": 37,
-       "oi": 52
       }
      ],
      "call_wall": 870.0,
      "put_wall": 605.0,
-     "opt_volume": 9206
+     "opt_volume": 9686
     },
     {
      "date": "2026-10-30",
      "calls": [
-      {
-       "strike": 470.0,
-       "bid": 164.1,
-       "ask": 179.4,
-       "iv": 104.3,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 490.0,
-       "bid": 145.2,
-       "ask": 160.6,
-       "iv": 100.5,
-       "vol": 1,
-       "oi": 2
-      },
       {
        "strike": 500.0,
        "bid": 135.9,
@@ -193004,6 +193925,22 @@
        "oi": 1
       },
       {
+       "strike": 590.0,
+       "bid": 63.9,
+       "ask": 73.8,
+       "iv": 85.8,
+       "vol": 5,
+       "oi": 0
+      },
+      {
+       "strike": 600.0,
+       "bid": 57.3,
+       "ask": 70.2,
+       "iv": 88.8,
+       "vol": 0,
+       "oi": 3
+      },
+      {
        "strike": 620.0,
        "bid": 44.9,
        "ask": 55.0,
@@ -193028,6 +193965,14 @@
        "oi": 5
       },
       {
+       "strike": 645.0,
+       "bid": 35.8,
+       "ask": 41.4,
+       "iv": 86.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 650.0,
        "bid": 34.8,
        "ask": 36.6,
@@ -193036,12 +193981,28 @@
        "oi": 6
       },
       {
+       "strike": 655.0,
+       "bid": 29.3,
+       "ask": 38.4,
+       "iv": 85.0,
+       "vol": 18,
+       "oi": 0
+      },
+      {
        "strike": 660.0,
        "bid": 28.0,
        "ask": 36.5,
        "iv": 85.8,
        "vol": 7,
        "oi": 35
+      },
+      {
+       "strike": 665.0,
+       "bid": 26.7,
+       "ask": 31.6,
+       "iv": 83.3,
+       "vol": 3,
+       "oi": 6
       },
       {
        "strike": 670.0,
@@ -193098,30 +194059,6 @@
        "iv": 84.1,
        "vol": 43,
        "oi": 54
-      },
-      {
-       "strike": 705.0,
-       "bid": 12.7,
-       "ask": 19.5,
-       "iv": 81.0,
-       "vol": 13,
-       "oi": 13
-      },
-      {
-       "strike": 710.0,
-       "bid": 14.1,
-       "ask": 18.7,
-       "iv": 84.6,
-       "vol": 8,
-       "oi": 13
-      },
-      {
-       "strike": 715.0,
-       "bid": 10.6,
-       "ask": 18.7,
-       "iv": 83.0,
-       "vol": 9,
-       "oi": 5
       }
      ],
      "puts": [
@@ -193230,12 +194167,28 @@
        "oi": 96
       },
       {
+       "strike": 645.0,
+       "bid": 40.3,
+       "ask": 47.9,
+       "iv": 85.0,
+       "vol": 8,
+       "oi": 10
+      },
+      {
        "strike": 650.0,
        "bid": 39.5,
        "ask": 48.9,
        "iv": 79.3,
        "vol": 64,
        "oi": 268
+      },
+      {
+       "strike": 655.0,
+       "bid": 44.2,
+       "ask": 52.2,
+       "iv": 81.6,
+       "vol": 75,
+       "oi": 7
       },
       {
        "strike": 660.0,
@@ -193308,27 +194261,11 @@
        "iv": 81.5,
        "vol": 64,
        "oi": 345
-      },
-      {
-       "strike": 705.0,
-       "bid": 74.9,
-       "ask": 90.1,
-       "iv": 82.0,
-       "vol": 26,
-       "oi": 273
-      },
-      {
-       "strike": 710.0,
-       "bid": 81.3,
-       "ask": 89.4,
-       "iv": 79.5,
-       "vol": 32,
-       "oi": 51
       }
      ],
      "call_wall": 980.0,
      "put_wall": 550.0,
-     "opt_volume": 7019
+     "opt_volume": 7129
     },
     {
      "date": "2026-11-06",
@@ -193358,12 +194295,92 @@
        "oi": 2
       },
       {
+       "strike": 550.0,
+       "bid": 98.8,
+       "ask": 108.6,
+       "iv": 83.5,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 570.0,
+       "bid": 80.6,
+       "ask": 95.3,
+       "iv": 80.5,
+       "vol": 3,
+       "oi": 0
+      },
+      {
+       "strike": 580.0,
+       "bid": 75.9,
+       "ask": 88.2,
+       "iv": 82.3,
+       "vol": 12,
+       "oi": 0
+      },
+      {
+       "strike": 600.0,
+       "bid": 62.6,
+       "ask": 73.1,
+       "iv": 79.2,
+       "vol": 1,
+       "oi": 2
+      },
+      {
+       "strike": 610.0,
+       "bid": 56.8,
+       "ask": 69.7,
+       "iv": 81.3,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 630.0,
+       "bid": 45.0,
+       "ask": 55.5,
+       "iv": 77.1,
+       "vol": 15,
+       "oi": 0
+      },
+      {
+       "strike": 640.0,
+       "bid": 40.2,
+       "ask": 49.4,
+       "iv": 75.9,
+       "vol": 15,
+       "oi": 2
+      },
+      {
+       "strike": 645.0,
+       "bid": 36.1,
+       "ask": 46.7,
+       "iv": 74.0,
+       "vol": 13,
+       "oi": 8
+      },
+      {
        "strike": 650.0,
        "bid": 33.3,
        "ask": 43.8,
        "iv": 72.9,
        "vol": 4,
        "oi": 20
+      },
+      {
+       "strike": 655.0,
+       "bid": 36.3,
+       "ask": 41.9,
+       "iv": 77.3,
+       "vol": 0,
+       "oi": 10
+      },
+      {
+       "strike": 660.0,
+       "bid": 33.6,
+       "ask": 40.3,
+       "iv": 77.1,
+       "vol": 2,
+       "oi": 0
       },
       {
        "strike": 665.0,
@@ -193428,38 +194445,6 @@
        "iv": 77.8,
        "vol": 3,
        "oi": 250
-      },
-      {
-       "strike": 705.0,
-       "bid": 19.6,
-       "ask": 25.8,
-       "iv": 77.9,
-       "vol": 2,
-       "oi": 9
-      },
-      {
-       "strike": 710.0,
-       "bid": 19.2,
-       "ask": 22.7,
-       "iv": 77.0,
-       "vol": 15,
-       "oi": 18
-      },
-      {
-       "strike": 715.0,
-       "bid": 15.7,
-       "ask": 23.6,
-       "iv": 76.8,
-       "vol": 3,
-       "oi": 3
-      },
-      {
-       "strike": 720.0,
-       "bid": 17.2,
-       "ask": 19.7,
-       "iv": 76.7,
-       "vol": 1,
-       "oi": 21
       }
      ],
      "puts": [
@@ -193568,12 +194553,28 @@
        "oi": 83
       },
       {
+       "strike": 645.0,
+       "bid": 44.5,
+       "ask": 53.0,
+       "iv": 76.3,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 650.0,
        "bid": 47.5,
        "ask": 55.5,
        "iv": 76.2,
        "vol": 7,
        "oi": 73
+      },
+      {
+       "strike": 655.0,
+       "bid": 50.4,
+       "ask": 57.1,
+       "iv": 75.1,
+       "vol": 14,
+       "oi": 0
       },
       {
        "strike": 660.0,
@@ -193646,27 +194647,11 @@
        "iv": 76.9,
        "vol": 13,
        "oi": 411
-      },
-      {
-       "strike": 705.0,
-       "bid": 82.0,
-       "ask": 92.0,
-       "iv": 74.7,
-       "vol": 19,
-       "oi": 34
-      },
-      {
-       "strike": 710.0,
-       "bid": 85.8,
-       "ask": 96.2,
-       "iv": 75.2,
-       "vol": 13,
-       "oi": 18
       }
      ],
      "call_wall": 800.0,
      "put_wall": 630.0,
-     "opt_volume": 1620
+     "opt_volume": 1699
     }
    ]
   },
@@ -194082,19 +195067,11 @@
      ],
      "call_wall": 450.0,
      "put_wall": 250.0,
-     "opt_volume": 619393
+     "opt_volume": 619497
     },
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 322.5,
-       "bid": 32.85,
-       "ask": 37.9,
-       "iv": 78.7,
-       "vol": 3,
-       "oi": 9
-      },
       {
        "strike": 325.0,
        "bid": 32.2,
@@ -194102,6 +195079,14 @@
        "iv": 80.6,
        "vol": 5,
        "oi": 66
+      },
+      {
+       "strike": 327.5,
+       "bid": 28.7,
+       "ask": 33.1,
+       "iv": 74.6,
+       "vol": 3,
+       "oi": 12
       },
       {
        "strike": 330.0,
@@ -194492,18 +195477,18 @@
      ],
      "call_wall": 400.0,
      "put_wall": 220.0,
-     "opt_volume": 313320
+     "opt_volume": 313430
     },
     {
      "date": "2026-10-26",
      "calls": [
       {
-       "strike": 315.0,
-       "bid": 40.1,
-       "ask": 44.9,
-       "iv": 71.4,
+       "strike": 317.5,
+       "bid": 37.6,
+       "ask": 42.7,
+       "iv": 69.3,
        "vol": 4,
-       "oi": 3
+       "oi": 0
       },
       {
        "strike": 320.0,
@@ -194884,25 +195869,25 @@
        "oi": 46
       },
       {
+       "strike": 382.5,
+       "bid": 29.55,
+       "ask": 34.5,
+       "iv": 60.5,
+       "vol": 41,
+       "oi": 0
+      },
+      {
        "strike": 385.0,
        "bid": 31.55,
        "ask": 36.7,
        "iv": 61.0,
        "vol": 21,
        "oi": 37
-      },
-      {
-       "strike": 390.0,
-       "bid": 35.7,
-       "ask": 40.7,
-       "iv": 60.3,
-       "vol": 18,
-       "oi": 21
       }
      ],
      "call_wall": 400.0,
      "put_wall": 347.5,
-     "opt_volume": 21857
+     "opt_volume": 22778
     }
    ]
   },
@@ -194913,30 +195898,6 @@
     {
      "date": "2026-10-23",
      "calls": [
-      {
-       "strike": 360.0,
-       "bid": 52.2,
-       "ask": 55.3,
-       "iv": 72.7,
-       "vol": 3,
-       "oi": 17
-      },
-      {
-       "strike": 365.0,
-       "bid": 47.45,
-       "ask": 49.6,
-       "iv": 63.5,
-       "vol": 1,
-       "oi": 9
-      },
-      {
-       "strike": 370.0,
-       "bid": 42.35,
-       "ask": 45.45,
-       "iv": 63.0,
-       "vol": 1,
-       "oi": 11
-      },
       {
        "strike": 375.0,
        "bid": 37.5,
@@ -194986,12 +195947,28 @@
        "oi": 28
       },
       {
+       "strike": 397.5,
+       "bid": 17.6,
+       "ask": 19.3,
+       "iv": 48.2,
+       "vol": 30,
+       "oi": 10
+      },
+      {
        "strike": 400.0,
        "bid": 15.7,
        "ask": 17.1,
        "iv": 45.7,
        "vol": 17,
        "oi": 181
+      },
+      {
+       "strike": 402.5,
+       "bid": 13.9,
+       "ask": 16.1,
+       "iv": 49.2,
+       "vol": 21,
+       "oi": 122
       },
       {
        "strike": 405.0,
@@ -195002,12 +195979,28 @@
        "oi": 152
       },
       {
+       "strike": 407.5,
+       "bid": 9.7,
+       "ask": 11.7,
+       "iv": 42.5,
+       "vol": 251,
+       "oi": 28
+      },
+      {
        "strike": 410.0,
        "bid": 9.15,
        "ask": 10.05,
        "iv": 41.3,
        "vol": 312,
        "oi": 430
+      },
+      {
+       "strike": 412.5,
+       "bid": 7.8,
+       "ask": 8.6,
+       "iv": 40.5,
+       "vol": 318,
+       "oi": 76
       },
       {
        "strike": 415.0,
@@ -195104,14 +196097,6 @@
        "iv": 36.9,
        "vol": 313,
        "oi": 2004
-      },
-      {
-       "strike": 445.0,
-       "bid": 0.39,
-       "ask": 0.5,
-       "iv": 37.3,
-       "vol": 297,
-       "oi": 596
       }
      ],
      "puts": [
@@ -195318,19 +196303,11 @@
      ],
      "call_wall": 500.0,
      "put_wall": 375.0,
-     "opt_volume": 40251
+     "opt_volume": 40876
     },
     {
      "date": "2026-10-30",
      "calls": [
-      {
-       "strike": 355.0,
-       "bid": 57.4,
-       "ask": 60.25,
-       "iv": 54.1,
-       "vol": 6,
-       "oi": 4
-      },
       {
        "strike": 360.0,
        "bid": 53.05,
@@ -195412,12 +196389,28 @@
        "oi": 50
       },
       {
+       "strike": 407.5,
+       "bid": 13.1,
+       "ask": 15.05,
+       "iv": 39.9,
+       "vol": 20,
+       "oi": 24
+      },
+      {
        "strike": 410.0,
        "bid": 12.5,
        "ask": 13.5,
        "iv": 39.2,
        "vol": 169,
        "oi": 172
+      },
+      {
+       "strike": 412.5,
+       "bid": 11.15,
+       "ask": 12.1,
+       "iv": 38.8,
+       "vol": 189,
+       "oi": 43
       },
       {
        "strike": 415.0,
@@ -195428,12 +196421,28 @@
        "oi": 122
       },
       {
+       "strike": 417.5,
+       "bid": 8.7,
+       "ask": 9.55,
+       "iv": 37.9,
+       "vol": 276,
+       "oi": 112
+      },
+      {
        "strike": 420.0,
        "bid": 7.65,
        "ask": 8.4,
        "iv": 37.4,
        "vol": 330,
        "oi": 307
+      },
+      {
+       "strike": 422.5,
+       "bid": 6.65,
+       "ask": 7.4,
+       "iv": 37.2,
+       "vol": 57,
+       "oi": 34
       },
       {
        "strike": 425.0,
@@ -195498,41 +196507,9 @@
        "iv": 35.3,
        "vol": 41,
        "oi": 96
-      },
-      {
-       "strike": 445.0,
-       "bid": 1.46,
-       "ask": 1.86,
-       "iv": 35.5,
-       "vol": 193,
-       "oi": 671
-      },
-      {
-       "strike": 447.5,
-       "bid": 1.33,
-       "ask": 1.53,
-       "iv": 35.2,
-       "vol": 44,
-       "oi": 52
-      },
-      {
-       "strike": 450.0,
-       "bid": 1.1,
-       "ask": 1.3,
-       "iv": 35.3,
-       "vol": 541,
-       "oi": 1134
       }
      ],
      "puts": [
-      {
-       "strike": 355.0,
-       "bid": 0.52,
-       "ask": 0.66,
-       "iv": 47.5,
-       "vol": 5,
-       "oi": 258
-      },
       {
        "strike": 360.0,
        "bid": 0.68,
@@ -195614,12 +196591,28 @@
        "oi": 580
       },
       {
+       "strike": 407.5,
+       "bid": 7.85,
+       "ask": 9.25,
+       "iv": 37.7,
+       "vol": 64,
+       "oi": 70
+      },
+      {
        "strike": 410.0,
        "bid": 8.8,
        "ask": 10.05,
        "iv": 36.5,
        "vol": 221,
        "oi": 1048
+      },
+      {
+       "strike": 412.5,
+       "bid": 9.9,
+       "ask": 11.0,
+       "iv": 35.6,
+       "vol": 192,
+       "oi": 36
       },
       {
        "strike": 415.0,
@@ -195630,12 +196623,28 @@
        "oi": 597
       },
       {
+       "strike": 417.5,
+       "bid": 12.3,
+       "ask": 13.5,
+       "iv": 34.8,
+       "vol": 50,
+       "oi": 86
+      },
+      {
        "strike": 420.0,
        "bid": 13.75,
        "ask": 14.95,
        "iv": 34.7,
        "vol": 115,
        "oi": 1212
+      },
+      {
+       "strike": 422.5,
+       "bid": 15.15,
+       "ask": 17.35,
+       "iv": 37.4,
+       "vol": 134,
+       "oi": 37
       },
       {
        "strike": 425.0,
@@ -195700,71 +196709,15 @@
        "iv": 35.1,
        "vol": 3,
        "oi": 131
-      },
-      {
-       "strike": 445.0,
-       "bid": 31.5,
-       "ask": 35.15,
-       "iv": 40.4,
-       "vol": 42,
-       "oi": 301
-      },
-      {
-       "strike": 447.5,
-       "bid": 34.6,
-       "ask": 37.35,
-       "iv": 40.7,
-       "vol": 26,
-       "oi": 216
-      },
-      {
-       "strike": 450.0,
-       "bid": 36.65,
-       "ask": 38.8,
-       "iv": 36.1,
-       "vol": 77,
-       "oi": 911
       }
      ],
      "call_wall": 460.0,
      "put_wall": 280.0,
-     "opt_volume": 11346
+     "opt_volume": 12328
     },
     {
      "date": "2026-11-06",
      "calls": [
-      {
-       "strike": 260.0,
-       "bid": 152.6,
-       "ask": 155.65,
-       "iv": 114.6,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 295.0,
-       "bid": 117.75,
-       "ask": 120.8,
-       "iv": 89.3,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 310.0,
-       "bid": 102.85,
-       "ask": 105.9,
-       "iv": 79.2,
-       "vol": 2,
-       "oi": 11
-      },
-      {
-       "strike": 350.0,
-       "bid": 63.55,
-       "ask": 66.6,
-       "iv": 55.8,
-       "vol": 3,
-       "oi": 17
-      },
       {
        "strike": 355.0,
        "bid": 58.8,
@@ -195790,12 +196743,28 @@
        "oi": 1
       },
       {
+       "strike": 370.0,
+       "bid": 44.95,
+       "ask": 47.35,
+       "iv": 51.7,
+       "vol": 10,
+       "oi": 0
+      },
+      {
        "strike": 375.0,
        "bid": 40.3,
        "ask": 42.9,
        "iv": 49.7,
        "vol": 0,
        "oi": 1
+      },
+      {
+       "strike": 380.0,
+       "bid": 35.85,
+       "ask": 38.3,
+       "iv": 46.9,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 385.0,
@@ -195814,12 +196783,28 @@
        "oi": 43
       },
       {
+       "strike": 395.0,
+       "bid": 24.0,
+       "ask": 26.55,
+       "iv": 43.1,
+       "vol": 8,
+       "oi": 20
+      },
+      {
        "strike": 400.0,
        "bid": 20.8,
        "ask": 22.95,
        "iv": 41.8,
        "vol": 21,
        "oi": 39
+      },
+      {
+       "strike": 405.0,
+       "bid": 17.5,
+       "ask": 18.95,
+       "iv": 38.9,
+       "vol": 18,
+       "oi": 6
       },
       {
        "strike": 410.0,
@@ -196138,7 +197123,7 @@
      ],
      "call_wall": 460.0,
      "put_wall": 375.0,
-     "opt_volume": 7334
+     "opt_volume": 7373
     }
    ]
   },
@@ -196480,6 +197465,14 @@
        "oi": 25
       },
       {
+       "strike": 222.5,
+       "bid": 15.9,
+       "ask": 19.7,
+       "iv": 77.2,
+       "vol": 35,
+       "oi": 21
+      },
+      {
        "strike": 225.0,
        "bid": 18.3,
        "ask": 22.1,
@@ -196506,7 +197499,7 @@
      ],
      "call_wall": 220.0,
      "put_wall": 185.0,
-     "opt_volume": 1508
+     "opt_volume": 1546
     },
     {
      "date": "2026-10-30",
@@ -196566,6 +197559,14 @@
        "iv": 60.3,
        "vol": 2,
        "oi": 9
+      },
+      {
+       "strike": 192.5,
+       "bid": 12.7,
+       "ask": 16.0,
+       "iv": 53.8,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 195.0,
@@ -196672,6 +197673,14 @@
        "oi": 576
       },
       {
+       "strike": 227.5,
+       "bid": 0.7,
+       "ask": 2.65,
+       "iv": 52.7,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 230.0,
        "bid": 0.45,
        "ask": 1.35,
@@ -196694,33 +197703,9 @@
        "iv": 54.7,
        "vol": 4,
        "oi": 64
-      },
-      {
-       "strike": 245.0,
-       "bid": 0.0,
-       "ask": 0.5,
-       "iv": 50.0,
-       "vol": 1,
-       "oi": 1317
       }
      ],
      "puts": [
-      {
-       "strike": 155.0,
-       "bid": 0.0,
-       "ask": 1.75,
-       "iv": 96.9,
-       "vol": 1,
-       "oi": 2
-      },
-      {
-       "strike": 160.0,
-       "bid": 0.0,
-       "ask": 2.2,
-       "iv": 92.7,
-       "vol": 0,
-       "oi": 2
-      },
       {
        "strike": 165.0,
        "bid": 0.0,
@@ -196754,12 +197739,28 @@
        "oi": 78
       },
       {
+       "strike": 182.5,
+       "bid": 0.15,
+       "ask": 0.95,
+       "iv": 50.3,
+       "vol": 10,
+       "oi": 0
+      },
+      {
        "strike": 185.0,
        "bid": 0.25,
        "ask": 1.9,
        "iv": 57.5,
        "vol": 6,
        "oi": 12420
+      },
+      {
+       "strike": 187.5,
+       "bid": 0.0,
+       "ask": 2.55,
+       "iv": 58.9,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 190.0,
@@ -196892,7 +197893,7 @@
      ],
      "call_wall": 250.0,
      "put_wall": 185.0,
-     "opt_volume": 738
+     "opt_volume": 752
     },
     {
      "date": "2026-11-06",
@@ -197052,6 +198053,14 @@
      ],
      "puts": [
       {
+       "strike": 150.0,
+       "bid": 0.0,
+       "ask": 2.15,
+       "iv": 89.4,
+       "vol": 1375,
+       "oi": 0
+      },
+      {
        "strike": 165.0,
        "bid": 0.0,
        "ask": 2.25,
@@ -197174,7 +198183,7 @@
      ],
      "call_wall": 210.0,
      "put_wall": 210.0,
-     "opt_volume": 520
+     "opt_volume": 1895
     }
    ]
   },
@@ -204293,7 +205302,7 @@
     "age_days": 0,
     "max_age": 7,
     "status": "ok",
-    "note": "43 nomi in attesa del budget per run"
+    "note": "33 nomi in attesa del budget per run"
    },
    {
     "key": "bce",
@@ -204321,6 +205330,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-18T17:19:05Z"
+  "generated_at": "2026-10-18T17:32:33Z"
  }
 }

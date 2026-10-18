@@ -1,6 +1,67 @@
 {
  "aggiornato": "2026-10-18",
  "per_titolo": {
+  "AAPL": {
+   "carta_commerciale": {
+    "al": "2026-06-27",
+    "valore": 1997000000.0,
+    "valuta": "USD"
+   },
+   "cik": 320193,
+   "deposito": {
+    "accn": "0000320193-26-000020",
+    "data": "2026-07-31",
+    "forma": "10-Q",
+    "periodo": "2026-06-27"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2025-09-27",
+    "depositato": "2025-10-31",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 10078000000.0,
+     "anno_3": 9300000000.0,
+     "anno_4": 5235000000.0,
+     "anno_5": 4972000000.0,
+     "entro_12_mesi": 12393000000.0,
+     "oltre_5": 49303000000.0
+    }
+   }
+  },
+  "ABBV": {
+   "cik": 1551152,
+   "deposito": {
+    "accn": "0001551152-26-000026",
+    "data": "2026-08-03",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2025-12-31",
+    "depositato": "2026-02-20",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 5130000000.0,
+     "anno_3": 4466000000.0,
+     "anno_4": 8645000000.0,
+     "anno_5": 1000000000.0,
+     "entro_12_mesi": 6000000000.0,
+     "oltre_5": 39262000000.0
+    }
+   }
+  },
   "AMD": {
    "cik": 2488,
    "deposito": {
@@ -30,6 +91,123 @@
      "anno_5": 750000000.0,
      "entro_12_mesi": 875000000.0,
      "oltre_5": 1000000000.0
+    }
+   }
+  },
+  "AMGN": {
+   "carta_commerciale": {
+    "al": "2025-12-31",
+    "valore": 0.0,
+    "valuta": "USD"
+   },
+   "cik": 318154,
+   "deposito": {
+    "accn": "0000318154-26-000126",
+    "data": "2026-08-05",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2025-12-31",
+    "depositato": "2026-02-13",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 2724000000.0,
+     "anno_3": 4984000000.0,
+     "anno_4": 2943000000.0,
+     "anno_5": 4000000000.0,
+     "entro_12_mesi": 4571000000.0,
+     "oltre_5": 36822000000.0
+    }
+   }
+  },
+  "AMZN": {
+   "cik": 1018724,
+   "deposito": {
+    "accn": "0001018724-26-000026",
+    "data": "2026-07-31",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "equo": {
+    "al": "2017-03-31",
+    "depositato": "2017-04-28",
+    "forma": "10-Q",
+    "rapporto_pct": 98.6,
+    "voci": [
+     "LongTermDebtFairValue",
+     "LongTermDebt"
+    ]
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2025-12-31",
+    "depositato": "2026-02-06",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 8832000000.0,
+     "anno_3": 4752000000.0,
+     "anno_4": 3000000000.0,
+     "anno_5": 4500000000.0,
+     "entro_12_mesi": 2752000000.0,
+     "oltre_5": 45000000000.0
+    }
+   }
+  },
+  "ANET": {
+   "cik": 1596532,
+   "deposito": {
+    "accn": "0001596532-26-000175",
+    "data": "2026-08-05",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18"
+  },
+  "AVGO": {
+   "carta_commerciale": {
+    "al": "2025-08-03",
+    "valore": 496000000.0,
+    "valuta": "USD"
+   },
+   "cik": 1730168,
+   "deposito": {
+    "accn": "0001730168-26-000080",
+    "data": "2026-09-10",
+    "forma": "10-Q",
+    "periodo": "2026-08-02"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18",
+   "scadenze": {
+    "al": "2026-08-02",
+    "depositato": "2026-09-10",
+    "forma": "10-Q",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 5127000000.0,
+     "anno_3": 2405000000.0,
+     "anno_4": 6406000000.0,
+     "entro_12_mesi": 0.0,
+     "resto_esercizio": 2252000000.0
     }
    }
   },
@@ -64,6 +242,131 @@
      "entro_12_mesi": 0.0,
      "oltre_5": 0.0,
      "resto_esercizio": 3959000.0
+    }
+   }
+  },
+  "BLK": {
+   "cik": 2012383,
+   "deposito": {
+    "accn": "0001193125-26-337177",
+    "data": "2026-08-06",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "equo": {
+    "al": "2026-06-30",
+    "depositato": "2026-08-06",
+    "forma": "10-Q",
+    "rapporto_pct": 96.9,
+    "voci": [
+     "LongTermDebtFairValue",
+     "LongTermDebt"
+    ]
+   },
+   "letto_il": "2026-10-18"
+  },
+  "CBRS": {
+   "cik": 2021728,
+   "deposito": {
+    "accn": "0001628280-26-056357",
+    "data": "2026-08-12",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "letto_il": "2026-10-18"
+  },
+  "CEG": {
+   "carta_commerciale": {
+    "al": "2022-09-30",
+    "valore": 493000000.0,
+    "valuta": "USD"
+   },
+   "cik": 1868275,
+   "deposito": {
+    "accn": "0001868275-26-000104",
+    "data": "2026-08-06",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 0,
+    "voci": []
+   },
+   "equo": {
+    "al": "2022-12-31",
+    "depositato": "2023-02-16",
+    "forma": "10-K",
+    "fuori_scala": 0.0,
+    "voci": [
+     "DebtInstrumentFairValue",
+     "DebtInstrumentCarryingAmount"
+    ]
+   },
+   "letto_il": "2026-10-18",
+   "linee_disponibili": {
+    "al": "2026-06-30",
+    "valore": 2586000000.0,
+    "valuta": "USD"
+   },
+   "scadenze": {
+    "al": "2025-12-31",
+    "depositato": "2026-02-24",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 666000000.0,
+     "anno_3": 828000000.0,
+     "anno_4": 157000000.0,
+     "anno_5": 99000000.0,
+     "entro_12_mesi": 92000000.0,
+     "oltre_5": 5561000000.0
+    }
+   }
+  },
+  "COP": {
+   "carta_commerciale": {
+    "al": "2013-12-31",
+    "valore": 961000000.0,
+    "valuta": "USD"
+   },
+   "cik": 1163165,
+   "deposito": {
+    "accn": "0001163165-26-000032",
+    "data": "2026-08-06",
+    "forma": "10-Q",
+    "periodo": "2026-06-30"
+   },
+   "derivati_tassi": {
+    "n": 1,
+    "voci": [
+     "PercentageOfDebtHedgedByInterestRateDerivatives"
+    ]
+   },
+   "letto_il": "2026-10-18",
+   "linee_disponibili": {
+    "al": "2016-12-31",
+    "valore": 6750000000.0,
+    "valuta": "USD"
+   },
+   "scadenze": {
+    "al": "2025-12-31",
+    "depositato": "2026-02-17",
+    "forma": "10-K",
+    "valuta": "USD",
+    "voci": {
+     "anno_2": 786000000.0,
+     "anno_3": 670000000.0,
+     "anno_4": 992000000.0,
+     "anno_5": 1599000000.0,
+     "entro_12_mesi": 713000000.0
     }
    }
   },
