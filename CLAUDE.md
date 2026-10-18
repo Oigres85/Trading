@@ -7862,3 +7862,53 @@ avvisa (v421, v427). Finché lo storico non basta il brief dice che il silenzio 
   dal run del CI — la trappola v203, dichiarata prima.
 - Pavimenti: `test_update_data.py` 270 → 280 (292 punti di chiamata) e N_CHECKS_MINIMO 288 → 300 (305 eseguiti),
   `test_analisi_libro.py` 685 → 705 (721). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🗓️ v502 — IL PRIMO GIRO VERO DEI BILANCI SEC HA PUBBLICATO VOCI VECCHIE DI ANNI
+
+Trovato verificando nel run del CI il primo giro della v501 (lanciato a mano il 18/10): dieci posizioni lette, nessun
+errore, sorveglianza verde — e accanto al 10-Q di agosto la riga del debito avrebbe stampato:
+
+| nome | voce | da quale bilancio |
+|---|---|---|
+| SMCI | il mercato valuta il debito il 100% del carico | 10-K del **2013** |
+| NVDA | tasso effettivo 3,15% | 10-K del **2018** |
+| AMD | linee di credito non utilizzate 395 milioni | 10-K del **2016** |
+| MSTR | valore di mercato al 123,9% del carico | 10-Q del 2021 |
+| PLTR · RGTI | scadenze del capitale | 2021 · 2022 |
+| MRVL · RGTI | tasso | 2025 · 2024 |
+
+Per una voce che la società ha smesso di dichiarare in forma non dimensionale, «il fatto più recente» è un fatto di
+anni prima. La data c'era nella riga — ma letta accanto al 10-Q di agosto si legge come lo stato di oggi: la classe v400
+(il bilancio vecchio che non dichiarava di esserlo) e la regola del CEO della v396.
+
+- **Una voce conta solo se depositata nei 400 giorni prima dell'ultimo 10-Q/10-K della società**: la finestra che la
+  v501 usava già per i derivati, ora calcolata **una volta** per tutte le voci (v161). Un anno di depositi comprende
+  l'ultimo 10-K, dove vivono le scadenze per anno. L'iniezione che allarga la finestra fa cadere anche il check dei
+  derivati della v501: è la prova che la soglia è una sola.
+- **Quella ferma a prima si NOMINA** con la data del suo ultimo deposito (v406), e al suo posto la riga non scrive «non
+  dichiarato»: lo è stato, anni fa.
+- ⚠ **La cache non si corregge da sola**: una lettura si ripete solo con un deposito nuovo. Ogni lettura porta ora la sua
+  versione, una versione precedente si rilegge (le posizioni per prime, nel budget dei 10 per run), e finché non è
+  riletta la riga lo dichiara.
+- ⚠ **Un valore di mercato recente senza un carico della stessa data non è una voce vecchia**: la prima stesura lo
+  avrebbe dichiarato fermo. Trovato rileggendo la propria stesura prima dei test; un check lo costruisce.
+
+> **I gate della v501 non potevano vederlo**: le fixture avevano tutte le voci fresche, e il difetto viveva nello stato
+> che solo i dati veri producono — la lezione v425 (i gate girano su uno stato, i difetti vivono negli altri). L'ha preso
+> la verifica nel CI, il passo che la v501 aveva dichiarato **prima** di scrivere il codice (trappola v203): dichiararla
+> non bastava, andava fatta e letta riga per riga.
+
+⚠ E la mia sonda di verifica cercava le ore dei depositi in `macro.ore_depositi`: stanno in
+`macro.sec_calendario.ore_depositi`. Una sonda sulla chiave sbagliata misura un'altra cosa (v196, v229, v415): stavo per
+segnalare come difetto un campo che c'era.
+
+- **Nove iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**, ciascuna
+  sul controllo atteso — fra queste il filtro dell'eta' tolto, la finestra allargata a 4.000 giorni (cade anche il check
+  dei derivati della v501), la rilettura della cache spenta, la dichiarazione delle voci vecchie tolta, la versione non
+  passata dalle schede.
+- ⚠ **Una non mordeva al primo giro, e il difetto era il CONTROLLO**: togliere dalla resa il caso «lettura senza
+  versione» non cambiava niente, perche' il check passava sempre la versione corrente. Mancava lo stato di OGGI — uno
+  snapshot della v501 che la versione non la pubblica, con letture senza versione. *Un'iniezione che non morde prova che
+  il gate non contiene il fenomeno* (v430, v489): aggiunto, morde.
+Pavimenti: `test_update_data.py` 280 → 285 (295 punti di chiamata) e N_CHECKS_MINIMO 300 → 303 (308 eseguiti),
+`test_analisi_libro.py` 705 → 710 (724). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

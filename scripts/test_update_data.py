@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 300  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305 (sale, mai scende)
+N_CHECKS_MINIMO = 303  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -2416,6 +2416,61 @@ check("v501 sorveglianza del debito SEC (nasce sorvegliato, v390): assente → m
       and _vm501({"debito_sec": {"per_titolo": {"A": {}}, "errori": {"B": "HTTP 503"}}})["status"] == "stale"
       and "B" in _vm501({"debito_sec": {"per_titolo": {"A": {}}, "errori": {"B": "HTTP 503"}}})["note"]
       and _vm501({"debito_sec": {"per_titolo": {"A": {}}, "errori": {}, "in_attesa": ["C"]}})["status"] == "ok")
+
+# ═══ v502 — una voce SEC conta solo se dichiarata nell'ultimo anno di bilanci ════════════════════════════════════
+# Il primo run della v501 ha pubblicato il valore di mercato del debito di SMCI al 2013 e il tasso di NVDA da un 10-K del
+# 2018. Lo stato si COSTRUISCE: l'ultimo 10-Q della societa' e' del 26/08/2026, e accanto ci sono voci ferme da anni.
+_facts502 = {"facts": {"us-gaap": {
+    "Revenues": {"units": {"USD": [_f501("2026-07-26", 4e10, "10-Q", "2026-08-26")]}},
+    "LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths": {"units": {"USD": [
+        _f501("2020-12-31", 1e9, "10-K", "2021-02-26")]}},
+    "DebtInstrumentInterestRateEffectivePercentage": {"units": {"pure": [_f501("2018-01-28", 0.0315, "10-K", "2018-02-28")]}},
+    "DebtInstrumentFairValue": {"units": {"USD": [_f501("2013-06-30", 5e8, "10-K", "2013-09-11")]}},
+    "DebtInstrumentCarryingAmount": {"units": {"USD": [_f501("2013-06-30", 5e8, "10-K", "2013-09-11")]}},
+    "LineOfCreditFacilityRemainingBorrowingCapacity": {"units": {"USD": [_f501("2016-09-24", 3.95e8, "10-K", "2016-11-01")]}},
+    "CommercialPaper": {"units": {"USD": [_f501("2026-07-26", 2e9, "10-Q", "2026-08-26")]}},
+}}}
+_x502 = ud.debito_xbrl(_facts502)
+check("v502 una voce SEC ferma a bilanci di oltre un anno fa NON si pubblica e si DICHIARA con la data del suo ultimo "
+      "deposito (scadenze, tasso, valore di mercato, linee); una voce recente si pubblica: " + str(_x502),
+      "scadenze" not in _x502 and "tasso" not in _x502 and "equo" not in _x502 and "linee_disponibili" not in _x502
+      and _x502.get("stantii") == {"scadenze": "2021-02-26", "tasso": "2018-02-28", "equo": "2013-09-11",
+                                   "linee_disponibili": "2016-11-01"}
+      and _x502.get("carta_commerciale") == {"valore": 2e9, "valuta": "USD", "al": "2026-07-26"})
+_f502b = {"facts": {"us-gaap": {
+    "Revenues": {"units": {"USD": [_f501("2026-07-26", 4e10, "10-Q", "2026-08-26")]}},
+    # depositato dentro la finestra (400 giorni prima del 26/08/2026 = 22/07/2025): conta
+    "LongTermDebtWeightedAverageInterestRate": {"units": {"pure": [_f501("2025-06-30", 0.05, "10-K", "2025-07-23")]}},
+    # un valore di mercato RECENTE senza un carico della stessa data: non si pubblica il rapporto, e non e' vecchio
+    "LongTermDebtFairValue": {"units": {"USD": [_f501("2026-07-26", 9e9, "10-Q", "2026-08-26")]}},
+    "LongTermDebt": {"units": {"USD": [_f501("2026-04-26", 1e10, "10-Q", "2026-05-27")]}},
+}}}
+_x502b = ud.debito_xbrl(_f502b)
+check("v502 la finestra e' di UN anno di depositi e la stessa dei derivati: una voce depositata 399 giorni prima "
+      "dell'ultimo 10-Q conta; un valore di mercato recente senza carico della stessa data non diventa 'vecchio': "
+      + str(_x502b),
+      (_x502b.get("tasso") or {}).get("valore_pct") == 5.0 and "equo" not in _x502b
+      and "stantii" not in _x502b and ud.XBRL_FRESCO_GIORNI == 400
+      and "timedelta(days=XBRL_FRESCO_GIORNI)" in _SRC_UD_CODICE and "timedelta(days=400)" not in _SRC_UD_CODICE)
+_dir502 = Path(_tmp497.mkdtemp())
+_p502 = _dir502 / "debito_sec.json"
+_p502.write_text(_json.dumps({"per_titolo": {
+    "OLD": {"cik": 1, "deposito": {"accn": "a1"}, "letto_il": "2026-10-18"},
+    "NEW": {"cik": 2, "deposito": {"accn": "a2"}, "letto_il": "2026-10-18", "versione": ud.XBRL_VERSIONE}}}),
+    encoding="utf-8")
+_url502 = []
+def _get502(url, headers=None, timeout=None):
+    _url502.append(url)
+    return _R501(_facts502)
+_d502 = ud.aggiorna_debito_sec({"OLD": (1, {"accn": "a1"}), "NEW": (2, {"accn": "a2"})}, get=_get502, percorso=_p502,
+                               budget=5, ua={"User-Agent": "ua"}, oggi="2026-10-19", pausa=0)
+check("v502 la cache di una versione precedente si RILEGGE anche senza un deposito nuovo (era calcolata senza la regola "
+      "dell'eta'); quella della versione corrente no; la lettura porta la versione, e il blocco la pubblica: "
+      + str([_d502.get("letti_ora"), _d502.get("versione")]),
+      _d502.get("letti_ora") == ["OLD"] and len(_url502) == 1
+      and (_d502.get("per_titolo") or {}).get("OLD", {}).get("versione") == ud.XBRL_VERSIONE
+      and "stantii" in (_d502.get("per_titolo") or {}).get("OLD", {})
+      and _d502.get("versione") == ud.XBRL_VERSIONE and _d502.get("fresco_giorni") == ud.XBRL_FRESCO_GIORNI)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

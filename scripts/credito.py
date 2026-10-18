@@ -343,11 +343,19 @@ def riga_tasso(t):
     return f"{nome} {_n(t['valore_pct'], 2)}% ({nota}, al {_data(t.get('al'))})"
 
 
-def riga_debito(r, x=None, liquidita=None, esteri=()):
+# v502 — le voci SEC che la pipeline non pubblica perche' ferme a bilanci di oltre un anno fa: si nominano con la data
+# del loro ultimo deposito. Una voce vecchia letta come attuale e' peggio di una voce assente (v396).
+NOMI_VOCI_SEC = {"scadenze": "scadenze del capitale", "tasso": "tasso", "equo": "valore di mercato del debito",
+                 "linee_disponibili": "linee di credito non utilizzate", "carta_commerciale": "carta commerciale"}
+
+
+def riga_debito(r, x=None, liquidita=None, esteri=(), versione=None):
     """Il debito in UNA riga: dal bilancio della fonte (yfinance: totale, quota corrente, oneri) e dai fatti XBRL
     depositati (scadenze, tasso medio, valore di mercato, linee di credito, carta commerciale, derivati sui tassi).
     x: macro.debito_sec.per_titolo[tk] o None; liquidita: (valore, nome, dettaglio) da schede.liquidita_societa —
-    passata da chi chiama, perche' la lettura della liquidita' ha un proprietario solo (v161, v476)."""
+    passata da chi chiama, perche' la lettura della liquidita' ha un proprietario solo (v161, v476).
+    versione: quella della lettura SEC della pipeline (macro.debito_sec.versione); una voce in cache da una versione
+    precedente, o senza versione, lo dichiara (v502)."""
     if escluso(r):
         return "debito: lettura non significativa per un intermediario finanziario (il debito e' il mestiere)"
     c, k = (r or {}).get("combustione") or {}, (r or {}).get("credito") or {}
@@ -404,6 +412,7 @@ def riga_debito(r, x=None, liquidita=None, esteri=()):
         return "debito: " + " · ".join(pz)
     dep = x.get("deposito") or {}
     sez = [f"dal {dep.get('forma')} depositato il {_data(dep.get('data'))}" if dep else "bilanci SEC"]
+    st = x.get("stantii") or {}
     sc = x.get("scadenze")
     if sc and sc.get("voci"):
         totale = sum(v for v in sc["voci"].values() if v is not None)
@@ -412,9 +421,10 @@ def riga_debito(r, x=None, liquidita=None, esteri=()):
                      if sc["voci"].get(kk) is not None]
             sez.append(f"scadenze del capitale ({sc.get('forma')} al {_data(sc.get('al'))}, totale dichiarato "
                        f"{_importo(totale, sc.get('valuta'))}): " + ", ".join(parti))
-    else:
+    elif "scadenze" not in st:
         sez.append("scadenze per anno non dichiarate in forma leggibile")
-    sez.append(riga_tasso(x.get("tasso")))
+    if x.get("tasso") or "tasso" not in st:
+        sez.append(riga_tasso(x.get("tasso")))
     e = x.get("equo")
     if e and e.get("rapporto_pct") is not None:
         sez.append(f"il mercato valuta il debito il {_n(e['rapporto_pct'], 1)}% del valore di carico (al {_data(e['al'])}: "
@@ -428,6 +438,13 @@ def riga_debito(r, x=None, liquidita=None, esteri=()):
     d = x.get("derivati_tassi") or {}
     sez.append(f"derivati sui tassi: il bilancio li nomina ({', '.join(d['voci'])})" if d.get("voci") else
                "derivati sui tassi: nessuna voce XBRL non dimensionale li nomina — non vuol dire che non ne usi")
+    if st:
+        sez.append("NON pubblicate perche' ferme a bilanci di oltre un anno fa (una voce vecchia letta come attuale e' "
+                   "peggio di una voce assente): " + ", ".join(f"{NOMI_VOCI_SEC.get(k, k)} (ultimo deposito {_data(v)})"
+                                                            for k, v in sorted(st.items())))
+    if x.get("versione") is None or (versione is not None and x.get("versione") != versione):
+        sez.append("⚠ lettura precedente alla regola dell'eta' (v502): queste voci possono venire da bilanci vecchi "
+                   "di anni — la pipeline le rilegge ai prossimi giri, le posizioni per prime")
     if x.get("errore_ultimo"):
         sez.append(f"⚠ ultima lettura fallita il {_data(x['errore_ultimo'].get('il'))}: vale quella precedente")
     pz.append(" · ".join(sez))

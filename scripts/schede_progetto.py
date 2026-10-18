@@ -544,7 +544,8 @@ def righe_credito(r, meta_cds=None, dsec=None):
     if cc:
         out.append(cc)
     out.append(credito.riga_altman(credito.altman_rischio(r)))
-    out.append(credito.riga_debito(r, x, liquidita_societa(r.get("combustione")), ds.get("senza_10q") or ()))
+    out.append(credito.riga_debito(r, x, liquidita_societa(r.get("combustione")), ds.get("senza_10q") or (),
+                                   ds.get("versione")))
     return out
 
 

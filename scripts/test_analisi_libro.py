@@ -6144,6 +6144,39 @@ check("v501 il formato e il censimento: il blocco SALUTE DEL CREDITO nelle sched
       and "`scripts/credito.py` non è un passo di questo comando" in (Path(__file__).resolve().parent.parent / ".claude"
                                                                       / "commands" / "aggiorna.md").read_text(encoding="utf-8"))
 
+# ═══ v502 — le voci SEC vecchie si dichiarano, e una lettura precedente alla regola lo dice ═══════════════════
+_xs502 = {"deposito": {"forma": "10-Q", "data": "2026-08-26"}, "versione": 502,
+          "carta_commerciale": {"valore": 2e9, "valuta": "USD", "al": "2026-07-26"},
+          "stantii": {"scadenze": "2021-02-26", "tasso": "2018-02-28", "equo": "2013-09-11"},
+          "derivati_tassi": {"voci": [], "n": 0}}
+_ds502 = CR.riga_debito(_rd501, _xs502, (5.5e9, "liquidita'", "x"), (), 502)
+check("v502 la riga del debito NOMINA le voci ferme a bilanci di oltre un anno fa con la data del loro ultimo deposito, "
+      "e per quelle non scrive 'non dichiarato' (lo e' stato, anni fa); nessun avviso di versione su una lettura "
+      "corrente: " + _ds502,
+      "NON pubblicate perche' ferme a bilanci di oltre un anno fa" in _ds502
+      and "scadenze del capitale (ultimo deposito 26/02/2021)" in _ds502 and "tasso (ultimo deposito 28/02/2018)" in _ds502
+      and "valore di mercato del debito (ultimo deposito 11/09/2013)" in _ds502
+      and "tasso medio ponderato non dichiarato" not in _ds502 and "scadenze per anno non dichiarate" not in _ds502
+      and "carta commerciale in essere" in _ds502 and "precedente alla regola dell'eta'" not in _ds502)
+_dv502 = {v: CR.riga_debito(_rd501, {**_xs502, "versione": v} if v else {k: w for k, w in _xs502.items() if k != "versione"},
+                            (5.5e9, "liquidita'", "x"), (), 502) for v in (None, 501, 502)}
+# il caso che discrimina (l'iniezione che lo toglieva non mordeva, v430): uno snapshot della pipeline che la versione
+# non la pubblica ancora (versione None, lo stato del run precedente alla v502) con una lettura senza versione
+_dn502 = CR.riga_debito(_rd501, {k: w for k, w in _xs502.items() if k != "versione"}, (5.5e9, "liquidita'", "x"), (), None)
+_dc502 = CR.riga_debito(_rd501, _xs502, (5.5e9, "liquidita'", "x"), (), None)
+check("v502 una lettura senza versione, o di una versione diversa da quella della pipeline, DICHIARA che le voci possono "
+      "venire da bilanci vecchi — anche quando lo snapshot della pipeline la versione non la pubblica ancora; quella "
+      "corrente no",
+      "precedente alla regola dell'eta'" in _dv502[None] and "precedente alla regola dell'eta'" in _dv502[501]
+      and "precedente alla regola dell'eta'" not in _dv502[502]
+      and "precedente alla regola dell'eta'" in _dn502 and "precedente alla regola dell'eta'" not in _dc502)
+_r502 = {"ticker": "TST", "sector": "Technology", "combustione": _rd501["combustione"], "credito": _rd501["credito"]}
+_sc502 = {v: " ".join(SP.righe_credito(_r502, None, {"per_titolo": {"TST": {**_xs502, "versione": 501}}, "versione": v}))
+          for v in (501, 502)}
+check("v502 collegamento ESEGUITO (v483): le schede passano alla riga del debito la versione della lettura SEC della "
+      "pipeline — una cache rimasta indietro si dichiara, una allineata no",
+      "precedente alla regola dell'eta'" in _sc502[502] and "precedente alla regola dell'eta'" not in _sc502[501])
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

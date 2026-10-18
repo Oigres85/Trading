@@ -748,10 +748,14 @@ Le soglie sono **convenzioni del 18/10/2026** (v240), stanno in `scripts/credito
   per la consultazione. Al loro posto il CDS dove esiste, e il **valore di mercato del debito** che la società
   dichiara nei 10-Q e 10-K (fatti XBRL, `data/debito_sec.json`): sotto 100 il mercato chiede più delle cedole, e il dato
   non separa i tassi saliti dal credito peggiorato.
-- **Il debito dai bilanci SEC** (fatti XBRL non dimensionali): scadenze del capitale anno per anno, tasso medio
-  ponderato dichiarato, valore di mercato contro carico, linee di credito non utilizzate, carta commerciale, derivati
-  sui tassi. Si legge solo dopo un 10-Q o un 10-K nuovo, al massimo 10 per run; gli emittenti esteri (20-F, 6-K) non
-  sono letti, e si dice. Le cedole per obbligazione e i nozionali degli swap per tipo sono dichiarati per strumento:
+- **Il debito dai bilanci SEC** (fatti XBRL non dimensionali): scadenze del capitale anno per anno, il tasso dichiarato
+  col nome della sua voce (una media ponderata del debito, o il tasso effettivo di UNO strumento senza dire quale),
+  valore di mercato contro carico, linee di credito non utilizzate, carta commerciale, derivati sui tassi. Si legge solo
+  dopo un 10-Q o un 10-K nuovo, al massimo 10 per run; gli emittenti esteri (20-F, 6-K) non sono letti, e si dice.
+  ⚠ **Una voce conta solo se la società l'ha depositata nell'ultimo anno di bilanci** (400 giorni prima del suo ultimo
+  10-Q/10-K, la stessa finestra dei derivati): una voce ferma a prima NON si pubblica e si nomina con la data del suo
+  ultimo deposito (v502 — il primo giro vero aveva trovato il valore di mercato del debito di SMCI al 2013 e il tasso di
+  NVDA da un 10-K del 2018). Le cedole per obbligazione e i nozionali degli swap per tipo sono dichiarati per strumento:
   qui non si vedono, e la loro assenza non dice che non ci siano.
 - **Dove esce**: il blocco SALUTE DEL CREDITO di `schede_progetto.py` (segnali in testa, poi nome per nome) e gli
   EVENTI del CDS nel brief delle due letture del giorno; le condizioni di bilancio restano nell'analisi, perché

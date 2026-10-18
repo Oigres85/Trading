@@ -1464,6 +1464,16 @@ def _somma_trimestri(df, voce, n=4):
 DEBITO_SEC = ROOT / "data" / "debito_sec.json"
 XBRL_PER_RUN = 10
 XBRL_FORME = ("10-K", "10-Q", "10-K/A", "10-Q/A")
+# ⚠⚠ v502 — UNA VOCE CONTA SOLO SE LA SOCIETA' L'HA DICHIARATA NELL'ULTIMO ANNO DI BILANCI. Il primo run della v501 ha
+#   pubblicato il valore di mercato del debito di SMCI al 30/06/2013, il tasso di NVDA da un 10-K del 2018, le linee di
+#   credito di AMD del 2016: per una voce che la societa' ha smesso di dichiarare in forma non dimensionale, «il fatto
+#   piu' recente» e' un fatto vecchio di anni, e letto accanto al 10-Q di agosto si legge come lo stato di oggi. Ora ogni
+#   voce deve essere depositata nei XBRL_FRESCO_GIORNI prima dell'ultimo 10-Q/10-K della societa' — la stessa finestra
+#   dei derivati, che la usavano gia' (un anno di depositi comprende l'ultimo 10-K, dove vivono le scadenze per anno) —
+#   e quella ferma a prima si DICHIARA con la data del suo ultimo deposito (v396, v406), non si pubblica.
+XBRL_FRESCO_GIORNI = 400
+# la cache di una versione precedente si rilegge: e' stata calcolata senza la regola qui sopra
+XBRL_VERSIONE = 502
 XBRL_SCADENZE = (
     ("entro_12_mesi", "LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths"),
     ("resto_esercizio", "LongTermDebtMaturitiesRepaymentsOfPrincipalRemainderOfFiscalYear"),
@@ -1514,6 +1524,15 @@ def _piu_recente(fatti):
     return max(fatti, key=lambda x: (str(x[0].get("end")), str(x[0].get("filed")))) if fatti else None
 
 
+def _freschi(fatti, soglia):
+    """I fatti depositati dalla soglia in poi (v502): una voce ferma a bilanci vecchi non descrive il debito di oggi."""
+    return [x for x in fatti if soglia is None or str(x[0].get("filed")) >= soglia]
+
+
+def _deposito_vecchio(fatti):
+    return max((str(x[0].get("filed")) for x in fatti), default=None)
+
+
 def _importi(facts, tag):
     """I fatti in valuta: in dollari se ci sono, altrimenti nell'unica valuta dichiarata (con la valuta accanto)."""
     tutti = [x for x in _fatti_xbrl(facts, tag) if x[1] != "pure" and "/" not in x[1]]
@@ -1525,8 +1544,18 @@ def debito_xbrl(facts):
     """Le voci del debito dai fatti XBRL depositati (companyfacts). Ogni voce porta la data a cui si riferisce e il
     deposito da cui viene; una voce che la societa' non dichiara in forma non dimensionale manca, e si dice."""
     out = {}
+    usg = ((facts or {}).get("facts") or {}).get("us-gaap") or {}
+    # l'ultimo 10-Q/10-K della societa' e la finestra di un anno di depositi: UNA soglia per tutte le voci (v161)
+    ultimo = max((str(f.get("filed")) for t in usg.values() for lista in (t.get("units") or {}).values()
+                  for f in (lista or []) if f.get("form") in XBRL_FORME), default=None)
+    soglia = ((datetime.fromisoformat(ultimo[:10]) - timedelta(days=XBRL_FRESCO_GIORNI)).date().isoformat()
+              if ultimo else None)
+    stantii = {}
     # le scadenze del capitale: tutte alla STESSA data, quella piu' recente in cui la societa' le ha dichiarate
-    sc = {k: _importi(facts, tag) for k, tag in XBRL_SCADENZE}
+    sc_tutte = {k: _importi(facts, tag) for k, tag in XBRL_SCADENZE}
+    sc = {k: _freschi(v, soglia) for k, v in sc_tutte.items()}
+    if not any(sc.values()) and any(sc_tutte.values()):
+        stantii["scadenze"] = _deposito_vecchio([x for v in sc_tutte.values() for x in v])
     fine = max((str(f.get("end")) for v in sc.values() for f, _ in v), default=None)
     if fine:
         voci, dep, valuta = {}, None, None
@@ -1538,18 +1567,28 @@ def debito_xbrl(facts):
                 dep = dep or {"forma": f.get("form"), "depositato": f.get("filed")}
                 valuta = valuta or u
         out["scadenze"] = {"al": fine, **(dep or {}), "valuta": valuta, "voci": voci}
+    tassi_vecchi = []
     for tag in XBRL_TASSO:
-        x = _piu_recente(_fatti_xbrl(facts, tag, "pure"))
-        if x and 0 < float(x[0]["val"]) < 0.3:
+        validi = [x for x in _fatti_xbrl(facts, tag, "pure") if 0 < float(x[0]["val"]) < 0.3]
+        tassi_vecchi.extend(validi)
+        x = _piu_recente(_freschi(validi, soglia))
+        if x:
             out["tasso"] = {"valore_pct": round(float(x[0]["val"]) * 100, 2), "al": str(x[0]["end"]), "voce": tag,
                             "forma": x[0].get("form"), "depositato": x[0].get("filed")}
             break
+    if "tasso" not in out and tassi_vecchi:
+        stantii["tasso"] = _deposito_vecchio(tassi_vecchi)
+    equi_vecchi, equi_freschi = [], False
     for equo, carichi in XBRL_EQUO:
-        x = _piu_recente(_importi(facts, equo))
+        tutti = _importi(facts, equo)
+        equi_vecchi.extend(tutti)
+        x = _piu_recente(_freschi(tutti, soglia))
         if not x:
             continue
+        equi_freschi = True     # un valore di mercato recente senza un carico della stessa data non e' una voce vecchia
         for car in carichi:
-            alla = [y for y in _importi(facts, car) if str(y[0].get("end")) == str(x[0]["end"]) and y[1] == x[1]]
+            alla = [y for y in _freschi(_importi(facts, car), soglia)
+                    if str(y[0].get("end")) == str(x[0]["end"]) and y[1] == x[1]]
             if alla:
                 y = max(alla, key=lambda z: str(z[0].get("filed")))
                 if float(y[0]["val"]) > 0:
@@ -1562,19 +1601,21 @@ def debito_xbrl(facts):
                 break
         if "equo" in out:
             break
-    x = _piu_recente(_importi(facts, "LineOfCreditFacilityRemainingBorrowingCapacity"))
-    if x:
-        out["linee_disponibili"] = {"valore": float(x[0]["val"]), "valuta": x[1], "al": str(x[0]["end"])}
-    x = _piu_recente(_importi(facts, "CommercialPaper"))
-    if x:
-        out["carta_commerciale"] = {"valore": float(x[0]["val"]), "valuta": x[1], "al": str(x[0]["end"])}
-    # i derivati sui tassi: le voci che li NOMINANO, dichiarate nell'ultimo anno di depositi
-    usg = ((facts or {}).get("facts") or {}).get("us-gaap") or {}
-    ultimo = max((str(f.get("filed")) for t in usg.values() for lista in (t.get("units") or {}).values()
-                  for f in (lista or []) if f.get("form") in XBRL_FORME), default=None)
+    if "equo" not in out and equi_vecchi and not equi_freschi:
+        stantii["equo"] = _deposito_vecchio(equi_vecchi)
+    for chiave, tag in (("linee_disponibili", "LineOfCreditFacilityRemainingBorrowingCapacity"),
+                        ("carta_commerciale", "CommercialPaper")):
+        tutti = _importi(facts, tag)
+        x = _piu_recente(_freschi(tutti, soglia))
+        if x:
+            out[chiave] = {"valore": float(x[0]["val"]), "valuta": x[1], "al": str(x[0]["end"])}
+        elif tutti:
+            stantii[chiave] = _deposito_vecchio(tutti)
+    if stantii:
+        out["stantii"] = stantii
+    # i derivati sui tassi: le voci che li NOMINANO, dichiarate nell'ultimo anno di depositi (la stessa soglia)
     der = []
     if ultimo:
-        soglia = (datetime.fromisoformat(ultimo[:10]) - timedelta(days=400)).date().isoformat()
         for tag, t in sorted(usg.items()):
             if not XBRL_DERIVATI.search(tag):
                 continue
@@ -1598,8 +1639,11 @@ def aggiorna_debito_sec(bilanci, get=None, percorso=DEBITO_SEC, budget=XBRL_PER_
         cache = {}
     per = dict(cache.get("per_titolo") or {})
     pr = {t: i for i, t in enumerate(priorita)}
+    # si rilegge chi ha un deposito nuovo E chi e' in cache da una versione precedente (v502: calcolata senza la regola
+    # della freschezza, che la cache da sola non puo' correggere)
     da_leggere = [tk for tk, (_, ub) in bilanci.items()
-                  if ((per.get(tk) or {}).get("deposito") or {}).get("accn") != (ub or {}).get("accn")]
+                  if ((per.get(tk) or {}).get("deposito") or {}).get("accn") != (ub or {}).get("accn")
+                  or (per.get(tk) or {}).get("versione") != XBRL_VERSIONE]
     da_leggere.sort(key=lambda tk: (pr.get(tk, len(pr)), tk in per, tk))
     letti, errori = [], {}
     for tk in da_leggere[:budget]:
@@ -1607,7 +1651,8 @@ def aggiorna_debito_sec(bilanci, get=None, percorso=DEBITO_SEC, budget=XBRL_PER_
         try:
             r = get(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json", headers=ua or {}, timeout=40)
             r.raise_for_status()
-            per[tk] = {"cik": int(cik), "deposito": ub, "letto_il": oggi, **debito_xbrl(r.json())}
+            per[tk] = {"cik": int(cik), "deposito": ub, "letto_il": oggi, "versione": XBRL_VERSIONE,
+                       **debito_xbrl(r.json())}
             letti.append(tk)
         except Exception as e:  # noqa: BLE001
             errori[tk] = str(e)[:120]
@@ -1624,7 +1669,8 @@ def aggiorna_debito_sec(bilanci, get=None, percorso=DEBITO_SEC, budget=XBRL_PER_
     attesa = sorted(set(da_leggere[budget:]) | set(errori))
     return {"fonte": "SEC EDGAR, fatti XBRL dei 10-Q e 10-K (companyfacts): solo fatti non dimensionali",
             "per_titolo": {tk: per[tk] for tk in sorted(bilanci) if tk in per},
-            "letti_ora": letti, "in_attesa": attesa, "errori": errori, "budget": budget}
+            "letti_ora": letti, "in_attesa": attesa, "errori": errori, "budget": budget, "versione": XBRL_VERSIONE,
+            "fresco_giorni": XBRL_FRESCO_GIORNI}
 
 
 # ═══ v501 — ALTMAN Z'' SUL BILANCIO PIU' RECENTE ════════════════════════════════════════════════════════════════
