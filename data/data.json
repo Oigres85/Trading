@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-18T12:56:44Z",
+ "updated_at": "2026-10-18T16:43:44Z",
  "eurusd": 1.1242,
  "totals": {
   "usd_value": 0,
@@ -16606,37 +16606,37 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81859.57,
+   "price": 80969.13,
    "price_asof": "2026-10-18",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.59,
+   "change_pct": -0.51,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.1,
-   "sma200_dist_pct": 12.9,
-   "sma50_dist_pct": 0.6,
+   "ath_dist_pct": -35.8,
+   "sma200_dist_pct": 11.7,
+   "sma50_dist_pct": -0.5,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
-   "w52_dist_pct": -29.6,
+   "w52_dist_pct": -30.4,
    "day_high": 82143.93,
-   "day_low": 81302.48,
+   "day_low": 80954.69,
    "support": 79735.86,
    "resistance": 87146.35,
-   "rsi": 48.1,
-   "volume": 13522556928,
+   "rsi": 44.6,
+   "volume": 15741719552,
    "vol_ratio": 0.38,
-   "atr_14": 2040.99,
-   "atr_pct": 2.49,
-   "signal": "Trend rialzista",
-   "signal_class": "good",
+   "atr_14": 2065.83,
+   "atr_pct": 2.55,
+   "signal": "Neutrale",
+   "signal_class": "neutral",
    "sparks": {
     "w1": [
      81562.49,
      82141.46,
      81500.8,
      81382.15,
-     81859.57
+     80969.13
     ],
     "m6": [
      66289.5,
@@ -16764,7 +16764,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81859.57
+     80969.13
     ],
     "all": [
      386.94,
@@ -16912,7 +16912,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81859.57
+     80969.13
     ],
     "m1": [
      84458.09,
@@ -16936,7 +16936,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81859.57
+     80969.13
     ],
     "m3": [
      62975.59,
@@ -17004,7 +17004,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81859.57
+     80969.13
     ],
     "y1": [
      107198.27,
@@ -17080,7 +17080,7 @@
      84763.58,
      81676.34,
      83095.12,
-     81859.57
+     80969.13
     ],
     "d1": [
      81300.0,
@@ -17160,22 +17160,44 @@
      81939.79,
      81869.24,
      81828.57,
-     81859.57
+     81882.91,
+     81854.21,
+     81804.72,
+     81701.05,
+     81242.2,
+     81337.66,
+     81376.76,
+     81177.17,
+     81147.84,
+     81305.25,
+     81065.63,
+     81027.79,
+     80991.25,
+     81116.0,
+     81058.1,
+     81112.43,
+     81034.57,
+     80945.19,
+     81027.87,
+     81024.93,
+     81071.65,
+     81114.97,
+     81077.35
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 61,
+   "health": 41,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.6,
-   "sortino_1y": -0.83,
-   "sharpe_6m": 1.34,
-   "sortino_6m": 2.41,
+   "sharpe_1y": -0.62,
+   "sortino_1y": -0.86,
+   "sharpe_6m": 1.27,
+   "sortino_6m": 2.28,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81859.57,
-   "risk_reward": "1:1.3",
+   "prezzo_limite_aggiustato": 80969.13,
+   "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -17187,22 +17209,22 @@
     "w1": {
      "support": 79735.86,
      "resistance": 84049.06,
-     "change_pct": 0.36
+     "change_pct": -0.73
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -3.08
+     "change_pct": -4.13
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 29.99
+     "change_pct": 28.57
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 16.74
+     "change_pct": 15.47
     }
    },
    "financials": [],
@@ -17219,7 +17241,7 @@
      "lo": 83474.96,
      "hi": 85119.55
     },
-    "liq_above": 82262.21,
+    "liq_above": 81235.03,
     "liq_below": 80336.91,
     "order_block": {
      "dir": "rialzista",
@@ -17229,74 +17251,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81859.57,
+     "prezzo": 80969.13,
      "medie": {
       "sma10": {
-       "liv": 82244.22,
-       "dist_pct": -0.47
+       "liv": 82155.17,
+       "dist_pct": -1.44
       },
       "ema10": {
-       "liv": 82258.18,
-       "dist_pct": -0.48
+       "liv": 82096.28,
+       "dist_pct": -1.37
       },
       "sma20": {
-       "liv": 83325.45,
-       "dist_pct": -1.76
+       "liv": 83280.93,
+       "dist_pct": -2.78
       },
       "ema20": {
-       "liv": 82549.93,
-       "dist_pct": -0.84
+       "liv": 82465.12,
+       "dist_pct": -1.81
       },
       "sma30": {
-       "liv": 83560.82,
-       "dist_pct": -2.04
+       "liv": 83531.14,
+       "dist_pct": -3.07
       },
       "ema30": {
-       "liv": 82136.82,
-       "dist_pct": -0.34
+       "liv": 82079.37,
+       "dist_pct": -1.35
       },
       "sma50": {
-       "liv": 81395.17,
-       "dist_pct": 0.57
+       "liv": 81377.36,
+       "dist_pct": -0.5
       },
       "ema50": {
-       "liv": 80474.17,
-       "dist_pct": 1.72
+       "liv": 80439.25,
+       "dist_pct": 0.66
       },
       "sma100": {
-       "liv": 74199.65,
-       "dist_pct": 10.32
+       "liv": 74190.74,
+       "dist_pct": 9.14
       },
       "ema100": {
-       "liv": 76959.27,
-       "dist_pct": 6.37
+       "liv": 76941.64,
+       "dist_pct": 5.23
       },
       "sma200": {
-       "liv": 72494.6,
-       "dist_pct": 12.92
+       "liv": 72490.14,
+       "dist_pct": 11.7
       },
       "ema200": {
-       "liv": 75845.34,
-       "dist_pct": 7.93
+       "liv": 75836.48,
+       "dist_pct": 6.77
       }
      },
-     "medie_battute": 6,
+     "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 48.1,
+      "rsi14": 44.6,
       "macd": {
-       "linea": 25.65,
-       "segnale": 491.76,
-       "istogramma": -466.11
+       "linea": -45.39,
+       "segnale": 477.55,
+       "istogramma": -522.94
       },
-      "stoch_k": 29.3,
-      "stoch_d": 25.5,
-      "williams_r": -70.7,
-      "cci20": -52.6,
+      "stoch_k": 17.0,
+      "stoch_d": 21.4,
+      "williams_r": -83.0,
+      "cci20": -64.7,
       "adx14": 22.9,
-      "di_su": 18.5,
-      "di_giu": 20.6,
-      "momentum10": 183.23
+      "di_su": 18.3,
+      "di_giu": 20.4,
+      "momentum10": -707.2
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17788,20 +17810,20 @@
       "d": "2026-10-18",
       "o": 81383.29,
       "h": 82143.93,
-      "l": 81302.48,
-      "c": 81859.57
+      "l": 80954.69,
+      "c": 80969.13
      }
     ],
     "performance": {
-     "s1": -1.49,
-     "m1": -3.02,
-     "m3": 29.11,
-     "m6": 24.58,
-     "a1": 16.5,
-     "ytd": -7.75,
-     "a3": 136.13,
-     "a5": 33.5,
-     "a10": 11578.01
+     "s1": -2.56,
+     "m1": -4.07,
+     "m3": 27.71,
+     "m6": 23.22,
+     "a1": 15.23,
+     "ytd": -8.75,
+     "a3": 133.56,
+     "a5": 32.05,
+     "a10": 11450.98
     },
     "stagionalita": [
      {
@@ -17887,7 +17909,7 @@
      },
      {
       "mese": 10,
-      "media": 15.2,
+      "media": 15.12,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -17914,9 +17936,9 @@
      }
     ]
    },
-   "rs_1m": -3.4,
+   "rs_1m": -4.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.2,
+   "rs_ndx_1m": -3.2,
    "beta_ndx": 0.66,
    "avg_corr": 0.3,
    "max_corr": 0.78,
@@ -34969,7 +34991,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -39807,7 +39829,7 @@
      "a1": 121.44,
      "a3": 999.35,
      "a5": 744.12,
-     "a10": 749.03
+     "a10": 749.04
     },
     "stagionalita": [
      {
@@ -51693,7 +51715,7 @@
      24.28,
      21.19,
      21.19,
-     18.3,
+     18.31,
      20.9,
      17.41,
      13.16,
@@ -55139,7 +55161,7 @@
       },
       "evento": {
        "beta": 0.29,
-       "r2": 0.163,
+       "r2": 0.162,
        "corr": 0.4,
        "campione": 50,
        "da": "2025-10-27",
@@ -62630,7 +62652,7 @@
      961.76,
      1054.17,
      1054.93,
-     1064.75,
+     1064.74,
      1416.2,
      1445.53,
      1316.25,
@@ -62735,7 +62757,7 @@
      1641.52
     ],
     "y1": [
-     1022.54,
+     1022.53,
      1026.34,
      1054.17,
      1012.1,
@@ -70295,7 +70317,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -70616,7 +70638,7 @@
    "rating": {
     "key": "buy",
     "n": 11,
-    "target": 128.04,
+    "target": 128.06,
     "upside_pct": 57.1
    },
    "analisti": {
@@ -70630,9 +70652,9 @@
     "eps_min": 1.96,
     "eps_max": 4.1,
     "eps_n": 18,
-    "target_min": 83.78,
-    "target_max": 170.45,
-    "target_mediana": 134.23
+    "target_min": 83.8,
+    "target_max": 170.47,
+    "target_mediana": 134.25
    },
    "health": 19,
    "eps": 0.59,
@@ -70669,7 +70691,7 @@
     "debt_to_equity": 17.131,
     "dividend_yield": 0.0021,
     "price_to_book": null,
-    "target_mean": 128.0418,
+    "target_mean": 128.0599,
     "fcf": null,
     "gross_margin": 0.3511,
     "enterprise_value": null,
@@ -85640,7 +85662,7 @@
      32.88,
      31.09,
      28.92,
-     32.13,
+     32.12,
      32.9,
      33.61,
      31.46,
@@ -87452,7 +87474,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -93444,7 +93466,7 @@
     ],
     "y1": [
      290.74,
-     283.89,
+     283.88,
      290.37,
      311.56,
      327.65,
@@ -100397,7 +100419,7 @@
      324.5,
      348.61,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -101495,7 +101517,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -104690,9 +104712,9 @@
     "float_pct": 99.9,
     "avg_volume_30d": 34904354.0,
     "pe_ttm": 38.9211,
-    "forward_pe": 10.1874,
+    "forward_pe": 10.2492,
     "eps_ttm": 0.76,
-    "eps_forward": 2.9036,
+    "eps_forward": 2.8861,
     "revenue_fy": 63695998976.0,
     "net_income_fy": 4338999808.0,
     "revenue_growth": 0.026,
@@ -106133,7 +106155,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -106214,7 +106236,7 @@
      164.55,
      200.71,
      230.8,
-     237.33,
+     237.32,
      279.61,
      287.31,
      306.16,
@@ -109853,7 +109875,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -110020,7 +110042,7 @@
      427.74,
      448.72,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -122552,39 +122574,18 @@
   "news": {
    "voci": [
     {
-     "titolo": "Australian Home Auctions Decline as Rate Hikes Dampen Activity",
-     "riassunto": "The number of homes auctioned in Australia dropped over the past week as interest rates at a 15-year high weigh on activity in the housing market.",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-17T23:57:37Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-17/australian-home-auctions-decline-as-rate-hikes-dampen-activity"
-    },
-    {
      "titolo": "‘Some people did everything right’: I lost my home in the Great Recession. I rent in my 50s. Why is that judged as failure?",
      "riassunto": "”I earn $110,000 a year.”",
      "fonte": "MarketWatch",
-     "quando": "2026-10-17T16:47:00Z",
+     "quando": "2026-10-18T16:15:00Z",
      "url": "https://www.marketwatch.com/story/i-earn-110-000-a-year-i-lost-my-home-in-the-great-recession-im-renting-in-my-50s-why-is-that-judged-as-failure-d1371d67?mod=mw_rss_topstories"
     },
     {
-     "titolo": "CoreWeave Woes Risk Shutting Down AI Junk Market: Credit Weekly",
-     "riassunto": "Junk bond buyers are increasingly freezing out tech startups looking for financing, as CoreWeave Inc.’s pain raises bigger questions about how artificial intelligence companies will fund themselves.",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-17T14:27:13Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-17/coreweave-woes-risk-shutting-down-ai-junk-market-credit-weekly"
-    },
-    {
-     "titolo": "Meet the home buyers totally unfazed by 7% mortgage rates",
-     "riassunto": "Individual investors and second-home buyers accounted for 1 in 5 home purchases in September — the highest share in a little over a year.",
+     "titolo": "These surprising stocks could be some of the biggest drivers of S&P 500 earnings growth",
+     "riassunto": "Boeing, Meta and EchoStar recorded steep charges and expenses a year ago, which are expected to make this latest quarter’s results look especially strong by comparison.",
      "fonte": "MarketWatch",
-     "quando": "2026-10-17T13:00:00Z",
-     "url": "https://www.marketwatch.com/story/meet-the-home-buyers-totally-unfazed-by-7-mortgage-rates-7a9b1cc7?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "Silver’s recent 50% drop from a record high hints that an economic slowdown looms",
-     "riassunto": "There’s a relatively off-the-radar commodity that can provide hints on where the economy is headed — and it’s seen its value drop more than 50% from a record high earlier this year.",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-17T12:30:00Z",
-     "url": "https://www.marketwatch.com/story/silvers-recent-50-drop-from-a-record-high-hints-that-an-economic-slowdown-looms-e9fdfaf1?mod=mw_rss_topstories"
+     "quando": "2026-10-18T14:00:00Z",
+     "url": "https://www.marketwatch.com/story/these-surprising-stocks-could-be-some-of-the-biggest-drivers-of-s-p-500-earnings-growth-ea073a07?mod=mw_rss_topstories"
     },
     {
      "titolo": "U.S. budget deficit swells to almost $2 trillion for fiscal 2026, up 12% in a single year",
@@ -122676,14 +122677,36 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-14T04:24:28Z",
      "url": "https://www.cnbc.com/2026/10/14/godzilla-el-nino-asia-inflation-philippines.html"
+    },
+    {
+     "titolo": "The latest inflation data is expected to show price increases are accelerating",
+     "riassunto": "Economists expect the consumer price index for September to rise 0.6% on the month and 3.6% year over year.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-13T18:05:57Z",
+     "url": "https://www.cnbc.com/2026/10/13/september-consumer-price-index-inflation.html"
+    },
+    {
+     "titolo": "World Bank jobs council urges 'crisis-era' employment support measures as IMF warns of AI ‘tsunami’",
+     "riassunto": "IMF Chief Kristalina Georgieva warned AI is hitting the global labor market like a “slow-moving tsunami,” with young workers entering the job market the most exposed.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-13T13:09:55Z",
+     "url": "https://www.cnbc.com/2026/10/12/imf-world-bank-ai-jobs-inflation-.html"
+    },
+    {
+     "titolo": "IMF warns bond yields could see a 'disorderly' spike as debt, inflation risks worsen",
+     "riassunto": "The IMF says risks in the government bond market have worsened and that yields could jump sharply and disorderly.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-13T04:54:07Z",
+     "url": "https://www.cnbc.com/2026/10/13/treasury-yields-imf-debt-inflation-.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
-    "Bloomberg",
     "MarketWatch"
    ],
-   "fonti_mute": [],
+   "fonti_mute": [
+    "Bloomberg"
+   ],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -128655,7 +128678,7 @@
    "calls": 965706
   },
   "risk_sentiment": {
-   "score": 36,
+   "score": 35,
    "label": "Risk-Off",
    "components": [
     {
@@ -128672,7 +128695,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 56
+     "score": 45
     },
     {
      "label": "Treasury 10A",
@@ -133921,6 +133944,13 @@
       "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
      },
      {
+      "titolo": "Here's What $10,000 Split Across SpaceX, Palantir, and 3 AI Chip Stocks Could Be Worth in 2035",
+      "riassunto": "Key PointsFor each of these companies' bull cases to manifest, specific things will have to go right.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T08:27:00Z",
+      "url": "https://www.nasdaq.com/articles/heres-what-10000-split-across-spacex-palantir-and-3-ai-chip-stocks-could-be-worth-2035"
+     },
+     {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -133947,13 +133977,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-17T13:05:00Z",
       "url": "https://www.nasdaq.com/articles/nasdaq-100s-6-best-stocks-year-and-whether-they-can-keep-going"
-     },
-     {
-      "titolo": "Taiwan Semiconductor Posts Record Q3 Results: Time to Buy the Dip?",
-      "riassunto": "With strong earnings momentum and a favorable growth outlook, TSM may be an attractive stock to consider following the recent market pullback.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T22:36:00Z",
-      "url": "https://www.nasdaq.com/articles/taiwan-semiconductor-posts-record-q3-results-time-buy-dip"
      }
     ],
     "BE": [
@@ -134002,6 +134025,13 @@
     ],
     "CRWV": [
      {
+      "titolo": "CoreWeave's 15% Bond Yield Is Not a Neocloud Problem. Here's Why I'm Buying Neocloud Stock Dips.",
+      "riassunto": "Key PointsCoreWeave's bond yields went up to 15%, which will make refinancing its debt more expensive, and its 0.46 current ratio means some of that refinancing will have to happen soon.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T08:16:00Z",
+      "url": "https://www.nasdaq.com/articles/coreweaves-15-bond-yield-not-neocloud-problem-heres-why-im-buying-neocloud-stock-dips"
+     },
+     {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
@@ -134035,13 +134065,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-16T21:29:33Z",
       "url": "https://www.nasdaq.com/articles/stocks-are-mixed-rotation-out-chipmakers-and-ai-stocks"
-     },
-     {
-      "titolo": "Why Is CoreWeave Stock Falling Today?",
-      "riassunto": "Key PointsCoreWeave&rsquo;s debt-insurance costs hit a record high on Thursday.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T17:21:01Z",
-      "url": "https://www.nasdaq.com/articles/why-coreweave-stock-falling-today"
      }
     ],
     "MRVL": [
@@ -134178,6 +134201,20 @@
     ],
     "NVDA": [
      {
+      "titolo": "Own VGT? Here's How Much of It Is Really Nvidia, Apple, Microsoft, and Broadcom.",
+      "riassunto": "Key PointsThe Vanguard Information Technology ETF (VGT) has delivered impressive annualized returns of 24.7% for the past 10 years, outperforming the high-flying Nasdaq-100 index.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T13:28:00Z",
+      "url": "https://www.nasdaq.com/articles/own-vgt-heres-how-much-it-really-nvidia-apple-microsoft-and-broadcom"
+     },
+     {
+      "titolo": "Breakfast News: The Sunday Edition",
+      "riassunto": "OCTOBER 18, 2026AGI Is Almost Ready. Is Your Portfolio?\nBy Meilin QuinnTeam Hidden Gems",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T11:50:00Z",
+      "url": "https://www.nasdaq.com/articles/breakfast-news-sunday-edition-4"
+     },
+     {
       "titolo": "Prediction: $1,000 Invested in Taiwan Semiconductor Today Will Be Worth This Much by 2030",
       "riassunto": "Key PointsTSMC is a leader in chip manufacturing, and the AI boom has driven tremendous growth.",
       "fonte": "Nasdaq",
@@ -134185,42 +134222,42 @@
       "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
      },
      {
+      "titolo": "Prediction: SpaceX Will Be the Biggest Winner If Neoclouds Collapse",
+      "riassunto": "Key PointsSpaceX looks well positioned to be the biggest winner in any neocloud collapse.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T08:20:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-spacex-will-be-biggest-winner-if-neoclouds-collapse"
+     },
+     {
+      "titolo": "Vanguard's Growth ETF Has Returned About 18% a Year for a Decade. I'd Plan on Much Less Through 2030.",
+      "riassunto": "Key PointsThe fund's three largest holdings were around 35% of its assets at the end of June.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T07:56:02Z",
+      "url": "https://www.nasdaq.com/articles/vanguards-growth-etf-has-returned-about-18-year-decade-id-plan-much-less-through-2030"
+     },
+     {
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
       "quando": "2026-10-18T01:22:47Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
-     },
-     {
-      "titolo": "35 Analysts Cover SpaceX. Here's Why Their Price Targets Have Almost Nothing to Do With Rockets.",
-      "riassunto": "Key PointsMorgan Stanley assigns less than 3% of its $300 SpaceX price target to external launches.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-18T00:50:00Z",
-      "url": "https://www.nasdaq.com/articles/35-analysts-cover-spacex-heres-why-their-price-targets-have-almost-nothing-do-rockets"
-     },
-     {
-      "titolo": "How Nvidia Could Make $150 Billion Look Small",
-      "riassunto": "In this episode of Motley Fool Hidden Gems Investing, Motley Fool contributors Tyler Crowe, Lou Whiteman, and Rachel Warren discuss:",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-18T00:21:01Z",
-      "url": "https://www.nasdaq.com/articles/how-nvidia-could-make-150-billion-look-small"
-     },
-     {
-      "titolo": "$3,000 Split Across Nvidia, Broadcom, and TSMC Could Be Worth This Much by 2030",
-      "riassunto": "Key PointsNvidia is the king of AI and set to see continued strong growth in the years ahead.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-18T00:20:00Z",
-      "url": "https://www.nasdaq.com/articles/3000-split-across-nvidia-broadcom-and-tsmc-could-be-worth-much-2030"
-     },
-     {
-      "titolo": "CoreWeave Is Projected to Have a 6.3x Gross Leverage Ratio by Year End. The Market Is Worried About the Neocloud's Balance Sheet.",
-      "riassunto": "Key PointsCoreWeave has 51 active data centers online, with many more planned.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T21:50:00Z",
-      "url": "https://www.nasdaq.com/articles/coreweave-projected-have-63x-gross-leverage-ratio-year-end-market-worried-about-neoclouds"
      }
     ],
     "PLTR": [
+     {
+      "titolo": "NASA to Buy a New Space Station. Price Tag: $34.1 Billion",
+      "riassunto": "Key PointsNASA has invited space companies to bid to build an International Space Station replacement.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T11:27:00Z",
+      "url": "https://www.nasdaq.com/articles/nasa-buy-new-space-station-price-tag-341-billion"
+     },
+     {
+      "titolo": "Here's What $10,000 Split Across SpaceX, Palantir, and 3 AI Chip Stocks Could Be Worth in 2035",
+      "riassunto": "Key PointsFor each of these companies' bull cases to manifest, specific things will have to go right.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T08:27:00Z",
+      "url": "https://www.nasdaq.com/articles/heres-what-10000-split-across-spacex-palantir-and-3-ai-chip-stocks-could-be-worth-2035"
+     },
      {
       "titolo": "Is Palantir Stock a Buy Right Now?",
       "riassunto": "Key PointsPalantir&rsquo;s stock has generated an 18-bagger gain since its public debut.",
@@ -134248,20 +134285,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-16T14:57:02Z",
       "url": "https://www.nasdaq.com/articles/palantir-stock-near-its-record-heres-price-which-id-buy-it"
-     },
-     {
-      "titolo": "5 Stock Ideas for Your Short List",
-      "riassunto": "Forget the AI stocks. These five stocks have momentum right now.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T14:57:00Z",
-      "url": "https://www.nasdaq.com/articles/5-stock-ideas-your-short-list"
-     },
-     {
-      "titolo": "Palantir's Potential Next Catalyst After Retail Profit-Taking",
-      "riassunto": "Are retail investors bailing on Palantir Technologies (NASDAQ: PLTR)? At least one group of shareholders was selling. In its August 2026 Schwab Trading Activity Index report, Charles Schwab reported that PLTR was one of several high-beta technology stocks that its clients net so",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-16T14:50:00Z",
-      "url": "https://www.nasdaq.com/articles/palantirs-potential-next-catalyst-after-retail-profit-taking"
      }
     ],
     "RGTI": [
@@ -134374,7 +134397,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-18T12:56:44Z"
+   "letto_il": "2026-10-18T16:43:44Z"
   }
  },
  "broker": null,
@@ -134387,6 +134410,13 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-18T09:30:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
+    },
+    {
+     "titolo": "Here's What $10,000 Split Across SpaceX, Palantir, and 3 AI Chip Stocks Could Be Worth in 2035",
+     "riassunto": "Key PointsFor each of these companies' bull cases to manifest, specific things will have to go right.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T08:27:00Z",
+     "url": "https://www.nasdaq.com/articles/heres-what-10000-split-across-spacex-palantir-and-3-ai-chip-stocks-could-be-worth-2035"
     },
     {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
@@ -134415,13 +134445,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-17T13:05:00Z",
      "url": "https://www.nasdaq.com/articles/nasdaq-100s-6-best-stocks-year-and-whether-they-can-keep-going"
-    },
-    {
-     "titolo": "Taiwan Semiconductor Posts Record Q3 Results: Time to Buy the Dip?",
-     "riassunto": "With strong earnings momentum and a favorable growth outlook, TSM may be an attractive stock to consider following the recent market pullback.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T22:36:00Z",
-     "url": "https://www.nasdaq.com/articles/taiwan-semiconductor-posts-record-q3-results-time-buy-dip"
     }
    ],
    "BE": [
@@ -134470,6 +134493,13 @@
    ],
    "CRWV": [
     {
+     "titolo": "CoreWeave's 15% Bond Yield Is Not a Neocloud Problem. Here's Why I'm Buying Neocloud Stock Dips.",
+     "riassunto": "Key PointsCoreWeave's bond yields went up to 15%, which will make refinancing its debt more expensive, and its 0.46 current ratio means some of that refinancing will have to happen soon.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T08:16:00Z",
+     "url": "https://www.nasdaq.com/articles/coreweaves-15-bond-yield-not-neocloud-problem-heres-why-im-buying-neocloud-stock-dips"
+    },
+    {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
@@ -134503,13 +134533,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-16T21:29:33Z",
      "url": "https://www.nasdaq.com/articles/stocks-are-mixed-rotation-out-chipmakers-and-ai-stocks"
-    },
-    {
-     "titolo": "Why Is CoreWeave Stock Falling Today?",
-     "riassunto": "Key PointsCoreWeave&rsquo;s debt-insurance costs hit a record high on Thursday.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T17:21:01Z",
-     "url": "https://www.nasdaq.com/articles/why-coreweave-stock-falling-today"
     }
    ],
    "MRVL": [
@@ -134646,6 +134669,20 @@
    ],
    "NVDA": [
     {
+     "titolo": "Own VGT? Here's How Much of It Is Really Nvidia, Apple, Microsoft, and Broadcom.",
+     "riassunto": "Key PointsThe Vanguard Information Technology ETF (VGT) has delivered impressive annualized returns of 24.7% for the past 10 years, outperforming the high-flying Nasdaq-100 index.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T13:28:00Z",
+     "url": "https://www.nasdaq.com/articles/own-vgt-heres-how-much-it-really-nvidia-apple-microsoft-and-broadcom"
+    },
+    {
+     "titolo": "Breakfast News: The Sunday Edition",
+     "riassunto": "OCTOBER 18, 2026AGI Is Almost Ready. Is Your Portfolio?\nBy Meilin QuinnTeam Hidden Gems",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T11:50:00Z",
+     "url": "https://www.nasdaq.com/articles/breakfast-news-sunday-edition-4"
+    },
+    {
      "titolo": "Prediction: $1,000 Invested in Taiwan Semiconductor Today Will Be Worth This Much by 2030",
      "riassunto": "Key PointsTSMC is a leader in chip manufacturing, and the AI boom has driven tremendous growth.",
      "fonte": "Nasdaq",
@@ -134653,42 +134690,42 @@
      "url": "https://www.nasdaq.com/articles/prediction-1000-invested-taiwan-semiconductor-today-will-be-worth-much-2030"
     },
     {
+     "titolo": "Prediction: SpaceX Will Be the Biggest Winner If Neoclouds Collapse",
+     "riassunto": "Key PointsSpaceX looks well positioned to be the biggest winner in any neocloud collapse.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T08:20:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-spacex-will-be-biggest-winner-if-neoclouds-collapse"
+    },
+    {
+     "titolo": "Vanguard's Growth ETF Has Returned About 18% a Year for a Decade. I'd Plan on Much Less Through 2030.",
+     "riassunto": "Key PointsThe fund's three largest holdings were around 35% of its assets at the end of June.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T07:56:02Z",
+     "url": "https://www.nasdaq.com/articles/vanguards-growth-etf-has-returned-about-18-year-decade-id-plan-much-less-through-2030"
+    },
+    {
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
      "quando": "2026-10-18T01:22:47Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
-    },
-    {
-     "titolo": "35 Analysts Cover SpaceX. Here's Why Their Price Targets Have Almost Nothing to Do With Rockets.",
-     "riassunto": "Key PointsMorgan Stanley assigns less than 3% of its $300 SpaceX price target to external launches.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-18T00:50:00Z",
-     "url": "https://www.nasdaq.com/articles/35-analysts-cover-spacex-heres-why-their-price-targets-have-almost-nothing-do-rockets"
-    },
-    {
-     "titolo": "How Nvidia Could Make $150 Billion Look Small",
-     "riassunto": "In this episode of Motley Fool Hidden Gems Investing, Motley Fool contributors Tyler Crowe, Lou Whiteman, and Rachel Warren discuss:",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-18T00:21:01Z",
-     "url": "https://www.nasdaq.com/articles/how-nvidia-could-make-150-billion-look-small"
-    },
-    {
-     "titolo": "$3,000 Split Across Nvidia, Broadcom, and TSMC Could Be Worth This Much by 2030",
-     "riassunto": "Key PointsNvidia is the king of AI and set to see continued strong growth in the years ahead.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-18T00:20:00Z",
-     "url": "https://www.nasdaq.com/articles/3000-split-across-nvidia-broadcom-and-tsmc-could-be-worth-much-2030"
-    },
-    {
-     "titolo": "CoreWeave Is Projected to Have a 6.3x Gross Leverage Ratio by Year End. The Market Is Worried About the Neocloud's Balance Sheet.",
-     "riassunto": "Key PointsCoreWeave has 51 active data centers online, with many more planned.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T21:50:00Z",
-     "url": "https://www.nasdaq.com/articles/coreweave-projected-have-63x-gross-leverage-ratio-year-end-market-worried-about-neoclouds"
     }
    ],
    "PLTR": [
+    {
+     "titolo": "NASA to Buy a New Space Station. Price Tag: $34.1 Billion",
+     "riassunto": "Key PointsNASA has invited space companies to bid to build an International Space Station replacement.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T11:27:00Z",
+     "url": "https://www.nasdaq.com/articles/nasa-buy-new-space-station-price-tag-341-billion"
+    },
+    {
+     "titolo": "Here's What $10,000 Split Across SpaceX, Palantir, and 3 AI Chip Stocks Could Be Worth in 2035",
+     "riassunto": "Key PointsFor each of these companies' bull cases to manifest, specific things will have to go right.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T08:27:00Z",
+     "url": "https://www.nasdaq.com/articles/heres-what-10000-split-across-spacex-palantir-and-3-ai-chip-stocks-could-be-worth-2035"
+    },
     {
      "titolo": "Is Palantir Stock a Buy Right Now?",
      "riassunto": "Key PointsPalantir&rsquo;s stock has generated an 18-bagger gain since its public debut.",
@@ -134716,20 +134753,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-16T14:57:02Z",
      "url": "https://www.nasdaq.com/articles/palantir-stock-near-its-record-heres-price-which-id-buy-it"
-    },
-    {
-     "titolo": "5 Stock Ideas for Your Short List",
-     "riassunto": "Forget the AI stocks. These five stocks have momentum right now.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T14:57:00Z",
-     "url": "https://www.nasdaq.com/articles/5-stock-ideas-your-short-list"
-    },
-    {
-     "titolo": "Palantir's Potential Next Catalyst After Retail Profit-Taking",
-     "riassunto": "Are retail investors bailing on Palantir Technologies (NASDAQ: PLTR)? At least one group of shareholders was selling. In its August 2026 Schwab Trading Activity Index report, Charles Schwab reported that PLTR was one of several high-beta technology stocks that its clients net so",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-16T14:50:00Z",
-     "url": "https://www.nasdaq.com/articles/palantirs-potential-next-catalyst-after-retail-profit-taking"
     }
    ],
    "RGTI": [
@@ -134842,7 +134865,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-18T12:56:44Z"
+  "letto_il": "2026-10-18T16:43:44Z"
  },
  "predictions": [
   {
@@ -134851,19 +134874,14 @@
    "link": "https://polymarket.com/event/will-the-tesla-roadsters-0-60-time-be-less-than-1-second"
   },
   {
-   "question": "Bitcoin Up or Down on October 18?",
-   "yes": 90,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-october-18-2026"
+   "question": "Will Bitcoin dip to $80,000 October 12-18?",
+   "yes": 26,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-80k-october-12-18-2026-from-october-15"
   },
   {
    "question": "Will Bitcoin reach $84,000 October 12-18?",
-   "yes": 4,
+   "yes": 2,
    "link": "https://polymarket.com/event/will-bitcoin-reach-84k-october-12-18-2026-from-october-14"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $80,000 on October 18?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-80k-on-october-18-2026"
   },
   {
    "question": "Will there be no change in Fed interest rates after the October 2026 meeting?",
@@ -201736,7 +201754,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 18,
-    "risk_sentiment": 36,
+    "risk_sentiment": 35,
     "credit": 77,
     "systemic_risk": 60,
     "corp_profit": 53,
@@ -201882,7 +201900,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 13 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -201950,6 +201968,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-18T12:56:44Z"
+  "generated_at": "2026-10-18T16:43:45Z"
  }
 }
