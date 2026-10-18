@@ -597,25 +597,12 @@
     "voci": []
    },
    "letto_il": "2026-10-18",
-   "linee_disponibili": {
-    "al": "2010-09-30",
-    "valore": 1250000000.0,
-    "valuta": "USD"
+   "stantii": {
+    "equo": "2016-05-06",
+    "linee_disponibili": "2010-11-08",
+    "scadenze": "2021-02-25"
    },
-   "scadenze": {
-    "al": "2020-12-31",
-    "depositato": "2021-02-25",
-    "forma": "10-K",
-    "valuta": "USD",
-    "voci": {
-     "anno_2": 1500000000.0,
-     "anno_3": 4250000000.0,
-     "anno_4": 1750000000.0,
-     "anno_5": 1750000000.0,
-     "entro_12_mesi": 2750000000.0,
-     "oltre_5": 18500000000.0
-    }
-   }
+   "versione": 502
   },
   "GOOGL": {
    "carta_commerciale": {
@@ -658,14 +645,10 @@
      "entro_12_mesi": 2000000000.0,
      "oltre_5": 36145000000.0
     }
-   }
+   },
+   "versione": 502
   },
   "GS": {
-   "carta_commerciale": {
-    "al": "2024-12-31",
-    "valore": 0.0,
-    "valuta": "USD"
-   },
    "cik": 886982,
    "deposito": {
     "accn": "0000886982-26-000297",
@@ -678,13 +661,17 @@
     "voci": []
    },
    "letto_il": "2026-10-18",
+   "stantii": {
+    "carta_commerciale": "2025-02-27"
+   },
    "tasso": {
     "al": "2026-06-30",
     "depositato": "2026-08-03",
     "forma": "10-Q",
     "valore_pct": 5.62,
     "voce": "DebtWeightedAverageInterestRate"
-   }
+   },
+   "versione": 502
   },
   "INTC": {
    "carta_commerciale": {
@@ -728,13 +715,10 @@
      "oltre_5": 31698000000.0
     }
    },
-   "tasso": {
-    "al": "2019-12-28",
-    "depositato": "2020-01-24",
-    "forma": "10-K",
-    "valore_pct": 3.42,
-    "voce": "DebtInstrumentInterestRateEffectivePercentage"
-   }
+   "stantii": {
+    "tasso": "2020-01-24"
+   },
+   "versione": 502
   },
   "JPM": {
    "cik": 19617,
