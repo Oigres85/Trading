@@ -6288,7 +6288,8 @@ _conto503 = [{"trim": "2026-06-30", "ricavi": 200, "operativo": 30}, {"trim": "2
 try:
     _ud503.conto_trimestrale = lambda t: _conto503
     _ud503.credito = lambda t: {"debito_corrente": 100, "ebit_ttm": 70, "trimestri": 4}
-    _ud503.combustione = lambda t, m, b: {"fcf_ttm": 69, "trimestri": 4, "liquidita": 250,
+    # v504: i flussi finiscono lo stesso giorno dei ricavi (cashflow_al), o i rapporti non si fanno
+    _ud503.combustione = lambda t, m, b: {"fcf_ttm": 69, "trimestri": 4, "liquidita": 250, "cashflow_al": "2026-06-30",
                                           "investimenti_immateriali_prevalenti": True, "quota_immateriali_pct": 99.9}
     _ud503.altman_voci = lambda t, c: (1, 2, 3, 4, 5, 6, None, None)
     _ud503.altman_zpp = lambda *a: {"altman_z": 0.5, "altman_x": [0.05, -0.2, 0.1, 0.3]}
@@ -6368,7 +6369,8 @@ _po503 = KO.posti("X", ["X", "Y", "Z", "W"], _dati503)
 check("v503 il posto del nome per ogni misura fra chi ha il dato (1 = il piu' alto), n.d. dove manca, chi NON e' letto "
       "fuori dal confronto, nessun punteggio d'insieme: " + " · ".join(_po503),
       _po503 == ["crescita dei ricavi sull'anno 2° su 3", "margine lordo 2° su 3", "margine operativo 12 mesi: n.d.",
-                 "cassa libera 12 mesi sui ricavi: n.d.", "Altman Z'' 1° su 2", "liquidita' sul debito a breve: n.d."])
+                 "flusso operativo 12 mesi sui ricavi: n.d.", "cassa libera 12 mesi sui ricavi: n.d.",
+                 "ciclo di cassa: n.d.", "Altman Z'' 1° su 2", "liquidita' sul debito a breve: n.d."])
 
 # --- la resa di una societa' ---
 _rr503 = KO.riga_salute({"tk": "MSTR", "stato": "letto", "letto_il": "2026-10-18", "trim": "2026-06-30",
@@ -6503,6 +6505,251 @@ check("v503 un trimestre di ritardo resta nel confronto (dichiarato), oltre uno 
       _pg503[0] == "crescita dei ricavi sull'anno 2° su 2" and _pv503[0] == "crescita dei ricavi sull'anno: n.d."
       and "fuori dal confronto perche' i loro conti sono indietro di oltre 1 trimestre (un altro periodo): V" in _rg503
       and "indietro di 3 trimestri" in _rg503 and "indietro di 1 trimestre" in _rg503)
+
+# ============================ v504 — LE DUE SOLIDITA': PATRIMONIALE (STATICA) E OPERATIVA (DALLA CASSA) ============================
+# Il CEO, 18/10/2026 sera: «Per i titoli tieni conto della differenza tra solidita' operativa da cash flow e solidita'
+# patrimoniale statica. Rendila strutturale. Questo mi fa capire la % di rischio sulla base del rendimento». Gli stati si
+# COSTRUISCONO (v425): tre societa' coi numeri misurati il 18/10 — una come Dell (Altman in pericolo, si autofinanzia),
+# una come SMCI (Altman in sicurezza, consuma cassa), una come CoreWeave (senza magazzino, fa cassa ma non copre gli
+# investimenti) — piu' i casi limite. La pipeline misura (update_data.solidita_operativa), qui si legge.
+_fp504 = {k: "2026-07-31" for k in ("utile_12m", "ricavi_12m", "var_magazzino_12m", "riacquisti_12m", "dividendi_12m")}
+_tr504 = {k: 4 for k in _fp504}
+_dell504 = {"ticker": "DELL", "sector": "Technology", "currency": "USD", "valuta_bilancio": "USD",
+            "stats": {"altman_z": 0.89, "altman_x": [-0.025, 0.079, 0.121, -0.011], "altman_al": "2026-07-31",
+                      "altman_base": "trimestrale: x", "market_cap": 287e9, "forward_pe": 15.0},
+            "combustione": {"ocf_ttm": 12.15e9, "fcf_ttm": 8.56e9, "trimestri": 4, "patrimonio": -1.43e9,
+                            "valuta": "USD", "liquidita": 11.57e9},
+            "credito": {"debito_corrente": 8.5e9},
+            "solidita": {"bilancio_al": "2026-07-31",
+                         "giorni": {"al": "2026-07-31", "crediti": 45, "magazzino": 52, "fornitori": 122, "ciclo": -25},
+                         "giorni_anno_prima": {"al": "2025-07-31", "crediti": 46, "magazzino": 27, "fornitori": 103,
+                                               "ciclo": -30},
+                         "ocf_ultimo_trim": 2.225e9, "ocf_ultimo_al": "2026-07-31", "utile_12m": 11.38e9,
+                         "ricavi_12m": 151.2e9, "var_magazzino_12m": -14.31e9, "riacquisti_12m": -9.11e9,
+                         "dividendi_12m": -1.57e9, "trimestri": dict(_tr504), "fine_periodo": dict(_fp504),
+                         "utili_non_distribuiti": 10.065e9, "azioni_proprie": 20.01e9, "valuta": "USD"}}
+_fps504 = {k: "2026-06-30" for k in ("utile_12m", "ricavi_12m", "var_magazzino_12m")}
+_smci504 = {"ticker": "SMCI", "sector": "Technology", "currency": "USD", "valuta_bilancio": "USD",
+            "stats": {"altman_z": 6.77, "altman_x": [0.687, 0.189, 0.100, 0.936], "altman_al": "2026-06-30",
+                      "altman_base": "trimestrale: x", "market_cap": 20.78e9, "forward_pe": 5.94},
+            "combustione": {"ocf_ttm": -6.81e9, "fcf_ttm": -6.97e9, "trimestri": 4, "patrimonio": 14.48e9,
+                            "valuta": "USD", "liquidita": 7.52e9},
+            "credito": {"debito_corrente": 2.0e9},
+            "solidita": {"bilancio_al": "2026-06-30",
+                         "giorni": {"al": "2026-06-30", "crediti": 50, "magazzino": 128, "fornitori": 22, "ciclo": 156},
+                         "giorni_anno_prima": {"al": "2025-06-30", "crediti": 35, "magazzino": 82, "fornitori": 22,
+                                               "ciclo": 95},
+                         "ocf_ultimo_trim": 0.747e9, "ocf_ultimo_al": "2026-06-30", "utile_12m": 2.23e9,
+                         "ricavi_12m": 39.06e9, "var_magazzino_12m": -8.88e9,
+                         "trimestri": {k: 4 for k in _fps504}, "fine_periodo": dict(_fps504),
+                         "utili_non_distribuiti": 5.65e9, "valuta": "USD"}}
+_crwv504 = {"ticker": "CRWV", "sector": "Technology", "currency": "USD", "valuta_bilancio": "USD",
+            "stats": {"altman_z": -1.07, "altman_x": [-0.148, -0.05, -0.001, 0.12], "market_cap": 36e9,
+                      "forward_pe": -20.0},
+            "combustione": {"ocf_ttm": 6.9e9, "fcf_ttm": -14.6e9, "trimestri": 4, "valuta": "USD"},
+            "solidita": {"bilancio_al": "2026-06-30",
+                         "giorni": {"al": "2026-06-30", "crediti": 90, "magazzino": None, "fornitori": 377,
+                                    "ciclo": None, "motivo": "senza_magazzino"},
+                         "ocf_ultimo_trim": 0.679e9, "ocf_ultimo_al": "2026-06-30", "utile_12m": -1.93e9,
+                         "ricavi_12m": 7.57e9, "trimestri": {"utile_12m": 4, "ricavi_12m": 4},
+                         "fine_periodo": {"utile_12m": "2026-06-30", "ricavi_12m": "2026-06-30"}, "valuta": "USD"}}
+_aD504, _aS504, _aC504 = CR.altman_rischio(_dell504), CR.altman_rischio(_smci504), CR.altman_rischio(_crwv504)
+
+check("v504 lo stato OPERATIVO viene dai SEGNI dei flussi dei 12 mesi, senza soglie: consuma cassa (operativo negativo), "
+      "si autofinanzia (operativo e libera positivi), fa cassa ma non copre gli investimenti (operativo positivo, libera "
+      "negativa); tre trimestri non fanno 12 mesi, e senza cassa libera non si dice",
+      CR.stato_operativo({"ocf_ttm": -1, "fcf_ttm": -2, "trimestri": 4}) == CR.OPERATIVA_CONSUMA
+      and CR.stato_operativo({"ocf_ttm": 5, "fcf_ttm": 1, "trimestri": 4}) == CR.OPERATIVA_AUTOFINANZIA
+      and CR.stato_operativo({"ocf_ttm": 5, "fcf_ttm": 0, "trimestri": 4}) == CR.OPERATIVA_AUTOFINANZIA
+      and CR.stato_operativo({"ocf_ttm": 5, "fcf_ttm": -1, "trimestri": 4}) == CR.OPERATIVA_NON_COPRE
+      and CR.stato_operativo({"ocf_ttm": 5, "fcf_ttm": 1, "trimestri": 3}) is None
+      and CR.stato_operativo({"ocf_ttm": 5, "trimestri": 4}) is None and CR.stato_operativo(None) is None
+      and CR.stato_operativo({"ocf_ttm": -1, "trimestri": 4}) == CR.OPERATIVA_CONSUMA)
+check("v504 lo stato PATRIMONIALE segue le zone di Altman (sicurezza FORTE, grigia INTERMEDIA, pericolo DEBOLE); senza "
+      "un punteggio non c'e'",
+      CR.stato_patrimoniale(_aS504) == "FORTE" and CR.stato_patrimoniale(_aD504) == "DEBOLE"
+      and CR.stato_patrimoniale({"stato": "ok", "zona": "GRIGIA"}) == "INTERMEDIA"
+      and CR.stato_patrimoniale({"stato": "n.d."}) is None and CR.stato_patrimoniale(None) is None)
+_combo504 = {(p, o): CR.divergenza_solidita(p, o) for p in ("FORTE", "INTERMEDIA", "DEBOLE", None)
+             for o in (CR.OPERATIVA_AUTOFINANZIA, CR.OPERATIVA_NON_COPRE, CR.OPERATIVA_CONSUMA, None)}
+check("v504 le solidita' DIVERGONO solo in due casi su sedici: bilancio forte che consuma cassa, bilancio debole che si "
+      "autofinanzia — e ciascuno dice cosa vuol dire: " + str([k for k, v in _combo504.items() if v]),
+      sorted(k for k, v in _combo504.items() if v) == sorted([("FORTE", CR.OPERATIVA_CONSUMA),
+                                                               ("DEBOLE", CR.OPERATIVA_AUTOFINANZIA)])
+      and "non e' l'insolvenza" in _combo504[("FORTE", CR.OPERATIVA_CONSUMA)]
+      and "struttura del bilancio" in _combo504[("DEBOLE", CR.OPERATIVA_AUTOFINANZIA)])
+
+# --- da dove viene un circolante negativo, e da dove viene un patrimonio negativo ---
+_lenovo504 = {"giorni": {"al": "2025-09-30", "crediti": 55, "magazzino": 45, "fornitori": 85, "ciclo": 15}}
+_cfD504 = CR.circolante_dai_fornitori(_aD504, _dell504["solidita"])
+_cfL504 = CR.circolante_dai_fornitori(_aD504, _lenovo504)
+check("v504 un capitale circolante negativo che NASCE dal ciclo di cassa (Dell: -25 giorni) e' credito dei fornitori, e "
+      "la riga lo dice coi tre pezzi; con il ciclo positivo (Lenovo: +15) NON viene dai fornitori, e lo dice; in zona di "
+      "sicurezza, con il circolante positivo o senza ciclo non si dice niente: " + str([_cfD504, _cfL504]),
+      (_cfD504 or {}).get("dai_fornitori") is True and "-25 giorni" in _cfD504["testo"]
+      and "i fornitori sono pagati in 122" in _cfD504["testo"] and "i clienti pagano in 45" in _cfD504["testo"]
+      and (_cfL504 or {}).get("dai_fornitori") is False and "NON nasce dal ciclo di cassa (+15" in _cfL504["testo"]
+      and CR.circolante_dai_fornitori({**_aS504, "x": [-0.05, 0.3, 0.2, 0.5]},
+                                      {"giorni": {"al": "2026-06-30", "crediti": 30, "magazzino": 20, "fornitori": 90,
+                                                  "ciclo": -40}}) is None
+      and CR.circolante_dai_fornitori({**_aD504, "x": [0.01, 0.1, 0.1, 0.1]}, _dell504["solidita"]) is None
+      and CR.circolante_dai_fornitori(_aD504, {"giorni": {"motivo": "senza_magazzino"}}) is None
+      and CR.circolante_dai_fornitori(_aD504, None) is None)
+_pnD504 = CR.patrimonio_negativo(_aD504, _dell504["combustione"], _dell504["solidita"])
+_soltsy504 = {k: v for k, v in _dell504["solidita"].items() if k != "azioni_proprie"}
+check("v504 un patrimonio netto negativo con utili non distribuiti POSITIVI non viene da perdite (Dell: le azioni proprie "
+      "valgono 20,0 mld), senza azioni proprie nella fonte viene da altre voci, con utili negativi almeno in parte da "
+      "perdite, senza utili non si legge; con il patrimonio positivo o in sicurezza non si dice: " + str(_pnD504),
+      "NEGATIVO (-1,4 mld USD)" in str(_pnD504) and "non viene da perdite" in str(_pnD504)
+      and "le azioni proprie riacquistate valgono 20,0 mld USD" in str(_pnD504)
+      and "altre voci del patrimonio" in str(CR.patrimonio_negativo(_aD504, _dell504["combustione"], _soltsy504))
+      and "perdite accumulate" in str(CR.patrimonio_negativo(_aD504, None, {"utili_non_distribuiti": -5e9}))
+      and "non si legge" in str(CR.patrimonio_negativo(_aD504, None, {}))
+      and CR.patrimonio_negativo({**_aD504, "x": [-0.025, 0.079, 0.121, 0.2]}, None, _dell504["solidita"]) is None
+      and CR.patrimonio_negativo({**_aS504, "x": [0.1, 0.1, 0.1, -0.2]}, None, _dell504["solidita"]) is None)
+_raD504 = CR.riga_altman(_aD504, _dell504["solidita"], _dell504["combustione"])
+check("v504 la riga di Altman dice da dove vengono il circolante e il patrimonio negativi quando ha la solidita' "
+      "operativa; senza, resta quella di prima (chi la chiamava senza argomenti non cambia): " + _raD504,
+      "capitale circolante NEGATIVO che nasce dal ciclo di cassa" in _raD504 and "non viene da perdite" in _raD504
+      and CR.riga_altman(_aD504) == _raD504.split(" · capitale circolante NEGATIVO")[0]
+      and "circolante NEGATIVO" not in CR.riga_altman(_aD504))
+
+# --- il rendimento del prezzo: accanto al rischio, mai fuso ---
+_skhy504 = {**_dell504, "valuta_bilancio": "KRW", "currency": "USD", "stats": {**_dell504["stats"], "cross_currency": True}}
+check("v504 il rendimento del prezzo di oggi: la cassa libera sulla capitalizzazione SOLO nella stessa valuta (SKHY: "
+      "bilancio in won, prezzo in dollari → n.d., due unita' diverse), l'utile atteso sul prezzo come inverso del P/E "
+      "prospettico, e un utile atteso negativo detto per quello che e': " + str(CR.rendimento_prezzo(_dell504)),
+      "cassa libera 12 mesi +3,0% della capitalizzazione" in str(CR.rendimento_prezzo(_dell504))
+      and "utile atteso 6,7% del prezzo" in str(CR.rendimento_prezzo(_dell504))
+      and "n.d. (bilancio in KRW, prezzo in USD" in str(CR.rendimento_prezzo(_skhy504))
+      and "% della capitalizzazione" not in str(CR.rendimento_prezzo(_skhy504))
+      and "utile atteso NEGATIVO" in str(CR.rendimento_prezzo(_crwv504))
+      and "cassa libera 12 mesi -33,5% della capitalizzazione" in str(CR.rendimento_prezzo(_smci504))
+      and CR.rendimento_prezzo({"stats": {}, "combustione": {}}) is None)
+
+# --- la riga che le mette accanto, e la cassa dell'attivita' ---
+_rsD504, _rsS504, _rsC504 = CR.riga_solidita(_dell504), CR.riga_solidita(_smci504), CR.riga_solidita(_crwv504)
+check("v504 la riga delle due solidita': Dell DEBOLE e SI AUTOFINANZIA → DIVERGONO; SMCI FORTE e CONSUMA CASSA → "
+      "DIVERGONO; CoreWeave DEBOLE e FA CASSA MA NON COPRE → concordano, nessun avviso; il rischio storico e il "
+      "rendimento accanto; un intermediario finanziario non si legge: " + _rsS504,
+      "PATRIMONIALE (il bilancio a una data): DEBOLE" in _rsD504 and "SI AUTOFINANZIA — flusso operativo +8,0% dei ricavi"
+      in _rsD504 and "DIVERGONO" in _rsD504 and "27,9% a 5 anni" in _rsD504 and "rendimento del prezzo di oggi" in _rsD504
+      and "FORTE" in _rsS504 and "CONSUMA CASSA — flusso operativo -17,4% dei ricavi" in _rsS504 and "DIVERGONO" in _rsS504
+      and "TRASCURABILE (0,40% a 10 anni)" in _rsS504
+      and "FA CASSA MA NON COPRE GLI INVESTIMENTI" in _rsC504 and "DIVERGONO" not in _rsC504
+      and "non significativa" in CR.riga_solidita({**_dell504, "sector": "Financial Services"}))
+_caS504, _caD504, _caC504 = (CR.riga_cassa_attivita(_smci504), CR.riga_cassa_attivita(_dell504),
+                             CR.riga_cassa_attivita(_crwv504))
+check("v504 la cassa dell'attivita': l'utile che NON diventa cassa (SMCI), il ciclo coi tre pezzi e un anno prima, il "
+      "magazzino che assorbe, l'ultimo trimestre col suo giorno; Dell col flusso 1,07 volte l'utile, il ciclo negativo e "
+      "agli azionisti il 125% della cassa libera; CoreWeave senza magazzino e con l'utile negativo: " + _caS504,
+      "utile netto 12 mesi 2,2 mld USD: NON e' diventato cassa" in _caS504
+      and "ciclo di cassa 156 giorni al 30/06/2026 (crediti 50 + magazzino 128 - fornitori 22)" in _caS504
+      and "un anno prima 95 giorni (al 30/06/2025)" in _caS504 and "il magazzino ha assorbito 8,9 mld USD" in _caS504
+      and "ultimo trimestre 747,0 mln USD (al 30/06/2026)" in _caS504 and "(-17,4% dei ricavi)" in _caS504
+      and "ne vale 1,07 volte" in _caD504 and "NEGATIVO: i clienti pagano prima che si paghino i fornitori" in _caD504
+      and "agli azionisti in 12 mesi 10,7 mld USD (riacquisti 9,1 mld USD, dividendi pagati 1,6 mld USD) = 125% della "
+          "cassa libera" in _caD504
+      and "non si calcola senza un magazzino materiale" in _caC504 and "i clienti pagano in 90 giorni" in _caC504
+      and "negativo, il confronto col flusso non si legge" in _caC504)
+_dis504 = {**_dell504, "solidita": {**_dell504["solidita"],
+                                    "fine_periodo": {**_fp504, "utile_12m": "2026-04-30", "ricavi_12m": "2026-04-30"},
+                                    "trimestri": {**_tr504, "dividendi_12m": 2}}}
+_caX504 = CR.riga_cassa_attivita(_dis504)
+check("v504 flusso, ricavi e utile si confrontano SOLO se finiscono lo stesso giorno (la fonte puo' essere indietro col "
+      "conto e non coi flussi): periodi diversi → niente rapporto, e la riga lo dice; una voce su due trimestri non fa "
+      "12 mesi; senza la solidita' della pipeline (snapshot precedente) lo dice: " + _caX504,
+      CR.ocf_su_ricavi(_dis504) is None and "periodi diversi, il confronto non si fa" in _caX504
+      and "ne vale" not in _caX504 and "% dei ricavi" not in _caX504
+      and "dividendi pagati: la fonte porta 2 trimestri, non 12 mesi" in _caX504
+      and "(snapshot precedente alla v504)" in CR.riga_cassa_attivita({**_dell504, "solidita": None})
+      and abs(CR.ocf_su_ricavi(_dell504) - 12.15 / 151.2 * 100) < 1e-9)
+_sgD504, _sgS504, _sgC504 = CR.segnali(_dell504), CR.segnali(_smci504), CR.segnali(_crwv504)
+check("v504 i segnali in testa al blocco: Altman in pericolo con l'attivita' che si autofinanzia lo dice nella stessa "
+      "condizione; il bilancio in sicurezza che consuma cassa e' una condizione nuova; dove concordano nessun 'ma'; sono "
+      "CONDIZIONI, non eventi (il brief delle due letture non le porta): " + str([_sgD504, _sgS504]),
+      any("ma l'attivita' SI AUTOFINANZIA (flusso operativo +8,0% dei ricavi in 12 mesi)" in t for _, t in _sgD504)
+      and any("bilancio in zona di SICUREZZA (Altman 6,77) ma l'attivita' CONSUMA CASSA (flusso operativo -17,4%" in t
+              for _, t in _sgS504)
+      and any("Altman in zona di PERICOLO" in t for _, t in _sgC504) and not any(" ma " in t for _, t in _sgC504)
+      and all(tipo == "condizione" for tipo, _ in _sgD504 + _sgS504 + _sgC504))
+_rcD504 = SP.righe_credito(_dell504)
+check("v504 collegamento ESEGUITO (v483): le schede mettono la riga delle due solidita' in testa al blocco del nome, "
+      "passano la solidita' operativa alla riga di Altman (senza, il circolante non si spiega) e chiudono con la cassa "
+      "dell'attivita': " + str([x[:40] for x in _rcD504]),
+      _rcD504[0].startswith("solidita': PATRIMONIALE") and any(x.startswith("Altman Z''") and
+                                                               "nasce dal ciclo di cassa" in x for x in _rcD504)
+      and _rcD504[-1].startswith("cassa dell'attivita' (solidita' operativa)"))
+
+# --- il confronto coi concorrenti: due misure in piu', e il ciclo dove piu' basso e' meglio ---
+_dc504 = {"X": {"stato": "letto", "ciclo": 156, "ocf_12m_pct": -17.4},
+          "Y": {"stato": "letto", "ciclo": -25, "ocf_12m_pct": 8.0},
+          "Z": {"stato": "letto", "ciclo": 20, "ocf_12m_pct": 16.0}}
+check("v504 il posto per misura: per il ciclo di cassa 1 = il PIU' BASSO (meno giorni fra fornitori pagati e clienti "
+      "incassati), per il flusso operativo il piu' alto: " + " · ".join(KO.posti("X", ["X", "Y", "Z"], _dc504)),
+      "ciclo di cassa 3° su 3" in KO.posti("X", ["X", "Y", "Z"], _dc504)
+      and "ciclo di cassa 1° su 3" in KO.posti("Y", ["X", "Y", "Z"], _dc504)
+      and "flusso operativo 12 mesi sui ricavi 3° su 3" in KO.posti("X", ["X", "Y", "Z"], _dc504)
+      and KO.PIU_BASSO_MEGLIO == ("ciclo",))
+check("v504 la resa delle misure nuove: il ciclo negativo dice chi finanzia, senza magazzino non si calcola, flussi e "
+      "ricavi su periodi diversi non si confrontano; Altman dice da dove viene il circolante",
+      KO._misura_txt("ciclo", -25, {}) == "-25 giorni (i fornitori finanziano l'attivita')"
+      and KO._misura_txt("ciclo", 156, {}) == "156 giorni"
+      and KO._misura_txt("ciclo", None, {"senza_magazzino": True}).startswith("non si calcola")
+      and "periodi diversi" in KO._misura_txt("ocf_12m_pct", None, {"periodi_diversi": {"ricavi": "2026-03-31",
+                                                                                      "flussi": "2026-06-30"}})
+      and "periodi diversi" in KO._misura_txt("fcf_12m_pct", None, {"periodi_diversi": {"ricavi": "2026-03-31",
+                                                                                      "flussi": "2026-06-30"}})
+      and "nasce dal ciclo di cassa" in KO._misura_txt("altman_z", 0.89, {"altman_zona": "PERICOLO", "altman_rating": "B",
+                                                                          "altman_circolante_fornitori": True})
+      and "NON nasce" in KO._misura_txt("altman_z", 0.74, {"altman_zona": "PERICOLO", "altman_rating": "B",
+                                                           "altman_circolante_fornitori": False}))
+_orig504 = {k: getattr(_ud503, k) for k in _nomi_ud503 + ("solidita_operativa",)}
+try:
+    _ud503.conto_trimestrale = lambda t: _conto503
+    _ud503.credito = lambda t: {"debito_corrente": 100, "ebit_ttm": 70, "trimestri": 4}
+    _ud503.combustione = lambda t, m, b: {"ocf_ttm": 80, "fcf_ttm": 69, "trimestri": 4, "liquidita": 250}
+    _ud503.altman_voci = lambda t, c: (1, 2, 3, 4, 5, 6, None, None)
+    _ud503.altman_zpp = lambda *a: {"altman_z": 0.5, "altman_x": [-0.05, 0.2, 0.1, 0.3]}
+    _ud503.solidita_operativa = lambda t, c: {"ocf_ultimo_al": "2026-06-30",
+                                              "giorni": {"al": "2026-06-30", "crediti": 45, "magazzino": 52,
+                                                         "fornitori": 122, "ciclo": -25}}
+    _so504 = KO.salute("TSO", ticker=_T503(), oggi="2026-10-18")
+    _ud503.solidita_operativa = lambda t, c: {"ocf_ultimo_al": "2026-09-30",
+                                              "giorni": {"al": "2026-06-30", "motivo": "senza_magazzino"}}
+    _sx504 = KO.salute("TSX", ticker=_T503(), oggi="2026-10-18")
+finally:
+    for _k504, _v504 in _orig504.items():
+        setattr(_ud503, _k504, _v504)
+check("v504 la salute di ogni concorrente porta flusso operativo sui ricavi e ciclo di cassa con le funzioni della "
+      "pipeline, e Altman dice se il circolante nasce dai fornitori; quando flussi e ricavi finiscono in trimestri "
+      "diversi i due rapporti NON si fanno — vale anche per la cassa libera della v503 — e il perche' resta: "
+      + str([_so504, _sx504]),
+      _so504.get("ocf_12m_pct") == round(80 / 690 * 100, 1) and _so504.get("fcf_12m_pct") == round(69 / 690 * 100, 1)
+      and _so504.get("ciclo") == -25 and _so504.get("ciclo_al") == "2026-06-30"
+      and _so504.get("altman_circolante_fornitori") is True and _so504.get("versione") == KO.VERSIONE == 504
+      and "ocf_12m_pct" not in _sx504 and "fcf_12m_pct" not in _sx504 and _sx504.get("senza_magazzino") is True
+      and _sx504.get("periodi_diversi") == {"ricavi": "2026-06-30", "flussi": "2026-09-30"})
+
+# --- le regole stanno in un posto: le convenzioni rilette da LIBRO.md, e il formato le chiama ---
+_lib504 = (_RADICE_AL if "_RADICE_AL" in dir() else Path(__file__).resolve().parent.parent).joinpath(
+    "memoria", "LIBRO.md").read_text(encoding="utf-8")
+_sez504 = _lib504.split("**Le due solidità — patrimoniale e operativa**")[1].split("\n## ")[0] \
+    if "**Le due solidità — patrimoniale e operativa**" in _lib504 else ""
+_gt504 = re.search(r"×\s+\*\*(\d+,\d+)\*\*\s+giorni", _sez504)
+_mg504 = re.search(r"magazzino di almeno\s+\*\*(\d+)\*\*\s+giorni", _sez504)
+check("v504 le convenzioni rilette da LIBRO.md §1novies coincidono con quelle del codice: i giorni del trimestre (91,25), "
+      "il magazzino materiale (5 giorni), i tre stati operativi coi loro nomi: "
+      + str([_gt504 and _gt504.group(1), _mg504 and _mg504.group(1)]),
+      bool(_gt504 and _mg504) and float(_gt504.group(1).replace(",", ".")) == UD.GIORNI_TRIMESTRE
+      and float(_mg504.group(1)) == UD.MAGAZZINO_MATERIALE_GIORNI
+      and all(f"**{s}**" in _sez504 for s in (CR.OPERATIVA_AUTOFINANZIA, CR.OPERATIVA_NON_COPRE, CR.OPERATIVA_CONSUMA))
+      and all(f"**{s}**" in _sez504 for s in ("FORTE", "INTERMEDIA", "DEBOLE")))
+_fmt504 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v504 il formato dell'analisi chiama le due solidita' (le righe delle schede, la regola di lettura, il registro "
+      "delle richieste rese strutturali) e il confronto coi concorrenti porta il ciclo di cassa",
+      "la riga **solidità**" in _fmt504 and "**cassa dell'attività**" in _fmt504 and "**Le due solidità**" in _fmt504
+      and "le due solidità di ogni nome" in _fmt504 and "ciclo di cassa (v504)" in _fmt504)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

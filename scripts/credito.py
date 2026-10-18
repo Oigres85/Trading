@@ -166,6 +166,7 @@ def altman_rischio(r):
             v, i = min(contr)
             out["debole"] = {"termine": TERMINI_ALTMAN[i], "rapporto": x[i], "contributo": v}
         out["ebit_attivo"] = x[2]
+        out["x"] = list(x)          # v504 — i quattro termini: circolante e patrimonio si spiegano anche se non sono i piu' deboli
     if riga:
         cum = MORTALITA[riga]
         out["pd"] = {1: cum[0], 3: cum[2], 5: cum[4], 10: cum[9]}
@@ -184,9 +185,64 @@ def utili_negativi_penalizzano(a):
                 and ((a or {}).get("ebit_attivo") or 0) > 0 and (a or {}).get("zona") != "SICUREZZA")
 
 
-def riga_altman(a):
+def circolante_dai_fornitori(a, sol):
+    """v504 — il capitale circolante NEGATIVO fuori dalla zona di sicurezza: nasce dal ciclo di cassa o no?
+    Il CEO, 18/10/2026, su Dell e Lenovo: «riescono a farsi pagare dai clienti prima di dover pagare i fornitori … un
+    capitale circolante che abbassa … lo Z-Score, ma che nella realta' dimostra un grande potere contrattuale». Vero quando
+    il CICLO di cassa e' negativo (Dell, misurato: -25 giorni), e allora il termine X1 dello Z'' penalizza un
+    finanziamento dei fornitori; falso quando il ciclo e' positivo (Lenovo, sui conti della fonte al 30/09/2025: +15
+    giorni) — il circolante negativo viene da altre passivita' a breve, e la riga lo dice invece di generalizzare.
+    {dai_fornitori, testo} oppure None (circolante non negativo, zona di sicurezza, ciclo che non si calcola)."""
+    if not a or a.get("stato") != "ok" or a.get("zona") == "SICUREZZA":
+        return None
+    x = a.get("x") or []
+    if len(x) != 4 or x[0] is None or x[0] >= 0:
+        return None
+    g = (sol or {}).get("giorni") or {}
+    if g.get("ciclo") is None:
+        return None
+    if g["ciclo"] < 0:
+        return {"dai_fornitori": True,
+                "testo": (f"capitale circolante NEGATIVO che nasce dal ciclo di cassa ({g['ciclo']} giorni al "
+                          f"{_data(g.get('al'))}: i clienti pagano in {g['crediti']}, il magazzino gira in "
+                          f"{g['magazzino']}, i fornitori sono pagati in {g['fornitori']}) — e' credito dei fornitori, "
+                          "cioe' potere contrattuale finche' i volumi tengono: se le vendite calano si restituisce, e "
+                          "diventa un'uscita di cassa")}
+    return {"dai_fornitori": False,
+            "testo": (f"capitale circolante NEGATIVO che NON nasce dal ciclo di cassa (+{g['ciclo']} giorni al "
+                      f"{_data(g.get('al'))}): viene da altre passivita' a breve — debito in scadenza, anticipi, fondi: la "
+                      "fonte non dice quali")}
+
+
+def patrimonio_negativo(a, comb=None, sol=None):
+    """v504 — il patrimonio netto contabile NEGATIVO fuori dalla zona di sicurezza: viene da perdite o no? Lo dicono
+    gli utili non distribuiti e le azioni proprie, nelle voci della fonte. Dell (misurato il 18/10/2026): patrimonio
+    -1,4 mld con utili non distribuiti +10,1 mld e azioni proprie per 20,0 mld — viene dai riacquisti. Il termine X4
+    dello Z'' lo legge come debolezza. Testo, o None."""
+    if not a or a.get("stato") != "ok" or a.get("zona") == "SICUREZZA":
+        return None
+    x = a.get("x") or []
+    if len(x) != 4 or x[3] is None or x[3] >= 0:
+        return None
+    val = (comb or {}).get("valuta") or (sol or {}).get("valuta")
+    pat = (comb or {}).get("patrimonio")
+    s = "patrimonio netto contabile NEGATIVO" + (f" ({_importo(pat, val)})" if pat is not None and pat < 0 else "")
+    re_, tsy = (sol or {}).get("utili_non_distribuiti"), (sol or {}).get("azioni_proprie")
+    if re_ is None:
+        return s + ": la fonte non porta gli utili non distribuiti, e da dove venga non si legge"
+    if re_ > 0:
+        s += f" con utili non distribuiti positivi ({_importo(re_, val)}): non viene da perdite"
+        if tsy and tsy > 0:
+            return s + f" — le azioni proprie riacquistate valgono {_importo(tsy, val)}"
+        return (s + " — viene da altre voci del patrimonio (azioni riacquistate e annullate, distribuzioni, operazioni "
+                "sul capitale: la fonte non dice quale)")
+    return s + f" con utili non distribuiti negativi ({_importo(re_, val)}): almeno in parte viene da perdite accumulate"
+
+
+def riga_altman(a, sol=None, comb=None):
     """Lo Z'' in UNA riga: zona, base e data del bilancio, rating equivalente, frequenze storiche per orizzonte, la
-    finestra in cui il rischio si concentra, il termine piu' debole."""
+    finestra in cui il rischio si concentra, il termine piu' debole — e, v504, da dove vengono un circolante o un
+    patrimonio negativi (sol: la solidita' operativa della pipeline; comb: la combustione)."""
     if not a:
         return "Altman: n.d."
     if a["stato"] != "ok":
@@ -222,6 +278,14 @@ def riga_altman(a):
         if utili_negativi_penalizzano(a):
             s += (" — utili non distribuiti NEGATIVI con un EBIT positivo: vengono da perdite accumulate in passato o da "
                   "riacquisti di azioni (la fonte non dice quale), e il punteggio penalizza piu' del credito di oggi")
+    cf = circolante_dai_fornitori(a, sol)
+    if cf:
+        s += " · " + cf["testo"]
+    # senza la solidita' della pipeline (uno snapshot precedente, o chi chiama senza) non si dice niente: «la fonte non
+    #   porta gli utili» sarebbe falso — non e' la fonte a mancare, e' la lettura
+    pn = patrimonio_negativo(a, comb, sol) if sol else None
+    if pn:
+        s += " · " + pn
     return s
 
 
@@ -462,6 +526,222 @@ def riga_debito(r, x=None, liquidita=None, esteri=(), versione=None):
     return "debito: " + " · ".join(pz)
 
 
+# ═══ v504 — LE DUE SOLIDITA' ═══════════════════════════════════════════════════════════════════
+# Il CEO, 18/10/2026: «Per i titoli tieni conto della differenza tra solidita' operativa da cash flow e solidita'
+# patrimoniale statica. Rendila strutturale. Questo mi fa capire la % di rischio sulla base del rendimento e se questo
+# rapporto ne vale la pena». Due domande diverse:
+#   PATRIMONIALE (statica) — il bilancio, a una data, regge un colpo? Altman (zona e frequenza storica d'insolvenza del
+#     rating equivalente) e la liquidita' contro il debito a breve: la v501;
+#   OPERATIVA (dinamica) — l'attivita' produce cassa? Il flusso operativo e la cassa libera dei 12 mesi (combustione),
+#     il flusso dell'ultimo trimestre, se l'utile diventa cassa, il ciclo di cassa e il magazzino (update_data,
+#     solidita_operativa).
+# Lo stato OPERATIVO viene dai SEGNI dei flussi, senza soglie da sostenere (v240); il PATRIMONIALE dalle zone di Altman.
+# Nessun punteggio d'insieme (v200): le due solidita', il rischio storico e il rendimento del prezzo stanno ACCANTO, e
+# il giudizio — se il rapporto ne vale la pena — e' di chi legge.
+OPERATIVA_AUTOFINANZIA = "SI AUTOFINANZIA"
+OPERATIVA_NON_COPRE = "FA CASSA MA NON COPRE GLI INVESTIMENTI"
+OPERATIVA_CONSUMA = "CONSUMA CASSA"
+PATRIMONIALE = {"SICUREZZA": "FORTE", "GRIGIA": "INTERMEDIA", "PERICOLO": "DEBOLE"}
+
+
+def stato_operativo(comb):
+    """La solidita' OPERATIVA dai segni dei flussi di 12 mesi della combustione: flusso operativo negativo = CONSUMA
+    CASSA; positivo con la cassa libera positiva = SI AUTOFINANZIA; positivo con la cassa libera negativa = FA CASSA MA
+    NON COPRE GLI INVESTIMENTI (per crescere dipende dal mercato dei capitali, v404). None senza quattro trimestri: tre
+    non fanno 12 mesi."""
+    c = comb or {}
+    ocf = c.get("ocf_ttm")
+    if ocf is None or c.get("trimestri") != 4:
+        return None
+    if ocf < 0:
+        return OPERATIVA_CONSUMA
+    fcf = c.get("fcf_ttm")
+    if fcf is None:
+        return None
+    return OPERATIVA_AUTOFINANZIA if fcf >= 0 else OPERATIVA_NON_COPRE
+
+
+def stato_patrimoniale(a):
+    return PATRIMONIALE.get((a or {}).get("zona")) if (a or {}).get("stato") == "ok" else None
+
+
+def divergenza_solidita(pat, op):
+    """Le due combinazioni in cui le solidita' dicono cose opposte: il testo, o None."""
+    if pat == "FORTE" and op == OPERATIVA_CONSUMA:
+        return ("il bilancio regge un colpo e l'attivita' non fa cassa: il rischio non e' l'insolvenza, e' la cassa che "
+                "serve per andare avanti — chi la mette (debito, azioni nuove) e a che prezzo")
+    if pat == "DEBOLE" and op == OPERATIVA_AUTOFINANZIA:
+        return ("il punteggio di Altman e' basso e l'attivita' si autofinanzia: lo tiene giu' la struttura del bilancio "
+                "(nella riga di Altman: il termine piu' debole e da dove viene), non la cassa — la frequenza storica "
+                "d'insolvenza del rating equivalente descrive le societa' con quel punteggio, e va letta con questo")
+    return None
+
+
+def alla_pari(sol, chiave):
+    """La voce dei 12 mesi finisce lo stesso giorno del flusso operativo (la fine della sua finestra): solo allora si
+    confrontano. La fonte puo' essere indietro col conto e non coi flussi (AMZN il 18/10/2026), e un rapporto fra due
+    periodi diversi non e' un rapporto (v207)."""
+    s = sol or {}
+    f = (s.get("fine_periodo") or {}).get(chiave)
+    return bool(f and s.get("ocf_ultimo_al") and str(f)[:10] == str(s["ocf_ultimo_al"])[:10]
+                and (s.get("trimestri") or {}).get(chiave) == 4)
+
+
+def ocf_su_ricavi(r):
+    """Il flusso operativo dei 12 mesi sui ricavi dei 12 mesi, in %: una derivazione sola per la riga, la cassa e i
+    segnali (v161). None senza quattro trimestri di tutti e due, o se i due periodi non finiscono lo stesso giorno."""
+    c, s = (r or {}).get("combustione") or {}, (r or {}).get("solidita") or {}
+    ric = s.get("ricavi_12m") if alla_pari(s, "ricavi_12m") else None
+    if c.get("ocf_ttm") is None or c.get("trimestri") != 4 or not ric or ric <= 0:
+        return None
+    return c["ocf_ttm"] / ric * 100
+
+
+def _rischio_storico(a):
+    """La frequenza storica d'insolvenza del rating equivalente, con la STESSA resa della riga di Altman (v415)."""
+    pd = (a or {}).get("pd")
+    if not pd:
+        return None
+    if pd[10] < TRASCURABILE:
+        return f"insolvenza storica del rating equivalente TRASCURABILE ({_n(pd[10], 2)}% a 10 anni)"
+    return f"insolvenza storica del rating equivalente {_n(pd[5], 1)}% a 5 anni"
+
+
+def rendimento_prezzo(r):
+    """Quanto rende il PREZZO di oggi — non quanto rendera' l'azione: la cassa libera dei 12 mesi sulla
+    capitalizzazione, solo se bilancio e prezzo sono nella stessa valuta (v404: SKHY pubblica il bilancio in won), e
+    l'utile atteso sul prezzo (l'inverso del P/E prospettico). None se nessuno dei due si calcola."""
+    st, comb = (r or {}).get("stats") or {}, (r or {}).get("combustione") or {}
+    pz = []
+    mc = st.get("market_cap")
+    if comb.get("fcf_ttm") is not None and comb.get("trimestri") == 4 and mc and mc > 0:
+        vb, vq = (r or {}).get("valuta_bilancio"), (r or {}).get("currency")
+        if st.get("cross_currency") or (vb and vq and vb != vq):
+            pz.append(f"cassa libera sulla capitalizzazione n.d. (bilancio in {vb or 'altra valuta'}, prezzo in "
+                      f"{vq or 'altra valuta'}: due unita' diverse)")
+        else:
+            pz.append(f"cassa libera 12 mesi {_sg(comb['fcf_ttm'] / mc * 100, 1)}% della capitalizzazione")
+    fpe = st.get("forward_pe")
+    if isinstance(fpe, (int, float)):
+        pz.append(f"utile atteso {_n(100.0 / fpe, 1)}% del prezzo (l'inverso del P/E prospettico)" if fpe > 0 else
+                  "utile atteso NEGATIVO: nessun rendimento da utili")
+    return ("rendimento del prezzo di oggi: " + " · ".join(pz)) if pz else None
+
+
+def riga_solidita(r, a=None):
+    """Le due solidita' in UNA riga, col rischio storico e il rendimento del prezzo accanto — mai fusi (v200)."""
+    if escluso(r):
+        return "solidita': lettura non significativa per un intermediario finanziario (il debito e' il mestiere)"
+    a = a if a is not None else altman_rischio(r)
+    pat, op = stato_patrimoniale(a), stato_operativo((r or {}).get("combustione"))
+    pz = []
+    if pat:
+        p = f"PATRIMONIALE (il bilancio a una data): {pat} — Altman in zona di {a['zona']}"
+        rs = _rischio_storico(a)
+        pz.append(p + (f", {rs}" if rs else ""))
+    else:
+        pz.append("PATRIMONIALE: n.d. — " + ((a or {}).get("perche") or "Altman non calcolabile"))
+    if op:
+        o = f"OPERATIVA (la cassa dell'attivita' in 12 mesi): {op}"
+        pc = ocf_su_ricavi(r)
+        pz.append(o + (f" — flusso operativo {_sg(pc, 1)}% dei ricavi" if pc is not None else ""))
+    else:
+        pz.append("OPERATIVA: n.d. — la fonte non porta quattro trimestri di flussi (tre non fanno 12 mesi)")
+    rp = rendimento_prezzo(r)
+    if rp:
+        pz.append(rp)
+    s = "solidita': " + " · ".join(pz)
+    d = divergenza_solidita(pat, op)
+    return s + (f" → ⚠ DIVERGONO: {d}" if d else "")
+
+
+def _testo_ciclo(g, al_bilancio=None):
+    if not g:
+        return "ciclo di cassa: n.d. — la pipeline non lo porta per questo nome (snapshot precedente alla v504)"
+    if g.get("ciclo") is not None:
+        s = (f"ciclo di cassa {g['ciclo']} giorni al {_data(g.get('al'))} (crediti {g['crediti']} + magazzino "
+             f"{g['magazzino']} - fornitori {g['fornitori']})")
+        if g["ciclo"] < 0:
+            s += " — NEGATIVO: i clienti pagano prima che si paghino i fornitori"
+        if al_bilancio and str(g.get("al")) != str(al_bilancio)[:10]:
+            s += (f" ⚠ al {_data(g.get('al'))} e non al {_data(al_bilancio)}: il conto della fonte non ha il trimestre "
+                  "dell'ultimo stato patrimoniale")
+        return s
+    if g.get("motivo") == "senza_magazzino":
+        s = ("ciclo di cassa: non si calcola senza un magazzino materiale (i debiti verso fornitori di chi vende servizi "
+             "sono in gran parte per gli investimenti)")
+        return s + (f" · i clienti pagano in {g['crediti']} giorni" if g.get("crediti") is not None else "")
+    return "ciclo di cassa: n.d. — la fonte non porta tutte le voci (crediti, magazzino, fornitori, ricavi, costo del venduto)"
+
+
+def riga_cassa_attivita(r):
+    """La solidita' OPERATIVA nel dettaglio: il flusso dei 12 mesi sui ricavi e dell'ultimo trimestre (il verso di
+    oggi), se l'utile diventa cassa, il ciclo di cassa contro un anno prima, il magazzino, quanto va agli azionisti.
+    Importi nella valuta di bilancio, mai confrontati fra titoli (v404)."""
+    if escluso(r):
+        return None
+    comb, sol = (r or {}).get("combustione") or {}, (r or {}).get("solidita") or {}
+    if not comb and not sol:
+        return "cassa dell'attivita': n.d. — la pipeline non porta i flussi di questo nome"
+    val = sol.get("valuta") or comb.get("valuta")
+    n = sol.get("trimestri") or {}
+    pz = []
+    ocf, quattro = comb.get("ocf_ttm"), comb.get("trimestri") == 4
+    if ocf is not None and quattro:
+        pc = ocf_su_ricavi(r)
+        pz.append(f"flusso operativo 12 mesi {_importo(ocf, val)}" + (f" ({_sg(pc, 1)}% dei ricavi)" if pc is not None else ""))
+    elif ocf is not None:
+        pz.append(f"flusso operativo su {comb.get('trimestri')} trimestri {_importo(ocf, val)} (non sono 12 mesi)")
+    if sol.get("ocf_ultimo_trim") is not None:
+        pz.append(f"ultimo trimestre {_importo(sol['ocf_ultimo_trim'], val)} (al {_data(sol.get('ocf_ultimo_al'))})")
+    ut = sol.get("utile_12m") if alla_pari(sol, "utile_12m") else None
+    if sol.get("utile_12m") is not None and ut is None and n.get("utile_12m") == 4 and ocf is not None:
+        pz.append(f"utile netto 12 mesi fino al {_data((sol.get('fine_periodo') or {}).get('utile_12m'))}, flusso fino "
+                  f"al {_data(sol.get('ocf_ultimo_al'))}: periodi diversi, il confronto non si fa")
+    if ut is not None and ocf is not None and quattro:
+        if ut > 0 and ocf >= 0:
+            pz.append(f"utile netto 12 mesi {_importo(ut, val)}: il flusso operativo ne vale {_n(ocf / ut, 2)} volte")
+        elif ut > 0:
+            pz.append(f"utile netto 12 mesi {_importo(ut, val)}: NON e' diventato cassa")
+        else:
+            pz.append(f"utile netto 12 mesi {_importo(ut, val)}: negativo, il confronto col flusso non si legge")
+    if "giorni" in sol or "bilancio_al" in sol:
+        t = _testo_ciclo(sol.get("giorni"), sol.get("bilancio_al"))
+        g1 = sol.get("giorni_anno_prima") or {}
+        if (sol.get("giorni") or {}).get("ciclo") is not None and g1.get("ciclo") is not None:
+            t += f", un anno prima {g1['ciclo']} giorni (al {_data(g1.get('al'))})"
+        pz.append(t)
+    else:
+        pz.append(_testo_ciclo(None))
+    vm = sol.get("var_magazzino_12m") if n.get("var_magazzino_12m") == 4 else None
+    if vm is not None and vm < 0:
+        pz.append(f"il magazzino ha assorbito {_importo(-vm, val)} di cassa in 12 mesi")
+    elif vm is not None and vm > 0:
+        pz.append(f"il magazzino ha liberato {_importo(vm, val)} di cassa in 12 mesi")
+    parti, tot = [], 0.0
+    for chiave, nome in (("riacquisti_12m", "riacquisti"), ("dividendi_12m", "dividendi pagati")):
+        x = sol.get(chiave)
+        if x is None:
+            continue
+        if n.get(chiave) != 4:
+            parti.append(f"{nome}: la fonte porta {n.get(chiave)} trimestri, non 12 mesi")
+            continue
+        if x < 0:
+            parti.append(f"{nome} {_importo(-x, val)}")
+            tot += -x
+    if tot > 0:
+        s = f"agli azionisti in 12 mesi {_importo(tot, val)} ({', '.join(parti)})"
+        fcf = comb.get("fcf_ttm")
+        if fcf is not None and quattro and fcf > 0:
+            s += f" = {_n(tot / fcf * 100, 0)}% della cassa libera"
+        elif fcf is not None and quattro:
+            s += " con la cassa libera negativa: li pagano il debito o la liquidita'"
+        pz.append(s)
+    elif parti:
+        pz.append("agli azionisti: " + ", ".join(parti))
+    return "cassa dell'attivita' (solidita' operativa): " + " · ".join(pz)
+
+
 # ═══ SEGNALI ══════════════════════════════════════════════════════════════════════════════════
 def segnali(r, x=None, liquidita=None):
     """I segnali di un nome per la sintesi in testa al blocco: [(tipo, testo)]. EVENTI (si muovono coi prezzi):
@@ -481,9 +761,21 @@ def segnali(r, x=None, liquidita=None):
                                           f"il titolo {_sg(az['titolo_pct'])}% contro {az.get('mercato')} "
                                           f"{_sg(az['mercato_pct'])}%"))
     a = altman_rischio(r)
+    op = stato_operativo((r or {}).get("combustione"))
+    pc = ocf_su_ricavi(r)
     if a and a.get("stato") == "ok" and a["zona"] == "PERICOLO":
         out.append(("condizione", f"Altman in zona di PERICOLO (Z'' {_n(a['z'], 2)}, rating equivalente {a['bre']}"
-                                  + (f", {_n(a['pd'][5], 1)}% a 5 anni" if a.get("pd") else "") + ")"))
+                                  + (f", {_n(a['pd'][5], 1)}% a 5 anni" if a.get("pd") else "") + ")"
+                                  # v504 — la stessa condizione letta con la cassa: le due solidita' divergono
+                                  + (" — ma l'attivita' SI AUTOFINANZIA"
+                                     + (f" (flusso operativo {_sg(pc, 1)}% dei ricavi in 12 mesi)" if pc is not None else "")
+                                     + ": lo tiene giu' la struttura del bilancio, non la cassa"
+                                     if op == OPERATIVA_AUTOFINANZIA else "")))
+    # v504 — il caso opposto, che nessuna condizione vedeva: il bilancio in sicurezza e l'attivita' che brucia cassa
+    if stato_patrimoniale(a) == "FORTE" and op == OPERATIVA_CONSUMA:
+        out.append(("condizione", f"bilancio in zona di SICUREZZA (Altman {_n(a['z'], 2)}) ma l'attivita' CONSUMA CASSA"
+                                  + (f" (flusso operativo {_sg(pc, 1)}% dei ricavi in 12 mesi)" if pc is not None else "")
+                                  + ": il rischio e' la cassa per andare avanti, non l'insolvenza"))
     if not escluso(r):
         corr = ((r or {}).get("credito") or {}).get("debito_corrente")
         liq = (liquidita or (None,))[0]
@@ -514,6 +806,15 @@ def riferimento_credito(macro):
           "riacquista molte azioni ha utili non distribuiti bassi o negativi e un patrimonio piccolo, e il punteggio lo "
           "penalizza piu' del suo credito reale; per gli intermediari finanziari non si applica. Un'azione puo' perdere "
           "molto anche senza insolvenza (aumenti di capitale, diluizione)",
+          "SOLIDITA' (v504, richiesta del CEO del 18/10/2026): PATRIMONIALE = il bilancio a una data (Altman, liquidita' "
+          "contro il debito a breve); OPERATIVA = la cassa che l'attivita' produce in 12 mesi, dai SEGNI dei flussi: SI "
+          "AUTOFINANZIA (flusso operativo e cassa libera positivi) · FA CASSA MA NON COPRE GLI INVESTIMENTI (operativo "
+          "positivo, libera negativa: per crescere dipende dal mercato dei capitali) · CONSUMA CASSA (operativo "
+          "negativo). Possono dire cose opposte, e la riga lo dice. Il ciclo di cassa (crediti + magazzino - fornitori, "
+          "in giorni del trimestre) si calcola solo con un magazzino materiale; negativo = i fornitori finanziano "
+          "l'attivita'. Accanto, il RENDIMENTO DEL PREZZO di oggi (cassa libera sulla capitalizzazione, utile atteso sul "
+          "prezzo): non e' quanto rendera' l'azione, e un titolo growth rende poco oggi per costruzione, perche' il "
+          "prezzo paga la crescita. Rischio e rendimento stanno accanto, mai fusi in un punteggio",
           "obbligazioni sul secondario (rendimenti, asset swap spread, Z-spread): NON disponibili gratis in forma "
           "automatizzabile — TRACE di FINRA le ha, ma l'API vuole credenziali e il dato di fine giornata un contratto; il "
           "sito di FINRA le mostra per la consultazione (finra.org, Fixed Income Data). Al loro posto: il CDS dove esiste, "

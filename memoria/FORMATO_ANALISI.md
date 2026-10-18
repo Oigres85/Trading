@@ -61,6 +61,13 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    quota a 12 mesi contro la liquidità, costo approssimato, copertura degli oneri e, dai 10-Q e 10-K, scadenze per
    anno, tasso medio, valore di mercato del debito, linee di credito, derivati sui tassi (regole in `LIBRO.md`
    §1novies). Rendimenti delle obbligazioni, asset swap spread e Z-spread non sono disponibili gratis: si dice.
+   Da v504 (CEO, 18/10 sera: *"tieni conto della differenza tra solidità operativa da cash flow e solidità
+   patrimoniale statica. Rendila strutturale"*) in testa al blocco di ogni nome la riga **solidità**: PATRIMONIALE (il
+   bilancio a una data: Altman) e OPERATIVA (la cassa dell'attività in 12 mesi, dai segni dei flussi: si autofinanzia ·
+   fa cassa ma non copre gli investimenti · consuma cassa), col rischio storico e il **rendimento del prezzo** accanto,
+   e quando le due dicono cose opposte lo scrive; poi la riga **cassa dell'attività** (flusso operativo dei 12 mesi e
+   dell'ultimo trimestre, se l'utile diventa cassa, il ciclo di cassa contro un anno prima, il magazzino, quanto va
+   agli azionisti), e nella riga di Altman da dove vengono un circolante o un patrimonio negativi.
    Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
    misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
    NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
@@ -128,8 +135,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    `memoria/concorrenti.json` (mercato dichiarato, misura, periodo, fonte, link, data: una quota senza il suo mercato
    non si legge; una STIMA di analisti si dice tale; dove una quota pubblica verificabile non esiste, si dice), e la
    **salute a confronto** misurata con le funzioni della pipeline, uguali per il nome e per ogni concorrente: crescita
-   dei ricavi sullo stesso trimestre dell'anno prima, margine lordo, margine operativo e cassa libera degli ultimi 4
-   trimestri, Altman Z'' con zona e rating equivalente, liquidità sul debito a breve — solo rapporti, e per ogni
+   dei ricavi sullo stesso trimestre dell'anno prima, margine lordo, margine operativo, flusso operativo e cassa libera
+   degli ultimi 4 trimestri, ciclo di cassa (v504), Altman Z'' con zona e rating equivalente, liquidità sul debito a
+   breve — solo rapporti, e per ogni
    misura il posto del nome nel gruppo, senza punteggio. Le letture stanno in `memoria/concorrenti_dati.json` e si
    rifanno dopo 7 giorni, 15 per giro; una quota oltre 120 giorni dalla pubblicazione si dichiara da riverificare.
    I conti trimestrali di una società possono fermarsi prima del trimestre che la stessa fonte dichiara chiuso
@@ -213,6 +221,17 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    per i nomi in posizione o con un ingresso possibile anche Altman con la sua finestra temporale, detto per ciò che
    è (frequenza storica delle obbligazioni con quel rating, non una previsione) e la quota del debito a 12 mesi
    contro la liquidità. È INFORMAZIONE: non una prova della tenuta (il CDS del mese lo è già), non un colore.
+   **Le due solidità** (v504, CEO, 18/10 sera: *"Questo mi fa capire la % di rischio sulla base del rendimento e se
+   questo rapporto ne vale la pena"*): per i nomi in posizione o con un ingresso possibile si dicono SEPARATE — la
+   patrimoniale risponde «il bilancio regge un colpo?», l'operativa «l'attività fa cassa?» — con accanto il rischio
+   storico (Altman) e il rendimento del prezzo, mai fusi in un giudizio numerico. Quando divergono è la prima cosa da
+   dire: un bilancio forte che brucia cassa (SMCI il 18/10) sposta il rischio dall'insolvenza alla cassa per andare
+   avanti — debito o azioni nuove —; un punteggio di Altman basso con l'attività che si autofinanzia (Dell, HPE) si
+   legge col termine che lo tiene giù — un circolante negativo nato dal ciclo di cassa è credito dei fornitori, un
+   patrimonio negativo con utili positivi viene dai riacquisti — e la frequenza storica del rating equivalente si dice
+   con questa riserva. L'utile atteso sul prezzo di un ciclico (le memorie) è più alto proprio vicino al picco del
+   ciclo: si dice. Se il rapporto ne valga la pena lo argomenta la risposta, con le misure accanto; la decisione resta
+   del CEO. È INFORMAZIONE: non una prova della tenuta, non un colore.
 5bis. **Posizionamento** (v496, CEO, 17/10) — dal blocco di `posizionamento.py`: il put/call di mercato col
    suo percentile (alto = domanda di protezione: convenzione del mestiere, non una misura); le scadenze delle opzioni
    — una mensile o una trimestrale («tre streghe») entro cinque giorni si dice in cima alla sezione, perché alla
@@ -241,7 +260,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    posizione: il mercato, la quota del nome e dei concorrenti con la fonte e la data (e se la quota è vecchia, che va
    riverificata), poi chi è più sano su ogni misura — crescita, margini, cassa libera, Altman, liquidità sul debito a
    breve. La risposta distingue le due domande: **quanto mercato** (la quota) e **quanto è solida** (la salute), che
-   possono dire cose opposte — SMCI ha la metà della quota di Dell e il bilancio più solido del gruppo. È
+   possono dire cose opposte — SMCI ha la metà della quota di Dell e il bilancio più solido del gruppo. Da v504 la
+   salute ha due facce anche qui: la patrimoniale (Altman, liquidità) e l'operativa (flusso operativo, cassa libera,
+   ciclo di cassa) — il 18/10 SMCI era prima del gruppo per bilancio e ultima per cassa. È
    INFORMAZIONE: nessuna prova della tenuta, nessun colore, nessuna vendita. Un nome senza registro si nomina.
 6. **Tenuta e piano** (decisioni del CEO del 14/10/2026, regola in `memoria/LIBRO.md` §1sexies:
    *si lascia correre, si vende per EVIDENZA, e si valuta l'insieme — non la sola tecnica*) — dal
@@ -400,7 +421,9 @@ informazione (18/10) · la salute del credito di ogni nome — CDS con rincaro i
 dal titolo, Altman con la frequenza storica d'insolvenza per orizzonte, il debito dai bilanci depositati — e gli
 eventi del CDS nel brief delle due letture del giorno (18/10) · i concorrenti e le quote di mercato di ogni posizione
 con fonte e data, e la salute di ciascuno misurata con le stesse formule — e per i sorvegliati che diventano un
-ingresso, prima dell'ingresso (18/10 sera).
+ingresso, prima dell'ingresso (18/10 sera) · le due solidità di ogni nome — patrimoniale (il bilancio a una data) e
+operativa (la cassa dell'attività) — col rischio storico e il rendimento del prezzo accanto, da dove vengono un
+circolante o un patrimonio negativi, e il ciclo di cassa anche nel confronto coi concorrenti (18/10 sera).
 Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
 
 ## Regole

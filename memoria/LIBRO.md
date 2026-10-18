@@ -146,6 +146,7 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | JPM | JPMorgan Chase — banca universale (CEO, 14/10/2026). Trimestrale del 13/10 sotto le attese (utile rettificato per azione 5,75 $ contro 5,93). Sotto la SMA50 (~349), sopra la SMA200 (~322); supporto 20 sedute 325,07. Correlazione col libro ~0,25: diversifica. Con GS ~0,6: in buona parte la stessa scommessa, uno dei due |
 | BLK | BlackRock — gestione patrimoniale (CEO, 15/10/2026). Trimestrale del 14/10 sopra le attese: utile per azione rettificato 15,93 $ contro un consenso fra 14,24 e 14,40 secondo le fonti di stima (10,57 secondo i principi contabili, depresso da una rettifica non monetaria su acquisizioni passate), ricavi +19% sull'anno, 205 miliardi di afflussi netti nel trimestre, patrimonio gestito 15.500 miliardi. Il 14/10 ha aperto a +2,1%, toccato 1.106 e chiuso a 1.073,79 (+0,7%) su volumi al 90° percentile dell'anno: ha restituito gran parte del rialzo. Sotto la SMA50 (~1.107), sopra la SMA200 (~1.061); supporto 20 sedute 1.040,42. Correlazione col libro ~0,17: diversifica. Con GS ~0,5 e JPM ~0,6: in buona parte la stessa scommessa finanziaria. Fra i mandati il comunicato cita i finanziamenti agli hyperscaler: un canale verso il tema AI che la correlazione di oggi non mostra |
 | LLY | Eli Lilly — farmaci per obesita' e diabete (CEO, 17/10/2026). Il 16/10 a 1.257,03: -2,8% dal massimo storico (1.292,65 del 19/08), +9,1% in un mese ma con la media dei volumi a 20 sedute al 5° percentile dell'anno, cioe' un rialzo con poca partecipazione. La spinta del 14-15/10 sono i dati di Foundayo (il GLP-1 orale) e il posizionamento prima dei conti; il 30/09 la combinazione con eloralintide aveva dato il 23% di calo del peso ma piu' abbandoni per effetti collaterali, e il titolo era sceso. Sopra la zona d'ingresso: tirato, non si insegue. Pavimenti 1.163,50 (1 tocco) e 1.131-1.134 (2 tocchi, l'ultimo l'08/10). Correlazione col libro ~-0,37 e con QQQ ~-0,30 (60 sedute), beta sull'S&P 500 0,25: diversifica davvero. Con ABBV, AMGN e PFE ~0,6, con MRK e GILD ~0,4-0,5: dentro il farmaceutico e' in buona parte la stessa scommessa |
+| DELL | Dell Technologies — server e PC, concorrente diretto di SMCI (CEO, 18/10/2026). Il 14-15/10 −17% in due sedute dopo il declassamento di Barclays (da Overweight a Equal Weight, obiettivo da 603 a 574: le valutazioni dell'hardware sono salite più delle prove di spesa AI delle imprese, e i ricavi li gonfia il prezzo delle memorie); conti del 01/09 sopra le attese (EPS 6,76 contro 4,72 secondo Nasdaq), ricavi +58% sull'anno. Il 16/10 a 451,71: −24% dal massimo del 18/09 (595,51), doppio massimo 595 confermato sotto il collo 520,18, struttura rotta al ribasso, sotto il VWAP dai conti (532,79). Pavimenti 421,89–424,00 (2 tocchi, l'ultimo il 01/09; stop 390,07) e 368,14–378,66. Correlazione col libro ~0,64: stessa scommessa, non diversifica. Il CDS compensato a ICE è su Dell Inc, la controllata operativa. Trimestrale 24/11 |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
@@ -470,7 +471,24 @@ non si lascia scadere). Una riga per decisione nella forma «- TICKER — cosa s
 `numeri_libro.py` la riporta a ogni analisi con la prima trimestrale del nome dichiarata dalla
 fonte (v483). La riga esce quando la decisione si prende.
 
-(nessuna: la media di CRWV, rimandata ai conti il 14/10, il CEO l'ha fatta lo stesso giorno — vedi sotto)
+- CRWV — l'uscita: il CEO esce solo almeno in pari, cioè a un prezzo non sotto il carico di §1, e non alleggerisce sui rimbalzi; il conflitto si decide ai conti (18/10/2026)
+- ORCL — l'ingresso sui pavimenti (il 17/10: 121,23 e 114,50): per ora il CEO attende, e gli ordini, quando li inserirà, saranno giornalieri (18/10/2026)
+
+⚠ **18/10/2026 — le tre risposte del CEO al piano del 17/10**, testuali: *"1 no · 2 esco solo almeno in pari · 3 per
+ora attendo"*, poi *"1no · 2 in attesa · 3giornalieri"*.
+1. **SMCI — nessuno stop che sale col prezzo.** La proposta del 17/10 — spostare lo stop sotto ogni nuovo minimo più
+   alto, come regola speciale contro quella del 15/10 («non si vende sui ribassi») — è **respinta**: SMCI segue le regole
+   di tutti, la tenuta per evidenza (§1sexies), e lo stop del pavimento su cui è entrata resta un campanello (§1quater,
+   regola 3), non un'uscita. ⚠ SMCI non è fra i semiconduttori del salvavita (§1ter): è un produttore di server, e il
+   gradino del −30% non la tocca.
+2. **CRWV — si esce solo almeno in pari, e si aspetta.** Nessun alleggerimento sui rimbalzi sotto il carico; il
+   conflitto (§1sexies) si decide ai conti, con l'esame scritto prima. Il 16/10 (chiusura 61,39) servivano +41,8% per
+   tornare al carico. ⚠ Se ai conti la tenuta dicesse VENDITA PER EVIDENZA, questa regola direbbe di non uscire sotto il
+   carico: le due cose si portano al CEO insieme, non si risolvono da sole — come una decisione aperta che la tenuta
+   contraddice (§1sexies).
+3. **ORCL — per ora nessun ordine.** Quando il CEO li inserirà saranno **giornalieri**. Un ordine entra in §1septies solo
+   quando è sul conto: uno non inserito non blocca liquidità.
+La media di CRWV, rimandata ai conti il 14/10, il CEO l'ha fatta lo stesso giorno (vedi sopra).
 
 **Esami dei conflitti** (§1sexies, decisione del CEO del 14/10/2026). Una riga per nome in
 CONFLITTO nella forma «- TICKER — conti del AAAA-MM-GG · tenere se … · mediare se … · vendere se …»,
@@ -762,6 +780,41 @@ Le soglie sono **convenzioni del 18/10/2026** (v240), stanno in `scripts/credito
 - **Dove esce**: il blocco SALUTE DEL CREDITO di `schede_progetto.py` (segnali in testa, poi nome per nome) e gli
   EVENTI del CDS nel brief delle due letture del giorno; le condizioni di bilancio restano nell'analisi, perché
   cambiano coi trimestri e un avviso che suona tutte le mattine non avvisa.
+
+**Le due solidità — patrimoniale e operativa** (decisione del CEO del 18/10/2026 sera, v504), testuale: *"Per i titoli
+tieni conto della differenza tra solidità operativa da cash flow e solidità patrimoniale statica. Rendila strutturale.
+Questo mi fa capire la % di rischio sulla base del rendimento e se questo rapporto ne vale la pena"*. Due domande
+diverse, che possono dire cose opposte:
+- **PATRIMONIALE** (statica: il bilancio a una data regge un colpo?) — la zona di Altman qui sopra: **FORTE** in zona
+  di sicurezza, **INTERMEDIA** in zona grigia, **DEBOLE** in zona di pericolo; accanto la liquidità contro il debito a
+  breve.
+- **OPERATIVA** (dinamica: l'attività produce cassa?) — dai **segni** dei flussi dei 12 mesi, senza soglie:
+  **SI AUTOFINANZIA** (flusso operativo e cassa libera positivi) · **FA CASSA MA NON COPRE GLI INVESTIMENTI** (flusso
+  operativo positivo, cassa libera negativa: per crescere dipende dal mercato dei capitali, §1ter) · **CONSUMA CASSA**
+  (flusso operativo negativo). Accanto: il flusso dell'ultimo trimestre (il verso di oggi), se l'utile diventa cassa, il
+  **ciclo di cassa** contro un anno prima, quanto ha assorbito il magazzino, quanto è andato agli azionisti.
+- **Il ciclo di cassa** = giorni di crediti + giorni di magazzino − giorni di fornitori, sulle voci di FINE trimestre
+  divise per il conto dello stesso trimestre (ricavi per i crediti, costo del venduto per magazzino e fornitori) ×
+  **91,25** giorni — convenzione: i libri di testo usano le medie di inizio e fine periodo. Si calcola solo con un
+  magazzino di almeno **5** giorni del costo del venduto: per chi vende servizi i debiti verso fornitori sono in gran
+  parte per gli investimenti (CRWV: 377 «giorni»). **Negativo** = i clienti pagano prima che si paghino i fornitori: è
+  credito dei fornitori, potere contrattuale finché i volumi tengono — se le vendite calano si restituisce.
+- **Altman legge come debolezza anche scelte di finanza**, e la sua riga dice da dove vengono: un **capitale
+  circolante negativo** nato dal ciclo di cassa (Dell il 18/10: −25 giorni) o da altre passività a breve (Lenovo, sui
+  conti della fonte al 30/09/2025: +15 giorni); un **patrimonio netto negativo** con utili non distribuiti positivi non
+  viene da perdite (Dell: −1,4 mld di patrimonio, +10,1 mld di utili, 20,0 mld di azioni proprie riacquistate).
+- **Rischio contro rendimento, accanto e mai fusi** (v200): la frequenza storica d'insolvenza del rating equivalente e
+  il **rendimento del prezzo di oggi** — la cassa libera dei 12 mesi sulla capitalizzazione (solo se bilancio e prezzo
+  sono nella stessa valuta) e l'utile atteso sul prezzo (l'inverso del P/E prospettico). Non è quanto renderà
+  l'azione: un titolo growth rende poco oggi per costruzione, perché il prezzo paga la crescita, e l'utile atteso di un
+  ciclico è più alto proprio vicino al picco del ciclo. Se il rapporto ne valga la pena lo giudica chi legge.
+- **Misurato il 18/10/2026 prima di scriverlo** (yfinance): SMCI — patrimoniale FORTE (Altman 6,77) e operativa che
+  CONSUMA CASSA (−6,8 mld in 12 mesi, −17,4% dei ricavi; +0,7 mld nell'ultimo trimestre), ciclo da 95 a 156 giorni,
+  magazzino +8,9 mld; Dell — patrimoniale DEBOLE (0,89) e operativa che SI AUTOFINANZIA (+12,2 mld, 1,07 volte
+  l'utile), e agli azionisti il 125% della cassa libera; HPE — DEBOLE (0,99) e SI AUTOFINANZIA, ciclo +20 giorni: il
+  suo punteggio basso non viene dal circolante.
+- È **INFORMAZIONE**: non una prova della tenuta, non un colore, non una vendita. Lo stato operativo sta già, in altra
+  forma, nella famiglia del bilancio della tenuta (§1sexies): non si conta due volte.
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

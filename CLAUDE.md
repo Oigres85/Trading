@@ -7978,3 +7978,56 @@ ciascuna sul controllo atteso. Una non era applicata al primo giro: l'avevo scri
 `modifica_sicura` l'ha rifiutata lasciando il file intatto — riscritta, morde.
 Pavimento di `test_analisi_libro.py` 710 → 735 (751 punti di chiamata). `?v=` e `BUILD_VERSION` non toccati: nessun
 file servito al browser (v440).
+
+## ⚖️ v504 — LE DUE SOLIDITÀ: IL BILANCIO A UNA DATA E LA CASSA DELL'ATTIVITÀ
+
+Richiesta del CEO del 18/10/2026 sera, testuale: *"Per i titoli tieni conto della differenza tra solidità operativa da
+cash flow e solidità patrimoniale statica. Rendila strutturale. Questo mi fa capire la % di rischio sulla base del
+rendimento e se questo rapporto ne vale la pena"*, con un ragionamento incollato su SMCI, Dell, HPE e Lenovo. E le
+tre risposte al piano del 17/10: SMCI **nessuno stop che sale col prezzo**; CRWV **si esce solo almeno in pari, e si
+aspetta i conti**; ORCL **per ora nessun ordine, giornalieri quando li inserirà** (LIBRO.md §1quinquies). Dell entra in
+watchlist; il suo CDS compensato a ICE è su **Dell Inc**, la controllata operativa, e lo dice la nota.
+
+### Il ragionamento del CEO, misurato prima di costruire (v417)
+| affermazione | misura del 18/10 (yfinance) |
+|---|---|
+| SMCI ha un bilancio solido, il rischio sono margini e magazzino | **vero**: Altman 6,77 (sicurezza), ma flusso operativo **−6,8 mld** in 12 mesi con 2,2 mld di utile; magazzino 12,9 mld = 128 giorni (erano 82), ciclo di cassa da 95 a 156 giorni. L'ultimo trimestre è tornato positivo (+0,75 mld) |
+| Dell, HPE e Lenovo hanno Z-Score fra 1,2 e 2,2 | **dipende dalla formula**: Dell 0,89 con lo Z'' del sistema, 1,60 con lo Z' del 1983, **3,00** con lo Z originale del 1968 (capitalizzazione e ricavi sull'attivo); HPE 0,99 · 0,84 · 1,43 |
+| Dell e HPE usano la leva per acquisizioni, riacquisti e dividendi | **Dell sì**: 10,7 mld agli azionisti in 12 mesi, il 125% della cassa libera; patrimonio −1,4 mld con 20,0 mld di azioni proprie e utili non distribuiti +10,1 mld. **HPE** soprattutto per l'acquisizione (Juniper): agli azionisti il 34% della cassa libera |
+| il circolante negativo di Dell e Lenovo è potere contrattuale | **Dell sì**: ciclo −25 giorni (fornitori a 122, clienti a 45, magazzino a 52) — finché i volumi tengono. **Lenovo no** sui conti disponibili (30/09/2025, fermi): ciclo +15, il circolante negativo viene da altre passività |
+
+### Cosa fa il sistema
+- **La pipeline misura** (`update_data.solidita_operativa`): il ciclo di cassa all'ultimo bilancio completo e allo
+  stesso trimestre dell'anno prima — voci di fine trimestre sul conto dello stesso trimestre × 91,25, interi col mezzo
+  in su, il ciclo fatto coi pezzi già arrotondati perché la somma stampata torni (v415) —, il flusso dell'ultimo
+  trimestre, utile, ricavi, magazzino, riacquisti e dividendi dei 12 mesi **con la loro data di fine**, utili non
+  distribuiti e azioni proprie. Flusso e cassa libera dei 12 mesi restano della combustione: un proprietario (v161).
+- **credito.py legge**: lo stato PATRIMONIALE dalle zone di Altman (FORTE · INTERMEDIA · DEBOLE), l'OPERATIVO dai
+  **segni** dei flussi, senza soglie (SI AUTOFINANZIA · FA CASSA MA NON COPRE GLI INVESTIMENTI · CONSUMA CASSA), la
+  divergenza nei due soli casi in cui le due dicono cose opposte, e nei segnali in testa al blocco. La riga di Altman
+  dice da dove vengono un circolante negativo (dai fornitori o no) e un patrimonio negativo (perdite o riacquisti).
+- **Rischio contro rendimento, accanto e mai fusi** (v200): la frequenza storica d'insolvenza e il rendimento del
+  prezzo di oggi — cassa libera sulla capitalizzazione solo nella stessa valuta (SKHY: bilancio in won), utile atteso
+  sul prezzo. Se il rapporto ne valga la pena lo argomenta la risposta; la decisione resta del CEO.
+- **concorrenti.py** ha due misure in più — flusso operativo sui ricavi e ciclo di cassa, dove **1 è il più basso** —:
+  il 18/10 SMCI era **prima del gruppo per bilancio e ultima per cassa**.
+
+### ⚠⚠ I periodi sfasati, trovati costruendolo
+Su Amazon la fonte ha la colonna dei ricavi al 30/06 **vuota** e i flussi fermi al 31/03: `_somma_trimestri` dichiara
+la data della prima colonna, cioè quella vuota. Un flusso e dei ricavi si confrontano solo se **finiscono lo stesso
+giorno** (`alla_pari`, `stesso_trimestre`), e vale da qui anche per la cassa libera sui ricavi della v503, che lo dava
+per scontato. Il 18/10 i numeri pubblicati erano allineati per coincidenza: il controllo toglie la coincidenza.
+
+### 🧪 Il metodo
+- Un controllo rosso era un **difetto vero**: senza la solidità operativa la riga di Altman scriveva *"la fonte non
+  porta gli utili non distribuiti"* — falso, non era la fonte a mancare ma la lettura. L'altro era una sonda che non
+  reggeva un a capo del libro; e un nome di stato andava a capo dentro il grassetto, quindi non si trovava: si è
+  rimesso il nome su una riga invece di allentare il controllo.
+- Un controllo non discriminava (la zona di sicurezza col circolante positivo restava muta anche senza la condizione
+  sulla zona): ristretto PRIMA delle iniezioni.
+- **21 iniezioni**, una alla volta, ripristino verificato per impronta: **mordono tutte**, ciascuna sul controllo
+  atteso. Una, al primo giro, faceva MORIRE la suite (`KeyError`) invece di far cadere il controllo col suo nome: la
+  fixture aveva un ciclo senza i suoi tre pezzi, uno stato che la pipeline non produce. Completata, morde per nome
+  (v407, v471).
+- Pavimenti: `test_update_data.py` 285 → 295 (303 punti di chiamata) e N_CHECKS_MINIMO 303 → 312 (316 eseguiti),
+  `test_analisi_libro.py` 735 → 755 (768). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

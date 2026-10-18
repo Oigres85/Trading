@@ -58,7 +58,7 @@ ETA_DATI_GIORNI = 7
 LETTURE_PER_GIRO = 15
 # la versione delle letture in memoria: quando cambia una formula, le letture di prima si rifanno (la lezione della
 # v502 — una cache di dati DERIVATI senza versione conserva per sempre la formula vecchia)
-VERSIONE = 503
+VERSIONE = 504          # v504: il flusso operativo sui ricavi e il ciclo di cassa — le letture di prima si rifanno
 PAUSA = 0.4
 TIPI = ("misura", "stima", "nessuna")
 # i conti trimestrali della fonte possono fermarsi PRIMA del trimestre che la stessa fonte dichiara chiuso
@@ -68,10 +68,13 @@ TIPI = ("misura", "stima", "nessuna")
 # TRIM_INDIETRO_MAX descrive un altro periodo e resta fuori dal confronto dei posti, nominato (convenzioni del 18/10)
 TRIM_TOLLERANZA_GIORNI = 20
 TRIM_INDIETRO_MAX = 1
-# le misure del confronto, nell'ordine in cui si stampano; per tutte vale «piu' alto e' meglio»
+# le misure del confronto, nell'ordine in cui si stampano; per tutte vale «piu' alto e' meglio» TRANNE quelle in
+# PIU_BASSO_MEGLIO (v504: il ciclo di cassa — meno giorni fra il pagamento dei fornitori e l'incasso dai clienti)
 MISURE = (("ricavi_yoy", "crescita dei ricavi sull'anno"), ("margine_lordo", "margine lordo"),
-          ("margine_op_12m", "margine operativo 12 mesi"), ("fcf_12m_pct", "cassa libera 12 mesi sui ricavi"),
+          ("margine_op_12m", "margine operativo 12 mesi"), ("ocf_12m_pct", "flusso operativo 12 mesi sui ricavi"),
+          ("fcf_12m_pct", "cassa libera 12 mesi sui ricavi"), ("ciclo", "ciclo di cassa"),
           ("altman_z", "Altman Z''"), ("liq_su_breve", "liquidita' sul debito a breve"))
+PIU_BASSO_MEGLIO = ("ciclo",)
 
 
 # ═══ IL REGISTRO ══════════════════════════════════════════════════════════════════════════════
@@ -195,6 +198,15 @@ def _ud():
     return sys.modules["update_data"]
 
 
+def stesso_trimestre(a, b):
+    """Due date di fine trimestre entro TRIM_TOLLERANZA_GIORNI: lo stesso trimestre (fine mese contro fine della
+    settimana fiscale). False se una delle due non si legge."""
+    try:
+        return abs((date.fromisoformat(str(a)[:10]) - date.fromisoformat(str(b)[:10])).days) <= TRIM_TOLLERANZA_GIORNI
+    except (TypeError, ValueError):
+        return False
+
+
 def _ultimi4(conto, chiave):
     q = sorted([x for x in (conto or []) if isinstance(x, dict) and x.get("trim") and x.get(chiave) is not None
                 and x.get("ricavi")], key=lambda x: str(x["trim"]), reverse=True)[:4]
@@ -236,7 +248,28 @@ def salute(tk, ticker=None, oggi=None):
     if q4:
         out["margine_op_12m"] = round(sum(x["operativo"] for x in q4) / sum(x["ricavi"] for x in q4) * 100, 1)
     q4r = _ultimi4(conto, "ricavi")
-    if q4r and comb.get("fcf_ttm") is not None and comb.get("trimestri") == 4:
+    # v504 — la solidita' OPERATIVA accanto alla patrimoniale: il flusso operativo sui ricavi (stessi ricavi della cassa
+    #   libera) e il ciclo di cassa con la funzione della pipeline, uguale per il nome e per ogni concorrente (v161)
+    try:
+        sol = ud.solidita_operativa(ticker, comb) or {}
+    except Exception:  # noqa: BLE001
+        sol = {}
+    g = sol.get("giorni") or {}
+    if g.get("ciclo") is not None:
+        out["ciclo"], out["ciclo_al"] = g["ciclo"], g.get("al")
+    elif g.get("motivo") == "senza_magazzino":
+        out["senza_magazzino"] = True
+    # ⚠ v504 — flussi e ricavi sullo STESSO periodo: i quattro trimestri dei ricavi devono finire entro
+    #   TRIM_TOLLERANZA_GIORNI dall'ultimo trimestre dei flussi, o il rapporto mescola due periodi (v207). Vale da qui
+    #   anche per la cassa libera della v503, che lo dava per scontato: quando la fonte e' indietro col conto e non coi
+    #   flussi, il rapporto non si fa e la riga lo dice
+    fine = sol.get("ocf_ultimo_al") or comb.get("cashflow_al")
+    pari = bool(q4r and fine and stesso_trimestre(q4r[0]["trim"], fine))
+    if q4r and fine and not pari and comb.get("trimestri") == 4:
+        out["periodi_diversi"] = {"ricavi": str(q4r[0]["trim"])[:10], "flussi": str(fine)[:10]}
+    if pari and comb.get("ocf_ttm") is not None and comb.get("trimestri") == 4:
+        out["ocf_12m_pct"] = round(comb["ocf_ttm"] / sum(x["ricavi"] for x in q4r) * 100, 1)
+    if pari and comb.get("fcf_ttm") is not None and comb.get("trimestri") == 4:
         out["fcf_12m_pct"] = round(comb["fcf_ttm"] / sum(x["ricavi"] for x in q4r) * 100, 1)
         # v477: quando gli «investimenti» sono soprattutto attivita' immateriali (per Strategy: bitcoin), la cassa
         # libera non misura un'azienda che costruisce — la riga lo dice, con la quota dichiarata dalla fonte
@@ -256,6 +289,9 @@ def salute(tk, ticker=None, oggi=None):
         out.update({"altman_z": round(a["z"], 2), "altman_zona": a["zona"], "altman_rating": a["bre"]})
         if CR.utili_negativi_penalizzano(a):
             out["altman_utili_negativi"] = True
+        cf = CR.circolante_dai_fornitori(a, sol)       # v504 — da dove viene un circolante negativo
+        if cf:
+            out["altman_circolante_fornitori"] = cf["dai_fornitori"]
     elif a.get("stato") == "non applicabile":
         out["altman_na"] = info.get("sector") or True
     return out
@@ -301,18 +337,30 @@ def _misura_txt(chiave, v, r):
             return "nessun debito a breve"
         if chiave == "altman_z" and r.get("altman_na"):
             return "non si applica (la fonte classifica la societa' nel settore finanziario)"
+        if chiave == "ciclo" and r.get("senza_magazzino"):
+            return "non si calcola (senza magazzino materiale)"
+        if chiave in ("ocf_12m_pct", "fcf_12m_pct") and r.get("periodi_diversi"):
+            p = r["periodi_diversi"]
+            return (f"n.d. (ricavi fino al {CR._data(p.get('ricavi'))}, flussi fino al {CR._data(p.get('flussi'))}: "
+                    "periodi diversi)")
         return "n.d."
+    if chiave == "ciclo":
+        return f"{v} giorni" + (" (i fornitori finanziano l'attivita')" if v < 0 else "")
     if chiave == "ricavi_yoy":
         return f"{CR._sg(v, 1)}%"
     if chiave == "fcf_12m_pct" and r.get("immateriali_pct") is not None:
         return (f"{CR._n(v, 1)}% — ⚠ il {CR._n(r['immateriali_pct'], 1)}% degli investimenti e' in attivita' "
                 "immateriali (non impianti): non misura un'azienda che costruisce")
-    if chiave in ("margine_lordo", "margine_op_12m", "fcf_12m_pct"):
+    if chiave in ("margine_lordo", "margine_op_12m", "fcf_12m_pct", "ocf_12m_pct"):
         return f"{CR._n(v, 1)}%"
     if chiave == "altman_z":
         return (f"{CR._n(v, 2)} {r.get('altman_zona')} ({r.get('altman_rating')})"
                 + (" — utili non distribuiti negativi con un EBIT positivo (perdite passate o riacquisti di azioni): "
-                   "il punteggio penalizza piu' del credito di oggi" if r.get("altman_utili_negativi") else ""))
+                   "il punteggio penalizza piu' del credito di oggi" if r.get("altman_utili_negativi") else "")
+                + (" — circolante negativo che nasce dal ciclo di cassa (credito dei fornitori): il punteggio lo legge "
+                   "come debolezza" if r.get("altman_circolante_fornitori") is True else
+                   " — circolante negativo che NON nasce dal ciclo di cassa" if r.get("altman_circolante_fornitori") is False
+                   else ""))
     if chiave == "liq_su_breve":
         return "meno di 0,1×" if v < 0.1 else f"{CR._n(v, 1)}×"
     return str(v)
@@ -342,7 +390,8 @@ def fuori_dal_confronto(gruppo, dati):
 
 
 def posti(tk, gruppo, dati):
-    """Per ogni misura il posto del nome fra chi ha il dato (1 = il piu' alto). Nessun punteggio d'insieme (v200)."""
+    """Per ogni misura il posto del nome fra chi ha il dato (1 = il migliore: il valore piu' alto, il piu' basso per le
+    misure in PIU_BASSO_MEGLIO). Nessun punteggio d'insieme (v200)."""
     out = []
     fuori = set(fuori_dal_confronto(gruppo, dati))
     for k, lab in MISURE:
@@ -352,7 +401,7 @@ def posti(tk, gruppo, dati):
         if mio is None or not vals:
             out.append(f"{lab}: n.d.")
             continue
-        posto = 1 + sum(1 for v, _ in vals if v > mio)
+        posto = 1 + sum(1 for v, _ in vals if (v < mio if k in PIU_BASSO_MEGLIO else v > mio))
         out.append(f"{lab} {posto}° su {len(vals)}")
     return out
 
@@ -366,7 +415,8 @@ def righe_nome(tk, nomi, dati, oggi, ruolo):
     out.append("  salute a confronto (stesse formule per tutti; solo rapporti, i bilanci sono in valute diverse):")
     out.extend("     " + riga_salute(dati.get(t) or {"tk": t}, tk) for t in gruppo)
     fuori = fuori_dal_confronto(gruppo, dati)
-    out.append(f"  il posto di {tk} per misura (1 = il valore piu' alto; nessun punteggio d'insieme): "
+    out.append(f"  il posto di {tk} per misura (1 = il migliore: il valore piu' alto, il piu' basso per il ciclo di "
+               "cassa; nessun punteggio d'insieme): "
                + " · ".join(posti(tk, gruppo, dati))
                + (f" · fuori dal confronto perche' i loro conti sono indietro di oltre {TRIM_INDIETRO_MAX} trimestre "
                   f"(un altro periodo): {', '.join(fuori)}" if fuori else ""))
@@ -381,8 +431,10 @@ def intestazione():
             f"(registro memoria/concorrenti.json; oltre {ETA_QUOTE_GIORNI} giorni dalla pubblicazione si dichiarano "
             "da riverificare); una STIMA di analisti non e' una misura · la SALUTE la misura lo strumento con le "
             "funzioni della pipeline, uguali per il nome e per i concorrenti: crescita dei ricavi sullo stesso "
-            "trimestre dell'anno prima (per data), margine lordo, margine operativo e cassa libera degli ultimi 4 "
-            "trimestri, Altman Z'' con zona e rating equivalente, liquidita' sul debito in scadenza entro un anno · i "
+            "trimestre dell'anno prima (per data), margine lordo, margine operativo, flusso operativo e cassa libera "
+            "degli ultimi 4 trimestri, il ciclo di cassa (crediti + magazzino - fornitori, in giorni; solo con un "
+            "magazzino materiale) — la solidita' OPERATIVA —, Altman Z'' con zona e rating equivalente e la liquidita' "
+            "sul debito in scadenza entro un anno — la PATRIMONIALE (v504: possono dire cose opposte) · i "
             "trimestri delle societa' finiscono in date diverse, e ciascuna riga dice la sua")
 
 

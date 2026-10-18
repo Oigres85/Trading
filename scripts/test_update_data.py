@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 303  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308 (sale, mai scende)
+N_CHECKS_MINIMO = 312  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -2471,6 +2471,122 @@ check("v502 la cache di una versione precedente si RILEGGE anche senza un deposi
       and (_d502.get("per_titolo") or {}).get("OLD", {}).get("versione") == ud.XBRL_VERSIONE
       and "stantii" in (_d502.get("per_titolo") or {}).get("OLD", {})
       and _d502.get("versione") == ud.XBRL_VERSIONE and _d502.get("fresco_giorni") == ud.XBRL_FRESCO_GIORNI)
+
+# ═══ v504 — LA SOLIDITA' OPERATIVA: IL CICLO DI CASSA, IL FLUSSO DELL'ULTIMO TRIMESTRE, LE VOCI DEL PATRIMONIO ═══════
+# Richiesta del CEO del 18/10/2026 sera: «tieni conto della differenza tra solidita' operativa da cash flow e solidita'
+# patrimoniale statica». La pipeline MISURA (qui), credito.py legge. Lo stato si COSTRUISCE (v425): cinque trimestri con
+# le colonne come le scrive yfinance (la piu' recente per prima), un conto che manca all'ultima data (v503: AMZN), una
+# societa' senza magazzino, una colonna del conto spostata di qualche giorno (settimane fiscali).
+def _q504(valori, date):
+    return pd.DataFrame({pd.Timestamp(d): v for d, v in zip(date, valori)})
+_d504 = ["2026-07-31", "2026-04-30", "2026-01-31", "2025-10-31", "2025-07-31"]
+# ultimo trimestre: crediti 50 / ricavi 100 × 91,25 = 45,6 → 46 · magazzino 40 / costo 80 → 46 · fornitori 100 / 80 →
+# 114 · ciclo 46 + 46 - 114 = -22. Un anno prima: 20 / 50 × 91,25 = 36,5 → 37 col mezzo in su (round() dava 36) · 10 / 40
+# → 23 · 40 / 40 → 91 · ciclo -31
+_bs504 = _q504([{"Total Assets": 500.0, "Accounts Receivable": 50.0, "Inventory": 40.0, "Accounts Payable": 100.0,
+                 "Retained Earnings": 30.0, "Treasury Stock": 60.0},
+                {"Total Assets": 480.0, "Accounts Receivable": 45.0, "Inventory": 35.0, "Accounts Payable": 90.0},
+                {"Total Assets": 460.0, "Accounts Receivable": 40.0, "Inventory": 30.0, "Accounts Payable": 80.0},
+                {"Total Assets": 440.0, "Accounts Receivable": 30.0, "Inventory": 20.0, "Accounts Payable": 60.0},
+                {"Total Assets": 400.0, "Accounts Receivable": 20.0, "Inventory": 10.0, "Accounts Payable": 40.0}], _d504)
+_inc504 = _q504([{"Total Revenue": 100.0, "Cost Of Revenue": 80.0, "Net Income": 4.0},
+                 {"Total Revenue": 90.0, "Cost Of Revenue": 70.0, "Net Income": 3.0},
+                 {"Total Revenue": 80.0, "Cost Of Revenue": 60.0, "Net Income": 2.0},
+                 {"Total Revenue": 70.0, "Cost Of Revenue": 50.0, "Net Income": 1.0},
+                 {"Total Revenue": 50.0, "Cost Of Revenue": 40.0, "Net Income": 7.0}], _d504)
+_cf504 = _q504([{"Operating Cash Flow": 5.0, "Change In Inventory": -4.0, "Repurchase Of Capital Stock": -2.0,
+                 "Cash Dividends Paid": -1.0},
+                {"Operating Cash Flow": 3.0, "Change In Inventory": -3.0, "Repurchase Of Capital Stock": -2.0,
+                 "Cash Dividends Paid": -1.0},
+                {"Operating Cash Flow": 2.0, "Change In Inventory": -2.0, "Repurchase Of Capital Stock": -2.0,
+                 "Cash Dividends Paid": -1.0},
+                {"Operating Cash Flow": 1.0, "Change In Inventory": -1.0, "Repurchase Of Capital Stock": -2.0,
+                 "Cash Dividends Paid": -1.0},
+                {"Operating Cash Flow": 9.0, "Change In Inventory": 9.0, "Repurchase Of Capital Stock": -9.0,
+                 "Cash Dividends Paid": -9.0}], _d504)
+class _T504:
+    def __init__(self, bs, inc, cf):
+        self.quarterly_balance_sheet, self.quarterly_income_stmt, self.quarterly_cashflow = bs, inc, cf
+_s504 = ud.solidita_operativa(_T504(_bs504, _inc504, _cf504), {"ocf_ttm": 11.0, "trimestri": 4})
+check("v504 il ciclo di cassa all'ultimo bilancio e allo stesso trimestre dell'anno prima, trovato per DATA: giorni interi "
+      "col mezzo in su (36,5 → 37), e il ciclo fatto coi pezzi GIA' arrotondati, cosi' la somma stampata torna sempre "
+      "(v415): " + str([_s504.get("giorni"), _s504.get("giorni_anno_prima")]),
+      _s504.get("bilancio_al") == "2026-07-31"
+      and _s504.get("giorni") == {"al": "2026-07-31", "crediti": 46, "magazzino": 46, "fornitori": 114, "ciclo": -22}
+      and _s504.get("giorni_anno_prima") == {"al": "2025-07-31", "crediti": 37, "magazzino": 23, "fornitori": 91,
+                                             "ciclo": -31}
+      and all(g["ciclo"] == g["crediti"] + g["magazzino"] - g["fornitori"]
+              for g in (_s504["giorni"], _s504["giorni_anno_prima"])))
+check("v504 i flussi: l'ultimo trimestre col suo giorno, e utile, ricavi, magazzino, riacquisti e dividendi sugli ULTIMI "
+      "QUATTRO trimestri col conteggio (il quinto non entra); utili non distribuiti e azioni proprie all'ultimo bilancio; "
+      "il flusso dei 12 mesi NON si ricalcola (resta della combustione): " + str(_s504),
+      _s504.get("ocf_ultimo_trim") == 5.0 and _s504.get("ocf_ultimo_al") == "2026-07-31"
+      and _s504.get("utile_12m") == 10.0 and _s504.get("ricavi_12m") == 340.0 and _s504.get("var_magazzino_12m") == -10.0
+      and _s504.get("riacquisti_12m") == -8.0 and _s504.get("dividendi_12m") == -4.0
+      and _s504.get("trimestri") == {"utile_12m": 4, "ricavi_12m": 4, "var_magazzino_12m": 4, "riacquisti_12m": 4,
+                                     "dividendi_12m": 4}
+      and _s504.get("utili_non_distribuiti") == 30.0 and _s504.get("azioni_proprie") == 60.0
+      and _s504.get("fine_periodo") == {k: "2026-07-31" for k in ("utile_12m", "ricavi_12m", "var_magazzino_12m",
+                                                                  "riacquisti_12m", "dividendi_12m")}
+      and "ocf_ttm" not in _s504 and "fcf_ttm" not in _s504)
+# il conto senza l'ultimo trimestre (la fonte e' indietro): il ciclo si prende alla colonna completa precedente, e la
+#   data lo dice — mai stato patrimoniale di una data e conto di un'altra
+_d504b = ["2026-06-30", "2026-03-31", "2025-12-31", "2025-09-30", "2025-06-30", "2025-03-31"]
+_bs504b = _q504([{"Total Assets": 9.0, "Accounts Receivable": 99.0, "Inventory": 99.0, "Accounts Payable": 1.0}]
+                + [{"Total Assets": 9.0, "Accounts Receivable": 50.0, "Inventory": 40.0, "Accounts Payable": 100.0}] * 5,
+                _d504b)
+_inc504b = _q504([{"Total Revenue": 100.0, "Cost Of Revenue": 80.0}] * 5, _d504b[1:])
+_s504b = ud.solidita_operativa(_T504(_bs504b, _inc504b, None), None)
+check("v504 il conto della fonte indietro di un trimestre: il ciclo al 31/03 (l'ultima colonna completa), l'anno prima al "
+      "31/03 dell'anno prima, il bilancio al 30/06 dichiarato a parte, i ricavi con la LORO fine; senza flussi nessun "
+      "campo dei flussi inventato: " + str(_s504b),
+      _s504b.get("bilancio_al") == "2026-06-30" and (_s504b.get("giorni") or {}).get("al") == "2026-03-31"
+      and (_s504b.get("giorni") or {}).get("ciclo") == -22
+      and (_s504b.get("giorni_anno_prima") or {}).get("al") == "2025-03-31"
+      and _s504b.get("fine_periodo") == {"ricavi_12m": "2026-03-31"} and _s504b.get("ricavi_12m") == 400.0
+      and "ocf_ultimo_trim" not in _s504b and "var_magazzino_12m" not in _s504b)
+# AMZN il 18/10/2026: la colonna dei ricavi al 30/06 c'e' ed e' VUOTA. La somma salta il vuoto e la sua data deve essere
+#   quella del dato (31/03), non della prima colonna — e' su quella data che si confronta col flusso
+_inc504g = _q504([{"Total Revenue": float("nan")}, {"Total Revenue": 10.0}, {"Total Revenue": 10.0},
+                  {"Total Revenue": 10.0}, {"Total Revenue": 10.0}],
+                 ["2026-06-30", "2026-03-31", "2025-12-31", "2025-09-30", "2025-06-30"])
+check("v504 la fine del periodo di una somma e' quella dell'ultimo dato usato, non della prima colonna (che puo' essere "
+      "vuota): " + str(ud._somma_quattro(_inc504g, ("Total Revenue",))),
+      ud._somma_quattro(_inc504g, ("Total Revenue",)) == (40.0, 4, "2026-03-31")
+      and ud._somma_trimestri(_inc504g, "Total Revenue")[2] == "2026-06-30"
+      and ud._somma_quattro(None, ("Total Revenue",)) == (None, 0, None))
+# settimane fiscali: il conto chiude il 27/07, il bilancio il 31/07 — lo stesso trimestre entro 20 giorni; a 30 no
+_g504c = ud.giorni_ciclo(_q504([{"Accounts Receivable": 50.0, "Inventory": 40.0, "Accounts Payable": 100.0}], ["2026-07-31"]),
+                         _q504([{"Total Revenue": 100.0, "Cost Of Revenue": 80.0}], ["2026-07-27"]),
+                         ud.datetime(2026, 7, 31).date())
+_g504d = ud.giorni_ciclo(_q504([{"Accounts Receivable": 50.0, "Inventory": 40.0, "Accounts Payable": 100.0}], ["2026-07-31"]),
+                         _q504([{"Total Revenue": 100.0, "Cost Of Revenue": 80.0}], ["2026-07-01"]),
+                         ud.datetime(2026, 7, 31).date())
+check("v504 lo stesso trimestre si riconosce entro 20 giorni (settimane fiscali), oltre no: allora le voci MANCANO, non "
+      "si prende la colonna vicina: " + str([_g504c, _g504d]),
+      _g504c.get("ciclo") == -22 and _g504d.get("ciclo") is None and _g504d.get("motivo") == "voci_mancanti"
+      and _g504d.get("crediti") is None)
+# senza magazzino: chi vende servizi (la voce non c'e') e chi ne ha meno di 5 giorni del costo del venduto
+_g504e = ud.giorni_ciclo(_q504([{"Accounts Receivable": 50.0, "Accounts Payable": 300.0}], ["2026-06-30"]),
+                         _q504([{"Total Revenue": 100.0, "Cost Of Revenue": 80.0}], ["2026-06-30"]),
+                         ud.datetime(2026, 6, 30).date())
+_g504f = ud.giorni_ciclo(_q504([{"Accounts Receivable": 50.0, "Inventory": 4.0, "Accounts Payable": 10.0}], ["2026-06-30"]),
+                         _q504([{"Total Revenue": 100.0, "Cost Of Revenue": 80.0}], ["2026-06-30"]),
+                         ud.datetime(2026, 6, 30).date())
+check("v504 senza un magazzino materiale il ciclo NON si pubblica (i debiti verso fornitori di chi vende servizi sono "
+      "per gli investimenti: CRWV 377 'giorni'), e lo dice; i crediti restano: " + str([_g504e, _g504f]),
+      _g504e.get("ciclo") is None and _g504e.get("motivo") == "senza_magazzino" and _g504e.get("crediti") == 46
+      and _g504f.get("ciclo") is None and _g504f.get("motivo") == "senza_magazzino"
+      and ud.MAGAZZINO_MATERIALE_GIORNI == 5.0 and ud.GIORNI_TRIMESTRE == 91.25)
+check("v504 senza stato patrimoniale nessuna lettura (meglio assente che vuota), e un errore della fonte non fa cadere il "
+      "titolo",
+      ud.solidita_operativa(_T504(None, None, None)) is None
+      and ud.solidita_operativa(type("_Rotto", (), {"quarterly_balance_sheet": property(lambda s: 1 / 0)})()) is None)
+_sol504 = _SRC_UD_CODICE.find("_sol = solidita_operativa(t, _comb")
+check("v504 collegamento: il giro dei titoli calcola la solidita' operativa DOPO la combustione e con la combustione (il "
+      "flusso dei 12 mesi ha un proprietario solo), in un try suo, e la pubblica nella riga del titolo",
+      _sol504 > 0 and 0 < _SRC_UD_CODICE.find("_comb = combustione(t, ") < _sol504
+      and '"solidita": _sol' in _SRC_UD_CODICE and "_comb = _cred = _fuori = _short = _sol = None" in _SRC_UD_CODICE)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

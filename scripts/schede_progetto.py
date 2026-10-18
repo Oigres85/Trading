@@ -543,9 +543,16 @@ def righe_credito(r, meta_cds=None, dsec=None):
     cc = credito.riga_credito_cds(r, meta_cds)
     if cc:
         out.append(cc)
-    out.append(credito.riga_altman(credito.altman_rischio(r)))
+    a = credito.altman_rischio(r)
+    # v504 — le due solidita' prima del dettaglio: la riga che le mette accanto, poi Altman (patrimoniale) con da dove
+    #   vengono un circolante o un patrimonio negativi, il debito, e la cassa dell'attivita' (operativa)
+    out.append(credito.riga_solidita(r, a))
+    out.append(credito.riga_altman(a, r.get("solidita"), r.get("combustione")))
     out.append(credito.riga_debito(r, x, liquidita_societa(r.get("combustione")), ds.get("senza_10q") or (),
                                    ds.get("versione")))
+    ca = credito.riga_cassa_attivita(r)
+    if ca:
+        out.append(ca)
     return out
 
 

@@ -1890,6 +1890,196 @@ def combustione(t, mcap, buyback):
     return {k: v for k, v in out.items() if v is not None}
 
 
+# ═══ v504 — LA SOLIDITA' OPERATIVA: quanta cassa produce l'attivita' ═════════════════════════════════════════════════
+# Il CEO, 18/10/2026: «Per i titoli tieni conto della differenza tra solidita' operativa da cash flow e solidita'
+# patrimoniale statica. Rendila strutturale». La PATRIMONIALE c'e' dalla v501 — Altman sul bilancio piu' recente, la
+# liquidita' contro il debito a breve —, ed e' una FOTOGRAFIA del bilancio a una data. L'OPERATIVA e' un FLUSSO: quanta
+# cassa produce l'attivita', se l'utile diventa cassa, in quanti giorni un dollaro speso in merce torna incassato.
+# Le due possono dire cose opposte, ed e' il caso che il CEO ha portato (misurato il 18/10/2026 su yfinance):
+#   SMCI — Altman 6,77 (SICUREZZA), ma flusso operativo -6,8 mld in 12 mesi con 2,2 mld di utile: il magazzino e' salito
+#          di 8,9 mld, e il ciclo di cassa e' passato da 94 a 156 giorni;
+#   DELL — Altman 0,89 (PERICOLO), ma flusso operativo +12,2 mld, 1,07 volte l'utile: il circolante negativo nasce dal
+#          ciclo di cassa (-25 giorni: i fornitori sono pagati in 122, i clienti pagano in 45) e il patrimonio negativo
+#          dalle azioni proprie riacquistate (20,0 mld), non da perdite (utili non distribuiti +10,1 mld).
+# Qui si MISURA; la resa e la lettura vivono in scripts/credito.py (v498: la pipeline misura, l'analisi decide).
+# ⚠ Flusso operativo e cassa libera dei 12 mesi NON si ricalcolano: sono quelli di combustione() (ocf_ttm, fcf_ttm) —
+#   una grandezza, un proprietario (v161). Qui ci sono le voci che la combustione non porta.
+# ⚠ I giorni sono le voci di FINE trimestre divise per il conto DELLO STESSO trimestre (i ricavi per i crediti, il costo
+#   del venduto per magazzino e fornitori) × 91,25: convenzione dichiarata (v240) — i libri di testo usano le medie di
+#   inizio e fine periodo, e con una crescita del 90% la differenza conta. Le colonne si trovano per DATA, mai per
+#   posizione (v207, v393). Si pubblicano INTERI, e il ciclo si fa con i pezzi gia' arrotondati: la somma stampata
+#   torna sempre (v415).
+# ⚠ Senza un magazzino materiale il ciclo NON si pubblica: i debiti verso fornitori di chi vende servizi sono in gran
+#   parte per gli investimenti (CRWV: 377 «giorni» di fornitori su un costo del venduto di 0,9 mld), e il ciclo
+#   affermerebbe un finanziamento dei fornitori che non c'e'.
+GIORNI_TRIMESTRE = 91.25
+MAGAZZINO_MATERIALE_GIORNI = 5.0      # sotto, il magazzino non e' materiale (convenzione, v240)
+CICLO_TOLLERANZA_GIORNI = 20          # una colonna "dello stesso trimestre" cade entro 20 giorni dalla data cercata
+
+
+def _intero(x):
+    """Mezzo in su, come Math.round (v496): mai il banker's rounding di round()."""
+    return int(math.floor(float(x) + 0.5))
+
+
+def _data_colonna(col):
+    try:
+        return col.date() if hasattr(col, "date") else datetime.fromisoformat(str(col)[:10]).date()
+    except (TypeError, ValueError):
+        return None
+
+
+def _valore_alla_data(df, voci, data, tolleranza=CICLO_TOLLERANZA_GIORNI):
+    """La prima voce presente, nella colonna che cade entro `tolleranza` giorni da `data` (per DATA, v207). None se la
+    voce manca, e' NaN o nessuna colonna cade li'."""
+    if df is None or getattr(df, "empty", True):
+        return None
+    for v in voci:
+        if v not in df.index:
+            continue
+        try:
+            riga = df.loc[v]
+        except Exception:  # noqa: BLE001
+            continue
+        if hasattr(riga, "columns"):          # un'etichetta ripetuta: si legge la prima
+            riga = riga.iloc[0]
+        for col, x in riga.items():
+            d = _data_colonna(col)
+            if d is None or abs((d - data).days) > tolleranza:
+                continue
+            try:
+                x = float(x)
+            except (TypeError, ValueError):
+                continue
+            if x == x:
+                return x
+    return None
+
+
+def giorni_ciclo(bs, inc, data):
+    """Il ciclo di conversione di cassa alla data di un bilancio trimestrale: {al, crediti, magazzino, fornitori, ciclo,
+    motivo}. crediti = crediti commerciali / ricavi del trimestre, magazzino e fornitori = la voce / costo del venduto
+    del trimestre, × 91,25; ciclo = crediti + magazzino - fornitori, coi pezzi gia' interi. `motivo` quando il ciclo non
+    c'e': 'senza_magazzino' (la voce non c'e' nel bilancio, o vale meno di MAGAZZINO_MATERIALE_GIORNI) · 'voci_mancanti'
+    (crediti, magazzino, fornitori, ricavi o costo del venduto non sono nella fonte a quella data)."""
+    out = {"al": data.isoformat(), "crediti": None, "magazzino": None, "fornitori": None, "ciclo": None}
+    cr = _valore_alla_data(bs, ("Accounts Receivable", "Receivables"), data)
+    mg = _valore_alla_data(bs, ("Inventory",), data)
+    fo = _valore_alla_data(bs, ("Accounts Payable", "Payables"), data)
+    ric = _valore_alla_data(inc, ("Total Revenue", "Operating Revenue"), data)
+    cv = _valore_alla_data(inc, ("Cost Of Revenue", "Reconciled Cost Of Revenue"), data)
+    if cr is not None and ric and ric > 0:
+        out["crediti"] = _intero(cr / ric * GIORNI_TRIMESTRE)
+    if cv and cv > 0:
+        if mg is not None:
+            out["magazzino"] = _intero(mg / cv * GIORNI_TRIMESTRE)
+        if fo is not None:
+            out["fornitori"] = _intero(fo / cv * GIORNI_TRIMESTRE)
+    senza = (bs is None or getattr(bs, "empty", True) or "Inventory" not in bs.index
+             or (mg is not None and cv and cv > 0 and mg / cv * GIORNI_TRIMESTRE < MAGAZZINO_MATERIALE_GIORNI))
+    if senza:
+        out["motivo"] = "senza_magazzino"
+    elif None in (out["crediti"], out["magazzino"], out["fornitori"]):
+        out["motivo"] = "voci_mancanti"
+    else:
+        out["ciclo"] = out["crediti"] + out["magazzino"] - out["fornitori"]
+    return out
+
+
+def _somma_quattro(df, voci):
+    """(somma, trimestri, data) degli ultimi quattro trimestri NON vuoti della prima voce presente, con la data del piu'
+    recente davvero usato: un flusso e i ricavi si confrontano solo se finiscono lo stesso giorno (v207). La data di
+    _somma_trimestri e' la prima colonna del DataFrame anche quando quella colonna e' vuota (AMZN il 18/10/2026: ricavi
+    al 30/06 vuoti), e qui serve quella del dato."""
+    if df is None or getattr(df, "empty", True):
+        return None, 0, None
+    for v in voci:
+        if v not in df.index:
+            continue
+        try:
+            s = df.loc[v]
+            if hasattr(s, "columns"):
+                s = s.iloc[0]
+            s = s.dropna()
+        except Exception:  # noqa: BLE001
+            continue
+        if len(s) == 0:
+            continue
+        usati = s.iloc[:4]
+        d = _data_colonna(usati.index[0])
+        return float(usati.sum()), len(usati), (d.isoformat() if d else None)
+    return None, 0, None
+
+
+def solidita_operativa(t, comb=None):
+    """v504 — le voci della solidita' OPERATIVA che la combustione non porta: il ciclo di cassa all'ultimo bilancio
+    completo e allo stesso trimestre dell'anno prima, il flusso operativo dell'ULTIMO trimestre (il verso di oggi, accanto
+    ai 12 mesi), l'utile e i ricavi di 12 mesi, quanto ha assorbito il magazzino, quanto e' andato agli azionisti, e le
+    voci del patrimonio che spiegano lo Z'' (utili non distribuiti, azioni proprie). `comb` non si usa per ricalcolare:
+    flusso e cassa libera dei 12 mesi restano suoi. None se la fonte non ha lo stato patrimoniale trimestrale."""
+    try:
+        bs = t.quarterly_balance_sheet
+    except Exception:  # noqa: BLE001
+        bs = None
+    try:
+        inc = t.quarterly_income_stmt
+    except Exception:  # noqa: BLE001
+        inc = None
+    try:
+        cf = t.quarterly_cashflow
+    except Exception:  # noqa: BLE001
+        cf = None
+    _, al = _riga_bilancio(bs, "Total Assets")
+    if al is None:
+        return None
+    out = {"bilancio_al": al}
+    # il ciclo all'ultima colonna in cui la fonte porta tutte le voci, al massimo tre trimestri indietro: se il conto e'
+    #   indietro rispetto allo stato patrimoniale (v503: AMZN, MU) la data del ciclo lo dice, e non si mescolano due date
+    date_bs = sorted({d for d in (_data_colonna(c) for c in bs.columns) if d is not None}, reverse=True)
+    ciclo = None
+    for d in date_bs[:4]:
+        g = giorni_ciclo(bs, inc, d)
+        if g.get("motivo") != "voci_mancanti":
+            ciclo = g
+            break
+    if ciclo is None and date_bs:
+        ciclo = giorni_ciclo(bs, inc, date_bs[0])
+    if ciclo:
+        out["giorni"] = ciclo
+        if ciclo.get("ciclo") is not None:
+            d1 = datetime.fromisoformat(ciclo["al"]).date() - timedelta(days=365)
+            g1 = giorni_ciclo(bs, inc, d1)
+            if g1.get("ciclo") is not None:
+                out["giorni_anno_prima"] = g1
+    # il flusso dell'ULTIMO trimestre, e il giorno in cui finisce: e' anche la fine della finestra dei 12 mesi della
+    #   combustione (che salta i trimestri vuoti come qui), quindi il confronto coi ricavi e con l'utile si fa a quella data
+    x, k, d = _somma_quattro(cf, ("Operating Cash Flow",))
+    if x is not None:
+        s = cf.loc["Operating Cash Flow"]
+        if hasattr(s, "columns"):
+            s = s.iloc[0]
+        s = s.dropna()
+        out["ocf_ultimo_trim"] = float(s.iloc[0])
+        out["ocf_ultimo_al"] = d
+    n, fine = {}, {}
+    for chiave, df, voci in (("utile_12m", inc, ("Net Income", "Net Income Common Stockholders")),
+                             ("ricavi_12m", inc, ("Total Revenue", "Operating Revenue")),
+                             ("var_magazzino_12m", cf, ("Change In Inventory",)),
+                             ("riacquisti_12m", cf, ("Repurchase Of Capital Stock",)),
+                             ("dividendi_12m", cf, ("Cash Dividends Paid", "Common Stock Dividend Paid"))):
+        x, k, d = _somma_quattro(df, voci)
+        if x is not None:
+            out[chiave], n[chiave], fine[chiave] = x, k, d
+    if n:
+        out["trimestri"] = n                 # quanti trimestri ha davvero sommato ogni voce: tre non fanno 12 mesi
+        out["fine_periodo"] = fine           # l'ultimo trimestre di ciascuna: si confronta col flusso solo alla pari
+    for chiave, voci in (("utili_non_distribuiti", ("Retained Earnings",)), ("azioni_proprie", ("Treasury Stock",))):
+        x, _ = _riga_bilancio(bs, *voci)
+        if x is not None:
+            out[chiave] = x
+    return out
+
+
 def riga_precedente(ticker):
     """La riga dello STESSO titolo nello snapshot del run precedente, ovunque stia.
     Cerca in entrambe le liste perche' un titolo puo' passare da watchlist a portafoglio fra
@@ -2340,7 +2530,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # costruito anche per i simboli senza fondamentali (indici, futures, ETF). Vedi il gate
     # "v369 nessuna variabile del record assegnata solo dentro un ramo" in test_update_data.py.
     stats = None
-    _comb = _cred = _fuori = _short = None
+    _comb = _cred = _fuori = _short = _sol = None
     if has_fundamentals(ticker, currency):
         g = info.get
         def num(*keys):
@@ -2407,6 +2597,14 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         except Exception as _e:
             print(f"!! combustione {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
             _comb = None
+        # ⚠ v504 — la solidita' OPERATIVA (vedi solidita_operativa() piu' sopra): un try suo, come ogni blocco
+        try:
+            _sol = solidita_operativa(t, _comb)
+            if _sol:
+                _sol["valuta"] = g("financialCurrency") or g("currency")
+        except Exception as _e:
+            print(f"!! solidita operativa {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
+            _sol = None
 
         # ⚠ v367 — credito (al posto del CDS) e flusso fuori mercato. Ogni fonte in un try
         # suo: FINRA e' un servizio esterno, e un suo disservizio non deve far cadere il run.
@@ -2571,6 +2769,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "stats": stats,
         "combustione": _comb,   # v365 — cassa, debito, flusso operativo, capex. None se la fonte non li da'.
         "credito": _cred,       # v367 — al posto del CDS: oneri finanziari, copertura, scadenze.
+        "solidita": _sol,       # v504 — ciclo di cassa, flusso dell'ultimo trimestre, utile, magazzino, azionisti.
         "fuori_mercato": _fuori,# v367 — ATS (dark pool) e OTC non-ATS per settimana, FINRA.
         "short_flusso": _short, # v367 — quota di volume venduta allo scoperto, FINRA, giornaliera.
         "tech_by_range": tech_by_range,

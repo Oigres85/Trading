@@ -60,12 +60,14 @@
   "JPM": "JPM",
   "BLK": null,
   "LLY": null,
+  "DELL": "DELLN",
   "BTP-V28": "ITALY"
  },
  "note": {
   "CEG": "il CDS e' sulla controllata operativa Constellation Energy Generation LLC, che e' l'emittente del debito: non sulla capogruppo quotata",
   "XOM": "l'entita' di riferimento e' Exxon Mobil Corp; il nome della societa' quotata nella pipeline e' ExxonMobil Holdings Corporation",
   "BTP-V28": "il BTP e' un titolo della Repubblica Italiana: il suo CDS e' quello sovrano (Rep Italy), non quello di una societa'",
-  "ORCL": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation"
+  "ORCL": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation",
+  "DELL": "il CDS e' su Dell Inc, la societa' operativa controllata, non sulla capogruppo quotata Dell Technologies Inc (verificato il 2026-10-18 sull'elenco ICE del 2026-10-16: DELLN, cedole 100 e 500)"
  }
 }
