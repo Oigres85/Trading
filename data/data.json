@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-10-18T18:32:37Z",
- "eurusd": 1.1242,
+ "updated_at": "2026-10-18T21:13:29Z",
+ "eurusd": 1.1191,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -71,8 +71,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "ITALY",
-    "entita": "Rep Italy",
-    "contratto": "SNRFOR.USD.CR14",
+    "entita": "ITALY",
+    "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.671,
     "punti": -1.67,
@@ -4077,7 +4077,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMD",
-    "entita": "Advanced Micro Devices Inc",
+    "entita": "AMD",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.7893,
@@ -5928,7 +5928,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NVIDIA",
-    "entita": "NVIDIA Corp",
+    "entita": "NVIDIA",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 100.1318,
@@ -13415,8 +13415,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "SKHYN",
-    "entita": "SK hynix Inc",
-    "contratto": "SNRFOR.USD.CR14",
+    "entita": "SKHYN",
+    "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.8901,
     "punti": -1.89,
@@ -16679,7 +16679,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COREWEI",
-    "entita": "COREWEAVE INC",
+    "entita": "COREWEI",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 500,
     "prezzo": 80.9439,
@@ -16721,28 +16721,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81068.57,
+   "price": 80821.5,
    "price_asof": "2026-10-18",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.39,
+   "change_pct": -0.69,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -35.8,
-   "sma200_dist_pct": 11.8,
-   "sma50_dist_pct": -0.4,
+   "ath_dist_pct": -36.0,
+   "sma200_dist_pct": 11.5,
+   "sma50_dist_pct": -0.7,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
-   "w52_dist_pct": -30.3,
+   "w52_dist_pct": -30.5,
    "day_high": 82143.93,
-   "day_low": 80954.69,
+   "day_low": 80696.82,
    "support": 79735.86,
    "resistance": 87146.35,
-   "rsi": 44.9,
-   "volume": 15855305728,
-   "vol_ratio": 0.38,
-   "atr_14": 2065.83,
-   "atr_pct": 2.55,
+   "rsi": 44.1,
+   "volume": 17232191488,
+   "vol_ratio": 0.57,
+   "atr_14": 2084.25,
+   "atr_pct": 2.58,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -16751,7 +16751,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81068.57
+     80821.5
     ],
     "m6": [
      66289.5,
@@ -16879,7 +16879,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81068.57
+     80821.5
     ],
     "all": [
      386.94,
@@ -17027,7 +17027,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81068.57
+     80821.5
     ],
     "m1": [
      84458.09,
@@ -17051,7 +17051,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81068.57
+     80821.5
     ],
     "m3": [
      62975.59,
@@ -17119,7 +17119,7 @@
      82141.46,
      81500.8,
      81382.15,
-     81068.57
+     80821.5
     ],
     "y1": [
      107198.27,
@@ -17195,7 +17195,7 @@
      84763.58,
      81676.34,
      83095.12,
-     81068.57
+     80821.5
     ],
     "d1": [
      81300.0,
@@ -17308,21 +17308,37 @@
      81079.39,
      81112.5,
      81084.54,
-     81040.73
+     81040.73,
+     81026.75,
+     81036.0,
+     81091.96,
+     81042.45,
+     81063.95,
+     80965.39,
+     80868.62,
+     80723.99,
+     80809.15,
+     80777.74,
+     80769.71,
+     80765.57,
+     80781.29,
+     80743.01,
+     80845.94,
+     80891.52
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 42,
+   "health": 41,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.62,
+   "sharpe_1y": -0.63,
    "sortino_1y": -0.86,
-   "sharpe_6m": 1.28,
-   "sortino_6m": 2.3,
+   "sharpe_6m": 1.26,
+   "sortino_6m": 2.26,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81068.57,
+   "prezzo_limite_aggiustato": 80821.5,
    "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17335,22 +17351,22 @@
     "w1": {
      "support": 79735.86,
      "resistance": 84049.06,
-     "change_pct": -0.61
+     "change_pct": -0.91
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -4.01
+     "change_pct": -4.31
     },
     "m3": {
      "support": 62487.7,
      "resistance": 87363.76,
-     "change_pct": 28.73
+     "change_pct": 28.34
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 15.61
+     "change_pct": 15.26
     }
    },
    "financials": [],
@@ -17377,74 +17393,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81068.57,
+     "prezzo": 80821.5,
      "medie": {
       "sma10": {
-       "liv": 82165.12,
-       "dist_pct": -1.33
+       "liv": 82140.41,
+       "dist_pct": -1.61
       },
       "ema10": {
-       "liv": 82114.36,
-       "dist_pct": -1.27
+       "liv": 82069.44,
+       "dist_pct": -1.52
       },
       "sma20": {
-       "liv": 83285.9,
-       "dist_pct": -2.66
+       "liv": 83273.55,
+       "dist_pct": -2.94
       },
       "ema20": {
-       "liv": 82474.59,
-       "dist_pct": -1.7
+       "liv": 82451.06,
+       "dist_pct": -1.98
       },
       "sma30": {
-       "liv": 83534.46,
-       "dist_pct": -2.95
+       "liv": 83526.22,
+       "dist_pct": -3.24
       },
       "ema30": {
-       "liv": 82085.78,
-       "dist_pct": -1.24
+       "liv": 82069.84,
+       "dist_pct": -1.52
       },
       "sma50": {
-       "liv": 81379.35,
-       "dist_pct": -0.38
+       "liv": 81374.41,
+       "dist_pct": -0.68
       },
       "ema50": {
-       "liv": 80443.15,
-       "dist_pct": 0.78
+       "liv": 80433.46,
+       "dist_pct": 0.48
       },
       "sma100": {
-       "liv": 74191.74,
-       "dist_pct": 9.27
+       "liv": 74189.27,
+       "dist_pct": 8.94
       },
       "ema100": {
-       "liv": 76943.61,
-       "dist_pct": 5.36
+       "liv": 76938.71,
+       "dist_pct": 5.05
       },
       "sma200": {
-       "liv": 72490.64,
-       "dist_pct": 11.83
+       "liv": 72489.41,
+       "dist_pct": 11.49
       },
       "ema200": {
-       "liv": 75837.47,
-       "dist_pct": 6.9
+       "liv": 75835.01,
+       "dist_pct": 6.58
       }
      },
      "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 44.9,
+      "rsi14": 44.1,
       "macd": {
-       "linea": -37.45,
-       "segnale": 479.14,
-       "istogramma": -516.59
+       "linea": -57.16,
+       "segnale": 475.19,
+       "istogramma": -532.36
       },
-      "stoch_k": 18.4,
-      "stoch_d": 21.9,
-      "williams_r": -81.6,
-      "cci20": -63.7,
+      "stoch_k": 15.0,
+      "stoch_d": 20.7,
+      "williams_r": -85.0,
+      "cci20": -68.6,
       "adx14": 22.9,
-      "di_su": 18.3,
-      "di_giu": 20.4,
-      "momentum10": -607.77
+      "di_su": 18.2,
+      "di_giu": 20.2,
+      "momentum10": -854.84
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -17936,20 +17952,20 @@
       "d": "2026-10-18",
       "o": 81383.29,
       "h": 82143.93,
-      "l": 80954.69,
-      "c": 81068.57
+      "l": 80696.82,
+      "c": 80821.5
      }
     ],
     "performance": {
-     "s1": -2.44,
-     "m1": -3.95,
-     "m3": 27.86,
-     "m6": 23.37,
-     "a1": 15.38,
-     "ytd": -8.64,
-     "a3": 133.84,
-     "a5": 32.21,
-     "a10": 11465.17
+     "s1": -2.74,
+     "m1": -4.25,
+     "m3": 27.47,
+     "m6": 23.0,
+     "a1": 15.02,
+     "ytd": -8.92,
+     "a3": 133.13,
+     "a5": 31.81,
+     "a10": 11429.92
     },
     "stagionalita": [
      {
@@ -18035,7 +18051,7 @@
      },
      {
       "mese": 10,
-      "media": 15.13,
+      "media": 15.1,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -18062,9 +18078,9 @@
      }
     ]
    },
-   "rs_1m": -4.3,
+   "rs_1m": -4.6,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -3.1,
+   "rs_ndx_1m": -3.4,
    "beta_ndx": 0.66,
    "avg_corr": 0.3,
    "max_corr": 0.78,
@@ -25565,27 +25581,27 @@
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
    "price": 1.12,
-   "price_asof": "2026-10-17",
+   "price_asof": "2026-10-18",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.26,
+   "change_pct": -0.2,
    "pe": null,
    "ath": 1.6,
-   "ath_dist_pct": -29.9,
-   "sma200_dist_pct": -3.0,
-   "sma50_dist_pct": -2.0,
+   "ath_dist_pct": -30.2,
+   "sma200_dist_pct": -3.4,
+   "sma50_dist_pct": -2.4,
    "w52_high": 1.2,
    "w52_low": 1.11,
-   "w52_dist_pct": -6.5,
+   "w52_dist_pct": -6.9,
    "day_high": 1.12,
    "day_low": 1.12,
    "support": 1.11,
    "resistance": 1.15,
-   "rsi": 37.8,
+   "rsi": 30.3,
    "volume": 0,
    "vol_ratio": null,
-   "atr_14": 0.00639,
-   "atr_pct": 0.57,
+   "atr_14": 0.0066,
+   "atr_pct": 0.59,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -26289,16 +26305,16 @@
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 32,
+   "health": 29,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.29,
-   "sortino_1y": -1.83,
-   "sharpe_6m": -2.53,
-   "sortino_6m": -3.12,
+   "sharpe_1y": -1.37,
+   "sortino_1y": -1.94,
+   "sharpe_6m": -2.74,
+   "sortino_6m": -3.36,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.12,
-   "risk_reward": "1:2.2",
+   "risk_reward": "1:2.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -26310,37 +26326,37 @@
     "w1": {
      "support": 1.11,
      "resistance": 1.13,
-     "change_pct": 0.74
+     "change_pct": 0.27
     },
     "m1": {
      "support": 1.11,
      "resistance": 1.15,
-     "change_pct": -2.04
+     "change_pct": -2.49
     },
     "m3": {
      "support": 1.11,
      "resistance": 1.17,
-     "change_pct": -1.62
+     "change_pct": -2.07
     },
     "y1": {
      "support": 1.11,
      "resistance": 1.2,
-     "change_pct": -3.56
+     "change_pct": -4.01
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 24,
+    "bias": 20,
     "label": "Distribuzione",
     "structure": "ribassista",
     "bos": null,
-    "bull_fvg": 1,
+    "bull_fvg": 0,
     "bear_fvg": 7,
     "last_fvg": {
-     "dir": "rialzista",
-     "lo": 1.12,
-     "hi": 1.12
+     "dir": "ribassista",
+     "lo": 1.13,
+     "hi": 1.13
     },
     "liq_above": 1.14,
     "liq_below": 1.12,
@@ -26356,70 +26372,70 @@
      "medie": {
       "sma10": {
        "liv": 1.12,
-       "dist_pct": 0.28
+       "dist_pct": -0.13
       },
       "ema10": {
        "liv": 1.12,
-       "dist_pct": 0.11
+       "dist_pct": -0.27
       },
       "sma20": {
        "liv": 1.13,
-       "dist_pct": -0.38
+       "dist_pct": -0.81
       },
       "ema20": {
        "liv": 1.13,
-       "dist_pct": -0.41
+       "dist_pct": -0.82
       },
       "sma30": {
        "liv": 1.14,
-       "dist_pct": -1.18
+       "dist_pct": -1.62
       },
       "ema30": {
        "liv": 1.13,
-       "dist_pct": -0.84
+       "dist_pct": -1.27
       },
       "sma50": {
        "liv": 1.15,
-       "dist_pct": -1.99
+       "dist_pct": -2.43
       },
       "ema50": {
        "liv": 1.14,
-       "dist_pct": -1.36
+       "dist_pct": -1.8
       },
       "sma100": {
        "liv": 1.15,
-       "dist_pct": -2.0
+       "dist_pct": -2.44
       },
       "ema100": {
        "liv": 1.15,
-       "dist_pct": -1.98
+       "dist_pct": -2.42
       },
       "sma200": {
        "liv": 1.16,
-       "dist_pct": -2.96
+       "dist_pct": -3.4
       },
       "ema200": {
        "liv": 1.15,
-       "dist_pct": -2.55
+       "dist_pct": -2.99
       }
      },
-     "medie_battute": 2,
+     "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 37.8,
+      "rsi14": 30.3,
       "macd": {
        "linea": -0.01,
        "segnale": -0.01,
        "istogramma": 0.0
       },
-      "stoch_k": 48.6,
-      "stoch_d": 38.4,
-      "williams_r": -51.4,
-      "cci20": -16.2,
-      "adx14": 50.8,
-      "di_su": 10.8,
-      "di_giu": 26.2,
-      "momentum10": -0.0
+      "stoch_k": 29.1,
+      "stoch_d": 31.9,
+      "williams_r": -70.9,
+      "cci20": -30.9,
+      "adx14": 51.1,
+      "di_su": 10.4,
+      "di_giu": 28.2,
+      "momentum10": -0.01
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -26908,7 +26924,7 @@
       "c": 1.12
      },
      {
-      "d": "2026-10-17",
+      "d": "2026-10-18",
       "o": 1.12,
       "h": 1.12,
       "l": 1.12,
@@ -26916,15 +26932,15 @@
      }
     ],
     "performance": {
-     "s1": 0.34,
-     "m1": -1.98,
-     "m3": -1.77,
-     "m6": -3.78,
-     "a1": -3.51,
-     "ytd": -4.32,
-     "a3": 5.91,
-     "a5": -2.76,
-     "a10": 2.35
+     "s1": -0.13,
+     "m1": -2.43,
+     "m3": -2.22,
+     "m6": -4.22,
+     "a1": -3.96,
+     "ytd": -4.76,
+     "a3": 5.42,
+     "a5": -3.21,
+     "a10": 1.88
     },
     "stagionalita": [
      {
@@ -27010,7 +27026,7 @@
      },
      {
       "mese": 10,
-      "media": -0.31,
+      "media": -0.33,
       "mediana": -0.32,
       "positivi_pct": 48,
       "campione": 23,
@@ -34674,7 +34690,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMZN",
-    "entita": "Amazon Com Inc",
+    "entita": "AMZN",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.0292,
@@ -35142,7 +35158,7 @@
      98.35,
      84.39,
      94.22,
-     99.64,
+     99.65,
      83.74,
      89.74,
      116.26,
@@ -38218,7 +38234,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ALPHINC",
-    "entita": "Alphabet Inc",
+    "entita": "ALPHINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.0963,
@@ -42140,8 +42156,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "TAISEM",
-    "entita": "Taiwan Semicon Mfg Co Ltd",
-    "contratto": "SNRFOR.USD.CR14",
+    "entita": "TAISEM",
+    "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.7167,
     "punti": -1.72,
@@ -45422,7 +45438,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "INTC",
-    "entita": "Intel Corp",
+    "entita": "INTC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 100.6103,
@@ -46648,7 +46664,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "SPACEXP",
-    "entita": "SPACE EXPL TECH CORP",
+    "entita": "SPACEXP",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 94.9642,
@@ -48357,7 +48373,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "TESLINC",
-    "entita": "Tesla Inc",
+    "entita": "TESLINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 96.2354,
@@ -49815,7 +49831,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CONSENAG",
-    "entita": "Constellation Energy Generation LLC",
+    "entita": "CONSENAG",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 100.9804,
@@ -50545,9 +50561,9 @@
     "float_pct": 99.3,
     "avg_volume_30d": 34614664.0,
     "pe_ttm": 22.1792,
-    "forward_pe": 18.56,
+    "forward_pe": 18.5588,
     "eps_ttm": 3.18,
-    "eps_forward": 3.8001,
+    "eps_forward": 3.8003,
     "revenue_fy": 48370765824.0,
     "net_income_fy": 13649642496.0,
     "revenue_growth": 0.134,
@@ -51622,7 +51638,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NFLX",
-    "entita": "Netflix Inc",
+    "entita": "NFLX",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.0701,
@@ -53622,7 +53638,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MSFT",
-    "entita": "Microsoft Corp",
+    "entita": "MSFT",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.139,
@@ -55467,7 +55483,7 @@
       },
       "evento": {
        "beta": 0.29,
-       "r2": 0.162,
+       "r2": 0.163,
        "corr": 0.4,
        "campione": 50,
        "da": "2025-10-27",
@@ -55626,7 +55642,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "APLINC",
-    "entita": "Apple Inc.",
+    "entita": "APLINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.5386,
@@ -57311,7 +57327,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "METAPL",
-    "entita": "META PLATFORMS INC",
+    "entita": "METAPL",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.7536,
@@ -62440,7 +62456,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "BROINC",
-    "entita": "BROADCOM INC",
+    "entita": "BROINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 98.0629,
@@ -63214,8 +63230,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 17,
-    "target": 2155.32,
-    "upside_pct": 31.3
+    "target": 2145.43,
+    "upside_pct": 30.7
    },
    "analisti": {
     "eps_ora": 55.9293,
@@ -63228,9 +63244,9 @@
     "eps_min": 37.43,
     "eps_max": 63.9,
     "eps_n": 27,
-    "target_min": 869.75,
-    "target_max": 2889.86,
-    "target_mediana": 2309.31
+    "target_min": 865.76,
+    "target_max": 2876.6,
+    "target_mediana": 2298.71
    },
    "health": 47,
    "eps": 40.64,
@@ -63267,7 +63283,7 @@
     "debt_to_equity": 8.897,
     "dividend_yield": 0.0055,
     "price_to_book": null,
-    "target_mean": 2155.3225,
+    "target_mean": 2145.4336,
     "fcf": null,
     "gross_margin": 0.5434,
     "enterprise_value": null,
@@ -64085,7 +64101,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.64,
+      "mediana": 1.63,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -66033,7 +66049,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -68267,7 +68283,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ORCLE",
-    "entita": "Oracle Cop",
+    "entita": "ORCLE",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 91.758,
@@ -70281,7 +70297,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MCD",
-    "entita": "McDONALDS Corp",
+    "entita": "MCD",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.4788,
@@ -71043,8 +71059,8 @@
    "rating": {
     "key": "buy",
     "n": 11,
-    "target": 127.98,
-    "upside_pct": 57.0
+    "target": 128.23,
+    "upside_pct": 57.3
    },
    "analisti": {
     "eps_ora": 2.5999,
@@ -71057,9 +71073,9 @@
     "eps_min": 1.96,
     "eps_max": 4.1,
     "eps_n": 18,
-    "target_min": 83.74,
-    "target_max": 170.36,
-    "target_mediana": 134.17
+    "target_min": 83.91,
+    "target_max": 170.7,
+    "target_mediana": 134.43
    },
    "health": 19,
    "eps": 0.59,
@@ -71096,7 +71112,7 @@
     "debt_to_equity": 17.131,
     "dividend_yield": 0.0021,
     "price_to_book": null,
-    "target_mean": 127.9784,
+    "target_mean": 128.2295,
     "fcf": null,
     "gross_margin": 0.3511,
     "enterprise_value": null,
@@ -83615,7 +83631,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "XOM",
-    "entita": "Exxon Mobil Corp",
+    "entita": "XOM",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8063,
@@ -84073,7 +84089,7 @@
      26.8,
      25.7,
      26.38,
-     27.77,
+     27.76,
      27.44,
      28.48,
      30.19,
@@ -84207,7 +84223,7 @@
      71.81,
      71.36,
      69.91,
-     70.48,
+     70.49,
      73.77,
      73.44,
      80.18,
@@ -85630,7 +85646,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CVX",
-    "entita": "Chevron Corp",
+    "entita": "CVX",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8473,
@@ -86153,7 +86169,7 @@
      32.88,
      31.09,
      28.92,
-     32.12,
+     32.13,
      32.9,
      33.61,
      31.46,
@@ -87644,7 +87660,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COP",
-    "entita": "ConocoPhillips",
+    "entita": "COP",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.237,
@@ -87980,7 +87996,7 @@
      140.26,
      150.21,
      160.86,
-     166.38,
+     166.39,
      149.99,
      148.7,
      158.18,
@@ -89322,7 +89338,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ABBVINC",
-    "entita": "ABBVIE INC",
+    "entita": "ABBVINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1637,
@@ -95218,7 +95234,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMGN",
-    "entita": "Amgen Inc.",
+    "entita": "AMGN",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1685,
@@ -95560,7 +95576,7 @@
      171.99,
      163.61,
      170.13,
-     175.79,
+     175.8,
      179.02,
      189.57,
      173.43,
@@ -100385,7 +100401,10 @@
    "rs_ndx_1m": 9.5,
    "cds": {
     "stato": "assente",
-    "verificato": "2026-10-17"
+    "verificato": "2026-10-17",
+    "candidati": [
+     "PHILIP"
+    ]
    },
    "beta_ndx": -0.33,
    "avg_corr": -0.41,
@@ -100993,7 +101012,7 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
      336.45,
      329.49,
@@ -102101,7 +102120,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -102371,7 +102390,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "DE",
-    "entita": "Deere & Co",
+    "entita": "DE",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.4987,
@@ -104381,7 +104400,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "THWALT",
-    "entita": "Walt Disney Co.",
+    "entita": "THWALT",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.9211,
@@ -106395,7 +106414,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "PFE",
-    "entita": "Pfizer Inc",
+    "entita": "PFE",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1865,
@@ -106725,7 +106744,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -106882,7 +106901,7 @@
      352.96,
      313.87,
      334.37,
-     321.42,
+     321.43,
      301.14,
      316.17,
      300.45,
@@ -108236,7 +108255,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "GS",
-    "entita": "Goldman Sachs Gp Inc",
+    "entita": "GS",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.5906,
@@ -110246,7 +110265,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "JPM",
-    "entita": "JPMorgan Chase & Co",
+    "entita": "JPM",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.4283,
@@ -110493,7 +110512,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -110526,7 +110545,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -110693,7 +110712,7 @@
      427.74,
      448.72,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -110721,7 +110740,7 @@
      559.58,
      599.35,
      549.48,
-     603.73,
+     603.74,
      601.22,
      500.17,
      587.09,
@@ -121156,15 +121175,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1242",
-    "change_pct": 0.26,
+    "value": "1.1189",
+    "change_pct": -0.21,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "176.99",
-    "change_pct": -0.19,
+    "value": "176.69",
+    "change_pct": -0.36,
     "suffix": "%"
    }
   ],
@@ -123241,6 +123260,27 @@
   "news": {
    "voci": [
     {
+     "titolo": "Traders Grow Wary of Copper Bull Market With No Sign of Tariffs",
+     "riassunto": "Since Donald Trump came back into office, copper has surged on a seismic reshuffling of global inventories linked to the risk that he’ll impose tariffs on the metal. But as Trump nears the halfway mark on his second term, the market’s many bulls are growing wary that prices could crash if he doesn’t follow through.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-18T20:00:04Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-18/traders-grow-wary-of-copper-bull-market-with-no-sign-of-tariffs"
+    },
+    {
+     "titolo": "Bond Market’s Big Short Bet Gets Wakeup Call as AI Trade Wobbles",
+     "riassunto": "US Treasuries are showing tentative signs of reclaiming their traditional role as a haven — threatening to wrong-foot investors who are heavily positioned for this year’s bond slump to deepen.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-18T19:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-18/bond-market-s-big-short-bet-gets-wakeup-call-as-ai-trade-wobbles"
+    },
+    {
+     "titolo": "CPI Test Set to Make or Break New Zealand Dollar’s Losing Run",
+     "riassunto": "The New Zealand dollar has fallen for five straight quarters and if analysts are right, it may be on course to test a pandemic-era low.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-18T19:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-18/cpi-test-set-to-make-or-break-new-zealand-dollar-s-losing-run"
+    },
+    {
      "titolo": "‘Some people did everything right’: I lost my home in the Great Recession. I rent in my 50s. Why is that judged as failure?",
      "riassunto": "”I earn $110,000 a year.”",
      "fonte": "MarketWatch",
@@ -123344,36 +123384,14 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-14T04:24:28Z",
      "url": "https://www.cnbc.com/2026/10/14/godzilla-el-nino-asia-inflation-philippines.html"
-    },
-    {
-     "titolo": "The latest inflation data is expected to show price increases are accelerating",
-     "riassunto": "Economists expect the consumer price index for September to rise 0.6% on the month and 3.6% year over year.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-13T18:05:57Z",
-     "url": "https://www.cnbc.com/2026/10/13/september-consumer-price-index-inflation.html"
-    },
-    {
-     "titolo": "World Bank jobs council urges 'crisis-era' employment support measures as IMF warns of AI ‘tsunami’",
-     "riassunto": "IMF Chief Kristalina Georgieva warned AI is hitting the global labor market like a “slow-moving tsunami,” with young workers entering the job market the most exposed.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-13T13:09:55Z",
-     "url": "https://www.cnbc.com/2026/10/12/imf-world-bank-ai-jobs-inflation-.html"
-    },
-    {
-     "titolo": "IMF warns bond yields could see a 'disorderly' spike as debt, inflation risks worsen",
-     "riassunto": "The IMF says risks in the government bond market have worsened and that yields could jump sharply and disorderly.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-13T04:54:07Z",
-     "url": "https://www.cnbc.com/2026/10/13/treasury-yields-imf-debt-inflation-.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
+    "Bloomberg",
     "MarketWatch"
    ],
-   "fonti_mute": [
-    "Bloomberg"
-   ],
+   "fonti_mute": [],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -125286,182 +125304,182 @@
     "JPM": {
      "cik": 19617,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-06",
       "accn": "0001628280-26-054343",
+      "data": "2026-08-06",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
-     },
-     "letto_il": "2026-10-18",
-     "versione": 502,
-     "stantii": {
-      "scadenze": "2023-02-21",
-      "carta_commerciale": "2017-11-01"
      },
      "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
-    },
-    "LLY": {
-     "cik": 59478,
-     "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-05",
-      "accn": "0000059478-26-000081",
-      "periodo": "2026-06-30"
+      "n": 0,
+      "voci": []
      },
      "letto_il": "2026-10-18",
-     "versione": 502,
-     "linee_disponibili": {
-      "valore": 10100000000.0,
-      "valuta": "USD",
-      "al": "2025-12-31"
+     "stantii": {
+      "carta_commerciale": "2017-11-01",
+      "scadenze": "2023-02-21"
      },
+     "versione": 502
+    },
+    "LLY": {
      "carta_commerciale": {
+      "al": "2025-12-31",
       "valore": 0.0,
-      "valuta": "USD",
-      "al": "2025-12-31"
+      "valuta": "USD"
+     },
+     "cik": 59478,
+     "deposito": {
+      "accn": "0000059478-26-000081",
+      "data": "2026-08-05",
+      "forma": "10-Q",
+      "periodo": "2026-06-30"
+     },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18",
+     "linee_disponibili": {
+      "al": "2025-12-31",
+      "valore": 10100000000.0,
+      "valuta": "USD"
      },
      "stantii": {
       "scadenze": "2025-02-19",
       "tasso": "2025-02-19"
      },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "versione": 502
     },
     "MA": {
      "cik": 1141391,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-07-30",
       "accn": "0001141391-26-000083",
+      "data": "2026-07-30",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
      "letto_il": "2026-10-18",
-     "versione": 502,
      "scadenze": {
       "al": "2025-12-31",
-      "forma": "10-K",
       "depositato": "2026-02-11",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 750000000.0,
        "anno_2": 1941000000.0,
        "anno_3": 2750000000.0,
        "anno_4": 1882000000.0,
        "anno_5": 1676000000.0,
+       "entro_12_mesi": 750000000.0,
        "oltre_5": 10150000000.0
       }
      },
      "stantii": {
       "equo": "2018-05-02"
      },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "versione": 502
     },
     "MCD": {
+     "carta_commerciale": {
+      "al": "2025-12-31",
+      "valore": 798000000.0,
+      "valuta": "USD"
+     },
      "cik": 63908,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-07",
       "accn": "0000063908-26-000073",
+      "data": "2026-08-07",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "equo": {
+      "al": "2026-06-30",
+      "depositato": "2026-08-07",
+      "forma": "10-Q",
+      "rapporto_pct": 96.0,
+      "voci": [
+       "LongTermDebtFairValue",
+       "DebtInstrumentCarryingAmount"
+      ]
+     },
      "letto_il": "2026-10-18",
-     "versione": 502,
      "scadenze": {
       "al": "2025-12-31",
-      "forma": "10-K",
       "depositato": "2026-02-24",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 0.0,
        "anno_2": 3201000000.0,
        "anno_3": 5166000000.0,
        "anno_4": 3637000000.0,
        "anno_5": 3011000000.0,
+       "entro_12_mesi": 0.0,
        "oltre_5": 25130000000.0
       }
      },
-     "equo": {
-      "al": "2026-06-30",
-      "voci": [
-       "LongTermDebtFairValue",
-       "DebtInstrumentCarryingAmount"
-      ],
-      "forma": "10-Q",
-      "depositato": "2026-08-07",
-      "rapporto_pct": 96.0
-     },
-     "carta_commerciale": {
-      "valore": 798000000.0,
-      "valuta": "USD",
-      "al": "2025-12-31"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "versione": 502
     },
     "META": {
      "cik": 1326801,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-07-30",
       "accn": "0001628280-26-050705",
+      "data": "2026-07-30",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
      "letto_il": "2026-10-18",
-     "versione": 502,
      "scadenze": {
       "al": "2026-06-30",
-      "forma": "10-Q",
       "depositato": "2026-07-30",
+      "forma": "10-Q",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 2750000000.0,
-       "resto_esercizio": 0.0,
        "anno_2": 1500000000.0,
        "anno_3": 1000000000.0,
-       "anno_4": 5000000000.0
+       "anno_4": 5000000000.0,
+       "entro_12_mesi": 2750000000.0,
+       "resto_esercizio": 0.0
       }
      },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "versione": 502
     },
     "MRK": {
      "cik": 310158,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-07",
       "accn": "0000310158-26-000212",
+      "data": "2026-08-07",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
      "letto_il": "2026-10-18",
-     "versione": 502,
      "scadenze": {
       "al": "2025-12-31",
-      "forma": "10-K",
       "depositato": "2026-02-24",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 2600000000.0,
        "anno_2": 2700000000.0,
        "anno_3": 2100000000.0,
        "anno_4": 3000000000.0,
-       "anno_5": 2700000000.0
+       "anno_5": 2700000000.0,
+       "entro_12_mesi": 2600000000.0
       }
      },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "versione": 502
     },
     "MRVL": {
      "cik": 1835632,
@@ -125495,48 +125513,48 @@
      "versione": 502
     },
     "MSFT": {
+     "carta_commerciale": {
+      "al": "2025-06-30",
+      "valore": 0.0,
+      "valuta": "USD"
+     },
      "cik": 789019,
      "deposito": {
-      "forma": "10-K",
-      "data": "2026-07-29",
       "accn": "0001193125-26-323660",
+      "data": "2026-07-29",
+      "forma": "10-K",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
+     "equo": {
+      "al": "2026-06-30",
+      "depositato": "2026-07-29",
+      "forma": "10-K",
+      "rapporto_pct": 90.6,
+      "voci": [
+       "LongTermDebtFairValue",
+       "LongTermDebt"
+      ]
+     },
      "letto_il": "2026-10-18",
-     "versione": 502,
      "scadenze": {
       "al": "2026-06-30",
-      "forma": "10-K",
       "depositato": "2026-07-29",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 9250000000.0,
        "anno_2": 0.0,
        "anno_3": 2001000000.0,
        "anno_4": 0.0,
        "anno_5": 500000000.0,
+       "entro_12_mesi": 9250000000.0,
        "oltre_5": 34385000000.0
       }
      },
-     "equo": {
-      "al": "2026-06-30",
-      "voci": [
-       "LongTermDebtFairValue",
-       "LongTermDebt"
-      ],
-      "forma": "10-K",
-      "depositato": "2026-07-29",
-      "rapporto_pct": 90.6
-     },
-     "carta_commerciale": {
-      "valore": 0.0,
-      "valuta": "USD",
-      "al": "2025-06-30"
-     },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "versione": 502
     },
     "MSTR": {
      "cik": 1050446,
@@ -125599,61 +125617,84 @@
     "NET": {
      "cik": 1477333,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-08-06",
       "accn": "0001477333-26-000054",
+      "data": "2026-08-06",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
-     "letto_il": "2026-10-18",
-     "versione": 502,
      "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+      "n": 0,
+      "voci": []
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502
     },
     "NFLX": {
      "cik": 1065280,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-07-17",
       "accn": "0001065280-26-000212",
+      "data": "2026-07-17",
+      "forma": "10-Q",
       "periodo": "2026-06-30"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
      "letto_il": "2026-10-18",
-     "versione": 502,
      "stantii": {
       "scadenze": "2020-04-21"
      },
-     "derivati_tassi": {
-      "voci": [],
-      "n": 0
-     }
+     "versione": 502
     },
     "NKE": {
      "cik": 320187,
      "deposito": {
-      "forma": "10-Q",
-      "data": "2026-10-02",
       "accn": "0000320187-26-000193",
+      "data": "2026-10-02",
+      "forma": "10-Q",
       "periodo": "2026-08-31"
      },
+     "derivati_tassi": {
+      "n": 0,
+      "voci": []
+     },
      "letto_il": "2026-10-18",
-     "versione": 502,
      "scadenze": {
       "al": "2026-05-31",
-      "forma": "10-K",
       "depositato": "2026-07-15",
+      "forma": "10-K",
       "valuta": "USD",
       "voci": {
-       "entro_12_mesi": 2000000000.0,
        "anno_2": 0.0,
        "anno_3": 0.0,
        "anno_4": 1500000000.0,
-       "anno_5": 0.0
+       "anno_5": 0.0,
+       "entro_12_mesi": 2000000000.0
       }
      },
      "stantii": {
       "carta_commerciale": "2015-07-23"
+     },
+     "versione": 502
+    },
+    "NOW": {
+     "cik": 1373715,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-07-23",
+      "accn": "0001373715-26-000076",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "carta_commerciale": {
+      "valore": 2100000000.0,
+      "valuta": "USD",
+      "al": "2026-06-30"
+     },
+     "stantii": {
+      "tasso": "2017-05-05"
      },
      "derivati_tassi": {
       "voci": [],
@@ -125689,6 +125730,103 @@
      },
      "versione": 502
     },
+    "OKLO": {
+     "cik": 1849056,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-07",
+      "accn": "0001628280-26-054571",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "ORCL": {
+     "cik": 1341439,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-09-11",
+      "accn": "0001193125-26-389274",
+      "periodo": "2026-08-31"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "scadenze": {
+      "al": "2026-05-31",
+      "forma": "10-K",
+      "depositato": "2026-06-22",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 7210000000.0,
+       "anno_2": 10145000000.0,
+       "anno_3": 5500000000.0,
+       "anno_4": 7250000000.0,
+       "anno_5": 9750000000.0,
+       "oltre_5": 90250000000.0
+      }
+     },
+     "stantii": {
+      "equo": "2012-03-23",
+      "carta_commerciale": "2016-06-22"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "PANW": {
+     "cik": 1327567,
+     "deposito": {
+      "forma": "10-K",
+      "data": "2026-09-10",
+      "accn": "0001327567-26-000023",
+      "periodo": "2026-07-31"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "stantii": {
+      "tasso": "2018-06-05"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "PFE": {
+     "cik": 78003,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-04",
+      "accn": "0000078003-26-000095",
+      "periodo": "2026-06-28"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "tasso": {
+      "valore_pct": 3.6,
+      "al": "2025-05-31",
+      "voce": "DebtInstrumentInterestRateEffectivePercentage",
+      "forma": "10-Q",
+      "depositato": "2025-11-04"
+     },
+     "carta_commerciale": {
+      "valore": 0.0,
+      "valuta": "USD",
+      "al": "2025-12-31"
+     },
+     "stantii": {
+      "scadenze": "2017-11-09",
+      "equo": "2014-08-07"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
     "PLTR": {
      "cik": 1321655,
      "deposito": {
@@ -125706,6 +125844,38 @@
       "scadenze": "2021-02-26"
      },
      "versione": 502
+    },
+    "PM": {
+     "cik": 1413329,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-07-24",
+      "accn": "0001628280-26-049493",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-02-06",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 3540000000.0,
+       "anno_2": 6816000000.0,
+       "anno_3": 4968000000.0,
+       "anno_4": 4968000000.0,
+       "anno_5": 5903000000.0
+      }
+     },
+     "stantii": {
+      "equo": "2013-02-22",
+      "carta_commerciale": "2020-02-07"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
     },
     "RGTI": {
      "cik": 1838359,
@@ -125756,19 +125926,128 @@
       "equo": "2013-09-11"
      },
      "versione": 502
+    },
+    "SPCX": {
+     "cik": 1181412,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-04",
+      "accn": "0001628280-26-052535",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "scadenze": {
+      "al": "2026-06-30",
+      "forma": "10-Q",
+      "depositato": "2026-08-04",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 2402000000.0,
+       "resto_esercizio": 944000000.0,
+       "anno_2": 2867000000.0,
+       "anno_3": 3422000000.0,
+       "anno_4": 3597000000.0
+      }
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "STX": {
+     "cik": 1137789,
+     "deposito": {
+      "forma": "10-K",
+      "data": "2026-08-04",
+      "accn": "0001137789-26-000159",
+      "periodo": "2026-07-03"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "scadenze": {
+      "al": "2026-07-03",
+      "forma": "10-K",
+      "depositato": "2026-08-04",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 0.0,
+       "anno_2": 186000000.0,
+       "anno_3": 381000000.0,
+       "anno_4": 636000000.0,
+       "anno_5": 599000000.0,
+       "oltre_5": 1801000000.0
+      }
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "TSLA": {
+     "cik": 1318605,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-07-23",
+      "accn": "0001628280-26-049270",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "scadenze": {
+      "al": "2025-12-31",
+      "forma": "10-K",
+      "depositato": "2026-01-29",
+      "valuta": "USD",
+      "voci": {
+       "entro_12_mesi": 1576000000.0,
+       "anno_2": 1233000000.0,
+       "anno_3": 649000000.0,
+       "anno_4": 4386000000.0,
+       "anno_5": 89000000.0,
+       "oltre_5": 244000000.0
+      }
+     },
+     "stantii": {
+      "tasso": "2015-02-26",
+      "equo": "2015-02-26",
+      "linee_disponibili": "2017-08-04"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
+    },
+    "TTWO": {
+     "cik": 946581,
+     "deposito": {
+      "forma": "10-Q",
+      "data": "2026-08-07",
+      "accn": "0001628280-26-054870",
+      "periodo": "2026-06-30"
+     },
+     "letto_il": "2026-10-18",
+     "versione": 502,
+     "stantii": {
+      "scadenze": "2022-11-08"
+     },
+     "derivati_tassi": {
+      "voci": [],
+      "n": 0
+     }
     }
    },
    "letti_ora": [
-    "JPM",
-    "LLY",
-    "MA",
-    "MCD",
-    "META",
-    "MRK",
-    "MSFT",
-    "NET",
-    "NFLX",
-    "NKE"
+    "NOW",
+    "OKLO",
+    "ORCL",
+    "PANW",
+    "PFE",
+    "PM",
+    "SPCX",
+    "STX",
+    "TSLA",
+    "TTWO"
    ],
    "in_attesa": [
     "AAPL",
@@ -125791,16 +126070,6 @@
     "GOOGL",
     "GS",
     "INTC",
-    "NOW",
-    "OKLO",
-    "ORCL",
-    "PANW",
-    "PFE",
-    "PM",
-    "SPCX",
-    "STX",
-    "TSLA",
-    "TTWO",
     "V",
     "WDC",
     "XOM"
@@ -130581,8 +130850,8 @@
    "us10": 5.1,
    "jp10": 2.95,
    "spread": 2.15,
-   "usdjpy": 157.99,
-   "usdjpy_chg_1m": 1.75,
+   "usdjpy": 158.02,
+   "usdjpy_chg_1m": 1.77,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -130616,7 +130885,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 46
+     "score": 44
     },
     {
      "label": "Treasury 10A",
@@ -135746,11 +136015,11 @@
   "cds": {
    "fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
    "url": "https://www.ice.com/api/cds-settlement-prices/icc-single-names",
-   "letto": true,
-   "errore": null,
+   "letto": false,
+   "errore": "HTTP 403",
    "data": "2026-10-16",
    "scadenza": "2031-12-20",
-   "entita_ice": 690,
+   "entita_ice": null,
    "tasso_pct": 3.88,
    "tasso_fonte": "EFFR del 2026-10-15 (NY Fed), proxy della curva SOFR della convenzione ISDA",
    "recupero": 0.4,
@@ -135759,16 +136028,16 @@
     "HY": {
      "serie": 47,
      "versione": 1,
-     "prezzo": 105.8411,
      "cedola": 500,
+     "prezzo": 105.8411,
      "pb": 357.1,
      "var": {}
     },
     "IG": {
      "serie": 47,
      "versione": 1,
-     "prezzo": 101.7081,
      "cedola": 100,
+     "prezzo": 101.7081,
      "pb": 62.9,
      "var": {}
     }
@@ -135861,7 +136130,7 @@
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-18T17:36:37Z",
+      "quando": "2026-10-18T20:25:43Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
@@ -135949,7 +136218,7 @@
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-18T17:36:37Z",
+      "quando": "2026-10-18T20:25:43Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
@@ -135993,7 +136262,7 @@
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-18T17:36:37Z",
+      "quando": "2026-10-18T20:25:43Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
@@ -136081,8 +136350,22 @@
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-18T17:36:37Z",
+      "quando": "2026-10-18T20:25:43Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+     },
+     {
+      "titolo": "Why Micron's Latest Long-Term Deals Are a Game-Changer for Investors",
+      "riassunto": "Key PointsMicron and other memory stocks have fallen amid concerns that increased supply from China will eventually flood the market.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T20:05:00Z",
+      "url": "https://www.nasdaq.com/articles/why-microns-latest-long-term-deals-are-game-changer-investors"
+     },
+     {
+      "titolo": "Better AI Chip Stock: Taiwan Semiconductor vs. Micron",
+      "riassunto": "Key PointsMicron and Taiwan Semiconductor are two major players in the chip space.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-18T16:04:00Z",
+      "url": "https://www.nasdaq.com/articles/better-ai-chip-stock-taiwan-semiconductor-vs-micron"
      },
      {
       "titolo": "Micron Technology (MU) Stock Is Down 24% From Its Peak. History Says $10,000 Invested Right Now Could Be Worth This Much by 2030",
@@ -136104,20 +136387,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-18T07:25:00Z",
       "url": "https://www.nasdaq.com/articles/elon-musk-says-optimus-teslas-most-important-product-these-3-suppliers-get-paid-tesla-does"
-     },
-     {
-      "titolo": "Micron Technology vs. Sandisk: Which AI Memory Stock Is the Better Investment?",
-      "riassunto": "Key PointsMicron Technology generates approximately 60% of its revenue from the data center market and maintains a highly profitable DRAM and NAND portfolio.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-18T03:10:01Z",
-      "url": "https://www.nasdaq.com/articles/micron-technology-vs-sandisk-which-ai-memory-stock-better-investment"
-     },
-     {
-      "titolo": "Is Micron's Incredible Run About to End?",
-      "riassunto": "Key PointsMicron, Samsung, and SK Hynix control the vast majority of the memory chip market.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-17T19:27:00Z",
-      "url": "https://www.nasdaq.com/articles/microns-incredible-run-about-end"
      }
     ],
     "NVDA": [
@@ -136125,7 +136394,7 @@
       "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-18T17:36:37Z",
+      "quando": "2026-10-18T20:25:43Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
      },
      {
@@ -136318,7 +136587,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-18T18:32:37Z"
+   "letto_il": "2026-10-18T21:13:29Z"
   }
  },
  "broker": null,
@@ -136329,7 +136598,7 @@
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-18T17:36:37Z",
+     "quando": "2026-10-18T20:25:43Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
@@ -136417,7 +136686,7 @@
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-18T17:36:37Z",
+     "quando": "2026-10-18T20:25:43Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
@@ -136461,7 +136730,7 @@
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-18T17:36:37Z",
+     "quando": "2026-10-18T20:25:43Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
@@ -136549,8 +136818,22 @@
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-18T17:36:37Z",
+     "quando": "2026-10-18T20:25:43Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
+    },
+    {
+     "titolo": "Why Micron's Latest Long-Term Deals Are a Game-Changer for Investors",
+     "riassunto": "Key PointsMicron and other memory stocks have fallen amid concerns that increased supply from China will eventually flood the market.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T20:05:00Z",
+     "url": "https://www.nasdaq.com/articles/why-microns-latest-long-term-deals-are-game-changer-investors"
+    },
+    {
+     "titolo": "Better AI Chip Stock: Taiwan Semiconductor vs. Micron",
+     "riassunto": "Key PointsMicron and Taiwan Semiconductor are two major players in the chip space.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-18T16:04:00Z",
+     "url": "https://www.nasdaq.com/articles/better-ai-chip-stock-taiwan-semiconductor-vs-micron"
     },
     {
      "titolo": "Micron Technology (MU) Stock Is Down 24% From Its Peak. History Says $10,000 Invested Right Now Could Be Worth This Much by 2030",
@@ -136572,20 +136855,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-18T07:25:00Z",
      "url": "https://www.nasdaq.com/articles/elon-musk-says-optimus-teslas-most-important-product-these-3-suppliers-get-paid-tesla-does"
-    },
-    {
-     "titolo": "Micron Technology vs. Sandisk: Which AI Memory Stock Is the Better Investment?",
-     "riassunto": "Key PointsMicron Technology generates approximately 60% of its revenue from the data center market and maintains a highly profitable DRAM and NAND portfolio.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-18T03:10:01Z",
-     "url": "https://www.nasdaq.com/articles/micron-technology-vs-sandisk-which-ai-memory-stock-better-investment"
-    },
-    {
-     "titolo": "Is Micron's Incredible Run About to End?",
-     "riassunto": "Key PointsMicron, Samsung, and SK Hynix control the vast majority of the memory chip market.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-17T19:27:00Z",
-     "url": "https://www.nasdaq.com/articles/microns-incredible-run-about-end"
     }
    ],
    "NVDA": [
@@ -136593,7 +136862,7 @@
      "titolo": "Stock Indexes Finish Sharply Lower as Tech Stocks Plunge",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -1.09% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down by -0.34%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -2.50%.  December E-mini S&P futures (ESZ26 ) fell -1.14%, and December E-mini...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-18T17:36:37Z",
+     "quando": "2026-10-18T20:25:43Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-sharply-lower-tech-stocks-plunge"
     },
     {
@@ -136786,7 +137055,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-18T18:32:37Z"
+  "letto_il": "2026-10-18T21:13:29Z"
  },
  "predictions": [
   {
@@ -136801,7 +137070,7 @@
   },
   {
    "question": "Will Bitcoin dip to $80,000 October 12-18?",
-   "yes": 22,
+   "yes": 30,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-80k-october-12-18-2026-from-october-15"
   },
   {
@@ -206053,7 +206322,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 2 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -206093,7 +206362,7 @@
     "age_days": 2,
     "max_age": 5,
     "status": "ok",
-    "note": ""
+    "note": "ICE non letto in questo run (HTTP 403): vale l'ultimo giorno raccolto"
    },
    {
     "key": "debito_sec",
@@ -206101,7 +206370,7 @@
     "age_days": 0,
     "max_age": 7,
     "status": "ok",
-    "note": "33 nomi in attesa del budget per run"
+    "note": "23 nomi in attesa del budget per run"
    },
    {
     "key": "bce",
@@ -206129,6 +206398,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-18T18:32:37Z"
+  "generated_at": "2026-10-18T21:13:30Z"
  }
 }
