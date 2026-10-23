@@ -8111,3 +8111,69 @@ riformulazione* — su un testo che non era codice.
   verifica che il valore ci sia prima di confrontarlo, e la stessa iniezione morde per nome.
 - Pavimento di `test_analisi_libro.py` 755 → 780 (795 punti di chiamata). `?v=` e `BUILD_VERSION` non toccati: nessun
   file servito al browser (v440).
+
+## 📉 v506 — LE VENDITE ALLO SCOPERTO: LE POSIZIONI CORTE APERTE, CON LA LORO DATA
+
+Il CEO, 19/10/2026, testuale: *"Analizza anche azioni allo scoperto ovvero attività short in % sui titoli qualora tu non
+lo faccia già e rendila strutturale"*. **Il sistema lo faceva a metà, e con due grandezze che non rispondevano alla
+domanda**, entrambe nella riga «short» delle schede:
+
+| grandezza | difetto |
+|---|---|
+| `stats.short_float` (Yahoo) | **nessuna data della rilevazione** (v396), e su certificati americani e titoli a più classi su una base sbagliata — misurato il 23/10: TSM 0,08% contro 0,63%, GOOGL la metà: le azioni corte sono di una specie e il flottante di un'altra |
+| `short_flusso` (FINRA Reg SHO) | la quota del volume di OGNI GIORNO venduta allo scoperto: un **flusso** che comprende i market maker, non la posizione aperta — ed è la stessa grandezza del DPI del dark pool, scritta due volte (v161, v415) |
+
+**Le posizioni corte APERTE le pubblica FINRA due volte al mese, gratis**, e il **calendario delle pubblicazioni è
+ufficiale**: misurato prima di scrivere, una richiesta sola per i 58 titoli seguiti e un anno di regolamenti in circa un
+secondo. La pipeline MISURA (`update_data.aggiorna_short`: quota del flottante, giorni per ricoprire, variazione sul
+regolamento precedente e in tre mesi col titolo negli stessi giorni, percentile midrank dell'anno con minimo e massimo
+datati), le schede LEGGONO (blocco **VENDITE ALLO SCOPERTO** in testa, riga **short** di ogni nome): una resa sola, e la
+quota di Yahoo e il flusso giornaliero non si ristampano più.
+
+### I casi che hanno deciso il codice, tutti trovati sui dati veri
+- **SPCX era un ETF**: fino a giugno 2026 lo stesso simbolo era «The SPAC and New Issue ETF». La serie si taglia al cambio
+  del NOME dell'emittente e il taglio si dichiara col nome di prima — la classe del veicolo di quotazione (v492). XOM ha
+  cambiato nome il 15/07 per una riorganizzazione: il taglio è prudente, e dichiarato.
+- **NFLX, «+413%» in quindici giorni**: un frazionamento. FINRA lo segna sul primo regolamento DOPO, e il precedente è
+  contato nella base vecchia: la serie riparte da lì, e nessuna variazione lo attraversa.
+- **Il «1» di FINRA sotto un giorno**: il suo `daysToCoverQuantity` vale 1 anche a 0,78 (MU il 15/06). I giorni si
+  calcolano dai due numeri pubblicati, posizioni corte e volume medio.
+- **La quota del flottante solo fra grandezze della stessa specie**: certificati americani e New York registry (TSM, SKHY,
+  ASML) no; un flottante più grande delle azioni della classe quotata (GOOGL) no; e quando la nostra quota e quella di
+  Yahoo non coincidono oltre il ±25% (SPCX 7,1% contro 2,6%, TSLA 3,1% contro 2,0%) **la riga lo dice** invece di sceglierne
+  una: i dati qui presenti non dicono se la differenza sia nel flottante o nella data.
+- **Il calendario dalla pagina di FINRA, mai stimato** (v396): tre date per regolamento, gennaio dopo dicembre è dell'anno
+  dopo, una terna fuori ordine vuol dire che il formato è cambiato e il prossimo aggiornamento diventa «dato non
+  disponibile». ⚠ La prima stesura leggeva come una terna gli avvisi datati in fondo alla pagina («October 27, 2022») e
+  restituiva None: trovato **provandola sulla pagina vera**, prima di scrivere i controlli.
+- **Nasce sorvegliata** (v390): `validate_macro` alza `short_interest` se manca, se il regolamento ha più di 31 giorni, e
+  se il calendario dice che il regolamento successivo è già pubblicato e i dati non lo portano. Se FINRA non risponde
+  vale la misura del run precedente, **dichiarata**.
+
+Prima lettura, regolamento del 30/09: quota alta (da 10% del flottante) OKLO 20,8% · RGTI 20,0% · CRWV 18,3% · SMCI 15,7% ·
+CBRS 12,8%; RGTI al 98° percentile, cioè al massimo del proprio anno. Prossima pubblicazione il 26/10 (regolamento del
+15/10). **È informazione**, letta in coppia col titolo negli stessi giorni (FORMATO 5bis): non una prova della tenuta, non
+un colore — se il CEO vorrà farne un segnale, lo deciderà lui.
+
+### 🧪 Il metodo
+- 18 controlli nella pipeline e 13 nelle schede, sugli stati costruiti (v425); il fixture della v505 porta ora il blocco e
+  le righe, perché la scheda completa (v505) li cerca nei due versi.
+- **32 iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**, ciascuna sul
+  controllo atteso — fra queste il taglio al cambio di nome tolto, il frazionamento ignorato, i giorni presi col
+  pavimento di FINRA, la chiusura del giorno DOPO un regolamento senza seduta, la tolleranza del flottante stretta a zero
+  (GS esce), l'anno di gennaio non spostato, il ripiego sul run precedente spento, la quota di Yahoo ristampata, il blocco
+  tolto dal catalogo della scheda.
+- ⚠⚠ **Una non mordeva al primo giro, e il difetto era il FIXTURE.** Le due guardie del calendario — la data con l'anno e
+  la nota a piè di tabella — si coprivano a vicenda, così ho messo fra le tabelle una riga con l'anno perché la prima
+  avesse il suo caso: cominciava con «Updated», quindi non sembrava mai una data e la guardia non veniva messa alla prova.
+  L'iniezione che la toglieva restava verde. Ora la riga è «December 1, 2025», e morde (v430: *un'iniezione che non morde
+  prova che il gate non contiene il fenomeno*).
+- ⚠ Una serie di iniezioni è stata **interrotta con ordine** (SIGINT: il `finally` dell'harness ripristina il file e ne
+  verifica l'impronta, che è tornata giusta) per distribuirla su tre copie verificate: dodici minuti invece di quaranta.
+- ⚠ Le iniezioni delle schede sono girate su una **copia verificata per impronta** del repo, in parallelo a quelle della
+  pipeline (v501): la copia ha ricostruito `update_data.py` da HEAD più le stesse sostituzioni, e le sei impronte
+  coincidevano prima di cominciare.
+- **Annotato e NON corretto**: la pagina e il pacchetto della dashboard (`app.js`) e gli allarmi di `notify_alerts.py`
+  usano ancora la quota di Yahoo. Il CEO legge l'analisi in chat; allinearli è un cambiamento della pagina.
+- Pavimenti: `test_update_data.py` 295 → 310 (321 punti di chiamata) e N_CHECKS_MINIMO 312 → 328 (334 eseguiti),
+  `test_analisi_libro.py` 780 → 795 (808). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

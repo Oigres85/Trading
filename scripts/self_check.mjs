@@ -156,7 +156,8 @@ const SUITE = [
   /* v501: 292 punti di chiamata (+14 su Altman trimestrale, CDS della settimana col lato azionario, debito XBRL) -> 280 */
   /* v502: 295 punti di chiamata (+3 sull'eta' delle voci SEC e la rilettura della cache) -> 285 */
   /* v504: 303 punti di chiamata (+8 sulla solidita' operativa: ciclo di cassa per data, flussi, fine dei periodi) -> 295 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 295, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v506: 321 punti di chiamata (+18 sulle posizioni corte aperte FINRA: tagli, quota, calendario, sorveglianza) -> 310 */
+  { file: "test_update_data.py", cmd: "python3", minimo: 310, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -175,7 +176,8 @@ const SUITE = [
   /* v504: 768 punti di chiamata (+17 sulle due solidita': stati, divergenza, circolante e patrimonio, rendimento) -> 755 */
   /* v505: 795 punti di chiamata (+27 sulla scheda completa: registro nei due versi, conservazione, copertura, resa,
      collegamento con analisi.py, e la lettura a 5 anni di DIS) -> 780 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 780, firma: /\d+\/\d+ CHECK OK/ },
+  /* v506: 808 punti di chiamata (+13 sulle vendite allo scoperto nelle schede: riga, blocco, tre assenze) -> 795 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 795, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

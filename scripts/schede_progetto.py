@@ -392,15 +392,197 @@ def riga_cassa(r):
     return "cassa: " + " · ".join(pz)
 
 
+# ── v506 — VENDITE ALLO SCOPERTO: le posizioni corte APERTE di ogni nome (FINRA), misurate dalla pipeline ───────────
+# Richiesta del CEO del 19/10/2026: "Analizza anche azioni allo scoperto ovvero attività short in % sui titoli
+# qualora tu non lo faccia già e rendila strutturale". Una resa sola, dalla misura di update_data.aggiorna_short: la
+# quota di Yahoo senza data e il flusso giornaliero — che il DPI del dark pool porta gia' — non si ristampano qui, ed
+# erano la stessa grandezza scritta due volte (v161, v415).
+# Le BANDE della quota del flottante sono una convenzione del mestiere, non un dato del file (v240): la resa lo dice.
+SI_BANDE = ((5.0, "bassa"), (10.0, "moderata"), (20.0, "alta"))     # sotto la soglia l'etichetta; da 20% «molto alta»
+SI_ALTA = 10.0          # da qui la quota e' alta, e il nome si elenca in testa al blocco
+SI_RANGO_ALTO = 90      # dal 90° percentile dei propri regolamenti dell'anno: vicino al massimo dell'anno
+SI_BASI = (0.8, 1.25)   # oltre questo rapporto con la quota di Yahoo le due rese si dichiarano diverse
+FLOTTANTE_ND = {
+    "certificati": "le azioni corte sono certificati di deposito americani e il flottante della fonte è in azioni ordinarie",
+    "classi": "il flottante della fonte comprende più classi di azioni ed è più grande delle azioni della classe quotata",
+    "assente": "la fonte non pubblica il flottante"}
+
+
+def banda_short(p):
+    if p is None:
+        return None
+    for soglia, nome in SI_BANDE:
+        if p < soglia:
+            return nome
+    return "molto alta"
+
+
+def _sg1(x):
+    """Il segno sul valore GIA' arrotondato a un decimale: «-0,0%» non si stampa (v496)."""
+    try:
+        v = round(float(x), 1)
+    except (TypeError, ValueError):
+        return "n.d."
+    if v == 0:
+        return "0,0"
+    return ("+" if v > 0 else "") + _n(v, 1)
+
+
+def _azioni(q):
+    if q is None:
+        return "n.d."
+    if q >= 1e6:
+        return f"{_n(q / 1e6, 1)} milioni di azioni"
+    return f"{int(q):,}".replace(",", ".") + " azioni"
+
+
+def _data_it(d):
+    try:
+        return datetime.fromisoformat(str(d)[:10]).strftime("%d/%m/%Y")
+    except ValueError:
+        return str(d or "n.d.")
+
+
+def quota_short(si):
+    p = si.get("pct_flottante")
+    if p is None:
+        return "quota del flottante non calcolabile: " + FLOTTANTE_ND.get(si.get("flottante_nd"), "motivo n.d.")
+    t = f"{_n(p, 1)}% del flottante ({banda_short(p)})"
+    y = si.get("pct_yahoo")
+    if y and not (SI_BASI[0] <= p / y <= SI_BASI[1]):
+        t += (f" — Yahoo ne pubblica il {_n(y, 1)}%: due rese che non coincidono, e i dati qui presenti non dicono se "
+              "la differenza sia nel flottante o nella data")
+    return t
+
+
+def _var_short(v, etichetta):
+    if not v:
+        return None
+    t = f"{_sg1(v['pct'])}% {etichetta} (dal {_data_breve(v['da'])})"
+    if v.get("titolo_pct") is not None:
+        t += f", il titolo negli stessi giorni {_sg1(v['titolo_pct'])}%"
+    return t
+
+
+def _giorni_short(g):
+    if g is None:
+        return None
+    if g < 1:
+        return f"meno di un giorno di scambi per ricoprirle ({_n(g, 2)})"
+    return f"{_n(g, 1)} giorni di scambi per ricoprirle"
+
+
 def riga_short(r):
-    st = r.get("stats") or {}
-    sf = r.get("short_flusso") or {}
-    pz = []
-    if st.get("short_float") is not None:
-        pz.append(f"short interest {_n(st['short_float'] * 100)}% del flottante")
-    if sf.get("ultimo_pct") is not None:
-        pz.append(f"quota short dei volumi {_n(sf['ultimo_pct'])}% (media {_n(sf.get('media_pct'))}%)")
-    return ("short: " + " · ".join(pz)) if pz else None
+    """La riga «short:» di ogni scheda (v506): le posizioni corte APERTE, con la data del regolamento FINRA. Ogni
+    assenza si dichiara (v406): snapshot precedente, nessun dato, non letto."""
+    si = r.get("short_interest")
+    if si is None:
+        return ("short: snapshot precedente alla v506 — la pipeline non pubblica ancora le posizioni corte aperte "
+                "(FINRA): è il dato che manca, non un valore nullo")
+    stato = si.get("stato")
+    if stato == "nessun dato":
+        return ("short: FINRA non ha posizioni corte segnalate per questo simbolo nell'ultimo anno — non vuol dire "
+                "«nessuno scommette contro»: le segnalazioni negli USA per questo titolo non ci sono")
+    if stato != "misurato":
+        return "short: posizioni corte aperte NON lette — FINRA non ha risposto e nessun run precedente le aveva"
+    pz = [f"posizioni corte aperte al {_data_it(si['data'])} (FINRA)", quota_short(si), _azioni(si.get("q"))]
+    for x in (_giorni_short(si.get("giorni")), _var_short(si.get("var1"), "sul regolamento precedente"),
+              _var_short(si.get("var3m"), "in tre mesi")):
+        if x:
+            pz.append(x)
+    if si.get("rango") is not None:
+        # le date del minimo e del massimo con l'anno: in un anno di regolamenti «31/10» puo' essere di due anni diversi
+        pz.append(f"{si['rango']}° percentile dei {si['regolamenti']} regolamenti dell'anno (minimo "
+                  f"{_azioni(si['min']['q'])} il {_data_it(si['min']['d'])}, massimo {_azioni(si['max']['q'])} il "
+                  f"{_data_it(si['max']['d'])})")
+    else:
+        pz.append(f"percentile dell'anno n.d. ({si.get('regolamenti')} regolamenti, ne servono {si.get('rango_min')})")
+    for t in si.get("tagli") or []:
+        if t.get("motivo") == "nome":
+            pz.append(f"serie dal {_data_it(t['dal'])}: prima lo stesso simbolo era «{t.get('prima')}»")
+        else:
+            pz.append(f"serie dal {_data_it(t['dal'])}: un frazionamento, e i regolamenti di prima contano le azioni "
+                      "nella base vecchia")
+    if si.get("riportato"):
+        pz.append("misura del run precedente: FINRA non ha risposto in questo run")
+    return "short: " + " · ".join(pz)
+
+
+def riga_tabella_short(si):
+    """La riga di un nome nella tabella in testa: le stesse funzioni della riga «short:», un sottoinsieme."""
+    if not si or si.get("stato") != "misurato":
+        return {"nessun dato": "nessun dato FINRA nell'ultimo anno", "non letto": "NON letto"}.get(
+            (si or {}).get("stato"), "snapshot precedente alla v506")
+    p = si.get("pct_flottante")
+    pz = [f"{_n(p, 1)}% ({banda_short(p)})" if p is not None else "quota n.d."]
+    g = si.get("giorni")
+    if g is not None:
+        pz.append(f"{_n(g, 1)} giorni" if g >= 1 else f"{_n(g, 2)} giorni")
+    v = si.get("var3m") or si.get("var1")
+    if v:
+        et = "tre mesi" if si.get("var3m") else "un regolamento"
+        pz.append(f"{et} {_sg1(v['pct'])}%" + (f" (titolo {_sg1(v['titolo_pct'])}%)" if v.get("titolo_pct") is not None
+                                               else ""))
+    if si.get("rango") is not None:
+        pz.append(f"{si['rango']}° percentile")
+    return " · ".join(pz)
+
+
+def blocco_short(righe, pos, sorv, macro, filtro=None):
+    """VENDITE ALLO SCOPERTO, in testa alle schede: date del regolamento e della prossima pubblicazione (calendario
+    UFFICIALE di FINRA, mai stimata: v396), la convenzione delle bande, la differenza col flusso giornaliero, i nomi
+    con la quota alta o vicini al massimo del proprio anno, e la tabella di posizioni e sorvegliati."""
+    m = (macro or {}).get("short_interest")
+    L = ["VENDITE ALLO SCOPERTO — le posizioni corte APERTE di ogni nome (FINRA, short interest consolidato, due "
+         "regolamenti al mese)"]
+    if not m:
+        L.append("  snapshot precedente alla v506: la pipeline non pubblica ancora le posizioni corte aperte — il dato "
+                 "che manca, non un valore nullo")
+        return L
+    reg = m.get("regolamento")
+    t = f"  regolamento del {_data_it(reg)}" if reg else "  nessun regolamento letto"
+    if m.get("pubblicato"):
+        t += f", pubblicato il {_data_it(m['pubblicato'])}"
+    pr = m.get("prossimo")
+    if pr:
+        t += (f" · prossimo: regolamento del {_data_it(pr['regolamento'])}, pubblicazione il "
+              f"{_data_it(pr['pubblicazione'])} (calendario FINRA)")
+    else:
+        t += " · prossima pubblicazione: dato non disponibile" + (
+            " (calendario FINRA non letto in questo run)" if m.get("calendario") != "letto"
+            else " (oltre il calendario che FINRA ha pubblicato)")
+    if not m.get("letto"):
+        t += f" · ⚠ FINRA non letto in questo run ({m.get('errore') or 'motivo n.d.'}): vale la misura del run precedente"
+    L.append(t)
+    L.append("  quota del flottante: sotto 5% bassa · 5-10% moderata · 10-20% alta · da 20% molto alta — una "
+             "convenzione del mestiere, non un dato")
+    L.append("  giorni per ricoprire = posizioni corte ÷ volume medio giornaliero dello stesso periodo, i due numeri che "
+             "FINRA pubblica")
+    L.append("  ⚠ la quota del volume venduta allo scoperto OGNI GIORNO (FINRA Reg SHO) è un flusso che comprende i "
+             "market maker: è il DPI del blocco DARK POOL, e non si confronta con questa")
+    voci = []
+    for gr, ruolo in ((pos, "POSIZIONI"), (sorv, "SORVEGLIATI")):
+        for tk in gr:
+            if (filtro and tk not in filtro) or tk not in righe:
+                continue
+            voci.append((tk, ruolo, righe[tk].get("short_interest") or {}))
+    alte = sorted(((tk, si["pct_flottante"]) for tk, _, si in voci if si.get("pct_flottante") is not None
+                   and si["pct_flottante"] >= SI_ALTA), key=lambda x: (-x[1], x[0]))
+    L.append(f"  quota alta (da {_n(SI_ALTA, 0)}% del flottante): "
+             + (" · ".join(f"{tk} {_n(p, 1)}%" for tk, p in alte) if alte else "nessun nome"))
+    vicini = sorted(((tk, si["rango"]) for tk, _, si in voci if si.get("rango") is not None
+                     and si["rango"] >= SI_RANGO_ALTO), key=lambda x: (-x[1], x[0]))
+    L.append(f"  vicine al massimo del proprio anno (dal {SI_RANGO_ALTO}° percentile dei regolamenti): "
+             + (" · ".join(f"{tk} {r}°" for tk, r in vicini) if vicini else "nessun nome"))
+    for ruolo in ("POSIZIONI", "SORVEGLIATI"):
+        gr = [(tk, si) for tk, ru, si in voci if ru == ruolo]
+        if not gr:
+            continue
+        L.append(f"  {ruolo}")
+        gr.sort(key=lambda x: (-(x[1].get("pct_flottante") if x[1].get("pct_flottante") is not None else -1.0), x[0]))
+        for tk, si in gr:
+            L.append(f"    {tk} {riga_tabella_short(si)}")
+    return L
 
 
 def riga_trimestrale(r, sec):
@@ -615,6 +797,7 @@ def genera(dati, pos, sorv, filtro=None):
     for b in (dati.get("portfolio") or []):
         if isinstance(b, dict) and b.get("cds"):
             out.append(f"{b.get('ticker')} [POSIZIONE, titolo di Stato] — " + riga_cds(b, meta_cds))
+    out.extend(blocco_short(righe, pos, sorv, dati.get("macro"), filtro))      # v506 — le vendite allo scoperto
     mancanti = []
     for gruppo, ruolo in ((pos, "POSIZIONE"), (sorv, "SORVEGLIATO")):
         for tk in gruppo:

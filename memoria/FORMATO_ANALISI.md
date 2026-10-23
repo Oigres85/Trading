@@ -79,6 +79,12 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    e quando le due dicono cose opposte lo scrive; poi la riga **cassa dell'attività** (flusso operativo dei 12 mesi e
    dell'ultimo trimestre, se l'utile diventa cassa, il ciclo di cassa contro un anno prima, il magazzino, quanto va
    agli azionisti), e nella riga di Altman da dove vengono un circolante o un patrimonio negativi.
+   Da v506 (CEO, 19/10: *"Analizza anche azioni allo scoperto ovvero attività short in % sui titoli qualora tu non lo
+   faccia già e rendila strutturale"*) il blocco **VENDITE ALLO SCOPERTO** in testa e la riga **short** di ogni nome:
+   le posizioni corte APERTE dal consolidato di FINRA — in % del flottante, coi giorni di scambi per ricoprirle, la
+   variazione sul regolamento precedente e in tre mesi col titolo negli stessi giorni, il percentile dei regolamenti
+   dell'anno — con la data del regolamento e la prossima pubblicazione dal calendario UFFICIALE di FINRA. Prima la riga
+   portava la quota di Yahoo senza data e il flusso giornaliero, che è il DPI del dark pool: tolti, una resa sola.
    Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
    misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
    NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
@@ -259,6 +265,14 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Da v500 (CEO, 18/10: *"1 ok tua proposta"*) è anche **misurato** (`LIBRO.md` §1ter): nessuno di questi segnali,
    né la curva della volatilità degli indici, anticipa i cali più del caso. La risposta li legge come termometri
    dello stress in corso, non come avvisi di un calo che deve ancora venire.
+   Da v506 le **vendite allo scoperto** (blocco delle schede): per i nomi con la quota alta, vicini al massimo del
+   proprio anno, in posizione o con un ingresso possibile si dice la quota del flottante con la data del regolamento,
+   i giorni per ricoprire e il verso in tre mesi ACCANTO al titolo negli stessi giorni — è la coppia che si legge:
+   posizioni corte in aumento col titolo in salita sono ricoperture che un dato favorevole può costringere (il
+   carburante di uno squeeze); in aumento col titolo in discesa, ribassisti che accompagnano la discesa; in calo col
+   titolo in salita, una parte del rialzo è ricopertura e non acquisto nuovo. Il dato ha due settimane di ritardo per
+   costruzione: la data del regolamento si scrive sempre, e la prossima pubblicazione dal calendario. È INFORMAZIONE:
+   non una prova della tenuta, non un colore — se il CEO vorrà farne un segnale, lo deciderà lui.
 5ter. **Indici** (v499, CEO, 17/10 sera) — dal blocco di `indici.py`: il P/E dell'S&P 500 prospettico contro le
    medie della STESSA FactSet, gli ultimi 12 mesi e il CAPE contro le mediane della stessa serie di multpl, il
    Nasdaq-100 dal WSJ col valore di un anno prima — mai il valore di una fonte contro la media di un'altra, perché
@@ -432,6 +446,7 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[bitcoin]` il bitcoin dall'ultima chiusura USA su MSTR (17/10) — informazione, non una prova
 - `[cds]` i CDS a 5 anni di posizioni e sorvegliati, con gli indici CDX e l'Italia per il BTP (17/10) — e dalla sera stessa il loro allargamento oltre l'indice come prova della tenuta, in funzione quando lo storico raccolto basta (17/10)
 - `[dark_pool]` il dark pool (FINRA, DIX) (17/10 sera) — informazione, non una prova
+- `[short]` le vendite allo scoperto di ogni posizione e sorvegliato: le posizioni corte APERTE in % del flottante (FINRA, con la data del regolamento e la prossima pubblicazione dal calendario ufficiale), i giorni per ricoprirle, la variazione e il percentile dell'anno, il titolo negli stessi giorni (19/10) — informazione, non una prova
 - `[gamma]` la gamma dei dealer (call wall, put wall, cambio di regime) (17/10 sera) — informazione, non una prova
 - `[indici]` gli indici S&P 500 e Nasdaq-100 — P/E con la storia della sua fonte, stagione delle trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza (17/10 sera) — informazione, non prove
 - `[vwap]` il VWAP dall'ultima trimestrale accanto ai pavimenti di ogni titolo (18/10)

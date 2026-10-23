@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 312  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316 (sale, mai scende)
+N_CHECKS_MINIMO = 328  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -2587,6 +2587,227 @@ check("v504 collegamento: il giro dei titoli calcola la solidita' operativa DOPO
       "flusso dei 12 mesi ha un proprietario solo), in un try suo, e la pubblica nella riga del titolo",
       _sol504 > 0 and 0 < _SRC_UD_CODICE.find("_comb = combustione(t, ") < _sol504
       and '"solidita": _sol' in _SRC_UD_CODICE and "_comb = _cred = _fuori = _short = _sol = None" in _SRC_UD_CODICE)
+
+# ============================ v506 — VENDITE ALLO SCOPERTO: LE POSIZIONI CORTE APERTE (FINRA) ============================
+# Richiesta del CEO del 19/10/2026: "Analizza anche azioni allo scoperto ovvero attività short in % sui titoli ... e
+# rendila strutturale". Lo stato si COSTRUISCE (v425, v429): righe di FINRA finte nel formato vero (misurato il 23/10),
+# nessuna rete. I casi che discriminano sono quelli trovati sui dati veri: il simbolo riusato (SPCX era un ETF), il
+# frazionamento (NFLX, «+413%»), il certificato americano (TSM, SKHY), le classi (GOOGL), il «1» di FINRA sotto un giorno.
+def _si506(tk, d, q, adv, nome="Alfa Inc. Common Stock", split=None, rev=None):
+    return {"symbolCode": tk, "settlementDate": d, "currentShortPositionQuantity": q, "averageDailyVolumeQuantity": adv,
+            "issueName": nome, "stockSplitFlag": split, "revisionFlag": rev, "daysToCoverQuantity": 1}
+
+
+_date506 = ["2025-10-15", "2025-10-31", "2025-11-14", "2025-11-28", "2025-12-15", "2025-12-31", "2026-01-15",
+            "2026-01-30", "2026-02-13", "2026-02-27", "2026-03-13", "2026-03-31", "2026-04-15", "2026-04-30",
+            "2026-05-15", "2026-05-29", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-31", "2026-08-14",
+            "2026-08-31", "2026-09-15", "2026-09-30"]
+
+
+class _Risp506:
+    def __init__(self, codice, dati=None, testo=""):
+        self.status_code, self._d, self.text = codice, dati, testo
+
+    def json(self):
+        return self._d
+
+
+_chiamate506 = []
+
+
+def _post506(url, json=None, headers=None, timeout=None):
+    _chiamate506.append({"url": url, "corpo": json, "headers": headers})
+    righe = [_si506("AAA", d, 1_000_000 + i * 10_000, 2_000_000) for i, d in enumerate(_date506)]
+    righe += [_si506("BBB", d, 500_000, 1_000_000, nome="Bravo Inc.") for d in _date506[-3:]]
+    return _Risp506(200, righe)
+
+
+_l506 = ud.leggi_short_interest(["BBB", "AAA", "AAA"], post=_post506, oggi=ud.datetime(2026, 10, 23).date())
+_c506 = _chiamate506[0]["corpo"] if _chiamate506 else {}
+check("v506 UNA richiesta per tutti i simboli (filtro di dominio, senza doppioni), un anno di regolamenti, e le righe "
+      "divise per simbolo",
+      len(_chiamate506) == 1 and _c506.get("domainFilters") == [{"fieldName": "symbolCode", "values": ["AAA", "BBB"]}]
+      and _c506["dateRangeFilters"][0]["startDate"] == "2025-09-18" and _c506["dateRangeFilters"][0]["endDate"] == "2026-10-23"
+      and len(_l506.get("AAA") or []) == 24 and len(_l506.get("BBB") or []) == 3)
+_pagine506 = []
+
+
+def _post_pagine506(url, json=None, headers=None, timeout=None):
+    _pagine506.append(json.get("offset"))
+    n = ud.SI_PAGINA if len(_pagine506) == 1 else 7
+    return _Risp506(200, [_si506("AAA", "2026-09-30", 1, 1)] * n)
+
+
+_lp506 = ud.leggi_short_interest(["AAA"], post=_post_pagine506)
+check("v506 una pagina PIENA ne chiede un'altra dall'offset giusto: nessuna riga persa al limite della pagina",
+      _pagine506 == [0, ud.SI_PAGINA] and len(_lp506["AAA"]) == ud.SI_PAGINA + 7)
+try:
+    ud.leggi_short_interest(["AAA"], post=lambda *a, **k: _Risp506(503, None))
+    _err506 = None
+except Exception as _e506:  # noqa: BLE001
+    _err506 = str(_e506)
+check("v506 FINRA che non risponde SOLLEVA (il chiamante lo dichiara), non restituisce un vuoto che si legge «nessuno "
+      "e' corto»: " + str(_err506), bool(_err506) and "503" in _err506)
+
+# --- la serie: i tagli dove le azioni smettono di essere confrontabili ---
+_sp506 = [_si506("SPCX", d, 9_000_000, 3_000_000, nome="The SPAC and New Issue ETF") for d in _date506[:16]]
+_sp506 += [_si506("SPCX", d, 150_000_000 + i, 90_000_000, nome="Space Exploration Technologies")
+           for i, d in enumerate(_date506[16:])]
+_s506, _t506, _n506 = ud.serie_short(list(reversed(_sp506)))
+check("v506 SIMBOLO RIUSATO: la serie comincia dal primo regolamento col nome di oggi, e il taglio si dichiara col nome "
+      "di prima (SPCX era «The SPAC and New Issue ETF» fino a giugno 2026)",
+      [x["d"] for x in _s506] == _date506[16:] and _n506 == "Space Exploration Technologies"
+      and _t506 == [{"motivo": "nome", "dal": "2026-06-15", "prima": "The SPAC and New Issue ETF"}])
+_nf506 = [_si506("NFLX", d, 14_000_000, 4_000_000) for d in _date506[:3]]
+_nf506 += [_si506("NFLX", _date506[3], 75_000_000, 35_000_000, split="S")]
+_nf506 += [_si506("NFLX", d, 73_000_000, 40_000_000) for d in _date506[4:]]
+_sn506, _tn506, _ = ud.serie_short(_nf506)
+_mn506 = ud.misure_short(_sn506, _tn506, "Netflix, Inc. Common Stock", {"float_shares": 4e9, "shares": 4.2e9})
+check("v506 FRAZIONAMENTO: FINRA lo segna sul primo regolamento DOPO; la serie riparte da li', e nessuna variazione "
+      "attraversa il frazionamento (NFLX il 28/11/2025: 75 milioni contro 14, «+413%» che non e' un aumento)",
+      _sn506[0]["d"] == _date506[3] and len(_sn506) == 21 and _tn506 == [{"motivo": "frazionamento", "dal": _date506[3]}]
+      and abs(_mn506["var3m"]["pct"]) < 1e-9 and _mn506.get("rango_min") is None)
+_buchi506 = [_si506("AAA", "2026-09-30", 100, 50), {"symbolCode": "AAA", "settlementDate": "2026-09-15",
+                                                     "currentShortPositionQuantity": None}]
+_sb506, _, _ = ud.serie_short(_buchi506 + [_si506("AAA", d, 100, 50) for d in _date506[:-2]])
+check("v506 un regolamento senza quantita' non entra (un buco non e' uno zero, v205), e la serie tiene gli ULTIMI 24",
+      "2026-09-15" not in [x["d"] for x in _sb506] and _sb506[-1]["d"] == "2026-09-30"
+      and len(ud.serie_short([_si506("A", f"2025-{m:02d}-{g:02d}", 1, 1) for m in range(1, 13) for g in (10, 20, 28)])[0])
+      == ud.SI_REGOLAMENTI)
+
+# --- le misure ---
+_rend506 = [0.0] * 252
+_dr506 = [(ud.datetime(2025, 10, 1) + ud.timedelta(days=i)).strftime("%Y-%m-%d") for i in range(400)]
+_dr506 = [d for d in _dr506 if ud.datetime.fromisoformat(d).weekday() < 5][-252:]
+_iA, _iB = _dr506.index("2026-06-30"), _dr506.index("2026-09-30")
+_rend506[_iA + 1] = 0.10                                   # una seduta di +10,5% dopo il 30/06, dentro i tre mesi
+_rend506[_iB] = -0.05                                      # l'ultima seduta, IL 30/09: dentro entrambe le finestre
+_q24_506 = [{"d": d, "q": 1_000_000 + i * 10_000, "adv": 2_000_000} for i, d in enumerate(_date506)]
+_ms506 = ud.misure_short(_q24_506,
+                         None, "Alfa Inc. Common Stock", {"float_shares": 10_000_000, "shares": 10_100_000,
+                                                          "short_float": 0.12}, _rend506, _dr506)
+check("v506 le misure: quota del flottante dall'ULTIMO regolamento, la quota di Yahoo accanto, i giorni CALCOLATI (q/adv), "
+      "le variazioni col titolo negli stessi giorni per data, il percentile midrank e min/max con la data: " + str(_ms506),
+      _ms506["data"] == "2026-09-30" and abs(_ms506["pct_flottante"] - 12.3) < 1e-9 and _ms506["pct_yahoo"] == 12.0
+      and _ms506["giorni"] == round(1_230_000 / 2_000_000, 2) and _ms506["var1"]["da"] == "2026-09-15" and _ms506["var3m"]["da"] == "2026-06-30"
+      and abs(_ms506["var1"]["pct"] - round((1.23 / 1.22 - 1) * 100, 1)) < 1e-9
+      and _ms506["var1"]["titolo_pct"] == round((ud.math.exp(-0.05) - 1) * 100, 1)
+      and _ms506["var3m"]["titolo_pct"] == round((ud.math.exp(0.05) - 1) * 100, 1)
+      and _ms506["rango"] == 98 and _ms506["min"] == {"q": 1_000_000, "d": "2025-10-15"}
+      and _ms506["max"] == {"q": 1_230_000, "d": "2026-09-30"} and _ms506["regolamenti"] == 24)
+check("v506 i giorni per ricoprire si calcolano dai due numeri, mai dal «daysToCover» di FINRA che sotto un giorno vale 1 "
+      "(MU il 15/06/2026: 41,6 milioni su 53,2 = 0,78)",
+      ud.misure_short([{"d": "2026-06-15", "q": 41_592_382, "adv": 53_187_253}])["giorni"] == 0.78)
+_lunedi506 = ud.titolo_fra([0.01, 0.02, 0.03], ["2026-10-16", "2026-10-19", "2026-10-20"], "2026-10-17", "2026-10-20")
+check("v506 un regolamento senza seduta del titolo usa la chiusura PRECEDENTE (il sabato 17/10 vale la chiusura del 16), "
+      "e una data prima della serie non da' un numero: " + str(_lunedi506),
+      _lunedi506 == round((ud.math.exp(0.05) - 1) * 100, 1)
+      and ud.titolo_fra([0.01], ["2026-10-16"], "2026-10-01", "2026-10-16") is None
+      and ud.titolo_fra(None, None, "2026-10-01", "2026-10-16") is None)
+_basi506 = {
+    "certificati": ud.misure_short([{"d": "2026-09-30", "q": 1, "adv": 1}], None, "SK hynix Inc. American Deposit",
+                                   {"float_shares": 5e9, "shares": 7e9}),
+    "classi": ud.misure_short([{"d": "2026-09-30", "q": 1, "adv": 1}], None, "Alphabet Inc. Class A Common S",
+                              {"float_shares": 10.9e9, "shares": 5.9e9}),
+    "assente": ud.misure_short([{"d": "2026-09-30", "q": 1, "adv": 1}], None, "Alfa Inc.", {"shares": 5e9}),
+    "ny": ud.misure_short([{"d": "2026-09-30", "q": 1, "adv": 1}], None, "ASML Holding N.V. New York Reg",
+                          {"float_shares": 3e8, "shares": 3.9e8}),
+    "gs": ud.misure_short([{"d": "2026-09-30", "q": 6_647_698, "adv": 1}], None, "Goldman Sachs Group Inc.",
+                          {"float_shares": 294_435_918, "shares": 291_171_408})}
+check("v506 la quota del flottante SOLO se azioni corte e flottante sono della stessa specie: certificati americani e New "
+      "York registry no, un flottante piu' grande delle azioni della classe no, un flottante assente no — e un flottante "
+      "appena sopra le azioni (GS, +1%) si', e' l'arrotondamento della fonte: " + str({k: v.get("flottante_nd") for k, v in _basi506.items()}),
+      _basi506["certificati"].get("flottante_nd") == "certificati" and _basi506["ny"].get("flottante_nd") == "certificati"
+      and _basi506["classi"].get("flottante_nd") == "classi" and _basi506["assente"].get("flottante_nd") == "assente"
+      and all(_basi506[k].get("pct_flottante") is None for k in ("certificati", "ny", "classi", "assente"))
+      and _basi506["gs"].get("pct_flottante") == round(6_647_698 / 294_435_918 * 100, 2))
+_corta506 = ud.misure_short([{"d": d, "q": 5, "adv": 10} for d in _date506[-6:]])
+check("v506 sotto 12 regolamenti il percentile dell'anno non si pubblica e la soglia viaggia col dato; sotto 7 non c'e' "
+      "la variazione in tre mesi",
+      "rango" not in _corta506 and _corta506.get("rango_min") == ud.SI_RANGO_MIN == 12 and "var3m" not in _corta506
+      and "var1" in _corta506 and ud.misure_short([]) is None)
+
+# --- il calendario UFFICIALE delle pubblicazioni ---
+_html506 = ("<html><script>var x='January 5';</script><h2>2025&nbsp;Short Interest Reporting Dates</h2><table><tr>"
+            "<th>Settlement Date</th><th>Due Date<sup>1</sup></th><th>Publication Date</th></tr>"
+            "<tr><td>December 15<br>(Monday)</td><td>December 17 – 6:00 p.m.<br>(Wednesday)</td><td>December 24<br>(Wednesday)</td></tr>"
+            "<tr><td>December 31<br>(Wednesday)</td><td>January 5 – 6:00 p.m.<br>(Monday)</td><td>January 12<br>(Monday)</td></tr></table>"
+            "<p>December 1, 2025</p><h2>2026 Short Interest Reporting Dates</h2><table>"
+            "<tr><td>September 30<br>(Wednesday)</td><td>October 2 – 6:00 p.m.<br>(Friday)</td><td>October 9<br>(Friday)</td></tr>"
+            "<tr><td>October 15<br>(Thursday)</td><td>October 19 – 6:00 p.m.<br>(Monday)</td><td>October 26<br>(Monday)</td></tr>"
+            "</table><p>1. All referenced times are reflected as Eastern Time.</p><p>November 4</p>"
+            "<ul><li>October 27, 2022</li><li>January 17, 2017</li><li>May 10, 2019</li></ul></html>")
+_cal506 = ud.leggi_calendario_short(_html506)
+check("v506 il calendario si legge dalla pagina di FINRA: tre date per regolamento, l'anno della tabella, e gennaio "
+      "dopo dicembre e' dell'anno DOPO; una data CON l'anno fra le tabelle («December 1, 2025») non entra, e "
+      "la nota a pie' di tabella chiude la lettura — una data senza anno dopo di lei non e' del calendario: " + str(_cal506),
+      _cal506 == [{"regolamento": "2025-12-15", "pubblicazione": "2025-12-24"},
+                  {"regolamento": "2025-12-31", "pubblicazione": "2026-01-12"},
+                  {"regolamento": "2026-09-30", "pubblicazione": "2026-10-09"},
+                  {"regolamento": "2026-10-15", "pubblicazione": "2026-10-26"}])
+check("v506 una terna fuori ordine vuol dire che il formato e' cambiato: il calendario NON si indovina (None), e senza "
+      "tabelle neppure",
+      ud.leggi_calendario_short(_html506.replace("October 26", "October 1")) is None
+      and ud.leggi_calendario_short("<p>niente</p>") is None and ud.leggi_calendario_short(None) is None)
+check("v506 dal calendario: la pubblicazione del regolamento che i dati portano e il PROSSIMO con la sua data; fuori dal "
+      "calendario, nessuna stima",
+      ud.pubblicazioni_short(_cal506, "2026-09-30") == ("2026-10-09", {"regolamento": "2026-10-15", "pubblicazione": "2026-10-26"})
+      and ud.pubblicazioni_short(_cal506, "2026-10-15") == ("2026-10-26", None)
+      and ud.pubblicazioni_short(None, "2026-09-30") == (None, None))
+
+# --- il giro: tre esiti, il ripiego dichiarato, i riferimenti fuori ---
+_righe506 = [{"ticker": "AAA", "stats": {"float_shares": 10_000_000, "shares": 10_000_000}},
+             {"ticker": "BBB", "stats": {}}, {"ticker": "CCC", "stats": {}}, {"ticker": "^VIX"}, {"ticker": "EURUSD=X"},
+             {"ticker": "BTC-USD"}]
+_ag506 = ud.aggiorna_short(_righe506, post=_post506, get=lambda u: _Risp506(200, testo=_html506),
+                           oggi=ud.datetime(2026, 10, 23).date())
+check("v506 il giro: misurati, NESSUN DATO per chi FINRA non porta, i riferimenti (indici, cambi, criptovalute) fuori per "
+      "FORMA, e il riepilogo con regolamento, pubblicazione e prossimo dal calendario: " + str({k: _ag506.get(k) for k in (
+          "misurati", "senza_dati", "regolamento", "pubblicato", "prossimo", "calendario")}),
+      _ag506["misurati"] == ["AAA", "BBB"] and _ag506["senza_dati"] == ["CCC"] and _ag506["letto"] is True
+      and _righe506[2]["short_interest"] == {"stato": "nessun dato"}
+      and all("short_interest" not in r for r in _righe506[3:])
+      and _ag506["regolamento"] == "2026-09-30" and _ag506["pubblicato"] == "2026-10-09"
+      and _ag506["prossimo"] == {"regolamento": "2026-10-15", "pubblicazione": "2026-10-26"}
+      and _ag506["calendario"] == "letto")
+_righe506b = [{"ticker": "AAA"}, {"ticker": "BBB"}]
+_ag506b = ud.aggiorna_short(_righe506b, precedenti={"AAA": dict(_righe506[0]["short_interest"])},
+                            post=lambda *a, **k: _Risp506(500, None), get=lambda u: _Risp506(404))
+check("v506 FINRA NON LETTO: vale la misura del run precedente, DICHIARATA (riportato), e chi non l'aveva e' «non letto» "
+      "— mai «nessun dato»; senza calendario la prossima pubblicazione e' assente, non stimata",
+      _ag506b["letto"] is False and "500" in (_ag506b.get("errore") or "")
+      and _righe506b[0]["short_interest"].get("riportato") is True and _righe506b[0]["short_interest"]["q"] > 0
+      and _righe506b[1]["short_interest"] == {"stato": "non letto"} and _ag506b["riportati"] == ["AAA"]
+      and _ag506b["non_letti"] == ["BBB"] and _ag506b["prossimo"] is None and _ag506b["calendario"] == "non letto")
+
+# --- la sorveglianza: nasce sorvegliata (v390) ---
+def _dq506(si):
+    return next((c for c in ud.validate_macro({"short_interest": si} if si is not None else {})["checks"]
+                 if c["key"] == "short_interest"), None)
+
+
+_oggi506 = ud.datetime.now(ud.timezone.utc).date()
+_q506 = {"assente": _dq506(None),
+         "fresco": _dq506({"regolamento": (_oggi506 - ud.timedelta(days=10)).isoformat(), "letto": True,
+                           "prossimo": {"regolamento": "x", "pubblicazione": (_oggi506 + ud.timedelta(days=3)).isoformat()}}),
+         "vecchio": _dq506({"regolamento": (_oggi506 - ud.timedelta(days=40)).isoformat(), "letto": True}),
+         "indietro": _dq506({"regolamento": (_oggi506 - ud.timedelta(days=20)).isoformat(), "letto": True,
+                             "prossimo": {"regolamento": "y", "pubblicazione": (_oggi506 - ud.timedelta(days=1)).isoformat()}}),
+         "riportato": _dq506({"regolamento": (_oggi506 - ud.timedelta(days=10)).isoformat(), "letto": False,
+                              "errore": "RuntimeError: FINRA ha risposto 500"})}
+check("v506 sorveglianza: assente = missing; oltre 31 giorni = stale; un regolamento che il calendario dice GIA' "
+      "pubblicato e che i dati non portano = stale anche con l'eta' normale; un ripiego si dichiara: "
+      + str({k: (v or {}).get("status") for k, v in _q506.items()}),
+      _q506["assente"]["status"] == "missing" and _q506["fresco"]["status"] == "ok"
+      and _q506["vecchio"]["status"] == "stale" and _q506["indietro"]["status"] == "stale"
+      and "i dati non lo portano" in _q506["indietro"]["note"] and _q506["riportato"]["status"] == "ok"
+      and "run precedente" in _q506["riportato"]["note"] and ud.SI_ETA_MAX == 31)
+_cs506 = _SRC_UD_CODICE.find("macro[\"short_interest\"] = aggiorna_short(watchlist, _prec_si)")
+check("v506 collegamento: il giro principale chiama aggiorna_short coi titoli seguiti e le misure del run precedente, "
+      "PRIMA di togliere le serie private (il titolo negli stessi giorni vive in _ret_series)",
+      _cs506 > 0 and _cs506 < _SRC_UD_CODICE.find("strip_private(watchlist)")
+      and _SRC_UD_CODICE.find("aggiorna_cds(watchlist") < _cs506
+      and '_prec_si = {r.get("ticker"): r.get("short_interest") for r in (prev_data.get("watchlist") or [])' in _SRC_UD_CODICE)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

@@ -6868,13 +6868,22 @@ _U505 = {
         "Dati del progetto: run della pipeline 2026-10-18T22:52:13Z (6,6 ore fa).",
         "CDS a 5 anni (richiesta del CEO del 17/10/2026) — ICE Clear Credit", "  CDX IG 64 pb",
         "SALUTE DEL CREDITO (richiesta del CEO del 18/10/2026)", "SEGNALI DEL CREDITO — eventi (si muovono coi prezzi): nessuno",
-        "BTP-V28 [POSIZIONE, titolo di Stato] — CDS 5 anni 64 pb", "",
+        "BTP-V28 [POSIZIONE, titolo di Stato] — CDS 5 anni 64 pb",
+        # v506 — le vendite allo scoperto: il blocco in testa e la riga «short:» di ogni nome
+        "VENDITE ALLO SCOPERTO — le posizioni corte APERTE di ogni nome (FINRA, short interest consolidato)",
+        "  regolamento del 30/09/2026, pubblicato il 09/10/2026 · prossimo: regolamento del 15/10/2026, pubblicazione il "
+        "26/10/2026 (calendario FINRA)", "  quota alta (da 10% del flottante): BBB 21,0%",
+        "  POSIZIONI", "    BBB 21,0% (molto alta) · 3,9 giorni", "    AAA 2,3% (bassa) · 1,1 giorni",
+        "  SORVEGLIATI", "    WWW 1,0% (bassa) · 2,0 giorni", "",
         "AAA [POSIZIONE] Alfa Inc. — prezzo pipeline del 2026-10-16", "  valutazione: P/E ultimi 12 mesi 10,0×",
+        "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 2,3% del flottante (bassa)",
         "  CDS 5 anni: NESSUN CDS compensato a ICE", "  solidita': PATRIMONIALE: FORTE", "  Altman Z'' 5,00: zona di SICUREZZA",
         "  debito: debito finanziario 1,0 mld USD", "",
-        "BBB [POSIZIONE] Beta Inc. — prezzo pipeline del 2026-10-16", "  valutazione: utile NEGATIVO", "  CDS 5 anni 900 pb",
+        "BBB [POSIZIONE] Beta Inc. — prezzo pipeline del 2026-10-16", "  valutazione: utile NEGATIVO",
+        "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 21,0% del flottante (molto alta)", "  CDS 5 anni 900 pb",
         "  solidita': PATRIMONIALE: DEBOLE", "  Altman Z'' -1,00: zona di PERICOLO", "  debito: debito finanziario 2,0 mld USD", "",
         "WWW [SORVEGLIATO] Www Corp. — prezzo pipeline del 2026-10-16", "  valutazione: P/E 20×",
+        "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 1,0% del flottante (bassa)",
         "  CDS 5 anni: NESSUN CDS", "  solidita': lettura non significativa", "  Altman: NON APPLICABILE",
         "  debito: lettura non significativa"],
     "rotazione": [
@@ -7100,6 +7109,119 @@ _breve505 = ROT.lettura_5anni(_serie492([41 + 20.7 * i / 40 for i in range(41)] 
 check("v505 su un titolo quotato da meno di cinque anni il primo prezzo E' un punto di partenza vero: il rialzo si misura",
       _breve505["breve"] is True and _breve505["rialzo"]["censurato"] is False
       and _breve505["rialzo"]["restituito_pct"] is not None)
+
+# ============================ v506 — VENDITE ALLO SCOPERTO: la resa nelle schede ============================
+# Il CEO, 19/10/2026: "Analizza anche azioni allo scoperto ovvero attività short in % sui titoli qualora tu non lo faccia
+# già e rendila strutturale". La pipeline misura (update_data.aggiorna_short), le schede leggono: una resa sola. Lo stato
+# si COSTRUISCE (v425): misure finte nel formato della pipeline, nessuna rete.
+_si506 = {"stato": "misurato", "data": "2026-09-30", "q": 65_671_238, "adv": 16_795_161, "regolamenti": 24,
+          "dal": "2025-10-15", "giorni": 3.91, "pct_flottante": 20.02, "pct_yahoo": 19.76,
+          "var1": {"da": "2026-09-15", "pct": 5.3, "titolo_pct": -4.9},
+          "var3m": {"da": "2026-06-30", "pct": 12.0, "titolo_pct": 80.3},
+          "rango": 98, "min": {"q": 39_726_621, "d": "2025-10-31"}, "max": {"q": 65_671_238, "d": "2026-09-30"}}
+_rs506 = SP.riga_short({"short_interest": _si506})
+check("v506 la riga «short:» porta le posizioni corte APERTE con la data del regolamento, la quota del flottante con la "
+      "sua banda, le azioni, i giorni per ricoprire, le due variazioni col titolo negli stessi giorni e il percentile con "
+      "minimo e massimo DATATI con l'anno: " + _rs506,
+      _rs506.startswith("short: posizioni corte aperte al 30/09/2026 (FINRA)")
+      and "20,0% del flottante (molto alta)" in _rs506 and "65,7 milioni di azioni" in _rs506
+      and "3,9 giorni di scambi per ricoprirle" in _rs506
+      and "+5,3% sul regolamento precedente (dal 15/09), il titolo negli stessi giorni -4,9%" in _rs506
+      and "+12,0% in tre mesi (dal 30/06), il titolo negli stessi giorni +80,3%" in _rs506
+      and "98° percentile dei 24 regolamenti dell'anno (minimo 39,7 milioni di azioni il 31/10/2025, massimo 65,7 "
+          "milioni di azioni il 30/09/2026)" in _rs506 and "Yahoo" not in _rs506)
+check("v506 sotto un giorno di scambi si dice «meno di un giorno» col numero, mai «0,8 giorni» letto come quasi uno",
+      "meno di un giorno di scambi per ricoprirle (0,78)" in SP.riga_short({"short_interest": {**_si506, "giorni": 0.78}}))
+check("v506 la quota del flottante non si calcola su basi di specie diversa, e la riga dice PERCHE'",
+      all(SP.FLOTTANTE_ND[k] in SP.riga_short({"short_interest": {**{x: y for x, y in _si506.items() if x != "pct_flottante"},
+                                                                   "flottante_nd": k}}) for k in ("certificati", "classi", "assente"))
+      and "quota del flottante non calcolabile" in SP.riga_short({"short_interest": {
+          **{x: y for x, y in _si506.items() if x != "pct_flottante"}, "flottante_nd": "certificati"}}))
+_y506 = {k: SP.quota_short({"pct_flottante": 7.07, "pct_yahoo": y}) for k, y in (("lontana", 2.65), ("vicina", 6.5),
+                                                                                  ("sopra", 9.0))}
+check("v506 due rese della stessa quota che NON coincidono si dichiarano (SPCX: 7,1% contro il 2,6% di Yahoo), e quando "
+      "coincidono entro la tolleranza no — nei due versi: " + str(_y506),
+      "Yahoo ne pubblica il 2,6%" in _y506["lontana"] and "Yahoo" not in _y506["vicina"]
+      and "Yahoo ne pubblica il 9,0%" in _y506["sopra"])
+check("v506 le bande della quota (convenzione): sotto 5 bassa, da 5 moderata, da 10 alta, da 20 molto alta — e il segno "
+      "si mette sul valore arrotondato (nessun «-0,0»)",
+      [SP.banda_short(x) for x in (4.99, 5.0, 9.99, 10.0, 19.99, 20.0, 45.0)]
+      == ["bassa", "moderata", "moderata", "alta", "alta", "molto alta", "molto alta"]
+      and SP._sg1(-0.04) == "0,0" and SP._sg1(0.04) == "0,0" and SP._sg1(-1.26) == "-1,3" and SP._sg1(2) == "+2,0")
+_tg506 = SP.riga_short({"short_interest": {**_si506, "regolamenti": 8, "rango": None, "rango_min": 12,
+                                           "tagli": [{"motivo": "nome", "dal": "2026-06-15",
+                                                      "prima": "The SPAC and New Issue ETF"}], "riportato": True}})
+check("v506 i tagli della serie si dichiarano (il simbolo riusato col nome di prima), il percentile assente dice quanti "
+      "regolamenti servono — la soglia arriva col dato — e un ripiego sul run precedente si dice: " + _tg506,
+      "percentile dell'anno n.d. (8 regolamenti, ne servono 12)" in _tg506
+      and "serie dal 15/06/2026: prima lo stesso simbolo era «The SPAC and New Issue ETF»" in _tg506
+      and "misura del run precedente: FINRA non ha risposto in questo run" in _tg506)
+_stati506 = {k: SP.riga_short(v) for k, v in (("snapshot", {}), ("nessuno", {"short_interest": {"stato": "nessun dato"}}),
+                                              ("nonletto", {"short_interest": {"stato": "non letto"}}))}
+check("v506 TRE assenze, tre frasi diverse (v406): snapshot precedente, nessun dato FINRA, NON letto — nessuna si legge "
+      "«nessuno e' corto»: " + str(_stati506),
+      "snapshot precedente alla v506" in _stati506["snapshot"] and "il dato che manca" in _stati506["snapshot"]
+      and "FINRA non ha posizioni corte segnalate" in _stati506["nessuno"]
+      and "non vuol dire «nessuno scommette contro»" in _stati506["nessuno"]
+      and "NON lette" in _stati506["nonletto"] and len(set(_stati506.values())) == 3
+      and all(v.startswith("short: ") for v in _stati506.values()))
+
+# --- il blocco in testa: date, calendario, convenzioni, selezioni, tabella ---
+_righe506 = {"AAA": {"short_interest": dict(_si506)},
+             "BBB": {"short_interest": {**_si506, "pct_flottante": 2.3, "rango": 15, "giorni": 1.06}},
+             "CCC": {"short_interest": {k: v for k, v in _si506.items() if k != "pct_flottante"} | {"flottante_nd": "classi"}},
+             "WWW": {"short_interest": {**_si506, "pct_flottante": 12.8, "rango": 50}},
+             "ZZZ": {"short_interest": {"stato": "nessun dato"}}}
+_meta506 = {"short_interest": {"regolamento": "2026-09-30", "pubblicato": "2026-10-09", "letto": True,
+                               "prossimo": {"regolamento": "2026-10-15", "pubblicazione": "2026-10-26"},
+                               "calendario": "letto"}}
+_b506 = "\n".join(SP.blocco_short(_righe506, ["BBB", "AAA", "CCC"], ["ZZZ", "WWW"], _meta506))
+_pos506 = [_b506.find(x) for x in ("  POSIZIONI", "    AAA ", "    BBB ", "    CCC ", "  SORVEGLIATI", "    WWW ", "    ZZZ ")]
+check("v506 il blocco in testa: regolamento, pubblicazione e prossimo dal calendario FINRA; le bande dichiarate come "
+      "convenzione; il flusso giornaliero rimandato al DPI; quota alta e vicine al massimo dell'anno; la tabella per "
+      "gruppo, dalla quota piu' alta e coi n.d. in fondo: " + _b506[:600],
+      _b506.startswith("VENDITE ALLO SCOPERTO")
+      and "regolamento del 30/09/2026, pubblicato il 09/10/2026 · prossimo: regolamento del 15/10/2026, pubblicazione il "
+          "26/10/2026 (calendario FINRA)" in _b506
+      and "una convenzione del mestiere, non un dato" in _b506 and "è il DPI del blocco DARK POOL" in _b506
+      and "quota alta (da 10% del flottante): AAA 20,0% · WWW 12,8%" in _b506
+      and "vicine al massimo del proprio anno (dal 90° percentile dei regolamenti): AAA 98°" in _b506
+      and all(p >= 0 for p in _pos506) and _pos506 == sorted(_pos506)
+      and "    ZZZ nessun dato FINRA nell'ultimo anno" in _b506 and "    CCC quota n.d." in _b506)
+_b506c = "\n".join(SP.blocco_short(_righe506, ["AAA"], [], {"short_interest": {**_meta506["short_interest"],
+                                                                                "prossimo": None, "calendario": "non letto",
+                                                                                "letto": False, "errore": "HTTP 500"}}))
+_b506d = "\n".join(SP.blocco_short(_righe506, ["AAA"], [], {"short_interest": {**_meta506["short_interest"], "prossimo": None}}))
+check("v506 senza calendario la prossima pubblicazione e' «dato non disponibile» col perche' (non letto, o oltre il "
+      "calendario pubblicato) — mai una data stimata (v396) — e un FINRA non letto si dichiara in testa",
+      "prossima pubblicazione: dato non disponibile (calendario FINRA non letto in questo run)" in _b506c
+      and "⚠ FINRA non letto in questo run (HTTP 500): vale la misura del run precedente" in _b506c
+      and "prossima pubblicazione: dato non disponibile (oltre il calendario che FINRA ha pubblicato)" in _b506d)
+check("v506 uno snapshot senza il blocco della pipeline lo DICE, invece di stampare una tabella vuota",
+      "snapshot precedente alla v506" in "\n".join(SP.blocco_short(_righe506, ["AAA"], [], {})))
+
+# --- una resa sola, e il collegamento ESEGUITO ---
+_src506 = Path(__file__).with_name("schede_progetto.py").read_text(encoding="utf-8")
+check("v506 le schede NON ristampano la quota di Yahoo senza data ne' il flusso giornaliero (il DPI del dark pool): una "
+      "resa sola della grandezza (v161, v415)",
+      "short_float" not in _src506 and "short_flusso" not in _src506)
+_dati506 = {"updated_at": "2026-10-23T14:02:09Z", "watchlist": [
+    {"ticker": "AAA", "name": "Alfa", "price_asof": "2026-10-22", "short_interest": dict(_si506)},
+    {"ticker": "WWW", "name": "Www", "price_asof": "2026-10-22", "short_interest": {"stato": "nessun dato"}}],
+    "macro": dict(_meta506)}
+_g506 = SP.genera(_dati506, ["AAA"], ["WWW"])
+_i506 = [_g506.find(x) for x in ("VENDITE ALLO SCOPERTO", "AAA [POSIZIONE]", "WWW [SORVEGLIATO]")]
+_blocchi506 = [b for b in _g506.split("\n\n") if "[POSIZIONE]" in b or "[SORVEGLIATO]" in b]
+check("v506 collegamento: genera() stampa il blocco PRIMA delle schede dei nomi, e la scheda di OGNI nome ha la sua "
+      "riga «short:» (anche chi non ha dati, che lo dice)",
+      all(i >= 0 for i in _i506) and _i506 == sorted(_i506) and len(_blocchi506) == 2
+      and all("\n  short: " in b for b in _blocchi506))
+_fa506 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v506 il formato: la riga short nella voce delle schede, la lettura in coppia col titolo nella 5bis e la voce "
+      "[short] nel registro, informazione e non una prova",
+      "il blocco **VENDITE ALLO SCOPERTO** in testa e la riga **short** di ogni nome" in _fa506
+      and "posizioni corte in aumento col titolo in salita" in _fa506.replace("\n   ", " ")
+      and "- `[short]` le vendite allo scoperto di ogni posizione e sorvegliato" in _fa506)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

@@ -6076,6 +6076,265 @@ def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_ma
             "verificato": mappa.get("verificato"), **stati}
 
 
+# ═══ v506 — VENDITE ALLO SCOPERTO: LE POSIZIONI CORTE APERTE DI OGNI TITOLO (FINRA, short interest) ═════════════
+# Richiesta del CEO del 19/10/2026, testuale: "Analizza anche azioni allo scoperto ovvero attività short in % sui
+# titoli qualora tu non lo faccia già e rendila strutturale". Il sistema lo faceva a meta', con due grandezze che non
+# rispondevano alla domanda:
+#   · stats.short_float — la quota del flottante di Yahoo, SENZA la data della rilevazione (v396) e, sui certificati
+#     americani e sui titoli a piu' classi, su una base sbagliata: misurato il 23/10, TSM 0,08% contro 0,63% e GOOGL la
+#     meta', perche' le azioni corte sono di una specie e il flottante di un'altra;
+#   · short_flusso — la quota del volume di OGNI GIORNO venduta allo scoperto (FINRA Reg SHO): un FLUSSO che comprende i
+#     market maker, non la posizione aperta, ed e' la stessa grandezza del DPI del dark pool (posizionamento.py).
+# Le posizioni corte APERTE le pubblica FINRA due volte al mese, gratis, con la data di regolamento, e il calendario
+# delle pubblicazioni e' ufficiale: e' la misura che la domanda chiede. Una richiesta sola per tutti i titoli e un anno
+# di regolamenti (~1 s il 23/10). La pipeline MISURA, l'analisi legge (v498): bande e lettura in schede_progetto.py.
+SI_URL = "https://api.finra.org/data/group/otcMarket/name/consolidatedShortInterest"
+SI_CALENDARIO = "https://www.finra.org/filing-reporting/regulatory-filing-systems/short-interest"
+SI_REGOLAMENTI = 24      # un anno di regolamenti: due al mese
+SI_GIORNI = 400          # la finestra chiesta all'API, con margine sui 24 regolamenti
+SI_RANGO_MIN = 12        # sotto sei mesi di regolamenti il percentile dell'anno non si pubblica
+SI_TRIMESTRE = 6         # sei regolamenti: circa tre mesi
+SI_PAGINA = 5000
+SI_ETA_MAX = 31          # giorni: fra un regolamento e la pubblicazione del successivo ne passano al piu' ~27
+_SI_CERTIFICATI = re.compile(r"(?i)american deposit|\bADRS?\b|\bADS\b|new york reg")
+_SI_MESI = {m: i for i, m in enumerate(("january", "february", "march", "april", "may", "june", "july", "august",
+                                         "september", "october", "november", "december"), 1)}
+
+
+def leggi_short_interest(simboli, post=None, oggi=None):
+    """Le posizioni corte aperte di tutti i simboli in UNA richiesta (filtro di dominio sul simbolo) e un anno di
+    regolamenti. Restituisce {simbolo: [righe di FINRA]}; solleva se FINRA non risponde, e il chiamante lo dichiara."""
+    post = post or requests.post
+    oggi = oggi or datetime.now(timezone.utc).date()
+    corpo = {"limit": SI_PAGINA, "offset": 0,
+             "domainFilters": [{"fieldName": "symbolCode", "values": sorted(set(simboli))}],
+             "dateRangeFilters": [{"fieldName": "settlementDate",
+                                   "startDate": (oggi - timedelta(days=SI_GIORNI)).isoformat(),
+                                   "endDate": oggi.isoformat()}]}
+    righe = []
+    for _ in range(20):
+        r = post(SI_URL, json=dict(corpo), headers={**UA_ONESTO, "Accept": "application/json"}, timeout=40)
+        if r.status_code != 200:
+            raise RuntimeError(f"FINRA ha risposto {r.status_code}")
+        pagina = r.json()
+        if not isinstance(pagina, list):
+            raise RuntimeError("FINRA: la risposta non e' un elenco")
+        righe.extend(pagina)
+        if len(pagina) < SI_PAGINA:
+            break
+        corpo["offset"] += len(pagina)
+    per = collections.defaultdict(list)
+    for x in righe:
+        if isinstance(x, dict) and x.get("symbolCode"):
+            per[str(x["symbolCode"])].append(x)
+    return dict(per)
+
+
+def serie_short(righe):
+    """La serie di un simbolo in ordine di regolamento, tagliata dove le azioni smettono di essere confrontabili:
+      · al cambio del NOME dell'emittente: lo stesso simbolo puo' essere stato di un'altra societa' — SPCX era «The SPAC
+        and New Issue ETF» fino a giugno 2026 (misurato il 23/10), la classe del veicolo di quotazione (v492);
+      · al FRAZIONAMENTO: FINRA lo segna sul primo regolamento DOPO, e il precedente e' contato nella base vecchia (NFLX
+        il 28/11/2025: 75,2 milioni contro 14,7 — «+413%» che non e' un aumento).
+    Ogni taglio si dichiara (v406). Un regolamento senza quantita' non entra: un buco non e' uno zero (v205).
+    Restituisce (serie, tagli, nome dell'emittente)."""
+    rs = sorted((x for x in (righe or []) if x.get("settlementDate") and x.get("currentShortPositionQuantity") is not None),
+                key=lambda x: str(x["settlementDate"]))
+    tagli = []
+    if rs:
+        nome = rs[-1].get("issueName")
+        i = len(rs) - 1
+        while i > 0 and rs[i - 1].get("issueName") == nome:
+            i -= 1
+        if i > 0:
+            tagli.append({"motivo": "nome", "dal": str(rs[i]["settlementDate"])[:10], "prima": rs[i - 1].get("issueName")})
+            rs = rs[i:]
+        fr = [k for k, x in enumerate(rs) if x.get("stockSplitFlag")]
+        if fr and fr[-1] > 0:
+            tagli.append({"motivo": "frazionamento", "dal": str(rs[fr[-1]]["settlementDate"])[:10]})
+            rs = rs[fr[-1]:]
+    serie = []
+    for x in rs[-SI_REGOLAMENTI:]:
+        adv = x.get("averageDailyVolumeQuantity")
+        serie.append({"d": str(x["settlementDate"])[:10], "q": int(x["currentShortPositionQuantity"]),
+                      "adv": int(adv) if adv else None, **({"rev": True} if x.get("revisionFlag") else {})})
+    return serie, tagli, (rs[-1].get("issueName") if rs else None)
+
+
+def titolo_fra(rendimenti, date_rend, da, a):
+    """Il rendimento del titolo dalla chiusura al regolamento `da` a quella al regolamento `a`, per DATA (v207), dai
+    log-rendimenti della riga (_ret_series). Un regolamento senza seduta del titolo usa la chiusura PRECEDENTE, mai la
+    successiva, che quel giorno non era ancora nota. None se una delle due date cade prima della serie."""
+    if not rendimenti or not date_rend or len(rendimenti) != len(date_rend):
+        return None
+    i0 = i1 = None
+    for i, d in enumerate(date_rend):
+        if d <= da:
+            i0 = i
+        if d <= a:
+            i1 = i
+    if i0 is None or i1 is None or i1 <= i0:
+        return None
+    return round((math.exp(sum(rendimenti[i0 + 1:i1 + 1])) - 1) * 100, 1)
+
+
+def misure_short(serie, tagli=None, nome=None, stats=None, rendimenti=None, date_rend=None):
+    """Le misure sulla serie di un titolo. Nessuna soglia: bande e lettura le decide l'analisi (v498)."""
+    if not serie:
+        return None
+    u = serie[-1]
+    out = {"stato": "misurato", "data": u["d"], "q": u["q"], "adv": u["adv"], "regolamenti": len(serie),
+           "dal": serie[0]["d"]}
+    if tagli:
+        out["tagli"] = tagli
+    if nome:
+        out["nome"] = nome
+    # ⚠ i giorni per ricoprire si CALCOLANO dai due numeri che FINRA pubblica: il suo daysToCoverQuantity vale 1 anche
+    #   sotto un giorno (MU il 15/06/2026: 41,6 milioni di azioni su 53,2 di volume medio = 0,78, pubblicato «1»)
+    out["giorni"] = round(u["q"] / u["adv"], 2) if u.get("adv") else None
+    # la quota del flottante: azioni corte e flottante devono essere della STESSA specie
+    st = stats or {}
+    fl, sh = st.get("float_shares"), st.get("shares")
+    if _SI_CERTIFICATI.search(nome or ""):
+        out["flottante_nd"] = "certificati"
+    elif not fl or fl <= 0:
+        out["flottante_nd"] = "assente"
+    elif sh and fl > sh * 1.02:
+        out["flottante_nd"] = "classi"
+    else:
+        out["pct_flottante"] = round(u["q"] / fl * 100, 2)
+        if st.get("short_float") is not None:
+            out["pct_yahoo"] = round(st["short_float"] * 100, 2)
+    # le variazioni per POSIZIONE nella serie gia' tagliata — le date sono quelle dei regolamenti — col titolo negli
+    #   stessi giorni, per data
+    for k, n in (("var1", 1), ("var3m", SI_TRIMESTRE)):
+        if len(serie) > n and serie[-1 - n]["q"] > 0:
+            b = serie[-1 - n]
+            out[k] = {"da": b["d"], "pct": round((u["q"] / b["q"] - 1) * 100, 1),
+                      "titolo_pct": titolo_fra(rendimenti, date_rend, b["d"], u["d"])}
+    if len(serie) >= SI_RANGO_MIN:
+        qs = [x["q"] for x in serie]
+        p = (sum(1 for v in qs if v < u["q"]) + 0.5 * sum(1 for v in qs if v == u["q"])) / len(qs) * 100
+        out["rango"] = int(math.floor(p + 0.5))        # midrank, intero per eccesso sul mezzo (v496)
+        mn, mx = min(serie, key=lambda x: x["q"]), max(serie, key=lambda x: x["q"])
+        out["min"], out["max"] = {"q": mn["q"], "d": mn["d"]}, {"q": mx["q"], "d": mx["d"]}
+    else:
+        out["rango_min"] = SI_RANGO_MIN       # la soglia viaggia col dato: la resa non la riscrive (v474)
+    return out
+
+
+def leggi_calendario_short(testo):
+    """Il calendario UFFICIALE delle pubblicazioni di FINRA, dalla sua pagina: per ogni anno una tabella con tre date
+    per regolamento — regolamento, scadenza delle segnalazioni, pubblicazione — scritte «Month Day». L'anno e' quello
+    della tabella; una data di un mese PRECEDENTE a quello del regolamento e' dell'anno dopo (il regolamento del 31/12
+    si pubblica a gennaio). Nessuna data proiettata (v396): se una terna non e' in ordine il formato e' cambiato, e la
+    funzione non indovina — restituisce None, e il prossimo aggiornamento e' «dato non disponibile».
+    ⚠ Dopo le tabelle la pagina ha altre date, ma CON l'anno («October 27, 2022», gli avvisi collegati): una data
+      della tabella non lo porta mai, e quelle righe non entrano (misurato il 23/10: la prima stesura le leggeva come
+      una terna e restituiva None). La nota a piè di tabella («1. All referenced times…») chiude la lettura."""
+    t = re.sub(r"(?is)<(script|style)\b.*?</\1>", " ", testo or "")
+    t = re.sub(r"<[^>]+>", "\n", t).replace("&nbsp;", " ")
+    anno, buf, out = None, [], []
+    for riga in t.splitlines():
+        riga = " ".join(riga.split())
+        if not riga:
+            continue
+        m = re.match(r"^(\d{4}) Short Interest Reporting Dates$", riga)
+        if m:
+            if buf:
+                return None
+            anno, buf = int(m.group(1)), []
+            continue
+        if anno is None:
+            continue
+        if riga.startswith("1. "):
+            anno = None
+            continue
+        m = re.match(r"^([A-Za-z]+) (\d{1,2})\b", riga)
+        if not m or m.group(1).lower() not in _SI_MESI or re.search(r"\b(?:19|20)\d{2}\b", riga):
+            continue
+        buf.append((_SI_MESI[m.group(1).lower()], int(m.group(2))))
+        if len(buf) == 3:
+            (ms, gs), terna = buf[0], []
+            try:
+                for mm, gg in buf:
+                    terna.append(datetime(anno + (1 if mm < ms else 0), mm, gg).date())
+            except ValueError:
+                return None
+            reg, _, pub = terna
+            if not (terna[0] < terna[1] < terna[2]) or (pub - reg).days > 25:
+                return None
+            out.append({"regolamento": reg.isoformat(), "pubblicazione": pub.isoformat()})
+            buf = []
+    if buf or not out:
+        return None
+    return sorted(out, key=lambda x: x["regolamento"])
+
+
+def pubblicazioni_short(calendario, regolamento):
+    """Dal calendario ufficiale: la pubblicazione del regolamento che i dati portano, e il prossimo regolamento con la
+    sua pubblicazione. Fuori dal calendario letto, None: non si stima."""
+    if not calendario or not regolamento:
+        return None, None
+    pub = next((x["pubblicazione"] for x in calendario if x["regolamento"] == regolamento), None)
+    pros = next((dict(x) for x in calendario if x["regolamento"] > regolamento), None)
+    return pub, pros
+
+
+def aggiorna_short(righe, precedenti=None, post=None, get=None, oggi=None):
+    """Attacca r['short_interest'] a ogni titolo seguito e restituisce il riepilogo per macro['short_interest'].
+    Tre esiti per titolo, distinti (v389): misurato · NESSUN DATO (FINRA ha risposto e il simbolo non c'e') · NON LETTO
+    (FINRA non ha risposto: vale la misura del run precedente, DICHIARATA, se c'era). I riferimenti (indici, cambi,
+    future, criptovalute) si riconoscono dalla FORMA del simbolo (v410) e non entrano."""
+    oggi = oggi or datetime.now(timezone.utc).date()
+    get = get or (lambda u: requests.get(u, headers=UA_ONESTO, timeout=30))
+    titoli = [r for r in righe if isinstance(r, dict) and r.get("ticker")
+              and not (str(r["ticker"]).startswith("^") or "=" in str(r["ticker"]) or str(r["ticker"]).endswith("-USD"))]
+    letti, errore = None, None
+    try:
+        letti = leggi_short_interest([r["ticker"] for r in titoli], post=post, oggi=oggi)
+    except Exception as e:  # noqa: BLE001
+        errore = f"{type(e).__name__}: {str(e)[:140]}"
+    calendario, err_cal = None, None
+    try:
+        rc = get(SI_CALENDARIO)
+        if getattr(rc, "status_code", 200) != 200:
+            raise RuntimeError(f"HTTP {rc.status_code}")
+        calendario = leggi_calendario_short(rc.text)
+        if calendario is None:
+            err_cal = "la pagina non ha il formato atteso"
+    except Exception as e:  # noqa: BLE001
+        err_cal = f"{type(e).__name__}: {str(e)[:100]}"
+    stati = collections.defaultdict(list)
+    prec = precedenti or {}
+    for r in titoli:
+        tk = r["ticker"]
+        if letti is None:
+            p = prec.get(tk)
+            if isinstance(p, dict) and p.get("stato") == "misurato":
+                r["short_interest"] = {**p, "riportato": True}
+                stati["riportati"].append(tk)
+            else:
+                r["short_interest"] = {"stato": "non letto"}
+                stati["non_letti"].append(tk)
+            continue
+        serie, tagli, nome = serie_short(letti.get(tk))
+        m = misure_short(serie, tagli, nome, r.get("stats"), r.get("_ret_series"), r.get("_ret_dates"))
+        if m is None:
+            r["short_interest"] = {"stato": "nessun dato"}
+            stati["senza_dati"].append(tk)
+        else:
+            r["short_interest"] = m
+            stati["misurati"].append(tk)
+    date = [r["short_interest"]["data"] for r in titoli if (r.get("short_interest") or {}).get("data")]
+    reg = max(date) if date else None
+    pub, pros = pubblicazioni_short(calendario, reg)
+    return {"fonte": "FINRA — short interest consolidato: posizioni corte aperte, due regolamenti al mese",
+            "url": SI_URL, "letto": letti is not None, "errore": errore, "regolamento": reg, "pubblicato": pub,
+            "prossimo": pros, "calendario": "letto" if calendario else "non letto", "errore_calendario": err_cal,
+            "calendario_url": SI_CALENDARIO, **{k: sorted(v) for k, v in stati.items()}}
+
+
 def validate_macro(macro):
     """DATA ASSERTIONS (post-incidente margin debt congelato): valida il macro PRIMA che
     finisca nel payload AI. Due famiglie di regole:
@@ -6298,6 +6557,25 @@ def validate_macro(macro):
     if _cds.get("non_classificati"):
         add("cds_abbinamenti", _cds.get("data"), 5, "missing",
             f"titoli seguiti senza classificazione in config/cds_entita.json: {', '.join(_cds['non_classificati'])}")
+
+    # v506 — le posizioni corte aperte nascono sorvegliate (v390). Due regolamenti al mese, pubblicati ~7 giorni
+    #   lavorativi dopo: fra un regolamento e la pubblicazione del successivo passano al piu' ~27 giorni, e oltre
+    #   SI_ETA_MAX il dato e' fermo. E se il calendario UFFICIALE dice che il regolamento successivo e' gia' stato
+    #   pubblicato — prima di oggi — e i dati non lo portano, la lettura e' rimasta indietro anche con un'eta' normale.
+    _si = macro.get("short_interest")
+    if not _si or not _si.get("regolamento"):
+        add("short_interest", None, SI_ETA_MAX, "missing", "posizioni corte aperte (FINRA) non lette in questo run"
+            + (f" — {_si.get('errore')}" if _si and _si.get("errore") else ""))
+    else:
+        _a = age_of(_si["regolamento"])
+        _pr = _si.get("prossimo") or {}
+        _indietro = bool(_pr.get("pubblicazione") and _pr["pubblicazione"] < today.isoformat())
+        add("short_interest", _si["regolamento"], SI_ETA_MAX,
+            "ok" if (_a is not None and _a <= SI_ETA_MAX and not _indietro) else "stale",
+            (f"il regolamento del {_pr.get('regolamento')} e' pubblicato dal {_pr.get('pubblicazione')} e i dati non "
+             f"lo portano" if _indietro else "")
+            + ("" if _si.get("letto") else f"FINRA non letto in questo run ({_si.get('errore') or 'motivo n.d.'}): "
+                                            f"vale la misura del run precedente"))
 
     # v501 — il debito dai bilanci SEC nasce sorvegliato (v390). L'eta' non e' il segnale giusto (un 10-Q esce ogni
     # tre mesi): lo sono l'ASSENZA del blocco, un archivio vuoto e gli errori di lettura di questo run. I nomi in attesa
@@ -7244,6 +7522,21 @@ def main():
               + f" · storico {_c['storia']['giorni']} giorni")
     except Exception as e:  # noqa: BLE001
         print(f"!! CDS: {e}", file=sys.stderr)
+
+    # v506 — le posizioni corte aperte (FINRA): dopo le posizioni e PRIMA di strip_private, perche' il titolo negli
+    #   stessi giorni dei regolamenti si misura sui suoi rendimenti datati (_ret_series). Se FINRA non risponde vale la
+    #   misura del run precedente, dichiarata.
+    try:
+        _prec_si = {r.get("ticker"): r.get("short_interest") for r in (prev_data.get("watchlist") or [])
+                    if isinstance(r, dict) and r.get("short_interest")}
+        macro["short_interest"] = aggiorna_short(watchlist, _prec_si)
+        _si = macro["short_interest"]
+        print(f"   short interest (FINRA): {'letto' if _si['letto'] else 'NON letto — ' + str(_si.get('errore'))} · "
+              f"regolamento {_si.get('regolamento')} · {len(_si.get('misurati') or [])} misurati"
+              + (f", senza dati: {_si['senza_dati']}" if _si.get("senza_dati") else "")
+              + f" · calendario {_si['calendario']}")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! short interest: {e}", file=sys.stderr)
 
     # MACRO SHOCK ALERT v125: incrocia futures Nasdaq (macro) e KOSPI live (watchlist) → flag panico
     shock = compute_shock_alert(macro, watchlist)
