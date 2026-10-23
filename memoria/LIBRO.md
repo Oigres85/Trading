@@ -22,7 +22,7 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 |---|---|---|---|---|
 | NVDA | 270 | **87,1667** | USD | ⚠ confermato dal CEO: `portfolio_state.json` diceva 81,167 ed era sbagliato |
 | MSTR | 173 | 173,3045 | USD | |
-| CRWV | 205 | 81,41 | USD | media del CEO del 20/10/2026: +50 azioni a ~63,86 $, ricavato dal carico che il broker dichiara (da 87,07 a 81,41); la prima il 14/10/2026: +50 a ~65,80 $ (da 97,199 a 87,07) |
+| CRWV | 255 | 76,14 | USD | media del CEO del 23/10/2026: +50 azioni a ~54,53 $, ricavato dal carico che il broker dichiara (da 81,41 a 76,14); il 20/10/2026: +50 a ~63,86 $ (da 87,07 a 81,41); la prima il 14/10/2026: +50 a ~65,80 $ (da 97,199 a 87,07) |
 | AMD | 100 | 153,916 | USD | |
 | PLTR | 100 | 113,50 | USD | |
 | MU | 70 | 87,63 | USD | |
@@ -37,10 +37,11 @@ giornaliero (§1septies). Il CEO, testuale: *"Smci vendute 250 a 32,81 non mi fi
 speculazione"*. Plusvalenza (32,81 − 31,60) × 250 = **+302,50 $** (+3,8% in due sedute), imposta ~79 $ al 26% — il conto
 definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliati (§1bis).
 
-**Liquidità: ~49.475 €** IN TUTTO, bloccata compresa — **una stima, da confermare col saldo del broker**: i 45.000 €
+**Liquidità: ~47.040 €** IN TUTTO, bloccata compresa — **una stima, da confermare col saldo del broker**: i 45.000 €
 dichiarati dal CEO il 17/10/2026 (testuale: *"La liquiditita è di 45k"*), più la vendita di SMCI del 19/10 (250 × 32,81 $
-= 8.202,50 $ ≈ 7.317 € a EUR/USD 1,121, il cambio della pipeline quel giorno) e meno la media di CRWV del 20/10
-(205 × 81,41 − 155 × 87,07 = 3.193,20 $ ≈ 2.842 € a 1,1236). Imposta sulla plusvalenza di SMCI e commissioni escluse.
+= 8.202,50 $ ≈ 7.317 € a EUR/USD 1,121, il cambio della pipeline quel giorno) e meno le due medie di CRWV, del 20/10
+(205 × 81,41 − 155 × 87,07 = 3.193,20 $ ≈ 2.842 € a 1,1236) e del 23/10 (255 × 76,14 − 205 × 81,41 = 2.726,65 $ ≈
+2.435 € a 1,1196). Imposta sulla plusvalenza di SMCI e commissioni escluse.
 In §1septies non c'è nessun ordine: per quanto il sistema sa, è tutta libera. La liquidità si scrive in tutto perché un ordine non
 eseguito non ha speso niente: se si esegue, qui si toglie la sua spesa e in alto entra la posizione; se scade, questo
 numero non cambia. La libera la calcola `numeri_libro.py` (blocco «ORDINI APERTI») togliendo gli ordini ancora attivi (v490).
@@ -473,6 +474,10 @@ sua: la rimandata è chiusa, e resta la scadenza del conflitto — i conti, con 
 ⚠ **CRWV — 20/10/2026: il CEO ha mediato di nuovo**, sempre prima dei conti: +50 azioni a ~63,86 $ (ricavato dal carico
 che il broker dichiara), 205 in tutto, carico da 87,07 a **81,41** (§1). La regola del 18/10 si sposta col carico: si
 esce solo almeno in pari, cioè non sotto il carico di §1.
+⚠ **CRWV — 23/10/2026: la terza media**, sempre prima dei conti. Il CEO, testuale: *"Corewave pmc 76.14 255 azioni
+aggiorna"*: +50 azioni a ~54,53 $ (ricavato dal carico che il broker dichiara; quel giorno il titolo ha scambiato fra
+54,07 e 56,10 $), 255 in tutto, carico da 81,41 a **76,14** (§1). Il pareggio scende col carico: a 54,80 $ (pipeline,
+23/10 in seduta) servivano +38,9% per tornare in pari, contro +48,6% sul carico di prima.
 ⚠ **15/10/2026 — il gradino dell'arancione del 14/10 NON è stato eseguito**, per decisione del CEO
 («mantenere le posizioni di Mu e amd e gli altri»), e la regola è cambiata lo stesso giorno:
 arancione e rosso non vendono più, resta il salvavita a −30% (§1ter).
