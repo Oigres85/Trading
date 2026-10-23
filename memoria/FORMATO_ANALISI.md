@@ -11,6 +11,17 @@ volta**, anche a un'ora dall'ultima. Una sezione senza novità si scrive in una 
 …»), **non si salta**. Solo «sintetizza» o «in poche righe» autorizzano la forma breve.
 Il 09/10 alle 20:22 un aggiornamento è uscito senza la sezione 7: da qui il comando unico.
 
+**Dal 19/10 la risposta ha DUE parti** (v505, decisione del CEO: *«B»*, dopo *"Ho la sensazione che questa analisi si
+apriva di tante parti strutturali che ci diceva di inserire, ma che in realtà non ci sono vengono riportate in questo
+report"* — misurato: 16 richieste su 43 portate per intero, 18 ridotte, 9 per niente):
+- **in chat**: le sezioni 0-7 con le DECISIONI, ciò che è CAMBIATO e il GIUDIZIO — chi va guardato e perché, cosa
+  fare o non fare, le notizie cercate in rete con fonte e data, le conseguenze dei numeri;
+- **la SCHEDA COMPLETA, allegata ogni volta**: la scrive `scripts/scheda.py` (la lancia il comando unico) con le
+  uscite di tutti gli strumenti, parola per parola, per sezione e per NOME, e in testa l'indice delle richieste rese
+  strutturali con quanti nomi portano ciascuna. Non costa token: è lo script a scriverla, non la risposta.
+La completezza non dipende più dal riassunto: la porta la scheda, e un gate verifica nei due versi che ogni richiesta
+del registro qui sotto abbia la sua sezione.
+
 **Il comando: `python3 scripts/analisi.py`** (v473). Esegue in parallelo tutti gli strumenti
 qui sotto, sceglie da solo pre-market / seduta / after-hours dall'ora di New York, dichiara lo
 strumento che fallisce e chiude con la CHECKLIST — la sezione «Cosa contiene la risposta» di
@@ -384,47 +395,55 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        allo stop) e la trimestrale vicina; la stessa scommessa sempre dichiarata. Priorità e
        livelli, mai la quantità da comprare: l'unità è un'unità di calcolo.
 
-**Richieste del CEO rese strutturali — entrano TUTTE in ogni «Aggiorna analisi»**: semaforo
-d'uscita (06/10) · costo dell'attesa e scadenze (06/10) · pre-market prima dell'apertura (06/10) ·
-schede del progetto (06/10) · credito sul libro (07/10) · rotazione con candidati, tecnica,
-volumi e notizie (07/10) · target, beta e volatilità (07/10) · volumi come percentile 0-100
-(08/10) · aste del Tesoro in ora italiana (07/10) · ingressi sulla watchlist (09/10) ·
-riferimento QQQ e registro della performance (09/10) · semaforo calcolato (09/10) · in giallo
-nessun divieto ma conseguenze di rischio di ogni ingresso (09/10) · costo delle decisioni aperte
-(09/10) · piano per la liquidità (09/10) · nessun tetto alle memorie (14/10) · tenuta delle posizioni:
-si lascia correre, si vende per evidenza, col pareggio fiscale, anche sui sorvegliati (14/10) ·
-ingressi speculativi ammessi e dichiarati (14/10) · bilancio dell'evidenza nei due versi, il rialzo
-possibile valutato, l'aritmetica della media sulle posizioni in perdita (14/10) · le decisioni
-rimandate di proposito, riportate con la loro scadenza (14/10) · la riduzione in proporzione al
-rischio, il salvavita a −30% dal massimo, la scadenza e l'esame di ogni conflitto (14/10 sera) ·
-non si vende sui ribassi: arancione e rosso sono un segnale, l'unica vendita automatica è il
-salvavita, e nessuna presa di profitto ai massimi (15/10) · ingressi sui minimi: i pavimenti di ogni nome della
-watchlist, con ordine, stop e perdita per 5.000 € (15/10) · gli ordini aperti seguiti a ogni analisi, con storno o
-discesa e il rischio di alzare il limite (15/10) · i pavimenti delle posizioni e la media sui pavimenti sotto il
-carico (15/10) · i volumi, anche della seduta in corso col tempo trascorso (15/10) · le date dei conti dichiarate
-dall'emittente (15/10) · gli ingressi in ordine d'interesse, con prezzi e motivazioni (15/10) · gli ordini
-giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera) · la lettura
-a 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10) · la
-struttura delle oscillazioni — massimi e minimi crescenti o decrescenti, rotture, doppi, divergenze — in ogni ingresso
-e su ogni posizione, e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10) — la
-struttura «solo informazione», non una prova nella tenuta (decisione del CEO dello stesso giorno) · la variazione
-annua della leva dal file storico FINRA, col suo percentile; put e call di mercato e di ogni posizione, le scadenze
-delle opzioni (mensile e «tre streghe»), le posizioni dei grandi operatori (CFTC) e il bitcoin dall'ultima chiusura
-USA su MSTR — informazione, non prove (17/10) · i CDS a 5 anni di posizioni e sorvegliati, con gli indici CDX e
-l'Italia per il BTP (17/10) — e dalla sera stessa il loro allargamento oltre l'indice come prova della tenuta, in
-funzione quando lo storico raccolto basta (17/10) · le notizie di TUTTE le posizioni e di TUTTI i sorvegliati, coi
-segnali davanti, e il feed vuoto o fermo dichiarato; il dark pool (FINRA, DIX) e la gamma dei dealer (call wall, put
-wall, cambio di regime); gli indici S&P 500 e Nasdaq-100 — P/E con la storia della sua fonte, stagione delle
-trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza — informazione, non prove (17/10 sera) · il
-VWAP dall'ultima trimestrale accanto ai pavimenti di ogni titolo; i segnali di mercato misurati e lasciati come
-informazione (18/10) · la salute del credito di ogni nome — CDS con rincaro improvviso, allargamento e divergenza
-dal titolo, Altman con la frequenza storica d'insolvenza per orizzonte, il debito dai bilanci depositati — e gli
-eventi del CDS nel brief delle due letture del giorno (18/10) · i concorrenti e le quote di mercato di ogni posizione
-con fonte e data, e la salute di ciascuno misurata con le stesse formule — e per i sorvegliati che diventano un
-ingresso, prima dell'ingresso (18/10 sera) · le due solidità di ogni nome — patrimoniale (il bilancio a una data) e
-operativa (la cassa dell'attività) — col rischio storico e il rendimento del prezzo accanto, da dove vengono un
-circolante o un patrimonio negativi, e il ciclo di cassa anche nel confronto coi concorrenti (18/10 sera).
-Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno strumento.
+**Richieste del CEO rese strutturali — entrano TUTTE in ogni «Aggiorna analisi»** (v505: ogni voce ha la sua
+chiave fra parentesi quadre, e `scripts/scheda.py` la mette nella SCHEDA COMPLETA — un gate verifica nei due versi
+che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catalogo non ne abbia una che qui non c'è):
+- `[semaforo]` semaforo d'uscita (06/10), calcolato (09/10)
+- `[attesa]` costo dell'attesa e scadenze (06/10)
+- `[premarket]` pre-market prima dell'apertura (06/10)
+- `[schede]` schede del progetto (06/10)
+- `[credito_libro]` credito sul libro (07/10)
+- `[rotazione]` rotazione con candidati, tecnica, volumi e notizie (07/10)
+- `[target_beta]` target, beta e volatilità (07/10)
+- `[volumi]` volumi come percentile 0-100 (08/10); i volumi, anche della seduta in corso col tempo trascorso (15/10)
+- `[aste]` aste del Tesoro in ora italiana (07/10)
+- `[ingressi]` ingressi sulla watchlist (09/10)
+- `[registro]` riferimento QQQ e registro della performance (09/10)
+- `[conseguenze]` in giallo nessun divieto ma conseguenze di rischio di ogni ingresso (09/10)
+- `[decisioni]` costo delle decisioni aperte (09/10); le decisioni rimandate di proposito, riportate con la loro scadenza (14/10)
+- `[liquidita]` piano per la liquidità (09/10)
+- `[memorie]` nessun tetto alle memorie (14/10)
+- `[tenuta]` tenuta delle posizioni: si lascia correre, si vende per evidenza, col pareggio fiscale, anche sui sorvegliati (14/10); bilancio dell'evidenza nei due versi, il rialzo possibile valutato (14/10)
+- `[speculativi]` ingressi speculativi ammessi e dichiarati (14/10)
+- `[media]` l'aritmetica della media sulle posizioni in perdita (14/10)
+- `[salvavita]` la riduzione in proporzione al rischio, il salvavita a −30% dal massimo (14/10 sera); non si vende sui ribassi: arancione e rosso sono un segnale, l'unica vendita automatica è il salvavita, e nessuna presa di profitto ai massimi (15/10)
+- `[conflitti]` la scadenza e l'esame di ogni conflitto (14/10 sera)
+- `[pavimenti]` ingressi sui minimi: i pavimenti di ogni nome della watchlist, con ordine, stop e perdita per 5.000 € (15/10); i pavimenti delle posizioni e la media sui pavimenti sotto il carico (15/10)
+- `[ordini]` gli ordini aperti seguiti a ogni analisi, con storno o discesa e il rischio di alzare il limite (15/10); gli ordini giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera)
+- `[conti_emittente]` le date dei conti dichiarate dall'emittente (15/10)
+- `[ordine_interesse]` gli ingressi in ordine d'interesse, con prezzi e motivazioni (15/10)
+- `[cinque_anni]` la lettura a 5 anni in ogni ingresso, sulla serie della società di oggi (16/10)
+- `[pe]` il P/E come metrica di ogni azione (16/10)
+- `[struttura]` la struttura delle oscillazioni — massimi e minimi crescenti o decrescenti, rotture, doppi, divergenze — in ogni ingresso e su ogni posizione (17/10), «solo informazione», non una prova nella tenuta (decisione del CEO dello stesso giorno)
+- `[notizie]` le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10); le notizie di TUTTE le posizioni e di TUTTI i sorvegliati, coi segnali davanti, e il feed vuoto o fermo dichiarato (17/10 sera)
+- `[leva]` la variazione annua della leva dal file storico FINRA, col suo percentile (17/10) — informazione, non una prova
+- `[opzioni]` put e call di mercato e di ogni posizione, le scadenze delle opzioni (mensile e «tre streghe») (17/10) — informazione, non prove
+- `[cftc]` le posizioni dei grandi operatori (CFTC) (17/10) — informazione, non una prova
+- `[bitcoin]` il bitcoin dall'ultima chiusura USA su MSTR (17/10) — informazione, non una prova
+- `[cds]` i CDS a 5 anni di posizioni e sorvegliati, con gli indici CDX e l'Italia per il BTP (17/10) — e dalla sera stessa il loro allargamento oltre l'indice come prova della tenuta, in funzione quando lo storico raccolto basta (17/10)
+- `[dark_pool]` il dark pool (FINRA, DIX) (17/10 sera) — informazione, non una prova
+- `[gamma]` la gamma dei dealer (call wall, put wall, cambio di regime) (17/10 sera) — informazione, non una prova
+- `[indici]` gli indici S&P 500 e Nasdaq-100 — P/E con la storia della sua fonte, stagione delle trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza (17/10 sera) — informazione, non prove
+- `[vwap]` il VWAP dall'ultima trimestrale accanto ai pavimenti di ogni titolo (18/10)
+- `[segnali_misurati]` i segnali di mercato misurati e lasciati come informazione (18/10)
+- `[credito_salute]` la salute del credito di ogni nome — CDS con rincaro improvviso, allargamento e divergenza dal titolo, Altman con la frequenza storica d'insolvenza per orizzonte, il debito dai bilanci depositati (18/10)
+- `[credito_brief]` gli eventi del CDS nel brief delle due letture del giorno (18/10)
+- `[concorrenti]` i concorrenti e le quote di mercato di ogni posizione con fonte e data, e la salute di ciascuno misurata con le stesse formule — e per i sorvegliati che diventano un ingresso, prima dell'ingresso (18/10 sera)
+- `[solidita]` le due solidità di ogni nome — patrimoniale (il bilancio a una data) e operativa (la cassa dell'attività) — col rischio storico e il rendimento del prezzo accanto, da dove vengono un circolante o un patrimonio negativi, e il ciclo di cassa anche nel confronto coi concorrenti (18/10 sera)
+- `[scheda]` la SCHEDA COMPLETA di ogni analisi, scritta dallo script e mandata come allegato: tutto ciò che gli strumenti stampano, per sezione e per nome, con l'indice di queste richieste e quanti nomi portano ciascuna (19/10)
+
+Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno
+strumento: il gate della v505 non lascia l'una senza l'altra.
 
 ## Regole
 - Direzione, priorità e livelli sì; le quantità solo come aritmetica dichiarata (v439).
@@ -446,3 +465,7 @@ Una richiesta nuova si aggiunge qui, nello stesso giorno in cui diventa uno stru
   Ventures** (Series C, maggio 2023): BLK, GS e CRM portano la stessa dichiarazione. Aggiunti il
   15/10/2026 sera, quando banche e software sono entrati nella valutazione della rotazione.
 - Rapporto HTML solo se richiesto: costa token (decisione del CEO).
+- **La SCHEDA COMPLETA si manda SEMPRE come allegato** (v505, decisione del CEO del 19/10/2026: «B»): il comando la
+  scrive in `memoria/dati/scheda_analisi_<data>_<ora>.md` e il suo riepilogo sta sopra questa checklist. La risposta
+  rimanda alla scheda per i dati nome per nome e non riscrive le righe che la scheda porta per intero; se il riepilogo
+  dice RICHIESTA SENZA RIGHE OGGI, o uno strumento è fallito, la risposta lo dice in cima.

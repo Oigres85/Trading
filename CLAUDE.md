@@ -8031,3 +8031,83 @@ per scontato. Il 18/10 i numeri pubblicati erano allineati per coincidenza: il c
   (v407, v471).
 - Pavimenti: `test_update_data.py` 285 → 295 (303 punti di chiamata) e N_CHECKS_MINIMO 303 → 312 (316 eseguiti),
   `test_analisi_libro.py` 735 → 755 (768). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🗂️ v505 — LA COMPLETEZZA NON DIPENDE PIÙ DAL RIASSUNTO: LA SCHEDA COMPLETA, SCRITTA DALLO SCRIPT
+
+Il CEO, 19/10/2026, dopo l'«Analisi» del mattino, testuale: *"Ho la sensazione che questa analisi si apriva di tante
+parti strutturali che ci diceva di inserire, ma che in realtà non ci sono vengono riportate in questo report"*.
+**Aveva ragione, ed era misurabile**: delle 43 richieste del registro di `FORMATO_ANALISI.md` la risposta ne portava
+**16 per intero, 18 ridotte e 9 per niente** — VWAP, lettura a 5 anni, P/E, volumi, target e beta, notizie dei
+sorvegliati, concorrenti, variazione annua della leva, pre-market nome per nome. Gli strumenti le avevano calcolate
+tutte: si perdevano nel RIASSUNTO, cioè nell'unico passaggio che nessun gate guardava.
+
+> È la classe **v393** — *contato e poi nascosto* — nella sua forma più larga: ~4.000 righe di strumenti dette in
+> qualche centinaio. E non si chiudeva con l'attenzione (v230): ogni giorno una richiesta in più rendeva il riassunto
+> più lungo da scrivere e più facile da accorciare.
+
+Tre strade: A) tutto in chat, B) decisioni e giudizio in chat più una scheda completa scritta dallo script, C) come
+prima. **Il CEO ha scelto la B.**
+
+### `scripts/scheda.py`: sposta, non ricalcola
+- **Nessun numero viene letto.** Per ogni strumento un CATALOGO dei blocchi (l'intestazione a colonna 0 e la sezione
+  della risposta in cui il blocco va); dentro un blocco, la riga che apre il blocco di un NOME porta con sé le righe
+  più rientrate. «Sposta»: il blocco va nella scheda del nome e nella sezione resta un sommario o un rimando.
+  «Copia»: la riga resta nella sua tabella, che si confronta fra i nomi, e si copia nella scheda del nome. Il numero
+  lo calcola lo strumento; qui si sposta e basta (v436: una grandezza, un proprietario).
+- **Il ticker deve essere del libro** (posizioni e sorvegliati di `LIBRO.md`): una riga che comincia con due maiuscole
+  non diventa un nome per caso, e una riga che elenca più nomi non si attribuisce al primo.
+- **Conservazione**: ogni riga non vuota e non decorativa degli strumenti finisce nella scheda, nella sua sezione o
+  nella scheda del nome. Un blocco che il catalogo non conosce **resta dove lo strumento l'ha stampato e si dichiara**
+  (`fuori catalogo`), invece di sparire.
+- **In testa l'indice delle richieste**: per ogni voce del registro la sua sezione e quanti nomi la portano oggi. Stati
+  distinti: presente · parziale (con chi manca) · **ASSENTE** (con la ragione: strumento fallito, blocco non stampato,
+  nessun nome la porta) · non in questa fase (il prezzo esteso in seduta) · regola · giudizio. **Una richiesta ASSENTE
+  fa uscire 1 il comando unico**, come uno strumento fallito (v453).
+- **Markdown inerte**: asterischi, trattini bassi, dollari, parentesi, barre, cancelletti e gli inizi di riga che il
+  visualizzatore leggerebbe come elenchi si neutralizzano: una riga degli strumenti si legge com'è stata stampata.
+- **Non vive nel repo**: `memoria/dati/` è ignorata da git, e la scheda si manda come allegato a ogni analisi.
+- ⚠ **Il prezzo della completezza, misurato** sull'uscita del 19/10: 3.561 righe lette, **0 perse**, 58 schede di
+  nome, 0 blocchi fuori catalogo, 43 richieste (40 presenti, 2 regole, 1 giudizio); ~900 KB, ~5.700 righe. Un file
+  solo, perché il CEO lo apre da telefono.
+
+### Il registro ha le CHIAVI, e il gate è nei due versi
+Le richieste di `FORMATO_ANALISI.md` erano un paragrafo unico separato da «·»: ora sono una voce per riga con la chiave
+fra parentesi quadre, e il catalogo della scheda ha una voce per ogni chiave. Una richiesta nuova senza la sua voce nel
+catalogo fa andare rossa la suite, e una voce del catalogo che il registro non ha più anche (classe v387, v406).
+⚠ La prima stesura del formato diceva *"ogni sezione ha la sua voce"*: falso — rischio, brief e macro non sono richieste
+del CEO, sono il formato di sempre. L'invariante è sulle CHIAVI, e la frase lo dice.
+
+### ⚠⚠ DIS il 19/10: «restituito il 619%» di un rialzo di dieci giorni
+La lettura a 5 anni misura quanto del rialzo verso il massimo il prezzo ha restituito, dal minimo che precede il
+massimo. Quando il massimo cade vicino all'inizio della finestra quel «rialzo» può durare pochi giorni — su DIS dieci, da
+168,15 a 179,25 nell'autunno 2021 — e un prezzo che oggi sta un terzo sotto ne aveva «restituito il 619%». Su PFE e NKE
+peggio: **la base era il primo giorno della finestra** (155% e 613%), cioè il rialzo vero era cominciato prima e la
+finestra ne mostrava solo la coda. Due correzioni:
+- **una base all'inizio della finestra** (il minimo delle prime 5 sedute, la regola dei pavimenti) non è una base: il
+  rialzo restituito è **n.d.**, e la riga dice perché. Non vale per un titolo quotato di recente, il cui primo prezzo è
+  un punto di partenza vero;
+- **oltre il 100% una percentuale non dice più quanto**: la riga scrive *"l'ha restituito tutto, e oltre il punto di
+  partenza"* con la distanza del prezzo da quella base — la grandezza che il numero nascondeva. Aritmeticamente esatto,
+  comunicativamente falso: la classe dell'autonomia di *"1022,6 mesi"* (v389).
+Trovato misurando quanto la risposta perdeva, cioè **leggendo per intero le uscite degli strumenti** — proprio le righe
+che il riassunto tagliava, e che ora la scheda porta ogni volta.
+
+### 🦴 Quattro gate erano ancorati agli a capo del vecchio paragrafo
+v492, v494, v496 e v498 cercavano la propria richiesta nel registro **con l'a capo** del paragrafo di prima (*"variazione
+\nannua"*, una congiunzione che legava due voci): riscritto il registro, sono andati rossi su codice giusto. Riagganciati
+alla VOCE con la sua chiave. Ancora la trappola numero uno di questo file — *un check ancorato alla forma si rompe alla
+riformulazione* — su un testo che non era codice.
+
+### 🧪 Tre sviste trovate dai gate, e una iniezione che non mordeva per eccezione
+- La riga di TENUTA di un ticker di **cinque lettere** (GOOGL) ha UNO spazio prima dell'esito, perché `numeri_libro`
+  scrive il ticker su cinque colonne: un'espressione che pretendeva due spazi la perdeva. Ora uno o più.
+- Il rimando dei blocchi a colonna 0 (le schede del progetto) finiva nella sezione dei CDS invece che in quella dello
+  strumento.
+- Il collegamento «ogni intestazione è testo che il suo strumento stampa» non trovava SALUTE DEL CREDITO: la stampa
+  `credito.py`, che `schede_progetto.py` importa. Ora le fonti di uno strumento comprendono le librerie che importa.
+- ⚠ **23 iniezioni, una alla volta, con `modifica_sicura` e ripristino verificato per impronta: mordono tutte**,
+  ciascuna sul controllo atteso. Una — il titolo quotato da poco trattato come una finestra censurata — al primo giro
+  faceva MORIRE la suite: il check v492 sottraeva un `None` invece di cadere col suo nome (v407, v471). Ora il check
+  verifica che il valore ci sia prima di confrontarlo, e la stessa iniezione morde per nome.
+- Pavimento di `test_analisi_libro.py` 755 → 780 (795 punti di chiamata). `?v=` e `BUILD_VERSION` non toccati: nessun
+  file servito al browser (v440).

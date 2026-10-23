@@ -698,15 +698,24 @@ def lettura_5anni(barre, px, adesso=None, veicolo=None, anni=ANNI_LETTURA):
     prima_hi = [b for b in con_l if b["t"] < hi["t"]]
     base = min(prima_hi, key=lambda b: b["l"]) if prima_hi else None
     amp = hi["h"] - lo["l"]
+    breve = str(serie[0]["t"])[:10] > (_data.fromisoformat(inizio) + _td(days=14)).isoformat()
+    # v505 — IL PUNTO DI PARTENZA DEL RIALZO DEVE STARE DENTRO LA FINESTRA. Se la finestra di cinque anni si apre gia' a
+    #   quel livello o sotto (il minimo delle prime PAV_LATO sedute, la regola dei pavimenti: un minimo si riconosce
+    #   dalle sedute che lo precedono), il rialzo verso il massimo e' cominciato PRIMA della finestra e la sua base
+    #   vera non si vede: misurato il 19/10 su PFE e NKE, base il primo giorno, «restituito» 155% e 613% di un rialzo
+    #   di cui la finestra mostra solo la coda. Vale solo se la storia continua oltre la finestra: un titolo quotato
+    #   di recente (breve) parte dal suo primo prezzo, e quello e' un punto di partenza vero.
+    censurato = bool(base) and not breve and min(b["l"] for b in con_l[:PAV_LATO]) <= base["l"]
     return {"da": str(serie[0]["t"])[:10], "fino_a": str(serie[-1]["t"])[:10], "inizio_finestra": inizio,
-            "breve": str(serie[0]["t"])[:10] > (_data.fromisoformat(inizio) + _td(days=14)).isoformat(),
+            "breve": breve,
             "settimane": len(chiusure), "taglio": taglio, "motivo": motivo, "medie": medie, "px": px,
             "massimo": {"prezzo": hi["h"], "data": str(hi["t"])[:10]},
             "minimo": {"prezzo": lo["l"], "data": str(lo["t"])[:10]},
             "dmax_pct": (px / hi["h"] - 1) * 100, "dmin_pct": (px / lo["l"] - 1) * 100 if lo["l"] > 0 else None,
             "posizione": (px - lo["l"]) / amp * 100 if amp > 0 else None,
-            "rialzo": ({"da": base["l"], "data": str(base["t"])[:10],
-                        "restituito_pct": (hi["h"] - px) / (hi["h"] - base["l"]) * 100}
+            "rialzo": ({"da": base["l"], "data": str(base["t"])[:10], "censurato": censurato,
+                        "restituito_pct": None if censurato else (hi["h"] - px) / (hi["h"] - base["l"]) * 100,
+                        "dist_base_pct": (px / base["l"] - 1) * 100 if base["l"] > 0 else None}
                        if base and hi["h"] > base["l"] else None)}
 
 
@@ -1410,12 +1419,22 @@ def righe_5anni(l, veicolo=None):
         ptxt = f"posizione nell'intervallo {piano(pos, 0)}/100 (0 = il minimo, 100 = il massimo)"
     if r is None:
         rtxt = "rialzo restituito n.d. (il massimo sta all'inizio della serie: nessun rialzo da misurare)"
+    elif r.get("censurato"):
+        rtxt = (f"rialzo restituito n.d. (la finestra si apre gia' al livello da cui sale verso il massimo, "
+                f"{prezzo(r['da'])} il {r['data']}: il rialzo e' cominciato prima dei {ANNI_LETTURA} anni e la sua base "
+                "vera non si vede)")
     elif r["restituito_pct"] <= 0:
         rtxt = f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo non ha restituito nulla"
+    elif r["restituito_pct"] > 100:
+        # v505 — oltre il 100% una percentuale non dice piu' quanto: DIS il 19/10 usciva «619%» di un rialzo di dieci
+        #   giorni. Aritmeticamente esatto, comunicativamente falso (classe v389): si dice che e' restituito per intero
+        #   e di quanto il prezzo sta sotto il punto di partenza, che e' la grandezza che il numero nascondeva.
+        d = r.get("dist_base_pct")
+        rtxt = (f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo l'ha restituito tutto, e oltre il punto di "
+                "partenza" + (f" (il prezzo ne dista {n(d, 1, '%')})" if d is not None else ""))
     else:
         rtxt = (f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo ne ha restituito il "
-                f"{piano(r['restituito_pct'], 0)}%" + (" — tutto, e oltre il punto di partenza"
-                                                       if r["restituito_pct"] > 100 else ""))
+                f"{piano(r['restituito_pct'], 0)}%")
     L.append(f"   massimo {prezzo(mx['prezzo'])} del {mx['data']} (il prezzo ne dista {n(l['dmax_pct'], 1, '%')}) · "
              f"minimo {prezzo(mn['prezzo'])} del {mn['data']} (il prezzo ne dista {n(l['dmin_pct'], 1, '%')}) · {ptxt} · {rtxt}")
     v = veicolo or {}

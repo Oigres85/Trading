@@ -173,7 +173,9 @@ const SUITE = [
   /* v502: 724 punti di chiamata (+3 sulle voci SEC vecchie dichiarate e la versione della lettura) -> 710 */
   /* v503: 751 punti di chiamata (+27 su concorrenti e quote di mercato: registro, salute, memoria, posti) -> 735 */
   /* v504: 768 punti di chiamata (+17 sulle due solidita': stati, divergenza, circolante e patrimonio, rendimento) -> 755 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 755, firma: /\d+\/\d+ CHECK OK/ },
+  /* v505: 795 punti di chiamata (+27 sulla scheda completa: registro nei due versi, conservazione, copertura, resa,
+     collegamento con analisi.py, e la lettura a 5 anni di DIS) -> 780 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 780, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

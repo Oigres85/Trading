@@ -35,6 +35,13 @@ posizionamento.py e la storia raccolta del P/E del Nasdaq-100 di indici.py (deci
 v503 — concorrenti.py: i concorrenti di ogni posizione con le quote di mercato (dal registro, con fonte e data) e la
 salute misurata con le stesse formule per tutti; la sua memoria delle letture (memoria/concorrenti_dati.json) va
 committata come le altre (CEO, 18/10/2026).
+
+v505 — LA SCHEDA COMPLETA (decisione del CEO del 19/10/2026, «B»): a ogni giro scripts/scheda.py raccoglie le uscite di
+tutti gli strumenti, parola per parola, per sezione della risposta e per nome, con l'indice delle richieste del CEO e
+quanti nomi portano ciascuna, e la scrive in memoria/dati/ (ignorata da git). Si manda al CEO come allegato; la risposta
+in chat porta decisioni e giudizio. Il 19/10 la risposta aveva portato 16 richieste su 43 per intero: gli strumenti le
+avevano calcolate tutte, e si perdevano nel riassunto. Una richiesta senza righe oggi fa uscire 1, come uno strumento
+fallito: un buco descritto vale piu' di una sezione che manca in silenzio (v453).
 """
 from __future__ import annotations
 
@@ -48,6 +55,8 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+import scheda
 
 RADICE = Path(__file__).resolve().parent.parent
 FORMATO = RADICE / "memoria" / "FORMATO_ANALISI.md"
@@ -158,7 +167,22 @@ def impronta(percorso=REGISTRO):
         return None
 
 
-def resa(esiti, cl, intestazione="", registro_cambiato=False, memorie_cambiate=()):
+def scrivi_scheda(esiti, f, adesso, percorso=None):
+    """v505 — la scheda completa del giro: (righe del riepilogo, codice, percorso). Non solleva mai: una scheda non
+    scritta si DICHIARA ed esce 1, e gli strumenti del giro restano stampati sopra."""
+    roma = adesso.astimezone(ROMA)
+    try:
+        testo, cop, r, _ = scheda.genera(esiti, fase=f, quando=f"{roma:%d/%m/%Y %H:%M} ora italiana")
+        percorso = Path(percorso) if percorso else scheda.percorso_del_giorno(roma)
+        percorso.parent.mkdir(parents=True, exist_ok=True)
+        percorso.write_text(testo, encoding="utf-8")
+        righe, codice = scheda.sommario(cop, r, percorso)
+        return righe, codice, percorso
+    except Exception as e:                                        # un guasto descritto, mai uno muto
+        return [f"⚠ SCHEDA COMPLETA NON SCRITTA: {type(e).__name__}: {e} — dichiararlo in cima alla risposta"], 1, None
+
+
+def resa(esiti, cl, intestazione="", registro_cambiato=False, memorie_cambiate=(), scheda_righe=None, scheda_codice=0):
     L = [intestazione] if intestazione else []
     falliti = []
     for k, e in enumerate(esiti, 1):
@@ -171,6 +195,10 @@ def resa(esiti, cl, intestazione="", registro_cambiato=False, memorie_cambiate=(
                      "DISPONIBILI, con questo errore — non si saltano")
             L.extend("   " + r for r in (e["errore"].strip().splitlines() or ["(nessun messaggio d'errore)"])[-15:])
         L.append(e["uscita"].rstrip())
+    if scheda_righe:
+        L.append("")
+        L.append("════════ SCHEDA COMPLETA — scripts/scheda.py: tutte le uscite, per sezione e per nome ════════")
+        L.extend(scheda_righe)
     L.append("")
     L.append("════════ CHECKLIST DELLA RISPOSTA — da memoria/FORMATO_ANALISI.md, parola per parola ════════")
     if cl is None:
@@ -192,7 +220,7 @@ def resa(esiti, cl, intestazione="", registro_cambiato=False, memorie_cambiate=(
         L.append("")
         L.append(f"⚠ {len(falliti)} strumento/i FALLITO/I: " + ", ".join(e["argv"][1].split("/")[-1] for e in falliti)
                  + " — dichiararlo in cima alla risposta")
-    return "\n".join(L), (1 if falliti or cl is None else 0)
+    return "\n".join(L), (1 if falliti or cl is None or scheda_codice else 0)
 
 
 def main():
@@ -208,8 +236,10 @@ def main():
     esiti = esegui(lista)
     testa = (f"ANALISI DEL LIBRO — {adesso.astimezone(ROMA):%d/%m/%Y %H:%M} ora italiana · New York "
              f"{adesso:%H:%M} · fase: {f.upper()} · {len(lista)} strumenti in parallelo, {round(time.time() - t0)} s")
+    sc_righe, sc_codice, _ = scrivi_scheda(esiti, f, adesso)
     testo, codice = resa(esiti, checklist(), testa, registro_cambiato=impronta() != prima,
-                         memorie_cambiate=[p for p in MEMORIE if impronta(p) != prima_mem[p]])
+                         memorie_cambiate=[p for p in MEMORIE if impronta(p) != prima_mem[p]],
+                         scheda_righe=sc_righe, scheda_codice=sc_codice)
     print(testo)
     sys.exit(codice)
 

@@ -3964,7 +3964,8 @@ _m492 = ROT.lettura_5anni(_serie492(_p492, lo=_p492, hi=_p492), 40.0, _DOPO492)
 check("v492 massimo e minimo con la data, posizione nell'intervallo (0 = minimo, 100 = massimo) e quota del rialzo — dal "
       "minimo che precede il massimo al massimo — che il prezzo ha gia' restituito: da 10 a 100 e giu' a 40 = 33/100 e 67%",
       _m492["massimo"]["prezzo"] == 100.0 and _m492["minimo"]["prezzo"] == 10.0
-      and abs(_m492["posizione"] - 100 / 3) < 1e-9 and abs(_m492["rialzo"]["restituito_pct"] - 200 / 3) < 1e-9
+      and abs(_m492["posizione"] - 100 / 3) < 1e-9 and _m492["rialzo"]["restituito_pct"] is not None
+      and abs(_m492["rialzo"]["restituito_pct"] - 200 / 3) < 1e-9
       and _m492["rialzo"]["da"] == 10.0 and abs(_m492["dmax_pct"] + 60.0) < 1e-9
       and "posizione nell'intervallo 33/100" in "\n".join(ROT.righe_5anni(_m492))
       and "ne ha restituito il 67%" in "\n".join(ROT.righe_5anni(_m492)), str(_m492 and {k: _m492[k] for k in ("posizione", "rialzo")}))
@@ -4154,8 +4155,10 @@ check("v492 nella tenuta la lettura a 5 anni accompagna la MEDIA, cioe' le sole 
 _fmt492 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
 check("v492 FORMATO_ANALISI: la lettura a 5 anni e il P/E sono nel registro delle richieste del 16/10 e nella sezione 7",
       "7d-quater. **la LETTURA A 5 ANNI e il P/E**" in _fmt492
-      and "la lettura\na 5 anni in ogni ingresso, sulla serie della società di oggi, e il P/E come metrica di ogni azione (16/10)"
-      in _fmt492)
+      # v505 — riagganciato alla VOCE del registro (ora ha una chiave), non all'a capo del vecchio paragrafo: il gate
+      #   pretendeva «la lettura\na 5 anni», cioe' il punto in cui la riga andava a capo (ancoraggio alla forma)
+      and "- `[cinque_anni]` la lettura a 5 anni in ogni ingresso, sulla serie della società di oggi (16/10)" in _fmt492
+      and "- `[pe]` il P/E come metrica di ogni azione (16/10)" in _fmt492)
 
 
 # ================================================================ v494 — la STRUTTURA DELLE OSCILLAZIONI e le notizie
@@ -4475,7 +4478,8 @@ check("v494 FORMATO_ANALISI: la struttura e le ultimissime notizie nella sezione
       "richiesta nel registro del 17/10",
       "7d-quinquies. **la STRUTTURA e le ULTIMISSIME NOTIZIE**" in _fmt494 and "**STRUTTURA DELLE OSCILLAZIONI**" in _fmt494
       and "NOTIZIE ULTIMISSIME** di `numeri_libro.py`" in _fmt494
-      and "e le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10)" in _fmt494)
+      # v505 — la voce ha la sua chiave nel registro: si cerca li', non la congiunzione che la legava alla precedente
+      and "- `[notizie]` le ultimissime notizie dei nomi con un ingresso possibile o un'uscita accesa (17/10)" in _fmt494)
 
 # ================================================================ v495 — la struttura e' «solo informazione»
 # Decisione del CEO del 17/10/2026, alla domanda se la struttura delle oscillazioni dovesse entrare come prova nel bilancio
@@ -4775,7 +4779,8 @@ _cl496 = AN.checklist() or ""
 check("v496 il formato porta la sezione 5bis del posizionamento — informazione, non prove — e la richiesta del 17/10 nel registro "
       "delle richieste rese strutturali; la checklist la stampa",
       "5bis. **Posizionamento**" in _cl496 and "È tutto INFORMAZIONE" in _cl496 and "grandi operatori (CFTC)" in _cl496
-      and "variazione\nannua della leva" in _fa496 and "un'uscita accesa (17/10)" in _fa496)
+      # v505 — riagganciato alla voce con chiave: pretendeva «variazione\nannua», l'a capo del vecchio paragrafo
+      and "- `[leva]` la variazione annua della leva dal file storico FINRA" in _fa496 and "un'uscita accesa (17/10)" in _fa496)
 check("v496 il posizionamento e' dichiarato nel censimento di /aggiorna con la sua ragione (v387)",
       "`scripts/posizionamento.py` resta **fuori**" in (Path(__file__).resolve().parent.parent / ".claude" / "commands" / "aggiorna.md")
       .read_text(encoding="utf-8"))
@@ -4983,7 +4988,7 @@ check("v498 sorvegliati (eseguito, v483): la stessa riga della regola in testa a
       and "a favore: tendenza intatta" in _rw498 and "-30,0% rispetto all'indice" in _rw498, _rw498[-1500:])
 check("v498 il formato porta la prova del CDS in §5 e §6 e nel registro delle richieste: non piu' «solo informazione»",
       "è una **prova della tenuta**" in _fa496 and "la tenuta ha una prova in più, il **CDS**" in _fa496
-      and "come prova della tenuta, in\nfunzione quando lo storico raccolto basta (17/10)" in _fa496
+      and "come prova della tenuta, in funzione quando lo storico raccolto basta (17/10)" in " ".join(_fa496.split())
       and "È INFORMAZIONE: non è una prova della tenuta" not in _fa496)
 
 # ============================ v499 — NOTIZIE PER TUTTI, DARK POOL, GAMMA DEI DEALER, INDICI ============================
@@ -6750,6 +6755,351 @@ check("v504 il formato dell'analisi chiama le due solidita' (le righe delle sche
       "delle richieste rese strutturali) e il confronto coi concorrenti porta il ciclo di cassa",
       "la riga **solidità**" in _fmt504 and "**cassa dell'attività**" in _fmt504 and "**Le due solidità**" in _fmt504
       and "le due solidità di ogni nome" in _fmt504 and "ciclo di cassa (v504)" in _fmt504)
+
+# ============================ v505 — LA SCHEDA COMPLETA (decisione del CEO del 19/10/2026: «B») ============================
+# Il CEO: «Ho la sensazione che questa analisi si apriva di tante parti strutturali che ci diceva di inserire, ma che in
+# realta' non ci sono vengono riportate in questo report». Misurato: 16 richieste su 43 per intero nella risposta. Gli
+# strumenti le avevano calcolate tutte: si perdevano nel riassunto. Ora la completezza la porta la scheda, scritta dallo
+# script; questi controlli verificano che il registro e il catalogo coincidano, che nessuna riga si perda, e che cio' che
+# manca si dica. Lo stato si COSTRUISCE (v425, v429): uscite finte nel formato degli strumenti, nessuna rete.
+import scheda as SC
+from collections import Counter as _Cnt505
+import tempfile as _tmp505
+
+# --- 1. il registro nei DUE versi (v387, v406) ---
+_reg505 = SC.leggi_registro() or []
+_chiavi505 = [k for k, _ in _reg505]
+check("v505 il registro delle richieste di FORMATO_ANALISI.md e il catalogo della scheda coincidono nei DUE versi: ogni "
+      "voce del registro ha la sua voce nel catalogo, e il catalogo non ne ha una che il registro non ha piu': "
+      + str((sorted(set(_chiavi505) - set(SC.REGISTRO)), sorted(set(SC.REGISTRO) - set(_chiavi505)))),
+      len(_reg505) >= 40 and len(_chiavi505) == len(set(_chiavi505)) and set(_chiavi505) == set(SC.REGISTRO))
+_vuote505 = [k for k, v in SC.REGISTRO.items() if not (v.sezioni or v.marcatori or v.regola or v.righe)]
+_sez_ignote505 = sorted({s for v in SC.REGISTRO.values() for s in v.sezioni} - set(SC.TITOLI))
+_tipi_ignoti505 = sorted({m.tipo for v in SC.REGISTRO.values() for m in v.marcatori} - set(SC.ETICHETTE_TIPI))
+_sez_blocchi505 = {b.sezione for s in SC.CATALOGO.values() for b in s.blocchi} | {s.sezione for s in SC.CATALOGO.values()}
+_nomi_tipi505 = {n.tipo for s in SC.CATALOGO.values() for b in s.blocchi for n in b.nomi} | \
+    {n.tipo for s in SC.CATALOGO.values() for n in s.nomi_col0}
+check("v505 il catalogo e' chiuso su se stesso: ogni voce porta almeno una sezione, un marcatore o una regola; ogni sezione "
+      "citata esiste e qualche blocco la riempie; ogni tipo di blocco per nome ha la sua etichetta — e nessuna sezione o "
+      "tipo resta senza chi lo produce: " + str((_vuote505, _sez_ignote505, _tipi_ignoti505,
+                                                sorted(set(SC.TITOLI) - _sez_blocchi505), sorted(set(SC.ETICHETTE_TIPI) - _nomi_tipi505))),
+      not _vuote505 and not _sez_ignote505 and not _tipi_ignoti505 and _sez_blocchi505 <= set(SC.TITOLI)
+      and set(SC.TITOLI) <= _sez_blocchi505 and _nomi_tipi505 == set(SC.ETICHETTE_TIPI))
+
+# --- 2. il collegamento: le intestazioni e i marcatori del catalogo sono testo che gli strumenti stampano ---
+_cartella505 = Path(__file__).resolve().parent
+def _fonti505(k):
+    """Il sorgente dello strumento piu' quello delle librerie del repo che importa: le intestazioni della salute del
+    credito le stampa schede_progetto.py attraverso credito.py (una libreria sola, v501)."""
+    s = (_cartella505 / f"{k.replace('_esteso', '')}.py").read_text(encoding="utf-8")
+    libs = set(re.findall(r"^\s*(?:import|from)\s+([a-z_]+)", s, re.M))
+    return s + "".join((_cartella505 / f"{x}.py").read_text(encoding="utf-8") for x in sorted(libs)
+                       if (_cartella505 / f"{x}.py").exists())
+_sorgenti505 = {k: _fonti505(k) for k in SC.CATALOGO}
+_tutto505 = "\n".join(_sorgenti505.values()) + "\n".join(
+    (_cartella505 / f).read_text(encoding="utf-8") for f in ("credito.py",))
+def _letterale505(rx):
+    s = re.sub(r"\[(?:\\.|[^\]])*\]", "\x00", rx)
+    s = re.sub(r"[*+?]|\{\d+,?\d*\}", "\x00", s)
+    s = re.sub(r"\\(.)", r"\1", s)
+    for c in "^$().":
+        s = s.replace(c, "\x00")
+    return max(s.split("\x00"), key=len).strip()
+_orfane505 = [(k, alt) for k, spec in SC.CATALOGO.items() for b in spec.blocchi for alt in b.regex.split("|")
+              if _letterale505(alt) and _letterale505(alt) not in _sorgenti505[k]]
+_marc_orfani505 = sorted({m.testo for v in SC.REGISTRO.values() for m in v.marcatori if m.testo and m.testo not in _tutto505}
+                         | {t for v in SC.REGISTRO.values() for _, t in v.righe if t not in _tutto505})
+check("v505 collegamento: ogni intestazione del catalogo e' testo che il SUO strumento stampa, e ogni marcatore e' testo "
+      "che uno strumento stampa — una riformulazione nello strumento fa cadere questo, non svuota la scheda in silenzio: "
+      + str((_orfane505, _marc_orfani505)),
+      not _orfane505 and not _marc_orfani505 and len([1 for s in SC.CATALOGO.values() for b in s.blocchi]) >= 30)
+
+# --- 3. uscite finte nel formato degli strumenti: posizioni AAA e BBB, sorvegliato WWW ---
+_POS505, _SORV505 = ["AAA", "BBB"], ["WWW"]
+_U505 = {
+    "numeri_libro_esteso": [
+        "FUORI SESSIONE rispetto all'ultima chiusura · libro -10 $ (-0,39%)", "POSIZIONI",
+        "  AAA       10,05  -1,07%     -19 $ · res +3,7 ATR · supp +0,9 ATR",
+        "  BBB   non quotato fuori sessione", "RIFERIMENTI",
+        "  QQQ      707,87  -0,27% · res +5,2 ATR · supp +0,1 ATR", "SORVEGLIATI",
+        "  WWW       30,00  -0,50% · res +1,0 ATR · supp +0,5 ATR"],
+    "numeri_libro": [
+        "SEMAFORO D'USCITA — 🟠 ARANCIONE · famiglie accese: prezzo", "  prezzo: SMH chiusura 539,79 — ACCESO",
+        "  leva: margin debt FINRA di settembre 2026 +1,8% sul mese — spento · sull'anno +31,4%",
+        "SALVAVITA (LIBRO.md §1ter) — azionario -12,79% dal massimo", "PIANO DI RIDUZIONE — il gradino del salvavita",
+        "  AAA   vendere 3 azioni = 300 $ (10% della posizione)",
+        "Periodo 2026-10-15 -> 2026-10-16 (1 seduta) · azionario 1.000 $", "Libro -1,00% · QQQ -0,50%",
+        "REGISTRO DELLA PERFORMANCE contro QQQ — dal 2026-10-09", "  libro azionario in dollari -1% · QQQ -0,5%",
+        "Vol 40,0% · VaR95 4,0% · ES95 5,0%", "Beta libro: QQQ 2,0 (R² 0,8)",
+        "  AAA   peso  60,0% rischio  70,0%  periodo -10 $  vs carico +5%",
+        "  BBB   peso  40,0% rischio  30,0%  periodo -5 $  vs carico -3%",
+        "Stress Nasdaq 100 -10%: -100 $ (-10,0%) · R² 0,8", "COSTO DELL'ATTESA: seduta tipica ±10 $",
+        "SCADENZE (prima trimestrale dichiarata dalla fonte): AAA 2026-10-22 (3 g, dichiarata dall'emittente)",
+        "DECISIONI APERTE: nessuna in LIBRO.md §1quinquies", "RIMANDATE DI PROPOSITO — si riprendono all'evento",
+        "  BBB — l'uscita: in pari", "ORDINI APERTI: nessuno attivo in LIBRO.md §1septies",
+        "CREDITO SUL LIBRO — chi brucia cassa: 40,0% · BBB", "TENUTA DELLE POSIZIONI — bilancio dell'evidenza",
+        "  regola: VENDITA PER EVIDENZA = tendenza ROTTA e un'altra prova CONTRO",
+        "  AAA   IN OSSERVAZIONE · peso 60,0%", "      contro: macro ACCESA",
+        "      struttura delle oscillazioni (ultimo anno) — LATERALE", "         una chiusura sopra 10 fa un massimo crescente",
+        "      pavimenti: 9,00 (-10%, 1 tocco) stop 8,50", "      VWAP dai conti 10,50 — conti del 11/08/2026",
+        "  BBB   CONFLITTO — DA VALUTARE · peso 40,0%", "      contro: tendenza ROTTA",
+        "      struttura delle oscillazioni (ultimo anno) — RIBASSISTA",
+        "      scadenza (LIBRO.md §1sexies, decisione del CEO del 14/10/2026): si decide coi conti",
+        "      media (un'unità di calcolo, non una quantità): 10 azioni a 5,00 $",
+        "      lettura a 5 anni — dal 2021-10-18 · 261 settimane concluse",
+        "      pavimenti: 4,00 (-20%, 2 tocchi) stop 3,50", "      media sui pavimenti (sotto il carico 6,00): a 4,00",
+        "      VWAP dai conti 5,50 — conti del 06/08/2026",
+        "NOTIZIE ULTIMISSIME — TUTTE LE POSIZIONI E GLI ORDINI D'ACQUISTO ATTIVI",
+        "  AAA — nessun segnale: le voci piu' recenti", "      [AAA] 19/10 00:30 Titolo uno",
+        "  BBB — tenuta: CONFLITTO — DA VALUTARE", "      [BBB] 18/10 10:16 Titolo due",
+        "  CRONACA DI MERCATO — 1 voce nel feed di almeno 3 nomi", "      [AAA,BBB,CCC] 17/10 13:50 Stocks fall"],
+    "brief": [
+        "BRIEF MATTINA — 19/10/2026 07:29 ora italiana", "=" * 66,
+        "OLTRE LA PROPRIA AMPIEZZA (soglia 1,5x ATR — non una percentuale, v210)",
+        "  WWW    seduta del 2026-10-16: escursione 10,20% = 2,8x", "         SMA20 -1,2 ATR · supporto 20s 28,00",
+        "TRIMESTRALI DICHIARATE DALLA FONTE — prossimi 21 giorni",
+        "  AAA    2026-10-22 (fra 3g) · dopo la campana · consenso 0,56 $",
+        "ASTE DEL TESORO USA — note e bond, prossimi 7 giorni (TreasuryDirect)", "  nessuna asta annunciata",
+        "CREDITO — i CDS dei tuoi nomi: rincaro improvviso (settimana)", "  nessun evento sui 2 nomi",
+        "DOVE STA OGNI POSIZIONE (livelli misurati — la decisione resta sul tuo grafico)",
+        "  AAA     10,00 · -5,63% nell'ultima seduta", "MACRO — i canali che toccano QUESTO libro (1 voce in finestra)",
+        "  [16/10] Fed holds rates", "-" * 66, "Prezzi: stockanalysis.com, ultima barra 2026-10-16."],
+    "schede_progetto": [
+        "Dati del progetto: run della pipeline 2026-10-18T22:52:13Z (6,6 ore fa).",
+        "CDS a 5 anni (richiesta del CEO del 17/10/2026) — ICE Clear Credit", "  CDX IG 64 pb",
+        "SALUTE DEL CREDITO (richiesta del CEO del 18/10/2026)", "SEGNALI DEL CREDITO — eventi (si muovono coi prezzi): nessuno",
+        "BTP-V28 [POSIZIONE, titolo di Stato] — CDS 5 anni 64 pb", "",
+        "AAA [POSIZIONE] Alfa Inc. — prezzo pipeline del 2026-10-16", "  valutazione: P/E ultimi 12 mesi 10,0×",
+        "  CDS 5 anni: NESSUN CDS compensato a ICE", "  solidita': PATRIMONIALE: FORTE", "  Altman Z'' 5,00: zona di SICUREZZA",
+        "  debito: debito finanziario 1,0 mld USD", "",
+        "BBB [POSIZIONE] Beta Inc. — prezzo pipeline del 2026-10-16", "  valutazione: utile NEGATIVO", "  CDS 5 anni 900 pb",
+        "  solidita': PATRIMONIALE: DEBOLE", "  Altman Z'' -1,00: zona di PERICOLO", "  debito: debito finanziario 2,0 mld USD", "",
+        "WWW [SORVEGLIATO] Www Corp. — prezzo pipeline del 2026-10-16", "  valutazione: P/E 20×",
+        "  CDS 5 anni: NESSUN CDS", "  solidita': lettura non significativa", "  Altman: NON APPLICABILE",
+        "  debito: lettura non significativa"],
+    "rotazione": [
+        "CANDIDATI PER SETTORE — prezzi di oggi", "■ XLE Energia — IN TENDENZA · 1m +5,8%",
+        "   XOM (Exxon Mobil, 5% dell'ETF) 178,98 · 1m +9,6%", "",
+        "WATCHLIST DEL LIBRO E INGRESSI — 1 nomi", "   prezzi di oggi (stockanalysis.com)",
+        "■ CANDIDATI — zona, pendenza e correlazione soddisfatte — 1",
+        "   WWW    30,00 · CANDIDATO · DIVERSIFICA (corr +0,40) · 1m +6,3%",
+        "      ingresso: prezzo DENTRO la zona 28,00-31,00", "      struttura delle oscillazioni (ultimo anno) — RIALZISTA",
+        "      pavimenti (LIBRO.md §1bis, decisione del CEO del 15/10/2026) — minimi di oscillazione",
+        "         1) 28,50 (-5%) · 1 tocco → ordine con limite 28,50 · stop 27,00",
+        "      VWAP dai conti 29,00 — conti del 29/07/2026", "      lettura a 5 anni — dal 2021-10-18 · 261 settimane concluse",
+        "      volumi (0 = minimo dell'anno, 100 = massimo, 50 = norma): seduta conclusa 32/100 · target analisti (pipeline) "
+        "mediana 35,00 · beta S&P 500 1,20 (R2 0,50, 250 sedute) · volatilita' annua 30%",
+        "      valutazione: P/E 20×",
+        "      tenuta se fosse in portafoglio (LIBRO.md §1sexies): VENDITA PER EVIDENZA — un ingresso qui e' speculativo, "
+        "CONTRO l'evidenza: ammesso, e si dichiara tale", "",
+        "NOTIZIE ULTIMISSIME — TUTTI I SORVEGLIATI", "  WWW — candidato · prezzo dentro la zona d'ingresso",
+        "      [WWW] 19/10 01:00 Titolo tre", "", "PIANO PER LA LIQUIDITÀ — 45.000 € dichiarati in LIBRO.md",
+        "■ OPERABILI ADESSO — 1", "    WWW (watchlist) 30,00 · DIVERSIFICA (corr +0,40) · per 5.000 €: volatilità -1,10 punti",
+        "    XOM (candidato di settore, XLE Energia) 178,98 · DIVERSIFICA (corr -0,39)",
+        "■ SENZA LIVELLO OGGI — zona vuota o non misurabile — 2", "    WWW (zona vuota) · ZZZ (non misurabile)"],
+    "posizionamento": [
+        "POSIZIONAMENTO — 19/10/2026 07:29 ora italiana", "PUT/CALL DI MERCATO — CBOE", "  seduta del 16/10/2026 · azioni 0,65",
+        "SCADENZE DELLE OPZIONI — le date che la borsa LISTA", "  prossima mensile: 20/11/2026",
+        "OPZIONI SULLE POSIZIONI — catene complete CBOE", "  AAA — prezzo 10,00 · volatilita' implicita a 30 giorni 59,3%",
+        "    put/call: volumi 0,89", "  BBB — prezzo 5,00 · volatilita' implicita a 30 giorni 89,5%", "    put/call: volumi 1,60",
+        "  movimento implicito = prezzo dello straddle diviso il prezzo", "GAMMA DEI DEALER (GEX) — stima",
+        "  AAA 10,00 · gamma netta -100 mln $ per 1% (NEGATIVA)", "  SPY 763,25 · gamma netta -11,95 mld $ per 1% (NEGATIVA)",
+        "DARK POOL — vendite allo scoperto sui mercati fuori borsa", "  AAA: DPI 49,1% il 16/10 (49° percentile dell'anno)",
+        "  WWW: DPI 53,1% il 16/10 (88° percentile dell'anno)", "GRANDI OPERATORI — CFTC, Traders in Financial Futures",
+        "  Nasdaq-100: fondi a leva -10%", "BITCOIN DALL'ULTIMA CHIUSURA USA — il bitcoin scambia anche di notte",
+        "  MSTR: sensibilita' 1,5"],
+    "indici": ["INDICI — S&P 500 e Nasdaq-100 (decisione del CEO del 17/10/2026)",
+               "VALUTAZIONE — ogni multiplo con la storia DELLA SUA fonte", "  S&P 500 prospettico 22,0×",
+               "TENDENZA — gli ETF SPY e QQQ"],
+    "concorrenti": ["CONCORRENTI E QUOTE DI MERCATO (richiesta del CEO del 18/10/2026)", "", "AAA [POSIZIONE] Alfa",
+                    "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
+                    "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
+                    "letture: 0 nuove in questo giro"],
+}
+def _es505(uscite=None, codici=None):
+    u = dict(_U505, **(uscite or {}))
+    return [{"etichetta": k, "argv": ["python3", f"scripts/{k.replace('_esteso', '')}.py"] + (["--esteso"] if k.endswith("_esteso") else []),
+             "codice": (codici or {}).get(k, 0), "uscita": "\n".join(u[k]), "errore": ""} for k in u]
+_r505 = SC.raccogli(_es505(), set(_POS505 + _SORV505))
+_in505 = _Cnt505(x for k in _U505 for x in _U505[k] if x.strip() and not SC.decorativa(x))
+_fuori505 = _Cnt505()
+for _v in _r505.sezioni.values():
+    _fuori505.update(_v)
+for _d in _r505.schede.values():
+    for _bl in _d.values():
+        for _b in _bl:
+            _fuori505.update(_b)
+_perse505 = [x for x, k in _in505.items() if _fuori505[x] < k]
+check("v505 CONSERVAZIONE: ogni riga stampata dagli strumenti finisce nella scheda — nella sua sezione o nella scheda del "
+      "suo nome — e le sole righe di decorazione («====», «----») restano fuori: " + str(_perse505[:5]),
+      not _perse505 and _r505.righe_lette == sum(_in505.values()) and not _r505.fuori_catalogo)
+
+_aaa505 = _r505.schede["AAA"]["tenuta"][0]
+check("v505 SPOSTA: il blocco di AAA nella TENUTA va nella sua scheda con tutte le righe piu' rientrate; nella sezione resta "
+      "la sola riga d'apertura come sommario, e il blocco di BBB comincia dove comincia la sua riga",
+      _aaa505[0] == "  AAA   IN OSSERVAZIONE · peso 60,0%" and _aaa505[-1] == "      VWAP dai conti 10,50 — conti del 11/08/2026"
+      and len(_aaa505) == 6 and "  AAA   IN OSSERVAZIONE · peso 60,0%" in _r505.sezioni["tenuta"]
+      and "      contro: macro ACCESA" not in _r505.sezioni["tenuta"]
+      and _r505.schede["BBB"]["tenuta"][0][0] == "  BBB   CONFLITTO — DA VALUTARE · peso 40,0%")
+check("v505 un nome si riconosce SOLO dentro il blocco che lo prevede: la riga di BBB fra le decisioni RIMANDATE resta li', "
+      "e la cronaca di mercato (un nome che non e' del libro) resta nella sezione delle notizie",
+      "  BBB — l'uscita: in pari" in _r505.sezioni["decisioni"] and "rimandate" not in _r505.schede["BBB"]
+      and "  CRONACA DI MERCATO — 1 voce nel feed di almeno 3 nomi" in _r505.sezioni["notizie_posizioni"]
+      and "      [AAA,BBB,CCC] 17/10 13:50 Stocks fall" in _r505.sezioni["notizie_posizioni"])
+check("v505 COPIA: le righe delle tabelle (dark pool, gamma, prezzo esteso, peso e rischio, piano) restano nella loro "
+      "tabella E si copiano nella scheda del nome; un ticker fuori dal libro (SPY, QQQ, XOM) resta solo nella tabella",
+      "  AAA: DPI 49,1% il 16/10 (49° percentile dell'anno)" in _r505.sezioni["dark_pool"]
+      and _r505.schede["AAA"]["dark_pool"] == [["  AAA: DPI 49,1% il 16/10 (49° percentile dell'anno)"]]
+      and "  SPY 763,25 · gamma netta -11,95 mld $ per 1% (NEGATIVA)" in _r505.sezioni["gamma"]
+      and "SPY" not in _r505.schede and "QQQ" not in _r505.schede and "XOM" not in _r505.schede
+      and _r505.schede["BBB"]["premarket"] == [["  BBB   non quotato fuori sessione"]]
+      and _r505.schede["WWW"]["mossi"] == [["  WWW    seduta del 2026-10-16: escursione 10,20% = 2,8x",
+                                            "         SMA20 -1,2 ATR · supporto 20s 28,00"]])
+check("v505 una riga che elenca PIU' nomi («WWW (zona vuota) · ZZZ (non misurabile)») non si attribuisce al primo: resta "
+      "nella tabella del piano, e la scheda di WWW porta solo la sua riga",
+      _r505.schede["WWW"]["liquidita"] == [["    WWW (watchlist) 30,00 · DIVERSIFICA (corr +0,40) · per 5.000 €: volatilità -1,10 punti"]]
+      and "    WWW (zona vuota) · ZZZ (non misurabile)" in _r505.sezioni["liquidita"])
+check("v505 i blocchi a colonna 0 (schede del progetto, concorrenti) vanno nelle schede dei nomi e la sezione dello strumento "
+      "li elenca in un rimando; la riga del BTP (la Repubblica Italiana) resta nella sezione dei CDS; il gruppo della "
+      "watchlist accompagna il nome",
+      _r505.rimandi.get("schede_testa") == ["AAA", "BBB", "WWW"] and _r505.rimandi.get("concorrenti") == ["AAA", "BBB"]
+      and "BTP-V28 [POSIZIONE, titolo di Stato] — CDS 5 anni 64 pb" in _r505.sezioni["cds"]
+      and _r505.schede["WWW"]["schede"][0][-1] == "  debito: lettura non significativa"
+      and _r505.gruppi.get("WWW") == "CANDIDATI"
+      and "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW" in _r505.sezioni["concorrenti"])
+
+# --- 4. la copertura delle richieste, sullo stato costruito ---
+_cop505 = SC.copertura(_r505, _reg505, _POS505, _SORV505, "pre-market")
+check("v505 copertura: sullo stato costruito ogni richiesta e' presente, una regola o un giudizio — tranne la gamma, che "
+      "manca a BBB e lo dice per nome («parziale», non «presente»): "
+      + str({k: c["stato"] for k, c in _cop505.items() if c["stato"] not in ("presente", "regola", "giudizio")}),
+      set(_cop505) == set(_chiavi505) and _cop505["gamma"]["stato"] == "parziale"
+      and any("1 su 2 — mancano: BBB" in x for x in _cop505["gamma"]["conteggi"])
+      and all(c["stato"] in ("presente", "regola", "giudizio") for k, c in _cop505.items() if k != "gamma")
+      and _cop505["memorie"]["stato"] == "regola" and _cop505["ordine_interesse"]["stato"] == "giudizio")
+check("v505 il prezzo esteso esiste solo prima dell'apertura e dopo la chiusura: in seduta la richiesta e' «non in questa "
+      "fase», non ASSENTE",
+      SC.copertura(_r505, _reg505, _POS505, _SORV505, "seduta")["premarket"]["stato"] == "non in questa fase")
+_r505f = SC.raccogli(_es505({"posizionamento": []}, {"posizionamento": 1}), set(_POS505 + _SORV505))
+_cop505f = SC.copertura(_r505f, _reg505, _POS505, _SORV505, "pre-market")
+check("v505 uno strumento FALLITO: le sue richieste sono ASSENTI e la ragione dice NON DISPONIBILE — strumento fallito, "
+      "non «nessuna riga»: " + str(_cop505f["cftc"]["perche"]),
+      all(_cop505f[k]["stato"] == "ASSENTE" for k in ("opzioni", "cftc", "bitcoin", "dark_pool", "gamma"))
+      and "strumento fallito (posizionamento)" in " ".join(_cop505f["cftc"]["perche"]) and _r505f.falliti)
+_r505m = SC.raccogli(_es505({"posizionamento": [x for x in _U505["posizionamento"] if "GRANDI OPERATORI" not in x
+                                                and "fondi a leva" not in x]}), set(_POS505 + _SORV505))
+_cop505m = SC.copertura(_r505m, _reg505, _POS505, _SORV505, "pre-market")
+check("v505 un blocco che lo strumento non ha stampato, a strumento riuscito: la richiesta e' ASSENTE con «nessuna riga "
+      "nelle uscite di oggi»",
+      _cop505m["cftc"]["stato"] == "ASSENTE" and "nessuna riga nelle uscite di oggi" in " ".join(_cop505m["cftc"]["perche"])
+      and _cop505m["bitcoin"]["stato"] == "presente")
+_r505v = SC.raccogli(_es505({k: [x for x in v if "VWAP dai conti" not in x] for k, v in _U505.items()}),
+                     set(_POS505 + _SORV505))
+_cop505v = SC.copertura(_r505v, _reg505, _POS505, _SORV505, "pre-market")
+check("v505 una richiesta che vive DENTRO i blocchi per nome e che nessun nome porta piu' (il VWAP tolto dalle righe): "
+      "ASSENTE, coi nomi attesi contati — e il riepilogo esce 1 e la nomina",
+      _cop505v["vwap"]["stato"] == "ASSENTE" and any("0 su 2" in x for x in _cop505v["vwap"]["conteggi"])
+      and SC.sommario(_cop505v, _r505v, "x.md")[1] == 1
+      and any("RICHIESTA SENZA RIGHE OGGI: vwap" in x for x in SC.sommario(_cop505v, _r505v, "x.md")[0])
+      and SC.sommario(_cop505, _r505, "x.md")[1] == 0)
+_r505l = SC.raccogli(_es505({"numeri_libro": [x for x in _U505["numeri_libro"] if not x.strip().startswith("leva:")]}),
+                     set(_POS505 + _SORV505))
+check("v505 la variazione annua della leva vive DENTRO il semaforo: senza la sua riga la richiesta e' ASSENTE anche se il "
+      "semaforo c'e'",
+      SC.copertura(_r505l, _reg505, _POS505, _SORV505, "pre-market")["leva"]["stato"] == "ASSENTE"
+      and _cop505["leva"]["stato"] == "presente")
+_r505u = SC.raccogli(_es505({"rotazione": _U505["rotazione"] + ["NUOVO BLOCCO MISTERIOSO — una riga che nessuno conosce",
+                                                               "  il suo contenuto"]}), set(_POS505 + _SORV505))
+check("v505 un blocco che il catalogo non conosce: resta dove lo strumento l'ha stampato (nessuna riga persa) e si "
+      "DICHIARA fuori catalogo, nella scheda e nel riepilogo",
+      _r505u.fuori_catalogo == [("rotazione", "NUOVO BLOCCO MISTERIOSO — una riga che nessuno conosce")]
+      and "  il suo contenuto" in _r505u.sezioni["liquidita"]
+      and any("fuori catalogo" in x for x in SC.sommario(SC.copertura(_r505u, _reg505, _POS505, _SORV505, "pre-market"),
+                                                         _r505u, "x.md")[0]))
+check("v505 GOOGL ha una lettera in piu': numeri_libro scrive f\"  {tk:5} ...\" e dopo un ticker di cinque lettere resta UNO "
+      "spazio solo — il nome si riconosce dalla parola che segue, non dall'incolonnamento",
+      "GOOGL" in SC.raccogli(_es505({"numeri_libro": ["TENUTA DELLE POSIZIONI — x", "  GOOGL IN OSSERVAZIONE · peso 5,0%",
+                                                       "      contro: nessuna"]}), {"GOOGL"}).schede)
+
+# --- 5. la resa: Markdown inerte, rientri come annidamento, e nessuna riga persa nella resa ---
+check("v505 Markdown inerte: asterischi, trattini bassi, dollari, parentesi quadre, barre, maggiore/minore, cancelletti e "
+      "tilde restano caratteri; una riga che comincia con «1)» o «- » non diventa un elenco",
+      SC.md_testo("*a* _b_ $5 [x] | <y> #z ~w") == r"\*a\* \_b\_ \$5 \[x\] \| \<y\> \#z \~w"
+      and SC.md_testo("1) 28,50 (-5%)") == r"1\) 28,50 (-5%)" and SC.md_testo("- meno") == r"\- meno"
+      and SC.md_elenco(["A", "  b", "      c", "  d"]) == ["- A", "  - b", "    - c", "  - d"])
+_md505, _c505, _rr505, _ = SC.genera(_es505(), fase="pre-market", quando="19/10/2026 07:29 ora italiana",
+                                     posizioni=_POS505, sorvegliati=_SORV505)
+_mancanti505 = [x for x in _in505 if SC.md_testo(x) not in _md505]
+check("v505 la resa porta ogni riga (resa inerte) e l'indice con ogni voce del registro: " + str(_mancanti505[:3]),
+      not _mancanti505 and all(f"**{k}**" in _md505 for k in _chiavi505)
+      and "## Le schede per nome" in _md505 and "#### AAA — in portafoglio" in _md505
+      and "#### WWW — sorvegliato · CANDIDATI" in _md505 and _md505.index("#### AAA") < _md505.index("#### WWW"))
+
+# --- 6. il collegamento con analisi.py: la stampa del giro e la sua rilettura, la scrittura, il codice d'uscita ---
+_esan505 = [dict(e, argv=[sys.executable, str(AN.RADICE / "scripts" / e["argv"][1].split("/")[-1])] + e["argv"][2:],
+                 secondi=1) for e in _es505()]
+_stampa505, _ = AN.resa(_esan505, "CHECKLIST",
+                        "ANALISI DEL LIBRO — 19/10/2026 07:29 ora italiana · New York 01:29 · fase: PRE-MARKET · 8 strumenti")
+_riletti505 = SC.esiti_da_testo(_stampa505)
+check("v505 collegamento con analisi.py: la sua stampa si rilegge — stessi strumenti, stessi codici, stesse uscite — e la "
+      "testa da' data e fase (la scheda si rifa' da un giro salvato con --da)",
+      [SC.chiave_strumento(e["argv"]) for e in _riletti505] == list(_U505)
+      and all(a["uscita"].strip() == "\n".join(_U505[k]).strip() for a, k in zip(_riletti505, _U505))
+      and SC.testa_da_testo(_stampa505) == ("19/10/2026 07:29", "pre-market"))
+with _tmp505.TemporaryDirectory() as _d505:
+    _p505 = Path(_d505) / "scheda.md"
+    _ri505, _co505, _pp505 = AN.scrivi_scheda(_esan505, "pre-market", _dt474(2026, 10, 19, 1, 29, tzinfo=_NY474), _p505)
+    _scritta505 = _p505.exists() and "# Scheda completa dell'analisi — 19/10/2026 07:29" in _p505.read_text(encoding="utf-8")
+try:                       # se la funzione sollevasse, il check deve cadere col suo nome, non far morire la suite (v407)
+    _ko505 = AN.scrivi_scheda(None, "pre-market", _dt474(2026, 10, 19, 1, 29, tzinfo=_NY474), "/nonesiste/x.md")
+except Exception as _e505:
+    _ko505 = ([f"ECCEZIONE {type(_e505).__name__}"], 0, None)
+check("v505 analisi.py scrive la scheda e il suo riepilogo; una scheda che non si scrive NON solleva: si dichiara ed esce 1",
+      _scritta505 and _pp505 == _p505 and _ri505 and _ri505[0].startswith("SCHEDA COMPLETA")
+      and _ko505[1] == 1 and _ko505[0][0].startswith("⚠ SCHEDA COMPLETA NON SCRITTA"))
+check("v505 il codice d'uscita del comando unico porta quello della scheda, e il riepilogo sta PRIMA della checklist",
+      AN.resa(_esan505, "CL", scheda_righe=["SCHEDA COMPLETA x"], scheda_codice=1)[1] == 1
+      and AN.resa(_esan505, "CL", scheda_righe=["SCHEDA COMPLETA x"], scheda_codice=0)[1] == 0
+      and AN.resa(_esan505, "CL", scheda_righe=["SCHEDA COMPLETA x"])[0].index("SCHEDA COMPLETA x")
+      < AN.resa(_esan505, "CL", scheda_righe=["SCHEDA COMPLETA x"])[0].index("CHECKLIST DELLA RISPOSTA"))
+_main505 = _corpo_di((Path(__file__).resolve().parent / "analisi.py").read_text(encoding="utf-8"), "main")
+check("v505 collegamento in main: il giro scrive la scheda e passa riepilogo e codice alla resa",
+      "scrivi_scheda(esiti, f, adesso)" in _main505 and "scheda_righe=sc_righe" in _main505
+      and "scheda_codice=sc_codice" in _main505)
+
+# --- 7. il formato e il censimento ---
+_fa505 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_cl505 = AN.checklist() or ""
+check("v505 il formato: la risposta in due parti (chat e scheda), la regola di consegna stampata nella checklist, e il "
+      "registro con le chiavi; /aggiorna dichiara scheda.py fuori con la sua ragione (v387)",
+      "**Dal 19/10 la risposta ha DUE parti**" in _fa505 and "**La SCHEDA COMPLETA si manda SEMPRE come allegato**" in _cl505
+      and "- `[scheda]` la SCHEDA COMPLETA di ogni analisi" in _fa505
+      and "`scripts/scheda.py` resta **fuori**" in (Path(__file__).resolve().parent.parent / ".claude" / "commands"
+                                                    / "aggiorna.md").read_text(encoding="utf-8"))
+
+# --- 8. la lettura a 5 anni: il rialzo da misurare deve cominciare dentro la finestra (DIS, NKE, PFE il 19/10) ---
+_pfe505 = [41 + 20.7 * i / 40 for i in range(41)] + [61.7 - 32.1 * i / 1258 for i in range(1, 1259)]
+_l505p = ROT.lettura_5anni(_serie492(_pfe505), 29.58, _DOPO492)
+_t505p = "\n".join(ROT.righe_5anni(_l505p))
+check("v505 se la finestra di cinque anni si apre GIA' al livello da cui sale il rialzo verso il massimo, quel rialzo e' "
+      "cominciato prima e la sua base non si vede: la quota restituita e' n.d. e si dice perche' — non «155%»",
+      _l505p["breve"] is False and _l505p["rialzo"]["censurato"] is True and _l505p["rialzo"]["restituito_pct"] is None
+      and "rialzo restituito n.d. (la finestra si apre gia' al livello" in _t505p and "restituito il" not in _t505p, _t505p[-400:])
+_dis505 = ([172 - 3.85 * i / 9 for i in range(10)] + [168.15 + 11.1 * i / 6 for i in range(1, 7)]
+           + [179.25 - 68.66 * i / 1284 for i in range(1, 1285)])
+_l505d = ROT.lettura_5anni(_serie492(_dis505), 110.59, _DOPO492)
+_t505d = "\n".join(ROT.righe_5anni(_l505d))
+check("v505 oltre il 100% una percentuale non dice piu' quanto (DIS il 19/10: «619%» di un rialzo di dieci giorni): la riga "
+      "dice che e' restituito tutto, e di quanto il prezzo sta sotto il punto di partenza — la grandezza che il numero "
+      "nascondeva",
+      _l505d["rialzo"]["censurato"] is False and _l505d["rialzo"]["restituito_pct"] > 400
+      and "l'ha restituito tutto, e oltre il punto di partenza (il prezzo ne dista -33,6%)" in _t505d
+      and "%" not in _t505d.split("l'ha restituito tutto")[0][-40:], _t505d[-400:])
+_breve505 = ROT.lettura_5anni(_serie492([41 + 20.7 * i / 40 for i in range(41)] + [61.7 - 32.1 * i / 600 for i in range(1, 601)],
+                                        inizio="2024-01-02"), 29.58, _DOPO492)
+check("v505 su un titolo quotato da meno di cinque anni il primo prezzo E' un punto di partenza vero: il rialzo si misura",
+      _breve505["breve"] is True and _breve505["rialzo"]["censurato"] is False
+      and _breve505["rialzo"]["restituito_pct"] is not None)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

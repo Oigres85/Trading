@@ -220,6 +220,10 @@ e «Aggiorna analisi» del CEO — che esegue in parallelo `numeri_libro.py`, `b
 la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 
+`scripts/scheda.py` resta **fuori** (v505): è la SCHEDA COMPLETA dell'analisi in chat — la scrive `scripts/analisi.py`
+a ogni giro raccogliendo, parola per parola, le uscite dei suoi strumenti, già dichiarati fuori qui. Non legge dati ma
+le uscite di un giro: eseguita da sola non avrebbe niente da raccogliere.
+
 `scripts/credito.py` non è un passo di questo comando (v501): è la libreria della salute del credito — soglie e
 mappature dichiarate del monitor (CDS, Altman, debito dai bilanci) — e la usano `schede_progetto.py`, `brief.py` e
 `numeri_libro.py`, che sono già dichiarati qui. Una libreria sola perché la soglia del CDS è la stessa per la tenuta e
