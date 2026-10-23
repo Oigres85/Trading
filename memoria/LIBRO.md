@@ -22,7 +22,7 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 |---|---|---|---|---|
 | NVDA | 270 | **87,1667** | USD | ⚠ confermato dal CEO: `portfolio_state.json` diceva 81,167 ed era sbagliato |
 | MSTR | 173 | 173,3045 | USD | |
-| CRWV | 155 | 87,07 | USD | media del CEO del 14/10/2026: +50 azioni a ~65,80 $ (carico da 97,199 a 87,07) |
+| CRWV | 205 | 81,41 | USD | media del CEO del 20/10/2026: +50 azioni a ~63,86 $, ricavato dal carico che il broker dichiara (da 87,07 a 81,41); la prima il 14/10/2026: +50 a ~65,80 $ (da 97,199 a 87,07) |
 | AMD | 100 | 153,916 | USD | |
 | PLTR | 100 | 113,50 | USD | |
 | MU | 70 | 87,63 | USD | |
@@ -30,11 +30,18 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
-| SMCI | 250 | 31,60 | USD | Super Micro Computer — server AI. Acquistata il 16/10/2026 con l'ordine giornaliero a 31,60 (§1septies); candidato di rotazione da CRWV dal 14/09/2026 |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
-**Liquidità: 45.000 €** IN TUTTO, bloccata compresa — dichiarata dal CEO il 17/10/2026, testuale: *"La liquiditita è di
-45k"*. Nessun ordine è aperto (§1septies): oggi è tutta libera. La liquidità si scrive in tutto perché un ordine non
+⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
+giornaliero (§1septies). Il CEO, testuale: *"Smci vendute 250 a 32,81 non mi fido per ora e ho fatto un minimo di
+speculazione"*. Plusvalenza (32,81 − 31,60) × 250 = **+302,50 $** (+3,8% in due sedute), imposta ~79 $ al 26% — il conto
+definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliati (§1bis).
+
+**Liquidità: ~49.475 €** IN TUTTO, bloccata compresa — **una stima, da confermare col saldo del broker**: i 45.000 €
+dichiarati dal CEO il 17/10/2026 (testuale: *"La liquiditita è di 45k"*), più la vendita di SMCI del 19/10 (250 × 32,81 $
+= 8.202,50 $ ≈ 7.317 € a EUR/USD 1,121, il cambio della pipeline quel giorno) e meno la media di CRWV del 20/10
+(205 × 81,41 − 155 × 87,07 = 3.193,20 $ ≈ 2.842 € a 1,1236). Imposta sulla plusvalenza di SMCI e commissioni escluse.
+In §1septies non c'è nessun ordine: per quanto il sistema sa, è tutta libera. La liquidità si scrive in tutto perché un ordine non
 eseguito non ha speso niente: se si esegue, qui si toglie la sua spesa e in alto entra la posizione; se scade, questo
 numero non cambia. La libera la calcola `numeri_libro.py` (blocco «ORDINI APERTI») togliendo gli ordini ancora attivi (v490).
 ⚠⚠ **Fino al 17/10 mattina qui c'era scritto ~72.360 €: 27.360 € di troppo, ed era un conto mio.** Il 15/10 sera il CEO
@@ -101,6 +108,7 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | Ticker | Nota |
 |---|---|
 | OKLO | Oklo — reattori nucleari modulari per datacenter. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
+| SMCI | Super Micro Computer — server AI, concorrente di DELL. **Venduta il 19/10/2026 a 32,81 $** (250 azioni comprate il 16/10 a 31,60): il CEO *"non mi fido per ora"*. Candidato di rotazione da CRWV dal 14/09/2026. Il 18/10: bilancio solido (Altman 6,77) e cassa dell'attività negativa (−6,8 miliardi di flusso operativo in 12 mesi, magazzino a 128 giorni) |
 | AMZN | Amazon — candidato d'ingresso (CEO, 02/10/2026). Diversifica in parte dal gruppo AI e porta ~15-20% di Anthropic. Livelli: acquisto 244-246 (supporto 244,30), uscita sotto SMA200 ~240. Trimestrale 29/10 |
 | STX | Seagate — candidato d'ingresso (CEO, 02/10/2026). Leader tecnologico dischi (HAMR), stesso ciclo di WDC. Livelli: ingresso vicino al supporto 758 solo se regge 2-3 sedute, o dopo la trimestrale 27-28/10; uscita sotto 758 |
 | GOOGL | Alphabet — uscito dal libro a ~+2% (fine settembre); rientro valutato sul supporto 327,74 o sopra 364 |
@@ -462,6 +470,9 @@ carico da 97,20 a 87,07 (§1). La proposta del 14/10 era di aspettare i conti de
 obbligazioni di CoreWeave rendevano intorno al 15% e il titolo perdeva il 16%, e il programma di
 vendita di 35 milioni di azioni annunciato a settembre può partire da metà ottobre. La decisione è
 sua: la rimandata è chiusa, e resta la scadenza del conflitto — i conti, con l'esame scritto prima.
+⚠ **CRWV — 20/10/2026: il CEO ha mediato di nuovo**, sempre prima dei conti: +50 azioni a ~63,86 $ (ricavato dal carico
+che il broker dichiara), 205 in tutto, carico da 87,07 a **81,41** (§1). La regola del 18/10 si sposta col carico: si
+esce solo almeno in pari, cioè non sotto il carico di §1.
 ⚠ **15/10/2026 — il gradino dell'arancione del 14/10 NON è stato eseguito**, per decisione del CEO
 («mantenere le posizioni di Mu e amd e gli altri»), e la regola è cambiata lo stesso giorno:
 arancione e rosso non vendono più, resta il salvavita a −30% (§1ter).
@@ -480,7 +491,8 @@ ora attendo"*, poi *"1no · 2 in attesa · 3giornalieri"*.
    alto, come regola speciale contro quella del 15/10 («non si vende sui ribassi») — è **respinta**: SMCI segue le regole
    di tutti, la tenuta per evidenza (§1sexies), e lo stop del pavimento su cui è entrata resta un campanello (§1quater,
    regola 3), non un'uscita. ⚠ SMCI non è fra i semiconduttori del salvavita (§1ter): è un produttore di server, e il
-   gradino del −30% non la tocca.
+   gradino del −30% non la tocca. ⚠ **Il 19/10/2026 il CEO ha venduto SMCI per intero** (§1): la regola resta scritta per
+   il giorno in cui rientrasse.
 2. **CRWV — si esce solo almeno in pari, e si aspetta.** Nessun alleggerimento sui rimbalzi sotto il carico; il
    conflitto (§1sexies) si decide ai conti, con l'esame scritto prima. Il 16/10 (chiusura 61,39) servivano +41,8% per
    tornare al carico. ⚠ Se ai conti la tenuta dicesse VENDITA PER EVIDENZA, questa regola direbbe di non uscire sotto il

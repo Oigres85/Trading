@@ -1,7 +1,7 @@
 {
  "_nota": "Posizioni del CEO. NON e' la lista dei simboli da seguire: quella resta config/ui_watchlist.json. Questo file e' una SOVRAPPOSIZIONE.",
  "_fonte": "modificato dalla dashboard",
- "aggiornato": "2026-10-16",
+ "aggiornato": "2026-10-20",
  "posizioni": [
   {
    "ticker": "BTP-V28",
@@ -52,12 +52,6 @@
    "valuta": "USD"
   },
   {
-   "ticker": "SMCI",
-   "qta": 250,
-   "pmc": 31.6,
-   "valuta": "USD"
-  },
-  {
    "ticker": "SKHY",
    "qta": 45,
    "pmc": 139,
@@ -71,8 +65,8 @@
   },
   {
    "ticker": "CRWV",
-   "qta": 155,
-   "pmc": 87.07,
+   "qta": 205,
+   "pmc": 81.41,
    "valuta": "USD",
    "mercato": "NASDAQ"
   }

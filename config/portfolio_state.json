@@ -1,7 +1,7 @@
 {
  "cash": {
-  "v": 45000,
-  "at": "2026-10-17"
+  "v": 49475,
+  "at": "2026-10-20"
  },
  "btp": {
   "v": {
@@ -11,5 +11,5 @@
   "at": ""
  },
  "_nota": "v439 — il blocco 'holdings' e' stato tolto: era una COPIA del libro (RGTI 595 contro 463, NVDA pmc 81,167 che il CEO ha confermato sbagliato l'08/09, 8 nomi su 13, 'at' vuoto) e NON lo leggeva nessuno — app.js (fuoriAzionarioEur) e analisi_libro.py (stato_patrimoniale) prendono solo 'cash' e 'btp'. Le posizioni vivono in config/posizioni.json e in memoria/LIBRO.md. Una seconda copia degli stessi numeri invecchia da sola.",
- "_nota_cash": "v479 — la liquidita' qui e' una COPIA di quella dichiarata dal CEO in chat e annotata in memoria/LIBRO.md §1 (~50.000 € il 01/10/2026 piu' l'incasso di ORCL del 05/10/2026). Restava a 10.000 € dell'08/08: la pagina, il pacchetto, conseguenze.py e analisi_libro.stato_patrimoniale leggevano questa copia, numeri_libro.py e rotazione.py l'altra. Un gate in test_analisi_libro.py pretende che le due coincidano: se si aggiorna una, si aggiorna l'altra. v490 — il 15/10/2026 sera il CEO ha dichiarato 56.600 € liberi esclusa la liquidita' bloccata dagli ordini aperti (~22.800 € ai limiti): qui, come in LIBRO.md, la si scrive IN TUTTO, bloccata compresa, perche' un ordine non eseguito non ha speso niente. Il 16/10/2026 meno l'acquisto di SMCI (250 azioni a 31,60 $ = 7.900 $, circa 7.040 € al cambio del giorno): circa 72.360 €, da confermare col saldo del broker. v496 — il 17/10/2026 il CEO ha dichiarato 45.000 € («La liquiditita è di 45k»): la stima di 72.360 € sommava ai 56.600 € del 15/10 la parte bloccata dagli ordini, ed era 27.360 € di troppo. Vale la dichiarazione (memoria/LIBRO.md §1)."
+ "_nota_cash": "v479 — la liquidita' qui e' una COPIA di quella dichiarata dal CEO in chat e annotata in memoria/LIBRO.md §1 (~50.000 € il 01/10/2026 piu' l'incasso di ORCL del 05/10/2026). Restava a 10.000 € dell'08/08: la pagina, il pacchetto, conseguenze.py e analisi_libro.stato_patrimoniale leggevano questa copia, numeri_libro.py e rotazione.py l'altra. Un gate in test_analisi_libro.py pretende che le due coincidano: se si aggiorna una, si aggiorna l'altra. v490 — il 15/10/2026 sera il CEO ha dichiarato 56.600 € liberi esclusa la liquidita' bloccata dagli ordini aperti (~22.800 € ai limiti): qui, come in LIBRO.md, la si scrive IN TUTTO, bloccata compresa, perche' un ordine non eseguito non ha speso niente. Il 16/10/2026 meno l'acquisto di SMCI (250 azioni a 31,60 $ = 7.900 $, circa 7.040 € al cambio del giorno): circa 72.360 €, da confermare col saldo del broker. v496 — il 17/10/2026 il CEO ha dichiarato 45.000 € («La liquiditita è di 45k»): la stima di 72.360 € sommava ai 56.600 € del 15/10 la parte bloccata dagli ordini, ed era 27.360 € di troppo. Vale la dichiarazione (memoria/LIBRO.md §1). Il 19/10/2026 il CEO ha venduto SMCI (250 a 32,81 $ = 8.202,50 $, circa 7.317 € a EUR/USD 1,121) e il 20/10 ha mediato CRWV (+50 azioni, 3.193,20 $ ricavati dal carico, circa 2.842 € a 1,1236): circa 49.475 €, una stima da confermare col saldo del broker, imposta e commissioni escluse."
 }
