@@ -6408,11 +6408,21 @@ check("v390 EDGAR: il deposito passato e' un FATTO, la data futura resta una sti
   DATA.macro.sec_calendario = salvato;
   /* ⚠ v396 — la SECONDA STIMA (ultimo deposito + cadenza mediana) era una proiezione nostra ed
      e' stata tolta. L'invariante si rovescia e diventa piu' netto: il deposito passato e la
-     cadenza misurata si pubblicano come FATTI, e da essi NON deve uscire nessuna data futura. */
+     cadenza misurata si pubblicano come FATTI, e da essi NON deve uscire nessuna data futura.
+     ⚠ v508 — la data proiettata (2026-06-24 + 91 giorni = 2026-09-23) si cerca DOVE VIVREBBE:
+     nella riga del deposito e in quella della prossima trimestrale, non nel pacchetto intero.
+     Il 23/10/2026 il digest della curva 10A-2A apriva la propria finestra di un mese proprio il
+     2026-09-23, e il check e' andato rosso su codice corretto: la classe v475, una data scritta
+     a mano nel check che il calendario rende vera altrove. Il pavimento e' sulla riga del
+     deposito, che il check costruisce: quella della prossima trimestrale c'e' solo se la fonte
+     ha la data, e pretenderla renderebbe il check dipendente dai dati del giorno (v429). */
+  const _righe = p.split(String.fromCharCode(10)).filter((x) =>
+    x.indexOf("ULTIMO DEPOSITO DEI RISULTATI") >= 0 || x.indexOf("Prossima trimestrale") >= 0);
   return /ULTIMO DEPOSITO DEI RISULTATI[^\\n]*e' un FATTO, non una stima[^\\n]*2026-06-24/.test(p)
       && /cadenza dei suoi ultimi 36 depositi e' di 91 giorni/.test(p)
       && /non una previsione, e il sistema non ne ricava una data/.test(p)
-      && p.indexOf("2026-09-23") < 0;`));
+      && _righe.length >= 1
+      && _righe.every((x) => x.indexOf("2026-09-23") < 0);`));
 
 check("v390 EDGAR: una cadenza irregolare NON produce una data", suVeri(`
   const salvato = DATA.macro.sec_calendario;

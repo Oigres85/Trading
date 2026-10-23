@@ -8281,3 +8281,11 @@ giorni «completi» hanno ora l'indice: un giorno senza indici, nella semantica 
   rimasti fermi diciannove. Corretta contando i run dall'API invece che ricordandoli.
 - Pavimenti: `test_app.mjs` 615 (628 punti di chiamata), `test_update_data.py` 330 (341) e N_CHECKS_MINIMO 345 (353
   eseguiti), `test_analisi_libro.py` 805 (819). `?v=` e `BUILD_VERSION` a 508: cambia `assets/app.js`.
+
+### 🗓️ E il `pre-push` ha fermato il push su una data scritta a mano
+Il rebase ha portato il run delle 21:49 e **v390** è andato rosso su codice che nessuno aveva toccato: inietta un
+deposito del 2026-06-24 con cadenza di 91 giorni e pretendeva che la data proiettata, **2026-09-23**, non comparisse
+**in tutto il pacchetto** di MU. Quella sera la finestra mensile del digest della curva 10A-2A cominciava proprio il
+2026-09-23. È la **v475** una seconda volta, su un altro check: chi cerca l'assenza di una data guarda la **regione**
+in cui la data vivrebbe — la riga del deposito e quella della prossima trimestrale — e il pavimento sta sulla riga che
+il check stesso costruisce. Due iniezioni — la data proiettata rimessa in ciascuna delle due righe — mordono entrambe.
