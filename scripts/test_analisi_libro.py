@@ -7223,6 +7223,29 @@ check("v506 il formato: la riga short nella voce delle schede, la lettura in cop
       and "posizioni corte in aumento col titolo in salita" in _fa506.replace("\n   ", " ")
       and "- `[short]` le vendite allo scoperto di ogni posizione e sorvegliato" in _fa506)
 
+# ============================ v507 — UNA SEDUTA SOLA PER TUTTE LE SERIE ============================
+# Il 23/10/2026 alle 13:43 di New York la fonte aveva gia' la barra del giorno per QQQ, SMH, SPY, SKHY e BE e non per le
+# altre sette posizioni: la fine presa da QQQ faceva cadere numeri_libro (KeyError) e con lui semaforo, salvavita,
+# tenuta e ordini. Lo stato si COSTRUISCE: il fenomeno dipende dall'ora in cui gira la suite (v402, v429).
+_sc507 = {"QQQ": {"2026-10-21": 1, "2026-10-22": 1, "2026-10-23": 1}, "AAA": {"2026-10-21": 1, "2026-10-22": 1},
+          "BBB": {"2026-10-21": 1, "2026-10-22": 1, "2026-10-23": 1}}
+_dq507, _av507 = NL.seduta_comune(_sc507, ["2026-10-21", "2026-10-22", "2026-10-23"])
+check("v507 a seduta aperta le serie finiscono in giorni diversi: la fine e' l'ultima seduta che TUTTE portano, e chi va "
+      "oltre si nomina con la sua data (il 23/10 alle 13:43 la fine di QQQ faceva cadere l'intero strumento): "
+      + str((_dq507, _av507)),
+      _dq507 == ["2026-10-21", "2026-10-22"] and _av507 == {"QQQ": "2026-10-23", "BBB": "2026-10-23"})
+_pari507 = NL.seduta_comune({"QQQ": {"a": 1, "b": 1}, "AAA": {"a": 1, "b": 1}}, ["a", "b"])
+_buco507 = NL.seduta_comune({"QQQ": {"a": 1, "b": 1, "c": 1}, "AAA": {"a": 1, "c": 1}}, ["a", "b", "c"])
+check("v507 con le serie allineate niente cambia e nessuno si nomina; un buco nel mezzo non sposta la fine; senza una "
+      "seduta comune nessuna data inventata",
+      _pari507 == (["a", "b"], {}) and _buco507 == (["a", "b", "c"], {})
+      and NL.seduta_comune({"QQQ": {"a": 1}, "AAA": {"b": 1}}, ["a"]) == ([], {}))
+_src507 = Path(__file__).with_name("numeri_libro.py").read_text(encoding="utf-8")
+_calc507 = _corpo_di(_src507, "calcola")
+check("v507 collegamento: calcola prende la fine da seduta_comune, la passa alla resa, e la resa nomina chi va oltre",
+      'dq, avanti = seduta_comune(S, [x["t"] for x in B["QQQ"]])' in _calc507 and '"avanti": avanti' in _calc507
+      and "hanno gia' una barra piu' recente nello storico della fonte" in _src507)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

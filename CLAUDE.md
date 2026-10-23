@@ -8177,3 +8177,20 @@ un colore — se il CEO vorrà farne un segnale, lo deciderà lui.
   usano ancora la quota di Yahoo. Il CEO legge l'analisi in chat; allinearli è un cambiamento della pagina.
 - Pavimenti: `test_update_data.py` 295 → 310 (321 punti di chiamata) e N_CHECKS_MINIMO 312 → 328 (334 eseguiti),
   `test_analisi_libro.py` 780 → 795 (808). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🕐 v507 — A SEDUTA APERTA LE SERIE FINISCONO IN GIORNI DIVERSI, E LO STRUMENTO PRINCIPALE CADEVA
+
+Trovato lanciando l'analisi del 23/10/2026 alle 13:43 di New York, subito dopo la v506: `numeri_libro.py` è uscito 1 con
+`KeyError: '2026-10-23'`, e con lui semaforo, salvavita, tenuta, ordini e decisioni — la metà della risposta che decide.
+La fonte aggiunge allo storico la barra in formazione **in tempi diversi per titoli diversi**: QQQ, SMH, SPY, SKHY e BE
+l'avevano già, le altre sette posizioni no, e `calcola` prendeva la fine dalle date di QQQ dando per scontato che fossero
+di tutti.
+
+> È la **v186** dentro lo strumento che dovrebbe dichiararla: le date non dipendono da noi, ma un risultato si misura su
+> UNA seduta sola. La v489 l'aveva vista (*"alle 09:40 lo storico non aveva la barra del giorno, alle 13:50 sì"*) e
+> annotata come un dettaglio dell'ATR: era un guasto che aspettava l'ora sbagliata.
+
+Ora `seduta_comune` prende l'ultima seduta che TUTTE le serie portano, e chi va oltre **si nomina** con la sua data sotto
+il periodo — non sparisce (v406). Con le serie allineate non cambia niente; un buco nel mezzo non sposta la fine; senza una
+seduta comune nessuna data inventata. Lo stato si costruisce (il fenomeno dipende dall'ora in cui gira la suite, v402):
+tre controlli, due iniezioni — la fine presa di nuovo dal riferimento, il collegamento tolto — mordono entrambe.

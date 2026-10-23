@@ -99,6 +99,23 @@ def _barre_o_vuoto(tk):
         return []
 
 
+def seduta_comune(S, date_rif):
+    """v507 — L'ULTIMA SEDUTA CHE TUTTE LE SERIE PORTANO. A seduta aperta la fonte aggiunge allo storico la barra in
+    formazione in tempi diversi per titoli diversi: il 23/10/2026 alle 13:43 di New York QQQ, SMH, SPY, SKHY e BE
+    avevano gia' la barra del giorno e le altre sette posizioni no, e la fine presa da QQQ faceva cadere l'INTERO
+    strumento (KeyError) — semaforo, salvavita, tenuta e ordini compresi. La classe v186: le date non dipendono da noi,
+    ma un risultato si misura su UNA seduta sola, e chi va piu' avanti si nomina invece di sparire.
+    S: {nome: {data: chiusura}}; date_rif: le date del riferimento (QQQ), in ordine. Restituisce (le date del
+    riferimento fino alla seduta comune, {nome: la sua ultima data} di chi va oltre)."""
+    comuni = set(date_rif)
+    for v in S.values():
+        comuni &= set(v)
+    if not comuni:
+        return [], {}
+    fine = max(comuni)
+    return [d for d in date_rif if d <= fine], {t: max(v) for t, v in S.items() if v and max(v) > fine}
+
+
 def calcola(sedute=1, registra=False, adesso=None):
     import brief
     pos, cassa_eur, sorv = brief.leggi_libro()
@@ -118,7 +135,7 @@ def calcola(sedute=1, registra=False, adesso=None):
         fuori = [t for t in dict.fromkeys(aperte + in_ordine) if t not in TK]
         TEC.update(zip(fuori, ex.map(lambda t: brief.tecnica(t, d=B.get(t) or None), fuori)))
     S = {t: {x["t"]: (x.get("a") or x["c"]) for x in B[t]} for t in TK + FATTORI}
-    dq = [x["t"] for x in B["QQQ"]]
+    dq, avanti = seduta_comune(S, [x["t"] for x in B["QQQ"]])     # v507 — una seduta sola per tutti
     fine, ini, ini21 = dq[-1], dq[-1 - sedute], dq[-22]
     qty = {p["tk"]: p["qta"] for p in az}
     pmc = {p["tk"]: p["pmc"] for p in az}
@@ -131,7 +148,7 @@ def calcola(sedute=1, registra=False, adesso=None):
     pnl21, ret21 = attribuzione(qty, {t: S[t].get(ini21) for t in TK}, px)
     out = {"fine": fine, "inizio": ini, "sedute": sedute, "tot_usd": tot, "cassa_eur": cassa_eur,
            "ret_libro": ret, "pnl_libro": sum(v for v in pnl.values() if v is not None),
-           "ret_21": ret21, "pnl_21": sum(v for v in pnl21.values() if v is not None),
+           "ret_21": ret21, "pnl_21": sum(v for v in pnl21.values() if v is not None), "avanti": avanti,
            "bench": {f: S[f][fine] / S[f][ini] - 1 for f in FATTORI},
            "bench_21": {f: S[f][fine] / S[f][ini21] - 1 for f in FATTORI},
            "titoli": [{"tk": t, "peso": w[t], "pnl": pnl[t], "pnl_21": pnl21[t],
@@ -2550,6 +2567,11 @@ def sintesi(o):
     L += [f"Periodo {o['inizio']} -> {o['fine']} ({_conta(o['sedute'], 'seduta', 'sedute')}) · azionario {_it(o['tot_usd'], 0)} $",
          f"Libro {p(o['ret_libro'])} ({_sg(o['pnl_libro'], 0)} $) · QQQ {p(b['QQQ'])} · SMH {p(b['SMH'])} · SPY {p(b['SPY'])} · RSP {p(b['RSP'])}",
          f"21 sedute: libro {p(o['ret_21'],1)} · SMH {p(o['bench_21']['SMH'],1)} · QQQ {p(o['bench_21']['QQQ'],1)}"]
+    if o.get("avanti"):
+        # v507 — chi ha gia' una barra piu' recente si nomina: «non c'e' nel conto» e «non e' arrivato» si leggono uguali
+        L.append(f"  ⚠ seduta comune {o['fine']}: " + ", ".join(f"{t} ({d})" for t, d in sorted(o["avanti"].items()))
+                 + " hanno gia' una barra piu' recente nello storico della fonte (a seduta aperta e' quella in "
+                 "formazione): il periodo si misura sull'ultima seduta che tutte le serie portano (v186)")
     if o.get("registro"):
         L.extend(righe_registro(o["registro"]))
     L += [f"Vol {_it(r['vol_ann'] * 100, 1)}% · VaR95 {_it(r['var95'] * 100, 2)}% · ES95 {_it(r['es95'] * 100, 2)}% · scommesse eff. {_it(r['scommesse_eff'], 2)}"
