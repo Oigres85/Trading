@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-10-22",
+ "aggiornato": "2026-10-23",
  "per_titolo": {
   "AAPL": {
    "carta_commerciale": {
@@ -1267,16 +1267,16 @@
   "PM": {
    "cik": 1413329,
    "deposito": {
-    "accn": "0001628280-26-049493",
-    "data": "2026-07-24",
+    "accn": "0001628280-26-066976",
+    "data": "2026-10-23",
     "forma": "10-Q",
-    "periodo": "2026-06-30"
+    "periodo": "2026-09-30"
    },
    "derivati_tassi": {
     "n": 0,
     "voci": []
    },
-   "letto_il": "2026-10-18",
+   "letto_il": "2026-10-23",
    "scadenze": {
     "al": "2025-12-31",
     "depositato": "2026-02-06",
@@ -1491,31 +1491,19 @@
   "WDC": {
    "cik": 106040,
    "deposito": {
-    "accn": "0001628280-26-057139",
-    "data": "2026-08-14",
-    "forma": "10-K",
-    "periodo": "2026-07-03"
+    "accn": "0001628280-26-066933",
+    "data": "2026-10-23",
+    "forma": "10-Q",
+    "periodo": "2026-10-02"
    },
    "derivati_tassi": {
     "n": 0,
     "voci": []
    },
-   "letto_il": "2026-10-18",
-   "scadenze": {
-    "al": "2025-06-27",
-    "depositato": "2025-08-14",
-    "forma": "10-K",
-    "valuta": "USD",
-    "voci": {
-     "anno_2": 1523000000.0,
-     "anno_3": 0.0,
-     "anno_4": 500000000.0,
-     "anno_5": 0.0,
-     "entro_12_mesi": 2226000000.0
-    }
-   },
+   "letto_il": "2026-10-23",
    "stantii": {
     "linee_disponibili": "2013-08-19",
+    "scadenze": "2025-08-14",
     "tasso": "2015-08-21"
    },
    "versione": 502
