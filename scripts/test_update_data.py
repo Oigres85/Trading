@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 328  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334 (sale, mai scende)
+N_CHECKS_MINIMO = 345  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1939,6 +1939,8 @@ _nomi497 = [
     {"clearingDate": "2026-10-16", "eodPrice": "99.1000", "instrumentName": "MICRONT.SNRFOR.USD.XR14.100.2031-12-20", "name": "Micron Technology Inc"},
     {"clearingDate": "2026-10-16", "eodPrice": "98.0000", "instrumentName": "BDK.SNRFOR.USD.XR14.100.2031-12-20", "name": "Black & Decker Corp"},
     {"clearingDate": "2026-10-15", "eodPrice": "50.0000", "instrumentName": "VECCHIO.SNRFOR.USD.XR14.100.2031-12-20", "name": "Giorno prima"},
+    # v508 — un contratto di un giorno prima della STESSA entita': e' questo che si scarta
+    {"clearingDate": "2026-10-15", "eodPrice": "92.5000", "instrumentName": "ORCLE.SNRFOR.USD.XR14.100.2031-12-20", "name": "Oracle Cop"},
 ]
 _idx497 = [
     {"clearingDate": "2026-10-16", "eodPrice": "101.6004", "instrumentName": "CDX-NAIGS46V1-5Y"},
@@ -1950,9 +1952,16 @@ _idx497 = [
 ]
 _get497 = lambda u: _R497(_nomi497 if u == ud.ICE_CDS_NOMI else _idx497)
 _l497 = ud.leggi_cds_ice(_get497)
-check("v497 la lettura tiene UN giorno solo (il piu' recente): un contratto di un altro giorno non entra nella "
-      "fotografia, e si conta come scartato",
-      _l497["data"] == "2026-10-16" and "VECCHIO" not in _l497["entita"] and _l497["scartati"] == 1
+# ⚠ v508 — l'invariante della v497 («un giorno solo, il piu' recente») ERA IL DIFETTO: ICE pubblica lo stesso giorno a
+#   ondate, per area, e tenere la sola data piu' recente buttava per tutta la giornata l'ondata non ancora arrivata (i nomi
+#   americani «non quotati oggi» fino a sera). Ora ogni entita' porta la SUA ultima data; dentro una entita' un contratto
+#   di un giorno prima si scarta, perche' mescolarli farebbe una fotografia mai esistita (v186).
+check("v497→v508 la lettura: ogni entita' porta i contratti della SUA ultima data (VECCHIO resta, al 15/10); dentro la "
+      "stessa entita' un contratto di un giorno prima si scarta e si conta; 'date' conta le entita' per giorno",
+      _l497["data"] == "2026-10-16" and _l497["entita"].get("VECCHIO", {}).get("data") == "2026-10-15"
+      and _l497["entita"]["ORCLE"]["data"] == "2026-10-16" and _l497["scartati"] == 1
+      and all(c["data"] == "2026-10-16" for c in _l497["entita"]["ORCLE"]["contratti"])
+      and _l497["date"] == {"2026-10-15": 1, "2026-10-16": 5}
       and _l497["scadenza"] == _m497 and _l497["entita"]["ORCLE"]["nome"] == "Oracle Cop")
 check("v497 gli indici in corso si scelgono dalla FORMA del nome (serie e versione piu' alte, solo 5 anni, solo Nord "
       "America), con la cedola del contratto: 100 l'IG, 500 l'HY",
@@ -1963,16 +1972,21 @@ check("v497 gli indici in corso si scelgono dalla FORMA del nome (serie e versio
 # --- lo storico: un giorno per riga, mai riscritto, mai all'indietro, con un tetto
 def _riga497(d, p, r=3.88, i=None):
     return {"d": d, "m": "2031-12-20", "r": r, "p": p, "i": i or {}}
-_st497, _n1 = ud.aggiungi_storia_cds([], _riga497("2026-10-15", {"ORCLE": [100, 92.5]}))
-_st497, _n2 = ud.aggiungi_storia_cds(_st497, _riga497("2026-10-15", {"ORCLE": [100, 90.0]}))
-_st497, _n3 = ud.aggiungi_storia_cds(_st497, _riga497("2026-10-14", {"ORCLE": [100, 93.0]}))
-_st497, _n4 = ud.aggiungi_storia_cds(_st497, _riga497("2026-10-16", {"ORCLE": [100, 91.758]}))
+# ⚠ v508 — «lo stesso giorno non si riscrive» era il difetto (le ondate successive di ICE venivano rifiutate): ora un
+#   giorno si COMPLETA, e resta vero che un prezzo gia' raccolto non cambia
+_st497, _e1 = ud.unisci_storia_cds([], [_riga497("2026-10-15", {"ORCLE": [100, 92.5]})])
+_st497, _e2 = ud.unisci_storia_cds(_st497, [_riga497("2026-10-15", {"ORCLE": [100, 90.0]})])
+_st497, _e3 = ud.unisci_storia_cds(_st497, [_riga497("2026-10-14", {"ORCLE": [100, 93.0]})])
+_st497, _e4 = ud.unisci_storia_cds(_st497, [_riga497("2026-10-16", {"ORCLE": [100, 91.758]})])
 _cap497 = []
 for _g in range(10):
-    _cap497, _ = ud.aggiungi_storia_cds(_cap497, _riga497(f"2026-09-{10 + _g:02d}", {}), massimo=4)
-check("v497 storico: lo stesso giorno non si riscrive (e' la stessa pubblicazione), un giorno piu' vecchio "
-      "dell'ultimo non entra, e il tetto tiene gli ultimi",
-      _n1 and not _n2 and not _n3 and _n4 and [r["d"] for r in _st497] == ["2026-10-15", "2026-10-16"]
+    _cap497, _ = ud.unisci_storia_cds(_cap497, [_riga497(f"2026-09-{10 + _g:02d}", {})], massimo=4)
+check("v497→v508 storico: un prezzo gia' raccolto non cambia (un secondo prezzo diverso per lo stesso giorno resta "
+      "il primo e si conta fra i difformi), un giorno piu' vecchio dell'ultimo SENZA la sua riga non entra (fuori "
+      "ordine), e il tetto tiene gli ultimi",
+      _e1["cambiato"] and not _e2["cambiato"] and _e2["difformi"] == 1 and not _e3["cambiato"]
+      and _e3["fuori_ordine"] == ["2026-10-14"] and _e4["cambiato"] and _e4["nuove"] == ["2026-10-16"]
+      and [r["d"] for r in _st497] == ["2026-10-15", "2026-10-16"]
       and _st497[0]["p"]["ORCLE"][1] == 92.5 and len(_cap497) == 4 and _cap497[-1]["d"] == "2026-09-19")
 with _tmp497.TemporaryDirectory() as _dir497:
     _f497 = Path(_dir497) / "cds.jsonl"
@@ -1985,7 +1999,9 @@ check("v497 storico su file: andata e ritorno identici, una riga illeggibile si 
       _rl497 == _st497 and _rl497b == _st497 and ud.leggi_storia_cds(Path("/non/esiste.jsonl")) == [])
 
 # --- le variazioni per DATA: la base e' un giorno, e un giorno senza il nome e' un buco (v205, v207)
-_lin497 = [_riga497("2026-10-0" + str(g), {"ORCLE": [100, 95.0 - g * 0.5]} if g != 3 else {"ALTRO": [100, 100.0]})
+# v508 — giorni COMPLETI (con l'indice): un giorno senza gli indici e' raccolto a meta', e il buco lo direbbe
+_lin497 = [_riga497("2026-10-0" + str(g), {"ORCLE": [100, 95.0 - g * 0.5]} if g != 3 else {"ALTRO": [100, 100.0]},
+                    i={"IG": [47, 1, 100, 101.0]})
            for g in range(1, 8)]
 _ser497 = ud.serie_cds(_lin497, "ORCLE")
 _var497 = ud.variazioni_cds(_lin497, _ser497, sedute=(1, 4, 5))
@@ -2051,9 +2067,9 @@ with _tmp497.TemporaryDirectory() as _dir497:
     _ko497 = ud.aggiorna_cds(_righe_giu497, {}, get=_giu497, percorso_storia=_fs497, percorso_mappa=_fm497)
     _righe_storia497 = len(_fs497.read_text().splitlines())
 check("v497 ICE giu': i titoli si leggono dall'ULTIMO giorno raccolto, il riepilogo dice 'non letto' con l'errore, e lo "
-      "storico non si sporca",
+      "storico non si sporca (v508: la lettura buona ha scritto i suoi DUE giorni, il 15 di VECCHIO e il 16)",
       _ok497["letto"] and not _ko497["letto"] and "503" in (_ko497["errore"] or "") and _ko497["data"] == "2026-10-16"
-      and next(r for r in _righe_giu497 if r["ticker"] == "ORCL")["cds"]["stato"] == "quotato" and _righe_storia497 == 1)
+      and next(r for r in _righe_giu497 if r["ticker"] == "ORCL")["cds"]["stato"] == "quotato" and _righe_storia497 == 2)
 _vq497 = lambda c: next((x for x in ud.validate_macro({"cds": c})["checks"] if x["key"] == "cds_ice"), {})
 _oggi497 = _dt497.now().date().isoformat()
 _vecchio497 = (_dt497.now().date() - _td497(days=9)).isoformat()
@@ -2119,7 +2135,8 @@ check("v498 finestra: nome e indice che si allargano insieme danno un eccesso vi
 _f498d = ud.finestra_cds(_s498a[:21], "TESTCO", 100)
 check("v498 finestra: con 21 giorni raccolti la prova NON E' ANCORA IN FUNZIONE, e lo dice coi giorni che ha e quelli "
       "che servono, e da quando raccoglie — nessuna data proiettata (v396)",
-      _f498d == {"stato": "storico corto", "n": 21, "giorni": 21, "servono": 22, "dal": _giorni498[0]}
+      _f498d == {"stato": "storico corto", "n": 21, "giorni": 21, "servono": 22, "dal": _giorni498[0],
+                 "giorni_nome": 21}     # v508 — quanti di quei giorni portano il nome
       and ud.finestra_cds([], "TESTCO", 100)["giorni"] == 0 and ud.finestra_cds([], "TESTCO", 100)["dal"] is None)
 _f498e = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, manca=_giorni498[0]), "TESTCO", 100)
 _f498e2 = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, manca=_giorni498[21]), "TESTCO", 100)
@@ -2808,6 +2825,196 @@ check("v506 collegamento: il giro principale chiama aggiorna_short coi titoli se
       _cs506 > 0 and _cs506 < _SRC_UD_CODICE.find("strip_private(watchlist)")
       and _SRC_UD_CODICE.find("aggiorna_cds(watchlist") < _cs506
       and '_prec_si = {r.get("ticker"): r.get("short_interest") for r in (prev_data.get("watchlist") or [])' in _SRC_UD_CODICE)
+
+# ============================ v508 — ICE PUBBLICA A ONDATE: LO STORICO SI COMPLETA PER DATA ============================
+# Misurato sui run dal 19 al 23/10/2026: l'Asia-Pacifico verso le 09 UTC, l'Europa nel pomeriggio, il Nord America con
+# gli indici CDX la sera. Lo storico scriveva un giorno alla prima lettura e rifiutava le successive, e per quattro giorni
+# ha tenuto solo l'Asia-Pacifico. Gli stati si COSTRUISCONO (v425): una lettura delle 09 UTC, una della sera, un giorno
+# raccolto a meta', una componente del composito senza valore.
+_D0_508, _D1_508 = "2026-10-22", "2026-10-23"
+def _g508(o, *k):
+    """Il valore annidato o None: con un difetto iniettato il check deve cadere col suo nome, non far morire la suite (v407)."""
+    for x in k:
+        o = o.get(x) if isinstance(o, dict) else None
+    return o
+def _nome508(cod, d, pz, ced=100):
+    return {"clearingDate": d, "eodPrice": str(pz), "instrumentName": f"{cod}.SNRFOR.USD.XR14.{ced}.2031-12-20", "name": cod}
+def _idx508(d, ig=101.70, hy=105.84):
+    return [{"clearingDate": d, "eodPrice": str(ig), "instrumentName": "CDX-NAIGS47V1-5Y"},
+            {"clearingDate": d, "eodPrice": str(hy), "instrumentName": "CDX-NAHYS47V1-5Y"}]
+# la lettura delle 09 UTC: l'Asia-Pacifico (SKHYN) e' gia' al giorno nuovo, il Nord America e gli indici a quello prima
+_mattino508 = [_nome508("SKHYN", _D1_508, 99.10), _nome508("ORCLE", _D0_508, 91.758), _nome508("COREWEI", _D0_508, 80.94, 500)]
+_lm508 = ud.leggi_cds_ice(lambda u: _R497(_mattino508 if u == ud.ICE_CDS_NOMI else _idx508(_D0_508)))
+check("v508 la lettura delle 09 UTC: ogni entita' con la sua data (SKHYN al giorno nuovo, ORCLE e COREWEI a quello "
+      "prima), gli indici con la loro (arrivano con l'ondata nordamericana), e 'data' e' la piu' recente",
+      _lm508["data"] == _D1_508 and _g508(_lm508, "entita", "SKHYN", "data") == _D1_508
+      and _g508(_lm508, "entita", "ORCLE", "data") == _D0_508 and _g508(_lm508, "indici", "IG", "data") == _D0_508
+      and _lm508.get("date") == {_D0_508: 2, _D1_508: 1} and _lm508.get("scartati") == 0)
+_rm508 = ud.righe_storia_cds(_lm508, 3.88)
+check("v508 una lettura che porta due giorni produce una riga per giorno, dal piu' vecchio: il 22 coi nomi "
+      "nordamericani e gli indici, il 23 con l'Asia-Pacifico e senza indici",
+      [r["d"] for r in _rm508] == [_D0_508, _D1_508] and set(_rm508[0]["p"]) == {"ORCLE", "COREWEI"}
+      and set(_rm508[0]["i"]) == {"IG", "HY"} and set(_rm508[1]["p"]) == {"SKHYN"} and _rm508[1]["i"] == {})
+# lo storico come lo lasciava la v507: il 22 scritto alle 09 col solo Asia-Pacifico
+_st508 = [{"d": _D0_508, "m": "2031-12-20", "r": 3.88, "p": {"SKHYN": [100, 99.0]}, "i": {}}]
+_st508b, _es508 = ud.unisci_storia_cds(_st508, _rm508)
+check("v508 IL GIORNO GIA' RACCOLTO SI COMPLETA: il 22, scritto col solo Asia-Pacifico, riceve i nomi nordamericani e "
+      "gli indici dalla lettura delle 09 del 23 (che li porta ancora al 22), e il 23 entra come giorno nuovo — la v507 "
+      "rifiutava il primo ('e' la stessa pubblicazione'): " + str(_es508),
+      _es508["completate"] == {_D0_508: 4} and _es508["nuove"] == [_D1_508] and _es508["difformi"] == 0
+      and set(_st508b[0]["p"]) == {"SKHYN", "ORCLE", "COREWEI"} and set(_st508b[0]["i"]) == {"IG", "HY"}
+      and _st508b[0]["p"]["SKHYN"] == [100, 99.0] and _st508b[0]["r"] == 3.88)
+_sera508 = [_nome508("SKHYN", _D1_508, 99.10), _nome508("ORCLE", _D1_508, 91.50), _nome508("COREWEI", _D1_508, 79.80, 500)]
+_ls508 = ud.leggi_cds_ice(lambda u: _R497(_sera508 if u == ud.ICE_CDS_NOMI else _idx508(_D1_508, 101.75, 105.90)))
+_st508c, _es508c = ud.unisci_storia_cds(_st508b, ud.righe_storia_cds(_ls508, 3.88))
+check("v508 la sera: il giorno nuovo si completa coi nomi nordamericani e gli indici, e quello prima non cambia",
+      _es508c["completate"] == {_D1_508: 4} and not _es508c["nuove"] and _st508c[0] == _st508b[0]
+      and set(_st508c[1]["p"]) == {"SKHYN", "ORCLE", "COREWEI"} and set(_st508c[1]["i"]) == {"IG", "HY"})
+_sc508, _ = ud.unisci_storia_cds([{"d": _D0_508, "m": "2031-12-20", "r": 3.88, "p": {}, "i": {"IG": [47, 1, 100, 101.7]}}],
+                                 [{"d": _D0_508, "m": "2031-06-20", "r": 3.9,
+                                   "p": {"AAA": [100, 99.0], "BBB": [100, 98.0, "2031-12-20"]}, "i": {}}])
+check("v508 un'entita' aggiunta porta la scadenza rispetto a quella della RIGA (una riga ha una scadenza di riferimento "
+      "sola), e la riga tiene il proprio tasso",
+      _g508(_sc508[0], "p", "AAA") == [100, 99.0, "2031-06-20"] and _g508(_sc508[0], "p", "BBB") == [100, 98.0]
+      and _sc508[0]["r"] == 3.88 and _sc508[0]["m"] == "2031-12-20")
+
+# --- la data del NOME, e le misure sullo storico fino a quel giorno
+_righe508 = [{"ticker": "ORCL", "name": "Oracle"}, {"ticker": "SKHY", "name": "SK hynix"}]
+ud.cds_dei_titoli(_righe508, _lm508, _st508b, {"entita": {"ORCL": "ORCLE", "SKHY": "SKHYN"}})
+_c508 = {r["ticker"]: r["cds"] for r in _righe508}
+check("v508 la data del NOME: alle 09 UTC ORCL e' 'quotato' col suo prezzo del 22 — non 'non quotato oggi', come per "
+      "tutta la giornata fino alla v507 — dichiara che ICE ha gia' pubblicato il 23 per altre aree, e lo spread esce "
+      "dalla riga del 22; SKHY e' al 23 e non dichiara niente",
+      _g508(_c508, "ORCL", "stato") == "quotato" and _g508(_c508, "ORCL", "data") == _D0_508
+      and _g508(_c508, "ORCL", "ultima_ice") == _D1_508 and _g508(_c508, "ORCL", "pb") is not None
+      and _g508(_c508, "SKHY", "data") == _D1_508 and "ultima_ice" not in (_c508.get("SKHY") or {}))
+# otto giorni completi del nome e un nono raccolto a meta' (solo l'Asia-Pacifico): la settimana del nome finisce l'ottavo
+_s508w = _storia498((100, 130), (60, 60), n=8) + [{"d": _giorni498[8], "m": "2031-12-20", "r": 3.88,
+                                                   "p": {"APACO": [100, 99.0]}, "i": {}}]
+_lw508 = ud.lettura_da_storia(_s508w)
+_rw508 = [{"ticker": "TST", "name": "Test"}]
+ud.cds_dei_titoli(_rw508, _lw508, _s508w, {"entita": {"TST": "TESTCO"}})
+_cw508 = _rw508[0]["cds"]
+check("v508 le misure del nome finiscono il giorno del nome: con l'ultimo giorno raccolto a meta' la settimana di TST "
+      "e' MISURATA sullo storico fino al suo giorno (ricalcolata uguale) — sullo storico intero sarebbe un buco",
+      _cw508.get("data") == _giorni498[7] and _g508(_cw508, "finestra5", "stato") == "misurato"
+      and _cw508.get("finestra5") == ud.finestra_cds(_s508w[:-1], "TESTCO", 100, n=5)
+      and ud.finestra_cds(_s508w, "TESTCO", 100, n=5).get("stato") == "buco")
+check("v508 il ripiego senza ICE legge per entita': il giorno raccolto a meta' non cancella TESTCO, che resta al giorno "
+      "prima con la sua data; gli indici hanno la loro; oltre la finestra del ripiego un'entita' non rientra",
+      _lw508.get("data") == _giorni498[8] and _g508(_lw508, "entita", "TESTCO", "data") == _giorni498[7]
+      and _g508(_lw508, "entita", "APACO", "data") == _giorni498[8] and _g508(_lw508, "indici", "IG", "data") == _giorni498[7]
+      and "TESTCO" not in ud.lettura_da_storia(_s508w, giorni=1)["entita"])
+
+# --- lo spread mancante con la causa VERA
+_pp508 = {"tasso": ud._cds_perche_pb([{"d": _D0_508, "m": "2031-12-20", "r": None, "p": {"X": [100, 99.0]}, "i": {}}], _D0_508, "X"),
+          "riga": ud._cds_perche_pb([{"d": _D0_508, "m": "2031-12-20", "r": 3.88, "p": {}, "i": {}}], _D0_508, "X"),
+          "dominio": ud._cds_perche_pb([{"d": _D0_508, "m": "2031-12-20", "r": 3.88, "p": {"X": [100, 250.0]}, "i": {}}], _D0_508, "X")}
+_rn508 = [{"ticker": "SKHY", "name": "SK hynix"}]
+ud.cds_dei_titoli(_rn508, _lm508, _st508, {"entita": {"SKHY": "SKHYN"}})
+check("v508 lo spread n.d. dice la causa VERA — senza tasso, senza il nome nella riga del giorno (il 23/10 la Repubblica "
+      "Italiana risultava 'senza tasso' col tasso presente), fuori dal dominio della conversione — e cds_dei_titoli la "
+      "attacca; un prezzo il cui giorno non e' nello storico non ancora le misure altrove",
+      "tasso" in _pp508["tasso"] and "storico raccolto" in _pp508["riga"] and "dominio" in _pp508["dominio"]
+      and _g508(_rn508[0], "cds", "pb") is None and "storico raccolto" in (_g508(_rn508[0], "cds", "pb_perche") or "")
+      and _g508(_rn508[0], "cds", "finestra", "stato") == "buco" and _g508(_rn508[0], "cds", "var") == {})
+
+# --- il giorno raccolto a meta' si dice, nella finestra, nelle variazioni e nel riepilogo
+_s508p = _storia498((100, 130), (60, 60), n=22, manca=_giorni498[0])
+_s508p[0] = {**_s508p[0], "i": {}, "parziale": "solo l'ondata Asia-Pacifico di ICE"}
+_f508p = ud.finestra_cds(_s508p, "TESTCO", 100)
+_f508q = ud.finestra_cds(_storia498((100, 130), (60, 60), n=22, manca=_giorni498[0]), "TESTCO", 100)
+check("v508 una base su un giorno raccolto a meta' NON e' 'il nome non e' quotato': la finestra dice che quel giorno non "
+      "e' stato letto, col motivo della riga; su un giorno completo resta 'non quotato'",
+      _f508p["stato"] == "buco" and _f508p.get("parziale") is True and "raccolto a meta'" in _f508p["perche"]
+      and "Asia-Pacifico" in _f508p["perche"] and _f508q["stato"] == "buco" and "non e' quotato" in _f508q["perche"]
+      and not _f508q.get("parziale"))
+_vp508 = ud.variazioni_cds(_s508p, ud.serie_cds(_s508p, "TESTCO"), sedute=(21,))
+check("v508 la variazione con la base su un giorno raccolto a meta' lo dice nella nota (le pagine la stampano)",
+      _vp508["21"]["pb"] is None and "raccolto a meta'" in _vp508["21"].get("nota", ""))
+_rp508 = ud.riepilogo_storia_cds([
+    {"d": "2026-10-19", "p": {"A": [100, 99.0]}, "i": {"IG": [47, 1, 100, 101.0]}},
+    {"d": "2026-10-20", "p": {"A": [100, 99.0]}, "i": {"IG": [47, 1, 100, 101.0]}, "parziale": "solo l'Asia-Pacifico",
+     "ricostruiti": {"fonte": "data.json del run delle 21:05 UTC (commit abc1234)"}},
+    {"d": "2026-10-21", "p": {"A": [100, 99.0]}, "i": {}},
+    {"d": "2026-10-22", "p": {"A": [100, 99.0]}, "i": {}}])
+check("v508 il riepilogo dello storico nomina i giorni raccolti a meta' coi loro motivi e le fonti delle ricostruzioni; "
+      "l'ultimo giorno senza indici e senza dichiarazione e' 'in corso', non un buco; i non dichiarati si contano a parte: "
+      + str(_rp508),
+      _rp508.get("giorni") == 4 and _rp508.get("parziali") == ["2026-10-20", "2026-10-21"]
+      and _rp508.get("parziali_non_dichiarati") == ["2026-10-21"] and _rp508.get("in_corso") == "2026-10-22"
+      and _g508(_rp508, "parziali_motivi", "2026-10-20") == "solo l'Asia-Pacifico"
+      and "indici CDX" in (_g508(_rp508, "parziali_motivi", "2026-10-21") or "")
+      and "commit abc1234" in (_g508(_rp508, "ricostruiti", "2026-10-20") or ""))
+# un giorno a meta' oltre le finestre delle misure (64 giorni raccolti) non si nomina piu' ogni giorno: si conta
+_lungo508 = ([{"d": "2026-01-01", "p": {}, "i": {}, "parziale": "solo l'Asia-Pacifico"}]
+             + [{"d": (_dt497(2026, 1, 2) + _td497(days=k)).date().isoformat(), "p": {"A": [100, 99.0]},
+                 "i": {"IG": [47, 1, 100, 101.0]}} for k in range(70)])
+_lungo508[-3] = {**_lungo508[-3], "i": {}, "parziale": "solo l'ondata europea"}
+_rl508 = ud.riepilogo_storia_cds(_lungo508)
+check("v508 i giorni a meta' si nominano finche' cadono dentro le finestre delle misure (64 giorni raccolti): quelli "
+      "piu' vecchi si contano — nominarli ogni giorno per due anni sarebbe un avviso che suona sempre: " + str(_rl508),
+      _rl508.get("parziali") == ["2026-01-01", _lungo508[-3]["d"]]
+      and _rl508.get("parziali_recenti") == [_lungo508[-3]["d"]] and _rl508.get("parziali_vecchi") == 1
+      and max(ud.CDS_SEDUTE_VAR) == 63)
+_oggi508 = _dt497.now().date()
+_vcs508 = lambda st: next((x for x in ud.validate_macro({"cds": {"data": _oggi508.isoformat(), "letto": True, "storia": st}})["checks"]
+                           if x["key"] == "cds_storia"), None)
+_q508 = {"ieri": _vcs508({"parziali": [(_oggi508 - _td497(days=1)).isoformat()],
+                          "parziali_non_dichiarati": [(_oggi508 - _td497(days=1)).isoformat()]}),
+         "vecchio": _vcs508({"parziali": ["2026-01-05"], "parziali_non_dichiarati": ["2026-01-05"]}),
+         "dichiarato": _vcs508({"parziali": [(_oggi508 - _td497(days=1)).isoformat()]})}
+check("v508 sorveglianza: un giorno raccolto a meta' e NON dichiarato suona (stale) per una settimana; dopo, e se e' "
+      "dichiarato, resta nominato nel riepilogo senza suonare: " + str({k: (v or {}).get("status") for k, v in _q508.items()}),
+      (_q508["ieri"] or {}).get("status") == "stale" and "a meta'" in (_q508["ieri"] or {}).get("note", "")
+      and _q508["vecchio"] is None and _q508["dichiarato"] is None and ud.CDS_PARZIALE_ETA == 7)
+
+# --- il composito MacroQuant non puo' far cadere la pipeline (21/10/2026: FRED giu', «100 - None», nove run morti)
+try:
+    _mq508 = ud.composito_macroquant({"indicators": [{"label": "A", "impact": 60}, {"label": "B", "impact": None},
+                                                     {"label": "C", "impact": "x"}],
+                                      "signposts": {"pct": None}, "buffett": {"score": 40}, "vix": {"value": None},
+                                      "fear_greed": {"score": 55}, "credit": {}, "smart_money": {"score": 70}})
+except Exception as _e508:  # noqa: BLE001 — e' proprio il guasto del 21/10: il check deve cadere col suo nome
+    _mq508 = {"eccezione": repr(_e508)}
+_mq508b = ud.composito_macroquant({"indicators": [{"label": "A", "impact": 60}], "signposts": {"pct": 30},
+                                   "vix": {"value": 20}, "fear_greed": {"score": 45}})
+check("v508 il composito MacroQuant con componenti senza valore NON solleva: entra cio' che e' un numero, il resto si "
+      "nomina fra gli assenti (i campanelli BofA a percentuale nulla, il 21/10, facevano morire tutta la pipeline): "
+      + str(_mq508),
+      _mq508 is not None and "eccezione" not in _mq508
+      and [c["label"] for c in _mq508.get("components") or []] == ["A", "Valutazione (Buffett)", "Fear & Greed",
+                                                                  "Smart Money (VIX+HY/IG+P/C)"]
+      and _mq508.get("assenti") == ["C", "Segnali ribassisti BofA", "Volatilità (VIX)"] and _mq508.get("score") == 56)
+check("v508 con tutte le componenti il composito e' quello di prima (stessa formula: BofA 100 meno la percentuale, VIX "
+      "100 meno valore/50) e non dichiara assenti; senza nessuna componente non esiste",
+      _mq508b["score"] == round((60 + 70 + 60 + 45) / 4) and "assenti" not in _mq508b
+      and [c["score"] for c in _mq508b["components"]] == [60, 70, 45, 60] and ud.composito_macroquant({}) is None)
+check("v508 senza il calendario di FRED nessun messaggio dice piu' che le uscite tornano proiettate o stimate: dalla v396 "
+      "sono 'dato non disponibile', e la frase sbagliata era quella che si leggeva il giorno in cui FRED non rispondeva",
+      all(x not in _SRC_UD_CODICE for x in ("PROIETTATE", "resta la proiezione", "restano stimate"))
+      and "le prossime uscite macro sono 'dato non disponibile'" in _SRC_UD_CODICE)
+check("v508 collegamento: fetch_macro passa dal composito che non cade, e la sottrazione nuda sui campanelli non c'e' piu'",
+      "_mq = composito_macroquant(macro)" in _SRC_UD_CODICE
+      and '100 - macro["signposts"]["pct"]' not in _SRC_UD_CODICE)
+check("v508 collegamento: aggiorna_cds unisce TUTTI i giorni della lettura (unisci_storia_cds su righe_storia_cds), il "
+      "ripiego legge per entita' (lettura_da_storia), il riepilogo nomina i giorni a meta'; la funzione che rifiutava "
+      "il giorno gia' scritto non esiste piu'",
+      "storia, esito = unisci_storia_cds(storia, righe_storia_cds(lettura, tasso))" in _SRC_UD_CODICE
+      and "lettura = lettura_da_storia(storia)" in _SRC_UD_CODICE
+      and '"storia": riepilogo_storia_cds(storia)' in _SRC_UD_CODICE and "aggiungi_storia_cds" not in _SRC_UD_CODICE)
+# la ricevuta della ricostruzione (v508): i quattro giorni raccolti a meta' lo dichiarano nel file vero, e i tre
+#   ricostruiti dai run della sera portano gli indici e la loro fonte. Quando il tetto li togliera' (fra due anni) la
+#   ricevuta non ha piu' oggetto, e lo dice.
+_reale508 = {r["d"]: r for r in ud.leggi_storia_cds()}
+_tolti508 = bool(_reale508) and min(_reale508) > "2026-10-19"
+check("v508 la ricevuta della ricostruzione nel file vero: 19, 20, 21 e 22/10/2026 dichiarano di essere stati raccolti "
+      "a meta'; 19, 20 e 22 portano gli indici CDX e la fonte col commit del run della sera"
+      + (" — (righe gia' uscite dal tetto dello storico)" if _tolti508 else ""),
+      _tolti508 or (all((_reale508.get(d) or {}).get("parziale") for d in ("2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22"))
+                    and all("commit " in ((_reale508.get(d) or {}).get("ricostruiti") or {}).get("fonte", "")
+                            and set((_reale508.get(d) or {}).get("i") or {}) == {"IG", "HY"}
+                            for d in ("2026-10-19", "2026-10-20", "2026-10-22"))))
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

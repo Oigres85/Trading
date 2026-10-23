@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "500";
+const BUILD_VERSION = "508";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5539,9 +5539,18 @@ function rigaCds(c, meta) {
   const p = Number(c.punti);
   const punti = !Number.isFinite(p) ? "punti n.d." : Math.abs(p) < 0.005 ? "alla pari"
     : `${fmtNum.format(Math.round(Math.abs(p) * 100) / 100)} punti ${p > 0 ? "pagati" : "ricevuti"} in anticipo`;
-  const pz = [c.pb != null ? `${pbTxt(c.pb)} pb` : "spread n.d. (nel run mancava il tasso: resta il prezzo)",
+  /* v508 — lo spread n.d. con la causa VERA, che la pipeline dichiara: fino alla v507 la riga diceva "nel run mancava
+     il tasso" anche col tasso presente (Repubblica Italiana, 23/10/2026) */
+  const pbNd = c.pb_perche ? `spread n.d. (${c.pb_perche}: resta il prezzo)`
+    : ((meta || {}).tasso_pct == null ? "spread n.d. (nel run mancava il tasso: resta il prezzo)"
+      : "spread n.d. (questo run della pipeline non dichiara perche': resta il prezzo)");
+  const pz = [c.pb != null ? `${pbTxt(c.pb)} pb` : pbNd,
     `prezzo ${fmtNum.format(Math.round(Number(c.prezzo) * 100) / 100)} su cedola ${c.cedola_pb} (${punti}), `
       + `${c.entita} [${c.contratto}], ${dataBreveCds(c.data)}`];
+  /* v508 — ICE pubblica lo stesso giorno a ondate, per area: un nome americano alle 09 UTC e' ancora al giorno prima */
+  if (c.ultima_ice)
+    pz.push(`ICE ha gia' pubblicato il ${dataBreveCds(c.ultima_ice)} per altre aree: questo nome e' ancora al `
+      + `${dataBreveCds(c.data)}, e le sue misure finiscono quel giorno`);
   if (c.indicativo)
     pz.push(`⚠ oltre ${pbTxt((meta || {}).punti_max)} punti anticipati lo spread dipende dal recupero assunto: vale il prezzo`);
   /* la cedola dice in che fascia il mercato tratta il nome: 100 pb come investment grade, 500 come high yield */
@@ -5569,24 +5578,32 @@ function rigaCdsMacro(m) {
   const pzI = ["IG", "HY"].filter((f) => ind[f]).map((f) => {
     const v = variazioniCds(ind[f].var);
     return `CDX ${f === "IG" ? "investment grade" : "high yield"} serie ${ind[f].serie} ${pbTxt(ind[f].pb)} pb`
+      + (ind[f].data && ind[f].data !== m.data ? ` [al ${dataBreveCds(ind[f].data)}]` : "")
       + (v.length ? ` (${v.join(", ")})` : "");
   });
   const pos = ((DATA && DATA.watchlist) || []).filter((r) => r && r.cds && numero(r.qta) > 0);
   const q = pos.filter((r) => r.cds.stato === "quotato").map((r) => {
     const v5 = (r.cds.var || {})["5"];
     return `${r.ticker} ${pbTxt(r.cds.pb)} pb`
+      + (r.cds.data && r.cds.data !== m.data ? ` [al ${dataBreveCds(r.cds.data)}]` : "")
       + (v5 && v5.pb != null ? ` (${v5.pb > 0 ? "+" : ""}${pbTxt(v5.pb)} in 5 giorni)` : "");
   });
   const a = pos.filter((r) => r.cds.stato === "assente").map((r) => r.ticker);
   const altri = pos.filter((r) => !["quotato", "assente"].includes(r.cds.stato)).map((r) => `${r.ticker} (${r.cds.stato})`);
   const btp = ((DATA && DATA.portfolio) || []).find((r) => r && r.cds && r.cds.stato === "quotato");
   const st = m.storia || {};
-  return `- CDS a 5 anni [ICE Clear Credit, prezzi pubblici di fine giornata del ${dataBreveCds(m.data)}; ${convenzioneCds(m)}]: `
+  /* v508 — i giorni raccolti a meta' si nominano: un nome assente quei giorni non e' stato letto */
+  const recenti = Array.isArray(st.parziali_recenti) ? st.parziali_recenti : st.parziali;
+  const parz = Array.isArray(recenti) && recenti.length
+    ? `, di cui raccolti a meta' ${recenti.map(dataBreveCds).join(", ")}` : "";
+  const ondate = Object.keys(m.date || {}).length > 1
+    ? "; ICE pubblica per area in momenti diversi, e ogni valore porta la data della sua ultima pubblicazione" : "";
+  return `- CDS a 5 anni [ICE Clear Credit, prezzi pubblici di fine giornata del ${dataBreveCds(m.data)}${ondate}; ${convenzioneCds(m)}]: `
     + `indici ${pzI.join(" · ") || "n.d."}. Posizioni del libro quotate: ${q.join(" · ") || "nessuna"}`
     + (a.length ? `; senza CDS compensato a ICE: ${a.join(", ")}` : "")
     + (altri.length ? `; ${altri.join(", ")}` : "")
     + (btp ? `. Repubblica Italiana (emittente del BTP) ${pbTxt(btp.cds.pb)} pb` : "")
-    + `. Storico raccolto dalla pipeline dal ${dataBreveCds(st.dal)} (${st.giorni || 0} ${st.giorni === 1 ? "giorno" : "giorni"}): ICE non pubblica lo `
+    + `. Storico raccolto dalla pipeline dal ${dataBreveCds(st.dal)} (${st.giorni || 0} ${st.giorni === 1 ? "giorno" : "giorni"}${parz}): ICE non pubblica lo `
     + `storico gratis, e le variazioni compaiono quando i giorni raccolti bastano.`;
 }
 
@@ -5667,7 +5684,7 @@ function renderCredito() {
         <td>${M(r.oneri)}${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
         <td class="${r.var4 != null && r.var4 >= 25 && r.conta ? "neg" : ""}">${r.var4 == null || r.var4 <= -100 ? "—" : signTxt(r.var4)}</td>
         <td class="${r.corrente != null && r.liq && r.liq.v < r.corrente ? "neg" : ""}">${M(r.corrente)}<span class="muted"> vs ${M(r.liq ? r.liq.v : null)}</span>${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
-        <td>${!r.cds ? `<span class="muted">n.d.</span>` : r.cds.stato === "quotato" ? `${pbTxt(r.cds.pb)} pb${(r.cds.var || {})["5"] && r.cds.var["5"].pb != null ? `<span class="muted"> · ${r.cds.var["5"].pb > 0 ? "+" : ""}${pbTxt(r.cds.var["5"].pb)} in 5 giorni</span>` : ""}` : r.cds.stato === "assente" ? `<span class="muted">nessun CDS</span>` : `<span class="muted">${esc(r.cds.stato)}</span>`}</td>
+        <td>${!r.cds ? `<span class="muted">n.d.</span>` : r.cds.stato === "quotato" ? `${pbTxt(r.cds.pb)} pb${r.cds.data && r.cds.data !== ((((DATA && DATA.macro) || {}).cds) || {}).data ? `<span class="muted"> · al ${dataBreveCds(r.cds.data)}</span>` : ""}${(r.cds.var || {})["5"] && r.cds.var["5"].pb != null ? `<span class="muted"> · ${r.cds.var["5"].pb > 0 ? "+" : ""}${pbTxt(r.cds.var["5"].pb)} in 5 giorni</span>` : ""}` : r.cds.stato === "assente" ? `<span class="muted">nessun CDS</span>` : `<span class="muted">${esc(r.cds.stato)}</span>`}</td>
       </tr>`).join("")
     + `</tbody></table>`;
   const altreValute = [...new Set(righe.filter((r) => r.val && r.val !== "USD").map((r) => r.val))];

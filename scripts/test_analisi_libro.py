@@ -7246,6 +7246,74 @@ check("v507 collegamento: calcola prende la fine da seduta_comune, la passa alla
       'dq, avanti = seduta_comune(S, [x["t"] for x in B["QQQ"]])' in _calc507 and '"avanti": avanti' in _calc507
       and "hanno gia' una barra piu' recente nello storico della fonte" in _src507)
 
+# ============================ v508 — ICE A ONDATE: la resa dei CDS nelle schede, nel brief e nella regola ============================
+# ICE pubblica lo stesso giorno a ondate (Asia-Pacifico, Europa, Nord America con gli indici); dal 19 al 22/10/2026 la
+# pipeline teneva solo la prima. La pipeline ora porta la data di ogni nome, i giorni raccolti a meta' coi loro motivi e la
+# causa vera di uno spread mancante (provati in test_update_data.py); qui la resa. Lo stato si COSTRUISCE (v425).
+_mot508a = "solo l'ondata Asia-Pacifico di ICE e, ricostruiti dal data.json del run della sera, i nomi seguiti e gli indici CDX"
+_mot508b = "solo l'ondata Asia-Pacifico di ICE: la sera la pipeline era caduta"
+_meta508 = {**_meta497, "data": "2026-10-23", "date": {"2026-10-23": 343, "2026-10-22": 354},
+            "indici": {"IG": {"serie": 47, "pb": 61.0, "data": "2026-10-22", "var": {}}},
+            "storia": {"giorni": 6, "dal": "2026-10-16", "in_corso": "2026-10-23",
+                       "parziali": ["2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22"],
+                       "parziali_motivi": {"2026-10-19": _mot508a, "2026-10-20": _mot508a, "2026-10-21": _mot508b,
+                                           "2026-10-22": _mot508a},
+                       "ricostruiti": {"2026-10-19": "data.json del run delle 22:46 UTC (commit 51ea54b)"}}}
+_t508 = SP.riferimento_cds({"cds": _meta508})
+check("v508 l'intestazione dei CDS dice che ICE pubblica per area (quante entita' per giorno), da' all'indice la sua data, "
+      "nomina i giorni raccolti a meta' raggruppati per motivo con le fonti delle ricostruzioni, e il giorno in corso",
+      "ultima pubblicazione letta: giorno di compensazione 23/10" in _t508
+      and "343 entita' al 23/10, 354 entita' al 22/10" in _t508 and "61 pb [al 22/10]" in _t508
+      and "19/10, 20/10, 22/10: " + _mot508a in _t508 and "21/10: " + _mot508b in _t508
+      and "ricostruiti da: 19/10 ← data.json del run delle 22:46 UTC (commit 51ea54b)" in _t508
+      and "il 23/10 e' in corso" in _t508, _t508)
+_t508v = SP.riferimento_cds({"cds": {**_meta508, "storia": {**_meta508["storia"], "parziali_recenti": ["2026-10-21"],
+                                                              "parziali_vecchi": 3}}})
+check("v508 quando lo storico separa i giorni a meta' recenti dai vecchi, l'intestazione nomina solo i recenti (coi "
+      "loro motivi) e conta i vecchi; le fonti delle ricostruzioni seguono i nominati",
+      "21/10: " + _mot508b in _t508v and "19/10, 20/10, 22/10" not in _t508v and "ricostruiti da" not in _t508v
+      and "piu' 3 giorni raccolti a meta' piu' vecchi" in _t508v, _t508v)
+_t508b = SP.riferimento_cds({"cds": {**_meta497, "date": {"2026-10-16": 697}}})
+check("v508 con una pubblicazione sola, completa, l'intestazione non parla di ondate ne' di giorni a meta'",
+      "per area" not in _t508b and "raccolti a meta'" not in _t508b and "in corso" not in _t508b, _t508b)
+_r508 = SP.riga_cds({"cds": {**_q497["cds"], "data": "2026-10-22", "ultima_ice": "2026-10-23"}}, _meta508)
+check("v508 la riga del nome ancora al giorno prima lo dice (alle 09 UTC un nome americano e' ancora a ieri) e dice che "
+      "le sue misure finiscono quel giorno; un nome al giorno nuovo non lo dice",
+      "ICE ha gia' pubblicato il 23/10 per altre aree: questo nome e' ancora al 22/10" in _r508
+      and "per altre aree" not in SP.riga_cds(_q497, _meta508), _r508)
+_pbn508 = SP.riga_cds({"cds": {**_q497["cds"], "pb": None,
+                               "pb_perche": "il giorno del prezzo (2026-10-23) non e' nello storico raccolto"}}, _meta508)
+_pbt508 = SP.riga_cds({"cds": {**_q497["cds"], "pb": None}}, {**_meta508, "tasso_pct": None})
+_pbx508 = SP.riga_cds({"cds": {**_q497["cds"], "pb": None}}, _meta508)
+check("v508 lo spread n.d. con la causa VERA dichiarata dalla pipeline; 'mancava il tasso' solo quando il tasso manca "
+      "davvero (il 23/10 la Repubblica Italiana lo diceva col tasso presente); senza causa dichiarata non se ne inventa una",
+      "non e' nello storico raccolto; resta il prezzo" in _pbn508 and "mancava il tasso" not in _pbn508
+      and "nel run mancava il tasso" in _pbt508 and "non dichiara perche'" in _pbx508 and "mancava il tasso" not in _pbx508,
+      _pbn508 + " | " + _pbt508 + " | " + _pbx508)
+_rb508 = brief.righe_credito({"stato": "ok", "eventi": [], "con_cds": ["CRWV"], "giorni": 6,
+                              "servono": {"finestra5": 6, "finestra": 22}, "parziali": ["2026-10-19", "2026-10-21"]})
+check("v508 il brief dice quanti giorni dello storico dei CDS sono raccolti a meta' e quali: un 'nessun evento' su giorni "
+      "non letti non vuol dire 'nessun rincaro'",
+      any("6 giorni (di cui 2 raccolti a meta': 19/10, 21/10" in x for x in _rb508), " | ".join(_rb508))
+with tempfile.TemporaryDirectory() as _d508:
+    _f508 = Path(_d508) / "data.json"
+    _f508.write_text(_json.dumps({"macro": {"cds": {"storia": {"giorni": 70, "parziali": ["2026-01-01", "2026-10-20"],
+                                                               "parziali_recenti": ["2026-10-20"]}}},
+                                  "watchlist": [{"ticker": "CRWV", "cds": {"stato": "quotato",
+                                                                           "finestra": {"stato": "storico corto", "n": 21, "servono": 22}}}]}),
+                     encoding="utf-8")
+    _cb508 = brief.credito_dalla_pipeline(["CRWV"], str(_f508))
+check("v508 collegamento: il brief legge i giorni raccolti a meta' dal riepilogo della pipeline",
+      _cb508.get("parziali") == ["2026-10-20"] and _cb508.get("giorni") == 70, str(_cb508))
+_p508 = NL.prova_cds({"cds": {"stato": "quotato", "pb": 100.0, "finestra": {"stato": "storico corto", "n": 21, "giorni": 6,
+                                                                            "servono": 22, "dal": "2026-10-16", "giorni_nome": 3}}})
+_p508b = NL.prova_cds({"cds": {"stato": "quotato", "pb": 100.0, "finestra": {"stato": "storico corto", "n": 21, "giorni": 6,
+                                                                             "servono": 22, "dal": "2026-10-16", "giorni_nome": 6}}})
+check("v508 la prova del CDS non ancora in funzione dice in quanti dei giorni raccolti c'e' il nome, quando non sono tutti: "
+      "un giorno raccolto a meta' conta fra i giorni dello storico, non per lui",
+      "il nome in 3" in _p508["perche"] and _p508.get("in_attesa") and "il nome in" not in _p508b["perche"],
+      _p508["perche"] + " | " + _p508b["perche"])
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

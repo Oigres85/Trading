@@ -747,7 +747,11 @@ def credito_dalla_pipeline(tickers, percorso=None):
     except Exception as e:
         return {"stato": f"data.json non leggibile ({str(e)[:40]})", "eventi": []}
     righe = {r.get("ticker"): r for r in (d.get("watchlist") or []) if isinstance(r, dict)}
-    giorni = (((d.get("macro") or {}).get("cds") or {}).get("storia") or {}).get("giorni")
+    _sto = (((d.get("macro") or {}).get("cds") or {}).get("storia") or {})
+    giorni = _sto.get("giorni")
+    # v508 — i giorni raccolti a meta' si dicono anche qui: quelli dentro le finestre delle misure (uno snapshot
+    #   precedente alla divisione porta solo l'elenco intero)
+    parziali = (_sto.get("parziali_recenti") if "parziali_recenti" in _sto else _sto.get("parziali")) or []
     eventi, con_cds, servono = [], [], {}
     for tk in tickers:
         r = righe.get(tk)
@@ -760,7 +764,8 @@ def credito_dalla_pipeline(tickers, percorso=None):
             if f.get("n") is not None:
                 servono.setdefault(chiave, f.get("servono") or f["n"] + 1)
         eventi.extend((tk, testo) for tipo, testo in credito.segnali(r) if tipo == "evento")
-    return {"stato": "ok", "eventi": eventi, "con_cds": con_cds, "giorni": giorni, "servono": servono}
+    return {"stato": "ok", "eventi": eventi, "con_cds": con_cds, "giorni": giorni, "servono": servono,
+            "parziali": parziali}
 
 
 def righe_credito(cr):
@@ -778,7 +783,10 @@ def righe_credito(cr):
     if g is not None and sv and g < max(sv.values()):
         parti = [f"{nome} si misura da {sv[k]} giorni" if k in sv else f"{nome}: la pipeline non la pubblica ancora"
                  for k, nome in (("finestra5", "la settimana"), ("finestra", "il mese"))]
-        out.append(f"  storico dei CDS raccolto: {g} {'giorno' if g == 1 else 'giorni'} — {', '.join(parti)}: prima, il "
+        pz = cr.get("parziali") or []
+        _parz = (f" (di cui {len(pz)} raccolti a meta': " + ", ".join(f"{x[8:10]}/{x[5:7]}" for x in pz)
+                 + " — un nome assente quei giorni non e' stato letto)") if pz else ""
+        out.append(f"  storico dei CDS raccolto: {g} {'giorno' if g == 1 else 'giorni'}{_parz} — {', '.join(parti)}: prima, il "
                    "silenzio qui NON vuol dire 'nessun rincaro'")
     return out
 

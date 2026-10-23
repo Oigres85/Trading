@@ -10400,6 +10400,69 @@ check("v497 nel codice nessuna frase dice piu' che il CDS e' un dato a pagamento
   return (codice.match(/rigaCds\(/g) || []).length >= 2 || no("rigaCds non e' usata dal pacchetto del titolo");
 })());
 
+/* ═══ v508 — ICE PUBBLICA A ONDATE: LA DATA DI OGNI NOME, I GIORNI A META', LA CAUSA DELLO SPREAD MANCANTE ═════════
+   ICE pubblica lo stesso giorno per area (Asia-Pacifico, Europa, Nord America con gli indici): la pipeline ora porta la
+   data di ogni nome e dell'indice, i giorni raccolti a meta' e la causa vera di uno spread mancante; app.js rende e basta.
+   Lo stato si COSTRUISCE (v425): nei dati del giorno quei casi possono non esserci. */
+check("v508 pacchetto del titolo: lo spread mancante dice la causa che la pipeline dichiara, 'mancava il tasso' solo se il tasso manca davvero, e un nome ancora al giorno prima lo dice",
+  suVeriEsito(`
+    const r = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+    const base = { stato: "quotato", codice: "COREWEI", entita: "COREWEAVE INC", contratto: "SNRFOR.USD.XR14", cedola_pb: 500,
+      prezzo: 80.9439, punti: 19.06, pb: null, indicativo: false, data: "2026-10-22", var: {}, storia: { giorni: 1 } };
+    DATA.macro.cds = { fonte: "ICE", letto: true, data: "2026-10-23", tasso_pct: 3.88, recupero: 0.4, punti_max: 30,
+      storia: { giorni: 6, dal: "2026-10-16" }, indici: {} };
+    const rigaDi = () => buildPromptTicker(r.ticker).split(String.fromCharCode(10)).find(l => l.indexOf("- CDS A 5 ANNI") === 0) || "";
+    r.cds = Object.assign({}, base, { pb_perche: "il giorno del prezzo (2026-10-23) non e' nello storico raccolto", ultima_ice: "2026-10-23" });
+    const a = rigaDi();
+    if (a.indexOf("non e' nello storico raccolto: resta il prezzo") < 0) return "la causa dichiarata non c'e': " + a.slice(0, 220);
+    if (a.indexOf("mancava il tasso") >= 0) return "dice 'mancava il tasso' col tasso presente";
+    if (a.indexOf("ICE ha gia' pubblicato il 23/10 per altre aree: questo nome e' ancora al 22/10") < 0) return "il nome al giorno prima non lo dice: " + a.slice(0, 260);
+    r.cds = Object.assign({}, base);
+    if (rigaDi().indexOf("non dichiara perche'") < 0) return "senza causa dichiarata se ne inventa una";
+    DATA.macro.cds.tasso_pct = null;
+    return rigaDi().indexOf("nel run mancava il tasso") >= 0 || "col tasso davvero assente non lo dice";`));
+
+check("v508 pacchetto macro: la data di un nome o di un indice che ICE non ha ancora ripubblicato, le ondate e i giorni raccolti a meta' si dicono nella riga dei CDS",
+  suVeriEsito(`
+    const pos = DATA.watchlist.filter(x => x && x.qta > 0);
+    if (pos.length < 2) return "servono due posizioni";
+    DATA.watchlist.forEach(x => { delete x.cds; });
+    pos[0].cds = { stato: "quotato", pb: 97.0, data: "2026-10-22", var: {} };
+    pos[1].cds = { stato: "quotato", pb: 60.0, data: "2026-10-23", var: {} };
+    DATA.macro.cds = { letto: true, data: "2026-10-23", date: { "2026-10-23": 343, "2026-10-22": 354 }, tasso_pct: 3.88,
+      recupero: 0.4, storia: { giorni: 70, dal: "2026-08-16", parziali: ["2026-08-20", "2026-10-19", "2026-10-21"],
+        parziali_recenti: ["2026-10-19", "2026-10-21"], parziali_vecchi: 1 },
+      indici: { IG: { serie: 47, pb: 62, data: "2026-10-22" }, HY: { serie: 47, pb: 354, data: "2026-10-23" } } };
+    const riga = buildPrompt().split(String.fromCharCode(10)).find(l => l.indexOf("- CDS a 5 anni [ICE Clear Credit") === 0) || "";
+    if (!riga) return "manca la riga dei CDS nel macro";
+    const att = [pos[0].ticker + " 97 pb [al 22/10]", "CDX investment grade serie 47 62 pb [al 22/10]",
+      "ICE pubblica per area in momenti diversi", "di cui raccolti a meta' 19/10, 21/10"];
+    for (const p of att) if (riga.indexOf(p) < 0) return "nella riga manca: " + p + " — " + riga.slice(0, 300);
+    if (riga.indexOf("20/08") >= 0) return "nomina un giorno a meta' fuori dalle finestre delle misure";
+    if (riga.indexOf(pos[1].ticker + " 60 pb [al") >= 0) return "un nome al giorno nuovo porta una data che non serve";
+    return riga.indexOf("CDX high yield serie 47 354 pb [al") < 0 || "un indice al giorno nuovo porta una data che non serve";`));
+
+check("v508 pagina: nella tabella del credito il CDS di un nome ancora al giorno prima porta la sua data",
+  suVeriEsito(`
+    const pos = (DATA.watchlist || []).filter(r => r && r.qta > 0 && numero(r.controvalore) > 0);
+    if (pos.length < 2) return "servono due posizioni";
+    const a = pos[0], b = pos[1];
+    a.credito = { copertura: 2.5, oneri_ttm: 0.4e9, debito_corrente: 2e9 };
+    b.credito = { copertura: 3, oneri_ttm: 0.1e9, debito_corrente: 0.5e9 };
+    DATA.macro.cds = { letto: true, data: "2026-10-23" };
+    a.cds = { stato: "quotato", pb: 1139.1, data: "2026-10-22", var: {} };
+    b.cds = { stato: "quotato", pb: 60.0, data: "2026-10-23", var: {} };
+    const presi = {};
+    const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "" });
+    const q = document.querySelector;
+    document.querySelector = (s) => finto(s);
+    try { renderCredito(); } finally { document.querySelector = q; }
+    const t = finto("#credito-tabella").innerHTML;
+    if (t.indexOf("1139 pb") < 0) return "il quotato non porta i punti base";
+    if (t.indexOf("al 22/10") < 0) return "il nome al giorno prima non porta la sua data";
+    if (t.indexOf("al 23/10") >= 0) return "la data compare anche dove non serve";
+    return t.split("al 22/10").length === 2 || "la data del nome compare piu' di una volta";`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

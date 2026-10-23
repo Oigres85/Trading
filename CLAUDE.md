@@ -8194,3 +8194,90 @@ Ora `seduta_comune` prende l'ultima seduta che TUTTE le serie portano, e chi va 
 il periodo — non sparisce (v406). Con le serie allineate non cambia niente; un buco nel mezzo non sposta la fine; senza una
 seduta comune nessuna data inventata. Lo stato si costruisce (il fenomeno dipende dall'ora in cui gira la suite, v402):
 tre controlli, due iniezioni — la fine presa di nuovo dal riferimento, il collegamento tolto — mordono entrambe.
+
+## 🌊 v508 — ICE PUBBLICA A ONDATE E LO STORICO TENEVA SOLO LA PRIMA; E «100 − None» HA FERMATO LA PIPELINE PER UNA SERA
+
+Trovato rileggendo l'analisi del 23/10 come il destinatario: i CDS dei nomi americani risultavano «non quotati oggi», il
+loro storico si fermava al 16/10, e la Repubblica Italiana usciva «senza tasso» col tasso presente. Due difetti, e il
+secondo ha aggravato il primo.
+
+### 1. Le ondate di ICE, misurate sui `data.json` dei run del 22/10
+| ondata | compare fra i run delle (UTC) | entità di ICE al giorno nuovo |
+|---|---|---|
+| Asia-Pacifico | già al primo run del mattino (09:15) | 51 |
+| Europa | 14:19 → 17:46 | 343 |
+| Nord America, con gli indici CDX | 19:50 → 21:00 | 697 (di cui ~430 col contratto standard in dollari, quelle che lo storico raccoglie) |
+
+Due difetti in fila: `leggi_cds_ice` teneva **la sola data più recente** — per tutto il giorno i nomi americani, ancora al
+giorno prima, uscivano «non quotati oggi» — e `aggiungi_storia_cds` scriveva un giorno alla prima lettura e **rifiutava
+le successive** («è la stessa pubblicazione»). Dal 19 al 22/10 lo storico ha tenuto 51 entità su ~430 e nessun indice,
+mentre i run della sera leggevano la pubblicazione intera e la buttavano.
+
+> ⚠⚠ **«Un giorno non letto è perso per sempre» era scritto nel commento della v497. Questi giorni erano stati letti, e
+> buttati da una regola di deduplica.** Una deduplica scritta su un'ipotesi («le letture dello stesso giorno sono la
+> stessa pubblicazione») è una perdita di dati che si presenta come una pulizia.
+
+**La correzione**: ogni entità porta i contratti della **sua** ultima data (l'ultimo dato ufficiale con la sua data,
+v396); lo storico si **completa per data** — entità e indici che mancano entrano, quelli già raccolti non cambiano
+(misurato: i 51 prezzi delle 09:11 del 23/10 coincidono al centesimo con quelli delle 21:24); le misure di un nome
+(finestre, variazioni, rango) si fanno sullo storico **fino alla data del nome**; il ripiego senza ICE legge per entità;
+il riepilogo **nomina** i giorni raccolti a metà col motivo della riga; un giorno a metà non dichiarato fa suonare
+`cds_storia` per una settimana. E lo spread mancante dice la causa **vera** (`pb_perche`): l'Italia del 23/10 non era
+«senza tasso», mancava nella riga delle 09:11.
+⚠ Un giorno a metà si nomina finché cade dentro le finestre delle misure (64 giorni raccolti, la più lunga delle
+variazioni più uno): oltre, si conta. Nominarlo ogni giorno per due anni sarebbe un avviso che suona sempre (v421, v427).
+
+### 2. FRED non rispondeva, e una sottrazione fuori da ogni `try` ha fermato tutto
+Il 21/10 fra le 17:43 e le 23:54 UTC **dieci run di fila** non hanno scritto niente — nove morti con `TypeError:
+unsupported operand type(s) for -: 'int' and 'NoneType'`, uno annullato —: FRED restituiva risposte non JSON, i
+campanelli BofA uscivano con la percentuale nulla e il composito MacroQuant faceva `100 - macro["signposts"]["pct"]`. I
+dati sono rimasti fermi al run delle 14:18 fino alle 09:15 del giorno dopo, e con loro si sono perse le ondate europea e
+nordamericana dei CDS di quel giorno. L'allarme ha funzionato (Issue #208 aperta e commentata a ogni caduta), ma la
+pipeline è ripartita da sola il mattino dopo, quando FRED è tornato: nessuno ha corretto la causa.
+`composito_macroquant()` prende solo le componenti che sono numeri e **nomina le assenti** (v406).
+
+⚠⚠ **Provato dall'inizio alla fine, non per sezione.** In una copia del repo la pipeline è girata per intero con FRED reso
+irraggiungibile come quel giorno — `http_get` che per `stlouisfed.org` restituisce una risposta il cui `.json()` solleva,
+e una chiave finta perché il codice prenda la strada JSON del CI (senza chiave prende quella CSV, che con una risposta
+vuota **non solleva**: il giro avrebbe provato un'altra cosa). Esito sul codice definitivo:
+**nessuna eccezione**, `data.json` scritto, e `data_quality` suona su sette voci (PCE, PIL, Fed Funds, SLOOS, NFCI, CCC,
+calendario); il composito pubblica 49 e nomina la componente assente. L'ottava voce del primo giro — lo storico
+dei CDS a metà — tace, perché ora quei giorni sono dichiarati. Il composito era l'unico punto che faceva cadere tutto.
+⚠ E il primo giro era partito dalla copia **prima** della correzione: si sarebbe fermato sulla riga che conoscevo già, e
+l'ho fermato. *Un collaudo che si ferma al primo guasto noto non dice niente su quelli dopo.*
+
+⚠ **Lo stesso scenario ha smascherato tre frasi della v395** — «resta la proiezione», «le uscite macro tornano
+PROIETTATE», «le uscite restano stimate» — che dalla v396 dicono il contrario del vero: senza calendario la prossima
+uscita è «dato non disponibile». Erano le frasi che si leggono proprio il giorno in cui FRED non risponde.
+
+### La ricostruzione, e cosa resta perso
+I `data.json` dei run serali del 19, 20 e 22/10 sono nella storia di git e portano, per i nomi seguiti, il contratto
+standard di quel giorno e gli indici CDX. Ricostruiti i nomi seguiti — **28 in più dei 51 del mattino** — e gli indici
+per ciascuno dei tre giorni, con due verifiche prima di scrivere: tutti i run della stessa sera danno gli stessi prezzi,
+e SK hynix e TSMC — gli unici nomi seguiti già nella riga del mattino — coincidono al centesimo. Le righe lo dichiarano
+(`parziale`, `ricostruiti` col commit).
+**Perso**: le altre ~350 entità di quei tre giorni, e del 21/10 tutto ciò che non è Asia-Pacifico (la pipeline era
+caduta, e ICE pubblica solo l'ultimo giorno). Il 23/10 è stato completato con la lettura viva di ICE **passando dal
+codice nuovo**: +386 entità e i due indici.
+
+### 🦴 Due gate della v497 pinnavano il difetto
+«La lettura tiene UN giorno solo (il più recente)» e «lo stesso giorno non si riscrive (è la stessa pubblicazione)»:
+chiedevano esattamente il comportamento che buttava i dati. *Un gate che pinna un difetto lo rende permanente* (v326,
+v411, v415, v422, v441). Riagganciati all'invariante vero — **un prezzo già raccolto non cambia** — e le fixture dei
+giorni «completi» hanno ora l'indice: un giorno senza indici, nella semantica nuova, è raccolto a metà.
+
+### 🧪 Il metodo
+- Gli stati si **costruiscono** (v425): la lettura delle 09 UTC con l'Asia-Pacifico al giorno nuovo, quella della sera, la
+  riga a metà, il nome il cui giorno non è nello storico, il composito con componenti nulle o non numeriche.
+- **41 iniezioni**, una alla volta per copia, su copie separate del repo verificate per impronta, ripristino da snapshot:
+  **mordono tutte**, ciascuna sul controllo atteso — una solo dopo la correzione del controllo (sotto).
+- ⚠ **Un mio gate faceva morire la suite invece di cadere col suo nome**: passava una LISTA come dettaglio a `check()`,
+  che la concatena a una stringa. L'ha trovato l'iniezione, non la rilettura (v407, v471).
+- ⚠ E un gate della pagina è morto per eccezione al primo giro: `\/` dentro un template passato al vm diventa `/` e spezza
+  la regex (v406, v422). Riscritto con `indexOf`.
+- ⚠ Due sonde mie sbagliate prima di accusare il codice (v433): l'ordine delle componenti del composito, e il dizionario
+  dello «storico corto» del gate v498, che ha un campo in più (`giorni_nome`).
+- ⚠ **E la nota di lavoro di questa versione diceva «sette ore senza dati»**: i run caduti coprono sei ore, i dati sono
+  rimasti fermi diciannove. Corretta contando i run dall'API invece che ricordandoli.
+- Pavimenti: `test_app.mjs` 615 (628 punti di chiamata), `test_update_data.py` 330 (341) e N_CHECKS_MINIMO 345 (353
+  eseguiti), `test_analisi_libro.py` 805 (819). `?v=` e `BUILD_VERSION` a 508: cambia `assets/app.js`.

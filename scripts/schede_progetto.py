@@ -651,7 +651,14 @@ def riferimento_cds(macro):
     if not c:
         return ("CDS a 5 anni: il run della pipeline non li porta — non e' 'nessun CDS', e' il dato che manca")
     pz = [f"CDS a 5 anni (richiesta del CEO del 17/10/2026: monitorare i CDS di posizioni e sorvegliati) — {c.get('fonte')}, "
-          f"giorno di compensazione {_data_breve(c.get('data'))}"]
+          f"ultima pubblicazione letta: giorno di compensazione {_data_breve(c.get('data'))}"]
+    # v508 — ICE pubblica lo stesso giorno a ondate, per area: quando la lettura porta piu' date lo si dice, perche'
+    #   «non ancora pubblicato» e «non quotato» si leggono uguali e non lo sono (v406)
+    dt = c.get("date") or {}
+    if len(dt) > 1:
+        pz.append("ICE pubblica per area in momenti diversi della giornata: "
+                  + ", ".join(f"{n} entita' al {_data_breve(d)}" for d, n in sorted(dt.items(), reverse=True))
+                  + " — ogni nome porta la data della sua ultima pubblicazione")
     if not c.get("letto"):
         pz.append(f"⚠ ICE NON letto nell'ultimo run ({c.get('errore') or 'motivo n.d.'}): valgono i prezzi dell'ultimo "
                   f"giorno raccolto, il {_data_breve(c.get('data'))}")
@@ -664,13 +671,34 @@ def riferimento_cds(macro):
     for fam, nome in (("IG", "CDX investment grade"), ("HY", "CDX high yield")):
         v = (c.get("indici") or {}).get(fam)
         if v:
-            ri.append(" ".join([f"{nome} serie {v.get('serie')} {_pb(v.get('pb'))} pb"] + _var_cds(v.get("var"))))
+            _al = f" [al {_data_breve(v.get('data'))}]" if v.get("data") and v.get("data") != c.get("data") else ""
+            ri.append(" ".join([f"{nome} serie {v.get('serie')} {_pb(v.get('pb'))} pb{_al}"] + _var_cds(v.get("var"))))
     if ri:
         pz.append("indici: " + " · ".join(ri))
     st = c.get("storia") or {}
     g = st.get("giorni") or 0
     pz.append(f"storico raccolto dalla pipeline dal {_data_breve(st.get('dal'))}: {g} {'giorno' if g == 1 else 'giorni'} "
               "— ICE non pubblica lo storico gratis, e le variazioni compaiono quando i giorni raccolti bastano")
+    # v508 — i giorni raccolti a meta' si NOMINANO: un nome assente quel giorno non era «non quotato», non e' stato letto
+    # i giorni a meta' DENTRO le finestre delle misure; quelli piu' vecchi si contano (uno snapshot precedente alla
+    #   divisione porta solo l'elenco intero)
+    _rec = st.get("parziali_recenti") if "parziali_recenti" in st else st.get("parziali")
+    if _rec:
+        # i giorni con lo stesso motivo insieme, il motivo come la riga dello storico lo dichiara
+        gruppi = {}
+        for d in _rec:
+            gruppi.setdefault((st.get("parziali_motivi") or {}).get(d) or "motivo non dichiarato", []).append(d)
+        pz.append("⚠ raccolti a meta' — un nome assente quei giorni non e' stato letto, e non vuol dire che ICE non lo "
+                  "quotasse: " + " · ".join(f"{', '.join(_data_breve(d) for d in ds)}: {m}" for m, ds in gruppi.items()))
+        _ric = {d: f for d, f in (st.get("ricostruiti") or {}).items() if d in _rec}
+        if _ric:
+            pz.append("ricostruiti da: " + ", ".join(f"{_data_breve(d)} ← {f}" for d, f in sorted(_ric.items())))
+    if st.get("parziali_vecchi"):
+        pz.append(f"piu' {st['parziali_vecchi']} {'giorno' if st['parziali_vecchi'] == 1 else 'giorni'} raccolti a meta' "
+                  "piu' vecchi, fuori dalle finestre delle misure")
+    if st.get("in_corso"):
+        pz.append(f"il {_data_breve(st['in_corso'])} e' in corso: ICE non ha ancora pubblicato gli indici CDX e i nomi "
+                  "nordamericani di quel giorno, che restano al giorno prima")
     if c.get("non_classificati"):
         pz.append(f"⚠ NON CLASSIFICATI in config/cds_entita.json: {', '.join(c['non_classificati'])} — vanno abbinati a mano")
     return " · ".join(pz)
@@ -693,10 +721,21 @@ def riga_cds(r, meta=None):
                 "spread a zero, e' il dato che manca")
     if st != "quotato":
         return "CDS 5 anni: NON CLASSIFICATO — il nome non e' in config/cds_entita.json, va abbinato a mano"
-    pz = [f"CDS 5 anni {_pb(c['pb'])} pb" if c.get("pb") is not None
-          else "CDS 5 anni: spread n.d. (nel run mancava il tasso; resta il prezzo)"]
+    # v508 — lo spread n.d. con la causa VERA (la pipeline la dichiara): fino alla v507 la riga scriveva «nel run
+    #   mancava il tasso» anche col tasso presente (Repubblica Italiana, 23/10/2026)
+    if c.get("pb") is not None:
+        pz = [f"CDS 5 anni {_pb(c['pb'])} pb"]
+    elif c.get("pb_perche"):
+        pz = [f"CDS 5 anni: spread n.d. ({c['pb_perche']}; resta il prezzo)"]
+    elif (meta or {}).get("tasso_pct") is None:
+        pz = ["CDS 5 anni: spread n.d. (nel run mancava il tasso; resta il prezzo)"]
+    else:
+        pz = ["CDS 5 anni: spread n.d. (questo run della pipeline non dichiara perche'; resta il prezzo)"]
     pz.append(f"prezzo {_n(c.get('prezzo'), 2)} su cedola {c.get('cedola_pb')} ({_punti_cds(c.get('punti'))}), "
               f"{c.get('entita')} [{c.get('contratto')}], {_data_breve(c.get('data'))}")
+    if c.get("ultima_ice"):
+        pz.append(f"ICE ha gia' pubblicato il {_data_breve(c['ultima_ice'])} per altre aree: questo nome e' ancora al "
+                  f"{_data_breve(c.get('data'))}, e le sue misure finiscono quel giorno")
     if c.get("indicativo"):
         pz.append(f"⚠ oltre {_n((meta or {}).get('punti_max'), 0)} punti anticipati lo spread dipende dal recupero "
                   "assunto: vale il prezzo")

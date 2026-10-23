@@ -3402,6 +3402,64 @@ STORICO_IND = [
 ]
 
 
+def _numero_o_none(x):
+    """Il valore come numero finito, o None: un campo nullo, una stringa o un NaN non sono un numero."""
+    try:
+        v = float(x)
+    except (TypeError, ValueError):
+        return None
+    return v if math.isfinite(v) else None
+
+
+def composito_macroquant(macro):
+    """MacroQuant (riproduzione trasparente stile BCA): composito del ciclo dai fattori macro disponibili. NON e' il
+    dato proprietario BCA Research.
+    ⚠⚠ v508 — UNA COMPONENTE SENZA VALORE NON PUO' FAR CADERE LA PIPELINE. Il 21/10/2026 FRED non rispondeva: i
+    campanelli BofA sono usciti con la percentuale nulla, «100 - None» ha sollevato TypeError fuori da ogni try, e la
+    pipeline e' morta nove volte di fila per sette ore — e con lei TUTTI gli altri dati, compresa l'ondata serale dei
+    CDS di quel giorno, persa per sempre (ICE non pubblica lo storico). Ora una componente entra solo se il suo valore
+    e' un numero, e quelle senza si NOMINANO (v406): un composito su meno componenti si legge uguale a uno completo, e
+    non lo e'."""
+    mq, assenti = [], []
+    for i in macro.get("indicators", []) or []:
+        if i.get("impact") is None:
+            continue
+        v = _numero_o_none(i.get("impact"))
+        if v is None:
+            assenti.append(i.get("label"))
+        else:
+            mq.append((i.get("label"), v))
+
+    def voce(nome, blocco, campo, f=lambda v: v):
+        b = macro.get(blocco)
+        if not b:
+            return
+        v = _numero_o_none(b.get(campo)) if isinstance(b, dict) else None
+        if v is None:
+            assenti.append(nome)
+        else:
+            mq.append((nome, f(v)))
+    voce("Valutazione (Buffett)", "buffett", "score")
+    voce("Segnali ribassisti BofA", "signposts", "pct", lambda v: 100 - v)
+    voce("Fear & Greed", "fear_greed", "score")
+    voce("Volatilità (VIX)", "vix", "value", lambda v: round(clamp(100 - v / 50 * 100)))
+    voce("Rischio Credito (HY)", "credit", "score")
+    voce("Smart Money (VIX+HY/IG+P/C)", "smart_money", "score")
+    if not mq:
+        return None
+    score = round(sum(s for _, s in mq) / len(mq))
+    out = {
+        "score": score,
+        "label": "Espansione" if score >= 60 else "Contrazione" if score <= 40 else "Rallentamento",
+        "components": [{"label": l, "score": round(s)} for l, s in mq],
+        "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici "
+                "(il MacroQuant ufficiale di BCA Research è proprietario e a pagamento).",
+    }
+    if assenti:
+        out["assenti"] = assenti
+    return out
+
+
 def fetch_macro():
     macro = {}
 
@@ -4171,9 +4229,14 @@ def fetch_macro():
             }
             print(f"   calendario FRED: {len(_cal)} indicatori con data di uscita CONFERMATA")
         else:
-            print("!! calendario FRED: nessuna data restituita, resta la proiezione", file=sys.stderr)
+            # v508 — dalla v396 il sistema non proietta piu' nessuna data: senza calendario la prossima uscita e'
+            #   «dato non disponibile». Questi messaggi dicevano il contrario («resta la proiezione»), ed e' la frase che
+            #   si legge proprio il giorno in cui FRED non risponde (21/10/2026)
+            print("!! calendario FRED: nessuna data restituita — le prossime uscite macro sono 'dato non disponibile' "
+                  "(nessuna data proiettata, v396)", file=sys.stderr)
     except Exception as e:  # noqa: BLE001
-        print(f"!! calendario FRED: {e} — le uscite restano stimate", file=sys.stderr)
+        print(f"!! calendario FRED: {e} — le prossime uscite macro sono 'dato non disponibile' (nessuna data "
+              "proiettata, v396)", file=sys.stderr)
 
     # ═══ v309 — STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE ═════════════════════════
     # Il CEO: "reinserisci scheda macro per stagionalita' mensile nasdaq100 e se puoi aggiungi
@@ -4877,31 +4940,10 @@ def fetch_macro():
 
     # MacroQuant (riproduzione trasparente stile BCA): composito del ciclo/risk dai
     # fattori macro disponibili. NON è il dato proprietario BCA Research.
-    mq = []
-    for i in macro.get("indicators", []):
-        if i.get("impact") is not None:
-            mq.append((i["label"], i["impact"]))
-    if macro.get("buffett"):
-        mq.append(("Valutazione (Buffett)", macro["buffett"]["score"]))
-    if macro.get("signposts"):
-        mq.append(("Segnali ribassisti BofA", 100 - macro["signposts"]["pct"]))
-    if macro.get("fear_greed"):
-        mq.append(("Fear & Greed", macro["fear_greed"]["score"]))
-    if macro.get("vix"):
-        mq.append(("Volatilità (VIX)", round(clamp(100 - macro["vix"]["value"] / 50 * 100))))
-    if macro.get("credit"):
-        mq.append(("Rischio Credito (HY)", macro["credit"]["score"]))
-    if macro.get("smart_money"):
-        mq.append(("Smart Money (VIX+HY/IG+P/C)", macro["smart_money"]["score"]))
-    if mq:
-        score = round(sum(s for _, s in mq) / len(mq))
-        macro["macroquant"] = {
-            "score": score,
-            "label": "Espansione" if score >= 60 else "Contrazione" if score <= 40 else "Rallentamento",
-            "components": [{"label": l, "score": round(s)} for l, s in mq],
-            "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici "
-                    "(il MacroQuant ufficiale di BCA Research è proprietario e a pagamento).",
-        }
+    # v508 — in una funzione che non cade su una componente senza valore (vedi composito_macroquant)
+    _mq = composito_macroquant(macro)
+    if _mq:
+        macro["macroquant"] = _mq
 
     try:
         macro["seasonality"] = fetch_seasonality()
@@ -5552,6 +5594,15 @@ def credito_ccc(serie):
 #   v498 — e 403 anche dai runner di GitHub (misurato il 17/10/2026 con una sonda su un ramo usa e getta),
 #   mentre l'archivio web ha solo due fotografie dell'API di ICE (maggio e luglio 2024): uno storico GRATUITO
 #   dei CDS su singolo nome non e' raggiungibile, e quello che serve alla tenuta lo raccoglie questa pipeline.
+# ⚠⚠ v508 — ICE PUBBLICA LO STESSO GIORNO A ONDATE, PER AREA, e ogni entita' porta la propria data. Misurato sui run
+#   dal 19 al 23/10/2026: verso le 09 UTC l'Asia-Pacifico (51 entita' coi contratti in dollari), fra le 14:20 e le 17:40
+#   l'Europa (343), fra le 19:50 e le 21:05 il Nord America con gli indici CDX (697). Fino alla v507 la lettura teneva
+#   la sola data piu' recente — per tutta la giornata, la prima ondata — e lo storico scriveva un giorno alla prima
+#   lettura e rifiutava le successive («e' la stessa pubblicazione»): dal 19 al 22/10 ha tenuto 51 entita' su ~430 e
+#   nessun indice, mentre i run della sera leggevano la pubblicazione intera e la buttavano. Ora ogni entita' porta i
+#   contratti della SUA ultima data, lo storico si COMPLETA per data, e le misure di un nome si fanno sullo storico fino
+#   alla data del nome. I prezzi di una giornata non cambiano fra le ondate: i 51 delle 09:11 del 23/10 coincidono al
+#   centesimo con quelli della sera.
 ICE_CDS_NOMI = "https://www.ice.com/api/cds-settlement-prices/icc-single-names"
 ICE_CDS_INDICI = "https://www.ice.com/api/cds-settlement-prices/icc-indexes"
 CDS_STORIA = ROOT / "data" / "cds_storia.jsonl"
@@ -5566,6 +5617,8 @@ CDS_RANGO_MIN = 60        # v501 — sotto, il percentile della settimana fra qu
 CDS_FAMIGLIA = {100: "IG", 500: "HY"}   # la cedola dice in che fascia il mercato tratta il nome
 CDS_STORIA_MINMAX = 20    # sotto, minimo e massimo dello storico raccolto non dicono niente
 CDS_DOC_PREF = ("XR14", "CR14", "MR14", "MM14", "XR", "CR", "MR", "MM")
+CDS_RIPIEGO_GIORNI = 5    # v508 — senza ICE, l'ultimo giorno di ogni entita' fra gli ultimi 5 raccolti
+CDS_PARZIALE_ETA = 7      # v508 — un giorno raccolto a meta' e non dichiarato suona per una settimana
 
 
 def _cds_date_standard(t0, scadenza):
@@ -5667,9 +5720,15 @@ def contratto_standard(contratti):
 
 
 def leggi_cds_ice(get=None):
-    """Una lettura di ICE: {'data', 'scadenza', 'entita': {codice: {'nome', 'contratti'}},
-    'indici', 'scartati'}. Un errore di rete si PROPAGA al chiamante, che lo dichiara: 'nessun
-    prezzo' e 'ICE non ha risposto' si leggono uguali e significano l'opposto (v389)."""
+    """Una lettura di ICE: {'data', 'scadenza', 'scadenze', 'date', 'entita': {codice: {'nome', 'data', 'contratti'}},
+    'indici', 'scartati'}. Un errore di rete si PROPAGA al chiamante, che lo dichiara: 'nessun prezzo' e 'ICE non ha
+    risposto' si leggono uguali e significano l'opposto (v389).
+    v508 — OGNI ENTITA' PORTA LA SUA DATA. ICE pubblica lo stesso giorno a ondate, per area (vedi in testa): fino alla
+    v507 qui si teneva la sola data piu' recente, e per tutta la giornata — fino all'ondata nordamericana della sera —
+    i nomi americani risultavano «non quotati oggi» mentre ICE pubblicava il loro prezzo del giorno prima. Ora ogni
+    entita' tiene i contratti della SUA ultima data: e' l'ultimo dato ufficiale, con la sua data (v396). Dentro una
+    entita' un contratto di una data piu' vecchia non entra e si conta fra gli scartati: mescolarli farebbe una
+    fotografia mai esistita (classe v186). 'data' e' la data piu' recente letta, 'date' quante entita' porta ciascuna."""
     get = get or (lambda u: http_get(u, tries=2, timeout=40))
     righe = get(ICE_CDS_NOMI).json()
     contr = []
@@ -5682,51 +5741,80 @@ def leggi_cds_ice(get=None):
         if s:
             s.update(prezzo=pz, data=str(x.get("clearingDate") or "")[:10], nome=x.get("name"))
             contr.append(s)
+    contr = [s for s in contr if s["data"]]
     if not contr:
-        return {"data": None, "scadenza": None, "entita": {}, "indici": {}, "scartati": 0}
-    data = max(s["data"] for s in contr)
-    # ⚠ un giorno solo: un contratto con una data diversa non e' dello stesso giorno, e mescolarli
-    #   farebbe una fotografia mai esistita (classe v186)
-    oggi = [s for s in contr if s["data"] == data]
-    entita = {}
-    for s in oggi:
-        entita.setdefault(s["codice"], {"nome": s["nome"], "contratti": []})["contratti"].append(s)
-    scad = collections.Counter(s["scadenza"] for s in oggi).most_common(1)[0][0]
+        return {"data": None, "scadenza": None, "scadenze": {}, "date": {}, "entita": {}, "indici": {}, "scartati": 0}
+    gruppi = collections.defaultdict(list)
+    for s in contr:
+        gruppi[s["codice"]].append(s)
+    entita, scartati = {}, 0
+    for cod, lst in sorted(gruppi.items()):
+        d = max(s["data"] for s in lst)
+        tieni = [s for s in lst if s["data"] == d]
+        scartati += len(lst) - len(tieni)
+        entita[cod] = {"nome": tieni[0]["nome"], "data": d, "contratti": tieni}
+    date = collections.Counter(e["data"] for e in entita.values())
+    data = max(date)
+    # la scadenza standard di ogni data, la piu' comune fra i suoi contratti: rotola il 20 marzo e il 20 settembre, e
+    #   nei giorni a cavallo due ondate possono portarne due diverse
+    scadenze = {d: collections.Counter(s["scadenza"] for e in entita.values() if e["data"] == d
+                                       for s in e["contratti"]).most_common(1)[0][0] for d in date}
     indici = {}
     try:
         for x in get(ICE_CDS_INDICI).json() or []:
             m = re.match(r"^CDX-NA(IG|HY)S(\d+)V(\d+)-5Y$", str(x.get("instrumentName") or ""))
-            if not m or str(x.get("clearingDate") or "")[:10] != data:
+            dx = str(x.get("clearingDate") or "")[:10]
+            if not m or not dx:
                 continue
             fam, ser, ver = m.group(1), int(m.group(2)), int(m.group(3))
             try:
                 pz = float(x.get("eodPrice"))
             except (TypeError, ValueError):
                 continue
-            # ⚠ in corso = la serie piu' alta, e dentro la serie la versione piu' alta: la
-            #   regola sta nella FORMA del nome, non in un numero di serie scritto qui (v410)
-            if fam not in indici or (ser, ver) > (indici[fam]["serie"], indici[fam]["versione"]):
+            # ⚠ prima la data piu' recente (v508: gli indici arrivano con l'ondata nordamericana, e fino ad allora sono
+            #   del giorno prima), poi la serie piu' alta, e dentro la serie la versione piu' alta: la regola sta nella
+            #   FORMA del nome, non in un numero di serie scritto qui (v410)
+            k = (dx, ser, ver)
+            if fam not in indici or k > (indici[fam]["data"], indici[fam]["serie"], indici[fam]["versione"]):
                 # cedola del contratto: 100 pb sull'IG, 500 pb sull'HY (specifica dell'indice)
-                indici[fam] = {"serie": ser, "versione": ver, "prezzo": pz, "cedola": 100 if fam == "IG" else 500}
+                indici[fam] = {"serie": ser, "versione": ver, "prezzo": pz, "cedola": 100 if fam == "IG" else 500,
+                               "data": dx}
     except Exception as e:  # noqa: BLE001 — gli indici sono un contorno: il loro buco si dichiara
         print(f"!! indici CDX non letti: {e}", file=sys.stderr)
-    return {"data": data, "scadenza": scad, "entita": entita, "indici": indici,
-            "scartati": len(contr) - len(oggi)}
+    return {"data": data, "scadenza": scadenze[data], "scadenze": scadenze, "date": dict(sorted(date.items())),
+            "entita": entita, "indici": indici, "scartati": scartati}
 
 
-def riga_storia_cds(lettura, tasso_pct):
-    """La riga di un giorno: per ogni entita' il contratto standard come [cedola, prezzo]
-    (piu' la scadenza se diversa da quella del giorno), e gli indici in corso."""
+def riga_storia_cds(lettura, tasso_pct, data=None):
+    """La riga di UN giorno: per ogni entita' di quel giorno il contratto standard come [cedola, prezzo] (piu' la
+    scadenza se diversa da quella del giorno), e gli indici di quel giorno. v508 — una lettura porta piu' date (le
+    ondate di ICE): `data` sceglie quale, e senza vale la piu' recente. None se quel giorno non porta niente."""
     if not lettura or not lettura.get("data"):
         return None
-    scad = lettura["scadenza"]
+    d = data or lettura["data"]
+    scad = (lettura.get("scadenze") or {}).get(d) or lettura["scadenza"]
     p = {}
     for cod, e in sorted(lettura["entita"].items()):
+        if (e.get("data") or lettura["data"]) != d:
+            continue
         c = contratto_standard(e["contratti"])
         if c:
             p[cod] = [c["cedola"], c["prezzo"]] + ([c["scadenza"].isoformat()] if c["scadenza"] != scad else [])
-    i = {f: [v["serie"], v["versione"], v["cedola"], v["prezzo"]] for f, v in sorted(lettura["indici"].items())}
-    return {"d": lettura["data"], "m": scad.isoformat(), "r": tasso_pct, "p": p, "i": i}
+    i = {f: [v["serie"], v["versione"], v["cedola"], v["prezzo"]] for f, v in sorted(lettura["indici"].items())
+         if (v.get("data") or lettura["data"]) == d}
+    if not p and not i:
+        return None
+    return {"d": d, "m": scad.isoformat(), "r": tasso_pct, "p": p, "i": i}
+
+
+def righe_storia_cds(lettura, tasso_pct):
+    """v508 — le righe di TUTTI i giorni che una lettura porta, dal piu' vecchio: verso le 09 UTC l'Asia-Pacifico e'
+    gia' al giorno nuovo, l'Europa e il Nord America (con gli indici) ancora a quello prima."""
+    if not lettura or not lettura.get("data"):
+        return []
+    date = set(lettura.get("date") or {}) | {v.get("data") for v in (lettura.get("indici") or {}).values() if v.get("data")}
+    out = [riga_storia_cds(lettura, tasso_pct, d) for d in sorted(date or {lettura["data"]})]
+    return [r for r in out if r]
 
 
 def leggi_storia_cds(percorso=CDS_STORIA):
@@ -5745,13 +5833,118 @@ def leggi_storia_cds(percorso=CDS_STORIA):
     return sorted(righe, key=lambda r: r["d"])
 
 
-def aggiungi_storia_cds(storia, riga, massimo=CDS_STORIA_MAX):
-    """Una riga per giorno di compensazione. Un giorno gia' raccolto non si riscrive: le letture
-    successive dello stesso giorno sono la stessa pubblicazione. Un giorno PIU' VECCHIO
-    dell'ultimo non entra: sarebbe una risposta fuori ordine, e lo storico si legge per data."""
-    if not riga or not riga.get("d") or (storia and riga["d"] <= storia[-1]["d"]):
-        return storia, False
-    return (storia + [riga])[-massimo:], True
+def unisci_storia_cds(storia, righe, massimo=CDS_STORIA_MAX):
+    """v508 — LO STORICO SI COMPONE PER DATA. ICE pubblica lo stesso giorno a ondate: fino alla v507 la prima lettura
+    di un giorno ne scriveva la riga e le successive si rifiutavano («e' la stessa pubblicazione»), cosi' dal 19 al
+    22/10/2026 lo storico ha tenuto solo l'Asia-Pacifico. Ora una riga si COMPLETA: le entita' e gli indici che mancano
+    entrano, quelli gia' raccolti non cambiano — il prezzo di compensazione di un giorno non cambia fra le ondate
+    (misurato il 23/10), e se ne arrivasse uno diverso resta il primo e si conta fra i difformi.
+    Un giorno NUOVO entra solo se e' piu' recente dell'ultimo raccolto: una data piu' vecchia senza la sua riga sarebbe
+    una risposta fuori ordine, e si conta. Il tetto tiene gli ultimi `massimo` giorni.
+    Restituisce (storia, esito) con esito = {'nuove', 'completate': {giorno: voci aggiunte}, 'difformi',
+    'fuori_ordine', 'cambiato'}."""
+    st = list(storia or [])
+    per = {r["d"]: k for k, r in enumerate(st)}
+    esito = {"nuove": [], "completate": {}, "difformi": 0, "fuori_ordine": []}
+    for R in sorted((x for x in (righe or []) if x and x.get("d")), key=lambda x: x["d"]):
+        d = R["d"]
+        if d in per:
+            r = st[per[d]]
+            p, i, m = dict(r.get("p") or {}), dict(r.get("i") or {}), r.get("m")
+            aggiunte = 0
+            for cod, v in (R.get("p") or {}).items():
+                # la scadenza si riscrive rispetto a quella della RIGA: una riga ha una scadenza di riferimento sola
+                scad = v[2] if len(v) > 2 else R.get("m")
+                v2 = [v[0], v[1]] + ([scad] if scad != m else [])
+                if cod not in p:
+                    p[cod] = v2
+                    aggiunte += 1
+                elif p[cod] != v2:
+                    esito["difformi"] += 1
+            for f, v in (R.get("i") or {}).items():
+                if f not in i:
+                    i[f] = v
+                    aggiunte += 1
+                elif i[f] != v:
+                    esito["difformi"] += 1
+            if aggiunte:
+                st[per[d]] = {**r, "p": dict(sorted(p.items())), "i": dict(sorted(i.items()))}
+                esito["completate"][d] = aggiunte
+        elif not st or d > st[-1]["d"]:
+            st.append(R)
+            per[d] = len(st) - 1
+            esito["nuove"].append(d)
+        else:
+            esito["fuori_ordine"].append(d)
+    esito["cambiato"] = bool(esito["nuove"] or esito["completate"])
+    return st[-massimo:], esito
+
+
+def _cds_riga_parziale(r):
+    """v508 — un giorno raccolto a meta': DICHIARATO nella riga (i giorni dal 19 al 22/10/2026, ricostruiti dove si
+    poteva), oppure senza gli indici CDX, che arrivano con l'ondata nordamericana di ICE. Un nome assente da un giorno
+    cosi' non e' «non quotato»: quel giorno non e' stato letto."""
+    return bool(r) and (bool(r.get("parziale")) or not r.get("i"))
+
+
+def _cds_motivo_parziale(r):
+    return (r or {}).get("parziale") or "mancano gli indici CDX, che arrivano con l'ultima ondata di ICE"
+
+
+def lettura_da_storia(storia, giorni=CDS_RIPIEGO_GIORNI):
+    """v508 — il ripiego quando ICE non risponde: per ogni entita' e per ogni indice l'ULTIMO giorno raccolto in cui
+    compare, fra gli ultimi `giorni` — un giorno raccolto a meta' non cancella i nomi che porta il giorno prima — con la
+    sua data (v396). I nomi delle entita' lo storico non li porta: resta il codice."""
+    if not storia:
+        return None
+    ent, ind = {}, {}
+    for r in storia[-giorni:]:
+        for c, v in (r.get("p") or {}).items():
+            ent[c] = {"nome": c, "data": r["d"], "contratti": [{
+                "livello": "SNRFOR", "valuta": "USD", "clausola": "XR14", "cedola": v[0], "prezzo": v[1],
+                "scadenza": datetime.fromisoformat(v[2] if len(v) > 2 else r["m"]).date()}]}
+        for f, v in (r.get("i") or {}).items():
+            ind[f] = {"serie": v[0], "versione": v[1], "cedola": v[2], "prezzo": v[3], "data": r["d"]}
+    u = storia[-1]
+    date = collections.Counter(e["data"] for e in ent.values())
+    return {"data": u["d"], "scadenza": datetime.fromisoformat(u["m"]).date(),
+            "scadenze": {r["d"]: datetime.fromisoformat(r["m"]).date() for r in storia[-giorni:]},
+            "date": dict(sorted(date.items())), "entita": ent, "indici": ind, "scartati": 0}
+
+
+def riepilogo_storia_cds(storia):
+    """v508 — lo storico raccolto, coi giorni raccolti a meta' NOMINATI (v406): «6 giorni» senza dire che quattro
+    portano solo l'Asia-Pacifico si legge come sei giorni completi. L'ultimo giorno senza gli indici e senza una
+    dichiarazione e' «in corso» (l'ondata nordamericana non e' ancora arrivata), non un buco; quelli non dichiarati
+    li sorveglia validate_macro."""
+    out = {"giorni": len(storia), "dal": storia[0]["d"] if storia else None}
+    parz, nuovi, motivi, ric = [], [], {}, {}
+    # le misure guardano al piu' gli ultimi max(CDS_SEDUTE_VAR)+1 giorni raccolti: un giorno a meta' piu' vecchio non
+    #   entra piu' in nessuna finestra, e nominarlo ogni giorno per due anni sarebbe un avviso che suona sempre (v421)
+    recenti = {r["d"] for r in storia[-(max(CDS_SEDUTE_VAR) + 1):]}
+    for k, r in enumerate(storia):
+        if not _cds_riga_parziale(r):
+            continue
+        if k == len(storia) - 1 and not r.get("parziale"):
+            out["in_corso"] = r["d"]
+            continue
+        parz.append(r["d"])
+        # il motivo lo porta la riga (una dichiarazione scritta una volta, dove il fatto e' accaduto), non chi la stampa
+        motivi[r["d"]] = _cds_motivo_parziale(r)
+        if (r.get("ricostruiti") or {}).get("fonte"):
+            ric[r["d"]] = r["ricostruiti"]["fonte"]
+        if not r.get("parziale"):
+            nuovi.append(r["d"])
+    if parz:
+        out["parziali"] = parz
+        out["parziali_motivi"] = motivi
+        out["parziali_recenti"] = [d for d in parz if d in recenti]
+        out["parziali_vecchi"] = sum(1 for d in parz if d not in recenti)
+    if ric:
+        out["ricostruiti"] = ric
+    if nuovi:
+        out["parziali_non_dichiarati"] = nuovi
+    return out
 
 
 def scrivi_storia_cds(storia, percorso=CDS_STORIA):
@@ -5806,7 +5999,11 @@ def variazioni_cds(storia, serie, sedute=CDS_SEDUTE_VAR):
             continue
         b = per_data.get(giorni[-1 - n])
         if b is None or b[1] is None:
-            out[str(n)] = {"da": giorni[-1 - n], "pb": None}
+            o = {"da": giorni[-1 - n], "pb": None}
+            # v508 — un nome assente da un giorno raccolto a meta' non era «non quotato»: quel giorno non e' stato letto
+            if b is None and _cds_riga_parziale(storia[-1 - n]):
+                o["nota"] = f"il {giorni[-1 - n]} lo storico e' stato raccolto a meta'"
+            out[str(n)] = o
         elif len(b) > 2 and b[2] != ult[2]:
             out[str(n)] = {"da": giorni[-1 - n], "pb": None, "nota": "cambio di serie dell'indice"}
         else:
@@ -5832,13 +6029,21 @@ def finestra_cds(storia, codice, cedola, n=CDS_SEDUTE_PROVA):
     st = storia or []
     if len(st) <= n:
         return {"stato": "storico corto", "n": n, "giorni": len(st), "servono": n + 1,
-                "dal": st[0]["d"] if st else None}
+                "dal": st[0]["d"] if st else None,
+                # v508 — quanti di quei giorni portano il nome: un giorno raccolto a meta' conta fra i giorni, non per lui
+                "giorni_nome": sum(1 for r in st if codice in (r.get("p") or {}))}
     rb, ra = st[-1 - n], st[-1]
     fam = CDS_FAMIGLIA.get(cedola)
     out = {"n": n, "da": rb["d"], "a": ra["d"], "indice": fam}
     vb, va = (rb.get("p") or {}).get(codice), (ra.get("p") or {}).get(codice)
     if vb is None or va is None:
-        return {**out, "stato": "buco", "perche": f"il nome non e' quotato il {rb['d'] if vb is None else ra['d']}"}
+        rr = rb if vb is None else ra
+        if _cds_riga_parziale(rr):
+            # v508 — non e' la stessa cosa: ICE quel giorno poteva quotarlo, e' la pipeline che non l'ha letto
+            return {**out, "stato": "buco", "parziale": True,
+                    "perche": f"il {rr['d']} lo storico e' stato raccolto a meta' ({_cds_motivo_parziale(rr)}): il nome "
+                              "quel giorno non e' stato letto, e non vuol dire che ICE non lo quotasse"}
+        return {**out, "stato": "buco", "perche": f"il nome non e' quotato il {rr['d']}"}
     mb, ma = (vb[2] if len(vb) > 2 else rb.get("m")), (va[2] if len(va) > 2 else ra.get("m"))
     if mb != ma:
         return {**out, "stato": "cambio di scadenza",
@@ -5848,7 +6053,9 @@ def finestra_cds(storia, codice, cedola, n=CDS_SEDUTE_PROVA):
         return {**out, "stato": "indice n.d.", "perche": f"cedola di {cedola} pb: nessun indice CDX della stessa cedola"}
     ib, ia = (rb.get("i") or {}).get(fam), (ra.get("i") or {}).get(fam)
     if not ib or not ia:
-        return {**out, "stato": "indice n.d.", "perche": f"indice CDX {fam} non raccolto il {rb['d'] if not ib else ra['d']}"}
+        rr = rb if not ib else ra
+        return {**out, "stato": "indice n.d.", "perche": f"indice CDX {fam} non raccolto il {rr['d']}"
+                + (f" (lo storico di quel giorno e' stato raccolto a meta': {rr['parziale']})" if rr.get("parziale") else "")}
     if (ib[0], ib[1]) != (ia[0], ia[1]):
         return {**out, "stato": "cambio di serie",
                 "perche": f"l'indice CDX {fam} passa dalla serie {ib[0]} versione {ib[1]} alla {ia[0]} versione "
@@ -5943,7 +6150,6 @@ def cds_dei_titoli(righe, lettura, storia, mappa, mercato=None):
     entita_map = (mappa or {}).get("entita") or {}
     note = (mappa or {}).get("note") or {}
     ent = (lettura or {}).get("entita") or {}
-    ult = storia[-1] if storia else None
     stati = collections.defaultdict(list)
     for r in righe:
         if not isinstance(r, dict):
@@ -5972,28 +6178,47 @@ def cds_dei_titoli(righe, lettura, storia, mappa, mercato=None):
             continue
         e = ent.get(cod)
         c = contratto_standard(e["contratti"]) if e else None
-        if not c or not ult or ult.get("d") != lettura.get("data"):
+        if not c:
             r["cds"] = {"stato": "non quotato oggi", "codice": cod}
             stati["non_quotati_oggi"].append(tk)
             continue
-        ser = serie_cds(storia, cod)
-        pb = ser[-1][1] if ser and ser[-1][0] == ult["d"] else None
+        # v508 — la data del NOME: ICE pubblica per area in momenti diversi, e le misure si fanno sullo storico fino a
+        #   quel giorno — alle 09 UTC il prezzo di un nome americano e' di ieri, e la sua finestra finisce ieri
+        de = e.get("data") or lettura.get("data")
+        st_e = [g for g in storia if g["d"] <= de]
+        ser = serie_cds(st_e, cod)
+        pb = ser[-1][1] if ser and ser[-1][0] == de else None
         punti = round(100.0 - c["prezzo"], 2)
+        if st_e and st_e[-1]["d"] == de:
+            fin = finestra_cds(st_e, cod, c["cedola"])
+            fin5 = finestra_cds(st_e, cod, c["cedola"], n=CDS_SEDUTE_RAPIDA)
+            var = variazioni_cds(st_e, ser)
+        else:
+            # il giorno del prezzo non e' nello storico (una risposta fuori ordine): le misure non si ancorano altrove
+            _p = f"il giorno del prezzo ({de}) non e' nello storico raccolto"
+            fin = {"stato": "buco", "n": CDS_SEDUTE_PROVA, "perche": _p}
+            fin5 = {"stato": "buco", "n": CDS_SEDUTE_RAPIDA, "perche": _p}
+            var = {}
         x = {"stato": "quotato", "codice": cod, "entita": e["nome"],
              "contratto": f'{c["livello"]}.{c["valuta"]}.{c["clausola"]}', "cedola_pb": c["cedola"],
              "prezzo": c["prezzo"], "punti": punti, "pb": round(pb, 1) if pb is not None else None,
-             "indicativo": abs(punti) > CDS_PUNTI_MAX, "data": lettura["data"],
-             "scadenza": c["scadenza"].isoformat(), "var": variazioni_cds(storia, ser),
-             "storia": _cds_storia_entita(storia, ser), "indice": CDS_FAMIGLIA.get(c["cedola"]),
+             "indicativo": abs(punti) > CDS_PUNTI_MAX, "data": de,
+             "scadenza": c["scadenza"].isoformat(), "var": var,
+             "storia": _cds_storia_entita(st_e, ser), "indice": CDS_FAMIGLIA.get(c["cedola"]),
              # v498 — la misura della prova di tenuta: un mese, al netto dell'indice della stessa cedola
-             "finestra": finestra_cds(storia, cod, c["cedola"]),
+             "finestra": fin,
              # v501 — il rincaro IMPROVVISO: una settimana, con la stessa misura
-             "finestra5": finestra_cds(storia, cod, c["cedola"], n=CDS_SEDUTE_RAPIDA)}
+             "finestra5": fin5}
+        if de != lettura.get("data"):
+            # v508 — ICE ha gia' pubblicato un giorno piu' recente per altre aree: questo nome non ancora
+            x["ultima_ice"] = lettura.get("data")
+        if pb is None:
+            x["pb_perche"] = _cds_perche_pb(st_e, de, cod)
         # v501 — accanto alle misure, MAI dentro: la finestra resta il risultato di finestra_cds, e chi la ricalcola la
         #   ritrova uguale (il gate v498 lo confronta). Il rango della settimana fra quelle del nome, e il lato azionario
         #   sugli stessi due giorni di ciascuna finestra (la divergenza la decide l'analisi)
         if x["finestra5"].get("stato") == "misurato":
-            x["rango5"] = rango_cds(storia, cod, c["cedola"])
+            x["rango5"] = rango_cds(st_e, cod, c["cedola"])
         _az = {}
         for _f in ("finestra", "finestra5"):
             _la = lato_azione(x[_f], r.get("_ret_series"), r.get("_ret_dates"), mercato)
@@ -6007,11 +6232,25 @@ def cds_dei_titoli(righe, lettura, storia, mappa, mercato=None):
         stati["quotati"].append(tk)
     indici = {}
     for fam, v in sorted(((lettura or {}).get("indici") or {}).items()):
-        si = serie_indice_cds(storia, fam)
-        pb = si[-1][1] if si and ult and si[-1][0] == ult["d"] else None
-        indici[fam] = {**v, "pb": round(pb, 1) if pb is not None else None,
-                       "var": variazioni_cds(storia, si)}
+        # v508 — anche l'indice ha la sua data: arriva con l'ondata nordamericana
+        di = v.get("data") or (lettura or {}).get("data")
+        st_i = [g for g in storia if g["d"] <= di]
+        si = serie_indice_cds(st_i, fam)
+        pb = si[-1][1] if si and si[-1][0] == di else None
+        indici[fam] = {**v, "data": di, "pb": round(pb, 1) if pb is not None else None,
+                       "var": variazioni_cds(st_i, si)}
     return {k: sorted(v) for k, v in stati.items()}, indici
+
+
+def _cds_perche_pb(storia, data, codice):
+    """v508 — perche' lo spread manca, con la causa VERA. Fino alla v507 le righe scrivevano «nel run mancava il
+    tasso» anche quando il tasso c'era e mancava il nome nella riga del giorno (Repubblica Italiana, 23/10/2026)."""
+    r = storia[-1] if storia and storia[-1]["d"] == data else None
+    if r is None or codice not in (r.get("p") or {}):
+        return f"il giorno del prezzo ({data}) non e' nello storico raccolto"
+    if r.get("r") is None:
+        return "nel giorno raccolto mancava il tasso della conversione"
+    return "prezzo fuori dal dominio della conversione: nessuna intensita' di default lo riproduce"
 
 
 def tasso_cds(macro, storia):
@@ -6049,30 +6288,30 @@ def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_ma
     except Exception as e:  # noqa: BLE001
         errore = str(e)[:160]
     letto = bool(lettura and lettura.get("data"))
+    esito = {}
     if letto:
-        storia, nuova = aggiungi_storia_cds(storia, riga_storia_cds(lettura, tasso))
-        if nuova:
+        # v508 — tutti i giorni che la lettura porta, e un giorno gia' raccolto si COMPLETA
+        storia, esito = unisci_storia_cds(storia, righe_storia_cds(lettura, tasso))
+        if esito["cambiato"]:
             scrivi_storia_cds(storia, percorso_storia)
+        if esito["difformi"]:
+            print(f"!! CDS: {esito['difformi']} prezzi diversi da quelli gia' raccolti per lo stesso giorno: resta il primo",
+                  file=sys.stderr)
     elif storia:
-        # ⚠ ripiego dichiarato: la fotografia e' quella dell'ultimo giorno raccolto, coi nomi delle
-        #   entita' che lo storico non porta (resta il codice)
-        u = storia[-1]
-        lettura = {"data": u["d"], "scadenza": datetime.fromisoformat(u["m"]).date(), "scartati": 0,
-                   "entita": {c: {"nome": c, "contratti": [{"livello": "SNRFOR", "valuta": "USD",
-                                                            "clausola": "XR14", "cedola": v[0], "prezzo": v[1],
-                                                            "scadenza": datetime.fromisoformat(v[2] if len(v) > 2 else u["m"]).date()}]}
-                              for c, v in (u.get("p") or {}).items()},
-                   "indici": {f: {"serie": v[0], "versione": v[1], "cedola": v[2], "prezzo": v[3]}
-                              for f, v in (u.get("i") or {}).items()}}
+        # ⚠ ripiego dichiarato: per ogni entita' l'ultimo giorno raccolto in cui compare, con la sua data (v508)
+        lettura = lettura_da_storia(storia)
     stati, indici = cds_dei_titoli(righe, lettura or {}, storia, mappa, mercato)
     return {"fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
             "url": ICE_CDS_NOMI, "letto": letto, "errore": errore,
             "data": (lettura or {}).get("data"),
+            # v508 — quante entita' porta ciascuna data: ICE pubblica per area in momenti diversi, e ogni nome ha la sua
+            "date": (lettura or {}).get("date") or {},
             "scadenza": (lettura or {}).get("scadenza").isoformat() if (lettura or {}).get("scadenza") else None,
             "entita_ice": len((lettura or {}).get("entita") or {}) if letto else None,
             "tasso_pct": tasso, "tasso_fonte": tasso_fonte, "recupero": CDS_RECUPERO,
             "punti_max": CDS_PUNTI_MAX, "indici": indici,
-            "storia": {"giorni": len(storia), "dal": storia[0]["d"] if storia else None},
+            "storia": riepilogo_storia_cds(storia),
+            "unione": {k: esito.get(k) for k in ("nuove", "completate", "difformi", "fuori_ordine")} if esito else None,
             "verificato": mappa.get("verificato"), **stati}
 
 
@@ -6557,6 +6796,15 @@ def validate_macro(macro):
     if _cds.get("non_classificati"):
         add("cds_abbinamenti", _cds.get("data"), 5, "missing",
             f"titoli seguiti senza classificazione in config/cds_entita.json: {', '.join(_cds['non_classificati'])}")
+    # v508 — lo storico che si scrive a meta' deve suonare: dal 19 al 22/10/2026 ha tenuto solo l'Asia-Pacifico per
+    #   quattro giorni e nessun gate lo vedeva. Un giorno senza gli indici, non dichiarato, che non e' l'ultimo (quello
+    #   puo' aspettare l'ondata della sera), suona per CDS_PARZIALE_ETA giorni: dopo resta nominato nel riepilogo.
+    _pnd = [d for d in ((_cds.get("storia") or {}).get("parziali_non_dichiarati") or [])
+            if (age_of(d) is not None and age_of(d) <= CDS_PARZIALE_ETA)]
+    if _pnd:
+        add("cds_storia", _pnd[-1], CDS_PARZIALE_ETA, "stale",
+            f"storico dei CDS raccolto a meta' il {', '.join(_pnd)} (senza gli indici CDX): l'ondata nordamericana di ICE "
+            "non e' stata letta, oppure ICE quel giorno non l'ha pubblicata (festivita' negli Stati Uniti)")
 
     # v506 — le posizioni corte aperte nascono sorvegliate (v390). Due regolamenti al mese, pubblicati ~7 giorni
     #   lavorativi dopo: fra un regolamento e la pubblicazione del successivo passano al piu' ~27 giorni, e oltre
@@ -6612,8 +6860,8 @@ def validate_macro(macro):
     _pc = cu.get("per_chiave") or {}
     if not _pc:
         add("calendario_uscite", None, 2, "missing",
-            "FRED non ha dato il calendario: le uscite macro tornano PROIETTATE dal ritardo "
-            "tipico della fonte, non confermate")
+            "FRED non ha dato il calendario: le prossime uscite macro sono 'dato non disponibile' — nessuna data "
+            "proiettata (v396)")
     else:
         # una data nel passato significa calendario fermo: le uscite si consumano da sole.
         _fut = [k for k, v in _pc.items()
@@ -7519,7 +7767,10 @@ def main():
         print(f"   CDS (ICE): {'letto' if _c['letto'] else 'NON letto — ' + str(_c.get('errore'))} · giorno "
               f"{_c.get('data')} · {len(_c.get('quotati') or [])} quotati, {len(_c.get('assenti') or [])} senza CDS"
               + (f", NON CLASSIFICATI: {_c['non_classificati']}" if _c.get("non_classificati") else "")
-              + f" · storico {_c['storia']['giorni']} giorni")
+              + f" · date {', '.join(f'{_d}: {_k}' for _d, _k in (_c.get('date') or {}).items()) or 'n.d.'}"
+              + f" · storico {_c['storia']['giorni']} giorni"
+              + (f", a meta': {', '.join(_c['storia']['parziali'])}" if _c['storia'].get('parziali') else "")
+              + (f" · unione: {_c['unione']}" if _c.get("unione") else ""))
     except Exception as e:  # noqa: BLE001
         print(f"!! CDS: {e}", file=sys.stderr)
 

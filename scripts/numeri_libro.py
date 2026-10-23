@@ -1539,8 +1539,11 @@ def prova_cds(riga):
         return {"verso": None, "cds_stato": st,
                 "perche": "la pipeline non ha pubblicato la misura di un mese (snapshot precedente alla v498)"}
     if f.get("stato") == "storico corto":
+        # v508 — un giorno raccolto a meta' conta fra i giorni dello storico ma non per il nome: lo si dice
+        _gn = f.get("giorni_nome")
         return {"verso": None, "applicabile": False, "in_attesa": True, "cds_stato": st, **f,
-                "perche": f"storico raccolto di {f.get('giorni')} giorni su {f.get('servono')}"}
+                "perche": f"storico raccolto di {f.get('giorni')} giorni su {f.get('servono')}"
+                          + (f", il nome in {_gn}" if _gn is not None and _gn != f.get("giorni") else "")}
     if f.get("stato") != "misurato":
         return {"verso": None, "cds_stato": st, **f, "perche": f.get("perche") or f.get("stato")}
     e = f["eccesso_pct"]

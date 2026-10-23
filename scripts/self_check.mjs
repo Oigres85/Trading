@@ -148,7 +148,8 @@ const SUITE = [
      legittima. Si alzano quando la suite cresce, mai si abbassano per far passare qualcosa. */
   /* v476: 608 punti di chiamata in test_app (+7), 210 in test_update_data (+8): pavimenti su */
   /* v496: 620 punti di chiamata in test_app (+3 sulla variazione annua della leva col percentile) -> 600 */
-  { file: "test_app.mjs",        cmd: "node",    minimo: 605, firma: /\d+\/\d+ check superati/ },
+  /* v508: 628 punti di chiamata (+3 sui CDS a ondate: data del nome, giorni a meta', causa dello spread mancante) -> 615 */
+  { file: "test_app.mjs",        cmd: "node",    minimo: 615, firma: /\d+\/\d+ check superati/ },
   /* v492: 236 punti di chiamata in test_update_data (+5 sulla fine del veicolo di quotazione, dal registro SEC) -> 225 */
   /* v496: 250 punti di chiamata (+14 sul file storico FINRA: variazione annua per data, percentile, i due canali) -> 240 */
   /* v498: 275 punti di chiamata (+6 sulla finestra di un mese del CDS, al netto dell'indice) -> 265 */
@@ -157,7 +158,9 @@ const SUITE = [
   /* v502: 295 punti di chiamata (+3 sull'eta' delle voci SEC e la rilettura della cache) -> 285 */
   /* v504: 303 punti di chiamata (+8 sulla solidita' operativa: ciclo di cassa per data, flussi, fine dei periodi) -> 295 */
   /* v506: 321 punti di chiamata (+18 sulle posizioni corte aperte FINRA: tagli, quota, calendario, sorveglianza) -> 310 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 310, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v508: 340 punti di chiamata (+19 sulle ondate di ICE, lo storico per data, i giorni a meta', il composito che
+     non cade senza FRED) -> 330 */
+  { file: "test_update_data.py", cmd: "python3", minimo: 330, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -177,7 +180,8 @@ const SUITE = [
   /* v505: 795 punti di chiamata (+27 sulla scheda completa: registro nei due versi, conservazione, copertura, resa,
      collegamento con analisi.py, e la lettura a 5 anni di DIS) -> 780 */
   /* v506: 808 punti di chiamata (+13 sulle vendite allo scoperto nelle schede: riga, blocco, tre assenze) -> 795 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 795, firma: /\d+\/\d+ CHECK OK/ },
+  /* v508: 818 punti di chiamata (+7 sui CDS a ondate nelle schede, nel brief e nella regola) -> 805 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 805, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];
