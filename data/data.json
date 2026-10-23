@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-10-23T20:48:35Z",
- "eurusd": 1.1196,
+ "updated_at": "2026-10-23T21:48:53Z",
+ "eurusd": 1.1204,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -10,13 +10,13 @@
   "eur_gain_pct": 1.32,
   "tax_est": 66.02,
   "eur_gain_net": 462.14,
-  "portfolio_sharpe_ratio": -0.14,
-  "portfolio_sortino_ratio": -0.2,
+  "portfolio_sharpe_ratio": -0.17,
+  "portfolio_sortino_ratio": -0.25,
   "risk_free_rate": 0.0363,
-  "portfolio_beta_ndx": 2.32,
+  "portfolio_beta_ndx": 2.33,
   "avg_pairwise_corr": 0.49,
-  "var95_1d_pct": 5.19,
-  "es95_1d_pct": 6.51,
+  "var95_1d_pct": 5.22,
+  "es95_1d_pct": 6.54,
   "var95_1d_eur": null,
   "es95_1d_eur": null,
   "var95_hist_pct": null,
@@ -130,8 +130,8 @@
    "support": 849.25,
    "resistance": 1107.83,
    "rsi": 38.2,
-   "volume": 21056819,
-   "vol_ratio": 1.24,
+   "volume": 21123737,
+   "vol_ratio": 0.81,
    "atr_14": 47.84,
    "atr_pct": 5.45,
    "signal": "Neutrale",
@@ -465,7 +465,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -994,10 +994,10 @@
    "sortino_6m": 1.92,
    "prepost": {
     "label": "after",
-    "price": 880.3,
-    "change_pct": 0.31
+    "price": 880.52,
+    "change_pct": 0.34
    },
-   "prezzo_limite_aggiustato": 880.3,
+   "prezzo_limite_aggiustato": 880.52,
    "risk_reward": "1:2.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -1862,7 +1862,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -2169,7 +2169,7 @@
    "avg_corr": 0.58,
    "max_corr": 0.82,
    "max_corr_with": "SKHY",
-   "risk_contrib_pct": 31.0
+   "risk_contrib_pct": 30.5
   },
   {
    "ticker": "AMD",
@@ -2195,8 +2195,8 @@
    "support": 502.6,
    "resistance": 658.52,
    "rsi": 39.0,
-   "volume": 15049021,
-   "vol_ratio": 1.32,
+   "volume": 15094156,
+   "vol_ratio": 0.7,
    "atr_14": 27.36,
    "atr_pct": 5.29,
    "signal": "Neutrale",
@@ -3059,10 +3059,10 @@
    "sortino_6m": 1.63,
    "prepost": {
     "label": "after",
-    "price": 517.8,
-    "change_pct": 0.2
+    "price": 517.9,
+    "change_pct": 0.21
    },
-   "prezzo_limite_aggiustato": 517.8,
+   "prezzo_limite_aggiustato": 517.9,
    "risk_reward": "1:2.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -4194,8 +4194,38 @@
    "controvalore": 51679.0,
    "gain_pct_pos": 235.76,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "AMD"
+    "stato": "quotato",
+    "codice": "AMD",
+    "entita": "Advanced Micro Devices Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 99.0242,
+    "punti": 0.98,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -4232,7 +4262,7 @@
    "avg_corr": 0.57,
    "max_corr": 0.77,
    "max_corr_with": "MU",
-   "risk_contrib_pct": 22.0
+   "risk_contrib_pct": 21.6
   },
   {
    "ticker": "NVDA",
@@ -4258,8 +4288,8 @@
    "support": 210.18,
    "resistance": 243.37,
    "rsi": 38.1,
-   "volume": 77270084,
-   "vol_ratio": 1.19,
+   "volume": 79740563,
+   "vol_ratio": 0.75,
    "atr_14": 6.06,
    "atr_pct": 2.87,
    "signal": "Neutrale",
@@ -4954,11 +4984,11 @@
    "sortino_6m": -0.02,
    "prepost": {
     "label": "after",
-    "price": 211.19,
-    "change_pct": 0.11
+    "price": 211.4,
+    "change_pct": 0.21
    },
-   "prezzo_limite_aggiustato": 211.19,
-   "risk_reward": "1:2.7",
+   "prezzo_limite_aggiustato": 211.4,
+   "risk_reward": "1:2.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -5794,7 +5824,7 @@
      "a1": 4.43,
      "a3": 418.86,
      "a5": 728.76,
-     "a10": 11984.16
+     "a10": 11984.15
     },
     "stagionalita": [
      {
@@ -6091,8 +6121,38 @@
    "controvalore": 56959.2,
    "gain_pct_pos": 142.02,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "NVIDIA"
+    "stato": "quotato",
+    "codice": "NVIDIA",
+    "entita": "NVIDIA Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 98.6957,
+    "punti": 1.3,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -6129,7 +6189,7 @@
    "avg_corr": 0.43,
    "max_corr": 0.53,
    "max_corr_with": "MRVL",
-   "risk_contrib_pct": 11.0
+   "risk_contrib_pct": 10.8
   },
   {
    "ticker": "PLTR",
@@ -6155,8 +6215,8 @@
    "support": 184.45,
    "resistance": 212.94,
    "rsi": 54.4,
-   "volume": 15988368,
-   "vol_ratio": 0.98,
+   "volume": 16072134,
+   "vol_ratio": 0.68,
    "atr_14": 8.13,
    "atr_pct": 4.13,
    "signal": "Trend rialzista",
@@ -6591,10 +6651,10 @@
    "sortino_6m": 1.72,
    "prepost": {
     "label": "after",
-    "price": 196.97,
-    "change_pct": 0.11
+    "price": 196.7,
+    "change_pct": -0.03
    },
-   "prezzo_limite_aggiustato": 196.97,
+   "prezzo_limite_aggiustato": 196.7,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -6620,14 +6680,14 @@
     "target_mean": 206.6192,
     "fcf": 2159104512.0,
     "gross_margin": 0.848,
-    "enterprise_value": 462369030144.0,
-    "ev_ebitda": 173.651,
+    "enterprise_value": 463714746368.0,
+    "ev_ebitda": 174.157,
     "peg": 1.75,
     "roa": 0.1729,
     "short_float": 0.0259,
     "buyback_yield": 0.0002,
     "ps": 76.8,
-    "ev_s": 75.11,
+    "ev_s": 75.33,
     "altman_z": 12.22,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -7657,8 +7717,8 @@
    "support": 220.21,
    "resistance": 301.2,
    "rsi": 41.1,
-   "volume": 12949774,
-   "vol_ratio": 1.29,
+   "volume": 12981216,
+   "vol_ratio": 0.66,
    "atr_14": 16.07,
    "atr_pct": 7.03,
    "signal": "Neutrale",
@@ -8336,10 +8396,10 @@
    "sortino_6m": 0.98,
    "prepost": {
     "label": "after",
-    "price": 228.5,
-    "change_pct": -0.0
+    "price": 228.11,
+    "change_pct": -0.18
    },
-   "prezzo_limite_aggiustato": 228.5,
+   "prezzo_limite_aggiustato": 228.11,
    "risk_reward": "1:2.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -8365,14 +8425,14 @@
     "target_mean": 341.4355,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
-    "enterprise_value": 197314150400.0,
-    "ev_ebitda": 69.226,
+    "enterprise_value": 201733718016.0,
+    "ev_ebitda": 70.776,
     "peg": 0.6,
     "roa": 0.0413,
     "short_float": 0.0321,
     "buyback_yield": 0.0099,
     "ps": 21.73,
-    "ev_s": 20.88,
+    "ev_s": 21.35,
     "altman_z": 4.49,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -9513,7 +9573,7 @@
    "avg_corr": 0.58,
    "max_corr": 0.76,
    "max_corr_with": "AMD",
-   "risk_contrib_pct": 4.9
+   "risk_contrib_pct": 4.8
   },
   {
    "ticker": "RGTI",
@@ -9539,8 +9599,8 @@
    "support": 11.11,
    "resistance": 16.7,
    "rsi": 30.6,
-   "volume": 8556172,
-   "vol_ratio": 0.85,
+   "volume": 8563790,
+   "vol_ratio": 0.55,
    "atr_14": 0.81,
    "atr_pct": 7.05,
    "signal": "Trend debole",
@@ -9963,10 +10023,10 @@
    "sortino_6m": -1.22,
    "prepost": {
     "label": "after",
-    "price": 11.54,
-    "change_pct": 0.17
+    "price": 11.5,
+    "change_pct": -0.15
    },
-   "prezzo_limite_aggiustato": 11.54,
+   "prezzo_limite_aggiustato": 11.5,
    "risk_reward": "1:3.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -9992,14 +10052,14 @@
     "target_mean": 28.525,
     "fcf": 26453624.0,
     "gross_margin": 0.3461,
-    "enterprise_value": 3445657088.0,
+    "enterprise_value": 3459008000.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": -0.0945,
     "short_float": 0.1976,
     "buyback_yield": -0.0993,
     "ps": 287.95,
-    "ev_s": 258.04,
+    "ev_s": 259.04,
     "altman_z": 1.42,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -11005,7 +11065,7 @@
    "avg_corr": 0.53,
    "max_corr": 0.64,
    "max_corr_with": "CRWV",
-   "risk_contrib_pct": 3.4
+   "risk_contrib_pct": 3.3
   },
   {
    "ticker": "BE",
@@ -11031,8 +11091,8 @@
    "support": 189.0,
    "resistance": 302.35,
    "rsi": 33.1,
-   "volume": 35651659,
-   "vol_ratio": 1.53,
+   "volume": 35824073,
+   "vol_ratio": 2.25,
    "atr_14": 20.28,
    "atr_pct": 10.49,
    "signal": "Trend debole",
@@ -11493,10 +11553,10 @@
    "sortino_6m": -0.52,
    "prepost": {
     "label": "after",
-    "price": 193.33,
-    "change_pct": 0.02
+    "price": 192.94,
+    "change_pct": -0.19
    },
-   "prezzo_limite_aggiustato": 193.33,
+   "prezzo_limite_aggiustato": 192.94,
    "risk_reward": "1:2.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -12661,7 +12721,7 @@
    "avg_corr": 0.51,
    "max_corr": 0.7,
    "max_corr_with": "CRWV",
-   "risk_contrib_pct": 4.5
+   "risk_contrib_pct": 4.4
   },
   {
    "ticker": "SKHY",
@@ -12687,8 +12747,8 @@
    "support": 130.79,
    "resistance": 195.97,
    "rsi": 34.1,
-   "volume": 15994919,
-   "vol_ratio": 1.24,
+   "volume": 16180562,
+   "vol_ratio": 0.82,
    "atr_14": 8.7,
    "atr_pct": 6.35,
    "signal": "Neutrale",
@@ -12966,10 +13026,10 @@
    "sortino_6m": -1.12,
    "prepost": {
     "label": "after",
-    "price": 137.35,
-    "change_pct": 0.24
+    "price": 137.45,
+    "change_pct": 0.31
    },
-   "prezzo_limite_aggiustato": 137.35,
+   "prezzo_limite_aggiustato": 137.45,
    "risk_reward": "1:3.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -13979,8 +14039,8 @@
    "support": 133.6,
    "resistance": 170.17,
    "rsi": 49.5,
-   "volume": 18332609,
-   "vol_ratio": 0.96,
+   "volume": 18365943,
+   "vol_ratio": 0.85,
    "atr_14": 9.79,
    "atr_pct": 6.7,
    "signal": "Trend rialzista",
@@ -14682,10 +14742,10 @@
    "sortino_6m": -0.65,
    "prepost": {
     "label": "after",
-    "price": 146.63,
-    "change_pct": 0.42
+    "price": 146.95,
+    "change_pct": 0.64
    },
-   "prezzo_limite_aggiustato": 146.63,
+   "prezzo_limite_aggiustato": 146.95,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -15855,7 +15915,7 @@
    "avg_corr": 0.36,
    "max_corr": 0.48,
    "max_corr_with": "RGTI",
-   "risk_contrib_pct": 9.0
+   "risk_contrib_pct": 8.9
   },
   {
    "ticker": "CRWV",
@@ -15881,8 +15941,8 @@
    "support": 53.5,
    "resistance": 93.21,
    "rsi": 25.8,
-   "volume": 45984246,
-   "vol_ratio": 1.86,
+   "volume": 46371125,
+   "vol_ratio": 1.02,
    "atr_14": 5.99,
    "atr_pct": 11.04,
    "signal": "Ipervenduto",
@@ -16263,10 +16323,10 @@
    "sortino_6m": -2.13,
    "prepost": {
     "label": "after",
-    "price": 54.36,
-    "change_pct": 0.23
+    "price": 54.39,
+    "change_pct": 0.29
    },
-   "prezzo_limite_aggiustato": 54.36,
+   "prezzo_limite_aggiustato": 54.39,
    "risk_reward": "1:3.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -17272,13 +17332,43 @@
    "rs_1m": -38.8,
    "rs_bench": "sp500",
    "rs_ndx_1m": -34.8,
-   "qta": 205,
-   "pmc": 81.41,
-   "controvalore": 11119.2,
-   "gain_pct_pos": -33.37,
+   "qta": 255,
+   "pmc": 76.14,
+   "controvalore": 13831.2,
+   "gain_pct_pos": -28.76,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "COREWEI"
+    "stato": "quotato",
+    "codice": "COREWEI",
+    "entita": "COREWEAVE INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 500,
+    "prezzo": 80.4973,
+    "punti": 19.5,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "HY",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "HY",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -17315,7 +17405,7 @@
    "avg_corr": 0.54,
    "max_corr": 0.7,
    "max_corr_with": "BE",
-   "risk_contrib_pct": 6.6
+   "risk_contrib_pct": 8.2
   },
   {
    "ticker": "BTC-USD",
@@ -17323,15 +17413,15 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 81331.05,
+   "price": 81253.1,
    "price_asof": "2026-10-23",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.02,
+   "change_pct": -0.07,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -35.6,
-   "sma200_dist_pct": 11.6,
+   "sma200_dist_pct": 11.5,
    "sma50_dist_pct": -0.6,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
@@ -17340,11 +17430,11 @@
    "day_low": 81046.8,
    "support": 79735.86,
    "resistance": 86971.78,
-   "rsi": 46.1,
-   "volume": 21963960320,
-   "vol_ratio": 1.16,
+   "rsi": 45.8,
+   "volume": 21873364992,
+   "vol_ratio": 0.76,
    "atr_14": 2077.05,
-   "atr_pct": 2.55,
+   "atr_pct": 2.56,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -17353,7 +17443,7 @@
      82941.0,
      84011.97,
      81311.89,
-     81331.05
+     81253.1
     ],
     "m6": [
      64239.68,
@@ -17481,7 +17571,7 @@
      82941.0,
      84011.97,
      81311.89,
-     81331.05
+     81253.1
     ],
     "all": [
      386.94,
@@ -17629,7 +17719,7 @@
      62813.75,
      78548.63,
      83553.85,
-     81324.61
+     81253.11
     ],
     "m1": [
      84497.21,
@@ -17653,7 +17743,7 @@
      82941.0,
      84011.97,
      81311.89,
-     81331.05
+     81253.1
     ],
     "m3": [
      69266.19,
@@ -17721,7 +17811,7 @@
      82941.0,
      84011.97,
      81311.89,
-     81331.05
+     81253.1
     ],
     "y1": [
      110069.73,
@@ -17797,7 +17887,7 @@
      81676.34,
      83095.12,
      82017.6,
-     81331.05
+     81253.1
     ],
     "d1": [
      81159.82,
@@ -17924,7 +18014,13 @@
      81257.76,
      81257.91,
      81279.07,
-     81331.05
+     81383.49,
+     81370.82,
+     81359.11,
+     81330.05,
+     81350.37,
+     81291.84,
+     81252.9
     ]
    },
    "earnings_date": null,
@@ -17933,12 +18029,12 @@
    "health": 42,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.66,
-   "sortino_1y": -0.91,
-   "sharpe_6m": 1.52,
-   "sortino_6m": 2.73,
+   "sharpe_1y": -0.67,
+   "sortino_1y": -0.92,
+   "sharpe_6m": 1.51,
+   "sortino_6m": 2.72,
    "prepost": null,
-   "prezzo_limite_aggiustato": 81331.05,
+   "prezzo_limite_aggiustato": 81253.1,
    "risk_reward": "1:1.4",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -17952,22 +18048,22 @@
     "w1": {
      "support": 80841.27,
      "resistance": 84840.05,
-     "change_pct": -0.64
+     "change_pct": -0.73
     },
     "m1": {
      "support": 79735.86,
      "resistance": 87146.35,
-     "change_pct": -3.75
+     "change_pct": -3.84
     },
     "m3": {
      "support": 64111.07,
      "resistance": 87363.76,
-     "change_pct": 17.42
+     "change_pct": 17.31
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 16.57
+     "change_pct": 16.46
     }
    },
    "financials": [],
@@ -17994,74 +18090,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 81331.05,
+     "prezzo": 81253.1,
      "medie": {
       "sma10": {
-       "liv": 82005.4,
-       "dist_pct": -0.82
+       "liv": 81997.6,
+       "dist_pct": -0.91
       },
       "ema10": {
-       "liv": 82207.86,
-       "dist_pct": -1.07
+       "liv": 82193.69,
+       "dist_pct": -1.14
       },
       "sma20": {
-       "liv": 82841.32,
-       "dist_pct": -1.82
+       "liv": 82837.42,
+       "dist_pct": -1.91
       },
       "ema20": {
-       "liv": 82433.41,
-       "dist_pct": -1.34
+       "liv": 82425.99,
+       "dist_pct": -1.42
       },
       "sma30": {
-       "liv": 83296.59,
-       "dist_pct": -2.36
+       "liv": 83293.99,
+       "dist_pct": -2.45
       },
       "ema30": {
-       "liv": 82176.7,
-       "dist_pct": -1.03
+       "liv": 82171.67,
+       "dist_pct": -1.12
       },
       "sma50": {
-       "liv": 81783.48,
-       "dist_pct": -0.55
+       "liv": 81781.92,
+       "dist_pct": -0.65
       },
       "ema50": {
-       "liv": 80804.37,
-       "dist_pct": 0.65
+       "liv": 80801.32,
+       "dist_pct": 0.56
       },
       "sma100": {
-       "liv": 75121.05,
-       "dist_pct": 8.27
+       "liv": 75120.27,
+       "dist_pct": 8.16
       },
       "ema100": {
-       "liv": 77470.17,
-       "dist_pct": 4.98
+       "liv": 77468.63,
+       "dist_pct": 4.89
       },
       "sma200": {
-       "liv": 72857.87,
-       "dist_pct": 11.63
+       "liv": 72857.48,
+       "dist_pct": 11.52
       },
       "ema200": {
-       "liv": 76233.1,
-       "dist_pct": 6.69
+       "liv": 76232.33,
+       "dist_pct": 6.59
       }
      },
      "medie_battute": 5,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 46.1,
+      "rsi14": 45.8,
       "macd": {
-       "linea": -48.86,
-       "segnale": 183.73,
-       "istogramma": -232.59
+       "linea": -55.08,
+       "segnale": 182.49,
+       "istogramma": -237.56
       },
-      "stoch_k": 31.3,
-      "stoch_d": 48.6,
-      "williams_r": -68.7,
-      "cci20": -60.3,
+      "stoch_k": 29.7,
+      "stoch_d": 48.1,
+      "williams_r": -70.3,
+      "cci20": -61.3,
       "adx14": 17.3,
       "di_su": 19.6,
       "di_giu": 21.0,
-      "momentum10": -1764.08
+      "momentum10": -1842.02
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -18554,19 +18650,19 @@
       "o": 81316.2,
       "h": 81914.82,
       "l": 81046.8,
-      "c": 81331.05
+      "c": 81253.1
      }
     ],
     "performance": {
-     "s1": -0.84,
-     "m1": -4.15,
-     "m3": 25.74,
-     "m6": 28.0,
-     "a1": 18.11,
-     "ytd": -8.34,
-     "a3": 134.6,
-     "a5": 32.64,
-     "a10": 11502.61
+     "s1": -0.93,
+     "m1": -4.24,
+     "m3": 25.62,
+     "m6": 27.88,
+     "a1": 18.0,
+     "ytd": -8.43,
+     "a3": 134.38,
+     "a5": 32.51,
+     "a10": 11491.49
     },
     "stagionalita": [
      {
@@ -18652,7 +18748,7 @@
      },
      {
       "mese": 10,
-      "media": 15.15,
+      "media": 15.14,
       "mediana": 10.92,
       "positivi_pct": 69,
       "campione": 13,
@@ -18679,7 +18775,7 @@
      }
     ]
    },
-   "rs_1m": -2.7,
+   "rs_1m": -2.8,
    "rs_bench": "sp500",
    "rs_ndx_1m": 1.2,
    "beta_ndx": 0.67,
@@ -20289,25 +20385,25 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 29164.75,
+   "price": 29175.0,
    "price_asof": "2026-10-23",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.08,
+   "change_pct": 0.11,
    "pe": null,
    "ath": 31616.5,
-   "ath_dist_pct": -7.8,
+   "ath_dist_pct": -7.7,
    "sma200_dist_pct": 4.3,
    "sma50_dist_pct": -2.7,
    "w52_high": 31616.5,
    "w52_low": 22961.5,
-   "w52_dist_pct": -7.8,
+   "w52_dist_pct": -7.7,
    "day_high": 29326.0,
    "day_low": 28987.0,
    "support": 28987.0,
    "resistance": 31616.5,
-   "rsi": 37.0,
-   "volume": 668991,
+   "rsi": 37.2,
+   "volume": 672105,
    "vol_ratio": 1.21,
    "atr_14": 541.87,
    "atr_pct": 1.86,
@@ -20319,7 +20415,7 @@
      29675.25,
      30007.0,
      29142.0,
-     29164.75
+     29175.0
     ],
     "m6": [
      27440.5,
@@ -20447,7 +20543,7 @@
      29675.25,
      30007.0,
      29142.0,
-     29164.75
+     29175.0
     ],
     "all": [
      3621.0,
@@ -20717,7 +20813,7 @@
      28404.25,
      29513.0,
      30698.75,
-     29164.75
+     29175.0
     ],
     "m1": [
      30766.75,
@@ -20741,7 +20837,7 @@
      29675.25,
      30007.0,
      29142.0,
-     29164.75
+     29175.0
     ],
     "m3": [
      28620.75,
@@ -20809,7 +20905,7 @@
      29675.25,
      30007.0,
      29142.0,
-     29164.75
+     29175.0
     ],
     "y1": [
      25254.0,
@@ -20963,7 +21059,10 @@
      29122.5,
      29144.0,
      29166.5,
-     29169.0
+     29169.0,
+     29166.75,
+     29166.75,
+     29175.0
     ]
    },
    "earnings_date": null,
@@ -20973,11 +21072,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": 0.55,
-   "sortino_1y": 0.78,
+   "sortino_1y": 0.79,
    "sharpe_6m": 0.4,
-   "sortino_6m": 0.57,
+   "sortino_6m": 0.58,
    "prepost": null,
-   "prezzo_limite_aggiustato": 29164.75,
+   "prezzo_limite_aggiustato": 29175.0,
    "risk_reward": "1:2.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -20991,22 +21090,22 @@
     "w1": {
      "support": 28987.0,
      "resistance": 30113.0,
-     "change_pct": -1.88
+     "change_pct": -1.84
     },
     "m1": {
      "support": 28987.0,
      "resistance": 31616.5,
-     "change_pct": -5.21
+     "change_pct": -5.17
     },
     "m3": {
      "support": 27201.5,
      "resistance": 31616.5,
-     "change_pct": 1.9
+     "change_pct": 1.94
     },
     "y1": {
      "support": 22961.5,
      "resistance": 31616.5,
-     "change_pct": 15.49
+     "change_pct": 15.53
     }
    },
    "financials": [],
@@ -21029,74 +21128,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 29164.75,
+     "prezzo": 29175.0,
      "medie": {
       "sma10": {
-       "liv": 29911.92,
-       "dist_pct": -2.5
+       "liv": 29912.95,
+       "dist_pct": -2.47
       },
       "ema10": {
-       "liv": 29831.06,
-       "dist_pct": -2.23
+       "liv": 29832.92,
+       "dist_pct": -2.21
       },
       "sma20": {
-       "liv": 30455.06,
-       "dist_pct": -4.24
+       "liv": 30455.58,
+       "dist_pct": -4.2
       },
       "ema20": {
-       "liv": 30093.58,
-       "dist_pct": -3.09
+       "liv": 30094.56,
+       "dist_pct": -3.06
       },
       "sma30": {
-       "liv": 30315.55,
-       "dist_pct": -3.8
+       "liv": 30315.89,
+       "dist_pct": -3.76
       },
       "ema30": {
-       "liv": 30112.08,
-       "dist_pct": -3.15
+       "liv": 30112.74,
+       "dist_pct": -3.11
       },
       "sma50": {
-       "liv": 29975.5,
-       "dist_pct": -2.7
+       "liv": 29975.71,
+       "dist_pct": -2.67
       },
       "ema50": {
-       "liv": 29989.91,
-       "dist_pct": -2.75
+       "liv": 29990.31,
+       "dist_pct": -2.72
       },
       "sma100": {
-       "liv": 29719.36,
-       "dist_pct": -1.87
+       "liv": 29719.46,
+       "dist_pct": -1.83
       },
       "ema100": {
-       "liv": 29475.45,
-       "dist_pct": -1.05
+       "liv": 29475.65,
+       "dist_pct": -1.02
       },
       "sma200": {
-       "liv": 27966.27,
-       "dist_pct": 4.29
+       "liv": 27966.32,
+       "dist_pct": 4.32
       },
       "ema200": {
-       "liv": 28457.99,
-       "dist_pct": 2.48
+       "liv": 28458.09,
+       "dist_pct": 2.52
       }
      },
      "medie_battute": 2,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 37.0,
+      "rsi14": 37.2,
       "macd": {
-       "linea": -197.42,
-       "segnale": 24.93,
-       "istogramma": -222.35
+       "linea": -196.6,
+       "segnale": 25.09,
+       "istogramma": -221.69
       },
-      "stoch_k": 6.8,
-      "stoch_d": 14.5,
-      "williams_r": -93.2,
-      "cci20": -102.4,
+      "stoch_k": 7.1,
+      "stoch_d": 14.7,
+      "williams_r": -92.9,
+      "cci20": -102.1,
       "adx14": 26.0,
       "di_su": 12.4,
       "di_giu": 30.6,
-      "momentum10": -1944.0
+      "momentum10": -1933.75
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -21589,19 +21688,19 @@
       "o": 29116.5,
       "h": 29326.0,
       "l": 28987.0,
-      "c": 29164.75
+      "c": 29175.0
      }
     ],
     "performance": {
-     "s1": -0.77,
-     "m1": -5.2,
-     "m3": -0.06,
-     "m6": 6.3,
-     "ytd": 14.89,
-     "a1": 24.31,
-     "a3": 118.95,
-     "a5": 125.89,
-     "a10": 604.25
+     "s1": -0.74,
+     "m1": -5.17,
+     "m3": -0.02,
+     "m6": 6.34,
+     "ytd": 14.93,
+     "a1": 24.35,
+     "a3": 119.03,
+     "a5": 125.97,
+     "a10": 604.5
     },
     "stagionalita": [
      {
@@ -21714,7 +21813,7 @@
      }
     ]
    },
-   "rs_1m": -4.2,
+   "rs_1m": -4.1,
    "rs_bench": "sp500",
    "rs_ndx_1m": -0.2,
    "beta_ndx": 0.98,
@@ -24721,7 +24820,7 @@
    "resistance": 2864.83,
    "rsi": 43.3,
    "volume": 0,
-   "vol_ratio": 1.14,
+   "vol_ratio": null,
    "atr_14": 34.19,
    "atr_pct": 1.23,
    "signal": "Trend debole",
@@ -26291,20 +26390,20 @@
    "price_asof": "2026-10-23",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.36,
+   "change_pct": -0.27,
    "pe": null,
    "ath": 1.6,
-   "ath_dist_pct": -30.2,
-   "sma200_dist_pct": -3.3,
-   "sma50_dist_pct": -2.2,
+   "ath_dist_pct": -30.1,
+   "sma200_dist_pct": -3.2,
+   "sma50_dist_pct": -2.1,
    "w52_high": 1.2,
    "w52_low": 1.11,
-   "w52_dist_pct": -6.9,
+   "w52_dist_pct": -6.8,
    "day_high": 1.12,
    "day_low": 1.12,
    "support": 1.11,
    "resistance": 1.14,
-   "rsi": 33.0,
+   "rsi": 34.0,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 0.00607,
@@ -27001,19 +27100,23 @@
      1.12,
      1.12,
      1.12,
+     1.12,
+     1.12,
+     1.12,
+     1.12,
      1.12
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 31,
+   "health": 32,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.32,
-   "sortino_1y": -1.86,
-   "sharpe_6m": -2.73,
-   "sortino_6m": -3.34,
+   "sharpe_1y": -1.3,
+   "sortino_1y": -1.84,
+   "sharpe_6m": -2.7,
+   "sortino_6m": -3.31,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.12,
    "risk_reward": "1:1.6",
@@ -27029,22 +27132,22 @@
     "w1": {
      "support": 1.12,
      "resistance": 1.13,
-     "change_pct": -0.28
+     "change_pct": -0.19
     },
     "m1": {
      "support": 1.11,
      "resistance": 1.14,
-     "change_pct": -1.65
+     "change_pct": -1.56
     },
     "m3": {
      "support": 1.11,
      "resistance": 1.17,
-     "change_pct": -1.6
+     "change_pct": -1.51
     },
     "y1": {
      "support": 1.11,
      "resistance": 1.2,
-     "change_pct": -2.82
+     "change_pct": -2.73
     }
    },
    "financials": [],
@@ -27075,66 +27178,66 @@
      "medie": {
       "sma10": {
        "liv": 1.12,
-       "dist_pct": -0.12
+       "dist_pct": -0.04
       },
       "ema10": {
        "liv": 1.12,
-       "dist_pct": -0.24
+       "dist_pct": -0.17
       },
       "sma20": {
        "liv": 1.12,
-       "dist_pct": -0.44
+       "dist_pct": -0.36
       },
       "ema20": {
        "liv": 1.13,
-       "dist_pct": -0.62
+       "dist_pct": -0.54
       },
       "sma30": {
        "liv": 1.13,
-       "dist_pct": -1.13
+       "dist_pct": -1.04
       },
       "ema30": {
        "liv": 1.13,
-       "dist_pct": -1.01
+       "dist_pct": -0.93
       },
       "sma50": {
        "liv": 1.14,
-       "dist_pct": -2.18
+       "dist_pct": -2.1
       },
       "ema50": {
        "liv": 1.14,
-       "dist_pct": -1.55
+       "dist_pct": -1.46
       },
       "sma100": {
        "liv": 1.15,
-       "dist_pct": -2.28
+       "dist_pct": -2.19
       },
       "ema100": {
        "liv": 1.14,
-       "dist_pct": -2.23
+       "dist_pct": -2.14
       },
       "sma200": {
        "liv": 1.16,
-       "dist_pct": -3.3
+       "dist_pct": -3.21
       },
       "ema200": {
        "liv": 1.15,
-       "dist_pct": -2.83
+       "dist_pct": -2.75
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 33.0,
+      "rsi14": 34.0,
       "macd": {
        "linea": -0.01,
        "segnale": -0.01,
        "istogramma": 0.0
       },
-      "stoch_k": 49.7,
-      "stoch_d": 63.3,
-      "williams_r": -50.3,
-      "cci20": -18.0,
+      "stoch_k": 55.9,
+      "stoch_d": 65.4,
+      "williams_r": -44.1,
+      "cci20": -16.4,
       "adx14": 47.8,
       "di_su": 10.6,
       "di_giu": 25.1,
@@ -27635,15 +27738,15 @@
      }
     ],
     "performance": {
-     "s1": -0.17,
-     "m1": -2.21,
-     "m3": -1.9,
-     "m6": -4.2,
-     "a1": -2.89,
-     "ytd": -4.73,
-     "a3": 5.46,
-     "a5": -3.17,
-     "a10": 1.91
+     "s1": -0.08,
+     "m1": -2.13,
+     "m3": -1.82,
+     "m6": -4.11,
+     "a1": -2.81,
+     "ytd": -4.65,
+     "a3": 5.55,
+     "a5": -3.09,
+     "a10": 2.0
     },
     "stagionalita": [
      {
@@ -27761,7 +27864,7 @@
    "rs_ndx_1m": 3.2,
    "beta_ndx": -0.0,
    "avg_corr": -0.05,
-   "max_corr": 0.12,
+   "max_corr": 0.11,
    "max_corr_with": "BE"
   },
   {
@@ -27774,24 +27877,24 @@
    "price_asof": "2026-10-23",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 2.23,
+   "change_pct": 2.12,
    "pe": null,
    "ath": 6.83,
-   "ath_dist_pct": -4.8,
-   "sma200_dist_pct": 5.1,
-   "sma50_dist_pct": -1.0,
+   "ath_dist_pct": -4.9,
+   "sma200_dist_pct": 5.0,
+   "sma50_dist_pct": -1.1,
    "w52_high": 6.83,
    "w52_low": 4.92,
-   "w52_dist_pct": -4.8,
+   "w52_dist_pct": -4.9,
    "day_high": 6.53,
    "day_low": 6.37,
    "support": 6.36,
    "resistance": 6.73,
-   "rsi": 47.1,
-   "volume": 42540,
-   "vol_ratio": 0.65,
+   "rsi": 46.7,
+   "volume": 42983,
+   "vol_ratio": 39.75,
    "atr_14": 0.09586,
-   "atr_pct": 1.47,
+   "atr_pct": 1.48,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -28446,19 +28549,21 @@
      6.49,
      6.49,
      6.5,
+     6.5,
+     6.5,
      6.5
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 44,
+   "health": 43,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.78,
-   "sortino_1y": 1.12,
-   "sharpe_6m": 0.48,
-   "sortino_6m": 0.65,
+   "sharpe_1y": 0.77,
+   "sortino_1y": 1.11,
+   "sharpe_6m": 0.47,
+   "sortino_6m": 0.64,
    "prepost": null,
    "prezzo_limite_aggiustato": 6.5,
    "risk_reward": "1:1.2",
@@ -28474,31 +28579,31 @@
     "w1": {
      "support": 6.36,
      "resistance": 6.57,
-     "change_pct": -0.51
+     "change_pct": -0.62
     },
     "m1": {
      "support": 6.36,
      "resistance": 6.73,
-     "change_pct": -3.19
+     "change_pct": -3.29
     },
     "m3": {
      "support": 6.25,
      "resistance": 6.83,
-     "change_pct": 3.16
+     "change_pct": 3.05
     },
     "y1": {
      "support": 4.92,
      "resistance": 6.83,
-     "change_pct": 27.99
+     "change_pct": 27.85
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 38,
-    "label": "Lieve ribasso",
+    "bias": 24,
+    "label": "Distribuzione",
     "structure": "laterale",
-    "bos": null,
+    "bos": "ribassista",
     "bull_fvg": 0,
     "bear_fvg": 4,
     "last_fvg": {
@@ -28507,7 +28612,7 @@
      "hi": 6.54
     },
     "liq_above": 6.52,
-    "liq_below": 6.5,
+    "liq_below": 6.46,
     "order_block": {
      "dir": "rialzista",
      "lo": 6.54,
@@ -28520,66 +28625,66 @@
      "medie": {
       "sma10": {
        "liv": 6.55,
-       "dist_pct": -0.76
+       "dist_pct": -0.86
       },
       "ema10": {
-       "liv": 6.53,
-       "dist_pct": -0.33
+       "liv": 6.52,
+       "dist_pct": -0.42
       },
       "sma20": {
        "liv": 6.56,
-       "dist_pct": -0.79
+       "dist_pct": -0.89
       },
       "ema20": {
        "liv": 6.55,
-       "dist_pct": -0.71
+       "dist_pct": -0.8
       },
       "sma30": {
        "liv": 6.57,
-       "dist_pct": -0.94
+       "dist_pct": -1.05
       },
       "ema30": {
        "liv": 6.56,
-       "dist_pct": -0.78
+       "dist_pct": -0.88
       },
       "sma50": {
        "liv": 6.57,
-       "dist_pct": -1.0
+       "dist_pct": -1.11
       },
       "ema50": {
        "liv": 6.54,
-       "dist_pct": -0.52
+       "dist_pct": -0.62
       },
       "sma100": {
        "liv": 6.46,
-       "dist_pct": 0.73
+       "dist_pct": 0.62
       },
       "ema100": {
        "liv": 6.43,
-       "dist_pct": 1.08
+       "dist_pct": 0.98
       },
       "sma200": {
        "liv": 6.19,
-       "dist_pct": 5.07
+       "dist_pct": 4.96
       },
       "ema200": {
        "liv": 6.19,
-       "dist_pct": 5.09
+       "dist_pct": 4.98
       }
      },
      "medie_battute": 4,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 47.1,
+      "rsi14": 46.7,
       "macd": {
        "linea": -0.02,
        "segnale": -0.0,
        "istogramma": -0.02
       },
-      "stoch_k": 39.6,
-      "stoch_d": 21.4,
-      "williams_r": -60.4,
-      "cci20": -102.0,
+      "stoch_k": 37.7,
+      "stoch_d": 20.7,
+      "williams_r": -62.3,
+      "cci20": -104.3,
       "adx14": 11.0,
       "di_su": 30.3,
       "di_giu": 36.0,
@@ -29080,15 +29185,15 @@
      }
     ],
     "performance": {
-     "s1": -0.41,
-     "m1": -2.6,
-     "m3": 0.83,
-     "m6": 7.99,
-     "ytd": 15.33,
-     "a1": 43.95,
-     "a3": 68.07,
-     "a5": 82.02,
-     "a10": 157.3
+     "s1": -0.51,
+     "m1": -2.7,
+     "m3": 0.72,
+     "m6": 7.87,
+     "ytd": 15.2,
+     "a1": 43.8,
+     "a3": 67.89,
+     "a5": 81.82,
+     "a10": 157.02
     },
     "stagionalita": [
      {
@@ -29215,28 +29320,28 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 103.28,
+   "price": 103.44,
    "price_asof": "2026-10-23",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 3.83,
+   "change_pct": 3.99,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -29.9,
-   "sma200_dist_pct": 21.1,
-   "sma50_dist_pct": 11.1,
+   "ath_dist_pct": -29.8,
+   "sma200_dist_pct": 21.3,
+   "sma50_dist_pct": 11.3,
    "w52_high": 119.48,
    "w52_low": 54.98,
-   "w52_dist_pct": -13.6,
+   "w52_dist_pct": -13.4,
    "day_high": 103.92,
    "day_low": 98.84,
    "support": 86.86,
    "resistance": 110.48,
-   "rsi": 63.0,
-   "volume": 307011,
-   "vol_ratio": 1.13,
+   "rsi": 63.2,
+   "volume": 309751,
+   "vol_ratio": 1.06,
    "atr_14": 4.6,
-   "atr_pct": 4.45,
+   "atr_pct": 4.44,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -29245,7 +29350,7 @@
      101.79,
      97.15,
      99.47,
-     103.28
+     103.44
     ],
     "m6": [
      96.37,
@@ -29373,7 +29478,7 @@
      101.79,
      97.15,
      99.47,
-     103.28
+     103.44
     ],
     "all": [
      33.1,
@@ -29644,7 +29749,7 @@
      84.67,
      85.76,
      90.42,
-     103.28
+     103.44
     ],
     "m1": [
      94.61,
@@ -29668,7 +29773,7 @@
      101.79,
      97.15,
      99.47,
-     103.28
+     103.44
     ],
     "m3": [
      92.19,
@@ -29736,7 +29841,7 @@
      101.79,
      97.15,
      99.47,
-     103.28
+     103.44
     ],
     "y1": [
      61.79,
@@ -29891,21 +29996,23 @@
      103.6,
      103.48,
      103.21,
-     103.28
+     103.31,
+     103.34,
+     103.26
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 86,
+   "health": 87,
    "eps": null,
    "beta": null,
    "sharpe_1y": 0.86,
    "sortino_1y": 1.18,
-   "sharpe_6m": 0.28,
-   "sortino_6m": 0.4,
+   "sharpe_6m": 0.29,
+   "sortino_6m": 0.41,
    "prepost": null,
-   "prezzo_limite_aggiustato": 103.28,
+   "prezzo_limite_aggiustato": 103.44,
    "risk_reward": "1:0.8",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -29919,22 +30026,22 @@
     "w1": {
      "support": 96.26,
      "resistance": 110.48,
-     "change_pct": -0.37
+     "change_pct": -0.21
     },
     "m1": {
      "support": 86.86,
      "resistance": 110.48,
-     "change_pct": 9.16
+     "change_pct": 9.33
     },
     "m3": {
      "support": 74.24,
      "resistance": 110.48,
-     "change_pct": 12.03
+     "change_pct": 12.2
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 67.15
+     "change_pct": 67.41
     }
    },
    "financials": [],
@@ -29961,74 +30068,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 103.28,
+     "prezzo": 103.44,
      "medie": {
       "sma10": {
-       "liv": 98.77,
-       "dist_pct": 4.57
+       "liv": 98.79,
+       "dist_pct": 4.71
       },
       "ema10": {
-       "liv": 98.84,
-       "dist_pct": 4.49
+       "liv": 98.87,
+       "dist_pct": 4.62
       },
       "sma20": {
-       "liv": 94.73,
-       "dist_pct": 9.03
+       "liv": 94.74,
+       "dist_pct": 9.19
       },
       "ema20": {
-       "liv": 96.72,
-       "dist_pct": 6.78
+       "liv": 96.74,
+       "dist_pct": 6.93
       },
       "sma30": {
        "liv": 95.87,
-       "dist_pct": 7.73
+       "dist_pct": 7.89
       },
       "ema30": {
-       "liv": 95.32,
-       "dist_pct": 8.35
+       "liv": 95.33,
+       "dist_pct": 8.51
       },
       "sma50": {
        "liv": 92.93,
-       "dist_pct": 11.14
+       "dist_pct": 11.31
       },
       "ema50": {
        "liv": 93.12,
-       "dist_pct": 10.91
+       "dist_pct": 11.08
       },
       "sma100": {
        "liv": 86.38,
-       "dist_pct": 19.57
+       "dist_pct": 19.75
       },
       "ema100": {
        "liv": 89.73,
-       "dist_pct": 15.11
+       "dist_pct": 15.28
       },
       "sma200": {
        "liv": 85.29,
-       "dist_pct": 21.1
+       "dist_pct": 21.28
       },
       "ema200": {
        "liv": 84.49,
-       "dist_pct": 22.24
+       "dist_pct": 22.43
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.0,
+      "rsi14": 63.2,
       "macd": {
-       "linea": 2.43,
+       "linea": 2.45,
        "segnale": 1.66,
-       "istogramma": 0.77
+       "istogramma": 0.78
       },
-      "stoch_k": 69.5,
-      "stoch_d": 55.5,
-      "williams_r": -30.5,
-      "cci20": 99.2,
+      "stoch_k": 70.2,
+      "stoch_d": 55.7,
+      "williams_r": -29.8,
+      "cci20": 99.8,
       "adx14": 29.4,
       "di_su": 34.9,
       "di_giu": 13.4,
-      "momentum10": 11.43
+      "momentum10": 11.59
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -30521,19 +30628,19 @@
       "o": 99.1,
       "h": 103.92,
       "l": 98.84,
-      "c": 103.28
+      "c": 103.44
      }
     ],
     "performance": {
-     "s1": 1.84,
-     "m1": 12.07,
-     "m3": 18.95,
-     "m6": 9.41,
-     "ytd": 80.18,
-     "a1": 61.35,
-     "a3": 34.51,
-     "a5": 97.85,
-     "a10": 114.1
+     "s1": 2.0,
+     "m1": 12.24,
+     "m3": 19.13,
+     "m6": 9.58,
+     "ytd": 80.46,
+     "a1": 61.6,
+     "a3": 34.72,
+     "a5": 98.16,
+     "a10": 114.43
     },
     "stagionalita": [
      {
@@ -30646,9 +30753,9 @@
      }
     ]
    },
-   "rs_1m": 10.2,
+   "rs_1m": 10.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 14.2,
+   "rs_ndx_1m": 14.3,
    "beta_ndx": -0.89,
    "avg_corr": -0.23,
    "max_corr": -0.04,
@@ -30678,8 +30785,8 @@
    "support": 30.92,
    "resistance": 45.77,
    "rsi": 38.0,
-   "volume": 29519817,
-   "vol_ratio": 1.18,
+   "volume": 29585501,
+   "vol_ratio": 0.78,
    "atr_14": 2.55,
    "atr_pct": 7.74,
    "signal": "Neutrale",
@@ -31276,10 +31383,10 @@
    "sortino_6m": 0.3,
    "prepost": {
     "label": "after",
-    "price": 32.98,
-    "change_pct": 0.12
+    "price": 32.96,
+    "change_pct": 0.06
    },
-   "prezzo_limite_aggiustato": 32.98,
+   "prezzo_limite_aggiustato": 32.96,
    "risk_reward": "1:2.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -32096,7 +32203,7 @@
      },
      {
       "d": "2026-10-23",
-      "o": 33.7,
+      "o": 33.64,
       "h": 34.14,
       "l": 32.73,
       "c": 32.94
@@ -32467,8 +32574,8 @@
    "support": 26.07,
    "resistance": 39.3,
    "rsi": 27.2,
-   "volume": 6079538,
-   "vol_ratio": 0.76,
+   "volume": 6097177,
+   "vol_ratio": 0.6,
    "atr_14": 2.02,
    "atr_pct": 7.67,
    "signal": "Ipervenduto",
@@ -32893,10 +33000,10 @@
    "sortino_6m": -3.16,
    "prepost": {
     "label": "after",
-    "price": 26.42,
-    "change_pct": 0.27
+    "price": 26.3,
+    "change_pct": -0.19
    },
-   "prezzo_limite_aggiustato": 26.42,
+   "prezzo_limite_aggiustato": 26.3,
    "risk_reward": "1:3.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Utilities",
@@ -32922,14 +33029,14 @@
     "target_mean": 72.0,
     "fcf": -239324880.0,
     "gross_margin": 0.4041,
-    "enterprise_value": 2563324672.0,
+    "enterprise_value": 2440552960.0,
     "ev_ebitda": null,
     "peg": null,
     "roa": -0.0665,
     "short_float": 0.1999,
     "buyback_yield": null,
     "ps": 4050.88,
-    "ev_s": 2118.45,
+    "ev_s": 2016.99,
     "altman_al": "2026-06-30",
     "altman_base": "trimestrale: stato patrimoniale al 2026-06-30, EBIT degli ultimi 4 trimestri (conto al None)",
     "altman_fuori_scala": 44.84
@@ -33920,8 +34027,8 @@
    "support": 244.73,
    "resistance": 265.34,
    "rsi": 43.2,
-   "volume": 25336345,
-   "vol_ratio": 1.36,
+   "volume": 25470108,
+   "vol_ratio": 0.69,
    "atr_14": 6.66,
    "atr_pct": 2.69,
    "signal": "Neutrale",
@@ -34636,10 +34743,10 @@
    "sortino_6m": -0.75,
    "prepost": {
     "label": "after",
-    "price": 248.6,
-    "change_pct": 0.24
+    "price": 248.26,
+    "change_pct": 0.1
    },
-   "prezzo_limite_aggiustato": 248.6,
+   "prezzo_limite_aggiustato": 248.26,
    "risk_reward": "1:1.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -35764,8 +35871,38 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": 4.4,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "AMZN"
+    "stato": "quotato",
+    "codice": "AMZN",
+    "entita": "Amazon Com Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 100.6581,
+    "punti": -0.66,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -35827,8 +35964,8 @@
    "support": 621.0,
    "resistance": 946.36,
    "rsi": 31.8,
-   "volume": 5548439,
-   "vol_ratio": 1.23,
+   "volume": 5566303,
+   "vol_ratio": 1.17,
    "atr_14": 49.32,
    "atr_pct": 7.82,
    "signal": "Trend debole",
@@ -36505,14 +36642,14 @@
     "target_mean": 1116.5834,
     "fcf": 1943750016.0,
     "gross_margin": 0.4558,
-    "enterprise_value": 147731513344.0,
-    "ev_ebitda": 32.815,
+    "enterprise_value": 145091100672.0,
+    "ev_ebitda": 32.228,
     "peg": 0.4,
     "roa": 0.2935,
     "short_float": 0.0307,
     "buyback_yield": 0.0012,
     "ps": 11.76,
-    "ev_s": 12.11,
+    "ev_s": 11.9,
     "altman_z": 2.41,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -37672,8 +37809,8 @@
    "support": 320.18,
    "resistance": 359.4,
    "rsi": 31.3,
-   "volume": 17369140,
-   "vol_ratio": 1.09,
+   "volume": 17506463,
+   "vol_ratio": 0.69,
    "atr_14": 8.6,
    "atr_pct": 2.69,
    "signal": "Trend debole",
@@ -38301,10 +38438,10 @@
    "sortino_6m": -0.76,
    "prepost": {
     "label": "after",
-    "price": 321.09,
-    "change_pct": 0.27
+    "price": 321.25,
+    "change_pct": 0.32
    },
-   "prezzo_limite_aggiustato": 321.09,
+   "prezzo_limite_aggiustato": 321.25,
    "risk_reward": "1:2.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -39419,8 +39556,38 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": -1.5,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "ALPHINC"
+    "stato": "quotato",
+    "codice": "ALPHINC",
+    "entita": "Alphabet Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 100.6816,
+    "punti": -0.68,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -39481,8 +39648,8 @@
    "support": 331.81,
    "resistance": 465.9,
    "rsi": 35.8,
-   "volume": 13804469,
-   "vol_ratio": 1.58,
+   "volume": 13892448,
+   "vol_ratio": 1.56,
    "atr_14": 24.79,
    "atr_pct": 7.21,
    "signal": "Trend debole",
@@ -40420,10 +40587,10 @@
    "sortino_6m": -0.58,
    "prepost": {
     "label": "after",
-    "price": 342.24,
-    "change_pct": -0.42
+    "price": 342.41,
+    "change_pct": -0.37
    },
-   "prezzo_limite_aggiustato": 342.24,
+   "prezzo_limite_aggiustato": 342.41,
    "risk_reward": "1:2.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -41619,8 +41786,8 @@
    "support": 407.13,
    "resistance": 487.47,
    "rsi": 41.5,
-   "volume": 9436491,
-   "vol_ratio": 1.51,
+   "volume": 9451901,
+   "vol_ratio": 0.85,
    "atr_14": 12.81,
    "atr_pct": 3.06,
    "signal": "Neutrale",
@@ -42330,10 +42497,10 @@
    "sortino_6m": 0.18,
    "prepost": {
     "label": "after",
-    "price": 418.55,
-    "change_pct": 0.01
+    "price": 418.0,
+    "change_pct": -0.12
    },
-   "prezzo_limite_aggiustato": 418.55,
+   "prezzo_limite_aggiustato": 418.0,
    "risk_reward": "1:2.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -43559,8 +43726,8 @@
    "support": 106.13,
    "resistance": 214.0,
    "rsi": 23.6,
-   "volume": 7559373,
-   "vol_ratio": 1.33,
+   "volume": 7575788,
+   "vol_ratio": 0.88,
    "atr_14": 11.56,
    "atr_pct": 10.43,
    "signal": "Ipervenduto",
@@ -43886,10 +44053,10 @@
    "sortino_6m": -2.84,
    "prepost": {
     "label": "after",
-    "price": 111.47,
-    "change_pct": 0.58
+    "price": 111.44,
+    "change_pct": 0.56
    },
-   "prezzo_limite_aggiustato": 111.47,
+   "prezzo_limite_aggiustato": 111.44,
    "risk_reward": "1:4.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -44890,8 +45057,8 @@
    "support": 84.65,
    "resistance": 126.0,
    "rsi": 32.8,
-   "volume": 71475768,
-   "vol_ratio": 1.27,
+   "volume": 71684828,
+   "vol_ratio": 0.67,
    "atr_14": 5.61,
    "atr_pct": 6.45,
    "signal": "Neutrale",
@@ -45754,10 +45921,10 @@
    "sortino_6m": 0.13,
    "prepost": {
     "label": "after",
-    "price": 87.09,
-    "change_pct": 0.15
+    "price": 86.81,
+    "change_pct": -0.18
    },
-   "prezzo_limite_aggiustato": 87.09,
+   "prezzo_limite_aggiustato": 86.81,
    "risk_reward": "1:3.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -45783,14 +45950,14 @@
     "target_mean": 117.1395,
     "fcf": 4866375168.0,
     "gross_margin": 0.3887,
-    "enterprise_value": 467622559744.0,
-    "ev_ebitda": 27.769,
+    "enterprise_value": 475037237248.0,
+    "ev_ebitda": 28.209,
     "peg": 1.36,
     "roa": 0.0141,
     "short_float": 0.0316,
     "buyback_yield": -0.0277,
     "ps": 8.06,
-    "ev_s": 8.2,
+    "ev_s": 8.33,
     "altman_z": 2.04,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -46885,8 +47052,38 @@
    "rs_bench": "sox",
    "rs_ndx_1m": -26.7,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "INTC"
+    "stato": "quotato",
+    "codice": "INTC",
+    "entita": "Intel Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 100.0368,
+    "punti": -0.04,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -46948,8 +47145,8 @@
    "support": 140.66,
    "resistance": 176.42,
    "rsi": 46.7,
-   "volume": 109416222,
-   "vol_ratio": 2.02,
+   "volume": 109627721,
+   "vol_ratio": 1.1,
    "atr_14": 8.1,
    "atr_pct": 5.49,
    "signal": "Neutrale",
@@ -47250,10 +47447,10 @@
    "sortino_6m": -0.48,
    "prepost": {
     "label": "after",
-    "price": 147.82,
-    "change_pct": 0.22
+    "price": 147.8,
+    "change_pct": 0.21
    },
-   "prezzo_limite_aggiustato": 147.82,
+   "prezzo_limite_aggiustato": 147.8,
    "risk_reward": "1:1.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -47279,14 +47476,14 @@
     "target_mean": 257.7059,
     "fcf": null,
     "gross_margin": 0.5674,
-    "enterprise_value": 1914549305344.0,
-    "ev_ebitda": 181.801,
+    "enterprise_value": 1951755665408.0,
+    "ev_ebitda": 185.334,
     "peg": null,
     "roa": null,
     "short_float": 0.0265,
     "buyback_yield": -0.0088,
     "ps": 62.51,
-    "ev_s": 59.75,
+    "ev_s": 60.91,
     "altman_z": 4.15,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -48189,8 +48386,38 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": 4.6,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "SPACEXP"
+    "stato": "quotato",
+    "codice": "SPACEXP",
+    "entita": "SPACE EXPL TECH CORP",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 93.1073,
+    "punti": 6.89,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -48251,8 +48478,8 @@
    "support": 345.88,
    "resistance": 388.86,
    "rsi": 51.5,
-   "volume": 34409377,
-   "vol_ratio": 1.47,
+   "volume": 34615357,
+   "vol_ratio": 0.96,
    "atr_14": 12.58,
    "atr_pct": 3.38,
    "signal": "Sopra SMA50",
@@ -48810,10 +49037,10 @@
    "sortino_6m": -0.15,
    "prepost": {
     "label": "after",
-    "price": 372.11,
-    "change_pct": -0.03
+    "price": 372.06,
+    "change_pct": -0.04
    },
-   "prezzo_limite_aggiustato": 372.11,
+   "prezzo_limite_aggiustato": 372.06,
    "risk_reward": "1:0.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -49937,8 +50164,38 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": 3.5,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "TESLINC"
+    "stato": "quotato",
+    "codice": "TESLINC",
+    "entita": "Tesla Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 95.5038,
+    "punti": 4.5,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -50000,8 +50257,8 @@
    "support": 247.2,
    "resistance": 309.8,
    "rsi": 40.7,
-   "volume": 2657174,
-   "vol_ratio": 1.04,
+   "volume": 2679664,
+   "vol_ratio": 0.7,
    "atr_14": 13.22,
    "atr_pct": 5.21,
    "signal": "Trend debole",
@@ -50420,10 +50677,10 @@
    "sortino_6m": -1.37,
    "prepost": {
     "label": "after",
-    "price": 253.45,
-    "change_pct": 0.0
+    "price": 253.88,
+    "change_pct": 0.17
    },
-   "prezzo_limite_aggiustato": 253.45,
+   "prezzo_limite_aggiustato": 253.88,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Utilities",
@@ -50449,14 +50706,14 @@
     "target_mean": 338.0713,
     "fcf": -6625124864.0,
     "gross_margin": 0.2211,
-    "enterprise_value": 114770788352.0,
-    "ev_ebitda": 14.433,
+    "enterprise_value": 114147205120.0,
+    "ev_ebitda": 14.355,
     "peg": 3.74,
     "roa": 0.0389,
     "short_float": 0.0374,
     "buyback_yield": 0.0045,
     "ps": 2.87,
-    "ev_s": 3.67,
+    "ev_s": 3.65,
     "altman_z": 1.57,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -51238,7 +51495,7 @@
      },
      {
       "d": "2026-10-23",
-      "o": 254.0,
+      "o": 254.02,
       "h": 256.79,
       "l": 247.25,
       "c": 253.45
@@ -51343,7 +51600,7 @@
       },
       "evento": {
        "beta": 0.88,
-       "r2": 0.105,
+       "r2": 0.106,
        "corr": 0.32,
        "campione": 50,
        "da": "2025-10-29",
@@ -51434,8 +51691,39 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 1.9,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "CONSENAG"
+    "stato": "quotato",
+    "codice": "CONSENAG",
+    "entita": "Constellation Energy Generation LLC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 101.0449,
+    "punti": -1.04,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    },
+    "nota": "il CDS e' sulla controllata operativa Constellation Energy Generation LLC, che e' l'emittente del debito: non sulla capogruppo quotata"
    },
    "short_interest": {
     "stato": "misurato",
@@ -51497,8 +51785,8 @@
    "support": 64.1,
    "resistance": 73.07,
    "rsi": 37.1,
-   "volume": 35460039,
-   "vol_ratio": 1.5,
+   "volume": 35672753,
+   "vol_ratio": 0.88,
    "atr_14": 2.12,
    "atr_pct": 3.22,
    "signal": "Trend debole",
@@ -52153,10 +52441,10 @@
    "sortino_6m": -2.66,
    "prepost": {
     "label": "after",
-    "price": 65.96,
-    "change_pct": 0.17
+    "price": 65.83,
+    "change_pct": -0.03
    },
-   "prezzo_limite_aggiustato": 65.96,
+   "prezzo_limite_aggiustato": 65.83,
    "risk_reward": "1:1.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -53275,8 +53563,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": -3.2,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "NFLX"
+    "stato": "quotato",
+    "codice": "NFLX",
+    "entita": "Netflix Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 101.7086,
+    "punti": -1.71,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -53344,8 +53662,8 @@
    "support": 502.22,
    "resistance": 551.15,
    "rsi": 52.6,
-   "volume": 13305533,
-   "vol_ratio": 1.0,
+   "volume": 13629072,
+   "vol_ratio": 0.64,
    "atr_14": 11.28,
    "atr_pct": 2.15,
    "signal": "Trend rialzista",
@@ -54194,10 +54512,10 @@
    "sortino_6m": 2.04,
    "prepost": {
     "label": "after",
-    "price": 524.65,
-    "change_pct": 0.03
+    "price": 523.45,
+    "change_pct": -0.2
    },
-   "prezzo_limite_aggiustato": 524.65,
+   "prezzo_limite_aggiustato": 523.45,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -54223,14 +54541,14 @@
     "target_mean": 601.7281,
     "fcf": 16545500160.0,
     "gross_margin": 0.6794,
-    "enterprise_value": 3921273159680.0,
-    "ev_ebitda": 20.188,
+    "enterprise_value": 3946742808576.0,
+    "ev_ebitda": 20.319,
     "peg": 1.73,
     "roa": 0.1409,
     "short_float": 0.0082,
     "buyback_yield": 0.0052,
     "ps": 11.74,
-    "ev_s": 11.82,
+    "ev_s": 11.89,
     "altman_z": 4.71,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -55321,8 +55639,38 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": 10.3,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "MSFT"
+    "stato": "quotato",
+    "codice": "MSFT",
+    "entita": "Microsoft Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 101.9818,
+    "punti": -1.98,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -55384,8 +55732,8 @@
    "support": 325.81,
    "resistance": 351.73,
    "rsi": 63.9,
-   "volume": 39323315,
-   "vol_ratio": 1.18,
+   "volume": 39450857,
+   "vol_ratio": 1.01,
    "atr_14": 6.41,
    "atr_pct": 1.84,
    "signal": "Trend rialzista",
@@ -56248,10 +56596,10 @@
    "sortino_6m": 2.48,
    "prepost": {
     "label": "after",
-    "price": 347.5,
-    "change_pct": -0.06
+    "price": 347.44,
+    "change_pct": -0.08
    },
-   "prezzo_limite_aggiustato": 347.5,
+   "prezzo_limite_aggiustato": 347.44,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -57372,8 +57720,38 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": 8.5,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "APLINC"
+    "stato": "quotato",
+    "codice": "APLINC",
+    "entita": "Apple Inc.",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.3693,
+    "punti": -2.37,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -57435,8 +57813,8 @@
    "support": 633.27,
    "resistance": 771.27,
    "rsi": 35.8,
-   "volume": 14618577,
-   "vol_ratio": 1.91,
+   "volume": 14729073,
+   "vol_ratio": 0.67,
    "atr_14": 26.08,
    "atr_pct": 4.06,
    "signal": "Neutrale",
@@ -57971,10 +58349,10 @@
    "sortino_6m": -0.4,
    "prepost": {
     "label": "after",
-    "price": 640.58,
-    "change_pct": -0.32
+    "price": 640.03,
+    "change_pct": -0.4
    },
-   "prezzo_limite_aggiustato": 640.58,
+   "prezzo_limite_aggiustato": 640.03,
    "risk_reward": "1:2.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -59094,8 +59472,38 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": -12.4,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "METAPL"
+    "stato": "quotato",
+    "codice": "METAPL",
+    "entita": "META PLATFORMS INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 98.796,
+    "punti": 1.2,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -59157,8 +59565,8 @@
    "support": 220.29,
    "resistance": 252.42,
    "rsi": 60.8,
-   "volume": 5836479,
-   "vol_ratio": 1.0,
+   "volume": 5839544,
+   "vol_ratio": 0.6,
    "atr_14": 8.78,
    "atr_pct": 3.53,
    "signal": "Trend rialzista",
@@ -59536,14 +59944,14 @@
      247.18,
      258.21,
      275.82,
-     303.03,
+     303.04,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -59788,10 +60196,10 @@
    "sortino_6m": 2.42,
    "prepost": {
     "label": "after",
-    "price": 248.35,
-    "change_pct": -0.09
+    "price": 248.67,
+    "change_pct": 0.04
    },
-   "prezzo_limite_aggiustato": 248.35,
+   "prezzo_limite_aggiustato": 248.67,
    "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -59817,14 +60225,14 @@
     "target_mean": 286.1385,
     "fcf": 17731874816.0,
     "gross_margin": 0.7728,
-    "enterprise_value": 236961677312.0,
-    "ev_ebitda": 18.371,
+    "enterprise_value": 235546116096.0,
+    "ev_ebitda": 18.261,
     "peg": 0.86,
     "roa": 0.057,
     "short_float": 0.0462,
     "buyback_yield": 0.0616,
     "ps": 4.66,
-    "ev_s": 5.39,
+    "ev_s": 5.36,
     "altman_z": 1.89,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -60975,8 +61383,8 @@
    "support": 126.75,
    "resistance": 159.5,
    "rsi": 70.0,
-   "volume": 11048177,
-   "vol_ratio": 1.51,
+   "volume": 11057820,
+   "vol_ratio": 0.95,
    "atr_14": 6.12,
    "atr_pct": 3.85,
    "signal": "Ipercomprato",
@@ -61539,14 +61947,14 @@
     "target_mean": 156.5361,
     "fcf": 5149374976.0,
     "gross_margin": 0.7477,
-    "enterprise_value": 166105333760.0,
-    "ev_ebitda": 57.337,
+    "enterprise_value": 168131706880.0,
+    "ev_ebitda": 58.036,
     "peg": 1.1,
     "roa": 0.0425,
     "short_float": 0.0287,
     "buyback_yield": 0.0112,
     "ps": 11.16,
-    "ev_s": 11.28,
+    "ev_s": 11.41,
     "altman_z": 1.07,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -62704,8 +63112,8 @@
    "support": 320.23,
    "resistance": 380.84,
    "rsi": 34.3,
-   "volume": 15680021,
-   "vol_ratio": 1.22,
+   "volume": 15826189,
+   "vol_ratio": 0.68,
    "atr_14": 11.26,
    "atr_pct": 3.5,
    "signal": "Trend debole",
@@ -63273,10 +63681,10 @@
    "sortino_6m": -1.55,
    "prepost": {
     "label": "after",
-    "price": 322.5,
-    "change_pct": 0.25
+    "price": 322.4,
+    "change_pct": 0.22
    },
-   "prezzo_limite_aggiustato": 322.5,
+   "prezzo_limite_aggiustato": 322.4,
    "risk_reward": "1:2.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -63302,14 +63710,14 @@
     "target_mean": 529.1,
     "fcf": 30596499456.0,
     "gross_margin": 0.7551,
-    "enterprise_value": 1578472177664.0,
-    "ev_ebitda": 30.204,
+    "enterprise_value": 1571025190912.0,
+    "ev_ebitda": 30.062,
     "peg": 0.33,
     "roa": 0.1537,
     "short_float": 0.0116,
     "buyback_yield": 0.004,
     "ps": 17.23,
-    "ev_s": 17.71,
+    "ev_s": 17.63,
     "altman_z": 4.22,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -64406,8 +64814,38 @@
    "rs_bench": "sox",
    "rs_ndx_1m": -3.2,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "BROINC"
+    "stato": "quotato",
+    "codice": "BROINC",
+    "entita": "BROADCOM INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 96.845,
+    "punti": 3.16,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -64469,8 +64907,8 @@
    "support": 1550.0,
    "resistance": 1873.5,
    "rsi": 35.2,
-   "volume": 994303,
-   "vol_ratio": 1.39,
+   "volume": 996919,
+   "vol_ratio": 0.67,
    "atr_14": 55.94,
    "atr_pct": 3.56,
    "signal": "Trend debole",
@@ -64920,7 +65358,7 @@
      354.59,
      349.94,
      342.3,
-     416.42,
+     416.43,
      463.98,
      508.16,
      539.49,
@@ -65184,8 +65622,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 17,
-    "target": 2141.74,
-    "upside_pct": 36.3
+    "target": 2143.42,
+    "upside_pct": 36.4
    },
    "analisti": {
     "eps_ora": 55.9293,
@@ -65198,9 +65636,9 @@
     "eps_min": 37.43,
     "eps_max": 63.9,
     "eps_n": 27,
-    "target_min": 866.14,
-    "target_max": 2845.24,
-    "target_mediana": 2299.74
+    "target_min": 866.82,
+    "target_max": 2847.47,
+    "target_mediana": 2301.55
    },
    "health": 20,
    "eps": 40.64,
@@ -65211,10 +65649,10 @@
    "sortino_6m": 0.35,
    "prepost": {
     "label": "after",
-    "price": 1575.22,
-    "change_pct": 0.22
+    "price": 1575.97,
+    "change_pct": 0.27
    },
-   "prezzo_limite_aggiustato": 1575.22,
+   "prezzo_limite_aggiustato": 1575.97,
    "risk_reward": "1:2.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -65237,7 +65675,7 @@
     "debt_to_equity": 8.897,
     "dividend_yield": 0.0058,
     "price_to_book": null,
-    "target_mean": 2141.7407,
+    "target_mean": 2143.4207,
     "fcf": null,
     "gross_margin": 0.5434,
     "enterprise_value": null,
@@ -66383,8 +66821,8 @@
    "support": 31.97,
    "resistance": 38.44,
    "rsi": 55.3,
-   "volume": 25490445,
-   "vol_ratio": 0.69,
+   "volume": 25525339,
+   "vol_ratio": 0.62,
    "atr_14": 1.09,
    "atr_pct": 2.92,
    "signal": "Sopra SMA50",
@@ -67247,10 +67685,10 @@
    "sortino_6m": -1.61,
    "prepost": {
     "label": "after",
-    "price": 37.4,
-    "change_pct": 0.26
+    "price": 37.38,
+    "change_pct": 0.21
    },
-   "prezzo_limite_aggiustato": 37.4,
+   "prezzo_limite_aggiustato": 37.38,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -68433,8 +68871,8 @@
    "support": 122.76,
    "resistance": 146.4,
    "rsi": 39.4,
-   "volume": 19093493,
-   "vol_ratio": 1.1,
+   "volume": 19159076,
+   "vol_ratio": 0.59,
    "atr_14": 6.56,
    "atr_pct": 5.2,
    "signal": "Trend debole",
@@ -69006,7 +69444,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -69283,10 +69721,10 @@
    "sortino_6m": -1.53,
    "prepost": {
     "label": "after",
-    "price": 126.5,
-    "change_pct": 0.27
+    "price": 126.64,
+    "change_pct": 0.38
    },
-   "prezzo_limite_aggiustato": 126.5,
+   "prezzo_limite_aggiustato": 126.64,
    "risk_reward": "1:1.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -70408,8 +70846,39 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": -4.3,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "ORCLE"
+    "stato": "quotato",
+    "codice": "ORCLE",
+    "entita": "Oracle Cop",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 91.1483,
+    "punti": 8.85,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    },
+    "nota": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation"
    },
    "short_interest": {
     "stato": "misurato",
@@ -70471,8 +70940,8 @@
    "support": 229.2,
    "resistance": 252.88,
    "rsi": 57.9,
-   "volume": 4140617,
-   "vol_ratio": 0.82,
+   "volume": 4155805,
+   "vol_ratio": 0.67,
    "atr_14": 4.58,
    "atr_pct": 1.84,
    "signal": "Trend debole",
@@ -71007,7 +71476,7 @@
      124.63,
      129.28,
      126.62,
-     134.89,
+     134.88,
      139.8,
      139.92,
      139.13,
@@ -71335,10 +71804,10 @@
    "sortino_6m": -2.25,
    "prepost": {
     "label": "after",
-    "price": 248.35,
-    "change_pct": -0.04
+    "price": 248.42,
+    "change_pct": -0.01
    },
-   "prezzo_limite_aggiustato": 248.35,
+   "prezzo_limite_aggiustato": 248.42,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -72459,8 +72928,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 9.8,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "MCD"
+    "stato": "quotato",
+    "codice": "MCD",
+    "entita": "McDONALDS Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.4544,
+    "punti": -3.45,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -72522,8 +73021,8 @@
    "support": 76.92,
    "resistance": 94.57,
    "rsi": 33.3,
-   "volume": 3103175,
-   "vol_ratio": 1.26,
+   "volume": 3103439,
+   "vol_ratio": 0.95,
    "atr_14": 3.21,
    "atr_pct": 4.08,
    "signal": "Trend debole",
@@ -73225,8 +73724,8 @@
    "rating": {
     "key": "buy",
     "n": 10,
-    "target": 125.55,
-    "upside_pct": 59.7
+    "target": 125.62,
+    "upside_pct": 59.8
    },
    "analisti": {
     "eps_ora": 2.6566,
@@ -73239,9 +73738,9 @@
     "eps_min": 2.05,
     "eps_max": 4.1,
     "eps_n": 17,
-    "target_min": 84.54,
-    "target_max": 171.98,
-    "target_mediana": 130.47
+    "target_min": 84.59,
+    "target_max": 172.09,
+    "target_mediana": 130.55
    },
    "health": 18,
    "eps": 0.59,
@@ -73252,10 +73751,10 @@
    "sortino_6m": -2.56,
    "prepost": {
     "label": "after",
-    "price": 78.6,
-    "change_pct": 0.0
+    "price": 78.64,
+    "change_pct": 0.05
    },
-   "prezzo_limite_aggiustato": 78.6,
+   "prezzo_limite_aggiustato": 78.64,
    "risk_reward": "1:2.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -73278,7 +73777,7 @@
     "debt_to_equity": 17.131,
     "dividend_yield": 0.0022,
     "price_to_book": null,
-    "target_mean": 125.5464,
+    "target_mean": 125.6208,
     "fcf": null,
     "gross_margin": 0.3511,
     "enterprise_value": null,
@@ -74436,8 +74935,8 @@
    "support": 196.3,
    "resistance": 215.66,
    "rsi": 44.4,
-   "volume": 1517673,
-   "vol_ratio": 0.95,
+   "volume": 1561934,
+   "vol_ratio": 0.63,
    "atr_14": 6.15,
    "atr_pct": 3.02,
    "signal": "Trend debole",
@@ -75153,10 +75652,10 @@
    "sortino_6m": -0.45,
    "prepost": {
     "label": "after",
-    "price": 204.7,
-    "change_pct": 0.5
+    "price": 204.07,
+    "change_pct": 0.19
    },
-   "prezzo_limite_aggiustato": 204.7,
+   "prezzo_limite_aggiustato": 204.07,
    "risk_reward": "1:0.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -75182,14 +75681,14 @@
     "target_mean": 286.4417,
     "fcf": 1256137472.0,
     "gross_margin": 0.5713,
-    "enterprise_value": 39974506496.0,
-    "ev_ebitda": 52.152,
+    "enterprise_value": 39204147200.0,
+    "ev_ebitda": 51.147,
     "peg": 2.82,
     "roa": -0.0062,
     "short_float": 0.05,
     "buyback_yield": -0.0328,
     "ps": 5.7,
-    "ev_s": 5.98,
+    "ev_s": 5.86,
     "altman_z": -1.53,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -75954,7 +76453,7 @@
      },
      {
       "d": "2026-10-23",
-      "o": 207.64,
+      "o": 207.88,
       "h": 208.38,
       "l": 203.53,
       "c": 203.69
@@ -76325,8 +76824,8 @@
    "support": 168.25,
    "resistance": 217.41,
    "rsi": 33.7,
-   "volume": 4964997,
-   "vol_ratio": 1.54,
+   "volume": 5003387,
+   "vol_ratio": 0.9,
    "atr_14": 8.58,
    "atr_pct": 4.98,
    "signal": "Neutrale",
@@ -76836,10 +77335,10 @@
    "sortino_6m": -0.21,
    "prepost": {
     "label": "after",
-    "price": 173.5,
-    "change_pct": 0.66
+    "price": 173.14,
+    "change_pct": 0.45
    },
-   "prezzo_limite_aggiustato": 173.5,
+   "prezzo_limite_aggiustato": 173.14,
    "risk_reward": "1:2.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -76865,14 +77364,14 @@
     "target_mean": 243.5865,
     "fcf": 3891512576.0,
     "gross_margin": 0.63,
-    "enterprise_value": 202414407680.0,
-    "ev_ebitda": 43.628,
+    "enterprise_value": 204053987328.0,
+    "ev_ebitda": 43.981,
     "peg": 1.38,
     "roa": 0.1412,
     "short_float": 0.0114,
     "buyback_yield": 0.0074,
     "ps": 20.62,
-    "ev_s": 19.2,
+    "ev_s": 19.36,
     "altman_z": 8.33,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -78015,8 +78514,8 @@
    "support": 221.36,
    "resistance": 286.99,
    "rsi": 55.9,
-   "volume": 13323820,
-   "vol_ratio": 1.01,
+   "volume": 13342948,
+   "vol_ratio": 1.32,
    "atr_14": 12.9,
    "atr_pct": 5.01,
    "signal": "Trend rialzista",
@@ -78466,10 +78965,10 @@
    "sortino_6m": 4.95,
    "prepost": {
     "label": "after",
-    "price": 258.02,
-    "change_pct": 0.17
+    "price": 257.4,
+    "change_pct": -0.07
    },
-   "prezzo_limite_aggiustato": 258.02,
+   "prezzo_limite_aggiustato": 257.4,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -79531,8 +80030,8 @@
    "support": 334.75,
    "resistance": 432.33,
    "rsi": 52.3,
-   "volume": 6555901,
-   "vol_ratio": 1.25,
+   "volume": 6561456,
+   "vol_ratio": 1.11,
    "atr_14": 18.9,
    "atr_pct": 4.97,
    "signal": "Trend rialzista",
@@ -80065,11 +80564,11 @@
    "sortino_6m": 4.48,
    "prepost": {
     "label": "after",
-    "price": 381.54,
-    "change_pct": 0.26
+    "price": 380.85,
+    "change_pct": 0.08
    },
-   "prezzo_limite_aggiustato": 381.54,
-   "risk_reward": "1:1.3",
+   "prezzo_limite_aggiustato": 380.85,
+   "risk_reward": "1:1.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -81246,8 +81745,8 @@
    "support": 285.05,
    "resistance": 370.35,
    "rsi": 50.6,
-   "volume": 4157513,
-   "vol_ratio": 1.58,
+   "volume": 4166087,
+   "vol_ratio": 1.35,
    "atr_14": 18.44,
    "atr_pct": 5.66,
    "signal": "Trend rialzista",
@@ -81694,11 +82193,11 @@
    "sortino_6m": 1.71,
    "prepost": {
     "label": "after",
-    "price": 328.0,
-    "change_pct": 0.7
+    "price": 327.2,
+    "change_pct": 0.45
    },
-   "prezzo_limite_aggiustato": 328.0,
-   "risk_reward": "1:1.1",
+   "prezzo_limite_aggiustato": 327.2,
+   "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -82764,8 +83263,8 @@
    "support": 243.63,
    "resistance": 300.68,
    "rsi": 53.2,
-   "volume": 2233575,
-   "vol_ratio": 1.29,
+   "volume": 2234890,
+   "vol_ratio": 0.75,
    "atr_14": 14.5,
    "atr_pct": 5.38,
    "signal": "Trend rialzista",
@@ -83212,10 +83711,10 @@
    "sortino_6m": 3.3,
    "prepost": {
     "label": "after",
-    "price": 270.0,
-    "change_pct": 0.13
+    "price": 269.65,
+    "change_pct": 0.0
    },
-   "prezzo_limite_aggiustato": 270.0,
+   "prezzo_limite_aggiustato": 269.65,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -83241,14 +83740,14 @@
     "target_mean": 292.3579,
     "fcf": 1051412352.0,
     "gross_margin": 0.7954,
-    "enterprise_value": 88843952128.0,
-    "ev_ebitda": 1071.739,
+    "enterprise_value": 93116940288.0,
+    "ev_ebitda": 1123.285,
     "peg": 1.42,
     "roa": 0.0018,
     "short_float": 0.0326,
     "buyback_yield": -0.0,
     "ps": 24.41,
-    "ev_s": 22.4,
+    "ev_s": 23.47,
     "altman_z": 5.33,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -84281,7 +84780,7 @@
    "support": 159.27,
    "resistance": 183.75,
    "rsi": 76.2,
-   "volume": 11460332,
+   "volume": 11493872,
    "vol_ratio": 0.9,
    "atr_14": 3.89,
    "atr_pct": 2.12,
@@ -85145,10 +85644,10 @@
    "sortino_6m": 2.32,
    "prepost": {
     "label": "after",
-    "price": 183.16,
-    "change_pct": -0.03
+    "price": 183.2,
+    "change_pct": -0.01
    },
-   "prezzo_limite_aggiustato": 183.16,
+   "prezzo_limite_aggiustato": 183.2,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -85174,14 +85673,14 @@
     "target_mean": 179.4091,
     "fcf": 20671000576.0,
     "gross_margin": 0.2977,
-    "enterprise_value": 771377070080.0,
-    "ev_ebitda": 11.354,
+    "enterprise_value": 791854383104.0,
+    "ev_ebitda": 11.656,
     "peg": 1.54,
     "roa": 0.0552,
     "short_float": 0.0107,
     "buyback_yield": 0.0269,
     "ps": 2.09,
-    "ev_s": 2.14,
+    "ev_s": 2.19,
     "altman_z": 5.7,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -86276,8 +86775,39 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 18.0,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "XOM"
+    "stato": "quotato",
+    "codice": "XOM",
+    "entita": "Exxon Mobil Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.8163,
+    "punti": -2.82,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    },
+    "nota": "l'entita' di riferimento e' Exxon Mobil Corp; il nome della societa' quotata nella pipeline e' ExxonMobil Holdings Corporation"
    },
    "short_interest": {
     "stato": "misurato",
@@ -86333,8 +86863,8 @@
    "support": 201.96,
    "resistance": 233.74,
    "rsi": 76.9,
-   "volume": 8124061,
-   "vol_ratio": 0.72,
+   "volume": 8131403,
+   "vol_ratio": 0.9,
    "atr_14": 4.78,
    "atr_pct": 2.05,
    "signal": "Ipercomprato",
@@ -86731,7 +87261,7 @@
      26.8,
      25.7,
      26.38,
-     27.77,
+     27.76,
      27.44,
      28.48,
      30.19,
@@ -87197,10 +87727,10 @@
    "sortino_6m": 2.79,
    "prepost": {
     "label": "after",
-    "price": 233.21,
+    "price": 233.2,
     "change_pct": -0.0
    },
-   "prezzo_limite_aggiustato": 233.21,
+   "prezzo_limite_aggiustato": 233.2,
    "risk_reward": "1:0.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -87226,14 +87756,14 @@
     "target_mean": 230.6667,
     "fcf": 21934000128.0,
     "gross_margin": 0.4427,
-    "enterprise_value": 478876237824.0,
-    "ev_ebitda": 9.452,
+    "enterprise_value": 491685511168.0,
+    "ev_ebitda": 9.705,
     "peg": 0.98,
     "roa": 0.0586,
     "short_float": 0.0121,
     "buyback_yield": 0.0264,
     "ps": 2.18,
-    "ev_s": 2.29,
+    "ev_s": 2.35,
     "altman_z": 4.47,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -88331,8 +88861,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 18.4,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "CVX"
+    "stato": "quotato",
+    "codice": "CVX",
+    "entita": "Chevron Corp",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.8491,
+    "punti": -2.85,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -88394,8 +88954,8 @@
    "support": 123.46,
    "resistance": 152.77,
    "rsi": 76.8,
-   "volume": 7149801,
-   "vol_ratio": 0.85,
+   "volume": 7221306,
+   "vol_ratio": 1.1,
    "atr_14": 3.62,
    "atr_pct": 2.4,
    "signal": "Ipercomprato",
@@ -90392,8 +90952,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 21.6,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "COP"
+    "stato": "quotato",
+    "codice": "COP",
+    "entita": "ConocoPhillips",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.232,
+    "punti": -3.23,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -90455,8 +91045,8 @@
    "support": 256.3,
    "resistance": 291.4,
    "rsi": 66.1,
-   "volume": 4593792,
-   "vol_ratio": 1.29,
+   "volume": 4597666,
+   "vol_ratio": 0.95,
    "atr_14": 6.47,
    "atr_pct": 2.26,
    "signal": "Trend rialzista",
@@ -91012,14 +91602,14 @@
     "target_mean": 284.7857,
     "fcf": 16870250496.0,
     "gross_margin": 0.7279,
-    "enterprise_value": 568327208960.0,
-    "ev_ebitda": 18.474,
+    "enterprise_value": 569122357248.0,
+    "ev_ebitda": 18.5,
     "peg": 0.58,
     "roa": 0.1051,
     "short_float": 0.0102,
     "buyback_yield": 0.0019,
     "ps": 7.84,
-    "ev_s": 8.83,
+    "ev_s": 8.84,
     "altman_z": -0.27,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -92110,8 +92700,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 13.4,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "ABBVINC"
+    "stato": "quotato",
+    "codice": "ABBVINC",
+    "entita": "ABBVIE INC",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.1099,
+    "punti": -3.11,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -92173,8 +92793,8 @@
    "support": 138.8,
    "resistance": 154.02,
    "rsi": 49.6,
-   "volume": 8376682,
-   "vol_ratio": 1.94,
+   "volume": 8378881,
+   "vol_ratio": 0.82,
    "atr_14": 4.31,
    "atr_pct": 2.97,
    "signal": "Neutrale",
@@ -93037,11 +93657,11 @@
    "sortino_6m": 3.03,
    "prepost": {
     "label": "after",
-    "price": 145.99,
-    "change_pct": 0.5
+    "price": 145.03,
+    "change_pct": -0.17
    },
-   "prezzo_limite_aggiustato": 145.99,
-   "risk_reward": "1:0.9",
+   "prezzo_limite_aggiustato": 145.03,
+   "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
    "stats": {
@@ -93066,14 +93686,14 @@
     "target_mean": 158.56,
     "fcf": 15171500032.0,
     "gross_margin": 0.759,
-    "enterprise_value": 410087358464.0,
-    "ev_ebitda": 14.204,
+    "enterprise_value": 405227012096.0,
+    "ev_ebitda": 14.036,
     "peg": 2.8,
     "roa": 0.1187,
     "short_float": 0.0115,
     "buyback_yield": 0.0142,
     "ps": 5.38,
-    "ev_s": 6.16,
+    "ev_s": 6.09,
     "altman_z": 2.94,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -94231,8 +94851,8 @@
    "support": 142.6,
    "resistance": 160.51,
    "rsi": 58.6,
-   "volume": 6061258,
-   "vol_ratio": 1.04,
+   "volume": 6063078,
+   "vol_ratio": 1.02,
    "atr_14": 3.82,
    "atr_pct": 2.45,
    "signal": "Trend rialzista",
@@ -96207,8 +96827,8 @@
    "support": 396.01,
    "resistance": 450.98,
    "rsi": 60.9,
-   "volume": 1681579,
-   "vol_ratio": 1.04,
+   "volume": 1808640,
+   "vol_ratio": 0.61,
    "atr_14": 10.58,
    "atr_pct": 2.41,
    "signal": "Trend rialzista",
@@ -97893,7 +98513,7 @@
      },
      {
       "d": "2026-10-23",
-      "o": 444.4,
+      "o": 443.44,
       "h": 444.59,
       "l": 439.07,
       "c": 439.26
@@ -98201,8 +98821,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 13.2,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "AMGN"
+    "stato": "quotato",
+    "codice": "AMGN",
+    "entita": "Amgen Inc.",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.147,
+    "punti": -3.15,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -98264,8 +98914,8 @@
    "support": 356.75,
    "resistance": 414.6,
    "rsi": 70.0,
-   "volume": 5057036,
-   "vol_ratio": 1.14,
+   "volume": 5071142,
+   "vol_ratio": 0.8,
    "atr_14": 6.77,
    "atr_pct": 1.66,
    "signal": "Ipercomprato",
@@ -98850,10 +99500,10 @@
    "sortino_6m": 4.47,
    "prepost": {
     "label": "after",
-    "price": 407.92,
-    "change_pct": -0.0
+    "price": 408.5,
+    "change_pct": 0.14
    },
-   "prezzo_limite_aggiustato": 407.92,
+   "prezzo_limite_aggiustato": 408.5,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Financial Services",
@@ -100033,8 +100683,8 @@
    "support": 544.58,
    "resistance": 633.29,
    "rsi": 70.2,
-   "volume": 2677275,
-   "vol_ratio": 1.39,
+   "volume": 2696779,
+   "vol_ratio": 0.9,
    "atr_14": 10.14,
    "atr_pct": 1.63,
    "signal": "Ipercomprato",
@@ -100641,10 +101291,10 @@
    "sortino_6m": 2.8,
    "prepost": {
     "label": "after",
-    "price": 623.6,
-    "change_pct": 0.0
+    "price": 623.99,
+    "change_pct": 0.06
    },
-   "prezzo_limite_aggiustato": 623.6,
+   "prezzo_limite_aggiustato": 623.99,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Financial Services",
@@ -100670,14 +101320,14 @@
     "target_mean": 674.93,
     "fcf": 16961250304.0,
     "gross_margin": 1.0,
-    "enterprise_value": 567727226880.0,
-    "ev_ebitda": 25.572,
+    "enterprise_value": 559308800000.0,
+    "ev_ebitda": 25.193,
     "peg": 1.63,
     "roa": 0.2406,
     "short_float": 0.0073,
     "buyback_yield": 0.0215,
     "ps": 15.57,
-    "ev_s": 16.18,
+    "ev_s": 15.94,
     "altman_z": 7.91,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -101829,8 +102479,8 @@
    "support": 184.0,
    "resistance": 210.45,
    "rsi": 54.7,
-   "volume": 3533754,
-   "vol_ratio": 1.1,
+   "volume": 3536225,
+   "vol_ratio": 0.75,
    "atr_14": 5.36,
    "atr_pct": 2.69,
    "signal": "Trend rialzista",
@@ -103609,8 +104259,8 @@
    "support": 618.0,
    "resistance": 692.83,
    "rsi": 46.8,
-   "volume": 693283,
-   "vol_ratio": 0.68,
+   "volume": 693475,
+   "vol_ratio": 0.56,
    "atr_14": 17.64,
    "atr_pct": 2.73,
    "signal": "Neutrale",
@@ -105603,8 +106253,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": -1.8,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "DE"
+    "stato": "quotato",
+    "codice": "DE",
+    "entita": "Deere & Co",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.4953,
+    "punti": -3.5,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -105666,8 +106346,8 @@
    "support": 101.15,
    "resistance": 113.38,
    "rsi": 66.5,
-   "volume": 6294898,
-   "vol_ratio": 1.0,
+   "volume": 6296649,
+   "vol_ratio": 0.72,
    "atr_14": 2.01,
    "atr_pct": 1.79,
    "signal": "Trend rialzista",
@@ -106530,10 +107210,10 @@
    "sortino_6m": 0.97,
    "prepost": {
     "label": "after",
-    "price": 112.52,
-    "change_pct": 0.0
+    "price": 112.53,
+    "change_pct": 0.01
    },
-   "prezzo_limite_aggiustato": 112.52,
+   "prezzo_limite_aggiustato": 112.53,
    "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -106559,14 +107239,14 @@
     "target_mean": 126.5828,
     "fcf": 4860375040.0,
     "gross_margin": 0.376,
-    "enterprise_value": 243006095360.0,
-    "ev_ebitda": 11.592,
+    "enterprise_value": 241952817152.0,
+    "ev_ebitda": 11.542,
     "peg": 3.64,
     "roa": 0.0481,
     "short_float": 0.0113,
     "buyback_yield": 0.018,
     "ps": 1.97,
-    "ev_s": 2.46,
+    "ev_s": 2.45,
     "altman_z": 2.58,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -107653,8 +108333,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 11.6,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "THWALT"
+    "stato": "quotato",
+    "codice": "THWALT",
+    "entita": "Walt Disney Co.",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.8154,
+    "punti": -2.82,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -107716,8 +108426,8 @@
    "support": 27.12,
    "resistance": 30.44,
    "rsi": 65.6,
-   "volume": 29366671,
-   "vol_ratio": 0.91,
+   "volume": 29400028,
+   "vol_ratio": 0.94,
    "atr_14": 0.56,
    "atr_pct": 1.86,
    "signal": "Trend rialzista",
@@ -108580,10 +109290,10 @@
    "sortino_6m": 1.94,
    "prepost": {
     "label": "after",
-    "price": 29.99,
-    "change_pct": -0.13
+    "price": 30.03,
+    "change_pct": -0.0
    },
-   "prezzo_limite_aggiustato": 29.99,
+   "prezzo_limite_aggiustato": 30.03,
    "risk_reward": "1:0.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
@@ -108609,14 +109319,14 @@
     "target_mean": 29.2596,
     "fcf": 12485624832.0,
     "gross_margin": 0.7472,
-    "enterprise_value": 225462075392.0,
-    "ev_ebitda": 8.882,
+    "enterprise_value": 223239192576.0,
+    "ev_ebitda": 8.795,
     "peg": 13.68,
     "roa": 0.0578,
     "short_float": 0.0264,
     "buyback_yield": -0.0,
     "ps": 2.69,
-    "ev_s": 3.54,
+    "ev_s": 3.5,
     "altman_z": 3.11,
     "altman_missing": 0,
     "altman_model": "Z''",
@@ -109708,8 +110418,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 10.7,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "PFE"
+    "stato": "quotato",
+    "codice": "PFE",
+    "entita": "Pfizer Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 103.1428,
+    "punti": -3.14,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -109771,8 +110511,8 @@
    "support": 859.03,
    "resistance": 932.0,
    "rsi": 37.5,
-   "volume": 1771409,
-   "vol_ratio": 0.86,
+   "volume": 1781070,
+   "vol_ratio": 0.75,
    "atr_14": 24.39,
    "atr_pct": 2.79,
    "signal": "Trend debole",
@@ -110042,7 +110782,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -110463,10 +111203,10 @@
    "sortino_6m": -0.59,
    "prepost": {
     "label": "after",
-    "price": 876.05,
-    "change_pct": 0.04
+    "price": 877.01,
+    "change_pct": 0.15
    },
-   "prezzo_limite_aggiustato": 876.05,
+   "prezzo_limite_aggiustato": 877.01,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Financial Services",
@@ -111587,8 +112327,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": -0.2,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "GS"
+    "stato": "quotato",
+    "codice": "GS",
+    "entita": "Goldman Sachs Gp Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 101.3938,
+    "punti": -1.39,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -111650,8 +112420,8 @@
    "support": 324.25,
    "resistance": 344.4,
    "rsi": 42.0,
-   "volume": 4702715,
-   "vol_ratio": 0.75,
+   "volume": 4778374,
+   "vol_ratio": 0.57,
    "atr_14": 6.33,
    "atr_pct": 1.91,
    "signal": "Neutrale",
@@ -112514,10 +113284,10 @@
    "sortino_6m": 0.91,
    "prepost": {
     "label": "after",
-    "price": 331.58,
-    "change_pct": 0.0
+    "price": 331.87,
+    "change_pct": 0.09
    },
-   "prezzo_limite_aggiustato": 331.58,
+   "prezzo_limite_aggiustato": 331.87,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Financial Services",
@@ -113635,8 +114405,38 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": 3.4,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "JPM"
+    "stato": "quotato",
+    "codice": "JPM",
+    "entita": "JPMorgan Chase & Co",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 102.3004,
+    "punti": -2.3,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    }
    },
    "short_interest": {
     "stato": "misurato",
@@ -113698,8 +114498,8 @@
    "support": 1040.42,
    "resistance": 1159.99,
    "rsi": 55.3,
-   "volume": 811097,
-   "vol_ratio": 1.2,
+   "volume": 813285,
+   "vol_ratio": 1.3,
    "atr_14": 26.54,
    "atr_pct": 2.37,
    "signal": "Trend rialzista",
@@ -113919,7 +114719,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -113992,7 +114792,7 @@
      137.15,
      142.3,
      133.05,
-     118.61,
+     118.62,
      119.02,
      119.32,
      124.66,
@@ -114084,7 +114884,7 @@
      390.19,
      418.26,
      427.74,
-     448.71,
+     448.72,
      393.97,
      377.2,
      430.42,
@@ -115568,8 +116368,8 @@
    "support": 1131.21,
    "resistance": 1321.21,
    "rsi": 62.2,
-   "volume": 2261329,
-   "vol_ratio": 1.16,
+   "volume": 2269331,
+   "vol_ratio": 0.98,
    "atr_14": 38.22,
    "atr_pct": 3.0,
    "signal": "Trend rialzista",
@@ -116432,10 +117232,10 @@
    "sortino_6m": 3.8,
    "prepost": {
     "label": "after",
-    "price": 1274.5,
-    "change_pct": 0.08
+    "price": 1274.99,
+    "change_pct": 0.12
    },
-   "prezzo_limite_aggiustato": 1274.5,
+   "prezzo_limite_aggiustato": 1274.99,
    "risk_reward": "1:0.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
@@ -117621,8 +118421,8 @@
    "support": 439.5,
    "resistance": 594.24,
    "rsi": 38.0,
-   "volume": 4315923,
-   "vol_ratio": 0.84,
+   "volume": 4325290,
+   "vol_ratio": 0.55,
    "atr_14": 30.93,
    "atr_pct": 6.78,
    "signal": "Neutrale",
@@ -118106,10 +118906,10 @@
    "sortino_6m": 3.03,
    "prepost": {
     "label": "after",
-    "price": 458.4,
-    "change_pct": 0.43
+    "price": 457.9,
+    "change_pct": 0.32
    },
-   "prezzo_limite_aggiustato": 458.4,
+   "prezzo_limite_aggiustato": 457.9,
    "risk_reward": "1:2.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -119240,8 +120040,39 @@
    "rs_bench": "sp500",
    "rs_ndx_1m": -9.7,
    "cds": {
-    "stato": "non quotato oggi",
-    "codice": "DELLN"
+    "stato": "quotato",
+    "codice": "DELLN",
+    "entita": "Dell Inc",
+    "contratto": "SNRFOR.USD.XR14",
+    "cedola_pb": 100,
+    "prezzo": 100.5346,
+    "punti": -0.53,
+    "pb": null,
+    "indicativo": false,
+    "data": "2026-10-23",
+    "scadenza": "2031-12-20",
+    "var": {},
+    "storia": {
+     "giorni": 1,
+     "dal": "2026-10-16"
+    },
+    "indice": "IG",
+    "finestra": {
+     "stato": "storico corto",
+     "n": 21,
+     "giorni": 6,
+     "servono": 22,
+     "dal": "2026-10-16"
+    },
+    "finestra5": {
+     "n": 5,
+     "da": "2026-10-16",
+     "a": "2026-10-23",
+     "indice": "IG",
+     "stato": "buco",
+     "perche": "il nome non e' quotato il 2026-10-23"
+    },
+    "nota": "il CDS e' su Dell Inc, la societa' operativa controllata, non sulla capogruppo quotata Dell Technologies Inc (verificato il 2026-10-18 sull'elenco ICE del 2026-10-16: DELLN, cedole 100 e 500)"
    },
    "short_interest": {
     "stato": "misurato",
@@ -119417,8 +120248,8 @@
     {
      "mese": "2026-12",
      "simbolo": "ZQZ26.CBT",
-     "prezzo": 95.95999908447266,
-     "tasso": 4.04
+     "prezzo": 95.96499633789062,
+     "tasso": 4.035
     }
    ],
    "next_fomc": "2026-10-28",
@@ -119446,15 +120277,15 @@
      "giorni_vecchio": 9,
      "giorni_nuovo": 22,
      "giorni_mese": 31,
-     "mosse_25bp": 0.79,
-     "mosse_cumulate": 0.87,
-     "tasso_atteso_fine_mese": 4.097,
+     "mosse_25bp": 0.76,
+     "mosse_cumulate": 0.84,
+     "tasso_atteso_fine_mese": 4.09,
      "base_effr": 3.9,
      "contratto": "ZQZ26.CBT",
-     "tasso_contratto": 4.04,
+     "tasso_contratto": 4.035,
      "cut_prob": null,
-     "hike_prob": 79,
-     "hold_prob": 21
+     "hike_prob": 76,
+     "hold_prob": 24
     }
    ],
    "dot_plot": [
@@ -119478,10 +120309,6 @@
    "dot_plot_note": "Mediana proiezioni FOMC (SEP). Fonte: federalreserve.gov"
   },
   "curve_history": [
-   {
-    "d": "2024-10-21",
-    "v": 0.17
-   },
    {
     "d": "2024-10-22",
     "v": 0.17
@@ -121481,6 +122308,10 @@
    {
     "d": "2026-10-22",
     "v": 0.31
+   },
+   {
+    "d": "2026-10-23",
+    "v": 0.31
    }
   ],
   "yield_recession": {
@@ -123130,22 +123961,18 @@
     "key": "curve",
     "label": "Curva 10A-2A",
     "value": "+0.31 pp",
-    "date": "2026-10-22",
+    "date": "2026-10-23",
     "impact": 62,
     "next_release": "Giornaliero (FRED) · curva invertita = rischio recessione"
    },
    {
     "key": "curve3m",
     "label": "Curva 10A-3M",
-    "value": "+0.74 pp",
-    "date": "2026-10-22",
-    "impact": 80,
+    "value": "+0.78 pp",
+    "date": "2026-10-23",
+    "impact": 81,
     "next_release": "Giornaliero (FRED) · il tratto 10A-3M è quello che la Fed guarda per la recessione",
     "storico": [
-     {
-      "d": "2025-10-31",
-      "v": 0.22
-     },
      {
       "d": "2025-11-03",
       "v": 0.15
@@ -124117,6 +124944,10 @@
      {
       "d": "2026-10-22",
       "v": 0.74
+     },
+     {
+      "d": "2026-10-23",
+      "v": 0.78
      }
     ],
     "storico_serie": "T10Y3M"
@@ -125119,15 +125950,11 @@
    {
     "key": "breakeven",
     "label": "Inflazione attesa 10A (breakeven)",
-    "value": "2.32%",
-    "date": "2026-10-22",
+    "value": "2.34%",
+    "date": "2026-10-23",
     "impact": 90,
     "next_release": "Giornaliero (FRED) · l'inflazione che il mercato si aspetta a 10 anni",
     "storico": [
-     {
-      "d": "2025-10-31",
-      "v": 2.3
-     },
      {
       "d": "2025-11-03",
       "v": 2.31
@@ -126099,6 +126926,10 @@
      {
       "d": "2026-10-22",
       "v": 2.32
+     },
+     {
+      "d": "2026-10-23",
+      "v": 2.34
      }
     ],
     "storico_serie": "T10YIE"
@@ -126366,15 +127197,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1196",
-    "change_pct": -0.35,
+    "value": "1.1204",
+    "change_pct": -0.27,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "175.51",
-    "change_pct": -1.21,
+    "value": "175.72",
+    "change_pct": -1.09,
     "suffix": "%"
    }
   ],
@@ -126900,10 +127731,10 @@
     "symbol": "HG=F",
     "label": "Rame",
     "unita": "$/lb",
-    "value": 6.506,
-    "change_pct": 2.26,
-    "var_1y": 28.0,
-    "pos_range_1y": 84.2,
+    "value": 6.497,
+    "change_pct": 2.12,
+    "var_1y": 27.9,
+    "pos_range_1y": 83.7,
     "min_1y": 4.926,
     "max_1y": 6.804,
     "history": [
@@ -127413,7 +128244,7 @@
      },
      {
       "d": "2026-10-23",
-      "v": 6.506
+      "v": 6.497
      }
     ]
    },
@@ -127421,10 +128252,10 @@
     "symbol": "CL=F",
     "label": "Petrolio WTI",
     "unita": "$",
-    "value": 103.36,
-    "change_pct": 3.91,
-    "var_1y": 67.3,
-    "pos_range_1y": 83.4,
+    "value": 103.44,
+    "change_pct": 3.99,
+    "var_1y": 67.4,
+    "pos_range_1y": 83.5,
     "min_1y": 55.27,
     "max_1y": 112.95,
     "history": [
@@ -127934,7 +128765,7 @@
      },
      {
       "d": "2026-10-23",
-      "v": 103.36
+      "v": 103.44
      }
     ]
    },
@@ -127942,10 +128773,10 @@
     "symbol": "GC=F",
     "label": "Oro",
     "unita": "$/oz",
-    "value": 4008,
-    "change_pct": -1.29,
+    "value": 4010,
+    "change_pct": -1.24,
     "var_1y": -3.3,
-    "pos_range_1y": 3.5,
+    "pos_range_1y": 3.6,
     "min_1y": 3960,
     "max_1y": 5318,
     "history": [
@@ -128455,13 +129286,41 @@
      },
      {
       "d": "2026-10-23",
-      "v": 4008.1
+      "v": 4010.0
      }
     ]
    }
   },
   "news": {
    "voci": [
+    {
+     "titolo": "National Wealth Tax Could Work: Tilson",
+     "riassunto": "Whitney Tilson, editor for Stansberry Research, joins Scarlet Fu and Tom Keene on \"Bloomberg Money.\" They discuss Tilson's hopes to bring Democrats back to the center, his personal investing strategy, and the potential for a national wealth tax.  (Source: Bloomberg)",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-23T21:34:51Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-10-23/national-wealth-tax-could-work-tilson-video"
+    },
+    {
+     "titolo": "Some Republicans are opposing Trump on tariffs. Maine’s Susan Collins just got him to back down on Canadian levies.",
+     "riassunto": "As she faces a tough midterm race, the five-term GOP senator is touting her successful lobbying effort against certain tariffs on Canada",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-23T20:50:00Z",
+     "url": "https://www.marketwatch.com/story/some-republicans-are-opposing-trump-on-tariffs-maines-susan-collins-just-got-him-to-back-down-on-canadian-levies-02b202ae?mod=mw_rss_topstories"
+    },
+    {
+     "titolo": "Trump's approval rating on economy hits all-time low as midterm looms: CNBC survey",
+     "riassunto": "Eight out of 10 Americans now rate the economy as fair or poor, one of several findings in a CNBC poll that show why Republican candidates face uphill battles.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-23T20:49:42Z",
+     "url": "https://www.cnbc.com/2026/10/22/trump-economic-approval-rating-midterms-poll.html"
+    },
+    {
+     "titolo": "AI Trade Stumbles Again as Investors Rediscover Treasury Haven",
+     "riassunto": "According to the president of Blackstone Inc., there’s no bubble in artificial intelligence. Treasury Secretary Scott Bessent isn’t seeing a “systemic problem” in the boom. But as hard as Wall Street brass works to tamp down concerns around the space, markets are refusing to be calmed.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-23T20:32:42Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-23/ai-trade-stumbles-again-as-investors-rediscover-treasury-haven"
+    },
     {
      "titolo": "The U.S. economy is great by this measure, and the good times aren’t over. So why are Americans so sour?",
      "riassunto": "A once-in-a-generation investment boom has created lots of winners — but many Americans are feeling left out.",
@@ -128491,25 +129350,11 @@
      "url": "https://www.bloomberg.com/news/articles/2026-10-23/florida-retiree-mega-complex-s-muni-bond-deal-sees-strong-demand"
     },
     {
-     "titolo": "‘Some people did everything right’: I lost my home in the Great Recession. I rent in my 50s. Why is that judged as failure?",
-     "riassunto": "”I earn $110,000 a year.”",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-23T17:00:00Z",
-     "url": "https://www.marketwatch.com/story/i-earn-110-000-a-year-i-lost-my-home-in-the-great-recession-im-renting-in-my-50s-why-is-that-judged-as-failure-d1371d67?mod=mw_rss_topstories"
-    },
-    {
      "titolo": "US Consumer Sentiment Slips to Five-Month Low on Inflation",
      "riassunto": "US consumer sentiment edged down to a five-month low in October as high prices and rising interest rates depressed morale. The University of Michigan’s final sentiment index eased to 48 from 48.1 in September, according to the survey released Friday. Even so, that was an improvement from the preliminary reading and top",
      "fonte": "Bloomberg",
      "quando": "2026-10-23T16:20:54Z",
      "url": "https://www.bloomberg.com/news/videos/2026-10-23/us-consumer-sentiment-slips-to-five-month-low-video"
-    },
-    {
-     "titolo": "French Bond Risk Gauge Rises Another Week as Crisis Deepens",
-     "riassunto": "French bond markets suffered a historic bout of turbulence this week as political unrest exacerbates concerns over the country’s public finances.",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-23T09:41:05Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-23/french-bond-risk-nears-biggest-weekly-rise-as-crisis-deepens"
     },
     {
      "titolo": "Treasuries’ AI Link Shows Sharp Shift as Haven Trade Returns",
@@ -128531,13 +129376,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-22T16:40:09Z",
      "url": "https://www.cnbc.com/2026/10/22/jobless-claims-record-low-weekly.html"
-    },
-    {
-     "titolo": "Trump's approval rating on economy hits all-time low as midterm looms: CNBC survey",
-     "riassunto": "Eight out of 10 Americans now rate the economy as fair or poor, one of several findings in a CNBC poll that show why Republican candidates face uphill battles.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-22T13:18:36Z",
-     "url": "https://www.cnbc.com/2026/10/22/trump-economic-approval-rating-midterms-poll.html"
     },
     {
      "titolo": "Housing is flashing warning signs just as the Fed weighs more interest rate hikes",
@@ -128580,13 +129418,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-16T22:34:29Z",
      "url": "https://www.cnbc.com/2026/10/16/us-budget-deficit-2026.html"
-    },
-    {
-     "titolo": "Analysis: Why a $2 trillion deficit and 5% Treasury yields are becoming America's biggest economic challenge",
-     "riassunto": "Treasury yields above 5% are raising borrowing costs for households and the federal government, highlighting the challenge of financing $2 trillion deficits.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-16T22:33:05Z",
-     "url": "https://www.cnbc.com/2026/10/15/treasury-yields-deficit-national-debt-ai.html"
     }
    ],
    "fonti": [
@@ -136143,7 +136974,7 @@
    "us10": 4.99,
    "jp10": 2.91,
    "spread": 2.07,
-   "usdjpy": 156.82,
+   "usdjpy": 156.81,
    "usdjpy_chg_1m": -0.41,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
@@ -136178,7 +137009,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 49
     },
     {
      "label": "Treasury 10A",
@@ -140801,7 +141632,7 @@
     },
     {
      "label": "Curva 10A-3M",
-     "score": 80
+     "score": 81
     },
     {
      "label": "Treasury USA 30A",
@@ -141035,8 +141866,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 101.83,
-   "chg_3m_pct": 0.44,
+   "value": 101.75,
+   "chg_3m_pct": 0.37,
    "flag": null,
    "src": "DXY"
   },
@@ -141058,26 +141889,26 @@
    "nasdaq": {
     "symbol": "NQ=F",
     "label": "Futures Nasdaq 100",
-    "price": 29162.5,
-    "change_pct": -0.01
+    "price": 29175.0,
+    "change_pct": 0.03
    },
    "sp500": {
     "symbol": "ES=F",
     "label": "Futures S&P 500",
-    "price": 7669.25,
-    "change_pct": -0.41
+    "price": 7672.5,
+    "change_pct": -0.37
    }
   },
   "froth": {
    "soxl": {
     "symbol": "SOXL",
-    "rvol": 2.54,
+    "rvol": 1.21,
     "chg_5d_pct": -10.79,
     "asof": "2026-10-23"
    },
    "tqqq": {
     "symbol": "TQQQ",
-    "rvol": 1.68,
+    "rvol": 0.96,
     "chg_5d_pct": -2.81,
     "asof": "2026-10-23"
    },
@@ -141300,7 +142131,7 @@
   },
   "posizioni": {
    "quante": 11,
-   "aggiornato": "2026-10-20",
+   "aggiornato": "2026-10-23",
    "fonte": "modificato dalla dashboard",
    "non_seguite": [],
    "senza_prezzo": []
@@ -141312,12 +142143,29 @@
    "errore": null,
    "data": "2026-10-23",
    "scadenza": "2031-12-20",
-   "entita_ice": 343,
+   "entita_ice": 697,
    "tasso_pct": 3.88,
    "tasso_fonte": "EFFR del 2026-10-22 (NY Fed), proxy della curva SOFR della convenzione ISDA",
    "recupero": 0.4,
    "punti_max": 30.0,
-   "indici": {},
+   "indici": {
+    "HY": {
+     "serie": 47,
+     "versione": 1,
+     "prezzo": 105.5907,
+     "cedola": 500,
+     "pb": null,
+     "var": {}
+    },
+    "IG": {
+     "serie": 47,
+     "versione": 1,
+     "prezzo": 101.6502,
+     "cedola": 100,
+     "pb": null,
+     "var": {}
+    }
+   },
    "storia": {
     "giorni": 6,
     "dal": "2026-10-16"
@@ -141354,13 +142202,14 @@
     "V",
     "WDC"
    ],
-   "non_quotati_oggi": [
+   "quotati": [
     "AAPL",
     "ABBV",
     "AMD",
     "AMGN",
     "AMZN",
     "AVGO",
+    "BTP-V28",
     "CEG",
     "COP",
     "CRWV",
@@ -141379,14 +142228,11 @@
     "NVDA",
     "ORCL",
     "PFE",
+    "SKHY",
     "SPCX",
     "TSLA",
+    "TSM",
     "XOM"
-   ],
-   "quotati": [
-    "BTP-V28",
-    "SKHY",
-    "TSM"
    ]
   },
   "short_interest": {
@@ -141471,14 +142317,14 @@
       "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%.  December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-23T20:17:27Z",
+      "quando": "2026-10-23T21:31:31Z",
       "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
      },
      {
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-23T19:46:16Z",
+      "quando": "2026-10-23T21:22:07Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
      },
      {
@@ -141511,6 +142357,13 @@
      }
     ],
     "BE": [
+     {
+      "titolo": "Stock Market Today, Oct. 23: Bloom Energy Falls on Cash Flow Concerns Despite Record Q3 Revenue",
+      "riassunto": "Bloom Energy (NYSE:BE), a solid-oxide fuel cell systems provider, closed at $193.30, down 11.24%. Investors are locking in profits as the company reports negative operating cash flow and faces heavier expansion spending after an earnings beat-and-raise.Trading volume reached 34.7",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-23T21:06:38Z",
+      "url": "https://www.nasdaq.com/articles/stock-market-today-oct-23-bloom-energy-falls-cash-flow-concerns-despite-record-q3-revenue"
+     },
      {
       "titolo": "Bloom Energy Stock Sinks Despite Record Revenue and a Stellar Outlook. Is It Time to Buy?",
       "riassunto": "Key PointsBloom Energy's Q3 revenue surged 138%, and backlog is growing faster than revenue.",
@@ -141545,13 +142398,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-23T15:09:34Z",
       "url": "https://www.nasdaq.com/articles/sp-500-movers-be-cci"
-     },
-     {
-      "titolo": "BE Q3 Earnings Beat Estimates on Strong Product Sales, View Up",
-      "riassunto": "Bloom Energy's Q3 earnings beat estimates as revenues surge 138.1% on record product sales, stronger margins and rising demand, prompting a higher 2026 outlook.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-23T14:49:00Z",
-      "url": "https://www.nasdaq.com/articles/be-q3-earnings-beat-estimates-strong-product-sales-view"
      }
     ],
     "CRWV": [
@@ -141600,18 +142446,18 @@
     ],
     "MRVL": [
      {
-      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-23T20:22:32Z",
-      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
-     },
-     {
       "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%.  December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-23T20:17:27Z",
+      "quando": "2026-10-23T21:40:46Z",
       "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
+     },
+     {
+      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-23T21:22:07Z",
+      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
      },
      {
       "titolo": "Stocks Fall Sharply on Risk-Off as Meta Slides -7%",
@@ -141647,7 +142493,7 @@
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-23T20:22:32Z",
+      "quando": "2026-10-23T21:22:07Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
      },
      {
@@ -141691,14 +142537,14 @@
       "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%.  December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-23T20:17:27Z",
+      "quando": "2026-10-23T21:31:31Z",
       "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
      },
      {
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-23T19:46:16Z",
+      "quando": "2026-10-23T21:22:07Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
      },
      {
@@ -141731,6 +142577,13 @@
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Prediction: Nvidia Will Outperform Broadcom Over the Next 5 Years",
+      "riassunto": "Key PointsNvidia has a stronger moat than Broadcom.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-23T21:05:01Z",
+      "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-outperform-broadcom-over-next-5-years"
+     },
      {
       "titolo": "Stocks Fall Sharply on Risk-Off as Meta Slides -7%",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.21%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose +0.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -2.90%.  December E-mini S&P futures (ESZ26 ) fell -1.18%, and December E-mini Nasdaq futures (NQZ26 ) fell -2.79%. A...",
@@ -141765,13 +142618,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-23T16:10:00Z",
       "url": "https://www.nasdaq.com/articles/ai-rout-sorting-capex-fact-fiction"
-     },
-     {
-      "titolo": "CoreWeave Is Down 13% in a Week. Here's the Price at Which I'd Buy",
-      "riassunto": "Key PointsCoreWeave&rsquo;s stock reached a new 52-week low this week.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-23T16:00:00Z",
-      "url": "https://www.nasdaq.com/articles/coreweave-down-13-week-heres-price-which-id-buy"
      }
     ],
     "PLTR": [
@@ -141883,7 +142729,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-23T20:48:35Z"
+   "letto_il": "2026-10-23T21:48:53Z"
   }
  },
  "broker": null,
@@ -141894,14 +142740,14 @@
      "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%.  December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-23T20:17:27Z",
+     "quando": "2026-10-23T21:31:31Z",
      "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
     },
     {
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-23T19:46:16Z",
+     "quando": "2026-10-23T21:22:07Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
     },
     {
@@ -141934,6 +142780,13 @@
     }
    ],
    "BE": [
+    {
+     "titolo": "Stock Market Today, Oct. 23: Bloom Energy Falls on Cash Flow Concerns Despite Record Q3 Revenue",
+     "riassunto": "Bloom Energy (NYSE:BE), a solid-oxide fuel cell systems provider, closed at $193.30, down 11.24%. Investors are locking in profits as the company reports negative operating cash flow and faces heavier expansion spending after an earnings beat-and-raise.Trading volume reached 34.7",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-23T21:06:38Z",
+     "url": "https://www.nasdaq.com/articles/stock-market-today-oct-23-bloom-energy-falls-cash-flow-concerns-despite-record-q3-revenue"
+    },
     {
      "titolo": "Bloom Energy Stock Sinks Despite Record Revenue and a Stellar Outlook. Is It Time to Buy?",
      "riassunto": "Key PointsBloom Energy's Q3 revenue surged 138%, and backlog is growing faster than revenue.",
@@ -141968,13 +142821,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-23T15:09:34Z",
      "url": "https://www.nasdaq.com/articles/sp-500-movers-be-cci"
-    },
-    {
-     "titolo": "BE Q3 Earnings Beat Estimates on Strong Product Sales, View Up",
-     "riassunto": "Bloom Energy's Q3 earnings beat estimates as revenues surge 138.1% on record product sales, stronger margins and rising demand, prompting a higher 2026 outlook.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-23T14:49:00Z",
-     "url": "https://www.nasdaq.com/articles/be-q3-earnings-beat-estimates-strong-product-sales-view"
     }
    ],
    "CRWV": [
@@ -142023,18 +142869,18 @@
    ],
    "MRVL": [
     {
-     "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-23T20:22:32Z",
-     "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
-    },
-    {
      "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%.  December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-23T20:17:27Z",
+     "quando": "2026-10-23T21:40:46Z",
      "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
+    },
+    {
+     "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-23T21:22:07Z",
+     "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
     },
     {
      "titolo": "Stocks Fall Sharply on Risk-Off as Meta Slides -7%",
@@ -142070,7 +142916,7 @@
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-23T20:22:32Z",
+     "quando": "2026-10-23T21:22:07Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
     },
     {
@@ -142114,14 +142960,14 @@
      "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%.  December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-23T20:17:27Z",
+     "quando": "2026-10-23T21:31:31Z",
      "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
     },
     {
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.47%.  December E-mini S&P futures (ESZ26 ) are down -0.29%, and December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-23T19:46:16Z",
+     "quando": "2026-10-23T21:22:07Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
     },
     {
@@ -142154,6 +143000,13 @@
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Prediction: Nvidia Will Outperform Broadcom Over the Next 5 Years",
+     "riassunto": "Key PointsNvidia has a stronger moat than Broadcom.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-23T21:05:01Z",
+     "url": "https://www.nasdaq.com/articles/prediction-nvidia-will-outperform-broadcom-over-next-5-years"
+    },
     {
      "titolo": "Stocks Fall Sharply on Risk-Off as Meta Slides -7%",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.21%, the Dow Jones Industrial Average ($DOWI ) (DIA ) rose +0.02%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -2.90%.  December E-mini S&P futures (ESZ26 ) fell -1.18%, and December E-mini Nasdaq futures (NQZ26 ) fell -2.79%. A...",
@@ -142188,13 +143041,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-23T16:10:00Z",
      "url": "https://www.nasdaq.com/articles/ai-rout-sorting-capex-fact-fiction"
-    },
-    {
-     "titolo": "CoreWeave Is Down 13% in a Week. Here's the Price at Which I'd Buy",
-     "riassunto": "Key PointsCoreWeave&rsquo;s stock reached a new 52-week low this week.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-23T16:00:00Z",
-     "url": "https://www.nasdaq.com/articles/coreweave-down-13-week-heres-price-which-id-buy"
     }
    ],
    "PLTR": [
@@ -142306,29 +143152,24 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-23T20:48:35Z"
+  "letto_il": "2026-10-23T21:48:53Z"
  },
  "predictions": [
+  {
+   "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
+   "yes": 6,
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-october-2026-meeting-20260617190324032"
+  },
   {
    "question": "Will there be no change in Fed interest rates after the October 2026 meeting?",
    "yes": 92,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-october-2026-meeting-20260617190324031"
-  },
-  {
-   "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
-   "yes": 8,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-october-2026-meeting-20260617190324032"
-  },
-  {
-   "question": "Will the price of Ethereum be between $2,300 and $2,400 on October 22?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/will-the-price-of-ethereum-be-between-2300-2400-on-october-22-2026"
   }
  ],
  "options": {
   "AAPL": {
    "spot": 347.73,
-   "avg_volume": 38500190,
+   "avg_volume": 38506567,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -143468,7 +144309,7 @@
   },
   "ABBV": {
    "spot": 285.64,
-   "avg_volume": 5300074,
+   "avg_volume": 5300268,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -144392,7 +145233,7 @@
   },
   "AMD": {
    "spot": 516.79,
-   "avg_volume": 19480841,
+   "avg_volume": 19483097,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -145556,7 +146397,7 @@
   },
   "AMGN": {
    "spot": 439.26,
-   "avg_volume": 2735453,
+   "avg_volume": 2741807,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -146488,7 +147329,7 @@
   },
   "AMZN": {
    "spot": 248.0,
-   "avg_volume": 35806442,
+   "avg_volume": 35813130,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -147636,7 +148477,7 @@
   },
   "ANET": {
    "spot": 172.37,
-   "avg_volume": 5638829,
+   "avg_volume": 5640749,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -148760,7 +149601,7 @@
   },
   "ASML": {
    "spot": 1571.8,
-   "avg_volume": 1517535,
+   "avg_volume": 1517665,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -149924,7 +150765,7 @@
   },
   "AVGO": {
    "spot": 321.68,
-   "avg_volume": 21670956,
+   "avg_volume": 21678264,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -151080,7 +151921,7 @@
   },
   "BE": {
    "spot": 193.3,
-   "avg_volume": 15185057,
+   "avg_volume": 15193678,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -152188,7 +153029,7 @@
   },
   "BLK": {
    "spot": 1118.25,
-   "avg_volume": 667879,
+   "avg_volume": 667989,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -153120,7 +153961,7 @@
   },
   "CBRS": {
    "spot": 110.82,
-   "avg_volume": 10395528,
+   "avg_volume": 10396349,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -153892,7 +154733,7 @@
   },
   "CCJ": {
    "spot": 78.6,
-   "avg_volume": 3315878,
+   "avg_volume": 3315891,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -154808,7 +155649,7 @@
   },
   "CEG": {
    "spot": 253.45,
-   "avg_volume": 4231183,
+   "avg_volume": 4232308,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -155908,7 +156749,7 @@
   },
   "COP": {
    "spot": 150.8,
-   "avg_volume": 5957810,
+   "avg_volume": 5961385,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -156664,7 +157505,7 @@
   },
   "CRM": {
    "spot": 248.57,
-   "avg_volume": 7980278,
+   "avg_volume": 7980432,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -157772,7 +158613,7 @@
   },
   "CRWD": {
    "spot": 257.57,
-   "avg_volume": 8612811,
+   "avg_volume": 8613767,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -158968,7 +159809,7 @@
   },
   "CRWV": {
    "spot": 54.24,
-   "avg_volume": 51765377,
+   "avg_volume": 51784721,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -160180,7 +161021,7 @@
   },
   "CVX": {
    "spot": 233.21,
-   "avg_volume": 7378918,
+   "avg_volume": 7379285,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -160984,7 +161825,7 @@
   },
   "DDOG": {
    "spot": 269.65,
-   "avg_volume": 2743913,
+   "avg_volume": 2743979,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -162076,7 +162917,7 @@
   },
   "DE": {
    "spot": 646.15,
-   "avg_volume": 1140824,
+   "avg_volume": 1140833,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -163040,7 +163881,7 @@
   },
   "DELL": {
    "spot": 456.44,
-   "avg_volume": 6564881,
+   "avg_volume": 6565349,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -164276,7 +165117,7 @@
   },
   "DIS": {
    "spot": 112.52,
-   "avg_volume": 8455054,
+   "avg_volume": 8455142,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -165248,7 +166089,7 @@
   },
   "GILD": {
    "spot": 156.04,
-   "avg_volume": 5738547,
+   "avg_volume": 5738638,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -166180,7 +167021,7 @@
   },
   "GOOGL": {
    "spot": 320.21,
-   "avg_volume": 23676567,
+   "avg_volume": 23683433,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -167336,7 +168177,7 @@
   },
   "GS": {
    "spot": 875.68,
-   "avg_volume": 2304960,
+   "avg_volume": 2305443,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -168572,7 +169413,7 @@
   },
   "INTC": {
    "spot": 86.96,
-   "avg_volume": 98021123,
+   "avg_volume": 98031576,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -169808,7 +170649,7 @@
   },
   "JPM": {
    "spot": 331.58,
-   "avg_volume": 7497885,
+   "avg_volume": 7501668,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -170884,7 +171725,7 @@
   },
   "LLY": {
    "spot": 1273.46,
-   "avg_volume": 2314786,
+   "avg_volume": 2315186,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -172120,7 +172961,7 @@
   },
   "MA": {
    "spot": 623.6,
-   "avg_volume": 3091108,
+   "avg_volume": 3092083,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -173028,7 +173869,7 @@
   },
   "MCD": {
    "spot": 248.46,
-   "avg_volume": 5723535,
+   "avg_volume": 5724295,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -174072,7 +174913,7 @@
   },
   "META": {
    "spot": 642.62,
-   "avg_volume": 19246718,
+   "avg_volume": 19252243,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -175188,7 +176029,7 @@
   },
   "MRK": {
    "spot": 145.27,
-   "avg_volume": 9665619,
+   "avg_volume": 9665729,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -176232,7 +177073,7 @@
   },
   "MRVL": {
    "spot": 228.51,
-   "avg_volume": 20465568,
+   "avg_volume": 20467140,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -177468,7 +178309,7 @@
   },
   "MSFT": {
    "spot": 524.51,
-   "avg_volume": 20177461,
+   "avg_volume": 20193638,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -178704,7 +179545,7 @@
   },
   "MSTR": {
    "spot": 146.01,
-   "avg_volume": 19343665,
+   "avg_volume": 19345332,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -179940,7 +180781,7 @@
   },
   "MU": {
    "spot": 877.55,
-   "avg_volume": 26891765,
+   "avg_volume": 26895111,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -181176,7 +182017,7 @@
   },
   "NET": {
    "spot": 325.73,
-   "avg_volume": 3005665,
+   "avg_volume": 3006094,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -182404,7 +183245,7 @@
   },
   "NFLX": {
    "spot": 65.85,
-   "avg_volume": 42264201,
+   "avg_volume": 42274837,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -183600,7 +184441,7 @@
   },
   "NKE": {
    "spot": 37.3,
-   "avg_volume": 42537407,
+   "avg_volume": 42539151,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -184692,7 +185533,7 @@
   },
   "NOW": {
    "spot": 158.96,
-   "avg_volume": 11242543,
+   "avg_volume": 11243026,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -185760,7 +186601,7 @@
   },
   "NVDA": {
    "spot": 210.96,
-   "avg_volume": 105158714,
+   "avg_volume": 105282238,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -186972,7 +187813,7 @@
   },
   "OKLO": {
    "spot": 26.35,
-   "avg_volume": 9471801,
+   "avg_volume": 9472683,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -187840,7 +188681,7 @@
   },
   "ORCL": {
    "spot": 126.16,
-   "avg_volume": 29358014,
+   "avg_volume": 29361293,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -189076,7 +189917,7 @@
   },
   "PANW": {
    "spot": 380.55,
-   "avg_volume": 5357750,
+   "avg_volume": 5358027,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -190304,7 +191145,7 @@
   },
   "PFE": {
    "spot": 30.03,
-   "avg_volume": 29757288,
+   "avg_volume": 29758956,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -191372,7 +192213,7 @@
   },
   "PLTR": {
    "spot": 196.75,
-   "avg_volume": 22107353,
+   "avg_volume": 22111541,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -192608,7 +193449,7 @@
   },
   "PM": {
    "spot": 199.47,
-   "avg_volume": 4553657,
+   "avg_volume": 4553781,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -193316,7 +194157,7 @@
   },
   "RGTI": {
    "spot": 11.52,
-   "avg_volume": 14314043,
+   "avg_volume": 14314424,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -194200,7 +195041,7 @@
   },
   "SKHY": {
    "spot": 137.02,
-   "avg_volume": 18875265,
+   "avg_volume": 18884548,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -195316,7 +196157,7 @@
   },
   "SMCI": {
    "spot": 32.94,
-   "avg_volume": 35446285,
+   "avg_volume": 35449570,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -196440,7 +197281,7 @@
   },
   "SPCX": {
    "spot": 147.49,
-   "avg_volume": 101532626,
+   "avg_volume": 101543201,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -197676,7 +198517,7 @@
   },
   "STX": {
    "spot": 630.49,
-   "avg_volume": 5123136,
+   "avg_volume": 5124030,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -198840,7 +199681,7 @@
   },
   "TSLA": {
    "spot": 372.22,
-   "avg_volume": 36238678,
+   "avg_volume": 36248977,
    "expiries": [
     {
      "date": "2026-10-26",
@@ -200052,7 +200893,7 @@
   },
   "TSM": {
    "spot": 418.51,
-   "avg_volume": 11370984,
+   "avg_volume": 11371755,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -201288,7 +202129,7 @@
   },
   "TTWO": {
    "spot": 203.69,
-   "avg_volume": 2317858,
+   "avg_volume": 2320071,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -202252,7 +203093,7 @@
   },
   "V": {
    "spot": 407.92,
-   "avg_volume": 5952196,
+   "avg_volume": 5952902,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -203176,7 +204017,7 @@
   },
   "WDC": {
    "spot": 343.67,
-   "avg_volume": 9886698,
+   "avg_volume": 9891097,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -204324,7 +205165,7 @@
   },
   "XOM": {
    "spot": 183.21,
-   "avg_volume": 11396141,
+   "avg_volume": 11397818,
    "expiries": [
     {
      "date": "2026-10-30",
@@ -209357,7 +210198,7 @@
   },
   {
    "date": "2026-10-23",
-   "sharpe": -0.14,
+   "sharpe": -0.17,
    "gain_pct": 1.32,
    "eur_value": 40528.16,
    "vix": 19.45,
@@ -209381,7 +210222,7 @@
     "in:unemp": 72,
     "in:umich": 14,
     "in:curve": 62,
-    "in:curve3m": 80,
+    "in:curve3m": 81,
     "in:t30": 18,
     "in:real10": 9,
     "in:breakeven": 90,
@@ -209595,6 +210436,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-23T20:48:37Z"
+  "generated_at": "2026-10-23T21:48:56Z"
  }
 }
