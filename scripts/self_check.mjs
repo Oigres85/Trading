@@ -149,7 +149,8 @@ const SUITE = [
   /* v476: 608 punti di chiamata in test_app (+7), 210 in test_update_data (+8): pavimenti su */
   /* v496: 620 punti di chiamata in test_app (+3 sulla variazione annua della leva col percentile) -> 600 */
   /* v508: 628 punti di chiamata (+3 sui CDS a ondate: data del nome, giorni a meta', causa dello spread mancante) -> 615 */
-  { file: "test_app.mjs",        cmd: "node",    minimo: 615, firma: /\d+\/\d+ check superati/ },
+  /* v509: 633 punti di chiamata (+5 sul dot plot letto dalla Fed: pacchetto, perimetro, popup, lettura, ricevuta) -> 620 */
+  { file: "test_app.mjs",        cmd: "node",    minimo: 620, firma: /\d+\/\d+ check superati/ },
   /* v492: 236 punti di chiamata in test_update_data (+5 sulla fine del veicolo di quotazione, dal registro SEC) -> 225 */
   /* v496: 250 punti di chiamata (+14 sul file storico FINRA: variazione annua per data, percentile, i due canali) -> 240 */
   /* v498: 275 punti di chiamata (+6 sulla finestra di un mese del CDS, al netto dell'indice) -> 265 */
@@ -160,7 +161,8 @@ const SUITE = [
   /* v506: 321 punti di chiamata (+18 sulle posizioni corte aperte FINRA: tagli, quota, calendario, sorveglianza) -> 310 */
   /* v508: 340 punti di chiamata (+19 sulle ondate di ICE, lo storico per data, i giorni a meta', il composito che
      non cade senza FRED) -> 330 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 330, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v509: 354 punti di chiamata (+14 sulle proiezioni del FOMC, i tre esiti, la sorveglianza e il calendario 2027) -> 340 */
+  { file: "test_update_data.py", cmd: "python3", minimo: 340, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -181,7 +183,8 @@ const SUITE = [
      collegamento con analisi.py, e la lettura a 5 anni di DIS) -> 780 */
   /* v506: 808 punti di chiamata (+13 sulle vendite allo scoperto nelle schede: riga, blocco, tre assenze) -> 795 */
   /* v508: 818 punti di chiamata (+7 sui CDS a ondate nelle schede, nel brief e nella regola) -> 805 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 805, firma: /\d+\/\d+ CHECK OK/ },
+  /* v509: 821 punti di chiamata (+2 sul consenso negativo del calendario di Nasdaq) -> 810 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 810, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

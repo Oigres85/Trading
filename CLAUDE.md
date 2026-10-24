@@ -8289,3 +8289,72 @@ deposito del 2026-06-24 con cadenza di 91 giorni e pretendeva che la data proiet
 2026-09-23. È la **v475** una seconda volta, su un altro check: chi cerca l'assenza di una data guarda la **regione**
 in cui la data vivrebbe — la riga del deposito e quella della prossima trimestrale — e il pavimento sta sulla riga che
 il check stesso costruisce. Due iniezioni — la data proiettata rimessa in ciascuna delle due righe — mordono entrambe.
+
+## 🗓️ v509 — IL DOT PLOT ERA SCRITTO A MANO, E IL CALENDARIO FOMC FINIVA IL 9 DICEMBRE
+
+Trovati rispondendo al CEO sulla Fed di dicembre (24/10/2026): per quella risposta ho letto le proiezioni sul sito
+della Fed, e il popup FedWatch della dashboard ne mostrava altre. Istruzione del CEO, testuale: *"Correggi"*.
+
+| mediana del tasso a fine anno | il sistema | la Fed, tabella 1 del 16/09/2026 |
+|---|---|---|
+| 2026 | 3,6 | **4,1** |
+| 2027 | 3,4 | **4,1** |
+| 2028 | 3,1 | **3,9** |
+| lungo periodo | 3,0 | **3,2** |
+
+Erano quattro mediane SCRITTE NEL CODICE («da aggiornare a ogni SEP»), senza data: la Fed che taglia, nel popup di
+una Fed che ha appena alzato. Confrontate con le tabelle vecchie, erano quelle di giugno 2025 con un 2028 aggiunto.
+
+> **Un numero scritto a mano non si rompe: invecchia** (v410, v411, v424), e senza la sua data non si distingue da uno
+> fresco (v396). Le tre suite sono andate verdi al primo giro col codice nuovo: nessun gate guardava quel numero, ed è
+> esattamente per questo che è durato più di un anno.
+
+**Ora `update_data.proiezioni_fomc`:**
+- il link alla tabella lo pubblica la Fed nella pagina del calendario FOMC (v496: è la fonte a dire dove sta il file),
+  e vale il più recente non successivo a oggi;
+- la tabella si legge per INTESTAZIONE: gli anni dalla riga di testa (il primo blocco, fino a «Longer run»), la
+  mediana dalla riga «Federal funds rate», la proiezione precedente dalla riga sotto, che la tabella stessa etichetta
+  (v207); una cella vuota è un buco (v205); una forma diversa torna None, dichiarata;
+- **provato su nove tabelle vere**, da marzo 2023 al 16/09/2026: tutte lette, anni e mediane al loro posto;
+- tre esiti (v389): letto · riportato dal run precedente con la sua data e l'errore · non letto. Il dot plot scritto a
+  mano di uno snapshot precedente non si riporta avanti: non ha data;
+- vive in un blocco suo, `macro.proiezioni_fomc`, fuori dal try di FedWatch: un contratto non letto non si porta via
+  il dot plot, né il contrario (v201-v204);
+- nasce sorvegliato (v390): `validate_macro` → `proiezioni_fomc` missing se non letto, stale se riportato o se la
+  tabella più recente supera i 110 giorni (convenzione: fra due riunioni con proiezioni, nel calendario 2026-2027,
+  passano al più 98 giorni);
+- sul sito della Fed ci si identifica per quello che si è (`UA_ONESTO`, v266).
+
+**Pagina e pacchetto, una lettura sola (`proiezioniFomc`, v161):** il popup disegna il dot plot solo con la sua data,
+con la proiezione precedente sotto ogni anno; senza data dichiara «dato non disponibile» — ed è quello che dice finché
+il CI non rigenera. Il pacchetto porta una riga «PROIEZIONI DEL FOMC» accanto a FedWatch, e il perimetro (NON SA)
+smette di negare il dot plot quando il pacchetto lo porta: nega solo quello uscito dopo la sua riunione (v389, v406).
+
+### Il calendario FOMC finiva il 09/12/2026
+`FOMC_2026` → `FOMC_DECISIONI`, col 2027 che la Fed pubblica nella stessa pagina (verificato il 24/10/2026). Dal 10/12
+FedWatch sarebbe rimasto senza riunioni proprio quando il mercato prezza il 2027. Col 2027 la catena arriva a gennaio
+e marzo, coi contratti ZQF27, ZQG27 e ZQH27: tre richieste in più a run, misurate — Yahoo li serve.
+- Resta una lista scritta a mano, quindi invecchia: `validate_macro` → `fomc_calendario` suona quando restano meno di
+  due riunioni future, **prima** che finisca;
+- un gate pretende che ogni data sia un mercoledì, il secondo giorno di una riunione di due: un errore di battitura
+  cade lì;
+- ⚠ il gate v477 «gennaio 2027 fuori dal calendario» passava ancora, **per una ragione che non era più la sua**:
+  gennaio 2027 è nel calendario e ha una riunione. Riagganciato a gennaio 2028, e gennaio 2027 ha un gate suo.
+
+### Il consenso negativo del brief
+Il calendario di Nasdaq scrive i negativi fra parentesi contabili, «($1.45)», e la v500 provava «-$1.25», una forma
+che la fonte non usa: CRWV, RGTI, OKLO e CBRS uscivano «consenso ($1.45)», che si legge positivo. Ora «-1,45 $», e mai
+«-0,00 $». L'altra chiamata di Nasdaq (earnings-surprise) scrive i negativi col meno: misurata, si legge giusta.
+
+### 🧪 Metodo
+- 22 iniezioni, una alla volta per copia, su quattro copie del repo verificate per impronta, con `modifica_sicura` e ripristino dallo snapshot (v427, v430). Esito nella riga qui sotto.
+- ESITO_INIEZIONI
+- ⚠ **La trappola della variabile in background (v492), rifatta**: `S=… && mkdir … && (…) &` sulla stessa riga dà il
+  percorso solo al primo processo, e gli altri due hanno scritto in `/dot/run/`. Visto subito, perché le uscite non
+  c'erano: la variabile si assegna su una riga sua, prima dei processi.
+- ⚠ Le iniezioni in sequenza sullo stesso albero costavano quattro minuti l'una (la suite della pipeline): fermate con
+  ordine (SIGINT: il `finally` ha ripristinato, impronte verificate) e rifatte su quattro copie verificate, in
+  parallelo (v501, v506).
+- Pavimenti: `test_app.mjs` 615 → 620 (633 punti di chiamata), `test_update_data.py` 330 → 340 (354) e
+  N_CHECKS_MINIMO 345 → 360 (367 eseguiti), `test_analisi_libro.py` 805 → 810 (821).
+- `?v=` e `BUILD_VERSION` a 509: cambia `assets/app.js`.

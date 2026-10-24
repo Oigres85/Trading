@@ -7314,6 +7314,26 @@ check("v508 la prova del CDS non ancora in funzione dice in quanti dei giorni ra
       "il nome in 3" in _p508["perche"] and _p508.get("in_attesa") and "il nome in" not in _p508b["perche"],
       _p508["perche"] + " | " + _p508b["perche"])
 
+# ═══ v509 — IL CONSENSO NEGATIVO DEL CALENDARIO DI NASDAQ USCIVA GREZZO, E SI LEGGEVA POSITIVO ═══════════════
+# Il calendario scrive i negativi fra parentesi contabili, «($1.45)»; la v500 provava solo «-$1.25», che la fonte
+# non usa. Lo stato si COSTRUISCE: la riga del calendario con la forma vera di Nasdaq, la rete non c'e'.
+check("v509 le parentesi contabili del calendario di Nasdaq sono un MENO: «($1.45)» → «-1,45 $», e mai «-0,00 $»",
+      brief.consenso_testo("($1.45)") == "-1,45 $" and brief.consenso_testo("($0.07)") == "-0,07 $"
+      and brief.consenso_testo("($0.00)") == "0,00 $" and brief.consenso_testo("$0.82") == "0,82 $"
+      and brief.consenso_testo("(n.d.)") == "(n.d.)",
+      str([brief.consenso_testo(x) for x in ("($1.45)", "($0.07)", "($0.00)", "$0.82", "(n.d.)")]))
+_vtg509, _vcd509 = brief._trim_giorno, brief.leggi_conti_dichiarati
+try:
+    brief._trim_giorno = lambda g: (g, [{"symbol": "CRWV", "time": "time-not-supplied", "epsForecast": "($1.45)",
+                                         "fiscalQuarterEnding": "Sep/2026"}], None)
+    brief.leggi_conti_dichiarati = lambda *a, **k: []
+    _cal509 = brief.calendario_trimestrali(["CRWV"], giorni=5)
+finally:
+    brief._trim_giorno, brief.leggi_conti_dichiarati = _vtg509, _vcd509
+check("v509 collegamento: il calendario attacca il consenso negativo gia' tradotto, che testo e pagina leggono di li'",
+      bool(_cal509["attesi"]) and all(x.get("consenso") == "-1,45 $" for x in _cal509["attesi"]),
+      str([x.get("consenso") for x in _cal509["attesi"]]))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

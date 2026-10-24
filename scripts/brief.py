@@ -844,13 +844,19 @@ def orario_trimestrale(codice):
 
 
 def consenso_testo(eps):
-    """"$0.82" della fonte → "0,82 $"; un valore che non si legge resta com'e'."""
+    """"$0.82" della fonte → "0,82 $"; un valore che non si legge resta com'e'.
+    ⚠ v509 — il calendario di Nasdaq scrive i NEGATIVI fra parentesi contabili, «($1.45)», e la
+    v500 provava solo «-$1.25», che la fonte non usa: su CRWV, RGTI, OKLO e CBRS il consenso usciva
+    grezzo e si leggeva positivo. Le parentesi sono un segno, e diventano un meno."""
     if eps in (None, ""):
         return None
+    s = str(eps).replace("$", "").replace(",", "").strip()
+    negativo = len(s) > 2 and s[0] == "(" and s[-1] == ")"
     try:
-        return n2(float(str(eps).replace("$", "").replace(",", "").strip()), 2) + " $"
+        v = float(s[1:-1].strip() if negativo else s)
     except ValueError:
         return str(eps)
+    return n2((-v if negativo else v) or 0.0, 2) + " $"     # «or 0.0»: mai un «-0,00 $»
 
 
 def _prec(p):

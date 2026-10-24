@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 345  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353 (sale, mai scende)
+N_CHECKS_MINIMO = 360  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1488,9 +1488,11 @@ check("v477 oltre tre movimenti su una riunione sola si dichiara fuori scala, co
 check("v477 senza EFFR del giorno nessuna riunione si calcola, e si dice perche'",
       all(v.get("motivo") == "dati" for v in ud.catena_fedwatch(None, ["2026-10-28", "2026-12-09"],
                                                              {(2026, 11): 3.94, (2026, 12): 4.085})))
-_gen = ud.catena_fedwatch(3.88, ["2026-12-09"], {(2026, 12): 4.085, (2027, 1): 4.16})
-check("v477 un mese fuori dal calendario noto (gennaio 2027) non si assume senza riunioni",
-      _gen[0].get("metodo") == "mese_riunione" and _gen[0].get("contratto") == "ZQZ26.CBT")
+# ⚠ v509 — il calendario arriva ora al 2027, quindi gennaio 2027 e' NOTO (e ha una riunione): il mese fuori dal
+#   calendario e' gennaio 2028, e l'invariante si prova li'. Gennaio 2027 ha un gate suo, per la ragione nuova.
+_gen = ud.catena_fedwatch(3.88, ["2027-12-08"], {(2027, 12): 4.085, (2028, 1): 4.16})
+check("v477 un mese fuori dal calendario noto (gennaio 2028) non si assume senza riunioni",
+      _gen[0].get("metodo") == "mese_riunione" and _gen[0].get("contratto") == "ZQZ27.CBT")
 
 # l'EFFR del giorno: NY Fed, poi FRED EFFR — MAI FEDFUNDS, la media mensile
 class _RispNYF:
@@ -3015,6 +3017,162 @@ check("v508 la ricevuta della ricostruzione nel file vero: 19, 20, 21 e 22/10/20
                     and all("commit " in ((_reale508.get(d) or {}).get("ricostruiti") or {}).get("fonte", "")
                             and set((_reale508.get(d) or {}).get("i") or {}) == {"IG", "HY"}
                             for d in ("2026-10-19", "2026-10-20", "2026-10-22"))))
+
+# ═══ v509 — IL DOT PLOT SI LEGGE DALLA FED; IL CALENDARIO FOMC ARRIVA AL 2027 ═════════════════════
+# Fino alla v508 il blocco FedWatch portava quattro mediane SCRITTE NEL CODICE (3,6 · 3,4 · 3,1 · 3,0, la Fed che
+# taglia) mentre la tabella ufficiale del 16/09/2026 dice 4,1 · 4,1 · 3,9 · 3,6 · 3,2; e il calendario FOMC finiva il
+# 09/12/2026. Nessun gate guardava nessuno dei due. Gli stati si COSTRUISCONO (v425): pagine finte con la forma di
+# quelle vere della Fed, e la rete non c'e'.
+_CAL509 = ('<a href="/monetarypolicy/fomcprojtabl20260617.htm">PDF</a> <a href="/monetarypolicy/fomcprojtabl20260916.htm">'
+           'HTML</a> <a href="/monetarypolicy/files/fomcprojtabl20260916.pdf">PDF</a> '
+           '<a href="/monetarypolicy/fomcprojtabl20261209.htm">HTML</a>')
+check("v509 il link alle proiezioni e' quello che la Fed pubblica, il piu' recente non successivo a oggi",
+      ud.ultima_tabella_proiezioni(_CAL509, "2026-10-24")
+      == ("2026-09-16", "https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260916.htm")
+      and (ud.ultima_tabella_proiezioni(_CAL509, "2026-12-10") or ("",))[0] == "2026-12-09"
+      and ud.ultima_tabella_proiezioni("<p>nessun link</p>", "2026-10-24") is None)
+
+
+def _tab509(righe_ff, anni=("2026", "2027", "2028", "2029", "Longer run")):
+    """Una Tabella 1 con la forma di quella vera: due righe di testa (gruppi, poi gli anni tre volte), le variabili,
+    la riga del tasso e la proiezione precedente; dopo, una seconda tabella che non deve essere letta."""
+    testa = "".join(f"<th>{a}</th>" for a in anni) * 3
+    corpo = "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in righe_ff)
+    return ("<p>Table 1. Economic projections of Federal Reserve Board members</p><table>"
+            "<tr><th>Variable</th><th>Median<sup>1</sup></th><th>Central Tendency<sup>2</sup></th>"
+            "<th>Range<sup>3</sup></th></tr>"
+            f"<tr>{testa}</tr>"
+            "<tr><td>Change in real GDP</td><td>2.3</td><td>2.4</td><td>2.2</td><td>2.1</td><td>2.0</td></tr>"
+            "<tr><td>June projection</td><td>2.2</td><td>2.3</td><td>2.2</td><td>&nbsp;</td><td>2.0</td></tr>"
+            "<tr><td>Memo: Projected appropriate policy path</td></tr>"
+            + corpo + "</table><p>Table 2</p><table><tr><td>Federal funds rate</td><td>9.9</td></tr></table>")
+
+
+_FF509 = [["Federal funds rate", "4.1", "4.1", "3.9", "3.6", "3.2", "4.1–4.4"],
+          ["June projection", "3.8", "3.6", "3.4", "&nbsp;", "3.1", "3.6–4.1"]]
+_p509 = ud.proiezioni_tasso_fed(_tab509(_FF509))
+check("v509 la tabella si legge per INTESTAZIONE: gli anni dalla riga di testa, la mediana dalla riga del tasso, la "
+      "proiezione precedente da quella sotto, e una cella vuota e' un buco, non uno zero (v205)",
+      _p509 == {"anni": ["2026", "2027", "2028", "2029", "Longer run"], "mediana": [4.1, 4.1, 3.9, 3.6, 3.2],
+                "precedente": {"etichetta": "June projection", "mediana": [3.8, 3.6, 3.4, None, 3.1]}})
+check("v509 una tabella che non ha la forma attesa si DICHIARA (None), non s'indovina: senza «Longer run», con un "
+      "valore fuori scala, senza il primo valore, senza la riga del tasso, senza tabella",
+      ud.proiezioni_tasso_fed(_tab509(_FF509, anni=("2026", "2027", "2028"))) is None
+      and ud.proiezioni_tasso_fed(_tab509([["Federal funds rate", "41", "4.1", "3.9", "3.6", "3.2"]])) is None
+      and ud.proiezioni_tasso_fed(_tab509([["Federal funds rate", "&nbsp;", "4.1", "3.9", "3.6", "3.2"]])) is None
+      and ud.proiezioni_tasso_fed(_tab509([["Unemployment rate", "4.1", "4.1", "4.1", "4.1", "4.2"]])) is None
+      and ud.proiezioni_tasso_fed("<p>pagina senza tabelle</p>") is None)
+check("v509 senza la riga della proiezione precedente la tabella non la inventa",
+      "precedente" not in (ud.proiezioni_tasso_fed(_tab509(_FF509[:1])) or {"precedente": 1}))
+
+
+class _Risp509:
+    def __init__(self, t):
+        self.text = t
+
+
+def _get509(mappa):
+    def get(url, *a, **k):
+        if url not in mappa:
+            raise RuntimeError("HTTP 503")
+        return _Risp509(mappa[url])
+    return get
+
+
+_URL509 = "https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260916.htm"
+_letto509 = ud.proiezioni_fomc(oggi="2026-10-24", get=_get509({ud.FED_CALENDARIO_URL: _CAL509, _URL509: _tab509(_FF509)}))
+_rip509 = ud.proiezioni_fomc(oggi="2026-10-25", get=_get509({}), precedente=_letto509)
+_rip2_509 = ud.proiezioni_fomc(oggi="2026-10-26", get=_get509({}), precedente=_rip509)
+_vecchio509 = ud.proiezioni_fomc(oggi="2026-10-25", get=_get509({}),
+                                 precedente={"dot_plot": [{"year": "2026", "median": 3.6}]})
+_forma509 = ud.proiezioni_fomc(oggi="2026-10-24", get=_get509({ud.FED_CALENDARIO_URL: _CAL509, _URL509: "<p>niente</p>"}))
+check("v509 primo esito: LETTO, con la riunione, la fonte e il giorno della lettura",
+      _letto509.get("stato") == "letto" and _letto509.get("riunione") == "2026-09-16"
+      and _letto509.get("fonte") == _URL509 and _letto509.get("letto_il") == "2026-10-24"
+      and _letto509.get("mediana") == [4.1, 4.1, 3.9, 3.6, 3.2])
+check("v509 secondo esito: se la Fed non risponde vale il run precedente, RIPORTATO con la sua riunione, il giorno in "
+      "cui fu letto e l'errore di oggi — anche per piu' run di fila",
+      _rip509.get("stato") == "riportato" and _rip509.get("riunione") == "2026-09-16"
+      and _rip509.get("letto_il") == "2026-10-24" and "503" in str(_rip509.get("errore"))
+      and _rip2_509.get("stato") == "riportato" and _rip2_509.get("letto_il") == "2026-10-24")
+check("v509 terzo esito: NON LETTO col motivo — il dot plot scritto a mano del run precedente non si riporta avanti "
+      "(non ha data), e una tabella cambiata dice che non ha la forma attesa",
+      _vecchio509.get("stato") == "non_letto" and "mediana" not in _vecchio509
+      and _forma509.get("stato") == "non_letto" and "forma attesa" in str(_forma509.get("errore")))
+
+
+def _dq509(pz):
+    q = ud.validate_macro({"proiezioni_fomc": pz} if pz is not None else {})
+    return next((c for c in q["checks"] if c["key"] == "proiezioni_fomc"), {})
+
+
+_oggi509 = ud.datetime.now(ud.timezone.utc).date()
+_recente509 = dict(_letto509, riunione=(_oggi509 - ud.timedelta(days=30)).isoformat())
+_riportato509 = dict(_recente509, stato="riportato", errore="HTTP 503")
+check("v509 la fonte nasce sorvegliata (v390): letta e recente ok; riportata stale con l'errore; non letta o assente "
+      "missing; letta ma piu' vecchia di SEP_MAX_GIORNI stale",
+      _dq509(_recente509).get("status") == "ok"
+      and _dq509(_riportato509).get("status") == "stale" and "HTTP 503" in _dq509(_riportato509).get("note", "")
+      and _dq509({"stato": "non_letto", "errore": "HTTP 503"}).get("status") == "missing"
+      and _dq509(None).get("status") == "missing"
+      and _dq509(dict(_letto509, riunione=(_oggi509 - ud.timedelta(days=ud.SEP_MAX_GIORNI + 5)).isoformat())
+                 ).get("status") == "stale")
+
+_cal_vero509 = list(ud.FOMC_DECISIONI)
+check("v509 il calendario FOMC porta il 2027 pubblicato dalla Fed (verificato il 24/10/2026), in ordine, senza "
+      "doppioni, e ogni giorno di decisione e' un mercoledi' — il secondo giorno di una riunione di due",
+      [d for d in _cal_vero509 if d.startswith("2027")] == ["2027-01-27", "2027-03-17", "2027-04-28", "2027-06-09",
+                                                            "2027-07-28", "2027-09-15", "2027-10-27", "2027-12-08"]
+      and _cal_vero509 == sorted(set(_cal_vero509))
+      and all(ud.datetime.strptime(d, "%Y-%m-%d").weekday() == 2 for d in _cal_vero509))
+try:
+    _oggi_iso509 = _oggi509.isoformat()
+    ud.FOMC_DECISIONI = [d for d in _cal_vero509 if d < _oggi_iso509] + [(_oggi509 + ud.timedelta(days=20)).isoformat()]
+    _q1_509 = next(c for c in ud.validate_macro({})["checks"] if c["key"] == "fomc_calendario")
+    ud.FOMC_DECISIONI = _cal_vero509 + [(_oggi509 + ud.timedelta(days=d)).isoformat() for d in (800, 850)]
+    _q2_509 = next(c for c in ud.validate_macro({})["checks"] if c["key"] == "fomc_calendario")
+finally:
+    ud.FOMC_DECISIONI = _cal_vero509
+check("v509 il calendario scritto a mano suona PRIMA di finire: con una sola riunione futura e' stale e lo dice, con "
+      "due o piu' tace",
+      _q1_509.get("status") == "stale" and "pipeline: 1 (" in _q1_509.get("note", "") and _q2_509.get("status") == "ok")
+
+_jan509 = ud.catena_fedwatch(3.88, ["2026-12-09", "2027-01-27"], {(2026, 12): 4.035, (2027, 2): 4.175})
+check("v509 col 2027 nel calendario la catena arriva a gennaio: la riunione del 27/01 si legge dal contratto di "
+      "febbraio, mese senza riunioni, e dicembre resta nel proprio mese perche' gennaio ha una riunione",
+      _jan509[0].get("metodo") == "mese_riunione" and _jan509[0].get("contratto") == "ZQZ26.CBT"
+      and _jan509[1].get("prezzata_dal_contratto") is True and _jan509[1].get("metodo") == "mese_dopo"
+      and _jan509[1].get("contratto") == "ZQG27.CBT")
+
+_i509 = _SRC_UD_CODICE.index('macro["proiezioni_fomc"] = proiezioni_fomc(')
+check("v509 collegamento: fetch_macro scrive le proiezioni dal loro lettore, col run precedente come ripiego, FUORI dal "
+      "try di FedWatch; e il dot plot scritto a mano non c'e' piu' (ricevuta della rimozione)",
+      'precedente=(PREV_DATA.get("macro") or {}).get("proiezioni_fomc")' in _SRC_UD_CODICE[_i509:_i509 + 200]
+      and _SRC_UD_CODICE.index('print(f"!! fedwatch: {e}", file=sys.stderr)') < _i509
+      and '"dot_plot"' not in _SRC_UD_CODICE and '"median": 3.6' not in _SRC_UD_CODICE
+      and "FOMC_2026" not in _SRC_UD_CODICE)
+
+_vr509, _presi509 = ud.requests.get, {}
+
+
+class _R200_509:
+    status_code = 200
+
+
+def _cattura509(url, headers=None, timeout=None):
+    _presi509[url] = headers
+    return _R200_509()
+
+
+try:
+    ud.requests.get = _cattura509
+    ud.http_get("https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm")
+    ud.http_get("https://example.org/x")
+finally:
+    ud.requests.get = _vr509
+check("v509 sul sito della Fed ci si identifica per quello che si e' (v266); altrove resta l'intestazione di sempre",
+      _presi509.get("https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm") == ud.UA_ONESTO
+      and _presi509.get("https://example.org/x") == ud.UA)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

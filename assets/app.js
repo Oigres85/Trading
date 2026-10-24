@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "508";
+const BUILD_VERSION = "509";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7613,6 +7613,52 @@ function fonteFedWatch(fw, mt) {
 
 /* La riga che il popup mostra per una riunione: tre stati, gli stessi del pacchetto e della
    scheda a barre (v446) — PROBABILITA' · MOVIMENTI · NON PREZZATA — piu' la disputa. */
+/* ═══ v509 — LE PROIEZIONI DEL FOMC (il dot plot), una lettura sola per il popup e per il
+   pacchetto (v161, v207). Fino alla v508 la pipeline scriveva a mano quattro mediane senza data
+   — 3,6 · 3,4 · 3,1 · 3,0, la Fed che taglia — mentre la tabella ufficiale del 16/09/2026 dice
+   4,1 · 4,1 · 3,9 · 3,6 · 3,2. Ora le legge dalla Fed (`macro.proiezioni_fomc`) con la riunione
+   e la fonte, e qui un dot plot senza data NON si mostra: si dichiara mancante (v396). */
+const MESI_EN_IT = { January: "gennaio", February: "febbraio", March: "marzo", April: "aprile",
+  May: "maggio", June: "giugno", July: "luglio", August: "agosto", September: "settembre",
+  October: "ottobre", November: "novembre", December: "dicembre" };
+function proiezioniFomc(p) {
+  if (!p || (p.stato !== "letto" && p.stato !== "riportato") || !/^\d{4}-\d{2}-\d{2}$/.test(String(p.riunione || ""))
+      || !Array.isArray(p.anni) || !Array.isArray(p.mediana)) return null;
+  const prima = ((p.precedente || {}).mediana) || [];
+  const voci = p.anni.map((a, i) => ({
+    anno: a === "Longer run" ? "lungo periodo" : String(a),
+    mediana: Number.isFinite(p.mediana[i]) ? p.mediana[i] : null,
+    prima: Number.isFinite(prima[i]) ? prima[i] : null,
+  })).filter(v => v.mediana != null);
+  if (!voci.length) return null;
+  const et = String((p.precedente || {}).etichetta || "").trim();
+  const mese = MESI_EN_IT[et.split(" ")[0]];
+  const gg = (d) => `${d.slice(8, 10)}/${d.slice(5, 7)}/${d.slice(0, 4)}`;
+  return {
+    quando: gg(p.riunione), voci,
+    prima: mese ? "a " + mese : (et || null),
+    riportato: p.stato === "riportato",
+    letto: p.letto_il ? gg(String(p.letto_il)) : null,
+    errore: p.errore || null,
+    fonte: p.fonte || "federalreserve.gov",
+  };
+}
+function motivoProiezioniFomc(p) {
+  if (!p) return "lo snapshot non porta le proiezioni del FOMC con la loro data — dato non disponibile";
+  if (p.stato === "non_letto") return `non lette dalla Fed in questo run (${p.errore || "motivo non dichiarato"}) — dato non disponibile`;
+  return "le proiezioni del FOMC dello snapshot non hanno la forma attesa — dato non disponibile";
+}
+function rigaProiezioniFomc(p) {
+  const z = proiezioniFomc(p);
+  if (!z) return `- PROIEZIONI DEL FOMC (dot plot): ${motivoProiezioniFomc(p)}`;
+  const pc = (x) => fmtNum.format(x) + "%";
+  const anni = z.voci.map(v => `${v.anno} ${pc(v.mediana)}${v.prima != null && z.prima ? ` (${z.prima} ${pc(v.prima)})` : ""}`);
+  return `- PROIEZIONI DEL FOMC (dot plot: mediana del tasso sui Fed Funds a fine anno), riunione del ${z.quando}: `
+    + anni.join(" · ")
+    + ` — fonte: tabella 1 delle proiezioni economiche, ${z.fonte}`
+    + (z.riportato ? ` · ⚠ non rilette in questo run (${z.errore || "motivo non dichiarato"}): sono quelle lette il ${z.letto || "n.d."}, e una riunione con proiezioni avvenuta dopo il ${z.quando} qui non c'e'` : "");
+}
+
 function rigaFedWatch(r) {
   if (!r || !r.prezzata) return `<span class="muted">non prezzata: ${esc(motivoFedWatch(r))}</span>`;
   if (r.sospetta) return `<span class="neg">${fmtNum.format(r.mosse_25bp)} movimenti</span> ⚠ contro ${fmtNum.format(r.attesa_previsione)} dei mercati di previsione — derivazione non attribuibile`;
@@ -8130,13 +8176,23 @@ function openMacroInfo(key) {
           <td colspan="3">${rigaFedWatch(r)}</td></tr>`; }).join("")
         + `</tbody></table><div class="info-line muted" style="font-size:11px">Probabilità stimate dai futures sui Fed Funds (stile CME FedWatch). ⚠ Una probabilità esiste solo fino a un movimento intero: oltre, il contratto dice QUANTI movimenti sono prezzati, e uno zero stampato al suo posto direbbe l'opposto. Una riunione che questo contratto non prezza lo dichiara invece di prendere tre zeri.</div>`;
     }
-    if ((fw.dot_plot || []).length) {            // Dot Plot: mediana proiezioni FOMC
-      const mx = Math.max(...fw.dot_plot.map(d => d.median));
-      extra += `<h4 style="margin:12px 0 4px">Dot Plot — mediana proiezioni FOMC</h4>
-        <div class="dotplot">` + fw.dot_plot.map(d =>
-        `<div class="dp-col"><div class="dp-bar-wrap"><div class="dp-bar" style="height:${Math.round(d.median / mx * 100)}%"></div></div>
-           <div class="dp-val">${fmtNum.format(d.median)}%</div><div class="dp-year">${d.year}</div></div>`).join("")
-        + `</div><div class="info-line muted" style="font-size:11px">${esc(fw.dot_plot_note || "")}</div>`;
+    /* ⚠⚠ v509 — IL DOT PLOT ERA SCRITTO A MANO NELLA PIPELINE e qui si disegnava senza data.
+       Ora viene dalla Fed con la riunione e la fonte (proiezioniFomc): senza data non si
+       disegna, si dichiara mancante (v396). */
+    const pz = proiezioniFomc(m.proiezioni_fomc);
+    if (pz) {
+      const mx = Math.max(...pz.voci.map(v => v.mediana));
+      extra += `<h4 style="margin:12px 0 4px">Dot Plot — mediana delle proiezioni FOMC del ${pz.quando}</h4>
+        <div class="dotplot">` + pz.voci.map(v =>
+        `<div class="dp-col"><div class="dp-bar-wrap"><div class="dp-bar" style="height:${Math.round(v.mediana / mx * 100)}%"></div></div>
+           <div class="dp-val">${fmtNum.format(v.mediana)}%</div><div class="dp-year">${esc(v.anno)}</div>`
+        + (v.prima != null && pz.prima ? `<div class="dp-year muted">${esc(pz.prima)}: ${fmtNum.format(v.prima)}%</div>` : "")
+        + `</div>`).join("")
+        + `</div><div class="info-line muted" style="font-size:11px">Tabella 1 delle proiezioni economiche del FOMC, ${esc(pz.fonte)}`
+        + (pz.riportato ? ` · ⚠ non rilette in questo run (${esc(pz.errore || "")}): sono quelle lette il ${esc(pz.letto || "n.d.")}` : "")
+        + `</div>`;
+    } else {
+      extra += `<div class="info-line muted" style="margin-top:12px"><b>Dot Plot:</b> ${esc(motivoProiezioniFomc(m.proiezioni_fomc))}</div>`;
     }
   } else if (key === "fear_greed" && m.fear_greed) {
     const fg = m.fear_greed;
@@ -9015,8 +9071,14 @@ function buildPrompt(opz) {
   lines.push("MISURA: il valore corrente di ciascuna serie, la sua posizione nel proprio intervallo storico "
     + "(percentili, inversioni, pendenze), le soglie di lettura con la loro provenienza, e la rotazione "
     + "settoriale su 21 ETF. Questa parte NON e' reperibile cercando online: richiede le serie storiche.");
+  /* v509 — col dot plot datato nel pacchetto (riga PROIEZIONI DEL FOMC) il perimetro non lo nega
+     piu' (v389, v406): nega solo quello uscito dopo la sua riunione. */
+  const _pz509 = proiezioniFomc(m.proiezioni_fomc);
   lines.push("NON SA, e va cercato altrove ogni volta: (a) CHI GUIDA le istituzioni e cosa hanno "
-    + "dichiarato — presidenza della Fed, composizione del FOMC, ultimo dot plot, verbali; (b) gli EVENTI "
+    + "dichiarato — presidenza della Fed, composizione del FOMC, "
+    + (_pz509 ? `verbali, e proiezioni del FOMC piu' recenti di quelle del ${_pz509.quando} (riga PROIEZIONI DEL FOMC)`
+              : "ultimo dot plot, verbali")
+    + "; (b) gli EVENTI "
     + "NON STATISTICI — simposi, audizioni, vertici, discorsi programmati: qui trovi solo le uscite di "
     + "dati con calendario proprio; (c) le NOTIZIE SOCIETARIE e qualunque cosa riguardi un singolo titolo; "
     + "(d) tutto cio' che e' successo dopo la generazione dichiarata in testa.");
@@ -10304,6 +10366,9 @@ function buildPrompt(opz) {
        La riga dice cosa la catena ha ricavato, o perche' non l'ha fatto (motivoFedWatch). */
     lines.push(`- FedWatch prossima riunione ${mt.date}${quandoRiunione} (${fonteFedWatch(m.fedwatch, mt)}): ${rami.join(" · ")}${conf}${curva}`);
   }
+  /* v509 — le proiezioni del FOMC con la loro data, o il buco dichiarato (v396, v406). Fuori dal
+     blocco FedWatch: un contratto non letto non si porta via il dot plot (v201-v204). */
+  lines.push(rigaProiezioniFomc(m.proiezioni_fomc));
   if ((m.tilt || []).length) {
     lines.push("");
     lines.push("ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):");

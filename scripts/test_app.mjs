@@ -10473,6 +10473,102 @@ check("v508 pagina: nella tabella del credito il CDS di un nome ancora al giorno
     if (t.indexOf("al 23/10") >= 0) return "la data compare anche dove non serve";
     return t.split("al 22/10").length === 2 || "la data del nome compare piu' di una volta";`));
 
+/* ═══ v509 — IL DOT PLOT SI LEGGE DALLA FED, E SENZA DATA NON SI MOSTRA ═══════════════════════
+   Fino alla v508 la pipeline scriveva a mano quattro mediane (3,6 · 3,4 · 3,1 · 3,0, la Fed che
+   taglia) e la pagina le disegnava senza data accanto a una Fed che alza. Lo stato si COSTRUISCE
+   (v425): i quattro stati — letto, riportato, non letto, snapshot precedente senza data — perche'
+   un gate che ne percorre due non vede gli altri (v419, v420). */
+const _PZ509 = { stato: "letto", riunione: "2026-09-16",
+  fonte: "https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260916.htm", letto_il: "2026-10-24",
+  anni: ["2026", "2027", "2028", "2029", "Longer run"], mediana: [4.1, 4.1, 3.9, 3.6, 3.2],
+  precedente: { etichetta: "June projection", mediana: [3.8, 3.6, 3.4, null, 3.1] } };
+const _STATI509 = `
+  const NL = String.fromCharCode(10);
+  const PZ = ${JSON.stringify(_PZ509)};
+  const stati = { letto: PZ, riportato: Object.assign({}, PZ, { stato: "riportato", errore: "HTTP 503" }),
+    non_letto: { stato: "non_letto", errore: "HTTP 503" }, vecchio: null };
+  const rendi = (k) => {
+    DATA.macro = DATA.macro || {};
+    if (stati[k] === null) delete DATA.macro.proiezioni_fomc; else DATA.macro.proiezioni_fomc = stati[k];
+    const righe = buildPrompt().split(NL);
+    return { riga: righe.filter(x => x.indexOf("- PROIEZIONI DEL FOMC") === 0),
+             perimetro: righe.find(x => x.indexOf("NON SA, e va cercato") === 0) || "" };
+  };`;
+
+check("v509 pacchetto: le proiezioni del FOMC escono con la loro data, o il buco si dichiara — nei quattro stati",
+  suVeriEsito(_STATI509 + `
+    const a = rendi("letto");
+    if (a.riga.length !== 1) return "letto: righe " + a.riga.length;
+    for (const p of ["riunione del 16/09/2026", "2026 4,1% (a giugno 3,8%)", "2029 3,6% ·",
+                     "lungo periodo 3,2% (a giugno 3,1%)", "fomcprojtabl20260916.htm"])
+      if (a.riga[0].indexOf(p) < 0) return "letto: manca " + p + " — " + a.riga[0].slice(0, 260);
+    if (a.riga[0].indexOf("non rilette") >= 0) return "letto: dichiara una rilettura mancata che non c'e'";
+    const b = rendi("riportato");
+    if (b.riga.length !== 1 || b.riga[0].indexOf("non rilette in questo run (HTTP 503)") < 0
+        || b.riga[0].indexOf("lette il 24/10/2026") < 0) return "riportato: " + (b.riga[0] || "").slice(0, 320);
+    const c = rendi("non_letto");
+    if (c.riga.length !== 1 || c.riga[0].indexOf("non lette dalla Fed in questo run (HTTP 503)") < 0
+        || c.riga[0].indexOf("dato non disponibile") < 0) return "non letto: " + (c.riga[0] || "").slice(0, 320);
+    const d = rendi("vecchio");
+    return (d.riga.length === 1 && d.riga[0].indexOf("dato non disponibile") >= 0)
+      || "snapshot vecchio: " + (d.riga[0] || "").slice(0, 320);`));
+
+check("v509 il perimetro del pacchetto non nega il dot plot che il pacchetto porta, e lo nega quando non c'e' (v389, v406)",
+  suVeriEsito(_STATI509 + `
+    for (const k of ["letto", "riportato"]) {
+      const p = rendi(k).perimetro;
+      if (!p) return k + ": manca la riga del perimetro";
+      if (p.indexOf("ultimo dot plot") >= 0) return k + ": il perimetro dice di non sapere un dot plot che il pacchetto porta";
+      if (p.indexOf("piu' recenti di quelle del 16/09/2026") < 0) return k + ": il perimetro non dice da quale riunione in poi non sa";
+    }
+    for (const k of ["non_letto", "vecchio"])
+      if (rendi(k).perimetro.indexOf("ultimo dot plot") < 0) return k + ": senza proiezioni datate il perimetro deve dire che il dot plot non c'e'";
+    return true;`));
+
+check("v509 popup FedWatch: il dot plot si disegna solo con la sua data, e quello scritto a mano non torna",
+  suVeriEsito(_STATI509 + `
+    const apri = () => { let html = ""; const vero = openInfoModal;
+      openInfoModal = (t, b) => { html = b; };
+      try { openMacroInfo("fedwatch"); } finally { openInfoModal = vero; }
+      return html; };
+    DATA.macro.fedwatch = Object.assign({ target_range: "3.75–4.00%", implied_rate: 3.885, meetings: [] },
+      DATA.macro.fedwatch || {},
+      { dot_plot: [{ year: "2026", median: 3.6 }, { year: "2027", median: 3.4 }], dot_plot_note: "scritto a mano" });
+    DATA.macro.proiezioni_fomc = stati.letto;
+    let h = apri();
+    if (h.indexOf("proiezioni FOMC del 16/09/2026") < 0) return "letto: il titolo non porta la riunione — " + h.slice(-400);
+    if (h.indexOf("a giugno: 3,8%") < 0) return "letto: manca la proiezione precedente";
+    if (h.indexOf("lungo periodo") < 0) return "letto: Longer run non tradotto";
+    if (h.indexOf("scritto a mano") >= 0) return "letto: riappare la nota del dot plot scritto a mano";
+    delete DATA.macro.proiezioni_fomc;
+    h = apri();
+    if (h.indexOf("dp-bar") >= 0) return "snapshot vecchio: disegna un dot plot senza data";
+    if (h.indexOf("dato non disponibile") < 0) return "snapshot vecchio: non dichiara il buco";
+    DATA.macro.proiezioni_fomc = stati.non_letto;
+    h = apri();
+    return (h.indexOf("dp-bar") < 0 && h.indexOf("non lette dalla Fed in questo run (HTTP 503)") >= 0)
+      || "non letto: " + h.slice(-300);`));
+
+check("v509 una proiezione senza data o senza valori non si mostra (v396), e quella buona si legge per intero",
+  suVeriEsito(`
+    const PZ = ${JSON.stringify(_PZ509)};
+    if (proiezioniFomc(Object.assign({}, PZ, { riunione: "settembre" })) !== null) return "una data non ISO passa";
+    if (proiezioniFomc(Object.assign({}, PZ, { mediana: [null, null, null, null, null] })) !== null) return "una tabella senza valori passa";
+    if (proiezioniFomc({ dot_plot: [{ year: "2026", median: 3.6 }] }) !== null) return "il formato scritto a mano passa";
+    if (proiezioniFomc({ stato: "non_letto", errore: "x" }) !== null) return "un non letto passa";
+    const z = proiezioniFomc(PZ);
+    return (z && z.quando === "16/09/2026" && z.prima === "a giugno" && z.voci.length === 5
+      && z.voci[4].anno === "lungo periodo" && z.voci[3].prima === null && z.riportato === false)
+      || "lettura del caso buono: " + JSON.stringify(z);`));
+
+check("v509 ricevuta: la pagina non legge piu' il dot plot scritto a mano, e popup e pacchetto passano dalla stessa lettura",
+  (() => {
+    const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    if (/\bdot_plot\b/.test(codice)) return no("app.js legge ancora fw.dot_plot");
+    if ((codice.match(/proiezioniFomc\(m\.proiezioni_fomc\)/g) || []).length < 2) return no("popup e perimetro non passano da proiezioniFomc");
+    return /lines\.push\(rigaProiezioniFomc\(m\.proiezioni_fomc\)\)/.test(codice) || no("il pacchetto non stampa la riga delle proiezioni");
+  })());
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

@@ -197,13 +197,21 @@ def sane_val(v, lo, hi, what=""):
     return v
 
 
-# Calendario FOMC 2026 (fonte: federalreserve.gov, pubblicato in anticipo) — serve a rendere
+# Calendario FOMC (fonte: federalreserve.gov, pubblicato in anticipo) — serve a rendere
 # esplicita nel prompt la data della prossima riunione accanto al tasso attuale.
 # ⚠ UNICA fonte di verità: giorno della DECISIONE (2° giorno della riunione), quello che conta
 # per i mercati. Prima convivevano due liste hardcoded (qui i giorni-1, in fetch_fedwatch i
 # giorni-2) e il prompt stampava due date diverse per la stessa riunione (28/07 vs 29/07).
-FOMC_2026 = ["2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
-             "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09"]
+# ⚠⚠ v509 — FINIVA IL 09/12/2026: dal giorno dopo nessuna riunione nota, cioe' FedWatch spento
+#   proprio quando il mercato prezza il 2027. Le date del 2027 sono quelle che la Fed pubblica
+#   nella pagina del calendario (FED_CALENDARIO_URL, verificata il 24/10/2026: gennaio 26-27,
+#   marzo 16-17, aprile 27-28, giugno 8-9, luglio 27-28, settembre 14-15, ottobre 26-27,
+#   dicembre 7-8). Resta una lista scritta a mano, quindi invecchia: `validate_macro` suona
+#   (fomc_calendario) quando restano meno di due riunioni future — prima che finisca, non dopo.
+FOMC_DECISIONI = ["2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
+                  "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09",
+                  "2027-01-27", "2027-03-17", "2027-04-28", "2027-06-09",
+                  "2027-07-28", "2027-09-15", "2027-10-27", "2027-12-08"]
 
 
 def movimenti_impliciti_fomc(implied, effr, riunione, mese_contratto, esito=None):
@@ -302,7 +310,7 @@ def _mese_dopo(anno, mese):
 def mesi_contratti_fomc(riunioni, calendario=None):
     """I mesi i cui contratti servono alla catena: per ogni riunione il mese DOPO, se e' noto e
     senza riunioni (il suo tasso medio E' il tasso deciso), altrimenti il mese della riunione."""
-    cal = calendario if calendario is not None else FOMC_2026
+    cal = calendario if calendario is not None else FOMC_DECISIONI
     con_riunione = {(int(d[:4]), int(d[5:7])) for d in cal}
     anni = {int(d[:4]) for d in cal}
     mesi = []
@@ -332,7 +340,7 @@ def catena_fedwatch(effr, riunioni, tassi_mese, calendario=None):
     I movimenti di ogni riunione sono quelli IN PIU' rispetto alla precedente; i cumulati si
     contano da oggi. Una riunione che non si ricava interrompe la catena: le successive
     dipendono da lei, e si dichiarano invece di essere calcolate su una base mancante."""
-    cal = calendario if calendario is not None else FOMC_2026
+    cal = calendario if calendario is not None else FOMC_DECISIONI
     con_riunione = {(int(d[:4]), int(d[5:7])) for d in cal}
     anni = {int(d[:4]) for d in cal}
     out, pre, rotta = [], effr, None
@@ -416,7 +424,117 @@ def _prezzo_contratto(simbolo):
 
 def next_fomc_date():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    return next((d for d in FOMC_2026 if d >= today), None)
+    return next((d for d in FOMC_DECISIONI if d >= today), None)
+
+
+# ═══ v509 — IL DOT PLOT SI LEGGE DALLA FED: era scritto a mano, senza data, e vecchio di un anno ═══
+# Fino alla v508 il blocco FedWatch portava quattro mediane SCRITTE NEL CODICE («da aggiornare a
+# ogni SEP»): 3,6 · 3,4 · 3,1 · 3,0, la Fed che TAGLIA, mentre la tabella ufficiale del 16/09/2026
+# dice 4,1 · 4,1 · 3,9 · 3,6 · 3,2, la Fed che ALZA e nel 2027 non taglia. Nessun gate poteva
+# vederlo: un numero scritto a mano non si rompe, invecchia (v410, v411, v424), e senza data non
+# si distingue da uno fresco (v396).
+#  · il LINK alla tabella lo pubblica la Fed nella pagina del calendario (v496: e' la fonte a dire
+#    dove sta il file), e vale il piu' recente non successivo a oggi;
+#  · la tabella si legge per INTESTAZIONE — gli anni dalla riga di testa, il valore dalla riga che
+#    comincia con «Federal funds rate», la proiezione precedente dalla riga sotto, che la tabella
+#    stessa etichetta — mai per posizione fra righe diverse (v207);
+#  · tre esiti (v389): letto · riportato dal run precedente, con la sua data e l'errore di oggi ·
+#    non letto. Un dot plot senza data non esce.
+FED_CALENDARIO_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+FED_SITO = "https://www.federalreserve.gov"
+# convenzione (v240): le proiezioni escono alle riunioni che le prevedono, e fra due di esse nel
+# calendario 2026-2027 passano al piu' 98 giorni (09/12/2026 → 17/03/2027): oltre 110 la tabella
+# piu' recente linkata e' piu' vecchia di quanto il calendario permetta
+SEP_MAX_GIORNI = 110
+
+
+def ultima_tabella_proiezioni(pagina, oggi):
+    """(data ISO, url) della tabella delle proiezioni piu' recente fra quelle che la pagina del
+    calendario FOMC linka, non successiva a `oggi` (AAAA-MM-GG); None se la pagina non ne linka."""
+    link = {}
+    for href, d in re.findall(r'href="(/monetarypolicy/fomcprojtabl(\d{8})\.htm)"', pagina or ""):
+        iso = f"{d[:4]}-{d[4:6]}-{d[6:]}"
+        if iso <= oggi:
+            link[iso] = FED_SITO + href
+    if not link:
+        return None
+    ultima = max(link)
+    return ultima, link[ultima]
+
+
+def _righe_tabella(pagina, titolo):
+    """Le righe della prima tabella dopo `titolo`, come liste di testi di cella ripuliti."""
+    pagina = pagina or ""
+    i = pagina.find(titolo)
+    j = pagina.find("<table", i) if i >= 0 else -1
+    k = pagina.find("</table>", j) if j >= 0 else -1
+    if k < 0:
+        return []
+    return [[re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", c))).strip()
+             for c in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", r, re.S)]
+            for r in re.findall(r"<tr[^>]*>(.*?)</tr>", pagina[j:k], re.S)]
+
+
+def proiezioni_tasso_fed(pagina):
+    """La mediana del tasso sui Fed Funds dalla Tabella 1 delle proiezioni economiche (SEP), con la
+    proiezione precedente che la tabella stampa sotto. {anni, mediana, precedente} o None se la
+    forma non e' quella attesa: una forma cambiata si DICHIARA, non s'indovina."""
+    righe = _righe_tabella(pagina, "Table 1")
+    anni = None
+    for c in righe:
+        if c and re.fullmatch(r"20\d\d", c[0]):
+            if "Longer run" not in c:
+                return None
+            anni = c[:c.index("Longer run") + 1]      # il primo blocco e' quello delle MEDIANE
+            break
+    if not anni:
+        return None
+
+    def valori(c):
+        out = []
+        for x in c[1:1 + len(anni)]:
+            try:
+                out.append(float(x))
+            except ValueError:
+                out.append(None)          # una cella vuota e' un buco, non uno zero (v205)
+        return out
+
+    for n, c in enumerate(righe):
+        if not (c and c[0].startswith("Federal funds rate")):
+            continue
+        med = valori(c)
+        if len(med) != len(anni) or med[0] is None or any(v is not None and not 0 <= v <= 20 for v in med):
+            return None
+        out = {"anni": anni, "mediana": med}
+        sotto = righe[n + 1] if n + 1 < len(righe) else []
+        if sotto and sotto[0].lower().endswith("projection"):
+            out["precedente"] = {"etichetta": sotto[0], "mediana": valori(sotto)}
+        return out
+    return None
+
+
+def proiezioni_fomc(oggi=None, get=None, precedente=None):
+    """Il dot plot ufficiale: il link dalla pagina del calendario, i valori dalla tabella. Tre esiti:
+    «letto» (con riunione, fonte e giorno della lettura) · «riportato» (quello del run precedente, con
+    la sua data e l'errore di oggi) · «non_letto» (e perche'). Non solleva mai."""
+    get = get or http_get
+    oggi = oggi or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    try:
+        u = ultima_tabella_proiezioni(get(FED_CALENDARIO_URL).text, oggi)
+        if not u:
+            raise RuntimeError("la pagina del calendario FOMC non linka nessuna tabella delle proiezioni")
+        riunione, url = u
+        p = proiezioni_tasso_fed(get(url).text)
+        if not p:
+            raise RuntimeError(f"la tabella delle proiezioni del {riunione} non ha la forma attesa")
+        return {"stato": "letto", "riunione": riunione, "fonte": url, "letto_il": oggi, **p}
+    except Exception as e:  # noqa: BLE001
+        errore = str(e)[:200]
+    print(f"!! proiezioni FOMC: {errore}", file=sys.stderr)
+    prec = precedente if isinstance(precedente, dict) else {}
+    if prec.get("stato") in ("letto", "riportato") and prec.get("riunione") and prec.get("mediana"):
+        return dict(prec, stato="riportato", errore=errore)
+    return {"stato": "non_letto", "errore": errore}
 
 # candidati per la classifica delle maggiori capitalizzazioni mondiali
 TOP_CAP_CANDIDATES = {
@@ -448,7 +566,7 @@ UA_ONESTO = {"User-Agent": "Trading-dashboard/1.0 (+https://github.com/Oigres85/
 
 def http_get(url, tries=3, timeout=25):
     last = None
-    intestazioni = UA_ONESTO if "stlouisfed.org" in url else UA
+    intestazioni = UA_ONESTO if ("stlouisfed.org" in url or "federalreserve.gov" in url) else UA
     for i in range(tries):
         try:
             r = requests.get(url, headers=intestazioni, timeout=timeout)
@@ -3521,7 +3639,7 @@ def fetch_macro():
         #   mese dopo prima della fine del mese (verificato il 13/10/2026). `implied` e' la media
         #   attesa del MESE IN CORSO, dal suo contratto: e' cio' che il pacchetto dice che sia.
         oggi_utc = datetime.now(timezone.utc).date()
-        fomc = [d for d in FOMC_2026
+        fomc = [d for d in FOMC_DECISIONI
                 if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
         _mesi_fw = [(oggi_utc.year, oggi_utc.month)] + [
             x for x in mesi_contratti_fomc(fomc[:4]) if x != (oggi_utc.year, oggi_utc.month)]
@@ -3625,17 +3743,17 @@ def fetch_macro():
             "contratti": contratti,
             "next_fomc": next_fomc_date(),   # data esplicita della prossima riunione FOMC
             "meetings": meetings,
-            # Dot Plot: mediana SEP (Summary of Economic Projections) — da aggiornare a ogni SEP
-            "dot_plot": [
-                {"year": "2026", "median": 3.6},
-                {"year": "2027", "median": 3.4},
-                {"year": "2028", "median": 3.1},
-                {"year": "Lungo periodo", "median": 3.0},
-            ],
-            "dot_plot_note": "Mediana proiezioni FOMC (SEP). Fonte: federalreserve.gov",
+            # ⚠ v509 — il dot plot NON sta piu' qui: era scritto a mano (3,6 · 3,4 · 3,1 · 3,0, la
+            #   Fed che taglia) e ora si legge dalla Fed nel blocco suo, `proiezioni_fomc`
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! fedwatch: {e}", file=sys.stderr)
+
+    # ═══ v509 — LE PROIEZIONI DEL FOMC, lette dalla Fed con la loro data ═══
+    # Fuori dal try di FedWatch: un contratto non letto non deve portarsi via il dot plot, ne' il
+    # contrario (v201-v204, il vicino del taglio). Non solleva mai: i tre esiti stanno nel dato.
+    macro["proiezioni_fomc"] = proiezioni_fomc(
+        precedente=(PREV_DATA.get("macro") or {}).get("proiezioni_fomc"))
 
     # Serie FRED
     def yoy(series):
@@ -6690,6 +6808,28 @@ def validate_macro(macro):
             aq = age_of(efq.get("data"))
             add("fedwatch", efq.get("data"), 5, "ok" if (aq is not None and aq <= 5 and not persi) else "stale",
                 ("contratti non letti: " + ", ".join(str(x) for x in persi)) if persi else "")
+
+    # --- v509 — le proiezioni del FOMC nascono sorvegliate (v390): un dot plot non riletto non deve
+    #   passare per l'ultimo uscito, e il calendario scritto a mano deve suonare PRIMA di finire ---
+    pzq = macro.get("proiezioni_fomc") or {}
+    if pzq.get("stato") not in ("letto", "riportato"):
+        add("proiezioni_fomc", None, SEP_MAX_GIORNI, "missing",
+            f"proiezioni del FOMC non lette dalla Fed: {pzq.get('errore') or 'blocco assente'}")
+    else:
+        aq = age_of(pzq.get("riunione"))
+        recenti = aq is not None and aq <= SEP_MAX_GIORNI
+        nota = (f"non rilette in questo run ({pzq.get('errore')}): sono quelle della riunione del {pzq.get('riunione')}"
+                if pzq["stato"] == "riportato" else
+                "" if recenti else
+                f"la tabella piu' recente linkata dalla Fed e' del {pzq.get('riunione')}, oltre {SEP_MAX_GIORNI} giorni")
+        add("proiezioni_fomc", pzq.get("riunione"), SEP_MAX_GIORNI,
+            "ok" if (pzq["stato"] == "letto" and recenti) else "stale", nota)
+    _futuri = [d for d in FOMC_DECISIONI if d >= today.isoformat()]
+    add("fomc_calendario", _futuri[0] if _futuri else FOMC_DECISIONI[-1], None,
+        "ok" if len(_futuri) >= 2 else "stale",
+        "" if len(_futuri) >= 2 else
+        (f"riunioni future nel calendario FOMC scritto nella pipeline: {len(_futuri)} (l'ultima e' il "
+         f"{FOMC_DECISIONI[-1]}); l'anno nuovo e' nella pagina della Fed, {FED_CALENDARIO_URL}"))
 
     # --- valutazione mercato (forward P/E, S&P P/E): se mancano il quadro leva è monco ---
     for k, obj in (("forward_pe", macro.get("forward_pe")), ("sp500_pe", macro.get("sp500_pe"))):
