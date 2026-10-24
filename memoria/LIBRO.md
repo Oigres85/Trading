@@ -478,6 +478,16 @@ esce solo almeno in pari, cioè non sotto il carico di §1.
 aggiorna"*: +50 azioni a ~54,53 $ (ricavato dal carico che il broker dichiara; quel giorno il titolo ha scambiato fra
 54,07 e 56,10 $), 255 in tutto, carico da 81,41 a **76,14** (§1). Il pareggio scende col carico: a 54,80 $ (pipeline,
 23/10 in seduta) servivano +38,9% per tornare in pari, contro +48,6% sul carico di prima.
+⚠ **CRWV — 24/10/2026: la regola d'uscita cambia, su proposta dell'analisi.** Il CEO, testuale: *"Si per regola
+proposta"*. «Si esce solo almeno in pari» (18/10) legava l'uscita al prezzo di carico, che il mercato non conosce: il
+24/10 (chiusura del 23/10, 54,23 $) servivano +40,4% per tornare a 76,14, circa il doppio del movimento che le opzioni
+prezzavano fino ai conti (±21,5% al 13/11). Ora la decisione si prende ai conti del 09/11 sul fatto che per CoreWeave
+conta, il **finanziamento**: si tiene se è coperto, si esce se non lo è, a prescindere dal carico. L'esame scritto
+(§1sexies) si manda al CEO dal 02/11 e porta le condizioni: (1) il debito in scadenza entro 12 mesi (7,5 miliardi di $
+contro 5,5 di liquidità al 30/06) e gli investimenti già contrattati coperti da finanziamenti chiusi, e a quale costo;
+(2) la guida sugli investimenti; (3) gli ordini firmati e la tenuta degli impegni dei clienti, OpenAI per primo; (4) il
+risultato operativo contro gli interessi; (5) la diluizione. ⚠ Un'uscita in perdita realizza una minusvalenza: se e
+quanto valga dipende dal regime fiscale e dalle plusvalenze, che il sistema non conosce.
 ⚠ **15/10/2026 — il gradino dell'arancione del 14/10 NON è stato eseguito**, per decisione del CEO
 («mantenere le posizioni di Mu e amd e gli altri»), e la regola è cambiata lo stesso giorno:
 arancione e rosso non vendono più, resta il salvavita a −30% (§1ter).
@@ -487,7 +497,7 @@ non si lascia scadere). Una riga per decisione nella forma «- TICKER — cosa s
 `numeri_libro.py` la riporta a ogni analisi con la prima trimestrale del nome dichiarata dalla
 fonte (v483). La riga esce quando la decisione si prende.
 
-- CRWV — l'uscita: il CEO esce solo almeno in pari, cioè a un prezzo non sotto il carico di §1, e non alleggerisce sui rimbalzi; il conflitto si decide ai conti (18/10/2026)
+- CRWV — l'uscita si decide ai conti sul FINANZIAMENTO, non sul carico: si tiene se i conti mostrano coperti il debito in scadenza entro 12 mesi e gli investimenti già contrattati, si esce se non lo sono, a prescindere da dove sta il prezzo rispetto al carico di §1; fino ai conti si aspetta (24/10/2026: sostituisce «esce solo almeno in pari» del 18/10)
 - ORCL — l'ingresso sui pavimenti (il 17/10: 121,23 e 114,50): per ora il CEO attende, e gli ordini, quando li inserirà, saranno giornalieri (18/10/2026)
 
 ⚠ **18/10/2026 — le tre risposte del CEO al piano del 17/10**, testuali: *"1 no · 2 esco solo almeno in pari · 3 per
@@ -498,7 +508,8 @@ ora attendo"*, poi *"1no · 2 in attesa · 3giornalieri"*.
    regola 3), non un'uscita. ⚠ SMCI non è fra i semiconduttori del salvavita (§1ter): è un produttore di server, e il
    gradino del −30% non la tocca. ⚠ **Il 19/10/2026 il CEO ha venduto SMCI per intero** (§1): la regola resta scritta per
    il giorno in cui rientrasse.
-2. **CRWV — si esce solo almeno in pari, e si aspetta.** Nessun alleggerimento sui rimbalzi sotto il carico; il
+2. **CRWV — si esce solo almeno in pari, e si aspetta** (sostituita il 24/10/2026: ora l'uscita si decide ai conti sul
+   finanziamento, non sul carico — vedi sopra). Nessun alleggerimento sui rimbalzi sotto il carico; il
    conflitto (§1sexies) si decide ai conti, con l'esame scritto prima. Il 16/10 (chiusura 61,39) servivano +41,8% per
    tornare al carico. ⚠ Se ai conti la tenuta dicesse VENDITA PER EVIDENZA, questa regola direbbe di non uscire sotto il
    carico: le due cose si portano al CEO insieme, non si risolvono da sole — come una decisione aperta che la tenuta
