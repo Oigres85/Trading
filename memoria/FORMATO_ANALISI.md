@@ -278,7 +278,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Nasdaq-100 dal WSJ col valore di un anno prima — mai il valore di una fonte contro la media di un'altra, perché
    fonti diverse usano utili diversi; il premio sul Tesoro (convenzione); la stagione delle trimestrali (quante
    battono le attese contro le medie di FactSet, la crescita «blended»); VIX e VXN col loro percentile e la
-   struttura a termine (sopra 1 è invertita: la forma dello stress); quanto pesano i primi dieci titoli e quali
+   struttura a termine (sopra 1 è invertita: la forma dello stress); dalla v510 (CEO, 24/10) il **Fear & Greed della
+   CNN** con la data della rilevazione, i confronti e il suo anno — ⚠ due delle sue sette componenti sono il VIX e il
+   put/call che l'analisi legge già: non è una seconda conferma, è la stessa lettura riassunta (B3); quanto pesano i primi dieci titoli e quali
    sono nel libro; l'ampiezza; la tendenza di SPY e QQQ. È INFORMAZIONE: nessuna prova della tenuta, nessun
    colore, nessuna vendita. Il riferimento accanto ai multipli dei titoli (schede) resta quello della pipeline.
 5quater. **Concorrenti e quote di mercato** (v503, CEO, 18/10 sera) — dal blocco di `concorrenti.py`, per ogni
@@ -449,6 +451,7 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[short]` le vendite allo scoperto di ogni posizione e sorvegliato: le posizioni corte APERTE in % del flottante (FINRA, con la data del regolamento e la prossima pubblicazione dal calendario ufficiale), i giorni per ricoprirle, la variazione e il percentile dell'anno, il titolo negli stessi giorni (19/10) — informazione, non una prova
 - `[gamma]` la gamma dei dealer (call wall, put wall, cambio di regime) (17/10 sera) — informazione, non una prova
 - `[indici]` gli indici S&P 500 e Nasdaq-100 — P/E con la storia della sua fonte, stagione delle trimestrali, volatilità implicita, concentrazione, ampiezza e tendenza (17/10 sera) — informazione, non prove
+- `[fear_greed]` il Fear & Greed della CNN accanto al VIX, con la data della rilevazione, i confronti che la fonte porta e il suo anno, e la sovrapposizione con VIX e put/call dichiarata (24/10) — informazione, non una prova
 - `[vwap]` il VWAP dall'ultima trimestrale accanto ai pavimenti di ogni titolo (18/10)
 - `[segnali_misurati]` i segnali di mercato misurati e lasciati come informazione (18/10)
 - `[credito_salute]` la salute del credito di ogni nome — CDS con rincaro improvviso, allargamento e divergenza dal titolo, Altman con la frequenza storica d'insolvenza per orizzonte, il debito dai bilanci depositati (18/10)

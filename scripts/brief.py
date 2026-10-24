@@ -24,6 +24,9 @@ from zoneinfo import ZoneInfo
 from email.utils import parsedate_to_datetime
 from xml.etree import ElementTree
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from comuni import testo_feed  # noqa: E402 — v510: il titolo di una voce come lo legge una persona
+
 RADICE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"}
@@ -273,7 +276,8 @@ def _voci_rss(xml, fonte):
     except Exception:
         return out
     for it in root.iter("item"):
-        t = (it.findtext("title") or "").strip()
+        # v510 — il parser XML toglie UN livello di entita', e Nasdaq ne scrive due («&amp;quot;»): usciva «&quot;»
+        t = testo_feed(it.findtext("title"))
         dt = it.findtext("pubDate")
         link = (it.findtext("link") or "").strip()
         when = None
@@ -389,8 +393,38 @@ def leggi_conti_dichiarati(testo=None):
         celle = [x.strip() for x in riga.strip().strip("|").split("|")]
         if len(celle) < 4 or not re.match(r"\d{4}-\d{2}-\d{2}$", celle[1]):
             continue
-        out.append({"tk": celle[0].upper(), "data": celle[1], "fonte": celle[2], "depositato": celle[3]})
+        # v510 — la quinta colonna, facoltativa, e' l'ORA dichiarata («09:00 Asia/Seoul»): in coda, cosi' le
+        #   prime quattro non si spostano (v208)
+        out.append({"tk": celle[0].upper(), "data": celle[1], "fonte": celle[2], "depositato": celle[3],
+                    "ora": celle[4] if len(celle) > 4 and celle[4] else None})
     return out if trovata else None
+
+
+def ora_dichiarata(data, cella):
+    """⚠ v510 — L'ORA DEI CONTI DICHIARATA DALL'EMITTENTE, nel SUO fuso, convertita col fuso e mai con uno scarto
+    a mano (v470). Il 24/10/2026 la riga di SK hynix diceva «orario non dichiarato» accanto alla propria fonte, che
+    lo dichiarava: «teleconferenza alle 9:00 di Seul». La cella e' «HH:MM Zona/IANA» (LIBRO.md §1octies, colonna
+    Ora). Torna (codice, testo): il codice e' quello di Nasdaq per la seduta di New York della data dei conti —
+    prima dell'apertura, dopo la chiusura, o None durante la seduta — cosi' chi lo usa (le scadenze delle opzioni,
+    v496) lo legge come quello del calendario. (None, None) se la cella non si legge: un orario indovinato e'
+    peggio di nessun orario (v199)."""
+    m = re.match(r"\s*(\d{1,2}):(\d{2})\s+([A-Za-z]+/[A-Za-z_]+)\s*$", str(cella or ""))
+    if not m:
+        return None, None
+    try:
+        g = datetime.fromisoformat(str(data)[:10]).date()
+        quando = datetime(g.year, g.month, g.day, int(m.group(1)), int(m.group(2)), tzinfo=ZoneInfo(m.group(3)))
+    except (ValueError, KeyError, OSError):
+        return None, None
+    apre = datetime(g.year, g.month, g.day, 9, 30, tzinfo=NEW_YORK)
+    chiude = datetime(g.year, g.month, g.day, 16, 0, tzinfo=NEW_YORK)
+    codice = "time-pre-market" if quando < apre else "time-after-hours" if quando >= chiude else None
+    it, ny = quando.astimezone(ROMA), quando.astimezone(NEW_YORK)
+    rispetto = ("prima dell'apertura di New York" if codice == "time-pre-market" else
+                "dopo la chiusura di New York" if codice == "time-after-hours" else "a seduta di New York aperta")
+    return codice, (f"{rispetto} del {g:%d/%m} — {int(m.group(1)):02d}:{m.group(2)} {m.group(3)}, cioe' "
+                    f"{it:%H:%M} ora italiana del {it:%d/%m} e {ny:%H:%M} a New York del {ny:%d/%m} "
+                    "(ora dichiarata dall'emittente)")
 
 
 def con_conti_dichiarati(attesi, cercati, oggi, giorni, dichiarati):
@@ -409,8 +443,11 @@ def con_conti_dichiarati(attesi, cercati, oggi, giorni, dichiarati):
         if g < 0 or g >= giorni:
             continue
         nasdaq = sorted(a["data"] for a in out if a["tk"] == c["tk"])
-        voce = {"tk": c["tk"], "data": c["data"], "quando": "", "eps_atteso": None, "trimestre": None, "giorni": g,
-                "fonte": f"dichiarata dall'emittente: {c['fonte']}, depositato il {c['depositato']}"}
+        codice, orario = ora_dichiarata(c["data"], c.get("ora"))
+        voce = {"tk": c["tk"], "data": c["data"], "quando": codice or "", "eps_atteso": None, "trimestre": None,
+                "giorni": g, "fonte": f"dichiarata dall'emittente: {c['fonte']}, depositato il {c['depositato']}"}
+        if orario:
+            voce["orario_dichiarato"] = orario
         if nasdaq and nasdaq[0] != c["data"]:
             voce["nasdaq"] = nasdaq[0]
         out = [a for a in out if a["tk"] != c["tk"]] + [voce]
@@ -444,7 +481,7 @@ def calendario_trimestrali(tickers, giorni=21):
     attesi.sort(key=lambda x: x["data"])
     attesi = con_conti_dichiarati(attesi, cercati, oggi, giorni, leggi_conti_dichiarati())
     for x in attesi:                     # v500 — resi una volta per il testo e per la pagina (v455)
-        x["orario"] = orario_trimestrale(x.get("quando"))
+        x["orario"] = x.get("orario_dichiarato") or orario_trimestrale(x.get("quando"))
         x["consenso"] = consenso_testo(x.get("eps_atteso"))
     return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni}
 
@@ -532,13 +569,30 @@ def _duration(a):
     return a.get("securityType") in ("Note", "Bond") and a.get("floatingRate") != "Yes"
 
 
+def _campo(a, *nomi):
+    """Il primo campo NON VUOTO fra i nomi dati. ⚠⚠ v510 — il Tesoro ha cambiato i nomi: il giorno dell'asta sta in
+    `competitiveAuctionCloseDate` (auctionDate e' null), l'ora in `competitiveAuctionCloseTime` (closingTimeCompetitive
+    e' null), l'indicizzazione in `inflationProtected` (tips e' null). Verificato il 24/10/2026: il blocco leggeva i
+    nomi vecchi e diceva «nessuna asta annunciata» con 2, 5 e 7 anni — 183 miliardi — fra il 26 e il 29/10. I nomi
+    vecchi restano come ripiego: una fonte che torna indietro non deve spegnerlo di nuovo."""
+    for n in nomi:
+        v = a.get(n)
+        if v not in (None, ""):
+            return v
+    return None
+
+
+def _indicizzato(a):
+    return _campo(a, "inflationProtected", "tips") == "Yes"
+
+
 def _scadenza(a):
     """'10-Year' -> '10 anni'. Conta il termine ORIGINALE: una riapertura del decennale si
     chiama '9-Year 10-Month' ed e' lo stesso titolo dell'asta originale."""
     t = a.get("originalSecurityTerm") or a.get("securityTerm") or "scadenza n.d."
     t = re.sub(r"(\d+)-Year", r"\1 anni", t)
     t = re.sub(r"(\d+)-Month", r"\1 mesi", t)
-    return t + (" indicizzato all'inflazione" if a.get("tips") == "Yes" else "")
+    return t + (" indicizzato all'inflazione" if _indicizzato(a) else "")
 
 
 def _num(x):
@@ -573,15 +627,24 @@ def aste_tesoro(giorni=7, adesso=None, leggi=None):
 
     def giorno(a):
         try:
-            return datetime.fromisoformat(str(a.get("auctionDate", ""))[:10]).date()
+            return datetime.fromisoformat(str(_campo(a, "competitiveAuctionCloseDate", "auctionDate") or "")[:10]).date()
         except ValueError:
             return None
+
+    # ⚠ v510 — UNA LETTURA CON VOCI CHE NON SI SANNO DATARE NON E' UN CALENDARIO VUOTO (v389): e' la quarta sorte,
+    #   accanto a «con voci», «senza voci» e «NON letto». Senza, un cambio di nomi della fonte si legge «nessuna asta».
+    if annunciate and not any(giorno(a) for a in annunciate):
+        out["calendario"] = (f"letto ma ILLEGGIBILE: {len(annunciate)} aste di note e bond annunciate, nessuna con un "
+                             "giorno riconoscibile")
+    if fatte and not any(giorno(a) for a in fatte):
+        out["esiti"] = (f"letti ma ILLEGGIBILI: {len(fatte)} esiti di note e bond, nessuno con un giorno "
+                        "riconoscibile")
 
     def precedente(a):
         # ⚠ La stessa scadenza ORIGINALE, e la stessa natura (nominale o indicizzata): una
         #   riapertura si confronta col proprio titolo, non con un'altra scadenza.
-        chiave = (a.get("originalSecurityTerm"), a.get("tips"))
-        prima = [x for x in (fatte or []) if (x.get("originalSecurityTerm"), x.get("tips")) == chiave
+        chiave = (a.get("originalSecurityTerm"), _indicizzato(a))
+        prima = [x for x in (fatte or []) if (x.get("originalSecurityTerm"), _indicizzato(x)) == chiave
                  and giorno(x) and giorno(a) and giorno(x) < giorno(a)]
         if not prima:
             return None
@@ -597,7 +660,8 @@ def aste_tesoro(giorni=7, adesso=None, leggi=None):
         if g is None or not (oggi <= g <= oggi + timedelta(days=giorni)) \
            or (a.get("cusip"), g) in concluse:
             continue
-        quando = ora_da_new_york(a.get("auctionDate"), a.get("closingTimeCompetitive"))
+        quando = ora_da_new_york(_campo(a, "competitiveAuctionCloseDate", "auctionDate"),
+                                 _campo(a, "competitiveAuctionCloseTime", "closingTimeCompetitive"))
         out["prossime"].append({
             "giorno": g.isoformat(), "scadenza": _scadenza(a), "riapertura": a.get("reopening") == "Yes",
             "importo_mld": ((_num(a.get("offeringAmount")) or 0) / 1e9) or None,
@@ -797,7 +861,11 @@ def n2(x, d=2):
 
 
 def sgn(x, d=2, suff="%"):
-    return "n.d." if x is None else f"{'+' if x >= 0 else ''}{n2(x, d)}{suff}"
+    """v510 — il segno sul valore GIA' arrotondato (v496): -0,001 a due cifre e' «+0,00», mai «-0,00»."""
+    if x is None:
+        return "n.d."
+    v = round(x, d) + 0.0
+    return f"{'+' if v >= 0 else ''}{n2(v, d)}{suff}"
 
 
 MESI_IT = ("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",

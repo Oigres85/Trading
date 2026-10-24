@@ -40,6 +40,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
+from comuni import art, r2_rumore  # noqa: E402 — v510: l'articolo davanti a un numero; il pavimento del rumore
 
 FATTORI = ["QQQ", "SMH", "SPY", "TLT", "HYG", "IBIT", "RSP"]
 # Uno shock alla volta, propagato coi beta di ciascun titolo. Non si sommano: si sovrappongono.
@@ -439,6 +440,17 @@ MESI = ("gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", 
 def _it(x, d=2):
     """Convenzione del pacchetto: virgola decimale, punto per le migliaia (v442, v443)."""
     return "n.d." if x is None else f"{x:,.{d}f}".replace(",", "_").replace(".", ",").replace("_", ".")
+
+
+def testo_beta(f, b, r2, n):
+    """Il beta del libro su un fattore, col SUO R²; sotto il pavimento del rumore (comuni.r2_rumore, lo stesso delle
+    schede e della pipeline) il numero non si pubblica. ⚠ v510 — «TLT 0,53 (R² 0,01)» usciva qui mentre le schede, sullo
+    stesso canale, dicevano «non misurabile»: un beta sotto il rumore non e' un numero piccolo, non e' un numero (v316,
+    v401, v415)."""
+    pav = r2_rumore(n)
+    if pav is not None and r2 is not None and r2 < pav:
+        return f"{f} non misurabile (R² {_it(r2, 2)}, sotto il rumore {_it(pav, 3)} su {n} sedute)"
+    return f"{f} {_it(b, 2)} (R² {_it(r2, 2)})"
 
 
 def _sg(x, d=1):
@@ -1039,7 +1051,7 @@ def testo_verifica(o, ver, estremo, chiuso):
                 f"{_it(c)}): prima o dopo non si distingue — lo sa il conto")
     if ver.get("motivo") == "soffio":
         v = e if e is not None else c
-        return (f"⚠ {pre}; dopo le {hm} il {nome} è stato {_it(v)}, a meno dello {_it(MARGINE_5MIN, 1)}% dal limite: le "
+        return (f"⚠ {pre}; dopo le {hm} il {nome} è stato {_it(v)}, a meno {art('del', _it(MARGINE_5MIN, 1) + '%')} dal limite: le "
                 "barre a 5 minuti possono non vedere una stampa isolata — lo sa il conto")
     return f"⚠ {pre}: dopo le {hm} non si decide ({ver.get('motivo') or 'n.d.'})"
 
@@ -1257,7 +1269,7 @@ def righe_ordini(oo, finestra=45):
         L.append(testa + f" · ora {_it(x['px'])}"
                  + (f" ({_sg(vp)}% nella seduta del {x['seduta_quota']})" if vp is not None else "")
                  + (" · ⚠ il limite sta SOPRA il prezzo: si esegue subito" if x["sopra_prezzo"] else
-                    f" · il limite è il {_it(-x['distanza_pct'], 1)}% sotto il prezzo"))
+                    f" · il limite è {art('il', _it(-x['distanza_pct'], 1) + '%')} sotto il prezzo"))
         if x["toccato_oggi"]:
             ver = x.get("verifica") or {}
             if ver.get("letto"):
@@ -1562,7 +1574,7 @@ def riga_regola_cds(voci):
     ignoti = sorted(tk for tk, p in voci if p.get("cds_stato") not in mappati + ("assente",))
     n = next((p.get("n") for _, p in voci if p.get("n")), None)
     s = (f"CDS (decisione del CEO del 17/10/2026): lo spread del nome che in {f'{n} giorni' if n else 'un mese'} di "
-         f"compensazione cresce di oltre il {_it(SOGLIA_CDS, 0)}% PIU' dell'indice CDX della stessa cedola e' una prova "
+         f"compensazione cresce di oltre {art('il', _it(SOGLIA_CDS, 0) + '%')} PIU' dell'indice CDX della stessa cedola e' una prova "
          "CONTRO; che scende oltre la stessa soglia e' A FAVORE, ma non e' crescita e non apre un conflitto · conta la "
          "parte del nome: se si allarga tutto il credito lo dice il semaforo (famiglia credito)")
     s += f" · con un CDS compensato a ICE: {', '.join(con) if con else 'nessuno'}"
@@ -1815,7 +1827,7 @@ def testo_prova(k, p):
             return "stime a 90 giorni n.d."
         a, b, soglia = p["prima"], p["ora"], f"{_it(SOGLIA_EPS_90, 0)}%"
         if a < 0 and b < 0:
-            s = f"perdita attesa {'AMPLIATA' if b < a else 'RIDOTTA'} del {_it(abs(p['var']), 1)}% a 90 giorni"
+            s = f"perdita attesa {'AMPLIATA' if b < a else 'RIDOTTA'} {art('del', _it(abs(p['var']), 1) + '%')} a 90 giorni"
         elif a > 0 > b:
             s = "stima a 90 giorni passata da utile a PERDITA"
         elif a < 0 < b:
@@ -1831,7 +1843,7 @@ def testo_prova(k, p):
         if p.get("verso") is None:
             return "ricavi del trimestre n.d."
         return (f"ricavi {_sg(p['yoy'])}% sullo stesso trimestre dell'anno prima (al {p['trim']})"
-                + (f" — sotto la soglia di crescita del {_it(SOGLIA_RICAVI, 0)}%" if p["verso"] == "neutro" else ""))
+                + (f" — sotto la soglia di crescita {art('del', _it(SOGLIA_RICAVI, 0) + '%')}" if p["verso"] == "neutro" else ""))
     if k == "bilancio":
         if p.get("verso") is None:
             return f"bilancio n.d. ({p.get('perche')})"
@@ -2579,7 +2591,7 @@ def sintesi(o):
         L.extend(righe_registro(o["registro"]))
     L += [f"Vol {_it(r['vol_ann'] * 100, 1)}% · VaR95 {_it(r['var95'] * 100, 2)}% · ES95 {_it(r['es95'] * 100, 2)}% · scommesse eff. {_it(r['scommesse_eff'], 2)}"
          f" su {len(r['mcr'])} nomi (fuori matrice: {', '.join(o['esclusi_matrice']) or 'nessuno'}) · {r['n_sedute']} sedute",
-         "Beta libro: " + " · ".join(f"{f} {_it(bb, 2)} (R² {_it(r2, 2)})" for f, (bb, r2) in r["beta_libro"].items())]
+         "Beta libro: " + " · ".join(testo_beta(f, bb, r2, r["n_sedute"]) for f, (bb, r2) in r["beta_libro"].items())]
     for t in sorted(o["titoli"], key=lambda x: -(x["pnl"] or 0)):
         m = r["mcr"].get(t["tk"])
         ris_s = "n.d." if m is None else (_it(m * 100, 1) + "%").rjust(6)
@@ -2587,6 +2599,14 @@ def sintesi(o):
         L.append(f"  {t['tk']:5} peso {(_it(t['peso'] * 100, 1) + '%').rjust(6)} rischio {ris_s}  periodo {pnl_s}  "
                  f"vs carico {_sg(t['vs_pmc'] * 100, 0)}%")
     for k, v in o["stress"].items():
+        # ⚠ v510 — uno stress costruito su un canale che il libro non segue in modo misurabile e' rumore in dollari:
+        #   «Treasury lunghi -8%: -10.922 $ · R² 0,01» si leggeva come una perdita, accanto a un R² che la smentiva
+        pav = r2_rumore(r["n_sedute"])
+        if pav is not None and v["r2"] is not None and v["r2"] < pav:
+            L.append(f"Stress {k}: NON MISURABILE — il libro non segue questo canale in modo misurabile (R² "
+                     f"{_it(v['r2'], 2)}, sotto il rumore {_it(pav, 3)} su {r['n_sedute']} sedute): un importo in dollari "
+                     "su quel beta sarebbe rumore")
+            continue
         L.append(f"Stress {k}: {_sg(v['pnl'], 0)} $ ({_sg(v['pct'] * 100, 1)}%) · R² {_it(v['r2'], 2)}")
     if o["esclusi_matrice"]:
         L.append(f"(stress: {', '.join(o['esclusi_matrice'])} senza storia sufficiente, propagati col beta del libro)")

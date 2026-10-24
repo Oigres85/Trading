@@ -35,6 +35,7 @@ RADICE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RADICE / "scripts"))
 import brief  # noqa: E402
 import credito  # noqa: E402  — v501: la salute del credito (Altman, CDS, debito dai bilanci)
+from comuni import art  # noqa: E402  — v510: l'articolo davanti a un numero («l'11%», non «il 11%»)
 
 CANALI = (("mercato", "mercato"), ("settore", "comparto"), ("tassi", "tassi"), ("dollaro", "dollaro"))
 
@@ -51,6 +52,7 @@ def _segno(x, dec=1):
         x = float(x)
     except (TypeError, ValueError):
         return "n.d."
+    x = round(x, dec) + 0.0                  # v510 — il segno sul valore GIA' arrotondato (v496): mai «-0,0»
     return ("+" if x > 0 else "") + _n(x, dec)
 
 
@@ -84,7 +86,7 @@ def riga_revisioni(a, con_target=True):
         verso = ("la PERDITA attesa si e' AMPLIATA" if d < 0 else "la perdita attesa si e' RIDOTTA") \
             if ora <= 0 and prima <= 0 else ("stima in salita" if d > 0 else "stima in discesa")
     else:
-        verso = f"stima {'in salita' if d > 0 else 'in discesa'} del {_n(abs(d) / prima * 100)}%"
+        verso = f"stima {'in salita' if d > 0 else 'in discesa'} {art('del', _n(abs(d) / prima * 100) + '%')}"
     s = f"revisioni: EPS atteso {_n(prima, 2)} → {_n(ora, 2)} a 90 giorni, {verso}"
     if a.get("su_30g") is not None or a.get("giu_30g") is not None:
         s += f" · ultimi 30 giorni {a.get('su_30g', 0)} su, {a.get('giu_30g', 0)} giu'"
@@ -279,7 +281,8 @@ def riga_ricavi(r):
         a, b = u.get("operativo"), (anno or {}).get("operativo")
         if a is not None and b is not None:
             if a < 0 and b < 0:
-                pz.append(f"perdita operativa {'AMPLIATA' if a < b else 'RIDOTTA'} del {_n(abs(a / b - 1) * 100)}% sull'anno prima")
+                pz.append(f"perdita operativa {'AMPLIATA' if a < b else 'RIDOTTA'} "
+                          f"{art('del', _n(abs(a / b - 1) * 100) + '%')} sull'anno prima")
             elif a >= 0 and b > 0:
                 pz.append(f"utile operativo {_segno((a / b - 1) * 100)}% sull'anno prima")
             elif a >= 0 > b:
@@ -366,7 +369,7 @@ def riga_cassa(r):
         #   cantiere che resta a meta'. Stessa qualifica di autonomiaCassa in app.js.
         inv = f"{_mesi(c['mesi_capex'])} di investimenti"
         if c.get("investimenti_immateriali_prevalenti") and c.get("quota_immateriali_pct") is not None:
-            inv += (f" (⚠ il {_n(c['quota_immateriali_pct'])}% sono acquisti di attivita' immateriali,"
+            inv += (f" (⚠ {art('il', _n(c['quota_immateriali_pct']) + '%')} sono acquisti di attivita' immateriali,"
                     " non impianti: non e' un piano di costruzione"
                     + (f"; sui soli impianti {_mesi(c['mesi_impianti'])}"
                        if c.get("mesi_impianti") is not None else "") + ")")
@@ -450,7 +453,7 @@ def quota_short(si):
     t = f"{_n(p, 1)}% del flottante ({banda_short(p)})"
     y = si.get("pct_yahoo")
     if y and not (SI_BASI[0] <= p / y <= SI_BASI[1]):
-        t += (f" — Yahoo ne pubblica il {_n(y, 1)}%: due rese che non coincidono, e i dati qui presenti non dicono se "
+        t += (f" — Yahoo ne pubblica {art('il', _n(y, 1) + '%')}: due rese che non coincidono, e i dati qui presenti non dicono se "
               "la differenza sia nel flottante o nella data")
     return t
 

@@ -207,7 +207,8 @@ CATALOGO = {
         Blocco(r"BITCOIN", "bitcoin"),
     )),
     "indici": Strumento("indici", (
-        Blocco(r"INDICI|VALUTAZIONE|STAGIONE DELLE TRIMESTRALI|VOLATILITA'|CONCENTRAZIONE|AMPIEZZA|TENDENZA", "indici"),
+        Blocco(r"INDICI|VALUTAZIONE|STAGIONE DELLE TRIMESTRALI|VOLATILITA'|SENTIMENT|CONCENTRAZIONE|AMPIEZZA|TENDENZA",
+               "indici"),
     )),
     "concorrenti": Strumento("concorrenti", (
         Blocco(r"CONCORRENTI E QUOTE", "concorrenti"),
@@ -287,6 +288,7 @@ REGISTRO = {
     "short": Voce(("short",), (Marcatore("schede", "short:", "tutti"),)),                     # v506
     "gamma": Voce(("gamma",), (Marcatore("gamma", None, "posizioni"),)),
     "indici": Voce(("indici",)),
+    "fear_greed": Voce(("indici",), righe=(("indici", "Fear & Greed (CNN):"),)),                       # v510
     "vwap": Voce((), (Marcatore("tenuta", "VWAP dai conti", "posizioni"),
                       Marcatore("watchlist", "VWAP dai conti", "sorvegliati"))),
     "segnali_misurati": Voce(("posizionamento",),

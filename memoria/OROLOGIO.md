@@ -75,7 +75,27 @@ Fuso    Europe/Rome
 Risposta attesa: **204 No Content**. Un 404 quasi sempre significa permesso mancante, non URL
 sbagliato — GitHub risponde 404 anche quando la risorsa esiste ma il token non la può vedere.
 
-## Stato: ACCESO dal 09/09/2026
+## ⚠⚠ Stato: SPENTO dal 15/09/2026 alle 17:00 (ora italiana) — era acceso dal 09/09
+
+Misurato il 24/10/2026 sui 400 run `workflow_dispatch` più recenti, letti dall'API di GitHub: **54** cadono entro due
+minuti da uno dei sei orari dello scheduler, il primo il 15/06 e **l'ultimo il 15/09 alle 17:00:54**. Da allora i run
+`workflow_dispatch` sono soltanto quelli lanciati a mano dalle sessioni di lavoro, a orari qualunque; i dati arrivano
+dalla sola coda del cron di GitHub, cioè con 99-263 minuti di ritardo sull'orario scritto (§1).
+
+**La causa non si vede da qui**: lo storico dei job vive su cron-job.org, che da questo ambiente non si raggiunge. Le
+tre cose da guardare nell'ordine, nella pagina del job:
+- il **codice di risposta** delle ultime esecuzioni — `401` vuol dire token non più valido (cancellato o rigenerato),
+  `403` un permesso mancante, `404` di solito anche quello (GitHub risponde 404 a chi non può vedere la risorsa);
+- se il job risulta **disattivato** — uno scheduler può fermare da sé un job che fallisce di continuo: va riattivato
+  DOPO aver sistemato il token, altrimenti si ferma di nuovo;
+- se la **notifica di fallimento** era accesa (punto qui sotto): se lo era e non è arrivato niente, il problema è
+  l'indirizzo della notifica, non il job.
+
+⚠ **Conseguenza nel sistema (v510)**: la pagina e il pacchetto scrivevano ancora «prossimo run atteso alle HH:MM»,
+proiettato dal calendario del cron — un orario che il cron non rispetta e che lo scheduler non garantiva più. La
+proiezione è stata tolta: il prossimo run si dichiara non disponibile (istruzione permanente del CEO, v396).
+
+### Com'era quando funzionava (09/09-15/09)
 
 | scatto | ritardo sull'orario dichiarato |
 |---|---|

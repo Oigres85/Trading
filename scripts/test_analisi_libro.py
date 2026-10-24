@@ -3557,7 +3557,8 @@ _cc489 = ROT.brief.con_conti_dichiarati(
 check("v489 le date dichiarate dall'emittente: si leggono solo dentro il loro titolo e solo con una data vera; vince "
       "l'emittente e la data di Nasdaq resta accanto; una data passata, oltre la finestra o di un nome non cercato non "
       "entra; ogni voce porta la sua fonte e l'elenco resta in ordine di data",
-      _cd489 == [{"tk": "SKHY", "data": "2026-10-28", "fonte": "6-K", "depositato": "2026-10-14"}]
+      # v510 — la quinta colonna (l'ORA dichiarata) e' facoltativa: senza, l'ora e' None, mai indovinata
+      _cd489 == [{"tk": "SKHY", "data": "2026-10-28", "fonte": "6-K", "depositato": "2026-10-14", "ora": None}]
       and ROT.brief.leggi_conti_dichiarati("## 1. POSIZIONI\n") is None
       and [(c["tk"], c["data"]) for c in _cc489] == [("MU", "2026-10-20"), ("SKHY", "2026-10-28")]
       and _cc489[1]["nasdaq"] == "2026-10-27" and _cc489[1]["giorni"] == 13 and "dichiarata dall'emittente" in _cc489[1]["fonte"]
@@ -4405,7 +4406,8 @@ check("v494 la resa delle notizie: la STESSA voce nel feed di piu' nomi e' crona
       "DIVERSI (v389); la copertura del feed dichiarata; chi ha le notizie altrove lo dice",
       _rn494.count("Stocks Plunge") == 1 and "(nel feed di AAA, BBB, FFF)" in _rn494 and "[AAA] " in _rn494
       and "… e altre 2 voci nelle stesse ore, non mostrate" in _rn494 and "+ 1 voce di cronaca di mercato" in _rn494
-      and "nessuna voce propria: le 1 del feed sono cronaca di mercato" in _rn494
+      # v510 — riagganciato: la sonda pretendeva «le 1 del feed sono», cioe' il plurale fisso su una voce sola
+      and "nessuna voce propria: l'unica voce del feed e' cronaca di mercato" in _rn494
       and "feed NON letto (HTTP 429)" in _rn494 and "feed letto, nessuna voce nelle ultime 72 ore" in _rn494
       and "arriva solo fino al" in _rn494 and "notizie: nel blocco CANDIDATI" in _rn494
       and ROT.righe_notizie("T", {}, {}) == ["T: nessun nome con un segnale in questo giro"], _rn494)
@@ -5475,7 +5477,8 @@ _bsrc500 = Path(__file__).with_name("brief.py").read_text(encoding="utf-8")
 _bpsrc500 = Path(__file__).with_name("brief_pagina.py").read_text(encoding="utf-8")
 check("v500 collegamento: il calendario delle trimestrali attacca orario e consenso tradotti, il testo e la pagina li "
       "leggono di li' con lo stesso ripiego, e la tabella macro della pagina usa le rese del brief",
-      'x["orario"] = orario_trimestrale(x.get("quando"))' in _bsrc500
+      # v510 — l'ora DICHIARATA dall'emittente (LIBRO.md §1octies) vince sul codice di Nasdaq; senza, lo stesso ripiego
+      'x["orario"] = x.get("orario_dichiarato") or orario_trimestrale(x.get("quando"))' in _bsrc500
       and 'x["consenso"] = consenso_testo(x.get("eps_atteso"))' in _bsrc500
       and 'x.get("orario") or brief.orario_trimestrale(x.get("quando"))' in _bpsrc500
       and 'x.get("consenso") or brief.consenso_testo(x.get("eps_atteso"))' in _bpsrc500
@@ -5599,7 +5602,10 @@ _rv500 = ROT.riga_vwap(_v500)
 check("v500 la riga del VWAP: il prezzo, i conti col risultato contro le attese (l'EPS senza segno), il deposito con l'ora "
       "di New York e la seduta d'ancora, le sedute, la distanza e la lettura; gli errori e il «non calcolato» detti",
       _rv500.startswith("VWAP dai conti ") and "conti del 30/09/2026 (agosto 2026: EPS 33,19 contro 31,41 attesi, +5,7%)" in _rv500
-      and "comunicato alle 16:05 di New York del 30/09/2026 (8-K su SEC EDGAR), dopo la chiusura → dalla seduta del 01/10/2026" in _rv500
+      # ⚠ v510 — l'ora e' quella in cui SEC ha ACCETTATO il deposito, il piu' tardi a cui i conti erano pubblici: la
+      #   riga la chiamava «comunicato alle», cioe' affermava l'ora del comunicato che il dato non porta
+      and "deposito accettato alle 16:05 di New York del 30/09/2026 (8-K su SEC EDGAR), dopo la chiusura → dalla seduta del 01/10/2026" in _rv500
+      and "comunicato alle" not in _rv500
       and f"{len(_sel500)} sedute" in _rv500 and "chi ha comprato dopo i conti e' in media in guadagno" in _rv500
       and ROT.riga_vwap(_vs500).startswith("VWAP dai conti: non calcolabile — un'operazione societaria")
       and ROT.riga_vwap(None) == "VWAP dai conti: non calcolato"
@@ -6044,7 +6050,9 @@ check("v501 la riga del debito: i FINANZIAMENTI (senza leasing) come base di quo
       "debito finanziario 35,1 mld USD (a breve 7,5 mld USD, a lungo 27,6 mld USD" in _db501
       and "con i leasing 51,6 mld USD" in _db501 and "21,4% dei finanziamenti" in _db501
       and "NON copre la quota corrente" in _db501 and f"costo APPROSSIMATO {CR._n(640e6 * 4 / 35.1e9 * 100, 1)}%" in _db501
-      and "10% nel resto dell'esercizio, 30% nel 2° anno, 40% nel 3°, 20% oltre il 5°" in _db501
+      # ⚠ v510 — in un 10-Q l'esercizio in corso non e' chiuso: «...InYearTwo» (FASB) e' il 2° esercizio SUCCESSIVO, non
+      #   «il 2° anno» da oggi. Il check pinnava i nomi del 10-K su un fixture di 10-Q
+      and "10% nel resto dell'esercizio in corso, 30% nel 2° esercizio successivo, 40% nel 3°, 20% oltre il 5°" in _db501
       and "tasso medio ponderato dichiarato 9,10%" in _db501 and "il 92,5% del valore di carico" in _db501
       and "nessuna voce XBRL non dimensionale li nomina" in _db501)
 _rt501 = {v: CR.riga_tasso({"valore_pct": 4.25, "al": "2026-06-30", "voce": v}) for v in
@@ -6919,6 +6927,9 @@ _U505 = {
         "  MSTR: sensibilita' 1,5"],
     "indici": ["INDICI — S&P 500 e Nasdaq-100 (decisione del CEO del 17/10/2026)",
                "VALUTAZIONE — ogni multiplo con la storia DELLA SUA fonte", "  S&P 500 prospettico 22,0×",
+               # v510 — il Fear & Greed: il registro lo cerca nella sezione degli indici (la richiesta del 24/10)
+               "SENTIMENT — CNN Fear & Greed, dalla pipeline: il composito della CNN su 0-100, non una misura nostra",
+               "  Fear & Greed (CNN): 21 su 100, giudizio della fonte «paura estrema» · rilevazione del 23/10/2026",
                "TENDENZA — gli ETF SPY e QQQ"],
     "concorrenti": ["CONCORRENTI E QUOTE DI MERCATO (richiesta del CEO del 18/10/2026)", "", "AAA [POSIZIONE] Alfa",
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
@@ -7333,6 +7344,238 @@ finally:
 check("v509 collegamento: il calendario attacca il consenso negativo gia' tradotto, che testo e pagina leggono di li'",
       bool(_cal509["attesi"]) and all(x.get("consenso") == "-1,45 $" for x in _cal509["attesi"]),
       str([x.get("consenso") for x in _cal509["attesi"]]))
+
+# ═══ v510 — I DIFETTI TROVATI LEGGENDO L'ANALISI DEL 24/10/2026 COME IL DESTINATARIO (strumenti) ════════════════
+# Ogni stato si COSTRUISCE (v425): i dati del giorno possono non contenerlo domani.
+import comuni as CM
+from datetime import datetime as _dt510, timezone as _tz510, date as _gd510, timedelta as _td510
+
+# --- l'articolo davanti a un numero, un posto solo ---
+_art510 = {(p, t): CM.art(p, t) for p, t in (("il", "11%"), ("il", "8,1%"), ("il", "1,2%"), ("il", "0,5%"), ("il", "89,7%"),
+                                             ("il", "92,5%"), ("il", "18%"), ("il", "1.436,1"), ("il", "11.400"),
+                                             ("del", "0,4%"), ("del", "27,8%"), ("del", "80%"), ("il", "+5%"))}
+check("v510 l'articolo davanti a un numero si sceglie sul numero com'e' scritto: «l'11%», «l'8,1%», «l'1,2%», «lo 0,5%», "
+      "«l'89,7%», ma «il 92,5%», «il 18%», «il 1.436,1»; «l'11.400»; «dello 0,4%», «del 27,8%», «dell'80%»; un segno "
+      "davanti non elide: " + str(_art510),
+      [_art510[k] for k in (("il", "11%"), ("il", "8,1%"), ("il", "1,2%"), ("il", "0,5%"), ("il", "89,7%"),
+                            ("il", "92,5%"), ("il", "18%"), ("il", "1.436,1"), ("il", "11.400"), ("del", "0,4%"),
+                            ("del", "27,8%"), ("del", "80%"), ("il", "+5%"))]
+      == ["l'11%", "l'8,1%", "l'1,2%", "lo 0,5%", "l'89,7%", "il 92,5%", "il 18%", "il 1.436,1", "l'11.400",
+          "dello 0,4%", "del 27,8%", "dell'80%", "il +5%"])
+_FONTI510 = {n: (Path(__file__).with_name(n).read_text(encoding="utf-8")) for n in
+             ("numeri_libro.py", "schede_progetto.py", "rotazione.py", "posizionamento.py", "credito.py", "brief.py",
+              "concorrenti.py", "indici.py")}
+_fissi510 = {n: re.findall(r"(?<![A-Za-z'])(?:il|del|lo|dello) \{(?:_it|_n|n2|_n2|piano|_sg|n)\(",
+                           "\n".join(r.split("#")[0] for r in s.splitlines()))
+             for n, s in _FONTI510.items()}
+check("v510 nessun articolo SCRITTO A MANO davanti a un numero formattato negli strumenti (tredici volte in un'analisi "
+      "sola: «del 0,1%», «il 11%»): passa da comuni.art: " + str({k: v for k, v in _fissi510.items() if v}),
+      not any(_fissi510.values()))
+
+# --- i titoli dei feed, una funzione sola ---
+check("v510 il titolo di un feed si decodifica finche' ci sono entita' (Nasdaq scrive «&amp;quot;»), senza tag e senza "
+      "spazi doppi; la usano pipeline e brief (una funzione, due consumatori)",
+      CM.testo_feed("Is &amp;quot;Off the Charts.&amp;quot;  Nvidia") == 'Is "Off the Charts." Nvidia'
+      and CM.testo_feed("&amp;lt;b&amp;gt;Due&amp;lt;/b&amp;gt; &amp;amp;amp; tre") == "Due & tre"
+      and CM.testo_feed(None) == "" and brief.testo_feed is CM.testo_feed and UD.testo_feed is CM.testo_feed)
+_xml510 = ("<rss><channel><item><title>Is &amp;quot;Off the Charts.&amp;quot; Nvidia's run over?</title>"
+           "<pubDate>Fri, 23 Oct 2026 14:00:00 GMT</pubDate><link>x</link></item></channel></rss>")
+_vb510 = brief._voci_rss(_xml510, "Prova")
+check("v510 collegamento: il brief legge i titoli con testo_feed — il parser XML toglie un livello solo e usciva «&quot;»: "
+      + str(_vb510), len(_vb510) == 1 and _vb510[0]["titolo"] == "Is \"Off the Charts.\" Nvidia's run over?")
+
+# --- il pavimento del rumore, uno per pipeline e strumenti; il beta del libro sotto il rumore non e' un numero ---
+check("v510 il pavimento del rumore e' UNA funzione (comuni.r2_rumore) per pipeline e strumenti",
+      NL.r2_rumore is CM.r2_rumore and UD.r2_rumore is CM.r2_rumore and "def r2_rumore" not in _FONTI510["numeri_libro.py"])
+_tb510 = (NL.testo_beta("TLT", 0.53, 0.01, 250), NL.testo_beta("QQQ", 2.0, 0.8, 250))
+check("v510 il beta del libro sotto il pavimento del rumore non si pubblica come numero (era «TLT 0,53 (R² 0,01)» mentre le "
+      "schede dicevano «non misurabile»); sopra si', col suo R²: " + str(_tb510),
+      _tb510[0].startswith("TLT non misurabile (R² 0,01, sotto il rumore 0,015 su 250 sedute)") and "0,53" not in _tb510[0]
+      and _tb510[1] == "QQQ 2,00 (R² 0,80)")
+_o510 = {**_o483, "rischio": {**_o483["rischio"], "beta_libro": {"QQQ": (2.0, 0.8), "TLT": (0.53, 0.01)}},
+         "stress": {"Treasury lunghi -8%": {"pnl": -10922.0, "pct": -0.04, "r2": 0.01},
+                    "Nasdaq -10%": {"pnl": -54000.0, "pct": -0.2, "r2": 0.8}}}
+_sint510 = NL.sintesi(_o510)
+check("v510 collegamento: la sintesi stampa il beta del libro e gli stress col pavimento del rumore — uno stress su un "
+      "canale che il libro non segue in modo misurabile e' NON MISURABILE, non una perdita in dollari",
+      "TLT non misurabile" in _sint510 and "Stress Treasury lunghi -8%: NON MISURABILE" in _sint510
+      and "10.922" not in _sint510 and "Stress Nasdaq -10%: -54.000 $" in _sint510, _sint510[-900:])
+
+# --- le scadenze del debito coi nomi del documento (FASB): 10-Q e 10-K non sono la stessa cosa ---
+_x510k = {**_x501, "scadenze": {**_x501["scadenze"], "forma": "10-K",
+                                "voci": {"entro_12_mesi": 2e9, "anno_2": 6e9, "anno_3": 8e9, "oltre_5": 4e9}}}
+_db510k = CR.riga_debito(_rd501, _x510k, (5.5e9, "liquidita'", "x"), ())
+check("v510 in un 10-K «InNextTwelveMonths» e' il PROSSIMO esercizio e «InYearTwo» il 2°; in un 10-Q il resto "
+      "dell'esercizio in corso viene PRIMA dell'esercizio successivo (su CRWV la riga metteva prima la scadenza che viene "
+      "dopo): " + _db510k,
+      "10% nel prossimo esercizio, 30% nel 2° esercizio, 40% nel 3°, 20% oltre il 5°" in _db510k
+      and CR.nomi_scadenze("10-Q")[0] == ("resto_esercizio", "nel resto dell'esercizio in corso")
+      and CR.nomi_scadenze("10-Q")[1] == ("entro_12_mesi", "nell'esercizio successivo")
+      and CR.nomi_scadenze("10-K/A") is CR.SCADENZE_NOMI_10K and CR.nomi_scadenze(None) is CR.SCADENZE_NOMI_10K
+      and "nei 12 mesi" not in _db510k)
+
+# --- «zona GRIGIA», non «zona di GRIGIA» ---
+_rg510 = CR.riga_altman(CR.altman_rischio(_ra501(2.0)))
+check("v510 Altman: «zona GRIGIA» (un aggettivo), «zona di PERICOLO» e «zona di SICUREZZA» — usciva «zona di GRIGIA» due "
+      "volte per analisi: " + _rg510,
+      "zona GRIGIA" in _rg510 and "zona di GRIGIA" not in _rg510 and CR.testo_zona("PERICOLO") == "zona di PERICOLO"
+      and CR.testo_zona("SICUREZZA") == "zona di SICUREZZA" and CR.testo_zona("GRIGIA") == "zona GRIGIA"
+      and "zona di {a['zona']}" not in _FONTI510["credito.py"])
+
+# --- oneri ed EBIT su periodi diversi: la riga dice che non si dividono ---
+_rd510o = {**_rd501, "credito": {k: v for k, v in _rd501["credito"].items() if k != "copertura"}}
+_rd510o["credito"].update({"conto_al": "2026-06-30", "oneri_al": "2026-03-31"})
+_db510o = CR.riga_debito(_rd510o, _x501, (5.5e9, "liquidita'", "x"), ())
+check("v510 la riga del debito: oneri ed utile operativo su periodi diversi → «n.d.» con le due date, mai un rapporto "
+      "fra due periodi (v207): " + _db510o,
+      "utile operativo / oneri n.d.: nella fonte gli oneri si fermano al 31/03/2026 e l'utile operativo al 30/06/2026"
+      in _db510o and "utile operativo / oneri -" not in _db510o)
+
+# --- le aste del Tesoro coi nomi dei campi che la fonte scrive OGGI, e una lettura illeggibile dichiarata ---
+def _asta510(term, orig, giorno, tipo="Note", ora="01:00 PM", mld=None, tips="No", rend=None, cop=None, cusip=None):
+    # come TreasuryDirect dal 24/10/2026: i nomi vecchi ci sono e sono vuoti
+    return {"securityType": tipo, "securityTerm": term, "originalSecurityTerm": orig, "auctionDate": None,
+            "closingTimeCompetitive": None, "tips": None, "competitiveAuctionCloseDate": giorno + "T00:00:00",
+            "competitiveAuctionCloseTime": ora, "inflationProtected": tips, "floatingRate": "No",
+            "offeringAmount": str(int(mld * 1e9)) if mld else "", "highYield": rend or "", "bidToCoverRatio": cop or "",
+            "cusip": cusip or term + giorno, "reopening": "No"}
+_ann510 = [_asta510("2-Year", "2-Year", "2026-10-26", mld=69), _asta510("5-Year", "5-Year", "2026-10-27", mld=70),
+           _asta510("5-Year", "5-Year", "2026-10-28", mld=25, tips="Yes"), _asta510("7-Year", "7-Year", "2026-10-29", mld=44)]
+_fat510 = [_asta510("5-Year", "5-Year", "2026-09-24", rend="3.9000", cop="2.300000")]
+_leggi510 = lambda ann: (lambda url, timeout=20: ann if "/upcoming" in url else (_fat510 if "type=Note" in url else []))
+_a510 = brief.aste_tesoro(adesso=_dt510(2026, 10, 24, 18, 0, tzinfo=brief.ROMA), leggi=_leggi510(_ann510))
+_q510 = [(x["quando"], x["scadenza"], x["importo_mld"]) for x in _a510["prossime"]]
+check("v510 aste: il giorno e l'ora dai campi che il Tesoro scrive oggi (competitiveAuctionClose…, inflationProtected) — "
+      "prima «nessuna asta annunciata» con 208 miliardi in arrivo; 13:00 di New York = 18:00 in Italia nella settimana a "
+      "cinque ore: " + str(_q510),
+      _q510 == [("26/10 18:00", "2 anni", 69), ("27/10 18:00", "5 anni", 70),
+                ("28/10 18:00", "5 anni indicizzato all'inflazione", 25), ("29/10 18:00", "7 anni", 44)]
+      and (_a510["prossime"][1]["precedente"] or {}).get("data") == "24/09" and _a510["prossime"][2]["precedente"] is None
+      and _a510["calendario"] == "ok")
+_il510 = brief.aste_tesoro(adesso=_dt510(2026, 10, 24, 18, 0, tzinfo=brief.ROMA),
+                           leggi=_leggi510([{"securityType": "Note", "securityTerm": "2-Year", "floatingRate": "No"}]))
+_ti510 = "\n".join(brief.righe_aste(_il510))
+check("v510 aste: un calendario letto con voci senza un giorno riconoscibile e' ILLEGGIBILE, non «nessuna asta» — la "
+      "quarta sorte accanto alle tre della v389: " + _ti510,
+      "letto ma ILLEGGIBILE: 1 aste" in _ti510 and "nessuna asta annunciata" not in _ti510)
+
+# --- l'ora dei conti dichiarata dall'emittente, nel suo fuso, convertita col fuso ---
+_od510 = {(g, c): brief.ora_dichiarata(g, c) for g, c in (("2026-10-28", "09:00 Asia/Seoul"),
+                                                          ("2026-10-21", "09:00 Asia/Seoul"),
+                                                          ("2026-11-05", "09:00 Asia/Seoul"),
+                                                          ("2026-10-28", "10:00 America/New_York"),
+                                                          ("2026-10-28", "16:30 America/New_York"),
+                                                          ("2026-10-28", "alle 9 di mattina"),
+                                                          ("2026-10-28", "09:00 Marte/Olimpo"), ("ieri", "09:00 Asia/Seoul"))}
+check("v510 l'ora dei conti dichiarata (SK hynix: «9:00 di Seul») si converte col FUSO: il 21/10 sono le 02:00 italiane e "
+      "le 20:00 del 20 a New York, il 28/10 l'01:00 e le 20:00 del 27, il 05/11 l'01:00 e le 19:00 del 04 — uno scarto a "
+      "mano ne sbaglia almeno uno; prima dell'apertura, a seduta aperta, dopo la chiusura; una cella illeggibile e' "
+      "(None, None): " + str(_od510),
+      _od510[("2026-10-28", "09:00 Asia/Seoul")][0] == "time-pre-market"
+      and "01:00 ora italiana del 28/10 e 20:00 a New York del 27/10" in _od510[("2026-10-28", "09:00 Asia/Seoul")][1]
+      and "02:00 ora italiana del 21/10 e 20:00 a New York del 20/10" in _od510[("2026-10-21", "09:00 Asia/Seoul")][1]
+      and "01:00 ora italiana del 05/11 e 19:00 a New York del 04/11" in _od510[("2026-11-05", "09:00 Asia/Seoul")][1]
+      and _od510[("2026-10-28", "10:00 America/New_York")][0] is None
+      and "a seduta di New York aperta" in _od510[("2026-10-28", "10:00 America/New_York")][1]
+      and _od510[("2026-10-28", "16:30 America/New_York")][0] == "time-after-hours"
+      and all(_od510[k] == (None, None) for k in (("2026-10-28", "alle 9 di mattina"), ("2026-10-28", "09:00 Marte/Olimpo"),
+                                                 ("ieri", "09:00 Asia/Seoul"))))
+_cd510 = brief.leggi_conti_dichiarati("## 1octies. CONTI DICHIARATI DALL'EMITTENTE\n"
+                                      "| Nome | Conti | Fonte | Depositato | Ora |\n|---|---|---|---|---|\n"
+                                      "| SKHY | 2026-10-28 | 6-K | 2026-10-14 | 09:00 Asia/Seoul |\n"
+                                      "| ABC | 2026-10-30 | comunicato | 2026-10-20 |  |\n")
+_cc510 = brief.con_conti_dichiarati([], {"SKHY", "ABC"}, _gd510(2026, 10, 24), 45, _cd510)
+check("v510 la quinta colonna del §1octies e' l'ORA dichiarata (in coda: le prime quattro non si spostano), vuota = None; "
+      "la voce prende il codice della seduta e il testo dell'ora — e senza ora resta «orario non dichiarato»: " + str(_cc510),
+      [c["ora"] for c in _cd510] == ["09:00 Asia/Seoul", None]
+      and _cc510[0]["tk"] == "SKHY" and _cc510[0]["quando"] == "time-pre-market"
+      and "01:00 ora italiana del 28/10" in _cc510[0].get("orario_dichiarato", "")
+      and _cc510[1]["tk"] == "ABC" and _cc510[1]["quando"] == "" and "orario_dichiarato" not in _cc510[1])
+_vtg510, _vcd510 = brief._trim_giorno, brief.leggi_conti_dichiarati
+_dd510 = (_dt510.now(_tz510.utc).date() + _td510(days=3)).isoformat()
+try:
+    brief._trim_giorno = lambda g: (g, [], None)
+    brief.leggi_conti_dichiarati = lambda *a, **k: [{"tk": "SKHY", "data": _dd510, "fonte": "6-K", "depositato": "x",
+                                                     "ora": "09:00 Asia/Seoul"}]
+    _ct510 = brief.calendario_trimestrali(["SKHY"], giorni=10)
+finally:
+    brief._trim_giorno, brief.leggi_conti_dichiarati = _vtg510, _vcd510
+check("v510 collegamento: il calendario delle trimestrali porta l'ora DICHIARATA al posto di «orario non dichiarato» — "
+      "provato eseguendolo con Nasdaq muto: " + str(_ct510.get("attesi")),
+      len(_ct510["attesi"]) == 1 and "ora dichiarata dall'emittente" in _ct510["attesi"][0].get("orario", ""))
+
+# --- il segno sul valore GIA' arrotondato, e lo zero senza segno ---
+check("v510 il segno si mette sul valore arrotondato: mai «-0,0» (undici volte in un'analisi sola), e lo zero non porta "
+      "segno negli strumenti di rotazione e delle schede",
+      ROT.n(-0.04) == "0,0" and ROT.n(0.04) == "0,0" and ROT.n(0.06) == "+0,1" and ROT.n(-0.06) == "-0,1"
+      and ROT.n(-0.04, 1, "%") == "0,0%" and ROT.n(None) == "n.d."
+      and SP._segno(-0.04) == "0,0" and SP._segno(0.06) == "+0,1" and brief.sgn(-0.001) == "+0,00%")
+
+# --- il rialzo restituito: l'articolo sul numero, e un valore che si arrotonda a zero in parole ---
+_m510 = {px: ROT.lettura_5anni(_serie492(_p492, lo=_p492, hi=_p492), px, _DOPO492) for px in (90.1, 99.73, 80.8)}
+_r510 = {px: "\n".join(ROT.righe_5anni(l)) for px, l in _m510.items()}
+check("v510 rialzo restituito: «ne ha restituito l'11%» (era «il 11%»), «il 21%», e sotto l'1% in parole invece di «lo 0%»",
+      "ne ha restituito l'11%" in _r510[90.1] and "ne ha restituito il 21%" in _r510[80.8]
+      and "ne ha restituito meno dell'1%" in _r510[99.73] and "restituito lo 0%" not in _r510[99.73],
+      " | ".join(x[-260:] for x in _r510.values()))
+
+# --- il deposito a seduta aperta non dice l'ora del comunicato ---
+_ac510 = ROT.ancora_conti({**_TR500, "data": "2026-10-01"}, [{"forma": "8-K", "accettato": "2026-10-01T15:05:00"}], _B500,
+                          _DOM500)
+check("v510 VWAP: un deposito accettato a seduta aperta dice che i conti erano pubblici AL PIU' TARDI a quell'ora — non che "
+      "il comunicato sia uscito a seduta aperta (SK hynix deposita il 6-K ore dopo Seul): " + str(_ac510),
+      "al piu' tardi a quell'ora" in str(_ac510.get("quando")) and "mescola il prima e il dopo" not in str(_ac510))
+
+# --- le voci non mostrate al singolare ---
+_nw510 = {"AAA": {"stato": "ok", "voci": [_vv(2 + k, f"AAA propria {k}") for k in range(7)], "copre_da": None, "lette": 7}}
+_rn510 = "\n".join(ROT.righe_notizie("NOTIZIE — PROVA", {"AAA": ["x"]}, _nw510))
+check("v510 una voce non mostrata si dice al singolare: «un'altra voce ... non mostrata», non «non mostrate»: " + _rn510[-300:],
+      "… e un'altra voce nelle stesse ore, non mostrata" in _rn510 and "non mostrate" not in _rn510)
+
+# --- il Fear & Greed nell'analisi: data, confronti, anno, sovrapposizione, e la sua assenza detta ---
+_dfg510 = {"updated_at": "2026-10-24T13:04:16Z", "macro": {"fear_greed": {
+    "score": 21, "rating": "extreme fear", "asof": "2026-10-23", "prev_close": 20, "week_ago": None, "month_ago": 33,
+    "year_ago": 28, "components": [{"label": "Momentum S&P 500"}, {"label": "Volatilità (VIX)"},
+                                   {"label": "Opzioni Put/Call"}],
+    "storia": {"n": 251, "da": "2025-10-24", "a": "2026-10-23", "rango": 9, "minimo": {"valore": 4, "data": "2026-04-07"},
+               "massimo": {"valore": 79, "data": "2026-07-20"}}}}}
+_fg510 = IX.fear_greed_pipeline(_dfg510)
+_rfg510 = "\n".join(IX.righe_sentimento(_fg510))
+_dfg510b = {"updated_at": "2026-10-24T13:04:16Z", "macro": {"fear_greed": {"score": 21, "rating": "extreme fear",
+                                                                            "components": []}}}
+_rfg510b = "\n".join(IX.righe_sentimento(IX.fear_greed_pipeline(_dfg510b)))
+_dfg510c = {"macro": {"fear_greed": {"score": 50, "rating": "neutral", "asof": "2026-10-23",
+                                     "components": [{"label": "Momentum S&P 500"}]}}}
+_rfg510c = "\n".join(IX.righe_sentimento(IX.fear_greed_pipeline(_dfg510c)))
+check("v510 Fear & Greed nell'analisi (il CEO: «non so se tieni conto del fear and greed» — non lo faceva): il punteggio "
+      "col giudizio della fonte, la data della rilevazione, i SOLI confronti che la fonte porta, l'anno; che VIX e "
+      "put/call sono sue componenti gia' lette a parte (B3); che e' informazione: " + _rfg510,
+      "Fear & Greed (CNN): 21 su 100, giudizio della fonte «paura estrema» · rilevazione del 23/10/2026" in _rfg510
+      and "la seduta prima 20 · un mese fa 33 · un anno fa 28" in _rfg510 and "settimana fa" not in _rfg510
+      and "None" not in _rfg510 and "9° percentile (251 rilevazioni dal 24/10/2025 al 23/10/2026)" in _rfg510
+      and "il VIX e il put/call sono due delle sue 3 componenti" in _rfg510
+      and "non l'ha misurato" in _rfg510 and "e' INFORMAZIONE" in _rfg510)
+check("v510 Fear & Greed: senza data lo dice con l'ora di lettura in ora italiana; senza storico lo dice; senza componenti non "
+      "afferma sovrapposizioni; con componenti diverse dice che non si sovrappone; senza blocco e' «il dato che manca», non "
+      "«neutrale»",
+      "la data della rilevazione non e' in questi dati: letto dalla pipeline il 24/10/2026 alle 15:04 ora italiana" in _rfg510b
+      and "storico non pubblicato dalla pipeline" in _rfg510b and "la composizione non e' in questi dati" in _rfg510b
+      and "la fonte non porta i confronti" in _rfg510b
+      and "non compaiono il VIX ne' il put/call" in _rfg510c
+      and "NON nei dati della pipeline" in "\n".join(IX.righe_sentimento(IX.fear_greed_pipeline({})))
+      and "e' il dato che manca" in "\n".join(IX.righe_sentimento(None)), _rfg510b + " || " + _rfg510c)
+_six510 = "\n".join(IX.sintesi({"tassi": {}, "vol": {}, "termine": None, "composizione": {}, "libro": [], "barre": {},
+                                "schede": {}, "errori": {}, "fear_greed": _fg510}))
+_src_ix510 = Path(__file__).with_name("indici.py").read_text(encoding="utf-8")
+check("v510 collegamento: la sintesi degli indici stampa il Fear & Greed SUBITO DOPO la volatilita' (ne riassume due "
+      "componenti), e calcola lo legge dalla pipeline",
+      "SENTIMENT — CNN Fear & Greed" in _six510
+      and _six510.index("VOLATILITA' IMPLICITA") < _six510.index("SENTIMENT — CNN Fear & Greed") < _six510.index("CONCENTRAZIONE")
+      and '"fear_greed": fear_greed_pipeline(d)' in _src_ix510, _six510[:400])
+check("v510 la scheda completa porta il blocco SENTIMENT nella sezione degli indici (non «fuori catalogo»), e il registro "
+      "ha la voce del Fear & Greed",
+      any(re.match(b.regex, "SENTIMENT — CNN Fear & Greed, dalla pipeline") for b in SC.CATALOGO["indici"].blocchi)
+      and "fear_greed" in SC.REGISTRO and ("indici", "Fear & Greed (CNN):") in SC.REGISTRO["fear_greed"].righe)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

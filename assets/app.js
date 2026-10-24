@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "509";
+const BUILD_VERSION = "510";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1096,7 +1096,7 @@ function applyMacroOverrides() {
     const v = parseFloat(o.value);
     if (!(v > 0)) return;
     if (key === "forward_pe") {
-      m.forward_pe = { value: v, avg_hist: 16.5,
+      m.forward_pe = { value: v,     // v510 — niente piu' avg_hist: era una costante scritta a mano (16,5)
         label: v > 22 ? "Estremo" : v > 18 ? "Elevato" : v > 14 ? "Normale" : "Conveniente",
         manual_override: true, override_date: o.savedAt };
     } else if (key === "sp500_pe") {
@@ -1249,13 +1249,18 @@ function sessionContextLine() {
   // al portafoglio). Un'affermazione vera in ogni caso non può diventare pendente.
   /* ⚠ v277 — RAMO MORTO. Chiamava newsSplitByClose(), uscita col blocco news in v256: il
      try/catch la mascherava e il valore era SEMPRE 0. Un ramo che non puo' dare altro che zero
-     non e' una protezione, e' un commento che sembra codice (classe v234). */
-  const nUnp = 0;
+     non e' una protezione, e' un commento che sembra codice (classe v234).
+     ⚠⚠ v510 — E LO ZERO FISSO SCRIVEVA UNA FRASE FALSA: «Nessuna notizia nuova dopo la campana» il 24/10/2026, con
+     cinque titoli macro pubblicati dopo la chiusura nello stesso pacchetto. Il conteggio ora e' quello del blocco dei
+     titoli macro (vociDopoChiusura, una derivazione sola: v161), e quando non e' calcolabile lo si dice. */
+  const _vociNews = (((DATA && DATA.macro) || {}).news || {}).voci;
+  const _np = Array.isArray(_vociNews) ? vociDopoChiusura(_vociNews, lastUsEquityCloseUTC()) : null;
+  const nUnp = _np ? _np.length : 0;
   const asiaViva = seoulSessionOpen();
   const guida = (s.phase === "weekend" && asiaViva)
     ? `WEEKEND a New York MA BORSA ASIATICA APERTA (Seoul sta scambiando ORA; apertura USA tra ~${hrs}h). ATTENZIONE ALLA FRESCHEZZA: la borsa coreana è aperta, ma il valore del KOSPI qui sopra viene dallo snapshot della pipeline e NON è aggiornato in tempo reale — è l'ultima chiusura, non la seduta in corso. Storicamente il primo mercato che vota sulle notizie del fine settimana è l'Asia, e i semiconduttori coreani sono i più correlati a questo book${nUnp ? `; le ${nUnp} notizie non ancora prezzate sono elencate sotto` : ""}`
     : s.phase === "weekend"
-    ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA.${nUnp ? ` Il segnale fresco di questo run sono le ${nUnp} NOTIZIE arrivate dopo la campana, che il prezzo non ha ancora votato:` : " Nessuna notizia nuova dopo la campana:"} il prossimo prezzo che esiste e' quello dell'apertura di lunedi'`
+    ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA.${_np == null ? " Se dopo la campana siano usciti titoli macro, il sistema non sa dirlo (nessuna raccolta o chiusura non determinabile):" : nUnp ? ` Il segnale fresco di questo run ${nUnp === 1 ? "e' il titolo macro pubblicato" : `sono i ${nUnp} titoli macro pubblicati`} dopo la campana, che il prezzo non ha ancora votato:` : " Nessun titolo macro pubblicato dopo la campana fra quelli raccolti:"} il prossimo prezzo che esiste e' quello dell'apertura di lunedi'`
     : beforeBell
     ? `SEI PRIMA DELLA CAMPANA (apertura tra ~${hrs}h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura`
     : s.phase === "regular"
@@ -1355,6 +1360,16 @@ function lastUsEquityCloseUTC(now = new Date()) {
     if (isNaN(t)) return null;
   }
   return t.getTime() > now.getTime() ? null : { at: t, asof: giorno };
+}
+/* v510 — le voci pubblicate DOPO l'ultima chiusura USA davvero avvenuta (lastUsEquityCloseUTC): una derivazione per il
+   blocco dei titoli macro e per la riga della fase (v161). null = la chiusura non e' determinabile, che non e' «nessuna
+   notizia» (v406). Le voci con una data nel futuro o illeggibile non entrano. */
+function vociDopoChiusura(voci, chiusura, adesso = Date.now()) {
+  if (!chiusura) return null;
+  return (voci || []).filter((v) => {
+    const t = Date.parse(v && v.quando);
+    return Number.isFinite(t) && t <= adesso && t > chiusura.at.getTime();
+  });
 }
 /* news pubblicate DOPO l'ultima chiusura = non ancora nel prezzo.
    Esclude le voci sintetiche Polymarket (sono snapshot di probabilità, non notizie). */
@@ -2055,6 +2070,32 @@ function trimestreEsteso(s) {
   return `${q}° trimestre ${a} (${MESI[(q - 1) * 3]}-${MESI[(q - 1) * 3 + 2]})`;
 }
 
+/* ⚠ v510 — IL PERIODO DI RIFERIMENTO, UNA RESA SOLA (v392, v161): la riga di cadenza lo scriveva per esteso e la riga
+   di freschezza del pacchetto elencava le statistiche ufficiali con la data d'inizio del periodo («Inflazione CPI
+   (2026-09-01)»), cioe' la forma che la v392 aveva tolto perche' si legge come un giorno. */
+function periodoRiferito(passo, s) {
+  const x = String(s || "").slice(0, 10);
+  if (passo === "trimestrale") return trimestreEsteso(x);
+  if (passo === "mensile") return meseEsteso(x);
+  return `${x.slice(8, 10)}/${x.slice(5, 7)}/${x.slice(0, 4)}`;      // giornaliero: il giorno E' il periodo
+}
+
+/* v510 — «0 giorni fa» e «1 giorni fa» non sono italiano, e sono i due casi piu' frequenti (la classe v458) */
+function giorniFa(n) {
+  /* ⚠ Number(null) vale 0, cioe' «oggi»: un'eta' che manca non e' un'eta' nulla (v205) */
+  if (n == null || n === "") return "n.d.";
+  const g = Number(n);
+  if (!Number.isFinite(g)) return "n.d.";
+  return g <= 0 ? "oggi" : g === 1 ? "ieri" : `${g} giorni fa`;
+}
+
+/* ⚠⚠ v510 — IL PROSSIMO RUN NON HA UN ORARIO. La pagina e il pacchetto scrivevano «prossimo run atteso alle HH:MM»
+   proiettandolo dal calendario del cron di GitHub: ma quel calendario e' una coda, non un orario (v437: i run
+   partono con 99-263 minuti di ritardo), e lo scheduler esterno che lo correggeva non spara dal 15/09. Era una
+   proiezione, e l'istruzione permanente del CEO (v396) le vieta: «se non abbiamo queste informazioni dici dato non
+   disponibile». La funzione che la calcolava (prossimoRunPipeline) e' stata tolta. */
+const ORARIO_RUN_ND = "orario non disponibile — il cron di GitHub e' una coda, non un orario";
+
 /* la riga da mostrare sotto una card macro e da mettere nel payload */
 function rigaCadenza(chiave, dataRilevazione) {
   const c = cadenzaDato(chiave, dataRilevazione);
@@ -2067,12 +2108,7 @@ function rigaCadenza(chiave, dataRilevazione) {
      (una "correzione" al PIL e una ai fondi monetari, entrambe false). */
   const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
                 "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-  const periodo = (s) => {
-    const a = s.slice(0, 4), m = Number(s.slice(5, 7));
-    if (c.passo === "trimestrale") return `al ${trimestreEsteso(s)}`;
-    if (c.passo === "mensile") return `a ${MESI[m - 1]} ${a}`;
-    return `al ${it(s)}`;      // giornaliero: il giorno E' il periodo
-  };
+  const periodo = (s) => (c.passo === "mensile" ? "a " : "al ") + periodoRiferito(c.passo, s);   // v510: una resa sola
   /* ═══ v396 — TRE FATTI E NESSUNA STIMA ════════════════════════════════════════════════
      Ogni pezzo di questa riga o viene dalla fonte o non viene scritto. "dato non
      disponibile" e' un'informazione: dice che il sistema NON SA quando arriva il prossimo
@@ -2081,7 +2117,7 @@ function rigaCadenza(chiave, dataRilevazione) {
   const ND = "dato non disponibile";
   return `riferito ${periodo(c.rilevato)}`
     + ` · acquisito ${c.acquisito ? "il " + it(c.acquisito) : ND}`
-    + ` · ultima uscita ${c.pubblicato ? `${it(c.pubblicato)} (${c.eta} giorni fa)` : ND}`
+    + ` · ultima uscita ${c.pubblicato ? `${it(c.pubblicato)} (${giorniFa(c.eta)})` : ND}`
     + (c.superato
         ? ` ⚠⚠ QUELL'USCITA NON E' QUELLA DI QUESTO VALORE: cade oltre un passo di cadenza dopo `
           + `la fine del periodo qui sopra, quindi ha pubblicato un periodo PIU' RECENTE che il `
@@ -2093,41 +2129,8 @@ function rigaCadenza(chiave, dataRilevazione) {
         : ND}`
     + ` · ${c.fonte}, ${c.passo}`;
 }
-/* ═══ v253 — LE CARD DI MERCATO NON DICEVANO QUANDO SONO STATE RILEVATE ═══════════════
-   Misurato sulla pagina viva: 6 card su 27 portavano la riga di cadenza, 21 no. Non è che
-   mancasse il dato — VIX, Fear & Greed, EUR/USD, put/call, DXY, curva, spread di credito e
-   compagnia non hanno un calendario di pubblicazione: si aggiornano a OGNI run della
-   pipeline. Ma "si aggiorna spesso" non è ciò che il CEO ha chiesto: ha chiesto di sapere
-   di quando è il numero che sta guardando, e su quelle 21 card la risposta non c'era.
-   Gli orari qui sotto sono il calendario DICHIARATO in .github/workflows/update-data.yml,
-   non una stima — e un check li rilegge da quel file, perché un registro copiato a mano
-   invecchia da solo (è la classe C10 e degli indici fissi del red team). */
-const RUN_FISSI_UTC = [[4, 0], [5, 0], [8, 0], [9, 0], [13, 30], [14, 30], [15, 0], [16, 0], [19, 0], [20, 0], [21, 0]];
-const RUN_ORARIO_UTC = { da: 13, a: 22, feriali: true };   // cron "0 13-22 * * 1-5"
-
-/* prossimo run atteso della pipeline, in UTC. Considera sia i run fissi sia quello orario
-   dei giorni feriali; guarda fino a 48 ore avanti e poi si arrende invece di indovinare. */
-function prossimoRunPipeline(adesso = new Date()) {
-  /* ⚠ la prima stesura avanzava a passi di 10 minuti da ADESSO: il minuto restava congruo a
-     quello di partenza, quindi alle 18:53 la sequenza era 19:03, 19:13… e il run delle 19:00
-     non veniva MAI incontrato. Si costruiscono invece i candidati del giorno, che è ciò che
-     il cron fa davvero. */
-  for (let g = 0; g <= 2; g++) {
-    const base = new Date(adesso.getTime() + g * 86400000);
-    const gi = base.getUTCDay(), feriale = gi >= 1 && gi <= 5;
-    const cand = RUN_FISSI_UTC.map(([H, M]) => [H, M]);
-    if (RUN_ORARIO_UTC.feriali && feriale) {
-      for (let h = RUN_ORARIO_UTC.da; h <= RUN_ORARIO_UTC.a; h++) cand.push([h, 0]);
-    }
-    const oggi = cand
-      .map(([H, M]) => Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), H, M))
-      .filter((ms) => ms > adesso.getTime())
-      .sort((a, b) => a - b);
-    if (oggi.length) return new Date(oggi[0]);
-  }
-  return null;
-}
-
+/* v510 — qui stavano RUN_FISSI_UTC, RUN_ORARIO_UTC e prossimoRunPipeline(): proiettavano l'orario del prossimo
+   run dal calendario del cron, che e' una coda e non un orario (v437). Vedi ORARIO_RUN_ND. */
 /* la riga di freschezza per un dato che si aggiorna a ogni run (non ha un calendario di
    pubblicazione). Si basa su DATA.updated_at, che è il timestamp REALE del run che ha
    prodotto questo file — non sull'orologio del browser. */
@@ -2247,19 +2250,17 @@ function rigaFreschezzaMercato(blocco) {
     const giorni = Math.round((oggi - barra) / 86400000);
     if (giorni >= 1) {
       const it = ab.data.slice(8, 10) + "/" + ab.data.slice(5, 7);
-      const p = prossimoRunPipeline();
-      return `ultima rilevazione: CHIUSURA DEL ${it}` + (giorni === 1 ? " (ieri)" : ` (${giorni} giorni fa)`)
+      return `ultima rilevazione: CHIUSURA DEL ${it}` + ` (${giorniFa(giorni)})`
         + ` · il run delle ${d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })} l'ha solo riscaricata, non e' un dato nuovo`
-        + (p ? ` · prossimo run ${p.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}` : "")
+        + ` · prossimo run: ${ORARIO_RUN_ND}`
         + (ab.dedotta ? " · data dedotta dalle barre dei titoli" : "");
     }
   }
   const oreFa = Math.max(0, Math.round((Date.now() - d.getTime()) / 3600000));
   const hhmm = (x) => x.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
-  const p = prossimoRunPipeline();
   return `rilevazione al run delle ${hhmm(d)} del ${d.toLocaleDateString("it-IT").slice(0, 5)}`
        + ` (${oreFa === 0 ? "meno di un'ora fa" : oreFa === 1 ? "1 ora fa" : `${oreFa} ore fa`})`
-       + (p ? ` · prossimo run atteso alle ${hhmm(p)}` : "")
+       + ` · prossimo run: ${ORARIO_RUN_ND}`
        + " · dato di mercato, si aggiorna a ogni run";
 }
 
@@ -2326,10 +2327,17 @@ function openMarginDebtModal() {
 
 /* Rischio sistemico combinato: Margin Debt (leva) + Forward P/E (valutazione).
    ROSSO se leva vicino ai massimi E P/E forward elevato. Stima impatto deleveraging. */
+/* v510 — il tipo e la fonte del P/E del Nasdaq-100, una resa per pacchetto e popup */
+function tipoPeNasdaq(pe) {
+  const k = (pe || {}).nasdaq_pe_kind, f = (pe || {}).nasdaq_pe_source;
+  if (!k) return "(trailing o prospettico: questo snapshot non lo dichiara — non confrontabile col trailing dell'S&P qui accanto)";
+  return `(${k === "forward" ? "PROSPETTICO" : "TRAILING"}${f ? `, fonte ${f}` : ""}`
+    + (k === "forward" ? ": non confrontabile col trailing dell'S&P qui accanto)" : ")");
+}
+
 function systemicRiskHtml(md) {
   const fpe = (DATA.macro || {}).forward_pe;
   const pe = fpe ? fpe.value : null;
-  const peAvg = fpe ? fpe.avg_hist : 16.5;
   const highLev = md.pct_of_peak >= 90;
   const highPe = pe != null && pe > 20;
   const danger = highLev && highPe;
@@ -2339,12 +2347,16 @@ function systemicRiskHtml(md) {
   const callsBn = Math.round(md.value / 1000 * 0.12);   // ~12% del margin debt (in $ mld)
   return `<div class="info-line" style="background:var(--card-2);border-left:3px solid ${col};border-radius:8px;padding:10px;margin-top:10px">
     <div style="font-size:13px;font-weight:700;color:${col};margin-bottom:4px">${verdict}</div>
-    <div style="font-size:12px">Leva (Margin Debt): <b>${md.pct_of_peak}% del picco</b> ${highLev ? "⚠" : ""}${md.series ? ` <span class="muted">(${esc(md.series)}, rilevazione ${md.date})</span>` : ""} · Valutazione (Forward P/E S&P): <b>${pe != null ? pe + "×" : "n.d. — dato API assente, nessuna stima fittizia"}</b>${pe != null ? ` vs media storica ${peAvg}×` : ""} ${highPe ? "⚠" : ""}</div>
+    <div style="font-size:12px">Leva (Margin Debt): <b>${md.pct_of_peak}% del picco</b> ${highLev ? "⚠" : ""}${md.series ? ` <span class="muted">(${esc(md.series)}, rilevazione ${md.date})</span>` : ""} · Valutazione (Forward P/E S&P): <b>${pe != null ? pe + "×" : "n.d. — dato API assente, nessuna stima fittizia"}</b>${pe != null ? ` <span class="muted">(la media storica della stessa fonte non e' nei dati)</span>` : ""} ${highPe ? "⚠" : ""}</div>
     <div class="muted" style="font-size:11px;margin-top:4px">Logica: rosso se leva ≥90% del picco <b>E</b> Forward P/E &gt;20×. Scenario "deleveraging" (−15% mercato): possibili ~<b>$${fmtNum.format(callsBn)} mld</b> di margin call forzate, che amplificano la discesa. Tieni liquidità pronta per i ribassi.</div>
   </div>`;
 }
 
 /* Popup Sharpe di PORTAFOGLIO (diverso dal popup per-titolo openSharpeInfo) */
+/* v510 — il tasso privo di rischio del calcolo e' un parametro FISSO della pipeline (RISK_FREE_RATE, 3,63% salvo
+   configurazione), non il rendimento dei titoli di Stato di oggi: pacchetto e popup lo dicono con la stessa frase */
+const NOTA_RF = "un parametro FISSO del calcolo, non il rendimento dei titoli di Stato di oggi";
+
 function openPortfolioSharpeModal() {
   const t = DATA.totals || {};
   const ps = t.portfolio_sharpe_ratio;
@@ -2370,7 +2382,7 @@ function openPortfolioSharpeModal() {
     if (vE != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>VaR 95% (1 giorno${isHist ? ", storico" : ", parametrico"})</b>: <b class="neg">${fmtEUR.format(vE)}</b> (${fmtNum.format(vP)}% dell'azionario) — la perdita che nel 95% dei giorni NON viene superata${isHist ? ", misurata sui percentili REALI degli ultimi 12 mesi" : ""}.${eE != null ? ` <b>Expected Shortfall</b>: <b class="neg">${fmtEUR.format(eE)}</b> — la perdita MEDIA nel 5% dei giorni peggiori (la coda oltre il VaR).` : ""}${isHist && t.var95_1d_eur != null ? ` <span class="muted">(col metodo parametrico normale: VaR ${fmtEUR.format(t.var95_1d_eur)}${t.es95_1d_eur != null ? `, ES ${fmtEUR.format(t.es95_1d_eur)}` : ""} — sottostima le code grasse)</span>` : ""}</div>`);
   }
   openInfoModal("Sharpe Ratio del portafoglio",
-    `<div class="info-line" style="margin-bottom:10px"><b>Sharpe Ratio</b> = rendimento corretto per il rischio: l'extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>) per ogni unità di volatilità. Quello di portafoglio è calcolato sulla <b>matrice di covarianza</b> pesata per controvalore, quindi tiene conto della diversificazione fra i titoli.</div>
+    `<div class="info-line" style="margin-bottom:10px"><b>Sharpe Ratio</b> = rendimento corretto per il rischio: l'extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>, ${NOTA_RF}) per ogni unità di volatilità. Quello di portafoglio è calcolato sulla <b>matrice di covarianza</b> pesata per controvalore, quindi tiene conto della diversificazione fra i titoli.</div>
      <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
        <div style="font-size:13px">Portafoglio: <b style="color:${ps != null ? sharpeColor(ps) : 'var(--muted)'};font-size:20px">${ps != null ? fmtNum.format(ps) : "n.d."}</b> ${verdict ? `<span style="color:${verdict.c};font-weight:700">· ${verdict.t}</span>` : ""}</div>
        ${extraRisk.join("")}
@@ -3885,7 +3897,7 @@ function indicatoriClassifica() {
   const _teT = tassoEffettivoFed(m);
   if (_teT) orf.push({ k: "fed_market", nome: "Tasso Fed Funds",
     score: cl(100 - (_teT.v - 1) * 20),
-    sub: `${fmtNum.format(_teT.v)}% ${_teT.giornaliero ? "(EFFR del giorno)" : `(media mensile FEDFUNDS di ${_teT.mese}, non il tasso di oggi)`} — sopra il 4% comprime i multipli` });
+    sub: `${fmtNum.format(_teT.v)}% ${_teT.giornaliero ? "(EFFR del giorno)" : `(media mensile FEDFUNDS di ${_teT.mese}, non il tasso di oggi)`}` });
   /* ⚠⚠ v321 — QUESTA TESSERA NON E' MAI NATA. Leggeva `yield_recession.current`, ma il campo
      che la pipeline pubblica si chiama `current_curve`: la condizione era sempre falsa, la
      tessera non veniva creata, la fusione dichiarata non scattava, e `was_inverted_24m` — cioe'
@@ -3904,7 +3916,8 @@ function indicatoriClassifica() {
   }
   if (m.forward_pe?.value != null) orf.push({ k: "forward_pe", nome: "Valutazione S&P (P/E forward)",
     score: cl(100 - (m.forward_pe.value - 13) * 8),
-    sub: `${fmtNum.format(m.forward_pe.value)}× vs media storica ${fmtNum.format(m.forward_pe.avg ?? 16.5)}×` });
+    /* v510 — "vs media storica 16,5×": `avg` non e' mai esistito, quindi usciva SEMPRE la costante scritta a mano */
+    sub: `${fmtNum.format(m.forward_pe.value)}× sugli utili attesi a 12 mesi — media storica della stessa fonte non nei dati` });
   if ((m.fedwatch?.meetings || []).length) {
     const rf = ramiFedWatch(m.fedwatch, m.fedwatch.meetings[0]);
     /* ⚠⚠ v450 — IL PUNTEGGIO VENIVA DALLE PROBABILITA', CHE SOPRA UN MOVIMENTO INTERO SONO
@@ -4523,12 +4536,42 @@ const ZONE_PE = [
   { da: 25, a: 60, nome: "valutazione tesa", colore: "var(--red)" },
 ];
 
+/* ⚠ v510 — i NOMI delle zone affermavano un rialzo («rialzo condiviso», «rally stretto») che lo scarto fra i due
+   indici non misura: lo scarto e' lo stesso con entrambi in salita o in discesa. Ora dicono solo chi fa meglio. */
 const ZONE_AMPIEZZA = [
-  { da: -8, a: -1, nome: "partecipazione larga: l'azione media batte l'indice", colore: "var(--green)" },
-  { da: -1, a: 1.5, nome: "rialzo condiviso", colore: "var(--muted)" },
-  { da: 1.5, a: 4, nome: "l'indice tira piu' dell'azione media", colore: "var(--yellow)" },
-  { da: 4, a: 12, nome: "solo le megacap: rally stretto", colore: "var(--red)" },
+  { da: -8, a: -1, nome: "l'azione media fa meglio dell'indice", colore: "var(--green)" },
+  { da: -1, a: 1.5, nome: "indice e azione media insieme", colore: "var(--muted)" },
+  { da: 1.5, a: 4, nome: "l'indice fa meglio dell'azione media", colore: "var(--yellow)" },
+  { da: 4, a: 12, nome: "solo i grandi reggono l'indice", colore: "var(--red)" },
 ];
+
+/* ═══ v510 — UNA LETTURA DELL'AMPIEZZA, PER IL PACCHETTO E PER LA PAGINA (v161) ═══════════════════════════════════════
+   Il 24/10/2026 SPY faceva -0,94% e RSP +2,99% a un mese. Il pacchetto scriveva «partecipazione uniforme … con entrambi
+   in calo la discesa non e' concentrata», la scheda della pagina «RIALZO CONDIVISO»: tre affermazioni false sullo
+   stesso dato, perche' entrambe le letture guardavano lo SCARTO e non i due SEGNI. La v405 aveva chiuso il segno del
+   cap-pesato, la v430 la grandezza; restavano i segni OPPOSTI, che sono il caso che dice di piu': l'indice scende
+   mentre l'azione media sale, cioe' cedono i grandi e non il mercato. Le bande dello scarto sono quelle di
+   ZONE_AMPIEZZA (da +1,5 pp a favore dell'indice, da -1 pp a favore dell'azione media): una convenzione di lettura,
+   dichiarata (v240). Ritorna {d, lato, testo} o null senza i due numeri. */
+function letturaAmpiezza(spy, rsp) {
+  const s = numero(spy), r = numero(rsp);
+  if (!Number.isFinite(s) || !Number.isFinite(r)) return null;
+  const d = s - r;
+  const lato = d >= 1.5 ? "indice" : d <= -1 ? "media" : "insieme";
+  let testo;
+  if (s > 0 && r < 0) testo = "l'indice sale MENTRE l'azione media scende: lo reggono pochi nomi grandi";
+  else if (s < 0 && r > 0) testo = "l'indice scende MENTRE l'azione media sale: a cedere sono i grandi, non il mercato";
+  else {
+    const su = s > 0 || r > 0, giu = s < 0 || r < 0;
+    testo = !su && !giu ? "indice e azione media fermi"
+      : lato === "insieme" ? `indice e azione media ${su ? "salgono" : "scendono"} insieme: partecipazione uniforme`
+      : lato === "indice" ? (su ? "salgono entrambi, l'indice piu' dell'azione media: lo tirano soprattutto i grandi"
+                                : "scendono entrambi, l'azione media piu' dell'indice: i grandi tengono l'indice")
+      : (su ? "salgono entrambi, l'azione media piu' dell'indice: partecipazione larga"
+            : "scendono entrambi, l'indice piu' dell'azione media: a cedere sono soprattutto i grandi");
+  }
+  return { d, lato, testo };
+}
 const ZONE_PUTCALL = [
   { da: 0.5, a: 0.8, nome: "compiacenza", colore: "var(--red)" },
   { da: 0.8, a: 1.2, nome: "equilibrio", colore: "var(--muted)" },
@@ -5128,10 +5171,10 @@ const FORMA_INDICATORE = {
     const b = m.breadth; if (!b || b.divergence_pp == null) return null;
     const d = Number(b.divergence_pp);
     const spy = Number(b.spy_1m_pct), rsp = Number(b.rsp_1m_pct);
-    const conclusione = d > 4
-      ? "SOLO LE MEGACAP: l'indice sale, l'azione media resta indietro"
-      : d < -2 ? "PARTECIPAZIONE LARGA: l'azione media fa meglio dell'indice"
-      : "RIALZO CONDIVISO: indice e azione media si muovono insieme";
+    /* v510 — la conclusione dalla lettura condivisa col pacchetto: «RIALZO CONDIVISO» usciva anche con l'indice in
+       calo e l'azione media in salita */
+    const _la = letturaAmpiezza(spy, rsp);
+    const conclusione = _la ? _la.testo.charAt(0).toUpperCase() + _la.testo.slice(1) : "lettura non disponibile";
     return {
       g: dueBarre([
         { nome: "SPY (i grandi)", val: spy, testo: signTxt(spy), colore: "var(--blue)" },
@@ -5140,9 +5183,10 @@ const FORMA_INDICATORE = {
       score: punteggioDaZone(d, ZONE_AMPIEZZA),
       n: `<b>${conclusione}.</b> A un mese l'indice pesato per capitalizzazione fa ${signTxt(spy)}, `
         + `quello dove ogni azione pesa uguale fa ${signTxt(rsp)}: <b>${signTxt(d, " pp")}</b> di scarto.`
-        + `<br><b>Come si legge:</b> se la barra di SPY e' molto piu' lunga il rialzo lo stanno facendo `
-        + `poche societa' enormi, e un rialzo cosi' si rompe quando quelle poche inciampano. Se e' piu' `
-        + `lunga RSP, sta salendo il mercato e non cinque titoli.`,
+        + `<br><b>Come si legge:</b> se SPY fa molto meglio di RSP, l'indice lo reggono poche societa' `
+        + `enormi, e un indice cosi' cede quando quelle poche inciampano; se fa meglio RSP, a muoversi e' `
+        + `il mercato e non cinque titoli. Le due barre dicono il verso di ciascuno, e il verso conta: `
+        + `l'indice che scende mentre l'azione media sale e' un'altra storia dall'indice che sale da solo.`,
     };
   },
 
@@ -5276,8 +5320,17 @@ const FORMA_INDICATORE = {
              { da: 55, a: 75, nome: "avidità", colore: "var(--green)" },
              { da: 75, a: 100, nome: "avidità estrema", colore: "var(--green)" }],
       fonte: "le cinque bande sono quelle pubblicate da CNN per questo indice" });
-    const st = [f.week_ago, f.month_ago, f.year_ago].filter(x => x != null);
-    return { g: tach, n: `${st.length ? `Una settimana fa ${f.week_ago} · un mese fa ${f.month_ago} · un anno fa ${f.year_ago}. ` : ""}I sette componenti hanno ciascuno la propria scheda qui sotto. <b>Come si legge:</b> è un contrarian: la paura estrema è storicamente un momento di acquisto e l'avidità estrema un momento di cautela. Il livello di oggi conta meno della DIREZIONE rispetto alle rilevazioni passate.` };
+    /* ⚠ v510 — due frasi false. «I sette componenti hanno ciascuno la propria scheda qui sotto»: dalla v445 nessun
+       componente e' una scheda (richiesta del CEO). «La paura estrema e' storicamente un momento di acquisto»: un
+       rendimento storico che questo sistema non ha mai misurato, scritto come un fatto (v240). Resta cio' che si sa: la
+       data, i confronti della fonte, l'anno, la sovrapposizione con le grandezze che la pagina mostra, e la teoria come
+       la dichiara la CNN stessa. */
+    const conf = confrontiFearGreed(f), anno = annoFearGreed(f);
+    return { g: tach, n: `${dataFearGreed(f)}${conf.length ? ` · ${conf.join(" · ")}` : ""}${anno ? ` · ${anno}` : ""}. `
+      + `I componenti della CNN non hanno una scheda propria (richiesta del CEO): quattro misurano grandezze che la pagina `
+      + `mostra gia' — il VIX, il put/call, l'S&P contro la sua media a 125 sedute e lo spread high yield — e per questo `
+      + `l'indice le riassume, non le conferma. <b>Come si legge:</b> secondo la CNN la paura eccessiva tende a spingere i `
+      + `prezzi in basso e l'avidita' in alto; quanto il livello anticipi i rendimenti questo sistema non l'ha misurato.` };
   },
   _alpha: (m) => {
     const b = m.benchmarks || {}; if (b.ndx == null) return null;
@@ -5312,7 +5365,7 @@ const FORMA_INDICATORE = {
                { da: 3.5, a: 4.5, nome: "fascia neutra", colore: "var(--muted)" },
                { da: 4.5, a: 6, nome: "tassi che comprimono i multipli", colore: "var(--red)" }],
         soglie: [{ v: 4, testo: "4%" }],
-        fonte: "la soglia del 4% è quella già usata dal sistema (sopra comprime i multipli)" }),
+        fonte: "bande di sola lettura, convenzione del sistema: nei dati non c'è una misura che leghi un livello del decennale ai multipli (v510)" }),
       n: `${q.value} (${signTxt(q.change_pct)} pp nella seduta). <b>Come si legge:</b> è il tasso privo di rischio con cui si scontano gli utili futuri. Più sale, meno vale oggi un utile lontano nel tempo — ed è per questo che colpisce il growth più del value: i suoi utili stanno più avanti.` };
   },
   momentum: (m) => {
@@ -5380,7 +5433,9 @@ const FORMA_INDICATORE = {
                     colore: p2.current > 25 ? "var(--red)" : p2.current > 18 ? "var(--yellow)" : "var(--green)" }];
     if (f && f.value != null) voci.push({ nome: "Forward", val: Number(f.value), testo: `${fmtNum.format(f.value)}×`,
                     colore: f.value > 22 ? "var(--red)" : f.value > 17 ? "var(--yellow)" : "var(--green)" });
-    const rifF = f && f.avg_hist != null ? Number(f.avg_hist) : null;
+    /* v510 — il riferimento del forward era `avg_hist`, cioe' la costante 16,5 scritta a mano nella pipeline: senza una
+       media della stessa fonte, il riferimento non si disegna (v240) */
+    const rifF = null;
     return {
       g: voci.length >= 2
         ? dueBarre(voci, { soloPositivi: true, minScala: 34, soglia: rifF,
@@ -6427,7 +6482,7 @@ function serieIndicatore(k) {
     }
     case "fed_market":
       return (m.fed_market?.fedfunds || []).length > 2
-        ? { punti: m.fed_market.fedfunds, soglie: [{ v: 4, testo: "comprime i multipli", colore: "var(--yellow)" }], unita: "%" } : null;
+        ? { punti: m.fed_market.fedfunds, soglie: [{ v: 4, testo: "4% (convenzione di lettura)", colore: "var(--yellow)" }], unita: "%" } : null;
     case "decouple": {
       /* stessa cura del caso qui sopra: la finestra e' quella COMUNE, e si dichiara. */
       const dc = m.decouple || {};
@@ -7016,7 +7071,7 @@ function openSharpeInfo(ticker) {
     : s >= 0 ? { t: "DEBOLE", c: "var(--muted)", d: "rendimento che ha appena battuto (o quasi) il tasso privo di rischio: poco premio per la volatilità." }
     : { t: "NEGATIVO", c: "var(--red)", d: "ha reso meno del tasso privo di rischio: il rischio assunto NON è stato ripagato." };
   openInfoModal(`Sharpe Ratio (12 mesi) — ${r.name} (${ticker})`,
-    `<div class="info-line" style="margin-bottom:10px"><b>Cos'è lo Sharpe Ratio?</b><br>Misura il <b>rendimento corretto per il rischio</b>: quanto extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>) un titolo genera per ogni unità di volatilità. Formula: <span style="font-family:var(--mono)">(Rendimento annuo − ${fmtNum.format(rf)}%) ÷ Volatilità annua</span>. Più è alto, meglio il titolo "paga" il rischio che ti fa correre.</div>
+    `<div class="info-line" style="margin-bottom:10px"><b>Cos'è lo Sharpe Ratio?</b><br>Misura il <b>rendimento corretto per il rischio</b>: quanto extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>, ${NOTA_RF}) un titolo genera per ogni unità di volatilità. Formula: <span style="font-family:var(--mono)">(Rendimento annuo − ${fmtNum.format(rf)}%) ÷ Volatilità annua</span>. Più è alto, meglio il titolo "paga" il rischio che ti fa correre.</div>
      <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
        <div style="font-size:13px;margin-bottom:4px">${ticker}: <b style="color:${sharpeColor(s)};font-size:20px">${s != null ? fmtNum.format(s) : "n.d."}</b></div>
        ${verdict ? `<div style="font-size:13px;color:${verdict.c};font-weight:700">${verdict.t}</div><div class="muted" style="font-size:12px;margin-top:3px">${verdict.d}</div>` : `<div class="muted" style="font-size:12px">Sharpe non ancora disponibile (servono ≥60 giorni di storico).</div>`}
@@ -7835,7 +7890,7 @@ const MACRO_INFO = {
   decouple: ["Disaccoppiamento Macro", "Divergenza tra mercato azionario (S&P 500) e economia reale (PIL reale USA GDPC1): misura quanta crescita futura è già prezzata nella borsa. Entrambe le serie normalizzate a 100 all'inizio del periodo.", "Mensile/trimestrale (FRED)", /disaccopp|decoupl|valuation|bolla|bubble|pil|gdp|utili|profit|crescita/i],
   smart_money: ["Istituzionali VS Retail", "Posizionamento istituzionale (SMC) vs folla retail (Fear & Greed) — divergenze estreme segnalano accumulo o distribuzione.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|retail|hedge.?fund|posizionament|flow|flussi|put.?call|vix|smc|order.?block|liquidit|struttura/i],
   sp500_pe: ["P/E Ratio Storico S&P 500", "Rapporto Prezzo/Utili dell'S&P 500 su base mensile (FRED SP500PE). Mostra se il mercato è sopravvalutato rispetto alla media storica. P/E > 25 indica valutazioni tese; P/E > 35 livelli estremi. La percentile di rango storico indica quante volte negli ultimi 10 anni il mercato è stato più economico di adesso.", "Mensile (FRED SP500PE)", /p\/e|price.?earning|multiplo|valutaz|sopravvalut|cape|shiller/i],
-  corp_profit: ["S&P 500 & Nasdaq 100 vs Profitti Reali", "Divergenza tra S&P 500 e Nasdaq 100 nominali e i profitti aziendali reali USA (FRED CP). Gap ampio = Asset Inflation da fiat debasement, non crescita utili reali. Storico: gap >40 pp precede correzioni o lateralizzazioni.", "Trimestrale (FRED CP + SP500/NDX mensile)", /profitti|profit|asset.?inflat|nominal|real.?earn|corp|aziend|deflat|nasdaq/i],
+  corp_profit: ["S&P 500 & Nasdaq 100 vs Profitti Reali", "Divergenza tra S&P 500 e Nasdaq 100 nominali e i profitti aziendali reali USA (FRED CP). Gap ampio = i prezzi sono saliti piu' dei profitti reali; le cause (multipli, tassi, inflazione) questi dati non le separano. La soglia dei 40 pp e' una convenzione di lettura del sistema.", "Trimestrale (FRED CP + SP500/NDX mensile)", /profitti|profit|asset.?inflat|nominal|real.?earn|corp|aziend|deflat|nasdaq/i],
   fed_market: ["Fed Funds Rate vs S&P 500", "Andamento storico del tasso Fed Funds sovrapposto all'S&P 500 negli ultimi 5 anni. Mostra come i cicli di rialzo/taglio della politica monetaria influenzino il mercato azionario. Tassi alti comprimono i multipli; i tagli stimolano i rally.", "Mensile (FRED FEDFUNDS + SP500)", /fed.?fund|interest.?rate|tasso.?fed|fed.?rate|monetar|fomc.*trend|tassi.*mercato/i],
 };
 
@@ -8196,7 +8251,9 @@ function openMacroInfo(key) {
     }
   } else if (key === "fear_greed" && m.fear_greed) {
     const fg = m.fear_greed;
-    extra = `<div class="info-line"><b>Oggi:</b> ${fg.score} (${FG_LABELS[fg.rating] || fg.rating}) · 1 sett ${fg.week_ago} · 1 mese ${fg.month_ago}${fg.year_ago ? ` · 1 anno ${fg.year_ago}` : ""}</div>`;
+    const _cfp = confrontiFearGreed(fg), _afp = annoFearGreed(fg);
+    extra = `<div class="info-line"><b>${esc(dataFearGreed(fg))}:</b> ${fg.score} (${FG_LABELS[fg.rating] || fg.rating})`
+      + `${_cfp.length ? ` · ${esc(_cfp.join(" · "))}` : ""}${_afp ? ` · ${esc(_afp)}` : ""}</div>`;
     if (fg.fomo != null) {
       extra += `<div class="info-line"><b>FOMO:</b> <span style="color:${scoreColor(100 - fg.fomo)}">${fg.fomo}/100 — ${fg.fomo_label}</span></div>
         ${meterBar(fg.fomo, scoreColor(100 - fg.fomo), fg.fomo + "")}
@@ -8424,7 +8481,7 @@ function openMacroInfo(key) {
     const pe = m.sp500_pe;
     const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
     const ndxPeCol = pe.nasdaq_pe > 40 ? "var(--red)" : pe.nasdaq_pe > 30 ? "var(--yellow)" : "var(--muted)";
-    const ndxRow = pe.nasdaq_pe ? `<div class="info-line"><b>Nasdaq 100 (QQQ) P/E attuale:</b> <span style="color:${ndxPeCol}">${pe.nasdaq_pe}×</span> <span class="muted" style="font-size:11px">(storicamente NDX tratta a premio vs S&P; sopra 35× indica valutazioni tech tese)</span></div>` : "";
+    const ndxRow = pe.nasdaq_pe ? `<div class="info-line"><b>Nasdaq 100 P/E attuale:</b> <span style="color:${ndxPeCol}">${pe.nasdaq_pe}×</span> <span class="muted" style="font-size:11px">${esc(tipoPeNasdaq(pe))}</span></div>` : "";
     extra = `<div class="info-line"><b>S&P 500 P/E attuale:</b> <span style="color:${peCol}">${pe.current}× — ${pe.label}</span></div>
       ${ndxRow}
       ${pe.avg_10y != null ? `<div class="info-line"><b>Media S&P ultimi 10 anni:</b> ${pe.avg_10y}×</div>` : ""}
@@ -8465,11 +8522,11 @@ function openMacroInfo(key) {
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
     const ndxGapCol = cp.ndx_gap != null ? (cp.ndx_gap > 40 ? "var(--red)" : cp.ndx_gap > 20 ? "var(--yellow)" : "var(--green)") : "var(--muted)";
     extra = `<div class="info-line"><b>Gap S&amp;P 500 vs Profitti Reali:</b> <span style="color:${gapCol}">${cp.gap > 0 ? "+" : ""}${cp.gap} pp — ${cp.label}</span></div>
-      ${cp.ndx_gap != null ? `<div class="info-line"><b>Gap Nasdaq 100 vs Profitti Reali:</b> <span style="color:${ndxGapCol}">${cp.ndx_gap > 0 ? "+" : ""}${cp.ndx_gap} pp</span> <span class="muted" style="font-size:11px">(il Nasdaq tratta storicamente a premio su S&P)</span></div>` : ""}
+      ${cp.ndx_gap != null ? `<div class="info-line"><b>Gap Nasdaq 100 vs Profitti Reali:</b> <span style="color:${ndxGapCol}">${cp.ndx_gap > 0 ? "+" : ""}${cp.ndx_gap} pp</span> </div>` : ""}
       ${thermoBar(cp.score, ["Allineati", "Asset Inflation"])}
       <div class="info-line muted" style="font-size:11px;margin:6px 0">
-        Quando S&amp;P 500 e Nasdaq 100 nominali crescono molto più dei profitti aziendali reali, l'eccesso è spiegato da svalutazione monetaria (fiat debasement) e non da crescita degli utili.
-        Storicamente gap &gt;40 pp precede correzioni prolungate o lateralizzazione. Vedi 2000, 2007, 2021.
+        Quando S&amp;P 500 e Nasdaq 100 nominali crescono molto più dei profitti aziendali reali, i prezzi stanno pagando più di quanto gli utili reali siano cresciuti: le cause — multipli, tassi, inflazione — questi dati non le separano.
+        La soglia dei 40 pp è una convenzione di lettura del sistema, non una misura (v510).
       </div>
       <h4 style="margin:12px 0 4px">S&amp;P 500 nominale vs Profitti Aziendali Reali USA (base 100)</h4>
       ${miniDualChart(cp.sp500, cp.profits, { color1: "var(--blue)", color2: "var(--yellow)", label1: "S&P 500 nominale", label2: "Profitti reali (FRED CP)" })}
@@ -8494,8 +8551,8 @@ function openMacroInfo(key) {
       ${miniDualChart(fm.fedfunds, fm.sp500.map(p => ({ d: p.d, v: p.v / 1000 })),
         { color1: "var(--red)", color2: "var(--blue)", label1: "Fed Funds Rate (%)", label2: "S&P 500 (÷1000)" })}
       <div class="info-line muted" style="font-size:11px;margin-top:6px">
-        Con Fed Funds &gt;4% la storia mostra compressione dei multipli azionari entro 12-18 mesi.
-        Un taglio rapido (emergenza) storico precede rally ma anche segnali di crisi economica.
+        La linea dei Fed Funds e quella dell'S&amp;P 500 stanno sullo stesso asse dei tempi: il grafico mostra i due
+        percorsi, non una regola che leghi un livello del tasso ai multipli (v510: la frase che lo affermava non aveva fonte).
       </div>`;
   } else {
     extra = `<div class="info-line"><b>Aggiornamento:</b> ${cadence}</div>`;
@@ -8615,6 +8672,27 @@ const FSC = {
 
 /* ---------------- gauges ---------------- */
 const FG_LABELS = { "extreme fear": "Paura estrema", fear: "Paura", neutral: "Neutrale", greed: "Avidità", "extreme greed": "Avidità estrema" };
+
+/* ⚠ v510 — IL FEAR & GREED CON LA SUA DATA E SENZA «null». La pipeline buttava il `timestamp` della CNN, e pagina e
+   pacchetto non potevano dire di quando fosse il punteggio (v396); e scriveva 0 — «paura estrema» — dove la fonte non
+   dava un confronto, che ora e' un buco (v205): senza queste tre funzioni la riga avrebbe stampato «1 settimana fa
+   null». Una resa sola per scheda, popup e pacchetto (v161). */
+function confrontiFearGreed(f) {
+  const c = (x) => x != null && x !== "" && Number.isFinite(Number(x));
+  return [["la seduta prima", f && f.prev_close], ["1 settimana fa", f && f.week_ago],
+          ["1 mese fa", f && f.month_ago], ["1 anno fa", f && f.year_ago]]
+    .filter(([, x]) => c(x)).map(([n, x]) => `${n} ${x}`);
+}
+function dataFearGreed(f) {
+  const a = String((f && f.asof) || "");
+  return /^\d{4}-\d{2}-\d{2}$/.test(a) ? `rilevazione CNN del ${a.slice(8, 10)}/${a.slice(5, 7)}/${a.slice(0, 4)}`
+    : "la data della rilevazione non e' in questo snapshot";
+}
+function annoFearGreed(f) {
+  const st = f && f.storia;
+  if (!st || st.rango == null || !st.minimo || !st.massimo) return "";
+  return `nel suo anno: ${st.rango}° percentile su ${st.n} rilevazioni (minimo ${st.minimo.valore}, massimo ${st.massimo.valore})`;
+}
 
 /* colore sfumato verde(100)→arancio(50)→rosso(0) */
 function scoreColor(s) {
@@ -8967,7 +9045,15 @@ function buildPrompt(opz) {
     lines.push("");
   }
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
-  const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live, e i livelli critici sono i primi a spostarsi]` : "";
+  /* ⚠ v510 — «i prezzi potrebbero essere disallineati dal mercato live» usciva anche di sabato: a mercati USA chiusi
+     non c'e' un prezzo vivo da cui disallinearsi (v210 l'aveva gia' segnalato). Conta la data della barra, che la
+     riga di freschezza scrive. */
+  const _eta = ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min";
+  const _faseUsa = usSessionInfo().phase;
+  const lagNote = ageMin <= 90 ? ""
+    : ["regular", "pre-market", "after-hours"].includes(_faseUsa)
+      ? ` [ATTENZIONE: snapshot di ${_eta} fa — i prezzi potrebbero essere disallineati dal mercato live, e i livelli critici sono i primi a spostarsi]`
+      : ` [snapshot di ${_eta} fa: a mercati USA chiusi (${_faseUsa}) non c'e' un prezzo vivo, quindi nessun disallineamento — conta la data della barra, scritta nella riga di freschezza]`;
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")} (prezzi: snapshot pipeline + refresh live lato client ogni 60s)${lagNote}`);
   lines.push(sessionContextLine());   // v256: fase della seduta USA, calcolata ADESSO lato client
 
@@ -9016,11 +9102,9 @@ function buildPrompt(opz) {
   {
     const iso = DATA.updated_at ? new Date(DATA.updated_at) : null;
     const quando = iso && !isNaN(iso) ? iso.toLocaleString("it-IT") : "n.d.";
-    const prossimo = (typeof prossimoRunPipeline === "function" && prossimoRunPipeline())
-      ? prossimoRunPipeline().toLocaleString("it-IT") : null;
     const conCalendario = (m.indicators || [])
       .filter(i => i && i.key && typeof CADENZA_FONTE !== "undefined" && CADENZA_FONTE[i.key] && i.date)
-      .map(i => `${i.label || i.key} (${String(i.date).slice(0, 10)})`);
+      .map(i => `${i.label || i.key}: ${periodoRiferito(CADENZA_FONTE[i.key].passo, i.date)}`);   // v510 (v392)
     lines.push(`FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:`);
     /* ⚠ v261 — LA BARRA, NON IL RUN. Questa riga diceva "rilevati al run delle HH:MM" e lasciava
        all'LLM il compito di capire che in un run domenicale quel numero e' di venerdi'. Ora la
@@ -9035,7 +9119,7 @@ function buildPrompt(opz) {
       etaBarra = Math.round((oggi0 - b) / 86400000);
     }
     lines.push(`· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, `
-      + `momentum): scaricati al run delle ${quando}${prossimo ? `, prossimo run ${prossimo}` : ""}. `
+      + `momentum): scaricati al run delle ${quando} · prossimo run: ${ORARIO_RUN_ND}. `
       + (barra && etaBarra >= 1
           ? `⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL ${barra} — ${etaBarra} ${etaBarra === 1 ? "giorno" : "giorni"} fa. `
             + `Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.`
@@ -9091,7 +9175,11 @@ function buildPrompt(opz) {
   /* v256 — "Termometro tecnico del portafoglio" tolto: era un punteggio calcolato sui
      titoli in portafoglio, non un dato macro. Senza libro non misura niente. */
   if (m.fear_greed) {
-    let fgl = `- Fear & Greed: ${m.fear_greed.score} (${FG_LABELS[m.fear_greed.rating] || m.fear_greed.rating}), 1 settimana fa ${m.fear_greed.week_ago}, 1 mese fa ${m.fear_greed.month_ago}${m.fear_greed.year_ago ? `, 1 anno fa ${m.fear_greed.year_ago}` : ""}`;
+    /* ⚠ v510 — con la data della rilevazione (v396) e i soli confronti che la fonte porta: senza confrontiFearGreed un
+       buco usciva «1 settimana fa null» */
+    const _cfg = confrontiFearGreed(m.fear_greed), _afg = annoFearGreed(m.fear_greed);
+    let fgl = `- Fear & Greed: ${m.fear_greed.score} (${FG_LABELS[m.fear_greed.rating] || m.fear_greed.rating}) · `
+      + `${dataFearGreed(m.fear_greed)}${_cfg.length ? ` · ${_cfg.join(", ")}` : ""}${_afg ? ` · ${_afg}` : ""}`;
     /* v263 — VIA L'ELENCO DEI COMPONENTI anche dal payload. La scheda non li mostra piu'
        (v262, richiesta del CEO) perche' hanno tutti una scheda propria; il payload continuava a
        portarli, e per due di loro — "Momentum S&P 500" e "Domanda bond high yield" — la pagina
@@ -9111,7 +9199,9 @@ function buildPrompt(opz) {
     /* v337 — il rimando e' caduto col blocco che nominava: un rinvio a una sezione che non
        esiste piu' e' esattamente la classe C10, e insegna al modello che i riferimenti del
        payload non sono affidabili. Resta la parte VERA della frase, che non rimanda a niente. */
-    fgl += " — livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati, non due segnali.";
+    /* ⚠ v510 — qui c'era «livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati»: la
+       dispersione dei componenti non e' piu' nel pacchetto dalla v337, e la riga rimandava a una cosa che chi legge
+       non trova (classe C10). Che i componenti manchino lo dice la riga delle esclusioni (v406). */
     lines.push(fgl);
   }
   // sanity finale sul payload: un valore impossibile diventa "n.d." e NON entra nell'analisi
@@ -9359,7 +9449,10 @@ function buildPrompt(opz) {
          UNIFORME", che e' un'informazione diversa e altrettanto utile (nessuna rotazione in
          corso, il calo non e' concentrato). Il segno si legge dal cap-pesato, che e' l'indice
          di riferimento; l'ampiezza resta la distanza fra i due. */
-      const _amp = br.divergence_pp > 2 ? "trainata dalle megacap" : "uniforme";
+      /* ⚠ v510 — la lettura dell'ampiezza viene da letturaAmpiezza, la stessa della pagina: qui c'era `_amp`
+         ("trainata dalle megacap" sopra 2 pp, "uniforme" altrimenti), che guardava lo scarto e non i segni — il
+         24/10/2026, con SPY -0,94% e RSP +2,99%, diceva «partecipazione uniforme … con entrambi in calo». */
+      const _la = letturaAmpiezza(br.spy_1m_pct, br.rsp_1m_pct);
       /* ⚠⚠ v430 — "RALLY" SU UN MESE DA +0,21%. La v405 aveva corretto il SEGNO — l'etichetta
          diceva "rally" anche con entrambi gli indici in calo — e aveva lasciato aperta
          l'AMPIEZZA: il 05/09/2026 SPY faceva +0,21% e RSP +0,19% in un mese, cioe' il mercato
@@ -9370,10 +9463,11 @@ function buildPrompt(opz) {
          la parola che afferma una GRANDEZZA che la riga non misura. La direzione resta, e
          l'ampiezza del movimento sta gia' in cifre due parole prima, dentro `base`. */
       const _verso = numero(br.spy_1m_pct) > 0 ? "mese in rialzo" : numero(br.spy_1m_pct) < 0 ? "mese in ribasso" : "mese piatto";
-      lines.push(`- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): ${base} — ${_verso} `
-        + `con partecipazione ${_amp} (alert se SPY+ con RSP− o spread >4pp). ⚠ L'ampiezza misura la `
-        + `DISTANZA fra i due indici, non la direzione: qui il verso lo da' il cap-pesato, e con `
-        + `entrambi ${numero(br.spy_1m_pct) < 0 ? "in calo la discesa non e' concentrata su pochi nomi" : "in rialzo la salita e' partecipata"}.`);
+      lines.push(`- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): ${base} — ${_verso} per il `
+        + `cap-pesato; ${_la ? _la.testo : "lettura non disponibile"} (alert della pipeline se SPY+ con RSP− o spread `
+        + `>4pp; le bande dello scarto — da +1,5 pp a favore dell'indice, da -1 pp a favore dell'azione media — sono `
+        + `una convenzione di lettura). ⚠ L'ampiezza misura la DISTANZA fra i due indici, non la direzione: il verso `
+        + `lo da' il cap-pesato, e quello dell'equi-pesato si legge accanto.`);
     }
   }
   // EUR/JPY escluso dal payload (v138): ridondante — il rischio yen è già nel blocco Carry
@@ -9429,7 +9523,12 @@ function buildPrompt(opz) {
     : i.key === "philly" ? "indagine mensile della Federal Reserve di Philadelphia (FRED GACDFSA066MSFRBPHI). NON è l'ISM: l'ISM è sotto licenza e non è ridistribuibile. Stessa specie di misura (diffusion index sulla manifattura, esce prima dell'ISM), ma copre un distretto, non il paese: è un'indicazione di direzione, non il livello nazionale"
     : i.key === "umich" ? (i.fonte === "ripiego"
         ? "serie mensile via FRED UMCSENT (RIPIEGO: la fonte primaria non ha risposto in questo run), che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui, quindi questo valore NON è l'ultimo pubblicato"
-        : "indagine mensile dell'Università del Michigan, presa dalla FONTE PRIMARIA (sca.isr.umich.edu) e non da FRED, che la ridistribuisce con 1-2 mesi di ritardo di licenza: questo è il dato definitivo del mese indicato")
+        : "indagine mensile dell'Università del Michigan, presa dalla FONTE PRIMARIA (sca.isr.umich.edu) e non da FRED, che la ridistribuisce con 1-2 mesi di ritardo di licenza: "
+          /* ⚠ v510 — «questo è il dato definitivo» era scritto fisso: falso fra il preliminare di meta' mese e il
+             definitivo di fine mese. La lettura la dichiara la fonte, e la pipeline la porta solo se e' dello stesso mese */
+          + (i.lettura === "definitiva" ? "la fonte lo dichiara la lettura DEFINITIVA del mese indicato"
+             : i.lettura === "preliminare" ? "la fonte lo dichiara la lettura PRELIMINARE del mese: il definitivo esce a fine mese e puo' cambiarlo"
+             : "se sia la lettura preliminare o la definitiva del mese, questo snapshot non lo dichiara"))
     : "serie mensile, normale ritardo di pubblicazione";
   /* ⚠ v266 — LA CADENZA NON DEVE MANGIARSI L'IDENTIFICAZIONE DELLA SERIE. Aggiungendo le
      cadenze giornaliere, `cad` ha cominciato a esistere anche per la curva e ha preso il posto
@@ -9661,8 +9760,7 @@ function buildPrompt(opz) {
        Due variabili omonime con tipi diversi sono la stessa classe delle due derivazioni della
        stessa grandezza (v161, v207, v316), in versione locale. Ora l'elenco e' uno solo e il
        conteggio si ricava da lui. */
-    const nonPrezzate = chiusura
-      ? conEta.filter(v => Date.parse(v.quando) > chiusura.at.getTime()) : null;
+    const nonPrezzate = vociDopoChiusura(conEta, chiusura, adesso);     // v510 — la stessa della riga della fase
     if (!conEta.length) {
       lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE: IL SISTEMA NON NE HA. ⚠ Questo NON `
         + `significa "non e' uscita nessuna notizia": significa che in questo run la raccolta dei feed `
@@ -9891,7 +9989,7 @@ function buildPrompt(opz) {
       const age = d ? Math.round((Date.now() - new Date(d)) / 86400000) : null;
       return `, ⚠ CARRY-FORWARD dal run precedente${d ? ` (rilevato ${String(d).slice(0, 10)}${age != null ? `, ${age}g fa` : ""})` : ""} — la fonte era irraggiungibile: pesalo come dato DATATO, non odierno`;
     };
-    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label} — ⚠ l'etichetta viene da bande FISSE, convenzione di lettura e non un dato di questo file: oltre 22 "Estremo", oltre 18 "Elevato", oltre 14 "Normale", sotto "Conveniente". Il FATTO nella riga e' il confronto con la media storica, che e' un campo del file; l'etichetta non porta nessuna informazione in piu' del numero). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
+    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: ${fmtNum.format(fp.value)}× (${fp.label} — ⚠ l'etichetta viene da bande FISSE, convenzione di lettura e non un dato di questo file: oltre 22 "Estremo", oltre 18 "Elevato", oltre 14 "Normale", sotto "Conveniente"; l'etichetta non porta nessuna informazione in piu' del numero). ⚠ La media storica del multiplo prospettico della STESSA fonte non e' in questi dati: un confronto con una media va fatto sulla fonte che la pubblica, con la sua finestra. ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
         /* ⚠⚠ v414 — QUESTA RIGA AFFERMAVA UN VERSO SENZA IL PROPRIO ORIZZONTE, e la riga
            successiva dichiara che leggerne uno solo porta alla conclusione opposta: la leva e' in
            ritiro sull'ULTIMO MESE e ancora in espansione sul trimestre e sull'anno. Dire "il
@@ -9923,10 +10021,15 @@ function buildPrompt(opz) {
       + `${Number.isFinite(_shar) ? `Sharpe ${fmtNum.format(_shar)}` : ""}`
       + `${Number.isFinite(_shar) && Number.isFinite(_sort) ? " · " : ""}`
       + `${Number.isFinite(_sort) ? `Sortino ${fmtNum.format(_sort)}` : ""}`
-      + `${Number.isFinite(_rf) ? ` (tasso privo di rischio ${fmtNum.format(Math.round(_rf * 1000) / 10)}%)` : ""}. `
+      + `${Number.isFinite(_rf) ? ` (tasso privo di rischio ${fmtNum.format(Math.round(_rf * 1000) / 10)}%: ${NOTA_RF})` : ""}. `
       + `⚠ Misurano il rendimento PER UNITA' DI RISCHIO ${finestraRischio()}, non una previsione. `
-      + `Il Sortino non penalizza i rialzi, quindi su un libro che sale a strappi sta sopra lo Sharpe `
-      + `per costruzione: la differenza fra i due dice quanto del rischio e' al RIALZO. ⚠ Non entrano `
+      /* ⚠ v510 — «sta sopra lo Sharpe per costruzione» e' vero solo con un rendimento in eccesso POSITIVO: il Sortino
+         divide lo stesso numeratore per la sola volatilita' al ribasso, quindi ne AMPLIFICA il segno. Il 24/10/2026
+         il pacchetto lo affermava con Sortino -0,25 e Sharpe -0,17. */
+      + `Il Sortino divide lo stesso rendimento in eccesso per la sola volatilita' al RIBASSO: quando questa e' `
+      + `minore di quella totale ne amplifica il segno — sopra lo Sharpe con un rendimento in eccesso positivo, `
+      + `SOTTO (piu' negativo) con uno negativo${Number.isFinite(_shar) && Number.isFinite(_sort)
+          ? ` (qui ${_sort >= _shar ? "sta sopra" : "sta sotto"})` : ""}. ⚠ Non entrano `
       + `nelle discipline piu' sotto, che misurano un'altra cosa — concentrazione ed esposizione, non `
       + `efficienza: un libro puo' avere Sharpe alto E stare oltre ogni soglia di concentrazione.`);
   }
@@ -10125,7 +10228,7 @@ function buildPrompt(opz) {
     if (gg) {
       const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
       const anni = Math.round(gg / 365 * 10) / 10;
-      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp su una finestra di ${anni} anni (azionario ${signTxt(Math.round((m.decouple.sp500.slice(-1)[0].v - 100) * 10) / 10)} contro PIL reale ${signTxt(Math.round((m.decouple.gdp.slice(-1)[0].v - 100) * 10) / 10)} dal ${m.decouple.sp500[0].d}). ⚠ COME SI LEGGE: è una differenza CUMULATA, quindi cresce meccanicamente con la lunghezza della finestra — la soglia dei "40 pp" citata in letteratura NON è confrontabile con finestre di durata diversa, e su ${anni} anni di mercato al rialzo viene superata quasi sempre. Serve come contesto di valutazione, NON come segnale di uscita.`);
+      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp su una finestra di ${fmtNum.format(anni)} anni (azionario ${signTxt(Math.round((m.decouple.sp500.slice(-1)[0].v - 100) * 10) / 10)} contro PIL reale ${signTxt(Math.round((m.decouple.gdp.slice(-1)[0].v - 100) * 10) / 10)} dal ${m.decouple.sp500[0].d}). ⚠ COME SI LEGGE: è una differenza CUMULATA, quindi cresce meccanicamente con la lunghezza della finestra — la soglia dei "40 pp" citata in letteratura NON è confrontabile con finestre di durata diversa, e su ${fmtNum.format(anni)} anni di mercato al rialzo viene superata quasi sempre. Serve come contesto di valutazione, NON come segnale di uscita.`);
     } else {
       lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: NON CALCOLABILE in questo snapshot — le due serie non condividono nessun periodo (azionario e PIL arrivano con finestre diverse), quindi la loro differenza non sarebbe un gap ma il confronto fra due orizzonti diversi. Si ricalcola da solo al prossimo run della pipeline.`);
     }
@@ -10358,7 +10461,7 @@ function buildPrompt(opz) {
     const quandoRiunione = giorniAllaRiunione == null ? ""
       : giorniAllaRiunione === 0 ? " (OGGI)"
       : giorniAllaRiunione === 1 ? " (DOMANI)"
-      : giorniAllaRiunione < 0 ? " (gia' avvenuta, " + Math.abs(giorniAllaRiunione) + " giorni fa)"
+      : giorniAllaRiunione < 0 ? " (gia' avvenuta, " + giorniFa(Math.abs(giorniAllaRiunione)) + ")"
       : " (fra " + giorniAllaRiunione + " giorni)";
     /* ⚠ v477 — IL RAMO "FUORI ORIZZONTE" E' STATO TOLTO, non spento: l'orizzonte era il limite
        del contratto CONTINUO, e con i contratti dei singoli mesi non lo e' piu'. Lasciarlo dietro
@@ -10415,18 +10518,22 @@ function buildPrompt(opz) {
   }
   if (m.sp500_pe) {
     const cf = m.sp500_pe.carried ? `, ⚠ CARRY-FORWARD dal run precedente${m.sp500_pe.fetched_at || m.sp500_pe.date ? ` (rilevato ${String(m.sp500_pe.fetched_at || m.sp500_pe.date).slice(0, 10)})` : ""} — fonte irraggiungibile: dato DATATO` : "";
-    let peLine = `- P/E Ratio S&P 500 [TRAILING, fonte: ${m.sp500_pe.source || "FRED/multpl"}${cf}]: ${m.sp500_pe.current}× (${m.sp500_pe.label} — etichetta nostra, confine a 25× per "sopravvalutazione" e 20× per "elevata")${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
-    if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
+    let peLine = `- P/E Ratio S&P 500 [TRAILING, fonte: ${m.sp500_pe.source || "FRED/multpl"}${cf}]: ${fmtNum.format(m.sp500_pe.current)}× (${m.sp500_pe.label} — etichetta nostra, confine a 25× per "sopravvalutazione" e 20× per "elevata")${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
+    /* ⚠ v510 — il numero usciva senza dire se fosse trailing o prospettico (la pipeline prendeva «trailingPE o
+       forwardPE») e con due affermazioni senza fonte («tech solitamente a premio; >35× = valutazioni tese") */
+    if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 P/E: ${fmtNum.format(m.sp500_pe.nasdaq_pe)}× ${tipoPeNasdaq(m.sp500_pe)}`;
     lines.push(peLine);
   }
   if (perTitolo && m.corp_profit) potati.push("il confronto pluriennale fra indici e profitti aziendali reali");
   if (!perTitolo && m.corp_profit) {
     const ggCp = sovrapposizioneGiorni(m.corp_profit.sp500, m.corp_profit.profits);
     let cpBp = ggCp
-      ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`
+      ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${signTxt(m.corp_profit.gap, " pp")}`
       : `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): il gap dell'S&P NON è calcolabile in questo snapshot (la sua serie e quella dei profitti non condividono nessun periodo)`;
-    if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${m.corp_profit.ndx_gap > 0 ? "+" : ""}${m.corp_profit.ndx_gap} pp`;
-    cpBp += ` — ${m.corp_profit.label} (soglia di lettura: gap>40 pp = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.`;
+    if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${signTxt(m.corp_profit.ndx_gap, " pp")}`;
+    /* ⚠ v510 — «gap>40 pp = Asset Inflation da fiat debasement» era una CAUSA affermata senza fonte: i dati dicono di
+       quanto i prezzi sono saliti piu' dei profitti, non perche'. E «+15.5 pp» col punto inglese (v442) */
+    cpBp += ` — ${m.corp_profit.label} (soglia di lettura del sistema: gap oltre 40 pp, una convenzione e non una misura; cosa abbia allargato il divario — multipli, tassi, inflazione — questi dati non lo separano). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.`;
     lines.push(cpBp);
   }
   if (m.fed_market || m.fedwatch) /* ⚠ v264 — DICEVA "Fed Funds Rate" PER LA SECONDA VOLTA, CON UN NUMERO DIVERSO. In QUADRO
@@ -10443,8 +10550,8 @@ function buildPrompt(opz) {
       const _te = tassoEffettivoFed(m);
       const _tr = String(((m.fedwatch || {}).target_range) || "n.d.").replace(/[.]/g, ",");
       if (_te) lines.push(_te.giornaliero
-        ? `- Tasso EFFETTIVO (EFFR) ${fmtNum.format(_te.v)}% del ${String(_te.data || "").split("-").reverse().join("/")} (${_te.fonte}) — e' dove le banche si prestano DENTRO il target ${_tr} dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.`
-        : `- Tasso EFFETTIVO del giorno NON disponibile in questo run: c'e' solo la media MENSILE FEDFUNDS di ${_te.mese}, ${fmtNum.format(_te.v)}% — non il tasso di oggi, e un mese che contiene una riunione mescola il tasso di prima e quello di dopo, quindi non si riconcilia DENTRO il target ${_tr} dichiarato in QUADRO MACRO. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.`); }
+        ? `- Tasso EFFETTIVO (EFFR) ${fmtNum.format(_te.v)}% del ${String(_te.data || "").split("-").reverse().join("/")} (${_te.fonte}) — e' dove le banche si prestano DENTRO il target ${_tr} dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria.`
+        : `- Tasso EFFETTIVO del giorno NON disponibile in questo run: c'e' solo la media MENSILE FEDFUNDS di ${_te.mese}, ${fmtNum.format(_te.v)}% — non il tasso di oggi, e un mese che contiene una riunione mescola il tasso di prima e quello di dopo, quindi non si riconcilia DENTRO il target ${_tr} dichiarato in QUADRO MACRO.`); }
   // 4 streghe SOLO se imminenti (v138): a >30 giorni è rumore senza valore operativo
   if (m.witching && m.witching.days != null && m.witching.days < 30) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)`);
   /* v256 — QUATTRO BLOCCHI RELATIVI AL PORTAFOGLIO TOLTI DAL QUADRO MACRO: salute del
@@ -14444,9 +14551,12 @@ function datiNostriDelTitolo(tk) {
         : Math.abs(v) >= 1e9 ? `${fmtNum.format(Math.round(v / 1e8) / 10)} mld`
         : `${fmtNum.format(Math.round(v / 1e6))} milioni`;
       const pezzi = [];
-      if (c.oneri_ttm != null) pezzi.push(`oneri finanziari ${M(c.oneri_ttm)} su ${c.trimestri || "?"} trimestri`);
+      if (c.oneri_ttm != null) pezzi.push(`oneri finanziari ${M(c.oneri_ttm)} su ${c.trimestri || "?"} trimestri`
+        + (c.oneri_al ? ` (fino al ${c.oneri_al}: la fonte non li porta per l'ultimo trimestre del conto)` : ""));
       if (c.ebit_ttm != null) pezzi.push(`EBIT ${M(c.ebit_ttm)}`);
       let cop = "";
+      /* v510 — oneri ed EBIT su periodi diversi: la pipeline non li divide (v207), e la riga lo dice (v406) */
+      if (c.copertura == null && c.oneri_al) cop = ` Copertura degli interessi NON CALCOLABILE: oneri ed EBIT finiscono in trimestri diversi.`;
       if (c.copertura != null) {
         cop = c.copertura < 0
           ? ` COPERTURA DEGLI INTERESSI NEGATIVA (${fmtNum.format(c.copertura)}×): la gestione operativa `
@@ -14626,7 +14736,7 @@ function datiNostriDelTitolo(tk) {
          alla tabella, con la stessa regola dei blocchi che la dichiarano ferma (depositoOltreLaTabella). */
       const _oltre = depositoOltreLaTabella(tk, ultimoTrimestreTabella(tk));
       let r = `- ULTIMO DEPOSITO DEI RISULTATI (SEC EDGAR, 8-K item 2.02 — e' un FATTO, non una stima): `
-        + `${_sec.ultimo_deposito}${_gg != null ? `, ${_gg} giorni fa` : ""}. `
+        + `${_sec.ultimo_deposito}${_gg != null ? `, ${giorniFa(_gg)}` : ""}. `
         + (_oltre
             ? `Cade ${_oltre.gg} giorni dopo l'ultimo trimestre della tabella dei conti (${ultimoTrimestreTabella(tk)}), `
               + `oltre la fine del trimestre successivo: e' il deposito di un trimestre che qui non c'e'.`
@@ -14755,8 +14865,6 @@ function buildPromptTicker(tkGrezzo) {
   const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
   const rilevazione = DATA && DATA.updated_at
     ? new Date(DATA.updated_at).toLocaleString("it-IT") : "n.d.";
-  const prossimoRun = (typeof prossimoRunPipeline === "function" && prossimoRunPipeline())
-    ? prossimoRunPipeline().toLocaleString("it-IT") : "n.d.";
 
   /* ⚠⚠ v423 — UNA VARIABILE SERVIVA A DUE DOMANDE DIVERSE, E LA PIU' RESTRITTIVA VINCEVA.
      `rigaLibro` filtrava per `qta > 0 && pmc > 0`, cioe' rispondeva a "e' una POSIZIONE?", e da
@@ -14937,8 +15045,8 @@ function buildPromptTicker(tkGrezzo) {
 `grandezze che contano per ${tk} e di' attraverso quale canale arrivano al suo conto economico`,
 `— quale tasso, quale costo, quale domanda finale. Guarda anche dove gli indicatori NON sono`,
 `d'accordo fra loro e di' da quale lato di quel disaccordo sta questo titolo.`,
-`⚠ Il quadro macro in coda e' rilevato dal sistema il ${rilevazione}; il prossimo run del sistema`,
-`e' atteso il ${prossimoRun}. Ogni serie porta la propria data di rilevazione e il proprio prossimo`,
+`⚠ Il quadro macro in coda e' rilevato dal sistema il ${rilevazione}; l'orario del prossimo run non`,
+`e' disponibile. Ogni serie porta la propria data di rilevazione e il proprio prossimo`,
 `aggiornamento: un dato di due mesi non e' lo stato di oggi, e se lo usi dichiari quanto e' vecchio.`,
 ``,
 `2) L'AZIENDA E CONTRO CHI GIOCA — cosa vende e a chi, poi una tabella dei concorrenti diretti:`,
@@ -15203,7 +15311,7 @@ function buildPromptTicker(tkGrezzo) {
 ``,
 `──────────────────────────────────────────────────────────────────`,
 `QUADRO MACRO DI RIFERIMENTO (rilevato dal sistema, non da te)`,
-`Snapshot del ${rilevazione} · prossimo aggiornamento atteso ${prossimoRun}`,
+`Snapshot del ${rilevazione} · prossimo aggiornamento: ${ORARIO_RUN_ND}`,
 `──────────────────────────────────────────────────────────────────`,
 ].join("\n");
 

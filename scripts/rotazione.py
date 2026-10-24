@@ -98,6 +98,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import brief
 import schede_progetto
+from comuni import art   # v510 — l'articolo davanti a un numero, un posto solo
 
 SEDUTE_CORR = 60
 SOGLIA_CORR = 0.5
@@ -1017,7 +1018,12 @@ def calendario_sicuro(tks, giorni=GIORNI_CALENDARIO):
 
 
 def n(x, d=1, s=""):
-    return "n.d." if x is None else f"{x:+.{d}f}{s}".replace(".", ",")
+    """Col segno, sul valore GIA' arrotondato (v496): «-0,0 ATR» e «-0,0%» si leggevano come un movimento che non c'e'
+    (v510 — undici volte in un'analisi sola, sulle distanze dagli ordini e dalle medie). Lo zero non porta segno."""
+    if x is None:
+        return "n.d."
+    v = round(x, d) + 0.0
+    return (f"{v:+.{d}f}" if v != 0 else f"{0:.{d}f}").replace(".", ",") + s
 
 
 def piano(x, d=1):
@@ -1199,8 +1205,9 @@ INTESTAZIONE_VWAP = ("il VWAP dai conti (decisione del CEO del 18/10/2026) = il 
                      "dopo l'ultima trimestrale: prezzo tipico (massimo+minimo+chiusura)/3 delle barre GIORNALIERE "
                      "pesato sui volumi, dalla prima seduta dopo il comunicato all'ultima conclusa — un'approssimazione "
                      "di quello dei grafici, che usa barre di pochi minuti · data del comunicato da Nasdaq, ora dal "
-                     "deposito su SEC EDGAR (prima delle 09:30 di New York muove la seduta stessa, dalle 16:00 la "
-                     "successiva); senza l'ora, la seduta piu' scambiata fra il giorno dei conti e il successivo, "
+                     "deposito su SEC EDGAR, che e' il PIU' TARDI a cui i conti erano pubblici, non l'ora del comunicato "
+                     "(prima delle 09:30 di New York muove la seduta stessa, dalle 16:00 la successiva); senza l'ora, "
+                     "la seduta piu' scambiata fra il giorno dei conti e il successivo, "
                      "dichiarato · sopra il VWAP chi ha comprato dopo i conti e' in media in guadagno, sotto in perdita "
                      "(lettura convenzionale): un livello, non una prova della tenuta")
 
@@ -1241,8 +1248,14 @@ def ancora_conti(trim, depositi, barre, adesso=None):
             seduta, quando = next((s for s in sedute if s > giorno), None), "dopo la chiusura"
         else:
             seduta = next((s for s in sedute if s >= giorno), None)
+            # ⚠ v510 — UN DEPOSITO A SEDUTA APERTA NON DICE CHE IL COMUNICATO SIA USCITO A SEDUTA APERTA: l'ora di
+            #   accettazione e' il PIU' TARDI a cui i conti erano pubblici. SK hynix pubblica a Seul e deposita il 6-K
+            #   ore dopo (10:01 di New York il 29/07); molti emittenti americani escono prima dell'apertura e depositano
+            #   l'8-K alle 10-11. La riga diceva «a seduta aperta: la barra mescola il prima e il dopo», cioe' affermava
+            #   un'ora che il dato non porta. La seduta d'ancora non cambia: e' la prima dopo i conti in entrambi i casi
             quando = ("prima dell'apertura" if hm < VWAP_APERTURA or seduta != giorno else
-                      "a seduta aperta: la barra di quella seduta mescola il prima e il dopo")
+                      "a seduta aperta: i conti erano pubblici al piu' tardi a quell'ora — spesso escono prima "
+                      "dell'apertura e il deposito segue — e questa e' comunque la prima seduta dopo i conti")
         if seduta is None:
             return {"errore": f"la prima seduta dopo i conti del {D} non e' ancora conclusa", "comunicato": D}
         return {"seduta": seduta, "comunicato": D, "ora": f"{t:%H:%M}", "giorno_deposito": giorno,
@@ -1310,7 +1323,7 @@ def riga_vwap(v):
     if v.get("da_volumi"):
         ancora = f"dalla seduta del {_data_it(v['seduta'])} — {v['quando']}, perche' {v['perche']}"
     else:
-        ancora = (f"comunicato alle {v['ora']} di New York del {_data_it(v['giorno_deposito'])} ({v.get('forma')} su "
+        ancora = (f"deposito accettato alle {v['ora']} di New York del {_data_it(v['giorno_deposito'])} ({v.get('forma')} su "
                   f"SEC EDGAR), {v['quando']} → dalla seduta del {_data_it(v['seduta'])}")
     s = f"VWAP dai conti {prezzo(v['vwap'])} — {conti} · {ancora}, {v['sedute']} {'seduta' if v['sedute'] == 1 else 'sedute'}"
     if v.get("dist_pct") is not None:
@@ -1433,8 +1446,11 @@ def righe_5anni(l, veicolo=None):
         rtxt = (f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo l'ha restituito tutto, e oltre il punto di "
                 "partenza" + (f" (il prezzo ne dista {n(d, 1, '%')})" if d is not None else ""))
     else:
-        rtxt = (f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo ne ha restituito il "
-                f"{piano(r['restituito_pct'], 0)}%")
+        # v510 — «ne ha restituito il 87%», «il 11%», «il 0%»: l'articolo si sceglie sul numero (comuni.art), e un
+        #   valore che si arrotonda a zero si dice in parole invece che come «lo 0%»
+        rtxt = (f"del rialzo da {prezzo(r['da'])} ({r['data']}) al massimo "
+                + (f"ne ha restituito {art('il', piano(r['restituito_pct'], 0) + '%')}"
+                   if round(r["restituito_pct"]) > 0 else "ne ha restituito meno dell'1%"))
     L.append(f"   massimo {prezzo(mx['prezzo'])} del {mx['data']} (il prezzo ne dista {n(l['dmax_pct'], 1, '%')}) · "
              f"minimo {prezzo(mn['prezzo'])} del {mn['data']} (il prezzo ne dista {n(l['dmin_pct'], 1, '%')}) · {ptxt} · {rtxt}")
     v = veicolo or {}
@@ -1630,7 +1646,8 @@ def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
     anche = {k: sorted(x["tk"]) for k, x in chi.items() if 2 <= len(x["tk"]) < SOGLIA_CRONACA}
 
     def non_mostrate(k):
-        return f"… e {'un' + chr(39) + 'altra voce' if k == 1 else f'altre {k} voci'} nelle stesse ore, non mostrate"
+        return ("… e un" + chr(39) + "altra voce nelle stesse ore, non mostrata" if k == 1 else
+                f"… e altre {k} voci nelle stesse ore, non mostrate")
     L = [f"{titolo} — feed Nasdaq del simbolo, ultime {ore} ore, ora italiana · [TK] = trovata nel feed di TK, non "
          f"'notizia su TK' (v415) · la voce che sta nel feed di almeno {SOGLIA_CRONACA} nomi del blocco e' cronaca di "
          "mercato: una volta, in fondo; quella nel feed di due resta con ciascuno, e dice dove altro compare (v500) "
@@ -1658,7 +1675,10 @@ def righe_notizie(titolo, segnali, news, ore=NOTIZIE_ORE, altrove=None):
         elif not nw["voci"]:
             L.append(f"      feed letto, nessuna voce nelle ultime {ore} ore")
         elif not proprie:
-            L.append(f"      nessuna voce propria: le {k_com} del feed sono cronaca di mercato, in fondo al blocco")
+            # v510 — «le 1 del feed sono»: il plurale fisso su una voce sola
+            L.append("      nessuna voce propria: " + ("l'unica voce del feed e' cronaca di mercato" if k_com == 1 else
+                                                      f"le {k_com} voci del feed sono cronaca di mercato")
+                     + ", in fondo al blocco")
         for v in proprie[:tetto]:
             altri = [x for x in anche.get(chiave(v), []) if x != tk]
             L.append(f"      [{tk}] {quando(v)} {v['titolo'][:110]}"

@@ -749,9 +749,14 @@ senza scadenza e senza l'avviso dei 14 giorni. Qui va **solo una data scritta da
 la contiene: non una stima (v396). `brief.calendario_trimestrali` la aggiunge nella sua finestra, e se Nasdaq
 dice un'altra data vince l'emittente, con quella di Nasdaq scritta accanto. Una data passata esce da sé.
 
-| Nome | Conti | Fonte | Depositato |
-|---|---|---|---|
-| SKHY | 2026-10-28 | 6-K su SEC EDGAR: teleconferenza alle 9:00 di Seul, la sera del 27/10 a New York | 2026-10-14 |
+**Ora** (v510, facoltativa, in coda perché le altre colonne non si spostano): l'ora dichiarata dall'emittente nel
+SUO fuso, scritta `HH:MM Zona/IANA` (es. `09:00 Asia/Seoul`). La conversione in ora italiana e di New York la fa
+`brief.ora_dichiarata` col fuso, mai con uno scarto a mano (v470); senza l'ora la riga dice «orario non dichiarato».
+Il 24/10/2026 la riga di SK hynix diceva proprio quello accanto alla propria fonte, che l'ora la dichiarava.
+
+| Nome | Conti | Fonte | Depositato | Ora |
+|---|---|---|---|---|
+| SKHY | 2026-10-28 | 6-K su SEC EDGAR: teleconferenza alle 9:00 di Seul, la sera del 27/10 a New York | 2026-10-14 | 09:00 Asia/Seoul |
 
 ## 1novies. SALUTE DEL CREDITO — monitor deciso dal CEO il 18/10/2026 (v501)
 

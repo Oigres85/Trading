@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 360  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367 (sale, mai scende)
+N_CHECKS_MINIMO = 375  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1009,10 +1009,19 @@ try:
     _URL_VISTI.clear()
     _cal = ud.calendario_uscite_fred(ud.STORICO_IND)
 
-    check("v395 il calendario esce dalla stessa tabella dello storico, non da una seconda copia",
+    # ⚠ v510 — riagganciato all'invariante: «una corrispondenza chiave→serie sola». La v510 ha aggiunto le due serie che
+    #   lo storico prende altrove (curve, t30): la loro corrispondenza vive in CALENDARIO_EXTRA, e la leggono ANCHE i due
+    #   indicatori — cosi' il calendario descrive per costruzione la serie da cui esce il valore. Il check pretendeva la
+    #   chiamata con la sola STORICO_IND, cioe' il calendario che dichiarava «non copre la serie» su due serie giornaliere.
+    _chiavi_storico = {r[0] for r in ud.STORICO_IND}
+    check("v395 il calendario esce dalla stessa tabella dello storico, non da una seconda copia (v510: piu' le due serie "
+          "che lo storico prende altrove, con la corrispondenza che leggono anche i loro indicatori)",
           "STORICO_IND" in _SRC_UD_CODICE
           and _SRC_UD_CODICE.count("STORICO_IND = [") == 1
-          and "calendario_uscite_fred(STORICO_IND)" in _SRC_UD_CODICE)
+          and _SRC_UD_CODICE.count("CALENDARIO_EXTRA = [") == 1
+          and "calendario_uscite_fred(STORICO_IND + CALENDARIO_EXTRA)" in _SRC_UD_CODICE
+          and not ({k for k, _s in ud.CALENDARIO_EXTRA} & _chiavi_storico)
+          and all(f'fred_series(SERIE_FUORI_STORICO["{k}"], 1)' in _SRC_UD_CODICE for k, _s in ud.CALENDARIO_EXTRA))
 
     # ⚠ la classe v393: descrivere il calendario del RIPIEGO sotto un dato che viene dalla
     # fonte primaria. UMich e' marcata PRIMARIA: e non deve comparire.
@@ -1710,7 +1719,7 @@ check("v492 un emittente estero (6-K e 20-F, nessun 8-K) e una risposta vuota si
                                             , oggi=_date492(2026, 10, 16)).get("non_verificabile", "")
       and "non_verificabile" in ud.storia_quotazione({}, oggi=_date492(2026, 10, 16)))
 _sec492 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
-_sec492 = _sec492[:_sec492.find("calendario_uscite_fred(STORICO_IND)")]
+_sec492 = _sec492[:_sec492.find("calendario_uscite_fred(STORICO_IND")]
 check("v492 collegamento: il giro del calendario EDGAR passa ogni risposta letta a storia_quotazione PRIMA del filtro degli "
       "esteri, e la pubblica in sec_calendario.storia_quotazione anche quando non ci sono trimestrali",
       "storia[_tk] = storia_quotazione(_sub)" in _sec492
@@ -2202,7 +2211,7 @@ check("v500 ore dei depositi: il tetto di voci si rispetta (dal piu' recente), u
                                                     "acceptanceDateTime": ["2026-10-01T16:05:00.000Z"]}}},
                           oggi=_date500(2026, 10, 18)) == [])
 _sec500 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
-_sec500 = _sec500[:_sec500.find("calendario_uscite_fred(STORICO_IND)")]
+_sec500 = _sec500[:_sec500.find("calendario_uscite_fred(STORICO_IND")]
 check("v500 collegamento: il giro del calendario EDGAR passa ogni risposta letta a ore_depositi PRIMA del filtro degli "
       "esteri (i 6-K servono a loro), e le pubblica in sec_calendario.ore_depositi con l'orologio dichiarato — UTC, "
       "come EDGAR lo scrive (misurato in v501: la v500 lo dichiarava ora di New York), anche quando non ci sono trimestrali",
@@ -2419,7 +2428,7 @@ check("v501 debito SEC: un deposito NUOVO fa rileggere il nome; se la rilettura 
       and (((_d501d.get("per_titolo") or {}).get("BBB") or {}).get("errore_ultimo") or {}).get("il") == "2026-10-21"
       and "BBB" in (_d501d.get("in_attesa") or []))
 _sec501 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
-_sec501 = _sec501[:_sec501.find("calendario_uscite_fred(STORICO_IND)")]
+_sec501 = _sec501[:_sec501.find("calendario_uscite_fred(STORICO_IND")]
 check("v501 collegamento: il giro EDGAR prende l'ultimo 10-Q/10-K di ogni risposta letta PRIMA del filtro degli esteri, "
       "e dopo il giro legge il debito con lo stesso User-Agent, le posizioni per prime, e lo pubblica in macro",
       "_ub = ultimo_bilancio_sec(_sub)" in _sec501
@@ -2572,7 +2581,10 @@ _inc504g = _q504([{"Total Revenue": float("nan")}, {"Total Revenue": 10.0}, {"To
 check("v504 la fine del periodo di una somma e' quella dell'ultimo dato usato, non della prima colonna (che puo' essere "
       "vuota): " + str(ud._somma_quattro(_inc504g, ("Total Revenue",))),
       ud._somma_quattro(_inc504g, ("Total Revenue",)) == (40.0, 4, "2026-03-31")
-      and ud._somma_trimestri(_inc504g, "Total Revenue")[2] == "2026-06-30"
+      # ⚠ v510 — qui il check pretendeva "2026-06-30" da _somma_trimestri, cioe' la data della colonna VUOTA: pinnava il
+      #   difetto (MU il 24/10/2026, «conto al 2026-08-31» su trimestri che finivano il 31/05). Le due somme danno ora
+      #   la stessa data, quella dell'ultimo dato usato
+      and ud._somma_trimestri(_inc504g, "Total Revenue")[2] == "2026-03-31"
       and ud._somma_quattro(None, ("Total Revenue",)) == (None, 0, None))
 # settimane fiscali: il conto chiude il 27/07, il bilancio il 31/07 — lo stesso trimestre entro 20 giorni; a 30 no
 _g504c = ud.giorni_ciclo(_q504([{"Accounts Receivable": 50.0, "Inventory": 40.0, "Accounts Payable": 100.0}], ["2026-07-31"]),
@@ -3173,6 +3185,157 @@ finally:
 check("v509 sul sito della Fed ci si identifica per quello che si e' (v266); altrove resta l'intestazione di sempre",
       _presi509.get("https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm") == ud.UA_ONESTO
       and _presi509.get("https://example.org/x") == ud.UA)
+
+# ═══ v510 — I DIFETTI TROVATI LEGGENDO L'ANALISI DEL 24/10/2026 COME IL DESTINATARIO (pipeline) ═════════════════
+# Ogni stato si COSTRUISCE (v425, v429): i dati del giorno possono non contenerlo domani.
+import comuni as _cm510
+
+# --- credito(): la data del conto dall'EBIT, gli oneri con la loro, nessuna divisione fra periodi diversi ---
+_d510 = ["2026-08-31", "2026-05-31", "2026-02-28", "2025-11-30", "2025-08-31"]
+_c510a = ud.credito(_T504(None, _q504([{"EBIT": 10.0}] * 4, _d510[:4]), None))
+_c510b = ud.credito(_T504(None, _q504([{"EBIT": 10.0, "Interest Expense": float("nan")}]
+                                      + [{"EBIT": 10.0, "Interest Expense": 5.0}] * 4, _d510), None))
+_c510c = ud.credito(_T504(None, _q504([{"EBIT": 10.0, "Interest Expense": 5.0}] * 4, _d510[:4]), None))
+_c510d = ud.credito(_T504(None, _q504([{"EBIT": 10.0, "Interest Expense": v} for v in (0.0, 32.0, 74.0, 124.0)],
+                                      _d510[:4]), None))
+check("v510 credito: senza la voce degli oneri la data del conto viene dall'EBIT (prima «conto al None» su PLTR, OKLO, "
+      "AAPL, ASML, NKE), e non c'e' copertura: " + str(_c510a),
+      _c510a.get("conto_al") == "2026-08-31" and "copertura" not in _c510a and "oneri_al" not in _c510a)
+check("v510 credito: oneri fermi a un trimestre prima dell'EBIT → «oneri_al» con la loro data e NESSUNA copertura (due "
+      "periodi diversi non si dividono, v207); sugli stessi periodi la copertura c'e': " + str([_c510b, _c510c]),
+      _c510b.get("conto_al") == "2026-08-31" and _c510b.get("oneri_al") == "2026-05-31" and "copertura" not in _c510b
+      and _c510c.get("copertura") == 2.0 and "oneri_al" not in _c510c and _c510c.get("conto_al") == "2026-08-31")
+check("v510 credito: un ultimo trimestre di oneri a ZERO non e' un costo sparito — niente «-100% in 4 trimestri», la serie "
+      "resta per la riga del costo, e nessun campo in piu' che nessuno legge: " + str(_c510d),
+      "oneri_var_4trim_pct" not in _c510d and _c510d.get("oneri_trim") == [124, 74, 32, 0]
+      and "oneri_ultimo_zero" not in _c510d)
+
+# --- il Fear & Greed: la data, i buchi, l'anno, la sorveglianza ---
+_ms510 = int(datetime(2026, 10, 23, 20, 0, tzinfo=timezone.utc).timestamp() * 1000)
+check("v510 Fear & Greed: la data della rilevazione nel fuso di New York (la seduta che descrive) dall'ISO o dai "
+      "millisecondi; senza data, o illeggibile, None — mai inventata",
+      ud._data_fg("2026-10-23T23:59:57+00:00") == "2026-10-23"
+      and ud._data_fg("2026-10-24T02:00:00+00:00") == "2026-10-23"      # le 22 di New York del 23: UTC direbbe 24
+      and ud._data_fg("2026-10-23T14:00:00Z") == "2026-10-23" and ud._data_fg(_ms510) == "2026-10-23"
+      and ud._data_fg(None) is None and ud._data_fg("") is None and ud._data_fg("ieri") is None)
+check("v510 Fear & Greed: un confronto che la fonte non porta e' un BUCO, non uno zero (prima «seduta prima 0», cioe' "
+      "paura estrema inventata)",
+      ud._fg_intero(None) is None and ud._fg_intero("x") is None and ud._fg_intero(20.4) == 20 and ud._fg_intero(0) == 0)
+_base510 = datetime(2025, 9, 19, 20, 0, tzinfo=timezone.utc)
+_punti510 = [{"x": (_base510 + timedelta(days=i)).timestamp() * 1000, "y": float((i * 7) % 100)} for i in range(400)]
+_punti510 += [{"x": "rotto", "y": 3.0}, {"x": _punti510[10]["x"], "y": float("nan")}, {"y": 5.0}]
+_punti510.append({"x": _punti510[399]["x"], "y": 17.0})              # lo stesso giorno: vince l'ultima
+_st510 = ud.storia_fear_greed({"fear_and_greed_historical": {"data": _punti510}})
+_fine510 = (_base510 + timedelta(days=399)).date()
+_anno510 = {(_base510 + timedelta(days=i)).date().isoformat(): float((i * 7) % 100) for i in range(400)
+            if (_fine510 - (_base510 + timedelta(days=i)).date()).days < 365}
+_anno510[_fine510.isoformat()] = 17.0
+_v510 = list(_anno510.values())
+_atteso510 = int(ud.math.floor(((sum(1 for v in _v510 if v < 17.0) + sum(1 for v in _v510 if v == 17.0) / 2)
+                             / len(_v510) * 100) + 0.5))
+check("v510 Fear & Greed col suo anno: le rilevazioni degli ultimi 365 giorni PER DATA (l'ultima del giorno vince, i punti "
+      "rotti si scartano), il percentile midrank di oggi per eccesso sul mezzo, minimo e massimo con l'ULTIMA data "
+      "toccata: " + str(_st510),
+      _st510 is not None and _st510["n"] == 365 and _st510["a"] == _fine510.isoformat()
+      and _st510["rango"] == _atteso510 and _st510["minimo"]["valore"] == 0 and _st510["massimo"]["valore"] == 99
+      and _st510["minimo"]["data"] == max(g for g, v in _anno510.items() if v == 0)
+      and _st510["massimo"]["data"] == max(g for g, v in _anno510.items() if v == 99))
+# il mezzo si arrotonda per eccesso: 24 rilevazioni sotto e 2 pari su 200 danno 12,5 → 13; il round() di Python darebbe
+#   12 (arrotondamento al pari): la regola del percentile intero della v496. La serie di prima non lo conteneva (17,26)
+_base510m = datetime(2025, 12, 1, 20, 0, tzinfo=timezone.utc)
+_pm510 = [{"x": (_base510m + timedelta(days=i)).timestamp() * 1000,
+           "y": 10.0 if i < 24 else 50.0 if i in (100, 199) else 90.0} for i in range(200)]
+_stm510 = ud.storia_fear_greed({"fear_and_greed_historical": {"data": _pm510}})
+check("v510 Fear & Greed: il percentile sul mezzo si arrotonda per eccesso, come il resto del sistema (12,5 → 13; il "
+      "round() di Python darebbe 12, v496): " + str(_stm510),
+      _stm510 is not None and _stm510["n"] == 200 and _stm510["rango"] == 13)
+check("v510 Fear & Greed: una serie corta o assente non da' un percentile dell'anno (convenzione dichiarata, v240)",
+      ud.storia_fear_greed({"fear_and_greed_historical": {"data": _punti510[-60:]}}) is None
+      and ud.storia_fear_greed({}) is None and ud.storia_fear_greed(None) is None)
+_fg510 = _SRC_UD_CODICE[_SRC_UD_CODICE.index('macro["fear_greed"] = {'):][:1600]
+check("v510 collegamento: fetch_macro pubblica la data dalla fonte, i confronti senza zeri inventati e l'anno in un try "
+      "suo (un anno che non si legge non si porta via il punteggio)",
+      '"asof": _data_fg(fg.get("timestamp"))' in _fg510 and '_fg_intero(fg.get("previous_close"))' in _fg510
+      and '_fg_intero(fg.get("previous_1_year"))' in _fg510 and "storia_fear_greed(data)" in _fg510
+      and 'fg.get("previous_close", 0)' not in _SRC_UD_CODICE
+      and _fg510.index("try:") < _fg510.index("storia_fear_greed(data)"))
+_vfg510 = lambda m: next((c for c in ud.validate_macro(m)["checks"] if c["key"] == "fear_greed"), None)
+_oggi510 = datetime.now(timezone.utc).date()
+check("v510 il Fear & Greed nasce SORVEGLIATO (v390): assente → missing; data di oggi → ok; senza data → stale che lo "
+      "dice; vecchio di 10 giorni → stale coi giorni",
+      _vfg510({})["status"] == "missing"
+      and _vfg510({"fear_greed": {"score": 21, "asof": _oggi510.isoformat()}})["status"] == "ok"
+      and _vfg510({"fear_greed": {"score": 21}})["status"] == "stale"
+      and "non dichiara" in _vfg510({"fear_greed": {"score": 21}})["note"]
+      and _vfg510({"fear_greed": {"score": 21, "asof": (_oggi510 - timedelta(days=10)).isoformat()}})["status"] == "stale")
+
+# --- la Bank of Japan: il giorno della decisione, dalla lista ufficiale, sorvegliata prima che finisca ---
+check("v510 BoJ: il giorno della DECISIONE (il secondo di due: ottobre e' il 30, non il 29), la lista ufficiale col 2027, "
+      "in ordine e senza doppioni; fetch_macro la legge da li'",
+      ud.BOJ_DECISIONI == sorted(set(ud.BOJ_DECISIONI)) and "2026-10-30" in ud.BOJ_DECISIONI
+      and "2026-10-29" not in ud.BOJ_DECISIONI and sum(1 for d in ud.BOJ_DECISIONI if d.startswith("2027")) == 8
+      and "boj = [d for d in BOJ_DECISIONI if d >=" in _SRC_UD_CODICE
+      and '"2026-10-29", "2026-12-18")' not in _SRC_UD_CODICE)
+_vb510 = lambda: next((c for c in ud.validate_macro({})["checks"] if c["key"] == "boj_calendario"), None)
+_orig_boj510 = ud.BOJ_DECISIONI
+try:
+    ud.BOJ_DECISIONI = ["2020-01-01", (_oggi510 + timedelta(days=30)).isoformat()]
+    _b1_510 = _vb510()
+    ud.BOJ_DECISIONI = ["2020-01-01", (_oggi510 + timedelta(days=30)).isoformat(), (_oggi510 + timedelta(days=90)).isoformat()]
+    _b2_510 = _vb510()
+finally:
+    ud.BOJ_DECISIONI = _orig_boj510
+check("v510 il calendario BoJ scritto a mano suona PRIMA di finire: con una sola riunione futura e' stale, con due ok",
+      _b1_510["status"] == "stale" and "Bank of Japan" in _b1_510["note"] and _b2_510["status"] == "ok")
+
+# --- le due serie che lo storico prende altrove hanno il loro calendario, dalla stessa corrispondenza ---
+_vk510 = os.environ.get("FRED_API_KEY")
+try:
+    ud.http_get = _fred_finta
+    ud.time.sleep = lambda *_a, **_k: None
+    os.environ["FRED_API_KEY"] = "a" * 32
+    _cal510 = ud.calendario_uscite_fred(ud.STORICO_IND + ud.CALENDARIO_EXTRA)
+finally:
+    ud.http_get, ud.time.sleep = _vero_get, _vero_sleep
+    if _vk510 is None:
+        os.environ.pop("FRED_API_KEY", None)
+    else:
+        os.environ["FRED_API_KEY"] = _vk510
+check("v510 il calendario ufficiale copre anche la curva 10A-2A e il Treasury a 30 anni (prima: «il calendario non copre la "
+      "serie» su due serie giornaliere), con la serie da cui esce il loro valore",
+      _cal510.get("curve", {}).get("serie") == "T10Y2Y" and _cal510.get("t30", {}).get("serie") == "DGS30"
+      and bool(_cal510["curve"].get("prossime")) and ud.SERIE_FUORI_STORICO == dict(ud.CALENDARIO_EXTRA))
+
+# --- UMich: preliminare o definitiva, la dichiara la fonte ---
+check("v510 UMich: preliminare o definitiva la dichiara la pagina della fonte, col suo mese; senza dichiarazione None",
+      ud.umich_lettura("<h2>Preliminary Results for October 2026</h2>") == {"lettura": "preliminare", "mese": "2026-10-01"}
+      and ud.umich_lettura("<p>Final  Results for <b>September</b> 2026</p>") == {"lettura": "definitiva", "mese": "2026-09-01"}
+      and ud.umich_lettura("<p>Surveys of Consumers</p>") is None
+      and ud.umich_lettura("Final Results for Smarch 2026") is None)
+check("v510 collegamento UMich: la lettura vale solo dalla fonte primaria e solo se e' dello STESSO mese del valore",
+      'if _ind_um["fonte"] == "primaria":' in _SRC_UD_CODICE and '_lt["mese"] == s[-1][0]' in _SRC_UD_CODICE)
+
+# --- il P/E del Nasdaq-100 dice quale P/E e'; la media 16,5 scritta a mano non torna ---
+check("v510 il P/E del Nasdaq-100 viaggia col suo tipo e la sua fonte (prima «trailing o forward» senza dire quale), e la "
+      "«media storica 16,5» scritta a mano non e' piu' nel blocco del prospettico",
+      '"nasdaq_pe": ndx_pe, "nasdaq_pe_kind": ndx_kind, "nasdaq_pe_source": ndx_src' in _SRC_UD_CODICE
+      and 'qqq_info.get("trailingPE") or qqq_info.get("forwardPE")' not in _SRC_UD_CODICE
+      and '"avg_hist"' not in _SRC_UD_CODICE)
+
+# --- i titoli dei feed come li legge una persona; una funzione sola per pipeline e strumenti ---
+_rss510 = ("<rss><channel><item><title>Is &amp;quot;Off the Charts.&amp;quot; Nvidia's run over?</title>"
+           "<pubDate>Fri, 23 Oct 2026 14:00:00 GMT</pubDate>"
+           "<description>&amp;lt;p&amp;gt;Due &amp;amp;amp; tre&amp;lt;/p&amp;gt;</description></item></channel></rss>")
+_vr510 = ud.voci_rss(_rss510, "Prova")
+check("v510 i titoli dei feed si decodificano finche' ci sono entita' (Nasdaq scrive «&amp;quot;»: usciva «&quot;» nel "
+      "brief e nei pacchetti), e i tag del riassunto se ne vanno: " + str(_vr510),
+      len(_vr510) == 1 and _vr510[0]["titolo"] == "Is \"Off the Charts.\" Nvidia's run over?"
+      and _vr510[0]["riassunto"] == "Due & tre" and "&quot;" not in str(_vr510) and "&amp;" not in str(_vr510))
+check("v510 una funzione sola: il pavimento del rumore e la decodifica dei feed vivono in comuni.py e la pipeline li "
+      "importa (nessuna seconda copia)",
+      ud.r2_rumore is _cm510.r2_rumore and ud.testo_feed is _cm510.testo_feed
+      and "def r2_rumore" not in _SRC_UD and abs(_cm510.r2_rumore(251) - 0.0153) < 0.0005
+      and _cm510.r2_rumore(20) is None)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

@@ -32,6 +32,11 @@ scritte in memoria/LIBRO.md §1novies e rilette da un gate.
 from __future__ import annotations
 
 import math
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from comuni import art  # noqa: E402  — v510: «l'89,7%», non «il 89,7%»
 
 # ═══ soglie (convenzioni: LIBRO.md §1novies, rilette dai gate) ═══════════════════════════════
 SOGLIA_RAPIDA = 15.0     # CDS oltre l'indice della stessa cedola in 5 giorni raccolti: rincaro IMPROVVISO
@@ -91,6 +96,12 @@ def _sg(x, dec=1):
     if v == 0:
         return _n(0, dec)
     return ("+" if v > 0 else "") + _n(v, dec)
+
+
+def testo_zona(zona):
+    """«zona di PERICOLO», «zona di SICUREZZA», ma «zona GRIGIA»: il terzo nome e' un aggettivo (v510 — usciva «zona di
+    GRIGIA» in due righe di ogni analisi)."""
+    return "zona GRIGIA" if zona == "GRIGIA" else f"zona di {zona}"
 
 
 def _data(d):
@@ -250,7 +261,7 @@ def riga_altman(a, sol=None, comb=None):
     soglia = (f"sotto {_n(ALTMAN_PERICOLO, 1)}" if a["zona"] == "PERICOLO" else
               f"sopra {_n(ALTMAN_SICUREZZA, 1)}" if a["zona"] == "SICUREZZA" else
               f"fra {_n(ALTMAN_PERICOLO, 1)} e {_n(ALTMAN_SICUREZZA, 1)}")
-    s = f"Altman Z'' {_n(a['z'], 2)}: zona di {a['zona']} ({soglia})"
+    s = f"Altman Z'' {_n(a['z'], 2)}: {testo_zona(a['zona'])} ({soglia})"
     if a.get("base"):
         s += f" · {a['base']}"
     elif a.get("al"):
@@ -393,9 +404,23 @@ def riga_credito_cds(r, meta=None):
 
 
 # ═══ DEBITO ════════════════════════════════════════════════════════════════════════════════════
-SCADENZE_NOMI = (("entro_12_mesi", "nei 12 mesi"), ("resto_esercizio", "nel resto dell'esercizio"),
-                 ("anno_2", "nel 2° anno"), ("anno_3", "nel 3°"), ("anno_4", "nel 4°"), ("anno_5", "nel 5°"),
-                 ("oltre_5", "oltre il 5°"))
+# ⚠⚠ v510 — I NOMI DELLE SCADENZE DIPENDONO DAL DOCUMENTO. Per la tassonomia FASB (definizioni del 2025) la voce
+#   «...InNextTwelveMonths» e' il debito che scade nell'esercizio SUCCESSIVO a quello in corso, non nei prossimi dodici
+#   mesi, e «...InYearTwo» il secondo esercizio successivo. In un 10-K l'esercizio in corso e' quello appena chiuso e le
+#   due letture quasi coincidono; in un 10-Q no: su CRWV (10-Q al 30/06/2026) la riga scriveva «30% nei 12 mesi, 21%
+#   nel resto dell'esercizio», cioe' metteva PRIMA la scadenza che viene DOPO. Ora l'ordine e il nome seguono la forma,
+#   e il resto dell'esercizio in corso — la scadenza piu' vicina — viene per primo.
+SCADENZE_NOMI_10K = (("resto_esercizio", "nel resto dell'esercizio"), ("entro_12_mesi", "nel prossimo esercizio"),
+                     ("anno_2", "nel 2° esercizio"), ("anno_3", "nel 3°"), ("anno_4", "nel 4°"), ("anno_5", "nel 5°"),
+                     ("oltre_5", "oltre il 5°"))
+SCADENZE_NOMI_10Q = (("resto_esercizio", "nel resto dell'esercizio in corso"),
+                     ("entro_12_mesi", "nell'esercizio successivo"), ("anno_2", "nel 2° esercizio successivo"),
+                     ("anno_3", "nel 3°"), ("anno_4", "nel 4°"), ("anno_5", "nel 5°"), ("oltre_5", "oltre il 5°"))
+
+
+def nomi_scadenze(forma):
+    """I nomi delle scadenze per la forma del documento da cui sono lette: 10-Q (esercizio in corso) o 10-K."""
+    return SCADENZE_NOMI_10Q if str(forma or "").upper().startswith("10-Q") else SCADENZE_NOMI_10K
 
 
 # ⚠ v501 — l'ETICHETTA DEL TASSO SEGUE LA VOCE che lo dichiara (v240, v405). Le prime due sono medie ponderate del
@@ -477,6 +502,10 @@ def riga_debito(r, x=None, liquidita=None, esteri=(), versione=None):
             pz.append("costo n.d.: l'ultimo trimestre della fonte non riporta oneri finanziari (non vuol dire zero)")
     if k.get("copertura") is not None:
         pz.append(f"utile operativo / oneri {_n(k['copertura'], 2)}×")
+    elif k.get("oneri_al") and k.get("conto_al"):
+        # v510 — la pipeline non divide due periodi diversi (v207), e l'assenza si dichiara (v406)
+        pz.append(f"utile operativo / oneri n.d.: nella fonte gli oneri si fermano al {_data(k['oneri_al'])} e l'utile "
+                  f"operativo al {_data(k['conto_al'])} — due periodi diversi non si dividono")
     if k.get("oneri_var_4trim_pct") is not None:
         pz.append(f"oneri {_sg(k['oneri_var_4trim_pct'])}% in 4 trimestri")
     tk = (r or {}).get("ticker")
@@ -492,7 +521,7 @@ def riga_debito(r, x=None, liquidita=None, esteri=(), versione=None):
     if sc and sc.get("voci"):
         totale = sum(v for v in sc["voci"].values() if v is not None)
         if totale > 0:
-            parti = [f"{_n(sc['voci'][kk] / totale * 100, 0)}% {nome}" for kk, nome in SCADENZE_NOMI
+            parti = [f"{_n(sc['voci'][kk] / totale * 100, 0)}% {nome}" for kk, nome in nomi_scadenze(sc.get("forma"))
                      if sc["voci"].get(kk) is not None]
             sez.append(f"scadenze del capitale ({sc.get('forma')} al {_data(sc.get('al'))}, totale dichiarato "
                        f"{_importo(totale, sc.get('valuta'))}): " + ", ".join(parti))
@@ -502,7 +531,7 @@ def riga_debito(r, x=None, liquidita=None, esteri=(), versione=None):
         sez.append(riga_tasso(x.get("tasso")))
     e = x.get("equo")
     if e and e.get("rapporto_pct") is not None:
-        sez.append(f"il mercato valuta il debito il {_n(e['rapporto_pct'], 1)}% del valore di carico (al {_data(e['al'])}: "
+        sez.append(f"il mercato valuta il debito {art('il', _n(e['rapporto_pct'], 1) + '%')} del valore di carico (al {_data(e['al'])}: "
                    "sotto 100 chiede piu' delle cedole — tassi saliti o credito peggiorato, il dato non separa le due cose)")
     l_ = x.get("linee_disponibili")
     if l_:
@@ -636,7 +665,7 @@ def riga_solidita(r, a=None):
     pat, op = stato_patrimoniale(a), stato_operativo((r or {}).get("combustione"))
     pz = []
     if pat:
-        p = f"PATRIMONIALE (il bilancio a una data): {pat} — Altman in zona di {a['zona']}"
+        p = f"PATRIMONIALE (il bilancio a una data): {pat} — Altman in {testo_zona(a['zona'])}"
         rs = _rischio_storico(a)
         pz.append(p + (f", {rs}" if rs else ""))
     else:
@@ -792,8 +821,9 @@ def riferimento_credito(macro):
     ds = m.get("debito_sec") or {}
     pz = ["SALUTE DEL CREDITO (richiesta del CEO del 18/10/2026: anticipare con il credito gli impatti sulle azioni) — "
           "INFORMAZIONE, non una prova della tenuta (il CDS del mese lo e' gia': v498) ne' una vendita",
-          f"CDS: rincaro IMPROVVISO = in 5 giorni raccolti lo spread del nome cresce oltre il {_n(SOGLIA_RAPIDA, 0)}% PIU' "
-          f"dell'indice CDX della stessa cedola; ALLARGAMENTO = in 21 giorni oltre il {_n(SOGLIA_MESE, 0)}% (la soglia della "
+          f"CDS: rincaro IMPROVVISO = in 5 giorni raccolti lo spread del nome cresce oltre {art('il', _n(SOGLIA_RAPIDA, 0) + '%')} "
+          f"PIU' dell'indice CDX della stessa cedola; ALLARGAMENTO = in 21 giorni oltre {art('il', _n(SOGLIA_MESE, 0) + '%')} "
+          "(la soglia della "
           "prova di tenuta); DIVERGENZA = un rincaro o un allargamento mentre il titolo, negli STESSI giorni, non fa peggio "
           "di QQQ — il credito prezza un rischio che l'azione non sconta ancora (convenzioni del 18/10, LIBRO.md §1novies)"
           + (f" · storico raccolto: {st} {'giorno' if st == 1 else 'giorni'}" if st is not None else ""),

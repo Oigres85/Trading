@@ -195,6 +195,11 @@ const suVeriAlle = (code, iso = "2026-09-10T12:00:00Z") => suVeriEsito(`
   try { ${code} } finally { Date = _DV; }`);
 /* il 06/10/2026, il giorno in cui la base EFFR mensile conteneva gia' il rialzo del 16/09 */
 const suVeriOttobre = (code) => suVeriAlle(code, "2026-10-06T12:00:00Z");
+/* v510 — un sabato sera (mercati chiusi) e un martedi' a seduta aperta. Due helper invece di un secondo argomento
+   dopo il template: «template, "data")» si legge come un template spezzato, e il meta-gate dei backtick lo rifiuta
+   (v462, la stessa ragione di suVeriOttobre). */
+const suVeriSabato = (code) => suVeriAlle(code, "2026-10-24T18:00:00Z");
+const suVeriInSeduta = (code) => suVeriAlle(code, "2026-10-27T15:00:00Z");
 const suReale = suVeri;          // nome storico, stessa funzione
 
 /* ---------- checks ---------- */
@@ -397,8 +402,10 @@ check("v263 Fear & Greed: il payload non elenca i componenti (hanno una scheda c
      vm sono gia' costati due check in questa sessione. Si cerca la riga del QUADRO MACRO per
      una sottostringa che solo lei ha, e si guarda se elenca i componenti. */
   const NL = String.fromCharCode(10);
-  const riga = buildPrompt().split(NL)
-    .find(l => l.indexOf("- Fear & Greed: ") === 0 && l.indexOf("settimana fa") > 0);
+  /* ⚠ v510 — la sonda pretendeva anche «settimana fa»: dalla v510 un confronto che la fonte non porta non si stampa
+     (v205), e senza quel confronto il check non avrebbe trovato la riga per una ragione che non c'entra coi
+     componenti. Che la riga sia una sola lo verifica v276. */
+  const riga = buildPrompt().split(NL).find(l => l.indexOf("- Fear & Greed: ") === 0);
   return !!riga && riga.indexOf("componenti") < 0`));
 
 
@@ -1713,9 +1720,13 @@ check("v276 pacchetto: i livelli sono arrotondati alla fonte, non solo a schermo
 /* ⚠ "Fear & Greed" compariva due volte con lo stesso numero, in due blocchi. Sono
    complementari, ma la testata impone di CONTARE I SEGNALI UNA VOLTA SOLA e due righe uguali
    sono precisamente cio' che porta a contarne due. Il payload lo dichiara gia' per CPI/PCE. */
-check("v276 pacchetto: il Fear & Greed doppio e' dichiarato come una misura sola", suVeri(`
+check("v276 pacchetto: il Fear & Greed esce in una riga sola, senza rimandi a una dispersione che il pacchetto non porta", suVeri(`
   const p = buildPrompt();
-  return /UNA misura guardata da due lati, non due segnali/.test(p)`));
+  /* ⚠ v510 — il check pretendeva la frase «UNA misura guardata da due lati»: dalla v337 la dispersione dei componenti
+     non e' piu' nel pacchetto, e la frase rimandava a una cosa assente (classe C10). L'invariante della v276 — contare
+     Fear & Greed una volta sola — resta, ed e' piu' stretto: una riga di dati sola. */
+  const righe = p.split(String.fromCharCode(10)).filter(r => r.indexOf("- Fear & Greed:") === 0);
+  return righe.length === 1 && p.indexOf("dispersione interna") < 0`));
 
 /* ══ v280 — MATERIE PRIME E SEMICONDUTTORI COL LORO STORICO ══════════════════════════════
    Quattro richieste del CEO, una per messaggio. NON e' un ritorno indietro rispetto a v272:
@@ -2521,30 +2532,23 @@ check("v309 grafico: il clic sul bottone non apre anche il pannello", (() => {
    cosa gia' presente in altra forma (rotazione = i 21 ETF, tassi10 = la curva) troverebbero
    comunque un riscontro; quelle senza blocco proprio in `macro` non hanno niente da confrontare. */
 check("v310 nessuna tessera e' cieca al pacchetto: cio' che si disegna arriva all'LLM", suVeri(`
-  const m = DATA.macro || {};
+  /* ⚠ v510 — il check confrontava gli scalari GREZZI del blocco dati di ogni tessera col pacchetto, e la tessera dei
+     Fed Funds passava PER CASO: lo scalare «2026-09-01» del blocco compariva nella riga delle statistiche ufficiali
+     come data d'inizio del CPI. Quella tessera dalla v478 disegna l'EFFR del giorno, che sta in un altro blocco, e il
+     pacchetto scrive i numeri con la virgola: lo scalare grezzo non misurava cio' che si disegna. Ora si confrontano
+     i NUMERI CHE LA TESSERA MOSTRA (il suo sottotitolo), senza gli anni, e almeno dieci tessere devono essere
+     giudicabili, perche' un check che non giudica niente e' verde per assenza (v196). */
   const p = buildPrompt();
-  const scalari = (o, prof) => {
-    if (o == null || prof > 2) return [];
-    if (typeof o === "number") return [String(o)];
-    if (typeof o === "string") return (o.length > 2 && o.length < 40) ? [o] : [];
-    if (Array.isArray(o)) return [];
-    if (typeof o === "object") {
-      return Object.entries(o)
-        .filter(([k]) => !/histor|spark|serie|storico|components|items|voci|mesi|scadenze/i.test(k))
-        .flatMap(([, v]) => scalari(v, prof + 1)).slice(0, 8);
-    }
-    return [];
-  };
-  const cieche = [];
+  const cieche = []; let giudicate = 0;
   for (const r of indicatoriClassifica()) {
-    const chiave = String(r.k).replace(/^(in:|mk:|mat:|fg:)/, "");
-    const blocco = m[chiave];
-    if (!blocco || typeof blocco !== "object") continue;      // niente blocco: non giudicabile
-    const vals = scalari(blocco, 0).filter(x => x && String(x).length > 1);
-    if (!vals.length) continue;                               // nessuno scalare: non giudicabile
-    if (!vals.some(v => p.indexOf(String(v)) >= 0)) cieche.push(r.k);
+    const nums = (String(r.sub || "").match(/[-+]?[0-9]+(?:[.,][0-9]+)?/g) || [])
+      .map(x => x.replace(/^[+]/, ""))
+      .filter(x => x.replace(/[^0-9]/g, "").length > 1 && !/^(19|20)[0-9][0-9]$/.test(x));
+    if (!nums.length) continue;
+    giudicate++;
+    if (!nums.some(x => p.indexOf(x) >= 0)) cieche.push(r.k);
   }
-  return cieche.length === 0`));
+  return giudicate >= 10 && cieche.length === 0`));
 
 /* ══ v310 — I REPERTI DEL TERZO GIRO DEL LOOP ═══════════════════════════════════════════ */
 
@@ -3814,8 +3818,12 @@ check("v257 analisi titolo: chiede le consegne che il CEO ha elencato", suVeri(`
 
 check("v257 analisi titolo: dichiara data del dato macro e prossimo aggiornamento", suVeri(`
   const t = buildPromptTicker("NVDA");
-  return /Snapshot del /.test(t) && /prossimo aggiornamento atteso/.test(t)
-      && /prossimo run del sistema/.test(t)`));
+  /* ⚠ v510 — il check pretendeva «prossimo aggiornamento atteso» e «prossimo run del sistema», cioe' l'orario
+     PROIETTATO dal calendario del cron di GitHub, che e' una coda e non un orario (v437). L'invariante resta — la data
+     dello snapshot e il prossimo aggiornamento sono dichiarati — e il prossimo aggiornamento si dichiara non
+     disponibile, come vuole l'istruzione permanente del CEO (v396). */
+  return /Snapshot del /.test(t) && t.indexOf("prossimo aggiornamento: " + ORARIO_RUN_ND) >= 0
+      && t.indexOf("l'orario del prossimo run non") >= 0 && !/atteso (il|alle) [0-9]/.test(t)`));
 
 check("v257 analisi titolo: porta dentro di se' il quadro macro", suVeri(`
   const t = buildPromptTicker("NVDA");
@@ -4585,10 +4593,11 @@ check("v396 cadenza: periodo, acquisizione e prossimo aggiornamento sono TRE cam
   return righe.every(l =>
        /riferito (a|al) /.test(l)
     && /acquisito (il \\d{2}\\/\\d{2}\\/\\d{4}|dato non disponibile)/.test(l)
-    && /ultima uscita (\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)|dato non disponibile)/.test(l)
+    /* v510 — l'eta' 0 e 1 si scrive «oggi» e «ieri» (giorniFa): tre forme della stessa grandezza, tutte accettate */
+    && /ultima uscita (\\d{2}\\/\\d{2}\\/\\d{4} \\((\\d+ giorni fa|oggi|ieri)\\)|dato non disponibile)/.test(l)
     && /prossimo aggiornamento (\\d{2}\\/\\d{2}\\/\\d{4}|dato non disponibile)/.test(l)
     /* nessuna riga puo' portare un'eta' senza la data a cui si riferisce */
-    && !/\\(\\d+ giorni fa\\)/.test(l.replace(/ultima uscita \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/g, "")));`));
+    && !/\\((\\d+ giorni fa|oggi|ieri)\\)/.test(l.replace(/ultima uscita \\d{2}\\/\\d{2}\\/\\d{4} \\((\\d+ giorni fa|oggi|ieri)\\)/g, "")));`));
 
 
 check("v350 pre/after: un prezzo di ieri non si chiama 'adesso'", (() => {
@@ -5162,7 +5171,7 @@ check("meta: nessun backtick dentro un template passato al vm", (() => {
   /* si isola ogni template passato a un helper del vm e si guarda se, PRIMA della chiusura,
      compare un backtick non escapato: se c'e', il template finisce li' e il resto del check
      diventa sintassi arbitraria — che e' come si e' rotta la suite tre volte oggi. */
-  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`/g;
+  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|suVeriSabato|suVeriInSeduta|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`/g;
   const guasti = [];
   for (const m of mio.matchAll(APERTURE)) {
     const da = m.index + m[0].length;
@@ -5195,7 +5204,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
      essi i backslash non raddoppiati davanti alle classi che contano. */
   const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|suVeriSabato|suVeriInSeduta|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
     /* ⚠⚠ v422 — LA CLASSE SI ALLARGA A n/r/t/0, e la ragione e' peggiore delle altre: dentro un
@@ -5215,7 +5224,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      un template. Non esiste nessuna ragione legittima di scriverla: il template l'ha gia'
      mangiata prima che il vm la veda, quindi la si cerca in TUTTI i template passati al vm, non
      solo in quelli che contengono una regex. Costata un giro di debug in v406. */
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|suVeriAlle|suVeriOttobre|suVeriSabato|suVeriInSeduta|conDiario|conComb|conCombEsito|_LEVA|_LEVA493|_LEVA496)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     for (const b of t.matchAll(/(?<!\\)\\["']/g)) {
       sospetti.push("virgoletta sfuggita: " + t.slice(Math.max(0, b.index - 34), b.index + 12).replace(/\n/g, "⏎"));
@@ -6681,7 +6690,9 @@ check("v392 l'eta' in giorni resta attaccata alla PUBBLICAZIONE, che e' cio' che
      piu' una stima col "~"), il fatto no: l'eta' in giorni sta attaccata alla data di uscita e
      non al periodo misurato. Ancorarsi al testo esatto sarebbe la classe gia' pagata quindici
      volte; ci si ancora alla vicinanza fra `c.pubblicato` e `c.eta` nella stessa espressione. */
-  return /ultima uscita \$\{c\.pubblicato[\s\S]{0,120}c\.eta\} giorni fa/.test(senzaCommenti)
+  /* ⚠ v510 — l'eta' passa da giorniFa (0 e 1 si scrivono «oggi» e «ieri»): la vicinanza da verificare e' quella fra
+     la data di uscita e la sua eta', non la parola «giorni» */
+  return /ultima uscita \$\{c\.pubblicato[\s\S]{0,120}giorniFa\(c\.eta\)/.test(senzaCommenti)
       && !/NON dalla pubblicazione/.test(senzaCommenti);
 })());
 
@@ -7332,11 +7343,17 @@ check("v405 il verso dell'ampiezza lo da' il cap-pesato, in tutti e tre gli stat
     if (!r) { guai.push("con SPY " + spy + " la riga non viene emessa"); continue; }
     if (r.indexOf("mese in " + atteso) < 0) guai.push("con SPY " + spy + " il verso non e' 'mese in " + atteso + "'");
     if (r.indexOf("mese in " + vietato) >= 0) guai.push("con SPY " + spy + " la riga descrive anche un mese in " + vietato);
-    if (r.indexOf("partecipazione uniforme") < 0) guai.push("con SPY " + spy + " sparisce la lettura dell'ampiezza");
+    /* ⚠ v510 — la prima stesura pretendeva «partecipazione uniforme» anche col caso a SEGNI OPPOSTI, cioe' pinnava il
+       difetto: con l'indice in calo e l'azione media in salita la partecipazione non e' uniforme, e la riga lo
+       affermava (il 24/10/2026, SPY -0,94% e RSP +2,99%). I casi concordi restano uniformi, l'opposto si dice. */
+    const opposti = (spy > 0) !== (rsp > 0);
+    if (!opposti && r.indexOf("partecipazione uniforme") < 0) guai.push("con SPY " + spy + " sparisce la lettura dell'ampiezza");
+    if (opposti && (r.indexOf("MENTRE l'azione media") < 0 || r.indexOf("uniforme") >= 0))
+      guai.push("con SPY " + spy + " e RSP " + rsp + " i segni opposti non si dicono");
   }
-  /* e la divergenza ampia resta "trainata dalle megacap", che e' l'altra meta' della lettura */
+  /* e la divergenza ampia dice chi tira, che e' l'altra meta' della lettura */
   DATA.macro.breadth = { spy_1m_pct: 3.4, rsp_1m_pct: 0.2, divergence_pp: 3.2, alert: false };
-  if (riga().indexOf("trainata dalle megacap") < 0) guai.push("con spread 3,2pp l'ampiezza non e' dichiarata trainata dalle megacap");
+  if (riga().indexOf("l'indice piu' dell'azione media") < 0) guai.push("con spread 3,2pp non si dice che l'indice fa meglio dell'azione media");
   return guai.length ? guai.join(" · ") : true;`));
 
 /* ⚠ "rilassato" e' corretto contro la banda e falso contro la distribuzione: al 3° percentile
@@ -10568,6 +10585,200 @@ check("v509 ricevuta: la pagina non legge piu' il dot plot scritto a mano, e pop
     if ((codice.match(/proiezioniFomc\(m\.proiezioni_fomc\)/g) || []).length < 2) return no("popup e perimetro non passano da proiezioniFomc");
     return /lines\.push\(rigaProiezioniFomc\(m\.proiezioni_fomc\)\)/.test(codice) || no("il pacchetto non stampa la riga delle proiezioni");
   })());
+
+/* ══ v510 — I DIFETTI TROVATI LEGGENDO L'ANALISI DEL 24/10/2026 COME IL DESTINATARIO ══════════════════════════════
+   Ogni gate costruisce lo stato che misura (v425, v429): i dati del giorno possono non contenerlo domani. */
+
+check("v510 ampiezza: una lettura sola per pacchetto e scheda, dai DUE segni — nei nove stati", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  DATA.macro = DATA.macro || {};
+  const riga = () => (buildPrompt().split(NL).find(r => r.indexOf("- Ampiezza di mercato") === 0) || "");
+  const casi = [
+    [-0.94, 2.99, "l'indice scende MENTRE l'azione media sale"],
+    [2.6, -0.8, "l'indice sale MENTRE l'azione media scende"],
+    [2.1, 1.9, "salgono insieme"],
+    [3.4, 0.2, "l'indice piu' dell'azione media: lo tirano"],
+    [0.4, 2.0, "l'azione media piu' dell'indice: partecipazione larga"],
+    [-0.8, -0.74, "scendono insieme"],
+    [-0.5, -3.0, "l'azione media piu' dell'indice: i grandi tengono"],
+    [-3.0, -0.5, "l'indice piu' dell'azione media: a cedere"],
+    [0, 0, "fermi"],
+  ];
+  const guai = [];
+  for (const [spy, rsp, atteso] of casi) {
+    DATA.macro.breadth = { spy_1m_pct: spy, rsp_1m_pct: rsp, divergence_pp: spy - rsp, alert: false };
+    const r = riga(), la = letturaAmpiezza(spy, rsp), card = FORMA_INDICATORE.breadth(DATA.macro);
+    if (!la || la.testo.indexOf(atteso) < 0) { guai.push("SPY " + spy + " / RSP " + rsp + ": " + (la && la.testo)); continue; }
+    if (r.indexOf(la.testo) < 0) guai.push("SPY " + spy + ": il pacchetto non porta la lettura condivisa");
+    if (!card || card.n.indexOf(la.testo.slice(1)) < 0) guai.push("SPY " + spy + ": la scheda non porta la lettura condivisa");
+    if ((spy > 0) !== (rsp > 0) && (r.indexOf("uniforme") >= 0 || r.indexOf("entrambi in calo") >= 0))
+      guai.push("SPY " + spy + ": segni opposti letti come uniformi");
+  }
+  const zone = ZONE_AMPIEZZA.map(z => z.nome).join(" | ");
+  if (zone.indexOf("rialzo") >= 0 || zone.indexOf("rally") >= 0) guai.push("i nomi delle zone affermano un rialzo: " + zone);
+  return guai.length ? guai.join(" · ") : true;`));
+
+check("v510 il P/E prospettico non porta la media storica scritta a mano, nemmeno da uno snapshot che la contiene", suVeriEsito(`
+  DATA.macro = DATA.macro || {};
+  DATA.macro.forward_pe = { value: 19.1, avg_hist: 16.5, label: "Elevato", source: "WSJ (estimate)", kind: "forward",
+                            fetched_at: "2026-10-24" };
+  const riga = buildPrompt().split(String.fromCharCode(10)).find(r => r.indexOf("- Forward P/E S&P 500") === 0) || "";
+  if (!riga) return "la riga del P/E prospettico non esce";
+  if (riga.indexOf("16,5") >= 0 || riga.indexOf("16.5") >= 0) return "la costante torna nel pacchetto: " + riga.slice(0, 260);
+  if (riga.indexOf("19,1×") < 0) return "il valore non esce con la virgola";
+  if (riga.indexOf("non e' in questi dati") < 0) return "l'assenza della media della stessa fonte non si dichiara";
+  /* la tessera del prospettico si FONDE in quella del trailing quando c'e' (FUSIONI): si cerca il testo prodotto */
+  const tile = indicatoriClassifica().find(r => String(r.sub).indexOf("sugli utili attesi a 12 mesi") >= 0);
+  if (!tile) return "la tessera del P/E prospettico non esce";
+  if (String(tile.sub).indexOf("16,5") >= 0 || String(tile.sub).indexOf("16.5") >= 0) return "la tessera: " + tile.sub;
+  if (String(tile.sub).indexOf("19,1×") < 0) return "la tessera non porta il valore: " + tile.sub;
+  const pop = systemicRiskHtml({ pct_of_peak: 95, value: 1200000, date: "2026-09-30" });
+  if (pop.indexOf("16.5") >= 0 || pop.indexOf("16,5") >= 0 || pop.indexOf("non e' nei dati") < 0) return "il popup del rischio sistemico";
+  return true;`));
+
+check("v510 il Sortino sta sopra o sotto lo Sharpe secondo il SEGNO del rendimento, e il tasso privo di rischio e' un parametro", suVeriEsito(`
+  DATA.totals = DATA.totals || {};
+  const riga = () => buildPrompt().split(String.fromCharCode(10)).find(r => r.indexOf("- EFFICIENZA DEL LIBRO") === 0) || "";
+  DATA.totals.portfolio_sharpe_ratio = -0.17; DATA.totals.portfolio_sortino_ratio = -0.25; DATA.totals.risk_free_rate = 0.0363;
+  const neg = riga();
+  DATA.totals.portfolio_sharpe_ratio = 1.2; DATA.totals.portfolio_sortino_ratio = 1.9;
+  const pos = riga();
+  if (!neg || !pos) return "la riga non esce";
+  if ((neg + pos).indexOf("per costruzione") >= 0) return "torna «per costruzione»";
+  if (neg.indexOf("(qui sta sotto)") < 0) return "con rendimento negativo non dice che sta sotto: " + neg.slice(0, 300);
+  if (pos.indexOf("(qui sta sopra)") < 0) return "con rendimento positivo non dice che sta sopra";
+  return neg.indexOf("parametro FISSO del calcolo") >= 0 || "il tasso privo di rischio si legge come quello di oggi";`));
+
+check("v510 il P/E del Nasdaq-100 dice se e' trailing o prospettico, e niente soglie senza fonte", suVeriEsito(`
+  DATA.macro = DATA.macro || {};
+  DATA.macro.sp500_pe = Object.assign({}, DATA.macro.sp500_pe || {}, { current: 26.1, label: "Sopravvalutazione",
+                                      source: "multpl", history: [] });
+  const riga = () => buildPrompt().split(String.fromCharCode(10)).find(r => r.indexOf("- P/E Ratio S&P 500") === 0) || "";
+  Object.assign(DATA.macro.sp500_pe, { nasdaq_pe: 33.4, nasdaq_pe_kind: "forward", nasdaq_pe_source: "Yahoo, su QQQ" });
+  const fw = riga();
+  DATA.macro.sp500_pe.nasdaq_pe_kind = "trailing";
+  const tr = riga();
+  delete DATA.macro.sp500_pe.nasdaq_pe_kind; delete DATA.macro.sp500_pe.nasdaq_pe_source;
+  const nd = riga();
+  if (fw.indexOf("33,4× (PROSPETTICO, fonte Yahoo, su QQQ: non confrontabile") < 0) return "prospettico: " + fw.slice(-220);
+  if (tr.indexOf("33,4× (TRAILING, fonte Yahoo, su QQQ)") < 0) return "trailing: " + tr.slice(-200);
+  if (nd.indexOf("non lo dichiara") < 0) return "senza tipo non lo dichiara: " + nd.slice(-200);
+  if ((fw + tr + nd).indexOf("valutazioni tese") >= 0 || (fw + tr + nd).indexOf("a premio") >= 0) return "tornano le soglie senza fonte";
+  return fw.indexOf("26,1×") >= 0 || "il trailing dell'S&P non esce con la virgola";`));
+
+check("v510 il pacchetto non afferma cause senza fonte: niente regola dei 12-18 mesi, niente «fiat debasement», gap con la virgola", suVeriEsito(`
+  DATA.macro = DATA.macro || {};
+  DATA.macro.corp_profit = Object.assign({ sp500: [{ d: "2023-04-01", v: 100 }, { d: "2026-04-01", v: 115.5 }],
+                                           profits: [{ d: "2023-04-01", v: 100 }, { d: "2026-04-01", v: 100 }] },
+                                         DATA.macro.corp_profit || {}, { gap: 15.5, ndx_gap: 38.3, label: "Tensione moderata" });
+  const p = buildPrompt();
+  if (p.indexOf("comprime i multipli P/E in 12-18 mesi") >= 0) return "torna la regola dei 12-18 mesi";
+  if (p.indexOf("fiat debasement") >= 0) return "torna il fiat debasement";
+  const r = p.split(String.fromCharCode(10)).find(x => x.indexOf("- S&P 500 & Nasdaq 100 vs Profitti") === 0) || "";
+  if (!r) return "la riga dei profitti reali non esce";
+  if (r.indexOf("15.5") >= 0 || r.indexOf("38.3") >= 0) return "il gap esce col punto inglese: " + r.slice(0, 200);
+  return r.indexOf("una convenzione e non una misura") >= 0 || "la soglia dei 40 pp non si dichiara convenzione";`));
+
+check("v510 nel weekend la riga della fase conta i titoli dopo la campana come il blocco dei titoli macro, e senza raccolta lo dice",
+  suVeriSabato(`
+  const NL = String.fromCharCode(10);
+  DATA.macro = DATA.macro || {};
+  const fase = () => buildPrompt().split(NL).find(r => r.indexOf("CONTESTO DI SESSIONE") === 0) || "";
+  const voce = (iso) => ({ titolo: "Titolo di prova abbastanza lungo " + iso, riassunto: "", fonte: "Prova", quando: iso });
+  DATA.macro.news = { fonti: ["Prova"], voci: [voce("2026-10-24T10:00:00Z"), voce("2026-10-24T08:00:00Z"), voce("2026-10-23T15:00:00Z")] };
+  const due = fase();
+  DATA.macro.news = { fonti: ["Prova"], voci: [voce("2026-10-24T10:00:00Z")] };
+  const una = fase();
+  DATA.macro.news = { fonti: ["Prova"], voci: [voce("2026-10-23T15:00:00Z")] };
+  const zero = fase();
+  delete DATA.macro.news;
+  const senza = fase();
+  if (due.indexOf("WEEKEND") < 0) return "l'orologio fermo non e' nel weekend: " + due.slice(0, 160);
+  if (due.indexOf("sono i 2 titoli macro pubblicati dopo la campana") < 0) return "due: " + due.slice(-320);
+  if (una.indexOf("e' il titolo macro pubblicato dopo la campana") < 0) return "una: " + una.slice(-320);
+  if (zero.indexOf("Nessun titolo macro pubblicato dopo la campana") < 0) return "zero: " + zero.slice(-320);
+  return senza.indexOf("non sa dirlo") >= 0 || "senza raccolta: " + senza.slice(-320);`));
+
+check("v510 lo snapshot vecchio si dice «disallineato dal mercato live» solo quando un mercato vivo c'e'",
+  suVeriSabato(`
+    DATA.updated_at = new Date(Date.now() - 5 * 3600000).toISOString();
+    const r = buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("DATI AL ") === 0) || "";
+    return (r.indexOf("non c'e' un prezzo vivo") >= 0 && r.indexOf("disallineati") < 0) || "sabato: " + r;`)
+  && suVeriInSeduta(`
+    DATA.updated_at = new Date(Date.now() - 5 * 3600000).toISOString();
+    const r = buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("DATI AL ") === 0) || "";
+    return r.indexOf("disallineati dal mercato live") >= 0 || "martedi' in seduta: " + r;`));
+
+check("v510 il prossimo run non ha un orario: nessuna proiezione dal cron, e la funzione che la calcolava non esiste piu'", (() => {
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if (/prossimoRunPipeline|RUN_FISSI_UTC|RUN_ORARIO_UTC/.test(codice)) return no("torna la proiezione dal calendario del cron");
+  return suVeriEsito(`
+    const t = buildCIOText() + buildPromptTicker("NVDA");
+    if (/prossimo run (atteso )?(alle|il) [0-9]/.test(t)) return "un orario proiettato del prossimo run";
+    if (/aggiornamento atteso [0-9]/.test(t)) return "un prossimo aggiornamento proiettato";
+    return t.indexOf("prossimo run: " + ORARIO_RUN_ND) >= 0 || "manca la dichiarazione del prossimo run";`);
+})());
+
+check("v510 freschezza: le statistiche ufficiali col loro periodo, mai con la data d'inizio (v392); «oggi» e «ieri» invece di «0/1 giorni fa»",
+  suVeriEsito(`
+    const r = buildCIOText().split(String.fromCharCode(10)).find(x => x.indexOf("· STATISTICHE UFFICIALI") === 0) || "";
+    if (!r) return "la riga delle statistiche ufficiali non esce";
+    if (/[(]20[0-9][0-9]-[0-9][0-9]-[0-9][0-9][)]/.test(r)) return "una data ISO d'inizio periodo: " + r.slice(0, 300);
+    if (giorniFa(0) !== "oggi" || giorniFa(1) !== "ieri" || giorniFa(5) !== "5 giorni fa" || giorniFa(null) !== "n.d.") return "giorniFa";
+    if (periodoRiferito("mensile", "2026-09-01") !== "settembre 2026") return "mensile: " + periodoRiferito("mensile", "2026-09-01");
+    if (periodoRiferito("trimestrale", "2026-04-01").indexOf("2° trimestre 2026") !== 0) return "trimestrale";
+    return periodoRiferito("giornaliero", "2026-10-22") === "22/10/2026" || "giornaliero";`));
+
+check("v510 UMich: preliminare o definitiva la dichiara la fonte, e senza dichiarazione non si afferma", suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const ind = ((DATA.macro || {}).indicators || []).find(i => i.key === "umich");
+  if (!ind) return "il data.json non ha UMich: il check non misura niente";
+  ind.fonte = "primaria";
+  const riga = () => buildPrompt().split(NL).find(r => r.indexOf("Fiducia consumatori") >= 0 && r.indexOf("sca.isr.umich.edu") >= 0) || "";
+  ind.lettura = "definitiva"; const d = riga();
+  ind.lettura = "preliminare"; const p = riga();
+  delete ind.lettura; const n = riga();
+  if ((d + p + n).indexOf("questo è il dato definitivo") >= 0) return "torna l'affermazione fissa";
+  if (d.indexOf("lettura DEFINITIVA") < 0) return "definitiva: " + d.slice(0, 260);
+  if (p.indexOf("lettura PRELIMINARE") < 0) return "preliminare: " + p.slice(0, 260);
+  return n.indexOf("questo snapshot non lo dichiara") >= 0 || "senza dichiarazione: " + n.slice(0, 300);`));
+
+check("v510 pacchetto: oneri ed EBIT su periodi diversi non si dividono, e la riga del credito lo dice", suVeriEsito(`
+  const tk = "CRWV";
+  const r = (DATA.watchlist || []).find(x => x.ticker === tk) || (DATA.portfolio || []).find(x => x.ticker === tk);
+  if (!r) return "CRWV non e' nei dati: il check non misura niente";
+  r.credito = { oneri_ttm: 1.5e9, ebit_ttm: -1e8, trimestri: 3, conto_al: "2026-06-30", oneri_al: "2026-03-31" };
+  const c = buildPromptTicker(tk).split(String.fromCharCode(10)).find(x => x.indexOf("- CREDITO [") === 0) || "";
+  if (!c) return "la riga del credito non esce";
+  return (c.indexOf("NON CALCOLABILE") >= 0 && c.indexOf("fino al 2026-03-31") >= 0
+          && c.indexOf("COPERTURA DEGLI INTERESSI NEGATIVA") < 0) || c.slice(0, 400);`));
+
+check("v510 Fear & Greed: la data della rilevazione, i soli confronti che la fonte porta (mai «null» ne' uno zero), l'anno quando c'e' — in pacchetto, scheda e popup; e la scheda non promette componenti che non sono schede ne' un rendimento mai misurato",
+  suVeriEsito(`
+  const NL = String.fromCharCode(10);
+  const riga = () => buildPrompt().split(NL).find(l => l.indexOf("- Fear & Greed: ") === 0) || "";
+  const apri = () => { let html = ""; const vero = openInfoModal;
+    openInfoModal = (t, b) => { html = b; };
+    try { openMacroInfo("fear_greed"); } finally { openInfoModal = vero; }
+    return html; };
+  DATA.macro = DATA.macro || {};
+  DATA.macro.fear_greed = { score: 21, rating: "extreme fear", asof: "2026-10-23", prev_close: 20, week_ago: null,
+    month_ago: 33, year_ago: 28, components: [], fomo: 30, fomo_label: "Nessuna FOMO",
+    storia: { n: 251, da: "2025-10-24", a: "2026-10-23", rango: 9, minimo: { valore: 4, data: "2026-04-07" },
+              massimo: { valore: 79, data: "2026-07-20" } } };
+  const con = riga(), card = FORMA_INDICATORE.fear_greed(DATA.macro).n, pop = apri();
+  for (const [dove, t] of [["pacchetto", con], ["scheda", card], ["popup", pop]]) {
+    if (t.indexOf("rilevazione CNN del 23/10/2026") < 0) return dove + ": manca la data della rilevazione — " + t.slice(0, 200);
+    if (t.indexOf("null") >= 0 || t.indexOf("settimana fa") >= 0 || t.indexOf("1 sett ") >= 0) return dove + ": un confronto assente stampato — " + t.slice(0, 260);
+    if (t.indexOf("1 mese fa 33") < 0 || t.indexOf("la seduta prima 20") < 0) return dove + ": manca un confronto presente";
+    if (t.indexOf("9° percentile su 251 rilevazioni") < 0) return dove + ": manca l'anno";
+  }
+  if (card.indexOf("propria scheda qui sotto") >= 0) return "la scheda promette componenti che non sono schede (v445)";
+  if (card.indexOf("storicamente") >= 0 || card.indexOf("contrarian") >= 0) return "la scheda afferma un rendimento storico mai misurato";
+  delete DATA.macro.fear_greed.asof; delete DATA.macro.fear_greed.storia;
+  const senza = riga();
+  if (senza.indexOf("la data della rilevazione non e' in questo snapshot") < 0) return "senza data: " + senza;
+  return senza.indexOf("nel suo anno") < 0 || "senza storia stampa l'anno";`));
 
 let fail = 0;
 for (const [name, ok] of T) {

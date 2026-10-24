@@ -8363,3 +8363,130 @@ che la fonte non usa: CRWV, RGTI, OKLO e CBRS uscivano «consenso ($1.45)», che
 - Pavimenti: `test_app.mjs` 615 → 620 (633 punti di chiamata), `test_update_data.py` 330 → 340 (354) e
   N_CHECKS_MINIMO 345 → 360 (367 eseguiti), `test_analisi_libro.py` 805 → 810 (821).
 - `?v=` e `BUILD_VERSION` a 509: cambia `assets/app.js`.
+
+
+## 🔎 v510 — RILETTA COME IL DESTINATARIO, L'ANALISI DEL 24/10 AVEVA UNA TRENTINA DI DIFETTI CHE NESSUN GATE VEDEVA
+
+Il CEO, 24/10/2026, testuale: *"Puoi vedere se ci sono altri errori nell'analisi? E correggerli."*, e poi *"Non so se
+tieni anche conto del vix e del fear and greed"*. Metodo dell'esercizio ricorrente: le uscite degli strumenti e i due
+pacchetti della pagina letti per intero, riga per riga, come il modello che li riceve. **Nessuno dei difetti faceva
+fallire un gate**, e quasi tutti hanno una delle tre forme che questo file conosce già.
+
+### 1. Il dato c'era, e l'etichetta affermava di più (v405, v430)
+| dove | cosa diceva | cosa era vero |
+|---|---|---|
+| ampiezza: pacchetto e scheda | *"partecipazione uniforme … con entrambi in calo"* e *"RIALZO CONDIVISO"* | SPY −0,94% e RSP +2,99% a un mese: l'indice scendeva **mentre** l'azione media saliva. Le due letture guardavano lo SCARTO e non i due SEGNI; ora una funzione sola (`letturaAmpiezza`, v161), e i nomi delle zone non affermano più un rialzo |
+| Sortino | *"sta sopra lo Sharpe per costruzione"* | vero solo con un rendimento in eccesso positivo: con Sharpe −0,17 il Sortino −0,25 sta SOTTO. La riga dice quale dei due |
+| UMich | *"questo è il dato definitivo del mese"*, scritto fisso | la pagina della fonte dichiara preliminare o definitiva: si legge quella, solo se è dello stesso mese del valore |
+| il segno | *"-0,0 ATR"*, *"-0,0%"*, undici volte | il segno sul valore già arrotondato (v496), negli strumenti come nella pipeline |
+| la fase del weekend | *"Nessuna notizia nuova dopo la campana"* | cinque titoli macro dopo la chiusura nello stesso pacchetto: era uno ZERO FISSO. Ora conta come il blocco dei titoli (`vociDopoChiusura`, una derivazione sola) |
+| il sabato | *"i prezzi potrebbero essere disallineati dal mercato live"* | a mercati chiusi non c'è un prezzo vivo da cui disallinearsi |
+| VWAP | *"comunicato alle HH di New York"* | è l'ora in cui SEC ha ACCETTATO il deposito, il PIÙ TARDI a cui i conti erano pubblici: SK hynix deposita il 6-K ore dopo Seul |
+| Altman | *"zona di GRIGIA"*, due volte per analisi | un aggettivo |
+| il tasso privo di rischio | *"(tasso privo di rischio 3,6%)"* accanto a Sharpe e Sortino | un parametro FISSO del calcolo, non il rendimento dei titoli di Stato di oggi: ora lo dice, con la stessa frase in pacchetto e popup |
+| i numeri piccoli | *"ne ha restituito lo 0%"*, *"le 1 del feed sono"*, *"altre voci … non mostrate"* su una voce | sotto l'1% in parole, e il singolare quando è una |
+| l'articolo | *"del 0,1%"*, *"il 11%"*, tredici volte | `comuni.art`, scelto sul numero com'è scritto |
+
+### 2. Due periodi diversi dentro una divisione sola (v207)
+- `_somma_trimestri` datava la somma con la PRIMA colonna del DataFrame, che può essere vuota: MU *"conto al 2026-08-31"*
+  su quattro trimestri che finivano il 31/05. È la regola che `_somma_quattro` (v504) applicava già, ora per tutti.
+- `conto_al` veniva dagli oneri: cinque società senza la voce (PLTR, OKLO, AAPL, ASML, NKE) uscivano *"conto al None"*,
+  anche nella base di Altman. Ora viene dall'EBIT; oneri fermi a un trimestre prima portano `oneri_al` e la copertura
+  non si calcola — pacchetto e riga del debito dicono *non calcolabile*, con le due date.
+- MU, oneri 124 → 74 → 32 → 0 milioni: la riga stampava *"-100% in 4 trimestri"* accanto a *"l'ultimo trimestre non
+  riporta oneri (non vuol dire zero)"*. Due affermazioni opposte sullo stesso dato: la variazione non si calcola.
+- le scadenze del debito: `InNextTwelveMonths` (FASB) in un 10-K è il PROSSIMO esercizio, e in un 10-Q il resto
+  dell'esercizio in corso viene PRIMA. Su CRWV la riga metteva per prima la scadenza che viene dopo.
+
+### 3. Numeri scritti a mano e cause senza fonte (v240, v396, v410)
+- la **media storica del P/E prospettico, 16,5**: una costante della pipeline senza fonte né finestra, in pacchetto,
+  tessera e popup del rischio sistemico — e nella tessera il campo letto (`avg`) non era mai esistito, quindi usciva
+  SEMPRE la costante. Tolta; si dichiara che la media della stessa fonte non è nei dati.
+- il **P/E del Nasdaq-100**: *"trailingPE o forwardPE"* senza dire quale, accanto al trailing dell'S&P, con *"tech
+  solitamente a premio; >35× = valutazioni tese"*. Ora viaggia col suo tipo e la sua fonte, senza soglie.
+- *"Asset Inflation da fiat debasement"*, *"con Fed Funds >4% compressione dei multipli entro 12-18 mesi"*, *"gap >40 pp
+  precede correzioni, vedi 2000, 2007, 2021"*: cause e regole senza una misura. Tolte; i 40 pp restano una convenzione
+  dichiarata.
+- **il prossimo run "atteso alle HH:MM"**, proiettato dal calendario del cron, che è una coda (v437) — e lo scheduler
+  esterno non spara dal 15/09 (`memoria/OROLOGIO.md`, misurato sui run). Tolta la funzione; si dichiara non disponibile.
+- **la Bank of Japan**: la riunione di ottobre è il 29-30 e la lista ne scriveva il PRIMO giorno: il pacchetto
+  annunciava la decisione un giorno prima, a sei giorni dalla riunione. Ora il giorno della decisione dalla pagina della
+  banca, col 2027 pubblicato, e una sorveglianza che suona prima che la lista finisca (come il FOMC, v509).
+- il **calendario ufficiale** non copriva la curva 10A-2A né il Treasury a 30 anni (*"il calendario non copre la serie"*
+  su due serie giornaliere): una corrispondenza chiave→serie che leggono sia il calendario sia i due indicatori.
+- le **statistiche ufficiali** con la data d'inizio del periodo (*"Inflazione CPI (2026-09-01)"*, la forma che la v392
+  aveva tolto altrove), e *"0 giorni fa"*, *"1 giorni fa"*.
+- la riga del Fear & Greed rimandava alla dispersione dei componenti, tolta dalla v337 (C10); la scheda prometteva
+  componenti *"ciascuno con la propria scheda"* (falso dalla v445) e scriveva che *"la paura estrema è storicamente un
+  momento di acquisto"*: un rendimento che il sistema non ha mai misurato.
+
+### 4. Quattro fonti lette male
+- **TreasuryDirect ha cambiato i nomi dei campi** (`competitiveAuctionCloseDate`, `…CloseTime`, `inflationProtected`; i
+  vecchi ci sono e sono `null`): il brief diceva *"nessuna asta annunciata"* con 2, 5 e 7 anni — 183 miliardi — fra il
+  26 e il 29/10. I nomi nuovi, i vecchi come ripiego; e un calendario letto con voci senza un giorno riconoscibile è
+  ILLEGGIBILE, non «nessuna asta» (la quarta sorte accanto alle tre della v389).
+- **Nasdaq codifica due volte le virgolette** (`&amp;quot;`): un `html.unescape` solo lasciava `&quot;` nei titoli di
+  brief, notizie e pacchetti. `comuni.testo_feed` decodifica finché ci sono entità.
+- **l'ora dei conti dichiarata dall'emittente** (SK hynix, 9:00 di Seul) usciva *"orario non dichiarato"* accanto alla
+  propria fonte: ora la colonna `Ora` in coda al §1octies, convertita col fuso — il 21/10 sono le 02:00 italiane, il
+  28/10 l'01:00: uno scarto a mano ne sbaglia uno (v470).
+- **il beta del libro su TLT (0,53, R² 0,01)** usciva come un numero mentre le schede, sullo stesso canale, dicevano
+  «non misurabile»: il pavimento del rumore viveva solo nella pipeline. Ora `comuni.r2_rumore` per tutti, e uno stress
+  su un canale che il libro non segue in modo misurabile è NON MISURABILE, non una perdita in dollari (v316, v415).
+
+`scripts/comuni.py` è nato per questo: le tre rese che pipeline e strumenti devono dare uguali (rumore, titolo di un
+feed, articolo davanti a un numero), una copia sola (v161, v387). È dichiarato in `/aggiorna`.
+
+### 5. Il Fear & Greed, che l'analisi in chat non leggeva
+**Il VIX sì**: `indici.py` (VIX, VXN, VIX3M col percentile e la struttura a termine), `posizionamento.py` (put/call del
+VIX, future VIX della CFTC), `LIBRO.md` §1ter (misurato: un termometro dello stress, non un anticipatore). **Il Fear &
+Greed no**: era solo nel pacchetto della pagina, e la pipeline lo salvava male — senza la data della rilevazione, che
+la CNN pubblica e il blocco buttava, e con `round(fg.get(..., 0))`, cioè *"paura estrema"* inventata dove la fonte non
+dava un confronto (v205).
+- la pipeline pubblica `asof` (nel fuso di New York: la seduta che descrive), i confronti assenti come buchi, e
+  l'**anno** (`storia_fear_greed`: 365 giorni PER DATA, percentile midrank per eccesso sul mezzo, minimo e massimo con
+  l'ultima data toccata; sotto 120 rilevazioni nessun percentile, convenzione dichiarata);
+- nasce sorvegliato (`validate_macro` → `fear_greed`: assente missing, senza data o oltre 5 giorni stale, v390);
+- `indici.py` ha il blocco **SENTIMENT** subito dopo la volatilità, con la sovrapposizione dichiarata: il VIX e il
+  put/call sono due delle sue sette componenti, quindi le riassume e non le conferma (B3). È informazione: non una prova
+  della tenuta, non un colore;
+- la scheda completa (v505) porta il blocco, e il registro di `FORMATO_ANALISI.md` la voce `[fear_greed]`.
+⚠ **La CNN risponde 418 a questo ambiente** (*"I'm a teapot. You're a bot."*): la lettura vive nella pipeline, e i campi
+nuovi si verificano nel run del CI — la trappola v203, dichiarata prima.
+
+### 🦴 Nove gate pinnavano il difetto o una forma, e nessuno è stato zittito
+- **v504** pretendeva che `_somma_trimestri` datasse `"2026-06-30"`, cioè la colonna VUOTA: pinnava il difetto di MU;
+- **v395** pretendeva il calendario dalla sola `STORICO_IND`, cioè quello che diceva «non copre la serie»;
+- il gate dell'ampiezza pretendeva *«partecipazione uniforme»* anche coi segni opposti;
+- **v276** pretendeva la frase sulla dispersione dei componenti, il rimando a una cosa assente;
+- il gate dello snapshot pretendeva *«prossimo aggiornamento atteso»*, cioè l'orario proiettato dal cron;
+- il gate delle tessere confrontava gli scalari grezzi, e la tessera dei Fed Funds passava **per caso**: il suo
+  «2026-09-01» compariva nel pacchetto come data d'inizio del CPI;
+- **v494** pretendeva il plurale fisso (*"le 1 del feed sono"*); **v489**, **v500** e **v501** la forma del dizionario
+  e delle frasi di prima; il gate del Fear & Greed la parola *«settimana fa»*, cioè il confronto stampato anche assente.
+Ciascuno riagganciato al proprio invariante, più stretto di prima dove si poteva.
+
+### 🧪 Il metodo
+- **Un controllo è nato PRIMA della sua iniezione**: calcolando se la serie del gate conteneva il caso dell'arrotondamento,
+  il percentile veniva 17,26 — 17 in tutti e due i modi. L'iniezione non avrebbe morso perché la fixture non conteneva
+  il fenomeno (v430): aggiunta una serie che dà esattamente 12,5.
+- `giorniFa(null)` restituiva *"oggi"*: `Number(null)` vale 0, e un'età che manca non è un'età nulla (v205). Preso dal gate.
+- Il meta-gate dei backtick ha rifiutato `suVeriAlle(template, "data")` come un template spezzato (v462): da qui
+  `suVeriSabato` e `suVeriInSeduta`, con l'orologio dentro, e i loro nomi nei tre meta-gate.
+- La scheda completa (v505) ha dichiarato ASSENTE la richiesta nuova: la fixture del gate non portava il blocco. È il gate
+  nei due versi che fa il suo lavoro.
+- C9 ha preso *"disallinearsi"*, infinito con clitico: riformulato invece di allentare il detector.
+- **Tre allarmi erano falsi, e verificarli prima ha evitato tre correzioni sbagliate** (v417): il rendimento di QQQ
+  in euro uguale a quello in dollari (il cambio ai due capi era lo stesso, 1,1204), MU −30,1% (dal massimo di 1.255
+  a giugno, non da un errore di base), e UMich di ottobre davvero definitivo quel giorno.
+- **Ottantanove iniezioni, una alla volta su quattro copie del repo verificate per impronta**, con `modifica_sicura` e
+  ripristino dallo snapshot (v427, v430): al momento del commit erano in corso — l'esito sta nel commit successivo, e
+  un'iniezione che non morde si corregge nel gate, non si tace.
+- Pavimenti: `test_app.mjs` 620 → 630 (645 punti di chiamata), `test_update_data.py` 340 → 355 (372) e
+  N_CHECKS_MINIMO 360 → 375 (385 eseguiti), `test_analisi_libro.py` 810 → 830 (844).
+- `?v=` e `BUILD_VERSION` a 510: cambia `assets/app.js`.
+
+### 📋 Annotato e NON corretto
+- una dozzina di descrizioni dei popup della pagina con un *"storicamente…"* senza fonte (P/E > 25, Fed Funds alti,
+  credito, Buffett, istituzionali): nella pagina, non nel pacchetto, e una per una vanno o misurate o tolte;
+- il brief scrive *"+0,00%"* per lo zero, rotazione e schede *"0,0"*: una convenzione diversa, nessuna conclusione cambia.

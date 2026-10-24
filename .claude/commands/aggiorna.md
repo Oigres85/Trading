@@ -234,6 +234,13 @@ sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf
 che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed
 è una sola perché due copie divergerebbero al primo ritocco.
 
+`scripts/comuni.py` non è un passo di questo comando (v510): è la libreria delle tre rese che la pipeline e gli
+strumenti dell'analisi devono dare uguali — il pavimento del rumore di un R² (`r2_rumore`, che la pipeline usa per
+decidere se un canale c'è e le schede per dirlo), il titolo di una voce di feed decodificato come lo legge una persona
+(`testo_feed`) e l'articolo con l'elisione davanti a un numero (`art`). La usano `update_data.py`, `brief.py`,
+`credito.py` e gli strumenti già dichiarati qui. Una sola, perché il 24/10/2026 il pavimento del rumore viveva solo
+nella pipeline, e `numeri_libro.py` pubblicava i beta del libro senza: una seconda copia sarebbe stata la classe v161.
+
 ⚠ Un gate verifica che questo elenco sia COMPLETO: ogni script del repo deve essere o eseguito
 qui, o dichiarato fuori qui, con la sua ragione. Se domani nasce uno strumento nuovo e nessuno
 aggiorna questo file, il gate lo dice — invece di lasciare che il comando resti indietro in

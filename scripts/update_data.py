@@ -49,6 +49,7 @@ import requests
 import yfinance as yf
 
 from rumore_yf import zittisci_yfinance   # fonte UNICA, condivisa col rapporto
+from comuni import r2_rumore, testo_feed  # v510 — una funzione, due consumatori: pipeline e strumenti
 
 # yfinance logga internamente ("$TICKER: possibly delisted", 404 quoteSummary) su indici/ticker
 # flaky: catturiamo già le eccezioni a valle, quindi il muro per titolo non deve inquinare stderr.
@@ -212,6 +213,19 @@ FOMC_DECISIONI = ["2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
                   "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09",
                   "2027-01-27", "2027-03-17", "2027-04-28", "2027-06-09",
                   "2027-07-28", "2027-09-15", "2027-10-27", "2027-12-08"]
+
+# ⚠⚠ v510 — LA BANK OF JAPAN, CON LA STESSA REGOLA: il giorno della DECISIONE, cioe' il secondo di una riunione di
+#   due, dalla pagina della banca (BOJ_CALENDARIO_URL, verificata il 24/10/2026). La riunione di ottobre 2026 e' il
+#   29-30: la lista ne scriveva il primo giorno, il 29, e il pacchetto annunciava la decisione con un giorno
+#   d'anticipo a sei giorni dalla riunione. Il 2027 la banca l'ha pubblicato (gennaio 21-22, marzo 17-18, aprile
+#   27-28, giugno 10-11, luglio 21-22, settembre 21-22, ottobre 28-29, dicembre 16-17): la v396 aveva tolto le date
+#   STIMATE, queste sono dichiarate. Resta una lista scritta a mano: `validate_macro` suona (boj_calendario) quando
+#   restano meno di due riunioni future, come per il FOMC.
+BOJ_CALENDARIO_URL = "https://www.boj.or.jp/en/mopo/mpmsche_minu/index.htm"
+BOJ_DECISIONI = ["2026-01-23", "2026-03-19", "2026-04-28", "2026-06-16",
+                 "2026-07-31", "2026-09-18", "2026-10-30", "2026-12-18",
+                 "2027-01-22", "2027-03-18", "2027-04-28", "2027-06-11",
+                 "2027-07-22", "2027-09-22", "2027-10-29", "2027-12-17"]
 
 
 def movimenti_impliciti_fomc(implied, effr, riunione, mese_contratto, esito=None):
@@ -1161,32 +1175,9 @@ _FINESTRA_BREVE = 60
 _QUOTA_EVENTO = 0.20
 
 
-def r2_rumore(n):
-    """L'R2 che il PURO CASO supera nel 5% dei campioni, a questa numerosita'.
-
-    ⚠⚠ NASCE DA UNA SOGLIA CHE NON REGGEVA IL CAMBIO DI FINESTRA. Il sistema dichiarava
-    "canale presente" sopra R2 0,05 — una CONVENZIONE, non una misura, e nel v240 questo
-    progetto ha gia' pagato che ogni soglia disegnata e' un'AFFERMAZIONE. Con una finestra sola
-    la convenzione era innocua perche' conservativa; con due finestre diventa falsa, e in
-    direzioni opposte:
-      · su 251 osservazioni il caso supera R2 0,015 nel 5% dei campioni → 0,05 e' PRUDENTE
-      · su  60 osservazioni la stessa cifra e' 0,065 → 0,05 accenderebbe canali dal NULLA
-    Cioe' la finestra corta, con la vecchia soglia, avrebbe fabbricato esattamente il segnale
-    che deve rilevare. Qui la soglia si CALCOLA dal campione invece di essere scelta.
-
-    R2 critico = t2 / (t2 + df), con df = n - 2 e t il quantile 97,5% di Student — cioe' il
-    punto in cui una regressione semplice diventa significativa al 5% bilaterale.
-    L'approssimazione di Cornish-Fisher su t e' esatta a ~1e-5 per df >= 30 (verificata contro
-    i valori tabulati: df=58 → 2,00171 contro 2,00172; df=249 → 1,96954 contro 1,96959), e
-    sotto df 30 NON si restituisce niente invece di restituire un numero peggiore del silenzio.
-    """
-    df = int(n) - 2
-    if df < 30:
-        return None
-    z = 1.959964                      # quantile 97,5% della normale
-    t = z + 2.37243 / df + 2.82264 / (df * df)
-    t2 = t * t
-    return t2 / (t2 + df)
+# v510 — r2_rumore vive in scripts/comuni.py (importata in testa): la usano anche gli strumenti d'analisi,
+#   e una seconda copia divergerebbe al primo ritocco (v161, v207). numeri_libro pubblicava il beta del libro
+#   su TLT (0,53, R² 0,01) come un numero, mentre le schede dicevano «non misurabile» sullo stesso canale.
 
 
 def sensibilita_macro(closes, serie_bench):
@@ -1500,17 +1491,23 @@ def credito(t):
         bs = t.quarterly_balance_sheet
     except Exception:
         bs = None
-    oneri, n_on, data_ce = _somma_trimestri(inc, "Interest Expense")
-    ebit, n_eb, _ = _somma_trimestri(inc, "EBIT")
+    oneri, n_on, data_on = _somma_trimestri(inc, "Interest Expense")
+    ebit, n_eb, data_eb = _somma_trimestri(inc, "EBIT")
     if ebit is None:
-        ebit, n_eb, _ = _somma_trimestri(inc, "Operating Income")
+        ebit, n_eb, data_eb = _somma_trimestri(inc, "Operating Income")
     if oneri is None and ebit is None:
         return None
     out["oneri_ttm"] = oneri
     out["ebit_ttm"] = ebit
     out["trimestri"] = min(n_on, n_eb) if (n_on and n_eb) else (n_on or n_eb)
-    out["conto_al"] = data_ce
-    if oneri and oneri > 0 and ebit is not None:
+    # ⚠ v510 — LA DATA DEL CONTO E' QUELLA DELL'EBIT, e non manca quando mancano gli oneri: prima veniva dagli oneri,
+    #   e cinque societa' senza la voce (PLTR, OKLO, AAPL, ASML, NKE) uscivano «conto al None» anche nella base di
+    #   Altman. Gli oneri portano la loro data quando e' un'altra, e allora il rapporto fra i due non si fa: mescolerebbe
+    #   due periodi (v207)
+    out["conto_al"] = data_eb or data_on
+    if data_on and data_on != out["conto_al"]:
+        out["oneri_al"] = data_on
+    if oneri and oneri > 0 and ebit is not None and data_on == data_eb:
         out["copertura"] = round(ebit / oneri, 2)     # <1 = non copre, <0 = non copre nulla
     # il VERSO degli oneri: un costo del debito che accelera e' un fatto diverso dal suo livello
     if inc is not None and getattr(inc, "empty", True) is False and "Interest Expense" in inc.index:
@@ -1518,7 +1515,12 @@ def credito(t):
             s = inc.loc["Interest Expense"].dropna()
             if len(s) >= 4:
                 rec, vec = float(s.iloc[0]), float(s.iloc[3])
-                if vec > 0:
+                # ⚠ v510 — UN ULTIMO TRIMESTRE A ZERO NON E' UN COSTO SPARITO. MU il 24/10/2026: 124 → 74 → 32 → 0
+                #   milioni, e la riga stampava «oneri -100,0% in 4 trimestri» accanto a «costo n.d.: l'ultimo
+                #   trimestre della fonte non riporta oneri finanziari (non vuol dire zero)». Due affermazioni
+                #   opposte sullo stesso dato: la variazione non si calcola, e lo zero lo dichiara la riga del costo, che
+                #   lo legge da oneri_trim (v205) — un solo posto, nessun campo in piu' che nessuno leggerebbe (v390)
+                if rec != 0 and vec > 0:
                     out["oneri_var_4trim_pct"] = round((rec / vec - 1) * 100, 1)
                 out["oneri_trim"] = [round(float(x)) for x in s.iloc[:4]][::-1]
         except Exception:
@@ -1560,7 +1562,11 @@ def _somma_trimestri(df, voce, n=4):
     if len(serie) == 0:
         return None, 0, None
     usati = serie.iloc[:n]
-    return float(usati.sum()), len(usati), str(df.columns[0])[:10]
+    # ⚠ v510 — la data e' quella del trimestre piu' recente DAVVERO sommato, non della prima colonna del DataFrame:
+    #   quella puo' essere vuota (MU il 24/10/2026: colonna al 31/08 tutta vuota, «conto al 2026-08-31» su quattro
+    #   trimestri che finivano il 31/05). E' la regola che _somma_quattro (v504) applicava gia', ora per tutti.
+    d = _data_colonna(usati.index[0])
+    return float(usati.sum()), len(usati), (d.isoformat() if d else None)
 
 
 
@@ -1812,7 +1818,8 @@ def altman_voci(t, cred=None):
         cl, _ = _riga_bilancio(bsq, "Current Liabilities", "Total Current Liabilities")
         re_, _ = _riga_bilancio(bsq, "Retained Earnings")
         return (ta, tl, ca, cl, re_, c["ebit_ttm"], al,
-                f"trimestrale: stato patrimoniale al {al}, EBIT degli ultimi 4 trimestri (conto al {c.get('conto_al')})")
+                f"trimestrale: stato patrimoniale al {al}, EBIT degli ultimi 4 trimestri (conto al "
+                f"{c.get('conto_al') or 'n.d.'})")
     try:
         bs = t.balance_sheet
     except Exception:  # noqa: BLE001
@@ -3307,7 +3314,9 @@ def voci_rss(testo, fonte, filtro_re=None, limite=30):
         dm = re.search(r"<pubDate>(.*?)</pubDate>", pezzo, re.S)
         if not tm or not dm:
             continue                      # senza data non entra: non si puo' pesare
-        titolo = re.sub(r"<[^>]+>", "", html.unescape(tm.group(1))).strip()
+        # v510 — testo_feed decodifica FINCHE' ci sono entita': Nasdaq scrive «&amp;quot;», e un giro solo
+        #   lasciava «&quot;» nei titoli del brief, delle notizie e dei pacchetti
+        titolo = testo_feed(tm.group(1))
         if not titolo or len(titolo) < 12:
             continue
         if filtro_re is not None and not filtro_re.search(titolo):
@@ -3318,7 +3327,7 @@ def voci_rss(testo, fonte, filtro_re=None, limite=30):
             continue
         rias = ""
         if de:
-            rias = re.sub(r"<[^>]+>", "", html.unescape(de.group(1))).strip()[:320]
+            rias = testo_feed(de.group(1))[:320]
             if rias.lower() == titolo.lower():
                 rias = ""          # ripetere il titolo non e' un riassunto
         fuori.append({"titolo": titolo[:180], "riassunto": rias, "fonte": fonte,
@@ -3400,6 +3409,27 @@ def umich_series(n=2):
         raise ValueError("CSV UMich senza righe valide")
     out.sort(key=lambda x: x[0])
     return out[-n:] if n else out
+
+
+UMICH_HOME_URL = "https://www.sca.isr.umich.edu/"
+
+
+def umich_lettura(pagina=None):
+    """⚠ v510 — PRELIMINARE O DEFINITIVA, LO DICE LA FONTE. Il pacchetto scriveva sempre «questo e' il dato
+    definitivo del mese indicato», fisso: vero il 24/10/2026 (il definitivo di ottobre era uscito il 23), falso nelle
+    settimane fra il preliminare di meta' mese e il definitivo di fine mese. La pagina principale della fonte dichiara
+    quale lettura pubblica («Preliminary Results for October 2026», «Final Results for ...»): si legge quella, e
+    senza la dichiarazione non si afferma niente (v396).
+    Ritorna {"lettura": "preliminare"|"definitiva", "mese": "AAAA-MM-01"}, o None se la pagina non lo dichiara."""
+    if pagina is None:
+        pagina = requests.get(UMICH_HOME_URL, headers={"User-Agent": "Mozilla/5.0 (Macintosh) AppleWebKit/537.36"},
+                              timeout=20).text
+    testo = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", pagina or ""))
+    m = re.search(r"(Preliminary|Final) Results for ([A-Z][a-z]+) (\d{4})", testo)
+    if not m or m.group(2) not in UMICH_MONTHS:
+        return None
+    return {"lettura": "definitiva" if m.group(1) == "Final" else "preliminare",
+            "mese": f"{int(m.group(3)):04d}-{UMICH_MONTHS[m.group(2)]:02d}-01"}
 
 
 def _distanza_mesi(a: str, b: str) -> int:
@@ -3518,6 +3548,13 @@ STORICO_IND = [
     ("real10",   "DFII10",                "diretta",     250),
     ("breakeven","T10YIE",                "diretta",     250),
 ]
+# ⚠⚠ v510 — LE DUE SERIE CHE LO STORICO PRENDE ALTROVE NON AVEVANO CALENDARIO. Il calendario ufficiale (v395) leggeva
+#   la sola STORICO_IND, da cui `curve` e `t30` mancano per una ragione giusta (v295: lo storico ce l'hanno gia'), e il
+#   pacchetto dichiarava «il calendario ufficiale non copre la serie» su due serie che FRED pubblica ogni giorno
+#   lavorativo. Qui la corrispondenza chiave→serie: non tocca lo storico, e la leggono ANCHE i due indicatori, cosi'
+#   il calendario descrive per costruzione la serie da cui esce il valore — una corrispondenza sola (v395), non due.
+CALENDARIO_EXTRA = [("curve", "T10Y2Y"), ("t30", "DGS30")]
+SERIE_FUORI_STORICO = dict(CALENDARIO_EXTRA)
 
 
 def _numero_o_none(x):
@@ -3578,6 +3615,66 @@ def composito_macroquant(macro):
     return out
 
 
+# ⚠ v510 — il Fear & Greed col SUO anno. Sotto FG_STORIA_MINIMO rilevazioni un «percentile dell'anno» non e' dell'anno
+#   (convenzione dichiarata, v240): la riga dice che lo storico manca invece di pubblicare un percentile corto.
+FG_STORIA_MINIMO = 120
+
+
+def _data_fg(ts):
+    """La data della rilevazione CNN dal suo `timestamp` (ISO, o millisecondi dall'epoca), nel fuso di New York: e' la
+    seduta che il punteggio descrive. None se la fonte non la dichiara — e allora la riga lo dice (v396)."""
+    if ts in (None, ""):
+        return None
+    try:
+        if isinstance(ts, (int, float)):
+            t = datetime.fromtimestamp(float(ts) / 1000, tz=timezone.utc)
+        else:
+            t = datetime.fromisoformat(str(ts).strip().replace("Z", "+00:00"))
+            if t.tzinfo is None:
+                t = t.replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError, OverflowError, OSError):
+        return None
+    return (t.astimezone(ZoneInfo("America/New_York")) if ZoneInfo is not None else t).date().isoformat()
+
+
+def storia_fear_greed(data, giorni=365):
+    """⚠ v510 — IL FEAR & GREED COL SUO ANNO. La fonte pubblica la serie (`fear_and_greed_historical.data`, punti
+    {x: millisecondi, y: punteggio}) e il pacchetto ne portava tre punti soli. Qui: le rilevazioni dell'ultimo anno
+    PER DATA (v207: l'ultima del giorno vince, un giorno senza punto e' un buco), il percentile midrank di quella di
+    oggi (_rango_midrank, la convenzione di tutto il sistema, v161) arrotondato per eccesso sul mezzo (v496), il minimo
+    e il massimo con l'ultima data in cui sono stati toccati. None se la serie manca o e' corta."""
+    punti = (((data or {}).get("fear_and_greed_historical") or {}).get("data")) or []
+    serie = {}
+    for p in punti:
+        try:
+            g = _data_fg(float(p["x"]))
+            v = float(p["y"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if g and v == v:
+            serie[g] = v
+    if not serie:
+        return None
+    ultimo = max(serie)
+    fine = datetime.fromisoformat(ultimo).date()
+    anno = sorted((g, v) for g, v in serie.items() if (fine - datetime.fromisoformat(g).date()).days < giorni)
+    if len(anno) < FG_STORIA_MINIMO:
+        return None
+    vals = [v for _, v in anno]
+    oggi = anno[-1][1]
+    mn = max((g for g, v in anno if v == min(vals)))
+    mx = max((g for g, v in anno if v == max(vals)))
+    return {"n": len(anno), "da": anno[0][0], "a": ultimo,
+            "rango": int(math.floor(_rango_midrank(oggi, vals) + 0.5)),
+            "minimo": {"valore": round(min(vals)), "data": mn}, "massimo": {"valore": round(max(vals)), "data": mx}}
+
+
+def _fg_intero(x):
+    """Un confronto che la fonte non porta e' un buco, non uno zero (v205)."""
+    v = _numero_o_none(x)
+    return None if v is None else round(v)
+
+
 def fetch_macro():
     macro = {}
 
@@ -3609,15 +3706,25 @@ def fetch_macro():
         except Exception:  # noqa: BLE001
             fomo = round(fg["score"])
         fomo_label = "FOMO elevata" if fomo >= 70 else "FOMO moderata" if fomo >= 50 else "Nessuna FOMO"
+        # ⚠ v510 — LA DATA E I BUCHI. La rilevazione la dichiara la fonte (`timestamp`): il blocco la buttava, e pagina,
+        #   pacchetto e analisi non potevano dire di quando fosse il punteggio (v396). E `round(fg.get(..., 0))` scriveva
+        #   0 — «paura estrema» — dove la fonte non dava il confronto: un buco non e' uno zero (v205)
         macro["fear_greed"] = {
             "score": round(fg["score"]), "rating": fg["rating"],
-            "prev_close": round(fg.get("previous_close", 0)),
-            "week_ago": round(fg.get("previous_1_week", 0)),
-            "month_ago": round(fg.get("previous_1_month", 0)),
-            "year_ago": round(fg.get("previous_1_year", 0)),
+            "asof": _data_fg(fg.get("timestamp")),
+            "prev_close": _fg_intero(fg.get("previous_close")),
+            "week_ago": _fg_intero(fg.get("previous_1_week")),
+            "month_ago": _fg_intero(fg.get("previous_1_month")),
+            "year_ago": _fg_intero(fg.get("previous_1_year")),
             "components": comps,
             "fomo": fomo, "fomo_label": fomo_label,
         }
+        try:
+            _st_fg = storia_fear_greed(data)
+            if _st_fg:
+                macro["fear_greed"]["storia"] = _st_fg
+        except Exception as e:  # noqa: BLE001
+            print(f"!! fear&greed storico: {e}", file=sys.stderr)
     except Exception as e:  # noqa: BLE001
         print(f"!! fear&greed: {e}", file=sys.stderr)
 
@@ -3829,15 +3936,25 @@ def fetch_macro():
     try:
         s = series_fallback("umich", lambda: umich_series(2), lambda: fred_series("UMCSENT", 2))
         v = s[-1][1]
-        indicators.append({"key": "umich", "label": "Fiducia consumatori (UMich)",
-                           "value": f"{v}", "date": s[-1][0],
-                           # v393 — chi ha servito decide etichetta E calendario lato pagina
-                           "fonte": FONTE_SERVITA.get("umich", "primaria"),
-                           "impact": round(clamp((v - 40) * 1.7))})
+        _ind_um = {"key": "umich", "label": "Fiducia consumatori (UMich)",
+                   "value": f"{v}", "date": s[-1][0],
+                   # v393 — chi ha servito decide etichetta E calendario lato pagina
+                   "fonte": FONTE_SERVITA.get("umich", "primaria"),
+                   "impact": round(clamp((v - 40) * 1.7))}
+        # v510 — la lettura (preliminare o definitiva) la dichiara la fonte primaria, e vale solo se e' dello STESSO mese
+        #   del valore: una dichiarazione su un altro mese non dice niente su questo
+        if _ind_um["fonte"] == "primaria":
+            try:
+                _lt = umich_lettura()
+                if _lt and _lt["mese"] == s[-1][0]:
+                    _ind_um["lettura"] = _lt["lettura"]
+            except Exception as e:  # noqa: BLE001
+                print(f"!! umich lettura: {e}", file=sys.stderr)
+        indicators.append(_ind_um)
     except Exception as e:  # noqa: BLE001
         print(f"!! umcsent: {e}", file=sys.stderr)
     try:
-        s = fred_series("T10Y2Y", 1)            # spread curva 10A-2A (segnale recessione)
+        s = fred_series(SERIE_FUORI_STORICO["curve"], 1)   # spread curva 10A-2A (segnale recessione)
         v = s[-1][1]
         indicators.append({"key": "curve", "label": "Curva 10A-2A", "value": f"{v:+.2f} pp",
                            "date": s[-1][0], "impact": round(clamp(50 + v * 40))})
@@ -3854,7 +3971,7 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! curve3m: {e}", file=sys.stderr)
     try:
-        s30 = fred_series("DGS30", 1)
+        s30 = fred_series(SERIE_FUORI_STORICO["t30"], 1)
         v = s30[-1][1]
         # ⚠ IMPACT AL CONTRARIO degli altri: il 30 anni alto SCONTA i titoli a lunga duration.
         # Il neutro sta al 4%, e ogni punto in piu' toglie 25 punti d'impatto.
@@ -4338,7 +4455,7 @@ def fetch_macro():
     # ⚠ Il fallimento e' RUMOROSO e sorvegliato da validate_macro: una fonte che nessun check
     # guarda puo' morire il giorno in cui nasce, ed e' costato la vita intera alle news (v389).
     try:
-        _cal = calendario_uscite_fred(STORICO_IND)
+        _cal = calendario_uscite_fred(STORICO_IND + CALENDARIO_EXTRA)
         if _cal:
             macro["calendario_uscite"] = {
                 "per_chiave": _cal,
@@ -4529,14 +4646,10 @@ def fetch_macro():
         usdjpy = float(hj.iloc[-1])
         usdjpy_chg_1m = round((usdjpy / float(hj.iloc[0]) - 1) * 100, 2)
         spread = round(us10 - float(jp10), 2)
-        # prossime riunioni Bank of Japan (calendario ufficiale 2026; date = 2° giorno = annuncio decisione)
-        boj = [d for d in ("2026-01-23", "2026-03-19", "2026-04-28", "2026-06-16",
-                           "2026-07-31", "2026-09-18", "2026-10-29", "2026-12-18")
-                           # ⚠ v396 — le quattro date 2027 erano "stimate sul calendario tipico
-                           # BoJ, da confermare": una proiezione nostra, e il CEO le ha vietate.
-                           # Quando il 2026 sara' esaurito la lista si svuota e la pagina lo
-                           # dice, invece di mostrare riunioni che nessuno ha convocato.
-               if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:4]
+        # prossime riunioni Bank of Japan: il giorno della decisione, dalla lista ufficiale (BOJ_DECISIONI, v510).
+        # ⚠ v396 — le date 2027 erano state tolte perche' "stimate sul calendario tipico BoJ": quelle di oggi le
+        #   pubblica la banca. Esaurita la lista, si svuota e la pagina lo dice: nessuna riunione inventata.
+        boj = [d for d in BOJ_DECISIONI if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:4]
         # tasso BoJ (overnight call rate) via FRED
         boj_rate_val = None
         boj_rate_date = None
@@ -4942,15 +5055,20 @@ def fetch_macro():
             avg_pe = round(sum(pe_vals) / len(pe_vals), 1) if has_hist else None
             pct_rank = round(sum(1 for v in pe_vals if v < cur_pe) / len(pe_vals) * 100) if has_hist else None
             score = clamp(round(100 - (cur_pe - 10) / 40 * 100))
-            ndx_pe = None
+            # ⚠ v510 — «trailingPE o forwardPE»: il numero usciva senza dire QUALE dei due fosse, e chi lo leggeva
+            #   lo affiancava al trailing dell'S&P 500. Due definizioni diverse dell'utile con lo stesso nome: ora il
+            #   tipo e la fonte viaggiano col valore
+            ndx_pe, ndx_kind, ndx_src = None, None, None
             try:
                 qqq_info = yf.Ticker("QQQ").info
-                raw_pe = qqq_info.get("trailingPE") or qqq_info.get("forwardPE")
-                ndx_pe = round(float(raw_pe), 1) if raw_pe else None
+                for _chiave, _tipo in (("trailingPE", "trailing"), ("forwardPE", "forward")):
+                    if qqq_info.get(_chiave):
+                        ndx_pe, ndx_kind, ndx_src = round(float(qqq_info[_chiave]), 1), _tipo, "Yahoo, su QQQ"
+                        break
             except Exception:
                 pass
-            if ndx_pe is None:
-                ndx_pe = wsj_pe.get("ndx_trail")   # fallback WSJ per il Nasdaq 100
+            if ndx_pe is None and wsj_pe.get("ndx_trail") is not None:
+                ndx_pe, ndx_kind, ndx_src = wsj_pe.get("ndx_trail"), "trailing", "WSJ"   # ripiego per il Nasdaq 100
             macro["sp500_pe"] = {
                 "current":  round(cur_pe, 1),
                 "avg_10y":  avg_pe,
@@ -4961,7 +5079,7 @@ def fetch_macro():
                             else "Sopravvalutazione" if cur_pe > 25
                             else "Valutazione elevata" if cur_pe > 20
                             else "Valutazione normale" if cur_pe > 14 else "Sottovalutazione",
-                "nasdaq_pe": ndx_pe,
+                "nasdaq_pe": ndx_pe, "nasdaq_pe_kind": ndx_kind, "nasdaq_pe_source": ndx_src,
                 # TRASPARENZA FONTE (anti-allucinazione LLM): trailing e forward vengono da fonti
                 # e metodologie DIVERSE — etichettarle evita falsi tassi di crescita impliciti
                 "source": pe_source, "kind": "trailing",
@@ -4986,7 +5104,9 @@ def fetch_macro():
             fpe = round(float(fpe), 1)
             macro["forward_pe"] = {
                 "value": fpe,
-                "avg_hist": 16.5,                              # media storica forward P/E S&P 500
+                # ⚠ v510 — qui c'era "avg_hist": 16.5, «media storica forward P/E S&P 500»: un numero scritto a mano,
+                #   senza fonte ne' finestra, stampato nel pacchetto e nella pagina come un fatto (v240). La media
+                #   storica della STESSA fonte del valore non e' nei dati: la pagina lo dichiara (v406)
                 "label": "Estremo" if fpe > 22 else "Elevato" if fpe > 18 else "Normale" if fpe > 14 else "Conveniente",
                 "source": "WSJ (estimate)" if wsj_pe.get("sp_fwd") is not None else "Yahoo SPY",
                 "kind": "forward",
@@ -6830,6 +6950,24 @@ def validate_macro(macro):
         "" if len(_futuri) >= 2 else
         (f"riunioni future nel calendario FOMC scritto nella pipeline: {len(_futuri)} (l'ultima e' il "
          f"{FOMC_DECISIONI[-1]}); l'anno nuovo e' nella pagina della Fed, {FED_CALENDARIO_URL}"))
+    # v510 — IL FEAR & GREED NON ERA SORVEGLIATO: un blocco che il pacchetto pubblica e nessun check guarda (v390).
+    #   Massimo 5 giorni dalla rilevazione (convenzione: un venerdi' letto il mercoledi' dopo, o un fine settimana lungo)
+    _fg = macro.get("fear_greed") or {}
+    if _fg.get("score") is None:
+        add("fear_greed", None, 5, "missing", "CNN non letta in questo run: il sentiment manca, non e' neutrale")
+    else:
+        _a_fg = age_of(_fg.get("asof"))
+        add("fear_greed", _fg.get("asof"), 5, "ok" if (_a_fg is not None and _a_fg <= 5) else "stale",
+            "" if (_a_fg is not None and _a_fg <= 5) else
+            ("la fonte non dichiara la data della rilevazione" if not _fg.get("asof") else
+             f"rilevazione di {_a_fg} giorni fa"))
+    # v510 — la stessa sorveglianza per la Bank of Japan: una lista scritta a mano suona PRIMA di finire
+    _futuri_boj = [d for d in BOJ_DECISIONI if d >= today.isoformat()]
+    add("boj_calendario", _futuri_boj[0] if _futuri_boj else BOJ_DECISIONI[-1], None,
+        "ok" if len(_futuri_boj) >= 2 else "stale",
+        "" if len(_futuri_boj) >= 2 else
+        (f"riunioni future nel calendario Bank of Japan scritto nella pipeline: {len(_futuri_boj)} (l'ultima e' il "
+         f"{BOJ_DECISIONI[-1]}); l'anno nuovo e' nella pagina della banca, {BOJ_CALENDARIO_URL}"))
 
     # --- valutazione mercato (forward P/E, S&P P/E): se mancano il quadro leva è monco ---
     for k, obj in (("forward_pe", macro.get("forward_pe")), ("sp500_pe", macro.get("sp500_pe"))):

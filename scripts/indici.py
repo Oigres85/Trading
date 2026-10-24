@@ -38,7 +38,9 @@ accanto al prospettico, senza provenienza (v240).
 - CBOE: storico dei valori di chiusura di VIX, VXN e VIX3M (dal 1990, dal 2009).
 - stockanalysis: barre di SPY, QQQ, RSP e QQEW — prezzi di oggi, la stessa fonte di brief e rotazione — e la
   composizione degli ETF (la quota dei primi dieci, i loro nomi, la data dei dati dell'emittente).
-- pipeline (data/data.json): Treasury e TIPS a 10 anni con le loro date — una grandezza, un proprietario (v436).
+- pipeline (data/data.json): Treasury e TIPS a 10 anni con le loro date — una grandezza, un proprietario (v436) —
+  e, dalla v510, il Fear & Greed della CNN con la sua data e il suo anno (la CNN risponde 418 a questo ambiente:
+  lo legge la pipeline, dai runner).
 """
 from __future__ import annotations
 
@@ -84,6 +86,9 @@ NOME_WSJ = {"ndx": "NASDAQ 100 Index"}
 VOLATILITA = (("VIX", "S&P 500, prossimi 30 giorni"), ("VXN", "Nasdaq-100, prossimi 30 giorni"),
               ("VIX3M", "S&P 500, prossimi 3 mesi"))
 TENDENZA = (("SPY", "S&P 500"), ("QQQ", "Nasdaq-100"))
+# i giudizi che la CNN scrive accanto al punteggio, tradotti: sono suoi, non soglie nostre (v240)
+GIUDIZI_FG = {"extreme fear": "paura estrema", "fear": "paura", "neutral": "neutrale", "greed": "avidita'",
+              "extreme greed": "avidita' estrema"}
 AMPIEZZA = (("RSP", "SPY", "S&P 500"), ("QQEW", "QQQ", "Nasdaq-100"))
 MESI_EN = {m: i for i, m in enumerate(("January", "February", "March", "April", "May", "June", "July", "August",
                                        "September", "October", "November", "December"), 1)}
@@ -483,6 +488,23 @@ def tassi_pipeline(d):
             "reale": num(r10.get("value")), "data_reale": r10.get("date")}
 
 
+def fear_greed_pipeline(d):
+    """⚠ v510 — il Fear & Greed della CNN dalla pipeline (una grandezza, un proprietario: v436), con la data della
+    rilevazione, i confronti che la fonte porta (un confronto assente resta None: v205), l'anno se la pipeline lo
+    pubblica, e quali sue componenti l'analisi legge gia' a parte. None se il blocco non c'e'."""
+    m = (d or {}).get("macro") or {}
+    f = m.get("fear_greed") or {}
+    if f.get("score") is None:
+        return None
+    comp = [str(c.get("label") or "") for c in (f.get("components") or []) if isinstance(c, dict)]
+    return {"punteggio": f["score"], "giudizio": f.get("rating"), "data": f.get("asof"),
+            "letto": (d or {}).get("updated_at"),
+            "prima": [(nome, f.get(k)) for k, nome in (("prev_close", "la seduta prima"), ("week_ago", "una settimana fa"),
+                                                        ("month_ago", "un mese fa"), ("year_ago", "un anno fa"))],
+            "storia": f.get("storia"), "n_componenti": len(comp),
+            "con_vix": any("VIX" in c for c in comp), "con_putcall": any("put/call" in c.lower() for c in comp)}
+
+
 def premio(pe_fwd, tassi):
     """Il rendimento degli utili attesi (100 / P/E prospettico) meno i rendimenti a 10 anni: il «modello Fed»."""
     if not pe_fwd:
@@ -629,6 +651,60 @@ def righe_volatilita(vol, ts, errori):
     return L
 
 
+def _letto_it(iso):
+    """L'ora in cui la pipeline ha letto la fonte, in ora italiana (v470): quella del run, non della rilevazione."""
+    try:
+        t = datetime.fromisoformat(str(iso).replace("Z", "+00:00")).astimezone(ROMA)
+    except (TypeError, ValueError):
+        return None
+    return f"{t:%d/%m/%Y} alle {t:%H:%M} ora italiana"
+
+
+def righe_sentimento(fg):
+    """⚠ v510 — IL FEAR & GREED NELL'ANALISI IN CHAT. Il 24/10/2026 il CEO ha chiesto se l'analisi ne tenesse conto: non
+    lo faceva, c'era solo nel pacchetto della pagina. E' il composito della CNN — non un punteggio nostro (v200 riguarda i
+    nostri) — letto con la sua data, coi confronti che la fonte porta e col suo anno. E la riga dice cio' che lo rende
+    facile da contare due volte: due delle sue componenti sono grandezze che l'analisi legge gia' a parte (B3)."""
+    L = ["SENTIMENT — CNN Fear & Greed, dalla pipeline: il composito della CNN su 0-100, non una misura nostra"]
+    if not fg:
+        L.append("  Fear & Greed (CNN): NON nei dati della pipeline — la fonte non ha risposto o il run non l'ha letto: "
+                 "non e' «neutrale», e' il dato che manca")
+        return L
+    g = GIUDIZI_FG.get(str(fg.get("giudizio") or "").lower(), fg.get("giudizio") or "non dichiarato")
+    if fg.get("data"):
+        quando = f"rilevazione del {_gma(fg['data'])}"
+    else:
+        letto = _letto_it(fg.get("letto"))
+        quando = ("la data della rilevazione non e' in questi dati"
+                  + (f": letto dalla pipeline il {letto}" if letto else ""))
+    confronti = " · ".join(f"{n} {v}" for n, v in fg.get("prima") or [] if v is not None)
+    L.append(f"  Fear & Greed (CNN): {fg['punteggio']} su 100, giudizio della fonte «{g}» · {quando}"
+             + (f" · {confronti}" if confronti else " · la fonte non porta i confronti con le rilevazioni passate"))
+    st = fg.get("storia")
+    if st:
+        L.append(f"  nel suo anno: {st['rango']}° percentile ({st['n']} rilevazioni dal {_gma(st['da'])} al "
+                 f"{_gma(st['a'])}) · minimo {st['minimo']['valore']} (l'ultima volta il {_gma(st['minimo']['data'])}), "
+                 f"massimo {st['massimo']['valore']} (l'ultima volta il {_gma(st['massimo']['data'])})")
+    else:
+        L.append("  nel suo anno: storico non pubblicato dalla pipeline — il livello si legge coi confronti qui sopra")
+    sovrap = [x for x, c in (("il VIX", fg.get("con_vix")), ("il put/call", fg.get("con_putcall"))) if c]
+    if sovrap:
+        chi = " e ".join(sovrap)
+        quante = "sono due" if len(sovrap) == 2 else "e' una"
+        L.append(f"  ⚠ {chi} {quante} delle sue {fg.get('n_componenti')} componenti, e questa analisi li legge gia' a parte "
+                 "(VOLATILITA' IMPLICITA qui sopra, PUT/CALL DI MERCATO nel posizionamento): il Fear & Greed li "
+                 "riassume, non li conferma — contati due volte raddoppiano un segnale solo")
+    elif fg.get("n_componenti"):
+        L.append(f"  fra le sue {fg['n_componenti']} componenti non compaiono il VIX ne' il put/call: non si sovrappone alle "
+                 "letture qui sopra")
+    else:
+        L.append("  la composizione non e' in questi dati: da qui non si sa quanto si sovrapponga al VIX e al put/call")
+    L.append("  quanto il livello anticipi i rendimenti questo sistema non l'ha misurato (LIBRO.md §1ter misura VIX/VIX3M, "
+             "put/call, DIX, GEX e grandi operatori): e' INFORMAZIONE, non una prova della tenuta ne' un colore del "
+             "semaforo")
+    return L
+
+
 def righe_concentrazione(comp, libro, errori):
     L = ["CONCENTRAZIONE — quanto pesano i primi dieci titoli dell'indice (stockanalysis, dati dell'emittente dell'ETF; "
          "le due classi di Alphabet sono due righe e la fonte le conta entrambe)"]
@@ -696,6 +772,7 @@ def sintesi(o):
     L += righe_valutazione(o.get("factset"), o.get("multpl"), o.get("wsj"), o.get("memoria"), o.get("tassi"), o.get("errori"))
     L += righe_stagione(o.get("factset"))
     L += righe_volatilita(o.get("vol"), o.get("termine"), o.get("errori"))
+    L += righe_sentimento(o.get("fear_greed"))
     L += righe_concentrazione(o.get("composizione"), o.get("libro"), o.get("errori"))
     L += righe_ampiezza(o.get("barre"))
     L += righe_tendenza(o.get("schede"))
@@ -742,7 +819,8 @@ def calcola(adesso=None, memoria=None):
     mem = memoria if memoria is not None else {}
     cambiata = aggiungi_memoria(mem, wsj)
     return {"factset": fs, "multpl": mp, "wsj": wsj, "memoria": mem, "memoria_cambiata": cambiata,
-            "tassi": tassi_pipeline(d), "vol": {s: stato_vol(v) for s, v in vol_serie.items()},
+            "tassi": tassi_pipeline(d), "fear_greed": fear_greed_pipeline(d),
+            "vol": {s: stato_vol(v) for s, v in vol_serie.items()},
             "termine": struttura_termine(vol_serie.get("VIX"), vol_serie.get("VIX3M")), "composizione": comp,
             "libro": sorted(p["tk"] for p in pos), "barre": barre,
             "schede": {tk: scheda_indice(tk, barre.get(tk), lunghe.get(tk), adesso) for tk, _ in TENDENZA},

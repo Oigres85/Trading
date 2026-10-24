@@ -67,6 +67,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import brief            # noqa: E402
 import numeri_libro as NL  # noqa: E402  (solo i formattatori: virgola decimale, un posto solo — v443)
+from comuni import art     # noqa: E402  (v510 — l'articolo davanti a un numero: «l'11%», non «il 11%»)
 import rotazione        # noqa: E402
 
 RADICE = Path(__file__).resolve().parent.parent
@@ -474,7 +475,7 @@ def righe_scadenze(ind, oggi):
             L.append(f"  {tk}: catena non letta o mensile assente")
             continue
         a = r["mensile"]
-        L.append(f"  {tk} (chiusura {_it(r['spot'], 2)}): alla mensile scade il {_it(a['quota_oi'], 0)}% dell'open interest di "
+        L.append(f"  {tk} (chiusura {_it(r['spot'], 2)}): alla mensile scade {art('il', _it(a['quota_oi'], 0) + '%')} dell'open interest di "
                  f"tutte le scadenze · put/call sull'open interest di quella scadenza {_it(a['pc_oi'])} · max pain "
                  f"{_strike(a['max_pain'])} ({_sg((a['max_pain'] / r['spot'] - 1) * 100)}% dal prezzo) · "
                  + _mov(a.get("movimento"), "movimento implicito"))
@@ -524,7 +525,7 @@ def righe_opzioni(rie, pos_qta, storia=None):
                 conc.append(f"call {_strike(mv['call_vicino']['strike'])} ({_it(mv['call_vicino']['oi'], 0)} contratti)")
             if mv.get("put_vicino"):
                 conc.append(f"put {_strike(mv['put_vicino']['strike'])} ({_it(mv['put_vicino']['oi'], 0)})")
-            L.append(f"    alla mensile: scade il {_it(a['quota_oi'], 0)}% dell'open interest · put/call sull'open interest "
+            L.append(f"    alla mensile: scade {art('il', _it(a['quota_oi'], 0) + '%')} dell'open interest · put/call sull'open interest "
                      f"{_it(a['pc_oi'])} · max pain {_strike(a['max_pain'])}"
                      + (f" ({_sg((a['max_pain'] / r['spot'] - 1) * 100)}%)" if a.get("max_pain") else "")
                      + (" · massimo open interest dentro il movimento implicito: " + ", ".join(conc) if conc else ""))
