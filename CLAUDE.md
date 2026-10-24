@@ -8348,7 +8348,12 @@ che la fonte non usa: CRWV, RGTI, OKLO e CBRS uscivano «consenso ($1.45)», che
 
 ### 🧪 Metodo
 - 22 iniezioni, una alla volta per copia, su quattro copie del repo verificate per impronta, con `modifica_sicura` e ripristino dallo snapshot (v427, v430). Esito nella riga qui sotto.
-- ESITO_INIEZIONI
+- **Mordono tutte e 22, ciascuna sul controllo atteso**, e i ventidue ripristini tornano per impronta. Fra
+  queste: il link preso anche se successivo a oggi, gli anni presi da tutta la riga di testa, una cella vuota letta
+  come zero, il dot plot scritto a mano riportato avanti dal run precedente, il riportato che passa per «ok», il
+  calendario che suona solo a zero riunioni, una data del 2027 sbagliata di un giorno, il dot plot rimesso nel blocco
+  FedWatch, il popup che ridisegna quello senza data, il perimetro che lo nega sempre, le parentesi contabili ignorate
+  e lo zero negativo.
 - ⚠ **La trappola della variabile in background (v492), rifatta**: `S=… && mkdir … && (…) &` sulla stessa riga dà il
   percorso solo al primo processo, e gli altri due hanno scritto in `/dot/run/`. Visto subito, perché le uscite non
   c'erano: la variabile si assegna su una riga sua, prima dei processi.
