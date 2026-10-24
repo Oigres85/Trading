@@ -1197,13 +1197,17 @@ for _n, _t_tab in ((60, 2.00172), (90, 1.98729), (251, 1.96959)):
     check("v401 il pavimento del rumore a n=%d coincide col valore tabulato" % _n,
           _r2r(_n) is not None and abs(_r2r(_n) - _atteso) < 1e-4)
 
+# ⚠ v510 — i due check qui sotto confrontavano _r2r(...) senza guardare se fosse un numero: con una funzione che
+#   restituisce None (iniezione «seconda copia del rumore») la suite MORIVA con un TypeError invece di cadere col nome
+#   del check — e i check della v510 non giravano piu'. Un check che muore per eccezione racconta male (v407, v471)
+_r60, _r251 = _r2r(60), _r2r(251)
 check("v401 il pavimento e' PIU' ALTO sulla finestra corta che su quella lunga",
-      _r2r(60) > _r2r(251) and _r2r(60) > 0.06 and _r2r(251) < 0.02)
+      _r60 is not None and _r251 is not None and _r60 > _r251 and _r60 > 0.06 and _r251 < 0.02)
 
 # ⚠ E' IL PUNTO DELLA MODIFICA: con la vecchia soglia fissa la finestra corta avrebbe acceso
 # canali dal nulla, cioe' avrebbe fabbricato proprio il segnale che deve rilevare.
 check("v401 la vecchia soglia fissa 0,05 sarebbe PERMISSIVA sulla finestra corta",
-      0.05 < _r2r(60))
+      _r60 is not None and 0.05 < _r60)
 
 check("v401 sotto df 30 non si restituisce un numero peggiore del silenzio",
       _r2r(31) is None and _r2r(32) is not None)
