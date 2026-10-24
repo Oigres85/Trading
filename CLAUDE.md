@@ -8479,9 +8479,13 @@ Ciascuno riagganciato al proprio invariante, più stretto di prima dove si potev
 - **Tre allarmi erano falsi, e verificarli prima ha evitato tre correzioni sbagliate** (v417): il rendimento di QQQ
   in euro uguale a quello in dollari (il cambio ai due capi era lo stesso, 1,1204), MU −30,1% (dal massimo di 1.255
   a giugno, non da un errore di base), e UMich di ottobre davvero definitivo quel giorno.
-- **Ottantanove iniezioni, una alla volta su quattro copie del repo verificate per impronta**, con `modifica_sicura` e
-  ripristino dallo snapshot (v427, v430): al momento del commit erano in corso — l'esito sta nel commit successivo, e
-  un'iniezione che non morde si corregge nel gate, non si tace.
+- **Novanta iniezioni, una alla volta su cinque copie del repo verificate per impronta**, con `modifica_sicura` e il
+  ripristino dallo snapshot (v427, v430): **mordono tutte, ciascuna sul controllo atteso**. Una non lo faceva al primo
+  giro, e il difetto era la SUITE: la seconda copia di `r2_rumore` che restituisce `None` faceva morire
+  `test_update_data.py` con un `TypeError` in tre check della v401 e della v403 che confrontavano due `None` — il
+  difetto si vedeva, ma i check della v510 non giravano piu' e la diagnosi era un traceback (v407, v471). Resi robusti,
+  cadono col loro nome e la suite arriva in fondo. La copia FEDELE — il difetto realistico, che i check della v401 non
+  possono vedere perche' da' gli stessi numeri — la prende il check della v510.
 - Pavimenti: `test_app.mjs` 620 → 630 (645 punti di chiamata), `test_update_data.py` 340 → 355 (372) e
   N_CHECKS_MINIMO 360 → 375 (385 eseguiti), `test_analisi_libro.py` 810 → 830 (844).
 - `?v=` e `BUILD_VERSION` a 510: cambia `assets/app.js`.

@@ -1242,8 +1242,9 @@ check("v401 sensibilita': la finestra corta misura DAVVERO le ultime 60 sedute",
 check("v401 sensibilita': un canale acceso solo di recente risulta acceso SOLO sul breve",
       _sens["tassi"]["acceso"] is False and _sens["tassi"]["breve"]["acceso"] is True)
 
+_sl401, _sb401 = _sens["tassi"]["r2_soglia"], _sens["tassi"]["breve"]["r2_soglia"]
 check("v401 sensibilita': ogni finestra porta la propria soglia, non una condivisa",
-      _sens["tassi"]["r2_soglia"] < _sens["tassi"]["breve"]["r2_soglia"])
+      _sl401 is not None and _sb401 is not None and _sl401 < _sb401)
 
 # ⚠ con meno di 90 osservazioni le due finestre coinciderebbero: stampare due volte lo stesso
 # numero e' peggio che non stamparlo (v184, la ridondanza misurata e tolta).
@@ -1268,6 +1269,7 @@ _sE = ud.sensibilita_macro(_cE, {"tassi": ("TLT", "i tassi", _bE)})["tassi"]
 check("v403 il terzo sguardo esiste e porta il proprio campione e la propria soglia",
       _sE.get("evento") is not None
       and _sE["evento"]["campione"] >= 32
+      and _sE["evento"]["r2_soglia"] is not None and _sE["r2_soglia"] is not None
       and _sE["evento"]["r2_soglia"] > _sE["r2_soglia"])
 
 # ⚠ IL PUNTO DELLA MISURA, e la sua affermazione onesta: NON scopre un canale invisibile — una
