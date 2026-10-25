@@ -187,7 +187,8 @@ const SUITE = [
   /* v508: 818 punti di chiamata (+7 sui CDS a ondate nelle schede, nel brief e nella regola) -> 805 */
   /* v509: 821 punti di chiamata (+2 sul consenso negativo del calendario di Nasdaq) -> 810 */
   /* v510: 844 punti di chiamata (+23 su articoli, feed, rumore, scadenze, aste, ore dichiarate, segni, Fear & Greed) -> 830 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 830, firma: /\d+\/\d+ CHECK OK/ },
+  /* v511: 877 punti di chiamata (+33 su fonti dirette, scelta del giro, oscillatori, stagionalita', due tempi) -> 860 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 860, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

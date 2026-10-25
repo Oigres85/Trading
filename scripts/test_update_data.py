@@ -614,6 +614,21 @@ check("v316 stagionalita': un mese per riga, col proprio campione e i propri est
       _st and len(_st) == 12 and all(x["campione"] >= 8 and x["peggio"] <= x["meglio"] for x in _st))
 check("v316 stagionalita': sotto otto anni di storia non si pubblica una media fra esiti opposti",
       ud.stagionalita_titolo(_mens.head(48)) is None)
+# v511 — il mese IN CORSO non e' concluso e non entra: la barra mensile del mese corrente e' una variazione a meta'
+#   mese. Lo stato si COSTRUISCE: un ottobre 2026 a +100%, letto il 25/10 (in corso), alle 23 di New York del 31/10
+#   (ancora ottobre: il mese e' quello di New York, v470) e il 2/11 (concluso: allora entra).
+_m511 = _pd.Series([100.0 + (i % 7) for i in range(129)] + [210.0],
+                   index=_pd.date_range("2016-01-01", periods=130, freq="MS"))
+_ott511 = lambda adesso: next((x for x in ud.stagionalita_titolo(_m511, adesso=adesso) or [] if x["mese"] == 10), {})
+_dt511u = __import__("datetime")
+_utc511 = _dt511u.timezone.utc
+_a511, _b511, _c511 = (_ott511(_dt511u.datetime(2026, 10, 25, 12, tzinfo=_utc511)),
+                       _ott511(_dt511u.datetime(2026, 11, 1, 3, tzinfo=_utc511)),
+                       _ott511(_dt511u.datetime(2026, 11, 2, 15, tzinfo=_utc511)))
+check("v511 stagionalita' del titolo: il mese in corso (nel mese di New York) non entra fra gli anni di quel mese, e "
+      "concluso entra",
+      _a511.get("campione") == 10 and _a511.get("meglio", 999) < 50 and _b511 == _a511
+      and _c511.get("campione") == 11 and _c511.get("meglio", 0) > 50)
 
 # ══ v323 — IL CONTRATTO FRA LE DUE LINGUE ═══════════════════════════════════════════════════
 # Il punteggio del credito si calcola qui e in assets/app.js. Le due implementazioni sono gia'
@@ -885,9 +900,16 @@ check("v390 la lista dei titoli per EDGAR viene da load_holdings, non da un elen
       "_, _wl_sec, _ = load_holdings()" in _SRC_UD
       and "for _tk in sorted(_seguiti):" in _SRC_UD)
 
-check("v390 credito banche: SLOOS e NFCI arrivano con la loro data e la loro serie",
-      '"serie": "DRTSCILM"' in _SRC_UD and '"serie": "NFCI"' in _SRC_UD
-      and 'macro["credito_banche"]' in _SRC_UD)
+# v511 — RIAGGANCIATO: la costruzione vive in comuni.py (sloos_da, nfci_da), la stessa per la pipeline e per l'analisi che
+#   legge le serie alla fonte. L'invariante e' lo stesso — data e serie viaggiano col valore — e ora si ESERCITA invece di
+#   cercarsi come testo nel sorgente della pipeline.
+_sl511 = ud.sloos_da([("2026-04-01", 8.1), ("2026-07-01", 0.0)])
+_nf511 = ud.nfci_da([("2026-09-%02d" % g, -0.5 - g / 1000) for g in range(1, 8)])
+check("v390 credito banche: SLOOS e NFCI arrivano con la loro data e la loro serie (v511: dalla derivazione condivisa)",
+      _sl511["serie"] == "DRTSCILM" and _sl511["data"] == "2026-07-01" and _sl511["precedente"] == 8.1
+      and _nf511["serie"] == "NFCI" and _nf511["data"] == "2026-09-07" and _nf511["mese_fa"] == round(-0.5 - 3 / 1000, 2)
+      and 'macro["credito_banche"]["sloos"] = sloos_da(_sl)' in _SRC_UD
+      and 'macro["credito_banche"]["nfci"] = nfci_da(_nf)' in _SRC_UD and ud.sloos_da([]) is None)
 
 check("v390 BCE: la serie e' dichiarata nel campo fonte, non solo nel codice",
       "MRR_FR" in _SRC_UD and '"fonte": "BCE Data Portal' in _SRC_UD)
@@ -3258,13 +3280,32 @@ check("v510 Fear & Greed: il percentile sul mezzo si arrotonda per eccesso, come
 check("v510 Fear & Greed: una serie corta o assente non da' un percentile dell'anno (convenzione dichiarata, v240)",
       ud.storia_fear_greed({"fear_and_greed_historical": {"data": _punti510[-60:]}}) is None
       and ud.storia_fear_greed({}) is None and ud.storia_fear_greed(None) is None)
-_fg510 = _SRC_UD_CODICE[_SRC_UD_CODICE.index('macro["fear_greed"] = {'):][:1600]
+# v511 — RIAGGANCIATO: punteggio, data, confronti e anno vengono da comuni.fear_greed_base, la derivazione condivisa con
+#   l'analisi (che legge la CNN alla fonte). L'invariante si ESERCITA: la data dalla fonte, un confronto assente resta None
+#   (mai uno zero), e un anno che non si calcola non si porta via il punteggio.
+import comuni as _cm511
+_fgb511 = ud.fear_greed_base({"fear_and_greed": {"score": 20.6, "rating": "extreme fear",
+                                                 "timestamp": "2026-10-24T02:00:00+00:00", "previous_close": None,
+                                                 "previous_1_week": 22.4, "previous_1_month": None, "previous_1_year": 28}})
+_orig_st511 = _cm511.storia_fear_greed
+try:
+    def _rompe511(*_a, **_k):
+        raise ValueError("storico illeggibile")
+    _cm511.storia_fear_greed = _rompe511
+    # un'eccezione qui e' proprio il difetto: deve far cadere il CHECK col suo nome, non la suite (v407, v471)
+    try:
+        _fgr511 = ud.fear_greed_base({"fear_and_greed": {"score": 50, "rating": "neutral"}})
+    except Exception as _e:  # noqa: BLE001
+        _fgr511 = {"_eccezione": repr(_e)}
+finally:
+    _cm511.storia_fear_greed = _orig_st511
 check("v510 collegamento: fetch_macro pubblica la data dalla fonte, i confronti senza zeri inventati e l'anno in un try "
-      "suo (un anno che non si legge non si porta via il punteggio)",
-      '"asof": _data_fg(fg.get("timestamp"))' in _fg510 and '_fg_intero(fg.get("previous_close"))' in _fg510
-      and '_fg_intero(fg.get("previous_1_year"))' in _fg510 and "storia_fear_greed(data)" in _fg510
-      and 'fg.get("previous_close", 0)' not in _SRC_UD_CODICE
-      and _fg510.index("try:") < _fg510.index("storia_fear_greed(data)"))
+      "suo (un anno che non si legge non si porta via il punteggio) — v511: dalla derivazione condivisa",
+      _fgb511["score"] == 21 and _fgb511["asof"] == "2026-10-23" and _fgb511["prev_close"] is None
+      and _fgb511["week_ago"] == 22 and _fgb511["month_ago"] is None and _fgb511["year_ago"] == 28
+      and _fgr511.get("score") == 50 and "storia" not in _fgr511
+      and 'macro["fear_greed"] = {**fear_greed_base(data), "components": comps' in _SRC_UD_CODICE
+      and 'fg.get("previous_close", 0)' not in _SRC_UD_CODICE)
 _vfg510 = lambda m: next((c for c in ud.validate_macro(m)["checks"] if c["key"] == "fear_greed"), None)
 _oggi510 = datetime.now(timezone.utc).date()
 check("v510 il Fear & Greed nasce SORVEGLIATO (v390): assente → missing; data di oggi → ok; senza data → stale che lo "

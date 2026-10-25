@@ -797,6 +797,56 @@ def macro_dalla_pipeline():
     return {"stato": "ok", "serie": out, "eta_ore": eta, "run": run}
 
 
+# ---------------------------------------------------------------- v511: la macro ALLA FONTE, la pipeline come ripiego
+# Decisione del CEO del 25/10/2026: «i dati in ritardo ... Elimina le dipendenze e cercale altrove se puoi». Le serie di
+# questo blocco hanno una fonte pubblica raggiungibile SENZA credenziali (FRED il CSV pubblico, NY Fed, BCE): le legge
+# scripts/fonti_dirette.py una volta per giro, con le STESSE derivazioni della pipeline (scripts/comuni.py), e la
+# pipeline resta il ripiego RIGA PER RIGA, dichiarato. ⚠ La chiave FRED continua a non servire e a non vivere qui: il
+# CSV pubblico e' senza chiave, e nessuno strumento ne nomina una (gate v452, riagganciato in v511).
+def macro_del_giorno(giro=None):
+    import fonti_dirette
+    if giro is None:
+        giro = fonti_dirette.del_giro()
+    sc = giro.get("scelta") or {}
+    out = []
+
+    def riga(k, nome, nota=None, periodo=None, prec=None):
+        v = sc.get(k)
+        if not v:
+            return
+        out.append({"nome": nome, "valore": v.get("valore"), "data": v.get("data"), "prec": prec, "nota": nota,
+                    "valore_testo": fonti_dirette.valore_testo(k, v), "quando_testo": quando_serie(v.get("data"), periodo),
+                    "fonte": v.get("fonte"), "esito": v.get("esito")})
+
+    riga("t10", "Treasury 10A")
+    riga("curva", "Curva 10A-2A")
+    for k, nome in (("cpi", "Inflazione CPI (a/a)"), ("disoccupazione", "Disoccupazione"), ("nfp", "Non-Farm Payrolls")):
+        mesi = (sc.get(k) or {}).get("mesi")
+        span = (f"su {mesi} mesi: la base esatta non c'e'" if (k == "cpi" and mesi and mesi != 12)
+                or (k == "nfp" and mesi and mesi != 1) else None)
+        riga(k, nome, nota=span, periodo="mese")
+    riga("reale10", "Tasso reale 10A (TIPS)")
+    riga("hy", "HY OAS (credito)")
+    cc = sc.get("ccc") or {}
+    riga("ccc", "Spread CCC (fascia peggiore)", prec=cc.get("mese_fa"),
+         nota=(f"{sgn(cc['salita_60_pp'], 2, ' pp')} dal minimo di 60 sedute ({n2(cc.get('min_60'), 2)}%)"
+               if cc.get("salita_60_pp") is not None else "storico insufficiente per la salita"))
+    riga("nfci", "NFCI (condizioni fin.)", prec=(sc.get("nfci") or {}).get("mese_fa"))
+    riga("sloos", "SLOOS (banche)", prec=(sc.get("sloos") or {}).get("precedente"),
+         nota="negativo = le banche allentano", periodo="indagine")
+    riga("effr", "Fed Funds effettivo (EFFR del giorno)")
+    ev = sc.get("eurusd") or {}
+    riga("eurusd", "EUR/USD",
+         nota=("riferimento BCE delle 14:15 CET, datato" if ev.get("esito") == "fonte"
+               else "quotazione dello snapshot della pipeline, non una serie datata"))
+    assenti = [fonti_dirette.NOMI[k] for k in fonti_dirette.ORDINE
+               if k not in sc and k not in ("fear_greed",)]
+    stato = "ok" if out else "nessuna serie: ne' la fonte ne' la pipeline le hanno"
+    return {"stato": stato, "serie": out, "eta_ore": giro.get("eta_ore"), "run": giro.get("run"),
+            "dirette": sum(1 for r in out if r["esito"] == "fonte"),
+            "ripiego": sum(1 for r in out if r["esito"] == "pipeline"), "assenti": assenti}
+
+
 # ---------------------------------------------------------------- v501: gli eventi del credito dalla pipeline
 def credito_dalla_pipeline(tickers, percorso=None):
     """Gli EVENTI del credito dei nomi del brief — il CDS che si allarga di colpo (settimana) o per un mese, e la
@@ -1104,21 +1154,33 @@ def componi(modo, dati):
         A("    sono in questo brief. Non e' 'nessun movimento': e' il dato che manca.")
     else:
         eta = mf.get("eta_ore")
-        # ⚠ L'eta' del run si dichiara SEMPRE: se la pipeline si ferma, la macro si ferma con
-        #   lei, e chi legge deve poterlo vedere invece di dedurlo (v369, v406).
-        if eta is None:
-            A("  ⚠ le serie vengono dalla pipeline, che non dichiara quando ha girato")
-        elif eta > 24:
-            A(f"  ⚠⚠ PIPELINE FERMA DA {n2(eta,1)} ORE: queste serie non si aggiornano da allora.")
-        else:
-            A(f"  dalla pipeline, run di {n2(eta,1)} ore fa — ogni riga porta la PROPRIA rilevazione")
+        # v511 — le serie si leggono ALLA FONTE (scripts/fonti_dirette.py); la pipeline e' il ripiego riga per riga.
+        #   ⚠ L'eta' del run si dichiara quando una riga viene da lei: se la pipeline si ferma, quelle righe si
+        #   fermano con lei, e chi legge deve poterlo vedere invece di dedurlo (v369, v406).
+        rip = mf.get("ripiego")
+        if rip is None:                                   # la resa della sola pipeline (macro_dalla_pipeline)
+            rip = len(mf["serie"])
+        if mf.get("dirette"):
+            A(f"  lette ALLA FONTE adesso: {mf['dirette']} serie (FRED, NY Fed, BCE) — ogni riga porta la PROPRIA "
+              "rilevazione; la pipeline e' il ripiego")
+        if rip:
+            if eta is None:
+                A(f"  ⚠ {rip} serie dalla pipeline, che non dichiara quando ha girato")
+            elif eta > 24:
+                A(f"  ⚠⚠ PIPELINE FERMA DA {n2(eta,1)} ORE: le {rip} serie che vengono da lei non si aggiornano da allora.")
+            else:
+                A(f"  {rip} serie dalla pipeline (ripiego), run di {n2(eta,1)} ore fa — ogni riga porta la PROPRIA rilevazione")
         for s in mf["serie"]:
             quando = s.get("quando_testo") or quando_serie(s.get("data"))
             prec = ""
             if s.get("prec") is not None and isinstance(s.get("valore"), (int, float)):
                 prec = f"   (prima {valore_serie(s['prec'])})"
             nota = f"   — {s['nota']}" if s.get("nota") else ""
-            A(f"  {s['nome']:24} {(s.get('valore_testo') or valore_serie(s.get('valore'))):>10}   {quando}{prec}{nota}")
+            dove = "   [pipeline]" if s.get("esito") == "pipeline" and mf.get("dirette") else ""
+            A(f"  {s['nome']:24} {(s.get('valore_testo') or valore_serie(s.get('valore'))):>10}   {quando}{prec}{nota}{dove}")
+        if mf.get("assenti"):
+            A(f"  ⚠ NON DISPONIBILI (ne' alla fonte ne' nella pipeline): {', '.join(mf['assenti'])} — e' il dato che "
+              "manca, non un valore neutro")
 
     A("")
     A("-" * 66)
@@ -1166,7 +1228,7 @@ def main():
     nw = raccogli_news(tickers, da)
     cal = calendario_trimestrali(tickers)
     aste = aste_tesoro()
-    mf = macro_dalla_pipeline()
+    mf = macro_del_giorno()                    # v511 — alla fonte, la pipeline come ripiego
     cr = credito_dalla_pipeline(tickers)       # v501
 
     sedute = [r["seduta"] for r in tec if r.get("seduta")]

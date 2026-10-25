@@ -50,6 +50,12 @@ import yfinance as yf
 
 from rumore_yf import zittisci_yfinance   # fonte UNICA, condivisa col rapporto
 from comuni import r2_rumore, testo_feed  # v510 — una funzione, due consumatori: pipeline e strumenti
+# v511 — le derivazioni delle serie macro che l'analisi legge anche ALLA FONTE (scripts/fonti_dirette.py): vivono in
+#   comuni.py, e qui si importano coi nomi di prima. Due copie della stessa domanda divergono al primo ritocco (v161).
+from comuni import (distanza_mesi as _distanza_mesi, mese_meno as _mese_meno, var_per_data as _var_per_data,  # noqa: E402
+                    delta_mensile, rango_midrank as _rango_midrank, credito_ccc, nfci_da, sloos_da,
+                    numero_o_none as _numero_o_none, FG_STORIA_MINIMO, data_fg as _data_fg, storia_fear_greed,
+                    fg_intero as _fg_intero, fear_greed_base, fredgraph)
 
 # yfinance logga internamente ("$TICKER: possibly delisted", 404 quoteSummary) su indici/ticker
 # flaky: catturiamo già le eccezioni a valle, quindi il muro per titolo non deve inquinare stderr.
@@ -1147,13 +1153,21 @@ def performance_orizzonti(hist, monthly=None):
     return out or None
 
 
-def stagionalita_titolo(monthly, min_anni=8):
+def stagionalita_titolo(monthly, min_anni=8, adesso=None):
     """Stagionalita' del TITOLO, mese per mese, sul suo storico mensile.
     ⚠ Sotto `min_anni` osservazioni per mese non si pubblica niente: una 'media' su tre anni fra
     esiti opposti non e' una stagionalita', e' rumore con un'etichetta. Stessa disciplina gia'
-    applicata alla stagionalita' del Nasdaq."""
+    applicata alla stagionalita' del Nasdaq.
+    ⚠ v511 — IL MESE IN CORSO NON E' CONCLUSO: la barra mensile di Yahoo per il mese corrente e' una
+    variazione a meta' mese, e contarla fra gli anni di quel mese mescola un mese intero con un pezzo
+    (la classe della barra in formazione, v471). Il 25/10/2026 ottobre «su 42 anni» comprendeva
+    l'ottobre 2026 a tre quarti. Si tolgono i mesi dal corrente in poi, nel mese di New York (v470)."""
     if monthly is None or len(monthly) < min_anni * 12:
         return None
+    ny = adesso or datetime.now(timezone.utc)
+    if ZoneInfo is not None:
+        ny = ny.astimezone(ZoneInfo("America/New_York"))
+    monthly = monthly[[(d.year, d.month) < (ny.year, ny.month) for d in monthly.index]]
     r = monthly.pct_change().dropna() * 100
     fuori = []
     for m in range(1, 13):
@@ -3090,14 +3104,7 @@ def fred_series(series_id, n=14, freq=None):
                 continue
         return out[-n:]
     r = http_get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}")
-    out = []
-    for line in r.text.strip().splitlines()[1:]:
-        date, _, val = line.partition(",")
-        try:
-            out.append((date, float(val)))
-        except ValueError:
-            continue
-    return out[-n:]
+    return fredgraph(r.text)[-n:]      # v511 — un parser solo per la pipeline e l'analisi (comuni.py)
 
 
 # ═══ v395 — IL CALENDARIO UFFICIALE DELLE USCITE, AL POSTO DELLA PROIEZIONE ═══════════════
@@ -3432,65 +3439,6 @@ def umich_lettura(pagina=None):
             "mese": f"{int(m.group(3)):04d}-{UMICH_MONTHS[m.group(2)]:02d}-01"}
 
 
-def _distanza_mesi(a: str, b: str) -> int:
-    """quanti mesi separano due osservazioni ISO (b - a)."""
-    return (int(b[:4]) - int(a[:4])) * 12 + (int(b[5:7]) - int(a[5:7]))
-
-
-def _mese_meno(iso: str, n: int) -> str:
-    """la data ISO di n mesi prima. Le osservazioni mensili FRED stanno sempre al giorno 01."""
-    tot = int(iso[:4]) * 12 + (int(iso[5:7]) - 1) - n
-    return f"{tot // 12:04d}-{tot % 12 + 1:02d}-{iso[8:10]}"
-
-
-def _var_per_data(serie, mesi: int):
-    """Variazione percentuale su `mesi`, agganciata alla DATA e non alla POSIZIONE.
-
-    ═══ v393 — L'INFLAZIONE PUBBLICATA ERA UN 13 MESI CHIAMATO "a/a" ═══════════════════════
-    `yoy` faceva `series[-1] / series[-13]`: conta tredici POSIZIONI indietro e da' per
-    scontato che siano dodici mesi. Lo sono solo se la serie non ha buchi.
-
-    ⚠⚠ CPIAUCSL HA UN BUCO A OTTOBRE 2025 (il BLS non ha pubblicato quel mese), e UNRATE lo
-    ha con lui. Misurato sui dati veri il 30/08/2026: la posizione -13 cadeva su GIUGNO 2025
-    invece che su luglio, quindi il pacchetto pubblicava 332,813/321,435 = 3,54% -> "CPI 3,5%"
-    dove l'anno su anno vero e' 332,813/322,169 = 3,30%. Sovrastima di 0,24 pp sul numero
-    macro piu' letto del pacchetto, e NON su un punto solo: nove punti consecutivi dello
-    storico, tutti gonfiati, da novembre 2025 in poi.
-    Un LLM reale l'ha intercettato dall'esito (obiettava 3,4% del BLS contro il nostro 3,5%)
-    senza poter vedere la causa, e la causa non era ne' la fonte ne' l'arrotondamento.
-
-    E' la classe v207 — *l'allineamento per POSIZIONE invece che per data* — gia' pagata sui
-    grafici macro e di nuovo in v391 sulle barre OHLC filtrate indipendentemente. Qui stava
-    nel numero che apre il quadro macro.
-
-    ⚠ QUANDO LA BASE ESATTA NON C'E' non si tace e non si finge: si prende l'osservazione
-    precedente piu' vicina e si RESTITUISCE LA DISTANZA VERA, cosi' chi stampa puo' dichiarare
-    "su 13 mesi" invece di scrivere "a/a" su una cosa che non lo e'. Far sparire l'inflazione
-    per un mese intero sarebbe peggio del difetto (v199: un numero fuori orizzonte e' peggio
-    di nessun numero, ma un buco dichiarato non e' un numero fuori orizzonte).
-
-    Ritorna (valore, data_ultima_osservazione, mesi_effettivi).
-    """
-    if not serie or len(serie) < 2:
-        raise ValueError("serie troppo corta per una variazione")
-    ultima, valore = serie[-1]
-    atteso = _mese_meno(ultima, mesi)
-    per_data = {d: v for d, v in serie}
-    base = per_data.get(atteso)
-    effettivi = mesi
-    if base is None:
-        precedenti = [(d, v) for d, v in serie if d < atteso]
-        if not precedenti:
-            raise ValueError(f"nessuna osservazione a {mesi} mesi da {ultima}")
-        d0, base = precedenti[-1]
-        effettivi = _distanza_mesi(d0, ultima)
-        print(f"!! {atteso} assente nella serie: base a {d0}, distanza reale {effettivi} mesi",
-              file=sys.stderr)
-    if not base:
-        raise ValueError(f"base nulla a {atteso}")
-    return round((valore / base - 1) * 100, 1), ultima, effettivi
-
-
 # ⚠⚠ v393 — CHI HA SERVITO IL DATO E' PARTE DEL DATO, e finora non usciva dalla funzione.
 # UMich ha una fonte primaria (sca.isr.umich.edu, che pubblica il definitivo a FINE mese) e un
 # ripiego su FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA. Il pacchetto scriveva
@@ -3557,15 +3505,6 @@ CALENDARIO_EXTRA = [("curve", "T10Y2Y"), ("t30", "DGS30")]
 SERIE_FUORI_STORICO = dict(CALENDARIO_EXTRA)
 
 
-def _numero_o_none(x):
-    """Il valore come numero finito, o None: un campo nullo, una stringa o un NaN non sono un numero."""
-    try:
-        v = float(x)
-    except (TypeError, ValueError):
-        return None
-    return v if math.isfinite(v) else None
-
-
 def composito_macroquant(macro):
     """MacroQuant (riproduzione trasparente stile BCA): composito del ciclo dai fattori macro disponibili. NON e' il
     dato proprietario BCA Research.
@@ -3615,66 +3554,6 @@ def composito_macroquant(macro):
     return out
 
 
-# ⚠ v510 — il Fear & Greed col SUO anno. Sotto FG_STORIA_MINIMO rilevazioni un «percentile dell'anno» non e' dell'anno
-#   (convenzione dichiarata, v240): la riga dice che lo storico manca invece di pubblicare un percentile corto.
-FG_STORIA_MINIMO = 120
-
-
-def _data_fg(ts):
-    """La data della rilevazione CNN dal suo `timestamp` (ISO, o millisecondi dall'epoca), nel fuso di New York: e' la
-    seduta che il punteggio descrive. None se la fonte non la dichiara — e allora la riga lo dice (v396)."""
-    if ts in (None, ""):
-        return None
-    try:
-        if isinstance(ts, (int, float)):
-            t = datetime.fromtimestamp(float(ts) / 1000, tz=timezone.utc)
-        else:
-            t = datetime.fromisoformat(str(ts).strip().replace("Z", "+00:00"))
-            if t.tzinfo is None:
-                t = t.replace(tzinfo=timezone.utc)
-    except (TypeError, ValueError, OverflowError, OSError):
-        return None
-    return (t.astimezone(ZoneInfo("America/New_York")) if ZoneInfo is not None else t).date().isoformat()
-
-
-def storia_fear_greed(data, giorni=365):
-    """⚠ v510 — IL FEAR & GREED COL SUO ANNO. La fonte pubblica la serie (`fear_and_greed_historical.data`, punti
-    {x: millisecondi, y: punteggio}) e il pacchetto ne portava tre punti soli. Qui: le rilevazioni dell'ultimo anno
-    PER DATA (v207: l'ultima del giorno vince, un giorno senza punto e' un buco), il percentile midrank di quella di
-    oggi (_rango_midrank, la convenzione di tutto il sistema, v161) arrotondato per eccesso sul mezzo (v496), il minimo
-    e il massimo con l'ultima data in cui sono stati toccati. None se la serie manca o e' corta."""
-    punti = (((data or {}).get("fear_and_greed_historical") or {}).get("data")) or []
-    serie = {}
-    for p in punti:
-        try:
-            g = _data_fg(float(p["x"]))
-            v = float(p["y"])
-        except (KeyError, TypeError, ValueError):
-            continue
-        if g and v == v:
-            serie[g] = v
-    if not serie:
-        return None
-    ultimo = max(serie)
-    fine = datetime.fromisoformat(ultimo).date()
-    anno = sorted((g, v) for g, v in serie.items() if (fine - datetime.fromisoformat(g).date()).days < giorni)
-    if len(anno) < FG_STORIA_MINIMO:
-        return None
-    vals = [v for _, v in anno]
-    oggi = anno[-1][1]
-    mn = max((g for g, v in anno if v == min(vals)))
-    mx = max((g for g, v in anno if v == max(vals)))
-    return {"n": len(anno), "da": anno[0][0], "a": ultimo,
-            "rango": int(math.floor(_rango_midrank(oggi, vals) + 0.5)),
-            "minimo": {"valore": round(min(vals)), "data": mn}, "massimo": {"valore": round(max(vals)), "data": mx}}
-
-
-def _fg_intero(x):
-    """Un confronto che la fonte non porta e' un buco, non uno zero (v205)."""
-    v = _numero_o_none(x)
-    return None if v is None else round(v)
-
-
 def fetch_macro():
     macro = {}
 
@@ -3709,22 +3588,10 @@ def fetch_macro():
         # ⚠ v510 — LA DATA E I BUCHI. La rilevazione la dichiara la fonte (`timestamp`): il blocco la buttava, e pagina,
         #   pacchetto e analisi non potevano dire di quando fosse il punteggio (v396). E `round(fg.get(..., 0))` scriveva
         #   0 — «paura estrema» — dove la fonte non dava il confronto: un buco non e' uno zero (v205)
-        macro["fear_greed"] = {
-            "score": round(fg["score"]), "rating": fg["rating"],
-            "asof": _data_fg(fg.get("timestamp")),
-            "prev_close": _fg_intero(fg.get("previous_close")),
-            "week_ago": _fg_intero(fg.get("previous_1_week")),
-            "month_ago": _fg_intero(fg.get("previous_1_month")),
-            "year_ago": _fg_intero(fg.get("previous_1_year")),
-            "components": comps,
-            "fomo": fomo, "fomo_label": fomo_label,
-        }
-        try:
-            _st_fg = storia_fear_greed(data)
-            if _st_fg:
-                macro["fear_greed"]["storia"] = _st_fg
-        except Exception as e:  # noqa: BLE001
-            print(f"!! fear&greed storico: {e}", file=sys.stderr)
+        #   v511 — punteggio, data, confronti e anno vengono da comuni.fear_greed_base: la stessa derivazione dell'analisi,
+        #   che legge la CNN alla fonte (scripts/fonti_dirette.py). Qui si aggiungono le componenti e la FOMO, che servono
+        #   alla pagina; lo storico che non si calcola non porta via il resto (dentro fear_greed_base)
+        macro["fear_greed"] = {**fear_greed_base(data), "components": comps, "fomo": fomo, "fomo_label": fomo_label}
     except Exception as e:  # noqa: BLE001
         print(f"!! fear&greed: {e}", file=sys.stderr)
 
@@ -3920,9 +3787,12 @@ def fetch_macro():
     try:
         s = series_fallback("nfp", lambda: fred_series("PAYEMS", 3),
                             lambda: bls_series("CES0000000001", 3))
-        delta = round((s[-1][1] - s[-2][1]))
-        indicators.append({"key": "nfp", "label": "Non-Farm Payrolls", "value": f"{delta:+d}K", "date": s[-1][0],
-                           "impact": round(clamp(50 + (delta - 100) / 4))})
+        delta, _d_nfp, _mesi_nfp = delta_mensile(s)          # v511 — per data, comuni.py (lo usa anche l'analisi)
+        _ind_nfp = {"key": "nfp", "label": "Non-Farm Payrolls", "value": f"{delta:+d}K", "date": _d_nfp,
+                    "impact": round(clamp(50 + (delta - 100) / 4))}
+        if _mesi_nfp != 1:
+            _ind_nfp["span_mesi"] = _mesi_nfp
+        indicators.append(_ind_nfp)
     except Exception as e:  # noqa: BLE001
         print(f"!! nfp: {e}", file=sys.stderr)
     try:
@@ -4811,19 +4681,10 @@ def fetch_macro():
         if _sl or _nf:
             macro["credito_banche"] = {}
             if _sl:
-                macro["credito_banche"]["sloos"] = {
-                    "valore": round(_sl[-1][1], 1), "data": _sl[-1][0],
-                    "precedente": round(_sl[-2][1], 1) if len(_sl) > 1 else None,
-                    "serie": "DRTSCILM",
-                    "storia": [{"d": d, "v": round(v, 1)} for d, v in _sl],
-                }
+                # v511 — la derivazione condivisa con l'analisi, che legge la stessa serie alla fonte (comuni.py)
+                macro["credito_banche"]["sloos"] = sloos_da(_sl)
             if _nf:
-                macro["credito_banche"]["nfci"] = {
-                    "valore": round(_nf[-1][1], 2), "data": _nf[-1][0],
-                    "mese_fa": round(_nf[-5][1], 2) if len(_nf) > 5 else None,
-                    "serie": "NFCI",
-                    "storia": [{"d": d, "v": round(v, 2)} for d, v in _nf],
-                }
+                macro["credito_banche"]["nfci"] = nfci_da(_nf)                      # v511 — comuni.py
             print(f"   credito banche: SLOOS {'ok' if _sl else 'ko'}, NFCI {'ok' if _nf else 'ko'}")
     except Exception as e:  # noqa: BLE001
         print(f"!! credito banche (SLOOS/NFCI): {e}", file=sys.stderr)
@@ -5555,16 +5416,6 @@ def _mese_spostato(iso, mesi):
     return f"{t // 12:04d}-{t % 12 + 1:02d}-01"
 
 
-def _rango_midrank(x, serie):
-    """Percentile 'midrank': quota della serie sotto x piu' meta' dei pari, x 100. E' la convenzione di
-    dgPercentile (assets/app.js) e di rotazione.percentile_midrank: un gate le confronta (v161)."""
-    if x is None or not serie:
-        return None
-    sotto = sum(1 for y in serie if y < x)
-    pari = sum(1 for y in serie if y == x)
-    return (sotto + pari / 2) / len(serie) * 100
-
-
 def _finra_xlsx_righe(contenuto):
     """v496 — Le righe del file storico FINRA (margin-statistics.xlsx): [(iso_date, debit balances $ mln)].
     Un xlsx e' uno zip di XML: si legge con la libreria standard, senza dipendenze nuove (openpyxl nel CI
@@ -5789,20 +5640,6 @@ def fetch_margin_debt(prev_md=None):
 #   cambia col ciclo e il CSV pubblico di FRED porta solo ~3 anni (licenza ICE), quindi una
 #   soglia di livello sarebbe una tacca senza storia (v240). La soglia della salita e' una
 #   CONVENZIONE scelta col CEO (memoria/LIBRO.md §1ter), non un dato.
-def credito_ccc(serie):
-    """serie: [(data, valore)] in ordine cronologico. Un buco non e' uno zero (v205)."""
-    vals = [(d, v) for d, v in (serie or []) if v is not None]
-    if not vals:
-        return None
-    ult_d, ult = vals[-1]
-    finestra = [v for _, v in vals[-61:-1]]
-    minimo = min(finestra) if len(finestra) >= 60 else None
-    return {"valore": round(ult, 2), "data": ult_d, "serie": "BAMLH0A3HYC",
-            "min_60": round(minimo, 2) if minimo is not None else None,
-            "salita_60_pp": round(ult - minimo, 2) if minimo is not None else None,
-            "mese_fa": round(vals[-22][1], 2) if len(vals) >= 22 else None,
-            "sedute": len(vals)}
-
 # ═══ v497 — CDS A 5 ANNI: IL CREDITO PREZZATO DAL MERCATO, NOME PER NOME ═══════════════════
 # Il CEO ha chiesto (17/10/2026) di monitorare l'andamento dei CDS sulle azioni in portafoglio e
 # in watchlist. La v367 aveva risposto che i CDS su singolo nome sono a pagamento — vero per lo

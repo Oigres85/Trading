@@ -214,8 +214,13 @@ quando lo storico cresce, come i due backtest — se i segnali di mercato (curva
 pool, put/call, grandi operatori, multipli) avrebbero anticipato i cali. Il primo giro legge da fonti esterne circa
 1.600 file e il risultato non cambia da un giorno all'altro: la conclusione sta in `memoria/LIBRO.md` §1ter.
 
+`scripts/fonti_dirette.py` resta **fuori** per la stessa ragione di `numeri_libro.py` (v511): è il blocco FRESCHEZZA
+DEI DATI dell'analisi in chat — le serie macro lette alla fonte (FRED col CSV pubblico, NY Fed, BCE, CNN) all'ora
+dell'analisi, con la pipeline come ripiego dichiarato riga per riga — e scrive la lettura del giro in
+`memoria/dati/fonti_dirette.json` (ignorata da git), che gli altri strumenti riusano: questo comando legge, non scrive.
+
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
-e «Aggiorna analisi» del CEO — che esegue in parallelo `numeri_libro.py`, `brief.py`,
+e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
 `schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py` e `concorrenti.py`, già dichiarati fuori qui con la loro ragione, e chiude con
 la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
@@ -237,7 +242,9 @@ che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto
 `scripts/comuni.py` non è un passo di questo comando (v510): è la libreria delle tre rese che la pipeline e gli
 strumenti dell'analisi devono dare uguali — il pavimento del rumore di un R² (`r2_rumore`, che la pipeline usa per
 decidere se un canale c'è e le schede per dirlo), il titolo di una voce di feed decodificato come lo legge una persona
-(`testo_feed`) e l'articolo con l'elisione davanti a un numero (`art`). La usano `update_data.py`, `brief.py`,
+(`testo_feed`) e l'articolo con l'elisione davanti a un numero (`art`); da v511 anche le derivazioni delle serie
+macro che l'analisi legge alla fonte e la pipeline pubblica (CPI per data, posti di lavoro, CCC, NFCI, SLOOS, Fear &
+Greed). La usano `update_data.py`, `fonti_dirette.py`, `brief.py`,
 `credito.py` e gli strumenti già dichiarati qui. Una sola, perché il 24/10/2026 il pavimento del rumore viveva solo
 nella pipeline, e `numeri_libro.py` pubblicava i beta del libro senza: una seconda copia sarebbe stata la classe v161.
 

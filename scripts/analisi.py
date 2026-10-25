@@ -64,8 +64,11 @@ TITOLO_CHECKLIST = "## Cosa contiene la risposta"
 TITOLO_REGOLE = "## Regole"
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-STRUMENTI = ("numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py", "indici.py",
-             "concorrenti.py")
+STRUMENTI = ("fonti_dirette.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py",
+             "indici.py", "concorrenti.py")
+# v511 — fonti_dirette.py gira PRIMA degli altri, da solo: scrive la lettura alla fonte del giro che gli altri riusano
+#   (una lettura per analisi, la stessa osservazione per tutti), e stampa il blocco FRESCHEZZA DEI DATI
+PRIMA = ("fonti_dirette.py",)
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 # v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
 # v499 — e il dark pool (posizionamento.py) e la storia del P/E del Nasdaq-100 (indici.py): stesse ragioni
@@ -90,7 +93,8 @@ def comandi(f, sedute=1):
     """(etichetta, argomenti) di ogni strumento, nell'ordine in cui la risposta li usa.
     Fuori dalla seduta numeri_libro gira due volte: l'ultima seduta E il prezzo esteso
     (istruzione del CEO del 06/10: prima dell'apertura l'analisi parte dal pre-market)."""
-    c = []
+    c = [("FRESCHEZZA DEI DATI — le serie macro lette alla fonte adesso, la pipeline come ripiego e la sua eta'",
+          ["fonti_dirette.py"])]
     if f == "pre-market":
         c.append(("PRE-MARKET — il libro sul prezzo esteso (volumi sottili: e' un'indicazione)",
                   ["numeri_libro.py", "--esteso"]))
@@ -233,7 +237,9 @@ def main():
     t0 = time.time()
     prima = impronta()
     prima_mem = {p: impronta(p) for p in MEMORIE}
-    esiti = esegui(lista)
+    # v511 — prima la lettura alla fonte (da sola), poi tutti gli altri in parallelo: la riusano dal disco
+    testa_l = [x for x in lista if Path(x[1][1]).name in PRIMA]
+    esiti = esegui(testa_l) + esegui([x for x in lista if x not in testa_l])
     testa = (f"ANALISI DEL LIBRO — {adesso.astimezone(ROMA):%d/%m/%Y %H:%M} ora italiana · New York "
              f"{adesso:%H:%M} · fase: {f.upper()} · {len(lista)} strumenti in parallelo, {round(time.time() - t0)} s")
     sc_righe, sc_codice, _ = scrivi_scheda(esiti, f, adesso)

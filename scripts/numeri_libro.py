@@ -184,20 +184,26 @@ def calcola(sedute=1, registra=False, adesso=None):
                        ("px", "d50_atr", "d200_atr", "supporto20", "supp_atr", "resistenza20", "res_atr",
                         "atr_pct", "dmax52_pct", "seduta_quota")}} for t in TK]
     out["calendario"] = brief.calendario_trimestrali(TK + [s["tk"] for s in sorv] + fuori, giorni=45)
-    out["macro"] = brief.macro_dalla_pipeline()
-    out["attesa"] = costo_attesa(tot, ris["vol_ann"], ris["var95"], ris["es95"], out["calendario"], TK)
-    _fcf, _ccc = credito_dalla_pipeline(TK)
-    out["credito"] = dipendenti_credito([{**x, "valore": val[x["tk"]]} for x in out["titoli"]], out["tecnica"], _fcf, _ccc)
     # v474 — semaforo, decisioni aperte, registro. Il file della pipeline si apre in una funzione
     #   propria: le POSIZIONI di questo corpo restano quelle del libro (v439, gate v460).
     pipe = _carica_pipeline()
-    out["semaforo"] = semaforo(B["SMH"], {t: B.get(t) for t in LEADER}, segnali_pipeline(pipe), adesso)
+    # v511 — le serie macro lette ALLA FONTE una volta per giro (scripts/fonti_dirette.py), la pipeline come ripiego
+    #   dichiarato: il credito e i tassi del semaforo, il credito sul libro e il cambio del patrimonio non aspettano
+    #   piu' la coda del cron di GitHub (decisione del CEO del 25/10/2026)
+    import fonti_dirette
+    giro = fonti_dirette.del_giro(pipe)
+    out["fonti"] = giro
+    out["macro"] = brief.macro_del_giorno(giro)
+    out["attesa"] = costo_attesa(tot, ris["vol_ann"], ris["var95"], ris["es95"], out["calendario"], TK)
+    _fcf, _ccc = credito_dalla_pipeline(TK, giro["scelta"])
+    out["credito"] = dipendenti_credito([{**x, "valore": val[x["tk"]]} for x in out["titoli"]], out["tecnica"], _fcf, _ccc)
+    out["semaforo"] = semaforo(B["SMH"], {t: B.get(t) for t in LEADER}, segnali_pipeline(pipe, giro["scelta"]), adesso)
     out["semaforo"]["reazioni"] = reazioni_libro(testo_libro())
     # v481-v482 — la tenuta di ogni posizione (LIBRO.md §1sexies): la stessa funzione dei sorvegliati, e
     #   per le posizioni in perdita l'aritmetica della media con le funzioni degli ingressi (v161)
     import rotazione
     eur = {p["tk"]: p for p in pos if p["valuta"] == "EUR"}
-    pat_pipe = patrimonio_pipeline(pipe, {t: p["pmc"] for t, p in eur.items()})
+    pat_pipe = patrimonio_pipeline(pipe, {t: p["pmc"] for t, p in eur.items()}, giro["scelta"])
     prima_trim = {}
     for a in out["calendario"].get("attesi") or []:
         prima_trim.setdefault(a["tk"], a.get("giorni"))       # gli attesi arrivano gia' in ordine di data
@@ -245,8 +251,14 @@ def calcola(sedute=1, registra=False, adesso=None):
                                   (TEC.get(t) or {}).get("px"), (TEC.get(t) or {}).get("atr"), adesso,
                                   veicolo=storia.get(t))
           for t in con_pav}
+    # v511 — gli oscillatori coi loro estremi, il supporto e l'accumulo, la stagionalita' del titolo (domanda del CEO del
+    #   24/10, «Ok» del 25/10): informazione accanto alla tenuta, attaccata DOPO il bilancio dell'evidenza — che quindi
+    #   non la vede, come la struttura (v495)
+    _rp511 = righe_pipeline(pipe)
     for r in (out["tenuta"] or {}).get("righe") or []:
         r["vwap"] = vw.get(r["tk"])
+        r["oscillatori"] = rotazione.oscillatori(B.get(r["tk"]), adesso)
+        r["stagionalita"] = ((_rp511.get(r["tk"]) or {}).get("tv") or {}).get("stagionalita")
     for x in (out["ordini"] or {}).get("righe") or []:
         if not x.get("errore"):
             x["vwap"] = vw.get(x["tk"])
@@ -323,16 +335,19 @@ def fcf_di(riga):
     return ((riga or {}).get("combustione") or {}).get("fcf_ttm")
 
 
-def credito_dalla_pipeline(nomi):
+def credito_dalla_pipeline(nomi, sc=None):
     """Da data.json: il SEGNO del flusso di cassa libero di ciascun nome (v404: solo segni e
     rapporti, mai grandezze fra titoli — SKHY pubblica in won) e macro.credit_ccc.
-    None = la pipeline non lo ha; un file illeggibile da' None ovunque, mai un default."""
+    None = la pipeline non lo ha; un file illeggibile da' None ovunque, mai un default.
+    v511 — lo spread CCC dalla fonte letta adesso (sc = fonti_dirette.scegli), la pipeline come ripiego: lo stesso
+    numero del semaforo, nello stesso giro (v161)."""
+    ccc = (sc or {}).get("ccc")
     d = _carica_pipeline()
     if d is None:
-        return {t: None for t in nomi}, None
+        return {t: None for t in nomi}, ccc
     righe = righe_pipeline(d)
     return ({t: fcf_di(righe.get(t)) for t in nomi},
-            (d.get("macro") or {}).get("credit_ccc"))
+            ccc or (d.get("macro") or {}).get("credit_ccc"))
 
 
 def dipendenti_credito(titoli, tecnica, fcf, ccc):
@@ -626,20 +641,30 @@ def righe_pipeline(d):
             for r in ((d or {}).get("portfolio") or []) + ((d or {}).get("watchlist") or []) if isinstance(r, dict)}
 
 
-def segnali_pipeline(d):
-    """Gli ingressi del semaforo che vengono dalla pipeline, ciascuno con la SUA data (v431)."""
+def segnali_pipeline(d, sc=None):
+    """Gli ingressi del semaforo che vengono dalla pipeline, ciascuno con la SUA data (v431).
+    v511 — credito (CCC, HY OAS) e tassi (Treasury 10A) dalla fonte letta adesso: sc = fonti_dirette.scegli, che
+    porta la fonte e l'esito di ciascuno («fonte» o «pipeline», il ripiego). Analisti e leva restano della pipeline:
+    una fonte raggiungibile da qui non c'e' (Yahoo 429), e il blocco FRESCHEZZA DEI DATI lo dichiara."""
     if not d:
-        return {"ccc": None, "hy": None, "t10": None, "analisti": {}, "margin": None}
-    m = d.get("macro") or {}
-    cr = m.get("credit") or {}
-    a10 = next((s for s in ((m.get("tassi") or {}).get("scadenze") or []) if s.get("key") == "a10"), None)
-    righe = righe_pipeline(d)
-    return {"ccc": m.get("credit_ccc"),
-            "hy": {"valore": cr["spread_hy"], "data": cr.get("date")} if cr.get("spread_hy") is not None else None,
-            "t10": ({"valore": a10["value"], "data": a10.get("observation_date")}
-                    if a10 and a10.get("value") is not None else None),
-            "analisti": {tk: (righe.get(tk) or {}).get("analisti") for tk in REVISIONI_AI},
-            "margin": m.get("margin_debt")}
+        out = {"ccc": None, "hy": None, "t10": None, "analisti": {}, "margin": None}
+    else:
+        m = d.get("macro") or {}
+        cr = m.get("credit") or {}
+        a10 = next((s for s in ((m.get("tassi") or {}).get("scadenze") or []) if s.get("key") == "a10"), None)
+        righe = righe_pipeline(d)
+        out = {"ccc": m.get("credit_ccc"),
+               "hy": {"valore": cr["spread_hy"], "data": cr.get("date")} if cr.get("spread_hy") is not None else None,
+               "t10": ({"valore": a10["value"], "data": a10.get("observation_date")}
+                       if a10 and a10.get("value") is not None else None),
+               "analisti": {tk: (righe.get(tk) or {}).get("analisti") for tk in REVISIONI_AI},
+               "margin": m.get("margin_debt")}
+    for k in ("ccc", "hy", "t10"):
+        v = (sc or {}).get(k)
+        if v and v.get("valore") is not None:
+            out[k] = (dict(v) if k == "ccc" else
+                      {"valore": v["valore"], "data": v.get("data"), "fonte": v.get("fonte"), "esito": v.get("esito")})
+    return out
 
 
 def semaforo(smh, leader, seg, adesso=None):
@@ -709,6 +734,13 @@ def righe_semaforo(s, precedente=None, mcr=None):
                 if hy.get("valore") is not None else " · HY OAS n.d.") + f" — {st(c)}")
     tv = f["tassi"]["t10"] or {}
     L.append(f"  tassi: Treasury 10 anni {_it(tv.get('valore'))}% del {tv.get('data') or 'n.d.'} (soglia 5,4) — {st(f['tassi'])}")
+    # v511 — chi ha servito credito e tassi: la fonte letta adesso o la pipeline (ripiego). Senza questa riga un valore
+    #   della pipeline di ieri e uno letto stamattina si leggerebbero uguali (v393, v406)
+    _fz = [(n, x) for n, x in (("CCC", ccc), ("HY OAS", hy), ("Treasury", tv)) if x.get("valore") is not None]
+    if _fz:
+        L.append("  fonti di credito e tassi: " + " · ".join(
+            f"{n} " + ("dalla pipeline (RIPIEGO)" if x.get("esito") == "pipeline" else (x.get("fonte") or "pipeline"))
+            for n, x in _fz) + " — dettaglio in FRESCHEZZA DEI DATI")
     fo = f["fondamentali"]
     rev = " · ".join(f"{r['tk']} {r['su']} su, {r['giu']} giù" if r["misurato"] else f"{r['tk']} n.d." for r in fo["righe"])
     L.append(f"  fondamentali AI: revisioni a 30 giorni {rev} — {st(fo)} · la guida sugli investimenti degli "
@@ -1944,6 +1976,9 @@ def righe_tenuta(t):
         import rotazione
         L.append("  " + rotazione.INTESTAZIONE_STRUTTURA + " — e non vende: dal 15/10 non si vende sui ribassi "
                  "(LIBRO.md §1ter), si guardano la tenuta e le notizie")
+    if any("oscillatori" in r for r in t["righe"]):
+        import rotazione
+        L.append("  " + rotazione.INTESTAZIONE_IPERVENDUTO)
     for r in t["righe"]:
         tp = testo_prove(r)
         L.append(f"  {r['tk']:5} {etichetta_esito(r)}" + (f" · peso {_it(r['peso'] * 100, 1)}%" if r.get("peso") is not None else ""))
@@ -1963,6 +1998,13 @@ def righe_tenuta(t):
         if "struttura" in r:          # v494 — la struttura delle oscillazioni accanto alla tendenza: la stessa famiglia
             import rotazione
             L.extend(f"      {x}" for x in rotazione.righe_struttura(r["struttura"]))
+        if "oscillatori" in r:        # v511 — ipervenduto e ipercomprato, supporto e accumulo: informazione
+            import rotazione
+            L.extend(f"      {x}" for x in rotazione.righe_ipervenduto_accumulo(r["oscillatori"], r.get("pavimenti"),
+                                                                                r.get("struttura")))
+        if "stagionalita" in r:       # v511 — il mese in corso e il successivo, col campione
+            import rotazione
+            L.append("      " + rotazione.riga_stagionalita(r["stagionalita"]))
         fuori = []
         c = r.get("consenso")
         if c:
@@ -2108,12 +2150,18 @@ def leggi_registro(percorso=None):
     return sorted(righe, key=lambda r: r["seduta"]), rotte
 
 
-def patrimonio_pipeline(d, eur_pmc):
+def patrimonio_pipeline(d, eur_pmc, sc=None):
     """(cambio EUR/USD, sua fonte, {obbligazione: (prezzo, fonte)}) dalla pipeline. Senza la riga
     della pipeline l'obbligazione resta AL CARICO, dichiarato: farla sparire rimpicciolirebbe il
-    patrimonio e gonfierebbe ogni percentuale (v439)."""
+    patrimonio e gonfierebbe ogni percentuale (v439).
+    v511 — il cambio dal riferimento della BCE letto adesso (sc = fonti_dirette.scegli), che ha una DATA: la
+    quotazione dello snapshot della pipeline non ne ha, ed e' il ripiego. Le due non sono la stessa grandezza (un
+    fixing delle 14:15 CET contro una quotazione dell'ora del run), e la fonte viaggia col numero."""
     fx, fonte = None, None
-    if d:
+    ev = (sc or {}).get("eurusd") or {}
+    if ev.get("esito") == "fonte" and ev.get("valore"):
+        fx, fonte = float(ev["valore"]), f"{ev.get('fonte')}, del {ev.get('data') or 'n.d.'}"
+    elif d:
         e = next((x for x in ((d.get("macro") or {}).get("markets") or []) if x.get("key") == "EURUSD=X"), None)
         try:
             fx = float(e["value"]) if e else None

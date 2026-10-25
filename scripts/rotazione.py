@@ -853,6 +853,192 @@ def struttura(barre, px, atr, adesso=None, veicolo=None, anni=ANNI_STRUTTURA):
             "rottura": rottura, "estremo": estremo, "doppi": doppi, "divergenze": divergenze, "volumi": volumi}
 
 
+# ---------------------------------------------------------------- v511: ipervenduto, supporto e accumulo, stagionalita'
+# Domanda del CEO del 24/10/2026: «Anche la stagionalità, il sentiment e quando un'azione è in ipervenduto tutte queste
+# cose sono strutturati nell'analisi? O se un'azione è in una zona di supporto e accumulo e quindi c'è un cambio
+# eventualmente di tendenza»; il 25/10, alla proposta: «Ok». Tre righe per ogni posizione e ogni sorvegliato, tutte
+# INFORMAZIONE — non una prova della tenuta, non un colore, non un ingresso (la regola della struttura dal 17/10):
+#   · gli OSCILLATORI coi loro estremi: le stesse formule della pipeline (update_data.batteria_tecnica, un gate le
+#     confronta) sulle barre dell'analisi, quelle di tutti gli altri numeri tecnici in chat, e solo sulle sedute
+#     CONCLUSE (v471). Le soglie sono le convenzioni di lettura dei manuali, dichiarate (v240);
+#   · SUPPORTO E ACCUMULO: quante delle quattro condizioni che i manuali leggono come una base che si forma sono
+#     presenti oggi — nessun punteggio (v200): si dice QUALI, e una condizione non misurata e' un buco (v205);
+#   · la STAGIONALITA' del titolo nel mese in corso e nel successivo, dallo storico mensile che la pipeline pubblica
+#     (almeno 8 anni per mese, v316: una media su tre anni fra esiti opposti e' rumore), col campione accanto. Cambia
+#     una volta al mese: il ritardo della pipeline qui non pesa. ⚠ Una media su N anni non e' una previsione.
+SOGLIE_OSCILLATORI = {"rsi": (30.0, 70.0), "stocastico": (20.0, 80.0), "williams": (-80.0, -20.0), "cci": (-100.0, 100.0)}
+OSC_MINIMO = 2               # ipervenduto (o ipercomprato) = almeno 2 dei 4 oltre la propria soglia: convenzione
+NOMI_OSCILLATORI = {"rsi": "RSI 14", "stocastico": "stocastico 14/3 (%K)", "williams": "Williams %R 14", "cci": "CCI 20"}
+
+
+def oscillatori(barre, adesso=None):
+    """v511 — RSI 14 (Wilder, rsi_wilder: None sotto 100 barre, v436), stocastico 14/3, Williams %R 14 e CCI 20 con le
+    formule di update_data.batteria_tecnica, sulle sedute concluse. None = barre non lette o meno di 30 sedute."""
+    if not barre:
+        return None
+    if seduta_in_corso(barre, adesso):
+        barre = barre[:-1]
+    b = [x for x in barre if x.get("h") is not None and x.get("l") is not None and x.get("c") is not None]
+    if len(b) < 30:
+        return None
+    h, lo, c = [x["h"] for x in b], [x["l"] for x in b], [x["c"] for x in b]
+
+    def k_a(i):
+        aa, bb = max(h[i - 13:i + 1]), min(lo[i - 13:i + 1])
+        return None if aa == bb else 100 * (c[i] - bb) / (aa - bb)
+    k3 = [k_a(i) for i in range(len(b) - 3, len(b))]
+    aa, bb = max(h[-14:]), min(lo[-14:])
+    tp = [(x + y + z) / 3 for x, y, z in zip(h, lo, c)]
+    m20 = [None] * len(tp)
+    for i in range(19, len(tp)):
+        m20[i] = sum(tp[i - 19:i + 1]) / 20
+    cci = None
+    if len(tp) >= 39:
+        dev = [abs(tp[i] - m20[i]) for i in range(len(tp) - 20, len(tp))]
+        md = sum(dev) / 20
+        cci = (tp[-1] - m20[-1]) / (0.015 * md) if md else None
+    return {"seduta": str(b[-1]["t"])[:10], "rsi": rsi_wilder(b), "stocastico": k3[-1],
+            "stocastico_d": sum(k3) / 3 if all(x is not None for x in k3) else None,
+            "williams": None if aa == bb else -100 * (aa - c[-1]) / (aa - bb), "cci": cci}
+
+
+def lettura_oscillatori(o):
+    """{stato, ipervenduto: [nomi], ipercomprato: [nomi], misurati}. Lo stato e' una CONVENZIONE di lettura: almeno
+    OSC_MINIMO dei quattro oltre la soglia; sotto OSC_MINIMO misurati e' NON MISURABILE (v389)."""
+    if not o:
+        return None
+    vals = {k: o.get(k) for k in SOGLIE_OSCILLATORI}
+    giu = [k for k, v in vals.items() if v is not None and v <= SOGLIE_OSCILLATORI[k][0]]
+    su = [k for k, v in vals.items() if v is not None and v >= SOGLIE_OSCILLATORI[k][1]]
+    mis = [k for k, v in vals.items() if v is not None]
+    if len(mis) < OSC_MINIMO:
+        stato = "NON MISURABILE"
+    elif len(giu) >= OSC_MINIMO and len(su) >= OSC_MINIMO:
+        stato = "CONTRADDITTORIO"
+    elif len(giu) >= OSC_MINIMO:
+        stato = "IPERVENDUTO"
+    elif len(su) >= OSC_MINIMO:
+        stato = "IPERCOMPRATO"
+    else:
+        stato = "NELLA NORMA"
+    return {"stato": stato, "ipervenduto": giu, "ipercomprato": su, "misurati": mis}
+
+
+def supporto_accumulo(pav, osc, st):
+    """v511 — le quattro condizioni che i manuali leggono come una BASE che si forma, una per una: [(nome, vera,
+    testo)] dove vera e' True, False o None (non misurata: un buco, non un no). Nessun punteggio (v200).
+      1. sul pavimento: un minimo di oscillazione raggruppato entro 1 ATR dal prezzo (VICINO_ATR, rotazione.pavimenti);
+      2. ipervenduto: lettura_oscillatori;
+      3. accumulo: nelle ultime 20 sedute concluse il volume medio delle sedute in salita supera quello delle sedute in
+         discesa (rotazione.struttura);
+      4. segnale di svolta: una divergenza rialzista dell'RSI, o un doppio minimo confermato da non piu' di STR_RECENTE
+         sedute (rotazione.struttura)."""
+    L = []
+    if pav is None:
+        L.append(("sul pavimento", None, "pavimenti non calcolati"))
+    else:
+        vic = [z for z in pav.get("minimi") or [] if z.get("atr") is not None and abs(z["atr"]) <= VICINO_ATR]
+        L.append(("sul pavimento", bool(vic),
+                  (f"pavimento {prezzo(vic[0]['alto'])} a {piano(abs(vic[0]['atr']), 1)} ATR" if vic
+                   else "nessun pavimento entro 1 ATR")))
+    lo = lettura_oscillatori(osc)
+    if not lo or lo["stato"] == "NON MISURABILE":
+        L.append(("ipervenduto", None, "oscillatori non misurabili"))
+    else:
+        L.append(("ipervenduto", lo["stato"] == "IPERVENDUTO",
+                  (f"{len(lo['ipervenduto'])} oscillatori su {len(lo['misurati'])} oltre la soglia" if lo["ipervenduto"]
+                   else "nessun oscillatore oltre la soglia dell'ipervenduto")))
+    v = (st or {}).get("volumi")
+    if not v or v.get("rapporto") is None:
+        L.append(("accumulo", None, "volumi in salita e in discesa non misurabili"))
+    else:
+        L.append(("accumulo", v["rapporto"] > 1,
+                  f"volume medio in salita {piano(v['rapporto'], 2)} volte quello in discesa ({v['su']} sedute su, "
+                  f"{v['giu']} giu')"))
+    if st is None:
+        L.append(("segnale di svolta", None, "struttura non letta"))
+    else:
+        div = [d for d in st.get("divergenze") or [] if d["tipo"] == "rialzista"]
+        dop = [d for d in st.get("doppi") or [] if d["tipo"] == "minimo" and d["esito"] == "confermato"
+               and d.get("sedute_dal") is not None and d["sedute_dal"] <= STR_RECENTE]
+        testo = ("divergenza rialzista dell'RSI" + (" in formazione" if div and div[0]["in_formazione"] else "")
+                 if div else f"doppio minimo confermato dal {dop[0]['dal']}" if dop
+                 else "ne' divergenza rialzista ne' doppio minimo confermato di recente")
+        L.append(("segnale di svolta", bool(div or dop), testo))
+    return L
+
+
+def righe_ipervenduto_accumulo(osc, pav, st):
+    """La resa: la riga degli oscillatori e quella del supporto e dell'accumulo. Le soglie si dichiarano una volta per
+    blocco (INTESTAZIONE_IPERVENDUTO, v407)."""
+    if not osc:
+        r1 = "oscillatori: barre NON lette o meno di 30 sedute concluse — non vuol dire 'nella norma'"
+    else:
+        lo = lettura_oscillatori(osc)
+        # RSI e stocastico sono livelli su 0-100, senza verso (piano); Williams e CCI hanno il segno nella definizione
+        parti = [f"{NOMI_OSCILLATORI[k]} " + ("n.d." if osc.get(k) is None else
+                                              (piano(osc[k], 1) if k in ("rsi", "stocastico") else n(osc[k], 1)))
+                 for k in SOGLIE_OSCILLATORI]
+        r1 = f"oscillatori (seduta del {osc['seduta']}): " + " · ".join(parti) + f" — {lo['stato']}"
+        if lo["ipervenduto"]:
+            r1 += " (oltre la soglia dell'ipervenduto: " + ", ".join(NOMI_OSCILLATORI[k] for k in lo["ipervenduto"]) + ")"
+        if lo["ipercomprato"]:
+            r1 += " (oltre la soglia dell'ipercomprato: " + ", ".join(NOMI_OSCILLATORI[k] for k in lo["ipercomprato"]) + ")"
+    cond = supporto_accumulo(pav, osc, st)
+    vere = [c for c in cond if c[1] is True]
+    nm = [c for c in cond if c[1] is None]
+    r2 = (f"supporto e accumulo: {len(vere)} {'condizione' if len(vere) == 1 else 'condizioni'} su {len(cond)}"
+          + (f" ({len(nm)} non misurate)" if nm else "") + " — "
+          + " · ".join(f"{'SI' if c[1] else ('n.d.' if c[1] is None else 'no')} {c[0]}: {c[2]}" for c in cond)
+          + " · un'informazione, non un ingresso")
+    return [r1, r2]
+
+
+def _soglie_testo(i, segno):
+    # le soglie sono intere: si scrivono senza decimali e col meno, da sole — l'intestazione si costruisce al
+    #   caricamento del modulo, prima delle funzioni di resa (piano, n) definite piu' sotto
+    return ", ".join(f"{NOMI_OSCILLATORI[k].split(' ')[0]} {segno} {int(round(v[i]))}"
+                     for k, v in SOGLIE_OSCILLATORI.items())
+
+
+INTESTAZIONE_IPERVENDUTO = (   # v511 — dichiarata una volta per blocco (v407), e in LIBRO.md §1bis; le soglie dalle costanti
+    "oscillatori e supporto/accumulo (domanda del CEO del 24/10/2026) = RSI 14 (Wilder), stocastico 14/3, Williams %R 14 "
+    "e CCI 20 sulle sedute concluse, con le formule della pipeline · soglie di lettura dei manuali, convenzioni: "
+    f"ipervenduto {_soglie_testo(0, '<=')}; ipercomprato {_soglie_testo(1, '>=')}; "
+    f"lo stato vale con almeno {OSC_MINIMO} dei quattro oltre la soglia · supporto e "
+    "accumulo = quante delle quattro condizioni di una base sono presenti (sul pavimento entro 1 ATR, ipervenduto, volume "
+    f"in salita maggiore che in discesa sulle ultime {STR_VOLUMI} sedute, divergenza rialzista o doppio minimo confermato "
+    f"da non piu' di {STR_RECENTE} sedute) — contate, non pesate (v200) · informazione, non una prova della tenuta ne' "
+    "un ingresso")
+
+
+def stagionalita_mesi(stag, adesso=None):
+    """v511 — la stagionalita' del titolo nel mese in corso e nel successivo (mese di New York), dallo storico mensile
+    della pipeline (tv.stagionalita: media, mediana, quota di mesi positivi, campione, peggiore e migliore). Un mese
+    senza voce non ha abbastanza anni (almeno 8): si dice, non si stima."""
+    ny = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
+    mesi = (ny.month, ny.month % 12 + 1)
+    per = {x.get("mese"): x for x in (stag or []) if isinstance(x, dict)}
+    return [(m, per.get(m)) for m in mesi]
+
+
+def riga_stagionalita(stag, adesso=None):
+    if not stag:
+        return ("stagionalita' del titolo: la pipeline non la pubblica (meno di 8 anni di storico mensile, o titolo non "
+                "seguito) — non vuol dire 'nessuna stagionalita''")
+    parti = []
+    for m, x in stagionalita_mesi(stag, adesso):
+        nome = brief.MESI_IT[m - 1]
+        if not x:
+            parti.append(f"{nome}: meno di 8 anni nello storico, nessuna media")
+            continue
+        parti.append(f"{nome} media {n(x.get('media'), 1, '%')}, mediana {n(x.get('mediana'), 1, '%')}, positivo "
+                     f"{art('il', str(x.get('positivi_pct')) + '%')} delle volte su {x.get('campione')} anni (peggiore {n(x.get('peggio'), 1, '%')}, "
+                     f"migliore {n(x.get('meglio'), 1, '%')})")
+    return ("stagionalita' del titolo (storico mensile della pipeline; una media su N anni, non una previsione): "
+            + " · ".join(parti))
+
+
 def scheda(tk, barre, rlibro, rspy=None, target=None):
     t = brief.tecnica(tk, d=barre) if barre else {"tk": tk, "errore": "nessuna barra"}
     if t.get("errore"):
@@ -876,7 +1062,9 @@ def scheda(tk, barre, rlibro, rspy=None, target=None):
             "atr": t.get("atr"), "min52": t.get("min52"), "minimi": struttura_minimi(barre, atr=t.get("atr")),
             "dal_minimo": dal_minimo(barre, t["px"]),
             # v489 — il volume della seduta in corso, col tempo trascorso (None fuori dalla seduta)
-            "vol_seduta_corso": volume_seduta(t, barre)}
+            "vol_seduta_corso": volume_seduta(t, barre),
+            # v511 — gli oscillatori coi loro estremi, sulle sedute concluse delle stesse barre
+            "oscillatori": oscillatori(barre)}
 
 
 def _barre_sicure(tk):
@@ -950,8 +1138,11 @@ def raccogli():
         prima_trim.setdefault(a["tk"], a)          # gli attesi arrivano gia' in ordine di data
     # v481 — la regola di tenuta del CEO (LIBRO.md §1sexies) vale anche per i nomi oggetto di analisi:
     #   la STESSA funzione delle posizioni, col semaforo calcolato sugli stessi dati (un'implementazione).
+    # v511 — credito e tassi del semaforo dalla fonte letta adesso, la stessa lettura del giro (scripts/fonti_dirette.py)
+    import fonti_dirette
+    giro = fonti_dirette.del_giro(d)
     sem = numeri_libro.semaforo(B.get("SMH"), {t: B.get(t) for t in numeri_libro.LEADER},
-                                numeri_libro.segnali_pipeline(d))
+                                numeri_libro.segnali_pipeline(d, giro["scelta"]))
     watch = [{**(S.get(s["tk"]) or {"tk": s["tk"], "errore": "non letto"}),
               "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"), x.get("pend50"),
                                                   x.get("d50_atr"), x.get("corr_libro")))(S.get(s["tk"]) or {})),
@@ -961,6 +1152,8 @@ def raccogli():
               "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe,
               # v492 — i multipli per il P/E, e la storia della quotazione (veicolo, SEC EDGAR) dalla pipeline
               "stats": (pipe.get(s["tk"]) or {}).get("stats"), "veicolo": veicolo_pipeline(d, s["tk"]),
+              # v511 — la stagionalita' del titolo dallo storico mensile della pipeline (cambia una volta al mese)
+              "stagionalita": ((pipe.get(s["tk"]) or {}).get("tv") or {}).get("stagionalita"),
               "tenuta": numeri_libro.valuta_tenuta(B.get(s["tk"]), pipe.get(s["tk"]), sem)}
              for s in sorv]
     # v487 — i pavimenti (decisione del CEO del 15/10/2026: entrare sui minimi). Lo storico di cinque anni
@@ -984,7 +1177,7 @@ def raccogli():
     # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
     eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
     eur_nom = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "EUR"}
-    fx, fonte_fx, prezzi_eur = numeri_libro.patrimonio_pipeline(d, eur_pmc)
+    fx, fonte_fx, prezzi_eur = numeri_libro.patrimonio_pipeline(d, eur_pmc, giro["scelta"])
     valore_libro = sum(qta[tk] * B[tk][-1]["c"] for tk in qta if B.get(tk))
     pat = numeri_libro.patrimonio_eur(valore_libro, fx, cassa, [(eur_nom[t], prezzi_eur[t][0]) for t in eur_nom])
     rqqq = rendimenti_per_data(B["QQQ"]) if B.get("QQQ") else {}
@@ -1161,6 +1354,10 @@ def righe_ingresso(t, cal=None):
     L.append(f"      {base}")
     if "struttura" in t:          # v494 — la struttura delle oscillazioni: il calcolo vive in raccogli
         L.extend(f"      {r}" for r in righe_struttura(t["struttura"]))
+    if "oscillatori" in t:        # v511 — ipervenduto e ipercomprato, supporto e accumulo: informazione
+        L.extend(f"      {r}" for r in righe_ipervenduto_accumulo(t["oscillatori"], t.get("pavimenti"), t.get("struttura")))
+    if "stagionalita" in t:       # v511 — il mese in corso e il successivo, col campione
+        L.append(f"      {riga_stagionalita(t['stagionalita'])}")
     if "pavimenti" in t:          # v487 — solo i sorvegliati: il calcolo vive in raccogli
         L.extend(f"      {r}" for r in righe_pavimenti(t["pavimenti"]))
     if "vwap" in t:               # v500 — il VWAP dall'ultima trimestrale, accanto ai pavimenti
@@ -1770,6 +1967,7 @@ def righe_watchlist(o):
          "oggi: dall'ultima operazione societaria e dalla fine del veicolo di quotazione (SPAC) dichiarata sul registro SEC",
          "   " + (o.get("valutazione_rif") or "valutazione: riferimento n.d."),
          "   " + INTESTAZIONE_STRUTTURA,
+         "   " + INTESTAZIONE_IPERVENDUTO,
          "   " + INTESTAZIONE_VWAP]          # v500 — una volta per blocco (v407)
     if o.get("spy_assente"):
         L.append("   ⚠ serie dell'S&P 500 NON letta: i beta mancano tutti, non sono zero")

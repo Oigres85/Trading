@@ -56,6 +56,7 @@ TK = r"(?P<tk>[A-Z][A-Z0-9.\-]*)"
 
 # ── le sezioni della risposta, nell'ordine di memoria/FORMATO_ANALISI.md ─────────────────────────────────────
 SEZIONI = (
+    ("freschezza", "0 · Freschezza dei dati: chi ha servito ogni serie, e l'eta' della pipeline"),     # v511
     ("semaforo", "0 · Semaforo d'uscita"),
     ("salvavita", "0 · Salvavita e piano di riduzione"),
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
@@ -151,6 +152,7 @@ class Strumento:
 #   f"  {tk:5} …", e un ticker di cinque lettere (GOOGL) ha uno spazio solo dopo di se'
 _RIGA_PREZZO = Nome(rf"  {TK} +(?:[0-9]|non quotato)", "premarket", "copia")
 CATALOGO = {
+    "fonti_dirette": Strumento("freschezza", (Blocco(r"FRESCHEZZA DEI DATI", "freschezza"),)),        # v511
     "numeri_libro_esteso": Strumento("premarket", (
         Blocco(r"FUORI SESSIONE|POSIZIONI$|RIFERIMENTI$|SORVEGLIATI$", "premarket", (_RIGA_PREZZO,)),
     )),
@@ -207,8 +209,8 @@ CATALOGO = {
         Blocco(r"BITCOIN", "bitcoin"),
     )),
     "indici": Strumento("indici", (
-        Blocco(r"INDICI|VALUTAZIONE|STAGIONE DELLE TRIMESTRALI|VOLATILITA'|SENTIMENT|CONCENTRAZIONE|AMPIEZZA|TENDENZA",
-               "indici"),
+        Blocco(r"INDICI|VALUTAZIONE|STAGIONE DELLE TRIMESTRALI|VOLATILITA'|SENTIMENT|STAGIONALITA' DEL NASDAQ|CONCENTRAZIONE|"
+               r"AMPIEZZA|TENDENZA", "indici"),
     )),
     "concorrenti": Strumento("concorrenti", (
         Blocco(r"CONCORRENTI E QUOTE", "concorrenti"),
@@ -242,6 +244,7 @@ class Voce:
 # Le chiavi sono quelle di memoria/FORMATO_ANALISI.md («Richieste del CEO rese strutturali»): un gate le confronta
 # nei due versi. Una richiesta nuova si aggiunge li' E qui, nello stesso giorno in cui diventa uno strumento.
 REGISTRO = {
+    "freschezza": Voce(("freschezza",)),                                                             # v511
     "semaforo": Voce(("semaforo",)),
     "attesa": Voce(("attesa",)),
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),
@@ -301,6 +304,18 @@ REGISTRO = {
     "concorrenti": Voce(("concorrenti",), (Marcatore("concorrenti", None, "posizioni"),)),
     "solidita": Voce((), (Marcatore("schede", "solidita'", "tutti"),)),
     "scheda": Voce(regola="questa scheda: scritta dallo script a ogni giro, con l'indice qui sopra"),
+    # v511 — ipervenduto e ipercomprato coi quattro oscillatori, supporto e accumulo contato, stagionalita' del titolo e
+    #   del Nasdaq-100 (domanda del CEO del 24/10, «Ok» del 25/10), e il flusso in due tempi
+    "ipervenduto": Voce((), (Marcatore("tenuta", "oscillatori", "posizioni"),
+                             Marcatore("watchlist", "oscillatori", "sorvegliati"),
+                             Marcatore("tenuta", "supporto e accumulo", "posizioni"),
+                             Marcatore("watchlist", "supporto e accumulo", "sorvegliati"))),
+    "stagionalita": Voce(("indici",), (Marcatore("tenuta", "stagionalita' del titolo", "posizioni"),
+                                       Marcatore("watchlist", "stagionalita' del titolo", "sorvegliati")),
+                         righe=(("indici", "STAGIONALITA' DEL NASDAQ-100"),)),
+    "due_tempi": Voce(regola="l'analisi in due tempi (CEO, 25/10): la risposta chiude con le domande mirate (sezione 8 "
+                             "del formato), e il ragionamento sulle risposte si fa in chat — la scheda porta i dati, le "
+                             "domande le scrive la risposta"),
 }
 
 

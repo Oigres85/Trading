@@ -60,6 +60,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import brief            # noqa: E402
+import comuni           # noqa: E402  (v511 — l'articolo davanti a un numero, un posto solo)
 import numeri_libro as NL  # noqa: E402  (i formattatori: virgola decimale, un posto solo — v443)
 import posizionamento as POS  # noqa: E402  (scarica, il segno sul valore arrotondato, il percentile: v161)
 import rotazione        # noqa: E402
@@ -505,6 +506,68 @@ def fear_greed_pipeline(d):
             "con_vix": any("VIX" in c for c in comp), "con_putcall": any("put/call" in c.lower() for c in comp)}
 
 
+def tassi_del_giro(sc, d=None):
+    """v511 — Treasury e TIPS a 10 anni dalla fonte letta adesso (sc = fonti_dirette.scegli: FRED DGS10 e DFII10, la
+    pipeline come ripiego dichiarato in «fonte»), con le loro date. Senza la scelta resta la pipeline."""
+    out = tassi_pipeline(d)
+    for k, chiave in (("t10", "nominale"), ("reale10", "reale")):
+        v = (sc or {}).get(k)
+        if v and v.get("valore") is not None:
+            out[chiave], out[f"data_{chiave}"], out[f"fonte_{chiave}"] = v["valore"], v.get("data"), v.get("fonte")
+    return out
+
+
+def fear_greed_del_giro(sc, d=None, letto=None):
+    """v511 — il Fear & Greed della CNN letto ALLA FONTE adesso (comuni.fear_greed_base, la stessa derivazione della
+    pipeline: v161), con la pipeline come ripiego. Le componenti le elenca la fonte nella stessa risposta: chi lo legge
+    alla fonte sa da se' se il VIX e il put/call ne fanno parte."""
+    f = (sc or {}).get("fear_greed")
+    if not f or f.get("esito") != "fonte":
+        base = fear_greed_pipeline(d)
+        return {**base, "esito": "pipeline"} if base else None
+    comp = f.get("componenti") or []
+    return {"punteggio": f["score"], "giudizio": f.get("rating"), "data": f.get("asof"), "letto": letto,
+            "prima": [(nome, f.get(k)) for k, nome in (("prev_close", "la seduta prima"), ("week_ago", "una settimana fa"),
+                                                        ("month_ago", "un mese fa"), ("year_ago", "un anno fa"))],
+            "storia": f.get("storia"), "n_componenti": len(comp),
+            "con_vix": "market_volatility_vix" in comp, "con_putcall": "put_call_options" in comp,
+            "esito": "fonte", "fonte": f.get("fonte")}
+
+
+CICLI = {1: "post-elezione", 2: "MIDTERM", 3: "pre-elezione", 4: "elezione presidenziale"}
+
+
+def righe_stagionalita_ndx(s, adesso=None):
+    """v511 — la stagionalita' del Nasdaq-100 nel mese in corso e nel successivo, su tutti gli anni e negli anni dello
+    stesso ciclo presidenziale (macro.stagionalita_ndx della pipeline: barre mensili dal primo anno disponibile, l'anno in
+    corso escluso). Cambia una volta al mese: il ritardo della pipeline qui non pesa. ⚠ Il campione degli anni di
+    midterm e' di una decina di osservazioni: la media sta accanto alla dispersione, e non e' una previsione."""
+    L = ["STAGIONALITA' DEL NASDAQ-100 — storico mensile della pipeline: una media su N anni, non una previsione"]
+    if not s or not s.get("mesi"):
+        L.append("  stagionalita' del Nasdaq-100: NON nei dati della pipeline — e' il dato che manca, non 'nessuna stagionalita''")
+        return L
+    ny = (adesso or datetime.now(NEW_YORK)).astimezone(NEW_YORK)
+    per = {x.get("mese"): x for x in s["mesi"] if isinstance(x, dict)}
+    ciclo = s.get("ciclo_ora")
+    nome_ciclo = CICLI.get(ciclo, "n.d.")
+    for m in (ny.month, ny.month % 12 + 1):
+        x = per.get(m)
+        nome = brief.MESI_IT[m - 1]
+        if not x:
+            L.append(f"  {nome}: nessuna media nello storico")
+            continue
+        r = f"  {nome}: media {_sg(x.get('media'), 2)}% su {x.get('n')} anni ({s.get('dal')}-{s.get('al')})"
+        if ciclo == 2 and x.get("media_mid") is not None:
+            r += (f" · negli anni di midterm {_sg(x['media_mid'], 2)}% su {x.get('n_mid')} anni, positivo "
+                  f"{comuni.art('il', str(x.get('pos_mid')) + '%')} delle volte (peggiore {_sg(x.get('peggio_mid'), 1)}%, migliore "
+                  f"{_sg(x.get('meglio_mid'), 1)}%)")
+        elif ciclo == 2:
+            r += " · negli anni di midterm meno di 5 osservazioni: nessuna media"
+        L.append(r)
+    L.append(f"  quest'anno e' il {ciclo or 'n.d.'}° del ciclo presidenziale ({nome_ciclo}); fonte: {s.get('fonte') or 'n.d.'}")
+    return L
+
+
 def premio(pe_fwd, tassi):
     """Il rendimento degli utili attesi (100 / P/E prospettico) meno i rendimenti a 10 anni: il «modello Fed»."""
     if not pe_fwd:
@@ -665,10 +728,13 @@ def righe_sentimento(fg):
     lo faceva, c'era solo nel pacchetto della pagina. E' il composito della CNN — non un punteggio nostro (v200 riguarda i
     nostri) — letto con la sua data, coi confronti che la fonte porta e col suo anno. E la riga dice cio' che lo rende
     facile da contare due volte: due delle sue componenti sono grandezze che l'analisi legge gia' a parte (B3)."""
-    L = ["SENTIMENT — CNN Fear & Greed, dalla pipeline: il composito della CNN su 0-100, non una misura nostra"]
+    # v511 — chi l'ha servito sta nell'intestazione: letto alla fonte adesso, oppure la pipeline (il ripiego)
+    alla_fonte = (fg or {}).get("esito") == "fonte"
+    L = ["SENTIMENT — CNN Fear & Greed, " + ("letto ALLA FONTE adesso" if alla_fonte else "dalla pipeline")
+         + ": il composito della CNN su 0-100, non una misura nostra"]
     if not fg:
-        L.append("  Fear & Greed (CNN): NON nei dati della pipeline — la fonte non ha risposto o il run non l'ha letto: "
-                 "non e' «neutrale», e' il dato che manca")
+        L.append("  Fear & Greed (CNN): NON letto alla fonte in questo giro e NON nei dati della pipeline — la fonte non ha "
+                 "risposto o il run non l'ha letto: non e' «neutrale», e' il dato che manca")
         return L
     g = GIUDIZI_FG.get(str(fg.get("giudizio") or "").lower(), fg.get("giudizio") or "non dichiarato")
     if fg.get("data"):
@@ -676,7 +742,7 @@ def righe_sentimento(fg):
     else:
         letto = _letto_it(fg.get("letto"))
         quando = ("la data della rilevazione non e' in questi dati"
-                  + (f": letto dalla pipeline il {letto}" if letto else ""))
+                  + (f": letto {'alla fonte' if alla_fonte else 'dalla pipeline'} il {letto}" if letto else ""))
     confronti = " · ".join(f"{n} {v}" for n, v in fg.get("prima") or [] if v is not None)
     L.append(f"  Fear & Greed (CNN): {fg['punteggio']} su 100, giudizio della fonte «{g}» · {quando}"
              + (f" · {confronti}" if confronti else " · la fonte non porta i confronti con le rilevazioni passate"))
@@ -686,7 +752,9 @@ def righe_sentimento(fg):
                  f"{_gma(st['a'])}) · minimo {st['minimo']['valore']} (l'ultima volta il {_gma(st['minimo']['data'])}), "
                  f"massimo {st['massimo']['valore']} (l'ultima volta il {_gma(st['massimo']['data'])})")
     else:
-        L.append("  nel suo anno: storico non pubblicato dalla pipeline — il livello si legge coi confronti qui sopra")
+        L.append("  nel suo anno: " + ("la fonte non ne porta abbastanza rilevazioni" if alla_fonte
+                                       else "storico non pubblicato dalla pipeline")
+                 + " — il livello si legge coi confronti qui sopra")
     sovrap = [x for x, c in (("il VIX", fg.get("con_vix")), ("il put/call", fg.get("con_putcall"))) if c]
     if sovrap:
         chi = " e ".join(sovrap)
@@ -773,6 +841,7 @@ def sintesi(o):
     L += righe_stagione(o.get("factset"))
     L += righe_volatilita(o.get("vol"), o.get("termine"), o.get("errori"))
     L += righe_sentimento(o.get("fear_greed"))
+    L += righe_stagionalita_ndx(o.get("stagionalita_ndx"))          # v511
     L += righe_concentrazione(o.get("composizione"), o.get("libro"), o.get("errori"))
     L += righe_ampiezza(o.get("barre"))
     L += righe_tendenza(o.get("schede"))
@@ -818,8 +887,14 @@ def calcola(adesso=None, memoria=None):
     pos, _cassa, _sorv = brief.leggi_libro()
     mem = memoria if memoria is not None else {}
     cambiata = aggiungi_memoria(mem, wsj)
+    # v511 — Treasury, TIPS e Fear & Greed letti ALLA FONTE una volta per giro (scripts/fonti_dirette.py): la pipeline
+    #   e' il ripiego, dichiarato
+    import fonti_dirette
+    giro = fonti_dirette.del_giro(d)
     return {"factset": fs, "multpl": mp, "wsj": wsj, "memoria": mem, "memoria_cambiata": cambiata,
-            "tassi": tassi_pipeline(d), "fear_greed": fear_greed_pipeline(d),
+            "tassi": tassi_del_giro(giro["scelta"], d),
+            "fear_greed": fear_greed_del_giro(giro["scelta"], d, letto=(giro.get("lettura") or {}).get("letto")),
+            "stagionalita_ndx": ((d or {}).get("macro") or {}).get("stagionalita_ndx"),                  # v511
             "vol": {s: stato_vol(v) for s, v in vol_serie.items()},
             "termine": struttura_termine(vol_serie.get("VIX"), vol_serie.get("VIX3M")), "composizione": comp,
             "libro": sorted(p["tk"] for p in pos), "barre": barre,

@@ -205,17 +205,27 @@ def genera(d):
                  'Non e\u0300 «nessun movimento»: e\u0300 il dato che manca.</p>')
     else:
         eta = mf.get("eta_ore")
-        # L'eta del run si dichiara SEMPRE: se la pipeline si ferma, la macro si ferma con lei.
-        if eta is None:
-            cap = ('<p class="mancante">Le serie vengono dalla pipeline, che non dichiara quando '
-                   'ha girato: la loro freschezza non &egrave; verificabile.</p>')
-        elif eta > 24:
-            cap = (f'<p class="mancante"><b>Pipeline ferma da {n2(eta,1)} ore.</b> '
-                   'Queste serie non si aggiornano da allora: ogni riga porta comunque la '
-                   'propria rilevazione, che &egrave; pi&ugrave; vecchia del run.</p>')
-        else:
-            cap = (f'<p class="note-fonti">Dalla pipeline, run di <b>{n2(eta,1)} ore</b> fa. '
-                   'Ogni riga porta la <b>propria</b> rilevazione, che &egrave; un&rsquo;altra data.</p>')
+        # v511 — le serie si leggono alla fonte; l'eta del run si dichiara per le righe che vengono dalla pipeline
+        #   (il ripiego): se la pipeline si ferma, quelle righe si fermano con lei. La stessa resa del testo (v455).
+        rip = mf.get("ripiego")
+        if rip is None:
+            rip = len(mf["serie"])
+        cap = (f'<p class="note-fonti">Lette <b>alla fonte</b> adesso: {mf["dirette"]} serie (FRED, NY Fed, BCE). '
+               'Ogni riga porta la <b>propria</b> rilevazione; la pipeline &egrave; il ripiego.</p>'
+               if mf.get("dirette") else "")
+        if rip and eta is None:
+            cap += (f'<p class="mancante">{rip} serie dalla pipeline, che non dichiara quando '
+                    'ha girato: la loro freschezza non &egrave; verificabile.</p>')
+        elif rip and eta > 24:
+            cap += (f'<p class="mancante"><b>Pipeline ferma da {n2(eta,1)} ore.</b> '
+                    f'Le {rip} serie che vengono da lei non si aggiornano da allora: ogni riga porta comunque la '
+                    'propria rilevazione, che &egrave; pi&ugrave; vecchia del run.</p>')
+        elif rip:
+            cap += (f'<p class="note-fonti">{rip} serie dalla pipeline (ripiego), run di <b>{n2(eta,1)} ore</b> fa. '
+                    'Ogni riga porta la <b>propria</b> rilevazione, che &egrave; un&rsquo;altra data.</p>')
+        if mf.get("assenti"):
+            cap += (f'<p class="mancante"><b>Non disponibili</b> (n&eacute; alla fonte n&eacute; nella pipeline): '
+                    f'{e(", ".join(mf["assenti"]))} &mdash; &egrave; il dato che manca, non un valore neutro.</p>')
         righe = ""
         for s in mf["serie"]:
             # v500 — il periodo descritto (mese, indagine) o il giorno, reso da brief.py (v392, v455)

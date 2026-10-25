@@ -29,6 +29,16 @@ questo file, stampata parola per parola. Un gate verifica che gli strumenti del 
 esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti e due i posti.
 
 ## Come si produce
+00. `python3 scripts/fonti_dirette.py` — **FRESCHEZZA DEI DATI** (v511, decisione del CEO del 25/10/2026: *"i dati in
+   ritardo … Elimina le dipendenze e cercale altrove se puoi. Non voglio tornare ai vecchi problemi"*). Gira PRIMA di
+   tutti gli altri: legge alla fonte, all'ora dell'analisi, le serie macro che il semaforo, il brief e gli indici usano
+   — Treasury e TIPS a 10 anni, curva, HY OAS, CCC, NFCI, SLOOS, CPI, disoccupazione, posti di lavoro (FRED, il CSV
+   pubblico senza chiave), l'EFFR (NY Fed), il cambio EUR/USD (riferimento BCE, datato), il Fear & Greed (CNN) — con le
+   STESSE derivazioni della pipeline (la libreria `comuni.py`), e scrive la lettura che gli altri strumenti riusano. Per
+   ogni serie dice chi l'ha servita (la fonte o la pipeline come ripiego), la sua rilevazione e come sta la pipeline
+   rispetto alla fonte; per la pipeline l'età del run e se è precedente all'ultima chiusura USA, con l'elenco di ciò
+   che porta solo lei (target e revisioni, sensibilità, CDS, short, bilanci SEC, leva, BTP): quelle righe descrivono la
+   seduta prima, e la risposta lo dice.
 0. **Prima dell'apertura americana (prima delle 15:30 italiane) l'analisi parte dal PRE-MARKET**
    (istruzione del CEO, 06/10/2026): `python3 scripts/numeri_libro.py --esteso` — risultato del
    libro sul prezzo esteso, livelli ricalcolati su quel prezzo, titoli che fuori sessione stanno
@@ -162,6 +172,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    un altro periodo e resta fuori dai posti, nominata.
 
 ## Cosa contiene la risposta, in quest'ordine
+00. **Freschezza dei dati** (v511) — in UNA riga dal blocco FRESCHEZZA DEI DATI: quante serie lette alla fonte, chi è
+   venuto dalla pipeline (ripiego) e perché, e se la pipeline è precedente all'ultima chiusura USA. Se lo è, le righe che
+   porta solo lei (target, revisioni, CDS, short, bilanci) si leggono come la seduta prima, e la risposta lo dice dove
+   le usa. Una serie NON DISPONIBILE si nomina: è il dato che manca, non un valore neutro.
 0. **Semaforo d'uscita** (decisione del CEO del 06/10; calcolato da v474): il colore di oggi in
    UNA riga dal blocco `SEMAFORO D'USCITA` di `numeri_libro.py`, con i segnali accesi nominati —
    regole in `memoria/LIBRO.md` §1ter. La guida sugli investimenti degli hyperscaler non è calcolata:
@@ -410,10 +424,29 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        gli avvisi le conseguenze di un'unità di 5.000 € sul libro (volatilità, beta su QQQ, perdita
        allo stop) e la trimestrale vicina; la stessa scommessa sempre dichiarata. Priorità e
        livelli, mai la quantità da comprare: l'unità è un'unità di calcolo.
+8. **Il secondo tempo: le DOMANDE MIRATE** (decisione del CEO del 25/10/2026, testuale: *"Preferisco ragionare con te
+   qui in chat dopo l'analisi, è un sistema che funziona per me. 1 step analisi secondo step domande mirate e
+   ragionamento con te."*). L'analisi (il primo tempo) chiude con **2-4 domande numerate**, ciascuna su una decisione
+   aperta o su un segnale nuovo di oggi — un colore cambiato, un conflitto in scadenza, un ingresso su un pavimento, una
+   serie che la pipeline non ha portato — con le opzioni e cosa comporta ciascuna, in numeri dove il sistema li ha. Le
+   domande non decidono al posto del CEO e non sono un riassunto: sono il punto da cui parte il ragionamento in chat.
+   Il secondo tempo è quel ragionamento, sulle sue risposte: ciò che decide entra in `memoria/LIBRO.md`, e se diventa
+   una regola nel registro qui sotto e nel codice, lo stesso giorno.
+
+Accanto alla tenuta di ogni posizione e all'ingresso di ogni sorvegliato, da v511 (domanda del CEO del 24/10, *«Ok»* del
+25/10): la riga degli **oscillatori** (RSI 14, stocastico 14/3, Williams %R 14, CCI 20, sulle sedute concluse, con lo
+stato IPERVENDUTO / IPERCOMPRATO / NELLA NORMA quando almeno due dei quattro passano la soglia di lettura), la riga
+**supporto e accumulo** (quante delle quattro condizioni di una base sono presenti: sul pavimento entro 1 ATR,
+ipervenduto, volume in salita maggiore che in discesa, divergenza rialzista o doppio minimo confermato di recente —
+contate, non pesate) e la **stagionalità** del titolo nel mese in corso e nel successivo col suo campione; negli indici
+la stagionalità del Nasdaq-100 negli anni dello stesso ciclo presidenziale. Tutto **informazione**: non una prova della
+tenuta, non un colore, non un ingresso — un ipervenduto su un titolo in discesa può restarlo a lungo, e la risposta lo
+legge insieme alla struttura e alle notizie.
 
 **Richieste del CEO rese strutturali — entrano TUTTE in ogni «Aggiorna analisi»** (v505: ogni voce ha la sua
 chiave fra parentesi quadre, e `scripts/scheda.py` la mette nella SCHEDA COMPLETA — un gate verifica nei due versi
 che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catalogo non ne abbia una che qui non c'è):
+- `[freschezza]` i dati in ritardo tolti dove una fonte raggiungibile c'è: le serie macro lette alla fonte all'ora dell'analisi, la pipeline come ripiego dichiarato riga per riga, e la sua età con ciò che porta solo lei (25/10)
 - `[semaforo]` semaforo d'uscita (06/10), calcolato (09/10)
 - `[attesa]` costo dell'attesa e scadenze (06/10)
 - `[premarket]` pre-market prima dell'apertura (06/10)
@@ -459,6 +492,9 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[concorrenti]` i concorrenti e le quote di mercato di ogni posizione con fonte e data, e la salute di ciascuno misurata con le stesse formule — e per i sorvegliati che diventano un ingresso, prima dell'ingresso (18/10 sera)
 - `[solidita]` le due solidità di ogni nome — patrimoniale (il bilancio a una data) e operativa (la cassa dell'attività) — col rischio storico e il rendimento del prezzo accanto, da dove vengono un circolante o un patrimonio negativi, e il ciclo di cassa anche nel confronto coi concorrenti (18/10 sera)
 - `[scheda]` la SCHEDA COMPLETA di ogni analisi, scritta dallo script e mandata come allegato: tutto ciò che gli strumenti stampano, per sezione e per nome, con l'indice di queste richieste e quanti nomi portano ciascuna (19/10)
+- `[ipervenduto]` ipervenduto e ipercomprato coi quattro oscillatori, e il supporto e l'accumulo contati condizione per condizione, su ogni posizione e ogni sorvegliato (25/10) — informazione, non una prova
+- `[stagionalita]` la stagionalità del titolo nel mese in corso e nel successivo col campione, e del Nasdaq-100 negli anni dello stesso ciclo presidenziale (25/10) — informazione, non una previsione
+- `[due_tempi]` l'analisi in due tempi: prima l'analisi, che chiude con domande mirate; poi il ragionamento col CEO in chat sulle sue risposte (25/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno
 strumento: il gate della v505 non lascia l'una senza l'altra.

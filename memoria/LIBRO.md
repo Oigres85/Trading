@@ -235,6 +235,25 @@ ordine attivo. Convenzioni di lettura scelte da Claude e dichiarate come tali (v
   sotto «è il mercato, non il nome»). Il feed è UNA fonte: la ricerca web nelle stesse ore resta obbligatoria, e la
   risposta cita fonte e data.
 
+**Ipervenduto, supporto e accumulo, stagionalità** (domanda del CEO del 24/10/2026, testuale: *"Anche la stagionalità,
+il sentiment e quando un'azione è in ipervenduto tutte queste cose sono strutturati nell'analisi? O se un'azione è in una
+zona di supporto e accumulo e quindi c'è un cambio eventualmente di tendenza"*; alla proposta, il 25/10: *"Ok"*).
+`numeri_libro.py` per ogni posizione, `rotazione.py` per ogni sorvegliato. Convenzioni di lettura dei manuali, scelte da
+Claude e dichiarate come tali (v240), rilette dal codice da un gate:
+- **Gli oscillatori**: RSI 14 (Wilder), stocastico 14/3, Williams %R 14 e CCI 20, sulle sedute CONCLUSE, con le formule
+  della pipeline. **Ipervenduto**: RSI **≤ 30**, stocastico **≤ 20**, Williams **≤ -80**, CCI **≤ -100**;
+  **ipercomprato**: RSI **≥ 70**, stocastico **≥ 80**, Williams **≥ -20**, CCI **≥ 100**. Lo stato vale con almeno
+  **2** dei quattro oltre la soglia.
+- **Supporto e accumulo**: quante delle quattro condizioni di una base sono presenti oggi — sul pavimento (entro
+  **1 ATR**), ipervenduto, accumulo (nelle ultime **20** sedute concluse il volume medio delle sedute in salita supera
+  quello delle sedute in discesa), segnale di svolta (una divergenza rialzista dell'RSI, o un doppio minimo confermato da
+  non più di **10** sedute). Contate, non pesate: nessun punteggio (v200).
+- **La stagionalità** del titolo nel mese in corso e nel successivo, dallo storico mensile che la pipeline pubblica
+  (almeno 8 anni per mese), col campione; quella del Nasdaq-100 negli anni dello stesso ciclo presidenziale.
+- È tutto **informazione**: non una prova della tenuta (§1sexies), non un colore (§1ter), non un ingresso — un titolo
+  in discesa può restare in ipervenduto a lungo, e una media su dieci anni non è una previsione. Come la struttura dal
+  17/10, resta accanto alla tenuta e non ne cambia l'esito.
+
 **Il VWAP dall'ultima trimestrale, accanto ai pavimenti** (decisione del CEO del 18/10/2026, testuale: *"2ok"* alla
 proposta di *"i livelli VWAP calcolati dall'ultima trimestrale — il prezzo medio pagato da chi ha comprato dopo i conti —
 accanto ai pavimenti di ogni titolo"*). `rotazione.py` lo calcola per ogni sorvegliato, `numeri_libro.py` per ogni

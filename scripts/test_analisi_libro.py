@@ -5428,7 +5428,10 @@ check("v499 collegamento degli indici (v399): ogni fonte entra in calcola — Fa
       "oggi e a 5 anni, i tassi della pipeline, la memoria — e la memoria si scrive solo senza --no-memoria",
       all(x in _ixcalc499 for x in ("stato_factset, oggi", "URL_MULTPL.items()", "_testo, URL_WSJ", "URL_VOL.format(s=s)",
                                      "URL_COMPOSIZIONE.format(tk=tk.lower())", "brief.barre, tk", "rotazione.barre_lunghe, tk",
-                                     "tassi_pipeline(d)", "aggiungi_memoria(mem, wsj)"))
+                                     # v511 — RIAGGANCIATO: i tassi entrano dalla lettura del giro (la fonte, con la
+                                     #   pipeline come ripiego dentro tassi_del_giro), non piu' dalla sola pipeline
+                                     "fonti_dirette.del_giro(d)", 'tassi_del_giro(giro["scelta"], d)',
+                                     "aggiungi_memoria(mem, wsj)"))
       and 'if not a.no_memoria and o["memoria_cambiata"]:\n        scrivi_memoria(mem)' in _ixmain499)
 _cm499 = {f: [a for _, a in AN.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
 check("v499 il comando unico esegue indici.py in ogni fase, lo dichiara fra gli strumenti, e conta fra le memorie da committare "
@@ -6825,6 +6828,14 @@ check("v505 collegamento: ogni intestazione del catalogo e' testo che il SUO str
 # --- 3. uscite finte nel formato degli strumenti: posizioni AAA e BBB, sorvegliato WWW ---
 _POS505, _SORV505 = ["AAA", "BBB"], ["WWW"]
 _U505 = {
+    # v511 — la freschezza dei dati: lo strumento che gira per primo, e la sua richiesta nel registro
+    "fonti_dirette": [
+        "FRESCHEZZA DEI DATI — letta alla fonte il 19/10/2026 alle 07:29 ora italiana (New York 01:29), in 1,7 s",
+        "  Serie macro: la fonte letta adesso; la pipeline e' il ripiego, e ogni riga porta la PROPRIA rilevazione.",
+        "  Treasury 10A                                  4,96%   rilevazione 2026-10-16   FRED DGS10",
+        "                                         pipeline: stessa osservazione",
+        "  -> 13 su 13 lette alla fonte, 0 dalla pipeline, 0 non disponibili",
+        "  PIPELINE (data/data.json): run del 2026-10-18T22:52:13Z, 8,6 ore fa — dopo l'ultima chiusura USA"],
     "numeri_libro_esteso": [
         "FUORI SESSIONE rispetto all'ultima chiusura · libro -10 $ (-0,39%)", "POSIZIONI",
         "  AAA       10,05  -1,07%     -19 $ · res +3,7 ATR · supp +0,9 ATR",
@@ -6849,9 +6860,16 @@ _U505 = {
         "  regola: VENDITA PER EVIDENZA = tendenza ROTTA e un'altra prova CONTRO",
         "  AAA   IN OSSERVAZIONE · peso 60,0%", "      contro: macro ACCESA",
         "      struttura delle oscillazioni (ultimo anno) — LATERALE", "         una chiusura sopra 10 fa un massimo crescente",
+        # v511 — oscillatori, supporto e accumulo, stagionalita' del titolo: dentro il blocco del nome
+        "      oscillatori (seduta del 2026-10-16): RSI 14 45,0 · stocastico 14/3 (%K) 50,0 — NELLA NORMA",
+        "      supporto e accumulo: 1 condizioni su 4 — SI sul pavimento: pavimento 9,00 a 0,8 ATR",
+        "      stagionalita' del titolo (storico mensile della pipeline): ottobre media +1,0%",
         "      pavimenti: 9,00 (-10%, 1 tocco) stop 8,50", "      VWAP dai conti 10,50 — conti del 11/08/2026",
         "  BBB   CONFLITTO — DA VALUTARE · peso 40,0%", "      contro: tendenza ROTTA",
         "      struttura delle oscillazioni (ultimo anno) — RIBASSISTA",
+        "      oscillatori (seduta del 2026-10-16): RSI 14 25,0 · stocastico 14/3 (%K) 10,0 — IPERVENDUTO",
+        "      supporto e accumulo: 2 condizioni su 4 — SI ipervenduto: 2 oscillatori su 4 oltre la soglia",
+        "      stagionalita' del titolo: la pipeline non la pubblica (meno di 8 anni di storico mensile)",
         "      scadenza (LIBRO.md §1sexies, decisione del CEO del 14/10/2026): si decide coi conti",
         "      media (un'unità di calcolo, non una quantità): 10 azioni a 5,00 $",
         "      lettura a 5 anni — dal 2021-10-18 · 261 settimane concluse",
@@ -6901,6 +6919,9 @@ _U505 = {
         "■ CANDIDATI — zona, pendenza e correlazione soddisfatte — 1",
         "   WWW    30,00 · CANDIDATO · DIVERSIFICA (corr +0,40) · 1m +6,3%",
         "      ingresso: prezzo DENTRO la zona 28,00-31,00", "      struttura delle oscillazioni (ultimo anno) — RIALZISTA",
+        "      oscillatori (seduta del 2026-10-16): RSI 14 60,0 — NELLA NORMA",
+        "      supporto e accumulo: 0 condizioni su 4 — no sul pavimento",
+        "      stagionalita' del titolo (storico mensile della pipeline): ottobre media -0,5%",
         "      pavimenti (LIBRO.md §1bis, decisione del CEO del 15/10/2026) — minimi di oscillazione",
         "         1) 28,50 (-5%) · 1 tocco → ordine con limite 28,50 · stop 27,00",
         "      VWAP dai conti 29,00 — conti del 29/07/2026", "      lettura a 5 anni — dal 2021-10-18 · 261 settimane concluse",
@@ -6930,6 +6951,9 @@ _U505 = {
                # v510 — il Fear & Greed: il registro lo cerca nella sezione degli indici (la richiesta del 24/10)
                "SENTIMENT — CNN Fear & Greed, dalla pipeline: il composito della CNN su 0-100, non una misura nostra",
                "  Fear & Greed (CNN): 21 su 100, giudizio della fonte «paura estrema» · rilevazione del 23/10/2026",
+               # v511 — la stagionalita' del Nasdaq-100 negli anni dello stesso ciclo presidenziale
+               "STAGIONALITA' DEL NASDAQ-100 — storico mensile della pipeline: una media su N anni, non una previsione",
+               "  ottobre: media +1,7% su 40 anni (1986-2025)",
                "TENDENZA — gli ETF SPY e QQQ"],
     "concorrenti": ["CONCORRENTI E QUOTE DI MERCATO (richiesta del CEO del 18/10/2026)", "", "AAA [POSIZIONE] Alfa",
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
@@ -6958,7 +6982,7 @@ _aaa505 = _r505.schede["AAA"]["tenuta"][0]
 check("v505 SPOSTA: il blocco di AAA nella TENUTA va nella sua scheda con tutte le righe piu' rientrate; nella sezione resta "
       "la sola riga d'apertura come sommario, e il blocco di BBB comincia dove comincia la sua riga",
       _aaa505[0] == "  AAA   IN OSSERVAZIONE · peso 60,0%" and _aaa505[-1] == "      VWAP dai conti 10,50 — conti del 11/08/2026"
-      and len(_aaa505) == 6 and "  AAA   IN OSSERVAZIONE · peso 60,0%" in _r505.sezioni["tenuta"]
+      and len(_aaa505) == 9 and "  AAA   IN OSSERVAZIONE · peso 60,0%" in _r505.sezioni["tenuta"]
       and "      contro: macro ACCESA" not in _r505.sezioni["tenuta"]
       and _r505.schede["BBB"]["tenuta"][0][0] == "  BBB   CONFLITTO — DA VALUTARE · peso 40,0%")
 check("v505 un nome si riconosce SOLO dentro il blocco che lo prevede: la riga di BBB fra le decisioni RIMANDATE resta li', "
@@ -7571,11 +7595,389 @@ check("v510 collegamento: la sintesi degli indici stampa il Fear & Greed SUBITO 
       "componenti), e calcola lo legge dalla pipeline",
       "SENTIMENT — CNN Fear & Greed" in _six510
       and _six510.index("VOLATILITA' IMPLICITA") < _six510.index("SENTIMENT — CNN Fear & Greed") < _six510.index("CONCENTRAZIONE")
-      and '"fear_greed": fear_greed_pipeline(d)' in _src_ix510, _six510[:400])
+      # v511 — RIAGGANCIATO: calcola lo legge dalla lettura del giro (la CNN alla fonte, la pipeline come ripiego)
+      and 'fear_greed_del_giro(giro["scelta"], d' in _src_ix510, _six510[:400])
 check("v510 la scheda completa porta il blocco SENTIMENT nella sezione degli indici (non «fuori catalogo»), e il registro "
       "ha la voce del Fear & Greed",
       any(re.match(b.regex, "SENTIMENT — CNN Fear & Greed, dalla pipeline") for b in SC.CATALOGO["indici"].blocchi)
       and "fear_greed" in SC.REGISTRO and ("indici", "Fear & Greed (CNN):") in SC.REGISTRO["fear_greed"].righe)
+
+
+# ============================== v511 — LE FONTI DIRETTE, GLI OSCILLATORI, LA STAGIONALITA', I DUE TEMPI ==============================
+# Decisione del CEO del 25/10/2026, testuale: «Per ciò che concerne i dati i ritardo o altri dati in ritardo che impattano
+# sull'anaslisi creando errori o dati non affidabili Elimina le dipendenze e cercale altrove se puoi. Non voglio tornare ai
+# vecchi problemi … 1 step analisi secondo step domande mirate e ragionamento con te.» E l'«Ok» alla proposta su
+# stagionalita', ipervenduto, supporto e accumulo. Lo stato si COSTRUISCE (v425, v429): nessuna rete, nessun orologio vero.
+import fonti_dirette as FD
+import comuni as _cm511
+import json as _js511, tempfile as _tf511
+from datetime import datetime as _dt511, timedelta as _td511, timezone as _tz511
+_SRC_UD511 = (_ROOT / "scripts" / "update_data.py").read_text(encoding="utf-8")
+_COD_UD511 = _solo_codice_py(_SRC_UD511)
+
+# --- una derivazione sola: la pipeline IMPORTA da comuni.py, non ne tiene una copia (v161) ---
+_CONDIVISE511 = (("distanza_mesi", "_distanza_mesi"), ("mese_meno", "_mese_meno"), ("var_per_data", "_var_per_data"),
+                 ("delta_mensile", "delta_mensile"), ("rango_midrank", "_rango_midrank"), ("credito_ccc", "credito_ccc"),
+                 ("nfci_da", "nfci_da"), ("sloos_da", "sloos_da"), ("numero_o_none", "_numero_o_none"),
+                 ("data_fg", "_data_fg"), ("storia_fear_greed", "storia_fear_greed"), ("fg_intero", "_fg_intero"),
+                 ("fear_greed_base", "fear_greed_base"), ("fredgraph", "fredgraph"))
+_dup511 = [loc for nome, loc in _CONDIVISE511 if re.search(rf"^def {re.escape(loc)}\(", _COD_UD511, re.M)]
+_diverse511 = [loc for nome, loc in _CONDIVISE511 if getattr(UD, loc, None) is not getattr(_cm511, nome)]
+check("v511 una derivazione sola: le funzioni che pipeline e fonti dirette condividono vivono in comuni.py, e la pipeline "
+      "le IMPORTA coi nomi di prima — nessuna seconda definizione in update_data.py",
+      not _dup511 and not _diverse511, f"ridefinite: {_dup511} · non le stesse: {_diverse511}")
+# ⚠ la serie ha un BUCO (giugno): per posizione la base starebbe a dicembre 2025, per data e' gennaio 2026 — senza il
+#   buco le due letture coinciderebbero e il check non discriminerebbe (v393, v430)
+_sh511 = ([("2025-12-01", 299.0)] + [(f"2026-{m:02d}-01", 300.0 + m) for m in range(1, 13) if m != 6]
+          + [("2027-01-01", 315.0)])
+_cc511 = [(f"2026-{1 + i // 28:02d}-{1 + i % 28:02d}", 10 + i / 100) for i in range(260)]
+check("v511 la fonte diretta dà le STESSE voci della pipeline sugli stessi ingressi (CCC, NFCI, SLOOS, CPI per data, posti "
+      "di lavoro): la stessa domanda alla stessa fonte non può dare due risposte (v161)",
+      FD.da_fred("ccc", _cc511) == {**UD.credito_ccc(_cc511), "fonte": "FRED BAMLH0A3HYC"}
+      and {k: v for k, v in FD.da_fred("nfci", _cc511[-60:]).items() if k != "fonte"} == UD.nfci_da(_cc511[-60:])
+      and {k: v for k, v in FD.da_fred("sloos", _cc511[-20:]).items() if k != "fonte"} == UD.sloos_da(_cc511[-20:])
+      and (FD.da_fred("cpi", _sh511)["valore"], FD.da_fred("cpi", _sh511)["mesi"]) == UD._var_per_data(_sh511, 12)[::2]
+      and FD.da_fred("nfp", _sh511)["valore"] == UD.delta_mensile(_sh511)[0] and FD.da_fred("t10", []) is None)
+check("v511 il CSV di FRED: il «.» dei giorni senza dato è un buco e non entra (v205), l'intestazione non è un dato",
+      _cm511.fredgraph("observation_date,DGS10\n2026-10-21,4.95\n2026-10-22,.\n2026-10-23,4.96\n")
+      == [("2026-10-21", 4.95), ("2026-10-23", 4.96)] and _cm511.fredgraph("") == [] and _cm511.fredgraph(None) == [])
+check("v511 le intestazioni sono quelle della pipeline (v500): FRED e BCE con quella onesta, la CNN con quella del browser — "
+      "e le componenti della CNN sono le chiavi che la pipeline legge",
+      FD.UA_ONESTO == UD.UA_ONESTO and FD.UA == UD.UA
+      and all(f'"{k}"' in _SRC_UD511 for k in FD.CNN_COMPONENTI) and len(FD.CNN_COMPONENTI) == 7)
+_cnn511 = {"fear_and_greed": {"score": 20.6, "rating": "extreme fear", "timestamp": "2026-10-24T02:00:00+00:00",
+                              "previous_close": 22.0, "previous_1_week": None, "previous_1_month": 40, "previous_1_year": 28},
+           "market_volatility_vix": {"rating": "fear"}, "put_call_options": {"rating": "extreme fear"},
+           "junk_bond_demand": {"score": 3}}
+_fg511 = FD.da_cnn(_cnn511)
+check("v511 la CNN letta alla fonte: la derivazione della pipeline (punteggio, data della seduta a New York, confronti "
+      "assenti come buchi) e le componenti che la risposta porta davvero",
+      _fg511["valore"] == 21 and _fg511["data"] == "2026-10-23" and _fg511["week_ago"] is None
+      and _fg511["componenti"] == ["put_call_options", "market_volatility_vix"] and _fg511["fonte"] == "CNN",
+      str(_fg511)[:300])
+
+# --- la scelta: i sette stati, ciascuno detto ---
+_dv = {"t10": {"valore": 4.96, "data": "2026-10-23", "fonte": "FRED DGS10"},
+       "hy": {"valore": 3.40, "data": "2026-10-23", "fonte": "FRED X"},
+       "ccc": {"valore": 13.4, "data": "2026-10-23", "fonte": "FRED Y"},
+       "curva": {"valore": 0.31, "data": "2026-10-22", "fonte": "FRED T10Y2Y"},
+       "eurusd": {"valore": 1.1193, "data": "2026-10-23", "fonte": "BCE"}}
+_pv = {"t10": {"valore": 4.96, "data": "2026-10-23", "fonte": "pipeline"},
+       "hy": {"valore": 3.38, "data": "2026-10-22", "fonte": "pipeline"},
+       "ccc": {"valore": 13.1, "data": "2026-10-23", "fonte": "pipeline"},
+       "curva": {"valore": 0.33, "data": "2026-10-23", "fonte": "pipeline"},
+       "nfci": {"valore": -0.5, "data": "2026-10-16", "fonte": "pipeline"},
+       "eurusd": {"valore": 1.1204, "data": None, "fonte": "pipeline: snapshot"}}
+_sc511 = FD.scegli(_dv, _pv)
+check("v511 la scelta: stessa osservazione · pipeline INDIETRO · stessa data e valore diverso (vale la fonte, coi numeri "
+      "nella convenzione del pacchetto) · pipeline PIU' RECENTE (vale la piu' recente: l'ultimo dato ufficiale, v396) · non "
+      "letta alla fonte (ripiego) · assente da entrambe (nessuna voce) · il cambio, che non è la stessa grandezza",
+      _sc511["t10"]["esito"] == "fonte" and _sc511["t10"]["confronto"] == "pipeline: stessa osservazione"
+      and _sc511["hy"]["esito"] == "fonte" and "INDIETRO" in _sc511["hy"]["confronto"] and "2026-10-22" in _sc511["hy"]["confronto"]
+      and _sc511["ccc"]["esito"] == "fonte" and "STESSA DATA, VALORE DIVERSO" in _sc511["ccc"]["confronto"]
+      and "13,10% contro 13,40%" in _sc511["ccc"]["confronto"]
+      and _sc511["curva"]["esito"] == "pipeline" and _sc511["curva"]["valore"] == 0.33
+      and "PIU' RECENTE" in _sc511["curva"]["confronto"]
+      and _sc511["nfci"]["esito"] == "pipeline" and _sc511["nfci"]["confronto"] == "non letta alla fonte in questo giro"
+      and "sloos" not in _sc511 and "effr" not in _sc511
+      and _sc511["eurusd"]["esito"] == "fonte" and "un'altra grandezza" in _sc511["eurusd"]["confronto"],
+      _js511.dumps(_sc511, default=str)[:900])
+
+# --- una lettura per analisi: la memoria del giro si riusa per 30 minuti, poi si rilegge; mai un'eccezione ---
+_d511 = Path(_tf511.mkdtemp())
+_orig_laf511 = FD.leggi_alla_fonte
+_chiamate511 = []
+try:
+    def _laf511():
+        _chiamate511.append(1)
+        return {"t10": {"valore": 5.0, "data": "2026-10-23", "fonte": "FRED DGS10"}}, {}
+    FD.leggi_alla_fonte = _laf511
+    _ora511 = _dt511(2026, 10, 14, 7, 45, tzinfo=_tz511.utc)
+    _p511 = _d511 / "fd.json"
+    _l0 = FD.leggi(percorso=_p511, adesso=_ora511)
+    _l1 = FD.leggi(percorso=_p511, adesso=_ora511 + _td511(minutes=20))
+    _n_riuso511 = len(_chiamate511)
+    _l2 = FD.leggi(percorso=_p511, adesso=_ora511 + _td511(minutes=31))
+    _l3 = FD.leggi(percorso=_p511, adesso=_ora511 + _td511(minutes=32), forza=True)
+    _l4 = FD.leggi(percorso=_p511, adesso=_ora511 - _td511(minutes=5))      # una memoria scritta «nel futuro»
+    _p511.write_text("{non json", encoding="utf-8")
+    _l5 = FD.leggi(percorso=_p511, adesso=_ora511)
+finally:
+    FD.leggi_alla_fonte = _orig_laf511
+check("v511 una lettura per analisi: entro 30 minuti la memoria del giro si riusa (due strumenti non vedono due "
+      "osservazioni diverse), oltre si rilegge, forza rilegge, una memoria «nel futuro» o rotta si rilegge",
+      _n_riuso511 == 1 and _l1["letto"] == _l0["letto"] and len(_chiamate511) == 5
+      and _l2["letto"] != _l0["letto"] and _l5["diretta"]["t10"]["valore"] == 5.0, f"chiamate {len(_chiamate511)}")
+
+class _Risp511:
+    def __init__(self, testo="", js=None):
+        self.text, self._js = testo, js
+    def json(self):
+        if self._js is None:
+            raise ValueError("non json")
+        return self._js
+_orig_get511 = FD._get
+try:
+    def _rotto511(url, intestazioni, timeout=20):
+        raise ConnectionError("rete giù")
+    FD._get = _rotto511
+    # un'eccezione qui deve far cadere il CHECK col suo nome, non la suite (v407, v471)
+    try:
+        _v_rotto, _e_rotto = FD.leggi_alla_fonte()
+    except Exception as _e:  # noqa: BLE001
+        _v_rotto, _e_rotto = None, {"_eccezione": repr(_e)}
+    FD._get = lambda url, intestazioni, timeout=20: _Risp511("observation_date,X\n")
+    try:
+        _v_vuoto, _e_vuoto = FD.leggi_alla_fonte()
+    except Exception as _e:  # noqa: BLE001
+        _v_vuoto, _e_vuoto = None, {"_eccezione": repr(_e)}
+finally:
+    FD._get = _orig_get511
+check("v511 una fonte che non risponde è un ESITO, non un'eccezione: tutte e tredici nominate con la loro causa; e una "
+      "fonte che risponde senza osservazioni non passa per un valore",
+      _v_rotto == {} and set(_e_rotto) == set(FD.ORDINE) and all("ConnectionError" in e or "NY Fed" in e for e in _e_rotto.values())
+      and _v_vuoto == {} and _e_vuoto.get("t10") == "la fonte ha risposto senza osservazioni utilizzabili",
+      str(_e_rotto)[:300] + " || " + str(_e_vuoto)[:300])
+
+# --- la resa: NON DISPONIBILE, l'ora della LETTURA, i periodi, l'avviso sul run precedente all'ultima chiusura ---
+_g511 = {"scelta": FD.scegli({"cpi": {"valore": 3.7, "data": "2026-09-01", "mesi": 12, "fonte": "FRED CPIAUCNS"},
+                               "sloos": {"valore": 0.0, "data": "2026-07-01", "fonte": "FRED DRTSCILM"},
+                               "nfp": {"valore": 29, "data": "2026-09-01", "mesi": 2, "fonte": "FRED PAYEMS"}}, {}),
+         "lettura": {"letto": "2026-10-14T07:45:00+00:00", "secondi": 2.1, "errori": {"t10": "ConnectionError: rete giù"}},
+         "run": "2026-10-13T19:00:00Z", "eta_ore": 13.2}
+_s511 = "\n".join(FD.sintesi(_g511, adesso=_dt511(2026, 10, 14, 8, 10, tzinfo=_tz511.utc)))
+check("v511 la freschezza: l'ora è quella della LETTURA (non di adesso), il mese si scrive come mese (v392), un'assente è "
+      "«il dato che manca», un posti di lavoro su due mesi lo dice, e un run precedente all'ultima chiusura USA nomina cosa "
+      "porta solo la pipeline",
+      "il 14/10/2026 alle 09:45 ora italiana (New York 03:45)" in _s511
+      and "riferito a settembre 2026" in _s511 and "indagine di luglio 2026" in _s511
+      and "Treasury 10A" in _s511 and "NON DISPONIBILE — ne' la fonte (ConnectionError: rete giù)" in _s511
+      and "(su 2 mesi: la base esatta non c'e')" in _s511
+      and "PRECEDENTE all'ultima chiusura USA (13/10 16:00 di New York)" in _s511
+      and all(x in _s511 for x in FD.SOLO_PIPELINE) and "3 su 13 lette alla fonte" in _s511, _s511[:1500])
+_s511b = "\n".join(FD.sintesi({**_g511, "run": "2026-10-13T21:30:00Z", "eta_ore": 10.0},
+                              adesso=_dt511(2026, 10, 14, 8, 10, tzinfo=_tz511.utc)))
+_s511c = "\n".join(FD.sintesi({**_g511, "run": None, "eta_ore": None}, adesso=_dt511(2026, 10, 14, 8, 10, tzinfo=_tz511.utc)))
+check("v511 la freschezza nei due versi: un run DOPO l'ultima chiusura non suona; senza pipeline lo dice e nomina cosa manca",
+      "PRECEDENTE" not in _s511b and "dopo l'ultima chiusura USA (13/10 16:00 di New York)" in _s511b
+      and "ASSENTE o illeggibile" in _s511c, _s511b[-700:])
+_uc511 = lambda *a: FD.ultima_chiusura_usa(_dt511(*a, tzinfo=_tz511.utc)).astimezone(_tz511.utc).strftime("%Y-%m-%d %H:%M")
+check("v511 l'ultima chiusura USA col FUSO (v470): il sabato è il venerdì, prima delle 16 di New York è il giorno prima, "
+      "e la settimana di fine ottobre (5 ore di scarto da Roma) come quella di novembre (ora solare a New York)",
+      _uc511(2026, 10, 24, 10, 0) == "2026-10-23 20:00" and _uc511(2026, 10, 26, 15, 0) == "2026-10-23 20:00"
+      and _uc511(2026, 10, 26, 21, 0) == "2026-10-26 20:00" and _uc511(2026, 11, 2, 22, 0) == "2026-11-02 21:00",
+      str([_uc511(2026, 10, 24, 10, 0), _uc511(2026, 10, 26, 21, 0), _uc511(2026, 11, 2, 22, 0)]))
+check("v511 le rese nella convenzione del pacchetto (virgola, v442): curva col segno e in punti, posti di lavoro col segno, "
+      "cambio a quattro cifre",
+      FD.valore_testo("curva", {"valore": 0.31}) == "+0,31 pp" and FD.valore_testo("nfp", {"valore": -23}) == "-23K"
+      and FD.valore_testo("eurusd", {"valore": 1.1193}) == "1,1193" and FD.valore_testo("t10", {"valore": None}) == "n.d.")
+_pipe511 = {"updated_at": "2026-10-24T23:12:27Z", "macro": {
+    "tassi": {"scadenze": [{"key": "a10", "value": 4.96, "observation_date": "2026-10-22"}]},
+    "indicators": [{"key": "cpi", "value": "3.7%", "date": "2026-09-01", "span_mesi": 12},
+                   {"key": "nfp", "value": "+29K", "date": "2026-09-01"}],
+    "credit": {"spread_hy": 3.4, "date": "2026-10-22"},
+    "markets": [{"key": "EURUSD=X", "value": 1.1204}], "fear_greed": {"score": 21, "asof": "2026-10-23"}}}
+_dp511 = FD.dalla_pipeline(_pipe511)
+check("v511 il ripiego legge dalla pipeline le stesse serie, ciascuna con la SUA data; il cambio dello snapshot non ha data",
+      _dp511["t10"] == {"valore": 4.96, "data": "2026-10-22", "fonte": "pipeline"} and _dp511["cpi"]["valore"] == 3.7
+      and _dp511["nfp"]["valore"] == 29 and _dp511["hy"]["data"] == "2026-10-22" and _dp511["eurusd"]["data"] is None
+      and _dp511["fear_greed"]["data"] == "2026-10-23" and FD.dalla_pipeline(None) == {}, str(_dp511)[:500])
+
+# --- i collegamenti: chi legge la scelta del giro, e chi la stampa per primo ---
+_scsem511 = {"ccc": {"valore": 13.4, "data": "2026-10-23", "salita_60_pp": 2.0, "fonte": "FRED BAMLH0A3HYC", "esito": "fonte"},
+             "hy": {"valore": 3.3, "data": "2026-10-22", "fonte": "pipeline", "esito": "pipeline"},
+             "t10": {"valore": 4.96, "data": "2026-10-23", "fonte": "FRED DGS10", "esito": "fonte"}}
+_pipesem511 = {"macro": {"credit_ccc": {"valore": 12.0, "data": "2026-10-20", "salita_60_pp": 0.5},
+                         "credit": {"spread_hy": 3.1, "date": "2026-10-20"},
+                         "tassi": {"scadenze": [{"key": "a10", "value": 4.8, "observation_date": "2026-10-20"}]},
+                         "margin_debt": {"history": [1, 2]}}, "watchlist": []}
+_seg511 = NL.segnali_pipeline(_pipesem511, _scsem511)
+_seg511p = NL.segnali_pipeline(_pipesem511)
+check("v511 il semaforo: credito e tassi dalla scelta del giro (la fonte, o il ripiego dichiarato), la leva e gli analisti "
+      "dalla pipeline; senza la scelta tutto dalla pipeline",
+      _seg511["ccc"]["valore"] == 13.4 and _seg511["ccc"]["esito"] == "fonte" and _seg511["t10"]["valore"] == 4.96
+      and _seg511["hy"]["esito"] == "pipeline" and _seg511["margin"] == {"history": [1, 2]}
+      and _seg511p["ccc"]["valore"] == 12.0 and _seg511p["t10"]["valore"] == 4.8, str(_seg511)[:400])
+_sm511 = NL.semaforo(_barre474(_sale), {k: _barre474(_sale, vol=_alto) for k in NL.LEADER}, _seg511, _ALLE17)
+_sm511["reazioni"] = _rz
+_rs511 = "\n".join(NL.righe_semaforo(_sm511, None))
+check("v511 il semaforo dice CHI ha servito credito e tassi: la fonte letta adesso, oppure «dalla pipeline (RIPIEGO)» — un "
+      "valore di ieri e uno di stamattina non si leggono uguali (v393, v406)",
+      "fonti di credito e tassi: CCC FRED BAMLH0A3HYC · HY OAS dalla pipeline (RIPIEGO) · Treasury FRED DGS10" in _rs511,
+      _rs511[:1200])
+_pat511 = NL.patrimonio_pipeline({"macro": {"markets": [{"key": "EURUSD=X", "value": 1.12}]}, "updated_at": "R"}, {},
+                                 {"eurusd": {"valore": 1.1193, "data": "2026-10-23", "fonte": "BCE", "esito": "fonte"}})
+_pat511p = NL.patrimonio_pipeline({"macro": {"markets": [{"key": "EURUSD=X", "value": 1.12}]}, "updated_at": "R"}, {},
+                                  {"eurusd": {"valore": 1.12, "data": None, "fonte": "pipeline", "esito": "pipeline"}})
+check("v511 il patrimonio in euro col riferimento BCE datato quando c'è; altrimenti la quotazione della pipeline, dichiarata",
+      _pat511[:2] == (1.1193, "BCE, del 2026-10-23") and _pat511p[:2] == (1.12, "pipeline, run R")
+      and NL.patrimonio_pipeline(None, {}, None) == (None, None, {}), str((_pat511[:2], _pat511p[:2])))
+_mg511 = brief.macro_del_giorno({"scelta": _sc511, "run": "R", "eta_ore": 30.0})
+check("v511 il brief: le serie dalla scelta del giro, quante alla fonte e quante dal ripiego, e le assenti NOMINATE",
+      _mg511["dirette"] == 4 and _mg511["ripiego"] == 2 and "SLOOS (banche)" in _mg511["assenti"]
+      and "Fed Funds effettivo (EFFR del giorno)" in _mg511["assenti"] and "Fear & Greed (CNN)" not in _mg511["assenti"]
+      and any(s["nome"] == "EUR/USD" and "riferimento BCE" in s["nota"] for s in _mg511["serie"]), str(_mg511)[:600])
+_ix511 = IX.tassi_del_giro({"t10": {"valore": 4.96, "data": "2026-10-23", "fonte": "FRED DGS10"}}, None)
+# un ripiego che restituisce None deve far cadere il CHECK col suo nome, non la suite (v407, v471)
+_fgx511 = IX.fear_greed_del_giro({"fear_greed": {**_fg511, "esito": "fonte"}}, None, letto="L") or {}
+check("v511 gli indici: il Treasury dalla fonte con data e fonte; il Fear & Greed letto alla CNN dice le componenti che "
+      "porta (il VIX e il put/call), senza la fonte il ripiego è dichiarato",
+      _ix511["nominale"] == 4.96 and _ix511["data_nominale"] == "2026-10-23" and _ix511["fonte_nominale"] == "FRED DGS10"
+      and _fgx511.get("esito") == "fonte" and _fgx511.get("con_vix") and _fgx511.get("con_putcall")
+      and _fgx511.get("n_componenti") == 2 and _fgx511.get("punteggio") == 21 and _fgx511.get("data") == "2026-10-23"
+      and (IX.fear_greed_del_giro({}, None) is None or IX.fear_greed_del_giro({}, None).get("esito") == "pipeline"),
+      str(_fgx511)[:400])
+_cnl511 = _solo_codice_py((_ROOT / "scripts" / "numeri_libro.py").read_text(encoding="utf-8"))
+_crt511 = _solo_codice_py((_ROOT / "scripts" / "rotazione.py").read_text(encoding="utf-8"))
+_cix511 = _solo_codice_py((_ROOT / "scripts" / "indici.py").read_text(encoding="utf-8"))
+_cbr511 = _solo_codice_py((_ROOT / "scripts" / "brief.py").read_text(encoding="utf-8"))
+_cfd511 = _solo_codice_py((_ROOT / "scripts" / "fonti_dirette.py").read_text(encoding="utf-8"))
+_calc511 = _corpo_di(_cnl511, "calcola")
+check("v511 collegamenti: numeri_libro, rotazione, indici e brief leggono la SCELTA DEL GIRO (non la sola pipeline) e la "
+      "passano a semaforo, patrimonio e credito",
+      "fonti_dirette.del_giro(pipe)" in _calc511 and 'segnali_pipeline(pipe, giro["scelta"])' in _calc511
+      and 'giro["scelta"])' in _calc511[_calc511.find("patrimonio_pipeline("):][:200]
+      and "brief.macro_del_giorno(giro)" in _calc511
+      and "fonti_dirette.del_giro(d)" in _corpo_di(_crt511, "raccogli")
+      and 'segnali_pipeline(d, giro["scelta"])' in _corpo_di(_crt511, "raccogli")
+      and "fonti_dirette.del_giro(d)" in _corpo_di(_cix511, "calcola")
+      and "mf = macro_del_giorno()" in _corpo_di(_cbr511, "main"))
+check("v511 nessuna chiave FRED nelle fonti dirette: il CSV pubblico non la chiede, e il repository è pubblico",
+      "FRED_API_KEY" not in _cfd511 and "api.stlouisfed.org" not in _cfd511 and "fredgraph.csv" in _cfd511)
+_coman511 = [c for f in ("pre-market", "seduta", "after-hours", "chiuso") for c in AN.comandi(f)[:1]]
+check("v511 il comando unico esegue le fonti dirette PRIMA di tutti gli altri strumenti (che ne riusano la lettura) e la "
+      "freschezza apre la scheda",
+      AN.PRIMA == ("fonti_dirette.py",) and all(c[1][0] == "fonti_dirette.py" for c in _coman511) and len(_coman511) == 4
+      and "esegui(testa_l) + esegui(" in _solo_codice_py((_ROOT / "scripts" / "analisi.py").read_text(encoding="utf-8"))
+      and SC.SEZIONI[0][0] == "freschezza", str([c[1] for c in _coman511]))
+
+# --- gli oscillatori: le formule della pipeline, sulle sedute concluse ---
+import random as _rnd511
+_rnd511.seed(511)
+_px511, _b511, _g0 = 100.0, [], _dt511(2025, 6, 2)
+for _i in range(320):
+    _px511 *= 1 + _rnd511.gauss(0, 0.018)
+    _h, _lw = _px511 * (1 + abs(_rnd511.gauss(0, 0.01))), _px511 * (1 - abs(_rnd511.gauss(0, 0.01)))
+    _b511.append({"t": (_g0 + _td511(days=_i)).date().isoformat(), "o": _px511, "h": _h, "l": _lw, "c": _px511,
+                  "v": 1_000_000 + _i})
+_hist511 = pd.DataFrame({"Close": [x["c"] for x in _b511], "High": [x["h"] for x in _b511], "Low": [x["l"] for x in _b511],
+                         "Open": [x["o"] for x in _b511], "Volume": [x["v"] for x in _b511]})
+_bt511 = UD.batteria_tecnica(_hist511)["oscillatori"]
+_os511 = ROT.oscillatori(_b511, _dt511(2026, 10, 14, 22, 0, tzinfo=_tz511.utc))
+check("v511 gli oscillatori sono quelli della pipeline sulle stesse barre (stocastico %K e %D, Williams %R, CCI 20; RSI di "
+      "Wilder sul seme della pipeline, che converge su una serie lunga)",
+      all(abs(_os511[a] - _bt511[b]) <= 0.051 for a, b in (("stocastico", "stoch_k"), ("stocastico_d", "stoch_d"),
+                                                          ("williams", "williams_r"), ("cci", "cci20")))
+      and abs(_os511["rsi"] - _bt511["rsi14"]) <= 0.2,
+      str({k: _os511[k] for k in ("rsi", "stocastico", "stocastico_d", "williams", "cci")}) + " || " + str(_bt511))
+_bin511 = _b511 + [{"t": "2026-10-14", "o": 1.0, "h": 2.0, "l": 0.5, "c": 0.6, "v": 5}]
+_osin511 = ROT.oscillatori(_bin511, _dt511(2026, 10, 14, 15, 0, tzinfo=_tz511.utc))
+check("v511 la barra in formazione non entra (v471): a seduta aperta gli oscillatori sono quelli della seduta conclusa; "
+      "sotto 30 sedute o senza barre nessun numero",
+      _osin511["seduta"] == _b511[-1]["t"] and _osin511 == ROT.oscillatori(_b511, _dt511(2026, 10, 14, 15, 0, tzinfo=_tz511.utc))
+      and ROT.oscillatori(_b511[:29]) is None and ROT.oscillatori(None) is None and ROT.oscillatori([]) is None,
+      str(_osin511)[:200])
+_lo511 = ROT.lettura_oscillatori
+check("v511 la lettura degli oscillatori: la soglia vale col suo bordo (≤ e ≥), servono 2 dei 4, gli estremi nei due versi "
+      "insieme sono CONTRADDITTORI, sotto 2 misurati NON MISURABILE",
+      _lo511({"rsi": 30.0, "stocastico": 20.0, "williams": -50, "cci": 0})["stato"] == "IPERVENDUTO"
+      and _lo511({"rsi": 30.01, "stocastico": 20.01, "williams": -79.9, "cci": -99.9})["stato"] == "NELLA NORMA"
+      and _lo511({"rsi": 25, "stocastico": 50, "williams": -50, "cci": 0})["stato"] == "NELLA NORMA"
+      and _lo511({"rsi": 71, "stocastico": 85, "williams": -10, "cci": 50})["stato"] == "IPERCOMPRATO"
+      and _lo511({"rsi": 25, "stocastico": 15, "williams": -10, "cci": 120})["stato"] == "CONTRADDITTORIO"
+      and _lo511({"rsi": 25, "stocastico": None, "williams": None, "cci": None})["stato"] == "NON MISURABILE"
+      and _lo511(None) is None)
+_st511 = {"volumi": {"rapporto": 1.3, "su": 12, "giu": 8}, "divergenze": [],
+          "doppi": [{"tipo": "minimo", "esito": "confermato", "sedute_dal": 3, "dal": "2026-10-09"}]}
+_pav511 = {"minimi": [{"alto": 100.0, "atr": -0.6}]}
+_iperv511 = {"seduta": "2026-10-13", "rsi": 25.0, "stocastico": 12.0, "williams": -88.0, "cci": -130.0}
+_sa = lambda p, o, s: [c[1] for c in ROT.supporto_accumulo(p, o, s)]
+check("v511 supporto e accumulo: le quattro condizioni una per una, un doppio minimo oltre 10 sedute non è un segnale "
+      "nuovo, un pavimento oltre 1 ATR non è «sul pavimento», e quella non misurata è un buco (None), mai un no (v205)",
+      _sa(_pav511, _iperv511, _st511) == [True, True, True, True]
+      and _sa({"minimi": [{"alto": 100.0, "atr": -1.2}]}, _iperv511,
+              {**_st511, "doppi": [{**_st511["doppi"][0], "sedute_dal": 11}], "volumi": {"rapporto": 0.8, "su": 8, "giu": 12}})
+      == [False, True, False, False]
+      and _sa(None, None, None) == [None, None, None, None]
+      and _sa(_pav511, _iperv511, {**_st511, "volumi": {"rapporto": None}})[2] is None)
+_ri511 = ROT.righe_ipervenduto_accumulo(_iperv511, _pav511, _st511)
+_ri511b = ROT.righe_ipervenduto_accumulo(None, None, {"volumi": {"rapporto": 1.2, "su": 11, "giu": 9}, "divergenze": [], "doppi": []})
+check("v511 la resa: RSI e stocastico senza segno, Williams e CCI col loro meno, lo stato e chi è oltre la soglia; il "
+      "singolare con una condizione, le non misurate contate, e senza barre «non vuol dire nella norma»",
+      "RSI 14 25,0" in _ri511[0] and "stocastico 14/3 (%K) 12,0" in _ri511[0] and "Williams %R 14 -88,0" in _ri511[0]
+      and "CCI 20 -130,0" in _ri511[0] and "— IPERVENDUTO" in _ri511[0] and "+" not in _ri511[0]
+      and _ri511[1].startswith("supporto e accumulo: 4 condizioni su 4") and "un'informazione, non un ingresso" in _ri511[1]
+      and _ri511b[1].startswith("supporto e accumulo: 1 condizione su 4 (2 non misurate)")
+      and "non vuol dire 'nella norma'" in _ri511b[0], " || ".join(_ri511 + _ri511b))
+_lib511 = (_ROOT / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_par511 = _lib511[_lib511.find("**Ipervenduto, supporto e accumulo, stagionalità**"):][:2200]
+_ipv511 = re.search(r"\*\*Ipervenduto\*\*: RSI \*\*≤ (-?\d+)\*\*, stocastico \*\*≤ (-?\d+)\*\*, Williams \*\*≤ (-?\d+)\*\*, "
+                    r"CCI \*\*≤ (-?\d+)\*\*", _par511)
+_ipc511 = re.search(r"\*\*ipercomprato\*\*: RSI \*\*≥ (-?\d+)\*\*, stocastico \*\*≥ (-?\d+)\*\*, Williams \*\*≥ (-?\d+)\*\*, "
+                    r"CCI \*\*≥ (-?\d+)\*\*", _par511.replace("\n  ", " "))
+_alt511 = re.search(r"almeno\s+\*\*(\d+)\*\* dei quattro", _par511)
+_atr511 = re.search(r"entro\s+\*\*(\d+) ATR\*\*", _par511)
+_vol511 = re.search(r"nelle ultime \*\*(\d+)\*\* sedute", _par511.replace("\n  ", " "))
+_rec511 = re.search(r"non più di \*\*(\d+)\*\* sedute", _par511.replace("\n  ", " "))
+_k511 = list(ROT.SOGLIE_OSCILLATORI)
+check("v511 il libro e il codice: soglie dell'ipervenduto e dell'ipercomprato, il minimo dei quattro, 1 ATR, 20 sedute "
+      "dell'accumulo e 10 del segnale — rilette da LIBRO.md §1bis",
+      bool(_ipv511 and _ipc511 and _alt511 and _atr511 and _vol511 and _rec511)
+      and [float(x) for x in _ipv511.groups()] == [ROT.SOGLIE_OSCILLATORI[k][0] for k in _k511]
+      and [float(x) for x in _ipc511.groups()] == [ROT.SOGLIE_OSCILLATORI[k][1] for k in _k511]
+      and int(_alt511.group(1)) == ROT.OSC_MINIMO and float(_atr511.group(1)) == ROT.VICINO_ATR
+      and int(_vol511.group(1)) == ROT.STR_VOLUMI and int(_rec511.group(1)) == ROT.STR_RECENTE
+      and "ipervenduto RSI <= 30, stocastico <= 20, Williams <= -80, CCI <= -100" in ROT.INTESTAZIONE_IPERVENDUTO
+      and f"almeno {ROT.OSC_MINIMO} dei quattro" in ROT.INTESTAZIONE_IPERVENDUTO,
+      str((_ipv511 and _ipv511.groups(), _ipc511 and _ipc511.groups(), _alt511, _atr511, _vol511, _rec511)))
+check("v511 gli oscillatori sono INFORMAZIONE: la tenuta non li legge (si attaccano alla riga DOPO il bilancio "
+      "dell'evidenza), e nemmeno la stagionalità",
+      "oscillatori" not in _corpo_di(_cnl511, "valuta_tenuta") and "stagionalita" not in _corpo_di(_cnl511, "valuta_tenuta")
+      and "oscillatori" not in _corpo_di(_cnl511, "tenuta_posizioni")
+      and _calc511.find("tenuta_posizioni(") < _calc511.find('r["oscillatori"] = rotazione.oscillatori(')
+      and "\"oscillatori\": oscillatori(barre)" in _corpo_di(_crt511, "scheda"))
+
+# --- la stagionalita': il mese di New York, il successivo che gira a gennaio, il campione accanto ---
+_sg511 = [{"mese": 10, "media": 2.1, "mediana": 1.5, "positivi_pct": 80, "campione": 10, "peggio": -9.0, "meglio": 12.0},
+          {"mese": 12, "media": -0.4, "mediana": 0.2, "positivi_pct": 60, "campione": 9, "peggio": -14.0, "meglio": 8.0}]
+check("v511 la stagionalità del titolo nel mese di NEW YORK (a mezzanotte di Roma del 1/11 a New York è ancora ottobre), e "
+      "dicembre gira su gennaio",
+      [m for m, _ in ROT.stagionalita_mesi(_sg511, _dt511(2026, 11, 1, 3, 30, tzinfo=_tz511.utc))] == [10, 11]
+      and [m for m, _ in ROT.stagionalita_mesi(_sg511, _dt511(2026, 12, 15, 12, 0, tzinfo=_tz511.utc))] == [12, 1])
+_rsg511 = ROT.riga_stagionalita(_sg511, _dt511(2026, 10, 14, 12, 0, tzinfo=_tz511.utc))
+check("v511 la resa della stagionalità: media, mediana, quota positiva con l'articolo giusto («l'80%»), campione, "
+      "peggiore e migliore; un mese senza voce lo dice; senza storico «non vuol dire nessuna stagionalità»",
+      "ottobre media +2,1%" in _rsg511 and "positivo l'80% delle volte su 10 anni" in _rsg511
+      and "novembre: meno di 8 anni nello storico, nessuna media" in _rsg511 and "non una previsione" in _rsg511
+      and "non vuol dire 'nessuna stagionalita''" in ROT.riga_stagionalita(None), _rsg511)
+_sn511 = {"mesi": [{"mese": 10, "media": 1.7, "n": 40, "media_mid": 3.94, "n_mid": 10, "pos_mid": 80, "peggio_mid": -8.7,
+                    "meglio_mid": 18.9}, {"mese": 11, "media": 2.0, "n": 40}], "dal": 1986, "al": 2025, "ciclo_ora": 2,
+          "fonte": "Yahoo ^NDX mensile"}
+_rn511 = "\n".join(IX.righe_stagionalita_ndx(_sn511, _dt511(2026, 10, 14, 12, 0, tzinfo=_tz511.utc)))
+_rn511b = "\n".join(IX.righe_stagionalita_ndx({**_sn511, "ciclo_ora": 3}, _dt511(2026, 10, 14, 12, 0, tzinfo=_tz511.utc)))
+check("v511 il Nasdaq-100: negli anni di midterm la media del ciclo col campione e la dispersione, «meno di 5 osservazioni» "
+      "dove non c'è, niente clausola fuori dal midterm, e senza dati «il dato che manca»",
+      "ottobre: media +1,70% su 40 anni (1986-2025) · negli anni di midterm +3,94% su 10 anni, positivo l'80%" in _rn511
+      and "novembre: media +2,00% su 40 anni (1986-2025) · negli anni di midterm meno di 5 osservazioni" in _rn511
+      and "2° del ciclo presidenziale (MIDTERM)" in _rn511 and "midterm" not in _rn511b.split("quest'anno")[0]
+      and "e' il dato che manca" in "\n".join(IX.righe_stagionalita_ndx(None)), _rn511)
+_six511 = "\n".join(IX.sintesi({"tassi": {}, "vol": {}, "termine": None, "composizione": {}, "libro": [], "barre": {},
+                                "schede": {}, "errori": {}, "fear_greed": None, "stagionalita_ndx": _sn511}))
+check("v511 la sintesi degli indici stampa la stagionalità del Nasdaq-100 dopo il sentiment, e la scheda completa la porta",
+      "STAGIONALITA' DEL NASDAQ-100" in _six511
+      and _six511.index("SENTIMENT") < _six511.index("STAGIONALITA' DEL NASDAQ-100")
+      and any(re.match(b.regex, "STAGIONALITA' DEL NASDAQ-100 — storico") for b in SC.CATALOGO["indici"].blocchi),
+      _six511[:300])
+
+# --- i due tempi: l'analisi, poi le domande mirate ---
+_fmt511 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_ag511 = (_ROOT / ".claude" / "commands" / "aggiorna.md").read_text(encoding="utf-8")
+check("v511 i due tempi (CEO, 25/10): il formato chiude con le DOMANDE MIRATE, la checklist apre con la freschezza, il "
+      "registro ha le quattro chiavi nuove; /aggiorna dichiara fonti_dirette.py fuori con la sua ragione (v387)",
+      "\n8. **Il secondo tempo: le DOMANDE MIRATE**" in _fmt511 and "1 step analisi secondo step domande mirate" in _fmt511
+      and "00. **Freschezza dei dati**" in _fmt511
+      and all(f"[{k}]" in _fmt511 and k in SC.REGISTRO for k in ("freschezza", "ipervenduto", "stagionalita", "due_tempi"))
+      and "fonti_dirette.py" in _ag511)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

@@ -8494,3 +8494,98 @@ Ciascuno riagganciato al proprio invariante, più stretto di prima dove si potev
 - una dozzina di descrizioni dei popup della pagina con un *"storicamente…"* senza fonte (P/E > 25, Fed Funds alti,
   credito, Buffett, istituzionali): nella pagina, non nel pacchetto, e una per una vanno o misurate o tolte;
 - il brief scrive *"+0,00%"* per lo zero, rotazione e schede *"0,0"*: una convenzione diversa, nessuna conclusione cambia.
+
+## 🔌 v511 — LE SERIE MACRO SI LEGGONO ALLA FONTE, E L'ANALISI SI FA IN DUE TEMPI
+
+Il CEO, 25/10/2026, testuale: *"Per ciò che concerne i dati in ritardo o altri dati in ritardo che impattano sull'analisi
+creando errori o dati non affidabili Elimina le dipendenze e cercale altrove se puoi. Non voglio tornare ai vecchi
+problemi. Preferisco ragionare con te qui in chat dopo l'analisi, è un sistema che funziona per me. 1 step analisi
+secondo step domande mirate e ragionamento con te."* E l'«Ok» alla proposta su stagionalità, ipervenduto, supporto e
+accumulo.
+
+### La dipendenza da togliere era l'orologio della pipeline, non la pipeline
+La pipeline gira sulla coda del cron di GitHub (99-263 minuti di ritardo, v437) e lo scheduler esterno tace dal 15/09:
+semaforo (famiglie del credito e dei tassi), brief e indici leggevano da lei serie che hanno una fonte pubblica
+raggiungibile da qui **senza credenziali** — misurato il 25/10:
+
+| fonte | cosa | tempo |
+|---|---|---|
+| FRED, il CSV pubblico (`fredgraph.csv`, intestazione onesta) | Treasury 10A, curva, TIPS, HY, CCC, NFCI, SLOOS, CPI, disoccupazione, posti di lavoro | 0,4-0,5 s a serie |
+| NY Fed | l'EFFR del giorno (ripiego: FRED EFFR) | 0,6 s |
+| BCE | il riferimento EUR/USD delle 14:15 CET, **con la sua data** | 0,9 s |
+| CNN | il Fear & Greed | 0,5 s con l'intestazione della pipeline; **418** con quella onesta |
+
+`scripts/fonti_dirette.py` le legge **una volta per analisi** (13 serie in ~2 s, in parallelo) e scrive la lettura in
+`memoria/dati/fonti_dirette.json` (ignorata da git): gli altri strumenti la **riusano per 30 minuti**, perché due
+strumenti che leggessero la stessa serie in due momenti potrebbero vederne due osservazioni. `analisi.py` la esegue
+**prima** di tutti (`PRIMA`), e la scheda completa apre con la sezione FRESCHEZZA.
+
+**Tre esiti per serie** (v389): letta alla fonte · servita dalla pipeline (ripiego, dichiarato riga per riga) · non
+disponibile («il dato che manca, non un valore neutro»). E il **confronto con la pipeline si stampa**: stessa
+osservazione · pipeline INDIETRO (di quanto) · STESSA DATA E VALORE DIVERSO (una revisione della fonte o un difetto:
+vale la fonte, e si nomina) · pipeline PIÙ RECENTE (vale la più recente: l'ultimo dato ufficiale da qualunque parte
+arrivi, v396).
+⚠ **Il cambio non è la stessa grandezza nei due posti**: la BCE pubblica un fixing datato, la pipeline una quotazione
+dello snapshot senza data. Il patrimonio in euro usa la BCE quando c'è, e la fonte viaggia col numero.
+
+### ⚠⚠ Una derivazione sola, verificata sugli stessi ingressi
+CPI anno su anno per data, posti di lavoro, salita del CCC, NFCI, SLOOS e Fear & Greed passano dalle **stesse
+funzioni** della pipeline: vivono ora in `scripts/comuni.py` e `update_data.py` le importa **coi nomi di prima**
+(`_var_per_data`, `credito_ccc`, `fear_greed_base`…). Prima di spostarle, confronto sugli stessi ingressi grezzi:
+uguali tutte. Un gate verifica che la pipeline non ne tenga una seconda copia e che i nomi puntino agli stessi oggetti,
+e un'iniezione che rimette una copia locale morde.
+⚠ Il fixture del CPI ha un **buco** a giugno: senza, la base per posizione e quella per data coincidono e il gate non
+discrimina (v393, v430). Con il buco: 4,7% per data, 5,35% per posizione.
+
+### Cosa NON si trova altrove, e si dichiara
+I dati per titolo che la pipeline legge da Yahoo (target e revisioni, sensibilità ai canali, FedWatch — Yahoo 429 da
+qui), i CDS (ICE pubblica solo l'ultimo giorno: lo storico lo raccoglie la pipeline), le vendite allo scoperto, i bilanci
+SEC (403 senza un contatto), il debito a margine, la composizione degli ETF, il prezzo del BTP. Per quelli il blocco
+FRESCHEZZA dichiara **l'età del run** e, se è precedente all'ultima chiusura USA conclusa (calcolata col fuso, v470),
+**nomina cosa descrive la seduta prima**. ⚠ Le festività USA non sono note al calcolo: in un giorno di chiusura l'avviso
+suona nel verso prudente, e lo dice.
+
+### Oscillatori, supporto e accumulo, stagionalità: INFORMAZIONE
+- **Gli oscillatori** (RSI 14 di Wilder, stocastico 14/3, Williams %R 14, CCI 20) con le **formule della pipeline**
+  (`batteria_tecnica`: un gate li confronta sulle stesse barre), sulle sedute **concluse** (v471). Ipervenduto e
+  ipercomprato sono convenzioni dei manuali (v240), con almeno 2 dei 4 oltre la soglia; gli estremi nei due versi
+  insieme sono CONTRADDITTORI, sotto 2 misurati NON MISURABILE.
+- **Supporto e accumulo**: quante delle quattro condizioni di una base sono presenti — sul pavimento entro 1 ATR,
+  ipervenduto, volume medio in salita maggiore che in discesa sulle 20 sedute, divergenza rialzista o doppio minimo
+  confermato da non più di 10 sedute. **Contate, non pesate** (v200); una condizione non misurata è un buco, mai un no.
+- **La stagionalità** del titolo nel mese in corso e nel successivo (mese di New York), col campione; quella del
+  Nasdaq-100 negli anni dello stesso ciclo presidenziale.
+- Soglie in `LIBRO.md` §1bis, **rilette dal codice** da un gate (v474). Nessuna entra nella tenuta, nel semaforo o in
+  un ingresso: si attaccano alla riga DOPO il bilancio dell'evidenza, e un gate lo verifica sul codice.
+
+### ⚠ La stagionalità del titolo contava il mese a metà
+Trovato **leggendo l'uscita come il destinatario**: *"ottobre … su 42 anni"* comprendeva l'ottobre 2026 a tre quarti —
+la barra mensile di Yahoo per il mese corrente è una variazione a metà mese. È la barra in formazione della v471 su un
+altro orizzonte. `stagionalita_titolo` toglie ora i mesi dal corrente in poi, nel mese di New York; un gate costruisce un
+ottobre a +100% e lo legge il 25/10, alle 23 di New York del 31/10 (ancora ottobre) e il 2/11 (concluso: entra).
+
+### I due tempi
+`FORMATO_ANALISI.md` §8: l'analisi chiude con **2-4 domande mirate**, numerate, ciascuna su una decisione aperta o un
+segnale nuovo di oggi, con le opzioni e cosa comporta ciascuna — in numeri dove il sistema li ha. Non decidono al posto
+del CEO e non sono un riassunto: sono il punto da cui parte il ragionamento in chat. Voci del registro `[freschezza]`,
+`[ipervenduto]`, `[stagionalita]`, `[due_tempi]`.
+
+### 🧪 Il metodo, e cinque errori miei
+- **Un'intestazione costruita al caricamento del modulo con funzioni definite più sotto** (`piano`, `n`): `NameError`
+  all'import. L'ha preso la verifica dell'import, non un gate — un modulo che non si importa non arriva ai gate.
+- **La riga di freschezza dichiarava l'ora di ADESSO su una lettura riusata dalla memoria del giro**: l'etichetta
+  dall'orologio, il valore dai dati (v431). Ora l'ora è quella della lettura.
+- **Tre sonde mie sbagliate** prima di accusare il codice (v433): la struttura di `analisi.comandi` (etichetta, argv),
+  le condizioni «non misurate» di un fixture (2, non 3), il grassetto dei marcatori di `FORMATO_ANALISI.md`.
+- **Due controlli morivano per eccezione invece di cadere col loro nome** (v407, v471): un ripiego che restituisce
+  `None` letto con le parentesi quadre, e un'eccezione voluta che usciva dal blocco `try/finally` del test. L'hanno
+  trovato le iniezioni A35 e U02, che al primo giro **non mordevano**: la suite moriva prima del controllo.
+- Riagganciati senza zittirli: v390 (SLOOS e NFCI) e v510 (Fear & Greed) nella suite della pipeline, ora **esercitano**
+  la derivazione condivisa invece di cercarne il testo; v499 e v510 nella suite dell'analisi, sulla lettura del giro.
+- **Quaranta iniezioni** (A01–A36 sugli strumenti, U01–U04 sulla pipeline), una alla volta per copia del repo verificata
+  per impronta, con `modifica_sicura` e ripristino dallo snapshot: **mordono tutte, ciascuna sul controllo atteso** — A35
+  e U02 solo dopo aver reso robusto il controllo. ⚠ Un harness interrotto a metà (la sessione compattata) ha lasciato
+  l'iniezione U03 nella copia c5: trovato confrontando la copia col repo prima di rilanciare, non dopo. *Una copia si
+  verifica a ogni ripresa, non solo alla creazione.*
+- Pavimenti: `test_update_data.py` 386 check eseguiti, `test_analisi_libro.py` 830 → 860 (886). `?v=` e
+  `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
