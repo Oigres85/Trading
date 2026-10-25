@@ -442,6 +442,127 @@ def _prezzo_contratto(simbolo):
     return None
 
 
+def fedwatch_da(adesso=None):
+    """Il blocco macro["fedwatch"]: i contratti per esteso, l'EFFR del giorno e la catena delle riunioni (v477). Solleva
+    se il contratto del mese in corso non si legge: il chiamante lo dichiara.
+    v512 — estratto dal giro macro senza cambiarne il calcolo: la sessione dell'analisi (scripts/fonti_titoli.py) lo
+    rifa' ALLA FONTE all'ora dell'analisi, perche' i future quotano tutto il giorno e il run della pipeline arriva con
+    99-263 minuti di ritardo (v437). Una derivazione sola (v161). E non legge `macro`: non dipende dall'ordine in cui
+    il giro scrive le chiavi (v443) per costruzione."""
+    # ⚠⚠ v477 — i contratti PER ESTESO, mese per mese, non il continuo `ZQ=F`, che rotola sul
+    #   mese dopo prima della fine del mese (verificato il 13/10/2026). `implied` e' la media
+    #   attesa del MESE IN CORSO, dal suo contratto: e' cio' che il pacchetto dice che sia.
+    _adesso = adesso or datetime.now(timezone.utc)
+    oggi_utc = _adesso.date()
+    fomc = [d for d in FOMC_DECISIONI
+            if d >= _adesso.strftime("%Y-%m-%d")]
+    _mesi_fw = [(oggi_utc.year, oggi_utc.month)] + [
+        x for x in mesi_contratti_fomc(fomc[:4]) if x != (oggi_utc.year, oggi_utc.month)]
+    contratti, tassi_mese = [], {}
+    for (_a, _m) in _mesi_fw:
+        _s = simbolo_fed_funds(_a, _m)
+        _p = _prezzo_contratto(_s)
+        contratti.append({"mese": f"{_a}-{_m:02d}", "simbolo": _s, "prezzo": _p,
+                          "tasso": round(100 - _p, 4) if _p is not None else None})
+        if _p is not None:
+            tassi_mese[(_a, _m)] = 100 - _p
+    if tassi_mese.get((oggi_utc.year, oggi_utc.month)) is None:
+        raise RuntimeError(f"contratto del mese in corso non letto ({simbolo_fed_funds(oggi_utc.year, oggi_utc.month)})")
+    implied = round(tassi_mese[(oggi_utc.year, oggi_utc.month)], 3)
+    target = target_low = None
+    try:                                        # 1) FRED
+        target = fred_series("DFEDTARU", 1)[-1][1]
+        target_low = fred_series("DFEDTARL", 1)[-1][1]
+    except Exception:  # noqa: BLE001
+        try:                                    # 2) NY Fed
+            rr = http_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json").json()["refRates"][0]
+            target, target_low = float(rr["targetRateTo"]), float(rr["targetRateFrom"])
+        except Exception:  # noqa: BLE001        # 3) fascia ricavata dal tasso implicito
+            target_low = math.floor(implied / 0.25) * 0.25
+            target = target_low + 0.25
+    mid = (target + target_low) / 2
+    # v186 — IL SEGNO CONTA, ED ERA BUTTATO VIA.
+    # (mid - implied)/0.25 e' la distanza dal punto medio del range in "quarti di punto":
+    # POSITIVA quando i futures prezzano un tasso PIU BASSO (taglio atteso), NEGATIVA quando
+    # ne prezzano uno PIU ALTO (rialzo atteso). Il max(0, ...) schiacciava a zero tutto il
+    # ramo del rialzo, e il payload stampava "prob. taglio 0%" — vero e inutile, perche' il
+    # rischio stava dall'altra parte. Il 26/07/2026 il valore grezzo era -38,0: cioe' 38% di
+    # probabilita' di RIALZO, esattamente il numero pubblicato da CME FedWatch quel giorno.
+    # Il sistema aveva la cifra giusta e la cestinava a tre giorni dal FOMC.
+    # ═══ v441 — LA METODOLOGIA CME, al posto della nostra approssimazione ═════════════
+    # La formula vecchia era `quarti = (mid - implied)/0.25*100`, e sbagliava tre volte:
+    #   1. trattava la MEDIA DEL MESE come il tasso POST-riunione (sottostima quasi 2x);
+    #   2. confrontava col punto medio del RANGE invece che con l'EFFR, che il contratto
+    #      settla davvero e che il sistema pubblica gia' in fed_market.current_rate;
+    #   3. proiettava le riunioni successive con `+ i*12`, dodici punti a riunione scritti
+    #      a mano: il pacchetto pubblicava 78% a ottobre e 90% a dicembre, numeri che
+    #      nessun mercato ha quotato (classe v240, una soglia inventata).
+    # Misurato il 09/09 con implied 3,79 ed EFFR 3,63: la vecchia dava 66%, CME pubblicava
+    # ~57%, e la metodologia corretta sul NOSTRO implied da' 1,37 movimenti da 25bp.
+    # ⚠ Il front-month prezza SOLO il proprio mese: le riunioni successive non si proiettano
+    #   piu' — si dichiara che questo contratto non le prezza (v199).
+    #   ⚠ v477: ora ogni riunione si prezza col contratto del PROPRIO mese (o del mese dopo,
+    #   se senza riunioni) — la catena qui sotto. Proiettare resta vietato: si legge.
+    # ⚠⚠ v443 — QUESTA LETTURA TORNAVA SEMPRE None, E IL BLOCCO NON PUBBLICAVA NULLA.
+    #   `macro["fed_market"]` viene scritto MILLE RIGHE PIU' SOTTO: qui la chiave non esiste
+    #   ancora, quindi `effr_corrente` era None, `mov` era None, e ogni riunione usciva
+    #   "non prezzata dal contratto" con tutti i campi a null. Il pacchetto restava corretto
+    #   solo perche' `app.js` rifa' il conto da se' (il ripiego della v441) — cioe' il difetto
+    #   era invisibile proprio dove si guarda.
+    #   E' la lezione v399 nella sua forma piu' pura: i sei gate della v441 provavano il
+    #   CONTROLLO (la funzione, chiamata a mano) e non il COLLEGAMENTO (da dove arriva il suo
+    #   ingresso in produzione).
+    # ⚠⚠ v477 — LA BASE E' L'EFFR DEL GIORNO, non la media mensile FEDFUNDS: il 06/10 la
+    #   media di settembre valeva 3,75 (meta' mese prima del rialzo del 16/09, meta' dopo)
+    #   contro un EFFR di 3,88, e ogni riunione che segue un movimento usciva fuori scala.
+    #   Nessuna lettura da `macro`: la chiave fed_market si scrive mille righe piu' sotto (v443).
+    effr_corrente = None
+    _effr = effr_giornaliero()
+    if _effr:
+        effr_corrente = _effr["valore"]
+    catena = catena_fedwatch(effr_corrente, fomc[:4], tassi_mese)
+    meetings = []
+    for voce in catena:
+        # ⚠ Una PROBABILITA' esiste solo dentro (0, 1]: sopra, il movimento intero e' gia'
+        #   prezzato e il resto e' la quota di un secondo. Schiacciare a 100 perderebbe il
+        #   fatto, scrivere 137% sarebbe una probabilita' impossibile (v400). Vale per ogni
+        #   riunione sui movimenti IN PIU' rispetto alla precedente.
+        voce["cut_prob"] = voce["hike_prob"] = voce["hold_prob"] = None
+        if voce.get("prezzata_dal_contratto"):
+            m25 = voce["mosse_25bp"]
+            if 0 < m25 <= 1:
+                voce["hike_prob"] = round(m25 * 100)
+            elif -1 <= m25 < 0:
+                voce["cut_prob"] = round(-m25 * 100)
+            if voce["hike_prob"] is not None or voce["cut_prob"] is not None:
+                voce["hold_prob"] = max(0, 100 - (voce["cut_prob"] or 0) - (voce["hike_prob"] or 0))
+            elif m25 == 0:
+                voce["hold_prob"] = 100
+        meetings.append(voce)
+    mov = meetings[0] if meetings and meetings[0].get("prezzata_dal_contratto") else None
+    cut_prob = mov["cut_prob"] if mov else None
+    hike_prob = mov["hike_prob"] if mov else None
+    return {
+        "target_range": f"{target_low:.2f}–{target:.2f}%",
+        "implied_rate": implied,
+        "delta_bp": round((implied - mid) * 100),
+        "next_cut_prob": cut_prob,
+        "next_hike_prob": hike_prob,
+        # il FATTO che il calcolo produce davvero, accanto alla probabilita' che ne deriva
+        # solo dove e' tale. `None` significa "questo contratto non prezza quella riunione".
+        "movimenti": mov,
+        "base_effr": effr_corrente,
+        # v477 — l'EFFR del giorno con la sua data e la fonte, e i contratti per esteso letti
+        #   in questo run: la catena si ricostruisce da qui, e un contratto non letto si vede
+        "effr": _effr,
+        "contratti": contratti,
+        "next_fomc": next_fomc_date(),   # data esplicita della prossima riunione FOMC
+        "meetings": meetings,
+        # ⚠ v509 — il dot plot NON sta piu' qui: era scritto a mano (3,6 · 3,4 · 3,1 · 3,0, la
+        #   Fed che taglia) e ora si legge dalla Fed nel blocco suo, `proiezioni_fomc`
+    }
+
+
 def next_fomc_date():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     return next((d for d in FOMC_DECISIONI if d >= today), None)
@@ -1153,6 +1274,18 @@ def performance_orizzonti(hist, monthly=None):
     return out or None
 
 
+def mesi_conclusi(serie, adesso=None):
+    """Una serie di barre MENSILI senza il mese in corso (e senza quelli dopo), nel mese di New York (v470): la barra
+    mensile di Yahoo per il mese corrente e' una variazione a meta' mese (v511). v512 — una regola sola per la
+    stagionalita' del titolo e per quella di S&P 500 e Nasdaq-100, che contava il mese in corso fra quelli conclusi."""
+    if serie is None:
+        return serie
+    ny = adesso or datetime.now(timezone.utc)
+    if ZoneInfo is not None:
+        ny = ny.astimezone(ZoneInfo("America/New_York"))
+    return serie[[(d.year, d.month) < (ny.year, ny.month) for d in serie.index]]
+
+
 def stagionalita_titolo(monthly, min_anni=8, adesso=None):
     """Stagionalita' del TITOLO, mese per mese, sul suo storico mensile.
     ⚠ Sotto `min_anni` osservazioni per mese non si pubblica niente: una 'media' su tre anni fra
@@ -1164,10 +1297,7 @@ def stagionalita_titolo(monthly, min_anni=8, adesso=None):
     l'ottobre 2026 a tre quarti. Si tolgono i mesi dal corrente in poi, nel mese di New York (v470)."""
     if monthly is None or len(monthly) < min_anni * 12:
         return None
-    ny = adesso or datetime.now(timezone.utc)
-    if ZoneInfo is not None:
-        ny = ny.astimezone(ZoneInfo("America/New_York"))
-    monthly = monthly[[(d.year, d.month) < (ny.year, ny.month) for d in monthly.index]]
+    monthly = mesi_conclusi(monthly, adesso)
     r = monthly.pct_change().dropna() * 100
     fuori = []
     for m in range(1, 13):
@@ -2357,6 +2487,76 @@ def seduta_arretrata(ticker, price_asof):
     return massima if (price_asof and massima and massima > str(price_asof)) else None
 
 
+def rendimenti_log(closes):
+    """I log-rendimenti giornalieri di una serie di chiusure: base unica di Sharpe, volatilita', beta e correlazioni."""
+    return np.log(closes / closes.shift(1)).replace([np.inf, -np.inf], np.nan).dropna()
+
+
+def rendimenti_datati(daily_ret, n=252):
+    """(_ret_series, _ret_dates) di una riga: gli ultimi n log-rendimenti con le loro date. v512 — una costruzione sola
+    per il giro dei titoli e per la sessione che rifa' CDS e vendite allo scoperto alla fonte (scripts/fonti_titoli.py):
+    il lato azionario di quelle misure si legge sugli stessi rendimenti (v161)."""
+    return ([round(float(x), 6) for x in daily_ret.tail(n)],
+            [d.strftime("%Y-%m-%d") for d in daily_ret.index[-n:]])
+
+
+def analisti_da(t, ticker=""):
+    """Revisioni, dispersione degli utili e dei target di un titolo, da yfinance (v361). None se la fonte non porta
+    niente o non risponde.
+    v512 — estratta da fetch_symbol senza cambiarne una riga: la sessione dell'analisi (scripts/fonti_titoli.py) la
+    rilegge ALLA FONTE all'ora dell'analisi, e la stessa domanda alla stessa fonte deve dare la stessa risposta nei
+    due posti (v161). Un gate le confronta sugli stessi ingressi."""
+    analisti = None
+    try:
+        def _riga(df, per):
+            if df is None or getattr(df, "empty", True) or per not in df.index:
+                return None
+            return df.loc[per]
+
+        def _n(x):
+            try:
+                v = float(x)
+                return None if v != v else v
+            except (TypeError, ValueError):
+                return None
+
+        tr = _riga(t.eps_trend, "+1y")
+        rv = _riga(t.eps_revisions, "+1y")
+        es = _riga(t.earnings_estimate, "+1y")
+        pt = t.analyst_price_targets or {}
+        ora = _n(tr["current"]) if tr is not None else None
+        g90 = _n(tr["90daysAgo"]) if tr is not None else None
+        g7 = _n(tr["7daysAgo"]) if tr is not None else None
+        analisti = {
+            # la TRAIETTORIA della stima sull'esercizio prossimo: e' la revisione
+            "eps_ora": round(ora, 4) if ora else None,
+            "eps_90g_fa": round(g90, 4) if g90 else None,
+            # v400 — il FATTO accanto al rapporto: su un utile NEGATIVO il rapporto inverte il
+            # senso (-4,37 / -3,42 = +28% mentre il conto peggiora), quindi chi stampa deve
+            # poter guardare la differenza fra due stime e non solo la loro divisione.
+            "eps_7g_fa": round(g7, 4) if g7 else None,
+            "revisione_90g_pct": round((ora / g90 - 1) * 100, 2) if (ora and g90) else None,
+            "revisione_7g_pct": round((ora / g7 - 1) * 100, 2) if (ora and g7) else None,
+            # AMPIEZZA: quanti hanno alzato e quanti abbassato. Il verso conta piu' del numero.
+            "su_30g": int(rv["upLast30days"]) if (rv is not None and _n(rv["upLast30days"]) is not None) else None,
+            "giu_30g": int(rv["downLast30days"]) if (rv is not None and _n(rv["downLast30days"]) is not None) else None,
+            # DISPERSIONE degli utili attesi: forbice larga su consenso unanime = non stanno
+            # valutando la stessa azienda
+            "eps_min": round(_n(es["low"]), 4) if (es is not None and _n(es["low"])) else None,
+            "eps_max": round(_n(es["high"]), 4) if (es is not None and _n(es["high"])) else None,
+            "eps_n": int(es["numberOfAnalysts"]) if (es is not None and _n(es["numberOfAnalysts"]) is not None) else None,
+            # DISPERSIONE dei target: il minimo puo' stare SOTTO il prezzo, e la media lo nasconde
+            "target_min": round(_n(pt.get("low")), 2) if _n(pt.get("low")) else None,
+            "target_max": round(_n(pt.get("high")), 2) if _n(pt.get("high")) else None,
+            "target_mediana": round(_n(pt.get("median")), 2) if _n(pt.get("median")) else None,
+        }
+        if not any(v is not None for v in analisti.values()):
+            analisti = None
+    except Exception as e:  # noqa: BLE001
+        print(f"!! analisti {ticker}: {e}", file=sys.stderr)
+    return analisti
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
@@ -2442,7 +2642,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # Rendimenti LOGARITMICI giornalieri (12 mesi): base unica di Sharpe, volatilità, beta
     # e correlazioni. I log-return sono additivi nel tempo e non sovrastimano il rendimento
     # composto come la media aritmetica dei rendimenti semplici (bias ~ +sigma^2/2 sui titoli volatili).
-    daily_ret = np.log(closes / closes.shift(1)).replace([np.inf, -np.inf], np.nan).dropna()
+    daily_ret = rendimenti_log(closes)
     sharpe_1y, sortino_1y = risk_ratios(daily_ret)
     # Finestra 6M (~126 sedute): metrica di REGIME per lo score dei RIABILITATI growth —
     # dopo un crash la finestra 12M resta contaminata dal drawdown per mesi e schiaccia
@@ -2549,54 +2749,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     #   9,65-16,97 non e' un consenso, e' una media fra due tesi opposte.
     # · il MINIMO dei target su NVDA e' 180 contro un prezzo di 209: la media di 304 lo nasconde,
     #   ed e' il numero che dice quanto e' distante chi la pensa peggio.
-    analisti = None
-    try:
-        def _riga(df, per):
-            if df is None or getattr(df, "empty", True) or per not in df.index:
-                return None
-            return df.loc[per]
-
-        def _n(x):
-            try:
-                v = float(x)
-                return None if v != v else v
-            except (TypeError, ValueError):
-                return None
-
-        tr = _riga(t.eps_trend, "+1y")
-        rv = _riga(t.eps_revisions, "+1y")
-        es = _riga(t.earnings_estimate, "+1y")
-        pt = t.analyst_price_targets or {}
-        ora = _n(tr["current"]) if tr is not None else None
-        g90 = _n(tr["90daysAgo"]) if tr is not None else None
-        g7 = _n(tr["7daysAgo"]) if tr is not None else None
-        analisti = {
-            # la TRAIETTORIA della stima sull'esercizio prossimo: e' la revisione
-            "eps_ora": round(ora, 4) if ora else None,
-            "eps_90g_fa": round(g90, 4) if g90 else None,
-            # v400 — il FATTO accanto al rapporto: su un utile NEGATIVO il rapporto inverte il
-            # senso (-4,37 / -3,42 = +28% mentre il conto peggiora), quindi chi stampa deve
-            # poter guardare la differenza fra due stime e non solo la loro divisione.
-            "eps_7g_fa": round(g7, 4) if g7 else None,
-            "revisione_90g_pct": round((ora / g90 - 1) * 100, 2) if (ora and g90) else None,
-            "revisione_7g_pct": round((ora / g7 - 1) * 100, 2) if (ora and g7) else None,
-            # AMPIEZZA: quanti hanno alzato e quanti abbassato. Il verso conta piu' del numero.
-            "su_30g": int(rv["upLast30days"]) if (rv is not None and _n(rv["upLast30days"]) is not None) else None,
-            "giu_30g": int(rv["downLast30days"]) if (rv is not None and _n(rv["downLast30days"]) is not None) else None,
-            # DISPERSIONE degli utili attesi: forbice larga su consenso unanime = non stanno
-            # valutando la stessa azienda
-            "eps_min": round(_n(es["low"]), 4) if (es is not None and _n(es["low"])) else None,
-            "eps_max": round(_n(es["high"]), 4) if (es is not None and _n(es["high"])) else None,
-            "eps_n": int(es["numberOfAnalysts"]) if (es is not None and _n(es["numberOfAnalysts"]) is not None) else None,
-            # DISPERSIONE dei target: il minimo puo' stare SOTTO il prezzo, e la media lo nasconde
-            "target_min": round(_n(pt.get("low")), 2) if _n(pt.get("low")) else None,
-            "target_max": round(_n(pt.get("high")), 2) if _n(pt.get("high")) else None,
-            "target_mediana": round(_n(pt.get("median")), 2) if _n(pt.get("median")) else None,
-        }
-        if not any(v is not None for v in analisti.values()):
-            analisti = None
-    except Exception as e:  # noqa: BLE001
-        print(f"!! analisti {ticker}: {e}", file=sys.stderr)
+    analisti = analisti_da(t, ticker)   # v512 — la stessa funzione che la sessione rilegge alla fonte
 
     # quotazione pre/after market (se la sessione la espone)
     prepost = None
@@ -2926,8 +3079,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             ("conto_trim", conto_trimestrale(t) if has_fundamentals(ticker, currency) else None),
         ) if v},
         # serie rendimenti giornalieri (uso interno per lo Sharpe di portafoglio; rimossa prima del dump)
-        "_ret_series": [round(float(x), 6) for x in daily_ret.tail(252)],
-        "_ret_dates": [d.strftime("%Y-%m-%d") for d in daily_ret.index[-252:]],
+        "_ret_series": rendimenti_datati(daily_ret)[0],
+        "_ret_dates": rendimenti_datati(daily_ret)[1],
     }
 
 
@@ -3607,119 +3760,9 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! vix: {e}", file=sys.stderr)
 
-    # FedWatch (tassi impliciti dai futures Fed Funds 30-day)
+    # FedWatch (tassi impliciti dai futures Fed Funds 30-day) — v512: il calcolo vive in fedwatch_da
     try:
-        # ⚠⚠ v477 — i contratti PER ESTESO, mese per mese, non il continuo `ZQ=F`, che rotola sul
-        #   mese dopo prima della fine del mese (verificato il 13/10/2026). `implied` e' la media
-        #   attesa del MESE IN CORSO, dal suo contratto: e' cio' che il pacchetto dice che sia.
-        oggi_utc = datetime.now(timezone.utc).date()
-        fomc = [d for d in FOMC_DECISIONI
-                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
-        _mesi_fw = [(oggi_utc.year, oggi_utc.month)] + [
-            x for x in mesi_contratti_fomc(fomc[:4]) if x != (oggi_utc.year, oggi_utc.month)]
-        contratti, tassi_mese = [], {}
-        for (_a, _m) in _mesi_fw:
-            _s = simbolo_fed_funds(_a, _m)
-            _p = _prezzo_contratto(_s)
-            contratti.append({"mese": f"{_a}-{_m:02d}", "simbolo": _s, "prezzo": _p,
-                              "tasso": round(100 - _p, 4) if _p is not None else None})
-            if _p is not None:
-                tassi_mese[(_a, _m)] = 100 - _p
-        if tassi_mese.get((oggi_utc.year, oggi_utc.month)) is None:
-            raise RuntimeError(f"contratto del mese in corso non letto ({simbolo_fed_funds(oggi_utc.year, oggi_utc.month)})")
-        implied = round(tassi_mese[(oggi_utc.year, oggi_utc.month)], 3)
-        target = target_low = None
-        try:                                        # 1) FRED
-            target = fred_series("DFEDTARU", 1)[-1][1]
-            target_low = fred_series("DFEDTARL", 1)[-1][1]
-        except Exception:  # noqa: BLE001
-            try:                                    # 2) NY Fed
-                rr = http_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json").json()["refRates"][0]
-                target, target_low = float(rr["targetRateTo"]), float(rr["targetRateFrom"])
-            except Exception:  # noqa: BLE001        # 3) fascia ricavata dal tasso implicito
-                target_low = math.floor(implied / 0.25) * 0.25
-                target = target_low + 0.25
-        mid = (target + target_low) / 2
-        # v186 — IL SEGNO CONTA, ED ERA BUTTATO VIA.
-        # (mid - implied)/0.25 e' la distanza dal punto medio del range in "quarti di punto":
-        # POSITIVA quando i futures prezzano un tasso PIU BASSO (taglio atteso), NEGATIVA quando
-        # ne prezzano uno PIU ALTO (rialzo atteso). Il max(0, ...) schiacciava a zero tutto il
-        # ramo del rialzo, e il payload stampava "prob. taglio 0%" — vero e inutile, perche' il
-        # rischio stava dall'altra parte. Il 26/07/2026 il valore grezzo era -38,0: cioe' 38% di
-        # probabilita' di RIALZO, esattamente il numero pubblicato da CME FedWatch quel giorno.
-        # Il sistema aveva la cifra giusta e la cestinava a tre giorni dal FOMC.
-        # ═══ v441 — LA METODOLOGIA CME, al posto della nostra approssimazione ═════════════
-        # La formula vecchia era `quarti = (mid - implied)/0.25*100`, e sbagliava tre volte:
-        #   1. trattava la MEDIA DEL MESE come il tasso POST-riunione (sottostima quasi 2x);
-        #   2. confrontava col punto medio del RANGE invece che con l'EFFR, che il contratto
-        #      settla davvero e che il sistema pubblica gia' in fed_market.current_rate;
-        #   3. proiettava le riunioni successive con `+ i*12`, dodici punti a riunione scritti
-        #      a mano: il pacchetto pubblicava 78% a ottobre e 90% a dicembre, numeri che
-        #      nessun mercato ha quotato (classe v240, una soglia inventata).
-        # Misurato il 09/09 con implied 3,79 ed EFFR 3,63: la vecchia dava 66%, CME pubblicava
-        # ~57%, e la metodologia corretta sul NOSTRO implied da' 1,37 movimenti da 25bp.
-        # ⚠ Il front-month prezza SOLO il proprio mese: le riunioni successive non si proiettano
-        #   piu' — si dichiara che questo contratto non le prezza (v199).
-        #   ⚠ v477: ora ogni riunione si prezza col contratto del PROPRIO mese (o del mese dopo,
-        #   se senza riunioni) — la catena qui sotto. Proiettare resta vietato: si legge.
-        # ⚠⚠ v443 — QUESTA LETTURA TORNAVA SEMPRE None, E IL BLOCCO NON PUBBLICAVA NULLA.
-        #   `macro["fed_market"]` viene scritto MILLE RIGHE PIU' SOTTO: qui la chiave non esiste
-        #   ancora, quindi `effr_corrente` era None, `mov` era None, e ogni riunione usciva
-        #   "non prezzata dal contratto" con tutti i campi a null. Il pacchetto restava corretto
-        #   solo perche' `app.js` rifa' il conto da se' (il ripiego della v441) — cioe' il difetto
-        #   era invisibile proprio dove si guarda.
-        #   E' la lezione v399 nella sua forma piu' pura: i sei gate della v441 provavano il
-        #   CONTROLLO (la funzione, chiamata a mano) e non il COLLEGAMENTO (da dove arriva il suo
-        #   ingresso in produzione).
-        # ⚠⚠ v477 — LA BASE E' L'EFFR DEL GIORNO, non la media mensile FEDFUNDS: il 06/10 la
-        #   media di settembre valeva 3,75 (meta' mese prima del rialzo del 16/09, meta' dopo)
-        #   contro un EFFR di 3,88, e ogni riunione che segue un movimento usciva fuori scala.
-        #   Nessuna lettura da `macro`: la chiave fed_market si scrive mille righe piu' sotto (v443).
-        effr_corrente = None
-        _effr = effr_giornaliero()
-        if _effr:
-            effr_corrente = _effr["valore"]
-        catena = catena_fedwatch(effr_corrente, fomc[:4], tassi_mese)
-        meetings = []
-        for voce in catena:
-            # ⚠ Una PROBABILITA' esiste solo dentro (0, 1]: sopra, il movimento intero e' gia'
-            #   prezzato e il resto e' la quota di un secondo. Schiacciare a 100 perderebbe il
-            #   fatto, scrivere 137% sarebbe una probabilita' impossibile (v400). Vale per ogni
-            #   riunione sui movimenti IN PIU' rispetto alla precedente.
-            voce["cut_prob"] = voce["hike_prob"] = voce["hold_prob"] = None
-            if voce.get("prezzata_dal_contratto"):
-                m25 = voce["mosse_25bp"]
-                if 0 < m25 <= 1:
-                    voce["hike_prob"] = round(m25 * 100)
-                elif -1 <= m25 < 0:
-                    voce["cut_prob"] = round(-m25 * 100)
-                if voce["hike_prob"] is not None or voce["cut_prob"] is not None:
-                    voce["hold_prob"] = max(0, 100 - (voce["cut_prob"] or 0) - (voce["hike_prob"] or 0))
-                elif m25 == 0:
-                    voce["hold_prob"] = 100
-            meetings.append(voce)
-        mov = meetings[0] if meetings and meetings[0].get("prezzata_dal_contratto") else None
-        cut_prob = mov["cut_prob"] if mov else None
-        hike_prob = mov["hike_prob"] if mov else None
-        macro["fedwatch"] = {
-            "target_range": f"{target_low:.2f}–{target:.2f}%",
-            "implied_rate": implied,
-            "delta_bp": round((implied - mid) * 100),
-            "next_cut_prob": cut_prob,
-            "next_hike_prob": hike_prob,
-            # il FATTO che il calcolo produce davvero, accanto alla probabilita' che ne deriva
-            # solo dove e' tale. `None` significa "questo contratto non prezza quella riunione".
-            "movimenti": mov,
-            "base_effr": effr_corrente,
-            # v477 — l'EFFR del giorno con la sua data e la fonte, e i contratti per esteso letti
-            #   in questo run: la catena si ricostruisce da qui, e un contratto non letto si vede
-            "effr": _effr,
-            "contratti": contratti,
-            "next_fomc": next_fomc_date(),   # data esplicita della prossima riunione FOMC
-            "meetings": meetings,
-            # ⚠ v509 — il dot plot NON sta piu' qui: era scritto a mano (3,6 · 3,4 · 3,1 · 3,0, la
-            #   Fed che taglia) e ora si legge dalla Fed nel blocco suo, `proiezioni_fomc`
-        }
+        macro["fedwatch"] = fedwatch_da()
     except Exception as e:  # noqa: BLE001
         print(f"!! fedwatch: {e}", file=sys.stderr)
 
@@ -5681,6 +5724,8 @@ def fetch_margin_debt(prev_md=None):
 ICE_CDS_NOMI = "https://www.ice.com/api/cds-settlement-prices/icc-single-names"
 ICE_CDS_INDICI = "https://www.ice.com/api/cds-settlement-prices/icc-indexes"
 CDS_STORIA = ROOT / "data" / "cds_storia.jsonl"
+# v512 — i giorni di ICE letti da una sessione d'analisi e non ancora nello storico (scripts/fonti_titoli.py)
+CDS_SESSIONE = ROOT / "memoria" / "cds_sessione.jsonl"
 CDS_ENTITA = ROOT / "config" / "cds_entita.json"
 CDS_RECUPERO = 0.40       # convenzione di mercato per il debito senior non garantito
 CDS_PUNTI_MAX = 30.0      # oltre, lo spread equivalente dipende dal recupero assunto: vale il prezzo
@@ -5908,7 +5953,7 @@ def leggi_storia_cds(percorso=CDS_STORIA):
     return sorted(righe, key=lambda r: r["d"])
 
 
-def unisci_storia_cds(storia, righe, massimo=CDS_STORIA_MAX):
+def unisci_storia_cds(storia, righe, massimo=CDS_STORIA_MAX, inserisci_vecchi=False):
     """v508 — LO STORICO SI COMPONE PER DATA. ICE pubblica lo stesso giorno a ondate: fino alla v507 la prima lettura
     di un giorno ne scriveva la riga e le successive si rifiutavano («e' la stessa pubblicazione»), cosi' dal 19 al
     22/10/2026 lo storico ha tenuto solo l'Asia-Pacifico. Ora una riga si COMPLETA: le entita' e gli indici che mancano
@@ -5920,7 +5965,7 @@ def unisci_storia_cds(storia, righe, massimo=CDS_STORIA_MAX):
     'fuori_ordine', 'cambiato'}."""
     st = list(storia or [])
     per = {r["d"]: k for k, r in enumerate(st)}
-    esito = {"nuove": [], "completate": {}, "difformi": 0, "fuori_ordine": []}
+    esito = {"nuove": [], "completate": {}, "difformi": 0, "fuori_ordine": [], "inseriti": []}
     for R in sorted((x for x in (righe or []) if x and x.get("d")), key=lambda x: x["d"]):
         d = R["d"]
         if d in per:
@@ -5949,9 +5994,18 @@ def unisci_storia_cds(storia, righe, massimo=CDS_STORIA_MAX):
             st.append(R)
             per[d] = len(st) - 1
             esito["nuove"].append(d)
+        elif inserisci_vecchi:
+            # v512 — un giorno PIU' VECCHIO dell'ultimo e assente dallo storico: lo porta la lettura di una sessione
+            #   d'analisi (memoria/cds_sessione.jsonl), che lo ha letto da ICE quando era l'ultimo pubblicato e la
+            #   pipeline non girava. Entra al suo posto PER DATA; una risposta fuori ordine di ICE resta rifiutata
+            #   (inserisci_vecchi=False), perche' li' una data vecchia e' un'anomalia della fonte, non un giorno ritrovato
+            k = next(i for i, x in enumerate(st) if x["d"] > d)
+            st.insert(k, R)
+            per = {x["d"]: i for i, x in enumerate(st)}
+            esito["inseriti"].append(d)
         else:
             esito["fuori_ordine"].append(d)
-    esito["cambiato"] = bool(esito["nuove"] or esito["completate"])
+    esito["cambiato"] = bool(esito["nuove"] or esito["completate"] or esito["inseriti"])
     return st[-massimo:], esito
 
 
@@ -6346,11 +6400,19 @@ def tasso_cds(macro, storia):
     return None, "nessun tasso disponibile: spread non calcolati, restano i prezzi"
 
 
-def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_mappa=CDS_ENTITA, mercato=None):
+def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_mappa=CDS_ENTITA, mercato=None,
+                 percorso_sessione=None):
     """Lettura → storico → titoli. Se ICE non risponde, i titoli si leggono dall'ULTIMO giorno
     raccolto, e il riepilogo lo dichiara con la data: un dato vecchio e detto e' meglio di un
-    buco muto, e la sorveglianza (validate_macro) ne misura l'eta'."""
+    buco muto, e la sorveglianza (validate_macro) ne misura l'eta'.
+    v512 — percorso_sessione: i giorni che una sessione d'analisi ha letto da ICE e lo storico non ha (scripts/
+    fonti_titoli.py li scrive in memoria/cds_sessione.jsonl) si uniscono PRIMA della lettura di adesso: ICE pubblica
+    solo l'ultimo giorno, e un giorno in cui la pipeline non gira la sera sarebbe perso per sempre (il 21/10/2026).
+    Un prezzo gia' raccolto non cambia: valgono le regole di unisci_storia_cds."""
     storia = leggi_storia_cds(percorso_storia)
+    sessione = {}
+    if percorso_sessione is not None:
+        storia, sessione = unisci_storia_cds(storia, leggi_storia_cds(Path(percorso_sessione)), inserisci_vecchi=True)
     try:
         mappa = json.loads(Path(percorso_mappa).read_text(encoding="utf-8"))
     except Exception as e:  # noqa: BLE001
@@ -6367,7 +6429,7 @@ def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_ma
     if letto:
         # v508 — tutti i giorni che la lettura porta, e un giorno gia' raccolto si COMPLETA
         storia, esito = unisci_storia_cds(storia, righe_storia_cds(lettura, tasso))
-        if esito["cambiato"]:
+        if esito["cambiato"] or sessione.get("cambiato"):
             scrivi_storia_cds(storia, percorso_storia)
         if esito["difformi"]:
             print(f"!! CDS: {esito['difformi']} prezzi diversi da quelli gia' raccolti per lo stesso giorno: resta il primo",
@@ -6375,6 +6437,8 @@ def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_ma
     elif storia:
         # ⚠ ripiego dichiarato: per ogni entita' l'ultimo giorno raccolto in cui compare, con la sua data (v508)
         lettura = lettura_da_storia(storia)
+        if sessione.get("cambiato"):
+            scrivi_storia_cds(storia, percorso_storia)
     stati, indici = cds_dei_titoli(righe, lettura or {}, storia, mappa, mercato)
     return {"fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
             "url": ICE_CDS_NOMI, "letto": letto, "errore": errore,
@@ -6387,7 +6451,10 @@ def aggiorna_cds(righe, macro, get=None, percorso_storia=CDS_STORIA, percorso_ma
             "punti_max": CDS_PUNTI_MAX, "indici": indici,
             "storia": riepilogo_storia_cds(storia),
             "unione": {k: esito.get(k) for k in ("nuove", "completate", "difformi", "fuori_ordine")} if esito else None,
-            "verificato": mappa.get("verificato"), **stati}
+            "verificato": mappa.get("verificato"),
+            # v512 — i giorni ritrovati dalla sessione d'analisi, nominati (v406)
+            "sessione": ({k: sessione.get(k) for k in ("nuove", "completate", "inseriti")}
+                         if sessione.get("cambiato") else None), **stati}
 
 
 # ═══ v506 — VENDITE ALLO SCOPERTO: LE POSIZIONI CORTE APERTE DI OGNI TITOLO (FINRA, short interest) ═════════════
@@ -7018,13 +7085,20 @@ def seasonality_score(avg_pct, pos_pct):
     return round(clamp(50 + (pos_pct - 55) * 1.4 + avg_pct * 10))
 
 
-def fetch_seasonality():
+def fetch_seasonality(storia=None, adesso=None):
     """Stagionalità mensile storica di S&P 500 e Nasdaq 100: rendimento medio e % mesi positivi
-    per ciascun mese del calendario. Alimenta il tachimetro del mese corrente e il grafico nel popup."""
+    per ciascun mese del calendario. Alimenta il tachimetro del mese corrente e il grafico nel popup.
+    ⚠⚠ v512 — CONTAVA IL MESE IN CORSO FRA QUELLI CONCLUSI: la barra mensile di ottobre 2026, a meta' mese, entrava fra
+    gli «ottobre» della storia e nel punteggio del mese corrente — la classe dell'errore di stagionalita' della v511, qui
+    rimasta. Ora i mesi dal corrente in poi restano fuori (mesi_conclusi, la regola del titolo).
+    storia: {simbolo: serie mensile} per le suite; senza, la lettura di yfinance."""
     out = {}
     for key, sym in (("sp500", "^GSPC"), ("ndx", "^NDX")):
         try:
-            h = yf.Ticker(sym).history(period="max", interval="1mo")["Close"].dropna()
+            h = (storia or {}).get(sym)
+            if h is None:
+                h = yf.Ticker(sym).history(period="max", interval="1mo")["Close"].dropna()
+            h = mesi_conclusi(h, adesso)
             ret = h.pct_change().dropna()
             buckets = {m: [] for m in range(1, 13)}
             for dt, r in ret.items():
@@ -7042,7 +7116,8 @@ def fetch_seasonality():
             out[key] = months
         except Exception as e:  # noqa: BLE001
             print(f"!! stagionalità {sym}: {e}", file=sys.stderr)
-    cur_m = datetime.now(timezone.utc).month
+    _ny = (adesso or datetime.now(timezone.utc))
+    cur_m = (_ny.astimezone(ZoneInfo("America/New_York")) if ZoneInfo is not None else _ny).month
     sp_cur = next((x for x in out.get("sp500", []) if x["m"] == cur_m), None)
     ndx_cur = next((x for x in out.get("ndx", []) if x["m"] == cur_m), None)
     scores = [x["score"] for x in (sp_cur, ndx_cur) if x]
@@ -7877,7 +7952,8 @@ def main():
                 _qqq = {d.strftime("%Y-%m-%d"): float(v) for d, v in _m[2].items() if v == v}
         except Exception as e:  # noqa: BLE001
             print(f"!! CDS: serie di QQQ per il lato azionario non disponibile ({e})", file=sys.stderr)
-        macro["cds"] = aggiorna_cds(watchlist + ([btp] if isinstance(btp, dict) else []), macro, mercato=_qqq)
+        macro["cds"] = aggiorna_cds(watchlist + ([btp] if isinstance(btp, dict) else []), macro, mercato=_qqq,
+                                    percorso_sessione=CDS_SESSIONE)
         _c = macro["cds"]
         print(f"   CDS (ICE): {'letto' if _c['letto'] else 'NON letto — ' + str(_c.get('errore'))} · giorno "
               f"{_c.get('data')} · {len(_c.get('quotati') or [])} quotati, {len(_c.get('assenti') or [])} senza CDS"

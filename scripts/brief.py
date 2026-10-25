@@ -200,6 +200,17 @@ def barre_5min(tk):
     return out
 
 
+def barra_in_formazione(d, adesso=None):
+    """Vero se l'ultima barra e' quella di OGGI a New York e la campana delle 16:00 non e' ancora suonata: quella barra
+    e' in formazione (v439, v469). Il fuso, mai uno scarto a mano (v470).
+    v512 — spostata qui da rotazione.seduta_in_corso (che la chiama, col suo nome di prima): la usa anche tecnica(), e
+    una regola in due posti diverge al primo ritocco (v161)."""
+    if not d:
+        return False
+    adesso = (adesso or datetime.now(NEW_YORK)).astimezone(NEW_YORK)
+    return d[-1]["t"] == adesso.date().isoformat() and adesso.hour < 16
+
+
 def atr_wilder(d, n=14):
     """⚠ WILDER, non la media semplice. Verificato contro data.json su 8 titoli su 8."""
     if len(d) < n + 1:
@@ -216,9 +227,14 @@ def sma(d, n):
     return sum(x["c"] for x in d[-n:]) / n if len(d) >= n else None
 
 
-def tecnica(tk, d=None):
+def tecnica(tk, d=None, adesso=None):
     """Tutto cio' che si puo' AFFERMARE su un titolo dalle sue barre vere. Niente altro.
-    d: barre gia' scaricate (v468, rotazione.py) — evita di chiederle due volte alla fonte."""
+    d: barre gia' scaricate (v468, rotazione.py) — evita di chiederle due volte alla fonte.
+    ⚠⚠ v512 — LE MISURE SI FANNO SULLE SEDUTE CONCLUSE. A seduta aperta la fonte aggiunge allo storico la barra di
+    oggi, in formazione (misurato in v489: dalle 13:50 di New York c'e', alle 09:40 no), e ATR, medie, massimo e minimo
+    dell'anno, supporto e resistenza la contavano come una seduta intera — un pezzo di giornata letto come una giornata,
+    la stessa forma dell'ottobre «su 42 anni» a tre quarti della stagionalita' (v511). E «chiusura_prec» era il prezzo
+    di adesso. Il PREZZO resta quello della quota, di adesso: la distanza e' fra il prezzo vivo e i livelli conclusi."""
     if d is None:
         try:
             d = barre(tk)
@@ -226,13 +242,19 @@ def tecnica(tk, d=None):
             return {"tk": tk, "errore": str(e)[:80]}
     if not d:
         return {"tk": tk, "errore": "nessuna barra"}
+    vive = d
+    d = d[:-1] if barra_in_formazione(d, adesso) else d
+    if not d:
+        return {"tk": tk, "errore": "nessuna seduta conclusa"}
     try:
         q = quota(tk)
     except Exception:
         q = {}
-    px = q.get("p") or d[-1]["c"]
+    px = q.get("p") or vive[-1]["c"]
     atr = atr_wilder(d)
     r = {"tk": tk, "barre": len(d), "seduta": d[-1]["t"], "px": px,
+         # v512 — la barra di oggi tolta dalle misure perche' ancora in formazione: chi stampa lo puo' dire
+         "in_formazione": len(vive) > len(d),
          "chiusura_prec": d[-1]["c"], "var_pct": q.get("cp"), "stato_mercato": q.get("ms"),
          # ⚠ La variazione e l'escursione vengono dalla QUOTA, non dall'ultima barra storica: la
          #   seduta che descrivono e' quella dichiarata dalla quota (td). d[-1]["t"] e' la barra
@@ -717,6 +739,8 @@ def macro_dalla_pipeline():
     except Exception as e:
         return {"stato": f"data.json ILLEGGIBILE: {str(e)[:40]}", "serie": [],
                 "eta_ore": None, "run": None}
+    import fonti_titoli
+    d = fonti_titoli.carica(d)          # v512 — FedWatch e EFFR letti alla fonte nel giro, dove piu' recenti
     m = d.get("macro") or {}
     run = d.get("updated_at")
     eta = None
@@ -860,6 +884,9 @@ def credito_dalla_pipeline(tickers, percorso=None):
         d = json.load(open(p, encoding="utf-8"))
     except Exception as e:
         return {"stato": f"data.json non leggibile ({str(e)[:40]})", "eventi": []}
+    if percorso is None:
+        import fonti_titoli
+        d = fonti_titoli.carica(d)      # v512 — il CDS letto alla fonte nel giro, se ICE e' piu' avanti della pipeline
     righe = {r.get("ticker"): r for r in (d.get("watchlist") or []) if isinstance(r, dict)}
     _sto = (((d.get("macro") or {}).get("cds") or {}).get("storia") or {})
     giorni = _sto.get("giorni")

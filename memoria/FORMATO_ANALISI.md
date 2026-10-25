@@ -39,6 +39,15 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    rispetto alla fonte; per la pipeline l'età del run e se è precedente all'ultima chiusura USA, con l'elenco di ciò
    che porta solo lei (target e revisioni, sensibilità, CDS, short, bilanci SEC, leva, BTP): quelle righe descrivono la
    seduta prima, e la risposta lo dice.
+00bis. `python3 scripts/fonti_titoli.py` — **DATI PER TITOLO** (v512, CEO del 25/10/2026: *"target degli analisti,
+   FedWatch, storico dei CDS, vendite allo scoperto, bilanci SEC della pipeline se non sono aggiornati … trovali altrove
+   anche attraverso news; dati non aggiornati non sono affidabili"*). Gira PRIMA degli altri, insieme alle fonti dirette:
+   rilegge alla fonte, con le STESSE funzioni della pipeline, target e revisioni degli analisti (Yahoo), FedWatch (future
+   per esteso e EFFR), il CDS dell'ultimo giorno (ICE: se la pipeline è indietro le misure si rifanno, e il giorno che lo
+   storico non ha si conserva per lei), le vendite allo scoperto (FINRA), le date dei 10-Q e 10-K; e dove la tabella dei
+   trimestri della pipeline è ferma prima di un deposito di risultati prende il trimestre da Nasdaq, solo se le due fonti
+   danno gli stessi numeri sul trimestre in comune. Gli strumenti dopo di lui leggono quei dati. Stampa ogni quanto cambia
+   ciascun dato e la lista **DA CERCARE IN RETE**: dove nemmeno la fonte è aggiornata.
 0. **Prima dell'apertura americana (prima delle 15:30 italiane) l'analisi parte dal PRE-MARKET**
    (istruzione del CEO, 06/10/2026): `python3 scripts/numeri_libro.py --esteso` — risultato del
    libro sul prezzo esteso, livelli ricalcolati su quel prezzo, titoli che fuori sessione stanno
@@ -96,8 +105,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    dell'anno — con la data del regolamento e la prossima pubblicazione dal calendario UFFICIALE di FINRA. Prima la riga
    portava la quota di Yahoo senza data e il flusso giornaliero, che è il DPI del dark pool: tolti, una resa sola.
    Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
-   misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch derivato dal future
-   NON si usa come misura (v450): per la Fed mercati di previsione + verifica online.
+   misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch si legge dal blocco DATI PER
+   TITOLO: dalla v477 viene dai contratti per esteso di ciascun mese con l'EFFR del giorno (il continuo
+   `ZQ=F` della v450 non si usa più), letti all'ora dell'analisi. Si affianca ai mercati di previsione
+   con verifica online; se le due letture divergono oltre un movimento intero si dichiara (v450).
 4. Ricerca web sulle notizie che spiegano i movimenti, con fonte e data.
 5. `python3 scripts/rotazione.py` (v468, istruzione del CEO del 07/10: *"questa analisi deve
    essere strutturale e aggiunta sempre"*) — i 21 ETF settoriali e i primi cinque titoli di
@@ -176,6 +187,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    venuto dalla pipeline (ripiego) e perché, e se la pipeline è precedente all'ultima chiusura USA. Se lo è, le righe che
    porta solo lei (target, revisioni, CDS, short, bilanci) si leggono come la seduta prima, e la risposta lo dice dove
    le usa. Una serie NON DISPONIBILE si nomina: è il dato che manca, non un valore neutro.
+   Da v512 nella stessa riga il blocco DATI PER TITOLO: quale fonte ha servito analisti, FedWatch, CDS, short e trimestri,
+   e ogni voce di **DA CERCARE IN RETE** si cerca nelle notizie (comunicato della società, 10-Q, calendario dell'ente)
+   con fonte e data; se non si trova si scrive dato non disponibile, mai un numero ricordato o stimato.
 0. **Semaforo d'uscita** (decisione del CEO del 06/10; calcolato da v474): il colore di oggi in
    UNA riga dal blocco `SEMAFORO D'USCITA` di `numeri_libro.py`, con i segnali accesi nominati —
    regole in `memoria/LIBRO.md` §1ter. La guida sugli investimenti degli hyperscaler non è calcolata:
@@ -419,6 +433,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
        Da v503 (CEO, 18/10 sera): un sorvegliato che diventa un ingresso riceve PRIMA la sua voce nel registro dei
        concorrenti (`memoria/concorrenti.json`: mercato, quote, fonte e data cercati in rete), così l'ingresso porta
        accanto la sua quota di mercato e la salute dei concorrenti come ogni posizione.
+   7d-sexies. **il CALENDARIO FISCALE DI FINE ANNO** (v512, decisione del 25/10/2026, LIBRO.md §1ter) — da ottobre a
+       gennaio, in una riga: quanti nomi sono in perdita sull'anno e quali sono piccoli (dove la vendita per le
+       minusvalenze e il rimbalzo di gennaio sono misurati) e quali grandi (rumore). Informazione: non cambia tenuta,
+       semaforo né ingressi. Fuori finestra il blocco dice che è spento, e la risposta non lo nomina.
    7e. **il PIANO PER LA LIQUIDITÀ** (v474, decisione del CEO del 09/10) — dal blocco omonimo di
        `rotazione.py`: la liquidità e la sua quota del patrimonio; per gli operabili adesso e per
        gli avvisi le conseguenze di un'unità di 5.000 € sul libro (volatilità, beta su QQQ, perdita
@@ -447,6 +465,8 @@ legge insieme alla struttura e alle notizie.
 chiave fra parentesi quadre, e `scripts/scheda.py` la mette nella SCHEDA COMPLETA — un gate verifica nei due versi
 che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catalogo non ne abbia una che qui non c'è):
 - `[freschezza]` i dati in ritardo tolti dove una fonte raggiungibile c'è: le serie macro lette alla fonte all'ora dell'analisi, la pipeline come ripiego dichiarato riga per riga, e la sua età con ciò che porta solo lei (25/10)
+- `[fine_anno]` calendario fiscale di fine anno, da ottobre a gennaio: i nomi in perdita sull'anno con la capitalizzazione, e dove la regolarità è misurata (piccoli) e dove è rumore (grandi) — informazione (25/10)
+- `[freschezza_titoli]` i dati per titolo della pipeline letti alla fonte se vecchi — analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC, trimestri che la pipeline non ha ancora — con ogni quanto cambiano, e cercati nelle notizie dove nemmeno la fonte è aggiornata (25/10)
 - `[semaforo]` semaforo d'uscita (06/10), calcolato (09/10)
 - `[attesa]` costo dell'attesa e scadenze (06/10)
 - `[premarket]` pre-market prima dell'apertura (06/10)
@@ -502,6 +522,11 @@ strumento: il gate della v505 non lascia l'una senza l'altra.
 ## Regole
 - Direzione, priorità e livelli sì; le quantità solo come aritmetica dichiarata (v439).
 - Ogni numero porta la sua data e il suo denominatore; ciò che manca si dichiara.
+- **Un dato vecchio non si usa come se fosse di oggi** (CEO, 25/10/2026: *"dati non aggiornati non sono affidabili …
+  non voglio avere mai errori simili"*). Un periodo in formazione — la seduta in corso, il mese non concluso, il
+  trimestre non ancora depositato — non si legge come concluso; un dato che la pipeline porta da un run vecchio si
+  legge dalla fonte di adesso (DATI PER TITOLO) o si cerca in rete con fonte e data; se non si trova, dato non
+  disponibile.
 - **Ogni orario di un evento si scrive in ora italiana, preso dalla fonte ufficiale nel suo
   fuso e convertito col fuso** (v470): le aste dal blocco ASTE del brief (TreasuryDirect, ora
   di New York); Fed e dati macro dal calendario dell'ente, che li dà in ora di New York. Un

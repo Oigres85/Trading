@@ -276,7 +276,10 @@ def riga_ricavi(r):
             parti.append(f"{_segno(verso_trim)}% sullo stesso trimestre dell'anno prima")
         if t["qoq"] is not None:
             parti.append(f"{_segno(t['qoq'])}% sul trimestre precedente")
-        pz.append(f"ultimo trimestre (al {t['trim']}) "
+        # v512 — un trimestre che la tabella della pipeline non portava, ritrovato da un'altra fonte (scripts/fonti_titoli.py,
+        #   verificato sul trimestre in comune): la fonte viaggia col numero
+        _fonte = f", da {u['fonte']}: la tabella della pipeline non lo porta ancora" if u.get("fonte") else ""
+        pz.append(f"ultimo trimestre (al {t['trim']}{_fonte}) "
                   + (", ".join(parti) if parti else "senza un trimestre di confronto nel dato"))
         a, b = u.get("operativo"), (anno or {}).get("operativo")
         if a is not None and b is not None:
@@ -818,6 +821,11 @@ def genera(dati, pos, sorv, filtro=None):
             out.append(f"Dati del progetto: run della pipeline {agg} ({_n(ore)} ore fa).")
         except ValueError:
             out.append(f"Dati del progetto: run della pipeline {agg}.")
+    _ft = (dati.get("macro") or {}).get("_fonti_titoli")
+    if _ft:
+        # v512 — quale fonte ha vinto per ciascun blocco: chi legge sa se un numero e' della pipeline o di adesso (v406)
+        out.append("Lettura alla fonte del giro (scripts/fonti_titoli.py): "
+                   + " · ".join(f"{k} {v}" for k, v in (_ft.get("esiti") or {}).items()))
     out.append("Opzioni: non qui — le guardie di plausibilita' vivono nel pacchetto titolo della dashboard.")
     out.append(riferimento_valutazione(dati.get("macro")))      # v492 — una volta per blocco (v407)
     meta_cds = (dati.get("macro") or {}).get("cds")
@@ -860,6 +868,8 @@ def main():
     tks_pos = [p["tk"] for p in pos if p.get("valuta") == "USD"]
     tks_sorv = [s["tk"] for s in sorv if s["tk"] not in tks_pos]
     dati = json.loads((RADICE / "data" / "data.json").read_text(encoding="utf-8").replace("NaN", "null"))
+    import fonti_titoli
+    dati = fonti_titoli.carica(dati)    # v512 — la lettura alla fonte del giro, dove piu' recente della pipeline
     filtro = set(a.upper() for a in sys.argv[1:]) or None
     print(genera(dati, tks_pos, tks_sorv, filtro))
 

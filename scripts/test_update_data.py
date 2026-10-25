@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 375  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385 (sale, mai scende)
+N_CHECKS_MINIMO = 388  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1440,7 +1440,9 @@ _cod_fw = "\n".join(l for l in _src.splitlines() if not l.strip().startswith("#"
 #   Rosso su codice corretto. L'invariante non e' una stringa ma una PROPRIETA': il ciclo che
 #   costruisce `meetings` non deve avere un indice, perche' senza indice non esiste rampa —
 #   la vecchia usava `enumerate(fomc[:4])` proprio per averlo.
-_blocco_meetings = _cod_fw.split("meetings = []")[1].split("macro[\"fedwatch\"]")[0] \
+# ⚠ v512 — il blocco vive ora in fedwatch_da e finisce col suo `return {`: la fine si cerca li', non piu' nella chiave
+#   di `macro` che il giro scriveva (riagganciato al luogo vero, non allentato)
+_blocco_meetings = _cod_fw.split("meetings = []")[1].split("    return {")[0] \
     if "meetings = []" in _cod_fw else ""
 check("v441 il ciclo delle riunioni non ha un indice, quindi non puo' proiettare una rampa",
       bool(_blocco_meetings) and "enumerate" not in _blocco_meetings
@@ -1468,15 +1470,16 @@ check("v441 il blocco FedWatch e' agganciato a movimenti_impliciti_fomc, non sol
 # ⚠ La proprieta' e' generale e non nomina il difetto: ogni chiave di `macro` che il blocco
 #   FedWatch LEGGE dev'essere gia' stata scritta piu' sopra, oppure la lettura deve avere un
 #   ripiego che non dipende da `macro`. Vale anche per le letture che verranno dopo.
-_i_fw = _src.index('macro["fedwatch"] = {')
-_pre_fw = _src[:_i_fw]
-_blocco_effr = _pre_fw[_pre_fw.rindex("effr_corrente = None"):]
-_letture = set(__import__("re").findall(r'macro\.get\("([a-z_]+)"\)', _blocco_effr))
-_tardive = sorted(k for k in _letture
-                  if ('macro["%s"] = ' % k) in _src and _src.index('macro["%s"] = ' % k) > _i_fw)
-check("v443 il blocco FedWatch non dipende da una chiave che il file scrive dopo di lui"
-      + (" (tardive: %s)" % ", ".join(_tardive) if _tardive else ""),
-      not _tardive or "fred_series(\"FEDFUNDS\"" in _blocco_effr)
+# ⚠ v512 — il blocco e' una funzione (fedwatch_da) e la proprieta' e' diventata PIU' FORTE: non legge `macro` affatto,
+#   quindi non puo' dipendere dall'ordine in cui il giro scrive le chiavi. Si guarda il CODICE della funzione, senza la
+#   docstring, che nomina `macro` per spiegarlo (il gate che trova se' stesso: v213, v240, v393)
+_i_fw = _src.index("def fedwatch_da(")
+_fn_fw = _src[_i_fw:_src.index("\ndef ", _i_fw + 10)]
+_fn_fw_cod = "\n".join(r.split("#")[0] for r in _fn_fw.split('"""', 2)[-1].splitlines())
+_letture = set(__import__("re").findall(r'macro(?:\.get\(|\[)"([a-z_]+)"', _fn_fw_cod))
+check("v443 il blocco FedWatch non dipende da una chiave di macro: fedwatch_da non ne legge nessuna"
+      + (" (letture: %s)" % ", ".join(sorted(_letture)) if _letture else ""),
+      not _letture and "effr_corrente = None" in _fn_fw_cod and "catena_fedwatch(effr_corrente" in _fn_fw_cod)
 
 # ═══ v477 — IL CONTRATTO CONTINUO ROTOLA A META' MESE, E LA BASE ERA UNA MEDIA MENSILE ═══════
 # Verificato il 13/10/2026: `ZQ=F` serviva ZQX26 (novembre) mentre la riunione era il 28/10, e
@@ -1554,7 +1557,9 @@ check("v477 l'EFFR viene dalla NY Fed col suo giorno, poi da FRED EFFR, e senza 
 # ⚠ _SRC_UD_CODICE non ha commenti: l'ancora del blocco e' una riga di CODICE, non il titolo
 _i477 = _SRC_UD_CODICE.index("def effr_giornaliero(")
 _fn_effr = _SRC_UD_CODICE[_i477:_SRC_UD_CODICE.index("\ndef ", _i477 + 10)]
-_i477b = _SRC_UD_CODICE.index('macro["fedwatch"] = {')
+# ⚠ v512 — il blocco vive in fedwatch_da: da _mesi_fw al suo `return {`
+_i477a = _SRC_UD_CODICE.index("def fedwatch_da(")
+_i477b = _SRC_UD_CODICE.index("    return {", _i477a)
 _blocco477 = _SRC_UD_CODICE[_SRC_UD_CODICE.rindex("_mesi_fw = ", 0, _i477b):_i477b]
 check("v477 collegamento: il blocco legge i contratti PER ESTESO e l'EFFR del giorno, mai il continuo ne' FEDFUNDS",
       "simbolo_fed_funds(" in _blocco477 and "effr_giornaliero()" in _blocco477
@@ -3383,6 +3388,138 @@ check("v510 una funzione sola: il pavimento del rumore e la decodifica dei feed 
       ud.r2_rumore is _cm510.r2_rumore and ud.testo_feed is _cm510.testo_feed
       and "def r2_rumore" not in _SRC_UD and abs(_cm510.r2_rumore(251) - 0.0153) < 0.0005
       and _cm510.r2_rumore(20) is None)
+
+# ══ v512 — LE FUNZIONI CHE LA SESSIONE D'ANALISI RILEGGE ALLA FONTE (scripts/fonti_titoli.py) ═════════════════════
+# Il CEO, 25/10/2026: «dati non aggiornati non sono affidabili». La sessione rilegge analisti, FedWatch, CDS e short con
+# le STESSE funzioni della pipeline (v161): qui si prova che le funzioni estratte fanno quello che faceva il codice in
+# linea, che la pipeline le chiama (il collegamento, non il controllo: v399, v443), e che i giorni di ICE conservati da
+# una sessione entrano nello storico al loro posto.
+import tempfile as _tmp512, json as _json512
+class _T512:
+    """Un Ticker finto coi quattro campi che analisti_da legge (gli stessi numeri di CRWV del 25/10/2026)."""
+    def __init__(self, vuoto=False, rotto=False):
+        self.vuoto, self.rotto = vuoto, rotto
+    def _df(self, righe, colonne):
+        return pd.DataFrame([righe], index=["+1y"], columns=colonne) if not self.vuoto else pd.DataFrame()
+    @property
+    def eps_trend(self):
+        if self.rotto:
+            raise RuntimeError("HTTP 429")
+        return self._df([-4.58584, -4.36516, -3.67395], ["current", "7daysAgo", "90daysAgo"])
+    @property
+    def eps_revisions(self):
+        return self._df([3, 1], ["upLast30days", "downLast30days"])
+    @property
+    def earnings_estimate(self):
+        return self._df([-8.97, -1.07659, 23], ["low", "high", "numberOfAnalysts"])
+    @property
+    def analyst_price_targets(self):
+        return {} if self.vuoto else {"low": 39.0, "high": 278.0, "median": 135.0, "mean": 135.8158}
+_a512 = ud.analisti_da(_T512(), "CRWV")
+check("v512 analisti_da (estratta da fetch_symbol) ridà, sugli stessi ingressi, il dizionario che la pipeline ha "
+      "pubblicato per CRWV il 25/10: " + str(_a512),
+      _a512 == {"eps_ora": -4.5858, "eps_90g_fa": -3.674, "eps_7g_fa": -4.3652, "revisione_90g_pct": 24.82,
+                "revisione_7g_pct": 5.06, "su_30g": 3, "giu_30g": 1, "eps_min": -8.97, "eps_max": -1.0766, "eps_n": 23,
+                "target_min": 39.0, "target_max": 278.0, "target_mediana": 135.0})
+check("v512 analisti_da: niente dalla fonte → None (non un dizionario di vuoti); un errore → None, senza portarsi via il "
+      "giro dei titoli",
+      ud.analisti_da(_T512(vuoto=True), "X") is None and ud.analisti_da(_T512(rotto=True), "X") is None)
+_c512 = "\n".join(r.split("#")[0] for r in _SRC_UD.splitlines())
+_fs512 = _c512[_c512.index("def fetch_symbol("):_c512.index("\ndef ", _c512.index("def fetch_symbol(") + 10)]
+check("v512 collegamento: fetch_symbol chiama analisti_da e le due funzioni dei rendimenti (nessuna copia in linea "
+      "rimasta), il giro macro chiama fedwatch_da dentro il suo try",
+      "analisti = analisti_da(t, ticker)" in _fs512 and "t.eps_trend" not in _fs512
+      and "daily_ret = rendimenti_log(closes)" in _fs512 and "rendimenti_datati(daily_ret)[0]" in _fs512
+      and "np.log(closes / closes.shift(1))" not in _fs512
+      and 'macro["fedwatch"] = fedwatch_da()' in _c512
+      and _c512.index('macro["fedwatch"] = fedwatch_da()') < _c512.index('print(f"!! fedwatch: {e}", file=sys.stderr)'))
+_ser512 = pd.Series([10.0, 11.0, 10.5, float("nan"), 12.0, 0.0, 13.0], index=pd.date_range("2026-01-01", periods=7))
+_vec512 = np.log(_ser512 / _ser512.shift(1)).replace([np.inf, -np.inf], np.nan).dropna()
+_rs512, _rd512 = ud.rendimenti_datati(ud.rendimenti_log(_ser512), 3)
+check("v512 i rendimenti della riga: la stessa formula di prima (log, senza infiniti ne' buchi), gli ultimi n con le "
+      "loro date",
+      ud.rendimenti_log(_ser512).equals(_vec512)
+      and _rs512 == [round(float(x), 6) for x in _vec512.tail(3)]
+      and _rd512 == [d.strftime("%Y-%m-%d") for d in _vec512.index[-3:]])
+# --- fedwatch_da sui contratti costruiti: lo stato si COSTRUISCE (v425), a orologio fermo (v402) ---
+_vp512, _ve512, _vf512, _vh512 = ud._prezzo_contratto, ud.effr_giornaliero, ud.fred_series, ud.http_get
+_prezzi512 = {"ZQV26.CBT": 96.1175, "ZQX26.CBT": 96.095, "ZQZ26.CBT": 95.96, "ZQF27.CBT": 95.90, "ZQG27.CBT": 95.825,
+              "ZQH27.CBT": 95.76}
+class _R512:
+    def json(self):
+        return {"refRates": [{"targetRateTo": 4.0, "targetRateFrom": 3.75}]}
+def _nofred512(*a, **k):
+    raise RuntimeError("FRED giu'")
+try:
+    ud._prezzo_contratto = lambda s: _prezzi512.get(s)
+    ud.effr_giornaliero = lambda: {"valore": 3.88, "data": "2026-10-22", "fonte": "NY Fed"}
+    ud.fred_series, ud.http_get = _nofred512, lambda u, *a, **k: _R512()
+    _fw512 = ud.fedwatch_da(ud.datetime(2026, 10, 25, 12, tzinfo=ud.timezone.utc))
+    _prezzi512.pop("ZQV26.CBT")
+    try:
+        ud.fedwatch_da(ud.datetime(2026, 10, 25, 12, tzinfo=ud.timezone.utc))
+        _manca512 = None
+    except Exception as _e512:  # noqa: BLE001 — un'altra eccezione e' il difetto, e deve cadere col nome del check
+        _manca512 = f"{type(_e512).__name__}: {_e512}"
+finally:
+    ud._prezzo_contratto, ud.effr_giornaliero, ud.fred_series, ud.http_get = _vp512, _ve512, _vf512, _vh512
+_m0_512 = (_fw512.get("meetings") or [{}])[0]
+check("v512 fedwatch_da a orologio fermo: i contratti per esteso dei mesi giusti, la fascia dalla NY Fed, e la prima "
+      "riunione (28/10, prezzata dal mese dopo) a +0,1 movimenti = RIALZO 10% · invariato 90%; senza il contratto del "
+      "mese in corso solleva, e il giro lo dichiara: " + str(_m0_512),
+      [c["simbolo"] for c in _fw512["contratti"]][:3] == ["ZQV26.CBT", "ZQX26.CBT", "ZQZ26.CBT"]
+      and _fw512["target_range"] == "3.75–4.00%" and _fw512["implied_rate"] == round(100 - 96.1175, 3)
+      and _m0_512.get("riunione") == "2026-10-28" and _m0_512.get("hike_prob") == 10 and _m0_512.get("hold_prob") == 90
+      and _fw512["effr"]["data"] == "2026-10-22" and _manca512 and _manca512.startswith("RuntimeError") and "ZQV26.CBT" in _manca512)
+# --- i giorni di ICE conservati da una sessione: entrano al loro posto, per DATA ---
+_R1_512 = {"d": "2026-10-19", "m": "2031-12-20", "r": 3.88, "p": {"AAA": [100, 98.0]}, "i": {"IG": [47, 1, 100, 99.0]}}
+_R2_512 = {"d": "2026-10-21", "m": "2031-12-20", "r": 3.88, "p": {"AAA": [100, 97.9]}, "i": {"IG": [47, 1, 100, 99.1]},
+           "origine": "sessione d'analisi (scripts/fonti_titoli.py)"}
+_R3_512 = {"d": "2026-10-22", "m": "2031-12-20", "r": 3.88, "p": {"AAA": [100, 97.8]}, "i": {"IG": [47, 1, 100, 99.2]}}
+_no512, _eno512 = ud.unisci_storia_cds([_R1_512, _R3_512], [_R2_512])
+_si512, _esi512 = ud.unisci_storia_cds([_R1_512, _R3_512], [_R2_512], inserisci_vecchi=True)
+check("v512 un giorno PIU' VECCHIO dell'ultimo e assente: dalla lettura di ICE resta fuori ordine (un'anomalia della "
+      "fonte), da una sessione entra al suo posto per data; e un prezzo gia' raccolto non cambia",
+      _eno512["fuori_ordine"] == ["2026-10-21"] and [r["d"] for r in _no512] == ["2026-10-19", "2026-10-22"]
+      and not _eno512["cambiato"]
+      and _esi512["inseriti"] == ["2026-10-21"] and [r["d"] for r in _si512] == ["2026-10-19", "2026-10-21", "2026-10-22"]
+      and _esi512["cambiato"] and ud.unisci_storia_cds(_si512, [_R2_512], inserisci_vecchi=True)[1]["cambiato"] is False)
+with _tmp512.TemporaryDirectory() as _dir512:
+    _st512, _se512, _mp512 = Path(_dir512) / "s.jsonl", Path(_dir512) / "sess.jsonl", Path(_dir512) / "m.json"
+    ud.scrivi_storia_cds([_R1_512, _R3_512], _st512)
+    ud.scrivi_storia_cds([_R2_512], _se512)
+    _mp512.write_text(_json512.dumps({"entita": {"AAA": "AAA"}}))
+    def _giu512(u):
+        raise RuntimeError("HTTP 503")
+    _senza512 = ud.aggiorna_cds([{"ticker": "AAA"}], {}, get=_giu512, percorso_storia=_st512, percorso_mappa=_mp512)
+    _d_senza512 = [r["d"] for r in ud.leggi_storia_cds(_st512)]
+    _con512 = ud.aggiorna_cds([{"ticker": "AAA"}], {}, get=_giu512, percorso_storia=_st512, percorso_mappa=_mp512,
+                              percorso_sessione=_se512)
+    _d_con512 = [r["d"] for r in ud.leggi_storia_cds(_st512)]
+check("v512 aggiorna_cds unisce i giorni della sessione PRIMA della lettura di adesso — anche con ICE giu' — e lo "
+      "dichiara; senza il percorso non legge nessun file di sessione (le suite restano isolate)",
+      _d_senza512 == ["2026-10-19", "2026-10-22"] and _senza512.get("sessione") is None
+      and _d_con512 == ["2026-10-19", "2026-10-21", "2026-10-22"]
+      and (_con512.get("sessione") or {}).get("inseriti") == ["2026-10-21"]
+      and "percorso_sessione=CDS_SESSIONE" in _c512 and str(ud.CDS_SESSIONE).endswith("memoria/cds_sessione.jsonl"))
+
+# --- v512 — la stagionalita' di S&P 500 e Nasdaq-100 contava il mese in corso fra quelli conclusi ---
+_idx512 = pd.date_range("2022-01-01", "2026-10-01", freq="MS")
+_vals512 = [100.0 * (1.01 ** i) for i in range(len(_idx512))]
+_vals512[-1] = _vals512[-2] * 1.50                      # ottobre 2026 a meta' mese: +50% che non e' un ottobre intero
+_ser512m = pd.Series(_vals512, index=_idx512)
+_st512 = ud.fetch_seasonality(storia={"^GSPC": _ser512m, "^NDX": _ser512m},
+                              adesso=ud.datetime(2026, 10, 25, 12, tzinfo=ud.timezone.utc))
+_ott512 = next(x for x in _st512["sp500"] if x["m"] == 10)
+check("v512 stagionalita' di S&P 500 e Nasdaq-100: ottobre si misura sugli ottobre CONCLUSI (2022-2025, +1% ciascuno), "
+      "non sul +50% di un ottobre 2026 a meta'; il mese corrente e' quello di New York: " + str(_ott512),
+      _ott512["n"] == 4 and abs(_ott512["avg"] - 1.0) < 0.01 and _ott512["pos"] == 100.0 and _st512["current_month"] == 10
+      and len(ud.mesi_conclusi(_ser512m, ud.datetime(2026, 10, 25, tzinfo=ud.timezone.utc))) == len(_ser512m) - 1
+      and len(ud.mesi_conclusi(_ser512m, ud.datetime(2026, 11, 1, 3, tzinfo=ud.timezone.utc))) == len(_ser512m) - 1
+      and len(ud.mesi_conclusi(_ser512m, ud.datetime(2026, 11, 1, 6, tzinfo=ud.timezone.utc))) == len(_ser512m))
+check("v512 una regola sola per i mesi conclusi: la stagionalita' del titolo e quella degli indici passano da mesi_conclusi",
+      "monthly = mesi_conclusi(monthly, adesso)" in _c512 and "h = mesi_conclusi(h, adesso)" in _c512
+      and _c512.count("(d.year, d.month) < (ny.year, ny.month)") == 1)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

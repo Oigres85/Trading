@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """Test di analisi_libro.py. Nessuna rete: dati sintetici costruiti per far scattare
 esattamente le trappole gia' pagate sul campo."""
-import math, re, sys
+import math, os, re, sys
 from pathlib import Path
 import numpy as np, pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+# v512 — chi carica data.json vi sovrappone la lettura alla fonte del giro (scripts/fonti_titoli.py) se ce n'e' una di
+#   meno di trenta minuti: le suite non devono dipendere da un'analisi fatta mezz'ora prima. I check della v512 la
+#   esercitano costruendola, con la variabile tolta dove serve.
+os.environ["TRADING_FONTI_TITOLI"] = "spenta"
 import analisi_libro as A
 
 FALLITI = []; ESEGUITI = []
@@ -2855,8 +2859,10 @@ check("v481-v482 il piano (FORMATO §6) porta il bilancio dell'evidenza, la rice
       and "nei due versi" in _s6_481 and NL.CONFLITTO in _s6_481 and "aritmetica della media" in _s6_481
       and "compensando la plusvalenza" not in _s6_481
       and "Nessuna presa di profitto per prezzo" in NL.reazioni_libro(_lib474).get("giallo", "")
-      and "tenuta delle posizioni" in _fmt481.split("Richieste del CEO rese strutturali")[1][:2000]
-      and "bilancio dell'evidenza" in _fmt481.split("Richieste del CEO rese strutturali")[1][:2500])
+      # ⚠ v512 — una finestra FISSA di 2.000 caratteri invecchia a ogni voce che il registro guadagna (v409: una distanza
+      #   non e' una proprieta'): si cerca dentro il registro intero, fino al titolo dopo
+      and "tenuta delle posizioni" in _fmt481.split("Richieste del CEO rese strutturali")[1].split("\n## ")[0]
+      and "bilancio dell'evidenza" in _fmt481.split("Richieste del CEO rese strutturali")[1].split("\n## ")[0])
 _s5q482 = _lib474[_lib474.find("## 1quinquies"):_lib474.find("## 1sexies")]
 check("v482 il libro non afferma piu' che la vendita di RGTI 'regge anche con la regola' — e lo stato delle decisioni NON "
       "si fissa qui: il 14/10 il CEO l'ha revocata, e un gate che pretendeva 'aperta' pinnava una decisione (v481)",
@@ -3096,7 +3102,10 @@ check("v484 collegamento: calcola produce il piano dall'elenco del libro, il sal
       and 'out["esami"] = leggi_esami()' in _calc474 and 'con_scadenze(out["tenuta"], scad, out["esami"]' in _calc474
       and "SALVAVITA SCATTATO" in _sint484 and "PIANO DI RIDUZIONE" in _sint484
       and _sint484.find("SALVAVITA") < _sint484.find("PIANO DI RIDUZIONE") < _sint484.find("Periodo "), _sint484[:500])
-_s0_484 = _fmt481[_fmt481.find("0. **Semaforo d'uscita**"):_fmt481.find("0bis.")]
+# ⚠ v512 — la fine si cerca DOPO l'inizio: «00bis.» (il passo delle fonti per titolo in «Come si produce») contiene
+#   «0bis.», e la prima stesura prendeva quello — l'ancoraggio aperto, nella sonda di un gate (v422)
+_i0_484 = _fmt481.find("0. **Semaforo d'uscita**")
+_s0_484 = _fmt481[_i0_484:_fmt481.find("\n0bis.", _i0_484)]
 check("v484 il formato porta salvavita e piano nella sezione 0, la scadenza e l'esame dei conflitti nella sezione 6, e il "
       "registro delle richieste le elenca (analisi.py stampa la checklist da qui)",
       "SALVAVITA" in _s0_484 and "PIANO DI RIDUZIONE" in _s0_484 and "esame scritto prima" in _s6_481
@@ -6836,6 +6845,13 @@ _U505 = {
         "                                         pipeline: stessa osservazione",
         "  -> 13 su 13 lette alla fonte, 0 dalla pipeline, 0 non disponibili",
         "  PIPELINE (data/data.json): run del 2026-10-18T22:52:13Z, 8,6 ore fa — dopo l'ultima chiusura USA"],
+    # v512 — i dati per titolo letti alla fonte: il secondo strumento che gira per primo
+    "fonti_titoli": [
+        "DATI PER TITOLO — LA PIPELINE E LA FONTE LETTA ADESSO (v512)",
+        "  run della pipeline 2026-10-18T22:52:13Z (8,6 ore fa) · lettura alla fonte 19/10 07:29 ora italiana (6,1 s)",
+        "  · ANALISTI: letti adesso per 3 titoli; rispetto al run della pipeline nessuna differenza",
+        "  DA CERCARE IN RETE — dove nemmeno la fonte e' aggiornata o raggiungibile (con fonte e data):",
+        "    · niente: le fonti lette adesso sono allineate o piu' avanti della pipeline"],
     "numeri_libro_esteso": [
         "FUORI SESSIONE rispetto all'ultima chiusura · libro -10 $ (-0,39%)", "POSIZIONI",
         "  AAA       10,05  -1,07%     -19 $ · res +3,7 ATR · supp +0,9 ATR",
@@ -6930,6 +6946,7 @@ _U505 = {
         "      valutazione: P/E 20×",
         "      tenuta se fosse in portafoglio (LIBRO.md §1sexies): VENDITA PER EVIDENZA — un ingresso qui e' speculativo, "
         "CONTRO l'evidenza: ammesso, e si dichiara tale", "",
+        "CALENDARIO FISCALE DI FINE ANNO — fuori finestra: si accende da ottobre a gennaio (decisione del 25/10/2026)", "",
         "NOTIZIE ULTIMISSIME — TUTTI I SORVEGLIATI", "  WWW — candidato · prezzo dentro la zona d'ingresso",
         "      [WWW] 19/10 01:00 Titolo tre", "", "PIANO PER LA LIQUIDITÀ — 45.000 € dichiarati in LIBRO.md",
         "■ OPERABILI ADESSO — 1", "    WWW (watchlist) 30,00 · DIVERSIFICA (corr +0,40) · per 5.000 €: volatilità -1,10 punti",
@@ -7845,9 +7862,11 @@ check("v511 collegamenti: numeri_libro, rotazione, indici e brief leggono la SCE
 check("v511 nessuna chiave FRED nelle fonti dirette: il CSV pubblico non la chiede, e il repository è pubblico",
       "FRED_API_KEY" not in _cfd511 and "api.stlouisfed.org" not in _cfd511 and "fredgraph.csv" in _cfd511)
 _coman511 = [c for f in ("pre-market", "seduta", "after-hours", "chiuso") for c in AN.comandi(f)[:1]]
+# ⚠ v512 — riagganciato: le fonti che girano per prime sono DUE (fonti_dirette e fonti_titoli); l'invariante e' che la
+#   lettura alla fonte stia in testa a ogni fase e che le fonti dirette restino la prima, non che sia una sola
 check("v511 il comando unico esegue le fonti dirette PRIMA di tutti gli altri strumenti (che ne riusano la lettura) e la "
       "freschezza apre la scheda",
-      AN.PRIMA == ("fonti_dirette.py",) and all(c[1][0] == "fonti_dirette.py" for c in _coman511) and len(_coman511) == 4
+      AN.PRIMA[0] == "fonti_dirette.py" and all(c[1][0] == "fonti_dirette.py" for c in _coman511) and len(_coman511) == 4
       and "esegui(testa_l) + esegui(" in _solo_codice_py((_ROOT / "scripts" / "analisi.py").read_text(encoding="utf-8"))
       and SC.SEZIONI[0][0] == "freschezza", str([c[1] for c in _coman511]))
 
@@ -7978,6 +7997,404 @@ check("v511 i due tempi (CEO, 25/10): il formato chiude con le DOMANDE MIRATE, l
       and "00. **Freschezza dei dati**" in _fmt511
       and all(f"[{k}]" in _fmt511 and k in SC.REGISTRO for k in ("freschezza", "ipervenduto", "stagionalita", "due_tempi"))
       and "fonti_dirette.py" in _ag511)
+
+# ══ v512 — I DATI PER TITOLO DELLA PIPELINE, LETTI ALLA FONTE ALL'ORA DELL'ANALISI (scripts/fonti_titoli.py) ══════════
+# Il CEO, 25/10/2026: «target degli analisti, FedWatch, storico dei CDS, vendite allo scoperto, bilanci SEC della pipeline
+# se non sono aggiornati … trovali altrove anche attraverso news; dati non aggiornati non sono affidabili». Nessuna rete:
+# gli stati si COSTRUISCONO (v425) e le letture si sostituiscono con funzioni finte.
+import copy as _cp512, datetime as _dtm512, json as _js512, tempfile as _tf512
+import fonti_titoli as FT
+_UTC512 = _dtm512.timezone.utc
+
+# --- le date dei depositi periodici: l'ultimo di ciascun tipo; le modifiche e gli 8-K restano fuori ---
+_dep512 = [{"type": "10-Q", "date": _dtm512.date(2026, 7, 31)}, {"type": "10-Q", "date": _dtm512.date(2026, 4, 30)},
+           {"type": "10-Q/A", "date": _dtm512.date(2026, 8, 20)}, {"type": "8-K", "date": _dtm512.date(2026, 10, 2)},
+           {"type": "10-K", "date": "2026-02-10"}]
+check("v512 i depositi periodici dalla lista di Yahoo: l'ultimo 10-Q e l'ultimo 10-K; un 10-Q/A non e' un trimestre "
+      "nuovo e un 8-K non e' un periodico",
+      FT.periodici_da(_dep512) == {"10-Q": "2026-07-31", "10-K": "2026-02-10"} and FT.periodici_da(None) == {})
+
+# --- Nasdaq in migliaia, coi negativi col meno e i vuoti come '--' ---
+_nq_js512 = {"data": {"incomeStatementTable": {
+    "headers": {"value1": "Quarterly Ending:", "value2": "9/30/2026", "value3": "6/30/2026", "value4": "3/31/2026"},
+    "rows": [{"value1": "Total Revenue", "value2": "$1,235,837", "value3": "$1,065,365", "value4": "$751,054"},
+             {"value1": "Operating Income", "value2": "$225,449", "value3": "$182,237", "value4": "--"},
+             {"value1": "Net Income", "value2": "$247,374", "value3": "$200,636", "value4": "$75,000"},
+             {"value1": "Net Income Applicable to Common Shareholders", "value2": "$250,271", "value3": "$196,290",
+              "value4": "$70,653"}]}}}
+_nq512 = FT.trimestri_nasdaq(_nq_js512)
+check("v512 Nasdaq: le date dei trimestri dall'intestazione, dal piu' recente; gli importi in migliaia diventano unita', "
+      "'-$49,000' e' negativo, '--' e' un buco (mai uno zero)",
+      [q["trim"] for q in _nq512] == ["2026-09-30", "2026-06-30", "2026-03-31"]
+      and _nq512[0]["voci"]["Total Revenue"] == 1235837000 and _nq512[2]["voci"]["Operating Income"] is None
+      and FT._num_nasdaq("-$49,000") == -49000000 and FT._num_nasdaq("--") is None and FT.trimestri_nasdaq({}) == [])
+
+# --- il trimestre mancante: solo se le due fonti coincidono sul trimestre in comune ---
+_ct512 = [{"trim": "2026-06-30", "ricavi": 1065365000, "utile": 196290000, "operativo": 182237000},
+          {"trim": "2026-03-31", "ricavi": 751054000, "utile": 70653000, "operativo": 72190000}]
+_cm512 = FT.completa_trimestri(_ct512, _nq512)
+_u512 = (_cm512.get("nuovi") or [{}])[0]
+check("v512 la tabella della pipeline ferma al 30/06 e Nasdaq al 30/09: entra il trimestre nuovo con la fonte dichiarata; "
+      "l'utile e' quello della voce che COINCIDE sul trimestre in comune (qui «Applicable to Common», non «Net Income»): "
+      + str(_cm512),
+      _cm512.get("esito") == "completata" and len(_cm512["nuovi"]) == 1 and _u512.get("trim") == "2026-09-30"
+      and _u512.get("ricavi") == 1235837000 and _u512.get("operativo") == 225449000 and _u512.get("utile") == 250271000
+      and _u512.get("fonte") == "Nasdaq" and _cm512["voci"]["utile"] == "Net Income Applicable to Common Shareholders"
+      and _u512.get("margine") == round(250271000 / 1235837000 * 100, 1))
+_ct512b = [dict(_ct512[0], ricavi=1_200_000_000), _ct512[1]]
+_ct512c = [dict(_ct512[0], utile=123), _ct512[1]]
+_cm512b, _cm512c = FT.completa_trimestri(_ct512b, _nq512), FT.completa_trimestri(_ct512c, _nq512)
+_cm512d = FT.completa_trimestri([{"trim": "2025-12-31", "ricavi": 5}], _nq512)
+check("v512 due fornitori non si mescolano per ipotesi: ricavi diversi sul trimestre in comune → niente si aggiunge (le "
+      "banche del 25/10); un utile che nessuna voce riproduce → il trimestre entra SENZA utile; nessun trimestre in "
+      "comune → niente",
+      _cm512b["nuovi"] == [] and "non coincidono" in _cm512b["esito"]
+      and len(_cm512c["nuovi"]) == 1 and _cm512c["nuovi"][0]["utile"] is None and _cm512c["nuovi"][0]["ricavi"]
+      and _cm512d["nuovi"] == [] and "nessun confronto" in _cm512d["esito"])
+
+# --- quali tabelle sono ferme: la regola delle schede (v500), col deposito piu' recente fra 8-K e 10-Q/10-K ---
+_d512 = {"updated_at": "2026-10-25T14:03:21Z",
+         "macro": {"sec_calendario": {"per_titolo": {"BBB": {"ultimo_deposito": "2026-10-22"}}},
+                   "debito_sec": {"per_titolo": {"AAA": {"deposito": {"data": "2026-08-05", "forma": "10-Q"}}}},
+                   "fedwatch": {"meetings": [{"riunione": "2026-10-28", "prezzata_dal_contratto": True, "mosse_25bp": 0.2,
+                                              "hike_prob": 20, "hold_prob": 80}]},
+                   "cds": {"data": "2026-10-22", "indici": {"HY": {"data": "2026-10-22"}, "IG": {"data": "2026-10-22"}}},
+                   "short_interest": {"regolamento": "2026-09-30",
+                                      "prossimo": {"regolamento": "2026-10-15", "pubblicazione": "2026-10-26"}}},
+         "portfolio": [],
+         "watchlist": [{"ticker": "AAA", "analisti": {"eps_ora": 2.0, "target_mediana": 100.0, "su_30g": 1, "giu_30g": 0},
+                        "tv": {"conto_trim": _cp512.deepcopy(_ct512)},
+                        "cds": {"stato": "quotato", "data": "2026-10-22"}, "short_interest": {"stato": "misurato", "data": "2026-09-30"}},
+                       {"ticker": "BBB", "analisti": {"eps_ora": 1.0}, "tv": {"conto_trim": _cp512.deepcopy(_ct512)}},
+                       {"ticker": "CCC", "tv": {"conto_trim": [{"trim": "2026-09-30", "ricavi": 1}]}}]}
+_fe512 = FT.ferme(_d512, {"AAA": {"10-Q": "2026-10-23"}, "CCC": {"10-Q": "2026-10-23"}})
+check("v512 tabelle ferme: AAA (10-Q del 23/10 oltre i 101 giorni dal 30/06) e BBB (8-K del 22/10), non CCC (la sua "
+      "tabella ha gia' il 30/09): " + str(sorted(_fe512)),
+      sorted(_fe512) == ["AAA", "BBB"] and _fe512["AAA"]["dep"] == "2026-10-23" and _fe512["BBB"]["dep"] == "2026-10-22")
+
+# --- il CDS: piu' recente nella fonte, per nome e per indice ---
+_lett512 = {"data": "2026-10-23", "entita": {"AAAX": {"data": "2026-10-23"}, "BBBX": {"data": "2026-10-22"}},
+            "indici": {"HY": {"data": "2026-10-23"}, "IG": {"data": "2026-10-22"}}}
+_mappa512 = {"entita": {"AAA": "AAAX", "BBB": "BBBX", "CCC": None}}
+_n512, _i512 = FT.cds_piu_recenti(_lett512, _d512, _mappa512)
+_d512s = _cp512.deepcopy(_d512)
+_d512s["watchlist"][1]["cds"] = {"stato": "quotato", "data": "2026-10-22"}
+_n512s, _ = FT.cds_piu_recenti(_lett512, _d512s, _mappa512)
+check("v512 CDS: ICE piu' avanti per AAA (23/10 contro il 22/10 della pipeline) e per l'indice HY; BBB, che la pipeline "
+      "non quotava, e' piu' recente per definizione; a pari giorno non lo e'; un nome senza CDS resta fuori",
+      _n512 == ["AAA", "BBB"] and _i512 == ["HY"] and _n512s == ["AAA"])
+
+# --- la lettura del CDS: a pari giorno nessun ricalcolo; piu' avanti, aggiorna_cds sulla COPIA e con la sessione ---
+_vac512, _vl512 = FT._ud().aggiorna_cds, FT._ud().leggi_storia_cds
+_chiamate512 = []
+def _ac512(righe, macro, **k):
+    _chiamate512.append(k)
+    for r in righe:
+        r["cds"] = {"stato": "quotato", "data": "2026-10-23", "rifatto": True}
+    return {"data": "2026-10-23", "letto": True}
+try:
+    FT._ud().aggiorna_cds = _ac512
+    with _tf512.TemporaryDirectory() as _dr512:
+        _sess512 = Path(_dr512) / "sess.jsonl"
+        _pari512 = FT.leggi_cds(_d512s, None, lettura={"data": "2026-10-22", "entita": {"AAAX": {"data": "2026-10-22"},
+                                                                                   "BBBX": {"data": "2026-10-22"}},
+                                                        "indici": {"HY": {"data": "2026-10-22"}}, "date": {}},
+                                percorso_sessione=_sess512)
+        _n_pari512 = len(_chiamate512)
+        _avanti512 = FT.leggi_cds(_d512, None, lettura={**_lett512, "date": {"2026-10-23": 1}},
+                                  rendimenti=lambda: {"AAA": ([0.01], ["2026-10-23"])}, mercato=lambda: {"2026-10-23": 1.0},
+                                  percorso_sessione=_sess512)
+finally:
+    FT._ud().aggiorna_cds = _vac512
+_k512 = _chiamate512[-1] if _chiamate512 else {}
+check("v512 CDS letto: a pari giorno «stesso giorno» e nessun ricalcolo; con ICE piu' avanti le misure si rifanno con "
+      "aggiorna_cds della pipeline sulla COPIA dello storico (mai data/cds_storia.jsonl) e coi giorni della sessione",
+      _pari512["esito"] == "stesso giorno" and _n_pari512 == 0 and _avanti512["esito"] == "rifatto"
+      and _avanti512["per_titolo"]["AAA"].get("rifatto") is True
+      and Path(_k512.get("percorso_storia")) == FT.STORIA_COPIA and Path(_k512.get("percorso_storia")) != FT._ud().CDS_STORIA
+      and _k512.get("percorso_sessione") is not None and _k512.get("mercato") == {"2026-10-23": 1.0})
+
+# --- i giorni conservati per la pipeline: solo cio' che lo storico del repo non ha ---
+_ud512 = FT._ud()
+_scad512 = _dtm512.date(2031, 12, 20)
+_lettc512 = {"data": "2026-10-23", "scadenza": _scad512, "scadenze": {"2026-10-23": _scad512}, "date": {"2026-10-23": 1},
+             "entita": {"AAAX": {"nome": "A", "data": "2026-10-23", "contratti": [
+                 {"livello": "SNRFOR", "valuta": "USD", "clausola": "XR14", "cedola": 100, "prezzo": 98.5,
+                  "scadenza": _scad512}]}},
+             "indici": {"IG": {"serie": 47, "versione": 1, "cedola": 100, "prezzo": 99.0, "data": "2026-10-23"}}}
+with _tf512.TemporaryDirectory() as _dr512b:
+    _sc512 = Path(_dr512b) / "s.jsonl"
+    _cons512 = FT.conserva_giorni_cds(_lettc512, 3.88, [{"d": "2026-10-22", "m": "2031-12-20", "p": {}, "i": {}}], _sc512)
+    _scritto512 = _ud512.leggi_storia_cds(_sc512)
+    _gia512 = FT.conserva_giorni_cds(_lettc512, 3.88, _scritto512, Path(_dr512b) / "t.jsonl")
+check("v512 il giorno di ICE che lo storico del repo non ha si CONSERVA per la pipeline, con la sua origine; quello che "
+      "lo storico ha gia' non si riscrive",
+      _cons512 == ["2026-10-23"] and [r["d"] for r in _scritto512] == ["2026-10-23"]
+      and "sessione" in (_scritto512[0].get("origine") or "") and _gia512 == []
+      and not (Path(_dr512b) / "t.jsonl").exists())
+
+# --- le vendite allo scoperto: si rifanno solo con un regolamento PIU' RECENTE ---
+_vas512 = _ud512.aggiorna_short
+_si_ch512 = []
+def _as512(nuovo):
+    def f(righe, prec, **k):
+        _si_ch512.append(prec)
+        for r in righe:
+            r["short_interest"] = {"stato": "misurato", "data": nuovo}
+        return {"letto": True, "regolamento": nuovo, "prossimo": {"regolamento": "2026-10-31", "pubblicazione": "2026-11-10"},
+                "pubblicato": "2026-10-26", "calendario": "letto"}
+    return f
+try:
+    _ud512.aggiorna_short = _as512("2026-09-30")
+    _sip512 = FT.leggi_short(_d512)
+    _n_sip512 = len(_si_ch512)
+    _ud512.aggiorna_short = _as512("2026-10-15")
+    _sin512 = FT.leggi_short(_d512, rendimenti_di_fn=lambda nomi: {n: ([0.0], ["2026-10-15"]) for n in nomi})
+finally:
+    _ud512.aggiorna_short = _vas512
+check("v512 short: a pari regolamento «stesso regolamento» con UNA lettura; con un regolamento piu' recente le misure si "
+      "rifanno (seconda lettura, coi rendimenti e coi precedenti della pipeline)",
+      _sip512["esito"] == "stesso regolamento" and _n_sip512 == 1
+      and _sin512["esito"] == "rifatto" and _sin512["per_titolo"]["AAA"]["data"] == "2026-10-15"
+      and len(_si_ch512) == 3 and (_si_ch512[-1] or {}).get("AAA", {}).get("data") == "2026-09-30")
+
+# --- la sovrapposizione: vince la lettura di adesso dove c'e', resta la pipeline dove manca, e lo si dice ---
+_g512 = {"letto": "2026-10-25T16:00:00+00:00", "secondi": 6.1,
+         "analisti": {"esito": "letto", "per_titolo": {"AAA": {"eps_ora": 2.5, "target_mediana": 110.0, "su_30g": 2,
+                                                               "giu_30g": 0}}, "vuoti": ["BBB"]},
+         "fedwatch": {"esito": "letto", "valore": {"meetings": [{"riunione": "2026-10-28", "prezzata_dal_contratto": True,
+                                                                 "mosse_25bp": 0.1, "hike_prob": 10, "hold_prob": 90}],
+                                                   "effr": {"valore": 3.88, "data": "2026-10-22", "fonte": "NY Fed"},
+                                                   "target_range": "3.75–4.00%"}},
+         "cds": {"esito": "rifatto", "macro": {"data": "2026-10-23"}, "per_titolo": {"AAA": {"stato": "quotato",
+                                                                                          "data": "2026-10-23"}},
+                 "ice": {"data": "2026-10-23", "date": {"2026-10-23": 690}}, "nuovi": ["AAA"], "indici_nuovi": ["HY"],
+                 "conservati": ["2026-10-23"]},
+         # i valori per titolo di uno short NON rifatto: leggi_short non li scrive, ma la lettura arriva dal disco e
+         #   puo' venire da un'altra versione — entra solo un regolamento rifatto (senza questo caso la guardia di
+         #   sovrapponi non veniva messa alla prova: l'iniezione che la toglieva non mordeva)
+         "short": {"esito": "stesso regolamento", "regolamento": "2026-09-30",
+                   "per_titolo": {"AAA": {"data": "2026-10-15"}},
+                   "prossimo": {"regolamento": "2026-10-15", "pubblicazione": "2026-10-20"}},
+         "sec": {"esito": "letto", "per_titolo": {"AAA": {"10-Q": "2026-10-23"}}, "non_letti": []},
+         "trimestri": {"esito": "letto", "ferme": _fe512,
+                       "per_titolo": {"AAA": _cm512, "BBB": {"esito": "Nasdaq non porta trimestri piu' recenti", "nuovi": []}}}}
+_dprima512 = _js512.dumps(_d512, sort_keys=True)
+_o512 = FT.sovrapponi(_d512, _g512)
+_r512 = {r["ticker"]: r for r in _o512["watchlist"]}
+check("v512 sovrapposizione: analisti di AAA dalla fonte, BBB (Yahoo vuoto) tiene la pipeline; CDS rifatto entra, short "
+      "a pari regolamento resta; FedWatch dalla fonte; il trimestre di Nasdaq in testa alla tabella; l'originale intatto; "
+      "e macro._fonti_titoli dice chi ha vinto: " + str(_o512["macro"].get("_fonti_titoli")),
+      _r512["AAA"]["analisti"]["eps_ora"] == 2.5 and _r512["BBB"]["analisti"] == {"eps_ora": 1.0}
+      and _r512["AAA"]["cds"]["data"] == "2026-10-23" and _o512["macro"]["cds"] == {"data": "2026-10-23"}
+      and _r512["AAA"]["short_interest"]["data"] == "2026-09-30" and _o512["macro"]["short_interest"]["regolamento"] == "2026-09-30"
+      and _o512["macro"]["fedwatch"]["meetings"][0]["hike_prob"] == 10
+      and _r512["AAA"]["tv"]["conto_trim"][0]["trim"] == "2026-09-30" and _r512["AAA"]["tv"]["conto_trim"][0]["fonte"] == "Nasdaq"
+      and _r512["AAA"]["_periodici"] == {"10-Q": "2026-10-23"}
+      and _js512.dumps(_d512, sort_keys=True) == _dprima512
+      and "fonte per 1 titoli" in _o512["macro"]["_fonti_titoli"]["esiti"]["analisti"]
+      and _o512["macro"]["_fonti_titoli"]["esiti"]["short"].startswith("pipeline")
+      and "AAA" in _o512["macro"]["_fonti_titoli"]["esiti"]["trimestri"])
+_o512n = FT.sovrapponi(_d512, None)
+check("v512 senza lettura del giro resta la pipeline, e lo si dice blocco per blocco (non un silenzio che si legge come "
+      "«aggiornato»)",
+      _o512n["watchlist"][0]["analisti"]["eps_ora"] == 2.0
+      and all(v.startswith("pipeline") for v in _o512n["macro"]["_fonti_titoli"]["esiti"].values()))
+
+# --- carica: mai la rete; la lettura del giro solo se di meno di trenta minuti; spenta nelle suite ---
+_vcache512, _venv512 = FT.CACHE, os.environ.pop("TRADING_FONTI_TITOLI", None)
+try:
+    with _tf512.TemporaryDirectory() as _dr512c:
+        FT.CACHE = Path(_dr512c) / "ft.json"
+        _ora512 = _dtm512.datetime.now(_UTC512)
+        FT.CACHE.write_text(_js512.dumps({**_g512, "letto": _ora512.isoformat()}))
+        _fresca512 = FT.carica(_cp512.deepcopy(_d512))
+        import numeri_libro as _NL512
+        _vjson512 = _NL512.json.loads
+        _NL512.json.loads = lambda s, *a, **k: _cp512.deepcopy(_d512) if "watchlist" in str(s)[:200000] else _vjson512(s, *a, **k)
+        try:
+            _da_nl512 = _NL512._carica_pipeline()
+        finally:
+            _NL512.json.loads = _vjson512
+        FT.CACHE.write_text(_js512.dumps({**_g512, "letto": (_ora512 - _dtm512.timedelta(minutes=45)).isoformat()}))
+        _vecchia512 = FT.carica(_cp512.deepcopy(_d512))
+        # la variabile delle suite si prova con una lettura FRESCA sul disco: senza, «resta la pipeline» passerebbe anche
+        #   ignorandola
+        FT.CACHE.write_text(_js512.dumps({**_g512, "letto": _ora512.isoformat()}))
+        os.environ["TRADING_FONTI_TITOLI"] = "spenta"
+        _spenta512 = FT.carica(_cp512.deepcopy(_d512))
+finally:
+    FT.CACHE = _vcache512
+    os.environ["TRADING_FONTI_TITOLI"] = "spenta"
+check("v512 carica: la lettura del giro entra se ha meno di trenta minuti (e numeri_libro la vede: il collegamento "
+      "ESEGUITO, v483), una di 45 minuti no — resta la pipeline e lo dice; con la variabile delle suite resta la pipeline",
+      _fresca512["watchlist"][0]["analisti"]["eps_ora"] == 2.5
+      and (_da_nl512 or {}).get("watchlist", [{}])[0].get("analisti", {}).get("eps_ora") == 2.5
+      and _vecchia512["watchlist"][0]["analisti"]["eps_ora"] == 2.0
+      and _vecchia512["macro"]["_fonti_titoli"]["letto"] is None
+      and "_fonti_titoli" not in _spenta512.get("macro", {})
+      and _spenta512["watchlist"][0]["analisti"]["eps_ora"] == 2.0)
+
+# --- il collegamento negli strumenti che caricano data.json ---
+_src_ft512 = {f: _solo_codice_py((_ROOT / "scripts" / f"{f}.py").read_text(encoding="utf-8"))
+              for f in ("numeri_libro", "schede_progetto", "rotazione", "brief", "fonti_titoli")}
+check("v512 collegamento: numeri_libro, le schede, la rotazione e il brief (macro ed eventi del credito) caricano data.json "
+      "con la lettura del giro sovrapposta",
+      "fonti_titoli.carica(d)" in _corpo_di(_src_ft512["numeri_libro"], "_carica_pipeline")
+      and "fonti_titoli.carica(dati)" in _corpo_di(_src_ft512["schede_progetto"], "main")
+      and "fonti_titoli.carica(d)" in _corpo_di(_src_ft512["rotazione"], "raccogli")
+      and "fonti_titoli.carica(d)" in _corpo_di(_src_ft512["brief"], "macro_dalla_pipeline")
+      and "fonti_titoli.carica(d)" in _corpo_di(_src_ft512["brief"], "credito_dalla_pipeline"))
+check("v512 una derivazione sola: fonti_titoli usa le funzioni della pipeline (analisti, FedWatch, CDS, short, rendimenti) "
+      "e non ne tiene una seconda copia",
+      all(x in _src_ft512["fonti_titoli"] for x in ("ud.analisti_da(", "ud.fedwatch_da()", "ud.aggiorna_cds(",
+                                                    "ud.aggiorna_short(", "ud.rendimenti_datati(", "ud.rendimenti_log(",
+                                                    "schede_progetto.deposito_oltre_la_tabella("))
+      and "eps_trend" not in _src_ft512["fonti_titoli"] and "np.log(" not in _src_ft512["fonti_titoli"]
+      and "catena_fedwatch(" not in _src_ft512["fonti_titoli"])
+
+# --- i future CME: aperti da domenica alle 18 a venerdi' alle 17 di New York, con la pausa delle 17 ---
+_NY512 = FT.NEW_YORK
+_ap512 = lambda *a: FT.future_aperti(_dtm512.datetime(*a, tzinfo=_NY512))
+check("v512 i future CME: chiusi il sabato, la domenica prima delle 18, il venerdi' dalle 17 e nella pausa delle 17; "
+      "aperti la domenica dalle 18 e in seduta",
+      not _ap512(2026, 10, 24, 12) and not _ap512(2026, 10, 25, 17, 30) and _ap512(2026, 10, 25, 18, 30)
+      and not _ap512(2026, 10, 23, 17, 30) and not _ap512(2026, 10, 21, 17, 15) and _ap512(2026, 10, 21, 12)
+      # il venerdi' DOPO le 18: alle 17:30 la pausa quotidiana chiude comunque, e quel caso da solo non distingue una
+      #   settimana che finisce il venerdi' da una che continua
+      and not _ap512(2026, 10, 23, 20, 0) and _ap512(2026, 10, 22, 20, 0))
+
+# --- la resa: le cadenze, i cambi, la cosa da cercare in rete ---
+_s512 = FT.sintesi(_d512, _g512, adesso=_dtm512.datetime(2026, 10, 24, 18, tzinfo=_UTC512))
+check("v512 la resa: ogni quanto cambia ciascun dato (le cinque fonti e la pipeline), gli analisti CAMBIATI col prima e "
+      "dopo, FedWatch col mercato dei future chiuso il sabato e la riunione con la pipeline accanto, il CDS rifatto coi "
+      "giorni conservati, il trimestre ritrovato da Nasdaq, e DA CERCARE IN RETE il regolamento FINRA che il calendario "
+      "dava pubblicato e l'API no, e la tabella di BBB",
+      all(nome in _s512 for _k, nome, _t in FT.CADENZE) and FT.CADENZA_PIPELINE in _s512
+      and "CAMBIATI in 1: AAA (utile atteso 2,00 → 2,50; target mediano 100,00 → 110,00; rialzi a 30 g 1 → 2)" in _s512
+      and "mercato dei future CHIUSO" in _s512 and "(nel run della pipeline: 0,20)" in _s512
+      and "misure rifatte sul giorno nuovo" in _s512 and "conservati in memoria/cds_sessione.jsonl" in _s512
+      and "COMPLETATA da Nasdaq: AAA" in _s512 and "verificato sul 30/06/2026" in _s512
+      and "il calendario di FINRA dava il regolamento 2026-10-15 pubblicato il 20/10/2026" in _s512
+      and "i conti dell'ultimo trimestre (comunicato o 10-Q) di BBB" in _s512, _s512[-1500:])
+_s512n = FT.sintesi(_d512, {}, adesso=_dtm512.datetime(2026, 10, 24, 18, tzinfo=_UTC512))
+check("v512 senza lettura alla fonte la resa lo dice in testa e manda a cercare in rete consenso e FedWatch",
+      "NESSUNA lettura alla fonte in questo giro" in _s512n and "ANALISTI: NON letti" in _s512n
+      and "probabilita' della prossima riunione Fed" in _s512n)
+
+# --- la riga dei ricavi dichiara la fonte di un trimestre che la tabella della pipeline non portava ---
+import schede_progetto as _SP512
+_rr512 = _SP512.riga_ricavi({"tv": {"conto_trim": [dict(_u512)] + _ct512 + [{"trim": "2025-09-30", "ricavi": 519000000}]}})
+check("v512 la riga dei ricavi dichiara la fonte del trimestre ritrovato: " + str(_rr512),
+      "al 2026-09-30, da Nasdaq: la tabella della pipeline non lo porta ancora" in (_rr512 or "")
+      and "sullo stesso trimestre dell'anno prima" in (_rr512 or ""))
+
+# --- il comando unico, la scheda, il formato e /aggiorna ---
+_coman512 = [AN.comandi(f)[:2] for f in ("pre-market", "seduta", "after-hours", "chiuso")]
+_fmt512 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_ag512 = (_ROOT / ".claude" / "commands" / "aggiorna.md").read_text(encoding="utf-8")
+check("v512 il comando unico esegue fonti_titoli insieme alle fonti dirette, PRIMA degli altri; la sua memoria dei giorni "
+      "di ICE si committa; la scheda ha la sezione e la voce del registro; il formato porta lo strumento, la chiave e la "
+      "regola del dato vecchio; /aggiorna lo dichiara fuori con la sua ragione (v387)",
+      AN.PRIMA == ("fonti_dirette.py", "fonti_titoli.py") and "fonti_titoli.py" in AN.STRUMENTI
+      and all(c[1][1][0] == "fonti_titoli.py" for c in _coman512)
+      and any(str(p).endswith("memoria/cds_sessione.jsonl") for p in AN.MEMORIE)
+      and SC.SEZIONI[1][0] == "freschezza_titoli" and "fonti_titoli" in SC.CATALOGO
+      and "freschezza_titoli" in SC.REGISTRO and "`python3 scripts/fonti_titoli.py`" in _fmt512
+      and "[freschezza_titoli]" in _fmt512 and "Un dato vecchio non si usa come se fosse di oggi" in _fmt512
+      and "`scripts/fonti_titoli.py` resta **fuori**" in _ag512)
+check("v512 le fonti dirette non dicono piu' «Yahoo 429» come fatto, e rimandano ai dati per titolo letti alla fonte",
+      "Yahoo 429" not in _solo_codice_py((_ROOT / "scripts" / "fonti_dirette.py").read_text(encoding="utf-8"))
+      and not any("analisti" in x or "vendite allo scoperto" in x for x in FD.SOLO_PIPELINE)
+      and "FedWatch" in FD.RILETTI_PER_TITOLO
+      and "riletti alla fonte da scripts/fonti_titoli.py" in "\n".join(FD.sintesi(_g511, adesso=_dt511(2026, 10, 14, 8, 10, tzinfo=_tz511.utc))))
+
+# ══ v512 — PERIODI IN FORMAZIONE LETTI COME CONCLUSI: la ricerca in tutto il sistema, e il calendario di fine anno ═══
+import rotazione as _R512
+_NYz512 = _R512.brief.NEW_YORK
+def _barre512(n, ultimo, prezzo=100.0):
+    """n barre giornaliere fino al giorno `ultimo` (ISO), una per giorno di calendario: per le misure basta l'ordine."""
+    from datetime import date as _d, timedelta as _td
+    u = _d.fromisoformat(ultimo)
+    return [{"t": (u - _td(days=n - 1 - i)).isoformat(), "o": prezzo, "h": prezzo + 1, "l": prezzo - 1,
+             "c": prezzo + (i % 5) * 0.1, "v": 1000} for i in range(n)]
+_bt512 = _barre512(260, "2026-10-23")
+_bt512.append({"t": "2026-10-26", "o": 100.0, "h": 160.0, "l": 40.0, "c": 150.0, "v": 10})      # la seduta di oggi, a meta'
+_vq512 = _R512.brief.quota
+_R512.brief.quota = lambda tk: {"p": 150.0}
+try:
+    _te_aperta512 = _R512.brief.tecnica("ZZZ", d=_bt512, adesso=_dtm512.datetime(2026, 10, 26, 13, tzinfo=_NYz512))
+    _te_chiusa512 = _R512.brief.tecnica("ZZZ", d=_bt512, adesso=_dtm512.datetime(2026, 10, 26, 16, 30, tzinfo=_NYz512))
+    _te_ref512 = _R512.brief.tecnica("ZZZ", d=_bt512[:-1], adesso=_dtm512.datetime(2026, 10, 26, 13, tzinfo=_NYz512))
+finally:
+    _R512.brief.quota = _vq512
+check("v512 la tecnica a seduta aperta si misura sulle sedute CONCLUSE: ATR, medie, massimo dell'anno e supporto senza la "
+      "barra di oggi (che qui ha un'escursione di 120 punti), il prezzo resta quello della quota; dopo la campana la barra "
+      "entra; e lo si dichiara",
+      _te_aperta512["atr"] == _te_ref512["atr"] and _te_aperta512["sma20"] == _te_ref512["sma20"]
+      and _te_aperta512["max52"] == _te_ref512["max52"] and _te_aperta512["supporto20"] == _te_ref512["supporto20"]
+      and _te_aperta512["seduta"] == "2026-10-23" and _te_aperta512["chiusura_prec"] == _bt512[-2]["c"]
+      and _te_aperta512["px"] == 150.0 and _te_aperta512["in_formazione"] is True
+      and _te_chiusa512["in_formazione"] is False and _te_chiusa512["max52"] == 160.0 and _te_chiusa512["seduta"] == "2026-10-26")
+check("v512 una regola sola per la barra in formazione: rotazione.seduta_in_corso chiama brief.barra_in_formazione",
+      "brief.barra_in_formazione(barre, adesso)" in _corpo_di(_solo_codice_py((_ROOT / "scripts" / "rotazione.py").read_text(encoding="utf-8")), "seduta_in_corso")
+      and _R512.seduta_in_corso(_bt512, _dtm512.datetime(2026, 10, 26, 13, tzinfo=_NYz512)) is True
+      and _R512.seduta_in_corso(_bt512, _dtm512.datetime(2026, 10, 26, 16, 0, tzinfo=_NYz512)) is False)
+
+# --- il calendario fiscale di fine anno ---
+check("v512 la finestra di fine anno: da ottobre a dicembre l'anno in corso, a gennaio quello appena chiuso, fuori spento "
+      "(il mese di New York: alle 01 di Roma del 1/10 a New York e' ancora settembre)",
+      _R512.anno_fiscale(_dtm512.datetime(2026, 10, 25, 12, tzinfo=_NYz512)) == (2026, True)
+      and _R512.anno_fiscale(_dtm512.datetime(2027, 1, 15, 12, tzinfo=_NYz512)) == (2026, True)
+      and _R512.anno_fiscale(_dtm512.datetime(2026, 9, 30, 20, tzinfo=_NYz512)) == (None, False)
+      and _R512.anno_fiscale(_dtm512.datetime(2026, 10, 1, 2, 0, tzinfo=_UTC512)) == (None, False)
+      and _R512.anno_fiscale(_dtm512.datetime(2027, 2, 1, 12, tzinfo=_NYz512)) == (None, False))
+_ba512 = [{"t": "2025-12-30", "c": 100.0, "v": 10}, {"t": "2025-12-31", "c": 80.0, "v": 10},
+          {"t": "2026-01-02", "c": 70.0, "v": 100}, {"t": "2026-06-01", "c": 50.0, "v": 300},
+          {"t": "2026-10-23", "c": 40.0, "v": 100}, {"t": "2026-10-26", "c": 10.0, "v": 5}]
+_fa512 = _R512.fine_anno(_ba512, 2026, adesso=_dtm512.datetime(2026, 10, 26, 13, tzinfo=_NYz512))
+_vw512 = (70 * 100 + 50 * 300 + 40 * 100) / 500
+_fg512 = _R512.fine_anno(_ba512[:-1] + [{"t": "2026-12-31", "c": 45.0, "v": 100}, {"t": "2027-01-14", "c": 54.0, "v": 50}],
+                         2026, adesso=_dtm512.datetime(2027, 1, 15, 12, tzinfo=_NYz512))
+check("v512 il risultato dell'anno: base l'ultima chiusura dell'anno prima (non il primo giorno), fine l'ultima seduta "
+      "CONCLUSA (quella di oggi, a meta', resta fuori), il prezzo medio pesato sui volumi; a gennaio l'anno chiuso e il "
+      "mese nuovo finora; senza la fine dell'anno prima un buco: " + str(_fa512),
+      _fa512 and _fa512["base_t"] == "2025-12-31" and abs(_fa512["anno_pct"] - (40 / 80 - 1) * 100) < 1e-9
+      and _fa512["fine_t"] == "2026-10-23" and abs(_fa512["vwap"] - _vw512) < 1e-9
+      and abs(_fa512["dist_vwap_pct"] - (40 / _vw512 - 1) * 100) < 1e-9 and "dopo_pct" not in _fa512
+      and _fg512["fine_t"] == "2026-12-31" and abs(_fg512["anno_pct"] - (45 / 80 - 1) * 100) < 1e-9
+      and abs(_fg512["dopo_pct"] - (54 / 45 - 1) * 100) < 1e-9
+      and _R512.fine_anno([{"t": "2026-03-02", "c": 5.0, "v": 1}], 2026) is None)
+_ofa512 = {"fine_anno": {"attivo": True, "anno": 2026, "voci": [
+    {"tk": "PIC", "ruolo": "posizione", "cap": 3.8e9, **_fa512},
+    {"tk": "GRA", "ruolo": "sorvegliato", "cap": 400e9, **dict(_fa512, anno_pct=-10.0)},
+    {"tk": "SU", "ruolo": "sorvegliato", "cap": 50e9, **dict(_fa512, anno_pct=12.0)},
+    {"tk": "NEW", "ruolo": "sorvegliato", "cap": 1e9, "assente": "corta"},
+    {"tk": "ROT", "ruolo": "sorvegliato", "cap": 1e9, "assente": "non lette"}]}}
+_rfa512 = "\n".join(_R512.righe_fine_anno(_ofa512))
+_rfa512s = "\n".join(_R512.righe_fine_anno({"fine_anno": {"attivo": False}}))
+check("v512 il blocco di fine anno: la misura con fonte, i nomi in PERDITA dal peggiore (non quelli in guadagno), la "
+      "capitalizzazione e dove la regolarita' e' misurata o e' rumore, la storia corta e i prezzi non letti detti come "
+      "due cose diverse; fuori finestra una riga che dice che e' spento",
+      _rfa512.index("  PIC — anno 2026: -50,0%") < _rfa512.index("  GRA — anno 2026: -10,0%") and "  SU —" not in _rfa512
+      and "3,8 mld $ (piccola o media" in _rfa512 and "400,0 mld $ (grande: qui e' rumore)" in _rfa512
+      and "in perdita sull'anno 2026: 2 su 3 nomi" in _rfa512 and all(m in _rfa512 for m in _R512.FINE_ANNO_MISURA)
+      and "storia tagliata: n.d., non uno zero): NEW" in _rfa512 and "non e' 'nessuna perdita'): ROT" in _rfa512
+      and _rfa512s.startswith("CALENDARIO FISCALE DI FINE ANNO — fuori finestra") and _rfa512s.count("\n") == 0)
+_lib512 = (_ROOT / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+check("v512 i numeri della misura stampati dal blocco sono quelli del libro (§1ter), dove sta il metodo: un numero, un "
+      "posto (v436), e la decisione del CEO e' scritta con le sue parole",
+      all(x in _lib512 for x in ("ottobre −1,31 (t −1,8)", "dicembre −2,71", "gennaio +7,30 (t +3,8)", "gennaio t +1,6",
+                                  "regge solo gennaio (t +2,1)", "2018 −13,0", "+21,6"))
+      and "decidi tu in base al fatto che sia rumore o utile" in _lib512 and "*\"2no\"*" in _lib512
+      and "1,31 punti al mese" in _R512.FINE_ANNO_MISURA[0] and "t +3,8" in _R512.FINE_ANNO_MISURA[0])
+_crt512 = _solo_codice_py((_ROOT / "scripts" / "rotazione.py").read_text(encoding="utf-8"))
+check("v512 collegamento: raccogli costruisce il calendario sulle stesse barre (a gennaio le posizioni coi cinque anni), "
+      "e la resa lo stampa dopo la watchlist; la scheda lo porta nella sua sezione",
+      '"fine_anno": fa,' in _corpo_di(_crt512, "raccogli") and "fine_anno(_serie, _fa_anno)" in _corpo_di(_crt512, "raccogli")
+      and "righe_fine_anno(o)" in _crt512[_crt512.index('if __name__ == "__main__":'):]
+      and "fine_anno" in SC.REGISTRO and any(t == "fine_anno" for t, _ in SC.SEZIONI)
+      and any(b.sezione == "fine_anno" for b in SC.CATALOGO["rotazione"].blocchi))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

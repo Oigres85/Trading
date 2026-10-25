@@ -321,12 +321,16 @@ SOGLIA_CCC_PP = 1.5   # la stessa convenzione del semaforo (LIBRO.md §1ter), no
 
 def _carica_pipeline():
     """data/data.json una volta sola, o None. Un file illeggibile non diventa mai un default: chi lo
-    usa dichiara il buco (v396)."""
+    usa dichiara il buco (v396).
+    v512 — con la lettura alla fonte del giro sovrapposta dove e' piu' recente (scripts/fonti_titoli.py: analisti,
+    FedWatch, CDS, vendite allo scoperto, trimestri), come la leggono le schede e la rotazione."""
     import brief
+    import fonti_titoli
     try:
-        return json.loads((Path(brief.RADICE) / "data" / "data.json").read_text(encoding="utf-8").replace("NaN", "null"))
+        d = json.loads((Path(brief.RADICE) / "data" / "data.json").read_text(encoding="utf-8").replace("NaN", "null"))
     except (OSError, ValueError):
         return None
+    return fonti_titoli.carica(d)
 
 
 def fcf_di(riga):

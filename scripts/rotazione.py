@@ -147,11 +147,9 @@ SEDUTE_BETA = 250
 
 def seduta_in_corso(barre, adesso=None):
     """Vero se l'ultima barra e' quella di OGGI a New York e la campana delle 16:00 non e' ancora
-    suonata: quella barra e' in formazione (v439, v469). Il fuso, mai uno scarto a mano (v470)."""
-    if not barre:
-        return False
-    adesso = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
-    return barre[-1]["t"] == adesso.date().isoformat() and adesso.hour < 16
+    suonata: quella barra e' in formazione (v439, v469). Il fuso, mai uno scarto a mano (v470).
+    v512 — la regola vive in brief.barra_in_formazione, che la usa anche per la tecnica: una sola (v161)."""
+    return brief.barra_in_formazione(barre, adesso)
 
 
 def beta_mercato(rt, rm, n=SEDUTE_BETA):
@@ -1085,6 +1083,9 @@ def raccogli():
     qta = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "USD"}
     try:
         d = json.loads((Path(brief.RADICE) / "data" / "data.json").read_text(encoding="utf-8").replace("NaN", "null"))
+        # v512 — analisti, CDS, short e trimestri letti alla fonte nel giro, dove piu' recenti (scripts/fonti_titoli.py)
+        import fonti_titoli
+        d = fonti_titoli.carica(d)
         tilt = (d.get("macro") or {}).get("tilt") or []
     except (OSError, ValueError):
         tilt, d = [], {}
@@ -1160,7 +1161,10 @@ def raccogli():
     #   SOLO per i sorvegliati, in parallelo: le schede restano sull'anno della fonte, i pavimenti guardano due anni
     # v492 — e anche per i CANDIDATI di settore: la lettura a 5 anni entra in ogni ingresso
     cand = [t for s in settori for t in s["titoli"] if e_candidato(t)]      # anche chi e' in watchlist: stessa lettura
-    lunghi = list(dict.fromkeys([t["tk"] for t in watch] + [t["tk"] for t in cand]))
+    # v512 — a gennaio il calendario fiscale guarda l'anno appena chiuso: le posizioni servono coi cinque anni
+    _fa_anno, _fa_attivo = anno_fiscale()
+    _gennaio = _fa_attivo and datetime.now(brief.NEW_YORK).month == 1
+    lunghi = list(dict.fromkeys([t["tk"] for t in watch] + [t["tk"] for t in cand] + (sorted(qta) if _gennaio else [])))
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
         BL = dict(zip(lunghi, ex.map(barre_lunghe, lunghi)))
     ore_sec = ore_depositi_pipeline(d)
@@ -1174,6 +1178,17 @@ def raccogli():
         t["cinque_anni"] = lettura_5anni(BL.get(t["tk"]), t.get("px"), veicolo=t["veicolo"])
         # v494 — la struttura delle oscillazioni accompagna ogni ingresso, sulla stessa serie della societa'
         t["struttura"] = struttura(BL.get(t["tk"]), t.get("px"), t.get("atr"), veicolo=t["veicolo"])
+    # v512 — il calendario fiscale di fine anno (informazione, ottobre-gennaio), sulle stesse barre e sulle sedute concluse
+    fa = {"attivo": _fa_attivo, "anno": _fa_anno, "voci": []}
+    if _fa_attivo:
+        for tk, ruolo in [(x, "posizione") for x in sorted(qta)] + [(t["tk"], "sorvegliato") for t in watch]:
+            _serie = BL.get(tk) or B.get(tk)
+            x = fine_anno(_serie, _fa_anno) if _serie else None
+            # «non lette» e «storia corta» si leggono uguali e sono due cose diverse (v389): la fonte che non risponde
+            #   (stockanalysis rifiuta con 429 quando la si interroga troppo) non e' un titolo quotato da poco
+            fa["voci"].append({"tk": tk, "ruolo": ruolo,
+                               "cap": ((pipe.get(tk) or {}).get("stats") or {}).get("market_cap"),
+                               **(x or {"assente": "corta" if _serie else "non lette"})})
     # v474 — il piano per la liquidita': patrimonio e cambio da numeri_libro (un proprietario, v436)
     eur_pmc = {p["tk"]: p["pmc"] for p in pos if p["valuta"] == "EUR"}
     eur_nom = {p["tk"]: p["qta"] for p in pos if p["valuta"] == "EUR"}
@@ -1197,8 +1212,102 @@ def raccogli():
             # v492 — l'intestazione dei multipli col riferimento dell'S&P 500, una volta per blocco (v407)
             "valutazione_rif": schede_progetto.riferimento_valutazione(d.get("macro")),
             "spy_assente": not rspy, "calendario": {k: cal.get(k) for k in ("giorni_non_letti", "finestra", "errore")},
+            "fine_anno": fa,
             "piano": {"voci": piano, "liquidita": cassa, "patrimonio": pat, "cambio": fx, "fonte_cambio": fonte_fx,
                       "qqq_assente": not rqqq, "obbligazioni": {t: prezzi_eur[t] for t in eur_nom}}}
+
+
+# ═══ v512 — IL CALENDARIO FISCALE DI FINE ANNO: INFORMAZIONE, DA OTTOBRE A GENNAIO ══════════════════════════════
+# Il CEO, 25/10/2026: «a fine anno i fondi si muovono anche per compensare le fiscalità … prima verifica se è corretta
+# la mia affermazione», e poi, sul se renderlo strutturale: «decidi tu in base al fatto che sia rumore o utile, forse va
+# bene il ultimo mese di ottobre essendo quello il momento utile? Scegli tu».
+# Misurato sui portafogli di Kenneth French (decili per rendimento dei 12 mesi prima, dati fino ad agosto 2026; LIBRO.md
+# §1ter): la vendita per le minusvalenze e il rimbalzo di gennaio sono REALI sui nomi piccoli e a pesi uguali, e RUMORE
+# sui grandi dal 1987. La scelta: il blocco si accende da ottobre (molti fondi comuni americani chiudono l'esercizio il 31
+# ottobre) a gennaio (il rimbalzo misurato), nomina i nomi in perdita sull'anno con la capitalizzazione accanto, e dice
+# su quali la regolarita' e' misurata e su quali no. NON e' una prova della tenuta, ne' un ingresso: e' un calendario.
+FINE_ANNO_MESI = (10, 11, 12, 1)
+CAP_PICCOLA = 10e9          # convenzione (v240): sotto i 10 miliardi di dollari «piccola o media», dove l'effetto e' misurato
+FINE_ANNO_MISURA = (
+    "a PESI UGUALI (pesano i piccoli), perdenti meno vincitori dell'anno, 1987-2025: ottobre 1,31 punti al mese sotto gli "
+    "altri mesi (t −1,8), dicembre 2,71 sotto (t −2,4), gennaio 7,30 sopra (t +3,8)",
+    "PESATI PER CAPITALIZZAZIONE, stesso periodo: nessun mese oltre due errori standard (ottobre t −0,5, dicembre t −0,7, "
+    "gennaio t +1,6); fra le GRANDI (il quinto piu' capitalizzato) nemmeno; fra le PICCOLE (il quinto meno "
+    "capitalizzato) regge solo gennaio (t +2,1)",
+    "il segno cambia da un anno all'altro (gennaio, pesati per capitalizzazione: 2018 −13,0 punti, 2023 +21,6): e' una "
+    "frequenza sui portafogli, non una previsione sul singolo nome",
+)
+
+
+def anno_fiscale(adesso=None):
+    """(anno descritto, attivo): da ottobre a dicembre l'anno in corso, a gennaio quello appena chiuso; fuori dalla
+    finestra (None, False). Il mese di New York (v470)."""
+    ny = (adesso or datetime.now(brief.NEW_YORK)).astimezone(brief.NEW_YORK)
+    if ny.month not in FINE_ANNO_MESI:
+        return None, False
+    return (ny.year - 1 if ny.month == 1 else ny.year), True
+
+
+def fine_anno(barre, anno, adesso=None):
+    """Il risultato di un nome nell'anno fiscale descritto, sulle SEDUTE CONCLUSE (v512: un pezzo di giornata non e' una
+    giornata): la base e' l'ultima chiusura dell'anno prima, la fine l'ultima chiusura dell'anno (a gennaio) o l'ultima
+    conclusa (da ottobre a dicembre); il prezzo medio dell'anno pesato sui volumi (chi ha comprato nell'anno, in media,
+    a che prezzo) e la distanza dell'ultima chiusura da lui; a gennaio anche il mese finora. None se la storia non copre
+    la fine dell'anno prima: un buco, non uno zero (v205)."""
+    b = [x for x in (barre or []) if x.get("c")]
+    b = b[:-1] if brief.barra_in_formazione(b, adesso) else b
+    prima = [x for x in b if x["t"] < f"{anno}-01-01"]
+    dentro = [x for x in b if f"{anno}-01-01" <= x["t"] <= f"{anno}-12-31"]
+    if not prima or not dentro:
+        return None
+    base, fine = prima[-1], dentro[-1]
+    pv = [(x["c"], x.get("v") or 0) for x in dentro]
+    vol = sum(v for _, v in pv)
+    vwap = sum(c * v for c, v in pv) / vol if vol else None
+    ult = b[-1]
+    out = {"anno": anno, "base_t": base["t"], "base": base["c"], "fine_t": fine["t"], "fine": fine["c"],
+           "anno_pct": (fine["c"] / base["c"] - 1) * 100, "vwap": vwap,
+           "dist_vwap_pct": (ult["c"] / vwap - 1) * 100 if vwap else None, "ultima_t": ult["t"]}
+    if ult["t"] > fine["t"]:
+        out["dopo_pct"] = (ult["c"] / fine["c"] - 1) * 100
+    return out
+
+
+def righe_fine_anno(o):
+    """Il blocco CALENDARIO FISCALE DI FINE ANNO: fuori dalla finestra una riga che lo dice (un blocco che sparisce si
+    legge come «non c'e' niente», v406); dentro, la misura e i nomi in perdita sull'anno, con la loro capitalizzazione."""
+    fa = (o or {}).get("fine_anno") or {}
+    if not fa.get("attivo"):
+        return ["CALENDARIO FISCALE DI FINE ANNO — fuori finestra: si accende da ottobre a gennaio (decisione del "
+                "25/10/2026, LIBRO.md §1ter)"]
+    L = [f"CALENDARIO FISCALE DI FINE ANNO {fa['anno']} — INFORMAZIONE, non un segnale ne' una prova della tenuta "
+         "(decisione del 25/10/2026): molti fondi comuni americani chiudono l'esercizio fiscale il 31 ottobre, i privati "
+         "il 31 dicembre, e chi ha minusvalenze le realizza prima della chiusura. Misurato sui portafogli di Kenneth "
+         "French (LIBRO.md §1ter):"]
+    L += ["  · " + m for m in FINE_ANNO_MISURA]
+    voci = fa.get("voci") or []
+    misurati = [v for v in voci if v.get("anno_pct") is not None]
+    perd = sorted([v for v in misurati if v["anno_pct"] < 0], key=lambda v: v["anno_pct"])
+    L.append(f"  in perdita sull'anno {fa['anno']}: {len(perd)} su {len(misurati)} nomi (dall'ultima chiusura dell'anno "
+             "prima all'ultima seduta conclusa)")
+    for v in perd:
+        cap = v.get("cap")
+        dim = ("piccola o media: la' la regolarita' e' misurata" if cap and cap < CAP_PICCOLA else
+               "grande: qui e' rumore" if cap else "capitalizzazione n.d.")
+        s = (f"  {v['tk']} — anno {v['anno']}: {n(v['anno_pct'])}% (base {_data_it(v['base_t'])}) · rispetto al prezzo "
+             f"medio dell'anno pesato sui volumi {n(v.get('dist_vwap_pct'))}% · {v['ruolo']} · capitalizzazione "
+             + (f"{piano(cap / 1e9)} mld $" if cap else "n.d.") + f" ({dim})")
+        if v.get("dopo_pct") is not None:
+            s += f" · nell'anno nuovo finora {n(v['dopo_pct'])}%"
+        L.append(s)
+    corte = [v["tk"] for v in voci if v.get("assente") == "corta"]
+    nonlette = [v["tk"] for v in voci if v.get("assente") == "non lette"]
+    if corte:
+        L.append("  la storia non copre la fine dell'anno prima (quotati da poco o storia tagliata: n.d., non uno zero): "
+                 + ", ".join(corte))
+    if nonlette:
+        L.append("  prezzi NON letti in questo giro (la fonte non ha risposto: non e' 'nessuna perdita'): " + ", ".join(nonlette))
+    return L
 
 
 def calendario_sicuro(tks, giorni=GIORNI_CALENDARIO):
@@ -2253,6 +2362,8 @@ if __name__ == "__main__":
         print("\n".join(righe_candidati(o, notizie_candidati(o))))
         print()
         print("\n".join(righe_watchlist(o)))
+        print()
+        print("\n".join(righe_fine_anno(o)))         # v512 — il calendario fiscale di fine anno
         print()
         # v494 — le ultimissime notizie dei sorvegliati (CEO, 17/10/2026)
         # v499 — di TUTTI i sorvegliati, non solo di quelli con un ingresso possibile: la Roadster di Tesla (16/10) sarebbe

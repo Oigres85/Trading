@@ -57,6 +57,8 @@ TK = r"(?P<tk>[A-Z][A-Z0-9.\-]*)"
 # ── le sezioni della risposta, nell'ordine di memoria/FORMATO_ANALISI.md ─────────────────────────────────────
 SEZIONI = (
     ("freschezza", "0 · Freschezza dei dati: chi ha servito ogni serie, e l'eta' della pipeline"),     # v511
+    ("freschezza_titoli", "0 · Dati per titolo: analisti, FedWatch, CDS, short, depositi SEC e trimestri — la fonte "
+                          "letta adesso contro la pipeline, e cosa cercare in rete"),                     # v512
     ("semaforo", "0 · Semaforo d'uscita"),
     ("salvavita", "0 · Salvavita e piano di riduzione"),
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
@@ -90,6 +92,7 @@ SEZIONI = (
     ("notizie_posizioni", "6 · Notizie ultimissime delle posizioni e degli ordini"),
     ("candidati", "7 · Rotazione e candidati per settore"),
     ("watchlist", "7 · Watchlist e ingressi"),
+    ("fine_anno", "7 · Calendario fiscale di fine anno (da ottobre a gennaio): informazione"),            # v512
     ("notizie_sorvegliati", "7 · Notizie ultimissime dei sorvegliati"),
     ("liquidita", "7e · Piano per la liquidità"),
 )
@@ -113,13 +116,14 @@ TIPI = (
     ("gamma", "Gamma dei dealer — posizionamento.py"),
     ("dark_pool", "Dark pool — posizionamento.py"),
     ("notizie", "Notizie ultimissime (72 ore) — numeri_libro.py e rotazione.py"),
+    ("fine_anno", "Calendario fiscale di fine anno: il risultato dell'anno e la capitalizzazione — rotazione.py"),   # v512
 )
 ETICHETTE_TIPI = dict(TIPI)
 BREVI = {"tenuta": "tenuta", "watchlist": "watchlist e ingresso", "liquidita": "piano per la liquidità",
          "rischio": "peso e rischio", "piano_riduzione": "piano di riduzione", "premarket": "prezzo esteso",
          "mossi": "mossi oltre l'ampiezza", "trimestrale": "trimestrale", "schede": "schede del progetto",
          "concorrenti": "concorrenti", "opzioni": "opzioni", "gamma": "gamma dei dealer", "dark_pool": "dark pool",
-         "notizie": "notizie"}
+         "notizie": "notizie", "fine_anno": "fine anno"}
 
 
 @dataclass(frozen=True)
@@ -153,6 +157,7 @@ class Strumento:
 _RIGA_PREZZO = Nome(rf"  {TK} +(?:[0-9]|non quotato)", "premarket", "copia")
 CATALOGO = {
     "fonti_dirette": Strumento("freschezza", (Blocco(r"FRESCHEZZA DEI DATI", "freschezza"),)),        # v511
+    "fonti_titoli": Strumento("freschezza_titoli", (Blocco(r"DATI PER TITOLO", "freschezza_titoli"),)),  # v512
     "numeri_libro_esteso": Strumento("premarket", (
         Blocco(r"FUORI SESSIONE|POSIZIONI$|RIFERIMENTI$|SORVEGLIATI$", "premarket", (_RIGA_PREZZO,)),
     )),
@@ -194,6 +199,7 @@ CATALOGO = {
     "rotazione": Strumento("candidati", (
         Blocco(r"CANDIDATI PER SETTORE", "candidati"),
         Blocco(r"WATCHLIST DEL LIBRO", "watchlist", (Nome(rf"   {TK} +[0-9]", "watchlist"),)),
+        Blocco(r"CALENDARIO FISCALE DI FINE ANNO", "fine_anno", (Nome(rf"  {TK} — anno ", "fine_anno", "copia"),)),
         Blocco(r"NOTIZIE ULTIMISSIME", "notizie_sorvegliati", (Nome(rf"  {TK} — ", "notizie"),)),
         Blocco(r"PIANO PER LA LIQUIDIT", "liquidita",
                (Nome(rf"    {TK} (?:\((?:watchlist|candidato)[^)]*\) )?[0-9]", "liquidita", "copia"),)),
@@ -245,6 +251,8 @@ class Voce:
 # nei due versi. Una richiesta nuova si aggiunge li' E qui, nello stesso giorno in cui diventa uno strumento.
 REGISTRO = {
     "freschezza": Voce(("freschezza",)),                                                             # v511
+    "freschezza_titoli": Voce(("freschezza_titoli",)),                                               # v512
+    "fine_anno": Voce(("fine_anno",)),                                                               # v512
     "semaforo": Voce(("semaforo",)),
     "attesa": Voce(("attesa",)),
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),

@@ -407,6 +407,22 @@ un calo di almeno il 10% è «anticipato» se il segnale si accende entro il gio
 - **Da misurare quando la storia raccolta lo permette** (almeno un anno): la nostra gamma sulle catene (raccolta dalla
   v500), put/call e volatilità implicita per titolo, il P/E del Nasdaq-100. Con la stessa misura: se non anticipano,
   restano informazione.
+- **Il calendario fiscale di fine anno** (verificato il 25/10/2026 su richiesta del CEO: *"a fine anno i fondi si muovono
+  anche per compensare le fiscalità … prima verifica se è corretta la mia affermazione"*). L'affermazione è giusta a metà:
+  molti fondi comuni americani chiudono l'esercizio fiscale al 31 ottobre e i privati al 31 dicembre, e chi ha
+  minusvalenze le realizza prima; **non** è vero che vendere un vincitore «faccia trovare i ricavi in bilancio», perché il
+  valore di un fondo è ai prezzi di mercato e una plusvalenza realizzata non lo alza. Misurato sui portafogli di Kenneth
+  French (decili per rendimento dei 12 mesi prima; perdenti meno vincitori, punti al mese rispetto agli altri mesi; dati
+  fino ad agosto 2026): **a pesi uguali** — dove pesano i piccoli — 1987-2025 ottobre −1,31 (t −1,8), dicembre −2,71
+  (t −2,4), gennaio +7,30 (t +3,8); **pesati per capitalizzazione** nessun mese oltre due errori standard (ottobre t −0,5,
+  dicembre t −0,7, gennaio t +1,6); fra le **grandi** (il quinto più capitalizzato) niente, fra le **piccole** (il quinto
+  meno capitalizzato) regge solo gennaio (t +2,1); il segno cambia da un anno all'altro (gennaio 2018 −13,0 punti, 2023
+  +21,6). **Decisione del 25/10/2026** (il CEO, testuale: *"decidi tu in base al fatto che sia rumore o utile, forse va
+  bene il ultimo mese di ottobre … Scegli tu"*): utile sui nomi piccoli in perdita, rumore sui grandi; il blocco
+  CALENDARIO FISCALE DI FINE ANNO di `rotazione.py` si accende **da ottobre a gennaio** (ottobre per i fondi, dicembre per
+  i privati, gennaio per il rimbalzo misurato), nomina i nomi in perdita sull'anno con la capitalizzazione e dice su
+  quali la regolarità è misurata (sotto 10 miliardi di dollari, convenzione). È INFORMAZIONE: non entra nella tenuta, nel
+  semaforo né negli ingressi. Il bilancio fiscale del CEO non si annota (sua risposta: *"2no"*).
 
 **Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: SMH 638 (media 50 ≈ 573,
 200 ≈ 502) · **spread CCC 12,11%, +2,4 punti sul minimo di 60 sedute (9,69) — SEGNALE ACCESO** · HY OAS 3,1 · Treasury 10 anni 5,28% · margin debt 96,8% del massimo, +2,6% sul mese ·

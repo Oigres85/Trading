@@ -64,17 +64,21 @@ TITOLO_CHECKLIST = "## Cosa contiene la risposta"
 TITOLO_REGOLE = "## Regole"
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-STRUMENTI = ("fonti_dirette.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py", "posizionamento.py",
-             "indici.py", "concorrenti.py")
+STRUMENTI = ("fonti_dirette.py", "fonti_titoli.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py",
+             "posizionamento.py", "indici.py", "concorrenti.py")
 # v511 — fonti_dirette.py gira PRIMA degli altri, da solo: scrive la lettura alla fonte del giro che gli altri riusano
 #   (una lettura per analisi, la stessa osservazione per tutti), e stampa il blocco FRESCHEZZA DEI DATI
-PRIMA = ("fonti_dirette.py",)
+# v512 — e con lui, in parallelo, fonti_titoli.py: analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC e trimestri
+#   letti alla fonte all'ora dell'analisi (CEO, 25/10/2026: «dati non aggiornati non sono affidabili»)
+PRIMA = ("fonti_dirette.py", "fonti_titoli.py")
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 # v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
 # v499 — e il dark pool (posizionamento.py) e la storia del P/E del Nasdaq-100 (indici.py): stesse ragioni
 MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzioni_titoli.jsonl",
            RADICE / "memoria" / "dark_pool.jsonl", RADICE / "memoria" / "indici.jsonl",
-           RADICE / "memoria" / "concorrenti_dati.json")
+           RADICE / "memoria" / "concorrenti_dati.json",
+           # v512 — i giorni di ICE che lo storico della pipeline non ha: la pipeline li unisce al run dopo
+           RADICE / "memoria" / "cds_sessione.jsonl")
 LIMITE_SECONDI = 600
 
 
@@ -94,7 +98,9 @@ def comandi(f, sedute=1):
     Fuori dalla seduta numeri_libro gira due volte: l'ultima seduta E il prezzo esteso
     (istruzione del CEO del 06/10: prima dell'apertura l'analisi parte dal pre-market)."""
     c = [("FRESCHEZZA DEI DATI — le serie macro lette alla fonte adesso, la pipeline come ripiego e la sua eta'",
-          ["fonti_dirette.py"])]
+          ["fonti_dirette.py"]),
+         ("DATI PER TITOLO — analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC e trimestri: la fonte letta "
+          "adesso contro la pipeline, e cosa cercare in rete", ["fonti_titoli.py"])]
     if f == "pre-market":
         c.append(("PRE-MARKET — il libro sul prezzo esteso (volumi sottili: e' un'indicazione)",
                   ["numeri_libro.py", "--esteso"]))

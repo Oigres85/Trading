@@ -219,8 +219,13 @@ DEI DATI dell'analisi in chat — le serie macro lette alla fonte (FRED col CSV 
 dell'analisi, con la pipeline come ripiego dichiarato riga per riga — e scrive la lettura del giro in
 `memoria/dati/fonti_dirette.json` (ignorata da git), che gli altri strumenti riusano: questo comando legge, non scrive.
 
+`scripts/fonti_titoli.py` resta **fuori** per la stessa ragione (v512): è il blocco DATI PER TITOLO dell'analisi in chat
+— analisti, FedWatch, CDS, vendite allo scoperto, date dei depositi SEC e trimestri mancanti letti alla fonte all'ora
+dell'analisi — e scrive la lettura del giro in `memoria/dati/fonti_titoli.json` e i giorni di ICE che lo storico non ha
+in `memoria/cds_sessione.jsonl`: questo comando legge, non scrive.
+
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
-e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
+e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e `fonti_titoli.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
 `schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py` e `concorrenti.py`, già dichiarati fuori qui con la loro ragione, e chiude con
 la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).

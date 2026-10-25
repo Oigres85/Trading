@@ -34,11 +34,14 @@ Si leggono ALLA FONTE una volta per analisi; la pipeline resta il RIPIEGO, dichi
 ⚠ IL CAMBIO NON E' LA STESSA GRANDEZZA nei due posti: la BCE pubblica un riferimento datato (il fixing delle 14:15 CET),
   la pipeline una quotazione dello snapshot senza data. Si dichiara ogni volta, perche' "1,1193" e "1,1204" non sono un
   disaccordo.
-⚠ COSA NON SI TROVA ALTROVE, misurato: i dati per titolo che la pipeline legge da Yahoo (target e revisioni degli
-  analisti, sensibilita' ai canali, opzioni della pipeline, FedWatch) — Yahoo risponde 429 da qui —; i CDS (ICE pubblica
-  solo l'ultimo giorno, lo storico lo raccoglie la pipeline); le vendite allo scoperto; i bilanci SEC (403 senza un
-  contatto). Per quelli il blocco DICHIARA l'eta' del run e se e' precedente all'ultima chiusura USA conclusa: chi legge
-  sa che descrivono la seduta prima, invece di scoprirlo.
+⚠ COSA NON SI TROVA ALTROVE, misurato: le sensibilita' ai canali, le voci dei bilanci SEC (403 senza un contatto), lo
+  storico dei CDS (ICE pubblica solo l'ultimo giorno), il debito a margine, la composizione degli ETF, il prezzo del BTP.
+  Per quelli il blocco DICHIARA l'eta' del run e se e' precedente all'ultima chiusura USA conclusa: chi legge sa che
+  descrivono la seduta prima, invece di scoprirlo.
+⚠⚠ v512 — QUESTO DOCSTRING DICEVA «Yahoo risponde 429 da qui», e il 25/10/2026 non era vero: rimisurato, Yahoo risponde
+  (59 titoli in 4 secondi). Target e revisioni degli analisti, FedWatch, il CDS dell'ultimo giorno, le vendite allo
+  scoperto, le date dei depositi SEC e i trimestri che la pipeline non ha ancora li rilegge alla fonte
+  scripts/fonti_titoli.py (blocco DATI PER TITOLO). Una conclusione «non disponibile» si rimisura (v497).
 """
 from __future__ import annotations
 
@@ -94,10 +97,13 @@ NOMI.update({"effr": "Fed Funds effettivo (EFFR del giorno)", "eurusd": "EUR/USD
 ORDINE = tuple(k for k, *_ in SERIE_FRED[:7]) + ("effr", "eurusd", "fear_greed") + tuple(k for k, *_ in SERIE_FRED[7:])
 
 # ⚠ COSA LA PIPELINE PORTA DA SOLA (nessuna fonte raggiungibile da qui): si nomina quando il run e' indietro.
-SOLO_PIPELINE = ("target e revisioni degli analisti (anche la famiglia «fondamentali AI» del semaforo)",
-                 "sensibilita' ai canali macro", "CDS a 5 anni e loro storico", "vendite allo scoperto (FINRA)",
-                 "bilanci SEC e salute del credito", "debito a margine (famiglia «leva» del semaforo)",
-                 "composizione degli ETF della rotazione", "prezzo del BTP")
+SOLO_PIPELINE = ("sensibilita' ai canali macro", "storico dei CDS (il giorno di oggi lo rilegge fonti_titoli.py)",
+                 "voci dei bilanci SEC (debito, scadenze, derivati) e salute del credito",
+                 "debito a margine (famiglia «leva» del semaforo)", "composizione degli ETF della rotazione",
+                 "prezzo del BTP")
+# v512 — quelli che una fonte raggiungibile ce l'hanno: li rilegge scripts/fonti_titoli.py (blocco DATI PER TITOLO)
+RILETTI_PER_TITOLO = ("target e revisioni degli analisti", "FedWatch", "CDS dell'ultimo giorno", "vendite allo scoperto",
+                      "date dei depositi SEC e trimestri che la pipeline non ha ancora")
 
 
 # ══════════════════════════════════ LETTURA ALLA FONTE ═════════════════════════════════════════════════════════
@@ -449,13 +455,14 @@ def sintesi(g, adesso=None):
              + (f"⚠ PRECEDENTE all'ultima chiusura USA ({chiusura:%d/%m %H:%M} di New York)" if prima
                 else f"dopo l'ultima chiusura USA ({chiusura:%d/%m %H:%M} di New York)"))
     if prima or (eta is not None and eta > 24):
-        L.append("    ⚠ descrivono la seduta PRIMA, perche' una fonte raggiungibile da qui non c'e' (Yahoo 429, SEC 403, "
-                 "ICE solo l'ultimo giorno): " + "; ".join(SOLO_PIPELINE))
+        L.append("    ⚠ descrivono la seduta PRIMA, perche' una fonte raggiungibile da qui non c'e' (SEC 403, ICE solo "
+                 "l'ultimo giorno, FINRA per il debito a margine): " + "; ".join(SOLO_PIPELINE))
         L.append("    ⚠ le festivita' USA non sono note al calcolo dell'ultima chiusura: in un giorno di chiusura questo "
                  "avviso suona nel verso prudente")
     else:
-        L.append("    dati per titolo dalla pipeline (nessuna fonte raggiungibile da qui), allineati all'ultima seduta: "
+        L.append("    solo dalla pipeline (nessuna fonte raggiungibile da qui), allineati all'ultima seduta: "
                  + "; ".join(SOLO_PIPELINE))
+    L.append("    riletti alla fonte da scripts/fonti_titoli.py, blocco DATI PER TITOLO (v512): " + "; ".join(RILETTI_PER_TITOLO))
     return L
 
 

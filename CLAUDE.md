@@ -8589,3 +8589,113 @@ del CEO e non sono un riassunto: sono il punto da cui parte il ragionamento in c
   verifica a ogni ripresa, non solo alla creazione.*
 - Pavimenti: `test_update_data.py` 386 check eseguiti, `test_analisi_libro.py` 830 → 860 (886). `?v=` e
   `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 📡 v512 — I DATI PER TITOLO DELLA PIPELINE SI LEGGONO ALLA FONTE, E DUE PERIODI IN FORMAZIONE LETTI COME CONCLUSI
+
+Il CEO, 25/10/2026, testuale: *"target degli analisti, FedWatch, storico dei CDS, vendite allo scoperto, bilanci SEC
+della pipeline se non sono aggiornati (non so ogni quanto si aggiornano) trovali altrove anche attraverso news; dati non
+aggiornati non sono affidabili come per esempio errore stagionalità, non voglio avere mai errori simili fanno danni
+sull'analisi"*. E alle due domande sul calendario di fine anno: *"decidi tu in base al fatto che sia rumore o utile …
+Scegli tu"* e *"2no"*.
+
+### ⚠⚠ La v511 aveva scritto «Yahoo 429 da qui» come un fatto, e non lo era più
+La v511 aveva tolto le serie macro dalla coda del cron e DICHIARATO che i dati per titolo non si trovavano altrove.
+Rimisurato il 25/10 invece che ricordato: Yahoo risponde (59 titoli in 4 secondi), e con lui i future Fed Funds per
+esteso; ICE e FINRA rispondevano già. È la v497 una seconda volta — *una conclusione «non disponibile» si rimisura quando
+la domanda torna* — e la frase stava anche nel docstring di `fonti_dirette.py`, ora corretta. La riga della v511 qui
+sopra resta com'è: è la storia di quel giorno.
+
+### `scripts/fonti_titoli.py`: la lettura del giro, con le funzioni della pipeline
+Gira PRIMA degli altri strumenti, insieme a `fonti_dirette.py` (`analisi.PRIMA`), in ~12 secondi. Per ogni posizione e
+sorvegliato rilegge alla fonte, **con le stesse funzioni della pipeline** (v161):
+
+| blocco | fonte | funzione della pipeline | quando vince la lettura di adesso |
+|---|---|---|---|
+| analisti | Yahoo | `analisti_da` (estratta da `fetch_symbol`) | sempre, salvo un titolo per cui Yahoo non restituisce niente: tiene la pipeline, dichiarato |
+| FedWatch | contratti ZQ per esteso, EFFR NY Fed | `fedwatch_da` (estratta dal giro macro) | sempre |
+| CDS | ICE | `aggiorna_cds` su una COPIA dello storico | solo se ICE ha un giorno PIÙ RECENTE della pipeline per qualche nome o indice |
+| vendite allo scoperto | FINRA | `aggiorna_short` | solo se FINRA ha pubblicato un regolamento più recente |
+| depositi SEC | Yahoo (`sec_filings`) | — | le date dei 10-Q e 10-K: SEC risponde 403 senza un contatto, e il contatto del CEO non si manda a un servizio nuovo |
+| trimestri | Nasdaq | `schede_progetto.deposito_oltre_la_tabella` decide chi è fermo | solo sulle tabelle ferme, e solo se le due fonti coincidono sul trimestre in comune |
+
+Estrarre `analisti_da`, `fedwatch_da`, `rendimenti_log` e `rendimenti_datati` è stato verificato **identico** sugli
+stessi ingressi (sei titoli, la catena FedWatch, i rendimenti) prima di toccare la pipeline; un gate pretende che la
+pipeline le chiami e che `fonti_titoli` non ne tenga una seconda copia.
+- **Una lettura per analisi**: `memoria/dati/fonti_titoli.json` (ignorata da git), riusata per 30 minuti da chi carica
+  `data.json` — `carica()`, chiamata da numeri_libro, schede, rotazione e brief — e mai la rete. Ogni blocco dichiara chi
+  ha vinto (`macro._fonti_titoli`).
+- **Le suite la spengono** (`TRADING_FONTI_TITOLI=spenta`): al primo giro sei check della suite d'analisi erano rossi
+  perché leggevano la lettura scritta da un'analisi di mezz'ora prima. *Un gate che dipende dall'ora dell'ultima analisi
+  va rosso a caso* (v233, v429).
+- **Stampa ogni quanto cambia ciascun dato** — la domanda del CEO — e la lista **DA CERCARE IN RETE**: dove nemmeno la
+  fonte è aggiornata (un 10-Q che Yahoo non ha ancora, un regolamento che il calendario FINRA dichiara pubblicato e l'API
+  no). FORMATO 00bis: quelle voci si cercano nelle notizie con fonte e data, o si scrive dato non disponibile.
+
+### I trimestri da Nasdaq, e i due fornitori che non si mescolano per ipotesi
+Sette tabelle ferme il 25/10, completate da Nasdaq: AMZN, **BE** (posizione: il 3° trimestre, ricavi +138,1% sull'anno),
+META, NFLX, PM, TSLA, WDC. Nasdaq scrive in migliaia, e **entra solo se i ricavi coincidono con quelli della pipeline sul
+trimestre in comune**; l'utile entra con la voce che coincide (su BE «Net Income Applicable to Common Shareholders», non
+«Net Income»: i fornitori usano definizioni diverse). Su **BLK, GS e JPM i ricavi non coincidono**: le banche non si
+mescolano, e restano fra le voci da cercare in rete insieme a SMCI (Nasdaq non ha ancora il trimestre) e SPCX. La riga dei
+ricavi dichiara la fonte del trimestre ritrovato.
+
+### Lo storico dei CDS non ha un'altra fonte, quindi lo raccoglie anche la sessione
+ICE pubblica solo l'ultimo giorno (v497): il giorno che lo storico del repo non ha, letto da una sessione, si conserva in
+`memoria/cds_sessione.jsonl` (30 giorni), e `aggiorna_cds` lo unisce al proprio storico **per data** al run dopo
+(`inserisci_vecchi=True`: un giorno più vecchio dell'ultimo entra al suo posto; dalla lettura di ICE resta rifiutato, perché
+lì una data vecchia è un'anomalia della fonte). Il 21/10 è andato perso proprio così (v508). Le misure rifatte dalla
+sessione stanno su una copia dello storico, mai sul file del repo.
+
+### Il rastrellamento dei periodi in formazione: due difetti, entrambi la v511 applicata a metà
+Cercati in tutto il sistema i punti in cui un periodo non concluso si leggeva come concluso (la forma dell'ottobre «su
+42 anni» della v511):
+1. **La stagionalità di S&P 500 e Nasdaq-100** (`fetch_seasonality`) contava il mese in corso: la v511 aveva corretto
+   quella del titolo e non quella degli indici — la classe v412. Ora `mesi_conclusi`, una regola sola per le due, nel
+   mese di New York.
+2. **`brief.tecnica` misurava ATR, medie, massimo dell'anno, supporto e resistenza con la barra di oggi**, che a seduta
+   aperta è in formazione (misurato in v489: dalle 13:50 di New York c'è), e scriveva come «chiusura precedente» il prezzo
+   di adesso. Ora le misure stanno sulle sedute concluse e il prezzo resta quello della quota; `barra_in_formazione` vive
+   in `brief.py` e `rotazione.seduta_in_corso` la chiama: una regola sola (v161).
+Controllati e già a posto: la stagionalità NDX del ciclo presidenziale (esclude l'anno in corso), la lettura a 5 anni
+(settimane concluse), i volumi (v471), il registro (v485), gli oscillatori (v511), il registro delle opzioni (solo a seduta
+conclusa), l'ampiezza (dichiarata «prezzi di oggi»).
+
+### Il calendario fiscale di fine anno: deciso sulla misura
+L'affermazione del CEO era giusta a metà (LIBRO.md §1ter): molti fondi comuni americani chiudono l'esercizio al 31
+ottobre e i privati al 31 dicembre, e chi ha minusvalenze le realizza; non è vero che vendere un vincitore faccia trovare
+ricavi in bilancio. Sui portafogli di Kenneth French l'effetto c'è **a pesi uguali** (ottobre t −1,8, dicembre t −2,4,
+gennaio t +3,8) e **non pesato per capitalizzazione**; fra le grandi niente, fra le piccole regge gennaio. Decisione:
+utile sui piccoli in perdita, rumore sui grandi; il blocco CALENDARIO FISCALE DI FINE ANNO di `rotazione.py` si accende
+**da ottobre a gennaio** (mese di New York), sulle sedute concluse e con la base nell'ultima chiusura dell'anno prima,
+nomina i nomi in perdita con la capitalizzazione (sotto 10 miliardi di dollari «piccola o media», convenzione) ed è
+INFORMAZIONE. I numeri stampati sono quelli del libro, e un gate li confronta. Il bilancio fiscale del CEO non si annota.
+⚠ La prima resa diceva «la storia non copre» su BE, BLK e LLY: era la fonte che rispondeva 429. «Non letto» e «storia
+corta» si leggono uguali e sono due cose diverse (v389, v406): ora sono due righe.
+
+### 🧪 Il metodo
+- **Tre gate della pipeline erano ancorati al testo della funzione estratta** (`macro["fedwatch"] = {`): riagganciati a
+  `fedwatch_da`, con lo stesso invariante.
+- **Una prima stesura usava un dizionario «pigro»** per i rendimenti, con un vuoto che si leggeva «letto e vuoto»:
+  sostituito da funzioni da chiamare, perché la lettura costosa si fa solo quando ICE o FINRA sono davvero più avanti.
+- **Il gate dell'anno fiscale non discriminava il fuso**: il caso in UTC cadeva nello stesso mese in entrambi i modi.
+  Ora è l'01:00 UTC del 1° ottobre, ancora 30 settembre a New York — corretto prima delle iniezioni.
+- **Trentadue iniezioni** (8 sulla pipeline, 24 sugli strumenti), una alla volta su cinque copie verificate per impronta,
+  con `modifica_sicura` e ripristino dallo snapshot: **mordono tutte, ciascuna sul controllo atteso**. Tre non lo
+  facevano al primo giro, e tutte e tre per un difetto del GATE, non del codice (v430, v448, v471):
+  - la guardia che tiene fuori uno short NON rifatto: il fixture non aveva valori per titolo in quel caso — `leggi_short`
+    non li scrive — quindi toglierla non cambiava niente. La lettura però arriva dal disco e può venire da un'altra
+    versione: il caso ora c'è;
+  - i future aperti il venerdì sera: il gate provava solo le 17:30, e alle 17 la pausa quotidiana chiude comunque. Ora
+    c'è il venerdì alle 20 contro il giovedì alle 20;
+  - FedWatch senza il contratto del mese in corso: il difetto si vedeva, ma la suite della pipeline MORIVA con un
+    `KeyError` invece di far cadere il controllo, perché il test catturava solo `RuntimeError`. Ora cattura tutto e
+    pretende che l'errore sia quello giusto, col contratto nominato.
+  E il caso «suite spenta» del gate di `carica` girava su un percorso già cancellato: stretto prima di lanciare le
+  iniezioni, con una lettura fresca sul disco.
+- ⚠ **Il primo comando per creare le copie è stato fermato dal controllo di sicurezza** (`rm -f $B/$c/...`: una variabile
+  vuota lo farebbe diventare un `rm` sulla radice). Riscritto con `"${B:?}"`, che si ferma invece di cancellare.
+- ⚠ **Un ciclo d'attesa che cercava il processo per nome trovava sé stesso**: `pgrep -f harness512` dentro un
+  `until … ; do sleep; done` corrisponde anche alla riga di comando del ciclo, che quindi non finiva mai. Si aspetta il
+  FILE che il processo scrive, mai il nome del processo.
+- Pavimenti: `test_update_data.py` N_CHECKS_MINIMO 388 (395 eseguiti), floor 365 in `self_check`;
+  `test_analisi_libro.py` 913 check, floor 880. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
