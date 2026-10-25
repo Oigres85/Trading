@@ -50,6 +50,7 @@ import yfinance as yf
 
 from rumore_yf import zittisci_yfinance   # fonte UNICA, condivisa col rapporto
 from comuni import r2_rumore, testo_feed  # v510 — una funzione, due consumatori: pipeline e strumenti
+from comuni import seduta_aperta, trimestre_a  # v514 — la barra in formazione e il trimestre per data, una regola sola
 # v511 — le derivazioni delle serie macro che l'analisi legge anche ALLA FONTE (scripts/fonti_dirette.py): vivono in
 #   comuni.py, e qui si importano coi nomi di prima. Due copie della stessa domanda divergono al primo ritocco (v161).
 from comuni import (distanza_mesi as _distanza_mesi, mese_meno as _mese_meno, var_per_data as _var_per_data,  # noqa: E402
@@ -1166,6 +1167,102 @@ def conto_trimestrale(t, quanti=6):
                       "margine": round(u / r * 100, 1) if u is not None and r else None,
                       "margine_op": round(o / r * 100, 1) if o is not None and r else None})
     return fuori or None
+
+
+# ══ v514 — AZIONI IN CIRCOLAZIONE, DILUIZIONE E ROTAZIONE DEL FLOTTANTE ═════════════════════════════════════════════
+# Il CEO, 25/10/2026: *"Inserisci anche un'analisi del flottante, se è utile"*. Misurato prima di scrivere: la parte che
+#   cambia la lettura e' la DILUIZIONE — sull'anno, per data, MSTR +32%, BE +26%, OKLO +25%, TSLA +22%, CRWV +13%, SMCI
+#   +11% —, cioe' quanta societa' in meno possiede ogni azione. Il flottante di Yahoo non ha una data (v396): si pubblica
+#   dichiarato, e la sua rotazione giornaliera (mediana 0,75% sui 58 nomi seguiti, 5-11% sui nomi speculativi del libro)
+#   dice quanto e' «caldo» lo scambio rispetto alle azioni che girano davvero.
+AZ_VOCI = ("Ordinary Shares Number", "Share Issued")    # la prima e' «emesse meno azioni proprie», la seconda il ripiego
+# fra due trimestri consecutivi un rapporto fuori da qui non e' una diluizione: e' un frazionamento che la fonte non ha
+#   rettificato o una riclassificazione delle classi — la variazione che lo attraversa non si pubblica (v396). Convenzione
+#   (v240): Yahoo rettifica i frazionamenti (NFLX 10:1 del 17/11/2025, misurato), e questa e' la rete se non lo fa
+AZ_SALTO = (0.55, 1.9)
+ROTAZIONE_SEDUTE = 63           # un trimestre di borsa
+
+
+def azioni_in_circolazione(t, quanti=6):
+    """Le azioni in circolazione a fine trimestre dallo stato patrimoniale trimestrale, con la loro data: [{trim,
+    azioni}], dal piu' recente, e la voce che le porta. None se la fonte non le ha."""
+    try:
+        bs = t.quarterly_balance_sheet
+    except Exception:  # noqa: BLE001
+        return None
+    if bs is None or bs.empty:
+        return None
+    voce = next((v for v in AZ_VOCI if v in bs.index), None)
+    if voce is None:
+        return None
+    serie = []
+    for col in list(bs.columns)[:quanti]:
+        try:
+            v = float(bs.loc[voce].get(col))
+        except (TypeError, ValueError):
+            continue
+        if v == v and v > 0:
+            serie.append({"trim": col.strftime("%Y-%m-%d"), "azioni": int(round(v))})
+    serie.sort(key=lambda x: x["trim"], reverse=True)
+    return {"voce": voce, "serie": serie} if serie else None
+
+
+def variazioni_azioni(serie):
+    """Le variazioni delle azioni in circolazione, per DATA (comuni.trimestre_a, la regola dei conti delle schede: v161):
+    sull'anno (il trimestre di 365 giorni prima) e sul trimestre (91). Un salto fuori da AZ_SALTO fra due trimestri
+    consecutivi ferma la variazione che lo attraversa, e si dichiara."""
+    if not serie:
+        return {}
+    u = serie[0]
+    out = {"al": u["trim"], "azioni": u["azioni"]}
+    salti = [{"dal": b["trim"], "al": a["trim"], "rapporto": round(a["azioni"] / b["azioni"], 2)}
+             for a, b in zip(serie, serie[1:]) if not AZ_SALTO[0] <= a["azioni"] / b["azioni"] <= AZ_SALTO[1]]
+    if salti:
+        out["salti"] = salti
+    for k, gg in (("var_anno", 365), ("var_trim", 91)):
+        b = trimestre_a(serie, u["trim"], gg)
+        if b is None:
+            continue
+        if any(b["trim"] <= s["dal"] and s["al"] <= u["trim"] for s in salti):
+            out[k] = {"da": b["trim"], "pct": None, "perche": "salto"}
+        else:
+            out[k] = {"da": b["trim"], "pct": round((u["azioni"] / b["azioni"] - 1) * 100, 2) + 0.0}   # mai -0.0
+    return out
+
+
+def rotazione_flottante(hist, flottante, adesso=None, sedute=ROTAZIONE_SEDUTE):
+    """La quota del flottante scambiata in una seduta media: il volume medio delle ultime `sedute` CONCLUSE (la barra di
+    oggi a seduta aperta e' in formazione: comuni.seduta_aperta, la regola degli strumenti) diviso il flottante. Una
+    seduta senza volume e' un buco, non uno zero (v205). Il volume e' datato, il flottante della fonte no: chi stampa lo
+    dice. None senza almeno venti sedute."""
+    if hist is None or getattr(hist, "empty", True) or "Volume" not in hist or not flottante or flottante <= 0:
+        return None
+    v = hist["Volume"].dropna()
+    if len(v) and seduta_aperta(v.index[-1].strftime("%Y-%m-%d"), adesso):
+        v = v.iloc[:-1]
+    v = v[v > 0].iloc[-sedute:]
+    if len(v) < 20:
+        return None
+    m = float(v.mean())
+    return {"pct": round(m / flottante * 100, 2), "sedute": int(len(v)), "dal": v.index[0].strftime("%Y-%m-%d"),
+            "al": v.index[-1].strftime("%Y-%m-%d"), "volume_medio": int(round(m))}
+
+
+def flottante_e_azioni(t, hist, info, flottante, adesso=None):
+    """Il blocco della riga: azioni in circolazione datate con le variazioni, rotazione del flottante, data della
+    quotazione (da cui dipendono i vincoli di vendita dopo l'offerta, che il sistema non legge: si dichiara)."""
+    out = {}
+    a = azioni_in_circolazione(t)
+    if a:
+        out.update(a)
+        out.update(variazioni_azioni(a["serie"]))
+    r = rotazione_flottante(hist, flottante, adesso)
+    if r:
+        out["rotazione"] = r
+    ms = (info or {}).get("firstTradeDateMilliseconds")
+    if isinstance(ms, (int, float)) and ms > 0:
+        out["quotata_dal"] = datetime.fromtimestamp(ms / 1000, timezone.utc).strftime("%Y-%m-%d")
+    return out or None
 
 
 def barre_ohlc(hist, quante=70):
@@ -2822,7 +2919,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # costruito anche per i simboli senza fondamentali (indici, futures, ETF). Vedi il gate
     # "v369 nessuna variabile del record assegnata solo dentro un ramo" in test_update_data.py.
     stats = None
-    _comb = _cred = _fuori = _short = _sol = None
+    _comb = _cred = _fuori = _short = _sol = _az = None
     if has_fundamentals(ticker, currency):
         g = info.get
         def num(*keys):
@@ -2889,6 +2986,12 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         except Exception as _e:
             print(f"!! combustione {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
             _comb = None
+        # ⚠ v514 — azioni in circolazione, diluizione, rotazione del flottante: un try suo, come ogni blocco
+        try:
+            _az = flottante_e_azioni(t, hist, info, float_sh)
+        except Exception as _e:
+            print(f"!! azioni e flottante {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
+            _az = None
         # ⚠ v504 — la solidita' OPERATIVA (vedi solidita_operativa() piu' sopra): un try suo, come ogni blocco
         try:
             _sol = solidita_operativa(t, _comb)
@@ -3062,6 +3165,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "combustione": _comb,   # v365 — cassa, debito, flusso operativo, capex. None se la fonte non li da'.
         "credito": _cred,       # v367 — al posto del CDS: oneri finanziari, copertura, scadenze.
         "solidita": _sol,       # v504 — ciclo di cassa, flusso dell'ultimo trimestre, utile, magazzino, azionisti.
+        "azioni": _az,          # v514 — azioni in circolazione datate, diluizione, rotazione del flottante, quotazione.
         "fuori_mercato": _fuori,# v367 — ATS (dark pool) e OTC non-ATS per settimana, FINRA.
         "short_flusso": _short, # v367 — quota di volume venduta allo scoperto, FINRA, giornaliera.
         "tech_by_range": tech_by_range,

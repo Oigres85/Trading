@@ -114,6 +114,18 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    variazione sul regolamento precedente e in tre mesi col titolo negli stessi giorni, il percentile dei regolamenti
    dell'anno — con la data del regolamento e la prossima pubblicazione dal calendario UFFICIALE di FINRA. Prima la riga
    portava la quota di Yahoo senza data e il flusso giornaliero, che è il DPI del dark pool: tolti, una resa sola.
+   Da v514 (CEO, 25/10: *"Inserisci anche un'analisi del flottante, se è utile"*) il blocco **FLOTTANTE E
+   DILUIZIONE** in testa e la riga **flottante** di ogni nome: le azioni in circolazione a fine trimestre dallo stato
+   patrimoniale, con la data, e la loro variazione sull'anno e sul trimestre trovata per data — cioè **quanta società
+   in meno possiede ogni azione** —; il flottante (Yahoo, senza la data della rilevazione), sul totale del bilancio
+   quando la fonte conta meno azioni (più classi: CBRS 98% per Yahoo, 48% sul bilancio); quanta parte del flottante si
+   scambia a seduta, sulle sedute concluse, con la mediana del giorno; la data di quotazione. La parte che cambia la
+   lettura è la diluizione: una crescita dei ricavi del 25% con il 25% di azioni in più non arriva a chi tiene
+   un'azione. ⚠ I **vincoli di vendita dopo la quotazione** (lock-up) stanno nel prospetto, con scaglioni e
+   condizioni, e il sistema non lo legge: per un nome quotato da meno di 540 giorni che entra in posizione o fra gli
+   ingressi, la risposta cerca il calendario nel prospetto o in un deposito della società, con fonte e data — mai dalle
+   ricostruzioni dei giornali, che il 25/10/2026 non concordavano fra loro né per SpaceX né per Cerebras. È
+   informazione, non una prova della tenuta.
    Entra SEMPRE nei punti 3-5 della risposta: un canale sotto il rumore si dice non
    misurabile, una revisione si legge dalla differenza. ⚠ Il FedWatch si legge dal blocco DATI PER
    TITOLO: dalla v477 viene dai contratti per esteso di ciascun mese con l'EFFR del giorno (il continuo
@@ -476,6 +488,7 @@ chiave fra parentesi quadre, e `scripts/scheda.py` la mette nella SCHEDA COMPLET
 che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catalogo non ne abbia una che qui non c'è):
 - `[freschezza]` i dati in ritardo tolti dove una fonte raggiungibile c'è: le serie macro lette alla fonte all'ora dell'analisi, la pipeline come ripiego dichiarato riga per riga, e la sua età con ciò che porta solo lei (25/10)
 - `[fine_anno]` calendario fiscale di fine anno, da ottobre a gennaio: i nomi in perdita sull'anno con la capitalizzazione, e dove la regolarità è misurata (piccoli) e dove è rumore (grandi) — informazione (25/10)
+- `[flottante]` l'analisi del flottante di ogni posizione e sorvegliato: le azioni in circolazione dai bilanci con la data e la diluizione sull'anno e sul trimestre, il flottante e quanto ne gira a seduta, la data di quotazione e i vincoli di vendita da verificare nel prospetto (25/10) — informazione, non una prova
 - `[comunicati]` dove le fonti non concordano sui ricavi (le banche) o nessuna porta il trimestre, i conti dal comunicato ufficiale della società con fonte, link e data, confrontati solo coi trimestri del comunicato stesso (25/10)
 - `[freschezza_titoli]` i dati per titolo della pipeline letti alla fonte se vecchi — analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC, trimestri che la pipeline non ha ancora — con ogni quanto cambiano, e cercati nelle notizie dove nemmeno la fonte è aggiornata (25/10)
 - `[semaforo]` semaforo d'uscita (06/10), calcolato (09/10)

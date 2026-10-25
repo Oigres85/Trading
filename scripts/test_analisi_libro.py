@@ -2428,7 +2428,8 @@ _src_sp476 = Path(__file__).with_name("schede_progetto.py").read_text()
 _src_rp476 = Path(__file__).with_name("rapporto.py").read_text()
 _extra476 = _corpo_di(_src_rp476, "extra")
 check("v476 collegamento: le schede stampano i ricavi, e il rapporto usa liquidita' e ricavi dalla lettura unica",
-      "for f in (riga_ricavi, riga_cassa, riga_short):" in _corpo_di(_src_sp476, "scheda")
+      # v514 — la tupla si e' allungata (riga_flottante): l'invariante e' che i ricavi ci siano, non la sua lunghezza
+      "for f in (riga_ricavi, riga_cassa, riga_short" in _corpo_di(_src_sp476, "scheda")
       and "SP.liquidita_societa(cb)" in _extra476 and "SP.riga_ricavi(r)" in _extra476
       and 'cb.get("cassa")' not in _extra476 and "/1e9:.1f} mld" not in _extra476)
 
@@ -6919,16 +6920,23 @@ _U505 = {
         "  regolamento del 30/09/2026, pubblicato il 09/10/2026 · prossimo: regolamento del 15/10/2026, pubblicazione il "
         "26/10/2026 (calendario FINRA)", "  quota alta (da 10% del flottante): BBB 21,0%",
         "  POSIZIONI", "    BBB 21,0% (molto alta) · 3,9 giorni", "    AAA 2,3% (bassa) · 1,1 giorni",
-        "  SORVEGLIATI", "    WWW 1,0% (bassa) · 2,0 giorni", "",
+        "  SORVEGLIATI", "    WWW 1,0% (bassa) · 2,0 giorni",
+        # v514 — flottante e diluizione: il blocco in testa e la riga «flottante:» di ogni nome
+        "FLOTTANTE E DILUIZIONE — le azioni in circolazione dai bilanci trimestrali (per data), il flottante e quanto ne "
+        "gira a seduta (v514)", "  diluizione forte sull'anno: BBB +20,0% (in posizione)", "",
         "AAA [POSIZIONE] Alfa Inc. — prezzo pipeline del 2026-10-16", "  valutazione: P/E ultimi 12 mesi 10,0×",
         "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 2,3% del flottante (bassa)",
+        "  flottante: azioni in circolazione al 30/06/2026: 100,0 milioni di azioni · +1,0% sull'anno",
         "  CDS 5 anni: NESSUN CDS compensato a ICE", "  solidita': PATRIMONIALE: FORTE", "  Altman Z'' 5,00: zona di SICUREZZA",
         "  debito: debito finanziario 1,0 mld USD", "",
         "BBB [POSIZIONE] Beta Inc. — prezzo pipeline del 2026-10-16", "  valutazione: utile NEGATIVO",
-        "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 21,0% del flottante (molto alta)", "  CDS 5 anni 900 pb",
+        "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 21,0% del flottante (molto alta)",
+        "  flottante: azioni in circolazione al 30/06/2026: 120,0 milioni di azioni · +20,0% sull'anno",
+        "  CDS 5 anni 900 pb",
         "  solidita': PATRIMONIALE: DEBOLE", "  Altman Z'' -1,00: zona di PERICOLO", "  debito: debito finanziario 2,0 mld USD", "",
         "WWW [SORVEGLIATO] Www Corp. — prezzo pipeline del 2026-10-16", "  valutazione: P/E 20×",
         "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 1,0% del flottante (bassa)",
+        "  flottante: azioni in circolazione al 30/06/2026: 50,0 milioni di azioni · -3,0% sull'anno",
         "  CDS 5 anni: NESSUN CDS", "  solidita': lettura non significativa", "  Altman: NON APPLICABILE",
         "  debito: lettura non significativa"],
     "rotazione": [
@@ -8613,6 +8621,112 @@ check("v513 la regola sta nel formato (dove cercare, cosa trascrivere, i confron
       "`memoria/trimestri_ufficiali.json`" in _fmt513 and "**DEL COMUNICATO STESSO**" in _fmt513
       and "`preliminari`" in _fmt513 and "- `[comunicati]`" in _fmt513 and "comunicati" in SC.REGISTRO
       and any(i == "· CONTI DAL COMUNICATO UFFICIALE" for _s, i in SC.REGISTRO["comunicati"].righe))
+
+# ══════════════ v514 — FLOTTANTE E DILUIZIONE (CEO, 25/10/2026: «Inserisci anche un'analisi del flottante») ══════════════
+import statistics as _stat514
+from datetime import datetime as _dt514, timezone as _tz514
+_OGGI514 = _dt514(2026, 10, 25, 18, tzinfo=_tz514.utc)
+
+
+def _r514(tk="AAA", va=32.26, vt=7.42, serie=True, fl=363.6e6, sh=403.9e6, tot=371.6e6, fpct=90.0, rot=6.19,
+          quot="1998-06-11", nd=None):
+    a = {"voce": "Ordinary Shares Number", "al": "2026-06-30", "azioni": tot,
+         "serie": [{"trim": "2026-06-30", "azioni": tot}] if serie else [],
+         "rotazione": {"pct": rot, "sedute": 63, "dal": "2026-07-28", "al": "2026-10-23", "volume_medio": 1} if rot else None,
+         "quotata_dal": quot}
+    if va is not None:
+        a["var_anno"] = {"da": "2025-06-30", "pct": va}
+    if vt is not None:
+        a["var_trim"] = {"da": "2026-03-31", "pct": vt}
+    r = {"ticker": tk, "azioni": a, "stats": {"float_shares": fl, "shares": sh, "float_pct": fpct}}
+    if nd:
+        r["short_interest"] = {"flottante_nd": nd}
+    return r
+
+
+_m514 = SP.riga_flottante(_r514(), adesso=_OGGI514)
+_c514 = SP.riga_flottante(_r514("CCC", va=None, vt=6.1, fl=109.9e6, sh=112.2e6, tot=228.2e6, fpct=97.9, rot=7.17,
+                                quot="2026-05-14"), adesso=_OGGI514)
+_n514 = SP.riga_flottante(_r514("NNN", va=-0.8, vt=None, rot=0.5), adesso=_OGGI514)
+_t514 = SP.riga_flottante(_r514("TTT", nd="certificati"), adesso=_OGGI514)
+_x514 = SP.riga_flottante(_r514("XXX", va=None, vt=None, serie=False, fl=None), adesso=_OGGI514)
+_j514 = SP.riga_flottante(dict(_r514(), azioni=dict(_r514()["azioni"], var_anno={"da": "2025-06-30", "pct": None,
+                                                                                  "perche": "salto"})), adesso=_OGGI514)
+check("v514 la riga del flottante: le azioni del bilancio con la data e la voce, la diluizione sull'anno e sul trimestre "
+      "con la base datata e cosa vuol dire per chi tiene un'azione (+32,26% = il 24,4% in meno della societa'), il "
+      "flottante dichiarato SENZA data, la rotazione con la banda e le sedute",
+      _m514.startswith("flottante: azioni in circolazione al 30/06/2026: 371,6 milioni di azioni (stato patrimoniale")
+      and "+32,3% sull'anno (dal 30/06/2025): ogni azione possiede il 24,4% in meno della societa' di allora" in _m514
+      and "+7,4% sul trimestre (dal 31/03/2026)" in _m514
+      and "flottante 363,6 milioni di azioni (Yahoo, senza la data della rilevazione), il 90,0%" in _m514
+      and "il 6,19% del flottante a seduta (molto alta; 63 sedute concluse dal 28/07/2026 al 23/10/2026)" in _m514
+      and "quotata dal" not in _m514, _m514)
+check("v514 il bilancio con MENO azioni della fonte (emissioni dopo la sua data, MSTR) non si legge come piu' classi; "
+      "con PIU' azioni (CBRS: tre classi) il flottante si rilegge sul totale del bilancio e la causa NON si afferma",
+      "stato patrimoniale al" not in _m514.split("flottante 363")[1]
+      and "ne conta 228,2 milioni di azioni, contro 112,2 milioni di azioni dichiarate dalla fonte (piu' classi di azioni, "
+          "o azioni ritirate dopo quella data: i dati qui non dicono quale): sul totale del bilancio il flottante e' il "
+          "48,2% (due date diverse)" in _c514
+      and SP.quota_flottante(_r514("CCC", fl=109.9e6, sh=112.2e6, tot=228.2e6, fpct=97.9)) == 48.2
+      and SP.quota_flottante(_r514()) == 90.0, _c514)
+check("v514 i casi detti per quello che sono: le azioni diminuite («in piu' della societa'»), un salto non spiegato, "
+      "il certificato (flottante e volume di due specie: niente rotazione), la fonte senza azioni ne' flottante, la "
+      "quotazione recente coi vincoli di vendita da verificare nel prospetto",
+      "-0,8% sull'anno (dal 30/06/2025): ogni azione possiede lo 0,8% in piu' della societa' di allora" in _n514
+      and "(normale;" in _n514
+      and "sull'anno n.d. (dal 30/06/2025): fra i trimestri un salto che non e' una diluizione" in _j514
+      and "flottante n.d.: le azioni corte sono certificati di deposito americani" in _t514 and "rotazione" not in _t514
+      and "azioni in circolazione: la fonte non le pubblica" in _x514 and "flottante: la fonte non lo pubblica" in _x514
+      and "quotata dal 14/05/2026 (164 giorni): i vincoli di vendita dopo l'offerta (lock-up)" in _c514
+      and "da verificare in rete con la fonte" in _c514
+      and SP.riga_flottante({"ticker": "Z"}).startswith("flottante: snapshot precedente alla v514"),
+      str([_n514, _j514, _t514, _x514]))
+check("v514 le bande e l'aritmetica: la rotazione sotto 1% normale, da 1 a 3 alta, da 3 molto alta (il bordo dal lato "
+      "alto); +25% di azioni = il 20,0% in meno della societa' per azione; sopra il miliardo le azioni in miliardi",
+      SP.banda_rotazione(0.99) == "normale" and SP.banda_rotazione(1.0) == "alta" and SP.banda_rotazione(2.99) == "alta"
+      and SP.banda_rotazione(3.0) == "molto alta" and SP.banda_rotazione(None) is None
+      and "il 20,0% in meno" in SP.testo_diluizione({"da": "2025-06-30", "pct": 25.0}, "sull'anno")
+      and SP.testo_diluizione({"da": "2025-06-30", "pct": 0.0}, "sull'anno") == "0,0% sull'anno (dal 30/06/2025)"
+      and SP._az(13.176e9) == "13,18 miliardi di azioni" and SP._az(371.6e6) == "371,6 milioni di azioni")
+_righe514 = {"AAA": _r514("AAA"), "CCC": _r514("CCC", va=None, vt=6.1, fl=109.9e6, sh=112.2e6, tot=228.2e6, fpct=97.9,
+                                                rot=7.17, quot="2026-05-14"),
+             "NNN": _r514("NNN", va=-3.0, rot=0.5), "TTT": _r514("TTT", va=12.0, rot=0.03, nd="certificati"),
+             "OLD": {"ticker": "OLD", "stats": {}}}
+_bl514 = "\n".join(SP.blocco_flottante(_righe514, ["AAA", "CCC"], ["NNN", "TTT", "OLD"], adesso=_OGGI514))
+_bv514 = "\n".join(SP.blocco_flottante({"OLD": {"ticker": "OLD"}}, ["OLD"], [], adesso=_OGGI514))
+check("v514 il blocco in testa: le convenzioni dette per tali, la diluizione forte e le azioni diminuite ordinate, la "
+      "rotazione molto alta con la MEDIANA DEL GIORNO calcolata (non scritta a mano: v410) e senza i certificati, il "
+      "flottante ridotto letto sul totale del bilancio, le quotazioni recenti, chi non ha la misura nominato",
+      "convenzioni, non dati (v240)" in _bl514
+      and "diluizione forte sull'anno: AAA +32,3% (in posizione) · TTT +12,0% (sorvegliato)" in _bl514
+      and "azioni diminuite sull'anno: NNN -3,0%" in _bl514
+      and "rotazione molto alta del flottante: CCC 7,2% · AAA 6,2% — la mediana di oggi fra 3 nomi e' "
+          + SP._n(_stat514.median([6.19, 7.17, 0.5]), 2) + "% a seduta" in _bl514
+      and "TTT 0,0" not in _bl514 and "flottante ridotto: CCC 48,2%" in _bl514
+      and "quotate da poco (vincoli di vendita da verificare nel prospetto): CCC dal 14/05/2026" in _bl514
+      and "senza la misura in questo snapshot: OLD" in _bl514
+      and "snapshot precedente alla v514" in _bv514, _bl514)
+_dg514 = {"updated_at": "2026-10-25T14:00:00Z", "macro": {}, "portfolio": [],
+          "watchlist": [dict(_r514("AAA"), name="Alfa", price_asof="2026-10-23")]}
+_g514 = SP.genera(_dg514, ["AAA"], [])
+check("v514 collegamento ESEGUITO: genera stampa il blocco in testa dopo le vendite allo scoperto e la riga «flottante:» "
+      "nella scheda del nome",
+      "FLOTTANTE E DILUIZIONE" in _g514 and _g514.index("VENDITE ALLO SCOPERTO") < _g514.index("FLOTTANTE E DILUIZIONE")
+      and "\n  flottante: azioni in circolazione al 30/06/2026" in _g514
+      and _g514.index("FLOTTANTE E DILUIZIONE") < _g514.index("AAA [POSIZIONE]"))
+import comuni as _CM514
+check("v514 una regola sola per il trimestre trovato per data: le schede delegano a comuni.trimestre_a, che usa anche la "
+      "pipeline",
+      "return comuni.trimestre_a(q, data, giorni, tolleranza)" in _corpo_di(
+          (_ROOT / "scripts" / "schede_progetto.py").read_text(encoding="utf-8"), "_trimestre_a")
+      and SP._trimestre_a([{"trim": "2025-06-30"}], "2026-06-30", 365) == {"trim": "2025-06-30"}
+      and _CM514.trimestre_a([{"trim": "2025-03-31"}], "2026-06-30", 365) is None)
+_f514 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v514 la regola sta nel formato (la diluizione, il flottante sul totale, i vincoli di vendita dal prospetto e mai "
+      "dalle ricostruzioni dei giornali) e la richiesta nel registro, con la sua voce e il suo blocco nella scheda",
+      "**FLOTTANTE E" in _f514 and "quanta società" in _f514 and "lock-up" in _f514
+      and "mai dalle\n   ricostruzioni dei giornali" in _f514 and "- `[flottante]`" in _f514
+      and "flottante" in SC.REGISTRO and any(b.sezione == "flottante" for b in SC.CATALOGO["schede_progetto"].blocchi))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

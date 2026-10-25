@@ -101,6 +101,35 @@ def art(prep, testo):
     return (forme[1] if e == "lo" else forme[2] if e == "l'" else forme[0]) + str(testo)
 
 
+# ══════════════════════════ v514 — DUE REGOLE CHE PIPELINE E STRUMENTI DEVONO DARE UGUALI ══════════════════════════
+def seduta_aperta(data_iso, adesso=None):
+    """Vero se `data_iso` e' OGGI a New York e la campana delle 16:00 non e' ancora suonata: la barra di quella data e'
+    in formazione (v439, v469, v471). Il fuso, mai uno scarto a mano (v470). Una regola sola per la pipeline (la
+    rotazione del flottante, v514) e per gli strumenti (brief.barra_in_formazione la chiama)."""
+    from zoneinfo import ZoneInfo
+    ny = ZoneInfo("America/New_York")
+    adesso = (adesso or datetime.now(ny)).astimezone(ny)
+    return str(data_iso or "")[:10] == adesso.date().isoformat() and adesso.hour < 16
+
+
+def trimestre_a(q, data, giorni, tolleranza=20):
+    """Il trimestre di `q` (voci con «trim») che cade `giorni` prima di `data`: per DATA, mai per posizione (v207,
+    v393). Una regola sola per i conti delle schede e per le azioni in circolazione della pipeline (v514)."""
+    from datetime import date
+    try:
+        d0 = date.fromisoformat(str(data)[:10])
+    except ValueError:
+        return None
+    for x in q:
+        try:
+            dx = date.fromisoformat(str(x.get("trim"))[:10])
+        except ValueError:
+            continue
+        if abs((d0 - dx).days - giorni) <= tolleranza:
+            return x
+    return None
+
+
 # ══════════════════════════ v511 — LE DERIVAZIONI DELLE SERIE MACRO, UNA COPIA SOLA ══════════════════════════════
 def distanza_mesi(a: str, b: str) -> int:
     """quanti mesi separano due osservazioni ISO (b - a)."""

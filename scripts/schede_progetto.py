@@ -224,20 +224,10 @@ def scala_importi(valori):
 
 
 def _trimestre_a(q, data, giorni, tolleranza=20):
-    """Il trimestre che cade `giorni` prima di `data`: per DATA, mai per posizione (v207, v393)."""
-    from datetime import date
-    try:
-        d0 = date.fromisoformat(str(data)[:10])
-    except ValueError:
-        return None
-    for x in q:
-        try:
-            dx = date.fromisoformat(str(x.get("trim"))[:10])
-        except ValueError:
-            continue
-        if abs((d0 - dx).days - giorni) <= tolleranza:
-            return x
-    return None
+    """Il trimestre che cade `giorni` prima di `data`: per DATA, mai per posizione (v207, v393). v514 — la regola vive in
+    comuni.py: la usa anche la pipeline per le azioni in circolazione, e una regola in due posti diverge (v161)."""
+    import comuni
+    return comuni.trimestre_a(q, data, giorni, tolleranza)
 
 
 def ultimo_trimestre(r):
@@ -601,6 +591,187 @@ def blocco_short(righe, pos, sorv, macro, filtro=None):
     return L
 
 
+# ── v514 — FLOTTANTE E DILUIZIONE: le azioni in circolazione dai bilanci (per data), il flottante, quanto ne gira ─────
+# Il CEO, 25/10/2026: *"Inserisci anche un'analisi del flottante, se è utile"*. La misura della pipeline
+# (update_data.flottante_e_azioni) qui si rende e basta. Le soglie sono convenzioni (v240), scelte il 25/10/2026 sulla
+# distribuzione dei nomi seguiti: la mediana del giorno la calcola e la stampa il blocco, non questo commento (v410).
+AZ_DILUIZIONE_FORTE = 10.0      # da +10% di azioni in un anno la diluizione si elenca in testa
+AZ_RIACQUISTI = -2.0            # da -2% in un anno: riacquisti che riducono le azioni
+ROT_BANDE = ((1.0, "normale"), (3.0, "alta"))      # % del flottante scambiata a seduta; da 3% «molto alta»
+FLOTTANTE_RIDOTTO = 50.0        # sotto meta' delle azioni che la fonte dichiara
+QUOTATA_RECENTE_GG = 540        # diciotto mesi: comprende il vincolo usuale di 180 giorni e quello di 366 dei soci forti
+AZ_CLASSI = 0.05                # oltre il 5% di scarto fra il bilancio e le azioni dichiarate da Yahoo: piu' classi
+
+
+def banda_rotazione(p):
+    if p is None:
+        return None
+    for soglia, nome in ROT_BANDE:
+        if p < soglia:
+            return nome
+    return "molto alta"
+
+
+def flottante_nd(r):
+    """Quando flottante e volume non sono della stessa specie: la regola delle vendite allo scoperto (v506), una sola."""
+    nd = ((r or {}).get("short_interest") or {}).get("flottante_nd")
+    return nd if nd in ("certificati", "classi") else None
+
+
+def _az(q):
+    """Un numero di azioni: sopra il miliardo in miliardi, perche' «13176,0 milioni» non si legge."""
+    if q is not None and q >= 1e9:
+        return f"{_n(q / 1e9, 2)} miliardi di azioni"
+    return _azioni(q)
+
+
+def flottante_su_totale(r):
+    """(quota, totale) quando lo stato patrimoniale conta PIU' azioni di quelle che la fonte dichiara oltre AZ_CLASSI:
+    il flottante di Yahoo letto sulle sue azioni sembra quasi tutto (CBRS 97,9% il 25/10/2026) mentre sul totale del
+    bilancio e' meta'. Il contrario — il bilancio con MENO azioni della fonte — e' quasi sempre un'emissione dopo la data
+    del bilancio (MSTR), e non dice niente delle classi: None."""
+    a, st = (r or {}).get("azioni") or {}, (r or {}).get("stats") or {}
+    fl, sh, tot = st.get("float_shares"), st.get("shares"), a.get("azioni")
+    if fl and sh and tot and tot > sh * (1 + AZ_CLASSI) and not flottante_nd(r):
+        return round(fl / tot * 100, 1), tot
+    return None
+
+
+def quota_flottante(r):
+    """La quota del flottante che si legge: sul totale del bilancio quando la fonte ne conta meno, altrimenti quella
+    della fonte. Una derivazione sola per la riga e per l'elenco in testa (v161)."""
+    ft = flottante_su_totale(r)
+    if ft:
+        return ft[0]
+    if flottante_nd(r):
+        return None
+    return ((r or {}).get("stats") or {}).get("float_pct")
+
+
+def testo_diluizione(v, etichetta):
+    """Una variazione delle azioni con la sua base datata, e cosa vuol dire per chi tiene un'azione."""
+    if not v:
+        return None
+    if v.get("pct") is None:
+        return (f"{etichetta} n.d. (dal {_data_it(v['da'])}): fra i trimestri un salto che non e' una diluizione — un "
+                "frazionamento non rettificato dalla fonte o classi riclassificate")
+    p = v["pct"]
+    t = f"{_sg1(p)}% {etichetta} (dal {_data_it(v['da'])})"
+    q = round((1 - 1 / (1 + p / 100)) * 100, 1)
+    if q > 0:
+        t += f": ogni azione possiede {art('il', _n(q, 1) + '%')} in meno della societa' di allora"
+    elif q < 0:
+        t += f": ogni azione possiede {art('il', _n(-q, 1) + '%')} in piu' della societa' di allora (le azioni sono diminuite)"
+    return t
+
+
+def riga_flottante(r, adesso=None):
+    """La riga «flottante:» di ogni scheda (v514). Ogni assenza si dichiara (v406)."""
+    a = r.get("azioni")
+    if a is None:
+        return ("flottante: snapshot precedente alla v514 — la pipeline non pubblica ancora azioni in circolazione, "
+                "diluizione e rotazione: il dato che manca, non un valore nullo")
+    pz = []
+    if a.get("serie"):
+        pz.append(f"azioni in circolazione al {_data_it(a['al'])}: {_az(a['azioni'])} (stato patrimoniale, voce "
+                  f"«{a.get('voce')}»)")
+        pz.append(testo_diluizione(a.get("var_anno"), "sull'anno")
+                  or "sull'anno n.d. (la tabella non ha il trimestre di un anno prima)")
+        x = testo_diluizione(a.get("var_trim"), "sul trimestre")
+        if x:
+            pz.append(x)
+    else:
+        pz.append("azioni in circolazione: la fonte non le pubblica")
+    st = r.get("stats") or {}
+    nd, fl = flottante_nd(r), st.get("float_shares")
+    if nd:
+        pz.append("flottante n.d.: " + FLOTTANTE_ND[nd])
+    elif fl:
+        s = f"flottante {_az(fl)} (Yahoo, senza la data della rilevazione)"
+        if st.get("float_pct") is not None:
+            s += f", {art('il', _n(st['float_pct'], 1) + '%')} delle azioni che la fonte dichiara"
+        ft = flottante_su_totale(r)
+        if ft:
+            s += (f" — ma lo stato patrimoniale al {_data_it(a['al'])} ne conta {_az(ft[1])}, contro "
+                  f"{_az(st.get('shares'))} dichiarate dalla fonte (piu' classi di azioni, o azioni ritirate dopo quella "
+                  f"data: i dati qui non dicono quale): sul totale del bilancio il flottante e' "
+                  f"{art('il', _n(ft[0], 1) + '%')} (due date diverse)")
+        pz.append(s)
+        ro = a.get("rotazione")
+        if ro:
+            pz.append(f"rotazione: si scambia in media {art('il', _n(ro['pct'], 2) + '%')} del flottante a seduta "
+                      f"({banda_rotazione(ro['pct'])}; {ro['sedute']} sedute concluse dal {_data_it(ro['dal'])} al "
+                      f"{_data_it(ro['al'])})")
+    else:
+        pz.append("flottante: la fonte non lo pubblica")
+    q = a.get("quotata_dal")
+    if q:
+        oggi = (adesso or datetime.now(timezone.utc)).date()
+        try:
+            gg = (oggi - datetime.fromisoformat(q).date()).days
+        except ValueError:
+            gg = None
+        if gg is not None and 0 <= gg < QUOTATA_RECENTE_GG:
+            pz.append(f"quotata dal {_data_it(q)} ({gg} giorni): i vincoli di vendita dopo l'offerta (lock-up) e i loro "
+                      "scaglioni stanno nel prospetto, che il sistema non legge — ogni scaglione che scade aggiunge "
+                      "azioni al flottante: da verificare in rete con la fonte")
+    return "flottante: " + " · ".join(pz)
+
+
+def blocco_flottante(righe, pos, sorv, filtro=None, adesso=None):
+    """FLOTTANTE E DILUIZIONE, in testa alle schede: le convenzioni, i nomi che le superano, la mediana del giorno."""
+    import statistics
+    L = ["FLOTTANTE E DILUIZIONE — le azioni in circolazione dai bilanci trimestrali (per data), il flottante e quanto ne "
+         "gira a seduta (v514)"]
+    L.append(f"  convenzioni, non dati (v240): diluizione forte da +{_n(AZ_DILUIZIONE_FORTE, 0)}% di azioni in un anno · "
+             f"riacquisti da {_n(AZ_RIACQUISTI, 0)}% · rotazione del flottante a seduta sotto {_n(ROT_BANDE[0][0], 0)}% "
+             f"normale, {_n(ROT_BANDE[0][0], 0)}-{_n(ROT_BANDE[1][0], 0)}% alta, da {_n(ROT_BANDE[1][0], 0)}% molto alta · "
+             f"flottante ridotto sotto {art('il', _n(FLOTTANTE_RIDOTTO, 0) + '%')} delle azioni · quotazione recente "
+             f"sotto i {QUOTATA_RECENTE_GG} giorni")
+    L.append("  ⚠ la diluizione e' un fatto del bilancio (azioni a fine trimestre, con la data); il flottante di Yahoo non "
+             "ha la data della rilevazione; nessuna di queste misure e' una prova della tenuta")
+    voci = [(tk, ru, righe[tk]) for gr, ru in ((pos, "POSIZIONE"), (sorv, "SORVEGLIATO")) for tk in gr
+            if tk in righe and not (filtro and tk not in filtro)]
+    con = [(tk, ru, r, r["azioni"]) for tk, ru, r in voci if r.get("azioni") is not None]
+    if not con:
+        L.append("  snapshot precedente alla v514: la pipeline non pubblica ancora le azioni in circolazione — il dato "
+                 "che manca, non un valore nullo")
+        return L
+    va = [(tk, ru, a["var_anno"]["pct"]) for tk, ru, _r, a in con if (a.get("var_anno") or {}).get("pct") is not None]
+    sigla = {"POSIZIONE": "in posizione", "SORVEGLIATO": "sorvegliato"}
+    dil = sorted(((tk, ru, p) for tk, ru, p in va if p >= AZ_DILUIZIONE_FORTE), key=lambda x: (-x[2], x[0]))
+    L.append(f"  diluizione forte sull'anno: " + (" · ".join(f"{tk} {_sg1(p)}% ({sigla[ru]})" for tk, ru, p in dil)
+                                                 if dil else "nessun nome"))
+    rac = sorted(((tk, ru, p) for tk, ru, p in va if p <= AZ_RIACQUISTI), key=lambda x: (x[2], x[0]))
+    L.append(f"  azioni diminuite sull'anno: " + (" · ".join(f"{tk} {_sg1(p)}%" for tk, ru, p in rac) if rac else "nessun nome"))
+    ro = [(tk, r["azioni"]["rotazione"]["pct"]) for tk, _ru, r, _a in con
+          if (r["azioni"].get("rotazione") or {}).get("pct") is not None and not flottante_nd(r)]
+    if ro:
+        alte = sorted(((tk, p) for tk, p in ro if banda_rotazione(p) == "molto alta"), key=lambda x: (-x[1], x[0]))
+        L.append(f"  rotazione molto alta del flottante: " + (" · ".join(f"{tk} {_n(p, 1)}%" for tk, p in alte)
+                                                              if alte else "nessun nome")
+                 + f" — la mediana di oggi fra {len(ro)} nomi e' {_n(statistics.median(p for _t, p in ro), 2)}% a seduta")
+    rid = sorted(((tk, quota_flottante(r)) for tk, _ru, r, _a in con
+                  if quota_flottante(r) is not None and quota_flottante(r) < FLOTTANTE_RIDOTTO), key=lambda x: (x[1], x[0]))
+    L.append(f"  flottante ridotto: " + (" · ".join(f"{tk} {_n(p, 1)}%" for tk, p in rid) if rid else "nessun nome"))
+    oggi = (adesso or datetime.now(timezone.utc)).date()
+    rec = []
+    for tk, _ru, _r, a in con:
+        try:
+            gg = (oggi - datetime.fromisoformat(a["quotata_dal"]).date()).days if a.get("quotata_dal") else None
+        except ValueError:
+            gg = None
+        if gg is not None and 0 <= gg < QUOTATA_RECENTE_GG:
+            rec.append((tk, a["quotata_dal"], gg))
+    rec.sort(key=lambda x: x[2])
+    L.append(f"  quotate da poco (vincoli di vendita da verificare nel prospetto): "
+             + (" · ".join(f"{tk} dal {_data_it(q)}" for tk, q, _g in rec) if rec else "nessun nome"))
+    senza = sorted(tk for tk, _ru, r in voci if r.get("azioni") is None)
+    if senza:
+        L.append(f"  senza la misura in questo snapshot: {', '.join(senza)}")
+    return L
+
+
 def riga_trimestrale(r, sec):
     pz = []
     if r.get("earnings_date"):
@@ -808,7 +979,7 @@ def scheda(tk, ruolo, righe, sec, meta_cds=None, dsec=None):
         out.append("  sensibilita' macro: n.d.")
     out.append("  " + riga_revisioni(r.get("analisti")))
     out.append("  " + riga_valutazione(r))          # v492 — il P/E come metrica
-    for f in (riga_ricavi, riga_cassa, riga_short):
+    for f in (riga_ricavi, riga_cassa, riga_short, riga_flottante):
         x = f(r)
         if x:
             out.append("  " + x)
@@ -858,6 +1029,7 @@ def genera(dati, pos, sorv, filtro=None):
         if isinstance(b, dict) and b.get("cds"):
             out.append(f"{b.get('ticker')} [POSIZIONE, titolo di Stato] — " + riga_cds(b, meta_cds))
     out.extend(blocco_short(righe, pos, sorv, dati.get("macro"), filtro))      # v506 — le vendite allo scoperto
+    out.extend(blocco_flottante(righe, pos, sorv, filtro))                     # v514 — flottante e diluizione
     mancanti = []
     for gruppo, ruolo in ((pos, "POSIZIONE"), (sorv, "SORVEGLIATO")):
         for tk in gruppo:

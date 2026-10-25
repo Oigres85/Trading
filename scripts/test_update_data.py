@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 388  # +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 396  # v514: 401 eseguiti · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -2650,7 +2650,10 @@ _sol504 = _SRC_UD_CODICE.find("_sol = solidita_operativa(t, _comb")
 check("v504 collegamento: il giro dei titoli calcola la solidita' operativa DOPO la combustione e con la combustione (il "
       "flusso dei 12 mesi ha un proprietario solo), in un try suo, e la pubblica nella riga del titolo",
       _sol504 > 0 and 0 < _SRC_UD_CODICE.find("_comb = combustione(t, ") < _sol504
-      and '"solidita": _sol' in _SRC_UD_CODICE and "_comb = _cred = _fuori = _short = _sol = None" in _SRC_UD_CODICE)
+      # v514 — l'invariante e' che `_sol` sia inizializzata PRIMA del ramo insieme alle altre (v369), non la lunghezza
+      #   della riga: la v514 ci ha aggiunto `_az` e la forma letterale andava rossa su codice giusto
+      and '"solidita": _sol' in _SRC_UD_CODICE
+      and bool(__import__("re").search(r"_comb = _cred = _fuori = _short = _sol(?: = [a-z_]+)* = None", _SRC_UD_CODICE)))
 
 # ============================ v506 — VENDITE ALLO SCOPERTO: LE POSIZIONI CORTE APERTE (FINRA) ============================
 # Richiesta del CEO del 19/10/2026: "Analizza anche azioni allo scoperto ovvero attività short in % sui titoli ... e
@@ -3520,6 +3523,87 @@ check("v512 stagionalita' di S&P 500 e Nasdaq-100: ottobre si misura sugli ottob
 check("v512 una regola sola per i mesi conclusi: la stagionalita' del titolo e quella degli indici passano da mesi_conclusi",
       "monthly = mesi_conclusi(monthly, adesso)" in _c512 and "h = mesi_conclusi(h, adesso)" in _c512
       and _c512.count("(d.year, d.month) < (ny.year, ny.month)") == 1)
+
+# ============== v514 — AZIONI IN CIRCOLAZIONE, DILUIZIONE E ROTAZIONE DEL FLOTTANTE (CEO, 25/10/2026) ==============
+# Lo stato si COSTRUISCE (v425, v429): stati patrimoniali e barre finte nel formato di yfinance, nessuna rete.
+class _T514:
+    def __init__(self, bs):
+        self._bs = bs
+
+    @property
+    def quarterly_balance_sheet(self):
+        if isinstance(self._bs, Exception):
+            raise self._bs
+        return self._bs
+
+
+def _bs514(righe, date):
+    return pd.DataFrame(righe, index=[pd.Timestamp(d) for d in date]).T
+
+
+_date514 = ["2026-06-30", "2026-03-31", "2025-12-31", "2025-09-30", "2025-06-30"]
+_a514 = ud.azioni_in_circolazione(_T514(_bs514(
+    [{"Ordinary Shares Number": v, "Share Issued": v + 5} for v in (130.0, 120.0, float("nan"), 105.0, 100.0)], _date514)))
+_b514 = ud.azioni_in_circolazione(_T514(_bs514([{"Share Issued": v} for v in (50.0, 40.0)], _date514[:2])))
+check("v514 le azioni in circolazione dallo stato patrimoniale, con la loro data e la voce: «Ordinary Shares Number» "
+      "prima (emesse meno proprie), «Share Issued» come ripiego, una cella vuota e' un buco (v205); senza la voce, senza "
+      "lo stato o con un errore della fonte: None",
+      _a514 and _a514["voce"] == "Ordinary Shares Number"
+      and [x["trim"] for x in _a514["serie"]] == ["2026-06-30", "2026-03-31", "2025-09-30", "2025-06-30"]
+      and _a514["serie"][0]["azioni"] == 130 and _b514 and _b514["voce"] == "Share Issued"
+      and ud.azioni_in_circolazione(_T514(None)) is None
+      and ud.azioni_in_circolazione(_T514(_bs514([{"Total Assets": 1.0}], ["2026-06-30"]))) is None
+      and ud.azioni_in_circolazione(_T514(RuntimeError("Yahoo"))) is None)
+# per DATA, mai per posizione: con un trimestre mancante la quarta voce non e' l'anno prima (v207, v393)
+_s514 = [{"trim": "2026-06-30", "azioni": 130}, {"trim": "2026-03-31", "azioni": 120}, {"trim": "2025-12-31", "azioni": 115},
+         {"trim": "2025-06-30", "azioni": 100}, {"trim": "2025-03-31", "azioni": 90}]   # per posizione: +44,4%
+_v514 = ud.variazioni_azioni(_s514)
+check("v514 diluizione per DATA: sull'anno la base e' il 30/06/2025 (+30%), non la quinta voce per posizione; sul "
+      "trimestre il 31/03/2026; il valore e' quello arrotondato a due decimali",
+      _v514["al"] == "2026-06-30" and _v514["var_anno"] == {"da": "2025-06-30", "pct": 30.0}
+      and _v514["var_trim"] == {"da": "2026-03-31", "pct": round((130 / 120 - 1) * 100, 2)}
+      and "salti" not in _v514)
+_sal514 = ud.variazioni_azioni([{"trim": "2026-06-30", "azioni": 1300}, {"trim": "2026-03-31", "azioni": 1200},
+                                {"trim": "2025-12-31", "azioni": 115}, {"trim": "2025-06-30", "azioni": 100}])
+# il caso vero di TSM il 25/10/2026: -0,00095% arrotondato a due decimali e' «-0.0», che si stamperebbe col segno
+_zero514 = ud.variazioni_azioni([{"trim": "2026-06-30", "azioni": 25932370067}, {"trim": "2025-06-30", "azioni": 25932615521}])
+check("v514 un salto fuori da AZ_SALTO fra due trimestri (un frazionamento non rettificato) ferma la variazione che lo "
+      "attraversa e si dichiara; quella che non lo attraversa resta; uno zero non e' mai «-0,0»",
+      _sal514["salti"] == [{"dal": "2025-12-31", "al": "2026-03-31", "rapporto": round(1200 / 115, 2)}]
+      and _sal514["var_anno"] == {"da": "2025-06-30", "pct": None, "perche": "salto"}
+      and _sal514["var_trim"]["pct"] == round((1300 / 1200 - 1) * 100, 2)
+      and str(_zero514["var_anno"]["pct"]) == "0.0" and ud.AZ_SALTO == (0.55, 1.9) and ud.variazioni_azioni([]) == {})
+_ix514 = pd.bdate_range("2026-07-01", "2026-10-23")
+_h514 = pd.DataFrame({"Volume": [1000.0] * len(_ix514)}, index=_ix514)
+_h514.iloc[-1, 0] = 0.0                                  # una seduta senza volume: un buco, non uno zero
+_h514o = pd.concat([_h514, pd.DataFrame({"Volume": [99000.0]}, index=[pd.Timestamp("2026-10-26")])])
+_NY514 = ud.ZoneInfo("America/New_York")
+_ra514 = ud.rotazione_flottante(_h514o, 10000.0, adesso=ud.datetime(2026, 10, 26, 11, 0, tzinfo=_NY514))
+_rc514 = ud.rotazione_flottante(_h514o, 10000.0, adesso=ud.datetime(2026, 10, 26, 17, 0, tzinfo=_NY514))
+check("v514 rotazione del flottante: volume medio delle ultime 63 sedute CONCLUSE diviso il flottante — a seduta aperta "
+      "la barra di oggi resta fuori, dopo la campana entra; la seduta a volume zero non entra; con meno di venti sedute, "
+      "senza flottante o senza volume: None",
+      _ra514 and _ra514["pct"] == 10.0 and _ra514["sedute"] == 63 and _ra514["al"] == "2026-10-22"
+      and _rc514 and _rc514["al"] == "2026-10-26" and _rc514["pct"] > 10.0
+      and ud.rotazione_flottante(_h514.iloc[:15], 10000.0) is None and ud.rotazione_flottante(_h514, 0) is None
+      and ud.rotazione_flottante(_h514, None) is None and ud.rotazione_flottante(None, 10000.0) is None)
+_fa514 = ud.flottante_e_azioni(_T514(_bs514([{"Ordinary Shares Number": v} for v in (130.0, 100.0)],
+                                             ["2026-06-30", "2025-06-30"])), _h514, {"firstTradeDateMilliseconds":
+                                                                                    1781271000000}, 10000.0)
+check("v514 il blocco della riga: azioni, variazioni, rotazione e la data di quotazione (firstTradeDate della fonte, "
+      "il giorno UTC); senza nulla di tutto questo None, non un dizionario vuoto",
+      _fa514["var_anno"]["pct"] == 30.0 and _fa514["rotazione"]["pct"] == 10.0 and _fa514["quotata_dal"] == "2026-06-12"
+      and ud.flottante_e_azioni(_T514(None), None, {}, None) is None)
+_br514 = (Path(__file__).with_name("brief.py")).read_text(encoding="utf-8")
+check("v514 collegamento: fetch_symbol calcola il blocco in un try suo coi dati del titolo e lo pubblica nella riga, "
+      "inizializzato PRIMA del ramo (v369); la barra in formazione e il trimestre per data sono UNA regola in comuni.py, "
+      "che pipeline e strumenti importano senza tenerne una copia",
+      "_az = flottante_e_azioni(t, hist, info, float_sh)" in _SRC_UD_CODICE and '"azioni": _az' in _SRC_UD_CODICE
+      and bool(__import__("re").search(r"_comb = _cred = _fuori = _short = _sol = _az = None", _SRC_UD_CODICE))
+      and "from comuni import seduta_aperta, trimestre_a" in _SRC_UD_CODICE
+      and ud.seduta_aperta is __import__("comuni").seduta_aperta and ud.trimestre_a is __import__("comuni").trimestre_a
+      and "return seduta_aperta(d[-1][\"t\"], adesso)" in _br514 and "adesso.hour < 16" not in _br514
+      and _SRC_UD_CODICE.count("adesso.hour < 16") == 0)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

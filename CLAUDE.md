@@ -8764,3 +8764,62 @@ della tabella ferma. Farlo leggere alla pipeline è un cambiamento della pagina;
   riga nuova, e il gate nei due versi ha dichiarato ASSENTE la richiesta — che è il suo lavoro.
 - Pavimento di `test_analisi_libro.py` 880 → 895 (926 check). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al
   browser (v440).
+
+## 🧮 v514 — IL FLOTTANTE: LA PARTE UTILE ERA LA DILUIZIONE, E I VINCOLI DI VENDITA NON SI PRENDONO DAI GIORNALI
+
+Il CEO, 25/10/2026, testuale: *"Inserisci anche un'analisi del flottante, se è utile"*. Il «se è utile» è stato preso
+alla lettera: **misurato prima di scrivere**. Il sistema aveva già il flottante di Yahoo, ma lo usava solo come
+denominatore delle vendite allo scoperto (v506).
+
+### Cosa la misura ha detto
+| parte | utile? | perché |
+|---|---|---|
+| **diluizione** (azioni a fine trimestre, sull'anno, per data) | **sì, la più utile** | MSTR +32%, BE +26%, OKLO +25%, TSLA +22%, CRWV +13%, SMCI +11%: una crescita dei ricavi del 25% col 25% di azioni in più non arriva a chi tiene un'azione. E un fatto datato del bilancio |
+| **flottante sul totale del bilancio** | sì | Yahoo dava a Cerebras il **97,9%** di flottante; lo stato patrimoniale conta il doppio delle azioni (tre classi) e sul totale è il **48%**. SpaceX 33% per Yahoo, **21%** sul totale |
+| **rotazione del flottante** (volume medio a seduta ÷ flottante) | sì, come informazione | mediana 0,75-0,9% a seduta sui nomi seguiti, **5-11%** sui nomi speculativi del libro (CRWV 11,3%) |
+| **vincoli di vendita dopo la quotazione** (lock-up) | sì, ma **non dai dati qui** | vedi sotto |
+| quota di insider e istituzionali | no | Yahoo non ne pubblica la data, e il flottante sul totale dice già quanta parte delle azioni non gira (v396) |
+
+### ⚠⚠ I vincoli di vendita: le fonti secondarie non concordavano, e il prospetto non si legge da qui
+Per SpaceX (quotata il 12/06/2026) e Cerebras (14/05/2026) i giornali davano calendari a scaglioni diversi fra loro —
+date, quote e condizioni. Il prospetto è la fonte, ma SEC risponde 403 senza un contatto (che non si manda a un servizio
+nuovo), la copia del collocatore è un PDF senza testo estraibile da qui, e la pagina degli investitori risponde 403.
+Quindi **nessuna data di lock-up è stata registrata**: la riga dichiara la data di quotazione e che i vincoli vanno
+verificati nel prospetto, e il formato chiede alla risposta di cercarli **nel prospetto o in un deposito della
+società**, mai nelle ricostruzioni dei giornali. *Meglio non avere dati che averli non corretti* (v396).
+
+### Cosa fa il sistema
+- **La pipeline misura** (`update_data.flottante_e_azioni`, in un try suo): le azioni in circolazione dallo stato
+  patrimoniale trimestrale («Ordinary Shares Number», ripiego «Share Issued»), le variazioni **per data** sull'anno e sul
+  trimestre, la rotazione sulle 63 sedute **concluse**, la data di quotazione.
+- ⚠ **Un salto fuori da 0,55-1,9 fra due trimestri non è una diluizione**: è un frazionamento che la fonte non ha
+  rettificato o una riclassificazione delle classi, e la variazione che lo attraversa non si pubblica. Yahoo rettifica
+  i frazionamenti (NFLX 10:1, misurato): questa è la rete se non lo fa.
+- **Le schede rendono** (`riga_flottante`, `blocco_flottante`): la diluizione con **cosa vuol dire per chi tiene
+  un'azione** (+32,3% = il 24,4% in meno della società), il flottante dichiarato senza data, la rotazione con la sua
+  banda, e in testa i nomi oltre le convenzioni con la **mediana del giorno calcolata**, non scritta a mano (v410).
+- ⚠⚠ **La prima stesura affermava una causa che i dati non portano.** Su MSTR scriveva «più classi di azioni» perché il
+  bilancio e Yahoo differivano dell'8% — ma lì il bilancio conta **meno** azioni di Yahoo: è un'emissione dopo la data
+  del bilancio, non una classe. La nota esce solo quando il bilancio conta **più** azioni della fonte, e dichiara le due
+  cause possibili invece di sceglierne una. Trovato leggendo l'uscita come il destinatario.
+- **Due regole in un posto solo** (v161): la barra in formazione (`comuni.seduta_aperta`, che `brief.barra_in_formazione`
+  ora chiama) e il trimestre trovato per data (`comuni.trimestre_a`, che `schede_progetto._trimestre_a` ora chiama) —
+  servono anche alla pipeline, che gli strumenti non li importa.
+- È **informazione**: non una prova della tenuta, non un colore.
+
+### 🧪 Il metodo
+- **22 iniezioni**, una alla volta su cinque copie del repo verificate per impronta, con `modifica_sicura` e ripristino
+  dallo snapshot: **mordono tutte, ciascuna sul controllo atteso**. Una (lo zero col segno) non mordeva al primo giro: la
+  fixture metteva 100 contro 100, che da' uno zero positivo, mentre «−0,0» nasce da una variazione minuscola e negativa —
+  il caso vero di TSM, −0,00095%. *Un'iniezione che non morde prova che la fixture non contiene il fenomeno* (v430).
+- ⚠ Due controlli vecchi pinnavano la **forma** di una riga che la v514 ha allungato (l'elenco delle variabili
+  inizializzate prima del ramo, v369/v504; la tupla delle righe della scheda, v476): riagganciati all'invariante, non
+  zittiti.
+- ⚠ Un mio controllo era rosso per la **fixture**: fra due trimestri c'era un dimezzamento, cioè proprio il salto che la
+  regola deve fermare. *Un check rosso è prima di tutto una fixture da verificare* (v433).
+- ⚠ Il `check()` di `test_update_data.py` prende **due** argomenti: un terzo argomento di dettaglio ha fatto morire la
+  suite con un `TypeError` invece di farla parlare — rumorosamente, che è il comportamento giusto.
+- Pavimenti: `test_update_data.py` 365 → 375 e N_CHECKS_MINIMO 388 → 396 (401 eseguiti); `test_analisi_libro.py`
+  895 → 905 (934). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+- ⚠ **Il campo arriva col prossimo run della pipeline**: fino ad allora schede e blocco dicono «snapshot precedente alla
+  v514», che è vero.

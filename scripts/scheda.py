@@ -84,6 +84,7 @@ SEZIONI = (
     ("gamma", "5bis · Gamma dei dealer"),
     ("dark_pool", "5bis · Dark pool"),
     ("short", "5bis · Vendite allo scoperto: posizioni corte aperte (FINRA)"),
+    ("flottante", "5bis · Flottante e diluizione: azioni in circolazione, flottante, rotazione, quotazione"),
     ("cftc", "5bis · Grandi operatori (CFTC)"),
     ("bitcoin", "5bis · Bitcoin dall'ultima chiusura USA"),
     ("indici", "5ter · Indici: S&P 500 e Nasdaq-100"),
@@ -195,6 +196,7 @@ CATALOGO = {
         Blocco(r"SEGNALI DEL CREDITO", "credito_salute"),
         Blocco(r"[A-Z][A-Z0-9\-]* \[POSIZIONE, titolo di Stato\]", "cds"),
         Blocco(r"VENDITE ALLO SCOPERTO", "short"),                       # v506
+        Blocco(r"FLOTTANTE E DILUIZIONE", "flottante"),                  # v514
     ), nomi_col0=(Nome(rf"{TK} \[(?:POSIZIONE|SORVEGLIATO)\]", "schede", sommario=False),)),
     "rotazione": Strumento("candidati", (
         Blocco(r"CANDIDATI PER SETTORE", "candidati"),
@@ -298,6 +300,7 @@ REGISTRO = {
     "cds": Voce(("cds",), (Marcatore("schede", "CDS 5 anni", "tutti"),)),
     "dark_pool": Voce(("dark_pool",), (Marcatore("dark_pool", None, None),)),
     "short": Voce(("short",), (Marcatore("schede", "short:", "tutti"),)),                     # v506
+    "flottante": Voce(("flottante",), (Marcatore("schede", "flottante:", "tutti"),)),         # v514
     "gamma": Voce(("gamma",), (Marcatore("gamma", None, "posizioni"),)),
     "indici": Voce(("indici",)),
     "fear_greed": Voce(("indici",), righe=(("indici", "Fear & Greed (CNN):"),)),                       # v510

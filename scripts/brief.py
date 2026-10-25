@@ -25,7 +25,7 @@ from email.utils import parsedate_to_datetime
 from xml.etree import ElementTree
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from comuni import testo_feed  # noqa: E402 — v510: il titolo di una voce come lo legge una persona
+from comuni import testo_feed, seduta_aperta  # noqa: E402 — v510 il titolo di una voce; v514 la barra in formazione
 
 RADICE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -207,8 +207,7 @@ def barra_in_formazione(d, adesso=None):
     una regola in due posti diverge al primo ritocco (v161)."""
     if not d:
         return False
-    adesso = (adesso or datetime.now(NEW_YORK)).astimezone(NEW_YORK)
-    return d[-1]["t"] == adesso.date().isoformat() and adesso.hour < 16
+    return seduta_aperta(d[-1]["t"], adesso)      # v514 — la regola vive in comuni.py: la usa anche la pipeline
 
 
 def atr_wilder(d, n=14):
