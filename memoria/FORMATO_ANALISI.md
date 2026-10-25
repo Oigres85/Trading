@@ -48,6 +48,16 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    trimestri della pipeline è ferma prima di un deposito di risultati prende il trimestre da Nasdaq, solo se le due fonti
    danno gli stessi numeri sul trimestre in comune. Gli strumenti dopo di lui leggono quei dati. Stampa ogni quanto cambia
    ciascun dato e la lista **DA CERCARE IN RETE**: dove nemmeno la fonte è aggiornata.
+   **Il comunicato ufficiale** (v513, scelta del CEO del 25/10/2026: *"A"*): dove Yahoo e Nasdaq non concordano sui ricavi
+   (le banche) o nessuna delle due porta ancora il trimestre, DA CERCARE IN RETE chiede il comunicato della società. La
+   risposta lo cerca (l'8-K con l'Exhibit 99.1 su SEC, o la pagina dei risultati), ne trascrive i numeri in
+   `memoria/trimestri_ufficiali.json` **come il comunicato li stampa** — ricavi, utile, risultato operativo, ciascuno con
+   la voce che lo porta, e i confronti **DEL COMUNICATO STESSO** (l'anno prima e il trimestre prima), il link, la data e
+   il giorno della verifica — e rilancia l'analisi: da lì il trimestre entra nelle schede e nella tenuta. ⚠ Un trimestre
+   del comunicato non si confronta MAI con la tabella di un altro fornitore: su JPM il 2° trimestre 2026 vale 57,347
+   miliardi nel comunicato e 52,852 in Yahoo, e una variazione fra i due misurerebbe la definizione. ⚠ Un intervallo di
+   stime o un risultato preliminare non è un numero del trimestre: va nella lista `preliminari` del registro, così lo
+   strumento non lo chiede di nuovo. Un trimestre registrato non cambia: la ricerca si fa una volta per trimestre e nome.
 0. **Prima dell'apertura americana (prima delle 15:30 italiane) l'analisi parte dal PRE-MARKET**
    (istruzione del CEO, 06/10/2026): `python3 scripts/numeri_libro.py --esteso` — risultato del
    libro sul prezzo esteso, livelli ricalcolati su quel prezzo, titoli che fuori sessione stanno
@@ -466,6 +476,7 @@ chiave fra parentesi quadre, e `scripts/scheda.py` la mette nella SCHEDA COMPLET
 che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catalogo non ne abbia una che qui non c'è):
 - `[freschezza]` i dati in ritardo tolti dove una fonte raggiungibile c'è: le serie macro lette alla fonte all'ora dell'analisi, la pipeline come ripiego dichiarato riga per riga, e la sua età con ciò che porta solo lei (25/10)
 - `[fine_anno]` calendario fiscale di fine anno, da ottobre a gennaio: i nomi in perdita sull'anno con la capitalizzazione, e dove la regolarità è misurata (piccoli) e dove è rumore (grandi) — informazione (25/10)
+- `[comunicati]` dove le fonti non concordano sui ricavi (le banche) o nessuna porta il trimestre, i conti dal comunicato ufficiale della società con fonte, link e data, confrontati solo coi trimestri del comunicato stesso (25/10)
 - `[freschezza_titoli]` i dati per titolo della pipeline letti alla fonte se vecchi — analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC, trimestri che la pipeline non ha ancora — con ogni quanto cambiano, e cercati nelle notizie dove nemmeno la fonte è aggiornata (25/10)
 - `[semaforo]` semaforo d'uscita (06/10), calcolato (09/10)
 - `[attesa]` costo dell'attesa e scadenze (06/10)

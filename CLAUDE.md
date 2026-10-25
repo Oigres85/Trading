@@ -8699,3 +8699,68 @@ corta» si leggono uguali e sono due cose diverse (v389, v406): ora sono due rig
   FILE che il processo scrive, mai il nome del processo.
 - Pavimenti: `test_update_data.py` N_CHECKS_MINIMO 388 (395 eseguiti), floor 365 in `self_check`;
   `test_analisi_libro.py` 913 check, floor 880. `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🧾 v513 — I CONTI DAL COMUNICATO UFFICIALE, E UNA DEFINIZIONE SOLA PER CONFRONTO
+
+Scelta del CEO del 25/10/2026, alla domanda «per GS, JPM e BLK le due fonti non concordano sui ricavi: (a) a ogni
+analisi si cerca il comunicato ufficiale e si usa quello, con fonte e data; (b) restano sui dati della pipeline con
+l'avviso», testuale: *"A"*.
+
+### La misura prima del codice: le due fonti NON erano lo stesso problema per le tre banche
+Letti i tre comunicati (8-K, Exhibit 99.1 su SEC) e confrontati con la tabella della pipeline sugli stessi trimestri:
+
+| nome | voce del comunicato | coincide con Yahoo sui trimestri in comune? |
+|---|---|---|
+| GS | Net revenues | sì (3° trimestre 2025: 15,184 miliardi in tutti e due) |
+| BLK | Total revenue | sì sui ricavi e sull'utile; **no sul risultato operativo** (Q2 2026: 2,461 contro 2,472) |
+| JPM | Net revenue - reported | sì sul 3° trimestre 2025; **no sul 2° trimestre 2026: 57,347 contro 52,852** |
+
+Nasdaq non coincideva con Yahoo su nessuna delle tre. Quindi la regola non è «il comunicato al posto di Yahoo»: è che
+**un trimestre del comunicato si confronta SOLO coi trimestri che il comunicato stesso stampa accanto** (l'anno prima e
+il trimestre prima, nella stessa tabella). Su JPM una variazione fra 50,172 del comunicato e 52,852 di Yahoo avrebbe
+misurato la differenza di definizione, non l'andamento: −5,1% invece di −12,5% sul trimestre prima.
+Il confronto con la pipeline si fa lo stesso, per DICHIARARE dove le definizioni coincidono — mai per scegliere i numeri.
+
+### Cosa fa il sistema
+- `memoria/trimestri_ufficiali.json`: i numeri **come il comunicato li stampa** (in milioni, `unita`), con la voce che li
+  porta, i confronti del comunicato stesso, il link, la data del comunicato e quella della verifica. Un comunicato con un
+  difetto non si usa e si **nomina** col motivo (`difetti_ufficiale`: campi mancanti, date, una finestra di cento giorni
+  dopo la chiusura — convenzione, v240 —, numeri che non sono numeri, booleani compresi, lo stesso trimestre due volte).
+- `fonti_titoli.applica_ufficiali`, chiamata da `carica`: il comunicato più recente entra in cima alla tabella se è dello
+  stesso trimestre dell'ultimo o più recente. **Un comunicato più vecchio dell'ultimo trimestre della tabella non entra**:
+  messo in mezzo, farebbe da confronto ai trimestri di un altro fornitore.
+- `schede_progetto.ultimo_trimestre`: una riga del comunicato porta i propri `confronti`, e quando mancano la variazione
+  è n.d. — **non si prende dalla tabella**, che il trimestre di un anno prima ce l'ha. Schede e tenuta leggono la stessa
+  derivazione (v161).
+- La resa (DATI PER TITOLO) dice per ogni ferma se il comunicato la copre — con la regola delle schede, 101 giorni, mai
+  una seconda soglia —, cosa cercare dove non c'è e **perché** (le due fonti definiscono i ricavi diversamente), e
+  stampa sempre la riga CONTI DAL COMUNICATO UFFICIALE: assente, illeggibile, spento e vuoto sono quattro stati (v389).
+- ⚠ **Un preliminare non è un numero del trimestre.** SMCI il 20/10 ha depositato un «aggiornamento preliminare»: un
+  intervallo di stime non revisionate (ricavi fra 18,5 e 19,5 miliardi). Va nella lista `preliminari` del registro, così
+  lo strumento non lo chiede di nuovo a ogni analisi; i conti definitivi il 03/11 (v396).
+- ⚠ Il registro non si legge nelle suite (`TRADING_FONTI_TITOLI=spenta`, come la lettura del giro): cresce a ogni
+  trimestre, e un gate che dipende da lui andrebbe rosso a calendario.
+- ⚠ **Il prezzo, misurato**: una ricerca per trimestre e per nome, non a ogni analisi — un trimestre passato non cambia.
+  Il 25/10 quattro comunicati (GS, JPM, BLK, SpaceX) e un preliminare (SMCI), cercati in pochi minuti.
+
+**Cosa ha cambiato sui dati veri**: JPM +17,8% (2° trimestre, Yahoo) → **+8,1%** (3° trimestre, comunicato); BLK
++30,6% → **+19,1%**, e la prova dei ricavi della tenuta passa da A FAVORE a neutra (sotto la soglia del 25%); GS da n.d.
+(tabella ferma al 31/03) → **+23,0%**; SpaceX +91,9% → **+161,4%**, da perdita a utile operativo.
+
+### Annotato e NON corretto
+La **pagina** (`app.js`) legge `data.json` e non il registro: lì le banche restano con la tabella di Yahoo e l'avviso
+della tabella ferma. Farlo leggere alla pipeline è un cambiamento della pagina; il CEO legge l'analisi in chat.
+
+### 🧪 Il metodo, e un difetto delle suite trovato dalle iniezioni
+- **21 iniezioni**, una alla volta su cinque copie del repo verificate per impronta, con `modifica_sicura` e ripristino
+  dallo snapshot: **mordono tutte, ciascuna sul controllo atteso**.
+- ⚠⚠ Tre di loro facevano cadere **anche** controlli che non c'entravano (il raccoglitore dei grafici). Non era rumore:
+  quei controlli scrivevano la pagina raccolta in un file con un **nome fisso in /tmp**, condiviso fra le cinque copie che
+  giravano in parallelo — una copia leggeva la pagina dell'altra. È la v430 (*due processi che scrivono sullo stesso file
+  si sporcano a vicenda*) dentro una suite. Ora una cartella propria per esecuzione; rieseguite le cinque iniezioni in
+  parallelo, i fallimenti in più sono spariti.
+- ⚠ **Due controlli riagganciati, nessuno zittito**: il v512 sulla resa pretendeva la frase «i conti dell'ultimo
+  trimestre (comunicato o 10-Q) di BBB», che non diceva con quali confronti; il fixture della scheda (v505) non aveva la
+  riga nuova, e il gate nei due versi ha dichiarato ASSENTE la richiesta — che è il suo lavoro.
+- Pavimento di `test_analisi_libro.py` 880 → 895 (926 check). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al
+  browser (v440).

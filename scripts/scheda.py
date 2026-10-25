@@ -252,6 +252,7 @@ class Voce:
 REGISTRO = {
     "freschezza": Voce(("freschezza",)),                                                             # v511
     "freschezza_titoli": Voce(("freschezza_titoli",)),                                               # v512
+    "comunicati": Voce(("freschezza_titoli",), righe=(("freschezza_titoli", "· CONTI DAL COMUNICATO UFFICIALE"),)),  # v513
     "fine_anno": Voce(("fine_anno",)),                                                               # v512
     "semaforo": Voce(("semaforo",)),
     "attesa": Voce(("attesa",)),

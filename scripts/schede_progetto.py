@@ -251,8 +251,15 @@ def ultimo_trimestre(r):
         return None
     q.sort(key=lambda x: str(x["trim"]), reverse=True)
     u = q[0]
-    anno = _trimestre_a(q, u["trim"], 365)
-    prec = _trimestre_a(q, u["trim"], 91)
+    if isinstance(u.get("confronti"), dict):
+        # v513 — un trimestre del COMUNICATO UFFICIALE (scripts/fonti_titoli.py, memoria/trimestri_ufficiali.json) si
+        #   confronta SOLO coi trimestri che il comunicato stesso stampa accanto: sul 2° trimestre 2026 di JPM i ricavi
+        #   di Yahoo (52,852 miliardi) e quelli del comunicato (57,347) sono due definizioni, e una variazione fra le due
+        #   misurerebbe la differenza di definizione, non l'andamento. Senza un confronto nel comunicato: n.d.
+        anno, prec = u["confronti"].get("anno"), u["confronti"].get("prec")
+    else:
+        anno = _trimestre_a(q, u["trim"], 365)
+        prec = _trimestre_a(q, u["trim"], 91)
     return {"u": u, "anno": anno, "prec": prec, "trim": str(u["trim"])[:10],
             "yoy": (u["ricavi"] / anno["ricavi"] - 1) * 100 if anno and anno["ricavi"] else None,
             "qoq": (u["ricavi"] / prec["ricavi"] - 1) * 100 if prec and prec["ricavi"] else None}
@@ -279,6 +286,9 @@ def riga_ricavi(r):
         # v512 — un trimestre che la tabella della pipeline non portava, ritrovato da un'altra fonte (scripts/fonti_titoli.py,
         #   verificato sul trimestre in comune): la fonte viaggia col numero
         _fonte = f", da {u['fonte']}: la tabella della pipeline non lo porta ancora" if u.get("fonte") else ""
+        if isinstance(u.get("confronti"), dict):
+            _fonte = (f", {u['fonte']}, voce «{(u.get('voci') or {}).get('ricavi')}»: i confronti sono quelli del "
+                      "comunicato stesso")
         pz.append(f"ultimo trimestre (al {t['trim']}{_fonte}) "
                   + (", ".join(parti) if parti else "senza un trimestre di confronto nel dato"))
         a, b = u.get("operativo"), (anno or {}).get("operativo")

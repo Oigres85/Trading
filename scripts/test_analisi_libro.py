@@ -160,7 +160,9 @@ check("la stagionalita' usa la chiave vera (positivi_pct), non un default silenz
 #   al testo si e' rotto NOVE volte qui dentro.
 import subprocess, tempfile
 srcG = (Path(__file__).resolve().parent / "grafici.mjs").read_text(encoding="utf-8")
-_out = Path(tempfile.gettempdir()) / "test_grafici_raccolti.html"
+# v513 — una cartella PROPRIA per ogni esecuzione: con un nome fisso in /tmp due suite in parallelo (le copie delle
+#   iniezioni) leggevano l'una la pagina dell'altra, e tre controlli del raccoglitore cadevano senza un difetto (v430)
+_out = Path(tempfile.mkdtemp()) / "test_grafici_raccolti.html"
 _r = subprocess.run(["node", str(Path(__file__).resolve().parent / "grafici.mjs"), str(_out)],
                     capture_output=True, text=True, cwd=str(Path(__file__).resolve().parent.parent))
 _pag = _out.read_text(encoding="utf-8") if _out.exists() else ""
@@ -6850,6 +6852,7 @@ _U505 = {
         "DATI PER TITOLO — LA PIPELINE E LA FONTE LETTA ADESSO (v512)",
         "  run della pipeline 2026-10-18T22:52:13Z (8,6 ore fa) · lettura alla fonte 19/10 07:29 ora italiana (6,1 s)",
         "  · ANALISTI: letti adesso per 3 titoli; rispetto al run della pipeline nessuna differenza",
+        "  · CONTI DAL COMUNICATO UFFICIALE (memoria/trimestri_ufficiali.json, v513): nessun comunicato registrato",
         "  DA CERCARE IN RETE — dove nemmeno la fonte e' aggiornata o raggiungibile (con fonte e data):",
         "    · niente: le fonti lette adesso sono allineate o piu' avanti della pipeline"],
     "numeri_libro_esteso": [
@@ -8276,7 +8279,10 @@ check("v512 la resa: ogni quanto cambia ciascun dato (le cinque fonti e la pipel
       and "misure rifatte sul giorno nuovo" in _s512 and "conservati in memoria/cds_sessione.jsonl" in _s512
       and "COMPLETATA da Nasdaq: AAA" in _s512 and "verificato sul 30/06/2026" in _s512
       and "il calendario di FINRA dava il regolamento 2026-10-15 pubblicato il 20/10/2026" in _s512
-      and "i conti dell'ultimo trimestre (comunicato o 10-Q) di BBB" in _s512, _s512[-1500:])
+      # v513 — la tabella di BBB si cerca nel COMUNICATO UFFICIALE, coi confronti del comunicato stesso (la frase di prima,
+      #   «i conti dell'ultimo trimestre (comunicato o 10-Q)», non diceva con quali confronti)
+      and "il comunicato ufficiale di BBB sui risultati depositati il" in _s512
+      and "COI CONFRONTI DEL COMUNICATO STESSO" in _s512, _s512[-1500:])
 _s512n = FT.sintesi(_d512, {}, adesso=_dtm512.datetime(2026, 10, 24, 18, tzinfo=_UTC512))
 check("v512 senza lettura alla fonte la resa lo dice in testa e manda a cercare in rete consenso e FedWatch",
       "NESSUNA lettura alla fonte in questo giro" in _s512n and "ANALISTI: NON letti" in _s512n
@@ -8395,6 +8401,218 @@ check("v512 collegamento: raccogli costruisce il calendario sulle stesse barre (
       and "righe_fine_anno(o)" in _crt512[_crt512.index('if __name__ == "__main__":'):]
       and "fine_anno" in SC.REGISTRO and any(t == "fine_anno" for t, _ in SC.SEZIONI)
       and any(b.sezione == "fine_anno" for b in SC.CATALOGO["rotazione"].blocchi))
+
+# ══════════════ v513 — I CONTI DAL COMUNICATO UFFICIALE (scelta del CEO del 25/10/2026: «A») ══════════════
+import json as _js513, copy as _cp513, tempfile as _tf513
+import brief as _BR513
+_dir513 = Path(_tf513.mkdtemp())
+
+
+def _reg513(comunicati, preliminari=None, nome="r.json"):
+    p = _dir513 / nome
+    p.write_text(_js513.dumps({"comunicati": comunicati, "preliminari": preliminari or []}), encoding="utf-8")
+    return p
+
+
+_E513 = {"ticker": "BNK", "trim": "2026-09-30", "periodo": "3° trimestre 2026", "valuta": "USD", "unita": 1000000,
+         "voci": {"ricavi": "Net revenue - reported", "utile": "Net income"},
+         "ricavi": 50172, "ricavi_anno_prima": 46427, "ricavi_trim_prima": 57347,
+         "utile": 15305, "utile_anno_prima": 14393, "utile_trim_prima": 21155,
+         "fonte": "BNK, 3Q26 Earnings Release", "link": "https://www.sec.gov/x.htm",
+         "data_comunicato": "2026-10-13", "verificato_il": "2026-10-25"}
+# la tabella di un ALTRO fornitore: il trimestre di un anno prima coincide col comunicato, quello prima NO (52,852 contro
+#   57,347 — il caso vero di JPM il 25/10/2026), e c'e' un trimestre di un anno prima che una formula per posizione o per
+#   data sulla tabella prenderebbe
+_CT513 = [{"trim": "2026-06-30", "ricavi": 52852e6, "utile": 21155e6},
+          {"trim": "2026-03-31", "ricavi": 49833e6, "utile": 16494e6},
+          {"trim": "2025-12-31", "ricavi": 45796e6, "utile": 13025e6},
+          {"trim": "2025-09-30", "ricavi": 46430e6, "utile": 14393e6}]
+_D513 = {"updated_at": "2026-10-25T14:00:00Z", "portfolio": [],
+         "watchlist": [{"ticker": "BNK", "tv": {"conto_trim": _cp513.deepcopy(_CT513)}}], "macro": {}}
+
+# --- il registro vero ---
+_rv513 = FT.leggi_ufficiali()
+_pos513, _x513, _sorv513 = _BR513.leggi_libro()
+_univ513 = {x["tk"] for x in _pos513} | {x["tk"] for x in _sorv513}
+check("v513 il registro vero dei comunicati si legge senza difetti, ogni nome e' del libro, e ogni comunicato porta "
+      "link, data, verifica e il confronto sull'anno prima stampato dal comunicato stesso",
+      _rv513["stato"] == "letto" and not _rv513["difetti"] and len(_rv513["comunicati"]) >= 1
+      and all(e["ticker"] in _univ513 for e in _rv513["comunicati"] + _rv513.get("preliminari", []))
+      and all(e.get("ricavi_anno_prima") is not None for e in _rv513["comunicati"]),
+      str(_rv513["difetti"]) + " fuori dal libro: " + str([e["ticker"] for e in _rv513["comunicati"]
+                                                           if e["ticker"] not in _univ513]))
+
+# --- i difetti, ciascuno col suo motivo ---
+_dif513 = {
+    "senza link": ({k: v for k, v in _E513.items() if k != "link"}, "manca il campo «link»"),
+    "trim illeggibile": (dict(_E513, trim="30/09/2026"), "«trim» non e' una data"),
+    "comunicato prima della chiusura": (dict(_E513, data_comunicato="2026-09-29"), "non cade entro"),
+    "comunicato troppo tardi": (dict(_E513, data_comunicato="2027-01-15", verificato_il="2027-01-16"), "non cade entro"),
+    "verifica prima del comunicato": (dict(_E513, verificato_il="2026-10-12"), "la verifica e' precedente"),
+    "link non https": (dict(_E513, link="http://x"), "non e' un indirizzo https"),
+    "unita' nulla": (dict(_E513, unita=0), "«unita» non e' un numero positivo"),
+    "ricavi negativi": (dict(_E513, ricavi=-5), "«ricavi» non e' positivo"),
+    "utile senza voce": (dict(_E513, voci={"ricavi": "Net revenue"}), "manca la voce del comunicato per «utile»"),
+    "testo al posto del numero": (dict(_E513, utile="15.305"), "«utile» non e' un numero"),
+    "booleano al posto del numero": (dict(_E513, ricavi_trim_prima=True), "«ricavi_trim_prima» non e' un numero"),
+}
+_mot513 = {}
+for _k513, (_e513, _m513) in _dif513.items():
+    _mot513[_k513] = (FT.difetti_ufficiale(_e513), _m513)
+_dup513 = FT.leggi_ufficiali(_reg513([_E513, dict(_E513)], [{"ticker": "BNK", "deposito": "2026-10-13"}], "dup.json"))
+check("v513 ogni difetto del registro e' nominato col suo motivo, il comunicato buono non ne ha, lo stesso trimestre "
+      "due volte e un preliminare senza nota non si usano",
+      not FT.difetti_ufficiale(_E513) and all(any(m in x for x in dd) for dd, m in _mot513.values())
+      and len(_dup513["comunicati"]) == 1 and any("due volte" in "; ".join(m) for _c, m in _dup513["difetti"])
+      and any(c.startswith("preliminare") and "«nota»" in "; ".join(m) for c, m in _dup513["difetti"])
+      and not _dup513["preliminari"],
+      str({k: v[0] for k, v in _mot513.items() if not any(v[1] in x for x in v[0])}) + str(_dup513["difetti"]))
+check("v513 un registro che non c'e' e uno illeggibile sono due stati diversi, e nessuno dei due inventa comunicati",
+      FT.leggi_ufficiali(_dir513 / "non_c_e.json")["stato"] == "assente"
+      and (lambda p: (p.write_text("{rotto", encoding="utf-8"), FT.leggi_ufficiali(p))[1]["stato"])(_dir513 / "rotto.json")
+      == "illeggibile")
+
+# --- una definizione sola per confronto ---
+_ok513 = FT.leggi_ufficiali(_reg513([_E513]))
+_d1 = _cp513.deepcopy(_D513)
+_es1 = FT.applica_ufficiali(_d1, _ok513)
+_r1 = _d1["watchlist"][0]
+_q1 = SP.ultimo_trimestre(_r1) or {}
+_atteso_yoy = (50172 / 46427 - 1) * 100
+_atteso_qoq = (50172 / 57347 - 1) * 100
+_sbagliato_qoq = (50172e6 / 52852e6 - 1) * 100
+check("v513 il trimestre del comunicato entra in cima alla tabella e si confronta SOLO coi trimestri del comunicato: "
+      "sul trimestre prima la tabella dice 52,852 e il comunicato 57,347, e la variazione e' quella del comunicato",
+      _es1.get("BNK", {}).get("esito") == "aggiunto" and _q1.get("trim") == "2026-09-30"
+      and _q1.get("yoy") is not None and abs(_q1["yoy"] - _atteso_yoy) < 1e-9
+      and _q1.get("qoq") is not None and abs(_q1["qoq"] - _atteso_qoq) < 1e-9
+      and abs(_q1["qoq"] - _sbagliato_qoq) > 1 and len(_r1["tv"]["conto_trim"]) == len(_CT513) + 1,
+      f"{_q1.get('yoy')} {_q1.get('qoq')} attesi {_atteso_yoy} {_atteso_qoq}")
+_d2 = _cp513.deepcopy(_D513)
+FT.applica_ufficiali(_d2, FT.leggi_ufficiali(_reg513([{k: v for k, v in _E513.items()
+                                                       if not k.endswith(("_anno_prima", "_trim_prima"))}], nome="nc.json")))
+_q2 = SP.ultimo_trimestre(_d2["watchlist"][0]) or {}
+check("v513 un comunicato che non stampa trimestri di confronto da' variazioni n.d.: non le prende dalla tabella, che "
+      "il trimestre di un anno prima ce l'ha",
+      _q2.get("trim") == "2026-09-30" and _q2.get("yoy") is None and _q2.get("qoq") is None, str(_q2))
+_d3 = _cp513.deepcopy(_D513)
+_d3["watchlist"][0]["tv"]["conto_trim"].insert(0, {"trim": "2026-09-30", "ricavi": 48000e6, "utile": 15000e6})
+_es3 = FT.applica_ufficiali(_d3, _ok513)
+_ct3 = _d3["watchlist"][0]["tv"]["conto_trim"]
+_d4 = _cp513.deepcopy(_D513)
+_d4["watchlist"][0]["tv"]["conto_trim"].insert(0, {"trim": "2026-12-31", "ricavi": 51000e6, "utile": 15000e6})
+_prima4 = _cp513.deepcopy(_d4["watchlist"][0]["tv"]["conto_trim"])
+_es4 = FT.applica_ufficiali(_d4, _ok513)
+check("v513 sullo STESSO trimestre il comunicato prende il posto della riga dell'altro fornitore; un comunicato PIU' "
+      "VECCHIO dell'ultimo trimestre della tabella non entra (messo in mezzo, farebbe da confronto a un'altra "
+      "definizione) e si dice; un nome che il sistema non segue non entra",
+      _es3["BNK"]["esito"] == "sostituito" and len(_ct3) == len(_CT513) + 1
+      and _ct3[0].get("confronti") and abs(_ct3[0]["ricavi"] - 50172e6) < 1
+      and sum(1 for x in _ct3 if x["trim"] == "2026-09-30") == 1
+      and _es4["BNK"]["esito"] == "superato" and _d4["watchlist"][0]["tv"]["conto_trim"] == _prima4
+      and FT.applica_ufficiali(_cp513.deepcopy(_D513), {"comunicati": [dict(_E513, ticker="ZZZ")]})["ZZZ"]["esito"]
+      == "non seguito")
+_tc513 = FT.testo_confronto(_es1["BNK"])
+check("v513 il confronto con la pipeline sugli stessi trimestri DICHIARA quali voci coincidono e quali no, coi due "
+      "numeri — e non sceglie: i numeri restano quelli del comunicato",
+      "coincidono con la pipeline: ricavi del 30/09/2025, utile del 30/09/2025, utile del 30/06/2026" in _tc513
+      and "NON coincidono: ricavi del 30/06/2026 (57,347 contro 52,852 mld USD)" in _tc513
+      and "valgono i confronti del comunicato" in _tc513, _tc513)
+
+# --- la resa: coperto, ancora fermo, preliminare, e la frase sulle due definizioni ---
+_dS513 = {"updated_at": "2026-10-25T14:00:00Z", "portfolio": [], "macro": {}, "watchlist": [
+    {"ticker": "BNK", "tv": {"conto_trim": _cp513.deepcopy(_CT513)}},
+    {"ticker": "OLD", "tv": {"conto_trim": [{"trim": "2026-03-31", "ricavi": 10e9}]}},
+    {"ticker": "PRE", "tv": {"conto_trim": [{"trim": "2026-06-30", "ricavi": 5e9}]}},
+    {"ticker": "LIM", "tv": {"conto_trim": [{"trim": "2026-03-31", "ricavi": 9e9}]}},
+    {"ticker": "OLT", "tv": {"conto_trim": [{"trim": "2026-03-31", "ricavi": 9e9}]}}]}
+_fe513 = {"BNK": {"dep": "2026-10-13", "gg": 105, "trim": "2026-06-30", "irregolare": False},
+          "OLD": {"dep": "2026-10-20", "gg": 203, "trim": "2026-03-31", "irregolare": False},
+          "PRE": {"dep": "2026-10-20", "gg": 112, "trim": "2026-06-30", "irregolare": True},
+          # il confine della regola delle schede: 101 giorni dopo il trimestre del comunicato e' coperto, 102 no
+          "LIM": {"dep": "2026-10-09", "gg": 192, "trim": "2026-03-31", "irregolare": False},
+          "OLT": {"dep": "2026-10-10", "gg": 193, "trim": "2026-03-31", "irregolare": False}}
+_regS513 = _reg513([_E513, dict(_E513, ticker="OLD", trim="2026-06-30", data_comunicato="2026-07-20",
+                                verificato_il="2026-07-21"),
+                    dict(_E513, ticker="LIM", trim="2026-06-30", data_comunicato="2026-07-20", verificato_il="2026-07-21"),
+                    dict(_E513, ticker="OLT", trim="2026-06-30", data_comunicato="2026-07-20", verificato_il="2026-07-21")],
+                   [{"ticker": "PRE", "deposito": "2026-10-20", "nota": "ricavi stimati fra 1 e 2 miliardi",
+                     "link": "https://x", "verificato_il": "2026-10-25"}], "sint.json")
+_gS513 = {"letto": "2026-10-25T16:00:00+00:00", "sec": {"esito": "letto", "per_titolo": {}},
+          "trimestri": {"esito": "letto", "ferme": _fe513, "per_titolo": {
+              "BNK": {"esito": "sul trimestre in comune (2026-06-30) i ricavi di Nasdaq non coincidono con quelli della "
+                               "pipeline: le due fonti non si mescolano", "nuovi": []},
+              "OLD": {"esito": "Nasdaq non porta trimestri piu' recenti", "nuovi": []},
+              "PRE": {"esito": "Nasdaq non porta trimestri piu' recenti", "nuovi": []},
+              "LIM": {"esito": "Nasdaq non porta trimestri piu' recenti", "nuovi": []},
+              "OLT": {"esito": "Nasdaq non porta trimestri piu' recenti", "nuovi": []}}}}
+_sS513 = FT.sintesi(_dS513, _gS513, adesso=_dtm512.datetime(2026, 10, 25, 18, tzinfo=_UTC512), ufficiali=_regS513)
+_cerca513 = _sS513[_sS513.index("DA CERCARE IN RETE"):]
+check("v513 la resa: la tabella ferma coperta dal comunicato si dice completata e non si cerca; un comunicato piu' "
+      "vecchio del deposito lascia la tabella ferma e il comunicato da cercare; un preliminare registrato non si cerca; "
+      "sul confine la regola e' quella delle schede (101 giorni coperto, 102 no)",
+      "COMPLETATA dal comunicato ufficiale registrato: BNK" in _sS513 and "LIM (" in _sS513.split("COMPLETATA dal comunicato")[1]
+      and "il comunicato ufficiale di BNK" not in _cerca513 and "il comunicato ufficiale di LIM" not in _cerca513
+      and "il comunicato ufficiale di OLD sui risultati depositati il 20/10/2026" in _cerca513
+      and "il comunicato ufficiale di OLT sui risultati depositati il 10/10/2026" in _cerca513
+      and "precedente a quel deposito" in _sS513 and "il comunicato ufficiale di PRE" not in _cerca513
+      and "aggiornamento PRELIMINARE, registrato il 25/10/2026: ricavi stimati fra 1 e 2 miliardi" in _sS513
+      and "COI CONFRONTI DEL COMUNICATO STESSO" in _cerca513, _sS513[-2500:])
+_gS2 = _cp513.deepcopy(_gS513)
+_sS2 = FT.sintesi(_dS513, _gS2, adesso=_dtm512.datetime(2026, 10, 25, 18, tzinfo=_UTC512), ufficiali=_dir513 / "vuoto.json")
+check("v513 senza il comunicato, DA CERCARE IN RETE nomina la banca col PERCHE' (le due fonti definiscono i ricavi "
+      "diversamente) e il preliminare con la sua avvertenza — non una frase generica",
+      "il comunicato ufficiale di BNK sui risultati depositati il 13/10/2026 — sul trimestre in comune Yahoo e Nasdaq non "
+      "danno gli stessi ricavi" in _sS2
+      and "il comunicato ufficiale di PRE" in _sS2 and "se il deposito e' un preliminare o una guida" in _sS2, _sS2[-1800:])
+_rr513 = {s: "\n".join(FT.righe_ufficiali(r, {})) for s, r in (
+    ("assente", {"stato": "assente", "comunicati": [], "difetti": []}),
+    ("illeggibile", {"stato": "illeggibile", "comunicati": [], "difetti": [("registro", ["ValueError"])]}),
+    ("spento", {"stato": "spento", "comunicati": [], "difetti": []}),
+    ("vuoto", {"stato": "letto", "comunicati": [], "difetti": [("BNK 2026-09-30", ["manca il campo «link»"])]}))}
+check("v513 la riga CONTI DAL COMUNICATO UFFICIALE esce sempre, e assente, illeggibile, spento e vuoto si dicono come "
+      "quattro cose diverse; un comunicato scartato si nomina col motivo",
+      all(v.startswith("  · CONTI DAL COMUNICATO UFFICIALE") for v in _rr513.values())
+      and "registro assente" in _rr513["assente"] and "ILLEGGIBILE" in _rr513["illeggibile"]
+      and "spenta" in _rr513["spento"] and "nessun comunicato registrato" in _rr513["vuoto"]
+      and "⚠ NON USATO BNK 2026-09-30: manca il campo «link»" in _rr513["vuoto"]
+      and "· CONTI DAL COMUNICATO UFFICIALE" in _sS513 and "BNK: 3° trimestre 2026 (al 30/09/2026)" in _sS513
+      # le suite non leggono il registro vero, che cresce a ogni trimestre (come carica): senza un percorso, spento
+      and "registro non letto (TRADING_FONTI_TITOLI=spenta)" in _s512)
+
+# --- le schede e la tenuta leggono la variazione del comunicato ---
+_rc513 = SP.riga_ricavi(_r1) or ""
+_pf513 = NL.prove_fondamentali(_r1)
+check("v513 la riga dei ricavi dichiara la fonte, la voce e che i confronti sono del comunicato; la tenuta prende la "
+      "STESSA variazione (una derivazione sola) e la tabella non e' piu' ferma",
+      "dal comunicato ufficiale del 13/10/2026, voce «Net revenue - reported»: i confronti sono quelli del comunicato "
+      "stesso" in _rc513 and "+8,1% sullo stesso trimestre dell'anno prima" in _rc513
+      and "-12,5% sul trimestre precedente" in _rc513
+      and _pf513["ricavi"]["yoy"] is not None and abs(_pf513["ricavi"]["yoy"] - _atteso_yoy) < 1e-9
+      and _pf513["ricavi"]["trim"] == "2026-09-30"
+      and SP.deposito_oltre_la_tabella(_r1, {"ultimo_deposito": "2026-10-13"}) is None, _rc513)
+
+# --- il collegamento: carica applica il registro, e le suite no ---
+_venv513 = os.environ.pop("TRADING_FONTI_TITOLI", None)
+try:
+    _c513 = FT.carica(_cp513.deepcopy(_D513), percorso=_dir513 / "nessuna_lettura.json", ufficiali=_reg513([_E513]))
+    os.environ["TRADING_FONTI_TITOLI"] = "spenta"
+    _cs513 = FT.carica(_cp513.deepcopy(_D513), percorso=_dir513 / "nessuna_lettura.json", ufficiali=_reg513([_E513]))
+finally:
+    os.environ["TRADING_FONTI_TITOLI"] = "spenta"
+    if _venv513 is not None:
+        os.environ["TRADING_FONTI_TITOLI"] = _venv513
+check("v513 collegamento: carica sovrappone il comunicato anche senza una lettura del giro e lo dichiara fra gli esiti; "
+      "con TRADING_FONTI_TITOLI=spenta resta la pipeline",
+      _c513["watchlist"][0]["tv"]["conto_trim"][0].get("confronti") is not None
+      and "comunicato ufficiale per BNK" in _c513["macro"]["_fonti_titoli"]["esiti"]["comunicati"]
+      and _cs513["watchlist"][0]["tv"]["conto_trim"] == _CT513)
+_fmt513 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v513 la regola sta nel formato (dove cercare, cosa trascrivere, i confronti del comunicato, i preliminari) e la "
+      "richiesta nel registro, con la sua voce nella scheda completa",
+      "`memoria/trimestri_ufficiali.json`" in _fmt513 and "**DEL COMUNICATO STESSO**" in _fmt513
+      and "`preliminari`" in _fmt513 and "- `[comunicati]`" in _fmt513 and "comunicati" in SC.REGISTRO
+      and any(i == "· CONTI DAL COMUNICATO UFFICIALE" for _s, i in SC.REGISTRO["comunicati"].righe))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

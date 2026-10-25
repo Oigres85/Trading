@@ -1,0 +1,103 @@
+{
+  "nota": "v513 — i conti di un trimestre presi dal COMUNICATO UFFICIALE della societa', dove Yahoo e Nasdaq non concordano sui ricavi (le banche) o nessuna delle due porta ancora il trimestre. Scelta del CEO del 25/10/2026: 'A' (a ogni analisi si cerca il comunicato e si usa quello, con fonte e data). I numeri si trascrivono come il comunicato li stampa, nell'unita' dichiarata (unita: 1000000 = milioni), con la voce che li porta e i confronti DEL COMUNICATO STESSO: l'anno prima (_anno_prima) e il trimestre prima (_trim_prima). Un trimestre del comunicato non si confronta mai con la tabella di un altro fornitore. Un intervallo di guida o un risultato preliminare non e' un numero del trimestre: non si registra. Lo legge scripts/fonti_titoli.py (leggi_ufficiali, applica_ufficiali). I depositi di risultati che sono aggiornamenti PRELIMINARI (un intervallo di stime) stanno in 'preliminari': cosi' lo strumento sa che non c'e' ancora un numero del trimestre da cercare.",
+  "comunicati": [
+    {
+      "ticker": "GS",
+      "trim": "2026-09-30",
+      "periodo": "3° trimestre 2026",
+      "valuta": "USD",
+      "unita": 1000000,
+      "voci": {
+        "ricavi": "Net revenues",
+        "utile": "Net earnings"
+      },
+      "ricavi": 18679,
+      "ricavi_anno_prima": 15184,
+      "ricavi_trim_prima": 20338,
+      "utile": 5294,
+      "utile_anno_prima": 4098,
+      "utile_trim_prima": 6628,
+      "fonte": "Goldman Sachs, Third Quarter 2026 Earnings Results (SEC, 8-K, Exhibit 99.1)",
+      "link": "https://www.sec.gov/Archives/edgar/data/0000886982/000088698226000529/a3q26gsearningsresults.htm",
+      "data_comunicato": "2026-10-13",
+      "verificato_il": "2026-10-25"
+    },
+    {
+      "ticker": "JPM",
+      "trim": "2026-09-30",
+      "periodo": "3° trimestre 2026",
+      "valuta": "USD",
+      "unita": 1000000,
+      "voci": {
+        "ricavi": "Net revenue - reported",
+        "utile": "Net income"
+      },
+      "ricavi": 50172,
+      "ricavi_anno_prima": 46427,
+      "ricavi_trim_prima": 57347,
+      "utile": 15305,
+      "utile_anno_prima": 14393,
+      "utile_trim_prima": 21155,
+      "fonte": "JPMorgan Chase, 3Q26 Earnings Release (SEC, 8-K, Exhibit 99.1)",
+      "link": "https://www.sec.gov/Archives/edgar/data/0000019617/000162828026065582/a3q26erfexhibit991narrative.htm",
+      "data_comunicato": "2026-10-13",
+      "verificato_il": "2026-10-25"
+    },
+    {
+      "ticker": "BLK",
+      "trim": "2026-09-30",
+      "periodo": "3° trimestre 2026",
+      "valuta": "USD",
+      "unita": 1000000,
+      "voci": {
+        "ricavi": "Total revenue",
+        "utile": "Net income attributable to BlackRock, Inc.",
+        "operativo": "Operating income"
+      },
+      "ricavi": 7752,
+      "ricavi_anno_prima": 6509,
+      "ricavi_trim_prima": 7084,
+      "utile": 1659,
+      "utile_anno_prima": 1323,
+      "utile_trim_prima": 1914,
+      "operativo": 2328,
+      "operativo_anno_prima": 1955,
+      "operativo_trim_prima": 2461,
+      "fonte": "BlackRock, Third Quarter 2026 Earnings (SEC, 8-K, Exhibit 99.1)",
+      "link": "https://www.sec.gov/Archives/edgar/data/0002012383/000119312526420979/blk-ex99_1.htm",
+      "data_comunicato": "2026-10-14",
+      "verificato_il": "2026-10-25"
+    },
+    {
+      "ticker": "SPCX",
+      "trim": "2026-09-30",
+      "periodo": "3° trimestre 2026",
+      "valuta": "USD",
+      "unita": 1000000,
+      "voci": {
+        "ricavi": "Revenue",
+        "utile": "Net income (loss)",
+        "operativo": "Income (loss) from operations"
+      },
+      "ricavi": 14575,
+      "ricavi_anno_prima": 5576,
+      "utile": 4404,
+      "utile_anno_prima": -1054,
+      "operativo": 2791,
+      "operativo_anno_prima": -273,
+      "fonte": "SpaceX Reports Third Quarter 2026 Results (comunicato, Consolidated Statements of Operations; il comunicato non stampa il 2° trimestre)",
+      "link": "https://s21.q4cdn.com/184289198/files/content_files/SpaceX-Reports-Third-Quarter-2026-Results.pdf",
+      "data_comunicato": "2026-10-20",
+      "verificato_il": "2026-10-25"
+    }
+  ],
+  "preliminari": [
+    {
+      "ticker": "SMCI",
+      "deposito": "2026-10-20",
+      "nota": "1° trimestre dell'esercizio 2027 (al 30/09/2026): ricavi stimati fra 18,5 e 19,5 miliardi di dollari e margine lordo fra 12,0% e 12,5%, non revisionati; i conti definitivi il 03/11/2026 dopo la chiusura",
+      "link": "https://www.sec.gov/Archives/edgar/data/0001375365/000137536526000025/smcifirstquarterfy2027busi.htm",
+      "verificato_il": "2026-10-25"
+    }
+  ]
+}

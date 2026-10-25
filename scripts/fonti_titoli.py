@@ -282,6 +282,249 @@ def completa_trimestri(conto, nasdaq):
             "comune": str(u["trim"])[:10], "voci": {k: v for k, v in scelte.items()}}
 
 
+# ══════════════════════ v513 — I CONTI DAL COMUNICATO UFFICIALE (memoria/trimestri_ufficiali.json) ══════════════════════
+# Il CEO, 25/10/2026, alla domanda «per GS, JPM e BLK le due fonti non concordano sui ricavi: (a) a ogni analisi si cerca
+# il comunicato ufficiale e si usa quello, con fonte e data; (b) restano sui dati della pipeline con l'avviso», ha
+# risposto: *"A"*.
+# ⚠⚠ UNA DEFINIZIONE SOLA PER CONFRONTO. I ricavi di una banca non hanno una definizione unica: il 25/10 il «Total
+#   Revenue» di Nasdaq non coincideva con quello di Yahoo su nessuna delle tre, e su JPM quello di Yahoo non coincide
+#   nemmeno col comunicato (2° trimestre 2026: 52,852 miliardi contro i 57,347 del «Net revenue - reported»). Quindi un
+#   trimestre del comunicato si confronta SOLO coi trimestri che il comunicato stesso stampa accanto — l'anno prima e il
+#   trimestre prima, nella stessa tabella — e mai con la tabella di un altro fornitore. Il confronto con la pipeline sui
+#   trimestri in comune si fa lo stesso, ma per DICHIARARE se le definizioni coincidono, non per scegliere i numeri.
+# ⚠ I numeri si trascrivono come il comunicato li stampa (di solito in milioni: `unita` 1000000), con la voce che li
+#   porta, il link, la data del comunicato e quella della verifica. Un comunicato con un difetto non si usa e si NOMINA.
+# ⚠ Una volta registrato, un trimestre passato non cambia: la ricerca si fa una volta per trimestre e per nome, e a ogni
+#   analisi lo strumento dice cosa manca (DA CERCARE IN RETE). Un intervallo di guida o un risultato preliminare non e'
+#   un numero del trimestre: non si registra (v396).
+UFFICIALI = RADICE / "memoria" / "trimestri_ufficiali.json"
+CAMPI_UFFICIALI = ("ticker", "trim", "periodo", "valuta", "unita", "voci", "ricavi", "fonte", "link", "data_comunicato",
+                   "verificato_il")
+VOCI_UFFICIALI = ("ricavi", "utile", "operativo")
+GIORNI_COMUNICATO = 100     # convenzione (v240): i conti di un trimestre si pubblicano entro cento giorni dalla chiusura
+NOMI_VOCI = {"ricavi": "ricavi", "utile": "utile", "operativo": "risultato operativo"}
+
+
+def _numero(x):
+    return isinstance(x, (int, float)) and not isinstance(x, bool) and x == x
+
+
+def _giorno(x):
+    from datetime import date
+    try:
+        return date.fromisoformat(str(x)[:10]) if len(str(x)) >= 10 else None
+    except ValueError:
+        return None
+
+
+def difetti_ufficiale(e):
+    """I difetti di un comunicato registrato, ciascuno col suo motivo. Vuoto = si puo' usare."""
+    if not isinstance(e, dict):
+        return ["la voce non e' un oggetto"]
+    out = [f"manca il campo «{c}»" for c in CAMPI_UFFICIALI if e.get(c) in (None, "", {})]
+    t, dc, dv = _giorno(e.get("trim")), _giorno(e.get("data_comunicato")), _giorno(e.get("verificato_il"))
+    if e.get("trim") and t is None:
+        out.append("«trim» non e' una data")
+    if e.get("data_comunicato") and dc is None:
+        out.append("«data_comunicato» non e' una data")
+    if e.get("verificato_il") and dv is None:
+        out.append("«verificato_il» non e' una data")
+    if t and dc and not (t < dc and (dc - t).days <= GIORNI_COMUNICATO):
+        out.append(f"il comunicato del {dc} non cade entro {GIORNI_COMUNICATO} giorni dopo la chiusura del trimestre "
+                   f"({t})")
+    if dc and dv and dv < dc:
+        out.append("la verifica e' precedente al comunicato")
+    if e.get("link") and not str(e["link"]).startswith("https://"):
+        out.append("il link non e' un indirizzo https")
+    if e.get("unita") is not None and not (_numero(e["unita"]) and e["unita"] > 0):
+        out.append("«unita» non e' un numero positivo")
+    voci = e.get("voci") if isinstance(e.get("voci"), dict) else {}
+    if e.get("voci") is not None and not isinstance(e.get("voci"), dict):
+        out.append("«voci» non e' un oggetto")
+    for campo in VOCI_UFFICIALI:
+        presenti = [k for k in (campo, campo + "_anno_prima", campo + "_trim_prima") if e.get(k) is not None]
+        for k in presenti:
+            if not _numero(e[k]):
+                out.append(f"«{k}» non e' un numero")
+        if presenti and not voci.get(campo):
+            out.append(f"manca la voce del comunicato per «{campo}» (come la chiama la societa')")
+    for k in ("ricavi", "ricavi_anno_prima", "ricavi_trim_prima"):
+        if _numero(e.get(k)) and e[k] <= 0:
+            out.append(f"«{k}» non e' positivo")
+    return out
+
+
+def leggi_ufficiali(percorso=None):
+    """{comunicati: [validi], difetti: [(chi, motivi)], stato}. Un comunicato con un difetto non si usa e si nomina."""
+    p = Path(percorso) if percorso else UFFICIALI
+    try:
+        reg = json.loads(p.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {"stato": "assente", "comunicati": [], "difetti": []}
+    except (OSError, ValueError) as e:
+        return {"stato": "illeggibile", "comunicati": [], "difetti": [("registro", [f"{type(e).__name__}"])]}
+    ok, difetti, visti = [], [], set()
+    prel = []
+    for i, e in enumerate(reg.get("preliminari") or []):
+        dd = ([f"manca il campo «{c}»" for c in ("ticker", "deposito", "link", "verificato_il", "nota")
+               if not (isinstance(e, dict) and e.get(c))] if isinstance(e, dict) else ["la voce non e' un oggetto"])
+        if isinstance(e, dict) and e.get("deposito") and _giorno(e["deposito"]) is None:
+            dd.append("«deposito» non e' una data")
+        if dd:
+            difetti.append((f"preliminare {e.get('ticker') if isinstance(e, dict) else i + 1}", dd))
+        else:
+            prel.append(e)
+    for i, e in enumerate(reg.get("comunicati") or []):
+        chi = f"{e.get('ticker')} {str(e.get('trim'))[:10]}" if isinstance(e, dict) else f"voce {i + 1}"
+        dd = difetti_ufficiale(e)
+        chiave = (e.get("ticker"), str(e.get("trim"))[:10]) if isinstance(e, dict) else None
+        if chiave in visti:
+            dd.append("lo stesso trimestre e' registrato due volte")
+        visti.add(chiave)
+        if dd:
+            difetti.append((chi, dd))
+        else:
+            ok.append(e)
+    return {"stato": "letto", "comunicati": ok, "preliminari": prel, "difetti": difetti}
+
+
+def _uff(e, k):
+    x = e.get(k)
+    return x * e["unita"] if _numero(x) else None
+
+
+def riga_ufficiale(e):
+    """Il trimestre del comunicato nella forma di update_data.conto_trimestrale, coi confronti del comunicato stesso."""
+    r = {c: _uff(e, c) for c in VOCI_UFFICIALI}
+    r.update({"trim": str(e["trim"])[:10],
+              "margine": round(r["utile"] / r["ricavi"] * 100, 1) if r["utile"] is not None and r["ricavi"] else None,
+              "margine_op": (round(r["operativo"] / r["ricavi"] * 100, 1) if r["operativo"] is not None and r["ricavi"]
+                             else None),
+              "fonte": f"dal comunicato ufficiale del {_data_it(e['data_comunicato'])}",
+              "voci": dict(e["voci"]), "link": e["link"], "verificato_il": str(e["verificato_il"])[:10]})
+    conf = {}
+    for quale, suff in (("anno", "_anno_prima"), ("prec", "_trim_prima")):
+        conf[quale] = ({c: _uff(e, c + suff) for c in VOCI_UFFICIALI} if _uff(e, "ricavi" + suff) is not None else None)
+    r["confronti"] = conf
+    return r
+
+
+def confronto_con_pipeline(e, conto):
+    """I confronti del comunicato contro la tabella della pipeline sugli STESSI trimestri, trovati per data (v207):
+    servono a dichiarare se le definizioni coincidono, mai a scegliere i numeri."""
+    import schede_progetto
+    out = []
+    ct = [x for x in conto or [] if isinstance(x, dict) and x.get("trim")]
+    for quale, suff, gg in (("l'anno prima", "_anno_prima", 365), ("il trimestre prima", "_trim_prima", 91)):
+        p = schede_progetto._trimestre_a(ct, e["trim"], gg)
+        for c in VOCI_UFFICIALI:
+            a = _uff(e, c + suff)
+            if a is None:
+                continue
+            b = (p or {}).get(c)
+            out.append({"voce": c, "quale": quale, "trim": (p or {}).get("trim"), "comunicato": a, "pipeline": b,
+                        "coincide": None if b is None else abs(a - b) <= max(abs(b) * 0.0005, e["unita"])})
+    return out
+
+
+def applica_ufficiali(d, reg):
+    """Sovrappone a `d` (che MODIFICA: va passata una copia) il comunicato piu' recente di ciascun nome, se e' dello
+    stesso trimestre dell'ultimo della tabella o piu' recente. Un comunicato piu' vecchio dell'ultimo trimestre della
+    tabella NON entra: messo in mezzo, farebbe da confronto ai trimestri di un altro fornitore. {tk: esito}."""
+    esiti = {}
+    righe = {r["ticker"]: r for r in _righe(d)}
+    per = {}
+    for e in (reg or {}).get("comunicati") or []:
+        per.setdefault(e["ticker"], []).append(e)
+    for tk, lst in sorted(per.items()):
+        e = max(lst, key=lambda x: str(x["trim"]))
+        r = righe.get(tk)
+        if r is None:
+            esiti[tk] = {"esito": "non seguito", "trim": str(e["trim"])[:10]}
+            continue
+        tv = r.setdefault("tv", {})
+        ct = [x for x in tv.get("conto_trim") or [] if isinstance(x, dict) and x.get("trim")]
+        cima = max((str(x["trim"])[:10] for x in ct), default=None)
+        if cima and str(e["trim"])[:10] < cima and not _vicini(str(e["trim"]), cima, 20):
+            esiti[tk] = {"esito": "superato", "trim": str(e["trim"])[:10], "tabella": cima}
+            continue
+        resto = [x for x in ct if not _vicini(str(x["trim"]), str(e["trim"]), 20)]
+        tv["conto_trim"] = sorted([riga_ufficiale(e)] + resto, key=lambda x: str(x["trim"]), reverse=True)
+        esiti[tk] = {"esito": "sostituito" if len(resto) < len(ct) else "aggiunto", "trim": str(e["trim"])[:10],
+                     "data": str(e["data_comunicato"])[:10], "verificato_il": str(e["verificato_il"])[:10],
+                     "periodo": e.get("periodo"), "voci": dict(e["voci"]), "valuta": e.get("valuta"),
+                     "confronto": confronto_con_pipeline(e, ct)}
+    return esiti
+
+
+def testo_confronti_propri(es):
+    """Quali confronti porta il comunicato stesso: quelli che mancano restano n.d., mai presi da un altro fornitore."""
+    tutti = ("l'anno prima", "il trimestre prima")
+    cc = {c["quale"] for c in es.get("confronto") or []}
+    ci, manca = [x for x in tutti if x in cc], [x for x in tutti if x not in cc]
+    if not ci:
+        return "il comunicato non stampa trimestri di confronto: variazioni n.d."
+    return ("confronti dal comunicato stesso: " + " e ".join(ci)
+            + (f" ({manca[0]} non e' nel comunicato: quella variazione e' n.d.)" if manca else ""))
+
+
+def testo_confronto(es):
+    """Il confronto coi numeri della pipeline sugli stessi trimestri, voce per voce, in una riga."""
+    cc = [c for c in es.get("confronto") or [] if c.get("pipeline") is not None]
+    if not cc:
+        return "la tabella della pipeline non ha i trimestri di confronto del comunicato"
+    ok = [c for c in cc if c["coincide"]]
+    no = [c for c in cc if not c["coincide"]]
+    pz = []
+    if ok:
+        pz.append("coincidono con la pipeline: " + ", ".join(f"{NOMI_VOCI[c['voce']]} del {_data_it(c['trim'])}"
+                                                               for c in ok))
+    if no:
+        pz.append("NON coincidono: " + ", ".join(
+            f"{NOMI_VOCI[c['voce']]} del {_data_it(c['trim'])} ({_n(c['comunicato'] / 1e9, 3)} contro "
+            f"{_n(c['pipeline'] / 1e9, 3)} mld {es.get('valuta') or ''})".replace(" )", ")") for c in no)
+                  + " — le due fonti definiscono la voce diversamente: valgono i confronti del comunicato")
+    return " · ".join(pz)
+
+
+def righe_ufficiali(reg, es):
+    """La riga CONTI DAL COMUNICATO UFFICIALE, sempre stampata: un registro vuoto e un registro non letto si leggono
+    uguali e sono due cose diverse (v389, v406)."""
+    reg = reg or {"stato": "assente", "comunicati": [], "difetti": []}
+    s = "  · CONTI DAL COMUNICATO UFFICIALE (memoria/trimestri_ufficiali.json, v513): "
+    if reg["stato"] == "assente":
+        s += "registro assente: nessun comunicato in uso"
+    elif reg["stato"] == "illeggibile":
+        s += "registro ILLEGGIBILE: nessun comunicato in uso"
+    elif reg["stato"] == "spento":
+        s += "registro non letto (TRADING_FONTI_TITOLI=spenta): nessun comunicato in uso"
+    else:
+        n = len(reg["comunicati"])
+        s += (f"{n} comunicat{'o' if n == 1 else 'i'} registrat{'o' if n == 1 else 'i'} e valid{'o' if n == 1 else 'i'}"
+              if n else "nessun comunicato registrato")
+    L = [s]
+    for tk, v in sorted((es or {}).items()):
+        if v["esito"] in ("aggiunto", "sostituito"):
+            L.append(f"      {tk}: {v.get('periodo') or 'trimestre'} (al {_data_it(v['trim'])}), comunicato del "
+                     f"{_data_it(v['data'])}, verificato il {_data_it(v['verificato_il'])}, voce dei ricavi "
+                     f"«{(v.get('voci') or {}).get('ricavi')}» — "
+                     + ("prende il posto dello stesso trimestre della pipeline" if v["esito"] == "sostituito" else
+                        "la tabella della pipeline non lo porta")
+                     + "; " + testo_confronti_propri(v) + " · " + testo_confronto(v))
+        elif v["esito"] == "superato":
+            L.append(f"      {tk}: il comunicato registrato (trimestre al {_data_it(v['trim'])}) e' superato dalla "
+                     f"tabella della pipeline, che arriva al {_data_it(v['tabella'])}: non entra")
+        else:
+            L.append(f"      {tk}: comunicato registrato (trimestre al {_data_it(v['trim'])}) per un nome che il sistema "
+                     "non segue: non entra")
+    for p in reg.get("preliminari") or []:
+        L.append(f"      {p['ticker']}: il deposito del {_data_it(p['deposito'])} e' registrato come aggiornamento "
+                 f"PRELIMINARE (non e' un numero del trimestre): {p['nota']}")
+    for chi, motivi in reg.get("difetti") or []:
+        L.append(f"      ⚠ NON USATO {chi}: " + "; ".join(motivi))
+    return L
+
+
 def leggi_trimestri(nomi, lettore=None):
     """{tk: trimestri di Nasdaq o None}."""
     if lettore is None:
@@ -618,13 +861,22 @@ def sovrapponi(d, giro):
     return out
 
 
-def carica(d=None, percorso=None, adesso=None):
-    """data.json con la lettura del giro sovrapposta, se c'e' (mai la rete). Con TRADING_FONTI_TITOLI=spenta resta la
-    pipeline: le suite non devono dipendere da una lettura scritta da un'analisi di mezz'ora prima."""
+def carica(d=None, percorso=None, adesso=None, ufficiali=None):
+    """data.json con la lettura del giro sovrapposta, se c'e' (mai la rete), e i conti dei comunicati ufficiali
+    registrati (v513). Con TRADING_FONTI_TITOLI=spenta resta la pipeline: le suite non devono dipendere da una lettura
+    scritta da un'analisi di mezz'ora prima, ne' dal registro dei comunicati che cresce a ogni trimestre."""
     d = _carica_pipeline() if d is None else d
     if d is None or os.environ.get(SPENTA) == "spenta":
         return d
-    return sovrapponi(d, dal_disco(percorso, adesso=adesso))
+    out = sovrapponi(d, dal_disco(percorso, adesso=adesso))
+    reg = leggi_ufficiali(ufficiali)
+    es = applica_ufficiali(out, reg)
+    usati = sorted(tk for tk, v in es.items() if v["esito"] in ("aggiunto", "sostituito"))
+    ft = out.setdefault("macro", {}).setdefault("_fonti_titoli", {"letto": None, "esiti": {}})
+    ft.setdefault("esiti", {})["comunicati"] = (
+        f"comunicato ufficiale per {', '.join(usati)} (confronti dal comunicato stesso)" if usati else
+        "nessun comunicato registrato in uso" + (f" (registro {reg['stato']})" if reg["stato"] != "letto" else ""))
+    return out
 
 
 # ══════════════════════════════════ LA RESA ══════════════════════════════════════════════════════════════════════
@@ -675,10 +927,15 @@ def riga_riunione(v):
     return s + (f" — {' · '.join(rami)}" if rami else " — sopra il movimento intero non e' una probabilita'")
 
 
-def sintesi(d, giro, adesso=None):
+def sintesi(d, giro, adesso=None, ufficiali=None):
     """Il blocco DATI PER TITOLO: per ciascuno la fonte che ha vinto, il confronto con la pipeline, e cosa cercare in
-    rete perche' nemmeno la fonte e' aggiornata."""
+    rete perche' nemmeno la fonte e' aggiornata. `ufficiali`: il percorso del registro dei comunicati (v513)."""
     ora = adesso or datetime.now(timezone.utc)
+    # il registro dei comunicati cresce a ogni trimestre: con TRADING_FONTI_TITOLI=spenta le suite non lo leggono (come
+    #   carica), salvo un percorso esplicito
+    uff_reg = (leggi_ufficiali(ufficiali) if ufficiali or os.environ.get(SPENTA) != "spenta"
+               else {"stato": "spento", "comunicati": [], "difetti": []})
+    uff_es = applica_ufficiali(sovrapponi(d, giro), uff_reg) if d else {}
     L = ["DATI PER TITOLO — LA PIPELINE E LA FONTE LETTA ADESSO (v512)"]
     run = (d or {}).get("updated_at")
     eta = None
@@ -782,14 +1039,15 @@ def sintesi(d, giro, adesso=None):
         L.append(f"  · VENDITE ALLO SCOPERTO (FINRA): NON lette ({si.get('errore') or 'n.d.'}): vale il regolamento "
                  f"della pipeline ({psi.get('regolamento') or 'n.d.'})")
     # sec e trimestri
-    L.extend(righe_sec(d, g.get("sec") or {}, cercare, g.get("trimestri") or {}))
+    L.extend(righe_sec(d, g.get("sec") or {}, cercare, g.get("trimestri") or {}, uff_es, uff_reg))
+    L.extend(righe_ufficiali(uff_reg, uff_es))
     L.append("  DA CERCARE IN RETE — dove nemmeno la fonte e' aggiornata o raggiungibile (con fonte e data):")
     L.extend(["    · " + c for c in cercare] or ["    · niente: le fonti lette adesso sono allineate o piu' avanti "
                                                   "della pipeline"])
     return "\n".join(L)
 
 
-def righe_sec(d, sec, cercare, trim=None):
+def righe_sec(d, sec, cercare, trim=None, uff_es=None, uff_reg=None):
     """I depositi periodici (10-Q, 10-K) piu' recenti della lettura del debito della pipeline, e le tabelle dei
     trimestri ferme prima di un deposito di risultati — con il trimestre ritrovato da Nasdaq dove le due fonti
     coincidono sul trimestre in comune: fatti, coi loro giorni."""
@@ -798,7 +1056,7 @@ def righe_sec(d, sec, cercare, trim=None):
         return [f"  · DEPOSITI SEC: date NON lette ({sec.get('errore') or 'n.d.'}): restano quelle della pipeline"]
     ds = ((((d or {}).get("macro") or {}).get("debito_sec")) or {}).get("per_titolo") or {}
     righe = {r["ticker"]: r for r in _righe(d)}
-    dietro, ferme_l, ritrovati = [], [], []
+    dietro, ferme_l, ritrovati, dal_com = [], [], [], []
     for tk, per in sorted((sec.get("per_titolo") or {}).items()):
         if not per:
             continue
@@ -810,13 +1068,39 @@ def righe_sec(d, sec, cercare, trim=None):
     for tk, f in sorted(((trim or {}).get("ferme") or {}).items()):
         nq = ((trim or {}).get("per_titolo") or {}).get(tk) or {}
         base = f"{tk} (conti al {_data_it(f['trim'])}, risultati depositati il {_data_it(f['dep'])}, {f['gg']} giorni dopo"
-        if nq.get("nuovi"):
+        ue = (uff_es or {}).get(tk) or {}
+        in_uso = ue.get("esito") in ("aggiunto", "sostituito")
+        # v513 — un deposito di risultati che e' un aggiornamento PRELIMINARE (un intervallo di stime non revisionate:
+        #   SMCI il 20/10/2026) non e' un numero del trimestre: registrato come tale, non si cerca a ogni analisi
+        pre = next((p for p in (uff_reg or {}).get("preliminari") or []
+                    if p["ticker"] == tk and str(p["deposito"])[:10] == f["dep"]), None)
+        # v513 — il comunicato copre il deposito se, messo in cima alla tabella, la tabella non e' piu' ferma: la stessa
+        #   regola delle schede e della tenuta (v161), non una seconda soglia
+        if in_uso and not schede_progetto.deposito_oltre_la_tabella({"tv": {"conto_trim": [{"trim": ue["trim"]}]}},
+                                                                     {"ultimo_deposito": f["dep"]}):
+            dal_com.append(base + f"; dal comunicato ufficiale del {_data_it(ue['data'])} il trimestre al "
+                           f"{_data_it(ue['trim'])})")
+        elif pre and not nq.get("nuovi"):
+            ferme_l.append(base + f"; il deposito del {_data_it(f['dep'])} e' un aggiornamento PRELIMINARE, registrato il "
+                           f"{_data_it(pre['verificato_il'])}: {pre['nota']} — non e' un numero del trimestre)")
+        elif nq.get("nuovi"):
             ritrovati.append(base + f"; da Nasdaq il trimestre al {_data_it(nq['nuovi'][0]['trim'])}, verificato sul "
                              f"{_data_it(nq.get('comune'))}" + ("" if (nq.get("voci") or {}).get("utile") else
                                                                 ", senza l'utile: le due fonti lo definiscono diversamente")
                              + ")")
         else:
-            ferme_l.append(base + f"; Nasdaq: {nq.get('esito') or 'non letto'})")
+            ferme_l.append(base + f"; Nasdaq: {nq.get('esito') or 'non letto'}"
+                           + (f"; il comunicato registrato e' del trimestre al {_data_it(ue['trim'])}, precedente a quel "
+                              "deposito" if in_uso else "") + ")")
+            perche = (" — sul trimestre in comune Yahoo e Nasdaq non danno gli stessi ricavi: le due fonti li definiscono "
+                      "diversamente" if "non coincidono" in str(nq.get("esito")) else "")
+            if f.get("irregolare"):
+                perche += (" (⚠ deposita risultati anche fuori ciclo: se il deposito e' un preliminare o una guida, non "
+                           "e' un numero del trimestre e non si registra)")
+            cercare.append(f"il comunicato ufficiale di {tk} sui risultati depositati il {_data_it(f['dep'])}{perche}: "
+                           "ricavi, utile e risultato operativo del trimestre COI CONFRONTI DEL COMUNICATO STESSO "
+                           "(l'anno prima e il trimestre prima), con la voce, il link e la data, da scrivere in "
+                           "memoria/trimestri_ufficiali.json")
     L = [f"  · DEPOSITI SEC (date dei 10-Q e 10-K da Yahoo): {len(sec.get('per_titolo') or {})} titoli letti"
          + (f", non letti {', '.join(sec['non_letti'])}" if sec.get("non_letti") else "")]
     if dietro:
@@ -833,8 +1117,11 @@ def righe_sec(d, sec, cercare, trim=None):
         L.append(f"      ⚠ tabella dei trimestri FERMA (risultati depositati oltre {schede_progetto.GIORNI_DEPOSITO_OLTRE} "
                  "giorni dopo l'ultimo trimestre della tabella) e NON completata: " + ", ".join(ferme_l)
                  + " — ricavi e utili di quei nomi sono di un trimestre prima")
-        cercare.append("i conti dell'ultimo trimestre (comunicato o 10-Q) di " + ", ".join(x.split(" ")[0] for x in ferme_l))
-    if not dietro and not ritrovati and not ferme_l:
+    if dal_com:
+        L.append("      ✓ tabella dei trimestri della pipeline ferma, COMPLETATA dal comunicato ufficiale registrato: "
+                 + ", ".join(dal_com) + " — ricavi e utile del trimestre entrano nelle schede e nella tenuta coi "
+                 "confronti del comunicato stesso; cassa, debito e Altman restano del bilancio precedente")
+    if not dietro and not ritrovati and not ferme_l and not dal_com:
         L.append("      nessun bilancio periodico piu' recente di quelli letti dal sistema")
     return L
 
