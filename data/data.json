@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-25T14:03:21Z",
+ "updated_at": "2026-10-25T17:11:40Z",
  "eurusd": 1.1204,
  "totals": {
   "usd_value": 0,
@@ -5858,7 +5858,7 @@
      "a1": 4.43,
      "a3": 418.86,
      "a5": 728.76,
-     "a10": 11984.16
+     "a10": 11984.15
     },
     "stagionalita": [
      {
@@ -17491,28 +17491,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 80274.08,
+   "price": 80707.15,
    "price_asof": "2026-10-25",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.64,
+   "change_pct": -0.1,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -36.4,
-   "sma200_dist_pct": 10.0,
-   "sma50_dist_pct": -1.9,
+   "ath_dist_pct": -36.0,
+   "sma200_dist_pct": 10.6,
+   "sma50_dist_pct": -1.4,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
-   "w52_dist_pct": -31.0,
+   "w52_dist_pct": -30.6,
    "day_high": 80920.16,
    "day_low": 80007.93,
    "support": 79145.54,
    "resistance": 86664.54,
-   "rsi": 42.4,
-   "volume": 18969276416,
+   "rsi": 43.9,
+   "volume": 11548389376,
    "vol_ratio": 0.76,
    "atr_14": 2026.66,
-   "atr_pct": 2.52,
+   "atr_pct": 2.51,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -17521,7 +17521,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80274.08
+     80707.15
     ],
     "m6": [
      63952.11,
@@ -17649,7 +17649,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80274.08
+     80707.15
     ],
     "all": [
      386.94,
@@ -17797,7 +17797,7 @@
      62813.75,
      78548.63,
      83553.85,
-     80274.08
+     80707.15
     ],
     "m1": [
      86480.3,
@@ -17821,7 +17821,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80274.08
+     80707.15
     ],
     "m3": [
      78335.19,
@@ -17889,7 +17889,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80274.08
+     80707.15
     ],
     "y1": [
      111641.73,
@@ -17965,7 +17965,7 @@
      82912.23,
      82141.46,
      82941.0,
-     80274.08
+     80707.15
     ],
     "d1": [
      80709.84,
@@ -18051,22 +18051,41 @@
      80251.96,
      80170.72,
      80288.34,
-     80287.08
+     80287.08,
+     80228.07,
+     80304.53,
+     80245.79,
+     80243.22,
+     80314.77,
+     80440.53,
+     80595.66,
+     80583.94,
+     80437.28,
+     80535.54,
+     80559.49,
+     80543.22,
+     80463.14,
+     80495.49,
+     80441.07,
+     80516.53,
+     80489.89,
+     80606.49,
+     80677.49
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 36,
+   "health": 37,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.72,
-   "sortino_1y": -0.98,
-   "sharpe_6m": 1.47,
-   "sortino_6m": 2.65,
+   "sharpe_1y": -0.71,
+   "sortino_1y": -0.97,
+   "sharpe_6m": 1.51,
+   "sortino_6m": 2.72,
    "prepost": null,
-   "prezzo_limite_aggiustato": 80274.08,
-   "risk_reward": "1:1.6",
+   "prezzo_limite_aggiustato": 80707.15,
+   "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -18079,31 +18098,31 @@
     "w1": {
      "support": 79145.54,
      "resistance": 84840.05,
-     "change_pct": -4.45
+     "change_pct": -3.93
     },
     "m1": {
      "support": 79145.54,
      "resistance": 86971.78,
-     "change_pct": -7.18
+     "change_pct": -6.68
     },
     "m3": {
      "support": 73011.41,
      "resistance": 87363.76,
-     "change_pct": 2.48
+     "change_pct": 3.03
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 16.6
+     "change_pct": 17.23
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 46,
-    "label": "Neutro",
+    "bias": 60,
+    "label": "Lieve rialzo",
     "structure": "rialzista",
-    "bos": "ribassista",
+    "bos": null,
     "bull_fvg": 0,
     "bear_fvg": 2,
     "last_fvg": {
@@ -18112,7 +18131,7 @@
      "hi": 82543.45
     },
     "liq_above": 81235.03,
-    "liq_below": 79735.86,
+    "liq_below": 80615.4,
     "order_block": {
      "dir": "rialzista",
      "lo": 81853.54,
@@ -18121,74 +18140,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 80274.08,
+     "prezzo": 80707.15,
      "medie": {
       "sma10": {
-       "liv": 81715.81,
-       "dist_pct": -1.76
+       "liv": 81759.11,
+       "dist_pct": -1.29
       },
       "ema10": {
-       "liv": 81614.2,
-       "dist_pct": -1.64
+       "liv": 81692.94,
+       "dist_pct": -1.21
       },
       "sma20": {
-       "liv": 82268.38,
-       "dist_pct": -2.42
+       "liv": 82290.03,
+       "dist_pct": -1.92
       },
       "ema20": {
-       "liv": 82066.2,
-       "dist_pct": -2.18
+       "liv": 82107.45,
+       "dist_pct": -1.71
       },
       "sma30": {
-       "liv": 83043.06,
-       "dist_pct": -3.33
+       "liv": 83057.49,
+       "dist_pct": -2.83
       },
       "ema30": {
-       "liv": 81955.8,
-       "dist_pct": -2.05
+       "liv": 81983.74,
+       "dist_pct": -1.56
       },
       "sma50": {
-       "liv": 81809.72,
-       "dist_pct": -1.88
+       "liv": 81818.39,
+       "dist_pct": -1.36
       },
       "ema50": {
-       "liv": 80773.77,
-       "dist_pct": -0.62
+       "liv": 80790.75,
+       "dist_pct": -0.1
       },
       "sma100": {
-       "liv": 75452.24,
-       "dist_pct": 6.39
+       "liv": 75456.57,
+       "dist_pct": 6.96
       },
       "ema100": {
-       "liv": 77586.29,
-       "dist_pct": 3.46
+       "liv": 77594.86,
+       "dist_pct": 4.01
       },
       "sma200": {
-       "liv": 72946.59,
-       "dist_pct": 10.04
+       "liv": 72948.76,
+       "dist_pct": 10.64
       },
       "ema200": {
-       "liv": 76355.91,
-       "dist_pct": 5.13
+       "liv": 76360.22,
+       "dist_pct": 5.69
       }
      },
      "medie_battute": 4,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 42.4,
+      "rsi14": 43.9,
       "macd": {
-       "linea": -306.19,
-       "segnale": 24.9,
-       "istogramma": -331.09
+       "linea": -271.64,
+       "segnale": 31.81,
+       "istogramma": -303.45
       },
-      "stoch_k": 19.8,
-      "stoch_d": 25.0,
-      "williams_r": -80.2,
-      "cci20": -83.1,
+      "stoch_k": 27.4,
+      "stoch_d": 27.5,
+      "williams_r": -72.6,
+      "cci20": -77.5,
       "adx14": 17.4,
       "di_su": 17.3,
       "di_giu": 24.0,
-      "momentum10": -1867.38
+      "momentum10": -1434.31
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -18681,19 +18700,19 @@
       "o": 80770.71,
       "h": 80920.16,
       "l": 80007.93,
-      "c": 80274.08
+      "c": 80707.15
      }
     ],
     "performance": {
-     "s1": -3.22,
-     "m1": -5.3,
-     "m3": 9.92,
-     "m6": 26.94,
-     "a1": 16.7,
-     "ytd": -9.53,
-     "a3": 131.55,
-     "a5": 30.91,
-     "a10": 11351.82
+     "s1": -2.69,
+     "m1": -4.79,
+     "m3": 10.51,
+     "m6": 27.63,
+     "a1": 17.33,
+     "ytd": -9.04,
+     "a3": 132.8,
+     "a5": 31.62,
+     "a10": 11413.61
     },
     "stagionalita": [
      {
@@ -18806,9 +18825,9 @@
      }
     ]
    },
-   "rs_1m": -6.1,
+   "rs_1m": -5.6,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.2,
+   "rs_ndx_1m": -1.7,
    "beta_ndx": 0.67,
    "avg_corr": 0.33,
    "max_corr": 0.78,
@@ -36106,7 +36125,7 @@
      98.35,
      84.39,
      94.22,
-     99.64,
+     99.65,
      83.74,
      89.74,
      116.26,
@@ -51410,7 +51429,7 @@
       },
       "evento": {
        "beta": 0.88,
-       "r2": 0.106,
+       "r2": 0.105,
        "corr": 0.32,
        "campione": 50,
        "da": "2025-10-29",
@@ -59864,14 +59883,14 @@
      247.18,
      258.21,
      275.82,
-     303.03,
+     303.04,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -65352,7 +65371,7 @@
      961.76,
      1054.17,
      1054.93,
-     1064.75,
+     1064.74,
      1416.2,
      1445.53,
      1316.25,
@@ -68475,7 +68494,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -69371,7 +69390,7 @@
      89.67,
      84.81,
      81.51,
-     76.13,
+     76.14,
      71.27,
      77.61,
      69.12,
@@ -87170,7 +87189,7 @@
      17.66,
      17.66,
      16.5,
-     17.24,
+     17.23,
      16.68,
      17.58,
      16.44,
@@ -87224,7 +87243,7 @@
      26.8,
      25.7,
      26.38,
-     27.77,
+     27.76,
      27.44,
      28.48,
      30.19,
@@ -89402,7 +89421,7 @@
      32.88,
      31.09,
      28.92,
-     32.13,
+     32.12,
      32.9,
      33.61,
      31.46,
@@ -99232,7 +99251,7 @@
      155.94,
      153.23,
      164.84,
-     169.07,
+     169.06,
      171.99,
      163.61,
      170.13,
@@ -99295,7 +99314,7 @@
      261.2,
      272.27,
      270.87,
-     285.55,
+     285.54,
      310.99,
      311.94,
      337.36,
@@ -101039,7 +101058,7 @@
      344.76,
      305.88,
      342.21,
-     344.34,
+     344.33,
      369.93,
      349.13,
      353.5,
@@ -104863,7 +104882,7 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
      336.45,
      329.49,
@@ -106008,7 +106027,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -110937,7 +110956,7 @@
      149.48,
      156.2,
      164.48,
-     166.55,
+     166.56,
      163.59,
      150.97,
      139.09,
@@ -114767,7 +114786,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -114800,7 +114819,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -114818,7 +114837,7 @@
      99.51,
      97.2,
      108.68,
-     129.7,
+     129.69,
      124.73,
      136.32,
      138.59,
@@ -114965,7 +114984,7 @@
      390.19,
      418.26,
      427.74,
-     448.72,
+     448.71,
      393.97,
      377.2,
      430.42,
@@ -129454,6 +129473,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "We have a $300,000 mortgage with a 2.75% interest rate. I want to pay it off. My husband says I’m crazy. Who’s right?",
+     "riassunto": "“I don’t want to enter retirement owing six figures when we have the cash to clear it.”",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-25T17:00:00Z",
+     "url": "https://www.marketwatch.com/story/we-have-a-300-000-mortgage-with-a-2-75-interest-rate-i-want-to-pay-it-off-my-husband-says-im-crazy-whos-right-4ed15226?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "Fed Looks Set to Pause After September Rate Hike",
      "riassunto": "On Bloomberg This Weekend, Bloomberg News Federal Reserve reporter Maria Eloisa Capurro previews the Fed’s upcoming rate decision, with policymakers widely expected to pause after September’s first rate increase since 2023 despite inflation remaining above target. Speaking with hosts David Gura and Christina Ruffini, C",
      "fonte": "Bloomberg",
@@ -129482,39 +129508,11 @@
      "url": "https://www.bloomberg.com/news/articles/2026-10-25/emerging-debt-outruns-treasuries-as-rich-world-fiscal-fears-grow"
     },
     {
-     "titolo": "Why economic health no longer dictates stock-market returns",
-     "riassunto": "There is a wide disconnect between Wall Street and Main Street, and AI could drive them even further apart",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-25T12:00:00Z",
-     "url": "https://www.marketwatch.com/story/why-economic-health-no-longer-dictates-stock-market-returns-c44b88f2?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "Here’s the real signal to watch for the Fed’s next move",
-     "riassunto": "Investors should focus not on the rate itself, but on where financial conditions are",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-25T11:30:00Z",
-     "url": "https://www.marketwatch.com/story/heres-the-real-signal-to-watch-for-the-feds-next-move-9189cb51?mod=mw_rss_topstories"
-    },
-    {
      "titolo": "French Bond Rout Puts Crisis at Heart of ECB Succession Endgame",
      "riassunto": "The European Central Bank’s presidency race looks increasingly likely to hinge on which candidate can best take on the bond vigilantes.",
      "fonte": "Bloomberg",
      "quando": "2026-10-25T10:00:00Z",
      "url": "https://www.bloomberg.com/news/articles/2026-10-25/french-bond-rout-puts-crisis-at-heart-of-ecb-succession-endgame"
-    },
-    {
-     "titolo": "Embracing the Bond Market: Masters in Business with Robin Wigglesworth",
-     "riassunto": "Barry speaks with Robin Wigglesworth, editor of Financial Times' Alphaville blog and author of the new book 'A Fabulous Debt: The Epic Story of How Bonds Built the Modern World'. They discuss the bond market as the engine of the global economy, why the 30-year mortgage is \"a miracle of the modern world,\" and when we sh",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-24T17:05:04Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-10-24/embracing-the-bond-market-masters-in-business-with-robin-wigglesworth"
-    },
-    {
-     "titolo": "‘Total Meltdown’ in Riskiest Debt Unnerves Market: Credit Weekly",
-     "riassunto": "It was a panicked message from a colleague that woke fund manager Ivelina Green at 5 a.m. on Thursday morning in New York: “Total meltdown.”",
-     "fonte": "Bloomberg",
-     "quando": "2026-10-24T15:21:35Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-10-24/-total-meltdown-in-riskiest-debt-unnerves-market-credit-weekly"
     },
     {
      "titolo": "Trump's approval rating on economy hits all-time low as midterm looms: CNBC survey",
@@ -129578,6 +129576,27 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-16T22:33:05Z",
      "url": "https://www.cnbc.com/2026/10/15/treasury-yields-deficit-national-debt-ai.html"
+    },
+    {
+     "titolo": "Analysis: Everyone expects the Fed to hold rates in October. Kevin Warsh could surprise us all",
+     "riassunto": "Investors expect the Fed to pause rate hikes in October, but Kevin Warsh's rejection of traditional communications practices and continued concern about inflation leave the decision uncertain.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-16T16:27:31Z",
+     "url": "https://www.cnbc.com/2026/10/16/kevin-warsh-fed-october-rate-hike-interest-rates-markets.html"
+    },
+    {
+     "titolo": "Wholesale prices jumped 6.3% annually in September, biggest gain since 2022",
+     "riassunto": "September producer prices were expected to increase 0.6% month over month and 5.5% annually, according to the consensus estimate by Dow Jones.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-15T16:15:44Z",
+     "url": "https://www.cnbc.com/2026/10/15/september-producer-price-index-retail-sales-data.html"
+    },
+    {
+     "titolo": "Economists: Hot PPI shows Fed's work is not done",
+     "riassunto": "'We see real risks the Fed will deliver another rate hike in two weeks' time,' one Fedwatcher warns",
+     "fonte": "CNBC Economia",
+     "quando": "2026-10-15T15:37:59Z",
+     "url": "https://www.cnbc.com/2026/10/15/pce-ppi-september-fed-reserve-rate-hike.html"
     }
    ],
    "fonti": [
@@ -137182,7 +137201,7 @@
    "calls": 563102
   },
   "risk_sentiment": {
-   "score": 37,
+   "score": 38,
    "label": "Risk-Off",
    "components": [
     {
@@ -137199,7 +137218,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 43
+     "score": 49
     },
     {
      "label": "Treasury 10A",
@@ -142608,6 +142627,13 @@
       "url": "https://www.nasdaq.com/articles/bloom-energy-raised-its-2026-forecast-third-time-stock-buy-more-third-below-its-record"
      },
      {
+      "titolo": "Bloom Energy Just Reported—Its Biggest Order Is Still Waiting on a Pipeline",
+      "riassunto": "Bloom Energy’s (NYSE: BE) Q3 earnings report shows strong growth despite uncertainty surrounding Oracle’s (NASDAQ: ORCL) force majeure notice. While a headwind, it is offset by numerous tailwinds, and investors must not get this wrong: Bloom's broader growth outlook does not de",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-24T15:05:00Z",
+      "url": "https://www.nasdaq.com/articles/bloom-energy-just-reported-its-biggest-order-still-waiting-pipeline"
+     },
+     {
       "titolo": "U.S. Power Demand Is Set to Jump 20% by 2030. Here's What It Means for Energy Stocks.",
       "riassunto": "Key PointsU.S. electricity demand could surge 20% by 2030, driven by AI data centers, electrification, and manufacturing growth.",
       "fonte": "Nasdaq",
@@ -142627,13 +142653,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-23T21:06:38Z",
       "url": "https://www.nasdaq.com/articles/stock-market-today-oct-23-bloom-energy-falls-cash-flow-concerns-despite-record-q3-revenue"
-     },
-     {
-      "titolo": "Bloom Energy Stock Sinks Despite Record Revenue and a Stellar Outlook. Is It Time to Buy?",
-      "riassunto": "Key PointsBloom Energy's Q3 revenue surged 138%, and backlog is growing faster than revenue.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-23T18:03:53Z",
-      "url": "https://www.nasdaq.com/articles/bloom-energy-stock-sinks-despite-record-revenue-and-stellar-outlook-it-time-buy"
      }
     ],
     "CRWV": [
@@ -142685,7 +142704,7 @@
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-25T13:40:49Z",
+      "quando": "2026-10-25T15:35:55Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
      },
      {
@@ -142729,7 +142748,7 @@
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-25T13:40:49Z",
+      "quando": "2026-10-25T15:35:55Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
      },
      {
@@ -142773,8 +142792,15 @@
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-25T13:40:49Z",
+      "quando": "2026-10-25T15:35:55Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
+     },
+     {
+      "titolo": "Micron Just Revealed a New Business Strategy. That Change Makes It a Screaming Buy.",
+      "riassunto": "Key PointsMicron's stock is dirt cheap because the market is still worried about a downturn.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-25T14:51:00Z",
+      "url": "https://www.nasdaq.com/articles/micron-just-revealed-new-business-strategy-change-makes-it-screaming-buy"
      },
      {
       "titolo": "Stock-Split Watch: Is Micron Next?",
@@ -142803,16 +142829,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-24T19:50:00Z",
       "url": "https://www.nasdaq.com/articles/nasdaq-just-had-its-worst-day-4-months-heres-level-would-signal-correction-and-what"
-     },
-     {
-      "titolo": "Micron vs. Sandisk: Which Is the Better AI Memory Stock to Own for the Next 3 Years",
-      "riassunto": "Key PointsSandisk has outperformed Micron on the stock market in 2026.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-24T13:22:00Z",
-      "url": "https://www.nasdaq.com/articles/micron-vs-sandisk-which-better-ai-memory-stock-own-next-3-years-0"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "2 Quantum Computing Stocks That Could Help Make You a Fortune",
+      "riassunto": "Key PointsIonQ's industry-leading technology and large system position it as a front-runner in the race to develop a commercially viable quantum computer.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-25T16:31:00Z",
+      "url": "https://www.nasdaq.com/articles/2-quantum-computing-stocks-could-help-make-you-fortune"
+     },
+     {
+      "titolo": "Prediction: A Stock Market Crash Is Coming. Here's What Investors Should Do Based on Warren Buffett's Advice.",
+      "riassunto": "Key PointsThe S&P 500 stock market index is a stone's throw from the highest valuation in its history, which was set during the dot-com bubble in 2000.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-25T13:54:00Z",
+      "url": "https://www.nasdaq.com/articles/prediction-stock-market-crash-coming-heres-what-investors-should-do-based-warren-0"
+     },
      {
       "titolo": "Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030",
       "riassunto": "Key PointsNvidia continues to be well positioned as a major AI winner.",
@@ -142840,20 +142873,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-25T07:28:01Z",
       "url": "https://www.nasdaq.com/articles/spacex-just-shared-great-news-artificial-intelligence-ai-investors-here-are-2-stocks-could"
-     },
-     {
-      "titolo": "As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid",
-      "riassunto": "Key PointsNvidia, Broadcom, and Advanced Micro Devices get paid to supply hardware.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-25T04:20:00Z",
-      "url": "https://www.nasdaq.com/articles/ai-labs-burn-cash-real-question-which-suppliers-get-paid"
-     },
-     {
-      "titolo": "Before You Buy the Vanguard S&P 500 ETF, There's 1 Sneaky Risk Investors Should Know",
-      "riassunto": "Key PointsThe Vanguard S&P 500 ETF has generated a total return of 323% in the past decade.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-24T21:43:00Z",
-      "url": "https://www.nasdaq.com/articles/you-buy-vanguard-sp-500-etf-theres-1-sneaky-risk-investors-should-know"
      }
     ],
     "PLTR": [
@@ -142965,7 +142984,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-25T14:03:21Z"
+   "letto_il": "2026-10-25T17:11:40Z"
   }
  },
  "broker": null,
@@ -143031,6 +143050,13 @@
      "url": "https://www.nasdaq.com/articles/bloom-energy-raised-its-2026-forecast-third-time-stock-buy-more-third-below-its-record"
     },
     {
+     "titolo": "Bloom Energy Just Reported—Its Biggest Order Is Still Waiting on a Pipeline",
+     "riassunto": "Bloom Energy’s (NYSE: BE) Q3 earnings report shows strong growth despite uncertainty surrounding Oracle’s (NASDAQ: ORCL) force majeure notice. While a headwind, it is offset by numerous tailwinds, and investors must not get this wrong: Bloom's broader growth outlook does not de",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-24T15:05:00Z",
+     "url": "https://www.nasdaq.com/articles/bloom-energy-just-reported-its-biggest-order-still-waiting-pipeline"
+    },
+    {
      "titolo": "U.S. Power Demand Is Set to Jump 20% by 2030. Here's What It Means for Energy Stocks.",
      "riassunto": "Key PointsU.S. electricity demand could surge 20% by 2030, driven by AI data centers, electrification, and manufacturing growth.",
      "fonte": "Nasdaq",
@@ -143050,13 +143076,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-23T21:06:38Z",
      "url": "https://www.nasdaq.com/articles/stock-market-today-oct-23-bloom-energy-falls-cash-flow-concerns-despite-record-q3-revenue"
-    },
-    {
-     "titolo": "Bloom Energy Stock Sinks Despite Record Revenue and a Stellar Outlook. Is It Time to Buy?",
-     "riassunto": "Key PointsBloom Energy's Q3 revenue surged 138%, and backlog is growing faster than revenue.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-23T18:03:53Z",
-     "url": "https://www.nasdaq.com/articles/bloom-energy-stock-sinks-despite-record-revenue-and-stellar-outlook-it-time-buy"
     }
    ],
    "CRWV": [
@@ -143108,7 +143127,7 @@
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-25T13:40:49Z",
+     "quando": "2026-10-25T15:35:55Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
     },
     {
@@ -143152,7 +143171,7 @@
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-25T13:40:49Z",
+     "quando": "2026-10-25T15:35:55Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
     },
     {
@@ -143196,8 +143215,15 @@
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-25T13:40:49Z",
+     "quando": "2026-10-25T15:35:55Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
+    },
+    {
+     "titolo": "Micron Just Revealed a New Business Strategy. That Change Makes It a Screaming Buy.",
+     "riassunto": "Key PointsMicron's stock is dirt cheap because the market is still worried about a downturn.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-25T14:51:00Z",
+     "url": "https://www.nasdaq.com/articles/micron-just-revealed-new-business-strategy-change-makes-it-screaming-buy"
     },
     {
      "titolo": "Stock-Split Watch: Is Micron Next?",
@@ -143226,16 +143252,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-24T19:50:00Z",
      "url": "https://www.nasdaq.com/articles/nasdaq-just-had-its-worst-day-4-months-heres-level-would-signal-correction-and-what"
-    },
-    {
-     "titolo": "Micron vs. Sandisk: Which Is the Better AI Memory Stock to Own for the Next 3 Years",
-     "riassunto": "Key PointsSandisk has outperformed Micron on the stock market in 2026.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-24T13:22:00Z",
-     "url": "https://www.nasdaq.com/articles/micron-vs-sandisk-which-better-ai-memory-stock-own-next-3-years-0"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "2 Quantum Computing Stocks That Could Help Make You a Fortune",
+     "riassunto": "Key PointsIonQ's industry-leading technology and large system position it as a front-runner in the race to develop a commercially viable quantum computer.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-25T16:31:00Z",
+     "url": "https://www.nasdaq.com/articles/2-quantum-computing-stocks-could-help-make-you-fortune"
+    },
+    {
+     "titolo": "Prediction: A Stock Market Crash Is Coming. Here's What Investors Should Do Based on Warren Buffett's Advice.",
+     "riassunto": "Key PointsThe S&P 500 stock market index is a stone's throw from the highest valuation in its history, which was set during the dot-com bubble in 2000.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-25T13:54:00Z",
+     "url": "https://www.nasdaq.com/articles/prediction-stock-market-crash-coming-heres-what-investors-should-do-based-warren-0"
+    },
     {
      "titolo": "Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030",
      "riassunto": "Key PointsNvidia continues to be well positioned as a major AI winner.",
@@ -143263,20 +143296,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-25T07:28:01Z",
      "url": "https://www.nasdaq.com/articles/spacex-just-shared-great-news-artificial-intelligence-ai-investors-here-are-2-stocks-could"
-    },
-    {
-     "titolo": "As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid",
-     "riassunto": "Key PointsNvidia, Broadcom, and Advanced Micro Devices get paid to supply hardware.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-25T04:20:00Z",
-     "url": "https://www.nasdaq.com/articles/ai-labs-burn-cash-real-question-which-suppliers-get-paid"
-    },
-    {
-     "titolo": "Before You Buy the Vanguard S&P 500 ETF, There's 1 Sneaky Risk Investors Should Know",
-     "riassunto": "Key PointsThe Vanguard S&P 500 ETF has generated a total return of 323% in the past decade.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-24T21:43:00Z",
-     "url": "https://www.nasdaq.com/articles/you-buy-vanguard-sp-500-etf-theres-1-sneaky-risk-investors-should-know"
     }
    ],
    "PLTR": [
@@ -143388,7 +143407,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-25T14:03:21Z"
+  "letto_il": "2026-10-25T17:11:40Z"
  },
  "predictions": [
   {
@@ -143400,16 +143419,6 @@
    "question": "Will the Fed increase interest rates by 25 bps after the October 2026 meeting?",
    "yes": 6,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-october-2026-meeting-20260617190324032"
-  },
-  {
-   "question": "Will Bitcoin dip to $70,000 by December 31, 2026?",
-   "yes": 40,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-70000-by-december-31-2026-from-august-24"
-  },
-  {
-   "question": "Will Bitcoin dip to $78,000 October 19-25?",
-   "yes": 5,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-78k-october-19-25-2026"
   }
  ],
  "options": {
@@ -214608,7 +214617,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 21,
-    "risk_sentiment": 37,
+    "risk_sentiment": 38,
     "credit": 76,
     "systemic_risk": 53,
     "corp_profit": 53,
@@ -214870,6 +214879,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-25T14:03:22Z"
+  "generated_at": "2026-10-25T17:11:41Z"
  }
 }
