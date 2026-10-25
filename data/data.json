@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-25T17:11:40Z",
+ "updated_at": "2026-10-25T17:50:04Z",
  "eurusd": 1.1204,
  "totals": {
   "usd_value": 0,
@@ -1879,7 +1879,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -17491,14 +17491,14 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 80707.15,
+   "price": 80696.28,
    "price_asof": "2026-10-25",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.1,
+   "change_pct": -0.12,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -36.0,
+   "ath_dist_pct": -36.1,
    "sma200_dist_pct": 10.6,
    "sma50_dist_pct": -1.4,
    "w52_high": 116273.31,
@@ -17509,7 +17509,7 @@
    "support": 79145.54,
    "resistance": 86664.54,
    "rsi": 43.9,
-   "volume": 11548389376,
+   "volume": 11412911104,
    "vol_ratio": 0.76,
    "atr_14": 2026.66,
    "atr_pct": 2.51,
@@ -17521,7 +17521,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80707.15
+     80696.28
     ],
     "m6": [
      63952.11,
@@ -17649,7 +17649,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80707.15
+     80696.28
     ],
     "all": [
      386.94,
@@ -17797,7 +17797,7 @@
      62813.75,
      78548.63,
      83553.85,
-     80707.15
+     80696.28
     ],
     "m1": [
      86480.3,
@@ -17821,7 +17821,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80707.15
+     80696.28
     ],
     "m3": [
      78335.19,
@@ -17889,7 +17889,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80707.15
+     80696.28
     ],
     "y1": [
      111641.73,
@@ -17965,7 +17965,7 @@
      82912.23,
      82141.46,
      82941.0,
-     80707.15
+     80696.28
     ],
     "d1": [
      80709.84,
@@ -18070,7 +18070,11 @@
      80516.53,
      80489.89,
      80606.49,
-     80677.49
+     80677.49,
+     80675.27,
+     80686.85,
+     80631.95,
+     80712.25
     ]
    },
    "earnings_date": null,
@@ -18081,10 +18085,10 @@
    "beta": null,
    "sharpe_1y": -0.71,
    "sortino_1y": -0.97,
-   "sharpe_6m": 1.51,
+   "sharpe_6m": 1.5,
    "sortino_6m": 2.72,
    "prepost": null,
-   "prezzo_limite_aggiustato": 80707.15,
+   "prezzo_limite_aggiustato": 80696.28,
    "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -18098,22 +18102,22 @@
     "w1": {
      "support": 79145.54,
      "resistance": 84840.05,
-     "change_pct": -3.93
+     "change_pct": -3.95
     },
     "m1": {
      "support": 79145.54,
      "resistance": 86971.78,
-     "change_pct": -6.68
+     "change_pct": -6.69
     },
     "m3": {
      "support": 73011.41,
      "resistance": 87363.76,
-     "change_pct": 3.03
+     "change_pct": 3.01
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 17.23
+     "change_pct": 17.22
     }
    },
    "financials": [],
@@ -18140,55 +18144,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 80707.15,
+     "prezzo": 80696.28,
      "medie": {
       "sma10": {
-       "liv": 81759.11,
-       "dist_pct": -1.29
+       "liv": 81758.03,
+       "dist_pct": -1.3
       },
       "ema10": {
-       "liv": 81692.94,
-       "dist_pct": -1.21
+       "liv": 81690.97,
+       "dist_pct": -1.22
       },
       "sma20": {
-       "liv": 82290.03,
-       "dist_pct": -1.92
+       "liv": 82289.49,
+       "dist_pct": -1.94
       },
       "ema20": {
-       "liv": 82107.45,
-       "dist_pct": -1.71
+       "liv": 82106.41,
+       "dist_pct": -1.72
       },
       "sma30": {
-       "liv": 83057.49,
-       "dist_pct": -2.83
+       "liv": 83057.13,
+       "dist_pct": -2.84
       },
       "ema30": {
-       "liv": 81983.74,
-       "dist_pct": -1.56
+       "liv": 81983.04,
+       "dist_pct": -1.57
       },
       "sma50": {
-       "liv": 81818.39,
-       "dist_pct": -1.36
+       "liv": 81818.17,
+       "dist_pct": -1.37
       },
       "ema50": {
-       "liv": 80790.75,
-       "dist_pct": -0.1
+       "liv": 80790.33,
+       "dist_pct": -0.12
       },
       "sma100": {
-       "liv": 75456.57,
-       "dist_pct": 6.96
+       "liv": 75456.46,
+       "dist_pct": 6.94
       },
       "ema100": {
-       "liv": 77594.86,
-       "dist_pct": 4.01
+       "liv": 77594.65,
+       "dist_pct": 4.0
       },
       "sma200": {
-       "liv": 72948.76,
-       "dist_pct": 10.64
+       "liv": 72948.7,
+       "dist_pct": 10.62
       },
       "ema200": {
-       "liv": 76360.22,
-       "dist_pct": 5.69
+       "liv": 76360.11,
+       "dist_pct": 5.68
       }
      },
      "medie_battute": 4,
@@ -18196,18 +18200,18 @@
      "oscillatori": {
       "rsi14": 43.9,
       "macd": {
-       "linea": -271.64,
-       "segnale": 31.81,
-       "istogramma": -303.45
+       "linea": -272.51,
+       "segnale": 31.63,
+       "istogramma": -304.14
       },
-      "stoch_k": 27.4,
-      "stoch_d": 27.5,
-      "williams_r": -72.6,
-      "cci20": -77.5,
+      "stoch_k": 27.2,
+      "stoch_d": 27.4,
+      "williams_r": -72.8,
+      "cci20": -77.6,
       "adx14": 17.4,
       "di_su": 17.3,
       "di_giu": 24.0,
-      "momentum10": -1434.31
+      "momentum10": -1445.18
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -18700,19 +18704,19 @@
       "o": 80770.71,
       "h": 80920.16,
       "l": 80007.93,
-      "c": 80707.15
+      "c": 80696.28
      }
     ],
     "performance": {
-     "s1": -2.69,
-     "m1": -4.79,
-     "m3": 10.51,
-     "m6": 27.63,
-     "a1": 17.33,
-     "ytd": -9.04,
-     "a3": 132.8,
-     "a5": 31.62,
-     "a10": 11413.61
+     "s1": -2.71,
+     "m1": -4.8,
+     "m3": 10.49,
+     "m6": 27.61,
+     "a1": 17.31,
+     "ytd": -9.06,
+     "a3": 132.77,
+     "a5": 31.6,
+     "a10": 11412.06
     },
     "stagionalita": [
      {
@@ -51429,7 +51433,7 @@
       },
       "evento": {
        "beta": 0.88,
-       "r2": 0.105,
+       "r2": 0.106,
        "corr": 0.32,
        "campione": 50,
        "da": "2025-10-29",
@@ -53854,7 +53858,7 @@
      24.28,
      21.19,
      21.19,
-     18.3,
+     18.31,
      20.9,
      17.41,
      13.16,
@@ -56211,7 +56215,7 @@
      133.39,
      142.05,
      148.09,
-     138.02,
+     138.01,
      146.11,
      161.46,
      173.45,
@@ -59883,14 +59887,14 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -65371,7 +65375,7 @@
      961.76,
      1054.17,
      1054.93,
-     1064.74,
+     1064.75,
      1416.2,
      1445.53,
      1316.25,
@@ -66475,7 +66479,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.64,
+      "mediana": 1.63,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -66520,7 +66524,7 @@
      {
       "mese": 12,
       "media": 2.95,
-      "mediana": 4.33,
+      "mediana": 4.32,
       "positivi_pct": 71,
       "campione": 31,
       "peggio": -25.0,
@@ -73391,7 +73395,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -87189,7 +87193,7 @@
      17.66,
      17.66,
      16.5,
-     17.23,
+     17.24,
      16.68,
      17.58,
      16.44,
@@ -90673,7 +90677,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -97617,7 +97621,7 @@
      322.37,
      340.11,
      336.06,
-     360.42,
+     360.43,
      358.86,
      369.78,
      383.01,
@@ -99314,7 +99318,7 @@
      261.2,
      272.27,
      270.87,
-     285.54,
+     285.55,
      310.99,
      311.94,
      337.36,
@@ -101058,7 +101062,7 @@
      344.76,
      305.88,
      342.21,
-     344.33,
+     344.34,
      369.93,
      349.13,
      353.5,
@@ -104882,7 +104886,7 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
      336.45,
      329.49,
@@ -106027,7 +106031,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -110956,7 +110960,7 @@
      149.48,
      156.2,
      164.48,
-     166.56,
+     166.55,
      163.59,
      150.97,
      139.09,
@@ -111048,7 +111052,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -114786,7 +114790,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -114819,7 +114823,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -114837,7 +114841,7 @@
      99.51,
      97.2,
      108.68,
-     129.69,
+     129.7,
      124.73,
      136.32,
      138.59,
@@ -114984,7 +114988,7 @@
      390.19,
      418.26,
      427.74,
-     448.71,
+     448.72,
      393.97,
      377.2,
      430.42,
@@ -127395,8 +127399,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "175.50",
-    "change_pct": -0.06,
+    "value": "175.40",
+    "change_pct": -0.11,
     "suffix": "%"
    }
   ],
@@ -142877,6 +142881,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "I Said Palantir Stock Would Top $220 This Year. Here's What It Has to Prove on Nov. 2.",
+      "riassunto": "Key PointsTo kick off another meaningful rally, Palantir will need to report accelerating revenue growth in Q3.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-25T17:03:00Z",
+      "url": "https://www.nasdaq.com/articles/i-said-palantir-stock-would-top-220-year-heres-what-it-has-prove-nov-2"
+     },
+     {
       "titolo": "Here's What a $10,000 Investment in Palantir Could Be Worth in 10 Years",
       "riassunto": "Key PointsRevenue increased 93% year over year in the latest quarter; however, over the next decade, a more conservative 20% annual growth rate is appropriate.",
       "fonte": "Nasdaq",
@@ -142910,13 +142921,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-24T08:20:00Z",
       "url": "https://www.nasdaq.com/articles/what-will-10000-investment-palantir-be-worth-2030"
-     },
-     {
-      "titolo": "Palantir Guided for $2.16 Billion in Revenue for Q3. Its Last 2 Quarters Suggest We Should Expect More.",
-      "riassunto": "Key PointsManagement guided for third-quarter revenue of about $2.16 billion.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-23T16:24:00Z",
-      "url": "https://www.nasdaq.com/articles/palantir-guided-216-billion-revenue-q3-its-last-2-quarters-suggest-we-should-expect-more"
      }
     ],
     "RGTI": [
@@ -142984,7 +142988,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-25T17:11:40Z"
+   "letto_il": "2026-10-25T17:50:04Z"
   }
  },
  "broker": null,
@@ -143300,6 +143304,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "I Said Palantir Stock Would Top $220 This Year. Here's What It Has to Prove on Nov. 2.",
+     "riassunto": "Key PointsTo kick off another meaningful rally, Palantir will need to report accelerating revenue growth in Q3.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-25T17:03:00Z",
+     "url": "https://www.nasdaq.com/articles/i-said-palantir-stock-would-top-220-year-heres-what-it-has-prove-nov-2"
+    },
+    {
      "titolo": "Here's What a $10,000 Investment in Palantir Could Be Worth in 10 Years",
      "riassunto": "Key PointsRevenue increased 93% year over year in the latest quarter; however, over the next decade, a more conservative 20% annual growth rate is appropriate.",
      "fonte": "Nasdaq",
@@ -143333,13 +143344,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-24T08:20:00Z",
      "url": "https://www.nasdaq.com/articles/what-will-10000-investment-palantir-be-worth-2030"
-    },
-    {
-     "titolo": "Palantir Guided for $2.16 Billion in Revenue for Q3. Its Last 2 Quarters Suggest We Should Expect More.",
-     "riassunto": "Key PointsManagement guided for third-quarter revenue of about $2.16 billion.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-23T16:24:00Z",
-     "url": "https://www.nasdaq.com/articles/palantir-guided-216-billion-revenue-q3-its-last-2-quarters-suggest-we-should-expect-more"
     }
    ],
    "RGTI": [
@@ -143407,7 +143411,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-25T17:11:40Z"
+  "letto_il": "2026-10-25T17:50:04Z"
  },
  "predictions": [
   {
@@ -214795,7 +214799,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -214879,6 +214883,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-25T17:11:41Z"
+  "generated_at": "2026-10-25T17:50:06Z"
  }
 }
