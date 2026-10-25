@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-25T13:32:06Z",
+ "updated_at": "2026-10-25T14:03:21Z",
  "eurusd": 1.1204,
  "totals": {
   "usd_value": 0,
@@ -1879,7 +1879,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -1937,10 +1937,10 @@
      },
      {
       "mese": 10,
-      "media": -0.96,
-      "mediana": -2.49,
-      "positivi_pct": 45,
-      "campione": 42,
+      "media": -0.56,
+      "mediana": -2.33,
+      "positivi_pct": 46,
+      "campione": 41,
       "peggio": -36.1,
       "meglio": 33.8
      },
@@ -3996,10 +3996,10 @@
      },
      {
       "mese": 10,
-      "media": -1.56,
-      "mediana": -6.79,
-      "positivi_pct": 38,
-      "campione": 42,
+      "media": -1.22,
+      "mediana": -5.73,
+      "positivi_pct": 39,
+      "campione": 41,
       "peggio": -47.7,
       "meglio": 58.3
      },
@@ -5858,7 +5858,7 @@
      "a1": 4.43,
      "a3": 418.86,
      "a5": 728.76,
-     "a10": 11984.15
+     "a10": 11984.16
     },
     "stagionalita": [
      {
@@ -5944,10 +5944,10 @@
      },
      {
       "mese": 10,
-      "media": 5.07,
-      "mediana": 4.88,
-      "positivi_pct": 57,
-      "campione": 28,
+      "media": 5.54,
+      "mediana": 5.91,
+      "positivi_pct": 59,
+      "campione": 27,
       "peggio": -25.0,
       "meglio": 56.0
      },
@@ -9376,10 +9376,10 @@
      },
      {
       "mese": 10,
-      "media": 0.18,
-      "mediana": -1.81,
-      "positivi_pct": 44,
-      "campione": 27,
+      "media": 0.7,
+      "mediana": -1.05,
+      "positivi_pct": 46,
+      "campione": 26,
       "peggio": -27.7,
       "meglio": 69.6
      },
@@ -12517,10 +12517,10 @@
      },
      {
       "mese": 10,
-      "media": -1.09,
-      "mediana": -9.09,
-      "positivi_pct": 22,
-      "campione": 9,
+      "media": 2.55,
+      "mediana": -7.75,
+      "positivi_pct": 25,
+      "campione": 8,
       "peggio": -30.3,
       "meglio": 67.0
      },
@@ -15723,10 +15723,10 @@
      },
      {
       "mese": 10,
-      "media": 15.87,
-      "mediana": 16.35,
-      "positivi_pct": 72,
-      "campione": 29,
+      "media": 16.6,
+      "mediana": 16.78,
+      "positivi_pct": 75,
+      "campione": 28,
       "peggio": -35.0,
       "meglio": 143.4
      },
@@ -17491,16 +17491,16 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 80208.17,
+   "price": 80274.08,
    "price_asof": "2026-10-25",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.72,
+   "change_pct": -0.64,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -36.4,
    "sma200_dist_pct": 10.0,
-   "sma50_dist_pct": -2.0,
+   "sma50_dist_pct": -1.9,
    "w52_high": 116273.31,
    "w52_low": 57747.77,
    "w52_dist_pct": -31.0,
@@ -17508,11 +17508,11 @@
    "day_low": 80007.93,
    "support": 79145.54,
    "resistance": 86664.54,
-   "rsi": 42.2,
-   "volume": 19033487360,
+   "rsi": 42.4,
+   "volume": 18969276416,
    "vol_ratio": 0.76,
    "atr_14": 2026.66,
-   "atr_pct": 2.53,
+   "atr_pct": 2.52,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -17521,7 +17521,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80208.17
+     80274.08
     ],
     "m6": [
      63952.11,
@@ -17649,7 +17649,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80208.17
+     80274.08
     ],
     "all": [
      386.94,
@@ -17797,7 +17797,7 @@
      62813.75,
      78548.63,
      83553.85,
-     80208.17
+     80274.08
     ],
     "m1": [
      86480.3,
@@ -17821,7 +17821,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80208.17
+     80274.08
     ],
     "m3": [
      78335.19,
@@ -17889,7 +17889,7 @@
      81311.89,
      81074.19,
      80790.84,
-     80208.17
+     80274.08
     ],
     "y1": [
      111641.73,
@@ -17965,7 +17965,7 @@
      82912.23,
      82141.46,
      82941.0,
-     80208.17
+     80274.08
     ],
     "d1": [
      80709.84,
@@ -18048,21 +18048,24 @@
      80333.0,
      80283.21,
      80312.83,
-     80251.96
+     80251.96,
+     80170.72,
+     80288.34,
+     80287.08
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 35,
+   "health": 36,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.72,
-   "sortino_1y": -0.99,
-   "sharpe_6m": 1.46,
-   "sortino_6m": 2.64,
+   "sortino_1y": -0.98,
+   "sharpe_6m": 1.47,
+   "sortino_6m": 2.65,
    "prepost": null,
-   "prezzo_limite_aggiustato": 80208.17,
+   "prezzo_limite_aggiustato": 80274.08,
    "risk_reward": "1:1.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -18076,22 +18079,22 @@
     "w1": {
      "support": 79145.54,
      "resistance": 84840.05,
-     "change_pct": -4.53
+     "change_pct": -4.45
     },
     "m1": {
      "support": 79145.54,
      "resistance": 86971.78,
-     "change_pct": -7.25
+     "change_pct": -7.18
     },
     "m3": {
      "support": 73011.41,
      "resistance": 87363.76,
-     "change_pct": 2.39
+     "change_pct": 2.48
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 16.51
+     "change_pct": 16.6
     }
    },
    "financials": [],
@@ -18118,74 +18121,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 80208.17,
+     "prezzo": 80274.08,
      "medie": {
       "sma10": {
-       "liv": 81709.21,
-       "dist_pct": -1.84
+       "liv": 81715.81,
+       "dist_pct": -1.76
       },
       "ema10": {
-       "liv": 81602.22,
-       "dist_pct": -1.71
+       "liv": 81614.2,
+       "dist_pct": -1.64
       },
       "sma20": {
-       "liv": 82265.08,
-       "dist_pct": -2.5
+       "liv": 82268.38,
+       "dist_pct": -2.42
       },
       "ema20": {
-       "liv": 82059.92,
-       "dist_pct": -2.26
+       "liv": 82066.2,
+       "dist_pct": -2.18
       },
       "sma30": {
-       "liv": 83040.86,
-       "dist_pct": -3.41
+       "liv": 83043.06,
+       "dist_pct": -3.33
       },
       "ema30": {
-       "liv": 81951.55,
-       "dist_pct": -2.13
+       "liv": 81955.8,
+       "dist_pct": -2.05
       },
       "sma50": {
-       "liv": 81808.41,
-       "dist_pct": -1.96
+       "liv": 81809.72,
+       "dist_pct": -1.88
       },
       "ema50": {
-       "liv": 80771.19,
-       "dist_pct": -0.7
+       "liv": 80773.77,
+       "dist_pct": -0.62
       },
       "sma100": {
-       "liv": 75451.58,
-       "dist_pct": 6.3
+       "liv": 75452.24,
+       "dist_pct": 6.39
       },
       "ema100": {
-       "liv": 77584.98,
-       "dist_pct": 3.38
+       "liv": 77586.29,
+       "dist_pct": 3.46
       },
       "sma200": {
-       "liv": 72946.26,
-       "dist_pct": 9.96
+       "liv": 72946.59,
+       "dist_pct": 10.04
       },
       "ema200": {
-       "liv": 76355.25,
-       "dist_pct": 5.05
+       "liv": 76355.91,
+       "dist_pct": 5.13
       }
      },
      "medie_battute": 4,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 42.2,
+      "rsi14": 42.4,
       "macd": {
-       "linea": -311.45,
-       "segnale": 23.85,
-       "istogramma": -335.29
+       "linea": -306.19,
+       "segnale": 24.9,
+       "istogramma": -331.09
       },
-      "stoch_k": 18.7,
-      "stoch_d": 24.6,
-      "williams_r": -81.3,
-      "cci20": -83.9,
+      "stoch_k": 19.8,
+      "stoch_d": 25.0,
+      "williams_r": -80.2,
+      "cci20": -83.1,
       "adx14": 17.4,
       "di_su": 17.3,
       "di_giu": 24.0,
-      "momentum10": -1933.29
+      "momentum10": -1867.38
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -18678,19 +18681,19 @@
       "o": 80770.71,
       "h": 80920.16,
       "l": 80007.93,
-      "c": 80208.17
+      "c": 80274.08
      }
     ],
     "performance": {
-     "s1": -3.29,
-     "m1": -5.37,
-     "m3": 9.82,
-     "m6": 26.84,
-     "a1": 16.6,
-     "ytd": -9.61,
-     "a3": 131.36,
-     "a5": 30.8,
-     "a10": 11342.42
+     "s1": -3.22,
+     "m1": -5.3,
+     "m3": 9.92,
+     "m6": 26.94,
+     "a1": 16.7,
+     "ytd": -9.53,
+     "a3": 131.55,
+     "a5": 30.91,
+     "a10": 11351.82
     },
     "stagionalita": [
      {
@@ -18776,10 +18779,10 @@
      },
      {
       "mese": 10,
-      "media": 15.05,
-      "mediana": 10.92,
-      "positivi_pct": 69,
-      "campione": 13,
+      "media": 16.63,
+      "mediana": 12.94,
+      "positivi_pct": 75,
+      "campione": 12,
       "peggio": -12.6,
       "meglio": 49.1
      },
@@ -18803,9 +18806,9 @@
      }
     ]
    },
-   "rs_1m": -6.2,
+   "rs_1m": -6.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.3,
+   "rs_ndx_1m": -2.2,
    "beta_ndx": 0.67,
    "avg_corr": 0.33,
    "max_corr": 0.78,
@@ -20372,10 +20375,10 @@
      },
      {
       "mese": 10,
-      "media": 4.87,
-      "mediana": 3.54,
-      "positivi_pct": 59,
-      "campione": 37,
+      "media": 4.47,
+      "mediana": 3.37,
+      "positivi_pct": 58,
+      "campione": 36,
       "peggio": -38.5,
       "meglio": 75.2
      },
@@ -21710,10 +21713,10 @@
      },
      {
       "mese": 10,
-      "media": 2.63,
-      "mediana": 4.43,
-      "positivi_pct": 65,
-      "campione": 23,
+      "media": 2.99,
+      "mediana": 4.76,
+      "positivi_pct": 68,
+      "campione": 22,
       "peggio": -16.1,
       "meglio": 16.5
      },
@@ -23179,10 +23182,10 @@
      },
      {
       "mese": 10,
-      "media": -1.04,
-      "mediana": -0.41,
-      "positivi_pct": 43,
-      "campione": 30,
+      "media": -0.43,
+      "mediana": -0.32,
+      "positivi_pct": 45,
+      "campione": 29,
       "peggio": -27.2,
       "meglio": 24.0
      },
@@ -24684,10 +24687,10 @@
      },
      {
       "mese": 10,
-      "media": 1.68,
-      "mediana": 0.76,
-      "positivi_pct": 58,
-      "campione": 33,
+      "media": 2.19,
+      "mediana": 2.03,
+      "positivi_pct": 59,
+      "campione": 32,
       "peggio": -22.0,
       "meglio": 23.9
      },
@@ -26269,10 +26272,10 @@
      },
      {
       "mese": 10,
-      "media": -0.55,
-      "mediana": 1.27,
-      "positivi_pct": 55,
-      "campione": 40,
+      "media": -0.54,
+      "mediana": 1.76,
+      "positivi_pct": 56,
+      "campione": 39,
       "peggio": -30.8,
       "meglio": 15.0
      },
@@ -27756,10 +27759,10 @@
      },
      {
       "mese": 10,
-      "media": -0.33,
-      "mediana": -0.32,
-      "positivi_pct": 48,
-      "campione": 23,
+      "media": -0.29,
+      "mediana": -0.03,
+      "positivi_pct": 50,
+      "campione": 22,
       "peggio": -9.9,
       "meglio": 4.1
      },
@@ -29099,10 +29102,10 @@
      },
      {
       "mese": 10,
-      "media": 0.43,
-      "mediana": 1.85,
-      "positivi_pct": 57,
-      "campione": 23,
+      "media": 0.49,
+      "mediana": 2.0,
+      "positivi_pct": 59,
+      "campione": 22,
       "peggio": -36.1,
       "meglio": 15.4
      },
@@ -30442,10 +30445,10 @@
      },
      {
       "mese": 10,
-      "media": -1.52,
-      "mediana": -2.23,
-      "positivi_pct": 39,
-      "campione": 23,
+      "media": -2.24,
+      "mediana": -2.54,
+      "positivi_pct": 36,
+      "campione": 22,
       "peggio": -32.6,
       "meglio": 17.7
      },
@@ -32016,10 +32019,10 @@
      },
      {
       "mese": 10,
-      "media": -4.95,
-      "mediana": -0.91,
-      "positivi_pct": 50,
-      "campione": 20,
+      "media": -4.17,
+      "mediana": 1.41,
+      "positivi_pct": 53,
+      "campione": 19,
       "peggio": -36.4,
       "meglio": 27.7
      },
@@ -35369,10 +35372,10 @@
      },
      {
       "mese": 10,
-      "media": 2.74,
-      "mediana": 1.19,
-      "positivi_pct": 53,
-      "campione": 30,
+      "media": 2.85,
+      "mediana": 2.35,
+      "positivi_pct": 55,
+      "campione": 29,
       "peggio": -21.3,
       "meglio": 27.3
      },
@@ -37265,10 +37268,10 @@
      },
      {
       "mese": 10,
-      "media": -1.51,
-      "mediana": -4.73,
-      "positivi_pct": 42,
-      "campione": 24,
+      "media": -0.2,
+      "mediana": -2.94,
+      "positivi_pct": 43,
+      "campione": 23,
       "peggio": -44.1,
       "meglio": 57.1
      },
@@ -39071,10 +39074,10 @@
      },
      {
       "mese": 10,
-      "media": 8.01,
-      "mediana": 8.12,
-      "positivi_pct": 70,
-      "campione": 23,
+      "media": 8.69,
+      "mediana": 9.2,
+      "positivi_pct": 73,
+      "campione": 22,
       "peggio": -10.3,
       "meglio": 47.1
      },
@@ -41259,10 +41262,10 @@
      },
      {
       "mese": 10,
-      "media": 0.4,
-      "mediana": -2.34,
-      "positivi_pct": 44,
-      "campione": 48,
+      "media": 0.93,
+      "mediana": -2.33,
+      "positivi_pct": 45,
+      "campione": 47,
       "peggio": -30.2,
       "meglio": 57.5
      },
@@ -43154,10 +43157,10 @@
      },
      {
       "mese": 10,
-      "media": 5.33,
-      "mediana": 5.83,
-      "positivi_pct": 76,
-      "campione": 29,
+      "media": 5.82,
+      "mediana": 5.93,
+      "positivi_pct": 79,
+      "campione": 28,
       "peggio": -13.7,
       "meglio": 36.0
      },
@@ -46589,10 +46592,10 @@
      },
      {
       "mese": 10,
-      "media": 1.76,
-      "mediana": 3.28,
-      "positivi_pct": 60,
-      "campione": 42,
+      "media": 2.48,
+      "mediana": 3.74,
+      "positivi_pct": 61,
+      "campione": 41,
       "peggio": -32.5,
       "meglio": 24.6
      },
@@ -49743,10 +49746,10 @@
      },
      {
       "mese": 10,
-      "media": 2.62,
-      "mediana": -2.81,
-      "positivi_pct": 41,
-      "campione": 17,
+      "media": 2.48,
+      "mediana": -2.95,
+      "positivi_pct": 38,
+      "campione": 16,
       "peggio": -19.7,
       "meglio": 43.7
      },
@@ -53184,10 +53187,10 @@
      },
      {
       "mese": 10,
-      "media": 6.06,
-      "mediana": 6.59,
-      "positivi_pct": 64,
-      "campione": 25,
+      "media": 6.53,
+      "mediana": 6.81,
+      "positivi_pct": 67,
+      "campione": 24,
       "peggio": -38.6,
       "meglio": 70.7
      },
@@ -55281,10 +55284,10 @@
      },
      {
       "mese": 10,
-      "media": 4.83,
-      "mediana": 4.03,
-      "positivi_pct": 66,
-      "campione": 41,
+      "media": 4.89,
+      "mediana": 4.05,
+      "positivi_pct": 65,
+      "campione": 40,
       "peggio": -24.9,
       "meglio": 37.2
      },
@@ -57384,10 +57387,10 @@
      },
      {
       "mese": 10,
-      "media": 5.12,
-      "mediana": 5.95,
+      "media": 5.14,
+      "mediana": 6.03,
       "positivi_pct": 71,
-      "campione": 42,
+      "campione": 41,
       "peggio": -31.6,
       "meglio": 35.2
      },
@@ -59157,10 +59160,10 @@
      },
      {
       "mese": 10,
-      "media": -3.07,
-      "mediana": -0.85,
-      "positivi_pct": 40,
-      "campione": 15,
+      "media": -2.47,
+      "mediana": -0.44,
+      "positivi_pct": 43,
+      "campione": 14,
       "peggio": -31.3,
       "meglio": 13.4
      },
@@ -59861,14 +59864,14 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -61026,10 +61029,10 @@
      },
      {
       "mese": 10,
-      "media": 4.72,
-      "mediana": 8.09,
-      "positivi_pct": 74,
-      "campione": 23,
+      "media": 4.55,
+      "mediana": 7.27,
+      "positivi_pct": 73,
+      "campione": 22,
       "peggio": -36.0,
       "meglio": 30.0
      },
@@ -62745,12 +62748,12 @@
      },
      {
       "mese": 10,
-      "media": 5.27,
-      "mediana": 5.12,
-      "positivi_pct": 73,
-      "campione": 15,
+      "media": 4.32,
+      "mediana": 4.72,
+      "positivi_pct": 71,
+      "campione": 14,
       "peggio": -20.8,
-      "meglio": 18.6
+      "meglio": 17.6
      },
      {
       "mese": 11,
@@ -64512,10 +64515,10 @@
      },
      {
       "mese": 10,
-      "media": 0.97,
-      "mediana": 0.22,
-      "positivi_pct": 50,
-      "campione": 18,
+      "media": 1.52,
+      "mediana": 1.3,
+      "positivi_pct": 53,
+      "campione": 17,
       "peggio": -12.1,
       "meglio": 12.0
      },
@@ -65349,7 +65352,7 @@
      961.76,
      1054.17,
      1054.93,
-     1064.74,
+     1064.75,
      1416.2,
      1445.53,
      1316.25,
@@ -66453,7 +66456,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.63,
+      "mediana": 1.64,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -66479,10 +66482,10 @@
      },
      {
       "mese": 10,
-      "media": 5.65,
-      "mediana": 2.63,
-      "positivi_pct": 62,
-      "campione": 32,
+      "media": 6.26,
+      "mediana": 2.85,
+      "positivi_pct": 65,
+      "campione": 31,
       "peggio": -25.8,
       "meglio": 62.5
      },
@@ -68472,7 +68475,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -68525,10 +68528,10 @@
      },
      {
       "mese": 10,
-      "media": 1.52,
-      "mediana": 2.41,
-      "positivi_pct": 60,
-      "campione": 42,
+      "media": 1.43,
+      "mediana": 2.08,
+      "positivi_pct": 59,
+      "campione": 41,
       "peggio": -29.8,
       "meglio": 37.6
      },
@@ -70559,10 +70562,10 @@
      },
      {
       "mese": 10,
-      "media": 2.47,
-      "mediana": 1.5,
-      "positivi_pct": 56,
-      "campione": 41,
+      "media": 2.73,
+      "mediana": 1.88,
+      "positivi_pct": 57,
+      "campione": 40,
       "peggio": -23.1,
       "meglio": 29.6
      },
@@ -72662,10 +72665,10 @@
      },
      {
       "mese": 10,
-      "media": 2.0,
-      "mediana": 2.62,
-      "positivi_pct": 60,
-      "campione": 42,
+      "media": 1.86,
+      "mediana": 2.55,
+      "positivi_pct": 59,
+      "campione": 41,
       "peggio": -15.5,
       "meglio": 18.2
      },
@@ -73369,7 +73372,7 @@
      11.1,
      11.27,
      11.09,
-     11.07,
+     11.06,
      11.8,
      11.5,
      10.69,
@@ -73690,7 +73693,7 @@
    "rating": {
     "key": "buy",
     "n": 10,
-    "target": 125.6,
+    "target": 125.62,
     "upside_pct": 59.8
    },
    "analisti": {
@@ -73704,9 +73707,9 @@
     "eps_min": 2.05,
     "eps_max": 4.1,
     "eps_n": 17,
-    "target_min": 84.58,
-    "target_max": 172.06,
-    "target_mediana": 130.53
+    "target_min": 84.59,
+    "target_max": 172.09,
+    "target_mediana": 130.55
    },
    "health": 18,
    "eps": 0.59,
@@ -73743,7 +73746,7 @@
     "debt_to_equity": 17.131,
     "dividend_yield": 0.0022,
     "price_to_book": null,
-    "target_mean": 125.6028,
+    "target_mean": 125.6208,
     "fcf": null,
     "gross_margin": 0.3511,
     "enterprise_value": null,
@@ -74628,10 +74631,10 @@
      },
      {
       "mese": 10,
-      "media": 1.46,
-      "mediana": -0.51,
-      "positivi_pct": 45,
-      "campione": 31,
+      "media": 1.82,
+      "mediana": -0.34,
+      "positivi_pct": 47,
+      "campione": 30,
       "peggio": -27.3,
       "meglio": 28.5
      },
@@ -76512,10 +76515,10 @@
      },
      {
       "mese": 10,
-      "media": 4.6,
-      "mediana": -0.88,
-      "positivi_pct": 47,
-      "campione": 30,
+      "media": 4.82,
+      "mediana": -0.77,
+      "positivi_pct": 48,
+      "campione": 29,
       "peggio": -27.7,
       "meglio": 97.0
      },
@@ -78199,11 +78202,11 @@
      },
      {
       "mese": 10,
-      "media": 1.63,
-      "mediana": 2.36,
-      "positivi_pct": 69,
-      "campione": 13,
-      "peggio": -15.3,
+      "media": 3.04,
+      "mediana": 3.89,
+      "positivi_pct": 75,
+      "campione": 12,
+      "peggio": -13.4,
       "meglio": 19.2
      },
      {
@@ -81422,10 +81425,10 @@
      },
      {
       "mese": 10,
-      "media": -0.76,
-      "mediana": 2.15,
-      "positivi_pct": 53,
-      "campione": 15,
+      "media": -0.51,
+      "mediana": 2.91,
+      "positivi_pct": 57,
+      "campione": 14,
       "peggio": -18.7,
       "meglio": 11.6
      },
@@ -86503,10 +86506,10 @@
      },
      {
       "mese": 10,
-      "media": 1.63,
-      "mediana": 1.27,
-      "positivi_pct": 57,
-      "campione": 42,
+      "media": 1.36,
+      "mediana": 1.12,
+      "positivi_pct": 56,
+      "campione": 41,
       "peggio": -12.3,
       "meglio": 26.9
      },
@@ -87221,7 +87224,7 @@
      26.8,
      25.7,
      26.38,
-     27.76,
+     27.77,
      27.44,
      28.48,
      30.19,
@@ -87355,7 +87358,7 @@
      71.81,
      71.36,
      69.91,
-     70.48,
+     70.49,
      73.77,
      73.44,
      80.18,
@@ -88610,10 +88613,10 @@
      },
      {
       "mese": 10,
-      "media": 1.19,
-      "mediana": 0.79,
-      "positivi_pct": 52,
-      "campione": 42,
+      "media": 0.88,
+      "mediana": 0.53,
+      "positivi_pct": 51,
+      "campione": 41,
       "peggio": -17.6,
       "meglio": 25.9
      },
@@ -90722,10 +90725,10 @@
      },
      {
       "mese": 10,
-      "media": 0.4,
-      "mediana": 0.5,
-      "positivi_pct": 52,
-      "campione": 42,
+      "media": -0.09,
+      "mediana": 0.48,
+      "positivi_pct": 51,
+      "campione": 41,
       "peggio": -28.3,
       "meglio": 23.2
      },
@@ -91307,7 +91310,7 @@
      123.58,
      115.79,
      115.57,
-     127.35,
+     127.36,
      140.21,
      140.59,
      129.75,
@@ -92491,10 +92494,10 @@
      },
      {
       "mese": 10,
-      "media": 2.32,
-      "mediana": 5.33,
-      "positivi_pct": 64,
-      "campione": 14,
+      "media": 1.74,
+      "mediana": 4.06,
+      "positivi_pct": 62,
+      "campione": 13,
       "peggio": -16.8,
       "meglio": 10.7
      },
@@ -94600,10 +94603,10 @@
      },
      {
       "mese": 10,
-      "media": 2.2,
-      "mediana": 1.81,
-      "positivi_pct": 55,
-      "campione": 42,
+      "media": 2.25,
+      "mediana": 2.44,
+      "positivi_pct": 56,
+      "campione": 41,
       "peggio": -14.0,
       "meglio": 22.8
      },
@@ -96572,10 +96575,10 @@
      },
      {
       "mese": 10,
-      "media": 0.44,
-      "mediana": 0.48,
-      "positivi_pct": 54,
-      "campione": 35,
+      "media": 0.31,
+      "mediana": 0.34,
+      "positivi_pct": 53,
+      "campione": 34,
       "peggio": -27.7,
       "meglio": 31.2
      },
@@ -97459,7 +97462,7 @@
      254.33,
      285.97,
      292.15,
-     310.87,
+     310.86,
      314.31,
      303.37,
      301.44,
@@ -97595,7 +97598,7 @@
      322.37,
      340.11,
      336.06,
-     360.43,
+     360.42,
      358.86,
      369.78,
      383.01,
@@ -98625,10 +98628,10 @@
      },
      {
       "mese": 10,
-      "media": 3.12,
-      "mediana": 2.73,
-      "positivi_pct": 57,
-      "campione": 42,
+      "media": 3.1,
+      "mediana": 2.72,
+      "positivi_pct": 56,
+      "campione": 41,
       "peggio": -18.4,
       "meglio": 36.9
      },
@@ -99229,7 +99232,7 @@
      155.94,
      153.23,
      164.84,
-     169.06,
+     169.07,
      171.99,
      163.61,
      170.13,
@@ -100445,10 +100448,10 @@
      },
      {
       "mese": 10,
-      "media": 3.59,
-      "mediana": 3.98,
-      "positivi_pct": 68,
-      "campione": 19,
+      "media": 3.04,
+      "mediana": 3.66,
+      "positivi_pct": 67,
+      "campione": 18,
       "peggio": -9.8,
       "meglio": 16.6
      },
@@ -101036,7 +101039,7 @@
      344.76,
      305.88,
      342.21,
-     344.33,
+     344.34,
      369.93,
      349.13,
      353.5,
@@ -102237,10 +102240,10 @@
      },
      {
       "mese": 10,
-      "media": 3.87,
-      "mediana": 5.47,
-      "positivi_pct": 71,
-      "campione": 21,
+      "media": 3.41,
+      "mediana": 5.41,
+      "positivi_pct": 70,
+      "campione": 20,
       "peggio": -16.6,
       "meglio": 28.5
      },
@@ -104013,10 +104016,10 @@
      },
      {
       "mese": 10,
-      "media": 2.01,
-      "mediana": 2.92,
-      "positivi_pct": 53,
-      "campione": 19,
+      "media": 1.82,
+      "mediana": 1.33,
+      "positivi_pct": 50,
+      "campione": 18,
       "peggio": -10.2,
       "meglio": 12.0
      },
@@ -104860,7 +104863,7 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
      336.45,
      329.49,
@@ -106066,10 +106069,10 @@
      },
      {
       "mese": 10,
-      "media": 1.26,
-      "mediana": 2.11,
-      "positivi_pct": 64,
-      "campione": 42,
+      "media": 1.38,
+      "mediana": 2.16,
+      "positivi_pct": 66,
+      "campione": 41,
       "peggio": -27.9,
       "meglio": 18.5
      },
@@ -108167,10 +108170,10 @@
      },
      {
       "mese": 10,
-      "media": 2.64,
+      "media": 2.53,
       "mediana": 2.13,
-      "positivi_pct": 69,
-      "campione": 42,
+      "positivi_pct": 68,
+      "campione": 41,
       "peggio": -28.7,
       "meglio": 15.6
      },
@@ -110273,10 +110276,10 @@
      },
      {
       "mese": 10,
-      "media": 1.34,
-      "mediana": 1.59,
-      "positivi_pct": 64,
-      "campione": 42,
+      "media": 1.24,
+      "mediana": 1.48,
+      "positivi_pct": 63,
+      "campione": 41,
       "peggio": -24.0,
       "meglio": 18.1
      },
@@ -110869,7 +110872,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -111001,7 +111004,7 @@
      164.55,
      200.71,
      230.8,
-     237.33,
+     237.32,
      279.61,
      287.31,
      306.16,
@@ -111056,7 +111059,7 @@
      585.73,
      690.4,
      705.85,
-     730.88,
+     730.87,
      780.99,
      774.14,
      810.11,
@@ -112160,10 +112163,10 @@
      },
      {
       "mese": 10,
-      "media": 4.16,
-      "mediana": 5.19,
-      "positivi_pct": 75,
-      "campione": 28,
+      "media": 4.42,
+      "mediana": 5.8,
+      "positivi_pct": 78,
+      "campione": 27,
       "peggio": -27.5,
       "meglio": 17.6
      },
@@ -114251,10 +114254,10 @@
      },
      {
       "mese": 10,
-      "media": 1.8,
-      "mediana": 2.27,
-      "positivi_pct": 62,
-      "campione": 42,
+      "media": 1.82,
+      "mediana": 2.78,
+      "positivi_pct": 61,
+      "campione": 41,
       "peggio": -34.7,
       "meglio": 32.9
      },
@@ -116172,10 +116175,10 @@
      },
      {
       "mese": 10,
-      "media": 3.22,
-      "mediana": 3.9,
-      "positivi_pct": 70,
-      "campione": 27,
+      "media": 3.12,
+      "mediana": 3.75,
+      "positivi_pct": 69,
+      "campione": 26,
       "peggio": -32.5,
       "meglio": 33.2
      },
@@ -118221,10 +118224,10 @@
      },
      {
       "mese": 10,
-      "media": 0.98,
-      "mediana": 1.45,
-      "positivi_pct": 57,
-      "campione": 42,
+      "media": 0.76,
+      "mediana": 1.05,
+      "positivi_pct": 56,
+      "campione": 41,
       "peggio": -23.2,
       "meglio": 14.3
      },
@@ -119899,11 +119902,11 @@
      },
      {
       "mese": 10,
-      "media": 1.38,
-      "mediana": 2.7,
-      "positivi_pct": 64,
-      "campione": 11,
-      "peggio": -15.0,
+      "media": 3.02,
+      "mediana": 3.68,
+      "positivi_pct": 70,
+      "campione": 10,
+      "peggio": -11.0,
       "meglio": 14.7
      },
      {
@@ -120220,6 +120223,20 @@
    "week_ago": 22,
    "month_ago": 33,
    "year_ago": 28,
+   "storia": {
+    "n": 250,
+    "da": "2025-10-26",
+    "a": "2026-10-23",
+    "rango": 11,
+    "minimo": {
+     "valore": 5,
+     "data": "2025-11-19"
+    },
+    "massimo": {
+     "valore": 71,
+     "data": "2026-04-30"
+    }
+   },
    "components": [
     {
      "label": "Momentum S&P 500",
@@ -120258,21 +120275,7 @@
     }
    ],
    "fomo": 30,
-   "fomo_label": "Nessuna FOMO",
-   "storia": {
-    "n": 250,
-    "da": "2025-10-26",
-    "a": "2026-10-23",
-    "rango": 11,
-    "minimo": {
-     "valore": 5,
-     "data": "2025-11-19"
-    },
-    "massimo": {
-     "valore": 71,
-     "data": "2026-04-30"
-    }
-   }
+   "fomo_label": "Nessuna FOMO"
   },
   "vix": {
    "value": 19.45,
@@ -129451,6 +129454,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Fed Looks Set to Pause After September Rate Hike",
+     "riassunto": "On Bloomberg This Weekend, Bloomberg News Federal Reserve reporter Maria Eloisa Capurro previews the Fed’s upcoming rate decision, with policymakers widely expected to pause after September’s first rate increase since 2023 despite inflation remaining above target. Speaking with hosts David Gura and Christina Ruffini, C",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-25T13:48:02Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-10-25/fed-looks-set-to-pause-after-september-rate-hike-video"
+    },
+    {
      "titolo": "‘Nonanswers’ aren’t working. This is what investors really need from the Fed.",
      "riassunto": "What really matters to investors, economists say, is for Fed Chairman Kevin Warsh to prove he can successfully communicate the central bank’s strategy.",
      "fonte": "MarketWatch",
@@ -129491,13 +129501,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-10-25T10:00:00Z",
      "url": "https://www.bloomberg.com/news/articles/2026-10-25/french-bond-rout-puts-crisis-at-heart-of-ecb-succession-endgame"
-    },
-    {
-     "titolo": "I want to pay off $4,500 in credit-card debt in 2 months. Is this possible?",
-     "riassunto": "“I’m 32 years old and feel like I should know how to do this stuff by now.”",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-24T17:39:00Z",
-     "url": "https://www.marketwatch.com/story/i-want-to-pay-off-4-500-in-credit-card-debt-in-2-months-is-this-possible-059d9a21?mod=mw_rss_topstories"
     },
     {
      "titolo": "Embracing the Bond Market: Masters in Business with Robin Wigglesworth",
@@ -142547,6 +142550,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030",
+      "riassunto": "Key PointsNvidia continues to be well positioned as a major AI winner.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-25T13:35:00Z",
+      "url": "https://www.nasdaq.com/articles/heres-what-10000-invested-equally-nvidia-amd-and-broadcom-could-be-worth-2030"
+     },
+     {
       "titolo": "As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid",
       "riassunto": "Key PointsNvidia, Broadcom, and Advanced Micro Devices get paid to supply hardware.",
       "fonte": "Nasdaq",
@@ -142580,13 +142590,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-23T23:32:41Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
-     },
-     {
-      "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%. December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-23T23:32:41Z",
-      "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
      }
     ],
     "BE": [
@@ -142682,7 +142685,7 @@
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-25T03:32:41Z",
+      "quando": "2026-10-25T13:40:49Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
      },
      {
@@ -142726,7 +142729,7 @@
       "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-25T03:32:41Z",
+      "quando": "2026-10-25T13:40:49Z",
       "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
      },
      {
@@ -142767,6 +142770,13 @@
     ],
     "MU": [
      {
+      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-25T13:40:49Z",
+      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
+     },
+     {
       "titolo": "Stock-Split Watch: Is Micron Next?",
       "riassunto": "Key PointsMicron's impressive rally over the past year has pushed the price of each share close to $900.",
       "fonte": "Nasdaq",
@@ -142788,13 +142798,6 @@
       "url": "https://www.nasdaq.com/articles/nvidia-vs-micron-ai-revolution-big-enough-both-heres-better-buy"
      },
      {
-      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-25T03:32:41Z",
-      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
-     },
-     {
       "titolo": "The Nasdaq Just Had Its Worst Day in 4 Months. Here's the Level That Would Signal a Correction, and What History Says Investors Can Do About It.",
       "riassunto": "Key PointsThe Nasdaq just suffered its biggest one-day drop since June 5.",
       "fonte": "Nasdaq",
@@ -142810,6 +142813,13 @@
      }
     ],
     "NVDA": [
+     {
+      "titolo": "Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030",
+      "riassunto": "Key PointsNvidia continues to be well positioned as a major AI winner.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-25T13:35:00Z",
+      "url": "https://www.nasdaq.com/articles/heres-what-10000-invested-equally-nvidia-amd-and-broadcom-could-be-worth-2030"
+     },
      {
       "titolo": "3 AI Stocks That Can Beat the Nasdaq Composite in 2027",
       "riassunto": "Key PointsDell's AI-server racks continue to enjoy strong demand, resulting in a $95 billion backlog.",
@@ -142844,13 +142854,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-24T21:43:00Z",
       "url": "https://www.nasdaq.com/articles/you-buy-vanguard-sp-500-etf-theres-1-sneaky-risk-investors-should-know"
-     },
-     {
-      "titolo": "Elon Musk Just Gave Fantastic News for Nvidia Investors",
-      "riassunto": "Key PointsSpaceX's SI business is demonstrating massive growth, and the company is building out to meet demand.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-24T20:37:00Z",
-      "url": "https://www.nasdaq.com/articles/elon-musk-just-gave-fantastic-news-nvidia-investors"
      }
     ],
     "PLTR": [
@@ -142962,13 +142965,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-25T13:32:06Z"
+   "letto_il": "2026-10-25T14:03:21Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030",
+     "riassunto": "Key PointsNvidia continues to be well positioned as a major AI winner.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-25T13:35:00Z",
+     "url": "https://www.nasdaq.com/articles/heres-what-10000-invested-equally-nvidia-amd-and-broadcom-could-be-worth-2030"
+    },
     {
      "titolo": "As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid",
      "riassunto": "Key PointsNvidia, Broadcom, and Advanced Micro Devices get paid to supply hardware.",
@@ -143003,13 +143013,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-23T23:32:41Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety"
-    },
-    {
-     "titolo": "Stocks See Continued Downward Pressure from AI Anxiety and Oil Prices",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.45%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.08%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.08%. December E-mini S&P futures (ESZ26 ) are down -0.43%, and December E-mini Nasdaq futures (NQZ26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-23T23:32:41Z",
-     "url": "https://www.nasdaq.com/articles/stocks-see-continued-downward-pressure-ai-anxiety-and-oil-prices"
     }
    ],
    "BE": [
@@ -143105,7 +143108,7 @@
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-25T03:32:41Z",
+     "quando": "2026-10-25T13:40:49Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
     },
     {
@@ -143149,7 +143152,7 @@
      "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-25T03:32:41Z",
+     "quando": "2026-10-25T13:40:49Z",
      "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
     },
     {
@@ -143190,6 +143193,13 @@
    ],
    "MU": [
     {
+     "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-25T13:40:49Z",
+     "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
+    },
+    {
      "titolo": "Stock-Split Watch: Is Micron Next?",
      "riassunto": "Key PointsMicron's impressive rally over the past year has pushed the price of each share close to $900.",
      "fonte": "Nasdaq",
@@ -143211,13 +143221,6 @@
      "url": "https://www.nasdaq.com/articles/nvidia-vs-micron-ai-revolution-big-enough-both-heres-better-buy"
     },
     {
-     "titolo": "Stocks Undercut by Oil Prices and Continued AI Anxiety",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-25T03:32:41Z",
-     "url": "https://www.nasdaq.com/articles/stocks-undercut-oil-prices-and-continued-ai-anxiety-0"
-    },
-    {
      "titolo": "The Nasdaq Just Had Its Worst Day in 4 Months. Here's the Level That Would Signal a Correction, and What History Says Investors Can Do About It.",
      "riassunto": "Key PointsThe Nasdaq just suffered its biggest one-day drop since June 5.",
      "fonte": "Nasdaq",
@@ -143233,6 +143236,13 @@
     }
    ],
    "NVDA": [
+    {
+     "titolo": "Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030",
+     "riassunto": "Key PointsNvidia continues to be well positioned as a major AI winner.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-25T13:35:00Z",
+     "url": "https://www.nasdaq.com/articles/heres-what-10000-invested-equally-nvidia-amd-and-broadcom-could-be-worth-2030"
+    },
     {
      "titolo": "3 AI Stocks That Can Beat the Nasdaq Composite in 2027",
      "riassunto": "Key PointsDell's AI-server racks continue to enjoy strong demand, resulting in a $95 billion backlog.",
@@ -143267,13 +143277,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-24T21:43:00Z",
      "url": "https://www.nasdaq.com/articles/you-buy-vanguard-sp-500-etf-theres-1-sneaky-risk-investors-should-know"
-    },
-    {
-     "titolo": "Elon Musk Just Gave Fantastic News for Nvidia Investors",
-     "riassunto": "Key PointsSpaceX's SI business is demonstrating massive growth, and the company is building out to meet demand.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-24T20:37:00Z",
-     "url": "https://www.nasdaq.com/articles/elon-musk-just-gave-fantastic-news-nvidia-investors"
     }
    ],
    "PLTR": [
@@ -143385,7 +143388,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-25T13:32:06Z"
+  "letto_il": "2026-10-25T14:03:21Z"
  },
  "predictions": [
   {
@@ -143405,7 +143408,7 @@
   },
   {
    "question": "Will Bitcoin dip to $78,000 October 19-25?",
-   "yes": 6,
+   "yes": 5,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-78k-october-19-25-2026"
   }
  ],
@@ -214783,7 +214786,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -214867,6 +214870,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-25T13:32:08Z"
+  "generated_at": "2026-10-25T14:03:22Z"
  }
 }

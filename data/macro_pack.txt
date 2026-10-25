@@ -1,4 +1,4 @@
-⟦ BUILD v510 · generato 25/10/2026 13:32 ⟧
+⟦ BUILD v510 · generato 25/10/2026 14:03 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 25/10/2026, 13:32:06 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 09:32, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,3% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,17% · Fut S&P -0,54% · BTC -0,72% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~24h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 10 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 25/10/2026, 14:03:21 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 10:03, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,3% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,17% · Fut S&P -0,54% · BTC -0,64% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~23.5h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 10 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 25/10/2026, 13:32:06 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-23 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 25/10/2026, 14:03:21 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-23 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): settembre 2026 · Inflazione PCE (a/a): agosto 2026 · PIL USA (t/t ann.): 2° trimestre 2026 (aprile-giugno) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: settembre 2026 · Disoccupazione: settembre 2026 · Fiducia consumatori (UMich): ottobre 2026 · Curva 10A-2A: 23/10/2026 · Curva 10A-3M: 23/10/2026 · Treasury USA 30A: 22/10/2026 · Tasso reale 10A (TIPS): 22/10/2026 · Inflazione attesa 10A (breakeven): 23/10/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -95,24 +95,24 @@ QUADRO MACRO:
 - CURVA DEI TASSI USA (FRED (Federal Reserve Bank of St. Louis), OSSERVAZIONI PUBBLICATE — non stime, ultima del 2026-10-22, quindi NON di oggi: la fonte pubblica con qualche giorno di ritardo): 3 mesi 4,22% [+0,26 vs 3,96% del 2026-07-24] · 2 anni 4,65% [+0,32 vs 4,33% del 2026-07-24] · 5 anni 4,78% [+0,35 vs 4,43% del 2026-07-24] · 10 anni 4,96% [+0,27 vs 4,69% del 2026-07-24] · 30 anni 5,29% [+0,13 vs 5,16% del 2026-07-24]. Pendenza 3 mesi→30 anni: +1,07 pp, era +1,2 pp tre mesi fa. Fra parentesi quadre lo scarto dalla stessa scadenza tre mesi fa: e' un confronto fra due osservazioni datate, non una tendenza ricostruita.
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): ottobre +3,94% negli anni di midterm contro +1,7% su tutti gli anni, 80% di mesi positivi, esiti da -8,7% a +18,9% · novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8% · dicembre -1,19% negli anni di midterm contro +1,69% su tutti gli anni, 30% di mesi positivi, esiti da -11,8% a +17,8%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
 - MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 10.779 (+0,44% nell'ultima seduta) — +54,5% in un anno, e sta al 54% dell'intervallo annuale 6352–14.635 · Rame 6,51 $/lb (+2,28% nell'ultima seduta) — +26,6% in un anno, e sta al 84% dell'intervallo annuale 4,93–6,8 · Petrolio WTI 103,27 $ (+3,82% nell'ultima seduta) — +68,4% in un anno, e sta al 83% dell'intervallo annuale 55,27–112,95 · Oro 4008 $/oz (-1,29% nell'ultima seduta) — -0,3% in un anno, e sta al 4% dell'intervallo annuale 3960–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
-- TITOLI MACRO — 6 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 10 pubblicate DOPO l'ultima chiusura USA del 2026-10-23, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
+- TITOLI MACRO — 7 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 10 pubblicate DOPO l'ultima chiusura USA del 2026-10-23, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
+    · [Bloomberg, 0h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Fed Looks Set to Pause After September Rate Hike
+      On Bloomberg This Weekend, Bloomberg News Federal Reserve reporter Maria Eloisa Capurro previews the Fed’s upcoming rate decision, with policymakers widely expected to pause after September’s first rate increase since 2023 despite inflation remaining above target. Speaking with hosts David Gura and Christina Ruffini, C
     · [MarketWatch, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] ‘Nonanswers’ aren’t working. This is what investors really need from the Fed.
       What really matters to investors, economists say, is for Fed Chairman Kevin Warsh to prove he can successfully communicate the central bank’s strategy.
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] What’s Happening in EM: Bond Investors Turn to Developing World
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] What’s Happening in EM: Bond Investors Turn to Developing World
       This week, Mpho Hlakudi and Selcuk Gokoluk discuss how some of the world’s biggest asset managers increase their exposure to emerging markets despite the surge in US Treasury yields, weakening a traditional correlation in financial markets.
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Emerging Debt Outruns Treasuries as Rich-World Fiscal Fears Grow
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Emerging Debt Outruns Treasuries as Rich-World Fiscal Fears Grow
       Investors from JPMorgan Asset Management to Generali and Ninety One SA are loading up on emerging-market debt, defying a surge in Treasury yields that would once have sent them running for the exits.
     · [MarketWatch, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Why economic health no longer dictates stock-market returns
       There is a wide disconnect between Wall Street and Main Street, and AI could drive them even further apart
-    · [MarketWatch, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Here’s the real signal to watch for the Fed’s next move
+    · [MarketWatch, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Here’s the real signal to watch for the Fed’s next move
       Investors should focus not on the rate itself, but on where financial conditions are
     · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] French Bond Rout Puts Crisis at Heart of ECB Succession Endgame
       The European Central Bank’s presidency race looks increasingly likely to hinge on which candidate can best take on the bond vigilantes.
-    · [MarketWatch, 20h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] I want to pay off $4,500 in credit-card debt in 2 months. Is this possible?
-      “I’m 32 years old and feel like I should know how to do this stuff by now.”
-    · [Bloomberg, 20h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Embracing the Bond Market: Masters in Business with Robin Wigglesworth
+    · [Bloomberg, 21h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Embracing the Bond Market: Masters in Business with Robin Wigglesworth
       Barry speaks with Robin Wigglesworth, editor of Financial Times' Alphaville blog and author of the new book 'A Fabulous Debt: The Epic Story of How Bonds Built the Modern World'. They discuss the bond market as the engine of the global economy, why the 30-year mortgage is "a miracle of the modern world," and when we sh
-    · [Bloomberg, 22h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] ‘Total Meltdown’ in Riskiest Debt Unnerves Market: Credit Weekly
+    · [Bloomberg, 23h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] ‘Total Meltdown’ in Riskiest Debt Unnerves Market: Credit Weekly
       It was a panicked message from a colleague that woke fund manager Ivelina Green at 5 a.m. on Thursday morning in New York: “Total meltdown.”
     · [CNBC Economia, 41h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Trump's approval rating on economy hits all-time low as midterm looms: CNBC survey
       Eight out of 10 Americans now rate the economy as fair or poor, one of several findings in a CNBC poll that show why Republican candidates face uphill battles.
@@ -176,7 +176,7 @@ MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment
 - Will there be no change in Fed interest rates after the October 2026 meeting?: 94% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the October 2026 meeting?: 6% [Δ7g —]
 - Will Bitcoin dip to $70,000 by December 31, 2026?: 40% [Δ7g —]
-- Will Bitcoin dip to $78,000 October 19-25?: 6% [Δ7g —]
+- Will Bitcoin dip to $78,000 October 19-25?: 5% [Δ7g —]
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -238,26 +238,26 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (76,8% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 9h fa] As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid
+  [AMD] · [Nasdaq, 0h fa] Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030
+      Key PointsNvidia continues to be well positioned as a major AI winner.
+  [AMD] · [Nasdaq, 10h fa] As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid
       Key PointsNvidia, Broadcom, and Advanced Micro Devices get paid to supply hardware.
-  [AMD] · [Nasdaq, 13h fa] 1 Red Flag That Keeps Me From Buying AMD Stock
-      Key PointsAbout a year and a half of growth is priced into AMD's stock right now.
-  [CRWV] · [Nasdaq, 6h fa] SpaceX Just Shared Great News for Artificial Intelligence (AI) Investors. Here Are 2 Stocks That Could Benefit
+  [CRWV] · [Nasdaq, 7h fa] SpaceX Just Shared Great News for Artificial Intelligence (AI) Investors. Here Are 2 Stocks That Could Benefit
       Key PointsSpaceX posted excellent third-quarter results fueled by strong Super Intelligence growth.
-  [CRWV] · [Nasdaq, 9h fa] As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid
+  [CRWV] · [Nasdaq, 10h fa] As AI Labs Burn Cash, the Real Question Is Which Suppliers Get Paid
       Key PointsNvidia, Broadcom, and Advanced Micro Devices get paid to supply hardware.
-  [MRVL] · [Nasdaq, 10h fa] Stocks Undercut by Oil Prices and Continued AI Anxiety
+  [MRVL] · [Nasdaq, 0h fa] Stocks Undercut by Oil Prices and Continued AI Anxiety
       The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...
-  [MRVL] · [Nasdaq, 26h fa] Prediction: $200 a Month Invested in Nvidia Will Be Worth This Much by 2035
+  [MRVL] · [Nasdaq, 27h fa] Prediction: $200 a Month Invested in Nvidia Will Be Worth This Much by 2035
       Key PointsNvidia is the engine behind the AI revolution.
-  [MU] · [Nasdaq, 1h fa] Stock-Split Watch: Is Micron Next?
+  [MU] · [Nasdaq, 0h fa] Stocks Undercut by Oil Prices and Continued AI Anxiety
+      The S&P 500 Index ($SPX ) (SPY ) fell by -0.52% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell by -1.23%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) was unchanged. December E-mini S&P futures (ESZ26 ) fell -0.48%, while December E-mini Nasdaq futures (NQZ26...
+  [MU] · [Nasdaq, 2h fa] Stock-Split Watch: Is Micron Next?
       Key PointsMicron's impressive rally over the past year has pushed the price of each share close to $900.
-  [MU] · [Nasdaq, 4h fa] 3 AI Stocks That Can Beat the Nasdaq Composite in 2027
-      Key PointsDell's AI-server racks continue to enjoy strong demand, resulting in a $95 billion backlog.
+  [NVDA] · [Nasdaq, 0h fa] Here's What $10,000 Invested Equally in Nvidia, AMD, and Broadcom Could Be Worth by 2030
+      Key PointsNvidia continues to be well positioned as a major AI winner.
   [NVDA] · [Nasdaq, 4h fa] 3 AI Stocks That Can Beat the Nasdaq Composite in 2027
       Key PointsDell's AI-server racks continue to enjoy strong demand, resulting in a $95 billion backlog.
-  [NVDA] · [Nasdaq, 5h fa] Nvidia vs. Micron: The AI Revolution Is Big Enough for Both. Here's the Better Buy.
-      Key PointsNvidia sells logic chips, while Micron provides memory -- both are essential to AI.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
 === LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH, APPLICATA A QUESTO LIBRO ===
