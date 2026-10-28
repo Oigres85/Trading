@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-10-23",
+ "aggiornato": "2026-10-28",
  "per_titolo": {
   "AAPL": {
    "carta_commerciale": {
@@ -932,46 +932,43 @@
    "versione": 502
   },
   "MSFT": {
-   "carta_commerciale": {
-    "al": "2025-06-30",
-    "valore": 0.0,
-    "valuta": "USD"
-   },
    "cik": 789019,
    "deposito": {
-    "accn": "0001193125-26-323660",
-    "data": "2026-07-29",
-    "forma": "10-K",
-    "periodo": "2026-06-30"
+    "accn": "0001193125-26-436133",
+    "data": "2026-10-28",
+    "forma": "10-Q",
+    "periodo": "2026-09-30"
    },
    "derivati_tassi": {
     "n": 0,
     "voci": []
    },
    "equo": {
-    "al": "2026-06-30",
-    "depositato": "2026-07-29",
-    "forma": "10-K",
-    "rapporto_pct": 90.6,
+    "al": "2026-09-30",
+    "depositato": "2026-10-28",
+    "forma": "10-Q",
+    "rapporto_pct": 82.6,
     "voci": [
      "LongTermDebtFairValue",
      "LongTermDebt"
     ]
    },
-   "letto_il": "2026-10-18",
+   "letto_il": "2026-10-28",
    "scadenze": {
-    "al": "2026-06-30",
-    "depositato": "2026-07-29",
-    "forma": "10-K",
+    "al": "2026-09-30",
+    "depositato": "2026-10-28",
+    "forma": "10-Q",
     "valuta": "USD",
     "voci": {
-     "anno_2": 0.0,
-     "anno_3": 2001000000.0,
-     "anno_4": 0.0,
-     "anno_5": 500000000.0,
-     "entro_12_mesi": 9250000000.0,
-     "oltre_5": 34385000000.0
+     "anno_2": 1988000000.0,
+     "anno_3": 0.0,
+     "anno_4": 500000000.0,
+     "entro_12_mesi": 0.0,
+     "resto_esercizio": 4400000000.0
     }
+   },
+   "stantii": {
+    "carta_commerciale": "2025-07-30"
    },
    "versione": 502
   },
