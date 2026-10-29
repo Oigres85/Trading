@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-10-28",
+ "aggiornato": "2026-10-29",
  "per_titolo": {
   "AAPL": {
    "carta_commerciale": {
@@ -606,32 +606,32 @@
   },
   "GOOGL": {
    "carta_commerciale": {
-    "al": "2026-06-30",
+    "al": "2026-09-30",
     "valore": 0.0,
     "valuta": "USD"
    },
    "cik": 1652044,
    "deposito": {
-    "accn": "0001652044-26-000071",
-    "data": "2026-07-23",
+    "accn": "0001652044-26-000084",
+    "data": "2026-10-29",
     "forma": "10-Q",
-    "periodo": "2026-06-30"
+    "periodo": "2026-09-30"
    },
    "derivati_tassi": {
     "n": 0,
     "voci": []
    },
    "equo": {
-    "al": "2026-06-30",
-    "depositato": "2026-07-23",
+    "al": "2026-09-30",
+    "depositato": "2026-10-29",
     "forma": "10-Q",
-    "rapporto_pct": 93.9,
+    "rapporto_pct": 90.1,
     "voci": [
      "LongTermDebtFairValue",
      "DebtInstrumentCarryingAmount"
     ]
    },
-   "letto_il": "2026-10-18",
+   "letto_il": "2026-10-29",
    "scadenze": {
     "al": "2025-12-31",
     "depositato": "2026-02-05",
