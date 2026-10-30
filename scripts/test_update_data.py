@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 402  # v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 404  # v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -3656,6 +3656,31 @@ _a517 = ud.analisti_da(_T517(), "MSFT")
 check("v517 analisti_da porta il consenso dell'esercizio IN CORSO dalla stessa tabella dell'esercizio prossimo, e la "
       "riga dell'esercizio prossimo resta quella delle revisioni (non si scambiano)",
       _a517["eps_anno_corrente"] == 20.02 and _a517["eps_ora"] == 24.14 and _a517["revisione_90g_pct"] == round((24.14 / 23.47 - 1) * 100, 2))
+
+
+# ============== v519 — LA FORZA RELATIVA A UN MESE: UNA FUNZIONE SOLA per portafoglio, watchlist e sessione ==============
+# fetch_equities e fetch_watchlist la scrivevano due volte; ora l'una e l'altra, e la lettura in sessione dell'analisi
+# (scripts/fonti_titoli.py, opzione B scelta dal CEO il 30/10/2026), chiamano benchmark_mese e forza_relativa.
+_r519 = {"sparks": {"m1": [100.0, 110.0]}}
+_sec519 = next(t for t, b in ud.SECTOR_BENCH.items() if b == "sox")
+check("v519 forza_relativa: la variazione a un mese della riga meno quella del suo benchmark di settore e del Nasdaq-100, "
+      "a una cifra; senza il benchmark di settore vale l'S&P 500; senza il Nasdaq-100 la seconda e' un buco; senza "
+      "sparks nessuna delle due",
+      ud.forza_relativa(_sec519, _r519, {"sp500": 2.0, "sox": 4.0, "ndx": 3.0}) == (6.0, "sox", 7.0)
+      and ud.forza_relativa(_sec519, _r519, {"sp500": 2.0, "sox": None, "ndx": None}) == (8.0, "sox", None)
+      and ud.forza_relativa("ZZZNONSEGUITO", _r519, {"sp500": 2.0, "sox": 4.0, "ndx": 3.0}) == (8.0, "sp500", 7.0)
+      and ud.forza_relativa(_sec519, {"sparks": {"m1": [0, 5]}}, {"sp500": 1.0, "ndx": 1.0}) == (None, "sox", None))
+import ast as _ast519
+_alb519 = _ast519.parse(_SRC_UD)
+def _corpo519(nome):
+    n = next((x for x in _alb519.body if isinstance(x, _ast519.FunctionDef) and x.name == nome), None)
+    return _ast519.get_source_segment(_SRC_UD, n) if n else ""
+check("v519 fetch_equities e fetch_watchlist chiamano benchmark_mese e forza_relativa, e il conto non ha una seconda copia "
+      "nel file (la variazione del titolo a un mese si calcola in un posto solo)",
+      all("bench_m1 = benchmark_mese()" in _corpo519(f) and "forza_relativa(" in _corpo519(f)
+          for f in ("fetch_equities", "fetch_watchlist"))
+      and _SRC_UD_CODICE.count("stk_m1 = (m1[-1] / m1[0] - 1) * 100") == 1
+      and _SRC_UD_CODICE.count("bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100") == 1)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

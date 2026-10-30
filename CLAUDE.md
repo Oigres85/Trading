@@ -9021,3 +9021,59 @@ scelta da fare in silenzio.
   22 mordono**.
 - Pavimento di `test_analisi_libro.py` 940 → 950 (976 check). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al
   browser (v440).
+
+## 📡 v519 — LE RIGHE DEI TITOLI SI PRODUCONO IN SESSIONE, E UNA LETTURA PIÙ POVERA NON CANCELLA QUELLA COMPLETA
+
+Risposta del CEO del 30/10/2026 alla domanda della v518 (*"B"*): i dati per titolo di **tutte** le righe della pipeline —
+posizioni, sorvegliati e riferimenti, 67 — si producono **in sessione a ogni analisi**, con `update_data.fetch_symbol`:
+la stessa funzione, gli stessi argomenti, lo snapshot del run come «run precedente» (`PREV_DATA`). Prezzo, tecnica,
+multipli, conti, combustione di cassa, solidità, flottante e sensibilità ai canali escono dall'elenco
+`fonti_dirette.SOLO_PIPELINE`; restano del run correlazioni, beta sul Nasdaq-100 e contributo al rischio, che si
+calcolano sui titoli **insieme**. Misurato prima di scrivere: 67 righe in 33 s con 10 thread e nessun 429, 50 s con 6 e un
+429; il giro intero di `fonti_titoli.py` passa da ~12 a ~70 secondi.
+
+### ⚠⚠ Il dato più fresco non deve cancellare quello completo
+La misura sulle righe vere ha trovato **13 righe su 67 più povere della pipeline** alla prima lettura: una chiamata di
+Yahoo rifiutata fa uscire AMZN, GOOGL, STX, WDC e TSM senza settore, multipli, consenso e flottante, e SMCI e OKLO senza la
+data dei conti. Sostituirle in blocco avrebbe tolto dati veri in nome della freschezza. Quindi `fonti_titoli.fonde` lavora
+**campo per campo**:
+- i campi dell'**istante** (prezzo, prezzo esteso, variazione, volumi, misure sulle barre) vincono anche vuoti — fuori dalla
+  sessione estesa il prezzo esteso non c'è, e tenere quello del run affiancherebbe due istanti (v186);
+- i campi **stabili** vincono solo se non perdono niente di ciò che la pipeline ha; altrimenti restano del run e **si
+  nominano** (il settore «Altro» conta come vuoto);
+- una riga più povera si **rilegge una volta**: al giro del 30/10 tutte e 14 le righe povere sono tornate complete;
+- la data dei conti che la lettura di adesso non porta perché è **passata** non si ripesca dal run;
+- controvalore, guadagno sul carico e forza relativa a un mese si **rifanno** sul prezzo di adesso — la forza relativa con
+  `update_data.forza_relativa`, estratta da `fetch_equities` e `fetch_watchlist`, che la scrivevano due volte (v161).
+  Verificata identica sui 201 casi delle righe vere prima di toccare la pipeline.
+
+### 🧵 Una cache che si riempie a pezzi, e il parallelo la legge a metà
+MU e BE uscivano senza sensibilità al settore, ai tassi e al dollaro: `_CANALI` della pipeline si riempie **un canale alla
+volta**, e un thread che la trova a metà restituisce i canali che ci sono. La pipeline gira in sequenza e non può vederlo.
+La sessione la riempie **una volta prima dei thread**, e il gate lo verifica eseguendo la strada vera con funzioni finte
+e guardando l'**ordine** delle chiamate.
+
+### 🔗 Il resto del giro sulle righe già fuse
+Tabelle dei trimestri ferme, flottante delle vendite allo scoperto e CDS si giudicano sulle righe di **adesso**: Yahoo può
+aver già portato il trimestre che la pipeline non aveva, e completarlo da Nasdaq lo avrebbe scritto **due volte** (il gate
+costruisce quel caso, e un'iniezione che toglie la guardia contro il doppione morde). Gli analisti si prendono dalla riga, e
+i rendimenti di CDS e short pure: non si scaricano una seconda volta.
+
+### 🕐 Le barre a 5 minuti: una barra che manca non è un fuso cambiato
+Il 30/10 la verifica rifiutava tutta la finestra perché il 27/10 cominciava alle 09:35. La mia prima ipotesi — il primo giorno
+tagliato dalla finestra mobile — **era sbagliata**, e l'ha detto la misura: manca una barra in mezzo alla finestra (anche il
+28/10 ne ha 77 su 78). Un fuso cambiato sposta **tutta** la giornata di 4-5 ore; ora ogni giornata deve cominciare fra le
+09:30 e le 10:00 e finire entro le 16:00, e almeno una alle 09:30 esatte.
+
+### 🧪 Il metodo
+- **21 iniezioni**, una alla volta su tre copie del repo verificate, con `modifica_sicura` e ripristino verificato per impronta:
+  **mordono tutte, ciascuna sul controllo atteso**. Una — la guardia contro il trimestre doppione — non mordeva al primo
+  giro, e la colpa era della **fixture**: la riga «di adesso» non portava il trimestre, quindi il caso non esisteva (v430).
+- Lo stato del sistema prende ora le voci delle dipendenze per **nome**, non per posizione: togliere una voce spostava le
+  date sulla voce accanto senza rompere niente. Il gate v518 che pinnava «almeno 7 voci, una col flottante» è stato
+  riagganciato all'invariante: i multipli stanno in **uno** dei due elenchi.
+- ⚠ **Dopo il riavvio del container** mancavano `requests` e `yfinance` per Python 3.11, `core.hooksPath` non era impostato
+  e il ramo locale `main` era fermo al 28/10: il primo push è stato respinto. Reinstallato da `scripts/requirements.txt`,
+  riattivati gli hook, riallineato il ramo. Le sessioni nuove vanno controllate su tutte e tre le cose prima di lavorare.
+- Pavimenti: `test_analisi_libro.py` 965 (980 punti di chiamata), `test_update_data.py` N_CHECKS_MINIMO 404 (406 eseguiti).
+  `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

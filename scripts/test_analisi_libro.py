@@ -9102,15 +9102,18 @@ check("v518 fuori da un'analisi (a fine di un giro di lavoro) una lettura vecchi
 _dd518 = SS.date_dipendenze({"updated_at": "2026-10-30T17:29:00Z", "macro": {"margin_debt": {"date": "2026-09-01"}},
                              "portfolio": [{"ticker": "BTP-V28", "price": 101.59}]})
 check("v518 ogni voce di fonti_dirette.SOLO_PIPELINE ha la sua data nello stato del sistema, e lo stato non ne ha una "
-      "che l'elenco non porta — compresa la voce nuova dei multipli e bilanci per titolo",
-      set(_dd518) == set(_FD518.SOLO_PIPELINE) and len(_FD518.SOLO_PIPELINE) >= 7
-      and any("flottante" in v for v in _FD518.SOLO_PIPELINE), str(sorted(_dd518)))
+      "che l'elenco non porta — e i multipli e bilanci per titolo stanno in UNO dei due elenchi (v519: fra i riletti, "
+      "con le righe intere lette in sessione)",
+      set(_dd518) == set(_FD518.SOLO_PIPELINE) and len(_FD518.SOLO_PIPELINE) >= 6
+      and sum(any("flottante" in v for v in _l) for _l in (_FD518.SOLO_PIPELINE, _FD518.RILETTI_PER_TITOLO)) == 1,
+      str(sorted(_dd518)))
 _rdi518 = "\n".join(SS.righe_dipendenze({"updated_at": None, "macro": {}, "portfolio": []}, {"prima_chiusura": None}))
-_senza518 = [r for r in _rdi518.splitlines() if any(r.lstrip("⚠ ").startswith(_FD518.SOLO_PIPELINE[i] + ":")
-                                                   for i in (0, 3, 4, 5, 6))]
+# le voci datate dal run o dal mese della leva (CDS e SEC leggono file veri, e la loro data c'e')
+_run518 = [v for v in _FD518.SOLO_PIPELINE if "CDS" not in v and "SEC" not in v]
+_senza518 = [r for r in _rdi518.splitlines() if any(r.lstrip("⚠ ").startswith(v + ":") for v in _run518)]
 check("v518 una dipendenza senza data (il run senza ora, la leva senza mese) si marca ⚠ e il debito a margine si data "
       "col MESE (v392); i riletti alla fonte si elencano a parte",
-      len(_senza518) == 5 and all(SS.AVVISO in r for r in _senza518)
+      len(_run518) >= 4 and len(_senza518) == len(_run518) and all(SS.AVVISO in r for r in _senza518)
       and "gia' letti qui alla fonte" in _rdi518
       and "settembre 2026" in "\n".join(SS.righe_dipendenze({"updated_at": "2026-10-30T17:29:00Z",
                                                              "macro": {"margin_debt": {"date": "2026-09-01"}}},
@@ -9222,6 +9225,199 @@ check("v518 collegamento: lo stato del sistema e' l'ULTIMO comando in ogni fase,
       and any(b.sezione == "stato_sistema" for b in SC.CATALOGO["stato_sistema"].blocchi)
       and "9. `python3 scripts/stato_sistema.py`" in _fa518 and "9. **Stato del sistema**" in _fa518
       and "`[stato_sistema]`" in _fa518 and "python3 scripts/stato_sistema.py" in _ag518)
+
+
+# ============================== v519 — LE RIGHE DEI TITOLI PRODOTTE IN SESSIONE (opzione B, CEO 30/10/2026) ==============================
+import copy as _cp519
+_P519 = {"ticker": "AAA", "name": "Aaa Inc", "price": 100.0, "price_asof": "2026-10-29", "prepost": {"price": 101.0},
+         "sector": "Technology", "stats": {"roe": 0.2, "gross_margin": 0.5}, "pe": 30.0, "earnings_date": "2026-11-20",
+         "qta": 10, "pmc": 50.0, "controvalore": 1000.0, "gain_pct_pos": 100.0, "risk_contrib_pct": 12.0,
+         "cds": {"x": 1}, "short_interest": {"y": 2}, "rs_1m": 1.0, "rs_bench": "sp500", "rs_ndx_1m": 0.5,
+         "sparks": {"m1": [100.0, 110.0]},
+         "tv": {"tecnica": {"rsi": 55}, "sensibilita": {"mercato": {"beta": 1.2}, "tassi": {"beta": -0.3}},
+                "conto_trim": [{"trim": "2026-06-30", "ricavi": 1}]}}
+_X519 = {"ticker": "AAA", "name": "Aaa Inc", "price": 120.0, "price_asof": "2026-10-30", "prepost": None,
+         "sector": "Altro", "stats": {"roe": None, "gross_margin": 0.5}, "pe": 31.0, "earnings_date": "2026-11-20",
+         "_ret_series": [0.01], "_ret_dates": ["2026-10-30"], "sparks": {"m1": [100.0, 120.0]},
+         "risk_contrib_pct": 99.0,   # un campo calcolato dopo la riga, se un giorno fetch_symbol lo portasse
+         "tv": {"tecnica": {"rsi": None}, "sensibilita": {"mercato": {"beta": 1.1}},
+                "conto_trim": [{"trim": "2026-09-30", "ricavi": 2}, {"trim": "2026-06-30", "ricavi": 1}]}}
+_f519, _t519 = FT.fonde(_P519, _X519, oggi="2026-10-30")
+check("v519 la fusione: i campi dell'ISTANTE vincono anche vuoti (fuori dalla sessione estesa non c'e' un prezzo esteso), "
+      "quelli STABILI che la lettura di adesso perde restano della pipeline e si nominano — il settore «Altro» e' vuoto —, "
+      "quelli completi vincono, e i campi calcolati dopo la riga e i privati non si toccano",
+      _f519["price"] == 120.0 and _f519["prepost"] is None and _f519["price_asof"] == "2026-10-30"
+      and _f519["sector"] == "Technology" and _f519["stats"] == {"roe": 0.2, "gross_margin": 0.5} and _f519["pe"] == 31.0
+      and _f519["qta"] == 10 and _f519["risk_contrib_pct"] == 12.0 and _f519["cds"] == {"x": 1}
+      and _f519["short_interest"] == {"y": 2} and _f519["rs_1m"] == 1.0
+      and "_ret_series" not in _f519 and "_ret_dates" not in _f519
+      and set(_t519) == {"sector", "stats", "tv.sensibilita"}, str(_t519))
+check("v519 dentro tv: tecnica, performance e barre sono dell'istante (vincono anche piu' povere), sensibilita' e conti "
+      "sono stabili (la sensibilita' che perde un canale resta della pipeline, i conti con un trimestre in piu' vincono)",
+      _f519["tv"]["tecnica"] == {"rsi": None} and _f519["tv"]["sensibilita"] == _P519["tv"]["sensibilita"]
+      and _f519["tv"]["conto_trim"][0]["trim"] == "2026-09-30", str(_f519["tv"]))
+_fe519a = FT.fonde({**_P519, "earnings_date": "2026-10-28"}, {**_X519, "earnings_date": None}, oggi="2026-10-30")
+_fe519b = FT.fonde(_P519, {**_X519, "earnings_date": None}, oggi="2026-10-30")
+_fe519c = FT.fonde({**_P519, "earnings_date": "2026-10-30"}, {**_X519, "earnings_date": None}, oggi="2026-10-30")
+check("v519 la data dei conti: se la lettura di adesso non la porta perche' e' PASSATA non si ripesca dal run; se la "
+      "lettura la perde e la data del run e' futura (o di oggi), resta e si nomina",
+      _fe519a[0]["earnings_date"] is None and "earnings_date" not in _fe519a[1]
+      and _fe519b[0]["earnings_date"] == "2026-11-20" and "earnings_date" in _fe519b[1]
+      and _fe519c[0]["earnings_date"] == "2026-10-30" and "earnings_date" in _fe519c[1])
+_r519 = FT.ricalcola_posizione(dict(_f519), {"sp500": 5.0, "sox": None, "ndx": 2.0})
+_r519b = FT.ricalcola_posizione(dict(_f519), None)
+check("v519 dopo la fusione controvalore e guadagno si rifanno sul prezzo di adesso (un prezzo nuovo accanto a un "
+      "guadagno vecchio e' due istanti in una riga, v316) e la forza relativa con update_data.forza_relativa sulle sparks "
+      "nuove; senza benchmark resta quella del run, marcata",
+      _r519["controvalore"] == 1200.0 and _r519["gain_pct_pos"] == 140.0
+      and (_r519["rs_1m"], _r519["rs_bench"], _r519["rs_ndx_1m"]) == UD.forza_relativa("AAA", _r519, {"sp500": 5.0, "sox": None, "ndx": 2.0})
+      and _r519["rs_1m"] == 15.0 and "_rs_del_run" not in _r519
+      and _r519b["rs_1m"] == 1.0 and _r519b.get("_rs_del_run") is True and _r519b["controvalore"] == 1200.0)
+
+# la lettura delle righe, col lettore finto: una prima lettura povera si rilegge, una povera due volte resta della
+#   pipeline per quei campi, una riga che non arriva vale la pipeline
+_d519 = {"updated_at": "2026-10-30T20:00:00Z", "watchlist": [
+    dict(_P519), {**_P519, "ticker": "BBB"}, {**_P519, "ticker": "CCC"}, {**_P519, "ticker": "DDD"}]}
+_n519 = {"AAA": 0, "BBB": 0, "CCC": 0, "DDD": 0}
+def _lett519(r):
+    tk = r["ticker"]
+    _n519[tk] += 1
+    buona = {**_X519, "ticker": tk, "sector": "Technology", "stats": {"roe": 0.21, "gross_margin": 0.5},
+             "tv": {"tecnica": {"rsi": 60}, "sensibilita": {"mercato": {"beta": 1.1}, "tassi": {"beta": -0.2}},
+                    "conto_trim": [{"trim": "2026-09-30", "ricavi": 2}, {"trim": "2026-06-30", "ricavi": 1}]}}
+    if tk == "AAA":
+        return buona if _n519[tk] >= 2 else {**buona, "stats": {"roe": None, "gross_margin": None}}
+    if tk == "BBB":
+        return {**buona, "sector": "Altro"}
+    if tk == "CCC":
+        return None
+    return buona
+_l519 = FT.leggi_righe(_d519, lettore=_lett519, bench=lambda: {"sp500": 1.0, "sox": 2.0, "ndx": 3.0})
+check("v519 leggi_righe: una riga piu' povera della pipeline si rilegge UNA volta e si tiene la lettura che perde meno; "
+      "una povera anche alla seconda nomina i campi tenuti; una che non arriva e' fra le non lette; i rendimenti restano "
+      "per il giro e i campi privati non arrivano alla lettura salvata",
+      sorted(_l519["per_titolo"]) == ["AAA", "BBB", "DDD"] and _l519["non_letti"] == ["CCC"]
+      and _l519["riletti"] == ["AAA", "BBB", "CCC"] and _n519 == {"AAA": 2, "BBB": 2, "CCC": 2, "DDD": 1}
+      and _l519["parziali"] == {"BBB": ["sector"]} and _l519["per_titolo"]["AAA"]["stats"]["roe"] == 0.21
+      and sorted(_l519["_rendimenti"]) == ["AAA", "BBB", "DDD"]
+      and not any(k in x for x in _l519["per_titolo"].values() for k in FT.PRIVATI)
+      and _l519["bench_m1"] == {"sp500": 1.0, "sox": 2.0, "ndx": 3.0} and _l519["righe_pipeline"] == 4,
+      str({k: v for k, v in _l519.items() if k not in ("per_titolo", "_rendimenti")}))
+def _bench_rotto519():
+    raise RuntimeError("Yahoo rifiuta")
+_l519b = FT.leggi_righe(_d519, lettore=lambda r: None, bench=_bench_rotto519)
+check("v519 leggi_righe: nessuna riga e i benchmark che sollevano non fanno morire la lettura — esito «non letto», la "
+      "forza relativa resta del run",
+      _l519b["esito"] == "non letto" and _l519b["non_letti"] == ["AAA", "BBB", "CCC", "DDD"] and _l519b["bench_m1"] is None)
+
+# ⚠ le cache della pipeline si riempiono PRIMA dei thread (misurato il 30/10: _CANALI riempita a meta' da un altro
+#   thread lasciava MU e BE senza settore, tassi e dollaro): il gate lo verifica ESEGUENDO la strada vera, con fetch_symbol
+#   e canali_macro finti, e guarda l'ordine delle chiamate
+_ud519 = FT._ud()
+_ordine519 = []
+_sal519 = (_ud519.fetch_symbol, _ud519.canali_macro, getattr(_ud519, "PREV_DATA", None))
+try:
+    _ud519.canali_macro = lambda: _ordine519.append("canali") or {}
+    _ud519.fetch_symbol = lambda tk, name=None, currency="USD": _ordine519.append(("riga", tk, name, currency)) or None
+    FT.leggi_righe(_d519, bench=lambda: None)
+    _prev519 = _ud519.PREV_DATA
+finally:
+    _ud519.fetch_symbol, _ud519.canali_macro, _ud519.PREV_DATA = _sal519
+check("v519 la strada vera: i canali macro si leggono una volta PRIMA di ogni riga, fetch_symbol riceve ticker, nome e "
+      "valuta come nella pipeline (dalla watchlist configurata, o dalla riga), e il run vale come «run precedente»",
+      bool(_ordine519) and _ordine519[0] == "canali" and _ordine519.count("canali") == 1
+      and sorted(x[1] for x in _ordine519[1:]) == ["AAA", "AAA", "BBB", "BBB", "CCC", "CCC", "DDD", "DDD"]
+      and all(len(x) == 4 and x[3] for x in _ordine519[1:]) and _prev519 is _d519, str(_ordine519[:4]))
+
+# la sovrapposizione: righe, ricalcoli, esiti; e un trimestre che la riga porta gia' non si aggiunge due volte
+_g519 = {"letto": "2026-10-30T21:00:00+00:00", "righe": {k: v for k, v in _l519.items() if k != "_rendimenti"},
+         "trimestri": {"per_titolo": {"AAA": {"nuovi": [{"trim": "2026-09-30", "ricavi": 9}]}}}}
+_d519s = {"updated_at": "2026-10-30T20:00:00Z", "macro": {}, "portfolio": [], "watchlist": _cp519.deepcopy(_d519["watchlist"])}
+_s519 = FT.sovrapponi(_d519s, _g519)
+_a519 = next(r for r in _s519["watchlist"] if r["ticker"] == "AAA")
+_c519 = next(r for r in _s519["watchlist"] if r["ticker"] == "CCC")
+_e519 = _s519["macro"]["_fonti_titoli"]["esiti"]["righe"]
+check("v519 sovrapponi: la riga letta adesso entra, controvalore e forza relativa si rifanno, il contributo al rischio "
+      "resta del run, la riga non letta resta quella della pipeline; l'esito dice quante e nomina i campi tenuti; il "
+      "trimestre che la riga di adesso porta gia' non si aggiunge una seconda volta; data.json non si tocca",
+      _a519["price"] == 120.0 and _a519["controvalore"] == 1200.0 and _a519["risk_contrib_pct"] == 12.0
+      and _a519["rs_1m"] == UD.forza_relativa("AAA", _a519, _l519["bench_m1"])[0]
+      and [(x["trim"], x["ricavi"]) for x in _a519["tv"]["conto_trim"]] == [("2026-09-30", 2), ("2026-06-30", 1)]
+      and _c519["price"] == 100.0 and "fonte per 3 titoli su 4" in _e519 and "BBB (sector)" in _e519
+      and _d519s["watchlist"][0]["price"] == 100.0, _e519)
+_s519b = FT.sovrapponi(_cp519.deepcopy(_d519s), {"letto": "x", "righe": {"esito": "non letto", "errore": "rete giu'"}})
+_cr519 = FT.con_righe(_d519s, _l519)
+check("v519 senza righe lette l'esito dice pipeline e perche'; con_righe da' una COPIA fusa e lascia data.json intatto",
+      _s519b["macro"]["_fonti_titoli"]["esiti"]["righe"] == "pipeline (rete giu')"
+      and next(r for r in _cr519["watchlist"] if r["ticker"] == "AAA")["price"] == 120.0
+      and _d519s["watchlist"][0]["price"] == 100.0)
+
+# la resa nei tre stati
+_cer519 = []
+_rr519 = "\n".join(FT.righe_righe(_d519s, _l519, _cer519))
+_cer519b = []
+_rr519b = "\n".join(FT.righe_righe(_d519s, {"esito": "non letto", "errore": "rete giu'"}, _cer519b))
+_rr519c = "\n".join(FT.righe_righe(_d519s, {**_l519, "bench_m1": None}, []))
+check("v519 la resa: quante righe su quante, le rilette, le NON lette (e vanno cercate in rete), i campi tenuti dalla "
+      "pipeline, cosa resta del run; senza lettura lo dice e lo mette fra le cose da cercare; senza benchmark avvisa che "
+      "la forza relativa e' del run",
+      "3 su 4 lette adesso con update_data.fetch_symbol" in _rr519 and "AAA, BBB, CCC" in _rr519
+      and "NON lette, vale la riga del run: CCC" in _rr519 and "BBB (sector)" in _rr519
+      and "contributo al rischio" in _rr519 and any("CCC" in c for c in _cer519)
+      and "NON lette alla fonte (rete giu')" in _rr519b and len(_cer519b) == 1
+      and "forza relativa a un mese resta quella del run" in _rr519c, _rr519)
+
+# il collegamento: il giro legge le righe per prime, ne riusa analisti e rendimenti, e non salva i rendimenti
+_cg519 = _corpo_di((_ROOT / "scripts" / "fonti_titoli.py").read_text(encoding="utf-8"), "leggi_alla_fonte")
+check("v519 collegamento: il giro legge le righe, ne prende gli analisti (rilegge a parte solo chi manca) e i rendimenti "
+      "per CDS e short, giudica trimestri, short e CDS sulle righe GIA' fuse, e non scrive i rendimenti su disco",
+      "ex.submit(leggi_righe, d)" in _cg519 and 'g["righe"].pop("_rendimenti"' in _cg519
+      and "dd = con_righe(d, g[\"righe\"])" in _cg519 and "leggi_short, dd, rend_di" in _cg519
+      and "ferme(dd," in _cg519 and "leggi_cds(dd," in _cg519 and "rendimenti=rend_cds" in _cg519
+      and "leggi_analisti(resto)" in _cg519 and FT.BLOCCHI[0] == "righe"
+      and any(k == "righe" for k, _n, _t in FT.CADENZE))
+def _solleva(f):
+    try:
+        f()
+    except KeyError:
+        return True
+    return False
+check("v519 lo stato del sistema prende le voci delle dipendenze per NOME, non per posizione: una parola che non c'e' o "
+      "che ne trova due solleva invece di datare la voce accanto",
+      SS._voce("debito a margine").startswith("debito a margine")
+      and all(_solleva(lambda w=w: SS._voce(w)) for w in ("parola che non c'e'", "de")))
+
+
+# --- v519 le barre a 5 minuti: una barra che manca non e' una codifica cambiata (il 27/10/2026 cominciava alle 09:35) ---
+def _sa519(giorni):
+    """giorni: [(AAAA-MM-GG, ora d'inizio in minuti dalla mezzanotte, quante barre)], ora di PARETE scritta come UTC."""
+    out = []
+    for g, inizio, n in giorni:
+        y, m, d = map(int, g.split("-"))
+        base = _dt474(y, m, d, 0, 0, tzinfo=_tz491.utc).timestamp() + inizio * 60
+        out += [{"t": int(base) + 300 * i, "o": 1.0, "h": 2.0, "l": 0.5, "c": 1.0, "v": 10} for i in range(n)]
+    return {"status": 200, "data": out}
+def _prova519(giorni):
+    try:
+        ROT.brief.jget = lambda url, timeout=20: _sa519(giorni)
+        try:
+            return len(ROT.brief.barre_5min("AAA")), None
+        except ValueError as e:
+            return None, str(e)
+    finally:
+        ROT.brief.jget = _vera491
+_ok519 = _prova519([("2026-10-26", 570, 78), ("2026-10-27", 575, 77), ("2026-10-28", 570, 78)])
+_tutti519 = _prova519([("2026-10-26", 575, 77), ("2026-10-27", 575, 77)])
+_dopo519 = _prova519([("2026-10-26", 570, 78), ("2026-10-27", 810, 78)])
+_prima519 = _prova519([("2026-10-26", 330, 78), ("2026-10-27", 330, 78)])
+_oltre519 = _prova519([("2026-10-26", 570, 78), ("2026-10-27", 570, 100)])
+check("v519 le barre a 5 minuti: una giornata a cui manca la barra delle 09:30 si legge (la fonte a volte non la porta), "
+      "mentre una codifica cambiata — tutta la giornata spostata di ore, in avanti o indietro, o nessuna giornata alle "
+      "09:30 esatte — resta illeggibile e lo dice",
+      _ok519 == (233, None) and _tutti519[0] is None and "dopo le 09:30 in tutti i giorni" in _tutti519[1]
+      and _dopo519[0] is None and "13:30" in _dopo519[1] and _prima519[0] is None and "05:30" in _prima519[1]
+      and _oltre519[0] is None and "fino alle 17:45" in _oltre519[1],
+      str((_ok519, _tutti519, _dopo519, _prima519, _oltre519)))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

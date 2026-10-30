@@ -18,6 +18,12 @@ quando la domanda torna (v497).
 
 Cosa fa, e con QUALI funzioni — sempre quelle della pipeline, perche' la stessa domanda alla stessa fonte dia la stessa
 risposta nei due posti (v161):
+  · RIGHE INTERE (v519, opzione B scelta dal CEO il 30/10/2026): update_data.fetch_symbol per ogni riga della pipeline,
+    con gli stessi argomenti e lo snapshot del run come «run precedente»; prezzo, tecnica, multipli, conti, combustione,
+    solidita', flottante e sensibilita' ai canali arrivano cosi' da adesso. Una riga piu' povera della pipeline (una
+    chiamata di Yahoo rifiutata) si rilegge una volta; un campo stabile che resta piu' povero vale quello del run,
+    DICHIARATO. Controvalore, guadagno e forza relativa a un mese si rifanno; correlazioni, beta sul Nasdaq-100 e
+    contributo al rischio restano del run (si calcolano sui titoli insieme). Misurato: 67 righe in 33-56 s.
   · ANALISTI (Yahoo): update_data.analisti_da, per ogni posizione e sorvegliato. Vince la lettura di adesso; un titolo
     per cui Yahoo non restituisce niente tiene la pipeline, DICHIARATO.
   · FEDWATCH (future Fed Funds per esteso via Yahoo, EFFR della NY Fed): update_data.fedwatch_da, la catena delle
@@ -75,11 +81,14 @@ VOCI_NASDAQ = {"ricavi": ("Total Revenue",),
 SPENTA = "TRADING_FONTI_TITOLI"     # ="spenta": le suite non leggono la lettura del giro (dipenderebbero dall'ora)
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-BLOCCHI = ("analisti", "fedwatch", "cds", "short", "sec", "trimestri")
+BLOCCHI = ("righe", "analisti", "fedwatch", "cds", "short", "sec", "trimestri")
 
 # ⚠ OGNI QUANTO CAMBIA CIASCUN DATO, e ogni quanto la pipeline lo rilegge: la domanda del CEO del 25/10. Fatti delle fonti
 #   (orari, scadenze di legge, calendario), non stime: dove la cadenza non e' fissata dalla fonte si dice.
 CADENZE = (
+    ("righe", "Righe dei titoli (Yahoo, con la funzione della pipeline)",
+     "prezzo, tecnica e volumi cambiano a ogni scambio; multipli, consenso e flottante quando Yahoo li aggiorna; conti, "
+     "combustione di cassa e solidita' a ogni trimestre, quando la societa' deposita i conti"),
     ("analisti", "Analisti (Yahoo)",
      "nessuna cadenza fissa: una casa alza o taglia un target o una stima in qualunque giorno, e la lettura di adesso e' "
      "il consenso che Yahoo pubblica in questo momento"),
@@ -691,29 +700,216 @@ def leggi_short(d, rendimenti_di_fn=None, post=None, get=None, oggi=None):
     return out
 
 
+# ══════════════════════════════════ LE RIGHE DEI TITOLI (v519) ══════════════════════════════════════════════════
+# Opzione B scelta dal CEO il 30/10/2026: i dati per titolo di TUTTE le righe della pipeline (posizioni, sorvegliati e
+# riferimenti) si producono in sessione a ogni analisi, con update_data.fetch_symbol — la stessa funzione, gli stessi
+# argomenti, lo snapshot del run come «run precedente» (PREV_DATA), cosi' la stessa domanda alla stessa fonte da' la
+# stessa risposta nei due posti (v161).
+THREAD_RIGHE = 10   # misurato il 30/10/2026 su 67 righe: 33 s con 10 thread e nessun 429; 50 s con 6 e un 429
+# Campi che la pipeline calcola DOPO fetch_symbol, sui titoli INSIEME o sulle posizioni: la lettura di una riga sola non
+# li produce, e restano quelli del run (la forza relativa no: si ricalcola, sotto)
+DOPO_LA_RIGA = ("rs_1m", "rs_bench", "rs_ndx_1m", "qta", "pmc", "controvalore", "gain_pct_pos", "qty", "value", "gain",
+                "gain_pct", "bval", "bgain", "risk_contrib_pct", "avg_corr", "max_corr", "max_corr_with", "beta_ndx",
+                "stop_atr", "stop_violated", "cds", "short_interest")
+PRIVATI = ("_ret_series", "_ret_dates")     # la pipeline li toglie prima di scrivere (strip_private)
+# Campi dell'ISTANTE: la lettura di adesso vince anche quando e' vuota, perche' vuoto e' uno stato — fuori dalla sessione
+#   estesa non c'e' un prezzo esteso, un filtro di sanita' scarta una variazione. Tenere quello del run vorrebbe dire
+#   affiancare a un prezzo di adesso un prezzo esteso di ore prima (la classe v186)
+DELL_ISTANTE = ("price", "price_asof", "price_asof_arretrata_da", "price_live", "price_src", "change_pct", "prepost",
+                "prezzo_limite_aggiustato", "volume", "vol_ratio", "day_high", "day_low", "support", "resistance", "rsi",
+                "signal", "signal_class", "sparks", "risk_reward", "risk_reward_base", "sma200_dist_pct",
+                "sma50_dist_pct", "w52_high", "w52_low", "w52_dist_pct", "ath", "ath_dist_pct", "atr_14", "atr_pct",
+                "tech_by_range", "smc", "fuori_mercato", "short_flusso", "sharpe_1y", "sortino_1y", "sharpe_6m",
+                "sortino_6m")
+TV_ISTANTE = ("tecnica", "performance", "ohlc")     # dentro tv: misure sulle barre, come quelle qui sopra
+# Gli altri campi (multipli, conti, bilanci, settore, consenso, sensibilita', stagionalita', flottante…) sono STABILI: la
+#   lettura di adesso vince solo se non perde niente di cio' che la pipeline ha. Una chiamata di Yahoo rifiutata fa uscire
+#   una riga piu' povera — misurato il 30/10: AMZN, GOOGL, STX, WDC e TSM senza settore, multipli, consenso e flottante —
+#   e il dato piu' fresco non deve cancellare quello completo
+
+
+def _foglie(x, p=""):
+    """I percorsi delle foglie NON vuote (un elenco vuoto, None e il settore «Altro» sono vuoti)."""
+    if isinstance(x, dict):
+        for k, v in x.items():
+            yield from _foglie(v, f"{p}.{k}")
+    elif isinstance(x, list):
+        if x:
+            yield p
+    elif x is not None and not (p.endswith("sector") and x == "Altro"):
+        yield p
+
+
+def _perde(pipe, ora, nome=""):
+    """True se `ora` non ha una foglia non vuota che `pipe` ha."""
+    return bool(set(_foglie(pipe, nome)) - set(_foglie(ora, nome)))
+
+
+def fonde(pipe, ora, oggi=None):
+    """(riga, tenuti): la riga della pipeline con la lettura di adesso sopra, campo per campo, e i campi tenuti dalla
+    pipeline perche' la lettura di adesso li perdeva. I campi calcolati dopo la riga non si toccano.
+    `oggi` (giorno di New York, AAAA-MM-GG) decide un caso solo: la data dei conti che la lettura di adesso non porta
+    perche' e' PASSATA (fetch_symbol tiene solo le date future) non si ripesca dal run."""
+    out = dict(pipe or {})
+    tenuti = []
+    oggi = oggi or datetime.now(NEW_YORK).date().isoformat()
+    for k, v in (ora or {}).items():
+        if k in DOPO_LA_RIGA or k in PRIVATI or k == "ticker":
+            continue
+        if k == "earnings_date" and v is None and out.get(k) and str(out[k])[:10] < oggi:
+            out[k] = None
+        elif k == "tv" and isinstance(v, dict) and isinstance(out.get("tv"), dict):
+            tv = dict(out["tv"])
+            for s, sv in v.items():
+                if s in TV_ISTANTE or not _perde(tv.get(s), sv, s):
+                    tv[s] = sv
+                else:
+                    tenuti.append(f"tv.{s}")
+            out["tv"] = tv
+        elif k in DELL_ISTANTE or not _perde(out.get(k), v, k):
+            out[k] = v
+        else:
+            tenuti.append(k)
+    return out, tenuti
+
+
+def ricalcola_posizione(r, bench_m1=None):
+    """Dopo la fusione: controvalore e guadagno sul prezzo di adesso (gli stessi conti della pipeline in main, perche' un
+    prezzo nuovo accanto a un guadagno vecchio e' due istanti in una riga, v316), e la forza relativa a un mese con
+    update_data.forza_relativa sulle sparks nuove. Senza i benchmark letti adesso la forza relativa resta del run, e lo
+    dice il campo `_rs_del_run`."""
+    pz = r.get("price")
+    if r.get("qta") and r.get("pmc") and pz:
+        r["controvalore"] = round(float(pz) * float(r["qta"]), 2)
+        r["gain_pct_pos"] = round((float(pz) / float(r["pmc"]) - 1) * 100, 2)
+    if bench_m1 and any(v is not None for v in bench_m1.values()):
+        r["rs_1m"], r["rs_bench"], r["rs_ndx_1m"] = _ud().forza_relativa(r["ticker"], r, bench_m1)
+        r.pop("_rs_del_run", None)
+    else:
+        r["_rs_del_run"] = True
+    return r
+
+
+def leggi_righe(d, lettore=None, thread=THREAD_RIGHE, bench=None):
+    """{"esito", "per_titolo": {tk: riga}, "non_letti", "parziali": {tk: campi tenuti dalla pipeline}, "bench_m1"}.
+    Una riga che perde qualcosa rispetto alla pipeline si rilegge UNA volta (una chiamata rifiutata e' quasi sempre di
+    quell'istante), e si tiene la lettura che perde meno. `lettore(riga) -> riga o None` e `bench() -> dict` si
+    sostituiscono nei gate."""
+    ud = _ud()
+    righe = [r for r in ((d or {}).get("watchlist") or []) if isinstance(r, dict) and r.get("ticker")]
+    pipe = {r["ticker"]: r for r in righe}
+    if lettore is None:
+        ud.PREV_DATA = d or {}
+        conf = {w.get("ticker"): w for w in (getattr(ud, "WATCHLIST", None) or []) if isinstance(w, dict)}
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            # ⚠ le cache della pipeline si riempiono UNA volta, prima dei thread: _CANALI si riempie un canale alla
+            #   volta, e un thread che la trova a meta' perde i canali che mancano — misurato il 30/10/2026: MU e BE
+            #   senza settore, tassi e dollaro. La pipeline gira in sequenza e non lo vede
+            ud.canali_macro()
+
+        def lettore(r):
+            w = conf.get(r["ticker"]) or {}
+            return ud.fetch_symbol(r["ticker"], w.get("name") if w else r.get("name"),
+                                   w.get("currency", "USD") if w else (r.get("currency") or "USD"))
+    if bench is None:
+        bench = ud.benchmark_mese
+    t0 = time.time()
+    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        try:
+            bench_m1 = bench()
+        except Exception:  # noqa: BLE001 — senza benchmark la forza relativa resta del run, dichiarata
+            bench_m1 = None
+        letti = _in_parallelo(lambda tk: lettore(pipe[tk]), list(pipe), thread=thread)
+
+        def conta(tk, x):
+            return None if not x else len(fonde(pipe[tk], x)[1])
+        da_rileggere = [tk for tk, x in letti.items() if not x or conta(tk, x)]
+        if da_rileggere:
+            nuovi = _in_parallelo(lambda tk: lettore(pipe[tk]), da_rileggere, thread=3)
+            for tk, x in nuovi.items():
+                if x and (not letti.get(tk) or conta(tk, x) < conta(tk, letti[tk])):
+                    letti[tk] = x
+    per_titolo, parziali, rendimenti = {}, {}, {}
+    for tk, x in letti.items():
+        if not x:
+            continue
+        per_titolo[tk] = {k: v for k, v in x.items() if k not in PRIVATI}
+        if x.get("_ret_series") and x.get("_ret_dates"):
+            rendimenti[tk] = (x["_ret_series"], x["_ret_dates"])
+        t = fonde(pipe[tk], x)[1]
+        if t:
+            parziali[tk] = t
+    # `_rendimenti` serve al giro (il lato azionario di CDS e short sugli stessi rendimenti della riga, senza scaricarli
+    #   una seconda volta) e non si scrive su disco: leggi_alla_fonte lo toglie
+    return {"esito": "letto" if per_titolo else "non letto", "per_titolo": per_titolo,
+            "non_letti": sorted(tk for tk in pipe if tk not in per_titolo), "parziali": parziali,
+            "riletti": sorted(da_rileggere), "bench_m1": bench_m1, "righe_pipeline": len(pipe),
+            "secondi": round(time.time() - t0, 1), "_rendimenti": rendimenti}
+
+
+def con_righe(d, rg):
+    """Una copia di data.json con le righe lette adesso fuse sopra (fonde), senza i ricalcoli di posizione: serve al
+    giro, perche' tabelle dei trimestri, flottante e CDS si giudichino sulle righe di adesso."""
+    if not d:
+        return d
+    out = copy.deepcopy(d)
+    pt = (rg or {}).get("per_titolo") or {}
+    for r in _righe(out):
+        x = pt.get(r["ticker"])
+        if x:
+            nuova = fonde(r, x)[0]
+            r.clear()
+            r.update(nuova)
+    return out
+
+
 def leggi_alla_fonte(d, nomi):
-    """Il giro: le cinque letture in parallelo (CDS dopo FedWatch, che ne da' il tasso). Non solleva mai."""
+    """Il giro: le letture in parallelo (CDS dopo FedWatch, che ne da' il tasso). Non solleva mai."""
     t0 = time.time()
     g = {k: {"esito": "non letto"} for k in BLOCCHI}
     ud = _ud()
 
     def fw():
         return ud.fedwatch_da()
-    with ThreadPoolExecutor(4) as ex:
-        f_an = ex.submit(leggi_analisti, nomi)
+    # 1. le righe (le piu' lunghe) e FedWatch insieme
+    with ThreadPoolExecutor(2) as ex:
+        f_rg = ex.submit(leggi_righe, d)
         f_fw = ex.submit(fw)
-        f_sec = ex.submit(leggi_sec, nomi)
-        f_si = ex.submit(leggi_short, d)
         try:
-            an = f_an.result()
-            g["analisti"] = {"esito": "letto", "per_titolo": {k: v for k, v in an.items() if v},
-                             "vuoti": sorted(k for k, v in an.items() if not v)}
+            g["righe"] = f_rg.result()
         except Exception as e:  # noqa: BLE001
-            g["analisti"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
+            g["righe"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
         try:
             g["fedwatch"] = {"esito": "letto", "valore": f_fw.result()}
         except Exception as e:  # noqa: BLE001
             g["fedwatch"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
+    rend = g["righe"].pop("_rendimenti", None) or {}
+    # 2. il resto sulle righe GIA' FUSE: una tabella dei trimestri ferma si giudica su quella di adesso (Yahoo puo' aver
+    #    gia' portato il trimestre), e il flottante delle vendite allo scoperto e' quello di adesso
+    dd = con_righe(d, g["righe"])
+
+    def rend_di(tks):
+        """I rendimenti delle righe lette adesso; si scaricano a parte solo quelli che mancano."""
+        manca = [tk for tk in tks if tk not in rend]
+        return {**{tk: rend[tk] for tk in tks if tk in rend}, **(rendimenti_di(manca) if manca else {})}
+    # gli analisti vengono dalla riga (fetch_symbol chiama update_data.analisti_da): si rileggono a parte solo i nomi
+    #   che la riga non ha portato
+    dalla_riga = {tk: x.get("analisti") for tk, x in ((g["righe"].get("per_titolo") or {}).items()) if tk in set(nomi)}
+
+    def an_resto():
+        resto = [tk for tk in nomi if not dalla_riga.get(tk)]
+        return {**dalla_riga, **(leggi_analisti(resto) if resto else {})}
+    with ThreadPoolExecutor(3) as ex:
+        f_an = ex.submit(an_resto)
+        f_sec = ex.submit(leggi_sec, nomi)
+        f_si = ex.submit(leggi_short, dd, rend_di)
+        try:
+            an = f_an.result()
+            g["analisti"] = {"esito": "letto", "per_titolo": {k: v for k, v in an.items() if v},
+                             "vuoti": sorted(k for k, v in an.items() if not v),
+                             "dalla_riga": sorted(k for k, v in dalla_riga.items() if v)}
+        except Exception as e:  # noqa: BLE001
+            g["analisti"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
         try:
             sec = f_sec.result()
             g["sec"] = {"esito": "letto", "per_titolo": {k: v for k, v in sec.items() if v is not None},
@@ -725,10 +921,10 @@ def leggi_alla_fonte(d, nomi):
         except Exception as e:  # noqa: BLE001
             g["short"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
     try:
-        _fe = ferme(d, (g["sec"] or {}).get("per_titolo"))
+        _fe = ferme(dd, (g["sec"] or {}).get("per_titolo"))
         _fe = {k: v for k, v in _fe.items() if k in set(nomi)}
         _nq = leggi_trimestri(sorted(_fe)) if _fe else {}
-        righe_d = {r["ticker"]: r for r in _righe(d)}
+        righe_d = {r["ticker"]: r for r in _righe(dd)}
         g["trimestri"] = {"esito": "letto", "ferme": _fe,
                           "per_titolo": {tk: completa_trimestri(((righe_d.get(tk) or {}).get("tv") or {}).get("conto_trim"),
                                                                 _nq.get(tk))
@@ -741,8 +937,8 @@ def leggi_alla_fonte(d, nomi):
         quotabili = [tk for tk, c in (mappa.get("entita") or {}).items() if c]
 
         def rend_cds():
-            return rendimenti_di([r["ticker"] for r in _righe(d) if r["ticker"] in quotabili])
-        g["cds"] = leggi_cds(d, (g["fedwatch"] or {}).get("valore"), rendimenti=rend_cds, mercato=mercato_qqq)
+            return rend_di([r["ticker"] for r in _righe(dd) if r["ticker"] in quotabili])
+        g["cds"] = leggi_cds(dd, (g["fedwatch"] or {}).get("valore"), rendimenti=rend_cds, mercato=mercato_qqq)
     except Exception as e:  # noqa: BLE001
         g["cds"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
     g["secondi"] = round(time.time() - t0, 1)
@@ -817,9 +1013,21 @@ def sovrapponi(d, giro):
     sec = giro.get("sec") or {}
     cds = giro.get("cds") or {}
     si = giro.get("short") or {}
-    rifatti_an, completati = [], []
+    rg = giro.get("righe") or {}
+    rg_pt = rg.get("per_titolo") or {}
+    rifatti_an, completati, dalla_fonte, tenuti, rs_run = [], [], [], {}, []
     for r in _righe(out):
         tk = r["ticker"]
+        x = rg_pt.get(tk)
+        if x:
+            nuova, t = fonde(r, x)
+            r.clear()
+            r.update(ricalcola_posizione(nuova, rg.get("bench_m1")))
+            dalla_fonte.append(tk)
+            if t:
+                tenuti[tk] = t
+            if r.get("_rs_del_run"):
+                rs_run.append(tk)
         v = (an.get("per_titolo") or {}).get(tk)
         if v:
             r["analisti"] = v
@@ -831,11 +1039,21 @@ def sovrapponi(d, giro):
         if tk in (sec.get("per_titolo") or {}):
             r["_periodici"] = sec["per_titolo"][tk]
         nq = ((giro.get("trimestri") or {}).get("per_titolo") or {}).get(tk) or {}
-        if nq.get("nuovi"):
+        tv = r.get("tv") if isinstance(r.get("tv"), dict) else {}
+        # v519 — un trimestre che la riga di adesso porta gia' non si aggiunge una seconda volta
+        gia = {str(x.get("trim")) for x in (tv.get("conto_trim") or [])}
+        nuovi = [x for x in (nq.get("nuovi") or []) if str(x.get("trim")) not in gia]
+        if nuovi:
             tv = r.setdefault("tv", {})
-            tv["conto_trim"] = sorted(list(nq["nuovi"]) + list(tv.get("conto_trim") or []),
+            tv["conto_trim"] = sorted(nuovi + list(tv.get("conto_trim") or []),
                                       key=lambda x: str(x.get("trim")), reverse=True)
             completati.append(tk)
+    n_pipe = len([r for r in _righe(out) if not str(r["ticker"]).startswith("BTP")])
+    esiti["righe"] = ((f"fonte per {len(dalla_fonte)} titoli su {n_pipe}"
+                       + (f"; campi tenuti dalla pipeline perche' la lettura di adesso li perdeva: "
+                          + "; ".join(f"{tk} ({', '.join(c)})" for tk, c in sorted(tenuti.items())) if tenuti else "")
+                       + (f"; forza relativa del run (benchmark non letti adesso): {', '.join(rs_run)}" if rs_run else ""))
+                      if dalla_fonte else "pipeline (" + (rg.get("errore") or "nessuna riga letta alla fonte") + ")")
     esiti["analisti"] = (f"fonte per {len(rifatti_an)} titoli" if rifatti_an else
                          "pipeline (" + (an.get("errore") or "nessun titolo letto alla fonte") + ")")
     fw = (giro.get("fedwatch") or {}).get("valore")
@@ -955,6 +1173,7 @@ def sintesi(d, giro, adesso=None, ufficiali=None):
     cercare = []
     righe = {r["ticker"]: r for r in _righe(d)}
     g = giro or {}
+    L.extend(righe_righe(d, g.get("righe") or {}, cercare))
     # analisti
     an = g.get("analisti") or {}
     if an.get("esito") == "letto":
@@ -1045,6 +1264,37 @@ def sintesi(d, giro, adesso=None, ufficiali=None):
     L.extend(["    · " + c for c in cercare] or ["    · niente: le fonti lette adesso sono allineate o piu' avanti "
                                                   "della pipeline"])
     return "\n".join(L)
+
+
+def righe_righe(d, rg, cercare):
+    """v519 — la resa del blocco delle righe: quante lette adesso, quali campi restano della pipeline e perche', e cosa
+    la lettura di una riga sola non puo' produrre."""
+    n = rg.get("righe_pipeline") or len([r for r in ((d or {}).get("watchlist") or []) if r.get("ticker")])
+    pt = rg.get("per_titolo") or {}
+    if rg.get("esito") != "letto" or not pt:
+        cercare.append("prezzi, multipli e conti dei nomi in esame: le righe dei titoli non sono state lette alla fonte, "
+                       "e vale il run della pipeline")
+        return [f"  · RIGHE DEI TITOLI (v519): NON lette alla fonte ({rg.get('errore') or 'nessuna riga letta'}): "
+                "prezzo, tecnica, multipli, conti, combustione di cassa, solidita', flottante e sensibilita' ai canali "
+                "sono quelli del run della pipeline"]
+    L = [f"  · RIGHE DEI TITOLI (v519): {len(pt)} su {n} lette adesso con update_data.fetch_symbol, la funzione della "
+         f"pipeline ({_n(rg.get('secondi'), 1)} s)"
+         + (f"; rilette una seconda volta perche' la prima lettura perdeva qualcosa: {', '.join(rg['riletti'])}"
+            if rg.get("riletti") else "")]
+    if rg.get("non_letti"):
+        L.append(f"      NON lette, vale la riga del run: {', '.join(rg['non_letti'])}")
+        cercare.append(f"i dati del giorno di {', '.join(rg['non_letti'])}: la fonte non ha restituito la riga")
+    if rg.get("parziali"):
+        L.append("      campi tenuti dalla pipeline, perche' la lettura di adesso li perdeva (una chiamata di Yahoo "
+                 "rifiutata fa uscire una riga piu' povera): "
+                 + "; ".join(f"{tk} ({', '.join(c)})" for tk, c in sorted(rg["parziali"].items())))
+    if not any(v is not None for v in (rg.get("bench_m1") or {}).values()):
+        L.append("      ⚠ benchmark della forza relativa non letti adesso: la forza relativa a un mese resta quella del "
+                 "run, accanto a prezzi di adesso")
+    L.append("      restano del run, perche' si calcolano sui titoli INSIEME o hanno un blocco proprio: correlazioni, "
+             "beta sul Nasdaq-100 e contributo al rischio; CDS e vendite allo scoperto (qui sotto). Controvalore, "
+             "guadagno sul carico e forza relativa a un mese si rifanno sul prezzo di adesso")
+    return L
 
 
 def righe_sec(d, sec, cercare, trim=None, uff_es=None, uff_reg=None):

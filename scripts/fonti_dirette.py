@@ -98,15 +98,18 @@ NOMI.update({"effr": "Fed Funds effettivo (EFFR del giorno)", "eurusd": "EUR/USD
 ORDINE = tuple(k for k, *_ in SERIE_FRED[:7]) + ("effr", "eurusd", "fear_greed") + tuple(k for k, *_ in SERIE_FRED[7:])
 
 # ⚠ COSA LA PIPELINE PORTA DA SOLA (nessuna fonte raggiungibile da qui): si nomina quando il run e' indietro.
-SOLO_PIPELINE = ("sensibilita' ai canali macro", "storico dei CDS (il giorno di oggi lo rilegge fonti_titoli.py)",
+SOLO_PIPELINE = ("storico dei CDS (il giorno di oggi lo rilegge fonti_titoli.py)",
                  "voci dei bilanci SEC (debito, scadenze, derivati) e salute del credito",
                  "debito a margine (famiglia «leva» del semaforo)", "composizione degli ETF della rotazione",
                  "prezzo del BTP",
-                 # v518 — mancava, e lo stato del sistema l'ha mostrato: multipli, conti e bilanci di ogni titolo vengono
-                 #   ancora tutti dal run (fonti_titoli.py rilegge solo cio' che ha una fonte rapida, sotto)
-                 "multipli, conti trimestrali, combustione di cassa, solidita' e flottante di ogni titolo")
-# v512 — quelli che una fonte raggiungibile ce l'hanno: li rilegge scripts/fonti_titoli.py (blocco DATI PER TITOLO)
-RILETTI_PER_TITOLO = ("target e revisioni degli analisti", "FedWatch", "CDS dell'ultimo giorno", "vendite allo scoperto",
+                 # v519 — restano del run perche' si calcolano sui titoli INSIEME (la matrice dei rendimenti di tutte le
+                 #   righe): la lettura di una riga sola non li produce
+                 "correlazioni, beta sul Nasdaq-100 e contributo al rischio delle righe dei titoli")
+# v512 — quelli che una fonte raggiungibile ce l'hanno: li rilegge scripts/fonti_titoli.py (blocco DATI PER TITOLO).
+# v519 — opzione B scelta dal CEO il 30/10/2026: anche le righe intere di ogni titolo, con update_data.fetch_symbol
+RILETTI_PER_TITOLO = ("righe intere di ogni titolo con la funzione della pipeline — prezzo, tecnica, multipli, conti "
+                      "trimestrali, combustione di cassa, solidita', flottante e sensibilita' ai canali macro",
+                      "target e revisioni degli analisti", "FedWatch", "CDS dell'ultimo giorno", "vendite allo scoperto",
                       "date dei depositi SEC e trimestri che la pipeline non ha ancora")
 
 

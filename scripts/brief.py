@@ -193,9 +193,19 @@ def barre_5min(tk):
     primo = {}
     for b in out:
         primo.setdefault(b["dt"].date(), b["dt"])
-    storti = [f"{g:%d/%m} alle {t:%H:%M}" for g, t in primo.items() if (t.hour, t.minute) != (9, 30)]
-    if storti:
-        raise ValueError("ore delle barre a 5 minuti non verificabili: la giornata comincia " + ", ".join(storti)
+    ultima = {}
+    for b in out:
+        ultima[b["dt"].date()] = b["dt"]
+    # ⚠ v519 — UNA BARRA CHE MANCA NON E' UNA CODIFICA CAMBIATA. Il 30/10/2026 il 27/10 cominciava alle 09:35 e il 28/10
+    #   aveva 77 barre su 78: la fonte, a volte, non porta una barra di 5 minuti. La regola vecchia (ogni giornata alle
+    #   09:30 esatte) dichiarava illeggibile tutta la finestra per una barra. Una codifica cambiata sposta invece TUTTA la
+    #   giornata di 4-5 ore: ogni giornata deve cominciare fra le 09:30 e le 10:00 e finire entro le 16:00, e almeno una
+    #   alle 09:30 esatte. ⚠ Il minimo di una barra che manca non si conosce: e' un buco, non un prezzo (v205)
+    storti = [f"{g:%d/%m} alle {t:%H:%M}" for g, t in primo.items() if not ((9, 30) <= (t.hour, t.minute) < (10, 0))]
+    storti += [f"{g:%d/%m} fino alle {t:%H:%M}" for g, t in ultima.items() if (t.hour, t.minute) >= (16, 0)]
+    if storti or not any((t.hour, t.minute) == (9, 30) for t in primo.values()):
+        raise ValueError("ore delle barre a 5 minuti non verificabili: la giornata comincia "
+                         + (", ".join(storti) if storti else "dopo le 09:30 in tutti i giorni")
                          + " invece che alle 09:30")
     return out
 

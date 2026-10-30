@@ -3196,12 +3196,36 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     }
 
 
-def fetch_equities():
-    # benchmark 1 mese per RS relativa (SP500, SOX, NDX)
+def benchmark_mese():
+    """La variazione a un mese dei tre benchmark della forza relativa (S&P 500, SOX, NDX), in percentuale.
+    v519 — una funzione sola per portafoglio, watchlist e la lettura in sessione dell'analisi
+    (scripts/fonti_titoli.py): due copie della stessa domanda divergono al primo ritocco (v161)."""
     bench_m1 = {}
     for sym, key, fb in (("^GSPC", "sp500", None), ("^SOX", "sox", "SOXX"), ("^NDX", "ndx", None)):
         h = bench_close(sym, fb)   # ^SOX flaky da IP datacenter → fallback SOXX (stessa % RS)
         bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if (h is not None and len(h) >= 22) else None
+    return bench_m1
+
+
+def forza_relativa(ticker, row, bench_m1):
+    """(rs_1m, rs_bench, rs_ndx_1m): la variazione a un mese della riga (dalle sparks m1) meno quella del suo benchmark
+    di settore e del Nasdaq-100. v519 — estratta da fetch_equities e fetch_watchlist, che la scrivevano due volte."""
+    bkey = SECTOR_BENCH.get(ticker, "sp500")
+    bm1 = bench_m1.get(bkey) or bench_m1.get("sp500")
+    m1 = row.get("sparks", {}).get("m1", [])
+    rs_1m, rs_ndx_1m = None, None
+    if len(m1) >= 2 and m1[0]:
+        stk_m1 = (m1[-1] / m1[0] - 1) * 100
+        if bm1 is not None:
+            rs_1m = round(stk_m1 - bm1, 1)
+        if bench_m1.get("ndx") is not None:
+            rs_ndx_1m = round(stk_m1 - bench_m1["ndx"], 1)
+    return rs_1m, bkey, rs_ndx_1m
+
+
+def fetch_equities():
+    # benchmark 1 mese per RS relativa (SP500, SOX, NDX)
+    bench_m1 = benchmark_mese()
 
     rows = []
     for pos in PORTFOLIO:
@@ -3218,16 +3242,7 @@ def fetch_equities():
         value = row["price"] * pos["qty"]
         cost = pos["pmc"] * pos["qty"]
         # RS 1M vs benchmark settoriale + RS 1M vs NDX (metro diretto del mandato)
-        bkey = SECTOR_BENCH.get(pos["ticker"], "sp500")
-        bm1 = bench_m1.get(bkey) or bench_m1.get("sp500")
-        m1 = row.get("sparks", {}).get("m1", [])
-        rs_1m, rs_ndx_1m = None, None
-        if len(m1) >= 2 and m1[0]:
-            stk_m1 = (m1[-1] / m1[0] - 1) * 100
-            if bm1 is not None:
-                rs_1m = round(stk_m1 - bm1, 1)
-            if bench_m1.get("ndx") is not None:
-                rs_ndx_1m = round(stk_m1 - bench_m1["ndx"], 1)
+        rs_1m, bkey, rs_ndx_1m = forza_relativa(pos["ticker"], row, bench_m1)
         row.update({
             "qty": pos["qty"], "pmc": pos["pmc"],
             # snapshot reale broker in EUR (controvalore/profitto) se fornito in config
@@ -3244,26 +3259,14 @@ def fetch_equities():
 
 
 def fetch_watchlist():
-    bench_m1 = {}
-    for sym, key, fb in (("^GSPC", "sp500", None), ("^SOX", "sox", "SOXX"), ("^NDX", "ndx", None)):
-        h = bench_close(sym, fb)   # ^SOX flaky da IP datacenter → fallback SOXX (stessa % RS)
-        bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if (h is not None and len(h) >= 22) else None
+    bench_m1 = benchmark_mese()
 
     rows = []
     for w in WATCHLIST:
         row = fetch_symbol(w["ticker"], w.get("name"), w.get("currency", "USD"))
         if not row:
             continue
-        bkey = SECTOR_BENCH.get(w["ticker"], "sp500")
-        bm1 = bench_m1.get(bkey) or bench_m1.get("sp500")
-        m1 = row.get("sparks", {}).get("m1", [])
-        rs_1m, rs_ndx_1m = None, None
-        if len(m1) >= 2 and m1[0]:
-            stk_m1 = (m1[-1] / m1[0] - 1) * 100
-            if bm1 is not None:
-                rs_1m = round(stk_m1 - bm1, 1)
-            if bench_m1.get("ndx") is not None:
-                rs_ndx_1m = round(stk_m1 - bench_m1["ndx"], 1)
+        rs_1m, bkey, rs_ndx_1m = forza_relativa(w["ticker"], row, bench_m1)
         row["rs_1m"] = rs_1m
         row["rs_bench"] = bkey
         row["rs_ndx_1m"] = rs_ndx_1m
