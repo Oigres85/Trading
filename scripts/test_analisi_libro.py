@@ -8843,7 +8843,7 @@ check("v516 collegamento: calcola legge il registro, valuta al prezzo di adesso 
       "pesi, lo toglie dal periodo, e il blocco usa lo STESSO cambio del patrimonio (una lettura sola, v161); la sintesi "
       "lo stampa",
       "ops = leggi_operazioni()" in _cc516 and _cc516.index("dopo = dopo_la_seduta(ops, qty, fine)") < _cc516.index("val = {t:")
-      and "(None if t in dopo else S[t].get(ini))" in _cc516 and "pat_pipe[0], pat_pipe[1]" in _cc516
+      and "(None if t in dopo" in _cc516 and "else S[t].get(ini))" in _cc516 and "pat_pipe[0], pat_pipe[1]" in _cc516
       and _cc516.count("patrimonio_pipeline(") == 1
       and "L.extend(righe_cambio(o[\"cambio\"]))" in _corpo_di((_ROOT / "scripts" / "numeri_libro.py").read_text(encoding="utf-8"), "sintesi"))
 _lib516 = (_ROOT / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
@@ -9418,6 +9418,41 @@ check("v519 le barre a 5 minuti: una giornata a cui manca la barra delle 09:30 s
       and _dopo519[0] is None and "13:30" in _dopo519[1] and _prima519[0] is None and "05:30" in _prima519[1]
       and _oltre519[0] is None and "fino alle 17:45" in _oltre519[1],
       str((_ok519, _tutti519, _dopo519, _prima519, _oltre519)))
+
+
+# --- v519 il periodo: chi e' entrato DURANTE il periodo non c'era alla chiusura d'inizio (INTC e ORCL il 30/10/2026) ---
+_ops519 = [{"tk": "INT", "data": "2026-10-30", "verso": "acquisto", "qta": 130, "prezzo": 64.5, "fx": 1.1172},
+           {"tk": "OLD", "data": "2026-10-30", "verso": "acquisto", "qta": 10, "prezzo": 100.0, "fx": 1.1172},
+           {"tk": "PRE", "data": "2026-10-29", "verso": "acquisto", "qta": 37, "prezzo": 282.0, "fx": 1.113},
+           {"tk": "DOP", "data": "2026-11-02", "verso": "acquisto", "qta": 5, "prezzo": 10.0, "fx": 1.1}]
+_qty519 = {"INT": 130, "OLD": 50, "PRE": 37, "DOP": 5, "NUL": 7}
+_en519 = NL.entrate_nel_periodo(_ops519, _qty519, "2026-10-29", "2026-10-30")
+check("v519 entrate_nel_periodo: dentro chi ha un'operazione DOPO la chiusura d'inizio e fino alla seduta del blocco (non "
+      "il giorno d'inizio, non dopo la fine, non chi non e' in portafoglio); «da zero» solo se la posizione intera e' stata "
+      "comprata nel periodo, e la spesa e' quella delle operazioni",
+      sorted(_en519) == ["INT", "OLD"] and _en519["INT"]["da_zero"] is True and _en519["INT"]["spesa"] == 130 * 64.5
+      and _en519["OLD"]["da_zero"] is False and _en519["INT"]["data"] == "2026-10-30", str(_en519))
+_cnl519 = _corpo_di((_ROOT / "scripts" / "numeri_libro.py").read_text(encoding="utf-8"), "calcola")
+check("v519 collegamento: calcola toglie dal periodo e dalle 21 sedute chi e' entrato durante la finestra (come chi e' "
+      "entrato dopo la seduta del blocco, v516), e passa le entrate alla resa",
+      "durante = entrate_nel_periodo(ops, qty, ini, fine)" in _cnl519
+      and "durante21 = entrate_nel_periodo(ops, qty, ini21, fine)" in _cnl519
+      and "(None if t in dopo or t in durante else S[t].get(ini))" in _cnl519
+      and "(None if t in dopo or t in durante21 else S[t].get(ini21))" in _cnl519
+      and '"durante": durante' in _cnl519)
+_o519 = {"inizio": "2026-10-29", "fine": "2026-10-30", "sedute": 1, "tot_usd": 1000.0, "ret_libro": -0.05, "pnl_libro": -50.0,
+         "bench": {f: 0.0 for f in NL.FATTORI}, "ret_21": -0.1, "bench_21": {f: 0.0 for f in NL.FATTORI},
+         "durante": {"INT": {"data": "2026-10-30", "da_zero": True, "dall_acquisto": 164.0},
+                     "OLD": {"data": "2026-10-30", "da_zero": False}},
+         "durante_21": ["INT", "OLD", "PRE"],
+         "rischio": {"vol_ann": 0.4, "var95": 0.05, "es95": 0.06, "scommesse_eff": 2.0, "mcr": {}, "n_sedute": 251,
+                     "beta_libro": {}}, "esclusi_matrice": [], "titoli": [], "stress": {}}
+_ro519 = "\n".join(NL.sintesi(_o519)) if isinstance(NL.sintesi(_o519), list) else NL.sintesi(_o519)
+check("v519 la resa: le entrate durante il periodo si nominano con la data e, se la posizione e' nata li', col risultato "
+      "dal prezzo d'acquisto; una posizione che c'era gia' lo dice; a 21 sedute si nominano anche le altre",
+      "entrate DURANTE il periodo, dopo la chiusura del 29/10/2026" in _ro519
+      and "INT (30/10/2026, dal prezzo d'acquisto +164 $)" in _ro519 and "OLD (30/10/2026, posizione che c'era gia'" in _ro519
+      and "a 21 sedute fuori anche chi ha un'operazione nella finestra: INT, OLD, PRE" in _ro519, _ro519[:900])
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

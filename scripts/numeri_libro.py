@@ -157,8 +157,18 @@ def calcola(sedute=1, registra=False, adesso=None):
     tot = sum(val.values())
     w = {t: val[t] / tot for t in TK}
 
-    pnl, ret = attribuzione(qty, {t: (None if t in dopo else S[t].get(ini)) for t in TK}, px)
-    pnl21, ret21 = attribuzione(qty, {t: (None if t in dopo else S[t].get(ini21)) for t in TK}, px)
+    # ⚠⚠ v519 — e chi ha un'operazione DURANTE il periodo, dopo la chiusura d'inizio: alla chiusura d'inizio non era in
+    #   portafoglio in quelle quantita'. Il 30/10/2026 INTC e ORCL, comprate quel giorno, entravano nel risultato della
+    #   seduta come se fossero state tenute dalla chiusura del 29/10: INTC -3.420 $ per un calo avvenuto PRIMA
+    #   dell'acquisto a 64,50, e il libro «-7,78%» contava 3.953 $ di perdite mai avute. La v516 escludeva solo le
+    #   operazioni dopo la seduta del blocco. Restano fuori dal periodo, e si dice cosa hanno fatto dal prezzo d'acquisto
+    durante = entrate_nel_periodo(ops, qty, ini, fine)
+    durante21 = entrate_nel_periodo(ops, qty, ini21, fine)
+    for t, x in durante.items():
+        if x["da_zero"]:
+            x["dall_acquisto"] = qty[t] * px[t] - x["spesa"]
+    pnl, ret = attribuzione(qty, {t: (None if t in dopo or t in durante else S[t].get(ini)) for t in TK}, px)
+    pnl21, ret21 = attribuzione(qty, {t: (None if t in dopo or t in durante21 else S[t].get(ini21)) for t in TK}, px)
     out = {"fine": fine, "inizio": ini, "sedute": sedute, "tot_usd": tot, "cassa_eur": cassa_eur,
            "ret_libro": ret, "pnl_libro": sum(v for v in pnl.values() if v is not None),
            "ret_21": ret21, "pnl_21": sum(v for v in pnl21.values() if v is not None), "avanti": avanti,
@@ -168,7 +178,7 @@ def calcola(sedute=1, registra=False, adesso=None):
                        "vs_pmc": (None if t in dopo and not dopo[t].get("quota") else px[t] / pmc[t] - 1),
                        "latente": (None if t in dopo and not dopo[t].get("quota") else qty[t] * (px[t] - pmc[t]))}
                       for t in TK],
-           "dopo_seduta": dopo}
+           "dopo_seduta": dopo, "durante": durante, "durante_21": sorted(durante21)}
 
     lunghi = [t for t in TK if len(B[t]) >= MIN_BARRE_MATRICE]
     out["esclusi_matrice"] = [t for t in TK if t not in lunghi]
@@ -2271,6 +2281,28 @@ def dopo_la_seduta(operazioni, qty, fine):
     return out
 
 
+def entrate_nel_periodo(operazioni, qty, inizio, fine):
+    """{ticker: {"data", "acquisti", "spesa", "vendite", "da_zero"}} per le posizioni con un'operazione registrata DOPO
+    la chiusura d'inizio `inizio` e fino alla seduta `fine` (v519): alla chiusura d'inizio non erano in portafoglio in
+    quelle quantita', e misurarle da li' attribuisce al libro un movimento avvenuto prima dell'operazione. `da_zero`: la
+    posizione intera e' stata comprata nel periodo, quindi il suo risultato dal prezzo d'acquisto e' un fatto."""
+    out = {}
+    for o in operazioni or []:
+        d = str(o.get("data") or "")
+        if o["tk"] not in qty or not d or not (str(inizio) < d <= str(fine)):
+            continue
+        x = out.setdefault(o["tk"], {"data": d, "acquisti": 0.0, "spesa": 0.0, "vendite": 0.0})
+        x["data"] = max(x["data"], d)
+        if o.get("verso") == "acquisto" and o.get("qta") and o.get("prezzo"):
+            x["acquisti"] += o["qta"]
+            x["spesa"] += o["qta"] * o["prezzo"]
+        else:
+            x["vendite"] += o.get("qta") or 0
+    for t, x in out.items():
+        x["da_zero"] = x["vendite"] == 0 and abs(x["acquisti"] - qty[t]) < 1e-9
+    return out
+
+
 def carico_in_euro(operazioni, tk):
     """Il carico in euro di un titolo dal registro, a COSTO MEDIO PONDERATO (il metodo del regime amministrato): un
     acquisto aggiunge azioni x prezzo / cambio, una vendita toglie la sua parte al costo medio. None se il registro non
@@ -2835,6 +2867,19 @@ def sintesi(o):
     L += [f"Periodo {o['inizio']} -> {o['fine']} ({_conta(o['sedute'], 'seduta', 'sedute')}) · azionario {_it(o['tot_usd'], 0)} $",
          f"Libro {p(o['ret_libro'])} ({_sg(o['pnl_libro'], 0)} $) · QQQ {p(b['QQQ'])} · SMH {p(b['SMH'])} · SPY {p(b['SPY'])} · RSP {p(b['RSP'])}",
          f"21 sedute: libro {p(o['ret_21'],1)} · SMH {p(o['bench_21']['SMH'],1)} · QQQ {p(o['bench_21']['QQQ'],1)}"]
+    if o.get("durante"):
+        # v519 — chi e' entrato DURANTE il periodo resta fuori dal suo risultato, e si dice cosa ha fatto dall'acquisto
+        L.append("  ⚠ entrate DURANTE il periodo, dopo la chiusura del " + _data_it(o["inizio"]) + ": " + ", ".join(
+            f"{t} ({_data_it(x['data'])}"
+            + (f", dal prezzo d'acquisto {_sg(x['dall_acquisto'], 0)} $)" if x.get("dall_acquisto") is not None
+               else ", posizione che c'era gia': il risultato dall'operazione non si separa)")
+            for t, x in sorted(o["durante"].items()))
+            + " — fuori dal risultato del periodo: alla chiusura d'inizio non erano in portafoglio in quelle quantita' "
+              "(LIBRO.md §1decies)")
+    if o.get("durante_21"):
+        L.append("  ⚠ a 21 sedute fuori anche chi ha un'operazione nella finestra: " + ", ".join(o["durante_21"])
+                 + " · le operazioni di prima del 30/10/2026 non sono nel registro, e per quelle il risultato a 21 "
+                   "sedute conta le quantita' di oggi")
     if o.get("dopo_seduta"):
         # v516 — chi e' entrato dopo la seduta del blocco si valuta al prezzo di adesso e resta fuori dal periodo
         L.append("  ⚠ operazioni DOPO la seduta del " + _data_it(o["fine"]) + ": " + ", ".join(

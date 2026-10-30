@@ -9065,8 +9065,17 @@ tagliato dalla finestra mobile — **era sbagliata**, e l'ha detto la misura: ma
 28/10 ne ha 77 su 78). Un fuso cambiato sposta **tutta** la giornata di 4-5 ore; ora ogni giornata deve cominciare fra le
 09:30 e le 10:00 e finire entro le 16:00, e almeno una alle 09:30 esatte.
 
+### 📉 Il risultato del periodo contava perdite mai avute
+Trovato leggendo l'uscita dopo il push, come il destinatario: il periodo 29/10 → 30/10 diceva **«Libro −7,78%
+(−23.619 $)»**, e dentro c'erano INTC **−3.420 $** e ORCL −533 $ — due titoli comprati **durante** quella seduta,
+misurati dalla chiusura del giorno prima. INTC era scesa del 29,7% *prima* dell'acquisto a 64,50. La v516 escludeva solo
+le operazioni **dopo** la seduta del blocco; ora `entrate_nel_periodo` toglie dal periodo (e dalle 21 sedute) chi ha
+un'operazione dopo la chiusura d'inizio, e la riga dice cosa ha fatto **dal prezzo d'acquisto** (INTC +164 $, ORCL
++250 $). Il libro tenuto dall'inizio della seduta: **−6,94% (−19.665 $)**. ⚠ Le operazioni di prima del 30/10 non sono nel
+registro, e per quelle il risultato a 21 sedute conta le quantità di oggi: la riga lo dice.
+
 ### 🧪 Il metodo
-- **21 iniezioni**, una alla volta su tre copie del repo verificate, con `modifica_sicura` e ripristino verificato per impronta:
+- **25 iniezioni** (21 sulle righe e sulle barre, 4 sul periodo), una alla volta su tre copie del repo verificate, con `modifica_sicura` e ripristino verificato per impronta:
   **mordono tutte, ciascuna sul controllo atteso**. Una — la guardia contro il trimestre doppione — non mordeva al primo
   giro, e la colpa era della **fixture**: la riga «di adesso» non portava il trimestre, quindi il caso non esisteva (v430).
 - Lo stato del sistema prende ora le voci delle dipendenze per **nome**, non per posizione: togliere una voce spostava le
