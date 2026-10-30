@@ -618,6 +618,18 @@ def flottante_nd(r):
     return nd if nd in ("certificati", "classi") else None
 
 
+CHIAVI_AZIONI = ("serie", "rotazione", "quotata_dal")   # almeno una c'e' in ogni blocco che la pipeline scrive (v514)
+
+
+def azioni_di(r):
+    """Il blocco «azioni» della riga, solo se ha la forma che la pipeline scrive; altrimenti None.
+    ⚠⚠ v515 — il primo run della v514 ha pubblicato in «azioni» il dizionario dello Z-Score (due variabili omonime
+    nella pipeline), e queste schede l'hanno letto come una misura senza diluizione: «diluizione forte: nessun nome» con
+    MSTR a +32%. Un campo che non ha la forma attesa e' un dato che manca, non un valore nullo (v205, v406)."""
+    a = (r or {}).get("azioni")
+    return a if isinstance(a, dict) and any(k in a for k in CHIAVI_AZIONI) else None
+
+
 def _az(q):
     """Un numero di azioni: sopra il miliardo in miliardi, perche' «13176,0 milioni» non si legge."""
     if q is not None and q >= 1e9:
@@ -630,7 +642,7 @@ def flottante_su_totale(r):
     il flottante di Yahoo letto sulle sue azioni sembra quasi tutto (CBRS 97,9% il 25/10/2026) mentre sul totale del
     bilancio e' meta'. Il contrario — il bilancio con MENO azioni della fonte — e' quasi sempre un'emissione dopo la data
     del bilancio (MSTR), e non dice niente delle classi: None."""
-    a, st = (r or {}).get("azioni") or {}, (r or {}).get("stats") or {}
+    a, st = azioni_di(r) or {}, (r or {}).get("stats") or {}
     fl, sh, tot = st.get("float_shares"), st.get("shares"), a.get("azioni")
     if fl and sh and tot and tot > sh * (1 + AZ_CLASSI) and not flottante_nd(r):
         return round(fl / tot * 100, 1), tot
@@ -667,8 +679,11 @@ def testo_diluizione(v, etichetta):
 
 def riga_flottante(r, adesso=None):
     """La riga «flottante:» di ogni scheda (v514). Ogni assenza si dichiara (v406)."""
-    a = r.get("azioni")
+    a = azioni_di(r)
     if a is None:
+        if r.get("azioni") is not None:
+            return ("flottante: il campo «azioni» di questo snapshot non ha la forma che la pipeline scrive (il primo run "
+                    "della v514 ci ha messo lo Z-Score, corretto nella v515) — il dato che manca, non un valore nullo")
         return ("flottante: snapshot precedente alla v514 — la pipeline non pubblica ancora azioni in circolazione, "
                 "diluizione e rotazione: il dato che manca, non un valore nullo")
     pz = []
@@ -732,10 +747,15 @@ def blocco_flottante(righe, pos, sorv, filtro=None, adesso=None):
              "ha la data della rilevazione; nessuna di queste misure e' una prova della tenuta")
     voci = [(tk, ru, righe[tk]) for gr, ru in ((pos, "POSIZIONE"), (sorv, "SORVEGLIATO")) for tk in gr
             if tk in righe and not (filtro and tk not in filtro)]
-    con = [(tk, ru, r, r["azioni"]) for tk, ru, r in voci if r.get("azioni") is not None]
+    con = [(tk, ru, r, azioni_di(r)) for tk, ru, r in voci if azioni_di(r) is not None]
     if not con:
-        L.append("  snapshot precedente alla v514: la pipeline non pubblica ancora le azioni in circolazione — il dato "
-                 "che manca, non un valore nullo")
+        if any(r.get("azioni") is not None for _tk, _ru, r in voci):
+            L.append("  il campo «azioni» di questo snapshot non ha la forma che la pipeline scrive (il primo run della "
+                     "v514 ci ha messo lo Z-Score, corretto nella v515): nessuna misura — il dato che manca, non un valore "
+                     "nullo")
+        else:
+            L.append("  snapshot precedente alla v514: la pipeline non pubblica ancora le azioni in circolazione — il dato "
+                     "che manca, non un valore nullo")
         return L
     va = [(tk, ru, a["var_anno"]["pct"]) for tk, ru, _r, a in con if (a.get("var_anno") or {}).get("pct") is not None]
     sigla = {"POSIZIONE": "in posizione", "SORVEGLIATO": "sorvegliato"}
@@ -744,8 +764,8 @@ def blocco_flottante(righe, pos, sorv, filtro=None, adesso=None):
                                                  if dil else "nessun nome"))
     rac = sorted(((tk, ru, p) for tk, ru, p in va if p <= AZ_RIACQUISTI), key=lambda x: (x[2], x[0]))
     L.append(f"  azioni diminuite sull'anno: " + (" · ".join(f"{tk} {_sg1(p)}%" for tk, ru, p in rac) if rac else "nessun nome"))
-    ro = [(tk, r["azioni"]["rotazione"]["pct"]) for tk, _ru, r, _a in con
-          if (r["azioni"].get("rotazione") or {}).get("pct") is not None and not flottante_nd(r)]
+    ro = [(tk, a["rotazione"]["pct"]) for tk, _ru, r, a in con
+          if (a.get("rotazione") or {}).get("pct") is not None and not flottante_nd(r)]
     if ro:
         alte = sorted(((tk, p) for tk, p in ro if banda_rotazione(p) == "molto alta"), key=lambda x: (-x[1], x[0]))
         L.append(f"  rotazione molto alta del flottante: " + (" · ".join(f"{tk} {_n(p, 1)}%" for tk, p in alte)
@@ -766,7 +786,7 @@ def blocco_flottante(righe, pos, sorv, filtro=None, adesso=None):
     rec.sort(key=lambda x: x[2])
     L.append(f"  quotate da poco (vincoli di vendita da verificare nel prospetto): "
              + (" · ".join(f"{tk} dal {_data_it(q)}" for tk, q, _g in rec) if rec else "nessun nome"))
-    senza = sorted(tk for tk, _ru, r in voci if r.get("azioni") is None)
+    senza = sorted(tk for tk, _ru, r in voci if azioni_di(r) is None)
     if senza:
         L.append(f"  senza la misura in questo snapshot: {', '.join(senza)}")
     return L

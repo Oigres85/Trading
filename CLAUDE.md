@@ -8823,3 +8823,34 @@ società**, mai nelle ricostruzioni dei giornali. *Meglio non avere dati che ave
   895 → 905 (934). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
 - ⚠ **Il campo arriva col prossimo run della pipeline**: fino ad allora schede e blocco dicono «snapshot precedente alla
   v514», che è vero.
+
+## 🪤 v515 — IL FLOTTANTE DELLA v514 NON È MAI ARRIVATO: ALTMAN L'HA SOVRASCRITTO, E LE SCHEDE HANNO LETTO «NESSUN NOME»
+
+Trovato verificando nel CI il primo run della v514, cioè facendo il passo che la v514 aveva dichiarato (trappola v203):
+`data.json` aveva il campo `azioni` su 58 righe su 68, e dentro c'era **il dizionario dello Z-Score**. In `fetch_symbol`
+la variabile del blocco nuovo si chiamava `_az`, lo stesso nome che il blocco di Altman usa ottanta righe più sotto: il
+secondo assegnamento vinceva, e il record pubblicava Altman sotto il nome del flottante. Classe **v393** (due variabili
+omonime con contenuti diversi), in una funzione da 500 righe.
+
+> ⚠⚠ **E il blocco delle schede ha scritto «diluizione forte sull'anno: nessun nome» con MSTR a +32%.** Un campo
+> presente ma di forma sbagliata è stato letto come una misura senza diluizione: il silenzio che si legge come un no
+> (v389, v406). Il difetto della pipeline era innocuo per chi legge; quello delle schede no.
+
+- **La variabile si chiama `_flot`**, e un gate sull'albero sintattico di `fetch_symbol` pretende che **ogni variabile
+  `_x` pubblicata dal record sia assegnata da UNA funzione sola** (più i None dei rami che falliscono). Copre la classe,
+  non il caso: la prossima collisione su `_comb`, `_cred` o `_sol` cade lì. Il gate costruisce anche lo stato da cui è
+  nato (la variabile di Altman rinominata come quella del flottante) e pretende di vederlo.
+- **`schede_progetto.azioni_di`**: il campo vale come misura solo se ha la forma che la pipeline scrive (almeno una fra
+  `serie`, `rotazione`, `quotata_dal`). Altrimenti la riga lo dice, il blocco lo nomina fra chi non ha la misura e, se
+  nessuno ce l'ha, non scrive «nessun nome» sulla diluizione. Uno snapshot della v514 si legge ora così.
+- ⚠ Il gate v514 sul collegamento pinnava il nome `_az` — cioè proprio la variabile sbagliata — e passava: *un gate che
+  pinna un nome conferma la collisione invece di prenderla* (v326). Riagganciato al nome nuovo e all'inizializzazione
+  prima del ramo, con la classe sorvegliata dal gate v515.
+- Quattro iniezioni (la collisione rimessa, `azioni_di` che accetta qualunque dizionario, il blocco e la riga che contano
+  il campo sbagliato come misura), una alla volta su due copie verificate per impronta: **mordono tutte**.
+- Pavimenti: `test_update_data.py` N_CHECKS_MINIMO 400 (403 eseguiti), floor 380; `test_analisi_libro.py` floor 910
+  (935). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+- ⚠ **E il pre-commit ha fermato il commit su v430**, rosso su codice che nessuno aveva toccato: il 30/10 le scommesse
+  effettive del libro sono cadute su un intero («2 su 9 nomi») e la sonda pretendeva un decimale. È la classe v443 —
+  *un check che dipende da quante cifre ha il numero di oggi* — per la terza volta (v432/v418, v443, ora qui). Il
+  decimale è facoltativo; l'iniezione che rimette la formula a pesi uguali morde ancora.

@@ -9537,7 +9537,9 @@ check("v430 la formula delle scommesse effettive riproduce il numero pubblicato"
   const p = buildCIOText();
   const guai = [];
   const rigaProfili = p.split(NL).find(r => r.indexOf("- Il tuo libro:") === 0) || "";
-  const m = rigaProfili.match(/scommesse effettive ([0-9]+[.,][0-9]+) su ([0-9]+) nomi/);
+  /* v515 — il 30/10 il valore e' caduto su un intero («2 su 9 nomi») e la sonda pretendeva un decimale: il formattatore
+     lascia cadere lo zero finale (v443). Il decimale e' facoltativo. */
+  const m = rigaProfili.match(/scommesse effettive ([0-9]+(?:[.,][0-9]+)?) su ([0-9]+) nomi/);
   if (!m) return "il profilo del libro non pubblica le scommesse effettive: il check non misura niente";
   const eff = Number(String(m[1]).replace(",", ".")), k = Number(m[2]);
   const rc = p.split(NL).find(r => r.indexOf("RISCHIO DEL LIBRO NEL SUO INSIEME") === 0) || "";

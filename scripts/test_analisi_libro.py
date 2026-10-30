@@ -8728,6 +8728,24 @@ check("v514 la regola sta nel formato (la diluizione, il flottante sul totale, i
       and "mai dalle\n   ricostruzioni dei giornali" in _f514 and "- `[flottante]`" in _f514
       and "flottante" in SC.REGISTRO and any(b.sezione == "flottante" for b in SC.CATALOGO["schede_progetto"].blocchi))
 
+# ═══════ v515 — UN CAMPO DI FORMA SBAGLIATA E' UN DATO CHE MANCA, MAI «NESSUN NOME» (il flottante sovrascritto) ═══════
+# Il primo run della v514 ha pubblicato in «azioni» il dizionario dello Z-Score, e il blocco in testa ha scritto
+# «diluizione forte sull'anno: nessun nome» con MSTR a +32%: una misura assente letta come una misura nulla (v205, v406).
+# Lo stato si COSTRUISCE con la forma vera del campo sbagliato (misurata sul data.json del 30/10).
+_alt515 = {"altman_z": 2.04, "altman_missing": 0, "altman_model": "Z''", "altman_al": "2026-06-30"}
+_righe515 = {"AAA": _r514("AAA"), "BAD": {"ticker": "BAD", "azioni": dict(_alt515), "stats": {"float_pct": 90.0}}}
+_b515 = "\n".join(SP.blocco_flottante(_righe515, ["AAA"], ["BAD"], adesso=_OGGI514))
+_s515 = "\n".join(SP.blocco_flottante({"BAD": _righe515["BAD"]}, ["BAD"], [], adesso=_OGGI514))
+_rf515 = SP.riga_flottante(_righe515["BAD"], adesso=_OGGI514)
+check("v515 il campo «azioni» con un'altra forma (lo Z-Score) non e' una misura: azioni_di lo rifiuta, la riga lo dice, "
+      "il blocco lo nomina fra chi non ha la misura e — se nessuno ce l'ha — non scrive «nessun nome» sulla diluizione",
+      SP.azioni_di(_righe515["BAD"]) is None and SP.azioni_di(_r514()) is not None
+      and SP.azioni_di({"azioni": {"serie": []}}) is not None and SP.azioni_di({"azioni": None}) is None
+      and "non ha la forma che la pipeline scrive" in _rf515 and "snapshot precedente" not in _rf515
+      and "senza la misura in questo snapshot: BAD" in _b515 and "AAA +32,3%" in _b515
+      and "nessun nome" not in _s515 and "non ha la forma che la pipeline scrive" in _s515
+      and SP.flottante_su_totale(_righe515["BAD"]) is None and SP.quota_flottante(_righe515["BAD"]) == 90.0, _b515)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

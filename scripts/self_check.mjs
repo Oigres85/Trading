@@ -165,7 +165,7 @@ const SUITE = [
   /* v509: 354 punti di chiamata (+14 sulle proiezioni del FOMC, i tre esiti, la sorveglianza e il calendario 2027) -> 340 */
   /* v510: 372 punti di chiamata (+18 su conto e oneri, Fear & Greed, BoJ, calendario, UMich, feed) -> 355 */
   /* v512: 380 punti di chiamata (+8 sulle funzioni estratte per la sessione e i giorni di ICE conservati) -> 365 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 375, firma: /CHECK OK|CHECK FALLITI/ },
+  { file: "test_update_data.py", cmd: "python3", minimo: 380, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -191,7 +191,7 @@ const SUITE = [
   /* v511: 877 punti di chiamata (+33 su fonti dirette, scelta del giro, oscillatori, stagionalita', due tempi) -> 860 */
   /* v512: 897 punti di chiamata (+20 sui dati per titolo letti alla fonte: depositi, Nasdaq, CDS, short, sovrapposizione,
      collegamento, resa) -> 880 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 905, firma: /\d+\/\d+ CHECK OK/ },
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 910, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

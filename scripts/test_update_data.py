@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 396  # v514: 401 eseguiti · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 400  # v515: 403 eseguiti · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -3598,12 +3598,49 @@ _br514 = (Path(__file__).with_name("brief.py")).read_text(encoding="utf-8")
 check("v514 collegamento: fetch_symbol calcola il blocco in un try suo coi dati del titolo e lo pubblica nella riga, "
       "inizializzato PRIMA del ramo (v369); la barra in formazione e il trimestre per data sono UNA regola in comuni.py, "
       "che pipeline e strumenti importano senza tenerne una copia",
-      "_az = flottante_e_azioni(t, hist, info, float_sh)" in _SRC_UD_CODICE and '"azioni": _az' in _SRC_UD_CODICE
-      and bool(__import__("re").search(r"_comb = _cred = _fuori = _short = _sol = _az = None", _SRC_UD_CODICE))
+      # v515 — riagganciato alla proprieta': pinnava il nome «_az», cioe' proprio la variabile che Altman sovrascriveva
+      "_flot = flottante_e_azioni(t, hist, info, float_sh)" in _SRC_UD_CODICE and '"azioni": _flot' in _SRC_UD_CODICE
+      and bool(__import__("re").search(r"_comb = _cred = _fuori = _short = _sol(?: = [a-z_]+)* = _flot(?: = [a-z_]+)* = None",
+                                       _SRC_UD_CODICE))
       and "from comuni import seduta_aperta, trimestre_a" in _SRC_UD_CODICE
       and ud.seduta_aperta is __import__("comuni").seduta_aperta and ud.trimestre_a is __import__("comuni").trimestre_a
       and "return seduta_aperta(d[-1][\"t\"], adesso)" in _br514 and "adesso.hour < 16" not in _br514
       and _SRC_UD_CODICE.count("adesso.hour < 16") == 0)
+
+
+# ============== v515 — UNA VARIABILE DEL RECORD, UNA FUNZIONE SOLA (il flottante sovrascritto da Altman) ==============
+# Il primo run della v514 ha pubblicato in «azioni» il dizionario dello Z-Score: `_az` era assegnata da
+# flottante_e_azioni e, ottanta righe piu' sotto, da altman_zpp. Nessun gate lo vedeva — provavano la funzione, non chi
+# scrive nel campo (v399, v443). La proprieta' sta sull'albero sintattico di fetch_symbol: ogni variabile «_x» che il
+# record pubblica e' assegnata da UNA funzione sola (piu' i None dei rami che falliscono).
+def _ass515(src):
+    import ast as _ast
+    f = next(n for n in _ast.walk(_ast.parse(src)) if isinstance(n, _ast.FunctionDef) and n.name == "fetch_symbol")
+    rec = max((n for n in _ast.walk(f) if isinstance(n, _ast.Dict)), key=lambda n: len(n.keys))
+    campo = {v.id: k.value for k, v in zip(rec.keys, rec.values)
+             if isinstance(v, _ast.Name) and isinstance(k, _ast.Constant) and v.id.startswith("_")}
+    da = {}
+    for n in _ast.walk(f):
+        if isinstance(n, _ast.Assign):
+            for tg in n.targets:
+                if isinstance(tg, _ast.Name) and tg.id in campo and isinstance(n.value, _ast.Call):
+                    da.setdefault(tg.id, set()).add(_ast.unparse(n.value.func))
+    return campo, da
+
+
+_src515 = Path(ud.__file__).read_text(encoding="utf-8")
+_campo515, _da515 = _ass515(_src515)
+_doppie515 = {_c: sorted(_f) for _c, _f in _da515.items() if len(_f) > 1}
+check("v515 ogni variabile «_x» che il record pubblica e' assegnata da UNA funzione sola: due funzioni sulla stessa "
+      "variabile pubblicano nel campo l'ultima che ha girato (il flottante sovrascritto da Altman) — doppie: "
+      + (str(_doppie515) or "nessuna"),
+      not _doppie515 and len(_campo515) >= 6 and _da515.get("_flot") == {"flottante_e_azioni"}
+      and _campo515.get("_flot") == "azioni")
+_inj515 = _src515.replace("_az = altman_zpp(", "_flot = altman_zpp(", 1)
+_c2, _d2 = _ass515(_inj515)
+check("v515 il gate morde sul caso da cui e' nato: la variabile di Altman rinominata come quella del flottante si vede "
+      "come due funzioni sul campo «azioni» (lo stato si costruisce, v425)",
+      _inj515 != _src515 and _d2.get("_flot") == {"flottante_e_azioni", "altman_zpp"})
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

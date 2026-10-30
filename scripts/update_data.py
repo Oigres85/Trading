@@ -2919,7 +2919,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # costruito anche per i simboli senza fondamentali (indici, futures, ETF). Vedi il gate
     # "v369 nessuna variabile del record assegnata solo dentro un ramo" in test_update_data.py.
     stats = None
-    _comb = _cred = _fuori = _short = _sol = _az = None
+    _comb = _cred = _fuori = _short = _sol = _flot = None
     if has_fundamentals(ticker, currency):
         g = info.get
         def num(*keys):
@@ -2988,10 +2988,13 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             _comb = None
         # ⚠ v514 — azioni in circolazione, diluizione, rotazione del flottante: un try suo, come ogni blocco
         try:
-            _az = flottante_e_azioni(t, hist, info, float_sh)
+            # ⚠⚠ v515 — si chiamava _az, lo stesso nome della variabile di Altman piu' sotto: il primo run della v514
+            #   ha pubblicato in «azioni» il dizionario dello Z-Score, e le schede hanno scritto «diluizione forte:
+            #   nessun nome» con MSTR a +32%. Due variabili omonime con contenuti diversi (classe v393).
+            _flot = flottante_e_azioni(t, hist, info, float_sh)
         except Exception as _e:
             print(f"!! azioni e flottante {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
-            _az = None
+            _flot = None
         # ⚠ v504 — la solidita' OPERATIVA (vedi solidita_operativa() piu' sopra): un try suo, come ogni blocco
         try:
             _sol = solidita_operativa(t, _comb)
@@ -3165,7 +3168,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "combustione": _comb,   # v365 — cassa, debito, flusso operativo, capex. None se la fonte non li da'.
         "credito": _cred,       # v367 — al posto del CDS: oneri finanziari, copertura, scadenze.
         "solidita": _sol,       # v504 — ciclo di cassa, flusso dell'ultimo trimestre, utile, magazzino, azionisti.
-        "azioni": _az,          # v514 — azioni in circolazione datate, diluizione, rotazione del flottante, quotazione.
+        "azioni": _flot,        # v514 — azioni in circolazione datate, diluizione, rotazione del flottante, quotazione.
         "fuori_mercato": _fuori,# v367 — ATS (dark pool) e OTC non-ATS per settimana, FINRA.
         "short_flusso": _short, # v367 — quota di volume venduta allo scoperto, FINRA, giornaliera.
         "tech_by_range": tech_by_range,
