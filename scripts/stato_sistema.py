@@ -133,6 +133,34 @@ def classifica(percorso):
     return "altro"
 
 
+def percorsi_ci(testo=None):
+    """I percorsi che fanno partire i test, letti da .github/workflows/tests.yml (`push: paths:`): una fonte sola, perche'
+    un secondo elenco qui invecchierebbe da solo (v519 — CODICE comprendeva CLAUDE.md, .claude/ e .githooks/, che il CI
+    non guarda). None se il file non si legge: allora vale CODICE, il verso prudente."""
+    import re
+    try:
+        testo = testo if testo is not None else (RADICE / ".github" / "workflows" / WF_TEST).read_text(encoding="utf-8")
+    except OSError:
+        return None
+    m = re.search(r"^\s*push:\s*\n(?:\s+.*\n)*?\s+paths:\s*\[([^\]]*)\]", testo, re.M)
+    if not m:
+        return None
+    return tuple(x.strip().strip("'\"") for x in m.group(1).split(",") if x.strip())
+
+
+def guardato_dal_ci(percorso, percorsi=None):
+    """True se un file cambiato fa partire i test. «cartella/**» guarda tutta la cartella; un nome esatto, quel file."""
+    percorsi = percorsi if percorsi is not None else percorsi_ci()
+    if percorsi is None:
+        return any(percorso == c or percorso.startswith(c) for c in CODICE)
+    for x in percorsi:
+        if x.endswith("/**") and percorso.startswith(x[:-2]):
+            return True
+        if percorso == x:
+            return True
+    return False
+
+
 def stato_codice(git=_git, gh=_gh, rete=True):
     out = {"fetch": None, "head": None, "origin": None, "avanti": None, "indietro": None, "modificati": {},
            "ci": None, "ci_errore": None}
@@ -219,6 +247,12 @@ def righe_codice(s):
         elif ci["dopo"] is not None and ci["dopo"] and all(x.startswith("data/") for x in ci["dopo"]):
             L.append(f"  {'' if esito == 'success' else AVVISO + ' '}{base}: dopo, solo commit dei dati (i test non "
                      "girano su data/)")
+        elif ci["dopo"] and not any(guardato_dal_ci(x) for x in ci["dopo"]):
+            # v519 — un commit che il CI non guarda non avra' mai i suoi test: annunciarli «non ancora girati» suonava
+            #   dopo ogni registrazione nel libro (un avviso che suona sempre non avvisa, v421)
+            L.append(f"  {'' if esito == 'success' else AVVISO + ' '}{base}: dopo, solo file che i test non guardano "
+                     f"({', '.join(sorted(ci['dopo'])[:6])}{' …' if len(ci['dopo']) > 6 else ''}) — i percorsi dei test "
+                     "sono quelli di .github/workflows/tests.yml")
         else:
             L.append(f"  {AVVISO} {base}, ma HEAD e' un altro commit che tocca il codice: i test di HEAD non sono "
                      "ancora girati o non sono letti")

@@ -9074,8 +9074,15 @@ un'operazione dopo la chiusura d'inizio, e la riga dice cosa ha fatto **dal prez
 +250 $ sul prezzo dichiarato per primo, +64 $ sul 129,60 che il CEO ha poi corretto). Il libro tenuto dall'inizio della seduta: **−6,94% (−19.665 $)**, che non cambia con la correzione: ORCL ne resta fuori. ⚠ Le operazioni di prima del 30/10 non sono nel
 registro, e per quelle il risultato a 21 sedute conta le quantità di oggi: la riga lo dice.
 
+### 🔔 Lo stato del sistema suonava dopo ogni registrazione nel libro
+Dopo il commit della correzione di ORCL lo stato del sistema diceva *«HEAD è un altro commit che tocca il codice: i test di
+HEAD non sono ancora girati»* — su un commit di libro, configurazione e CLAUDE.md, per cui il workflow dei test **non
+parte mai**. L'elenco `CODICE` della v518 comprendeva file che il CI non guarda, quindi l'avviso sarebbe suonato dopo ogni
+operazione annotata: *un avviso che suona sempre non avvisa* (v421). Ora i percorsi si **leggono** dal `push: paths:` di
+`.github/workflows/tests.yml` (una fonte sola), e senza workflow leggibile vale l'elenco prudente.
+
 ### 🧪 Il metodo
-- **25 iniezioni** (21 sulle righe e sulle barre, 4 sul periodo), una alla volta su tre copie del repo verificate, con `modifica_sicura` e ripristino verificato per impronta:
+- **29 iniezioni** (21 sulle righe e sulle barre, 4 sul periodo, 4 sui percorsi del CI), una alla volta su tre copie del repo verificate, con `modifica_sicura` e ripristino verificato per impronta:
   **mordono tutte, ciascuna sul controllo atteso**. Una — la guardia contro il trimestre doppione — non mordeva al primo
   giro, e la colpa era della **fixture**: la riga «di adesso» non portava il trimestre, quindi il caso non esisteva (v430).
 - Lo stato del sistema prende ora le voci delle dipendenze per **nome**, non per posizione: togliere una voce spostava le

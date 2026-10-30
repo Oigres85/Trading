@@ -9454,6 +9454,36 @@ check("v519 la resa: le entrate durante il periodo si nominano con la data e, se
       and "INT (30/10/2026, dal prezzo d'acquisto +164 $)" in _ro519 and "OLD (30/10/2026, posizione che c'era gia'" in _ro519
       and "a 21 sedute fuori anche chi ha un'operazione nella finestra: INT, OLD, PRE" in _ro519, _ro519[:900])
 
+
+# --- v519 lo stato del sistema: i percorsi dei test si leggono dal workflow, e un commit che il CI non guarda non suona ---
+_wf519 = "on:\n  pull_request:\n    paths: [\"a/**\"]\n  push:\n    branches: [main]\n    paths: [\"assets/**\", \"scripts/**\", \"index.html\"]\n"
+check("v519 percorsi_ci legge i percorsi di `push:` da .github/workflows/tests.yml (non quelli della pull request), e "
+      "guardato_dal_ci li applica: «cartella/**» guarda la cartella, un nome esatto quel file; senza workflow leggibile "
+      "vale l'elenco prudente CODICE",
+      SS.percorsi_ci(_wf519) == ("assets/**", "scripts/**", "index.html")
+      and "scripts/**" in (SS.percorsi_ci() or ()) and SS.percorsi_ci("on:\n  workflow_dispatch:\n") is None
+      and SS.guardato_dal_ci("scripts/x.py", ("scripts/**",)) and not SS.guardato_dal_ci("scriptsx/a.py", ("scripts/**",))
+      and SS.guardato_dal_ci("index.html", ("index.html",)) and not SS.guardato_dal_ci("CLAUDE.md", ("scripts/**", "index.html")),
+      str(SS.percorsi_ci()))
+_sal519 = SS.percorsi_ci
+try:
+    SS.percorsi_ci = lambda testo=None: ("assets/**", "scripts/**", "index.html", ".github/workflows/tests.yml")
+    _rl519 = "\n".join(SS.righe_codice(SS.stato_codice(
+        _git518("0 0", "", "CLAUDE.md\nmemoria/LIBRO.md\nconfig/posizioni.json\n"), _gh518(sha="c" * 40))))
+    _rs519 = "\n".join(SS.righe_codice(SS.stato_codice(
+        _git518("0 0", "", "memoria/LIBRO.md\nscripts/y.py\n"), _gh518(sha="c" * 40))))
+    SS.percorsi_ci = lambda testo=None: None
+    _rn519 = "\n".join(SS.righe_codice(SS.stato_codice(
+        _git518("0 0", "", "CLAUDE.md\n"), _gh518(sha="c" * 40))))
+finally:
+    SS.percorsi_ci = _sal519
+check("v519 un commit dopo i test che tocca solo file che il CI non guarda (libro, configurazione, CLAUDE.md) e' in "
+      "regola e lo dice, senza ⚠ — suonava dopo ogni registrazione nel libro; con uno script dentro HEAD non ha i suoi "
+      "test e lo DICHIARA; senza workflow leggibile vale l'elenco prudente",
+      "solo file che i test non guardano (CLAUDE.md, config/posizioni.json, memoria/LIBRO.md)" in _rl519
+      and SS.AVVISO not in _rl519 and "HEAD e' un altro commit che tocca il codice" in _rs519
+      and "HEAD e' un altro commit che tocca il codice" in _rn519, _rl519 + "\n" + _rs519 + "\n" + _rn519)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
