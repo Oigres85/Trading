@@ -32,7 +32,7 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | BE | 40 | 214,00 | USD | |
 | GOOGL | 37 | 282,00 | USD | acquisto del **29/10/2026** (testuale: *"Registra entrata su Alphabet 282 con 37 azioni"*; la seduta l'ha confermata il CEO il 30/10: *"1 29/10"*). 282 cade nell'intervallo di quella seduta (280,36–288,33). Carico in euro nel registro §1decies |
 | INTC | 130 | 64,50 | USD | acquisto del **30/10/2026** (testuale: *"Registra anche acquisto Intel prezzo 64.5 130 azioni"*), il giorno del −29,7% dopo i conti: 64,50 cade solo nell'intervallo di quella seduta (64,11–68,77). Carico in euro nel registro §1decies |
-| ORCL | 60 | 126,50 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"aggiungi acquisto Oracle 126.5 60 azioni"*, poi *"Eseguito a mercato usa aperta due ore fa circa"*). ⚠ **prezzo da confermare**: 126,50 sta sotto il minimo di quella seduta, 129,00 su due fonti (stockanalysis e Yahoo, pre-market e after-hours compresi); verso le 15:15 di New York ORCL scambiava a circa 129,5–130 (§1undecies). Carico in euro nel registro §1decies |
+| ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 ⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
@@ -43,10 +43,10 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 **Liquidità: ~24.000 €** IN TUTTO, bloccata compresa, **tutta in euro** — dichiarata dal CEO il 30/10/2026 dopo
 l'acquisto di ORCL (testuale: *"Liquidità residua in euro 24k"*). Sella riconverte in euro il ricavato delle vendite (CEO,
 30/10/2026: *"Tutta in euro"*), quindi la liquidità non è esposta al cambio. La stima del libro, prima della dichiarazione,
-era ~23.366 €: ~47.040 € fino al 28/10, meno i tre acquisti (§1decies) al riferimento BCE della loro seduta — GOOGL del 29/10,
+era ~23.200 €: ~47.040 € fino al 28/10, meno i tre acquisti (§1decies) al riferimento BCE della loro seduta — GOOGL del 29/10,
 37 × 282 = 10.434 $ ≈ 9.375 € a 1,1130; INTC del 30/10, 130 × 64,50 = 8.385 $ ≈ 7.505 € a 1,1172; ORCL del 30/10,
-60 × 126,50 = 7.590 $ ≈ 6.794 € a 1,1172 —, commissioni e margine di cambio del broker esclusi. La dichiarazione sta circa
-634 € sopra la stima, e la dichiarazione vale. Storia dei ~47.040 €: i 45.000 €
+60 × 129,60 = 7.776 $ ≈ 6.960 € a 1,1172 —, commissioni e margine di cambio del broker esclusi. La dichiarazione sta circa
+800 € sopra la stima, e la dichiarazione vale. Storia dei ~47.040 €: i 45.000 €
 dichiarati dal CEO il 17/10/2026 (testuale: *"La liquiditita è di 45k"*), più la vendita di SMCI del 19/10 (250 × 32,81 $
 = 8.202,50 $ ≈ 7.317 € a EUR/USD 1,121, il cambio della pipeline quel giorno) e meno le due medie di CRWV, del 20/10
 (205 × 81,41 − 155 × 87,07 = 3.193,20 $ ≈ 2.842 € a 1,1236) e del 23/10 (255 × 76,14 − 205 × 81,41 = 2.726,65 $ ≈
@@ -557,7 +557,7 @@ ora attendo"*, poi *"1no · 2 in attesa · 3giornalieri"*.
    contraddice (§1sexies).
 3. **ORCL — per ora nessun ordine.** Quando il CEO li inserirà saranno **giornalieri**. Un ordine entra in §1septies solo
    quando è sul conto: uno non inserito non blocca liquidità. ⚠ **Decisione presa il 30/10/2026**: il CEO è entrato
-   **a mercato**, 60 azioni a 126,50 $ dichiarati (§1, prezzo da confermare), senza un ordine con limite; la riga fra le
+   **a mercato**, 60 azioni a 129,60 $ (§1), senza un ordine con limite; la riga fra le
    rimandate è uscita.
 La media di CRWV, rimandata ai conti il 14/10, il CEO l'ha fatta lo stesso giorno (vedi sopra).
 
@@ -906,7 +906,7 @@ euro se si vendesse oggi.
 |---|---|---|---|---|---|---|---|
 | 29/10/2026 | GOOGL | acquisto | 37 | 282,00 | 1,1130 | BCE, riferimento del 29/10/2026 | seduta confermata dal CEO il 30/10/2026 |
 | 30/10/2026 | INTC | acquisto | 130 | 64,50 | 1,1172 | BCE, riferimento del 30/10/2026 | |
-| 30/10/2026 | ORCL | acquisto | 60 | 126,50 | 1,1172 | BCE, riferimento del 30/10/2026 | prezzo da confermare: sotto il minimo della seduta, 129,00 (§1undecies) |
+| 30/10/2026 | ORCL | acquisto | 60 | 129,60 | 1,1172 | BCE, riferimento del 30/10/2026 | prezzo corretto dal CEO il 30/10/2026 (il primo dichiarato, 126,50, stava sotto il minimo della seduta) |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -931,7 +931,6 @@ da qui il giorno della risposta**, e la risposta entra dove serve (§1, §1decie
 
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 30/10/2026 | ORCL: il prezzo dell'acquisto di 60 azioni, dichiarato 126,50 $, sta sotto il minimo della seduta del 30/10 (129,00 su due fonti, pre-market e after-hours compresi) | il carico, e con lui plusvalenza e imposta: a 129,50 il carico salirebbe di 180 $ | il prezzo sulla conferma dell'eseguito di Sella |
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

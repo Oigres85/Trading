@@ -9071,7 +9071,7 @@ Trovato leggendo l'uscita dopo il push, come il destinatario: il periodo 29/10 �
 misurati dalla chiusura del giorno prima. INTC era scesa del 29,7% *prima* dell'acquisto a 64,50. La v516 escludeva solo
 le operazioni **dopo** la seduta del blocco; ora `entrate_nel_periodo` toglie dal periodo (e dalle 21 sedute) chi ha
 un'operazione dopo la chiusura d'inizio, e la riga dice cosa ha fatto **dal prezzo d'acquisto** (INTC +164 $, ORCL
-+250 $). Il libro tenuto dall'inizio della seduta: **−6,94% (−19.665 $)**. ⚠ Le operazioni di prima del 30/10 non sono nel
++250 $ sul prezzo dichiarato per primo, +64 $ sul 129,60 che il CEO ha poi corretto). Il libro tenuto dall'inizio della seduta: **−6,94% (−19.665 $)**, che non cambia con la correzione: ORCL ne resta fuori. ⚠ Le operazioni di prima del 30/10 non sono nel
 registro, e per quelle il risultato a 21 sedute conta le quantità di oggi: la riga lo dice.
 
 ### 🧪 Il metodo
