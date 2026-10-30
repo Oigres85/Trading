@@ -42,6 +42,11 @@ quanti nomi portano ciascuna, e la scrive in memoria/dati/ (ignorata da git). Si
 in chat porta decisioni e giudizio. Il 19/10 la risposta aveva portato 16 richieste su 43 per intero: gli strumenti le
 avevano calcolate tutte, e si perdevano nel riassunto. Una richiesta senza righe oggi fa uscire 1, come uno strumento
 fallito: un buco descritto vale piu' di una sezione che manca in silenzio (v453).
+
+v518 — STATO DEL SISTEMA, in coda e da solo (CEO, 30/10/2026: «Alla fine fai sempre un controllo generico dello stato del
+sistema … Se ritieni fammi sempre domande»): scripts/stato_sistema.py gira DOPO tutti gli strumenti, perche' deve vedere
+le letture del giro gia' scritte e le memorie che il giro ha cambiato. Esce sempre 0: i suoi avvisi vanno nella sezione
+9 della risposta, e le domande aperte che contano oggi nella sezione 8.
 """
 from __future__ import annotations
 
@@ -65,12 +70,15 @@ TITOLO_REGOLE = "## Regole"
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
 STRUMENTI = ("fonti_dirette.py", "fonti_titoli.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py",
-             "posizionamento.py", "indici.py", "concorrenti.py")
+             "posizionamento.py", "indici.py", "concorrenti.py", "stato_sistema.py")
 # v511 — fonti_dirette.py gira PRIMA degli altri, da solo: scrive la lettura alla fonte del giro che gli altri riusano
 #   (una lettura per analisi, la stessa osservazione per tutti), e stampa il blocco FRESCHEZZA DEI DATI
 # v512 — e con lui, in parallelo, fonti_titoli.py: analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC e trimestri
 #   letti alla fonte all'ora dell'analisi (CEO, 25/10/2026: «dati non aggiornati non sono affidabili»)
 PRIMA = ("fonti_dirette.py", "fonti_titoli.py")
+# v518 — e stato_sistema.py DOPO tutti, da solo (CEO, 30/10/2026: «Alla fine fai sempre un controllo generico dello stato
+#   del sistema»): deve vedere le letture del giro gia' scritte e le memorie che il giro ha cambiato e non ancora committato
+DOPO = ("stato_sistema.py",)
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 # v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
 # v499 — e il dark pool (posizionamento.py) e la storia del P/E del Nasdaq-100 (indici.py): stesse ragioni
@@ -122,6 +130,8 @@ def comandi(f, sedute=1):
               "concentrazione, ampiezza, tendenza", ["indici.py"]))
     c.append(("CONCORRENTI E QUOTE DI MERCATO — chi sono, quanta parte del mercato hanno (fonte e data), e la salute "
               "con le stesse formule per tutti", ["concorrenti.py"]))
+    c.append(("STATO DEL SISTEMA — codice e test, pipeline su GitHub, dati del giro, dipendenze da GitHub con la loro "
+              "data, coerenza del libro, domande aperte al CEO", ["stato_sistema.py"]))
     return c
 
 
@@ -247,7 +257,8 @@ def main():
     prima_mem = {p: impronta(p) for p in MEMORIE}
     # v511 — prima la lettura alla fonte (da sola), poi tutti gli altri in parallelo: la riusano dal disco
     testa_l = [x for x in lista if Path(x[1][1]).name in PRIMA]
-    esiti = esegui(testa_l) + esegui([x for x in lista if x not in testa_l])
+    coda_l = [x for x in lista if Path(x[1][1]).name in DOPO]
+    esiti = esegui(testa_l) + esegui([x for x in lista if x not in testa_l and x not in coda_l]) + esegui(coda_l)
     testa = (f"ANALISI DEL LIBRO — {adesso.astimezone(ROMA):%d/%m/%Y %H:%M} ora italiana · New York "
              f"{adesso:%H:%M} · fase: {f.upper()} · {len(lista)} strumenti in parallelo, {round(time.time() - t0)} s")
     sc_righe, sc_codice, _ = scrivi_scheda(esiti, f, adesso)

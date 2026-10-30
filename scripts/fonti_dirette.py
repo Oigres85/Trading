@@ -101,7 +101,10 @@ ORDINE = tuple(k for k, *_ in SERIE_FRED[:7]) + ("effr", "eurusd", "fear_greed")
 SOLO_PIPELINE = ("sensibilita' ai canali macro", "storico dei CDS (il giorno di oggi lo rilegge fonti_titoli.py)",
                  "voci dei bilanci SEC (debito, scadenze, derivati) e salute del credito",
                  "debito a margine (famiglia «leva» del semaforo)", "composizione degli ETF della rotazione",
-                 "prezzo del BTP")
+                 "prezzo del BTP",
+                 # v518 — mancava, e lo stato del sistema l'ha mostrato: multipli, conti e bilanci di ogni titolo vengono
+                 #   ancora tutti dal run (fonti_titoli.py rilegge solo cio' che ha una fonte rapida, sotto)
+                 "multipli, conti trimestrali, combustione di cassa, solidita' e flottante di ogni titolo")
 # v512 — quelli che una fonte raggiungibile ce l'hanno: li rilegge scripts/fonti_titoli.py (blocco DATI PER TITOLO)
 RILETTI_PER_TITOLO = ("target e revisioni degli analisti", "FedWatch", "CDS dell'ultimo giorno", "vendite allo scoperto",
                       "date dei depositi SEC e trimestri che la pipeline non ha ancora")

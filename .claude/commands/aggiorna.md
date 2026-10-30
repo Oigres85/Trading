@@ -29,6 +29,10 @@ leggerla, non dopo.
    - `config/posizioni.json` (la dashboard). **Sopra 7 giorni** l'analisi descrive un libro che
      potrebbe non esistere più. Nessuno lo aggiorna da solo.
    - la seduta usata per i prezzi, e se una è stata scartata perché incompleta.
+3bis. **`python3 scripts/stato_sistema.py`** (v518, CEO, 30/10/2026: *"Alla fine fai sempre un controllo generico
+   dello stato del sistema"*) — legge e basta: `main` contro HEAD e i test del CI, la pipeline (età del run, fonti non
+   lette nell'ultimo run, run caduti, Issue aperte), le dipendenze da GitHub con la loro data, la coerenza delle copie
+   del libro e le domande aperte al CEO. Le righe con ⚠ si dicono qui in cima, come un gate rosso.
 4. **I gate.** Ognuno sorveglia una cosa che questo comando ESEGUE davvero — non si esegue un
    gate per completezza, si esegue perché il suo bersaglio è nel percorso:
 
@@ -226,8 +230,8 @@ in `memoria/cds_sessione.jsonl`: questo comando legge, non scrive.
 
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
 e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e `fonti_titoli.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
-`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py` e `concorrenti.py`, già dichiarati fuori qui con la loro ragione, e chiude con
-la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
+`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py` e `concorrenti.py`, già dichiarati fuori qui con la loro ragione, poi
+`stato_sistema.py` (eseguito anche qui, al passo 3bis), e chiude con la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 
 `scripts/scheda.py` resta **fuori** (v505): è la SCHEDA COMPLETA dell'analisi in chat — la scrive `scripts/analisi.py`

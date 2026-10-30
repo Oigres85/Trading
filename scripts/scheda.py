@@ -98,6 +98,8 @@ SEZIONI = (
     ("fine_anno", "7 · Calendario fiscale di fine anno (da ottobre a gennaio): informazione"),            # v512
     ("notizie_sorvegliati", "7 · Notizie ultimissime dei sorvegliati"),
     ("liquidita", "7e · Piano per la liquidità"),
+    ("stato_sistema", "9 · Stato del sistema: codice e test, pipeline su GitHub, letture del giro, dipendenze da GitHub, "
+                      "coerenza del libro, domande aperte al CEO"),                                               # v518
 )
 TITOLI = dict(SEZIONI)
 
@@ -230,6 +232,10 @@ CATALOGO = {
         Blocco(r"CONCORRENTI E QUOTE", "concorrenti"),
         Blocco(r"SENZA REGISTRO", "concorrenti"),
     ), nomi_col0=(Nome(rf"{TK} \[(?:POSIZIONE|SORVEGLIATO)\]", "concorrenti", sommario=False),)),
+    "stato_sistema": Strumento("stato_sistema", (                                                           # v518
+        Blocco(r"STATO DEL SISTEMA|CODICE — |PIPELINE SU GITHUB|DATI DI QUESTO GIRO|DIPENDENZE DA GITHUB|COERENZA DEL "
+               r"LIBRO|DOMANDE APERTE AL CEO", "stato_sistema"),
+    )),
 }
 
 
@@ -265,6 +271,7 @@ REGISTRO = {
     "semaforo": Voce(("semaforo",)),
     "attesa": Voce(("attesa",)),
     "cambio": Voce(("cambio",)),                                                                       # v516
+    "stato_sistema": Voce(("stato_sistema",)),                                                         # v518
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),
     "schede": Voce(("schede_testa",), (Marcatore("schede", None, "tutti"),)),
     "credito_libro": Voce(("credito_libro",)),

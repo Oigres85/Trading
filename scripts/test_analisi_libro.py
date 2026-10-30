@@ -6814,7 +6814,13 @@ _cartella505 = Path(__file__).resolve().parent
 def _fonti505(k):
     """Il sorgente dello strumento piu' quello delle librerie del repo che importa: le intestazioni della salute del
     credito le stampa schede_progetto.py attraverso credito.py (una libreria sola, v501)."""
-    s = (_cartella505 / f"{k.replace('_esteso', '')}.py").read_text(encoding="utf-8")
+    # v518 — una chiave del catalogo senza il suo script (uno strumento rinominato, una chiave scritta male) e' un sorgente
+    #   VUOTO: le sue intestazioni risultano orfane e il check qui sotto cade col suo nome, invece di far morire la suite
+    #   (l'iniezione C01 della v518 l'ha trovato: il difetto si vedeva, la diagnosi si perdeva — v407, v471)
+    f = _cartella505 / f"{k.replace('_esteso', '')}.py"
+    if not f.exists():
+        return ""
+    s = f.read_text(encoding="utf-8")
     libs = set(re.findall(r"^\s*(?:import|from)\s+([a-z_]+)", s, re.M))
     return s + "".join((_cartella505 / f"{x}.py").read_text(encoding="utf-8") for x in sorted(libs)
                        if (_cartella505 / f"{x}.py").exists())
@@ -6994,6 +7000,15 @@ _U505 = {
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
                     "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
                     "letture: 0 nuove in questo giro"],
+    # v518 — lo stato del sistema, l'ultimo strumento del giro: tutte le sue intestazioni stanno nel catalogo
+    "stato_sistema": ["STATO DEL SISTEMA — 30/10/2026 18:22 ora italiana",
+                      "  esito: 1 punto da guardare (le righe con ⚠) · 1 domanda aperta al CEO", "",
+                      "CODICE — main, i test, i file non committati", "  HEAD fc9af23 = origin/main", "",
+                      "PIPELINE SU GITHUB — dipendenza esterna", "  ⚠ fonte NON letta nell'ultimo run: cds_ice", "",
+                      "DATI DI QUESTO GIRO — letti qui, alla fonte", "  serie macro (fonti_dirette.py): letta", "",
+                      "DIPENDENZE DA GITHUB CHE RESTANO — con la sua data", "  prezzo del BTP: 30/10 17:29", "",
+                      "COERENZA DEL LIBRO — le copie confrontate", "  coincidono", "",
+                      "DOMANDE APERTE AL CEO — memoria/LIBRO.md §1undecies", "  GOOGL: la seduta"],
 }
 def _es505(uscite=None, codici=None):
     u = dict(_U505, **(uscite or {}))
@@ -8954,6 +8969,250 @@ check("v517 collegamento: il comando legge il forum in parallelo alle altre font
       and _cpz517.find("if not a.no_memoria:\n            scrivi_memoria_wsb") > 0
       and "L += righe_wsb(letto_wsb" in _cpz517 and "wsb" in SC.REGISTRO and "peg" in SC.REGISTRO
       and any(b.sezione == "wsb" for b in SC.CATALOGO["posizionamento"].blocchi))
+
+# ═══════ v518 — LO STATO DEL SISTEMA IN CHIUSURA DI OGNI ANALISI (CEO, 30/10/2026) ═══════
+# «Alla fine fai sempre un controllo generico dello stato del sistema cercando di eliminare quanto piu possibile le
+# dipendenze dal progetto GitHub … Se ritieni fammi sempre domande». Gli stati si COSTRUISCONO (v425, v429): git e l'API
+# di GitHub si iniettano, il libro si passa come argomento, l'ora si ferma. Un controllo che dipendesse da com'e' il
+# repository adesso andrebbe rosso o verde a seconda di quando gira la suite.
+import stato_sistema as SS
+import fonti_dirette as _FD518
+from datetime import datetime as _dt518, timezone as _tz518, date as _d518, timedelta as _td518
+_H518, _O518 = "a" * 40, "b" * 40
+
+
+def _git518(avanti_indietro="1 2", porcelain="", diff=""):
+    def g(*args, timeout=30):
+        if args[0] == "fetch":
+            return 0, ""
+        if args[:2] == ("rev-parse", "HEAD"):
+            return 0, _H518 + "\n"
+        if args[:2] == ("rev-parse", "origin/main"):
+            return 0, _O518 + "\n"
+        if args[0] == "rev-list":
+            return 0, avanti_indietro + "\n"
+        if args[0] == "status":
+            return 0, porcelain
+        if args[0] == "diff":
+            return 0, diff
+        return 1, "comando inatteso"
+    return g
+
+
+def _gh518(sha=_H518, esito="success", stato="completed", solleva=False):
+    def g(percorso, timeout=30):
+        if solleva:
+            raise RuntimeError("HTTP 403 dal proxy")
+        return {"workflow_runs": [{"head_sha": sha, "status": stato, "conclusion": esito,
+                                   "created_at": "2026-10-30T16:00:00Z"}]}
+    return g
+
+
+_por518 = (" M memoria/wsb.jsonl\n?? memoria/registro_performance.jsonl\n M config/posizioni.json\n"
+           " M scripts/x.py\n M data/data.json\n M memoria/LIBRO.md\n")
+_c518 = SS.stato_codice(_git518(porcelain=_por518), _gh518())
+_r518 = "\n".join(SS.righe_codice(_c518))
+check("v518 il codice: i commit qui e non su main si DICHIARANO non online; i file non committati divisi per cosa "
+      "chiedono — le memorie del giro da committare, il libro e la configurazione dopo le suite, il codice da provare, "
+      "data/ che la pipeline riscrive",
+      "1 commit qui e NON su main" in _r518 and "2 commit su main e non qui" in _r518
+      and "memorie da committare: memoria/registro_performance.jsonl, memoria/wsb.jsonl" in _r518
+      and "config/posizioni.json, memoria/LIBRO.md" in _r518 and "provati con le suite" in _r518
+      and "scripts/x.py" in _r518 and "data/ modificato in locale: data/data.json" in _r518
+      and "test del CI success sul commit aaaaaaa" in _r518 and "che e' HEAD" in _r518, _r518)
+_rd518 = "\n".join(SS.righe_codice(SS.stato_codice(_git518("0 0", "", "data/data.json\n"), _gh518(sha="c" * 40))))
+_rk518 = "\n".join(SS.righe_codice(SS.stato_codice(_git518("0 0", "", "data/data.json\nscripts/y.py\n"),
+                                                   _gh518(sha="c" * 40))))
+check("v518 i test del CI su un commit che non e' HEAD: se dopo ci sono solo i dati della pipeline e' in regola (i test "
+      "non girano su data/), se c'e' codice HEAD non ha ancora i suoi test e si DICHIARA",
+      "HEAD aaaaaaa = origin/main" in _rd518 and "solo commit dei dati" in _rd518 and SS.AVVISO not in _rd518
+      and "HEAD e' un altro commit che tocca il codice" in _rk518, _rd518 + "\n" + _rk518)
+_rr518 = "\n".join(SS.righe_codice(SS.stato_codice(_git518("0 0"), _gh518(esito="failure"))))
+_rx518 = "\n".join(SS.righe_codice(SS.stato_codice(_git518("0 0"), _gh518(solleva=True))))
+check("v518 main ROSSA si dice come lavoro da fare adesso (v442); un'API che non risponde e' «non letti», mai «verde»",
+      "main e' ROSSA" in _rr518 and "test del CI NON letti (RuntimeError: HTTP 403 dal proxy)" in _rx518
+      and "success" not in _rx518, _rr518 + "\n" + _rx518)
+
+# --- la pipeline: l'eta' contro l'ultima chiusura, le fonti non lette, le cadute delle ultime 24 ore ---
+_ad518 = _dt518(2026, 10, 30, 18, 0, tzinfo=_tz518.utc)          # venerdi', 14:00 a New York: ultima chiusura il 29/10
+
+
+def _dati518(run, note="", stato="ok"):
+    return {"updated_at": run, "data_quality": {"checks": [
+        {"key": "cds_ice", "date": "2026-10-30", "status": stato, "note": note}]}}
+
+
+def _ghp518(runs, issue=()):
+    def g(percorso, timeout=30):
+        return list(issue) if "issues" in percorso else {"workflow_runs": runs}
+    return g
+
+
+_runs518 = [{"conclusion": "failure", "status": "completed", "created_at": "2026-10-30T16:00:00Z"},
+            {"conclusion": "success", "status": "completed", "created_at": "2026-10-30T15:00:00Z",
+             "updated_at": "2026-10-30T15:10:00Z"},
+            {"conclusion": "failure", "status": "completed", "created_at": "2026-10-28T12:00:00Z"}]
+_iss518 = [{"number": 208, "title": "Pipeline caduta"}, {"number": 9, "title": "PR", "pull_request": {}}]
+_p1 = "\n".join(SS.righe_pipeline(SS.stato_pipeline(_dati518("2026-10-30T17:30:00Z", "ICE non letto in questo run "
+                                                             "(HTTP 403): vale l'ultimo giorno raccolto"),
+                                                    _ad518, _ghp518(_runs518, _iss518)), _ad518))
+check("v518 la pipeline: un run dopo l'ultima chiusura e' in regola, una fonte non letta nell'ultimo run si NOMINA "
+      "anche se la sorveglianza e' verde (il ripiego regge, ma va saputo), le cadute si contano solo nelle ultime 24 ore, "
+      "le Issue «pipeline» si nominano e le pull request no",
+      # ⚠ dal 25/10 Roma e' a UTC+1 e New York ancora all'ora legale fino all'1/11: la chiusura delle 16:00 di New York
+      #   sono le 21:00 italiane, le 15:10 UTC le 16:10 — l'ora viene dal fuso, e il caso lo prova (v470)
+      "dopo l'ultima chiusura USA (29/10 21:00)" in _p1 and "fonte NON letta nell'ultimo run: cds_ice" in _p1
+      and "1 run CADUTI nelle ultime 24 ore" in _p1 and "#208 Pipeline caduta" in _p1 and "#9" not in _p1
+      and "ultimo run riuscito: 30/10 16:10" in _p1, _p1)
+_p2 = "\n".join(SS.righe_pipeline(SS.stato_pipeline(_dati518("2026-10-29T18:00:00Z"), _ad518, _ghp518([])), _ad518))
+_p3 = "\n".join(SS.righe_pipeline(SS.stato_pipeline(_dati518("2026-10-28T12:00:00Z", stato="stale"), _ad518,
+                                                    _ghp518([])), _ad518))
+check("v518 un run PRECEDENTE all'ultima chiusura USA si dichiara (le righe che porta solo lei descrivono la seduta "
+      "prima); oltre 24 ore e' PIPELINE FERMA; un controllo della sorveglianza non verde si nomina col suo stato",
+      "PRECEDENTE all'ultima chiusura USA" in _p2 and "PIPELINE FERMA" in _p3 and "cds_ice STALE" in _p3
+      and "PIPELINE FERMA" not in _p2, _p2 + "\n" + _p3)
+
+# --- i dati del giro: la lettura di QUESTO giro, una vecchia, nessuna ---
+import tempfile as _tf518
+with _tf518.TemporaryDirectory() as _dir518:
+    _fd518, _ft518 = Path(_dir518) / "fd.json", Path(_dir518) / "ft.json"
+    _fd518.write_text(_json.dumps({"letto": (_ad518 - _td518(minutes=5)).isoformat(), "diretta": {"t10": {}, "hy": {}},
+                                   "errori": {"cpi": "HTTP 500"}}), encoding="utf-8")
+    _ft518.write_text(_json.dumps({"letto": (_ad518 - _td518(hours=2)).isoformat(), "analisti": {"esito": "letto"}}),
+                      encoding="utf-8")
+    _g1 = "\n".join(SS.righe_giro(SS.stato_giro(_ad518, {"fonti_dirette": _fd518, "fonti_titoli": _ft518})))
+    _ft518.write_text(_json.dumps({"letto": (_ad518 - _td518(minutes=3)).isoformat(), "analisti": {"esito": "letto"},
+                                   "cds": {"esito": "non letto"}}), encoding="utf-8")
+    _g2 = "\n".join(SS.righe_giro(SS.stato_giro(_ad518, {"fonti_dirette": Path(_dir518) / "manca.json",
+                                                         "fonti_titoli": _ft518})))
+check("v518 le letture del giro: fresca con le serie e quelle NON lette alla fonte nominate; oltre i 30 minuti di "
+      "validita' «non e' la lettura di questo giro»; assente «nessuna lettura»; un blocco per titolo non letto si nomina",
+      "2 serie" in _g1 and "non lette alla fonte: cpi" in _g1 and "non e' la lettura di questo giro" in _g1
+      and "NESSUNA lettura su disco" in _g2 and "dati per titolo da guardare: cds" in _g2, _g1 + "\n" + _g2)
+
+# --- le dipendenze da GitHub: l'elenco e' quello di fonti_dirette, nei DUE versi (v387, v406) ---
+_dd518 = SS.date_dipendenze({"updated_at": "2026-10-30T17:29:00Z", "macro": {"margin_debt": {"date": "2026-09-01"}},
+                             "portfolio": [{"ticker": "BTP-V28", "price": 101.59}]})
+check("v518 ogni voce di fonti_dirette.SOLO_PIPELINE ha la sua data nello stato del sistema, e lo stato non ne ha una "
+      "che l'elenco non porta — compresa la voce nuova dei multipli e bilanci per titolo",
+      set(_dd518) == set(_FD518.SOLO_PIPELINE) and len(_FD518.SOLO_PIPELINE) >= 7
+      and any("flottante" in v for v in _FD518.SOLO_PIPELINE), str(sorted(_dd518)))
+_rdi518 = "\n".join(SS.righe_dipendenze({"updated_at": None, "macro": {}, "portfolio": []}, {"prima_chiusura": None}))
+_senza518 = [r for r in _rdi518.splitlines() if any(r.lstrip("⚠ ").startswith(_FD518.SOLO_PIPELINE[i] + ":")
+                                                   for i in (0, 3, 4, 5, 6))]
+check("v518 una dipendenza senza data (il run senza ora, la leva senza mese) si marca ⚠ e il debito a margine si data "
+      "col MESE (v392); i riletti alla fonte si elencano a parte",
+      len(_senza518) == 5 and all(SS.AVVISO in r for r in _senza518)
+      and "gia' letti qui alla fonte" in _rdi518
+      and "settembre 2026" in "\n".join(SS.righe_dipendenze({"updated_at": "2026-10-30T17:29:00Z",
+                                                             "macro": {"margin_debt": {"date": "2026-09-01"}}},
+                                                            {"prima_chiusura": False})), _rdi518)
+check("v518 lo storico dei CDS a meta': sul giorno del run e' il caso normale (le ondate di ICE, v508), su un giorno "
+      "passato e' un giorno non completato e si marca ⚠",
+      SS.AVVISO not in SS.nota_cds({"giorno": "2026-10-30", "entita": 51, "indici": 0}, "2026-10-30T17:29:00Z")
+      and "prima dell'ondata nordamericana" in SS.nota_cds({"giorno": "2026-10-30", "entita": 51, "indici": 0},
+                                                             "2026-10-30T17:29:00Z")
+      and SS.AVVISO in SS.nota_cds({"giorno": "2026-10-29", "entita": 51, "indici": 0}, "2026-10-30T17:29:00Z")
+      and SS.AVVISO not in SS.nota_cds({"giorno": "2026-10-29", "entita": 697, "indici": 2}, "2026-10-30T17:29:00Z"))
+
+# --- la coerenza delle copie del libro, sullo stato costruito ---
+_lib518 = ([{"tk": "MU", "qta": 70.0, "pmc": 87.63, "valuta": "USD"}, {"tk": "INTC", "qta": 130.0, "pmc": 64.5,
+            "valuta": "USD"}, {"tk": "BTP-V28", "qta": 40000.0, "pmc": 100.0, "valuta": "EUR"}],
+           30195.0, [{"tk": "OKLO", "nota": ""}])
+_cfg518 = {"aggiornato": "2026-10-30", "posizioni": [{"ticker": "MU", "qta": 70, "pmc": 87.63},
+                                                     {"ticker": "INTC", "qta": 130, "pmc": 64.5},
+                                                     {"ticker": "BTP-V28", "qta": 40000, "pmc": 100}]}
+_ui518 = ["MU", "INTC", "BTP-V28", "OKLO", "^GSPC", "EURUSD=X", "BTC-USD"]
+_ops518 = [{"tk": "INTC", "verso": "acquisto", "qta": 130.0, "data_testo": "30/10/2026"}]
+
+
+def _coe518(**k):
+    a = dict(libro=_lib518, posizioni_cfg=_cfg518, stato_cfg={"cash": {"v": 30195}}, watchlist_cfg=_ui518,
+             registro_conc={"MU": {}, "INTC": {}}, operazioni=_ops518, oggi=_d518(2026, 10, 30))
+    a.update(k)
+    return SS.coerenza_libro(**a)
+
+
+_cfg518b = _json.loads(_json.dumps(_cfg518)); _cfg518b["posizioni"][1]["qta"] = 100
+_e518 = {
+    "uguali": _coe518(),
+    "quantita'": _coe518(posizioni_cfg=_cfg518b),
+    "liquidita'": _coe518(stato_cfg={"cash": {"v": 45000}}),
+    "sorvegliato": _coe518(watchlist_cfg=_ui518 + ["SMCI"]),
+    "concorrenti": _coe518(registro_conc={"MU": {}}),
+    "operazioni": _coe518(operazioni=_ops518 + [{"tk": "INTC", "verso": "acquisto", "qta": 50.0, "data_testo": "x"}]),
+    "vecchia": _coe518(posizioni_cfg=dict(_cfg518, aggiornato="2026-10-01")),
+    "assente": _coe518(operazioni=None),
+}
+check("v518 la coerenza del libro: copie uguali → niente; una quantita' diversa, la liquidita' diversa, un sorvegliato "
+      "solo nella pipeline, una posizione senza concorrenti, piu' azioni nel registro delle operazioni che in §1, "
+      "config/posizioni.json oltre 7 giorni, il registro delle operazioni assente — ciascuno NOMINATO",
+      _e518["uguali"] == [] and any("INTC: LIBRO.md 130 a 64.5" in x for x in _e518["quantita'"])
+      and any("liquidita' diversa" in x and "45000" in x for x in _e518["liquidita'"])
+      and any("'SMCI'" in x for x in _e518["sorvegliato"]) and any("['INTC']" in x for x in _e518["concorrenti"])
+      and any("INTC: il registro delle operazioni porta 180" in x for x in _e518["operazioni"])
+      and any("29 giorni fa" in x for x in _e518["vecchia"]) and any("ASSENTE" in x for x in _e518["assente"]),
+      str(_e518))
+check("v518 la coerenza sui file VERI si calcola senza eccezioni (che coincidano lo pretendono i gate v479, v480, v503)",
+      isinstance(SS.coerenza_libro(), list))
+
+# --- le domande aperte: una tabella sola, con la data, e i «da confermare» che non ci sono si segnalano ---
+_tl518 = ("## 1. POSIZIONI\n| GOOGL | 37 | 282,00 | USD | seduta da confermare |\n"
+          "**Liquidità: ~30.195 €** — una stima, da confermare col saldo\n"
+          "## 1decies. OPERAZIONI E CAMBIO\n| 30/10/2026 | INTC | acquisto | 130 | 64,50 | 1,1172 | BCE | da confermare |\n"
+          "## 1undecies. DA CONFERMARE COL CEO — x\n| Aperta il | Cosa | Perché conta | Come si chiude |\n|---|---|---|---|\n"
+          "| 25/10/2026 | GOOGL: la seduta | il carico | l'eseguito |\n"
+          "## 2. ALTRO\n| 30/10/2026 | NON | letta | qui |\n")
+_dm518 = SS.leggi_domande(_tl518)
+check("v518 le domande si leggono SOLO dentro la loro sezione (la riga di un'altra no), senza intestazione e separatore; "
+      "una sezione assente e' None, non «nessuna domanda» (v406)",
+      _dm518 == [{"aperta": "25/10/2026", "cosa": "GOOGL: la seduta", "perche": "il carico", "come": "l'eseguito"}]
+      and SS.leggi_domande("## 1. POSIZIONI\n") is None and SS.leggi_domande("## 1undecies. DA CONFERMARE COL CEO\n") == [])
+check("v518 un «da confermare» in §1 o in §1decies che la tabella delle domande non nomina si SEGNALA (INTC, la "
+      "liquidita'); uno nominato no (GOOGL)",
+      SS.confermare_non_registrate(_tl518, _dm518) == ["liquidita'", "INTC"], str(SS.confermare_non_registrate(_tl518, _dm518)))
+_rq518 = "\n".join(SS.righe_domande(_dm518 + [{"aperta": "30/10/2026", "cosa": "fresca", "perche": "p", "come": "c"}],
+                                    ["INTC"], _d518(2026, 10, 30)))
+check("v518 la resa delle domande: oltre 3 giorni ⚠ con l'eta', una di oggi senza; i «da confermare» scoperti nominati",
+      "⚠ GOOGL: la seduta — aperta il 25/10/2026, 5 giorni fa" in _rq518 and "  fresca — aperta il 30/10/2026 ·" in _rq518
+      and "«da confermare» su INTC" in _rq518, _rq518)
+check("v518 il libro VERO ha la tabella delle domande, e ogni «da confermare» delle sue tabelle vi e' registrato",
+      SS.leggi_domande() is not None and SS.confermare_non_registrate() == [], str(SS.confermare_non_registrate()))
+
+# --- l'insieme: non muore mai, e ogni controllo che solleva si dichiara ---
+def _rompe518():
+    raise ValueError("finto")
+try:                                       # v407: col difetto dentro il check deve cadere col suo nome, non uccidere la suite
+    _sez518 = SS._sezione(_rompe518)
+except Exception as _e518:
+    _sez518 = [f"ha sollevato: {_e518!r}"]
+check("v518 un controllo che solleva diventa una riga «NON CONTROLLATO» col suo errore, e il resto resta",
+      "NON CONTROLLATO: ValueError: finto" in _sez518[0], str(_sez518))
+import subprocess as _sp518
+_x518 = _sp518.run([sys.executable, str(_ROOT / "scripts" / "stato_sistema.py"), "--senza-rete"], capture_output=True,
+                   text=True, cwd=str(_ROOT), timeout=120)
+check("v518 lo strumento esegue e parla, esce 0, e porta le sei parti — senza rete dice che CI, run e Issue non sono "
+      "controllati",
+      _x518.returncode == 0 and all(t in _x518.stdout for t in (
+          "STATO DEL SISTEMA — ", "CODICE — ", "PIPELINE SU GITHUB", "DATI DI QUESTO GIRO", "DIPENDENZE DA GITHUB",
+          "COERENZA DEL LIBRO", "DOMANDE APERTE AL CEO")) and "SENZA RETE" in _x518.stdout,
+      _x518.stdout[-600:] + _x518.stderr[-400:])
+
+# --- il collegamento: ultimo passo del comando unico, da solo, e nella scheda e nel formato ---
+import analisi as _AN518
+_cmain518 = _corpo_di((_ROOT / "scripts" / "analisi.py").read_text(encoding="utf-8"), "main")
+_fa518 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_ag518 = (_ROOT / ".claude" / "commands" / "aggiorna.md").read_text(encoding="utf-8").split("## Cosa questo comando NON fa")[0]
+check("v518 collegamento: lo stato del sistema e' l'ULTIMO comando in ogni fase, gira DOPO tutti gli altri e da solo; la "
+      "scheda completa lo porta nella sezione 9 e il registro ha la sua chiave; il formato ha il passo, la sezione 9 della "
+      "risposta e la voce del registro; /aggiorna lo esegue fra i suoi passi",
+      "stato_sistema.py" in _AN518.STRUMENTI and _AN518.DOPO == ("stato_sistema.py",)
+      and all(_AN518.comandi(f)[-1][1] == ["stato_sistema.py"] for f in ("pre-market", "seduta", "after-hours", "chiuso"))
+      and "+ esegui(coda_l)" in _cmain518 and "x not in coda_l" in _cmain518
+      and "stato_sistema" in SC.REGISTRO and "stato_sistema" in SC.CATALOGO
+      and any(b.sezione == "stato_sistema" for b in SC.CATALOGO["stato_sistema"].blocchi)
+      and "9. `python3 scripts/stato_sistema.py`" in _fa518 and "9. **Stato del sistema**" in _fa518
+      and "`[stato_sistema]`" in _fa518 and "python3 scripts/stato_sistema.py" in _ag518)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

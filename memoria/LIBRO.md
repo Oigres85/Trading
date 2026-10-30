@@ -915,6 +915,21 @@ Regole del registro:
 - ⚠ **da confermare col CEO**: se il conto Sella tiene in dollari il ricavato di una vendita invece di riconvertirlo,
   anche la liquidità ha un'esposizione al cambio, che oggi il libro non porta (è scritta tutta in euro).
 
+## 1undecies. DA CONFERMARE COL CEO — le domande aperte, con la data in cui sono nate (v518)
+
+Istruzione del CEO del 30/10/2026: *"Alla fine fai sempre un controllo generico dello stato del sistema … Se ritieni
+fammi sempre domande."* Una domanda scritta in una nota del libro invecchia da sola e non si ritrova: qui ce n'è una
+per riga, con quando è nata, perché conta e come si chiude. `scripts/stato_sistema.py` le riporta a ogni analisi con la
+loro età, e segnala ogni «da confermare» delle tabelle di §1 e §1decies che qui non c'è. **Una domanda chiusa si toglie
+da qui il giorno della risposta**, e la risposta entra dove serve (§1, §1decies, `config/`).
+
+| Aperta il | Cosa | Perché conta | Come si chiude |
+|---|---|---|---|
+| 30/10/2026 | GOOGL: la seduta dell'acquisto di 37 azioni a 282 $, il 29/10 o il 30/10 | il carico in euro: col 29/10 il cambio BCE è 1,1130 e il carico costa circa 35 € in più | la data sull'eseguito di Sella |
+| 30/10/2026 | il cambio APPLICATO da Sella agli acquisti di GOOGL e INTC del 30/10 | carico in euro e imposta in euro: oggi si usa il riferimento BCE, che ne differisce per il margine del broker | il cambio sulla conferma dell'eseguito |
+| 30/10/2026 | la liquidità: il saldo del broker, oggi una stima di ~30.195 € (ultima dichiarazione: 45.000 € il 17/10) | è il denominatore della quota azionaria, cioè il moltiplicatore che porta VaR, ES e drawdown al patrimonio (v432) | il saldo letto sul conto |
+| 30/10/2026 | se il conto Sella tiene in dollari il ricavato delle vendite invece di riconvertirlo | se sì, anche la liquidità è esposta al cambio, e il libro oggi la scrive tutta in euro | verificarlo sul conto |
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da

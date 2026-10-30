@@ -271,6 +271,15 @@ feriali e 11 nei weekend — misurato in v437, NON "ogni 30 minuti" come diceva 
 ogni push** serve `git pull --rebase origin main`. Sui conflitti in `data/data.json` vince la
 versione remota fresca — i calcoli si rifanno al run successivo.
 
+> 🩺 **ALLA FINE DI OGNI GIRO DI LAVORO: `python3 scripts/stato_sistema.py`** (istruzione permanente del CEO del
+> 30/10/2026, testuale: *"Alla fine fai sempre un controllo generico dello stato del sistema cercando di eliminare quanto
+> piu possibile le dipendenze dal progetto GitHub e lavorare più qui con te, in modo da rendere stabile il processo e non
+> incappare in errori di calcolo. Se ritieni fammi sempre domande."*). Vale per ogni analisi — `analisi.py` lo esegue da
+> sé come ultimo strumento — e per ogni giro di modifiche, dopo il push: l'esito si riporta in due-quattro righe in fondo
+> alla risposta, ogni riga con ⚠ detta per nome. Un punto che si può sistemare nella sessione si sistema prima di
+> chiudere; uno che chiede il CEO diventa una DOMANDA, e una domanda aperta vive in `memoria/LIBRO.md` §1undecies con la
+> sua data, non in una nota sparsa (v518).
+
 
 ## 🔁 Esercizio ricorrente: "check del prompt AI applicato a te stesso"
 
@@ -8959,3 +8968,51 @@ la fonte non dichiara (v406). Le classi della stessa società si sommano (GOOG +
 - ⚠ **Una data scritta a mano era entrata nel testo** («si raccolgono da oggi, 30/10/2026»): invecchia da sola (v410,
   v424), trovata rileggendo l'uscita. Ora la data è il primo giorno della memoria.
 - `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🩺 v518 — LO STATO DEL SISTEMA CHIUDE OGNI ANALISI, E LE DOMANDE AL CEO HANNO UN POSTO
+
+Istruzione del CEO (30/10/2026), testuale: *"Alla fine fai sempre un controllo generico dello stato del sistema cercando
+di eliminare quanto piu possibile le dipendenze dal progetto GitHub e lavorare più qui con te, in modo da rendere stabile
+il processo e non incappare in errori di calcolo. Se ritieni fammi sempre domande."*
+
+`scripts/stato_sistema.py` — l'ultimo strumento di `analisi.py`, da solo dopo tutti gli altri (deve vedere le letture del
+giro già scritte e le memorie che il giro ha cambiato), e il passo 3bis di `/aggiorna`. **Legge e basta**, ed esce sempre
+0: un controllo che fallisce lo dice nella sua riga («NON CONTROLLATO», con l'errore) invece di portarsi via il resto.
+
+| parte | cosa misura | perché qui |
+|---|---|---|
+| CODICE | HEAD contro `origin/main`, i test del CI su HEAD (o: dopo, solo commit dei dati), i file non committati divisi per cosa chiedono | `main` rossa da stamattina e nessuno se n'era accorto (v442, v462) |
+| PIPELINE SU GITHUB | l'età del run contro l'ultima chiusura USA, le fonti NON lette nell'ultimo run anche a sorveglianza verde, i run caduti nelle ultime 24 ore, le Issue «pipeline» | il ripiego regge e per questo tace |
+| DATI DI QUESTO GIRO | se le letture alla fonte di questa analisi ci sono davvero (30 minuti di validità) | una lettura vecchia vuol dire che gli strumenti hanno usato la pipeline |
+| DIPENDENZE DA GITHUB | ciò che solo la pipeline produce, ciascuna voce con la sua data | l'elenco è `fonti_dirette.SOLO_PIPELINE`: un gate lo confronta nei due versi |
+| COERENZA DEL LIBRO | posizioni, carichi, liquidità e sorvegliati uguali in `LIBRO.md` e in `config/`, concorrenti, operazioni | i gate v479/v480 girano solo al commit, e una modifica dalla pagina non accende la CI |
+| DOMANDE APERTE | `LIBRO.md` §1undecies, ciascuna con la data in cui è nata; oltre 3 giorni ⚠ | una domanda in una nota sparsa invecchia e non si ritrova |
+
+**Al primo giro ha trovato due cose vere**: ICE ha risposto **403** al run delle 16:29 UTC del 30/10 (la sorveglianza era
+verde perché il ripiego sull'ultimo giorno raccolto regge — ed è esattamente il silenzio che va nominato), e le quattro
+domande aperte al CEO di quel giorno (la seduta di GOOGL, il cambio applicato da Sella, il saldo, se Sella tiene i dollari)
+stavano in tre note diverse del libro e in nessuna tabella. E l'elenco delle dipendenze **mancava di una voce**: multipli,
+conti trimestrali, combustione, solidità e flottante di ogni titolo vengono ancora tutti dal run, e `SOLO_PIPELINE` non lo
+diceva (v406).
+
+⚠ **Le dipendenze si nominano con la data, non si tolgono qui.** Misurato il 30/10: la funzione della pipeline per un titolo
+(`fetch_symbol`) gira anche da questo ambiente — **12 posizioni in 9,7 secondi**, 57 campi su 71, tutti quelli per titolo;
+restano alla pipeline i 14 incrociati (correlazioni, contributo al rischio, forza relativa, CDS, short), che in parte
+`fonti_titoli.py` rilegge già. Produrli in sessione cambia da dove arriva metà del libro: è una domanda al CEO, non una
+scelta da fare in silenzio.
+
+⚠ **Il fuso, ancora**: dal 25/10 Roma è a UTC+1 e New York resta all'ora legale fino all'1/11, quindi la chiusura delle
+16:00 di New York sono le **21:00** italiane. Due attese del mio primo gate erano scritte con lo scarto dell'estate (22:00,
+17:10): rosse su codice giusto. L'ora viene dal fuso, e il gate ora lo dice (v470).
+
+### 🧪 Il metodo
+- **20 iniezioni**, una alla volta su quattro copie del repo verificate per impronta, con `modifica_sicura` e ripristino
+  dallo snapshot: **mordono tutte, ciascuna sul controllo atteso**. Una — la chiave del catalogo della scheda rinominata —
+  al primo giro faceva MORIRE la suite: il gate v505 apriva lo script di ogni chiave del catalogo senza chiedersi se
+  esistesse. Il difetto si vedeva, la diagnosi si perdeva (v407, v471): ora un sorgente che manca è vuoto e il check
+  delle intestazioni orfane cade col suo nome.
+- ⚠ **L'iniezione sul registro delle domande è stata scelta due volte.** La prima toglieva «GOOGL» dalla riga della
+  domanda: non mordeva, perché anche la domanda sul cambio nomina GOOGL. *L'iniezione va scelta fra i casi che il gate
+  DEVE prendere* (v389): la seconda aggiunge un «da confermare» su MU, che nessuna domanda nomina, e morde.
+- Pavimento di `test_analisi_libro.py` 940 → 950 (976 check). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al
+  browser (v440).

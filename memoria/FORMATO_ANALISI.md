@@ -205,6 +205,16 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    I conti trimestrali di una società possono fermarsi prima del trimestre che la stessa fonte dichiara chiuso
    (il 18/10: Amazon, Micron, Lenovo): un trimestre di ritardo si dichiara nella riga, oltre uno la società descrive
    un altro periodo e resta fuori dai posti, nominata.
+9. `python3 scripts/stato_sistema.py` (v518, CEO, 30/10/2026: *"Alla fine fai sempre un controllo generico dello stato
+   del sistema cercando di eliminare quanto piu possibile le dipendenze dal progetto GitHub e lavorare più qui con te, in
+   modo da rendere stabile il processo e non incappare in errori di calcolo. Se ritieni fammi sempre domande."*) — gira
+   DOPO tutti gli altri, da solo: il **codice** (HEAD contro `origin/main`, i test del CI su HEAD, i file non committati
+   divisi per cosa chiedono), la **pipeline su GitHub** (l'età del run e se è precedente all'ultima chiusura USA, le fonti
+   non lette nell'ultimo run, i run caduti nelle ultime 24 ore, le Issue «pipeline» aperte), i **dati del giro** (se le
+   letture alla fonte di questa analisi ci sono davvero), le **dipendenze da GitHub che restano** con la loro data
+   (l'elenco è `fonti_dirette.SOLO_PIPELINE`), la **coerenza del libro** (posizioni, carichi, liquidità e sorvegliati
+   uguali in `memoria/LIBRO.md` e in `config/`, concorrenti, operazioni) e le **domande aperte** di `LIBRO.md`
+   §1undecies con la loro età. Esce sempre 0: un controllo che fallisce lo dice nella sua riga.
 
 ## Cosa contiene la risposta, in quest'ordine
 00. **Freschezza dei dati** (v511) — in UNA riga dal blocco FRESCHEZZA DEI DATI: quante serie lette alla fonte, chi è
@@ -483,6 +493,15 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    domande non decidono al posto del CEO e non sono un riassunto: sono il punto da cui parte il ragionamento in chat.
    Il secondo tempo è quel ragionamento, sulle sue risposte: ciò che decide entra in `memoria/LIBRO.md`, e se diventa
    una regola nel registro qui sotto e nel codice, lo stesso giorno.
+   Fra le domande entrano quelle aperte del blocco STATO DEL SISTEMA (`LIBRO.md` §1undecies) che contano oggi: una
+   domanda aperta da più giorni si ripropone, non si lascia invecchiare.
+9. **Stato del sistema** (v518, CEO, 30/10/2026) — in chiusura, dal blocco STATO DEL SISTEMA, in **due-quattro righe**:
+   l'esito (quanti punti da guardare, quante domande aperte), ogni riga con ⚠ detta per nome — `main` rossa o commit non
+   online, un run caduto o precedente all'ultima chiusura USA, una fonte non letta nell'ultimo run, una lettura del giro
+   che manca, una copia del libro che non coincide —, e quanta parte dell'analisi poggia ancora sulla pipeline (le
+   DIPENDENZE DA GITHUB con la loro data). Se tutto è a posto si scrive in una riga, **non si salta**. Un punto che si può
+   sistemare in questa sessione si sistema prima di chiudere, e la risposta lo dice; uno che chiede il CEO diventa una
+   domanda della sezione 8.
 
 Accanto alla tenuta di ogni posizione e all'ingresso di ogni sorvegliato, da v511 (domanda del CEO del 24/10, *«Ok»* del
 25/10): la riga degli **oscillatori** (RSI 14, stocastico 14/3, Williams %R 14, CCI 20, sulle sedute concluse, con lo
@@ -552,6 +571,7 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[due_tempi]` l'analisi in due tempi: prima l'analisi, che chiude con domande mirate; poi il ragionamento col CEO in chat sulle sue risposte (25/10)
 - `[wsb]` WallStreetBets: rango, menzioni delle ultime 24 ore e impennate dei nomi del libro e dei sorvegliati, con la memoria giornaliera — l'attenzione della folla, non una fonte di fatti (30/10) — informazione, non una prova
 - `[peg]` il PEG sull'esercizio prossimo con la sua crescita dichiarata (il consenso dell'esercizio in corso e del prossimo, stessa tabella), accanto a quello dell'aggregatore (30/10) — una metrica, non una prova
+- `[stato_sistema]` il controllo generico dello stato del sistema in chiusura di ogni analisi e di ogni giro di lavoro: codice e test, pipeline su GitHub e fonti non lette, letture del giro, dipendenze da GitHub con la loro data, coerenza delle copie del libro, domande aperte al CEO con la loro età (30/10)
 - `[cambio]` il cambio euro/dollaro: quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio, dove sta il cambio nel suo anno, e per ogni operazione col suo cambio (LIBRO.md §1decies) il risultato in euro scomposto in effetto del prezzo ed effetto del cambio, con l'imposta in euro (30/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno
