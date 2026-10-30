@@ -1,4 +1,4 @@
-⟦ BUILD v510 · generato 30/10/2026 22:47 ⟧
+⟦ BUILD v510 · generato 30/10/2026 23:31 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 30/10/2026, 22:47:27 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 18:47, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,48% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,4% · Fut S&P -0,86% · BTC -1,22% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~62.7h); il "→ agg." incorpora già il gap after.
+DATI AL 30/10/2026, 23:31:44 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 19:31, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,48% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,4% · Fut S&P -0,86% · BTC -0,99% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~62h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 30/10/2026, 22:47:27 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-10-30.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 30/10/2026, 23:31:44 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-10-30.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): settembre 2026 · Inflazione PCE (a/a): settembre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: settembre 2026 · Disoccupazione: settembre 2026 · Fiducia consumatori (UMich): ottobre 2026 · Curva 10A-2A: 30/10/2026 · Curva 10A-3M: 30/10/2026 · Treasury USA 30A: 29/10/2026 · Tasso reale 10A (TIPS): 29/10/2026 · Inflazione attesa 10A (breakeven): 30/10/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -96,9 +96,9 @@ QUADRO MACRO:
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): ottobre +3,94% negli anni di midterm contro +1,7% su tutti gli anni, 80% di mesi positivi, esiti da -8,7% a +18,9% · novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8% · dicembre -1,19% negli anni di midterm contro +1,69% su tutti gli anni, 30% di mesi positivi, esiti da -11,8% a +17,8%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
 - MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 10.689 (-7,2% nell'ultima seduta) — +47,9% in un anno, e sta al 52% dell'intervallo annuale 6352–14.635 · Rame 6,51 $/lb (-1,09% nell'ultima seduta) — +28,2% in un anno, e sta al 84% dell'intervallo annuale 4,93–6,8 · Petrolio WTI 102,95 $ (+0,93% nell'ultima seduta) — +70% in un anno, e sta al 83% dell'intervallo annuale 55,27–112,95 · Oro 3885 $/oz (-3,63% nell'ultima seduta) — -3,3% in un anno, e sta al 0% dell'intervallo annuale 3885–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
 - TITOLI MACRO — 2 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 2 pubblicate DOPO l'ultima chiusura USA del 2026-10-30, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
-    · [MarketWatch, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Warsh wants the Fed to say less. Two officials are pushing for more transparency.
+    · [MarketWatch, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Warsh wants the Fed to say less. Two officials are pushing for more transparency.
       More interest-rate hikes are needed to fight inflation, Fed officials say.
-    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Wall Street Boom to Cut New York State Budget Deficit in Half
+    · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Wall Street Boom to Cut New York State Budget Deficit in Half
       New York projected the budget deficit will narrow by $3.5 billion next year as the state expects a boom in trading and borrowing to deliver record profits to Wall Street and stronger bonus payments to boost revenue.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-11-06 Non-Farm Payrolls (precedente +29K) · 2026-11-06 Disoccupazione (precedente 4.2%) · 2026-11-10 Inflazione CPI (a/a) (precedente 3.7%). ⚠ Per 1 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich)): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 5 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-2A, Curva 10A-3M, Treasury USA 30A, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-10-30 CCJ · 2026-10-30 XOM · 2026-10-30 CVX · 2026-10-30 ABBV · 2026-11-02 PLTR · 2026-11-02 AAPL · 2026-11-03 AMD · 2026-11-03 SMCI · 2026-11-03 ANET · 2026-11-03 AMGN · 2026-11-03 PFE · 2026-11-04 MCD · 2026-11-04 DDOG · 2026-11-05 NET · 2026-11-05 COP · 2026-11-06 OKLO · 2026-11-09 CEG · 2026-11-09 TTWO · 2026-11-10 RGTI · 2026-11-10 CRWV · 2026-11-12 CBRS. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -157,12 +157,11 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 - Tasso EFFETTIVO (EFFR) 3,88% del 29/10/2026 (NY Fed) — e' dove le banche si prestano DENTRO il target 3,75–4,00% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria.
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
+- Will Bitcoin dip to $75,000 in October?: 10% [Δ7g —]
 - Will there be no change in Fed interest rates after the December 2026 meeting?: 28% [Δ7g —]
-- Will Bitcoin dip to $75,000 in October?: 14% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the December 2026 meeting?: 70% [Δ7g —]
-- Will Bitcoin dip to $72,500 in October?: 3% [Δ7g —]
-- Will Ethereum dip to $2,100 in October?: 6% [Δ7g —]
-⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
+- Will Ethereum dip to $2,100 in October?: 5% [Δ7g —]
+⚠ 2 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -234,45 +233,45 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (89,7% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 0h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [AMD] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+      The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
+  [AMD] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) is down -1.26%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.52%. December E-mini S&P futures (ESZ26 ) are down -1.33%, and December E-mini Nasdaq futures (NQZ26...
-  [AMD] · [Nasdaq, 0h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
-      The S&P 500 Index ($SPX ) (SPY ) is down -1.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.31%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.64%. December E-mini S&P futures (ESZ26 ) are down -1.19%, and December E-mini Nasdaq futures (NQZ26...
   [BE] · [Nasdaq, 4h fa] Bloom Energy Just Joined the S&P 500. Here's What History Says Happens Next.
       Key PointsBloom was added to the S&P 500 in September.
   [BE] · [Nasdaq, 8h fa] Bloom Energy or Plug Power: Which Offers Better Long-Term Upside Now?
       BE outshines PLUG in earnings growth, profitability and liquidity, but a sharp valuation gap raises questions about long-term upside.
-  [CRWV] · [Nasdaq, 1h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
+  [CRWV] · [Nasdaq, 2h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
       Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.
   [CRWV] · [Nasdaq, 4h fa] Bloom Energy Just Joined the S&P 500. Here's What History Says Happens Next.
       Key PointsBloom was added to the S&P 500 in September.
-  [INTC] · [Nasdaq, 0h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [INTC] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+      The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
+  [INTC] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) is down -1.26%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.52%. December E-mini S&P futures (ESZ26 ) are down -1.33%, and December E-mini Nasdaq futures (NQZ26...
-  [INTC] · [Nasdaq, 0h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
-      The S&P 500 Index ($SPX ) (SPY ) is down -1.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.31%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.64%. December E-mini S&P futures (ESZ26 ) are down -1.19%, and December E-mini Nasdaq futures (NQZ26...
-  [MRVL] · [Nasdaq, 4h fa] Stocks Close Lower as Alphabet Disappoints and Chip Stocks Fall
+  [MRVL] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+      The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
+  [MRVL] · [Nasdaq, 5h fa] Stocks Close Lower as Alphabet Disappoints and Chip Stocks Fall
       The S&P 500 Index ($SPX ) (SPY ) fell -0.30%, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -0.25%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -1.38%. December E-mini S&P futures (ESZ26 ) fell -0.87%, and December E-mini Nasdaq futures (NQZ26 ) fell -2.67%. US...
-  [MRVL] · [Nasdaq, 6h fa] Should You Buy, Sell, or Hold ALAB Stock Before Q3 Earnings Release?
-      Astera Labs' Q3 earnings outlook looks promising on strong AI demand and Scorpio growth, but high valuation and margin pressures warrant caution.
   [MSTR] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
-      The S&P 500 Index ($SPX ) (SPY ) is down -1.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.31%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.64%. December E-mini S&P futures (ESZ26 ) are down -1.19%, and December E-mini Nasdaq futures (NQZ26...
+      The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
   [MSTR] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) is down -1.26%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.52%. December E-mini S&P futures (ESZ26 ) are down -1.33%, and December E-mini Nasdaq futures (NQZ26...
-  [MU] · [Nasdaq, 4h fa] Stocks Close Lower as Alphabet Disappoints and Chip Stocks Fall
+  [MU] · [Nasdaq, 5h fa] Stocks Close Lower as Alphabet Disappoints and Chip Stocks Fall
       The S&P 500 Index ($SPX ) (SPY ) fell -0.30%, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -0.25%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -1.38%. December E-mini S&P futures (ESZ26 ) fell -0.87%, and December E-mini Nasdaq futures (NQZ26 ) fell -2.67%. US...
-  [MU] · [Nasdaq, 5h fa] 2 AI Stocks Poised to Surge on the Halloween Effect
+  [MU] · [Nasdaq, 6h fa] 2 AI Stocks Poised to Surge on the Halloween Effect
       Micron and NVIDIA could benefit from the Halloween effect as AI demand, surging revenues and expanding margins strengthen their growth prospects.
-  [NVDA] · [Nasdaq, 0h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [NVDA] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+      The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
+  [NVDA] · [Nasdaq, 1h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) is down -1.26%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.52%. December E-mini S&P futures (ESZ26 ) are down -1.33%, and December E-mini Nasdaq futures (NQZ26...
-  [NVDA] · [Nasdaq, 0h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
-      The S&P 500 Index ($SPX ) (SPY ) is down -1.19%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.31%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.64%. December E-mini S&P futures (ESZ26 ) are down -1.19%, and December E-mini Nasdaq futures (NQZ26...
-  [ORCL] · [Nasdaq, 1h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
+  [ORCL] · [Nasdaq, 2h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
       Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.
   [ORCL] · [Nasdaq, 4h fa] Bloom Energy Just Joined the S&P 500. Here's What History Says Happens Next.
       Key PointsBloom was added to the S&P 500 in September.
-  [RGTI] · [Nasdaq, 26h fa] Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market
+  [RGTI] · [Nasdaq, 27h fa] Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market
       In the most recent trading session, Rigetti Computing, Inc. (RGTI) closed at $12.06, indicating a -2.74% shift from the previous trading day.
-  [RGTI] · [Nasdaq, 29h fa] IONQ Below Key Moving Averages: Buy, Hold or Sell Before Q3 Earnings?
+  [RGTI] · [Nasdaq, 30h fa] IONQ Below Key Moving Averages: Buy, Hold or Sell Before Q3 Earnings?
       IonQ trades below key SMAs as earnings estimates weaken, but new Air Force funding and an analyst price target point to potential upside ahead of Q3 results.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
