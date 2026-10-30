@@ -6874,6 +6874,9 @@ _U505 = {
         "  BBB   peso  40,0% rischio  30,0%  periodo -5 $  vs carico -3%",
         "Stress Nasdaq 100 -10%: -100 $ (-10,0%) · R² 0,8", "COSTO DELL'ATTESA: seduta tipica ±10 $",
         "SCADENZE (prima trimestrale dichiarata dalla fonte): AAA 2026-10-22 (3 g, dichiarata dall'emittente)",
+        # v516 — il cambio euro/dollaro e la riga di un nome col carico in euro (copiata nella sua scheda)
+        "CAMBIO EURO/DOLLARO (v516) — EUR/USD 1,1172 (BCE, del 2026-10-30)",
+        "  BBB   carico 1.000 $ a EUR/USD 1,1172 = 895 € · oggi 890 € · in euro -5 € = prezzo -5 € + cambio 0 €",
         "DECISIONI APERTE: nessuna in LIBRO.md §1quinquies", "RIMANDATE DI PROPOSITO — si riprendono all'evento",
         "  BBB — l'uscita: in pari", "ORDINI APERTI: nessuno attivo in LIBRO.md §1septies",
         "CREDITO SUL LIBRO — chi brucia cassa: 40,0% · BBB", "TENUTA DELLE POSIZIONI — bilancio dell'evidenza",
@@ -8745,6 +8748,105 @@ check("v515 il campo «azioni» con un'altra forma (lo Z-Score) non e' una misur
       and "senza la misura in questo snapshot: BAD" in _b515 and "AAA +32,3%" in _b515
       and "nessun nome" not in _s515 and "non ha la forma che la pipeline scrive" in _s515
       and SP.flottante_su_totale(_righe515["BAD"]) is None and SP.quota_flottante(_righe515["BAD"]) == 90.0, _b515)
+
+# ═══════ v516 — IL CAMBIO EURO/DOLLARO NELLE OPERAZIONI (CEO, 30/10/2026) ═══════
+# «in futuro quando effettuo operazioni (con broker sella X trading) valuta anche il cambio euro dollaro». Lo stato si
+# COSTRUISCE (v425): operazioni con cambi diversi, una vendita, una riga illeggibile, una posizione coperta in parte.
+_tx516 = """## 1decies. OPERAZIONI E CAMBIO EURO/DOLLARO — prova
+| Data | Ticker | Operazione | Azioni | Prezzo $ | EUR/USD | Fonte del cambio | Note |
+|---|---|---|---|---|---|---|---|
+| 02/03/2026 | AAA | acquisto | 10 | 100,00 | 1,0000 | BCE | |
+| 03/03/2026 | AAA | acquisto | 10 | 120,00 | 1,2000 | broker | |
+| 04/03/2026 | AAA | vendita | 10 | 130,00 | 1,1000 | BCE | |
+| 05/03/2026 | BBB | acquisto | 5 | 50,00 | 1,1000 | BCE | |
+| 06/03/2026 | CCC | acquisto | 7 | 10,00 |  | BCE | cambio non annotato |
+## 2. ALTRO
+| 01/01/2026 | ZZZ | acquisto | 1 | 1 | 1 | x | fuori sezione |
+"""
+_op516 = NL.leggi_operazioni(_tx516)
+_cA516 = NL.carico_in_euro(_op516, "AAA")
+check("v516 il registro §1decies si legge dentro il suo titolo (la riga di un'altra sezione no), le date si portano in "
+      "AAAA-MM-GG, il verso dall'operazione; senza la sezione None, che e' diverso da «nessuna operazione» (v389)",
+      len(_op516) == 5 and {o["tk"] for o in _op516} == {"AAA", "BBB", "CCC"} and _op516[0]["data"] == "2026-03-02"
+      and _op516[2]["verso"] == "vendita" and _op516[1]["fx"] == 1.2 and NL.leggi_operazioni("## 1. POSIZIONI\n") is None
+      and NL.leggi_operazioni("## 1decies. OPERAZIONI E CAMBIO\n") == [])
+check("v516 il carico in euro e' a COSTO MEDIO PONDERATO: due acquisti a cambi diversi (1.000 $ a 1,00 = 1.000 €, 1.200 $ "
+      "a 1,20 = 1.000 €), poi una vendita di meta' toglie meta' del carico in euro e in dollari; una riga senza cambio e' "
+      "ILLEGGIBILE, non un carico costruito saltandola",
+      _cA516 is not None and abs(_cA516["azioni"] - 10) < 1e-9 and abs(_cA516["carico_eur"] - 1000) < 1e-6
+      and abs(_cA516["carico_usd"] - 1100) < 1e-6 and abs(_cA516["fx_medio"] - 1.1) < 1e-9
+      and NL.carico_in_euro(_op516, "CCC") == {"illeggibile": "06/03/2026"} and NL.carico_in_euro(_op516, "ZZZ") is None)
+_cl516 = NL.cambio_libro(_op516, {"AAA": 10, "BBB": 8, "DDD": 3, "CCC": 7}, {"AAA": 110.0, "BBB": 55.0, "DDD": 10.0, "CCC": 10.0},
+                         1.25, "BCE, del 2026-03-10", None, 1000.0, 500.0)
+_x516 = {x["tk"]: x for x in _cl516["coperte"]}
+check("v516 il risultato in euro e' la SOMMA dell'effetto del prezzo e di quello del cambio (un'identita', non un valore "
+      "atteso: v326), e con l'euro piu' forte del carico l'effetto del cambio e' NEGATIVO; l'imposta e' in euro, al 26% "
+      "della plusvalenza in euro — non dei dollari convertiti",
+      set(_x516) == {"AAA"} and abs(_x516["AAA"]["pnl_eur"] - (_x516["AAA"]["effetto_prezzo"] + _x516["AAA"]["effetto_cambio"])) < 1e-9
+      and abs(_x516["AAA"]["valore_eur"] - 10 * 110 / 1.25) < 1e-9 and abs(_x516["AAA"]["pnl_eur"] - (880 - 1000)) < 1e-9
+      and _x516["AAA"]["effetto_cambio"] < 0 and abs(_x516["AAA"]["effetto_prezzo"] - 0.0) < 1e-9
+      and _x516["AAA"]["imposta"] == 0.0)
+_cg516 = NL.cambio_libro([{"tk": "EEE", "verso": "acquisto", "qta": 10.0, "prezzo": 100.0, "fx": 1.20, "data_testo": "x"}],
+                         {"EEE": 10}, {"EEE": 100.0}, 1.0, "BCE", None)
+check("v516 un titolo FERMO in dollari con l'euro sceso da 1,20 a 1,00 da' una plusvalenza in euro (+166,67 €) tutta di "
+      "cambio, e l'imposta in euro la conta — il caso che il conto in dollari non vede",
+      abs(_cg516["coperte"][0]["pnl_eur"] - (1000 - 1000 / 1.2)) < 1e-6 and abs(_cg516["coperte"][0]["effetto_prezzo"]) < 1e-9
+      and abs(_cg516["coperte"][0]["imposta"] - 0.26 * (1000 - 1000 / 1.2)) < 1e-6)
+_rc516 = "\n".join(NL.righe_cambio(_cl516))
+check("v516 la resa: le parziali dichiarate con le azioni coperte, le illeggibili nominate, chi non ha il cambio annotato "
+      "nominato (il broker fa il conto) — mai sparito; il patrimonio in dollari con la quota e l'1% nei due versi",
+      "BBB 5 azioni su 8" in _rc516 and "CCC (06/03/2026)" in _rc516 and "senza cambio di carico annotato" in _rc516
+      and "DDD" in _rc516 and "del patrimonio" in _rc516 and abs(_cl516["euro_piu_forte"] - _cl516["eur"] * (1 / 1.01 - 1)) < 1e-9
+      and _cl516["euro_piu_forte"] < 0 < _cl516["euro_piu_debole"]
+      and abs(_cl516["quota"] - _cl516["eur"] / (_cl516["eur"] + 1500)) < 1e-12, _rc516)
+check("v516 senza cambio il blocco non c'e' e lo dice (un patrimonio con dollari ed euro sommati e' la classe v432); senza "
+      "il registro lo dice invece di non nominare nessuno",
+      NL.cambio_libro(_op516, {"AAA": 10}, {"AAA": 1.0}, None, None) is None
+      and "nessun cambio disponibile" in NL.righe_cambio(None)[0]
+      and "ASSENTE" in "\n".join(NL.righe_cambio(NL.cambio_libro(None, {"AAA": 1}, {"AAA": 1.0}, 1.1, "BCE"))))
+_an516 = [(f"2026-{1 + i // 28:02d}-{1 + i % 28:02d}", 1.0 + i / 1000) for i in range(130)]
+_pa516 = NL.posizione_anno_cambio(_an516, 1.0 + 64.5 / 1000)
+check("v516 il cambio nel suo anno: percentile midrank (la regola di dgPercentile), minimo e massimo con la loro data; "
+      "sotto 120 osservazioni nessun percentile",
+      _pa516["percentile"] == 50 and sum(v < 1.0645 for _d, v in _an516) == 65
+      # il caso che discrimina il midrank: 40 osservazioni UGUALI al cambio di oggi (la prima fixture non ne aveva, e
+      #   contare le pari per intero dava lo stesso numero: l'iniezione non mordeva, v430)
+      and NL.posizione_anno_cambio([(f"d{i:03d}", 1.0 if i < 45 else (1.1 if i < 85 else 1.2)) for i in range(130)],
+                                   1.1)["percentile"] == 50 and _pa516["minimo"] == _an516[0]
+      and _pa516["massimo"] == _an516[-1] and "percentile" not in NL.posizione_anno_cambio(_an516[:100], 1.05)
+      and NL.posizione_anno_cambio([], 1.1) is None)
+check("v516 chi ha un'operazione DOPO la seduta del blocco si riconosce (la chiusura comune e' di prima dell'operazione); "
+      "la stessa seduta no",
+      NL.dopo_la_seduta(_op516, {"AAA": 10, "BBB": 5}, "2026-03-04") == {"BBB": {"data": "2026-03-05"}}
+      and NL.dopo_la_seduta(_op516, {"AAA": 10}, "2026-03-04") == {})
+_cc516 = _corpo_di((_ROOT / "scripts" / "numeri_libro.py").read_text(encoding="utf-8"), "calcola")
+check("v516 collegamento: calcola legge il registro, valuta al prezzo di adesso chi e' entrato dopo la seduta PRIMA dei "
+      "pesi, lo toglie dal periodo, e il blocco usa lo STESSO cambio del patrimonio (una lettura sola, v161); la sintesi "
+      "lo stampa",
+      "ops = leggi_operazioni()" in _cc516 and _cc516.index("dopo = dopo_la_seduta(ops, qty, fine)") < _cc516.index("val = {t:")
+      and "(None if t in dopo else S[t].get(ini))" in _cc516 and "pat_pipe[0], pat_pipe[1]" in _cc516
+      and _cc516.count("patrimonio_pipeline(") == 1
+      and "L.extend(righe_cambio(o[\"cambio\"]))" in _corpo_di((_ROOT / "scripts" / "numeri_libro.py").read_text(encoding="utf-8"), "sintesi"))
+_lib516 = (_ROOT / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_pos516 = {p["tk"]: p["qta"] for p in __import__("brief").leggi_libro()[0]}
+_ope516 = NL.leggi_operazioni(_lib516)
+_net516 = {}
+for _o in _ope516 or []:
+    _net516[_o["tk"]] = _net516.get(_o["tk"], 0) + (_o["qta"] or 0) * (1 if _o["verso"] == "acquisto" else -1)
+check("v516 il registro del libro: la sezione c'e', ogni riga ha cambio e fonte, e non porta mai PIU' azioni di quelle in "
+      "§1 (una vendita dimenticata nel registro fa un carico in euro su azioni che non ci sono); chi e' a zero non e' in §1",
+      _ope516 and all(o["fx"] and o["fonte_fx"] and o["verso"] for o in _ope516)
+      and all(q <= _pos516.get(t, 0) + 1e-9 for t, q in _net516.items() if q > 0)
+      and all(t not in _pos516 for t, q in _net516.items() if q <= 0), str(_net516))
+_fm516 = (_ROOT / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+check("v516 la regola sta nel formato (a ogni operazione il cambio della seduta, il controvalore in euro, la liquidita' e "
+      "la lettura del cambio) e la richiesta nel registro, con la sua voce e il suo blocco nella scheda; la BCE si legge "
+      "per un anno",
+      "**Quando il CEO comunica un'operazione**" in _fm516 and "- `[cambio]`" in _fm516 and "cambio" in SC.REGISTRO
+      and any(b.sezione == "cambio" for b in SC.CATALOGO["numeri_libro"].blocchi)
+      and "lastNObservations=260" in FD.URL_BCE
+      and FD.da_bce("TIME_PERIOD,OBS_VALUE\n2026-10-29,1.113\n2026-10-30,1.1172\n")["anno"] == [["2026-10-29", 1.113],
+                                                                                               ["2026-10-30", 1.1172]])
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

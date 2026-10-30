@@ -229,6 +229,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    §1quater): il blocco `COSTO DELL'ATTESA` / `SCADENZE` di `numeri_libro.py`, e per ogni
    decisione aperta del piano la sua scadenza (prima trimestrale del nome) e i giorni che mancano.
    Le protezioni non ancora messe si segnalano qui, ogni giorno, finché non lo sono.
+   Da v516 il blocco **CAMBIO EURO/DOLLARO** (`LIBRO.md` §1decies, CEO del 30/10/2026): il cambio di oggi col
+   suo anno, quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio, e per le posizioni col cambio
+   annotato il risultato in euro diviso fra prezzo e cambio, con l'imposta in euro se si vendesse oggi. Chi è
+   entrato dopo la seduta del blocco si valuta al prezzo di adesso e resta fuori dal risultato del periodo.
    Da v474 il blocco `DECISIONI APERTE` (tabella in `LIBRO.md` §1quinquies): per ogni decisione
    confermata e non eseguita quanto l'attesa è costata o ha fatto guadagnare dalla chiusura della
    conferma, se la condizione vale ancora e la scadenza. Una condizione RIENTRATA si dice.
@@ -539,11 +543,19 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[ipervenduto]` ipervenduto e ipercomprato coi quattro oscillatori, e il supporto e l'accumulo contati condizione per condizione, su ogni posizione e ogni sorvegliato (25/10) — informazione, non una prova
 - `[stagionalita]` la stagionalità del titolo nel mese in corso e nel successivo col campione, e del Nasdaq-100 negli anni dello stesso ciclo presidenziale (25/10) — informazione, non una previsione
 - `[due_tempi]` l'analisi in due tempi: prima l'analisi, che chiude con domande mirate; poi il ragionamento col CEO in chat sulle sue risposte (25/10)
+- `[cambio]` il cambio euro/dollaro: quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio, dove sta il cambio nel suo anno, e per ogni operazione col suo cambio (LIBRO.md §1decies) il risultato in euro scomposto in effetto del prezzo ed effetto del cambio, con l'imposta in euro (30/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno
 strumento: il gate della v505 non lascia l'una senza l'altra.
 
 ## Regole
+- **Quando il CEO comunica un'operazione** (broker Sella, X-Trading; CEO, 30/10/2026: *"in futuro quando effettuo
+  operazioni … valuta anche il cambio euro dollaro"*): si scrive in LIBRO.md §1 e nel registro §1decies col **cambio
+  della seduta** — quello applicato dal broker se il CEO lo dà, altrimenti il riferimento BCE con la sua data —, il
+  controvalore in euro e la liquidità nuova; e nella risposta si dice dove sta il cambio nel suo anno, quanta parte del
+  patrimonio è in dollari dopo l'operazione e cosa fa un 1% del cambio, e che la plusvalenza in euro si calcolerà col
+  cambio d'acquisto e di vendita. Una seduta non dichiarata si ricava dal prezzo solo se cade in UNA seduta; se cade in
+  più d'una si registra la più recente e si chiede (v396). È informazione: il cambio non si prevede.
 - Direzione, priorità e livelli sì; le quantità solo come aritmetica dichiarata (v439).
 - Ogni numero porta la sua data e il suo denominatore; ciò che manca si dichiara.
 - **Un dato vecchio non si usa come se fosse di oggi** (CEO, 25/10/2026: *"dati non aggiornati non sono affidabili …

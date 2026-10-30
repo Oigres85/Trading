@@ -76,7 +76,8 @@ UA = {
 
 URL_FRED = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={sid}"
 URL_EFFR = "https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json"
-URL_BCE = ("https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?lastNObservations=10&format=csvdata")
+# v516 — un anno di osservazioni (260 sedute BCE): il blocco del cambio dice dove sta il cambio di oggi nel suo anno
+URL_BCE = ("https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?lastNObservations=260&format=csvdata")
 URL_CNN = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
 
 # (chiave, nome da stampare, serie FRED, quante osservazioni tiene la pipeline per la stessa derivazione)
@@ -157,7 +158,7 @@ def da_bce(testo):
     if not oss:
         return None
     d, v = max(oss)
-    return {"valore": v, "data": d, "fonte": "BCE, riferimento delle 14:15 CET"}
+    return {"valore": v, "data": d, "fonte": "BCE, riferimento delle 14:15 CET", "anno": [list(x) for x in sorted(oss)]}
 
 
 CNN_COMPONENTI = ("market_momentum_sp500", "stock_price_strength", "stock_price_breadth", "put_call_options",

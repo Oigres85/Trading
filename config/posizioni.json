@@ -1,7 +1,7 @@
 {
  "_nota": "Posizioni del CEO. NON e' la lista dei simboli da seguire: quella resta config/ui_watchlist.json. Questo file e' una SOVRAPPOSIZIONE.",
  "_fonte": "modificato dalla dashboard",
- "aggiornato": "2026-10-23",
+ "aggiornato": "2026-10-30",
  "posizioni": [
   {
    "ticker": "BTP-V28",
@@ -69,6 +69,18 @@
    "pmc": 76.14,
    "valuta": "USD",
    "mercato": "NASDAQ"
+  },
+  {
+   "ticker": "GOOGL",
+   "qta": 37,
+   "pmc": 282.0,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "INTC",
+   "qta": 130,
+   "pmc": 64.5,
+   "valuta": "USD"
   }
  ]
 }

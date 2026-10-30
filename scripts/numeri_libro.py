@@ -141,19 +141,34 @@ def calcola(sedute=1, registra=False, adesso=None):
     qty = {p["tk"]: p["qta"] for p in az}
     pmc = {p["tk"]: p["pmc"] for p in az}
     px = {t: S[t][fine] for t in TK}
+    # ⚠⚠ v516 — chi ha un'OPERAZIONE DOPO la seduta del blocco (LIBRO.md §1decies): la chiusura di `fine` e' di PRIMA
+    #   dell'operazione, e misurarci contro il carico afferma un guadagno o una perdita mai avvenuti (INTC il 30/10/2026,
+    #   comprata a 64,50 il giorno del -29,7%: la chiusura comune era quella del 29/10, 92,07, e il blocco scriveva «+43%
+    #   sul carico»). Si valuta al prezzo di ADESSO (la quota, con la sua seduta), e il periodo non la conta: in quelle
+    #   quantita' non era in portafoglio. Un nome senza quota resta alla chiusura e il confronto col carico non si fa.
+    ops = leggi_operazioni()
+    dopo = dopo_la_seduta(ops, qty, fine)
+    for t in dopo:
+        q_ora = (TEC.get(t) or {}).get("px")
+        if q_ora:
+            px[t] = q_ora
+            dopo[t]["quota"] = (TEC.get(t) or {}).get("seduta_quota")
     val = {t: qty[t] * px[t] for t in TK}
     tot = sum(val.values())
     w = {t: val[t] / tot for t in TK}
 
-    pnl, ret = attribuzione(qty, {t: S[t].get(ini) for t in TK}, px)
-    pnl21, ret21 = attribuzione(qty, {t: S[t].get(ini21) for t in TK}, px)
+    pnl, ret = attribuzione(qty, {t: (None if t in dopo else S[t].get(ini)) for t in TK}, px)
+    pnl21, ret21 = attribuzione(qty, {t: (None if t in dopo else S[t].get(ini21)) for t in TK}, px)
     out = {"fine": fine, "inizio": ini, "sedute": sedute, "tot_usd": tot, "cassa_eur": cassa_eur,
            "ret_libro": ret, "pnl_libro": sum(v for v in pnl.values() if v is not None),
            "ret_21": ret21, "pnl_21": sum(v for v in pnl21.values() if v is not None), "avanti": avanti,
            "bench": {f: S[f][fine] / S[f][ini] - 1 for f in FATTORI},
            "bench_21": {f: S[f][fine] / S[f][ini21] - 1 for f in FATTORI},
            "titoli": [{"tk": t, "peso": w[t], "pnl": pnl[t], "pnl_21": pnl21[t],
-                       "vs_pmc": px[t] / pmc[t] - 1, "latente": qty[t] * (px[t] - pmc[t])} for t in TK]}
+                       "vs_pmc": (None if t in dopo and not dopo[t].get("quota") else px[t] / pmc[t] - 1),
+                       "latente": (None if t in dopo and not dopo[t].get("quota") else qty[t] * (px[t] - pmc[t]))}
+                      for t in TK],
+           "dopo_seduta": dopo}
 
     lunghi = [t for t in TK if len(B[t]) >= MIN_BARRE_MATRICE]
     out["esclusi_matrice"] = [t for t in TK if t not in lunghi]
@@ -204,6 +219,12 @@ def calcola(sedute=1, registra=False, adesso=None):
     import rotazione
     eur = {p["tk"]: p for p in pos if p["valuta"] == "EUR"}
     pat_pipe = patrimonio_pipeline(pipe, {t: p["pmc"] for t, p in eur.items()}, giro["scelta"])
+    # v516 — il cambio euro/dollaro del libro e delle operazioni col loro cambio (LIBRO.md §1decies, CEO 30/10/2026):
+    #   lo STESSO cambio del patrimonio e del registro (una lettura sola, v161), l'anno dalla BCE letta adesso
+    out["cambio"] = cambio_libro(ops, qty, {t: (None if t in dopo and not dopo[t].get("quota") else px[t]) for t in TK},
+                                 pat_pipe[0], pat_pipe[1], ((giro["scelta"] or {}).get("eurusd") or {}).get("anno"),
+                                 cassa_eur, sum(p["qta"] * pat_pipe[2].get(t, (p["pmc"], ""))[0] / 100
+                                                for t, p in eur.items()))
     prima_trim = {}
     for a in out["calendario"].get("attesi") or []:
         prima_trim.setdefault(a["tk"], a.get("giorni"))       # gli attesi arrivano gia' in ordine di data
@@ -2192,6 +2213,186 @@ def patrimonio_eur(valore_az_usd, fx, cassa_eur, obbligazioni):
             "totale": az + (cassa_eur or 0.0) + obb}
 
 
+# ═══════ v516 — IL CAMBIO EURO/DOLLARO NELLE OPERAZIONI (CEO, 30/10/2026) ════════════════════════════════════════════
+# «in futuro quando effettuo operazioni (con broker sella X trading) valuta anche il cambio euro dollaro». Il conto e' in
+# euro: ogni acquisto in dollari converte euro al cambio del broker, ogni vendita li riconverte, e la plusvalenza fiscale
+# di un titolo estero si calcola IN EURO coi cambi del giorno d'acquisto e di vendita (art. 9 TUIR). Il cambio e' quindi
+# parte del risultato: un titolo fermo in dollari puo' dare una plusvalenza o una minusvalenza in euro. Il registro delle
+# operazioni col loro cambio sta in LIBRO.md §1decies; le operazioni di prima del 30/10/2026 non hanno il cambio
+# annotato, e per quelle posizioni il risultato in euro lo calcola il broker — si dice, non si stima (v396).
+EFFETTO_CAMBIO_PCT = 1.0      # «se il cambio si muove dell'1%»: un'unita' di lettura, non una previsione (v240)
+MIN_ANNO_CAMBIO = 120         # sotto, nessun percentile: la stessa convenzione dello storico del Fear & Greed (v510)
+
+
+def _data_it(iso):
+    """AAAA-MM-GG → GG/MM/AAAA; un testo che non e' una data resta com'e'."""
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", str(iso or ""))
+    return f"{m.group(3)}/{m.group(2)}/{m.group(1)}" if m else str(iso or "n.d.")
+
+
+def _data_iso(s):
+    m = re.match(r"\s*(\d{1,2})/(\d{1,2})/(\d{4})", s or "")
+    return f"{m.group(3)}-{int(m.group(2)):02d}-{int(m.group(1)):02d}" if m else None
+
+
+def leggi_operazioni(testo=None):
+    """La tabella OPERAZIONI E CAMBIO di LIBRO.md (§1decies). None = sezione ASSENTE, che si legge diverso da «nessuna
+    operazione» (v389, v406). Si legge solo dentro il proprio titolo (v454)."""
+    if testo is None:
+        testo = testo_libro()
+    out, sez, trovata = [], False, False
+    for riga in testo.splitlines():
+        if riga.startswith("## "):
+            sez = "OPERAZIONI E CAMBIO" in riga.upper()
+            trovata = trovata or sez
+            continue
+        if not sez or not riga.startswith("|"):
+            continue
+        celle = [x.strip() for x in riga.strip().strip("|").split("|")]
+        if len(celle) < 7 or celle[0] in ("Data", "") or set(celle[0]) <= set("-: "):
+            continue
+        data, tk, op, q, prezzo, fx, fonte = celle[:7]
+        o = op.lower()
+        verso = ("acquisto" if o.startswith(("acquist", "entrat", "media")) else
+                 "vendita" if o.startswith(("vendit", "uscit", "alleggeriment")) else None)
+        out.append({"data": _data_iso(data), "data_testo": data, "tk": tk.upper(), "verso": verso, "verso_testo": op,
+                    "qta": _num_it(q), "prezzo": _num_it(prezzo), "fx": _num_it(fx), "fonte_fx": fonte,
+                    "nota": celle[7] if len(celle) > 7 else ""})
+    return out if trovata else None
+
+
+def dopo_la_seduta(operazioni, qty, fine):
+    """{ticker: {"data": ultima operazione}} per le posizioni con un'operazione registrata DOPO la seduta `fine`: in
+    quelle quantita' e a quel carico non esistevano ancora alla chiusura su cui il blocco misura."""
+    out = {}
+    for o in operazioni or []:
+        if o["tk"] in qty and o.get("data") and str(o["data"]) > str(fine):
+            out[o["tk"]] = {"data": max((out.get(o["tk"]) or {}).get("data", ""), o["data"])}
+    return out
+
+
+def carico_in_euro(operazioni, tk):
+    """Il carico in euro di un titolo dal registro, a COSTO MEDIO PONDERATO (il metodo del regime amministrato): un
+    acquisto aggiunge azioni x prezzo / cambio, una vendita toglie la sua parte al costo medio. None se il registro non
+    ha operazioni sul nome, o ne ha una illeggibile: un carico in euro costruito saltando una riga e' un altro carico."""
+    q, usd, eur, n = 0.0, 0.0, 0.0, 0
+    for o in operazioni or []:
+        if o["tk"] != tk:
+            continue
+        if None in (o.get("qta"), o.get("prezzo"), o.get("fx"), o.get("verso")) or not o["fx"] or o["qta"] <= 0:
+            return {"illeggibile": o.get("data_testo") or "una riga"}
+        n += 1
+        if o["verso"] == "acquisto":
+            q += o["qta"]; usd += o["qta"] * o["prezzo"]; eur += o["qta"] * o["prezzo"] / o["fx"]
+        else:
+            if q <= 0:
+                return {"illeggibile": o.get("data_testo") or "una vendita senza acquisti prima"}
+            f = min(o["qta"], q) / q
+            q -= min(o["qta"], q); usd *= 1 - f; eur *= 1 - f
+    if not n:
+        return None
+    return {"azioni": q, "carico_usd": usd, "carico_eur": eur, "fx_medio": usd / eur if eur else None, "operazioni": n}
+
+
+def posizione_anno_cambio(anno, fx):
+    """Dove sta il cambio di oggi nel suo anno: percentile midrank (come dgPercentile), minimo e massimo con la loro
+    data, variazione su un mese di osservazioni (21) e sull'anno. Sotto MIN_ANNO_CAMBIO osservazioni nessun percentile."""
+    oss = sorted((d, v) for d, v in (anno or []) if d and isinstance(v, (int, float)))
+    if len(oss) < 2 or not fx:
+        return None
+    vv = [v for _d, v in oss]
+    out = {"n": len(oss), "dal": oss[0][0], "al": oss[-1][0],
+           "minimo": min(oss, key=lambda x: (x[1], x[0])), "massimo": max(oss, key=lambda x: (x[1], x[0])),
+           "mese": (fx / oss[-22][1] - 1) * 100 if len(oss) >= 22 else None, "anno": (fx / oss[0][1] - 1) * 100}
+    if len(oss) >= MIN_ANNO_CAMBIO:
+        sotto, pari = sum(v < fx for v in vv), sum(v == fx for v in vv)
+        out["percentile"] = int((sotto + pari / 2) / len(vv) * 100 + 0.5)
+    return out
+
+
+def cambio_libro(operazioni, qty, px, fx, fonte_fx, anno=None, cassa_eur=None, obbligazioni_eur=0.0):
+    """Il blocco CAMBIO EURO/DOLLARO: quanta parte del patrimonio e' in dollari, cosa fa un 1% del cambio, dove sta il
+    cambio nel suo anno, e per le posizioni col carico in euro dal registro il risultato in euro scomposto in effetto
+    del prezzo ed effetto del cambio, con la plusvalenza imponibile. Senza cambio None: un patrimonio con l'azionario
+    in dollari sommato agli euro e' la classe v432."""
+    if not fx:
+        return None
+    import conseguenze
+    usd = sum(qty[t] * px[t] for t in qty if px.get(t))
+    eur = usd / fx
+    pat = eur + (cassa_eur or 0.0) + (obbligazioni_eur or 0.0)
+    k = EFFETTO_CAMBIO_PCT / 100
+    out = {"fx": fx, "fonte": fonte_fx, "usd": usd, "eur": eur, "quota": eur / pat if pat else None,
+           "euro_piu_forte": eur * (1 / (1 + k) - 1), "euro_piu_debole": eur * (1 / (1 - k) - 1),
+           "anno": posizione_anno_cambio(anno, fx), "coperte": [], "senza": [], "parziali": [], "illeggibili": [],
+           "aliquota": conseguenze.ALIQUOTA, "registro": operazioni is not None}
+    for t in sorted(qty):
+        c = carico_in_euro(operazioni, t)
+        if c is None:
+            out["senza"].append(t)
+        elif "illeggibile" in c:
+            out["illeggibili"].append((t, c["illeggibile"]))
+        elif abs(c["azioni"] - qty[t]) > 1e-6:
+            out["parziali"].append((t, c["azioni"], qty[t]))
+        elif px.get(t):
+            val = qty[t] * px[t] / fx
+            pnl = val - c["carico_eur"]
+            prezzo = qty[t] * px[t] / fx - c["carico_usd"] / fx
+            out["coperte"].append({"tk": t, "azioni": qty[t], "carico_eur": c["carico_eur"], "carico_usd": c["carico_usd"],
+                                   "fx_carico": c["fx_medio"], "valore_eur": val, "pnl_eur": pnl, "effetto_prezzo": prezzo,
+                                   "effetto_cambio": pnl - prezzo,
+                                   "imposta": pnl * conseguenze.ALIQUOTA if pnl > 0 else 0.0})
+    return out
+
+
+def righe_cambio(c):
+    """La resa del blocco: fatti in euro, nessun consiglio (il cambio non si prevede qui)."""
+    if not c:
+        return ["CAMBIO EURO/DOLLARO: nessun cambio disponibile in questo giro (ne' la BCE ne' la pipeline): l'esposizione "
+                "al dollaro in euro non si calcola — il dato che manca, non un valore nullo"]
+    a = c.get("anno")
+    L = [f"CAMBIO EURO/DOLLARO (v516) — EUR/USD {_it(c['fx'], 4)} ({c['fonte']})"]
+    if a:
+        pz = [f"nell'anno di osservazioni della BCE ({a['n']}, dal {_data_it(a['dal'])}): minimo {_it(a['minimo'][1], 4)} "
+              f"il {_data_it(a['minimo'][0])}, massimo {_it(a['massimo'][1], 4)} il {_data_it(a['massimo'][0])}"]
+        if a.get("percentile") is not None:
+            pz.append(f"oggi al {a['percentile']}° percentile")
+        if a.get("mese") is not None:
+            pz.append(f"{_sg(a['mese'], 1)}% in un mese")
+        pz.append(f"{_sg(a['anno'], 1)}% sull'anno")
+        L.append("  " + " · ".join(pz) + " — un euro piu' forte rende meno euro per ogni dollaro, e viceversa")
+    else:
+        L.append("  la storia del cambio non e' in questo giro (la BCE non letta: vale il solo valore di oggi)")
+    L.append(f"  in dollari: l'azionario, {_it(c['usd'], 0)} $ = {_it(c['eur'], 0)} €"
+             + (f", {art('il', _it(c['quota'] * 100, 1) + '%')} del patrimonio" if c.get("quota") is not None else "")
+             + f" · se l'euro sale {art('del', _it(EFFETTO_CAMBIO_PCT, 0) + '%')} sul dollaro, a prezzi fermi "
+             f"{_sg(c['euro_piu_forte'], 0)} €; se scende {art('del', _it(EFFETTO_CAMBIO_PCT, 0) + '%')}, "
+             f"{_sg(c['euro_piu_debole'], 0)} € (unita' di lettura, non una previsione)")
+    if not c.get("registro"):
+        L.append("  ⚠ il registro delle operazioni col cambio (LIBRO.md §1decies) e' ASSENTE: nessun carico in euro")
+        return L
+    for x in c["coperte"]:
+        L.append(f"  {x['tk']:5} carico {_it(x['carico_usd'], 0)} $ a EUR/USD {_it(x['fx_carico'], 4)} = "
+                 f"{_it(x['carico_eur'], 0)} € · oggi {_it(x['valore_eur'], 0)} € · in euro {_sg(x['pnl_eur'], 0)} € = "
+                 f"prezzo {_sg(x['effetto_prezzo'], 0)} € + cambio {_sg(x['effetto_cambio'], 0)} €"
+                 + (f" · se si vendesse oggi, imposta sulla plusvalenza in euro {_it(x['imposta'], 0)} € al "
+                    f"{_it(c['aliquota'] * 100, 0)}%"
+                    if x["imposta"] else (" · in euro e' una minusvalenza" if x["pnl_eur"] < 0 else "")))
+    if c["coperte"]:
+        L.append("  ⚠ il carico usa il cambio annotato nel registro: quello APPLICATO dal broker quando il CEO lo dichiara, "
+                 "altrimenti il riferimento BCE della seduta, che dal cambio del broker differisce per il suo margine; "
+                 "il conto fiscale definitivo lo fa il broker, commissioni comprese")
+    if c["parziali"]:
+        L.append("  carico in euro solo in parte nel registro: " + " · ".join(
+            f"{t} {_it(q, 0)} azioni su {_it(n, 0)}" for t, q, n in c["parziali"]) + " — risultato in euro non calcolabile")
+    if c["illeggibili"]:
+        L.append("  ⚠ righe del registro illeggibili: " + " · ".join(f"{t} ({r})" for t, r in c["illeggibili"]))
+    if c["senza"]:
+        L.append(f"  senza cambio di carico annotato (operazioni di prima del 30/10/2026): {', '.join(c['senza'])} — il "
+                 "risultato in euro e l'imposta li calcola il broker col cambio di ogni acquisto; qui valgono i dollari")
+    return L
+
+
 def nuova_riga(seduta, az, obb, barre, cassa_eur, pat, colore, precedente=None, adesso=None):
     """La riga della seduta CONCLUSA `seduta`. az {tk: quantita'} in dollari, obb {tk: nominale} in
     euro, pat = patrimonio_pipeline(). I prezzi si salvano per le posizioni di oggi E per quelle della
@@ -2634,6 +2835,13 @@ def sintesi(o):
     L += [f"Periodo {o['inizio']} -> {o['fine']} ({_conta(o['sedute'], 'seduta', 'sedute')}) · azionario {_it(o['tot_usd'], 0)} $",
          f"Libro {p(o['ret_libro'])} ({_sg(o['pnl_libro'], 0)} $) · QQQ {p(b['QQQ'])} · SMH {p(b['SMH'])} · SPY {p(b['SPY'])} · RSP {p(b['RSP'])}",
          f"21 sedute: libro {p(o['ret_21'],1)} · SMH {p(o['bench_21']['SMH'],1)} · QQQ {p(o['bench_21']['QQQ'],1)}"]
+    if o.get("dopo_seduta"):
+        # v516 — chi e' entrato dopo la seduta del blocco si valuta al prezzo di adesso e resta fuori dal periodo
+        L.append("  ⚠ operazioni DOPO la seduta del " + _data_it(o["fine"]) + ": " + ", ".join(
+            f"{t} ({_data_it(x['data'])}" + (f", valutata al prezzo di adesso, quota del {_data_it(x['quota'])})"
+                                             if x.get("quota") else ", senza quota: confronto col carico non fatto)")
+            for t, x in sorted(o["dopo_seduta"].items()))
+                 + " — la chiusura comune e' di prima dell'operazione: fuori dal risultato del periodo (LIBRO.md §1decies)")
     if o.get("avanti"):
         # v507 — chi ha gia' una barra piu' recente si nomina: «non c'e' nel conto» e «non e' arrivato» si leggono uguali
         L.append(f"  ⚠ seduta comune {o['fine']}: " + ", ".join(f"{t} ({d})" for t, d in sorted(o["avanti"].items()))
@@ -2664,6 +2872,8 @@ def sintesi(o):
         L.append(f"(stress: {', '.join(o['esclusi_matrice'])} senza storia sufficiente, propagati col beta del libro)")
     if o.get("attesa"):
         L.extend(righe_attesa(o["attesa"]))
+    if "cambio" in o:                     # v516
+        L.extend(righe_cambio(o["cambio"]))
     if "decisioni" in o:
         L.extend(righe_decisioni(o["decisioni"], (o.get("calendario") or {}).get("finestra") or 45))
     if "rimandate" in o:

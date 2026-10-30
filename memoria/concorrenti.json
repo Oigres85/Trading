@@ -411,6 +411,89 @@
         "Quantinuum",
         "Google (divisione)"
       ]
+    },
+    "GOOGL": {
+      "nome": "Alphabet",
+      "mercati": [
+        {
+          "mercato": "motori di ricerca nel mondo",
+          "misura": "quota delle pagine di risultati viste (tutte le piattaforme)",
+          "periodo": "agosto 2026",
+          "tipo": "misura",
+          "fonte": "StatCounter Global Stats, search engine market share worldwide",
+          "url": "https://gs.statcounter.com/search-engine-market-share",
+          "pubblicato": "2026-09",
+          "verificato_il": "2026-10-30",
+          "quote": [
+            {
+              "nome": "Google",
+              "ticker": "GOOGL",
+              "quota_pct": 91.1
+            },
+            {
+              "nome": "Bing (Microsoft)",
+              "ticker": "MSFT",
+              "quota_pct": 4.5
+            }
+          ],
+          "nota": "il mese di settembre 2026 (Google 89,9%, Bing 5,3%) risultava ancora parziale alla verifica; StatCounter misura le pagine viste dei siti che lo ospitano, non i ricavi pubblicitari"
+        }
+      ],
+      "concorrenti_quotati": [
+        "MSFT",
+        "AMZN",
+        "META"
+      ],
+      "concorrenti_non_quotati": [],
+      "mercati_condivisi": [
+        {
+          "da": "CRWV",
+          "mercato": "infrastruttura cloud nel mondo"
+        }
+      ]
+    },
+    "INTC": {
+      "nome": "Intel",
+      "mercati": [
+        {
+          "mercato": "processori x86 per PC (desktop e portatili)",
+          "misura": "quota delle unita' consegnate, IoT e SoC esclusi",
+          "periodo": "2° trimestre 2026",
+          "tipo": "misura",
+          "fonte": "Mercury Research (via TechSpot, agosto 2026)",
+          "url": "https://www.techspot.com/news/113569-amd-crosses-30-client-cpu-market-share-against.html",
+          "pubblicato": "2026-08",
+          "verificato_il": "2026-10-30",
+          "quote": [
+            {
+              "nome": "Intel",
+              "ticker": "INTC",
+              "quota_pct": 69.7,
+              "un_anno_prima_pct": 76.1
+            },
+            {
+              "nome": "AMD",
+              "ticker": "AMD",
+              "quota_pct": 30.3,
+              "un_anno_prima_pct": 23.9
+            }
+          ],
+          "nota": "numeri di seconda mano (la nota di Mercury non e' pubblica); Mercury stima anche Arm al 15,3% dei processori per PC, su una base che comprende gli Arm"
+        }
+      ],
+      "concorrenti_quotati": [
+        "AMD",
+        "NVDA",
+        "QCOM",
+        "ARM"
+      ],
+      "concorrenti_non_quotati": [],
+      "mercati_condivisi": [
+        {
+          "da": "AMD",
+          "mercato": "processori x86 per server"
+        }
+      ]
     }
   }
 }

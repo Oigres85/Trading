@@ -30,6 +30,8 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
+| GOOGL | 37 | 282,00 | USD | entrata dichiarata dal CEO (testuale: *"Registra entrata su Alphabet 282 con 37 azioni"*); la seduta è il **30/10/2026 o il 29/10**, da confermare: 282 cade nell'intervallo di tutte e due (29/10: 280,36–288,33; 30/10: 279,00–283,14). Carico in euro nel registro §1decies |
+| INTC | 130 | 64,50 | USD | acquisto del **30/10/2026** (testuale: *"Registra anche acquisto Intel prezzo 64.5 130 azioni"*), il giorno del −29,7% dopo i conti: 64,50 cade solo nell'intervallo di quella seduta (64,11–68,77). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 ⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
@@ -37,7 +39,10 @@ giornaliero (§1septies). Il CEO, testuale: *"Smci vendute 250 a 32,81 non mi fi
 speculazione"*. Plusvalenza (32,81 − 31,60) × 250 = **+302,50 $** (+3,8% in due sedute), imposta ~79 $ al 26% — il conto
 definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliati (§1bis).
 
-**Liquidità: ~47.040 €** IN TUTTO, bloccata compresa — **una stima, da confermare col saldo del broker**: i 45.000 €
+**Liquidità: ~30.195 €** IN TUTTO, bloccata compresa — **una stima, da confermare col saldo del broker**: ~47.040 € fino
+al 29/10, meno i due acquisti del 30/10 (§1decies) al riferimento BCE della seduta, 1,1172: GOOGL 37 × 282 = 10.434 $ ≈
+9.339 € e INTC 130 × 64,50 = 8.385 $ ≈ 7.505 €, 16.845 € in tutto (commissioni e margine di cambio del broker esclusi;
+se GOOGL è del 29/10, al riferimento di quel giorno, 1,1130, costa ~35 € in più). Storia dei ~47.040 €: i 45.000 €
 dichiarati dal CEO il 17/10/2026 (testuale: *"La liquiditita è di 45k"*), più la vendita di SMCI del 19/10 (250 × 32,81 $
 = 8.202,50 $ ≈ 7.317 € a EUR/USD 1,121, il cambio della pipeline quel giorno) e meno le due medie di CRWV, del 20/10
 (205 × 81,41 − 155 × 87,07 = 3.193,20 $ ≈ 2.842 € a 1,1236) e del 23/10 (255 × 76,14 − 205 × 81,41 = 2.726,65 $ ≈
@@ -112,11 +117,9 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | SMCI | Super Micro Computer — server AI, concorrente di DELL. **Venduta il 19/10/2026 a 32,81 $** (250 azioni comprate il 16/10 a 31,60): il CEO *"non mi fido per ora"*. Candidato di rotazione da CRWV dal 14/09/2026. Il 18/10: bilancio solido (Altman 6,77) e cassa dell'attività negativa (−6,8 miliardi di flusso operativo in 12 mesi, magazzino a 128 giorni) |
 | AMZN | Amazon — candidato d'ingresso (CEO, 02/10/2026). Diversifica in parte dal gruppo AI e porta ~15-20% di Anthropic. Livelli: acquisto 244-246 (supporto 244,30), uscita sotto SMA200 ~240. Trimestrale 29/10 |
 | STX | Seagate — candidato d'ingresso (CEO, 02/10/2026). Leader tecnologico dischi (HAMR), stesso ciclo di WDC. Livelli: ingresso vicino al supporto 758 solo se regge 2-3 sedute, o dopo la trimestrale 27-28/10; uscita sotto 758 |
-| GOOGL | Alphabet — uscito dal libro a ~+2% (fine settembre); rientro valutato sul supporto 327,74 o sopra 364 |
 | WDC | Western Digital — uscito dal libro a ~+2%; ciclo dischi in allentamento (Toshiba), indietro su HAMR |
 | TSM | TSMC — collo di bottiglia CoWoS; trimestrale 15/10 |
 | CBRS | Cerebras — quotata da maggio 2026; lock-up principale a meta' novembre, ~80% degli ordini da OpenAI |
-| INTC | Intel — in watchlist del CEO |
 | SPCX | SpaceX — in watchlist del CEO, quotata di recente (storia corta) |
 | TSLA | Tesla — in watchlist del CEO |
 | CEG | Constellation — nucleare esistente, correlazione bassa col libro (0,2-0,4); livelli 247 / ~270 |
@@ -332,7 +335,8 @@ tre mesi dopo SMH era più in alto —; in un mercato orso come il 2022 (semicon
 gradino avrebbe evitato circa 30.000 $ di perdite su quella parte. ⚠ Senza gradino l'esposizione è
 quella del libro intero: il 14/10 un Nasdaq −10% valeva −21,9% (−59.174 $).
 
-**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY.
+**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY, INTC.
+INTC entra il 30/10/2026, il giorno dell'acquisto, per la regola qui sotto: progetta e produce processori, è nel comparto.
 Il settore non è nei dati — la pipeline mette RGTI fra i semiconduttori e SK hynix no (v473) —
 quindi l'elenco sta qui, e un nome nuovo del comparto ci entra il giorno dell'acquisto. Le posizioni
 fuori dall'elenco si nominano a ogni analisi: un'omissione si vede.
@@ -883,6 +887,33 @@ diverse, che possono dire cose opposte:
   suo punteggio basso non viene dal circolante.
 - È **INFORMAZIONE**: non una prova della tenuta, non un colore, non una vendita. Lo stato operativo sta già, in altra
   forma, nella famiglia del bilancio della tenuta (§1sexies): non si conta due volte.
+
+## 1decies. OPERAZIONI E CAMBIO EURO/DOLLARO — ogni operazione col suo cambio (CEO, 30/10/2026, v516)
+
+Istruzione del CEO, testuale: *"in futuro quando effettuo operazioni (con broker sella X trading) valuta anche il cambio
+euro dollaro"*. Perché conta: il conto è in **euro**, quindi ogni acquisto in dollari converte euro al cambio del broker e
+ogni vendita li riconverte; e la **plusvalenza fiscale** di un titolo estero si calcola **in euro**, col cambio del giorno
+d'acquisto e di quello di vendita (art. 9 TUIR). Il cambio è parte del risultato: un titolo fermo in dollari può dare una
+plusvalenza o una minusvalenza in euro. `numeri_libro.py` legge questa tabella (blocco «CAMBIO EURO/DOLLARO»): carico in
+euro a costo medio ponderato, risultato in euro scomposto in **effetto del prezzo** ed **effetto del cambio**, imposta in
+euro se si vendesse oggi.
+
+| Data | Ticker | Operazione | Azioni | Prezzo $ | EUR/USD | Fonte del cambio | Note |
+|---|---|---|---|---|---|---|---|
+| 30/10/2026 | GOOGL | acquisto | 37 | 282,00 | 1,1172 | BCE, riferimento del 30/10/2026 | seduta da confermare: se è il 29/10, cambio BCE 1,1130 |
+| 30/10/2026 | INTC | acquisto | 130 | 64,50 | 1,1172 | BCE, riferimento del 30/10/2026 | |
+
+Regole del registro:
+- **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
+  **riferimento BCE della seduta** (14:15 CET), dichiarato nella colonna: dal cambio del broker differisce per il suo
+  margine, che il sistema non conosce;
+- una **vendita** si scrive con la sua riga: il carico in euro scende al costo medio, e la plusvalenza in euro è il
+  ricavato al cambio della vendita meno quel carico;
+- ⚠ **le operazioni di prima del 30/10/2026 non hanno il cambio annotato**: per quelle posizioni il risultato in euro e
+  l'imposta li calcola il broker, e il blocco le nomina invece di stimarle (v396). Se il CEO legge dall'estratto di Sella
+  i cambi dei suoi acquisti, si aggiungono qui e il blocco li usa;
+- ⚠ **da confermare col CEO**: se il conto Sella tiene in dollari il ricavato di una vendita invece di riconvertirlo,
+  anche la liquidità ha un'esposizione al cambio, che oggi il libro non porta (è scritta tutta in euro).
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

@@ -8854,3 +8854,53 @@ omonime con contenuti diversi), in una funzione da 500 righe.
   effettive del libro sono cadute su un intero («2 su 9 nomi») e la sonda pretendeva un decimale. È la classe v443 —
   *un check che dipende da quante cifre ha il numero di oggi* — per la terza volta (v432/v418, v443, ora qui). Il
   decimale è facoltativo; l'iniezione che rimette la formula a pesi uguali morde ancora.
+
+## 💱 v516 — IL CAMBIO EURO/DOLLARO NELLE OPERAZIONI, E UNA POSIZIONE VALUTATA SU UNA CHIUSURA DI PRIMA DELL'ACQUISTO
+
+Istruzione del CEO (30/10/2026), testuale: *"in futuro quando effettuo operazioni (con broker sella X trading) valuta
+anche il cambio euro dollaro"*, dopo due operazioni da registrare: *"Registra entrata su Alphabet 282 con 37 azioni"* e
+*"Registra anche acquisto Intel prezzo 64.5 130 azioni"*.
+
+**Perché il cambio è parte del risultato.** Il conto è in euro: ogni acquisto in dollari converte euro al cambio del
+broker, e la plusvalenza fiscale di un titolo estero si calcola **in euro**, col cambio del giorno d'acquisto e di
+quello di vendita (art. 9 TUIR). Un titolo fermo in dollari può quindi dare una plusvalenza o una minusvalenza in euro —
+il caso che il conto in dollari della v481 non vede, e un gate lo costruisce: euro da 1,20 a 1,00, titolo fermo, +166,67 €
+tutti di cambio, e l'imposta li conta.
+
+- **`memoria/LIBRO.md` §1decies**: il registro delle operazioni, ognuna col suo cambio e la fonte del cambio — quello
+  APPLICATO dal broker quando il CEO lo dichiara, altrimenti il riferimento BCE della seduta, che ne differisce per il
+  margine del broker. Le operazioni di prima del 30/10 non hanno il cambio annotato: quelle posizioni si **nominano** e
+  il conto in euro lo fa il broker (v396, v406).
+- **`numeri_libro.py`, blocco CAMBIO EURO/DOLLARO**: il cambio di oggi nel suo anno (260 osservazioni BCE, percentile
+  midrank, minimo e massimo datati), quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio nei due versi;
+  per le posizioni col cambio annotato il carico in euro a **costo medio ponderato** (il metodo del regime
+  amministrato), il risultato in euro come **somma** dell'effetto del prezzo e di quello del cambio (un'identità, che il
+  gate verifica come tale: v326) e l'imposta in euro se si vendesse oggi. Lo stesso cambio del patrimonio e del registro:
+  una lettura sola (v161), e il gate v481 l'ha preteso al primo giro.
+- **`FORMATO_ANALISI.md`**: la regola di ogni operazione (cambio della seduta, controvalore in euro, liquidità, dove sta
+  il cambio nel suo anno), e la chiave `[cambio]` nel registro delle richieste e nella scheda completa.
+
+### ⚠⚠ Il difetto trovato prima di pubblicare: INTC valutata alla chiusura del giorno prima dell'acquisto
+Al primo giro il blocco scriveva per INTC **«in euro +3.208 €»**: comprata il 30/10 a 64,50 (il giorno del −29,7% dopo i
+conti), ma `numeri_libro` misura sull'ultima seduta che **tutte** le serie portano (v507), e a seduta aperta era quella
+del 29/10, **92,07**. Lo stesso valeva per la colonna «vs carico» (+43%) e per la tenuta: un guadagno mai avvenuto, sul
+nome comprato quel giorno. Ora chi ha un'operazione registrata **dopo** la seduta del blocco si valuta al prezzo di
+adesso (la quota, con la sua seduta), esce dal risultato del periodo — in quelle quantità non era in portafoglio — e la
+riga lo dichiara. *Una media su una seduta comune è giusta per il periodo e sbagliata per chi non c'era* (classe v186).
+
+- **INTC entra fra i semiconduttori del libro** (§1ter), per la regola che lo dice da v484: *"un nome nuovo del comparto
+  ci entra il giorno dell'acquisto"*. L'ha segnalato il blocco del piano, che nomina chi resta fuori dall'elenco.
+- **GOOGL e INTC nel registro dei concorrenti** (gate v503: ogni posizione con la sua voce): motori di ricerca
+  (StatCounter, agosto 2026: Google 91,1%, Bing 4,5%) e processori x86 per PC (Mercury Research via TechSpot, 2°
+  trimestre 2026: Intel 69,7%, AMD 30,3%), più i mercati condivisi (cloud da CRWV, server x86 da AMD).
+- ⚠ **La seduta di GOOGL non è certa**: 282 cade nell'intervallo del 29/10 e del 30/10. Si registra la più recente e si
+  chiede al CEO (la regola nuova del formato); col 29/10 il carico costa ~35 € in più.
+- **Liquidità ~30.195 €** (stima): 47.040 meno 16.845 € al riferimento BCE del 30/10, 1,1172; `portfolio_state.json`
+  allineato (gate v479).
+
+### 🧪 Il metodo
+- **Dieci iniezioni** su due copie verificate per impronta, ripristino dallo snapshot: **mordono tutte**. Una — il
+  percentile senza midrank — non mordeva al primo giro, e il difetto era la **fixture**: nessuna osservazione era uguale
+  al cambio di oggi, e contare le pari per intero dava lo stesso numero. Aggiunte 40 osservazioni uguali, morde (v430).
+- Pavimento di `test_analisi_libro.py` 910 → 920 (937 punti di chiamata, 947 check). `?v=` e `BUILD_VERSION` non
+  toccati: nessun file servito al browser (v440).

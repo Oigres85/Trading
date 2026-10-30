@@ -62,6 +62,7 @@ SEZIONI = (
     ("semaforo", "0 · Semaforo d'uscita"),
     ("salvavita", "0 · Salvavita e piano di riduzione"),
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
+    ("cambio", "0bis · Cambio euro/dollaro: l'esposizione del libro al dollaro e le operazioni col loro cambio"),  # v516
     ("decisioni", "0bis · Decisioni aperte e rimandate"),
     ("ordini", "0bis · Ordini aperti"),
     ("credito_libro", "0ter · Credito sul libro"),
@@ -106,6 +107,7 @@ TIPI = (
                   "portafoglio — rotazione.py"),
     ("liquidita", "Piano per la liquidità: cosa fa al libro un'unità di 5.000 € — rotazione.py"),
     ("rischio", "Peso, quota del rischio e risultato del periodo — numeri_libro.py"),
+    ("cambio", "Carico in euro, risultato in euro fra prezzo e cambio, imposta in euro — numeri_libro.py"),   # v516
     ("piano_riduzione", "Se scatta il salvavita: il gradino del piano di riduzione — numeri_libro.py"),
     ("premarket", "Prezzo esteso (pre-market o after-hours) — numeri_libro.py --esteso"),
     ("mossi", "Oltre la propria ampiezza nell'ultima seduta — brief.py"),
@@ -124,7 +126,7 @@ BREVI = {"tenuta": "tenuta", "watchlist": "watchlist e ingresso", "liquidita": "
          "rischio": "peso e rischio", "piano_riduzione": "piano di riduzione", "premarket": "prezzo esteso",
          "mossi": "mossi oltre l'ampiezza", "trimestrale": "trimestrale", "schede": "schede del progetto",
          "concorrenti": "concorrenti", "opzioni": "opzioni", "gamma": "gamma dei dealer", "dark_pool": "dark pool",
-         "notizie": "notizie", "fine_anno": "fine anno"}
+         "notizie": "notizie", "fine_anno": "fine anno", "cambio": "cambio euro/dollaro"}
 
 
 @dataclass(frozen=True)
@@ -171,6 +173,7 @@ CATALOGO = {
         Blocco(r"Vol [0-9]", "rischio", (Nome(rf"  {TK} +peso ", "rischio", "copia"),)),
         Blocco(r"COSTO DELL'ATTESA", "attesa"),
         Blocco(r"SCADENZE", "attesa"),
+        Blocco(r"CAMBIO EURO/DOLLARO", "cambio", (Nome(rf"  {TK} +carico ", "cambio", "copia"),)),        # v516
         Blocco(r"DECISIONI APERTE", "decisioni"),
         Blocco(r"RIMANDATE DI PROPOSITO", "decisioni"),
         Blocco(r"ORDINI APERTI", "ordini"),
@@ -258,6 +261,7 @@ REGISTRO = {
     "fine_anno": Voce(("fine_anno",)),                                                               # v512
     "semaforo": Voce(("semaforo",)),
     "attesa": Voce(("attesa",)),
+    "cambio": Voce(("cambio",)),                                                                       # v516
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),
     "schede": Voce(("schede_testa",), (Marcatore("schede", None, "tutti"),)),
     "credito_libro": Voce(("credito_libro",)),
