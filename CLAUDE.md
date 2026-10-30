@@ -9014,5 +9014,10 @@ scelta da fare in silenzio.
 - ⚠ **L'iniezione sul registro delle domande è stata scelta due volte.** La prima toglieva «GOOGL» dalla riga della
   domanda: non mordeva, perché anche la domanda sul cambio nomina GOOGL. *L'iniezione va scelta fra i casi che il gate
   DEVE prendere* (v389): la seconda aggiunge un «da confermare» su MU, che nessuna domanda nomina, e morde.
+- ⚠ **Il primo rapporto, letto come il destinatario, aveva un avviso che suona sempre**: fuori da un'analisi — a fine di
+  un giro di lavoro, che è quando il CEO ha chiesto il controllo — le letture del giro sono per forza più vecchie di 30
+  minuti, e le due righe uscivano ⚠ ogni volta. L'allarme vale solo dentro un'analisi (`analisi.py` passa `--giro`);
+  fuori la riga dice l'età senza ⚠. Trovato leggendo l'uscita, non dai gate (v412, v413). Due iniezioni in più: **22 su
+  22 mordono**.
 - Pavimento di `test_analisi_libro.py` 940 → 950 (976 check). `?v=` e `BUILD_VERSION` non toccati: nessun file servito al
   browser (v440).

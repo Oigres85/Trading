@@ -131,7 +131,7 @@ def comandi(f, sedute=1):
     c.append(("CONCORRENTI E QUOTE DI MERCATO — chi sono, quanta parte del mercato hanno (fonte e data), e la salute "
               "con le stesse formule per tutti", ["concorrenti.py"]))
     c.append(("STATO DEL SISTEMA — codice e test, pipeline su GitHub, dati del giro, dipendenze da GitHub con la loro "
-              "data, coerenza del libro, domande aperte al CEO", ["stato_sistema.py"]))
+              "data, coerenza del libro, domande aperte al CEO", ["stato_sistema.py", "--giro"]))
     return c
 
 

@@ -9085,10 +9085,18 @@ with _tf518.TemporaryDirectory() as _dir518:
                                    "cds": {"esito": "non letto"}}), encoding="utf-8")
     _g2 = "\n".join(SS.righe_giro(SS.stato_giro(_ad518, {"fonti_dirette": Path(_dir518) / "manca.json",
                                                          "fonti_titoli": _ft518})))
+    _ft518.write_text(_json.dumps({"letto": (_ad518 - _td518(hours=2)).isoformat(), "analisti": {"esito": "letto"}}),
+                      encoding="utf-8")
+    _g3 = "\n".join(SS.righe_giro(SS.stato_giro(_ad518, {"fonti_dirette": _fd518, "fonti_titoli": _ft518}),
+                                  nel_giro=False))
 check("v518 le letture del giro: fresca con le serie e quelle NON lette alla fonte nominate; oltre i 30 minuti di "
       "validita' «non e' la lettura di questo giro»; assente «nessuna lettura»; un blocco per titolo non letto si nomina",
       "2 serie" in _g1 and "non lette alla fonte: cpi" in _g1 and "non e' la lettura di questo giro" in _g1
       and "NESSUNA lettura su disco" in _g2 and "dati per titolo da guardare: cds" in _g2, _g1 + "\n" + _g2)
+check("v518 fuori da un'analisi (a fine di un giro di lavoro) una lettura vecchia e' il caso normale: si dice senza ⚠, "
+      "altrimenti l'avviso suonerebbe a ogni giro e smetterebbe di essere letto (v421, v427)",
+      "fuori da un'analisi e' normale" in _g3 and "non e' la lettura di questo giro" not in _g3
+      and SS.AVVISO not in _g3.split("dati per titolo")[1], _g3)
 
 # --- le dipendenze da GitHub: l'elenco e' quello di fonti_dirette, nei DUE versi (v387, v406) ---
 _dd518 = SS.date_dipendenze({"updated_at": "2026-10-30T17:29:00Z", "macro": {"margin_debt": {"date": "2026-09-01"}},
@@ -9207,7 +9215,8 @@ check("v518 collegamento: lo stato del sistema e' l'ULTIMO comando in ogni fase,
       "scheda completa lo porta nella sezione 9 e il registro ha la sua chiave; il formato ha il passo, la sezione 9 della "
       "risposta e la voce del registro; /aggiorna lo esegue fra i suoi passi",
       "stato_sistema.py" in _AN518.STRUMENTI and _AN518.DOPO == ("stato_sistema.py",)
-      and all(_AN518.comandi(f)[-1][1] == ["stato_sistema.py"] for f in ("pre-market", "seduta", "after-hours", "chiuso"))
+      and all(_AN518.comandi(f)[-1][1] == ["stato_sistema.py", "--giro"]
+              for f in ("pre-market", "seduta", "after-hours", "chiuso"))
       and "+ esegui(coda_l)" in _cmain518 and "x not in coda_l" in _cmain518
       and "stato_sistema" in SC.REGISTRO and "stato_sistema" in SC.CATALOGO
       and any(b.sezione == "stato_sistema" for b in SC.CATALOGO["stato_sistema"].blocchi)

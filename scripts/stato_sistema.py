@@ -324,7 +324,9 @@ def stato_giro(adesso, percorsi=None):
     return out
 
 
-def righe_giro(g):
+def righe_giro(g, nel_giro=True):
+    """nel_giro: lo stato gira dentro un'analisi (analisi.py passa --giro). Fuori, a fine di un giro di lavoro, una lettura
+    piu' vecchia di 30 minuti e' il caso normale: dirlo con ⚠ ogni volta sarebbe un avviso che suona sempre (v421, v427)."""
     L = ["DATI DI QUESTO GIRO — letti qui, alla fonte, all'ora dell'analisi (v511, v512)"]
     nomi = {"fonti_dirette": "serie macro (fonti_dirette.py)", "fonti_titoli": "dati per titolo (fonti_titoli.py)"}
     for k, nome in nomi.items():
@@ -335,6 +337,9 @@ def righe_giro(g):
             continue
         fresca = r["minuti"] is not None and r["minuti"] <= r["validita"]
         quando = f"letta alle {ora_it(r['letto'])} ({eta_testo(r['minuti'] / 60)})"
+        if not fresca and not nel_giro:
+            L.append(f"  {nome}: ultima lettura {quando} — fuori da un'analisi e' normale: la prossima analisi la rifa'")
+            continue
         if not fresca:
             L.append(f"  {AVVISO} {nome}: {quando}, oltre i {r['validita']} minuti in cui gli strumenti la riusano — "
                      "non e' la lettura di questo giro: gli strumenti hanno usato la pipeline")
@@ -589,7 +594,7 @@ def _sezione(f, *a, **k):
         return [f"{f.__name__.replace('righe_', '').upper()} — {AVVISO} NON CONTROLLATO: {type(e).__name__}: {e}"]
 
 
-def rapporto(adesso=None, rete=True, git=_git, gh=_gh, dati=None):
+def rapporto(adesso=None, rete=True, git=_git, gh=_gh, dati=None, nel_giro=False):
     adesso = adesso or datetime.now(timezone.utc)
     if dati is None:
         try:
@@ -604,7 +609,7 @@ def rapporto(adesso=None, rete=True, git=_git, gh=_gh, dati=None):
         blocchi.append(righe_pipeline(pipe, adesso))
     except Exception as e:
         blocchi.append([f"PIPELINE SU GITHUB — {AVVISO} NON CONTROLLATA: {type(e).__name__}: {e}"])
-    blocchi.append(_sezione(lambda: righe_giro(stato_giro(adesso))))
+    blocchi.append(_sezione(lambda: righe_giro(stato_giro(adesso), nel_giro)))
     blocchi.append(_sezione(lambda: righe_dipendenze(dati, pipe)))
     blocchi.append(_sezione(lambda: righe_coerenza(coerenza_libro(oggi=adesso.astimezone(ROMA).date()))))
     oggi = adesso.astimezone(ROMA).date()
@@ -630,8 +635,9 @@ def rapporto(adesso=None, rete=True, git=_git, gh=_gh, dati=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--senza-rete", action="store_true", help="niente git fetch ne' API di GitHub")
+    ap.add_argument("--giro", action="store_true", help="dentro un'analisi: le letture del giro devono esserci")
     a = ap.parse_args()
-    testo, _, _ = rapporto(rete=not a.senza_rete)
+    testo, _, _ = rapporto(rete=not a.senza_rete, nel_giro=a.giro)
     print(testo)
 
 
