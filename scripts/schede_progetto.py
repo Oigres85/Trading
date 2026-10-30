@@ -122,10 +122,67 @@ def riferimento_valutazione(macro):
             + (" · ".join(rif) if rif else "n.d. (la pipeline non lo pubblica)")
             + " — fonti e basi diverse da quelle dei titoli (orizzonte, definizione dell'utile): un confronto "
             "indicativo, non una misura · il P/E e' una METRICA, non una prova della tenuta (§1sexies)"
+            # v517 — la convenzione del PEG, una volta per blocco (v407)
+            + f" · PEG = P/E diviso la crescita attesa dell'utile in punti percentuali: sotto {_n(PEG_SOGLIA, 0)} la "
+            "crescita attesa costa poco rispetto al prezzo (la lettura di Lynch: una convenzione, v240); quello "
+            "«sull'esercizio prossimo» e' calcolato qui sul consenso della stessa tabella (esercizio in corso e "
+            "prossimo, stessa base), quello dell'aggregatore ha una crescita non dichiarata"
             # v500 — il 18/10 l'uscita portava "prospettico 19,2× [WSJ]" qui e "19,0× (FactSet)" nel blocco INDICI: due
             #   valori per lo stesso nome di grandezza. Sono due definizioni dell'utile atteso, e si dice (v499)
             + " · il blocco INDICI porta il prospettico di FactSet e la storia di ciascuna fonte: utili attesi "
             "definiti in modo diverso, quindi i due prospettici non si confrontano fra loro")
+
+
+# ═══════ v517 — IL PEG CON LA SUA CRESCITA DICHIARATA (CEO, 30/10/2026: «Se possibile ed utile aggiungere come
+# parametro rapporto PEG») ═══════
+# Il PEG c'era gia' (v492), quello dell'aggregatore, con una riserva: la crescita su cui e' calcolato non e' dichiarata.
+# Misurato prima di aggiungerne un altro: un PEG nostro sull'utile degli ultimi 12 mesi contro quello atteso e' INSERVIBILE
+# — CRWD +2.585% di crescita, MRK +633%, ABBV +358%: utile contabile depresso contro stima rettificata, due basi (v193).
+# Quello che regge e' sulla STESSA tabella del consenso (eps_trend): P/E sull'esercizio prossimo diviso la crescita del
+# consenso dall'esercizio in corso al prossimo. Stessa fonte, stessa base, esercizi dichiarati.
+PEG_DISTORTO = 100.0    # crescita del consenso oltre il 100% in un esercizio: viene da un utile in corso depresso (v240)
+PEG_SOGLIA = 1.0        # la lettura di Lynch: sotto 1 la crescita attesa costa poco rispetto al prezzo — convenzione
+
+
+def peg_esercizio(r):
+    """Il PEG sull'esercizio prossimo: {"peg", "pe1", "crescita", "distorto"}; {"motivo"} quando non e' definito
+    (un utile negativo, un consenso che non cresce); None quando la riga non porta il consenso dell'esercizio in corso
+    (uno snapshot precedente alla v517) o il prezzo. Il prezzo e' quello della riga: il vivo negli ingressi, quello del
+    run nelle schede."""
+    r = r or {}
+    a = r.get("analisti") or {}
+    e0, e1, px = a.get("eps_anno_corrente"), a.get("eps_ora"), r.get("px") or r.get("price")
+    if e1 is None or not px:
+        return None
+    if e0 is None:
+        return {"motivo": "manca"}
+    if e0 <= 0 or e1 <= 0:
+        return {"motivo": "perdita", "e0": e0, "e1": e1}
+    g = (e1 / e0 - 1) * 100
+    pe1 = px / e1
+    if g <= 0:
+        return {"motivo": "non cresce", "pe1": pe1, "crescita": g}
+    return {"peg": pe1 / g, "pe1": pe1, "crescita": g, "distorto": g > PEG_DISTORTO}
+
+
+def testo_peg(p):
+    if p is None:
+        return None
+    if p.get("motivo") == "manca":
+        return ("PEG sull'esercizio prossimo n.d.: la riga non porta il consenso dell'esercizio in corso (snapshot "
+                "precedente alla v517) — il dato che manca, non un PEG nullo")
+    if p.get("motivo") == "perdita":
+        return ("PEG sull'esercizio prossimo non definito: un utile negativo (dell'esercizio in corso o del prossimo) "
+                "non ha un P/E ne' una crescita in percentuale")
+    if p.get("motivo") == "non cresce":
+        return (f"PEG sull'esercizio prossimo non definito: il consenso dell'esercizio prossimo e' piu' basso di quello "
+                f"in corso ({_sg1(p['crescita'])}%), e un PEG senza crescita non ha senso")
+    t = (f"PEG sull'esercizio prossimo {_n(p['peg'], 2)} (P/E {_n(p['pe1'])}× sul consenso dell'esercizio prossimo, "
+         f"crescita del consenso {_sg1(p['crescita'])}% dall'esercizio in corso)")
+    if p["distorto"]:
+        t += (f" ⚠ una crescita oltre {art('il', _n(PEG_DISTORTO, 0) + '%')} in un esercizio viene da un utile dell'esercizio "
+              "in corso depresso, non dal ritmo della societa': questo PEG non misura la crescita")
+    return t
 
 
 def riga_valutazione(r):
@@ -174,6 +231,9 @@ def riga_valutazione(r):
     if eo is not None and ef is not None and abs(eo - ef) > max(0.05, abs(ef) * 0.05):
         pz.append(f"⚠ la riga delle revisioni porta un altro utile atteso ({_n(eo, 2)}): due campi distinti "
                   "dell'aggregatore, e non e' stabilito che descrivano lo stesso esercizio")
+    tp = testo_peg(peg_esercizio(r))            # v517 — accanto, mai al posto: sono due misure con due basi
+    if tp:
+        pz.append(tp)
     if st.get("peg") is not None:
         pz.append(f"PEG {_n(st['peg'], 2)} (dell'aggregatore: la crescita su cui e' calcolato non e' dichiarata)")
     return "valutazione: " + " · ".join(pz)

@@ -78,7 +78,9 @@ MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzi
            RADICE / "memoria" / "dark_pool.jsonl", RADICE / "memoria" / "indici.jsonl",
            RADICE / "memoria" / "concorrenti_dati.json",
            # v512 — i giorni di ICE che lo storico della pipeline non ha: la pipeline li unisce al run dopo
-           RADICE / "memoria" / "cds_sessione.jsonl")
+           RADICE / "memoria" / "cds_sessione.jsonl",
+           # v517 — le menzioni di WallStreetBets: la fonte pubblica solo le ultime 24 ore, lo storico si raccoglie qui
+           RADICE / "memoria" / "wsb.jsonl")
 LIMITE_SECONDI = 600
 
 

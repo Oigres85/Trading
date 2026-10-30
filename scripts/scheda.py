@@ -88,6 +88,7 @@ SEZIONI = (
     ("flottante", "5bis · Flottante e diluizione: azioni in circolazione, flottante, rotazione, quotazione"),
     ("cftc", "5bis · Grandi operatori (CFTC)"),
     ("bitcoin", "5bis · Bitcoin dall'ultima chiusura USA"),
+    ("wsb", "5bis · WallStreetBets: l'attenzione dei piccoli investitori sui nomi del libro"),                # v517
     ("indici", "5ter · Indici: S&P 500 e Nasdaq-100"),
     ("concorrenti", "5quater · Concorrenti e quote di mercato"),
     ("tenuta", "6 · Tenuta delle posizioni"),
@@ -118,6 +119,7 @@ TIPI = (
     ("opzioni", "Opzioni — posizionamento.py"),
     ("gamma", "Gamma dei dealer — posizionamento.py"),
     ("dark_pool", "Dark pool — posizionamento.py"),
+    ("wsb", "WallStreetBets: rango e menzioni delle ultime 24 ore — posizionamento.py"),                     # v517
     ("notizie", "Notizie ultimissime (72 ore) — numeri_libro.py e rotazione.py"),
     ("fine_anno", "Calendario fiscale di fine anno: il risultato dell'anno e la capitalizzazione — rotazione.py"),   # v512
 )
@@ -126,7 +128,7 @@ BREVI = {"tenuta": "tenuta", "watchlist": "watchlist e ingresso", "liquidita": "
          "rischio": "peso e rischio", "piano_riduzione": "piano di riduzione", "premarket": "prezzo esteso",
          "mossi": "mossi oltre l'ampiezza", "trimestrale": "trimestrale", "schede": "schede del progetto",
          "concorrenti": "concorrenti", "opzioni": "opzioni", "gamma": "gamma dei dealer", "dark_pool": "dark pool",
-         "notizie": "notizie", "fine_anno": "fine anno", "cambio": "cambio euro/dollaro"}
+         "notizie": "notizie", "fine_anno": "fine anno", "cambio": "cambio euro/dollaro", "wsb": "WallStreetBets"}
 
 
 @dataclass(frozen=True)
@@ -218,6 +220,7 @@ CATALOGO = {
         Blocco(r"DARK POOL", "dark_pool", (Nome(rf"  {TK}: DPI", "dark_pool", "copia"),)),
         Blocco(r"GRANDI OPERATORI", "cftc"),
         Blocco(r"BITCOIN", "bitcoin"),
+        Blocco(r"WALLSTREETBETS", "wsb", (Nome(rf"  {TK} +\[", "wsb", "copia"),)),                              # v517
     )),
     "indici": Strumento("indici", (
         Blocco(r"INDICI|VALUTAZIONE|STAGIONE DELLE TRIMESTRALI|VOLATILITA'|SENTIMENT|STAGIONALITA' DEL NASDAQ|CONCENTRAZIONE|"
@@ -301,6 +304,8 @@ REGISTRO = {
     "opzioni": Voce(("putcall", "scadenze_opzioni", "opzioni"), (Marcatore("opzioni", None, "posizioni"),)),
     "cftc": Voce(("cftc",)),
     "bitcoin": Voce(("bitcoin",)),
+    "wsb": Voce(("wsb",)),                                                                             # v517
+    "peg": Voce((), (Marcatore("schede", "PEG sull'esercizio prossimo", None, dentro=True),)),          # v517
     "cds": Voce(("cds",), (Marcatore("schede", "CDS 5 anni", "tutti"),)),
     "dark_pool": Voce(("dark_pool",), (Marcatore("dark_pool", None, None),)),
     "short": Voce(("short",), (Marcatore("schede", "short:", "tutti"),)),                     # v506

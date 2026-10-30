@@ -1049,6 +1049,171 @@ def righe_gex(g, errori=None):
     return L
 
 
+# ══════════ v517 — WALLSTREETBETS: L'ATTENZIONE DEI PICCOLI INVESTITORI (CEO, 30/10/2026: «Osserva anche il forum
+# WallStreetBets») ══════════
+# Reddit risponde 403 da qui (misurato il 12/09 e il 30/10/2026). ApeWisdom pubblica, gratis e senza chiave, per ogni
+# titolo citato su r/wallstreetbets il rango, le menzioni delle ultime 24 ore (finestra MOBILE), quelle di 24 ore prima e
+# i voti: 649 titoli in 7 pagine, ~0,7 s a pagina, misurato. Tradestie pubblica un «sentiment» calcolato con un modello
+# di linguaggio che non dichiara: resta fuori, perche' un punteggio di cui non si conosce la costruzione non si legge.
+# ⚠⚠ I POST NON SONO UNA FONTE DI FATTI (la regola v451: un LLM aveva marcato [VERIFICATO] delle medie mobili con
+#   fonte Reddit). Si contano le menzioni: dicono dove guarda la folla, non dove andra' il prezzo — informazione, non
+#   una prova della tenuta.
+URL_WSB = "https://apewisdom.io/api/v1.0/filter/wallstreetbets/page/{n}"
+CACHE_WSB = RADICE / "memoria" / "wsb.jsonl"
+CLASSI_WSB = {"GOOGL": ("GOOGL", "GOOG"), "BRK-B": ("BRK.B", "BRK.A")}   # una societa', piu' classi: le menzioni si sommano
+IMPENNATA_X = 3.0         # menzioni almeno 3 volte quelle di 24 ore prima (convenzione, v240)
+IMPENNATA_MIN = 20        # e almeno 20: sotto, un rapporto fra numeri piccoli e' rumore
+PRIMI_WSB = 10            # i piu' citati del forum, accanto ai nomi del libro
+RANGO_RIGA_WSB = 50       # un sorvegliato oltre il 50° posto e senza impennata sta nella riga compatta (convenzione)
+GIORNI_WSB = 400
+
+
+def leggi_wsb(leggi=scarica, paralleli=4):
+    """Tutte le pagine di ApeWisdom per r/wallstreetbets: {"righe", "dichiarate", "pagine"}. Solleva se la prima pagina
+    non si legge: «non letto» e «nessun titolo citato» si leggono uguali e sono due cose diverse (v389)."""
+    j = json.loads(leggi(URL_WSB.format(n=1)))
+    pagine = int(j.get("pages") or 1)
+    righe = list(j.get("results") or [])
+    if pagine > 1:
+        with ThreadPoolExecutor(paralleli) as ex:
+            for jj in ex.map(lambda n: json.loads(leggi(URL_WSB.format(n=n))), range(2, pagine + 1)):
+                righe += jj.get("results") or []
+    return {"righe": righe, "dichiarate": j.get("count"), "pagine": pagine}
+
+
+def _nome_wsb(ticker):
+    """Il ticker del libro di un ticker del forum: GOOG → GOOGL (classi della stessa societa')."""
+    t = str(ticker or "").upper()
+    return next((k for k, cl in CLASSI_WSB.items() if t in cl), t)
+
+
+def wsb_nome(righe, tk):
+    """Un nome del libro sul forum, con le classi della stessa societa' sommate. None = fuori dai titoli che la fonte
+    elenca nelle ultime 24 ore: non «zero menzioni», che la fonte non dichiara."""
+    rr = [r for r in righe or [] if _nome_wsb(r.get("ticker")) == tk]
+    if not rr:
+        return None
+    pv = [r.get("mentions_24h_ago") for r in rr]
+    return {"rango": min(int(r["rank"]) for r in rr), "menzioni": sum(int(r.get("mentions") or 0) for r in rr),
+            "prima": None if all(v is None for v in pv) else sum(int(v or 0) for v in pv),
+            "voti": sum(int(r.get("upvotes") or 0) for r in rr), "classi": sorted(str(r["ticker"]) for r in rr)}
+
+
+def impennata(x):
+    """L'attenzione che esplode: almeno IMPENNATA_MIN menzioni e almeno IMPENNATA_X volte quelle di 24 ore prima (o un
+    nome che 24 ore prima la fonte non elencava). Una convenzione, dichiarata (v240)."""
+    if not x or x["menzioni"] < IMPENNATA_MIN:
+        return False
+    return not x["prima"] or x["menzioni"] >= IMPENNATA_X * x["prima"]
+
+
+def leggi_memoria_wsb(p=CACHE_WSB):
+    out = {}
+    try:
+        for r in Path(p).read_text(encoding="utf-8").splitlines():
+            if r.strip():
+                x = json.loads(r)
+                out[x["d"]] = x
+    except (OSError, ValueError, KeyError):
+        pass
+    return out
+
+
+def registra_wsb(memoria, letto, universo, adesso):
+    """Una riga per giorno di New York, l'ULTIMA lettura del giorno: la finestra della fonte e' di 24 ore mobili, quindi
+    due giorni letti a ore diverse non coprono le stesse ore — si dichiara accanto al percentile. Solo i nomi seguiti."""
+    d = oggi_ny(adesso).isoformat()
+    tot = sum(int(r.get("mentions") or 0) for r in letto["righe"])
+    memoria[d] = {"d": d, "letto": adesso.isoformat(), "totale": tot, "titoli": len(letto["righe"]),
+                  "nomi": {tk: (wsb_nome(letto["righe"], tk) or {}).get("menzioni") for tk in universo}}
+    for k in sorted(memoria)[:-GIORNI_WSB]:
+        memoria.pop(k, None)
+    return memoria
+
+
+def scrivi_memoria_wsb(memoria, p=CACHE_WSB):
+    Path(p).write_text("".join(json.dumps(memoria[k], ensure_ascii=False) + "\n" for k in sorted(memoria)),
+                       encoding="utf-8")
+
+
+def storia_wsb(memoria, tk, oggi, minimo=MIN_STORIA):
+    """Il percentile delle menzioni di oggi fra i giorni raccolti PRIMA di oggi (un nome fuori elenco conta zero in
+    quei giorni: la fonte elencava tutti i titoli citati). Sotto `minimo` giorni nessun percentile."""
+    gg = [r for d, r in sorted(memoria.items()) if d < oggi]
+    if len(gg) < minimo:
+        return {"giorni": len(gg)}
+    serie = [(r.get("nomi") or {}).get(tk) or 0 for r in gg]
+    ora = ((memoria.get(oggi) or {}).get("nomi") or {}).get(tk) or 0
+    return {"giorni": len(gg), "percentile": _rango(_pct_rank(ora, serie)), "dal": gg[0]["d"]}
+
+
+def righe_wsb(letto, pos, sorv, memoria, adesso, errore=None):
+    """La resa del blocco: il forum di oggi, i nomi del libro e dei sorvegliati, chi non e' citato, la memoria."""
+    if errore or letto is None:
+        return [f"WALLSTREETBETS: NON letto ({errore or 'nessuna risposta'}) — il dato che manca, non un forum muto"]
+    righe = letto["righe"]
+    tot = sum(int(r.get("mentions") or 0) for r in righe)
+    L = [f"WALLSTREETBETS — l'attenzione dei piccoli investitori (ApeWisdom su r/wallstreetbets: menzioni delle ultime 24 "
+         f"ore, finestra mobile; letta alle {adesso.astimezone(ROMA):%H:%M} ora italiana)",
+         "  ⚠ attenzione, non fatti: i post del forum non sono una fonte di fatti (regola v451) — si contano le menzioni. "
+         f"Impennata (convenzione): almeno {NL._it(IMPENNATA_X, 0)} volte le menzioni di 24 ore prima e almeno "
+         f"{IMPENNATA_MIN}. Dice dove guarda la folla, non dove andra' il prezzo: informazione, non una prova della tenuta"]
+    if not righe:
+        L.append("  la fonte ha risposto senza titoli citati: letto e vuoto, non «non letto»")
+        return L
+    if letto.get("dichiarate") is not None and len(righe) != int(letto["dichiarate"]):
+        L.append(f"  ⚠ lette {len(righe)} righe su {letto['dichiarate']} dichiarate dalla fonte: l'elenco e' incompleto")
+    ruolo = {**{t: "in posizione" for t in pos}, **{t: "sorvegliato" for t in sorv if t not in pos}}
+    primi = []
+    for r in sorted(righe, key=lambda r: int(r.get("rank") or 10 ** 6))[:PRIMI_WSB]:
+        nb = _nome_wsb(r.get("ticker"))
+        primi.append(f"{r['rank']} {r['ticker']} {NL._it(int(r.get('mentions') or 0), 0)}"
+                     + (f" ({ruolo[nb]}" + (f", come {nb}" if nb != r["ticker"] else "") + ")" if nb in ruolo else ""))
+    L.append(f"  il forum di oggi: {len(righe)} titoli citati, {NL._it(tot, 0)} menzioni · i piu' citati: " + " · ".join(primi))
+    oggi = oggi_ny(adesso).isoformat()
+    voci, fuori = [], []
+    for tk, ru in ruolo.items():
+        x = wsb_nome(righe, tk)
+        if x is None:
+            fuori.append(tk)
+        else:
+            voci.append((tk, ru, x))
+    imp = sorted(((tk, x) for tk, _ru, x in voci if impennata(x)), key=lambda v: (-v[1]["menzioni"], v[0]))
+    L.append("  impennate fra i nomi del libro e i sorvegliati: " + (" · ".join(
+        f"{tk} {NL._it(x['menzioni'], 0)} da " + (f"{NL._it(x['prima'], 0)} ({NL._it(x['menzioni'] / x['prima'], 1)}×)"
+                                                   if x["prima"] else "fuori elenco 24 ore prima") for tk, x in imp)
+                                                                      if imp else "nessuna"))
+    giorni = storia_wsb(memoria, "", oggi).get("giorni", 0)
+    if giorni < MIN_STORIA:
+        L.append(f"  percentile delle menzioni di ogni nome sui giorni raccolti: da {MIN_STORIA} giorni prima di oggi, "
+                 f"oggi {giorni} — la memoria comincia il {_gma(min(memoria)) if memoria else 'n.d.'}, una lettura per giorno")
+    compatti = []
+    for tk, ru, x in sorted(voci, key=lambda v: (v[1] != "in posizione", v[2]["rango"])):
+        if ru == "sorvegliato" and x["rango"] > RANGO_RIGA_WSB and not impennata(x):
+            compatti.append(f"{tk} {x['rango']}°/{NL._it(x['menzioni'], 0)}")
+            continue
+        st = storia_wsb(memoria, tk, oggi)
+        q = x["menzioni"] / tot * 100 if tot else 0.0
+        s = (f"  {tk:5} [{ru}] {x['rango']}° · {NL._it(x['menzioni'], 0)} {'menzione' if x['menzioni'] == 1 else 'menzioni'} "
+             + (f"(24 ore prima: {NL._it(x['prima'], 0)})" if x["prima"] is not None else "(24 ore prima: fuori elenco)")
+             + f" · {NL._it(x['voti'], 0)} voti · "
+             + (f"{art('il', NL._it(q, 1) + '%')} delle menzioni del forum" if q >= 0.05 else "meno dello 0,1% delle menzioni del forum"))
+        if len(x["classi"]) > 1:
+            s += f" · classi sommate: {'+'.join(x['classi'])}"
+        if st.get("percentile") is not None:
+            s += f" · {st['percentile']}° percentile dei {st['giorni']} giorni raccolti dal {_gma(st['dal'])}"
+        L.append(s)
+    if compatti:
+        L.append(f"  sorvegliati oltre il {RANGO_RIGA_WSB}° posto, senza impennata (rango/menzioni): " + " · ".join(compatti))
+    if fuori:
+        L.append(f"  non fra i {len(righe)} titoli che la fonte elenca nelle ultime 24 ore: {', '.join(sorted(fuori))} "
+                 "— non vuol dire zero menzioni, che la fonte non dichiara")
+    L.append(f"  memoria: {NL._conta(len(memoria), 'giorno raccolto', 'giorni raccolti')} in memoria/wsb.jsonl (l'ultima lettura di ogni giorno: la finestra "
+             "della fonte e' di 24 ore mobili, e due giorni letti a ore diverse non coprono le stesse ore)")
+    return L
+
+
+
 # ══════════════════════════════════════ ESECUZIONE ══════════════════════════════════════
 def _catena(tk):
     try:
@@ -1092,6 +1257,7 @@ def main():
         f_mstr = ex.submit(brief.barre, "MSTR")
         f_ibit = ex.submit(brief.barre, "IBIT")
         f_conti = ex.submit(brief.calendario_trimestrali, sorted(qta), GIORNI_CONTI)
+        f_wsb = ex.submit(leggi_wsb)          # v517 — WallStreetBets (ApeWisdom)
         agg = aggiorna_pc(oggi, memoria)
         agg_dp = aggiorna_dp(oggi, memoria_dp, universo_dp)
     if not a.no_memoria:
@@ -1155,6 +1321,18 @@ def main():
     L += righe_cot(cot_stato(righe_c), err_cot)
     L.append("")
     L += righe_btc(btc, err_btc)
+    L.append("")
+    # v517 — WallStreetBets: l'attenzione dei piccoli investitori sui nomi del libro e sui sorvegliati
+    memoria_wsb = leggi_memoria_wsb()
+    try:
+        letto_wsb, err_wsb = f_wsb.result(), None
+    except Exception as e:  # noqa: BLE001
+        letto_wsb, err_wsb = None, f"{type(e).__name__}: {str(e)[:80]}"
+    if letto_wsb is not None:
+        registra_wsb(memoria_wsb, letto_wsb, list(dict.fromkeys(sorted(qta) + [s["tk"] for s in sorv])), adesso)
+        if not a.no_memoria:
+            scrivi_memoria_wsb(memoria_wsb)
+    L += righe_wsb(letto_wsb, sorted(qta), [s["tk"] for s in sorv], memoria_wsb, adesso, err_wsb)
     L.append("")
     L.append(f"  memoria del put/call: {sum(1 for r in memoria.values() if r.get('azioni') is not None)} sedute, "
              f"{agg['nuove']} lette ora, {agg['assenti']} giorni di borsa chiusa registrati"

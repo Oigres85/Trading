@@ -84,7 +84,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    dollaro col loro R² (anno, trimestre, giornate forti), revisioni delle stime, autonomia di
    cassa e copertura degli oneri per chi brucia cassa, short interest, ultimo deposito SEC, e da
    v492 (CEO, 16/10: *"inserisci anche il fattore P/e come metrica di analisi delle azioni"*) la riga
-   **valutazione**: P/E degli ultimi 12 mesi e prospettico con l'utile per azione, la perdita detta
+   **valutazione** (da v517 anche il **PEG sull'esercizio prossimo**: P/E sul consenso dell'esercizio prossimo
+   diviso la crescita del consenso dall'esercizio in corso, oltre il 100% dichiarato distorto; accanto, mai al posto,
+   quello dell'aggregatore): P/E degli ultimi 12 mesi e prospettico con l'utile per azione, la perdita detta
    come perdita (nessun P/E, e prezzo/ricavi al suo posto), i due utili attesi quando differiscono,
    il PEG con la sua riserva; il riferimento dell'S&P 500 una volta in testa, con fonte e data.
    Da v497 (CEO, 17/10: *"Monitora anche per le azioni in portafoglio e quelle in watchlist l'andamento dei
@@ -316,6 +318,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    Da v499 la **gamma dei dealer** (regime, cambio di regime, call wall e put wall delle posizioni e di SPY, QQQ e
    IWM: livelli dove il prezzo si è fermato più spesso, non dove si fermerà) e il **dark pool** (DPI di ogni nome
    col percentile dell'anno e la media a 10 sedute, DIX e GEX dell'S&P 500): stessa natura, informazione.
+   Da v517 (CEO, 30/10: *"Osserva anche il forum WallStreetBets"*) il blocco **WALLSTREETBETS**: per ogni posizione e
+   sorvegliato il rango sul forum, le menzioni delle ultime 24 ore contro quelle di 24 ore prima, le impennate
+   (convenzione: almeno 3 volte e almeno 20 menzioni) e, da venti giorni raccolti, il percentile. Si contano le
+   menzioni: **i post non sono una fonte di fatti** (regola v451), e un nome al centro del forum dice dove guarda la
+   folla — affollamento, volatilità di breve — non dove andrà il prezzo. Stessa natura: informazione.
    Da v500 (CEO, 18/10: *"1 ok tua proposta"*) è anche **misurato** (`LIBRO.md` §1ter): nessuno di questi segnali,
    né la curva della volatilità degli indici, anticipa i cali più del caso. La risposta li legge come termometri
    dello stress in corso, non come avvisi di un calo che deve ancora venire.
@@ -543,6 +550,8 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[ipervenduto]` ipervenduto e ipercomprato coi quattro oscillatori, e il supporto e l'accumulo contati condizione per condizione, su ogni posizione e ogni sorvegliato (25/10) — informazione, non una prova
 - `[stagionalita]` la stagionalità del titolo nel mese in corso e nel successivo col campione, e del Nasdaq-100 negli anni dello stesso ciclo presidenziale (25/10) — informazione, non una previsione
 - `[due_tempi]` l'analisi in due tempi: prima l'analisi, che chiude con domande mirate; poi il ragionamento col CEO in chat sulle sue risposte (25/10)
+- `[wsb]` WallStreetBets: rango, menzioni delle ultime 24 ore e impennate dei nomi del libro e dei sorvegliati, con la memoria giornaliera — l'attenzione della folla, non una fonte di fatti (30/10) — informazione, non una prova
+- `[peg]` il PEG sull'esercizio prossimo con la sua crescita dichiarata (il consenso dell'esercizio in corso e del prossimo, stessa tabella), accanto a quello dell'aggregatore (30/10) — una metrica, non una prova
 - `[cambio]` il cambio euro/dollaro: quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio, dove sta il cambio nel suo anno, e per ogni operazione col suo cambio (LIBRO.md §1decies) il risultato in euro scomposto in effetto del prezzo ed effetto del cambio, con l'imposta in euro (30/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno

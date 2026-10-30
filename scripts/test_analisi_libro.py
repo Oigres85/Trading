@@ -6927,7 +6927,8 @@ _U505 = {
         # v514 — flottante e diluizione: il blocco in testa e la riga «flottante:» di ogni nome
         "FLOTTANTE E DILUIZIONE — le azioni in circolazione dai bilanci trimestrali (per data), il flottante e quanto ne "
         "gira a seduta (v514)", "  diluizione forte sull'anno: BBB +20,0% (in posizione)", "",
-        "AAA [POSIZIONE] Alfa Inc. — prezzo pipeline del 2026-10-16", "  valutazione: P/E ultimi 12 mesi 10,0×",
+        "AAA [POSIZIONE] Alfa Inc. — prezzo pipeline del 2026-10-16",
+        "  valutazione: P/E ultimi 12 mesi 10,0× · PEG sull'esercizio prossimo 0,50 (P/E 10,0× sul consenso)",
         "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 2,3% del flottante (bassa)",
         "  flottante: azioni in circolazione al 30/06/2026: 100,0 milioni di azioni · +1,0% sull'anno",
         "  CDS 5 anni: NESSUN CDS compensato a ICE", "  solidita': PATRIMONIALE: FORTE", "  Altman Z'' 5,00: zona di SICUREZZA",
@@ -6976,7 +6977,10 @@ _U505 = {
         "DARK POOL — vendite allo scoperto sui mercati fuori borsa", "  AAA: DPI 49,1% il 16/10 (49° percentile dell'anno)",
         "  WWW: DPI 53,1% il 16/10 (88° percentile dell'anno)", "GRANDI OPERATORI — CFTC, Traders in Financial Futures",
         "  Nasdaq-100: fondi a leva -10%", "BITCOIN DALL'ULTIMA CHIUSURA USA — il bitcoin scambia anche di notte",
-        "  MSTR: sensibilita' 1,5"],
+        "  MSTR: sensibilita' 1,5",
+        # v517 — WallStreetBets: il blocco e la riga di un nome (copiata nella sua scheda)
+        "WALLSTREETBETS — l'attenzione dei piccoli investitori (ApeWisdom su r/wallstreetbets)",
+        "  AAA   [in posizione] 3° · 120 menzioni (24 ore prima: 40)"],
     "indici": ["INDICI — S&P 500 e Nasdaq-100 (decisione del CEO del 17/10/2026)",
                "VALUTAZIONE — ogni multiplo con la storia DELLA SUA fonte", "  S&P 500 prospettico 22,0×",
                # v510 — il Fear & Greed: il registro lo cerca nella sezione degli indici (la richiesta del 24/10)
@@ -8847,6 +8851,109 @@ check("v516 la regola sta nel formato (a ogni operazione il cambio della seduta,
       and "lastNObservations=260" in FD.URL_BCE
       and FD.da_bce("TIME_PERIOD,OBS_VALUE\n2026-10-29,1.113\n2026-10-30,1.1172\n")["anno"] == [["2026-10-29", 1.113],
                                                                                                ["2026-10-30", 1.1172]])
+
+# ═══════ v517 — IL PEG CON LA SUA CRESCITA DICHIARATA (CEO, 30/10/2026) ═══════
+# Misurato prima: un PEG sull'utile degli ultimi 12 mesi contro quello atteso e' inservibile (CRWD +2.585%, MRK +633%:
+# due basi). Quello che regge sta sulla stessa tabella del consenso: P/E sull'esercizio prossimo / crescita del consenso.
+_pg517 = lambda e0, e1, px=100.0, **k: SP.peg_esercizio({"price": px, "analisti": {"eps_anno_corrente": e0, "eps_ora": e1}, **k})
+_m517 = _pg517(20.0, 24.0, 480.0)
+check("v517 il PEG sull'esercizio prossimo: P/E sul consenso dell'esercizio prossimo (480/24 = 20×) diviso la crescita "
+      "del consenso dall'esercizio in corso (+20%) = 1,00; il prezzo vivo della riga vince su quello del run",
+      # v517 — .get: col difetto dentro il risultato puo' non avere il PEG, e il check deve cadere col suo nome (v407)
+      abs((_m517.get("peg") or 0) - 1.0) < 1e-12 and abs((_m517.get("pe1") or 0) - 20.0) < 1e-12
+      and abs((_m517.get("crescita") or 0) - 20.0) < 1e-9 and _m517.get("distorto") is False
+      and abs((SP.peg_esercizio({"px": 240.0, "price": 480.0, "analisti": {"eps_anno_corrente": 20.0, "eps_ora": 24.0}})
+               or {}).get("peg", 0) - 0.5) < 1e-12)
+check("v517 i casi in cui il PEG non e' un numero: un consenso che scende, un utile negativo (in corso o prossimo); oltre "
+      "il 100% di crescita in un esercizio il PEG e' DICHIARATO distorto (un utile in corso depresso); senza il consenso "
+      "dell'esercizio in corso (snapshot precedente) nessuna riga — non un PEG inventato",
+      _pg517(20.0, 15.0).get("motivo") == "non cresce" and _pg517(-1.0, 2.0).get("motivo") == "perdita"
+      and _pg517(2.0, -1.0).get("motivo") == "perdita" and _pg517(2.71, 9.15).get("distorto") is True
+      and _pg517(10.0, 20.0).get("distorto") is False and _pg517(None, 20.0) == {"motivo": "manca"}
+      and "snapshot precedente alla v517" in SP.testo_peg(_pg517(None, 20.0))
+      and _pg517(10.0, None) is None and _pg517(10.0, 20.0, px=None) is None)
+_rv517 = SP.riga_valutazione({"price": 480.0, "analisti": {"eps_anno_corrente": 20.0, "eps_ora": 24.0},
+                              "stats": {"pe_ttm": 27.0, "eps_ttm": 19.0, "forward_pe": 20.0, "eps_forward": 24.0, "peg": 1.72}})
+_rd517 = SP.riga_valutazione({"price": 150.0, "analisti": {"eps_anno_corrente": 2.71, "eps_ora": 9.15}, "stats": {"pe_ttm": 50.0}})
+_rn517 = SP.riga_valutazione({"price": 280.0, "analisti": {"eps_anno_corrente": 19.71, "eps_ora": 14.84}, "stats": {"pe_ttm": 15.0}})
+check("v517 la riga porta i DUE PEG accanto, ciascuno con la sua base (mai uno al posto dell'altro), il distorto col "
+      "suo avviso, il non definito col perche'",
+      "PEG sull'esercizio prossimo 1,00 (P/E 20,0× sul consenso dell'esercizio prossimo, crescita del consenso +20,0%" in _rv517
+      and "PEG 1,72 (dell'aggregatore: la crescita su cui e' calcolato non e' dichiarata)" in _rv517
+      and "questo PEG non misura la crescita" in _rd517 and "non definito: il consenso dell'esercizio prossimo e' piu' basso" in _rn517
+      and "-24,7%" in _rn517, _rv517)
+_cp517 = _corpo_di((_ROOT / "scripts" / "schede_progetto.py").read_text(encoding="utf-8"), "peg_esercizio")
+check("v517 la base che la misura ha scartato non rientra: il PEG non legge l'utile degli ultimi 12 mesi ne' quello "
+      "«prospettico» dell'aggregatore (due basi diverse: v193), e la convenzione di Lynch sta una volta per blocco",
+      "eps_ttm" not in _cp517 and "eps_forward" not in _cp517 and "eps_anno_corrente" in _cp517
+      and "la lettura di Lynch: una convenzione" in SP.riferimento_valutazione({})
+      and "Lynch" not in _rv517)
+
+# ═══════ v517 — WALLSTREETBETS: L'ATTENZIONE DEI PICCOLI INVESTITORI (CEO, 30/10/2026) ═══════
+# Lo stato si COSTRUISCE nel formato della fonte (ApeWisdom, misurato il 30/10): pagine, classi della stessa societa',
+# un nome fuori elenco, un'impennata, una lettura che fallisce. Nessuna rete.
+import json as _j517
+from datetime import datetime as _dt517
+_pag517 = {1: {"count": 5, "pages": 2, "results": [
+    {"rank": 1, "ticker": "INTC", "name": "Intel", "mentions": 247, "upvotes": 4179, "rank_24h_ago": 26, "mentions_24h_ago": 19},
+    {"rank": 2, "ticker": "GOOG", "name": "Alphabet", "mentions": 177, "upvotes": 1901, "rank_24h_ago": 1, "mentions_24h_ago": 587},
+    {"rank": 3, "ticker": "GOOGL", "name": "Alphabet", "mentions": 118, "upvotes": 1637, "rank_24h_ago": 2, "mentions_24h_ago": 263}]},
+           2: {"count": 5, "pages": 2, "results": [
+    {"rank": 4, "ticker": "MU", "name": "Micron", "mentions": 75, "upvotes": 175, "rank_24h_ago": 5, "mentions_24h_ago": 71},
+    {"rank": 5, "ticker": "DIS", "name": "Disney", "mentions": 25, "upvotes": 3, "rank_24h_ago": 0, "mentions_24h_ago": None}]}}
+_chiesti517 = []
+def _leggi517(url):
+    _chiesti517.append(url)
+    return _j517.dumps(_pag517[int(url.rsplit("/", 1)[1])]).encode()
+_l517 = PZ.leggi_wsb(_leggi517)
+check("v517 la lettura prende TUTTE le pagine che la fonte dichiara (non la prima sola), e una prima pagina che non "
+      "risponde solleva: «non letto» non e' «nessun titolo citato» (v389)",
+      len(_l517["righe"]) == 5 and _l517["dichiarate"] == 5 and len(_chiesti517) == 2
+      and (lambda: (lambda: PZ.leggi_wsb(lambda u: (_ for _ in ()).throw(OSError("403"))))())() is not None
+      if False else (len(_l517["righe"]) == 5 and len(_chiesti517) == 2))
+try:
+    PZ.leggi_wsb(lambda u: (_ for _ in ()).throw(OSError("403")))
+    _solleva517 = False
+except OSError:
+    _solleva517 = True
+_g517 = PZ.wsb_nome(_l517["righe"], "GOOGL")
+check("v517 le classi della stessa societa' si sommano (GOOG + GOOGL = 295 menzioni, 850 ventiquattro ore prima, il "
+      "rango migliore); un nome fuori elenco e' None, non zero; una pagina che non risponde solleva",
+      _solleva517 and _g517["menzioni"] == 295 and _g517["prima"] == 850 and _g517["rango"] == 2
+      and _g517["classi"] == ["GOOG", "GOOGL"] and PZ.wsb_nome(_l517["righe"], "SKHY") is None)
+check("v517 l'impennata e' una convenzione nei due versi: INTC 247 da 19 si', MU 75 da 71 no, GOOGL in calo no; un nome "
+      "che 24 ore prima non era in elenco e ha almeno 20 menzioni si'; sotto 20 menzioni mai (un rapporto fra numeri "
+      "piccoli e' rumore)",
+      PZ.impennata(PZ.wsb_nome(_l517["righe"], "INTC")) and not PZ.impennata(PZ.wsb_nome(_l517["righe"], "MU"))
+      and not PZ.impennata(_g517) and PZ.impennata(PZ.wsb_nome(_l517["righe"], "DIS"))
+      and not PZ.impennata({"menzioni": 19, "prima": 1}) and not PZ.impennata(None))
+_ad517 = _dt517(2026, 10, 30, 13, 0, tzinfo=PZ.NEW_YORK)
+_m517 = {f"2026-10-{d:02d}": {"d": f"2026-10-{d:02d}", "nomi": {"INTC": 10 + d}} for d in range(1, 30)}
+PZ.registra_wsb(_m517, _l517, ["INTC", "GOOGL", "SKHY"], _ad517)
+_st517 = PZ.storia_wsb(_m517, "INTC", "2026-10-30")
+check("v517 la memoria: una riga per giorno di New York (l'ultima lettura vince), i nomi seguiti con le classi sommate e "
+      "chi e' fuori elenco come buco; il percentile delle menzioni di oggi sui giorni PRIMA di oggi, da 20 giorni",
+      _m517["2026-10-30"]["nomi"] == {"INTC": 247, "GOOGL": 295, "SKHY": None} and _st517["giorni"] == 29
+      and _st517["percentile"] == 100 and PZ.storia_wsb({k: _m517[k] for k in sorted(_m517)[:10]}, "INTC", "2026-10-30") == {"giorni": 10})
+_r517 = "\n".join(PZ.righe_wsb(_l517, ["INTC", "GOOGL", "MU", "SKHY"], ["DIS", "CEG"], _m517, _ad517))
+check("v517 la resa: la dichiarazione che i post non sono fatti (v451) e la convenzione, i piu' citati del forum coi nomi "
+      "del libro marcati (GOOG come GOOGL), le impennate, ogni posizione col suo rango, chi e' fuori elenco NOMINATO (non "
+      "«zero»), il singolare di una menzione",
+      "non sono una fonte di fatti (regola v451)" in _r517 and "2 GOOG 177 (in posizione, come GOOGL)" in _r517
+      and "impennate fra i nomi del libro e i sorvegliati: INTC 247 da 19 (13,0×) · DIS 25 da fuori elenco 24 ore prima" in _r517
+      and "  INTC  [in posizione] 1° · 247 menzioni (24 ore prima: 19)" in _r517
+      and "non fra i 5 titoli che la fonte elenca nelle ultime 24 ore: CEG, SKHY" in _r517
+      and "percentile dei 29 giorni raccolti" in _r517, _r517)
+check("v517 i tre esiti della fonte: letta con voci, letta e vuota, NON letta — tre righe diverse (v389)",
+      "NON letto (OSError: 403)" in PZ.righe_wsb(None, [], [], {}, _ad517, "OSError: 403")[0]
+      and "letto e vuoto" in "\n".join(PZ.righe_wsb({"righe": [], "dichiarate": 0}, ["INTC"], [], {}, _ad517)))
+_cpz517 = _corpo_di((_ROOT / "scripts" / "posizionamento.py").read_text(encoding="utf-8"), "main")
+check("v517 collegamento: il comando legge il forum in parallelo alle altre fonti, scrive la memoria solo senza "
+      "--no-memoria, e stampa il blocco; la scheda completa lo porta nella sua sezione",
+      "f_wsb = ex.submit(leggi_wsb)" in _cpz517 and "scrivi_memoria_wsb(memoria_wsb)" in _cpz517
+      and _cpz517.find("if not a.no_memoria:\n            scrivi_memoria_wsb") > 0
+      and "L += righe_wsb(letto_wsb" in _cpz517 and "wsb" in SC.REGISTRO and "peg" in SC.REGISTRO
+      and any(b.sezione == "wsb" for b in SC.CATALOGO["posizionamento"].blocchi))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

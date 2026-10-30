@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 400  # v515: 403 eseguiti · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 402  # v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -3423,7 +3423,9 @@ check("v512 analisti_da (estratta da fetch_symbol) ridà, sugli stessi ingressi,
       "pubblicato per CRWV il 25/10: " + str(_a512),
       _a512 == {"eps_ora": -4.5858, "eps_90g_fa": -3.674, "eps_7g_fa": -4.3652, "revisione_90g_pct": 24.82,
                 "revisione_7g_pct": 5.06, "su_30g": 3, "giu_30g": 1, "eps_min": -8.97, "eps_max": -1.0766, "eps_n": 23,
-                "target_min": 39.0, "target_max": 278.0, "target_mediana": 135.0})
+                "target_min": 39.0, "target_max": 278.0, "target_mediana": 135.0,
+                # v517 — la riga «0y» non c'e' in questa fixture: il consenso dell'esercizio in corso e' un buco, non uno 0
+                "eps_anno_corrente": None})
 check("v512 analisti_da: niente dalla fonte → None (non un dizionario di vuoti); un errore → None, senza portarsi via il "
       "giro dei titoli",
       ud.analisti_da(_T512(vuoto=True), "X") is None and ud.analisti_da(_T512(rotto=True), "X") is None)
@@ -3641,6 +3643,19 @@ _c2, _d2 = _ass515(_inj515)
 check("v515 il gate morde sul caso da cui e' nato: la variabile di Altman rinominata come quella del flottante si vede "
       "come due funzioni sul campo «azioni» (lo stato si costruisce, v425)",
       _inj515 != _src515 and _d2.get("_flot") == {"flottante_e_azioni", "altman_zpp"})
+
+# ============== v517 — IL PEG CON LA SUA CRESCITA DICHIARATA: il consenso dell'esercizio in corso ==============
+# Il CEO (30/10/2026): «Se possibile ed utile aggiungere come parametro rapporto PEG». La pipeline pubblica il consenso
+# dell'esercizio IN CORSO dalla stessa tabella di quello prossimo (eps_trend), cosi' il PEG ha una crescita dichiarata.
+class _T517(_T512):
+    @property
+    def eps_trend(self):
+        return pd.DataFrame([[20.02, 19.9, 19.5], [24.14, 23.7, 23.47]], index=["0y", "+1y"],
+                            columns=["current", "7daysAgo", "90daysAgo"])
+_a517 = ud.analisti_da(_T517(), "MSFT")
+check("v517 analisti_da porta il consenso dell'esercizio IN CORSO dalla stessa tabella dell'esercizio prossimo, e la "
+      "riga dell'esercizio prossimo resta quella delle revisioni (non si scambiano)",
+      _a517["eps_anno_corrente"] == 20.02 and _a517["eps_ora"] == 24.14 and _a517["revisione_90g_pct"] == round((24.14 / 23.47 - 1) * 100, 2))
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

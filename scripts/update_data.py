@@ -2618,6 +2618,7 @@ def analisti_da(t, ticker=""):
                 return None
 
         tr = _riga(t.eps_trend, "+1y")
+        tr0 = _riga(t.eps_trend, "0y")     # v517 — l'esercizio IN CORSO, dalla stessa tabella: la base del PEG
         rv = _riga(t.eps_revisions, "+1y")
         es = _riga(t.earnings_estimate, "+1y")
         pt = t.analyst_price_targets or {}
@@ -2632,6 +2633,10 @@ def analisti_da(t, ticker=""):
             # senso (-4,37 / -3,42 = +28% mentre il conto peggiora), quindi chi stampa deve
             # poter guardare la differenza fra due stime e non solo la loro divisione.
             "eps_7g_fa": round(g7, 4) if g7 else None,
+            # v517 — il consenso sull'esercizio IN CORSO, stessa tabella e stessa base dell'esercizio prossimo: con i
+            #   due il PEG ha una crescita DICHIARATA (CEO, 30/10/2026: «aggiungere come parametro rapporto PEG»)
+            "eps_anno_corrente": (round(_n(tr0["current"]), 4) if (tr0 is not None and _n(tr0["current"]) is not None)
+                                  else None),
             "revisione_90g_pct": round((ora / g90 - 1) * 100, 2) if (ora and g90) else None,
             "revisione_7g_pct": round((ora / g7 - 1) * 100, 2) if (ora and g7) else None,
             # AMPIEZZA: quanti hanno alzato e quanti abbassato. Il verso conta piu' del numero.

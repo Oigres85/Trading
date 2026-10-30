@@ -8904,3 +8904,58 @@ riga lo dichiara. *Una media su una seduta comune è giusta per il periodo e sba
   al cambio di oggi, e contare le pari per intero dava lo stesso numero. Aggiunte 40 osservazioni uguali, morde (v430).
 - Pavimento di `test_analisi_libro.py` 910 → 920 (937 punti di chiamata, 947 check). `?v=` e `BUILD_VERSION` non
   toccati: nessun file servito al browser (v440).
+
+## 📈 v517 — IL PEG CON LA SUA CRESCITA DICHIARATA, E WALLSTREETBETS COME ATTENZIONE, NON COME FONTE
+
+Richieste del CEO (30/10/2026), testuali: *"Se possibile ed utile aggiungere come parametro rapporto PEG"* e *"Osserva
+anche il forum WallStreetBets"*.
+
+### Il PEG: c'era già, e la misura ha deciso quale aggiungere
+Dalla v492 la riga «valutazione» porta il PEG dell'aggregatore (`pegRatio`/`trailingPegRatio`), con la riserva che la
+crescita su cui è calcolato non è dichiarata. **Misurato prima di aggiungerne un altro**, sui 68 nomi del 30/10:
+- un PEG nostro sull'utile degli ultimi 12 mesi contro quello atteso è **inservibile**: crescite di +2.585% (CRWD),
+  +633% (MRK), +358% (ABBV) — utile contabile depresso contro stima rettificata, due basi (la classe v193);
+- quello che regge sta sulla **stessa tabella del consenso** (`eps_trend`): P/E sul consenso dell'esercizio prossimo
+  diviso la crescita del consenso dall'esercizio in corso al prossimo. Stessa fonte, stessa base, esercizi dichiarati.
+  Sui dati veri: MSFT 1,05 · AAPL 4,41 · NVDA 0,18 · AMD 0,29 · INTC 0,70 · PLTR 1,74 · JPM 2,11.
+
+La pipeline pubblica ora `analisti.eps_anno_corrente` (la riga «0y» della stessa tabella); `fonti_titoli` la rilegge
+alla fonte a ogni analisi con la stessa funzione (v512), quindi il PEG c'è subito, prima del run del CI.
+- ⚠ **Oltre il 100% di crescita in un esercizio il PEG si dichiara DISTORTO** (MRK 0,07: un utile dell'esercizio in corso
+  depresso, non il ritmo della società); un consenso che scende (GOOGL −24,7%) o un utile negativo non danno un PEG, e
+  si dice perché; uno snapshot senza il consenso dell'esercizio in corso lo dichiara (v406).
+- I due PEG stanno **accanto, mai uno al posto dell'altro**; la convenzione di Lynch (sotto 1 la crescita costa poco
+  rispetto al prezzo) sta **una volta per blocco** (v407), dichiarata convenzione (v240). È una metrica, non una prova.
+- ⚠ Il gate v512 pinnava il dizionario di `analisti_da` esattamente: riagganciato col campo nuovo, che sulla sua fixture
+  (senza la riga «0y») è un buco e non uno zero.
+
+### WallStreetBets: si contano le menzioni, i post non sono fatti
+Reddit risponde **403** da qui (misurato il 12/09 e il 30/10). **ApeWisdom** pubblica gratis, senza chiave, per ogni titolo
+citato su r/wallstreetbets il rango, le menzioni delle ultime 24 ore (finestra mobile), quelle di 24 ore prima e i voti:
+649 titoli in 7 pagine, ~0,7 s a pagina. Tradestie pubblica un «sentiment» calcolato con un modello che non dichiara:
+**escluso**, un punteggio di cui non si conosce la costruzione non si legge (v200, v240).
+
+Il blocco **WALLSTREETBETS** di `posizionamento.py`: i più citati del forum coi nomi del libro marcati, le **impennate**
+(convenzione: almeno 3 volte le menzioni di 24 ore prima e almeno 20), ogni posizione e sorvegliato col rango, le
+menzioni, i voti e la quota del forum; chi non è nell'elenco della fonte si **nomina** — non vuol dire zero menzioni, che
+la fonte non dichiara (v406). Le classi della stessa società si sommano (GOOG + GOOGL), dichiarato.
+- ⚠⚠ **I post non sono una fonte di fatti**: è la regola della v451 (un LLM aveva marcato [VERIFICATO] delle medie mobili
+  con fonte Reddit), e la riga lo ripete ogni volta. Un nome al centro del forum dice dove guarda la folla — affollamento,
+  volatilità di breve — non dove andrà il prezzo: informazione, non una prova della tenuta né un colore.
+- **Lo storico non c'è alla fonte** (solo le ultime 24 ore): `memoria/wsb.jsonl` raccoglie una lettura per giorno di New
+  York, l'ultima del giorno, e da 20 giorni raccolti esce il percentile delle menzioni. ⚠ Due giorni letti a ore diverse
+  non coprono le stesse ore: si dice. La memoria entra fra quelle che `analisi.py` chiede di committare.
+- Il 30/10 il blocco ha mostrato **INTC al 2° posto con 247 menzioni contro 19 il giorno prima**, il giorno del −29,7% e
+  dell'acquisto del CEO: l'attenzione arriva dopo il movimento, non prima — ed è per questo che resta informazione.
+
+### 🧪 Il metodo
+- **Tredici iniezioni** su tre copie verificate per impronta, ripristino dallo snapshot: **mordono tutte**. Due — il
+  PEG sull'utile degli ultimi 12 mesi e la memoria scritta anche con `--no-memoria` — al primo giro facevano MORIRE la
+  suite (un `KeyError` e un `index` su una stringa assente) invece di far cadere il controllo col suo nome: il difetto si
+  vedeva, la diagnosi si perdeva (v407, v471). Ora `.get` e `find`, e la stessa iniezione cade per nome. Una terza
+  risultava «non morde» per un refuso nel nome atteso dell'harness (`analisi_da` per `analisti_da`): il FAIL era quello
+  giusto. *Un'iniezione che «non morde» si guarda prima nell'harness* (v433).
+- Pavimenti: `test_analisi_libro.py` 920 → 940 (957 check), `test_update_data.py` N_CHECKS_MINIMO 400 → 402 (404).
+- ⚠ **Una data scritta a mano era entrata nel testo** («si raccolgono da oggi, 30/10/2026»): invecchia da sola (v410,
+  v424), trovata rileggendo l'uscita. Ora la data è il primo giorno della memoria.
+- `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
