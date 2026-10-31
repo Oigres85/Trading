@@ -7609,16 +7609,23 @@ check("v407 la media a 20 giorni, chiesta dal CEO, arriva su ogni posizione che 
    deve produrre ESATTAMENTE quello di prima. Non "quasi": identico al byte. Un costruttore che
    cambia comportamento anche solo un po' quando gli si aggiunge un parametro e' il primo passo
    verso i due costruttori che divergono (v161, v207). */
+/* ⚠ v522 — L'OROLOGIO SI FERMA. Il pacchetto porta l'ora al minuto: il 31/10/2026 il pre-push ha bloccato un push perche'
+   le tre chiamate stavano a cavallo di un minuto, e «a !== b» misurava l'orologio, non il costruttore (v233, v431: un
+   check che dipende dal caso invece che dalla proprieta' va rosso da solo). L'istante e' quello di adesso, fermo. */
 check("v408 senza opzione buildPrompt e' identico al byte a buildPrompt({}) e al pacchetto macro", suVeriEsito(`
-  const a = buildPrompt();
-  const b = buildPrompt({});
-  const c = buildPrompt({ perTitolo: "" });
-  if (a !== b) return "buildPrompt({}) differisce di " + Math.abs(a.length - b.length) + " caratteri";
-  if (a !== c) return "un titolo vuoto pota lo stesso: differenza di " + Math.abs(a.length - c.length);
-  /* e con l'opzione attiva DEVE essere piu' corto: se fosse uguale la potatura non esiste */
-  const d = buildPrompt({ perTitolo: "MU" });
-  if (d === a) return "con perTitolo il payload e' identico: la potatura non ha effetto";
-  return true;`));
+  const _DV408 = Date, _T408 = _DV408.now();
+  Date = class extends _DV408 { constructor(...x) { if (x.length) super(...x); else super(_T408); } static now() { return _T408; } };
+  try {
+    const a = buildPrompt();
+    const b = buildPrompt({});
+    const c = buildPrompt({ perTitolo: "" });
+    if (a !== b) return "buildPrompt({}) differisce di " + Math.abs(a.length - b.length) + " caratteri";
+    if (a !== c) return "un titolo vuoto pota lo stesso: differenza di " + Math.abs(a.length - c.length);
+    /* e con l'opzione attiva DEVE essere piu' corto: se fosse uguale la potatura non esiste */
+    const d = buildPrompt({ perTitolo: "MU" });
+    if (d === a) return "con perTitolo il payload e' identico: la potatura non ha effetto";
+    return true;
+  } finally { Date = _DV408; }`));
 
 check("v408 i quattro blocchi potati escono dal pacchetto di titolo e restano in quello macro", suVeriEsito(`
   const macro = buildCIOText();

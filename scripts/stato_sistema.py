@@ -52,7 +52,6 @@ GIORNI_DOMANDA = 3               # una domanda aperta da piu' giorni si dichiara
 LIBRO = RADICE / "memoria" / "LIBRO.md"
 DATI = RADICE / "data" / "data.json"
 CDS_STORIA = RADICE / "data" / "cds_storia.jsonl"
-DEBITO_SEC = RADICE / "data" / "debito_sec.json"
 TITOLO_DOMANDE = "DA CONFERMARE COL CEO"
 AVVISO = "⚠"
 
@@ -294,7 +293,12 @@ def stato_pipeline(dati, adesso, gh=_gh, rete=True):
 
 
 def righe_pipeline(p, adesso):
-    L = ["PIPELINE SU GITHUB — dipendenza esterna: il cron e' una coda (99-263 minuti di ritardo, v437)"]
+    L = ["PIPELINE SU GITHUB — dipendenza esterna: il cron e' una coda (99-263 minuti di ritardo, v437)",
+         # v522 — cosa tocca un suo guasto, detto una volta: un avviso qui sotto non vuol dire «l'analisi e' sbagliata»
+         "  cosa tocca un suo guasto (v522): la PAGINA della dashboard e lo storico dei CDS — di quello la sessione tiene "
+         "una riserva (memoria/cds_sessione.jsonl), che la pipeline unisce al run dopo. L'analisi in chat legge alla "
+         "fonte righe dei titoli, SEC EDGAR, composizione degli ETF, macro, BTP e leva (DATI DI QUESTO GIRO); la "
+         "pipeline resta la RISERVA di quelle letture, e viceversa"]
     if p["run"] is None:
         L.append(f"  {AVVISO} data/data.json senza ora del run: l'eta' dei dati della pipeline NON e' nota")
     else:
@@ -404,13 +408,6 @@ def _ultimo_cds(percorso=CDS_STORIA):
         return None
 
 
-def _debito(percorso=DEBITO_SEC):
-    try:
-        return (json.loads(Path(percorso).read_text(encoding="utf-8")) or {}).get("aggiornato")
-    except (OSError, ValueError):
-        return None
-
-
 def nota_cds(cds, run):
     """Il giorno raccolto senza gli indici CDX e' a meta': ICE pubblica a ondate (Asia, Europa, Nord America con gli indici
     fra le 19:50 e le 21:00 UTC, v508). Sul giorno del run e' il caso normale; su un giorno passato e' un giorno perso."""
@@ -441,11 +438,9 @@ def date_dipendenze(dati):
     cds = _ultimo_cds()
     v = {
         _voce("storico dei CDS"): ((cds or {}).get("giorno"), nota_cds(cds, (dati or {}).get("updated_at"))),
-        _voce("voci dei bilanci SEC"): (_debito(), "le voci si rileggono solo dopo un 10-Q o 10-K nuovo, al piu' dieci "
-                                                   "per run"),
-        _voce("composizione degli ETF"): (run, "composizione dichiarata dall'emittente, letta a ogni run"),
         _voce("contributo al rischio"): (run, "si calcolano a ogni run sulla matrice dei rendimenti di tutti i titoli "
-                                              "insieme: la lettura in sessione di una riga sola non li produce"),
+                                              "insieme e servono alla PAGINA: l'analisi non li legge, calcola i suoi "
+                                              "sulle barre (numeri_libro.py, v460)"),
     }
     return v
 

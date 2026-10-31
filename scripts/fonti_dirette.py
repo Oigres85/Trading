@@ -98,21 +98,28 @@ NOMI.update({"effr": "Fed Funds effettivo (EFFR del giorno)", "eurusd": "EUR/USD
 ORDINE = tuple(k for k, *_ in SERIE_FRED[:7]) + ("effr", "eurusd", "fear_greed") + tuple(k for k, *_ in SERIE_FRED[7:])
 
 # ⚠ COSA LA PIPELINE PORTA DA SOLA (nessuna fonte raggiungibile da qui): si nomina quando il run e' indietro.
+# v522 — SEC EDGAR e la composizione degli ETF si leggono in sessione (fonti_titoli.py): restano lo storico dei CDS, che
+#   nessuna fonte pubblica (ICE pubblica solo l'ultimo giorno), e le misure incrociate delle righe, che servono alla
+#   PAGINA e al pacchetto della dashboard — l'analisi in chat le calcola da se' sulle barre (numeri_libro.py, v460), e
+#   rifarle qui sarebbe una seconda derivazione della stessa grandezza (v161)
 SOLO_PIPELINE = ("storico dei CDS (il giorno di oggi lo rilegge fonti_titoli.py)",
-                 "voci dei bilanci SEC (debito, scadenze, derivati) e salute del credito",
-                 "composizione degli ETF della rotazione",
                  # v519 — restano del run perche' si calcolano sui titoli INSIEME (la matrice dei rendimenti di tutte le
                  #   righe): la lettura di una riga sola non li produce
-                 "correlazioni, beta sul Nasdaq-100 e contributo al rischio delle righe dei titoli")
+                 "correlazioni, beta sul Nasdaq-100 e contributo al rischio delle righe dei titoli (per la pagina: "
+                 "quelli dell'analisi li calcola numeri_libro.py)")
 # v512 — quelli che una fonte raggiungibile ce l'hanno: li rilegge scripts/fonti_titoli.py (blocco DATI PER TITOLO).
 # v519 — opzione B scelta dal CEO il 30/10/2026: anche le righe intere di ogni titolo, con update_data.fetch_symbol
 RILETTI_PER_TITOLO = ("righe intere di ogni titolo con la funzione della pipeline — prezzo, tecnica, multipli, conti "
                       "trimestrali, combustione di cassa, solidita', flottante e sensibilita' ai canali macro",
                       "target e revisioni degli analisti", "FedWatch", "CDS dell'ultimo giorno", "vendite allo scoperto",
-                      "date dei depositi SEC e trimestri che la pipeline non ha ancora",
+                      # v522 — consenso del CEO del 31/10/2026 al contatto per SEC: la funzione della pipeline
+                      "SEC EDGAR: calendario dei risultati, ore dei depositi, storia della quotazione e voci dei bilanci "
+                      "(debito, scadenze, derivati), e i trimestri che la pipeline non ha ancora",
+                      "composizione degli ETF della rotazione",
                       # v521 — non sono «per titolo», ma la stessa lettura del giro li rifa' alla fonte: l'elenco e' quello
                       #   di cio' che qui non dipende piu' dalla pipeline
-                      "prezzo del BTP (Borsa Italiana, con la data del prezzo ufficiale)",
+                      "prezzo del BTP (Borsa Italiana: il piu' recente fra prezzo di riferimento e prezzo ufficiale, con "
+                      "la sua data)",
                       "debito a margine (FINRA, famiglia «leva» del semaforo)")
 
 
@@ -465,8 +472,8 @@ def sintesi(g, adesso=None):
              + (f"⚠ PRECEDENTE all'ultima chiusura USA ({chiusura:%d/%m %H:%M} di New York)" if prima
                 else f"dopo l'ultima chiusura USA ({chiusura:%d/%m %H:%M} di New York)"))
     if prima or (eta is not None and eta > 24):
-        L.append("    ⚠ descrivono la seduta PRIMA, perche' una fonte raggiungibile da qui non c'e' (SEC 403, ICE solo "
-                 "l'ultimo giorno, FINRA per il debito a margine): " + "; ".join(SOLO_PIPELINE))
+        L.append("    ⚠ descrivono la seduta PRIMA, perche' una fonte raggiungibile da qui non c'e' (ICE pubblica solo "
+                 "l'ultimo giorno; le misure incrociate si calcolano sui titoli insieme): " + "; ".join(SOLO_PIPELINE))
         L.append("    ⚠ le festivita' USA non sono note al calcolo dell'ultima chiusura: in un giorno di chiusura questo "
                  "avviso suona nel verso prudente")
     else:

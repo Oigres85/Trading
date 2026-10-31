@@ -35,9 +35,15 @@ risposta nei due posti (v161):
     e un giorno che nessuno raccoglie e' perso per sempre (v497, v508 — il 21/10 e' andato perso cosi').
   · VENDITE ALLO SCOPERTO (FINRA): se FINRA ha pubblicato un regolamento PIU' RECENTE di quello della pipeline, le
     misure si rifanno con update_data.aggiorna_short.
-  · DEPOSITI SEC: le date dei 10-Q e 10-K da Yahoo (SEC risponde 403 da qui senza un contatto, e il contatto del CEO non
-    si manda a un servizio nuovo). Un deposito periodico piu' recente della lettura del debito della pipeline si NOMINA,
-    e cosi' una tabella dei trimestri ferma prima di un 10-Q depositato. Le voci XBRL non si rileggono da qui: si dice.
+  · SEC EDGAR (v522, consenso del CEO del 31/10/2026 a mandare il contatto della pipeline): update_data.sec_edgar_da, la
+    STESSA funzione del run — calendario dei risultati (8-K 2.02), ore dei depositi, storia della quotazione e voci dei
+    bilanci (debito, scadenze, derivati: companyfacts) — con la stessa intestazione (update_data.SEC_UA). La cache del
+    debito della sessione (memoria/dati/debito_sec_sessione.json) parte da quella del repo: companyfacts si legge solo
+    per un 10-Q/10-K che nessuno dei due ha ancora letto, senza il tetto di dieci per run. Misurato il 31/10/2026: 54
+    bilanci, 30 secondi, uscita IDENTICA a quella del run. Se SEC non risponde, le date dei 10-Q e 10-K si prendono da
+    Yahoo (sec_filings), DICHIARATO: un ripiego, non una seconda derivazione.
+  · COMPOSIZIONE DEGLI ETF (v522): update_data.prime_etf, le prime cinque partecipazioni di ciascun ETF della rotazione
+    come l'emittente le dichiara. Senza macro.tilt nel run, le righe si costruiscono da update_data.SECTOR_ETF.
 ⚠ UNA LETTURA PER ANALISI: memoria/dati/fonti_titoli.json (ignorata da git), riusata per TRENTA minuti da chi carica
   data.json (carica): due strumenti che leggessero lo stesso titolo in due momenti potrebbero vederne due consensi.
 ⚠ VINCE LA PIU' RECENTE: un CDS o un regolamento della pipeline piu' avanti di quello letto restano quelli della
@@ -67,9 +73,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 RADICE = Path(__file__).resolve().parent.parent
 CACHE = RADICE / "memoria" / "dati" / "fonti_titoli.json"
+DEBITO_SESSIONE = RADICE / "memoria" / "dati" / "debito_sec_sessione.json"     # v522 — fuori dal repo, come la lettura
 STORIA_COPIA = RADICE / "memoria" / "dati" / "cds_storia_copia.jsonl"
 CDS_SESSIONE = RADICE / "memoria" / "cds_sessione.jsonl"
-CDS_SESSIONE_GIORNI = 30
+# v522 — la riserva della sessione deve reggere anche una pipeline ferma a lungo: lo stesso tetto dello storico del repo
+#   (circa due anni). Non cresce quando la pipeline gira, perche' i giorni che il repo ha gia' completi si tolgono
+#   (conserva_giorni_cds): resta solo cio' che nessun altro ha raccolto
+CDS_SESSIONE_GIORNI = 520
 VALIDITA_MINUTI = 30
 PERIODICI = ("10-Q", "10-K")
 URL_NASDAQ_FIN = "https://api.nasdaq.com/api/company/{tk}/financials?frequency=2"
@@ -81,7 +91,7 @@ VOCI_NASDAQ = {"ricavi": ("Total Revenue",),
 SPENTA = "TRADING_FONTI_TITOLI"     # ="spenta": le suite non leggono la lettura del giro (dipenderebbero dall'ora)
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-BLOCCHI = ("righe", "analisti", "fedwatch", "cds", "short", "sec", "trimestri", "btp", "leva")
+BLOCCHI = ("righe", "analisti", "fedwatch", "cds", "short", "sec", "trimestri", "btp", "leva", "edgar", "etf")
 
 # ⚠ OGNI QUANTO CAMBIA CIASCUN DATO, e ogni quanto la pipeline lo rilegge: la domanda del CEO del 25/10. Fatti delle fonti
 #   (orari, scadenze di legge, calendario), non stime: dove la cadenza non e' fissata dalla fonte si dice.
@@ -105,14 +115,22 @@ CADENZE = (
     ("sec", "Depositi SEC",
      "10-Q ogni trimestre, entro 40 o 45 giorni dalla chiusura secondo la dimensione della societa'; 10-K ogni anno, "
      "entro 60, 75 o 90 giorni; 8-K entro quattro giorni lavorativi da un evento (i conti escono di solito con un 8-K il "
-     "giorno stesso). La pipeline rilegge le voci del debito solo dopo un 10-Q o 10-K nuovo, al piu' dieci per run"),
+     "giorno stesso). Le voci del debito cambiano solo con un 10-Q o 10-K nuovo: la pipeline ne rilegge al piu' dieci "
+     "per run, questa lettura tutti quelli nuovi (v522)"),
     ("btp", "Prezzo del BTP (Borsa Italiana, v521)",
-     "un prezzo ufficiale per seduta del MOT, con la data che la pagina dichiara accanto"),
+     "per ogni seduta del MOT un prezzo di riferimento e un prezzo ufficiale, ciascuno con la data che la pagina "
+     "dichiara accanto: il prezzo ufficiale esce piu' tardi, e vale il piu' recente dei due (v522)"),
     ("leva", "Debito a margine (FINRA, v521)",
      "una rilevazione al mese, per il mese concluso: il giorno di pubblicazione lo fissa FINRA, e qui non si stima; "
      "la tabella della pagina e il file storico si uniscono per data, con la funzione della pipeline"),
+    ("edgar", "SEC EDGAR (v522)",
+     "un deposito quando la societa' lo fa: i conti con un 8-K, di solito il giorno stesso; 10-Q e 10-K entro le "
+     "scadenze di legge; l'archivio dei depositi e' consultabile in qualunque momento"),
+    ("etf", "Composizione degli ETF (v522)",
+     "la dichiara l'emittente, di solito ogni giorno; cambia coi ribilanciamenti del fondo, quindi lentamente"),
 )
-CADENZA_PIPELINE = ("La pipeline rilegge analisti, FedWatch, CDS, short, prezzo del BTP e debito a margine a ogni run: 14-15 run al giorno nei feriali e "
+CADENZA_PIPELINE = ("La pipeline rilegge analisti, FedWatch, CDS, short, prezzo del BTP, debito a margine, SEC EDGAR "
+                    "e composizione degli ETF a ogni run: 14-15 run al giorno nei feriali e "
                     "11 nel fine settimana, che partono con 99-263 minuti di ritardo sull'orario (la coda del cron di "
                     "GitHub, v437)")
 
@@ -607,14 +625,28 @@ def conserva_giorni_cds(lettura, tasso, storia_repo, percorso=CDS_SESSIONE, gior
     righe = ud.righe_storia_cds(lettura, tasso)
     _, es = ud.unisci_storia_cds(copy.deepcopy(storia_repo or []), copy.deepcopy(righe), inserisci_vecchi=True)
     utili = set(es["nuove"]) | set(es["completate"]) | set(es.get("inseriti") or [])
+    sess0 = ud.leggi_storia_cds(Path(percorso))
+    # v522 — i giorni che lo storico del repo ha gia' COMPLETI (ogni entita' e ogni indice della riga di sessione) si
+    #   tolgono: la pipeline li ha uniti, e la riserva resta piccola finche' la pipeline gira
+    sess = [r for r in sess0 if not gia_nel_repo(r, storia_repo)]
+    tolti = len(sess0) - len(sess)
     if not utili:
+        if tolti:
+            ud.scrivi_storia_cds(sess, Path(percorso))
         return []
     righe = [{**r, "origine": "sessione d'analisi (scripts/fonti_titoli.py)"} for r in righe if r["d"] in utili]
-    sess = ud.leggi_storia_cds(Path(percorso))
     sess, es2 = ud.unisci_storia_cds(sess, righe, massimo=giorni, inserisci_vecchi=True)
-    if es2["cambiato"]:
+    if es2["cambiato"] or tolti:
         ud.scrivi_storia_cds(sess, Path(percorso))
     return sorted(utili)
+
+
+def gia_nel_repo(riga, storia_repo):
+    """v522 — True se lo storico del repo ha il giorno della riga con TUTTE le sue entita' e i suoi indici: quel giorno
+    nella riserva della sessione non serve piu'. Un giorno che il repo ha a meta' resta."""
+    r = next((x for x in (storia_repo or []) if x.get("d") == (riga or {}).get("d")), None)
+    return bool(r) and set((riga or {}).get("p") or {}) <= set(r.get("p") or {}) \
+        and set((riga or {}).get("i") or {}) <= set(r.get("i") or {})
 
 
 def leggi_cds(d, fedwatch, lettura=None, rendimenti=None, mercato=None, get=None, percorso_sessione=CDS_SESSIONE):
@@ -894,6 +926,142 @@ def leggi_leva(fetch=None):
     return {"esito": "letto", "valore": md}
 
 
+def semina_debito(repo=None, sessione=None):
+    """v522 — la cache del debito della sessione parte da quella del repo (data/debito_sec.json, scritta dalla
+    pipeline): per ogni nome vale la lettura del bilancio piu' recente, a parita' quella della versione corrente, poi
+    la piu' recente letta. Cosi' companyfacts si legge solo per i bilanci che NESSUNO dei due ha ancora letto. Ritorna
+    il percorso della cache della sessione."""
+    ud = _ud()
+    rp = Path(repo) if repo else Path(ud.DEBITO_SEC)
+    sp = Path(sessione) if sessione else DEBITO_SESSIONE
+
+    def per(p):
+        try:
+            return json.loads(p.read_text(encoding="utf-8")).get("per_titolo") or {}
+        except (OSError, ValueError, AttributeError):
+            return {}
+
+    def chiave(x):
+        dep = (x or {}).get("deposito") or {}
+        return (str(dep.get("data") or ""), (x or {}).get("versione") == ud.XBRL_VERSIONE,
+                str((x or {}).get("letto_il") or ""))
+    a, b = per(rp), per(sp)
+    out = {tk: max([x for x in (a.get(tk), b.get(tk)) if x], key=chiave) for tk in set(a) | set(b)}
+    sp.parent.mkdir(parents=True, exist_ok=True)
+    tmp = sp.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"aggiornato": datetime.now(timezone.utc).date().isoformat(), "per_titolo": out,
+                               "seme": str(rp)}, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
+    os.replace(tmp, sp)
+    return sp
+
+
+def leggi_edgar(posizioni=(), get=None, percorso=None, repo=None, watchlist=None, pausa=0.12, pausa_xbrl=0.15):
+    """v522 — il giro di SEC EDGAR con la funzione della pipeline (update_data.sec_edgar_da) e la sua intestazione, sui
+    nomi che la pipeline segue (config/ui_watchlist.json), senza il tetto di dieci bilanci per run. Non solleva mai."""
+    ud = _ud()
+    t0 = time.time()
+    try:
+        p = semina_debito(repo, percorso)
+        if watchlist is None:
+            with contextlib.redirect_stdout(io.StringIO()):
+                _, watchlist, _ = ud.load_holdings()
+        seguiti = ud.seguiti_sec(watchlist)
+        r = ud.sec_edgar_da(seguiti, posizioni=list(posizioni or ()), get=get, ua=ud.SEC_UA, percorso_debito=p,
+                            budget=max(len(seguiti), 1), pausa=pausa, pausa_xbrl=pausa_xbrl)
+    except Exception as e:  # noqa: BLE001
+        return {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
+    return {"esito": "letto", **r, "seguiti": len(seguiti), "secondi": round(time.time() - t0, 1)}
+
+
+def periodici_edgar(lettura):
+    """{tk: {forma: data}} dell'ultimo 10-Q o 10-K letto adesso da EDGAR: la stessa forma di periodici_da (Yahoo),
+    perche' ferme e la resa ne leggano una sola. Le modifiche («10-Q/A») contano come la forma di base."""
+    return {tk: {str(ub["forma"]).split("/")[0]: ub["data"]}
+            for tk, ub in ((lettura or {}).get("bilanci") or {}).items() if ub and ub.get("forma") and ub.get("data")}
+
+
+def applica_edgar(m, lettura):
+    """v522 — il calendario dei risultati, le ore, la storia della quotazione e il debito letti adesso al posto del run.
+    Un nome che SEC non ha restituito in questo giro tiene la voce del run, DICHIARATO in `_sessione.dalla_pipeline`."""
+    if (lettura or {}).get("esito") != "letto":
+        return "pipeline (" + ((lettura or {}).get("errore") or "non letto") + ")"
+    err = lettura.get("errori_titoli") or {}
+    p_cal = m.get("sec_calendario") or {}
+    cal = copy.deepcopy(lettura.get("sec_calendario"))
+    tenuti = []
+    if cal:
+        for tk in sorted(err):
+            preso = False
+            for sotto in (None, "ore_depositi", "storia_quotazione"):
+                src = p_cal.get(sotto) if sotto else p_cal
+                dst = cal.setdefault(sotto, {}) if sotto else cal
+                v = ((src or {}).get("per_titolo") or {}).get(tk)
+                if v is not None:
+                    dst.setdefault("per_titolo", {})[tk] = v
+                    preso = True
+            if tk in (p_cal.get("senza_8k") or []) and tk not in (cal.get("senza_8k") or []):
+                cal.setdefault("senza_8k", []).append(tk)
+                preso = True
+            if preso:
+                tenuti.append(tk)
+        cal["_sessione"] = {"letto": True, "dalla_pipeline": tenuti, "errori": err}
+        m["sec_calendario"] = cal
+    ds = copy.deepcopy(lettura.get("debito_sec"))
+    if ds is not None:
+        p_ds = (m.get("debito_sec") or {}).get("per_titolo") or {}
+        for tk in sorted(err):
+            if tk in p_ds and tk not in ds.setdefault("per_titolo", {}):
+                ds["per_titolo"][tk] = p_ds[tk]
+        m["debito_sec"] = ds
+    parti = [f"SEC EDGAR letto adesso per {lettura.get('seguiti')} nomi"]
+    if not cal:
+        parti.append("calendario del run (la lettura non ha restituito nessun nome)")
+    if tenuti:
+        parti.append("del run per " + ", ".join(tenuti) + " (SEC non li ha restituiti)")
+    if ds is None:
+        parti.append("debito del run (" + (lettura.get("errore_debito") or "non letto") + ")")
+    elif ds.get("letti_ora"):
+        parti.append("bilanci letti ora: " + ", ".join(ds["letti_ora"]))
+    return "fonte (" + "; ".join(parti) + ")"
+
+
+def leggi_etf(lettore=None):
+    """v522 — le prime cinque partecipazioni di ogni ETF della rotazione, con update_data.prime_etf."""
+    ud = _ud()
+    simboli = list(ud.SECTOR_ETF)
+    letti = _in_parallelo(lettore or ud.prime_etf, simboli)
+    per = {s: v for s, v in letti.items() if v}
+    return {"esito": "letto" if per else "non letto", "per_etf": per,
+            "vuoti": sorted(s for s in simboli if not letti.get(s)),
+            "giorno": datetime.now(NEW_YORK).date().isoformat()}
+
+
+def applica_etf(m, lettura):
+    """v522 — la composizione letta adesso al posto di quella del run, ETF per ETF; un ETF che il fornitore non ha
+    restituito tiene quella del run. Senza macro.tilt nel run le righe si costruiscono da update_data.SECTOR_ETF (nome e
+    gruppo), cosi' la rotazione ha il suo universo anche quando la pipeline non l'ha scritto."""
+    if (lettura or {}).get("esito") != "letto":
+        return "pipeline (" + ((lettura or {}).get("errore") or "non letta") + ")"
+    per = lettura.get("per_etf") or {}
+    tilt = m.get("tilt")
+    costruite = not tilt
+    if costruite:
+        tilt = [{"ticker": s, "name": n, "group": g, "prime": []} for s, (n, g) in _ud().SECTOR_ETF.items()]
+    tenuti = []
+    for r in tilt:
+        v = per.get(r.get("ticker"))
+        if v:
+            r["prime"] = v
+            r["prime_letto_il"] = lettura.get("giorno")
+        elif r.get("prime"):
+            tenuti.append(r["ticker"])
+    m["tilt"] = tilt
+    return ("fonte (composizione letta adesso per " + str(len(per)) + " ETF"
+            + ("; righe costruite da SECTOR_ETF: il run non porta macro.tilt" if costruite else "")
+            + (f"; del run per {', '.join(tenuti)}" if tenuti else "")
+            + (f"; senza composizione: {', '.join(lettura['vuoti'])}" if lettura.get("vuoti") else "") + ")")
+
+
 def leggi_alla_fonte(d, nomi):
     """Il giro: le letture in parallelo (CDS dopo FedWatch, che ne da' il tasso). Non solleva mai."""
     t0 = time.time()
@@ -902,10 +1070,17 @@ def leggi_alla_fonte(d, nomi):
 
     def fw():
         return ud.fedwatch_da()
-    # 1. le righe (le piu' lunghe) e FedWatch insieme
-    with ThreadPoolExecutor(2) as ex:
+    # 1. le righe (le piu' lunghe), FedWatch, SEC EDGAR e la composizione degli ETF insieme: nessuno dipende dalle righe
+    with ThreadPoolExecutor(4) as ex:
         f_rg = ex.submit(leggi_righe, d)
         f_fw = ex.submit(fw)
+        f_ed = ex.submit(leggi_edgar, nomi)       # v522
+        f_etf = ex.submit(leggi_etf)              # v522
+        g["edgar"] = f_ed.result()
+        try:
+            g["etf"] = f_etf.result()
+        except Exception as e:  # noqa: BLE001
+            g["etf"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
         try:
             g["righe"] = f_rg.result()
         except Exception as e:  # noqa: BLE001
@@ -918,6 +1093,8 @@ def leggi_alla_fonte(d, nomi):
     # 2. il resto sulle righe GIA' FUSE: una tabella dei trimestri ferma si giudica su quella di adesso (Yahoo puo' aver
     #    gia' portato il trimestre), e il flottante delle vendite allo scoperto e' quello di adesso
     dd = con_righe(d, g["righe"])
+    if dd:
+        applica_edgar(dd.setdefault("macro", {}), g["edgar"])     # v522 — le tabelle ferme sui depositi di adesso
 
     def rend_di(tks):
         """I rendimenti delle righe lette adesso; si scaricano a parte solo quelli che mancano."""
@@ -932,7 +1109,8 @@ def leggi_alla_fonte(d, nomi):
         return {**dalla_riga, **(leggi_analisti(resto) if resto else {})}
     with ThreadPoolExecutor(5) as ex:
         f_an = ex.submit(an_resto)
-        f_sec = ex.submit(leggi_sec, nomi)
+        # v522 — le date dei 10-Q e 10-K da Yahoo solo se EDGAR non ha risposto: un ripiego, non una seconda derivazione
+        f_sec = None if g["edgar"].get("esito") == "letto" else ex.submit(leggi_sec, nomi)
         f_si = ex.submit(leggi_short, dd, rend_di)
         f_btp = ex.submit(leggi_btp)       # v521
         f_lv = ex.submit(leggi_leva)       # v521
@@ -945,12 +1123,18 @@ def leggi_alla_fonte(d, nomi):
                              "dalla_riga": sorted(k for k, v in dalla_riga.items() if v)}
         except Exception as e:  # noqa: BLE001
             g["analisti"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
-        try:
-            sec = f_sec.result()
-            g["sec"] = {"esito": "letto", "per_titolo": {k: v for k, v in sec.items() if v is not None},
-                        "non_letti": sorted(k for k, v in sec.items() if v is None)}
-        except Exception as e:  # noqa: BLE001
-            g["sec"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
+        if f_sec is None:
+            g["sec"] = {"esito": "letto", "fonte": "SEC EDGAR", "per_titolo": periodici_edgar(g["edgar"]),
+                        "non_letti": sorted(g["edgar"].get("errori_titoli") or {})}
+        else:
+            try:
+                sec = f_sec.result()
+                g["sec"] = {"esito": "letto", "fonte": "Yahoo, ripiego: EDGAR "
+                            + (g["edgar"].get("errore") or "non letto"),
+                            "per_titolo": {k: v for k, v in sec.items() if v is not None},
+                            "non_letti": sorted(k for k, v in sec.items() if v is None)}
+            except Exception as e:  # noqa: BLE001
+                g["sec"] = {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
         try:
             g["short"] = f_si.result()
         except Exception as e:  # noqa: BLE001
@@ -1109,14 +1293,17 @@ def sovrapponi(d, giro):
         esiti["short"] = "pipeline (" + (si.get("esito") or "non letto") + ")"
     esiti["btp"] = applica_btp(out, giro.get("btp") or {})
     esiti["leva"] = applica_leva(m, giro.get("leva") or {})
-    esiti["sec"] = "date dei depositi dalla fonte" if sec.get("esito") == "letto" else "solo la pipeline"
+    esiti["edgar"] = applica_edgar(m, giro.get("edgar") or {})     # v522
+    esiti["etf"] = applica_etf(m, giro.get("etf") or {})           # v522
+    esiti["sec"] = (f"date dei depositi dalla fonte ({sec.get('fonte') or 'Yahoo'})" if sec.get("esito") == "letto"
+                    else "solo la pipeline")
     esiti["trimestri"] = (f"Nasdaq per {', '.join(completati)} (verificato sul trimestre in comune)" if completati
                           else "pipeline")
     m["_fonti_titoli"] = {"letto": giro.get("letto"), "esiti": esiti}
     return out
 
 
-CAMPI_BTP = ("price", "price_asof", "price_src", "value", "gain", "gain_pct")
+CAMPI_BTP = ("price", "price_asof", "price_src", "value", "gain", "gain_pct", "rateo_netto")
 
 
 def applica_btp(d, lettura):
@@ -1137,7 +1324,7 @@ def applica_btp(d, lettura):
     nuova = _ud().fetch_btp(None, lettura)
     for k in CAMPI_BTP:
         r[k] = nuova.get(k)
-    return f"fonte (prezzo ufficiale del {_data_it(la)})" if la else "fonte (Borsa Italiana, senza data nella pagina)"
+    return f"fonte ({lettura.get('voce')} del {_data_it(la)})" if la else "fonte (Borsa Italiana, senza data nella pagina)"
 
 
 def applica_leva(m, lettura):
@@ -1337,6 +1524,8 @@ def sintesi(d, giro, adesso=None, ufficiali=None):
         L.append(f"  · VENDITE ALLO SCOPERTO (FINRA): NON lette ({si.get('errore') or 'n.d.'}): vale il regolamento "
                  f"della pipeline ({psi.get('regolamento') or 'n.d.'})")
     L.extend(righe_btp_leva(d, g, cercare))       # v521
+    L.extend(righe_edgar(d, g.get("edgar") or {}, cercare))     # v522
+    L.extend(righe_etf(d, g.get("etf") or {}))                  # v522
     # sec e trimestri
     L.extend(righe_sec(d, g.get("sec") or {}, cercare, g.get("trimestri") or {}, uff_es, uff_reg))
     L.extend(righe_ufficiali(uff_reg, uff_es))
@@ -1359,7 +1548,13 @@ def righe_btp_leva(d, g, cercare):
     if b.get("esito") == "letto":
         L.append(f"  · PREZZO DEL BTP (Borsa Italiana): {_n(b.get('prezzo'), 3)} "
                  + (f"del {_data_it(b.get('data'))}" if b.get("data") else "SENZA DATA nella pagina")
-                 + f" ({b.get('voce')}) · nel run: {run_btp}")
+                 + f" ({b.get('voce')})"
+                 # v522 — l'altro prezzo datato della pagina e il rateo, dichiarati: il valore resta a corso secco
+                 + (f" · {(b.get('altro') or {}).get('voce')} {_n((b.get('altro') or {}).get('prezzo'), 3)} del "
+                    f"{_data_it((b.get('altro') or {}).get('data'))}" if (b.get("altro") or {}).get("prezzo") else "")
+                 + (f" · rateo netto {_n(b.get('rateo_netto'), 4)} ogni 100 di nominale (il broker lo aggiunge al "
+                    "controvalore; qui il valore e' a corso secco)" if b.get("rateo_netto") is not None else "")
+                 + f" · nel run: {run_btp}")
     else:
         L.append(f"  · PREZZO DEL BTP: NON letto alla fonte ({b.get('errore') or 'n.d.'}) · vale il run: {run_btp}")
         if str(r.get("price_src") or "").startswith("RIPIEGO"):
@@ -1379,6 +1574,57 @@ def righe_btp_leva(d, g, cercare):
         if p.get("carried") or p.get("unreliable") or not p:
             cercare.append("il debito a margine di FINRA dell'ultimo mese: ne' la fonte ne' il run lo hanno")
     return L
+
+
+def righe_edgar(d, ed, cercare):
+    """v522 — SEC EDGAR letto adesso: quanti nomi, i depositi di risultati PIU' RECENTI del run, i bilanci riletti, chi
+    SEC non ha restituito (e tiene la voce del run, dichiarato)."""
+    if (ed or {}).get("esito") != "letto":
+        cercare.append("i depositi SEC piu' recenti dei nomi in esame: EDGAR non ha risposto, e calendario, ore, storia "
+                       "della quotazione e voci dei bilanci sono quelli del run")
+        return [f"  · SEC EDGAR: NON letto alla fonte ({(ed or {}).get('errore') or 'n.d.'}): calendario dei risultati, "
+                "ore dei depositi, storia della quotazione e voci dei bilanci sono quelli del run della pipeline"]
+    cal = ed.get("sec_calendario") or {}
+    pt = cal.get("per_titolo") or {}
+    pp = ((((d or {}).get("macro") or {}).get("sec_calendario")) or {}).get("per_titolo") or {}
+    nuovi = sorted(f"{tk} (8-K del {_data_it(v.get('ultimo_deposito'))}; nel run "
+                   + (f"{_data_it((pp.get(tk) or {}).get('ultimo_deposito'))})" if (pp.get(tk) or {}).get("ultimo_deposito")
+                      else "assente)")
+                   for tk, v in pt.items()
+                   if str(v.get("ultimo_deposito") or "") > str((pp.get(tk) or {}).get("ultimo_deposito") or ""))
+    ds = ed.get("debito_sec") or {}
+    L = [f"  · SEC EDGAR (letto adesso con l'intestazione della pipeline, la stessa funzione del run; "
+         f"{_n(ed.get('secondi'), 1)} s): {ed.get('seguiti')} nomi seguiti, {len(pt)} col calendario dei risultati, "
+         f"{len(cal.get('senza_8k') or [])} emittenti senza 8-K"
+         + (f"; voci dei bilanci per {len(ds.get('per_titolo') or {})} nomi, "
+            + (f"rilette ADESSO per {', '.join(ds['letti_ora'])} (un 10-Q o 10-K che il run non aveva ancora letto)"
+               if ds.get("letti_ora") else "nessun bilancio nuovo da rileggere") if ed.get("debito_sec") is not None
+            else f"; voci dei bilanci NON lette ({ed.get('errore_debito') or 'n.d.'}): valgono quelle del run")]
+    if nuovi:
+        L.append("      deposito di risultati PIU' RECENTE di quello del run: " + ", ".join(nuovi))
+    if ed.get("errori_titoli"):
+        L.append("      NON restituiti da SEC in questo giro, vale la voce del run: " + ", ".join(sorted(ed["errori_titoli"])))
+    if ds.get("errori"):
+        L.append("      ⚠ bilancio nuovo NON riletto (companyfacts ha dato errore): " + ", ".join(sorted(ds["errori"]))
+                 + " — debito, scadenze e derivati di quei nomi sono del bilancio precedente")
+        cercare.append("debito e scadenze dal 10-Q o 10-K piu' recente di " + ", ".join(sorted(ds["errori"]))
+                       + ": SEC non ha restituito i fatti del bilancio")
+    return L
+
+
+def righe_etf(d, etf):
+    """v522 — la composizione degli ETF della rotazione letta adesso, e dove cambia rispetto al run."""
+    if (etf or {}).get("esito") != "letto":
+        return [f"  · COMPOSIZIONE DEGLI ETF: NON letta alla fonte ({(etf or {}).get('errore') or 'n.d.'}): vale quella del "
+                "run (cambia coi ribilanciamenti, quindi lentamente)"]
+    per = etf.get("per_etf") or {}
+    pp = {r.get("ticker"): r.get("prime") for r in (((d or {}).get("macro") or {}).get("tilt") or [])}
+    cambiati = sorted(s for s, v in per.items() if pp.get(s) and [x.get("tk") for x in v] != [x.get("tk") for x in pp[s]])
+    return [f"  · COMPOSIZIONE DEGLI ETF (le prime cinque partecipazioni, come l'emittente le dichiara): letta adesso per "
+            f"{len(per)} ETF"
+            + ("; il run non porta macro.tilt, le righe si costruiscono da update_data.SECTOR_ETF" if not pp else
+               (f"; nomi diversi dal run per {', '.join(cambiati)}" if cambiati else "; stessi nomi del run"))
+            + (f"; senza composizione dal fornitore: {', '.join(etf['vuoti'])}" if etf.get("vuoti") else "")]
 
 
 def righe_righe(d, rg, cercare):
@@ -1407,7 +1653,8 @@ def righe_righe(d, rg, cercare):
         L.append("      ⚠ benchmark della forza relativa non letti adesso: la forza relativa a un mese resta quella del "
                  "run, accanto a prezzi di adesso")
     L.append("      restano del run, perche' si calcolano sui titoli INSIEME o hanno un blocco proprio: correlazioni, "
-             "beta sul Nasdaq-100 e contributo al rischio; CDS e vendite allo scoperto (qui sotto). Controvalore, "
+             "beta sul Nasdaq-100 e contributo al rischio delle righe (servono alla pagina: quelli dell'analisi li "
+             "calcola numeri_libro.py sulle barre, v460); CDS e vendite allo scoperto (qui sotto). Controvalore, "
              "guadagno sul carico e forza relativa a un mese si rifanno sul prezzo di adesso")
     return L
 
@@ -1466,12 +1713,14 @@ def righe_sec(d, sec, cercare, trim=None, uff_es=None, uff_reg=None):
                            "ricavi, utile e risultato operativo del trimestre COI CONFRONTI DEL COMUNICATO STESSO "
                            "(l'anno prima e il trimestre prima), con la voce, il link e la data, da scrivere in "
                            "memoria/trimestri_ufficiali.json")
-    L = [f"  · DEPOSITI SEC (date dei 10-Q e 10-K da Yahoo): {len(sec.get('per_titolo') or {})} titoli letti"
+    L = [f"  · DEPOSITI SEC (date dei 10-Q e 10-K da {sec.get('fonte') or 'Yahoo'}): "
+         f"{len(sec.get('per_titolo') or {})} titoli letti"
          + (f", non letti {', '.join(sec['non_letti'])}" if sec.get("non_letti") else "")]
     if dietro:
         L.append("      ⚠ un bilancio periodico PIU' RECENTE di quello da cui il sistema legge debito, scadenze e "
-                 "derivati: " + ", ".join(dietro) + " — quelle voci sono del bilancio precedente (SEC non risponde da "
-                 "qui: le rilegge la pipeline, al piu' dieci per run)")
+                 "derivati: " + ", ".join(dietro) + " — quelle voci sono del bilancio precedente ("
+                 + ("companyfacts non e' stato riletto in questo giro" if str(sec.get("fonte") or "").startswith("SEC")
+                    else "EDGAR non ha risposto in questo giro: le rilegge la pipeline, al piu' dieci per run") + ")")
         cercare.append("debito e scadenze dei nomi col bilancio nuovo non ancora letto: " + ", ".join(dietro))
     if ritrovati:
         L.append("      ⚠ tabella dei trimestri della pipeline FERMA (Yahoo non porta ancora l'ultimo trimestre), "

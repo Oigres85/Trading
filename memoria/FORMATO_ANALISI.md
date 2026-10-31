@@ -37,14 +37,16 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    STESSE derivazioni della pipeline (la libreria `comuni.py`), e scrive la lettura che gli altri strumenti riusano. Per
    ogni serie dice chi l'ha servita (la fonte o la pipeline come ripiego), la sua rilevazione e come sta la pipeline
    rispetto alla fonte; per la pipeline l'età del run e se è precedente all'ultima chiusura USA, con l'elenco di ciò
-   che porta solo lei (target e revisioni, sensibilità, CDS, short, bilanci SEC, leva, BTP): quelle righe descrivono la
-   seduta prima, e la risposta lo dice.
+   che porta solo lei — dal 31/10 (v522) lo storico dei CDS e le misure incrociate delle righe, che servono alla pagina:
+   quelle righe descrivono la seduta prima, e la risposta lo dice.
 00bis. `python3 scripts/fonti_titoli.py` — **DATI PER TITOLO** (v512, CEO del 25/10/2026: *"target degli analisti,
    FedWatch, storico dei CDS, vendite allo scoperto, bilanci SEC della pipeline se non sono aggiornati … trovali altrove
    anche attraverso news; dati non aggiornati non sono affidabili"*). Gira PRIMA degli altri, insieme alle fonti dirette:
    rilegge alla fonte, con le STESSE funzioni della pipeline, target e revisioni degli analisti (Yahoo), FedWatch (future
    per esteso e EFFR), il CDS dell'ultimo giorno (ICE: se la pipeline è indietro le misure si rifanno, e il giorno che lo
-   storico non ha si conserva per lei), le vendite allo scoperto (FINRA), le date dei 10-Q e 10-K; e dove la tabella dei
+   storico non ha si conserva per lei), le vendite allo scoperto (FINRA), il prezzo del BTP e il debito a margine, e
+   dal 31/10 (v522, consenso del CEO al contatto per SEC) **SEC EDGAR** con la funzione della pipeline — calendario dei
+   risultati, ore dei depositi, storia della quotazione, voci dei bilanci — e la **composizione degli ETF**; e dove la tabella dei
    trimestri della pipeline è ferma prima di un deposito di risultati prende il trimestre da Nasdaq, solo se le due fonti
    danno gli stessi numeri sul trimestre in comune. Gli strumenti dopo di lui leggono quei dati. Stampa ogni quanto cambia
    ciascun dato e la lista **DA CERCARE IN RETE**: dove nemmeno la fonte è aggiornata.
@@ -138,7 +140,8 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    essere strutturale e aggiunta sempre"*) — i 21 ETF settoriali e i primi cinque titoli di
    ciascuno su prezzi DI OGGI, con distanza dalle medie in ATR, supporto/resistenza e
    correlazione col libro. ⚠ Mai la tabella `macro.tilt` della pipeline per i numeri: è ferma
-   al proprio run. Da lì viene solo la composizione degli ETF.
+   al proprio run. Da lì viene solo la composizione degli ETF, che dal 31/10 (v522) la sessione rilegge
+   dall'emittente a ogni analisi.
    Di default stampa SOLO i candidati per settore (v469, istruzione del CEO): medie 20/50/200
    con livelli, distanza in ATR e pendenza, andamento a 1 e 3 mesi, RSI, volumi come PERCENTILE
    dell'anno 0-100 (v472: ultima seduta conclusa e media a 20; 0 = minimo, 50 = norma, 100 = massimo), supporto/resistenza e notizie del feed

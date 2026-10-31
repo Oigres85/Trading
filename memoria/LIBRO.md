@@ -931,11 +931,20 @@ per riga, con quando è nata, perché conta e come si chiude. `scripts/stato_sis
 loro età, e segnala ogni «da confermare» delle tabelle di §1 e §1decies che qui non c'è. **Una domanda chiusa si toglie
 da qui il giorno della risposta**, e la risposta entra dove serve (§1, §1decies, `config/`).
 
+**Chiuse il 31/10/2026** (CEO: *"1 ok foto / 2 ho solo foto grafico conto … va bene anche questo? / 3 si ma
+scegli tu soluzione migliore"*):
+- le tre righe di MSTR, RGTI e SKHY → in §1duodecies;
+- i versamenti netti: **il CEO non li ha** (ha solo il grafico del valore del conto, e un salto del grafico non
+  distingue un versamento da un guadagno). Il **ROI dall'inizio del conto resta NON CALCOLABILE**, e si dice. La
+  misura che non ha bisogno dei versamenti è il **registro della performance** dal 09/10/2026, a rendimento
+  ponderato per il tempo (§1quinquies e `memoria/registro_performance.jsonl`): un versamento non è un guadagno
+  perché ogni riga parte dalle posizioni d'inizio intervallo. Se un giorno l'estratto di Sella darà il totale
+  versato, il ROI si calcola da lì;
+- il contatto per SEC EDGAR: **sì** — la sessione manda la stessa intestazione della pipeline (`SEC_UA`), e le
+  voci SEC si rileggono a ogni analisi (v522).
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 31/10/2026 | le tre righe di MSTR, RGTI e SKHY della fotografia del broker (la schermata «AZIONI (13)» ne mostra 10: «VEDI TUTTI») | senza, il loro carico in euro — la base fiscale — non c'e', e il loro risultato in euro resta in dollari (insieme valgono 32.893 € con un profitto di −11.123 €, ricavati dai totali del broker) | la schermata «VEDI TUTTI» del dettaglio portafoglio: controvalore e profitto di ciascuno, in §1duodecies |
-| 31/10/2026 | i versamenti netti dall'apertura del conto (e i prelievi), e lo storico COMPLETO delle operazioni chiuse del 2026 con cedole e dividendi | il ROI dall'inizio del conto (richiesta del CEO, «2 si») non si calcola senza i versamenti: il +51,45% è il guadagno sul carico delle sole posizioni aperte | dall'estratto conto o dal rendiconto di Sella: il totale versato e prelevato, e le righe dello «STORICO OPERAZIONI» oltre le due già registrate |
-| 31/10/2026 | se la sessione può mandare a SEC EDGAR lo stesso contatto (intestazione «User-Agent» con l'indirizzo) che la pipeline usa già | SEC risponde 403 a chi non si identifica: senza quel contatto le voci dei bilanci SEC (debito, scadenze, derivati, salute del credito) restano l'ultima dipendenza da GitHub che una fonte pubblica potrebbe togliere, e l'indirizzo non si manda a un servizio senza il consenso del CEO | un sì o un no del CEO: col sì, le voci SEC si rileggono in sessione con la funzione della pipeline; col no, restano del run e lo stato del sistema le data |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
@@ -962,12 +971,17 @@ questo, dopo un acquisto o una vendita sul nome, la riga è **superata** e serve
 | NVDA | 49.456,49 | 27.503,46 | EUR | +125,28 |
 | ORCL | 7.018,25 | 46,96 | EUR | +0,67 |
 | PLTR | 16.479,59 | 6.467,24 | EUR | +64,59 |
+| MSTR | 20.209,65 | -5.733,87 | EUR | -22,10 |
+| RGTI | 6.673,32 | -5.982,98 | EUR | -47,27 |
+| SKHY | 6.010,06 | 594,02 | EUR | +10,97 |
 | BTP-V28 | 40.754,40 | 652,00 | EUR | +1,63 |
 | TOTALE TITOLI | 291.357,08 | 98.978,65 | EUR | +51,48 |
 | TOTALE IN DOLLARI (azioni) | — | 109.080,76 | USD | +63,83 |
 | TOTALE IN EURO (BTP) | — | 652,00 | EUR | +1,63 |
 
-⚠ La schermata delle azioni mostra 10 righe su 13: **MSTR, RGTI e SKHY mancano** (domanda in §1undecies). Il
+MSTR, RGTI e SKHY vengono dalla seconda schermata dello stesso sabato («VEDI TUTTI», mandata dal CEO il
+31/10/2026): a borsa chiusa i prezzi sono gli stessi della prima. Verificato: le tre righe insieme valgono 32.893,03 €
+con un profitto di −11.122,83 €, cioè esattamente la differenza fra i totali del broker e le altre dieci righe. Il
 controvalore dei titoli **non comprende la liquidità** (~24.000 €, §1). Verificato il 31/10/2026: il carico in dollari
 che il totale del broker implica (109.080,76 / 63,83%) è 170.893 $, quello del libro (§1, quantità × prezzo medio)
 170.893 $ — coincidono.
@@ -981,7 +995,8 @@ broker le calcola)
 | 20/10/2026 | 20/10/2026 | SMCI | vendita | 250 | 32,75 | +241,58 | 62,81 | — |
 
 ⚠ Lo storico registrato è **parziale**: le altre vendite del 2026 (WDC, la prima GOOGL, …), le cedole del BTP e i
-dividendi non ci sono — domanda in §1undecies. «Prezzo netto» è il prezzo di vendita al netto delle commissioni; le
+dividendi non ci sono, e il CEO il 31/10/2026 ha detto di non avere altro che il grafico del conto:
+restano fuori, e il blocco lo dichiara. «Prezzo netto» è il prezzo di vendita al netto delle commissioni; le
 imposte sono il 26% della plusvalenza in euro. «Plus/minus precedenti: —» dice che il broker non ha compensato
 minusvalenze pregresse su queste due vendite.
 

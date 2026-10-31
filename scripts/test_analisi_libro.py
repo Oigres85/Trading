@@ -9112,7 +9112,9 @@ _dd518 = SS.date_dipendenze({"updated_at": "2026-10-30T17:29:00Z", "macro": {"ma
 check("v518 ogni voce di fonti_dirette.SOLO_PIPELINE ha la sua data nello stato del sistema, e lo stato non ne ha una "
       "che l'elenco non porta — e i multipli e bilanci per titolo stanno in UNO dei due elenchi (v519: fra i riletti, "
       "con le righe intere lette in sessione)",
-      set(_dd518) == set(_FD518.SOLO_PIPELINE) and len(_FD518.SOLO_PIPELINE) >= 4
+      # v522 — RIAGGANCIATO: il pavimento era «almeno 4 voci», cioe' il NUMERO delle dipendenze di oggi, e la v522 ne ha
+      #   tolte due leggendole in sessione. L'invariante e' nei due versi, non nel conteggio (v208)
+      set(_dd518) == set(_FD518.SOLO_PIPELINE) and len(_FD518.SOLO_PIPELINE) >= 1
       and sum(any("flottante" in v for v in _l) for _l in (_FD518.SOLO_PIPELINE, _FD518.RILETTI_PER_TITOLO)) == 1,
       str(sorted(_dd518)))
 _rdi518 = "\n".join(SS.righe_dipendenze({"updated_at": None, "macro": {}, "portfolio": []}, {"prima_chiusura": None}))
@@ -9121,7 +9123,7 @@ _run518 = [v for v in _FD518.SOLO_PIPELINE if "CDS" not in v and "SEC" not in v]
 _senza518 = [r for r in _rdi518.splitlines() if any(r.lstrip("⚠ ").startswith(v + ":") for v in _run518)]
 check("v518 una dipendenza senza data (il run senza ora, la leva senza mese) si marca ⚠ e il debito a margine si data "
       "col MESE (v392); i riletti alla fonte si elencano a parte",
-      len(_run518) >= 2 and len(_senza518) == len(_run518) and all(SS.AVVISO in r for r in _senza518)
+      len(_run518) >= 1 and len(_senza518) == len(_run518) and all(SS.AVVISO in r for r in _senza518)
       and "gia' letti qui alla fonte" in _rdi518, _rdi518)
 # v521 — il debito a margine non e' piu' fra le dipendenze: il suo mese per nome lo rende fonti_titoli (check v521)
 check("v518 lo storico dei CDS a meta': sul giorno del run e' il caso normale (le ondate di ICE, v508), su un giorno "
@@ -9390,7 +9392,8 @@ def _solleva(f):
     return False
 check("v519 lo stato del sistema prende le voci delle dipendenze per NOME, non per posizione: una parola che non c'e' o "
       "che ne trova due solleva invece di datare la voce accanto",
-      SS._voce("composizione degli ETF").startswith("composizione degli ETF")
+      # v522 — RIAGGANCIATO: la composizione degli ETF si legge in sessione e non e' piu' fra le dipendenze
+      SS._voce("contributo al rischio").startswith("correlazioni")
       and all(_solleva(lambda w=w: SS._voce(w)) for w in ("parola che non c'e'", "de")))
 
 
@@ -9743,6 +9746,283 @@ _al521 = Path(Path(FT.__file__).parent / "analisi_libro.py").read_text(encoding=
 check("v521 analisi_libro.stato_patrimoniale legge il prezzo del BTP con la lettura del giro sovrapposta "
       "(fonti_titoli.carica, mai la rete) e porta la fonte e la data del prezzo",
       "dd = fonti_titoli.carica(dd) or dd" in _al521 and '"btp_fonte": fonte, "btp_al": al' in _al521)
+
+# ══ v522 — SEC EDGAR E LA COMPOSIZIONE DEGLI ETF IN SESSIONE; LA RISERVA DEI CDS; IL BTP PIU' RECENTE ═══════════════
+# Il CEO, 31/10/2026: *"3 si ma scegli tu soluzione migliore"* (il contatto per SEC dalla sessione) e *"Stato del sistema
+#   … trova tu soluzione"*. Gli stati si COSTRUISCONO: nessuna rete (v425, v429).
+import json as _js522
+import hashlib as _hl522
+import tempfile as _tf522
+import copy as _cp522
+_ud522 = FT._ud()
+
+
+def _scrivi522(p, per):
+    p.write_text(_js522.dumps({"aggiornato": "2026-10-30", "per_titolo": per}), encoding="utf-8")
+
+
+with _tf522.TemporaryDirectory() as _d522:
+    _rp522, _sp522 = Path(_d522) / "repo.json", Path(_d522) / "sess.json"
+    _V522 = _ud522.XBRL_VERSIONE
+    _scrivi522(_rp522, {"AAA": {"deposito": {"data": "2026-08-01", "accn": "r1"}, "versione": _V522, "letto_il": "2026-08-02"},
+                        "BBB": {"deposito": {"data": "2026-07-01", "accn": "r2"}, "versione": _V522, "letto_il": "2026-07-02"},
+                        "DDD": {"deposito": {"data": "2026-09-01", "accn": "r4"}, "versione": _V522, "letto_il": "2026-09-02"}})
+    _scrivi522(_sp522, {"AAA": {"deposito": {"data": "2026-10-30", "accn": "s1"}, "versione": _V522, "letto_il": "2026-10-31"},
+                        "CCC": {"deposito": {"data": "2026-10-01", "accn": "s3"}, "versione": _V522, "letto_il": "2026-10-02"},
+                        "DDD": {"deposito": {"data": "2026-09-01", "accn": "r4"}, "versione": 500, "letto_il": "2026-10-31"}})
+    _sem522 = _js522.loads(FT.semina_debito(_rp522, _sp522).read_text(encoding="utf-8"))["per_titolo"]
+check("v522 semina_debito: la cache della sessione parte da quella del repo, e per ogni nome vale il bilancio piu' "
+      "recente; a pari bilancio la versione corrente (una lettura di una versione precedente va rifatta, v502)",
+      # gli accessi restituiscono None invece di sollevare: un nome perso fa cadere il check, non la suite (v407)
+      ((_sem522.get("AAA") or {}).get("deposito") or {}).get("accn") == "s1"
+      and ((_sem522.get("BBB") or {}).get("deposito") or {}).get("accn") == "r2"
+      and ((_sem522.get("CCC") or {}).get("deposito") or {}).get("accn") == "s3"
+      and (_sem522.get("DDD") or {}).get("versione") == _V522, str(_sem522))
+
+
+class _R522:
+    def __init__(self, js=None, err=None):
+        self._js, self._err = js, err
+
+    def raise_for_status(self):
+        if self._err:
+            raise RuntimeError(self._err)
+
+    def json(self):
+        return self._js
+
+
+_SUB522 = {"filings": {"recent": {"form": ["10-Q", "8-K", "8-K", "8-K", "8-K"],
+                                  "filingDate": ["2026-10-30", "2026-10-28", "2026-07-29", "2026-04-29", "2026-01-28"],
+                                  "items": ["", "2.02", "2.02", "2.02", "2.02"],
+                                  "accessionNumber": ["q1", "k1", "k2", "k3", "k4"], "reportDate": ["2026-09-30", "", "", "", ""],
+                                  "acceptanceDateTime": ["2026-10-30T20:00:00.000Z"] * 5}}}
+_fatti522 = []
+
+
+def _get522(url, headers=None, timeout=None):
+    if "company_tickers" in url:
+        return _R522({"0": {"ticker": "AAA", "cik_str": 11}, "1": {"ticker": "BBB", "cik_str": 22}})
+    if "companyfacts" in url:
+        _fatti522.append(url)
+        return _R522({"facts": {"us-gaap": {}}})
+    if "CIK0000000011" in url:
+        return _R522(_SUB522)
+    return _R522(err="500 Server Error")
+
+
+with _tf522.TemporaryDirectory() as _d522:
+    _rp522, _sp522 = Path(_d522) / "repo.json", Path(_d522) / "sess.json"
+    _scrivi522(_rp522, {"AAA": {"cik": 11, "deposito": {"forma": "10-Q", "data": "2026-10-30", "accn": "q1"},
+                                "versione": _ud522.XBRL_VERSIONE, "letto_il": "2026-10-31"}})
+    _h522 = _hl522.sha256(_rp522.read_bytes()).hexdigest()
+    _wl522 = [{"ticker": "AAA"}, {"ticker": "BBB"}, {"ticker": "^NDX"}]
+    _e522 = FT.leggi_edgar(["AAA"], get=_get522, percorso=_sp522, repo=_rp522, watchlist=_wl522, pausa=0, pausa_xbrl=0)
+    _f522a = list(_fatti522)
+    _scrivi522(_rp522, {"AAA": {"cik": 11, "deposito": {"forma": "10-Q", "data": "2026-07-30", "accn": "q0"},
+                                "versione": _ud522.XBRL_VERSIONE, "letto_il": "2026-08-01"}})
+    _sp522.unlink()
+    _h522b = _hl522.sha256(_rp522.read_bytes()).hexdigest()
+    _e522b = FT.leggi_edgar(["AAA"], get=_get522, percorso=_sp522, repo=_rp522, watchlist=_wl522, pausa=0, pausa_xbrl=0)
+    _intatto522 = _hl522.sha256(_rp522.read_bytes()).hexdigest() == _h522b
+    _e522c = FT.leggi_edgar(["AAA"], get=lambda u, **k: _R522(err="403 Forbidden"), percorso=_sp522, repo=_rp522,
+                            watchlist=_wl522, pausa=0, pausa_xbrl=0)
+check("v522 leggi_edgar: la funzione della pipeline sui nomi seguiti (un indice non e' una societa'); i fatti di un "
+      "bilancio che il repo ha gia' letto NON si rileggono, quelli di un 10-Q nuovo si', senza scrivere il file del repo; "
+      "il nome che SEC non restituisce resta fra gli errori; senza SEC l'esito e' «non letto», mai un'eccezione",
+      _e522["esito"] == "letto" and _e522["seguiti"] == 2 and _f522a == []
+      and ((_e522["sec_calendario"] or {}).get("per_titolo") or {}).get("AAA", {}).get("cadenza_gg") == 91
+      and "BBB" in (_e522.get("errori_titoli") or {})
+      and _e522b["debito_sec"]["letti_ora"] == ["AAA"] and len(_fatti522) == 1 and _intatto522
+      and _e522c["esito"] == "non letto" and "403" in _e522c["errore"], str(_e522)[:600])
+check("v522 periodici_edgar: l'ultimo 10-Q o 10-K letto da EDGAR nella stessa forma delle date di Yahoo (una modifica "
+      "conta come la forma di base), perche' ferme e la resa ne leggano una sola",
+      FT.periodici_edgar({"bilanci": {"AAA": {"forma": "10-Q/A", "data": "2026-10-30"}, "BBB": None}})
+      == {"AAA": {"10-Q": "2026-10-30"}} and FT.periodici_edgar({}) == {})
+
+# la sovrapposizione: chi SEC non ha restituito tiene la voce del run, DICHIARATO
+_m522 = {"sec_calendario": {"per_titolo": {"AAA": {"ultimo_deposito": "2026-07-29"}, "BBB": {"ultimo_deposito": "2026-07-15"}},
+                            "ore_depositi": {"per_titolo": {"BBB": [{"data": "2026-07-15"}]}},
+                            "storia_quotazione": {"per_titolo": {"BBB": {"veicolo": None}}}, "senza_8k": ["EEE"]},
+         "debito_sec": {"per_titolo": {"BBB": {"cik": 22}}}}
+_l522 = {"esito": "letto", "seguiti": 3, "errori_titoli": {"BBB": "500", "EEE": "500"},
+         "sec_calendario": {"per_titolo": {"AAA": {"ultimo_deposito": "2026-10-28"}}, "ore_depositi": {"per_titolo": {}},
+                            "storia_quotazione": {"per_titolo": {}}, "senza_8k": []},
+         "debito_sec": {"per_titolo": {"AAA": {"cik": 11}}, "letti_ora": ["AAA"]}}
+def _a522(x, *chiavi):
+    """Un percorso che manca e' None: un check deve cadere col suo nome, non far morire la suite (v407, v471)."""
+    for k in chiavi:
+        x = x.get(k) if isinstance(x, dict) else None
+    return x
+
+
+_mm522 = _cp522.deepcopy(_m522)
+_es522 = FT.applica_edgar(_mm522, _l522)
+_mn522 = _cp522.deepcopy(_m522)
+_esn522 = FT.applica_edgar(_mn522, {"esito": "non letto", "errore": "403"})
+check("v522 applica_edgar: il calendario di adesso al posto del run; chi SEC non ha restituito tiene calendario, ore, "
+      "storia, posto fra gli esteri e debito del run, e l'esito lo nomina; senza lettura il run resta com'e'",
+      _a522(_mm522, "sec_calendario", "per_titolo", "AAA", "ultimo_deposito") == "2026-10-28"
+      and _a522(_mm522, "sec_calendario", "per_titolo", "BBB", "ultimo_deposito") == "2026-07-15"
+      and "BBB" in (_a522(_mm522, "sec_calendario", "ore_depositi", "per_titolo") or {})
+      and "BBB" in (_a522(_mm522, "sec_calendario", "storia_quotazione", "per_titolo") or {})
+      and _a522(_mm522, "sec_calendario", "senza_8k") == ["EEE"]
+      and _a522(_mm522, "sec_calendario", "_sessione", "dalla_pipeline") == ["BBB", "EEE"]
+      and _a522(_mm522, "debito_sec", "per_titolo", "BBB") == {"cik": 22}
+      and _a522(_mm522, "debito_sec", "per_titolo", "AAA") == {"cik": 11}
+      and "del run per BBB, EEE" in _es522 and "bilanci letti ora: AAA" in _es522 and _es522.startswith("fonte (")
+      and _mn522 == _m522 and _esn522 == "pipeline (403)", _es522)
+
+# la composizione degli ETF
+_t522 = {"tilt": [{"ticker": "SMH", "name": "Semi", "prime": [{"tk": "OLD"}]}, {"ticker": "XLE", "prime": [{"tk": "XOM"}]}]}
+_et522 = FT.applica_etf(_t522, {"esito": "letto", "per_etf": {"SMH": [{"tk": "NVDA", "peso": 20.0}]}, "vuoti": ["GLD"],
+                                "giorno": "2026-10-31"})
+_tv522 = {}
+_etv522 = FT.applica_etf(_tv522, {"esito": "letto", "per_etf": {"SMH": [{"tk": "NVDA"}]}, "vuoti": [], "giorno": "2026-10-31"})
+_tn522 = _cp522.deepcopy(_t522)
+_etn522 = FT.applica_etf(_tn522, {"esito": "non letto", "errore": "429"})
+check("v522 applica_etf: la composizione letta adesso ETF per ETF, chi il fornitore non restituisce tiene quella del run "
+      "(nominato); senza macro.tilt nel run le righe si costruiscono da update_data.SECTOR_ETF, e la rotazione ha il suo "
+      "universo; senza lettura il run resta com'e'",
+      _t522["tilt"][0]["prime"] == [{"tk": "NVDA", "peso": 20.0}] and _t522["tilt"][0].get("prime_letto_il") == "2026-10-31"
+      and _t522["tilt"][1]["prime"] == [{"tk": "XOM"}] and "del run per XLE" in _et522
+      and len(_tv522.get("tilt") or []) == len(_ud522.SECTOR_ETF) and "costruite" in _etv522
+      and (next((r for r in (_tv522.get("tilt") or []) if r.get("ticker") == "SMH"), {}) or {}).get("prime") == [{"tk": "NVDA"}]
+      and all(r.get("name") for r in (_tv522.get("tilt") or []))
+      and _tn522 == _t522 and _etn522 == "pipeline (429)", _et522 + " / " + _etv522)
+
+# il giro ESEGUITO (v483): EDGAR ed ETF col resto, Yahoo per le date solo come ripiego, le tabelle ferme sui depositi
+#   di adesso — con le letture sostituite, nessuna rete
+_orig522 = {k: getattr(FT, k) for k in ("leggi_righe", "leggi_edgar", "leggi_etf", "leggi_analisti", "leggi_sec",
+                                        "leggi_short", "leggi_btp", "leggi_leva", "ferme", "leggi_cds")}
+_fw_orig522 = _ud522.fedwatch_da
+_visti522 = {"sec": 0, "ferme": []}
+
+
+def _laf522(edgar):
+    FT.leggi_righe = lambda d: {"esito": "letto", "per_titolo": {}, "_rendimenti": {}}
+    _ud522.fedwatch_da = lambda: {}
+    FT.leggi_edgar = lambda nomi: edgar
+    FT.leggi_etf = lambda: {"esito": "letto", "per_etf": {"SMH": [{"tk": "NVDA"}]}, "vuoti": []}
+    FT.leggi_analisti = lambda nomi: {}
+    FT.leggi_sec = lambda nomi: (_visti522.__setitem__("sec", _visti522["sec"] + 1), {"AAA": {"10-Q": "2026-10-30"}})[1]
+    FT.leggi_short = lambda d, f: {"esito": "stesso regolamento"}
+    FT.leggi_btp = lambda: {"esito": "non letto", "errore": "prova"}
+    FT.leggi_leva = lambda: {"esito": "non letto", "errore": "prova"}
+    FT.ferme = lambda dd, per: (_visti522["ferme"].append((((dd.get("macro") or {}).get("sec_calendario") or {}), per)), {})[1]
+    FT.leggi_cds = lambda *a, **k: {"esito": "stesso giorno"}
+    return FT.leggi_alla_fonte({"watchlist": [], "portfolio": [],
+                                "macro": {"sec_calendario": {"per_titolo": {"AAA": {"ultimo_deposito": "2026-07-29"}}}}},
+                               ["AAA"])
+
+
+try:
+    _g522 = _laf522({"esito": "letto", "seguiti": 1, "errori_titoli": {},
+                     "sec_calendario": {"per_titolo": {"AAA": {"ultimo_deposito": "2026-10-28"}}, "senza_8k": []},
+                     "debito_sec": {"per_titolo": {}}, "bilanci": {"AAA": {"forma": "10-Q", "data": "2026-10-30"}}})
+    _sec_dopo_ed522 = _visti522["sec"]
+    _g522n = _laf522({"esito": "non letto", "errore": "403"})
+finally:
+    for _k522, _v522 in _orig522.items():
+        setattr(FT, _k522, _v522)
+    _ud522.fedwatch_da = _fw_orig522
+check("v522 il giro eseguito: EDGAR e composizione degli ETF si leggono col resto; con EDGAR le date dei 10-Q vengono da "
+      "EDGAR e Yahoo NON si chiama; le tabelle ferme si giudicano sul calendario letto adesso; senza EDGAR, Yahoo e' il "
+      "ripiego dichiarato",
+      _a522(_g522, "edgar", "esito") == "letto" and _a522(_g522, "etf", "esito") == "letto" and _sec_dopo_ed522 == 0
+      and _a522(_g522, "sec", "fonte") == "SEC EDGAR" and _a522(_g522, "sec", "per_titolo") == {"AAA": {"10-Q": "2026-10-30"}}
+      and len(_visti522["ferme"]) == 2
+      and _a522(_visti522["ferme"][0][0], "per_titolo", "AAA", "ultimo_deposito") == "2026-10-28"
+      and _visti522["ferme"][0][1] == {"AAA": {"10-Q": "2026-10-30"}}
+      and _visti522["sec"] == 1 and str(_a522(_g522n, "sec", "fonte")).startswith("Yahoo, ripiego: EDGAR 403")
+      and _a522(_visti522["ferme"][1][0], "per_titolo", "AAA", "ultimo_deposito") == "2026-07-29",
+      str(_g522.get("sec")) + " / " + str(_g522n.get("sec")))
+_ov522 = FT.sovrapponi({"watchlist": [], "portfolio": [], "macro": {"tilt": [{"ticker": "SMH", "prime": []}]}}, _g522)
+_ov522n = FT.sovrapponi({"watchlist": [], "portfolio": [], "macro": {}}, None)
+check("v522 sovrapponi: il calendario di EDGAR e la composizione letti adesso entrano in data.json, e macro._fonti_titoli "
+      "dice chi ha vinto per ciascuno (senza lettura: la pipeline, detto)",
+      _a522(_ov522, "macro", "sec_calendario", "per_titolo", "AAA", "ultimo_deposito") == "2026-10-28"
+      and (_a522(_ov522, "macro", "tilt") or [{}])[0].get("prime") == [{"tk": "NVDA"}]
+      and str(_a522(_ov522, "macro", "_fonti_titoli", "esiti", "edgar")).startswith("fonte (SEC EDGAR letto adesso")
+      and str(_a522(_ov522, "macro", "_fonti_titoli", "esiti", "etf")).startswith("fonte (composizione letta adesso")
+      and "SEC EDGAR" in str(_a522(_ov522, "macro", "_fonti_titoli", "esiti", "sec"))
+      and all(str(_a522(_ov522n, "macro", "_fonti_titoli", "esiti", k)).startswith("pipeline") for k in ("edgar", "etf")),
+      str(_ov522["macro"].get("_fonti_titoli")))
+
+# la resa
+_c522 = []
+_d522r = {"macro": {"sec_calendario": {"per_titolo": {"AAA": {"ultimo_deposito": "2026-07-29"}}},
+                    "tilt": [{"ticker": "SMH", "prime": [{"tk": "OLD"}]}]}}
+_re522 = "\n".join(FT.righe_edgar(_d522r, {"esito": "letto", "seguiti": 2, "secondi": 28.3, "errori_titoli": {"BBB": "500"},
+                                           "sec_calendario": {"per_titolo": {"AAA": {"ultimo_deposito": "2026-10-28"}},
+                                                              "senza_8k": []},
+                                           "debito_sec": {"per_titolo": {"AAA": {}}, "letti_ora": [], "errori": {"AAA": "x"}}},
+                                   _c522))
+_c522n = []
+_ren522 = "\n".join(FT.righe_edgar(_d522r, {"esito": "non letto", "errore": "403"}, _c522n))
+_rt522 = "\n".join(FT.righe_etf(_d522r, {"esito": "letto", "per_etf": {"SMH": [{"tk": "NVDA"}]}, "vuoti": ["GLD"]}))
+_rt522v = "\n".join(FT.righe_etf({"macro": {}}, {"esito": "letto", "per_etf": {"SMH": [{"tk": "NVDA"}]}, "vuoti": []}))
+check("v522 la resa: il deposito di risultati PIU' RECENTE del run si nomina con le due date; chi SEC non restituisce e il "
+      "bilancio nuovo non riletto si dicono, e quest'ultimo diventa una voce da cercare; senza EDGAR il run vale, detto; "
+      "la composizione nomina gli ETF cambiati e il fornitore che non risponde",
+      "AAA (8-K del 28/10/2026; nel run 29/07/2026)" in _re522 and "NON restituiti da SEC" in _re522
+      and "bilancio nuovo NON riletto" in _re522 and len(_c522) == 1
+      and "NON letto alla fonte (403)" in _ren522 and len(_c522n) == 1
+      and "nomi diversi dal run per SMH" in _rt522 and "senza composizione dal fornitore: GLD" in _rt522
+      and "il run non porta macro.tilt" in _rt522v, _re522 + "\n" + _rt522)
+_src522 = Path(FT.__file__).read_text(encoding="utf-8")
+check("v522 il collegamento della resa e dei blocchi: sintesi stampa EDGAR ed ETF, le cadenze li dichiarano, e il blocco "
+      "EDGAR e' fra i blocchi del giro (calcola non gira offline: qui il testo e' la prova)",
+      'L.extend(righe_edgar(d, g.get("edgar") or {}, cercare))' in _src522
+      and 'L.extend(righe_etf(d, g.get("etf") or {}))' in _src522
+      and {"edgar", "etf"} <= set(FT.BLOCCHI) and {"edgar", "etf"} <= {k for k, _n, _t in FT.CADENZE})
+
+# la riserva dei CDS: non cresce quando la pipeline gira, regge quando non gira
+with _tf522.TemporaryDirectory() as _d522:
+    _ps522 = Path(_d522) / "cds_sessione.jsonl"
+    _ud522.scrivi_storia_cds([{"d": "2026-10-29", "p": {"X": [1, 2]}, "i": {"HY": [3, 4]}},
+                              {"d": "2026-10-30", "p": {"X": [1, 2], "Y": [5, 6]}, "i": {}}], _ps522)
+    _repo522 = [{"d": "2026-10-29", "p": {"X": [1, 2], "Z": [0, 0]}, "i": {"HY": [3, 4], "IG": [1, 1]}},
+                {"d": "2026-10-30", "p": {"X": [1, 2]}, "i": {}}]
+    _rsc_orig522 = _ud522.righe_storia_cds
+    _ud522.righe_storia_cds = lambda lettura, tasso: []
+    try:
+        _cons522 = FT.conserva_giorni_cds({}, None, _repo522, percorso=_ps522)
+    finally:
+        _ud522.righe_storia_cds = _rsc_orig522
+    _rimasti522 = [r["d"] for r in _ud522.leggi_storia_cds(_ps522)]
+check("v522 la riserva dei CDS della sessione: un giorno che il repo ha COMPLETO (ogni entita' e indice) si toglie, uno "
+      "che il repo ha a meta' resta; e il tetto e' quello dello storico del repo, perche' la riserva regga anche una "
+      "pipeline ferma a lungo",
+      _cons522 == [] and _rimasti522 == ["2026-10-30"]
+      and FT.gia_nel_repo({"d": "2026-10-29", "p": {"X": 1}, "i": {}}, _repo522)
+      and not FT.gia_nel_repo({"d": "2026-10-31", "p": {}, "i": {}}, _repo522)
+      and FT.CDS_SESSIONE_GIORNI == _ud522.CDS_STORIA_MAX, str(_rimasti522))
+
+# lo stato del sistema e le dipendenze
+_pl522 = SS.righe_pipeline(SS.stato_pipeline(_dati518("2026-10-30T17:30:00Z"), _ad518, _ghp518([])), _ad518)
+check("v522 lo stato del sistema dice, in testa alla pipeline, cosa tocca un suo guasto (la pagina e lo storico dei CDS, "
+      "con la riserva della sessione): un avviso li' non vuol dire «l'analisi e' sbagliata»",
+      "cosa tocca un suo guasto" in _pl522[1] and "PAGINA" in _pl522[1] and "cds_sessione" in _pl522[1]
+      and "RISERVA" in _pl522[1], _pl522[1])
+check("v522 SEC EDGAR e la composizione degli ETF escono dalle dipendenze da GitHub ed entrano fra cio' che si rilegge "
+      "qui (una volta sola); lo stato del sistema non li data piu' dal run",
+      not any("SEC" in v or "ETF" in v for v in _FD518.SOLO_PIPELINE)
+      and sum("SEC EDGAR" in v for v in _FD518.RILETTI_PER_TITOLO) == 1
+      and sum("composizione degli ETF" in v for v in _FD518.RILETTI_PER_TITOLO) == 1
+      and set(SS.date_dipendenze({"updated_at": "x", "macro": {}, "portfolio": []})) == set(_FD518.SOLO_PIPELINE)
+      and "numeri_libro" in next(v for v in _FD518.SOLO_PIPELINE if "contributo al rischio" in v))
+_c522b = []
+_rb522 = "\n".join(FT.righe_btp_leva({"portfolio": [{"ticker": "BTP-V28", "price": 101.59, "price_asof": "2026-10-29",
+                                                     "price_src": "Borsa Italiana, prezzo ufficiale"}], "macro": {}},
+                                     {"btp": {"esito": "letto", "prezzo": 101.63, "data": "2026-10-30",
+                                              "voce": "prezzo di riferimento", "rateo_netto": 0.2568,
+                                              "altro": {"prezzo": 101.59099, "data": "2026-10-29", "voce": "prezzo ufficiale"}},
+                                      "leva": {"esito": "non letto", "errore": "prova"}}, _c522b))
+check("v522 la resa del BTP: il prezzo piu' recente con la sua voce e la sua data, l'altro prezzo datato accanto, e il "
+      "rateo netto dichiarato (il valore resta a corso secco)",
+      "101,630 del 30/10/2026 (prezzo di riferimento)" in _rb522 and "prezzo ufficiale 101,591 del 29/10/2026" in _rb522
+      and "rateo netto 0,2568 ogni 100 di nominale" in _rb522, _rb522)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

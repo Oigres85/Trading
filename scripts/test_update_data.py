@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 419  # v521: 421 eseguiti · v520: 415 eseguiti · v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 428  # v522: 430 eseguiti · v521: 421 eseguiti · v520: 415 eseguiti · v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -891,8 +891,9 @@ check("v390 SEC EDGAR: gli emittenti esteri finiscono in un elenco dichiarato, n
       '"senza_8k": esteri' in _SRC_UD and "esteri.append(_tk)" in _SRC_UD)
 
 # SEC chiede uno User-Agent identificabile e meno di 10 richieste al secondo
+# v522 — RIAGGANCIATO: il passo e' il parametro `pausa` di sec_edgar_da (0,12 per difetto); il check v522 lo ESEGUE
 check("v390 SEC EDGAR: User-Agent identificabile e passo rispettato",
-      "SEC_UA" in _SRC_UD and "time.sleep(0.12)" in _SRC_UD)
+      "SEC_UA" in _SRC_UD and "pausa=0.12" in _SRC_UD and "time.sleep(pausa)" in _SRC_UD)
 
 # ⚠ la prima stesura tagliava su "SEC EDGAR", che compare gia' nel commento di testa: la
 # finestra finiva prima del codice e il check falliva su codice corretto. Si ancora al CODICE.
@@ -1751,8 +1752,13 @@ check("v492 un emittente estero (6-K e 20-F, nessun 8-K) e una risposta vuota si
                                                                      "filingDate": ["2026-09-30", "2026-03-24"]}}}
                                             , oggi=_date492(2026, 10, 16)).get("non_verificabile", "")
       and "non_verificabile" in ud.storia_quotazione({}, oggi=_date492(2026, 10, 16)))
-_sec492 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
-_sec492 = _sec492[:_sec492.find("calendario_uscite_fred(STORICO_IND")]
+# v522 — RIAGGANCIATO: il giro di EDGAR vive in update_data.sec_edgar_da (la stessa funzione la chiama la sessione). La
+#   finestra «da sec_cal a calendario_uscite_fred» ora attraversava meta' file: l'invariante si guarda nel CORPO della
+#   funzione, senza i commenti (chi cerca l'ASSENZA di una costruzione guarda il codice, v393)
+import ast as _ast522
+_n522 = next((x for x in _ast522.parse(_SRC_UD).body if isinstance(x, _ast522.FunctionDef) and x.name == "sec_edgar_da"), None)
+_CORPO_SEC522 = "\n".join(r.split("#")[0] for r in (_ast522.get_source_segment(_SRC_UD, _n522) or "").splitlines()) if _n522 else ""
+_sec492 = _CORPO_SEC522
 check("v492 collegamento: il giro del calendario EDGAR passa ogni risposta letta a storia_quotazione PRIMA del filtro degli "
       "esteri, e la pubblica in sec_calendario.storia_quotazione anche quando non ci sono trimestrali",
       "storia[_tk] = storia_quotazione(_sub)" in _sec492
@@ -2243,8 +2249,7 @@ check("v500 ore dei depositi: il tetto di voci si rispetta (dal piu' recente), u
       and ud.ore_depositi({"filings": {"recent": {"form": ["8-K"], "filingDate": ["2026-10-01"],
                                                     "acceptanceDateTime": ["2026-10-01T16:05:00.000Z"]}}},
                           oggi=_date500(2026, 10, 18)) == [])
-_sec500 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
-_sec500 = _sec500[:_sec500.find("calendario_uscite_fred(STORICO_IND")]
+_sec500 = _CORPO_SEC522      # v522 — il corpo di sec_edgar_da
 check("v500 collegamento: il giro del calendario EDGAR passa ogni risposta letta a ore_depositi PRIMA del filtro degli "
       "esteri (i 6-K servono a loro), e le pubblica in sec_calendario.ore_depositi con l'orologio dichiarato — UTC, "
       "come EDGAR lo scrive (misurato in v501: la v500 lo dichiarava ora di New York), anche quando non ci sono trimestrali",
@@ -2460,15 +2465,18 @@ check("v501 debito SEC: un deposito NUOVO fa rileggere il nome; se la rilettura 
       and ((_d501d.get("per_titolo") or {}).get("BBB") or {}).get("deposito", {}).get("accn") == "x2"
       and (((_d501d.get("per_titolo") or {}).get("BBB") or {}).get("errore_ultimo") or {}).get("il") == "2026-10-21"
       and "BBB" in (_d501d.get("in_attesa") or []))
-_sec501 = _SRC_UD_CODICE[_SRC_UD_CODICE.find("sec_cal, senza_cik, esteri = {}, [], []"):]
-_sec501 = _sec501[:_sec501.find("calendario_uscite_fred(STORICO_IND")]
+_sec501 = _CORPO_SEC522      # v522 — il corpo di sec_edgar_da
 check("v501 collegamento: il giro EDGAR prende l'ultimo 10-Q/10-K di ogni risposta letta PRIMA del filtro degli esteri, "
       "e dopo il giro legge il debito con lo stesso User-Agent, le posizioni per prime, e lo pubblica in macro",
       "_ub = ultimo_bilancio_sec(_sub)" in _sec501
       and _sec501.find("_ub = ultimo_bilancio_sec(_sub)") < _sec501.find("esteri.append(_tk)")
-      and "aggiorna_debito_sec(bilanci_xbrl, ua=SEC_UA, priorita=_pos_x)" in _sec501
-      and 'macro["debito_sec"] = _ds' in _sec501 and '"orologio": "UTC"' in _sec501
-      and "America/New_York" not in _sec501)
+      # v522 — RIAGGANCIATO: la lettura del debito sta nella funzione, col percorso e il budget che chi chiama sceglie;
+      #   main la chiama col contatto e le posizioni per prime, e pubblica il debito in macro
+      and "aggiorna_debito_sec(bilanci_xbrl, get=get, percorso=percorso_debito, budget=budget, priorita=posizioni," in _sec501
+      and "ua=ua" in _sec501 and '"orologio": "UTC"' in _sec501 and "America/New_York" not in _sec501
+      and len(_sec501) > 500
+      and "sec_edgar_da(seguiti_sec(_wl_sec), posizioni=_pos_x, ua=SEC_UA)" in _SRC_UD_CODICE
+      and 'macro["debito_sec"] = _ds' in _SRC_UD_CODICE)
 _vm501 = lambda m: next((c for c in ud.validate_macro(m)["checks"] if c["key"] == "debito_sec"), None)
 check("v501 sorveglianza del debito SEC (nasce sorvegliato, v390): assente → missing; archivio vuoto → missing; errori "
       "di lettura → stale coi nomi; i nomi in attesa del budget non suonano",
@@ -3801,6 +3809,154 @@ _mn521 = _corpo519("main")
 check("v521 il collegamento: la pipeline passa a fetch_btp la riga del BTP del run precedente (v399: il collegamento, "
       "non solo il controllo)",
       "btp = fetch_btp(next((r for r in (PREV_DATA.get(\"portfolio\")" in _mn521)
+
+# ══ v522 — SEC EDGAR IN UNA FUNZIONE SOLA, LA COMPOSIZIONE DEGLI ETF, IL PREZZO DEL BTP PIU' RECENTE ═════════════════
+# Il CEO, 31/10/2026: *"3 si ma scegli tu soluzione migliore"* (il contatto per SEC dalla sessione) e *"Stato del sistema
+#   … trova tu soluzione"*. Il giro di EDGAR e' uscito da main() in sec_edgar_da, che la sessione chiama con la stessa
+#   intestazione: si ESEGUE con risposte costruite (la rete andrebbe rossa a seconda di dove gira la suite).
+import json as _js522
+import tempfile as _tf522
+from pathlib import Path as _P522
+
+
+class _R522:
+    def __init__(self, js=None, err=None):
+        self._js, self._err = js, err
+
+    def raise_for_status(self):
+        if self._err:
+            raise RuntimeError(self._err)
+
+    def json(self):
+        return self._js
+
+
+def _sub522(forme, date, items=None):
+    return {"filings": {"recent": {"form": forme, "filingDate": date, "items": items or [""] * len(forme),
+                                   "accessionNumber": [f"a{i}" for i in range(len(forme))],
+                                   "reportDate": ["2026-09-30" if f == "10-Q" else "" for f in forme],
+                                   "acceptanceDateTime": [d + "T20:16:50.000Z" for d in date]}}}
+
+
+_SUB522 = {11: _sub522(["10-Q", "8-K", "8-K", "8-K", "8-K"],
+                       ["2026-10-30", "2026-10-28", "2026-07-29", "2026-04-29", "2026-01-28"],
+                       ["", "2.02,9.01", "2.02", "2.02", "2.02"]),
+           22: _sub522(["6-K", "20-F"], ["2026-10-20", "2026-03-01"])}
+_chiamate522, _sonni522 = [], []
+
+
+def _get522(url, headers=None, timeout=None, mappa_rotta=False):
+    _chiamate522.append((url, headers))
+    if "company_tickers" in url:
+        return _R522(err="503") if mappa_rotta else _R522({"0": {"ticker": "AAA", "cik_str": 11},
+                                                            "1": {"ticker": "BBB", "cik_str": 22},
+                                                            "2": {"ticker": "CCC", "cik_str": 33}})
+    if "companyfacts" in url:
+        return _R522({"facts": {"us-gaap": {}}})
+    for cik, sub in _SUB522.items():
+        if f"CIK{cik:010d}" in url:
+            return _R522(sub)
+    return _R522(err="500 Server Error")
+
+
+_sleep_orig522 = ud.time.sleep
+ud.time.sleep = lambda x: _sonni522.append(x)
+try:
+    with _tf522.TemporaryDirectory() as _d522:
+        _r522 = ud.sec_edgar_da({"AAA", "BBB", "CCC", "DDD"}, posizioni=["BBB", "AAA"], get=_get522,
+                                percorso_debito=_P522(_d522) / "d.json", budget=5)
+        _scritto522 = _js522.loads((_P522(_d522) / "d.json").read_text(encoding="utf-8"))
+        _agg_orig522 = ud.aggiorna_debito_sec
+        ud.aggiorna_debito_sec = lambda *a, **k: (_ for _ in ()).throw(OSError("disco pieno"))
+        try:
+            _r522g = ud.sec_edgar_da({"AAA"}, get=_get522, percorso_debito=_P522(_d522) / "e.json")
+        except Exception as _eg522:  # noqa: BLE001 — un guasto che si propaga deve far cadere il check, non la suite (v407)
+            _r522g = {"debito_sec": "propagato", "errore_debito": f"SOLLEVATO: {_eg522}"}
+        finally:
+            ud.aggiorna_debito_sec = _agg_orig522
+        try:
+            ud.sec_edgar_da({"AAA"}, get=lambda u, **k: _get522(u, mappa_rotta=True, **k), percorso_debito=_P522(_d522) / "f.json")
+            _mappa522 = "non ha sollevato"
+        except RuntimeError as _e522:
+            _mappa522 = str(_e522)
+finally:
+    ud.time.sleep = _sleep_orig522
+_c522 = (_r522.get("sec_calendario") or {})
+check("v522 sec_edgar_da: ogni richiesta a SEC porta l'intestazione della pipeline (SEC_UA, l'unico contatto), e fra un "
+      "nome e l'altro c'e' il passo (0,12 s le pagine dei depositi, 0,15 s i fatti dei bilanci)",
+      len(_chiamate522) >= 5 and all(h == ud.SEC_UA for _u, h in _chiamate522)
+      and 0.12 in _sonni522 and 0.15 in _sonni522 and set(_sonni522) <= {0.12, 0.15})
+check("v522 sec_edgar_da: il calendario dei risultati (cadenza trimestrale), l'estero senza 8-K, il simbolo senza CIK, "
+      "il nome che SEC non restituisce fra gli errori — e storia e ore dei depositi anche per l'estero, prima del filtro",
+      (_c522.get("per_titolo") or {}).get("AAA") == {"ultimo_deposito": "2026-10-28", "n_depositi": 4, "cadenza_gg": 91}
+      and _c522.get("senza_8k") == ["BBB"] and _c522.get("senza_cik") == ["DDD"]
+      and "CCC" in (_r522.get("errori_titoli") or {}) and "CCC" not in (_c522.get("per_titolo") or {})
+      and {"AAA", "BBB"} <= set(((_c522.get("storia_quotazione") or {}).get("per_titolo")) or {})
+      and {"AAA", "BBB"} <= set(((_c522.get("ore_depositi") or {}).get("per_titolo")) or {})
+      and (_c522.get("ore_depositi") or {}).get("orologio") == "UTC")
+_ds522 = _r522.get("debito_sec") or {}
+check("v522 sec_edgar_da: l'ultimo 10-Q va nei bilanci e i suoi fatti si leggono nel percorso che chi chiama sceglie "
+      "(la sessione non scrive data/debito_sec.json); l'estero senza 10-Q si dichiara",
+      _r522.get("bilanci") == {"AAA": {"forma": "10-Q", "data": "2026-10-30", "accn": "a0", "periodo": "2026-09-30"}}
+      and ((_ds522.get("per_titolo") or {}).get("AAA") or {}).get("cik") == 11 and _ds522.get("letti_ora") == ["AAA"]
+      and _ds522.get("senza_10q") == ["BBB"] and "AAA" in (_scritto522.get("per_titolo") or {}))
+check("v522 sec_edgar_da: un guasto del debito non porta via il calendario (erano due try in main, ora sono due esiti), "
+      "e senza la mappa ticker→CIK la funzione SOLLEVA — chi chiama lo dichiara, nessun nome si legge in silenzio",
+      _r522g.get("debito_sec") is None and "disco pieno" in str(_r522g.get("errore_debito"))
+      and ((_r522g.get("sec_calendario") or {}).get("per_titolo") or {}).get("AAA") is not None
+      and "503" in _mappa522)
+_mn522 = _corpo519("fetch_macro")      # il giro SEC sta nel blocco macro della pipeline
+check("v522 il collegamento: fetch_macro chiama sec_edgar_da sui nomi di load_holdings col contatto e le posizioni per prime, e "
+      "pubblica calendario e debito in macro; nessuna seconda copia del giro nel blocco macro",
+      "_sec = sec_edgar_da(seguiti_sec(_wl_sec), posizioni=_pos_x, ua=SEC_UA)" in _mn522
+      and 'macro["sec_calendario"] = _sec["sec_calendario"]' in _mn522 and 'macro["debito_sec"] = _ds' in _mn522
+      and "submissions/CIK" not in _mn522 and "storia_quotazione(" not in _mn522)
+
+
+class _T522:
+    def __init__(self, df=None, rotto=False):
+        self._df, self._rotto = df, rotto
+
+    @property
+    def funds_data(self):
+        if self._rotto:
+            raise RuntimeError("Yahoo 429")
+        return type("F", (), {"top_holdings": self._df})()
+
+
+_df522 = pd.DataFrame({"Name": ["NVIDIA Corp", "Broadcom Inc"], "Holding Percent": [0.1234, 0.0801]},
+                      index=["NVDA", "AVGO"])
+check("v522 prime_etf: le partecipazioni con nome e peso come l'emittente le dichiara; un fornitore che solleva o non le "
+      "da' restituisce [] (meglio niente che nomi vecchi presentati come attuali, v298)",
+      ud.prime_etf("SMH", ticker=lambda s: _T522(_df522)) == [{"tk": "NVDA", "nome": "NVIDIA Corp", "peso": 12.3},
+                                                              {"tk": "AVGO", "nome": "Broadcom Inc", "peso": 8.0}]
+      and ud.prime_etf("SMH", ticker=lambda s: _T522(rotto=True)) == []
+      and ud.prime_etf("GLD", ticker=lambda s: _T522(None)) == [])
+check("v522 il collegamento: fetch_sector_tilt prende le prime cinque da prime_etf, e la lettura delle partecipazioni non "
+      "ha una seconda copia nel file (la sessione chiama la stessa funzione)",
+      "prime = prime_etf(sym)" in _corpo519("fetch_sector_tilt") and _SRC_UD_CODICE.count("top_holdings") == 1)
+
+# il prezzo del BTP: la pagina ne porta DUE datati, e vale il piu' recente (misurato il 31/10/2026)
+_pg522 = ("<div>Prezzo ufficiale</div><span>101,59099</span><div>Data Pr Ufficiale</div><span>29/10/26</span>"
+          "<div>Rateo Lordo</div><span>0,29348</span><div>Rateo Netto</div><span>0,2568</span>"
+          "<div>Prezzo di riferimento</div><span>101,63</span><div>Data di riferimento</div><span>30/10/2026</span>")
+_l522 = ud.prezzo_btp_da(_pg522)
+_l522u = ud.prezzo_btp_da(_pg522.replace("30/10/2026", "28/10/2026"))
+_l522p = ud.prezzo_btp_da(_pg522.replace("29/10/26", "30/10/26"))
+check("v522 la pagina di Borsa Italiana porta il prezzo di riferimento e il prezzo ufficiale, ciascuno con la sua data: "
+      "vale il PIU' RECENTE (il prezzo ufficiale esce piu' tardi), a pari data il prezzo di riferimento; l'altro "
+      "viaggia accanto, e il rateo netto si legge a parte",
+      _l522.get("prezzo") == 101.63 and _l522.get("data") == "2026-10-30" and _l522.get("voce") == "prezzo di riferimento"
+      and _l522.get("altro") == {"prezzo": 101.59099, "data": "2026-10-29", "voce": "prezzo ufficiale"}
+      and _l522.get("rateo_netto") == 0.2568
+      and _l522u.get("voce") == "prezzo ufficiale" and _l522u.get("data") == "2026-10-29"
+      and _l522p.get("voce") == "prezzo di riferimento" and _l522p.get("data") == "2026-10-30")
+_rb522 = ud.fetch_btp(None, _l522)
+check("v522 la riga del BTP nomina la voce letta e porta il rateo netto; il valore resta a corso secco (il broker il "
+      "rateo lo aggiunge al controvalore)",
+      _rb522["price"] == 101.63 and _rb522["price_asof"] == "2026-10-30"
+      and _rb522["price_src"] == "Borsa Italiana, prezzo di riferimento" and _rb522["rateo_netto"] == 0.2568
+      and abs(_rb522["value"] - ud.BTP["nominal"] * 101.63 / 100) < 0.01)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

@@ -9239,3 +9239,100 @@ patrimonio (v432, v439). E oggi il prezzo vero è **101,591**: il ripiego lo avr
 - Pavimenti: `test_update_data.py` 395 (408 punti di chiamata) e N_CHECKS_MINIMO 419 (421 eseguiti),
   `test_analisi_libro.py` 995 (1012 punti di chiamata, 1021 check). `?v=` e `BUILD_VERSION` non toccati: nessun file
   servito al browser (v440).
+
+## 🔌 v522 — SEC EDGAR E GLI ETF IN SESSIONE, IL BTP AL PREZZO PIÙ RECENTE, E COSA TOCCA DAVVERO UN GUASTO DELLA PIPELINE
+
+Risposte del CEO del 31/10/2026, testuali: *"1 ok foto / 2 ho solo foto grafico conto non so dove recuperare info, va
+bene anche questo? / 3 si ma scegli tu soluzione migliore / Stato del sistema non possiamo trovarlo soluzione per evitare
+di avere ulteriori problemi con la Pipeline? Trova tu soluzione."*
+
+### Le tre domande chiuse (LIBRO.md §1undecies, §1duodecies)
+- **MSTR, RGTI e SKHY** dalla seconda schermata del broker: le quattordici righe sommano **esattamente** ai totali del
+  broker (291.357,08 € e +98.978,65 €). Il carico in euro c'è ora per tredici posizioni su tredici.
+- **I versamenti netti il CEO non li ha**: un grafico del valore del conto non distingue un versamento da un guadagno. Il
+  **ROI dall'inizio del conto resta NON CALCOLABILE**, e si dice; la misura che non ne ha bisogno è il registro della
+  performance dal 09/10, a rendimento ponderato per il tempo.
+- **Il contatto per SEC: sì**, e la soluzione scelta è la meno invasiva — la sessione manda **la stessa intestazione che
+  la pipeline usa da sempre** (`update_data.SEC_UA`), non un indirizzo nuovo a un servizio nuovo.
+
+### SEC EDGAR in sessione: una funzione sola, estratta e misurata identica
+Il giro di EDGAR viveva dentro `fetch_macro()`, quindi la sessione poteva solo leggerne il risultato. Ora è
+`update_data.sec_edgar_da(seguiti, posizioni, get, ua, percorso_debito, budget, pausa, pausa_xbrl)` e la chiamano tutti e
+due (v161). **Prima di affidarla alla sessione si è misurata contro il run**: sui 58 nomi seguiti calendario dei
+risultati, ore dei depositi, storia della quotazione e voci dei bilanci sono **identici** a `data.json`, in 30 secondi.
+- La cache del debito della sessione (`memoria/dati/debito_sec_sessione.json`, fuori dal repo) **parte da quella del
+  repo** (`semina_debito`): companyfacts si legge solo per un 10-Q/10-K che nessuno dei due ha ancora letto, e senza il
+  tetto di dieci per run. Il file del repo non si scrive mai dalla sessione (un gate lo verifica per impronta).
+- **Yahoo per le date dei 10-Q diventa il RIPIEGO**, non una seconda derivazione: si chiama solo se EDGAR non risponde,
+  e la resa dice quale fonte ha servito.
+- Chi SEC non restituisce in un giro **tiene la voce del run, nominato** (`_sessione.dalla_pipeline`): un nome che sparisce
+  dal calendario si leggerebbe come «nessun deposito».
+- Un guasto della lettura del debito non porta via il calendario: in `main` erano due `try`, nella funzione sono **due
+  esiti** (`debito_sec` o `errore_debito`).
+
+### La composizione degli ETF, e la rotazione senza pipeline
+`update_data.prime_etf` (estratta da `fetch_sector_tilt`, misurata identica: 21 ETF su 21) si rilegge in sessione; senza
+`macro.tilt` nel run le righe si costruiscono da `SECTOR_ETF`, così la rotazione ha il suo universo anche quando la
+pipeline non l'ha scritto. GLD non ha partecipazioni azionarie: il fornitore non le dà, e la riga lo dice.
+
+### ⚠⚠ L'anomalia trovata: la pagina del BTP porta DUE prezzi datati, e leggevamo il più vecchio
+Misurato il 31/10: *"Prezzo ufficiale 101,59099 Data Pr Ufficiale 29/10/26"* e *"Prezzo di riferimento 101,63 Data di
+riferimento 30/10/2026"*. Il prezzo ufficiale esce più tardi: il sabato la pagina aveva quello di giovedì. **Il broker
+valorizza a 101,63** — la sua fotografia: 400 × 101,63 = 40.652 €, cioè esattamente il profitto di +652,00 € che stampa —
+più il **rateo netto** (0,2568 ogni 100, la pagina lo pubblica). Ora vale **il più recente dei due** (a pari data il
+prezzo di riferimento, quello del broker), l'altro viaggia accanto, e il rateo si pubblica a parte: il valore resta a
+corso secco, dichiarato.
+> La v521 aveva scritto la regola giusta — *l'ultimo dato ufficiale con la sua data* — e l'aveva applicata a **una sola**
+> delle due voci datate che la pagina porta. Una regola su «l'ultimo» vale solo se si sono guardati tutti i candidati.
+> L'ha trovata il confronto con la fotografia del broker, non un gate: i due prezzi differivano di 16 €.
+
+### «Correlazioni, beta e contributo al rischio delle righe» NON sono una dipendenza dell'analisi
+Restavano fra le dipendenze da GitHub. **Misurato leggendo chi li consuma**: nessuno strumento dell'analisi li legge —
+`numeri_libro.py` calcola i suoi sulle barre (v460); li usano la pagina, il pacchetto della dashboard e la sorveglianza.
+Rifarli in sessione sarebbe stato **una seconda derivazione della stessa grandezza** accanto a quella di `numeri_libro`
+(v161): si **dichiara** invece «per la pagina», e la risposta smette di presentarli come un buco dell'analisi.
+
+### La riserva dei CDS regge una pipeline ferma
+ICE pubblica solo l'ultimo giorno, e lo storico lo raccoglie la pipeline; la sessione conserva i giorni che il repo non ha
+(`memoria/cds_sessione.jsonl`). Il tetto era **30 giorni**: con la pipeline ferma un mese, la riserva perdeva i giorni più
+vecchi. Ora il tetto è quello dello storico del repo (`CDS_STORIA_MAX`, circa due anni), e i giorni che il repo ha già
+**completi** si tolgono (`gia_nel_repo`): la riserva non cresce finché la pipeline gira.
+
+### La risposta alla domanda del CEO, scritta nello stato del sistema
+La sezione PIPELINE apre ora con **cosa tocca un suo guasto**: la pagina della dashboard e lo storico dei CDS (con la
+riserva della sessione). Righe dei titoli, SEC EDGAR, ETF, macro, BTP e leva l'analisi li legge alla fonte, e la pipeline
+resta la **riserva** di quelle letture, e viceversa: **due motori indipendenti invece di uno solo**. Un avviso sulla
+pipeline non vuol più dire «l'analisi è sbagliata».
+
+### 🧪 Il metodo, e i miei errori
+- ⚠⚠ **La trappola della variabile in background, la QUARTA volta** (v492, v509, v520): `S=… && (suite) & (suite) &`
+  — la variabile vive solo nel primo processo, e l'uscita del secondo è finita nella radice. Riletta la regola: la
+  variabile si assegna **su una riga sua**.
+- **Il mio finto `get` perdeva le intestazioni**: una `lambda u, **k: _get522(u, …)` che non ripassava `**k`. Il gate
+  diceva «una richiesta senza contatto» ed era vero — del test.
+- **Il gate del collegamento cercava il giro SEC in `main`**: sta in `fetch_macro`. Una sonda nel posto sbagliato misura
+  un'altra cosa (v405).
+- **Cinque controlli nuovi mordevano per ECCEZIONE**: la suite moriva con un `KeyError` invece di far cadere il
+  controllo col suo nome (v407, v471). Riscritti con un accesso che restituisce None, e le stesse iniezioni cadono per nome.
+- **Riagganciati, nessuno zittito**: v518 (pinnava «almeno 4 dipendenze», cioè il NUMERO di oggi — v208), v519
+  (`_voce("composizione degli ETF")`, uscita dall'elenco), v390 (il passo è il parametro `pausa`), v492/v500/v501 (la
+  finestra «da sec_cal a calendario_uscite_fred» ora attraversava metà file: si guarda il corpo della funzione).
+- **Ventiquattro iniezioni**, una alla volta su quattro copie del repo verificate per impronta, con `modifica_sicura` e
+  ripristino dallo snapshot: **mordono tutte, ciascuna sul controllo atteso** — fra queste l'intestazione tolta alle
+  richieste di SEC, il passo tolto, il guasto del debito che si propaga, il debito non pubblicato in macro, la
+  composizione tolta da fetch_sector_tilt, il prezzo del BTP preso sempre dalla stessa voce, il rateo non letto, la
+  fonte del BTP scritta fissa, la semina che ignora il repo o la versione, il budget a zero, il file del repo scritto
+  dalla sessione, chi SEC non restituisce perso nella sovrapposizione, Yahoo chiamato anche con EDGAR, le tabelle
+  ferme giudicate sul calendario vecchio, la riserva dei CDS senza potatura o col tetto di 30, la riga dell'impatto
+  tolta dallo stato del sistema, la voce SEC rimessa fra le dipendenze. ⚠ Cinque mordevano al primo giro **per
+  eccezione** (sopra), e una mia iniezione era scritta male — un `try` tolto lasciava l'`except` orfano — e
+  `modifica_sicura` l'ha rifiutata lasciando il file intatto: riscritta, morde.
+- ⚠ **E il ciclo d'attesa sulle iniezioni cercava il processo per nome** (`pgrep -f`): trovava sé stesso e non sarebbe
+  finito mai — la trappola della v512, rifatta. Si aspetta il FILE che il processo scrive.
+- ⚠ **Il `pre-push` ha bloccato il push su v408**, verde dieci minuti prima: le tre chiamate a `buildPrompt` stavano a
+  cavallo di un minuto, e il pacchetto porta l'ora al minuto — il check misurava l'orologio, non il costruttore (v233,
+  v431). Ora l'istante si ferma dentro il check. Provato su una copia con un orologio che avanza di un minuto a ogni
+  lettura: il check vecchio cade, il nuovo regge.
+- Pavimenti: `test_update_data.py` 395 → 405 (417 punti di chiamata) e N_CHECKS_MINIMO 419 → 428 (430 eseguiti),
+  `test_analisi_libro.py` 995 → 1010 (1025 punti di chiamata, 1034 check). `?v=` e `BUILD_VERSION` non toccati: nessun
+  file servito al browser (v440).

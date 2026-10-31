@@ -2038,6 +2038,114 @@ def aggiorna_debito_sec(bilanci, get=None, percorso=DEBITO_SEC, budget=XBRL_PER_
             "fresco_giorni": XBRL_FRESCO_GIORNI}
 
 
+# ═══ v522 — IL GIRO DI SEC EDGAR, UNA FUNZIONE SOLA PER LA PIPELINE E PER LA SESSIONE ════════════════════════════
+# Risposta del CEO del 31/10/2026 alla domanda sul contatto (*"3 si ma scegli tu soluzione migliore"*): la sessione manda
+# a SEC la STESSA intestazione della pipeline, e rilegge calendario dei risultati, storia della quotazione, ore dei
+# depositi e voci dei bilanci con QUESTA funzione (v161). Prima viveva dentro main(), e una seconda copia nella sessione
+# sarebbe divergita al primo ritocco. SEC chiede un User-Agent che identifichi chi legge: senza, risponde 403
+# (misurato il 31/10/2026 da questo ambiente: 403 senza contatto, 200 in 0,4 secondi col contatto).
+SEC_UA = {"User-Agent": "Trading-Dashboard/1.0 (biagio.garofalo@siigep.tech)"}
+
+
+def seguiti_sec(watchlist):
+    """I simboli che EDGAR puo' conoscere: indici, cambi, future e cripto non sono societa'."""
+    s = {str((x or {}).get("ticker", "")).upper() for x in (watchlist or [])}
+    return {t for t in s if t and not t.startswith("^") and not t.endswith(("=F", "=X", "-USD"))}
+
+
+def sec_edgar_da(_seguiti, posizioni=(), get=None, ua=None, percorso_debito=DEBITO_SEC, budget=XBRL_PER_RUN,
+                 pausa=0.12, pausa_xbrl=0.15):
+    """Il giro di EDGAR sui nomi seguiti: {"sec_calendario" (o None), "debito_sec" (o None), "bilanci" ({tk: l'ultimo
+    10-Q/10-K}), "errori_titoli" ({tk: errore}), "errore_debito"}. Solleva solo se la mappa ticker→CIK non si legge:
+    senza, nessun nome si legge, e chi chiama lo dichiara. `get` si sostituisce nei gate."""
+    import statistics as _st
+    get = get or requests.get
+    ua = ua or SEC_UA
+    _r = get("https://www.sec.gov/files/company_tickers.json", headers=ua, timeout=25)
+    _r.raise_for_status()
+    _mappa = {v["ticker"].upper(): v["cik_str"] for v in _r.json().values()}
+    sec_cal, senza_cik, esteri = {}, [], []
+    storia = {}           # v492 — la fine del veicolo di quotazione (8-K item 5.06), vedi storia_quotazione
+    ore = {}              # v500 — l'ora dei depositi dei risultati (8-K 2.02, 6-K), vedi ore_depositi
+    bilanci_xbrl, senza_10q = {}, []   # v501 — il debito dai bilanci depositati, vedi aggiorna_debito_sec
+    errori = {}
+    for _tk in sorted(_seguiti):
+        _cik = _mappa.get(_tk)
+        if not _cik:
+            senza_cik.append(_tk)
+            continue
+        try:
+            _s = get(f"https://data.sec.gov/submissions/CIK{_cik:010d}.json", headers=ua, timeout=25)
+            _s.raise_for_status()
+            _sub = _s.json()
+            # v492 — PRIMA del filtro degli esteri: la storia della quotazione si dichiara per tutti
+            storia[_tk] = storia_quotazione(_sub)
+            ore[_tk] = ore_depositi(_sub)     # v500 — PRIMA del filtro degli esteri: i 6-K servono a loro
+            _ub = ultimo_bilancio_sec(_sub)    # v501 — il 10-Q/10-K piu' recente: da li' il debito XBRL
+            if _ub:
+                bilanci_xbrl[_tk] = (_cik, _ub)
+            else:
+                senza_10q.append(_tk)
+            _rec = _sub.get("filings", {}).get("recent", {})
+            _forme = _rec.get("form", [])
+            _items = _rec.get("items", [""] * len(_forme))
+            _dep = [d for f, d, it in zip(_forme, _rec.get("filingDate", []), _items)
+                    if f == "8-K" and "2.02" in (it or "")]
+            if not _dep:
+                esteri.append(_tk)
+                continue
+            voce = {"ultimo_deposito": _dep[0], "n_depositi": len(_dep)}
+            if len(_dep) >= 4:
+                _ds = [datetime.strptime(x, "%Y-%m-%d").date() for x in _dep[:8]]
+                _gap = [(_ds[i] - _ds[i + 1]).days for i in range(len(_ds) - 1)]
+                _cad = int(_st.median(_gap))
+                # solo una cadenza plausibilmente trimestrale autorizza una previsione
+                # ⚠ v396 — LA DATA ATTESA E' STATA TOLTA. Era `ultimo deposito + cadenza
+                # mediana`, cioe' una PROIEZIONE NOSTRA su dati che acquisiamo: il CEO l'ha
+                # vietata ("meglio non avere dati che avere dati non corretti"). Restano i
+                # FATTI, che sono la parte che vale: quando la societa' ha depositato davvero
+                # e ogni quanti giorni lo fa. Da quelli chi legge sa cosa aspettarsi senza
+                # che il sistema gli metta in mano una data che nessuno ha fissato.
+                if 80 <= _cad <= 100:
+                    voce["cadenza_gg"] = _cad
+                else:
+                    voce["cadenza_irregolare_gg"] = _cad
+            sec_cal[_tk] = voce
+        except Exception as e:  # noqa: BLE001
+            errori[_tk] = f"{type(e).__name__}: {str(e)[:120]}"
+        if pausa:
+            time.sleep(pausa)          # SEC chiede meno di 10 richieste al secondo
+    cal = None
+    if sec_cal or esteri or storia or ore:
+        cal = {
+            # v500 — l'ora di accettazione dei depositi dei risultati degli ultimi 130 giorni: da quale seduta parte
+            #   il VWAP ancorato ai conti (l'analisi la abbina alla data del comunicato dichiarata da Nasdaq)
+            "ore_depositi": {"per_titolo": ore, "giorni": 130,
+                             "fonte": "SEC EDGAR, acceptanceDateTime degli 8-K con item 2.02 e dei 6-K",
+                             # ⚠ v501 — UTC, misurato: vedi ore_depositi
+                             "orologio": "UTC"},
+            # v492 — per ogni titolo letto: quando ha smesso di essere un veicolo di quotazione
+            #   (SPAC). Chi legge lo storico lungo taglia li': i prezzi di prima sono di un'altra
+            #   societa'. Un titolo assente qui non e' verificato, e lo dichiara chi legge
+            "storia_quotazione": {"per_titolo": storia, "finestra_anni": 5,
+                                  "fonte": "SEC EDGAR, 8-K con item 5.06 (Change in Shell Company Status)"},
+            "per_titolo": sec_cal,
+            "senza_8k": esteri,          # emittenti esteri: 6-K/20-F, nessun item 2.02
+            "senza_cik": senza_cik,      # indici, cambi, materie prime: non sono societa'
+            "fonte": "SEC EDGAR, 8-K con item 2.02 (Results of Operations)",
+        }
+    # v501 — il debito dai bilanci depositati: dopo il giro, con le posizioni per prime
+    ds = err_ds = None
+    try:
+        ds = aggiorna_debito_sec(bilanci_xbrl, get=get, percorso=percorso_debito, budget=budget, priorita=posizioni,
+                                 ua=ua, pausa=pausa_xbrl)
+        ds["senza_10q"] = sorted(senza_10q)
+    except Exception as e:  # noqa: BLE001
+        err_ds = f"{type(e).__name__}: {str(e)[:120]}"
+    return {"sec_calendario": cal, "debito_sec": ds, "bilanci": {tk: ub for tk, (_c, ub) in bilanci_xbrl.items()},
+            "errori_titoli": errori, "errore_debito": err_ds}
+
+
 # ═══ v501 — ALTMAN Z'' SUL BILANCIO PIU' RECENTE ════════════════════════════════════════════════════════════════
 # Richiesta del CEO del 18/10/2026: «Monitora anche Altman Z-Score fornendo la % di rischio del parametro ed il range
 # temporale entro il quale puo' avvenire il potenziale default». La probabilita' e la finestra si leggono nell'analisi
@@ -3482,16 +3590,26 @@ def prezzo_btp_da(html):
     """v521 — il prezzo del BTP e la SUA data dalla pagina di Borsa Italiana. La pagina scrive «Prezzo ufficiale
     101,59099 Data Pr Ufficiale 29/10/26» (misurato il 31/10/2026): il prezzo ufficiale si pubblica una volta per
     seduta del MOT, e la data dice di quale. Le altre forme (lastPrice, Ultimo prezzo) restano come ripieghi della
-    pagina, e senza la data lo dicono (v396). Ritorna {"prezzo", "data", "voce"} o None."""
+    pagina, e senza la data lo dicono (v396). Ritorna {"prezzo", "data", "voce"} o None.
+    ⚠⚠ v522 — LA PAGINA PORTA DUE PREZZI DATATI, e il piu' recente non era quello letto. Misurato il 31/10/2026: «Prezzo
+    ufficiale 101,59099 Data Pr Ufficiale 29/10/26» e «Prezzo di riferimento 101,63 Data di riferimento 30/10/2026». Il
+    prezzo ufficiale esce piu' tardi: il sabato la pagina aveva quello di giovedi'. Il broker valorizza a 101,63 (la
+    fotografia del 31/10: 400 x 101,63 = 40.652 €, piu' il rateo). Vale l'ULTIMO dato ufficiale con la sua data (v396):
+    il piu' recente dei due; a pari data il prezzo di riferimento, quello con cui il broker valorizza. L'altro viaggia
+    accanto (`altro`), e il RATEO NETTO della pagina (gli interessi maturati, al netto dell'imposta, per 100 di
+    nominale) si pubblica a parte: il valore resta a corso secco, e il broker lo aggiunge al controvalore."""
     def _num(s):
         try:
             return float(s.replace(".", "").replace(",", ".")) if "," in s else float(s)
         except (TypeError, ValueError):
             return None
     txt = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html or ""))
-    m = re.search(r"Prezzo ufficiale\s*([0-9]{2,3},[0-9]{1,6})", txt)
-    if m and _num(m.group(1)):
-        d = re.search(r"Data Pr Ufficiale\s*([0-9]{2})/([0-9]{2})/([0-9]{2,4})", txt[m.end():m.end() + 200])
+
+    def _datato(voce, pat_p, pat_d):
+        m = re.search(pat_p + r"\s*([0-9]{2,3},[0-9]{1,6})", txt)
+        if not (m and _num(m.group(1))):
+            return None
+        d = re.search(pat_d + r"\s*([0-9]{2})/([0-9]{2})/([0-9]{2,4})", txt[m.end():m.end() + 200])
         data = None
         if d:
             aa = d.group(3) if len(d.group(3)) == 4 else "20" + d.group(3)
@@ -3499,7 +3617,19 @@ def prezzo_btp_da(html):
                 data = datetime(int(aa), int(d.group(2)), int(d.group(1))).date().isoformat()
             except ValueError:
                 data = None
-        return {"prezzo": _num(m.group(1)), "data": data, "voce": "prezzo ufficiale"}
+        return {"prezzo": _num(m.group(1)), "data": data, "voce": voce}
+    cand = [x for x in (_datato("prezzo di riferimento", r"Prezzo di riferimento", r"Data di riferimento"),
+                        _datato("prezzo ufficiale", r"Prezzo ufficiale", r"Data Pr Ufficiale")) if x]
+    if cand:
+        # il piu' recente con la data; a pari data (o senza date) il primo, cioe' il prezzo di riferimento
+        out = dict(max(cand, key=lambda x: (x["data"] or "", -cand.index(x))))
+        altri = [x for x in cand if x["voce"] != out["voce"]]
+        if altri:
+            out["altro"] = altri[0]
+        r = re.search(r"Rateo Netto\s*([0-9]{1,2},[0-9]{1,6})", txt)
+        if r and _num(r.group(1)) is not None:
+            out["rateo_netto"] = _num(r.group(1))
+        return out
     for voce, pat in (("lastPrice", r'"lastPrice"\s*:\s*([0-9.]+)'),
                       ("ultimo prezzo", r"Ultimo prezzo[^0-9]{0,200}?([0-9]{2,3}[.,][0-9]{1,4})")):
         m = re.search(pat, html or "") if voce == "lastPrice" else re.search(pat, txt)
@@ -3526,9 +3656,12 @@ def fetch_btp(prev=None, lettura="leggi"):
     `prev` e' la riga del BTP del run precedente; `lettura` la lettura gia' fatta (per i gate)."""
     letta = leggi_prezzo_btp() if lettura == "leggi" else lettura
     prev = prev if isinstance(prev, dict) else {}
+    rateo = None
     if letta and letta.get("prezzo"):
         price, asof = letta["prezzo"], letta.get("data")
-        src = FONTE_BTP if letta.get("voce") == "prezzo ufficiale" else f"Borsa Italiana ({letta.get('voce')}, senza data)"
+        rateo = letta.get("rateo_netto")      # v522 — per 100 di nominale; il valore resta a corso secco
+        # v522 — la fonte nomina la voce letta: prezzo ufficiale o di riferimento, il piu' recente dei due
+        src = f"Borsa Italiana, {letta.get('voce')}" if asof else f"Borsa Italiana ({letta.get('voce')}, senza data)"
     elif isinstance(prev.get("price"), (int, float)) and str(prev.get("price_src") or "").startswith("Borsa Italiana"):
         price, asof = float(prev["price"]), prev.get("price_asof")
         src = "riportato dal run precedente (Borsa Italiana non ha risposto)"
@@ -3549,7 +3682,7 @@ def fetch_btp(prev=None, lettura="leggi"):
         "ticker": BTP["ticker"], "name": BTP["name"], "isin": BTP["isin"],
         "qty": BTP["nominal"], "pmc": BTP["pmc"], "currency": "EUR",
         "bval": (BROKER or {}).get("controvalore_btp"), "bgain": (BROKER or {}).get("btp_bgain"),
-        "price": round(price, 2), "price_asof": asof, "price_src": src, "change_pct": None,
+        "price": round(price, 2), "price_asof": asof, "price_src": src, "change_pct": None, "rateo_netto": rateo,
         "value": round(value, 2), "gain": round(value - cost, 2),
         "gain_pct": round((value / cost - 1) * 100, 2),
         "pe": None, "ath": None, "ath_dist_pct": None, "w52_high": None, "w52_low": None,
@@ -4632,106 +4765,33 @@ def fetch_macro():
     # hanno gli "items". Per loro EDGAR non risponde alla domanda, e va DICHIARATO invece di
     # lasciare una riga vuota che si legge come "nessuna trimestrale".
     try:
-        import statistics as _st
-        SEC_UA = {"User-Agent": "Trading-Dashboard/1.0 (biagio.garofalo@siigep.tech)"}
-        _r = requests.get("https://www.sec.gov/files/company_tickers.json",
-                          headers=SEC_UA, timeout=25)
-        _r.raise_for_status()
-        _mappa = {v["ticker"].upper(): v["cik_str"] for v in _r.json().values()}
-        sec_cal, senza_cik, esteri = {}, [], []
-        storia = {}           # v492 — la fine del veicolo di quotazione (8-K item 5.06), vedi storia_quotazione
-        ore = {}              # v500 — l'ora dei depositi dei risultati (8-K 2.02, 6-K), vedi ore_depositi
-        bilanci_xbrl, senza_10q = {}, []   # v501 — il debito dai bilanci depositati, vedi aggiorna_debito_sec
+        # v522 — il giro vive in sec_edgar_da: la stessa funzione la chiama la sessione (scripts/fonti_titoli.py)
         # la lista viene dalla stessa fonte della pipeline (config/ui_watchlist.json), non
         # da un elenco scritto a mano che invecchierebbe da solo: un titolo nuovo entra qui
         # senza che nessuno se ne ricordi. Indici, cambi e future non sono societa' e finiscono
         # in `senza_cik`, che e' un esito dichiarato e non un buco.
         _, _wl_sec, _ = load_holdings()
-        _seguiti = {str(x.get("ticker", "")).upper() for x in _wl_sec}
-        _seguiti = {t for t in _seguiti
-                    if t and not t.startswith("^") and not t.endswith(("=F", "=X", "-USD"))}
-        for _tk in sorted(_seguiti):
-            _cik = _mappa.get(_tk)
-            if not _cik:
-                senza_cik.append(_tk)
-                continue
-            try:
-                _s = requests.get(f"https://data.sec.gov/submissions/CIK{_cik:010d}.json",
-                                  headers=SEC_UA, timeout=25)
-                _s.raise_for_status()
-                _sub = _s.json()
-                # v492 — PRIMA del filtro degli esteri: la storia della quotazione si dichiara per tutti
-                storia[_tk] = storia_quotazione(_sub)
-                ore[_tk] = ore_depositi(_sub)     # v500 — PRIMA del filtro degli esteri: i 6-K servono a loro
-                _ub = ultimo_bilancio_sec(_sub)    # v501 — il 10-Q/10-K piu' recente: da li' il debito XBRL
-                if _ub:
-                    bilanci_xbrl[_tk] = (_cik, _ub)
-                else:
-                    senza_10q.append(_tk)
-                _rec = _sub.get("filings", {}).get("recent", {})
-                _forme = _rec.get("form", [])
-                _items = _rec.get("items", [""] * len(_forme))
-                _dep = [d for f, d, it in zip(_forme, _rec.get("filingDate", []), _items)
-                        if f == "8-K" and "2.02" in (it or "")]
-                if not _dep:
-                    esteri.append(_tk)
-                    continue
-                voce = {"ultimo_deposito": _dep[0], "n_depositi": len(_dep)}
-                if len(_dep) >= 4:
-                    _ds = [datetime.strptime(x, "%Y-%m-%d").date() for x in _dep[:8]]
-                    _gap = [(_ds[i] - _ds[i + 1]).days for i in range(len(_ds) - 1)]
-                    _cad = int(_st.median(_gap))
-                    # solo una cadenza plausibilmente trimestrale autorizza una previsione
-                    # ⚠ v396 — LA DATA ATTESA E' STATA TOLTA. Era `ultimo deposito + cadenza
-                    # mediana`, cioe' una PROIEZIONE NOSTRA su dati che acquisiamo: il CEO l'ha
-                    # vietata ("meglio non avere dati che avere dati non corretti"). Restano i
-                    # FATTI, che sono la parte che vale: quando la societa' ha depositato davvero
-                    # e ogni quanti giorni lo fa. Da quelli chi legge sa cosa aspettarsi senza
-                    # che il sistema gli metta in mano una data che nessuno ha fissato.
-                    if 80 <= _cad <= 100:
-                        voce["cadenza_gg"] = _cad
-                    else:
-                        voce["cadenza_irregolare_gg"] = _cad
-                sec_cal[_tk] = voce
-            except Exception as e:  # noqa: BLE001
-                print(f"!! SEC EDGAR {_tk}: {e}", file=sys.stderr)
-            time.sleep(0.12)          # SEC chiede meno di 10 richieste al secondo
-        if sec_cal or esteri or storia or ore:
-            macro["sec_calendario"] = {
-                # v500 — l'ora di accettazione dei depositi dei risultati degli ultimi 130 giorni: da quale seduta parte
-                #   il VWAP ancorato ai conti (l'analisi la abbina alla data del comunicato dichiarata da Nasdaq)
-                "ore_depositi": {"per_titolo": ore, "giorni": 130,
-                                 "fonte": "SEC EDGAR, acceptanceDateTime degli 8-K con item 2.02 e dei 6-K",
-                                 # ⚠ v501 — UTC, misurato: vedi ore_depositi
-                                 "orologio": "UTC"},
-                # v492 — per ogni titolo letto: quando ha smesso di essere un veicolo di quotazione
-                #   (SPAC). Chi legge lo storico lungo taglia li': i prezzi di prima sono di un'altra
-                #   societa'. Un titolo assente qui non e' verificato, e lo dichiara chi legge
-                "storia_quotazione": {"per_titolo": storia, "finestra_anni": 5,
-                                      "fonte": "SEC EDGAR, 8-K con item 5.06 (Change in Shell Company Status)"},
-                "per_titolo": sec_cal,
-                "senza_8k": esteri,          # emittenti esteri: 6-K/20-F, nessun item 2.02
-                "senza_cik": senza_cik,      # indici, cambi, materie prime: non sono societa'
-                "fonte": "SEC EDGAR, 8-K con item 2.02 (Results of Operations)",
-            }
-            print(f"   SEC EDGAR: {len(sec_cal)} titoli con deposito trimestrale, "
-                  f"{len(esteri)} emittenti senza 8-K")
-        # v501 — il debito dai bilanci depositati: dopo il giro, con le posizioni per prime
         try:
-            try:
-                _pos_x = [str(p.get("ticker") or p.get("tk") or "").upper() for p in
-                          (json.loads((ROOT / "config" / "posizioni.json").read_text(encoding="utf-8")).get("posizioni") or [])]
-            except Exception:  # noqa: BLE001
-                _pos_x = []
-            _ds = aggiorna_debito_sec(bilanci_xbrl, ua=SEC_UA, priorita=_pos_x)
-            _ds["senza_10q"] = sorted(senza_10q)
+            _pos_x = [str(p.get("ticker") or p.get("tk") or "").upper() for p in
+                      (json.loads((ROOT / "config" / "posizioni.json").read_text(encoding="utf-8")).get("posizioni") or [])]
+        except Exception:  # noqa: BLE001
+            _pos_x = []
+        _sec = sec_edgar_da(seguiti_sec(_wl_sec), posizioni=_pos_x, ua=SEC_UA)
+        for _tk, _e in sorted(_sec["errori_titoli"].items()):
+            print(f"!! SEC EDGAR {_tk}: {_e}", file=sys.stderr)
+        if _sec["sec_calendario"]:
+            macro["sec_calendario"] = _sec["sec_calendario"]
+            print(f"   SEC EDGAR: {len(_sec['sec_calendario']['per_titolo'])} titoli con deposito trimestrale, "
+                  f"{len(_sec['sec_calendario']['senza_8k'])} emittenti senza 8-K")
+        _ds = _sec["debito_sec"]
+        if _ds is not None:
             macro["debito_sec"] = _ds
             print(f"   debito SEC (XBRL): {len(_ds['per_titolo'])} titoli in archivio, letti ora {len(_ds['letti_ora'])}"
                   + (f", in attesa {len(_ds['in_attesa'])}" if _ds["in_attesa"] else "")
                   + (f", ERRORI {sorted(_ds['errori'])}" if _ds["errori"] else "")
-                  + (f", esteri senza 10-Q/10-K {sorted(senza_10q)}" if senza_10q else ""))
-        except Exception as e:  # noqa: BLE001
-            print(f"!! debito SEC (XBRL): {e}", file=sys.stderr)
+                  + (f", esteri senza 10-Q/10-K {_ds['senza_10q']}" if _ds["senza_10q"] else ""))
+        elif _sec["errore_debito"]:
+            print(f"!! debito SEC (XBRL): {_sec['errore_debito']}", file=sys.stderr)
     except Exception as e:  # noqa: BLE001
         print(f"!! SEC EDGAR: {e}", file=sys.stderr)
 
@@ -7620,6 +7680,25 @@ def fetch_options_chain(symbols, n_strikes=12, n_expiries=3):
     return out
 
 
+def prime_etf(sym, ticker=None):
+    """v522 — le prime cinque partecipazioni dell'ETF, come l'emittente le dichiara (v298), col loro peso: [{tk, nome,
+    peso}]. [] se il fornitore non le da': meglio niente che cinque nomi vecchi presentati come attuali. Una funzione
+    sola per la pipeline (fetch_sector_tilt) e per la sessione (scripts/fonti_titoli.py, v161); `ticker` si sostituisce
+    nei gate."""
+    prime = []
+    try:
+        th = getattr(getattr((ticker or yf.Ticker)(sym), "funds_data", None), "top_holdings", None)
+        if th is not None and len(th):
+            for tk_h, riga in th.head(5).iterrows():
+                peso = riga.get("Holding Percent")
+                prime.append({"tk": str(tk_h),
+                              "nome": str(riga.get("Name") or tk_h)[:38],
+                              "peso": round(float(peso) * 100, 1) if peso is not None else None})
+    except Exception:  # noqa: BLE001
+        return []
+    return prime
+
+
 def fetch_sector_tilt():
     """Rotazione settoriale/tematica USA: momentum 1M e 3M degli ETF.
     I primi in classifica sono quelli su cui ruotare (overweight)."""
@@ -7645,17 +7724,7 @@ def fetch_sector_tilt():
                 # ribilanciata del fondo — la classe C10 / red team I6, gia' pagata piu' volte.
                 # Se il fornitore non le da', il campo resta assente e il tooltip tace: meglio
                 # niente che cinque nomi vecchi presentati come attuali.
-                prime = []
-                try:
-                    th = getattr(getattr(yf.Ticker(sym), "funds_data", None), "top_holdings", None)
-                    if th is not None and len(th):
-                        for tk_h, riga in th.head(5).iterrows():
-                            peso = riga.get("Holding Percent")
-                            prime.append({"tk": str(tk_h),
-                                          "nome": str(riga.get("Name") or tk_h)[:38],
-                                          "peso": round(float(peso) * 100, 1) if peso is not None else None})
-                except Exception:  # noqa: BLE001
-                    pass
+                prime = prime_etf(sym)      # v522 — una funzione sola, la chiama anche la sessione
                 # ═══ v305 — L'ANATOMIA DEL CICLO DI SETTORE ═══════════════════════════
                 # Dall'analisi che il CEO ha portato: per capire se una corsa di settore e'
                 # finita servono DUE ingredienti, e uno solo e' misurabile con dati gratuiti.
