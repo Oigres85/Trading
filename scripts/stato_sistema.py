@@ -437,20 +437,13 @@ def _voce(parola):
 def date_dipendenze(dati):
     """{voce di fonti_dirette.SOLO_PIPELINE: (data, nota)}. La chiave e' la stringa della voce: un gate verifica nei due
     versi che ogni voce abbia qui la sua data e che qui non ce ne sia una che l'elenco non ha (v387, v406)."""
-    import fonti_dirette as FD
-    m = (dati or {}).get("macro") or {}
     run = (dati or {}).get("updated_at")
-    md = m.get("margin_debt") or {}
     cds = _ultimo_cds()
-    btp = next((r for r in (dati or {}).get("portfolio") or [] if str(r.get("ticker", "")).startswith("BTP")), None)
     v = {
         _voce("storico dei CDS"): ((cds or {}).get("giorno"), nota_cds(cds, (dati or {}).get("updated_at"))),
         _voce("voci dei bilanci SEC"): (_debito(), "le voci si rileggono solo dopo un 10-Q o 10-K nuovo, al piu' dieci "
                                                    "per run"),
-        _voce("debito a margine"): (md.get("date"), "serie mensile di FINRA: riferita al mese, non a un giorno"),
         _voce("composizione degli ETF"): (run, "composizione dichiarata dall'emittente, letta a ogni run"),
-        _voce("prezzo del BTP"): (run, f"prezzo {str(btp.get('price')).replace('.', ',')}" if btp
-                                  else "riga del BTP assente"),
         _voce("contributo al rischio"): (run, "si calcolano a ogni run sulla matrice dei rendimenti di tutti i titoli "
                                               "insieme: la lettura in sessione di una riga sola non li produce"),
     }
@@ -467,7 +460,7 @@ def righe_dipendenze(dati, pipeline):
     for voce in FD.SOLO_PIPELINE:
         data, nota = dd.get(voce, (None, "data non associata"))
         q = _quando(data) if data and "T" in str(data) else None
-        quando = ora_it(q) if q else giorno_it(data, mese=voce == _voce("debito a margine"))
+        quando = ora_it(q) if q else giorno_it(data)
         segno = f"{AVVISO} " if (data is None or (q is not None and pipeline.get("prima_chiusura"))) else ""
         L.append(f"  {segno}{voce}: {quando} — {nota}")
     L.append("  gia' letti qui alla fonte, non piu' dalla pipeline: " + "; ".join(FD.RILETTI_PER_TITOLO)

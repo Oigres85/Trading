@@ -9112,7 +9112,7 @@ _dd518 = SS.date_dipendenze({"updated_at": "2026-10-30T17:29:00Z", "macro": {"ma
 check("v518 ogni voce di fonti_dirette.SOLO_PIPELINE ha la sua data nello stato del sistema, e lo stato non ne ha una "
       "che l'elenco non porta — e i multipli e bilanci per titolo stanno in UNO dei due elenchi (v519: fra i riletti, "
       "con le righe intere lette in sessione)",
-      set(_dd518) == set(_FD518.SOLO_PIPELINE) and len(_FD518.SOLO_PIPELINE) >= 6
+      set(_dd518) == set(_FD518.SOLO_PIPELINE) and len(_FD518.SOLO_PIPELINE) >= 4
       and sum(any("flottante" in v for v in _l) for _l in (_FD518.SOLO_PIPELINE, _FD518.RILETTI_PER_TITOLO)) == 1,
       str(sorted(_dd518)))
 _rdi518 = "\n".join(SS.righe_dipendenze({"updated_at": None, "macro": {}, "portfolio": []}, {"prima_chiusura": None}))
@@ -9121,11 +9121,9 @@ _run518 = [v for v in _FD518.SOLO_PIPELINE if "CDS" not in v and "SEC" not in v]
 _senza518 = [r for r in _rdi518.splitlines() if any(r.lstrip("⚠ ").startswith(v + ":") for v in _run518)]
 check("v518 una dipendenza senza data (il run senza ora, la leva senza mese) si marca ⚠ e il debito a margine si data "
       "col MESE (v392); i riletti alla fonte si elencano a parte",
-      len(_run518) >= 4 and len(_senza518) == len(_run518) and all(SS.AVVISO in r for r in _senza518)
-      and "gia' letti qui alla fonte" in _rdi518
-      and "settembre 2026" in "\n".join(SS.righe_dipendenze({"updated_at": "2026-10-30T17:29:00Z",
-                                                             "macro": {"margin_debt": {"date": "2026-09-01"}}},
-                                                            {"prima_chiusura": False})), _rdi518)
+      len(_run518) >= 2 and len(_senza518) == len(_run518) and all(SS.AVVISO in r for r in _senza518)
+      and "gia' letti qui alla fonte" in _rdi518, _rdi518)
+# v521 — il debito a margine non e' piu' fra le dipendenze: il suo mese per nome lo rende fonti_titoli (check v521)
 check("v518 lo storico dei CDS a meta': sul giorno del run e' il caso normale (le ondate di ICE, v508), su un giorno "
       "passato e' un giorno non completato e si marca ⚠",
       SS.AVVISO not in SS.nota_cds({"giorno": "2026-10-30", "entita": 51, "indici": 0}, "2026-10-30T17:29:00Z")
@@ -9392,7 +9390,7 @@ def _solleva(f):
     return False
 check("v519 lo stato del sistema prende le voci delle dipendenze per NOME, non per posizione: una parola che non c'e' o "
       "che ne trova due solleva invece di datare la voce accanto",
-      SS._voce("debito a margine").startswith("debito a margine")
+      SS._voce("composizione degli ETF").startswith("composizione degli ETF")
       and all(_solleva(lambda w=w: SS._voce(w)) for w in ("parola che non c'e'", "de")))
 
 
@@ -9644,6 +9642,107 @@ check("v520 il collegamento in calcola: il broker letto una volta, passato al ca
       "_broker = leggi_conto_broker()" in _src_nl520 and "broker=_broker, pmc=pmc)" in _src_nl520
       and 'out["conto"] = roi_conto(_broker, qty, pmc, pat_pipe[0], cassa_eur)' in _src_nl520
       and 'L.extend(righe_roi(o["conto"]))' in _src_nl520)
+
+
+# ══ v521 — PREZZO DEL BTP E DEBITO A MARGINE LETTI IN SESSIONE (richiesta del CEO del 31/10/2026: «distaccarsi quanto
+#   piu' possibile da GitHub»), con le funzioni della pipeline; lo stato si COSTRUISCE, nessuna rete ══════════════════
+class _Risp521:
+    def __init__(self, t):
+        self.text = t
+_PAG521 = ("<div>Prezzo ufficiale</div><span>101,59099</span><div>Data Pr Ufficiale</div><span>29/10/26</span>")
+_b521 = FT.leggi_btp(lambda url: _Risp521(_PAG521))
+def _getko521(url):
+    raise ConnectionError("prova")
+_bk521 = FT.leggi_btp(_getko521)
+check("v521 leggi_btp: il prezzo ufficiale di Borsa Italiana con la sua data, con la funzione della pipeline; una pagina "
+      "che non risponde e' NON LETTO col motivo, non un prezzo",
+      _b521.get("esito") == "letto" and _b521.get("prezzo") == 101.59099 and _b521.get("data") == "2026-10-29"
+      and _bk521.get("esito") == "non letto" and _bk521.get("errore"), f"{_b521} {_bk521}")
+_FINRA521 = {"date": "2026-09-01", "value": 1480054, "series": "FINRA debit balances (mensile)", "yoy": 31.4}
+_lv521 = [FT.leggi_leva(lambda prev, x=x: x) for x in
+          (_FINRA521, {**_FINRA521, "unreliable": True, "series": "Fed Z.1"}, {**_FINRA521, "carried": True}, None)]
+check("v521 leggi_leva: FINRA letta adesso vale; la Fed Z.1 (un'altra misura) e un dato riportato dal run precedente NON "
+      "sono una lettura alla fonte, e FINRA che non risponde e' NON LETTO",
+      _lv521[0].get("esito") == "letto" and _lv521[0]["valore"]["date"] == "2026-09-01"
+      and all(x.get("esito") == "non letto" for x in _lv521[1:]), str(_lv521))
+check("v521 leggi_leva chiama la funzione della pipeline SENZA il suo ripiego sul run precedente (qui il run precedente "
+      "e' la pipeline stessa)",
+      "(fetch or _ud().fetch_margin_debt)(None)" in Path(FT.__file__).read_text(encoding="utf-8"))
+
+def _dati521(price_asof=None, md=None):
+    # nominale e carico DIVERSI dalle costanti della pipeline: cosi' si vede se la sovrapposizione li tocca
+    r = {"ticker": "BTP-V28", "qty": 30000, "pmc": 99.0, "price": 101.2, "value": 40480.0, "gain": 480.0,
+         "gain_pct": 1.2}
+    if price_asof:
+        r.update({"price_asof": price_asof, "price_src": "Borsa Italiana, prezzo ufficiale"})
+    return {"updated_at": "2026-10-31T00:31:43Z", "portfolio": [r], "watchlist": [],
+            "macro": {"margin_debt": md if md is not None else {"date": "2026-08-01", "value": 1400000,
+                                                                "series": "FINRA debit balances (mensile)"}}}
+_lb521 = {"esito": "letto", "prezzo": 101.59099, "data": "2026-10-29", "voce": "prezzo ufficiale"}
+_o521 = FT.sovrapponi(_dati521(), {"letto": "2026-10-31T08:00:00+00:00", "btp": _lb521, "leva": _lv521[0]})
+_rb521 = _o521["portfolio"][0]
+_es521 = _o521["macro"]["_fonti_titoli"]["esiti"]
+check("v521 sovrapponi: il prezzo del BTP letto adesso sostituisce quello del run (prezzo, data, fonte, valore e "
+      "guadagno rifatti con fetch_btp), e nominale e carico restano del run; il debito a margine del mese piu' recente "
+      "vince; gli esiti lo dicono",
+      _rb521["price"] == 101.59 and _rb521["price_asof"] == "2026-10-29" and _rb521["price_src"].startswith("Borsa")
+      and abs(_rb521["value"] - 40636.4) < 0.01 and _rb521["qty"] == 30000 and _rb521["pmc"] == 99.0
+      and _o521["macro"]["margin_debt"]["date"] == "2026-09-01"
+      and _es521.get("btp") == "fonte (prezzo ufficiale del 29/10/2026)"
+      and _es521.get("leva") == "fonte (FINRA, settembre 2026)", f"{_rb521} {_es521}")
+_o521b = FT.sovrapponi(_dati521("2026-10-30"), {"letto": "x", "btp": _lb521, "leva": _lv521[0]})
+_o521c = FT.sovrapponi(_dati521("2026-10-28"), {"letto": "x", "btp": {**_lb521, "data": None}, "leva": _lv521[0]})
+_o521d = FT.sovrapponi(_dati521(md={"date": "2026-10-01", "value": 1500000, "series": "FINRA"}),
+                       {"letto": "x", "btp": _lb521, "leva": _lv521[0]})
+_o521e = FT.sovrapponi(_dati521(md={"date": "2026-10-01", "value": 1500000, "series": "FINRA", "carried": True}),
+                       {"letto": "x", "btp": _lb521, "leva": _lv521[0]})
+check("v521 una lettura piu' vecchia, o senza data contro un prezzo datato, NON scavalca il run (v396); un mese di leva "
+      "piu' recente nel run resta, ma un mese RIPORTATO dal run precedente cede il posto a FINRA letta adesso",
+      _o521b["portfolio"][0]["price"] == 101.2 and _o521b["portfolio"][0]["price_asof"] == "2026-10-30"
+      and _o521c["portfolio"][0]["price"] == 101.2
+      and _o521d["macro"]["margin_debt"]["date"] == "2026-10-01"
+      and _o521e["macro"]["margin_debt"]["date"] == "2026-09-01"
+      and _o521b["macro"]["_fonti_titoli"]["esiti"]["btp"].startswith("pipeline (il run ha il prezzo del 30/10/2026")
+      and "piu' recente" in _o521d["macro"]["_fonti_titoli"]["esiti"]["leva"])
+_o521f = FT.sovrapponi(_dati521(), {"letto": "x", "btp": {"esito": "non letto", "errore": "prova"},
+                                    "leva": {"esito": "non letto", "errore": "prova"}})
+check("v521 senza la lettura alla fonte vale il run, e l'esito dice perche' e cosa porta il run (la fonte del prezzo, il "
+      "mese della leva)",
+      _o521f["portfolio"][0]["price"] == 101.2
+      and _o521f["macro"]["_fonti_titoli"]["esiti"]["btp"].startswith("pipeline (prova")
+      and "agosto 2026" in _o521f["macro"]["_fonti_titoli"]["esiti"]["leva"])
+_c521 = []
+_rr521 = "\n".join(FT.righe_btp_leva(_dati521(), {"btp": _lb521, "leva": _lv521[0]}, _c521))
+_c521b = []
+_dd521 = _dati521()
+_dd521["portfolio"][0]["price_src"] = "RIPIEGO: 103,25 scritto nel codice, NON un prezzo di mercato"
+_dd521["macro"]["margin_debt"]["carried"] = True
+_rr521b = "\n".join(FT.righe_btp_leva(_dd521, {"btp": {"esito": "non letto", "errore": "prova"},
+                                               "leva": {"esito": "non letto", "errore": "prova"}}, _c521b))
+check("v521 la resa: il prezzo del BTP con la data della pagina e quello del run accanto; il mese della leva per NOME "
+      "(v392), in miliardi; senza la fonte, un prezzo di RIPIEGO o un mese RIPORTATO nel run diventano una voce da cercare",
+      "101,591 del 29/10/2026" in _rr521 and "nel run: 101,20 senza data" in _rr521
+      and "settembre 2026, 1.480 miliardi $" in _rr521 and "DIVERSO dal run" in _rr521 and not _c521
+      and "NON letto alla fonte" in _rr521b and len(_c521b) == 2 and "RIPORTATO" in _rr521b, _rr521 + "\n" + _rr521b)
+_src521 = Path(FT.__file__).read_text(encoding="utf-8")
+check("v521 il collegamento: il giro legge BTP e leva insieme agli altri blocchi, sovrapponi li applica, la resa li "
+      "stampa, e le cadenze li dichiarano (calcola non gira offline: qui il testo e' la prova)",
+      "ex.submit(leggi_btp)" in _src521 and "ex.submit(leggi_leva)" in _src521
+      and 'g["btp"] = f_btp.result()' in _src521 and 'g["leva"] = f_lv.result()' in _src521
+      and 'esiti["btp"] = applica_btp(out, giro.get("btp") or {})' in _src521
+      and 'esiti["leva"] = applica_leva(m, giro.get("leva") or {})' in _src521
+      and "L.extend(righe_btp_leva(d, g, cercare))" in _src521
+      and {"btp", "leva"} <= set(FT.BLOCCHI) and {"btp", "leva"} <= {k for k, _n, _t in FT.CADENZE})
+check("v521 BTP e debito a margine escono dalle dipendenze da GitHub ed entrano fra cio' che si rilegge qui: in UNO dei "
+      "due elenchi, e lo stato del sistema non li data piu' dal run",
+      not any("BTP" in v or "debito a margine" in v for v in _FD518.SOLO_PIPELINE)
+      and sum("BTP" in v for v in _FD518.RILETTI_PER_TITOLO) == 1
+      and sum("debito a margine" in v for v in _FD518.RILETTI_PER_TITOLO) == 1
+      and set(SS.date_dipendenze({"updated_at": "x", "macro": {}, "portfolio": []})) == set(_FD518.SOLO_PIPELINE))
+_al521 = Path(Path(FT.__file__).parent / "analisi_libro.py").read_text(encoding="utf-8")
+check("v521 analisi_libro.stato_patrimoniale legge il prezzo del BTP con la lettura del giro sovrapposta "
+      "(fonti_titoli.carica, mai la rete) e porta la fonte e la data del prezzo",
+      "dd = fonti_titoli.carica(dd) or dd" in _al521 and '"btp_fonte": fonte, "btp_al": al' in _al521)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

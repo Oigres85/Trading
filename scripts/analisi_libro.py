@@ -54,19 +54,28 @@ def stato_patrimoniale():
     # quella somma e' il denominatore con cui ogni misura di rischio passa al patrimonio.
     # Il carico resta il ripiego, DICHIARATO in `btp_base`, per quando la pipeline non
     # pubblica la riga. Stessa correzione di `fuoriAzionarioEur` in assets/app.js.
-    prezzo, base = None, "prezzo di carico (la pipeline non pubblica la riga)"
+    prezzo, base, fonte, al = None, "prezzo di carico (la pipeline non pubblica la riga)", None, None
     try:
         dd = json.loads((ROOT / "data" / "data.json").read_text(encoding="utf-8"))
+        # v521 — con la lettura alla fonte del giro sovrapposta, se c'e' (fonti_titoli.carica, mai la rete): il prezzo
+        #   del BTP di adesso, con la sua data, al posto di quello del run
+        try:
+            sys.path.insert(0, str(ROOT / "scripts"))
+            import fonti_titoli
+            dd = fonti_titoli.carica(dd) or dd
+        except Exception:
+            pass
         for r in (dd.get("portfolio") or []):
             if str(r.get("ticker") or "").startswith("BTP"):
                 p = r.get("price")
                 if isinstance(p, (int, float)) and p > 0:
                     prezzo, base = float(p), "prezzo di mercato"
+                    fonte, al = r.get("price_src"), r.get("price_asof")
                 break
     except Exception:
         pass
     btp = (bv.get("qty") or 0) * (prezzo if prezzo else (bv.get("pmc") or 0)) / 100 or None
-    return {"cassa": cassa, "btp": btp, "btp_base": base,
+    return {"cassa": cassa, "btp": btp, "btp_base": base, "btp_fonte": fonte, "btp_al": al,
             "cassa_al": (s.get("cash") or {}).get("at")}
 
 

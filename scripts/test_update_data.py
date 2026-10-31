@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 413  # v520: 415 eseguiti · v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 419  # v521: 421 eseguiti · v520: 415 eseguiti · v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -3762,6 +3762,45 @@ check("v520 il collegamento: fetch_symbol assegna il rendimento con rendimento_c
       "nel campo «rendimento» della riga (si prova il COLLEGAMENTO, non solo il controllo: v399)",
       "_rend = rendimento_capitale(t)" in _fs520 and '"rendimento": _rend' in _fs520
       and "rendimento del capitale {ticker}" in _fs520)
+
+
+# ══ v521 — IL PREZZO DEL BTP CON LA SUA DATA, E IL RIPIEGO CHE ERA MUTO ══════════════════════════════════════════
+# Senza Borsa Italiana il BTP valeva 103,25, un prezzo scritto nel codice, e la riga non lo diceva: su un titolo che
+#   entra nel denominatore della quota azionaria (v432). Le pagine si COSTRUISCONO: un check sulla rete andrebbe rosso
+#   a seconda di dove gira.
+_pag521 = ("<div>Prezzo ufficiale</div><span>101,59099</span><div>Data Pr Ufficiale</div><span>29/10/26</span>"
+           "<div>Ultimo prezzo</div><span>101,60</span>")
+_l521 = ud.prezzo_btp_da(_pag521)
+check("v521 la pagina di Borsa Italiana da' il prezzo ufficiale CON la sua data (la seduta del MOT a cui si riferisce)",
+      _l521 == {"prezzo": 101.59099, "data": "2026-10-29", "voce": "prezzo ufficiale"})
+_l521b = ud.prezzo_btp_da("<p>Ultimo prezzo</p> <b>101,60</b>")
+check("v521 senza il prezzo ufficiale vale l'ultimo prezzo della pagina, e SENZA data lo dice (data None, la voce "
+      "nominata); una pagina senza prezzo non da' un prezzo",
+      _l521b == {"prezzo": 101.6, "data": None, "voce": "ultimo prezzo"} and ud.prezzo_btp_da("<p>niente</p>") is None
+      and ud.prezzo_btp_da("") is None)
+_r521 = ud.fetch_btp(None, _l521)
+check("v521 la riga del BTP porta prezzo, data e fonte; valore e guadagno sul prezzo letto",
+      _r521["price"] == 101.59 and _r521["price_asof"] == "2026-10-29"
+      and _r521["price_src"] == ud.FONTE_BTP and abs(_r521["value"] - 40000 * 101.59099 / 100) < 0.01)
+_p521 = {"price": 101.2, "price_src": ud.FONTE_BTP, "price_asof": "2026-10-28"}
+_r521p = ud.fetch_btp(_p521, None)
+check("v521 se Borsa Italiana non risponde vale il prezzo del run PRECEDENTE letto da Borsa Italiana, DICHIARATO "
+      "riportato e con la sua data",
+      _r521p["price"] == 101.2 and _r521p["price_asof"] == "2026-10-28" and "riportato" in _r521p["price_src"])
+_r521v = ud.fetch_btp({"price": 101.4}, None)
+_r521f = ud.fetch_btp({"price": ud.BTP["fallback_price"]}, None)
+_r521n = ud.fetch_btp(None, None)
+check("v521 uno snapshot precedente alla v521 (senza fonte) si riporta se il prezzo non e' quello scritto nel codice, "
+      "senza data; altrimenti il ripiego scritto nel codice si DICHIARA non di mercato — mai in silenzio",
+      _r521v["price"] == 101.4 and _r521v["price_asof"] is None and "precedente alla v521" in _r521v["price_src"]
+      and all(x["price"] == ud.BTP["fallback_price"] and x["price_asof"] is None
+              and x["price_src"].startswith("RIPIEGO") and "NON un prezzo di mercato" in x["price_src"]
+              for x in (_r521f, _r521n))
+      and ud.fetch_btp({"price": 99.0, "price_src": _r521f["price_src"]}, None)["price_src"].startswith("RIPIEGO"))
+_mn521 = _corpo519("main")
+check("v521 il collegamento: la pipeline passa a fetch_btp la riga del BTP del run precedente (v399: il collegamento, "
+      "non solo il controllo)",
+      "btp = fetch_btp(next((r for r in (PREV_DATA.get(\"portfolio\")" in _mn521)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

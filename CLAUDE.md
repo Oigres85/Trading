@@ -9175,7 +9175,67 @@ conto. La sonda è una FORMA, non il dato vero, che non va scritto nemmeno nel t
   dallo snapshot: le **15 sugli strumenti mordono tutte**, ciascuna sul controllo atteso. Una — il carico del broker
   ignorato nel blocco del cambio — al primo giro faceva MORIRE la suite (un `next()` senza ripiego) invece di far cadere
   il controllo col suo nome (v407, v471): reso robusto, la stessa iniezione cade per nome. Le **8 sulla pipeline**
-  (aliquota, capitale medio, contiguità, perdita, negativi, alla pari, esercizi per data, collegamento) girano a parte:
-  l'esito si scrive qui quando c'è, non prima.
+  (aliquota, capitale medio, contiguità, perdita, negativi, alla pari, esercizi per data, collegamento), girate a parte
+  dopo il push: **mordono tutte e otto**, ciascuna sul controllo atteso.
 - Pavimenti: `test_update_data.py` 390 (402 punti di chiamata) e N_CHECKS_MINIMO 413 (415 eseguiti),
   `test_analisi_libro.py` 985 (1001 punti di chiamata, 1011 check). `?v=` e `BUILD_VERSION` a 520: cambia `assets/app.js`.
+
+## 🇮🇹 v521 — PREZZO DEL BTP E DEBITO A MARGINE LETTI IN SESSIONE; IL RIPIEGO DEL BTP ERA MUTO
+
+Istruzione del CEO del 31/10/2026, testuale: *"Alla fine del lavoro controlla se ci sono anomalia e valute sempre la mia
+richiesta di distaccarsi quanto più possibile con il sistema su GitHub al fine di far calcolare e recuperare i dati qui a
+te per una maggiore affidabilità"*. Delle quattro voci rimaste solo alla pipeline dopo la v519, due avevano una fonte
+pubblica raggiungibile da qui. Misurato prima di scrivere: Borsa Italiana risponde in meno di un secondo con il prezzo
+ufficiale del MOT **e la sua data**, e la pagina di FINRA (tabella più file storico, v496) risponde come nel CI.
+
+### ⚠⚠ L'anomalia: il prezzo del BTP poteva essere un numero scritto nel codice, e nessuno lo diceva
+Quando Borsa Italiana non rispondeva, `fetch_btp` usava `103,25`, cioè `BTP["fallback_price"]` scritto a mano, e la riga
+non portava né una fonte né una data. Era un ripiego muto (classe v389, v396) su un denominatore che pesa: il BTP vale
+circa 40.600 € dentro la quota azionaria del patrimonio, cioè il moltiplicatore con cui VaR, ES e drawdown passano al
+patrimonio (v432, v439). E oggi il prezzo vero è **101,591**: il ripiego lo avrebbe gonfiato di circa 660 €, in silenzio.
+- **La pipeline legge il prezzo ufficiale con la sua data** (`prezzo_btp_da`). Le voci di ripiego della pagina (l'ultimo
+  prezzo) entrano senza data, e la riga lo dice.
+- **Se Borsa Italiana non risponde vale il prezzo del run precedente**, dichiarato *riportato*, con la sua data. Uno
+  snapshot precedente alla v521, che la fonte non la porta, si riporta solo se il suo prezzo non è quello scritto nel
+  codice, e senza data.
+- **Il numero scritto nel codice resta come ultimo ripiego, e si chiama per quello che è**: *"RIPIEGO: 103,25 scritto nel
+  codice, NON un prezzo di mercato"*. La riga del BTP porta ora `price_asof` e `price_src`.
+
+### In sessione, con le funzioni della pipeline (v161)
+`fonti_titoli.py` legge i due blocchi nel giro (`btp`, `leva`) e `carica` li sovrappone a `data.json` come gli altri
+(v512):
+- **BTP**: si rifanno prezzo, data, fonte, valore e guadagno con `fetch_btp(None, lettura)`, quindi con la stessa
+  aritmetica. Quantità e carico restano quelli del run. La lettura vince se la sua data non è più vecchia di quella del
+  run, oppure se la riga del run non ha una data.
+- **Debito a margine**: `fetch_margin_debt(None)`, senza il ripiego sul run precedente (qui il run precedente è la
+  pipeline stessa). Vale solo una lettura di FINRA datata, affidabile e non riportata. Vince se il suo mese non è più
+  vecchio di quello del run, oppure se il run ha un dato riportato o non affidabile (la Fed Z.1 è un'altra misura).
+- `analisi_libro.stato_patrimoniale` (rapporto, scenari, soglie) legge ora con la lettura del giro sovrapposta e porta
+  la fonte e la data del prezzo.
+- La resa (DATI PER TITOLO) dà il prezzo con la sua data e quello del run accanto, e il mese della leva per nome (v392).
+  Un ripiego o un dato riportato nel run finiscono fra le voci da cercare in rete.
+- `fonti_dirette.SOLO_PIPELINE` scende a quattro voci: storico dei CDS (ICE pubblica solo l'ultimo giorno), voci dei
+  bilanci SEC (403 senza un contatto), composizione degli ETF, e le misure incrociate (correlazioni, beta, contributo al
+  rischio). Lo stato del sistema non data più le due voci uscite.
+
+**Sui dati del 31/10**: BTP **101,591 del 29/10/2026** (prezzo ufficiale), valore 40.636 €; debito a margine **settembre
+2026, 1.480 miliardi $**, lo stesso del run.
+
+### 🧪 Il metodo
+- **Riagganciati, nessuno zittito**: v518 (pinnava almeno sette voci e il mese della leva nella riga delle dipendenze) e
+  v519 (cercava la voce del debito a margine, uscita dall'elenco): ora l'invariante è che ogni voce stia in UNO dei due
+  elenchi.
+- La fixture del BTP aveva nominale e carico **uguali alle costanti del codice**, quindi un'iniezione che li sovrascrive
+  non poteva mordere (v430). Ora 30.000 e 99,0.
+- ⚠ **Il riavvio del worker ha interrotto un'iniezione a metà**: la copia c1 è rimasta con `update_data.py` iniettato.
+  L'ha trovato il confronto per impronta prima di rilanciare (v511: *una copia si verifica a ogni ripresa*). Le altre tre
+  copie differivano solo in `self_check.mjs`, copiato prima che i pavimenti salissero e non eseguito dalle suite.
+- **14 iniezioni**, una alla volta su quattro copie del repo verificate per impronta, con `modifica_sicura` e ripristino
+  dallo snapshot: **mordono tutte, ciascuna sul controllo atteso**. Quattro sulla pipeline (data non letta, ripiego che
+  si spaccia per Borsa Italiana, run precedente ignorato, collegamento tolto) e dieci sugli strumenti (leva non affidabile
+  accettata, guardia della data tolta, leva riportata accettata, nominale e carico sovrascritti, mese ISO nella resa,
+  ripiego non cercato, esito tolto, BTP rimesso fra le dipendenze, `stato_patrimoniale` senza la lettura del giro, leva
+  letta col ripiego).
+- Pavimenti: `test_update_data.py` 395 (408 punti di chiamata) e N_CHECKS_MINIMO 419 (421 eseguiti),
+  `test_analisi_libro.py` 995 (1012 punti di chiamata, 1021 check). `?v=` e `BUILD_VERSION` non toccati: nessun file
+  servito al browser (v440).

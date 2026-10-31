@@ -81,7 +81,7 @@ VOCI_NASDAQ = {"ricavi": ("Total Revenue",),
 SPENTA = "TRADING_FONTI_TITOLI"     # ="spenta": le suite non leggono la lettura del giro (dipenderebbero dall'ora)
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
-BLOCCHI = ("righe", "analisti", "fedwatch", "cds", "short", "sec", "trimestri")
+BLOCCHI = ("righe", "analisti", "fedwatch", "cds", "short", "sec", "trimestri", "btp", "leva")
 
 # ⚠ OGNI QUANTO CAMBIA CIASCUN DATO, e ogni quanto la pipeline lo rilegge: la domanda del CEO del 25/10. Fatti delle fonti
 #   (orari, scadenze di legge, calendario), non stime: dove la cadenza non e' fissata dalla fonte si dice.
@@ -106,8 +106,13 @@ CADENZE = (
      "10-Q ogni trimestre, entro 40 o 45 giorni dalla chiusura secondo la dimensione della societa'; 10-K ogni anno, "
      "entro 60, 75 o 90 giorni; 8-K entro quattro giorni lavorativi da un evento (i conti escono di solito con un 8-K il "
      "giorno stesso). La pipeline rilegge le voci del debito solo dopo un 10-Q o 10-K nuovo, al piu' dieci per run"),
+    ("btp", "Prezzo del BTP (Borsa Italiana, v521)",
+     "un prezzo ufficiale per seduta del MOT, con la data che la pagina dichiara accanto"),
+    ("leva", "Debito a margine (FINRA, v521)",
+     "una rilevazione al mese, per il mese concluso: il giorno di pubblicazione lo fissa FINRA, e qui non si stima; "
+     "la tabella della pagina e il file storico si uniscono per data, con la funzione della pipeline"),
 )
-CADENZA_PIPELINE = ("La pipeline rilegge analisti, FedWatch, CDS e short a ogni run: 14-15 run al giorno nei feriali e "
+CADENZA_PIPELINE = ("La pipeline rilegge analisti, FedWatch, CDS, short, prezzo del BTP e debito a margine a ogni run: 14-15 run al giorno nei feriali e "
                     "11 nel fine settimana, che partono con 99-263 minuti di ritardo sull'orario (la coda del cron di "
                     "GitHub, v437)")
 
@@ -863,6 +868,32 @@ def con_righe(d, rg):
     return out
 
 
+def leggi_btp(get=None):
+    """v521 — il prezzo del BTP da Borsa Italiana, con la funzione della pipeline (update_data.leggi_prezzo_btp)."""
+    try:
+        x = _ud().leggi_prezzo_btp(get)
+    except Exception as e:  # noqa: BLE001
+        return {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
+    if not x or not x.get("prezzo"):
+        return {"esito": "non letto", "errore": "Borsa Italiana non ha risposto o la pagina non porta il prezzo"}
+    return {"esito": "letto", **x}
+
+
+def leggi_leva(fetch=None):
+    """v521 — il debito a margine da FINRA, con la funzione della pipeline e SENZA il suo ripiego sul run precedente
+    (qui il run precedente e' la pipeline stessa: riportarlo sarebbe leggere due volte la stessa cosa). La Fed Z.1 e'
+    un'altra misura, piu' piccola, che la pipeline usa come ultima spiaggia marcandola inaffidabile: qui non vale."""
+    try:
+        md = (fetch or _ud().fetch_margin_debt)(None)
+    except Exception as e:  # noqa: BLE001
+        return {"esito": "non letto", "errore": f"{type(e).__name__}: {str(e)[:120]}"}
+    if not isinstance(md, dict) or not md.get("date"):
+        return {"esito": "non letto", "errore": "FINRA non ha risposto"}
+    if md.get("unreliable") or md.get("carried") or "FINRA" not in str(md.get("series") or ""):
+        return {"esito": "non letto", "errore": "FINRA non ha risposto (resta la sola Fed Z.1, un'altra misura)"}
+    return {"esito": "letto", "valore": md}
+
+
 def leggi_alla_fonte(d, nomi):
     """Il giro: le letture in parallelo (CDS dopo FedWatch, che ne da' il tasso). Non solleva mai."""
     t0 = time.time()
@@ -899,10 +930,14 @@ def leggi_alla_fonte(d, nomi):
     def an_resto():
         resto = [tk for tk in nomi if not dalla_riga.get(tk)]
         return {**dalla_riga, **(leggi_analisti(resto) if resto else {})}
-    with ThreadPoolExecutor(3) as ex:
+    with ThreadPoolExecutor(5) as ex:
         f_an = ex.submit(an_resto)
         f_sec = ex.submit(leggi_sec, nomi)
         f_si = ex.submit(leggi_short, dd, rend_di)
+        f_btp = ex.submit(leggi_btp)       # v521
+        f_lv = ex.submit(leggi_leva)       # v521
+        g["btp"] = f_btp.result()
+        g["leva"] = f_lv.result()
         try:
             an = f_an.result()
             g["analisti"] = {"esito": "letto", "per_titolo": {k: v for k, v in an.items() if v},
@@ -1072,11 +1107,55 @@ def sovrapponi(d, giro):
         esiti["short"] = "fonte (FINRA piu' avanti della pipeline)"
     else:
         esiti["short"] = "pipeline (" + (si.get("esito") or "non letto") + ")"
+    esiti["btp"] = applica_btp(out, giro.get("btp") or {})
+    esiti["leva"] = applica_leva(m, giro.get("leva") or {})
     esiti["sec"] = "date dei depositi dalla fonte" if sec.get("esito") == "letto" else "solo la pipeline"
     esiti["trimestri"] = (f"Nasdaq per {', '.join(completati)} (verificato sul trimestre in comune)" if completati
                           else "pipeline")
     m["_fonti_titoli"] = {"letto": giro.get("letto"), "esiti": esiti}
     return out
+
+
+CAMPI_BTP = ("price", "price_asof", "price_src", "value", "gain", "gain_pct")
+
+
+def applica_btp(d, lettura):
+    """v521 — il prezzo del BTP letto adesso al posto di quello del run, se e' almeno della stessa seduta. Una lettura
+    senza data non scavalca un prezzo datato (v396); la riga si rifa' con update_data.fetch_btp, la funzione della
+    pipeline, e se ne prendono solo prezzo e valori: carico e nominale restano quelli del run."""
+    r = next((x for x in ((d or {}).get("portfolio") or []) if isinstance(x, dict)
+              and str(x.get("ticker", "")).startswith("BTP")), None)
+    if r is None:
+        return "nessuna riga del BTP nel run"
+    if lettura.get("esito") != "letto":
+        return "pipeline (" + (lettura.get("errore") or "non letto") + "; prezzo del run: " + str(r.get("price_src")
+                                                                                              or "fonte non dichiarata") + ")"
+    pa, la = r.get("price_asof"), lettura.get("data")
+    if pa and (not la or la < pa):
+        return (f"pipeline (il run ha il prezzo del {_data_it(pa)}, la lettura di adesso "
+                + (f"del {_data_it(la)}" if la else "senza data") + ")")
+    nuova = _ud().fetch_btp(None, lettura)
+    for k in CAMPI_BTP:
+        r[k] = nuova.get(k)
+    return f"fonte (prezzo ufficiale del {_data_it(la)})" if la else "fonte (Borsa Italiana, senza data nella pagina)"
+
+
+def applica_leva(m, lettura):
+    """v521 — il debito a margine letto adesso al posto di quello del run, se il mese e' almeno lo stesso: vale
+    l'ultimo dato ufficiale, da qualunque parte arrivi (v511). Un run che riportava il mese prima o che stava sulla
+    Fed Z.1 cede il posto a FINRA letta adesso."""
+    from stato_sistema import giorno_it     # il mese per nome, una resa sola (v392)
+    p = m.get("margin_debt") or {}
+    if lettura.get("esito") != "letto":
+        stato = ("riportato dal run precedente" if p.get("carried") else
+                 "Fed Z.1, un'altra misura" if p.get("unreliable") else giorno_it(p.get("date"), mese=True))
+        return "pipeline (" + (lettura.get("errore") or "non letto") + f"; nel run: {stato})"
+    v = lettura["valore"]
+    if p.get("date") and not (p.get("carried") or p.get("unreliable")) and str(v["date"]) < str(p["date"]):
+        return (f"pipeline (il run ha {giorno_it(p['date'], mese=True)}, piu' recente della lettura di adesso, "
+                f"{giorno_it(v['date'], mese=True)})")
+    m["margin_debt"] = v
+    return f"fonte (FINRA, {giorno_it(v['date'], mese=True)})"
 
 
 def carica(d=None, percorso=None, adesso=None, ufficiali=None):
@@ -1257,6 +1336,7 @@ def sintesi(d, giro, adesso=None, ufficiali=None):
     else:
         L.append(f"  · VENDITE ALLO SCOPERTO (FINRA): NON lette ({si.get('errore') or 'n.d.'}): vale il regolamento "
                  f"della pipeline ({psi.get('regolamento') or 'n.d.'})")
+    L.extend(righe_btp_leva(d, g, cercare))       # v521
     # sec e trimestri
     L.extend(righe_sec(d, g.get("sec") or {}, cercare, g.get("trimestri") or {}, uff_es, uff_reg))
     L.extend(righe_ufficiali(uff_reg, uff_es))
@@ -1264,6 +1344,41 @@ def sintesi(d, giro, adesso=None, ufficiali=None):
     L.extend(["    · " + c for c in cercare] or ["    · niente: le fonti lette adesso sono allineate o piu' avanti "
                                                   "della pipeline"])
     return "\n".join(L)
+
+
+def righe_btp_leva(d, g, cercare):
+    """v521 — prezzo del BTP e debito a margine: cosa ha letto la sessione e cosa aveva il run. Un prezzo del BTP che il
+    run dichiara RIPIEGO, o un mese di leva riportato, e' un dato che va cercato se nemmeno la fonte ha risposto."""
+    from stato_sistema import giorno_it     # il mese per nome, una resa sola (v392)
+    L = []
+    r = next((x for x in ((d or {}).get("portfolio") or []) if isinstance(x, dict)
+              and str(x.get("ticker", "")).startswith("BTP")), None) or {}
+    b = g.get("btp") or {}
+    run_btp = (f"{_n(r.get('price'))} " + (f"del {_data_it(r.get('price_asof'))}" if r.get("price_asof") else "senza data")
+               + f" ({r.get('price_src') or 'fonte non dichiarata: snapshot precedente alla v521'})") if r else "riga assente"
+    if b.get("esito") == "letto":
+        L.append(f"  · PREZZO DEL BTP (Borsa Italiana): {_n(b.get('prezzo'), 3)} "
+                 + (f"del {_data_it(b.get('data'))}" if b.get("data") else "SENZA DATA nella pagina")
+                 + f" ({b.get('voce')}) · nel run: {run_btp}")
+    else:
+        L.append(f"  · PREZZO DEL BTP: NON letto alla fonte ({b.get('errore') or 'n.d.'}) · vale il run: {run_btp}")
+        if str(r.get("price_src") or "").startswith("RIPIEGO"):
+            cercare.append("il prezzo del BTP: nel run e' il valore scritto nel codice, non un prezzo di mercato")
+    lv = g.get("leva") or {}
+    p = ((d or {}).get("macro") or {}).get("margin_debt") or {}
+    run_lv = (f"{giorno_it(p.get('date'), mese=True)}" + (" RIPORTATO dal run precedente" if p.get("carried") else "")
+              + (" dalla Fed Z.1 (un'altra misura)" if p.get("unreliable") else "")) if p else "assente"
+    if lv.get("esito") == "letto":
+        v = lv["valore"]
+        dif = "" if (v.get("date") == p.get("date") and v.get("value") == p.get("value")) else " — DIVERSO dal run"
+        mld = f"{round((v.get('value') or 0) / 1e3):,}".replace(",", ".")     # FINRA scrive in milioni di dollari
+        L.append(f"  · DEBITO A MARGINE (FINRA): {giorno_it(v.get('date'), mese=True)}, {mld} miliardi $"
+                 f" · nel run: {run_lv}{dif}")
+    else:
+        L.append(f"  · DEBITO A MARGINE: NON letto alla fonte ({lv.get('errore') or 'n.d.'}) · vale il run: {run_lv}")
+        if p.get("carried") or p.get("unreliable") or not p:
+            cercare.append("il debito a margine di FINRA dell'ultimo mese: ne' la fonte ne' il run lo hanno")
+    return L
 
 
 def righe_righe(d, rg, cercare):

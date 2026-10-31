@@ -3474,26 +3474,82 @@ def fetch_watchlist():
     return rows
 
 
-def fetch_btp():
-    price = BTP["fallback_price"]
+URL_BTP = "https://www.borsaitaliana.it/borsa/obbligazioni/mot/btp/scheda/{isin}.html"
+FONTE_BTP = "Borsa Italiana, prezzo ufficiale"
+
+
+def prezzo_btp_da(html):
+    """v521 — il prezzo del BTP e la SUA data dalla pagina di Borsa Italiana. La pagina scrive «Prezzo ufficiale
+    101,59099 Data Pr Ufficiale 29/10/26» (misurato il 31/10/2026): il prezzo ufficiale si pubblica una volta per
+    seduta del MOT, e la data dice di quale. Le altre forme (lastPrice, Ultimo prezzo) restano come ripieghi della
+    pagina, e senza la data lo dicono (v396). Ritorna {"prezzo", "data", "voce"} o None."""
+    def _num(s):
+        try:
+            return float(s.replace(".", "").replace(",", ".")) if "," in s else float(s)
+        except (TypeError, ValueError):
+            return None
+    txt = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html or ""))
+    m = re.search(r"Prezzo ufficiale\s*([0-9]{2,3},[0-9]{1,6})", txt)
+    if m and _num(m.group(1)):
+        d = re.search(r"Data Pr Ufficiale\s*([0-9]{2})/([0-9]{2})/([0-9]{2,4})", txt[m.end():m.end() + 200])
+        data = None
+        if d:
+            aa = d.group(3) if len(d.group(3)) == 4 else "20" + d.group(3)
+            try:
+                data = datetime(int(aa), int(d.group(2)), int(d.group(1))).date().isoformat()
+            except ValueError:
+                data = None
+        return {"prezzo": _num(m.group(1)), "data": data, "voce": "prezzo ufficiale"}
+    for voce, pat in (("lastPrice", r'"lastPrice"\s*:\s*([0-9.]+)'),
+                      ("ultimo prezzo", r"Ultimo prezzo[^0-9]{0,200}?([0-9]{2,3}[.,][0-9]{1,4})")):
+        m = re.search(pat, html or "") if voce == "lastPrice" else re.search(pat, txt)
+        if m and _num(m.group(1)):
+            return {"prezzo": _num(m.group(1)), "data": None, "voce": voce}
+    return None
+
+
+def leggi_prezzo_btp(get=None):
+    """La lettura di Borsa Italiana, o None col motivo su stderr. La usano la pipeline e la sessione (v161)."""
+    get = get or http_get
     try:
-        url = f"https://www.borsaitaliana.it/borsa/obbligazioni/mot/btp/scheda/{BTP['isin']}.html"
-        html = http_get(url).text
-        m = re.search(r'Prezzo ufficiale[^0-9]{0,200}?([0-9]{2,3}[.,][0-9]{1,4})', html) or \
-            re.search(r'"lastPrice"\s*:\s*([0-9.]+)', html) or \
-            re.search(r'Ultimo prezzo[^0-9]{0,200}?([0-9]{2,3}[.,][0-9]{1,4})', html) or \
-            re.search(r'-\s*Prezzo[^0-9]{0,80}?([0-9]{2,3},[0-9]{1,4})', html)
-        if m:
-            price = float(m.group(1).replace(",", "."))
+        return prezzo_btp_da(get(URL_BTP.format(isin=BTP["isin"])).text)
     except Exception as e:  # noqa: BLE001
-        print(f"!! prezzo BTP non disponibile, uso fallback: {e}", file=sys.stderr)
+        print(f"!! prezzo BTP non letto da Borsa Italiana: {e}", file=sys.stderr)
+        return None
+
+
+def fetch_btp(prev=None, lettura="leggi"):
+    """La riga del BTP. ⚠⚠ v521 — IL RIPIEGO ERA MUTO: senza Borsa Italiana il BTP valeva 103,25, un prezzo scritto
+    nel codice, e la riga non lo diceva — su un titolo che entra nel denominatore della quota azionaria (v432). Ora:
+    1) Borsa Italiana, col prezzo e la sua data; 2) il prezzo del run precedente, se veniva da Borsa Italiana,
+    DICHIARATO riportato e con la sua data; 3) il prezzo scritto nel codice, dichiarato NON di mercato.
+    `prev` e' la riga del BTP del run precedente; `lettura` la lettura gia' fatta (per i gate)."""
+    letta = leggi_prezzo_btp() if lettura == "leggi" else lettura
+    prev = prev if isinstance(prev, dict) else {}
+    if letta and letta.get("prezzo"):
+        price, asof = letta["prezzo"], letta.get("data")
+        src = FONTE_BTP if letta.get("voce") == "prezzo ufficiale" else f"Borsa Italiana ({letta.get('voce')}, senza data)"
+    elif isinstance(prev.get("price"), (int, float)) and str(prev.get("price_src") or "").startswith("Borsa Italiana"):
+        price, asof = float(prev["price"]), prev.get("price_asof")
+        src = "riportato dal run precedente (Borsa Italiana non ha risposto)"
+    elif (isinstance(prev.get("price"), (int, float)) and "price_src" not in prev
+          and abs(float(prev["price"]) - BTP["fallback_price"]) > 1e-9):
+        # uno snapshot precedente alla v521 non dichiara la fonte: un prezzo diverso da quello scritto nel codice e'
+        # stato letto (era l'unico altro ramo), ma la sua data non c'e'
+        price, asof = float(prev["price"]), None
+        src = "riportato dal run precedente (Borsa Italiana non ha risposto; snapshot precedente alla v521, senza data)"
+    else:
+        price, asof = BTP["fallback_price"], None
+        src = (f"RIPIEGO: {str(BTP['fallback_price']).replace('.', ',')} scritto nel codice, NON un prezzo di mercato "
+               "(Borsa Italiana non ha risposto e il run precedente non ha un prezzo letto)")
+        print(f"!! prezzo BTP: {src}", file=sys.stderr)
     value = BTP["nominal"] * price / 100
     cost = BTP["nominal"] * BTP["pmc"] / 100
     return {
         "ticker": BTP["ticker"], "name": BTP["name"], "isin": BTP["isin"],
         "qty": BTP["nominal"], "pmc": BTP["pmc"], "currency": "EUR",
         "bval": (BROKER or {}).get("controvalore_btp"), "bgain": (BROKER or {}).get("btp_bgain"),
-        "price": round(price, 2), "change_pct": None,
+        "price": round(price, 2), "price_asof": asof, "price_src": src, "change_pct": None,
         "value": round(value, 2), "gain": round(value - cost, 2),
         "gain_pct": round((value / cost - 1) * 100, 2),
         "pe": None, "ath": None, "ath_dist_pct": None, "w52_high": None, "w52_low": None,
@@ -8185,7 +8241,8 @@ def main():
     PREV_DATA = prev_data
 
     equities = fetch_equities()
-    btp = fetch_btp()
+    btp = fetch_btp(next((r for r in (PREV_DATA.get("portfolio") or []) if isinstance(r, dict)
+                          and str(r.get("ticker", "")).startswith("BTP")), None))    # v521
     watchlist = fetch_watchlist()
     macro = fetch_macro()
     # ═══ v307 — LE POSIZIONI DEL CEO, COME SOVRAPPOSIZIONE ═══════════════════════════════

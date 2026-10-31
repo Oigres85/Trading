@@ -100,8 +100,7 @@ ORDINE = tuple(k for k, *_ in SERIE_FRED[:7]) + ("effr", "eurusd", "fear_greed")
 # ⚠ COSA LA PIPELINE PORTA DA SOLA (nessuna fonte raggiungibile da qui): si nomina quando il run e' indietro.
 SOLO_PIPELINE = ("storico dei CDS (il giorno di oggi lo rilegge fonti_titoli.py)",
                  "voci dei bilanci SEC (debito, scadenze, derivati) e salute del credito",
-                 "debito a margine (famiglia «leva» del semaforo)", "composizione degli ETF della rotazione",
-                 "prezzo del BTP",
+                 "composizione degli ETF della rotazione",
                  # v519 — restano del run perche' si calcolano sui titoli INSIEME (la matrice dei rendimenti di tutte le
                  #   righe): la lettura di una riga sola non li produce
                  "correlazioni, beta sul Nasdaq-100 e contributo al rischio delle righe dei titoli")
@@ -110,7 +109,11 @@ SOLO_PIPELINE = ("storico dei CDS (il giorno di oggi lo rilegge fonti_titoli.py)
 RILETTI_PER_TITOLO = ("righe intere di ogni titolo con la funzione della pipeline — prezzo, tecnica, multipli, conti "
                       "trimestrali, combustione di cassa, solidita', flottante e sensibilita' ai canali macro",
                       "target e revisioni degli analisti", "FedWatch", "CDS dell'ultimo giorno", "vendite allo scoperto",
-                      "date dei depositi SEC e trimestri che la pipeline non ha ancora")
+                      "date dei depositi SEC e trimestri che la pipeline non ha ancora",
+                      # v521 — non sono «per titolo», ma la stessa lettura del giro li rifa' alla fonte: l'elenco e' quello
+                      #   di cio' che qui non dipende piu' dalla pipeline
+                      "prezzo del BTP (Borsa Italiana, con la data del prezzo ufficiale)",
+                      "debito a margine (FINRA, famiglia «leva» del semaforo)")
 
 
 # ══════════════════════════════════ LETTURA ALLA FONTE ═════════════════════════════════════════════════════════
