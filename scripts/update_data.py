@@ -2446,6 +2446,197 @@ def solidita_operativa(t, comb=None):
     return out
 
 
+# ── v520 — ROIC e ROE (richiesta del CEO del 31/10/2026: «1 si … Sarebbe utile anche ROE») ──────────────────────
+#   Il ROE di Yahoo (`stats.roe`) non dichiara ne' la data ne' il periodo (v396), e il ROIC non lo calcolava nessuno.
+#   Qui si calcolano entrambi dalle voci dei bilanci, coi loro denominatori e le loro date — CONVENZIONI dichiarate:
+#   · ROIC = risultato operativo dei 12 mesi (Operating Income: senza le poste non operative — su Strategy i guadagni
+#     contabili sul bitcoin non entrano) al netto delle imposte, diviso il capitale investito MEDIO fra inizio e fine
+#     dei 12 mesi, come la fonte lo pubblica (Invested Capital: patrimonio degli azionisti ordinari piu' il debito
+#     finanziario, senza togliere la cassa);
+#   · ROE = utile degli azionisti ordinari dei 12 mesi diviso il loro patrimonio MEDIO fra inizio e fine;
+#   · l'aliquota e' quella EFFETTIVA dei 12 mesi (imposte / utile prima delle imposte) se cade fra 0 e ALIQUOTA_MAX,
+#     altrimenti la media dell'aliquota normalizzata che la fonte stessa pubblica (Tax Rate For Calcs); un risultato
+#     operativo negativo non riceve un beneficio fiscale;
+#   · un denominatore negativo o nullo non da' un rendimento: da' un buco, col suo motivo (v205).
+ALIQUOTA_MAX = 0.5                # un'aliquota effettiva oltre il 50% (o negativa) e' un anno anomalo, non la sua aliquota
+RENDIMENTO_ESERCIZI = 4           # esercizi chiusi pubblicati: uno puo' chiudere lo stesso trimestre dei 12 mesi
+TRE_TRIMESTRI_GIORNI = 273 + CICLO_TOLLERANZA_GIORNI   # quattro trimestri contigui: il primo e l'ultimo distano ~273 g
+
+
+def _quattro_contigui(df, voci):
+    """(somma, data di fine) dei quattro trimestri piu' recenti NON vuoti della prima voce presente, solo se sono
+    CONTIGUI: quattro colonne piene che saltano un trimestre vuoto coprono quindici mesi, non dodici (v207)."""
+    if df is None or getattr(df, "empty", True):
+        return None, None
+    for v in voci:
+        if v not in df.index:
+            continue
+        try:
+            s = df.loc[v]
+            if hasattr(s, "columns"):
+                s = s.iloc[0]
+            s = s.dropna()
+        except Exception:  # noqa: BLE001
+            continue
+        if len(s) < 4:
+            return None, None
+        usati = s.iloc[:4]
+        d0, d3 = _data_colonna(usati.index[0]), _data_colonna(usati.index[3])
+        if d0 is None or d3 is None or (d0 - d3).days > TRE_TRIMESTRI_GIORNI:
+            return None, None
+        return float(usati.sum()), d0
+    return None, None
+
+
+def _valore_colonna(df, voci, col):
+    """La prima voce presente nella colonna `col` (annuali: la colonna dell'esercizio). None se manca o e' NaN."""
+    for v in voci:
+        if df is None or v not in df.index or col not in df.columns:
+            continue
+        try:
+            x = df.loc[v, col]
+            if hasattr(x, "iloc"):
+                x = x.iloc[0]
+            x = float(x)
+        except (TypeError, ValueError, KeyError):
+            continue
+        if x == x:
+            return x
+    return None
+
+
+def _aliquota(ante, imposte, normalizzate):
+    """(aliquota, base): 'effettiva' = imposte / utile prima delle imposte, se l'utile e' positivo e l'aliquota cade
+    fra 0 e ALIQUOTA_MAX; altrimenti 'fonte' = la media delle aliquote normalizzate della fonte; (None, None) se nessuna."""
+    if ante is not None and ante > 0 and imposte is not None:
+        a = imposte / ante
+        if 0 <= a <= ALIQUOTA_MAX:
+            return a, "effettiva"
+    v = [x for x in (normalizzate or []) if x is not None and x == x and 0 <= x <= ALIQUOTA_MAX]
+    if v:
+        return sum(v) / len(v), "fonte"
+    return None, None
+
+
+def _medio(fine, inizio):
+    """(valore medio, base): 'media' fra inizio e fine, 'fine' se l'inizio manca; (None, motivo) se uno dei due e'
+    negativo o nullo — un denominatore che non e' positivo non da' un rendimento."""
+    if fine is None:
+        return None, "assente"
+    if fine <= 0 or (inizio is not None and inizio <= 0):
+        return None, "non_positivo"
+    if inizio is None:
+        return fine, "fine"
+    return (fine + inizio) / 2, "media"
+
+
+def _rendimento_periodo(op, ante, imposte, normalizzate, utile, ic_fine, ic_inizio, pn_fine, pn_inizio):
+    """ROIC e ROE di un periodo dalle sue voci: {roic, roe, nopat, aliquota, aliquota_base, capitale_base,
+    patrimonio_base, motivo_roic, motivo_roe}. Frazioni a quattro decimali, arrotondate una volta sola (v496)."""
+    out = {}
+    ic, base_ic = _medio(ic_fine, ic_inizio)
+    pn, base_pn = _medio(pn_fine, pn_inizio)
+    if op is None:
+        out["motivo_roic"] = "risultato_operativo_mancante"
+    else:
+        if op > 0:
+            a, ab = _aliquota(ante, imposte, normalizzate)
+            nopat = None if a is None else op * (1 - a)
+            out.update({"aliquota": None if a is None else round(a, 4), "aliquota_base": ab})
+        else:
+            nopat = op                       # un risultato operativo negativo non riceve un beneficio fiscale
+            out["aliquota_base"] = "nessuna_perdita"
+        if nopat is None:
+            out["motivo_roic"] = "aliquota_non_ricavabile"
+        elif ic is None:
+            out["motivo_roic"] = "capitale_" + base_ic
+        else:
+            out.update({"roic": round(nopat / ic, 4), "nopat": nopat, "capitale_medio": ic, "capitale_base": base_ic})
+    if utile is None:
+        out["motivo_roe"] = "utile_mancante"
+    elif pn is None:
+        out["motivo_roe"] = "patrimonio_" + base_pn
+    else:
+        out.update({"roe": round(utile / pn, 4), "utile": utile, "patrimonio_medio": pn, "patrimonio_base": base_pn})
+    return out
+
+
+VOCI_OPERATIVO = ("Operating Income",)
+VOCI_ANTE = ("Pretax Income",)
+VOCI_IMPOSTE = ("Tax Provision",)
+VOCI_ALIQUOTA_FONTE = ("Tax Rate For Calcs",)
+VOCI_UTILE_ORDINARI = ("Net Income Common Stockholders", "Net Income")
+VOCI_CAPITALE_INVESTITO = ("Invested Capital",)
+VOCI_PATRIMONIO_ORDINARI = ("Common Stock Equity", "Stockholders Equity")
+
+
+def rendimento_da(inc, bs, ai=None, ab=None):
+    """v520 — ROIC e ROE dei 12 mesi (conto e stato patrimoniale TRIMESTRALI) e degli ultimi RENDIMENTO_ESERCIZI
+    esercizi chiusi (ANNUALI), dalle stesse convenzioni. La fine dei 12 mesi e' l'ultimo trimestre del risultato
+    operativo; le altre voci del conto devono finire lo STESSO trimestre (alla pari, v504), e i bilanci si leggono PER
+    DATA alla fine e un anno prima (v207). None se il conto trimestrale non ha quattro trimestri contigui."""
+    op, fine = _quattro_contigui(inc, VOCI_OPERATIVO)
+    ut, fine_ut = _quattro_contigui(inc, VOCI_UTILE_ORDINARI)
+    if fine is None:
+        fine = fine_ut
+    if fine is None:
+        return None
+    def _pari(x, d):
+        return x if (x is not None and d is not None and abs((d - fine).days) <= CICLO_TOLLERANZA_GIORNI) else None
+    ante, d_a = _quattro_contigui(inc, VOCI_ANTE)
+    imp, d_i = _quattro_contigui(inc, VOCI_IMPOSTE)
+    norm = []
+    for v in VOCI_ALIQUOTA_FONTE:
+        if inc is not None and not getattr(inc, "empty", True) and v in inc.index:
+            s = inc.loc[v].dropna()
+            norm = [float(x) for c, x in s.items()
+                    if _data_colonna(c) and 0 <= (fine - _data_colonna(c)).days <= TRE_TRIMESTRI_GIORNI]
+            break
+    inizio = fine - timedelta(days=365)
+    p = _rendimento_periodo(
+        _pari(op, fine) if op is not None else None, _pari(ante, d_a), _pari(imp, d_i), norm, _pari(ut, fine_ut),
+        _valore_alla_data(bs, VOCI_CAPITALE_INVESTITO, fine), _valore_alla_data(bs, VOCI_CAPITALE_INVESTITO, inizio),
+        _valore_alla_data(bs, VOCI_PATRIMONIO_ORDINARI, fine), _valore_alla_data(bs, VOCI_PATRIMONIO_ORDINARI, inizio))
+    out = {"al": fine.isoformat(), "dal": (inizio + timedelta(days=1)).isoformat(), **p}
+    icf = _valore_alla_data(bs, VOCI_CAPITALE_INVESTITO, fine)
+    pnf = _valore_alla_data(bs, VOCI_PATRIMONIO_ORDINARI, fine)
+    if icf and icf > 0 and pnf is not None:
+        out["quota_patrimonio"] = round(pnf / icf, 3)     # quanta parte del capitale investito e' degli azionisti
+    es = []
+    if ai is not None and not getattr(ai, "empty", True):
+        cols = sorted([c for c in ai.columns if _data_colonna(c)], key=_data_colonna, reverse=True)
+        for c in cols:
+            if len(es) >= RENDIMENTO_ESERCIZI:
+                break
+            d = _data_colonna(c)
+            q = _rendimento_periodo(
+                _valore_colonna(ai, VOCI_OPERATIVO, c), _valore_colonna(ai, VOCI_ANTE, c),
+                _valore_colonna(ai, VOCI_IMPOSTE, c),
+                [x for x in [_valore_colonna(ai, VOCI_ALIQUOTA_FONTE, c)] if x is not None],
+                _valore_colonna(ai, VOCI_UTILE_ORDINARI, c),
+                _valore_alla_data(ab, VOCI_CAPITALE_INVESTITO, d),
+                _valore_alla_data(ab, VOCI_CAPITALE_INVESTITO, d - timedelta(days=365)),
+                _valore_alla_data(ab, VOCI_PATRIMONIO_ORDINARI, d),
+                _valore_alla_data(ab, VOCI_PATRIMONIO_ORDINARI, d - timedelta(days=365)))
+            if q.get("roic") is None and q.get("roe") is None:
+                continue
+            es.append({"al": d.isoformat(), **{k: q[k] for k in ("roic", "roe", "capitale_base", "patrimonio_base",
+                                                                 "motivo_roic", "motivo_roe") if k in q}})
+    out["esercizi"] = es
+    return out
+
+
+def rendimento_capitale(t):
+    """v520 — rendimento_da sulle quattro tabelle di un yfinance.Ticker. None se la fonte non ha il conto trimestrale."""
+    tab = []
+    for nome in ("quarterly_income_stmt", "quarterly_balance_sheet", "income_stmt", "balance_sheet"):
+        try:
+            tab.append(getattr(t, nome))
+        except Exception:  # noqa: BLE001
+            tab.append(None)
+    return rendimento_da(*tab)
+
+
 def riga_precedente(ticker):
     """La riga dello STESSO titolo nello snapshot del run precedente, ovunque stia.
     Cerca in entrambe le liste perche' un titolo puo' passare da watchlist a portafoglio fra
@@ -2924,7 +3115,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # costruito anche per i simboli senza fondamentali (indici, futures, ETF). Vedi il gate
     # "v369 nessuna variabile del record assegnata solo dentro un ramo" in test_update_data.py.
     stats = None
-    _comb = _cred = _fuori = _short = _sol = _flot = None
+    _comb = _cred = _fuori = _short = _sol = _flot = _rend = None
     if has_fundamentals(ticker, currency):
         g = info.get
         def num(*keys):
@@ -3008,6 +3199,14 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         except Exception as _e:
             print(f"!! solidita operativa {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
             _sol = None
+        # ⚠ v520 — ROIC e ROE dai bilanci, coi loro denominatori e le date (vedi rendimento_da): un try suo
+        try:
+            _rend = rendimento_capitale(t)
+            if _rend:
+                _rend["valuta"] = g("financialCurrency") or g("currency")
+        except Exception as _e:
+            print(f"!! rendimento del capitale {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
+            _rend = None
 
         # ⚠ v367 — credito (al posto del CDS) e flusso fuori mercato. Ogni fonte in un try
         # suo: FINRA e' un servizio esterno, e un suo disservizio non deve far cadere il run.
@@ -3174,6 +3373,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "credito": _cred,       # v367 — al posto del CDS: oneri finanziari, copertura, scadenze.
         "solidita": _sol,       # v504 — ciclo di cassa, flusso dell'ultimo trimestre, utile, magazzino, azionisti.
         "azioni": _flot,        # v514 — azioni in circolazione datate, diluizione, rotazione del flottante, quotazione.
+        "rendimento": _rend,    # v520 — ROIC e ROE dei 12 mesi e per esercizio, datati, coi loro denominatori.
         "fuori_mercato": _fuori,# v367 — ATS (dark pool) e OTC non-ATS per settimana, FINRA.
         "short_flusso": _short, # v367 — quota di volume venduta allo scoperto, FINRA, giornaliera.
         "tech_by_range": tech_by_range,

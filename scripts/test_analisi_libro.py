@@ -6398,7 +6398,8 @@ check("v503 il posto del nome per ogni misura fra chi ha il dato (1 = il piu' al
       "fuori dal confronto, nessun punteggio d'insieme: " + " · ".join(_po503),
       _po503 == ["crescita dei ricavi sull'anno 2° su 3", "margine lordo 2° su 3", "margine operativo 12 mesi: n.d.",
                  "flusso operativo 12 mesi sui ricavi: n.d.", "cassa libera 12 mesi sui ricavi: n.d.",
-                 "ciclo di cassa: n.d.", "Altman Z'' 1° su 2", "liquidita' sul debito a breve: n.d."])
+                 "ciclo di cassa: n.d.", "ROIC 12 mesi: n.d.", "ROE 12 mesi: n.d.", "Altman Z'' 1° su 2",
+                 "liquidita' sul debito a breve: n.d."])
 
 # --- la resa di una societa' ---
 _rr503 = KO.riga_salute({"tk": "MSTR", "stato": "letto", "letto_il": "2026-10-18", "trim": "2026-06-30",
@@ -6755,7 +6756,7 @@ check("v504 la salute di ogni concorrente porta flusso operativo sui ricavi e ci
       + str([_so504, _sx504]),
       _so504.get("ocf_12m_pct") == round(80 / 690 * 100, 1) and _so504.get("fcf_12m_pct") == round(69 / 690 * 100, 1)
       and _so504.get("ciclo") == -25 and _so504.get("ciclo_al") == "2026-06-30"
-      and _so504.get("altman_circolante_fornitori") is True and _so504.get("versione") == KO.VERSIONE == 504
+      and _so504.get("altman_circolante_fornitori") is True and _so504.get("versione") == KO.VERSIONE >= 504
       and "ocf_12m_pct" not in _sx504 and "fcf_12m_pct" not in _sx504 and _sx504.get("senza_magazzino") is True
       and _sx504.get("periodi_diversi") == {"ricavi": "2026-06-30", "flussi": "2026-09-30"})
 
@@ -6883,6 +6884,9 @@ _U505 = {
         # v516 — il cambio euro/dollaro e la riga di un nome col carico in euro (copiata nella sua scheda)
         "CAMBIO EURO/DOLLARO (v516) — EUR/USD 1,1172 (BCE, del 2026-10-30)",
         "  BBB   carico 1.000 $ a EUR/USD 1,1172 = 895 € · oggi 890 € · in euro -5 € = prezzo -5 € + cambio 0 €",
+        # v520 — il ROI del conto dalla fotografia del broker
+        "ROI DEL CONTO (v520, richiesta del CEO del 31/10/2026) — dalla fotografia del broker del 31/10/2026 alle 08:04",
+        "  posizioni APERTE (azioni e BTP): carico 1.000 € → controvalore 1.100 € · +100 € = +10,00% sul carico",
         "DECISIONI APERTE: nessuna in LIBRO.md §1quinquies", "RIMANDATE DI PROPOSITO — si riprendono all'evento",
         "  BBB — l'uscita: in pari", "ORDINI APERTI: nessuno attivo in LIBRO.md §1septies",
         "CREDITO SUL LIBRO — chi brucia cassa: 40,0% · BBB", "TENUTA DELLE POSIZIONI — bilancio dell'evidenza",
@@ -6935,16 +6939,19 @@ _U505 = {
         "gira a seduta (v514)", "  diluizione forte sull'anno: BBB +20,0% (in posizione)", "",
         "AAA [POSIZIONE] Alfa Inc. — prezzo pipeline del 2026-10-16",
         "  valutazione: P/E ultimi 12 mesi 10,0× · PEG sull'esercizio prossimo 0,50 (P/E 10,0× sul consenso)",
+        "  rendimento del capitale (12 mesi al 30/06/2026): ROIC 20,0% · ROE 30,0%",
         "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 2,3% del flottante (bassa)",
         "  flottante: azioni in circolazione al 30/06/2026: 100,0 milioni di azioni · +1,0% sull'anno",
         "  CDS 5 anni: NESSUN CDS compensato a ICE", "  solidita': PATRIMONIALE: FORTE", "  Altman Z'' 5,00: zona di SICUREZZA",
         "  debito: debito finanziario 1,0 mld USD", "",
         "BBB [POSIZIONE] Beta Inc. — prezzo pipeline del 2026-10-16", "  valutazione: utile NEGATIVO",
+        "  rendimento del capitale (12 mesi al 30/06/2026): ROIC -5,0% · ROE n.d. (patrimonio degli azionisti negativo)",
         "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 21,0% del flottante (molto alta)",
         "  flottante: azioni in circolazione al 30/06/2026: 120,0 milioni di azioni · +20,0% sull'anno",
         "  CDS 5 anni 900 pb",
         "  solidita': PATRIMONIALE: DEBOLE", "  Altman Z'' -1,00: zona di PERICOLO", "  debito: debito finanziario 2,0 mld USD", "",
         "WWW [SORVEGLIATO] Www Corp. — prezzo pipeline del 2026-10-16", "  valutazione: P/E 20×",
+        "  rendimento del capitale (12 mesi al 30/06/2026): ROIC 10,0% · ROE 12,0%",
         "  short: posizioni corte aperte al 30/09/2026 (FINRA) · 1,0% del flottante (bassa)",
         "  flottante: azioni in circolazione al 30/06/2026: 50,0 milioni di azioni · -3,0% sull'anno",
         "  CDS 5 anni: NESSUN CDS", "  solidita': lettura non significativa", "  Altman: NON APPLICABILE",
@@ -6965,6 +6972,7 @@ _U505 = {
         "      volumi (0 = minimo dell'anno, 100 = massimo, 50 = norma): seduta conclusa 32/100 · target analisti (pipeline) "
         "mediana 35,00 · beta S&P 500 1,20 (R2 0,50, 250 sedute) · volatilita' annua 30%",
         "      valutazione: P/E 20×",
+        "      rendimento del capitale (12 mesi al 30/06/2026): ROIC 10,0% · ROE 12,0%",
         "      tenuta se fosse in portafoglio (LIBRO.md §1sexies): VENDITA PER EVIDENZA — un ingresso qui e' speculativo, "
         "CONTRO l'evidenza: ammesso, e si dichiara tale", "",
         "CALENDARIO FISCALE DI FINE ANNO — fuori finestra: si accende da ottobre a gennaio (decisione del 25/10/2026)", "",
@@ -8814,7 +8822,7 @@ check("v516 un titolo FERMO in dollari con l'euro sceso da 1,20 a 1,00 da' una p
 _rc516 = "\n".join(NL.righe_cambio(_cl516))
 check("v516 la resa: le parziali dichiarate con le azioni coperte, le illeggibili nominate, chi non ha il cambio annotato "
       "nominato (il broker fa il conto) — mai sparito; il patrimonio in dollari con la quota e l'1% nei due versi",
-      "BBB 5 azioni su 8" in _rc516 and "CCC (06/03/2026)" in _rc516 and "senza cambio di carico annotato" in _rc516
+      "BBB 5 azioni su 8" in _rc516 and "CCC (06/03/2026)" in _rc516 and "senza carico in euro" in _rc516
       and "DDD" in _rc516 and "del patrimonio" in _rc516 and abs(_cl516["euro_piu_forte"] - _cl516["eur"] * (1 / 1.01 - 1)) < 1e-9
       and _cl516["euro_piu_forte"] < 0 < _cl516["euro_piu_debole"]
       and abs(_cl516["quota"] - _cl516["eur"] / (_cl516["eur"] + 1500)) < 1e-12, _rc516)
@@ -9483,6 +9491,159 @@ check("v519 un commit dopo i test che tocca solo file che il CI non guarda (libr
       "solo file che i test non guardano (CLAUDE.md, config/posizioni.json, memoria/LIBRO.md)" in _rl519
       and SS.AVVISO not in _rl519 and "HEAD e' un altro commit che tocca il codice" in _rs519
       and "HEAD e' un altro commit che tocca il codice" in _rn519, _rl519 + "\n" + _rs519 + "\n" + _rn519)
+
+# ═══ v520 — ROIC e ROE nelle schede, nei concorrenti e negli ingressi; il ROI del conto dal broker ═══════════════
+_x520 = {"al": "2026-08-31", "dal": "2025-09-01", "roic": 0.1414, "aliquota": 0.1295, "aliquota_base": "effettiva",
+         "capitale_base": "media", "roe": 0.4359, "patrimonio_base": "media", "quota_patrimonio": 0.33,
+         "esercizi": [{"al": "2026-08-31", "roic": 0.1414, "roe": 0.4359}, {"al": "2025-08-31", "roic": 0.15, "roe": 0.85},
+                      {"al": "2024-08-31", "roic": 0.153, "roe": 2.14}]}
+_rr520 = SP.riga_rendimento({"rendimento": _x520, "stats": {"roe": 0.4119}})
+check("v520 la riga del rendimento: ROIC e ROE dei 12 mesi con la data, l'aliquota dichiarata, la LEVA detta quando il "
+      "patrimonio e' meno di meta' del capitale investito, il ROE della fonte (non datato) dichiarato quando differisce, "
+      "con le due cause possibili e senza sceglierne una (v514), e l'esercizio che chiude lo stesso trimestre dei 12 mesi "
+      "NON ristampato (v415)", "12 mesi al 31/08/2026" in _rr520 and "ROIC 14,1%" in _rr520 and "ROE 43,6%" in _rr520
+      and "aliquota effettiva 13,0%" in _rr520 and "il 33% del capitale investito" in _rr520
+      and "41,2%" in _rr520 and "o dal periodo" in _rr520 and _rr520.count("31/08/2026") == 1
+      and "31/08/2025 ROIC 15,0%, ROE 85,0%" in _rr520, _rr520)
+_rs520 = (SP.riga_rendimento({}), SP.riga_rendimento({"rendimento": None}),
+          SP.riga_rendimento({"rendimento": {"al": "2026-06-30", "motivo_roic": "risultato_operativo_mancante",
+                                             "roe": 0.18, "patrimonio_base": "media", "esercizi": []},
+                              "sector": "Financial Services"}),
+          SP.riga_rendimento({"rendimento": {"al": "2026-06-30", "roic": -0.0009, "aliquota_base": "nessuna_perdita",
+                                             "motivo_roe": "patrimonio_non_positivo", "esercizi": []}}))
+check("v520 tre stati che non si confondono (v406): lo snapshot precedente alla v520 (il campo non c'e'), la fonte senza "
+      "quattro trimestri (None), il misurato; una banca ha il ROIC n.d. col perche' e il ROE; un patrimonio negativo non "
+      "da' un ROE; mai «-0,0%»", "snapshot precedente alla v520" in _rs520[0] and "quattro trimestri contigui" in _rs520[1]
+      and "ROIC n.d. (la fonte non porta il risultato operativo; per banche e assicurazioni vale il ROE)" in _rs520[2]
+      and "ROE 18,0%" in _rs520[2] and "ROE n.d. (patrimonio degli azionisti negativo" in _rs520[3]
+      and "-0,0%" not in _rs520[3] and "ROIC -0,1%" in _rs520[3], " | ".join(_rs520))
+_rb520 = SP.riga_rendimento({"rendimento": {"al": "2026-06-30", "roic": 0.02, "roe": -0.12, "esercizi": [],
+                                            "aliquota_base": "fonte", "aliquota": 0.28},
+                             "tv": {"conto_trim": [{"trim": "2026-09-26", "ricavi": 1}, {"trim": "2026-06-30", "ricavi": 1}]}})
+check("v520 quando il conto ha un trimestre piu' recente dello stato patrimoniale (un comunicato ufficiale, Nasdaq) la "
+      "riga lo dice: ROIC e ROE sono del periodo prima — il caso di INTC il 31/10/2026",
+      "il trimestre al 26/09/2026 c'e' per ricavi e utile, non per lo stato patrimoniale" in _rb520
+      and "aliquota normalizzata della fonte 28,0%" in _rb520, _rb520)
+_sk520 = SP.scheda("TST", "POSIZIONE", {"TST": {"ticker": "TST", "name": "Test", "rendimento": _x520,
+                                                "stats": {"roe": 0.4359}}}, {})
+check("v520 il collegamento ESEGUITO (v483): la scheda di un nome porta la riga del rendimento, accanto alla valutazione",
+      any("rendimento del capitale (12 mesi al 31/08/2026)" in x for x in _sk520)
+      and [i for i, x in enumerate(_sk520) if "valutazione:" in x][0] + 1
+      == [i for i, x in enumerate(_sk520) if "rendimento del capitale" in x][0], "\n".join(_sk520))
+_gn520 = str(SP.genera({"watchlist": [], "macro": {}}, [], [])).splitlines()
+check("v520 le convenzioni una volta per blocco (v407), in testa alle schede: il ROIC col capitale investito come la "
+      "fonte lo pubblica, il ROE con la leva, l'aliquota, e il costo del capitale dichiarato NON calcolato",
+      any(x.startswith("RENDIMENTO DEL CAPITALE") and "costo del capitale non e' calcolato" in x.replace("COSTO", "costo")
+          for x in _gn520) and sum(x.startswith("RENDIMENTO DEL CAPITALE") for x in _gn520) == 1)
+_ro520 = (ROT.riga_rendimento({"in_pipeline": False}), ROT.riga_rendimento({"in_pipeline": True, "rendimento": "assente"}),
+          ROT.riga_rendimento({"in_pipeline": True, "rendimento": _x520, "stats": {}}))
+check("v520 negli ingressi della watchlist la stessa resa delle schede (una sola, v161): fuori dalla pipeline n.d. col "
+      "perche', snapshot precedente dichiarato, misurato come nelle schede",
+      "titolo non seguito dalla pipeline" in _ro520[0] and "snapshot precedente alla v520" in _ro520[1]
+      and _ro520[2] == SP.riga_rendimento({"rendimento": _x520, "stats": {}, "sector": None}), " | ".join(_ro520))
+_src_rot520 = Path(ROT.__file__).read_text(encoding="utf-8")
+check("v520 rotazione porta il rendimento della pipeline nei candidati di settore e nella watchlist, e stampa la riga "
+      "accanto alla valutazione in entrambi i punti",
+      _src_rot520.count('"rendimento": (pipe.get(') == 2 and _src_rot520.count('L.append(f"      {riga_rendimento(t)}")') == 2)
+_orig520 = {k: getattr(KO._ud(), k) for k in ("conto_trimestrale", "credito", "combustione", "rendimento_capitale")}
+try:
+    KO._ud().conto_trimestrale = lambda t: _conto503
+    KO._ud().credito = lambda t: {"debito_corrente": 100}
+    KO._ud().combustione = lambda t, m, b: {"liquidita": 250}
+    KO._ud().rendimento_capitale = lambda t: {"al": "2026-06-30", "roic": 0.2, "roe": 0.5, "quota_patrimonio": 0.3}
+    _so520 = KO.salute("TSR", ticker=_T503(), oggi="2026-10-31")
+    KO._ud().rendimento_capitale = lambda t: {"al": "2026-06-30", "motivo_roic": "risultato_operativo_mancante", "roe": 0.1}
+    _sb520 = KO.salute("TSB", ticker=_T503(), oggi="2026-10-31")
+finally:
+    for _k520, _v520 in _orig520.items():
+        setattr(KO._ud(), _k520, _v520)
+check("v520 i concorrenti: ROIC e ROE con la funzione della pipeline, la stessa per il nome e per ogni concorrente (v161); "
+      "il ROE di chi ha poco patrimonio dice che porta la leva; un ROIC che non c'e' porta il suo motivo; una lettura di "
+      "prima della v520 lo dichiara invece di passare per n.d.",
+      _so520.get("roic_12m") == 20.0 and _so520.get("roe_12m") == 50.0 and _so520.get("rendimento_al") == "2026-06-30"
+      and "porta la leva" in KO._misura_txt("roe_12m", 50.0, _so520)
+      and "risultato operativo" in KO._misura_txt("roic_12m", None, _sb520)
+      and "precedente alla v520" in KO._misura_txt("roic_12m", None, {"versione": 504})
+      and KO.VERSIONE >= 520, str([_so520, _sb520]))
+_fp520, _ = FT.fonde({"ticker": "X", "price": 1}, {"ticker": "X", "price": 2, "rendimento": {"al": "2026-06-30", "roic": 0.1}})
+check("v520 la lettura in sessione (v519) porta il campo nuovo: la pipeline che non lo ha ancora non lo perde, perche' "
+      "non ha niente da perdere", (_fp520.get("rendimento") or {}).get("roic") == 0.1)
+
+_LB520 = """## 1duodecies. IL CONTO DAL BROKER — fotografia
+**Fotografia del broker: 31/10/2026 08:04**
+
+| Titolo | Controvalore € | Profitto | Valuta del profitto | Profitto % |
+|---|---|---|---|---|
+| AAA | 11.000,00 | 1.000,00 | EUR | +10,00 |
+| BBB | 4.000,00 | -1.000,00 | EUR | -20,00 |
+| BTP-V28 | 10.200,00 | 200,00 | EUR | +2,00 |
+| TOTALE TITOLI | 25.200,00 | 200,00 | EUR | +0,80 |
+| TOTALE IN DOLLARI (azioni) | — | 0,00 | USD | +0,01 |
+| TOTALE IN EURO (BTP) | — | 200,00 | EUR | +2,00 |
+
+| Data valuta | Data registrazione | Titolo | Operazione | Azioni | Prezzo netto $ | Plus/minus € | Imposte € | Plus/minus precedenti |
+|---|---|---|---|---|---|---|---|---|
+| 06/10/2026 | 06/10/2026 | CCC | vendita | 70 | 145,33 | +100,00 | 26,00 | — |
+
+## 2. ALTRO
+| ZZZ | 1 | 2 | EUR | 3 |
+"""
+_bk520 = NL.leggi_conto_broker(_LB520)
+check("v520 la sezione del broker si legge per tabelle: la fotografia con data e ora, le righe per titolo, i totali "
+      "(titoli, dollari, euro), lo storico delle operazioni chiuse — solo dentro il proprio titolo (v454); una sezione "
+      "assente e' None, diversa da 'nessuna riga' (v406): " + str(_bk520),
+      _bk520["fotografia"] == "2026-10-31T08:04" and set(_bk520["righe"]) == {"AAA", "BBB", "BTP-V28"}
+      and _bk520["righe"]["BBB"]["profitto"] == -1000.0 and set(_bk520["totali"]) == {"titoli", "usd", "eur"}
+      and _bk520["chiuse"][0]["plus_eur"] == 100.0 and _bk520["chiuse"][0]["valuta"] == "2026-10-06"
+      and NL.leggi_conto_broker("## 1. POSIZIONI\n| A | 1 |\n") is None)
+_op520 = [{"tk": "BBB", "data": "2026-11-02", "verso": "acquisto", "qta": 10.0, "prezzo": 100.0, "fx": 1.1,
+           "data_testo": "02/11/2026"}]
+check("v520 il carico in euro del broker (controvalore meno profitto) vale finche' sul nome non c'e' un'operazione "
+      "DOPO la fotografia: allora e' superato, e un carico di prima dell'operazione non si usa",
+      NL.carico_broker(_bk520, [], "AAA") == {"carico_eur": 10000.0, "controvalore_eur": 11000.0, "profitto_eur": 1000.0}
+      and NL.carico_broker(_bk520, _op520, "BBB") == {"superato": "2026-11-02"}
+      and NL.carico_broker(_bk520, [], "ZZZ") is None)
+_cb520 = NL.cambio_libro(_op520, {"AAA": 100, "BBB": 50}, {"AAA": 120.0, "BBB": 90.0}, 1.2, "BCE", None, 1000.0, 0.0,
+                         broker=_bk520, pmc={"AAA": 110.0, "BBB": 100.0})
+_xa520 = next((x for x in _cb520["coperte"] if x["tk"] == "AAA"), {})
+check("v520 nel blocco del cambio il carico del broker prende il posto del registro: identita' prezzo + cambio = "
+      "risultato in euro (v326), il cambio effettivo e' carico in dollari / carico in euro, e il nome con un'operazione "
+      "dopo la fotografia e' dichiarato superato (qui il registro non lo copre per intero: resta parziale e nominato)",
+      _xa520.get("fonte") == "broker" and abs((_xa520.get("carico_eur") or 0) - 10000) < 1e-9
+      and abs((_xa520.get("fx_carico") or 0) - 11000 / 10000) < 1e-12
+      and abs((_xa520.get("pnl_eur") or 0) - ((_xa520.get("effetto_prezzo") or 0) + (_xa520.get("effetto_cambio") or 0))) < 1e-9
+      and abs((_xa520.get("valore_eur") or 0) - 100 * 120 / 1.2) < 1e-9 and _cb520["superati"] == [("BBB", "2026-11-02")]
+      and (_cb520.get("totale") or {}).get("n") == 1 and abs((_cb520.get("totale") or {}).get("imposta", 1) - 0.0) < 1e-9,
+      str(_cb520.get("coperte")))
+_rcb520 = "\n".join(NL.righe_cambio(_cb520))
+check("v520 la resa del cambio col broker: la fonte del carico dichiarata, la fotografia datata, il superato nominato",
+      "cambio effettivo del broker, commissioni comprese" in _rcb520 and "fotografia del 31/10/2026 alle 08:04" in _rcb520
+      and "SUPERATA da un'operazione successiva: BBB (02/11/2026)" in _rcb520, _rcb520)
+_roi520 = NL.roi_conto(_bk520, {"AAA": 100, "BBB": 50, "DDD": 1}, {"AAA": 110.0, "BBB": 100.0, "DDD": 1.0}, 1.2)
+_rr2520 = "\n".join(NL.righe_roi(_roi520))
+check("v520 il ROI del conto: carico = controvalore meno profitto (25.000 €), il guadagno sul carico ricalcolato e la "
+      "percentuale del broker dichiarata se diversa, le operazioni chiuse con le imposte, chi manca dalla fotografia "
+      "nominato, e il ROI dall'inizio del conto DICHIARATO non calcolabile senza i versamenti (v396)",
+      abs(_roi520["titoli"]["carico"] - 25000) < 1e-9 and abs(_roi520["titoli"]["pct_calcolato"] - 0.8) < 1e-9
+      and _roi520["mancanti"] == ["DDD"] and _roi520["chiuse_tot"]["plus"] == 100.0
+      and "NON CALCOLABILE" in _rr2520 and "versamenti netti" in _rr2520 and "DDD" in _rr2520
+      and "nette +74,00 €" in _rr2520, _rr2520)
+check("v520 senza la sezione del broker il blocco lo dice (il dato che manca, non un rendimento nullo)",
+      "sezione IL CONTO DAL BROKER assente" in NL.righe_roi(None)[0])
+_lib520 = (Path(__file__).resolve().parent.parent / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_bv520 = NL.leggi_conto_broker(_lib520)
+_sez520 = _lib520.split("## 1duodecies.")[1].split("\n## ")[0] if "## 1duodecies." in _lib520 else ""
+check("v520 il libro vero: la fotografia del broker datata, le righe delle posizioni e il BTP, i totali, lo storico; e "
+      "NESSUN numero di conto ne' l'intestazione del conto (il repository e' pubblico)",
+      _bv520 is not None and _bv520["fotografia"] and len(_bv520["righe"]) >= 2 and "titoli" in _bv520["totali"]
+      and len(_bv520["chiuse"]) >= 1 and not re.search(r"\b\d[A-Z]\d{8,}\b", _sez520)
+      and "PORTAFOGLIO DI" not in _sez520.upper())
+_src_nl520 = Path(NL.__file__).read_text(encoding="utf-8")
+check("v520 il collegamento in calcola: il broker letto una volta, passato al cambio col prezzo medio, e il ROI calcolato "
+      "con lo stesso cambio del blocco; la sintesi stampa il blocco (calcola non gira offline: qui il testo e' la prova)",
+      "_broker = leggi_conto_broker()" in _src_nl520 and "broker=_broker, pmc=pmc)" in _src_nl520
+      and 'out["conto"] = roi_conto(_broker, qty, pmc, pat_pipe[0], cassa_eur)' in _src_nl520
+      and 'L.extend(righe_roi(o["conto"]))' in _src_nl520)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

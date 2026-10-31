@@ -9093,3 +9093,89 @@ operazione annotata: *un avviso che suona sempre non avvisa* (v421). Ora i perco
   riattivati gli hook, riallineato il ramo. Le sessioni nuove vanno controllate su tutte e tre le cose prima di lavorare.
 - Pavimenti: `test_analisi_libro.py` 965 (980 punti di chiamata), `test_update_data.py` N_CHECKS_MINIMO 404 (406 eseguiti).
   `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 📊 v520 — ROIC E ROE DAI BILANCI, E IL ROI DEL CONTO DALLA FOTOGRAFIA DEL BROKER
+
+Domanda del CEO (31/10/2026): *"Nell'analisi è contemplato anche il ROI?"*. In parte sì: il guadagno sul carico per
+posizione e il rendimento del registro dal 09/10. Mancavano due cose, e il CEO ha risposto *"1 si 2 si … Ti allego foto
+di informazioni in mio possesso. Sarebbe utile anche ROE"*.
+
+### 1. ROIC e ROE, datati e coi loro denominatori
+Il ROE di Yahoo (`stats.roe`) non dichiara né la data né il periodo (v396), e il ROIC non lo calcolava nessuno.
+`update_data.rendimento_da` lo calcola dai bilanci, dodici mesi e tre esercizi chiusi; la stessa funzione serve le
+righe (`fetch_symbol` → campo `rendimento`) e i concorrenti (v161). Convenzioni dichiarate in testa alle schede (v240):
+- **ROIC** = risultato operativo (Operating Income: su Strategy i guadagni contabili sul bitcoin restano fuori), al
+  netto dell'aliquota, diviso il capitale investito medio fra inizio e fine. Il capitale investito è quello che
+  pubblica la fonte: patrimonio degli ordinari più debito finanziario, cassa non tolta.
+- **ROE** = utile degli ordinari diviso il loro patrimonio medio.
+- **Aliquota** effettiva dei 12 mesi se cade fra 0 e 50%, altrimenti la normalizzata della fonte. Un risultato
+  operativo negativo non riceve un beneficio fiscale.
+- **Buchi** (v205): quattro trimestri che saltano un trimestre vuoto non fanno dodici mesi; un denominatore negativo dà
+  un buco col suo motivo.
+- **Leva**: sotto metà del capitale investito in patrimonio, la riga dice che il ROE porta la leva. ORCL 33%, CRWV 12%,
+  le banche.
+- **Costo del capitale**: il confronto non è calcolato.
+
+**Verifica non circolare.** Dove la fonte usa lo stesso patrimonio, il nostro ROE coincide col suo: MU 88,26%, NVDA
+117,2%, CRWV −43,6%, SK hynix 92,7%. Diverge dove ci sono privilegiate, patrimonio piccolo o un periodo diverso: MSTR
+−80,1% contro −63,6%, ORCL 43,6% contro 41,2%, AMZN 24,3% contro 30,6%. La riga dichiara la differenza con le due
+cause possibili, senza sceglierne una (v514).
+
+**Tre difetti trovati leggendo l'uscita come il destinatario, prima dei gate:**
+- l'esercizio di MU chiuso il 31/08/2026 è lo stesso periodo dei 12 mesi, e usciva due volte (v415);
+- su AMZN la prima stesura attribuiva al patrimonio una differenza che veniva dal periodo, con i conti della fonte
+  fermi al 31/03;
+- su INTC il conto ha il trimestre al 26/09 (dal comunicato registrato in v513), lo stato patrimoniale no. ROIC e ROE
+  sono del trimestre prima, e ora la riga lo dice.
+
+La lettura in sessione (v519) porta il campo nuovo subito: la pipeline non lo ha, quindi non ha niente da perdere.
+`concorrenti.VERSIONE` è passata a 520 e le 40 letture si sono rifatte con `--tutti`.
+
+### 2. Il ROI del conto, dalla fotografia del broker (LIBRO.md §1duodecies)
+Le foto del CEO (Sella, X-Trading) mostrano controvalore e profitto in euro di ogni titolo, i totali in euro e in
+dollari, e due vendite chiuse con plusvalenza e imposte.
+
+⚠⚠ **Nella foto c'erano il nome completo e il numero del conto, e non sono stati scritti da nessuna parte**: il
+repository è pubblico. Un gate verifica che la sezione non porti nessun numero di conto e nessuna intestazione del
+conto. La sonda è una FORMA, non il dato vero, che non va scritto nemmeno nel test.
+
+- **Il carico in euro di ogni posizione** (controvalore meno profitto) è la BASE FISCALE, commissioni e margine di
+  cambio compresi. Il blocco CAMBIO lo usa al posto della stima BCE della v516. Prima lo avevano solo tre posizioni,
+  ora dieci su tredici.
+- **Vale fino alla prossima operazione sul nome.** Dopo, la riga è SUPERATA e il blocco lo dice.
+- **Prova incrociata.** Il carico in dollari che il totale del broker implica (109.080,76 $ / 63,83%) è 170.892,62 $;
+  quello del libro (§1, quantità × prezzo medio) 170.892,91 $: coincidono. MSTR, RGTI e SKHY, che la schermata non
+  mostra, valgono insieme 32.893 € per il broker e 32.896 € per il sistema.
+- **La lettura che il CEO non aveva.** MU, NVDA e AMD sono stati comprati con l'euro a 1,04-1,07, e oggi è 1,117: in
+  euro hanno perso sul cambio −410, −887 e −549 €. I nomi del 2026 ci hanno guadagnato. Sul totale delle azioni il
+  cambio vale circa +689 € su 98.327 € di profitto.
+- **ROI dall'inizio del conto: NON CALCOLABILE**, e si dice ogni volta. Il +51,45% è il guadagno sulle sole posizioni
+  aperte. Mancano i versamenti netti e lo storico completo delle vendite, delle cedole e dei dividendi: due domande in
+  §1undecies, con la terza sulle righe nascoste dietro «VEDI TUTTI».
+- **SMCI**: il broker dà +241,58 € di plusvalenza e 62,81 € d'imposta, contro la stima del libro di +302,50 $. Vale il
+  broker.
+
+### 3. L'etichetta della pagina
+`app.js` scriveva «ROE / ROIC» accanto al solo ROE: un'etichetta che afferma più del dato (v405). Ora dice «ROE».
+`BUILD_VERSION` e `?v=` passano a 520.
+
+### 🧪 Il metodo, e sei sviste mie
+- ⚠⚠ **La trappola della v492, rifatta testualmente**: la variabile del percorso assegnata sulla stessa riga dei
+  processi in background. La suite della pipeline ha scritto nella radice ed è stata rilanciata. Anche a ricordarla
+  la trappola torna; la regola resta: la variabile su una riga sua.
+- **«il {numero}%» scritto a mano** invece di `comuni.art`: l'ha preso il gate v510.
+- **Due numeri di MU scritti dentro le istruzioni del formato** (la trappola v424): tolti prima del commit.
+- **Due sonde sbagliate**: `genera` restituisce un testo e non un elenco, e il finto titolo dei concorrenti aveva il
+  solo `info`. *Un check rosso è prima di tutto una sonda da verificare* (v433).
+- **Il gate v505 nei due versi ha dichiarato ASSENTI le due richieste nuove** perché la sua fixture non aveva i blocchi:
+  il suo lavoro (come in v513).
+- **Riagganciati, nessuno zittito**: v503 (l'elenco dei posti con le due misure nuove), v504 (pinnava
+  `VERSIONE == 504`), v516 (la frase sui nomi senza carico in euro).
+- **Iniezioni**, una alla volta su quattro copie del repo verificate per impronta, con `modifica_sicura` e ripristino
+  dallo snapshot: le **15 sugli strumenti mordono tutte**, ciascuna sul controllo atteso. Una — il carico del broker
+  ignorato nel blocco del cambio — al primo giro faceva MORIRE la suite (un `next()` senza ripiego) invece di far cadere
+  il controllo col suo nome (v407, v471): reso robusto, la stessa iniezione cade per nome. Le **8 sulla pipeline**
+  (aliquota, capitale medio, contiguità, perdita, negativi, alla pari, esercizi per data, collegamento) girano a parte:
+  l'esito si scrive qui quando c'è, non prima.
+- Pavimenti: `test_update_data.py` 390 (402 punti di chiamata) e N_CHECKS_MINIMO 413 (415 eseguiti),
+  `test_analisi_libro.py` 985 (1001 punti di chiamata, 1011 check). `?v=` e `BUILD_VERSION` a 520: cambia `assets/app.js`.

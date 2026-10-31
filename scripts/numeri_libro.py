@@ -229,12 +229,16 @@ def calcola(sedute=1, registra=False, adesso=None):
     import rotazione
     eur = {p["tk"]: p for p in pos if p["valuta"] == "EUR"}
     pat_pipe = patrimonio_pipeline(pipe, {t: p["pmc"] for t, p in eur.items()}, giro["scelta"])
+    _broker = leggi_conto_broker()
     # v516 — il cambio euro/dollaro del libro e delle operazioni col loro cambio (LIBRO.md §1decies, CEO 30/10/2026):
     #   lo STESSO cambio del patrimonio e del registro (una lettura sola, v161), l'anno dalla BCE letta adesso
     out["cambio"] = cambio_libro(ops, qty, {t: (None if t in dopo and not dopo[t].get("quota") else px[t]) for t in TK},
                                  pat_pipe[0], pat_pipe[1], ((giro["scelta"] or {}).get("eurusd") or {}).get("anno"),
                                  cassa_eur, sum(p["qta"] * pat_pipe[2].get(t, (p["pmc"], ""))[0] / 100
-                                                for t, p in eur.items()))
+                                                for t, p in eur.items()),
+                                 broker=_broker, pmc=pmc)
+    # v520 — il ROI del conto dalla fotografia del broker (LIBRO.md §1duodecies), con lo stesso cambio del blocco
+    out["conto"] = roi_conto(_broker, qty, pmc, pat_pipe[0], cassa_eur)
     prima_trim = {}
     for a in out["calendario"].get("attesi") or []:
         prima_trim.setdefault(a["tk"], a.get("giorni"))       # gli attesi arrivano gia' in ordine di data
@@ -2271,6 +2275,63 @@ def leggi_operazioni(testo=None):
     return out if trovata else None
 
 
+def leggi_conto_broker(testo=None):
+    """v520 — la sezione IL CONTO DAL BROKER di LIBRO.md (§1duodecies): la FOTOGRAFIA del conto (controvalore e
+    profitto in euro di ogni titolo, come il broker li stampa, con la data e l'ora) e lo STORICO delle operazioni
+    chiuse (plus/minusvalenza e imposte in euro). None = sezione ASSENTE (v389, v406). Si legge solo dentro il proprio
+    titolo (v454). Il nome e il numero del conto NON si scrivono: il repository e' pubblico."""
+    if testo is None:
+        testo = testo_libro()
+    out = {"fotografia": None, "righe": {}, "totali": {}, "chiuse": []}
+    sez = trovata = False
+    for riga in testo.splitlines():
+        if riga.startswith("## "):
+            sez = "CONTO DAL BROKER" in riga.upper()
+            trovata = trovata or sez
+            continue
+        if not sez:
+            continue
+        m = re.search(r"Fotografia del broker:\s*\**\s*(\d{1,2}/\d{1,2}/\d{4})\s+(\d{1,2}:\d{2})", riga)
+        if m:
+            out["fotografia"] = f"{_data_iso(m.group(1))}T{m.group(2)}"
+            continue
+        if not riga.startswith("|"):
+            continue
+        celle = [x.strip() for x in riga.strip().strip("|").split("|")]
+        if not celle or celle[0] in ("Titolo", "Data valuta", "") or set(celle[0]) <= set("-: "):
+            continue
+        if len(celle) >= 9 and _data_iso(celle[0]):          # lo storico delle operazioni chiuse
+            out["chiuse"].append({"valuta": _data_iso(celle[0]), "registrazione": _data_iso(celle[1]),
+                                  "tk": celle[2].upper(), "operazione": celle[3], "azioni": _num_it(celle[4]),
+                                  "prezzo_netto": _num_it(celle[5]), "plus_eur": _num_it(celle[6]),
+                                  "imposte_eur": _num_it(celle[7]), "precedenti": celle[8]})
+        elif len(celle) >= 5:                                 # la fotografia: titolo, controvalore, profitto, valuta, %
+            x = {"controvalore_eur": _num_it(celle[1]), "profitto": _num_it(celle[2]), "valuta": celle[3].upper(),
+                 "pct": _num_it(celle[4])}
+            nome = celle[0].upper()
+            if nome.startswith("TOTALE"):
+                out["totali"]["titoli" if "TITOLI" in nome else "usd" if "DOLLARI" in nome else "eur"] = x
+            else:
+                out["righe"][nome] = x
+    return out if trovata else None
+
+
+def carico_broker(broker, operazioni, tk):
+    """v520 — il carico in euro di un titolo come il broker lo dichiara (controvalore meno profitto della fotografia):
+    e' la base FISCALE, commissioni d'acquisto e margine di cambio compresi. Vale finche' sul nome non c'e'
+    un'operazione registrata DOPO la fotografia: allora {'superato': data} — un carico di prima di un'operazione e'
+    un altro carico. None se la fotografia non ha il nome o non ne porta il profitto in euro."""
+    r = ((broker or {}).get("righe") or {}).get(tk)
+    if not r or r.get("controvalore_eur") is None or r.get("profitto") is None or r.get("valuta") != "EUR":
+        return None
+    foto = str((broker or {}).get("fotografia") or "")[:10]
+    dopo = [o["data"] for o in (operazioni or []) if o.get("tk") == tk and o.get("data") and str(o["data"]) > foto]
+    if dopo:
+        return {"superato": max(dopo)}
+    return {"carico_eur": r["controvalore_eur"] - r["profitto"], "controvalore_eur": r["controvalore_eur"],
+            "profitto_eur": r["profitto"]}
+
+
 def dopo_la_seduta(operazioni, qty, fine):
     """{ticker: {"data": ultima operazione}} per le posizioni con un'operazione registrata DOPO la seduta `fine`: in
     quelle quantita' e a quel carico non esistevano ancora alla chiusura su cui il blocco misura."""
@@ -2342,7 +2403,8 @@ def posizione_anno_cambio(anno, fx):
     return out
 
 
-def cambio_libro(operazioni, qty, px, fx, fonte_fx, anno=None, cassa_eur=None, obbligazioni_eur=0.0):
+def cambio_libro(operazioni, qty, px, fx, fonte_fx, anno=None, cassa_eur=None, obbligazioni_eur=0.0, broker=None,
+                 pmc=None):
     """Il blocco CAMBIO EURO/DOLLARO: quanta parte del patrimonio e' in dollari, cosa fa un 1% del cambio, dove sta il
     cambio nel suo anno, e per le posizioni col carico in euro dal registro il risultato in euro scomposto in effetto
     del prezzo ed effetto del cambio, con la plusvalenza imponibile. Senza cambio None: un patrimonio con l'azionario
@@ -2357,8 +2419,24 @@ def cambio_libro(operazioni, qty, px, fx, fonte_fx, anno=None, cassa_eur=None, o
     out = {"fx": fx, "fonte": fonte_fx, "usd": usd, "eur": eur, "quota": eur / pat if pat else None,
            "euro_piu_forte": eur * (1 / (1 + k) - 1), "euro_piu_debole": eur * (1 / (1 - k) - 1),
            "anno": posizione_anno_cambio(anno, fx), "coperte": [], "senza": [], "parziali": [], "illeggibili": [],
-           "aliquota": conseguenze.ALIQUOTA, "registro": operazioni is not None}
+           "aliquota": conseguenze.ALIQUOTA, "registro": operazioni is not None,
+           "fotografia": (broker or {}).get("fotografia"), "superati": []}
     for t in sorted(qty):
+        # v520 — prima il carico in euro del BROKER (la base fiscale, LIBRO.md §1duodecies), se la fotografia e'
+        #   successiva all'ultima operazione sul nome; altrimenti il registro col suo cambio (§1decies)
+        b = carico_broker(broker, operazioni, t)
+        if b and "superato" in b:
+            out["superati"].append((t, b["superato"]))
+        if b and "carico_eur" in b and (pmc or {}).get(t) and px.get(t):
+            usd = qty[t] * pmc[t]
+            val = qty[t] * px[t] / fx
+            pnl = val - b["carico_eur"]
+            prezzo = (qty[t] * px[t] - usd) / fx
+            out["coperte"].append({"tk": t, "azioni": qty[t], "carico_eur": b["carico_eur"], "carico_usd": usd,
+                                   "fx_carico": usd / b["carico_eur"] if b["carico_eur"] else None, "valore_eur": val,
+                                   "pnl_eur": pnl, "effetto_prezzo": prezzo, "effetto_cambio": pnl - prezzo,
+                                   "imposta": pnl * conseguenze.ALIQUOTA if pnl > 0 else 0.0, "fonte": "broker"})
+            continue
         c = carico_in_euro(operazioni, t)
         if c is None:
             out["senza"].append(t)
@@ -2373,7 +2451,15 @@ def cambio_libro(operazioni, qty, px, fx, fonte_fx, anno=None, cassa_eur=None, o
             out["coperte"].append({"tk": t, "azioni": qty[t], "carico_eur": c["carico_eur"], "carico_usd": c["carico_usd"],
                                    "fx_carico": c["fx_medio"], "valore_eur": val, "pnl_eur": pnl, "effetto_prezzo": prezzo,
                                    "effetto_cambio": pnl - prezzo,
-                                   "imposta": pnl * conseguenze.ALIQUOTA if pnl > 0 else 0.0})
+                                   "imposta": pnl * conseguenze.ALIQUOTA if pnl > 0 else 0.0, "fonte": "registro"})
+    cc = out["coperte"]
+    if cc:
+        out["totale"] = {"n": len(cc), "pnl_eur": sum(x["pnl_eur"] for x in cc),
+                         "effetto_prezzo": sum(x["effetto_prezzo"] for x in cc),
+                         "effetto_cambio": sum(x["effetto_cambio"] for x in cc),
+                         "plus": sum(x["pnl_eur"] for x in cc if x["pnl_eur"] > 0),
+                         "minus": sum(x["pnl_eur"] for x in cc if x["pnl_eur"] < 0),
+                         "imposta": sum(x["imposta"] for x in cc)}
     return out
 
 
@@ -2404,24 +2490,125 @@ def righe_cambio(c):
         L.append("  ⚠ il registro delle operazioni col cambio (LIBRO.md §1decies) e' ASSENTE: nessun carico in euro")
         return L
     for x in c["coperte"]:
-        L.append(f"  {x['tk']:5} carico {_it(x['carico_usd'], 0)} $ a EUR/USD {_it(x['fx_carico'], 4)} = "
-                 f"{_it(x['carico_eur'], 0)} € · oggi {_it(x['valore_eur'], 0)} € · in euro {_sg(x['pnl_eur'], 0)} € = "
+        L.append(f"  {x['tk']:5} carico {_it(x['carico_usd'], 0)} $ a EUR/USD {_it(x['fx_carico'], 4)}"
+                 + (" (cambio effettivo del broker, commissioni comprese)" if x.get("fonte") == "broker" else "")
+                 + f" = {_it(x['carico_eur'], 0)} € · oggi {_it(x['valore_eur'], 0)} € · in euro {_sg(x['pnl_eur'], 0)} € = "
                  f"prezzo {_sg(x['effetto_prezzo'], 0)} € + cambio {_sg(x['effetto_cambio'], 0)} €"
                  + (f" · se si vendesse oggi, imposta sulla plusvalenza in euro {_it(x['imposta'], 0)} € al "
                     f"{_it(c['aliquota'] * 100, 0)}%"
                     if x["imposta"] else (" · in euro e' una minusvalenza" if x["pnl_eur"] < 0 else "")))
-    if c["coperte"]:
+    t = c.get("totale")
+    if t and t["n"] > 1:
+        L.append(f"  totale delle {t['n']} posizioni col carico in euro: {_sg(t['pnl_eur'], 0)} € = prezzo "
+                 f"{_sg(t['effetto_prezzo'], 0)} € + cambio {_sg(t['effetto_cambio'], 0)} € · plusvalenze latenti "
+                 f"{_sg(t['plus'], 0)} € (imposta se si vendessero oggi ~{_it(t['imposta'], 0)} € al "
+                 f"{_it(c['aliquota'] * 100, 0)}%) · minusvalenze latenti {_sg(t['minus'], 0)} € (compensano plusvalenze: "
+                 "nel regime amministrato entro i quattro anni successivi — una regola fiscale, non un consiglio)")
+    if any(x.get("fonte") == "broker" for x in c["coperte"]):
+        L.append(f"  carico in euro DAL BROKER (LIBRO.md §1duodecies, fotografia del {_data_it(str(c.get('fotografia'))[:10])} "
+                 f"alle {str(c.get('fotografia'))[11:16]}): controvalore meno profitto — la base FISCALE, commissioni "
+                 "d'acquisto e margine di cambio compresi, quindi l'«effetto del cambio» li porta dentro; vale fino alla "
+                 "prossima operazione sul nome, e il valore di oggi usa il riferimento BCE")
+    if any(x.get("fonte") == "registro" for x in c["coperte"]):
         L.append("  ⚠ il carico usa il cambio annotato nel registro: quello APPLICATO dal broker quando il CEO lo dichiara, "
                  "altrimenti il riferimento BCE della seduta, che dal cambio del broker differisce per il suo margine; "
                  "il conto fiscale definitivo lo fa il broker, commissioni comprese")
+    if c.get("superati"):
+        L.append("  ⚠ fotografia del broker SUPERATA da un'operazione successiva: " + " · ".join(
+            f"{t} ({_data_it(d)})" for t, d in c["superati"]) + " — per questi vale il registro, o serve una fotografia nuova")
     if c["parziali"]:
         L.append("  carico in euro solo in parte nel registro: " + " · ".join(
             f"{t} {_it(q, 0)} azioni su {_it(n, 0)}" for t, q, n in c["parziali"]) + " — risultato in euro non calcolabile")
     if c["illeggibili"]:
         L.append("  ⚠ righe del registro illeggibili: " + " · ".join(f"{t} ({r})" for t, r in c["illeggibili"]))
     if c["senza"]:
-        L.append(f"  senza cambio di carico annotato (operazioni di prima del 30/10/2026): {', '.join(c['senza'])} — il "
-                 "risultato in euro e l'imposta li calcola il broker col cambio di ogni acquisto; qui valgono i dollari")
+        L.append(f"  senza carico in euro (ne' nella fotografia del broker ne' nel registro col cambio): {', '.join(c['senza'])}"
+                 " — il risultato in euro e l'imposta li calcola il broker col cambio di ogni acquisto; qui valgono i dollari")
+    return L
+
+
+def roi_conto(broker, qty, pmc, fx, cassa_eur=None):
+    """v520 — il ROI del conto dalla fotografia del broker (richiesta del CEO del 31/10/2026, «2 si»): il guadagno sul
+    carico delle posizioni APERTE in euro e in dollari, come il broker li dichiara; quanto di quello in euro viene dai
+    prezzi e quanto dal cambio (e dalle commissioni) col carico in dollari del LIBRO, che si confronta con quello del
+    broker; le operazioni chiuse registrate con imposte; e il ROI dall'inizio del conto dichiarato NON calcolabile finche'
+    mancano i versamenti netti (v396). None se la sezione manca."""
+    if broker is None:
+        return None
+    tot = (broker.get("totali") or {})
+    ti, tu, te = tot.get("titoli") or {}, tot.get("usd") or {}, tot.get("eur") or {}
+    out = {"fotografia": broker.get("fotografia"), "fx": fx, "chiuse": broker.get("chiuse") or [],
+           "mancanti": sorted(t for t in qty if t not in (broker.get("righe") or {}))}
+    if ti.get("controvalore_eur") is not None and ti.get("profitto") is not None:
+        car = ti["controvalore_eur"] - ti["profitto"]
+        out["titoli"] = {"controvalore": ti["controvalore_eur"], "profitto": ti["profitto"], "carico": car,
+                         "pct_calcolato": ti["profitto"] / car * 100 if car > 0 else None, "pct_broker": ti.get("pct")}
+    # le azioni sono tutte in dollari, le obbligazioni in euro: il profitto in euro delle azioni e' il totale meno
+    #   quello in euro (il BTP) — due numeri che il broker stampa, non una stima
+    if out.get("titoli") and te.get("profitto") is not None:
+        out["profitto_azioni_eur"] = out["titoli"]["profitto"] - te["profitto"]
+    if tu.get("profitto") is not None and tu.get("pct"):
+        cu = tu["profitto"] / (tu["pct"] / 100)
+        libro = sum(qty[t] * pmc[t] for t in qty if (pmc or {}).get(t) is not None)
+        out["usd"] = {"profitto": tu["profitto"], "pct": tu["pct"], "carico_broker": cu, "carico_libro": libro,
+                      "scarto_pct": (libro / cu - 1) * 100 if cu else None}
+        btp = (broker.get("righe") or {}).get("BTP-V28") or {}
+        if out.get("titoli") and btp.get("controvalore_eur") is not None and btp.get("profitto") is not None and fx:
+            car_eur = out["titoli"]["carico"] - (btp["controvalore_eur"] - btp["profitto"])
+            out["azioni"] = {"carico_eur": car_eur, "fx_medio": libro / car_eur if car_eur else None,
+                             "effetto_prezzo": tu["profitto"] / fx, "effetto_cambio": libro / fx - car_eur}
+    ch = out["chiuse"]
+    out["chiuse_tot"] = ({"n": len(ch), "plus": sum(x["plus_eur"] or 0 for x in ch),
+                          "imposte": sum(x["imposte_eur"] or 0 for x in ch),
+                          "dal": min(x["valuta"] for x in ch if x.get("valuta")),
+                          "al": max(x["valuta"] for x in ch if x.get("valuta"))} if ch else None)
+    out["cassa_eur"] = cassa_eur
+    return out
+
+
+def righe_roi(r):
+    """La resa del blocco ROI DEL CONTO: fatti del broker, coi loro denominatori, e cio' che manca nominato."""
+    if r is None:
+        return ["ROI DEL CONTO (v520): sezione IL CONTO DAL BROKER assente in LIBRO.md — il ROI in euro non si calcola "
+                "(il dato che manca, non un rendimento nullo)"]
+    foto = str(r.get("fotografia") or "")
+    L = [f"ROI DEL CONTO (v520, richiesta del CEO del 31/10/2026) — dalla fotografia del broker del "
+         f"{_data_it(foto[:10])} alle {foto[11:16] or 'n.d.'} (LIBRO.md §1duodecies): i profitti cambiano coi prezzi, i "
+         "carichi in euro solo con un'operazione"]
+    t = r.get("titoli")
+    if t:
+        L.append(f"  posizioni APERTE (azioni e BTP): carico {_it(t['carico'], 0)} € → controvalore "
+                 f"{_it(t['controvalore'], 0)} € · {_sg(t['profitto'], 0)} € = {_sg(t['pct_calcolato'], 2)}% sul carico"
+                 + (f" (il broker stampa {_sg(t['pct_broker'], 2)}%: la sua percentuale usa una base che non pubblica)"
+                    if t.get("pct_broker") is not None and t.get("pct_calcolato") is not None
+                    and abs(t["pct_broker"] - t["pct_calcolato"]) >= 0.01 else ""))
+    u = r.get("usd")
+    if u:
+        L.append(f"  azioni in dollari: carico {_it(u['carico_broker'], 0)} $ (ricavato dal {_sg(u['pct'], 2)}% del broker) "
+                 f"→ {_sg(u['profitto'], 0)} $ · il carico del libro (quantita' × prezzo medio di §1) e' "
+                 f"{_it(u['carico_libro'], 0)} $: "
+                 + ("coincidono" if u.get("scarto_pct") is not None and abs(u["scarto_pct"]) < 0.05 else
+                    f"scarto {_sg(u.get('scarto_pct'), 2)}% — un prezzo medio di §1 non e' quello del broker"))
+    a = r.get("azioni")
+    if a and r.get("profitto_azioni_eur") is not None:
+        L.append(f"  azioni in euro: {_sg(r['profitto_azioni_eur'], 0)} € sul carico fiscale di {_it(a['carico_eur'], 0)} € · "
+                 f"dai prezzi ~{_sg(a['effetto_prezzo'], 0)} €, dal cambio e dalle commissioni ~{_sg(a['effetto_cambio'], 0)} € "
+                 f"(cambio medio d'acquisto {_it(a['fx_medio'], 4)}, oggi {_it(r['fx'], 4)}: un euro piu' debole di "
+                 "quello d'acquisto aggiunge, uno piu' forte toglie)")
+    c = r.get("chiuse_tot")
+    if c:
+        L.append(f"  operazioni CHIUSE registrate (storico del broker, valuta dal {_data_it(c['dal'])} al "
+                 f"{_data_it(c['al'])}): {c['n']} · plusvalenze {_sg(c['plus'], 2)} € · imposte {_it(c['imposte'], 2)} € · "
+                 f"nette {_sg(c['plus'] - c['imposte'], 2)} € — "
+                 + " · ".join(f"{x['tk']} {_data_it(x['valuta'])} {_sg(x['plus_eur'], 2)} €" for x in r["chiuse"]))
+    else:
+        L.append("  operazioni CHIUSE: nessuna registrata in LIBRO.md §1duodecies")
+    if r.get("mancanti"):
+        L.append(f"  ⚠ non nella fotografia del broker: {', '.join(r['mancanti'])} — il loro carico in euro non c'e'")
+    L.append("  ⚠ ROI DALL'INIZIO DEL CONTO: NON CALCOLABILE — servono i versamenti netti dall'apertura (e i prelievi). "
+             "Il guadagno sul carico conta le sole posizioni APERTE: non le vendite passate non registrate, non la "
+             "liquidita', non cedole e dividendi incassati · il rendimento ponderato per il tempo dal 09/10/2026 e' nel "
+             "REGISTRO DELLA PERFORMANCE")
     return L
 
 
@@ -2919,6 +3106,8 @@ def sintesi(o):
         L.extend(righe_attesa(o["attesa"]))
     if "cambio" in o:                     # v516
         L.extend(righe_cambio(o["cambio"]))
+    if "conto" in o:                      # v520
+        L.extend(righe_roi(o["conto"]))
     if "decisioni" in o:
         L.extend(righe_decisioni(o["decisioni"], (o.get("calendario") or {}).get("finestra") or 45))
     if "rimandate" in o:

@@ -276,7 +276,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    LIBRO` di `numeri_libro.py` — chi brucia cassa, il suo peso, le tre condizioni. Se la conferma
    è accesa, gli stop su quei nomi passano in cima alle decisioni. Non cambia il colore del semaforo.
 1. **Sintesi in 3-5 punti** — cosa è successo, perché, cosa cambia per il libro.
-2. **Risultato contro i riferimenti** — libro contro QQQ, SMH, SPY, RSP; chi ha portato il risultato.
+2. **Risultato contro i riferimenti** — libro contro QQQ, SMH, SPY, RSP; chi ha portato il risultato. Da v520 (CEO,
+   31/10/2026, «2 si») anche il **ROI del conto** dal blocco omonimo: il guadagno sul carico delle posizioni aperte in
+   euro come il broker lo dichiara, quanto viene dai prezzi e quanto dal cambio, le operazioni chiuse con le imposte; il
+   ROI dall'inizio del conto si dice non calcolabile finche' mancano i versamenti netti, e la fotografia del broker si
+   rinnova dopo ogni operazione (una fotografia superata il blocco la nomina).
    E il **registro della performance** (v474): libro in dollari e patrimonio in euro contro QQQ,
    il riferimento scelto dal CEO il 09/10, dalla prima riga a oggi.
 3. **Rischio** — peso contro quota del rischio; beta sul Nasdaq col suo R²; segnalare solo se cambia.
@@ -315,6 +319,12 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    con questa riserva. L'utile atteso sul prezzo di un ciclico (le memorie) è più alto proprio vicino al picco del
    ciclo: si dice. Se il rapporto ne valga la pena lo argomenta la risposta, con le misure accanto; la decisione resta
    del CEO. È INFORMAZIONE: non una prova della tenuta, non un colore.
+   **ROIC e ROE** (v520, CEO, 31/10/2026: *"1 si … Sarebbe utile anche ROE"*): per i nomi in posizione o con un ingresso
+   possibile la riga «rendimento del capitale» delle schede — il ROIC dice quanto rende ogni dollaro messo nell'attivita',
+   debito compreso; il ROE quanto rende il capitale degli azionisti, e cresce con la leva: quando il patrimonio e' una
+   piccola parte del capitale investito (ORCL, CRWV, le banche) si leggono insieme, e la riga lo dice. Sui ciclici il
+   ROIC dei 12 mesi va letto accanto agli esercizi chiusi, che mostrano quanto del rendimento viene dal momento del
+   ciclo. Il confronto col costo del capitale non e' calcolato. È INFORMAZIONE: non una prova della tenuta, non un colore.
 5bis. **Posizionamento** (v496, CEO, 17/10) — dal blocco di `posizionamento.py`: il put/call di mercato col
    suo percentile (alto = domanda di protezione: convenzione del mestiere, non una misura); le scadenze delle opzioni
    — una mensile o una trimestrale («tre streghe») entro cinque giorni si dice in cima alla sezione, perché alla
@@ -573,6 +583,8 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[peg]` il PEG sull'esercizio prossimo con la sua crescita dichiarata (il consenso dell'esercizio in corso e del prossimo, stessa tabella), accanto a quello dell'aggregatore (30/10) — una metrica, non una prova
 - `[stato_sistema]` il controllo generico dello stato del sistema in chiusura di ogni analisi e di ogni giro di lavoro: codice e test, pipeline su GitHub e fonti non lette, letture del giro, dipendenze da GitHub con la loro data, coerenza delle copie del libro, domande aperte al CEO con la loro età (30/10)
 - `[cambio]` il cambio euro/dollaro: quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio, dove sta il cambio nel suo anno, e per ogni operazione col suo cambio (LIBRO.md §1decies) il risultato in euro scomposto in effetto del prezzo ed effetto del cambio, con l'imposta in euro (30/10)
+- `[rendimento_capitale]` ROIC e ROE di ogni posizione e sorvegliato e dei concorrenti, dai bilanci con la data dei 12 mesi e degli esercizi chiusi: il ROIC sul capitale investito come la fonte lo pubblica, il ROE con la leva dichiarata quando il patrimonio e' meno di meta' del capitale, il ROE della fonte dichiarato quando differisce (31/10) — informazione, non una prova
+- `[roi_conto]` il ROI del conto dalla fotografia del broker (LIBRO.md §1duodecies): il guadagno sul carico delle posizioni aperte in euro e in dollari, il carico in euro di ogni posizione come base fiscale col risultato fra prezzo e cambio, le operazioni chiuse con le imposte, e il ROI dall'inizio del conto dichiarato non calcolabile finche' mancano i versamenti (31/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno
 strumento: il gate della v505 non lascia l'una senza l'altra.

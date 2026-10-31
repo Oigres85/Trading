@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 404  # v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 413  # v520: 415 eseguiti · v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -3681,6 +3681,87 @@ check("v519 fetch_equities e fetch_watchlist chiamano benchmark_mese e forza_rel
           for f in ("fetch_equities", "fetch_watchlist"))
       and _SRC_UD_CODICE.count("stk_m1 = (m1[-1] / m1[0] - 1) * 100") == 1
       and _SRC_UD_CODICE.count("bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100") == 1)
+
+# ═══ v520 — ROIC e ROE dai bilanci (richiesta del CEO del 31/10/2026): stati COSTRUITI, proprieta' e non valori ═══
+_Q520 = ["2026-06-30", "2026-03-31", "2025-12-31", "2025-09-30", "2025-06-30"]
+def _df520(righe, date):
+    return pd.DataFrame({pd.Timestamp(d): [righe[k][i] for k in righe] for i, d in enumerate(date)}, index=list(righe))
+def _inc520(op=(100, 100, 100, 100, 90), ante=(100, 100, 100, 100, 90), imp=(20, 20, 20, 20, 18),
+            ut=(75, 75, 75, 75, 70), norm=(0.2, 0.2, 0.2, 0.2, 0.2)):
+    return _df520({"Operating Income": list(op), "Pretax Income": list(ante), "Tax Provision": list(imp),
+                   "Tax Rate For Calcs": list(norm), "Net Income Common Stockholders": list(ut)}, _Q520)
+def _bs520(ic=(2000, 1800, 1600, 1400, 1200), pn=(1000, 900, 800, 700, 600)):
+    return _df520({"Invested Capital": list(ic), "Common Stock Equity": list(pn)}, _Q520)
+_r520 = ud.rendimento_da(_inc520(), _bs520())
+check("v520 ROIC = risultato operativo dei 12 mesi al netto dell'aliquota EFFETTIVA (80/400 = 20%), diviso il capitale "
+      "investito MEDIO fra fine e un anno prima ((2000+1200)/2): 320/1600 = 20% · ROE = utile 300 sul patrimonio medio "
+      "800 = 37,5% · la finestra e' datata (dal 01/07/2025 al 30/06/2026): " + str(_r520),
+      _r520 and _r520["al"] == "2026-06-30" and _r520["dal"] == "2025-07-01" and abs(_r520["roic"] - 0.2) < 1e-9
+      and _r520["aliquota_base"] == "effettiva" and abs(_r520["aliquota"] - 0.2) < 1e-9
+      and abs(_r520["roe"] - 0.375) < 1e-9 and _r520["capitale_base"] == "media" and _r520["patrimonio_base"] == "media"
+      and abs(_r520["quota_patrimonio"] - 0.5) < 1e-9)
+# l'invarianza di scala (v326): una formula che mescola le unita' non la soddisfa per caso
+_k520 = 1000.0
+_rk520 = ud.rendimento_da(_inc520(op=[x * _k520 for x in (100, 100, 100, 100, 90)],
+                                  ante=[x * _k520 for x in (100, 100, 100, 100, 90)],
+                                  imp=[x * _k520 for x in (20, 20, 20, 20, 18)],
+                                  ut=[x * _k520 for x in (75, 75, 75, 75, 70)]),
+                          _bs520(ic=[x * _k520 for x in (2000, 1800, 1600, 1400, 1200)],
+                                 pn=[x * _k520 for x in (1000, 900, 800, 700, 600)]))
+_rd520 = ud.rendimento_da(_inc520(), _bs520(ic=[x * 2 for x in (2000, 1800, 1600, 1400, 1200)]))
+check("v520 ROIC e ROE sono RAPPORTI: moltiplicare tutte le voci per mille (un bilancio in won invece che in dollari) "
+      "non li cambia; raddoppiare il capitale investito dimezza il ROIC e lascia il ROE",
+      abs(_rk520["roic"] - _r520["roic"]) < 1e-9 and abs(_rk520["roe"] - _r520["roe"]) < 1e-9
+      and abs(_rd520["roic"] - _r520["roic"] / 2) < 1e-4 and abs(_rd520["roe"] - _r520["roe"]) < 1e-9)
+_rc520 = ud.rendimento_da(_inc520(op=(100, float("nan"), 100, 100, 100)), _bs520())
+check("v520 quattro trimestri del risultato operativo che SALTANO un trimestre vuoto coprono quindici mesi, non dodici: "
+      "il ROIC non si calcola e il motivo resta; il ROE (utile contiguo) si'",
+      _rc520 and _rc520.get("roic") is None and _rc520.get("motivo_roic") == "risultato_operativo_mancante"
+      and _rc520.get("roe") is not None)
+_ra520 = ud.rendimento_da(_inc520(ante=(-10, -10, -10, -10, -9), imp=(5, 5, 5, 5, 5), norm=(0.25, 0.25, 0.25, 0.25, 0.25)),
+                          _bs520())
+_rp520 = ud.rendimento_da(_inc520(op=(-50, -50, -50, -50, -40)), _bs520())
+check("v520 con un utile prima delle imposte negativo l'aliquota effettiva non c'e': vale la normalizzata della fonte "
+      "(25%, dichiarata 'fonte'); con un risultato operativo NEGATIVO nessun beneficio fiscale — il ROIC e' la perdita "
+      "operativa sul capitale (-200/1600)",
+      _ra520["aliquota_base"] == "fonte" and abs(_ra520["roic"] - 300 / 1600) < 1e-9
+      and _rp520["aliquota_base"] == "nessuna_perdita" and abs(_rp520["roic"] - (-200 / 1600)) < 1e-9)
+_rn520 = ud.rendimento_da(_inc520(), _bs520(ic=(-100, 1800, 1600, 1400, 1200), pn=(-50, 900, 800, 700, 600)))
+_rf520 = ud.rendimento_da(_inc520(), _bs520(ic=(2000, 1800, 1600, 1400, float("nan")),
+                                             pn=(1000, 900, 800, 700, float("nan"))))
+check("v520 un capitale investito o un patrimonio negativo non da' un rendimento ne' alto ne' basso: da' un buco col suo "
+      "motivo (v205); senza il bilancio di un anno prima si usa la sola fine, DICHIARATA",
+      _rn520.get("roic") is None and _rn520.get("motivo_roic") == "capitale_non_positivo"
+      and _rn520.get("roe") is None and _rn520.get("motivo_roe") == "patrimonio_non_positivo"
+      and _rf520["capitale_base"] == "fine" and abs(_rf520["roic"] - 320 / 2000) < 1e-9
+      and _rf520["patrimonio_base"] == "fine")
+_inc520b = _df520({"Operating Income": [100, 100, 100, 100], "Pretax Income": [100, 100, 100, 100],
+                   "Tax Provision": [20, 20, 20, 20], "Net Income Common Stockholders": [75, 75, 75, 75]},
+                  ["2026-06-30", "2026-03-31", "2025-12-31", "2025-09-30"])
+_inc520c = _inc520b.copy()
+_inc520c.loc["Pretax Income"] = [float("nan"), 100, 100, 100]          # le imposte finiscono un trimestre prima
+_inc520c[pd.Timestamp("2025-06-30")] = [90, 100, 20, 70]
+_rpa520 = ud.rendimento_da(_inc520c, _bs520())
+check("v520 imposte e utile prima delle imposte si leggono sullo STESSO trimestre di fine del risultato operativo (alla "
+      "pari, v504): un utile prima delle imposte che finisce un trimestre prima non da' l'aliquota effettiva",
+      _rpa520 and _rpa520.get("aliquota_base") != "effettiva")
+_ai520 = _df520({"Operating Income": [400, 300, 200], "Pretax Income": [400, 300, 200], "Tax Provision": [80, 60, 40],
+                 "Net Income Common Stockholders": [300, 200, 100]}, ["2025-12-31", "2024-12-31", "2023-12-31"])
+_ab520 = _df520({"Invested Capital": [2000, 1600, 1200, 1000], "Common Stock Equity": [1000, 800, 600, 500]},
+                ["2025-12-31", "2024-12-31", "2023-12-31", "2022-12-31"])
+_re520 = ud.rendimento_da(_inc520(), _bs520(), _ai520, _ab520)
+check("v520 per esercizio chiuso: le stesse convenzioni sui bilanci ANNUALI, col capitale medio fra fine esercizio e "
+      "quello prima letto PER DATA (2025: 320/1800) — e il piu' recente per primo: " + str(_re520.get("esercizi")),
+      [e["al"] for e in _re520["esercizi"]] == ["2025-12-31", "2024-12-31", "2023-12-31"]
+      and abs(_re520["esercizi"][0]["roic"] - 320 / 1800) < 1e-4 and abs(_re520["esercizi"][0]["roe"] - 300 / 900) < 1e-4
+      and abs(_re520["esercizi"][2]["roic"] - 160 / 1100) < 1e-4)
+check("v520 senza conto trimestrale (o con meno di quattro trimestri) nessun rendimento, e None si legge diverso da zero",
+      ud.rendimento_da(None, _bs520()) is None and ud.rendimento_da(_inc520b.iloc[:, :3], _bs520()) is None)
+_fs520 = _corpo519("fetch_symbol")
+check("v520 il collegamento: fetch_symbol assegna il rendimento con rendimento_capitale(t), in un try suo, e lo pubblica "
+      "nel campo «rendimento» della riga (si prova il COLLEGAMENTO, non solo il controllo: v399)",
+      "_rend = rendimento_capitale(t)" in _fs520 and '"rendimento": _rend' in _fs520
+      and "rendimento del capitale {ticker}" in _fs520)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

@@ -1130,6 +1130,7 @@ def raccogli():
                                     "nel_libro": p["tk"] in qta, "seguito": p["tk"] in seguiti,
                                     # v492 — il P/E dei candidati: solo chi la pipeline segue ha i multipli
                                     "in_pipeline": p["tk"] in pipe, "stats": (pipe.get(p["tk"]) or {}).get("stats"),
+                                    "rendimento": (pipe.get(p["tk"]) or {}).get("rendimento", "assente"),
                                     "analisti": (pipe.get(p["tk"]) or {}).get("analisti"),
                                     "stato": stato_titolo(*(lambda x: (x.get("px"), x.get("sma200"),
                                              x.get("pend50"), x.get("d50_atr"), x.get("corr_libro")))(S.get(p["tk"]) or {}))}
@@ -1153,6 +1154,9 @@ def raccogli():
               "analisti": (pipe.get(s["tk"]) or {}).get("analisti"), "in_pipeline": s["tk"] in pipe,
               # v492 — i multipli per il P/E, e la storia della quotazione (veicolo, SEC EDGAR) dalla pipeline
               "stats": (pipe.get(s["tk"]) or {}).get("stats"), "veicolo": veicolo_pipeline(d, s["tk"]),
+              # v520 — ROIC e ROE dalla pipeline (o dalla lettura del giro): "assente" = snapshot precedente alla v520
+              "rendimento": (pipe.get(s["tk"]) or {}).get("rendimento", "assente"),
+              "sector_pipeline": (pipe.get(s["tk"]) or {}).get("sector"),
               # v511 — la stagionalita' del titolo dallo storico mensile della pipeline (cambia una volta al mese)
               "stagionalita": ((pipe.get(s["tk"]) or {}).get("tv") or {}).get("stagionalita"),
               "tenuta": numeri_libro.valuta_tenuta(B.get(s["tk"]), pipe.get(s["tk"]), sem)}
@@ -1478,6 +1482,7 @@ def righe_ingresso(t, cal=None):
            else "revisioni: titolo non seguito dalla pipeline")
     L.append(f"      {riga_trimestrale(t, cal)} · {rev}")
     L.append(f"      {riga_valutazione(t)}")
+    L.append(f"      {riga_rendimento(t)}")
     if t.get("tenuta"):
         L.append(f"      {riga_tenuta(t['tenuta'])}")
     if t.get("nota"):
@@ -2015,6 +2020,15 @@ def riga_valutazione(t):
             "valutazione: P/E n.d. — titolo non seguito dalla pipeline, il sistema non ha i multipli dell'aggregatore")
 
 
+def riga_rendimento(t):
+    """v520 — ROIC e ROE di un ingresso: la resa delle schede (una sola, v161). Fuori dalla pipeline non ci sono."""
+    if not t.get("in_pipeline"):
+        return "rendimento del capitale: n.d. — titolo non seguito dalla pipeline, il sistema non ha i bilanci"
+    x = t.get("rendimento")
+    return schede_progetto.riga_rendimento({"stats": t.get("stats"), "sector": t.get("sector_pipeline"),
+                                            **({} if x == "assente" else {"rendimento": x})})
+
+
 LETTURA_INGRESSO = {   # v481-v482 — l'esito della tenuta letto da chi NON possiede il nome
     "VENDITA PER EVIDENZA": "un ingresso qui e' speculativo, CONTRO l'evidenza: ammesso, e si dichiara tale",
     "CONFLITTO — DA VALUTARE": ("prezzo e crescita dicono cose opposte: e' il caso in cui un ingresso puo' essere "
@@ -2334,6 +2348,7 @@ def righe_candidati(o, news, giorni=7):
                      f"corr libro {n(t['corr_libro'],2)}")
             L.append(f"      {riga_target_beta(t)}")
             L.append(f"      {riga_valutazione(t)}")
+            L.append(f"      {riga_rendimento(t)}")
             if "cinque_anni" in t:        # v492
                 L.extend(f"      {r}" for r in righe_5anni(t["cinque_anni"], t.get("veicolo")))
             if "struttura" in t:          # v494

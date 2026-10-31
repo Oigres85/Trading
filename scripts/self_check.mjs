@@ -165,7 +165,8 @@ const SUITE = [
   /* v509: 354 punti di chiamata (+14 sulle proiezioni del FOMC, i tre esiti, la sorveglianza e il calendario 2027) -> 340 */
   /* v510: 372 punti di chiamata (+18 su conto e oneri, Fear & Greed, BoJ, calendario, UMich, feed) -> 355 */
   /* v512: 380 punti di chiamata (+8 sulle funzioni estratte per la sessione e i giorni di ICE conservati) -> 365 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 380, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v520: 402 punti di chiamata (+10 su ROIC e ROE: aliquota, medie, contiguita', scala, esercizi, collegamento) -> 390 */
+  { file: "test_update_data.py", cmd: "python3", minimo: 390, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */
@@ -192,7 +193,9 @@ const SUITE = [
   /* v512: 897 punti di chiamata (+20 sui dati per titolo letti alla fonte: depositi, Nasdaq, CDS, short, sovrapposizione,
      collegamento, resa) -> 880 */
   /* v519: 980 punti di chiamata in test_analisi_libro (+14 sulle righe lette in sessione e sulle barre a 5 minuti) -> 965 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 965, firma: /\d+\/\d+ CHECK OK/ },
+  /* v520: 1001 punti di chiamata (+21 su ROIC e ROE nelle schede, nei concorrenti e negli ingressi, e sul ROI del conto
+     dal broker) -> 985 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 985, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

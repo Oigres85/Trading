@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "510";
+const BUILD_VERSION = "520";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6979,7 +6979,7 @@ function openStockDetail(ticker) {
     row("P/E", st.pe_ttm || r.pe ? fmtNum.format(Math.round((st.pe_ttm || r.pe) * 10) / 10) + "×" : "—"),
     row("P/FCF", fcf ? fmtNum.format(fcf) + "×" : "—"),
     row("EV/EBITDA", st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"),
-    row("ROE / ROIC", st.roe != null ? pct(st.roe) + (st.roe > 0.15 ? " <span class='pos'>[premium]</span>" : st.roe < 0 ? " <span class='neg'>[zombie]</span>" : "") : "—"),
+    row("ROE", st.roe != null ? pct(st.roe) + (st.roe > 0.15 ? " <span class='pos'>[premium]</span>" : st.roe < 0 ? " <span class='neg'>[zombie]</span>" : "") : "—"),
     row("Margine netto", st.profit_margin != null ? pct(st.profit_margin) : "—"),
     row("Crescita ricavi", st.revenue_growth != null ? pct(st.revenue_growth) : "—"),
     row("PEG", st.peg != null ? fmtNum.format(Math.round(st.peg * 100) / 100) : "—"),

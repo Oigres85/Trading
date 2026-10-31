@@ -58,7 +58,7 @@ ETA_DATI_GIORNI = 7
 LETTURE_PER_GIRO = 15
 # la versione delle letture in memoria: quando cambia una formula, le letture di prima si rifanno (la lezione della
 # v502 — una cache di dati DERIVATI senza versione conserva per sempre la formula vecchia)
-VERSIONE = 504          # v504: il flusso operativo sui ricavi e il ciclo di cassa — le letture di prima si rifanno
+VERSIONE = 520          # v504: il flusso operativo sui ricavi e il ciclo di cassa · v520: ROIC e ROE — le letture di prima si rifanno
 PAUSA = 0.4
 TIPI = ("misura", "stima", "nessuna")
 # i conti trimestrali della fonte possono fermarsi PRIMA del trimestre che la stessa fonte dichiara chiuso
@@ -73,6 +73,7 @@ TRIM_INDIETRO_MAX = 1
 MISURE = (("ricavi_yoy", "crescita dei ricavi sull'anno"), ("margine_lordo", "margine lordo"),
           ("margine_op_12m", "margine operativo 12 mesi"), ("ocf_12m_pct", "flusso operativo 12 mesi sui ricavi"),
           ("fcf_12m_pct", "cassa libera 12 mesi sui ricavi"), ("ciclo", "ciclo di cassa"),
+          ("roic_12m", "ROIC 12 mesi"), ("roe_12m", "ROE 12 mesi"),
           ("altman_z", "Altman Z''"), ("liq_su_breve", "liquidita' sul debito a breve"))
 PIU_BASSO_MEGLIO = ("ciclo",)
 
@@ -280,6 +281,21 @@ def salute(tk, ticker=None, oggi=None):
         out["liq_su_breve"] = round(liq / breve, 2)
     elif liq is not None and breve is not None and breve <= 0:
         out["senza_debito_breve"] = True
+    # v520 — ROIC e ROE con la funzione della pipeline, la stessa per il nome e per ogni concorrente (v161)
+    try:
+        rend = ud.rendimento_capitale(ticker) or {}
+    except Exception:  # noqa: BLE001
+        rend = {}
+    for k, kk in (("roic", "roic_12m"), ("roe", "roe_12m")):
+        if rend.get(k) is not None:
+            out[kk] = round(rend[k] * 100, 1)
+        elif rend.get("motivo_" + k):
+            out[kk + "_motivo"] = rend["motivo_" + k]
+    if rend.get("al"):
+        out["rendimento_al"] = rend["al"]
+    qp = rend.get("quota_patrimonio")
+    if qp is not None:
+        out["quota_patrimonio"] = qp
     try:
         az = ud.altman_zpp(*ud.altman_voci(ticker, cred))
     except Exception:  # noqa: BLE001
@@ -339,6 +355,11 @@ def _misura_txt(chiave, v, r):
             return "non si applica (la fonte classifica la societa' nel settore finanziario)"
         if chiave == "ciclo" and r.get("senza_magazzino"):
             return "non si calcola (senza magazzino materiale)"
+        if chiave in ("roic_12m", "roe_12m"):
+            if (r.get("versione") or 0) < 520:
+                return "n.d. (lettura precedente alla v520: si rifa' al prossimo giro)"
+            m = r.get(chiave + "_motivo")
+            return f"n.d. ({SP.MOTIVI_RENDIMENTO.get(m, m)})" if m else "n.d."
         if chiave in ("ocf_12m_pct", "fcf_12m_pct") and r.get("periodi_diversi"):
             p = r["periodi_diversi"]
             return (f"n.d. (ricavi fino al {CR._data(p.get('ricavi'))}, flussi fino al {CR._data(p.get('flussi'))}: "
@@ -351,7 +372,11 @@ def _misura_txt(chiave, v, r):
     if chiave == "fcf_12m_pct" and r.get("immateriali_pct") is not None:
         return (f"{CR._n(v, 1)}% — ⚠ il {CR._n(r['immateriali_pct'], 1)}% degli investimenti e' in attivita' "
                 "immateriali (non impianti): non misura un'azienda che costruisce")
-    if chiave in ("margine_lordo", "margine_op_12m", "fcf_12m_pct", "ocf_12m_pct"):
+    if chiave == "roe_12m":
+        qp = r.get("quota_patrimonio")
+        return f"{CR._n(v, 1)}%" + (f" (patrimonio {CR._n(qp * 100, 0)}% del capitale investito: porta la leva)"
+                                     if qp is not None and 0 < qp < SP.LEVA_QUOTA_PATRIMONIO else "")
+    if chiave in ("margine_lordo", "margine_op_12m", "fcf_12m_pct", "ocf_12m_pct", "roic_12m"):
         return f"{CR._n(v, 1)}%"
     if chiave == "altman_z":
         return (f"{CR._n(v, 2)} {r.get('altman_zona')} ({r.get('altman_rating')})"

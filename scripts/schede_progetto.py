@@ -1044,6 +1044,114 @@ def righe_credito(r, meta_cds=None, dsec=None):
     return out
 
 
+LEVA_QUOTA_PATRIMONIO = 0.5     # v520 — convenzione: sotto la meta' del capitale investito, il ROE porta la leva
+SCARTO_ROE_FONTE = 0.02         # v520 — due punti: oltre, il ROE di Yahoo (non datato) e il nostro si dichiarano diversi
+RENDIMENTO_ESERCIZI_MOSTRA = 3  # v520 — gli esercizi chiusi accanto ai 12 mesi (la pipeline ne pubblica uno in piu')
+
+
+def _stesso_trimestre(a, b, giorni=20):
+    """Due date di fine periodo entro `giorni` l'una dall'altra: lo stesso trimestre (fine mese contro fine settimana)."""
+    try:
+        return abs((datetime.fromisoformat(str(a)[:10]) - datetime.fromisoformat(str(b)[:10])).days) <= giorni
+    except (TypeError, ValueError):
+        return False
+
+
+def _pct1(x):
+    """Una frazione in percentuale a una cifra, col segno sul valore gia' arrotondato (v496, v510): mai «-0,0%»."""
+    v = round(float(x) * 100, 1) + 0.0
+    return _n(v, 1) + "%"
+
+
+MOTIVI_RENDIMENTO = {
+    "risultato_operativo_mancante": "la fonte non porta il risultato operativo",
+    "aliquota_non_ricavabile": "aliquota non ricavabile (ne' effettiva ne' normalizzata dalla fonte)",
+    "capitale_non_positivo": "capitale investito negativo o nullo: non e' un rendimento alto o basso",
+    "capitale_assente": "la fonte non porta il capitale investito",
+    "utile_mancante": "la fonte non porta l'utile degli azionisti",
+    "patrimonio_non_positivo": "patrimonio degli azionisti negativo o nullo: un ROE non si legge",
+    "patrimonio_assente": "la fonte non porta il patrimonio",
+}
+
+
+def riferimento_rendimento():
+    """v520 — le convenzioni di ROIC e ROE, una volta per blocco (v407)."""
+    return ("RENDIMENTO DEL CAPITALE (richiesta del CEO del 31/10/2026) — INFORMAZIONE, non una prova della tenuta ne' "
+            "un colore · ROIC = risultato operativo dei 12 mesi al netto delle imposte, diviso il capitale investito "
+            "MEDIO fra inizio e fine (come la fonte lo pubblica: patrimonio degli azionisti ordinari piu' debito "
+            "finanziario, senza togliere la cassa): quanto rende ogni dollaro messo nell'attivita', debito compreso · "
+            "ROE = utile degli azionisti ordinari dei 12 mesi diviso il loro patrimonio MEDIO: quanto rende il capitale "
+            "degli azionisti, e cresce con la leva — quando il patrimonio e' una piccola parte del capitale investito "
+            "il ROE e' alto anche a parita' di attivita', e la riga lo dice · aliquota EFFETTIVA dei 12 mesi (imposte / "
+            "utile prima delle imposte) se cade fra 0 e 50%, altrimenti quella normalizzata della fonte; un risultato "
+            "operativo negativo non riceve un beneficio fiscale · per esercizio: le stesse convenzioni sugli esercizi "
+            "chiusi · il confronto col COSTO del capitale non e' calcolato: servirebbero ipotesi sul premio per il rischio "
+            "(v240) · sui ciclici (le memorie) il ROIC dei 12 mesi e' il piu' alto proprio vicino al picco del ciclo: "
+            "gli esercizi chiusi accanto mostrano da dove viene")
+
+
+def riga_rendimento(r, ferma=None):
+    """v520 — ROIC e ROE dei 12 mesi e per esercizio, coi motivi dei buchi. Tre stati (v406): snapshot precedente alla
+    v520 (il campo non c'e') · la fonte non ha il conto (None) · misurato."""
+    r = r or {}
+    if "rendimento" not in r:
+        return ("rendimento del capitale: snapshot precedente alla v520 — la pipeline non porta ancora ROIC e ROE "
+                "(non e' un rendimento nullo, e' il dato che manca)")
+    x = r.get("rendimento")
+    if not x:
+        return ("rendimento del capitale: n.d. — la fonte non ha quattro trimestri contigui del conto (non e' un "
+                "rendimento nullo)")
+    fin = str((r.get("sector") or "")).lower().startswith("financial")
+    pz = []
+    if x.get("roic") is not None:
+        base = (" — capitale investito alla sola fine del periodo (manca quello di un anno prima)"
+                if x.get("capitale_base") == "fine" else "")
+        al = x.get("aliquota")
+        aq = (f", aliquota effettiva {_pct1(al)}" if x.get("aliquota_base") == "effettiva" and al is not None else
+              f", aliquota normalizzata della fonte {_pct1(al)} (l'effettiva non e' ricavabile)"
+              if x.get("aliquota_base") == "fonte" and al is not None else
+              ", risultato operativo negativo: nessun beneficio fiscale" if x.get("aliquota_base") == "nessuna_perdita"
+              else "")
+        pz.append(f"ROIC {_pct1(x['roic'])}{aq}{base}")
+    else:
+        m = MOTIVI_RENDIMENTO.get(x.get("motivo_roic"), "n.d.")
+        pz.append(f"ROIC n.d. ({m}" + ("; per banche e assicurazioni vale il ROE" if fin else "") + ")")
+    if x.get("roe") is not None:
+        pz.append(f"ROE {_pct1(x['roe'])}" + (" — patrimonio alla sola fine del periodo"
+                                                if x.get("patrimonio_base") == "fine" else ""))
+    else:
+        pz.append(f"ROE n.d. ({MOTIVI_RENDIMENTO.get(x.get('motivo_roe'), 'n.d.')})")
+    s = (f"rendimento del capitale (12 mesi al {_data_it(x.get('al'))}): " + " · ".join(pz))
+    qp = x.get("quota_patrimonio")
+    if qp is not None and 0 < qp < LEVA_QUOTA_PATRIMONIO and x.get("roe") is not None:
+        s += (f" · ⚠ il patrimonio e' {art('il', _n(qp * 100, 0) + '%')} del capitale investito: il ROE porta la leva del debito, "
+              "il ROIC no — si leggono insieme")
+    yr = (r.get("stats") or {}).get("roe")
+    if yr is not None and x.get("roe") is not None and abs(float(yr) - x["roe"]) > SCARTO_ROE_FONTE:
+        s += (f" · il ROE che la fonte pubblica senza data e' {_pct1(yr)}: la differenza puo' venire dal patrimonio "
+              "usato (qui gli azionisti ordinari; la fonte puo' comprendere privilegiate e minoranze) o dal periodo, "
+              "che la fonte non dichiara")
+    ct = [str(q.get("trim"))[:10] for q in ((r.get("tv") or {}).get("conto_trim") or [])
+          if isinstance(q, dict) and q.get("trim")]
+    cima = max(ct, default=None)
+    if cima and str(x.get("al") or "") < cima and not _stesso_trimestre(cima, x.get("al")):
+        # il conto puo' avere un trimestre piu' recente (comunicato ufficiale, Nasdaq) che lo stato patrimoniale non ha:
+        #   ricavi e utile di quel trimestre ci sono, il capitale investito e il patrimonio no (v513)
+        s += (f" · ⚠ i bilanci della fonte arrivano al {_data_it(x.get('al'))}: il trimestre al {_data_it(cima)} c'e' "
+              "per ricavi e utile, non per lo stato patrimoniale — ROIC e ROE sono del periodo prima")
+    elif ferma:
+        s += (f" · ⚠ i bilanci della fonte arrivano al {_data_it(x.get('al'))} e un trimestre depositato dopo non c'e': "
+              "e' la tabella ferma della riga qui sotto")
+    # un esercizio che chiude lo stesso trimestre dei 12 mesi e' lo stesso periodo scritto due volte (v415)
+    es = [e for e in (x.get("esercizi") or []) if not _stesso_trimestre(e.get("al"), x.get("al"))]
+    es = es[:RENDIMENTO_ESERCIZI_MOSTRA]
+    if es:
+        s += " · per esercizio chiuso: " + " · ".join(
+            f"{_data_it(e['al'])} ROIC {_pct1(e['roic']) if e.get('roic') is not None else 'n.d.'}, "
+            f"ROE {_pct1(e['roe']) if e.get('roe') is not None else 'n.d.'}" for e in es)
+    return s
+
+
 def scheda(tk, ruolo, righe, sec, meta_cds=None, dsec=None):
     r = righe.get(tk)
     if r is None:
@@ -1059,11 +1167,12 @@ def scheda(tk, ruolo, righe, sec, meta_cds=None, dsec=None):
         out.append("  sensibilita' macro: n.d.")
     out.append("  " + riga_revisioni(r.get("analisti")))
     out.append("  " + riga_valutazione(r))          # v492 — il P/E come metrica
+    ferma = deposito_oltre_la_tabella(r, (sec or {}).get(tk) or {})       # v500
+    out.append("  " + riga_rendimento(r, ferma))    # v520 — ROIC e ROE, datati
     for f in (riga_ricavi, riga_cassa, riga_short, riga_flottante):
         x = f(r)
         if x:
             out.append("  " + x)
-    ferma = deposito_oltre_la_tabella(r, (sec or {}).get(tk) or {})       # v500
     if ferma:
         out.append("  " + testo_tabella_ferma(ferma))
     out.append("  " + riga_cds(r, meta_cds))       # v497 — il credito prezzato dal mercato, nome per nome
@@ -1089,6 +1198,7 @@ def genera(dati, pos, sorv, filtro=None):
                    + " · ".join(f"{k} {v}" for k, v in (_ft.get("esiti") or {}).items()))
     out.append("Opzioni: non qui — le guardie di plausibilita' vivono nel pacchetto titolo della dashboard.")
     out.append(riferimento_valutazione(dati.get("macro")))      # v492 — una volta per blocco (v407)
+    out.append(riferimento_rendimento())                        # v520 — una volta per blocco (v407)
     meta_cds = (dati.get("macro") or {}).get("cds")
     out.append(riferimento_cds(dati.get("macro")))              # v497 — una volta per blocco (v407)
     # v501 — la salute del credito: l'intestazione una volta, e in testa i SEGNALI di tutti i nomi, perche' un rincaro

@@ -63,6 +63,7 @@ SEZIONI = (
     ("salvavita", "0 · Salvavita e piano di riduzione"),
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
     ("cambio", "0bis · Cambio euro/dollaro: l'esposizione del libro al dollaro e le operazioni col loro cambio"),  # v516
+    ("roi_conto", "0bis · ROI del conto: la fotografia del broker, i carichi in euro, le operazioni chiuse"),     # v520
     ("decisioni", "0bis · Decisioni aperte e rimandate"),
     ("ordini", "0bis · Ordini aperti"),
     ("credito_libro", "0ter · Credito sul libro"),
@@ -178,6 +179,7 @@ CATALOGO = {
         Blocco(r"COSTO DELL'ATTESA", "attesa"),
         Blocco(r"SCADENZE", "attesa"),
         Blocco(r"CAMBIO EURO/DOLLARO", "cambio", (Nome(rf"  {TK} +carico ", "cambio", "copia"),)),        # v516
+        Blocco(r"ROI DEL CONTO", "roi_conto"),                                                           # v520
         Blocco(r"DECISIONI APERTE", "decisioni"),
         Blocco(r"RIMANDATE DI PROPOSITO", "decisioni"),
         Blocco(r"ORDINI APERTI", "ordini"),
@@ -199,6 +201,7 @@ CATALOGO = {
     "schede_progetto": Strumento("schede_testa", (
         Blocco(r"Dati del progetto", "schede_testa"),
         Blocco(r"CDS a 5 anni", "cds"),
+        Blocco(r"RENDIMENTO DEL CAPITALE", "schede_testa"),              # v520
         Blocco(r"SALUTE DEL CREDITO", "credito_salute"),
         Blocco(r"SEGNALI DEL CREDITO", "credito_salute"),
         Blocco(r"[A-Z][A-Z0-9\-]* \[POSIZIONE, titolo di Stato\]", "cds"),
@@ -271,6 +274,9 @@ REGISTRO = {
     "semaforo": Voce(("semaforo",)),
     "attesa": Voce(("attesa",)),
     "cambio": Voce(("cambio",)),                                                                       # v516
+    "roi_conto": Voce(("roi_conto",)),                                                                 # v520
+    "rendimento_capitale": Voce((), (Marcatore("schede", "rendimento del capitale", "tutti"),          # v520
+                                     Marcatore("watchlist", "rendimento del capitale", "sorvegliati"))),
     "stato_sistema": Voce(("stato_sistema",)),                                                         # v518
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),
     "schede": Voce(("schede_testa",), (Marcatore("schede", None, "tutti"),)),
