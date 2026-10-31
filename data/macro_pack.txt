@@ -1,4 +1,4 @@
-⟦ BUILD v520 · generato 31/10/2026 10:16 ⟧
+⟦ BUILD v520 · generato 31/10/2026 10:42 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 31/10/2026, 10:16:41 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 06:16, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,48% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,43% · Fut S&P -0,86% · BTC +0,14% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~51.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 2 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 31/10/2026, 10:42:14 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 06:42, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,48% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,43% · Fut S&P -0,86% · BTC +0,19% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~50.8h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 2 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 31/10/2026, 10:16:41 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-30 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 31/10/2026, 10:42:14 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-30 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): settembre 2026 · Inflazione PCE (a/a): settembre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: settembre 2026 · Disoccupazione: settembre 2026 · Fiducia consumatori (UMich): ottobre 2026 · Curva 10A-2A: 30/10/2026 · Curva 10A-3M: 30/10/2026 · Treasury USA 30A: 29/10/2026 · Tasso reale 10A (TIPS): 29/10/2026 · Inflazione attesa 10A (breakeven): 30/10/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -98,27 +98,27 @@ QUADRO MACRO:
 - TITOLI MACRO — 0 dentro le ultime 8 ORE, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le 12 piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha 13 ore (fonti: CNBC Economia, Bloomberg, MarketWatch) · 2 pubblicate DOPO l'ultima chiusura USA del 2026-10-30, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto · ⚠ altre 6 voci il sistema le HA e qui sotto non compaiono (tetto di 12 titoli): il taglio cade solo su quelle gia' dentro il prezzo di chiusura, mai su quelle pubblicate dopo. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [MarketWatch, 13h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Warsh wants the Fed to say less. Two officials are pushing for more transparency.
       More interest-rate hikes are needed to fight inflation, Fed officials say.
-    · [Bloomberg, 13h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Wall Street Boom to Cut New York State Budget Deficit in Half
+    · [Bloomberg, 14h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Wall Street Boom to Cut New York State Budget Deficit in Half
       New York projected the budget deficit will narrow by $3.5 billion next year as the state expects a boom in trading and borrowing to deliver record profits to Wall Street and stronger bonus payments to boost revenue.
     · [CNBC Economia, 23h fa] Euro zone economy slows to 0.4% growth in Q3 as crisis-hit France contracts
       The euro zone showed surprising resilience, but weak productivity, industrial competitiveness challenges and demographic pressures remain, analysts said.
-    · [CNBC Economia, 40h fa] Third-quarter U.S. GDP increases a better-than-expected 3.4% as September inflation accelerates
+    · [CNBC Economia, 41h fa] Third-quarter U.S. GDP increases a better-than-expected 3.4% as September inflation accelerates
       The personal consumption expenditures price index was projected to increase 0.5% in September for an annual rate of 3.7%, according to the Dow Jones consensus.
     · [CNBC Economia, 41h fa] Analysis: Kevin Warsh is keeping Wall Street guessing. It may be his most powerful tool
       The new chairman made clear he leans toward higher interest rates, but left himself options depending on how the data comes in.
-    · [CNBC Economia, 43h fa] The politics of President Lagarde's European Central Bank early exit — and who could replace her
+    · [CNBC Economia, 44h fa] The politics of President Lagarde's European Central Bank early exit — and who could replace her
       European Central Bank President Christine Lagarde will step down on Feb. 7 next year, she announced Thursday.
-    · [CNBC Economia, 43h fa] European Central Bank keeps key interest rate on hold at 2.5%
+    · [CNBC Economia, 44h fa] European Central Bank keeps key interest rate on hold at 2.5%
       Markets saw the decision as a hawkish pause and were last pricing in a 67% chance of a December rate hike.
     · [CNBC Economia, 61h fa] Here are five key takeaways from the Fed rate decision and Warsh news conference
       Even though the interest-rate vote went as expected, there were a few surprises out of this week's Federal Open Market Committee meeting.
-    · [CNBC Economia, 61h fa] Bessent says 'not necessarily' a mistake if the Fed hikes again
+    · [CNBC Economia, 62h fa] Bessent says 'not necessarily' a mistake if the Fed hikes again
       Treasury Secretary Scott Bessent joined CNBC for an interview on Oct. 28, 2026.
     · [CNBC Economia, 67h fa] The UK cuts energy bills, taxes banks and boosts defense in high-stakes budget
       The U.K. budget cuts household energy costs, raises taxes on banks and directs billions toward defense, Ukraine and artificial intelligence
     · [CNBC Economia, 90h fa] World Bank's Banga: Availability of capital 'not really an issue' as AI demand drives up borrowing costs
       World Bank President Ajay Banga came on CNBC's "Squawk Box" on Oct. 27, 2026.
-    · [CNBC Economia, 90h fa] Fed rate hikes are coming, but not this week: CNBC survey
+    · [CNBC Economia, 91h fa] Fed rate hikes are coming, but not this week: CNBC survey
       The CNBC Fed Survey shows that 93% of respondent expect a pause at the Federal Reserve meeting taking place this week.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-11-06 Non-Farm Payrolls (precedente +29K) · 2026-11-06 Disoccupazione (precedente 4.2%) · 2026-11-10 Inflazione CPI (a/a) (precedente 3.7%). ⚠ Per 1 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich)): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 5 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-2A, Curva 10A-3M, Treasury USA 30A, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-11-02 PLTR · 2026-11-02 AAPL · 2026-11-03 AMD · 2026-11-03 SMCI · 2026-11-03 ANET · 2026-11-03 AMGN · 2026-11-03 PFE · 2026-11-04 MCD · 2026-11-04 DDOG · 2026-11-05 NET · 2026-11-05 COP · 2026-11-06 OKLO · 2026-11-09 CEG · 2026-11-09 TTWO · 2026-11-10 RGTI · 2026-11-10 CRWV · 2026-11-12 CBRS. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -178,9 +178,8 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
 - Will there be no change in Fed interest rates after the December 2026 meeting?: 28% [Δ7g —]
-- Will Bitcoin dip to $75,000 in October?: 3% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the December 2026 meeting?: 70% [Δ7g —]
-⚠ 2 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
+⚠ 3 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -201,16 +200,16 @@ TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre
 - MU: medie: -6,92% dalla 20, -9,59% dalla 50, +18,5% dalla 200 · RSI 42 · -29,5% dal massimo 52s · forza relativa 1M -2,7 pp vs SOX · ampiezza tipica di seduta 5,6% · P/E prospettico 4,3× · ricavi +379,3% a/a · trimestrale fra 53 giorni
 - NVDA: medie: -7,59% dalla 20, -7,69% dalla 50, +0,27% dalla 200 · RSI 35,1 · -15,9% dal massimo 52s · forza relativa 1M +5,3 pp vs SOX · ampiezza tipica di seduta 3% · P/E prospettico 12,9× · ricavi +105,9% a/a · trimestrale fra 17 giorni
 - AMD: medie: -11,51% dalla 20, -7,93% dalla 50, +22,98% dalla 200 · RSI 39,7 · -23,3% dal massimo 52s · forza relativa 1M -1,3 pp vs SOX · ampiezza tipica di seduta 5,8% · P/E prospettico 31,7× · ricavi +50,1% a/a · trimestrale fra 3 giorni
-- MSTR: medie: -11,43% dalla 20, -9,16% dalla 50, -3,01% dalla 200 · RSI 40,1 · -52,8% dal massimo 52s · forza relativa 1M -11,7 pp vs NDX · ampiezza tipica di seduta 7,3% · P/E prospettico 5,5× · ricavi +6,9% a/a
-- PLTR: medie: -6,66% dalla 20, -1,5% dalla 50, +19,89% dalla 200 · RSI 41,9 · -13,5% dal massimo 52s · forza relativa 1M +3,8 pp vs NDX · ampiezza tipica di seduta 4,5% · P/E prospettico 78,8× · ricavi +92,8% a/a · trimestrale fra 2 giorni
+- MSTR: medie: -11,43% dalla 20, -9,16% dalla 50, -3,01% dalla 200 · RSI 40,1 · -52,8% dal massimo 52s · forza relativa 1M -11,7 pp vs NDX · ampiezza tipica di seduta 7,3% · P/E prospettico 5,5× · ricavi -2,5% a/a
+- PLTR: medie: -6,66% dalla 20, -1,5% dalla 50, +19,89% dalla 200 · RSI 41,9 · -13,5% dal massimo 52s · forza relativa 1M +3,8 pp vs NDX · ampiezza tipica di seduta 4,5% · P/E prospettico 78,3× · ricavi +92,8% a/a · trimestrale fra 2 giorni
 - CRWV: medie: -20,21% dalla 20, -30,94% dalla 50, -39,93% dalla 200 · RSI 33,4 · -60,3% dal massimo 52s · forza relativa 1M -36,9 pp vs SP500 · ampiezza tipica di seduta 10,7% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +112,5% a/a · trimestrale fra 10 giorni
 - GOOGL: medie: -16,19% dalla 20, -17,46% dalla 50, -17,78% dalla 200 · RSI 21,4 · -31,4% dal massimo 52s · forza relativa 1M -10,3 pp vs NDX · ampiezza tipica di seduta 3,7% · P/E prospettico 18,5× · ricavi +24,7% a/a
 - INTC: medie: -31,78% dalla 20, -34,96% dalla 50, -24,3% dalla 200 · RSI 25,1 · -53,8% dal massimo 52s · forza relativa 1M -28,5 pp vs SOX · ampiezza tipica di seduta 10,6% · P/E prospettico 31,3× · ricavi +20,9% a/a · trimestrale fra 89 giorni
 - MRVL: medie: -20,8% dalla 20, -19,04% dalla 50, +7,25% dalla 200 · RSI 34 · -40,4% dal massimo 52s · forza relativa 1M -10 pp vs SOX · ampiezza tipica di seduta 9% · P/E prospettico 26,8× · ricavi +36,5% a/a · trimestrale fra 31 giorni
-- BE: medie: -15,77% dalla 20, -18,15% dalla 50, -8,21% dalla 200 · RSI 39,2 · -42,2% dal massimo 52s · forza relativa 1M -25,7 pp vs SP500 · ampiezza tipica di seduta 9,7% · P/E prospettico 38,3× · ricavi +138,1% a/a
+- BE: medie: -15,77% dalla 20, -18,15% dalla 50, -8,21% dalla 200 · RSI 39,2 · -42,2% dal massimo 52s · forza relativa 1M -25,7 pp vs SP500 · ampiezza tipica di seduta 9,7% · P/E prospettico 38,2× · ricavi +138,1% a/a
 - ORCL: medie: -2,94% dalla 20, -7,61% dalla 50, -16,2% dalla 200 · RSI 45,8 · -50,2% dal massimo 52s · forza relativa 1M -3,9 pp vs SP500 · ampiezza tipica di seduta 5,9% · P/E prospettico 11,8× · ricavi +29,6% a/a · trimestrale fra 44 giorni
 - RGTI: medie: -11,13% dalla 20, -22,65% dalla 50, -34,5% dalla 200 · RSI 33,6 · -74,7% dal massimo 52s · forza relativa 1M -11,3 pp vs SOX · ampiezza tipica di seduta 7,1% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +185,3% a/a · trimestrale fra 10 giorni
-- SKHY: medie: -3,84% dalla 20, -11,65% dalla 50 · RSI 44,5 · -25,3% dal massimo 52s · forza relativa 1M -21,8 pp vs SP500 · ampiezza tipica di seduta 6,3% · P/E prospettico 3,5× · ricavi +256,8% a/a · trimestrale fra 88 giorni
+- SKHY: medie: -3,84% dalla 20, -11,65% dalla 50 · RSI 44,5 · -25,3% dal massimo 52s · forza relativa 1M -21,8 pp vs SP500 · ampiezza tipica di seduta 6,3% · P/E prospettico 3,5× · ricavi +327,9% a/a · trimestrale fra 88 giorni
 ⚠ COME SI LEGGE QUESTO ELENCO. La distanza dal massimo a 52 settimane e la posizione rispetto alle medie dicono cose diverse: la prima misura quanto e' gia' sceso il titolo, la seconda se il trend regge adesso. Un nome molto sotto il massimo ma sopra le medie sta risalendo; uno sotto entrambe no. ⚠ La forza relativa e' contro il riferimento NOMINATO in ciascuna riga, che cambia col titolo (il settore dove il sistema lo riconosce, l'indice generale dove ripiega): il confronto fra due righe con riferimenti diversi non e' omogeneo. ⚠ I fondamentali sono di fonte aggregatore, non del deposito ufficiale.
 APPROFONDIMENTO SU 10 POSIZIONI SU 13: quelle che hanno un evento datato vicino o una soglia rotta. ⚠ Le altre 3 non sono meno importanti e non sono state giudicate: semplicemente nessuna delle tre condizioni le tocca oggi, e la condizione che le seleziona e' scritta accanto a ciascuna. ⚠ Questi numeri sono calcolati dal sistema sulle stesse barre giornaliere del blocco qui sopra: non vanno ricalcolati ne' cercati online. ⚠ COME SI LEGGONO LE DUE MISURE CHE HANNO UNA CONVENZIONE: dell'ADX, per la convenzione di Wilder — che e' del mestiere e non un dato di questo file — sotto 20 la tendenza e' debole e sopra 25 e' in atto; del MACD esce il SEGNO, cioe' se la linea sta sopra o sotto il proprio segnale, che e' un fatto, e non un'etichetta compra/vendi, che sarebbe un verdetto e i verdetti sono fuori da questo sistema dalla v200.
 - NVDA — SELEZIONATO PERCHE': trimestrale fra 17 giorni.
@@ -260,11 +259,11 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsBloom was added to the S&P 500 in September.
   [BE] · [Nasdaq, 19h fa] Bloom Energy or Plug Power: Which Offers Better Long-Term Upside Now?
       BE outshines PLUG in earnings growth, profitability and liquidity, but a sharp valuation gap raises questions about long-term upside.
-  [CRWV] · [Nasdaq, 12h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
+  [CRWV] · [Nasdaq, 13h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
       Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.
   [CRWV] · [Nasdaq, 15h fa] Bloom Energy Just Joined the S&P 500. Here's What History Says Happens Next.
       Key PointsBloom was added to the S&P 500 in September.
-  [INTC] · [Nasdaq, 3h fa] A SpaceX and Tesla Merger Will Only Be Successful If This One Thing Happens
+  [INTC] · [Nasdaq, 4h fa] A SpaceX and Tesla Merger Will Only Be Successful If This One Thing Happens
       Key PointsA merger between SpaceX and Tesla is being formally considered.
   [INTC] · [Nasdaq, 5h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
@@ -274,7 +273,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The S&P 500 Index ($SPX ) (SPY ) fell -0.30%, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -0.25%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -1.38%. December E-mini S&P futures (ESZ26 ) fell -0.87%, and December E-mini Nasdaq futures (NQZ26 ) fell -2.67%. US...
   [MSTR] · [Nasdaq, 5h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
-  [MSTR] · [Nasdaq, 11h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [MSTR] · [Nasdaq, 12h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) is down -1.26%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.52%. December E-mini S&P futures (ESZ26 ) are down -1.33%, and December E-mini Nasdaq futures (NQZ26...
   [MU] · [Nasdaq, 4h fa] Prediction: 2 Under $1 Trillion Stocks That Will Be Worth More Than Micron 5 Years From Now
       Key PointsAs the HBM leader, SK Hynix stock should grow to be larger than Micron in the next five years.
@@ -282,15 +281,15 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The Q3 results we have already seen from 60% of S&P 500 members through Friday, October 30th, reconfirm the broad-based growth momentum we have become used to in the last few reporting cycles. Upcoming notable reports include Tech bellwethers like Apple, Advanced Micro Devices, and Palantir.
   [NVDA] · [Nasdaq, 5h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
-  [NVDA] · [Nasdaq, 11h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [NVDA] · [Nasdaq, 12h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) is down -1.26%, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.52%. December E-mini S&P futures (ESZ26 ) are down -1.33%, and December E-mini Nasdaq futures (NQZ26...
-  [ORCL] · [Nasdaq, 12h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
+  [ORCL] · [Nasdaq, 13h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
       Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.
   [ORCL] · [Nasdaq, 15h fa] Bloom Energy Just Joined the S&P 500. Here's What History Says Happens Next.
       Key PointsBloom was added to the S&P 500 in September.
-  [RGTI] · [Nasdaq, 37h fa] Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market
+  [RGTI] · [Nasdaq, 38h fa] Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market
       In the most recent trading session, Rigetti Computing, Inc. (RGTI) closed at $12.06, indicating a -2.74% shift from the previous trading day.
-  [RGTI] · [Nasdaq, 40h fa] IONQ Below Key Moving Averages: Buy, Hold or Sell Before Q3 Earnings?
+  [RGTI] · [Nasdaq, 41h fa] IONQ Below Key Moving Averages: Buy, Hold or Sell Before Q3 Earnings?
       IonQ trades below key SMAs as earnings estimates weaken, but new Air Force funding and an analyst price target point to potential upside ahead of Q3 results.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
