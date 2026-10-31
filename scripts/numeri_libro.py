@@ -239,6 +239,10 @@ def calcola(sedute=1, registra=False, adesso=None):
                                  broker=_broker, pmc=pmc)
     # v520 — il ROI del conto dalla fotografia del broker (LIBRO.md §1duodecies), con lo stesso cambio del blocco
     out["conto"] = roi_conto(_broker, qty, pmc, pat_pipe[0], cassa_eur)
+    # v523 — il rendimento del deposito titoli dai rendiconti del broker (LIBRO.md §1terdecies), con QQQ e la BCE
+    #   del giro: le stesse barre del periodo e lo stesso storico del cambio (v161)
+    out["rendiconti"] = rendimenti_rendiconti(leggi_rendiconti(), B.get("QQQ"),
+                                              ((giro["scelta"] or {}).get("eurusd") or {}).get("anno"))
     prima_trim = {}
     for a in out["calendario"].get("attesi") or []:
         prima_trim.setdefault(a["tk"], a.get("giorni"))       # gli attesi arrivano gia' in ordine di data
@@ -2612,6 +2616,245 @@ def righe_roi(r):
     return L
 
 
+# ══ v523 — IL RENDIMENTO DEL DEPOSITO TITOLI DAI RENDICONTI DEL BROKER (LIBRO.md §1terdecies) ═══════════════════════
+#   Il CEO, 31/10/2026: *"Scegli tu le soluzioni. Allego documenti ma non aggiornatissimi"* — il rendiconto del
+#   deposito al 30/09/2026. I versamenti del conto restano ignoti (il ROI dall'inizio non si calcola), ma fra due
+#   rendiconti il rendimento del capitale INVESTITO si misura senza: valori d'inizio e di fine come il broker li stampa,
+#   ogni acquisto e vendita pesato per i giorni in cui e' rimasto nel deposito (Dietz modificato).
+RENDICONTO_SOMMA_TOLLERANZA = 0.05       # euro: la tabella deve sommare al totale che il rendiconto dichiara
+
+
+def leggi_rendiconti(testo=None):
+    """v523 — la sezione RENDICONTO TRIMESTRALE di LIBRO.md (§1terdecies): {"rendiconti": [...], "commissione_usd"}.
+    Ogni rendiconto: inizio, fine, data di produzione, valori d'inizio e di fine di ogni titolo come il broker li stampa,
+    ratei del BTP, conto corrente, bollo, cedole e movimenti. None = sezione ASSENTE (v389, v406); si legge solo dentro
+    il proprio titolo (v454). Nome e numeri del conto NON si scrivono: il repository e' pubblico."""
+    if testo is None:
+        testo = testo_libro()
+    out, cur, sez, trovata = {"rendiconti": [], "commissione_usd": None}, None, False, False
+    for riga in testo.splitlines():
+        if riga.startswith("## "):
+            sez = "RENDICONTO TRIMESTRALE" in riga.upper()
+            trovata = trovata or sez
+            continue
+        if not sez:
+            continue
+        m = re.search(r"Commissione per ordine eseguito su NYSE e Nasdaq:\s*\**\s*([0-9]+,[0-9]{2})\s*\$", riga)
+        if m:
+            out["commissione_usd"] = _num_it(m.group(1))
+            continue
+        m = re.search(r"\*\*Rendiconto dal (\d{1,2}/\d{1,2}/\d{4}) al (\d{1,2}/\d{1,2}/\d{4})\*\*"
+                      r"(?:\s*\(prodotto il (\d{1,2}/\d{1,2}/\d{4})\))?", riga)
+        if m:
+            cur = {"inizio": _data_iso(m.group(1)), "fine": _data_iso(m.group(2)), "prodotto": _data_iso(m.group(3)),
+                   "valori": {}, "movimenti": [], "cedole": [], "ratei": {}, "totale_fine": None, "conto": None,
+                   "bollo": None}
+            out["rendiconti"].append(cur)
+            continue
+        if cur is None:
+            continue
+        m = re.search(r"totale titoli al (\d{1,2}/\d{1,2}/\d{4}):\s*([0-9.]+,[0-9]{2})\s*€", riga)
+        if m and _data_iso(m.group(1)) == cur["fine"]:
+            cur["totale_fine"] = _num_it(m.group(2))
+            continue
+        if "ratei del BTP:" in riga:
+            for v, d in re.findall(r"([0-9.]+,[0-9]{2})\s*€ al (\d{1,2}/\d{1,2}/\d{4})", riga):
+                cur["ratei"][_data_iso(d)] = _num_it(v)
+            continue
+        m = re.search(r"conto corrente al (\d{1,2}/\d{1,2}/\d{4}):\s*([0-9.]+,[0-9]{2})\s*€", riga)
+        if m:
+            cur["conto"] = {"data": _data_iso(m.group(1)), "eur": _num_it(m.group(2))}
+            continue
+        m = re.search(r"imposta di bollo del trimestre:\s*([0-9.]+,[0-9]{2})\s*€", riga)
+        if m:
+            cur["bollo"] = _num_it(m.group(1))
+            continue
+        m = re.search(r"cedola del BTP pagata nel trimestre:\s*(\d{1,2}/\d{1,2}/\d{4}),\s*([0-9.]+,[0-9]{2})\s*€ lordi,"
+                      r"\s*([0-9.]+,[0-9]{2})\s*€ netti", riga)
+        if m:
+            cur["cedole"].append({"data": _data_iso(m.group(1)), "lordo": _num_it(m.group(2)),
+                                  "netto": _num_it(m.group(3))})
+            continue
+        if not riga.startswith("|"):
+            continue
+        celle = [x.strip() for x in riga.strip().strip("|").split("|")]
+        if not celle or celle[0] in ("Titolo", "Data", "") or set(celle[0]) <= set("-: "):
+            continue
+        if len(celle) == 6 and _data_iso(celle[0]):
+            cur["movimenti"].append({"data": _data_iso(celle[0]), "tk": celle[1].upper(), "verso": celle[2].lower(),
+                                     "azioni": _num_it(celle[3]), "prezzo": _num_it(celle[4]),
+                                     "eur": _num_it(celle[5])})
+        elif len(celle) == 4:
+            cur["valori"][celle[0].upper()] = {"inizio": _num_it(celle[1]), "fine": _num_it(celle[2]),
+                                               "fx_carico": _num_it(celle[3])}
+    return out if trovata else None
+
+
+def _alla_data(serie, giorno):
+    """(data, valore) dell'ultima osservazione NON successiva a `giorno`: un rendiconto di fine trimestre puo' cadere
+    in un giorno senza seduta, e allora vale l'ultima — dichiarata con la sua data. None se non ce n'e'."""
+    prima = [(d, v) for d, v in serie if d <= giorno and v is not None]
+    return max(prima) if prima else None
+
+
+def rendimento_rendiconto(r, qqq=None, bce=None, commissione_usd=None):
+    """v523 — il rendimento del deposito titoli fra inizio e fine di un rendiconto, a Dietz modificato:
+    (V1 − V0 − F) / (V0 + Σ f·(T − t)/T), con V il valore dei titoli piu' i ratei del BTP, F i movimenti (acquisti
+    entrano, vendite e cedole escono) e ogni movimento pesato per i giorni che restano. I numeri sono quelli del broker;
+    se la tabella non somma al totale che il rendiconto dichiara il rendimento NON si calcola (meglio niente che un
+    numero sbagliato, v396). Accanto: il contributo di ogni titolo (la somma e' il guadagno: un'identita', v326), i costi
+    che i controvalori non comprendono (bollo; commissioni a `commissione_usd` per ordine, al cambio del movimento), la
+    verifica del cambio dei movimenti contro la BCE del giorno, e QQQ in euro sugli stessi giorni (prezzo senza
+    dividendi, come il deposito). qqq: [{t, c}] della fonte; bce: [[data, dollari per euro]]."""
+    out = {"inizio": r.get("inizio"), "fine": r.get("fine"), "prodotto": r.get("prodotto"), "conto": r.get("conto"),
+           "bollo": r.get("bollo")}
+    val, ini, fin = r.get("valori") or {}, r.get("inizio"), r.get("fine")
+    try:
+        d0, d1 = datetime.fromisoformat(ini).date(), datetime.fromisoformat(fin).date()
+    except (TypeError, ValueError):
+        return {**out, "errore": "date d'inizio e di fine illeggibili"}
+    T = (d1 - d0).days
+    if not val or T <= 0:
+        return {**out, "errore": "nessun valore d'inizio e di fine, o un periodo vuoto"}
+    if any(v.get("inizio") is None or v.get("fine") is None for v in val.values()):
+        return {**out, "errore": "un valore della tabella e' illeggibile: " + ", ".join(
+            t for t, v in val.items() if v.get("inizio") is None or v.get("fine") is None)}
+    s0, s1 = sum(v["inizio"] for v in val.values()), sum(v["fine"] for v in val.values())
+    tot = r.get("totale_fine")
+    if tot is None or abs(s1 - tot) > RENDICONTO_SOMMA_TOLLERANZA:
+        return {**out, "errore": f"la tabella somma {_it(s1, 2)} € al {_data_it(fin)} e il rendiconto dichiara "
+                                 f"{_it(tot, 2)} €: non quadra, e il rendimento non si calcola"}
+    ratei = r.get("ratei") or {}
+    rat0, rat1 = ratei.get(ini), ratei.get(fin)
+    v0, v1 = s0 + (rat0 or 0.0), s1 + (rat1 or 0.0)
+    flussi, fuori, contrib = [], [], {t: v["fine"] - v["inizio"] for t, v in val.items()}
+    for m in r.get("movimenti") or []:
+        segno = 1 if m.get("verso") == "acquisto" else -1 if m.get("verso") == "vendita" else 0
+        if not segno or m.get("eur") is None or not m.get("data") or not (ini < m["data"] <= fin) or m["tk"] not in val:
+            fuori.append(m)
+            continue
+        flussi.append((m["data"], segno * m["eur"]))
+        contrib[m["tk"]] -= segno * m["eur"]
+    btp = next((t for t in val if t.startswith("BTP")), None)
+    for c in r.get("cedole") or []:
+        if c.get("netto") is None or not c.get("data") or not (ini < c["data"] <= fin) or btp is None:
+            fuori.append(c)
+            continue
+        flussi.append((c["data"], -c["netto"]))
+        contrib[btp] += c["netto"]
+    if btp is not None:
+        contrib[btp] += (rat1 or 0.0) - (rat0 or 0.0)
+    F = sum(f for _, f in flussi)
+    W = sum(f * (d1 - datetime.fromisoformat(d).date()).days / T for d, f in flussi)
+    guadagno, den = v1 - v0 - F, v0 + W
+    if den <= 0:
+        return {**out, "errore": "capitale medio nullo o negativo: il rendimento non e' definito"}
+    ordini = [m for m in r.get("movimenti") or [] if m not in fuori]
+    comm = None
+    if commissione_usd is not None:
+        fx_mov = [m["azioni"] * m["prezzo"] / m["eur"] for m in ordini if m.get("azioni") and m.get("prezzo") and m["eur"]]
+        comm = sum(commissione_usd / f for f in fx_mov) if len(fx_mov) == len(ordini) else None
+    costi = (r.get("bollo") or 0.0) + (comm or 0.0)
+    out.update({"giorni": T, "v0": v0, "v1": v1, "flussi": F, "pesati": W, "guadagno": guadagno, "capitale": den,
+                "rendimento": guadagno / den, "n_movimenti": len(ordini),
+                "n_cedole": len([c for c in r.get("cedole") or [] if c not in fuori]), "fuori": fuori,
+                "ratei": (rat0, rat1), "contributi": contrib, "commissioni": comm, "commissione_usd": commissione_usd,
+                "netto": (guadagno - costi) / den if comm is not None else None})
+    # il cambio dei movimenti contro la BCE del giorno (una verifica, non un ingresso del calcolo)
+    if bce:
+        bm = {d: v for d, v in bce}
+        sc = [abs(m["azioni"] * m["prezzo"] / m["eur"] / bm[m["data"]] - 1) for m in ordini
+              if m.get("azioni") and m.get("prezzo") and m["eur"] and bm.get(m["data"])]
+        out["cambio_verificato"] = {"n": len(sc), "di": len(ordini), "scarto_max": max(sc) if sc else None}
+    # QQQ in euro sugli stessi giorni
+    q = [(x.get("t"), x.get("c")) for x in (qqq or [])]
+    a, b = _alla_data(q, ini), _alla_data(q, fin)
+    fa, fb = (_alla_data([tuple(x) for x in bce], ini), _alla_data([tuple(x) for x in bce], fin)) if bce else (None, None)
+    if a and b and fa and fb and a[0] < b[0]:
+        out["qqq"] = {"da": a, "a": b, "fx_da": fa, "fx_a": fb, "usd": b[1] / a[1] - 1,
+                      "eur": (b[1] / fb[1]) / (a[1] / fa[1]) - 1}
+    else:
+        out["qqq"] = {"errore": "lo storico letto non copre i due giorni" if not (a and b and a[0] < b[0]) else
+                      "il cambio BCE dei due giorni non c'e' nella lettura"}
+    return out
+
+
+def rendimenti_rendiconti(rd, qqq=None, bce=None):
+    """[rendimento_rendiconto(r) per ogni rendiconto], piu' i trimestri CONTIGUI concatenati (la fine dell'uno e'
+    l'inizio dell'altro). None se la sezione manca: il dato che manca, non un rendimento nullo."""
+    if rd is None:
+        return None
+    rs = [rendimento_rendiconto(r, qqq, bce, rd.get("commissione_usd")) for r in rd.get("rendiconti") or []]
+    ok = sorted((x for x in rs if "rendimento" in x), key=lambda x: x["inizio"])
+    catena = None
+    if len(ok) >= 2 and all(ok[i]["inizio"] == ok[i - 1]["fine"] for i in range(1, len(ok))):
+        p = 1.0
+        for x in ok:
+            p *= 1 + x["rendimento"]
+        catena = {"inizio": ok[0]["inizio"], "fine": ok[-1]["fine"], "n": len(ok), "rendimento": p - 1}
+    return {"rendiconti": rs, "catena": catena, "commissione_usd": rd.get("commissione_usd")}
+
+
+def righe_rendimento(x):
+    """La resa del blocco RENDIMENTO DEL DEPOSITO TITOLI (v523): fatti del broker, coi loro denominatori e i costi
+    che i controvalori non comprendono; cio' che manca si nomina."""
+    if x is None:
+        return ["RENDIMENTO DEL DEPOSITO TITOLI (v523): sezione RENDICONTO TRIMESTRALE assente in LIBRO.md — il "
+                "rendimento fra due rendiconti non si calcola (il dato che manca, non un rendimento nullo)"]
+    L = ["RENDIMENTO DEL DEPOSITO TITOLI (v523) — dai rendiconti trimestrali del broker (LIBRO.md §1terdecies): il "
+         "capitale INVESTITO nei titoli, a Dietz modificato (ogni movimento pesato per i giorni nel deposito), non il conto"]
+    if not x["rendiconti"]:
+        L.append("  nessun rendiconto registrato in §1terdecies")
+    for r in x["rendiconti"]:
+        testa = f"  dal {_data_it(r['inizio'])} al {_data_it(r['fine'])}" + (
+            f" (rendiconto prodotto il {_data_it(r['prodotto'])})" if r.get("prodotto") else "")
+        if r.get("errore"):
+            L.append(f"{testa}: ⚠ {r['errore']}")
+            continue
+        L.append(f"{testa}: {_sg(r['rendimento'] * 100, 2)}% · guadagno {_sg(r['guadagno'], 0)} € su un capitale medio "
+                 f"di {_it(r['capitale'], 0)} € · {r['giorni']} giorni, {_conta(r['n_movimenti'], 'movimento', 'movimenti')}"
+                 + (f", {_conta(r['n_cedole'], 'cedola', 'cedole')}" if r["n_cedole"] else "")
+                 + (" · ⚠ ratei del BTP non dichiarati a una delle due date" if None in r["ratei"] else ""))
+        if r.get("commissioni") is not None:
+            L.append(f"    fuori dai controvalori del rendiconto: bollo {_it(r.get('bollo') or 0, 2)} € e commissioni "
+                     f"~{_it(r['commissioni'], 0)} € ({_conta(r['n_movimenti'], 'ordine', 'ordini')} a "
+                     f"{_it(r['commissione_usd'], 2)} $, la commissione misurata) → al netto {_sg(r['netto'] * 100, 2)}%")
+        else:
+            L.append(f"    fuori dai controvalori: bollo {_it(r.get('bollo') or 0, 2)} € · commissioni NON stimate (manca "
+                     "la commissione per ordine in §1terdecies): il rendimento qui sopra e' prima delle commissioni")
+        q = r.get("qqq") or {}
+        if q.get("errore"):
+            L.append(f"    QQQ in euro sugli stessi giorni: n.d. — {q['errore']}")
+        else:
+            L.append(f"    QQQ in euro sugli stessi giorni (prezzo senza dividendi, come il deposito): {_sg(q['eur'] * 100, 2)}% "
+                     f"· in dollari {_sg(q['usd'] * 100, 2)}% ({_it(q['da'][1], 2)} → {_it(q['a'][1], 2)} $; euro "
+                     f"{_it(q['fx_da'][1], 4)} → {_it(q['fx_a'][1], 4)})"
+                     + (f" · sedute del {_data_it(q['da'][0])} e del {_data_it(q['a'][0])}"
+                        if (q["da"][0], q["a"][0]) != (r["inizio"], r["fine"]) else ""))
+        cs = sorted(((t, v) for t, v in r["contributi"].items() if round(v) != 0), key=lambda z: -z[1])
+        L.append("    da dove viene (contributo in euro, prezzo e cambio insieme; per chi e' entrato o uscito conta il "
+                 "tratto tenuto): " + " · ".join(f"{t} {_sg(v, 0)}" for t, v in cs))
+        cv = r.get("cambio_verificato")
+        if cv and cv.get("n"):
+            L.append(f"    ⚠ i controvalori dei movimenti sono al cambio BCE del giorno, non al cambio applicato dal broker "
+                     f"(verificato ora: {cv['n']} su {cv['di']}, scarto massimo {_it(cv['scarto_max'] * 100, 3)}%)")
+        else:
+            L.append("    il cambio dei movimenti non e' verificato: la lettura BCE non copre quei giorni")
+        if r.get("fuori"):
+            L.append(f"    ⚠ {_conta(len(r['fuori']), 'riga', 'righe')} fuori dal periodo o illeggibili, lasciate fuori dal "
+                     "calcolo: " + ", ".join(f"{m.get('tk', 'cedola')} {_data_it(m.get('data'))}" for m in r["fuori"]))
+        if r.get("conto"):
+            L.append(f"    conto corrente al {_data_it(r['conto']['data'])}: {_it(r['conto']['eur'], 2)} € — il fatto del "
+                     "broker sulla liquidita' a quella data (non entra nel rendimento)")
+    if x.get("catena"):
+        c = x["catena"]
+        L.append(f"  concatenati, dal {_data_it(c['inizio'])} al {_data_it(c['fine'])} ({c['n']} rendiconti contigui): "
+                 f"{_sg(c['rendimento'] * 100, 2)}%")
+    L.append("  ⚠ non nei controvalori: imposte sulle plusvalenze realizzate e dividendi incassati · il ROI dall'inizio "
+             "del conto resta NON CALCOLABILE senza i versamenti")
+    return L
+
+
 def nuova_riga(seduta, az, obb, barre, cassa_eur, pat, colore, precedente=None, adesso=None):
     """La riga della seduta CONCLUSA `seduta`. az {tk: quantita'} in dollari, obb {tk: nominale} in
     euro, pat = patrimonio_pipeline(). I prezzi si salvano per le posizioni di oggi E per quelle della
@@ -3108,6 +3351,8 @@ def sintesi(o):
         L.extend(righe_cambio(o["cambio"]))
     if "conto" in o:                      # v520
         L.extend(righe_roi(o["conto"]))
+    if "rendiconti" in o:                 # v523
+        L.extend(righe_rendimento(o["rendiconti"]))
     if "decisioni" in o:
         L.extend(righe_decisioni(o["decisioni"], (o.get("calendario") or {}).get("finestra") or 45))
     if "rimandate" in o:

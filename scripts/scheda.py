@@ -64,6 +64,8 @@ SEZIONI = (
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
     ("cambio", "0bis · Cambio euro/dollaro: l'esposizione del libro al dollaro e le operazioni col loro cambio"),  # v516
     ("roi_conto", "0bis · ROI del conto: la fotografia del broker, i carichi in euro, le operazioni chiuse"),     # v520
+    ("rendimento_deposito", "0bis · Rendimento del deposito titoli fra due rendiconti del broker, contro QQQ in "
+                            "euro"),                                                             # v523
     ("decisioni", "0bis · Decisioni aperte e rimandate"),
     ("ordini", "0bis · Ordini aperti"),
     ("credito_libro", "0ter · Credito sul libro"),
@@ -180,6 +182,7 @@ CATALOGO = {
         Blocco(r"SCADENZE", "attesa"),
         Blocco(r"CAMBIO EURO/DOLLARO", "cambio", (Nome(rf"  {TK} +carico ", "cambio", "copia"),)),        # v516
         Blocco(r"ROI DEL CONTO", "roi_conto"),                                                           # v520
+        Blocco(r"RENDIMENTO DEL DEPOSITO TITOLI", "rendimento_deposito"),                                # v523
         Blocco(r"DECISIONI APERTE", "decisioni"),
         Blocco(r"RIMANDATE DI PROPOSITO", "decisioni"),
         Blocco(r"ORDINI APERTI", "ordini"),
@@ -275,6 +278,7 @@ REGISTRO = {
     "attesa": Voce(("attesa",)),
     "cambio": Voce(("cambio",)),                                                                       # v516
     "roi_conto": Voce(("roi_conto",)),                                                                 # v520
+    "rendimento_deposito": Voce(("rendimento_deposito",)),                                             # v523
     "rendimento_capitale": Voce((), (Marcatore("schede", "rendimento del capitale", "tutti"),          # v520
                                      Marcatore("watchlist", "rendimento del capitale", "sorvegliati"))),
     "stato_sistema": Voce(("stato_sistema",)),                                                         # v518

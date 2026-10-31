@@ -284,6 +284,10 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    euro come il broker lo dichiara, quanto viene dai prezzi e quanto dal cambio, le operazioni chiuse con le imposte; il
    ROI dall'inizio del conto si dice non calcolabile finche' mancano i versamenti netti, e la fotografia del broker si
    rinnova dopo ogni operazione (una fotografia superata il blocco la nomina).
+   Da v523 (CEO, 31/10/2026: *"Scegli tu le soluzioni"*) il **rendimento del deposito titoli** fra due rendiconti
+   trimestrali del broker (`LIBRO.md` §1terdecies): il capitale investito a Dietz modificato, al lordo e al netto di
+   bollo e commissioni, contro QQQ in euro sugli stessi giorni, e da quali titoli viene. È un trimestre chiuso: si
+   riporta in una riga finché non arriva il rendiconto successivo, che si aggiunge alla sezione e si concatena.
    E il **registro della performance** (v474): libro in dollari e patrimonio in euro contro QQQ,
    il riferimento scelto dal CEO il 09/10, dalla prima riga a oggi.
 3. **Rischio** — peso contro quota del rischio; beta sul Nasdaq col suo R²; segnalare solo se cambia.
@@ -588,6 +592,7 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[cambio]` il cambio euro/dollaro: quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio, dove sta il cambio nel suo anno, e per ogni operazione col suo cambio (LIBRO.md §1decies) il risultato in euro scomposto in effetto del prezzo ed effetto del cambio, con l'imposta in euro (30/10)
 - `[rendimento_capitale]` ROIC e ROE di ogni posizione e sorvegliato e dei concorrenti, dai bilanci con la data dei 12 mesi e degli esercizi chiusi: il ROIC sul capitale investito come la fonte lo pubblica, il ROE con la leva dichiarata quando il patrimonio e' meno di meta' del capitale, il ROE della fonte dichiarato quando differisce (31/10) — informazione, non una prova
 - `[roi_conto]` il ROI del conto dalla fotografia del broker (LIBRO.md §1duodecies): il guadagno sul carico delle posizioni aperte in euro e in dollari, il carico in euro di ogni posizione come base fiscale col risultato fra prezzo e cambio, le operazioni chiuse con le imposte, e il ROI dall'inizio del conto dichiarato non calcolabile finche' mancano i versamenti (31/10)
+- `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno
 strumento: il gate della v505 non lascia l'una senza l'altra.

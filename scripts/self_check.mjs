@@ -199,7 +199,9 @@ const SUITE = [
   /* v520: 1001 punti di chiamata (+21 su ROIC e ROE nelle schede, nei concorrenti e negli ingressi, e sul ROI del conto
      dal broker) -> 985 */
   /* v521: 1012 punti di chiamata (+11 su BTP e debito a margine letti in sessione) -> 995 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1010, firma: /\d+\/\d+ CHECK OK/ },
+  /* v523: 1039 punti di chiamata in test_analisi_libro (+14 sul rendiconto trimestrale del broker e sul rendimento del
+     deposito titoli) -> 1025 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1025, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

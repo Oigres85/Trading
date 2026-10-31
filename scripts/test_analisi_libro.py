@@ -6887,6 +6887,9 @@ _U505 = {
         # v520 — il ROI del conto dalla fotografia del broker
         "ROI DEL CONTO (v520, richiesta del CEO del 31/10/2026) — dalla fotografia del broker del 31/10/2026 alle 08:04",
         "  posizioni APERTE (azioni e BTP): carico 1.000 € → controvalore 1.100 € · +100 € = +10,00% sul carico",
+        # v523 — il rendimento del deposito titoli fra due rendiconti del broker
+        "RENDIMENTO DEL DEPOSITO TITOLI (v523) — dai rendiconti trimestrali del broker (LIBRO.md §1terdecies)",
+        "  dal 30/06/2026 al 30/09/2026: +7,76% · guadagno +23.000 € su un capitale medio di 296.264 €",
         "DECISIONI APERTE: nessuna in LIBRO.md §1quinquies", "RIMANDATE DI PROPOSITO — si riprendono all'evento",
         "  BBB — l'uscita: in pari", "ORDINI APERTI: nessuno attivo in LIBRO.md §1septies",
         "CREDITO SUL LIBRO — chi brucia cassa: 40,0% · BBB", "TENUTA DELLE POSIZIONI — bilancio dell'evidenza",
@@ -10023,6 +10026,145 @@ check("v522 la resa del BTP: il prezzo piu' recente con la sua voce e la sua dat
       "rateo netto dichiarato (il valore resta a corso secco)",
       "101,630 del 30/10/2026 (prezzo di riferimento)" in _rb522 and "prezzo ufficiale 101,591 del 29/10/2026" in _rb522
       and "rateo netto 0,2568 ogni 100 di nominale" in _rb522, _rb522)
+
+
+# ══ v523 — IL RENDICONTO TRIMESTRALE DEL BROKER (LIBRO.md §1terdecies) E IL RENDIMENTO DEL DEPOSITO TITOLI ═══════════
+#   Il CEO, 31/10/2026: «Scegli tu le soluzioni. Allego documenti ma non aggiornatissimi». Il rendimento fra due
+#   rendiconti a Dietz modificato: lo stato si COSTRUISCE, e l'aritmetica attesa si scrive qui a mano (v326)
+_LIB523 = """## 1duodecies. IL CONTO DAL BROKER — altro
+| AAA | 9,00 | 9,00 | 9,00 |
+
+## 1terdecies. RENDICONTO TRIMESTRALE DEL DEPOSITO TITOLI — dal broker (v523)
+
+**Rendiconto dal 31/03/2026 al 30/06/2026** (prodotto il 15/07/2026)
+
+- totale titoli al 30/06/2026: 2.300,00 €
+- ratei del BTP: 10,00 € al 31/03/2026 · 12,00 € al 30/06/2026
+- conto corrente al 30/06/2026: 500,00 €
+- imposta di bollo del trimestre: 1,00 € (da inizio anno 2,00 €)
+- cedola del BTP pagata nel trimestre: 10/04/2026, 20,00 € lordi, 17,50 € netti — **calcolata**
+
+| Titolo | 31/03/2026 € | 30/06/2026 € | Cambio medio di carico |
+|---|---|---|---|
+| BTP-V28 | 1.000,00 | 990,00 | 1,00 |
+| AAA | 1.000,00 | 1.210,00 | 1,10 |
+| BBB | 0,00 | 100,00 | 1,10 |
+
+| Data | Titolo | Movimento | Azioni | Prezzo $ | Controvalore € |
+|---|---|---|---|---|---|
+| 30/04/2026 | BBB | acquisto | 1 | 110,00 | 100,00 |
+| 15/07/2026 | AAA | vendita | 1 | 100,00 | 90,00 |
+
+- **Commissione per ordine eseguito su NYSE e Nasdaq: 11,00 $** — misurata
+
+## 2. ALTRO
+| CCC | 1,00 | 2,00 | 3,00 |
+"""
+_rd523 = NL.leggi_rendiconti(_LIB523)
+_r523 = (_rd523 or {"rendiconti": [{}]})["rendiconti"][0]
+check("v523 leggi_rendiconti: il periodo, la data di produzione, totale, ratei alle due date, conto corrente, bollo, la "
+      "cedola, i valori di ogni titolo e i movimenti, e la commissione misurata — solo dentro il proprio titolo (le "
+      "tabelle di §1duodecies e di §2 non entrano)",
+      _rd523 is not None and _r523.get("inizio") == "2026-03-31" and _r523.get("fine") == "2026-06-30"
+      and _r523.get("prodotto") == "2026-07-15" and _r523.get("totale_fine") == 2300.0
+      and _r523.get("ratei") == {"2026-03-31": 10.0, "2026-06-30": 12.0}
+      and _r523.get("conto") == {"data": "2026-06-30", "eur": 500.0} and _r523.get("bollo") == 1.0
+      and _r523.get("cedole") == [{"data": "2026-04-10", "lordo": 20.0, "netto": 17.5}]
+      and set(_r523.get("valori") or {}) == {"BTP-V28", "AAA", "BBB"}
+      and (_r523.get("valori") or {}).get("AAA") == {"inizio": 1000.0, "fine": 1210.0, "fx_carico": 1.1}
+      and len(_r523.get("movimenti") or []) == 2 and _rd523.get("commissione_usd") == 11.0, str(_rd523))
+check("v523 senza la sezione il lettore torna None e la resa dice che il dato MANCA (non un rendimento nullo, v406)",
+      NL.leggi_rendiconti("## 1. POSIZIONI\n| X | 1 | 2 | 3 |\n") is None and NL.rendimenti_rendiconti(None) is None
+      and "assente" in NL.righe_rendimento(None)[0] and "non un rendimento nullo" in NL.righe_rendimento(None)[0])
+# l'aritmetica attesa, scritta qui a mano: T = 91 giorni, l'acquisto del 30/04 resta 61 giorni, la cedola esce il 10/04
+#   (81 giorni); il movimento del 15/07 e' FUORI dal periodo e non entra
+_v0, _v1 = 2000.0 + 10.0, 2300.0 + 12.0
+_F = 100.0 - 17.5
+_W = 100.0 * 61 / 91 - 17.5 * 81 / 91
+_att523 = (_v1 - _v0 - _F) / (_v0 + _W)
+_qqq523 = [{"t": "2026-03-31", "c": 500.0}, {"t": "2026-06-29", "c": 540.0}, {"t": "2026-06-30", "c": 550.0}]
+_bce523 = [["2026-03-31", 1.10], ["2026-04-30", 1.10], ["2026-06-30", 1.00]]
+_x523 = NL.rendimenti_rendiconti(_rd523, _qqq523, _bce523) or {"rendiconti": [{}]}
+_y523 = _x523["rendiconti"][0]
+check("v523 Dietz modificato: (V1 − V0 − F) / (V0 + Σ f·(T − t)/T), coi ratei del BTP nel valore, l'acquisto che entra, "
+      "la cedola netta che esce, e il movimento fuori dal periodo lasciato fuori e nominato",
+      abs((_y523.get("rendimento") or 0) - _att523) < 1e-12 and _y523.get("giorni") == 91
+      and abs((_y523.get("guadagno") or 0) - 219.5) < 1e-9 and _y523.get("n_movimenti") == 1
+      and _y523.get("n_cedole") == 1 and [m.get("data") for m in _y523.get("fuori") or []] == ["2026-07-15"], str(_y523))
+_ct523 = _y523.get("contributi") or {}
+check("v523 il contributo di ogni titolo: fine − inizio − acquisti + vendite, e sul BTP la cedola e la variazione dei ratei; "
+      "la somma e' il guadagno (un'identita', v326)",
+      abs(_ct523.get("AAA", 0) - 210.0) < 1e-9 and abs(_ct523.get("BBB", 1) - 0.0) < 1e-9
+      and abs(_ct523.get("BTP-V28", 0) - (990 - 1000 + 17.5 + 2.0)) < 1e-9
+      and abs(sum(_ct523.values()) - (_y523.get("guadagno") or 0)) < 1e-9, str(_ct523))
+check("v523 i costi fuori dai controvalori: il bollo e la commissione misurata per ordine, al cambio del movimento (11 $ "
+      "a 1,10 = 10 €), tolti dal guadagno sullo stesso capitale medio",
+      abs((_y523.get("commissioni") or 0) - 10.0) < 1e-9
+      and abs((_y523.get("netto") or 0) - (219.5 - 1.0 - 10.0) / (_v0 + _W)) < 1e-12, str(_y523.get("netto")))
+_qq523 = _y523.get("qqq") or {}
+check("v523 QQQ in euro sugli stessi giorni: prezzo in dollari diviso il riferimento BCE di ciascun giorno",
+      abs((_qq523.get("usd") or 0) - 0.10) < 1e-12 and abs((_qq523.get("eur") or 0) - (550 / 1.0) / (500 / 1.10) + 1) < 1e-12
+      and (_y523.get("cambio_verificato") or {}).get("n") == 1
+      and abs((_y523.get("cambio_verificato") or {}).get("scarto_max", 1)) < 1e-12, str(_qq523))
+_qqw523 = NL.rendimento_rendiconto(_r523, [{"t": "2026-03-31", "c": 500.0}, {"t": "2026-06-26", "c": 530.0}], _bce523)
+check("v523 un giorno senza seduta vale l'ultima seduta prima, dichiarata con la sua data; uno storico che non copre i "
+      "due giorni non da' un numero",
+      (_qqw523.get("qqq") or {}).get("a") == ("2026-06-26", 530.0)
+      and "sedute del 31/03/2026 e del 26/06/2026" in "\n".join(NL.righe_rendimento({"rendiconti": [_qqw523], "catena": None}))
+      and "errore" in (NL.rendimento_rendiconto(_r523, [{"t": "2026-06-30", "c": 1.0}], _bce523).get("qqq") or {}))
+_nq523 = NL.rendimento_rendiconto({**_r523, "totale_fine": 2299.0})
+check("v523 una tabella che non somma al totale dichiarato dal rendiconto NON da' un rendimento: lo dice (v396)",
+      "rendimento" not in _nq523 and "non quadra" in str(_nq523.get("errore"))
+      and "non quadra" in "\n".join(NL.righe_rendimento({"rendiconti": [_nq523], "catena": None})))
+_r2523 = {**_r523, "inizio": "2026-06-30", "fine": "2026-09-30", "prodotto": None, "movimenti": [], "cedole": [],
+          "ratei": {}, "valori": {"AAA": {"inizio": 1000.0, "fine": 1100.0, "fx_carico": 1.1}}, "totale_fine": 1100.0}
+_cat523 = NL.rendimenti_rendiconti({"rendiconti": [_r2523, _r523], "commissione_usd": None})
+check("v523 due rendiconti CONTIGUI si concatenano (prodotto dei due), in qualunque ordine siano scritti; senza la "
+      "commissione misurata le commissioni non si stimano e la resa lo dice",
+      abs(((_cat523 or {}).get("catena") or {}).get("rendimento", 0) - ((1 + _att523) * 1.1 - 1)) < 1e-12
+      and ((_cat523 or {}).get("catena") or {}).get("inizio") == "2026-03-31"
+      and "commissioni NON stimate" in "\n".join(NL.righe_rendimento(_cat523)))
+_rr523 = "\n".join(NL.righe_rendimento(_x523))
+check("v523 la resa: il rendimento, il capitale medio, i costi e il netto, QQQ in euro, i contributi, il cambio dei "
+      "movimenti verificato, il conto corrente datato, e il ROI dall'inizio del conto ancora NON CALCOLABILE",
+      "RENDIMENTO DEL DEPOSITO TITOLI" in _rr523 and f"{NL._sg(_att523 * 100, 2)}%" in _rr523
+      and "al netto" in _rr523 and "QQQ in euro sugli stessi giorni" in _rr523 and "AAA +210" in _rr523
+      and "cambio BCE del giorno" in _rr523 and "conto corrente al 30/06/2026: 500,00 €" in _rr523
+      and "NON CALCOLABILE" in _rr523 and "Dietz modificato" in _rr523, _rr523)
+
+# il libro vero
+_lib523 = (Path(__file__).resolve().parent.parent / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_rv523 = NL.leggi_rendiconti(_lib523) or {"rendiconti": []}
+_ve523 = [NL.rendimento_rendiconto(r) for r in _rv523["rendiconti"]]
+check("v523 il libro vero: almeno un rendiconto letto, che somma al totale dichiarato (il rendimento esce), coi contributi "
+      "che sommano al guadagno, e ogni movimento valorizzato a un cambio fra 1 e 1,3 dollari per euro",
+      len(_ve523) >= 1 and all("rendimento" in v for v in _ve523)
+      and all(abs(sum(v["contributi"].values()) - v["guadagno"]) < 0.01 for v in _ve523)
+      and all(1.0 < m["azioni"] * m["prezzo"] / m["eur"] < 1.3 for r in _rv523["rendiconti"] for m in r["movimenti"]),
+      str([v.get("errore") for v in _ve523]))
+_bk523 = NL.leggi_conto_broker(_lib523) or {"chiuse": []}
+_lordi523 = {"ORCL": 145.55, "SMCI": 32.81}     # i prezzi di vendita dichiarati dal CEO (LIBRO.md §1)
+check("v523 la commissione per ordine di §1terdecies e' quella che lo storico del broker implica: azioni × (prezzo "
+      "dichiarato − prezzo netto) sulle vendite registrate — un numero misurato, riletto, non scritto a mano due volte",
+      _rv523.get("commissione_usd") is not None and len([c for c in _bk523["chiuse"] if c["tk"] in _lordi523]) >= 2
+      and all(abs(c["azioni"] * (_lordi523[c["tk"]] - c["prezzo_netto"]) - _rv523["commissione_usd"]) < 0.01
+              for c in _bk523["chiuse"] if c["tk"] in _lordi523), str(_rv523.get("commissione_usd")))
+_sez523 = _lib523.split("## 1terdecies.")[1].split("\n## ")[0] if "## 1terdecies." in _lib523 else ""
+check("v523 il rendiconto nel libro NON porta identificativi personali (il repository e' pubblico): nessun numero di "
+      "conto o di deposito, IBAN, codice fiscale o CAP con citta', nessuna delle etichette che li accompagnano — sonde di "
+      "FORMA, non i dati veri, su tutto il libro",
+      bool(_sez523) and not re.search(r"\b\d[A-Z]\d{8,}\b", _lib523)
+      and not re.search(r"\bIT\d{2}[A-Z]\d{10}[0-9A-Z]{12}\b", _lib523)
+      and not re.search(r"\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b", _lib523)
+      and not re.search(r"\b\d{5}\s+[A-Z]{3,}\s+[A-Z]{2}\b", _lib523)
+      and not any(e in _lib523.upper() for e in ("INTESTATARIO", "CONTO COLLEGATO", "NUMERO DEPOSITO",
+                                                    "NUMERO CONTO", "DOSSIER TITOLI DI")))
+_src_nl523 = Path(NL.__file__).read_text(encoding="utf-8")
+check("v523 il collegamento: calcola legge i rendiconti con le barre di QQQ del periodo e la BCE del giro, e la sintesi "
+      "stampa il blocco subito dopo il ROI del conto",
+      'out["rendiconti"] = rendimenti_rendiconti(leggi_rendiconti(), B.get("QQQ"),' in _src_nl523
+      and '((giro["scelta"] or {}).get("eurusd") or {}).get("anno"))' in _src_nl523
+      and _src_nl523.find('L.extend(righe_rendimento(o["rendiconti"]))') > _src_nl523.find('L.extend(righe_roi(o["conto"]))') > 0)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

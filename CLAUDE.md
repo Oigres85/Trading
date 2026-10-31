@@ -9336,3 +9336,53 @@ pipeline non vuol più dire «l'analisi è sbagliata».
 - Pavimenti: `test_update_data.py` 395 → 405 (417 punti di chiamata) e N_CHECKS_MINIMO 419 → 428 (430 eseguiti),
   `test_analisi_libro.py` 995 → 1010 (1025 punti di chiamata, 1034 check). `?v=` e `BUILD_VERSION` non toccati: nessun
   file servito al browser (v440).
+
+## 📄 v523 — IL RENDICONTO DEL BROKER: IL ROI DI UN TRIMESTRE SI CALCOLA, E LA LIQUIDITÀ HA UN'ANCORA
+
+Il CEO, 31/10/2026, testuale: *"Scegli tu le soluzioni. Allego documenti ma non aggiornatissimi"* (il messaggio si
+interrompe a «Riporto a»). Due PDF: il **rendiconto del deposito titoli al 30/09/2026** (prodotto dal broker il
+23/10/2026) e il **documento di sintesi delle condizioni del 26/07/2024**. Letti per intero e **verificati prima di
+usarli**; nel repository nessun nome, indirizzo, numero di conto o di deposito.
+
+### Cosa i documenti hanno chiuso, e cosa no
+| domanda | esito |
+|---|---|
+| il ROI | **dall'inizio del conto resta NON CALCOLABILE** (il rendiconto non porta i versamenti), ma **fra due rendiconti il rendimento del capitale investito sì**: 3° trimestre 2026 **+7,76%** (Dietz modificato, 92 giorni, 15 movimenti, 1 cedola), **+7,65%** al netto di bollo (153,30 €) e commissioni (~196 €) — **QQQ in euro +0,80%** sugli stessi giorni. Da dove: MSTR +10.125 €, NVDA +6.890, PLTR +6.233 … MU −5.254 |
+| la liquidità | **49.338,74 € al 30/09/2026**, un fatto del broker. Ricostruita da lì con le operazioni di ottobre del libro: **~24.640 € al 30/10** (~24.490 col bollo) contro i **~24.000 dichiarati**; vale la dichiarazione, e lo scarto (2-3%) si dichiara |
+| GOOGL e WDC | le uscite «di circa il 2%» dichiarate a voce il 01/10 hanno data e prezzo: GOOGL 24/09 a 348,84 $, WDC 23/09 a 458,80 $ — **WDC era pari in dollari**, non +2% (+112 € in euro per il cambio) |
+| il cambio applicato | **non ricostruibile dal BCE**: con la commissione misurata, nessuna delle 8 regole (giorno o successivo, con o senza lo scarto dello 0,05% del documento) riproduce entrambe le plusvalenze del broker (la più vicina sbaglia di 4 € e di 25 €). Il broker usa un suo listino: la base fiscale resta il carico in euro della fotografia (v520) |
+| la commissione | **15,00 $ per ordine, MISURATA** sulle due vendite dello storico (prezzo dichiarato meno prezzo netto, esattamente 15,00 $ su ORCL e su SMCI). Il documento del 2024 diceva 0,16% con un minimo di 12 $: superato, come il CEO avvertiva |
+
+### ⚠⚠ Un controvalore del broker non è un cambio del broker
+Quantità × prezzo ÷ controvalore dà, **su 15 movimenti su 15, il riferimento BCE del giorno del movimento** (scarto
+massimo 0,038%): il rendiconto valorizza i movimenti a una convenzione sua, senza commissioni e senza il cambio
+applicato. Leggerlo come il cambio dell'operazione avrebbe «verificato» la stima BCE della v516 con un numero che è la
+stessa stima. *Una fonte autorevole può contenere una convenzione, non un fatto: prima di usarla come prova si
+controlla da che cosa è costruita* (classe v393, la verifica circolare).
+
+### `numeri_libro.py`: il blocco RENDIMENTO DEL DEPOSITO TITOLI
+- `leggi_rendiconti` legge `LIBRO.md` §1terdecies, una sezione propria: le tabelle a 4 e a 6 colonne in §1duodecies
+  sarebbero finite nella fotografia (che legge ogni riga da 5 colonne in su). Più rendiconti si concatenano se contigui.
+- `rendimento_rendiconto`: valori dei titoli più i ratei del BTP; acquisti che entrano, vendite e cedole che escono,
+  ciascuno pesato per i giorni che restano. **Se la tabella non somma al totale che il rendiconto dichiara il rendimento
+  non si calcola** (v396). Il contributo di ogni titolo somma al guadagno (identità, v326); i costi fuori dai controvalori
+  (bollo, commissione misurata al cambio di ciascun movimento) danno il netto; QQQ in euro col **prezzo senza dividendi**,
+  come il deposito; un giorno senza seduta vale l'ultima seduta prima, dichiarata.
+- ⚠ La cedola del BTP del 10/07 il rendiconto non la stampa: è **calcolata** dalle condizioni che stampa (4,10% annuo,
+  trimestrale, prossima cedola che passa dal 10/07 al 10/10) e dal 12,50%, e la riga del libro lo dichiara.
+- È un trimestre chiuso: il numero non cambia fino al rendiconto successivo, che si aggiunge alla sezione.
+
+### 🧪 Il metodo
+- **16 iniezioni**, una alla volta su quattro copie verificate per impronta, con `modifica_sicura` e ripristino dallo
+  snapshot (v427, v430): **mordono tutte e 16, ciascuna sul controllo atteso**, nessuna per
+  eccezione — fra queste i ratei tolti dal valore, i pesi dei giorni azzerati, la cedola dimenticata, un movimento
+  fuori dal periodo contato, il controllo della somma tolto, la commissione non convertita al cambio del movimento,
+  QQQ «in euro» senza il cambio, il giorno senza seduta preso dal lato sbagliato, la catena che dipende dall'ordine,
+  il lettore che esce dalla propria sezione, la commissione cambiata nel solo libro, un numero di deposito finto nel
+  libro, il blocco tolto dal catalogo della scheda.
+- Il gate v505 nei due versi ha dichiarato ASSENTE la richiesta nuova perché la sua fixture non aveva il blocco: il suo
+  lavoro, come in v513 e v520.
+- ⚠ **Il gate degli identificativi ora guarda TUTTO il libro**, con sonde di FORMA (numero di conto, IBAN, codice
+  fiscale, CAP con città) e le etichette che li accompagnano nei documenti del broker: mai i dati veri nel test.
+- Pavimento di `test_analisi_libro.py` 1010 → 1025 (1039 punti di chiamata, 1048 check). `?v=` e `BUILD_VERSION` non
+  toccati: nessun file servito al browser (v440).

@@ -48,7 +48,17 @@ l'acquisto di ORCL (testuale: *"Liquidità residua in euro 24k"*). Sella riconve
 era ~23.200 €: ~47.040 € fino al 28/10, meno i tre acquisti (§1decies) al riferimento BCE della loro seduta — GOOGL del 29/10,
 37 × 282 = 10.434 $ ≈ 9.375 € a 1,1130; INTC del 30/10, 130 × 64,50 = 8.385 $ ≈ 7.505 € a 1,1172; ORCL del 30/10,
 60 × 129,60 = 7.776 $ ≈ 6.960 € a 1,1172 —, commissioni e margine di cambio del broker esclusi. La dichiarazione sta circa
-800 € sopra la stima, e la dichiarazione vale. Storia dei ~47.040 €: i 45.000 €
+800 € sopra la stima, e la dichiarazione vale. ⚠ **Ricostruita dal rendiconto del broker** (v523, §1terdecies): il conto
+corrente al 30/09/2026 era 49.338,74 €; più la cedola netta del BTP del 10/10 (358,75 €), le due vendite al prezzo netto
+dello storico del broker (ORCL 10.173,50 $, SMCI 8.187,50 $) meno le loro imposte (58,76 € e 62,81 €), e meno ogni acquisto
+di ottobre — le medie di RGTI e CRWV dalla differenza dei carichi del broker, gli altri col prezzo dichiarato più la
+commissione misurata di 15 $ — ciascuno al riferimento BCE del giorno di valuta, quelli del 30/10 al
+riferimento del 30/10 perché quello del 02/11 non c'è ancora —, al 30/10 la liquidità viene **~24.640 €** (~24.490 € se il
+bollo del trimestre, 153,30 €, è stato addebitato in ottobre: il rendiconto non dice quando). La dichiarazione sta ~500-640 €
+sotto, il 2-3%: vale la dichiarazione, e lo scarto non è spiegato dai dati qui presenti (il cambio applicato dal broker,
+movimenti del conto corrente che il libro non vede). Sulle dichiarazioni precedenti la stessa ricostruzione dà ~53.400-53.600 €
+la sera del 15/10 (dichiarati 56.600) e ~46.400-46.500 € il 17/10 (dichiarati 45.000): le cifre a voce oscillano di
+qualche migliaio attorno al conto, e una cifra del broker vale più di entrambe. Storia dei ~47.040 €: i 45.000 €
 dichiarati dal CEO il 17/10/2026 (testuale: *"La liquiditita è di 45k"*), più la vendita di SMCI del 19/10 (250 × 32,81 $
 = 8.202,50 $ ≈ 7.317 € a EUR/USD 1,121, il cambio della pipeline quel giorno) e meno le due medie di CRWV, del 20/10
 (205 × 81,41 − 155 × 87,07 = 3.193,20 $ ≈ 2.842 € a 1,1236) e del 23/10 (255 × 76,14 − 205 × 81,41 = 2.726,65 $ ≈
@@ -85,8 +95,10 @@ il broker in euro, col cambio di carico.
 Destinazione dichiarata: acquisti su storni e IPO di Anthropic.
 
 > ⚠ **USCITE DICHIARATE DAL CEO il 01/10/2026: GOOGL (50) e WDC (25) venduti per intero "la
-> settimana scorsa", con un guadagno di circa il 2% su entrambi.** Prezzi e data esatti NON
-> confermati: ~+2% sul PMC corrisponde a ~347 $ (GOOGL) e ~467 $ (WDC). Il ricavato, al netto
+> settimana scorsa", con un guadagno di circa il 2% su entrambi.** Dal 31/10/2026 data e prezzo
+> sono **confermati dal rendiconto del broker** (§1terdecies): GOOGL 50 il 24/09/2026 a 348,84 $,
+> WDC 25 il 23/09/2026 a 458,80 $ — WDC era stata comprata il 07/08 a 458,60: in dollari pari, non
+> +2%; in euro +112 € prima delle commissioni, perché il dollaro si è rafforzato fra le due date. Il ricavato, al netto
 > dell'imposta, è **liquidità o è stato reinvestito: da confermare**. Finché non lo è, la
 > liquidità qui sopra è SOTTOSTIMATA, e le misure del livello C sotto (fotografia del 07/09)
 > includono ancora i due titoli: pesi e contributo al rischio vanno ricalcolati.
@@ -995,10 +1007,113 @@ broker le calcola)
 | 20/10/2026 | 20/10/2026 | SMCI | vendita | 250 | 32,75 | +241,58 | 62,81 | — |
 
 ⚠ Lo storico registrato è **parziale**: le altre vendite del 2026 (WDC, la prima GOOGL, …), le cedole del BTP e i
-dividendi non ci sono, e il CEO il 31/10/2026 ha detto di non avere altro che il grafico del conto:
+dividendi non ci sono — date, quantità e prezzi delle vendite del 3° trimestre sono nel rendiconto (§1terdecies, v523),
+che però non stampa le loro plus/minusvalenze, e il CEO il 31/10/2026 ha detto di non avere altro che il grafico del conto:
 restano fuori, e il blocco lo dichiara. «Prezzo netto» è il prezzo di vendita al netto delle commissioni; le
 imposte sono il 26% della plusvalenza in euro. «Plus/minus precedenti: —» dice che il broker non ha compensato
 minusvalenze pregresse su queste due vendite.
+
+## 1terdecies. RENDICONTO TRIMESTRALE DEL DEPOSITO TITOLI — dal broker, trimestre per trimestre (v523)
+
+Il CEO, 31/10/2026, testuale: *"Scegli tu le soluzioni. Allego documenti ma non aggiornatissimi"*: il rendiconto del
+deposito titoli al 30/09/2026 (prodotto dal broker il 23/10/2026) e il documento di sintesi delle condizioni del
+26/07/2024. Qui stanno i numeri **come il rendiconto li stampa**, coi titoli abbinati per ISIN. ⚠ Nome, indirizzo,
+numeri del conto e del deposito che i documenti portano **non si scrivono**: il repository è pubblico.
+`scripts/numeri_libro.py` legge questa sezione (blocco «RENDIMENTO DEL DEPOSITO TITOLI»): il rendimento del capitale
+investito nei titoli fra due rendiconti, a **Dietz modificato** (ogni movimento pesato per i giorni in cui è rimasto
+nel deposito), contro QQQ in euro sugli stessi giorni. È il rendimento del capitale **investito**, non del conto: la
+liquidità e i versamenti non entrano, e non servono.
+
+**Rendiconto dal 30/06/2026 al 30/09/2026** (prodotto il 23/10/2026)
+
+- totale titoli al 30/09/2026: 304.007,70 €
+- ratei del BTP: 364,95 € al 30/06/2026 · 365,43 € al 30/09/2026
+- conto corrente al 30/09/2026: 49.338,74 € (il totale del rendiconto, titoli e ratei e conto, è 353.711,87 €)
+- imposta di bollo del trimestre: 153,30 € (da inizio anno 387,60 €)
+- cedola del BTP pagata nel trimestre: 10/07/2026, 410,00 € lordi, 358,75 € netti — **calcolata** dalle condizioni
+  che il rendiconto stampa (4,10% annuo, pagamento trimestrale, prossima cedola che passa dal 10/07/2026 al 10/10/2026)
+  e dall'imposta del 12,50% sui titoli di Stato: il rendiconto non stampa l'incasso, che va sul conto
+
+| Titolo | 30/06/2026 € | 30/09/2026 € | Cambio medio di carico |
+|---|---|---|---|
+| BTP-V28 | 41.399,44 | 40.604,03 | 1,00 |
+| AMD | 50.983,85 | 53.875,83 | 1,07 |
+| GOOGL | 15.682,38 | 0,00 | — |
+| BE | 0,00 | 9.757,11 | 1,16 |
+| AVGO | 8.288,35 | 0,00 | — |
+| CBRS | 5.818,85 | 0,00 | — |
+| CRWV | 0,00 | 8.056,01 | 1,16 |
+| MRVL | 0,00 | 9.772,63 | 1,15 |
+| META | 14.831,23 | 0,00 | — |
+| MU | 70.914,78 | 65.660,68 | 1,04 |
+| NVDA | 47.414,69 | 54.304,36 | 1,08 |
+| ORCL | 0,00 | 8.464,11 | 1,14 |
+| PLTR | 10.239,60 | 16.472,92 | 1,13 |
+| RGTI | 10.088,99 | 6.417,98 | 1,17 |
+| SKHY | 0,00 | 7.297,89 | 1,16 |
+| MSTR | 13.198,96 | 23.324,15 | 1,16 |
+| WDC | 0,00 | 0,00 | — |
+
+| Data | Titolo | Movimento | Azioni | Prezzo $ | Controvalore € |
+|---|---|---|---|---|---|
+| 02/07/2026 | ORCL | acquisto | 70 | 143,18 | 8.792,44 |
+| 13/07/2026 | SKHY | acquisto | 50 | 169,04 | 7.398,46 |
+| 16/07/2026 | CBRS | vendita | 30 | 189,68 | 4.962,37 |
+| 16/07/2026 | SKHY | vendita | 50 | 171,78 | 7.490,18 |
+| 29/07/2026 | AVGO | vendita | 25 | 379,03 | 8.326,67 |
+| 29/07/2026 | RGTI | vendita | 32 | 14,16 | 398,15 |
+| 30/07/2026 | META | vendita | 30 | 587,17 | 15.349,60 |
+| 30/07/2026 | RGTI | vendita | 100 | 13,36 | 1.163,73 |
+| 07/08/2026 | MRVL | acquisto | 42 | 214,44 | 7.807,85 |
+| 07/08/2026 | WDC | acquisto | 25 | 458,60 | 9.939,32 |
+| 10/08/2026 | BE | acquisto | 40 | 214,38 | 7.421,03 |
+| 10/08/2026 | SKHY | acquisto | 45 | 139,33 | 5.426,21 |
+| 19/08/2026 | CRWV | acquisto | 105 | 97,34 | 8.807,33 |
+| 23/09/2026 | WDC | vendita | 25 | 458,80 | 10.051,70 |
+| 24/09/2026 | GOOGL | vendita | 50 | 348,84 | 15.344,42 |
+
+Quantità al 30/06/2026 (il rendiconto le stampa, e coi movimenti danno quelle del 30/09): AMD 100, GOOGL 50, AVGO 25,
+CBRS 30, META 30, MU 70, NVDA 270, PLTR 100, RGTI 595, MSTR 173, BTP 40.000 nominali.
+
+**Cosa i due documenti dicono, verificato prima di usarlo:**
+- ⚠ **i controvalori dei movimenti sono al cambio BCE DEL GIORNO, senza commissioni**: quantità × prezzo ÷ controvalore
+  dà il riferimento BCE della data del movimento in 15 movimenti su 15, entro lo 0,04%. È la convenzione con cui il
+  broker valorizza il rendiconto (e calcola il bollo), **non** il cambio applicato all'operazione;
+- il **cambio medio di carico** del rendiconto (due decimali) coincide con quello che il carico in euro della fotografia
+  del 31/10 (§1duodecies) implica — carico in dollari di §1 diviso carico in euro — entro l'arrotondamento su 7 posizioni
+  invariate su 8 (AMD, MU, PLTR, MSTR, SKHY, MRVL, BE); NVDA ne sta fuori dello 0,7% (1,072 contro 1,08): i dati qui
+  presenti non dicono se per le commissioni di acquisti lontani o per il frazionamento del 2024;
+- le uscite del 2026 che il CEO aveva dichiarato a voce il 01/10 hanno ora data e prezzo: **GOOGL** 50 vendute il
+  24/09/2026 a 348,84 $, **WDC** 25 vendute il 23/09/2026 a 458,80 $ (comprate il 07/08 a 458,60: in dollari pari, in
+  euro +112 € prima delle commissioni, perché il dollaro si è rafforzato fra le due date). E le altre del trimestre:
+  CBRS, AVGO, META, un andata e ritorno su SKHY (13/07 → 16/07), RGTI da 595 a 463 azioni;
+- la **liquidità al 30/09/2026 era 49.338,74 €**, cioè il «circa 50.000 €» dichiarato dal CEO il 01/10/2026 (§1).
+
+**Le condizioni del broker** (documento di sintesi del 26/07/2024 — il più recente che il CEO ha, e lo dichiara non
+aggiornato):
+- **nessun conto in dollari**: le compravendite si regolano in euro, convertendo a ogni operazione (conferma il *"Tutta
+  in euro"* del 30/10, §1decies). Cambio definitivo: quello del **giorno lavorativo successivo** all'operazione; scarto
+  dello **0,05%** sul riferimento BCE per gli ordini dalle piattaforme X-Trading; nessuna commissione valutaria su
+  quelle piattaforme. ⚠ Verificato su due vendite di ottobre (ORCL, SMCI), con la commissione misurata qui sotto anche
+  sull'acquisto: **nessuna delle 8 regole sul riferimento BCE** — giorno dell'operazione o successivo, all'acquisto e
+  alla vendita, con o senza lo scarto — **riproduce entrambe le plusvalenze del broker**; la più vicina sbaglia di 4 €
+  su ORCL e di 25 € su SMCI. Il broker usa un proprio listino («cartello dei cambi»):
+  il cambio applicato non si ricostruisce dal BCE al centesimo, e la sola base fiscale resta il carico in euro della
+  fotografia (§1duodecies). Fra due giorni consecutivi il BCE si è mosso fino allo 0,84% nel trimestre (29/07 → 30/07):
+  è l'ordine di grandezza dell'incertezza di una stima al cambio della seduta;
+- **Commissione per ordine eseguito su NYSE e Nasdaq: 15,00 $** — **misurata**, non quella del documento: sulle due
+  vendite di ottobre il prezzo netto dello storico del broker (§1duodecies) sta esattamente 15,00 $ sotto il prezzo
+  dichiarato dal CEO (ORCL: 70 × 145,55 = 10.188,50 $ lordi, 10.173,50 netti; SMCI: 250 × 32,81 = 8.202,50 $ lordi,
+  8.187,50 netti). Il documento del 2024 scriveva 0,16% con un minimo di 12 $, che su quelle due vendite darebbe
+  16,30 $ e 13,12 $: è superato, come il CEO avvertiva;
+- **imposta di bollo**: 0,20% annuo sul valore dei titoli, in proporzione ai giorni (153,30 € nel 3° trimestre);
+- **dividendi esteri** (condizioni del 2024): commissione valutaria dello 0,15% con un minimo di 3,00 € e spese
+  d'accredito di 1,81 € fra 10,01 e 51,65 € (8,50 € sopra): un dividendo sotto i 3 € lo assorbe per intero la sola
+  commissione valutaria minima.
+
+⚠ **Il rendiconto non porta**: i versamenti e i prelievi del conto, le imposte sulle plusvalenze realizzate, i dividendi
+incassati. Il ROI dall'inizio del conto resta **non calcolabile** (§1undecies, chiusa il 31/10/2026); il rendimento del
+trimestre qui sopra non ne ha bisogno, perché misura i titoli e non il conto.
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
