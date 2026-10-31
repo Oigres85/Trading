@@ -3431,3 +3431,8 @@ if __name__ == "__main__":
     if a.json:
         Path(a.json).write_text(json.dumps(o, default=str, indent=1))
     print(sintesi(o))
+    # v524 — il risultato per la sintesi operativa, solo dal giro dell'ultima seduta (il comando unico lo lancia con
+    #   --sedute 1): un giro a cinque sedute descrive un altro periodo
+    import comuni
+    if a.sedute == 1:
+        comuni.scrivi_del_giro(comuni.file_del_giro("libro"), {k: v for k, v in o.items() if k not in ("notizie",)})

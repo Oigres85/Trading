@@ -1115,6 +1115,55 @@ aggiornato):
 incassati. Il ROI dall'inizio del conto resta **non calcolabile** (§1undecies, chiusa il 31/10/2026); il rendimento del
 trimestre qui sopra non ne ha bisogno, perché misura i titoli e non il conto.
 
+## 1quattuordecies. LE LUCI DEL REGIME — la sintesi operativa (v524, decisione del CEO del 31/10/2026)
+
+Il CEO, testuale: *"Procedi su tutto e facciamo una prova"*, sull'analisi per INCROCI (regime × libro, tesi × prezzo,
+credito × prezzo, eventi × tutto). `scripts/sintesi.py` raccoglie i dati del mercato in **sei famiglie**, e ogni famiglia
+ha un colore: 🟢 favorevole · 🟡 neutro · 🟠 sfavorevole · 🔴 in tensione · ⚪ non misurata. **Sono convenzioni, non
+misure** (v240), e **non si sommano**: nessun punteggio d'insieme (v200). Non vendono e non comprano: danno il quadro in
+cui leggere la tenuta e gli ingressi. Dove una soglia esiste già — credito e tassi del semaforo, §1ter — la luce usa
+quella: due verdetti diversi sulla stessa cosa sarebbero il difetto peggiore.
+
+- **Crescita e utili** — gli utili dell'S&P 500 sull'anno (FactSet) e le revisioni dei leader (la famiglia del
+  semaforo). 🟢 crescita da +10% con le attese battute almeno quanto la media a 5 anni e le revisioni non accese ·
+  🔴 utili in calo o revisioni accese · 🟡 il resto. Gli investimenti delle grandi piattaforme cloud non sono una serie:
+  si verificano in rete, ogni volta.
+- **Tassi e Fed** — il decennale contro la soglia del semaforo (5,4), e FedWatch. 🔴 sopra la soglia · 🟠 entro 0,3
+  punti · 🟡 un rialzo alla prossima riunione prezzato da 50% · 🟢 il resto.
+- **Credito** — la famiglia CREDITO del semaforo, la stessa: 🟠 accesa · 🔴 high yield oltre 4,0 · 🟢 spenta.
+- **Rischio percepito** — VIX, curva del VIX, Fear & Greed, put/call, DIX, gamma, leva. 🔴 VIX/VIX3M da 1 (curva
+  invertita) · 🟠 VIX dall'80° percentile dell'anno o Fear & Greed fino a 25 · 🟡 VIX dal 60° o Fear & Greed fino a 45 ·
+  🟢 il resto. ⚠ È un TERMOMETRO: misurato in §1ter, non anticipa i cali più del caso.
+- **Flussi verso il libro** — SMH meno SPY sulle stesse 21 sedute concluse (il libro è per oltre metà semiconduttori).
+  🟢 da +5 punti · 🟠 da −5 · 🔴 da −10 · 🟡 il resto. Contesto: l'S&P a pesi uguali e i grandi operatori (CFTC).
+- **Valutazione** — il P/E dell'S&P 500 sugli utili attesi (FactSet) contro la sua media a 10 anni, e il CAPE. 🔴 oltre
+  il 20% sopra la media · 🟠 oltre il 10% · 🟢 sotto la media col CAPE sotto l'80° percentile dei 20 anni · 🟡 il resto.
+
+**La mappa tesi × prezzo** è la TENUTA (§1sexies) disegnata, non una regola nuova: prezzo ROTTO = la prova della
+tendenza contro (chiusura sotto la media a 200 con la 50 sotto la 200), tesi FORTE = almeno una prova di crescita a
+favore (ricavi, stime o revisioni). Rotto × forte è per costruzione il CONFLITTO.
+
+**Soglie** (convenzioni del 31/10/2026; il codice le rilegge da qui e un gate le confronta):
+- `CRESCITA_FORTE` = 10 — utili dell'S&P sull'anno, in %
+- `TASSI_VICINO` = 0,3 — punti dalla soglia del decennale del semaforo
+- `RIALZO_PROB` = 50 — probabilità di rialzo alla prossima riunione, in %
+- `VIX_ALTO` = 80 — percentile del VIX nell'anno
+- `VIX_MEDIO` = 60 — percentile del VIX nell'anno
+- `FG_PAURA_FORTE` = 25 — Fear & Greed
+- `FG_PAURA` = 45 — Fear & Greed
+- `TERMINE_INVERTITA` = 1 — VIX / VIX3M
+- `FLUSSI_CONTRO` = 5 — punti di SMH meno SPY a 21 sedute
+- `FLUSSI_FORTE` = 10 — punti di SMH meno SPY a 21 sedute
+- `VAL_SOPRA` = 1,10 — P/E prospettico su media a 10 anni
+- `VAL_MOLTO` = 1,20 — P/E prospettico su media a 10 anni
+- `CAPE_ALTO` = 80 — percentile del CAPE sui 20 anni
+- `LIVELLO_ATR` = 1 — un pavimento o la media a 200 entro questa distanza è un punto di decisione vicino
+- `SETTORI_CORR` = 0,3 — settori in tendenza con correlazione col libro sotto questa soglia
+
+**Il registro delle analisi** (`memoria/registro_analisi.jsonl`): una fotografia per analisi — luci, semaforo, caselle
+ed esiti — e il confronto si fa con l'ultima analisi di una SEDUTA diversa (le misure stanno sulle sedute concluse: due
+analisi della stessa seduta vedono gli stessi prezzi). Si scrive solo da un giro completo.
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da

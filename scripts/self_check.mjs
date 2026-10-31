@@ -201,7 +201,9 @@ const SUITE = [
   /* v521: 1012 punti di chiamata (+11 su BTP e debito a margine letti in sessione) -> 995 */
   /* v523: 1039 punti di chiamata in test_analisi_libro (+14 sul rendiconto trimestrale del broker e sul rendimento del
      deposito titoli) -> 1025 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1025, firma: /\d+\/\d+ CHECK OK/ },
+  /* v524: 1064 punti di chiamata in test_analisi_libro (+25 sulla sintesi operativa: luci, mappa, registro, agenda,
+     collegamenti) -> 1050 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1050, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

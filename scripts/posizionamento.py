@@ -1236,6 +1236,7 @@ def _cot(anno):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-memoria", action="store_true", help="non scrive memoria/cboe_putcall.jsonl")
+    ap.add_argument("--json", help="v524 — scrive le misure per la sintesi operativa (scripts/sintesi.py)")
     a = ap.parse_args()
     adesso = datetime.now(NEW_YORK)
     oggi = adesso.date()
@@ -1343,6 +1344,14 @@ def main():
              + (" (si registra solo a borsa chiusa o dalle 16:30 di New York)" if not nuove_tit else "")
              + ("" if not a.no_memoria else " — NON scritta (--no-memoria)"))
     print("\n".join(L))
+    # v524 — le misure di mercato che la sintesi incrocia: gli stessi stati che le righe qui sopra rendono (v161)
+    import comuni
+    percorso = a.json or comuni.file_del_giro("posizionamento")
+    if percorso:
+        spy = rie.get("SPY") or {}
+        mens = scadenze_mensili(spy["scadenze"], oggi) if spy.get("scadenze") else []
+        comuni.scrivi_del_giro(percorso, {"pc": stato_pc(memoria), "dix": dix, "cot": cot_stato(righe_c),
+                                          "mensile": mens[0] if mens else None})
 
 
 if __name__ == "__main__":

@@ -2371,6 +2371,14 @@ if __name__ == "__main__":
     o = raccogli()
     if a.json:
         Path(a.json).write_text(json.dumps(o, default=str, indent=1))
+    import comuni                     # v524 — il piano e i settori per la sintesi operativa (scripts/sintesi.py)
+    _pi = o.get("piano") or {}
+    _cv = ("tk", "fonte", "px", "corr", "gruppo", "posizione", "conseguenze", "stop", "perdita_eur", "perdita_pct",
+           "trimestrale", "pend50", "ingresso")
+    comuni.scrivi_del_giro(comuni.file_del_giro("rotazione"), {
+        "piano": {"patrimonio": _pi.get("patrimonio"), "liquidita": _pi.get("liquidita"), "cambio": _pi.get("cambio"),
+                  "voci": [{k: v.get(k) for k in _cv} for v in _pi.get("voci") or []]},
+        "settori": [{k: x.get(k) for k in ("etf", "nome", "stato", "m1", "m3", "corr_libro")} for x in o.get("settori") or []]})
     if a.tutti:
         print("\n".join(righe(o)))
     else:

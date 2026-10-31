@@ -9386,3 +9386,67 @@ controlla da che cosa è costruita* (classe v393, la verifica circolare).
   fiscale, CAP con città) e le etichette che li accompagnano nei documenti del broker: mai i dati veri nel test.
 - Pavimento di `test_analisi_libro.py` 1010 → 1025 (1039 punti di chiamata, 1048 check). `?v=` e `BUILD_VERSION` non
   toccati: nessun file servito al browser (v440).
+
+## 🧭 v524 — LA SINTESI OPERATIVA: L'ANALISI PARTE DALLE DECISIONI, NON DALLE FONTI
+
+Il CEO, 31/10/2026, testuale: *"Io voglio avere tutto ma non voglio passare un'ora a leggere avere un'infarinatura tale
+per cui da capire la situazione com'è ed eventualmente porti delle domande per singoli aspetti"*. Due prove le ha
+respinte: un resoconto discorsivo, e un inventario di tutte le fonti (*"troppo disordinata … tu che mi consigli? Conosci
+tutti i dati che abbiamo come è utile a intersecarli per operare in prospettiva?"*). Sull'impostazione per INCROCI —
+regime × libro, tesi × prezzo, credito × prezzo, eventi × tutto — ha risposto *"Procedi su tutto e facciamo una prova"*.
+
+### Cosa fa `scripts/sintesi.py`: incrocia, non ricalcola
+Gira **dopo** gli strumenti del giro e **prima** dello stato del sistema (`analisi.POI`), e legge i loro risultati da
+`memoria/dati/giro/<nome>.json` (fuori da git). Li scrivono numeri_libro, rotazione, indici e posizionamento alla fine
+del loro `__main__` (`comuni.file_del_giro`, `comuni.scrivi_del_giro`). La cartella la indica la variabile
+`TRADING_GIRO`, che `analisi.prepara_giro` imposta e **svuota prima** degli strumenti: un file di un giro precedente non
+può passare per questo. Fuori dal giro nessuno strumento scrive niente.
+- **Sei luci del regime** (crescita e utili, tassi e Fed, credito, rischio percepito, flussi verso il libro,
+  valutazione), con 🟢🟡🟠🔴 e ⚪ «non misurata». Sono convenzioni (v240) e **non si sommano** (v200). Dove una soglia
+  esiste già, la luce usa quella: la luce del credito È la famiglia credito del semaforo, il decennale legge
+  `NL.SOGLIA_T10`. Due verdetti sulla stessa cosa sarebbero il difetto peggiore. Il rischio percepito si dichiara un
+  TERMOMETRO (misurato in §1ter, v500). Le altre soglie stanno in `LIBRO.md` §1quattuordecies, e un gate le rilegge.
+- **Il libro nel regime**: esposizione, credito sul libro, e l'**incrocio** fra i flussi e la quota di semiconduttori.
+- **La mappa tesi × prezzo** è la TENUTA disegnata, non una regola nuova. Prezzo rotto = la prova della tendenza contro;
+  tesi forte = almeno una prova di crescita a favore. Rotto × forte è per costruzione il CONFLITTO di
+  `NL.regola_esito`, e un gate lo verifica su tutte le combinazioni delle prove. Accanto ai nomi: 📅 per i conti entro
+  14 giorni e ⚠ per gli allarmi di credito, short e diluizione, con le funzioni e le soglie delle schede (v161).
+- **Cosa è cambiato**: `memoria/registro_analisi.jsonl` tiene una fotografia per analisi (luci, semaforo, caselle,
+  esiti). Il confronto si fa con l'ultima analisi di una **seduta diversa**: due analisi della stessa seduta vedono gli
+  stessi prezzi. Si scrive solo da un giro **completo** — con un file mancante le luci ⚪ farebbero leggere al confronto
+  dopo un cambiamento mai avvenuto — e mai dalle suite.
+- **Agenda e livelli**: conti nei 21 giorni, l'esame di ogni CONFLITTO sette giorni prima dei conti, la Fed, la mensile;
+  la media a 200 e il pavimento più vicino entro 1 ATR.
+- **Le azioni delle regole**, casella per casella, e gli **ingressi** che stanno dentro la zona, diversificano e non
+  hanno i conti entro 14 giorni, in ordine di quanto riducono la volatilità del libro.
+
+### La risposta in chat, e il dettaglio nella scheda
+`FORMATO_ANALISI.md` ha la sezione nuova **«La risposta in chat, in quest'ordine»**: verdetto, luci, libro nel regime,
+mappa, cosa è cambiato, agenda e livelli, come muoversi, domande, stato del sistema. La regola: *un dato entra quando
+sposta una decisione o è cambiato; altrimenti è nella scheda*. La sezione di prima resta come DETTAGLIO di ogni blocco.
+La checklist che `analisi.py` stampa mette prima l'ordine della risposta, poi il dettaglio, poi le regole, e senza la
+sezione nuova lo dichiara. La scheda completa apre con la sintesi (`scheda.SEZIONI[0]`).
+
+### 🧪 Il metodo
+- Tre gate vecchi sono stati riagganciati, nessuno zittito: v473 (la checklist cominciava col dettaglio), v511 (la
+  freschezza apriva la scheda: ora è la prima sezione dei DATI, dopo la sintesi) e v512 (la posizione della freschezza
+  dei titoli).
+- Il primo giro vero ha mostrato quattro difetti di resa, trovati leggendo l'uscita come il destinatario:
+  - quote col segno («+68,3% dell'azionario»);
+  - l'articolo «il 82%»;
+  - l'allarme di MSTR ridotto a «bilancio in zona di SICUREZZA», che non è un allarme;
+  - il salvavita a una cifra contro le due del registro (v415).
+  Il DIX non si moltiplica per cento: è già una percentuale.
+- **31 iniezioni**, una alla volta su una copia del repo verificata per impronta, con `modifica_sicura` e ripristino
+  dallo snapshot: **mordono tutte, ciascuna sul controllo atteso**. Fra queste:
+  - la casella sbagliata, una soglia cambiata nel solo codice o nel solo libro, il decennale scritto a mano;
+  - il file vecchio accettato, il registro che ignora un file mancante o la suite, il confronto sulla stessa seduta;
+  - la freccia invertita, il 📅 senza il bordo, gli allarmi con un'altra soglia, l'esame a 5 giorni, i livelli senza
+    il bordo, gli ingressi con la stessa scommessa;
+  - la quota col segno, la cartella del giro non svuotata, uno strumento che non scrive il suo file;
+  - la checklist senza il dettaglio, la sintesi eseguita dopo lo stato del sistema, il blocco tolto dal catalogo.
+- ⚠ **Due non mordevano al primo giro, ed entrambe per la FIXTURE** (v430: *un'iniezione che non morde prova che il gate
+  non contiene il fenomeno*): l'incrocio CONTRO si provava solo col 🔴 e non col 🟠, e l'agenda non aveva un nome NON in
+  conflitto coi conti vicini, quindi l'esame mandato a tutti non si vedeva. Aggiunti i due casi, mordono.
+- Pavimento di `test_analisi_libro.py` 1025 → 1050 (1064 punti di chiamata, 1073 check). `?v=` e `BUILD_VERSION` non
+  toccati: nessun file servito al browser (v440).

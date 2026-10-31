@@ -213,6 +213,11 @@ concorrenti e delle quote di mercato che l'analisi in chat riporta sempre — le
 `memoria/concorrenti.json`, con fonte e data, e la salute di ogni concorrente con le formule della pipeline — e scrive
 una memoria (`memoria/concorrenti_dati.json`, le letture dei conti): questo comando legge, non scrive.
 
+`scripts/sintesi.py` resta **fuori** per la stessa ragione di `numeri_libro.py` (v524): è la SINTESI OPERATIVA
+dell'analisi in chat — il regime in sei luci, la mappa tesi × prezzo, cosa è cambiato — e legge i risultati che gli
+strumenti del comando unico (`analisi.py`) scrivono in `memoria/dati/giro/`: fuori da quel giro non ha niente da
+incrociare, e lo dichiarerebbe.
+
 `scripts/misura_segnali_mercato.py` resta **fuori** (v500): non è un passo dell'analisi ma una MISURA da rieseguire
 quando lo storico cresce, come i due backtest — se i segnali di mercato (curva della volatilità, gamma dei dealer, dark
 pool, put/call, grandi operatori, multipli) avrebbero anticipato i cali. Il primo giro legge da fonti esterne circa

@@ -905,10 +905,16 @@ def calcola(adesso=None, memoria=None):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--no-memoria", action="store_true", help="non scrive memoria/indici.jsonl")
+    ap.add_argument("--json", help="v524 — scrive il risultato per la sintesi operativa (scripts/sintesi.py)")
     a = ap.parse_args()
     mem = leggi_memoria()
     o = calcola(memoria=mem)
     print("\n".join(sintesi(o)))
+    # v524 — la sintesi legge QUESTO risultato invece di ricalcolarlo (v161); le barre e la memoria restano fuori: la
+    #   sintesi non le usa, e il file resterebbe di megabyte
+    import comuni
+    comuni.scrivi_del_giro(a.json or comuni.file_del_giro("indici"),
+                           {k: v for k, v in o.items() if k not in ("barre", "memoria")})
     if not a.no_memoria and o["memoria_cambiata"]:
         scrivi_memoria(mem)
     st = storia_raccolta(mem)

@@ -1970,7 +1970,10 @@ check("v473 il formato dice che «Aggiorna analisi» e' il formato COMPLETO e no
       "python3 scripts/analisi.py" in _fa473 and "formato COMPLETO" in _fa473 and "non si salta" in _fa473)
 _cl473 = AN.checklist()
 check("v473 la checklist stampata e' quella del formato: sezione 7d degli ingressi, registro delle richieste, regole",
-      _cl473 is not None and _cl473.startswith(AN.TITOLO_CHECKLIST) and "7d." in _cl473 and "INGRESSI" in _cl473
+      # ⚠ v524 — riagganciato: dal 31/10 la checklist APRE con l'ordine della risposta (la sintesi per incroci) e il
+      #   dettaglio di ogni blocco viene dopo; l'invariante e' che il dettaglio del formato ci sia, non che sia in testa
+      _cl473 is not None and _cl473.startswith(AN.TITOLO_RISPOSTA) and AN.TITOLO_CHECKLIST in _cl473
+      and "7d." in _cl473 and "INGRESSI" in _cl473
       and "ingressi sulla watchlist (09/10)" in _cl473 and AN.TITOLO_REGOLE in _cl473
       and "conflitto di interessi" in _cl473)
 import tempfile as _tf473
@@ -7011,6 +7014,9 @@ _U505 = {
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
                     "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
                     "letture: 0 nuove in questo giro"],
+    # v524 — la sintesi operativa: un blocco solo, che va nella sua sezione in testa alla scheda
+    "sintesi": ["SINTESI OPERATIVA (v524) — 31/10/2026 21:24 ora italiana · ultima seduta conclusa 30/10/2026", "",
+                "1 · IL REGIME — sei famiglie", "  🟢 CRESCITA E UTILI — favorevole", "      utili +30,2%"],
     # v518 — lo stato del sistema, l'ultimo strumento del giro: tutte le sue intestazioni stanno nel catalogo
     "stato_sistema": ["STATO DEL SISTEMA — 30/10/2026 18:22 ora italiana",
                       "  esito: 1 punto da guardare (le righe con ⚠) · 1 domanda aperta al CEO", "",
@@ -7912,7 +7918,9 @@ check("v511 il comando unico esegue le fonti dirette PRIMA di tutti gli altri st
       "freschezza apre la scheda",
       AN.PRIMA[0] == "fonti_dirette.py" and all(c[1][0] == "fonti_dirette.py" for c in _coman511) and len(_coman511) == 4
       and "esegui(testa_l) + esegui(" in _solo_codice_py((_ROOT / "scripts" / "analisi.py").read_text(encoding="utf-8"))
-      and SC.SEZIONI[0][0] == "freschezza", str([c[1] for c in _coman511]))
+      # ⚠ v524 — riagganciato: la scheda apre con la SINTESI OPERATIVA (l'incrocio di tutte le sezioni), e la
+      #   freschezza e' la prima sezione dei DATI, subito dopo
+      and SC.SEZIONI[0][0] == "sintesi" and SC.SEZIONI[1][0] == "freschezza", str([c[1] for c in _coman511]))
 
 # --- gli oscillatori: le formule della pipeline, sulle sedute concluse ---
 import random as _rnd511
@@ -8346,7 +8354,7 @@ check("v512 il comando unico esegue fonti_titoli insieme alle fonti dirette, PRI
       AN.PRIMA == ("fonti_dirette.py", "fonti_titoli.py") and "fonti_titoli.py" in AN.STRUMENTI
       and all(c[1][1][0] == "fonti_titoli.py" for c in _coman512)
       and any(str(p).endswith("memoria/cds_sessione.jsonl") for p in AN.MEMORIE)
-      and SC.SEZIONI[1][0] == "freschezza_titoli" and "fonti_titoli" in SC.CATALOGO
+      and [s[0] for s in SC.SEZIONI][1:3] == ["freschezza", "freschezza_titoli"] and "fonti_titoli" in SC.CATALOGO
       and "freschezza_titoli" in SC.REGISTRO and "`python3 scripts/fonti_titoli.py`" in _fmt512
       and "[freschezza_titoli]" in _fmt512 and "Un dato vecchio non si usa come se fosse di oggi" in _fmt512
       and "`scripts/fonti_titoli.py` resta **fuori**" in _ag512)
@@ -10165,6 +10173,276 @@ check("v523 il collegamento: calcola legge i rendiconti con le barre di QQQ del 
       'out["rendiconti"] = rendimenti_rendiconti(leggi_rendiconti(), B.get("QQQ"),' in _src_nl523
       and '((giro["scelta"] or {}).get("eurusd") or {}).get("anno"))' in _src_nl523
       and _src_nl523.find('L.extend(righe_rendimento(o["rendiconti"]))') > _src_nl523.find('L.extend(righe_roi(o["conto"]))') > 0)
+
+# ══ v524 — LA SINTESI OPERATIVA: il regime in sei luci, la mappa tesi × prezzo, il registro delle analisi ════════════
+import sintesi as SI524
+import itertools as _it524
+import json as _j524
+import tempfile as _tf524
+from datetime import datetime as _dt524, timezone as _tz524, timedelta as _td524, date as _d524
+import analisi as _AN524
+import comuni as _CO524
+os.environ.pop("TRADING_GIRO", None)
+
+# la mappa e' la TENUTA disegnata: su OGNI combinazione delle prove, rotto × forte ⇔ CONFLITTO
+_err524 = []
+_vers524 = ("contro", "neutro", "favore")
+for _t in ("contro", "neutro", "favore", None):
+    for _cr in _it524.product(_vers524, repeat=len(NL.CRESCITA)):
+        for _b in _vers524:
+            _pr = {"tendenza": {"verso": _t}, **{k: {"verso": v} for k, v in zip(NL.CRESCITA, _cr)}, "bilancio": {"verso": _b}}
+            _c = SI524.casella({"prove": _pr})
+            if _t is not None:
+                _es = NL.regola_esito({k: p["verso"] for k, p in _pr.items()})
+                if (_c == ("rotto", "forte")) != (_es == NL.CONFLITTO):
+                    _err524.append((_t, _cr, _b, _c, _es))
+                if _c[0] == "rotto" and _c[1] == "senza" and _es == NL.CONFLITTO:
+                    _err524.append(("senza-conflitto", _t, _cr))
+            elif _c[0] != "nm":
+                _err524.append(("nm", _cr, _c))
+check("v524 la MAPPA e' la tenuta disegnata: su tutte le combinazioni delle prove, prezzo rotto × tesi forte ⇔ CONFLITTO "
+      "della regola_esito, e una tendenza senza verso cade nella colonna NON MISURABILE — " + str(_err524[:3]), not _err524)
+
+# le sei luci, coi bordi delle convenzioni
+_fs524 = lambda cr, bt, m5: {"rapporti": [{"crescita": {"valore": cr, "trimestre": "Q3", "tipo": "blended"},
+                                           "battono": {"valore": bt, "media5": m5}}]}
+_sp524 = {"stato": "spento", "righe": []}
+check("v524 luce CRESCITA: da +10% con le attese battute quanto la media a 5 anni e le revisioni spente e' 🟢, a +9,9% 🟡, "
+      "con le revisioni accese o gli utili in calo 🔴, senza dati ⚪ — e dice ogni volta che gli investimenti delle grandi "
+      "piattaforme cloud non sono calcolati",
+      SI524.luce_crescita(_fs524(10.0, 78, 78), _sp524)["colore"] == "🟢"
+      and SI524.luce_crescita(_fs524(9.9, 78, 78), _sp524)["colore"] == "🟡"
+      and SI524.luce_crescita(_fs524(30.0, 77, 78), _sp524)["colore"] == "🟡"
+      and SI524.luce_crescita(_fs524(30.0, 82, 78), {"stato": "acceso", "righe": []})["colore"] == "🔴"
+      and SI524.luce_crescita(_fs524(-0.1, 82, 78), _sp524)["colore"] == "🔴"
+      and SI524.luce_crescita(None, None)["colore"] == "⚪"
+      and "NON calcolati" in " ".join(SI524.luce_crescita(_fs524(10.0, 78, 78), _sp524)["dati"]))
+_fw524 = lambda p: {"meetings": [{"date": "2026-12-09", "prezzata_dal_contratto": True, "hike_prob": p, "hold_prob": 100 - p}]}
+_ft524 = lambda v, st="spento": {"stato": st, "t10": {"valore": v, "data": "2026-10-29"}}
+check("v524 luce TASSI: oltre la soglia del semaforo 🔴, entro 0,3 punti 🟠, un rialzo prezzato da 50% 🟡, il resto 🟢 — la "
+      "soglia e' quella del SEMAFORO (NL.SOGLIA_T10), non una seconda",
+      SI524.luce_tassi(_ft524(5.5, "acceso"), {}, _fw524(0))["colore"] == "🔴"
+      and SI524.luce_tassi(_ft524(NL.SOGLIA_T10 - 0.3), {}, _fw524(0))["colore"] == "🟠"
+      and SI524.luce_tassi(_ft524(NL.SOGLIA_T10 - 0.31), {}, _fw524(50))["colore"] == "🟡"
+      and SI524.luce_tassi(_ft524(NL.SOGLIA_T10 - 0.31), {}, _fw524(49))["colore"] == "🟢"
+      and SI524.luce_tassi(_ft524(None), {}, None)["colore"] == "⚪")
+_vecchia524 = NL.SOGLIA_T10
+try:
+    NL.SOGLIA_T10 = 4.9
+    _sposta524 = SI524.luce_tassi(_ft524(4.7), {}, _fw524(0))["colore"]
+finally:
+    NL.SOGLIA_T10 = _vecchia524
+check("v524 la luce dei tassi LEGGE la soglia del semaforo: spostandola, la stessa lettura cambia colore",
+      _sposta524 == "🟠" and SI524.luce_tassi(_ft524(4.7), {}, _fw524(0))["colore"] == "🟢")
+check("v524 luce CREDITO = la famiglia del semaforo: il gradino del rosso 🔴, accesa 🟠, spenta 🟢, non misurabile ⚪",
+      SI524.luce_credito({"stato": "acceso", "rosso": True}, {})["colore"] == "🔴"
+      and SI524.luce_credito({"stato": "acceso", "ccc_acceso": True}, {})["colore"] == "🟠"
+      and SI524.luce_credito({"stato": "spento"}, {})["colore"] == "🟢"
+      and SI524.luce_credito({"stato": "non misurabile"}, {})["colore"] == "⚪")
+_ri524 = lambda ter, rk, fg: SI524.luce_rischio({"termine": {"rapporto": ter}, "vol": {"VIX": {"valore": 20, "rango": rk}},
+                                                 "fear_greed": {"punteggio": fg}}, {}, None)
+check("v524 luce RISCHIO PERCEPITO: curva del VIX invertita 🔴, VIX dall'80° o Fear & Greed fino a 25 🟠, VIX dal 60° o "
+      "Fear & Greed fino a 45 🟡, il resto 🟢 — e si dichiara un TERMOMETRO",
+      _ri524(1.0, 10, 90)["colore"] == "🔴" and _ri524(0.9, 80, 90)["colore"] == "🟠" and _ri524(0.9, 10, 25)["colore"] == "🟠"
+      and _ri524(0.9, 60, 90)["colore"] == "🟡" and _ri524(0.9, 10, 45)["colore"] == "🟡"
+      and _ri524(0.9, 59, 46)["colore"] == "🟢" and _ri524(None, None, None)["colore"] == "⚪"
+      and "termometro" in " ".join(_ri524(0.9, 59, 46)["dati"]))
+_fl524 = lambda smh, spy: SI524.luce_flussi({"SMH": smh, "SPY": spy, "RSP": 0.0}, None)["colore"]
+check("v524 luce FLUSSI: SMH meno SPY a 21 sedute da -10 punti 🔴, da -5 🟠, da +5 🟢, in mezzo 🟡, senza SMH ⚪",
+      _fl524(-0.10, 0.0) == "🔴" and _fl524(-0.0999, 0.0) == "🟠" and _fl524(-0.05, 0.0) == "🟠"
+      and _fl524(-0.0499, 0.0) == "🟡" and _fl524(0.05, 0.0) == "🟢" and _fl524(None, 0.0) == "⚪")
+_va524 = lambda v, rk: SI524.luce_valutazione({"factset": {"rapporti": [{"pe": {"valore": v, "media10": 20.0}}]},
+                                               "multpl": {"cape": {"valore": 30, "rango20": rk}}})["colore"]
+check("v524 luce VALUTAZIONE: il prospettico oltre il 20% sopra la media a 10 anni 🔴, oltre il 10% 🟠, sotto la media col "
+      "CAPE sotto l'80° percentile 🟢, sotto la media col CAPE alto 🟡",
+      _va524(24.0, 50) == "🔴" and _va524(22.0, 50) == "🟠" and _va524(21.9, 50) == "🟡" and _va524(19.9, 79) == "🟢"
+      and _va524(19.9, 80) == "🟡" and _va524(None, 50) == "⚪")
+
+# le soglie: una volta in LIBRO.md, una nel codice — il gate le confronta (v474)
+_sez524 = (Path(__file__).resolve().parent.parent / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_sez524 = _sez524[_sez524.find("## 1quattuordecies"):_sez524.find("## 2. LIVELLO C")]
+_lette524 = {m.group(1): float(m.group(2).replace(",", ".")) for m in re.finditer(r"- `([A-Z_]+)` = ([0-9]+(?:,[0-9]+)?)", _sez524)}
+_diverse524 = {k: (v, getattr(SI524, k, None)) for k, v in _lette524.items() if getattr(SI524, k, None) != v}
+check("v524 le soglie delle luci stanno in LIBRO.md §1quattuordecies e il codice usa le stesse (rilette, non copiate a "
+      f"occhio) — lette {len(_lette524)}, diverse {_diverse524}",
+      len(_lette524) >= 15 and not _diverse524)
+
+# la lettura del giro: un file mancante, vecchio o rotto si dichiara
+with _tf524.TemporaryDirectory() as _d:
+    _ora = _dt524.now(_tz524.utc)
+    _m0 = SI524.leggi_giro("libro", _d, _ora)
+    Path(_d, "libro.json").write_text('{"a": 1}', encoding="utf-8")
+    _m1 = SI524.leggi_giro("libro", _d, _ora)
+    os.utime(Path(_d, "libro.json"), (_ora.timestamp() - 31 * 60, _ora.timestamp() - 31 * 60))
+    _m2 = SI524.leggi_giro("libro", _d, _ora)
+    Path(_d, "indici.json").write_text("{rotto", encoding="utf-8")
+    _m3 = SI524.leggi_giro("indici", _d, _ora)
+check("v524 leggi_giro: il file del giro si usa; assente, di oltre 30 minuti o illeggibile si DICHIARA, mai usato in "
+      "silenzio",
+      _m1 == ({"a": 1}, None) and _m0[0] is None and "non scritto" in _m0[1] and _m2[0] is None and "altro giro" in _m2[1]
+      and _m3[0] is None and "illeggibile" in _m3[1])
+
+# il registro: solo da un giro completo, mai dalle suite
+with _tf524.TemporaryDirectory() as _d:
+    _p = Path(_d) / "reg.jsonl"
+    _r_ok = SI524.registra({"x": 1}, [], _p, env={})
+    _r_m = SI524.registra({"x": 2}, ["libro.json non scritto"], _p, env={})
+    _r_s = SI524.registra({"x": 3}, [], _p, env={"TRADING_FONTI_TITOLI": "spenta"})
+    _righe = _p.read_text(encoding="utf-8").splitlines()
+check("v524 il registro delle analisi si scrive solo da un giro completo e mai dalle suite: con un file mancante le luci ⚪ "
+      "farebbero leggere al confronto dopo un cambiamento mai avvenuto",
+      _r_ok == (True, None) and not _r_m[0] and "manca" in _r_m[1] and not _r_s[0] and _righe == ['{"x": 1}'])
+
+_reg524 = [{"seduta": "2026-10-29", "quando": "2026-10-29T20:00+00:00", "luci": {}},
+           {"seduta": "2026-10-30", "quando": "2026-10-30T20:00+00:00", "luci": {}},
+           {"seduta": "2026-10-30", "quando": "2026-10-31T09:00+00:00", "luci": {}}]
+check("v524 il confronto e' con l'ultima analisi di una SEDUTA diversa; se non c'e', con l'ultima; senza registro, nessuno",
+      SI524.base_confronto(_reg524, "2026-10-30")["seduta"] == "2026-10-29"
+      and SI524.base_confronto(_reg524[1:], "2026-10-30")["quando"] == "2026-10-31T09:00+00:00"
+      and SI524.base_confronto(_reg524, "2026-11-02")["quando"] == "2026-10-31T09:00+00:00"
+      and SI524.base_confronto([], "2026-10-30") is None)
+_b524 = {"semaforo": "giallo", "luci": {"credito": "🟡", "flussi": "🔴"}, "caselle": {"AAA": "sano/forte", "BBB": "sano/forte",
+         "CCC": "rotto/forte"}, "esiti": {"AAA": "LASCIAR CORRERE", "BBB": "IN OSSERVAZIONE", "CCC": NL.CONFLITTO}}
+_f524 = {"semaforo": "arancione", "luci": {"credito": "🟠", "flussi": "🟠"}, "caselle": {"AAA": "rotto/forte", "BBB": "sano/forte",
+         "DDD": "sano/senza"}, "esiti": {"AAA": NL.CONFLITTO, "BBB": "LASCIAR CORRERE", "DDD": "IN OSSERVAZIONE"}}
+_c524 = " | ".join(SI524.cambiamenti(_b524, _f524))
+check("v524 COSA E' CAMBIATO: il semaforo, le luci con la freccia nel verso giusto, i nomi che cambiano casella, quelli che "
+      "cambiano solo esito, i nuovi e gli usciti — e senza registro lo dice",
+      "semaforo: da giallo a arancione" in _c524 and "CREDITO: ↑ peggiorata da 🟡" in _c524
+      and "FLUSSI VERSO IL LIBRO: ↓ migliorata da 🔴" in _c524
+      and "AAA: da PREZZO SANO · TESI FORTE a PREZZO ROTTO · TESI FORTE" in _c524
+      and "BBB: esito da IN OSSERVAZIONE a LASCIAR CORRERE" in _c524 and "DDD: nuovo nella mappa" in _c524
+      and "CCC: uscito dalla mappa" in _c524
+      and SI524.cambiamenti(_f524, _f524) == ["nessun cambiamento: luci, semaforo, caselle ed esiti invariati"]
+      and SI524.cambiamenti(None, _f524)[0].startswith("primo giro del registro"))
+
+# la mappa: il 📅 ai conti entro 14 giorni, al bordo
+_ten524 = {"righe": [{"tk": t, "peso": w, "esito": "IN OSSERVAZIONE", "prove": {"tendenza": {"verso": "neutro"},
+                                                                               "ricavi": {"verso": "favore"}}}
+                     for t, w in (("AAA", 0.2), ("BBB", 0.5))]}
+_mp524 = SI524.mappa(_ten524, [{"tk": "AAA", "giorni": 14}, {"tk": "BBB", "giorni": 15}], {"BBB": ["x"]})
+_sf524 = _mp524[("sano", "forte")]
+check("v524 la mappa: i nomi nella casella per peso, il 📅 ai conti entro 14 giorni (bordo compreso, 15 no), gli allarmi "
+      "accanto al nome",
+      [x["tk"] for x in _sf524] == ["BBB", "AAA"] and _sf524[1]["conti"] == 14 and _sf524[0]["conti"] is None
+      and _sf524[0]["allarmi"] == ["x"] and _sf524[1]["allarmi"] == [])
+
+# gli allarmi: le funzioni delle schede, con le soglie delle schede
+import schede_progetto as _SP524
+_al524 = SI524.allarmi({"AAA": {"short_interest": {"stato": "misurato", "pct_flottante": 20.0}},
+                        "BBB": {"short_interest": {"stato": "misurato", "pct_flottante": 19.9}},
+                        "CCC": {"azioni": {"serie": [], "var_anno": {"pct": 10.0}}},
+                        "DDD": {"azioni": {"serie": [], "var_anno": {"pct": 9.9}}}}, ["AAA", "BBB", "CCC", "DDD"])
+check("v524 allarmi: le posizioni corte dalla banda «molto alta» delle schede (20%) e la diluizione dalla loro soglia (10% "
+      "in un anno), coi bordi — le stesse costanti, non due",
+      "AAA" in _al524 and "BBB" not in _al524 and "CCC" in _al524 and "DDD" not in _al524
+      and SI524.SHORT_MOLTO_ALTA == _SP524.SI_BANDE[-1][0] and SI524.DILUIZIONE_FORTE == _SP524.AZ_DILUIZIONE_FORTE)
+
+# l'agenda e i livelli
+_lib524 = {"attesa": {"scadenze": [{"tk": "AAA", "data": "2026-11-10", "giorni": 10},
+                                   {"tk": "BBB", "data": "2026-12-01", "giorni": 31}]},
+           "tenuta": {"righe": [{"tk": "AAA", "esito": NL.CONFLITTO, "scadenza": {"data": "2026-11-10", "giorni": 10}, "esame": None,
+                                 "prove": {"tendenza": {"d200_atr": -1.0, "sma200": 50.0}},
+                                 "pavimenti": {"minimi": [{"alto": 40.0, "pct": -3.0, "atr": -1.01, "tocchi": [1, 2]}]}},
+                                {"tk": "BBB", "esito": "IN OSSERVAZIONE", "scadenza": {"data": "2026-12-01", "giorni": 31},
+                                 "prove": {"tendenza": {"d200_atr": 1.2}}, "pavimenti": {"minimi": [{"alto": 9.0, "pct": -1.0,
+                                                                                                   "atr": -0.5, "tocchi": [1]}]}},
+                                # un nome NON in conflitto coi conti vicini: il suo esame non va in agenda
+                                {"tk": "CCC", "esito": "IN OSSERVAZIONE", "scadenza": {"data": "2026-11-12", "giorni": 12},
+                                 "esame": None, "prove": {}, "pavimenti": {}}]},
+           "semaforo": {"famiglie": {"prezzo": {"d200_atr": 0.15, "sma200": 519.5}}}}
+_ag524 = SI524.agenda(_lib524, _fw524(70), {"mensile": {"data": "2026-11-20", "trimestrale": False}}, _d524(2026, 10, 31))
+_agt524 = [t for _, t in _ag524]
+check("v524 agenda: i conti nei 21 giorni (oltre no), l'esame del CONFLITTO sette giorni prima dei conti (solo per i "
+      "conflitti), la Fed e la scadenza mensile, in ordine di data",
+      "conti di AAA" in _agt524 and not any("BBB" in t for t in _agt524)
+      and not any("esame del conflitto di CCC" in t for t in _agt524)
+      and ("2026-11-03", "esame del conflitto di AAA da mandare al CEO (conti del 10/11)") in _ag524
+      and any(t.startswith("riunione della Fed") for t in _agt524) and "scadenza mensile delle opzioni" in _agt524
+      and [d for d, _ in _ag524] == sorted(d for d, _ in _ag524))
+_lv524 = SI524.livelli(_lib524)
+check("v524 livelli: la media a 200 e il pavimento entro 1 ATR (bordo compreso), oltre no; la media a 200 di SMH quando e' "
+      "vicina",
+      any(x.startswith("SMH: media a 200") for x in _lv524) and "AAA: media a 200 a 50,00 (-1,0 ATR)" in _lv524
+      and any(x.startswith("BBB: pavimento 9,00") for x in _lv524) and not any("pavimento 40,00" in x for x in _lv524)
+      and not any("BBB: media" in x for x in _lv524))
+
+# gli ingressi: dentro la zona, che diversificano, senza conti entro 14 giorni, per riduzione della volatilita'
+_v524 = lambda tk, dv, gr="DIVERSIFICANO", pos="dentro", g=None: {"tk": tk, "px": 10.0, "corr": 0.1, "gruppo": gr, "posizione": pos,
+                                                                  "conseguenze": {"dvol": dv}, "stop": 9.0, "perdita_eur": -500.0,
+                                                                  "trimestrale": {"giorni": g} if g is not None else None}
+_in524 = SI524.ingressi({"piano": {"voci": [_v524("A", -0.5), _v524("B", -1.0, "STESSA SCOMMESSA"), _v524("C", -0.9, g=14),
+                                            _v524("D", -0.8, g=15), _v524("E", -0.7, pos="sotto"), _v524("F", -0.2),
+                                            _v524("G", -0.1)]}})
+check("v524 ingressi: solo DENTRO la zona, fuori la stessa scommessa e chi ha i conti entro 14 giorni (bordo escluso, 15 "
+      "entra), in ordine di riduzione della volatilita' del libro, al piu' tre",
+      [v["tk"] for v in _in524] == ["D", "A", "F"])
+
+# la resa: le quote senza segno, l'incrocio regime × libro nei due versi, gli ⚪ dichiarati
+_lc524 = {k: SI524._luce("🟡", ["d"], "x") for k, _ in SI524.FAMIGLIE}
+_libr524 = {"fine": "2026-10-30", "semaforo": {"colore": "arancione", "accesi": ["prezzo"]}, "piano": {"peso_semi_prima": 0.683},
+            "rischio": {"vol_ann": 0.485, "beta_libro": {"QQQ": [2.15, 0.81]}, "scommesse_eff": 2.1},
+            "credito": {"misurabile": True, "peso_dipendenti": 0.185, "arrivato_al_libro": True, "condizioni": {"a": True}}}
+def _resa524(fl, motivi=()):
+    lc = dict(_lc524, flussi=SI524._luce(fl, ["d"], "x"))
+    return "\n".join(SI524.resa(_libr524, lc, {c: [] for c in SI524.CASELLE}, ["x"], None, [], [], [], [], None,
+                                list(motivi), _dt524(2026, 10, 31, 20, 0, tzinfo=_tz524.utc)))
+_t524 = _resa524("🔴")
+check("v524 resa: le QUOTE senza segno («68,3% dell'azionario», non «+68,3%»), l'incrocio regime × libro CONTRO quando i "
+      "flussi sono 🟠/🔴 e il libro e' oltre meta' semiconduttori, A FAVORE con 🟢, nessuno con 🟡, e un file del giro "
+      "mancante dichiarato in testa",
+      "semiconduttori 68,3% dell'azionario" in _t524 and "+68,3%" not in _t524 and "volatilita' 48,5%" in _t524
+      and "il regime va CONTRO la concentrazione" in _t524 and "il regime va CONTRO la concentrazione" in _resa524("🟠")
+      and "A FAVORE" in _resa524("🟢")
+      and "non spingono in nessuno dei due versi" in _resa524("🟡")
+      and "⚠ NON DISPONIBILE: indici.json non scritto" in _resa524("🟡", ["indici.json non scritto in questo giro"]))
+
+# i collegamenti: il comando unico, i quattro strumenti, il formato
+_cm524 = {f: _AN524.comandi(f) for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+check("v524 il comando unico lancia la sintesi in ogni fase, con --registra, DOPO gli strumenti del giro e prima dello "
+      "stato del sistema; il registro delle analisi e' fra le memorie da committare",
+      all([c[1] for c in v][-2:] == [["sintesi.py", "--registra"], ["stato_sistema.py", "--giro"]] for v in _cm524.values())
+      and _AN524.POI == ("sintesi.py",) and "sintesi.py" in _AN524.STRUMENTI
+      and any(p.name == "registro_analisi.jsonl" for p in _AN524.MEMORIE))
+with _tf524.TemporaryDirectory() as _d:
+    Path(_d, "vecchio.json").write_text("{}", encoding="utf-8")
+    _prima524 = os.environ.get("TRADING_GIRO")
+    try:
+        _AN524.prepara_giro(_d)
+        _env524 = os.environ.get("TRADING_GIRO")
+        _vuota524 = not list(Path(_d).glob("*.json"))
+        _fd524 = _CO524.file_del_giro("libro")
+        _sc524 = _CO524.scrivi_del_giro(_fd524, {"a": 1}) and _j524.loads(Path(_fd524).read_text()) == {"a": 1}
+    finally:
+        if _prima524 is None:
+            os.environ.pop("TRADING_GIRO", None)
+        else:
+            os.environ["TRADING_GIRO"] = _prima524
+check("v524 prepara_giro svuota la cartella (un file di un giro precedente non passa per questo) e la passa agli "
+      "strumenti; fuori dal giro nessuno strumento scrive",
+      _env524 == _d and _vuota524 and _fd524 == str(Path(_d) / "libro.json") and _sc524
+      and _CO524.file_del_giro("libro") is None and _CO524.scrivi_del_giro(None, {}) is False)
+_srcs524 = {n: (Path(__file__).resolve().parent / f"{n}.py").read_text(encoding="utf-8") for n in
+            ("numeri_libro", "rotazione", "indici", "posizionamento")}
+check("v524 i quattro strumenti scrivono il proprio risultato per la sintesi, ciascuno col proprio nome: "
+      + str([n for n, s in _srcs524.items() if f'file_del_giro("{"libro" if n == "numeri_libro" else n}")' not in s]),
+      all(f'file_del_giro("{"libro" if n == "numeri_libro" else n}")' in s for n, s in _srcs524.items())
+      and set(SI524.STRUMENTI_GIRO) == {"libro", "rotazione", "indici", "posizionamento"})
+_cman524 = _solo_codice_py((Path(__file__).resolve().parent / "analisi.py").read_text(encoding="utf-8"))
+_cman524 = _cman524[_cman524.find("def main("):]
+check("v524 nel giro la cartella si svuota PRIMA degli strumenti, e la sintesi gira dopo il resto e prima dello stato del "
+      "sistema (l'ordine di esecuzione, non solo quello dell'elenco)",
+      0 <= _cman524.find("prepara_giro()") < _cman524.find("esegui(testa_l)")
+      and "+ esegui(poi_l) + esegui(coda_l))" in _cman524)
+_cl524 = _AN524.checklist() or ""
+check("v524 la checklist mette PRIMA l'ordine della risposta in chat e poi il dettaglio di ogni blocco",
+      0 <= _cl524.find("## La risposta in chat") < _cl524.find("## Cosa contiene la risposta"))
+with _tf524.TemporaryDirectory() as _d:
+    _ff524 = Path(_d) / "F.md"
+    _ff524.write_text("# x\n\n## Cosa contiene la risposta\nMARCATORE\n\n## Regole\n- r\n", encoding="utf-8")
+    _clf524 = _AN524.checklist(_ff524)
+check("v524 senza la sezione «La risposta in chat» la checklist lo DICHIARA e stampa comunque il dettaglio",
+      "⚠ '## La risposta in chat' non trovata" in _clf524 and "MARCATORE" in _clf524)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

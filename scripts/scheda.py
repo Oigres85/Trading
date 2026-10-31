@@ -56,6 +56,8 @@ TK = r"(?P<tk>[A-Z][A-Z0-9.\-]*)"
 
 # ── le sezioni della risposta, nell'ordine di memoria/FORMATO_ANALISI.md ─────────────────────────────────────
 SEZIONI = (
+    ("sintesi", "00 · Sintesi operativa: il regime in sei luci, il libro nel regime, la mappa tesi × prezzo, cosa e' "
+                "cambiato, l'agenda e le azioni delle regole"),                                    # v524
     ("freschezza", "0 · Freschezza dei dati: chi ha servito ogni serie, e l'eta' della pipeline"),     # v511
     ("freschezza_titoli", "0 · Dati per titolo: analisti, FedWatch, CDS, short, depositi SEC e trimestri — la fonte "
                           "letta adesso contro la pipeline, e cosa cercare in rete"),                     # v512
@@ -238,6 +240,7 @@ CATALOGO = {
         Blocco(r"CONCORRENTI E QUOTE", "concorrenti"),
         Blocco(r"SENZA REGISTRO", "concorrenti"),
     ), nomi_col0=(Nome(rf"{TK} \[(?:POSIZIONE|SORVEGLIATO)\]", "concorrenti", sommario=False),)),
+    "sintesi": Strumento("sintesi", (Blocco(r"SINTESI OPERATIVA", "sintesi"),)),                          # v524
     "stato_sistema": Strumento("stato_sistema", (                                                           # v518
         Blocco(r"STATO DEL SISTEMA|CODICE — |PIPELINE SU GITHUB|DATI DI QUESTO GIRO|DIPENDENZE DA GITHUB|COERENZA DEL "
                r"LIBRO|DOMANDE APERTE AL CEO", "stato_sistema"),
@@ -281,6 +284,7 @@ REGISTRO = {
     "rendimento_deposito": Voce(("rendimento_deposito",)),                                             # v523
     "rendimento_capitale": Voce((), (Marcatore("schede", "rendimento del capitale", "tutti"),          # v520
                                      Marcatore("watchlist", "rendimento del capitale", "sorvegliati"))),
+    "sintesi_operativa": Voce(("sintesi",)),                                                          # v524
     "stato_sistema": Voce(("stato_sistema",)),                                                         # v518
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),
     "schede": Voce(("schede_testa",), (Marcatore("schede", None, "tutti"),)),

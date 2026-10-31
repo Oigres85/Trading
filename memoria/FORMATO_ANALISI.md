@@ -6,8 +6,8 @@ alla misura di un giorno.
 
 ## Quando il CEO scrive «Analisi» o «Aggiorna analisi» (istruzione del 09/10/2026)
 *"Quando ti dico aggiorna analisi devi darmi tutte le informazioni che ti ho chiesto di rendere
-strutturali."* Quindi **«Analisi» e «Aggiorna analisi» = il formato COMPLETO, sezioni 0-7, ogni
-volta**, anche a un'ora dall'ultima. Una sezione senza novità si scrive in una riga («invariato:
+strutturali."* Quindi **«Analisi» e «Aggiorna analisi» = il formato COMPLETO ogni volta** — dal 31/10 (v524) i blocchi
+della «risposta in chat» qui sotto, con dentro tutte le famiglie di dati, e la scheda completa allegata —, anche a un'ora dall'ultima. Una sezione senza novità si scrive in una riga («invariato:
 …»), **non si salta**. Solo «sintetizza» o «in poche righe» autorizzano la forma breve.
 Il 09/10 alle 20:22 un aggiornamento è uscito senza la sezione 7: da qui il comando unico.
 
@@ -208,6 +208,16 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    I conti trimestrali di una società possono fermarsi prima del trimestre che la stessa fonte dichiara chiuso
    (il 18/10: Amazon, Micron, Lenovo): un trimestre di ritardo si dichiara nella riga, oltre uno la società descrive
    un altro periodo e resta fuori dai posti, nominata.
+8bis. `python3 scripts/sintesi.py --registra` (v524, CEO, 31/10/2026: *"Procedi su tutto"*) — gira DOPO gli strumenti
+   del giro e prima dello stato del sistema: **non ricalcola niente**, incrocia ciò che numeri_libro, rotazione, indici
+   e posizionamento hanno scritto in `memoria/dati/giro/` (la variabile TRADING_GIRO, una lettura per analisi) con la
+   lettura alla fonte del giro. Stampa il **regime in sei luci** (crescita e utili · tassi e Fed · credito · rischio
+   percepito · flussi verso il libro · valutazione — soglie in `LIBRO.md` §1quattuordecies), il **libro nel regime**,
+   la **mappa tesi × prezzo** (la tenuta disegnata: prezzo rotto × tesi forte è per costruzione il CONFLITTO), gli
+   **allarmi** di credito e diluizione, **cosa è cambiato** dall'analisi precedente (il registro
+   `memoria/registro_analisi.jsonl`), l'**agenda** con i livelli entro 1 ATR e le **azioni delle regole** per casella,
+   con gli ingressi in zona che diversificano. Un file del giro che manca si dichiara: la luce è ⚪, mai calcolata su
+   dati vecchi.
 9. `python3 scripts/stato_sistema.py` (v518, CEO, 30/10/2026: *"Alla fine fai sempre un controllo generico dello stato
    del sistema cercando di eliminare quanto piu possibile le dipendenze dal progetto GitHub e lavorare più qui con te, in
    modo da rendere stabile il processo e non incappare in errori di calcolo. Se ritieni fammi sempre domande."*) — gira
@@ -219,7 +229,34 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    uguali in `memoria/LIBRO.md` e in `config/`, concorrenti, operazioni) e le **domande aperte** di `LIBRO.md`
    §1undecies con la loro età. Esce sempre 0: un controllo che fallisce lo dice nella sua riga.
 
-## Cosa contiene la risposta, in quest'ordine
+## La risposta in chat, in quest'ordine (v524, decisione del CEO del 31/10/2026)
+Il CEO, testuale: *"Io voglio avere tutto ma non voglio passare un'ora a leggere avere un'infarinatura tale per cui da
+capire la situazione com'è ed eventualmente porti delle domande per singoli aspetti"*, e dopo due prove respinte (un
+inventario di tutte le fonti: *"troppo disordinata"*) l'impostazione per INCROCI: *"Procedi su tutto"*. La risposta parte
+dalle DECISIONI, non dalle fonti: ogni blocco risponde a una domanda e usa più famiglie di dati insieme. Il dettaglio di
+ogni strumento — la sezione qui sotto — entra nella risposta DENTRO questi blocchi, nella riga che lo riguarda; tutto il
+resto sta nella SCHEDA COMPLETA allegata, da cui si pesca quando il CEO fa una domanda su un singolo aspetto.
+1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso. È il
+   giudizio della risposta, scritto dopo aver letto tutto il resto.
+2. **Il regime: le sei luci** del blocco SINTESI OPERATIVA, una riga ciascuna col colore, il perché e i dati che la
+   compongono (VIX, Fear & Greed, put/call, DIX, gamma, CFTC, leva, P/E, CAPE, tassi, FedWatch, credito, NFCI, SLOOS,
+   stagione dei conti), con la freccia se è cambiata. Le luci non si sommano: nessun punteggio (v200). Il rischio
+   percepito è un termometro e lo si dice.
+3. **Il libro nel regime**: semaforo e salvavita, esposizione, risultato contro QQQ e SMH, costo dell'attesa, credito sul
+   libro, e l'incrocio regime × libro in una riga. Accanto, quando c'è, il rendimento del deposito e il ROI del conto.
+4. **La mappa tesi × prezzo**: le posizioni nelle caselle, con 📅 i conti entro 14 giorni e ⚠ gli allarmi; sotto, una
+   riga solo per i nomi che hanno CAMBIATO casella o esito, o che hanno un evento vicino, con le notizie cercate in rete
+   nei due versi (fonte e data). Gli altri sono «invariati» e non si commentano.
+5. **Cosa è cambiato** dall'analisi precedente, dal blocco: ciò che non è cambiato non si ripete.
+6. **L'agenda**: le date dei prossimi 21 giorni e i livelli entro 1 ATR, con cosa cambierebbe ciascuno.
+7. **Come muoversi**: per ogni casella l'azione delle regole già decise, e il giudizio della risposta («secondo me…»)
+   con direzione, priorità e livelli; per la liquidità gli ingressi in zona che diversificano. Le quantità restano
+   l'aritmetica dell'unità di 5.000 €, mai «la quantità giusta» (v439).
+8. **Le domande mirate** (2-4, sezione 8 qui sotto) e **lo stato del sistema** in una o due righe (sezione 9).
+La regola che tiene corta la risposta: **un dato entra quando sposta una decisione o è cambiato; altrimenti è nella
+scheda**. «Invariato» è un contenuto; un elenco di numeri fermi no.
+
+## Cosa contiene la risposta — il DETTAGLIO di ogni blocco (dal 31/10, v524: l'ordine in chat è quello qui sopra)
 00. **Freschezza dei dati** (v511) — in UNA riga dal blocco FRESCHEZZA DEI DATI: quante serie lette alla fonte, chi è
    venuto dalla pipeline (ripiego) e perché, e se la pipeline è precedente all'ultima chiusura USA. Se lo è, le righe che
    porta solo lei (target, revisioni, CDS, short, bilanci) si leggono come la seduta prima, e la risposta lo dice dove
@@ -592,6 +629,9 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[cambio]` il cambio euro/dollaro: quanta parte del patrimonio è in dollari e cosa fa un 1% del cambio, dove sta il cambio nel suo anno, e per ogni operazione col suo cambio (LIBRO.md §1decies) il risultato in euro scomposto in effetto del prezzo ed effetto del cambio, con l'imposta in euro (30/10)
 - `[rendimento_capitale]` ROIC e ROE di ogni posizione e sorvegliato e dei concorrenti, dai bilanci con la data dei 12 mesi e degli esercizi chiusi: il ROIC sul capitale investito come la fonte lo pubblica, il ROE con la leva dichiarata quando il patrimonio e' meno di meta' del capitale, il ROE della fonte dichiarato quando differisce (31/10) — informazione, non una prova
 - `[roi_conto]` il ROI del conto dalla fotografia del broker (LIBRO.md §1duodecies): il guadagno sul carico delle posizioni aperte in euro e in dollari, il carico in euro di ogni posizione come base fiscale col risultato fra prezzo e cambio, le operazioni chiuse con le imposte, e il ROI dall'inizio del conto dichiarato non calcolabile finche' mancano i versamenti (31/10)
+- `[sintesi_operativa]` l'analisi per INCROCI: il regime in sei luci, il libro nel regime, la mappa tesi × prezzo con
+  gli allarmi, cosa è cambiato dall'analisi precedente, l'agenda coi livelli vicini e le azioni delle regole — la risposta
+  in chat segue i suoi blocchi, il dettaglio sta nella scheda (31/10)
 - `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno

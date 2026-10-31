@@ -52,6 +52,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import subprocess
 import sys
 import tempfile
@@ -67,10 +68,11 @@ RADICE = Path(__file__).resolve().parent.parent
 FORMATO = RADICE / "memoria" / "FORMATO_ANALISI.md"
 TITOLO_CHECKLIST = "## Cosa contiene la risposta"
 TITOLO_REGOLE = "## Regole"
+TITOLO_RISPOSTA = "## La risposta in chat"     # v524 — l'ordine della risposta, prima del dettaglio di ogni blocco
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
 STRUMENTI = ("fonti_dirette.py", "fonti_titoli.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py",
-             "posizionamento.py", "indici.py", "concorrenti.py", "stato_sistema.py")
+             "posizionamento.py", "indici.py", "concorrenti.py", "sintesi.py", "stato_sistema.py")
 # v511 — fonti_dirette.py gira PRIMA degli altri, da solo: scrive la lettura alla fonte del giro che gli altri riusano
 #   (una lettura per analisi, la stessa osservazione per tutti), e stampa il blocco FRESCHEZZA DEI DATI
 # v512 — e con lui, in parallelo, fonti_titoli.py: analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC e trimestri
@@ -79,6 +81,11 @@ PRIMA = ("fonti_dirette.py", "fonti_titoli.py")
 # v518 — e stato_sistema.py DOPO tutti, da solo (CEO, 30/10/2026: «Alla fine fai sempre un controllo generico dello stato
 #   del sistema»): deve vedere le letture del giro gia' scritte e le memorie che il giro ha cambiato e non ancora committato
 DOPO = ("stato_sistema.py",)
+# v524 — e sintesi.py DOPO gli strumenti del giro e PRIMA dello stato del sistema (CEO, 31/10/2026: «Procedi su tutto»):
+#   incrocia cio' che numeri_libro, rotazione, indici e posizionamento hanno scritto in GIRO, e aggiunge la fotografia
+#   dell'analisi al registro, che lo stato del sistema deve vedere fra le memorie da committare
+POI = ("sintesi.py",)
+GIRO = RADICE / "memoria" / "dati" / "giro"
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 # v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
 # v499 — e il dark pool (posizionamento.py) e la storia del P/E del Nasdaq-100 (indici.py): stesse ragioni
@@ -88,8 +95,22 @@ MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzi
            # v512 — i giorni di ICE che lo storico della pipeline non ha: la pipeline li unisce al run dopo
            RADICE / "memoria" / "cds_sessione.jsonl",
            # v517 — le menzioni di WallStreetBets: la fonte pubblica solo le ultime 24 ore, lo storico si raccoglie qui
-           RADICE / "memoria" / "wsb.jsonl")
+           RADICE / "memoria" / "wsb.jsonl",
+           # v524 — la fotografia di ogni analisi (luci, caselle, esiti): le frecce di cambiamento partono da qui
+           RADICE / "memoria" / "registro_analisi.jsonl")
 LIMITE_SECONDI = 600
+
+
+def prepara_giro(cartella=GIRO):
+    """Svuota la cartella dei risultati del giro e la passa agli strumenti (TRADING_GIRO). Non solleva: senza la
+    cartella la sintesi dichiara i file mancanti, e gli altri blocchi restano."""
+    os.environ["TRADING_GIRO"] = str(cartella)
+    try:
+        Path(cartella).mkdir(parents=True, exist_ok=True)
+        for f in Path(cartella).glob("*.json"):
+            f.unlink()
+    except OSError:
+        pass
 
 
 def fase(adesso=None):
@@ -130,6 +151,8 @@ def comandi(f, sedute=1):
               "concentrazione, ampiezza, tendenza", ["indici.py"]))
     c.append(("CONCORRENTI E QUOTE DI MERCATO — chi sono, quanta parte del mercato hanno (fonte e data), e la salute "
               "con le stesse formule per tutti", ["concorrenti.py"]))
+    c.append(("SINTESI OPERATIVA — il regime in sei luci, il libro nel regime, la mappa tesi × prezzo, cosa e' cambiato, "
+              "l'agenda e le azioni delle regole", ["sintesi.py", "--registra"]))
     c.append(("STATO DEL SISTEMA — codice e test, pipeline su GitHub, dati del giro, dipendenze da GitHub con la loro "
               "data, coerenza del libro, domande aperte al CEO", ["stato_sistema.py", "--giro"]))
     return c
@@ -168,8 +191,9 @@ def sezione(testo, titolo):
 
 
 def checklist(percorso=FORMATO):
-    """Le sezioni «Cosa contiene la risposta» e «Regole» di FORMATO_ANALISI.md, parola per parola.
-    Senza la prima non si ripiega su un elenco scritto qui: si dichiara, e il comando esce 1."""
+    """Le sezioni «La risposta in chat» (v524: l'ordine della risposta), «Cosa contiene la risposta» (il dettaglio di
+    ogni blocco) e «Regole» di FORMATO_ANALISI.md, parola per parola, in quest'ordine. Senza il dettaglio non si ripiega
+    su un elenco scritto qui: si dichiara, e il comando esce 1; senza l'ordine della risposta lo si dichiara in testa."""
     try:
         testo = Path(percorso).read_text(encoding="utf-8")
     except OSError:
@@ -178,7 +202,10 @@ def checklist(percorso=FORMATO):
     if cl is None:
         return None
     regole = sezione(testo, TITOLO_REGOLE)
-    return cl + "\n\n" + (regole or f"⚠ '{TITOLO_REGOLE}' non trovata in {percorso}: le regole della risposta non si leggono")
+    risposta = sezione(testo, TITOLO_RISPOSTA)
+    return ((risposta or f"⚠ '{TITOLO_RISPOSTA}' non trovata in {percorso}: l'ordine della risposta non si legge, vale "
+                         "il dettaglio qui sotto") + "\n\n" + cl + "\n\n"
+            + (regole or f"⚠ '{TITOLO_REGOLE}' non trovata in {percorso}: le regole della risposta non si leggono"))
 
 
 def impronta(percorso=REGISTRO):
@@ -258,7 +285,12 @@ def main():
     # v511 — prima la lettura alla fonte (da sola), poi tutti gli altri in parallelo: la riusano dal disco
     testa_l = [x for x in lista if Path(x[1][1]).name in PRIMA]
     coda_l = [x for x in lista if Path(x[1][1]).name in DOPO]
-    esiti = esegui(testa_l) + esegui([x for x in lista if x not in testa_l and x not in coda_l]) + esegui(coda_l)
+    poi_l = [x for x in lista if Path(x[1][1]).name in POI]
+    # v524 — i risultati del giro per la sintesi: la cartella si svuota prima, cosi' un file di un giro precedente non
+    #   puo' passare per questo; la variabile la ereditano gli strumenti (comuni.file_del_giro)
+    prepara_giro()
+    esiti = (esegui(testa_l) + esegui([x for x in lista if x not in testa_l and x not in coda_l and x not in poi_l])
+             + esegui(poi_l) + esegui(coda_l))
     testa = (f"ANALISI DEL LIBRO — {adesso.astimezone(ROMA):%d/%m/%Y %H:%M} ora italiana · New York "
              f"{adesso:%H:%M} · fase: {f.upper()} · {len(lista)} strumenti in parallelo, {round(time.time() - t0)} s")
     sc_righe, sc_codice, _ = scrivi_scheda(esiti, f, adesso)

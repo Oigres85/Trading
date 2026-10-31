@@ -18,15 +18,40 @@ fatta alla stessa fonte deve dare la stessa risposta, in qualunque dei due posti
 Niente rete, niente pandas: si importa da qualunque parte senza costo.
 """
 import html
+import json
 import math
+import os
 import re
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
 try:
     from zoneinfo import ZoneInfo
 except ImportError:  # pragma: no cover
     ZoneInfo = None
+
+
+def file_del_giro(nome):
+    """v524 — dove uno strumento scrive il proprio risultato per la SINTESI OPERATIVA (scripts/sintesi.py), che lo legge
+    invece di ricalcolarlo (v161). La cartella la passa il comando unico (analisi.py) nella variabile TRADING_GIRO: fuori
+    da un giro, e nelle suite, la variabile non c'e' e nessuno scrive niente."""
+    d = os.environ.get("TRADING_GIRO")
+    return str(Path(d) / f"{nome}.json") if d else None
+
+
+def scrivi_del_giro(percorso, dati):
+    """Scrive il risultato del giro; un guasto qui non deve portarsi via l'uscita dello strumento, gia' stampata: si
+    dichiara su stderr, e la sintesi dichiarera' il file mancante (⚪, mai una luce su dati vecchi)."""
+    if not percorso:
+        return False
+    try:
+        Path(percorso).parent.mkdir(parents=True, exist_ok=True)
+        Path(percorso).write_text(json.dumps(dati, default=str), encoding="utf-8")
+        return True
+    except (OSError, TypeError, ValueError) as e:
+        print(f"⚠ risultato del giro NON scritto in {percorso}: {type(e).__name__}: {e}", file=sys.stderr)
+        return False
 
 
 def r2_rumore(n):
