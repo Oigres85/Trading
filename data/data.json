@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-31T17:55:07Z",
+ "updated_at": "2026-10-31T18:44:50Z",
  "eurusd": 1.1183,
  "totals": {
   "usd_value": 0,
@@ -490,7 +490,7 @@
      33.88,
      30.71,
      34.61,
-     44.63,
+     44.62,
      33.36,
      40.49,
      44.24,
@@ -1976,7 +1976,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -18430,27 +18430,27 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77575.33,
+   "price": 77547.23,
    "price_asof": "2026-10-31",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.49,
+   "change_pct": 0.45,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.5,
-   "sma200_dist_pct": 6.1,
+   "ath_dist_pct": -38.6,
+   "sma200_dist_pct": 6.0,
    "sma50_dist_pct": -5.3,
    "w52_high": 111167.31,
    "w52_low": 57747.77,
    "w52_dist_pct": -30.2,
-   "day_high": 77554.92,
+   "day_high": 77612.09,
    "day_low": 77000.92,
    "support": 76189.88,
    "resistance": 84840.05,
-   "rsi": 36.2,
-   "volume": 16410266624,
+   "rsi": 36.1,
+   "volume": 15951564800,
    "vol_ratio": 1.7,
-   "atr_14": 2015.36,
+   "atr_14": 2019.45,
    "atr_pct": 2.6,
    "signal": "Neutrale",
    "signal_class": "neutral",
@@ -18460,7 +18460,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77575.33
+     77547.23
     ],
     "m6": [
      59532.34,
@@ -18588,7 +18588,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77575.33
+     77547.23
     ],
     "all": [
      386.94,
@@ -18736,7 +18736,7 @@
      62813.75,
      78548.63,
      83553.85,
-     77575.33
+     77547.23
     ],
     "m1": [
      82912.23,
@@ -18760,7 +18760,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77575.33
+     77547.23
     ],
     "m3": [
      80257.54,
@@ -18828,7 +18828,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77575.33
+     77547.23
     ],
     "y1": [
      109556.16,
@@ -18904,7 +18904,7 @@
      81500.8,
      84011.97,
      80006.66,
-     77575.33
+     77547.23
     ],
     "d1": [
      77152.12,
@@ -19014,7 +19014,12 @@
      77472.85,
      77441.64,
      77479.69,
-     77575.33
+     77600.9,
+     77546.69,
+     77565.63,
+     77574.24,
+     77560.76,
+     77547.23
     ]
    },
    "earnings_date": null,
@@ -19023,12 +19028,12 @@
    "health": 35,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.74,
+   "sharpe_1y": -0.75,
    "sortino_1y": -1.02,
    "sharpe_6m": 1.59,
    "sortino_6m": 2.84,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77575.33,
+   "prezzo_limite_aggiustato": 77547.23,
    "risk_reward": "1:1.8",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19044,22 +19049,22 @@
     "w1": {
      "support": 76189.88,
      "resistance": 81889.95,
-     "change_pct": -4.0
+     "change_pct": -4.03
     },
     "m1": {
      "support": 76189.88,
      "resistance": 84840.05,
-     "change_pct": -6.44
+     "change_pct": -6.47
     },
     "m3": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": -3.34
+     "change_pct": -3.38
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 14.66
+     "change_pct": 14.61
     }
    },
    "financials": [],
@@ -19073,7 +19078,7 @@
     "bear_fvg": 4,
     "last_fvg": {
      "dir": "ribassista",
-     "lo": 77554.92,
+     "lo": 77612.09,
      "hi": 77737.19
     },
     "liq_above": 79463.71,
@@ -19086,74 +19091,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77575.33,
+     "prezzo": 77547.23,
      "medie": {
       "sma10": {
-       "liv": 79782.89,
-       "dist_pct": -2.77
+       "liv": 79780.08,
+       "dist_pct": -2.8
       },
       "ema10": {
-       "liv": 79534.42,
-       "dist_pct": -2.46
+       "liv": 79529.31,
+       "dist_pct": -2.49
       },
       "sma20": {
-       "liv": 81004.88,
-       "dist_pct": -4.23
+       "liv": 81003.47,
+       "dist_pct": -4.27
       },
       "ema20": {
-       "liv": 80615.7,
-       "dist_pct": -3.77
+       "liv": 80613.02,
+       "dist_pct": -3.8
       },
       "sma30": {
-       "liv": 82042.44,
-       "dist_pct": -5.44
+       "liv": 82041.5,
+       "dist_pct": -5.48
       },
       "ema30": {
-       "liv": 80955.9,
-       "dist_pct": -4.18
+       "liv": 80954.08,
+       "dist_pct": -4.21
       },
       "sma50": {
-       "liv": 81899.16,
-       "dist_pct": -5.28
+       "liv": 81898.6,
+       "dist_pct": -5.31
       },
       "ema50": {
-       "liv": 80390.95,
-       "dist_pct": -3.5
+       "liv": 80389.84,
+       "dist_pct": -3.54
       },
       "sma100": {
-       "liv": 76272.34,
-       "dist_pct": 1.71
+       "liv": 76272.05,
+       "dist_pct": 1.67
       },
       "ema100": {
-       "liv": 77747.2,
-       "dist_pct": -0.22
+       "liv": 77746.64,
+       "dist_pct": -0.26
       },
       "sma200": {
-       "liv": 73132.38,
-       "dist_pct": 6.08
+       "liv": 73132.24,
+       "dist_pct": 6.04
       },
       "ema200": {
-       "liv": 76458.3,
-       "dist_pct": 1.46
+       "liv": 76458.02,
+       "dist_pct": 1.42
       }
      },
      "medie_battute": 3,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 36.2,
+      "rsi14": 36.1,
       "macd": {
-       "linea": -1062.87,
-       "segnale": -551.63,
-       "istogramma": -511.24
+       "linea": -1065.12,
+       "segnale": -552.08,
+       "istogramma": -513.04
       },
-      "stoch_k": 16.0,
-      "stoch_d": 9.4,
-      "williams_r": -84.0,
-      "cci20": -134.4,
+      "stoch_k": 15.7,
+      "stoch_d": 9.3,
+      "williams_r": -84.3,
+      "cci20": -134.1,
       "adx14": 20.1,
-      "di_su": 13.9,
-      "di_giu": 29.6,
-      "momentum10": -6436.64
+      "di_su": 13.8,
+      "di_giu": 29.5,
+      "momentum10": -6464.74
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19644,21 +19649,21 @@
      {
       "d": "2026-10-31",
       "o": 77202.4,
-      "h": 77554.92,
+      "h": 77612.09,
       "l": 77000.92,
-      "c": 77575.33
+      "c": 77547.23
      }
     ],
     "performance": {
-     "s1": -3.04,
-     "m1": -6.02,
-     "m3": -1.84,
-     "m6": 29.42,
-     "a1": 14.08,
-     "ytd": -12.57,
-     "a3": 123.77,
-     "a5": 26.51,
-     "a10": 10966.82
+     "s1": -3.07,
+     "m1": -6.06,
+     "m3": -1.87,
+     "m6": 29.37,
+     "a1": 14.03,
+     "ytd": -12.61,
+     "a3": 123.69,
+     "a5": 26.47,
+     "a10": 10962.81
     },
     "stagionalita": [
      {
@@ -41947,7 +41952,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -47644,9 +47649,9 @@
     "float_pct": 91.5,
     "avg_volume_30d": 107654975.0,
     "pe_ttm": null,
-    "forward_pe": 31.9092,
+    "forward_pe": 32.9735,
     "eps_ttm": -2.42,
-    "eps_forward": 2.0608,
+    "eps_forward": 1.9943,
     "revenue_fy": 59891998720.0,
     "net_income_fy": -12032000000.0,
     "revenue_growth": 0.209,
@@ -56254,7 +56259,7 @@
      24.28,
      21.19,
      21.19,
-     18.3,
+     18.31,
      20.9,
      17.41,
      13.16,
@@ -62567,7 +62572,7 @@
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -71634,7 +71639,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -72530,7 +72535,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -76716,7 +76721,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -77079,9 +77084,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 3072121.0,
     "pe_ttm": 116.5303,
-    "forward_pe": 41.9518,
+    "forward_pe": 42.0972,
     "eps_ttm": 0.66,
-    "eps_forward": 1.8333,
+    "eps_forward": 1.827,
     "revenue_fy": null,
     "net_income_fy": null,
     "revenue_growth": -0.072,
@@ -91464,7 +91469,7 @@
      71.81,
      71.36,
      69.91,
-     70.48,
+     70.49,
      73.77,
      73.44,
      80.18,
@@ -91561,7 +91566,7 @@
      127.9,
      130.07,
      136.24,
-     144.29,
+     144.28,
      154.51,
      149.4,
      151.74,
@@ -94947,7 +94952,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -100144,9 +100149,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 6116218.0,
     "pe_ttm": null,
-    "forward_pe": 17.0803,
+    "forward_pe": 16.9473,
     "eps_ttm": -3.13,
-    "eps_forward": 9.9928,
+    "eps_forward": 10.0712,
     "revenue_fy": 30987999232.0,
     "net_income_fy": -3862000128.0,
     "revenue_growth": 0.068,
@@ -106103,9 +106108,9 @@
     "float_pct": 99.9,
     "avg_volume_30d": 2928478.0,
     "pe_ttm": 33.3862,
-    "forward_pe": 27.5839,
+    "forward_pe": 27.5791,
     "eps_ttm": 19.11,
-    "eps_forward": 23.1298,
+    "eps_forward": 23.1338,
     "revenue_fy": 36288000000.0,
     "net_income_fy": 16958000128.0,
     "revenue_growth": 0.14,
@@ -106114,7 +106119,7 @@
     "roe": 2.3137,
     "debt_to_equity": 355.163,
     "dividend_yield": 0.0055,
-    "price_to_book": 82.4835,
+    "price_to_book": 82.3983,
     "target_mean": 686.7949,
     "fcf": 16629250048.0,
     "gross_margin": 1.0,
@@ -111049,7 +111054,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -114512,9 +114517,9 @@
     "float_pct": 99.9,
     "avg_volume_30d": 33754310.0,
     "pe_ttm": 40.1579,
-    "forward_pe": 10.5822,
+    "forward_pe": 10.5722,
     "eps_ttm": 0.76,
-    "eps_forward": 2.8841,
+    "eps_forward": 2.8868,
     "revenue_fy": 63695998976.0,
     "net_income_fy": 4338999808.0,
     "revenue_growth": 0.026,
@@ -116169,7 +116174,7 @@
      149.48,
      156.2,
      164.48,
-     166.56,
+     166.55,
      163.59,
      150.97,
      139.09,
@@ -120253,7 +120258,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -120360,7 +120365,7 @@
      267.46,
      254.7,
      277.82,
-     275.25,
+     275.26,
      273.83,
      275.21,
      261.91,
@@ -120439,7 +120444,7 @@
      764.78,
      831.91,
      742.87,
-     835.7,
+     835.69,
      801.28,
      814.72,
      732.3,
@@ -135195,6 +135200,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Caregivers are now spending more than $11,000 a year out of pocket—up 60% in five years",
+     "riassunto": "An AARP study shows the financial sacrifices families make and their long-term impacts.",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-31T18:10:00Z",
+     "url": "https://www.marketwatch.com/story/were-spending-more-than-11-000-a-year-of-our-own-money-caring-for-our-aging-parents-and-loved-ones-8fc5b2dc?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "Want guaranteed income in retirement without an annuity? Try laddering I bonds.",
      "riassunto": "The new I-bond interest rate could be 5.5% or 5.4%, but that shouldn’t change your strategy.",
      "fonte": "MarketWatch",
@@ -135312,13 +135324,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-22T16:40:09Z",
      "url": "https://www.cnbc.com/2026/10/22/jobless-claims-record-low-weekly.html"
-    },
-    {
-     "titolo": "Housing is flashing warning signs just as the Fed weighs more interest rate hikes",
-     "riassunto": "Housing data deteriorated further in September, according to separate reports Tuesday.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-21T11:20:58Z",
-     "url": "https://www.cnbc.com/2026/10/20/housing-mortgage-rates-real-estate-federal-reserve.html"
     }
    ],
    "fonti": [
@@ -143033,7 +143038,7 @@
    "calls": 922100
   },
   "risk_sentiment": {
-   "score": 46,
+   "score": 45,
    "label": "Neutrale",
    "components": [
     {
@@ -148418,6 +148423,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-31T18:25:19Z",
+      "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
+     },
+     {
       "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
       "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
       "fonte": "Nasdaq",
@@ -148430,13 +148442,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-31T06:20:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-2-under-1-trillion-stocks-will-be-worth-more-micron-5-years-now"
-     },
-     {
-      "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-31T05:25:05Z",
-      "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
      },
      {
       "titolo": "Intel Drags Down CPU Rivals. Is it a Buying Opportunity for AMD and Arm?",
@@ -148594,6 +148599,13 @@
     ],
     "INTC": [
      {
+      "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-31T18:25:19Z",
+      "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
+     },
+     {
       "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
       "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
       "fonte": "Nasdaq",
@@ -148606,13 +148618,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-31T06:50:00Z",
       "url": "https://www.nasdaq.com/articles/spacex-and-tesla-merger-will-only-be-successful-if-one-thing-happens"
-     },
-     {
-      "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-31T05:25:05Z",
-      "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
      },
      {
       "titolo": "Intel Drags Down CPU Rivals. Is it a Buying Opportunity for AMD and Arm?",
@@ -148968,13 +148973,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-31T17:55:07Z"
+   "letto_il": "2026-10-31T18:44:50Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-31T18:25:19Z",
+     "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
+    },
     {
      "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
      "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
@@ -148988,13 +149000,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-31T06:20:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-2-under-1-trillion-stocks-will-be-worth-more-micron-5-years-now"
-    },
-    {
-     "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-31T05:25:05Z",
-     "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
     },
     {
      "titolo": "Intel Drags Down CPU Rivals. Is it a Buying Opportunity for AMD and Arm?",
@@ -149152,6 +149157,13 @@
    ],
    "INTC": [
     {
+     "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-31T18:25:19Z",
+     "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
+    },
+    {
      "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
      "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
      "fonte": "Nasdaq",
@@ -149164,13 +149176,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-31T06:50:00Z",
      "url": "https://www.nasdaq.com/articles/spacex-and-tesla-merger-will-only-be-successful-if-one-thing-happens"
-    },
-    {
-     "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-31T05:25:05Z",
-     "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
     },
     {
      "titolo": "Intel Drags Down CPU Rivals. Is it a Buying Opportunity for AMD and Arm?",
@@ -149526,20 +149531,9 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-31T17:55:07Z"
+  "letto_il": "2026-10-31T18:44:50Z"
  },
- "predictions": [
-  {
-   "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
-   "yes": 70,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
-  },
-  {
-   "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
-   "yes": 28,
-   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
-  }
- ],
+ "predictions": [],
  "options": {
   "AAPL": {
    "spot": 344.63,
@@ -218876,7 +218870,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 26,
-    "risk_sentiment": 46,
+    "risk_sentiment": 45,
     "credit": 76,
     "systemic_risk": 59,
     "corp_profit": 53,
@@ -219054,7 +219048,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 2 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -219138,6 +219132,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-31T17:55:08Z"
+  "generated_at": "2026-10-31T18:44:51Z"
  }
 }
