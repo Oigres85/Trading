@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-31T14:58:51Z",
+ "updated_at": "2026-10-31T17:55:07Z",
  "eurusd": 1.1183,
  "totals": {
   "usd_value": 0,
@@ -490,7 +490,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -6143,7 +6143,7 @@
      "a1": 1.3,
      "a3": 403.31,
      "a5": 703.93,
-     "a10": 11622.14
+     "a10": 11622.13
     },
     "stagionalita": [
      {
@@ -18430,28 +18430,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77362.55,
+   "price": 77575.33,
    "price_asof": "2026-10-31",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.21,
+   "change_pct": 0.49,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.7,
-   "sma200_dist_pct": 5.8,
-   "sma50_dist_pct": -5.5,
+   "ath_dist_pct": -38.5,
+   "sma200_dist_pct": 6.1,
+   "sma50_dist_pct": -5.3,
    "w52_high": 111167.31,
    "w52_low": 57747.77,
-   "w52_dist_pct": -30.4,
+   "w52_dist_pct": -30.2,
    "day_high": 77554.92,
    "day_low": 77000.92,
    "support": 76189.88,
    "resistance": 84840.05,
-   "rsi": 35.2,
-   "volume": 19544676352,
+   "rsi": 36.2,
+   "volume": 16410266624,
    "vol_ratio": 1.7,
    "atr_14": 2015.36,
-   "atr_pct": 2.61,
+   "atr_pct": 2.6,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -18460,7 +18460,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77362.55
+     77575.33
     ],
     "m6": [
      59532.34,
@@ -18588,7 +18588,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77362.55
+     77575.33
     ],
     "all": [
      386.94,
@@ -18736,7 +18736,7 @@
      62813.75,
      78548.63,
      83553.85,
-     77362.55
+     77575.33
     ],
     "m1": [
      82912.23,
@@ -18760,7 +18760,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77362.55
+     77575.33
     ],
     "m3": [
      80257.54,
@@ -18828,7 +18828,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77362.55
+     77575.33
     ],
     "y1": [
      109556.16,
@@ -18904,7 +18904,7 @@
      81500.8,
      84011.97,
      80006.66,
-     77362.55
+     77575.33
     ],
     "d1": [
      77152.12,
@@ -18996,22 +18996,40 @@
      77337.4,
      77355.83,
      77380.25,
-     77348.08
+     77332.63,
+     77240.64,
+     77300.98,
+     77306.59,
+     77361.96,
+     77445.14,
+     77440.58,
+     77472.11,
+     77472.07,
+     77506.21,
+     77431.5,
+     77442.07,
+     77471.3,
+     77429.7,
+     77480.26,
+     77472.85,
+     77441.64,
+     77479.69,
+     77575.33
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 34,
+   "health": 35,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.75,
+   "sharpe_1y": -0.74,
    "sortino_1y": -1.02,
-   "sharpe_6m": 1.57,
-   "sortino_6m": 2.81,
+   "sharpe_6m": 1.59,
+   "sortino_6m": 2.84,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77362.55,
-   "risk_reward": "1:1.9",
+   "prezzo_limite_aggiustato": 77575.33,
+   "risk_reward": "1:1.8",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -19026,22 +19044,22 @@
     "w1": {
      "support": 76189.88,
      "resistance": 81889.95,
-     "change_pct": -4.26
+     "change_pct": -4.0
     },
     "m1": {
      "support": 76189.88,
      "resistance": 84840.05,
-     "change_pct": -6.69
+     "change_pct": -6.44
     },
     "m3": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": -3.61
+     "change_pct": -3.34
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 14.34
+     "change_pct": 14.66
     }
    },
    "financials": [],
@@ -19068,74 +19086,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77362.55,
+     "prezzo": 77575.33,
      "medie": {
       "sma10": {
-       "liv": 79761.61,
-       "dist_pct": -3.01
+       "liv": 79782.89,
+       "dist_pct": -2.77
       },
       "ema10": {
-       "liv": 79495.74,
-       "dist_pct": -2.68
+       "liv": 79534.42,
+       "dist_pct": -2.46
       },
       "sma20": {
-       "liv": 80994.24,
-       "dist_pct": -4.48
+       "liv": 81004.88,
+       "dist_pct": -4.23
       },
       "ema20": {
-       "liv": 80595.43,
-       "dist_pct": -4.01
+       "liv": 80615.7,
+       "dist_pct": -3.77
       },
       "sma30": {
-       "liv": 82035.34,
-       "dist_pct": -5.7
+       "liv": 82042.44,
+       "dist_pct": -5.44
       },
       "ema30": {
-       "liv": 80942.17,
-       "dist_pct": -4.42
+       "liv": 80955.9,
+       "dist_pct": -4.18
       },
       "sma50": {
-       "liv": 81894.91,
-       "dist_pct": -5.53
+       "liv": 81899.16,
+       "dist_pct": -5.28
       },
       "ema50": {
-       "liv": 80382.6,
-       "dist_pct": -3.76
+       "liv": 80390.95,
+       "dist_pct": -3.5
       },
       "sma100": {
-       "liv": 76270.21,
-       "dist_pct": 1.43
+       "liv": 76272.34,
+       "dist_pct": 1.71
       },
       "ema100": {
-       "liv": 77742.98,
-       "dist_pct": -0.49
+       "liv": 77747.2,
+       "dist_pct": -0.22
       },
       "sma200": {
-       "liv": 73131.32,
-       "dist_pct": 5.79
+       "liv": 73132.38,
+       "dist_pct": 6.08
       },
       "ema200": {
-       "liv": 76456.19,
-       "dist_pct": 1.19
+       "liv": 76458.3,
+       "dist_pct": 1.46
       }
      },
      "medie_battute": 3,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 35.2,
+      "rsi14": 36.2,
       "macd": {
-       "linea": -1079.85,
-       "segnale": -555.02,
-       "istogramma": -524.82
+       "linea": -1062.87,
+       "segnale": -551.63,
+       "istogramma": -511.24
       },
-      "stoch_k": 13.6,
-      "stoch_d": 8.6,
-      "williams_r": -86.4,
-      "cci20": -136.6,
+      "stoch_k": 16.0,
+      "stoch_d": 9.4,
+      "williams_r": -84.0,
+      "cci20": -134.4,
       "adx14": 20.1,
       "di_su": 13.9,
       "di_giu": 29.6,
-      "momentum10": -6649.42
+      "momentum10": -6436.64
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19628,19 +19646,19 @@
       "o": 77202.4,
       "h": 77554.92,
       "l": 77000.92,
-      "c": 77362.55
+      "c": 77575.33
      }
     ],
     "performance": {
-     "s1": -3.3,
-     "m1": -6.28,
-     "m3": -2.11,
-     "m6": 29.07,
-     "a1": 13.76,
-     "ytd": -12.81,
-     "a3": 123.15,
-     "a5": 26.16,
-     "a10": 10936.47
+     "s1": -3.04,
+     "m1": -6.02,
+     "m3": -1.84,
+     "m6": 29.42,
+     "a1": 14.08,
+     "ytd": -12.57,
+     "a3": 123.77,
+     "a5": 26.51,
+     "a10": 10966.82
     },
     "stagionalita": [
      {
@@ -19753,9 +19771,9 @@
      }
     ]
    },
-   "rs_1m": -5.6,
+   "rs_1m": -5.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 0.2,
+   "rs_ndx_1m": 0.5,
    "beta_ndx": 0.67,
    "avg_corr": 0.33,
    "max_corr": 0.76,
@@ -37626,7 +37644,7 @@
      98.35,
      84.39,
      94.22,
-     99.64,
+     99.65,
      83.74,
      89.74,
      116.26,
@@ -47626,9 +47644,9 @@
     "float_pct": 91.5,
     "avg_volume_30d": 107654975.0,
     "pe_ttm": null,
-    "forward_pe": 31.3364,
+    "forward_pe": 31.9092,
     "eps_ttm": -2.42,
-    "eps_forward": 2.0985,
+    "eps_forward": 2.0608,
     "revenue_fy": 59891998720.0,
     "net_income_fy": -12032000000.0,
     "revenue_growth": 0.209,
@@ -53625,7 +53643,7 @@
      "m6": -14.5,
      "ytd": -28.04,
      "a1": -30.01,
-     "a3": 136.87
+     "a3": 136.88
     },
     "sensibilita": {
      "mercato": {
@@ -62542,7 +62560,7 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
@@ -68422,7 +68440,7 @@
      1220.99,
      1256.02,
      1386.5,
-     1446.3,
+     1446.29,
      1341.93,
      1400.14,
      1462.56,
@@ -72512,7 +72530,7 @@
      89.67,
      84.81,
      81.51,
-     76.13,
+     76.14,
      71.27,
      77.61,
      69.12,
@@ -91446,7 +91464,7 @@
      71.81,
      71.36,
      69.91,
-     70.49,
+     70.48,
      73.77,
      73.44,
      80.18,
@@ -94929,7 +94947,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -95602,7 +95620,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -102149,7 +102167,7 @@
      322.37,
      340.11,
      336.06,
-     360.43,
+     360.42,
      358.86,
      369.78,
      383.01,
@@ -105783,7 +105801,7 @@
      344.76,
      305.88,
      342.21,
-     344.33,
+     344.34,
      369.93,
      349.13,
      353.5,
@@ -108861,7 +108879,7 @@
      {
       "mese": 1,
       "media": 0.65,
-      "mediana": 0.01,
+      "mediana": 0.0,
       "positivi_pct": 50,
       "campione": 18,
       "peggio": -14.6,
@@ -109788,7 +109806,7 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
      336.45,
      329.49,
@@ -111031,7 +111049,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -112296,9 +112314,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 8561893.0,
     "pe_ttm": 22.8742,
-    "forward_pe": 14.8018,
+    "forward_pe": 14.7955,
     "eps_ttm": 4.85,
-    "eps_forward": 7.495,
+    "eps_forward": 7.4982,
     "revenue_fy": 98860998656.0,
     "net_income_fy": 8600000512.0,
     "revenue_growth": 0.068,
@@ -116086,7 +116104,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -116151,7 +116169,7 @@
      149.48,
      156.2,
      164.48,
-     166.55,
+     166.56,
      163.59,
      150.97,
      139.09,
@@ -116243,7 +116261,7 @@
      352.96,
      313.87,
      334.37,
-     321.42,
+     321.43,
      301.14,
      316.17,
      300.45,
@@ -120202,7 +120220,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120308,7 +120326,7 @@
      137.15,
      142.3,
      133.05,
-     118.61,
+     118.62,
      119.02,
      119.32,
      124.66,
@@ -120402,7 +120420,7 @@
      427.74,
      448.72,
      393.97,
-     377.21,
+     377.2,
      430.42,
      453.23,
      469.58,
@@ -120421,7 +120439,7 @@
      764.78,
      831.91,
      742.87,
-     835.69,
+     835.7,
      801.28,
      814.72,
      732.3,
@@ -120430,7 +120448,7 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
@@ -135177,11 +135195,25 @@
   "news": {
    "voci": [
     {
-     "titolo": "Your stock portfolio increasingly hinges on the bond market — and the midterm elections",
-     "riassunto": "Tech stocks in late October caught the cold that for months has been a drag on the corporate bond market.",
+     "titolo": "Want guaranteed income in retirement without an annuity? Try laddering I bonds.",
+     "riassunto": "The new I-bond interest rate could be 5.5% or 5.4%, but that shouldn’t change your strategy.",
      "fonte": "MarketWatch",
-     "quando": "2026-10-31T14:03:00Z",
-     "url": "https://www.marketwatch.com/story/your-stock-portfolio-increasingly-hinges-on-the-bond-market-and-the-midterm-elections-dc1abadb?mod=mw_rss_topstories"
+     "quando": "2026-10-31T16:02:00Z",
+     "url": "https://www.marketwatch.com/story/how-to-use-i-bonds-to-create-guaranteed-inflation-proof-income-in-retirement-50753fea?mod=mw_rss_topstories"
+    },
+    {
+     "titolo": "We’re in our 70s. Should we pay off our 2.5% mortgage — or put the money in a high-yield savings account?",
+     "riassunto": "“Let’s say 10 years from now, when I’m 84, we need a substantial amount of cash.”",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-31T16:00:00Z",
+     "url": "https://www.marketwatch.com/story/we-are-in-our-70s-should-we-pay-off-our-2-5-mortgage-or-build-up-our-savings-5a35e9c1?mod=mw_rss_topstories"
+    },
+    {
+     "titolo": "US Midterm Candidates Tap Rare Bipartisan Issue: Credit Card Rates",
+     "riassunto": "With control of Congress hanging on a number of razor-thin races, both Democrats and Republicans are seizing on voters’ frustrations with rising credit card debt to win over inflation-weary Americans.",
+     "fonte": "Bloomberg",
+     "quando": "2026-10-31T15:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-10-31/us-midterm-candidates-tap-rare-bipartisan-issue-credit-card-rates"
     },
     {
      "titolo": "Euro zone economy slows to 0.4% growth in Q3 as crisis-hit France contracts",
@@ -135287,20 +135319,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-21T11:20:58Z",
      "url": "https://www.cnbc.com/2026/10/20/housing-mortgage-rates-real-estate-federal-reserve.html"
-    },
-    {
-     "titolo": "UK inflation jumps to 3.5% — cementing rate hike expectations",
-     "riassunto": "U.K. inflation rose by a hotter-than-expected 3.5% in the 12 months to September, driven by the surging cost of motor fuels.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-21T07:50:10Z",
-     "url": "https://www.cnbc.com/2026/10/21/inflation-uk-cpi-interest-rates.html"
-    },
-    {
-     "titolo": "Car buyers are demanding lower prices and better tech. Automakers must deliver both",
-     "riassunto": "Bain says tech leads purchase considerations in China while price remains No. 1 in the U.S. and Europe, as pressure mounts on Western carmakers.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-21T01:01:01Z",
-     "url": "https://www.cnbc.com/2026/10/20/car-buyers-china-tech-price-europe.html"
     }
    ],
    "fonti": [
@@ -143015,7 +143033,7 @@
    "calls": 922100
   },
   "risk_sentiment": {
-   "score": 45,
+   "score": 46,
    "label": "Neutrale",
    "components": [
     {
@@ -143032,7 +143050,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 52
+     "score": 55
     },
     {
      "label": "Treasury 10A",
@@ -148400,6 +148418,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
+      "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-31T15:42:01Z",
+      "url": "https://www.nasdaq.com/articles/intel-has-massive-warning-amd-stock-investors-it-time-book-profits-nov-3"
+     },
+     {
       "titolo": "Prediction: 2 Under $1 Trillion Stocks That Will Be Worth More Than Micron 5 Years From Now",
       "riassunto": "Key PointsAs the HBM leader, SK Hynix stock should grow to be larger than Micron in the next five years.",
       "fonte": "Nasdaq",
@@ -148433,13 +148458,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-30T22:52:12Z",
       "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist"
-     },
-     {
-      "titolo": "AMD Reports on Nov. 3. Here's What You Should Do Before Then.",
-      "riassunto": "Key PointsAMD's stock is far more expensive than Nvidia's even as it continues to grow more slowly.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-30T15:50:00Z",
-      "url": "https://www.nasdaq.com/articles/amd-reports-nov-3-heres-what-you-should-do-then"
      }
     ],
     "BE": [
@@ -148576,6 +148594,13 @@
     ],
     "INTC": [
      {
+      "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
+      "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-31T15:42:01Z",
+      "url": "https://www.nasdaq.com/articles/intel-has-massive-warning-amd-stock-investors-it-time-book-profits-nov-3"
+     },
+     {
       "titolo": "A SpaceX and Tesla Merger Will Only Be Successful If This One Thing Happens",
       "riassunto": "Key PointsA merger between SpaceX and Tesla is being formally considered.",
       "fonte": "Nasdaq",
@@ -148609,13 +148634,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-31T01:11:30Z",
       "url": "https://www.nasdaq.com/articles/kgi-securities-upgrades-intel-outperform-neutral"
-     },
-     {
-      "titolo": "Is Intel Stock a Buy After Its Post-Earnings Plunge?",
-      "riassunto": "Key PointsIntel's third-quarter revenue grew 21% year over year to $16.5 billion.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-30T23:34:02Z",
-      "url": "https://www.nasdaq.com/articles/intel-stock-buy-after-its-post-earnings-plunge"
      }
     ],
     "MRVL": [
@@ -148708,6 +148726,13 @@
     ],
     "MU": [
      {
+      "titolo": "Elon Musk Has Incredible News for Micron Stock Investors",
+      "riassunto": "Key PointsElon Musk recently pointed out that humanoid robots will need a lot of dynamic random-access memory.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-31T15:14:01Z",
+      "url": "https://www.nasdaq.com/articles/elon-musk-has-incredible-news-micron-stock-investors"
+     },
+     {
       "titolo": "Prediction: 2 Under $1 Trillion Stocks That Will Be Worth More Than Micron 5 Years From Now",
       "riassunto": "Key PointsAs the HBM leader, SK Hynix stock should grow to be larger than Micron in the next five years.",
       "fonte": "Nasdaq",
@@ -148741,13 +148766,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-30T17:09:02Z",
       "url": "https://www.nasdaq.com/articles/why-intel-down-today"
-     },
-     {
-      "titolo": "Micron Became One of the 10 Biggest Holdings in S&P 500 Index Funds. What Does That Mean for the Stock?",
-      "riassunto": "Key PointsMicron was the ninth-largest holding in Vanguard's S&P 500 ETF on Sept. 30, at 1.82% of the fund.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-30T17:01:01Z",
-      "url": "https://www.nasdaq.com/articles/micron-became-one-10-biggest-holdings-sp-500-index-funds-what-does-mean-stock"
      }
     ],
     "NVDA": [
@@ -148796,6 +148814,13 @@
     ],
     "ORCL": [
      {
+      "titolo": "Here’s What a $1,000 Investment in Oracle Stock Will Be Worth by 2030",
+      "riassunto": "Key PointsOracle expects to become free cash flow positive in the second half of fiscal 2028.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-31T15:17:01Z",
+      "url": "https://www.nasdaq.com/articles/heres-what-1000-investment-oracle-stock-will-be-worth-2030"
+     },
+     {
       "titolo": "Elon Musk Says Neoclouds Face a \"Guppy Level\" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.",
       "riassunto": "Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.",
       "fonte": "Nasdaq",
@@ -148829,13 +148854,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-30T11:25:00Z",
       "url": "https://www.nasdaq.com/articles/5-stocks-buy-november-bargains-worth-giving-thanks"
-     },
-     {
-      "titolo": "Oracle Just Capped How Much New Money It Will Raise. I'd Consider Buying a Small Stake in the Stock.",
-      "riassunto": "Key PointsOracle pledged to raise at most $20 billion in extra money from the capital markets through fiscal 2030.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-30T08:01:01Z",
-      "url": "https://www.nasdaq.com/articles/oracle-just-capped-how-much-new-money-it-will-raise-id-consider-buying-small-stake-stock"
      }
     ],
     "PLTR": [
@@ -148884,6 +148902,13 @@
     ],
     "RGTI": [
      {
+      "titolo": "Are These 3 Quantum Computing Stocks Worth Buying Before 2027?",
+      "riassunto": "Key PointsThe leading quantum computing stocks have fallen this year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-10-31T16:40:00Z",
+      "url": "https://www.nasdaq.com/articles/are-these-3-quantum-computing-stocks-worth-buying-2027"
+     },
+     {
       "titolo": "Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market",
       "riassunto": "In the most recent trading session, Rigetti Computing, Inc. (RGTI) closed at $12.06, indicating a -2.74% shift from the previous trading day.",
       "fonte": "Nasdaq",
@@ -148917,13 +148942,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-10-28T11:26:00Z",
       "url": "https://www.nasdaq.com/articles/rigetti-computing-top-quantum-computing-stock-buy-now"
-     },
-     {
-      "titolo": "The Zacks Analyst Blog Highlights IonQ, Rigetti Computing, QTUM, WQTM, CHPX and Micron Technology",
-      "riassunto": "Quantum computing investment is surging, but hardware uncertainty raises risks for individual stocks. Explore three ETFs offering diversified exposure to the sector's growth.",
-      "fonte": "Nasdaq",
-      "quando": "2026-10-28T07:32:00Z",
-      "url": "https://www.nasdaq.com/articles/zacks-analyst-blog-highlights-ionq-rigetti-computing-qtum-wqtm-chpx-and-micron-technology"
      }
     ]
    },
@@ -148950,13 +148968,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-31T14:58:51Z"
+   "letto_il": "2026-10-31T17:55:07Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
+     "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-31T15:42:01Z",
+     "url": "https://www.nasdaq.com/articles/intel-has-massive-warning-amd-stock-investors-it-time-book-profits-nov-3"
+    },
     {
      "titolo": "Prediction: 2 Under $1 Trillion Stocks That Will Be Worth More Than Micron 5 Years From Now",
      "riassunto": "Key PointsAs the HBM leader, SK Hynix stock should grow to be larger than Micron in the next five years.",
@@ -148991,13 +149016,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-30T22:52:12Z",
      "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist"
-    },
-    {
-     "titolo": "AMD Reports on Nov. 3. Here's What You Should Do Before Then.",
-     "riassunto": "Key PointsAMD's stock is far more expensive than Nvidia's even as it continues to grow more slowly.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-30T15:50:00Z",
-     "url": "https://www.nasdaq.com/articles/amd-reports-nov-3-heres-what-you-should-do-then"
     }
    ],
    "BE": [
@@ -149134,6 +149152,13 @@
    ],
    "INTC": [
     {
+     "titolo": "Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?",
+     "riassunto": "Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-31T15:42:01Z",
+     "url": "https://www.nasdaq.com/articles/intel-has-massive-warning-amd-stock-investors-it-time-book-profits-nov-3"
+    },
+    {
      "titolo": "A SpaceX and Tesla Merger Will Only Be Successful If This One Thing Happens",
      "riassunto": "Key PointsA merger between SpaceX and Tesla is being formally considered.",
      "fonte": "Nasdaq",
@@ -149167,13 +149192,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-31T01:11:30Z",
      "url": "https://www.nasdaq.com/articles/kgi-securities-upgrades-intel-outperform-neutral"
-    },
-    {
-     "titolo": "Is Intel Stock a Buy After Its Post-Earnings Plunge?",
-     "riassunto": "Key PointsIntel's third-quarter revenue grew 21% year over year to $16.5 billion.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-30T23:34:02Z",
-     "url": "https://www.nasdaq.com/articles/intel-stock-buy-after-its-post-earnings-plunge"
     }
    ],
    "MRVL": [
@@ -149266,6 +149284,13 @@
    ],
    "MU": [
     {
+     "titolo": "Elon Musk Has Incredible News for Micron Stock Investors",
+     "riassunto": "Key PointsElon Musk recently pointed out that humanoid robots will need a lot of dynamic random-access memory.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-31T15:14:01Z",
+     "url": "https://www.nasdaq.com/articles/elon-musk-has-incredible-news-micron-stock-investors"
+    },
+    {
      "titolo": "Prediction: 2 Under $1 Trillion Stocks That Will Be Worth More Than Micron 5 Years From Now",
      "riassunto": "Key PointsAs the HBM leader, SK Hynix stock should grow to be larger than Micron in the next five years.",
      "fonte": "Nasdaq",
@@ -149299,13 +149324,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-30T17:09:02Z",
      "url": "https://www.nasdaq.com/articles/why-intel-down-today"
-    },
-    {
-     "titolo": "Micron Became One of the 10 Biggest Holdings in S&P 500 Index Funds. What Does That Mean for the Stock?",
-     "riassunto": "Key PointsMicron was the ninth-largest holding in Vanguard's S&P 500 ETF on Sept. 30, at 1.82% of the fund.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-30T17:01:01Z",
-     "url": "https://www.nasdaq.com/articles/micron-became-one-10-biggest-holdings-sp-500-index-funds-what-does-mean-stock"
     }
    ],
    "NVDA": [
@@ -149354,6 +149372,13 @@
    ],
    "ORCL": [
     {
+     "titolo": "Here’s What a $1,000 Investment in Oracle Stock Will Be Worth by 2030",
+     "riassunto": "Key PointsOracle expects to become free cash flow positive in the second half of fiscal 2028.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-31T15:17:01Z",
+     "url": "https://www.nasdaq.com/articles/heres-what-1000-investment-oracle-stock-will-be-worth-2030"
+    },
+    {
      "titolo": "Elon Musk Says Neoclouds Face a \"Guppy Level\" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.",
      "riassunto": "Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.",
      "fonte": "Nasdaq",
@@ -149387,13 +149412,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-30T11:25:00Z",
      "url": "https://www.nasdaq.com/articles/5-stocks-buy-november-bargains-worth-giving-thanks"
-    },
-    {
-     "titolo": "Oracle Just Capped How Much New Money It Will Raise. I'd Consider Buying a Small Stake in the Stock.",
-     "riassunto": "Key PointsOracle pledged to raise at most $20 billion in extra money from the capital markets through fiscal 2030.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-30T08:01:01Z",
-     "url": "https://www.nasdaq.com/articles/oracle-just-capped-how-much-new-money-it-will-raise-id-consider-buying-small-stake-stock"
     }
    ],
    "PLTR": [
@@ -149442,6 +149460,13 @@
    ],
    "RGTI": [
     {
+     "titolo": "Are These 3 Quantum Computing Stocks Worth Buying Before 2027?",
+     "riassunto": "Key PointsThe leading quantum computing stocks have fallen this year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-10-31T16:40:00Z",
+     "url": "https://www.nasdaq.com/articles/are-these-3-quantum-computing-stocks-worth-buying-2027"
+    },
+    {
      "titolo": "Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market",
      "riassunto": "In the most recent trading session, Rigetti Computing, Inc. (RGTI) closed at $12.06, indicating a -2.74% shift from the previous trading day.",
      "fonte": "Nasdaq",
@@ -149475,13 +149500,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-10-28T11:26:00Z",
      "url": "https://www.nasdaq.com/articles/rigetti-computing-top-quantum-computing-stock-buy-now"
-    },
-    {
-     "titolo": "The Zacks Analyst Blog Highlights IonQ, Rigetti Computing, QTUM, WQTM, CHPX and Micron Technology",
-     "riassunto": "Quantum computing investment is surging, but hardware uncertainty raises risks for individual stocks. Explore three ETFs offering diversified exposure to the sector's growth.",
-     "fonte": "Nasdaq",
-     "quando": "2026-10-28T07:32:00Z",
-     "url": "https://www.nasdaq.com/articles/zacks-analyst-blog-highlights-ionq-rigetti-computing-qtum-wqtm-chpx-and-micron-technology"
     }
    ]
   },
@@ -149508,23 +149526,18 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-31T14:58:51Z"
+  "letto_il": "2026-10-31T17:55:07Z"
  },
  "predictions": [
-  {
-   "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
-   "yes": 28,
-   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
-  },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
    "yes": 70,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
   },
   {
-   "question": "Will the Fed increase interest rates by 50+ bps after the December 2026 meeting?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-50-bps-after-the-december-2026-meeting-20260729232808637"
+   "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
+   "yes": 28,
+   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
   }
  ],
  "options": {
@@ -218863,7 +218876,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 26,
-    "risk_sentiment": 45,
+    "risk_sentiment": 46,
     "credit": 76,
     "systemic_risk": 59,
     "corp_profit": 53,
@@ -219041,7 +219054,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -219125,6 +219138,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-31T14:58:52Z"
+  "generated_at": "2026-10-31T17:55:08Z"
  }
 }
