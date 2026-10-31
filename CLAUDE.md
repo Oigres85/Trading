@@ -9448,5 +9448,14 @@ sezione nuova lo dichiara. La scheda completa apre con la sintesi (`scheda.SEZIO
 - ⚠ **Due non mordevano al primo giro, ed entrambe per la FIXTURE** (v430: *un'iniezione che non morde prova che il gate
   non contiene il fenomeno*): l'incrocio CONTRO si provava solo col 🔴 e non col 🟠, e l'agenda non aveva un nome NON in
   conflitto coi conti vicini, quindi l'esame mandato a tutti non si vedeva. Aggiunti i due casi, mordono.
-- Pavimento di `test_analisi_libro.py` 1025 → 1050 (1064 punti di chiamata, 1073 check). `?v=` e `BUILD_VERSION` non
-  toccati: nessun file servito al browser (v440).
+- Pavimento di `test_analisi_libro.py` 1025 → 1050 (1064 punti di chiamata, 1073 check).
+
+### 🗳️ E il `pre-push` ha fermato il primo push: Polymarket vuoto, e il pacchetto taceva
+Il rebase ha portato il run delle 19:48 e **v408** è andato rosso su codice che nessuno aveva toccato. Due run di fila
+(un sabato sera) non avevano trovato nessun mercato macro fra i più scambiati di Polymarket: il blocco «MERCATI DI
+PREVISIONE» mancava da TUTTI E DUE i pacchetti, e il check pretendeva di trovarlo — la v429, per l'ennesima volta. Ma il
+check aveva trovato anche un difetto vero: il pacchetto **taceva**, mentre la riga della potatura (v408) continuava a
+dire che i mercati di previsione restano «INTERI». Ora il blocco dichiara il buco, e dice che la pipeline non distingue
+la fonte caduta dalla fonte senza mercati macro (`fetch_predictions` restituisce una lista vuota in tutti e due i casi:
+v389, v406). Il v408 costruisce i mercati invece di aspettarli; un check nuovo percorre il ramo vuoto e morde togliendo
+la dichiarazione. `?v=` e `BUILD_VERSION` a 524: cambia `assets/app.js`.

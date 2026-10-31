@@ -7627,7 +7627,13 @@ check("v408 senza opzione buildPrompt e' identico al byte a buildPrompt({}) e al
     return true;
   } finally { Date = _DV408; }`));
 
+/* ⚠ v524 — riagganciato: il 31/10/2026 Polymarket non ha dato nessun mercato macro per due run, il blocco dei mercati di
+   previsione non c'era in NESSUNO dei due pacchetti, e il check andava rosso a calendario sul codice giusto (v429: uno
+   stato che si aspetta invece di costruirlo vale finche' i dati lo concedono). I mercati si COSTRUISCONO. */
 check("v408 i quattro blocchi potati escono dal pacchetto di titolo e restano in quello macro", suVeriEsito(`
+  const _pr408 = DATA.predictions;
+  DATA.predictions = [{ question: "Will the Fed cut rates in December?", yes: 40, link: "https://polymarket.com" }];
+  try {
   const macro = buildCIOText();
   const tit = buildPromptTicker("MU");
   const POTATI = ["STAGIONALITA' DEL NASDAQ", "BofA Bear-Market Signposts",
@@ -7643,9 +7649,25 @@ check("v408 i quattro blocchi potati escono dal pacchetto di titolo e restano in
   /* ⚠ e i due che NON si potano devono restare INTERI: il taglio non deve allargarsi da solo
      al vicino, che e' la classe v201-v204 (tre volte in quattro versioni). */
   for (const s of ["ROTAZIONE SETTORIALE", "MERCATI DI PREVISIONE"]) {
-    if (tit.indexOf(s) < 0) guai.push(s + ": potato, e non doveva esserlo");
+    if (macro.indexOf(s) < 0) guai.push(s + ": assente anche dal pacchetto macro, il check non misura niente");
+    else if (tit.indexOf(s) < 0) guai.push(s + ": potato, e non doveva esserlo");
   }
-  return guai.length ? guai.join(" · ") : true;`));
+  return guai.length ? guai.join(" · ") : true;
+  } finally { DATA.predictions = _pr408; }`));
+
+/* v524 — senza mercati macro il blocco DICHIARA il buco, in tutti e due i pacchetti, invece di sparire */
+check("v524 senza mercati di previsione macro il pacchetto lo dichiara, e non come assenza di attese", suVeriEsito(`
+  const _pr524 = DATA.predictions;
+  DATA.predictions = [];
+  try {
+    const macro = buildCIOText();
+    const tit = buildPromptTicker("MU");
+    const frase = "NESSUN mercato su temi macro in questo run";
+    if (macro.indexOf(frase) < 0) return "il pacchetto macro tace sui mercati di previsione";
+    if (tit.indexOf(frase) < 0) return "il pacchetto di titolo tace sui mercati di previsione";
+    if (macro.indexOf("i due casi qui non si distinguono") < 0) return "non dice che fonte caduta e fonte vuota si leggono uguali";
+    return true;
+  } finally { DATA.predictions = _pr524; }`));
 
 check("v408 la potatura si DICHIARA: mai un blocco tolto in silenzio", suVeriEsito(`
   const tit = buildPromptTicker("MU");

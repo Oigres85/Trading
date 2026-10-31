@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "520";
+const BUILD_VERSION = "524";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10580,6 +10580,16 @@ function buildPrompt(opz) {
     informativi.forEach(p => { const d = pmDelta7(p.question, p.yes); lines.push(`- ${p.question}: ${p.yes}% [Δ7g ${d == null ? "—" : (d > 0 ? "+" : "") + d + "pp"}]`); });
     if (scartati) lines.push(`⚠ ${scartati} ${scartati === 1 ? "mercato escluso" : "mercati esclusi"} perche' quota${scartati === 1 ? "" : "no"} sopra il 98% o sotto il 2%: `
       + `una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.`);
+  } else {
+    /* ⚠ v524 — IL BLOCCO SPARIVA IN SILENZIO. Il 31/10/2026 due run di fila non hanno trovato nessun mercato macro fra i
+       piu' scambiati di Polymarket (un sabato sera), e il pacchetto smetteva di nominare i mercati di previsione — mentre la
+       riga della potatura continuava a dirli «INTERI». «Il sistema non ha il dato» e «ce l'ha e non te lo passa» si leggono
+       uguali (v406). E la pipeline non distingue la fonte caduta dalla fonte senza mercati macro: si dice. */
+    lines.push("");
+    lines.push("MERCATI DI PREVISIONE (Polymarket): NESSUN mercato su temi macro in questo run. La pipeline legge i mercati "
+      + "piu' scambiati e tiene quelli su Fed, inflazione, recessione e borse: o la fonte non ha risposto, o fra i piu' "
+      + "scambiati non ce n'era nessuno su questi temi, e i due casi qui non si distinguono. Non vuol dire che il mercato "
+      + "non abbia attese: e' il dato che manca.");
   }
   /* v256 — ULTIME NEWS fuori dal payload: le news escono dal sistema con il portafoglio.
      La lettura delle notizie su un singolo nome torna, quando serve, dall'analisi spot del
