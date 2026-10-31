@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-31T19:00:45Z",
+ "updated_at": "2026-10-31T19:48:08Z",
  "eurusd": 1.1183,
  "totals": {
   "usd_value": 0,
@@ -74,8 +74,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "ITALY",
-    "entita": "ITALY",
-    "contratto": "SNRFOR.USD.XR14",
+    "entita": "Rep Italy",
+    "contratto": "SNRFOR.USD.CR14",
     "cedola_pb": 100,
     "prezzo": 101.2237,
     "punti": -1.22,
@@ -1976,7 +1976,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -3153,7 +3153,7 @@
     "eps_ora": 15.9059,
     "eps_90g_fa": 13.8715,
     "eps_7g_fa": 15.8232,
-    "eps_anno_corrente": 7.6184,
+    "eps_anno_corrente": 7.6207,
     "revisione_90g_pct": 14.67,
     "revisione_7g_pct": 0.52,
     "su_30g": 7,
@@ -3205,7 +3205,7 @@
     "gross_margin": 0.5572,
     "enterprise_value": 815238414336.0,
     "ev_ebitda": 85.258,
-    "peg": 0.56,
+    "peg": 0.5,
     "roa": 0.0513,
     "short_float": 0.0234,
     "buyback_yield": 0.0023,
@@ -4400,7 +4400,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMD",
-    "entita": "AMD",
+    "entita": "Advanced Micro Devices Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 97.7998,
@@ -5245,7 +5245,7 @@
     "gross_margin": 0.7467,
     "enterprise_value": 4908214910976.0,
     "ev_ebitda": 24.387,
-    "peg": 0.26,
+    "peg": 0.25,
     "roa": 0.5357,
     "short_float": 0.013,
     "buyback_yield": 0.0081,
@@ -6442,7 +6442,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NVIDIA",
-    "entita": "NVIDIA",
+    "entita": "NVIDIA Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 98.0469,
@@ -14757,8 +14757,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "SKHYN",
-    "entita": "SKHYN",
-    "contratto": "SNRFOR.USD.XR14",
+    "entita": "SK hynix Inc",
+    "contratto": "SNRFOR.USD.CR14",
     "cedola_pb": 100,
     "prezzo": 101.8598,
     "punti": -1.86,
@@ -18331,7 +18331,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COREWEI",
-    "entita": "COREWEI",
+    "entita": "COREWEAVE INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 500,
     "prezzo": 82.5505,
@@ -18430,11 +18430,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 77477.58,
+   "price": 77460.21,
    "price_asof": "2026-10-31",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.36,
+   "change_pct": 0.34,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -38.6,
@@ -18448,7 +18448,7 @@
    "support": 76189.88,
    "resistance": 84840.05,
    "rsi": 35.7,
-   "volume": 15339875328,
+   "volume": 14249902080,
    "vol_ratio": 1.7,
    "atr_14": 2019.45,
    "atr_pct": 2.61,
@@ -18460,7 +18460,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77477.58
+     77460.21
     ],
     "m6": [
      59532.34,
@@ -18588,7 +18588,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77477.58
+     77460.21
     ],
     "all": [
      386.94,
@@ -18736,7 +18736,7 @@
      62813.75,
      78548.63,
      83553.85,
-     77477.58
+     77460.21
     ],
     "m1": [
      82912.23,
@@ -18760,7 +18760,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77477.58
+     77460.21
     ],
     "m3": [
      80257.54,
@@ -18828,7 +18828,7 @@
      81267.59,
      77775.11,
      77198.21,
-     77477.58
+     77460.21
     ],
     "y1": [
      109556.16,
@@ -18904,7 +18904,7 @@
      81500.8,
      84011.97,
      80006.66,
-     77477.58
+     77460.21
     ],
     "d1": [
      77152.12,
@@ -19020,7 +19020,12 @@
      77574.24,
      77560.76,
      77547.22,
-     77483.39
+     77483.39,
+     77503.74,
+     77541.3,
+     77425.62,
+     77450.98,
+     77460.21
     ]
    },
    "earnings_date": null,
@@ -19034,7 +19039,7 @@
    "sharpe_6m": 1.58,
    "sortino_6m": 2.82,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77477.58,
+   "prezzo_limite_aggiustato": 77460.21,
    "risk_reward": "1:1.8",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19050,22 +19055,22 @@
     "w1": {
      "support": 76189.88,
      "resistance": 81889.95,
-     "change_pct": -4.12
+     "change_pct": -4.14
     },
     "m1": {
      "support": 76189.88,
      "resistance": 84840.05,
-     "change_pct": -6.55
+     "change_pct": -6.58
     },
     "m3": {
      "support": 74944.59,
      "resistance": 87363.76,
-     "change_pct": -3.46
+     "change_pct": -3.49
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 14.51
+     "change_pct": 14.49
     }
    },
    "financials": [],
@@ -19092,55 +19097,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77477.58,
+     "prezzo": 77460.21,
      "medie": {
       "sma10": {
-       "liv": 79773.11,
-       "dist_pct": -2.88
+       "liv": 79771.38,
+       "dist_pct": -2.9
       },
       "ema10": {
-       "liv": 79516.65,
-       "dist_pct": -2.56
+       "liv": 79513.49,
+       "dist_pct": -2.58
       },
       "sma20": {
-       "liv": 80999.99,
-       "dist_pct": -4.35
+       "liv": 80999.12,
+       "dist_pct": -4.37
       },
       "ema20": {
-       "liv": 80606.39,
-       "dist_pct": -3.88
+       "liv": 80604.73,
+       "dist_pct": -3.9
       },
       "sma30": {
-       "liv": 82039.18,
-       "dist_pct": -5.56
+       "liv": 82038.6,
+       "dist_pct": -5.58
       },
       "ema30": {
-       "liv": 80949.59,
-       "dist_pct": -4.29
+       "liv": 80948.47,
+       "dist_pct": -4.31
       },
       "sma50": {
-       "liv": 81897.21,
-       "dist_pct": -5.4
+       "liv": 81896.86,
+       "dist_pct": -5.42
       },
       "ema50": {
-       "liv": 80387.11,
-       "dist_pct": -3.62
+       "liv": 80386.43,
+       "dist_pct": -3.64
       },
       "sma100": {
-       "liv": 76271.36,
-       "dist_pct": 1.58
+       "liv": 76271.18,
+       "dist_pct": 1.56
       },
       "ema100": {
-       "liv": 77745.26,
-       "dist_pct": -0.34
+       "liv": 77744.92,
+       "dist_pct": -0.37
       },
       "sma200": {
-       "liv": 73131.89,
-       "dist_pct": 5.94
+       "liv": 73131.8,
+       "dist_pct": 5.92
       },
       "ema200": {
-       "liv": 76457.33,
-       "dist_pct": 1.33
+       "liv": 76457.16,
+       "dist_pct": 1.31
       }
      },
      "medie_battute": 3,
@@ -19148,18 +19153,18 @@
      "oscillatori": {
       "rsi14": 35.7,
       "macd": {
-       "linea": -1070.67,
-       "segnale": -553.19,
-       "istogramma": -517.48
+       "linea": -1072.06,
+       "segnale": -553.47,
+       "istogramma": -518.59
       },
-      "stoch_k": 14.9,
+      "stoch_k": 14.7,
       "stoch_d": 9.0,
-      "williams_r": -85.1,
-      "cci20": -134.8,
+      "williams_r": -85.3,
+      "cci20": -135.0,
       "adx14": 20.1,
       "di_su": 13.8,
       "di_giu": 29.5,
-      "momentum10": -6534.39
+      "momentum10": -6551.76
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19652,19 +19657,19 @@
       "o": 77202.4,
       "h": 77612.09,
       "l": 77000.92,
-      "c": 77477.58
+      "c": 77460.21
      }
     ],
     "performance": {
-     "s1": -3.16,
-     "m1": -6.14,
-     "m3": -1.96,
-     "m6": 29.26,
-     "a1": 13.93,
-     "ytd": -12.68,
-     "a3": 123.49,
-     "a5": 26.35,
-     "a10": 10952.88
+     "s1": -3.18,
+     "m1": -6.16,
+     "m3": -1.98,
+     "m6": 29.23,
+     "a1": 13.91,
+     "ytd": -12.7,
+     "a3": 123.44,
+     "a5": 26.32,
+     "a10": 10950.4
     },
     "stagionalita": [
      {
@@ -37125,7 +37130,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMZN",
-    "entita": "AMZN",
+    "entita": "Amazon Com Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.929,
@@ -41011,7 +41016,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ALPHINC",
-    "entita": "ALPHINC",
+    "entita": "Alphabet Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 100.3885,
@@ -41953,7 +41958,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -44098,7 +44103,7 @@
     "gross_margin": 0.6585,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.78,
+    "peg": 0.73,
     "roa": 0.2058,
     "short_float": 0.0061,
     "buyback_yield": -0.0,
@@ -45290,8 +45295,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "TAISEM",
-    "entita": "TAISEM",
-    "contratto": "SNRFOR.USD.XR14",
+    "entita": "Taiwan Semicon Mfg Co Ltd",
+    "contratto": "SNRFOR.USD.CR14",
     "cedola_pb": 100,
     "prezzo": 101.6197,
     "punti": -1.62,
@@ -47607,17 +47612,17 @@
    "earnings_date": "2027-01-28",
    "rating": {
     "key": "hold",
-    "n": 42,
-    "target": 107.21,
-    "upside_pct": 63.0
+    "n": 43,
+    "target": 101.02,
+    "upside_pct": 53.6
    },
    "analisti": {
-    "eps_ora": 2.0985,
+    "eps_ora": 1.9943,
     "eps_90g_fa": 2.0108,
     "eps_7g_fa": 2.1275,
-    "eps_anno_corrente": 1.4816,
-    "revisione_90g_pct": 4.36,
-    "revisione_7g_pct": -1.36,
+    "eps_anno_corrente": 1.4842,
+    "revisione_90g_pct": -0.82,
+    "revisione_7g_pct": -6.26,
     "su_30g": 1,
     "giu_30g": 0,
     "eps_min": 1.27,
@@ -47625,7 +47630,7 @@
     "eps_n": 43,
     "target_min": 70.0,
     "target_max": 165.0,
-    "target_mediana": 100.0
+    "target_mediana": 96.0
    },
    "health": 15,
    "eps": -2.42,
@@ -47662,7 +47667,7 @@
     "debt_to_equity": 38.108,
     "dividend_yield": 0.0,
     "price_to_book": 3.0387,
-    "target_mean": 107.2143,
+    "target_mean": 101.0233,
     "fcf": 670374976.0,
     "gross_margin": 0.4015,
     "enterprise_value": 361956605952.0,
@@ -48862,7 +48867,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "INTC",
-    "entita": "INTC",
+    "entita": "Intel Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 98.1966,
@@ -50299,7 +50304,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "SPACEXP",
-    "entita": "SPACEXP",
+    "entita": "SPACE EXPL TECH CORP",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 92.5822,
@@ -51005,7 +51010,7 @@
     "gross_margin": 0.1929,
     "enterprise_value": 1551950151680.0,
     "ev_ebitda": 157.751,
-    "peg": 4.7,
+    "peg": 4.66,
     "roa": 0.0135,
     "short_float": 0.0196,
     "buyback_yield": 0.0,
@@ -52192,7 +52197,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "TESLINC",
-    "entita": "TESLINC",
+    "entita": "Tesla Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 95.0886,
@@ -53834,7 +53839,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CONSENAG",
-    "entita": "CONSENAG",
+    "entita": "Constellation Energy Generation LLC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.1312,
@@ -55821,7 +55826,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NFLX",
-    "entita": "NFLX",
+    "entita": "Netflix Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.7641,
@@ -56260,7 +56265,7 @@
      24.28,
      21.19,
      21.19,
-     18.31,
+     18.3,
      20.9,
      17.41,
      13.16,
@@ -56766,8 +56771,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 51,
-    "target": 629.69,
-    "upside_pct": 20.7
+    "target": 631.09,
+    "upside_pct": 20.9
    },
    "analisti": {
     "eps_ora": 24.1416,
@@ -56820,12 +56825,12 @@
     "debt_to_equity": 28.465,
     "dividend_yield": 0.0075,
     "price_to_book": 8.2384,
-    "target_mean": 629.6884,
+    "target_mean": 631.0924,
     "fcf": 2994125056.0,
     "gross_margin": 0.6766,
     "enterprise_value": 3945227091968.0,
     "ev_ebitda": 19.18,
-    "peg": 1.72,
+    "peg": 1.69,
     "roa": 0.1441,
     "short_float": 0.0088,
     "buyback_yield": 0.0052,
@@ -58011,7 +58016,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MSFT",
-    "entita": "MSFT",
+    "entita": "Microsoft Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.8569,
@@ -60203,7 +60208,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "APLINC",
-    "entita": "APLINC",
+    "entita": "Apple Inc.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.3669,
@@ -62071,7 +62076,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "METAPL",
-    "entita": "METAPL",
+    "entita": "META PLATFORMS INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 98.9133,
@@ -62573,7 +62578,7 @@
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -67701,7 +67706,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "BROINC",
-    "entita": "BROINC",
+    "entita": "BROADCOM INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 96.0649,
@@ -69527,7 +69532,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.63,
+      "mediana": 1.64,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -71640,7 +71645,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -72790,12 +72795,12 @@
     "upside_pct": 80.5
    },
    "analisti": {
-    "eps_ora": 11.0326,
+    "eps_ora": 11.0401,
     "eps_90g_fa": 10.8902,
     "eps_7g_fa": 10.9899,
     "eps_anno_corrente": 8.1402,
-    "revisione_90g_pct": 1.31,
-    "revisione_7g_pct": 0.39,
+    "revisione_90g_pct": 1.38,
+    "revisione_7g_pct": 0.46,
     "su_30g": 23,
     "giu_30g": 10,
     "eps_min": 9.0,
@@ -72845,7 +72850,7 @@
     "gross_margin": 0.6396,
     "enterprise_value": 532555595776.0,
     "ev_ebitda": 15.466,
-    "peg": 0.78,
+    "peg": 0.73,
     "roa": 0.0636,
     "short_float": 0.0254,
     "buyback_yield": -0.0156,
@@ -74034,7 +74039,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ORCLE",
-    "entita": "ORCLE",
+    "entita": "Oracle Cop",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 92.0374,
@@ -76224,7 +76229,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MCD",
-    "entita": "MCD",
+    "entita": "McDONALDS Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.5144,
@@ -77047,17 +77052,17 @@
     "upside_pct": 63.7
    },
    "analisti": {
-    "eps_ora": 2.6566,
-    "eps_90g_fa": 2.6874,
-    "eps_7g_fa": 2.5999,
-    "eps_anno_corrente": 1.4467,
-    "revisione_90g_pct": -1.15,
-    "revisione_7g_pct": 2.18,
+    "eps_ora": 2.5657,
+    "eps_90g_fa": 2.6851,
+    "eps_7g_fa": 2.6566,
+    "eps_anno_corrente": 1.0617,
+    "revisione_90g_pct": -4.45,
+    "revisione_7g_pct": -3.42,
     "su_30g": 0,
     "giu_30g": 2,
-    "eps_min": 2.05,
+    "eps_min": 1.74,
     "eps_max": 4.1,
-    "eps_n": 17,
+    "eps_n": 18,
     "target_min": 84.77,
     "target_max": 172.45,
     "target_mediana": 130.82
@@ -89012,7 +89017,7 @@
      7.48,
      7.84,
      7.76,
-     7.75,
+     7.76,
      7.95,
      8.29,
      8.35,
@@ -90822,7 +90827,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "XOM",
-    "entita": "XOM",
+    "entita": "Exxon Mobil Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8093,
@@ -91567,7 +91572,7 @@
      127.9,
      130.07,
      136.24,
-     144.29,
+     144.28,
      154.51,
      149.4,
      151.74,
@@ -93027,7 +93032,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CVX",
-    "entita": "CVX",
+    "entita": "Chevron Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8502,
@@ -95233,7 +95238,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COP",
-    "entita": "COP",
+    "entita": "ConocoPhillips",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.2723,
@@ -95609,7 +95614,7 @@
      123.58,
      115.79,
      115.57,
-     127.36,
+     127.35,
      140.21,
      140.59,
      129.75,
@@ -95626,7 +95631,7 @@
      140.26,
      150.21,
      160.86,
-     166.38,
+     166.39,
      149.99,
      148.7,
      158.18,
@@ -95854,16 +95859,16 @@
     "upside_pct": -4.0
    },
    "analisti": {
-    "eps_ora": 16.1965,
-    "eps_90g_fa": 16.3335,
-    "eps_7g_fa": 16.1929,
-    "eps_anno_corrente": 13.9464,
-    "revisione_90g_pct": -0.84,
-    "revisione_7g_pct": 0.02,
+    "eps_ora": 16.163,
+    "eps_90g_fa": 16.2642,
+    "eps_7g_fa": 16.234,
+    "eps_anno_corrente": 14.0375,
+    "revisione_90g_pct": -0.62,
+    "revisione_7g_pct": -0.44,
     "su_30g": 3,
     "giu_30g": 6,
     "eps_min": 15.1723,
-    "eps_max": 17.65,
+    "eps_max": 17.23,
     "eps_n": 27,
     "target_min": 200.0,
     "target_max": 325.0,
@@ -95909,7 +95914,7 @@
     "gross_margin": 0.7501,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.59,
+    "peg": 0.6,
     "roa": null,
     "short_float": 0.0098,
     "buyback_yield": 0.0019,
@@ -97092,7 +97097,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ABBVINC",
-    "entita": "ABBVINC",
+    "entita": "ABBVIE INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.0923,
@@ -98045,19 +98050,19 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 159.99,
-    "upside_pct": 7.0
+    "target": 159.83,
+    "upside_pct": 6.9
    },
    "analisti": {
-    "eps_ora": 9.1228,
+    "eps_ora": 9.111,
     "eps_90g_fa": 9.6785,
     "eps_7g_fa": 9.2617,
-    "eps_anno_corrente": 2.7311,
-    "revisione_90g_pct": -5.74,
-    "revisione_7g_pct": -1.5,
+    "eps_anno_corrente": 2.7515,
+    "revisione_90g_pct": -5.86,
+    "revisione_7g_pct": -1.63,
     "su_30g": 1,
     "giu_30g": 10,
-    "eps_min": 8.48,
+    "eps_min": 8.5,
     "eps_max": 9.77,
     "eps_n": 22,
     "target_min": 105.0,
@@ -98099,7 +98104,7 @@
     "debt_to_equity": 128.408,
     "dividend_yield": 0.0227,
     "price_to_book": 8.8025,
-    "target_mean": 159.9865,
+    "target_mean": 159.8327,
     "fcf": null,
     "gross_margin": 0.7691,
     "enterprise_value": 415712509952.0,
@@ -100108,24 +100113,24 @@
    "rating": {
     "key": "buy",
     "n": 26,
-    "target": 165.31,
-    "upside_pct": -3.1
+    "target": 170.88,
+    "upside_pct": 0.1
    },
    "analisti": {
-    "eps_ora": 9.982,
+    "eps_ora": 10.0712,
     "eps_90g_fa": 9.6185,
     "eps_7g_fa": 9.9743,
-    "eps_anno_corrente": -1.0239,
-    "revisione_90g_pct": 3.78,
-    "revisione_7g_pct": 0.08,
+    "eps_anno_corrente": -1.0328,
+    "revisione_90g_pct": 4.71,
+    "revisione_7g_pct": 0.97,
     "su_30g": 5,
     "giu_30g": 2,
     "eps_min": 9.15,
-    "eps_max": 11.44,
+    "eps_max": 12.41,
     "eps_n": 26,
-    "target_min": 126.0,
-    "target_max": 195.0,
-    "target_mediana": 169.0
+    "target_min": 131.0,
+    "target_max": 200.0,
+    "target_mediana": 175.0
    },
    "health": 91,
    "eps": -3.13,
@@ -100162,7 +100167,7 @@
     "debt_to_equity": 204.176,
     "dividend_yield": 0.0192,
     "price_to_book": 16.3502,
-    "target_mean": 165.3077,
+    "target_mean": 170.8846,
     "fcf": 12642374656.0,
     "gross_margin": 0.7995,
     "enterprise_value": 231827881984.0,
@@ -103507,7 +103512,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMGN",
-    "entita": "AMGN",
+    "entita": "Amgen Inc.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.2423,
@@ -103906,7 +103911,7 @@
      171.99,
      163.61,
      170.13,
-     175.8,
+     175.79,
      179.02,
      189.57,
      173.43,
@@ -104241,7 +104246,7 @@
     "gross_margin": 0.9768,
     "enterprise_value": 753063165952.0,
     "ev_ebitda": 23.651,
-    "peg": 1.86,
+    "peg": 1.87,
     "roa": 0.1961,
     "short_float": 0.0119,
     "buyback_yield": 0.0237,
@@ -109173,10 +109178,7 @@
    "rs_ndx_1m": 18.8,
    "cds": {
     "stato": "assente",
-    "verificato": "2026-10-17",
-    "candidati": [
-     "PHILIP"
-    ]
+    "verificato": "2026-10-17"
    },
    "short_interest": {
     "stato": "misurato",
@@ -109815,7 +109817,7 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
      336.46,
      329.49,
@@ -111058,7 +111060,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -111328,7 +111330,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "DE",
-    "entita": "DE",
+    "entita": "Deere & Co",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.5423,
@@ -113526,7 +113528,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "THWALT",
-    "entita": "THWALT",
+    "entita": "Walt Disney Co.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8664,
@@ -115726,7 +115728,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "PFE",
-    "entita": "PFE",
+    "entita": "Pfizer Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1984,
@@ -116058,7 +116060,7 @@
      78.41,
      76.31,
      69.67,
-     72.9,
+     72.91,
      76.98,
      79.63,
      87.08,
@@ -116164,7 +116166,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -116300,7 +116302,7 @@
      585.73,
      690.4,
      705.85,
-     730.88,
+     730.87,
      780.99,
      774.14,
      810.11,
@@ -117741,7 +117743,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "GS",
-    "entita": "GS",
+    "entita": "Goldman Sachs Gp Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.4491,
@@ -119925,7 +119927,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "JPM",
-    "entita": "JPM",
+    "entita": "JPMorgan Chase & Co",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.3829,
@@ -120229,7 +120231,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120262,7 +120264,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -122842,8 +122844,8 @@
    "rating": {
     "key": "buy",
     "n": 29,
-    "target": 1397.02,
-    "upside_pct": -1.4
+    "target": 1403.64,
+    "upside_pct": -1.0
    },
    "analisti": {
     "eps_ora": 49.3587,
@@ -122859,7 +122861,7 @@
     "eps_n": 26,
     "target_min": 930.0,
     "target_max": 1650.0,
-    "target_mediana": 1410.0
+    "target_mediana": 1431.0
    },
    "health": 93,
    "eps": 30.81,
@@ -122896,7 +122898,7 @@
     "debt_to_equity": 122.925,
     "dividend_yield": 0.0049,
     "price_to_book": 31.3705,
-    "target_mean": 1397.0221,
+    "target_mean": 1403.6427,
     "fcf": 9343699968.0,
     "gross_margin": 0.8363,
     "enterprise_value": 1307284733952.0,
@@ -125852,7 +125854,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "DELLN",
-    "entita": "DELLN",
+    "entita": "Dell Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 100.322,
@@ -133126,8 +133128,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "176.47",
-    "change_pct": 0.23,
+    "value": "175.65",
+    "change_pct": -0.47,
     "suffix": "%"
    }
   ],
@@ -135204,6 +135206,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "We’re in our 70s. Should we pay off our 2.5% mortgage — or put the money in a high-yield savings account?",
+     "riassunto": "“Let’s say 10 years from now, when I’m 84, we need a substantial amount of cash.”",
+     "fonte": "MarketWatch",
+     "quando": "2026-10-31T19:00:00Z",
+     "url": "https://www.marketwatch.com/story/we-are-in-our-70s-should-we-pay-off-our-2-5-mortgage-or-build-up-our-savings-5a35e9c1?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "Caregivers are now spending more than $11,000 a year out of pocket—up 60% in five years",
      "riassunto": "An AARP study shows the financial sacrifices families make and their long-term impacts.",
      "fonte": "MarketWatch",
@@ -135216,13 +135225,6 @@
      "fonte": "MarketWatch",
      "quando": "2026-10-31T16:02:00Z",
      "url": "https://www.marketwatch.com/story/how-to-use-i-bonds-to-create-guaranteed-inflation-proof-income-in-retirement-50753fea?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "We’re in our 70s. Should we pay off our 2.5% mortgage — or put the money in a high-yield savings account?",
-     "riassunto": "“Let’s say 10 years from now, when I’m 84, we need a substantial amount of cash.”",
-     "fonte": "MarketWatch",
-     "quando": "2026-10-31T16:00:00Z",
-     "url": "https://www.marketwatch.com/story/we-are-in-our-70s-should-we-pay-off-our-2-5-mortgage-or-build-up-our-savings-5a35e9c1?mod=mw_rss_topstories"
     },
     {
      "titolo": "US Midterm Candidates Tap Rare Bipartisan Issue: Credit Card Rates",
@@ -143059,7 +143061,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 54
+     "score": 53
     },
     {
      "label": "Treasury 10A",
@@ -148206,14 +148208,14 @@
   "cds": {
    "fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
    "url": "https://www.ice.com/api/cds-settlement-prices/icc-single-names",
-   "letto": false,
-   "errore": "HTTP 403",
+   "letto": true,
+   "errore": null,
    "data": "2026-10-30",
    "date": {
-    "2026-10-30": 437
+    "2026-10-30": 697
    },
    "scadenza": "2031-12-20",
-   "entita_ice": null,
+   "entita_ice": 697,
    "tasso_pct": 3.88,
    "tasso_fonte": "EFFR del 2026-10-29 (NY Fed), proxy della curva SOFR della convenzione ISDA",
    "recupero": 0.4,
@@ -148222,8 +148224,8 @@
     "HY": {
      "serie": 47,
      "versione": 1,
-     "cedola": 500,
      "prezzo": 105.8711,
+     "cedola": 500,
      "data": "2026-10-30",
      "pb": 355.6,
      "var": {
@@ -148236,8 +148238,8 @@
     "IG": {
      "serie": 47,
      "versione": 1,
-     "cedola": 100,
      "prezzo": 101.7097,
+     "cedola": 100,
      "data": "2026-10-30",
      "pb": 62.7,
      "var": {
@@ -148276,7 +148278,12 @@
      "2026-10-22": "data.json del run delle 20:59 UTC (commit 20f3175)"
     }
    },
-   "unione": null,
+   "unione": {
+    "nuove": [],
+    "completate": {},
+    "difformi": 0,
+    "fuori_ordine": []
+   },
    "verificato": "2026-10-17",
    "sessione": null,
    "assenti": [
@@ -148425,7 +148432,7 @@
       "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-31T18:25:19Z",
+      "quando": "2026-10-31T19:25:32Z",
       "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
      },
      {
@@ -148645,7 +148652,7 @@
       "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
       "fonte": "Nasdaq",
-      "quando": "2026-10-31T18:25:19Z",
+      "quando": "2026-10-31T19:25:32Z",
       "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
      },
      {
@@ -148972,7 +148979,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-10-31T19:00:45Z"
+   "letto_il": "2026-10-31T19:48:08Z"
   }
  },
  "broker": null,
@@ -148983,7 +148990,7 @@
      "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-31T18:25:19Z",
+     "quando": "2026-10-31T19:25:32Z",
      "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
     },
     {
@@ -149203,7 +149210,7 @@
      "titolo": "Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...",
      "fonte": "Nasdaq",
-     "quando": "2026-10-31T18:25:19Z",
+     "quando": "2026-10-31T19:25:32Z",
      "url": "https://www.nasdaq.com/articles/stocks-fall-sharply-intel-and-amazon-sell-offs-and-crypto-heist-1"
     },
     {
@@ -149530,7 +149537,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-10-31T19:00:45Z"
+  "letto_il": "2026-10-31T19:48:08Z"
  },
  "predictions": [],
  "options": {
@@ -219087,7 +219094,7 @@
     "age_days": 1,
     "max_age": 5,
     "status": "ok",
-    "note": "ICE non letto in questo run (HTTP 403): vale l'ultimo giorno raccolto"
+    "note": ""
    },
    {
     "key": "short_interest",
@@ -219131,6 +219138,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-10-31T19:00:46Z"
+  "generated_at": "2026-10-31T19:48:09Z"
  }
 }
