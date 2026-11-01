@@ -7014,6 +7014,9 @@ _U505 = {
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
                     "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
                     "letture: 0 nuove in questo giro"],
+    # v528 — la pagina statistica: un blocco solo, nella sua sezione
+    "statistica": ["PAGINA STATISTICA (v528) — per ogni posizione lo stato di oggi e i casi simili, contro la BASE",
+                   "  AAA   seduta normale, tendenza intatta · 100 casi su 10 titoli · a 60 +5,0% → come la base"],
     # v524 — la sintesi operativa: un blocco solo, che va nella sua sezione in testa alla scheda
     "sintesi": ["SINTESI OPERATIVA (v524) — 31/10/2026 21:24 ora italiana · ultima seduta conclusa 30/10/2026", "",
                 "1 · IL REGIME — sei famiglie", "  🟢 CRESCITA E UTILI — favorevole", "      utili +30,2%",
@@ -10786,6 +10789,171 @@ check("v526 il formato: la risposta porta il rischio degli eventi in dollari e a
       "frase di giudizio; il registro ha la voce",
       "rischio degli eventi" in _risp526 and "cosa conta OGGI" in _risp526 and "[rischio_eventi]" in _fmt526
       and "`GAMMA_MAGGIORANZA` = 0,66" in _sez524)
+
+# ═════════ v528 — la forma statistica: prova d'ingresso, pagina, diario (CEO, 01/11/2026) ═════════
+import random as _rnd528
+import statistics
+import statistica as ST528
+import numeri_libro as _NL528
+from datetime import date as _d528, timedelta as _td528
+
+
+def _barre528(n, seme=1, deriva=0.0005, vol=0.02, v=1e6, inizio=_d528(2021, 1, 4)):
+    """Barre costruite: una passeggiata casuale deterministica, giorni feriali dal 2021."""
+    g = _rnd528.Random(seme)
+    out, c, d = [], 100.0, inizio
+    while len(out) < n:
+        if d.weekday() < 5:
+            c *= math.exp(deriva + vol * g.gauss(0, 1))
+            out.append({"t": d.isoformat(), "h": c * 1.01, "l": c * 0.99, "c": c, "v": v, "a": c})
+        d += _td528(days=1)
+    return out
+
+
+# ── lo stato del giorno: crollo e impennata dalle deviazioni standard, i volumi da notizia dal rapporto
+_b528 = _barre528(400, seme=3)
+_crollo = [dict(x) for x in _b528]
+_crollo[-1].update({"c": _crollo[-2]["c"] * 0.80, "l": _crollo[-2]["c"] * 0.79, "h": _crollo[-2]["c"] * 0.95, "v": 5e6})
+_crollo_muto = [dict(x) for x in _crollo]; _crollo_muto[-1]["v"] = 1e6
+_imp = [dict(x) for x in _b528]; _imp[-1].update({"c": _imp[-2]["c"] * 1.25, "h": _imp[-2]["c"] * 1.26, "v": 5e6})
+_g528 = [ST528.stati(x)[-1].get("giorno") for x in (_b528, _crollo, _crollo_muto, _imp)]
+check("v528 stato: una seduta oltre 3 deviazioni standard e' un crollo o un'impennata, con volumi da notizia sopra 2 volte "
+      "la media — una seduta normale resta normale: " + str(_g528),
+      _g528 == ["normale", "crollo con volumi da notizia", "crollo senza volumi anomali", "impennata con volumi da notizia"])
+
+# ── una regola sola: la tendenza della statistica e' quella della tenuta, l'ATR quello di brief (v161)
+_tend528 = []
+for _sem in (5, 6, 7, 8):
+    _bb = _barre528(320, seme=_sem, deriva=(-0.002 if _sem % 2 else 0.002))
+    for _k in (230, 280, 319):
+        _tend528.append((ST528.stati(_bb[:_k + 1])[-1]["tendenza"], _NL528.tendenza(_bb[:_k + 1])["stato"]))
+check("v528 la tendenza di ogni giorno e' la regola di numeri_libro.tendenza, calcolata con le somme mobili: "
+      + str(sorted(set(_tend528))),
+      all(a == b for a, b in _tend528) and {"rotta", "intatta"} <= {a for a, _ in _tend528})
+check("v528 l'ATR di ogni giorno e' quello di brief.atr_wilder (stesso seme)",
+      abs(ST528.atr_serie(_b528)[-1] - brief.atr_wilder(_b528)) < 1e-9
+      and abs(ST528.atr_serie(_b528[:200])[-1] - brief.atr_wilder(_b528[:200])) < 1e-9)
+# la deviazione standard mobile: e' quella delle 60 sedute PRIMA del giorno, non comprende il giorno stesso
+_c528 = [x["c"] for x in _b528]
+_z528 = math.log(_c528[399] / _c528[398])
+check("v528 la deviazione standard del giorno e' quella delle 60 sedute prima (somme mobili = calcolo diretto)",
+      abs(ST528.stati(_b528)[-1]["z"] - _z528 / statistics.pstdev([math.log(_c528[k] / _c528[k - 1]) for k in range(339, 399)])) < 1e-6)
+
+# ── la geometria: chi viene toccato prima, lo stesso giorno conta lo stop, senza nessuno dei due la chiusura in R
+def _geo528(percorso):
+    b = [{"t": f"2026-01-{i + 1:02d}", "h": h, "l": l, "c": c, "_atr": 1.0} for i, (h, l, c) in enumerate(percorso)]
+    return ST528.esito_geometria(b, 0, 2.0, 4.0, h=3)
+_e528 = [_geo528([(100, 100, 100), (101, 97.9, 99), (100, 99, 100), (100, 99, 100)]),
+         _geo528([(100, 100, 100), (104.1, 99, 103), (100, 99, 100), (100, 99, 100)]),
+         _geo528([(100, 100, 100), (104.5, 97.5, 100), (100, 99, 100), (100, 99, 100)]),
+         _geo528([(100, 100, 100), (101, 99, 100), (101, 99, 100), (101, 99, 101)])]
+check("v528 geometria: stop prima = -1 R, obiettivo prima = obiettivo/stop in R, tutti e due lo stesso giorno = lo stop, "
+      "nessuno = la chiusura finale in R: " + str([(x or {}).get("esito") for x in _e528]),
+      [x["esito"] for x in _e528] == ["stop", "obiettivo", "stop", "nessuno"]
+      and _e528[0]["R"] == -1.0 and _e528[1]["R"] == 2.0 and abs(_e528[3]["R"] - 0.5) < 1e-9)
+_cf528 = [{"t": f"2026-01-{i + 1:02d}", "h": h, "c": c} for i, (h, c) in enumerate([(110, 100), (108, 105), (109, 111), (112, 111)])]
+check("v528 la conferma: la prima chiusura sopra il massimo del giorno del crollo, e niente dopo `fino`",
+      ST528.conferma(_cf528, 0) == 2 and ST528.conferma(_cf528, 0, fino="2026-01-02") is None)
+
+# ── i casi: niente futuro, un caso al piu' ogni 20 sedute per titolo
+_B528 = {"X": _barre528(900, seme=11), "Y": _barre528(900, seme=12)}
+_tutti = ST528.casi(_B528, None, 2.0, 4.0)
+_fino = _B528["X"][600]["t"]
+_prima = ST528.casi(_B528, None, 2.0, 4.0, fino=_fino)
+_idx = {tk: {x["t"]: i for i, x in enumerate(b)} for tk, b in _B528.items()}
+_ok_dist = all(b2 - a2 >= ST528.DISTANZA for tk in _B528
+               for a2, b2 in zip(sorted(_idx[tk][c["t"]] for c in _tutti if c["tk"] == tk),
+                                 sorted(_idx[tk][c["t"]] for c in _tutti if c["tk"] == tk)[1:]))
+_ok_fut = all(_B528[c["tk"]][_idx[c["tk"]][c["t"]] + max(ST528.ORIZZONTI)]["t"] <= _fino for c in _prima)
+check(f"v528 i casi: un caso al piu' ogni {ST528.DISTANZA} sedute per titolo, e in una prova retroattiva nessuna finestra "
+      f"oltre la data ({len(_prima)} casi prima, {len(_tutti)} in tutto)", _ok_dist and _ok_fut and 0 < len(_prima) < len(_tutti))
+
+# ── il verdetto: due errori standard e 0,1 R, sotto 30 casi la statistica non dice
+_v528 = [ST528.verdetto(g)[0] for g in ({"n": 20, "ev": 1.0, "es": 0.1}, {"n": 100, "ev": 0.30, "es": 0.10},
+                                        {"n": 100, "ev": 0.20, "es": 0.14}, {"n": 100, "ev": -0.30, "es": 0.10},
+                                        {"n": 100, "ev": 0.05, "es": 0.01})]
+check("v528 verdetto: sotto 30 casi NON DICE; a favore o contro solo oltre 0,1 R E oltre 2 errori standard: " + str(_v528),
+      _v528 == ["LA STATISTICA NON DICE", "A FAVORE", "NON DISTINGUIBILE DAL CASO", "CONTRO", "NON DISTINGUIBILE DAL CASO"])
+
+# ── la prova su uno stato costruito: un crollo, i casi simili, la base, il valore atteso, cosa e' successo dopo
+_Bp = {f"T{k}": _barre528(1000, seme=20 + k) for k in range(6)}
+for _tk, _bb in _Bp.items():           # un crollo con volumi ogni 100 sedute, in ogni titolo
+    for _k in range(300, 1000, 100):
+        _bb[_k].update({"c": _bb[_k - 1]["c"] * 0.78, "a": _bb[_k - 1]["c"] * 0.78, "l": _bb[_k - 1]["c"] * 0.77,
+                        "h": _bb[_k - 1]["c"] * 0.96, "v": 6e6})   # anche "a": un salto di a/c e' un'operazione societaria
+        for _j in range(_k + 1, 1000):
+            for _f in ("c", "h", "l", "a"):
+                _bb[_j][_f] *= 0.78 / (_bb[_k - 1]["c"] / _bb[_k - 1]["c"])
+_Bp["QQQ"] = _barre528(1000, seme=99)
+_univ = ST528.universo
+ST528.universo = lambda: (list(_Bp), {"T0": {"tk": "T0", "qta": 10, "pmc": 1, "valuta": "USD"}})
+try:
+    _p528 = ST528.prova("T0", data=_Bp["T0"][800]["t"], B=_Bp)
+    _r528 = "\n".join(ST528.resa_prova(_p528))
+    _pg528 = "\n".join(ST528.resa_pagina(ST528.pagina(B=_Bp)))
+finally:
+    ST528.universo = _univ
+check("v528 la prova: lo stato e' il crollo con volumi da notizia, i casi simili sono crolli (non tutti i giorni), c'e' la "
+      "base, la geometria, il valore atteso, la variante con la conferma e cosa e' successo dopo — " + _r528[:200],
+      _p528.get("chiave", [None])[0] == "crollo con volumi da notizia" and 0 < _p528["pieno"]["n"] < _p528["base"]["n"]
+      and "BASE (tutti i giorni" in _r528 and "VALORE ATTESO" in _r528 and "ASPETTARE LA CONFERMA" in _r528
+      and "COSA E' SUCCESSO DOPO" in _r528 and "sopravvissuti" in _r528 and "PAGINA STATISTICA" in _pg528 and "T0" in _pg528)
+
+# ── il diario: la riga si scrive prima di sapere com'e' andata, il bilancio la misura dopo
+_dia = ST528.DIARIO
+ST528.DIARIO = str(Path(tempfile.mkdtemp()) / "diario.jsonl")
+try:
+    ST528.registra(_p528, "prova")
+    _bl528 = ST528.bilancio(B=_Bp)
+    _rb528 = "\n".join(ST528.resa_bilancio(_bl528))
+finally:
+    ST528.DIARIO = _dia
+_e0 = _bl528["righe"][0]
+_atteso = (_Bp["T0"][860]["c"] / _p528["prezzo"] - 1) * 100
+check("v528 il diario: la riga porta stato, casi, valore atteso, verdetto e intuizione; il bilancio misura il rendimento a "
+      "60 sedute dal prezzo d'ingresso e dice che sotto 30 decisioni il confronto non si legge",
+      _e0["riga"]["intuizione"] == "prova" and _e0["riga"]["verdetto"] and abs(_e0[60] - _atteso) < 1e-9
+      and "non si legge ancora" in _rb528)
+
+# ── la distorsione da sopravvivenza si dichiara negli stati di una discesa profonda, e solo li'
+check("v528 la distorsione da sopravvivenza si dichiara oltre il 25% sotto il massimo dell'anno, non entro il 25%",
+      ST528.sopravvivenza(("normale", "rotta", "oltre il 40% sotto il massimo dell'anno"))
+      and ST528.sopravvivenza(("normale", "rotta", "fra il 25% e il 40% sotto il massimo dell'anno"))
+      and not ST528.sopravvivenza(("normale", "intatta", "fra il 10% e il 25% sotto il massimo dell'anno"))
+      and not ST528.sopravvivenza(("crollo con volumi da notizia", "rotta")))
+
+# ── le convenzioni rilette dal libro (v474: un numero, un posto)
+_lib528 = (Path(__file__).resolve().parent.parent / "memoria" / "LIBRO.md").read_text(encoding="utf-8")
+_s528 = _lib528[_lib528.find("## 1quindecies"):_lib528.find("## 2. LIVELLO C")]
+_num = lambda pat: float(re.search(pat, _s528).group(1).replace(",", "."))
+check("v528 le convenzioni della forma statistica stanno nel libro (§1quindecies) e coincidono col codice",
+      _num(r"oltre \*\*(\d+)\*\* deviazioni standard") == ST528.SIGMA_GRANDE
+      and _num(r"standard delle \*\*(\d+)\*\* sedute") == ST528.SEDUTE_SIGMA
+      and _num(r"almeno \*\*(\d+)\*\* volte la media") == ST528.VOLUME_NOTIZIA
+      and _num(r"media delle \*\*(\d+)\*\* sedute") == ST528.SEDUTE_VOLUME
+      and _num(r"sotto \*\*(\d+)\*\*, sopra") == ST528.RSI_BASSO and _num(r"sopra \*\*(\d+)\*\*\)") == ST528.RSI_ALTO
+      and _num(r"ogni \*\*(\d+)\*\* sedute per titolo") == ST528.DISTANZA
+      and _num(r"sotto \*\*(\d+)\*\* casi") == ST528.MIN_CASI
+      and _num(r"oltre \*\*(\d+)\*\* errori standard") == ST528.ERRORI
+      and _num(r"oltre \*\*([\d,]+)\*\* R") == ST528.SOGLIA_EV
+      and _num(r"entro \*\*(\d+)\*\* ATR") == ST528.STOP_LONTANO_ATR
+      and _num(r"altrimenti \*\*(\d+)\*\* ATR") == ST528.STOP_STANDARD_ATR
+      and _num(r"altrimenti \*\*(\d+)\*\* volte il rischio") == ST528.OBIETTIVO_STANDARD_R
+      and _num(r"entro \*\*(\d+)\*\* sedute") == ST528.ATTESA_MAX)
+
+# ── i collegamenti: il comando unico, la scheda, il formato, /aggiorna; l'universo dal libro, mai dalla pipeline
+import analisi as _AN528
+_cmd528 = [c[1] for c in _AN528.comandi("seduta")]
+_srcst528 = _solo_codice_py((Path(__file__).resolve().parent / "statistica.py").read_text(encoding="utf-8"))
+_univ528 = _srcst528[_srcst528.find("def universo("):_srcst528.find("def leggi_barre(")]
+_fmt528 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_agg528 = (Path(__file__).resolve().parent.parent / ".claude" / "commands" / "aggiorna.md").read_text(encoding="utf-8")
+check("v528 collegamenti: il comando unico esegue la pagina statistica, la scheda ha sezione, catalogo e voce, il formato "
+      "lo strumento e la chiave, /aggiorna lo dichiara fuori; l'universo viene da LIBRO.md, non da data.json",
+      ["statistica.py", "pagina"] in _cmd528 and "statistica" in SC.CATALOGO and "statistica" in SC.REGISTRO
+      and "statistica" in [s[0] for s in SC.SEZIONI] and "`[statistica]`" in _fmt528
+      and "`python3 scripts/statistica.py pagina`" in _fmt528 and "`scripts/statistica.py` resta **fuori**" in _agg528
+      and "leggi_libro()" in _univ528 and "data.json" not in _univ528)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

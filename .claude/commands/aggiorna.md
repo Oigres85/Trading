@@ -208,6 +208,11 @@ indici S&P 500 e Nasdaq-100 che l'analisi in chat riporta sempre — P/E con la 
 delle trimestrali, volatilità implicita, concentrazione, ampiezza, tendenza — e scrive una memoria
 (`memoria/indici.jsonl`, la storia raccolta del P/E del Nasdaq-100): questo comando legge, non scrive.
 
+`scripts/statistica.py` resta **fuori** per la stessa ragione di `numeri_libro.py` (v528): è la pagina statistica
+dell'analisi in chat e la prova d'ingresso che si lancia prima di un'operazione — conta i casi simili sui cinque anni
+dei nomi seguiti — e la sua modalità `ingresso --registra` scrive una memoria (`memoria/diario_ingressi.jsonl`): questo
+comando legge, non scrive.
+
 `scripts/concorrenti.py` resta **fuori** per la stessa ragione di `numeri_libro.py` (v503): è il blocco dei
 concorrenti e delle quote di mercato che l'analisi in chat riporta sempre — le quote dal registro
 `memoria/concorrenti.json`, con fonte e data, e la salute di ogni concorrente con le formule della pipeline — e scrive
@@ -235,7 +240,7 @@ in `memoria/cds_sessione.jsonl`: questo comando legge, non scrive.
 
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
 e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e `fonti_titoli.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
-`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py` e `concorrenti.py`, già dichiarati fuori qui con la loro ragione, poi
+`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py`, `concorrenti.py` e `statistica.py`, già dichiarati fuori qui con la loro ragione, poi
 `stato_sistema.py` (eseguito anche qui, al passo 3bis), e chiude con la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 

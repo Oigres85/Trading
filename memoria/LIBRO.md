@@ -1193,6 +1193,35 @@ avvisa. Il giudizio su quale fatto pesi di più lo scrive la risposta.
 ed esiti — e il confronto si fa con l'ultima analisi di una SEDUTA diversa (le misure stanno sulle sedute concluse: due
 analisi della stessa seduta vedono gli stessi prezzi). Si scrive solo da un giro completo.
 
+## 1quindecies. LA FORMA STATISTICA — prova d'ingresso, pagina statistica, diario (v528, decisione del CEO del 01/11/2026)
+
+Il CEO, 01/11/2026: *"vorrei un supporto anche matematico finanziario correlato con gli aspetti macro e le ultime notizie"*
+e *"riforma l'analisi in forma statistica prendendo spunto anche dal caso di Intel"*. `scripts/statistica.py` conta,
+sui cinque anni dei nomi seguiti, cosa è successo dopo i giorni nello **stesso stato** di oggi. Sono **convenzioni**, il
+modo di contare, non misure (v240); il codice le confronta e un gate le rilegge da qui:
+
+- un **crollo** o un'**impennata**: una seduta oltre **3** deviazioni standard delle **60** sedute prima;
+- **con volumi da notizia**: volume da almeno **2** volte la media delle **20** sedute prima (la traccia di una notizia,
+  senza leggere i titoli);
+- la **tendenza**: la regola della tenuta (§1sexies, `numeri_libro.tendenza`);
+- nelle sedute normali l'**RSI** agli estremi (sotto **30**, sopra **70**), altrimenti la **distanza dal massimo
+  dell'anno** a fasce: entro il 10%, 10-25%, 25-40%, oltre il 40%;
+- un caso al più ogni **20** sedute per titolo; sotto **30** casi la statistica non generalizza, e si legge lo stato
+  largo dichiarandolo;
+- **meglio o peggio della base**, e il valore atteso **a favore o contro**: oltre **2** errori standard, e per il valore
+  atteso anche oltre **0,1** R;
+- la **geometria**: stop sotto il pavimento più vicino (il fondo meno 1 ATR) se sta entro **4** ATR, altrimenti **2** ATR;
+  obiettivo al massimo di oscillazione più vicino sopra il prezzo, altrimenti **2** volte il rischio; se nello stesso
+  giorno si toccano stop e obiettivo conta lo stop;
+- la **conferma** dopo un crollo: una chiusura sopra il massimo del giorno del crollo entro **10** sedute.
+
+⚠ L'universo sono i nomi seguiti OGGI: scelti perché interessanti adesso, cioè anche sopravvissuti. Negli stati di
+una discesa profonda (oltre il 25% sotto il massimo dell'anno) la distorsione pesa di più, e la riga lo dice.
+
+Il **diario** (`memoria/diario_ingressi.jsonl`): una riga per decisione, con l'intuizione del CEO e la statistica di
+quel giorno, scritta PRIMA di sapere com'è andata. Dopo 20-30 righe `statistica.py bilancio` dice se l'intuito batte la
+statistica. La prima riga è l'ingresso su Intel del 30/10, registrato a posteriori il 01/11 e dichiarato come tale.
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da

@@ -207,7 +207,9 @@ const SUITE = [
      posizione, export degli strumenti, agenda) -> 1065 */
   /* v526: 1092 punti di chiamata in test_analisi_libro (+14 sul rischio degli eventi in dollari, la riga ▶ «cosa conta
      oggi», la gamma detta una volta e i difetti di resa della prova del 01/11) -> 1080 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1080, firma: /\d+\/\d+ CHECK OK/ },
+  /* v528: 1105 punti di chiamata in test_analisi_libro (+13 sulla forma statistica: stato del giorno, casi simili senza
+     futuro, geometria, verdetto, diario, convenzioni rilette dal libro, collegamenti) -> 1095 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1095, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

@@ -9616,3 +9616,39 @@ mediare · Ok sposta storia su claude.md"*.
 - **La liquidità è una riserva** (§1undecies): l'eventuale quotazione di Anthropic o le medie dopo i conti; gli
   ingressi che diversificano restano informazione. Su Anthropic l'analista ha un conflitto d'interessi diretto: solo i
   fatti del prospetto.
+
+## 📐 v528 — LA FORMA STATISTICA: PROVA D'INGRESSO, PAGINA STATISTICA, DIARIO DELLE DECISIONI
+
+Il CEO, 01/11/2026, testuale: *"c'è sempre qualcosa che non mi convince in questo sistema … la risposta è sempre la
+stessa e non mi fornisce un valore aggiunto … vorrei un supporto anche matematico finanziario"*, e poi *"1 si · 2 libera
+· 3 decidi tu · riforma l'analisi in forma statistica prendendo spunto anche dal caso di Intel"*.
+
+La diagnosi, misurata: il libro è una scommessa sola (R² 0,81 sul Nasdaq-100, 2,1 scommesse effettive), il sistema
+DESCRIVE senza rispondere a «nei casi simili cos'è successo dopo?», e le regole fissano l'esito. `scripts/statistica.py`
+risponde a quella domanda contando, sui cinque anni dei nomi seguiti, i giorni nello stesso stato (seduta, tendenza della
+tenuta, RSI agli estremi o distanza dal massimo dell'anno) e cosa è successo a 20 e 60 sedute contro la base; la
+geometria dell'operazione (stop e obiettivo in ATR) riapplicata ai casi simili dà il valore atteso in R, e la variante
+«aspetta la conferma» misura la domanda del caso Intel. Convenzioni in LIBRO.md §1quindecies, rilette da un gate.
+
+**Il collaudo su Intel (30/10, 64,50 $)**: crollo a −8,9 deviazioni standard con volumi 4,6 volte la media, 138 casi
+simili su 47 titoli; a 60 sedute la mediana è +2,6% contro +5,0% della base, e la differenza delle medie (−5,7 punti,
+errore 1,7) dice che lo stato fa PEGGIO della base — la deriva dopo una notizia, misurata sui nostri dati. L'operazione
+con quella geometria (stop 2 ATR, obiettivo al massimo precedente, 3 R) non si distingue dal caso (+0,20 R, errore
+0,14); aspettare la conferma non cambia in modo distinguibile (+0,27 R, errore 0,22). È la prima riga del diario,
+registrata a posteriori e dichiarata come tale.
+
+- ⚠ **Due errori standard in tutte e due le letture**, il confronto con la base e il verdetto: la prima stesura usava
+  un errore solo per il verdetto e dava A FAVORE su Intel con +0,20 R e errore 0,14. Una regola sola (v161).
+- ⚠ **La distanza dal massimo dell'anno** è entrata dopo la prima pagina: con la sola fascia dell'RSI nove posizioni su
+  tredici uscivano «come la base», cioè di nuovo la stessa risposta. E dove pesa — oltre il 25% sotto il massimo — la
+  distorsione da sopravvivenza dell'universo (i nomi seguiti oggi) si dichiara nella riga.
+- ⚠ La fixture del crollo spostava la chiusura e non la chiusura rettificata: il salto di a/c si leggeva come
+  un'operazione societaria e la serie veniva tagliata a ogni crollo (`serie_della_societa`). La fixture non conteneva il
+  fenomeno (v430): ora sposta anche «a».
+- ⚠ Lo strumento non scrive un file del giro: il gate v524 vuole che la sintesi legga ogni file scritto, e la pagina va
+  in chat direttamente. La sezione della scheda sta dopo le due freschezze (v511, v512).
+- **Dieci iniezioni**, una alla volta su due copie verificate per impronta, con `modifica_sicura` e ripristino dallo
+  snapshot: **mordono tutte, ciascuna sul controllo atteso** — la finestra della deviazione standard che comprende il
+  giorno, la correzione con «e» al posto di «o», l'obiettivo controllato prima dello stop, il futuro nei casi, la
+  distanza fra i casi tolta, un errore standard solo, la soglia cambiata nel solo codice, l'universo dalla pipeline, la
+  distorsione da sopravvivenza muta, la pagina tolta dal comando unico. Pavimento della suite 1080 → 1095.

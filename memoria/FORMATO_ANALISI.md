@@ -208,6 +208,14 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    I conti trimestrali di una società possono fermarsi prima del trimestre che la stessa fonte dichiara chiuso
    (il 18/10: Amazon, Micron, Lenovo): un trimestre di ritardo si dichiara nella riga, oltre uno la società descrive
    un altro periodo e resta fuori dai posti, nominata.
+8ter. `python3 scripts/statistica.py pagina` (v528, CEO, 01/11/2026: *"riforma l'analisi in forma statistica prendendo
+   spunto anche dal caso di Intel"*) — la **pagina statistica**: per ogni posizione lo stato di oggi (la seduta, la
+   tendenza della tenuta, l'RSI agli estremi o la distanza dal massimo dell'anno) e cosa è successo nei **casi simili**
+   dei nomi seguiti in cinque anni, a 20 e 60 sedute, contro la **base** di tutti i giorni; meglio o peggio della base
+   solo oltre due errori standard. Prima di OGNI operazione: `python3 scripts/statistica.py ingresso TICKER PREZZO
+   --registra "intuizione"` — la geometria (stop e obiettivo in ATR) riapplicata ai casi simili, il valore atteso in
+   R, la variante «aspetta la conferma», e la riga nel diario; `statistica.py bilancio` misura l'intuito contro la
+   statistica. Convenzioni in `LIBRO.md` §1quindecies.
 8bis. `python3 scripts/sintesi.py --registra` (v524, CEO, 31/10/2026: *"Procedi su tutto"*) — gira DOPO gli strumenti
    del giro e prima dello stato del sistema: **non ricalcola niente**, incrocia ciò che numeri_libro, rotazione, indici
    e posizionamento hanno scritto in `memoria/dati/giro/` (la variabile TRADING_GIRO, una lettura per analisi) con la
@@ -237,6 +245,9 @@ entra quando sposta una decisione o è cambiato* — che faceva sparire proprio 
 «nella norma». Dal 01/11 la regola è l'opposta: **OGNI famiglia di dati entra in OGNI analisi, per OGNI posizione, in
 forma breve**; dove è nella norma basta una parola («nella norma», «invariato», «nessuna»), e l'approfondimento resta
 nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA, che li calcola tutti (v161).
+0. **La pagina statistica** (v528): per ogni posizione cosa è successo nei casi simili, contro la base, e se c'è
+   un'operazione in vista la sua prova d'ingresso coi numeri — valore atteso in R e variante «aspetta la conferma».
+   Dove la statistica non distingue dal caso lo si dice in una parola: è un'informazione, non un vuoto.
 1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso — scritto
    dopo aver letto tutto il resto.
 2. **Il regime: le sei luci**, una riga ciascuna col colore, il perché e i dati che la compongono, con la freccia se è
@@ -659,6 +670,9 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
   uscita, aste, BCE, cambio, Giappone, calendario, stagionalita', bitcoin, CFTC), notizie e forum, e per ogni posizione
   le sei famiglie — tecnica, opzioni, flussi e forum, credito, fondamentali, notizie — in forma breve; una famiglia nella
   norma si scrive in una parola, non si salta (01/11)
+- `[statistica]` la forma statistica dell'analisi: per ogni posizione i casi simili e cosa è successo dopo, contro la
+  base; prima di ogni operazione la prova d'ingresso (valore atteso in R, variante con la conferma) e la riga nel
+  diario che misura l'intuito contro la statistica (01/11)
 - `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno

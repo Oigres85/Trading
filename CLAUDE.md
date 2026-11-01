@@ -43,7 +43,10 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
 - **L'analisi in chat** — un comando: `python3 scripts/analisi.py`. PRIMA `fonti_dirette.py` e `fonti_titoli.py`
   (letture alla fonte del giro, valide 30 minuti, in `memoria/dati/`), poi `numeri_libro`, `brief`, `schede_progetto`,
   `rotazione`, `posizionamento`, `indici`, `concorrenti`, POI `sintesi.py --registra`, DOPO `stato_sistema.py --giro`.
-  La scheda completa (`memoria/dati/scheda_analisi_*.md`, fuori da git) si manda come allegato. Esce 1 se uno
+  La scheda completa (`memoria/dati/scheda_analisi_*.md`, fuori da git) si manda come allegato. **Forma statistica
+  (v528)**: `statistica.py pagina` dice per ogni posizione cosa è successo nei casi simili contro la base; prima di
+  OGNI operazione `statistica.py ingresso TICKER PREZZO --registra "intuizione"` (valore atteso in R, variante «aspetta
+  la conferma», riga nel diario `memoria/diario_ingressi.jsonl`); `statistica.py bilancio` misura l'intuito. Esce 1 se uno
   strumento fallisce o una richiesta del registro è ASSENTE.
 - **`memoria/LIBRO.md`**: posizioni (§1), sorvegliati (§1bis), semaforo e salvavita (§1ter), attesa (§1quater),
   decisioni ed esami (§1quinquies), tenuta (§1sexies), ordini (§1septies), conti dichiarati dall'emittente (§1octies),
@@ -121,7 +124,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
   ordini, decisioni, cambio · `rotazione.py` watchlist, pavimenti, struttura, ingressi · `schede_progetto.py` e
   `credito.py` schede per nome · `brief.py` notizie, aste, trimestrali · `posizionamento.py` opzioni, dark pool, CFTC,
   forum · `indici.py` multipli e volatilità · `concorrenti.py` quote e salute · `fonti_dirette.py`/`fonti_titoli.py`
-  letture alla fonte · `stato_sistema.py` stato · `scheda.py` scheda completa · `comuni.py` funzioni condivise.
+  letture alla fonte · `statistica.py` forma statistica e diario · `stato_sistema.py` stato · `scheda.py` scheda completa · `comuni.py` funzioni condivise.
 - `memoria/` libro, formato, registri (`registro_performance.jsonl`, `registro_analisi.jsonl`, `wsb.jsonl`,
   `cds_sessione.jsonl`…: si committano dopo l'analisi, lo stato del sistema lo ricorda).
 - `config/` posizioni e watchlist della pipeline (devono coincidere con il libro: gate v479/v480), `cds_entita.json`.
