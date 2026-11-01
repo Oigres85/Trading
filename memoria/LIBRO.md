@@ -957,6 +957,9 @@ scegli tu soluzione migliore"*):
 
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
+| 01/11/2026 | AMD: un esame scritto prima dei conti del 03/11, come per i CONFLITTI? | AMD è in OSSERVAZIONE, non in conflitto: la regola non lo chiede, ma pesa il 18% e ha il CDS in rincaro improvviso | il CEO dice sì o no |
+| 01/11/2026 | La liquidità (24.000 €): ingressi che diversificano (MRK, VLO, DIS) o riserva per medie dopo i conti? | col semaforo arancione e i flussi contro i semiconduttori, le due strade vanno in versi opposti | il CEO sceglie |
+| 01/11/2026 | CLAUDE.md: spostare la storia delle versioni in un file separato? | il file (~720 KB) si carica a ogni messaggio ed è la causa principale del consumo del piano | il CEO dice sì o no |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
