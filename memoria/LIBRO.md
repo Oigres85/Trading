@@ -581,7 +581,8 @@ scritta prima dei conti, mandata al CEO 7 giorni prima e confermata da lui. `num
 riporta accanto al conflitto, e dopo i conti la si confronta coi risultati. La riga esce quando la
 decisione si prende.
 
-(nessun esame ancora)
+- AMD — conti del 2026-11-03 · scritto il 01/11/2026 su richiesta del CEO (AMD è in OSSERVAZIONE, non in conflitto) · la tesi: acceleratori AI e processori per data center, ricavi +50,1% a/a al 30/06, stime in salita del 14,9% a 90 giorni, si autofinanzia · tenere se la guida del trimestre e del data center non scende sotto il consenso (EPS 1,68 $) e le stime a 30 giorni dopo i conti restano più rialzi che tagli · mediare se, in più, la chiusura dopo i conti tiene il pavimento 502,60 e il rincaro del CDS (eccesso +25,8% sull'indice nella settimana al 30/10) non continua — e la media aumenta i semiconduttori (68,3% dell'azionario): si dice accanto · vendere se la guida del data center scende E le stime girano a più tagli che rialzi: la tesi si rompe, non il prezzo — dal 15/10 non si vende sui ribassi · da confermare col CEO
+- CRWV — conti del 2026-11-10 · scritto il 01/11/2026 sulla regola del 24/10 (si decide sul FINANZIAMENTO, a prescindere dal carico) · tenere se i conti mostrano coperti da finanziamenti chiusi il debito in scadenza entro 12 mesi (7,5 mld $ contro 5,5 di liquidità al 30/06) e gli investimenti già contrattati, gli ordini firmati tengono e nessun cliente grande (OpenAI per primo) riduce gli impegni · mediare se, in più, la guida sugli investimenti è finanziata, il risultato operativo torna sopra gli interessi (oggi -0,03×) e la diluizione resta nel programma annunciato · vendere se il finanziamento NON è coperto, o un cliente grande riduce gli impegni, o arriva un'emissione di azioni oltre il programma annunciato · da confermare col CEO
 
 `numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
 - il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non
@@ -955,11 +956,14 @@ scegli tu soluzione migliore"*):
 - il contatto per SEC EDGAR: **sì** — la sessione manda la stessa intestazione della pipeline (`SEC_UA`), e le
   voci SEC si rileggono a ogni analisi (v522).
 
+**Chiuse il 01/11/2026** (CEO: *"Ok per amd ma anche per corewaeve · Liquidità per ipo antropic o per mediare · Ok sposta storia su claude.md"*):
+- l'esame prima dei conti: **sì, per AMD e per CoreWeave** → scritti in §1quinquies, «Esami dei conflitti», da confermare (la domanda qui sotto);
+- la liquidità: **riserva**, per l'eventuale quotazione di Anthropic o per mediare dopo i conti. Gli ingressi che diversificano (MRK, VLO, DIS) restano un'informazione dell'analisi, non un piano. ⚠ Su Anthropic l'analista ha un conflitto d'interessi diretto (Claude è un prodotto di Anthropic): ne riporta solo i fatti del prospetto, nessun giudizio;
+- la storia delle versioni esce da CLAUDE.md e va in `docs/STORIA_VERSIONI.md` (v527).
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 01/11/2026 | AMD: un esame scritto prima dei conti del 03/11, come per i CONFLITTI? | AMD è in OSSERVAZIONE, non in conflitto: la regola non lo chiede, ma pesa il 18% e ha il CDS in rincaro improvviso | il CEO dice sì o no |
-| 01/11/2026 | La liquidità (24.000 €): ingressi che diversificano (MRK, VLO, DIS) o riserva per medie dopo i conti? | col semaforo arancione e i flussi contro i semiconduttori, le due strade vanno in versi opposti | il CEO sceglie |
-| 01/11/2026 | CLAUDE.md: spostare la storia delle versioni in un file separato? | il file (~720 KB) si carica a ogni messaggio ed è la causa principale del consumo del piano | il CEO dice sì o no |
+| 01/11/2026 | Confermi i due esami scritti in §1quinquies (AMD, conti del 03/11; CRWV, conti del 10/11)? | un esame vale se è confermato PRIMA dei conti: dopo, si cercano ragioni | il CEO conferma o corregge le condizioni |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 

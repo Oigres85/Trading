@@ -270,7 +270,7 @@ nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA
 8. **L'agenda**: conti, uscite dei dati macro, aste, Fed, mensile, esami da mandare, con i livelli entro 1 ATR e cosa
    cambierebbe ciascuno.
 9. **Come muoversi**: per ogni casella l'azione delle regole già decise, e il giudizio della risposta («secondo me…»)
-   con direzione, priorità e livelli; per la liquidità gli ingressi in zona che diversificano. Le quantità restano
+   con direzione, priorità e livelli; per la liquidità la decisione del CEO del 01/11/2026 — RISERVA, per l'eventuale quotazione di Anthropic o per mediare dopo i conti (LIBRO.md §1undecies) — con gli ingressi in zona che diversificano come informazione. Le quantità restano
    l'aritmetica dell'unità di 5.000 €, mai «la quantità giusta» (v439).
 10. **Le domande mirate** (2-4, sezione 8 qui sotto) e **lo stato del sistema** in una o due righe (sezione 9).
 La regola che tiene leggibile la risposta: **una famiglia nella norma si scrive in una parola, non si salta**; le cifre
