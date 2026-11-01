@@ -450,11 +450,9 @@ def agenda(libro, fw, pos, oggi, cal=None, aste=None):
         if s.get("giorni") is not None and s["giorni"] <= AGENDA_GIORNI:
             ev.append((s["data"], f"conti di {s['tk']}" + (f" ({s['orario']})" if s.get("orario") else "")))
     for r in ((libro or {}).get("tenuta") or {}).get("righe") or []:
-        sc = r.get("scadenza")
-        if r.get("esito") == NL.CONFLITTO and sc and not r.get("esame") and sc.get("giorni") is not None:
-            dal = (datetime.fromisoformat(sc["data"]) - timedelta(days=NL.GIORNI_ESAME)).date().isoformat()
-            if dal <= (oggi + timedelta(days=AGENDA_GIORNI)).isoformat():
-                ev.append((max(dal, oggi.isoformat()), f"esame del conflitto di {r['tk']} da mandare al CEO (conti del {_gm(sc['data'])})"))
+        dal = esame_dal(r)
+        if dal and dal <= (oggi + timedelta(days=AGENDA_GIORNI)).isoformat():
+            ev.append((max(dal, oggi.isoformat()), f"esame del conflitto di {r['tk']} da mandare al CEO (conti del {_gm(r['scadenza']['data'])})"))
     m = _prossima_riunione(fw)
     if m and m["date"] <= (oggi + timedelta(days=AGENDA_GIORNI * 3)).isoformat():
         p = " · ".join(f"{n} {_it(m[k], 0)}%" for k, n in (("hike_prob", "rialzo"), ("hold_prob", "invariato"),
@@ -474,17 +472,34 @@ def livelli(libro):
     if pz.get("d200_atr") is not None and abs(pz["d200_atr"]) <= LIVELLO_ATR:
         L.append(f"SMH: media a 200 a {_it(pz['sma200'], 2)} ({_sg(pz['d200_atr'], 1)} ATR) — sotto, il prezzo del semaforo peggiora")
     for r in ((libro or {}).get("tenuta") or {}).get("righe") or []:
-        pz_ = []
-        t = (r.get("prove") or {}).get("tendenza") or {}
-        if t.get("d200_atr") is not None and abs(t["d200_atr"]) <= LIVELLO_ATR:
-            pz_.append(f"media a 200 a {_it(t.get('sma200'), 2)} ({_sg(t['d200_atr'], 1)} ATR)")
-        mn = ((r.get("pavimenti") or {}).get("minimi") or [])
-        if mn and mn[0].get("atr") is not None and abs(mn[0]["atr"]) <= LIVELLO_ATR:
-            z = mn[0]
-            pz_.append(f"pavimento {_it(z['alto'], 2)} ({_sg(z['pct'], 1)}%, {_conta(len(z.get('tocchi') or []), 'tocco', 'tocchi')})")
+        pz_ = livelli_nome(r)
         if pz_:
             L.append(f"{r['tk']}: " + " · ".join(pz_))
     return L
+
+
+def livelli_nome(r):
+    """v526 — i livelli di una posizione entro LIVELLO_ATR dal prezzo: la media a 200 e il pavimento piu' vicino. Una
+    regola sola per l'agenda e per la riga «cosa conta oggi» del cruscotto (v161)."""
+    pz_ = []
+    t = ((r or {}).get("prove") or {}).get("tendenza") or {}
+    if t.get("d200_atr") is not None and abs(t["d200_atr"]) <= LIVELLO_ATR:
+        pz_.append(f"media a 200 a {_it(t.get('sma200'), 2)} ({_sg(t['d200_atr'], 1)} ATR)")
+    mn = (((r or {}).get("pavimenti") or {}).get("minimi") or [])
+    if mn and mn[0].get("atr") is not None and abs(mn[0]["atr"]) <= LIVELLO_ATR:
+        z = mn[0]
+        pz_.append(f"pavimento {_it(z['alto'], 2)} ({_sg(z['pct'], 1)}%, {_conta(len(z.get('tocchi') or []), 'tocco', 'tocchi')})")
+    return pz_
+
+
+def esame_dal(r):
+    """v526 — da quando l'esame scritto di un CONFLITTO va mandato al CEO: NL.GIORNI_ESAME giorni prima dei conti
+    (decisione 3a del 14/10, LIBRO.md §1sexies); None se il nome non e' in conflitto, non ha i conti o l'esame e' gia'
+    scritto. Una regola sola per l'agenda e per la riga «cosa conta oggi» (v161)."""
+    sc = (r or {}).get("scadenza")
+    if (r or {}).get("esito") != NL.CONFLITTO or not sc or r.get("esame") or sc.get("giorni") is None or not sc.get("data"):
+        return None
+    return (datetime.fromisoformat(sc["data"]) - timedelta(days=NL.GIORNI_ESAME)).date().isoformat()
 
 
 def ingressi(rot):
@@ -752,23 +767,30 @@ def _riga_tecnica(r, oggi_adesso):
         t = st["stato"]
         if st.get("rottura"):
             t += f", ⚠ ROTTA AL {'RIBASSO' if st['rottura'] == 'ribasso' else 'RIALZO'}"
-        dop = [d for d in st.get("doppi") or [] if d.get("esito") == "confermato" and d.get("sedute_dal") is not None
-               and d["sedute_dal"] <= _R.STR_RECENTE]       # la regola dei segnali d'uscita (v494): una sola
-        if dop:
-            t += f", doppio {dop[0]['tipo']} confermato da {dop[0]['sedute_dal']} sedute"
+        for dp in doppi_recenti(st):
+            t += f", doppio {dp['tipo']} {'CONFERMATO' if dp['esito'] == 'confermato' else 'ROTTO'} " + _da_sedute(dp["sedute_dal"])
         if st.get("divergenze"):
             t += f", divergenza {st['divergenze'][0]['tipo']} dell'RSI"
         pz.append("struttura " + t)
     lo = _R.lettura_oscillatori(r.get("oscillatori"))
+    rsi = (r.get("oscillatori") or {}).get("rsi")
+    # v526 — un RSI che manca non e' un RSI nella norma: sotto RSI_SEDUTE barre non si calcola (rotazione.rsi_wilder,
+    # v436), e la riga lo dice invece di stampare «n.d.» accanto a uno stato che lo fa sembrare misurato
+    t_rsi = f"RSI {_it(rsi, 0)}" if rsi is not None else f"RSI non misurabile: chiede almeno {RSI_SEDUTE_()} sedute"
     if lo:
         pz.append(f"oscillatori {lo['stato'].lower()} ({len(lo['ipervenduto'] or lo['ipercomprato'])} su "
-                  f"{len(lo['misurati'])} oltre la soglia; RSI {_it((r.get('oscillatori') or {}).get('rsi'), 0)})"
+                  f"{len(lo['misurati'])} oltre la soglia; {t_rsi})"
                   if lo["ipervenduto"] or lo["ipercomprato"] else
-                  f"oscillatori {lo['stato'].lower()} (RSI {_it((r.get('oscillatori') or {}).get('rsi'), 0)})")
+                  f"oscillatori {lo['stato'].lower()} ({len(lo['misurati'])} su 4 misurati; {t_rsi})"
+                  if len(lo["misurati"]) < 4 else f"oscillatori {lo['stato'].lower()} ({t_rsi})")
+    else:
+        pz.append("oscillatori: dato non disponibile")
     v = r.get("volumi") or {}
     if v.get("vol_pct_seduta") is not None:
         pz.append(f"volumi {_it(v['vol_pct_seduta'], 0)}/100 (media 20 sedute {_it(v.get('vol_pct_20'), 0)}/100)"
-                  + (" ⚠" if v["vol_pct_seduta"] >= VOLUMI_ALTI else ""))
+                  + (" ⚠" if volumi_alti(v) else ""))
+    else:
+        pz.append("volumi non misurabili (servono 81 sedute concluse con volume: storia corta o sedute senza volume)")
     cond = _R.supporto_accumulo(r.get("pavimenti"), r.get("oscillatori"), r.get("struttura"))
     pz.append(f"base {sum(1 for c in cond if c[1] is True)}/{len(cond)} condizioni")
     mn = ((r.get("pavimenti") or {}).get("minimi") or [])
@@ -789,7 +811,7 @@ def _riga_tecnica(r, oggi_adesso):
     return " · ".join(pz) or "dato non disponibile"
 
 
-def _riga_opzioni(x):
+def _riga_opzioni(x, maggioranza=None):
     o, g = (x or {}).get("opzioni") or {}, (x or {}).get("gamma") or {}
     if not o:
         return "nessuna catena (non e' una posizione in dollari, o la fonte non l'ha)"
@@ -805,9 +827,13 @@ def _riga_opzioni(x):
                                                             if mz.get("max_pain") and o.get("spot") else ""))
     pz.append(f"put/call {_it(o.get('pc_vol'), 2)} sui volumi, {_it(o.get('pc_oi'), 2)} sull'open interest")
     if g.get("netta") is not None:
-        pz.append(f"gamma dei dealer {'POSITIVA (smorza)' if g['netta'] > 0 else 'NEGATIVA (amplifica)'}"
-                  + (f", cambio di regime {_it(g['flip'], 2)} ({_sg((g['flip'] / g['spot'] - 1) * 100, 1)}%)" if g.get("flip") and g.get("spot") else "")
-                  + (f", call wall {_it(g['call_wall'], 2)} · put wall {_it(g['put_wall'], 2)}" if g.get("call_wall") and g.get("put_wall") else ""))
+        # v526 — col segno della maggioranza (detto una volta in testa al cruscotto) la riga porta solo i livelli
+        come = maggioranza is not None and (g["netta"] > 0) == maggioranza
+        liv = ([f"cambio di regime {_it(g['flip'], 2)} ({_sg((g['flip'] / g['spot'] - 1) * 100, 1)}%)"] if g.get("flip") and g.get("spot") else [])
+        liv += [f"call wall {_it(g['call_wall'], 2)} · put wall {_it(g['put_wall'], 2)}"] if g.get("call_wall") and g.get("put_wall") else []
+        pz.append(("gamma: " + ", ".join(liv) if liv else "gamma col segno della maggioranza") if come else
+                  f"gamma dei dealer {'POSITIVA (smorza)' if g['netta'] > 0 else 'NEGATIVA (amplifica)'}"
+                  + (" — l'eccezione" if maggioranza is not None else "") + "".join(", " + x for x in liv))
     return " · ".join(pz)
 
 
@@ -817,10 +843,12 @@ def _riga_flussi(r, x):
     si = (r or {}).get("short_interest") or {}
     if si.get("stato") == "misurato":
         p = si.get("pct_flottante")
-        pz.append((f"short {_it(p, 1)}% del flottante ({SP.banda_short(p)})" if p is not None else "short: quota del flottante n.d.")
+        pz.append((f"short al {_gm(si['data'])}: " if si.get("data") else "short (regolamento senza data dichiarata): ")
+                  + (f"{_it(p, 1)}% del flottante ({SP.banda_short(p)})" if p is not None
+                  else "quota del flottante n.d.")
                   + (f", {_sg((si.get('var1') or {}).get('pct'), 0)}% sul regolamento prima" if (si.get("var1") or {}).get("pct") is not None else "")
                   + (f", {si['rango']}° percentile dell'anno" if si.get("rango") is not None else "")
-                  + (" ⚠" if (p or 0) >= SP.SI_ALTA or (si.get("rango") or 0) >= SP.SI_RANGO_ALTO else ""))
+                  + (" ⚠" if short_alta(si) else ""))
     else:
         pz.append("short: non misurato" + (f" ({si.get('stato')})" if si.get("stato") else ""))
     dp = (x or {}).get("dark_pool") or {}
@@ -832,7 +860,7 @@ def _riga_flussi(r, x):
         pz.append("forum: fuori dai titoli citati" if w is None else
                   f"forum {w['rango']}° con {_conta(w['menzioni'], 'menzione', 'menzioni')}"
                   + (f" (24 ore prima {w['prima']})" if w.get("prima") is not None else " (24 ore prima fuori elenco)")
-                  + (" ⚠ IMPENNATA" if w.get("impennata") else ""))
+                  + (" ⚠ IMPENNATA" if impennata(w) else ""))
     return " · ".join(pz)
 
 
@@ -843,10 +871,7 @@ def _riga_credito(r, debito_sec):
     c = (r or {}).get("cds") or {}
     if c.get("stato") == "quotato":
         f5, f21 = c.get("finestra5") or {}, c.get("finestra") or {}
-        pz.append(f"CDS 5 anni {_it(c.get('pb'), 0)} pb ({_gm(c.get('data'))})"
-                  + (f", {_sg(f5['eccesso_pct'], 1)}% in 5 giorni al netto dell'indice" if f5.get("stato") == "misurato" else "")
-                  + (f", {_sg(f21['eccesso_pct'], 1)}% in 21" if f21.get("stato") == "misurato" else
-                     " (mese: storico corto)" if f21.get("stato") == "storico corto" else ""))
+        pz.append(f"CDS 5 anni {_it(c.get('pb'), 0)} pb ({_gm(c.get('data'))})" + _cds_finestre(f5, f21))
     elif c.get("stato") == "assente":
         pz.append("CDS non compensato")
     else:
@@ -951,7 +976,202 @@ def _riga_notizie(nw, escluse=()):
             + (f" (e altre {altre})" if altre > 0 else ""))
 
 
-def cruscotto(libro, pos, conc, righe_wl, debito_sec, mp, adesso):
+# ══ v526 — IL RISCHIO DEGLI EVENTI IN DOLLARI, «COSA CONTA OGGI» PER NOME, E QUATTRO DIFETTI DI RESA ══════════════════
+# Il CEO, 01/11/2026, sulla prova della v525: «Secondo te va bene come analisi?». Non ancora: era un cruscotto, non
+# un'analisi — nessuna riga per nome con cio' che conta OGGI, nessun rischio degli eventi in dollari, e quattro difetti
+# di resa (la data dello short assente; il CDS in percentuale senza i punti base ne' la lunghezza dello storico; un RSI
+# che manca accanto a «nella norma»; la gamma dei dealer ripetuta uguale su dodici nomi su tredici). Risposta: «Sì».
+# ⚠ Il giudizio — quale dei fatti pesa di piu' e cosa farne — lo scrive la risposta: qui si elencano i FATTI che lo
+#   reggono, ciascuno con la regola che gia' lo accende (v161), in un ordine dichiarato e senza un punteggio (v200).
+GAMMA_MAGGIORANZA = 0.66      # un segno su almeno due terzi dei nomi con la gamma misurata (da 3): si dice una volta
+                              # (LIBRO.md §1quattuordecies, riletta da un gate: v474)
+
+
+def RSI_SEDUTE_():
+    import rotazione as _R
+    return _R.RSI_SEDUTE
+
+
+def volumi_alti(v):
+    """La seduta conclusa dal VOLUMI_ALTI-esimo percentile dell'anno (convenzione, LIBRO.md §1quattuordecies)."""
+    # il numero deciso e' quello stampato (v498): 89,6 si stampa 90 e accende la ⚠ — stesso arrotondamento del testo
+    return (v or {}).get("vol_pct_seduta") is not None and float(f"{v['vol_pct_seduta']:.0f}") >= VOLUMI_ALTI
+
+
+def short_alta(si):
+    """La quota dalla soglia alta delle schede, o il rango dell'anno dal loro percentile alto (schede_progetto, v506)."""
+    import schede_progetto as SP
+    si = si or {}
+    return si.get("stato") == "misurato" and ((si.get("pct_flottante") or 0) >= SP.SI_ALTA
+                                              or (si.get("rango") or 0) >= SP.SI_RANGO_ALTO)
+
+
+def impennata(w):
+    return bool((w or {}).get("impennata"))
+
+
+def doppi_recenti(st):
+    """I doppi minimi e massimi CONFERMATI o ROTTI da non piu' di STR_RECENTE sedute: la regola dei segnali d'uscita
+    (v494), una sola. Un doppio rotto e' un segnale quanto uno confermato: la base o il tetto non hanno tenuto."""
+    import rotazione as _R
+    return [d for d in (st or {}).get("doppi") or [] if d.get("esito") in ("confermato", "rotto")
+            and d.get("sedute_dal") is not None and d["sedute_dal"] <= _R.STR_RECENTE]
+
+
+def _da_sedute(n):
+    return "con l'ultima seduta" if n == 0 else "da 1 seduta" if n == 1 else f"da {n} sedute"
+
+
+def _cds_finestre(f5, f21):
+    """La settimana in PUNTI BASE accanto alle percentuali (del nome, e al netto dell'indice della stessa cedola: la
+    misura della regola, v501) e la lunghezza dello storico: la stessa percentuale e' un'altra cosa su 120 pb e su
+    1.000, e un mese che non si misura ancora si dice coi giorni che ha (v498)."""
+    f5, f21, pz = f5 or {}, f21 or {}, []
+    if f5.get("stato") == "misurato" and f5.get("pb_a") is not None and f5.get("pb_da") is not None:
+        pz.append(f"in 5 giorni {_sg(f5['pb_a'] - f5['pb_da'], 0)} pb ({_sg(f5.get('nome_pct'), 1)}%; "
+                  f"{_sg(f5.get('eccesso_pct'), 1)}% al netto dell'indice)")
+    if f21.get("stato") == "misurato":
+        pz.append(f"in 21 {_sg(f21.get('eccesso_pct'), 1)}% al netto dell'indice")
+    elif f21.get("stato") == "storico corto":
+        pz.append(f"il mese non si misura ancora: storico dal {_gm(f21.get('dal'))}, "
+                  f"{_conta(f21.get('giorni_nome'), 'giorno', 'giorni')} del nome su {f21.get('servono')}")
+    return (" · " + " · ".join(pz)) if pz else ""
+
+
+def gamma_maggioranza(pos, tks):
+    """(segno, n, totale, eccezioni): il segno della gamma netta dei dealer che copre almeno GAMMA_MAGGIORANZA dei nomi
+    misurati (da 3 nomi), con le eccezioni nominate; None se non c'e' una maggioranza chiara. Detta una volta in testa
+    al cruscotto, nelle righe compare solo dove fa eccezione: dodici righe uguali si leggono come rumore."""
+    tit = (pos or {}).get("titoli") or {}
+    seg = {tk: ((tit.get(tk) or {}).get("gamma") or {}).get("netta") for tk in tks}
+    seg = {tk: g > 0 for tk, g in seg.items() if g is not None}
+    if len(seg) < 3:
+        return None
+    pos_ = sum(1 for v in seg.values() if v)
+    for segno, n in ((True, pos_), (False, len(seg) - pos_)):
+        if n / len(seg) >= GAMMA_MAGGIORANZA:
+            return segno, n, len(seg), [tk for tk, v in seg.items() if v != segno]
+    return None
+
+
+def _nome_gamma(segno):
+    return "POSITIVA (smorza i movimenti)" if segno else "NEGATIVA (amplifica i movimenti)"
+
+
+def rischio_eventi(libro, pos):
+    """Per ogni posizione coi conti nei prossimi AGENDA_GIORNI (le SCADENZE di numeri_libro: la data DICHIARATA dal
+    calendario o dall'emittente, mai proiettata, v396): il movimento implicito fino alla scadenza delle opzioni che li
+    comprende (posizionamento: lo straddle sul denaro diviso il prezzo, l'AMPIEZZA che il mercato paga, non il verso
+    ne' una previsione) per il valore della posizione nell'azionario = ±$. Il movimento si attribuisce SOLO se le
+    opzioni misurano fino agli STESSI conti: altrimenti non attribuibile, detto. [{tk, data, giorni, orario, peso,
+    pct, scadenza, distacco, usd, motivo}] in ordine di data."""
+    tot = (libro or {}).get("tot_usd")
+    pesi = {r["tk"]: r.get("peso") for r in ((libro or {}).get("tenuta") or {}).get("righe") or []}
+    tit = (pos or {}).get("titoli") or {}
+    out = []
+    for s in ((libro or {}).get("attesa") or {}).get("scadenze") or []:
+        g = s.get("giorni")
+        if g is None or g < 0 or g > AGENDA_GIORNI or not s.get("data"):
+            continue
+        tk = s["tk"]
+        o = (tit.get(tk) or {}).get("opzioni") or {}
+        c = o.get("conti") or {}
+        e = {"tk": tk, "data": s["data"], "giorni": g, "orario": s.get("orario"), "peso": pesi.get(tk), "pct": None,
+             "scadenza": None, "distacco": None, "usd": None, "motivo": None}
+        if tk not in tit:
+            e["motivo"] = "il posizionamento non e' stato letto per questo nome"
+        elif not o:
+            e["motivo"] = "nessuna catena di opzioni"
+        elif o.get("motivo"):
+            e["motivo"] = f"catena NON letta ({o['motivo']})"
+        elif c.get("pct") is None:
+            e["motivo"] = "nessuna scadenza listata comprende i conti"
+        elif c.get("data_conti") != s["data"]:
+            e["motivo"] = (f"le opzioni misurano fino ai conti del {_gm(c.get('data_conti'))}, il calendario li dichiara "
+                           f"il {_gm(s['data'])}: movimento non attribuibile")
+        elif e["peso"] is None or not tot:
+            e["motivo"] = "valore della posizione non disponibile"
+        else:
+            e.update(pct=c["pct"], scadenza=c.get("data"), distacco=c.get("distacco"), usd=c["pct"] / 100 * e["peso"] * tot)
+        out.append(e)
+    return sorted(out, key=lambda e: (e["data"], e["tk"]))
+
+
+def righe_rischio_eventi(ev, libro):
+    at = (libro or {}).get("attesa") or {}
+    tks = [r["tk"] for r in ((libro or {}).get("tenuta") or {}).get("righe") or []]
+    L = []
+    for e in ev:
+        testa = (f"  {_gm(e['data'])} {_fra(e['giorni'])} · {e['tk']} {_it((e['peso'] or 0) * 100, 1)}% dell'azionario"
+                 + (f" ({e['orario']})" if e.get("orario") else ""))
+        if e["usd"] is None:
+            L.append(f"{testa} · movimento NON disponibile: {e['motivo']}")
+        else:
+            L.append(f"{testa} · ±{_it(e['pct'], 1)}% fino alla scadenza del {_gm(e['scadenza'])}"
+                     + (f" (la scadenza cade {_conta(e['distacco'], 'giorno', 'giorni')} dopo i conti: il movimento comprende la "
+                        "reazione e le sedute fino alla scadenza)"
+                        if e.get("distacco") else "") + f" → ±{_it(e['usd'], 0)} $")
+    con = [e for e in ev if e["usd"] is not None]
+    if con:
+        L.append(f"  insieme ±{_it(sum(e['usd'] for e in con), 0)} $ se andassero tutti nello stesso verso: un TETTO, non "
+                 "una stima (i conti cadono in giorni diversi e nessun movimento ha un verso dichiarato)"
+                 + (f" · per confronto, una deviazione standard del libro in una settimana vale ±{_it(at['settimana_1s'], 0)} $ "
+                    "(il costo dell'attesa)" if at.get("settimana_1s") is not None else ""))
+    elif not ev:
+        L.append(f"  nessuna posizione ha i conti dichiarati nei prossimi {AGENDA_GIORNI} giorni")
+    fuori = [tk for tk in tks if tk not in {e["tk"] for e in ev}]
+    if fuori:
+        L.append(f"  senza conti dichiarati nei prossimi {AGENDA_GIORNI} giorni: " + ", ".join(fuori))
+    L.append("  le uscite macro, le aste e la riunione della Fed sono nell'agenda: per quelle il sistema non ha un "
+             "movimento implicito proprio dell'evento, e non se ne scrive uno")
+    return L
+
+
+def cosa_conta(r, rw, x, s, ev, debito_sec, adesso):
+    """▶ — i FATTI di oggi per un nome, nell'ordine (convenzione dichiarata): i conti entro EVENTO_GIORNI col loro ±$;
+    l'esame del CONFLITTO da mandare; la decisione della tenuta (CONFLITTO, VENDITA PER EVIDENZA); gli EVENTI del
+    credito (rincaro, allargamento, divergenza); la struttura (rottura, doppio confermato o rotto di recente); i livelli
+    entro LIVELLO_ATR; i volumi dal VOLUMI_ALTI-esimo percentile; l'impennata sul forum. Ognuno con la regola che gia'
+    lo accende nel cruscotto (v161). Le CONDIZIONI — short alta, Altman, diluizione, quota del debito — restano con la
+    loro ⚠ nella riga: cambiano coi bilanci e coi regolamenti, e un avviso che suona ogni giorno non avvisa (v421, v501)."""
+    import credito as CR
+    import schede_progetto as SP
+    out = []
+    e = next((e for e in ev or [] if e["tk"] == (r or {}).get("tk")), None)
+    if s and s.get("giorni") is not None and s["giorni"] <= EVENTO_GIORNI:
+        out.append(f"conti {_fra(s['giorni'])} ({_gm(s.get('data'))})"
+                   + (f", ±{_it(e['usd'], 0)} $ di movimento implicito" if e and e.get("usd") is not None else
+                      ", movimento implicito non disponibile"))
+    dal = esame_dal(r or {})
+    oggi = adesso.astimezone(ZoneInfo("America/New_York")).date()
+    if dal and dal <= (oggi + timedelta(days=EVENTO_GIORNI)).isoformat():
+        out.append("esame del CONFLITTO da mandare al CEO " + ("ADESSO" if dal <= oggi.isoformat() else f"dal {_gm(dal)}"))
+    es = (r or {}).get("esito")
+    if es == NL.CONFLITTO:
+        out.append("tenuta in CONFLITTO: si decide ai conti successivi (§1sexies)")
+    elif es == NL.ESITI[0]:                 # «VENDITA PER EVIDENZA»: il primo esito, il piu' urgente
+        out.append("tenuta VENDITA PER EVIDENZA" + (" con la vendita gia' aperta" if (r or {}).get("vendita_aperta")
+                                                    else ": da proporre al CEO"))
+    if rw:
+        for tp, t in CR.segnali(rw, ((debito_sec or {}).get("per_titolo") or {}).get(rw.get("ticker")),
+                                SP.liquidita_societa(rw.get("combustione"))):
+            if tp == "evento":
+                out.append(testo_segnale(tp, t).split(" (")[0])
+    st = (r or {}).get("struttura") or {}
+    if st.get("rottura"):
+        out.append(f"struttura ROTTA AL {'RIBASSO' if st['rottura'] == 'ribasso' else 'RIALZO'}")
+    for dp in doppi_recenti(st):
+        out.append(f"doppio {dp['tipo']} {'CONFERMATO' if dp['esito'] == 'confermato' else 'ROTTO'} {_da_sedute(dp['sedute_dal'])}")
+    out.extend(livelli_nome(r))
+    v = (r or {}).get("volumi") or {}
+    if volumi_alti(v):
+        out.append(f"volumi dell'ultima seduta al {_it(v['vol_pct_seduta'], 0)}° percentile dell'anno")
+    if impennata((x or {}).get("wsb")):
+        out.append("impennata sul forum")
+    return out
+
+
+def cruscotto(libro, pos, conc, righe_wl, debito_sec, mp, adesso, ev=None):
     """Il cruscotto di ogni POSIZIONE, dal peso piu' alto: sei famiglie, ciascuna in una riga, coi valori degli
     strumenti che li calcolano (v161). ⚠ dove una convenzione gia' dichiarata scatta (rottura, volumi dal 90°, short
     alta, impennata, segnali di credito, diluizione forte): un segnale, non un punteggio (v200)."""
@@ -961,6 +1181,12 @@ def cruscotto(libro, pos, conc, righe_wl, debito_sec, mp, adesso):
     nw = (libro or {}).get("notizie") or {}
     escluse = {str(x["titolo"] or "").strip().lower() for x in cronaca(nw)}
     L = []
+    gm = gamma_maggioranza(pos, [r["tk"] for r in righe])
+    if gm:
+        segno, n, tot, ecc = gm
+        L.append(f"  gamma dei dealer {_nome_gamma(segno)} su {n} posizioni su {tot} con la gamma misurata"
+                 + (f" · {_nome_gamma(not segno)} su " + ", ".join(ecc) if ecc else "")
+                 + " — nelle righe sotto il segno compare solo dove fa eccezione (convenzione: dealer lunghi le call e corti le put)")
     for r in righe:
         tk = r["tk"]
         s = sc.get(tk) or {}
@@ -971,8 +1197,10 @@ def cruscotto(libro, pos, conc, righe_wl, debito_sec, mp, adesso):
                     if s.get("data") and s.get("giorni") is not None else ""))
         rw = (righe_wl or {}).get(tk)
         x = ((pos or {}).get("titoli") or {}).get(tk)
+        cc = cosa_conta(r, rw, x, s, ev, debito_sec, adesso)
+        L.append("      ▶ oggi: " + (" · ".join(cc) if cc else "nessun evento, decisione o livello vicino"))
         L.append("      tecnica: " + _riga_tecnica(r, adesso))
-        L.append("      opzioni: " + _riga_opzioni(x))
+        L.append("      opzioni: " + _riga_opzioni(x, gm[0] if gm else None))
         L.append("      flussi e forum: " + _riga_flussi(rw, x))
         L.append("      credito: " + (_riga_credito(rw, debito_sec) if rw else "riga della pipeline assente: dato non disponibile"))
         L.append("      fondamentali: " + (_riga_fondamentali(rw, r, (conc or {}).get(tk)) if rw else "dato non disponibile"))
@@ -984,7 +1212,7 @@ def cruscotto(libro, pos, conc, righe_wl, debito_sec, mp, adesso):
 def resa(libro, lc, mp, camb, base, ev, liv, ing, sett, rot, motivi, adesso, nuove=None):
     roma = adesso.astimezone(ROMA)
     sem = (libro or {}).get("semaforo") or {}
-    L = [f"SINTESI OPERATIVA (v525) — {roma:%d/%m/%Y %H:%M} ora italiana · ultima seduta conclusa "
+    L = [f"SINTESI OPERATIVA (v526) — {roma:%d/%m/%Y %H:%M} ora italiana · ultima seduta conclusa "
          f"{_data((libro or {}).get('fine'))} · " + (f"confronto con l'analisi del "
          f"{datetime.fromisoformat(base['quando']).astimezone(ROMA):%d/%m %H:%M}" if base else "primo giro del registro")]
     for m in motivi:
@@ -1045,7 +1273,12 @@ def resa(libro, lc, mp, camb, base, ev, liv, ing, sett, rot, motivi, adesso, nuo
     else:
         L.append("  incrocio regime × libro: i flussi non spingono in nessuno dei due versi")
     L.append("")
-    L.append("5 · LA MAPPA — tesi × prezzo, dalla tenuta (LIBRO.md §1sexies): prezzo ROTTO = chiusura sotto la media a 200 "
+    L.append(f"5 · IL RISCHIO DEGLI EVENTI — i conti delle posizioni nei prossimi {AGENDA_GIORNI} giorni: il movimento "
+             "implicito fino alla scadenza delle opzioni che li comprende (lo straddle sul denaro diviso il prezzo: "
+             "l'AMPIEZZA che il mercato paga, non il verso ne' una previsione) per il valore della posizione")
+    L.extend(nv.get("eventi") or ["  dato non disponibile: il rischio degli eventi non e' stato calcolato in questo giro"])
+    L.append("")
+    L.append("6 · LA MAPPA — tesi × prezzo, dalla tenuta (LIBRO.md §1sexies): prezzo ROTTO = chiusura sotto la media a 200 "
              "con la 50 sotto la 200 · tesi FORTE = almeno una prova di crescita a favore (ricavi, stime o revisioni) · "
              f"📅 conti entro {EVENTO_GIORNI} giorni · ⚠ allarme di credito o diluizione")
     for c in CASELLE:
@@ -1066,22 +1299,24 @@ def resa(libro, lc, mp, camb, base, ev, liv, ing, sett, rot, motivi, adesso, nuo
     if al:
         L.append("  ⚠ allarmi: " + " · ".join(f"{tk}: {'; '.join(a)}" for tk, a in al))
     L.append("")
-    L.append("6 · IL CRUSCOTTO DI OGNI POSIZIONE — sei famiglie per nome, dal peso piu' alto: tecnica, opzioni, flussi e "
+    L.append("7 · IL CRUSCOTTO DI OGNI POSIZIONE — per nome, dal peso piu' alto, la riga ▶ coi FATTI di oggi (conti "
+             "vicini col loro ±$, decisioni della tenuta, eventi del credito, struttura, livelli entro 1 ATR, volumi, forum: "
+             "il giudizio lo scrive la risposta) e sei famiglie: tecnica, opzioni, flussi e "
              "forum, credito, fondamentali, notizie; ogni numero e' quello dello strumento che lo calcola (v161) · ⚠ dove "
              "scatta una convenzione gia' dichiarata (rottura della struttura, volumi dal 90° percentile, short alta, "
              "impennata sul forum, segnali di credito, diluizione forte): un segnale, non un punteggio (v200)")
     L.extend(nv.get("cruscotto") or ["  dato non disponibile: il cruscotto non e' stato calcolato in questo giro"])
     L.append("")
-    L.append("7 · COSA E' CAMBIATO")
+    L.append("8 · COSA E' CAMBIATO")
     L.extend(f"  {x}" for x in camb)
     L.append("")
-    L.append(f"8 · L'AGENDA — i prossimi {AGENDA_GIORNI} giorni (le date le dichiarano le fonti, mai proiettate)")
+    L.append(f"9 · L'AGENDA — i prossimi {AGENDA_GIORNI} giorni (le date le dichiarano le fonti, mai proiettate)")
     L.extend(f"  {_data(d)} {t}" for d, t in ev) if ev else L.append("  nessun evento dichiarato")
     if liv:
         L.append(f"  livelli entro {_it(LIVELLO_ATR, 0)} ATR dal prezzo (punti di decisione vicini):")
         L.extend(f"    {x}" for x in liv)
     L.append("")
-    L.append("9 · LE AZIONI DELLE REGOLE, e la liquidita'")
+    L.append("10 · LE AZIONI DELLE REGOLE, e la liquidita'")
     pi_r = (rot or {}).get("piano") or {}
     pat = pi_r.get("patrimonio") or {}
     if pi_r.get("liquidita") is not None and pat.get("totale"):
@@ -1151,11 +1386,13 @@ def main():
     oggi = adesso.astimezone(ZoneInfo("America/New_York")).date()
     ev = agenda(libro, macro.get("fedwatch"), giro["posizionamento"], oggi, macro.get("calendario_uscite"),
                 (giro["brief"] or {}).get("aste"))
-    nuove = {"macro": quadro_macro(macro, scelta, libro, giro["indici"], giro["posizionamento"], giro["brief"],
+    ev_r = rischio_eventi(libro, giro["posizionamento"])
+    nuove = {"eventi": righe_rischio_eventi(ev_r, libro),
+             "macro": quadro_macro(macro, scelta, libro, giro["indici"], giro["posizionamento"], giro["brief"],
                                    giro["rotazione"], d.get("predictions"), oggi),
              "notizie": notizie_forum(giro["brief"], giro["posizionamento"], libro),
              "cruscotto": cruscotto(libro, giro["posizionamento"], giro["concorrenti"], righe_wl, macro.get("debito_sec"),
-                                    mp, adesso)}
+                                    mp, adesso, ev=ev_r)}
     print("\n".join(resa(libro, lc, mp, camb, base, ev, livelli(libro), ingressi(giro["rotazione"]),
                          settori(giro["rotazione"]), giro["rotazione"], motivi, adesso, nuove=nuove)))
     if a.registra:

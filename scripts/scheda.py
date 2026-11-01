@@ -286,6 +286,7 @@ REGISTRO = {
                                      Marcatore("watchlist", "rendimento del capitale", "sorvegliati"))),
     "sintesi_operativa": Voce(("sintesi",)),                                                          # v524
     "cruscotto": Voce(("sintesi",)),                                                                  # v525
+    "rischio_eventi": Voce(("sintesi",), righe=(("sintesi", "5 · IL RISCHIO DEGLI EVENTI"),)),          # v526
     "stato_sistema": Voce(("stato_sistema",)),                                                         # v518
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),
     "schede": Voce(("schede_testa",), (Marcatore("schede", None, "tutti"),)),

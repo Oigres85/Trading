@@ -9511,3 +9511,84 @@ v524 pretendeva `STRUMENTI_GIRO == {quattro nomi}`. Riagganciato all'invariante 
 legge ha uno strumento che lo scrive, e ogni strumento che scrive un file del giro è fra quelli che la sintesi legge.
 
 ⚠ `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).
+
+## 🎯 v526 — IL RISCHIO DEGLI EVENTI IN DOLLARI, «COSA CONTA OGGI» PER OGNI NOME, E QUATTRO DIFETTI DI RESA
+
+Il CEO, 01/11/2026, sulla prova della v525: *"Secondo te va bene come analisi?"*. La risposta onesta era no, non ancora:
+era un cruscotto, non un'analisi. Mancava la lettura per nome di cosa conta oggi, mancava il rischio degli eventi in
+dollari, e c'erano quattro difetti di resa. Alla proposta di correggere tutte e tre le cose il CEO ha risposto *"Sì"*.
+
+### Il rischio degli eventi (sezione 5 della sintesi)
+Per ogni posizione coi conti nei prossimi 21 giorni (la finestra dell'agenda) la sintesi calcola il movimento implicito
+fino alla scadenza delle opzioni che li comprende, moltiplicato per il valore della posizione nell'azionario, e lo
+scrive come ±$. Il movimento implicito è lo straddle sul denaro diviso il prezzo: misura l'AMPIEZZA, non il verso, ed è
+lo stesso numero che `posizionamento.py` stampa (v161). Sui dati del 01/11 i valori sono questi:
+
+| conti | nome | movimento | ±$ |
+|---|---|---|---|
+| 02/11 | PLTR | ±13,3% | 2.447 |
+| 03/11 | AMD | ±8,9% | 4.498 |
+| 10/11 | CRWV | ±20,1% | 2.811 |
+| 10/11 | RGTI | ±15,3% | 1.140 |
+| 17/11 | NVDA | ±9,3% | 5.127 |
+
+- **Somma**: ±16.023 $, accanto a una deviazione standard del libro in una settimana (±19.135 $).
+- ⚠ **La somma si dichiara un TETTO, non una stima.** I conti cadono in giorni diversi e nessun movimento ha un verso.
+- ⚠ **Il movimento si attribuisce solo se le opzioni misurano fino agli STESSI conti del calendario.** Se le due date
+  non coincidono, la riga dice «non attribuibile» con le due date. Una scadenza costruita su una data diversa
+  misurerebbe un'altra cosa.
+- **Quando la scadenza cade giorni dopo i conti**, la riga lo dice: il movimento comprende la reazione E le sedute fino
+  alla scadenza. La prima stesura scriveva *"comprende anche quelle sedute"*, che è falso su un conto pubblicato dopo
+  la campana: lì la seduta dopo È la reazione.
+- **I nomi senza conti nella finestra si nominano** (v406). Uscite macro, aste e Fed dichiarano che il sistema non ha un
+  movimento implicito proprio dell'evento.
+
+### La riga ▶ in testa a ogni nome
+La riga ▶ porta i FATTI di oggi, nell'ordine dichiarato in LIBRO.md §1quattuordecies:
+1. i conti entro 14 giorni, col ±$ del blocco sopra (una derivazione sola);
+2. l'esame del conflitto da mandare;
+3. la decisione della tenuta;
+4. gli EVENTI del credito;
+5. la struttura: rottura, o un doppio confermato o ROTTO di recente;
+6. i livelli entro 1 ATR;
+7. i volumi dal 90° percentile;
+8. l'impennata sul forum.
+
+Il giudizio su quale fatto pesi di più lo scrive la risposta, in una frase per nome (FORMATO, «La risposta in chat»).
+- ⚠ **Le CONDIZIONI restano nella loro riga con la ⚠**: short alta, Altman, diluizione, quota del debito. Cambiano coi
+  bilanci e coi regolamenti, e un avviso che suona ogni giorno non avvisa (v421, v501).
+- ⚠ **Un doppio minimo ROTTO non compariva**: la tecnica mostrava solo i doppi confermati, e NVDA e INTC il 30/10
+  avevano rotto il proprio con l'ultima seduta. `doppi_recenti` è una regola sola per la tecnica e per la riga ▶.
+- **Una regola sola anche per l'esame del conflitto e per i livelli vicini.** `esame_dal` e `livelli_nome` servono sia
+  l'agenda sia la riga ▶, e un gate conta le chiamate.
+
+### I quattro difetti di resa
+- **La short senza la data del regolamento**: la misura di FINRA ha due settimane. Ora la riga dice *"short al 15/10:"*.
+- **Il CDS in percentuale e basta**: +25,8% su 122 pb e +25,8% su 1.000 pb sono due cose diverse. Ora c'è la settimana
+  in PUNTI BASE accanto alle due percentuali (del nome e al netto dell'indice), e lo storico coi giorni che ha:
+  *"storico dal 16/10, 10 giorni del nome su 22"*.
+- **«Oscillatori nella norma (RSI n.d.)»**: un RSI che manca stava accanto a uno stato che lo faceva sembrare misurato.
+  Ora la riga dice *"3 su 4 misurati; RSI non misurabile: chiede almeno 100 sedute"*, e la soglia è
+  `rotazione.RSI_SEDUTE`: era un 100 scritto dentro `rsi_wilder`, ora è una costante letta anche dalla sintesi. Anche i
+  volumi che mancano si dicono, invece di sparire dalla riga.
+- **La gamma dei dealer NEGATIVA ripetuta su dodici righe**: dodici righe uguali si leggono come rumore. Se un segno copre
+  almeno due terzi dei nomi (`GAMMA_MAGGIORANZA` = 0,66, in LIBRO.md e riletta dal gate v524), il cruscotto lo dice una
+  volta in testa con le eccezioni nominate. Nelle righe il segno compare solo dove fa eccezione.
+- ⚠ **E un quinto, trovato leggendo l'uscita**: MSTR stampava *"volumi 90/100"* senza la ⚠, perché il confronto usava
+  89,6. Il numero deciso è quello stampato (v498): la soglia si confronta ora col valore arrotondato come nel testo.
+
+### 🧪 Il metodo
+- ⚠ **Tre gate della v525 riagganciati, nessuno zittito.**
+  - Uno pinnava SETTE righe per nome; ora l'invariante è testa + ▶ + sei famiglie.
+  - Uno pinnava i numeri delle sezioni (la 5 ha spostato le altre) e il conteggio di tre sezioni non calcolate (ora quattro).
+  - Uno cercava *"short 21,0%"*, che ora porta la data.
+- **Il gate v505 nei due versi ha dichiarato ASSENTE la richiesta nuova** perché la sua fixture non aveva la sezione: il suo
+  lavoro, come in v513, v520 e v523.
+- ⚠ **Una mia sonda contava anche la definizione** (`livelli_nome(r)` compare nella `def`): rossa su codice giusto. Ora
+  conta le chiamate meno la definizione. *Un check rosso è prima di tutto una sonda da verificare* (v433).
+- **30 iniezioni**, una alla volta su quattro copie del repo verificate per impronta, con `modifica_sicura` e ripristino
+  dallo snapshot: **mordono tutte, ciascuna sul controllo atteso**. Una — la settimana del CDS stampata in percentuale
+  invece che in punti base — non mordeva al primo giro, e il difetto era la FIXTURE: 100 → 125 pb fa +25 pb e +25%, lo
+  stesso numero. Ora 200 → 250 (v430).
+- Pavimento di `test_analisi_libro.py` 1065 → 1080 (1092 punti di chiamata, 1101 check). `?v=` e `BUILD_VERSION` non
+  toccati: nessun file servito al browser (v440).

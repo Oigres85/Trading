@@ -301,9 +301,12 @@ def rsi_wilder(barre, n=14):
     dal mercato (v436, SKHY 58-75 secondo il seme): None, un buco e non un numero.
     v494: e' l'ultimo valore di rsi_serie, una derivazione sola (v161)."""
     c = [x["c"] for x in barre]
-    if len(c) < 100:
+    if len(c) < RSI_SEDUTE:
         return None
     return rsi_serie(c, n)[-1]
+
+
+RSI_SEDUTE = 100   # v526 — sotto, l'RSI dipende dalla convenzione del seme (v436): una costante, letta anche dalla sintesi
 
 
 def volumi(barre, adesso=None):

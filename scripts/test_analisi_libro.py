@@ -7016,7 +7016,10 @@ _U505 = {
                     "letture: 0 nuove in questo giro"],
     # v524 — la sintesi operativa: un blocco solo, che va nella sua sezione in testa alla scheda
     "sintesi": ["SINTESI OPERATIVA (v524) — 31/10/2026 21:24 ora italiana · ultima seduta conclusa 30/10/2026", "",
-                "1 · IL REGIME — sei famiglie", "  🟢 CRESCITA E UTILI — favorevole", "      utili +30,2%"],
+                "1 · IL REGIME — sei famiglie", "  🟢 CRESCITA E UTILI — favorevole", "      utili +30,2%",
+                # v526 — il rischio degli eventi: la richiesta [rischio_eventi] la cerca per riga
+                "5 · IL RISCHIO DEGLI EVENTI — i conti delle posizioni nei prossimi 21 giorni",
+                "  03/11 fra 2 giorni · AAA 20,0% dell'azionario · ±10,0% fino alla scadenza del 06/11 → ±2.000 $"],
     # v518 — lo stato del sistema, l'ultimo strumento del giro: tutte le sue intestazioni stanno nel catalogo
     "stato_sistema": ["STATO DEL SISTEMA — 30/10/2026 18:22 ora italiana",
                       "  esito: 1 punto da guardare (le righe con ⚠) · 1 domanda aperta al CEO", "",
@@ -10576,15 +10579,18 @@ _fam525 = ("tecnica: ", "opzioni: ", "flussi e forum: ", "credito: ", "fondament
 check("v525 cruscotto: OGNI posizione ha le sei famiglie (una riga ciascuna, anche quando il dato manca: dichiarato), in "
       "ordine di peso; i conti di DOMANI non sono «fra 1 giorni» (v458); il ROIC che arrotonda a zero non porta il segno "
       "(v496); «1 menzione» al singolare",
-      len(_cr525) == 2 * (1 + len(_fam525)) and _cr525[0].startswith("  BBB") and _cr525[7].startswith("  AAA")
+      # v526 — riagganciato: pinnava SETTE righe per nome, e la v526 ha aggiunto la riga ▶ (una per nome): l'invariante
+      # e' che ogni nome abbia la testa, la riga ▶ e le sei famiglie, in ordine di peso
+      len(_cr525) == 2 * (2 + len(_fam525)) and _cr525[0].startswith("  BBB") and _cr525[8].startswith("  AAA")
+      and sum(1 for r in _cr525 if r.strip().startswith("▶ oggi: ")) == 2
       and all(sum(1 for r in _cr525 if r.strip().startswith(f)) == 2 for f in _fam525)
       and "conti 02/11, DOMANI" in _tcr525 and "fra 1 giorni" not in _tcr525 and "ROIC 0%" in _tcr525 and "-0%" not in _tcr525
-      and "con 1 menzione " in _tcr525 and "dato non disponibile" in _cr525[4] + _cr525[5])
+      and "con 1 menzione " in _tcr525 and "dato non disponibile" in _cr525[5] + _cr525[6])
 check("v525 cruscotto: ⚠ dove scatta una convenzione GIA' dichiarata — la rottura della struttura, i volumi dal 90° "
       "percentile, la short dalla soglia alta delle schede, l'impennata della regola del forum, la diluizione forte delle "
       "schede — e lo stato degli oscillatori e' dei quattro, non dell'RSI",
       "⚠ ROTTA AL RIBASSO" in _tcr525 and "volumi 95/100 (media 20 sedute 50/100) ⚠" in _tcr525
-      and "short 21,0% del flottante (molto alta) ⚠" in _tcr525 and "⚠ IMPENNATA" in _tcr525 and "azioni +12,0% in un anno ⚠" in _tcr525
+      and "21,0% del flottante (molto alta) ⚠" in _tcr525 and "⚠ IMPENNATA" in _tcr525 and "azioni +12,0% in un anno ⚠" in _tcr525
       and "oscillatori ipervenduto (4 su 4 oltre la soglia; RSI 25)" in _tcr525)
 check("v525 cruscotto: la cronaca di mercato (nel feed di almeno SOGLIA_CRONACA posizioni) NON si ripete sotto ogni nome, "
       "le voci del nome restano, e un nome con solo cronaca lo dice",
@@ -10624,12 +10630,15 @@ _rs525 = "\n".join(SI524.resa({}, {k: SI524._luce("🟡", ["d"], "x") for k, _ i
 _rs525v = "\n".join(SI524.resa({}, {k: SI524._luce("🟡", ["d"], "x") for k, _ in SI524.FAMIGLIE}, {c: [] for c in SI524.CASELLE},
                                ["x"], None, [], [], [], [], None, [], _ad525))
 check("v525 collegamento: la sintesi calcola quadro macro, notizie e cruscotto e li passa alla resa; la resa li stampa "
-      "nelle sezioni 2, 3 e 6, nell'ordine; senza, ciascuna sezione DICHIARA di non essere stata calcolata (v406)",
+      "nelle sezioni 2, 3 e 7, nell'ordine; senza, ciascuna sezione DICHIARA di non essere stata calcolata (v406)",
       "nuove=nuove" in _main525 and "quadro_macro(" in _main525 and "notizie_forum(" in _main525 and "cruscotto(" in _main525
       and 0 <= _rs525.find("2 · IL QUADRO MACRO") < _rs525.find("MACRO525") < _rs525.find("3 · NOTIZIE E FORUM")
-      < _rs525.find("NOTIZIE525") < _rs525.find("4 · IL LIBRO") < _rs525.find("5 · LA MAPPA") < _rs525.find("6 · IL CRUSCOTTO")
-      < _rs525.find("CRUSCOTTO525") < _rs525.find("7 · COSA E' CAMBIATO") < _rs525.find("9 · LE AZIONI")
-      and _rs525v.count("non e' stato calcolato in questo giro") + _rs525v.count("non calcolati in questo giro") == 3)
+      # v526 — riagganciato: la sezione 5 (il rischio degli eventi) sposta di uno le successive, e anche lei dichiara
+      # di non essere stata calcolata (quattro sezioni, non tre)
+      < _rs525.find("NOTIZIE525") < _rs525.find("4 · IL LIBRO") < _rs525.find("5 · IL RISCHIO DEGLI EVENTI")
+      < _rs525.find("6 · LA MAPPA") < _rs525.find("7 · IL CRUSCOTTO")
+      < _rs525.find("CRUSCOTTO525") < _rs525.find("8 · COSA E' CAMBIATO") < _rs525.find("10 · LE AZIONI")
+      and _rs525v.count("non e' stato calcolato in questo giro") + _rs525v.count("non calcolati in questo giro") == 4)
 _srcl525 = (Path(__file__).resolve().parent / "numeri_libro.py").read_text(encoding="utf-8")
 check("v525 numeri_libro passa le notizie alla sintesi in forma che il file porta (comuni.notizie_del_giro) e calcola i "
       "volumi delle posizioni con la funzione dei sorvegliati (rotazione.volumi, v161)",
@@ -10641,6 +10650,142 @@ check("v525 il formato: la risposta in chat porta il quadro macro intero, notizi
       "(v525" in _risp525 and "quadro macro" in _risp525.lower() and "cruscotto" in _risp525.lower()
       and "ogni posizione" in _risp525.lower() and "un dato entra quando sposta una decisione o è cambiato" not in _risp525
       and "[cruscotto]" in _fmt525)
+
+# ═══ v526 — IL RISCHIO DEGLI EVENTI IN DOLLARI, «COSA CONTA OGGI» PER NOME, E QUATTRO DIFETTI DI RESA ═══════════════
+# Il CEO, 01/11/2026, alla proposta: «Sì». Gli stati si COSTRUISCONO (v425, v429): domani i dati potrebbero non avere
+# un conto vicino, un doppio rotto, una gamma con la stessa direzione su quasi tutti i nomi.
+import credito as _CR526
+# ── il rischio degli eventi: il movimento implicito ai conti × il valore della posizione, coi casi che non si attribuiscono
+_lib526 = {"tot_usd": 100000.0,
+           "tenuta": {"righe": [{"tk": "AAA", "peso": 0.20}, {"tk": "BBB", "peso": 0.10}, {"tk": "CCC", "peso": 0.30},
+                                {"tk": "DDD", "peso": 0.05}, {"tk": "EEE", "peso": 0.15}, {"tk": "FFF", "peso": 0.20}]},
+           "attesa": {"settimana_1s": 9000.0, "scadenze": [
+               {"tk": "BBB", "data": "2026-11-06", "giorni": 5},
+               {"tk": "AAA", "data": "2026-11-03", "giorni": 2, "orario": "dopo la campana"},
+               {"tk": "CCC", "data": "2026-11-26", "giorni": 25},
+               {"tk": "DDD", "data": "2026-11-04", "giorni": 3},
+               {"tk": "EEE", "data": "2026-11-05", "giorni": 4}]}}
+_pos526 = {"titoli": {
+    "AAA": {"opzioni": {"spot": 50.0, "conti": {"data": "2026-11-06", "pct": 10.0, "data_conti": "2026-11-03", "distacco": 3}}},
+    "BBB": {"opzioni": {"spot": 20.0, "conti": {"data": "2026-11-13", "pct": 12.0, "data_conti": "2026-11-12", "distacco": 1}}},
+    "CCC": {"opzioni": {"spot": 9.0, "conti": {"data": "2026-11-27", "pct": 8.0, "data_conti": "2026-11-26", "distacco": 1}}},
+    "DDD": {"opzioni": {"motivo": "HTTP 403"}}}}
+_ev526 = SI524.rischio_eventi(_lib526, _pos526)
+_e526 = {e["tk"]: e for e in _ev526}
+_re526 = SI524.righe_rischio_eventi(_ev526, _lib526)
+_tre526 = "\n".join(_re526)
+check("v526 rischio degli eventi: ±$ = movimento implicito ai conti × il valore della posizione nell'azionario (10% di "
+      "20.000 $ = ±2.000 $); oltre i 21 giorni il conto non entra; in ordine di data — " + _tre526[:160],
+      [e["tk"] for e in _ev526] == ["AAA", "DDD", "EEE", "BBB"] and abs(_e526["AAA"]["usd"] - 2000.0) < 1e-6
+      and "CCC" not in _e526 and "±2.000 $" in _tre526 and "(dopo la campana)" in _tre526)
+check("v526 rischio degli eventi: il movimento si attribuisce SOLO se le opzioni misurano fino agli STESSI conti del "
+      "calendario; una catena non letta, un nome che il posizionamento non ha letto si DICONO col perche' (v406)",
+      _e526["BBB"]["usd"] is None and "non attribuibile" in _e526["BBB"]["motivo"] and "12/11" in _e526["BBB"]["motivo"]
+      and _e526["DDD"]["usd"] is None and "HTTP 403" in _e526["DDD"]["motivo"]
+      and _e526["EEE"]["usd"] is None and "non e' stato letto" in _e526["EEE"]["motivo"]
+      and _tre526.count("movimento NON disponibile") == 3)
+check("v526 rischio degli eventi: la somma e' un TETTO dichiarato, accanto alla settimana normale del libro (il costo "
+      "dell'attesa); i nomi SENZA conti nella finestra si NOMINANO; le uscite macro dichiarano di non avere un movimento",
+      "insieme ±2.000 $" in _tre526 and "TETTO" in _tre526 and "±9.000 $" in _tre526
+      and "senza conti dichiarati nei prossimi 21 giorni: CCC, FFF" in _tre526
+      and "non ha un movimento implicito proprio dell'evento" in _tre526
+      and "la scadenza cade 3 giorni dopo i conti" in _tre526)
+_vuoto526 = "\n".join(SI524.righe_rischio_eventi([], {"tenuta": {"righe": [{"tk": "AAA"}]}}))
+check("v526 rischio degli eventi senza conti nella finestra: lo dice, e nessuna somma (un tetto di zero si leggerebbe "
+      "come un rischio nullo)",
+      "nessuna posizione ha i conti dichiarati" in _vuoto526 and "insieme" not in _vuoto526)
+
+# ── la gamma detta una volta: la maggioranza, le eccezioni, nessuna maggioranza
+_g526 = lambda segni: {"titoli": {f"T{i}": {"gamma": {"netta": v, "spot": 10.0, "flip": 11.0}} for i, v in enumerate(segni)}}
+_gm526a = SI524.gamma_maggioranza(_g526([-1, -1, -1, 1]), ["T0", "T1", "T2", "T3"])
+_gm526b = SI524.gamma_maggioranza(_g526([-1, -1, 1, 1]), ["T0", "T1", "T2", "T3"])
+_gm526c = SI524.gamma_maggioranza(_g526([-1, -1]), ["T0", "T1"])
+_gm526d = SI524.gamma_maggioranza(_g526([-1, -1, 1]), ["T0", "T1", "T2"])
+check("v526 la gamma con lo stesso segno su almeno due terzi dei nomi (da 3) si dice una volta, con le eccezioni nominate; "
+      "con meta' e meta' o con meno di 3 nomi no",
+      _gm526a == (False, 3, 4, ["T3"]) and _gm526b is None and _gm526c is None and _gm526d == (False, 2, 3, ["T2"]))
+_po526 = {"gamma": {"netta": -5.0, "spot": 10.0, "flip": 11.0, "call_wall": 12, "put_wall": 9}, "opzioni": {"iv30": 40.0}}
+_pp526 = {"gamma": {"netta": 5.0, "spot": 10.0, "flip": 9.0}, "opzioni": {"iv30": 40.0}}
+check("v526 nelle righe la gamma col segno della maggioranza porta solo i livelli; l'eccezione porta il segno e lo "
+      "dichiara; senza maggioranza ogni riga porta il segno com'era",
+      "gamma: cambio di regime 11,00" in SI524._riga_opzioni(_po526, False) and "NEGATIVA" not in SI524._riga_opzioni(_po526, False)
+      and "gamma dei dealer POSITIVA (smorza) — l'eccezione, cambio di regime 9,00" in SI524._riga_opzioni(_pp526, False)
+      and "gamma dei dealer NEGATIVA (amplifica), cambio di regime" in SI524._riga_opzioni(_po526)
+      and "l'eccezione" not in SI524._riga_opzioni(_po526))
+
+# ── «cosa conta oggi»: i FATTI nell'ordine dichiarato, le condizioni fuori, i conti lontani fuori
+_r526 = {"tk": "AAA", "peso": 0.2, "esito": SI524.NL.CONFLITTO, "scadenza": {"data": "2026-11-03", "giorni": 2},
+         "struttura": {"rottura": "ribasso", "doppi": [{"tipo": "minimo", "esito": "rotto", "sedute_dal": 0}]},
+         "pavimenti": {"minimi": [{"alto": 48.0, "pct": -4.0, "atr": -0.5, "tocchi": [1, 2]}]},
+         "volumi": {"vol_pct_seduta": 89.6}, "prove": {}}
+_seg_prima526 = _CR526.segnali
+try:
+    _CR526.segnali = lambda r, x=None, liquidita=None: [
+        ("condizione", "Altman in zona di PERICOLO"), ("evento", "RINCARO IMPROVVISO del CDS (settimana): eccesso +20% sull'indice")]
+    _cc526 = SI524.cosa_conta(_r526, {"ticker": "AAA"}, {"wsb": {"impennata": True}}, _r526["scadenza"], _ev526, None, _ad525)
+finally:
+    _CR526.segnali = _seg_prima526
+_tcc526 = " · ".join(_cc526)
+_ord526 = ["conti fra 2 giorni (03/11), ±2.000 $", "esame del CONFLITTO da mandare al CEO ADESSO", "tenuta in CONFLITTO",
+           "RINCARO IMPROVVISO del CDS", "struttura ROTTA AL RIBASSO", "doppio minimo ROTTO con l'ultima seduta",
+           "pavimento 48,00", "volumi dell'ultima seduta al 90° percentile", "impennata sul forum"]
+check("v526 la riga ▶: conti vicini col loro ±$ (quello del rischio degli eventi), esame del conflitto, tenuta, eventi del "
+      "credito, struttura, doppio rotto, livelli, volumi (89,6 si stampa 90 e accende: il numero deciso e' quello stampato), "
+      "forum — in quest'ordine; le CONDIZIONI restano nella riga — " + _tcc526[:200],
+      all(x in _tcc526 for x in _ord526) and [_tcc526.find(x) for x in _ord526] == sorted(_tcc526.find(x) for x in _ord526)
+      and "Altman" not in _tcc526)
+_r526b = {"tk": "BBB", "esito": "LASCIAR CORRERE", "scadenza": {"data": "2026-11-17", "giorni": 16},
+          "struttura": {"doppi": [{"tipo": "minimo", "esito": "confermato", "sedute_dal": 11}]}, "volumi": {"vol_pct_seduta": 89.4}}
+_cc526b = SI524.cosa_conta(_r526b, None, None, _r526b["scadenza"], [], None, _ad525)
+check("v526 la riga ▶ resta vuota quando non c'e' niente di oggi: conti a 16 giorni (oltre i 14), un doppio di 11 sedute "
+      "fa (oltre STR_RECENTE), volumi 89,4 (si stampano 89)", _cc526b == [])
+_ten526 = {"righe": [dict(_r526), {"tk": "BBB", "peso": 0.1, "esito": "LASCIAR CORRERE", "prove": {}}]}
+_cr526 = SI524.cruscotto({"tenuta": _ten526, "attesa": {"scadenze": [_r526["scadenza"] | {"tk": "AAA"}]}},
+                         {"titoli": {}}, {}, {}, None, {}, _ad525, ev=_ev526)
+check("v526 il cruscotto apre ogni nome con la riga ▶, anche vuota (detta: «nessun evento, decisione o livello vicino»)",
+      sum(1 for r in _cr526 if r.strip().startswith("▶ oggi: ")) == 2 and "▶ oggi: nessun evento, decisione o livello vicino" in "\n".join(_cr526)
+      and "±2.000 $" in "\n".join(_cr526))
+
+# ── i quattro difetti di resa della prova del 01/11
+_t526 = SI524._riga_tecnica({"tk": "X", "oscillatori": {"rsi": None, "stocastico": 50, "williams": -50, "cci": 0},
+                             "volumi": {}, "struttura": {"stato": "LATERALE", "doppi": [{"tipo": "massimo", "esito": "rotto", "sedute_dal": 3}]}},
+                            _ad525)
+_t526b = SI524._riga_tecnica({"tk": "X", "oscillatori": {"rsi": 50, "stocastico": 50, "williams": -50, "cci": 0},
+                              "volumi": {"vol_pct_seduta": 89.6, "vol_pct_20": 40}}, _ad525)
+check("v526 tecnica: un RSI che manca si dice non misurabile con la soglia di rotazione (RSI_SEDUTE), i misurati si "
+      "contano; i volumi che mancano si dicono; un doppio ROTTO di recente compare; 89,6 si stampa 90 e porta la ⚠",
+      "3 su 4 misurati; RSI non misurabile: chiede almeno 100 sedute" in _t526 and "volumi non misurabili" in _t526
+      and "doppio massimo ROTTO da 3 sedute" in _t526 and "volumi 90/100 (media 20 sedute 40/100) ⚠" in _t526b
+      and SI524.RSI_SEDUTE_() == ROT.RSI_SEDUTE
+      and ROT.rsi_wilder([{"c": 100 + (i % 7)} for i in range(ROT.RSI_SEDUTE - 1)]) is None
+      and ROT.rsi_wilder([{"c": 100 + (i % 7)} for i in range(ROT.RSI_SEDUTE)]) is not None)
+_f526 = SI524._riga_flussi({"short_interest": {"stato": "misurato", "data": "2026-10-15", "pct_flottante": 21.0}}, None)
+_f526b = SI524._riga_flussi({"short_interest": {"stato": "misurato", "pct_flottante": 2.0}}, None)
+check("v526 flussi: la short porta la data del regolamento (la misura di FINRA e' di due settimane fa, v506); senza data "
+      "lo dice", "short al 15/10: 21,0% del flottante (molto alta)" in _f526 and "regolamento senza data dichiarata" in _f526b)
+_c526 = SI524._riga_credito({"ticker": "X", "cds": {"stato": "quotato", "pb": 250.0, "data": "2026-10-30",
+                             "finestra5": {"stato": "misurato", "pb_da": 200.0, "pb_a": 250.0, "nome_pct": 25.0, "eccesso_pct": 27.0},
+                             "finestra": {"stato": "storico corto", "dal": "2026-10-16", "giorni_nome": 10, "servono": 22}}}, None)
+check("v526 credito: la settimana del CDS in PUNTI BASE accanto alle percentuali, e lo storico coi giorni che ha — " + _c526[:150],
+      "in 5 giorni +50 pb (+25,0%; +27,0% al netto dell'indice)" in _c526
+      and "il mese non si misura ancora: storico dal 16/10, 10 giorni del nome su 22" in _c526)
+
+# ── una regola sola: l'esame e i livelli fra agenda e riga ▶; la soglia della gamma riletta dal libro
+_s526 = _solo_codice_py((Path(__file__).resolve().parent / "sintesi.py").read_text(encoding="utf-8"))
+_main526 = _s526[_s526.find("def main("):]
+check("v526 una regola sola: l'esame del conflitto (esame_dal) e i livelli vicini (livelli_nome) servono l'agenda e la "
+      "riga ▶ (v161); la sintesi calcola il rischio degli eventi una volta e lo passa alla sezione 5 e al cruscotto",
+      _s526.count("NL.GIORNI_ESAME") == 1
+      and _s526.count("livelli_nome(r)") - _s526.count("def livelli_nome(r)") == 2
+      and _s526.count("esame_dal(r") - _s526.count("def esame_dal(r") == 2
+      and "rischio_eventi(libro, giro[\"posizionamento\"])" in _main526 and "righe_rischio_eventi(ev_r, libro)" in _main526
+      and "ev=ev_r" in _main526)
+_fmt526 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_risp526 = _fmt526[_fmt526.find("## La risposta in chat"):_fmt526.find("## Cosa contiene la risposta")]
+check("v526 il formato: la risposta porta il rischio degli eventi in dollari e apre ogni nome con cosa conta oggi, in una "
+      "frase di giudizio; il registro ha la voce",
+      "rischio degli eventi" in _risp526 and "cosa conta OGGI" in _risp526 and "[rischio_eventi]" in _fmt526
+      and "`GAMMA_MAGGIORANZA` = 0,66" in _sez524)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

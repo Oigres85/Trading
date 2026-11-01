@@ -1161,6 +1161,8 @@ favore (ricavi, stime o revisioni). Rotto × forte è per costruzione il CONFLIT
 - `SETTORI_CORR` = 0,3 — settori in tendenza con correlazione col libro sotto questa soglia
 - `VOLUMI_ALTI` = 90 — v525: nel cruscotto i volumi della seduta conclusa da questo percentile dell'anno portano la ⚠
   (la seduta è fra le più scambiate dell'anno)
+- `GAMMA_MAGGIORANZA` = 0,66 — v526: se un segno della gamma netta dei dealer copre almeno questa quota dei nomi con la
+  gamma misurata (da 3 nomi), il cruscotto lo dice UNA volta in testa e nelle righe compare solo dove fa eccezione
 
 **Il cruscotto di ogni posizione e il quadro macro intero** (v525, il CEO del 01/11/2026: *"Ci sono tantissime variabili
 di cui non si tiene conto macro, news (forum) e tecniche"*): la sintesi porta anche il quadro macro che le luci non
@@ -1168,6 +1170,17 @@ riassumono e, per OGNI posizione, le sei famiglie — tecnica, opzioni, flussi e
 coi valori degli strumenti che li calcolano. La ⚠ segna solo le convenzioni già dichiarate altrove (la rottura della
 struttura, §1bis; la short dalla soglia alta delle schede; l'impennata del forum; i segnali di credito, §1novies; la
 diluizione forte), più `VOLUMI_ALTI` qui sopra. Non è un punteggio e non entra nella tenuta: è informazione.
+
+**Il rischio degli eventi e la riga «cosa conta oggi»** (v526, il CEO del 01/11/2026, alla proposta: *"Sì"*). Per ogni
+posizione coi conti nei prossimi 21 giorni, il movimento implicito fino alla scadenza delle opzioni che li comprende per
+il valore della posizione: ±$, con la somma dichiarata come un TETTO (i conti cadono in giorni diversi, e nessun
+movimento implicito ha un verso). Il movimento si attribuisce solo se le opzioni misurano fino agli stessi conti del
+calendario. In testa a ogni nome del cruscotto la riga ▶ coi FATTI di oggi, in quest'ordine (convenzione): conti entro 14
+giorni col loro ±$, l'esame del conflitto da mandare, la decisione della tenuta (CONFLITTO, VENDITA PER EVIDENZA), gli
+EVENTI del credito, la struttura (rottura, doppio confermato o rotto di recente), i livelli entro `LIVELLO_ATR`, i volumi
+dal `VOLUMI_ALTI`-esimo percentile, l'impennata sul forum. Le CONDIZIONI (short alta, Altman, diluizione, quota del
+debito) restano con la loro ⚠ nella riga: cambiano coi bilanci e coi regolamenti, e un avviso che suona ogni giorno non
+avvisa. Il giudizio su quale fatto pesi di più lo scrive la risposta.
 
 **Il registro delle analisi** (`memoria/registro_analisi.jsonl`): una fotografia per analisi — luci, semaforo, caselle
 ed esiti — e il confronto si fa con l'ultima analisi di una SEDUTA diversa (le misure stanno sulle sedute concluse: due

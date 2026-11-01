@@ -250,7 +250,10 @@ nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA
    cronaca di mercato, i feed muti o non letti, e WallStreetBets (i più citati, i nostri nomi marcati, le impennate):
    attenzione, non fatti (v451).
 5. **Il libro nel regime**: semaforo e salvavita, esposizione, risultato contro QQQ e SMH, costo dell'attesa, credito sul
-   libro, l'incrocio regime × libro. Accanto, quando c'è, il rendimento del deposito e il ROI del conto.
+   libro, l'incrocio regime × libro. Accanto, quando c'è, il rendimento del deposito e il ROI del conto. Subito dopo
+   **il rischio degli eventi** (sezione 5 della sintesi, v526): per ogni posizione coi conti nei prossimi 21 giorni il
+   movimento implicito in dollari (±$), la somma dichiarata come un TETTO e il confronto con una settimana normale del
+   libro; i conti non attribuibili alle opzioni si dicono col perché.
 6. **La mappa tesi × prezzo e il cruscotto di ogni posizione** (sezioni 5 e 6): per OGNI posizione, dal peso più alto,
    la casella e l'esito della tenuta, i conti, e le sei famiglie in forma breve — **tecnica** (struttura delle
    oscillazioni, oscillatori, volumi, pavimento, media a 200, VWAP dai conti, lettura a 5 anni, stagionalità del mese) ·
@@ -258,7 +261,11 @@ nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA
    forum** (short, dark pool, WallStreetBets) · **credito** (CDS, Altman, solidità operativa, segnali) ·
    **fondamentali** (ricavi, stime e revisioni, P/E e PEG, ROIC e ROE, diluizione, target, quota di mercato) ·
    **notizie** (le più recenti sul nome, verificate in rete per chi ha un evento). Un blocco di 3-5 righe per nome, la ⚠
-   dove scatta una convenzione già dichiarata. Nessun nome si salta.
+   dove scatta una convenzione già dichiarata. Nessun nome si salta. **Ogni nome si apre con cosa conta OGGI** (v526):
+   la riga ▶ della sintesi dà i fatti — conti vicini col loro ±$, decisioni della tenuta, eventi del credito, struttura,
+   livelli vicini, volumi, forum —, e la risposta li legge in UNA frase di giudizio («per MU oggi conta …»), prima delle
+   famiglie. Senza fatti ▶ la frase dice che il nome non chiede niente oggi. La gamma dei dealer, quando ha lo stesso
+   segno su quasi tutti i nomi, si dice una volta in testa al cruscotto, non nome per nome.
 7. **Cosa è cambiato** dall'analisi precedente, dal blocco.
 8. **L'agenda**: conti, uscite dei dati macro, aste, Fed, mensile, esami da mandare, con i livelli entro 1 ATR e cosa
    cambierebbe ciascuno.
@@ -645,6 +652,9 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[sintesi_operativa]` l'analisi per INCROCI: il regime in sei luci, il libro nel regime, la mappa tesi × prezzo con
   gli allarmi, cosa è cambiato dall'analisi precedente, l'agenda coi livelli vicini e le azioni delle regole — la risposta
   in chat segue i suoi blocchi, il dettaglio sta nella scheda (31/10)
+- `[rischio_eventi]` il rischio degli eventi in dollari: per ogni posizione coi conti nei prossimi 21 giorni il
+  movimento implicito fino alla scadenza che li comprende per il valore della posizione, la somma come un tetto, e in
+  testa a ogni nome del cruscotto la riga ▶ coi fatti di oggi che la risposta legge in una frase di giudizio (01/11)
 - `[cruscotto]` OGNI famiglia di dati in OGNI analisi: il quadro macro intero (Fed e dot plot, dati USA con la prossima
   uscita, aste, BCE, cambio, Giappone, calendario, stagionalita', bitcoin, CFTC), notizie e forum, e per ogni posizione
   le sei famiglie — tecnica, opzioni, flussi e forum, credito, fondamentali, notizie — in forma breve; una famiglia nella
