@@ -1226,6 +1226,36 @@ def componi(modo, dati):
     return "\n".join(L)
 
 
+NOTIZIE_MACRO_GIRO = 12      # v525 — le voci macro che la sintesi riceve; le altre si contano (v393)
+NOTIZIE_TITOLI_GIRO = 30
+
+
+def per_la_sintesi(nw, aste, cal, ora_utc, finestra):
+    """v525 — cio' che la sintesi legge del brief: le notizie macro (titolo, fonte, ora), quelle per titolo con i
+    nomi nel cui feed compaiono (la cronaca di mercato e' la voce in tanti feed, v451), le sorti di ogni fonte (letta e
+    muta, NON letta: v389), le aste e le trimestrali. Le voci oltre il tetto si contano, non spariscono (v393)."""
+    nw = nw or {}
+
+    def v(x, extra=()):
+        d = {"titolo": comuni_testo(x.get("titolo")), "fonte": x.get("fonte"),
+             "quando": x["quando"].isoformat() if hasattr(x.get("quando"), "isoformat") else x.get("quando")}
+        for k in extra:
+            d[k] = x.get(k)
+        return d
+    macro, tit = nw.get("macro") or [], nw.get("per_titolo") or []
+    return {"ora_utc": ora_utc.isoformat(), "finestra_h": finestra,
+            "macro": [v(x) for x in macro[:NOTIZIE_MACRO_GIRO]], "macro_totale": len(macro),
+            "per_titolo": [v(x, ("tks", "in_feed")) for x in tit[:NOTIZIE_TITOLI_GIRO]], "per_titolo_totale": len(tit),
+            "titoli_non_letti": nw.get("titoli_non_letti") or [], "titoli_muti": nw.get("titoli_muti") or [],
+            "macro_non_lette": nw.get("macro_non_lette") or [], "macro_mute": nw.get("macro_mute") or [],
+            "macro_scartate": nw.get("macro_scartate"), "aste": aste, "trimestrali": cal}
+
+
+def comuni_testo(s):
+    import comuni
+    return comuni.testo_feed(s or "")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--mattina", action="store_true")
@@ -1279,6 +1309,10 @@ def main():
     testo = componi(modo, dati)
     print(testo)
     print(f"\n[generato in {dati['secondi']}s]")
+    # v525 — notizie macro e per titolo, aste e trimestrali per la sintesi (il cruscotto e il quadro macro): le stesse
+    #   strutture che questo testo rende, con le date in ISO (default=str), mai ricalcolate
+    import comuni
+    comuni.scrivi_del_giro(comuni.file_del_giro("brief"), per_la_sintesi(nw, aste, cal, ora_utc, finestra))
     if a.json:
         s = dict(dati); s["ora"] = s["ora"].isoformat(); s["ora_utc"] = s["ora_utc"].isoformat()
         def _ser(v):

@@ -9459,3 +9459,55 @@ dire che i mercati di previsione restano «INTERI». Ora il blocco dichiara il b
 la fonte caduta dalla fonte senza mercati macro (`fetch_predictions` restituisce una lista vuota in tutti e due i casi:
 v389, v406). Il v408 costruisce i mercati invece di aspettarli; un check nuovo percorre il ramo vuoto e morde togliendo
 la dichiarazione. `?v=` e `BUILD_VERSION` a 524: cambia `assets/app.js`.
+
+## 🧩 v525 — OGNI FAMIGLIA IN OGNI ANALISI: IL QUADRO MACRO INTERO, NOTIZIE E FORUM, IL CRUSCOTTO DI OGNI POSIZIONE
+
+Il CEO, 01/11/2026, sulla prova della v524, testuale: *"Non mi piace. Ci sono tantissime variabili di cui non si tiene
+conto macro, news (forum) e tecniche che abbiamo inserito in questi giorni."* Terza forma respinta (discorsiva,
+inventario, incroci). Stavolta la causa era misurabile ed era una mia regola: il formato della v524 diceva *"un dato entra
+quando sposta una decisione o è cambiato; altrimenti è nella scheda"*. Così, nei giorni in cui erano «nella norma»,
+sparivano proprio le variabili costruite nelle settimane prima: dot plot, statistiche con la prossima uscita, aste, BCE,
+cambio, Giappone, stagionalità, calendario fiscale, bitcoin, CFTC, notizie, forum, e per ogni nome opzioni, dark pool,
+short, CDS, Altman, PEG, ROIC, diluizione, quote di mercato, VWAP, lettura a 5 anni.
+
+> **Una regola di sintesi che toglie ciò che è nella norma toglie la famiglia, non la cifra.** Chi legge non distingue
+> «il sistema l'ha guardato ed è tranquillo» da «il sistema non l'ha guardato» (v406). Dal 01/11 la regola è l'opposta:
+> ogni famiglia in ogni analisi, per ogni posizione, in forma breve; nella norma basta una parola.
+
+### Cosa fa il sistema
+- **Gli strumenti passano alla sintesi ciò che rendono, non ricalcolato (v161)**: `posizionamento.per_la_sintesi`
+  (opzioni con il movimento implicito alla prima scadenza, alla mensile e ai conti, gamma dei dealer, dark pool,
+  WallStreetBets con l'impennata della sua regola, bitcoin); `brief.per_la_sintesi` (notizie macro e per titolo con le
+  sorti delle fonti, aste, trimestrali); `concorrenti.per_la_sintesi` (mercato, quota del nome e del primo, data, età,
+  posti di salute); `numeri_libro` le notizie di ogni posizione (`comuni.notizie_del_giro`) e i volumi
+  (`rotazione.volumi`, la funzione dei sorvegliati); `rotazione` il calendario fiscale di fine anno. Credito,
+  fondamentali, short e flottante la sintesi li legge con le funzioni delle schede sulle righe della pipeline.
+- **Sintesi, sezione 2 — il quadro macro intero**: ciò che le luci non portano. La catena FedWatch **dopo** la prossima
+  riunione (la prima è nella luce dei tassi: due rese dello stesso numero sono la classe v415), il dot plot con la
+  proiezione precedente, Polymarket (vuoto = dichiarato), le statistiche con l'ultimo dato e la prossima uscita DICHIARATA
+  dal calendario FRED (mai proiettata, v396), aste, BCE, cambio, Giappone, calendario, bitcoin, CFTC.
+- **Sezione 3 — notizie e forum**: le macro con le fonti curate prima delle generaliste, la cronaca di mercato con la
+  regola del blocco delle notizie (`rotazione.SOGLIA_CRONACA`, v451, v500), i feed muti o non letti nominati,
+  WallStreetBets (attenzione, non fatti: v451).
+- **Sezione 6 — il cruscotto di ogni posizione**: dal peso più alto, la casella e l'esito della tenuta, i conti, e sei
+  righe — tecnica, opzioni, flussi e forum, credito, fondamentali, notizie. La ⚠ solo dove scatta una convenzione già
+  dichiarata, più `VOLUMI_ALTI` (90° percentile, LIBRO.md §1quattuordecies, riletta dal gate). La cronaca non si ripete
+  sotto ogni nome.
+- **L'agenda** porta anche le uscite macro e le aste annunciate (un'asta chiusa non è un appuntamento).
+- **FORMATO_ANALISI.md**, «La risposta in chat»: dieci blocchi, il cruscotto obbligatorio per ogni posizione, e la regola
+  nuova: *una famiglia nella norma si scrive in una parola, non si salta*. Voce `[cruscotto]` nel registro.
+
+### Difetti trovati leggendo l'uscita come il destinatario, prima dei gate
+- *"RSI 35 (ipervenduto)"*: lo stato è dei QUATTRO oscillatori, non dell'RSI. Ora *"oscillatori ipervenduto (3 su 4
+  oltre la soglia; RSI 35)"*.
+- *"⚠ bilancio in zona di SICUREZZA"* su MSTR nel cruscotto: la stessa svista che la v524 aveva corretto nella mappa,
+  rifatta in una seconda resa. Ora una funzione sola, `testo_segnale` (v161).
+- *"ROIC -0%"*, *"fra 1 giorni"*, *"1 menzioni"*, la data della BoJ senza anno (*"ultimo del 01/12"* per il 2023).
+- La cronaca (*"Prediction: This Will Be Palantir's Stock Price…"* nel feed di quattro posizioni) usciva sotto MU,
+  NVDA e AMD come notizia loro.
+
+### 🦴 Un gate pinnava l'insieme dei file del giro
+v524 pretendeva `STRUMENTI_GIRO == {quattro nomi}`. Riagganciato all'invariante nei due versi: ogni file che la sintesi
+legge ha uno strumento che lo scrive, e ogni strumento che scrive un file del giro è fra quelli che la sintesi legge.
+
+⚠ `?v=` e `BUILD_VERSION` non toccati: nessun file servito al browser (v440).

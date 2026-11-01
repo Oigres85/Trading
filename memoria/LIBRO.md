@@ -1159,6 +1159,15 @@ favore (ricavi, stime o revisioni). Rotto × forte è per costruzione il CONFLIT
 - `CAPE_ALTO` = 80 — percentile del CAPE sui 20 anni
 - `LIVELLO_ATR` = 1 — un pavimento o la media a 200 entro questa distanza è un punto di decisione vicino
 - `SETTORI_CORR` = 0,3 — settori in tendenza con correlazione col libro sotto questa soglia
+- `VOLUMI_ALTI` = 90 — v525: nel cruscotto i volumi della seduta conclusa da questo percentile dell'anno portano la ⚠
+  (la seduta è fra le più scambiate dell'anno)
+
+**Il cruscotto di ogni posizione e il quadro macro intero** (v525, il CEO del 01/11/2026: *"Ci sono tantissime variabili
+di cui non si tiene conto macro, news (forum) e tecniche"*): la sintesi porta anche il quadro macro che le luci non
+riassumono e, per OGNI posizione, le sei famiglie — tecnica, opzioni, flussi e forum, credito, fondamentali, notizie —
+coi valori degli strumenti che li calcolano. La ⚠ segna solo le convenzioni già dichiarate altrove (la rottura della
+struttura, §1bis; la short dalla soglia alta delle schede; l'impennata del forum; i segnali di credito, §1novies; la
+diluizione forte), più `VOLUMI_ALTI` qui sopra. Non è un punteggio e non entra nella tenuta: è informazione.
 
 **Il registro delle analisi** (`memoria/registro_analisi.jsonl`): una fotografia per analisi — luci, semaforo, caselle
 ed esiti — e il confronto si fa con l'ultima analisi di una SEDUTA diversa (le misure stanno sulle sedute concluse: due

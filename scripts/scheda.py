@@ -285,6 +285,7 @@ REGISTRO = {
     "rendimento_capitale": Voce((), (Marcatore("schede", "rendimento del capitale", "tutti"),          # v520
                                      Marcatore("watchlist", "rendimento del capitale", "sorvegliati"))),
     "sintesi_operativa": Voce(("sintesi",)),                                                          # v524
+    "cruscotto": Voce(("sintesi",)),                                                                  # v525
     "stato_sistema": Voce(("stato_sistema",)),                                                         # v518
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),
     "schede": Voce(("schede_testa",), (Marcatore("schede", None, "tutti"),)),

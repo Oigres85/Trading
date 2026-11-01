@@ -54,6 +54,27 @@ def scrivi_del_giro(percorso, dati):
         return False
 
 
+NOTIZIE_GIRO = 15         # v525 — le voci di ogni nome che la sintesi riceve: tutte quelle della finestra (il feed ne da' 15)
+
+
+def notizie_del_giro(news, n=NOTIZIE_GIRO):
+    """v525 — le notizie per titolo (rotazione.notizie_recenti: {tk: {stato, voci, ...}}) in forma che il file del giro
+    porta: le date in ISO, le prime `n` voci dalla piu' recente, e i tre esiti (v389) — letto con voci · letto e vuoto o
+    fermo · NON letto — che la sintesi deve poter distinguere. Le voci si contano: quelle oltre `n` non spariscono, si
+    dichiarano (v393)."""
+    def iso(x):
+        return x.isoformat() if hasattr(x, "isoformat") else x
+    out = {}
+    for tk, nw in (news or {}).items():
+        nw = nw or {}
+        voci = [v for v in nw.get("voci") or [] if isinstance(v, dict)]
+        out[tk] = {"stato": nw.get("stato"), "lette": nw.get("lette"), "totale": len(voci),
+                   "vuoto": bool(nw.get("vuoto")), "fermo_dal": iso(nw.get("fermo_dal")), "copre_da": iso(nw.get("copre_da")),
+                   "voci": [{"titolo": testo_feed(v.get("titolo") or ""), "quando": iso(v.get("quando")),
+                             "fonte": v.get("fonte")} for v in voci[:n]]}
+    return out
+
+
 def r2_rumore(n):
     """L'R2 che il PURO CASO supera nel 5% dei campioni, a questa numerosita'.
 

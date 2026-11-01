@@ -509,10 +509,38 @@ def sintesi(o):
     return out
 
 
+def per_la_sintesi(o):
+    """v525 — per ogni nome in esame cio' che il cruscotto della sintesi mette accanto ai fondamentali: il primo mercato
+    del registro (con la quota del nome e quella del primo della fonte, il tipo, la data e l'eta': una quota senza il suo
+    mercato non si legge, v400) e il posto del nome per ogni misura di salute — le STESSE righe di questo strumento
+    (righe_mercato, posti), non ricalcolate (v161)."""
+    oggi = date.fromisoformat(o["oggi"])
+    out = {}
+    for tk in o["in_esame"]:
+        v = o["nomi"].get(tk) or {}
+        mm = []
+        for m in mercati_di(tk, o["nomi"]):
+            pub = data_pubblicazione(m.get("pubblicato"))
+            quote = m.get("quote") or []
+            mio = next((q for q in quote if q.get("ticker") == tk), None)
+            primo = next((q for q in quote if not q.get("categoria")), None)
+            mm.append({"mercato": m.get("mercato"), "tipo": m.get("tipo"), "fonte": m.get("fonte"),
+                       "pubblicato": m.get("pubblicato"), "eta": (oggi - pub).days if pub else None,
+                       "da_riverificare": bool(pub and (oggi - pub).days > ETA_QUOTE_GIORNI),
+                       "quota": _quota(mio) if mio else None,
+                       "primo": ({"nome": primo.get("nome"), "quota": _quota(primo), "e_lui": primo.get("ticker") == tk}
+                                 if primo else None)})
+        gruppo = [tk] + [t for t in v.get("concorrenti_quotati") or [] if t != tk]
+        out[tk] = {"mercati": mm, "posti": posti(tk, gruppo, o["dati"]), "gruppo": len(gruppo)}
+    return out
+
+
 def main():
     args = sys.argv[1:]
     o = calcola(tutti="--tutti" in args, memoria="--no-memoria" not in args)
     print("\n".join(sintesi(o)))
+    import comuni                     # v525 — quote e posti per il cruscotto della sintesi
+    comuni.scrivi_del_giro(comuni.file_del_giro("concorrenti"), per_la_sintesi(o))
 
 
 if __name__ == "__main__":

@@ -229,32 +229,45 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    uguali in `memoria/LIBRO.md` e in `config/`, concorrenti, operazioni) e le **domande aperte** di `LIBRO.md`
    §1undecies con la loro età. Esce sempre 0: un controllo che fallisce lo dice nella sua riga.
 
-## La risposta in chat, in quest'ordine (v524, decisione del CEO del 31/10/2026)
-Il CEO, testuale: *"Io voglio avere tutto ma non voglio passare un'ora a leggere avere un'infarinatura tale per cui da
-capire la situazione com'è ed eventualmente porti delle domande per singoli aspetti"*, e dopo due prove respinte (un
-inventario di tutte le fonti: *"troppo disordinata"*) l'impostazione per INCROCI: *"Procedi su tutto"*. La risposta parte
-dalle DECISIONI, non dalle fonti: ogni blocco risponde a una domanda e usa più famiglie di dati insieme. Il dettaglio di
-ogni strumento — la sezione qui sotto — entra nella risposta DENTRO questi blocchi, nella riga che lo riguarda; tutto il
-resto sta nella SCHEDA COMPLETA allegata, da cui si pesca quando il CEO fa una domanda su un singolo aspetto.
-1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso. È il
-   giudizio della risposta, scritto dopo aver letto tutto il resto.
-2. **Il regime: le sei luci** del blocco SINTESI OPERATIVA, una riga ciascuna col colore, il perché e i dati che la
-   compongono (VIX, Fear & Greed, put/call, DIX, gamma, CFTC, leva, P/E, CAPE, tassi, FedWatch, credito, NFCI, SLOOS,
-   stagione dei conti), con la freccia se è cambiata. Le luci non si sommano: nessun punteggio (v200). Il rischio
-   percepito è un termometro e lo si dice.
-3. **Il libro nel regime**: semaforo e salvavita, esposizione, risultato contro QQQ e SMH, costo dell'attesa, credito sul
-   libro, e l'incrocio regime × libro in una riga. Accanto, quando c'è, il rendimento del deposito e il ROI del conto.
-4. **La mappa tesi × prezzo**: le posizioni nelle caselle, con 📅 i conti entro 14 giorni e ⚠ gli allarmi; sotto, una
-   riga solo per i nomi che hanno CAMBIATO casella o esito, o che hanno un evento vicino, con le notizie cercate in rete
-   nei due versi (fonte e data). Gli altri sono «invariati» e non si commentano.
-5. **Cosa è cambiato** dall'analisi precedente, dal blocco: ciò che non è cambiato non si ripete.
-6. **L'agenda**: le date dei prossimi 21 giorni e i livelli entro 1 ATR, con cosa cambierebbe ciascuno.
-7. **Come muoversi**: per ogni casella l'azione delle regole già decise, e il giudizio della risposta («secondo me…»)
+## La risposta in chat, in quest'ordine (v525, decisione del CEO del 01/11/2026)
+Il CEO, 31/10/2026: *"Io voglio avere tutto ma non voglio passare un'ora a leggere"*; sull'impostazione per INCROCI della
+v524 *"Procedi su tutto"*, e sulla prova del 31/10, il 01/11: *"Non mi piace. Ci sono tantissime variabili di cui non si
+tiene conto macro, news (forum) e tecniche che abbiamo inserito in questi giorni."* La v524 aveva una regola — *un dato
+entra quando sposta una decisione o è cambiato* — che faceva sparire proprio quelle variabili nei giorni in cui erano
+«nella norma». Dal 01/11 la regola è l'opposta: **OGNI famiglia di dati entra in OGNI analisi, per OGNI posizione, in
+forma breve**; dove è nella norma basta una parola («nella norma», «invariato», «nessuna»), e l'approfondimento resta
+nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA, che li calcola tutti (v161).
+1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso — scritto
+   dopo aver letto tutto il resto.
+2. **Il regime: le sei luci**, una riga ciascuna col colore, il perché e i dati che la compongono, con la freccia se è
+   cambiata. Le luci non si sommano (v200); il rischio percepito è un termometro e lo si dice.
+3. **Il quadro macro, intero** (sezione 2 della sintesi), in 5-6 righe brevi: la Fed (target, catena delle riunioni dopo
+   la prossima, dot plot con la proiezione precedente, mercati di previsione), i dati USA con l'ultimo dato e la prossima
+   uscita DICHIARATA, le aste del Tesoro, BCE, cambio e Giappone, il calendario (scadenze delle opzioni, stagionalità del
+   Nasdaq-100 nel mese e nel ciclo, calendario fiscale di fine anno), bitcoin e grandi operatori della CFTC. Ciò che le
+   luci portano non si ripete.
+4. **Notizie e forum** (sezione 3): le notizie macro che contano — dal feed E cercate in rete, con fonte e data —, la
+   cronaca di mercato, i feed muti o non letti, e WallStreetBets (i più citati, i nostri nomi marcati, le impennate):
+   attenzione, non fatti (v451).
+5. **Il libro nel regime**: semaforo e salvavita, esposizione, risultato contro QQQ e SMH, costo dell'attesa, credito sul
+   libro, l'incrocio regime × libro. Accanto, quando c'è, il rendimento del deposito e il ROI del conto.
+6. **La mappa tesi × prezzo e il cruscotto di ogni posizione** (sezioni 5 e 6): per OGNI posizione, dal peso più alto,
+   la casella e l'esito della tenuta, i conti, e le sei famiglie in forma breve — **tecnica** (struttura delle
+   oscillazioni, oscillatori, volumi, pavimento, media a 200, VWAP dai conti, lettura a 5 anni, stagionalità del mese) ·
+   **opzioni** (movimento implicito ai conti e alla mensile, put/call, gamma dei dealer col cambio di regime) · **flussi e
+   forum** (short, dark pool, WallStreetBets) · **credito** (CDS, Altman, solidità operativa, segnali) ·
+   **fondamentali** (ricavi, stime e revisioni, P/E e PEG, ROIC e ROE, diluizione, target, quota di mercato) ·
+   **notizie** (le più recenti sul nome, verificate in rete per chi ha un evento). Un blocco di 3-5 righe per nome, la ⚠
+   dove scatta una convenzione già dichiarata. Nessun nome si salta.
+7. **Cosa è cambiato** dall'analisi precedente, dal blocco.
+8. **L'agenda**: conti, uscite dei dati macro, aste, Fed, mensile, esami da mandare, con i livelli entro 1 ATR e cosa
+   cambierebbe ciascuno.
+9. **Come muoversi**: per ogni casella l'azione delle regole già decise, e il giudizio della risposta («secondo me…»)
    con direzione, priorità e livelli; per la liquidità gli ingressi in zona che diversificano. Le quantità restano
    l'aritmetica dell'unità di 5.000 €, mai «la quantità giusta» (v439).
-8. **Le domande mirate** (2-4, sezione 8 qui sotto) e **lo stato del sistema** in una o due righe (sezione 9).
-La regola che tiene corta la risposta: **un dato entra quando sposta una decisione o è cambiato; altrimenti è nella
-scheda**. «Invariato» è un contenuto; un elenco di numeri fermi no.
+10. **Le domande mirate** (2-4, sezione 8 qui sotto) e **lo stato del sistema** in una o due righe (sezione 9).
+La regola che tiene leggibile la risposta: **una famiglia nella norma si scrive in una parola, non si salta**; le cifre
+che non spostano niente restano nella scheda, la FAMIGLIA no. «Nella norma» è un contenuto; un'assenza no.
 
 ## Cosa contiene la risposta — il DETTAGLIO di ogni blocco (dal 31/10, v524: l'ordine in chat è quello qui sopra)
 00. **Freschezza dei dati** (v511) — in UNA riga dal blocco FRESCHEZZA DEI DATI: quante serie lette alla fonte, chi è
@@ -632,6 +645,10 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[sintesi_operativa]` l'analisi per INCROCI: il regime in sei luci, il libro nel regime, la mappa tesi × prezzo con
   gli allarmi, cosa è cambiato dall'analisi precedente, l'agenda coi livelli vicini e le azioni delle regole — la risposta
   in chat segue i suoi blocchi, il dettaglio sta nella scheda (31/10)
+- `[cruscotto]` OGNI famiglia di dati in OGNI analisi: il quadro macro intero (Fed e dot plot, dati USA con la prossima
+  uscita, aste, BCE, cambio, Giappone, calendario, stagionalita', bitcoin, CFTC), notizie e forum, e per ogni posizione
+  le sei famiglie — tecnica, opzioni, flussi e forum, credito, fondamentali, notizie — in forma breve; una famiglia nella
+  norma si scrive in una parola, non si salta (01/11)
 - `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno

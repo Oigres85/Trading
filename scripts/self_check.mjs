@@ -203,7 +203,9 @@ const SUITE = [
      deposito titoli) -> 1025 */
   /* v524: 1064 punti di chiamata in test_analisi_libro (+25 sulla sintesi operativa: luci, mappa, registro, agenda,
      collegamenti) -> 1050 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1050, firma: /\d+\/\d+ CHECK OK/ },
+  /* v525: 1078 punti di chiamata in test_analisi_libro (+14 sul quadro macro intero, notizie e forum, cruscotto di ogni
+     posizione, export degli strumenti, agenda) -> 1065 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1065, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

@@ -10422,12 +10422,19 @@ check("v524 prepara_giro svuota la cartella (un file di un giro precedente non p
       "strumenti; fuori dal giro nessuno strumento scrive",
       _env524 == _d and _vuota524 and _fd524 == str(Path(_d) / "libro.json") and _sc524
       and _CO524.file_del_giro("libro") is None and _CO524.scrivi_del_giro(None, {}) is False)
-_srcs524 = {n: (Path(__file__).resolve().parent / f"{n}.py").read_text(encoding="utf-8") for n in
-            ("numeri_libro", "rotazione", "indici", "posizionamento")}
-check("v524 i quattro strumenti scrivono il proprio risultato per la sintesi, ciascuno col proprio nome: "
-      + str([n for n, s in _srcs524.items() if f'file_del_giro("{"libro" if n == "numeri_libro" else n}")' not in s]),
-      all(f'file_del_giro("{"libro" if n == "numeri_libro" else n}")' in s for n, s in _srcs524.items())
-      and set(SI524.STRUMENTI_GIRO) == {"libro", "rotazione", "indici", "posizionamento"})
+# v525 — riagganciato: pinnava l'INSIEME dei quattro file della v524 e la v525 ne ha aggiunti due (brief, concorrenti).
+#   L'invariante e' nei due versi: ogni file che la sintesi legge ha uno strumento che lo scrive col suo nome, e ogni
+#   strumento che scrive un file del giro e' fra quelli che la sintesi legge (un file scritto e mai letto e' lavoro perso)
+_srcs524 = {n: (Path(__file__).resolve().parent / f"{'numeri_libro' if n == 'libro' else n}.py").read_text(encoding="utf-8")
+            for n in SI524.STRUMENTI_GIRO}
+_scrittori525 = {p.stem: p for p in (Path(__file__).resolve().parent).glob("*.py")
+                 if "file_del_giro(" in p.read_text(encoding="utf-8") and p.stem not in ("comuni", "test_analisi_libro")}
+check("v524 gli strumenti scrivono il proprio risultato per la sintesi, ciascuno col proprio nome, e nei due versi: "
+      + str([n for n, s in _srcs524.items() if f'file_del_giro("{n}")' not in s]) + " · scrittori fuori dalla sintesi "
+      + str(sorted(k for k in _scrittori525 if ("libro" if k == "numeri_libro" else k) not in SI524.STRUMENTI_GIRO)),
+      all(f'file_del_giro("{n}")' in s for n, s in _srcs524.items())
+      and {"libro", "rotazione", "indici", "posizionamento", "brief", "concorrenti"} <= set(SI524.STRUMENTI_GIRO)
+      and all(("libro" if k == "numeri_libro" else k) in SI524.STRUMENTI_GIRO for k in _scrittori525))
 _cman524 = _solo_codice_py((Path(__file__).resolve().parent / "analisi.py").read_text(encoding="utf-8"))
 _cman524 = _cman524[_cman524.find("def main("):]
 check("v524 nel giro la cartella si svuota PRIMA degli strumenti, e la sintesi gira dopo il resto e prima dello stato del "
@@ -10443,6 +10450,197 @@ with _tf524.TemporaryDirectory() as _d:
     _clf524 = _AN524.checklist(_ff524)
 check("v524 senza la sezione «La risposta in chat» la checklist lo DICHIARA e stampa comunque il dettaglio",
       "⚠ '## La risposta in chat' non trovata" in _clf524 and "MARCATORE" in _clf524)
+
+# ═══ v525 — IL QUADRO MACRO INTERO, NOTIZIE E FORUM, IL CRUSCOTTO DI OGNI POSIZIONE ════════════════════════════════
+# Il CEO, 01/11/2026: «Ci sono tantissime variabili di cui non si tiene conto macro, news (forum) e tecniche». Gli stati
+# si COSTRUISCONO (v425, v429): domani i dati potrebbero non contenere un'impennata, un'asta, un dato che manca.
+import posizionamento as PO525
+import brief as BR525
+import concorrenti as CC525
+import comuni as CO525
+_oggi525 = _d524(2026, 11, 1)
+_ad525 = _dt524(2026, 11, 1, 8, 0, tzinfo=_tz524.utc)
+
+# ── gli export: le stesse misure che gli strumenti rendono, nei tre esiti
+_rie525 = {"AAA": {"spot": 100.0, "iv30": 50.0, "pc_vol": 0.8, "pc_oi": 1.1,
+                   "prima_scadenza": {"data": "2026-11-06", "pct": 5.0, "strike": 100},
+                   "mensile": {"data": "2026-11-20", "max_pain": 110.0, "movimento": {"data": "2026-11-20", "pct": 9.0, "strike": 100}},
+                   "conti": {"data": "2026-11-10"}, "movimento_conti": {"data": "2026-11-13", "pct": 12.0, "strike": 100},
+                   "distacco_conti": 3}}
+_righe_w525 = [{"rank": 1, "ticker": "ZZZ", "mentions": 90, "mentions_24h_ago": 80, "upvotes": 5},
+               {"rank": 2, "ticker": "AAA", "mentions": 60, "mentions_24h_ago": 10, "upvotes": 9}]
+_ps525 = PO525.per_la_sintesi(_rie525, {"AAA": {"spot": 100.0, "netta": -5e6, "flip": 105.0, "call_wall": 120, "put_wall": 90}},
+                             {"AAA": {"data": "2026-10-30", "dpi": 45.0, "rango": 70, "media": 40.0, "rango_media": 60, "n": 252}},
+                             {"righe": _righe_w525}, None, ["AAA", "BBB"], ["CCC"], None, "rete", {"BBB": "HTTP 403"})
+_pn525 = PO525.per_la_sintesi({}, {}, {}, None, "timeout", ["AAA"], [], None, None, {})
+check("v525 posizionamento passa alla sintesi le misure per titolo che rende: opzioni (prima scadenza, mensile col max pain, "
+      "fino ai conti), gamma, dark pool e forum (con l'impennata della sua regola); una catena NON letta porta il motivo, il "
+      "forum non letto l'errore, il bitcoin che manca il perche' — tre esiti, mai un buco muto (v389)",
+      _ps525["titoli"]["AAA"]["opzioni"]["conti"]["pct"] == 12.0 and _ps525["titoli"]["AAA"]["opzioni"]["mensile"]["max_pain"] == 110.0
+      and _ps525["titoli"]["AAA"]["gamma"]["flip"] == 105.0 and _ps525["titoli"]["AAA"]["dark_pool"]["rango_media"] == 60
+      and _ps525["titoli"]["AAA"]["wsb"]["impennata"] is True and _ps525["titoli"]["AAA"]["wsb"]["impennata"] == PO525.impennata(
+          PO525.wsb_nome(_righe_w525, "AAA"))
+      and _ps525["titoli"]["BBB"]["opzioni"]["motivo"] == "HTTP 403" and _ps525["titoli"]["CCC"]["wsb"] is None
+      and _ps525["wsb_primi"][0]["ticker"] == "ZZZ" and _ps525["wsb_menzioni"] == 150 and _ps525["bitcoin_errore"] == "rete"
+      and _pn525["wsb_letto"] is False and _pn525["wsb_errore"] == "timeout" and "wsb" not in _pn525["titoli"]["AAA"])
+_nw525 = {"macro": [{"titolo": f"M{i}", "fonte": "Bloomberg", "quando": _ad525 - _td524(hours=i)} for i in range(20)],
+          "per_titolo": [{"titolo": "T&amp;amp;quot;x", "fonte": "Nasdaq[AAA]", "quando": _ad525, "tks": ["AAA"], "in_feed": 1}],
+          "titoli_non_letti": ["BBB(429)"], "titoli_muti": ["CCC"], "macro_non_lette": [], "macro_mute": ["CNBC Economia"]}
+_bs525 = BR525.per_la_sintesi(_nw525, {"finestra": 7}, {"attesi": []}, _ad525, 16.0)
+check("v525 il brief passa alla sintesi le notizie con le date in ISO, le voci oltre il tetto CONTATE (v393), il titolo "
+      "decodificato dalla funzione comune (v510), le sorti delle fonti, aste e trimestrali",
+      len(_bs525["macro"]) == BR525.NOTIZIE_MACRO_GIRO and _bs525["macro_totale"] == 20
+      and _bs525["macro"][0]["quando"] == _ad525.isoformat() and _bs525["per_titolo"][0]["titolo"] == 'T"x'
+      and _bs525["titoli_non_letti"] == ["BBB(429)"] and _bs525["macro_mute"] == ["CNBC Economia"]
+      and _bs525["aste"] == {"finestra": 7} and _json.loads(_json.dumps(_bs525)) == _bs525)
+_nl525 = CO525.notizie_del_giro({"AAA": {"stato": "ok", "lette": 15, "voci": [{"titolo": "a&amp;quot;b", "quando": _ad525}] * 20},
+                                 "BBB": {"stato": "429", "voci": []}, "CCC": {"stato": "ok", "lette": 0, "voci": [], "vuoto": True}})
+check("v525 le notizie per titolo nel file del giro: le date in ISO, al piu' NOTIZIE_GIRO voci con il TOTALE contato, e i "
+      "tre esiti distinti — letto con voci · letto e vuoto · NON letto (v389)",
+      len(_nl525["AAA"]["voci"]) == CO525.NOTIZIE_GIRO and _nl525["AAA"]["totale"] == 20
+      and _nl525["AAA"]["voci"][0]["quando"] == _ad525.isoformat() and _nl525["AAA"]["voci"][0]["titolo"] == 'a"b'
+      and _nl525["BBB"]["stato"] == "429" and _nl525["CCC"]["vuoto"] is True and _json.loads(_json.dumps(_nl525)) == _nl525)
+_reg525 = {"AAA": {"nome": "Alfa", "mercati": [{"mercato": "acceleratori", "tipo": "misura", "fonte": "F", "pubblicato": "2026-03-01",
+                                               "quote": [{"nome": "Zeta", "ticker": "ZZZ", "quota_pct": 60.0},
+                                                         {"nome": "Alfa", "ticker": "AAA", "quota_pct": 30.0}]}],
+                   "concorrenti_quotati": ["ZZZ"]}}
+_cs525 = CC525.per_la_sintesi({"oggi": "2026-11-01", "in_esame": ["AAA"], "nomi": _reg525, "dati": {}})
+check("v525 i concorrenti passano alla sintesi il mercato con la quota del nome e quella del primo, la data e l'eta' (oltre "
+      "il limite la quota si dichiara da riverificare) e i posti di salute dello strumento (v161)",
+      _cs525["AAA"]["mercati"][0]["quota"] == CC525._quota({"quota_pct": 30.0})
+      and _cs525["AAA"]["mercati"][0]["primo"]["nome"] == "Zeta" and _cs525["AAA"]["mercati"][0]["primo"]["e_lui"] is False
+      and _cs525["AAA"]["mercati"][0]["da_riverificare"] is True and _cs525["AAA"]["gruppo"] == 2
+      and _cs525["AAA"]["posti"] == CC525.posti("AAA", ["AAA", "ZZZ"], {}))
+
+# ── il quadro macro: cio' che le luci non portano, senza proiezioni e senza ripetere le luci
+_mac525 = {"fedwatch": {"target_range": "3.75–4.00%", "meetings": [
+               {"date": "2026-12-09", "prezzata_dal_contratto": True, "mosse_cumulate": 0.7, "hike_prob": 70, "hold_prob": 30},
+               {"date": "2027-01-27", "prezzata_dal_contratto": True, "mosse_cumulate": 0.96},
+               {"date": "2027-03-17", "prezzata_dal_contratto": False}]},
+           "proiezioni_fomc": {"stato": "letto", "riunione": "2026-09-16", "anni": ["2026", "2027", "2028"],
+                               "mediana": [4.1, 4.1, 3.9], "precedente": {"mediana": [3.8, 3.6, None]}},
+           "calendario_uscite": {"per_chiave": {"cpi": {"prossime": ["2026-10-14", "2026-11-10"]}, "nfp": {"prossime": []}}},
+           "bce": {"tasso_rifinanziamento": 2.65, "data": "2026-10-31"},
+           "carry": {"boj_rate": None, "boj_rate_date": "2023-12-01", "boj_meetings": ["2026-10-30", "2026-12-18"]},
+           "witching": {"next": "2026-12-18"}, "indicators": [{"key": "gdp", "value": "3.4%", "date": "2026-07-01"}]}
+_sc525 = {"cpi": {"valore": 3.7, "data": "2026-09-01"}, "nfp": {"valore": 29, "data": "2026-09-01"}}
+_q525 = "\n".join(SI524.quadro_macro(_mac525, _sc525, {"cambio": {}}, {}, {}, {"aste": None}, {}, [], _oggi525))
+check("v525 quadro macro: la prima riunione NON si ripete (e' nella luce dei tassi, v415) e la catena si ferma alla "
+      "prima riunione non prezzata; il dot plot con la proiezione precedente; Polymarket vuoto DICHIARATO; la prossima "
+      "uscita e' quella DICHIARATA dal calendario, e senza calendario «dato non disponibile» (v396); il PIL col trimestre; "
+      "la decisione della BoJ gia' passata non e' «la prossima», e un dato vecchio porta l'anno; aste non lette dichiarate",
+      "09/12" not in _q525.split("dot plot")[0] and "27/01 +0,96" in _q525 and "17/03 non prezzata" in _q525
+      and "2026 4,1% (prima 3,8)" in _q525 and "2028 3,9%" in _q525 and "(prima" not in _q525.split("2028")[1][:12]
+      and "nessun mercato macro in questo run" in _q525
+      and "inflazione CPI 3,7% (settembre 2026) → 10/11" in _q525 and "14/10" not in _q525
+      and "posti di lavoro +29 mila (settembre 2026) → prossima uscita: dato non disponibile" in _q525
+      and "PIL 3,4% (3° trimestre 2026)" in _q525 and "prossima decisione 18/12" in _q525
+      and "01/12/2023" in _q525 and "ASTE DEL TESORO: non lette" in _q525)
+
+# ── notizie e forum: la cronaca dalla regola dei feed (v451), il forum non letto dichiarato, i feed vuoti nominati
+_nwl525 = {t: {"stato": "ok", "voci": [{"titolo": "Mercato giu'", "quando": "2026-10-31T20:00:00+00:00"},
+                                         {"titolo": f"solo {t}", "quando": "2026-10-31T19:00:00+00:00"}]} for t in ("AAA", "BBB", "CCC")}
+_nwl525["DDD"] = {"stato": "ok", "voci": [{"titolo": "Mercato giu'", "quando": "2026-10-31T20:00:00+00:00"}]}
+for _t525 in ("AAA", "BBB"):     # una voce in DUE soli feed: sotto la soglia della cronaca, resta coi nomi (v500)
+    _nwl525[_t525]["voci"].append({"titolo": "Due feed", "quando": "2026-10-31T18:00:00+00:00"})
+_nwl525["EEE"] = {"stato": "ok", "voci": [], "vuoto": True}
+_nwl525["FFF"] = {"stato": "429", "voci": []}
+_crn525 = SI524.cronaca(_nwl525)
+_nf525 = "\n".join(SI524.notizie_forum({"macro": [], "macro_totale": 0, "finestra_h": 16, "macro_mute": []},
+                                       {"wsb_letto": False, "wsb_errore": "timeout"}, {"notizie": _nwl525}))
+check("v525 notizie e forum: la voce nel feed di almeno SOGLIA_CRONACA posizioni e' cronaca (la regola del blocco delle "
+      "notizie, v161) e quella di un nome solo no; i feed NON letti e quelli vuoti si nominano; il forum non letto e' "
+      "«il dato che manca, non un forum muto» (v389)",
+      [x["titolo"] for x in _crn525] == ["Mercato giu'"] and _crn525[0]["n"] == 4
+      and "CRONACA DI MERCATO" in _nf525 and "NON letti FFF" in _nf525 and "vuoti o fermi EEE" in _nf525
+      and "WALLSTREETBETS: NON letto (timeout)" in _nf525 and "nessuna voce macro nella finestra" in _nf525)
+
+# ── il cruscotto: OGNI posizione con le SEI famiglie, dal peso piu' alto, la cronaca fuori, i segnali dalle loro regole
+_ten525 = {"righe": [
+    {"tk": "AAA", "peso": 0.10, "esito": "IN OSSERVAZIONE", "prove": {"tendenza": {"sma200": 90.0, "d200_atr": 1.2},
+     "stime": {"ora": 2.0, "prima": 1.5}, "revisioni": {"su": 3, "giu": 1}}, "consenso": {"mediana": 25.0},
+     "struttura": {"stato": "LATERALE", "rottura": "ribasso", "doppi": [], "divergenze": []},
+     "oscillatori": {"seduta": "2026-10-30", "rsi": 25, "stocastico": 10, "williams": -90, "cci": -150},
+     "volumi": {"vol_pct_seduta": 95.0, "vol_pct_20": 50.0}, "pavimenti": {"minimi": [{"alto": 95.0, "pct": -5.0, "atr": -0.5}]},
+     "vwap": {"vwap": 101.0, "dist_pct": -1.0, "comunicato": "2026-08-01"}, "cinque_anni": {"posizione": 40.0, "dmax_pct": -30.0}},
+    {"tk": "BBB", "peso": 0.30, "esito": "LASCIAR CORRERE", "prove": {}}]}
+_lib525 = {"tenuta": _ten525, "attesa": {"scadenze": [{"tk": "AAA", "data": "2026-11-02", "giorni": 1}]},
+           "notizie": {"AAA": _nwl525["AAA"], "BBB": _nwl525["BBB"], "CCC": _nwl525["CCC"]}}
+_rwl525 = {"AAA": {"ticker": "AAA", "short_interest": {"stato": "misurato", "pct_flottante": 21.0},
+                   "cds": {"stato": "assente"}, "rendimento": {"roic": -0.001, "roe": 0.25, "al": "2026-06-30"},
+                   "azioni": {"serie": [1], "var_anno": {"pct": 12.0}}}}
+_cr525 = SI524.cruscotto(_lib525, {"titoli": {"AAA": {"wsb": {"rango": 5, "menzioni": 1, "prima": None, "impennata": True}}}},
+                         {}, _rwl525, None, {}, _ad525)
+_tcr525 = "\n".join(_cr525)
+_fam525 = ("tecnica: ", "opzioni: ", "flussi e forum: ", "credito: ", "fondamentali: ", "notizie: ")
+check("v525 cruscotto: OGNI posizione ha le sei famiglie (una riga ciascuna, anche quando il dato manca: dichiarato), in "
+      "ordine di peso; i conti di DOMANI non sono «fra 1 giorni» (v458); il ROIC che arrotonda a zero non porta il segno "
+      "(v496); «1 menzione» al singolare",
+      len(_cr525) == 2 * (1 + len(_fam525)) and _cr525[0].startswith("  BBB") and _cr525[7].startswith("  AAA")
+      and all(sum(1 for r in _cr525 if r.strip().startswith(f)) == 2 for f in _fam525)
+      and "conti 02/11, DOMANI" in _tcr525 and "fra 1 giorni" not in _tcr525 and "ROIC 0%" in _tcr525 and "-0%" not in _tcr525
+      and "con 1 menzione " in _tcr525 and "dato non disponibile" in _cr525[4] + _cr525[5])
+check("v525 cruscotto: ⚠ dove scatta una convenzione GIA' dichiarata — la rottura della struttura, i volumi dal 90° "
+      "percentile, la short dalla soglia alta delle schede, l'impennata della regola del forum, la diluizione forte delle "
+      "schede — e lo stato degli oscillatori e' dei quattro, non dell'RSI",
+      "⚠ ROTTA AL RIBASSO" in _tcr525 and "volumi 95/100 (media 20 sedute 50/100) ⚠" in _tcr525
+      and "short 21,0% del flottante (molto alta) ⚠" in _tcr525 and "⚠ IMPENNATA" in _tcr525 and "azioni +12,0% in un anno ⚠" in _tcr525
+      and "oscillatori ipervenduto (4 su 4 oltre la soglia; RSI 25)" in _tcr525)
+check("v525 cruscotto: la cronaca di mercato (nel feed di almeno SOGLIA_CRONACA posizioni) NON si ripete sotto ogni nome, "
+      "le voci del nome restano, e un nome con solo cronaca lo dice",
+      "solo AAA" in _tcr525 and "solo BBB" in _tcr525 and "Mercato giu'" not in _tcr525)
+_s525 = (Path(__file__).resolve().parent / "sintesi.py").read_text(encoding="utf-8")
+import credito as _CRx525
+_seg_prima525 = _CRx525.segnali
+try:
+    _CRx525.segnali = lambda r, x=None, liquidita=None: [
+        ("condizione", "bilancio in zona di SICUREZZA (Altman 3,1) e l'attivita' CONSUMA CASSA (flusso -1)"),
+        ("evento", "RINCARO IMPROVVISO del CDS (+25% in 5 giorni)")]
+    _rc525 = SI524._riga_credito({"ticker": "AAA", "cds": {"stato": "assente"}}, None)
+finally:
+    _CRx525.segnali = _seg_prima525
+check("v525 il testo dei segnali di credito e' UNO per la mappa e per il cruscotto (testo_segnale, v161): il bilancio "
+      "sicuro che consuma cassa si nomina per la cassa (v504), un evento per il suo nome — " + _rc525[-90:],
+      "⚠ l'attivita' consuma cassa (bilancio sicuro); RINCARO IMPROVVISO del CDS" in _rc525 and
+      SI524.testo_segnale("condizione", "bilancio in zona di SICUREZZA (Altman 3,1) e l'attivita' CONSUMA CASSA")
+      == "l'attivita' consuma cassa (bilancio sicuro)"
+      and _s525.count("CONSUMA CASSA\" in testo") == 1 and "testo_segnale(tipo, testo)" in _s525.split("def allarmi")[1][:900])
+
+# ── l'agenda: le uscite macro e le aste, dalle date DICHIARATE
+_ag525 = SI524.agenda({}, {}, {}, _oggi525, {"per_chiave": {"cpi": {"prossime": ["2026-11-10"]}, "gdp": {"prossime": ["2026-12-23"]}}},
+                      {"prossime": [{"giorno": "2026-11-05", "scadenza": "10 anni", "importo_mld": 42, "quando": "05/11 19:00"},
+                                    {"giorno": "2026-11-01", "scadenza": "3 anni", "chiusa": True}]})
+_tag525 = "\n".join(t for _, t in _ag525)
+check("v525 agenda: le uscite macro entro 21 giorni dal calendario ufficiale (non quelle oltre), le aste annunciate con "
+      "l'ora gia' convertita, mai un'asta chiusa come appuntamento",
+      "uscita: inflazione CPI" in _tag525 and "PIL" not in _tag525 and "asta del Tesoro 10 anni (42 mld $) — chiude 05/11 19:00" in _tag525
+      and "3 anni" not in _tag525)
+
+# ── i collegamenti: la sintesi legge brief e concorrenti, calcola le sezioni e le passa alla resa, e la resa le stampa
+_main525 = _solo_codice_py(_s525)[_solo_codice_py(_s525).find("def main("):]
+_rs525 = "\n".join(SI524.resa({}, {k: SI524._luce("🟡", ["d"], "x") for k, _ in SI524.FAMIGLIE}, {c: [] for c in SI524.CASELLE},
+                              ["x"], None, [], [], [], [], None, [], _ad525,
+                              nuove={"macro": ["  MACRO525"], "notizie": ["  NOTIZIE525"], "cruscotto": ["  CRUSCOTTO525"]}))
+_rs525v = "\n".join(SI524.resa({}, {k: SI524._luce("🟡", ["d"], "x") for k, _ in SI524.FAMIGLIE}, {c: [] for c in SI524.CASELLE},
+                               ["x"], None, [], [], [], [], None, [], _ad525))
+check("v525 collegamento: la sintesi calcola quadro macro, notizie e cruscotto e li passa alla resa; la resa li stampa "
+      "nelle sezioni 2, 3 e 6, nell'ordine; senza, ciascuna sezione DICHIARA di non essere stata calcolata (v406)",
+      "nuove=nuove" in _main525 and "quadro_macro(" in _main525 and "notizie_forum(" in _main525 and "cruscotto(" in _main525
+      and 0 <= _rs525.find("2 · IL QUADRO MACRO") < _rs525.find("MACRO525") < _rs525.find("3 · NOTIZIE E FORUM")
+      < _rs525.find("NOTIZIE525") < _rs525.find("4 · IL LIBRO") < _rs525.find("5 · LA MAPPA") < _rs525.find("6 · IL CRUSCOTTO")
+      < _rs525.find("CRUSCOTTO525") < _rs525.find("7 · COSA E' CAMBIATO") < _rs525.find("9 · LE AZIONI")
+      and _rs525v.count("non e' stato calcolato in questo giro") + _rs525v.count("non calcolati in questo giro") == 3)
+_srcl525 = (Path(__file__).resolve().parent / "numeri_libro.py").read_text(encoding="utf-8")
+check("v525 numeri_libro passa le notizie alla sintesi in forma che il file porta (comuni.notizie_del_giro) e calcola i "
+      "volumi delle posizioni con la funzione dei sorvegliati (rotazione.volumi, v161)",
+      '"notizie": comuni.notizie_del_giro(o.get("notizie"))' in _srcl525 and 'r["volumi"] = rotazione.volumi(' in _srcl525)
+_fmt525 = (Path(__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_risp525 = _fmt525[_fmt525.find("## La risposta in chat"):_fmt525.find("## Cosa contiene la risposta")]
+check("v525 il formato: la risposta in chat porta il quadro macro intero, notizie e forum e il cruscotto di OGNI posizione "
+      "con le sei famiglie, e la regola che toglieva i dati «fermi» (la causa del rilievo del CEO) non c'e' piu'",
+      "(v525" in _risp525 and "quadro macro" in _risp525.lower() and "cruscotto" in _risp525.lower()
+      and "ogni posizione" in _risp525.lower() and "un dato entra quando sposta una decisione o è cambiato" not in _risp525
+      and "[cruscotto]" in _fmt525)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

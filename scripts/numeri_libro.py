@@ -298,6 +298,9 @@ def calcola(sedute=1, registra=False, adesso=None):
         r["vwap"] = vw.get(r["tk"])
         r["oscillatori"] = rotazione.oscillatori(B.get(r["tk"]), adesso)
         r["stagionalita"] = ((_rp511.get(r["tk"]) or {}).get("tv") or {}).get("stagionalita")
+        # v525 — i volumi della seduta conclusa nel loro anno (la stessa funzione dei sorvegliati, v472): la sintesi li
+        #   mette nel cruscotto della posizione, e prima non li calcolava nessuno per le posizioni
+        r["volumi"] = rotazione.volumi(B.get(r["tk"]) or [], adesso)
     for x in (out["ordini"] or {}).get("righe") or []:
         if not x.get("errore"):
             x["vwap"] = vw.get(x["tk"])
@@ -3435,4 +3438,7 @@ if __name__ == "__main__":
     #   --sedute 1): un giro a cinque sedute descrive un altro periodo
     import comuni
     if a.sedute == 1:
-        comuni.scrivi_del_giro(comuni.file_del_giro("libro"), {k: v for k, v in o.items() if k not in ("notizie",)})
+        # v525 — anche le notizie, in forma che il file porta (le date in ISO, le prime voci di ogni nome, i tre esiti):
+        #   la sintesi le mette nel cruscotto di ogni posizione
+        comuni.scrivi_del_giro(comuni.file_del_giro("libro"), {**{k: v for k, v in o.items() if k not in ("notizie",)},
+                                                               "notizie": comuni.notizie_del_giro(o.get("notizie"))})

@@ -1214,6 +1214,57 @@ def righe_wsb(letto, pos, sorv, memoria, adesso, errore=None):
 
 
 
+def _mov_breve(m):
+    return None if not m else {"data": m.get("data"), "pct": m.get("pct"), "strike": m.get("strike")}
+
+
+def per_la_sintesi(rie, gex, stati_dp, letto_wsb, err_wsb, pos, sorv, btc=None, err_btc=None, errori_cat=None):
+    """v525 — le misure per titolo che la sintesi mette nel cruscotto di ogni nome: le STESSE che le righe di questo
+    strumento rendono (v161), non ricalcolate. Per ogni nome: opzioni (volatilita' implicita, put/call, movimento
+    implicito alla prima scadenza, alla mensile e fino ai conti, max pain), gamma dei dealer, dark pool, WallStreetBets.
+    Tre esiti distinti anche qui (v389): un nome senza catena porta il motivo, il forum NON letto porta l'errore."""
+    righe_w = (letto_wsb or {}).get("righe") if letto_wsb else None
+    tot_w = sum(int(r.get("mentions") or 0) for r in righe_w or [])
+    titoli = {}
+    for tk in list(dict.fromkeys(list(pos) + list(sorv))):
+        x = {}
+        r = (rie or {}).get(tk)
+        if r:
+            mens = r.get("mensile") or {}
+            x["opzioni"] = {"spot": r.get("spot"), "iv30": r.get("iv30"), "pc_vol": r.get("pc_vol"), "pc_oi": r.get("pc_oi"),
+                            "prima": _mov_breve(r.get("prima_scadenza")),
+                            "mensile": {**(_mov_breve(mens.get("movimento")) or {}), "max_pain": mens.get("max_pain"),
+                                        "scadenza": mens.get("data")} if mens else None,
+                            "conti": {**(_mov_breve(r.get("movimento_conti")) or {}),
+                                      "data_conti": (r.get("conti") or {}).get("data"),
+                                      "distacco": r.get("distacco_conti")} if r.get("movimento_conti") else None}
+        elif tk in pos:
+            x["opzioni"] = {"motivo": (errori_cat or {}).get(tk) or "catena non letta"}
+        g = (gex or {}).get(tk)
+        if g:
+            x["gamma"] = {k: g.get(k) for k in ("spot", "netta", "flip", "call_wall", "put_wall")}
+        dp = (stati_dp or {}).get(tk)
+        if dp:
+            x["dark_pool"] = {k: dp.get(k) for k in ("data", "dpi", "rango", "media", "rango_media", "n")}
+        if righe_w is not None:
+            w = wsb_nome(righe_w, tk)
+            x["wsb"] = (None if w is None else {**w, "impennata": impennata(w),
+                                                 "quota": (w["menzioni"] / tot_w * 100) if tot_w else None})
+        titoli[tk] = x
+    out = {"titoli": titoli, "wsb_letto": righe_w is not None, "wsb_errore": err_wsb}
+    if righe_w is not None:
+        out["wsb_primi"] = [{"rango": int(r.get("rank") or 0), "ticker": r.get("ticker"), "nome": _nome_wsb(r.get("ticker")),
+                             "menzioni": int(r.get("mentions") or 0)}
+                            for r in sorted(righe_w, key=lambda r: int(r.get("rank") or 10 ** 6))[:PRIMI_WSB]]
+        out["wsb_titoli"], out["wsb_menzioni"] = len(righe_w), tot_w
+    if btc:
+        out["bitcoin"] = {k: btc.get(k) for k in ("seduta", "campana", "adesso", "ora", "alla_campana", "var", "venerdi",
+                                                    "cme", "var_cme", "beta", "r2", "n", "mstr_equivalente", "dollari")}
+    else:
+        out["bitcoin_errore"] = err_btc or "non letto"
+    return out
+
+
 # ══════════════════════════════════════ ESECUZIONE ══════════════════════════════════════
 def _catena(tk):
     try:
@@ -1351,7 +1402,10 @@ def main():
         spy = rie.get("SPY") or {}
         mens = scadenze_mensili(spy["scadenze"], oggi) if spy.get("scadenze") else []
         comuni.scrivi_del_giro(percorso, {"pc": stato_pc(memoria), "dix": dix, "cot": cot_stato(righe_c),
-                                          "mensile": mens[0] if mens else None})
+                                          "mensile": mens[0] if mens else None,
+                                          # v525 — e le misure per titolo, il bitcoin e il forum: il cruscotto dei nomi
+                                          **per_la_sintesi(rie, gex, stati_dp, letto_wsb, err_wsb, sorted(qta),
+                                                           [s["tk"] for s in sorv], btc, err_btc, errori_cat)})
 
 
 if __name__ == "__main__":
