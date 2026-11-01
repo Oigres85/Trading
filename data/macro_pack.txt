@@ -1,4 +1,4 @@
-⟦ BUILD v524 · generato 01/11/2026 11:35 ⟧
+⟦ BUILD v524 · generato 01/11/2026 14:49 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,11 +55,11 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 01/11/2026, 11:35:04 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 06:35, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,48% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,43% · Fut S&P -0,86% · BTC +0,53% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~26.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 4 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 01/11/2026, 14:49:57 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 09:49, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,48% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,43% · Fut S&P -0,86% · BTC +0,64% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~23.7h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 6 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 01/11/2026, 11:35:04 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-30 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
-· STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): settembre 2026 · Inflazione PCE (a/a): settembre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: settembre 2026 · Disoccupazione: settembre 2026 · Fiducia consumatori (UMich): ottobre 2026 · Curva 10A-2A: 30/10/2026 · Curva 10A-3M: 30/10/2026 · Treasury USA 30A: 29/10/2026 · Tasso reale 10A (TIPS): 29/10/2026 · Inflazione attesa 10A (breakeven): 30/10/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 01/11/2026, 14:49:57 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-10-30 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): settembre 2026 · Inflazione PCE (a/a): settembre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: settembre 2026 · Disoccupazione: settembre 2026 · Fiducia consumatori (UMich): settembre 2026 · Curva 10A-2A: 30/10/2026 · Curva 10A-3M: 30/10/2026 · Treasury USA 30A: 29/10/2026 · Tasso reale 10A (TIPS): 29/10/2026 · Inflazione attesa 10A (breakeven): 30/10/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -85,7 +85,7 @@ QUADRO MACRO:
 - Vendite al dettaglio (m/m): 0.8% (riferito a settembre 2026 · acquisito il 01/11/2026 · ultima uscita 15/10/2026 (17 giorni fa) · prossimo aggiornamento 17/11/2026 (calendario ufficiale, Advance Monthly Sales for Retail and Food Services, via FRED) · Census, mensile)
 - Non-Farm Payrolls: +29K (riferito a settembre 2026 · acquisito il 01/11/2026 · ultima uscita 02/10/2026 (30 giorni fa) · prossimo aggiornamento 06/11/2026 (calendario ufficiale, Employment Situation, via FRED) · BLS, mensile)
 - Disoccupazione: 4.2% (riferito a settembre 2026 · acquisito il 01/11/2026 · ultima uscita 02/10/2026 (30 giorni fa) · prossimo aggiornamento 06/11/2026 (calendario ufficiale, Employment Situation, via FRED) · BLS, mensile)
-- Fiducia consumatori (UMich): 48.0 (riferito a ottobre 2026 · acquisito il 01/11/2026 · ultima uscita dato non disponibile · prossimo aggiornamento dato non disponibile · UMich (fonte primaria), mensile · indagine mensile dell'Università del Michigan, presa dalla FONTE PRIMARIA (sca.isr.umich.edu) e non da FRED, che la ridistribuisce con 1-2 mesi di ritardo di licenza: la fonte lo dichiara la lettura DEFINITIVA del mese indicato)
+- Fiducia consumatori (UMich): 48.1 (riferito a settembre 2026 · acquisito il 01/11/2026 · ultima uscita dato non disponibile · prossimo aggiornamento dato non disponibile · UMich via FRED (ripiego), mensile · serie mensile via FRED UMCSENT (RIPIEGO: la fonte primaria non ha risposto in questo run), che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui, quindi questo valore NON è l'ultimo pubblicato)
 - Curva 10A-3M: +0.78 pp (riferito al 30/10/2026 · acquisito il 01/11/2026 · ultima uscita 30/10/2026 (2 giorni fa) · prossimo aggiornamento 02/11/2026 (calendario ufficiale, Interest Rate Spreads, via FRED) · FRED, giornaliero · serie GIORNALIERA FRED T10Y3M, ultima chiusura — è lo STESSO segnale della curva 10A-2A su un altro tratto, non un secondo segnale)
 - Treasury USA 30A: 5.32% (riferito al 29/10/2026 · acquisito il 01/11/2026 · ultima uscita 30/10/2026 (2 giorni fa) · prossimo aggiornamento 02/11/2026 (calendario ufficiale, H.15 Selected Interest Rates, via FRED) · FRED, giornaliero · serie GIORNALIERA FRED DGS30, ultima chiusura)
 - Tasso reale 10A (TIPS): 2.63% (riferito al 29/10/2026 · acquisito il 01/11/2026 · ultima uscita 30/10/2026 (2 giorni fa) · prossimo aggiornamento 02/11/2026 (calendario ufficiale, H.15 Selected Interest Rates, via FRED) · FRED, giornaliero · serie GIORNALIERA FRED DFII10 (TIPS 10A): è il rendimento AL NETTO dell'inflazione attesa)
@@ -95,31 +95,19 @@ QUADRO MACRO:
 - CURVA DEI TASSI USA (FRED (Federal Reserve Bank of St. Louis), OSSERVAZIONI PUBBLICATE — non stime, ultima del 2026-10-29, quindi NON di oggi: la fonte pubblica con qualche giorno di ritardo): 3 mesi 4,18% [+0,35 vs 3,83% del 2026-07-31] · 2 anni 4,61% [+0,33 vs 4,28% del 2026-07-31] · 5 anni 4,78% [+0,33 vs 4,45% del 2026-07-31] · 10 anni 4,98% [+0,23 vs 4,75% del 2026-07-31] · 30 anni 5,32% [+0,05 vs 5,27% del 2026-07-31]. Pendenza 3 mesi→30 anni: +1,14 pp, era +1,44 pp tre mesi fa. Fra parentesi quadre lo scarto dalla stessa scadenza tre mesi fa: e' un confronto fra due osservazioni datate, non una tendenza ricostruita.
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8% · dicembre -1,19% negli anni di midterm contro +1,69% su tutti gli anni, 30% di mesi positivi, esiti da -11,8% a +17,8% · gennaio -0,32% negli anni di midterm contro +2,52% su tutti gli anni, 50% di mesi positivi, esiti da -9,8% a +8,7%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
 - MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 10.689 (-7,2% nell'ultima seduta) — +47,9% in un anno, e sta al 52% dell'intervallo annuale 6352–14.635 · Rame 6,48 $/lb (-1,5% nell'ultima seduta) — +28,4% in un anno, e sta al 83% dell'intervallo annuale 4,93–6,8 · Petrolio WTI 104,12 $ (+2,08% nell'ultima seduta) — +70,5% in un anno, e sta al 85% dell'intervallo annuale 55,27–112,95 · Oro 3899 $/oz (-3,29% nell'ultima seduta) — -2,9% in un anno, e sta al 0% dell'intervallo annuale 3899–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
-- TITOLI MACRO — 0 dentro le ultime 8 ORE, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le 12 piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha 14 ore (fonti: CNBC Economia, Bloomberg, MarketWatch) · 4 pubblicate DOPO l'ultima chiusura USA del 2026-10-30, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto · ⚠ altre 6 voci il sistema le HA e qui sotto non compaiono (tetto di 12 titoli): il taglio cade solo su quelle gia' dentro il prezzo di chiusura, mai su quelle pubblicate dopo. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
-    · [Bloomberg, 14h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Turkey Picks Tax Chief to Lead Markets Board After Fund Rout
+- TITOLI MACRO — 3 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 6 pubblicate DOPO l'ultima chiusura USA del 2026-10-30, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
+    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Tech Selloff Could Ease Pressure on the Fed
+      BMO Capital Markets Senior Economist and Managing Director Jennifer Lee tells Bloomberg This Weekend that heavy AI investment has helped drive interest rates and inflation pressures higher, while a cooling in the sector could make the Federal Reserve’s job easier. Speaking with hosts David Gura and Lisa Mateo, Lee says
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Australia’s Home Prices Fall Further Ahead of Expected Rate Hike
+      Australia’s home prices tumbled for a seventh straight month and are on track for the biggest fall in 40 years, a private gauge showed, as the Reserve Bank is expected to increase borrowing costs again this week.
+    · [MarketWatch, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Who really wins under Trump’s economy? Coastal liberal elites who hate him.
+      In other words, not the people Republicans likely intended.
+    · [Bloomberg, 17h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Turkey Picks Tax Chief to Lead Markets Board After Fund Rout
       Turkish President Recep Tayyip Erdogan appointed Muhsin Atci, head of the nation’s tax inspection body, as chief of the Capital Markets Board to help deal with an investment fund crisis that rocked financial markets.
-    · [MarketWatch, 17h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] We’re in our 70s. Should we pay off our 2.5% mortgage — or put the money in a high-yield savings account?
+    · [MarketWatch, 20h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] We’re in our 70s. Should we pay off our 2.5% mortgage — or put the money in a high-yield savings account?
       “Let’s say 10 years from now, when I’m 84, we need a substantial amount of cash.”
-    · [MarketWatch, 17h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Caregivers are now spending more than $11,000 a year out of pocket—up 60% in five years
+    · [MarketWatch, 21h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Caregivers are now spending more than $11,000 a year out of pocket—up 60% in five years
       An AARP study shows the financial sacrifices families make and their long-term impacts.
-    · [MarketWatch, 20h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Want guaranteed income in retirement without an annuity? Try laddering I bonds.
-      The new I-bond interest rate could be 5.5% or 5.4%, but that shouldn’t change your strategy.
-    · [CNBC Economia, 48h fa] Euro zone economy slows to 0.4% growth in Q3 as crisis-hit France contracts
-      The euro zone showed surprising resilience, but weak productivity, industrial competitiveness challenges and demographic pressures remain, analysts said.
-    · [CNBC Economia, 65h fa] Third-quarter U.S. GDP increases a better-than-expected 3.4% as September inflation accelerates
-      The personal consumption expenditures price index was projected to increase 0.5% in September for an annual rate of 3.7%, according to the Dow Jones consensus.
-    · [CNBC Economia, 66h fa] Analysis: Kevin Warsh is keeping Wall Street guessing. It may be his most powerful tool
-      The new chairman made clear he leans toward higher interest rates, but left himself options depending on how the data comes in.
-    · [CNBC Economia, 69h fa] The politics of President Lagarde's European Central Bank early exit — and who could replace her
-      European Central Bank President Christine Lagarde will step down on Feb. 7 next year, she announced Thursday.
-    · [CNBC Economia, 69h fa] European Central Bank keeps key interest rate on hold at 2.5%
-      Markets saw the decision as a hawkish pause and were last pricing in a 67% chance of a December rate hike.
-    · [CNBC Economia, 86h fa] Here are five key takeaways from the Fed rate decision and Warsh news conference
-      Even though the interest-rate vote went as expected, there were a few surprises out of this week's Federal Open Market Committee meeting.
-    · [CNBC Economia, 86h fa] Bessent says 'not necessarily' a mistake if the Fed hikes again
-      Treasury Secretary Scott Bessent joined CNBC for an interview on Oct. 28, 2026.
-    · [CNBC Economia, 92h fa] The UK cuts energy bills, taxes banks and boosts defense in high-stakes budget
-      The U.K. budget cuts household energy costs, raises taxes on banks and directs billions toward defense, Ukraine and artificial intelligence
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-11-06 Non-Farm Payrolls (precedente +29K) · 2026-11-06 Disoccupazione (precedente 4.2%) · 2026-11-10 Inflazione CPI (a/a) (precedente 3.7%). ⚠ Per 1 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich)): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 5 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-2A, Curva 10A-3M, Treasury USA 30A, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-11-02 PLTR · 2026-11-02 AAPL · 2026-11-03 AMD · 2026-11-03 SMCI · 2026-11-03 ANET · 2026-11-03 AMGN · 2026-11-03 PFE · 2026-11-04 MCD · 2026-11-04 DDOG · 2026-11-05 NET · 2026-11-05 COP · 2026-11-06 OKLO · 2026-11-09 CEG · 2026-11-09 TTWO · 2026-11-10 RGTI · 2026-11-10 CRWV · 2026-11-12 CBRS. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
 - Forward P/E S&P 500 [FORWARD, fonte: WSJ (estimate) — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: 19,2× (Elevato — ⚠ l'etichetta viene da bande FISSE, convenzione di lettura e non un dato di questo file: oltre 22 "Estremo", oltre 18 "Elevato", oltre 14 "Normale", sotto "Conveniente"; l'etichetta non porta nessuna informazione in piu' del numero). ⚠ La media storica del multiplo prospettico della STESSA fonte non e' in questi dati: un confronto con una media va fatto sulla fonte che la pubblica, con la sua finestra. Valutazioni  da monitorare insieme alla leva.
@@ -177,9 +165,8 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 - Tasso EFFETTIVO (EFFR) 3,88% del 29/10/2026 (NY Fed) — e' dove le banche si prestano DENTRO il target 3,75–4,00% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria.
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
-- Will the price of Ethereum be above $2,300 on November 1?: 3% [Δ7g —]
-- Ethereum Up or Down on November 1?: 88% [Δ7g —]
-- Bitcoin Up or Down on November 1?: 82% [Δ7g —]
+- Ethereum Up or Down on November 1?: 94% [Δ7g —]
+- Bitcoin Up or Down on November 1?: 92% [Δ7g —]
 ⚠ 3 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
@@ -202,12 +189,12 @@ TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre
 - NVDA: medie: -7,59% dalla 20, -7,69% dalla 50, +0,27% dalla 200 · RSI 35,1 · -15,9% dal massimo 52s · forza relativa 1M +5,3 pp vs SOX · ampiezza tipica di seduta 3% · P/E prospettico 12,9× · ricavi +105,9% a/a · trimestrale fra 16 giorni
 - AMD: medie: -11,51% dalla 20, -7,93% dalla 50, +22,98% dalla 200 · RSI 39,7 · -23,3% dal massimo 52s · forza relativa 1M -1,3 pp vs SOX · ampiezza tipica di seduta 5,8% · P/E prospettico 31,7× · ricavi +50,1% a/a · trimestrale fra 2 giorni
 - MSTR: medie: -11,43% dalla 20, -9,16% dalla 50, -3,01% dalla 200 · RSI 40,1 · -52,8% dal massimo 52s · forza relativa 1M -11,7 pp vs NDX · ampiezza tipica di seduta 7,3% · P/E prospettico 5,5× · ricavi -2,5% a/a
-- PLTR: medie: -6,66% dalla 20, -1,5% dalla 50, +19,89% dalla 200 · RSI 41,9 · -13,5% dal massimo 52s · forza relativa 1M +3,8 pp vs NDX · ampiezza tipica di seduta 4,5% · P/E prospettico 78,3× · ricavi +92,8% a/a · trimestrale fra 1 giorni
+- PLTR: medie: -6,66% dalla 20, -1,5% dalla 50, +19,89% dalla 200 · RSI 41,9 · -13,5% dal massimo 52s · forza relativa 1M +3,8 pp vs NDX · ampiezza tipica di seduta 4,5% · P/E prospettico 78,8× · ricavi +92,8% a/a · trimestrale fra 1 giorni
 - CRWV: medie: -20,21% dalla 20, -30,94% dalla 50, -39,93% dalla 200 · RSI 33,4 · -60,3% dal massimo 52s · forza relativa 1M -36,9 pp vs SP500 · ampiezza tipica di seduta 10,7% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +112,5% a/a · trimestrale fra 9 giorni
 - GOOGL: medie: -16,19% dalla 20, -17,46% dalla 50, -17,78% dalla 200 · RSI 21,4 · -31,4% dal massimo 52s · forza relativa 1M -10,3 pp vs NDX · ampiezza tipica di seduta 3,7% · P/E prospettico 18,5× · ricavi +24,7% a/a
 - INTC: medie: -31,78% dalla 20, -34,96% dalla 50, -24,3% dalla 200 · RSI 25,1 · -53,8% dal massimo 52s · forza relativa 1M -28,5 pp vs SOX · ampiezza tipica di seduta 10,6% · P/E prospettico 35,5× · ricavi +20,9% a/a · trimestrale fra 88 giorni
 - MRVL: medie: -20,8% dalla 20, -19,04% dalla 50, +7,25% dalla 200 · RSI 34 · -40,4% dal massimo 52s · forza relativa 1M -10 pp vs SOX · ampiezza tipica di seduta 9% · P/E prospettico 26,8× · ricavi +36,5% a/a · trimestrale fra 30 giorni
-- BE: medie: -15,77% dalla 20, -18,15% dalla 50, -8,21% dalla 200 · RSI 39,2 · -42,2% dal massimo 52s · forza relativa 1M -25,7 pp vs SP500 · ampiezza tipica di seduta 9,7% · P/E prospettico 38,2× · ricavi +138,1% a/a
+- BE: medie: -15,77% dalla 20, -18,15% dalla 50, -8,21% dalla 200 · RSI 39,2 · -42,2% dal massimo 52s · forza relativa 1M -25,7 pp vs SP500 · ampiezza tipica di seduta 9,7% · P/E prospettico 38,3× · ricavi +138,1% a/a
 - ORCL: medie: -2,94% dalla 20, -7,61% dalla 50, -16,2% dalla 200 · RSI 45,8 · -50,2% dal massimo 52s · forza relativa 1M -3,9 pp vs SP500 · ampiezza tipica di seduta 5,9% · P/E prospettico 11,8× · ricavi +29,6% a/a · trimestrale fra 43 giorni
 - RGTI: medie: -11,13% dalla 20, -22,65% dalla 50, -34,5% dalla 200 · RSI 33,6 · -74,7% dal massimo 52s · forza relativa 1M -11,3 pp vs SOX · ampiezza tipica di seduta 7,1% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +185,3% a/a · trimestrale fra 9 giorni
 - SKHY: medie: -3,84% dalla 20, -11,65% dalla 50 · RSI 44,5 · -25,3% dal massimo 52s · forza relativa 1M -21,8 pp vs SP500 · ampiezza tipica di seduta 6,3% · P/E prospettico 3,5× · ricavi +327,9% a/a · trimestrale fra 87 giorni
@@ -254,45 +241,45 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (89,7% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 16h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [AMD] · [Nasdaq, 19h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
-  [AMD] · [Nasdaq, 20h fa] Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?
+  [AMD] · [Nasdaq, 23h fa] Intel Has a Massive Warning for AMD Stock Investors. Is It Time to Book Profits Before Nov. 3?
       Key PointsThe decline in PC shipments led to weaker-than-expected guidance from Intel.
-  [BE] · [Nasdaq, 9h fa] Bloom Energy Trades at 140 Times Earnings. Here's the Growth Rate It Needs to Justify That.
-      Key PointsPrior to third-quarter 2026 earnings, Bloom Energy's trailing P/E ratio was over 350x.
-  [BE] · [Nasdaq, 40h fa] Bloom Energy Just Joined the S&P 500. Here's What History Says Happens Next.
-      Key PointsBloom was added to the S&P 500 in September.
-  [CRWV] · [Nasdaq, 38h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
+  [BE] · [Nasdaq, 0h fa] Anthropic Says It's Building Its Own Data Centers. Bloom Energy Sells Exactly the Onsite Power That Requires.
+      Key PointsBloom Energy posted a record third quarter.
+  [BE] · [Nasdaq, 1h fa] Is Bloom Energy Stock a Buy Right Now in November (2026)?
+      Should you buy stock in Bloom Energy right now? Before you buy stock in Bloom Energy, consider this:Missed AI’s "Act 1"? Act 2 Could Be 15x Bigger. Most investors think they missed the AI boat because they didn't buy Nvidia in 2005. But according to our analysts, we’re only at th
+  [CRWV] · [Nasdaq, 0h fa] Anthropic Says It's Building Its Own Data Centers. Bloom Energy Sells Exactly the Onsite Power That Requires.
+      Key PointsBloom Energy posted a record third quarter.
+  [CRWV] · [Nasdaq, 41h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
       Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.
-  [CRWV] · [Nasdaq, 40h fa] Bloom Energy Just Joined the S&P 500. Here's What History Says Happens Next.
-      Key PointsBloom was added to the S&P 500 in September.
-  [INTC] · [Nasdaq, 9h fa] Prediction: This Will Be Intel's Stock Price by Year-End 2027
+  [INTC] · [Nasdaq, 12h fa] Prediction: This Will Be Intel's Stock Price by Year-End 2027
       Key PointsIntel's 18A manufacturing process is finally shipping in real products.
-  [INTC] · [Nasdaq, 16h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [INTC] · [Nasdaq, 19h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
-  [MRVL] · [Nasdaq, 2h fa] Marvell Stock: Buy or Sell?
+  [MRVL] · [Nasdaq, 5h fa] Marvell Stock: Buy or Sell?
       Should you buy stock in Marvell Technology right now? Before you buy stock in Marvell Technology, consider this:Missed Nvidia in 2009? This Rare Signal Is Flashing Again. In 2009, a "Double Down" signal flashed for a little-known chipmaker called Nvidia. For the first time in yea
-  [MRVL] · [Nasdaq, 16h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [MRVL] · [Nasdaq, 19h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
-  [MSTR] · [Nasdaq, 8h fa] Strategy's Michel Saylor Says the Next Bitcoin Bull Market Has Already Started. Here's Why He's Right.
+  [MSTR] · [Nasdaq, 11h fa] Strategy's Michel Saylor Says the Next Bitcoin Bull Market Has Already Started. Here's Why He's Right.
       Key PointsStrategy's Michael Saylor recently said that a new Bitcoin bull market is already here.
-  [MSTR] · [Nasdaq, 16h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
+  [MSTR] · [Nasdaq, 19h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
-  [MU] · [Nasdaq, 8h fa] Micron's Chinese Rival CXMT Just Grew Its Sales More Than Sevenfold. I'd Buy Micron Stock Now.
+  [MU] · [Nasdaq, 11h fa] Micron's Chinese Rival CXMT Just Grew Its Sales More Than Sevenfold. I'd Buy Micron Stock Now.
       Key PointsCXMT's third-quarter revenue climbed 613% year over year to around 118.7 billion yuan.
-  [MU] · [Nasdaq, 12h fa] Prediction: This Will Be Palantir's Stock Price by the End of 2027
+  [MU] · [Nasdaq, 15h fa] Prediction: This Will Be Palantir's Stock Price by the End of 2027
       Key PointsPalantir is one of the few large consumer-facing software companies that have created a convincing business around AI.
-  [NVDA] · [Nasdaq, 1h fa] Alphabet Says Its AI Spending Will Keep Rising. 2 Data Center Stocks to Buy and Hold Through 2030.
+  [NVDA] · [Nasdaq, 5h fa] Alphabet Says Its AI Spending Will Keep Rising. 2 Data Center Stocks to Buy and Hold Through 2030.
       Key PointsAlphabet expects its capital spending to grow significantly in 2027.
-  [NVDA] · [Nasdaq, 12h fa] Prediction: This Will Be Palantir's Stock Price by the End of 2027
+  [NVDA] · [Nasdaq, 15h fa] Prediction: This Will Be Palantir's Stock Price by the End of 2027
       Key PointsPalantir is one of the few large consumer-facing software companies that have created a convincing business around AI.
-  [ORCL] · [Nasdaq, 20h fa] Here’s What a $1,000 Investment in Oracle Stock Will Be Worth by 2030
+  [ORCL] · [Nasdaq, 24h fa] Here’s What a $1,000 Investment in Oracle Stock Will Be Worth by 2030
       Key PointsOracle expects to become free cash flow positive in the second half of fiscal 2028.
-  [ORCL] · [Nasdaq, 38h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
+  [ORCL] · [Nasdaq, 41h fa] Elon Musk Says Neoclouds Face a "Guppy Level" Death. SpaceX Just Borrowed $40 Billion to Make Sure It Isn't One.
       Key PointsHyperscalers like Alphabet and SpaceX have stronger financial positions and access to capital.
-  [RGTI] · [Nasdaq, 19h fa] Are These 3 Quantum Computing Stocks Worth Buying Before 2027?
+  [RGTI] · [Nasdaq, 22h fa] Are These 3 Quantum Computing Stocks Worth Buying Before 2027?
       Key PointsThe leading quantum computing stocks have fallen this year.
-  [RGTI] · [Nasdaq, 63h fa] Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market
+  [RGTI] · [Nasdaq, 66h fa] Here's Why Rigetti Computing, Inc. (RGTI) Fell More Than Broader Market
       In the most recent trading session, Rigetti Computing, Inc. (RGTI) closed at $12.06, indicating a -2.74% shift from the previous trading day.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
