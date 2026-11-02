@@ -32,6 +32,8 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | BE | 40 | 214,00 | USD | |
 | GOOGL | 37 | 282,00 | USD | acquisto del **29/10/2026** (testuale: *"Registra entrata su Alphabet 282 con 37 azioni"*; la seduta l'ha confermata il CEO il 30/10: *"1 29/10"*). 282 cade nell'intervallo di quella seduta (280,36–288,33). Carico in euro nel registro §1decies |
 | ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
+| AVGO | 24 | 324,00 | USD | acquisto del **02/11/2026** col ricavato della vendita di INTC (testuale: *"Entrato Avgo 24 pezzi pmc 324"*). Carico in euro nel registro §1decies |
+| WDC | 24 | 342,00 | USD | acquisto del **02/11/2026** dalla riserva, speculazione sul rimbalzo (testuale: *"Entrato 24 a pmc 342 Wdc"*). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 ⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
@@ -41,9 +43,11 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~31.550 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 02/11/2026: i ~24.000 € dichiarati
+**Liquidità: ~17.270 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 02/11/2026: i ~24.000 € dichiarati
 più la vendita di INTC del 02/11 in pre-market (130 a 65 $ = 8.450 $, meno 15 $ di commissione, circa 7.550 € al
-riferimento BCE del 30/10, 1,1172, l'ultimo pubblicato all'ora della vendita), da confermare col saldo del broker.
+riferimento BCE del 30/10, 1,1172, l'ultimo pubblicato all'ora della vendita), meno i due acquisti del 02/11 — AVGO 24 a
+324 $ e WDC 24 a 342 $, 7.791 $ e 8.223 $ con la commissione stimata di 15 $ ciascuno, circa 14.280 € al riferimento BCE
+del 02/11, 1,1216 — da confermare col saldo del broker. È RISERVA per la quotazione di Anthropic (CEO, 02/11/2026).
 I ~24.000 € li ha dichiarati il CEO il 30/10/2026 dopo
 l'acquisto di ORCL (testuale: *"Liquidità residua in euro 24k"*). Sella riconverte in euro il ricavato delle vendite (CEO,
 30/10/2026: *"Tutta in euro"*), quindi la liquidità non è esposta al cambio. La stima del libro, prima della dichiarazione,
@@ -138,7 +142,6 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | SMCI | Super Micro Computer — server AI, concorrente di DELL. **Venduta il 19/10/2026 a 32,81 $** (250 azioni comprate il 16/10 a 31,60): il CEO *"non mi fido per ora"*. Candidato di rotazione da CRWV dal 14/09/2026. Il 18/10: bilancio solido (Altman 6,77) e cassa dell'attività negativa (−6,8 miliardi di flusso operativo in 12 mesi, magazzino a 128 giorni) |
 | AMZN | Amazon — candidato d'ingresso (CEO, 02/10/2026). Diversifica in parte dal gruppo AI e porta ~15-20% di Anthropic. Livelli: acquisto 244-246 (supporto 244,30), uscita sotto SMA200 ~240. Trimestrale 29/10 |
 | STX | Seagate — candidato d'ingresso (CEO, 02/10/2026). Leader tecnologico dischi (HAMR), stesso ciclo di WDC. Livelli: ingresso vicino al supporto 758 solo se regge 2-3 sedute, o dopo la trimestrale 27-28/10; uscita sotto 758 |
-| WDC | Western Digital — uscito dal libro a ~+2%; ciclo dischi in allentamento (Toshiba), indietro su HAMR |
 | TSM | TSMC — collo di bottiglia CoWoS; trimestrale 15/10 |
 | CBRS | Cerebras — quotata da maggio 2026; lock-up principale a meta' novembre, ~80% degli ordini da OpenAI |
 | SPCX | SpaceX — in watchlist del CEO, quotata di recente (storia corta) |
@@ -150,7 +153,6 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | META | Meta — in watchlist del CEO |
 | CRM | Salesforce — software applicativo, pressione da agenti AI. Zona d'ingresso 221-228 (supporto a 20 sedute 221,18), correlazione col libro 0-0,3 (CEO, 06/10/2026); uscita sotto il supporto |
 | NOW | ServiceNow — software applicativo, pressione da agenti AI. Zona d'ingresso 130-136 (supporto a 20 sedute 126,75), correlazione col libro 0-0,3 (CEO, 06/10/2026); uscita sotto il supporto |
-| AVGO | Broadcom — chip su misura e reti per AI |
 | ASML | ASML — litografia, fornitore unico di EUV |
 | NKE | Nike — conti del 01/10 deboli, sotto il minimo a 52 settimane; non entrare |
 | MCD | McDonald's — difensivo vicino ai minimi; aspettare la fine della discesa |
@@ -355,9 +357,11 @@ tre mesi dopo SMH era più in alto —; in un mercato orso come il 2022 (semicon
 gradino avrebbe evitato circa 30.000 $ di perdite su quella parte. ⚠ Senza gradino l'esposizione è
 quella del libro intero: il 14/10 un Nasdaq −10% valeva −21,9% (−59.174 $).
 
-**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY.
+**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY, AVGO.
 INTC entra il 30/10/2026, il giorno dell'acquisto, per la regola qui sotto: progetta e produce processori, è nel comparto.
-INTC esce il 02/11/2026, il giorno della vendita.
+INTC esce il 02/11/2026, il giorno della vendita. AVGO entra il 02/11/2026, il giorno dell'acquisto: progetta chip, è nel
+comparto. WDC, comprata lo stesso giorno, resta fuori: fa dischi rigidi, non chip — si nomina a ogni analisi come le
+altre posizioni fuori dall'elenco.
 Il settore non è nei dati — la pipeline mette RGTI fra i semiconduttori e SK hynix no (v473) —
 quindi l'elenco sta qui, e un nome nuovo del comparto ci entra il giorno dell'acquisto. Le posizioni
 fuori dall'elenco si nominano a ogni analisi: un'omissione si vede.
@@ -927,6 +931,8 @@ euro se si vendesse oggi.
 | 30/10/2026 | INTC | acquisto | 130 | 64,50 | 1,1172 | BCE, riferimento del 30/10/2026 | |
 | 30/10/2026 | ORCL | acquisto | 60 | 129,60 | 1,1172 | BCE, riferimento del 30/10/2026 | prezzo corretto dal CEO il 30/10/2026 (il primo dichiarato, 126,50, stava sotto il minimo della seduta) |
 | 02/11/2026 | INTC | vendita | 130 | 65,00 | 1,1172 | BCE, riferimento del 30/10/2026: l'ultimo pubblicato all'ora della vendita (pre-market, prima delle 14:15) | da confermare col cambio applicato da Sella; commissione misurata 15 $ |
+| 02/11/2026 | AVGO | acquisto | 24 | 324,00 | 1,1216 | BCE, riferimento del 02/11/2026 | da confermare col cambio applicato da Sella; commissione stimata 15 $ come quella di INTC |
+| 02/11/2026 | WDC | acquisto | 24 | 342,00 | 1,1216 | BCE, riferimento del 02/11/2026 | da confermare col cambio applicato da Sella; commissione stimata 15 $ come quella di INTC |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -976,9 +982,19 @@ in §1quinquies sono confermati.
 (circa 8.435 $ netti, ~7.550 €) va a un ingresso su AVGO; il resto della liquidità resta RISERVA (quotazione di
 Anthropic o medie dopo i conti, 01/11). AVGO entra fra i semiconduttori del libro (§1ter) il giorno dell'acquisto.
 
+**Eseguita il 02/11/2026** (CEO: *"Entrato Avgo 24 pezzi pmc 324"*): AVGO 24 a 324 $ col ricavato di INTC (7.791 $ dei
+circa 8.435; il resto torna alla riserva), fra i semiconduttori del libro (§1ter). **Lo stesso giorno, dalla riserva**
+(CEO: *"Entrato 24 a pmc 342 Wdc"*): WDC 24 a 342 $, speculazione sul rimbalzo. Le due prove d'ingresso, con
+l'intuizione, sono nel diario (`memoria/diario_ingressi.jsonl`).
+
+**Decisione del 02/11/2026** (CEO: *"Ora sto fermo solo per antropich"*): nessun altro ingresso; la liquidità che resta
+(~17.270 €) è RISERVA per la quotazione di Anthropic.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
 | 02/11/2026 | INTC, vendita del 02/11: quale cambio ha applicato Sella (o il controvalore in euro accreditato)? | la plusvalenza fiscale si calcola in euro col cambio dell'acquisto e della vendita; in §1decies c'e' il riferimento BCE del 30/10, da confermare | il CEO dà il cambio o l'importo in euro dal broker |
+| 02/11/2026 | AVGO e WDC, acquisti del 02/11: quale cambio ha applicato Sella, quale commissione, e quanta liquidità resta? | il carico in euro e la plusvalenza fiscale si calcolano col cambio del broker; in §1decies c'è il riferimento BCE del 02/11 e una commissione stimata, e la liquidità (~17.270 €) è una stima | il CEO dà cambio e commissione (o gli importi in euro) e il saldo dal broker |
+| 02/11/2026 | La riserva ora è solo per Anthropic (*"Ora sto fermo solo per antropich"*): le medie dopo i conti di AMD (03/11) e CRWV (10/11), previste il 01/11, restano possibili? | gli esami di AMD e CRWV in §1quinquies sono confermati e i conti di AMD escono il 03/11 | il CEO dice se le medie restano fra gli usi della riserva |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 

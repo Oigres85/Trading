@@ -27,8 +27,8 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    è il salvavita a −30% (§1ter); la tenuta si decide per evidenza nei due versi (§1sexies); un CONFLITTO si decide ai
    conti con l'esame scritto prima e confermato dal CEO (§1quinquies). Le quantità sono solo l'aritmetica dell'unità di
    5.000 €, mai «la quantità giusta» (v439). Nessun punteggio composito (v200); ogni soglia è una convenzione dichiarata
-   (v240). La liquidità è una RISERVA: quotazione di Anthropic o medie dopo i conti (01/11); il
-   ricavato della vendita di INTC va a un ingresso su AVGO (02/11).
+   (v240). La liquidità è una RISERVA per la quotazione di Anthropic (02/11; le medie dopo i conti,
+   decise il 01/11, sono una domanda aperta); il ricavato di INTC è andato su AVGO (02/11).
 6. **Conflitti d'interessi, sempre dichiarati**: NVDA, GOOGL, AMZN, MSFT, BLK, GS, CRM sono investitori di Anthropic;
    CRWV, ORCL, CBRS clienti di OpenAI; SpaceX possiede xAI. **Su Anthropic stessa** (Claude è un suo prodotto): solo i
    fatti del prospetto, nessun giudizio.

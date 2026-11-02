@@ -494,6 +494,38 @@
           "mercato": "processori x86 per server"
         }
       ]
+    },
+    "AVGO": {
+      "nome": "Broadcom",
+      "mercati": [],
+      "mercati_condivisi": [
+        {
+          "da": "MRVL"
+        }
+      ],
+      "concorrenti_quotati": [
+        "MRVL",
+        "3661.TW"
+      ],
+      "concorrenti_non_quotati": []
+    },
+    "WDC": {
+      "nome": "Western Digital",
+      "mercati": [
+        {
+          "mercato": "dischi rigidi (HDD) per i data center",
+          "tipo": "nessuna",
+          "fonte": "nessuna fonte pubblica con una quota verificabile letta il 02/11/2026 (i tracker di settore sono a pagamento)",
+          "verificato_il": "2026-11-02",
+          "quote": []
+        }
+      ],
+      "concorrenti_quotati": [
+        "STX"
+      ],
+      "concorrenti_non_quotati": [
+        "Toshiba"
+      ]
     }
   }
 }
