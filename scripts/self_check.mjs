@@ -210,7 +210,8 @@ const SUITE = [
   /* v528: 1105 punti di chiamata in test_analisi_libro (+13 sulla forma statistica: stato del giorno, casi simili senza
      futuro, geometria, verdetto, diario, convenzioni rilette dal libro, collegamenti) -> 1095 */
   /* v529: 1108 punti di chiamata in test_analisi_libro (+3 sugli stop a confronto) -> 1098 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1098, firma: /\d+\/\d+ CHECK OK/ },
+  /* v530: 1111 punti di chiamata in test_analisi_libro (+3 sugli ordini con limite a confronto) -> 1101 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1101, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

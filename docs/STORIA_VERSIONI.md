@@ -9674,3 +9674,19 @@ Il freno vero è la dimensione: le tre posizioni insieme, nel peggior 10% dei ca
   giro, ed entrambe per un difetto del CONTROLLO: la fixture non aveva un giorno che arma lo stop scendendo sotto il
   pareggio (v430), e il check leggeva le chiavi con le parentesi quadre, quindi la suite moriva con un KeyError invece
   di cadere col suo nome (v407, v471). Corretti tutti e due, mordono.
+
+## 🎯 v530 — GLI ORDINI CON LIMITE A CONFRONTO NELLA PROVA D'INGRESSO
+
+Il CEO, 02/11/2026, dopo aver venduto INTC in pre-market a 65 $ e chiesto *"A che prezzo e quando conviene entrare su
+Intel?"*: *"questa tabella dei limiti entri in ogni prova d'ingresso"*. La prova porta ora, sui casi simili, gli ordini
+con limite al prezzo e a 5, 10, 15 e 20% sotto, più il pavimento più vicino se sta entro il 35%: quante volte vengono
+eseguiti entro 60 sedute e cosa fa il titolo nelle 60 dopo l'esecuzione (al limite, o al massimo della seduta se ci
+apre sotto: senza l'apertura, il prezzo vero era al più quello). «Per tentativo» = quota eseguita × media, stampato come
+aritmetica e senza classifica (v200). Sotto 30 esiti la riga lo dice.
+
+Su INTC (crollo del 30/10): a −5% (62,47) eseguito nel 75% dei casi, poi +11,1% di media; per tentativo +8,2% contro
++5,5% comprando subito. Il pavimento a 42,88 (−34,8%) si esegue nel 5% dei casi: 7 esiti, non generalizza.
+
+- ⚠ Due attese della mia fixture erano sbagliate (l'esito si legge h sedute dopo l'ESECUZIONE, non dopo il caso): il check
+  era rosso per la sonda, non per il codice (v433).
+- Tre iniezioni (l'apertura sotto il limite ignorata, la tabella tolta dalla resa, i limiti cambiati nel solo codice): mordono tutte, al primo giro. Pavimento della suite 1098 → 1101.

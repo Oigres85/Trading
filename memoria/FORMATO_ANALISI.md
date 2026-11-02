@@ -672,7 +672,8 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
   norma si scrive in una parola, non si salta (01/11)
 - `[statistica]` la forma statistica dell'analisi: per ogni posizione i casi simili e cosa è successo dopo, contro la
   base; prima di ogni operazione la prova d'ingresso (valore atteso in R, variante con la conferma, gli stop a
-  confronto: tenere, al pareggio, fissi) e la riga nel
+  confronto: tenere, al pareggio, fissi; gli ordini con limite a confronto: quante volte vengono eseguiti e cosa
+  succede dopo) e la riga nel
   diario che misura l'intuito contro la statistica (01/11)
 - `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)
 

@@ -10978,6 +10978,26 @@ check("v529 le distanze degli stop a confronto stanno nel libro (§1quindecies) 
       bool(_m529) and tuple(float(x.replace(",", ".")) for x in _m529.groups()[:3]) == ST528.STOP_PAREGGIO_ATR
       and tuple(float(x.replace(",", ".")) for x in _m529.groups()[3:]) == ST528.STOP_FISSO_ATR)
 
+# ═════════ v530 — gli ordini con limite a confronto nella prova d'ingresso (CEO, 02/11/2026) ═════════
+_bl530 = [{"t": f"2026-03-{i + 1:02d}", "h": hh, "l": ll, "c": cc} for i, (hh, ll, cc) in enumerate(
+    [(100, 100, 100), (99, 96, 97), (93, 91, 92), (95, 92, 94), (96, 93, 95), (97, 94, 96), (98, 95, 97)])]
+_el530 = ST528.esiti_limiti(_bl530, 0, (0, -3, -5, -10, -20), h=3)
+check("v530 i limiti: lo 0 e' l'acquisto alla chiusura; un limite si esegue quando il minimo lo tocca, al limite o al massimo "
+      "della seduta se il prezzo ci apre sotto; non toccato = non eseguito; esito alla chiusura h sedute dopo, None se non "
+      "c'e' ancora: " + str(_el530),
+      abs(_el530[0]["r"] - (94 / 100 - 1) * 100) < 1e-9 and abs(_el530[-3]["r"] - (95 / 97 - 1) * 100) < 1e-9
+      and abs(_el530[-5]["r"] - (96 / 93 - 1) * 100) < 1e-9 and _el530[-10] == {"eseguito": False}
+      and _el530[-20] == {"eseguito": False}
+      and ST528.esiti_limiti(_bl530, 0, (-5,), h=6)[-5] == {"eseguito": True, "r": None})
+check("v530 la prova porta gli ordini con limite a confronto, coi prezzi, la quota eseguita e cosa e' successo dopo",
+      "limiti" in _p528["pieno"] and set(ST528.LIMITI_PCT) <= set(_p528["pieno"]["limiti"])
+      and "ORDINI CON LIMITE NEI CASI SIMILI" in _r528 and "eseguito nel" in _r528 and "per tentativo" in _r528)
+_m530 = re.search(r"al prezzo e a \*\*(\d+)\*\*, \*\*(\d+)\*\*, \*\*(\d+)\*\* e \*\*(\d+)\*\*% sotto, più il pavimento più "
+                  r"vicino se sta entro il \*\*(\d+)\*\*%", _s528)
+check("v530 i limiti a confronto stanno nel libro (§1quindecies) e coincidono col codice",
+      bool(_m530) and tuple([0] + [-int(x) for x in _m530.groups()[:4]]) == ST528.LIMITI_PCT
+      and int(_m530.group(5)) == ST528.PAVIMENTO_MAX_PCT)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

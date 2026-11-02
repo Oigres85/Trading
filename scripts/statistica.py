@@ -65,6 +65,8 @@ SOGLIA_EV = 0.10                  # un valore atteso dentro ±0,1 R non distingu
 ATTESA_MAX = 10                   # la conferma dopo un crollo si aspetta al piu' 10 sedute
 STOP_PAREGGIO_ATR = (0.5, 1.0, 2.0)   # v529: lo stop al prezzo d'ingresso, armato dopo un rialzo di tanti ATR
 STOP_FISSO_ATR = (1.0, 2.0, 3.0)      # v529: lo stop fisso, tanti ATR sotto l'ingresso
+LIMITI_PCT = (0, -5, -10, -15, -20)   # v530: gli ordini con limite a confronto, in % sotto il prezzo d'ingresso
+PAVIMENTO_MAX_PCT = 35                # v530: il pavimento piu' vicino entra nel confronto se sta entro il 35% sotto
 STOP_LONTANO_ATR = 4.0            # un pavimento oltre 4 ATR sotto il prezzo non fa da stop: si usa lo stop standard
 STOP_STANDARD_ATR = 2.0           # lo stop senza un pavimento vicino: 2 ATR, la convenzione del rischio del sistema
 OBIETTIVO_STANDARD_R = 2.0        # senza una resistenza sopra il prezzo, l'obiettivo e' 2 volte il rischio
@@ -297,6 +299,25 @@ def strategie_stop(b, i, atr, h=60):
     return out
 
 
+def esiti_limiti(b, i, limiti, h=60, fino=None):
+    """v530 — gli ordini con limite nel caso i: per ogni limite (in % sotto la chiusura di i) se il minimo lo tocca nelle h
+    sedute dopo, e a che prezzo — il limite, o il massimo della seduta se il prezzo ci apre sotto (prudente: senza
+    l'apertura il prezzo vero era al piu' quello). Lo 0 e' l'acquisto alla chiusura. L'esito e' la chiusura h sedute
+    DOPO l'esecuzione; se quella seduta non c'e' ancora (o e' dopo `fino`) l'esito e' None: eseguito, non maturo."""
+    out = {}
+    for lim in limiti:
+        L = b[i]["c"] * (1 + lim / 100)
+        j = i if lim == 0 else next((j for j in range(i + 1, min(i + h, len(b) - 1) + 1) if b[j]["l"] <= L), None)
+        if j is None:
+            out[lim] = {"eseguito": False}
+            continue
+        prezzo = L if lim == 0 else min(L, b[j]["h"])
+        f = j + h
+        r = (b[f]["c"] / prezzo - 1) * 100 if (f < len(b) and not (fino and b[f]["t"] > fino)) else None
+        out[lim] = {"eseguito": True, "r": r}
+    return out
+
+
 def conferma(b, i, fino=None):
     """L'indice della prima chiusura sopra il massimo del giorno i, entro ATTESA_MAX sedute (None se non arriva,
     o se arriverebbe dopo `fino`)."""
@@ -308,7 +329,7 @@ def conferma(b, i, fino=None):
     return None
 
 
-def casi(B, k, ks, kt, fino=None, rif=None, escludi=None):
+def casi(B, k, ks, kt, fino=None, rif=None, escludi=None, limiti=LIMITI_PCT):
     """Tutti i casi dello stato k (o della chiave larga, se k e' una chiave larga) nell'universo, al piu' uno ogni
     DISTANZA sedute per titolo, con la finestra di 60 sedute tutta prima di `fino`. k=None = la BASE: ogni giorno.
     Per ogni caso: rendimento a 20 e 60 sedute, eccesso sul riferimento negli stessi giorni (per DATA, v207),
@@ -344,7 +365,7 @@ def casi(B, k, ks, kt, fino=None, rif=None, escludi=None):
                 att = {"confermato": j is not None,
                        "esito": esito_geometria(b, j, ks, kt, fino=fino) if j is not None else None}
             out.append({"tk": tk, "t": b[i]["t"], "r": r, "eccesso": ecc, "geometria": g, "attesa": att,
-                        "stop": strategie_stop(b, i, s["atr"])})
+                        "stop": strategie_stop(b, i, s["atr"]), "limiti": esiti_limiti(b, i, limiti, fino=fino)})
             ultimo = i
     return out
 
@@ -368,6 +389,19 @@ def riassunto(cc):
         out["geometria"] = {"n": len(g), "ev": st.fmean(rr), "es": (st.stdev(rr) / math.sqrt(len(rr))) if len(rr) > 1 else None,
                             "obiettivo": sum(x["esito"] == "obiettivo" for x in g) / len(g) * 100,
                             "stop": sum(x["esito"] == "stop" for x in g) / len(g) * 100}
+    lv = [c["limiti"] for c in cc if c.get("limiti")]
+    if lv:
+        out["limiti"] = {}
+        for lim in lv[0]:
+            ese = [x[lim] for x in lv if x[lim]["eseguito"]]
+            rr = sorted(x["r"] for x in ese if x["r"] is not None)
+            d = {"eseguito": len(ese) / len(lv) * 100, "n": len(rr)}
+            if len(rr) >= 2:
+                d.update({"media": st.fmean(rr), "es": st.stdev(rr) / math.sqrt(len(rr)), "mediana": st.median(rr),
+                          "positivi": sum(x > 0 for x in rr) / len(rr) * 100,
+                          "peggiori": st.quantiles(rr, n=10)[0] if len(rr) >= 10 else None})
+                d["per_tentativo"] = d["eseguito"] / 100 * d["media"]
+            out["limiti"][lim] = d
     sv = [c["stop"] for c in cc if c.get("stop")]
     if sv:
         out["stop"] = {}
@@ -415,13 +449,16 @@ def geometria_oggi(b, px, atr, veicolo=None):
     else:
         ks, perche_s = STOP_STANDARD_ATR, f"lo stop standard: nessun pavimento entro {_n(STOP_LONTANO_ATR)} ATR sotto il prezzo"
     s = serie(b, veicolo)
+    zz = [z for z in (p.get("minimi") or []) if z.get("alto") is not None and z["alto"] < px]
+    vicino = max(zz, key=lambda z: z["alto"]) if zz else None
     alti = sorted(s[i]["h"] for i in R.perni(s, campo="h", massimi=True) if s[i]["h"] > px + 0.5 * atr) if s else []
     if alti:
         kt, perche_t = (alti[0] - px) / atr, f"il massimo di oscillazione {_n(alti[0], 2)}"
     else:
         kt, perche_t = OBIETTIVO_STANDARD_R * ks, f"{_n(OBIETTIVO_STANDARD_R)} volte il rischio: nessun massimo di oscillazione sopra"
     return {"ks": ks, "kt": kt, "stop": px - ks * atr, "obiettivo": px + kt * atr, "perche_stop": perche_s,
-            "perche_obiettivo": perche_t, "pareggio": 1 / (1 + kt / ks) * 100}
+            "perche_obiettivo": perche_t, "pareggio": 1 / (1 + kt / ks) * 100,
+            "pavimento": (round((vicino["alto"] / px - 1) * 100, 1), vicino["alto"]) if vicino else None}
 
 
 def sopravvivenza(k):
@@ -460,10 +497,12 @@ def prova(tk, prezzo=None, data=None, B=None, veicolo=None, adesso=None):
     k = chiave(oggi)
     rif = Bs.get(RIFERIMENTO)
     Bu = {t: x for t, x in Bs.items() if t != RIFERIMENTO}
-    pieno = riassunto(casi(Bu, k, g["ks"], g["kt"], fino=fino, rif=rif))
+    lims = LIMITI_PCT + ((g["pavimento"][0],) if (g.get("pavimento") and -PAVIMENTO_MAX_PCT <= g["pavimento"][0] < 0
+                                                  and g["pavimento"][0] not in LIMITI_PCT) else ())
+    pieno = riassunto(casi(Bu, k, g["ks"], g["kt"], fino=fino, rif=rif, limiti=lims))
     largo = None
     if pieno["n"] < MIN_CASI:
-        largo = riassunto(casi(Bu, chiave_larga(k), g["ks"], g["kt"], fino=fino, rif=rif))
+        largo = riassunto(casi(Bu, chiave_larga(k), g["ks"], g["kt"], fino=fino, rif=rif, limiti=lims))
     base = riassunto(casi(Bu, None, g["ks"], g["kt"], fino=fino, rif=rif))
     dopo = None
     if idx < len(b) - 1:
@@ -532,6 +571,26 @@ def resa_prova(p):
                      f"{_n(x['peggiori'], 1, True)}% · miglior 10% {_n(x['migliori'], 1, True)}% · esce nel "
                      f"{_n(x['uscito'], 0)}% dei casi")
         L.append("    il prezzo pagato non entra nel conto: conta solo cosa e' successo DOPO l'ingresso")
+    lm = usa.get("limiti")
+    if lm:
+        pav = (p["geometria"].get("pavimento") or (None, None))
+        L.append(f"  ORDINI CON LIMITE NEI CASI SIMILI (eseguito se il minimo tocca il limite entro {max(ORIZZONTI)} sedute; l'esito "
+                 f"a {max(ORIZZONTI)} sedute dall'esecuzione; «per tentativo» = quota eseguita × media, un'aritmetica, non "
+                 "una classifica):")
+        for lim, x in sorted(lm.items(), key=lambda kv: -kv[0]):
+            nome = ("subito, al prezzo" if lim == 0 else f"limite {_n(lim, 0 if float(lim).is_integer() else 1)}%") \
+                + (f" (il pavimento {_n(pav[1], 2)})" if lim == pav[0] else "")
+            prezzo = p["prezzo"] * (1 + lim / 100)
+            if "media" not in x:
+                L.append(f"    {nome:32} a {_n(prezzo, 2)} · eseguito nel {_n(x['eseguito'], 0)}% dei casi · troppo pochi esiti maturi "
+                         f"({x['n']}) per dire cosa e' successo dopo")
+                continue
+            L.append(f"    {nome:32} a {_n(prezzo, 2)} · eseguito nel {_n(x['eseguito'], 0)}% dei casi · poi media "
+                     f"{_n(x['media'], 1, True)}% (errore {_n(x['es'], 1)}), valore tipico {_n(x['mediana'], 1, True)}%, sale nel "
+                     f"{_n(x['positivi'], 0)}%, peggior 10% "
+                     + (f"{_n(x['peggiori'], 1, True)}%" if x.get('peggiori') is not None else "n.d. (meno di 10 esiti)")
+                     + f" · per tentativo {_n(x['per_tentativo'], 1, True)}% · su {x['n']} esiti"
+                     + (f" ⚠ sotto {MIN_CASI} esiti non generalizza" if x['n'] < MIN_CASI else ""))
     if p.get("dopo"):
         d = p["dopo"]
         L.append(f"  COSA E' SUCCESSO DOPO (fino al {d['fino_al']}, {d['sedute']} sedute): {_n(d['rendimento'], 1, True)}% "

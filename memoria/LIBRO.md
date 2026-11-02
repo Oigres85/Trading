@@ -1228,7 +1228,12 @@ modo di contare, non misure (v240); il codice le confronta e un gate le rilegge 
 - gli **stop a confronto** (v529, CEO 02/11: *"Sì"*): tenere senza stop, lo stop al pareggio armato dopo un rialzo
   di **0,5**, **1** e **2** ATR, lo stop fisso a **1**, **2** e **3** ATR sotto l'ingresso. Misurato il 02/11 su
   Intel, Alphabet e Oracle: lo stop «dopo qualche punto» esce in 8 casi su 10 e dimezza la media; ogni stop taglia i
-  casi peggiori e costa rendimento. Le regole del 15/10 e del 18/10 reggono: non c'era niente da togliere.
+  casi peggiori e costa rendimento. Le regole del 15/10 e del 18/10 reggono: non c'era niente da togliere;
+- gli **ordini con limite a confronto** (v530, CEO 02/11: *"questa tabella dei limiti entri in ogni prova
+  d'ingresso"*): al prezzo e a **5**, **10**, **15** e **20**% sotto, più il pavimento più vicino se sta entro il **35**%;
+  eseguito se il minimo tocca il limite entro 60 sedute, al prezzo del limite o al massimo della seduta se ci apre
+  sotto; l'esito a 60 sedute dall'esecuzione. «Per tentativo» = quota eseguita × media: un'aritmetica, non una
+  classifica (v200).
 
 ⚠ L'universo sono i nomi seguiti OGGI: scelti perché interessanti adesso, cioè anche sopravvissuti. Negli stati di
 una discesa profonda (oltre il 25% sotto il massimo dell'anno) la distorsione pesa di più, e la riga lo dice.
