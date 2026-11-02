@@ -1215,7 +1215,11 @@ modo di contare, non misure (v240); il codice le confronta e un gate le rilegge 
 - la **geometria**: stop sotto il pavimento più vicino (il fondo meno 1 ATR) se sta entro **4** ATR, altrimenti **2** ATR;
   obiettivo al massimo di oscillazione più vicino sopra il prezzo, altrimenti **2** volte il rischio; se nello stesso
   giorno si toccano stop e obiettivo conta lo stop;
-- la **conferma** dopo un crollo: una chiusura sopra il massimo del giorno del crollo entro **10** sedute.
+- la **conferma** dopo un crollo: una chiusura sopra il massimo del giorno del crollo entro **10** sedute;
+- gli **stop a confronto** (v529, CEO 02/11: *"Sì"*): tenere senza stop, lo stop al pareggio armato dopo un rialzo
+  di **0,5**, **1** e **2** ATR, lo stop fisso a **1**, **2** e **3** ATR sotto l'ingresso. Misurato il 02/11 su
+  Intel, Alphabet e Oracle: lo stop «dopo qualche punto» esce in 8 casi su 10 e dimezza la media; ogni stop taglia i
+  casi peggiori e costa rendimento. Le regole del 15/10 e del 18/10 reggono: non c'era niente da togliere.
 
 ⚠ L'universo sono i nomi seguiti OGGI: scelti perché interessanti adesso, cioè anche sopravvissuti. Negli stati di
 una discesa profonda (oltre il 25% sotto il massimo dell'anno) la distorsione pesa di più, e la riga lo dice.

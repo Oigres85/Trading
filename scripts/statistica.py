@@ -63,6 +63,8 @@ MIN_CASI = 30                     # sotto, la statistica non generalizza
 ERRORI = 2                        # una differenza conta oltre 2 errori standard (circa il 95%)
 SOGLIA_EV = 0.10                  # un valore atteso dentro ±0,1 R non distingue un'operazione dal caso
 ATTESA_MAX = 10                   # la conferma dopo un crollo si aspetta al piu' 10 sedute
+STOP_PAREGGIO_ATR = (0.5, 1.0, 2.0)   # v529: lo stop al prezzo d'ingresso, armato dopo un rialzo di tanti ATR
+STOP_FISSO_ATR = (1.0, 2.0, 3.0)      # v529: lo stop fisso, tanti ATR sotto l'ingresso
 STOP_LONTANO_ATR = 4.0            # un pavimento oltre 4 ATR sotto il prezzo non fa da stop: si usa lo stop standard
 STOP_STANDARD_ATR = 2.0           # lo stop senza un pavimento vicino: 2 ATR, la convenzione del rischio del sistema
 OBIETTIVO_STANDARD_R = 2.0        # senza una resistenza sopra il prezzo, l'obiettivo e' 2 volte il rischio
@@ -266,6 +268,35 @@ def esito_geometria(b, i, ks, kt, h=60, fino=None):
     return {"esito": "nessuno", "R": (b[i + h]["c"] - e) / (ks * atr), "sedute": h}
 
 
+def strategie_stop(b, i, atr, h=60):
+    """v529 — cosa avrebbero dato, nel caso i, TENERE senza stop, lo stop al PAREGGIO armato dopo un rialzo di k ATR
+    (si esce al prezzo d'ingresso se poi ci torna) e lo stop FISSO k ATR sotto l'ingresso, in % a 60 sedute. Lo stop al
+    pareggio si arma col massimo di una seduta e scatta dalle sedute DOPO (prudente: nello stesso giorno non si sa
+    cosa e' venuto prima). Il prezzo pagato non entra: conta solo cosa succede dopo l'ingresso."""
+    if not atr or i + h >= len(b):
+        return None
+    e = b[i]["c"]
+    fine = (b[i + h]["c"] / e - 1) * 100
+    out = {"tenere": fine}
+    for k in STOP_PAREGGIO_ATR:
+        armato, r = False, fine
+        for j in range(i + 1, i + h + 1):
+            if armato and b[j]["l"] <= e:
+                r = 0.0
+                break
+            if b[j]["h"] >= e + k * atr:
+                armato = True
+        out[f"pareggio dopo +{_n(k)} ATR"] = r
+    for k in STOP_FISSO_ATR:
+        r = fine
+        for j in range(i + 1, i + h + 1):
+            if b[j]["l"] <= e - k * atr:
+                r = -k * atr / e * 100
+                break
+        out[f"stop fisso -{_n(k)} ATR"] = r
+    return out
+
+
 def conferma(b, i, fino=None):
     """L'indice della prima chiusura sopra il massimo del giorno i, entro ATTESA_MAX sedute (None se non arriva,
     o se arriverebbe dopo `fino`)."""
@@ -312,7 +343,8 @@ def casi(B, k, ks, kt, fino=None, rif=None, escludi=None):
                 j = conferma(b, i, fino)
                 att = {"confermato": j is not None,
                        "esito": esito_geometria(b, j, ks, kt, fino=fino) if j is not None else None}
-            out.append({"tk": tk, "t": b[i]["t"], "r": r, "eccesso": ecc, "geometria": g, "attesa": att})
+            out.append({"tk": tk, "t": b[i]["t"], "r": r, "eccesso": ecc, "geometria": g, "attesa": att,
+                        "stop": strategie_stop(b, i, s["atr"])})
             ultimo = i
     return out
 
@@ -336,6 +368,15 @@ def riassunto(cc):
         out["geometria"] = {"n": len(g), "ev": st.fmean(rr), "es": (st.stdev(rr) / math.sqrt(len(rr))) if len(rr) > 1 else None,
                             "obiettivo": sum(x["esito"] == "obiettivo" for x in g) / len(g) * 100,
                             "stop": sum(x["esito"] == "stop" for x in g) / len(g) * 100}
+    sv = [c["stop"] for c in cc if c.get("stop")]
+    if sv:
+        out["stop"] = {}
+        for nome in sv[0]:
+            v = sorted(x[nome] for x in sv)
+            q = st.quantiles(v, n=10) if len(v) >= 10 else [None] * 9
+            out["stop"][nome] = {"media": st.fmean(v), "es": (st.stdev(v) / math.sqrt(len(v))) if len(v) > 1 else None,
+                                 "peggiori": q[0], "migliori": q[-1],
+                                 "uscito": sum(x[nome] != x["tenere"] for x in sv) / len(sv) * 100}
     a = [c["attesa"] for c in cc if c.get("attesa") is not None]
     if a:
         ok = [x["esito"]["R"] for x in a if x["confermato"] and x["esito"]]
@@ -482,6 +523,15 @@ def resa_prova(p):
         L.append(f"  ASPETTARE LA CONFERMA (una chiusura sopra il massimo del giorno, entro {ATTESA_MAX} sedute): arriva "
                  f"nel {_n(a['confermati'], 0)}% dei casi · valore atteso di chi aspetta {_n(a['ev'], 2, True)} R su "
                  f"{a['n']} casi (errore {_n(a['es'], 2)}) contro {_n(geo['ev'] if geo else None, 2, True)} R di chi entra subito")
+    sp = usa.get("stop")
+    if sp:
+        L.append(f"  GLI STOP NEI CASI SIMILI (a {max(ORIZZONTI)} sedute; 1 ATR = {_n(p['atr'], 2)} $, il "
+                 f"{_n(p['atr'] / p['prezzo'] * 100, 1)}% del prezzo: piu' stretto di cosi' lo stop lo tocca il rumore):")
+        for nome, x in sp.items():
+            L.append(f"    {nome:24} media {_n(x['media'], 1, True)}% (errore {_n(x['es'], 1)}) · peggior 10% "
+                     f"{_n(x['peggiori'], 1, True)}% · miglior 10% {_n(x['migliori'], 1, True)}% · esce nel "
+                     f"{_n(x['uscito'], 0)}% dei casi")
+        L.append("    il prezzo pagato non entra nel conto: conta solo cosa e' successo DOPO l'ingresso")
     if p.get("dopo"):
         d = p["dopo"]
         L.append(f"  COSA E' SUCCESSO DOPO (fino al {d['fino_al']}, {d['sedute']} sedute): {_n(d['rendimento'], 1, True)}% "

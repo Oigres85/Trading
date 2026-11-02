@@ -9652,3 +9652,25 @@ registrata a posteriori e dichiarata come tale.
   giorno, la correzione con «e» al posto di «o», l'obiettivo controllato prima dello stop, il futuro nei casi, la
   distanza fra i casi tolta, un errore standard solo, la soglia cambiata nel solo codice, l'universo dalla pipeline, la
   distorsione da sopravvivenza muta, la pagina tolta dal comando unico. Pavimento della suite 1080 → 1095.
+
+## 🛑 v529 — GLI STOP A CONFRONTO, E UNA REGOLA DEL CEO MESSA ALLA PROVA
+
+Il CEO, 02/11/2026: *"Stop loss su Intel Alphabet e Oracle se salgono di qualche punto?"* e, alla mia premessa che la
+domanda toccava una sua regola, *"Le mie regole se sono sbagliate vanno tolte"*; poi *"Sì"* a rendere strutturale il
+confronto. Ogni prova d'ingresso porta ora gli stop a confronto sui casi simili: tenere, lo stop al pareggio armato dopo
+un rialzo di 0,5, 1 e 2 ATR, lo stop fisso a 1, 2 e 3 ATR (convenzioni in LIBRO.md §1quindecies, rilette dal gate).
+
+Misurato su Intel, Alphabet e Oracle: lo stop «dopo qualche punto» (mezzo ATR: su Intel l'ATR vale il 10,6% del
+prezzo) esce in 8 casi su 10 e dimezza la media; ogni stop taglia i casi peggiori e costa rendimento. **Le regole del
+15/10 (non si vende sui ribassi) e del 18/10 (nessuno stop che sale col prezzo) reggono: non c'era niente da togliere.**
+Il freno vero è la dimensione: le tre posizioni insieme, nel peggior 10% dei casi, perdono circa 4.500 $.
+
+- ⚠ La prova dice anche che il prezzo pagato non entra nel conto: «uscire in pari» è un ancoraggio al carico, non una
+  protezione. La domanda giusta è se si comprerebbe oggi, e la risponde la stessa prova.
+- ⚠ Una fixture mia era sbagliata: un minimo a 94 «non tocca» uno stop a 94, e invece lo tocca (≤). *Un check rosso è
+  prima di tutto una fixture da verificare.*
+- **Quattro iniezioni** (lo stop al pareggio che scatta nello stesso giorno in cui si arma, lo stop fisso col segno
+  sbagliato, il blocco tolto dalla resa, le distanze cambiate nel solo codice): **mordono tutte**, ma due non al primo
+  giro, ed entrambe per un difetto del CONTROLLO: la fixture non aveva un giorno che arma lo stop scendendo sotto il
+  pareggio (v430), e il check leggeva le chiavi con le parentesi quadre, quindi la suite moriva con un KeyError invece
+  di cadere col suo nome (v407, v471). Corretti tutti e due, mordono.

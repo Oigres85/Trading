@@ -10955,6 +10955,29 @@ check("v528 collegamenti: il comando unico esegue la pagina statistica, la sched
       and "`python3 scripts/statistica.py pagina`" in _fmt528 and "`scripts/statistica.py` resta **fuori**" in _agg528
       and "leggi_libro()" in _univ528 and "data.json" not in _univ528)
 
+# ═════════ v529 — gli stop a confronto nella prova d'ingresso (CEO, 02/11/2026: «Sì») ═════════
+def _sp529(percorso, h=3):
+    b = [{"t": f"2026-02-{i + 1:02d}", "h": hh, "l": ll, "c": cc} for i, (hh, ll, cc) in enumerate(percorso)]
+    return ST528.strategie_stop(b, 0, 2.0, h=h)
+_a529 = _sp529([(100, 100, 100), (101.2, 99.5, 101), (101, 99.9, 100.5), (103, 100.5, 102)])   # sale di 0,5 ATR e torna al pareggio
+_b529 = _sp529([(100, 100, 100), (100.5, 97.5, 98), (99, 95.5, 96), (97, 94.5, 95)])          # scende: tocca -1 e -2 ATR, non -3 (94,5 > 94)
+# il giorno che arma lo stop scende anche sotto il pareggio: non si sa cosa e' venuto prima, e lo stop scatta solo DOPO
+_c529 = _sp529([(100, 100, 100), (101.5, 99.0, 101), (102, 100.5, 101.5), (103, 101, 102)])
+check("v529 gli stop: tenere = la chiusura finale; il pareggio si arma dopo il rialzo e scatta DOPO (esce a 0%); lo stop "
+      "fisso esce a -k ATR; chi non viene toccato tiene il risultato finale: " + str(_a529) + str(_b529),
+      bool(_a529 and _b529 and _c529) and abs(_a529["tenere"] - 2.0) < 1e-9 and _a529.get("pareggio dopo +0,5 ATR") == 0.0
+      and _a529.get("pareggio dopo +1,0 ATR") == _a529["tenere"] and _b529.get("stop fisso -1,0 ATR") == -2.0
+      and _b529.get("stop fisso -2,0 ATR") == -4.0 and _b529.get("stop fisso -3,0 ATR") == _b529["tenere"]
+      and _b529.get("pareggio dopo +0,5 ATR") == _b529["tenere"] and _c529.get("pareggio dopo +0,5 ATR") == _c529["tenere"])
+check("v529 la prova porta gli stop a confronto, coi casi che escono e il peggior 10%, e dice che il prezzo pagato non entra",
+      "stop" in _p528["pieno"] and "GLI STOP NEI CASI SIMILI" in _r528 and "pareggio dopo +0,5 ATR" in _r528
+      and "il prezzo pagato non entra nel conto" in _r528)
+_m529 = re.search(r"pareggio armato dopo un rialzo\s+di \*\*([\d,]+)\*\*, \*\*([\d,]+)\*\* e \*\*([\d,]+)\*\* ATR, lo stop fisso a "
+                  r"\*\*([\d,]+)\*\*, \*\*([\d,]+)\*\* e \*\*([\d,]+)\*\* ATR", _s528)
+check("v529 le distanze degli stop a confronto stanno nel libro (§1quindecies) e coincidono col codice",
+      bool(_m529) and tuple(float(x.replace(",", ".")) for x in _m529.groups()[:3]) == ST528.STOP_PAREGGIO_ATR
+      and tuple(float(x.replace(",", ".")) for x in _m529.groups()[3:]) == ST528.STOP_FISSO_ATR)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)
