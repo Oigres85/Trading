@@ -1,4 +1,4 @@
-⟦ BUILD v524 · generato 02/11/2026 22:27 ⟧
+⟦ BUILD v524 · generato 02/11/2026 22:55 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 02/11/2026, 22:27:37 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 17:27, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,24% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,97% · Fut S&P -0,82% · BTC -1,79% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~16.1h); il "→ agg." incorpora già il gap after.
+DATI AL 02/11/2026, 22:55:35 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 17:55, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +2,24% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,97% · Fut S&P -0,82% · BTC -1,9% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~15.6h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 02/11/2026, 22:27:37 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-11-02.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 02/11/2026, 22:55:35 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-11-02.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): settembre 2026 · Inflazione PCE (a/a): settembre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: settembre 2026 · Disoccupazione: settembre 2026 · Fiducia consumatori (UMich): ottobre 2026 · Curva 10A-2A: 02/11/2026 · Curva 10A-3M: 02/11/2026 · Treasury USA 30A: 30/10/2026 · Tasso reale 10A (TIPS): 30/10/2026 · Inflazione attesa 10A (breakeven): 02/11/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -71,16 +71,16 @@ QUADRO MACRO:
 - Fear & Greed: 23 (Paura estrema) · rilevazione CNN del 02/11/2026 · la seduta prima 26, 1 settimana fa 30, 1 mese fa 38, 1 anno fa 34 · nel suo anno: 14° percentile su 250 rilevazioni (minimo 5, massimo 71)
 - VIX: 21.15 (+8,91% nell'ultima seduta [chiusura del 02/11] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
 - Fed Funds Rate: range ATTUALE 3,75–4,00% · tasso implicito futures 3,88% (media attesa del mese in corso, dal suo contratto) · PROSSIMA RIUNIONE FOMC: 09/12/2026 (il tasso resta valido fino alla prossima decisione FOMC)
-- Carry USA-Giappone: spread tassi 10A 2,08 pp (US10A 4.89%, JGB10A 2.82%), USD/JPY 157.86 (-0,04% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/12/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
+- Carry USA-Giappone: spread tassi 10A 2,08 pp (US10A 4.89%, JGB10A 2.82%), USD/JPY 157.85 (-0,05% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/12/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1,23 — prevalgono le PUT = copertura/pessimismo (put 5598578, call 4533804). BANDE DI SOLA LETTURA, convenzione del mestiere e non un dato di questo file: sopra 1,1 prevalgono le put, sotto 0,7 le call, in mezzo e' zona centrale. ⚠ Il sistema NON ha lo storico di questa serie, quindi non puo' dire a quale percentile stia il valore di oggi: dove cominci un ESTREMO — che e' il punto in cui la lettura si rovescia in contrarian — qui non e' stabilito, e non va dedotto dalle due soglie qui sopra, che separano il verso e non l'intensita'.
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 8,2% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $73B su $882B di BIL+SHV+SPY (SPY da solo $809B)) · Retail Cash: fondi monetari retail $3044 mld (FRED RMFNS, YoY +5,2%, 98° percentile 5A, riferito a settembre 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
-- Righello Dollaro (DXY): 101.77 · 3 mesi +2,09% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
+- Righello Dollaro (DXY): 101.79 · 3 mesi +2,1% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7541,4 vs SMA125 7585 (-0,57%) · Nasdaq 100 27.989,82 vs SMA125 29.537,57 (-5,24%) — sopra = trend primario integro, sotto = deterioramento.
 - Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 28.223,75 (-1,97%) · S&P 500 (ES) 7587 (-0,82%) — in calo oltre il rumore: apertura USA attesa in gap-down.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 1,81× (-24,67% 5g) · TQQQ 3x NDX RVol 1,25× (-13,11% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
 - Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) -2,28% vs RSP (equi-pesato) +4,89% a 1M · spread -7,17pp — mese in ribasso per il cap-pesato; l'indice scende MENTRE l'azione media sale: a cedere sono i grandi, non il mercato (alert della pipeline se SPY+ con RSP− o spread >4pp; le bande dello scarto — da +1,5 pp a favore dell'indice, da -1 pp a favore dell'azione media — sono una convenzione di lettura). ⚠ L'ampiezza misura la DISTANZA fra i due indici, non la direzione: il verso lo da' il cap-pesato, e quello dell'equi-pesato si legge accanto.
 - Treasury USA 10A: 4.89% (-0,03 pp nell'ultima seduta) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,94% (FRED DGS10, osservazione del 2026-10-30): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
-- EUR/USD: 1.1193 (+0,09% nell'ultima seduta)
+- EUR/USD: 1.1189 (+0,06% nell'ultima seduta)
 - PIL USA (t/t ann.): 3.4% (riferito al 3° trimestre 2026 (luglio-settembre) · acquisito il 02/11/2026 · ultima uscita 29/10/2026 (4 giorni fa) · prossimo aggiornamento 25/11/2026 (calendario ufficiale, Gross Domestic Product, via FRED) · BEA, trimestrale · serie TRIMESTRALE, il dato più recente disponibile)
 - Vendite al dettaglio (m/m): 0.8% (riferito a settembre 2026 · acquisito il 02/11/2026 · ultima uscita 15/10/2026 (18 giorni fa) · prossimo aggiornamento 17/11/2026 (calendario ufficiale, Advance Monthly Sales for Retail and Food Services, via FRED) · Census, mensile)
 - Non-Farm Payrolls: +29K (riferito a settembre 2026 · acquisito il 02/11/2026 · ultima uscita 02/10/2026 (31 giorni fa) · prossimo aggiornamento 06/11/2026 (calendario ufficiale, Employment Situation, via FRED) · BLS, mensile)
@@ -102,9 +102,9 @@ QUADRO MACRO:
       "Bloomberg ETF IQ" focuses on the opportunities, risks and current trends tied to the trillions of dollars in the global exchange traded funds industry. Today's guests: Active Investment Company Alliance Founder & Executive Chair John Cole Scott, Tema ETFs Head of Investment Strategy Paisley Nardini, Subversive ETFs Po
     · [Bloomberg, 5h fa] Treasury Yields Extend Past Month’s Slide as Oil Prices Drop
       Treasuries rose, building on their biggest monthly advance in more than two years, as tumbling oil prices eased concern about inflation pressure leading to additional Federal Reserve interest-rate hikes.
-    · [Bloomberg, 5h fa] Hedge Funds Back SEC Push to Ease Rules on EU Bond Futures
+    · [Bloomberg, 6h fa] Hedge Funds Back SEC Push to Ease Rules on EU Bond Futures
       The Securities and Exchange Commission should add the European Union to a four-decade old list of exempted issuers, a move that would ease restrictions on US investor access to the bloc’s new bond futures market, according to a group representing hedge funds.
-    · [Bloomberg, 7h fa] Gold’s Faded Haven Allure Hinges on Deficit, Inflation Fears
+    · [Bloomberg, 8h fa] Gold’s Faded Haven Allure Hinges on Deficit, Inflation Fears
       As gold heads toward its worst annual loss in more than a decade, investors are gauging the odds a political shift in the US will restore the precious metal’s haven allure.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-11-06 Non-Farm Payrolls (precedente +29K) · 2026-11-06 Disoccupazione (precedente 4.2%) · 2026-11-10 Inflazione CPI (a/a) (precedente 3.7%). ⚠ Per 1 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich)): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 5 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-2A, Curva 10A-3M, Treasury USA 30A, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-11-02 PLTR · 2026-11-02 AAPL · 2026-11-03 AMD · 2026-11-03 SMCI · 2026-11-03 ANET · 2026-11-03 AMGN · 2026-11-03 PFE · 2026-11-04 MCD · 2026-11-04 DDOG · 2026-11-05 NET · 2026-11-05 COP · 2026-11-06 OKLO · 2026-11-09 CEG · 2026-11-09 TTWO · 2026-11-10 RGTI · 2026-11-10 CRWV · 2026-11-12 CBRS. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 1 accesi su 4 CALCOLABILI da una fonte — accesi: Inasprimento criteri di prestito. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "6/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 1 su 4.
@@ -252,9 +252,9 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The S&P 500 Index ($SPX ) (SPY ) is up +0.74% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +1.04%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.74%. December E-mini S&P futures (ESZ26 ) are up +0.72%, and December E-mini Nasdaq futures...
   [AVGO] · [Nasdaq, 3h fa] Why Free Cash Flow Matters More Than Ever: 5 Tech Stocks to Watch
       Free cash flow (FCF) is becoming one of the most important metrics for evaluating technology stocks heading into 2027.
-  [BE] · [Nasdaq, 32h fa] Anthropic Says It's Building Its Own Data Centers. Bloom Energy Sells Exactly the Onsite Power That Requires.
+  [BE] · [Nasdaq, 33h fa] Anthropic Says It's Building Its Own Data Centers. Bloom Energy Sells Exactly the Onsite Power That Requires.
       Key PointsBloom Energy posted a record third quarter.
-  [BE] · [Nasdaq, 32h fa] Is Bloom Energy Stock a Buy Right Now in November (2026)?
+  [BE] · [Nasdaq, 33h fa] Is Bloom Energy Stock a Buy Right Now in November (2026)?
       Should you buy stock in Bloom Energy right now? Before you buy stock in Bloom Energy, consider this:Missed AI’s "Act 1"? Act 2 Could Be 15x Bigger. Most investors think they missed the AI boat because they didn't buy Nvidia in 2005. But according to our analysts, we’re only at th
   [CRWV] · [Nasdaq, 5h fa] CrowdStrike And Coreweave Expand Partnership For AI Integration
       (RTTNews) - On Monday, CrowdStrike (CRWD) and CoreWeave (CRWV) expanded their strategic partnership to improve security for large-scale AI operations.
@@ -262,25 +262,25 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Here, we pick four Internet stocks - YELP, SHOP, CRWV and DOCN - that are likely to pull off a beat this earnings season.
   [MRVL] · [Nasdaq, 0h fa] Stocks Rally as Crude Oil Sinks on US-Iran Hopes
       The S&P 500 Index ($SPX ) (SPY ) is up +0.74% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +1.04%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.74%. December E-mini S&P futures (ESZ26 ) are up +0.72%, and December E-mini Nasdaq futures...
-  [MRVL] · [Nasdaq, 0h fa] Stock Market Today, Nov. 2: Marvell Announces $115 Billion All-Stock Acquisition of Lumentum
-      Marvell Technology (NASDAQ:MRVL), a data infrastructure chipmaker for AI data centers, closed at $170.80, down 13%. The blockbuster announcement that the company was acquiring Lumentum sent shares lower, and investors are watching financing and integration risks next.
+  [MRVL] · [Nasdaq, 0h fa] Stocks Rebound as Chipmakers Recover and Crude Oil Plunges
+      The S&P 500 Index ($SPX ) (SPY ) is up +0.62% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +1.01%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.69%. December E-mini S&P futures (ESZ26 ) are up +0.58%, and December E-mini Nasdaq futures...
   [MSTR] · [Nasdaq, 2h fa] Notable Monday Option Activity: GME, UPST, MSTR
       Among the underlying components of the Russell 3000 index, we saw noteworthy options trading volume today in GameStop Corp (Symbol: GME), where a total of 126,294 contracts have traded so far, representing approximately 12.6 million underlying shares. That amounts to about 128.
   [MSTR] · [Nasdaq, 4h fa] Stocks Fall Sharply on Intel and Amazon Sell-offs and Crypto Heist
       The S&P 500 Index ($SPX ) (SPY ) fell -1.82% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) fell -1.09%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) fell -3.46%. December E-mini S&P futures (ESZ26 ) fell -1.76%, and December E-mini Nasdaq futures (NQZ26 ) fell...
-  [MU] · [Nasdaq, 5h fa] 4 Stocks to Buy in November
+  [MU] · [Nasdaq, 0h fa] Micron Technology: Is This a Sign That Its Stock Has Already Peaked?
+      Key PointsTrading volumes for Micron's stock have fallen sharply in recent months, suggesting less interest from retail investors.
+  [MU] · [Nasdaq, 6h fa] 4 Stocks to Buy in November
       Key PointsNvidia and Broadcom's computing units will only become more in demand.
-  [MU] · [Nasdaq, 6h fa] November Is Historically the Best Month for the Stock Market. Here Are My Best 3 Stocks to Buy.
-      Key PointsNvidia and Micron are thriving from the artificial intelligence build-out.
-  [NVDA] · [Nasdaq, 0h fa] Stocks Rally as Crude Oil Sinks on US-Iran Hopes
+  [NVDA] · [Nasdaq, 1h fa] Stocks Rally as Crude Oil Sinks on US-Iran Hopes
       The S&P 500 Index ($SPX ) (SPY ) is up +0.74% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +1.04%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.74%. December E-mini S&P futures (ESZ26 ) are up +0.72%, and December E-mini Nasdaq futures...
   [NVDA] · [Nasdaq, 1h fa] Stocks Rebound as Chipmakers Recover and Crude Oil Plunges
       The S&P 500 Index ($SPX ) (SPY ) is up +0.62% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +1.01%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.69%. December E-mini S&P futures (ESZ26 ) are up +0.58%, and December E-mini Nasdaq futures...
   [ORCL] · [Nasdaq, 0h fa] Stocks Rally as Crude Oil Sinks on US-Iran Hopes
       The S&P 500 Index ($SPX ) (SPY ) is up +0.74% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +1.04%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.74%. December E-mini S&P futures (ESZ26 ) are up +0.72%, and December E-mini Nasdaq futures...
-  [ORCL] · [Nasdaq, 1h fa] Oracle To Raise $20 Bln Through Stock And Bond Offerings To Fund AI Expansion
-      (RTTNews) - Oracle Corp. (ORCL) plans to raise $20 billion through a combination of stock and debt offerings to finance its artificial intelligence infrastructure expansion.
-  [RGTI] · [Nasdaq, 3h fa] Quantum Stocks Plunge in October: Can Q3 Earnings Halt the Slide?
+  [ORCL] · [Nasdaq, 0h fa] Stocks Rebound as Chipmakers Recover and Crude Oil Plunges
+      The S&P 500 Index ($SPX ) (SPY ) is up +0.62% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +1.01%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.69%. December E-mini S&P futures (ESZ26 ) are up +0.58%, and December E-mini Nasdaq futures...
+  [RGTI] · [Nasdaq, 4h fa] Quantum Stocks Plunge in October: Can Q3 Earnings Halt the Slide?
       Quantum stocks IonQ, D-Wave, Rigetti and QCi plunged in October. Can upcoming Q3 earnings, revenue growth and commercial progress reverse the selloff?
   [RGTI] · [Nasdaq, 16h fa] D-Wave Quantum vs. Rigetti Computing: Which Quantum Computing Stock Is a Better Buy for 2027?
       Key PointsD-Wave Quantum focuses on commercial annealing and recently expanded its reach with a new government-focused business unit.
