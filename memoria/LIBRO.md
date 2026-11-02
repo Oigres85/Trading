@@ -31,7 +31,6 @@ il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'us
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
 | GOOGL | 37 | 282,00 | USD | acquisto del **29/10/2026** (testuale: *"Registra entrata su Alphabet 282 con 37 azioni"*; la seduta l'ha confermata il CEO il 30/10: *"1 29/10"*). 282 cade nell'intervallo di quella seduta (280,36–288,33). Carico in euro nel registro §1decies |
-| INTC | 130 | 64,50 | USD | acquisto del **30/10/2026** (testuale: *"Registra anche acquisto Intel prezzo 64.5 130 azioni"*), il giorno del −29,7% dopo i conti: 64,50 cade solo nell'intervallo di quella seduta (64,11–68,77). Carico in euro nel registro §1decies |
 | ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
@@ -42,7 +41,10 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~24.000 €** IN TUTTO, bloccata compresa, **tutta in euro** — dichiarata dal CEO il 30/10/2026 dopo
+**Liquidità: ~31.550 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 02/11/2026: i ~24.000 € dichiarati
+più la vendita di INTC del 02/11 in pre-market (130 a 65 $ = 8.450 $, meno 15 $ di commissione, circa 7.550 € al
+riferimento BCE del 30/10, 1,1172, l'ultimo pubblicato all'ora della vendita), da confermare col saldo del broker.
+I ~24.000 € li ha dichiarati il CEO il 30/10/2026 dopo
 l'acquisto di ORCL (testuale: *"Liquidità residua in euro 24k"*). Sella riconverte in euro il ricavato delle vendite (CEO,
 30/10/2026: *"Tutta in euro"*), quindi la liquidità non è esposta al cambio. La stima del libro, prima della dichiarazione,
 era ~23.200 €: ~47.040 € fino al 28/10, meno i tre acquisti (§1decies) al riferimento BCE della loro seduta — GOOGL del 29/10,
@@ -131,6 +133,7 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 
 | Ticker | Nota |
 |---|---|
+| INTC | venduta il 02/11/2026 in pre-market, 130 a 65 $ (ingresso del 30/10 a 64,50): torna fra i sorvegliati. Allo stato del 30/10 (crollo dopo una previsione tagliata) i casi simili facevano peggio della base |
 | OKLO | Oklo — reattori nucleari modulari per datacenter. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
 | SMCI | Super Micro Computer — server AI, concorrente di DELL. **Venduta il 19/10/2026 a 32,81 $** (250 azioni comprate il 16/10 a 31,60): il CEO *"non mi fido per ora"*. Candidato di rotazione da CRWV dal 14/09/2026. Il 18/10: bilancio solido (Altman 6,77) e cassa dell'attività negativa (−6,8 miliardi di flusso operativo in 12 mesi, magazzino a 128 giorni) |
 | AMZN | Amazon — candidato d'ingresso (CEO, 02/10/2026). Diversifica in parte dal gruppo AI e porta ~15-20% di Anthropic. Livelli: acquisto 244-246 (supporto 244,30), uscita sotto SMA200 ~240. Trimestrale 29/10 |
@@ -352,8 +355,9 @@ tre mesi dopo SMH era più in alto —; in un mercato orso come il 2022 (semicon
 gradino avrebbe evitato circa 30.000 $ di perdite su quella parte. ⚠ Senza gradino l'esposizione è
 quella del libro intero: il 14/10 un Nasdaq −10% valeva −21,9% (−59.174 $).
 
-**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY, INTC.
+**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY.
 INTC entra il 30/10/2026, il giorno dell'acquisto, per la regola qui sotto: progetta e produce processori, è nel comparto.
+INTC esce il 02/11/2026, il giorno della vendita.
 Il settore non è nei dati — la pipeline mette RGTI fra i semiconduttori e SK hynix no (v473) —
 quindi l'elenco sta qui, e un nome nuovo del comparto ci entra il giorno dell'acquisto. Le posizioni
 fuori dall'elenco si nominano a ogni analisi: un'omissione si vede.
@@ -922,6 +926,7 @@ euro se si vendesse oggi.
 | 29/10/2026 | GOOGL | acquisto | 37 | 282,00 | 1,1130 | BCE, riferimento del 29/10/2026 | seduta confermata dal CEO il 30/10/2026 |
 | 30/10/2026 | INTC | acquisto | 130 | 64,50 | 1,1172 | BCE, riferimento del 30/10/2026 | |
 | 30/10/2026 | ORCL | acquisto | 60 | 129,60 | 1,1172 | BCE, riferimento del 30/10/2026 | prezzo corretto dal CEO il 30/10/2026 (il primo dichiarato, 126,50, stava sotto il minimo della seduta) |
+| 02/11/2026 | INTC | vendita | 130 | 65,00 | 1,1172 | BCE, riferimento del 30/10/2026: l'ultimo pubblicato all'ora della vendita (pre-market, prima delle 14:15) | da confermare col cambio applicato da Sella; commissione misurata 15 $ |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -964,9 +969,12 @@ scegli tu soluzione migliore"*):
 **Chiusa il 02/11/2026** (CEO: *"Sì confermo"*): i due esami di AMD (conti del 03/11) e CRWV (conti del 10/11)
 in §1quinquies sono confermati.
 
+**Chiusa il 02/11/2026** (CEO: *"Venduto Intel in premarket a 65 130 azioni"*): INTC chiusa per intero, registrata in
+§1decies; esce dalle posizioni e dai semiconduttori del libro (§1ter) e torna fra i sorvegliati (§1bis).
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 02/11/2026 | INTC: tenerla come scommessa piccola, o chiuderla in pari per ridurre i semiconduttori? | la prova del 02/11 la mette PEGGIO della base (crollo dopo una notizia), il CDS rincara del 45% e il nome aggiunge al 68% di semiconduttori; per GOOGL e ORCL la statistica dice di tenere | il CEO sceglie |
+| 02/11/2026 | INTC, vendita del 02/11: quale cambio ha applicato Sella (o il controvalore in euro accreditato)? | la plusvalenza fiscale si calcola in euro col cambio dell'acquisto e della vendita; in §1decies c'e' il riferimento BCE del 30/10, da confermare | il CEO dà il cambio o l'importo in euro dal broker |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
