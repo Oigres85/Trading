@@ -9690,3 +9690,11 @@ Su INTC (crollo del 30/10): a −5% (62,47) eseguito nel 75% dei casi, poi +11,1
 - ⚠ Due attese della mia fixture erano sbagliate (l'esito si legge h sedute dopo l'ESECUZIONE, non dopo il caso): il check
   era rosso per la sonda, non per il codice (v433).
 - Tre iniezioni (l'apertura sotto il limite ignorata, la tabella tolta dalla resa, i limiti cambiati nel solo codice): mordono tutte, al primo giro. Pavimento della suite 1098 → 1101.
+
+## v531 — Domanda → solo risposta (02/11/2026)
+
+Il CEO ha chiesto se Broadcom e Marvell operano nello stesso settore; la risposta è arrivata dopo un commit, un
+push bloccato dal pre-push, la riparazione di un test e lo stato del sistema. Il CEO: «non capisco perché con una
+semplice domanda devi seguire un codice Python e push». Regola 10 di CLAUDE.md: a una domanda si risponde e basta;
+il libro si aggiorna solo quando il CEO opera o lo chiede, in un colpo solo a fine conversazione; la regola 3
+(stato del sistema) vale per i giri di lavoro, non per le domande.

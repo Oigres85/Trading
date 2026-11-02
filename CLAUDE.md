@@ -18,7 +18,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    nei pacchetti e nelle risposte.
 2. **Si lavora su `main`** e si pusha subito; una PR che nasce si unisce. Prima di ogni push `git pull --rebase origin
    main` (sui conflitti in `data/data.json` vince la remota). Il push È la pubblicazione: la rete è prima, negli hook.
-3. **Alla fine di ogni giro di lavoro: `python3 scripts/stato_sistema.py`**, esito in 2-4 righe con ogni ⚠ per nome.
+3. **Alla fine di ogni giro di lavoro (non di una domanda: regola 10): `python3 scripts/stato_sistema.py`**, esito in 2-4 righe con ogni ⚠ per nome.
    Ciò che si sistema in sessione si sistema; ciò che chiede il CEO diventa una DOMANDA in `memoria/LIBRO.md`
    §1undecies con la sua data. *"Se ritieni fammi sempre domande."*
 4. **Staccarsi da GitHub quanto più possibile**: i dati si leggono alla fonte in sessione (v511-v522); la pipeline è la
@@ -39,6 +39,10 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    `log_verdict.mjs`. 🛑 **Mai sovrascrivere `config/prompt_header.txt`** (lavoro del CEO).
 9. **Servizi dismessi** (non reintrodurre): WhatsApp/CallMeBot, Gemini, morning brief, il documento HTML del report CIO.
    Reddit/WallStreetBets: i post non sono fatti (v451) — si contano le menzioni, come attenzione.
+10. **Domanda → solo risposta (02/11/2026).** A una domanda del CEO si risponde e basta: niente codice, niente
+   push, niente stato del sistema. Il libro si aggiorna solo quando il CEO OPERA (acquisto, vendita, ordine) o lo
+   chiede, e in un colpo solo a fine conversazione. *"Non capisco perché con una semplice domanda devi seguire un
+   codice Python e push."*
 
 ## 🧭 Il sistema oggi
 - **L'analisi in chat** — un comando: `python3 scripts/analisi.py`. PRIMA `fonti_dirette.py` e `fonti_titoli.py`
