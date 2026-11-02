@@ -10714,6 +10714,10 @@ check("v510 nel weekend la riga della fase conta i titoli dopo la campana come i
   suVeriSabato(`
   const NL = String.fromCharCode(10);
   DATA.macro = DATA.macro || {};
+  /* v530 — lo stato si costruisce (v429): l'ultima chiusura la ricava lastUsEquityCloseUTC dal price_asof dei dati, e con
+     un data.json piu' recente dell'orologio fermo (il run del 02/11) tornava indietro di cinque sedute senza arrivare al
+     23/10: il check misurava la data del run, non la proprieta'. La seduta dei dati e' quella del sabato costruito. */
+  for (const r of [].concat(DATA.portfolio || [], DATA.watchlist || [])) { if (r && r.price_asof) r.price_asof = "2026-10-23"; }
   const fase = () => buildPrompt().split(NL).find(r => r.indexOf("CONTESTO DI SESSIONE") === 0) || "";
   const voce = (iso) => ({ titolo: "Titolo di prova abbastanza lungo " + iso, riassunto: "", fonte: "Prova", quando: iso });
   DATA.macro.news = { fonti: ["Prova"], voci: [voce("2026-10-24T10:00:00Z"), voce("2026-10-24T08:00:00Z"), voce("2026-10-23T15:00:00Z")] };
