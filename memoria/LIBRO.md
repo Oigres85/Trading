@@ -972,6 +972,10 @@ in §1quinquies sono confermati.
 **Chiusa il 02/11/2026** (CEO: *"Venduto Intel in premarket a 65 130 azioni"*): INTC chiusa per intero, registrata in
 §1decies; esce dalle posizioni e dai semiconduttori del libro (§1ter) e torna fra i sorvegliati (§1bis).
 
+**Decisione del 02/11/2026** (CEO: *"Utilizzo cash generato da vendita di Intel"*): il ricavato della vendita di INTC
+(circa 8.435 $ netti, ~7.550 €) va a un ingresso su AVGO; il resto della liquidità resta RISERVA (quotazione di
+Anthropic o medie dopo i conti, 01/11). AVGO entra fra i semiconduttori del libro (§1ter) il giorno dell'acquisto.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
 | 02/11/2026 | INTC, vendita del 02/11: quale cambio ha applicato Sella (o il controvalore in euro accreditato)? | la plusvalenza fiscale si calcola in euro col cambio dell'acquisto e della vendita; in §1decies c'e' il riferimento BCE del 30/10, da confermare | il CEO dà il cambio o l'importo in euro dal broker |
