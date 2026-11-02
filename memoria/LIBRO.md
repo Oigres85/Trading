@@ -966,6 +966,7 @@ in §1quinquies sono confermati.
 
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
+| 02/11/2026 | INTC: tenerla come scommessa piccola, o chiuderla in pari per ridurre i semiconduttori? | la prova del 02/11 la mette PEGGIO della base (crollo dopo una notizia), il CDS rincara del 45% e il nome aggiunge al 68% di semiconduttori; per GOOGL e ORCL la statistica dice di tenere | il CEO sceglie |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
