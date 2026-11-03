@@ -11110,6 +11110,22 @@ check("v533 collegamenti: il comando unico esegue le tre righe in ogni fase, PRI
       and "`laboratorio.py` (le tre righe)" in _agg528
       and "mancanti = [tk for tk in nomi if tk not in fresche]" in _srcst528)
 
+# ═════════ v534 — investing.com dai feed RSS pubblici (CEO, 03/11/2026: «ok») ═════════
+import brief as _BR534
+from datetime import timezone as _utc534
+_x534 = ("<rss><channel>"
+         "<item><title>Uno</title><pubDate>2026-11-03 13:42:35</pubDate></item>"
+         "<item><title>Due</title><pubDate>Tue, 03 Nov 2026 08:00:00 -0500</pubDate></item>"
+         "<item><title>Tre</title><pubDate>ieri sera</pubDate></item>"
+         "</channel></rss>")
+_v534 = {v["titolo"]: v["quando"] for v in _BR534._voci_rss(_x534, "prova")}
+check("v534 i feed: la data senza fuso di investing.com si legge in UTC, la data RFC 822 degli altri feed resta letta col "
+      "suo fuso, una data illeggibile resta un'assenza (v406) e non diventa «adesso»: " + str(_v534),
+      _v534.get("Uno") is not None and _v534["Uno"].isoformat() == "2026-11-03T13:42:35+00:00"
+      and _v534.get("Due") is not None and _v534["Due"].astimezone(_utc534.utc).isoformat() == "2026-11-03T13:00:00+00:00"
+      and "Tre" in _v534 and _v534["Tre"] is None
+      and any("investing.com" in u for _n, u, _g in _BR534.NEWS_MACRO))
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

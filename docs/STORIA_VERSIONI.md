@@ -9737,3 +9737,15 @@ tutto l'universo. Iniezione su una copia verificata: tolto il passo dal comando 
 comando contro formato) e il v533. Strada vera: un'analisi completa con le tre righe nella risposta e nella scheda.
 Gate: 2. La stessa giornata: il CEO ha chiesto se ci si collega a investing.com — i feed RSS pubblici (inglese e
 italiano) rispondono dal container; le librerie che lo leggono da programma (investpy, investiny) no, vedi la risposta.
+
+## v534 — investing.com dai feed RSS pubblici (03/11/2026)
+
+Il CEO, alla proposta di collegare investing.com dai suoi feed RSS: *"ok"*. Le librerie che leggono il sito da programma
+(investpy, investiny) restano fuori: il sito blocca i programmi e le rompe. Entrano due feed in `brief.NEWS_MACRO`:
+«Investing Economia» (news_14, per intero, come CNBC Economia) e «Investing Borsa» (news_25, dal filtro dei canali). I
+feed italiani esistono e rispondono, ma il filtro dei canali parla inglese: un feed italiano generalista passerebbe vuoto.
+La trappola trovata provando la strada vera: investing.com scrive la data «AAAA-MM-GG HH:MM:SS» SENZA fuso, il parser RFC
+822 la rifiutava e ogni voce aveva `quando` None — cioè il feed sarebbe stato muto per sempre, «letto» ma senza una voce
+fresca. `brief.data_senza_fuso` la legge in UTC: misurato, la voce più recente di «All News» stava 17 minuti prima
+dell'ora UTC (in ora di Roma 77 minuti su tutti i feed insieme, in ora di New York nel futuro). Il CEO usa investing.com
+solo per la watchlist: la fonte resta LIBRO.md §1bis. Gate: 1.

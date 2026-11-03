@@ -43,9 +43,15 @@ PARALLELI = 4
 # e si prende per intero (la selezione l'ha fatta una redazione, che e' meglio del mio elenco).
 NEWS_MACRO = [
     ("CNBC Economia", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258", False),
+    # v534 — investing.com dai suoi feed RSS pubblici (CEO, 03/11/2026: «ok»): l'economia per intero (la scelta l'ha
+    #   fatta una redazione), la borsa dal filtro dei canali. Le librerie che lo leggono da programma (investpy,
+    #   investiny) restano fuori: il sito blocca i programmi e le rompe. I feed italiani hanno le stesse notizie ma il
+    #   filtro dei canali parla inglese: un feed italiano generalista passerebbe vuoto.
+    ("Investing Economia", "https://www.investing.com/rss/news_14.rss", False),
     ("Bloomberg",     "https://feeds.bloomberg.com/markets/news.rss", True),
     ("Bloomberg Tech","https://feeds.bloomberg.com/technology/news.rss", True),
     ("MarketWatch",   "https://feeds.content.dowjones.io/public/rss/mw_topstories", True),
+    ("Investing Borsa", "https://www.investing.com/rss/news_25.rss", True),
 ]
 
 # ⚠⚠ I TRE CANALI, non "la macro" (deciso col CEO il 12/09/2026). Ognuno ha la sua ragione:
@@ -300,6 +306,17 @@ def tecnica(tk, d=None, adesso=None):
 
 
 # ---------------------------------------------------------------- notizie
+def data_senza_fuso(dt):
+    """v534 — investing.com scrive «AAAA-MM-GG HH:MM:SS» senza fuso, non la data RFC 822 dei feed. E' UTC, misurato il
+    03/11/2026: la voce piu' recente di «All News» stava 17 minuti prima dell'ora UTC; in ora di Roma sarebbe stata 77
+    minuti prima su tutti i feed insieme, in ora di New York nel futuro. None se non e' nemmeno questa forma: una data
+    illeggibile resta un'assenza (v406), non diventa «adesso»."""
+    try:
+        return datetime.strptime((dt or "").strip(), "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    except Exception:
+        return None
+
+
 def _voci_rss(xml, fonte):
     out = []
     try:
@@ -318,7 +335,7 @@ def _voci_rss(xml, fonte):
                 if when.tzinfo is None:
                     when = when.replace(tzinfo=timezone.utc)
             except Exception:
-                when = None
+                when = data_senza_fuso(dt)
         out.append({"titolo": t, "quando": when, "link": link, "fonte": fonte})
     return out
 
