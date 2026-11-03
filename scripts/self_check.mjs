@@ -213,7 +213,8 @@ const SUITE = [
   /* v530: 1111 punti di chiamata in test_analisi_libro (+3 sugli ordini con limite a confronto) -> 1101 */
   /* v532: 1117 punti di chiamata in test_analisi_libro (+6 sul laboratorio del portafoglio: pesi e date, tre esiti,
      libreria assente, salvavita sul passato, regimi, convenzioni rilette dal libro) -> 1107 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1107, firma: /\d+\/\d+ CHECK OK/ },
+  /* v533: 1119 punti di chiamata in test_analisi_libro (+2 sulle tre righe del laboratorio e i loro collegamenti) -> 1109 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1109, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

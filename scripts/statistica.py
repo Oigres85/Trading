@@ -97,15 +97,20 @@ def leggi_barre(nomi, adesso=None, rete=True):
     corso tolta (v471). Una lettura per ora in memoria/dati (fuori da git). None per chi non si legge: un nome
     non letto si nomina, non sparisce (v389)."""
     adesso = adesso or datetime.now(timezone.utc)
+    fresche, scritto = {}, adesso
     try:
         c = json.load(open(CACHE, encoding="utf-8"))
         eta = (adesso - datetime.fromisoformat(c["scritto"])).total_seconds() / 60
-        if eta <= VALIDITA_MIN and set(nomi) <= set(c["barre"]):
-            return {tk: c["barre"][tk] for tk in nomi}
+        if eta <= VALIDITA_MIN:
+            fresche, scritto = c["barre"], datetime.fromisoformat(c["scritto"])
+            if set(nomi) <= set(fresche):
+                return {tk: fresche[tk] for tk in nomi}
     except Exception:
         pass
     if not rete:
         return {tk: None for tk in nomi}
+    # v533 — con la cache fresca si leggono solo i nomi che mancano, e la cache tiene la data della lettura PIU' VECCHIA
+    #   che contiene: il laboratorio chiede anche SMH e i diversificanti senza far rileggere i cinque anni di tutti
 
     def una(tk):
         b = R.barre_lunghe(tk)
@@ -114,11 +119,14 @@ def leggi_barre(nomi, adesso=None, rete=True):
         b = [{k: x.get(k) for k in ("t", "h", "l", "c", "v", "a")} for x in b if x.get("c")]
         return b[:-1] if brief.barra_in_formazione(b, adesso) else b
 
+    mancanti = [tk for tk in nomi if tk not in fresche]
     with ThreadPoolExecutor(brief.PARALLELI) as ex:
-        B = dict(zip(nomi, ex.map(una, nomi)))
+        nuove = dict(zip(mancanti, ex.map(una, mancanti)))
+    B = {tk: nuove[tk] if tk in nuove else fresche[tk] for tk in nomi}
     try:
         os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-        json.dump({"scritto": adesso.isoformat(), "barre": B}, open(CACHE, "w", encoding="utf-8"))
+        json.dump({"scritto": (scritto if fresche else adesso).isoformat(), "barre": {**fresche, **nuove}},
+                  open(CACHE, "w", encoding="utf-8"))
     except Exception:
         pass
     return B

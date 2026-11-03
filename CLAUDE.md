@@ -48,7 +48,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
 ## 🧭 Il sistema oggi
 - **L'analisi in chat** — un comando: `python3 scripts/analisi.py`. PRIMA `fonti_dirette.py` e `fonti_titoli.py`
   (letture alla fonte del giro, valide 30 minuti, in `memoria/dati/`), poi `numeri_libro`, `brief`, `schede_progetto`,
-  `rotazione`, `posizionamento`, `indici`, `concorrenti`, POI `sintesi.py --registra`, DOPO `stato_sistema.py --giro`.
+  `rotazione`, `posizionamento`, `indici`, `concorrenti`, `laboratorio riassunto` (v533), POI `sintesi.py --registra`, DOPO `stato_sistema.py --giro`.
   La scheda completa (`memoria/dati/scheda_analisi_*.md`, fuori da git) si manda come allegato. **Forma statistica
   (v528)**: `statistica.py pagina` dice per ogni posizione cosa è successo nei casi simili contro la base; prima di
   OGNI operazione `statistica.py ingresso TICKER PREZZO --registra "intuizione"` (valore atteso in R, variante «aspetta

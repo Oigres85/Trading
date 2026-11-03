@@ -216,6 +216,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    --registra "intuizione"` — la geometria (stop e obiettivo in ATR) riapplicata ai casi simili, il valore atteso in
    R, la variante «aspetta la conferma», e la riga nel diario; `statistica.py bilancio` misura l'intuito contro la
    statistica. Convenzioni in `LIBRO.md` §1quindecies.
+8quater. `python3 scripts/laboratorio.py riassunto` (v533, CEO, 03/11/2026: *"sì"*, al riassunto del laboratorio in ogni
+   analisi) — il **laboratorio in tre righe**: nel 5% dei giorni peggiori dell'ultimo anno quanto ha perso in media il
+   portafoglio di oggi e chi porta quel rischio (Riskfolio-Lib), il regime di SMH e QQQ da due stati sui cinque anni
+   (hmmlearn), la volatilità di adesso contro la media lunga del modello (arch). Stime e misure, mai proiezioni; il
+   dettaglio delle nove librerie è `python3 scripts/laboratorio.py`, su richiesta. Convenzioni in `LIBRO.md` §1sexdecies.
 8bis. `python3 scripts/sintesi.py --registra` (v524, CEO, 31/10/2026: *"Procedi su tutto"*) — gira DOPO gli strumenti
    del giro e prima dello stato del sistema: **non ricalcola niente**, incrocia ciò che numeri_libro, rotazione, indici
    e posizionamento hanno scritto in `memoria/dati/giro/` (la variabile TRADING_GIRO, una lettura per analisi) con la
@@ -247,7 +252,8 @@ forma breve**; dove è nella norma basta una parola («nella norma», «invariat
 nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA, che li calcola tutti (v161).
 0. **La pagina statistica** (v528): per ogni posizione cosa è successo nei casi simili, contro la base, e se c'è
    un'operazione in vista la sua prova d'ingresso coi numeri — valore atteso in R e variante «aspetta la conferma».
-   Dove la statistica non distingue dal caso lo si dice in una parola: è un'informazione, non un vuoto.
+   Dove la statistica non distingue dal caso lo si dice in una parola: è un'informazione, non un vuoto. Sotto, **il
+   laboratorio in tre righe** (v533): i giorni peggiori e chi li porta, il regime di SMH e QQQ, la volatilità di adesso.
 1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso — scritto
    dopo aver letto tutto il resto.
 2. **Il regime: le sei luci**, una riga ciascuna col colore, il perché e i dati che la compongono, con la freccia se è
@@ -675,6 +681,8 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
   confronto: tenere, al pareggio, fissi; gli ordini con limite a confronto: quante volte vengono eseguiti e cosa
   succede dopo) e la riga nel
   diario che misura l'intuito contro la statistica (01/11)
+- `[laboratorio]` il laboratorio in tre righe in ogni analisi: la perdita media nel 5% dei giorni peggiori e chi la
+  porta, il regime di SMH e QQQ, la volatilità di adesso (03/11; il dettaglio delle nove librerie su richiesta)
 - `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno

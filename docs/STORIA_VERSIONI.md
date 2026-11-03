@@ -9723,3 +9723,17 @@ Iniezioni su due copie verificate per impronta: i regimi con la varianza scambia
 chiusure allineate per POSIZIONE invece che per data → il check NON cadeva, perché guardava solo il nome col giorno
 mancante, e lo scivolamento colpisce gli ALTRI (la fixture non conteneva il fenomeno, v430). Il check ora confronta
 ogni nome con le sue barre, data per data, e l'iniezione cade.
+
+## v533 — Il laboratorio in tre righe in ogni analisi (03/11/2026)
+
+Alla domanda «vuoi un riassunto di 3 righe del laboratorio in ogni analisi?» il CEO ha risposto *"sì"*. Nuovo passo del
+comando unico, nel gruppo in parallelo prima della sintesi: `laboratorio.py riassunto` — la perdita media nel 5% dei
+giorni peggiori dell'ultimo anno e chi la porta (Riskfolio-Lib), il regime di SMH e QQQ (hmmlearn), la volatilità di
+adesso contro la media lunga del modello (arch). Le stesse funzioni delle sezioni (`rischio_base` estratta da
+`s_rischio`, v161). La scheda ha sezione, catalogo e voce (`[laboratorio]`), il formato lo strumento (8quater) e la riga
+della risposta (sotto la pagina statistica). `statistica.leggi_barre` ora, con la cache fresca, legge solo i nomi che
+mancano e tiene la data della lettura più vecchia: il laboratorio chiede anche SMH senza far rileggere cinque anni di
+tutto l'universo. Iniezione su una copia verificata: tolto il passo dal comando → cadono il gate v473 (strumenti del
+comando contro formato) e il v533. Strada vera: un'analisi completa con le tre righe nella risposta e nella scheda.
+Gate: 2. La stessa giornata: il CEO ha chiesto se ci si collega a investing.com — i feed RSS pubblici (inglese e
+italiano) rispondono dal container; le librerie che lo leggono da programma (investpy, investiny) no, vedi la risposta.

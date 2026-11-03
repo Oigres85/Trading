@@ -35,6 +35,7 @@ Le regole del CEO valgono anche qui:
 Uso:
   python3 scripts/laboratorio.py                     tutte le sezioni
   python3 scripts/laboratorio.py rischio regimi      solo quelle nominate
+  python3 scripts/laboratorio.py riassunto           le tre righe dell'analisi (v533): giorni peggiori, regime, volatilita'
 Le librerie: pip install -r scripts/requirements_laboratorio.txt (fuori dalla pipeline dei dati: non la appesantiscono).
 Non scrive memorie: legge le barre di statistica.py (memoria/dati, fuori da git).
 """
@@ -203,23 +204,32 @@ def s_rendimento(P, B):
     return R, None
 
 
-def s_rischio(P, B):
+def rischio_base(P):
+    """(cvar, calo massimo, cdar, [(ticker, quota del CVaR, peso)] dal piu' grande), oppure (None, il perche')."""
     rp, err = _lib("riskfolio")
     if err:
         return None, err
     import numpy as np
     X, w, r = P["rend"], P["w"], P["rp"].values
-    cvar = float(rp.RiskFunctions.CVaR_Hist(r, alpha=ALFA))
-    mdd = float(rp.RiskFunctions.MDD_Rel(r))
-    cdar = float(rp.RiskFunctions.CDaR_Rel(r, alpha=ALFA))
+    rc = np.asarray(rp.Risk_Contribution(w.values.reshape(-1, 1), returns=X, cov=X.cov(), rm="CVaR", alpha=ALFA)).ravel()
+    quota = rc / rc.sum() if rc.sum() else rc
+    chi = sorted(((w.index[i], float(quota[i]), float(w.iloc[i])) for i in range(len(w))), key=lambda x: -x[1])
+    return (float(rp.RiskFunctions.CVaR_Hist(r, alpha=ALFA)), float(rp.RiskFunctions.MDD_Rel(r)),
+            float(rp.RiskFunctions.CDaR_Rel(r, alpha=ALFA)), chi), None
+
+
+def s_rischio(P, B):
+    rb, err = rischio_base(P)
+    if err:
+        return None, err
+    rp, _ = _lib("riskfolio")
+    X, w = P["rend"], P["w"]
+    cvar, mdd, cdar, chi = rb
     R = [f"nel 5% dei giorni peggiori della finestra la perdita media e' stata {_p(cvar)} al giorno (CVaR al 95%): "
          f"sul valore di oggi dei nomi dentro, circa {_usd(cvar * P['valore_dentro'])} · calo massimo {_p(mdd)} · "
          f"calo medio nel 5% delle fasi peggiori {_p(cdar)} (CDaR)"]
-    rc = np.asarray(rp.Risk_Contribution(w.values.reshape(-1, 1), returns=X, cov=X.cov(), rm="CVaR", alpha=ALFA)).ravel()
-    quota = rc / rc.sum() if rc.sum() else rc
-    ordine = sorted(range(len(w)), key=lambda i: -quota[i])[:6]
     R.append("chi porta il rischio dei giorni peggiori (quota del CVaR contro il peso): " + " · ".join(
-        f"{w.index[i]} {_p(quota[i], 0)} col {_p(w.iloc[i], 0)} del peso" for i in ordine))
+        f"{tk} {_p(q, 0)} col {_p(p, 0)} del peso" for tk, q, p in chi[:6]))
     hrp = rp.HCPortfolio(returns=X).optimization(model="HRP", codependence="pearson", rm="MV", rf=0,
                                                  linkage="single", leaf_order=True)
     h = hrp.iloc[:, 0] if hasattr(hrp, "iloc") else hrp
@@ -440,6 +450,50 @@ def s_regimi(P, B):
     return R, None
 
 
+def riassunto(P, B):
+    """v533 — il laboratorio in TRE righe per ogni analisi (CEO, 03/11/2026: «sì»): i giorni peggiori e chi li porta,
+    il regime di SMH e QQQ, la volatilita' di adesso. Le stesse funzioni delle sezioni (v161); una riga che non si
+    calcola si dichiara col perche' (v389). (righe, quante non calcolate)."""
+    R, buchi = [], 0
+    rb, err = rischio_base(P)
+    if err:
+        R.append(f"giorni peggiori: ⚠ non calcolati — {err}")
+        buchi += 1
+    else:
+        tk, q, p = rb[3][0]
+        R.append(f"giorni peggiori: nel 5% dei giorni peggiori dell'ultimo anno il portafoglio di oggi ha perso in media "
+                 f"{_p(rb[0])} al giorno, circa {_usd(rb[0] * P['valore_dentro'])}; il primo a portare quel rischio e' {tk} "
+                 f"({_p(q, 0)} del rischio col {_p(p, 0)} del peso)")
+    parti = []
+    for t in RIFERIMENTI:
+        px = riferimento(B, t, lunga=STORIA_LUNGA)
+        g, err = regimi(px.pct_change().iloc[1:].values) if px is not None else (None, "serie non letta")
+        parti.append(f"{t} in tensione con probabilita' {_p(g['tensione_oggi'], 0)}" if g else f"{t} ⚠ {err}")
+        buchi += 0 if g else 1
+    R.append("regime (due stati dai soli rendimenti, cinque anni): " + " · ".join(parti))
+    g, err = garch(P["rp"])
+    if err:
+        R.append(f"volatilita' di adesso: ⚠ non calcolata — {err}")
+        buchi += 1
+    else:
+        R.append(f"volatilita' di adesso (GARCH, una stima, non una previsione): {_n(g['oggi'], 2)}% al giorno, circa "
+                 f"±{_usd(g['oggi'] / 100 * P['valore_dentro'])}, contro una media lunga del modello di "
+                 + (f"{_n(g['lungo'], 2)}%" if g["lungo"] else "n.d."))
+    return R, buchi
+
+
+def resa_riassunto(P, R, adesso):
+    from zoneinfo import ZoneInfo
+    testa = (f"LABORATORIO IN TRE RIGHE (v533) — {adesso.astimezone(ZoneInfo('Europe/Rome')):%d/%m/%Y %H:%M} ora "
+             "italiana · il dettaglio: python3 scripts/laboratorio.py")
+    if P is None:
+        return testa + "\n  ⚠ nessuna posizione con la storia sufficiente: il laboratorio non ha un portafoglio"
+    fuori = ", ".join(f"{tk} ({_p(P['peso'].get(tk), 1)})" for tk in sorted(P["esclusi"]))
+    return "\n".join([testa] + [f"  {r}" for r in R] + [
+        f"  il portafoglio di oggi sulle {len(P['rend'])} sedute dal {datetime.fromisoformat(P['dal']):%d/%m/%Y}"
+        + (f"; fuori per la storia corta: {fuori}" if fuori else "") + " — non il rendimento avuto, nessuna proiezione"])
+
+
 ESECUTORI = {"rendimento": s_rendimento, "rischio": s_rischio, "robusta": s_robusta,
              "fuori_campione": s_fuori_campione, "diversificazione": s_diversificazione, "salvavita": s_salvavita,
              "volatilita": s_volatilita, "regimi": s_regimi}
@@ -497,6 +551,14 @@ def resa(L):
 
 
 def main(argv):
+    if argv[:1] == ["riassunto"]:
+        adesso = datetime.now(timezone.utc)
+        nomi, posiz = SA.universo()
+        B = SA.leggi_barre(nomi + [t for t in RIFERIMENTI if t not in nomi], adesso=adesso)
+        P = portafoglio(B, posiz)
+        R, buchi = riassunto(P, B) if P is not None else ([], 1)
+        print(resa_riassunto(P, R, adesso))
+        return 1 if buchi else 0
     sezioni = [a for a in argv if a in SEZIONI] or list(SEZIONI)
     ignote = [a for a in argv if a not in SEZIONI]
     if ignote:

@@ -62,6 +62,7 @@ SEZIONI = (
     ("freschezza_titoli", "0 · Dati per titolo: analisti, FedWatch, CDS, short, depositi SEC e trimestri — la fonte "
                           "letta adesso contro la pipeline, e cosa cercare in rete"),                     # v512
     ("statistica", "0ter · Pagina statistica: per ogni posizione i casi simili e cosa e' successo dopo, contro la base"),  # v528
+    ("laboratorio", "0ter · Laboratorio in tre righe: i giorni peggiori, il regime, la volatilita' di adesso"),  # v533
     ("semaforo", "0 · Semaforo d'uscita"),
     ("salvavita", "0 · Salvavita e piano di riduzione"),
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
@@ -243,6 +244,7 @@ CATALOGO = {
     ), nomi_col0=(Nome(rf"{TK} \[(?:POSIZIONE|SORVEGLIATO)\]", "concorrenti", sommario=False),)),
     "sintesi": Strumento("sintesi", (Blocco(r"SINTESI OPERATIVA", "sintesi"),)),                          # v524
     "statistica": Strumento("statistica", (Blocco(r"PAGINA STATISTICA", "statistica"),)),                 # v528
+    "laboratorio": Strumento("laboratorio", (Blocco(r"LABORATORIO IN TRE RIGHE", "laboratorio"),)),        # v533
     "stato_sistema": Strumento("stato_sistema", (                                                           # v518
         Blocco(r"STATO DEL SISTEMA|CODICE — |PIPELINE SU GITHUB|DATI DI QUESTO GIRO|DIPENDENZE DA GITHUB|COERENZA DEL "
                r"LIBRO|DOMANDE APERTE AL CEO", "stato_sistema"),
@@ -289,6 +291,7 @@ REGISTRO = {
     "sintesi_operativa": Voce(("sintesi",)),                                                          # v524
     "cruscotto": Voce(("sintesi",)),                                                                  # v525
     "statistica": Voce(("statistica",)),                                                              # v528
+    "laboratorio": Voce(("laboratorio",)),                                                            # v533
     "rischio_eventi": Voce(("sintesi",), righe=(("sintesi", "5 · IL RISCHIO DEGLI EVENTI"),)),          # v526
     "stato_sistema": Voce(("stato_sistema",)),                                                         # v518
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),

@@ -244,7 +244,7 @@ in `memoria/cds_sessione.jsonl`: questo comando legge, non scrive.
 
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
 e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e `fonti_titoli.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
-`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py`, `concorrenti.py` e `statistica.py`, già dichiarati fuori qui con la loro ragione, poi
+`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py`, `concorrenti.py`, `statistica.py` e `laboratorio.py` (le tre righe), già dichiarati fuori qui con la loro ragione, poi
 `stato_sistema.py` (eseguito anche qui, al passo 3bis), e chiude con la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 

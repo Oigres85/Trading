@@ -72,7 +72,8 @@ TITOLO_RISPOSTA = "## La risposta in chat"     # v524 — l'ordine della rispost
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
 STRUMENTI = ("fonti_dirette.py", "fonti_titoli.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py",
-             "posizionamento.py", "indici.py", "concorrenti.py", "statistica.py", "sintesi.py", "stato_sistema.py")
+             "posizionamento.py", "indici.py", "concorrenti.py", "statistica.py", "laboratorio.py", "sintesi.py",
+             "stato_sistema.py")
 # v511 — fonti_dirette.py gira PRIMA degli altri, da solo: scrive la lettura alla fonte del giro che gli altri riusano
 #   (una lettura per analisi, la stessa osservazione per tutti), e stampa il blocco FRESCHEZZA DEI DATI
 # v512 — e con lui, in parallelo, fonti_titoli.py: analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC e trimestri
@@ -153,6 +154,8 @@ def comandi(f, sedute=1):
               "con le stesse formule per tutti", ["concorrenti.py"]))
     c.append(("PAGINA STATISTICA — per ogni posizione cosa e' successo nei casi simili dei nomi seguiti, contro la base "
               "(v528)", ["statistica.py", "pagina"]))
+    c.append(("LABORATORIO IN TRE RIGHE — i giorni peggiori e chi li porta, il regime, la volatilita' di adesso (v533)",
+              ["laboratorio.py", "riassunto"]))
     c.append(("SINTESI OPERATIVA — il regime in sei luci, il libro nel regime, la mappa tesi × prezzo, cosa e' cambiato, "
               "l'agenda e le azioni delle regole", ["sintesi.py", "--registra"]))
     c.append(("STATO DEL SISTEMA — codice e test, pipeline su GitHub, dati del giro, dipendenze da GitHub con la loro "

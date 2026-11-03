@@ -7014,6 +7014,9 @@ _U505 = {
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
                     "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
                     "letture: 0 nuove in questo giro"],
+    # v533 — il laboratorio in tre righe: un blocco solo, nella sua sezione
+    "laboratorio": ["LABORATORIO IN TRE RIGHE (v533) — 03/11/2026 14:29 ora italiana · il dettaglio: python3 scripts/laboratorio.py",
+                    "  giorni peggiori: nel 5% dei giorni peggiori dell'ultimo anno il portafoglio di oggi ha perso in media 6,3% al giorno"],
     # v528 — la pagina statistica: un blocco solo, nella sua sezione
     "statistica": ["PAGINA STATISTICA (v528) — per ogni posizione lo stato di oggi e i casi simili, contro la BASE",
                    "  AAA   seduta normale, tendenza intatta · 100 casi su 10 titoli · a 60 +5,0% → come la base"],
@@ -11085,6 +11088,27 @@ check("v532 le convenzioni del laboratorio stanno nel libro (§1sexdecies) e coi
       _num532 == (LB532.FINESTRA, LB532.STORIA_LUNGA, round((1 - LB532.ALFA) * 100), LB532.ALLENAMENTO, LB532.PROVA)
       + tuple(LB532.QUOTE_DIVERSIFICATE) + tuple(-s for s in LB532.SOGLIE_SALVAVITA)
       + (LB532.MEDIA_RIENTRO, LB532.STATI_REGIME) and ", ".join(LB532.DIVERSIFICANTI) in _c532)
+
+# ═════════ v533 — il laboratorio in tre righe in ogni analisi (CEO, 03/11/2026: «sì») ═════════
+_R533, _b533 = LB532.riassunto(_P532, _B532)
+_rr533 = LB532.resa_riassunto(_P532, _R533, _L532["adesso"])
+check("v533 il riassunto: tre righe — giorni peggiori con chi porta il rischio, regime di SMH e QQQ, volatilita' di adesso "
+      "dichiarata come stima — calcolate con le funzioni delle sezioni (v161), e la coda dice chi e' fuori e che non e' "
+      "una proiezione: " + " | ".join(_R533),
+      len(_R533) == 3 and _b533 == 0 and _R533[0].startswith("giorni peggiori:") and "il primo a portare" in _R533[0]
+      and "SMH in tensione" in _R533[1] and "QQQ in tensione" in _R533[1] and "non una previsione" in _R533[2]
+      and _rr533.startswith("LABORATORIO IN TRE RIGHE") and "A5" in _rr533 and "nessuna proiezione" in _rr533
+      and f"{LB532.rischio_base(_P532)[0][0] * 100:.1f}".replace(".", ",") + "%" in _R533[0])
+_cm533 = {f: [c[1] for c in _AN528.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+check("v533 collegamenti: il comando unico esegue le tre righe in ogni fase, PRIMA della sintesi; la scheda ha sezione, "
+      "catalogo e voce; il formato lo strumento, la riga della risposta e la chiave; /aggiorna lo nomina fra i passi del "
+      "comando; le barre mancanti si leggono da sole, senza rileggere quelle fresche",
+      all(["laboratorio.py", "riassunto"] in v and v.index(["laboratorio.py", "riassunto"]) < v.index(["sintesi.py", "--registra"])
+          for v in _cm533.values()) and "laboratorio.py" in _AN528.STRUMENTI
+      and "laboratorio" in SC.CATALOGO and "laboratorio" in SC.REGISTRO and "laboratorio" in [x[0] for x in SC.SEZIONI]
+      and "`[laboratorio]`" in _fmt528 and "`python3 scripts/laboratorio.py riassunto`" in _fmt528
+      and "`laboratorio.py` (le tre righe)" in _agg528
+      and "mancanti = [tk for tk in nomi if tk not in fresche]" in _srcst528)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
