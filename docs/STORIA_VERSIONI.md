@@ -9698,3 +9698,28 @@ push bloccato dal pre-push, la riparazione di un test e lo stato del sistema. Il
 semplice domanda devi seguire un codice Python e push». Regola 10 di CLAUDE.md: a una domanda si risponde e basta;
 il libro si aggiorna solo quando il CEO opera o lo chiede, in un colpo solo a fine conversazione; la regola 3
 (stato del sistema) vale per i giri di lavoro, non per le domande.
+
+## v532 — Il laboratorio del portafoglio: nove librerie, una domanda ciascuna (03/11/2026)
+
+Il CEO ha chiesto progetti GitHub utili all'analisi del portafoglio e alla statistica dei mercati in ottica growth; alla
+lista proposta ha risposto *"procedi su tutti"*. Nasce `scripts/laboratorio.py`, su richiesta e fuori dal comando unico:
+QuantStats (rendimento e cali contro QQQ e SMH), Riskfolio-Lib (CVaR e CDaR al 95%, chi porta il rischio dei giorni
+peggiori, la diversificazione gerarchica come termometro), PyPortfolioOpt (volatilità con la stima Ledoit-Wolf e il minimo
+che gli stessi titoli permetterebbero), skfolio (pesi di oggi contro pesi uguali, HRP e minimo rischio, fuori campione
+126/21), bt (lo stesso portafoglio con lo 0, 20 e 40% su XLV, XLP, XLE), vectorbt (il salvavita a −20…−40% sul passato di
+SMH e QQQ, rientro sopra la media a 200), arch (GARCH: la volatilità di adesso contro la sua media lunga), hmmlearn (due
+regimi dai rendimenti, controllo indipendente delle sei luci). **cvxportfolio non è integrata**: l'imposta italiana in
+euro la calcola già numeri_libro.py (§1decies), e una seconda imposta con regole estere sarebbe sbagliata (v161).
+Le regole del CEO valgono dentro: nessuna proiezione (volatilità e regime sono stime dello stato di adesso), nessuna
+quantità giusta (i pesi dei modelli sono un termometro), assenze dichiarate (libreria non installata, storia corta: SKHY
+fuori col suo peso). Le convenzioni stanno in LIBRO.md §1sexdecies e un gate le rilegge. Le librerie stanno in
+`scripts/requirements_laboratorio.txt`, installate dalla sessione e dai test (tests.yml), NON dalla pipeline dei dati.
+Trappole dell'ambiente: il `pip` di sistema installa per un altro Python (3.13) — si usa `python3 -m pip`; `packaging` di
+Debian non si disinstalla (vincoli col freeze); il PIL di Debian rompe matplotlib (`--ignore-installed pillow`).
+Primo errore del codice: `min_volatility()` chiamata dentro una comprensione, cioè una volta per titolo — PyPortfolioOpt
+rifiuta di riaprire un problema risolto; si chiama una volta sola. Gate: 6 (pesi e date allineate per data, tre esiti,
+libreria assente dichiarata, salvavita sul passato, regimi, convenzioni rilette dal libro).
+Iniezioni su due copie verificate per impronta: i regimi con la varianza scambiata (argmin) → il check cade; le
+chiusure allineate per POSIZIONE invece che per data → il check NON cadeva, perché guardava solo il nome col giorno
+mancante, e lo scivolamento colpisce gli ALTRI (la fixture non conteneva il fenomeno, v430). Il check ora confronta
+ogni nome con le sue barre, data per data, e l'iniezione cade.

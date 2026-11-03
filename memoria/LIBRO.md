@@ -1279,6 +1279,26 @@ Il **diario** (`memoria/diario_ingressi.jsonl`): una riga per decisione, con l'i
 quel giorno, scritta PRIMA di sapere com'è andata. Dopo 20-30 righe `statistica.py bilancio` dice se l'intuito batte la
 statistica. La prima riga è l'ingresso su Intel del 30/10, registrato a posteriori il 01/11 e dichiarato come tale.
 
+## 1sexdecies. IL LABORATORIO DEL PORTAFOGLIO — nove librerie, una domanda ciascuna (v532, decisione del CEO del 03/11/2026)
+
+Il CEO, testuale: *"procedi su tutti"*, sui progetti GitHub per l'analisi del portafoglio e la statistica dei mercati.
+`scripts/laboratorio.py` — su richiesta, non nel comando unico — fa a ciascuna libreria UNA domanda che il sistema non si
+faceva: rendimento e cali contro QQQ e SMH (QuantStats), rischio dei giorni peggiori e chi lo porta (Riskfolio-Lib),
+volatilità con una stima robusta (PyPortfolioOpt), ottimizzatori provati fuori campione (skfolio), una quota diversificata
+(bt), il salvavita a soglie diverse (vectorbt), la volatilità di adesso (arch), i regimi (hmmlearn). **cvxportfolio NON è
+integrata**: l'imposta italiana in euro di una vendita la calcola già `numeri_libro.py` (§1decies), e una seconda imposta
+calcolata con regole estere sarebbe sbagliata accanto a quella giusta (v161).
+
+Convenzioni (v240), rilette da un gate: il portafoglio di oggi sulle ultime **252** sedute; i riferimenti sugli ultimi
+**1260** (cinque anni); CVaR e CDaR al **95**%; fuori campione **126** sedute per stimare e **21** per provare; la quota
+diversificata a **0**, **20** e **40**% in parti uguali su XLV, XLP, XLE; il salvavita provato a **20**, **25**, **30**,
+**35** e **40**% dal massimo, col rientro sopra la media a **200** sedute; **2** regimi, calmo e in tensione.
+
+⚠ Il portafoglio di oggi riportato sul passato coi pesi di oggi NON è il rendimento avuto, e i nomi scelti oggi sono
+anche sopravvissuti. I pesi dei modelli (diversificazione gerarchica, minimo rischio) sono un termometro della
+concentrazione, non un ordine (v439). Volatilità e regime sono stime dello stato di adesso di un modello, non previsioni
+(CLAUDE.md, istruzione 1).
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da

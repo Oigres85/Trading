@@ -1,0 +1,10 @@
+# v532 — le librerie del laboratorio del portafoglio (scripts/laboratorio.py), una domanda ciascuna.
+# FUORI dalla pipeline dei dati (update-data.yml installa solo requirements.txt): la installano la sessione e i test.
+quantstats==0.0.86
+riskfolio-lib==7.4.0
+PyPortfolioOpt==1.6.0
+skfolio==1.12.5
+bt==1.4.1
+vectorbt==1.2.0
+arch==8.0.0
+hmmlearn==0.3.3

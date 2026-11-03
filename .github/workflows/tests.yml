@@ -55,8 +55,12 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: scripts/requirements.txt
+          cache-dependency-path: |
+            scripts/requirements.txt
+            scripts/requirements_laboratorio.txt
       - run: pip install -r scripts/requirements.txt
+      # v532: le librerie del laboratorio, solo per i test — la pipeline dei dati (update-data.yml) non le carica
+      - run: pip install -r scripts/requirements_laboratorio.txt
       - name: Test funzioni pure pipeline (offline)
         run: python scripts/test_update_data.py
 

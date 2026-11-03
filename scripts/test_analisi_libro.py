@@ -10998,6 +10998,94 @@ check("v530 i limiti a confronto stanno nel libro (§1quindecies) e coincidono c
       bool(_m530) and tuple([0] + [-int(x) for x in _m530.groups()[:4]]) == ST528.LIMITI_PCT
       and int(_m530.group(5)) == ST528.PAVIMENTO_MAX_PCT)
 
+# ═════════ v532 — il laboratorio del portafoglio: nove librerie, una domanda ciascuna (CEO, 03/11/2026) ═════════
+import laboratorio as LB532
+import numpy as _np532
+import pandas as _pd532
+
+
+def _barre532(n, semente, salto=None, togli=None, vol=0.01):
+    """n sedute sintetiche dal 2024-01-01 (giorni lavorativi), chiusura = rettificata; `togli` = una data che manca."""
+    g = _np532.random.RandomState(semente)
+    px, out = 100.0, []
+    for i, d in enumerate(_pd532.bdate_range("2024-01-01", periods=n)):
+        px *= 1 + g.normal(0.0005, vol) + (salto if salto and i == n // 2 else 0)
+        t = d.strftime("%Y-%m-%d")
+        if t != togli:
+            out.append({"t": t, "h": px * 1.01, "l": px * 0.99, "c": px, "v": 1000, "a": px})
+    return out
+
+
+_togli532 = _pd532.bdate_range("2024-01-01", periods=300)[280].strftime("%Y-%m-%d")
+_B532 = {"A1": _barre532(300, 1), "A2": _barre532(300, 2), "A3": _barre532(300, 3), "A4": _barre532(300, 4, togli=_togli532),
+         "A5": _barre532(100, 5)}
+for _i532, _tk532 in enumerate(("QQQ", "SMH", "XLV", "XLP", "XLE")):
+    _B532[_tk532] = _barre532(300, 10 + _i532)
+_pos532 = {tk: {"tk": tk, "qta": q, "pmc": 1.0, "valuta": "USD"} for tk, q in
+           (("A1", 10), ("A2", 20), ("A3", 30), ("A4", 40), ("A5", 50))}
+_P532 = LB532.portafoglio(_B532, _pos532, finestra=200)
+# ogni nome contro le SUE barre, data per data: lo scivolamento colpisce chi NON ha il buco (la v532 lo controllava solo
+# sul nome col buco, e un'iniezione che allineava per posizione passava: la fixture non conteneva il fenomeno, v430)
+_bar532 = {tk: {b["t"]: b["a"] for b in _B532[tk]} for tk in ("A1", "A2", "A3", "A4")}
+check("v532 il portafoglio di oggi: pesi = quantita' × ultima chiusura sui nomi dentro, che sommano a 1; il nome con la "
+      "storia corta esce e si nomina col suo peso (v389); le date si allineano per DATA — il giorno che manca a un nome "
+      "manca a tutti, e nessuna serie scivola (v207)",
+      _P532 is not None and abs(float(_P532["w"].sum()) - 1) < 1e-9 and "A5" not in _P532["w"].index
+      and "storia corta" in _P532["esclusi"].get("A5", "") and _P532["peso"].get("A5", 0) > 0
+      and _pd532.Timestamp(_togli532) not in _P532["prezzi"].index and len(_P532["prezzi"]) == 201
+      and all(abs(float(_P532["prezzi"].loc[d, tk]) - _bar532[tk][d.strftime("%Y-%m-%d")]) < 1e-9
+              for tk in _P532["prezzi"].columns for d in _P532["prezzi"].index)
+      and abs(float(_P532["w"]["A4"]) - 40 * _B532["A4"][-1]["c"] / sum(
+          q * _B532[tk][-1]["c"] for tk, q in (("A1", 10), ("A2", 20), ("A3", 30), ("A4", 40)))) < 1e-9)
+
+_L532 = LB532.laboratorio(B=_B532, posiz=_pos532)
+_es532 = {e["nome"]: e for e in _L532["esiti"]}
+_r532 = LB532.resa(_L532)
+check("v532 ogni sezione ha uno dei tre esiti dichiarati — letta, non integrata col perche', non eseguita col perche' —, "
+      "nessuna tace, e la resa porta i suoi avvertimenti (non e' il rendimento avuto, sopravvissuti, nessuna proiezione, "
+      "i pesi non sono un ordine): " + "; ".join(f"{k} {v['stato']}" for k, v in _es532.items()),
+      set(_es532) == set(LB532.SEZIONI) and all(e["stato"] in ("letta", "non integrata") for e in _es532.values())
+      and _es532["costi"]["stato"] == "non integrata" and "numeri_libro" in (_es532["costi"]["perche"] or "")
+      and all(e["righe"] for e in _es532.values() if e["stato"] == "letta")
+      and "non e' il rendimento che hai avuto" in _r532 and "sopravvissuti" in _r532 and "nessuna proiezione" in _r532
+      and "non un ordine (v439)" in _r532 and "fuori dal calcolo storico: A5" in _r532)
+
+_lib532 = LB532._lib
+LB532._lib = lambda nome: (None, f"libreria {nome} non installata (prova)") if nome == "hmmlearn" else _lib532(nome)
+try:
+    _senza532 = LB532.esegui("regimi", _L532["P"], _B532)
+    _con532 = LB532.esegui("volatilita", _L532["P"], _B532)
+finally:
+    LB532._lib = _lib532
+check("v532 una libreria assente si dichiara col suo nome, e non spegne le altre sezioni (v389, v406)",
+      _senza532["stato"] == "non eseguita" and "hmmlearn" in (_senza532["perche"] or "") and _con532["stato"] == "letta")
+
+_d532 = _pd532.bdate_range("2023-01-02", periods=400)
+_px532 = _pd532.Series(_np532.concatenate([_np532.linspace(100, 200, 250), _np532.linspace(200, 130, 50),
+                                           _np532.linspace(130, 125, 100)]), index=_d532)
+_sv532, _ = LB532.salvavita_su(_px532, soglie=(-30, -40), media=50)
+_sv532 = {e["soglia"]: e for e in _sv532 or []}
+check("v532 il salvavita sul passato: un calo del 35% dal massimo fa uscire la soglia del 30% (calo massimo piu' piccolo di "
+      "chi tiene) e non quella del 40% (identica a chi tiene): " + str(_sv532),
+      set(_sv532) == {None, -30, -40} and _sv532[-30]["mdd"] > _sv532[None]["mdd"] + 0.02
+      and abs(_sv532[-40]["rend"] - _sv532[None]["rend"]) < 1e-6 and _sv532[-40]["uscite"] == 1)
+
+_g532 = _np532.random.RandomState(7)
+_rr532 = _np532.concatenate([_g532.normal(0.0005, 0.008, 500), _g532.normal(-0.001, 0.035, 60)])
+_rg532, _ = LB532.regimi(_rr532)
+check("v532 i regimi: un tratto finale ad alta volatilita' si riconosce come TENSIONE oggi, e la tensione e' il regime "
+      "che oscilla di piu': " + str({k: _rg532.get(k) for k in ("tensione_oggi", "quota", "vol")} if _rg532 else None),
+      bool(_rg532) and _rg532["tensione_oggi"] > 0.5 and _rg532["vol"][1] > _rg532["vol"][0] and 0 < _rg532["quota"] < 0.5)
+
+_s532 = _lib474[_lib474.find("## 1sexdecies"):_lib474.find("\n## ", _lib474.find("## 1sexdecies") + 1)]
+_c532 = _s532[_s532.find("Convenzioni (v240)"):]
+_c532 = _c532[:_c532.find("\n\n")]
+_num532 = tuple(int(x) for x in re.findall(r"\*\*(\d+)\*\*", _c532))
+check("v532 le convenzioni del laboratorio stanno nel libro (§1sexdecies) e coincidono col codice: " + str(_num532),
+      _num532 == (LB532.FINESTRA, LB532.STORIA_LUNGA, round((1 - LB532.ALFA) * 100), LB532.ALLENAMENTO, LB532.PROVA)
+      + tuple(LB532.QUOTE_DIVERSIFICATE) + tuple(-s for s in LB532.SOGLIE_SALVAVITA)
+      + (LB532.MEDIA_RIENTRO, LB532.STATI_REGIME) and ", ".join(LB532.DIVERSIFICANTI) in _c532)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

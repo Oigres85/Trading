@@ -213,6 +213,10 @@ dell'analisi in chat e la prova d'ingresso che si lancia prima di un'operazione 
 dei nomi seguiti — e la sua modalità `ingresso --registra` scrive una memoria (`memoria/diario_ingressi.jsonl`): questo
 comando legge, non scrive.
 
+`scripts/laboratorio.py` resta **fuori** (v532): è il laboratorio del portafoglio su richiesta del CEO — nove
+librerie open source, una domanda ciascuna (LIBRO.md §1sexdecies) — e chiede librerie che la pipeline non installa
+(`scripts/requirements_laboratorio.txt`) e minuti di calcolo: si lancia quando il CEO lo chiede, non a ogni aggiornamento.
+
 `scripts/concorrenti.py` resta **fuori** per la stessa ragione di `numeri_libro.py` (v503): è il blocco dei
 concorrenti e delle quote di mercato che l'analisi in chat riporta sempre — le quote dal registro
 `memoria/concorrenti.json`, con fonte e data, e la salute di ogni concorrente con le formule della pipeline — e scrive
