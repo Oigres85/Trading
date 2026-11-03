@@ -25,7 +25,8 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    riserva. Le dipendenze rimaste sono in `fonti_dirette.SOLO_PIPELINE`, e lo stato del sistema le data.
 5. **Investimento** (regole intere in `memoria/LIBRO.md`): non si vende sui ribassi (15/10); l'unica vendita automatica
    è il salvavita a −30% (§1ter); la tenuta si decide per evidenza nei due versi (§1sexies); un CONFLITTO si decide ai
-   conti con l'esame scritto prima e confermato dal CEO (§1quinquies). Le quantità sono solo l'aritmetica dell'unità di
+   conti con l'esame scritto prima e confermato dal CEO (§1quinquies) — ma dal 03/11 gli esami non vendono: i rami
+   secchi si tagliano dopo il recupero di tutti, poi si diversifica (§1undecies). Le quantità sono solo l'aritmetica dell'unità di
    5.000 €, mai «la quantità giusta» (v439). Nessun punteggio composito (v200); ogni soglia è una convenzione dichiarata
    (v240). La liquidità è una RISERVA per la quotazione di Anthropic (02/11; le medie dopo i conti,
    decise il 01/11, sono una domanda aperta); il ricavato di INTC è andato su AVGO (02/11).
