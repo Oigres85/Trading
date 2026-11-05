@@ -1,12 +1,14 @@
 {
  "last_alerted": {
   "stops": [],
-  "dq": [],
+  "dq": [
+   "bce: missing \u2014 BCE non raggiungibile: nessun tasso in euro in questo run"
+  ],
   "squeeze": [],
   "shock": [
-   "Futures Nasdaq 100 -4.86%",
-   "Futures S&P 500 -3.31%"
+   "Futures Nasdaq 100 -3.87%",
+   "Futures S&P 500 -2.97%"
   ]
  },
- "updated": "2026-11-05T16:15:45Z"
+ "updated": "2026-11-05T17:03:48Z"
 }
