@@ -9799,3 +9799,19 @@ solo oltre ±0,02 di abilità. Restano aperti, dichiarati: (6) le opzioni non gu
 (conta solo con barre vecchie); (9) il risolutore «tutti al carico» non riscala un frazionamento. Prima del revisore,
 la stessa giornata: il portafoglio partiva dal calo dell'ultima riga del registro (02/11, −19,49%) mentre la misura vera
 al 05/11 era −29,83%, a un passo dal salvavita — ora le sedute mancanti si ricostruiscono come nel risolutore. Gate: 4.
+
+
+## v538 — si registra solo a mercato chiuso (06/11/2026)
+Dopo l'analisi del 06/11 la lettura dell'uscita come il destinatario ha trovato un difetto di anticipo nel registro dal
+vivo: il lotto delle 17:32 (borsa di New York aperta) partiva dalla chiusura del 05/11 mentre il rimbalzo del 06/11 era
+già in corso, e 13 previsioni nostre si sono «avverate» lo stesso giorno (AMD «tocca +10%» col titolo già a +10%). Una
+previsione che conosce una parte del suo esito gonfia l'affidabilità misurata: è il futuro che entra nella misura.
+- `previsioni.motivo_sospensione(adesso, B)`: non si registra durante la seduta (9:30-16:00 di New York, zoneinfo) né
+  dopo la chiusura finché le barre di QQQ non contengono la seduta appena chiusa; il motivo si dichiara nell'esito e
+  le previsioni si mostrano lo stesso. Un festivo si legge come seduta mancante: si aspetta, mai il contrario.
+- Pulizia del registro: tolti i 309 record dei metodi propri scritti fra le 14:30 e le 21:00 UTC del 06/11 (i mercati
+  esterni restano: il loro prezzo alla lettura è già la previsione del mercato); riscritti dopo la chiusura i 20 che il
+  lotto pulito aveva saltato perché avevano lo stesso identificativo. Il bilancio dal vivo scende da 20 a 7 SÌ risolti.
+- Gate: 1, sulla strada vera di `pagina()` con un registro finto che conta le scritture (seduta, dopo con dati vecchi,
+  dopo con dati nuovi, sabato, l'apertura con l'ora legale); due iniezioni (ramo tolto, controllo delle barre tolto)
+  mordono entrambe. Pavimento 1120 → 1121.

@@ -11258,6 +11258,52 @@ check("v537 rilievo 10: le fasce senza errore di virgola mobile — 0,3 sta nell
       _AF535.fascia(0.3) == 3 and _AF535.fascia(0.7) == 7 and _AF535.fascia(0.6) == 6 and _AF535.fascia(1.0) == 9
       and _AF535.fascia(0.29999) == 2)
 
+# ═════════ v538 — si registra solo a mercato chiuso, con la seduta appena chiusa nei dati (06/11/2026) ═════════
+def _prova538(PV):
+    """La strada vera di pagina() con un registro finto che conta le chiamate: (esito, dettaglio)."""
+    chiamate = []
+    def _fin(nome):
+        if nome == "registro_previsioni":
+            m = _ty536.SimpleNamespace()
+            m.leggi = lambda **k: {"righe": []}
+            m.registra = lambda nuove, adesso, B=None, **k: chiamate.append(len(nuove)) or {"nuove": len(nuove),
+                                                                                             "gia_presenti": 0}
+            m.risolvi_scadute = lambda B, adesso, rete=False, **k: {"risolte": []}
+            m.bilancio = lambda **k: {}
+            m.n_previsioni = lambda prev: {}
+            m.resa_bilancio = lambda b: []
+            m.resa_risolvi = lambda r: []
+            return m
+        return _finto536(nome)
+    pos = {"AAA": {"tk": "AAA", "qta": 1, "pmc": 90.0, "valuta": "USD"}}
+    Bv = {"QQQ": [{"t": "2026-11-04"}, {"t": "2026-11-05"}]}
+    Bn = {"QQQ": Bv["QQQ"] + [{"t": "2026-11-06"}]}
+    u = _tzv536.utc
+    esiti = {}
+    for nome, B_, ora in (("seduta", Bv, _dtv536(2026, 11, 6, 16, 32, tzinfo=u)),
+                          ("dopo, dati vecchi", Bv, _dtv536(2026, 11, 6, 21, 44, tzinfo=u)),
+                          ("dopo, dati nuovi", Bn, _dtv536(2026, 11, 6, 21, 44, tzinfo=u)),
+                          ("sabato", Bn, _dtv536(2026, 11, 7, 15, 0, tzinfo=u))):
+        n0 = len(chiamate)
+        pg = PV.pagina(B=B_, posiz=pos, adesso=ora, rete=False, moduli=("previsioni_titoli",), importa=_fin)
+        motivi = list(((pg.get("registro") or {}).get("registrate") or {}).get("saltate_cadenza") or {})
+        esiti[nome] = (len(chiamate) > n0, motivi)
+    ok = (esiti["seduta"][0] is False and any("seduta di New York in corso" in x for x in esiti["seduta"][1])
+          and esiti["dopo, dati vecchi"][0] is False
+          and any("2026-11-06" in x for x in esiti["dopo, dati vecchi"][1])
+          and esiti["dopo, dati nuovi"][0] is True and esiti["sabato"][0] is True
+          and PV.mercato_aperto(_dtv536(2026, 11, 6, 14, 29, tzinfo=u)) is False
+          and PV.mercato_aperto(_dtv536(2026, 11, 6, 14, 30, tzinfo=u)) is True
+          and PV.mercato_aperto(_dtv536(2026, 7, 6, 13, 30, tzinfo=u)) is True
+          and PV.ultima_seduta_conclusa(_dtv536(2026, 11, 9, 13, 0, tzinfo=u)) == "2026-11-06")
+    return ok, esiti
+
+
+_ok538, _es538 = _prova538(_PV536)
+check("v538 si registra solo a mercato chiuso: in seduta, e dopo la chiusura finche' le barre non contengono la seduta "
+      "appena chiusa, il registro NON scrive e dice perche'; con la seduta nei dati, e di sabato, scrive; l'apertura delle "
+      "9:30 di New York segue l'ora legale (zoneinfo, v470): " + str(_es538), _ok538)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

@@ -26,7 +26,7 @@ Uso:
 import importlib
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 QUI = os.path.dirname(os.path.abspath(__file__))
@@ -41,6 +41,11 @@ ROMA = ZoneInfo("Europe/Rome")
 #   giorno); un mercato ESTERNO si registra una volta sola, alla prima lettura (la sua affidabilita' storica la misura gia'
 #   mercati_previsione sui mercati chiusi). Convenzione dichiarata (v240), riletta da un gate da LIBRO.md §1septdecies.
 CADENZA = 20
+# v538 — si registra SOLO a mercato chiuso: durante la seduta la finestra di ogni evento parte dall'ultima chiusura, ma
+#   una parte dell'esito (il movimento di oggi) e' gia' nota — il 06/11 alle 17:32 «AMD tocca +10% entro 20 sedute» e'
+#   stato registrato col titolo gia' a +10%, e si e' «avverato» lo stesso giorno. Le previsioni si mostrano lo stesso.
+#   Lo stesso vale DOPO la chiusura finche' le barre non contengono la seduta appena chiusa (motivo_sospensione).
+APERTURA_NY, CHIUSURA_NY = (9, 30), (16, 0)
 ESTERNI = ("polymarket", "kalshi", "fedwatch")
 RIFERIMENTO_SEDUTE = "QQQ"
 MODULI = ("previsioni_titoli", "previsioni_opzioni", "previsioni_portafoglio", "previsioni_macro", "mercati_previsione")
@@ -99,6 +104,38 @@ def esegui_modulo(nome, B, posiz, adesso, rete=True, importa=importlib.import_mo
     return dict(out, stato="letto", previsioni=list(prev or []), righe=righe, assenze=ass)
 
 
+def mercato_aperto(adesso):
+    """La seduta di New York in corso (giorni feriali, 9:30-16:00 ora di New York con zoneinfo, v470; le festivita' non
+    sono note e un giorno festivo si legge «aperto»: si registra il giorno dopo, mai un esito gia' noto)."""
+    ny = adesso.astimezone(ZoneInfo("America/New_York"))
+    return ny.weekday() < 5 and APERTURA_NY <= (ny.hour, ny.minute) < CHIUSURA_NY
+
+
+def ultima_seduta_conclusa(adesso):
+    """La data (AAAA-MM-GG, New York) dell'ultima seduta feriale gia' chiusa alle 16:00 di New York."""
+    ny = adesso.astimezone(ZoneInfo("America/New_York"))
+    g = ny.date()
+    if ny.weekday() >= 5 or (ny.hour, ny.minute) < CHIUSURA_NY:
+        g -= timedelta(days=1)
+    while g.weekday() >= 5:
+        g -= timedelta(days=1)
+    return g.isoformat()
+
+
+def motivo_sospensione(adesso, B):
+    """Perche' oggi non si registra (None = si registra). Due casi, v538: la seduta in corso, o le barre del riferimento
+    che non contengono ancora l'ultima seduta conclusa: in entrambi la previsione partirebbe da una chiusura vecchia
+    con una parte dell'esito gia' nota. Un festivo si legge come seduta mancante: si aspetta, mai il contrario."""
+    if mercato_aperto(adesso):
+        return "seduta di New York in corso: si registra solo a mercato chiuso (una parte dell'esito e' gia' nota)"
+    giorni = [str(b.get("t", ""))[:10] for b in (B or {}).get(RIFERIMENTO_SEDUTE) or [] if isinstance(b, dict)]
+    ultima, attesa = (max(giorni) if giorni else None), ultima_seduta_conclusa(adesso)
+    if not ultima or ultima < attesa:
+        return (f"le barre di {RIFERIMENTO_SEDUTE} finiscono il {ultima or '(nessuna barra)'} e la seduta del {attesa} "
+                "e' conclusa: si registra quando i dati la contengono (un festivo si legge come seduta mancante)")
+    return None
+
+
 def da_registrare(previsioni, esistenti, B):
     """(da registrare, saltate per motivo) secondo la cadenza: un mercato esterno solo se la sua chiave non c'e' gia'; un
     metodo proprio solo se dalla sua ultima fotografia sono passate almeno CADENZA sedute (contate sulle barre del
@@ -141,7 +178,11 @@ def pagina(B=None, posiz=None, adesso=None, rete=True, registra=True, moduli=MOD
     try:
         R = importa("registro_previsioni")
         kw = {"percorso": percorso} if percorso else {}
-        if registra:
+        sospesa = motivo_sospensione(adesso, B) if registra else None
+        if sospesa:
+            reg_esito = {"nuove": 0, "gia_presenti": 0, "saltate_cadenza": {sospesa: len(tutte)}}
+            ris = R.risolvi_scadute(B, adesso, rete=rete, **kw)
+        elif registra:
             esistenti = R.leggi(**kw).get("righe") or []
             nuove, saltate = da_registrare(tutte, esistenti, B)
             reg_esito = R.registra(nuove, adesso, B=B, **kw)
@@ -186,7 +227,7 @@ def resa(pg):
             L.append(f"  registrate oggi {r.get('nuove', 0)} nuove · gia' presenti {r.get('gia_presenti', 0)}"
                      + (f" · scartate {len(r.get('scartate') or [])}" if r.get("scartate") else ""))
             for motivo, n in sorted((r.get("saltate_cadenza") or {}).items()):
-                L.append(f"  non registrate per la cadenza: {n} — {motivo}")
+                L.append(f"  non registrate: {n} — {motivo}")
         L += [f"  {x}" if not str(x).startswith("  ") else str(x) for x in _righe(reg["righe_risolvi"])]
         L += [f"  {x}" if not str(x).startswith("  ") else str(x) for x in _righe(reg["righe"])]
         from statistica import _n

@@ -1312,7 +1312,8 @@ affidabilità si misurerà solo dal vivo. Famiglie: titoli, portafoglio, macro, 
 Convenzioni comuni (v240), in `scripts/affidabilita.py` e rilette da un gate: fasce di calibrazione larghe **10** punti;
 intervallo di Wilson al **95**%; una fascia con meno di **20** previsioni risolte non si legge; un metodo con meno di
 **100** previsioni risolte ha un'affidabilità «non ancora solida»; nel registro dal vivo i metodi propri registrano una
-fotografia ogni **20** sedute e un mercato esterno una volta sola. Le convenzioni dei singoli metodi stanno in testa ai
+fotografia ogni **20** sedute e un mercato esterno una volta sola; si registra solo a mercato
+chiuso e con la seduta appena chiusa nei dati (v538: in seduta una parte dell'esito è già nota). Le convenzioni dei singoli metodi stanno in testa ai
 loro moduli (previsioni_titoli, previsioni_opzioni, previsioni_portafoglio, previsioni_macro, mercati_previsione).
 
 ⚠ Quello che la misura ha detto subito (06/11/2026): i casi simili sui prezzi sono calibrati ma NON battono la base — il
