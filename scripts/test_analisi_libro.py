@@ -7014,6 +7014,9 @@ _U505 = {
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
                     "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
                     "letture: 0 nuove in questo giro"],
+    # v536 — le previsioni: un blocco solo, nella sua sezione
+    "previsioni": ["PREVISIONI (v536) — 06/11/2026 17:00 ora italiana · eccezione MISURATA alla regola 1 (CEO, 03/11/2026)",
+                   "  236 previsioni di oggi da 5 moduli su 5"],
     # v533 — il laboratorio in tre righe: un blocco solo, nella sua sezione
     "laboratorio": ["LABORATORIO IN TRE RIGHE (v533) — 03/11/2026 14:29 ora italiana · il dettaglio: python3 scripts/laboratorio.py",
                     "  giorni peggiori: nel 5% dei giorni peggiori dell'ultimo anno il portafoglio di oggi ha perso in media 6,3% al giorno"],
@@ -11125,6 +11128,101 @@ check("v534 i feed: la data senza fuso di investing.com si legge in UTC, la data
       and _v534.get("Due") is not None and _v534["Due"].astimezone(_utc534.utc).isoformat() == "2026-11-03T13:00:00+00:00"
       and "Tre" in _v534 and _v534["Tre"] is None
       and any("investing.com" in u for _n, u, _g in _BR534.NEWS_MACRO))
+
+# ═════════ v535 — la fondazione del sistema previsionale: l'affidabilita' misurata (CEO, 03/11/2026) ═════════
+import affidabilita as _AF535
+for _n535, _e535, _d535 in _AF535.verifiche():
+    check("v535 affidabilita': " + _n535, bool(_e535), _d535)
+
+# ═════════ v536 — il sistema previsionale: i moduli dello sciame e il loro collegamento (CEO, 03/11/2026) ═════════
+import importlib as _il536
+import types as _ty536
+for _m536 in ("previsioni_titoli", "previsioni_opzioni", "previsioni_portafoglio", "previsioni_macro",
+              "mercati_previsione", "registro_previsioni"):
+    try:
+        _v536 = _il536.import_module(_m536).verifiche()
+    except Exception as _e536:  # noqa: BLE001 — un modulo che non si importa cade col suo nome (v407)
+        _v536 = [("si importa e si prova", False, f"{type(_e536).__name__}: {str(_e536)[:120]}")]
+    for _n536, _x536, _d536 in _v536:
+        check(f"v536 {_m536}: {_n536}", bool(_x536), str(_d536)[:300])
+
+import previsioni as _PV536
+from datetime import datetime as _dtv536, timezone as _tzv536
+
+
+def _finto536(nome):
+    """Un modulo finto: i titoli rispondono con un record, le opzioni vanno in errore, il registro non c'e'."""
+    if nome == "previsioni_titoli":
+        _AF = _il536.import_module("affidabilita")
+        m = _ty536.SimpleNamespace()
+        m.calibrazione = lambda B, adesso=None: {}
+        m.previsioni_oggi = lambda B, posiz, adesso: [_AF.previsione(
+            "titoli", "AAA", "AAA sopra 100 fra 20 sedute", 0.6, "casi_simili",
+            _AF.evento_prezzo("AAA", "chiude_sopra", 100.0, "2026-11-02", 20), base=0.55, n=300,
+            scritto="2026-11-03T10:00+00:00")]
+        m.resa = lambda prev, cal: ["AAA sopra 100 fra 20 sedute: 60%"]
+        return m
+    if nome == "previsioni_opzioni":
+        m = _ty536.SimpleNamespace()
+        m.calibrazione_lognormale = lambda B, adesso=None: (_ for _ in ()).throw(RuntimeError("catena assente"))
+        return m
+    raise ImportError(f"{nome} assente nella prova")
+
+
+_pg536 = _PV536.pagina(B={}, posiz={"AAA": {"tk": "AAA", "qta": 1, "pmc": 90.0, "valuta": "USD"}},
+                       adesso=_dtv536(2026, 11, 3, 10, 0, tzinfo=_tzv536.utc), rete=False,
+                       moduli=("previsioni_titoli", "previsioni_opzioni", "previsioni_macro"), importa=_finto536)
+_rs536 = _PV536.resa(_pg536)
+_st536 = {e["modulo"]: e["stato"] for e in _pg536["esiti"]}
+check("v536 l'orchestratore: un modulo in errore e uno che non si importa si DICHIARANO col perche' e non spengono gli "
+      "altri (v389); il registro che manca si dice; la resa apre con l'eccezione alla regola 1 e i metodi affiancati: "
+      + str(_st536),
+      _st536 == {"previsioni_titoli": "letto", "previsioni_opzioni": "non eseguito", "previsioni_macro": "non eseguito"}
+      and _pg536["n_oggi"] == 1 and _pg536["registro"] is None and "registro non eseguito" in (_pg536["perche_registro"] or "")
+      and "catena assente" in _rs536 and "assente nella prova" in _rs536 and "⚠ NON ESEGUITO" in _rs536
+      and "eccezione MISURATA alla regola 1" in _rs536 and "mai mediati (v200)" in _rs536
+      and _rs536.startswith("PREVISIONI (v536)"))
+
+# la cadenza del registro: un mercato esterno una volta sola; un metodo proprio una fotografia ogni CADENZA sedute
+_AFc536 = _il536.import_module("affidabilita")
+def _r536(giorno, metodo, chiave):
+    p = _AFc536.previsione("titoli", "AAA", chiave, 0.5, metodo, {}, scritto=f"{giorno}T10:00+00:00")
+    return dict(p, chiave=chiave)
+_Bq536 = {"QQQ": [{"t": f"2026-10-{d:02d}"} for d in range(1, 32)] + [{"t": f"2026-11-{d:02d}"} for d in range(1, 7)]}
+_es536 = [_r536("2026-10-20", "casi_simili", "x"), _r536("2026-10-01", "polymarket", "m1")]
+_ok536, _sa536 = _PV536.da_registrare([_r536("2026-11-06", "casi_simili", "y"), _r536("2026-11-06", "polymarket", "m1"),
+                                        _r536("2026-11-06", "polymarket", "m2"), _r536("2026-11-06", "lognormale", "z")],
+                                       _es536, _Bq536)
+_ok536b, _ = _PV536.da_registrare([_r536("2026-11-06", "casi_simili", "y")], [_r536("2026-09-01", "casi_simili", "x")], _Bq536)
+check("v536 la cadenza del registro: il mercato gia' visto non rientra, quello nuovo si'; un metodo proprio fotografato "
+      "meno di 20 sedute fa aspetta, uno mai fotografato entra, uno fotografato oltre 20 sedute fa rientra: " + str(_sa536),
+      sorted((p["metodo"], p["chiave"]) for p in _ok536) == [("lognormale", "z"), ("polymarket", "m2")]
+      and sum(_sa536.values()) == 2 and len(_ok536b) == 1)
+
+_cm536 = {f: [c[1] for c in _AN528.comandi(f)] for f in ("pre-market", "seduta", "after-hours", "chiuso")}
+_cl536 = (Path(__file__).resolve().parent.parent / "CLAUDE.md").read_text(encoding="utf-8")
+_ag536 = (Path(__file__).resolve().parent.parent / ".claude" / "commands" / "aggiorna.md").read_text(encoding="utf-8")
+check("v536 collegamenti: il comando unico esegue le previsioni in ogni fase PRIMA della sintesi e committa il registro "
+      "dal vivo; la scheda ha sezione, catalogo e voce; il formato lo strumento e la chiave; /aggiorna dichiara ogni modulo "
+      "nuovo; CLAUDE.md porta l'eccezione alla regola 1",
+      all(["previsioni.py", "pagina"] in v and v.index(["previsioni.py", "pagina"]) < v.index(["sintesi.py", "--registra"])
+          for v in _cm536.values()) and "previsioni.py" in _AN528.STRUMENTI
+      and any(p.name == "previsioni.jsonl" for p in _AN528.MEMORIE)
+      and "previsioni" in SC.CATALOGO and "previsioni" in SC.REGISTRO and "previsioni" in [x[0] for x in SC.SEZIONI]
+      and "`[previsioni]`" in _fmt528 and "`python3 scripts/previsioni.py pagina`" in _fmt528
+      and all(f"`scripts/{n}` resta **fuori**" in _ag536 for n in (
+          "previsioni.py", "previsioni_titoli.py", "previsioni_opzioni.py", "previsioni_portafoglio.py",
+          "previsioni_macro.py", "mercati_previsione.py", "registro_previsioni.py", "affidabilita.py"))
+      and "**Eccezione misurata (03/11/2026)**" in _cl536)
+
+_s536 = _lib474[_lib474.find("## 1septdecies"):_lib474.find("\n## ", _lib474.find("## 1septdecies") + 1)]
+_c536 = _s536[_s536.find("Convenzioni comuni (v240)"):]
+_c536 = _c536[:_c536.find("\n\n")]
+_nn536 = tuple(int(x) for x in re.findall(r"\*\*(\d+)\*\*", _c536))
+check("v536 le convenzioni comuni delle previsioni stanno nel libro (§1septdecies) e coincidono con affidabilita.py: "
+      + str(_nn536),
+      _nn536 == (round(_AF535.LARGHEZZA_FASCIA * 100), 95, _AF535.MIN_FASCIA, _AF535.MIN_VALUTAZIONE, _PV536.CADENZA)
+      and abs(_AF535.Z - 1.96) < 1e-9)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

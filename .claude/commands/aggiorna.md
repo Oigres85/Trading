@@ -213,6 +213,24 @@ dell'analisi in chat e la prova d'ingresso che si lancia prima di un'operazione 
 dei nomi seguiti — e la sua modalità `ingresso --registra` scrive una memoria (`memoria/diario_ingressi.jsonl`): questo
 comando legge, non scrive.
 
+`scripts/previsioni.py` resta **fuori** (v536): il sistema previsionale dell'analisi in chat (v536, LIBRO.md §1septdecies): unisce i moduli e scrive il registro dal vivo `memoria/previsioni.jsonl` — questo comando legge, non scrive.
+
+`scripts/previsioni_titoli.py` resta **fuori** (v536): le probabilità di prezzo dai casi simili (v536), un modulo di `previsioni.py` — questo comando legge, non scrive.
+
+`scripts/previsioni_opzioni.py` resta **fuori** (v536): le probabilità del modello lognormale e delle opzioni (v536), un modulo di `previsioni.py` — questo comando legge, non scrive.
+
+`scripts/previsioni_portafoglio.py` resta **fuori** (v536): le probabilità del portafoglio dalla simulazione a blocchi (v536), un modulo di `previsioni.py` — questo comando legge, non scrive.
+
+`scripts/previsioni_macro.py` resta **fuori** (v536): le probabilità del semaforo dalle serie FRED (v536), un modulo di `previsioni.py` — questo comando legge, non scrive.
+
+`scripts/mercati_previsione.py` resta **fuori** (v536): quanto pagano Polymarket, Kalshi e FedWatch e la loro affidabilità storica (v536), un modulo di `previsioni.py` — questo comando legge, non scrive.
+
+`scripts/registro_previsioni.py` resta **fuori** (v536): il registro dal vivo delle previsioni (v536): registra, risolve e misura, e scrive `memoria/previsioni.jsonl` — questo comando legge, non scrive.
+
+`scripts/affidabilita.py` resta **fuori** (v535): è la misura comune dell'affidabilità delle previsioni (Brier, abilità contro
+la base, fasce di calibrazione, quante se ne avverano su n) e lo schema dei loro record — un modulo senza esecuzione propria,
+le cui prove girano nella suite.
+
 `scripts/laboratorio.py` resta **fuori** (v532): è il laboratorio del portafoglio su richiesta del CEO — nove
 librerie open source, una domanda ciascuna (LIBRO.md §1sexdecies) — e chiede librerie che la pipeline non installa
 (`scripts/requirements_laboratorio.txt`) e minuti di calcolo: si lancia quando il CEO lo chiede, non a ogni aggiornamento.
@@ -244,7 +262,7 @@ in `memoria/cds_sessione.jsonl`: questo comando legge, non scrive.
 
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
 e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e `fonti_titoli.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
-`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py`, `concorrenti.py`, `statistica.py` e `laboratorio.py` (le tre righe), già dichiarati fuori qui con la loro ragione, poi
+`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py`, `concorrenti.py`, `statistica.py`, `laboratorio.py` (le tre righe) e `previsioni.py`, già dichiarati fuori qui con la loro ragione, poi
 `stato_sistema.py` (eseguito anche qui, al passo 3bis), e chiude con la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 

@@ -221,6 +221,13 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    portafoglio di oggi e chi porta quel rischio (Riskfolio-Lib), il regime di SMH e QQQ da due stati sui cinque anni
    (hmmlearn), la volatilità di adesso contro la media lunga del modello (arch). Stime e misure, mai proiezioni; il
    dettaglio delle nove librerie è `python3 scripts/laboratorio.py`, su richiesta. Convenzioni in `LIBRO.md` §1sexdecies.
+8quinquies. `python3 scripts/previsioni.py pagina` (v536, CEO, 03/11/2026: il sistema previsionale «stile Polymarket», con
+   l'**eccezione misurata** alla regola 1) — le **previsioni**: per titoli, QQQ e SMH, portafoglio, macro e mercati di
+   previsione, ogni evento con la sua probabilità, la base, l'intervallo e l'affidabilità misurata sul passato senza
+   futuro («quando il metodo ha detto 60-70%, è successo il …%»), i metodi AFFIANCATI e mai mediati (v200): casi simili,
+   lognormale, opzioni, simulazione, serie storiche, Polymarket/Kalshi/FedWatch. Registra le previsioni nel registro dal
+   vivo (`memoria/previsioni.jsonl`), risolve le scadute e dice l'affidabilità dal vivo e quante se ne attendono su n.
+   Regola e convenzioni in `LIBRO.md` §1septdecies.
 8bis. `python3 scripts/sintesi.py --registra` (v524, CEO, 31/10/2026: *"Procedi su tutto"*) — gira DOPO gli strumenti
    del giro e prima dello stato del sistema: **non ricalcola niente**, incrocia ciò che numeri_libro, rotazione, indici
    e posizionamento hanno scritto in `memoria/dati/giro/` (la variabile TRADING_GIRO, una lettura per analisi) con la
@@ -254,6 +261,9 @@ nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA
    un'operazione in vista la sua prova d'ingresso coi numeri — valore atteso in R e variante «aspetta la conferma».
    Dove la statistica non distingue dal caso lo si dice in una parola: è un'informazione, non un vuoto. Sotto, **il
    laboratorio in tre righe** (v533): i giorni peggiori e chi li porta, il regime di SMH e QQQ, la volatilità di adesso.
+   Poi **le previsioni** (v536, l'eccezione misurata alla regola 1), in un blocco SEPARATO dai fatti: per famiglia le
+   probabilità che contano oggi, ognuna col metodo, la base e la sua affidabilità misurata (e se il metodo batte la
+   base); i metodi affiancati, mai una media; quante se ne attendono su n; l'affidabilità dal vivo dal registro.
 1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso — scritto
    dopo aver letto tutto il resto.
 2. **Il regime: le sei luci**, una riga ciascuna col colore, il perché e i dati che la compongono, con la freccia se è
@@ -683,6 +693,8 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
   diario che misura l'intuito contro la statistica (01/11)
 - `[laboratorio]` il laboratorio in tre righe in ogni analisi: la perdita media nel 5% dei giorni peggiori e chi la
   porta, il regime di SMH e QQQ, la volatilità di adesso (03/11; il dettaglio delle nove librerie su richiesta)
+- `[previsioni]` il sistema previsionale: per ogni evento la probabilità, la base, l'intervallo e la % di affidabilità
+  misurata (sul passato senza futuro, poi dal vivo), coi metodi affiancati; «% di raggiungimento di n previsioni» (03/11)
 - `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)
 
 Una richiesta nuova si aggiunge qui E nel REGISTRO di `scripts/scheda.py`, nello stesso giorno in cui diventa uno

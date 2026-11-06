@@ -72,8 +72,8 @@ TITOLO_RISPOSTA = "## La risposta in chat"     # v524 — l'ordine della rispost
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
 STRUMENTI = ("fonti_dirette.py", "fonti_titoli.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py",
-             "posizionamento.py", "indici.py", "concorrenti.py", "statistica.py", "laboratorio.py", "sintesi.py",
-             "stato_sistema.py")
+             "posizionamento.py", "indici.py", "concorrenti.py", "statistica.py", "laboratorio.py", "previsioni.py",
+             "sintesi.py", "stato_sistema.py")
 # v511 — fonti_dirette.py gira PRIMA degli altri, da solo: scrive la lettura alla fonte del giro che gli altri riusano
 #   (una lettura per analisi, la stessa osservazione per tutti), e stampa il blocco FRESCHEZZA DEI DATI
 # v512 — e con lui, in parallelo, fonti_titoli.py: analisti, FedWatch, CDS, vendite allo scoperto, depositi SEC e trimestri
@@ -97,6 +97,8 @@ MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzi
            RADICE / "memoria" / "cds_sessione.jsonl",
            # v517 — le menzioni di WallStreetBets: la fonte pubblica solo le ultime 24 ore, lo storico si raccoglie qui
            RADICE / "memoria" / "wsb.jsonl",
+           # v536 — il registro dal vivo delle previsioni: l'affidabilita' si misura solo se le righe restano
+           RADICE / "memoria" / "previsioni.jsonl",
            # v524 — la fotografia di ogni analisi (luci, caselle, esiti): le frecce di cambiamento partono da qui
            RADICE / "memoria" / "registro_analisi.jsonl")
 LIMITE_SECONDI = 600
@@ -156,6 +158,8 @@ def comandi(f, sedute=1):
               "(v528)", ["statistica.py", "pagina"]))
     c.append(("LABORATORIO IN TRE RIGHE — i giorni peggiori e chi li porta, il regime, la volatilita' di adesso (v533)",
               ["laboratorio.py", "riassunto"]))
+    c.append(("PREVISIONI — probabilita' per titoli, portafoglio, macro e mercato, coi metodi affiancati e l'affidabilita' "
+              "misurata: l'eccezione alla regola 1 (v536)", ["previsioni.py", "pagina"]))
     c.append(("SINTESI OPERATIVA — il regime in sei luci, il libro nel regime, la mappa tesi × prezzo, cosa e' cambiato, "
               "l'agenda e le azioni delle regole", ["sintesi.py", "--registra"]))
     c.append(("STATO DEL SISTEMA — codice e test, pipeline su GitHub, dati del giro, dipendenze da GitHub con la loro "

@@ -9749,3 +9749,35 @@ La trappola trovata provando la strada vera: investing.com scrive la data «AAAA
 fresca. `brief.data_senza_fuso` la legge in UTC: misurato, la voce più recente di «All News» stava 17 minuti prima
 dell'ora UTC (in ora di Roma 77 minuti su tutti i feed insieme, in ora di New York nel futuro). Il CEO usa investing.com
 solo per la watchlist: la fonte resta LIBRO.md §1bis. Gate: 1.
+
+## v535 — La fondazione del sistema previsionale (03/11/2026, pubblicata il 06/11)
+
+Il CEO ha chiesto un sistema previsionale «stile Polymarket» (una probabilità per evento e la % di affidabilità) e ha
+scelto l'eccezione MISURATA alla regola 1: previsioni solo come probabilità, separate dai fatti, con l'affidabilità
+misurata prima sul passato senza futuro e poi dal vivo; metodi affiancati, mai mediati. Prima dello sciame di agenti nasce
+`scripts/affidabilita.py`, la misura comune (v161): Brier, base senza futuro, abilità (Brier skill score), fasce di
+calibrazione con Wilson al 95% («quando il metodo dice 65%, succede 65 volte su 100?»), errore di calibrazione, quante se
+ne avverano su n (Poisson-binomiale, con l'avvertenza sull'indipendenza), e lo schema dei record col `risolutore` che
+rende ogni evento risolvibile dai dati. Lo sciame (sei agenti) si è fermato il 03/11 sul limite settimanale del piano,
+prima di scrivere un file; riparte il 06/11. La fondazione si pubblica da sola, con le sue sette prove nella suite.
+
+## v536 — Il sistema previsionale: sei moduli dello sciame, l'orchestratore, il registro dal vivo (06/11/2026)
+
+Lo sciame (sei agenti, ripartiti il 06/11 dopo il limite settimanale) ha consegnato sei moduli, ognuno una domanda e un
+metodo, tutti misurati con `affidabilita.py`: `previsioni_titoli` (casi simili con la soglia in unità di volatilità),
+`previsioni_opzioni` (lognormale con la volatilità realizzata, calibrato; opzioni CBOE neutrali al rischio, solo dal
+vivo), `previsioni_portafoglio` (bootstrap a blocchi della riga intera dei rendimenti: salvavita, ritorno al massimo,
+rami secchi insieme), `previsioni_macro` (serie FRED: VIX, credito, decennale), `mercati_previsione` (Polymarket, Kalshi,
+FedWatch e la calibrazione storica di Polymarket su 392 mercati chiusi), `registro_previsioni` (il dal vivo). Li unisce
+`previsioni.py`, passo del comando unico prima della sintesi (`previsioni.py pagina`). Ogni agente ha validato le sue
+prove con un'iniezione che morde; le loro prove girano nella suite da un punto solo.
+Quello che la misura ha detto subito: i casi simili sui prezzi sono calibrati ma NON battono la base (l'informazione sta
+nella volatilità, non nello stato); il lognormale batte la base sui tocchi ma sottostima i rialzi (deriva zero); la
+simulazione del portafoglio batte la base fino a 120 sedute e fa peggio oltre; VIX sì, decennale no; CCC e high yield
+hanno su FRED solo tre anni (non disponibile); Polymarket è ben calibrato (a 30 giorni abilità +0,46, ECE 0,025), con le
+fasce centrali ancora sotto i 20 casi.
+Trappola dell'integrazione: i moduli dei titoli vogliono le posizioni come ELENCO (brief.leggi_libro), quello del
+portafoglio come DIZIONARIO (statistica.universo) — la conversione sta nell'orchestratore, una volta sola. Trappola del
+registro: la prima lettura vera ha registrato 893 previsioni (555 di Polymarket, 1 MB): un registro che cresce di un mega
+al giorno nel repository pubblico. Nasce la CADENZA (§1septdecies, gate): i metodi propri una fotografia ogni 20 sedute,
+un mercato esterno una volta sola. Il CEO ha scelto l'eccezione misurata alla regola 1 (CLAUDE.md, istruzione 1).

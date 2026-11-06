@@ -215,7 +215,12 @@ const SUITE = [
      libreria assente, salvavita sul passato, regimi, convenzioni rilette dal libro) -> 1107 */
   /* v533: 1119 punti di chiamata in test_analisi_libro (+2 sulle tre righe del laboratorio e i loro collegamenti) -> 1109 */
   /* v534: 1120 punti di chiamata in test_analisi_libro (+1 sulle date dei feed di investing.com) -> 1110 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1110, firma: /\d+\/\d+ CHECK OK/ },
+  /* v535: 1121 punti di chiamata in test_analisi_libro (+1: le prove della fondazione dell'affidabilita', sette controlli
+     eseguiti da un punto solo) -> 1111 */
+  /* v536: 1126 punti di chiamata in test_analisi_libro (+5: le prove dei sei moduli dello sciame da un punto solo,
+     l'orchestratore che dichiara i moduli mancanti, la cadenza del registro, i collegamenti, le convenzioni comuni rilette
+     dal libro) -> 1116 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1116, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

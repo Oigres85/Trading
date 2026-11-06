@@ -1299,6 +1299,29 @@ anche sopravvissuti. I pesi dei modelli (diversificazione gerarchica, minimo ris
 concentrazione, non un ordine (v439). Volatilità e regime sono stime dello stato di adesso di un modello, non previsioni
 (CLAUDE.md, istruzione 1).
 
+## 1septdecies. LE PREVISIONI — l'eccezione misurata alla regola 1 (v535-v536, decisione del CEO del 03/11/2026)
+
+Il CEO ha chiesto un sistema previsionale «stile Polymarket» — per ogni evento la probabilità e la % di affidabilità,
+«% di raggiungimento di n previsioni» — e alla domanda su come riconciliarlo con la sua regola 1 («nessuna proiezione»)
+ha scelto l'**eccezione misurata**: le previsioni entrano SOLO come probabilità, in un blocco separato dai fatti, ognuna
+col suo metodo, la sua base, il suo intervallo e l'affidabilità MISURATA — prima sul passato senza futuro (walk-forward:
+alla data t solo esiti noti entro t), poi dal vivo dal registro `memoria/previsioni.jsonl`. I metodi stanno affiancati,
+mai mediati (v200). Un metodo che non batte la base lo dice; un metodo senza storia (le opzioni) dice che la sua
+affidabilità si misurerà solo dal vivo. Famiglie: titoli, portafoglio, macro, mercato.
+
+Convenzioni comuni (v240), in `scripts/affidabilita.py` e rilette da un gate: fasce di calibrazione larghe **10** punti;
+intervallo di Wilson al **95**%; una fascia con meno di **20** previsioni risolte non si legge; un metodo con meno di
+**100** previsioni risolte ha un'affidabilità «non ancora solida»; nel registro dal vivo i metodi propri registrano una
+fotografia ogni **20** sedute e un mercato esterno una volta sola. Le convenzioni dei singoli metodi stanno in testa ai
+loro moduli (previsioni_titoli, previsioni_opzioni, previsioni_portafoglio, previsioni_macro, mercati_previsione).
+
+⚠ Quello che la misura ha detto subito (06/11/2026): i casi simili sui prezzi sono calibrati ma NON battono la base — il
+grosso dell'informazione sta nella volatilità del titolo, non nel suo stato; il lognormale batte la base sui tocchi
+(+10%/−10%, il carico) ma sottostima i rialzi e sovrastima i ribassi (deriva zero); la simulazione del portafoglio batte la
+base fino a 120 sedute e fa PEGGIO oltre; sul VIX le serie storiche battono la base, sul decennale no; CCC e high yield
+hanno su FRED solo tre anni di storia (non disponibile). Gli eventi non sono indipendenti: «quante se ne avverano» è più
+disperso di quanto dica il conto. L'universo sono i nomi seguiti oggi: sopravvissuti.
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da
