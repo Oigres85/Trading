@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-11-05",
+ "aggiornato": "2026-11-06",
  "per_titolo": {
   "AAPL": {
    "carta_commerciale": {
@@ -1315,27 +1315,27 @@
   "SMCI": {
    "cik": 1375365,
    "deposito": {
-    "accn": "0001375365-26-000022",
-    "data": "2026-08-31",
-    "forma": "10-K",
-    "periodo": "2026-06-30"
+    "accn": "0001375365-26-000027",
+    "data": "2026-11-06",
+    "forma": "10-Q",
+    "periodo": "2026-09-30"
    },
    "derivati_tassi": {
     "n": 0,
     "voci": []
    },
-   "letto_il": "2026-10-18",
+   "letto_il": "2026-11-06",
    "scadenze": {
-    "al": "2026-06-30",
-    "depositato": "2026-08-31",
-    "forma": "10-K",
+    "al": "2026-09-30",
+    "depositato": "2026-11-06",
+    "forma": "10-Q",
     "valuta": "USD",
     "voci": {
-     "anno_2": 6061000.0,
-     "anno_3": 5381000.0,
-     "anno_4": 4932000.0,
-     "anno_5": 2000000000.0,
-     "entro_12_mesi": 2039774000.0
+     "anno_2": 5393000.0,
+     "anno_3": 4943000.0,
+     "anno_4": 2000000000.0,
+     "entro_12_mesi": 5393000.0,
+     "resto_esercizio": 1961342000.0
     }
    },
    "stantii": {
