@@ -394,11 +394,17 @@ def calibrazione(B, passo=PASSO, veicoli=None, adesso=None, percorso=CACHE, usa_
     previsione e' anch'essa contata col solo passato. Salvata in memoria/dati (fuori da git) e riusata per 24 ore se
     le convenzioni sono le stesse."""
     adesso = adesso or datetime.now(timezone.utc)
+    # v537 (revisore, rilievo 8): la calibrazione si fa sullo STESSO universo delle previsioni di oggi (i veicoli di
+    #   quotazione tagliati come in previsioni_oggi) e la cache vale solo per quello: universo e veicoli nella chiave
+    veicoli = veicoli_pipeline() if veicoli == "pipeline" else (veicoli or {})
+    import hashlib
+    chiave_dati = hashlib.sha256(repr(_impronta(B, veicoli)).encode()).hexdigest()
     if usa_cache and percorso:
         try:
             c = json.load(open(percorso, encoding="utf-8"))
             eta = (adesso - datetime.fromisoformat(c["scritto"])).total_seconds() / 3600
-            if 0 <= eta < VALIDITA_ORE and c.get("convenzioni") == _convenzioni() and c.get("passo") == passo:
+            if (0 <= eta < VALIDITA_ORE and c.get("convenzioni") == _convenzioni() and c.get("passo") == passo
+                    and c.get("universo") == chiave_dati):
                 c["riusata"] = True
                 return c
         except Exception:
@@ -432,6 +438,7 @@ def calibrazione(B, passo=PASSO, veicoli=None, adesso=None, percorso=CACHE, usa_
             pf[et] = {k: v[k] for k in ("n", "avverate", "brier", "brier_base", "abilita", "ece")}
         per_fascia[g] = pf
     out = {"scritto": adesso.isoformat(timespec="seconds"), "passo": passo, "convenzioni": _convenzioni(),
+           "universo": chiave_dati,
            "metodo": METODO, "universo": sorted(U.titoli), "non_letti": sorted(U.non_letti),
            "dal": min(date) if date else None, "al": max(date) if date else None,
            "fino_al": max((T.t[-1] for T in U.titoli.values()), default=None),
@@ -568,7 +575,7 @@ def resa(previsioni, calibrazione):
         x = pp[0]["extra"]
         L.append(f"  {tk:5} {_n(x['prezzo'], 2)} al {_data_it(pp[0]['risolutore']['dal'])[:5]} ({x['stato']}) · "
                  + " · ".join(f"{_breve(p)}: {_pc(p['probabilita'])} [{_pc(p['intervallo'][0])}-{_pc(p['intervallo'][1])}]"
-                              f" base {_pc(p['base'])} n {p['n']}" for p in pp))
+                              f" base a pari volatilita' {_pc(p['base'])} n {p['n']}" for p in pp))
         aff = []
         for p in pp:
             f = A.fascia_di(p["probabilita"], val.get(p["extra"]["gruppo"]))

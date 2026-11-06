@@ -220,6 +220,14 @@ def previsioni_oggi(B, posiz, adesso=None, righe=None, calib=None, percorsi=PERC
         righe, rotte = NL.leggi_registro()
         if rotte:
             out.assenze.append(f"registro della performance: {rotte} righe illeggibili, contate e lasciate fuori")
+    # v536 — la partenza e' la misura fino all'ULTIMA seduta conclusa, non all'ultima riga scritta del registro: il 06/11
+    #   la riga piu' recente era del 02/11 (-19,49%) e la misura vera al 05/11 era -29,83%, a un passo dal salvavita.
+    #   Le sedute che mancano si ricostruiscono come nel risolutore (una regola sola, v161), e si dice.
+    cal_b = [str(b.get("t"))[:10] for b in ((B or {}).get(CALENDARIO) or []) if b.get("c")]
+    if righe and cal_b and cal_b[-1] > max(r["seduta"] for r in righe):
+        righe = _righe_complete(sorted(righe, key=lambda x: x["seduta"]), B, cal_b[-1])
+        out.assenze.append(f"il calo di partenza comprende le sedute dopo l'ultima riga del registro, ricostruite dalle "
+                           f"barre fino al {_data_it(cal_b[-1])} con le posizioni dell'ultima riga")
     s = NL.salvavita(righe)
     if s["stato"] != "misurato":
         out.assenze.append(f"nessuna previsione del portafoglio: salvavita non misurabile — {s['perche']}")
@@ -437,7 +445,10 @@ def prevedi_serie(a, q, i, H, n=PERCORSI_CALIBRAZIONE, seme=SEME, varianti=tuple
 
 
 def _nel_dominio(analogo, d):
-    return d > SOGLIA_SALVAVITA if analogo == "calo" else d < 0
+    """v537 (revisore, rilievo 1): la base sullo STESSO dominio dei casi — almeno CALO_ANALOGO sotto il massimo, e per il
+    calo non ancora oltre la soglia. Prima la base prendeva ogni giorno sotto il massimo (anche a −0,5%): «torna al
+    massimo entro 60» aveva base 47,6% contro il 26,5% del dominio dei casi, e l'abilita' cambiava segno."""
+    return d <= CALO_ANALOGO and (d > SOGLIA_SALVAVITA if analogo == "calo" else True)
 
 
 def _base(pool, data):
@@ -450,7 +461,7 @@ def _base(pool, data):
 def _parametri(percorsi):
     return {"finestra": FINESTRA, "blocco": BLOCCO, "percorsi": percorsi, "seme": SEME, "passo": PASSO,
             "calo_analogo": CALO_ANALOGO, "soglia": SOGLIA_SALVAVITA, "min_base": MIN_BASE,
-            "analoghi": {k: list(v) for k, v in ANALOGHI.items()}, "versione": 1}
+            "analoghi": {k: list(v) for k, v in ANALOGHI.items()}, "versione": 2}
 
 
 def calibrazione(B, adesso=None, percorsi=PERCORSI_CALIBRAZIONE, rifai=False, cache=CACHE):

@@ -37,6 +37,8 @@ LARGHEZZA_FASCIA = 0.10      # le fasce di calibrazione: 0-10%, 10-20%, … 90-1
 Z = 1.96                     # intervallo di Wilson al 95%
 MIN_FASCIA = 20              # sotto, la frequenza di una fascia non si legge: «non misurabile»
 MIN_VALUTAZIONE = 100        # sotto, l'affidabilita' di un metodo non e' ancora misurabile, e lo si dice
+SOGLIA_ABILITA = 0.02        # v537: un'abilita' dentro ±0,02 non distingue il metodo dalla base (v405: l'etichetta non
+                             #   afferma piu' del dato)
 
 METODI = {                   # il nome di ogni metodo come lo legge il CEO (i metodi stanno affiancati, mai mediati)
     "casi_simili": "casi simili (5 anni dei nomi seguiti)",
@@ -79,7 +81,8 @@ def brier(ps, ys):
 
 def fascia(p, larghezza=LARGHEZZA_FASCIA):
     """L'indice della fascia di p: 0,65 → 6 (60-70%); p = 1 sta nell'ultima."""
-    k = int(float(p) / larghezza)
+    # v537 (revisore, rilievo 10): int(0,3/0,1) = 2 in virgola mobile; si arrotonda prima di prendere la parte intera
+    k = int(math.floor(round(float(p) / larghezza, 9)))
     return min(k, int(round(1 / larghezza)) - 1)
 
 
@@ -232,7 +235,7 @@ def riga_affidabilita(p, valutazione, metodo=None):
     from statistica import _n
     ab = valutazione.get("abilita")
     sk = ("" if ab is None else f" · contro la base: abilita' {_n(ab, 2, True)} "
-          f"({'sa qualcosa in piu' if ab > 0 else 'non fa meglio'} della base)")
+          f"({'sa qualcosa in piu' if ab > SOGLIA_ABILITA else ('non si distingue' if ab >= -SOGLIA_ABILITA else 'fa peggio')} della base)")
     if not valutazione.get("misurabile"):
         sk += f" · ⚠ {valutazione['n']} previsioni risolte, sotto le {MIN_VALUTAZIONE}: affidabilita' non ancora solida"
     return testo + sk

@@ -686,7 +686,7 @@ def resa(previsioni, calibrazione, assenze=None):
                 f_ = A.fascia_di(lg["probabilita"], (fam.get(lg["extra"]["famiglia_calibrazione"]) or {}).get("valutazione"))
                 aff = (f"; detto {_pc(f_['da'])}-{_pc(f_['a'])} → avverato {_pc(f_['frequenza'])} su {f_['n']}"
                        if f_ and f_["misurabile"] else "; fascia non misurabile")
-                r.append(f"lognormale {_pc(lg['probabilita'])}" + (f" [{_pc(iv[0])}-{_pc(iv[1])}]" if iv else "") + aff)
+                r.append(f"lognormale {_pc(lg['probabilita'])}" + (f" [{_pc(iv[0])}-{_pc(iv[1])}, solo l'incertezza della volatilita']" if iv else "") + aff)
             if op:
                 e = op["extra"]
                 r.append(f"opzioni {_pc(op['probabilita'])} (impl. {S._n(100 * e['iv'], 0)}%, {e['contratto']} "

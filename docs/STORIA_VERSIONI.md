@@ -9781,3 +9781,21 @@ portafoglio come DIZIONARIO (statistica.universo) — la conversione sta nell'or
 registro: la prima lettura vera ha registrato 893 previsioni (555 di Polymarket, 1 MB): un registro che cresce di un mega
 al giorno nel repository pubblico. Nasce la CADENZA (§1septdecies, gate): i metodi propri una fotografia ogni 20 sedute,
 un mercato esterno una volta sola. Il CEO ha scelto l'eccezione misurata alla regola 1 (CLAUDE.md, istruzione 1).
+
+## v537 — I rilievi del revisore avversario e la partenza vera del portafoglio (06/11/2026)
+
+Il settimo agente, il revisore (fermato due volte dai limiti del piano), ha consegnato 12 rilievi verificati. Corretti:
+(1, ALTA) la base del portafoglio prendeva ogni giorno sotto il massimo mentre i casi erano solo a −10% o peggio — basi
+di un altro evento, abilità che cambiava segno: ora la base sta sullo stesso dominio (`_nel_dominio`), cache rifatta;
+(2, ALTA) la calibrazione di Polymarket contava i mercati già decisi (0-3%, 97-100%) che dal vivo si scartano: ora solo la
+banda 3-97%, ricalcolata sempre dalle righe salvate, e la scelta del campione per volume FINALE è dichiarata accanto;
+(3, ALTA) le previsioni macro non si risolvevano mai dal vivo (il registro non passava la storia delle serie): ora la
+carica dal modulo macro; (4) l'intervallo del lognormale dice che copre solo l'incertezza della volatilità; (5) la base dei
+casi simili si chiama «a pari volatilità», non è quella grezza del lognormale; (7) le varianti della simulazione sono
+gruppi separati nel bilancio e in «quante se ne avverano»; (8) la calibrazione dei titoli usa gli stessi veicoli delle
+previsioni e la cache porta l'impronta dell'universo; (10) le fasce senza l'errore di virgola mobile (0,3 cadeva nella
+20-30%); (11) oltre 45 giorni la misura di Polymarket «a 30 giorni» non si riusa; (12) «sa qualcosa in più della base»
+solo oltre ±0,02 di abilità. Restano aperti, dichiarati: (6) le opzioni non guardano il percorso già fatto dopo `dal`
+(conta solo con barre vecchie); (9) il risolutore «tutti al carico» non riscala un frazionamento. Prima del revisore,
+la stessa giornata: il portafoglio partiva dal calo dell'ultima riga del registro (02/11, −19,49%) mentre la misura vera
+al 05/11 era −29,83%, a un passo dal salvavita — ora le sedute mancanti si ricostruiscono come nel risolutore. Gate: 4.

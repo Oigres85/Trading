@@ -377,9 +377,21 @@ def _risolutori(adesso, B, rete, storia, righe_registro):
                 cache["perf"] = None                       # non letto: lo dice il risolutore del portafoglio
         return cache["perf"]
 
+    def storia_macro():
+        # v537 (revisore, rilievo 3): senza la storia delle serie le previsioni macro restavano aperte per sempre — «ce
+        #   l'ha e non lo passa» (v406). Si carica una volta per giro dal modulo che la legge (una derivazione, v161).
+        if storia is not None:
+            return storia
+        if "storia" not in cache:
+            try:
+                cache["storia"] = importlib.import_module("previsioni_macro").storia(rete=rete, adesso=adesso)
+            except Exception:  # noqa: BLE001 — una storia non letta lascia aperte le previsioni, col perche'
+                cache["storia"] = None
+        return cache["storia"]
+
     return {
         "prezzo": lambda ris, rec: risolvi_prezzo(ris, (B or {}).get(ris.get("tk")), adesso, rec.get("extra")),
-        "serie": esterno("serie", lambda fn, ris: fn(ris, storia)),
+        "serie": esterno("serie", lambda fn, ris: fn(ris, storia_macro())),
         "portafoglio": esterno("portafoglio", lambda fn, ris: fn(ris, performance(), B)),
         "esterno": esterno("esterno", lambda fn, ris: fn(ris, rete)),
     }
@@ -471,7 +483,9 @@ def bilancio(percorso=REGISTRO, per=("metodo", "famiglia")):
 
     gruppi = {}
     for r in righe:
-        gruppi.setdefault(tuple(r.get(k) for k in per), []).append(r)
+        # v537 (revisore, rilievo 7): la variante di un metodo (la simulazione «storico» e «rumore») e' un gruppo a se':
+        #   affiancate, mai misurate insieme (v200)
+        gruppi.setdefault(tuple(r.get(k) for k in per) + (_variante(r),), []).append(r)
     G = []
     for chiave in sorted(gruppi, key=lambda k: tuple(str(x) for x in k)):
         rr = gruppi[chiave]
@@ -479,12 +493,18 @@ def bilancio(percorso=REGISTRO, per=("metodo", "famiglia")):
         con_base = [r for r in risolte if _numero(r.get("base"))]
         basi = [float(r["base"]) for r in risolte] if risolte and len(con_base) == len(risolte) else None
         v = A.valuta([r["probabilita"] for r in risolte], [r["esito"] for r in risolte], basi=basi)
-        G.append({"chiave": dict(zip(per, chiave)), **conta(rr), "valutazione": v,
+        G.append({"chiave": {**dict(zip(per, chiave[:-1])), **({"variante": chiave[-1]} if chiave[-1] else {})},
+                  **conta(rr), "valutazione": v,
                   "senza_base": len(risolte) - len(con_base),
                   "periodo": (min(str(r["risolto_il"])[:10] for r in risolte),
                               max(str(r["risolto_il"])[:10] for r in risolte)) if risolte else None})
     return {"stato": L["stato"], "guaste": L["guaste"], "errore": L.get("errore"), "per": tuple(per),
             "mescola_metodi": "metodo" not in per, **conta(righe), "gruppi": G}
+
+
+def _variante(r):
+    """La variante di un metodo, se il record la dichiara (extra['variante']); None altrimenti."""
+    return (r.get("extra") or {}).get("variante")
 
 
 def n_previsioni(previsioni, per="metodo", giorno=None):
@@ -494,7 +514,8 @@ def n_previsioni(previsioni, per="metodo", giorno=None):
     aperte = [r for r in previsioni or [] if stato(r) == "aperta" and (giorno is None or str(r["id"])[:10] == giorno)]
     gruppi = {}
     for r in aperte:
-        gruppi.setdefault(r.get(per), []).append(float(r["probabilita"]))
+        v = _variante(r)
+        gruppi.setdefault(f"{r.get(per)} ({v})" if v else r.get(per), []).append(float(r["probabilita"]))
     out = {}
     for g, ps in sorted(gruppi.items(), key=lambda x: str(x[0])):
         q = A.quante_si_avverano(ps)
@@ -517,7 +538,8 @@ def _registro_non_letto(stato_, errore=None):
 
 
 def _nome_gruppo(chiave):
-    return " · ".join(A.METODI.get(v, v) if k == "metodo" else str(v) for k, v in chiave.items())
+    return " · ".join(A.METODI.get(v, v) if k == "metodo" else (f"variante {v}" if k == "variante" else str(v))
+                      for k, v in chiave.items())
 
 
 def resa_bilancio(b):

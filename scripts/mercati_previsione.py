@@ -80,6 +80,11 @@ MAX_CAMPIONE = 400           # mercati chiusi del campione di calibrazione
 MAX_PER_EVENTO = 4           # al piu' 4 mercati per evento (i piu' scambiati): sono legati fra loro
 PAGINE_CAMPIONE = 3          # pagine da 100 eventi chiusi per etichetta, i piu' scambiati per primi
 VOLUME_MIN_CAMPIONE = 10_000  # $: sotto, il prezzo storico non e' un mercato
+ANTICIPO_MAX_GIORNI = 45      # v537: oltre, la misura «a 30 giorni» non descrive il mercato (convenzione, v240)
+# v537 (revisore, rilievo 2): il campione e' scelto per volume FINALE, che 1, 7 o 30 giorni prima non era noto: pende
+#   verso i mercati piu' seguiti, che possono essere i meglio calibrati. Si dichiara accanto alla misura.
+AVVERTENZA_CAMPIONE = ("campione scelto fra i mercati piu' scambiati per volume FINALE (non noto all'anticipo): pende "
+                       "verso i mercati piu' seguiti; misure solo nella banda di prezzo 3-97%, come i mercati mostrati")
 FIDELITY_MINUTI = 60         # lo storico dei prezzi a passo di un'ora, in una finestra che FINISCE all'istante
 TOLLERANZA_ORE = 48          # il prezzo di un anticipo e' l'ultimo punto non successivo, al piu' 48 ore prima
 MARGINE_CHIUSURA_ORE = 1     # un anticipo vale solo se il mercato era aperto almeno un'ora dopo
@@ -695,8 +700,11 @@ def calibra(righe):
     come valuta dichiara) e, accanto, l'abilita' contro chi dice sempre 50%."""
     out = {}
     for k in ANTICIPI:
+        # v537 (revisore, rilievo 2): solo i prezzi nella banda dei mercati mostrati dal vivo (PREZZO_MIN/MAX_OGGI):
+        #   a un giorno la maggioranza dei mercati era gia' decisa (0-3%, 97-100%) e gonfiava abilita' ed ECE
         coppie = [(r["p"][str(k)], r["avverato"]) for r in righe
-                  if r.get("p", {}).get(str(k)) is not None and r.get("avverato") is not None]
+                  if r.get("p", {}).get(str(k)) is not None and r.get("avverato") is not None
+                  and PREZZO_MIN_OGGI <= float(r["p"][str(k)]) <= PREZZO_MAX_OGGI]
         ps, ys = [p for p, _ in coppie], [y for _, y in coppie]
         v = af.valuta(ps, ys)
         v50 = af.valuta(ps, ys, basi=[0.5] * len(ps)) if ps else {}
@@ -710,6 +718,10 @@ def calibrazione(rete=True, adesso=None, forza=False, percorso=CACHE_CAL, get=No
     7 giorni; senza rete restituisce la cache anche vecchia, DICHIARANDOLO, o un esito «non disponibile»."""
     adesso = adesso or datetime.now(timezone.utc)
     c = _dal_disco(percorso, adesso, None) if percorso else None
+    if c and c.get("righe"):
+        # v537 — le misure si rifanno sempre dalle righe salvate: una regola nuova vale anche sulla cache, senza rete
+        c["anticipi"] = calibra(c["righe"])
+        c["campione"] = dict(c.get("campione") or {}, avvertenza=AVVERTENZA_CAMPIONE)
     if c and not forza and adesso - datetime.fromisoformat(c["letto"]) <= timedelta(days=VALIDITA_CAL_GIORNI):
         return c
     if not rete:
@@ -742,6 +754,7 @@ def calibrazione(rete=True, adesso=None, forza=False, percorso=CACHE_CAL, get=No
                "scelti": len(scelti), "con_storico": len(righe), "senza_storico": senza_storia, "scarti": scarti},
            "base": "frequenza del SI' nello stesso campione (in campione); accanto l'abilita' contro il 50%",
            "anticipi": calibra(righe), "righe": righe}
+    out["campione"]["avvertenza"] = AVVERTENZA_CAMPIONE
     if percorso:
         errore = _scrivi(percorso, out)
         if errore:
@@ -837,6 +850,9 @@ def anticipo_per(scade, adesso):
         giorni = (datetime.strptime(scade, "%Y-%m-%d").date() - adesso.date()).days
     except (TypeError, ValueError):
         return None
+    # v537 (revisore, rilievo 11): oltre ANTICIPO_MAX_GIORNI nessun anticipo misurato copre il mercato: «non misurato»
+    if giorni > ANTICIPO_MAX_GIORNI:
+        return None
     return min(ANTICIPI, key=lambda k: abs(k - max(giorni, 1)))
 
 
@@ -845,6 +861,9 @@ def riga_affidabilita_mercato(r, cal, adesso):
         return af.riga_affidabilita(r["probabilita"], None, r["metodo"])
     k = anticipo_per(r.get("scade"), adesso)
     v = (((cal or {}).get("anticipi") or {}).get(str(k)) or {}).get("valutazione") if k else None
+    if k is None:
+        return (f"affidabilita' di Polymarket a questa distanza dalla scadenza: non misurata (la misura arriva a "
+                f"{max(ANTICIPI)} giorni, questo mercato scade oltre i {ANTICIPO_MAX_GIORNI})")
     return af.riga_affidabilita(r["probabilita"], v, "polymarket") + (f" [misura a {k} g dalla scadenza]" if v else "")
 
 

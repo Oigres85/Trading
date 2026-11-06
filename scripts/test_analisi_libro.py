@@ -11155,7 +11155,7 @@ def _finto536(nome):
     if nome == "previsioni_titoli":
         _AF = _il536.import_module("affidabilita")
         m = _ty536.SimpleNamespace()
-        m.calibrazione = lambda B, adesso=None: {}
+        m.calibrazione = lambda B, adesso=None, veicoli=None: {}
         m.previsioni_oggi = lambda B, posiz, adesso: [_AF.previsione(
             "titoli", "AAA", "AAA sopra 100 fra 20 sedute", 0.6, "casi_simili",
             _AF.evento_prezzo("AAA", "chiude_sopra", 100.0, "2026-11-02", 20), base=0.55, n=300,
@@ -11223,6 +11223,40 @@ check("v536 le convenzioni comuni delle previsioni stanno nel libro (§1septdeci
       + str(_nn536),
       _nn536 == (round(_AF535.LARGHEZZA_FASCIA * 100), 95, _AF535.MIN_FASCIA, _AF535.MIN_VALUTAZIONE, _PV536.CADENZA)
       and abs(_AF535.Z - 1.96) < 1e-9)
+
+# ═════════ v537 — i rilievi del revisore avversario sul sistema previsionale (06/11/2026) ═════════
+import previsioni_portafoglio as _PP537, mercati_previsione as _MP537, registro_previsioni as _RP537
+check("v537 rilievo 1: la base del portafoglio sta sullo STESSO dominio dei casi (almeno 10% sotto il massimo; il calo non "
+      "ancora oltre la soglia) — un giorno a -5% non entra nella base di chi e' a -26%",
+      not _PP537._nel_dominio("torna", -0.05) and _PP537._nel_dominio("torna", -0.15)
+      and not _PP537._nel_dominio("calo", -0.35) and _PP537._nel_dominio("calo", -0.20))
+_righe537 = [{"p": {"1": 0.01, "7": 0.5, "30": 0.99}, "avverato": False},
+             {"p": {"1": 0.60, "7": 0.6, "30": 0.60}, "avverato": True}]
+_cal537 = _MP537.calibra(_righe537)
+check("v537 rilievo 2: la calibrazione di Polymarket conta solo i prezzi nella banda dei mercati mostrati (3-97%): un "
+      "mercato gia' deciso (1%, 99%) non entra nella misura",
+      _cal537["1"]["valutazione"]["n"] == 1 and _cal537["7"]["valutazione"]["n"] == 2
+      and _cal537["30"]["valutazione"]["n"] == 1)
+_fm537 = _ty536.ModuleType("previsioni_macro")
+_fm537.storia = lambda rete=True, adesso=None: {"VIXCLS": "storia di prova"}
+_fm537.risolvi_serie = lambda ris, storia: True if storia else None
+_vecchio537 = sys.modules.get("previsioni_macro")
+sys.modules["previsioni_macro"] = _fm537
+try:
+    _ris537 = _RP537._risolutori(_dtv536(2026, 11, 6, 22, 0, tzinfo=_tzv536.utc), {}, False, None, None)["serie"](
+        {"genere": "serie", "serie": "VIXCLS"}, {"extra": {}})
+finally:
+    if _vecchio537 is not None:
+        sys.modules["previsioni_macro"] = _vecchio537
+    else:
+        sys.modules.pop("previsioni_macro", None)
+check("v537 rilievo 3: senza storia passata il registro la CARICA dal modulo macro e risolve (prima restava aperta per "
+      "sempre: «ce l'ha e non lo passa», v406): " + str(_ris537),
+      _ris537 is True or (isinstance(_ris537, dict) and _ris537.get("esito") is True)
+      or (isinstance(_ris537, tuple) and _ris537[0] is True))
+check("v537 rilievo 10: le fasce senza errore di virgola mobile — 0,3 sta nella fascia 30-40%, 0,7 nella 70-80%",
+      _AF535.fascia(0.3) == 3 and _AF535.fascia(0.7) == 7 and _AF535.fascia(0.6) == 6 and _AF535.fascia(1.0) == 9
+      and _AF535.fascia(0.29999) == 2)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

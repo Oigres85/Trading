@@ -71,7 +71,7 @@ def esegui_modulo(nome, B, posiz, adesso, rete=True, importa=importlib.import_mo
     try:
         ass = []
         if nome == "previsioni_titoli":
-            cal = m.calibrazione(B, adesso=adesso)
+            cal = m.calibrazione(B, adesso=adesso, veicoli="pipeline")
             prev = m.previsioni_oggi(B, elenco, adesso)
             ass = _lista(getattr(prev, "assenze", None))
             righe = m.resa(prev, cal)
@@ -197,7 +197,10 @@ def resa(pg):
                      "da due metodi non sono due eventi, v200):")
         for metodo, v in sorted(gruppi.items(), key=lambda x: str(x[0])):
             if v.get("n"):
-                L.append(f"    {A.METODI.get(metodo, metodo)}: {v['n']} previsioni, se ne attendono {_n(v['attese'], 1)}; "
+                nome = str(metodo)
+                for k_, n_ in A.METODI.items():
+                    nome = nome.replace(k_, n_) if nome.split(" (")[0] == k_ else nome
+                L.append(f"    {nome}: {v['n']} previsioni, se ne attendono {_n(v['attese'], 1)}; "
                          f"almeno {v['k50']} con probabilita' {A._p(v['p50'])}, almeno {v['k90']} con {A._p(v['p90'])}")
         if gruppi and q.get("nota"):
             L.append(f"    {q['nota']}")

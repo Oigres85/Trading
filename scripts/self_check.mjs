@@ -220,7 +220,9 @@ const SUITE = [
   /* v536: 1126 punti di chiamata in test_analisi_libro (+5: le prove dei sei moduli dello sciame da un punto solo,
      l'orchestratore che dichiara i moduli mancanti, la cadenza del registro, i collegamenti, le convenzioni comuni rilette
      dal libro) -> 1116 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1116, firma: /\d+\/\d+ CHECK OK/ },
+  /* v537: 1130 punti di chiamata in test_analisi_libro (+4 sui rilievi del revisore: base del portafoglio, banda
+     di Polymarket, storia macro nel registro, fasce) -> 1120 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1120, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];
