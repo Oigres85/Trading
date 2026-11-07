@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-07T19:57:49Z",
+ "updated_at": "2026-11-07T22:29:45Z",
  "eurusd": 1.1228,
  "totals": {
   "usd_value": 0,
@@ -490,7 +490,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -18441,11 +18441,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 75662.29,
+   "price": 75681.22,
    "price_asof": "2026-11-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.11,
+   "change_pct": -0.09,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -40.0,
@@ -18455,14 +18455,14 @@
    "w52_low": 57747.77,
    "w52_dist_pct": -29.6,
    "day_high": 76101.3,
-   "day_low": 75599.65,
+   "day_low": 75518.66,
    "support": 74795.11,
    "resistance": 84840.05,
-   "rsi": 37.9,
-   "volume": 10939768832,
-   "vol_ratio": 1.07,
-   "atr_14": 2240.61,
-   "atr_pct": 2.96,
+   "rsi": 38.0,
+   "volume": 9500824576,
+   "vol_ratio": 0.35,
+   "atr_14": 2246.4,
+   "atr_pct": 2.97,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -18471,7 +18471,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75662.29
+     75681.22
     ],
     "m6": [
      63547.88,
@@ -18599,7 +18599,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75662.29
+     75681.22
     ],
     "all": [
      386.94,
@@ -18748,7 +18748,7 @@
      78548.63,
      83553.85,
      77434.75,
-     75662.29
+     75681.22
     ],
     "m1": [
      81382.15,
@@ -18772,7 +18772,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75662.29
+     75681.22
     ],
     "m3": [
      81271.74,
@@ -18840,7 +18840,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75662.29
+     75681.22
     ],
     "y1": [
      103372.41,
@@ -18916,7 +18916,7 @@
      81074.19,
      81267.59,
      76677.3,
-     75662.29
+     75681.22
     ],
     "d1": [
      75795.23,
@@ -19038,7 +19038,22 @@
      75675.22,
      75683.83,
      75644.92,
-     75660.31
+     75658.34,
+     75686.35,
+     75688.27,
+     75656.45,
+     75619.87,
+     75611.49,
+     75502.53,
+     75575.29,
+     75519.68,
+     75504.88,
+     75554.58,
+     75591.38,
+     75599.89,
+     75657.06,
+     75627.88,
+     75689.04
     ]
    },
    "earnings_date": null,
@@ -19052,7 +19067,7 @@
    "sharpe_6m": 1.05,
    "sortino_6m": 1.77,
    "prepost": null,
-   "prezzo_limite_aggiustato": 75662.29,
+   "prezzo_limite_aggiustato": 75681.22,
    "risk_reward": "1:2.0",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19068,22 +19083,22 @@
     "w1": {
      "support": 74795.11,
      "resistance": 81079.79,
-     "change_pct": -2.18
+     "change_pct": -2.15
     },
     "m1": {
      "support": 74795.11,
      "resistance": 84840.05,
-     "change_pct": -7.03
+     "change_pct": -7.01
     },
     "m3": {
      "support": 74795.11,
      "resistance": 87363.76,
-     "change_pct": -6.9
+     "change_pct": -6.88
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 15.1
+     "change_pct": 15.13
     }
    },
    "financials": [],
@@ -19110,74 +19125,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 75662.29,
+     "prezzo": 75681.22,
      "medie": {
       "sma10": {
-       "liv": 77243.55,
-       "dist_pct": -2.05
+       "liv": 77245.44,
+       "dist_pct": -2.03
       },
       "ema10": {
-       "liv": 77471.2,
-       "dist_pct": -2.33
+       "liv": 77474.64,
+       "dist_pct": -2.31
       },
       "sma20": {
-       "liv": 79326.11,
-       "dist_pct": -4.62
+       "liv": 79327.06,
+       "dist_pct": -4.6
       },
       "ema20": {
-       "liv": 78778.77,
-       "dist_pct": -3.96
+       "liv": 78780.57,
+       "dist_pct": -3.93
       },
       "sma30": {
-       "liv": 80304.08,
-       "dist_pct": -5.78
+       "liv": 80304.71,
+       "dist_pct": -5.76
       },
       "ema30": {
-       "liv": 79488.9,
-       "dist_pct": -4.81
+       "liv": 79490.12,
+       "dist_pct": -4.79
       },
       "sma50": {
-       "liv": 81870.1,
-       "dist_pct": -7.58
+       "liv": 81870.48,
+       "dist_pct": -7.56
       },
       "ema50": {
-       "liv": 79578.71,
-       "dist_pct": -4.92
+       "liv": 79579.45,
+       "dist_pct": -4.9
       },
       "sma100": {
-       "liv": 77171.4,
-       "dist_pct": -1.96
+       "liv": 77171.59,
+       "dist_pct": -1.93
       },
       "ema100": {
-       "liv": 77658.38,
-       "dist_pct": -2.57
+       "liv": 77658.76,
+       "dist_pct": -2.55
       },
       "sma200": {
-       "liv": 73187.35,
-       "dist_pct": 3.38
+       "liv": 73187.45,
+       "dist_pct": 3.41
       },
       "ema200": {
-       "liv": 76349.26,
-       "dist_pct": -0.9
+       "liv": 76349.45,
+       "dist_pct": -0.88
       }
      },
      "medie_battute": 1,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 37.9,
+      "rsi14": 38.0,
       "macd": {
-       "linea": -1493.44,
-       "segnale": -1161.32,
-       "istogramma": -332.12
+       "linea": -1491.93,
+       "segnale": -1161.02,
+       "istogramma": -330.91
       },
-      "stoch_k": 12.2,
-      "stoch_d": 12.6,
-      "williams_r": -87.8,
-      "cci20": -107.9,
+      "stoch_k": 12.5,
+      "stoch_d": 12.7,
+      "williams_r": -87.5,
+      "cci20": -108.5,
       "adx14": 19.0,
-      "di_su": 16.8,
+      "di_su": 16.7,
       "di_giu": 20.7,
-      "momentum10": -5605.3
+      "momentum10": -5586.37
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19669,20 +19684,20 @@
       "d": "2026-11-07",
       "o": 75741.02,
       "h": 76101.3,
-      "l": 75599.65,
-      "c": 75662.29
+      "l": 75518.66,
+      "c": 75681.22
      }
     ],
     "performance": {
-     "s1": -1.32,
-     "m1": -7.16,
-     "m3": -2.12,
-     "m6": 19.93,
-     "a1": 12.94,
-     "ytd": -14.73,
-     "a3": 100.63,
-     "a5": 32.73,
-     "a10": 10046.6
+     "s1": -1.3,
+     "m1": -7.14,
+     "m3": -2.09,
+     "m6": 19.96,
+     "a1": 12.96,
+     "ytd": -14.71,
+     "a3": 100.68,
+     "a5": 32.76,
+     "a10": 10049.14
     },
     "stagionalita": [
      {
@@ -19797,7 +19812,7 @@
    },
    "rs_1m": -2.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.1,
+   "rs_ndx_1m": 5.2,
    "beta_ndx": 0.67,
    "avg_corr": 0.35,
    "max_corr": 0.77,
@@ -32443,9 +32458,9 @@
     "float_pct": 84.8,
     "avg_volume_30d": 43864417.0,
     "pe_ttm": 6.0675,
-    "forward_pe": 4.278,
+    "forward_pe": 4.2533,
     "eps_ttm": 4.74,
-    "eps_forward": 6.7228,
+    "eps_forward": 6.7617,
     "revenue_fy": 53991112704.0,
     "net_income_fy": 3294405120.0,
     "revenue_growth": 2.975,
@@ -37645,7 +37660,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -62607,7 +62622,7 @@
      247.18,
      258.21,
      275.82,
-     303.03,
+     303.04,
      295.92,
      264.25,
      230.35,
@@ -75084,9 +75099,9 @@
     "float_pct": null,
     "avg_volume_30d": 5446428.0,
     "pe_ttm": 21.8766,
-    "forward_pe": 20.1709,
+    "forward_pe": 20.1766,
     "eps_ttm": 12.64,
-    "eps_forward": 13.7088,
+    "eps_forward": 13.705,
     "revenue_fy": 27782000640.0,
     "net_income_fy": 8995000320.0,
     "revenue_growth": 0.011,
@@ -76775,7 +76790,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -94967,7 +94982,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -95640,7 +95655,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -103920,11 +103935,11 @@
      155.94,
      153.23,
      164.84,
-     169.07,
+     169.06,
      171.99,
      163.61,
      170.13,
-     175.8,
+     175.79,
      179.02,
      189.57,
      173.43,
@@ -105826,7 +105841,7 @@
      344.76,
      305.88,
      342.21,
-     344.34,
+     344.33,
      369.93,
      349.13,
      353.5,
@@ -109835,7 +109850,7 @@
      324.5,
      348.6,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -111077,7 +111092,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -116291,7 +116306,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -120251,7 +120266,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -120284,7 +120299,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -135240,6 +135255,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Meta’s $25 Billion Bond Sale Highlights Shifting Landscape for Tech Debt",
+     "riassunto": "Selling billions of dollars of corporate bonds on Election Day seemed like a real gamble.",
+     "fonte": "Bloomberg",
+     "quando": "2026-11-07T20:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-07/meta-s-bond-sale-shows-new-reality-for-tech-debt-credit-weekly"
+    },
+    {
      "titolo": "Here are the 2027 capital-gains tax rates for each income level",
      "riassunto": "How much will you pay in capital-gains taxes next year? The IRS just released this crucial information.",
      "fonte": "MarketWatch",
@@ -135357,13 +135379,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-30T11:16:46Z",
      "url": "https://www.cnbc.com/2026/10/30/euro-zone-gdp-france.html"
-    },
-    {
-     "titolo": "Third-quarter U.S. GDP increases a better-than-expected 3.4% as September inflation accelerates",
-     "riassunto": "The personal consumption expenditures price index was projected to increase 0.5% in September for an annual rate of 3.7%, according to the Dow Jones consensus.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-29T18:06:31Z",
-     "url": "https://www.cnbc.com/2026/10/29/pce-inflation-report-september-2026-.html"
     }
    ],
    "fonti": [
@@ -143138,7 +143153,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 49
+     "score": 48
     },
     {
      "label": "Treasury 10A",
@@ -148509,7 +148524,7 @@
       "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-07T17:40:25Z",
+      "quando": "2026-11-07T20:40:46Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
      },
      {
@@ -148594,6 +148609,13 @@
     ],
     "BE": [
      {
+      "titolo": "Here's What $10,000 Invested in Bloom Energy (BE) Stock Could Be Worth in 3 Years",
+      "riassunto": "Key PointsNo one can know where Bloom Energy (or any stock) will be in the future.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-07T19:50:00Z",
+      "url": "https://www.nasdaq.com/articles/heres-what-10000-invested-bloom-energy-be-stock-could-be-worth-3-years"
+     },
+     {
       "titolo": "AI Stocks Plunge: Buy, Sell or Hold?",
       "riassunto": "Amid the sharp correction in AI stocks, investors question what to do next.",
       "fonte": "Nasdaq",
@@ -148627,13 +148649,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-04T16:30:00Z",
       "url": "https://www.nasdaq.com/articles/bloom-energy-grid-answer-ais-power-drain"
-     },
-     {
-      "titolo": "Bloom Energy's New Guidance Implies Up to $1.55 Billion in Q4 Revenue. Can It Deliver?",
-      "riassunto": "Key PointsAI data centers' electricity needs are fueling demand for Bloom Energy's fuel cells, which can deliver power in months rather than years.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-04T11:05:00Z",
-      "url": "https://www.nasdaq.com/articles/bloom-energys-new-guidance-implies-155-billion-q4-revenue-can-it-deliver"
      }
     ],
     "CRWV": [
@@ -148641,7 +148656,7 @@
       "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-07T17:40:25Z",
+      "quando": "2026-11-07T20:40:46Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
      },
      {
@@ -148729,7 +148744,7 @@
       "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-07T17:40:25Z",
+      "quando": "2026-11-07T20:40:46Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
      },
      {
@@ -148817,7 +148832,7 @@
       "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-07T17:40:25Z",
+      "quando": "2026-11-07T20:40:46Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
      },
      {
@@ -148946,6 +148961,13 @@
     ],
     "PLTR": [
      {
+      "titolo": "Palantir Stock Just Fell 8 Days in a Row. History Says What Followed Its Only 2 Longer Losing Streaks.",
+      "riassunto": "Key PointsPalantir's shares closed lower eight sessions in a row through Nov. 5, dropping around 22% along the way.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-07T19:56:02Z",
+      "url": "https://www.nasdaq.com/articles/palantir-stock-just-fell-8-days-row-history-says-what-followed-its-only-2-longer-losing"
+     },
+     {
       "titolo": "Palantir Stock Investors Just Got Great News From a Wall Street Analyst (Hint: The Stock Could Soar)",
       "riassunto": "Key PointsJPMorgan Chase analyst Brian Essex recently initiated coverage of Palantir; his target price of $262 per share is one of the highest on Wall Street.",
       "fonte": "Nasdaq",
@@ -148979,13 +149001,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-06T11:20:00Z",
       "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-midterms-just-made-magnificent-artificial-intelligence-ai-stock"
-     },
-     {
-      "titolo": "Palantir Stock Is Down 19% From Its Highs. Time to Buy the Dip?",
-      "riassunto": "Key PointsPalantir's stock is falling amid a broader sell-off of AI stocks.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-06T10:20:00Z",
-      "url": "https://www.nasdaq.com/articles/palantir-stock-down-19-its-highs-time-buy-dip"
      }
     ],
     "RGTI": [
@@ -149101,7 +149116,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-07T19:57:49Z"
+   "letto_il": "2026-11-07T22:29:45Z"
   }
  },
  "broker": null,
@@ -149112,7 +149127,7 @@
      "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-07T17:40:25Z",
+     "quando": "2026-11-07T20:40:46Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
     },
     {
@@ -149197,6 +149212,13 @@
    ],
    "BE": [
     {
+     "titolo": "Here's What $10,000 Invested in Bloom Energy (BE) Stock Could Be Worth in 3 Years",
+     "riassunto": "Key PointsNo one can know where Bloom Energy (or any stock) will be in the future.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-07T19:50:00Z",
+     "url": "https://www.nasdaq.com/articles/heres-what-10000-invested-bloom-energy-be-stock-could-be-worth-3-years"
+    },
+    {
      "titolo": "AI Stocks Plunge: Buy, Sell or Hold?",
      "riassunto": "Amid the sharp correction in AI stocks, investors question what to do next.",
      "fonte": "Nasdaq",
@@ -149230,13 +149252,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-04T16:30:00Z",
      "url": "https://www.nasdaq.com/articles/bloom-energy-grid-answer-ais-power-drain"
-    },
-    {
-     "titolo": "Bloom Energy's New Guidance Implies Up to $1.55 Billion in Q4 Revenue. Can It Deliver?",
-     "riassunto": "Key PointsAI data centers' electricity needs are fueling demand for Bloom Energy's fuel cells, which can deliver power in months rather than years.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-04T11:05:00Z",
-     "url": "https://www.nasdaq.com/articles/bloom-energys-new-guidance-implies-155-billion-q4-revenue-can-it-deliver"
     }
    ],
    "CRWV": [
@@ -149244,7 +149259,7 @@
      "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-07T17:40:25Z",
+     "quando": "2026-11-07T20:40:46Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
     },
     {
@@ -149332,7 +149347,7 @@
      "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-07T17:40:25Z",
+     "quando": "2026-11-07T20:40:46Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
     },
     {
@@ -149420,7 +149435,7 @@
      "titolo": "Stock Indexes Settle Mostly Higher as Chipmakers Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-07T17:40:25Z",
+     "quando": "2026-11-07T20:40:46Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-higher-chipmakers-rebound"
     },
     {
@@ -149549,6 +149564,13 @@
    ],
    "PLTR": [
     {
+     "titolo": "Palantir Stock Just Fell 8 Days in a Row. History Says What Followed Its Only 2 Longer Losing Streaks.",
+     "riassunto": "Key PointsPalantir's shares closed lower eight sessions in a row through Nov. 5, dropping around 22% along the way.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-07T19:56:02Z",
+     "url": "https://www.nasdaq.com/articles/palantir-stock-just-fell-8-days-row-history-says-what-followed-its-only-2-longer-losing"
+    },
+    {
      "titolo": "Palantir Stock Investors Just Got Great News From a Wall Street Analyst (Hint: The Stock Could Soar)",
      "riassunto": "Key PointsJPMorgan Chase analyst Brian Essex recently initiated coverage of Palantir; his target price of $262 per share is one of the highest on Wall Street.",
      "fonte": "Nasdaq",
@@ -149582,13 +149604,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-06T11:20:00Z",
      "url": "https://www.nasdaq.com/articles/not-nvidia-not-palantir-midterms-just-made-magnificent-artificial-intelligence-ai-stock"
-    },
-    {
-     "titolo": "Palantir Stock Is Down 19% From Its Highs. Time to Buy the Dip?",
-     "riassunto": "Key PointsPalantir's stock is falling amid a broader sell-off of AI stocks.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-06T10:20:00Z",
-     "url": "https://www.nasdaq.com/articles/palantir-stock-down-19-its-highs-time-buy-dip"
     }
    ],
    "RGTI": [
@@ -149704,7 +149719,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-07T19:57:49Z"
+  "letto_il": "2026-11-07T22:29:45Z"
  },
  "predictions": [],
  "options": {
@@ -217443,7 +217458,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -217527,6 +217542,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-07T19:57:50Z"
+  "generated_at": "2026-11-07T22:29:46Z"
  }
 }
