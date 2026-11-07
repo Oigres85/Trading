@@ -1,4 +1,4 @@
-⟦ BUILD v524 · generato 07/11/2026 19:04 ⟧
+⟦ BUILD v524 · generato 07/11/2026 19:17 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 07/11/2026, 19:04:19 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 14:04, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -6,02% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,23% · Fut S&P +0,16% · BTC -0,03% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~43.4h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 3 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 07/11/2026, 19:17:25 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 14:17, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -6,02% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,23% · Fut S&P +0,16% · BTC -0,09% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~43.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 3 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 07/11/2026, 19:04:19 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-11-06 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 07/11/2026, 19:17:25 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-11-06 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): settembre 2026 · Inflazione PCE (a/a): settembre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: ottobre 2026 · Disoccupazione: ottobre 2026 · Fiducia consumatori (UMich): ottobre 2026 · Curva 10A-2A: 06/11/2026 · Curva 10A-3M: 06/11/2026 · Treasury USA 30A: 05/11/2026 · Tasso reale 10A (TIPS): 05/11/2026 · Inflazione attesa 10A (breakeven): 06/11/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -236,7 +236,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (89,4% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
+  [AMD] · [Nasdaq, 2h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...
   [AMD] · [Nasdaq, 2h fa] The Artificial Intelligence (AI) Boom Is Far From Over. Here Are 4 Potential Long-Term Winners
       Key Points Recent earnings from major AI companies suggest that AI infrastructure spending could continue growing.
@@ -248,11 +248,11 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Amid the sharp correction in AI stocks, investors question what to do next.
   [BE] · [Nasdaq, 50h fa] Sick of Swings? Same… But History Is on Our Side
       The Nasdaq Composite is down more than 4% on Thursday as we write this. Stocks tied to the artificial intelligence (AI) trade, especially chipmakers and data center names, are sliding for a second day, both here and in Asia.
-  [CRWV] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
+  [CRWV] · [Nasdaq, 2h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...
   [CRWV] · [Nasdaq, 4h fa] 3 Artificial Intelligence (AI) Stocks I’d Buy Without Hesitation in a Market Crash
       Key PointsSpaceX and CoreWeave are seeing strong demand for their AI services, but the market may have already priced in much of that.
-  [MRVL] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
+  [MRVL] · [Nasdaq, 2h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...
   [MRVL] · [Nasdaq, 4h fa] Why Marvell Technology Stock Plunged 28.1% This Week
       Key PointsMarvell Technology agreed to acquire optical networking leader Lumentum in a $115 billion all-stock transaction announced on Monday.
@@ -260,7 +260,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       The S&P 500 Index ($SPX ) (SPY ) closed down -4.36% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -3.44%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -6.36%. December E-mini S&P futures (ESZ26 ) fell -4.46%, and December E-mini Nasdaq futures...
   [MSTR] · [Nasdaq, 71h fa] Stocks Finished Mostly Higher on Chipmaker Strength
       The S&P 500 Index ($SPX ) (SPY ) closed up +0.36% on Tuesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.38%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +0.68%. December E-mini S&P futures (ESZ26 ) rose +0.36%, and December E-mini Nasdaq futures...
-  [MU] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
+  [MU] · [Nasdaq, 2h fa] Stock Indexes Settle Mostly Higher as Chipmakers Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +0.31% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.46%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +1.35%. December E-mini S&P futures (ESZ26 ) rose +0.31%, and December E-mini Nasdaq futures...
   [MU] · [Nasdaq, 2h fa] AI Stocks Are Falling; Bitcoin Is Holding Ground. Here's What Could Come Next.
       Key PointsStocks associated with the AI value chain are falling right now.
@@ -272,10 +272,10 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsStocks associated with the AI value chain are falling right now.
   [ORCL] · [Nasdaq, 8h fa] Advanced Micro Devices (AMD) Recently Crashed Out of the $1 Trillion Club. Should You Buy the Dip?
       Key PointsAdvanced Micro Devices (AMD) has become one of Nvidia's top competitors in the market for artificial intelligence (AI) chips.
-  [RGTI] · [Nasdaq, 50h fa] Rigetti Q3 Earnings: Will Commercial Progress Translate Into Growth?
+  [RGTI] · [Nasdaq, 0h fa] Where Will Rigetti Computing Stock Be in 3 Years?
+      Key PointsRigetti Computing stock is down about 49% in 2026, and the sector sell-off after IonQ's equity offering hit it hard.
+  [RGTI] · [Nasdaq, 51h fa] Rigetti Q3 Earnings: Will Commercial Progress Translate Into Growth?
       RGTI's Q3 earnings spotlight Novera orders, pending system deliveries and quantum performance milestones as investors seek signs of commercial growth.
-  [RGTI] · [Nasdaq, 69h fa] Rigetti Computing, Inc. (RGTI) Ascends But Remains Behind Market: Some Facts to Note
-      Rigetti Computing, Inc. (RGTI) reached $11.21 at the closing of the latest trading day, reflecting a +1.13% change compared to its last close.
   [WDC] · [Nasdaq, 27h fa] Stock Indexes Routed on Capitulation out of Chipmakers and AI Stocks
       The S&P 500 Index ($SPX ) (SPY ) closed down -4.36% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -3.44%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -6.36%. December E-mini S&P futures (ESZ26 ) fell -4.46%, and December E-mini Nasdaq futures...
   [WDC] · [Nasdaq, 41h fa] Micron Technology vs. Western Digital: Which Tech Stock Is the Better Buy for 2027?
