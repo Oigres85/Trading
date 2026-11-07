@@ -30,8 +30,9 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    conti con l'esame scritto prima e confermato dal CEO (§1quinquies) — ma dal 03/11 gli esami non vendono: i rami
    secchi si tagliano dopo il recupero di tutti, poi si diversifica (§1undecies). Le quantità sono solo l'aritmetica dell'unità di
    5.000 €, mai «la quantità giusta» (v439). Nessun punteggio composito (v200); ogni soglia è una convenzione dichiarata
-   (v240). La liquidità è una RISERVA per la quotazione di Anthropic (02/11; le medie dopo i conti,
-   decise il 01/11, sono una domanda aperta); il ricavato di INTC è andato su AVGO (02/11).
+   (v240). La liquidità è una RISERVA per la quotazione di Anthropic e per le medie dopo i conti (07/11); il
+   ricavato di INTC è andato su AVGO (02/11). **Le regole sono guide, non obblighi (07/11)**: l'obiettivo è far
+   crescere il portafoglio nel lungo periodo; le soglie dicono quando decidere, decide il CEO (LIBRO §0).
 6. **Conflitti d'interessi, sempre dichiarati**: NVDA, GOOGL, AMZN, MSFT, BLK, GS, CRM sono investitori di Anthropic;
    CRWV, ORCL, CBRS clienti di OpenAI; SpaceX possiede xAI. **Su Anthropic stessa** (Claude è un suo prodotto): solo i
    fatti del prospetto, nessun giudizio.

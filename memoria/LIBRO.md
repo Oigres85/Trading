@@ -16,6 +16,12 @@ dalla chiusura del 09/10/2026: nessun numero prima di quella data è nel registr
 ⚠ Sovraperformare con un beta di 2 vuol dire anche sottoperformare di più quando il Nasdaq scende:
 il registro misura entrambi i versi, e il semaforo (§1ter) resta la regola d'uscita.
 
+**07/11/2026 — le regole sono guide, non obblighi** (CEO, testuale: *"le regole non sono perentorie. L'obiettivo è
+far crescere portafoglio in ottica lungo periodo"*). L'obiettivo è **far crescere il portafoglio nel lungo periodo**;
+QQQ resta il metro con cui il registro lo misura. Le regole e le soglie di questo libro (semaforo, salvavita, tenuta,
+esami, rami secchi) dicono **quando fermarsi a decidere** e con quali fatti, non cosa fare: il sistema le segnala
+tutte come prima, e decide il CEO.
+
 ## 1. POSIZIONI — confermate dal CEO l'08/09/2026
 
 | Ticker | Quantità | PMC | Valuta | Note |
@@ -1020,9 +1026,12 @@ dirmelo tu · 4 prezzo carico meglio se massimo storico"*):
   gli ingressi del 02/11 (AVGO, WDC), che si giudicano ai loro conti. Da confermare: la domanda qui sotto;
 - il recupero: **ciascuno al proprio carico** è la soglia; il massimo storico è la preferenza del CEO, non la soglia.
 
+**Chiusa il 07/11/2026** (CEO: *"No, non esco per ora, inoltre le regole non sono perentorie"*): nessuna uscita
+ora. L'elenco RGTI, CRWV, MSTR, ORCL resta la LETTURA dell'analista, non una decisione: si sorveglia, e il
+momento di tagliare lo decide il CEO (§0: le regole sono guide).
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 07/11/2026 | I rami secchi proposti dall'analista su delega del CEO: **RGTI, CRWV, MSTR, ORCL** (BE il caso di confine) — confermi? | l'elenco decide quando si taglia: si taglia solo quando TUTTI sono tornati al carico, e la cordata va al passo del più lento | il CEO conferma o cambia l'elenco |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
