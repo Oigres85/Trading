@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-07T19:17:25Z",
+ "updated_at": "2026-11-07T19:57:49Z",
  "eurusd": 1.1228,
  "totals": {
   "usd_value": 0,
@@ -490,7 +490,7 @@
      33.88,
      30.71,
      34.61,
-     44.63,
+     44.62,
      33.36,
      40.49,
      44.24,
@@ -1977,7 +1977,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -18441,11 +18441,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 75679.46,
+   "price": 75662.29,
    "price_asof": "2026-11-07",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.09,
+   "change_pct": -0.11,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -40.0,
@@ -18459,7 +18459,7 @@
    "support": 74795.11,
    "resistance": 84840.05,
    "rsi": 37.9,
-   "volume": 11069194240,
+   "volume": 10939768832,
    "vol_ratio": 1.07,
    "atr_14": 2240.61,
    "atr_pct": 2.96,
@@ -18471,7 +18471,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75679.46
+     75662.29
     ],
     "m6": [
      63547.88,
@@ -18599,7 +18599,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75679.46
+     75662.29
     ],
     "all": [
      386.94,
@@ -18748,7 +18748,7 @@
      78548.63,
      83553.85,
      77434.75,
-     75679.46
+     75662.29
     ],
     "m1": [
      81382.15,
@@ -18772,7 +18772,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75679.46
+     75662.29
     ],
     "m3": [
      81271.74,
@@ -18840,7 +18840,7 @@
      80405.29,
      75942.12,
      75746.93,
-     75679.46
+     75662.29
     ],
     "y1": [
      103372.41,
@@ -18916,7 +18916,7 @@
      81074.19,
      81267.59,
      76677.3,
-     75679.46
+     75662.29
     ],
     "d1": [
      75795.23,
@@ -19034,7 +19034,11 @@
      75720.01,
      75711.68,
      75703.45,
-     75679.46
+     75679.21,
+     75675.22,
+     75683.83,
+     75644.92,
+     75660.31
     ]
    },
    "earnings_date": null,
@@ -19048,7 +19052,7 @@
    "sharpe_6m": 1.05,
    "sortino_6m": 1.77,
    "prepost": null,
-   "prezzo_limite_aggiustato": 75679.46,
+   "prezzo_limite_aggiustato": 75662.29,
    "risk_reward": "1:2.0",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19064,22 +19068,22 @@
     "w1": {
      "support": 74795.11,
      "resistance": 81079.79,
-     "change_pct": -2.15
+     "change_pct": -2.18
     },
     "m1": {
      "support": 74795.11,
      "resistance": 84840.05,
-     "change_pct": -7.01
+     "change_pct": -7.03
     },
     "m3": {
      "support": 74795.11,
      "resistance": 87363.76,
-     "change_pct": -6.88
+     "change_pct": -6.9
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 15.12
+     "change_pct": 15.1
     }
    },
    "financials": [],
@@ -19106,55 +19110,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 75679.46,
+     "prezzo": 75662.29,
      "medie": {
       "sma10": {
-       "liv": 77245.27,
-       "dist_pct": -2.03
+       "liv": 77243.55,
+       "dist_pct": -2.05
       },
       "ema10": {
-       "liv": 77474.32,
-       "dist_pct": -2.32
+       "liv": 77471.2,
+       "dist_pct": -2.33
       },
       "sma20": {
-       "liv": 79326.97,
-       "dist_pct": -4.6
+       "liv": 79326.11,
+       "dist_pct": -4.62
       },
       "ema20": {
-       "liv": 78780.4,
-       "dist_pct": -3.94
+       "liv": 78778.77,
+       "dist_pct": -3.96
       },
       "sma30": {
-       "liv": 80304.65,
-       "dist_pct": -5.76
+       "liv": 80304.08,
+       "dist_pct": -5.78
       },
       "ema30": {
-       "liv": 79490.01,
-       "dist_pct": -4.79
+       "liv": 79488.9,
+       "dist_pct": -4.81
       },
       "sma50": {
-       "liv": 81870.44,
-       "dist_pct": -7.56
+       "liv": 81870.1,
+       "dist_pct": -7.58
       },
       "ema50": {
-       "liv": 79579.38,
-       "dist_pct": -4.9
+       "liv": 79578.71,
+       "dist_pct": -4.92
       },
       "sma100": {
-       "liv": 77171.57,
-       "dist_pct": -1.93
+       "liv": 77171.4,
+       "dist_pct": -1.96
       },
       "ema100": {
-       "liv": 77658.72,
-       "dist_pct": -2.55
+       "liv": 77658.38,
+       "dist_pct": -2.57
       },
       "sma200": {
-       "liv": 73187.44,
-       "dist_pct": 3.4
+       "liv": 73187.35,
+       "dist_pct": 3.38
       },
       "ema200": {
-       "liv": 76349.43,
-       "dist_pct": -0.88
+       "liv": 76349.26,
+       "dist_pct": -0.9
       }
      },
      "medie_battute": 1,
@@ -19162,18 +19166,18 @@
      "oscillatori": {
       "rsi14": 37.9,
       "macd": {
-       "linea": -1492.07,
-       "segnale": -1161.04,
-       "istogramma": -331.03
+       "linea": -1493.44,
+       "segnale": -1161.32,
+       "istogramma": -332.12
       },
-      "stoch_k": 12.5,
-      "stoch_d": 12.7,
-      "williams_r": -87.5,
-      "cci20": -107.8,
+      "stoch_k": 12.2,
+      "stoch_d": 12.6,
+      "williams_r": -87.8,
+      "cci20": -107.9,
       "adx14": 19.0,
       "di_su": 16.8,
       "di_giu": 20.7,
-      "momentum10": -5588.12
+      "momentum10": -5605.3
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19666,19 +19670,19 @@
       "o": 75741.02,
       "h": 76101.3,
       "l": 75599.65,
-      "c": 75679.46
+      "c": 75662.29
      }
     ],
     "performance": {
-     "s1": -1.3,
-     "m1": -7.14,
-     "m3": -2.1,
-     "m6": 19.96,
-     "a1": 12.96,
-     "ytd": -14.71,
-     "a3": 100.67,
-     "a5": 32.76,
-     "a10": 10048.9
+     "s1": -1.32,
+     "m1": -7.16,
+     "m3": -2.12,
+     "m6": 19.93,
+     "a1": 12.94,
+     "ytd": -14.73,
+     "a3": 100.63,
+     "a5": 32.73,
+     "a10": 10046.6
     },
     "stagionalita": [
      {
@@ -19793,7 +19797,7 @@
    },
    "rs_1m": -2.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.2,
+   "rs_ndx_1m": 5.1,
    "beta_ndx": 0.67,
    "avg_corr": 0.35,
    "max_corr": 0.77,
@@ -41950,7 +41954,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -48666,7 +48670,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -45.3,
-      "meglio": 24.6
+      "meglio": 24.5
      },
      {
       "mese": 11,
@@ -62603,14 +62607,14 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -68491,7 +68495,7 @@
      1220.99,
      1256.02,
      1386.5,
-     1446.3,
+     1446.29,
      1341.93,
      1400.14,
      1462.56,
@@ -72583,7 +72587,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -94963,7 +94967,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -103916,11 +103920,11 @@
      155.94,
      153.23,
      164.84,
-     169.06,
+     169.07,
      171.99,
      163.61,
      170.13,
-     175.79,
+     175.8,
      179.02,
      189.57,
      173.43,
@@ -111073,7 +111077,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -116103,7 +116107,7 @@
      137.0,
      128.03,
      157.65,
-     180.62,
+     180.61,
      165.11,
      156.67,
      145.63,
@@ -120280,7 +120284,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -120447,7 +120451,7 @@
      427.74,
      448.72,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -135236,6 +135240,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Here are the 2027 capital-gains tax rates for each income level",
+     "riassunto": "How much will you pay in capital-gains taxes next year? The IRS just released this crucial information.",
+     "fonte": "MarketWatch",
+     "quando": "2026-11-07T19:48:00Z",
+     "url": "https://www.marketwatch.com/story/here-are-the-2027-capital-gains-tax-rates-for-each-income-level-166fc306?mod=mw_rss_topstories"
+    },
+    {
      "titolo": "The 2027 tax brackets are out. See what the standard deduction and SALT tax breaks will be.",
      "riassunto": "The tax brackets at the heart of Americans’ income-tax bills will be adjusting at a steeper level in 2027 compared to this year, underscoring inflation’s rekindled presence.",
      "fonte": "MarketWatch",
@@ -135353,13 +135364,6 @@
      "fonte": "CNBC Economia",
      "quando": "2026-10-29T18:06:31Z",
      "url": "https://www.cnbc.com/2026/10/29/pce-inflation-report-september-2026-.html"
-    },
-    {
-     "titolo": "Analysis: Kevin Warsh is keeping Wall Street guessing. It may be his most powerful tool",
-     "riassunto": "The new chairman made clear he leans toward higher interest rates, but left himself options depending on how the data comes in.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-10-29T17:32:34Z",
-     "url": "https://www.cnbc.com/2026/10/29/kevin-warsh-fed-october-rate-decision-december-hike.html"
     }
    ],
    "fonti": [
@@ -149097,7 +149101,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-07T19:17:25Z"
+   "letto_il": "2026-11-07T19:57:49Z"
   }
  },
  "broker": null,
@@ -149700,7 +149704,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-07T19:17:25Z"
+  "letto_il": "2026-11-07T19:57:49Z"
  },
  "predictions": [],
  "options": {
@@ -217439,7 +217443,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 3 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -217523,6 +217527,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-07T19:17:26Z"
+  "generated_at": "2026-11-07T19:57:50Z"
  }
 }
