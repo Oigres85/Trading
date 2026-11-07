@@ -591,7 +591,7 @@ decisione si prende.
 
 - AMD — conti del 2026-11-03 · scritto il 01/11/2026 su richiesta del CEO (AMD è in OSSERVAZIONE, non in conflitto) · la tesi: acceleratori AI e processori per data center, ricavi +50,1% a/a al 30/06, stime in salita del 14,9% a 90 giorni, si autofinanzia · tenere se la guida del trimestre e del data center non scende sotto il consenso (EPS 1,68 $) e le stime a 30 giorni dopo i conti restano più rialzi che tagli · mediare se, in più, la chiusura dopo i conti tiene il pavimento 502,60 e il rincaro del CDS (eccesso +25,8% sull'indice nella settimana al 30/10) non continua — e la media aumenta i semiconduttori (68,3% dell'azionario): si dice accanto · vendere se la guida del data center scende E le stime girano a più tagli che rialzi: la tesi si rompe, non il prezzo — dal 15/10 non si vende sui ribassi · confermato dal CEO il 02/11/2026
 - CRWV — conti del 2026-11-10 · scritto il 01/11/2026 sulla regola del 24/10 (si decide sul FINANZIAMENTO, a prescindere dal carico) · tenere se i conti mostrano coperti da finanziamenti chiusi il debito in scadenza entro 12 mesi (7,5 mld $ contro 5,5 di liquidità al 30/06) e gli investimenti già contrattati, gli ordini firmati tengono e nessun cliente grande (OpenAI per primo) riduce gli impegni · mediare se, in più, la guida sugli investimenti è finanziata, il risultato operativo torna sopra gli interessi (oggi -0,03×) e la diluizione resta nel programma annunciato · vendere se il finanziamento NON è coperto, o un cliente grande riduce gli impegni, o arriva un'emissione di azioni oltre il programma annunciato · confermato dal CEO il 02/11/2026
-- RGTI — conti del 2026-11-10 · scritto il 03/11/2026 sotto la decisione del CEO del 03/11 (§1undecies: i conti non vendono) · tenere: sì, qualunque cosa dicano i conti — si leggono, come informazione, la cassa contro il consumo, le emissioni di azioni e i tempi del programma dei processori · mediare: no, la riserva è per Anthropic · vendere: no prima del recupero di tutti i rami secchi; resta solo il salvavita (§1ter) · confermato dal CEO il 03/11/2026 (*"2 no"*)
+- RGTI — conti del 2026-11-10 · scritto il 03/11/2026 sotto la decisione del CEO del 03/11 (§1undecies: i conti non vendono) · tenere: sì, qualunque cosa dicano i conti — si leggono, come informazione, la cassa contro il consumo, le emissioni di azioni e i tempi del programma dei processori · mediare: no, la riserva è per Anthropic (così il 03/11; dal 07/11 la riserva serve anche alle medie, §1undecies: una media su RGTI ai conti la chiede il CEO) · vendere: no prima del recupero di tutti i rami secchi; resta solo il salvavita (§1ter) · confermato dal CEO il 03/11/2026 (*"2 no"*)
 
 ⚠ **Dal 03/11/2026 gli esami non vendono** (decisione del CEO, §1undecies: *"2 no"*): la clausola «vendere» di CRWV
 resta scritta come lettura dei conti, non come azione — una tesi rotta si annota, non si vende, fino al recupero di
@@ -938,9 +938,9 @@ euro se si vendesse oggi.
 | 29/10/2026 | GOOGL | acquisto | 37 | 282,00 | 1,1130 | BCE, riferimento del 29/10/2026 | seduta confermata dal CEO il 30/10/2026 |
 | 30/10/2026 | INTC | acquisto | 130 | 64,50 | 1,1172 | BCE, riferimento del 30/10/2026 | |
 | 30/10/2026 | ORCL | acquisto | 60 | 129,60 | 1,1172 | BCE, riferimento del 30/10/2026 | prezzo corretto dal CEO il 30/10/2026 (il primo dichiarato, 126,50, stava sotto il minimo della seduta) |
-| 02/11/2026 | INTC | vendita | 130 | 65,00 | 1,1172 | BCE, riferimento del 30/10/2026: l'ultimo pubblicato all'ora della vendita (pre-market, prima delle 14:15) | da confermare col cambio applicato da Sella; commissione misurata 15 $ |
-| 02/11/2026 | AVGO | acquisto | 24 | 324,00 | 1,1216 | BCE, riferimento del 02/11/2026 | da confermare col cambio applicato da Sella; commissione stimata 15 $ come quella di INTC |
-| 02/11/2026 | WDC | acquisto | 24 | 342,00 | 1,1216 | BCE, riferimento del 02/11/2026 | da confermare col cambio applicato da Sella; commissione stimata 15 $ come quella di INTC |
+| 02/11/2026 | INTC | vendita | 130 | 65,00 | 1,1172 | BCE, riferimento del 30/10/2026: l'ultimo pubblicato all'ora della vendita (pre-market, prima delle 14:15) | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione misurata 15 $ |
+| 02/11/2026 | AVGO | acquisto | 24 | 324,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
+| 02/11/2026 | WDC | acquisto | 24 | 342,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -1004,14 +1004,25 @@ solo dopo che TUTTI hanno recuperato — non al ritorno del libro al massimo del
 diversificata. Gli esami ai conti NON vendono (§1quinquies) e la vendita per evidenza è sospesa (§1sexies): l'unica vendita
 prima del recupero resta il salvavita a −30% (§1ter). ⚠ Detto una volta: il salvavita guarda l'azionario intero, quindi un
 singolo nome può scendere molto senza farlo scattare (RGTI pesa il 2,6%, CRWV il 4,7%). Quali nomi e quale misura del
-recupero: la domanda qui sotto. L'esame di RGTI (conti del 10/11) è scritto in §1quinquies sotto questa decisione.
+recupero: chiuso il 07/11 (qui sotto). L'esame di RGTI (conti del 10/11) è scritto in §1quinquies sotto questa decisione.
+
+**Chiuse il 07/11/2026** (CEO: *"1 euro (Intel ricordo che è stato venduto) · 2 si anche per medie · 3 dovresti
+dirmelo tu · 4 prezzo carico meglio se massimo storico"*):
+- il cambio di Sella su INTC, AVGO e WDC: il CEO vede gli importi in euro, non il cambio → in §1decies resta il
+  riferimento BCE, dichiarato (come il 30/10); la plusvalenza esatta in euro la dà l'estratto di Sella. La liquidità
+  resta la stima di §1;
+- la riserva: **per la quotazione di Anthropic e per le medie dopo i conti** (torna la decisione del 01/11); la media
+  solo se la tesi regge, mai prima dei conti (§1sexies);
+- i rami secchi: li nomina l'analista su delega del CEO — i quattro in fondo alla classifica del 03/11 «chi avrà più
+  difficoltà a risalire», le tesi finanziate a cassa che brucia o a emissioni di azioni (RGTI, MSTR) e a debito con un
+  cliente che pesa (CRWV, ORCL): **RGTI, CRWV, MSTR, ORCL** (al 06/11 −47%, −39%, −26%, −10% sul carico). Caso di
+  confine BE (−19%, allarme di credito, ma prezzo sano e tesi forte); fuori MRVL (−34%, prezzo sano e tesi forte) e
+  gli ingressi del 02/11 (AVGO, WDC), che si giudicano ai loro conti. Da confermare: la domanda qui sotto;
+- il recupero: **ciascuno al proprio carico** è la soglia; il massimo storico è la preferenza del CEO, non la soglia.
 
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 02/11/2026 | INTC, vendita del 02/11: quale cambio ha applicato Sella (o il controvalore in euro accreditato)? | la plusvalenza fiscale si calcola in euro col cambio dell'acquisto e della vendita; in §1decies c'e' il riferimento BCE del 30/10, da confermare | il CEO dà il cambio o l'importo in euro dal broker |
-| 02/11/2026 | AVGO e WDC, acquisti del 02/11: quale cambio ha applicato Sella, quale commissione, e quanta liquidità resta? | il carico in euro e la plusvalenza fiscale si calcolano col cambio del broker; in §1decies c'è il riferimento BCE del 02/11 e una commissione stimata, e la liquidità (~17.270 €) è una stima | il CEO dà cambio e commissione (o gli importi in euro) e il saldo dal broker |
-| 02/11/2026 | La riserva ora è solo per Anthropic (*"Ora sto fermo solo per antropich"*): le medie dopo i conti di AMD (03/11) e CRWV (10/11), previste il 01/11, restano possibili? | gli esami di AMD e CRWV in §1quinquies sono confermati e i conti di AMD escono il 03/11 | il CEO dice se le medie restano fra gli usi della riserva |
-| 03/11/2026 | La decisione sui rami secchi (*"1 no recupero di tutti"*): quali nomi sono i rami secchi (la classifica del 03/11 metteva in testa RGTI, CRWV, MSTR, poi ORCL), e «recupero» vuol dire tornare ciascuno al proprio carico o al proprio massimo? | dal carico servono oggi RGTI +106%, CRWV +50%, MSTR +32%, ORCL +8,5%; dal massimo a 5 anni RGTI +456%, MSTR +317%, CRWV +270%, ORCL +194%: la scelta decide quando si taglia | il CEO nomina i rami secchi e la misura del recupero |
+| 07/11/2026 | I rami secchi proposti dall'analista su delega del CEO: **RGTI, CRWV, MSTR, ORCL** (BE il caso di confine) — confermi? | l'elenco decide quando si taglia: si taglia solo quando TUTTI sono tornati al carico, e la cordata va al passo del più lento | il CEO conferma o cambia l'elenco |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
