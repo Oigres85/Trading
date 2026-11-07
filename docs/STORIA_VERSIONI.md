@@ -9815,3 +9815,21 @@ previsione che conosce una parte del suo esito gonfia l'affidabilità misurata: 
 - Gate: 1, sulla strada vera di `pagina()` con un registro finto che conta le scritture (seduta, dopo con dati vecchi,
   dopo con dati nuovi, sabato, l'apertura con l'ora legale); due iniezioni (ramo tolto, controllo delle barre tolto)
   mordono entrambe. Pavimento 1120 → 1121.
+
+## v539 — il giudizio alla cieca: il pregiudizio del conflitto misurato (07/11/2026)
+Il CEO ha chiesto cosa cambia nelle risposte il conflitto d'interessi che l'analista dichiara (Claude è un prodotto di
+Anthropic, concorrente di OpenAI) e se si può superare. Del tutto no: un pregiudizio che non si vede non si toglie con la
+buona volontà. Si riduce col metodo e si misura; alla proposta il CEO ha detto *"Sì"*.
+- `scripts/cieca.py`: `schede` (per ogni posizione una scheda anonima coi fatti della tenuta in fasce, la chiave fuori
+  da git, un giro aperto si ristampa uguale), `giudica` (cieco, non si corregge), `col_nome`, `svela` (solo a giro
+  completo), `bilancio` (scarto col nome meno cieco per gruppo di conflitto; dopo 60 sedute chi ha visto giusto contro
+  QQQ). I fatti sono le prove della tenuta di numeri_libro e gli allarmi di sintesi.allarmi (v161). I gruppi sono quelli
+  di CLAUDE.md, istruzione 6, e un gate li rilegge da lì.
+- Nel comando unico il bilancio gira prima della sintesi; diario `memoria/giudizi_ciechi.jsonl` fra le memorie; scheda,
+  FORMATO (8sexies, `[cieca]`), /aggiorna, CLAUDE.md (istruzione 6: sui nomi in conflitto prima alla cieca), LIBRO
+  §1octodecies con le convenzioni (60 sedute, 10 casi, 0,5 gradini).
+- Primo giro (14 posizioni): 14 su 14 uguali fra cieco e col nome — prova debole, dichiarata nel libro: i verdetti col
+  nome erano di poche ore prima, dagli stessi fatti.
+- Gate: 5 (scheda anonima e giro, chi ha visto giusto, gruppi da CLAUDE.md, convenzioni dal libro, collegamenti con la
+  strada vera del bilancio); tre iniezioni (il nome nella scheda, lo scarto rovesciato, un investitore dimenticato)
+  mordono ciascuna sul suo. Pavimento 1121 → 1126.

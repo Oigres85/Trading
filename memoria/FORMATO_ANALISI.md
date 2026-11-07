@@ -228,6 +228,11 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    lognormale, opzioni, simulazione, serie storiche, Polymarket/Kalshi/FedWatch. Registra le previsioni nel registro dal
    vivo (`memoria/previsioni.jsonl`), risolve le scadute e dice l'affidabilità dal vivo e quante se ne attendono su n.
    Regola e convenzioni in `LIBRO.md` §1septdecies.
+8sexies. `python3 scripts/cieca.py bilancio` (v539, CEO, 07/11/2026: *"Sì"* al giudizio alla cieca) — il
+   **pregiudizio del conflitto misurato**: per gruppo (investitori di Anthropic, clienti di OpenAI, xAI, nessun
+   conflitto) lo scarto fra il verdetto dato col nome e quello dato alla cieca sulle schede anonime, e dopo 60 sedute
+   quale dei due ha visto giusto contro QQQ. Un giudizio su un nome in conflitto si dà PRIMA alla cieca (`cieca.py
+   schede`, `giudica`, poi `col_nome` e `svela`). Regola e convenzioni in `LIBRO.md` §1octodecies.
 8bis. `python3 scripts/sintesi.py --registra` (v524, CEO, 31/10/2026: *"Procedi su tutto"*) — gira DOPO gli strumenti
    del giro e prima dello stato del sistema: **non ricalcola niente**, incrocia ciò che numeri_libro, rotazione, indici
    e posizionamento hanno scritto in `memoria/dati/giro/` (la variabile TRADING_GIRO, una lettura per analisi) con la
@@ -264,6 +269,8 @@ nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA
    Poi **le previsioni** (v536, l'eccezione misurata alla regola 1), in un blocco SEPARATO dai fatti: per famiglia le
    probabilità che contano oggi, ognuna col metodo, la base e la sua affidabilità misurata (e se il metodo batte la
    base); i metodi affiancati, mai una media; quante se ne attendono su n; l'affidabilità dal vivo dal registro.
+   Accanto ai conflitti d'interessi, **il giudizio alla cieca** (v539) in una riga per gruppo: lo scarto fra col nome
+   e alla cieca, e se è già misurabile.
 1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso — scritto
    dopo aver letto tutto il resto.
 2. **Il regime: le sei luci**, una riga ciascuna col colore, il perché e i dati che la compongono, con la freccia se è
@@ -693,6 +700,8 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
   diario che misura l'intuito contro la statistica (01/11)
 - `[laboratorio]` il laboratorio in tre righe in ogni analisi: la perdita media nel 5% dei giorni peggiori e chi la
   porta, il regime di SMH e QQQ, la volatilità di adesso (03/11; il dettaglio delle nove librerie su richiesta)
+- `[cieca]` il giudizio alla cieca: per ogni gruppo di conflitto lo scarto fra il verdetto col nome e quello alla
+  cieca, e chi dei due ha visto giusto dopo 60 sedute — il pregiudizio misurato, non solo dichiarato (07/11)
 - `[previsioni]` il sistema previsionale: per ogni evento la probabilità, la base, l'intervallo e la % di affidabilità
   misurata (sul passato senza futuro, poi dal vivo), coi metodi affiancati; «% di raggiungimento di n previsioni» (03/11)
 - `[rendimento_deposito]` il rendimento del deposito titoli fra due rendiconti trimestrali del broker (LIBRO.md §1terdecies), a Dietz modificato, coi costi che i controvalori non comprendono (bollo, commissioni misurate), il contributo di ogni titolo e QQQ in euro sugli stessi giorni — il capitale investito, non il conto (31/10)

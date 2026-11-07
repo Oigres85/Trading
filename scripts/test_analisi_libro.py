@@ -7014,6 +7014,9 @@ _U505 = {
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
                     "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
                     "letture: 0 nuove in questo giro"],
+    # v539 — il giudizio alla cieca: un blocco solo, nella sua sezione
+    "cieca": ["GIUDIZIO ALLA CIECA (v539) — il pregiudizio del conflitto misurato: il verdetto col nome contro quello alla cieca",
+              "  1 giri svelati, 14 nomi giudicati alla cieca"],
     # v536 — le previsioni: un blocco solo, nella sua sezione
     "previsioni": ["PREVISIONI (v536) — 06/11/2026 17:00 ora italiana · eccezione MISURATA alla regola 1 (CEO, 03/11/2026)",
                    "  236 previsioni di oggi da 5 moduli su 5"],
@@ -11303,6 +11306,94 @@ _ok538, _es538 = _prova538(_PV536)
 check("v538 si registra solo a mercato chiuso: in seduta, e dopo la chiusura finche' le barre non contengono la seduta "
       "appena chiusa, il registro NON scrive e dice perche'; con la seduta nei dati, e di sabato, scrive; l'apertura delle "
       "9:30 di New York segue l'ora legale (zoneinfo, v470): " + str(_es538), _ok538)
+
+# ═════════ v539 — il giudizio alla cieca: il pregiudizio del conflitto misurato (07/11/2026) ═════════
+_CI539 = _il536.import_module("cieca")
+from datetime import datetime as _dt539, timezone as _tz539, date as _d539, timedelta as _td539
+
+
+def _riga539(tk, c, m50, m200, y, v, ora, su, giu, auto, mesi):
+    return {"tk": tk, "peso": 12.34, "carico": {"pct": 688.0},
+            "prove": {"tendenza": {"stato": "rotta", "chiusura": c, "sma50": m50, "sma200": m200},
+                      "ricavi": {"yoy": y, "trim": "2026-08-31"}, "stime": {"var": v, "ora": ora},
+                      "revisioni": {"su": su, "giu": giu}, "bilancio": {"autofinanzia": auto, "mesi": mesi}}}
+
+
+_R539 = [_riga539("NVDA", 187.45, 180, 170, 60, 12, 4, 10, 1, True, None),
+         _riga539("CRWV", 46.34, 75.6, 90.2, 112, -31, -4.7, 2, 6, False, 3.2),
+         _riga539("ZZZQ", 50.0, 49, 48, 5, 3, 1, 1, 1, True, None)]
+_dir539 = tempfile.mkdtemp()
+_kp539, _dp539 = os.path.join(_dir539, "chiave.json"), os.path.join(_dir539, "diario.jsonl")
+_ora539 = _dt539(2026, 11, 7, 9, 0, tzinfo=_tz539.utc)
+_k539, _n539 = _CI539.apri_giro(_R539, {"CRWV": ["azioni +30,1% in un anno"]}, _ora539, "2026-11-06", chiave_p=_kp539)
+_txt539 = _CI539.resa_schede(_k539, _n539, [])
+_k539b, _n539b = _CI539.apri_giro(list(reversed(_R539)), {}, _ora539, "2026-11-06", chiave_p=_kp539)
+_sv539a = _CI539.svela(_ora539, _kp539, _dp539)
+for _l539 in sorted(_k539["chiave"]):
+    _CI539.giudica(_l539, "guardare", "prova", _ora539, _kp539, _dp539)
+_g539 = _CI539.giudica(sorted(_k539["chiave"])[0], "preoccupa", "prova", _ora539, _kp539, _dp539)
+_CI539.col_nome("NVDA", "tranquillo", "prova", _ora539, _kp539, _dp539)
+_CI539.col_nome("CRWV", "preoccupa", "prova", _ora539, _kp539, _dp539)
+_sv539b = _CI539.svela(_ora539, _kp539, _dp539)
+_sc539 = _CI539.bilancio(_CI539.leggi_diario(_dp539))["scarti"]
+check("v539 il giudizio alla cieca: la scheda non nomina il titolo (ne' ticker, ne' prezzo, ne' peso, ne' carico, ne' "
+      "trimestre fiscale); il giro aperto si ristampa uguale; si svela solo a giro completo; un verdetto cieco non si "
+      "corregge; lo scarto col nome meno cieco va al gruppo giusto (+1 sugli investitori di Anthropic, -1 sui clienti "
+      "di OpenAI): " + str({g: v.get("media") for g, v in _sc539.items()}),
+      not any(x in _txt539 for x in ("NVDA", "CRWV", "ZZZQ", "187", "46,34", "12,34", "688", "2026-08-31"))
+      and "SOCIETA' A" in _txt539 and "diluizione forte" in _txt539
+      and _k539b["chiave"] == _k539["chiave"] and _n539b is False
+      and _sv539a[0] is False and _g539[0] is False and _sv539b[0] is True
+      and (_sc539.get("investitori di Anthropic") or {}).get("media") == 1
+      and (_sc539.get("clienti di OpenAI") or {}).get("media") == -1
+      and "nessun conflitto" not in _sc539
+      and "non ancora misurabile" in (_sc539.get("clienti di OpenAI") or {}).get("giudizio", ""))
+
+_gg539 = [(_d539(2026, 11, 6) + _td539(days=i)).isoformat() for i in range(70)]
+_bb539 = {"QQQ": [{"t": g, "c": 100.0} for g in _gg539],
+          "NVDA": [{"t": g, "c": 100.0 + i} for i, g in enumerate(_gg539)],
+          "CRWV": [{"t": g, "c": 100.0 - i * 0.5} for i, g in enumerate(_gg539)]}
+_cp539 = _CI539.appaiati(_CI539.leggi_diario(_dp539))
+_e539, _at539 = _CI539.esiti(_cp539, _bb539)
+_e539c, _at539c = _CI539.esiti(_cp539, {k: v[:30] for k, v in _bb539.items()})
+check("v539 chi ha visto giusto: dopo 60 sedute contro QQQ (date allineate per data) «preoccupa» e' giusto se il nome fa "
+      "peggio, «tranquillo» se fa meglio, «guardare» non si conta; senza l'orizzonte il caso aspetta e si dice: "
+      + str(_e539),
+      (_e539.get("investitori di Anthropic") or {}).get("col_nome") == [1, 1]
+      and (_e539.get("clienti di OpenAI") or {}).get("col_nome") == [1, 1]
+      and (_e539.get("investitori di Anthropic") or {}).get("cieco") == [0, 0]
+      and _at539 == 1 and _e539c == {} and _at539c == 3)
+
+_r6539 = _cl536[_cl536.find("6. **Conflitti d'interessi"):]
+_r6539 = _r6539[:_r6539.find("\n7. ")]
+_ma539 = re.search(r"([A-Z]{2,5}(?:, [A-Z]{2,5})*) sono investitori di Anthropic", _r6539)
+_mo539 = re.search(r"([A-Z]{2,5}(?:, [A-Z]{2,5})*) clienti di OpenAI", _r6539)
+check("v539 i gruppi di conflitto della cieca sono quelli di CLAUDE.md, istruzione 6 (riletti da li'), e xAI c'e'",
+      bool(_ma539) and bool(_mo539)
+      and set(_ma539.group(1).split(", ")) == set(_CI539.GRUPPI.get("investitori di Anthropic") or ())
+      and set(_mo539.group(1).split(", ")) == set(_CI539.GRUPPI.get("clienti di OpenAI") or ())
+      and "SpaceX possiede xAI" in _r6539 and "xAI (SpaceX)" in _CI539.GRUPPI)
+
+_s539 = _lib474[_lib474.find("## 1octodecies"):_lib474.find("\n## ", _lib474.find("## 1octodecies") + 1)]
+_c539 = _s539[_s539.find("Convenzioni (v240)"):]
+_c539 = _c539[:_c539.find("\n\n")]
+_nn539 = tuple(float(x.replace(",", ".")) for x in re.findall(r"\*\*(\d+(?:,\d+)?)\*\*", _c539))
+check("v539 le convenzioni del giudizio alla cieca stanno nel libro (§1octodecies) e coincidono con cieca.py: "
+      + str(_nn539),
+      _nn539 == (float(_CI539.ORIZZONTE), float(_CI539.MIN_CASI), float(_CI539.SOGLIA_SCARTO)))
+
+_pr539 = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "cieca.py"), "bilancio"],
+                        capture_output=True, text=True, timeout=120)
+check("v539 collegamenti: il comando unico esegue il bilancio della cieca in ogni fase PRIMA della sintesi e committa il "
+      "diario; la scheda ha sezione, catalogo e voce; il formato lo strumento e la chiave; /aggiorna lo dichiara fuori; "
+      "CLAUDE.md lo porta accanto ai conflitti; la strada vera del bilancio esce 0 col suo titolo",
+      all(["cieca.py", "bilancio"] in v and v.index(["cieca.py", "bilancio"]) < v.index(["sintesi.py", "--registra"])
+          for v in _cm536.values()) and "cieca.py" in _AN528.STRUMENTI
+      and any(p.name == "giudizi_ciechi.jsonl" for p in _AN528.MEMORIE)
+      and "cieca" in SC.CATALOGO and "cieca" in SC.REGISTRO and "cieca" in [x[0] for x in SC.SEZIONI]
+      and "`[cieca]`" in _fmt528 and "`python3 scripts/cieca.py bilancio`" in _fmt528
+      and "`scripts/cieca.py` resta **fuori**" in _ag536 and "`cieca.py`" in _r6539
+      and _pr539.returncode == 0 and _pr539.stdout.startswith("GIUDIZIO ALLA CIECA (v539)"))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

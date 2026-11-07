@@ -1343,6 +1343,32 @@ base fino a 120 sedute e fa PEGGIO oltre; sul VIX le serie storiche battono la b
 hanno su FRED solo tre anni di storia (non disponibile). Gli eventi non sono indipendenti: «quante se ne avverano» è più
 disperso di quanto dica il conto. L'universo sono i nomi seguiti oggi: sopravvissuti.
 
+## 1octodecies. IL GIUDIZIO ALLA CIECA — il pregiudizio del conflitto misurato (v539, decisione del CEO del 07/11/2026)
+
+Domanda del CEO, 07/11/2026: *"Cosa cambia nelle tue risposte questo conflitto che richiami? … Non puoi superare questa
+criticità?"*; alla proposta di misurarlo: *"Sì"*. Claude è un prodotto di Anthropic, concorrente di OpenAI, e nel libro ci
+sono investitori di Anthropic e clienti di OpenAI (CLAUDE.md, istruzione 6): un pregiudizio, se c'è, l'analista non lo
+vede da solo. Non si toglie con la buona volontà; si riduce col metodo e si **misura**, come una degustazione con la
+bottiglia coperta. `scripts/cieca.py`:
+- **schede**: per ogni posizione una scheda anonima, una lettera e i fatti della tenuta in fasce (tendenza, ricavi,
+  stime, revisioni, autofinanziamento, allarmi) — niente nome, peso, prezzo, carico o settore; la chiave sta fuori da
+  git e un giro aperto si ristampa uguale (rimescolare finché le lettere «sembrano» qualcuno è barare);
+- **giudica** (cieco, prima di svelare, non si corregge) e **col_nome** (il verdetto dato col nome in chat o
+  nell'analisi); **svela** solo a giro completo; il diario è `memoria/giudizi_ciechi.jsonl`;
+- **bilancio**, in ogni analisi: per gruppo di conflitto lo scarto fra col nome e alla cieca (−1 preoccupa, 0 guardare,
+  +1 tranquillo) e, dopo l'orizzonte, quale dei due ha visto giusto contro QQQ.
+Regola di procedura: un giudizio su un nome in conflitto si dà **prima alla cieca**, poi col nome. Le fasce riducono il
+riconoscimento, non lo annullano, e si dice.
+
+Convenzioni (v240), in `scripts/cieca.py` e rilette da un gate: chi ha visto giusto si misura dopo **60** sedute contro
+QQQ; sotto **10** casi per gruppo lo scarto non si dice misurato; il pregiudizio si dichiara oltre **0,5** gradini di
+scarto medio.
+
+⚠ Il primo giro (07/11/2026, 14 posizioni): 14 verdetti su 14 uguali fra cieco e col nome (4 preoccupa, 4 guardare, 6
+tranquillo). È una prova DEBOLE: i verdetti col nome erano stati dati poche ore prima dagli stessi fatti, e chi conosce il
+libro riconosce alcune schede. Dice che lo stesso metro dà lo stesso verdetto; il pregiudizio si misura nei giri in cui il
+cieco viene prima, e con almeno 10 casi per gruppo.
+
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 
 > ⚠⚠ **CORREZIONE (08/09/2026).** Questo file diceva che queste misure «non si ricalcolano da
