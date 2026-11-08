@@ -52,7 +52,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
 ## 🧭 Il sistema oggi
 - **L'analisi in chat** — un comando: `python3 scripts/analisi.py`. PRIMA `fonti_dirette.py` e `fonti_titoli.py`
   (letture alla fonte del giro, valide 30 minuti, in `memoria/dati/`), poi `numeri_libro`, `brief`, `schede_progetto`,
-  `rotazione`, `posizionamento`, `indici`, `concorrenti`, `laboratorio riassunto` (v533), `previsioni pagina` (v536), `cieca bilancio` (v539), POI `sintesi.py --registra`, DOPO `stato_sistema.py --giro`.
+  `rotazione`, `posizionamento`, `indici`, `concorrenti`, `laboratorio riassunto` (v533), `previsioni pagina` (v536), `cieca bilancio` (v539), `tesi` (v540), POI `sintesi.py --registra`, DOPO `stato_sistema.py --giro`.
   La scheda completa (`memoria/dati/scheda_analisi_*.md`, fuori da git) si manda come allegato. **Forma statistica
   (v528)**: `statistica.py pagina` dice per ogni posizione cosa è successo nei casi simili contro la base; prima di
   OGNI operazione `statistica.py ingresso TICKER PREZZO --registra "intuizione"` (valore atteso in R, variante «aspetta
@@ -62,8 +62,12 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
   decisioni ed esami (§1quinquies), tenuta (§1sexies), ordini (§1septies), conti dichiarati dall'emittente (§1octies),
   credito (§1novies), operazioni col cambio (§1decies), domande al CEO (§1undecies), fotografia del broker
   (§1duodecies), rendiconti (§1terdecies), soglie della sintesi (§1quattuordecies),
-  laboratorio (§1sexdecies), previsioni (§1septdecies), giudizio alla cieca (§1octodecies). Le soglie che il codice confronta
+  laboratorio (§1sexdecies), previsioni (§1septdecies), giudizio alla cieca (§1octodecies), tesi (§1novodecies), politica (§1vicies). Le soglie che il codice confronta
   stanno anche nel codice e un gate le rilegge dal libro.
+- **Il comitato (v540)**: SETTIMANA, CONTI, COMPRO, VENDO, PANICO, DIVERSIFICA, TRIMESTRE sono comandi del CEO
+  (`memoria/FORMATO_ANALISI.md`, «I comandi del comitato»); nelle decisioni parlano quattro voci (analista, risk
+  manager, avvocato del diavolo, segretario). Ogni posizione ha la sua tesi (LIBRO §1novodecies), scritta prima
+  dell'acquisto.
 - **`memoria/FORMATO_ANALISI.md`**: l'ordine della risposta in chat e il registro delle richieste con le chiavi
   (`[chiave]`): ogni richiesta nuova del CEO vi entra con la sua voce nel catalogo di `scripts/scheda.py`.
 - **La pipeline** `scripts/update_data.py` gira su GitHub Actions (il cron è una coda: 99-263 minuti di ritardo,
@@ -139,7 +143,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
   forum · `indici.py` multipli e volatilità · `concorrenti.py` quote e salute · `fonti_dirette.py`/`fonti_titoli.py`
   letture alla fonte · `statistica.py` forma statistica e diario · `laboratorio.py` nove librerie open source a richiesta, una domanda
   ciascuna (v532, LIBRO §1sexdecies; cvxportfolio esclusa per v161) · `previsioni.py` sistema previsionale (v536:
-  `affidabilita.py` la misura, `previsioni_*`/`mercati_previsione` i metodi, `registro_previsioni` il dal vivo) · `cieca.py` giudizio alla cieca e pregiudizio misurato (v539) · `stato_sistema.py` stato · `scheda.py` scheda completa · `comuni.py` funzioni condivise.
+  `affidabilita.py` la misura, `previsioni_*`/`mercati_previsione` i metodi, `registro_previsioni` il dal vivo) · `cieca.py` giudizio alla cieca e pregiudizio misurato (v539) · `tesi.py` le tesi e le loro condizioni (v540) · `stato_sistema.py` stato · `scheda.py` scheda completa · `comuni.py` funzioni condivise.
 - `memoria/` libro, formato, registri (`registro_performance.jsonl`, `registro_analisi.jsonl`, `wsb.jsonl`,
   `cds_sessione.jsonl`…: si committano dopo l'analisi, lo stato del sistema lo ricorda).
 - `config/` posizioni e watchlist della pipeline (devono coincidere con il libro: gate v479/v480), `cds_entita.json`.

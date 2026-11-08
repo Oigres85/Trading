@@ -226,7 +226,9 @@ const SUITE = [
      chiusa nei dati) -> 1121 */
   /* v539: 1136 punti di chiamata in test_analisi_libro (+5: la scheda anonima e il giro, chi ha visto giusto, i
      gruppi riletti da CLAUDE.md, le convenzioni dal libro, i collegamenti) -> 1126 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1126, firma: /\d+\/\d+ CHECK OK/ },
+  /* v540: 1139 punti di chiamata in test_analisi_libro (+3: le tesi lette e misurate, ogni posizione con la sua
+     tesi, i collegamenti coi comandi del comitato) -> 1129 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1129, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

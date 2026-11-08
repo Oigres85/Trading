@@ -72,7 +72,7 @@ TITOLO_RISPOSTA = "## La risposta in chat"     # v524 — l'ordine della rispost
 NEW_YORK = ZoneInfo("America/New_York")
 ROMA = ZoneInfo("Europe/Rome")
 STRUMENTI = ("fonti_dirette.py", "fonti_titoli.py", "numeri_libro.py", "brief.py", "schede_progetto.py", "rotazione.py",
-             "posizionamento.py", "indici.py", "concorrenti.py", "statistica.py", "laboratorio.py", "previsioni.py", "cieca.py",
+             "posizionamento.py", "indici.py", "concorrenti.py", "statistica.py", "laboratorio.py", "previsioni.py", "cieca.py", "tesi.py",
              "sintesi.py", "stato_sistema.py")
 # v511 — fonti_dirette.py gira PRIMA degli altri, da solo: scrive la lettura alla fonte del giro che gli altri riusano
 #   (una lettura per analisi, la stessa osservazione per tutti), e stampa il blocco FRESCHEZZA DEI DATI
@@ -164,6 +164,8 @@ def comandi(f, sedute=1):
               "misurata: l'eccezione alla regola 1 (v536)", ["previsioni.py", "pagina"]))
     c.append(("GIUDIZIO ALLA CIECA — il pregiudizio del conflitto misurato: il verdetto col nome contro quello alla "
               "cieca, per gruppo (v539)", ["cieca.py", "bilancio"]))
+    c.append(("TESI — tre condizioni e tre segnali per posizione, le misurabili controllate sulle prove della "
+              "tenuta (v540)", ["tesi.py"]))
     c.append(("SINTESI OPERATIVA — il regime in sei luci, il libro nel regime, la mappa tesi × prezzo, cosa e' cambiato, "
               "l'agenda e le azioni delle regole", ["sintesi.py", "--registra"]))
     c.append(("STATO DEL SISTEMA — codice e test, pipeline su GitHub, dati del giro, dipendenze da GitHub con la loro "

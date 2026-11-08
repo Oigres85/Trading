@@ -65,6 +65,7 @@ SEZIONI = (
     ("laboratorio", "0ter · Laboratorio in tre righe: i giorni peggiori, il regime, la volatilita' di adesso"),  # v533
     ("previsioni", "0ter · Previsioni: probabilita' coi metodi affiancati e l'affidabilita' misurata (eccezione alla regola 1)"),  # v536
     ("cieca", "0ter · Giudizio alla cieca: il verdetto col nome contro quello alla cieca, per gruppo di conflitto"),  # v539
+    ("tesi", "0ter · Tesi: tre condizioni e tre segnali per posizione, le misurabili controllate"),  # v540
     ("semaforo", "0 · Semaforo d'uscita"),
     ("salvavita", "0 · Salvavita e piano di riduzione"),
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
@@ -249,6 +250,7 @@ CATALOGO = {
     "laboratorio": Strumento("laboratorio", (Blocco(r"LABORATORIO IN TRE RIGHE", "laboratorio"),)),        # v533
     "previsioni": Strumento("previsioni", (Blocco(r"PREVISIONI \(v536\)", "previsioni"),)),                  # v536
     "cieca": Strumento("cieca", (Blocco(r"GIUDIZIO ALLA CIECA \(v539\)", "cieca"),)),                        # v539
+    "tesi": Strumento("tesi", (Blocco(r"TESI \(v540\)", "tesi"),)),                                       # v540
     "stato_sistema": Strumento("stato_sistema", (                                                           # v518
         Blocco(r"STATO DEL SISTEMA|CODICE — |PIPELINE SU GITHUB|DATI DI QUESTO GIRO|DIPENDENZE DA GITHUB|COERENZA DEL "
                r"LIBRO|DOMANDE APERTE AL CEO", "stato_sistema"),
@@ -298,6 +300,7 @@ REGISTRO = {
     "laboratorio": Voce(("laboratorio",)),                                                            # v533
     "previsioni": Voce(("previsioni",)),                                                              # v536
     "cieca": Voce(("cieca",)),                                                                        # v539
+    "tesi": Voce(("tesi",)),                                                                          # v540
     "rischio_eventi": Voce(("sintesi",), righe=(("sintesi", "5 · IL RISCHIO DEGLI EVENTI"),)),          # v526
     "stato_sistema": Voce(("stato_sistema",)),                                                         # v518
     "premarket": Voce(("premarket",), (Marcatore("premarket", None, "tutti"),), fasi=("pre-market", "after-hours")),

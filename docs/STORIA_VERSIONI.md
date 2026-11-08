@@ -9833,3 +9833,20 @@ buona volontà. Si riduce col metodo e si misura; alla proposta il CEO ha detto 
 - Gate: 5 (scheda anonima e giro, chi ha visto giusto, gruppi da CLAUDE.md, convenzioni dal libro, collegamenti con la
   strada vera del bilancio); tre iniezioni (il nome nella scheda, lo scarto rovesciato, un investitore dimenticato)
   mordono ciascuna sul suo. Pavimento 1121 → 1126.
+
+## v540 — il comitato: le tesi di ogni posizione, la politica proposta, i comandi (08/11/2026)
+Il CEO ha chiesto di portare al massimo l'analisi «partendo da zero»; alla proposta di montare il metodo del comitato
+d'investimento dentro il sistema (dove stanno già i dati e mesi di memoria), invece che in un progetto nuovo: *"Ok
+procedi come dici tu"*.
+- LIBRO §1novodecies: una tesi per ognuna delle 15 posizioni (perché, 3 condizioni, 3 segnali, verdetto datato); le
+  condizioni misurabili portano un'etichetta (`{ricavi>=X}`, `{stime>=X}`, `{revisioni}`, `{cassa>=X}`,
+  `{autofinanzia}`, `{tendenza}`). LIBRO §1vicies: la politica PROPOSTA (15% per titolo, semiconduttori al 50% in 12-24
+  mesi a tappe e sui rialzi, cuscinetto di 6 mesi, piano a −20/−30/−40%), con tre domande al CEO in §1undecies.
+- `scripts/tesi.py`: rilegge le tesi e misura le condizioni sulle prove della tenuta (v161); nel comando unico prima
+  della sintesi. Al primo giro tre condizioni violate: CRWV (stime −31% a 90 giorni), GOOGL (revisioni 16 su, 23 giù),
+  ORCL (cassa per 5,9 mesi di investimenti). Una condizione violata non vende: la tesi va riletta.
+- FORMATO: «I comandi del comitato» (SETTIMANA, CONTI, COMPRO, VENDO, PANICO, DIVERSIFICA, TRIMESTRE) e le quattro voci
+  nelle decisioni; 8septies e `[tesi]`; CLAUDE.md, /aggiorna, scheda, lo stato costruito di v505.
+- Gate: 3 (lettura e misura su una fixture con obbligazione e posizione senza tesi; ogni posizione del libro con la sua
+  tesi; collegamenti con la strada vera); tre iniezioni (revisioni rovesciate, la tesi di MRVL tolta, lo strumento
+  staccato dal comando unico) mordono ciascuna sul suo. Pavimento 1126 → 1129.

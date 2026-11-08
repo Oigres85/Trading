@@ -231,6 +231,9 @@ comando legge, non scrive.
 la base, fasce di calibrazione, quante se ne avverano su n) e lo schema dei loro record — un modulo senza esecuzione propria,
 le cui prove girano nella suite.
 
+`scripts/tesi.py` resta **fuori** (v540): le tesi dell'analisi in chat (LIBRO.md §1novodecies): rilegge le tre
+condizioni di ogni posizione e controlla quelle misurabili sulle prove della tenuta — questo comando legge, non scrive.
+
 `scripts/cieca.py` resta **fuori** (v539): il giudizio alla cieca dell'analisi in chat (LIBRO.md §1octodecies): schede
 anonime, verdetti ciechi e col nome, e il diario `memoria/giudizi_ciechi.jsonl` che misura il pregiudizio del
 conflitto — questo comando legge, non scrive.
@@ -266,7 +269,7 @@ in `memoria/cds_sessione.jsonl`: questo comando legge, non scrive.
 
 `scripts/analisi.py` resta **fuori** (v473): è il comando unico dell'analisi in chat — «Analisi»
 e «Aggiorna analisi» del CEO — che esegue `fonti_dirette.py` e `fonti_titoli.py` e poi in parallelo `numeri_libro.py`, `brief.py`,
-`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py`, `concorrenti.py`, `statistica.py`, `laboratorio.py` (le tre righe), `previsioni.py` e `cieca.py` (il bilancio), già dichiarati fuori qui con la loro ragione, poi
+`schede_progetto.py`, `rotazione.py`, `posizionamento.py`, `indici.py`, `concorrenti.py`, `statistica.py`, `laboratorio.py` (le tre righe), `previsioni.py`, `cieca.py` (il bilancio) e `tesi.py`, già dichiarati fuori qui con la loro ragione, poi
 `stato_sistema.py` (eseguito anche qui, al passo 3bis), e chiude con la checklist di `memoria/FORMATO_ANALISI.md`. Eseguirlo qui affiancherebbe al rapporto una seconda
 resa delle stesse grandezze (classe v161/v207).
 

@@ -1032,6 +1032,9 @@ momento di tagliare lo decide il CEO (§0: le regole sono guide).
 
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
+| 08/11/2026 | Le 14 tesi di §1novodecies (perché, 3 condizioni, 3 segnali, verdetto): le confermi o cambi qualcosa? | le condizioni misurate a ogni analisi decidono quando una tesi va riletta | il CEO conferma o corregge |
+| 08/11/2026 | La politica di §1vicies: peso massimo 15% per titolo e semiconduttori al 50% in 12-24 mesi, piano a −40%: va bene? | dice quando prendere profitto sui rialzi e dove vanno i risparmi | il CEO conferma o cambia le soglie |
+| 08/11/2026 | Il cuscinetto per la vita (6 mesi di spese proposti): quanti euro, e dove li tieni? E quanto puoi risparmiare al mese? | separa i soldi della vita da quelli della Borsa e misura la velocità della diversificazione | il CEO dà le due cifre |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
@@ -1368,6 +1371,124 @@ scarto medio.
 tranquillo). È una prova DEBOLE: i verdetti col nome erano stati dati poche ore prima dagli stessi fatti, e chi conosce il
 libro riconosce alcune schede. Dice che lo stesso metro dà lo stesso verdetto; il pregiudizio si misura nei giri in cui il
 cieco viene prima, e con almeno 10 casi per gruppo.
+
+## 1novodecies. LE TESI — tre condizioni e tre segnali per posizione (v540, decisione del CEO dell'08/11/2026)
+
+Decisione del CEO, 08/11/2026: *"Ok procedi come dici tu"* — il metodo del comitato d'investimento entra nel sistema. Per
+ogni posizione: perché la si tiene, le **3 condizioni** che devono restare vere, i **3 segnali** che romperebbero la tesi
+e il verdetto. Le condizioni con un'etichetta fra graffe si MISURANO a ogni analisi sulle prove della tenuta
+(`scripts/tesi.py`: `{ricavi>=X}` crescita dei ricavi a un anno in %, `{stime>=X}` variazione delle stime d'utile a 90
+giorni in %, `{revisioni}` revisioni in su almeno quante in giù, `{cassa>=X}` si autofinanzia o cassa per almeno X mesi,
+`{autofinanzia}`, `{tendenza}` prezzo non in tendenza rotta); le altre si leggono ai conti. Le soglie sono **proposte
+dell'analista** (v240), da confermare col CEO (§1undecies). Una condizione violata **non vende** (le regole sono guide,
+§0): dice che la tesi va riletta, e l'avvocato del diavolo parla per primo. Una posizione nuova entra con la sua tesi
+scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
+
+### NVDA — ⚠ investitore di Anthropic
+- perché: il fornitore dominante degli acceleratori per l'AI; il motore è la spesa in data center
+- deve essere vero: (1) ricavi a un anno sopra +30% {ricavi>=30}; (2) stime d'utile a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, la guida del trimestre dopo e il margine lordo tengono contro il trimestre prima
+- romperebbe: (1) ricavi a un anno sotto +15%; (2) stime a 90 giorni in calo oltre il 10%; (3) revisioni in maggioranza in giù per due mesi di fila
+- verdetto (08/11/2026): TIENI — sopra il peso massimo proposto (§1vicies): si alleggerisce sui rialzi, mai sui ribassi
+
+### MU
+- perché: memorie per l'AI (HBM e DRAM); il nome più ciclico del nucleo
+- deve essere vero: (1) ricavi a un anno sopra +25% {ricavi>=25}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, prezzi delle memorie e margine lordo non in discesa per due trimestri
+- romperebbe: (1) stime a 90 giorni in calo oltre il 10% (nelle memorie le stime girano prima dei ricavi); (2) ricavi in rallentamento per due trimestri; (3) revisioni in maggioranza in giù
+- verdetto (08/11/2026): TIENI — prima candidata alle prese di profitto sui rialzi (+688% sul carico), a tappe e col fisco
+
+### AMD
+- perché: la seconda fonte di acceleratori e processori per i data center
+- deve essere vero: (1) ricavi a un anno sopra +20% {ricavi>=20}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, il data center cresce più del gruppo
+- romperebbe: (1) ricavi a un anno sotto +10%; (2) stime a 90 giorni in calo oltre il 10%; (3) guida del data center sotto le attese per due trimestri
+- verdetto (08/11/2026): TIENI — sopra il peso massimo proposto: si alleggerisce sui rialzi
+
+### MSTR
+- perché: compra bitcoin con debito e nuove azioni: una scommessa a leva su bitcoin, l'unico nome lontano dall'AI
+- deve essere vero: (1) la cassa copre interessi e dividendi per oltre 24 mesi {cassa>=24}; (2) ai conti, il valore di borsa resta sopra il valore dei bitcoin posseduti (le nuove azioni creano valore); (3) ai conti, i bitcoin per azione crescono trimestre su trimestre
+- romperebbe: (1) valore di borsa sotto il valore dei bitcoin posseduti; (2) cassa per meno di 12 mesi; (3) bitcoin per azione in calo
+- verdetto (08/11/2026): GUARDARE — ramo secco (§1undecies): niente medie
+
+### PLTR
+- perché: software di AI per governi e aziende
+- deve essere vero: (1) ricavi a un anno sopra +30% {ricavi>=30}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, crescono i clienti commerciali americani e il margine operativo
+- romperebbe: (1) ricavi a un anno sotto +20%; (2) stime a 90 giorni in calo oltre il 10%; (3) contratti pubblici tagliati (il bilancio federale passa dal Congresso)
+- verdetto (08/11/2026): TIENI
+
+### CRWV — ⚠ cliente di OpenAI
+- perché: data center per l'AI in affitto, finanziati a debito, con pochi grandi clienti
+- deve essere vero: (1) ai conti, il debito in scadenza entro 12 mesi e gli investimenti già firmati sono coperti da finanziamenti chiusi (l'esame di §1quinquies); (2) ricavi a un anno sopra +50% {ricavi>=50}; (3) stime a 90 giorni non in calo oltre il 10% {stime>=-10}
+- romperebbe: (1) finanziamento non coperto: nuove azioni o debito caro; (2) un grande cliente che riduce i contratti; (3) il CDS che continua a salire più dell'indice dopo i conti
+- verdetto (08/11/2026): PREOCCUPA — ramo secco: si legge ai conti del 10/11, niente medie prima
+
+### GOOGL — ⚠ investitore di Anthropic
+- perché: ricerca, cloud, YouTube e modelli di AI propri, con la cassa per finanziarli
+- deve essere vero: (1) ricavi a un anno sopra +10% {ricavi>=10}; (2) revisioni degli analisti in su almeno quante in giù {revisioni}; (3) ai conti, il cloud cresce e la ricerca tiene la quota
+- romperebbe: (1) ricavi a un anno sotto +5%; (2) revisioni in giù per un altro trimestre; (3) una decisione antitrust che tocca la ricerca
+- verdetto (08/11/2026): GUARDARE — si rilegge ai prossimi conti
+
+### RGTI
+- perché: calcolo quantistico; ricavi ancora piccoli, la scommessa è sulla tecnologia
+- deve essere vero: (1) cassa per oltre 24 mesi {cassa>=24}; (2) ai conti, il programma dei processori rispetta i tempi dichiarati; (3) ai conti, nessuna grande emissione di azioni sotto il prezzo di mercato
+- romperebbe: (1) cassa sotto 24 mesi; (2) ritardi del programma; (3) nuove emissioni grandi
+- verdetto (08/11/2026): PREOCCUPA — ramo secco: si tiene, niente medie
+
+### BE
+- perché: celle a combustibile per l'energia dei data center
+- deve essere vero: (1) ricavi a un anno sopra +25% {ricavi>=25}; (2) si autofinanzia {autofinanzia}; (3) ai conti, crescono gli ordini dai data center
+- romperebbe: (1) smette di autofinanziarsi; (2) ricavi a un anno sotto +10%; (3) l'allarme di credito peggiora (rinnovo del debito convertibile a costo alto)
+- verdetto (08/11/2026): GUARDARE — allarme di credito
+
+### AVGO
+- perché: chip su misura per l'AI e reti dei data center, più il software
+- deve essere vero: (1) ricavi a un anno sopra +20% {ricavi>=20}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, i ricavi dell'AI crescono e la guida è sopra il consenso
+- romperebbe: (1) stime a 90 giorni in calo oltre il 10%; (2) ricavi dell'AI in rallentamento per due trimestri; (3) un grande cliente dei chip su misura che se ne va
+- verdetto (08/11/2026): TIENI — ingresso del 02/11, si giudica ai conti del 10/12
+
+### ORCL — ⚠ cliente di OpenAI
+- perché: database e cloud; investimenti enormi in data center, finanziati a debito
+- deve essere vero: (1) ricavi a un anno sopra +15% {ricavi>=15}; (2) cassa e finanziamenti per almeno 6 mesi di investimenti {cassa>=6}; (3) ai conti, i contratti firmati crescono e sono meno concentrati su un cliente
+- romperebbe: (1) il rating del debito sotto il grado d'investimento; (2) un grande cliente che riduce i contratti; (3) cassa per meno di 3 mesi di investimenti
+- verdetto (08/11/2026): PREOCCUPA — ramo secco
+
+### WDC
+- perché: dischi rigidi per i data center: lo spazio dove l'AI conserva i dati
+- deve essere vero: (1) ricavi a un anno sopra +20% {ricavi>=20}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) revisioni in su almeno quante in giù {revisioni}
+- romperebbe: (1) stime a 90 giorni in calo oltre il 10% (il ciclo dello storage gira); (2) ricavi in rallentamento per due trimestri; (3) margine lordo in calo ai conti
+- verdetto (08/11/2026): TIENI — speculazione sul rimbalzo dichiarata il 02/11
+
+### MRVL
+- perché: chip per le reti dei data center e chip su misura
+- deve essere vero: (1) ricavi a un anno sopra +20% {ricavi>=20}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, il data center cresce
+- romperebbe: (1) ricavi a un anno sotto +10%; (2) stime a 90 giorni in calo oltre il 10%; (3) un cliente dei chip su misura che se ne va
+- verdetto (08/11/2026): TIENI
+
+### SKHY
+- perché: SK hynix, memorie HBM per l'AI: lo stesso ciclo di MU
+- deve essere vero: (1) ricavi a un anno sopra +25% {ricavi>=25}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, tiene la quota nelle HBM
+- romperebbe: (1) stime a 90 giorni in calo oltre il 10%; (2) prezzi delle memorie in calo ai conti; (3) perdita di quota nelle HBM
+- verdetto (08/11/2026): TIENI — con MU pesa il 21,6%: lo stesso ciclo conta due volte
+
+### BTP-V28
+- perché: BTP Valore ottobre 2028, la parte non azionaria del patrimonio: cedole e rimborso a scadenza dallo Stato
+- deve essere vero: (1) l'Italia resta col debito nel grado d'investimento; (2) il CEO non ha bisogno di venderlo prima della scadenza (il prezzo di mercato conta solo se si vende prima); (3) l'inflazione italiana non resta a lungo sopra il suo rendimento
+- romperebbe: (1) un declassamento sotto il grado d'investimento; (2) una vendita forzata prima della scadenza con i prezzi bassi; (3) inflazione sopra il rendimento per anni
+- verdetto (08/11/2026): TIENI — è già, in parte, il cuscinetto fuori dalle azioni (§1vicies)
+
+## 1vicies. LA POLITICA — proposta dell'analista, da confermare col CEO (v540, 08/11/2026)
+
+L'unico vincolo è l'obiettivo (§0): far crescere il portafoglio nel lungo periodo. Queste sono guide: dicono quando
+fermarsi a decidere. Sono **proposte**, e restano tali finché il CEO non risponde alle domande di §1undecies.
+- **Peso massimo di un titolo: 15%** (al 06/11 NVDA 20,1%, MU 19,3%, AMD 17,9%).
+- **Peso massimo dei semiconduttori del libro (§1ter): 50%, come obiettivo in 12-24 mesi** (al 06/11 il 64,8%).
+- **Come ci si arriva, senza mai vendere sui ribassi**: i nuovi risparmi vanno tutti sulla parte diversificata; sopra il
+  peso massimo si prende profitto **sui rialzi**, un'unità da 5.000 € alla volta (v439), compensando le minusvalenze; la
+  riserva resta per la quotazione di Anthropic e per le medie dopo i conti.
+- **Cuscinetto per la vita: 6 mesi di spese**, fuori dalla Borsa e separato dalla riserva (l'importo lo dice il CEO); il BTP Valore 2028 (40.000 nominali, §1) lo è già in parte, se il CEO non prevede di venderlo prima della scadenza.
+- **Piano di calo** (dal massimo del 09/10/2026): a −20% si rileggono le tesi, nessuna vendita; a −30% il salvavita
+  (§1ter): il sistema propone il piano di riduzione, decide il CEO; a −40% revisione straordinaria: si tiene ciò che ha
+  le condizioni rispettate, e dove due condizioni su tre sono violate si propone l'uscita sul primo rimbalzo.
+- **La parte diversificata**: la base è un ETF azionario globale a basso costo; poi settori lontani dall'AI (salute,
+  consumi, energia, finanza), a tappe. Gli strumenti si scelgono col CEO (comando DIVERSIFICA).
 
 ## 2. LIVELLO C — RICALCOLABILE, e la mia affermazione contraria era sbagliata
 

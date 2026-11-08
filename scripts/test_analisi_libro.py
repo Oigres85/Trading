@@ -7014,6 +7014,9 @@ _U505 = {
                     "  mercato: acceleratori", "     Alfa ◀ 70%", "", "BBB [POSIZIONE] Beta", "  mercato: cloud", "",
                     "SENZA REGISTRO (concorrenti e quote non ancora cercati): sorvegliati 1: WWW",
                     "letture: 0 nuove in questo giro"],
+    # v540 — le tesi: un blocco solo, nella sua sezione
+    "tesi": ["TESI (v540) — tre condizioni e tre segnali per posizione (LIBRO.md §1novodecies)",
+             "  NVDA: 2 su 2 misurabili rispettate · 1 da leggere ai conti"],
     # v539 — il giudizio alla cieca: un blocco solo, nella sua sezione
     "cieca": ["GIUDIZIO ALLA CIECA (v539) — il pregiudizio del conflitto misurato: il verdetto col nome contro quello alla cieca",
               "  1 giri svelati, 14 nomi giudicati alla cieca"],
@@ -11394,6 +11397,61 @@ check("v539 collegamenti: il comando unico esegue il bilancio della cieca in ogn
       and "`[cieca]`" in _fmt528 and "`python3 scripts/cieca.py bilancio`" in _fmt528
       and "`scripts/cieca.py` resta **fuori**" in _ag536 and "`cieca.py`" in _r6539
       and _pr539.returncode == 0 and _pr539.stdout.startswith("GIUDIZIO ALLA CIECA (v539)"))
+
+# ═════════ v540 — il comitato: le tesi di ogni posizione e i comandi (08/11/2026) ═════════
+_TE540 = _il536.import_module("tesi")
+_BR540 = _il536.import_module("brief")
+_lib540f = ("intro\n## 1novodecies. LE TESI\n\n### AAA — ⚠ prova\n- perché: prova\n"
+            "- deve essere vero: (1) ricavi sopra +30% {ricavi>=30}; (2) revisioni a favore {revisioni}; (3) ai conti, la guida tiene\n"
+            "- romperebbe: (1) uno; (2) due; (3) tre\n- verdetto (08/11/2026): TIENI — prova\n\n### BTP-X\n- perché: obbligazione\n"
+            "- deve essere vero: (1) uno; (2) due; (3) tre\n- romperebbe: (1) uno; (2) due; (3) tre\n"
+            "- verdetto (08/11/2026): TIENI\n\n## 2. ALTRO\n\n### ZZZ\n- deve essere vero: (1) uno {ricavi>=1}\n")
+_t540 = _TE540.leggi_tesi(_lib540f)
+_c540 = _TE540.controlla(_t540, [{"tk": "AAA", "prove": {"ricavi": {"yoy": 45.0}, "revisioni": {"su": 2, "giu": 6}}}])
+_r540 = _TE540.resa(_t540, _c540, ["AAA", "BTP-X", "CCC"])
+_rb540 = [x for x in _r540.splitlines() if "BTP-X:" in x]
+check("v540 le tesi: si leggono SOLO dalla loro sezione, tre condizioni e tre segnali col verdetto datato; la condizione "
+      "con l'etichetta si misura (rispettata o violata, e la violata si nomina col suo valore), quella senza si dice «da "
+      "leggere ai conti», quella senza dato «non misurata»; la posizione senza tesi si nomina; un'obbligazione senza "
+      "condizioni misurabili non grida «nessuna prova»: " + str([x[1] for x in (_c540.get("AAA") or {}).get("condizioni", [])]),
+      set(_t540) == {"AAA", "BTP-X"}
+      and len(_t540["AAA"]["condizioni"]) == 3 and len(_t540["AAA"]["segnali"]) == 3
+      and (_t540["AAA"]["verdetto"] or "").startswith("TIENI")
+      and [x[1] for x in (_c540.get("AAA") or {}).get("condizioni", [])] == ["rispettata", "violata", "da leggere ai conti"]
+      and (_c540.get("AAA") or {}).get("violate") == [2]
+      and "VIOLATA la 2 (revisioni 2 in su, 6 in giu')" in _r540 and "SENZA tesi: CCC" in _r540
+      and len(_rb540) == 1 and "nessuna condizione misurabile" in _rb540[0] and "nessuna prova" not in _rb540[0]
+      and _TE540.valuta("x {cassa>=24}", {"bilancio": {"autofinanzia": True}})[0] == "rispettata"
+      and _TE540.valuta("x {cassa>=24}", {"bilancio": {"autofinanzia": False, "mesi": 3.2}})[0] == "violata"
+      and _TE540.valuta("x {stime>=-10}", {})[0] == "non misurata"
+      and _TE540.valuta("x {stime>=-10}", {"stime": {"var": -10.0}})[0] == "rispettata"
+      and _TE540.valuta("x {tendenza}", {"tendenza": {"verso": "contro"}})[0] == "violata")
+
+_pos540 = _BR540.leggi_libro()[0]
+_tr540 = _TE540.leggi_tesi(_lib474)
+_senza540 = [p["tk"] for p in _pos540 if p["tk"] not in _tr540]
+check("v540 ogni posizione del libro ha la sua tesi in §1novodecies (3 condizioni, 3 segnali, il verdetto); ogni azione "
+      "(in dollari) ha almeno una condizione che il sistema misura: senza tesi " + str(_senza540),
+      bool(_pos540) and not _senza540
+      and all(len(_tr540[p["tk"]]["condizioni"]) == 3 and len(_tr540[p["tk"]]["segnali"]) == 3
+              and bool(_tr540[p["tk"]]["verdetto"]) for p in _pos540)
+      and all(any(_TE540.ETICHETTA.search(x) for x in _tr540[p["tk"]]["condizioni"])
+              for p in _pos540 if p.get("valuta") == "USD"))
+
+_pr540 = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "tesi.py")],
+                        capture_output=True, text=True, timeout=120)
+check("v540 collegamenti: il comando unico esegue le tesi in ogni fase PRIMA della sintesi; la scheda ha sezione, "
+      "catalogo e voce; il formato porta lo strumento, la chiave e i sette comandi del comitato con le quattro voci; "
+      "/aggiorna lo dichiara fuori; CLAUDE.md porta il comitato; la strada vera esce 0 col suo titolo",
+      all(["tesi.py"] in v and v.index(["tesi.py"]) < v.index(["sintesi.py", "--registra"]) for v in _cm536.values())
+      and "tesi.py" in _AN528.STRUMENTI
+      and "tesi" in SC.CATALOGO and "tesi" in SC.REGISTRO and "tesi" in [x[0] for x in SC.SEZIONI]
+      and "`[tesi]`" in _fmt528 and "`python3 scripts/tesi.py`" in _fmt528
+      and all(f"**{c}" in _fmt528 for c in ("SETTIMANA", "CONTI", "COMPRO", "VENDO", "PANICO", "DIVERSIFICA", "TRIMESTRE"))
+      and all(v in " ".join(_fmt528.split()) for v in ("**ANALISTA**", "**RISK MANAGER**", "**AVVOCATO DEL DIAVOLO**",
+                                                       "**SEGRETARIO**"))
+      and "`scripts/tesi.py` resta **fuori**" in _ag536 and "**Il comitato (v540)**" in _cl536
+      and _pr540.returncode == 0 and _pr540.stdout.startswith("TESI (v540)"))
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

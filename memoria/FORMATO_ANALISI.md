@@ -28,6 +28,30 @@ strumento che fallisce e chiude con la CHECKLIST — la sezione «Cosa contiene 
 questo file, stampata parola per parola. Un gate verifica che gli strumenti del comando siano
 esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti e due i posti.
 
+## I comandi del comitato (v540, decisione del CEO dell'08/11/2026)
+*"Ok procedi come dici tu"*: il metodo del comitato d'investimento vive qui, sui dati del sistema. Il CEO scrive la
+parola; la routine parte allora, mai da sola (v387). Nelle **decisioni** (COMPRO, VENDO, DIVERSIFICA, TRIMESTRE e ogni
+«cosa faccio?») parlano **quattro voci**, una o due righe ciascuna: l'**ANALISTA** (la tesi e i numeri), il **RISK
+MANAGER** (il portafoglio intero, i pesi contro la politica di `LIBRO.md` §1vicies, il fisco), l'**AVVOCATO DEL
+DIAVOLO** (il miglior argomento contro e il pre-mortem; parla per primo se una condizione della tesi è violata), il
+**SEGRETARIO** (cosa va scritto nel libro, la riga pronta).
+- **SETTIMANA** → il giro di `analisi.py`, resa in 10-15 righe: cosa è cambiato nei fatti, le condizioni delle tesi
+  violate, l'agenda dei 14 giorni, calo dal massimo e salvavita, UNA azione oppure «nessuna azione».
+- **CONTI <TICKER>** → prima: `/titolo`, l'esame di §1quinquies se c'è, le condizioni «da leggere ai conti» della tesi
+  (§1novodecies), il movimento implicito. Dopo: risultati contro attese, guida, ogni condizione una per una, la tesi
+  regge sì o no. Su un nome in conflitto, prima alla cieca (`cieca.py`).
+- **COMPRO <TICKER> <PREZZO> [IMPORTO]** → la tesi scritta PRIMA (un nome nuovo entra in §1novodecies), `statistica.py
+  ingresso … --registra`, peso e tema dopo l'acquisto contro la politica, pre-mortem, l'alternativa per lo stesso
+  denaro, le quattro voci.
+- **VENDO <TICKER>** → è cambiata la tesi (condizioni violate) o solo il prezzo? Il fisco in euro (blocco del cambio),
+  dove va il ricavato secondo la politica, le quattro voci.
+- **PANICO** → solo fatti: semaforo e salvavita, il piano di calo scritto (§1vicies), cosa NON fare oggi, quando si
+  decide (il giorno dopo).
+- **DIVERSIFICA** → il piano a tappe della politica: risparmi, prese di profitto sui rialzi sopra il peso massimo (unità
+  da 5.000 €, v439), minusvalenze da compensare, strumenti da scegliere; le quattro voci.
+- **TRIMESTRE** → l'analisi completa, ogni tesi contro le sue condizioni, la politica rivista, il diario degli ingressi
+  (`statistica.py bilancio`), la cieca, le previsioni dal vivo, il rendimento contro QQQ.
+
 ## Come si produce
 00. `python3 scripts/fonti_dirette.py` — **FRESCHEZZA DEI DATI** (v511, decisione del CEO del 25/10/2026: *"i dati in
    ritardo … Elimina le dipendenze e cercale altrove se puoi. Non voglio tornare ai vecchi problemi"*). Gira PRIMA di
@@ -233,6 +257,9 @@ esattamente quelli nominati qui sotto: uno strumento nuovo si aggiunge in tutti 
    conflitto) lo scarto fra il verdetto dato col nome e quello dato alla cieca sulle schede anonime, e dopo 60 sedute
    quale dei due ha visto giusto contro QQQ. Un giudizio su un nome in conflitto si dà PRIMA alla cieca (`cieca.py
    schede`, `giudica`, poi `col_nome` e `svela`). Regola e convenzioni in `LIBRO.md` §1octodecies.
+8septies. `python3 scripts/tesi.py` (v540, CEO, 08/11/2026) — **le tesi**: per ogni posizione le tre condizioni di
+   `LIBRO.md` §1novodecies, quelle misurabili controllate sulle prove della tenuta (rispettata, violata, non
+   misurata) e le altre «da leggere ai conti»; le posizioni senza tesi si nominano. Una condizione violata non vende.
 8bis. `python3 scripts/sintesi.py --registra` (v524, CEO, 31/10/2026: *"Procedi su tutto"*) — gira DOPO gli strumenti
    del giro e prima dello stato del sistema: **non ricalcola niente**, incrocia ciò che numeri_libro, rotazione, indici
    e posizionamento hanno scritto in `memoria/dati/giro/` (la variabile TRADING_GIRO, una lettura per analisi) con la
@@ -270,7 +297,7 @@ nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA
    probabilità che contano oggi, ognuna col metodo, la base e la sua affidabilità misurata (e se il metodo batte la
    base); i metodi affiancati, mai una media; quante se ne attendono su n; l'affidabilità dal vivo dal registro.
    Accanto ai conflitti d'interessi, **il giudizio alla cieca** (v539) in una riga per gruppo: lo scarto fra col nome
-   e alla cieca, e se è già misurabile.
+   e alla cieca, e se è già misurabile. Poi **le tesi** (v540): solo le condizioni violate, per nome, in una riga.
 1. **Il verdetto**, in tre righe: com'è il mercato, cosa vuol dire per il libro, cosa fare o non fare adesso — scritto
    dopo aver letto tutto il resto.
 2. **Il regime: le sei luci**, una riga ciascuna col colore, il perché e i dati che la compongono, con la freccia se è
@@ -700,6 +727,8 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
   diario che misura l'intuito contro la statistica (01/11)
 - `[laboratorio]` il laboratorio in tre righe in ogni analisi: la perdita media nel 5% dei giorni peggiori e chi la
   porta, il regime di SMH e QQQ, la volatilità di adesso (03/11; il dettaglio delle nove librerie su richiesta)
+- `[tesi]` le tesi: per ogni posizione le tre condizioni e i tre segnali, le misurabili controllate a ogni analisi
+  e le violate per nome (08/11)
 - `[cieca]` il giudizio alla cieca: per ogni gruppo di conflitto lo scarto fra il verdetto col nome e quello alla
   cieca, e chi dei due ha visto giusto dopo 60 sedute — il pregiudizio misurato, non solo dichiarato (07/11)
 - `[previsioni]` il sistema previsionale: per ogni evento la probabilità, la base, l'intervallo e la % di affidabilità
