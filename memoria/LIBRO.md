@@ -1030,11 +1030,13 @@ dirmelo tu · 4 prezzo carico meglio se massimo storico"*):
 ora. L'elenco RGTI, CRWV, MSTR, ORCL resta la LETTURA dell'analista, non una decisione: si sorveglia, e il
 momento di tagliare lo decide il CEO (§0: le regole sono guide).
 
+**Chiuse l'08/11/2026** (CEO: *"Ok per tutto tranne 3 niente zero nada!"*): le 15 tesi di §1novodecies e la
+politica di §1vicies sono **confermate** (15% per titolo; semiconduttori al 50% in 12-24 mesi, a tappe e sui
+rialzi; il piano a −20/−30/−40%). Cuscinetto per la vita e risparmi mensili: **nessuno** — la diversificazione
+viene solo dalle prese di profitto sui rialzi, e se servisse denaro il primo è il BTP.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 08/11/2026 | Le 14 tesi di §1novodecies (perché, 3 condizioni, 3 segnali, verdetto): le confermi o cambi qualcosa? | le condizioni misurate a ogni analisi decidono quando una tesi va riletta | il CEO conferma o corregge |
-| 08/11/2026 | La politica di §1vicies: peso massimo 15% per titolo e semiconduttori al 50% in 12-24 mesi, piano a −40%: va bene? | dice quando prendere profitto sui rialzi e dove vanno i risparmi | il CEO conferma o cambia le soglie |
-| 08/11/2026 | Il cuscinetto per la vita (6 mesi di spese proposti): quanti euro, e dove li tieni? E quanto puoi risparmiare al mese? | separa i soldi della vita da quelli della Borsa e misura la velocità della diversificazione | il CEO dà le due cifre |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
@@ -1379,8 +1381,8 @@ ogni posizione: perché la si tiene, le **3 condizioni** che devono restare vere
 e il verdetto. Le condizioni con un'etichetta fra graffe si MISURANO a ogni analisi sulle prove della tenuta
 (`scripts/tesi.py`: `{ricavi>=X}` crescita dei ricavi a un anno in %, `{stime>=X}` variazione delle stime d'utile a 90
 giorni in %, `{revisioni}` revisioni in su almeno quante in giù, `{cassa>=X}` si autofinanzia o cassa per almeno X mesi,
-`{autofinanzia}`, `{tendenza}` prezzo non in tendenza rotta); le altre si leggono ai conti. Le soglie sono **proposte
-dell'analista** (v240), da confermare col CEO (§1undecies). Una condizione violata **non vende** (le regole sono guide,
+`{autofinanzia}`, `{tendenza}` prezzo non in tendenza rotta); le altre si leggono ai conti. Le soglie sono dell'analista
+(v240), **confermate dal CEO l'08/11/2026** (§1undecies). Una condizione violata **non vende** (le regole sono guide,
 §0): dice che la tesi va riletta, e l'avvocato del diavolo parla per primo. Una posizione nuova entra con la sua tesi
 scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 
@@ -1474,16 +1476,19 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - romperebbe: (1) un declassamento sotto il grado d'investimento; (2) una vendita forzata prima della scadenza con i prezzi bassi; (3) inflazione sopra il rendimento per anni
 - verdetto (08/11/2026): TIENI — è già, in parte, il cuscinetto fuori dalle azioni (§1vicies)
 
-## 1vicies. LA POLITICA — proposta dell'analista, da confermare col CEO (v540, 08/11/2026)
+## 1vicies. LA POLITICA — proposta dall'analista, confermata dal CEO l'08/11/2026 (v540)
 
 L'unico vincolo è l'obiettivo (§0): far crescere il portafoglio nel lungo periodo. Queste sono guide: dicono quando
-fermarsi a decidere. Sono **proposte**, e restano tali finché il CEO non risponde alle domande di §1undecies.
+fermarsi a decidere. Confermate dal CEO l'08/11/2026 (*"Ok per tutto tranne 3 niente zero nada!"*): niente
+cuscinetto e niente risparmi mensili.
 - **Peso massimo di un titolo: 15%** (al 06/11 NVDA 20,1%, MU 19,3%, AMD 17,9%).
 - **Peso massimo dei semiconduttori del libro (§1ter): 50%, come obiettivo in 12-24 mesi** (al 06/11 il 64,8%).
-- **Come ci si arriva, senza mai vendere sui ribassi**: i nuovi risparmi vanno tutti sulla parte diversificata; sopra il
-  peso massimo si prende profitto **sui rialzi**, un'unità da 5.000 € alla volta (v439), compensando le minusvalenze; la
+- **Come ci si arriva, senza mai vendere sui ribassi**: nuovi risparmi non ce ne sono (CEO, 08/11), quindi la parte
+  diversificata nasce SOLO dalle prese di profitto: sopra il peso massimo si prende profitto **sui rialzi**, un'unità da 5.000 € alla volta (v439), compensando le minusvalenze; la
   riserva resta per la quotazione di Anthropic e per le medie dopo i conti.
-- **Cuscinetto per la vita: 6 mesi di spese**, fuori dalla Borsa e separato dalla riserva (l'importo lo dice il CEO); il BTP Valore 2028 (40.000 nominali, §1) lo è già in parte, se il CEO non prevede di venderlo prima della scadenza.
+- **Cuscinetto per la vita: nessuno** (CEO, 08/11: *"niente zero nada"*). L'unica parte fuori dalle azioni è il BTP
+  Valore 2028 (40.000 nominali, §1): se servisse denaro, il sistema lo indica come primo da usare, prima di vendere
+  azioni in un calo.
 - **Piano di calo** (dal massimo del 09/10/2026): a −20% si rileggono le tesi, nessuna vendita; a −30% il salvavita
   (§1ter): il sistema propone il piano di riduzione, decide il CEO; a −40% revisione straordinaria: si tiene ciò che ha
   le condizioni rispettate, e dove due condizioni su tre sono violate si propone l'uscita sul primo rimbalzo.

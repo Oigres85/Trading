@@ -47,7 +47,7 @@ DIAVOLO** (il miglior argomento contro e il pre-mortem; parla per primo se una c
   dove va il ricavato secondo la politica, le quattro voci.
 - **PANICO** → solo fatti: semaforo e salvavita, il piano di calo scritto (§1vicies), cosa NON fare oggi, quando si
   decide (il giorno dopo).
-- **DIVERSIFICA** → il piano a tappe della politica: risparmi, prese di profitto sui rialzi sopra il peso massimo (unità
+- **DIVERSIFICA** → il piano a tappe della politica: prese di profitto sui rialzi sopra il peso massimo (unità
   da 5.000 €, v439), minusvalenze da compensare, strumenti da scegliere; le quattro voci.
 - **TRIMESTRE** → l'analisi completa, ogni tesi contro le sue condizioni, la politica rivista, il diario degli ingressi
   (`statistica.py bilancio`), la cieca, le previsioni dal vivo, il rendimento contro QQQ.
