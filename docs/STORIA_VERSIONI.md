@@ -9850,3 +9850,12 @@ procedi come dici tu"*.
 - Gate: 3 (lettura e misura su una fixture con obbligazione e posizione senza tesi; ogni posizione del libro con la sua
   tesi; collegamenti con la strada vera); tre iniezioni (revisioni rovesciate, la tesi di MRVL tolta, lo strumento
   staccato dal comando unico) mordono ciascuna sul suo. Pavimento 1126 → 1129.
+
+## v541 — le tesi girano DOPO il giro (10/11/2026)
+Alla prima analisi vera dopo la v540 il blocco delle tesi diceva per ogni nome «nessuna condizione misurabile»: nel
+comando unico `tesi.py` girava in parallelo con `numeri_libro.py`, cioè PRIMA che questo scrivesse le prove della
+tenuta nel file del giro (la cartella si svuota a ogni giro). Il gate della v540 provava la strada vera a giro già
+scritto, quindi non lo vedeva: la fixture non conteneva il fenomeno (v430). Ora `tesi.py` sta in `analisi.POI` con la
+sintesi, e il gate lo chiede; senza prove della tenuta la riga dice «condizioni NON misurate in questo giro», non che
+non siano misurabili (v405). Il gate della v524 non pinna più la forma di `POI` (una sola voce) ma la proprietà.
+Lo stesso giorno Nasdaq ha risposto 403 al calendario dei conti e ai feed dei nomi: dichiarato nell'analisi, non aggirato.

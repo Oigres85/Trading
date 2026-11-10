@@ -10420,7 +10420,7 @@ _cm524 = {f: _AN524.comandi(f) for f in ("pre-market", "seduta", "after-hours", 
 check("v524 il comando unico lancia la sintesi in ogni fase, con --registra, DOPO gli strumenti del giro e prima dello "
       "stato del sistema; il registro delle analisi e' fra le memorie da committare",
       all([c[1] for c in v][-2:] == [["sintesi.py", "--registra"], ["stato_sistema.py", "--giro"]] for v in _cm524.values())
-      and _AN524.POI == ("sintesi.py",) and "sintesi.py" in _AN524.STRUMENTI
+      and "sintesi.py" in _AN524.POI and "sintesi.py" in _AN524.STRUMENTI
       and any(p.name == "registro_analisi.jsonl" for p in _AN524.MEMORIE))
 with _tf524.TemporaryDirectory() as _d:
     Path(_d, "vecchio.json").write_text("{}", encoding="utf-8")
@@ -11421,6 +11421,7 @@ check("v540 le tesi: si leggono SOLO dalla loro sezione, tre condizioni e tre se
       and (_c540.get("AAA") or {}).get("violate") == [2]
       and "VIOLATA la 2 (revisioni 2 in su, 6 in giu')" in _r540 and "SENZA tesi: CCC" in _r540
       and len(_rb540) == 1 and "nessuna condizione misurabile" in _rb540[0] and "nessuna prova" not in _rb540[0]
+      and "AAA: condizioni NON misurate in questo giro" in _TE540.resa(_t540, _TE540.controlla(_t540, []), ["AAA"])
       and _TE540.valuta("x {cassa>=24}", {"bilancio": {"autofinanzia": True}})[0] == "rispettata"
       and _TE540.valuta("x {cassa>=24}", {"bilancio": {"autofinanzia": False, "mesi": 3.2}})[0] == "violata"
       and _TE540.valuta("x {stime>=-10}", {})[0] == "non misurata"
@@ -11444,7 +11445,7 @@ check("v540 collegamenti: il comando unico esegue le tesi in ogni fase PRIMA del
       "catalogo e voce; il formato porta lo strumento, la chiave e i sette comandi del comitato con le quattro voci; "
       "/aggiorna lo dichiara fuori; CLAUDE.md porta il comitato; la strada vera esce 0 col suo titolo",
       all(["tesi.py"] in v and v.index(["tesi.py"]) < v.index(["sintesi.py", "--registra"]) for v in _cm536.values())
-      and "tesi.py" in _AN528.STRUMENTI
+      and "tesi.py" in _AN528.STRUMENTI and "tesi.py" in _AN528.POI   # v541: legge il giro, quindi gira DOPO il giro
       and "tesi" in SC.CATALOGO and "tesi" in SC.REGISTRO and "tesi" in [x[0] for x in SC.SEZIONI]
       and "`[tesi]`" in _fmt528 and "`python3 scripts/tesi.py`" in _fmt528
       and all(f"**{c}" in _fmt528 for c in ("SETTIMANA", "CONTI", "COMPRO", "VENDO", "PANICO", "DIVERSIFICA", "TRIMESTRE"))

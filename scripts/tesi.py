@@ -142,7 +142,9 @@ def resa(tesi, ctrl, posizioni, scadenze=None, seduta=None):
         conti = f" · conti {s['data']}" if s and s.get("data") else ""
         testa = ((f"  {tk}: {c['rispettate']} su {c['misurabili']} misurabili rispettate"
                   + (f" · {c['da_leggere']} da leggere ai conti" if c["da_leggere"] else "")) if c["misurabili"]
-                 else f"  {tk}: nessuna condizione misurabile dal sistema · {c['da_leggere']} da leggere") + conti
+                 else (f"  {tk}: condizioni NON misurate in questo giro · {c['da_leggere']} da leggere ai conti"
+                       if any(ETICHETTA.search(x) for x in t["condizioni"])
+                       else f"  {tk}: nessuna condizione misurabile dal sistema · {c['da_leggere']} da leggere")) + conti
         if c["violate"]:
             testa = "  ⚠ " + testa.strip() + " · VIOLATA " + ", ".join(
                 f"la {i} ({c['condizioni'][i - 1][2] or 'non misurata'})" for i in c["violate"])

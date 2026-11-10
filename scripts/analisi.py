@@ -85,7 +85,9 @@ DOPO = ("stato_sistema.py",)
 # v524 — e sintesi.py DOPO gli strumenti del giro e PRIMA dello stato del sistema (CEO, 31/10/2026: «Procedi su tutto»):
 #   incrocia cio' che numeri_libro, rotazione, indici e posizionamento hanno scritto in GIRO, e aggiunge la fotografia
 #   dell'analisi al registro, che lo stato del sistema deve vedere fra le memorie da committare
-POI = ("sintesi.py",)
+# v541 — e con lei tesi.py: misura le condizioni sulle prove della tenuta che numeri_libro scrive in GIRO; in parallelo
+#   con gli altri (v540) girava PRIMA che il file esistesse, e il 10/11 ogni condizione usciva «non misurata»
+POI = ("tesi.py", "sintesi.py")
 GIRO = RADICE / "memoria" / "dati" / "giro"
 REGISTRO = RADICE / "memoria" / "registro_performance.jsonl"
 # v496 — le memorie che posizionamento.py costruisce: come il registro, vivono nel repo e vanno committate
