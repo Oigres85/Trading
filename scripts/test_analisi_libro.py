@@ -11590,6 +11590,43 @@ check("v542 collegamenti: i canali per simbolo della sessione sono gli stessi de
       and any(p.name == "riserva_conti.json" for p in _AN528.MEMORIE)
       and "`scripts/riserve.py` resta **fuori**" in _ag536)
 
+import threading as _th542, contextlib as _cx542, io as _io542, time as _tm542
+_cont542 = {"n": 0}
+
+
+def _carica542(d):
+    """Come fonti_titoli.carica: zittisce l'uscita, e ci mette abbastanza da intrecciarsi con un altro thread."""
+    _cont542["n"] += 1
+    with _cx542.redirect_stdout(_io542.StringIO()):
+        _tm542.sleep(0.05)
+    return dict(d, caricato=True)
+
+
+_pd542 = os.path.join(tempfile.mkdtemp(), "data.json")
+Path(_pd542).write_text('{"watchlist": []}', encoding="utf-8")
+_vft542, _vo542 = sys.modules.get("fonti_titoli"), sys.stdout
+_esc542 = []
+try:
+    sys.modules["fonti_titoli"] = _ty536.SimpleNamespace(carica=_carica542)
+    _RIS542._dati_cache.clear()
+    _tt542 = [_th542.Thread(target=lambda: _esc542.append(_RIS542.leggi_dati(p=_pd542))) for _ in range(8)]
+    for _t542 in _tt542:
+        _t542.start()
+    for _t542 in _tt542:
+        _t542.join()
+    _stesso542 = sys.stdout is _vo542
+finally:
+    sys.stdout = _vo542
+    _RIS542._dati_cache.clear()
+    if _vft542 is None:
+        sys.modules.pop("fonti_titoli", None)
+    else:
+        sys.modules["fonti_titoli"] = _vft542
+check("v542 i dati delle riserve si caricano UNA volta anche da otto thread insieme, e l'uscita standard resta la sua: "
+      "l'11/11 il brief e' uscito 0 con l'uscita vuota perche' due redirect intrecciati l'avevano lasciata zittita: "
+      + str((_cont542["n"], len(_esc542), _stesso542)),
+      _cont542["n"] == 1 and len(_esc542) == 8 and all(x.get("caricato") for x in _esc542) and _stesso542)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

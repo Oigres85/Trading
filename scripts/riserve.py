@@ -30,6 +30,7 @@ import fcntl
 import json
 import os
 import re
+import sys
 import threading
 import urllib.parse
 from datetime import datetime, timezone
@@ -43,6 +44,7 @@ ROMA = ZoneInfo("Europe/Rome")
 CAMPI = ("tk", "data", "quando", "eps_atteso", "trimestre")
 NASDAQ = "calendario Nasdaq"
 _serratura = threading.Lock()
+_carico = threading.Lock()
 _dati_cache = {}
 
 # i nomi che una ricerca per nome non distingue: il nome breve e' una parola comune, o il titolo si cerca con un altro nome
@@ -67,24 +69,36 @@ def orario(iso):
 
 
 def leggi_dati(dati=None, p=None):
-    """data/data.json (la pipeline), una volta per processo; {} se non si legge."""
+    """data/data.json (la pipeline) con le righe e i depositi SEC riletti in questo giro, una volta per processo; {}
+    se non si legge.
+    ⚠ v542 — SI CARICA SOTTO SERRATURA, UN THREAD ALLA VOLTA, E L'USCITA SI RIMETTE AL SUO POSTO. Le notizie si
+    leggono in piu' thread, e fonti_titoli.carica zittisce l'uscita con redirect_stdout, che non e' fatto per i
+    thread: due ingressi intrecciati lasciano sys.stdout puntato su un testo in memoria PER SEMPRE. L'11/11/2026 il
+    brief e' uscito 0 con l'uscita VUOTA dentro l'analisi: tre richieste della scheda risultavano assenti."""
     if dati is not None:
         return dati
     p = Path(p or DATI)
     try:
         chiave = (str(p), p.stat().st_mtime)
+    except OSError:
+        return {}
+    with _carico:
         if chiave not in _dati_cache:
-            _dati_cache.clear()
-            d = json.loads(p.read_text(encoding="utf-8").replace("NaN", "null"))
+            try:
+                d = json.loads(p.read_text(encoding="utf-8").replace("NaN", "null"))
+            except (OSError, ValueError):
+                return {}
+            uscite = sys.stdout, sys.stderr
             try:                       # le righe e i depositi SEC riletti in questo giro, se ci sono (fonti_titoli)
                 import fonti_titoli
                 d = fonti_titoli.carica(d)
             except Exception:  # noqa: BLE001
                 pass
+            finally:
+                sys.stdout, sys.stderr = uscite
+            _dati_cache.clear()
             _dati_cache[chiave] = d
         return _dati_cache[chiave]
-    except (OSError, ValueError):
-        return {}
 
 
 # ── la memoria dell'ultima lettura riuscita ────────────────────────────────────────────────────────────────────────

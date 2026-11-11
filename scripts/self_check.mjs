@@ -230,7 +230,9 @@ const SUITE = [
      tesi, i collegamenti coi comandi del comitato) -> 1129 */
   /* v542: 1143 punti di chiamata in test_analisi_libro (+4: le riserve delle notizie, del calendario dei conti,
      dell'ultima trimestrale, e i collegamenti con la pipeline) -> 1133 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1133, firma: /\d+\/\d+ CHECK OK/ },
+  /* v542 (11/11): 1144 punti di chiamata (+1: i dati delle riserve caricati una volta anche da piu' thread, con
+     l'uscita standard al suo posto) -> 1134 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1134, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

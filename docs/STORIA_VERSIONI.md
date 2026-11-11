@@ -9904,3 +9904,10 @@ passare un controllo anti-automi è stato fermato, giustamente): si passa a un'a
   sparisce. Lo stato si costruisce TUTTO (v429): il book (tre scadenze future con uno straddle quotato) e i tre casi —
   conti dopo l'ultima scadenza, prima della prima, in mezzo — con le date che partono da adesso. Iniezione in `app.js`
   rifatta: morde.
+- **L'uscita vuota del brief (11/11 sera).** Nella prima analisi completa dopo le riserve il brief è uscito 0 con
+  l'uscita VUOTA, e la scheda dava tre richieste assenti (aste, trimestrali, credito). Causa: `riserve.leggi_dati`
+  chiamava `fonti_titoli.carica` da più thread insieme (le notizie si leggono in parallelo), e `carica` zittisce
+  l'uscita con `redirect_stdout`, che non è fatto per i thread — due ingressi intrecciati lasciano `sys.stdout` su un
+  testo in memoria per sempre. Da solo e in parallelo ridotto non si riproduceva: è una corsa. Ora si carica sotto
+  serratura, una volta, e l'uscita si rimette al suo posto. Gate: otto thread insieme, una sola lettura, uscita
+  intatta; l'iniezione (serratura tolta) morde. Pavimento 1133 → 1134.
