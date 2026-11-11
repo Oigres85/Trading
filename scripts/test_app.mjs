@@ -4949,17 +4949,22 @@ check("v356 simmetria: se il motore di rischio non produce, il pacchetto LO DICE
 
 check("v356 evento: il premio si isola solo fra una scadenza PRIMA e una DOPO", suVeri(`
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
-  const o = (DATA.options || {}).NVDA;
-  if (!r || !r.earnings_date || !o) return true;
-  const p = buildPromptTicker("NVDA");
-  const date = (o.expiries || []).map(e => e.date);
-  const evento = String(r.earnings_date).slice(0, 10);
-  const haPrima = date.some(d => d < evento), haDopo = date.some(d => d >= evento);
+  const date = (((DATA.options || {}).NVDA || {}).expiries || []).map(e => e.date).sort();
+  if (!r || !date.length) return true;
   /* confrontavo le prime due scadenze chiunque fossero: con tutte e tre posteriori all'evento
      avrei chiamato "prezzo dell'evento" la differenza fra due scadenze che l'evento ce l'hanno
      gia' entrambe dentro */
-  if (haPrima && haDopo) return true;
-  return /IL PREMIO DELL'EVENTO NON E' ISOLABILE/.test(p) || !/MOVIMENTO IMPLICITO DALLE OPZIONI/.test(p);`));
+  /* v542 — LO STATO SI COSTRUISCE (v429): con la data vera dei conti il check usciva verde senza misurare ogni
+     volta che le scadenze quotate la comprendevano (dall'11/11/2026: conti il 17/11, scadenze il 13, il 16 e il
+     18). Ora i due stati non isolabili si costruiscono — i conti DOPO l'ultima scadenza, e PRIMA della prima — e
+     in entrambi il pacchetto deve dirlo. */
+  const g = (iso, n) => new Date(new Date(iso + "T00:00:00Z").getTime() + n * 86400000).toISOString().slice(0, 10);
+  const frase = /IL PREMIO DELL'EVENTO NON E' ISOLABILE/;
+  r.earnings_date = g(date[date.length - 1], 1);
+  const dopo = frase.test(buildPromptTicker("NVDA"));
+  r.earnings_date = g(date[0], -1);
+  const prima = frase.test(buildPromptTicker("NVDA"));
+  return dopo && prima;`));
 
 check("v356 etichette: il TTM non si chiama esercizio", suVeri(`
   const st = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).stats) || {};
@@ -5066,6 +5071,11 @@ const _TABELLA_FERMA = `
        di testa: e' esattamente la forma reale del difetto che questi gate sorvegliano. */
     if (r && r.tv && Array.isArray(r.tv.conto_trim) && r.tv.conto_trim.length > 4) r.tv.conto_trim.shift();
     const base = String((r && r.combustione && r.combustione.bilancio_al) || "2026-06-30").slice(0, 10);
+    /* v542 — LO STATO SI COSTRUISCE, NON SI ASPETTA (v429). La data ATTESA dei prossimi conti si leggeva dai dati
+       veri: l'11/11/2026, il giorno dopo i conti di CRWV, e' diventata vuota, e su codice corretto il ramo debole
+       della diagnosi (v397) e' andato rosso e il check del verso della crescita (v357) dormiente — bloccando ogni
+       pubblicazione. Ora la data e' costruita: 133 giorni dopo il bilancio, com'era quando i check sono nati. */
+    if (r) r.earnings_date = new Date(new Date(base + "T00:00:00").getTime() + 133 * 86400000).toISOString().slice(0, 10);
     /* v500 — 120 giorni, non 100: la soglia e' ora la fine del trimestre successivo piu' dieci giorni (101), e un
        deposito a 100 giorni dal bilancio e' per costruzione ancora dentro il ciclo di quel trimestre */
     const dep = new Date(new Date(base + "T00:00:00").getTime() + 120 * 86400000).toISOString().slice(0, 10);

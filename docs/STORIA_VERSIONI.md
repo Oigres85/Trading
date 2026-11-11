@@ -9881,3 +9881,9 @@ passare un controllo anti-automi è stato fermato, giustamente): si passa a un'a
 - Gate: 4 (notizie, calendario, ultima trimestrale, collegamenti con la pipeline); quattro iniezioni (il filtro del
   titolo tolto, la stima anche nei giorni letti, la memoria ignorata, le riserve accese nella pipeline) mordono
   ciascuna sul suo. Pavimento 1129 → 1133. Nessuna soglia nuova: una riserva porta sempre la sua data.
+- **Due controlli vecchi andati rossi a calendario lo stesso giorno** (pre-push dell'11/11): la data dei conti di CRWV,
+  passata il 10/11, è diventata vuota nei dati veri, e `test_app.mjs` v397 (il ramo debole della tabella ferma) è
+  andato rosso mentre v357 e v356 sono diventati dormienti oltre il tetto — su codice corretto, bloccando ogni
+  pubblicazione. Lo stato ora si costruisce (v429): `_TABELLA_FERMA` mette la data attesa a 133 giorni dal bilancio, e
+  v356 costruisce i due stati non isolabili (i conti dopo l'ultima scadenza quotata, e prima della prima). Un'iniezione
+  in `app.js` (tolto il caso «tutte prima») morde su v356.
