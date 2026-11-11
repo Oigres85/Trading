@@ -103,6 +103,8 @@ MEMORIE = (RADICE / "memoria" / "cboe_putcall.jsonl", RADICE / "memoria" / "opzi
            RADICE / "memoria" / "previsioni.jsonl",
            # v539 — il diario del giudizio alla cieca: lo scarto e chi ha visto giusto si misurano solo se le righe restano
            RADICE / "memoria" / "giudizi_ciechi.jsonl",
+           # v542 — l'ultima lettura riuscita del calendario dei conti e dell'ultima trimestrale: la riserva datata
+           RADICE / "memoria" / "riserva_conti.json",
            # v524 — la fotografia di ogni analisi (luci, caselle, esiti): le frecce di cambiamento partono da qui
            RADICE / "memoria" / "registro_analisi.jsonl")
 LIMITE_SECONDI = 600

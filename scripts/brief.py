@@ -25,6 +25,7 @@ from email.utils import parsedate_to_datetime
 from xml.etree import ElementTree
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import riserve as RIS  # noqa: E402 — v542 la seconda strada di notizie, calendario e ultima trimestrale
 from comuni import testo_feed, seduta_aperta  # noqa: E402 — v510 il titolo di una voce; v514 la barra in formazione
 
 RADICE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -317,6 +318,12 @@ def data_senza_fuso(dt):
         return None
 
 
+# v542 — i canali per simbolo, nell'ordine: gli stessi della pipeline (update_data.news_titoli; un gate li confronta)
+CANALI_NEWS = (("Nasdaq", "https://www.nasdaq.com/feed/rssoutbound?symbol={tk}"),
+               ("Yahoo Finance", "https://feeds.finance.yahoo.com/rss/2.0/headline?s={tk}&region=US&lang=en-US"))
+SERVITI = {}      # tk -> (chi ha servito le notizie, [(fonte che non ha risposto, perche')])
+
+
 def _voci_rss(xml, fonte):
     out = []
     try:
@@ -340,21 +347,45 @@ def _voci_rss(xml, fonte):
     return out
 
 
-def news_titolo(tk):
+def news_titolo(tk, riserve=None, dati=None):
     """⚠ L'ATTRIBUZIONE VIENE DALLA FONTE, non da un'euristica nostra (v399): Nasdaq espone
     un feed PER SIMBOLO. Google News si interroga con una stringa di ricerca e l'attribuzione
     la dovremmo indovinare: escluso.
     ⚠ [TK] significa 'trovata nel feed di TK', NON 'notizia su TK': i feed dei fornitori
-    includono regolarmente pezzi su concorrenti e sul comparto (v415, misurato 4 su 14)."""
-    try:
-        v = _voci_rss(http(f"https://www.nasdaq.com/feed/rssoutbound?symbol={tk}", 20), f"Nasdaq[{tk}]")
-        for x in v:
-            x["tk"] = tk
-        return tk, "ok", v
-    except urllib.error.HTTPError as e:
-        return tk, f"HTTP {e.code}", []          # ⚠ non si ritenta: un 429 e' una quota, non un intoppo
-    except Exception as e:
-        return tk, str(e)[:40], []
+    includono regolarmente pezzi su concorrenti e sul comparto (v415, misurato 4 su 14).
+    v542 — una fonte che rifiuta non si ritenta e non si aggira: si passa alla SUCCESSIVA (gli stessi due canali per
+    simbolo della pipeline), poi alle riserve (riserve.py: la pipeline, e Google News cercato per NOME — dichiarato
+    nella voce, e filtrato sul titolo). Lo stato resta l'errore della PRIMA fonte se nessuno risponde; SERVITI dice
+    chi ha servito ogni nome."""
+    errori = []
+    for nome, modello in CANALI_NEWS:
+        try:
+            v = _voci_rss(http(modello.format(tk=tk), 20), f"{nome}[{tk}]")
+            for x in v:
+                x["tk"] = tk
+            SERVITI[tk] = (nome, list(errori))
+            return tk, "ok", v
+        except urllib.error.HTTPError as e:
+            errori.append((nome, f"HTTP {e.code}"))      # ⚠ non si ritenta: un 429 e' una quota, non un intoppo
+        except Exception as e:
+            errori.append((nome, str(e)[:40]))
+    if RIS.attive() if riserve is None else riserve:
+        v, serviti = RIS.news_di_riserva(tk, http, _voci_rss, dati)
+        if serviti:
+            SERVITI[tk] = (" + ".join(serviti), list(errori))
+            return tk, "ok", v
+    SERVITI.pop(tk, None)
+    return tk, errori[0][1], []
+
+
+def serviti_da(tickers):
+    """v542 — {chi ha servito: [nomi]} per i nomi che la prima fonte NON ha servito, col perche' della prima."""
+    out = {}
+    for tk in tickers:
+        chi, errori = SERVITI.get(tk) or (None, [])
+        if chi and errori:
+            out.setdefault(f"{chi} — {errori[0][0]}: {errori[0][1]}", []).append(tk)
+    return out
 
 
 def raccogli_news(tickers, da):
@@ -400,7 +431,7 @@ def raccogli_news(tickers, da):
     macro.sort(key=lambda x: x["quando"], reverse=True)
     # ⚠ "letta e muta" e "NON letta" si leggono uguali e significano l'opposto (v389, v421).
     return {"per_titolo": per_titolo, "macro": macro, "macro_scartate": scartate,
-            "titoli_non_letti": fonti_ko, "titoli_muti": muti,
+            "titoli_non_letti": fonti_ko, "titoli_muti": muti, "titoli_da_riserva": serviti_da(tickers),
             "macro_non_lette": macro_ko, "macro_mute": macro_muti}
 
 
@@ -503,7 +534,7 @@ def con_conti_dichiarati(attesi, cercati, oggi, giorni, dichiarati):
     return out
 
 
-def calendario_trimestrali(tickers, giorni=21):
+def calendario_trimestrali(tickers, giorni=21, riserve=None, dati=None, memoria=None):
     """Le uscite dichiarate DALLA FONTE nei prossimi giorni. Nessuna proiezione nostra: se
     una data non c'e', si dice che non c'e' (istruzione permanente del CEO, v396).
     v489 — le fonti sono due: il calendario Nasdaq e, per chi non c'e', la data che l'emittente ha
@@ -514,24 +545,33 @@ def calendario_trimestrali(tickers, giorni=21):
         g = oggi + timedelta(days=i)
         if g.weekday() < 5:                      # i mercati USA non riportano nel fine settimana
             date.append(g.isoformat())
-    attesi, non_letti = [], []
+    attesi, non_letti, letti = [], [], []
     cercati = {t.upper() for t in tickers}
     with ThreadPoolExecutor(max_workers=PARALLELI) as ex:
         for giorno, righe, errore in ex.map(_trim_giorno, date):
             if righe is None:
                 non_letti.append(giorno); continue
+            letti.append(giorno)
             for r in righe:
                 if str(r.get("symbol", "")).upper() in cercati:
                     attesi.append({"tk": r["symbol"].upper(), "data": giorno,
                                    "quando": r.get("time", ""), "eps_atteso": r.get("epsForecast"),
                                    "trimestre": r.get("fiscalQuarterEnding"),
                                    "giorni": (datetime.fromisoformat(giorno).date() - oggi).days})
+    # v542 — i giorni che Nasdaq non ha dato a questa sessione si chiedono alle riserve (riserve.py): la pipeline,
+    #   l'ultima lettura riuscita, e in fondo la stima di Yahoo — ognuna dichiarata nella voce. Restano «non letti»
+    #   solo i giorni che nessuna fonte ha letto.
+    riserva = None
+    if RIS.attive() if riserve is None else riserve:
+        attesi, non_letti, riserva = RIS.completa_calendario(attesi, letti, non_letti, cercati, oggi, giorni,
+                                                             datetime.now(timezone.utc), dati, memoria)
     attesi.sort(key=lambda x: x["data"])
     attesi = con_conti_dichiarati(attesi, cercati, oggi, giorni, leggi_conti_dichiarati())
     for x in attesi:                     # v500 — resi una volta per il testo e per la pagina (v455)
         x["orario"] = x.get("orario_dichiarato") or orario_trimestrale(x.get("quando"))
         x["consenso"] = consenso_testo(x.get("eps_atteso"))
-    return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni}
+    return {"attesi": attesi, "giorni_non_letti": non_letti, "finestra": giorni, "giorni_letti": letti,
+            "riserva": riserva}
 
 
 # ---------------------------------------------------------------- v500: l'ultima trimestrale riportata
@@ -565,7 +605,7 @@ def leggi_ultima_trimestrale(d):
     return {"stato": "ok", **voci[0]}
 
 
-def ultime_trimestrali(tickers):
+def ultime_trimestrali(tickers, riserve=None, dati=None, memoria=None):
     """v500 — L'ULTIMA TRIMESTRALE GIA' RIPORTATA, dichiarata dalla fonte: Nasdaq pubblica per ogni titolo le ultime
     quattro, col trimestre fiscale, la data del comunicato, l'EPS riportato e il consenso. E' il FATTO da cui parte il
     VWAP ancorato ai conti (decisione del CEO del 18/10/2026). L'8-K con item 2.02 non basta: una societa' ne deposita
@@ -578,7 +618,11 @@ def ultime_trimestrali(tickers):
             return tk, {"stato": f"NON letto ({str(ex)[:40]})"}
     nomi = list(dict.fromkeys(t.upper() for t in tickers if t))
     with ThreadPoolExecutor(max_workers=PARALLELI) as ex:
-        return dict(ex.map(uno, nomi))
+        esiti = dict(ex.map(uno, nomi))
+    # v542 — chi Nasdaq non ha letto qui: la pipeline, poi l'ultima lettura riuscita (riserve.py); la voce dice quale
+    if RIS.attive() if riserve is None else riserve:
+        esiti = RIS.completa_ultime(esiti, datetime.now(timezone.utc), dati, memoria)
+    return esiti
 
 
 # ---------------------------------------------------------------- aste del Tesoro USA
@@ -1133,6 +1177,8 @@ def componi(modo, dati):
         eps = f" · consenso {_cons}" if _cons else ""
         fonte = "" if x.get("fonte", "calendario Nasdaq") == "calendario Nasdaq" else f" · {x['fonte']}"
         A(f"  {x['tk']:6} {x['data']} (fra {x['giorni']}g) · {q}{eps}{fonte}")
+    for riga in RIS.righe_riserva(cal.get("riserva"), cal["giorni_non_letti"]):
+        A(riga)
     if cal["giorni_non_letti"]:
         A(f"  ⚠ giorni NON letti (diverso da 'nessuna uscita'): {len(cal['giorni_non_letti'])}")
 
@@ -1182,6 +1228,8 @@ def componi(modo, dati):
         A(f"  ... e altre {len(nw['per_titolo'])-25} non elencate (tetto di 25)")
     if nw["titoli_muti"]:
         A(f"  letti e senza voci in finestra: {', '.join(nw['titoli_muti'])}")
+    for chi, nomi in sorted((nw.get("titoli_da_riserva") or {}).items()):
+        A(f"  serviti da un'altra fonte ({len(nomi)}): {chi} — {', '.join(nomi)}")
     if nw["titoli_non_letti"]:
         A(f"  ⚠ NON LETTI (diverso da 'nessuna notizia'): {', '.join(nw['titoli_non_letti'])}")
 
@@ -1237,7 +1285,7 @@ def componi(modo, dati):
 
     A("")
     A("-" * 66)
-    A(f"Prezzi: stockanalysis.com, ultima barra {dati['seduta_base']}. Notizie: Nasdaq per simbolo")
+    A(f"Prezzi: stockanalysis.com, ultima barra {dati['seduta_base']}. Notizie: per simbolo (Nasdaq, poi Yahoo; le riserve dichiarate)")
     A("+ CNBC/Bloomberg/MarketWatch. Il sistema NON conosce: altri conti, altri strumenti,")
     A("posizioni corte, coperture, situazione fiscale. Direzione e livelli si', quantita' no.")
     return "\n".join(L)

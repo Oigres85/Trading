@@ -3893,6 +3893,22 @@ def calendario_uscite_fred(voci, quante=3):
 # ne dura novanta, cioe' +32 minuti di CI al giorno su 48 run. Quattro richieste in parallelo
 # li portano a 10 secondi con lo stesso esito (13/13). Il parallelismo e' basso di proposito:
 # la fonte e' gratuita e non va martellata — e' la stessa ragione per cui un 429 non si ritenta.
+def riserva_conti(tickers, giorni=45):
+    """v542 — LA RISERVA DEI CONTI per l'analisi in chat: il calendario delle trimestrali e l'ultima trimestrale di
+    ogni nome seguito, letti da qui con le STESSE funzioni della sessione (brief.py: una derivazione sola, v161). Il
+    10/11/2026 Nasdaq ha risposto 403 alla sessione e non a questi runner: senza una seconda strada l'analisi usciva
+    senza i conti di CRWV la sera stessa. La sessione legge prima alla fonte; quando la fonte la rifiuta prende
+    questo blocco, col suo orario (riserve.py). Qui le riserve sono SPENTE: una riserva non si alimenta da se'."""
+    import brief
+    cal = brief.calendario_trimestrali(tickers, giorni=giorni, riserve=False)
+    return {"letto_il": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "finestra": giorni,
+            "giorni_letti": list(cal.get("giorni_letti") or []),
+            "giorni_non_letti": list(cal.get("giorni_non_letti") or []),
+            "calendario": [{k: x.get(k) for k in ("tk", "data", "quando", "eps_atteso", "trimestre")}
+                           for x in cal.get("attesi") or [] if x.get("fonte") == "calendario Nasdaq"],
+            "ultime": brief.ultime_trimestrali(tickers, riserve=False)}
+
+
 def news_titoli(tickers, per_titolo=6, giorni=14):
     """Titoli di notizia per ciascun ticker. Nasdaq primario, Yahoo di riserva.
 
@@ -8531,6 +8547,14 @@ def main():
     except Exception as e:  # noqa: BLE001
         print(f"!! news per titolo: {e}", file=sys.stderr)
 
+    # v542 — la riserva dei conti, anche lei in fondo al run e senza poter danneggiare il resto: None = non letta
+    riserva_conti_ = None
+    try:
+        riserva_conti_ = riserva_conti(sorted({str(r.get("ticker") or "").upper() for r in watchlist
+                                               if str(r.get("ticker") or "").strip()}))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! riserva dei conti: {e}", file=sys.stderr)
+
     metrics_history = [p for p in prev_hist if p.get("date") != today]
     metrics_history.append(point)
     metrics_history = metrics_history[-180:]   # ~6 mesi di storico giornaliero
@@ -8597,6 +8621,7 @@ def main():
         # `predictions` RESTA: e' Polymarket, e le sue righe finiscono davvero nel pacchetto
         # macro (buildPrompt legge DATA.predictions per le probabilita' sulla Fed).
         "news_titoli": news_tit,
+        "riserva_conti": riserva_conti_,     # v542 — calendario e ultima trimestrale per l'analisi in chat (riserve.py)
         "predictions": fetch_predictions(),
         "options": options,
         "metrics_history": metrics_history,

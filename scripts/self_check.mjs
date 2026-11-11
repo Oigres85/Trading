@@ -228,7 +228,9 @@ const SUITE = [
      gruppi riletti da CLAUDE.md, le convenzioni dal libro, i collegamenti) -> 1126 */
   /* v540: 1139 punti di chiamata in test_analisi_libro (+3: le tesi lette e misurate, ogni posizione con la sua
      tesi, i collegamenti coi comandi del comitato) -> 1129 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1129, firma: /\d+\/\d+ CHECK OK/ },
+  /* v542: 1143 punti di chiamata in test_analisi_libro (+4: le riserve delle notizie, del calendario dei conti,
+     dell'ultima trimestrale, e i collegamenti con la pipeline) -> 1133 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1133, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

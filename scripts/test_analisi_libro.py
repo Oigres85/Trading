@@ -11454,6 +11454,157 @@ check("v540 collegamenti: il comando unico esegue le tesi in ogni fase PRIMA del
       and "`scripts/tesi.py` resta **fuori**" in _ag536 and "**Il comitato (v540)**" in _cl536
       and _pr540.returncode == 0 and _pr540.stdout.startswith("TESI (v540)"))
 
+# ═════════ v542 — le riserve: nessuna famiglia di dati dipende da un solo fornitore (11/11/2026) ═════════
+_RIS542 = _il536.import_module("riserve")
+import urllib.error as _ue542
+from datetime import datetime as _dt542, timezone as _tz542, timedelta as _td542
+
+
+def _rss542(titoli):
+    return ("<rss><channel>" + "".join(
+        f"<item><title>{t}</title><pubDate>Tue, 10 Nov 2026 12:00:00 GMT</pubDate><link>x</link></item>" for t in titoli)
+        + "</channel></rss>").encode()
+
+
+def _http542(url, timeout=20):
+    """Nasdaq rifiuta tutti; Yahoo serve solo AAA; Google News risponde solo alla ricerca di «Gamma»."""
+    if "nasdaq.com" in url:
+        raise _ue542.HTTPError(url, 403, "Forbidden", None, None)
+    if "yahoo.com" in url:
+        if "s=AAA" in url:
+            return _rss542(["Notizia Yahoo su AAA"])
+        raise _ue542.HTTPError(url, 429, "Too Many Requests", None, None)
+    if "news.google.com" in url and "Gamma" in url:
+        return _rss542(["Gamma firma un contratto - Fonte", "Un'altra societa' cresce - Fonte", "Perche' CCCX sale - Fonte"])
+    raise OSError("fonte spenta nella prova")
+
+
+_oggi542 = _dt542.now(_tz542.utc).date()
+_gg542 = [g.isoformat() for g in (_oggi542 + _td542(days=i) for i in range(10)) if g.weekday() < 5]
+_dati542 = {
+    "watchlist": [{"ticker": "CCCX", "name": "Gamma Corp, Inc."}, {"ticker": "BBB", "name": "Beta Holdings"},
+                  {"ticker": "DDD", "earnings_date": _gg542[4]}, {"ticker": "EEE", "earnings_date": _gg542[1]}],
+    "news_titoli": {"per_titolo": {"BBB": [{"titolo": "Notizia della pipeline su BBB", "fonte": "Nasdaq",
+                                            "quando": "2026-11-10T19:49:21Z", "url": "u"}]},
+                    "senza_notizie": [], "letto_il": "2026-11-10T20:08:54Z"},
+    "riserva_conti": {"letto_il": "2026-11-10T20:08:54Z", "giorni_letti": [_gg542[2]],
+                      "calendario": [{"tk": "BBB", "data": _gg542[2], "quando": "time-after-hours",
+                                      "eps_atteso": "$1.00", "trimestre": None}],
+                      "ultime": {"AAA": {"stato": "ok", "data": "2026-11-03", "trimestre": "set 2026", "eps": 1.0,
+                                         "consenso": 0.9, "sorpresa_pct": 11.1}}}}
+_vh542 = brief.http
+try:
+    brief.http = _http542
+    _na542 = brief.news_titolo("AAA", riserve=True, dati=_dati542)
+    _nb542 = brief.news_titolo("BBB", riserve=True, dati=_dati542)
+    _nc542 = brief.news_titolo("CCCX", riserve=True, dati=_dati542)
+    _nd542 = brief.news_titolo("DDD", riserve=True, dati=_dati542)
+    _sv542 = brief.serviti_da(["AAA", "BBB", "CCCX", "DDD"])
+    _ns542 = brief.news_titolo("BBB")                       # come la suite: le riserve sono spente
+finally:
+    brief.http = _vh542
+check("v542 le notizie per titolo: la fonte che rifiuta non si ritenta, si passa alla successiva (Nasdaq 403 → Yahoo), poi "
+      "alle riserve — la pipeline col suo orario e Google News cercato per nome, dove entra solo il titolo che porta il "
+      "nome o il ticker; ogni voce dice chi l'ha servita; chi non ha nessuna strada resta NON letto con l'errore della "
+      "prima fonte; nelle suite le riserve sono spente: " + str(sorted(_sv542)),
+      _na542[1] == "ok" and [v["fonte"] for v in _na542[2]] == ["Yahoo Finance[AAA]"]
+      and _nb542[1] == "ok" and [v["fonte"] for v in _nb542[2]] == ["pipeline · Nasdaq[BBB]"]
+      and _nc542[1] == "ok" and sorted(v["titolo"] for v in _nc542[2]) == ["Gamma firma un contratto - Fonte",
+                                                                             "Perche' CCCX sale - Fonte"]
+      and all(v["fonte"] == "Google News «Gamma»" and v["tk"] == "CCCX" for v in _nc542[2])
+      and _nd542 == ("DDD", "HTTP 403", []) and _ns542[1] == "HTTP 403" and _ns542[2] == []
+      and any(k.startswith("Yahoo Finance — Nasdaq: HTTP 403") and v == ["AAA"] for k, v in _sv542.items())
+      and any("pipeline (run del 10/11 21:08)" in k and v == ["BBB"] for k, v in _sv542.items())
+      and any("Google News (ricerca per nome)" in k and v == ["CCCX"] for k, v in _sv542.items())
+      and not any("DDD" in v for v in _sv542.values()) and _RIS542.attive() is False)
+
+_mem542 = os.path.join(tempfile.mkdtemp(), "riserva_conti.json")
+_RIS542.ricorda_calendario([], [{"tk": "CCC", "data": _gg542[3], "quando": "time-pre-market", "eps_atteso": "$2.00",
+                                 "trimestre": None},
+                                {"tk": "ZZZ", "data": _gg542[1], "quando": "", "eps_atteso": None, "trimestre": None}],
+                           {"CCC", "ZZZ"}, "2026-11-08T08:41:00Z", "sessione", _mem542)
+_vtg542, _vcd542 = brief._trim_giorno, brief.leggi_conti_dichiarati
+try:
+    brief._trim_giorno = lambda g: ((g, [{"symbol": "AAA", "time": "time-after-hours", "epsForecast": "$0.50",
+                                          "fiscalQuarterEnding": "Sep/2026"}], None) if g == _gg542[0]
+                                    else (g, [], None) if g == _gg542[1] else (g, None, "HTTP Error 403: Forbidden"))
+    brief.leggi_conti_dichiarati = lambda *a, **k: []
+    _cal542 = brief.calendario_trimestrali(["AAA", "BBB", "CCC", "DDD", "EEE", "ZZZ"], giorni=10, riserve=True,
+                                           dati=_dati542, memoria=_mem542)
+    _cs542 = brief.calendario_trimestrali(["AAA", "BBB", "CCC", "DDD", "EEE", "ZZZ"], giorni=10)   # come la suite
+finally:
+    brief._trim_giorno, brief.leggi_conti_dichiarati = _vtg542, _vcd542
+_ca542 = {x["tk"]: x for x in _cal542["attesi"]}
+_mm542 = _RIS542.leggi_memoria(_mem542)["calendario"]
+check("v542 il calendario dei conti: i giorni che Nasdaq non da' alla sessione li serve la pipeline (col suo orario), poi "
+      "l'ultima lettura riuscita (datata), e in fondo la stima di Yahoo — solo in un giorno che NESSUNA fonte ha letto; "
+      "una data che la fonte non dichiara piu' nel giorno letto esce dalla memoria; restano «non letti» solo i giorni "
+      "senza nessuna fonte; nelle suite le riserve sono spente: "
+      + str({k: v.get("riserva") for k, v in sorted(_ca542.items())}),
+      sorted(_ca542) == ["AAA", "BBB", "CCC", "DDD"]
+      and _ca542["AAA"].get("riserva") is None and _ca542["AAA"]["fonte"] == "calendario Nasdaq"
+      and _ca542["BBB"].get("riserva") == "pipeline" and "pipeline (run del 10/11 21:08)" in _ca542["BBB"]["fonte"]
+      and _ca542["BBB"]["orario"] == brief.orario_trimestrale("time-after-hours")
+      and _ca542["CCC"].get("riserva") == "memoria" and "08/11 09:41" in _ca542["CCC"]["fonte"]
+      and _ca542["DDD"].get("riserva") == "stima" and _ca542["DDD"].get("stima") is True
+      and "STIMA" in _ca542["DDD"]["fonte"]
+      and _cal542["giorni_non_letti"] == [g for g in _gg542 if g not in _gg542[:3]]
+      and (_cal542.get("riserva") or {}).get("giorni_pipeline") == 1
+      and sorted(_mm542) == ["AAA", "BBB", "CCC"] and _mm542["BBB"]["via"] == "pipeline"
+      and sorted(x["tk"] for x in _cs542["attesi"]) == ["AAA"] and _cs542.get("riserva") is None
+      and len(_cs542["giorni_non_letti"]) == len(_gg542) - 2
+      and "STIMA" in NL._da_emittente({"fonte": "x", "riserva": "stima"})
+      and NL._da_emittente({"fonte": "dichiarata dall'emittente: 6-K"}) == ", dichiarata dall'emittente"
+      and NL._da_emittente({"fonte": "calendario Nasdaq"}) == ""
+      and "DDD" in (_RIS542.riga_date(_cal542["attesi"]) or "") and _RIS542.riga_date([_ca542["AAA"]]) is None)
+
+_RIS542.ricorda_ultime({"BBB": {"stato": "ok", "data": "2026-08-05", "trimestre": "giu 2026", "eps": 0.2,
+                                "consenso": 0.1, "sorpresa_pct": 100.0}}, "2026-11-08T08:41:00Z", "sessione", _mem542)
+_vj542 = brief.jget
+try:
+    brief.jget = lambda url, timeout=20: (_ for _ in ()).throw(_ue542.HTTPError(url, 403, "Forbidden", None, None))
+    _ul542 = brief.ultime_trimestrali(["AAA", "BBB", "CCC"], riserve=True, dati=_dati542, memoria=_mem542)
+    _us542 = brief.ultime_trimestrali(["AAA"])                                                       # come la suite
+finally:
+    brief.jget = _vj542
+check("v542 l'ultima trimestrale: chi Nasdaq non legge qui arriva dalla pipeline, poi dall'ultima lettura riuscita — la "
+      "voce resta «ok» e porta la fonte con la data; chi non ha nessuna strada resta NON letto: "
+      + str({k: (v.get("stato"), v.get("fonte")) for k, v in _ul542.items()}),
+      _ul542["AAA"].get("stato") == "ok" and _ul542["AAA"].get("data") == "2026-11-03"
+      and "pipeline (run del 10/11 21:08)" in (_ul542["AAA"].get("fonte") or "")
+      and _ul542["BBB"].get("stato") == "ok" and _ul542["BBB"].get("data") == "2026-08-05"
+      and "ultima lettura riuscita" in (_ul542["BBB"].get("fonte") or "") and "08/11 09:41" in _ul542["BBB"]["fonte"]
+      and str(_ul542["CCC"].get("stato", "")).startswith("NON letto")
+      and str(_us542["AAA"].get("stato", "")).startswith("NON letto"))
+
+_src542 = re.sub(r'"\s*\n\s*"', "", Path(UD.__file__).read_text(encoding="utf-8"))
+_chi542 = {}
+_fb542 = _ty536.SimpleNamespace(
+    calendario_trimestrali=lambda tks, giorni=21, **k: _chi542.setdefault("cal", k) and None or {
+        "attesi": [{"tk": "AAA", "data": "2026-11-12", "quando": "time-after-hours", "eps_atteso": "$1", "trimestre": None,
+                    "fonte": "calendario Nasdaq", "orario": "dopo la campana"},
+                   {"tk": "SKHY", "data": "2026-11-13", "quando": "", "eps_atteso": None, "trimestre": None,
+                    "fonte": "dichiarata dall'emittente: 6-K, depositato il 2026-11-01"}],
+        "giorni_letti": ["2026-11-12", "2026-11-13"], "giorni_non_letti": ["2026-11-16"]},
+    ultime_trimestrali=lambda tks, **k: _chi542.setdefault("ult", k) and None or {"AAA": {"stato": "ok"}})
+_vb542 = sys.modules.get("brief")
+try:
+    sys.modules["brief"] = _fb542
+    _rc542 = UD.riserva_conti(["AAA", "SKHY"])
+finally:
+    sys.modules["brief"] = _vb542
+check("v542 collegamenti: i canali per simbolo della sessione sono gli stessi della pipeline; la pipeline pubblica la "
+      "riserva dei conti con le funzioni della sessione e le riserve SPENTE (una riserva non si alimenta da se'), solo "
+      "le righe di Nasdaq; la memoria dell'ultima lettura si committa; /aggiorna dichiara il modulo",
+      all(u in _src542 for _, u in brief.CANALI_NEWS) and len(brief.CANALI_NEWS) >= 2
+      and '"riserva_conti": riserva_conti_' in _src542
+      and _chi542.get("cal") == {"riserve": False} and _chi542.get("ult") == {"riserve": False}
+      and [x["tk"] for x in _rc542["calendario"]] == ["AAA"] and "orario" not in _rc542["calendario"][0]
+      and _rc542["giorni_letti"] == ["2026-11-12", "2026-11-13"] and _rc542["giorni_non_letti"] == ["2026-11-16"]
+      and _rc542["ultime"] == {"AAA": {"stato": "ok"}} and bool(_rc542.get("letto_il"))
+      and any(p.name == "riserva_conti.json" for p in _AN528.MEMORIE)
+      and "`scripts/riserve.py` resta **fuori**" in _ag536)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

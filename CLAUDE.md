@@ -25,6 +25,9 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    §1undecies con la sua data. *"Se ritieni fammi sempre domande."*
 4. **Staccarsi da GitHub quanto più possibile**: i dati si leggono alla fonte in sessione (v511-v522); la pipeline è la
    riserva. Le dipendenze rimaste sono in `fonti_dirette.SOLO_PIPELINE`, e lo stato del sistema le data.
+   **Nessuna famiglia di dati dipende da un solo fornitore (v542)**: una fonte che rifiuta non si ritenta e non si
+   aggira (niente richieste travestite) — si passa alla successiva e lo si dice: altra fonte, pipeline, ultima lettura
+   riuscita datata (`riserve.py`). Una lettura nuova con una fonte sola nasce con la sua riserva.
 5. **Investimento** (regole intere in `memoria/LIBRO.md`): non si vende sui ribassi (15/10); l'unica vendita automatica
    è il salvavita a −30% (§1ter); la tenuta si decide per evidenza nei due versi (§1sexies); un CONFLITTO si decide ai
    conti con l'esame scritto prima e confermato dal CEO (§1quinquies) — ma dal 03/11 gli esami non vendono: i rami
@@ -143,7 +146,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
   forum · `indici.py` multipli e volatilità · `concorrenti.py` quote e salute · `fonti_dirette.py`/`fonti_titoli.py`
   letture alla fonte · `statistica.py` forma statistica e diario · `laboratorio.py` nove librerie open source a richiesta, una domanda
   ciascuna (v532, LIBRO §1sexdecies; cvxportfolio esclusa per v161) · `previsioni.py` sistema previsionale (v536:
-  `affidabilita.py` la misura, `previsioni_*`/`mercati_previsione` i metodi, `registro_previsioni` il dal vivo) · `cieca.py` giudizio alla cieca e pregiudizio misurato (v539) · `tesi.py` le tesi e le loro condizioni (v540) · `stato_sistema.py` stato · `scheda.py` scheda completa · `comuni.py` funzioni condivise.
+  `affidabilita.py` la misura, `previsioni_*`/`mercati_previsione` i metodi, `registro_previsioni` il dal vivo) · `cieca.py` giudizio alla cieca e pregiudizio misurato (v539) · `tesi.py` le tesi e le loro condizioni (v540) · `riserve.py` la seconda strada di notizie, calendario dei conti e ultima trimestrale (v542) · `stato_sistema.py` stato · `scheda.py` scheda completa · `comuni.py` funzioni condivise.
 - `memoria/` libro, formato, registri (`registro_performance.jsonl`, `registro_analisi.jsonl`, `wsb.jsonl`,
   `cds_sessione.jsonl`…: si committano dopo l'analisi, lo stato del sistema lo ricorda).
 - `config/` posizioni e watchlist della pipeline (devono coincidere con il libro: gate v479/v480), `cds_entita.json`.

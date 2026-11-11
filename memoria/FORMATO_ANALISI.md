@@ -773,4 +773,6 @@ strumento: il gate della v505 non lascia l'una senza l'altra.
 - **La SCHEDA COMPLETA si manda SEMPRE come allegato** (v505, decisione del CEO del 19/10/2026: «B»): il comando la
   scrive in `memoria/dati/scheda_analisi_<data>_<ora>.md` e il suo riepilogo sta sopra questa checklist. La risposta
   rimanda alla scheda per i dati nome per nome e non riscrive le righe che la scheda porta per intero; se il riepilogo
-  dice RICHIESTA SENZA RIGHE OGGI, o uno strumento è fallito, la risposta lo dice in cima.
+  dice RICHIESTA SENZA RIGHE OGGI, o uno strumento è fallito, la risposta lo dice in cima. Una famiglia servita da
+  una RISERVA (v542: un'altra fonte, la pipeline, l'ultima lettura riuscita, una stima) si dice in una riga, con la
+  fonte e la sua data: i dati ci sono, e chi legge sa da dove vengono.

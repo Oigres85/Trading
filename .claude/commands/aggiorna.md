@@ -231,6 +231,10 @@ comando legge, non scrive.
 la base, fasce di calibrazione, quante se ne avverano su n) e lo schema dei loro record — un modulo senza esecuzione propria,
 le cui prove girano nella suite.
 
+`scripts/riserve.py` resta **fuori** (v542): è la seconda strada delle letture dell'analisi in chat — notizie per titolo,
+calendario dei conti, ultima trimestrale — quando la prima fonte rifiuta; un modulo senza esecuzione propria, che
+`brief.py` chiama. Questo comando legge, non scrive.
+
 `scripts/tesi.py` resta **fuori** (v540): le tesi dell'analisi in chat (LIBRO.md §1novodecies): rilegge le tre
 condizioni di ogni posizione e controlla quelle misurabili sulle prove della tenuta — questo comando legge, non scrive.
 

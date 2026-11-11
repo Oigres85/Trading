@@ -1124,6 +1124,10 @@ def righe_rischio_eventi(ev, libro):
         L.append(f"  senza conti dichiarati nei prossimi {AGENDA_GIORNI} giorni: " + ", ".join(fuori))
     L.append("  le uscite macro, le aste e la riunione della Fed sono nell'agenda: per quelle il sistema non ha un "
              "movimento implicito proprio dell'evento, e non se ne scrive uno")
+    import riserve                                  # v542 — le date arrivate da una riserva si nominano, una volta
+    nota = riserve.riga_date(at.get("scadenze"))
+    if nota:
+        L.append(nota)
     return L
 
 

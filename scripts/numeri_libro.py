@@ -331,6 +331,9 @@ def _da_emittente(e):
     """v489 — ', dichiarata dall'emittente' quando la data viene da LIBRO.md §1octies e non dal calendario
     Nasdaq: chi legge la scadenza deve sapere da dove viene. Vuoto per Nasdaq e per le voci senza fonte."""
     f = (e or {}).get("fonte") or "calendario Nasdaq"
+    import riserve                              # v542 — una riserva non e' l'emittente: la data dice da dove viene
+    if riserve.etichetta(e):
+        return ", " + riserve.etichetta(e)
     return "" if f == "calendario Nasdaq" else ", dichiarata dall'emittente"
 
 
@@ -350,8 +353,8 @@ def costo_attesa(tot, vol_ann, var95, es95, calendario, nomi):
     scad = sorted(prime.values(), key=lambda e: e["data"])
     return {"seduta_1s": tot * sig, "settimana_1s": tot * sig * math.sqrt(5),
             "var_usd": tot * var95, "es_usd": tot * es95,
-            "scadenze": [{"tk": e["tk"], "data": e["data"], "giorni": e.get("giorni"), "fonte": e.get("fonte")}
-                         for e in scad],
+            "scadenze": [{"tk": e["tk"], "data": e["data"], "giorni": e.get("giorni"), "fonte": e.get("fonte"),
+                          "riserva": e.get("riserva")} for e in scad],
             "senza_data": [t for t in nomi if t not in prime],
             "prima": scad[0] if scad else None,
             "finestra": (calendario or {}).get("finestra"),

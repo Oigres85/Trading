@@ -9859,3 +9859,25 @@ scritto, quindi non lo vedeva: la fixture non conteneva il fenomeno (v430). Ora 
 sintesi, e il gate lo chiede; senza prove della tenuta la riga dice «condizioni NON misurate in questo giro», non che
 non siano misurabili (v405). Il gate della v524 non pinna più la forma di `POI` (una sola voce) ma la proprietà.
 Lo stesso giorno Nasdaq ha risposto 403 al calendario dei conti e ai feed dei nomi: dichiarato nell'analisi, non aggirato.
+
+## v542 — le riserve: nessuna famiglia di dati dipende da un solo fornitore (11/11/2026)
+Il 10/11 Nasdaq ha risposto 403 alle letture della sessione (non ai runner di GitHub) e Yahoo 429: il calendario dei
+conti, le notizie per titolo e l'ultima trimestrale sono usciti «NON letti» la sera dei conti di CRWV. Macro, tecnica,
+fondamentali, opzioni e credito erano letti: le tre letture cadute avevano UNA fonte sola. Il CEO: *"Trova soluzione per
+acquisire dati su news fondamentali Macro e tecnici aggiornati ogni volta che chiedo analisi … in forma gratuita. Se non
+ottieni il risultato abbandono questo tipo di analisi"*. Un rifiuto non si aggira (provare intestazioni diverse per
+passare un controllo anti-automi è stato fermato, giustamente): si passa a un'altra fonte, e lo si dice.
+- `scripts/riserve.py`. **Notizie per titolo**: Nasdaq → Yahoo Finance (i due canali per simbolo della pipeline) → le
+  notizie della pipeline (altri indirizzi, col suo orario) e Google News cercato per NOME (escluso nella v399 perché
+  l'attribuzione è una ricerca: ora entra solo come riserva, dichiarato nella voce, col titolo che deve portare il nome
+  o il ticker). **Calendario dei conti**: Nasdaq qui → lo stesso calendario letto dalla pipeline (`riserva_conti` in
+  data.json) → l'ultima lettura riuscita, datata (`memoria/riserva_conti.json`, che si committa) → la data di Yahoo,
+  dichiarata STIMA e solo nei giorni che nessuna fonte ha letto. **Ultima trimestrale**: Nasdaq → pipeline → memoria.
+- `update_data.riserva_conti`: la pipeline pubblica calendario (45 giorni) e ultima trimestrale di ogni nome seguito,
+  con le funzioni della sessione e le riserve spente (una riserva non si alimenta da sé), in fondo al run.
+- Chi usa le date senza scrivere la fonte accanto le nomina una volta (`riserve.riga_date` nel rischio degli eventi);
+  `numeri_libro._da_emittente` non chiama più «dichiarata dall'emittente» una data che viene da una riserva (v405).
+- La memoria parte con le letture riuscite di questa sessione (06/11 22:44 e 08/11 09:41), con la loro ora vera.
+- Gate: 4 (notizie, calendario, ultima trimestrale, collegamenti con la pipeline); quattro iniezioni (il filtro del
+  titolo tolto, la stima anche nei giorni letti, la memoria ignorata, le riserve accese nella pipeline) mordono
+  ciascuna sul suo. Pavimento 1129 → 1133. Nessuna soglia nuova: una riserva porta sempre la sua data.
