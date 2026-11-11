@@ -9887,3 +9887,20 @@ passare un controllo anti-automi è stato fermato, giustamente): si passa a un'a
   pubblicazione. Lo stato ora si costruisce (v429): `_TABELLA_FERMA` mette la data attesa a 133 giorni dal bilancio, e
   v356 costruisce i due stati non isolabili (i conti dopo l'ultima scadenza quotata, e prima della prima). Un'iniezione
   in `app.js` (tolto il caso «tutte prima») morde su v356.
+- **La prova dell'11/11 ha corretto il disegno.** La pipeline, fatta girare una volta col codice nuovo, ha pubblicato
+  una riserva dei conti VUOTA (0 giorni letti su 33, 0 ultime trimestrali su 67): Nasdaq rifiuta questo lettore anche
+  dai runner di GitHub — non è l'indirizzo, è la firma della richiesta. Cambiare firma per passare sarebbe aggirare un
+  controllo anti-automi: non si fa. `update_data.riserva_conti` è stata tolta (una riserva vuota non si pubblica, e
+  cento richieste rifiutate a ogni run non si mandano). Il connettore FMP del piano gratuito copre 4 dei 14 nomi del
+  libro (NVDA, AMD, PLTR, GOOGL): non è una fonte per il libro. Le riserve che restano sono fonti che accettano la
+  lettura: per le **notizie** la pipeline (che Nasdaq e Yahoo li legge) e Google News; per il **calendario** l'ultima
+  lettura riuscita e la data di Yahoo dalle righe dei titoli; per l'**ultima trimestrale** la più recente fra la
+  memoria e il deposito dei risultati su **SEC EDGAR** (8-K, item 2.02: ufficiale, gratuito, solo la data) — letto dal
+  vivo l'11/11: CRWV e RGTI 10/11, AMD 03/11, NVDA 26/08. Limite dichiarato: senza Nasdaq mancano l'orario dei conti
+  (prima o dopo la campana) e il consenso per le date nuove; SK hynix, emittente estero, non ha depositi 8-K.
+  Gate riscritti (4), due iniezioni rifatte (la stima anche nei giorni letti; la memoria vecchia che vince su EDGAR).
+- **v356, seconda correzione lo stesso giorno**: costruita la sola data dei conti, il check è tornato rosso la sera —
+  il book delle opzioni dello snapshot notturno ha bid e ask a zero, il movimento implicito non si calcola e il blocco
+  sparisce. Lo stato si costruisce TUTTO (v429): il book (tre scadenze future con uno straddle quotato) e i tre casi —
+  conti dopo l'ultima scadenza, prima della prima, in mezzo — con le date che partono da adesso. Iniezione in `app.js`
+  rifatta: morde.

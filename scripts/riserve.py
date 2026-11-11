@@ -12,10 +12,15 @@ Un rifiuto non si aggira (niente travestimenti delle richieste): si passa a un'A
                        riserva: le notizie per titolo lette dalla pipeline su GitHub (altri indirizzi, col suo orario) e
                        Google News cercato per NOME della societa' (dichiarato: e' una ricerca, non un feed per
                        simbolo; entra solo il titolo che porta il nome o il ticker — v399)
-  CALENDARIO DEI CONTI calendario Nasdaq letto qui → lo stesso calendario letto dalla pipeline (data.json,
-                       `riserva_conti`, col suo orario) → l'ULTIMA LETTURA RIUSCITA, datata (memoria/riserva_conti.json)
-                       → la data di Yahoo (yfinance), dichiarata STIMA e solo nei giorni che nessuna fonte ha letto
-  ULTIMA TRIMESTRALE   Nasdaq letto qui → la pipeline → l'ultima lettura riuscita, datata
+  CALENDARIO DEI CONTI calendario Nasdaq letto qui → l'ULTIMA LETTURA RIUSCITA, datata (memoria/riserva_conti.json) →
+                       la data di Yahoo (yfinance, dalle righe dei titoli), dichiarata STIMA e solo nei giorni che
+                       Nasdaq non ha dato; le date dichiarate dall'emittente (LIBRO.md §1octies) restano sopra tutto
+  ULTIMA TRIMESTRALE   Nasdaq letto qui → la piu' recente fra l'ultima lettura riuscita e il deposito dei risultati
+                       su SEC EDGAR (8-K con item 2.02: fonte ufficiale e gratuita, solo la data)
+
+L'11/11/2026 la prova ha detto due cose: Nasdaq rifiuta questo lettore anche dai runner di GitHub (la riserva dei conti
+pubblicata dalla pipeline e' arrivata vuota, ed e' stata tolta), e il connettore FMP del piano gratuito copre 4 dei 14
+nomi del libro. Per questo le riserve del calendario sono la memoria, Yahoo e SEC EDGAR, non un altro indirizzo.
 
 Ogni voce dice chi l'ha servita; i giorni che NESSUNA fonte ha letto restano «NON letti» (v389, v406). Nessuna soglia:
 una riserva porta sempre la sua data, e la legge chi decide. Le suite non leggono e non scrivono le riserve
@@ -70,15 +75,16 @@ def leggi_dati(dati=None, p=None):
         chiave = (str(p), p.stat().st_mtime)
         if chiave not in _dati_cache:
             _dati_cache.clear()
-            _dati_cache[chiave] = json.loads(p.read_text(encoding="utf-8").replace("NaN", "null"))
+            d = json.loads(p.read_text(encoding="utf-8").replace("NaN", "null"))
+            try:                       # le righe e i depositi SEC riletti in questo giro, se ci sono (fonti_titoli)
+                import fonti_titoli
+                d = fonti_titoli.carica(d)
+            except Exception:  # noqa: BLE001
+                pass
+            _dati_cache[chiave] = d
         return _dati_cache[chiave]
     except (OSError, ValueError):
         return {}
-
-
-def conti_pipeline(dati=None):
-    r = leggi_dati(dati).get("riserva_conti")
-    return r if isinstance(r, dict) and r.get("letto_il") else None
 
 
 # ── la memoria dell'ultima lettura riuscita ────────────────────────────────────────────────────────────────────────
@@ -146,30 +152,17 @@ def _voce(e, oggi, fonte, **altro):
 
 def completa_calendario(attesi, giorni_letti, non_letti, cercati, oggi, giorni, adesso, dati=None, memoria=None):
     """(attesi, giorni rimasti NON letti, riserva). `attesi`: le voci di Nasdaq lette qui; la riserva dice chi ha
-    servito il resto: {'giorni_pipeline', 'run_pipeline', 'da_memoria': [tk], 'stime': [tk]}."""
+    servito il resto: {'da_memoria': [tk], 'stime': [tk]}. I giorni restano «non letti»: una riserva non e' una
+    lettura del giorno, e lo si dice (v389)."""
     cercati = set(cercati)
     ora = adesso.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     out = list(attesi)
-    ris = {"giorni_pipeline": 0, "run_pipeline": None, "da_memoria": [], "stime": []}
+    ris = {"da_memoria": [], "stime": []}
     if giorni_letti:
         ricorda_calendario(giorni_letti, [a for a in out if a.get("fonte", NASDAQ) == NASDAQ], cercati, ora, "sessione",
                            memoria)
     scoperti = list(non_letti)
     presenti = {a["tk"] for a in out}
-    rp = conti_pipeline(dati)
-    if rp and scoperti:
-        letti_p = set(rp.get("giorni_letti") or [])
-        coperti = [g for g in scoperti if g in letti_p]
-        if coperti:
-            quando = orario(rp["letto_il"])
-            righe = [e for e in rp.get("calendario") or [] if e.get("data") in coperti and e.get("tk") in cercati]
-            for e in righe:
-                if e["tk"] not in presenti:
-                    out.append(_voce(e, oggi, f"{NASDAQ} letto dalla pipeline (run del {quando})", riserva="pipeline"))
-                    presenti.add(e["tk"])
-            ricorda_calendario(coperti, righe, cercati, str(rp["letto_il"]), "pipeline", memoria)
-            scoperti = [g for g in scoperti if g not in letti_p]
-            ris.update(giorni_pipeline=len(coperti), run_pipeline=quando)
     if scoperti:
         fino = oggi.toordinal() + giorni
         for tk, e in sorted(leggi_memoria(memoria)["calendario"].items()):
@@ -190,8 +183,7 @@ def completa_calendario(attesi, giorni_letti, non_letti, cercati, oggi, giorni, 
     return out, scoperti, ris
 
 
-ETICHETTA = {"pipeline": "letta dalla pipeline", "memoria": "dall'ultima lettura riuscita",
-             "stima": "⚠ STIMA di Yahoo, non dichiarata"}
+ETICHETTA = {"memoria": "dall'ultima lettura riuscita", "stima": "⚠ STIMA di Yahoo, non dichiarata"}
 
 
 def etichetta(voce):
@@ -214,40 +206,49 @@ def righe_riserva(ris, residui):
     L = []
     if not ris:
         return L
-    if ris.get("giorni_pipeline"):
-        L.append(f"  {ris['giorni_pipeline']} giorni del calendario serviti dalla RISERVA: Nasdaq letto dalla pipeline su "
-                 f"GitHub (run del {ris['run_pipeline']}), perche' a questa sessione non ha risposto")
     if ris.get("da_memoria"):
-        L.append(f"  dall'ultima lettura riuscita, datata accanto: {', '.join(ris['da_memoria'])}")
+        L.append(f"  dall'ultima lettura riuscita del calendario, datata accanto: {', '.join(ris['da_memoria'])}")
     if ris.get("stime"):
         L.append(f"  ⚠ solo una STIMA di Yahoo, non una data dichiarata: {', '.join(ris['stime'])}")
-    if (ris.get("giorni_pipeline") or ris.get("da_memoria") or ris.get("stime")) and not residui:
-        L.append("  nessun giorno della finestra e' rimasto senza una fonte")
     return L
 
 
 # ── l'ultima trimestrale ───────────────────────────────────────────────────────────────────────────────────────────
+def ultima_da_edgar(tk, dati=None):
+    """L'ultimo deposito dei risultati su SEC EDGAR (8-K con item 2.02): una fonte UFFICIALE e gratuita per la DATA
+    dell'ultima trimestrale. Non porta l'utile ne' il consenso, e chi deposita risultati anche fuori dal ciclo lo
+    dice (v500: le consegne di Tesla). None per chi non ha depositi (gli emittenti esteri)."""
+    per = (((leggi_dati(dati).get("macro") or {}).get("sec_calendario") or {}).get("per_titolo") or {}).get(tk)
+    if not isinstance(per, dict) or not per.get("ultimo_deposito"):
+        return None
+    d = str(per["ultimo_deposito"])[:10]
+    return {"stato": "ok", "data": d, "trimestre": None, "eps": None, "consenso": None, "sorpresa_pct": None,
+            "fonte": f"SEC EDGAR: l'ultimo deposito dei risultati (8-K, item 2.02) e' del {d[8:]}/{d[5:7]}/{d[:4]}"
+                     + (" — ⚠ questa societa' deposita risultati anche fuori dal ciclo: puo' non essere una trimestrale"
+                        if per.get("cadenza_irregolare_gg") else "")}
+
+
 def completa_ultime(esiti, adesso, dati=None, memoria=None):
-    """Chi Nasdaq non ha letto qui si prende dalla pipeline, poi dall'ultima lettura riuscita: la voce resta «ok» e
-    porta `fonte` con la sua data. Chi non ha nemmeno quella resta «NON letto»."""
+    """Chi Nasdaq non ha letto qui: l'ultima lettura riuscita (con l'utile e la sorpresa) e il deposito su SEC EDGAR
+    (solo la data) — vince la data PIU' RECENTE, perche' una memoria puo' essere di un trimestre fa. La voce resta «ok»
+    e porta `fonte`. Chi non ha nessuna delle due resta «NON letto»."""
     ora = adesso.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     ricorda_ultime(esiti, ora, "sessione", memoria)
-    rp = conti_pipeline(dati)
-    if rp:
-        ricorda_ultime(rp.get("ultime"), str(rp["letto_il"]), "pipeline", memoria)
     mem = None
     out = {}
     for tk, v in esiti.items():
         if isinstance(v, dict) and str(v.get("stato", "")).startswith("NON letto"):
-            p = ((rp or {}).get("ultime") or {}).get(tk)
-            if isinstance(p, dict) and p.get("stato") == "ok":
-                v = {**p, "fonte": f"Nasdaq letto dalla pipeline (run del {orario(rp['letto_il'])})"}
-            else:
-                mem = mem or leggi_memoria(memoria)["ultime"]
-                e = mem.get(tk)
-                if e:
-                    v = {**{k: x for k, x in e.items() if k not in ("letto_il", "via")},
-                         "fonte": f"ultima lettura riuscita di Nasdaq: {orario(e.get('letto_il'))} ({e.get('via')})"}
+            mem = leggi_memoria(memoria)["ultime"] if mem is None else mem
+            e = mem.get(tk)
+            cand = []
+            if e and e.get("data"):
+                cand.append({**{k: x for k, x in e.items() if k not in ("letto_il", "via")},
+                             "fonte": f"ultima lettura riuscita di Nasdaq: {orario(e.get('letto_il'))} ({e.get('via')})"})
+            ed = ultima_da_edgar(tk, dati)
+            if ed:
+                cand.append(ed)
+            if cand:
+                v = max(cand, key=lambda x: str(x["data"]))
         out[tk] = v
     return out
 

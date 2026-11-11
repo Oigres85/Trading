@@ -11487,11 +11487,10 @@ _dati542 = {
     "news_titoli": {"per_titolo": {"BBB": [{"titolo": "Notizia della pipeline su BBB", "fonte": "Nasdaq",
                                             "quando": "2026-11-10T19:49:21Z", "url": "u"}]},
                     "senza_notizie": [], "letto_il": "2026-11-10T20:08:54Z"},
-    "riserva_conti": {"letto_il": "2026-11-10T20:08:54Z", "giorni_letti": [_gg542[2]],
-                      "calendario": [{"tk": "BBB", "data": _gg542[2], "quando": "time-after-hours",
-                                      "eps_atteso": "$1.00", "trimestre": None}],
-                      "ultime": {"AAA": {"stato": "ok", "data": "2026-11-03", "trimestre": "set 2026", "eps": 1.0,
-                                         "consenso": 0.9, "sorpresa_pct": 11.1}}}}
+    "macro": {"sec_calendario": {"per_titolo": {
+        "AAA": {"ultimo_deposito": "2026-11-03", "n_depositi": 9, "cadenza_gg": 91},
+        "BBB": {"ultimo_deposito": "2026-11-05", "n_depositi": 9, "cadenza_gg": 91},
+        "FFF": {"ultimo_deposito": "2026-10-02", "n_depositi": 40, "cadenza_irregolare_gg": 26}}}}}
 _vh542 = brief.http
 try:
     brief.http = _http542
@@ -11529,79 +11528,65 @@ try:
                                           "fiscalQuarterEnding": "Sep/2026"}], None) if g == _gg542[0]
                                     else (g, [], None) if g == _gg542[1] else (g, None, "HTTP Error 403: Forbidden"))
     brief.leggi_conti_dichiarati = lambda *a, **k: []
-    _cal542 = brief.calendario_trimestrali(["AAA", "BBB", "CCC", "DDD", "EEE", "ZZZ"], giorni=10, riserve=True,
+    _cal542 = brief.calendario_trimestrali(["AAA", "CCC", "DDD", "EEE", "ZZZ"], giorni=10, riserve=True,
                                            dati=_dati542, memoria=_mem542)
-    _cs542 = brief.calendario_trimestrali(["AAA", "BBB", "CCC", "DDD", "EEE", "ZZZ"], giorni=10)   # come la suite
+    _cs542 = brief.calendario_trimestrali(["AAA", "CCC", "DDD", "EEE", "ZZZ"], giorni=10)   # come la suite
 finally:
     brief._trim_giorno, brief.leggi_conti_dichiarati = _vtg542, _vcd542
 _ca542 = {x["tk"]: x for x in _cal542["attesi"]}
 _mm542 = _RIS542.leggi_memoria(_mem542)["calendario"]
-check("v542 il calendario dei conti: i giorni che Nasdaq non da' alla sessione li serve la pipeline (col suo orario), poi "
-      "l'ultima lettura riuscita (datata), e in fondo la stima di Yahoo — solo in un giorno che NESSUNA fonte ha letto; "
-      "una data che la fonte non dichiara piu' nel giorno letto esce dalla memoria; restano «non letti» solo i giorni "
-      "senza nessuna fonte; nelle suite le riserve sono spente: "
+check("v542 il calendario dei conti: le date dei giorni che Nasdaq non da' alla sessione arrivano dall'ultima lettura "
+      "riuscita (datata) e in fondo dalla stima di Yahoo — solo in un giorno NON letto; una data che la fonte non "
+      "dichiara piu' nel giorno letto esce dalla memoria; i giorni restano «non letti» e la riserva dice chi ha "
+      "servito; nelle suite le riserve sono spente: "
       + str({k: v.get("riserva") for k, v in sorted(_ca542.items())}),
-      sorted(_ca542) == ["AAA", "BBB", "CCC", "DDD"]
+      sorted(_ca542) == ["AAA", "CCC", "DDD"]
       and _ca542["AAA"].get("riserva") is None and _ca542["AAA"]["fonte"] == "calendario Nasdaq"
-      and _ca542["BBB"].get("riserva") == "pipeline" and "pipeline (run del 10/11 21:08)" in _ca542["BBB"]["fonte"]
-      and _ca542["BBB"]["orario"] == brief.orario_trimestrale("time-after-hours")
       and _ca542["CCC"].get("riserva") == "memoria" and "08/11 09:41" in _ca542["CCC"]["fonte"]
+      and _ca542["CCC"]["orario"] == brief.orario_trimestrale("time-pre-market")
       and _ca542["DDD"].get("riserva") == "stima" and _ca542["DDD"].get("stima") is True
       and "STIMA" in _ca542["DDD"]["fonte"]
-      and _cal542["giorni_non_letti"] == [g for g in _gg542 if g not in _gg542[:3]]
-      and (_cal542.get("riserva") or {}).get("giorni_pipeline") == 1
-      and sorted(_mm542) == ["AAA", "BBB", "CCC"] and _mm542["BBB"]["via"] == "pipeline"
+      and _cal542["giorni_non_letti"] == _gg542[2:]
+      and (_cal542.get("riserva") or {}) == {"da_memoria": ["CCC"], "stime": ["DDD"]}
+      and sorted(_mm542) == ["AAA", "CCC"] and _mm542["AAA"]["via"] == "sessione"
       and sorted(x["tk"] for x in _cs542["attesi"]) == ["AAA"] and _cs542.get("riserva") is None
-      and len(_cs542["giorni_non_letti"]) == len(_gg542) - 2
       and "STIMA" in NL._da_emittente({"fonte": "x", "riserva": "stima"})
       and NL._da_emittente({"fonte": "dichiarata dall'emittente: 6-K"}) == ", dichiarata dall'emittente"
       and NL._da_emittente({"fonte": "calendario Nasdaq"}) == ""
-      and "DDD" in (_RIS542.riga_date(_cal542["attesi"]) or "") and _RIS542.riga_date([_ca542["AAA"]]) is None)
+      and "DDD" in (_RIS542.riga_date(_cal542["attesi"]) or "") and _RIS542.riga_date([_ca542["AAA"]]) is None
+      and any("CCC" in x for x in _RIS542.righe_riserva(_cal542["riserva"], _cal542["giorni_non_letti"])))
 
 _RIS542.ricorda_ultime({"BBB": {"stato": "ok", "data": "2026-08-05", "trimestre": "giu 2026", "eps": 0.2,
-                                "consenso": 0.1, "sorpresa_pct": 100.0}}, "2026-11-08T08:41:00Z", "sessione", _mem542)
+                                "consenso": 0.1, "sorpresa_pct": 100.0},
+                        "GGG": {"stato": "ok", "data": "2026-10-20", "trimestre": "set 2026", "eps": 0.3,
+                                "consenso": 0.2, "sorpresa_pct": 50.0}}, "2026-11-08T08:41:00Z", "sessione", _mem542)
 _vj542 = brief.jget
 try:
     brief.jget = lambda url, timeout=20: (_ for _ in ()).throw(_ue542.HTTPError(url, 403, "Forbidden", None, None))
-    _ul542 = brief.ultime_trimestrali(["AAA", "BBB", "CCC"], riserve=True, dati=_dati542, memoria=_mem542)
+    _ul542 = brief.ultime_trimestrali(["AAA", "BBB", "CCC", "FFF", "GGG"], riserve=True, dati=_dati542, memoria=_mem542)
     _us542 = brief.ultime_trimestrali(["AAA"])                                                       # come la suite
 finally:
     brief.jget = _vj542
-check("v542 l'ultima trimestrale: chi Nasdaq non legge qui arriva dalla pipeline, poi dall'ultima lettura riuscita — la "
-      "voce resta «ok» e porta la fonte con la data; chi non ha nessuna strada resta NON letto: "
-      + str({k: (v.get("stato"), v.get("fonte")) for k, v in _ul542.items()}),
+check("v542 l'ultima trimestrale: chi Nasdaq non legge qui prende la PIU' RECENTE fra l'ultima lettura riuscita (con "
+      "l'utile) e il deposito dei risultati su SEC EDGAR (la sola data, fonte ufficiale); chi deposita anche fuori dal "
+      "ciclo lo dice; la voce resta «ok» e porta la fonte; chi non ha nessuna strada resta NON letto: "
+      + str({k: (v.get("stato"), v.get("data")) for k, v in _ul542.items()}),
       _ul542["AAA"].get("stato") == "ok" and _ul542["AAA"].get("data") == "2026-11-03"
-      and "pipeline (run del 10/11 21:08)" in (_ul542["AAA"].get("fonte") or "")
-      and _ul542["BBB"].get("stato") == "ok" and _ul542["BBB"].get("data") == "2026-08-05"
-      and "ultima lettura riuscita" in (_ul542["BBB"].get("fonte") or "") and "08/11 09:41" in _ul542["BBB"]["fonte"]
+      and (_ul542["AAA"].get("fonte") or "").startswith("SEC EDGAR") and "03/11/2026" in _ul542["AAA"]["fonte"]
+      and _ul542["AAA"].get("eps") is None
+      and _ul542["BBB"].get("data") == "2026-11-05" and (_ul542["BBB"].get("fonte") or "").startswith("SEC EDGAR")
+      and _ul542["GGG"].get("data") == "2026-10-20" and _ul542["GGG"].get("eps") == 0.3
+      and "ultima lettura riuscita" in (_ul542["GGG"].get("fonte") or "") and "08/11 09:41" in _ul542["GGG"]["fonte"]
+      and "fuori dal ciclo" in (_ul542["FFF"].get("fonte") or "")
       and str(_ul542["CCC"].get("stato", "")).startswith("NON letto")
       and str(_us542["AAA"].get("stato", "")).startswith("NON letto"))
 
 _src542 = re.sub(r'"\s*\n\s*"', "", Path(UD.__file__).read_text(encoding="utf-8"))
-_chi542 = {}
-_fb542 = _ty536.SimpleNamespace(
-    calendario_trimestrali=lambda tks, giorni=21, **k: _chi542.setdefault("cal", k) and None or {
-        "attesi": [{"tk": "AAA", "data": "2026-11-12", "quando": "time-after-hours", "eps_atteso": "$1", "trimestre": None,
-                    "fonte": "calendario Nasdaq", "orario": "dopo la campana"},
-                   {"tk": "SKHY", "data": "2026-11-13", "quando": "", "eps_atteso": None, "trimestre": None,
-                    "fonte": "dichiarata dall'emittente: 6-K, depositato il 2026-11-01"}],
-        "giorni_letti": ["2026-11-12", "2026-11-13"], "giorni_non_letti": ["2026-11-16"]},
-    ultime_trimestrali=lambda tks, **k: _chi542.setdefault("ult", k) and None or {"AAA": {"stato": "ok"}})
-_vb542 = sys.modules.get("brief")
-try:
-    sys.modules["brief"] = _fb542
-    _rc542 = UD.riserva_conti(["AAA", "SKHY"])
-finally:
-    sys.modules["brief"] = _vb542
-check("v542 collegamenti: i canali per simbolo della sessione sono gli stessi della pipeline; la pipeline pubblica la "
-      "riserva dei conti con le funzioni della sessione e le riserve SPENTE (una riserva non si alimenta da se'), solo "
-      "le righe di Nasdaq; la memoria dell'ultima lettura si committa; /aggiorna dichiara il modulo",
+check("v542 collegamenti: i canali per simbolo della sessione sono gli stessi della pipeline; la pipeline NON legge il "
+      "calendario per conto della sessione (Nasdaq rifiuta questo lettore anche da li': una riserva vuota non si "
+      "pubblica); la memoria dell'ultima lettura si committa; /aggiorna dichiara il modulo",
       all(u in _src542 for _, u in brief.CANALI_NEWS) and len(brief.CANALI_NEWS) >= 2
-      and '"riserva_conti": riserva_conti_' in _src542
-      and _chi542.get("cal") == {"riserve": False} and _chi542.get("ult") == {"riserve": False}
-      and [x["tk"] for x in _rc542["calendario"]] == ["AAA"] and "orario" not in _rc542["calendario"][0]
-      and _rc542["giorni_letti"] == ["2026-11-12", "2026-11-13"] and _rc542["giorni_non_letti"] == ["2026-11-16"]
-      and _rc542["ultime"] == {"AAA": {"stato": "ok"}} and bool(_rc542.get("letto_il"))
+      and not hasattr(UD, "riserva_conti")
       and any(p.name == "riserva_conti.json" for p in _AN528.MEMORIE)
       and "`scripts/riserve.py` resta **fuori**" in _ag536)
 

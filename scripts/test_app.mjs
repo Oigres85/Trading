@@ -4949,22 +4949,30 @@ check("v356 simmetria: se il motore di rischio non produce, il pacchetto LO DICE
 
 check("v356 evento: il premio si isola solo fra una scadenza PRIMA e una DOPO", suVeri(`
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
-  const date = (((DATA.options || {}).NVDA || {}).expiries || []).map(e => e.date).sort();
-  if (!r || !date.length) return true;
+  if (!r) return true;
   /* confrontavo le prime due scadenze chiunque fossero: con tutte e tre posteriori all'evento
      avrei chiamato "prezzo dell'evento" la differenza fra due scadenze che l'evento ce l'hanno
      gia' entrambe dentro */
-  /* v542 — LO STATO SI COSTRUISCE (v429): con la data vera dei conti il check usciva verde senza misurare ogni
-     volta che le scadenze quotate la comprendevano (dall'11/11/2026: conti il 17/11, scadenze il 13, il 16 e il
-     18). Ora i due stati non isolabili si costruiscono — i conti DOPO l'ultima scadenza, e PRIMA della prima — e
-     in entrambi il pacchetto deve dirlo. */
-  const g = (iso, n) => new Date(new Date(iso + "T00:00:00Z").getTime() + n * 86400000).toISOString().slice(0, 10);
-  const frase = /IL PREMIO DELL'EVENTO NON E' ISOLABILE/;
-  r.earnings_date = g(date[date.length - 1], 1);
-  const dopo = frase.test(buildPromptTicker("NVDA"));
-  r.earnings_date = g(date[0], -1);
-  const prima = frase.test(buildPromptTicker("NVDA"));
-  return dopo && prima;`));
+  /* v542 — LO STATO SI COSTRUISCE TUTTO (v429). Con i dati veri il check dipendeva da due cose che cambiano da
+     sole: la data dei conti (dall'11/11/2026 le scadenze quotate la comprendevano, e usciva verde senza misurare) e
+     il book delle opzioni allo snapshot (di notte bid e ask sono a zero, il movimento implicito non si calcola e il
+     blocco sparisce). Ora si costruiscono il book — tre scadenze future con uno straddle quotato — e i tre stati:
+     i conti DOPO l'ultima scadenza, PRIMA della prima (non isolabile, e il pacchetto lo deve dire), e IN MEZZO
+     (isolabile: la frase non c'e' e il movimento implicito si'). Le date partono da adesso: restano future. */
+  const g = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const riga = () => ({ strike: 100, bid: 2, ask: 2.2, iv: 60, vol: 10, oi: 10 });
+  DATA.options = DATA.options || {};
+  DATA.options.NVDA = { spot: 100, avg_volume: 1000,
+    expiries: [7, 14, 21].map(n => ({ date: g(n), calls: [riga()], puts: [riga()], call_wall: 110, put_wall: 90, opt_volume: 20 })) };
+  const frase = /IL PREMIO DELL'EVENTO NON E' ISOLABILE/, blocco = /MOVIMENTO IMPLICITO DALLE OPZIONI/;
+  r.earnings_date = g(22);
+  const dopo = buildPromptTicker("NVDA");
+  r.earnings_date = g(3);
+  const prima = buildPromptTicker("NVDA");
+  r.earnings_date = g(10);
+  const mezzo = buildPromptTicker("NVDA");
+  return frase.test(dopo) && blocco.test(dopo) && frase.test(prima) && blocco.test(prima)
+      && !frase.test(mezzo) && blocco.test(mezzo);`));
 
 check("v356 etichette: il TTM non si chiama esercizio", suVeri(`
   const st = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).stats) || {};
