@@ -1035,8 +1035,16 @@ politica di §1vicies sono **confermate** (15% per titolo; semiconduttori al 50%
 rialzi; il piano a −20/−30/−40%). Cuscinetto per la vita e risparmi mensili: **nessuno** — la diversificazione
 viene solo dalle prese di profitto sui rialzi, e se servisse denaro il primo è il BTP.
 
+**Decisione del 12/11/2026** (CEO: *"Blocca tutto … Da oggi in poi, lavorerò lì"*): lo sciame lanciato l'11/11
+(stop e interventi, lettura dei conti da SEC, misura della politica, revisore) si è fermato sul limite d'uso del
+piano senza consegnare niente, e NON si riavvia. Il CEO lavora in una chat senza archivio, col solo portafoglio e
+l'obiettivo di crescita. Il progetto resta com'è e si riattiva su richiesta (13/11/2026: *"Riattiva
+momentaneamente il progetto"*). La richiesta dell'11/11 sugli stop è ora un comando del comitato (STOP,
+`memoria/FORMATO_ANALISI.md`).
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
+| 13/11/2026 | Dal 02/11/2026 (AVGO e WDC) non ci sono altre operazioni? E il BTP Valore 2028 è ancora in portafoglio? | le posizioni del libro non sono confermate da 11 giorni, e la domanda del 13/11 sui «40.000 €» presuppone il BTP | il CEO conferma, o dà le operazioni |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 

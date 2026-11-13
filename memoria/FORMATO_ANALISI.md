@@ -47,6 +47,11 @@ DIAVOLO** (il miglior argomento contro e il pre-mortem; parla per primo se una c
   dove va il ricavato secondo la politica, le quattro voci.
 - **PANICO** → solo fatti: semaforo e salvavita, il piano di calo scritto (§1vicies), cosa NON fare oggi, quando si
   decide (il giorno dopo).
+- **STOP** (CEO, 11/11/2026: *"Mi servono anche eventuali stop loss ed interventi"*) → per ogni posizione
+  `python3 scripts/statistica.py ingresso TICKER PREZZO` senza `--registra`: il livello d'allerta (sotto il pavimento
+  meno 1 ATR, o lo stop standard), la distanza, la perdita in dollari se scattasse, e «gli stop nei casi simili»
+  (tenere contro lo stop fisso a 1, 2 e 3 ATR). Poi chi supera il peso massimo della politica (§1vicies), in unità da
+  5.000 € con l'imposta per unità. Sono livelli d'allerta, non ordini: decide il CEO.
 - **DIVERSIFICA** → il piano a tappe della politica: prese di profitto sui rialzi sopra il peso massimo (unità
   da 5.000 €, v439), minusvalenze da compensare, strumenti da scegliere; le quattro voci.
 - **TRIMESTRE** → l'analisi completa, ogni tesi contro le sue condizioni, la politica rivista, il diario degli ingressi

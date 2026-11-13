@@ -9911,3 +9911,18 @@ passare un controllo anti-automi è stato fermato, giustamente): si passa a un'a
   testo in memoria per sempre. Da solo e in parallelo ridotto non si riproduceva: è una corsa. Ora si carica sotto
   serratura, una volta, e l'uscita si rimette al suo posto. Gate: otto thread insieme, una sola lettura, uscita
   intatta; l'iniezione (serratura tolta) morde. Pavimento 1133 → 1134.
+
+## 11-13/11/2026 — lo sciame v543 fermato, il progetto in pausa e riattivato per una domanda
+- L'11/11 il CEO ha chiesto «stop loss ed interventi» e, «se ritieni», uno sciame per perfezionare l'analisi. Risposta a
+  mano con `statistica.py ingresso` su ogni posizione (nei casi simili tenere senza stop ha reso in media più di ogni
+  stop fisso; lo stop a 2 ATR scattava in oltre metà dei casi). Lanciati quattro agenti (interventi, lettura dei conti da
+  SEC EDGAR, misura della politica sul passato, revisore): si sono fermati tutti sul limite d'uso del piano SENZA
+  consegnare niente. Il 12/11 il CEO: *"Blocca tutto"* — non si riavviano. Nessun file loro è nel repo.
+- Il CEO ha chiesto un prompt per una chat senza archivio (solo portafoglio e obiettivo di crescita, nessuna regola) e
+  lavora lì. Il 13/11 ha riattivato il progetto per una domanda (BTP o ETF sui 40.000 €; il portafoglio fra 5 anni
+  tenendo tutto o rimodulando): risposta con un esercizio dichiarato tale, fuori dal sistema previsionale.
+- La richiesta sugli stop è diventata il comando STOP del comitato (FORMATO), con la procedura a mano: nessun codice nuovo.
+- ⚠ Osservazione aperta del 13/11: la fonte dei prezzi restituisce 252 sedute invece di 5 anni per NVDA e PLTR
+  (`rotazione.barre_lunghe`, intervallo «5Y»), e Yahoo risponde 429 a questa sessione: per quei due nomi la lettura a 5
+  anni e i pavimenti lunghi poggiano su un anno. Da rimisurare alla prossima riattivazione (v497), e da dichiarare nella
+  resa se resta così.
