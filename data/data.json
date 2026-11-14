@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T14:50:37Z",
+ "updated_at": "2026-11-14T15:29:23Z",
  "eurusd": 1.105,
  "totals": {
   "usd_value": 0,
@@ -494,7 +494,7 @@
      33.88,
      30.71,
      34.61,
-     44.63,
+     44.62,
      33.36,
      40.49,
      44.24,
@@ -1953,7 +1953,7 @@
      "a1": 229.5,
      "a3": 932.34,
      "a5": 849.01,
-     "a10": 3987.45
+     "a10": 3987.46
     },
     "stagionalita": [
      {
@@ -18471,28 +18471,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 65993.81,
+   "price": 65201.08,
    "price_asof": "2026-11-14",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -3.3,
+   "change_pct": -4.47,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -47.7,
-   "sma200_dist_pct": -9.6,
-   "sma50_dist_pct": -17.7,
+   "ath_dist_pct": -48.3,
+   "sma200_dist_pct": -10.7,
+   "sma50_dist_pct": -18.7,
    "w52_high": 99804.43,
    "w52_low": 57747.77,
-   "w52_dist_pct": -33.9,
+   "w52_dist_pct": -34.7,
    "day_high": 68360.71,
-   "day_low": 65971.16,
-   "support": 65971.16,
+   "day_low": 65370.01,
+   "support": 65370.01,
    "resistance": 81889.95,
-   "rsi": 22.1,
-   "volume": 31529795584,
+   "rsi": 21.2,
+   "volume": 32145457152,
    "vol_ratio": 1.64,
-   "atr_14": 2377.93,
-   "atr_pct": 3.6,
+   "atr_14": 2420.87,
+   "atr_pct": 3.71,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18501,7 +18501,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65993.81
+     65201.08
     ],
     "m6": [
      63758.22,
@@ -18629,7 +18629,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65993.81
+     65201.08
     ],
     "all": [
      386.94,
@@ -18778,7 +18778,7 @@
      78548.63,
      83553.85,
      77434.75,
-     65993.81
+     65201.08
     ],
     "m1": [
      80790.84,
@@ -18802,7 +18802,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65993.81
+     65201.08
     ],
     "m3": [
      76568.12,
@@ -18870,7 +18870,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65993.81
+     65201.08
     ],
     "y1": [
      94397.79,
@@ -18946,7 +18946,7 @@
      77198.21,
      80405.29,
      75223.15,
-     65993.81
+     65201.08
     ],
     "d1": [
      68296.03,
@@ -19037,7 +19037,11 @@
      66391.65,
      66124.64,
      65986.69,
-     65991.08
+     65991.08,
+     65892.29,
+     65907.95,
+     65557.39,
+     65212.43
     ]
    },
    "earnings_date": null,
@@ -19046,13 +19050,13 @@
    "health": 14,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.77,
-   "sortino_1y": -1.05,
-   "sharpe_6m": 0.1,
-   "sortino_6m": 0.15,
+   "sharpe_1y": -0.79,
+   "sortino_1y": -1.08,
+   "sharpe_6m": 0.02,
+   "sortino_6m": 0.04,
    "prepost": null,
-   "prezzo_limite_aggiustato": 65993.81,
-   "risk_reward": "1:3.3",
+   "prezzo_limite_aggiustato": 65201.08,
+   "risk_reward": "1:3.4",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -19065,24 +19069,24 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 65971.16,
+     "support": 65370.01,
      "resistance": 75320.91,
-     "change_pct": -10.48
+     "change_pct": -11.56
     },
     "m1": {
-     "support": 65971.16,
+     "support": 65370.01,
      "resistance": 81889.95,
-     "change_pct": -18.32
+     "change_pct": -19.3
     },
     "m3": {
-     "support": 65971.16,
+     "support": 65370.01,
      "resistance": 87363.76,
-     "change_pct": -13.81
+     "change_pct": -14.85
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 0.04
+     "change_pct": -1.17
     }
    },
    "financials": [],
@@ -19109,74 +19113,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 65993.81,
+     "prezzo": 65201.08,
      "medie": {
       "sma10": {
-       "liv": 73051.51,
-       "dist_pct": -9.66
+       "liv": 72972.23,
+       "dist_pct": -10.65
       },
       "ema10": {
-       "liv": 72308.32,
-       "dist_pct": -8.73
+       "liv": 72164.19,
+       "dist_pct": -9.65
       },
       "sma20": {
-       "liv": 75883.93,
-       "dist_pct": -13.03
+       "liv": 75844.29,
+       "dist_pct": -14.03
       },
       "ema20": {
-       "liv": 74991.34,
-       "dist_pct": -12.0
+       "liv": 74915.84,
+       "dist_pct": -12.97
       },
       "sma30": {
-       "liv": 77819.55,
-       "dist_pct": -15.2
+       "liv": 77793.13,
+       "dist_pct": -16.19
       },
       "ema30": {
-       "liv": 76497.37,
-       "dist_pct": -13.73
+       "liv": 76446.23,
+       "dist_pct": -14.71
       },
       "sma50": {
-       "liv": 80174.4,
-       "dist_pct": -17.69
+       "liv": 80158.55,
+       "dist_pct": -18.66
       },
       "ema50": {
-       "liv": 77638.55,
-       "dist_pct": -15.0
+       "liv": 77607.47,
+       "dist_pct": -15.99
       },
       "sma100": {
-       "liv": 77748.68,
-       "dist_pct": -15.12
+       "liv": 77740.76,
+       "dist_pct": -16.13
       },
       "ema100": {
-       "liv": 76881.69,
-       "dist_pct": -14.16
+       "liv": 76865.99,
+       "dist_pct": -15.18
       },
       "sma200": {
-       "liv": 72983.6,
-       "dist_pct": -9.58
+       "liv": 72979.64,
+       "dist_pct": -10.66
       },
       "ema200": {
-       "liv": 75812.85,
-       "dist_pct": -12.95
+       "liv": 75804.96,
+       "dist_pct": -13.99
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 22.1,
+      "rsi14": 21.2,
       "macd": {
-       "linea": -3001.79,
-       "segnale": -2055.94,
-       "istogramma": -945.85
+       "linea": -3065.03,
+       "segnale": -2068.59,
+       "istogramma": -996.44
       },
-      "stoch_k": 0.1,
-      "stoch_d": 2.4,
-      "williams_r": -99.9,
-      "cci20": -168.9,
-      "adx14": 27.2,
-      "di_su": 9.4,
-      "di_giu": 37.3,
-      "momentum10": -14411.48
+      "stoch_k": -1.1,
+      "stoch_d": 2.0,
+      "williams_r": -101.1,
+      "cci20": -175.9,
+      "adx14": 27.3,
+      "di_su": 9.2,
+      "di_giu": 38.4,
+      "momentum10": -15204.21
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19668,20 +19672,20 @@
       "d": "2026-11-14",
       "o": 68238.21,
       "h": 68360.71,
-      "l": 65971.16,
-      "c": 65993.81
+      "l": 65370.01,
+      "c": 65201.08
      }
     ],
     "performance": {
-     "s1": -12.27,
-     "m1": -18.6,
-     "m3": -15.67,
-     "m6": 3.44,
-     "a1": -1.9,
-     "ytd": -25.63,
-     "a3": 74.99,
-     "a5": 15.77,
-     "a10": 8750.02
+     "s1": -13.32,
+     "m1": -19.58,
+     "m3": -16.69,
+     "m6": 2.19,
+     "a1": -3.08,
+     "ytd": -26.52,
+     "a3": 72.89,
+     "a5": 14.38,
+     "a10": 8643.71
     },
     "stagionalita": [
      {
@@ -19794,9 +19798,9 @@
      }
     ]
    },
-   "rs_1m": -16.0,
+   "rs_1m": -16.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -11.7,
+   "rs_ndx_1m": -12.6,
    "beta_ndx": 0.64,
    "avg_corr": 0.35,
    "max_corr": 0.77,
@@ -41973,7 +41977,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -71771,7 +71775,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -76863,7 +76867,7 @@
      11.1,
      11.27,
      11.09,
-     11.07,
+     11.06,
      11.8,
      11.5,
      10.69,
@@ -89121,7 +89125,7 @@
      7.48,
      7.84,
      7.76,
-     7.76,
+     7.75,
      7.95,
      8.29,
      8.35,
@@ -91584,7 +91588,7 @@
      71.81,
      71.36,
      69.91,
-     70.49,
+     70.48,
      73.77,
      73.44,
      80.18,
@@ -93726,7 +93730,7 @@
      32.88,
      31.09,
      28.92,
-     32.12,
+     32.13,
      32.9,
      33.61,
      31.46,
@@ -95073,7 +95077,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -95733,7 +95737,7 @@
      123.58,
      115.79,
      115.57,
-     127.36,
+     127.35,
      140.21,
      140.59,
      129.75,
@@ -105944,7 +105948,7 @@
      344.76,
      305.88,
      342.21,
-     344.34,
+     344.33,
      369.93,
      349.13,
      353.5,
@@ -109864,7 +109868,7 @@
      64.33,
      64.69,
      66.58,
-     72.6,
+     72.59,
      68.33,
      68.3,
      72.59,
@@ -111195,7 +111199,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -116264,7 +116268,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -120385,7 +120389,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -120418,7 +120422,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -120525,7 +120529,7 @@
      267.46,
      254.7,
      277.82,
-     275.25,
+     275.26,
      273.83,
      275.21,
      261.91,
@@ -120585,7 +120589,7 @@
      427.74,
      448.72,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -120604,7 +120608,7 @@
      764.78,
      831.91,
      742.87,
-     835.69,
+     835.7,
      801.28,
      814.72,
      732.3,
@@ -135367,6 +135371,13 @@
   "news": {
    "voci": [
     {
+     "titolo": "Fed’s Collins Says ‘Steady, Gradual’ Rate Hikes Appropriate",
+     "riassunto": "Federal Reserve Bank of Boston President Susan Collins said a gradual path for interest-rate hikes will be appropriate to lower inflation, as the labor market gains solid footing without adding to price pressures.",
+     "fonte": "Bloomberg",
+     "quando": "2026-11-14T15:08:45Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-14/fed-s-collins-says-steady-gradual-rate-hikes-appropriate"
+    },
+    {
      "titolo": "What’s the most tax-efficient way to donate to charity?",
      "riassunto": "How to make your donations beneficial for both you and the recipient",
      "fonte": "MarketWatch",
@@ -135484,22 +135495,14 @@
      "fonte": "CNBC Economia",
      "quando": "2026-11-05T21:32:52Z",
      "url": "https://www.cnbc.com/2026/11/05/october-jobs-report-preview.html"
-    },
-    {
-     "titolo": "Voters say the economy drove them to the polls — and blame Trump for their troubles",
-     "riassunto": "Participants in the CNBC Voter Poll ranked the economy the most important issue facing the country, ahead of topics tied to democracy and immigration.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-11-05T16:07:59Z",
-     "url": "https://www.cnbc.com/2026/11/04/2026-midterms-trump-economy-iran-war.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
+    "Bloomberg",
     "MarketWatch"
    ],
-   "fonti_mute": [
-    "Bloomberg"
-   ],
+   "fonti_mute": [],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -143251,7 +143254,7 @@
    "calls": 938734
   },
   "risk_sentiment": {
-   "score": 49,
+   "score": 47,
    "label": "Neutrale",
    "components": [
     {
@@ -143268,7 +143271,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 16
+     "score": 5
     },
     {
      "label": "Treasury 10A",
@@ -148768,6 +148771,13 @@
     ],
     "CRWV": [
      {
+      "titolo": "Prediction: This Will Be CoreWeave’s Stock Price After 1 Year Following Its Stunning Results (Hint: It Implies a Big Move)",
+      "riassunto": "Key PointsCoreWeave's latest quarterly report improved investor confidence in the stock, and I won't be surprised to see its bull run continue over the coming year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T14:29:01Z",
+      "url": "https://www.nasdaq.com/articles/prediction-will-be-coreweaves-stock-price-after-1-year-following-its-stunning-results-hint"
+     },
+     {
       "titolo": "What's Going on With CoreWeave Stock?",
       "riassunto": "Should you buy stock in CoreWeave right now? Before you buy stock in CoreWeave, consider this:Missed AI’s \"Act 1\"? Act 2 Could Be 15x Bigger. Most investors think they missed the AI boat because they didn't buy Nvidia in 2005. But according to our analysts, we’re only at the end",
       "fonte": "Nasdaq",
@@ -148801,13 +148811,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T23:04:29Z",
       "url": "https://www.nasdaq.com/articles/stock-market-today-nov-13-coreweave-falls-over-6-ai-cloud-selling-and-reported-4-billion"
-     },
-     {
-      "titolo": "Chartstopper: November 13, 2026",
-      "riassunto": "It was a busy week for markets, with jobs and inflation data, more Iran developments, and major updates in the artificial intelligence (AI) trade.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T21:52:59Z",
-      "url": "https://www.nasdaq.com/economic-institute/chartstopper-111326"
      }
     ],
     "GOOGL": [
@@ -149231,7 +149234,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-14T14:50:37Z"
+   "letto_il": "2026-11-14T15:29:23Z"
   }
  },
  "broker": null,
@@ -149371,6 +149374,13 @@
    ],
    "CRWV": [
     {
+     "titolo": "Prediction: This Will Be CoreWeave’s Stock Price After 1 Year Following Its Stunning Results (Hint: It Implies a Big Move)",
+     "riassunto": "Key PointsCoreWeave's latest quarterly report improved investor confidence in the stock, and I won't be surprised to see its bull run continue over the coming year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T14:29:01Z",
+     "url": "https://www.nasdaq.com/articles/prediction-will-be-coreweaves-stock-price-after-1-year-following-its-stunning-results-hint"
+    },
+    {
      "titolo": "What's Going on With CoreWeave Stock?",
      "riassunto": "Should you buy stock in CoreWeave right now? Before you buy stock in CoreWeave, consider this:Missed AI’s \"Act 1\"? Act 2 Could Be 15x Bigger. Most investors think they missed the AI boat because they didn't buy Nvidia in 2005. But according to our analysts, we’re only at the end",
      "fonte": "Nasdaq",
@@ -149404,13 +149414,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T23:04:29Z",
      "url": "https://www.nasdaq.com/articles/stock-market-today-nov-13-coreweave-falls-over-6-ai-cloud-selling-and-reported-4-billion"
-    },
-    {
-     "titolo": "Chartstopper: November 13, 2026",
-     "riassunto": "It was a busy week for markets, with jobs and inflation data, more Iran developments, and major updates in the artificial intelligence (AI) trade.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T21:52:59Z",
-     "url": "https://www.nasdaq.com/economic-institute/chartstopper-111326"
     }
    ],
    "GOOGL": [
@@ -149834,7 +149837,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-14T14:50:37Z"
+  "letto_il": "2026-11-14T15:29:23Z"
  },
  "predictions": [
   {
@@ -149854,12 +149857,12 @@
   },
   {
    "question": "Will there be no new be CEO of NVIDIA by December 31, 2028?",
-   "yes": 9,
+   "yes": 8,
    "link": "https://polymarket.com/event/will-candidate-a-be-the-next-ceo-of-nvidia"
   },
   {
    "question": "Will Bitcoin dip to $60,000 by December 31, 2026?",
-   "yes": 54,
+   "yes": 60,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-60k-by-december-31-2026-from-july-21"
   },
   {
@@ -222680,7 +222683,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 39,
-    "risk_sentiment": 49,
+    "risk_sentiment": 47,
     "credit": 77,
     "systemic_risk": 77,
     "corp_profit": 53,
@@ -222858,7 +222861,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 0 ore"
    },
    {
     "key": "sec_calendario",
@@ -222942,6 +222945,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-14T14:50:38Z"
+  "generated_at": "2026-11-14T15:29:24Z"
  }
 }
