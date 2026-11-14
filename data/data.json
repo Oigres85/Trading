@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T00:05:19Z",
+ "updated_at": "2026-11-14T00:45:41Z",
  "eurusd": 1.105,
  "totals": {
   "usd_value": 0,
@@ -1025,10 +1025,10 @@
    "sortino_6m": 0.17,
    "prepost": {
     "label": "after",
-    "price": 764.0,
-    "change_pct": -1.84
+    "price": 763.0,
+    "change_pct": -1.97
    },
-   "prezzo_limite_aggiustato": 764.0,
+   "prezzo_limite_aggiustato": 763.0,
    "risk_reward": "1:1.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -1953,7 +1953,7 @@
      "a1": 229.5,
      "a3": 932.34,
      "a5": 849.01,
-     "a10": 3987.46
+     "a10": 3987.45
     },
     "stagionalita": [
      {
@@ -3180,10 +3180,10 @@
    "sortino_6m": 0.75,
    "prepost": {
     "label": "after",
-    "price": 521.58,
-    "change_pct": -2.34
+    "price": 521.83,
+    "change_pct": -2.29
    },
-   "prezzo_limite_aggiustato": 521.58,
+   "prezzo_limite_aggiustato": 521.83,
    "risk_reward": "1:0.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -5220,10 +5220,10 @@
    "sortino_6m": -2.12,
    "prepost": {
     "label": "after",
-    "price": 160.88,
-    "change_pct": -1.21
+    "price": 160.96,
+    "change_pct": -1.16
    },
-   "prezzo_limite_aggiustato": 160.88,
+   "prezzo_limite_aggiustato": 160.96,
    "risk_reward": "1:3.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -7007,10 +7007,10 @@
    "sortino_6m": 1.12,
    "prepost": {
     "label": "after",
-    "price": 165.25,
-    "change_pct": -1.63
+    "price": 165.54,
+    "change_pct": -1.46
    },
-   "prezzo_limite_aggiustato": 165.25,
+   "prezzo_limite_aggiustato": 165.54,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -7021,9 +7021,9 @@
     "float_pct": 91.7,
     "avg_volume_30d": 25879196.0,
     "pe_ttm": 118.3028,
-    "forward_pe": 66.2625,
+    "forward_pe": 66.1698,
     "eps_ttm": 1.42,
-    "eps_forward": 2.5352,
+    "eps_forward": 2.5388,
     "revenue_fy": 7288260096.0,
     "net_income_fy": 3669104896.0,
     "revenue_growth": 0.959,
@@ -8840,10 +8840,10 @@
    "sortino_6m": -0.37,
    "prepost": {
     "label": "after",
-    "price": 152.82,
-    "change_pct": -2.51
+    "price": 152.5,
+    "change_pct": -2.72
    },
-   "prezzo_limite_aggiustato": 152.82,
+   "prezzo_limite_aggiustato": 152.5,
    "risk_reward": "1:2.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -8871,7 +8871,7 @@
     "gross_margin": 0.5222,
     "enterprise_value": 145559502848.0,
     "ev_ebitda": 51.068,
-    "peg": 0.42,
+    "peg": 0.4,
     "roa": 0.0413,
     "short_float": 0.0348,
     "buyback_yield": 0.0145,
@@ -10563,18 +10563,18 @@
    "sortino_6m": -1.9,
    "prepost": {
     "label": "after",
-    "price": 9.58,
-    "change_pct": -0.42
+    "price": 9.5,
+    "change_pct": -1.25
    },
-   "prezzo_limite_aggiustato": 9.58,
-   "risk_reward": "1:1.7",
+   "prezzo_limite_aggiustato": 9.5,
+   "risk_reward": "1:1.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
-    "market_cap": 3210855168.0,
-    "shares": 333768747.0,
+    "market_cap": 3297572608.0,
+    "shares": 342783018.0,
     "float_shares": 336979702.0,
-    "float_pct": null,
+    "float_pct": 98.3,
     "avg_volume_30d": 16216010.0,
     "pe_ttm": null,
     "forward_pe": -42.6494,
@@ -10597,8 +10597,8 @@
     "peg": null,
     "roa": -0.1094,
     "short_float": 0.2001,
-    "buyback_yield": -0.1189,
-    "ps": 250.52,
+    "buyback_yield": -0.1158,
+    "ps": 257.28,
     "ev_s": 246.93,
     "altman_z": 5.13,
     "altman_missing": 0,
@@ -10627,7 +10627,7 @@
     "fcf_ttm": -111133000.0,
     "mesi_capex": 97.5,
     "mesi_operativi": 71.9,
-    "emissione_netta_pct": 11.89,
+    "emissione_netta_pct": 11.58,
     "debito_netto": -376097000.0,
     "valuta": "USD"
    },
@@ -12122,7 +12122,7 @@
      186.49,
      185.58,
      186.3,
-     187.74,
+     187.72,
      188.55,
      187.13,
      188.26,
@@ -12184,18 +12184,18 @@
    "sortino_6m": -0.96,
    "prepost": {
     "label": "after",
-    "price": 187.73,
-    "change_pct": -2.22
+    "price": 186.81,
+    "change_pct": -2.7
    },
-   "prezzo_limite_aggiustato": 187.73,
-   "risk_reward": "1:1.2",
+   "prezzo_limite_aggiustato": 186.81,
+   "risk_reward": "1:1.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
    "stats": {
-    "market_cap": 56740192256.0,
-    "shares": 295537217.0,
+    "market_cap": 56763133952.0,
+    "shares": 295656689.0,
     "float_shares": 290367391.0,
-    "float_pct": 98.3,
+    "float_pct": 98.2,
     "avg_volume_30d": 15845318.0,
     "pe_ttm": 116.3576,
     "forward_pe": 36.0618,
@@ -12219,7 +12219,7 @@
     "roa": 0.0745,
     "short_float": 0.0681,
     "buyback_yield": -0.001,
-    "ps": 14.81,
+    "ps": 14.82,
     "ev_s": 15.67,
     "altman_z": 3.11,
     "altman_missing": 0,
@@ -13766,10 +13766,10 @@
    "sortino_6m": -1.08,
    "prepost": {
     "label": "after",
-    "price": 129.9,
-    "change_pct": -1.43
+    "price": 130.45,
+    "change_pct": -1.02
    },
-   "prezzo_limite_aggiustato": 129.9,
+   "prezzo_limite_aggiustato": 130.45,
    "risk_reward": "1:1.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -15602,10 +15602,10 @@
    "sortino_6m": -1.69,
    "prepost": {
     "label": "after",
-    "price": 109.96,
-    "change_pct": -1.49
+    "price": 109.86,
+    "change_pct": -1.58
    },
-   "prezzo_limite_aggiustato": 109.96,
+   "prezzo_limite_aggiustato": 109.86,
    "risk_reward": "1:2.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -17271,18 +17271,18 @@
    "sortino_6m": -2.03,
    "prepost": {
     "label": "after",
-    "price": 51.76,
-    "change_pct": -2.57
+    "price": 51.69,
+    "change_pct": -2.71
    },
-   "prezzo_limite_aggiustato": 51.76,
+   "prezzo_limite_aggiustato": 51.69,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
-    "market_cap": 29303138304.0,
-    "shares": 458871690.0,
+    "market_cap": 29546958848.0,
+    "shares": 465847732.0,
     "float_shares": 331011592.0,
-    "float_pct": 72.1,
+    "float_pct": 71.1,
     "avg_volume_30d": 44457201.0,
     "pe_ttm": null,
     "forward_pe": -30.4858,
@@ -17305,8 +17305,8 @@
     "peg": null,
     "roa": -0.0005,
     "short_float": 0.233,
-    "buyback_yield": -0.0508,
-    "ps": 2.96,
+    "buyback_yield": -0.0504,
+    "ps": 2.99,
     "ev_s": 9.45,
     "altman_z": -1.07,
     "altman_missing": 0,
@@ -17334,7 +17334,7 @@
     "cashflow_al": "2026-06-30",
     "fcf_ttm": -13655000000.0,
     "mesi_capex": 3.2,
-    "emissione_netta_pct": 5.08,
+    "emissione_netta_pct": 5.04,
     "debito_netto": 46069000000.0,
     "valuta": "USD"
    },
@@ -18468,28 +18468,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 68341.31,
+   "price": 68181.74,
    "price_asof": "2026-11-14",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -4.21,
+   "change_pct": -4.43,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -45.8,
-   "sma200_dist_pct": -6.4,
-   "sma50_dist_pct": -15.1,
+   "ath_dist_pct": -46.0,
+   "sma200_dist_pct": -6.6,
+   "sma50_dist_pct": -15.3,
    "w52_high": 99804.43,
    "w52_low": 57747.77,
-   "w52_dist_pct": -31.5,
-   "day_high": 71386.0,
-   "day_low": 67800.1,
-   "support": 67800.1,
+   "w52_dist_pct": -31.7,
+   "day_high": 68360.71,
+   "day_low": 68156.5,
+   "support": 68156.5,
    "resistance": 81889.95,
-   "rsi": 25.1,
-   "volume": 42802262016,
+   "rsi": 24.9,
+   "volume": 42723094528,
    "vol_ratio": 1.04,
-   "atr_14": 2363.49,
-   "atr_pct": 3.46,
+   "atr_14": 2334.96,
+   "atr_pct": 3.42,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18498,7 +18498,7 @@
      73720.12,
      73964.47,
      71342.97,
-     68341.31
+     68181.74
     ],
     "m6": [
      63802.03,
@@ -18626,7 +18626,7 @@
      73720.12,
      73964.47,
      71342.97,
-     68341.31
+     68181.74
     ],
     "all": [
      386.94,
@@ -18775,7 +18775,7 @@
      78548.63,
      83553.85,
      77434.75,
-     68341.31
+     68181.74
     ],
     "m1": [
      81074.19,
@@ -18799,7 +18799,7 @@
      73720.12,
      73964.47,
      71342.97,
-     68341.31
+     68181.74
     ],
     "m3": [
      78259.52,
@@ -18867,7 +18867,7 @@
      73720.12,
      73964.47,
      71342.97,
-     68341.31
+     68181.74
     ],
     "y1": [
      94397.79,
@@ -18944,7 +18944,13 @@
      80405.29,
      75223.15
     ],
-    "d1": []
+    "d1": [
+     68296.04,
+     68255.07,
+     68297.06,
+     68125.81,
+     68181.74
+    ]
    },
    "earnings_date": null,
    "rating": null,
@@ -18954,10 +18960,10 @@
    "beta": null,
    "sharpe_1y": -0.71,
    "sortino_1y": -0.97,
-   "sharpe_6m": 0.28,
-   "sortino_6m": 0.45,
+   "sharpe_6m": 0.27,
+   "sortino_6m": 0.43,
    "prepost": null,
-   "prezzo_limite_aggiustato": 68341.31,
+   "prezzo_limite_aggiustato": 68181.74,
    "risk_reward": "1:2.9",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -18971,24 +18977,24 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 67800.1,
+     "support": 68156.5,
      "resistance": 75505.34,
-     "change_pct": -9.15
+     "change_pct": -9.36
     },
     "m1": {
-     "support": 67800.1,
+     "support": 68156.5,
      "resistance": 81956.34,
-     "change_pct": -15.71
+     "change_pct": -15.9
     },
     "m3": {
-     "support": 67800.1,
+     "support": 68156.5,
      "resistance": 87363.76,
-     "change_pct": -12.67
+     "change_pct": -12.88
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": 1.59
+     "change_pct": 1.35
     }
    },
    "financials": [],
@@ -19002,7 +19008,7 @@
     "bear_fvg": 2,
     "last_fvg": {
      "dir": "ribassista",
-     "lo": 71386.0,
+     "lo": 68360.71,
      "hi": 73141.53
     },
     "liq_above": 79463.71,
@@ -19015,74 +19021,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 68341.31,
+     "prezzo": 68181.74,
      "medie": {
       "sma10": {
-       "liv": 74501.86,
-       "dist_pct": -8.27
+       "liv": 74485.9,
+       "dist_pct": -8.46
       },
       "ema10": {
-       "liv": 73728.28,
-       "dist_pct": -7.31
+       "liv": 73699.27,
+       "dist_pct": -7.49
       },
       "sma20": {
-       "liv": 76590.04,
-       "dist_pct": -10.77
+       "liv": 76582.06,
+       "dist_pct": -10.97
       },
       "ema20": {
-       "liv": 75947.22,
-       "dist_pct": -10.01
+       "liv": 75932.02,
+       "dist_pct": -10.21
       },
       "sma30": {
-       "liv": 78360.87,
-       "dist_pct": -12.79
+       "liv": 78355.55,
+       "dist_pct": -12.98
       },
       "ema30": {
-       "liv": 77227.69,
-       "dist_pct": -11.51
+       "liv": 77217.4,
+       "dist_pct": -11.7
       },
       "sma50": {
-       "liv": 80537.07,
-       "dist_pct": -15.14
+       "liv": 80533.88,
+       "dist_pct": -15.34
       },
       "ema50": {
-       "liv": 78117.46,
-       "dist_pct": -12.51
+       "liv": 78111.2,
+       "dist_pct": -12.71
       },
       "sma100": {
-       "liv": 77732.29,
-       "dist_pct": -12.08
+       "liv": 77730.69,
+       "dist_pct": -12.28
       },
       "ema100": {
-       "liv": 77103.47,
-       "dist_pct": -11.36
+       "liv": 77100.31,
+       "dist_pct": -11.57
       },
       "sma200": {
-       "liv": 73035.85,
-       "dist_pct": -6.43
+       "liv": 73035.05,
+       "dist_pct": -6.65
       },
       "ema200": {
-       "liv": 75912.45,
-       "dist_pct": -9.97
+       "liv": 75910.86,
+       "dist_pct": -10.18
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 25.1,
+      "rsi14": 24.9,
       "macd": {
-       "linea": -2521.83,
-       "segnale": -1818.01,
-       "istogramma": -703.83
+       "linea": -2534.56,
+       "segnale": -1820.55,
+       "istogramma": -714.01
       },
-      "stoch_k": 4.1,
-      "stoch_d": 6.8,
-      "williams_r": -95.9,
-      "cci20": -152.7,
-      "adx14": 24.7,
-      "di_su": 10.2,
-      "di_giu": 34.4,
-      "momentum10": -9003.73
+      "stoch_k": 0.2,
+      "stoch_d": 5.5,
+      "williams_r": -99.8,
+      "cci20": -168.5,
+      "adx14": 24.6,
+      "di_su": 10.3,
+      "di_giu": 33.8,
+      "momentum10": -9163.3
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19572,22 +19578,22 @@
      },
      {
       "d": "2026-11-14",
-      "o": 71371.77,
-      "h": 71386.0,
-      "l": 67800.1,
-      "c": 68341.31
+      "o": 68238.21,
+      "h": 68360.71,
+      "l": 68156.5,
+      "c": 68181.74
      }
     ],
     "performance": {
-     "s1": -8.37,
-     "m1": -15.95,
-     "m3": -12.87,
-     "m6": 6.57,
-     "a1": 0.3,
-     "ytd": -22.98,
-     "a3": 81.22,
-     "a5": 19.89,
-     "a10": 9064.83
+     "s1": -8.58,
+     "m1": -16.15,
+     "m3": -13.08,
+     "m6": 6.32,
+     "a1": 0.07,
+     "ytd": -23.16,
+     "a3": 80.79,
+     "a5": 19.61,
+     "a10": 9043.43
     },
     "stagionalita": [
      {
@@ -19700,9 +19706,9 @@
      }
     ]
    },
-   "rs_1m": -13.3,
+   "rs_1m": -13.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -9.1,
+   "rs_ndx_1m": -9.2,
    "beta_ndx": 0.62,
    "avg_corr": 0.34,
    "max_corr": 0.78,
@@ -21890,19 +21896,19 @@
      28384.5
     ],
     "d1": [
-     28372.75,
+     28376.0,
      28352.25,
      28337.25,
-     28325.75,
+     28326.25,
      28311.0,
      28289.5,
      28263.5,
-     28303.0,
+     28303.25,
      28307.0,
      28284.5,
      28287.0,
-     28347.5,
-     28360.5,
+     28348.5,
+     28361.0,
      28359.0,
      28357.75,
      28313.5,
@@ -21922,7 +21928,7 @@
      28334.75,
      28361.0,
      28376.75,
-     28360.25,
+     28359.25,
      28363.75,
      28376.75,
      28396.0,
@@ -21931,12 +21937,12 @@
      28400.75,
      28387.0,
      28435.25,
-     28445.5,
+     28446.5,
      28450.0,
      28434.5,
-     28417.5,
+     28418.25,
      28392.25,
-     28358.75,
+     28360.0,
      28390.0,
      28408.0,
      28385.0,
@@ -21944,50 +21950,50 @@
      28522.75,
      28443.25,
      28416.75,
-     28441.0,
+     28440.75,
      28465.25,
-     28390.25,
+     28390.75,
      28266.0,
-     28156.0,
-     28087.25,
-     27965.75,
+     28155.5,
+     28088.5,
+     27966.25,
      27805.25,
      27841.25,
-     27767.25,
+     27766.75,
      27822.25,
-     27826.75,
+     27827.5,
      27818.0,
      27746.0,
      27848.0,
-     27782.25,
-     27793.25,
-     27827.25,
+     27781.0,
+     27795.5,
+     27824.75,
      27942.5,
      27891.5,
-     27924.5,
-     27889.25,
+     27925.0,
+     27889.75,
      27926.0,
      27914.5,
-     27887.75,
+     27889.0,
      27904.25,
-     27949.0,
-     27956.25,
-     27972.5,
-     28007.5,
+     27949.25,
+     27957.25,
+     27972.75,
+     28007.25,
      28044.0,
-     28045.25,
+     28046.0,
      28038.75,
-     28019.75,
+     28020.25,
      27973.5,
-     28032.5,
+     28032.75,
      28020.5,
      28007.5,
      27989.75,
-     27983.75,
+     27984.0,
      28037.5,
      28038.25,
-     27912.5,
-     27897.75,
+     27913.0,
+     27898.0,
      27864.75,
      27819.25,
      27920.0,
@@ -29435,7 +29441,7 @@
      6.15,
      6.15,
      6.15,
-     6.15,
+     6.14,
      6.15,
      6.15,
      6.15,
@@ -30863,9 +30869,9 @@
      88.92,
      88.68,
      88.79,
-     88.78,
+     88.76,
      88.59,
-     88.32,
+     88.33,
      88.76,
      88.81,
      88.86,
@@ -30873,7 +30879,7 @@
      89.13,
      89.0,
      88.63,
-     88.53,
+     88.52,
      88.56,
      88.59,
      88.49,
@@ -30886,7 +30892,7 @@
      88.19,
      88.29,
      88.25,
-     88.23,
+     88.22,
      88.45,
      88.44,
      88.46,
@@ -30911,7 +30917,7 @@
      89.35,
      89.23,
      89.25,
-     89.16,
+     89.17,
      88.86,
      88.94,
      88.81,
@@ -30930,11 +30936,11 @@
      88.83,
      88.65,
      88.8,
-     88.94,
+     88.93,
      88.71,
      88.72,
      88.57,
-     88.56,
+     88.57,
      88.57,
      88.64,
      88.74,
@@ -30947,7 +30953,7 @@
      89.07,
      89.0,
      89.06,
-     89.13,
+     89.14,
      89.19,
      88.97,
      88.92
@@ -32339,10 +32345,10 @@
    "sortino_6m": -0.44,
    "prepost": {
     "label": "after",
-    "price": 26.36,
-    "change_pct": -1.88
+    "price": 26.32,
+    "change_pct": -2.03
    },
-   "prezzo_limite_aggiustato": 26.36,
+   "prezzo_limite_aggiustato": 26.32,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -34012,7 +34018,7 @@
      23.42,
      23.46,
      23.5,
-     23.58,
+     23.59,
      23.54,
      23.53,
      23.52,
@@ -34056,10 +34062,10 @@
    "sortino_6m": -3.03,
    "prepost": {
     "label": "after",
-    "price": 23.44,
-    "change_pct": -2.02
+    "price": 23.3,
+    "change_pct": -2.59
    },
-   "prezzo_limite_aggiustato": 23.44,
+   "prezzo_limite_aggiustato": 23.3,
    "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Utilities",
@@ -35868,10 +35874,10 @@
    "sortino_6m": -0.07,
    "prepost": {
     "label": "after",
-    "price": 264.36,
-    "change_pct": -0.86
+    "price": 264.4,
+    "change_pct": -0.85
    },
-   "prezzo_limite_aggiustato": 264.36,
+   "prezzo_limite_aggiustato": 264.4,
    "risk_reward": "1:0.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -37567,7 +37573,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -37809,10 +37815,10 @@
    "sortino_6m": -1.31,
    "prepost": {
     "label": "after",
-    "price": 518.69,
-    "change_pct": -1.82
+    "price": 521.0,
+    "change_pct": -1.38
    },
-   "prezzo_limite_aggiustato": 518.69,
+   "prezzo_limite_aggiustato": 521.0,
    "risk_reward": "1:1.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -39699,8 +39705,8 @@
     "eps_anno_corrente": 19.5609,
     "revisione_90g_pct": 1.28,
     "revisione_7g_pct": 0.11,
-    "su_30g": 18,
-    "giu_30g": 25,
+    "su_30g": 19,
+    "giu_30g": 26,
     "eps_min": 12.85,
     "eps_max": 21.0315,
     "eps_n": 51,
@@ -39717,10 +39723,10 @@
    "sortino_6m": -2.05,
    "prepost": {
     "label": "after",
-    "price": 294.15,
-    "change_pct": -0.55
+    "price": 294.19,
+    "change_pct": -0.53
    },
-   "prezzo_limite_aggiustato": 294.15,
+   "prezzo_limite_aggiustato": 294.19,
    "risk_reward": "1:2.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -39748,7 +39754,7 @@
     "gross_margin": 0.6086,
     "enterprise_value": 3575473766400.0,
     "ev_ebitda": 19.273,
-    "peg": 1.04,
+    "peg": 1.06,
     "roa": 0.1274,
     "short_float": 0.0149,
     "buyback_yield": 0.0126,
@@ -41995,10 +42001,10 @@
    "sortino_6m": -1.45,
    "prepost": {
     "label": "after",
-    "price": 289.0,
-    "change_pct": -2.25
+    "price": 290.4,
+    "change_pct": -1.78
    },
-   "prezzo_limite_aggiustato": 289.0,
+   "prezzo_limite_aggiustato": 290.4,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -43947,7 +43953,7 @@
      395.08,
      394.83,
      395.82,
-     396.48,
+     396.46,
      396.58,
      395.51,
      395.73,
@@ -44001,11 +44007,11 @@
    "sortino_6m": -0.16,
    "prepost": {
     "label": "after",
-    "price": 394.77,
-    "change_pct": -0.99
+    "price": 394.62,
+    "change_pct": -1.03
    },
-   "prezzo_limite_aggiustato": 394.77,
-   "risk_reward": "1:1.3",
+   "prezzo_limite_aggiustato": 394.62,
+   "risk_reward": "1:1.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -45339,7 +45345,7 @@
    "w52_low": 77.84,
    "w52_dist_pct": -71.9,
    "day_high": 120.44,
-   "day_low": 101.26,
+   "day_low": 101.18,
    "support": 77.84,
    "resistance": 130.86,
    "rsi": 44.6,
@@ -45688,10 +45694,10 @@
    "sortino_6m": -2.34,
    "prepost": {
     "label": "after",
-    "price": 106.33,
-    "change_pct": -2.2
+    "price": 106.4,
+    "change_pct": -2.13
    },
-   "prezzo_limite_aggiustato": 106.33,
+   "prezzo_limite_aggiustato": 106.4,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -46522,7 +46528,7 @@
       "d": "2026-11-13",
       "o": 108.4,
       "h": 120.44,
-      "l": 101.26,
+      "l": 101.18,
       "c": 108.72
      }
     ],
@@ -47595,10 +47601,10 @@
    "sortino_6m": -1.71,
    "prepost": {
     "label": "after",
-    "price": 58.67,
-    "change_pct": -1.66
+    "price": 58.78,
+    "change_pct": -1.47
    },
-   "prezzo_limite_aggiustato": 58.67,
+   "prezzo_limite_aggiustato": 58.78,
    "risk_reward": "1:3.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -48609,7 +48615,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -45.3,
-      "meglio": 24.5
+      "meglio": 24.6
      },
      {
       "mese": 11,
@@ -49232,11 +49238,11 @@
    },
    "analisti": {
     "eps_ora": 4.1006,
-    "eps_90g_fa": 1.7454,
-    "eps_7g_fa": 4.0195,
+    "eps_90g_fa": 1.7138,
+    "eps_7g_fa": 4.0427,
     "eps_anno_corrente": 0.2832,
-    "revisione_90g_pct": 134.94,
-    "revisione_7g_pct": 2.02,
+    "revisione_90g_pct": 139.27,
+    "revisione_7g_pct": 1.43,
     "su_30g": 14,
     "giu_30g": 1,
     "eps_min": 0.34,
@@ -49255,11 +49261,11 @@
    "sortino_6m": -0.66,
    "prepost": {
     "label": "after",
-    "price": 136.71,
-    "change_pct": -1.72
+    "price": 136.27,
+    "change_pct": -2.04
    },
-   "prezzo_limite_aggiustato": 136.71,
-   "risk_reward": "1:1.8",
+   "prezzo_limite_aggiustato": 136.27,
+   "risk_reward": "1:1.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
    "stats": {
@@ -50958,10 +50964,10 @@
    "sortino_6m": -0.48,
    "prepost": {
     "label": "after",
-    "price": 387.53,
-    "change_pct": -0.69
+    "price": 387.12,
+    "change_pct": -0.79
    },
-   "prezzo_limite_aggiustato": 387.53,
+   "prezzo_limite_aggiustato": 387.12,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
@@ -52293,7 +52299,7 @@
    "w52_low": 228.28,
    "w52_dist_pct": -26.1,
    "day_high": 284.97,
-   "day_low": 275.48,
+   "day_low": 275.52,
    "support": 231.3,
    "resistance": 284.97,
    "rsi": 56.5,
@@ -52719,11 +52725,11 @@
    "sortino_6m": 0.19,
    "prepost": {
     "label": "after",
-    "price": 277.11,
-    "change_pct": -1.1
+    "price": 278.62,
+    "change_pct": -0.56
    },
-   "prezzo_limite_aggiustato": 277.11,
-   "risk_reward": "1:0.3",
+   "prezzo_limite_aggiustato": 278.62,
+   "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Utilities",
    "stats": {
@@ -52733,9 +52739,9 @@
     "float_pct": 99.7,
     "avg_volume_30d": 3496610.0,
     "pe_ttm": 22.5241,
-    "forward_pe": 20.8752,
+    "forward_pe": 20.8481,
     "eps_ttm": 12.44,
-    "eps_forward": 13.4226,
+    "eps_forward": 13.4401,
     "revenue_fy": 34250000384.0,
     "net_income_fy": 4369999872.0,
     "revenue_growth": 0.454,
@@ -53628,7 +53634,7 @@
       "d": "2026-11-13",
       "o": 284.97,
       "h": 284.97,
-      "l": 275.48,
+      "l": 275.52,
       "c": 280.2
      }
     ],
@@ -54572,7 +54578,12 @@
     ]
    },
    "earnings_date": "2027-01-19",
-   "rating": null,
+   "rating": {
+    "key": "buy",
+    "n": 43,
+    "target": 84.76,
+    "upside_pct": 36.4
+   },
    "analisti": {
     "eps_ora": 3.7667,
     "eps_90g_fa": 3.8133,
@@ -54598,11 +54609,11 @@
    "sortino_6m": -2.59,
    "prepost": {
     "label": "after",
-    "price": 61.95,
-    "change_pct": -0.32
+    "price": 61.97,
+    "change_pct": -0.29
    },
-   "prezzo_limite_aggiustato": 61.95,
-   "risk_reward": "1:2.3",
+   "prezzo_limite_aggiustato": 61.97,
+   "risk_reward": "1:2.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
    "stats": {
@@ -54629,7 +54640,7 @@
     "gross_margin": 0.5069,
     "enterprise_value": 266732404736.0,
     "ev_ebitda": 16.716,
-    "peg": 1.03,
+    "peg": 1.0,
     "roa": 0.1712,
     "short_float": 0.0225,
     "buyback_yield": 0.0332,
@@ -56254,7 +56265,7 @@
      24.28,
      21.19,
      21.19,
-     18.3,
+     18.31,
      20.9,
      17.41,
      13.16,
@@ -56789,11 +56800,11 @@
    "sortino_6m": 2.02,
    "prepost": {
     "label": "after",
-    "price": 520.83,
-    "change_pct": -0.58
+    "price": 521.36,
+    "change_pct": -0.48
    },
-   "prezzo_limite_aggiustato": 520.83,
-   "risk_reward": "1:1.3",
+   "prezzo_limite_aggiustato": 521.36,
+   "risk_reward": "1:1.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -56803,9 +56814,9 @@
     "float_pct": 99.9,
     "avg_volume_30d": 23061331.0,
     "pe_ttm": 27.3424,
-    "forward_pe": 21.6518,
+    "forward_pe": 21.6569,
     "eps_ttm": 19.16,
-    "eps_forward": 24.1957,
+    "eps_forward": 24.1899,
     "revenue_fy": 346444988416.0,
     "net_income_fy": 142630993920.0,
     "revenue_growth": 0.188,
@@ -56914,7 +56925,7 @@
      },
      {
       "trim": "2026-06-30",
-      "azioni": 7428434704
+      "azioni": 7427000000
      },
      {
       "trim": "2026-03-31",
@@ -56937,7 +56948,7 @@
     },
     "var_trim": {
      "da": "2026-06-30",
-     "pct": -0.02
+     "pct": 0.0
     },
     "rotazione": {
      "pct": 0.31,
@@ -58992,10 +59003,10 @@
    "sortino_6m": 1.6,
    "prepost": {
     "label": "after",
-    "price": 355.37,
-    "change_pct": -0.25
+    "price": 355.3,
+    "change_pct": -0.27
    },
-   "prezzo_limite_aggiustato": 355.37,
+   "prezzo_limite_aggiustato": 355.3,
    "risk_reward": "1:0.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -60866,10 +60877,10 @@
    "sortino_6m": 0.18,
    "prepost": {
     "label": "after",
-    "price": 637.5,
-    "change_pct": -0.65
+    "price": 637.8,
+    "change_pct": -0.61
    },
-   "prezzo_limite_aggiustato": 637.5,
+   "prezzo_limite_aggiustato": 637.8,
    "risk_reward": "1:1.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -60897,7 +60908,7 @@
     "gross_margin": 0.8103,
     "enterprise_value": 1626490667008.0,
     "ev_ebitda": 13.999,
-    "peg": 0.82,
+    "peg": 0.81,
     "roa": 0.1458,
     "short_float": 0.0341,
     "buyback_yield": 0.016,
@@ -62834,10 +62845,10 @@
    "sortino_6m": 1.61,
    "prepost": {
     "label": "after",
-    "price": 217.25,
-    "change_pct": -0.27
+    "price": 217.0,
+    "change_pct": -0.39
    },
-   "prezzo_limite_aggiustato": 217.25,
+   "prezzo_limite_aggiustato": 217.0,
    "risk_reward": "1:2.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -64630,7 +64641,7 @@
     "revisione_90g_pct": -4.07,
     "revisione_7g_pct": 0.0,
     "su_30g": 6,
-    "giu_30g": 32,
+    "giu_30g": 33,
     "eps_min": 4.27,
     "eps_max": 5.27,
     "eps_n": 45,
@@ -64647,10 +64658,10 @@
    "sortino_6m": 0.19,
    "prepost": {
     "label": "after",
-    "price": 101.45,
-    "change_pct": -0.78
+    "price": 101.38,
+    "change_pct": -0.85
    },
-   "prezzo_limite_aggiustato": 101.45,
+   "prezzo_limite_aggiustato": 101.38,
    "risk_reward": "1:4.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -64678,7 +64689,7 @@
     "gross_margin": 0.7308,
     "enterprise_value": 108284723200.0,
     "ev_ebitda": 33.473,
-    "peg": 0.81,
+    "peg": 0.79,
     "roa": 0.0459,
     "short_float": 0.0262,
     "buyback_yield": 0.0173,
@@ -66470,24 +66481,24 @@
    "rating": {
     "key": "strong_buy",
     "n": 47,
-    "target": 533.42,
-    "upside_pct": 53.7
+    "target": 529.24,
+    "upside_pct": 52.5
    },
    "analisti": {
-    "eps_ora": 19.4651,
-    "eps_90g_fa": 19.5823,
-    "eps_7g_fa": 19.397,
-    "eps_anno_corrente": 11.6657,
-    "revisione_90g_pct": -0.6,
-    "revisione_7g_pct": 0.35,
+    "eps_ora": 19.414,
+    "eps_90g_fa": 19.598,
+    "eps_7g_fa": 19.4651,
+    "eps_anno_corrente": 11.6644,
+    "revisione_90g_pct": -0.94,
+    "revisione_7g_pct": -0.26,
     "su_30g": 2,
     "giu_30g": 0,
     "eps_min": 17.4665,
     "eps_max": 22.44,
     "eps_n": 48,
-    "target_min": 400.0,
+    "target_min": 398.47,
     "target_max": 660.0,
-    "target_mediana": 535.0
+    "target_mediana": 530.0
    },
    "health": 59,
    "eps": 7.83,
@@ -66498,10 +66509,10 @@
    "sortino_6m": -1.07,
    "prepost": {
     "label": "after",
-    "price": 340.96,
-    "change_pct": -1.74
+    "price": 340.6,
+    "change_pct": -1.85
    },
-   "prezzo_limite_aggiustato": 340.96,
+   "prezzo_limite_aggiustato": 340.6,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -66512,9 +66523,9 @@
     "float_pct": 98.8,
     "avg_volume_30d": 25248112.0,
     "pe_ttm": 44.318,
-    "forward_pe": 17.8273,
+    "forward_pe": 17.8742,
     "eps_ttm": 7.83,
-    "eps_forward": 19.4651,
+    "eps_forward": 19.414,
     "revenue_fy": 89103998976.0,
     "net_income_fy": 38264999936.0,
     "revenue_growth": 0.855,
@@ -66524,12 +66535,12 @@
     "debt_to_equity": 59.604,
     "dividend_yield": 0.0075,
     "price_to_book": 16.6177,
-    "target_mean": 533.4238,
+    "target_mean": 529.2381,
     "fcf": 30596499456.0,
     "gross_margin": 0.7551,
     "enterprise_value": 1774763769856.0,
     "ev_ebitda": 33.96,
-    "peg": 0.34,
+    "peg": 0.36,
     "roa": 0.1537,
     "short_float": 0.0111,
     "buyback_yield": 0.0037,
@@ -68475,7 +68486,7 @@
      1220.99,
      1256.02,
      1386.5,
-     1446.3,
+     1446.29,
      1341.93,
      1400.14,
      1462.56,
@@ -68591,10 +68602,10 @@
    "sortino_6m": -0.1,
    "prepost": {
     "label": "after",
-    "price": 1475.4,
-    "change_pct": -1.32
+    "price": 1477.28,
+    "change_pct": -1.2
    },
-   "prezzo_limite_aggiustato": 1475.4,
+   "prezzo_limite_aggiustato": 1477.28,
    "risk_reward": "1:1.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -68622,7 +68633,7 @@
     "gross_margin": 0.5434,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.8,
+    "peg": 0.79,
     "roa": 0.1828,
     "short_float": 0.003,
     "buyback_yield": 0.0101,
@@ -70719,11 +70730,11 @@
    "sortino_6m": -0.86,
    "prepost": {
     "label": "after",
-    "price": 37.89,
-    "change_pct": -0.26
+    "price": 37.8,
+    "change_pct": -0.5
    },
-   "prezzo_limite_aggiustato": 37.89,
-   "risk_reward": "1:1.3",
+   "prezzo_limite_aggiustato": 37.8,
+   "risk_reward": "1:1.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Consumer Cyclical",
    "stats": {
@@ -70750,7 +70761,7 @@
     "gross_margin": 0.4341,
     "enterprise_value": 58842259456.0,
     "ev_ebitda": 12.026,
-    "peg": 3.32,
+    "peg": 3.27,
     "roa": 0.0689,
     "short_float": 0.0972,
     "buyback_yield": 0.0026,
@@ -72847,10 +72858,10 @@
    "sortino_6m": -1.9,
    "prepost": {
     "label": "after",
-    "price": 123.72,
-    "change_pct": -1.3
+    "price": 123.57,
+    "change_pct": -1.42
    },
-   "prezzo_limite_aggiustato": 123.72,
+   "prezzo_limite_aggiustato": 123.57,
    "risk_reward": "1:1.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -75031,14 +75042,14 @@
     "upside_pct": 9.9
    },
    "analisti": {
-    "eps_ora": 13.6627,
-    "eps_90g_fa": 13.9943,
-    "eps_7g_fa": 13.7296,
-    "eps_anno_corrente": 12.9398,
-    "revisione_90g_pct": -2.37,
-    "revisione_7g_pct": -0.49,
-    "su_30g": 3,
-    "giu_30g": 13,
+    "eps_ora": 13.6537,
+    "eps_90g_fa": 13.9984,
+    "eps_7g_fa": 13.6772,
+    "eps_anno_corrente": 12.9388,
+    "revisione_90g_pct": -2.46,
+    "revisione_7g_pct": -0.17,
+    "su_30g": 4,
+    "giu_30g": 15,
     "eps_min": 12.86,
     "eps_max": 14.05,
     "eps_n": 31,
@@ -75086,7 +75097,7 @@
     "gross_margin": 0.5762,
     "enterprise_value": 246473883648.0,
     "ev_ebitda": 16.35,
-    "peg": 2.92,
+    "peg": 2.91,
     "roa": 0.1319,
     "short_float": 0.0184,
     "buyback_yield": 0.0107,
@@ -77114,11 +77125,11 @@
    "sortino_6m": -2.38,
    "prepost": {
     "label": "after",
-    "price": 70.99,
-    "change_pct": 0.37
+    "price": 70.17,
+    "change_pct": -0.79
    },
-   "prezzo_limite_aggiustato": 70.99,
-   "risk_reward": "1:1.9",
+   "prezzo_limite_aggiustato": 70.17,
+   "risk_reward": "1:2.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
    "stats": {
@@ -77152,7 +77163,7 @@
     "cross_currency": true,
     "ps": null,
     "ev_s": null,
-    "altman_z": 4.86,
+    "altman_z": 4.88,
     "altman_missing": 0,
     "altman_model": "Z''",
     "altman_al": "2026-09-30",
@@ -77160,7 +77171,7 @@
     "altman_x": [
      0.1332,
      0.3669,
-     0.0561,
+     0.059,
      2.3011
     ]
    },
@@ -77172,27 +77183,27 @@
     "debito": 996952000.0,
     "patrimonio": 7233845000.0,
     "bilancio_al": "2026-09-30",
-    "ocf_ttm": 814052000.0,
-    "capex_ttm": -416655000.0,
+    "ocf_ttm": 789369000.0,
+    "capex_ttm": -430639000.0,
     "trimestri": 4,
     "cashflow_al": "2026-09-30",
-    "fcf_ttm": 397397000.0,
-    "mesi_capex": 24.8,
+    "fcf_ttm": 358730000.0,
+    "mesi_capex": 24.0,
     "emissione_netta_pct": 0.01,
     "debito_netto": 137132000.0,
     "valuta": "CAD"
    },
    "credito": {
-    "oneri_ttm": 103042000.0,
-    "ebit_ttm": 582567000.0,
+    "oneri_ttm": 102460000.0,
+    "ebit_ttm": 612203000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "copertura": 5.65,
-    "oneri_var_4trim_pct": -0.9,
+    "copertura": 5.98,
+    "oneri_var_4trim_pct": -76.4,
     "oneri_trim": [
-     12985000,
      54438000,
      22754000,
+     12403000,
      12865000
     ],
     "debito_lungo": 996952000.0,
@@ -77216,9 +77227,9 @@
     },
     "ocf_ultimo_trim": 3287000.0,
     "ocf_ultimo_al": "2026-09-30",
-    "utile_12m": 372393000.0,
-    "ricavi_12m": 3279914000.0,
-    "var_magazzino_12m": -123189000.0,
+    "utile_12m": 397753000.0,
+    "ricavi_12m": 3479131000.0,
+    "var_magazzino_12m": -106596000.0,
     "dividendi_12m": -104480000.0,
     "trimestri": {
      "utile_12m": 4,
@@ -77243,6 +77254,10 @@
       "azioni": 435532979
      },
      {
+      "trim": "2026-06-30",
+      "azioni": 435532978
+     },
+     {
       "trim": "2026-03-31",
       "azioni": 435532978
      },
@@ -77253,10 +77268,6 @@
      {
       "trim": "2025-09-30",
       "azioni": 435407158
-     },
-     {
-      "trim": "2025-06-30",
-      "azioni": 435387448
      }
     ],
     "al": "2026-09-30",
@@ -77264,6 +77275,10 @@
     "var_anno": {
      "da": "2025-09-30",
      "pct": 0.03
+    },
+    "var_trim": {
+     "da": "2026-06-30",
+     "pct": 0.0
     },
     "rotazione": {
      "pct": 0.78,
@@ -77274,7 +77289,52 @@
     },
     "quotata_dal": "1996-03-14"
    },
-   "rendimento": null,
+   "rendimento": {
+    "al": "2026-09-30",
+    "dal": "2025-10-01",
+    "aliquota": 0.2197,
+    "aliquota_base": "effettiva",
+    "roic": 0.0487,
+    "nopat": 389665292.2511933,
+    "capitale_medio": 8003737500.0,
+    "capitale_base": "media",
+    "roe": 0.0568,
+    "utile": 397753000.0,
+    "patrimonio_medio": 7007183500.0,
+    "patrimonio_base": "media",
+    "quota_patrimonio": 0.879,
+    "esercizi": [
+     {
+      "al": "2025-12-31",
+      "roic": 0.0618,
+      "roe": 0.0889,
+      "capitale_base": "media",
+      "patrimonio_base": "media"
+     },
+     {
+      "al": "2024-12-31",
+      "roic": 0.0449,
+      "roe": 0.0276,
+      "capitale_base": "media",
+      "patrimonio_base": "media"
+     },
+     {
+      "al": "2023-12-31",
+      "roic": 0.0287,
+      "roe": 0.0605,
+      "capitale_base": "media",
+      "patrimonio_base": "media"
+     },
+     {
+      "al": "2022-12-31",
+      "roic": 0.0017,
+      "roe": 0.0153,
+      "capitale_base": "fine",
+      "patrimonio_base": "fine"
+     }
+    ],
+    "valuta": "CAD"
+   },
    "fuori_mercato": {
     "settimane": [
      {
@@ -78243,6 +78303,14 @@
       "margine_op": 9.2
      },
      {
+      "trim": "2026-06-30",
+      "ricavi": 813772000,
+      "utile": 25219000,
+      "operativo": 74139000,
+      "margine": 3.1,
+      "margine_op": 9.1
+     },
+     {
       "trim": "2026-03-31",
       "ricavi": 845365000,
       "utile": 130751000,
@@ -78265,14 +78333,6 @@
       "operativo": 82511000,
       "margine": -0.0,
       "margine_op": 13.4
-     },
-     {
-      "trim": "2025-06-30",
-      "ricavi": 877016000,
-      "utile": 320888000,
-      "operativo": 156260000,
-      "margine": 36.6,
-      "margine_op": 17.8
      }
     ]
    },
@@ -79037,12 +79097,12 @@
     "upside_pct": 24.6
    },
    "analisti": {
-    "eps_ora": 5.876,
+    "eps_ora": 5.9573,
     "eps_90g_fa": 5.3886,
     "eps_7g_fa": 5.6457,
-    "eps_anno_corrente": 1.8876,
-    "revisione_90g_pct": 9.04,
-    "revisione_7g_pct": 4.08,
+    "eps_anno_corrente": 1.8939,
+    "revisione_90g_pct": 10.55,
+    "revisione_7g_pct": 5.52,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 3.04,
@@ -79053,7 +79113,7 @@
     "target_mediana": 289.0
    },
    "health": 76,
-   "eps": -1.73,
+   "eps": -1.29,
    "beta": 0.92,
    "sharpe_1y": -0.19,
    "sortino_1y": -0.27,
@@ -79061,10 +79121,10 @@
    "sortino_6m": -0.66,
    "prepost": {
     "label": "after",
-    "price": 227.89,
-    "change_pct": 0.03
+    "price": 228.1,
+    "change_pct": 0.12
    },
-   "prezzo_limite_aggiustato": 227.89,
+   "prezzo_limite_aggiustato": 228.1,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -79075,9 +79135,9 @@
     "float_pct": 99.6,
     "avg_volume_30d": 2795426.0,
     "pe_ttm": null,
-    "forward_pe": 22.327,
-    "eps_ttm": -1.73,
-    "eps_forward": 10.2038,
+    "forward_pe": 22.4739,
+    "eps_ttm": -1.29,
+    "eps_forward": 10.1371,
     "revenue_fy": 6409699840.0,
     "net_income_fy": -240500000.0,
     "revenue_growth": -0.156,
@@ -79086,13 +79146,13 @@
     "roe": -0.0677,
     "debt_to_equity": 79.252,
     "dividend_yield": 0.0,
-    "price_to_book": 11.8066,
+    "price_to_book": 11.6093,
     "target_mean": 283.8555,
     "fcf": 787574976.0,
     "gross_margin": 0.5772,
     "enterprise_value": 43725901824.0,
     "ev_ebitda": 60.32,
-    "peg": 3.17,
+    "peg": 3.11,
     "roa": -0.0072,
     "short_float": 0.0499,
     "buyback_yield": -0.0292,
@@ -79129,15 +79189,15 @@
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 189300000.0,
+    "oneri_ttm": 136900000.0,
     "ebit_ttm": -60700000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "copertura": -0.32,
-    "oneri_var_4trim_pct": -19.3,
+    "copertura": -0.44,
+    "oneri_var_4trim_pct": -22.4,
     "oneri_trim": [
+     38900000,
      37400000,
-     91300000,
      30400000,
      30200000
     ],
@@ -80827,7 +80887,7 @@
     "eps_anno_corrente": 4.3769,
     "revisione_90g_pct": 17.01,
     "revisione_7g_pct": 15.6,
-    "su_30g": 17,
+    "su_30g": 18,
     "giu_30g": 0,
     "eps_min": 5.16,
     "eps_max": 6.45,
@@ -80845,10 +80905,10 @@
    "sortino_6m": 1.52,
    "prepost": {
     "label": "after",
-    "price": 195.0,
-    "change_pct": -1.16
+    "price": 194.82,
+    "change_pct": -1.25
    },
-   "prezzo_limite_aggiustato": 195.0,
+   "prezzo_limite_aggiustato": 194.82,
    "risk_reward": "1:0.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -80876,7 +80936,7 @@
     "gross_margin": 0.6288,
     "enterprise_value": 246697820160.0,
     "ev_ebitda": 46.51,
-    "peg": 1.43,
+    "peg": 1.5,
     "roa": 0.1504,
     "short_float": 0.0115,
     "buyback_yield": 0.0064,
@@ -82567,10 +82627,10 @@
    "sortino_6m": 2.19,
    "prepost": {
     "label": "after",
-    "price": 232.06,
-    "change_pct": 2.41
+    "price": 231.85,
+    "change_pct": 2.31
    },
-   "prezzo_limite_aggiustato": 232.06,
+   "prezzo_limite_aggiustato": 231.85,
    "risk_reward": "1:1.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -84261,11 +84321,11 @@
    "sortino_6m": 1.41,
    "prepost": {
     "label": "after",
-    "price": 327.48,
-    "change_pct": 1.63
+    "price": 327.9,
+    "change_pct": 1.76
    },
-   "prezzo_limite_aggiustato": 327.48,
-   "risk_reward": "1:2.1",
+   "prezzo_limite_aggiustato": 327.9,
+   "risk_reward": "1:2.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -84292,7 +84352,7 @@
     "gross_margin": 0.7038,
     "enterprise_value": 263431880704.0,
     "ev_ebitda": 168.867,
-    "peg": 1.71,
+    "peg": 1.65,
     "roa": 0.014,
     "short_float": 0.0254,
     "buyback_yield": 0.0038,
@@ -85981,10 +86041,10 @@
    "sortino_6m": 2.12,
    "prepost": {
     "label": "after",
-    "price": 303.43,
-    "change_pct": -0.78
+    "price": 304.0,
+    "change_pct": -0.59
    },
-   "prezzo_limite_aggiustato": 303.43,
+   "prezzo_limite_aggiustato": 304.0,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -87588,10 +87648,10 @@
    "sortino_6m": -0.51,
    "prepost": {
     "label": "after",
-    "price": 184.4,
-    "change_pct": 0.13
+    "price": 183.35,
+    "change_pct": -0.44
    },
-   "prezzo_limite_aggiustato": 184.4,
+   "prezzo_limite_aggiustato": 183.35,
    "risk_reward": "1:3.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -89612,10 +89672,10 @@
    "sortino_6m": 0.69,
    "prepost": {
     "label": "after",
-    "price": 170.58,
-    "change_pct": -0.01
+    "price": 170.7,
+    "change_pct": 0.06
    },
-   "prezzo_limite_aggiustato": 170.58,
+   "prezzo_limite_aggiustato": 170.7,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -89643,7 +89703,7 @@
     "gross_margin": 0.2981,
     "enterprise_value": 721398398976.0,
     "ev_ebitda": 9.253,
-    "peg": 1.31,
+    "peg": 1.34,
     "roa": 0.0675,
     "short_float": 0.0125,
     "buyback_yield": 0.0291,
@@ -91819,10 +91879,10 @@
    "sortino_6m": 1.62,
    "prepost": {
     "label": "after",
-    "price": 220.35,
-    "change_pct": 0.21
+    "price": 220.3,
+    "change_pct": 0.19
    },
-   "prezzo_limite_aggiustato": 220.35,
+   "prezzo_limite_aggiustato": 220.3,
    "risk_reward": "1:1.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Energy",
@@ -91833,9 +91893,9 @@
     "float_pct": 95.2,
     "avg_volume_30d": 8512825.0,
     "pe_ttm": 16.1446,
-    "forward_pe": 13.3304,
+    "forward_pe": 13.2731,
     "eps_ttm": 13.62,
-    "eps_forward": 16.4954,
+    "eps_forward": 16.5666,
     "revenue_fy": 226256994304.0,
     "net_income_fy": 26976000000.0,
     "revenue_growth": 0.348,
@@ -94011,8 +94071,8 @@
     "eps_anno_corrente": 11.9571,
     "revisione_90g_pct": 24.1,
     "revisione_7g_pct": 5.61,
-    "su_30g": 19,
-    "giu_30g": 3,
+    "su_30g": 18,
+    "giu_30g": 4,
     "eps_min": 8.16,
     "eps_max": 14.54,
     "eps_n": 28,
@@ -94060,7 +94120,7 @@
     "gross_margin": 0.4901,
     "enterprise_value": 178930843648.0,
     "ev_ebitda": 5.998,
-    "peg": 0.89,
+    "peg": 0.91,
     "roa": 0.0898,
     "short_float": 0.0135,
     "buyback_yield": 0.0283,
@@ -95634,7 +95694,7 @@
      123.58,
      115.79,
      115.57,
-     127.36,
+     127.35,
      140.21,
      140.59,
      129.75,
@@ -95904,11 +95964,11 @@
    "sortino_6m": 4.74,
    "prepost": {
     "label": "after",
-    "price": 294.95,
-    "change_pct": -0.03
+    "price": 293.53,
+    "change_pct": -0.51
    },
-   "prezzo_limite_aggiustato": 294.95,
-   "risk_reward": "1:0.6",
+   "prezzo_limite_aggiustato": 293.53,
+   "risk_reward": "1:0.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
    "stats": {
@@ -98104,11 +98164,11 @@
    "sortino_6m": 3.13,
    "prepost": {
     "label": "after",
-    "price": 147.76,
-    "change_pct": 0.0
+    "price": 148.0,
+    "change_pct": 0.16
    },
-   "prezzo_limite_aggiustato": 147.76,
-   "risk_reward": "1:0.8",
+   "prezzo_limite_aggiustato": 148.0,
+   "risk_reward": "1:0.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
    "stats": {
@@ -102295,13 +102355,13 @@
     "upside_pct": -7.3
    },
    "analisti": {
-    "eps_ora": 25.0429,
+    "eps_ora": 25.0557,
     "eps_90g_fa": 24.2794,
     "eps_7g_fa": 24.9869,
     "eps_anno_corrente": 23.5339,
-    "revisione_90g_pct": 3.14,
-    "revisione_7g_pct": 0.22,
-    "su_30g": 17,
+    "revisione_90g_pct": 3.2,
+    "revisione_7g_pct": 0.28,
+    "su_30g": 23,
     "giu_30g": 5,
     "eps_min": 23.52,
     "eps_max": 26.56,
@@ -102319,10 +102379,10 @@
    "sortino_6m": 3.36,
    "prepost": {
     "label": "after",
-    "price": 465.67,
-    "change_pct": -0.0
+    "price": 465.0,
+    "change_pct": -0.14
    },
-   "prezzo_limite_aggiustato": 465.67,
+   "prezzo_limite_aggiustato": 465.0,
    "risk_reward": "1:0.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
@@ -102350,7 +102410,7 @@
     "gross_margin": 0.7246,
     "enterprise_value": 293455134720.0,
     "ev_ebitda": 16.643,
-    "peg": 2.82,
+    "peg": 2.81,
     "roa": 0.0891,
     "short_float": 0.0233,
     "buyback_yield": -0.0,
@@ -106116,7 +106176,7 @@
     "eps_anno_corrente": 20.0579,
     "revisione_90g_pct": 0.67,
     "revisione_7g_pct": 0.06,
-    "su_30g": 22,
+    "su_30g": 24,
     "giu_30g": 5,
     "eps_min": 22.56,
     "eps_max": 23.8,
@@ -106165,7 +106225,7 @@
     "gross_margin": 1.0,
     "enterprise_value": 581990547456.0,
     "ev_ebitda": 25.272,
-    "peg": 1.72,
+    "peg": 1.7,
     "roa": 0.2445,
     "short_float": 0.0082,
     "buyback_yield": 0.0204,
@@ -110172,7 +110232,7 @@
     "gross_margin": 0.2518,
     "enterprise_value": 240708026368.0,
     "ev_ebitda": 27.989,
-    "peg": 1.61,
+    "peg": 1.58,
     "roa": 0.0376,
     "short_float": 0.0196,
     "buyback_yield": 0.0059,
@@ -112383,7 +112443,7 @@
     "gross_margin": 0.376,
     "enterprise_value": 251812200448.0,
     "ev_ebitda": 12.012,
-    "peg": 3.89,
+    "peg": 3.84,
     "roa": 0.0481,
     "short_float": 0.0122,
     "buyback_yield": 0.017,
@@ -114555,10 +114615,10 @@
    "sortino_6m": 2.17,
    "prepost": {
     "label": "after",
-    "price": 28.87,
-    "change_pct": -0.07
+    "price": 28.86,
+    "change_pct": -0.1
    },
-   "prezzo_limite_aggiustato": 28.87,
+   "prezzo_limite_aggiustato": 28.86,
    "risk_reward": "1:1.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
@@ -114586,7 +114646,7 @@
     "gross_margin": 0.749,
     "enterprise_value": 213754789888.0,
     "ev_ebitda": 8.572,
-    "peg": 9.0,
+    "peg": 8.81,
     "roa": 0.0559,
     "short_float": 0.0236,
     "buyback_yield": -0.0,
@@ -116230,7 +116290,7 @@
      149.48,
      156.2,
      164.48,
-     166.55,
+     166.56,
      163.59,
      150.97,
      139.09,
@@ -116267,7 +116327,7 @@
      197.41,
      187.75,
      183.34,
-     197.36,
+     197.35,
      198.33,
      187.01,
      187.95,
@@ -116352,7 +116412,7 @@
      585.73,
      690.4,
      705.85,
-     730.87,
+     730.88,
      780.99,
      774.14,
      810.11,
@@ -116588,10 +116648,10 @@
    "sortino_6m": -0.35,
    "prepost": {
     "label": "after",
-    "price": 911.07,
-    "change_pct": -0.6
+    "price": 911.5,
+    "change_pct": -0.55
    },
-   "prezzo_limite_aggiustato": 911.07,
+   "prezzo_limite_aggiustato": 911.5,
    "risk_reward": "1:0.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Financial Services",
@@ -116619,7 +116679,7 @@
     "gross_margin": 0.8129,
     "enterprise_value": 76050022400.0,
     "ev_ebitda": null,
-    "peg": 1.16,
+    "peg": 1.15,
     "roa": 0.0111,
     "short_float": 0.022,
     "buyback_yield": 0.0396,
@@ -116645,25 +116705,25 @@
     "debito": 480188000000.0,
     "patrimonio": 124929000000.0,
     "bilancio_al": "2026-09-30",
-    "ocf_ttm": -41283000000.0,
-    "capex_ttm": -2179000000.0,
+    "ocf_ttm": -37858000000.0,
+    "capex_ttm": -2123000000.0,
     "trimestri": 4,
     "cashflow_al": "2026-09-30",
-    "fcf_ttm": -43462000000.0,
-    "mesi_capex": 1113.2,
-    "mesi_operativi": 58.8,
+    "fcf_ttm": -39981000000.0,
+    "mesi_capex": 1142.5,
+    "mesi_operativi": 64.1,
     "debito_netto": 278057000000.0,
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 69746000000.0,
+    "oneri_ttm": 70869000000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "oneri_var_4trim_pct": 12.1,
+    "oneri_var_4trim_pct": 14.1,
     "oneri_trim": [
-     16970000000,
      16671000000,
      17082000000,
+     18093000000,
      19023000000
     ],
     "debito_corrente": 114076000000.0,
@@ -116682,10 +116742,10 @@
     },
     "ocf_ultimo_trim": 4181000000.0,
     "ocf_ultimo_al": "2026-09-30",
-    "utile_12m": 19639000000.0,
-    "ricavi_12m": 64544000000.0,
-    "riacquisti_12m": -15200000000.0,
-    "dividendi_12m": -6180000000.0,
+    "utile_12m": 22169000000.0,
+    "ricavi_12m": 69698000000.0,
+    "riacquisti_12m": -17875000000.0,
+    "dividendi_12m": -6307000000.0,
     "trimestri": {
      "utile_12m": 4,
      "ricavi_12m": 4,
@@ -117755,6 +117815,14 @@
       "margine_op": null
      },
      {
+      "trim": "2026-06-30",
+      "ricavi": 20338000000,
+      "utile": 6628000000,
+      "operativo": null,
+      "margine": 32.6,
+      "margine_op": null
+     },
+     {
       "trim": "2026-03-31",
       "ricavi": 17227000000,
       "utile": 5630000000,
@@ -117776,14 +117844,6 @@
       "utile": 4098000000,
       "operativo": null,
       "margine": 27.0,
-      "margine_op": null
-     },
-     {
-      "trim": "2025-06-30",
-      "ricavi": 14583000000,
-      "utile": 3723000000,
-      "operativo": null,
-      "margine": 25.5,
       "margine_op": null
      }
     ]
@@ -118779,10 +118839,10 @@
    "sortino_6m": 1.93,
    "prepost": {
     "label": "after",
-    "price": 344.84,
-    "change_pct": -0.39
+    "price": 344.86,
+    "change_pct": -0.38
    },
-   "prezzo_limite_aggiustato": 344.84,
+   "prezzo_limite_aggiustato": 344.86,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Financial Services",
@@ -118810,7 +118870,7 @@
     "gross_margin": 0.0,
     "enterprise_value": 675177037824.0,
     "ev_ebitda": null,
-    "peg": 1.46,
+    "peg": 1.45,
     "roa": 0.0137,
     "short_float": 0.009,
     "buyback_yield": 0.0344,
@@ -120392,7 +120452,7 @@
      137.15,
      142.3,
      133.05,
-     118.61,
+     118.62,
      119.02,
      119.32,
      124.66,
@@ -120484,7 +120544,7 @@
      390.19,
      418.26,
      427.74,
-     448.72,
+     448.71,
      393.97,
      377.2,
      430.42,
@@ -120818,7 +120878,7 @@
     "gross_margin": 0.4828,
     "enterprise_value": 196322082816.0,
     "ev_ebitda": 16.357,
-    "peg": 1.02,
+    "peg": 1.01,
     "roa": 0.0385,
     "short_float": 0.014,
     "buyback_yield": 0.0103,
@@ -122929,10 +122989,10 @@
    "sortino_6m": 3.79,
    "prepost": {
     "label": "after",
-    "price": 1438.6,
-    "change_pct": -0.34
+    "price": 1440.25,
+    "change_pct": -0.23
    },
-   "prezzo_limite_aggiustato": 1438.6,
+   "prezzo_limite_aggiustato": 1440.25,
    "risk_reward": "1:0.2",
    "risk_reward_base": "prezzo esteso",
    "sector": "Healthcare",
@@ -124694,10 +124754,10 @@
    "sortino_6m": 1.16,
    "prepost": {
     "label": "after",
-    "price": 339.15,
-    "change_pct": -1.56
+    "price": 339.5,
+    "change_pct": -1.46
    },
-   "prezzo_limite_aggiustato": 339.15,
+   "prezzo_limite_aggiustato": 339.5,
    "risk_reward": "1:2.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -125616,7 +125676,7 @@
      "ytd": 172.43,
      "a1": 161.09,
      "a3": 374.47,
-     "a5": 572.55,
+     "a5": 572.56,
      "a10": 2426.68
     },
     "stagionalita": [
@@ -135336,13 +135396,6 @@
      "url": "https://www.bloomberg.com/news/articles/2026-11-13/em-stocks-eye-first-weekly-gain-since-september-as-tech-rebounds"
     },
     {
-     "titolo": "Gold Set for Worst Week Since March as Fed Rate Hike Bets Mount",
-     "riassunto": "Gold is on course for its worst week since March as traders bet that persistent energy-driven inflation will lead to more Federal Reserve tightening, a challenge for the precious metal.",
-     "fonte": "Bloomberg",
-     "quando": "2026-11-12T23:58:45Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-11-12/gold-holds-drop-to-near-one-year-low-as-rate-hike-bets-increase"
-    },
-    {
      "titolo": "Analysis: Nvidia’s leadership crisis tests the chipmaker’s role as the ‘central bank of AI’",
      "riassunto": "The tech giant's web of ties to other companies is raising the possibility that it could do far-reaching economic and financial damage.",
      "fonte": "CNBC Economia",
@@ -135404,6 +135457,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-11-06T20:11:17Z",
      "url": "https://www.cnbc.com/2026/11/06/long-term-unemployment-october-jobs-report.html"
+    },
+    {
+     "titolo": "U.S. economy added 165,000 jobs in October, way more than expected; unemployment rate slips to 4.1%",
+     "riassunto": "Nonfarm payrolls were expected to increase by 59,000 in October as the unemployment rate was expected to hold steady at 4.2%.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-06T16:06:59Z",
+     "url": "https://www.cnbc.com/2026/11/06/jobs-report-october-2026.html"
     }
    ],
    "fonti": [
@@ -143180,7 +143240,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 8
+     "score": 7
     },
     {
      "label": "Treasury 10A",
@@ -143327,7 +143387,7 @@
       "qqq": 76.0
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-11-13",
     "price": 188.85,
     "d1": 0.54,
@@ -143493,7 +143553,7 @@
       "qqq": 76.0
      }
     },
-    "azioni_in_circolazione": 69700000,
+    "azioni_in_circolazione": null,
     "asof": "2026-11-13",
     "price": 212.5,
     "d1": -0.44,
@@ -143659,7 +143719,7 @@
       "qqq": 76.0
      }
     },
-    "azioni_in_circolazione": 120253000,
+    "azioni_in_circolazione": null,
     "asof": "2026-11-13",
     "price": 119.98,
     "d1": -0.4,
@@ -144074,7 +144134,7 @@
       "qqq": 76.0
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-11-13",
     "price": 83.71,
     "d1": 0.23,
@@ -144712,7 +144772,7 @@
       "qqq": 76.0
      }
     },
-    "azioni_in_circolazione": 272056000,
+    "azioni_in_circolazione": null,
     "asof": "2026-11-13",
     "price": 170.28,
     "d1": -2.01,
@@ -144961,7 +145021,7 @@
       "qqq": 76.0
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-11-13",
     "price": 486.75,
     "d1": -2.99,
@@ -146410,7 +146470,7 @@
   },
   "bce": {
    "tasso_rifinanziamento": 2.65,
-   "data": "2026-11-13",
+   "data": "2026-11-14",
    "fonte": "BCE Data Portal, serie FM.D.U2.EUR.4F.KR.MRR_FR.LEV"
   },
   "systemic_risk": {
@@ -148399,9 +148459,7 @@
    },
    "unione": {
     "nuove": [],
-    "completate": {
-     "2026-11-13": 355
-    },
+    "completate": {},
     "difformi": 0,
     "fuori_ordine": []
    },
@@ -148553,7 +148611,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:35:22Z",
+      "quando": "2026-11-14T00:19:42Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148601,6 +148659,13 @@
       "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
      },
      {
+      "titolo": "Broadcom Inc. (AVGO) Suffers a Larger Drop Than the General Market: Key Insights",
+      "riassunto": "In the closing of the recent trading day, Broadcom Inc. (AVGO) stood at $347.01, denoting a -4.76% move from the preceding trading day.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-13T21:45:01Z",
+      "url": "https://www.nasdaq.com/articles/broadcom-inc-avgo-suffers-larger-drop-general-market-key-insights-0"
+     },
+     {
       "titolo": "Stocks Settle Lower on Nvidia Rout and Higher Crude and Bond Yields",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.35% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.36%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.30%. December E-mini S&P futures (ESZ26 ) fell -0.33%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
@@ -148627,13 +148692,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T13:41:02Z",
       "url": "https://www.nasdaq.com/articles/broadcom-stock-buy-after-its-43-billion-anthropic-backstop"
-     },
-     {
-      "titolo": "Anthropic Delivers Huge News for Nvidia Stock, AMD Stock, Micron Stock, and Broadcom Stock Investors",
-      "riassunto": "Should you buy stock in Nvidia right now? Before you buy stock in Nvidia, consider this:Missed AI’s \"Act 1\"? Act 2 Could Be 15x Bigger. Most investors think they missed the AI boat because they didn't buy Nvidia in 2005. But according to our analysts, we’re only at the end of \"Ac",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T11:50:02Z",
-      "url": "https://www.nasdaq.com/articles/anthropic-delivers-huge-news-nvidia-stock-amd-stock-micron-stock-and-broadcom-stock"
      }
     ],
     "BE": [
@@ -148685,7 +148743,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:55:55Z",
+      "quando": "2026-11-14T00:19:42Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148773,7 +148831,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:35:22Z",
+      "quando": "2026-11-14T00:19:42Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148817,7 +148875,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:55:55Z",
+      "quando": "2026-11-14T00:19:42Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148861,7 +148919,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:35:22Z",
+      "quando": "2026-11-14T00:08:37Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148949,7 +149007,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:55:55Z",
+      "quando": "2026-11-14T00:19:42Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -149081,7 +149139,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:55:55Z",
+      "quando": "2026-11-14T00:19:42Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -149145,7 +149203,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-14T00:05:19Z"
+   "letto_il": "2026-11-14T00:45:41Z"
   }
  },
  "broker": null,
@@ -149156,7 +149214,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:35:22Z",
+     "quando": "2026-11-14T00:19:42Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149204,6 +149262,13 @@
      "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
     },
     {
+     "titolo": "Broadcom Inc. (AVGO) Suffers a Larger Drop Than the General Market: Key Insights",
+     "riassunto": "In the closing of the recent trading day, Broadcom Inc. (AVGO) stood at $347.01, denoting a -4.76% move from the preceding trading day.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-13T21:45:01Z",
+     "url": "https://www.nasdaq.com/articles/broadcom-inc-avgo-suffers-larger-drop-general-market-key-insights-0"
+    },
+    {
      "titolo": "Stocks Settle Lower on Nvidia Rout and Higher Crude and Bond Yields",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.35% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.36%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.30%. December E-mini S&P futures (ESZ26 ) fell -0.33%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
@@ -149230,13 +149295,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T13:41:02Z",
      "url": "https://www.nasdaq.com/articles/broadcom-stock-buy-after-its-43-billion-anthropic-backstop"
-    },
-    {
-     "titolo": "Anthropic Delivers Huge News for Nvidia Stock, AMD Stock, Micron Stock, and Broadcom Stock Investors",
-     "riassunto": "Should you buy stock in Nvidia right now? Before you buy stock in Nvidia, consider this:Missed AI’s \"Act 1\"? Act 2 Could Be 15x Bigger. Most investors think they missed the AI boat because they didn't buy Nvidia in 2005. But according to our analysts, we’re only at the end of \"Ac",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T11:50:02Z",
-     "url": "https://www.nasdaq.com/articles/anthropic-delivers-huge-news-nvidia-stock-amd-stock-micron-stock-and-broadcom-stock"
     }
    ],
    "BE": [
@@ -149288,7 +149346,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:55:55Z",
+     "quando": "2026-11-14T00:19:42Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149376,7 +149434,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:35:22Z",
+     "quando": "2026-11-14T00:19:42Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149420,7 +149478,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:55:55Z",
+     "quando": "2026-11-14T00:19:42Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149464,7 +149522,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:35:22Z",
+     "quando": "2026-11-14T00:08:37Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149552,7 +149610,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:55:55Z",
+     "quando": "2026-11-14T00:19:42Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149684,7 +149742,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:55:55Z",
+     "quando": "2026-11-14T00:19:42Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149748,7 +149806,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-14T00:05:19Z"
+  "letto_il": "2026-11-14T00:45:41Z"
  },
  "predictions": [
   {
@@ -149758,7 +149816,7 @@
   },
   {
    "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
-   "yes": 2,
+   "yes": 3,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
   },
   {
@@ -156803,7 +156861,7 @@
      ],
      "call_wall": 1900.0,
      "put_wall": 1400.0,
-     "opt_volume": 6461
+     "opt_volume": 6456
     },
     {
      "date": "2026-11-27",
@@ -166767,7 +166825,7 @@
      ],
      "call_wall": 290.0,
      "put_wall": 200.0,
-     "opt_volume": 21373
+     "opt_volume": 21387
     },
     {
      "date": "2026-11-27",
@@ -173071,7 +173129,7 @@
      ],
      "call_wall": 500.0,
      "put_wall": 260.0,
-     "opt_volume": 1324
+     "opt_volume": 1323
     }
    ]
   },
@@ -176275,7 +176333,7 @@
      ],
      "call_wall": 370.0,
      "put_wall": 290.0,
-     "opt_volume": 92635
+     "opt_volume": 92634
     }
    ]
   },
@@ -182479,7 +182537,7 @@
      ],
      "call_wall": 275.0,
      "put_wall": 250.0,
-     "opt_volume": 8345
+     "opt_volume": 8348
     },
     {
      "date": "2026-11-27",
@@ -198943,7 +199001,7 @@
      ],
      "call_wall": 450.0,
      "put_wall": 320.0,
-     "opt_volume": 9847
+     "opt_volume": 9850
     },
     {
      "date": "2026-11-27",
@@ -209639,7 +209697,7 @@
      ],
      "call_wall": 400.0,
      "put_wall": 250.0,
-     "opt_volume": 295656
+     "opt_volume": 295655
     }
    ]
   },
@@ -220432,8 +220490,8 @@
    },
    {
     "key": "bce",
-    "date": "2026-11-13",
-    "age_days": 1,
+    "date": "2026-11-14",
+    "age_days": 0,
     "max_age": 10,
     "status": "ok",
     "note": ""
@@ -220456,6 +220514,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-14T00:05:19Z"
+  "generated_at": "2026-11-14T00:45:42Z"
  }
 }
