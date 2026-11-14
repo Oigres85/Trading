@@ -9,7 +9,7 @@ l'affidabilita' misurata prima sul passato senza futuro e poi dal vivo. Metodi a
 Qui si uniscono i moduli dello sciame (03-06/11/2026), ognuno una domanda e un metodo:
 - previsioni_titoli.py      casi simili, con la soglia in unita' di volatilita' (titoli, QQQ e SMH, carico dei rami secchi)
 - previsioni_opzioni.py     lognormale con la volatilita' realizzata (calibrato) e opzioni CBOE (solo dal vivo)
-- previsioni_portafoglio.py simulazione a blocchi dei rendimenti del portafoglio (salvavita, massimo, rami secchi insieme)
+- previsioni_portafoglio.py simulazione a blocchi dei rendimenti del portafoglio (calo dal massimo, ritorno al massimo, rami secchi insieme)
 - previsioni_macro.py       serie storiche FRED (VIX, credito, decennale: gli eventi del semaforo)
 - mercati_previsione.py     quanto pagano Polymarket, Kalshi e FedWatch, e quanto ci hanno preso storicamente
 - registro_previsioni.py    il registro dal vivo (memoria/previsioni.jsonl): registra, risolve, misura

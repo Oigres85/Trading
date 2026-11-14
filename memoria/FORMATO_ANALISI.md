@@ -36,7 +36,7 @@ MANAGER** (il portafoglio intero, i pesi contro la politica di `LIBRO.md` §1vic
 DIAVOLO** (il miglior argomento contro e il pre-mortem; parla per primo se una condizione della tesi è violata), il
 **SEGRETARIO** (cosa va scritto nel libro, la riga pronta).
 - **SETTIMANA** → il giro di `analisi.py`, resa in 10-15 righe: cosa è cambiato nei fatti, le condizioni delle tesi
-  violate, l'agenda dei 14 giorni, calo dal massimo e salvavita, UNA azione oppure «nessuna azione».
+  violate, l'agenda dei 14 giorni, il calo dal massimo, UNA azione oppure «nessuna azione».
 - **CONTI <TICKER>** → prima: `/titolo`, l'esame di §1quinquies se c'è, le condizioni «da leggere ai conti» della tesi
   (§1novodecies), il movimento implicito. Dopo: risultati contro attese, guida, ogni condizione una per una, la tesi
   regge sì o no. Su un nome in conflitto, prima alla cieca (`cieca.py`).
@@ -45,7 +45,7 @@ DIAVOLO** (il miglior argomento contro e il pre-mortem; parla per primo se una c
   denaro, le quattro voci.
 - **VENDO <TICKER>** → è cambiata la tesi (condizioni violate) o solo il prezzo? Il fisco in euro (blocco del cambio),
   dove va il ricavato secondo la politica, le quattro voci.
-- **PANICO** → solo fatti: semaforo e salvavita, il piano di calo scritto (§1vicies), cosa NON fare oggi, quando si
+- **PANICO** → solo fatti: semaforo e calo dal massimo, il piano di calo scritto (§1vicies), cosa NON fare oggi, quando si
   decide (il giorno dopo).
 - **STOP** (CEO, 11/11/2026: *"Mi servono anche eventuali stop loss ed interventi"*) → per ogni posizione
   `python3 scripts/statistica.py ingresso TICKER PREZZO` senza `--registra`: il livello d'allerta (sotto il pavimento
@@ -315,7 +315,7 @@ nella SCHEDA COMPLETA allegata. I blocchi seguono quelli della SINTESI OPERATIVA
 4. **Notizie e forum** (sezione 3): le notizie macro che contano — dal feed E cercate in rete, con fonte e data —, la
    cronaca di mercato, i feed muti o non letti, e WallStreetBets (i più citati, i nostri nomi marcati, le impennate):
    attenzione, non fatti (v451).
-5. **Il libro nel regime**: semaforo e salvavita, esposizione, risultato contro QQQ e SMH, costo dell'attesa, credito sul
+5. **Il libro nel regime**: semaforo e calo dal massimo, esposizione, risultato contro QQQ e SMH, costo dell'attesa, credito sul
    libro, l'incrocio regime × libro. Accanto, quando c'è, il rendimento del deposito e il ROI del conto. Subito dopo
    **il rischio degli eventi** (sezione 5 della sintesi, v526): per ogni posizione coi conti nei prossimi 21 giorni il
    movimento implicito in dollari (±$), la somma dichiarata come un TETTO e il confronto con una settimana normale del
@@ -355,14 +355,12 @@ che non spostano niente restano nella scheda, la FAMIGLIA no. «Nella norma» è
    regole in `memoria/LIBRO.md` §1ter. La guida sugli investimenti degli hyperscaler non è calcolata:
    va verificata in rete. Se il blocco dice COLORE CAMBIATO, va in cima alla risposta e prima di tutto
    il resto; se dice MINIMO, si nomina la famiglia che non si misura.
-   Da v484, subito sotto (decisioni del CEO del 14/10 sera): il **SALVAVITA** — il calo dell'azionario
-   dal suo massimo sul registro della performance, soglia −30%; se il blocco dice SCATTATO va in cima
-   alla risposta, come un colore cambiato — e il **PIANO DI RIDUZIONE**: il gradino del salvavita
-   calcolato prima (un terzo dei semiconduttori in proporzione al rischio: azioni, imposta, rischio
-   prima e dopo). Dal 15/10 (decisione del CEO: *"non vendi sui ribassi ma sui massimi"*) arancione e
-   rosso NON vendono: il colore si scrive come segnale, e il piano in una riga in ogni colore — quanto
-   si venderebbe e l'imposta —; per intero, nome per nome, solo col salvavita scattato. Si vende,
-   non ci si copre: il CEO non opera con opzioni o ETF short, per ora.
+   Subito sotto il **CALO DAL MASSIMO**: il calo dell'azionario dal suo massimo sul registro della
+   performance — una misura. Dal 14/11/2026 (CEO: *"regola 30% eliminale andiamo in ottica di analisi
+   finanziaria non regole rigide"*) il salvavita a −30% e il suo piano di riduzione sono ELIMINATI: non c'è
+   nessuna vendita automatica, e il piano non si stampa più. Dal 15/10 (decisione del CEO: *"non vendi sui
+   ribassi ma sui massimi"*) arancione e rosso NON vendono: il colore si scrive come segnale. Cosa fare in un
+   calo lo dice l'analisi finanziaria del momento, e decide il CEO.
 0bis. **Costo dell'attesa e scadenze** (decisione del CEO del 06/10, regole in `memoria/LIBRO.md`
    §1quater): il blocco `COSTO DELL'ATTESA` / `SCADENZE` di `numeri_libro.py`, e per ogni
    decisione aperta del piano la sua scadenza (prima trimestrale del nome) e i giorni che mancano.
@@ -555,8 +553,7 @@ che non spostano niente restano nella scheda, la FAMIGLIA no. «Nella norma» è
 
 7. **Watchlist e rotazione** (sempre, v468) — in giallo, arancione e rosso NESSUN divieto
    d'ingresso (decisioni del CEO del 09/10 e del 15/10), ma ogni ingresso porta le sue conseguenze di
-   rischio e chi è nella stessa scommessa del libro lo dichiara; col salvavita scattato prima il suo
-   gradino. **Gli ingressi speculativi sono ammessi** (CEO, 14/10: *"se ci sono
+   rischio e chi è nella stessa scommessa del libro lo dichiara. **Gli ingressi speculativi sono ammessi** (CEO, 14/10: *"se ci sono
    margini di speculazione, ben venga"*): dove la riga «tenuta se fosse in portafoglio» dice
    VENDITA PER EVIDENZA, l'ingresso è una scommessa contro l'evidenza e si dichiara tale; dove dice
    CONFLITTO, è il caso AMD visto da fuori e lo leggono le notizie, nei due versi.
@@ -679,7 +676,7 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
 - `[tenuta]` tenuta delle posizioni: si lascia correre, si vende per evidenza, col pareggio fiscale, anche sui sorvegliati (14/10); bilancio dell'evidenza nei due versi, il rialzo possibile valutato (14/10)
 - `[speculativi]` ingressi speculativi ammessi e dichiarati (14/10)
 - `[media]` l'aritmetica della media sulle posizioni in perdita (14/10)
-- `[salvavita]` la riduzione in proporzione al rischio, il salvavita a −30% dal massimo (14/10 sera); non si vende sui ribassi: arancione e rosso sono un segnale, l'unica vendita automatica è il salvavita, e nessuna presa di profitto ai massimi (15/10)
+- `[salvavita]` il calo dal massimo dell'azionario, una misura: il salvavita a −30% e il suo piano di riduzione sono ELIMINATI (CEO, 14/11/2026: analisi finanziaria, non regole rigide) — nessuna vendita automatica; arancione e rosso sono un segnale (15/10)
 - `[conflitti]` la scadenza e l'esame di ogni conflitto (14/10 sera)
 - `[pavimenti]` ingressi sui minimi: i pavimenti di ogni nome della watchlist, con ordine, stop e perdita per 5.000 € (15/10); i pavimenti delle posizioni e la media sui pavimenti sotto il carico (15/10)
 - `[ordini]` gli ordini aperti seguiti a ogni analisi, con storno o discesa e il rischio di alzare il limite (15/10); gli ordini giornalieri seguiti fino alla loro campana, e la liquidità libera dopo gli ordini aperti (15/10 sera)

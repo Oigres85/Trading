@@ -28,10 +28,11 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    **Nessuna famiglia di dati dipende da un solo fornitore (v542)**: una fonte che rifiuta non si ritenta e non si
    aggira (niente richieste travestite) — si passa alla successiva e lo si dice: altra fonte, pipeline, ultima lettura
    riuscita datata (`riserve.py`). Una lettura nuova con una fonte sola nasce con la sua riserva.
-5. **Investimento** (regole intere in `memoria/LIBRO.md`): non si vende sui ribassi (15/10); l'unica vendita automatica
-   è il salvavita a −30% (§1ter); la tenuta si decide per evidenza nei due versi (§1sexies); un CONFLITTO si decide ai
-   conti con l'esame scritto prima e confermato dal CEO (§1quinquies) — ma dal 03/11 gli esami non vendono: i rami
-   secchi si tagliano dopo il recupero di tutti, poi si diversifica (§1undecies). Le quantità sono solo l'aritmetica dell'unità di
+5. **Investimento: analisi finanziaria, non regole rigide (14/11/2026).** Il salvavita a −30% e «i rami secchi si
+   tagliano dopo il recupero» sono ELIMINATI: **nessuna vendita automatica**, nessuna vendita vietata. Tenere,
+   vendere o mediare si decide con l'analisi del momento (conti, valutazione, credito, macro, tecnica, rischio), e
+   decide il CEO; il calo dal massimo (§1ter), la tenuta (§1sexies), gli esami (§1quinquies) e le tesi sono MISURE.
+   Nelle risposte non si cita una regola per dire cosa fare: si porta l'analisi. Le quantità sono solo l'aritmetica dell'unità di
    5.000 €, mai «la quantità giusta» (v439). Nessun punteggio composito (v200); ogni soglia è una convenzione dichiarata
    (v240). La liquidità è una RISERVA per la quotazione di Anthropic e per le medie dopo i conti (07/11); il
    ricavato di INTC è andato su AVGO (02/11). **Le regole sono guide, non obblighi (07/11)**: l'obiettivo è far
@@ -61,7 +62,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
   OGNI operazione `statistica.py ingresso TICKER PREZZO --registra "intuizione"` (valore atteso in R, variante «aspetta
   la conferma», gli stop e gli ordini con limite a confronto, riga nel diario `memoria/diario_ingressi.jsonl`); `statistica.py bilancio` misura l'intuito. Esce 1 se uno
   strumento fallisce o una richiesta del registro è ASSENTE.
-- **`memoria/LIBRO.md`**: posizioni (§1), sorvegliati (§1bis), semaforo e salvavita (§1ter), attesa (§1quater),
+- **`memoria/LIBRO.md`**: posizioni (§1), sorvegliati (§1bis), semaforo e calo dal massimo (§1ter), attesa (§1quater),
   decisioni ed esami (§1quinquies), tenuta (§1sexies), ordini (§1septies), conti dichiarati dall'emittente (§1octies),
   credito (§1novies), operazioni col cambio (§1decies), domande al CEO (§1undecies), fotografia del broker
   (§1duodecies), rendiconti (§1terdecies), soglie della sintesi (§1quattuordecies),

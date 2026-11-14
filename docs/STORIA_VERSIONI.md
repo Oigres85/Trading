@@ -9933,3 +9933,30 @@ passare un controllo anti-automi è stato fermato, giustamente): si passa a un'a
   «STRUMENTO FALLITO» (analisi con uscita 1, una richiesta ASSENTE); rilanciata da sola è finita in circa 8 minuti
   con uscita 0. Quel giorno ha rifatto le calibrazioni in linea: il margine sul tempo massimo non c'è. Da misurare
   alla prossima riattivazione (dove passa il tempo; calibrare fuori dal giro, o alzare il limite dichiarandolo).
+
+## v543 — due regole eliminate: il salvavita a −30% e «i rami secchi dopo il recupero» (14/11/2026)
+
+Il CEO, testuale: *"i rami secchi si tagliano dopo il recupero e regola 30% eliminale andiamo in ottica di analisi
+finanziaria non regole rigide"*. Veniva da tre risposte in cui le due regole decidevano al posto dell'analisi (il passo
+dello «scenario B», la domanda sul −30%, «si tagliano dopo il recupero»). Il numero v543 era stato prenotato dallo sciame
+dell'11/11, fermato senza consegnare niente: lo prende questa versione.
+
+- **Cosa sparisce.** La vendita automatica a −30% dal massimo e il suo gradino (un terzo dei semiconduttori); la regola
+  del 03/11 che vietava di tagliare RGTI, CRWV, MSTR e ORCL prima del recupero di tutti; la domanda aperta sul −30%.
+  Nel libro non c'è più nessuna vendita automatica e nessuna vendita vietata: decide l'analisi del momento, e il CEO.
+- **Cosa resta, come MISURA.** Il calo dal massimo (`numeri_libro.salvavita`, lo stesso calcolo: una derivazione sola,
+  v161), stampato come «CALO DAL MASSIMO» senza soglia che scatta; l'esito della tenuta; le tesi. Il −30% resta solo come
+  LIVELLO DI RIFERIMENTO delle previsioni del portafoglio (ha la sua storia di affidabilità): l'evento ora si chiama «il
+  calo dal massimo arriva a −30%», senza vendite collegate. `piano_riduzione` resta come calcolo (dà alla sintesi il peso
+  dei semiconduttori) ma `righe_piano` è tolta: il piano non si stampa più, in nessuno stato.
+- **Dove.** `numeri_libro.py` (resa del calo, due frasi sul semaforo, la sintesi), `sintesi.py` (la riga del libro nel
+  regime: via «scatta a» e «se scattasse: vendita di…»), `scheda.py` (sezione «0 · Calo dal massimo», via la voce del piano),
+  `rotazione.py`, `previsioni_portafoglio.py` (nome dell'evento, riga di partenza), LIBRO §0, §1ter, §1quater, §1quinquies,
+  §1sexies, §1undecies, §1vicies e i quattro verdetti di §1novodecies che citavano la regola, FORMATO, CLAUDE.md regola 5.
+- **Gate.** Sei controlli v484/v486 pretendevano il salvavita («SCATTATO», «DA ESEGUIRE», «l'unica vendita automatica»,
+  «una volta per discesa»): riagganciati alla proprietà opposta, non zittiti. Tre nuovi: la sintesi operativa col calo
+  passato oltre il livello e un piano calcolato; le superfici dei cinque sorgenti, tolti commenti e docstring; libro e
+  istruzioni coerenti col codice. Nove iniezioni su copie verificate per impronta, una per copia.
+- **Non toccato, e perché.** `laboratorio.py` tiene la domanda «una regola d'uscita a soglie diverse, sul passato»: è uno
+  studio a richiesta, non una regola del libro. I nomi interni (`salvavita()`, `SOGLIA_SALVAVITA`, la chiave `[salvavita]`
+  del registro) restano: cambiarli toccava il registro delle previsioni senza cambiare niente per chi legge.

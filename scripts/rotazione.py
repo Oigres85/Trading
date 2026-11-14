@@ -2257,8 +2257,8 @@ def righe_piano(o):
            "a libro, QQQ e titolo (fino a 250 sedute; il livello del libro è nel blocco NUMERI) · perdita allo stop = unità × "
            "(stop / ingresso − 1)",
          "   il SEMAFORO non vieta ingressi (numeri_libro.py, LIBRO.md §1ter): in giallo, arancione e rosso ogni ingresso "
-         "porta le sue conseguenze — dal 15/10/2026 arancione e rosso non vendono; col salvavita scattato vale prima il "
-         "suo gradino"]
+         "porta le sue conseguenze — dal 15/10/2026 arancione e rosso non vendono, e dal 14/11/2026 non c'è "
+         "nessuna vendita automatica"]
     if quota_txt:
         L.append(f"   {quota_txt}")
     if pi.get("qqq_assente"):

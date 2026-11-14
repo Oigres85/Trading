@@ -6,8 +6,9 @@ istruzione permanente n.1 («nessuna proiezione»): le previsioni entrano SOLO c
 ognuna col suo metodo, la sua base, il suo intervallo e l'affidabilita' MISURATA (scripts/affidabilita.py, la misura
 comune: qui non se ne scrive un'altra, v161). Gli eventi del portafoglio:
 
-- il SALVAVITA scatta (LIBRO.md §1ter: -30% dal massimo dell'azionario) entro 20 e 60 sedute;
-- il portafoglio TORNA AL MASSIMO (quello del salvavita, il 09/10/2026) entro 60, 120 e 252 sedute;
+- il CALO DAL MASSIMO arriva al livello di riferimento (LIBRO.md §1ter: -30%) entro 20 e 60 sedute — fino al
+  14/11/2026 era la soglia del salvavita; il CEO l'ha eliminato: e' una misura del rischio, senza vendite;
+- il portafoglio TORNA AL MASSIMO (quello della misura del calo, il 09/10/2026) entro 60, 120 e 252 sedute;
 - TUTTI I RAMI SECCHI tornano al carico entro 60, 120 e 252 sedute — un evento CONGIUNTO: si contano i percorsi in
   cui ognuno ci arriva, non si moltiplicano le probabilita' (i titoli si muovono insieme) — e, per confronto, ognuno
   da solo. I rami secchi sono RAMI_SECCHI qui sotto, IN ATTESA DELLA CONFERMA DEL CEO (LIBRO.md §1undecies, domanda
@@ -272,7 +273,8 @@ def previsioni_oggi(B, posiz, adesso=None, righe=None, calib=None, percorsi=PERC
                     "sopravvivenza": "i nomi sono quelli di oggi: il passato pende verso chi e' andato bene"}
     gia_scattato = bool(s.get("scattato_il"))
     if gia_scattato:
-        out.assenze.append(f"il salvavita e' gia' scattato il {_data_it(s['scattato_il'])}: il suo evento non si prevede")
+        out.assenze.append(f"il calo ha gia' passato il livello di riferimento ({_n(soglia * 100, 0)}%) il "
+                           f"{_data_it(s['scattato_il'])}: quell'evento non si prevede")
 
     def record(soggetto, evento, p, risolutore, h, analogo, v, dal, extra=None):
         b = (basi.get(f"{analogo}|{h}") or {}).get("frequenza") if analogo else None
@@ -287,7 +289,7 @@ def previsioni_oggi(B, posiz, adesso=None, righe=None, calib=None, percorsi=PERC
         port, nomi = simula(R, Q, w, 1.0 + calo0, soglia, livelli, H, percorsi, SEME, v)
         if not gia_scattato:
             for h in ORIZZONTI_SALVAVITA:
-                record("portafoglio", f"il salvavita scatta ({_n(soglia * 100, 0)}% dal massimo) entro {h} sedute",
+                record("portafoglio", f"il calo dal massimo arriva a {_n(soglia * 100, 0)}% entro {h} sedute",
                        prob(port["calo"], h), A.evento_portafoglio("calo_dal_massimo", soglia, s["al"], h), h, "calo",
                        v, s["al"])
         for h in ORIZZONTI_MASSIMO:
@@ -595,8 +597,9 @@ def resa(previsioni, calibrazione):
         R.append(f"PREVISIONI DEL PORTAFOGLIO (probabilita', non fatti) — simulazione: bootstrap a blocchi circolare di "
                  f"{BLOCCO} sedute, {percorsi} percorsi, seme {SEME}, sulle righe intere di "
                  f"{ctx['sedute']} sedute dal {_data_it(ctx['dal'])} al {_data_it(ctx['al'])}, quantita' ferme")
-        R.append(f"  partenza: {_p(ctx['calo'], 2, True)} dal massimo del {_data_it(ctx['massimo'])} (salvavita, "
-                 f"registro del {_data_it(ctx['seduta_calo'])}: scatta con un altro {_p(ctx['ulteriore'], 1, True)}) · "
+        R.append(f"  partenza: {_p(ctx['calo'], 2, True)} dal massimo del {_data_it(ctx['massimo'])} (registro del "
+                 f"{_data_it(ctx['seduta_calo'])}; al livello di riferimento {_p(SOGLIA_SALVAVITA, 0, True)} manca un "
+                 f"altro {_p(ctx['ulteriore'], 1, True)}: una misura del rischio, nessuna vendita collegata) · "
                  f"⚠ nomi di oggi (sopravvivenza), e nell'ultimo anno il portafoglio di oggi ha fatto "
                  f"{_p(ctx['deriva'], 0, True)}: la variante «solo rumore» lo toglie"
                  + (f" · fuori per la storia corta: {fuori}" if fuori else ""))

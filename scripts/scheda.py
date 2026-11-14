@@ -67,7 +67,7 @@ SEZIONI = (
     ("cieca", "0ter · Giudizio alla cieca: il verdetto col nome contro quello alla cieca, per gruppo di conflitto"),  # v539
     ("tesi", "0ter · Tesi: tre condizioni e tre segnali per posizione, le misurabili controllate"),  # v540
     ("semaforo", "0 · Semaforo d'uscita"),
-    ("salvavita", "0 · Salvavita e piano di riduzione"),
+    ("salvavita", "0 · Calo dal massimo"),
     ("attesa", "0bis · Costo dell'attesa e scadenze"),
     ("cambio", "0bis · Cambio euro/dollaro: l'esposizione del libro al dollaro e le operazioni col loro cambio"),  # v516
     ("roi_conto", "0bis · ROI del conto: la fotografia del broker, i carichi in euro, le operazioni chiuse"),     # v520
@@ -121,7 +121,6 @@ TIPI = (
     ("liquidita", "Piano per la liquidità: cosa fa al libro un'unità di 5.000 € — rotazione.py"),
     ("rischio", "Peso, quota del rischio e risultato del periodo — numeri_libro.py"),
     ("cambio", "Carico in euro, risultato in euro fra prezzo e cambio, imposta in euro — numeri_libro.py"),   # v516
-    ("piano_riduzione", "Se scatta il salvavita: il gradino del piano di riduzione — numeri_libro.py"),
     ("premarket", "Prezzo esteso (pre-market o after-hours) — numeri_libro.py --esteso"),
     ("mossi", "Oltre la propria ampiezza nell'ultima seduta — brief.py"),
     ("trimestrale", "Trimestrale dichiarata dalla fonte — brief.py"),
@@ -137,7 +136,7 @@ TIPI = (
 )
 ETICHETTE_TIPI = dict(TIPI)
 BREVI = {"tenuta": "tenuta", "watchlist": "watchlist e ingresso", "liquidita": "piano per la liquidità",
-         "rischio": "peso e rischio", "piano_riduzione": "piano di riduzione", "premarket": "prezzo esteso",
+         "rischio": "peso e rischio", "premarket": "prezzo esteso",
          "mossi": "mossi oltre l'ampiezza", "trimestrale": "trimestrale", "schede": "schede del progetto",
          "concorrenti": "concorrenti", "opzioni": "opzioni", "gamma": "gamma dei dealer", "dark_pool": "dark pool",
          "notizie": "notizie", "fine_anno": "fine anno", "cambio": "cambio euro/dollaro", "wsb": "WallStreetBets"}
@@ -180,8 +179,7 @@ CATALOGO = {
     )),
     "numeri_libro": Strumento("semaforo", (
         Blocco(r"SEMAFORO D'USCITA", "semaforo"),
-        Blocco(r"SALVAVITA", "salvavita"),
-        Blocco(r"PIANO DI RIDUZIONE", "salvavita", (Nome(rf"  {TK} +vendere ", "piano_riduzione", "copia"),)),
+        Blocco(r"CALO DAL MASSIMO", "salvavita"),
         Blocco(r"Periodo ", "risultato"),
         Blocco(r"REGISTRO DELLA PERFORMANCE", "registro"),
         Blocco(r"Vol [0-9]", "rischio", (Nome(rf"  {TK} +peso ", "rischio", "copia"),)),

@@ -1249,10 +1249,9 @@ def resa(libro, lc, mp, camb, base, ev, liv, ing, sett, rot, motivi, adesso, nuo
     bq = (ris.get("beta_libro") or {}).get("QQQ") or [None, None]
     L.append("4 · IL LIBRO NEL REGIME")
     L.append(f"  semaforo {sem.get('colore', 'n.d.').upper()} (" + ", ".join(sem.get("accesi") or []) + ")"
-             + (f" · salvavita {_pct(sv.get('calo'), 2)} dal massimo del {_gm(sv.get('massimo'))}, scatta a {_pct(sv.get('soglia'), 0)}"
-                f" (un altro {_pct(sv.get('ulteriore'))})" if sv.get("stato") == "misurato" else " · salvavita non misurato")
-             + (f" · se scattasse: vendita di {_it(pi.get('venduto'), 0)} $, imposta ~{_it(pi.get('imposta'), 0)} $"
-                if pi.get("venduto") else ""))
+             # v543 — il calo dal massimo e' una misura: il salvavita e la sua vendita sono eliminati (CEO, 14/11/2026)
+             + (f" · calo dal massimo del {_gm(sv.get('massimo'))}: {_pct(sv.get('calo'), 2)}"
+                if sv.get("stato") == "misurato" else " · calo dal massimo non misurato"))
     L.append(f"  esposizione: semiconduttori {_quota(pi.get('peso_semi_prima'))} dell'azionario · beta su QQQ "
              f"{_it(bq[0], 2)} (R² {_it(bq[1], 2) if len(bq) > 1 else 'n.d.'}) · scommesse effettive {_it(ris.get('scommesse_eff'), 1)} · "
              f"volatilita' {_quota(ris.get('vol_ann'))}")

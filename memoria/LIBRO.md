@@ -22,6 +22,13 @@ QQQ resta il metro con cui il registro lo misura. Le regole e le soglie di quest
 esami, rami secchi) dicono **quando fermarsi a decidere** e con quali fatti, non cosa fare: il sistema le segnala
 tutte come prima, e decide il CEO.
 
+**14/11/2026 — due regole eliminate** (CEO, testuale: *"i rami secchi si tagliano dopo il recupero e regola 30%
+eliminale andiamo in ottica di analisi finanziaria non regole rigide"*). Il
+**salvavita a −30%** (§1ter) e **«i rami secchi si tagliano dopo il recupero»** (§1undecies) non esistono più: nel
+libro non c'è **nessuna vendita automatica** e nessuna vendita vietata. Tenere, vendere o mediare si decide con
+l'**analisi finanziaria** del momento — conti, valutazione, credito, macro, tecnica, rischio — e decide il CEO. Il
+calo dal massimo, l'esito della tenuta e le tesi restano MISURE: informano, non comandano.
+
 ## 1. POSIZIONI — confermate dal CEO l'08/09/2026
 
 | Ticker | Quantità | PMC | Valuta | Note |
@@ -127,7 +134,8 @@ per MU + SK hynix intorno al 20% del libro (12-13/10) è **respinta**: il peso d
 un limite, e SK hynix resta in portafoglio senza uno stop di prezzo. Il 14/10 le memorie pesano
 il 26,4% del libro e MU da sola porta il 34% del rischio: senza tetto, se salgono, quelle quote
 crescono da sole, e il blocco dei pesi di `numeri_libro.py` le mostra a ogni analisi.
-**Resta in vigore**, perché non è un tetto, il salvavita (§1ter): a −30% dal massimo
+**Restava in vigore** fino al 14/11/2026 (poi eliminato dal CEO, §1ter), perché non era un tetto, il salvavita: a
+−30% dal massimo
 dell'azionario la riduzione dei semiconduttori segue il rischio di ciascuno — MU, che porta più
 rischio di quanto pesa, si taglia di più di un terzo — qualunque sia il peso delle memorie
 (decisione del CEO del 14/10/2026). Dal 15/10/2026 arancione e rosso non vendono più (§1ter).
@@ -342,8 +350,8 @@ parola per parola: le regole stanno in un posto solo.
 - 🟠 **Arancione** — due segnali di **famiglie diverse**: **nessuna vendita** — decisione del CEO
   del 15/10/2026, testuale: "non vendi sui ribassi ma sui massimi". Come in giallo, nessun divieto
   d'ingresso: ogni ingresso porta accanto le sue conseguenze sul libro. Il colore resta una prova
-  CONTRO per ogni nome nella tenuta (§1sexies, famiglia macro), e l'unica vendita automatica del
-  libro è il salvavita qui sotto. Fino al 15/10 l'arancione toglieva un terzo dei semiconduttori in
+  CONTRO per ogni nome nella tenuta (§1sexies, famiglia macro), e dal 14/11/2026 nel libro non c'è
+  nessuna vendita automatica (il salvavita qui sotto è eliminato). Fino al 15/10 l'arancione toglieva un terzo dei semiconduttori in
   proporzione al rischio: al suo primo arancione il CEO non l'ha eseguito e ha cambiato la regola.
 - 🔴 **Rosso** — SMH sotto la media a 200 **e** (credito sopra 4,0 **oppure** taglio della guida
   sugli investimenti AI): **nessuna vendita**, come l'arancione (decisione del CEO del 15/10/2026).
@@ -363,7 +371,7 @@ tre mesi dopo SMH era più in alto —; in un mercato orso come il 2022 (semicon
 gradino avrebbe evitato circa 30.000 $ di perdite su quella parte. ⚠ Senza gradino l'esposizione è
 quella del libro intero: il 14/10 un Nasdaq −10% valeva −21,9% (−59.174 $).
 
-**I semiconduttori del libro** (il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY, AVGO.
+**I semiconduttori del libro** (il comparto; fino al 14/11/2026 il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY, AVGO.
 INTC entra il 30/10/2026, il giorno dell'acquisto, per la regola qui sotto: progetta e produce processori, è nel comparto.
 INTC esce il 02/11/2026, il giorno della vendita. AVGO entra il 02/11/2026, il giorno dell'acquisto: progetta chip, è nel
 comparto. WDC, comprata lo stesso giorno, resta fuori: fa dischi rigidi, non chip — si nomina a ogni analisi come le
@@ -372,22 +380,21 @@ Il settore non è nei dati — la pipeline mette RGTI fra i semiconduttori e SK 
 quindi l'elenco sta qui, e un nome nuovo del comparto ci entra il giorno dell'acquisto. Le posizioni
 fuori dall'elenco si nominano a ogni analisi: un'omissione si vede.
 
-**Il salvavita sul patrimonio** (decisione del CEO del 14/10/2026). Il semaforo riconosce i crolli
-che conosce: un crollo dei soli titoli dell'intelligenza artificiale col credito calmo può lasciarlo
-giallo finché le stime non girano. Il salvavita stacca per qualunque causa, come quello di casa.
+**Il calo dal massimo** — fino al 14/11/2026 «il salvavita sul patrimonio» (decisione del CEO del 14/10/2026),
+**ELIMINATO il 14/11/2026** (CEO, testuale: *"i rami secchi si tagliano dopo il recupero e regola 30% eliminale
+andiamo in ottica di analisi finanziaria non regole rigide"*).
+Resta la misura; non c'è più niente che scatta.
 - **Misura**: il calo dell'azionario dal suo massimo, in dollari, sul rendimento ponderato per il
   tempo del registro della performance (§0): vendite, acquisti e depositi non lo falsano. Il massimo
   si conta dalla prima riga del registro (09/10/2026).
-- **Soglia: −30%** — una convenzione scelta col CEO (v240), oltre il peggior calo dell'ultimo anno
-  del libro di oggi guardato all'indietro (−26%, misurato il 14/10/2026): non scatta sul rumore.
-- **Reazione**: un terzo dei semiconduttori, **in proporzione al rischio** di ciascuno — chi porta
-  più rischio di quanto pesa si taglia di più, chi ne porta meno di meno (decisione del CEO del
-  14/10/2026) — qualunque sia il colore del semaforo. Azioni, imposta e rischio prima e dopo li
-  calcola `numeri_libro.py`, blocco «PIANO DI RIDUZIONE», a ogni analisi. Si vende, non ci si copre:
-  il CEO non opera con opzioni o ETF short, per ora. Dal 15/10/2026 è l'**unica vendita automatica**
-  del libro (arancione e rosso non vendono): scatta una volta per discesa, senza un secondo gradino
-  dopo, e si riarma quando l'azionario torna al massimo. Lo calcola `numeri_libro.py`, blocco
-  «SALVAVITA».
+- **Livello di riferimento: −30%** — non è più una soglia che vende: è il livello su cui le previsioni del
+  portafoglio (§1septdecies) misurano la probabilità di un calo profondo, con la loro affidabilità misurata. Era
+  stato scelto col CEO il 14/10/2026 (v240), oltre il peggior calo dell'ultimo anno del libro guardato all'indietro
+  (−26%).
+- **Reazione**: **nessuna vendita automatica**. A qualunque calo la risposta è l'analisi finanziaria del momento —
+  conti, valutazione, credito, macro, tecnica, rischio — e la decide il CEO. Fino al 14/11/2026 la reazione era un
+  terzo dei semiconduttori in proporzione al rischio (il blocco «PIANO DI RIDUZIONE» di `numeri_libro.py`, che non
+  si stampa più). La misura la calcola `numeri_libro.py`, blocco «CALO DAL MASSIMO».
 
 ⚠ Due segnali della **stessa** famiglia sono un segnale solo (B3): SMH sotto la 50 e NVDA sotto la
 50 nello stesso giorno sono il prezzo che parla due volte, non due prove.
@@ -491,8 +498,8 @@ nome su cui la decisione era ancora aperta.
    seduta, spesso di più dell'oscillazione di una settimana intera. Una decisione ancora aperta il
    giorno prima della trimestrale va presa o dichiarata rimandata **di proposito**, non lasciata
    scadere.
-5. Il salvavita (§1ter) **scavalca** le scadenze: se scatta, si agisce secondo il suo gradino senza
-   aspettare la data. Dal 15/10/2026 arancione e rosso non portano vendite (decisione del CEO):
+5. Fino al 14/11/2026 il salvavita (§1ter) scavalcava le scadenze; il CEO l'ha eliminato: nessuna vendita
+   automatica. Dal 15/10/2026 arancione e rosso non portano vendite (decisione del CEO):
    restano un segnale, non un'azione.
 
 **Fotografia del 06/10/2026, solo come riferimento — non sono le soglie**: seduta tipica ±9.500 $,
@@ -560,7 +567,7 @@ risultato operativo contro gli interessi; (5) la diluizione. ⚠ Un'uscita in pe
 quanto valga dipende dal regime fiscale e dalle plusvalenze, che il sistema non conosce.
 ⚠ **15/10/2026 — il gradino dell'arancione del 14/10 NON è stato eseguito**, per decisione del CEO
 («mantenere le posizioni di Mu e amd e gli altri»), e la regola è cambiata lo stesso giorno:
-arancione e rosso non vendono più, resta il salvavita a −30% (§1ter).
+arancione e rosso non vendono più; il salvavita a −30% (§1ter), rimasto allora, è eliminato dal 14/11/2026.
 
 **Rimandate di proposito** (§1quater, regola 4: una decisione che aspetta un evento si dichiara,
 non si lascia scadere). Una riga per decisione nella forma «- TICKER — cosa si rimanda»;
@@ -602,6 +609,9 @@ decisione si prende.
 ⚠ **Dal 03/11/2026 gli esami non vendono** (decisione del CEO, §1undecies: *"2 no"*): la clausola «vendere» di CRWV
 resta scritta come lettura dei conti, non come azione — una tesi rotta si annota, non si vende, fino al recupero di
 tutti i rami secchi. L'unica vendita prima di allora è il salvavita (§1ter).
+⚠ **14/11/2026** — il CEO elimina «i rami secchi si tagliano dopo il recupero» e il salvavita (§0, §1undecies): gli
+esami restano una lettura dei conti; tenere, vendere o mediare lo dice l'analisi finanziaria del momento, e decide
+il CEO.
 
 `numeri_libro.py` (blocco «DECISIONI APERTE») calcola per ciascuna, a ogni analisi:
 - il **prezzo di conferma**, cioè la chiusura del giorno della conferma letta dalle barre — non
@@ -618,6 +628,9 @@ tutti i rami secchi. L'unica vendita prima di allora è il salvavita (§1ter).
 
 ⚠ **03/11/2026 — la vendita per EVIDENZA è sospesa** fino al recupero di tutti i rami secchi (decisione del CEO, §1undecies):
 l'esito della tenuta resta calcolato e riportato come informazione; l'unica vendita è il salvavita (§1ter).
+⚠ **14/11/2026** — il CEO elimina la regola dei rami secchi e il salvavita (§0, §1undecies): la sospensione non ha
+più la sua condizione. L'esito della tenuta resta un'informazione per l'analisi finanziaria; una vendita la propone
+l'analisi e la decide il CEO. Nel libro non c'è nessuna vendita automatica.
 
 Istruzione del CEO, testuale: *"Se ci sono parametri tali, per cui in ottica di lungo periodo,
 lasciar correre mu può portare a ottimi rendimenti, tenendo conto anche dell'interesse composto
@@ -743,7 +756,10 @@ lo fa il broker in euro col cambio di carico, e regime fiscale e minusvalenze pr
 nel sistema. Per una posizione in perdita la minusvalenza vale solo se ci sono plusvalenze da
 compensare.
 
-**Il semaforo resta un segnale del libro; la sua sola vendita automatica è il salvavita**
+⚠ **14/11/2026** — il salvavita è eliminato (§1ter): il paragrafo qui sotto resta come storia, oggi non c'è nessun
+gradino automatico.
+
+**Il semaforo resta un segnale del libro; fino al 14/11/2026 la sua sola vendita automatica era il salvavita**
 (decisione del CEO del 15/10/2026: «non vendi sui ribassi ma sui massimi»). In arancione e in rosso
 il colore entra qui come prova CONTRO per ogni nome (famiglia macro), non come vendita. L'unico
 gradino automatico è il **salvavita** a −30% dal massimo dell'azionario (§1ter), qualunque sia il
@@ -1046,9 +1062,16 @@ momentaneamente il progetto"*). La richiesta dell'11/11 sugli stop è ora un com
 Valore 2028 è **ancora in portafoglio**. Le posizioni di §1 sono confermate al 14/11/2026
 (`config/posizioni.json` porta la stessa data).
 
+**Decisione del 14/11/2026** (CEO: *"i rami secchi si tagliano dopo il recupero e regola 30% eliminale andiamo in
+ottica di analisi finanziaria non regole rigide"*):
+**eliminate** la regola del 03/11 («i rami secchi si tagliano solo dopo che tutti hanno recuperato») e il salvavita a
+−30% (§1ter). Nel libro non c'è più nessuna vendita automatica e nessuna vendita vietata: RGTI, CRWV, MSTR e ORCL si
+giudicano come ogni altra posizione, con l'analisi finanziaria del momento (conti, valutazione, credito, macro,
+tecnica, rischio), e decide il CEO. Restano le MISURE: il calo dal massimo, l'esito della tenuta, le tesi
+(§1novodecies). La domanda del 14/11 sul −30% cade con la regola.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 14/11/2026 | Al −30% dal massimo (salvavita, §1ter; il 13/11 manca un altro −8,8%): si esegue la vendita del sistema, solo i tagli dello «scenario B» chiesto il 14/11 (prima i rami secchi, poi MU, AMD e NVDA al 15%), o niente? | la vendita del sistema prende i titoli in utile e paga l'imposta; con le perdite dei rami secchi realizzate PRIMA l'imposta scende; le regole sono guide (07/11) e la scelta è del CEO | il CEO sceglie |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
@@ -1420,7 +1443,7 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - perché: compra bitcoin con debito e nuove azioni: una scommessa a leva su bitcoin, l'unico nome lontano dall'AI
 - deve essere vero: (1) la cassa copre interessi e dividendi per oltre 24 mesi {cassa>=24}; (2) ai conti, il valore di borsa resta sopra il valore dei bitcoin posseduti (le nuove azioni creano valore); (3) ai conti, i bitcoin per azione crescono trimestre su trimestre
 - romperebbe: (1) valore di borsa sotto il valore dei bitcoin posseduti; (2) cassa per meno di 12 mesi; (3) bitcoin per azione in calo
-- verdetto (08/11/2026): GUARDARE — ramo secco (§1undecies): niente medie
+- verdetto (14/11/2026): GUARDARE — segue bitcoin ed emette azioni nuove: si giudica con l'analisi del momento
 
 ### PLTR
 - perché: software di AI per governi e aziende
@@ -1432,7 +1455,7 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - perché: data center per l'AI in affitto, finanziati a debito, con pochi grandi clienti
 - deve essere vero: (1) ai conti, il debito in scadenza entro 12 mesi e gli investimenti già firmati sono coperti da finanziamenti chiusi (l'esame di §1quinquies); (2) ricavi a un anno sopra +50% {ricavi>=50}; (3) stime a 90 giorni non in calo oltre il 10% {stime>=-10}
 - romperebbe: (1) finanziamento non coperto: nuove azioni o debito caro; (2) un grande cliente che riduce i contratti; (3) il CDS che continua a salire più dell'indice dopo i conti
-- verdetto (08/11/2026): PREOCCUPA — ramo secco: si legge ai conti del 10/11, niente medie prima
+- verdetto (14/11/2026): PREOCCUPA — crescita forte ma debito pesante: si rilegge a ogni trimestre
 
 ### GOOGL — ⚠ investitore di Anthropic
 - perché: ricerca, cloud, YouTube e modelli di AI propri, con la cassa per finanziarli
@@ -1444,7 +1467,7 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - perché: calcolo quantistico; ricavi ancora piccoli, la scommessa è sulla tecnologia
 - deve essere vero: (1) cassa per oltre 24 mesi {cassa>=24}; (2) ai conti, il programma dei processori rispetta i tempi dichiarati; (3) ai conti, nessuna grande emissione di azioni sotto il prezzo di mercato
 - romperebbe: (1) cassa sotto 24 mesi; (2) ritardi del programma; (3) nuove emissioni grandi
-- verdetto (08/11/2026): PREOCCUPA — ramo secco: si tiene, niente medie
+- verdetto (14/11/2026): PREOCCUPA — ricavi piccoli e in perdita, cassa lunga: una scommessa piccola
 
 ### BE
 - perché: celle a combustibile per l'energia dei data center
@@ -1462,7 +1485,7 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - perché: database e cloud; investimenti enormi in data center, finanziati a debito
 - deve essere vero: (1) ricavi a un anno sopra +15% {ricavi>=15}; (2) cassa e finanziamenti per almeno 6 mesi di investimenti {cassa>=6}; (3) ai conti, i contratti firmati crescono e sono meno concentrati su un cliente
 - romperebbe: (1) il rating del debito sotto il grado d'investimento; (2) un grande cliente che riduce i contratti; (3) cassa per meno di 3 mesi di investimenti
-- verdetto (08/11/2026): PREOCCUPA — ramo secco
+- verdetto (14/11/2026): PREOCCUPA — cassa corta e debito alto: si rilegge ai conti
 
 ### WDC
 - perché: dischi rigidi per i data center: lo spazio dove l'AI conserva i dati
@@ -1501,8 +1524,9 @@ cuscinetto e niente risparmi mensili.
 - **Cuscinetto per la vita: nessuno** (CEO, 08/11: *"niente zero nada"*). L'unica parte fuori dalle azioni è il BTP
   Valore 2028 (40.000 nominali, §1): se servisse denaro, il sistema lo indica come primo da usare, prima di vendere
   azioni in un calo.
-- **Piano di calo** (dal massimo del 09/10/2026): a −20% si rileggono le tesi, nessuna vendita; a −30% il salvavita
-  (§1ter): il sistema propone il piano di riduzione, decide il CEO; a −40% revisione straordinaria: si tiene ciò che ha
+- **Piano di calo** (dal massimo del 09/10/2026): a −20% si rileggono le tesi, nessuna vendita; a −30% **nessuna vendita
+  automatica** (il salvavita è eliminato dal 14/11/2026, §1ter): si decide con l'analisi del momento; a −40% revisione
+  straordinaria: si tiene ciò che ha
   le condizioni rispettate, e dove due condizioni su tre sono violate si propone l'uscita sul primo rimbalzo.
 - **La parte diversificata**: la base è un ETF azionario globale a basso costo; poi settori lontani dall'AI (salute,
   consumi, energia, finanza), a tappe. Gli strumenti si scelgono col CEO (comando DIVERSIFICA).

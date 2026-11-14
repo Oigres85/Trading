@@ -2964,8 +2964,7 @@ check("v484 piano: un nome non si vende OLTRE la posizione e l'eccedenza va agli
       "negativo non si vende; quello che non trova posto si DICHIARA, non sparisce",
       _rc484["XXX"]["azioni"] == 3 and abs(_rc484["YYY"]["teorico"] - (1000 / 3 - 30)) < 1e-6 and not _cap484["non_ripartito"]
       and _nul484["righe"][1]["nullo"] and _nul484["righe"][1]["azioni"] == 0
-      and abs(_nul484["non_ripartito"] - 100) < 1e-6
-      and "non trovano posto" in "\n".join(NL.righe_piano(_nul484, "arancione")),
+      and abs(_nul484["non_ripartito"] - 100) < 1e-6,
       str((_rc484, _nul484["non_ripartito"])))
 _rng484 = np.random.default_rng(484)
 _R484 = _rng484.normal(0, 0.02, (250, 2))
@@ -2974,41 +2973,27 @@ _pr484 = NL.piano_riduzione(["A1", "A2"], {"A1": 700.0, "A2": 300.0}, {"A1": 70,
 _C484 = np.cov(_R484, rowvar=False) * 252
 _v0 = np.array([700.0, 300.0])
 check("v484 piano: il rischio prima e' sqrt(v'Cv) annuo sulla stessa matrice (rifatto qui in modo indipendente), e dopo "
-      "la vendita e' minore; senza rendimenti il rischio e' n.d. e la resa lo dice",
+      "la vendita e' minore; senza rendimenti il rischio non si calcola (None)",
       abs(_pr484["rischio"]["prima"] - math.sqrt(_v0 @ _C484 @ _v0)) < 1e-9
-      and _pr484["rischio"]["dopo"] < _pr484["rischio"]["prima"] and _p484["rischio"] is None
-      and "rischio prima e dopo n.d." in "\n".join(NL.righe_piano(_p484, "giallo")))
-_rg484 = "\n".join(NL.righe_piano(_p484, "giallo"))
-_ra484 = "\n".join(NL.righe_piano(_p484, "arancione"))
-_rs484 = "\n".join(NL.righe_piano(_p484, "giallo", {"scattato_il": "2026-10-20"}))
-# v486 — RIAGGANCIATO, non zittito: pretendeva «DA ESEGUIRE» in arancione, cioe' la regola che il CEO ha cambiato il
-#   15/10 alle due domande («Solo il salvavita», «Solo col semaforo acceso»). L'invariante nuovo si percorre su TUTTI
-#   gli stati, non su quello comodo (v419, v420): DA ESEGUIRE se e solo se il salvavita e' scattato, in ogni colore —
-#   un salvavita scattato in giallo vende, un arancione senza salvavita no, e lo dice.
-_stati486 = [(c, s) for c in ("verde", "giallo", "arancione", "rosso", None)
-             for s in (None, {"scattato_il": None}, {"scattato_il": "2026-10-20"})]
-_sbagliati486 = []
-for _c486, _s486 in _stati486:
-    if ("DA ESEGUIRE" in "\n".join(NL.righe_piano(_p484, _c486, _s486))) != bool((_s486 or {}).get("scattato_il")):
-        _sbagliati486.append(f"{_c486}/{_s486}")
-_rr486 = "\n".join(NL.righe_piano(_p484, "rosso"))
-check("v486 resa del piano: DA ESEGUIRE se e solo se il salvavita e' scattato, in OGNI colore (15 stati); arancione e "
-      "rosso senza salvavita dicono di essere un segnale e non una vendita; nome per nome con azioni e imposta; chi e' "
-      "fuori dal piano si nomina; non e' una raccomandazione; senza elenco si dichiara",
-      not _sbagliati486 and "si esegue SOLO col salvavita scattato" in _rg484
-      and "il semaforo arancione è un segnale, non una vendita" in _ra484 and "DA ESEGUIRE: il salvavita è scattato" in _rs484
-      and "il semaforo rosso è un segnale, non una vendita" in _rr486
-      and "un segnale, non una vendita" not in _rg484 and "il prossimo è il rosso" not in _ra484
-      and "AAA   vendere 22 azioni" in _rg484
-      and "fuori dal piano (non nell'elenco dei semiconduttori): FUO" in _rg484 and "non una raccomandazione" in _rg484
-      and "NON calcolato" in NL.righe_piano(NL.piano_riduzione(None, {}, {}, {}, {}, {}))[0],
-      "stati sbagliati: " + ", ".join(_sbagliati486) + "\n" + _ra484)
+      and _pr484["rischio"]["dopo"] < _pr484["rischio"]["prima"] and _p484["rischio"] is None)
+# v543 — 14/11/2026: il CEO elimina il salvavita e il suo gradino («andiamo in ottica di analisi finanziaria non
+#   regole rigide»). Il piano in parole non esiste piu' (v486 pretendeva «DA ESEGUIRE» col salvavita scattato): resta
+#   il CALCOLO, che da' alla sintesi il peso dei semiconduttori. Che la sintesi non stampi nessun piano si prova
+#   piu' sotto eseguendola, col calo oltre il livello di riferimento.
+check("v543 il piano in parole non esiste piu' (il CEO ha eliminato il salvavita e il suo gradino il 14/11/2026): "
+      "nessuna funzione lo rende; il calcolo resta, nome per nome, e da' il peso dei semiconduttori; senza elenco "
+      "si dichiara",
+      not hasattr(NL, "righe_piano") and _p484.get("peso_semi_prima") is not None
+      and {r["tk"]: r["azioni"] for r in _p484["righe"]}.get("AAA") == 22 and "FUO" in _p484["fuori_piano"]
+      and bool(NL.piano_riduzione(None, {}, {}, {}, {}, {}).get("errore")),
+      str({k: _p484.get(k) for k in ("peso_semi_prima", "venduto", "fuori_piano")}))
 _rz484 = NL.reazioni_libro(_lib474)
 
 
 def _reazione_salvavita486(testo):
-    """La riga «- **Reazione**» del salvavita in LIBRO.md §1ter, con le sue righe di continuazione."""
-    i = testo.find("**Il salvavita sul patrimonio**")
+    """La riga «- **Reazione**» del calo dal massimo (fino al 14/11/2026: il salvavita) in LIBRO.md §1ter, con le
+    sue righe di continuazione."""
+    i = testo.find("**Il calo dal massimo**")
     j = testo.find("- **Reazione**", i) if i >= 0 else -1
     if j < 0:
         return ""
@@ -3026,11 +3011,13 @@ _rsv486 = _reazione_salvavita486(_lib474)
 #   terzo…»), e il check vecchio passava ancora leggendo la storia invece della regola: l'ottava volta che un gate
 #   trova la prosa che spiega il cambiamento (v213, v240, v393, v395, v418). Il gradino oggi vive nella reazione del
 #   SALVAVITA; arancione e rosso devono dire «nessuna vendita».
-check("v486 il gradino del codice e' QUELLO del libro: un terzo dei semiconduttori in proporzione al rischio, nella "
-      "reazione del SALVAVITA, che e' l'unica vendita automatica; arancione e rosso dicono «nessuna vendita» "
-      "(LIBRO.md §1ter, letto dal libro come le soglie del v474)",
-      abs(NL.QUOTA_GRADINO - 1 / 3) < 1e-12 and "un terzo dei semiconduttori" in _rsv486
-      and "in proporzione al rischio" in _rsv486 and "unica vendita automatica" in _rsv486
+# v543 — RIAGGANCIATO: pretendeva nel libro «l'unica vendita automatica» e il gradino di un terzo. Il 14/11/2026 il
+#   CEO ha eliminato il salvavita: la reazione scritta nel libro e' l'analisi del momento, e nessuna vendita scatta.
+check("v543 il libro dice che NON c'e' nessuna vendita automatica: la reazione al calo dal massimo e' l'analisi "
+      "finanziaria del momento (il salvavita e il suo gradino sono eliminati, CEO 14/11/2026); arancione e rosso "
+      "dicono «nessuna vendita» (LIBRO.md §1ter, letto dal libro come le soglie del v474)",
+      "nessuna vendita automatica" in _rsv486 and "analisi finanziaria" in _rsv486
+      and "unica vendita automatica" not in _rsv486 and "scatta una volta" not in _rsv486
       and "nessuna vendita" in _rz484.get("arancione", "") and "nessuna vendita" in _rz484.get("rosso", ""),
       _rsv486[:300] + " | " + str(_rz484.get("arancione", ""))[:200])
 
@@ -3058,17 +3045,21 @@ check("v484 salvavita: scatta UNA volta per discesa (risalire sopra la soglia se
       and NL.salvavita(_reg484[:2], _rg484f("2026-10-02", {"A": 10}, {"A": 50.0}))["provvisoria"] is False
       and NL.salvavita(_reg484[:2], _rg484f("2026-10-05", {"A": 10}, {"A": 50.0}))["scattato_il"] == "2026-10-05",
       str(_sv6))
-_m484 = re.search(r"\*\*Soglia: [−-](\d+)%\*\*", _lib474)
-check("v484 la soglia del salvavita nel codice e' QUELLA di LIBRO.md §1ter, letta dal libro (v474: una regola in due "
-      "posti diverge)",
+_m484 = re.search(r"\*\*Livello di riferimento: [−-](\d+)%\*\*", _lib474)
+check("v543 il livello di riferimento del calo nel codice e' QUELLO di LIBRO.md §1ter, letto dal libro (v474: un "
+      "numero in due posti diverge) — dal 14/11/2026 non e' piu' una soglia che vende",
       _m484 is not None and abs(-int(_m484.group(1)) / 100 - NL.SOGLIA_SALVAVITA) < 1e-9,
       str(_m484.group(0) if _m484 else None))
 _rsv5 = "\n".join(NL.righe_salvavita(_sv5))
 _rsv3 = "\n".join(NL.righe_salvavita(_sv3))
-check("v484 resa del salvavita: scattato va in cima con la data, il massimo e il gradino da eseguire; altrimenti dice "
-      "quanto manca da qui; non misurabile si dichiara",
-      "SALVAVITA SCATTATO il 2026-10-06" in _rsv5 and "PIANO DI RIDUZIONE" in _rsv5 and "va in cima alla risposta" in _rsv5
-      and "scatta a -30%" in _rsv3 and "un altro -30" in _rsv3
+_parole543 = ("SCATTATO", "scatta", "DA ESEGUIRE", "PIANO DI RIDUZIONE", "va in cima", "soglia", "gradino")
+check("v543 resa del calo dal massimo: una MISURA in ogni stato — anche col calo passato oltre il livello di "
+      "riferimento (qui -27% dopo un -32%) non c'e' ne' una soglia che scatta ne' una vendita; dice il calo, il "
+      "massimo e il peggior calo, e dichiara che non c'e' vendita automatica; non misurabile si dichiara",
+      _sv5["scattato_il"] == "2026-10-06" and _rsv5.startswith("CALO DAL MASSIMO") and _rsv3.startswith("CALO DAL MASSIMO")
+      and "-27,27% dal massimo del 2026-10-05" in _rsv5 and "peggior calo dal 2026-10-01: -31,82%" in _rsv5
+      and "nessuna vendita automatica" in _rsv5 and "nessuna vendita automatica" in _rsv3
+      and not [p for p in _parole543 if p in _rsv5 + _rsv3]
       and "NON MISURABILE" in NL.righe_salvavita(NL.salvavita([]))[0], _rsv5 + "\n" + _rsv3)
 
 # --- la scadenza dei conflitti e gli esami scritti prima ---
@@ -3099,22 +3090,27 @@ check("v484 resa: la scadenza esce sotto ogni CONFLITTO e sotto nessun altro esi
       _rtn484.count("scadenza (LIBRO.md §1sexies") == sum(1 for r in _tn484["righe"] if r["esito"] == NL.CONFLITTO) == 1
       and "si decide coi conti del 2026-11-09 (26 g)" in _rtn484 and "con l'esame scritto prima" in _rtn484, _rtn484[-700:])
 
-# --- collegamento (v399, v443): calcola produce piano, salvavita ed esami; la sintesi li STAMPA sotto il semaforo ---
+# --- collegamento (v399, v443): calcola produce piano, calo ed esami; la sintesi STAMPA il calo sotto il semaforo ---
 _o484 = {**_o483, "salvavita": _sv5, "piano": _p484, "semaforo": None}
 _sint484 = NL.sintesi(_o484)
-check("v484 collegamento: calcola produce il piano dall'elenco del libro, il salvavita dal registro e le scadenze dei "
-      "conflitti; la sintesi stampa salvavita e piano PRIMA del resto — provato eseguendola, non leggendo il sorgente (v234)",
+check("v543 collegamento: calcola produce il piano (per il peso dei semiconduttori), il calo dal registro e le "
+      "scadenze dei conflitti; la sintesi stampa il CALO DAL MASSIMO prima del resto e NESSUN piano di vendita, "
+      "nemmeno col calo oltre il livello di riferimento — provato eseguendola, non leggendo il sorgente (v234)",
       'out["piano"] = piano_riduzione(semiconduttori_libro(), val, qty, px, pmc, ris["mcr"], R, lunghi)' in _calc474 and 'out["salvavita"] = salvavita(' in _calc474
       and 'out["esami"] = leggi_esami()' in _calc474 and 'con_scadenze(out["tenuta"], scad, out["esami"]' in _calc474
-      and "SALVAVITA SCATTATO" in _sint484 and "PIANO DI RIDUZIONE" in _sint484
-      and _sint484.find("SALVAVITA") < _sint484.find("PIANO DI RIDUZIONE") < _sint484.find("Periodo "), _sint484[:500])
+      and bool(_sv5["scattato_il"]) and bool(_p484.get("venduto"))
+      and 0 <= _sint484.find("CALO DAL MASSIMO") < _sint484.find("Periodo ")
+      and not [p for p in ("PIANO DI RIDUZIONE", "SCATTATO", "DA ESEGUIRE", "AAA   vendere") if p in _sint484],
+      _sint484[:500])
 # ⚠ v512 — la fine si cerca DOPO l'inizio: «00bis.» (il passo delle fonti per titolo in «Come si produce») contiene
 #   «0bis.», e la prima stesura prendeva quello — l'ancoraggio aperto, nella sonda di un gate (v422)
 _i0_484 = _fmt481.find("0. **Semaforo d'uscita**")
 _s0_484 = _fmt481[_i0_484:_fmt481.find("\n0bis.", _i0_484)]
-check("v484 il formato porta salvavita e piano nella sezione 0, la scadenza e l'esame dei conflitti nella sezione 6, e il "
-      "registro delle richieste le elenca (analisi.py stampa la checklist da qui)",
-      "SALVAVITA" in _s0_484 and "PIANO DI RIDUZIONE" in _s0_484 and "esame scritto prima" in _s6_481
+check("v543 il formato porta il calo dal massimo nella sezione 0 e dichiara ELIMINATI il salvavita e il suo piano "
+      "(nessuna vendita automatica); la scadenza e l'esame dei conflitti restano nella sezione 6, e il registro "
+      "delle richieste li elenca (analisi.py stampa la checklist da qui)",
+      "CALO DAL MASSIMO" in _s0_484 and "ELIMINATI" in _s0_484 and "nessuna vendita automatica" in _s0_484
+      and "SCATTATO" not in _s0_484 and "esame scritto prima" in _s6_481
       and "salvavita" in _fmt481.split("Richieste del CEO rese strutturali")[1][:3500])
 _es484_lib = NL.leggi_esami(_lib474)
 check("v484 il libro vero si legge: la sezione delle decisioni c'e', e ogni esame ha un ticker (lo stato degli esami non "
@@ -3228,7 +3224,8 @@ _q1486 = _lib474[_lib474.find("## 1quinquies"):_lib474.find("\n## ", _lib474.fin
 check("v486 la decisione del 15/10 e' nel libro, con le parole del CEO: nella reazione dell'arancione e fra le "
       "decisioni (§1quinquies) — una decisione riassunta a memoria cambia verso senza rompere niente (v474)",
       "non vendi sui ribassi ma sui massimi" in _rz484.get("arancione", "") and "15/10/2026" in _rz484.get("arancione", "")
-      and "NON è stato eseguito" in _q1486 and "15/10/2026" in _q1486 and "una volta per discesa" in _rsv486,
+      and "NON è stato eseguito" in _q1486 and "15/10/2026" in _q1486
+      and "nessuna vendita automatica" in _rsv486,     # v543: il salvavita «una volta per discesa» e' eliminato
       _q1486[-500:])
 
 # ================================================================ v487 — i pavimenti: entrare sui minimi
@@ -6875,8 +6872,7 @@ _U505 = {
     "numeri_libro": [
         "SEMAFORO D'USCITA — 🟠 ARANCIONE · famiglie accese: prezzo", "  prezzo: SMH chiusura 539,79 — ACCESO",
         "  leva: margin debt FINRA di settembre 2026 +1,8% sul mese — spento · sull'anno +31,4%",
-        "SALVAVITA (LIBRO.md §1ter) — azionario -12,79% dal massimo", "PIANO DI RIDUZIONE — il gradino del salvavita",
-        "  AAA   vendere 3 azioni = 300 $ (10% della posizione)",
+        "CALO DAL MASSIMO (LIBRO.md §1ter: una misura, nessuna vendita automatica) — azionario -12,79% dal massimo",
         "Periodo 2026-10-15 -> 2026-10-16 (1 seduta) · azionario 1.000 $", "Libro -1,00% · QQQ -0,50%",
         "REGISTRO DELLA PERFORMANCE contro QQQ — dal 2026-10-09", "  libro azionario in dollari -1% · QQQ -0,5%",
         "Vol 40,0% · VaR95 4,0% · ES95 5,0%", "Beta libro: QQQ 2,0 (R² 0,8)",
@@ -11626,6 +11622,53 @@ check("v542 i dati delle riserve si caricano UNA volta anche da otto thread insi
       "l'11/11 il brief e' uscito 0 con l'uscita vuota perche' due redirect intrecciati l'avevano lasciata zittita: "
       + str((_cont542["n"], len(_esc542), _stesso542)),
       _cont542["n"] == 1 and len(_esc542) == 8 and all(x.get("caricato") for x in _esc542) and _stesso542)
+
+
+# ════════════════════════════════════════════════════════ v543 — le due regole eliminate dal CEO (14/11/2026)
+# Il CEO, testuale: «i rami secchi si tagliano dopo il recupero e regola 30% eliminale andiamo in ottica di analisi
+# finanziaria non regole rigide». Il salvavita a -30% e la regola dei rami secchi non esistono piu': il calo dal massimo
+# resta una MISURA, e nessuna superficie del sistema promette una vendita. Lo stato si costruisce (v429): il calo e'
+# quello della fixture v484, passato oltre il livello di riferimento, con un piano calcolato che prima si stampava.
+import tesi as _TS543
+
+_lib543 = {"salvavita": dict(_sv5), "piano": dict(_p484), "semaforo": {"colore": "arancione", "accesi": ["prezzo"]}}
+_rs543 = "\n".join(SI524.resa(_lib543, {k: SI524._luce("🟡", ["d"], "x") for k, _ in SI524.FAMIGLIE},
+                              {c: [] for c in SI524.CASELLE}, ["x"], None, [], [], [], [], None, [], _ad525))
+_riga543 = next((r for r in _rs543.splitlines() if "semaforo ARANCIONE" in r), "")
+check("v543 la sintesi operativa: nel «libro nel regime» il calo dal massimo e' una misura — col calo passato oltre il "
+      "livello di riferimento e un piano calcolato non dice ne' «scatta» ne' quanto si venderebbe; senza misura lo "
+      "dichiara: " + _riga543.strip()[:160],
+      bool(_sv5["scattato_il"]) and bool(_p484.get("venduto"))
+      and "calo dal massimo del 05/10" in _riga543 and "27,27%" in _riga543
+      and not [p for p in ("scatta", "vendita di", "imposta", "salvavita") if p in _riga543]
+      and "calo dal massimo non misurato" in _rs525v)
+
+_sup543 = {n: _solo_codice_py((Path(NL.__file__).resolve().parent / n).read_text(encoding="utf-8"))
+           for n in ("numeri_libro.py", "sintesi.py", "rotazione.py", "previsioni_portafoglio.py", "scheda.py")}
+_frasi543 = ("unica vendita automatica", "salvavita scatta", "salvavita è scattato", "salvavita e' gia' scattato",
+             "se scattasse", "DA ESEGUIRE", "piano_riduzione\", \"copia")
+check("v543 nessuna superficie promette piu' una vendita che scatta: tolti commenti e docstring, i cinque sorgenti che "
+      "stampano il calo non portano le frasi della regola eliminata; l'evento delle previsioni e' «il calo dal massimo "
+      "arriva a», e la scheda raccoglie il blocco col nome nuovo: "
+      + str({n: [f for f in _frasi543 if f in s] for n, s in _sup543.items() if [f for f in _frasi543 if f in s]}),
+      not [1 for s in _sup543.values() for f in _frasi543 if f in s]
+      and "il calo dal massimo arriva a" in _sup543["previsioni_portafoglio.py"]
+      and 'Blocco(r"CALO DAL MASSIMO", "salvavita")' in _sup543["scheda.py"])
+
+_cl543 = (Path(NL.__file__).resolve().parent.parent / "CLAUDE.md").read_text(encoding="utf-8")
+_r5_543 = _cl543[_cl543.find("5. **Investimento"):_cl543.find("6. **Conflitti d'interessi")]
+_z0_543 = _lib474[_lib474.find("## 0. "):_lib474.find("## 1. ")]
+_dm543 = _lib474[_lib474.find("## 1undecies"):_lib474.find("## 1duodecies")]
+_td543 = _TS543.leggi_tesi(_lib474)
+check("v543 libro e istruzioni dicono la stessa cosa del codice: la regola 5 e il §0 dichiarano eliminati il salvavita e la "
+      "regola dei rami secchi (nessuna vendita automatica, decide l'analisi), §1undecies porta la decisione del 14/11 e "
+      "non tiene aperta la domanda sul -30%, e nessun verdetto delle tesi cita la regola eliminata: "
+      + str([tk for tk, x in _td543.items() if "ramo secco" in (x.get("verdetto") or "")]),
+      "nessuna vendita automatica" in _r5_543 and "ELIMINATI" in _r5_543 and "analisi" in _r5_543
+      and "unica vendita automatica" not in _r5_543 and "dopo il recupero di tutti" not in _r5_543
+      and "14/11/2026 — due regole eliminate" in _z0_543 and "nessuna vendita automatica" in _z0_543
+      and "**Decisione del 14/11/2026**" in _dm543 and "| 14/11/2026 | Al −30%" not in _dm543
+      and len(_td543) >= 15 and not [tk for tk, x in _td543.items() if "ramo secco" in (x.get("verdetto") or "")])
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

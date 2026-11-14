@@ -22,16 +22,20 @@ v474 (decisioni del CEO del 09/10/2026) — tre blocchi nuovi, tutti CALCOLATI q
                       scelto dal CEO, a rendimento ponderato per il tempo (LIBRO.md §0).
 
 v484 (decisioni del CEO del 14/10/2026, sera) — tre blocchi nuovi, anche questi CALCOLATI qui:
-  SALVAVITA           il calo dell'azionario dal suo massimo sul rendimento ponderato per il tempo del
-                      registro; a -30% scatta il gradino di riduzione, qualunque sia il colore;
-  PIANO DI RIDUZIONE  il gradino del salvavita calcolato PRIMA: un terzo dei semiconduttori del
-                      libro, in proporzione al rischio di ciascuno — azioni intere, imposta, rischio
-                      in dollari prima e dopo;
+  CALO DAL MASSIMO    il calo dell'azionario dal suo massimo sul rendimento ponderato per il tempo del
+                      registro: una MISURA (fino al 14/11/2026 era il «salvavita», con una vendita a -30%);
+  PIANO DI RIDUZIONE  un terzo dei semiconduttori del libro in proporzione al rischio di ciascuno: dal
+                      14/11/2026 NON si stampa piu' (era il gradino del salvavita); resta il calcolo, che
+                      da' alla sintesi il peso dei semiconduttori;
   SCADENZE            ogni CONFLITTO con i suoi conti successivi e l'esame scritto prima (§1quinquies).
 
 v486 (decisione del CEO del 15/10/2026, «non vendi sui ribassi ma sui massimi») — al primo arancione
 il gradino non e' stato eseguito e la regola e' cambiata: arancione e rosso restano COLORI (un segnale,
 e una prova CONTRO nella tenuta) ma non vendono piu'. Il piano si esegue solo col salvavita scattato.
+
+v543 (decisione del CEO del 14/11/2026, «andiamo in ottica di analisi finanziaria non regole rigide») — il
+salvavita a -30% e' ELIMINATO come regola: nessuna vendita automatica, in nessuno stato. Il calo dal massimo
+resta una misura, e il suo vecchio gradino non si stampa piu'.
 """
 import argparse, json, math, re, sys
 from concurrent.futures import ThreadPoolExecutor
@@ -816,7 +820,7 @@ def righe_semaforo(s, precedente=None, mcr=None):
              f"  ⚠ reazione {ARTICOLO[s['colore']]} NON letta da LIBRO.md §1ter: la regola va riletta a mano")
     if s["colore"] in ("arancione", "rosso") and mcr:
         L.append("  chi pesa di più nel rischio oggi (contributo di Euler) — un'informazione, non una vendita: dal "
-                 "15/10/2026 arancione e rosso non vendono, l'unica vendita automatica è il salvavita (LIBRO.md §1ter): "
+                 "15/10/2026 arancione e rosso non vendono, e dal 14/11/2026 non c'è nessuna vendita automatica (LIBRO.md §1ter): "
                  + " · ".join(f"{t} {_it(v * 100, 1)}%" for t, v in sorted(mcr.items(), key=lambda x: -x[1])[:4]))
     return L
 
@@ -2150,7 +2154,7 @@ def righe_tenuta(t):
                  "può cambiare nei versi indicati sulla riga")
     if col in ("arancione", "rosso"):
         L.append(f"  ⚠ semaforo {col}: è una prova CONTRO per ogni nome (famiglia macro), non una vendita — dal 15/10/2026 "
-                 "arancione e rosso non vendono, l'unica vendita automatica è il salvavita (LIBRO.md §1ter)")
+                 "arancione e rosso non vendono, e dal 14/11/2026 non c'è nessuna vendita automatica (LIBRO.md §1ter)")
     vend = [r for r in t["righe"] if r["esito"] == "VENDITA PER EVIDENZA"]
     gia = [r["tk"] for r in vend if r["vendita_aperta"]]
     nuove = [r["tk"] for r in vend if not r["vendita_aperta"]]
@@ -3043,8 +3047,12 @@ def righe_registro(reg):
 # v486 — 15/10/2026: l'arancione e' arrivato e il CEO non ha eseguito il gradino («non vendi sui ribassi ma
 # sui massimi»); alle due domande ha risposto «Solo il salvavita» e «Solo col semaforo acceso». Quindi il
 # gradino resta, calcolato ogni giorno, ma si esegue SOLO col salvavita scattato: arancione e rosso no.
-QUOTA_GRADINO = 1 / 3        # «un terzo dei semiconduttori», il gradino del salvavita: LIBRO.md §1ter
-SOGLIA_SALVAVITA = -0.30     # convenzione scelta col CEO il 14/10 (v240): un gate la rilegge dal libro
+# v543 — 14/11/2026: il CEO elimina il salvavita («andiamo in ottica di analisi finanziaria non regole rigide»).
+# Il calo dal massimo resta una MISURA; la quota e' solo l'aritmetica di piano_riduzione (che non si stampa piu'
+# e da' alla sintesi il peso dei semiconduttori); il -30% e' un LIVELLO DI RIFERIMENTO per le previsioni del
+# portafoglio, senza nessuna vendita collegata.
+QUOTA_GRADINO = 1 / 3        # «un terzo dei semiconduttori»: aritmetica, non piu' una regola (v543)
+SOGLIA_SALVAVITA = -0.30     # livello di riferimento del calo (v543): un gate lo rilegge dal libro
 GIORNI_ESAME = 7             # l'esame di un conflitto si manda al CEO la settimana prima dei conti
 
 
@@ -3127,65 +3135,6 @@ def piano_riduzione(semi, val, qty, px, pmc, mcr, R=None, nomi_R=None, quota=QUO
     return out
 
 
-def righe_piano(p, colore=None, salv=None):
-    """Il piano in parole. Da eseguire SOLO col salvavita scattato (v486, decisione del CEO del 15/10/2026:
-    arancione e rosso non vendono piu'): in ogni altro caso si stampa perche' la reazione si decide prima
-    (§1ter), e il colore si nomina perche' chi legge non lo scambi per un ordine."""
-    if not p:
-        return []
-    if p.get("errore"):
-        return [f"PIANO DI RIDUZIONE: NON calcolato — {p['errore']}"]
-    pc = lambda x, d=1: "n.d." if x is None else _it(x * 100, d)
-    attivo = bool((salv or {}).get("scattato_il"))
-    L = [("⚠⚠ " if attivo else "") + "PIANO DI RIDUZIONE — il gradino del salvavita, calcolato prima "
-         "(LIBRO.md §1ter, decisioni del CEO del 14/10/2026: un terzo dei semiconduttori, in proporzione al rischio di "
-         f"ciascuno; e del 15/10/2026: arancione e rosso non vendono) · semaforo {colore or 'n.d.'}"
-         + (" · DA ESEGUIRE: il salvavita è scattato" if attivo else
-            " · si esegue SOLO col salvavita scattato"
-            + (f" — il semaforo {colore} è un segnale, non una vendita" if colore in ("arancione", "rosso") else ""))]
-    if not p["presenti"]:
-        L.append("  nessun semiconduttore dell'elenco di LIBRO.md §1ter è in portafoglio: il gradino non ha niente da togliere")
-    else:
-        L.append(f"  semiconduttori del libro (elenco di LIBRO.md §1ter): {', '.join(p['presenti'])} = {_it(p['totale'], 0)} $ "
-                 f"({pc(p['peso_semi_prima'])}% dell'azionario) · un terzo = {_it(p['obiettivo'], 0)} $")
-        for r in sorted(p["righe"], key=lambda x: -x["venduto"]):
-            if r["per_peso"]:
-                perche = "fuori matrice: il suo rischio non si misura, si taglia per PESO"
-            elif r["nullo"]:
-                perche = f"contributo al rischio {pc(r['mcr'])}%: toglierlo non toglie rischio, non si vende"
-            else:
-                perche = f"rischio {pc(r['mcr'])}% del libro su un peso del {pc(r['peso'])}%"
-            fisco = (f"imposta ~{_it(r['imposta'], 0)} $" if r["imposta"] else
-                     f"minusvalenza ~{_it(r['minus'], 0)} $" if r["minus"] else "nessuna imposta")
-            L.append(f"  {r['tk']:5} vendere {r['azioni']} azioni = {_it(r['venduto'], 0)} $ "
-                     f"({pc(r['frazione'], 0)}% della posizione) · {perche} · {fisco}")
-        rs = p.get("rischio")
-        tot = (f"  totale {_it(p['venduto'], 0)} $ · imposta ~{_it(p['imposta'], 0)} $"
-               + (f" · minusvalenze ~{_it(p['minus'], 0)} $" if p["minus"] else "")
-               + (f" · i semiconduttori passano dal {pc(p['peso_semi_prima'])}% al {pc(p['peso_semi_dopo'])}% "
-                  "dell'azionario" if p.get("peso_semi_dopo") is not None else ""))
-        if rs and rs["prima"]:
-            tot += (f" · rischio del libro in dollari (una deviazione standard annua) da {_it(rs['prima'], 0)} $ a "
-                    f"{_it(rs['dopo'], 0)} $ ({_sg((rs['dopo'] / rs['prima'] - 1) * 100)}%)"
-                    + (f", senza {', '.join(rs['fuori'])} che è fuori matrice" if rs["fuori"] else ""))
-        else:
-            tot += " · rischio prima e dopo n.d."
-        L.append(tot)
-        if p.get("non_ripartito"):
-            L.append(f"  ⚠ {_it(p['non_ripartito'], 0)} $ del gradino non trovano posto: i nomi che possono venderli sono "
-                     "già venduti per intero, o il loro contributo al rischio è nullo — il gradino resta incompleto, e lo si dice")
-    if p["fuori_piano"]:
-        L.append(f"  fuori dal piano (non nell'elenco dei semiconduttori): {', '.join(p['fuori_piano'])} — se uno di loro "
-                 "è un semiconduttore, l'elenco va corretto in LIBRO.md §1ter")
-    if p["fuori_elenco"]:
-        L.append(f"  ⚠ nell'elenco dei semiconduttori ma non in portafoglio: {', '.join(p['fuori_elenco'])}")
-    L.append("  ⚠ è la regola del CEO applicata, non una raccomandazione · un terzo dei semiconduttori di OGGI · il "
-             "salvavita scatta una volta per discesa, e dopo il suo gradino non ce n'è un secondo automatico (decisione "
-             "del CEO del 15/10/2026) · azioni intere, le più vicine · imposta in dollari al prezzo di oggi: il "
-             "conto vero lo fa il broker in euro col cambio di carico")
-    return L
-
-
 def salvavita(righe, provvisoria=None, soglia=SOGLIA_SALVAVITA):
     """Il calo dell'azionario dal suo massimo sul rendimento ponderato per il tempo del registro: ogni
     intervallo con le posizioni del suo INIZIO (intervallo(), la stessa funzione del confronto con QQQ, v161),
@@ -3225,21 +3174,16 @@ def salvavita(righe, provvisoria=None, soglia=SOGLIA_SALVAVITA):
 
 
 def righe_salvavita(s):
+    """v543 — il calo dal massimo e' una MISURA. Fino al 14/11/2026 era il «salvavita»: a -30% vendeva un terzo dei
+    semiconduttori. Il CEO l'ha eliminato («andiamo in ottica di analisi finanziaria non regole rigide»): qui non
+    c'e' piu' ne' una soglia che scatta ne' una vendita, in nessuno stato."""
     if not s:
         return []
-    soglia = _it(s["soglia"] * 100, 0)
+    testa = "CALO DAL MASSIMO (LIBRO.md §1ter: una misura, nessuna vendita automatica — CEO, 14/11/2026) — "
     if s["stato"] != "misurato":
-        return [f"SALVAVITA (LIBRO.md §1ter, decisione del CEO del 14/10/2026: {soglia}% dal massimo dell'azionario) — "
-                f"NON MISURABILE: {s['perche']}"]
-    if s["scattato_il"]:
-        L = [f"⚠⚠ SALVAVITA SCATTATO il {s['scattato_il']}: l'azionario è {_sg(s['calo'] * 100, 2)}% dal massimo del "
-             f"{s['massimo']} (soglia {soglia}%) — la reazione è il gradino del blocco PIANO DI RIDUZIONE, qualunque sia "
-             "il colore del semaforo: è l'unica vendita automatica del libro, una volta per discesa (LIBRO.md §1ter, "
-             "decisione del CEO del 15/10/2026) · va in cima alla risposta, prima di tutto il resto"]
-    else:
-        L = [f"SALVAVITA (LIBRO.md §1ter, decisione del CEO del 14/10/2026) — azionario {_sg(s['calo'] * 100, 2)}% dal "
-             f"massimo del {s['massimo']} · scatta a {soglia}%, cioè con un altro {_sg(s['ulteriore'] * 100, 1)}% da qui · "
-             f"peggior calo dal {s['dal']}: {_sg(s['peggiore'] * 100, 2)}%"]
+        return [testa + f"NON MISURABILE: {s['perche']}"]
+    L = [testa + f"azionario {_sg(s['calo'] * 100, 2)}% dal massimo del {s['massimo']} · peggior calo dal {s['dal']}: "
+         f"{_sg(s['peggiore'] * 100, 2)}%"]
     L.append(f"  misura: rendimento ponderato per il tempo del registro della performance, in dollari, dal {s['dal']} al "
              f"{s['al']} ({_conta(s['intervalli'], 'intervallo', 'intervalli')}"
              + (", l'ultimo fino alla chiusura non ancora registrata" if s["provvisoria"] else "")
@@ -3295,11 +3239,10 @@ def sintesi(o):
     # v474 — il semaforo per primo: e' la sezione 0 della risposta (FORMATO_ANALISI.md)
     L = (righe_semaforo(o["semaforo"], precedente_semaforo(o.get("registro"), o["semaforo"].get("seduta")), r["mcr"])
          if o.get("semaforo") else [])
-    # v484 — subito sotto il semaforo: il salvavita e il gradino di riduzione, decisi prima (LIBRO.md §1ter)
+    # v543 — subito sotto il semaforo: il calo dal massimo, una misura (LIBRO.md §1ter). Il piano di riduzione
+    #   non si stampa piu': era il gradino del salvavita, eliminato dal CEO il 14/11/2026
     if o.get("salvavita"):
         L.extend(righe_salvavita(o["salvavita"]))
-    if o.get("piano"):
-        L.extend(righe_piano(o["piano"], (o.get("semaforo") or {}).get("colore"), o.get("salvavita")))
     L += [f"Periodo {o['inizio']} -> {o['fine']} ({_conta(o['sedute'], 'seduta', 'sedute')}) · azionario {_it(o['tot_usd'], 0)} $",
          f"Libro {p(o['ret_libro'])} ({_sg(o['pnl_libro'], 0)} $) · QQQ {p(b['QQQ'])} · SMH {p(b['SMH'])} · SPY {p(b['SPY'])} · RSP {p(b['RSP'])}",
          f"21 sedute: libro {p(o['ret_21'],1)} · SMH {p(o['bench_21']['SMH'],1)} · QQQ {p(o['bench_21']['QQQ'],1)}"]
