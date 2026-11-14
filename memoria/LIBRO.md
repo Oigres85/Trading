@@ -1042,9 +1042,13 @@ l'obiettivo di crescita. Il progetto resta com'è e si riattiva su richiesta (13
 momentaneamente il progetto"*). La richiesta dell'11/11 sugli stop è ora un comando del comitato (STOP,
 `memoria/FORMATO_ANALISI.md`).
 
+**Chiusa il 14/11/2026** (CEO: *"1 si"*): dal 02/11/2026 (AVGO e WDC) **nessuna altra operazione**, e il BTP
+Valore 2028 è **ancora in portafoglio**. Le posizioni di §1 sono confermate al 14/11/2026
+(`config/posizioni.json` porta la stessa data).
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 13/11/2026 | Dal 02/11/2026 (AVGO e WDC) non ci sono altre operazioni? E il BTP Valore 2028 è ancora in portafoglio? | le posizioni del libro non sono confermate da 11 giorni, e la domanda del 13/11 sui «40.000 €» presuppone il BTP | il CEO conferma, o dà le operazioni |
+| 14/11/2026 | Al −30% dal massimo (salvavita, §1ter; il 13/11 manca un altro −8,8%): si esegue la vendita del sistema, solo i tagli dello «scenario B» chiesto il 14/11 (prima i rami secchi, poi MU, AMD e NVDA al 15%), o niente? | la vendita del sistema prende i titoli in utile e paga l'imposta; con le perdite dei rami secchi realizzate PRIMA l'imposta scende; le regole sono guide (07/11) e la scelta è del CEO | il CEO sceglie |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 

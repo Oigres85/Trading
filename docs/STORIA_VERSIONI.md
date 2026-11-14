@@ -9926,3 +9926,10 @@ passare un controllo anti-automi è stato fermato, giustamente): si passa a un'a
   (`rotazione.barre_lunghe`, intervallo «5Y»), e Yahoo risponde 429 a questa sessione: per quei due nomi la lettura a 5
   anni e i pavimenti lunghi poggiano su un anno. Da rimisurare alla prossima riattivazione (v497), e da dichiarare nella
   resa se resta così.
+- 14/11: il CEO conferma le posizioni (nessuna operazione dal 02/11, il BTP Valore 2028 resta) e chiede il primo passo
+  dello «scenario B» col momento. Risposta in chat, niente codice: prima i rami secchi (le perdite), poi MU, AMD e
+  NVDA al 15% sui rialzi — l'ordine conta per il fisco. Nel libro si apre la domanda sul −30% dal massimo.
+- ⚠ Osservazione aperta del 14/11: dentro `analisi.py` la pagina delle previsioni ha superato i 600 s ed è uscita
+  «STRUMENTO FALLITO» (analisi con uscita 1, una richiesta ASSENTE); rilanciata da sola è finita in circa 8 minuti
+  con uscita 0. Quel giorno ha rifatto le calibrazioni in linea: il margine sul tempo massimo non c'è. Da misurare
+  alla prossima riattivazione (dove passa il tempo; calibrare fuori dal giro, o alzare il limite dichiarandolo).
