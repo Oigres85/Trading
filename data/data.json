@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T19:28:10Z",
+ "updated_at": "2026-11-14T19:42:15Z",
  "eurusd": 1.105,
  "totals": {
   "usd_value": 0,
@@ -494,7 +494,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -1981,7 +1981,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -17285,9 +17285,9 @@
     "float_pct": 71.1,
     "avg_volume_30d": 45195746.0,
     "pe_ttm": null,
-    "forward_pe": -30.5359,
+    "forward_pe": -29.9699,
     "eps_ttm": -4.74,
-    "eps_forward": -1.7399,
+    "eps_forward": -1.7728,
     "revenue_fy": 9886000128.0,
     "net_income_fy": -2527000064.0,
     "revenue_growth": 1.682,
@@ -18471,28 +18471,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 65345.48,
+   "price": 65564.17,
    "price_asof": "2026-11-14",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -4.25,
+   "change_pct": -3.93,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -48.2,
-   "sma200_dist_pct": -10.5,
-   "sma50_dist_pct": -18.5,
+   "ath_dist_pct": -48.0,
+   "sma200_dist_pct": -10.2,
+   "sma50_dist_pct": -18.2,
    "w52_high": 99804.43,
    "w52_low": 57747.77,
-   "w52_dist_pct": -34.5,
+   "w52_dist_pct": -34.3,
    "day_high": 68360.71,
    "day_low": 65089.79,
    "support": 65089.79,
    "resistance": 81889.95,
-   "rsi": 21.4,
-   "volume": 35454840832,
+   "rsi": 21.6,
+   "volume": 35299860480,
    "vol_ratio": 1.64,
    "atr_14": 2440.88,
-   "atr_pct": 3.74,
+   "atr_pct": 3.72,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18501,7 +18501,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65345.48
+     65564.17
     ],
     "m6": [
      63758.22,
@@ -18629,7 +18629,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65345.48
+     65564.17
     ],
     "all": [
      386.94,
@@ -18778,7 +18778,7 @@
      78548.63,
      83553.85,
      77434.75,
-     65345.48
+     65564.17
     ],
     "m1": [
      80790.84,
@@ -18802,7 +18802,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65345.48
+     65564.17
     ],
     "m3": [
      76568.12,
@@ -18870,7 +18870,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65345.48
+     65564.17
     ],
     "y1": [
      94397.79,
@@ -18946,7 +18946,7 @@
      77198.21,
      80405.29,
      75223.15,
-     65345.48
+     65564.17
     ],
     "d1": [
      68296.03,
@@ -19065,7 +19065,8 @@
      65495.83,
      65616.98,
      65508.25,
-     65345.48
+     65369.72,
+     65512.34
     ]
    },
    "earnings_date": null,
@@ -19074,13 +19075,13 @@
    "health": 14,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.79,
+   "sharpe_1y": -0.78,
    "sortino_1y": -1.07,
-   "sharpe_6m": 0.04,
-   "sortino_6m": 0.06,
+   "sharpe_6m": 0.06,
+   "sortino_6m": 0.09,
    "prepost": null,
-   "prezzo_limite_aggiustato": 65345.48,
-   "risk_reward": "1:3.4",
+   "prezzo_limite_aggiustato": 65564.17,
+   "risk_reward": "1:3.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -19095,22 +19096,22 @@
     "w1": {
      "support": 65089.79,
      "resistance": 75320.91,
-     "change_pct": -11.36
+     "change_pct": -11.06
     },
     "m1": {
      "support": 65089.79,
      "resistance": 81889.95,
-     "change_pct": -19.12
+     "change_pct": -18.85
     },
     "m3": {
      "support": 65089.79,
      "resistance": 87363.76,
-     "change_pct": -14.66
+     "change_pct": -14.37
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": -0.95
+     "change_pct": -0.61
     }
    },
    "financials": [],
@@ -19137,74 +19138,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 65345.48,
+     "prezzo": 65564.17,
      "medie": {
       "sma10": {
-       "liv": 72986.67,
-       "dist_pct": -10.47
+       "liv": 73008.54,
+       "dist_pct": -10.2
       },
       "ema10": {
-       "liv": 72190.45,
-       "dist_pct": -9.48
+       "liv": 72230.21,
+       "dist_pct": -9.23
       },
       "sma20": {
-       "liv": 75851.51,
-       "dist_pct": -13.85
+       "liv": 75862.45,
+       "dist_pct": -13.57
       },
       "ema20": {
-       "liv": 74929.6,
-       "dist_pct": -12.79
+       "liv": 74950.43,
+       "dist_pct": -12.52
       },
       "sma30": {
-       "liv": 77797.94,
-       "dist_pct": -16.01
+       "liv": 77805.23,
+       "dist_pct": -15.73
       },
       "ema30": {
-       "liv": 76455.54,
-       "dist_pct": -14.53
+       "liv": 76469.65,
+       "dist_pct": -14.26
       },
       "sma50": {
-       "liv": 80161.44,
-       "dist_pct": -18.48
+       "liv": 80165.81,
+       "dist_pct": -18.21
       },
       "ema50": {
-       "liv": 77613.13,
-       "dist_pct": -15.81
+       "liv": 77621.7,
+       "dist_pct": -15.53
       },
       "sma100": {
-       "liv": 77742.2,
-       "dist_pct": -15.95
+       "liv": 77744.39,
+       "dist_pct": -15.67
       },
       "ema100": {
-       "liv": 76868.85,
-       "dist_pct": -14.99
+       "liv": 76873.18,
+       "dist_pct": -14.71
       },
       "sma200": {
-       "liv": 72980.36,
-       "dist_pct": -10.46
+       "liv": 72981.45,
+       "dist_pct": -10.16
       },
       "ema200": {
-       "liv": 75806.4,
-       "dist_pct": -13.8
+       "liv": 75808.58,
+       "dist_pct": -13.51
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 21.4,
+      "rsi14": 21.6,
       "macd": {
-       "linea": -3053.51,
-       "segnale": -2066.28,
-       "istogramma": -987.23
+       "linea": -3036.06,
+       "segnale": -2062.79,
+       "istogramma": -973.27
       },
-      "stoch_k": 1.6,
-      "stoch_d": 2.9,
-      "williams_r": -98.4,
-      "cci20": -176.6,
+      "stoch_k": 3.0,
+      "stoch_d": 3.3,
+      "williams_r": -97.0,
+      "cci20": -175.5,
       "adx14": 27.4,
       "di_su": 9.2,
       "di_giu": 38.9,
-      "momentum10": -15059.81
+      "momentum10": -14841.12
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19697,19 +19698,19 @@
       "o": 68238.21,
       "h": 68360.71,
       "l": 65089.79,
-      "c": 65345.48
+      "c": 65564.17
      }
     ],
     "performance": {
-     "s1": -13.13,
-     "m1": -19.4,
-     "m3": -16.5,
-     "m6": 2.42,
-     "a1": -2.86,
-     "ytd": -26.36,
-     "a3": 73.27,
-     "a5": 14.63,
-     "a10": 8663.08
+     "s1": -12.84,
+     "m1": -19.13,
+     "m3": -16.22,
+     "m6": 2.76,
+     "a1": -2.54,
+     "ytd": -26.11,
+     "a3": 73.85,
+     "a5": 15.01,
+     "a10": 8692.41
     },
     "stagionalita": [
      {
@@ -19822,9 +19823,9 @@
      }
     ]
    },
-   "rs_1m": -16.8,
+   "rs_1m": -16.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -12.5,
+   "rs_ndx_1m": -12.2,
    "beta_ndx": 0.64,
    "avg_corr": 0.35,
    "max_corr": 0.77,
@@ -42001,7 +42002,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -45051,7 +45052,7 @@
      "a1": 38.23,
      "a3": 326.46,
      "a5": 268.71,
-     "a10": 1593.77
+     "a10": 1593.76
     },
     "stagionalita": [
      {
@@ -48731,7 +48732,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -45.3,
-      "meglio": 24.6
+      "meglio": 24.5
      },
      {
       "mese": 11,
@@ -68602,7 +68603,7 @@
      1220.99,
      1256.02,
      1386.5,
-     1446.29,
+     1446.3,
      1341.93,
      1400.14,
      1462.56,
@@ -71799,7 +71800,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -72695,7 +72696,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -89149,7 +89150,7 @@
      7.48,
      7.84,
      7.76,
-     7.76,
+     7.75,
      7.95,
      8.29,
      8.35,
@@ -91709,7 +91710,7 @@
      127.9,
      130.07,
      136.24,
-     144.29,
+     144.28,
      154.51,
      149.4,
      151.74,
@@ -93754,7 +93755,7 @@
      32.88,
      31.09,
      28.92,
-     32.13,
+     32.12,
      32.9,
      33.61,
      31.46,
@@ -95778,7 +95779,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -105972,7 +105973,7 @@
      344.76,
      305.88,
      342.21,
-     344.33,
+     344.34,
      369.93,
      349.13,
      353.5,
@@ -109981,7 +109982,7 @@
      324.5,
      348.61,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -111223,7 +111224,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -116424,7 +116425,7 @@
      164.55,
      200.71,
      230.8,
-     237.33,
+     237.32,
      279.61,
      287.31,
      306.16,
@@ -116449,7 +116450,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -120553,7 +120554,7 @@
      267.46,
      254.7,
      277.82,
-     275.26,
+     275.25,
      273.83,
      275.21,
      261.91,
@@ -120641,7 +120642,7 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
@@ -122771,7 +122772,7 @@
      173.12,
      190.03,
      218.36,
-     231.67,
+     231.66,
      246.53,
      220.53,
      243.16,
@@ -143296,7 +143297,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 9
+     "score": 11
     },
     {
      "label": "Treasury 10A",
@@ -148667,7 +148668,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-14T18:49:59Z",
+      "quando": "2026-11-14T19:25:31Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148887,7 +148888,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-14T18:49:59Z",
+      "quando": "2026-11-14T19:25:31Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148931,7 +148932,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-14T18:49:59Z",
+      "quando": "2026-11-14T19:25:31Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -148975,7 +148976,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-14T18:49:59Z",
+      "quando": "2026-11-14T19:25:31Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -149063,7 +149064,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-14T18:49:59Z",
+      "quando": "2026-11-14T19:25:31Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -149259,7 +149260,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-14T19:28:10Z"
+   "letto_il": "2026-11-14T19:42:15Z"
   }
  },
  "broker": null,
@@ -149270,7 +149271,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-14T18:49:59Z",
+     "quando": "2026-11-14T19:25:31Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149490,7 +149491,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-14T18:49:59Z",
+     "quando": "2026-11-14T19:25:31Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149534,7 +149535,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-14T18:49:59Z",
+     "quando": "2026-11-14T19:25:31Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149578,7 +149579,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-14T18:49:59Z",
+     "quando": "2026-11-14T19:25:31Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149666,7 +149667,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-14T18:49:59Z",
+     "quando": "2026-11-14T19:25:31Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149862,7 +149863,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-14T19:28:10Z"
+  "letto_il": "2026-11-14T19:42:15Z"
  },
  "predictions": [
   {
@@ -149877,7 +149878,7 @@
   },
   {
    "question": "Will Jensen Huang rejoin NVIDIA by December 31, 2026?",
-   "yes": 14,
+   "yes": 13,
    "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
   },
   {
@@ -222970,6 +222971,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-14T19:28:11Z"
+  "generated_at": "2026-11-14T19:42:16Z"
  }
 }
