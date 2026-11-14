@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T15:29:23Z",
+ "updated_at": "2026-11-14T18:51:45Z",
  "eurusd": 1.105,
  "totals": {
   "usd_value": 0,
@@ -494,7 +494,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -1981,7 +1981,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -8146,7 +8146,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -4.68,
-   "pe": 54.1,
+   "pe": 51.6,
    "ath": 329.73,
    "ath_dist_pct": -52.5,
    "sma200_dist_pct": -16.1,
@@ -8832,7 +8832,7 @@
     "target_mediana": 300.0
    },
    "health": 18,
-   "eps": 2.9,
+   "eps": 3.04,
    "beta": 2.33,
    "sharpe_1y": 0.67,
    "sortino_1y": 0.97,
@@ -8853,9 +8853,9 @@
     "float_shares": 873839619.0,
     "float_pct": 99.5,
     "avg_volume_30d": 24566256.0,
-    "pe_ttm": 54.0552,
+    "pe_ttm": 51.5658,
     "forward_pe": 21.3282,
-    "eps_ttm": 2.9,
+    "eps_ttm": 3.04,
     "eps_forward": 7.3499,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
@@ -10555,7 +10555,7 @@
     "target_mediana": 20.0
    },
    "health": 19,
-   "eps": -0.24,
+   "eps": -0.26,
    "beta": 2.15,
    "sharpe_1y": -1.07,
    "sortino_1y": -1.56,
@@ -10578,7 +10578,7 @@
     "avg_volume_30d": 16215289.0,
     "pe_ttm": null,
     "forward_pe": -42.6494,
-    "eps_ttm": -0.24,
+    "eps_ttm": -0.26,
     "eps_forward": -0.2256,
     "revenue_fy": 12817000.0,
     "net_income_fy": -40841000.0,
@@ -17285,9 +17285,9 @@
     "float_pct": 71.1,
     "avg_volume_30d": 45195746.0,
     "pe_ttm": null,
-    "forward_pe": -31.6045,
+    "forward_pe": -30.5359,
     "eps_ttm": -4.74,
-    "eps_forward": -1.6811,
+    "eps_forward": -1.7399,
     "revenue_fy": 9886000128.0,
     "net_income_fy": -2527000064.0,
     "revenue_growth": 1.682,
@@ -18471,28 +18471,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 65201.08,
+   "price": 65560.87,
    "price_asof": "2026-11-14",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -4.47,
+   "change_pct": -3.94,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -48.3,
-   "sma200_dist_pct": -10.7,
-   "sma50_dist_pct": -18.7,
+   "ath_dist_pct": -48.0,
+   "sma200_dist_pct": -10.2,
+   "sma50_dist_pct": -18.2,
    "w52_high": 99804.43,
    "w52_low": 57747.77,
-   "w52_dist_pct": -34.7,
+   "w52_dist_pct": -34.3,
    "day_high": 68360.71,
-   "day_low": 65370.01,
-   "support": 65370.01,
+   "day_low": 65089.79,
+   "support": 65089.79,
    "resistance": 81889.95,
-   "rsi": 21.2,
-   "volume": 32145457152,
+   "rsi": 21.6,
+   "volume": 34978156544,
    "vol_ratio": 1.64,
-   "atr_14": 2420.87,
-   "atr_pct": 3.71,
+   "atr_14": 2440.88,
+   "atr_pct": 3.72,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18501,7 +18501,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65201.08
+     65560.87
     ],
     "m6": [
      63758.22,
@@ -18629,7 +18629,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65201.08
+     65560.87
     ],
     "all": [
      386.94,
@@ -18778,7 +18778,7 @@
      78548.63,
      83553.85,
      77434.75,
-     65201.08
+     65560.87
     ],
     "m1": [
      80790.84,
@@ -18802,7 +18802,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65201.08
+     65560.87
     ],
     "m3": [
      76568.12,
@@ -18870,7 +18870,7 @@
      73964.47,
      71342.97,
      68249.27,
-     65201.08
+     65560.87
     ],
     "y1": [
      94397.79,
@@ -18946,7 +18946,7 @@
      77198.21,
      80405.29,
      75223.15,
-     65201.08
+     65560.87
     ],
     "d1": [
      68296.03,
@@ -19041,7 +19041,27 @@
      65892.29,
      65907.95,
      65557.39,
-     65212.43
+     65212.43,
+     65194.52,
+     65682.94,
+     65623.03,
+     65586.46,
+     65250.79,
+     65402.57,
+     65274.92,
+     65305.94,
+     65404.21,
+     65234.87,
+     65142.03,
+     65524.72,
+     65586.28,
+     65975.08,
+     65766.47,
+     65764.38,
+     65841.57,
+     65782.17,
+     65836.19,
+     65743.01
     ]
    },
    "earnings_date": null,
@@ -19050,13 +19070,13 @@
    "health": 14,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.79,
-   "sortino_1y": -1.08,
-   "sharpe_6m": 0.02,
-   "sortino_6m": 0.04,
+   "sharpe_1y": -0.78,
+   "sortino_1y": -1.07,
+   "sharpe_6m": 0.06,
+   "sortino_6m": 0.09,
    "prepost": null,
-   "prezzo_limite_aggiustato": 65201.08,
-   "risk_reward": "1:3.4",
+   "prezzo_limite_aggiustato": 65560.87,
+   "risk_reward": "1:3.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -19069,24 +19089,24 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 65370.01,
+     "support": 65089.79,
      "resistance": 75320.91,
-     "change_pct": -11.56
+     "change_pct": -11.07
     },
     "m1": {
-     "support": 65370.01,
+     "support": 65089.79,
      "resistance": 81889.95,
-     "change_pct": -19.3
+     "change_pct": -18.85
     },
     "m3": {
-     "support": 65370.01,
+     "support": 65089.79,
      "resistance": 87363.76,
-     "change_pct": -14.85
+     "change_pct": -14.38
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": -1.17
+     "change_pct": -0.62
     }
    },
    "financials": [],
@@ -19113,74 +19133,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 65201.08,
+     "prezzo": 65560.87,
      "medie": {
       "sma10": {
-       "liv": 72972.23,
-       "dist_pct": -10.65
+       "liv": 73008.21,
+       "dist_pct": -10.2
       },
       "ema10": {
-       "liv": 72164.19,
-       "dist_pct": -9.65
+       "liv": 72229.61,
+       "dist_pct": -9.23
       },
       "sma20": {
-       "liv": 75844.29,
-       "dist_pct": -14.03
+       "liv": 75862.28,
+       "dist_pct": -13.58
       },
       "ema20": {
-       "liv": 74915.84,
-       "dist_pct": -12.97
+       "liv": 74950.11,
+       "dist_pct": -12.53
       },
       "sma30": {
-       "liv": 77793.13,
-       "dist_pct": -16.19
+       "liv": 77805.12,
+       "dist_pct": -15.74
       },
       "ema30": {
-       "liv": 76446.23,
-       "dist_pct": -14.71
+       "liv": 76469.44,
+       "dist_pct": -14.27
       },
       "sma50": {
-       "liv": 80158.55,
-       "dist_pct": -18.66
+       "liv": 80165.75,
+       "dist_pct": -18.22
       },
       "ema50": {
-       "liv": 77607.47,
-       "dist_pct": -15.99
+       "liv": 77621.57,
+       "dist_pct": -15.54
       },
       "sma100": {
-       "liv": 77740.76,
-       "dist_pct": -16.13
+       "liv": 77744.35,
+       "dist_pct": -15.67
       },
       "ema100": {
-       "liv": 76865.99,
-       "dist_pct": -15.18
+       "liv": 76873.12,
+       "dist_pct": -14.72
       },
       "sma200": {
-       "liv": 72979.64,
-       "dist_pct": -10.66
+       "liv": 72981.44,
+       "dist_pct": -10.17
       },
       "ema200": {
-       "liv": 75804.96,
-       "dist_pct": -13.99
+       "liv": 75808.54,
+       "dist_pct": -13.52
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 21.2,
+      "rsi14": 21.6,
       "macd": {
-       "linea": -3065.03,
-       "segnale": -2068.59,
-       "istogramma": -996.44
+       "linea": -3036.33,
+       "segnale": -2062.84,
+       "istogramma": -973.48
       },
-      "stoch_k": -1.1,
-      "stoch_d": 2.0,
-      "williams_r": -101.1,
-      "cci20": -175.9,
-      "adx14": 27.3,
+      "stoch_k": 2.9,
+      "stoch_d": 3.3,
+      "williams_r": -97.1,
+      "cci20": -175.5,
+      "adx14": 27.4,
       "di_su": 9.2,
-      "di_giu": 38.4,
-      "momentum10": -15204.21
+      "di_giu": 38.9,
+      "momentum10": -14844.42
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19672,20 +19692,20 @@
       "d": "2026-11-14",
       "o": 68238.21,
       "h": 68360.71,
-      "l": 65370.01,
-      "c": 65201.08
+      "l": 65089.79,
+      "c": 65560.87
      }
     ],
     "performance": {
-     "s1": -13.32,
-     "m1": -19.58,
-     "m3": -16.69,
-     "m6": 2.19,
-     "a1": -3.08,
-     "ytd": -26.52,
-     "a3": 72.89,
-     "a5": 14.38,
-     "a10": 8643.71
+     "s1": -12.84,
+     "m1": -19.13,
+     "m3": -16.23,
+     "m6": 2.76,
+     "a1": -2.54,
+     "ytd": -26.11,
+     "a3": 73.84,
+     "a5": 15.01,
+     "a10": 8691.96
     },
     "stagionalita": [
      {
@@ -19798,9 +19818,9 @@
      }
     ]
    },
-   "rs_1m": -16.9,
+   "rs_1m": -16.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -12.6,
+   "rs_ndx_1m": -12.2,
    "beta_ndx": 0.64,
    "avg_corr": 0.35,
    "max_corr": 0.77,
@@ -34146,7 +34166,7 @@
     "target_mediana": 59.0
    },
    "health": 20,
-   "eps": -0.94,
+   "eps": -0.96,
    "beta": 1.31,
    "sharpe_1y": -1.55,
    "sortino_1y": -2.14,
@@ -34169,7 +34189,7 @@
     "avg_volume_30d": 10120006.0,
     "pe_ttm": null,
     "forward_pe": -20.899,
-    "eps_ttm": -0.94,
+    "eps_ttm": -0.96,
     "eps_forward": -1.1445,
     "revenue_fy": 3071000.0,
     "net_income_fy": -164792992.0,
@@ -37243,7 +37263,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -3.09,
-   "pe": 28.6,
+   "pe": 27.7,
    "ath": 1144.08,
    "ath_dist_pct": -53.8,
    "sma200_dist_pct": -24.6,
@@ -37665,7 +37685,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -37899,7 +37919,7 @@
     "target_mediana": 1045.0
    },
    "health": 19,
-   "eps": 18.48,
+   "eps": 19.07,
    "beta": 2.2,
    "sharpe_1y": 0.9,
    "sortino_1y": 1.27,
@@ -37920,9 +37940,9 @@
     "float_shares": 228776010.0,
     "float_pct": 99.7,
     "avg_volume_30d": 4819484.0,
-    "pe_ttm": 28.5871,
+    "pe_ttm": 27.7027,
     "forward_pe": 8.0851,
-    "eps_ttm": 18.48,
+    "eps_ttm": 19.07,
     "eps_forward": 65.3416,
     "revenue_fy": 13799000064.0,
     "net_income_fy": 4396000256.0,
@@ -41977,7 +41997,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -51087,7 +51107,7 @@
     "gross_margin": 0.1929,
     "enterprise_value": 1514043211776.0,
     "ev_ebitda": 153.897,
-    "peg": 4.64,
+    "peg": 4.55,
     "roa": 0.0135,
     "short_float": 0.0203,
     "buyback_yield": 0.0,
@@ -52382,7 +52402,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": -0.78,
-   "pe": 22.7,
+   "pe": 22.5,
    "ath": 410.41,
    "ath_dist_pct": -31.7,
    "sma200_dist_pct": 0.8,
@@ -52809,7 +52829,7 @@
     "target_mediana": 346.0
    },
    "health": 62,
-   "eps": 12.34,
+   "eps": 12.44,
    "beta": 1.13,
    "sharpe_1y": -0.44,
    "sortino_1y": -0.61,
@@ -52830,9 +52850,9 @@
     "float_shares": 350444680.0,
     "float_pct": 99.7,
     "avg_volume_30d": 3501042.0,
-    "pe_ttm": 22.7066,
+    "pe_ttm": 22.5241,
     "forward_pe": 20.8481,
-    "eps_ttm": 12.34,
+    "eps_ttm": 12.44,
     "eps_forward": 13.4401,
     "revenue_fy": 34250000384.0,
     "net_income_fy": 4369999872.0,
@@ -56884,7 +56904,7 @@
     "target_mediana": 631.0
    },
    "health": 61,
-   "eps": 19.19,
+   "eps": 19.16,
    "beta": 1.04,
    "sharpe_1y": -0.0,
    "sortino_1y": -0.0,
@@ -56905,9 +56925,9 @@
     "float_shares": 7415278046.0,
     "float_pct": 99.9,
     "avg_volume_30d": 23217510.0,
-    "pe_ttm": 27.2996,
+    "pe_ttm": 27.3424,
     "forward_pe": 21.6569,
-    "eps_ttm": 19.19,
+    "eps_ttm": 19.16,
     "eps_forward": 24.1899,
     "revenue_fy": 346444988416.0,
     "net_income_fy": 142630993920.0,
@@ -62683,14 +62703,14 @@
      247.18,
      258.21,
      275.82,
-     303.03,
+     303.04,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -64200,7 +64220,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.58,
-   "pe": 72.0,
+   "pe": 73.6,
    "ath": 239.62,
    "ath_dist_pct": -57.3,
    "sma200_dist_pct": -10.1,
@@ -64742,7 +64762,7 @@
     "target_mediana": 155.0
    },
    "health": 17,
-   "eps": 1.42,
+   "eps": 1.39,
    "beta": 0.98,
    "sharpe_1y": -0.82,
    "sortino_1y": -1.02,
@@ -64763,9 +64783,9 @@
     "float_shares": 1035342966.0,
     "float_pct": 99.8,
     "avg_volume_30d": 15655262.0,
-    "pe_ttm": 72.007,
+    "pe_ttm": 73.5611,
     "forward_pe": 21.2919,
-    "eps_ttm": 1.42,
+    "eps_ttm": 1.39,
     "eps_forward": 4.8023,
     "revenue_fy": 15431000064.0,
     "net_income_fy": 1444999936.0,
@@ -69943,7 +69963,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 0.61,
-   "pe": 18.2,
+   "pe": 18.3,
    "ath": 163.42,
    "ath_dist_pct": -76.8,
    "sma200_dist_pct": -14.0,
@@ -70814,7 +70834,7 @@
     "target_mediana": 34.0
    },
    "health": 61,
-   "eps": 2.09,
+   "eps": 2.08,
    "beta": 1.03,
    "sharpe_1y": -1.44,
    "sortino_1y": -1.8,
@@ -70835,9 +70855,9 @@
     "float_shares": 1178473731.0,
     "float_pct": 97.9,
     "avg_volume_30d": 32837779.0,
-    "pe_ttm": 18.177,
+    "pe_ttm": 18.2644,
     "forward_pe": 24.5863,
-    "eps_ttm": 2.09,
+    "eps_ttm": 2.08,
     "eps_forward": 1.5452,
     "revenue_fy": 45890998272.0,
     "net_income_fy": 3092999936.0,
@@ -71775,7 +71795,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -72671,7 +72691,7 @@
      89.67,
      84.81,
      81.51,
-     76.13,
+     76.14,
      71.27,
      77.61,
      69.12,
@@ -76867,7 +76887,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -89125,7 +89145,7 @@
      7.48,
      7.84,
      7.76,
-     7.75,
+     7.76,
      7.95,
      8.29,
      8.35,
@@ -91454,7 +91474,7 @@
      26.8,
      25.7,
      26.38,
-     27.77,
+     27.76,
      27.44,
      28.48,
      30.19,
@@ -91588,7 +91608,7 @@
      71.81,
      71.36,
      69.91,
-     70.48,
+     70.49,
      73.77,
      73.44,
      80.18,
@@ -91953,7 +91973,7 @@
     "gross_margin": 0.4438,
     "enterprise_value": 455441186816.0,
     "ev_ebitda": 7.84,
-    "peg": 0.82,
+    "peg": 0.83,
     "roa": 0.0647,
     "short_float": 0.0135,
     "buyback_yield": 0.0282,
@@ -93730,7 +93750,7 @@
      32.88,
      31.09,
      28.92,
-     32.13,
+     32.12,
      32.9,
      33.61,
      31.46,
@@ -95077,7 +95097,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -95737,7 +95757,7 @@
      123.58,
      115.79,
      115.57,
-     127.35,
+     127.36,
      140.21,
      140.59,
      129.75,
@@ -95754,7 +95774,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -96924,7 +96944,7 @@
      "m6": 42.1,
      "ytd": 32.51,
      "a1": 33.45,
-     "a3": 128.93,
+     "a3": 128.94,
      "a5": 205.66,
      "a10": 629.27
     },
@@ -98238,7 +98258,7 @@
     "gross_margin": 0.752,
     "enterprise_value": 408570691584.0,
     "ev_ebitda": 13.854,
-    "peg": 3.56,
+    "peg": 3.58,
     "roa": 0.1129,
     "short_float": 0.0108,
     "buyback_yield": 0.014,
@@ -102307,7 +102327,7 @@
      322.37,
      340.11,
      336.06,
-     360.42,
+     360.43,
      358.86,
      369.78,
      383.01,
@@ -104333,7 +104353,7 @@
     "eps_anno_corrente": 15.0327,
     "revisione_90g_pct": 0.9,
     "revisione_7g_pct": -0.01,
-    "su_30g": 19,
+    "su_30g": 20,
     "giu_30g": 5,
     "eps_min": 16.54,
     "eps_max": 17.87,
@@ -104382,7 +104402,7 @@
     "gross_margin": 0.9768,
     "enterprise_value": 789158952960.0,
     "ev_ebitda": 24.785,
-    "peg": 1.9,
+    "peg": 1.93,
     "roa": 0.1961,
     "short_float": 0.0124,
     "buyback_yield": 0.0257,
@@ -105614,7 +105634,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 1.32,
-   "pe": 34.2,
+   "pe": 34.6,
    "ath": 681.99,
    "ath_dist_pct": -3.0,
    "sma200_dist_pct": 22.3,
@@ -106229,7 +106249,7 @@
     "target_mediana": 726.0
    },
    "health": 84,
-   "eps": 19.36,
+   "eps": 19.11,
    "beta": 0.77,
    "sharpe_1y": 0.7,
    "sortino_1y": 1.03,
@@ -106250,9 +106270,9 @@
     "float_shares": 863544611.0,
     "float_pct": 99.9,
     "avg_volume_30d": 2983635.0,
-    "pe_ttm": 34.1524,
+    "pe_ttm": 34.5992,
     "forward_pe": 28.5429,
-    "eps_ttm": 19.36,
+    "eps_ttm": 19.11,
     "eps_forward": 23.1648,
     "revenue_fy": 36288000000.0,
     "net_income_fy": 16958000128.0,
@@ -109955,7 +109975,7 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
      336.45,
      329.49,
@@ -116268,7 +116288,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -120422,7 +120442,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -120529,7 +120549,7 @@
      267.46,
      254.7,
      277.82,
-     275.26,
+     275.25,
      273.83,
      275.21,
      261.91,
@@ -120587,7 +120607,7 @@
      390.19,
      418.26,
      427.74,
-     448.72,
+     448.71,
      393.97,
      377.21,
      430.42,
@@ -120608,7 +120628,7 @@
      764.78,
      831.91,
      742.87,
-     835.7,
+     835.69,
      801.28,
      814.72,
      732.3,
@@ -135371,32 +135391,11 @@
   "news": {
    "voci": [
     {
-     "titolo": "Fed’s Collins Says ‘Steady, Gradual’ Rate Hikes Appropriate",
-     "riassunto": "Federal Reserve Bank of Boston President Susan Collins said a gradual path for interest-rate hikes will be appropriate to lower inflation, as the labor market gains solid footing without adding to price pressures.",
-     "fonte": "Bloomberg",
-     "quando": "2026-11-14T15:08:45Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-11-14/fed-s-collins-says-steady-gradual-rate-hikes-appropriate"
-    },
-    {
-     "titolo": "What’s the most tax-efficient way to donate to charity?",
-     "riassunto": "How to make your donations beneficial for both you and the recipient",
+     "titolo": "The trillion-dollar mistake corporate America is making about retirement",
+     "riassunto": "The market is dramatically underpricing the economic impact of Americans age 50 and older.",
      "fonte": "MarketWatch",
-     "quando": "2026-11-14T14:00:00Z",
-     "url": "https://www.marketwatch.com/story/whats-the-most-tax-efficient-way-to-donate-to-charity-3f5864bb?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "Washington can start delivering on affordability by rejecting Trump’s tariffs",
-     "riassunto": "Americans voted against policies that drove up their costs. Will policymakers ignore them?",
-     "fonte": "MarketWatch",
-     "quando": "2026-11-14T13:30:00Z",
-     "url": "https://www.marketwatch.com/story/washington-can-start-delivering-on-affordability-by-rejecting-trumps-tariffs-8f2c76fd?mod=mw_rss_topstories"
-    },
-    {
-     "titolo": "14 dividend stocks selected for long-term growth",
-     "riassunto": "These stocks feature attractive dividend payouts and are trading low to the companies’ intrinsic value, according to John Buckingham of Value87 Investment Partners.",
-     "fonte": "MarketWatch",
-     "quando": "2026-11-14T01:58:00Z",
-     "url": "https://www.marketwatch.com/story/14-dividend-stocks-selected-for-long-term-growth-0a095c0d?mod=mw_rss_topstories"
+     "quando": "2026-11-14T17:50:00Z",
+     "url": "https://www.marketwatch.com/story/corporate-america-is-making-a-trillion-dollar-mistake-about-retirement-234c8996?mod=mw_rss_topstories"
     },
     {
      "titolo": "AI risks are the biggest threat to the financial system, Fed survey finds",
@@ -135495,14 +135494,36 @@
      "fonte": "CNBC Economia",
      "quando": "2026-11-05T21:32:52Z",
      "url": "https://www.cnbc.com/2026/11/05/october-jobs-report-preview.html"
+    },
+    {
+     "titolo": "Voters say the economy drove them to the polls — and blame Trump for their troubles",
+     "riassunto": "Participants in the CNBC Voter Poll ranked the economy the most important issue facing the country, ahead of topics tied to democracy and immigration.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-05T16:07:59Z",
+     "url": "https://www.cnbc.com/2026/11/04/2026-midterms-trump-economy-iran-war.html"
+    },
+    {
+     "titolo": "Bank of England hikes interest rate for the first time since Iran war, warns inflation will near 5%",
+     "riassunto": "One policymaker voted to raise the bank's key interest rate to 4.25%.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-05T16:01:47Z",
+     "url": "https://www.cnbc.com/2026/11/05/interest-rates-inflation-uk.html"
+    },
+    {
+     "titolo": "Here's what the Democratic election rout could mean for the U.S. economy",
+     "riassunto": "The biggest forces shaping the economy aren't going to change just because the party in power did.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-05T14:33:32Z",
+     "url": "https://www.cnbc.com/2026/11/05/emocratic-midterm-economy.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
-    "Bloomberg",
     "MarketWatch"
    ],
-   "fonti_mute": [],
+   "fonti_mute": [
+    "Bloomberg"
+   ],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -143254,7 +143275,7 @@
    "calls": 938734
   },
   "risk_sentiment": {
-   "score": 47,
+   "score": 48,
    "label": "Neutrale",
    "components": [
     {
@@ -143271,7 +143292,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 5
+     "score": 10
     },
     {
      "label": "Treasury 10A",
@@ -148639,18 +148660,18 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T18:20:09Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+     },
+     {
       "titolo": "Why Advanced Micro Devices Stock Surged This Week",
       "riassunto": "Key PointsAMD stock rallied 19% this week, driven by strong signals of artificial intelligence infrastructure spending and new cloud computing wins.",
       "fonte": "Nasdaq",
       "quando": "2026-11-14T13:06:02Z",
       "url": "https://www.nasdaq.com/articles/why-advanced-micro-devices-stock-surged-week"
-     },
-     {
-      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-14T01:34:45Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
       "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -148771,6 +148792,20 @@
     ],
     "CRWV": [
      {
+      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T18:20:09Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+     },
+     {
+      "titolo": "CoreWeave Stock Surges as Revenue Soars. Is It Too Late to Buy the Stock?",
+      "riassunto": "Neocloud stocks have seen considerable pressure this year, but CoreWeave (NASDAQ:CRWV) just gave investors something to cheer about when it reported its third-quarter results. The sector has been hit with a trio of headwinds in 2026, which is why it may not be a good idea to chas",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T15:35:01Z",
+      "url": "https://www.nasdaq.com/articles/coreweave-stock-surges-revenue-soars-it-too-late-buy-stock"
+     },
+     {
       "titolo": "Prediction: This Will Be CoreWeave’s Stock Price After 1 Year Following Its Stunning Results (Hint: It Implies a Big Move)",
       "riassunto": "Key PointsCoreWeave's latest quarterly report improved investor confidence in the stock, and I won't be surprised to see its bull run continue over the coming year.",
       "fonte": "Nasdaq",
@@ -148785,13 +148820,6 @@
       "url": "https://www.nasdaq.com/articles/whats-going-coreweave-stock"
      },
      {
-      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-14T01:34:45Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
-     },
-     {
       "titolo": "Stocks Pressured by Rising Bond Yields",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.22% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.07%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.77%. December E-mini S&P futures (ESZ26 ) are down -0.24%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
@@ -148804,16 +148832,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T23:19:03Z",
       "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
-     },
-     {
-      "titolo": "Stock Market Today, Nov. 13: CoreWeave Falls Over 6% on AI-Cloud Selling and Reported $4 Billion Loan Talks",
-      "riassunto": "CoreWeave (NASDAQ:CRWV), a specialized cloud computing provider for generative AI workloads, also known as a neocloud, closed at $53.13, down 6.13%. Premarket AI-cloud selling and debt-funding concerns outweighed the company's strong revenue growth, and investors are watching gui",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:04:29Z",
-      "url": "https://www.nasdaq.com/articles/stock-market-today-nov-13-coreweave-falls-over-6-ai-cloud-selling-and-reported-4-billion"
      }
     ],
     "GOOGL": [
+     {
+      "titolo": "Billionaire Bill Ackman Says There’s a Huge Disconnect in Wall Street’s Expectations for Amazon, Microsoft, Meta, and Alphabet",
+      "riassunto": "Key PointsAmazon, Microsoft, Meta Platforms, and Alphabet are all rapidly increasing their data center capital expenditures.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T15:05:02Z",
+      "url": "https://www.nasdaq.com/articles/billionaire-bill-ackman-says-theres-huge-disconnect-wall-streets-expectations-amazon"
+     },
      {
       "titolo": "Sundar Pichai Reported Alphabet's Cloud Revenue Grew 103% Last Quarter While the Gemini App Reached 1 Billion Monthly Users. Is Google Cloud Becoming a Bigger Growth Driver Than Se",
       "riassunto": "Key PointsIn the last 12 months, the cloud segment added significantly more incremental revenue than the search platform.",
@@ -148848,29 +148876,29 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T19:37:00Z",
       "url": "https://www.nasdaq.com/articles/wall-street-writing-nvidia-stock-heres-why-thats-mistake"
-     },
-     {
-      "titolo": "Stocks Settle Lower on Nvidia Rout and Higher Crude and Bond Yields",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.35% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.36%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.30%. December E-mini S&P futures (ESZ26 ) fell -0.33%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T18:59:12Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
      }
     ],
     "MRVL": [
+     {
+      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T18:20:09Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+     },
+     {
+      "titolo": "Credo Technology Group vs. Marvell Technology: Which Technology Stock Is a Better Buy for 2027?",
+      "riassunto": "Key PointsCredo Technology Group is experiencing massive expansion by providing power-efficient, high-speed connectivity solutions for artificial intelligence infrastructure.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T17:50:02Z",
+      "url": "https://www.nasdaq.com/articles/credo-technology-group-vs-marvell-technology-which-technology-stock-better-buy-2027"
+     },
      {
       "titolo": "2 Stocks That Plunged on Oct. 29 to Buy and Hold Through 2030",
       "riassunto": "Key PointsMarvell's long-term model calls for over $30 in adjusted earnings per share by fiscal 2031.",
       "fonte": "Nasdaq",
       "quando": "2026-11-14T09:01:02Z",
       "url": "https://www.nasdaq.com/articles/2-stocks-plunged-oct-29-buy-and-hold-through-2030"
-     },
-     {
-      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-14T01:34:45Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
       "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -148892,29 +148920,29 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T20:24:11Z",
       "url": "https://www.nasdaq.com/articles/noteworthy-friday-option-activity-app-crcl-mrvl"
-     },
-     {
-      "titolo": "Stocks Settle Lower on Nvidia Rout and Higher Crude and Bond Yields",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.35% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.36%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.30%. December E-mini S&P futures (ESZ26 ) fell -0.33%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T18:59:12Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
      }
     ],
     "MSTR": [
+     {
+      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T18:20:09Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+     },
+     {
+      "titolo": "Bitcoin Is Slumping, but Michael Saylor Says Strategy Can Create $10 Billion to $30 Billion in \"Digital Credit\"",
+      "riassunto": "Key PointsMichael Saylor said on Strategy’s third-quarter earnings call that the company could create between $10 billion and $30 billion of “digital credit.”",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T17:31:00Z",
+      "url": "https://www.nasdaq.com/articles/bitcoin-slumping-michael-saylor-says-strategy-can-create-10-billion-30-billion-digital"
+     },
      {
       "titolo": "Strategy's Michael Saylor Says Bitcoin Is Now a Bipartisan Issue That Crosses Party Lines. Here's Why He's Right.",
       "riassunto": "Key PointsBitcoin has universal appeal that cuts across party lines.",
       "fonte": "Nasdaq",
       "quando": "2026-11-14T12:02:00Z",
       "url": "https://www.nasdaq.com/articles/strategys-michael-saylor-says-bitcoin-now-bipartisan-issue-crosses-party-lines-heres-why"
-     },
-     {
-      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-14T01:34:45Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
       "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -148936,16 +148964,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T18:59:12Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
-     },
-     {
-      "titolo": "Strategy Raises $21B: Will It Fuel More BTC Purchases?",
-      "riassunto": "MSTR raises $21.23 billion in 2026 to support its Bitcoin strategy, but shifting capital allocation and negative BTC Yield raise concerns.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T14:36:00Z",
-      "url": "https://www.nasdaq.com/articles/strategy-raises-21b-will-it-fuel-more-btc-purchases"
      }
     ],
     "MU": [
+     {
+      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T18:20:09Z",
+      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+     },
+     {
+      "titolo": "Where Will Micron Stock Be in 5 Years?",
+      "riassunto": "Key PointsMicron's sales and earnings are soaring, and the company has impressive market shares in DRAM and HBM.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T17:40:00Z",
+      "url": "https://www.nasdaq.com/articles/where-will-micron-stock-be-5-years"
+     },
      {
       "titolo": "Is It Too Late to Buy Micron Stock?",
       "riassunto": "Key PointsMicron's shares have skyrocketed in 2026 but have plunged since late June.",
@@ -148961,13 +148996,6 @@
       "url": "https://www.nasdaq.com/articles/nvidia-alphabet-microsoft-and-micron-are-all-buying-anthropics-ipo-should-you-buy-too"
      },
      {
-      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-14T01:34:45Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
-     },
-     {
       "titolo": "Micron Technology vs. Qualcomm: Which Tech Stock Is the Better Buy for 2027?",
       "riassunto": "Key PointsMicron’s revenue and profit have exploded on AI data center demand, but its results swing with memory prices.",
       "fonte": "Nasdaq",
@@ -148980,16 +149008,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T23:35:22Z",
       "url": "https://www.nasdaq.com/articles/stocks-pressured-rising-bond-yields-2"
-     },
-     {
-      "titolo": "Stocks Retreat as Chipmakers Sink and Bond Yields Rise",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.93% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.17%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.06%. December E-mini S&P futures (ESZ26 ) are down -0.92%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:19:03Z",
-      "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
      }
     ],
     "NVDA": [
+     {
+      "titolo": "After Jensen Huang’s Departure, Nvidia Just Did Something It Hasn’t Done Since 2019",
+      "riassunto": "Key PointsNvidia has become an AI giant, bringing in more than $200 billion in revenue in the latest fiscal year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T16:30:02Z",
+      "url": "https://www.nasdaq.com/articles/after-jensen-huangs-departure-nvidia-just-did-something-it-hasnt-done-2019"
+     },
      {
       "titolo": "Think Nvidia Stock Is a Bargain? 6 Reasons the Face of the AI Build-Out Can Plunge Another 50% Following Jensen Huang's Resignation.",
       "riassunto": "Key PointsNvidia rocked Wall Street on Nov. 12, with co-founder Jensen Huang resigning as CEO following allegations of extramarital affairs.",
@@ -149024,13 +149052,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-14T10:22:02Z",
       "url": "https://www.nasdaq.com/articles/nvidia-alphabet-microsoft-and-micron-are-all-buying-anthropics-ipo-should-you-buy-too"
-     },
-     {
-      "titolo": "Should You Really Buy Nvidia Stock After CEO Jensen Huang's Exit? Wall Street Has a Clear Answer for Investors.",
-      "riassunto": "Key PointsJensen Huang resigned from his position as CEO of Nvidia following revelations of extramarital affairs, including one with an alleged Chinese spy.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-14T09:41:02Z",
-      "url": "https://www.nasdaq.com/articles/should-you-really-buy-nvidia-stock-after-ceo-jensen-huangs-exit-wall-street-has-clear"
      }
     ],
     "ORCL": [
@@ -149038,8 +149059,15 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-14T01:34:45Z",
+      "quando": "2026-11-14T18:20:09Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+     },
+     {
+      "titolo": "Could Oracle Hit Its $30 Billion Free Cash Flow Target by Fiscal 2029?",
+      "riassunto": "Oracle (NYSE:ORCL) is attempting to transform extraordinary AI demand into a self-funding growth engine. I examine why its $30 billion fiscal 2029 free cash flow target could dramatically change how investors value the stock, even as a $20 billion financing deal, expensive bonds,",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-14T15:08:48Z",
+      "url": "https://www.nasdaq.com/articles/could-oracle-hit-its-30-billion-free-cash-flow-target-fiscal-2029"
      },
      {
       "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -149063,18 +149091,11 @@
       "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
      },
      {
-      "titolo": "Microsoft Just Piled Onto the Bad News for CoreWeave, Oracle, and Nebius",
-      "riassunto": "Key PointsMicrosoft is reevaluating its contracts with neocloud companies, prioritizing its own data centers.",
+      "titolo": "A 10-Stock Strategy That Balances AI Growth With Cash Flow",
+      "riassunto": "The AI trade is still alive and well, only shifting from speculation to execution, which is where investors stand to make the biggest gains. This portfolio aims to capture those gains, focusing on the names critical to AI’s success while balancing them against a trio of powerhou",
       "fonte": "Nasdaq",
-      "quando": "2026-11-13T11:40:02Z",
-      "url": "https://www.nasdaq.com/articles/microsoft-just-piled-bad-news-coreweave-oracle-and-nebius"
-     },
-     {
-      "titolo": "Bloom Energy vs. Constellation Energy: On-Site Power or Grid Power, Which Wins the Data Center?",
-      "riassunto": "Key PointsModern AI data centers require a lot of electricity, driving strong demand for both on-site and grid-scale power solutions.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T09:06:00Z",
-      "url": "https://www.nasdaq.com/articles/bloom-energy-vs-constellation-energy-site-power-or-grid-power-which-wins-data-center"
+      "quando": "2026-11-13T17:05:00Z",
+      "url": "https://www.nasdaq.com/articles/10-stock-strategy-balances-ai-growth-cash-flow"
      }
     ],
     "PLTR": [
@@ -149170,7 +149191,7 @@
       "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-14T01:34:45Z",
+      "quando": "2026-11-14T18:20:09Z",
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
@@ -149234,7 +149255,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-14T15:29:23Z"
+   "letto_il": "2026-11-14T18:51:45Z"
   }
  },
  "broker": null,
@@ -149242,18 +149263,18 @@
   "per_titolo": {
    "AMD": [
     {
+     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T18:20:09Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+    },
+    {
      "titolo": "Why Advanced Micro Devices Stock Surged This Week",
      "riassunto": "Key PointsAMD stock rallied 19% this week, driven by strong signals of artificial intelligence infrastructure spending and new cloud computing wins.",
      "fonte": "Nasdaq",
      "quando": "2026-11-14T13:06:02Z",
      "url": "https://www.nasdaq.com/articles/why-advanced-micro-devices-stock-surged-week"
-    },
-    {
-     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-14T01:34:45Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
      "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -149374,6 +149395,20 @@
    ],
    "CRWV": [
     {
+     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T18:20:09Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+    },
+    {
+     "titolo": "CoreWeave Stock Surges as Revenue Soars. Is It Too Late to Buy the Stock?",
+     "riassunto": "Neocloud stocks have seen considerable pressure this year, but CoreWeave (NASDAQ:CRWV) just gave investors something to cheer about when it reported its third-quarter results. The sector has been hit with a trio of headwinds in 2026, which is why it may not be a good idea to chas",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T15:35:01Z",
+     "url": "https://www.nasdaq.com/articles/coreweave-stock-surges-revenue-soars-it-too-late-buy-stock"
+    },
+    {
      "titolo": "Prediction: This Will Be CoreWeave’s Stock Price After 1 Year Following Its Stunning Results (Hint: It Implies a Big Move)",
      "riassunto": "Key PointsCoreWeave's latest quarterly report improved investor confidence in the stock, and I won't be surprised to see its bull run continue over the coming year.",
      "fonte": "Nasdaq",
@@ -149388,13 +149423,6 @@
      "url": "https://www.nasdaq.com/articles/whats-going-coreweave-stock"
     },
     {
-     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-14T01:34:45Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
-    },
-    {
      "titolo": "Stocks Pressured by Rising Bond Yields",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.22% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.07%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -0.77%. December E-mini S&P futures (ESZ26 ) are down -0.24%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
@@ -149407,16 +149435,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T23:19:03Z",
      "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
-    },
-    {
-     "titolo": "Stock Market Today, Nov. 13: CoreWeave Falls Over 6% on AI-Cloud Selling and Reported $4 Billion Loan Talks",
-     "riassunto": "CoreWeave (NASDAQ:CRWV), a specialized cloud computing provider for generative AI workloads, also known as a neocloud, closed at $53.13, down 6.13%. Premarket AI-cloud selling and debt-funding concerns outweighed the company's strong revenue growth, and investors are watching gui",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:04:29Z",
-     "url": "https://www.nasdaq.com/articles/stock-market-today-nov-13-coreweave-falls-over-6-ai-cloud-selling-and-reported-4-billion"
     }
    ],
    "GOOGL": [
+    {
+     "titolo": "Billionaire Bill Ackman Says There’s a Huge Disconnect in Wall Street’s Expectations for Amazon, Microsoft, Meta, and Alphabet",
+     "riassunto": "Key PointsAmazon, Microsoft, Meta Platforms, and Alphabet are all rapidly increasing their data center capital expenditures.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T15:05:02Z",
+     "url": "https://www.nasdaq.com/articles/billionaire-bill-ackman-says-theres-huge-disconnect-wall-streets-expectations-amazon"
+    },
     {
      "titolo": "Sundar Pichai Reported Alphabet's Cloud Revenue Grew 103% Last Quarter While the Gemini App Reached 1 Billion Monthly Users. Is Google Cloud Becoming a Bigger Growth Driver Than Se",
      "riassunto": "Key PointsIn the last 12 months, the cloud segment added significantly more incremental revenue than the search platform.",
@@ -149451,29 +149479,29 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T19:37:00Z",
      "url": "https://www.nasdaq.com/articles/wall-street-writing-nvidia-stock-heres-why-thats-mistake"
-    },
-    {
-     "titolo": "Stocks Settle Lower on Nvidia Rout and Higher Crude and Bond Yields",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.35% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.36%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.30%. December E-mini S&P futures (ESZ26 ) fell -0.33%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T18:59:12Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
     }
    ],
    "MRVL": [
+    {
+     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T18:20:09Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+    },
+    {
+     "titolo": "Credo Technology Group vs. Marvell Technology: Which Technology Stock Is a Better Buy for 2027?",
+     "riassunto": "Key PointsCredo Technology Group is experiencing massive expansion by providing power-efficient, high-speed connectivity solutions for artificial intelligence infrastructure.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T17:50:02Z",
+     "url": "https://www.nasdaq.com/articles/credo-technology-group-vs-marvell-technology-which-technology-stock-better-buy-2027"
+    },
     {
      "titolo": "2 Stocks That Plunged on Oct. 29 to Buy and Hold Through 2030",
      "riassunto": "Key PointsMarvell's long-term model calls for over $30 in adjusted earnings per share by fiscal 2031.",
      "fonte": "Nasdaq",
      "quando": "2026-11-14T09:01:02Z",
      "url": "https://www.nasdaq.com/articles/2-stocks-plunged-oct-29-buy-and-hold-through-2030"
-    },
-    {
-     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-14T01:34:45Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
      "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -149495,29 +149523,29 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T20:24:11Z",
      "url": "https://www.nasdaq.com/articles/noteworthy-friday-option-activity-app-crcl-mrvl"
-    },
-    {
-     "titolo": "Stocks Settle Lower on Nvidia Rout and Higher Crude and Bond Yields",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.35% on Thursday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -0.36%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.30%. December E-mini S&P futures (ESZ26 ) fell -0.33%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T18:59:12Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
     }
    ],
    "MSTR": [
+    {
+     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T18:20:09Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+    },
+    {
+     "titolo": "Bitcoin Is Slumping, but Michael Saylor Says Strategy Can Create $10 Billion to $30 Billion in \"Digital Credit\"",
+     "riassunto": "Key PointsMichael Saylor said on Strategy’s third-quarter earnings call that the company could create between $10 billion and $30 billion of “digital credit.”",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T17:31:00Z",
+     "url": "https://www.nasdaq.com/articles/bitcoin-slumping-michael-saylor-says-strategy-can-create-10-billion-30-billion-digital"
+    },
     {
      "titolo": "Strategy's Michael Saylor Says Bitcoin Is Now a Bipartisan Issue That Crosses Party Lines. Here's Why He's Right.",
      "riassunto": "Key PointsBitcoin has universal appeal that cuts across party lines.",
      "fonte": "Nasdaq",
      "quando": "2026-11-14T12:02:00Z",
      "url": "https://www.nasdaq.com/articles/strategys-michael-saylor-says-bitcoin-now-bipartisan-issue-crosses-party-lines-heres-why"
-    },
-    {
-     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-14T01:34:45Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
      "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -149539,16 +149567,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T18:59:12Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
-    },
-    {
-     "titolo": "Strategy Raises $21B: Will It Fuel More BTC Purchases?",
-     "riassunto": "MSTR raises $21.23 billion in 2026 to support its Bitcoin strategy, but shifting capital allocation and negative BTC Yield raise concerns.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T14:36:00Z",
-     "url": "https://www.nasdaq.com/articles/strategy-raises-21b-will-it-fuel-more-btc-purchases"
     }
    ],
    "MU": [
+    {
+     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T18:20:09Z",
+     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+    },
+    {
+     "titolo": "Where Will Micron Stock Be in 5 Years?",
+     "riassunto": "Key PointsMicron's sales and earnings are soaring, and the company has impressive market shares in DRAM and HBM.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T17:40:00Z",
+     "url": "https://www.nasdaq.com/articles/where-will-micron-stock-be-5-years"
+    },
     {
      "titolo": "Is It Too Late to Buy Micron Stock?",
      "riassunto": "Key PointsMicron's shares have skyrocketed in 2026 but have plunged since late June.",
@@ -149564,13 +149599,6 @@
      "url": "https://www.nasdaq.com/articles/nvidia-alphabet-microsoft-and-micron-are-all-buying-anthropics-ipo-should-you-buy-too"
     },
     {
-     "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-14T01:34:45Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
-    },
-    {
      "titolo": "Micron Technology vs. Qualcomm: Which Tech Stock Is the Better Buy for 2027?",
      "riassunto": "Key PointsMicron’s revenue and profit have exploded on AI data center demand, but its results swing with memory prices.",
      "fonte": "Nasdaq",
@@ -149583,16 +149611,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T23:35:22Z",
      "url": "https://www.nasdaq.com/articles/stocks-pressured-rising-bond-yields-2"
-    },
-    {
-     "titolo": "Stocks Retreat as Chipmakers Sink and Bond Yields Rise",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.93% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.17%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.06%. December E-mini S&P futures (ESZ26 ) are down -0.92%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:19:03Z",
-     "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
     }
    ],
    "NVDA": [
+    {
+     "titolo": "After Jensen Huang’s Departure, Nvidia Just Did Something It Hasn’t Done Since 2019",
+     "riassunto": "Key PointsNvidia has become an AI giant, bringing in more than $200 billion in revenue in the latest fiscal year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T16:30:02Z",
+     "url": "https://www.nasdaq.com/articles/after-jensen-huangs-departure-nvidia-just-did-something-it-hasnt-done-2019"
+    },
     {
      "titolo": "Think Nvidia Stock Is a Bargain? 6 Reasons the Face of the AI Build-Out Can Plunge Another 50% Following Jensen Huang's Resignation.",
      "riassunto": "Key PointsNvidia rocked Wall Street on Nov. 12, with co-founder Jensen Huang resigning as CEO following allegations of extramarital affairs.",
@@ -149627,13 +149655,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-14T10:22:02Z",
      "url": "https://www.nasdaq.com/articles/nvidia-alphabet-microsoft-and-micron-are-all-buying-anthropics-ipo-should-you-buy-too"
-    },
-    {
-     "titolo": "Should You Really Buy Nvidia Stock After CEO Jensen Huang's Exit? Wall Street Has a Clear Answer for Investors.",
-     "riassunto": "Key PointsJensen Huang resigned from his position as CEO of Nvidia following revelations of extramarital affairs, including one with an alleged Chinese spy.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-14T09:41:02Z",
-     "url": "https://www.nasdaq.com/articles/should-you-really-buy-nvidia-stock-after-ceo-jensen-huangs-exit-wall-street-has-clear"
     }
    ],
    "ORCL": [
@@ -149641,8 +149662,15 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-14T01:34:45Z",
+     "quando": "2026-11-14T18:20:09Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+    },
+    {
+     "titolo": "Could Oracle Hit Its $30 Billion Free Cash Flow Target by Fiscal 2029?",
+     "riassunto": "Oracle (NYSE:ORCL) is attempting to transform extraordinary AI demand into a self-funding growth engine. I examine why its $30 billion fiscal 2029 free cash flow target could dramatically change how investors value the stock, even as a $20 billion financing deal, expensive bonds,",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-14T15:08:48Z",
+     "url": "https://www.nasdaq.com/articles/could-oracle-hit-its-30-billion-free-cash-flow-target-fiscal-2029"
     },
     {
      "titolo": "Stocks Pressured by Rising Bond Yields",
@@ -149666,18 +149694,11 @@
      "url": "https://www.nasdaq.com/articles/stocks-settle-lower-nvidia-rout-and-higher-crude-and-bond-yields"
     },
     {
-     "titolo": "Microsoft Just Piled Onto the Bad News for CoreWeave, Oracle, and Nebius",
-     "riassunto": "Key PointsMicrosoft is reevaluating its contracts with neocloud companies, prioritizing its own data centers.",
+     "titolo": "A 10-Stock Strategy That Balances AI Growth With Cash Flow",
+     "riassunto": "The AI trade is still alive and well, only shifting from speculation to execution, which is where investors stand to make the biggest gains. This portfolio aims to capture those gains, focusing on the names critical to AI’s success while balancing them against a trio of powerhou",
      "fonte": "Nasdaq",
-     "quando": "2026-11-13T11:40:02Z",
-     "url": "https://www.nasdaq.com/articles/microsoft-just-piled-bad-news-coreweave-oracle-and-nebius"
-    },
-    {
-     "titolo": "Bloom Energy vs. Constellation Energy: On-Site Power or Grid Power, Which Wins the Data Center?",
-     "riassunto": "Key PointsModern AI data centers require a lot of electricity, driving strong demand for both on-site and grid-scale power solutions.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T09:06:00Z",
-     "url": "https://www.nasdaq.com/articles/bloom-energy-vs-constellation-energy-site-power-or-grid-power-which-wins-data-center"
+     "quando": "2026-11-13T17:05:00Z",
+     "url": "https://www.nasdaq.com/articles/10-stock-strategy-balances-ai-growth-cash-flow"
     }
    ],
    "PLTR": [
@@ -149773,7 +149794,7 @@
      "titolo": "Stock Indexes Settle Mostly Lower as Chipmakers Slide",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-14T01:34:45Z",
+     "quando": "2026-11-14T18:20:09Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
     },
     {
@@ -149837,7 +149858,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-14T15:29:23Z"
+  "letto_il": "2026-11-14T18:51:45Z"
  },
  "predictions": [
   {
@@ -149851,24 +149872,24 @@
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
   },
   {
-   "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
-   "yes": 88,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
-  },
-  {
    "question": "Will there be no new be CEO of NVIDIA by December 31, 2028?",
-   "yes": 8,
+   "yes": 11,
    "link": "https://polymarket.com/event/will-candidate-a-be-the-next-ceo-of-nvidia"
   },
   {
    "question": "Will Bitcoin dip to $60,000 by December 31, 2026?",
-   "yes": 60,
+   "yes": 56,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-60k-by-december-31-2026-from-july-21"
   },
   {
    "question": "Will Jensen Huang rejoin NVIDIA by December 31, 2026?",
    "yes": 10,
    "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
+  },
+  {
+   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
+   "yes": 16,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
   }
  ],
  "options": {
@@ -222683,7 +222704,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 39,
-    "risk_sentiment": 47,
+    "risk_sentiment": 48,
     "credit": 77,
     "systemic_risk": 77,
     "corp_profit": 53,
@@ -222861,7 +222882,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -222945,6 +222966,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-14T15:29:24Z"
+  "generated_at": "2026-11-14T18:51:46Z"
  }
 }
