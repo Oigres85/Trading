@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-15T11:50:35Z",
+ "updated_at": "2026-11-15T12:22:47Z",
  "eurusd": 1.105,
  "totals": {
   "usd_value": 0,
@@ -1949,7 +1949,7 @@
      "a1": 229.5,
      "a3": 932.34,
      "a5": 849.01,
-     "a10": 3987.45
+     "a10": 3987.46
     },
     "stagionalita": [
      {
@@ -1977,7 +1977,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -18431,25 +18431,25 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 65455.88,
+   "price": 65375.04,
    "price_asof": "2026-11-15",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 2.07,
+   "change_pct": 1.94,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -48.1,
-   "sma200_dist_pct": -10.2,
-   "sma50_dist_pct": -17.9,
+   "ath_dist_pct": -48.2,
+   "sma200_dist_pct": -10.3,
+   "sma50_dist_pct": -18.0,
    "w52_high": 97860.6,
    "w52_low": 57747.77,
-   "w52_dist_pct": -33.1,
+   "w52_dist_pct": -33.2,
    "day_high": 65889.23,
    "day_low": 62093.52,
    "support": 62093.52,
    "resistance": 81889.95,
-   "rsi": 25.2,
-   "volume": 54728671232,
+   "rsi": 24.9,
+   "volume": 55344574464,
    "vol_ratio": 1.66,
    "atr_14": 2655.53,
    "atr_pct": 4.06,
@@ -18461,7 +18461,7 @@
      71342.97,
      68249.27,
      64128.05,
-     65455.88
+     65375.04
     ],
     "m6": [
      62239.12,
@@ -18589,7 +18589,7 @@
      71342.97,
      68249.27,
      64128.05,
-     65455.88
+     65375.04
     ],
     "all": [
      386.94,
@@ -18738,7 +18738,7 @@
      78548.63,
      83553.85,
      77434.75,
-     65455.88
+     65375.04
     ],
     "m1": [
      80024.01,
@@ -18762,7 +18762,7 @@
      71342.97,
      68249.27,
      64128.05,
-     65455.88
+     65375.04
     ],
     "m3": [
      77173.8,
@@ -18830,7 +18830,7 @@
      71342.97,
      68249.27,
      64128.05,
-     65455.88
+     65375.04
     ],
     "y1": [
      95549.15,
@@ -18906,7 +18906,7 @@
      77434.75,
      75942.12,
      73720.12,
-     65455.88
+     65375.04
     ],
     "d1": [
      64048.57,
@@ -18979,7 +18979,10 @@
      65275.65,
      65384.51,
      65363.17,
-     65471.14
+     65471.14,
+     65440.9,
+     65242.8,
+     65319.51
     ]
    },
    "earnings_date": null,
@@ -18990,10 +18993,10 @@
    "beta": null,
    "sharpe_1y": -0.8,
    "sortino_1y": -1.09,
-   "sharpe_6m": 0.05,
-   "sortino_6m": 0.08,
+   "sharpe_6m": 0.04,
+   "sortino_6m": 0.06,
    "prepost": null,
-   "prezzo_limite_aggiustato": 65455.88,
+   "prezzo_limite_aggiustato": 65375.04,
    "risk_reward": "1:3.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19009,22 +19012,22 @@
     "w1": {
      "support": 62093.52,
      "resistance": 74703.45,
-     "change_pct": -11.5
+     "change_pct": -11.61
     },
     "m1": {
      "support": 62093.52,
      "resistance": 81889.95,
-     "change_pct": -18.2
+     "change_pct": -18.31
     },
     "m3": {
      "support": 62093.52,
      "resistance": 87363.76,
-     "change_pct": -15.18
+     "change_pct": -15.29
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": -4.31
+     "change_pct": -4.43
     }
    },
    "financials": [],
@@ -19047,74 +19050,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 65455.88,
+     "prezzo": 65375.04,
      "medie": {
       "sma10": {
-       "liv": 71816.31,
-       "dist_pct": -8.86
+       "liv": 71808.22,
+       "dist_pct": -8.96
       },
       "ema10": {
-       "liv": 70784.87,
-       "dist_pct": -7.53
+       "liv": 70770.18,
+       "dist_pct": -7.62
       },
       "sma20": {
-       "liv": 75063.1,
-       "dist_pct": -12.8
+       "liv": 75059.06,
+       "dist_pct": -12.9
       },
       "ema20": {
-       "liv": 73922.44,
-       "dist_pct": -11.45
+       "liv": 73914.74,
+       "dist_pct": -11.55
       },
       "sma30": {
-       "liv": 77222.53,
-       "dist_pct": -15.24
+       "liv": 77219.83,
+       "dist_pct": -15.34
       },
       "ema30": {
-       "liv": 75672.41,
-       "dist_pct": -13.5
+       "liv": 75667.2,
+       "dist_pct": -13.6
       },
       "sma50": {
-       "liv": 79758.08,
-       "dist_pct": -17.93
+       "liv": 79756.46,
+       "dist_pct": -18.03
       },
       "ema50": {
-       "liv": 77090.5,
-       "dist_pct": -15.09
+       "liv": 77087.33,
+       "dist_pct": -15.19
       },
       "sma100": {
-       "liv": 77735.78,
-       "dist_pct": -15.8
+       "liv": 77734.97,
+       "dist_pct": -15.9
       },
       "ema100": {
-       "liv": 76619.98,
-       "dist_pct": -14.57
+       "liv": 76618.38,
+       "dist_pct": -14.67
       },
       "sma200": {
-       "liv": 72922.67,
-       "dist_pct": -10.24
+       "liv": 72922.27,
+       "dist_pct": -10.35
       },
       "ema200": {
-       "liv": 75721.04,
-       "dist_pct": -13.56
+       "liv": 75720.24,
+       "dist_pct": -13.66
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 25.2,
+      "rsi14": 24.9,
       "macd": {
-       "linea": -3495.69,
-       "segnale": -2367.7,
-       "istogramma": -1127.99
+       "linea": -3502.14,
+       "segnale": -2368.99,
+       "istogramma": -1133.15
       },
-      "stoch_k": 17.7,
-      "stoch_d": 8.9,
-      "williams_r": -82.3,
-      "cci20": -171.5,
+      "stoch_k": 17.3,
+      "stoch_d": 8.7,
+      "williams_r": -82.7,
+      "cci20": -171.9,
       "adx14": 30.5,
       "di_su": 7.8,
       "di_giu": 40.9,
-      "momentum10": -10486.25
+      "momentum10": -10567.09
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19607,19 +19610,19 @@
       "o": 64119.78,
       "h": 65889.23,
       "l": 62093.52,
-      "c": 65455.88
+      "c": 65375.04
      }
     ],
     "performance": {
-     "s1": -11.21,
-     "m1": -18.98,
-     "m3": -14.51,
-     "m6": 2.66,
-     "a1": -0.78,
-     "ytd": -26.23,
-     "a3": 73.56,
-     "a5": 14.82,
-     "a10": 8677.88
+     "s1": -11.32,
+     "m1": -19.08,
+     "m3": -14.62,
+     "m6": 2.54,
+     "a1": -0.9,
+     "ytd": -26.32,
+     "a3": 73.35,
+     "a5": 14.68,
+     "a10": 8667.04
     },
     "stagionalita": [
      {
@@ -19732,9 +19735,9 @@
      }
     ]
    },
-   "rs_1m": -15.8,
+   "rs_1m": -16.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -11.6,
+   "rs_ndx_1m": -11.7,
    "beta_ndx": 0.64,
    "avg_corr": 0.35,
    "max_corr": 0.77,
@@ -37274,7 +37277,7 @@
      98.35,
      84.39,
      94.22,
-     99.64,
+     99.65,
      83.74,
      89.74,
      116.26,
@@ -41578,7 +41581,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -44620,7 +44623,7 @@
      "a1": 38.23,
      "a3": 326.46,
      "a5": 268.71,
-     "a10": 1593.77
+     "a10": 1593.76
     },
     "stagionalita": [
      {
@@ -48292,7 +48295,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -45.3,
-      "meglio": 24.6
+      "meglio": 24.5
      },
      {
       "mese": 11,
@@ -62240,14 +62243,14 @@
      247.18,
      258.21,
      275.82,
-     303.03,
+     303.04,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -69247,7 +69250,7 @@
      {
       "mese": 12,
       "media": 2.95,
-      "mediana": 4.32,
+      "mediana": 4.33,
       "positivi_pct": 71,
       "campione": 31,
       "peggio": -25.0,
@@ -91182,7 +91185,7 @@
      127.9,
      130.07,
      136.24,
-     144.28,
+     144.29,
      154.51,
      149.4,
      151.74,
@@ -93223,7 +93226,7 @@
      32.88,
      31.09,
      28.92,
-     32.13,
+     32.12,
      32.9,
      33.61,
      31.46,
@@ -94566,7 +94569,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -96409,7 +96412,7 @@
      "m6": 42.1,
      "ytd": 32.51,
      "a1": 33.45,
-     "a3": 128.93,
+     "a3": 128.94,
      "a5": 205.66,
      "a10": 629.27
     },
@@ -101784,7 +101787,7 @@
      322.37,
      340.11,
      336.06,
-     360.42,
+     360.43,
      358.86,
      369.78,
      383.01,
@@ -108588,7 +108591,7 @@
      {
       "mese": 12,
       "media": 1.11,
-      "mediana": 2.91,
+      "mediana": 2.92,
       "positivi_pct": 78,
       "campione": 18,
       "peggio": -21.7,
@@ -109416,7 +109419,7 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
      336.45,
      329.49,
@@ -110656,7 +110659,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -115717,7 +115720,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -115849,7 +115852,7 @@
      164.55,
      200.71,
      230.8,
-     237.32,
+     237.33,
      279.61,
      287.31,
      306.16,
@@ -119936,7 +119939,7 @@
      137.15,
      142.3,
      133.05,
-     118.62,
+     118.61,
      119.02,
      119.32,
      124.66,
@@ -120028,9 +120031,9 @@
      390.19,
      418.26,
      427.74,
-     448.72,
+     448.71,
      393.97,
-     377.21,
+     377.2,
      430.42,
      453.23,
      469.58,
@@ -120058,7 +120061,7 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
@@ -142700,7 +142703,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 71
+     "score": 69
     },
     {
      "label": "Treasury 10A",
@@ -148075,6 +148078,13 @@
       "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
      },
      {
+      "titolo": "Anthropic Just Delivered Great News for AMD Investors and Bad News for Nvidia",
+      "riassunto": "Key PointsAnthropic's Claude Mythos model can now optimize Claude to run on other AI chips in just three days.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-15T10:40:02Z",
+      "url": "https://www.nasdaq.com/articles/anthropic-just-delivered-great-news-amd-investors-and-bad-news-nvidia"
+     },
+     {
       "titolo": "Nvidia Fell While AMD and Broadcom Jumped. Here’s What History Says Happens Next to All 3 Stocks.",
       "riassunto": "Key PointsNvidia will likely be fine as a company, even without co-founder Jensen Huang as CEO.",
       "fonte": "Nasdaq",
@@ -148101,13 +148111,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-13T23:19:03Z",
       "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
-     },
-     {
-      "titolo": "Stock Market Today, Nov. 13: AMD Sinks 8.75% on Sector AI-Chip Sell-Off After Early Gains Reverse",
-      "riassunto": "Advanced Micro Devices (NASDAQ:AMD), a supplier of AI and general-purpose chips for PCs, servers, and embedded systems, closed at $534.06, down 8.75%. Friday's drop followed a sharp reversal from early AI-chip name buying into a sector sell-off. Investors are watching Nvidia's re",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T22:13:55Z",
-      "url": "https://www.nasdaq.com/articles/stock-market-today-nov-13-amd-sinks-875-sector-ai-chip-sell-after-early-gains-reverse"
      }
     ],
     "AVGO": [
@@ -148244,6 +148247,13 @@
     ],
     "GOOGL": [
      {
+      "titolo": "Anthropic Just Delivered Great News for AMD Investors and Bad News for Nvidia",
+      "riassunto": "Key PointsAnthropic's Claude Mythos model can now optimize Claude to run on other AI chips in just three days.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-15T10:40:02Z",
+      "url": "https://www.nasdaq.com/articles/anthropic-just-delivered-great-news-amd-investors-and-bad-news-nvidia"
+     },
+     {
       "titolo": "Most AI Stocks Need Perfect Conditions to Win. This One Doesn't.",
       "riassunto": "Key PointsGoogle Cloud’s revenue more than doubled in the third quarter, and its operating income roughly tripled.",
       "fonte": "Nasdaq",
@@ -148277,13 +148287,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-14T09:25:00Z",
       "url": "https://www.nasdaq.com/articles/prediction-2-stocks-will-be-worth-more-spacex-5-years-now"
-     },
-     {
-      "titolo": "Walmart, Target, and Nvidia Headline a Pivotal Week for Q3 Earnings",
-      "riassunto": "Nvidia, Target, and Walmart reflect three notable upcoming releases in the Q3 earnings season, with Nvidia's release wrapping up the reporting cycle for the Magnificent 7 group. Total Q3 earnings for the S&P 500 members that have reported are up +24.9% year-over-year on +13.7% higher revenues.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-13T23:00:00Z",
-      "url": "https://www.nasdaq.com/articles/walmart-target-and-nvidia-headline-pivotal-week-q3-earnings"
      }
     ],
     "MRVL": [
@@ -148663,7 +148666,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-15T11:50:35Z"
+   "letto_il": "2026-11-15T12:22:47Z"
   }
  },
  "broker": null,
@@ -148676,6 +148679,13 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-15T11:10:26Z",
      "url": "https://www.nasdaq.com/articles/stock-indexes-settle-mostly-lower-chipmakers-slide"
+    },
+    {
+     "titolo": "Anthropic Just Delivered Great News for AMD Investors and Bad News for Nvidia",
+     "riassunto": "Key PointsAnthropic's Claude Mythos model can now optimize Claude to run on other AI chips in just three days.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-15T10:40:02Z",
+     "url": "https://www.nasdaq.com/articles/anthropic-just-delivered-great-news-amd-investors-and-bad-news-nvidia"
     },
     {
      "titolo": "Nvidia Fell While AMD and Broadcom Jumped. Here’s What History Says Happens Next to All 3 Stocks.",
@@ -148704,13 +148714,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-13T23:19:03Z",
      "url": "https://www.nasdaq.com/articles/stocks-retreat-chipmakers-sink-and-bond-yields-rise"
-    },
-    {
-     "titolo": "Stock Market Today, Nov. 13: AMD Sinks 8.75% on Sector AI-Chip Sell-Off After Early Gains Reverse",
-     "riassunto": "Advanced Micro Devices (NASDAQ:AMD), a supplier of AI and general-purpose chips for PCs, servers, and embedded systems, closed at $534.06, down 8.75%. Friday's drop followed a sharp reversal from early AI-chip name buying into a sector sell-off. Investors are watching Nvidia's re",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T22:13:55Z",
-     "url": "https://www.nasdaq.com/articles/stock-market-today-nov-13-amd-sinks-875-sector-ai-chip-sell-after-early-gains-reverse"
     }
    ],
    "AVGO": [
@@ -148847,6 +148850,13 @@
    ],
    "GOOGL": [
     {
+     "titolo": "Anthropic Just Delivered Great News for AMD Investors and Bad News for Nvidia",
+     "riassunto": "Key PointsAnthropic's Claude Mythos model can now optimize Claude to run on other AI chips in just three days.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-15T10:40:02Z",
+     "url": "https://www.nasdaq.com/articles/anthropic-just-delivered-great-news-amd-investors-and-bad-news-nvidia"
+    },
+    {
      "titolo": "Most AI Stocks Need Perfect Conditions to Win. This One Doesn't.",
      "riassunto": "Key PointsGoogle Cloud’s revenue more than doubled in the third quarter, and its operating income roughly tripled.",
      "fonte": "Nasdaq",
@@ -148880,13 +148890,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-14T09:25:00Z",
      "url": "https://www.nasdaq.com/articles/prediction-2-stocks-will-be-worth-more-spacex-5-years-now"
-    },
-    {
-     "titolo": "Walmart, Target, and Nvidia Headline a Pivotal Week for Q3 Earnings",
-     "riassunto": "Nvidia, Target, and Walmart reflect three notable upcoming releases in the Q3 earnings season, with Nvidia's release wrapping up the reporting cycle for the Magnificent 7 group. Total Q3 earnings for the S&P 500 members that have reported are up +24.9% year-over-year on +13.7% higher revenues.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-13T23:00:00Z",
-     "url": "https://www.nasdaq.com/articles/walmart-target-and-nvidia-headline-pivotal-week-q3-earnings"
     }
    ],
    "MRVL": [
@@ -149266,18 +149269,18 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-15T11:50:35Z"
+  "letto_il": "2026-11-15T12:22:47Z"
  },
  "predictions": [
-  {
-   "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
-   "yes": 6,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
-  },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
    "yes": 86,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
+  },
+  {
+   "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
+   "yes": 6,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
   },
   {
    "question": "Will Bitcoin dip to $55,000 by December 31, 2026?",
@@ -149285,18 +149288,18 @@
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-55000-by-december-31-2026-527-627-868-745-188-361-314-673-612-946-821-624-855-557-684-381-884-939-182-939-516"
   },
   {
-   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
-   "yes": 15,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
-  },
-  {
    "question": "Will Jensen Huang rejoin NVIDIA by December 31, 2026?",
    "yes": 10,
    "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
   },
   {
+   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
+   "yes": 15,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
+  },
+  {
    "question": "Will Bitcoin dip to $62,000 November 9-15?",
-   "yes": 10,
+   "yes": 11,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-62k-november-9-15-2026"
   }
  ],
@@ -222324,7 +222327,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 14 ore"
+    "note": "18 voci, la piu' recente di 15 ore"
    },
    {
     "key": "sec_calendario",
@@ -222408,6 +222411,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-15T11:50:36Z"
+  "generated_at": "2026-11-15T12:22:48Z"
  }
 }
