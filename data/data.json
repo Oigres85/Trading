@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-15T19:29:28Z",
+ "updated_at": "2026-11-15T19:57:59Z",
  "eurusd": 1.1031,
  "totals": {
   "usd_value": 0,
@@ -494,7 +494,7 @@
      33.88,
      30.71,
      34.61,
-     44.63,
+     44.62,
      33.36,
      40.49,
      44.24,
@@ -1949,7 +1949,7 @@
      "a1": 229.5,
      "a3": 932.34,
      "a5": 849.01,
-     "a10": 3987.45
+     "a10": 3987.46
     },
     "stagionalita": [
      {
@@ -18431,11 +18431,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 64953.19,
+   "price": 64942.71,
    "price_asof": "2026-11-15",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 1.29,
+   "change_pct": 1.27,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -48.5,
@@ -18448,8 +18448,8 @@
    "day_low": 62093.52,
    "support": 62093.52,
    "resistance": 81889.95,
-   "rsi": 23.4,
-   "volume": 47568420864,
+   "rsi": 23.3,
+   "volume": 48157200384,
    "vol_ratio": 1.66,
    "atr_14": 2655.53,
    "atr_pct": 4.09,
@@ -18461,7 +18461,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64953.19
+     64942.71
     ],
     "m6": [
      62239.12,
@@ -18589,7 +18589,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64953.19
+     64942.71
     ],
     "all": [
      386.94,
@@ -18738,7 +18738,7 @@
      78548.63,
      83553.85,
      77434.75,
-     64953.19
+     64942.71
     ],
     "m1": [
      80024.01,
@@ -18762,7 +18762,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64953.19
+     64942.71
     ],
     "m3": [
      77173.8,
@@ -18830,7 +18830,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64953.19
+     64942.71
     ],
     "y1": [
      95549.15,
@@ -18906,7 +18906,7 @@
      77434.75,
      75942.12,
      73720.12,
-     64953.19
+     64942.71
     ],
     "d1": [
      64049.03,
@@ -19025,7 +19025,10 @@
      64577.75,
      64688.97,
      65033.01,
-     64906.11
+     64906.11,
+     64956.36,
+     64960.37,
+     64942.71
     ]
    },
    "earnings_date": null,
@@ -19039,7 +19042,7 @@
    "sharpe_6m": 0.0,
    "sortino_6m": 0.01,
    "prepost": null,
-   "prezzo_limite_aggiustato": 64953.19,
+   "prezzo_limite_aggiustato": 64942.71,
    "risk_reward": "1:3.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19055,22 +19058,22 @@
     "w1": {
      "support": 62093.52,
      "resistance": 74703.45,
-     "change_pct": -12.18
+     "change_pct": -12.2
     },
     "m1": {
      "support": 62093.52,
      "resistance": 81889.95,
-     "change_pct": -18.83
+     "change_pct": -18.85
     },
     "m3": {
      "support": 62093.52,
      "resistance": 87363.76,
-     "change_pct": -15.84
+     "change_pct": -15.85
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": -5.04
+     "change_pct": -5.06
     }
    },
    "financials": [],
@@ -19093,74 +19096,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 64953.19,
+     "prezzo": 64942.71,
      "medie": {
       "sma10": {
-       "liv": 71766.04,
-       "dist_pct": -9.49
+       "liv": 71764.99,
+       "dist_pct": -9.51
       },
       "ema10": {
-       "liv": 70693.48,
-       "dist_pct": -8.12
+       "liv": 70691.57,
+       "dist_pct": -8.13
       },
       "sma20": {
-       "liv": 75037.97,
-       "dist_pct": -13.44
+       "liv": 75037.44,
+       "dist_pct": -13.45
       },
       "ema20": {
-       "liv": 73874.56,
-       "dist_pct": -12.08
+       "liv": 73873.56,
+       "dist_pct": -12.09
       },
       "sma30": {
-       "liv": 77205.77,
-       "dist_pct": -15.87
+       "liv": 77205.42,
+       "dist_pct": -15.88
       },
       "ema30": {
-       "liv": 75639.98,
-       "dist_pct": -14.13
+       "liv": 75639.3,
+       "dist_pct": -14.14
       },
       "sma50": {
-       "liv": 79748.02,
-       "dist_pct": -18.55
+       "liv": 79747.81,
+       "dist_pct": -18.56
       },
       "ema50": {
-       "liv": 77070.79,
-       "dist_pct": -15.72
+       "liv": 77070.38,
+       "dist_pct": -15.74
       },
       "sma100": {
-       "liv": 77730.76,
-       "dist_pct": -16.44
+       "liv": 77730.65,
+       "dist_pct": -16.45
       },
       "ema100": {
-       "liv": 76610.03,
-       "dist_pct": -15.22
+       "liv": 76609.82,
+       "dist_pct": -15.23
       },
       "sma200": {
-       "liv": 72920.16,
-       "dist_pct": -10.93
+       "liv": 72920.11,
+       "dist_pct": -10.94
       },
       "ema200": {
-       "liv": 75716.04,
-       "dist_pct": -14.21
+       "liv": 75715.94,
+       "dist_pct": -14.23
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 23.4,
+      "rsi14": 23.3,
       "macd": {
-       "linea": -3535.79,
-       "segnale": -2375.72,
-       "istogramma": -1160.07
+       "linea": -3536.63,
+       "segnale": -2375.89,
+       "istogramma": -1160.74
       },
-      "stoch_k": 15.1,
+      "stoch_k": 15.0,
       "stoch_d": 8.0,
-      "williams_r": -84.9,
-      "cci20": -173.7,
+      "williams_r": -85.0,
+      "cci20": -173.8,
       "adx14": 30.5,
       "di_su": 7.8,
       "di_giu": 40.9,
-      "momentum10": -10988.93
+      "momentum10": -10999.41
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19653,19 +19656,19 @@
       "o": 64119.78,
       "h": 65889.23,
       "l": 62093.52,
-      "c": 64953.19
+      "c": 64942.71
      }
     ],
     "performance": {
-     "s1": -11.89,
-     "m1": -19.6,
-     "m3": -15.17,
-     "m6": 1.87,
-     "a1": -1.54,
-     "ytd": -26.8,
-     "a3": 72.23,
-     "a5": 13.94,
-     "a10": 8610.47
+     "s1": -11.91,
+     "m1": -19.62,
+     "m3": -15.18,
+     "m6": 1.86,
+     "a1": -1.56,
+     "ytd": -26.81,
+     "a3": 72.2,
+     "a5": 13.92,
+     "a10": 8609.06
     },
     "stagionalita": [
      {
@@ -37321,7 +37324,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -41625,7 +41628,7 @@
      199.67,
      214.77,
      243.03,
-     278.12,
+     278.11,
      259.91,
      283.8,
      285.22,
@@ -55973,7 +55976,7 @@
      24.28,
      21.19,
      21.19,
-     18.3,
+     18.31,
      20.9,
      17.41,
      13.16,
@@ -68026,7 +68029,7 @@
      702.69,
      704.46,
      696.35,
-     643.47,
+     643.46,
      573.45,
      583.34,
      667.8,
@@ -69249,7 +69252,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.64,
+      "mediana": 1.63,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -70058,7 +70061,7 @@
      52.6,
      56.04,
      56.58,
-     53.59,
+     53.6,
      53.17,
      52.81,
      52.85,
@@ -72255,7 +72258,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -76443,7 +76446,7 @@
      11.1,
      11.27,
      11.09,
-     11.07,
+     11.06,
      11.8,
      11.5,
      10.69,
@@ -91278,7 +91281,7 @@
      127.9,
      130.07,
      136.24,
-     144.28,
+     144.29,
      154.51,
      149.4,
      151.74,
@@ -95339,7 +95342,7 @@
      140.26,
      150.21,
      160.86,
-     166.38,
+     166.39,
      149.99,
      148.7,
      158.18,
@@ -96505,7 +96508,7 @@
      "m6": 42.1,
      "ytd": 32.51,
      "a1": 33.45,
-     "a3": 128.93,
+     "a3": 128.94,
      "a5": 205.66,
      "a10": 629.27
     },
@@ -101880,7 +101883,7 @@
      322.37,
      340.11,
      336.06,
-     360.42,
+     360.43,
      358.86,
      369.78,
      383.01,
@@ -108684,7 +108687,7 @@
      {
       "mese": 12,
       "media": 1.11,
-      "mediana": 2.91,
+      "mediana": 2.92,
       "positivi_pct": 78,
       "campione": 18,
       "peggio": -21.7,
@@ -109512,9 +109515,9 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -110752,7 +110755,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -115813,7 +115816,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -115970,7 +115973,7 @@
      352.96,
      313.87,
      334.37,
-     321.42,
+     321.43,
      301.14,
      316.17,
      300.45,
@@ -119926,7 +119929,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -120126,7 +120129,7 @@
      427.74,
      448.72,
      393.97,
-     377.21,
+     377.2,
      430.42,
      453.23,
      469.58,
@@ -122447,7 +122450,7 @@
      1070.01,
      1073.26,
      1101.43,
-     1066.83,
+     1066.84,
      1080.84,
      1017.98,
      1014.7,
@@ -132818,8 +132821,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "175.88",
-    "change_pct": -0.44,
+    "value": "175.90",
+    "change_pct": -0.43,
     "suffix": "%"
    }
   ],
@@ -142759,8 +142762,8 @@
    "us10": 5.15,
    "jp10": 2.84,
    "spread": 2.31,
-   "usdjpy": 159.57,
-   "usdjpy_chg_1m": 0.79,
+   "usdjpy": 159.54,
+   "usdjpy_chg_1m": 0.77,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -148648,6 +148651,13 @@
     ],
     "RGTI": [
      {
+      "titolo": "Rigetti Computing vs. SoundHound AI: Which Technology Stock Is a Better Buy for 2027?",
+      "riassunto": "Key PointsRigetti Computing is a pure-play developer of superconducting quantum processors and cloud-based quantum services.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-15T19:25:05Z",
+      "url": "https://www.nasdaq.com/articles/rigetti-computing-vs-soundhound-ai-which-technology-stock-better-buy-2027"
+     },
+     {
       "titolo": "Prediction: Rigetti Computing Stock Will Be Worth This Much in 1 Year",
       "riassunto": "Key PointsRigetti Computing developed some of the world's best quantum computers, but they still make too many errors to solve real-world problems.",
       "fonte": "Nasdaq",
@@ -148681,13 +148691,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-11T16:52:00Z",
       "url": "https://www.nasdaq.com/articles/rigetti-q3-earnings-call-highlights-quantum-roadmap-and-funding"
-     },
-     {
-      "titolo": "IonQ Raised the Bar, But 3 Quantum Rivals Face Tough Questions",
-      "riassunto": "Early in November 2026, quantum computing pioneer IonQ Inc. (NYSE: IONQ) set a high bar with a Q3 2026 earnings report that included revenue that more than quadrupled year over year (YOY), further increases to full-year guidance, and a growing pile of contracts and cash reserves",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-11T16:40:00Z",
-      "url": "https://www.nasdaq.com/articles/ionq-raised-bar-3-quantum-rivals-face-tough-questions"
      }
     ],
     "WDC": [
@@ -148759,7 +148762,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-15T19:29:28Z"
+   "letto_il": "2026-11-15T19:57:59Z"
   }
  },
  "broker": null,
@@ -149251,6 +149254,13 @@
    ],
    "RGTI": [
     {
+     "titolo": "Rigetti Computing vs. SoundHound AI: Which Technology Stock Is a Better Buy for 2027?",
+     "riassunto": "Key PointsRigetti Computing is a pure-play developer of superconducting quantum processors and cloud-based quantum services.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-15T19:25:05Z",
+     "url": "https://www.nasdaq.com/articles/rigetti-computing-vs-soundhound-ai-which-technology-stock-better-buy-2027"
+    },
+    {
      "titolo": "Prediction: Rigetti Computing Stock Will Be Worth This Much in 1 Year",
      "riassunto": "Key PointsRigetti Computing developed some of the world's best quantum computers, but they still make too many errors to solve real-world problems.",
      "fonte": "Nasdaq",
@@ -149284,13 +149294,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-11T16:52:00Z",
      "url": "https://www.nasdaq.com/articles/rigetti-q3-earnings-call-highlights-quantum-roadmap-and-funding"
-    },
-    {
-     "titolo": "IonQ Raised the Bar, But 3 Quantum Rivals Face Tough Questions",
-     "riassunto": "Early in November 2026, quantum computing pioneer IonQ Inc. (NYSE: IONQ) set a high bar with a Q3 2026 earnings report that included revenue that more than quadrupled year over year (YOY), further increases to full-year guidance, and a growing pile of contracts and cash reserves",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-11T16:40:00Z",
-     "url": "https://www.nasdaq.com/articles/ionq-raised-bar-3-quantum-rivals-face-tough-questions"
     }
    ],
    "WDC": [
@@ -149362,7 +149365,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-15T19:29:28Z"
+  "letto_il": "2026-11-15T19:57:59Z"
  },
  "predictions": [
   {
@@ -149371,14 +149374,19 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
   },
   {
+   "question": "Will Jensen Huang rejoin NVIDIA by December 31, 2026?",
+   "yes": 21,
+   "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
+  },
+  {
    "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
    "yes": 9,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
   },
   {
-   "question": "Will Jensen Huang rejoin NVIDIA by December 31, 2026?",
-   "yes": 23,
-   "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
+   "question": "Will there be no new be CEO of NVIDIA by December 31, 2028?",
+   "yes": 16,
+   "link": "https://polymarket.com/event/will-candidate-a-be-the-next-ceo-of-nvidia"
   },
   {
    "question": "Will Bitcoin dip to $55,000 by December 31, 2026?",
@@ -149387,13 +149395,8 @@
   },
   {
    "question": "Will Bitcoin dip to $62,000 November 9-15?",
-   "yes": 10,
+   "yes": 8,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-62k-november-9-15-2026"
-  },
-  {
-   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
-   "yes": 16,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
   }
  ],
  "options": {
@@ -222504,6 +222507,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-15T19:29:28Z"
+  "generated_at": "2026-11-15T19:58:00Z"
  }
 }

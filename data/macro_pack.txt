@@ -1,4 +1,4 @@
-⟦ BUILD v524 · generato 15/11/2026 19:29 ⟧
+⟦ BUILD v524 · generato 15/11/2026 19:58 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 15/11/2026, 19:29:28 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 14:29, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -0,98% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,17% · Fut S&P -0,46% · BTC +1,29% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~19h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 6 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 15/11/2026, 19:57:59 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 14:58, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -0,98% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,17% · Fut S&P -0,46% · BTC +1,27% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~18.5h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono i 6 titoli macro pubblicati dopo la campana, che il prezzo non ha ancora votato: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 15/11/2026, 19:29:28 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-11-13 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 15/11/2026, 19:57:59 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-11-13 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): ottobre 2026 · Inflazione PCE (a/a): settembre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): settembre 2026 · Non-Farm Payrolls: ottobre 2026 · Disoccupazione: ottobre 2026 · Fiducia consumatori (UMich): ottobre 2026 · Curva 10A-2A: 13/11/2026 · Curva 10A-3M: 13/11/2026 · Treasury USA 30A: 12/11/2026 · Tasso reale 10A (TIPS): 12/11/2026 · Inflazione attesa 10A (breakeven): 13/11/2026 · Manifattura Philly Fed (al posto dell'ISM): ottobre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -71,7 +71,7 @@ QUADRO MACRO:
 - Fear & Greed: 39 (Paura) · rilevazione CNN del 13/11/2026 · la seduta prima 40, 1 settimana fa 24, 1 mese fa 46, 1 anno fa 25 · nel suo anno: 45° percentile su 250 rilevazioni (minimo 5, massimo 71)
 - VIX: 19.3 (+3,21% nell'ultima seduta [chiusura del 13/11] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
 - Fed Funds Rate: range ATTUALE 3,75–4,00% · tasso implicito futures 3,88% (media attesa del mese in corso, dal suo contratto) · PROSSIMA RIUNIONE FOMC: 09/12/2026 (il tasso resta valido fino alla prossima decisione FOMC)
-- Carry USA-Giappone: spread tassi 10A 2,31 pp (US10A 5.15%, JGB10A 2.84%), USD/JPY 159.57 (+0,79% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/12/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
+- Carry USA-Giappone: spread tassi 10A 2,31 pp (US10A 5.15%, JGB10A 2.84%), USD/JPY 159.54 (+0,77% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/12/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 0,86 — zona centrale, nessuno dei due prevale (put 810355, call 938734). BANDE DI SOLA LETTURA, convenzione del mestiere e non un dato di questo file: sopra 1,1 prevalgono le put, sotto 0,7 le call, in mezzo e' zona centrale. ⚠ Il sistema NON ha lo storico di questa serie, quindi non puo' dire a quale percentile stia il valore di oggi: dove cominci un ESTREMO — che e' il punto in cui la lettura si rovescia in contrarian — qui non e' stabilito, e non va dedotto dalle due soglie qui sopra, che separano il verso e non l'intensita'.
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 8,1% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $70B su $867B di BIL+SHV+SPY (SPY da solo $797B)) · Retail Cash: fondi monetari retail $3044 mld (FRED RMFNS, YoY +5,2%, 98° percentile 5A, riferito a settembre 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
 - Righello Dollaro (DXY): 103.41 · 3 mesi +3,77% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
@@ -98,15 +98,15 @@ QUADRO MACRO:
 - TITOLI MACRO — 5 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 6 pubblicate DOPO l'ultima chiusura USA del 2026-11-13, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Peru’s Economy Unexpectedly Slows as Mining, Farming Slump
       Peru’s economy unexpectedly slowed in September, dragged down by weak mining and agriculture output.
-    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Inside India’s $130 Billion Wedding Economy
+    · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Inside India’s $130 Billion Wedding Economy
       India’s weddings are a major economic force, generating an estimated $130 billion in annual spending.. For many families, the financial commitment begins years before the ceremony through savings and gold accumulation, while some households borrow against existing jewelry to finance wedding expenses. (Source: Bloomberg
-    · [Bloomberg, 6h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Can America’s Next Jobs Boom Build a Middle-Class Life?
+    · [Bloomberg, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Can America’s Next Jobs Boom Build a Middle-Class Life?
       America’s aging population is driving rapid growth in demand for home care workers, but many of those jobs still offer wages too low to support a family. Ai-jen Poo of the National Domestic Workers Alliance says the country will need hundreds of thousands of additional home care workers in the coming decades, while Har
     · [Bloomberg, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Bond Drought in Emerging Markets Lifts Prices as Sales Slump 41%
       New sales of emerging-market government bonds have cratered in the second half of the year despite strong demand from international investors, creating a supply shortage that’s supporting prices before an expected rebound in issuance early next year.
     · [MarketWatch, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Gold and silver are supposed to protect against inflation. So why are both metals tumbling instead?
       Charts show the potential for more pain ahead
-    · [CNBC Economia, 46h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] AI risks are the biggest threat to the financial system, Fed survey finds
+    · [CNBC Economia, 47h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] AI risks are the biggest threat to the financial system, Fed survey finds
       The report comes with Wall Street on edge over high-flying AI hyperscalers, while communities are on alert for the rapid spread of data centers.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-11-17 Vendite al dettaglio (m/m) (precedente 0.8%) · 2026-11-19 Manifattura Philly Fed (al posto dell'ISM) (precedente +20.9) · 2026-11-25 Inflazione PCE (a/a) (precedente 3.6%) · 2026-11-25 PIL USA (t/t ann.) (precedente 3.4%). ⚠ Per 1 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich)): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 5 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-2A, Curva 10A-3M, Treasury USA 30A, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-11-17 NVDA · 2026-11-17 DIS · 2026-11-18 PANW · 2026-11-24 DELL · 2026-11-25 DE. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 1 accesi su 4 CALCOLABILI da una fonte — accesi: Inasprimento criteri di prestito. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "6/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 1 su 4.
@@ -166,11 +166,11 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
 - Will the Fed increase interest rates by 25 bps after the December 2026 meeting?: 86% [Δ7g —]
+- Will Jensen Huang rejoin NVIDIA by December 31, 2026?: 21% [Δ7g —]
 - Will Bitcoin dip to $45,000 by December 31, 2026?: 9% [Δ7g —]
-- Will Jensen Huang rejoin NVIDIA by December 31, 2026?: 23% [Δ7g —]
+- Will there be no new be CEO of NVIDIA by December 31, 2028?: 16% [Δ7g —]
 - Will Bitcoin dip to $55,000 by December 31, 2026?: 34% [Δ7g —]
-- Will Bitcoin dip to $62,000 November 9-15?: 10% [Δ7g —]
-- Will Bitcoin dip to $50,000 by December 31, 2026?: 16% [Δ7g —]
+- Will Bitcoin dip to $62,000 November 9-15?: 8% [Δ7g —]
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
 Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.
@@ -250,15 +250,15 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsThe demand for AMD's server CPUs continues to grow, as evidenced by the company's expanded agreement with Google.
   [AVGO] · [Nasdaq, 6h fa] Is Credo Technology a Better AI Networking Buy Than Broadcom?
       Key PointsBroadcom expects its artificial intelligence revenue to skyrocket to $230 billion by fiscal 2028.
-  [AVGO] · [Nasdaq, 17h fa] Broadcom Jumped as Nvidia Fell. This Is What Has Investors Excited.
+  [AVGO] · [Nasdaq, 18h fa] Broadcom Jumped as Nvidia Fell. This Is What Has Investors Excited.
       Key PointsBroadcom's custom AI chips are becoming more popular.
-  [BE] · [Nasdaq, 8h fa] Bloom Energy Is Down 43% From Its High. Should You Buy the Dip?
+  [BE] · [Nasdaq, 9h fa] Bloom Energy Is Down 43% From Its High. Should You Buy the Dip?
       Key PointsBloom's revenue has surged year over year, but concerns over AI spending have pressured its stock.
-  [BE] · [Nasdaq, 19h fa] Nvidia's Ousted CEO Said a 1-Gigawatt Data Center Delay Costs $10 Billion a Quarter. Here's Why That Matters for Power Stocks.
+  [BE] · [Nasdaq, 20h fa] Nvidia's Ousted CEO Said a 1-Gigawatt Data Center Delay Costs $10 Billion a Quarter. Here's Why That Matters for Power Stocks.
       Key PointsAI adoption growth continues unfazed.
   [CRWV] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Lower as Chipmakers Slide
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...
-  [CRWV] · [Nasdaq, 6h fa] Why Is Everyone Talking About CoreWeave Stock Right Now?
+  [CRWV] · [Nasdaq, 7h fa] Why Is Everyone Talking About CoreWeave Stock Right Now?
       Should you buy stock in CoreWeave right now? Before you buy stock in CoreWeave, consider this:Missed AI’s "Act 1"? Act 2 Could Be 15x Bigger. Most investors think they missed the AI boat because they didn't buy Nvidia in 2005. But according to our analysts, we’re only at the end
   [MRVL] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Lower as Chipmakers Slide
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...
@@ -274,16 +274,16 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsMicron expects its strategic customer agreements to make up over a third of its revenue through 2030.
   [NVDA] · [Nasdaq, 2h fa] Nvidia Reports Earnings on Nov. 17. Here's What Investors Should Be Watching.
       Key PointsNvidia's Nov. 17 earnings report will be its first since Jensen Huang stepped down as CEO.
-  [NVDA] · [Nasdaq, 3h fa] Archer Aviation and Joby Aviation: Speculative Plays With Upside Potential and Downside Risk
+  [NVDA] · [Nasdaq, 4h fa] Archer Aviation and Joby Aviation: Speculative Plays With Upside Potential and Downside Risk
       Key PointseVTOL stocks have declined due to certification issues and concerns over cash burn.
   [ORCL] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Lower as Chipmakers Slide
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...
-  [ORCL] · [Nasdaq, 28h fa] Could Oracle Hit Its $30 Billion Free Cash Flow Target by Fiscal 2029?
+  [ORCL] · [Nasdaq, 29h fa] Could Oracle Hit Its $30 Billion Free Cash Flow Target by Fiscal 2029?
       Oracle (NYSE:ORCL) is attempting to transform extraordinary AI demand into a self-funding growth engine. I examine why its $30 billion fiscal 2029 free cash flow target could dramatically change how investors value the stock, even as a $20 billion financing deal, expensive bonds,
+  [RGTI] · [Nasdaq, 1h fa] Rigetti Computing vs. SoundHound AI: Which Technology Stock Is a Better Buy for 2027?
+      Key PointsRigetti Computing is a pure-play developer of superconducting quantum processors and cloud-based quantum services.
   [RGTI] · [Nasdaq, 7h fa] Prediction: Rigetti Computing Stock Will Be Worth This Much in 1 Year
       Key PointsRigetti Computing developed some of the world's best quantum computers, but they still make too many errors to solve real-world problems.
-  [RGTI] · [Nasdaq, 50h fa] Can D-Wave's Liquidity Position Mitigate Rising Cash Burn?
-      QBTS' $503.4M liquidity position and potential $100M government funding offer financial support as operating costs surge and adjusted EBITDA losses widen.
   [WDC] · [Nasdaq, 1h fa] Stock Indexes Settle Mostly Lower as Chipmakers Slide
       The S&P 500 Index ($SPX ) (SPY ) closed down -0.40% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.10%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.22%. December E-mini S&P futures (ESZ26 ) fell -0.46%, and December E-mini Nasdaq futures...
   [WDC] · [Nasdaq, 44h fa] Stocks Pressured by Rising Bond Yields
