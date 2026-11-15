@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-15T19:57:59Z",
+ "updated_at": "2026-11-15T20:07:19Z",
  "eurusd": 1.1031,
  "totals": {
   "usd_value": 0,
@@ -494,7 +494,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -1949,7 +1949,7 @@
      "a1": 229.5,
      "a3": 932.34,
      "a5": 849.01,
-     "a10": 3987.46
+     "a10": 3987.45
     },
     "stagionalita": [
      {
@@ -18431,28 +18431,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 64942.71,
+   "price": 64775.92,
    "price_asof": "2026-11-15",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 1.27,
+   "change_pct": 1.01,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -48.5,
-   "sma200_dist_pct": -10.9,
-   "sma50_dist_pct": -18.6,
+   "ath_dist_pct": -48.7,
+   "sma200_dist_pct": -11.2,
+   "sma50_dist_pct": -18.8,
    "w52_high": 97860.6,
    "w52_low": 57747.77,
-   "w52_dist_pct": -33.6,
+   "w52_dist_pct": -33.8,
    "day_high": 65889.23,
    "day_low": 62093.52,
    "support": 62093.52,
    "resistance": 81889.95,
-   "rsi": 23.3,
-   "volume": 48157200384,
+   "rsi": 22.7,
+   "volume": 47954882560,
    "vol_ratio": 1.66,
    "atr_14": 2655.53,
-   "atr_pct": 4.09,
+   "atr_pct": 4.1,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18461,7 +18461,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64942.71
+     64775.92
     ],
     "m6": [
      62239.12,
@@ -18589,7 +18589,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64942.71
+     64775.92
     ],
     "all": [
      386.94,
@@ -18738,7 +18738,7 @@
      78548.63,
      83553.85,
      77434.75,
-     64942.71
+     64775.92
     ],
     "m1": [
      80024.01,
@@ -18762,7 +18762,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64942.71
+     64775.92
     ],
     "m3": [
      77173.8,
@@ -18830,7 +18830,7 @@
      71342.97,
      68249.27,
      64128.05,
-     64942.71
+     64775.92
     ],
     "y1": [
      95549.15,
@@ -18906,7 +18906,7 @@
      77434.75,
      75942.12,
      73720.12,
-     64942.71
+     64775.92
     ],
     "d1": [
      64049.03,
@@ -19028,7 +19028,8 @@
      64906.11,
      64956.36,
      64960.37,
-     64942.71
+     64958.26,
+     64775.92
     ]
    },
    "earnings_date": null,
@@ -19038,11 +19039,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.82,
-   "sortino_1y": -1.11,
-   "sharpe_6m": 0.0,
-   "sortino_6m": 0.01,
+   "sortino_1y": -1.12,
+   "sharpe_6m": -0.01,
+   "sortino_6m": -0.02,
    "prepost": null,
-   "prezzo_limite_aggiustato": 64942.71,
+   "prezzo_limite_aggiustato": 64775.92,
    "risk_reward": "1:3.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19058,22 +19059,22 @@
     "w1": {
      "support": 62093.52,
      "resistance": 74703.45,
-     "change_pct": -12.2
+     "change_pct": -12.42
     },
     "m1": {
      "support": 62093.52,
      "resistance": 81889.95,
-     "change_pct": -18.85
+     "change_pct": -19.05
     },
     "m3": {
      "support": 62093.52,
      "resistance": 87363.76,
-     "change_pct": -15.85
+     "change_pct": -16.06
     },
     "y1": {
      "support": 57747.77,
      "resistance": 87363.76,
-     "change_pct": -5.06
+     "change_pct": -5.3
     }
    },
    "financials": [],
@@ -19096,74 +19097,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 64942.71,
+     "prezzo": 64775.92,
      "medie": {
       "sma10": {
-       "liv": 71764.99,
-       "dist_pct": -9.51
+       "liv": 71748.31,
+       "dist_pct": -9.72
       },
       "ema10": {
-       "liv": 70691.57,
-       "dist_pct": -8.13
+       "liv": 70661.24,
+       "dist_pct": -8.33
       },
       "sma20": {
-       "liv": 75037.44,
-       "dist_pct": -13.45
+       "liv": 75029.1,
+       "dist_pct": -13.67
       },
       "ema20": {
-       "liv": 73873.56,
-       "dist_pct": -12.09
+       "liv": 73857.68,
+       "dist_pct": -12.3
       },
       "sma30": {
-       "liv": 77205.42,
-       "dist_pct": -15.88
+       "liv": 77199.86,
+       "dist_pct": -16.09
       },
       "ema30": {
-       "liv": 75639.3,
-       "dist_pct": -14.14
+       "liv": 75628.54,
+       "dist_pct": -14.35
       },
       "sma50": {
-       "liv": 79747.81,
-       "dist_pct": -18.56
+       "liv": 79744.48,
+       "dist_pct": -18.77
       },
       "ema50": {
-       "liv": 77070.38,
-       "dist_pct": -15.74
+       "liv": 77063.84,
+       "dist_pct": -15.95
       },
       "sma100": {
-       "liv": 77730.65,
-       "dist_pct": -16.45
+       "liv": 77728.98,
+       "dist_pct": -16.66
       },
       "ema100": {
-       "liv": 76609.82,
-       "dist_pct": -15.23
+       "liv": 76606.52,
+       "dist_pct": -15.44
       },
       "sma200": {
-       "liv": 72920.11,
-       "dist_pct": -10.94
+       "liv": 72919.27,
+       "dist_pct": -11.17
       },
       "ema200": {
-       "liv": 75715.94,
-       "dist_pct": -14.23
+       "liv": 75714.28,
+       "dist_pct": -14.45
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 23.3,
+      "rsi14": 22.7,
       "macd": {
-       "linea": -3536.63,
-       "segnale": -2375.89,
-       "istogramma": -1160.74
+       "linea": -3549.93,
+       "segnale": -2378.55,
+       "istogramma": -1171.38
       },
-      "stoch_k": 15.0,
-      "stoch_d": 8.0,
-      "williams_r": -85.0,
-      "cci20": -173.8,
+      "stoch_k": 14.1,
+      "stoch_d": 7.7,
+      "williams_r": -85.9,
+      "cci20": -174.5,
       "adx14": 30.5,
       "di_su": 7.8,
       "di_giu": 40.9,
-      "momentum10": -10999.41
+      "momentum10": -11166.2
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19656,19 +19657,19 @@
       "o": 64119.78,
       "h": 65889.23,
       "l": 62093.52,
-      "c": 64942.71
+      "c": 64775.92
      }
     ],
     "performance": {
-     "s1": -11.91,
-     "m1": -19.62,
-     "m3": -15.18,
-     "m6": 1.86,
-     "a1": -1.56,
-     "ytd": -26.81,
-     "a3": 72.2,
-     "a5": 13.92,
-     "a10": 8609.06
+     "s1": -12.13,
+     "m1": -19.82,
+     "m3": -15.4,
+     "m6": 1.6,
+     "a1": -1.81,
+     "ytd": -27.0,
+     "a3": 71.76,
+     "a5": 13.63,
+     "a10": 8586.7
     },
     "stagionalita": [
      {
@@ -19781,9 +19782,9 @@
      }
     ]
    },
-   "rs_1m": -16.5,
+   "rs_1m": -16.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -12.2,
+   "rs_ndx_1m": -12.4,
    "beta_ndx": 0.64,
    "avg_corr": 0.35,
    "max_corr": 0.77,
@@ -37324,7 +37325,7 @@
      98.35,
      84.39,
      94.22,
-     99.64,
+     99.65,
      83.74,
      89.74,
      116.26,
@@ -41628,7 +41629,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -55976,7 +55977,7 @@
      24.28,
      21.19,
      21.19,
-     18.31,
+     18.3,
      20.9,
      17.41,
      13.16,
@@ -58456,7 +58457,7 @@
      187.52,
      190.07,
      182.04,
-     178.67,
+     178.66,
      169.5,
      168.37,
      190.29,
@@ -62297,7 +62298,7 @@
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -69252,7 +69253,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.63,
+      "mediana": 1.64,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -70061,7 +70062,7 @@
      52.6,
      56.04,
      56.58,
-     53.6,
+     53.59,
      53.17,
      52.81,
      52.85,
@@ -71362,7 +71363,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -76446,7 +76447,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -95342,7 +95343,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -96508,7 +96509,7 @@
      "m6": 42.1,
      "ytd": 32.51,
      "a1": 33.45,
-     "a3": 128.94,
+     "a3": 128.93,
      "a5": 205.66,
      "a10": 629.27
     },
@@ -101883,7 +101884,7 @@
      322.37,
      340.11,
      336.06,
-     360.43,
+     360.42,
      358.86,
      369.78,
      383.01,
@@ -105516,7 +105517,7 @@
      344.76,
      305.88,
      342.21,
-     344.34,
+     344.33,
      369.93,
      349.13,
      353.5,
@@ -109515,9 +109516,9 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -110755,7 +110756,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -115973,7 +115974,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -119929,7 +119930,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120127,9 +120128,9 @@
      390.19,
      418.26,
      427.74,
-     448.72,
+     448.71,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -125247,7 +125248,7 @@
      "ytd": 172.43,
      "a1": 161.09,
      "a3": 374.47,
-     "a5": 572.56,
+     "a5": 572.55,
      "a10": 2426.68
     },
     "stagionalita": [
@@ -134927,13 +134928,6 @@
      "url": "https://www.bloomberg.com/news/articles/2026-11-15/bond-drought-in-emerging-markets-lifts-prices-as-sales-slump-41"
     },
     {
-     "titolo": "Gold and silver are supposed to protect against inflation. So why are both metals tumbling instead?",
-     "riassunto": "Charts show the potential for more pain ahead",
-     "fonte": "MarketWatch",
-     "quando": "2026-11-15T12:30:00Z",
-     "url": "https://www.marketwatch.com/story/gold-and-silver-are-supposed-to-protect-against-inflation-so-why-are-both-metals-tumbling-instead-1735eca7?mod=mw_rss_topstories"
-    },
-    {
      "titolo": "AI risks are the biggest threat to the financial system, Fed survey finds",
      "riassunto": "The report comes with Wall Street on edge over high-flying AI hyperscalers, while communities are on alert for the rapid spread of data centers.",
      "fonte": "CNBC Economia",
@@ -135023,14 +135017,22 @@
      "fonte": "CNBC Economia",
      "quando": "2026-11-06T16:06:59Z",
      "url": "https://www.cnbc.com/2026/11/06/jobs-report-october-2026.html"
+    },
+    {
+     "titolo": "The October jobs report is out Friday. Here's everything to expect",
+     "riassunto": "The Bureau of Labor Statistics releases the October nonfarm payrolls report Friday at 8:30 a.m. ET.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-05T21:32:52Z",
+     "url": "https://www.cnbc.com/2026/11/05/october-jobs-report-preview.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
-    "Bloomberg",
+    "Bloomberg"
+   ],
+   "fonti_mute": [
     "MarketWatch"
    ],
-   "fonti_mute": [],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -142799,7 +142801,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 62
+     "score": 61
     },
     {
      "label": "Treasury 10A",
@@ -148762,7 +148764,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-15T19:57:59Z"
+   "letto_il": "2026-11-15T20:07:19Z"
   }
  },
  "broker": null,
@@ -149365,7 +149367,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-15T19:57:59Z"
+  "letto_il": "2026-11-15T20:07:19Z"
  },
  "predictions": [
   {
@@ -149375,7 +149377,7 @@
   },
   {
    "question": "Will Jensen Huang rejoin NVIDIA by December 31, 2026?",
-   "yes": 21,
+   "yes": 20,
    "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
   },
   {
@@ -149395,7 +149397,7 @@
   },
   {
    "question": "Will Bitcoin dip to $62,000 November 9-15?",
-   "yes": 8,
+   "yes": 9,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-62k-november-9-15-2026"
   }
  ],
@@ -222507,6 +222509,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-15T19:58:00Z"
+  "generated_at": "2026-11-15T20:07:19Z"
  }
 }
