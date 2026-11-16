@@ -58,7 +58,7 @@ storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $
 02/11, più la vendita di GOOGL del 13/11 (37 a 294,71 $ = 10.904 $, meno 15 $ di commissione stimata, circa 9.850 € al
 riferimento BCE del 13/11, 1,1052), più la vendita di AVGO del 16/11 allo stop (24 a 329,75 $ = 7.914 $, meno 15 $,
 circa 7.170 € al riferimento BCE del 16/11, 1,1014) — prima delle imposte sulle due plusvalenze; da confermare col
-saldo del broker, e con le azioni di AVGO vendute (il CEO scrive 25, il libro ne portava 24: §1undecies). La stima del
+saldo del broker. La stima del
 02/11/2026 (~17.270 €) veniva da: i ~24.000 € dichiarati
 più la vendita di INTC del 02/11 in pre-market (130 a 65 $ = 8.450 $, meno 15 $ di commissione, circa 7.550 € al
 riferimento BCE del 30/10, 1,1172, l'ultimo pubblicato all'ora della vendita), meno i due acquisti del 02/11 — AVGO 24 a
@@ -969,7 +969,7 @@ euro se si vendesse oggi.
 | 02/11/2026 | AVGO | acquisto | 24 | 324,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
 | 02/11/2026 | WDC | acquisto | 24 | 342,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
 | 13/11/2026 | GOOGL | vendita | 37 | 294,71 | 1,1052 | BCE, riferimento del 13/11/2026 | detta dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
-| 16/11/2026 | AVGO | vendita | 24 | 329,75 | 1,1014 | BCE, riferimento del 16/11/2026 | stop del CEO; il CEO scrive 25 azioni, il libro ne portava 24 dal 02/11: registrate le 24, da confermare (§1undecies); cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 16/11/2026 | AVGO | vendita | 24 | 329,75 | 1,1014 | BCE, riferimento del 16/11/2026 | stop del CEO; 24 azioni, confermate dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -1090,10 +1090,11 @@ intero allo stop, a 329,75 $ contro i 324 dell'ingresso del 02/11 (circa +250 �
 imposta: il conto vero lo dà il broker). Torna fra i sorvegliati (§1bis) ed esce dai semiconduttori del libro (§1ter);
 la sua tesi è tolta da §1novodecies. Il ricavato (circa 7.170 €) va nella liquidità (§1).
 
+**Chiuse il 16/11/2026** (CEO: *"1 ok 24 · 2 nessuno"*): di Broadcom sono state vendute **24** azioni, come nel
+libro; sulle altre posizioni **nessuno stop attivo** al 16/11/2026.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 16/11/2026 | Broadcom: le azioni vendute erano 24 (così il libro dal 02/11, con le parole del CEO di allora) o 25 (così il messaggio del 16/11)? | cambia il ricavato di un'azione (329,75 $) e la liquidità stimata | il CEO conferma |
-| 16/11/2026 | Quali stop sono attivi sulle altre posizioni (titolo e prezzo)? In tre giorni ne sono scattati due (GOOGL il 13/11, AVGO il 16/11) | il libro non conosce gli ordini di stop dati al broker: una posizione venduta resta scritta finché il CEO non lo dice (GOOGL: tre giorni), e i livelli non entrano nell'analisi | il CEO elenca gli stop |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
