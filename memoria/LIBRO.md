@@ -43,9 +43,7 @@ calo dal massimo, l'esito della tenuta e le tesi restano MISURE: informano, non 
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
 | MRVL | 42 | 214,08 | USD | |
 | BE | 40 | 214,00 | USD | |
-| GOOGL | 37 | 282,00 | USD | acquisto del **29/10/2026** (testuale: *"Registra entrata su Alphabet 282 con 37 azioni"*; la seduta l'ha confermata il CEO il 30/10: *"1 29/10"*). 282 cade nell'intervallo di quella seduta (280,36–288,33). Carico in euro nel registro §1decies |
 | ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
-| AVGO | 24 | 324,00 | USD | acquisto del **02/11/2026** col ricavato della vendita di INTC (testuale: *"Entrato Avgo 24 pezzi pmc 324"*). Carico in euro nel registro §1decies |
 | WDC | 24 | 342,00 | USD | acquisto del **02/11/2026** dalla riserva, speculazione sul rimbalzo (testuale: *"Entrato 24 a pmc 342 Wdc"*). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
@@ -56,7 +54,12 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~17.270 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 02/11/2026: i ~24.000 € dichiarati
+**Liquidità: ~34.290 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 16/11/2026: i ~17.270 € stimati il
+02/11, più la vendita di GOOGL del 13/11 (37 a 294,71 $ = 10.904 $, meno 15 $ di commissione stimata, circa 9.850 € al
+riferimento BCE del 13/11, 1,1052), più la vendita di AVGO del 16/11 allo stop (24 a 329,75 $ = 7.914 $, meno 15 $,
+circa 7.170 € al riferimento BCE del 16/11, 1,1014) — prima delle imposte sulle due plusvalenze; da confermare col
+saldo del broker, e con le azioni di AVGO vendute (il CEO scrive 25, il libro ne portava 24: §1undecies). La stima del
+02/11/2026 (~17.270 €) veniva da: i ~24.000 € dichiarati
 più la vendita di INTC del 02/11 in pre-market (130 a 65 $ = 8.450 $, meno 15 $ di commissione, circa 7.550 € al
 riferimento BCE del 30/10, 1,1172, l'ultimo pubblicato all'ora della vendita), meno i due acquisti del 02/11 — AVGO 24 a
 324 $ e WDC 24 a 342 $, 7.791 $ e 8.223 $ con la commissione stimata di 15 $ ciascuno, circa 14.280 € al riferimento BCE
@@ -151,6 +154,8 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 
 | Ticker | Nota |
 |---|---|
+| GOOGL | Alphabet — venduta il 13/11/2026, 37 a 294,71 $ (ingresso del 29/10 a 282), detta dal CEO il 16/11: torna fra i sorvegliati. ⚠ investitore di Anthropic |
+| AVGO | Broadcom — venduta il 16/11/2026 allo stop, 24 a 329,75 $ (ingresso del 02/11 a 324): torna fra i sorvegliati |
 | INTC | venduta il 02/11/2026 in pre-market, 130 a 65 $ (ingresso del 30/10 a 64,50): torna fra i sorvegliati. Allo stato del 30/10 (crollo dopo una previsione tagliata) i casi simili facevano peggio della base |
 | OKLO | Oklo — reattori nucleari modulari per datacenter. Candidato di rotazione da CRWV (CEO, 14/09/2026) |
 | SMCI | Super Micro Computer — server AI, concorrente di DELL. **Venduta il 19/10/2026 a 32,81 $** (250 azioni comprate il 16/10 a 31,60): il CEO *"non mi fido per ora"*. Candidato di rotazione da CRWV dal 14/09/2026. Il 18/10: bilancio solido (Altman 6,77) e cassa dell'attività negativa (−6,8 miliardi di flusso operativo in 12 mesi, magazzino a 128 giorni) |
@@ -371,10 +376,10 @@ tre mesi dopo SMH era più in alto —; in un mercato orso come il 2022 (semicon
 gradino avrebbe evitato circa 30.000 $ di perdite su quella parte. ⚠ Senza gradino l'esposizione è
 quella del libro intero: il 14/10 un Nasdaq −10% valeva −21,9% (−59.174 $).
 
-**I semiconduttori del libro** (il comparto; fino al 14/11/2026 il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY, AVGO.
+**I semiconduttori del libro** (il comparto; fino al 14/11/2026 il gradino del salvavita): MU, NVDA, AMD, MRVL, SKHY.
 INTC entra il 30/10/2026, il giorno dell'acquisto, per la regola qui sotto: progetta e produce processori, è nel comparto.
 INTC esce il 02/11/2026, il giorno della vendita. AVGO entra il 02/11/2026, il giorno dell'acquisto: progetta chip, è nel
-comparto. WDC, comprata lo stesso giorno, resta fuori: fa dischi rigidi, non chip — si nomina a ogni analisi come le
+comparto. AVGO esce il 16/11/2026, il giorno della vendita allo stop. WDC, comprata lo stesso giorno di AVGO, resta fuori: fa dischi rigidi, non chip — si nomina a ogni analisi come le
 altre posizioni fuori dall'elenco.
 Il settore non è nei dati — la pipeline mette RGTI fra i semiconduttori e SK hynix no (v473) —
 quindi l'elenco sta qui, e un nome nuovo del comparto ci entra il giorno dell'acquisto. Le posizioni
@@ -963,6 +968,8 @@ euro se si vendesse oggi.
 | 02/11/2026 | INTC | vendita | 130 | 65,00 | 1,1172 | BCE, riferimento del 30/10/2026: l'ultimo pubblicato all'ora della vendita (pre-market, prima delle 14:15) | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione misurata 15 $ |
 | 02/11/2026 | AVGO | acquisto | 24 | 324,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
 | 02/11/2026 | WDC | acquisto | 24 | 342,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
+| 13/11/2026 | GOOGL | vendita | 37 | 294,71 | 1,1052 | BCE, riferimento del 13/11/2026 | detta dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 16/11/2026 | AVGO | vendita | 24 | 329,75 | 1,1014 | BCE, riferimento del 16/11/2026 | stop del CEO; il CEO scrive 25 azioni, il libro ne portava 24 dal 02/11: registrate le 24, da confermare (§1undecies); cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -1058,6 +1065,10 @@ l'obiettivo di crescita. Il progetto resta com'è e si riattiva su richiesta (13
 momentaneamente il progetto"*). La richiesta dell'11/11 sugli stop è ora un comando del comitato (STOP,
 `memoria/FORMATO_ANALISI.md`).
 
+⚠ **Corretta il 16/11/2026**: il 13/11 il CEO aveva venduto GOOGL (37 a 294,71 $), e l'ha detto il 16/11 — la
+conferma qui sotto non la contava. La riga del 13/11 del registro della performance è stata corretta lo stesso
+giorno (GOOGL fuori dalle posizioni, il ricavato nella liquidità).
+
 **Chiusa il 14/11/2026** (CEO: *"1 si"*): dal 02/11/2026 (AVGO e WDC) **nessuna altra operazione**, e il BTP
 Valore 2028 è **ancora in portafoglio**. Le posizioni di §1 sono confermate al 14/11/2026
 (`config/posizioni.json` porta la stessa data).
@@ -1070,8 +1081,19 @@ giudicano come ogni altra posizione, con l'analisi finanziaria del momento (cont
 tecnica, rischio), e decide il CEO. Restano le MISURE: il calo dal massimo, l'esito della tenuta, le tesi
 (§1novodecies). La domanda del 14/11 sul −30% cade con la regola.
 
+**Eseguita il 13/11/2026, detta il 16/11** (CEO: *"ho venduto anche alphabet a 294,71 37 azioni il 13 novembre"*): GOOGL chiusa per
+intero a 294,71 $ contro i 282 dell'ingresso del 29/10 (circa +520 € col cambio, prima di commissioni e imposta). Torna
+fra i sorvegliati (§1bis); la sua tesi è tolta da §1novodecies. Il ricavato (circa 9.850 €) va nella liquidità (§1).
+
+**Eseguita il 16/11/2026** (CEO: *"oggi mi è scattato stop loss anche su broadcom (prezzo 329,75 25 azioni)"*): AVGO chiusa per
+intero allo stop, a 329,75 $ contro i 324 dell'ingresso del 02/11 (circa +250 € col cambio, prima di commissioni e
+imposta: il conto vero lo dà il broker). Torna fra i sorvegliati (§1bis) ed esce dai semiconduttori del libro (§1ter);
+la sua tesi è tolta da §1novodecies. Il ricavato (circa 7.170 €) va nella liquidità (§1).
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
+| 16/11/2026 | Broadcom: le azioni vendute erano 24 (così il libro dal 02/11, con le parole del CEO di allora) o 25 (così il messaggio del 16/11)? | cambia il ricavato di un'azione (329,75 $) e la liquidità stimata | il CEO conferma |
+| 16/11/2026 | Quali stop sono attivi sulle altre posizioni (titolo e prezzo)? In tre giorni ne sono scattati due (GOOGL il 13/11, AVGO il 16/11) | il libro non conosce gli ordini di stop dati al broker: una posizione venduta resta scritta finché il CEO non lo dice (GOOGL: tre giorni), e i livelli non entrano nell'analisi | il CEO elenca gli stop |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
@@ -1457,12 +1479,6 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - romperebbe: (1) finanziamento non coperto: nuove azioni o debito caro; (2) un grande cliente che riduce i contratti; (3) il CDS che continua a salire più dell'indice dopo i conti
 - verdetto (14/11/2026): PREOCCUPA — crescita forte ma debito pesante: si rilegge a ogni trimestre
 
-### GOOGL — ⚠ investitore di Anthropic
-- perché: ricerca, cloud, YouTube e modelli di AI propri, con la cassa per finanziarli
-- deve essere vero: (1) ricavi a un anno sopra +10% {ricavi>=10}; (2) revisioni degli analisti in su almeno quante in giù {revisioni}; (3) ai conti, il cloud cresce e la ricerca tiene la quota
-- romperebbe: (1) ricavi a un anno sotto +5%; (2) revisioni in giù per un altro trimestre; (3) una decisione antitrust che tocca la ricerca
-- verdetto (08/11/2026): GUARDARE — si rilegge ai prossimi conti
-
 ### RGTI
 - perché: calcolo quantistico; ricavi ancora piccoli, la scommessa è sulla tecnologia
 - deve essere vero: (1) cassa per oltre 24 mesi {cassa>=24}; (2) ai conti, il programma dei processori rispetta i tempi dichiarati; (3) ai conti, nessuna grande emissione di azioni sotto il prezzo di mercato
@@ -1474,12 +1490,6 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - deve essere vero: (1) ricavi a un anno sopra +25% {ricavi>=25}; (2) si autofinanzia {autofinanzia}; (3) ai conti, crescono gli ordini dai data center
 - romperebbe: (1) smette di autofinanziarsi; (2) ricavi a un anno sotto +10%; (3) l'allarme di credito peggiora (rinnovo del debito convertibile a costo alto)
 - verdetto (08/11/2026): GUARDARE — allarme di credito
-
-### AVGO
-- perché: chip su misura per l'AI e reti dei data center, più il software
-- deve essere vero: (1) ricavi a un anno sopra +20% {ricavi>=20}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, i ricavi dell'AI crescono e la guida è sopra il consenso
-- romperebbe: (1) stime a 90 giorni in calo oltre il 10%; (2) ricavi dell'AI in rallentamento per due trimestri; (3) un grande cliente dei chip su misura che se ne va
-- verdetto (08/11/2026): TIENI — ingresso del 02/11, si giudica ai conti del 10/12
 
 ### ORCL — ⚠ cliente di OpenAI
 - perché: database e cloud; investimenti enormi in data center, finanziati a debito

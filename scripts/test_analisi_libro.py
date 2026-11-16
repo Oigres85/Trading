@@ -11668,7 +11668,7 @@ check("v543 libro e istruzioni dicono la stessa cosa del codice: la regola 5 e i
       and "unica vendita automatica" not in _r5_543 and "dopo il recupero di tutti" not in _r5_543
       and "14/11/2026 — due regole eliminate" in _z0_543 and "nessuna vendita automatica" in _z0_543
       and "**Decisione del 14/11/2026**" in _dm543 and "| 14/11/2026 | Al −30%" not in _dm543
-      and len(_td543) >= 15 and not [tk for tk, x in _td543.items() if "ramo secco" in (x.get("verdetto") or "")])
+      and bool(_td543) and not [tk for tk, x in _td543.items() if "ramo secco" in (x.get("verdetto") or "")])
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
