@@ -4556,14 +4556,25 @@ check("v350 diario: setDiary restituisce l'esito a chi lo chiama", (() => {
 })());
 
 
+/* 17/11/2026 — lo stato si COSTRUISCE (v429): dal run del 17/11 notte la pipeline pubblica la serie dei profitti con 2
+   punti invece di 20, la pagina non ha piu' la serie doppia e questo check usciva verde senza misurare niente — il
+   quarto dormiente, che ha bloccato il push. Ora le due serie le mette il check: frequenze diverse, inizi diversi,
+   valori di partenza 107,9 e 98,9 come nel difetto originale. */
 check("v350 grafico: le due linee partono davvero dalla soglia 'partenza'", suVeri(`
-  const se = serieIndicatore("corp_profit");
-  if (!se || !se.doppia) return true;
-  const primi = se.doppia.map(x => x.punti[0]);
-  /* la soglia era a 100 mentre dentro la finestra le linee partivano da 107,9 e 98,9: l'occhio
-     misurava una distanza iniziale che non esisteva */
-  return primi.every(p => p.v === 100) && primi[0].d === primi[1].d
-      && (se.soglie || []).some(s => s.v === 100 && String(s.testo).includes(primi[0].d));`));
+  const m = DATA.macro || (DATA.macro = {});
+  const salva = m.corp_profit;
+  try {
+    m.corp_profit = {
+      ndx: [{ d: "2025-01-01", v: 105 }, { d: "2025-04-01", v: 107.9 }, { d: "2025-07-01", v: 120 }, { d: "2025-10-01", v: 125 }, { d: "2026-01-01", v: 130 }],
+      profits: [{ d: "2025-04-01", v: 98.9 }, { d: "2025-07-01", v: 101 }, { d: "2025-10-01", v: 103 }] };
+    const se = serieIndicatore("corp_profit");
+    if (!se || !se.doppia) return false;
+    const primi = se.doppia.map(x => x.punti[0]);
+    /* la soglia era a 100 mentre dentro la finestra le linee partivano da 107,9 e 98,9: l'occhio
+       misurava una distanza iniziale che non esisteva */
+    return primi.every(p => p.v === 100) && primi[0].d === primi[1].d && primi[0].d === "2025-04-01"
+        && (se.soglie || []).some(s => s.v === 100 && String(s.testo).includes(primi[0].d));
+  } finally { m.corp_profit = salva; }`));
 
 
 check("v350 fibonacci: i livelli usano lo STESSO range stampato sopra di loro", suVeri(`
