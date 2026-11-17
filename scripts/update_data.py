@@ -3760,8 +3760,198 @@ def fred_series(series_id, n=14, freq=None):
             except ValueError:
                 continue
         return out[-n:]
-    r = http_get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}")
+    # v544 — SENZA CHIAVE `freq` ERA IGNORATO: il csv pubblico restituiva la frequenza nativa (per SP500, le sedute),
+    # cioe' il difetto v207 rimasto vivo nel ramo che la sessione percorre. Il csv accetta la stessa aggregazione
+    # dell'API (`fq`, `fas=avg`): misurato il 17/11/2026, SP500 mensile uguale al centesimo.
+    fq = {"m": "&fq=Monthly&fas=avg", "q": "&fq=Quarterly&fas=avg"}.get(freq, "")
+    r = http_get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}{fq}")
     return fredgraph(r.text)[-n:]      # v511 — un parser solo per la pipeline e l'analisi (comuni.py)
+
+
+# ═══ v544 — L'S&P 500 MENSILE HA DUE FORNITORI, E UNA STORIA CORTA SI DICHIARA ═════════════════════════════════════
+# Il 17/11/2026, fra il run delle 00:04 UTC e quello delle 02:15, FRED ha accorciato la serie SP500 a UN ANNO (parte
+# dal 17/11/2025, anche chiedendo una data d'inizio; il Dow Jones sulla stessa FRED ne ha ancora dieci). Nessun
+# errore: una risposta valida, solo piu' corta. `fred_series("SP500", 64, freq="m")` ha dato 11 mesi invece di 64,
+# `_finestra_comune` ha fatto il suo mestiere e il confronto con i profitti e' sceso a 2 trimestri: il gap pubblicato
+# (−8 pp) misurava TRE MESI sotto l'etichetta di cinque anni, e la pagina ha perso il grafico senza dirlo. Stesso
+# taglio in `decouple` (7 mesi invece di 37, con la tessera che scriveva «su 3 anni»).
+# La media mensile delle chiusure giornaliere di Yahoo ^GSPC e' LA STESSA GRANDEZZA di `aggregation_method=avg`:
+# misurata il 17/11/2026 sugli undici mesi che FRED da' ancora (2025-12 → 2026-10), uguale al centesimo. E' una
+# seconda FONTE, non una seconda derivazione (v161).
+def media_mensile(coppie, oggi):
+    """[(AAAA-MM-GG, chiusura)] giornaliere → [(AAAA-MM-01, media del mese)] dei soli mesi INTERI, come fa FRED:
+    il mese di `oggi` e' in formazione e non si pubblica (FRED lo lascia vuoto; v193), e il PRIMO mese della serie
+    non si puo' dimostrare intero (con la serie che parte dal 17/11/2025, FRED comincia dal 2025-12)."""
+    per_mese = {}
+    for d, v in coppie or []:
+        per_mese.setdefault(str(d)[:7], []).append(float(v))
+    return [(m + "-01", round(sum(per_mese[m]) / len(per_mese[m]), 2))
+            for m in sorted(per_mese)[1:] if m < str(oggi)[:7]]
+
+
+def sp500_giornaliero_yahoo():
+    """Le chiusure giornaliere dell'S&P 500 da Yahoo (^GSPC), dieci anni: [(AAAA-MM-GG, chiusura)]."""
+    h = yf.Ticker("^GSPC").history(period="10y", interval="1d", auto_adjust=True)["Close"].dropna()
+    return [(str(d.date()), float(v)) for d, v in h.items()]
+
+
+FONTE_SP500_FRED = "FRED SP500"
+FONTE_SP500_YAHOO = "Yahoo ^GSPC (media mensile delle chiusure)"
+
+
+def _avviso_sp500(let):
+    """La frase che dichiara un ripiego o una storia corta; None quando la prima fonte ha dato tutto."""
+    altre = [t for t in let.get("tentate") or [] if t.get("fonte") != let.get("fonte")]
+
+    def _una(t):
+        if t.get("mesi") is None:
+            return f"{t.get('fonte')} {t.get('esito')}"
+        return f"{t.get('fonte')} dà {t.get('mesi')} mesi su {let.get('chiesti')} chiesti (dal {t.get('dal')})"
+
+    if not let.get("serie"):
+        return "S&P 500 mensile NON LETTO: " + "; ".join(_una(t) for t in let.get("tentate") or [])
+    if not let.get("intera"):
+        return (f"S&P 500 mensile, STORIA CORTA: {let.get('mesi')} mesi su {let.get('chiesti')} chiesti "
+                f"(dal {let.get('dal')}, {let.get('fonte')})"
+                + ("; " + "; ".join(_una(t) for t in altre) if altre else ""))
+    if altre:
+        return f"S&P 500 mensile da {let.get('fonte')}: " + "; ".join(_una(t) for t in altre)
+    return None
+
+
+def _lettura_su(let, n):
+    """La stessa lettura sugli ultimi `n` mesi: una richiesta sola serve i due confronti (v161)."""
+    if not let:
+        return None
+    serie = list(let.get("serie") or [])[-n:]
+    out = dict(let, serie=serie, mesi=len(serie), chiesti=n, intera=len(serie) >= n,
+               dal=serie[0][0] if serie else None)
+    out["avviso"] = _avviso_sp500(out)
+    return out
+
+
+def sp500_mensile(n, oggi=None, letture=None):
+    """La media MENSILE dell'S&P 500 sugli ultimi `n` mesi, con la fonte e la lunghezza DICHIARATE.
+
+    Vince la prima fonte che da' TUTTI i mesi chiesti; se nessuna li da', la piu' lunga, e la lettura lo dice
+    (`intera` False, `avviso` col conto di ciascuna). Una risposta che non e' mensile (piu' osservazioni nello
+    stesso mese) non e' la grandezza chiesta e vale come non letta. `letture`, per i gate, e' la catena
+    [(nome, funzione senza argomenti)].
+    """
+    oggi = oggi or datetime.now(timezone.utc).date().isoformat()
+    if letture is None:
+        letture = [
+            (FONTE_SP500_FRED, lambda: fred_series("SP500", n, freq="m")),
+            (FONTE_SP500_YAHOO, lambda: media_mensile(sp500_giornaliero_yahoo(), oggi)),
+        ]
+    tentate, migliore = [], None
+    for nome, leggi in letture:
+        try:
+            serie = [(str(d), float(v)) for d, v in (leggi() or [])][-n:]
+            if len({d[:7] for d, _ in serie}) != len(serie):
+                raise ValueError("la risposta non e' mensile (piu' osservazioni nello stesso mese)")
+        except Exception as e:  # noqa: BLE001
+            tentate.append({"fonte": nome, "mesi": None, "dal": None, "esito": f"non letta ({str(e)[:120]})"})
+            print(f"!! S&P 500 mensile, {nome}: {e}", file=sys.stderr)
+            continue
+        tentate.append({"fonte": nome, "mesi": len(serie), "dal": serie[0][0] if serie else None,
+                        "esito": "storia intera" if len(serie) >= n else "storia corta"})
+        if serie and (migliore is None or len(serie) > len(migliore[1])):
+            migliore = (nome, serie)
+        if len(serie) >= n:
+            break
+    nome, serie = migliore if migliore else (None, [])
+    let = {"serie": serie, "fonte": nome, "mesi": len(serie), "chiesti": n, "intera": len(serie) >= n,
+           "dal": serie[0][0] if serie else None, "tentate": tentate}
+    let["avviso"] = _avviso_sp500(let)
+    if let["avviso"]:
+        print(("·· " if let["intera"] else "!! ") + let["avviso"], file=sys.stderr)
+    return let
+
+
+def _storia_sp500(let):
+    """Cio' che il blocco pubblica della lettura: la serie no (sta gia' nel blocco, a base 100)."""
+    return {k: (let or {}).get(k) for k in ("mesi", "chiesti", "intera", "dal", "avviso", "tentate")}
+
+
+def blocco_decouple(sp_let, gd):
+    """`macro.decouple`: S&P 500 e PIL reale sulla finestra comune, a base 100 (v207), con la fonte dell'S&P.
+    None quando le due serie non hanno una finestra comune: il confronto non si pubblica."""
+    al = _finestra_comune((sp_let or {}).get("serie") or [], gd)
+    if not al:
+        return None
+    sp2, gd2 = al
+    sp_base, gd_base = sp2[0][1], gd2[0][1]
+    return {
+        "sp500": [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp2],
+        "gdp":   [{"d": d, "v": round(v / gd_base * 100, 1)} for d, v in gd2],
+        "sp500_fonte": sp_let.get("fonte"),
+        "sp500_storia": _storia_sp500(sp_let),
+    }
+
+
+def blocco_corp_profit(cp, sp_let, ndx_pairs):
+    """`macro.corp_profit`: S&P 500 e Nasdaq 100 contro i profitti aziendali (FRED CP), a base 100.
+
+    `cp` trimestrale grezza, `sp_let` la lettura di `sp500_mensile`, `ndx_pairs` il Nasdaq mensile o None.
+    ⚠ v544 — IL GAP DELL'S&P SI PUBBLICA SOLO SULLA STORIA INTERA. Con una storia corta la finestra comune e' di
+    pochi mesi, e quel numero sotto la stessa chiave si leggerebbe come il divario pluriennale (la soglia dei 40 pp
+    e' pensata per cinque anni): `gap` e' None, `sp500_storia` dice perche', e il punteggio si fa sul solo Nasdaq.
+    None quando non c'e' nessuno dei due confronti.
+    """
+    cp_raw = list(cp or [])                    # v248: l'NDX si allinea ai profitti GREZZI, non a quelli ritagliati
+    sp_let = sp_let or {}
+    intera = bool(sp_let.get("intera"))
+    gap, sp_out, cp_out = None, [], []
+    al_cp = _finestra_comune(sp_let.get("serie") or [], cp_raw)
+    if al_cp:
+        sp_cp, cp2 = al_cp
+        cp_base, sp_base = cp2[0][1], sp_cp[0][1]
+        sp_out = [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp_cp]
+        cp_out = [{"d": d, "v": round(v / cp_base * 100, 1)} for d, v in cp2]
+        if intera:
+            cur_sp = round(sp_cp[-1][1] / sp_base * 100, 1)
+            cur_cp = round(cp2[-1][1] / cp_base * 100, 1)
+            gap = round(cur_sp - cur_cp, 1)
+    # Nasdaq 100: v248 (stessa FINESTRA dei profitti, non solo stessa frequenza) e v349 (stessa PARTENZA)
+    ndx_hist, ndx_gap = None, None
+    if ndx_pairs and len(ndx_pairs) > 10:
+        al_ndx = _finestra_comune(ndx_pairs, cp_raw)
+        if al_ndx:
+            ndx_al, cp_al = al_ndx
+            nb, cb = ndx_al[0][1], cp_al[0][1]
+            if nb and cb:
+                ndx_gap = round(ndx_al[-1][1] / nb * 100 - cp_al[-1][1] / cb * 100, 1)
+        # la serie per il grafico resta a base propria: disegna l'andamento, il gap NON la usa
+        ndx_base_v = float(ndx_pairs[0][1])
+        ndx_hist = [{"d": d, "v": round(float(v) / ndx_base_v * 100, 1)} for d, v in ndx_pairs]
+    if not al_cp and ndx_gap is None:
+        return None
+    # score/label sul gap PEGGIORE, non sulla media (v110): un flag di rischio non si diluisce
+    gaps = [g for g in (gap, ndx_gap) if g is not None]
+    worst_gap = round(max(gaps), 1) if gaps else None
+    if worst_gap is None:
+        score, label = None, "non valutabile: storia dell'S&P 500 corta e Nasdaq 100 non letto"
+    else:
+        score = clamp(round(100 - max(0, worst_gap - 10) / 60 * 100))
+        label = ("Asset Inflation estrema" if worst_gap > 70 else "Asset Inflation" if worst_gap > 40
+                 else "Tensione moderata" if worst_gap > 20 else "Allineati")
+        if gap is None:
+            label += " (solo NDX: S&P 500 con storia corta)"
+        elif ndx_gap is not None and ndx_gap > gap and worst_gap > 20:
+            label += " (driver: NDX)"
+    return {
+        "sp500":   sp_out,
+        "profits": cp_out,
+        "ndx":     ndx_hist,
+        "gap":     gap,
+        "ndx_gap": ndx_gap,
+        "worst_gap": worst_gap,
+        "score":   score,
+        "label":   label,
+        "sp500_fonte": sp_let.get("fonte"),
+        "sp500_storia": _storia_sp500(sp_let),
+    }
 
 
 # ═══ v395 — IL CALENDARIO UFFICIALE DELLE USCITE, AL POSTO DELLA PROIEZIONE ═══════════════
@@ -5224,23 +5414,20 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! systemic_risk: {e}", file=sys.stderr)
 
+    # v544 — UNA lettura dell'S&P 500 mensile per i due confronti qui sotto (v161), con due fornitori: vedi
+    # `sp500_mensile`. ~5 anni MENSILI (v207: senza `freq` arrivavano le sedute); il PIL ne usa gli ultimi 40.
+    try:
+        sp_let = sp500_mensile(64)
+    except Exception as e:  # noqa: BLE001
+        sp_let = None
+        print(f"!! S&P 500 mensile: {e}", file=sys.stderr)
+
     # Disaccoppiamento Macro: S&P 500 vs PIL reale USA (normalizzati a 100)
     try:
-        # ⚠ v207 — `freq="m"` NON C'ERA, e il commento diceva già "mensili": fred_series senza
-        # `freq` restituisce la frequenza NATIVA, e SP500 su FRED è GIORNALIERA. Quindi al posto
-        # di 36 mesi (3 anni) arrivavano 36 SEDUTE (7 settimane), rebasate a 100 su una data
-        # diversa da quella del PIL, e il "gap" sottraeva una variazione di 7 settimane da una
-        # di 3 anni. Misurato sui dati veri: gap pubblicato -3 pp, aritmeticamente privo di senso.
-        sp = fred_series("SP500", 40, freq="m")   # ~3 anni MENSILI
         gd = fred_series("GDPC1", 14, freq="q")   # ~3 anni trimestrali
-        al = _finestra_comune(sp, gd)
-        if al:
-            sp2, gd2 = al
-            sp_base, gd_base = sp2[0][1], gd2[0][1]
-            macro["decouple"] = {
-                "sp500": [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp2],
-                "gdp":   [{"d": d, "v": round(v / gd_base * 100, 1)} for d, v in gd2],
-            }
+        _dc = blocco_decouple(_lettura_su(sp_let, 40), gd)
+        if _dc:
+            macro["decouple"] = _dc
         else:
             print("!! decouple: le due serie non hanno una finestra comune, gap non pubblicato",
                   file=sys.stderr)
@@ -5249,71 +5436,20 @@ def fetch_macro():
 
     # S&P 500 + Nasdaq 100 vs Profitti Aziendali Reali USA (Corporate Profits, FRED CP)
     try:
-        # ⚠ v207 — stesso difetto del blocco decouple: senza `freq="m"` arrivavano 60 SEDUTE
-        # (86 giorni) invece di 60 mesi, e il gap sottraeva +1,7% di S&P su 3 mesi da +32,4% di
-        # profitti su 5 anni, pubblicando "S&P gap -30,7 pp". Il ramo NDX era invece corretto
-        # (yfinance, interval="1mo"), ed è per quello che worst_gap dava un valore sensato: il
-        # numero giusto copriva quello sbagliato.
         cp = fred_series("CP", 22, freq="q")       # ~5 anni trimestrali
-        cp_raw = list(cp)                          # v248: copia PRIMA del ritaglio sull'S&P
-        sp_cp = fred_series("SP500", 64, freq="m") # ~5 anni MENSILI
-        al_cp = _finestra_comune(sp_cp, cp)
-        if al_cp:
-            sp_cp, cp = al_cp
-            cp_base, sp_base = cp[0][1], sp_cp[0][1]
-            cur_sp = round(sp_cp[-1][1] / sp_base * 100, 1)
-            cur_cp = round(cp[-1][1] / cp_base * 100, 1)
-            gap = round(cur_sp - cur_cp, 1)
-            # Nasdaq 100 (^NDX) — mensile 5 anni via yfinance.
-            # ⚠ v248 — IL RAMO NDX NON ERA ALLINEATO, e nessuno se n'era accorto perché il
-            # commento qui sopra lo dichiarava "corretto": lo era sulla FREQUENZA (interval="1mo"),
-            # non sulla FINESTRA. Il difetto misurato l'08/08/2026 sui dati veri:
-            #   · ndx_hist ribasato sul PROPRIO primo punto (~2021-08), misurato al 2026-08-01
-            #   · cur_cp ribasato sulla finestra comune con l'S&P, misurato al 2026-01-01
-            # Basi diverse E date finali diverse: sette mesi di Nasdaq senza profitti a fronte.
-            # E siccome worst_gap = max(gap, ndx_gap) prendeva proprio l'NDX (69,9 contro 34,9),
-            # il numero SBAGLIATO era quello pubblicato in cima, con l'etichetta "(driver: NDX)".
-            # È la classe v207 identica, sopravvissuta nel ramo che quel commit dichiarava sano.
-            ndx_hist = None
-            ndx_gap = None
-            try:
-                ndx_raw = yf.Ticker("^NDX").history(period="5y", interval="1mo",
-                                                     auto_adjust=True)["Close"].dropna()
-                if len(ndx_raw) > 10:
-                    ndx_pairs = [(str(d.date()), float(v)) for d, v in ndx_raw.items()]
-                    # si allinea l'NDX ai profitti GREZZI (cp_raw), non a `cp` già ritagliato
-                    # sull'S&P: due ritagli in cascata darebbero una finestra più corta del vero.
-                    al_ndx = _finestra_comune(ndx_pairs, cp_raw)
-                    if al_ndx:
-                        ndx_al, cp_al = al_ndx
-                        nb, cb = ndx_al[0][1], cp_al[0][1]
-                        if nb and cb:
-                            ndx_gap = round(ndx_al[-1][1] / nb * 100 - cp_al[-1][1] / cb * 100, 1)
-                    # la serie per il grafico resta a base propria: serve a disegnare l'andamento,
-                    # non a calcolare il gap — e il gap ora NON la usa più.
-                    ndx_base_v = float(ndx_raw.iloc[0])
-                    ndx_hist = [{"d": str(d.date()), "v": round(float(v) / ndx_base_v * 100, 1)}
-                                for d, v in ndx_raw.items()]
-            except Exception:
-                pass
-            # score/label sul gap PEGGIORE, non sulla media: con S&P a -24 e NDX a +59 la
-            # media (17.5) diceva "Allineati 88/100" mentre l'NDX — il benchmark del mandato —
-            # bucava da solo la soglia "Asset Inflation" (>40). Un flag di rischio non si
-            # diluisce col comparto messo meglio (v110).
-            worst_gap = round(max(gap, ndx_gap), 1) if ndx_gap is not None else gap
-            score = clamp(round(100 - max(0, worst_gap - 10) / 60 * 100))
-            macro["corp_profit"] = {
-                "sp500":   [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp_cp],
-                "profits": [{"d": d, "v": round(v / cp_base * 100, 1)} for d, v in cp],
-                "ndx":     ndx_hist,
-                "gap":     gap,
-                "ndx_gap": ndx_gap,
-                "worst_gap": worst_gap,
-                "score":   score,
-                "label":   ("Asset Inflation estrema" if worst_gap > 70 else "Asset Inflation" if worst_gap > 40
-                            else "Tensione moderata" if worst_gap > 20 else "Allineati")
-                           + (" (driver: NDX)" if ndx_gap is not None and ndx_gap > gap and worst_gap > 20 else ""),
-            }
+        ndx_pairs = None
+        try:
+            ndx_raw = yf.Ticker("^NDX").history(period="5y", interval="1mo",
+                                                 auto_adjust=True)["Close"].dropna()
+            ndx_pairs = [(str(d.date()), float(v)) for d, v in ndx_raw.items()]
+        except Exception as e:  # noqa: BLE001
+            print(f"!! corp_profit, Nasdaq 100 non letto: {e}", file=sys.stderr)   # v544: era un `pass` muto
+        _cpb = blocco_corp_profit(cp, sp_let, ndx_pairs)
+        if _cpb:
+            macro["corp_profit"] = _cpb
+        else:
+            print("!! corp_profit: ne' l'S&P 500 ne' il Nasdaq 100 hanno una finestra comune con i profitti, "
+                  "blocco non pubblicato", file=sys.stderr)
     except Exception as e:
         print(f"!! corp_profit: {e}", file=sys.stderr)
 

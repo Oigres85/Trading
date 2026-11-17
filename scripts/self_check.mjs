@@ -151,7 +151,8 @@ const SUITE = [
   /* v508: 628 punti di chiamata (+3 sui CDS a ondate: data del nome, giorni a meta', causa dello spread mancante) -> 615 */
   /* v509: 633 punti di chiamata (+5 sul dot plot letto dalla Fed: pacchetto, perimetro, popup, lettura, ricevuta) -> 620 */
   /* v510: 645 punti di chiamata (+12 sui difetti letti come il destinatario e sul Fear & Greed datato) -> 630 */
-  { file: "test_app.mjs",        cmd: "node",    minimo: 630, firma: /\d+\/\d+ check superati/ },
+  /* v544: 650 punti di chiamata (+4 sulla serie doppia che non si disegna: assenza, tessera, pacchetto, finestra) -> 635 */
+  { file: "test_app.mjs",        cmd: "node",    minimo: 635, firma: /\d+\/\d+ check superati/ },
   /* v492: 236 punti di chiamata in test_update_data (+5 sulla fine del veicolo di quotazione, dal registro SEC) -> 225 */
   /* v496: 250 punti di chiamata (+14 sul file storico FINRA: variazione annua per data, percentile, i due canali) -> 240 */
   /* v498: 275 punti di chiamata (+6 sulla finestra di un mese del CDS, al netto dell'indice) -> 265 */
@@ -167,7 +168,8 @@ const SUITE = [
   /* v512: 380 punti di chiamata (+8 sulle funzioni estratte per la sessione e i giorni di ICE conservati) -> 365 */
   /* v520: 402 punti di chiamata (+10 su ROIC e ROE: aliquota, medie, contiguita', scala, esercizi, collegamento) -> 390 */
   /* v521: 408 punti di chiamata (+6 sul prezzo del BTP con la sua data e il ripiego dichiarato) -> 395 */
-  { file: "test_update_data.py", cmd: "python3", minimo: 405, firma: /CHECK OK|CHECK FALLITI/ },
+  /* v544: 430 punti di chiamata (+13 sull'S&P mensile a due fornitori e sulla storia corta dichiarata) -> 418 */
+  { file: "test_update_data.py", cmd: "python3", minimo: 418, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */

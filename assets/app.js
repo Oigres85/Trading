@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "524";
+const BUILD_VERSION = "544";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3911,8 +3911,11 @@ function indicatoriClassifica() {
     sub: `spread ${signTxt(m.yield_recession.current_curve, " pp")} · ${m.yield_recession.was_inverted_24m ? "invertita negli ultimi 24 mesi" : "nessuna inversione recente"}` });
   if ((m.decouple?.sp500 || []).length && (m.decouple?.gdp || []).length) {
     const gapD = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
+    /* v544 — «su 3 anni» era scritto a mano, e il 17/11/2026 stava sopra una finestra di sei mesi */
+    const ggD = sovrapposizioneGiorni(m.decouple.sp500, m.decouple.gdp);
+    const finD = ggD ? `su ${fmtNum.format(Math.round(ggD / 365 * 10) / 10)} anni` : "su una finestra non misurabile";
     orf.push({ k: "decouple", nome: "Borsa vs economia reale", score: cl(100 - gapD * 0.9),
-      sub: `gap ${signTxt(gapD, " pp")} su 3 anni — cumulato, cresce con la finestra` });
+      sub: `gap ${signTxt(gapD, " pp")} ${finD} — cumulato, cresce con la finestra` });
   }
   if (m.forward_pe?.value != null) orf.push({ k: "forward_pe", nome: "Valutazione S&P (P/E forward)",
     score: cl(100 - (m.forward_pe.value - 13) * 8),
@@ -6150,6 +6153,8 @@ function renderIndicatori() {
        e' "la serie vince" ma "la serie vince quando e' davvero una serie". */
     const SERIE_MINIMA = 20;   // sotto, una linea dice meno di una scala con le zone nominate
     const seGrezza = serieIndicatore(r.k);
+    /* v544 — le due linee che mancano perche' una serie e' corta: il motivo si scrive sulla tessera */
+    const assenzaLinee = seGrezza ? "" : assenzaCoppia(r.k);
     const quanti = seGrezza
       ? (seGrezza.punti ? seGrezza.punti.length
          : seGrezza.doppia ? Math.min(...seGrezza.doppia.map(x => (x.punti || []).length)) : 0)
@@ -6189,7 +6194,8 @@ function renderIndicatori() {
               { h: 104, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex,
                 fmtY: se.fmtY, etichetteDx: false, aria: r.nome }))
       : "";
-    const g = (!se && forma) ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
+    const gLinee = (!se && forma) ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
+    const g = (assenzaLinee ? `<div class="info-line muted" style="font-size:11px">⚠ ${esc(assenzaLinee)}</div>` : "") + gLinee;
     return tessera({ t: r.nome, tag: r.proxy || null,
       /* ⚠ v337 — QUI NON VA NIENTE, ed e' una scelta misurata non una omissione. Il CEO:
          "elimina dalle schede macro i parametri in alto a destra es. 56/100; il dato deve
@@ -6453,6 +6459,66 @@ const clsScore = (v) => v < 40 ? "neg" : v < 55 ? "warn" : "pos";
    dove non esiste resta il misuratore e la tessera lo DICHIARA, invece di far finta con una
    riga piatta a un punto. Per gli altri la pipeline ha cominciato ad accumulare (v224):
    fra qualche settimana avranno anche loro la loro linea, e comparira' da sola. */
+/* ═══ v544 — LA SERIE DOPPIA CHE NON SI PUO' DISEGNARE SI DICHIARA ════════════════════════
+   Il 17/11/2026 FRED ha accorciato a un anno la serie dell'S&P 500: la finestra comune con i
+   profitti e' scesa a 2 trimestri, `serieIndicatore` ha restituito null e la tessera ha perso
+   le due linee SENZA DIRLO — «il dato non c'e'» e «c'e' ma e' corto» si leggevano uguali (v406).
+   Qui sta l'unica derivazione delle due coppie (v161), con tre esiti: le due linee, l'assenza
+   col suo motivo, null quando il blocco non c'e' proprio. `serieIndicatore` ne passa solo le
+   linee, e chi disegna la tessera o il popup chiede qui il motivo quando le linee mancano. */
+const PUNTI_MINIMI_COPPIA = 3;   // sotto, due punti sono un segmento e non un andamento
+function coppiaIndicatore(k) {
+  const m = DATA?.macro || {};
+  const blocco = k === "decouple" ? m.decouple : k === "corp_profit" ? m.corp_profit : null;
+  if (!blocco) return null;
+  const nomi = k === "decouple" ? ["S&P 500", "PIL reale"] : ["Nasdaq 100", "Profitti reali"];
+  const a2 = (k === "decouple" ? blocco.sp500 : blocco.ndx) || [];
+  const b2 = (k === "decouple" ? blocco.gdp : blocco.profits) || [];
+  const manca = (A, B, dove) => {
+    const [nome, corta] = A.length < PUNTI_MINIMI_COPPIA ? [nomi[0], A] : [nomi[1], B];
+    const est = corta.length ? ` (${corta[0].d} → ${corta[corta.length - 1].d})` : "";
+    /* i profitti escono gia' ritagliati sulla finestra che condividono con l'S&P: una storia
+       corta dell'S&P accorcia anche loro, ed e' il fatto che spiega il conto */
+    const viaSp = (k === "corp_profit" && corta === B)
+      ? ` I profitti sono pubblicati sulla finestra che condividono con l'S&P 500, che ha ${(blocco.sp500 || []).length} punti.` : "";
+    const fonte = blocco.sp500_storia && blocco.sp500_storia.avviso ? ` ${blocco.sp500_storia.avviso}.` : "";
+    return { assenza: `Le due linee non si possono disegnare: la serie «${nome}» ha ${corta.length} `
+      + `${corta.length === 1 ? "punto" : "punti"}${est}${dove}, ne servono almeno ${PUNTI_MINIMI_COPPIA}.${viaSp}${fonte}` };
+  };
+  if (a2.length < PUNTI_MINIMI_COPPIA || b2.length < PUNTI_MINIMI_COPPIA) return manca(a2, b2, "");
+  /* la finestra e' quella COMUNE, e si dichiara (v207, v334): due linee che finiscono in
+     momenti diversi non sono confrontabili sull'ultimo tratto */
+  const fine = [a2[a2.length - 1].d, b2[b2.length - 1].d].sort()[0];
+  const inizio = [a2[0].d, b2[0].d].sort()[1];
+  const taglia = (arr) => arr.filter(x => x && x.d >= inizio && x.d <= fine);
+  let A = taglia(a2), B = taglia(b2);
+  if (A.length < PUNTI_MINIMI_COPPIA || B.length < PUNTI_MINIMI_COPPIA) return manca(A, B, " nella finestra comune");
+  if (k === "decouple") {
+    return { doppia: [{ nome: "S&P 500", punti: A, colore: "var(--blue)" },
+                      { nome: "PIL reale", punti: B, colore: "var(--muted)", tratteggio: true }],
+             soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }],
+             finestra: { inizio, fine } };
+  }
+  /* ⚠⚠ v334 — il CEO: "la linea tratteggiata non segue quella viola". Non era un difetto di
+     disegno: le due serie FINISCONO IN DATE DIVERSE. Il Nasdaq e' mensile e arriva a oggi; i
+     profitti aziendali sono TRIMESTRALI e la fonte li pubblica con mesi di ritardo.
+     Le due serie hanno frequenze diverse: la prima data DENTRO la finestra puo' non
+     coincidere, e ribasare su due date diverse e' esattamente il difetto v349. */
+  const inizio2 = [A[0].d, B[0].d].sort()[1];
+  A = A.filter(x => x.d >= inizio2); B = B.filter(x => x.d >= inizio2);
+  if (A.length < PUNTI_MINIMI_COPPIA || B.length < PUNTI_MINIMI_COPPIA) return manca(A, B, " dalla prima data comune");
+  const base = (arr) => { const b0 = arr[0].v; return b0 ? arr.map(x => ({ d: x.d, v: Math.round(x.v / b0 * 1000) / 10 })) : arr; };
+  return { doppia: [{ nome: "Nasdaq 100", punti: base(A), colore: "var(--purple)" },
+                    { nome: "Profitti reali", punti: base(B), colore: "var(--muted)", tratteggio: true }],
+           soglie: [{ v: 100, testo: `partenza (${inizio2})`, colore: "var(--border)" }],
+           finestra: { inizio: inizio2, fine } };
+}
+/* il motivo per cui le due linee di una coppia mancano, o "" (le linee ci sono, o il blocco non c'e') */
+function assenzaCoppia(k) {
+  const c = coppiaIndicatore(k);
+  return c && c.assenza ? c.assenza : "";
+}
+
 function serieIndicatore(k) {
   const m = DATA?.macro || {};
   const perc = (h, lo, hi) => (h || []).map(x => ({ d: x.d, v: x.v }));
@@ -6483,47 +6549,10 @@ function serieIndicatore(k) {
     case "fed_market":
       return (m.fed_market?.fedfunds || []).length > 2
         ? { punti: m.fed_market.fedfunds, soglie: [{ v: 4, testo: "4% (convenzione di lettura)", colore: "var(--yellow)" }], unita: "%" } : null;
-    case "decouple": {
-      /* stessa cura del caso qui sopra: la finestra e' quella COMUNE, e si dichiara. */
-      const dc = m.decouple || {};
-      const a2 = dc.sp500 || [], b2 = dc.gdp || [];
-      if (a2.length < 3 || b2.length < 3) return null;
-      const fine = [a2[a2.length - 1].d, b2[b2.length - 1].d].sort()[0];
-      const inizio = [a2[0].d, b2[0].d].sort()[1];
-      const taglia = (arr) => arr.filter(x => x && x.d >= inizio && x.d <= fine);
-      const A = taglia(a2), B = taglia(b2);
-      if (A.length < 3 || B.length < 3) return null;
-      return { doppia: [{ nome: "S&P 500", punti: A, colore: "var(--blue)" },
-                        { nome: "PIL reale", punti: B, colore: "var(--muted)", tratteggio: true }],
-               soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }],
-               finestra: { inizio, fine } };
-    }
-    case "corp_profit": {
-      /* ⚠⚠ v334 — il CEO: "la linea tratteggiata non segue quella viola". Non era un difetto di
-         disegno: le due serie FINISCONO IN DATE DIVERSE. Il Nasdaq e' mensile e arriva a oggi
-         (60 punti, fino al 2026-08); i profitti aziendali sono TRIMESTRALI e la fonte li
-         pubblica con mesi di ritardo (20 punti, fermi al 2026-01). La tratteggiata si fermava
-         prima perche' il dato finisce prima, e sembrava che il grafico fosse rotto.
-         Ora si disegna la FINESTRA COMUNE e la si dichiara: due linee che finiscono in momenti
-         diversi non sono confrontabili sull'ultimo tratto, ed e' la lezione v207. */
-      const cp = m.corp_profit || {};
-      const a2 = cp.ndx || [], b2 = cp.profits || [];
-      if (a2.length < 3 || b2.length < 3) return null;
-      const fine = [a2[a2.length - 1].d, b2[b2.length - 1].d].sort()[0];
-      const inizio = [a2[0].d, b2[0].d].sort()[1];
-      const taglia = (arr) => arr.filter(x => x && x.d >= inizio && x.d <= fine);
-      let A = taglia(a2), B = taglia(b2);
-      if (A.length < 3 || B.length < 3) return null;
-      /* le due serie hanno frequenze diverse: la prima data DENTRO la finestra puo' non
-         coincidere, e ribasare su due date diverse e' esattamente il difetto v349 */
-      const inizio2 = [A[0].d, B[0].d].sort()[1];
-      A = A.filter(x => x.d >= inizio2); B = B.filter(x => x.d >= inizio2);
-      if (A.length < 3 || B.length < 3) return null;
-      const base = (arr) => { const b0 = arr[0].v; return b0 ? arr.map(x => ({ d: x.d, v: Math.round(x.v / b0 * 1000) / 10 })) : arr; };
-      return { doppia: [{ nome: "Nasdaq 100", punti: base(A), colore: "var(--purple)" },
-                        { nome: "Profitti reali", punti: base(B), colore: "var(--muted)", tratteggio: true }],
-               soglie: [{ v: 100, testo: `partenza (${inizio2})`, colore: "var(--border)" }],
-               finestra: { inizio: inizio2, fine } };
+    case "decouple": case "corp_profit": {
+      /* v544 — una derivazione sola (coppiaIndicatore): da qui passa solo cio' che si disegna */
+      const c = coppiaIndicatore(k);
+      return c && c.doppia ? c : null;
     }
     default: {
       /* ═══ v292 — LA TRAIETTORIA DEGLI INDICATORI MACRO ══════════════════════════════════
@@ -8404,6 +8433,7 @@ function openMacroInfo(key) {
     extra = `<div class="info-line"><b>S&amp;P 500 (normalizzato):</b> <span class="pos">${signTxt(spLast - 100)} dal periodo base</span></div>
       <div class="info-line"><b>PIL reale USA (GDPC1):</b> ${signTxt(gdLast - 100)} dal periodo base</div>
       <div class="info-line"><b>Gap (disaccoppiamento):</b> <span style="color:${gapCol}">${gap > 0 ? "+" : ""}${gap} pp — ${gap > 40 ? "speculazione elevata" : gap > 20 ? "valutazione tesa" : "disaccoppiamento contenuto"}</span></div>
+      ${dc.sp500_storia && dc.sp500_storia.avviso ? `<div class="info-line muted" style="font-size:11px">⚠ ${esc(dc.sp500_storia.avviso)}</div>` : ""}
       <h4 style="margin:12px 0 4px">S&amp;P 500 vs PIL reale (base 100 = inizio periodo)</h4>
       ${miniDualChart(dc.sp500, dc.gdp, { color1: "var(--blue)", color2: "var(--green)", label1: "S&P 500", label2: "PIL reale" })}
       <div class="info-line muted" style="font-size:11px;margin-top:6px">Un gap ampio segnala che la borsa ha prezzato una crescita degli utili superiore a quella dell'economia reale. Storico pre-correzione: gap &gt;40 pp in 2000, 2007 e 2021.</div>`;
@@ -8521,9 +8551,20 @@ function openMacroInfo(key) {
         divario puo' restare aperto per anni.</div>${fin}` + extra;
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
     const ndxGapCol = cp.ndx_gap != null ? (cp.ndx_gap > 40 ? "var(--red)" : cp.ndx_gap > 20 ? "var(--yellow)" : "var(--green)") : "var(--muted)";
-    extra = `<div class="info-line"><b>Gap S&amp;P 500 vs Profitti Reali:</b> <span style="color:${gapCol}">${cp.gap > 0 ? "+" : ""}${cp.gap} pp — ${cp.label}</span></div>
-      ${cp.ndx_gap != null ? `<div class="info-line"><b>Gap Nasdaq 100 vs Profitti Reali:</b> <span style="color:${ndxGapCol}">${cp.ndx_gap > 0 ? "+" : ""}${cp.ndx_gap} pp</span> </div>` : ""}
-      ${thermoBar(cp.score, ["Allineati", "Asset Inflation"])}
+    /* v544 — il gap porta la SUA finestra (misurata sulle serie), e quando la storia dell'S&P e' corta la
+       pipeline non lo pubblica: si scrive «non calcolabile» col motivo, non un numero di tre mesi sotto
+       l'etichetta di cinque anni. I due gap escono dal formattatore unico (virgola decimale, v442).
+       Le due linee che mancano le dichiara la TESSERA, che questo contenuto lo porta dentro (v313): qui
+       la stessa frase uscirebbe due volte (misurato in browser). */
+    const ggP = sovrapposizioneGiorni(cp.sp500, cp.profits);
+    const stP = cp.sp500_storia || null;
+    const gapSp = cp.gap != null
+      ? `<span style="color:${gapCol}">${signTxt(cp.gap, " pp")}${ggP ? ` su ${fmtNum.format(Math.round(ggP / 365 * 10) / 10)} anni` : ""} — ${esc(cp.label)}</span>`
+      : `<span class="muted">non calcolabile in questo snapshot${stP && stP.avviso ? ` — ${esc(stP.avviso)}` : ""}</span> — ${esc(cp.label || "")}`;
+    extra = `<div class="info-line"><b>Gap S&amp;P 500 vs Profitti Reali:</b> ${gapSp}</div>
+      ${cp.ndx_gap != null ? `<div class="info-line"><b>Gap Nasdaq 100 vs Profitti Reali:</b> <span style="color:${ndxGapCol}">${signTxt(cp.ndx_gap, " pp")}</span> </div>` : ""}
+      ${cp.gap != null && stP && stP.avviso ? `<div class="info-line muted" style="font-size:11px">⚠ ${esc(stP.avviso)}</div>` : ""}
+      ${cp.score != null ? thermoBar(cp.score, ["Allineati", "Asset Inflation"]) : ""}
       <div class="info-line muted" style="font-size:11px;margin:6px 0">
         Quando S&amp;P 500 e Nasdaq 100 nominali crescono molto più dei profitti aziendali reali, i prezzi stanno pagando più di quanto gli utili reali siano cresciuti: le cause — multipli, tassi, inflazione — questi dati non le separano.
         La soglia dei 40 pp è una convenzione di lettura del sistema, non una misura (v510).
@@ -10228,7 +10269,7 @@ function buildPrompt(opz) {
     if (gg) {
       const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
       const anni = Math.round(gg / 365 * 10) / 10;
-      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp su una finestra di ${fmtNum.format(anni)} anni (azionario ${signTxt(Math.round((m.decouple.sp500.slice(-1)[0].v - 100) * 10) / 10)} contro PIL reale ${signTxt(Math.round((m.decouple.gdp.slice(-1)[0].v - 100) * 10) / 10)} dal ${m.decouple.sp500[0].d}). ⚠ COME SI LEGGE: è una differenza CUMULATA, quindi cresce meccanicamente con la lunghezza della finestra — la soglia dei "40 pp" citata in letteratura NON è confrontabile con finestre di durata diversa, e su ${fmtNum.format(anni)} anni di mercato al rialzo viene superata quasi sempre. Serve come contesto di valutazione, NON come segnale di uscita.`);
+      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp su una finestra di ${fmtNum.format(anni)} anni (azionario ${signTxt(Math.round((m.decouple.sp500.slice(-1)[0].v - 100) * 10) / 10)} contro PIL reale ${signTxt(Math.round((m.decouple.gdp.slice(-1)[0].v - 100) * 10) / 10)} dal ${m.decouple.sp500[0].d}). ⚠ COME SI LEGGE: è una differenza CUMULATA, quindi cresce meccanicamente con la lunghezza della finestra — la soglia dei "40 pp" citata in letteratura NON è confrontabile con finestre di durata diversa, e su ${fmtNum.format(anni)} anni di mercato al rialzo viene superata quasi sempre. Serve come contesto di valutazione, NON come segnale di uscita.${m.decouple.sp500_storia?.avviso ? ` [${m.decouple.sp500_storia.avviso}]` : ""}`);
     } else {
       lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: NON CALCOLABILE in questo snapshot — le due serie non condividono nessun periodo (azionario e PIL arrivano con finestre diverse), quindi la loro differenza non sarebbe un gap ma il confronto fra due orizzonti diversi. Si ricalcola da solo al prossimo run della pipeline.`);
     }
@@ -10527,9 +10568,12 @@ function buildPrompt(opz) {
   if (perTitolo && m.corp_profit) potati.push("il confronto pluriennale fra indici e profitti aziendali reali");
   if (!perTitolo && m.corp_profit) {
     const ggCp = sovrapposizioneGiorni(m.corp_profit.sp500, m.corp_profit.profits);
-    let cpBp = ggCp
-      ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${signTxt(m.corp_profit.gap, " pp")}`
-      : `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): il gap dell'S&P NON è calcolabile in questo snapshot (la sua serie e quella dei profitti non condividono nessun periodo)`;
+    /* v544 — il gap dell'S&P esce con la finestra su cui e' misurato; con la storia corta la pipeline non lo
+       pubblica e la riga dice perche'. La fonte dell'S&P si nomina quando non e' la prima (ripiego dichiarato). */
+    const avCp = m.corp_profit.sp500_storia?.avviso || "";
+    let cpBp = (ggCp && m.corp_profit.gap != null)
+      ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${signTxt(m.corp_profit.gap, " pp")} su una finestra di ${fmtNum.format(Math.round(ggCp / 365 * 10) / 10)} anni${avCp ? ` [${avCp}]` : ""}`
+      : `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): il gap dell'S&P NON è calcolabile in questo snapshot (${avCp || "la sua serie e quella dei profitti non condividono nessun periodo"})`;
     if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${signTxt(m.corp_profit.ndx_gap, " pp")}`;
     /* ⚠ v510 — «gap>40 pp = Asset Inflation da fiat debasement» era una CAUSA affermata senza fonte: i dati dicono di
        quanto i prezzi sono saliti piu' dei profitti, non perche'. E «+15.5 pp» col punto inglese (v442) */
