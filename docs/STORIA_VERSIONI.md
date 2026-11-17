@@ -9984,3 +9984,57 @@ posizioni) ma non quello dell'OPERAZIONE: prima di comprare o vendere il conto i
 - **Suite**: quattro controlli, stato costruito (cambio, prezzi, commissione e registro della fixture); il terzo passa
   da `main`. Iniezioni su copie, una per copia.
 - **Liquidità**: 31.000 € dichiarati dal CEO la sera del 17/11 (libro e `config/portfolio_state.json`).
+
+## v545 — FRED ha accorciato l'S&P 500 a un anno: due fornitori, e la storia corta si dichiara (17/11/2026)
+
+**Il sintomo.** Dal run delle 02:15 UTC del 17/11/2026 `data/data.json` porta `macro.corp_profit.profits` con 2 punti
+(erano 20) e `sp500` con 4 (erano 58), con `ndx` fermo a 60; `macro.decouple` scende da 37 e 13 punti a 7 e 3. Il run
+prima, delle 00:04 UTC, era intero, e in mezzo non c'è nessun commit di codice.
+
+**La causa, letta alla fonte.** FRED ha accorciato la serie `SP500` a UN ANNO: il csv pubblico parte dal 17/11/2025
+(261 sedute), anche chiedendo una data d'inizio esplicita (`cosd=2016-01-01` torna lo stesso file); fino al run prima ne
+dava dieci, e il Dow Jones (`DJIA`) sulla stessa FRED ne ha ancora dieci, dal 17/11/2016. Nessun errore: una risposta
+valida, solo più corta. `fred_series("SP500", 64, freq="m")` ha dato 11 mesi invece di 64, `_finestra_comune` ha fatto il
+suo mestiere e il confronto con i profitti (la serie `CP` è intera: 22 trimestri) è sceso alla finestra 2026-01 →
+2026-04. Il gap pubblicato (−8 pp) misurava TRE MESI sotto un'etichetta e una soglia pensate per cinque anni; la tessera
+del disaccoppiamento scriveva «su 3 anni» (a mano) sopra una finestra di sei mesi; e `serieIndicatore("corp_profit")`,
+con 2 punti di profitti, tornava `null`: le due linee sparivano dalla tessera senza una parola.
+
+- **La seconda fonte è la stessa grandezza.** La media mensile delle chiusure giornaliere di Yahoo `^GSPC` coincide AL
+  CENTESIMO con la media mensile di FRED sugli undici mesi che FRED dà ancora (2025-12 → 2026-10, misurato il 17/11): è
+  un secondo fornitore, non una seconda derivazione (v161). `media_mensile` tiene solo i mesi interi come fa FRED: fuori
+  il mese in formazione (FRED lo lascia vuoto) e il primo della serie (non dimostrabile intero).
+- **`sp500_mensile(n)`** prova FRED e poi Yahoo: vince la prima fonte che dà TUTTI i mesi chiesti; se nessuna li dà, la
+  più lunga, dichiarata corta. La lettura porta `fonte`, `mesi`, `chiesti`, `intera`, `dal`, `tentate` e un `avviso` in
+  parole, che esce su stderr e nel blocco (`sp500_fonte`, `sp500_storia`). Una risposta con più osservazioni nello stesso
+  mese non è mensile e vale come non letta (64 sedute non sono 64 mesi: v207). Una lettura sola serve i due confronti
+  (`_lettura_su` ne prende gli ultimi 40 mesi per il PIL).
+- **Il gap dell'S&P si pubblica solo sulla storia intera.** `blocco_corp_profit` e `blocco_decouple` sono ora funzioni
+  che un test costruisce. Con la storia corta `gap` è `None`, il punteggio si fa sul solo Nasdaq e l'etichetta lo dice;
+  senza nemmeno il Nasdaq non c'è punteggio (un buco non è uno zero, v205). Il `pass` muto sul Nasdaq ora scrive su stderr.
+- **`fred_series` senza chiave ignorava `freq`**: il csv pubblico tornava la frequenza nativa, cioè il difetto v207 vivo
+  nel ramo che la sessione percorre. Ora passa `fq`/`fas=avg`, che il csv accetta (misurato).
+- **La pagina.** `coppiaIndicatore` è l'unica derivazione delle due coppie di linee, con tre esiti: le linee, l'assenza
+  col suo motivo (quale serie è corta, quanti punti ha, da quando a quando, e l'avviso della pipeline), `null` se il
+  blocco non c'è. La tessera scrive il motivo dove starebbe il grafico; il pannello scrive il gap con la SUA finestra
+  misurata sulle serie («+15,5 pp su 4,8 anni») o «non calcolabile» col motivo; la riga del pacchetto fa lo stesso e
+  nomina la fonte quando è un ripiego. «su 3 anni» ora si misura. I due gap del pannello escono dal formattatore unico
+  (erano «15.5» col punto). `BUILD_VERSION` e `?v=` a 545.
+- **Riprova sulla strada vera** (17/11, in sessione): FRED 11 mesi → Yahoo 64; i due blocchi ricostruiti sono IDENTICI,
+  punto per punto, a quelli del run delle 00:04 (58 e 20 punti, gap +15,5 pp, NDX +38,3 pp, 37 e 13 nel disaccoppiamento).
+  In browser, con i dati corti di oggi, la tessera dichiara l'assenza una volta sola (la prima stesura la ripeteva nel
+  pannello: tolta).
+- **Gate.** Tredici controlli in `test_update_data.py` (lo stato costruito: FRED con undici mesi, la seconda fonte
+  presente, assente o giornaliera, l'orologio fermo) e quattro in `test_app.mjs` (assenza, tessera disegnata, pacchetto,
+  finestra misurata). Dodici iniezioni su copie verificate per impronta, una per copia: mordono tutte, ognuna col nome
+  del suo controllo, e la suite non muore mai. Pavimenti alzati.
+- **Non toccato, e perché.** `data/data.json` lo riscrive la pipeline al prossimo run (non si corregge a mano). Stooq
+  come terza fonte: dalla sessione rifiuta la connessione, non si ritenta (v542). `fed_market.sp500` legge ancora SP500
+  giornaliero (60 sedute) sotto un commento che dice «5 anni mensili»: il grafico del pannello copre tre mesi; stessa
+  classe v207, fuori dal perimetro. Nel pannello dei profitti la spiegazione v334 («come si leggono le due linee») è
+  assegnata a `extra` e sovrascritta due righe dopo: non è mai uscita. Il Nasdaq resta a chiusura di fine mese mentre
+  l'S&P è una media mensile: due misure diverse sotto lo stesso confronto.
+- **Il numero.** Nato come v544 nella PR #241; rinumerato v545 all'unione, perché v544 l'aveva preso su `main`, alle
+  17:19 UTC dello stesso giorno, «il cambio in ogni operazione» (un'altra sessione). Il conflitto era solo qui.
+- **La lezione.** Una fonte può rispondere bene e CORTA. Il conto di ciò che torna si confronta con ciò che si è chiesto,
+  e la differenza si dichiara: `_finestra_comune` proteggeva il calcolo, nessuno proteggeva la lunghezza.

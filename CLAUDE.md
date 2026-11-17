@@ -118,6 +118,8 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
 **Scrivere il codice**
 - **Una grandezza, una derivazione** (v161): due implementazioni della stessa domanda divergono al primo ritocco. Una
   correzione si applica a TUTTI i rami e a tutte le superfici (v412). Formattatore unico, **virgola decimale**.
+- **Una fonte può rispondere bene e CORTA** (v545): si conta ciò che torna contro ciò che si è chiesto, e la
+  differenza si dichiara nel dato (`sp500_storia`) e sulla pagina.
 - **Le assenze si dichiarano** (v406): «il sistema non ha il dato» e «ce l'ha e non lo passa» si leggono uguali. Le
   fonti hanno tre esiti — con voci, senza voci, NON letta (v389). Un buco non è uno zero (v205).
 - **Stato del mercato e freschezza del dato sono due cose diverse** (v193): una barra in formazione non è conclusa; le
