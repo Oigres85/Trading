@@ -9960,3 +9960,27 @@ dell'11/11, fermato senza consegnare niente: lo prende questa versione.
 - **Non toccato, e perché.** `laboratorio.py` tiene la domanda «una regola d'uscita a soglie diverse, sul passato»: è uno
   studio a richiesta, non una regola del libro. I nomi interni (`salvavita()`, `SOGLIA_SALVAVITA`, la chiave `[salvavita]`
   del registro) restano: cambiarli toccava il registro delle previsioni senza cambiare niente per chi legge.
+
+## v544 — il cambio in ogni operazione (17/11/2026)
+
+Il CEO, testuale: *"rendi strutturale l'analisi tenendo conto sempre del cambio in futuro in caso di vendita o
+acquisto"*. La domanda era nata nel pomeriggio: 8.000 € su TSMC a 352 $ col dollaro al massimo dell'anno sull'euro —
+«puoi inglobarmi nel pmc questo surplus?». Il sistema aveva il cambio del LIBRO (v516: carico e risultato in euro delle
+posizioni) ma non quello dell'OPERAZIONE: prima di comprare o vendere il conto in euro si faceva a mano.
+
+- **`numeri_libro.py`**: `incasso_eur` e la sua inversa `pareggio_usd` (una derivazione), `cambio_acquisto` (l'unità
+  di 5.000 € in euro: azioni, costo, carico per azione, pareggio a cambio fermo e negli scenari, stop e obiettivo in
+  euro), `cambio_vendita` (incasso, identità prezzo + cambio + costi, imposta in euro, i due pareggi), col carico della
+  stessa derivazione del blocco del libro. `cambio_libro` aggiunge a ogni posizione il suo pareggio in euro, che la
+  resa stampa in ogni analisi.
+- **`statistica.py`**: `ingresso` stampa la prova e l'acquisto in euro (`resa_ingresso`); comando nuovo `uscita TICKER
+  PREZZO [AZIONI]`; la riga del diario porta il cambio del giorno. Il cambio è quello del blocco del libro
+  (`cambio_del_giro`: BCE del giro, pipeline come ripiego dichiarato); senza cambio la resa lo dichiara.
+- **Convenzioni** in LIBRO §1decies, rilette dal gate: scarto della banca 0,0006 (dalla nota del 16/11), scenari −5%,
+  −2%, fermo, +2%, +5%. La commissione resta quella di §1terdecies (15 $ misurati a ottobre; la nota del 16/11 ne
+  porta 12,50: una sola nota, la riga non si tocca ancora).
+- **Registro**: chiave `[cambio_operazione]` nel formato e nel catalogo della scheda (marcatore «pareggio in euro» nel
+  blocco del cambio). COMPRO e VENDO nominano i due comandi; CLAUDE.md lo porta fra le regole dell'analisi in chat.
+- **Suite**: quattro controlli, stato costruito (cambio, prezzi, commissione e registro della fixture); il terzo passa
+  da `main`. Iniezioni su copie, una per copia.
+- **Liquidità**: 31.000 € dichiarati dal CEO la sera del 17/11 (libro e `config/portfolio_state.json`).

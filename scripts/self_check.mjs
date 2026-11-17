@@ -234,7 +234,9 @@ const SUITE = [
      l'uscita standard al suo posto) -> 1134 */
   /* v543: 1147 punti di chiamata (+3: la sintesi operativa senza «scatta», le superfici senza la regola eliminata,
      libro e istruzioni coerenti col codice; sei controlli del salvavita riagganciati alla proprieta' opposta) -> 1137 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1137, firma: /\d+\/\d+ CHECK OK/ },
+  /* v544: +4 punti di chiamata (l'acquisto in euro col pareggio che e' il pareggio, la vendita in euro come
+     identita', il collegamento per la strada vera di `ingresso` e `uscita`, libro e istruzioni col codice) -> 1141 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1141, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

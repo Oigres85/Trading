@@ -41,10 +41,11 @@ DIAVOLO** (il miglior argomento contro e il pre-mortem; parla per primo se una c
   (§1novodecies), il movimento implicito. Dopo: risultati contro attese, guida, ogni condizione una per una, la tesi
   regge sì o no. Su un nome in conflitto, prima alla cieca (`cieca.py`).
 - **COMPRO <TICKER> <PREZZO> [IMPORTO]** → la tesi scritta PRIMA (un nome nuovo entra in §1novodecies), `statistica.py
-  ingresso … --registra`, peso e tema dopo l'acquisto contro la politica, pre-mortem, l'alternativa per lo stesso
-  denaro, le quattro voci.
-- **VENDO <TICKER>** → è cambiata la tesi (condizioni violate) o solo il prezzo? Il fisco in euro (blocco del cambio),
-  dove va il ricavato secondo la politica, le quattro voci.
+  ingresso … --registra` — che da v544 dà anche l'acquisto in euro: carico per azione e pareggio ai vari cambi —,
+  peso e tema dopo l'acquisto contro la politica, pre-mortem, l'alternativa per lo stesso denaro, le quattro voci.
+- **VENDO <TICKER>** → è cambiata la tesi (condizioni violate) o solo il prezzo? `statistica.py uscita TICKER PREZZO`
+  (v544: incasso in euro, risultato fra prezzo, cambio e costi, imposta, pareggio in euro), dove va il ricavato
+  secondo la politica, le quattro voci.
 - **PANICO** → solo fatti: semaforo e calo dal massimo, il piano di calo scritto (§1vicies), cosa NON fare oggi, quando si
   decide (il giorno dopo).
 - **STOP** (CEO, 11/11/2026: *"Mi servono anche eventuali stop loss ed interventi"*) → per ogni posizione
@@ -727,6 +728,9 @@ che ogni voce di qui abbia la sua voce nel catalogo della scheda, e che il catal
   confronto: tenere, al pareggio, fissi; gli ordini con limite a confronto: quante volte vengono eseguiti e cosa
   succede dopo) e la riga nel
   diario che misura l'intuito contro la statistica (01/11)
+- `[cambio_operazione]` il cambio in ogni acquisto e in ogni vendita: il carico in euro per azione con commissione e
+  scarto, il prezzo di pareggio in euro a cambio fermo e negli scenari, e per le vendite l'incasso, il risultato
+  fra prezzo, cambio e costi e l'imposta in euro; in ogni analisi il pareggio in euro di ogni posizione (17/11)
 - `[laboratorio]` il laboratorio in tre righe in ogni analisi: la perdita media nel 5% dei giorni peggiori e chi la
   porta, il regime di SMH e QQQ, la volatilità di adesso (03/11; il dettaglio delle nove librerie su richiesta)
 - `[tesi]` le tesi: per ogni posizione le tre condizioni e i tre segnali, le misurabili controllate a ogni analisi

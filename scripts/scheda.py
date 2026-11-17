@@ -289,6 +289,7 @@ REGISTRO = {
     "attesa": Voce(("attesa",)),
     "cambio": Voce(("cambio",)),                                                                       # v516
     "roi_conto": Voce(("roi_conto",)),                                                                 # v520
+    "cambio_operazione": Voce(("cambio",), (Marcatore("cambio", "pareggio in euro", None, dentro=True),)),  # v544
     "rendimento_deposito": Voce(("rendimento_deposito",)),                                             # v523
     "rendimento_capitale": Voce((), (Marcatore("schede", "rendimento del capitale", "tutti"),          # v520
                                      Marcatore("watchlist", "rendimento del capitale", "sorvegliati"))),

@@ -240,7 +240,8 @@ def calcola(sedute=1, registra=False, adesso=None):
                                  pat_pipe[0], pat_pipe[1], ((giro["scelta"] or {}).get("eurusd") or {}).get("anno"),
                                  cassa_eur, sum(p["qta"] * pat_pipe[2].get(t, (p["pmc"], ""))[0] / 100
                                                 for t, p in eur.items()),
-                                 broker=_broker, pmc=pmc)
+                                 broker=_broker, pmc=pmc,
+                                 commissione_usd=(leggi_rendiconti() or {}).get("commissione_usd"))
     # v520 — il ROI del conto dalla fotografia del broker (LIBRO.md §1duodecies), con lo stesso cambio del blocco
     out["conto"] = roi_conto(_broker, qty, pmc, pat_pipe[0], cassa_eur)
     # v523 — il rendimento del deposito titoli dai rendiconti del broker (LIBRO.md §1terdecies), con QQQ e la BCE
@@ -2250,6 +2251,8 @@ def patrimonio_eur(valore_az_usd, fx, cassa_eur, obbligazioni):
 # annotato, e per quelle posizioni il risultato in euro lo calcola il broker — si dice, non si stima (v396).
 EFFETTO_CAMBIO_PCT = 1.0      # «se il cambio si muove dell'1%»: un'unita' di lettura, non una previsione (v240)
 MIN_ANNO_CAMBIO = 120         # sotto, nessun percentile: la stessa convenzione dello storico del Fear & Greed (v510)
+SCARTO_CAMBIO = 0.0006        # v544: lo scarto della banca sul cambio, per euro, a ogni conversione (LIBRO.md §1decies)
+SCENARI_CAMBIO_PCT = (-5, -2, 0, 2, 5)   # v544: «se l'euro si muove di tanto»: unita' di lettura (LIBRO.md §1decies)
 
 
 def _data_it(iso):
@@ -2417,8 +2420,138 @@ def posizione_anno_cambio(anno, fx):
     return out
 
 
+def incasso_eur(azioni, prezzo, fx, commissione_usd=0.0, scarto=SCARTO_CAMBIO):
+    """v544 — gli euro che una vendita rende: i dollari al netto della commissione, convertiti al cambio PIU' lo
+    scarto (vendendo dollari la banca ne chiede di piu' per ogni euro)."""
+    return (azioni * prezzo - (commissione_usd or 0.0)) / (fx + scarto)
+
+
+def pareggio_usd(costo_eur, azioni, fx, commissione_usd=0.0, scarto=SCARTO_CAMBIO):
+    """v544 — il prezzo in dollari a cui la vendita restituisce `costo_eur`: l'inversa di incasso_eur (v161)."""
+    return (costo_eur * (fx + scarto) + (commissione_usd or 0.0)) / azioni
+
+
+def cambio_acquisto(prezzo, fx, commissione_usd=0.0, unita_eur=None, scarto=SCARTO_CAMBIO, stop=None, obiettivo=None):
+    """v544 — l'acquisto di UN'UNITA' di calcolo (rotazione.UNITA_EUR: aritmetica, non una quantita' consigliata)
+    visto in EURO: le azioni che l'unita' compra al cambio MENO lo scarto (comprando dollari la banca ne da' meno per
+    ogni euro), il costo e il carico per azione con la commissione dentro, e il prezzo di PAREGGIO IN EURO — a che
+    prezzo in dollari la vendita restituisce gli euro spesi — a cambio fermo e negli scenari dichiarati. None senza
+    cambio: un carico in euro costruito su un cambio che non c'e' e' un altro carico."""
+    import rotazione
+    u = unita_eur or rotazione.UNITA_EUR
+    if not fx or not prezzo or fx <= scarto:
+        return None
+    c = commissione_usd or 0.0
+    n = int((u * (fx - scarto) - c) // prezzo)
+    if n <= 0:
+        return {"azioni": 0, "unita_eur": u, "prezzo": prezzo}
+    costo = (n * prezzo + c) / (fx - scarto)
+    out = {"azioni": n, "unita_eur": u, "prezzo": prezzo, "fx": fx, "costo_eur": costo, "carico_eur": costo / n,
+           "nudo_eur": prezzo / fx,
+           "scenari": [{"pct": s, "fx": fx * (1 + s / 100), "pareggio": pareggio_usd(costo, n, fx * (1 + s / 100), c, scarto)}
+                       for s in SCENARI_CAMBIO_PCT],
+           "un_pct": incasso_eur(n, prezzo, fx * (1 + EFFETTO_CAMBIO_PCT / 100), c, scarto) - incasso_eur(n, prezzo, fx, c, scarto)}
+    for nome, liv in (("stop", stop), ("obiettivo", obiettivo)):
+        if liv:
+            out[nome] = {"prezzo": liv, "eur": incasso_eur(n, liv, fx, c, scarto) - costo}
+    return out
+
+
+def cambio_vendita(tk, prezzo, azioni, coperta, fx, commissione_usd=0.0, scarto=SCARTO_CAMBIO):
+    """v544 — la vendita di `azioni` di una posizione vista in EURO. `coperta` e' la voce di cambio_libro per il nome
+    (il carico in euro del broker o del registro: la stessa derivazione del blocco del libro, v161), presa in
+    proporzione se la vendita e' parziale (costo medio ponderato). Il risultato e' un'identita': prezzo + cambio +
+    commissione e scarto. L'imposta e' sulla plusvalenza IN EURO."""
+    import conseguenze
+    c = commissione_usd or 0.0
+    k = azioni / coperta["azioni"]
+    carico_eur, carico_usd = coperta["carico_eur"] * k, coperta["carico_usd"] * k
+    lordo = azioni * prezzo / fx
+    inc = incasso_eur(azioni, prezzo, fx, c, scarto)
+    prezzo_eur = (azioni * prezzo - carico_usd) / fx
+    pnl = inc - carico_eur
+    return {"tk": tk, "prezzo": prezzo, "azioni": azioni, "di": coperta["azioni"], "carico_eur": carico_eur,
+            "carico_usd": carico_usd, "fx_carico": coperta.get("fx_carico"), "fonte": coperta.get("fonte"), "fx": fx,
+            "incasso_eur": inc, "pnl_eur": pnl, "effetto_prezzo": prezzo_eur,
+            "effetto_cambio": lordo - carico_eur - prezzo_eur, "costi": inc - lordo,
+            "imposta": pnl * conseguenze.ALIQUOTA if pnl > 0 else 0.0, "aliquota": conseguenze.ALIQUOTA,
+            "pareggio_usd": carico_usd / azioni, "pareggio_eur": pareggio_usd(carico_eur, azioni, fx, c, scarto),
+            "scenari": [{"pct": s, "fx": fx * (1 + s / 100),
+                         "pnl_eur": incasso_eur(azioni, prezzo, fx * (1 + s / 100), c, scarto) - carico_eur}
+                        for s in SCENARI_CAMBIO_PCT if s]}
+
+
+def _testa_cambio(cg):
+    return (f"EUR/USD {_it(cg['fx'], 4)} ({cg.get('fonte') or 'fonte n.d.'}) · scarto della banca {_it(SCARTO_CAMBIO, 4)} "
+            "per euro a ogni conversione · commissione "
+            + (f"{_it(cg['commissione_usd'], 2)} $ per ordine" if cg.get("commissione_usd") is not None
+               else "NON scritta nel libro: il conto e' senza commissione")
+            + " (LIBRO.md §1decies, §1terdecies)")
+
+
+def _riga_anno_cambio(cg):
+    a = posizione_anno_cambio(cg.get("anno"), cg.get("fx"))
+    if not a:
+        return "  la storia del cambio non e' in questo giro (la BCE non letta): vale il solo valore di oggi"
+    return (f"  nell'anno della BCE: minimo {_it(a['minimo'][1], 4)} il {_data_it(a['minimo'][0])}, massimo "
+            f"{_it(a['massimo'][1], 4)} il {_data_it(a['massimo'][0])}"
+            + (f" · percentile di oggi nell'anno: {a['percentile']} su 100" if a.get("percentile") is not None else "")
+            + " — piu' in basso sta l'euro, piu' euro costa ogni dollaro comprato e piu' ne rende ogni dollaro venduto")
+
+
+def righe_cambio_acquisto(a, tk, prezzo, cg):
+    """La resa dell'acquisto in euro: fatti e aritmetica dell'unita', nessun consiglio (il cambio non si prevede)."""
+    testa = f"IL CAMBIO NELL'ACQUISTO (v544) — {tk} a {_it(prezzo, 2)} $"
+    if not a:
+        return [testa + ": cambio NON letto in questo giro (ne' la BCE ne' la pipeline) — il carico in euro e il "
+                "pareggio non si calcolano: il dato che manca, non un cambio neutro"]
+    L = [testa + " · " + _testa_cambio(cg), _riga_anno_cambio(cg)]
+    if not a["azioni"]:
+        return L + [f"  un'unita' da {_it(a['unita_eur'], 0)} € non compra un'azione a questo prezzo: nessun conto"]
+    L.append(f"  un'unita' da {_it(a['unita_eur'], 0)} € (unita' di calcolo, non una quantita' consigliata): {a['azioni']} "
+             f"azioni · costo {_it(a['costo_eur'], 2)} € · CARICO {_it(a['carico_eur'], 2)} € per azione — "
+             f"{_it(a['nudo_eur'], 2)} € il prezzo al cambio di riferimento, {_it(a['carico_eur'] - a['nudo_eur'], 2)} € "
+             "commissione e scarto")
+    fermo = next(s for s in a["scenari"] if s["pct"] == 0)
+    L.append("  PAREGGIO IN EURO alla vendita (commissione e scarto d'uscita compresi): a cambio fermo "
+             f"{_it(fermo['pareggio'], 2)} $ ({_sg((fermo['pareggio'] / a['prezzo'] - 1) * 100, 1)}% sul prezzo) · "
+             + " · ".join(f"euro {_sg(s['pct'], 0)}% ({_it(s['fx'], 4)}) {_it(s['pareggio'], 2)} $"
+                          for s in a["scenari"] if s["pct"])
+             + " — unita' di lettura, non previsioni: un euro piu' forte alza il prezzo che serve per riavere gli euro spesi")
+    L.append("  a cambio fermo, sull'unita': "
+             + " · ".join([f"{nome} {_it(a[k]['prezzo'], 2)} $ → {_sg(a[k]['eur'], 0)} €"
+                           for k, nome in (("stop", "allo stop"), ("obiettivo", "all'obiettivo")) if a.get(k)]
+                          + [f"ogni {_it(EFFETTO_CAMBIO_PCT, 0)}% di euro piu' forte {_sg(a['un_pct'], 0)} €"]))
+    return L
+
+
+def righe_cambio_vendita(v, cg):
+    """La resa della vendita in euro. Un nome senza carico in euro o un cambio non letto si dichiarano."""
+    testa = f"IL CAMBIO NELLA VENDITA (v544) — {v['tk']}" + (f" a {_it(v['prezzo'], 2)} $" if v.get("prezzo") else "")
+    if v.get("errore"):
+        return [testa + ": " + v["errore"]]
+    L = [testa + f" · {_it(v['azioni'], 0)} azioni" + (f" su {_it(v['di'], 0)}" if v["azioni"] != v["di"] else "")
+         + " · " + _testa_cambio(cg), _riga_anno_cambio(cg)]
+    L.append(f"  carico {_it(v['carico_usd'], 0)} $ a EUR/USD {_it(v['fx_carico'], 4)} = {_it(v['carico_eur'], 0)} € ("
+             + ("fotografia del broker: la base fiscale" if v.get("fonte") == "broker" else "registro delle operazioni")
+             + f") → incasso netto {_it(v['incasso_eur'], 0)} € · IN EURO {_sg(v['pnl_eur'], 0)} € = prezzo "
+             f"{_sg(v['effetto_prezzo'], 0)} € + cambio {_sg(v['effetto_cambio'], 0)} € + commissione e scarto "
+             f"{_sg(v['costi'], 0)} €"
+             + (f" · imposta sulla plusvalenza in euro ~{_it(v['imposta'], 0)} € al {_it(v['aliquota'] * 100, 0)}%: "
+                f"restano {_it(v['incasso_eur'] - v['imposta'], 0)} €" if v["imposta"]
+                else " · in euro e' una minusvalenza: nessuna imposta"))
+    L.append(f"  PAREGGIO: in dollari al prezzo medio, {_it(v['pareggio_usd'], 2)} $ · IN EURO a {_it(v['pareggio_eur'], 2)} $ "
+             f"al cambio di oggi, commissione e scarto compresi — fra i due c'e' il cambio: carico a {_it(v['fx_carico'], 4)}, "
+             f"oggi {_it(v['fx'], 4)}")
+    L.append("  se il cambio si muove prima della vendita, a prezzo fermo: "
+             + " · ".join(f"euro {_sg(s['pct'], 0)}% ({_it(s['fx'], 4)}) → {_sg(s['pnl_eur'], 0)} €" for s in v["scenari"])
+             + " — unita' di lettura, non previsioni")
+    L.append("  ⚠ stima: il cambio vero e' quello della banca al momento dell'eseguito, e il conto fiscale lo fa il broker")
+    return L
+
+
 def cambio_libro(operazioni, qty, px, fx, fonte_fx, anno=None, cassa_eur=None, obbligazioni_eur=0.0, broker=None,
-                 pmc=None):
+                 pmc=None, commissione_usd=None):
     """Il blocco CAMBIO EURO/DOLLARO: quanta parte del patrimonio e' in dollari, cosa fa un 1% del cambio, dove sta il
     cambio nel suo anno, e per le posizioni col carico in euro dal registro il risultato in euro scomposto in effetto
     del prezzo ed effetto del cambio, con la plusvalenza imponibile. Senza cambio None: un patrimonio con l'azionario
@@ -2467,6 +2600,8 @@ def cambio_libro(operazioni, qty, px, fx, fonte_fx, anno=None, cassa_eur=None, o
                                    "effetto_cambio": pnl - prezzo,
                                    "imposta": pnl * conseguenze.ALIQUOTA if pnl > 0 else 0.0, "fonte": "registro"})
     cc = out["coperte"]
+    for x in cc:      # v544 — a che prezzo in dollari la vendita di oggi restituisce il carico in euro
+        x["pareggio_eur"] = pareggio_usd(x["carico_eur"], x["azioni"], fx, commissione_usd)
     if cc:
         out["totale"] = {"n": len(cc), "pnl_eur": sum(x["pnl_eur"] for x in cc),
                          "effetto_prezzo": sum(x["effetto_prezzo"] for x in cc),
@@ -2506,7 +2641,8 @@ def righe_cambio(c):
     for x in c["coperte"]:
         L.append(f"  {x['tk']:5} carico {_it(x['carico_usd'], 0)} $ a EUR/USD {_it(x['fx_carico'], 4)}"
                  + (" (cambio effettivo del broker, commissioni comprese)" if x.get("fonte") == "broker" else "")
-                 + f" = {_it(x['carico_eur'], 0)} € · oggi {_it(x['valore_eur'], 0)} € · in euro {_sg(x['pnl_eur'], 0)} € = "
+                 + f" = {_it(x['carico_eur'], 0)} € (pareggio in euro a {_it(x['pareggio_eur'], 2)} $) · oggi "
+                 f"{_it(x['valore_eur'], 0)} € · in euro {_sg(x['pnl_eur'], 0)} € = "
                  f"prezzo {_sg(x['effetto_prezzo'], 0)} € + cambio {_sg(x['effetto_cambio'], 0)} €"
                  + (f" · se si vendesse oggi, imposta sulla plusvalenza in euro {_it(x['imposta'], 0)} € al "
                     f"{_it(c['aliquota'] * 100, 0)}%"
