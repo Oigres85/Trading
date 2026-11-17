@@ -26,6 +26,7 @@ casi indipendenti la statistica non generalizza, e lo dice invece di concludere.
 
 Uso:
   python3 scripts/statistica.py ingresso TICKER [PREZZO] [--data AAAA-MM-GG] [--registra "intuizione"]
+  python3 scripts/statistica.py uscita TICKER PREZZO [AZIONI]   la vendita vista in euro (v544)
   python3 scripts/statistica.py pagina          la pagina statistica delle posizioni (passo del comando unico)
   python3 scripts/statistica.py bilancio        il diario delle decisioni contro cio' che e' successo dopo
 """
@@ -666,9 +667,65 @@ def resa_pagina(pg):
     return L
 
 
+# ───────────────────────── il cambio nell'operazione (v544) ─────────────────────────
+
+def cambio_del_giro():
+    """v544 — il cambio col quale si legge un'operazione: lo STESSO del blocco del libro (una lettura sola, v161:
+    numeri_libro.patrimonio_pipeline — il riferimento BCE del giro con la sua data, la quotazione della pipeline come
+    ripiego dichiarato), il suo anno e la commissione per ordine di LIBRO.md §1terdecies. Un cambio non letto resta
+    None, e la resa lo dichiara."""
+    import fonti_dirette
+    import numeri_libro as NL
+    try:
+        pipe = NL._carica_pipeline()
+        giro = fonti_dirette.del_giro(pipe)
+        fx, fonte, _ = NL.patrimonio_pipeline(pipe, {}, giro["scelta"])
+        anno = ((giro["scelta"] or {}).get("eurusd") or {}).get("anno")
+    except Exception:
+        fx, fonte, anno = None, None, None
+    return {"fx": fx, "fonte": fonte, "anno": anno, "commissione_usd": (NL.leggi_rendiconti() or {}).get("commissione_usd")}
+
+
+def resa_ingresso(p, cg):
+    """Cio' che `ingresso` stampa: la prova d'ingresso e, da v544, lo stesso acquisto visto in euro."""
+    L = resa_prova(p)
+    if p.get("errore"):
+        return L
+    import numeri_libro as NL
+    g = p["geometria"]
+    a = NL.cambio_acquisto(p["prezzo"], cg.get("fx"), cg.get("commissione_usd"), stop=g["stop"], obiettivo=g["obiettivo"])
+    return L + NL.righe_cambio_acquisto(a, p["tk"], p["prezzo"], cg)
+
+
+def uscita(tk, prezzo, azioni=None, cg=None, pos=None, operazioni=None, broker=None):
+    """v544 — la vendita di una posizione del libro vista in euro (numeri_libro.cambio_vendita), col carico della
+    stessa derivazione del blocco del cambio. Cio' che manca diventa un «errore» detto per nome, mai un conto a meta'."""
+    import numeri_libro as NL
+    cg = cg if cg is not None else cambio_del_giro()
+    pos = pos if pos is not None else universo()[1]
+    p = pos.get(tk)
+    if not p:
+        return {"tk": tk, "prezzo": prezzo, "errore": "non e' una posizione in dollari del libro (LIBRO.md §1)"}
+    q = azioni or p["qta"]
+    if q > p["qta"] or q <= 0:
+        return {"tk": tk, "prezzo": prezzo, "errore": f"il libro porta {_n(p['qta'], 0)} azioni: {_n(q, 0)} non si vendono"}
+    if not cg.get("fx"):
+        return {"tk": tk, "prezzo": prezzo, "errore": "cambio NON letto in questo giro (ne' la BCE ne' la pipeline): il "
+                "risultato in euro non si calcola — il dato che manca, non un cambio neutro"}
+    c = NL.cambio_libro(NL.leggi_operazioni() if operazioni is None else operazioni, {tk: p["qta"]}, {tk: prezzo},
+                        cg["fx"], cg.get("fonte"), cg.get("anno"),
+                        broker=NL.leggi_conto_broker() if broker is None else broker, pmc={tk: p["pmc"]},
+                        commissione_usd=cg.get("commissione_usd"))
+    cop = next(iter(c["coperte"]), None)
+    if not cop:
+        return {"tk": tk, "prezzo": prezzo, "errore": "il carico in euro non e' nel registro delle operazioni ne' nella "
+                "fotografia del broker (LIBRO.md §1decies, §1duodecies): il risultato in euro non si calcola"}
+    return NL.cambio_vendita(tk, prezzo, q, cop, cg["fx"], cg.get("commissione_usd"))
+
+
 # ───────────────────────── il diario delle decisioni ─────────────────────────
 
-def registra(p, intuizione, adesso=None):
+def registra(p, intuizione, adesso=None, cg=None):
     """Una riga per decisione: lo stato, la statistica di quel giorno e l'intuizione del CEO, PRIMA di sapere
     com'e' andata. Dopo 20-30 righe il bilancio dice se l'intuito batte la statistica (v528)."""
     usa = p["largo"] if (p["pieno"]["n"] < MIN_CASI and p["largo"]) else p["pieno"]
@@ -678,6 +735,8 @@ def registra(p, intuizione, adesso=None):
             "ev_R": round(geo["ev"], 3) if geo.get("ev") is not None else None, "verdetto": verdetto(geo or None)[0],
             "stop": round(p["geometria"]["stop"], 4), "obiettivo": round(p["geometria"]["obiettivo"], 4),
             "intuizione": intuizione}
+    if (cg or {}).get("fx"):                  # v544 — il cambio del giorno della decisione, con la sua fonte
+        riga["eurusd"], riga["fonte_cambio"] = cg["fx"], cg.get("fonte")
     with open(DIARIO, "a", encoding="utf-8") as f:
         f.write(json.dumps(riga, ensure_ascii=False) + "\n")
     return riga
@@ -721,7 +780,7 @@ def resa_bilancio(bl):
 
 
 def main(argv):
-    if not argv or argv[0] not in ("ingresso", "pagina", "bilancio"):
+    if not argv or argv[0] not in ("ingresso", "uscita", "pagina", "bilancio"):
         print(__doc__)
         return 2
     if argv[0] == "pagina":
@@ -732,6 +791,16 @@ def main(argv):
         print("\n".join(resa_bilancio(bilancio())))
         return 0
     args = argv[1:]
+    if argv[0] == "uscita":
+        if len(args) < 2:
+            print(__doc__)
+            return 2
+        cg = cambio_del_giro()
+        v = uscita(args[0].upper(), float(args[1].replace(",", ".")),
+                   float(args[2].replace(",", ".")) if len(args) > 2 else None, cg)
+        import numeri_libro as NL
+        print("\n".join(NL.righe_cambio_vendita(v, cg)))
+        return 0 if not v.get("errore") else 1
     data = intuizione = None
     if "--data" in args:
         k = args.index("--data"); data = args[k + 1]; del args[k:k + 2]
@@ -745,9 +814,10 @@ def main(argv):
     except Exception:
         veicolo = None
     p = prova(tk, prezzo, data, veicolo=veicolo)
-    print("\n".join(resa_prova(p)))
+    cg = cambio_del_giro()
+    print("\n".join(resa_ingresso(p, cg)))
     if intuizione is not None and not p.get("errore"):
-        registra(p, intuizione)
+        registra(p, intuizione, cg=cg)
         print(f"  registrata nel diario (memoria/diario_ingressi.jsonl): si committa, come le altre memorie")
     return 0 if not p.get("errore") else 1
 

@@ -378,7 +378,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
 # v476: il pavimento era fermo a 112 su 223 check eseguiti — META' suite poteva sparire restando
 # verde, il guasto per cui esiste (v277, v400). Alzato con margine, mai incollato al conteggio.
-N_CHECKS_MINIMO = 441  # v544: 443 eseguiti · v522: 430 eseguiti · v521: 421 eseguiti · v520: 415 eseguiti · v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
+N_CHECKS_MINIMO = 441  # v545: 443 eseguiti · v522: 430 eseguiti · v521: 421 eseguiti · v520: 415 eseguiti · v519: 406 eseguiti · v517: 404 eseguiti · v515: 403 · v514: 401 · +8 con le news per titolo v398, +8 con la liquidita' v476, v492: 249 eseguiti, v496: 263, v497: 282, v498: 288, v500: 291, v501: 305, v502: 308, v504: 316, v506: 334, v508: 353, v509: 367, v510: 385, v512: 393 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -3958,15 +3958,15 @@ check("v522 la riga del BTP nomina la voce letta e porta il rateo netto; il valo
       and _rb522["price_src"] == "Borsa Italiana, prezzo di riferimento" and _rb522["rateo_netto"] == 0.2568
       and abs(_rb522["value"] - ud.BTP["nominal"] * 101.63 / 100) < 0.01)
 
-# ═══ v544 — FRED HA ACCORCIATO SP500 A UN ANNO: DUE FORNITORI, E LA STORIA CORTA SI DICHIARA ═══════════════════════
+# ═══ v545 — FRED HA ACCORCIATO SP500 A UN ANNO: DUE FORNITORI, E LA STORIA CORTA SI DICHIARA ═══════════════════════
 # Il 17/11/2026 la serie SP500 di FRED e' passata da dieci anni a uno: la pipeline ha pubblicato `corp_profit` con 4
 # punti di S&P e 2 di profitti (erano 58 e 20) e un gap di tre mesi sotto l'etichetta di cinque anni, e la pagina ha
 # perso il grafico senza dirlo. Lo stato si COSTRUISCE (v429): la risposta corta la mette il check, l'orologio e'
 # fermo (`oggi`), nessuna rete.
-import os as _os544, re as _re544
+import os as _os545, re as _re545
 
 
-def _serie544(primo, quanti, v0, passo, ogni=1):
+def _serie545(primo, quanti, v0, passo, ogni=1):
     """`quanti` osservazioni dal mese `primo` (AAAA-MM), una ogni `ogni` mesi: [(AAAA-MM-01, valore)]."""
     a, m, out = int(primo[:4]), int(primo[5:7]), []
     for i in range(quanti):
@@ -3977,114 +3977,114 @@ def _serie544(primo, quanti, v0, passo, ogni=1):
     return out
 
 
-_OGGI544 = "2026-11-17"
-_FRED_CORTA544 = _serie544("2025-12", 11, 6800.0, 80.0)        # la risposta del 17/11/2026: undici mesi interi
-_LUNGA544 = _serie544("2016-12", 119, 2200.0, 46.0)            # dieci anni, fino a 2026-10
-_CP544 = _serie544("2021-01", 22, 2900.0, 60.0, ogni=3)        # profitti trimestrali, fino a 2026-04
-_GD544 = _serie544("2023-04", 14, 22000.0, 100.0, ogni=3)      # PIL trimestrale, fino a 2026-07
-_NDX544 = _serie544("2021-12", 60, 16000.0, 150.0)             # Nasdaq mensile, fino a 2026-11
-_chiamate544 = []
+_OGGI545 = "2026-11-17"
+_FRED_CORTA545 = _serie545("2025-12", 11, 6800.0, 80.0)        # la risposta del 17/11/2026: undici mesi interi
+_LUNGA545 = _serie545("2016-12", 119, 2200.0, 46.0)            # dieci anni, fino a 2026-10
+_CP545 = _serie545("2021-01", 22, 2900.0, 60.0, ogni=3)        # profitti trimestrali, fino a 2026-04
+_GD545 = _serie545("2023-04", 14, 22000.0, 100.0, ogni=3)      # PIL trimestrale, fino a 2026-07
+_NDX545 = _serie545("2021-12", 60, 16000.0, 150.0)             # Nasdaq mensile, fino a 2026-11
+_chiamate545 = []
 
 
-def _fonte544(nome, serie=None, errore=None):
+def _fonte545(nome, serie=None, errore=None):
     def _leggi():
-        _chiamate544.append(nome)
+        _chiamate545.append(nome)
         if errore:
             raise RuntimeError(errore)
         return list(serie)
     return (nome, _leggi)
 
 
-_gg544 = ([(f"2026-08-{g:02d}", 100.0) for g in (17, 18, 19)]
+_gg545 = ([(f"2026-08-{g:02d}", 100.0) for g in (17, 18, 19)]
           + [("2026-09-01", 10.0), ("2026-09-02", 20.0), ("2026-09-30", 30.0)]
           + [("2026-10-01", 40.0), ("2026-10-30", 60.0)] + [("2026-11-02", 500.0), ("2026-11-16", 700.0)])
-check("v544 media mensile: solo i mesi INTERI — fuori il primo (non dimostrabile) e quello in formazione (v193)",
-      ud.media_mensile(_gg544, _OGGI544) == [("2026-09-01", 20.0), ("2026-10-01", 50.0)])
+check("v545 media mensile: solo i mesi INTERI — fuori il primo (non dimostrabile) e quello in formazione (v193)",
+      ud.media_mensile(_gg545, _OGGI545) == [("2026-09-01", 20.0), ("2026-10-01", 50.0)])
 
-_let544 = ud.sp500_mensile(64, oggi=_OGGI544, letture=[_fonte544("FRED", _FRED_CORTA544),
-                                                       _fonte544("Yahoo", _LUNGA544)])
-check("v544 S&P mensile: una fonte con un anno di storia NON basta — si passa alla seconda e la serie torna intera",
-      _let544["fonte"] == "Yahoo" and _let544["intera"] is True and _let544["mesi"] == 64
-      and _let544["serie"][0][0] == "2021-07-01" and _let544["serie"][-1][0] == "2026-10-01")
-check("v544 S&P mensile: il ripiego e' RUMOROSO — l'avviso nomina la fonte scartata, i mesi che dava e quelli chiesti",
-      "FRED" in (_let544["avviso"] or "") and bool(_re544.search(r"\b11\b", _let544["avviso"] or ""))
-      and bool(_re544.search(r"\b64\b", _let544["avviso"] or ""))
-      and [t.get("esito") for t in _let544["tentate"]] == ["storia corta", "storia intera"])
+_let545 = ud.sp500_mensile(64, oggi=_OGGI545, letture=[_fonte545("FRED", _FRED_CORTA545),
+                                                       _fonte545("Yahoo", _LUNGA545)])
+check("v545 S&P mensile: una fonte con un anno di storia NON basta — si passa alla seconda e la serie torna intera",
+      _let545["fonte"] == "Yahoo" and _let545["intera"] is True and _let545["mesi"] == 64
+      and _let545["serie"][0][0] == "2021-07-01" and _let545["serie"][-1][0] == "2026-10-01")
+check("v545 S&P mensile: il ripiego e' RUMOROSO — l'avviso nomina la fonte scartata, i mesi che dava e quelli chiesti",
+      "FRED" in (_let545["avviso"] or "") and bool(_re545.search(r"\b11\b", _let545["avviso"] or ""))
+      and bool(_re545.search(r"\b64\b", _let545["avviso"] or ""))
+      and [t.get("esito") for t in _let545["tentate"]] == ["storia corta", "storia intera"])
 
-_corta544 = ud.sp500_mensile(64, oggi=_OGGI544, letture=[_fonte544("FRED", _FRED_CORTA544),
-                                                         _fonte544("Yahoo", errore="rete giu' 544")])
-check("v544 S&P mensile: seconda fonte NON letta — resta la storia corta, DICHIARATA (non intera, col conto e l'errore)",
-      _corta544["fonte"] == "FRED" and _corta544["intera"] is False and _corta544["mesi"] == 11
-      and "rete giu' 544" in (_corta544["avviso"] or "") and _corta544["tentate"][1].get("mesi") is None)
+_corta545 = ud.sp500_mensile(64, oggi=_OGGI545, letture=[_fonte545("FRED", _FRED_CORTA545),
+                                                         _fonte545("Yahoo", errore="rete giu' 545")])
+check("v545 S&P mensile: seconda fonte NON letta — resta la storia corta, DICHIARATA (non intera, col conto e l'errore)",
+      _corta545["fonte"] == "FRED" and _corta545["intera"] is False and _corta545["mesi"] == 11
+      and "rete giu' 545" in (_corta545["avviso"] or "") and _corta545["tentate"][1].get("mesi") is None)
 
-_chiamate544.clear()
-_prima544 = ud.sp500_mensile(64, oggi=_OGGI544, letture=[_fonte544("FRED", _LUNGA544), _fonte544("Yahoo", _LUNGA544)])
-check("v544 S&P mensile: con la prima fonte intera la seconda non si interroga e non c'e' avviso (v421: un avviso che "
+_chiamate545.clear()
+_prima545 = ud.sp500_mensile(64, oggi=_OGGI545, letture=[_fonte545("FRED", _LUNGA545), _fonte545("Yahoo", _LUNGA545)])
+check("v545 S&P mensile: con la prima fonte intera la seconda non si interroga e non c'e' avviso (v421: un avviso che "
       "suona sempre non avvisa)",
-      _prima544["fonte"] == "FRED" and _prima544["avviso"] is None and _chiamate544 == ["FRED"])
+      _prima545["fonte"] == "FRED" and _prima545["avviso"] is None and _chiamate545 == ["FRED"])
 
-_sedute544 = [(f"2026-{m:02d}-{g:02d}", 7000.0 + g) for m in (8, 9, 10) for g in range(1, 23)]
-_gior544 = ud.sp500_mensile(64, oggi=_OGGI544, letture=[_fonte544("FRED", _sedute544), _fonte544("Yahoo", _LUNGA544)])
-check("v544 S&P mensile: 64 SEDUTE non sono 64 mesi (v207) — una risposta giornaliera vale come non letta",
-      len(_sedute544) >= 64 and _gior544["fonte"] == "Yahoo" and _gior544["tentate"][0].get("mesi") is None)
+_sedute545 = [(f"2026-{m:02d}-{g:02d}", 7000.0 + g) for m in (8, 9, 10) for g in range(1, 23)]
+_gior545 = ud.sp500_mensile(64, oggi=_OGGI545, letture=[_fonte545("FRED", _sedute545), _fonte545("Yahoo", _LUNGA545)])
+check("v545 S&P mensile: 64 SEDUTE non sono 64 mesi (v207) — una risposta giornaliera vale come non letta",
+      len(_sedute545) >= 64 and _gior545["fonte"] == "Yahoo" and _gior545["tentate"][0].get("mesi") is None)
 
-_bInt544 = ud.blocco_corp_profit(_CP544, _let544, _NDX544)
-check("v544 corp_profit: con la seconda fonte tornano la storia intera e il gap, e il blocco nomina la fonte dell'S&P",
-      _bInt544 is not None and len(_bInt544["sp500"]) == 58 and len(_bInt544["profits"]) == 20
-      and isinstance(_bInt544["gap"], float) and _bInt544["sp500_fonte"] == "Yahoo"
-      and _bInt544["sp500_storia"]["intera"] is True and bool(_bInt544["sp500_storia"]["avviso"]))
+_bInt545 = ud.blocco_corp_profit(_CP545, _let545, _NDX545)
+check("v545 corp_profit: con la seconda fonte tornano la storia intera e il gap, e il blocco nomina la fonte dell'S&P",
+      _bInt545 is not None and len(_bInt545["sp500"]) == 58 and len(_bInt545["profits"]) == 20
+      and isinstance(_bInt545["gap"], float) and _bInt545["sp500_fonte"] == "Yahoo"
+      and _bInt545["sp500_storia"]["intera"] is True and bool(_bInt545["sp500_storia"]["avviso"]))
 
-_bCor544 = ud.blocco_corp_profit(_CP544, _corta544, _NDX544)
-check("v544 corp_profit: con la storia corta dell'S&P il gap pluriennale NON si pubblica, e il blocco dichiara perche'",
-      _bCor544 is not None and _bCor544["gap"] is None and len(_bCor544["sp500"]) == 4 and len(_bCor544["profits"]) == 2
-      and _bCor544["sp500_storia"]["intera"] is False and bool(_bCor544["sp500_storia"]["avviso"]))
-check("v544 corp_profit: il Nasdaq non paga la storia corta dell'S&P — stesso gap, e il punteggio si fa su quello",
-      _bCor544 is not None and _bInt544 is not None and _bCor544["ndx_gap"] is not None
-      and _bCor544["ndx_gap"] == _bInt544["ndx_gap"] and _bCor544["worst_gap"] == _bCor544["ndx_gap"]
-      and isinstance(_bCor544["score"], int) and _bCor544["label"] != _bInt544["label"])
+_bCor545 = ud.blocco_corp_profit(_CP545, _corta545, _NDX545)
+check("v545 corp_profit: con la storia corta dell'S&P il gap pluriennale NON si pubblica, e il blocco dichiara perche'",
+      _bCor545 is not None and _bCor545["gap"] is None and len(_bCor545["sp500"]) == 4 and len(_bCor545["profits"]) == 2
+      and _bCor545["sp500_storia"]["intera"] is False and bool(_bCor545["sp500_storia"]["avviso"]))
+check("v545 corp_profit: il Nasdaq non paga la storia corta dell'S&P — stesso gap, e il punteggio si fa su quello",
+      _bCor545 is not None and _bInt545 is not None and _bCor545["ndx_gap"] is not None
+      and _bCor545["ndx_gap"] == _bInt545["ndx_gap"] and _bCor545["worst_gap"] == _bCor545["ndx_gap"]
+      and isinstance(_bCor545["score"], int) and _bCor545["label"] != _bInt545["label"])
 
-_bSolo544 = ud.blocco_corp_profit(_CP544, _corta544, None)
-check("v544 corp_profit: storia corta e Nasdaq non letto — nessun punteggio, e lo storico non lo riceve (v205: un buco "
+_bSolo545 = ud.blocco_corp_profit(_CP545, _corta545, None)
+check("v545 corp_profit: storia corta e Nasdaq non letto — nessun punteggio, e lo storico non lo riceve (v205: un buco "
       "non e' uno zero)",
-      _bSolo544 is not None and _bSolo544["score"] is None and _bSolo544["worst_gap"] is None
-      and "corp_profit" not in _macro_scores({"corp_profit": _bSolo544})
-      and ud.blocco_corp_profit(_CP544, {"serie": [], "intera": False}, None) is None)
+      _bSolo545 is not None and _bSolo545["score"] is None and _bSolo545["worst_gap"] is None
+      and "corp_profit" not in _macro_scores({"corp_profit": _bSolo545})
+      and ud.blocco_corp_profit(_CP545, {"serie": [], "intera": False}, None) is None)
 
-_dcInt544 = ud.blocco_decouple(ud._lettura_su(_let544, 40), _GD544)
-_dcCor544 = ud.blocco_decouple(ud._lettura_su(_corta544, 40), _GD544)
-check("v544 decouple: la stessa lettura sugli ultimi 40 mesi — intera con la seconda fonte, corta e DICHIARATA senza",
-      _dcInt544 is not None and len(_dcInt544["sp500"]) == 37 and len(_dcInt544["gdp"]) == 13
-      and _dcInt544["sp500_storia"]["chiesti"] == 40 and _dcInt544["sp500_storia"]["intera"] is True
-      and _dcCor544 is not None and len(_dcCor544["sp500"]) == 7 and _dcCor544["sp500_storia"]["intera"] is False
-      and bool(_dcCor544["sp500_storia"]["avviso"]))
+_dcInt545 = ud.blocco_decouple(ud._lettura_su(_let545, 40), _GD545)
+_dcCor545 = ud.blocco_decouple(ud._lettura_su(_corta545, 40), _GD545)
+check("v545 decouple: la stessa lettura sugli ultimi 40 mesi — intera con la seconda fonte, corta e DICHIARATA senza",
+      _dcInt545 is not None and len(_dcInt545["sp500"]) == 37 and len(_dcInt545["gdp"]) == 13
+      and _dcInt545["sp500_storia"]["chiesti"] == 40 and _dcInt545["sp500_storia"]["intera"] is True
+      and _dcCor545 is not None and len(_dcCor545["sp500"]) == 7 and _dcCor545["sp500_storia"]["intera"] is False
+      and bool(_dcCor545["sp500_storia"]["avviso"]))
 
-_i544 = _SRC_UD_CODICE.index("def fetch_macro(")
-_fm544 = _SRC_UD_CODICE[_i544:_SRC_UD_CODICE.index("\ndef ", _i544 + 1)]
-check("v544 collegamento: fetch_macro legge l'S&P mensile UNA volta dalla catena e pubblica i due blocchi dalle "
+_i545 = _SRC_UD_CODICE.index("def fetch_macro(")
+_fm545 = _SRC_UD_CODICE[_i545:_SRC_UD_CODICE.index("\ndef ", _i545 + 1)]
+check("v545 collegamento: fetch_macro legge l'S&P mensile UNA volta dalla catena e pubblica i due blocchi dalle "
       "funzioni provate qui (v161, v399)",
-      _fm544.count("sp500_mensile(") == 1 and _fm544.count("blocco_corp_profit(") == 1
-      and _fm544.count("blocco_decouple(") == 1
-      and not _re544.search(r'fred_series\(\s*"SP500"[^)]*freq', _fm544))
+      _fm545.count("sp500_mensile(") == 1 and _fm545.count("blocco_corp_profit(") == 1
+      and _fm545.count("blocco_decouple(") == 1
+      and not _re545.search(r'fred_series\(\s*"SP500"[^)]*freq', _fm545))
 
-_env544, _hg544, _url544 = _os544.environ.pop("FRED_API_KEY", None), ud.http_get, []
+_env545, _hg545, _url545 = _os545.environ.pop("FRED_API_KEY", None), ud.http_get, []
 
 
-class _R544:
+class _R545:
     text = "observation_date,SP500\n2026-09-01,7669.41\n2026-10-01,7726.69\n"
 
 
 try:
-    ud.http_get = lambda u, *a, **k: (_url544.append(u), _R544())[1]
-    _csv544 = ud.fred_series("SP500", 5, freq="m")
+    ud.http_get = lambda u, *a, **k: (_url545.append(u), _R545())[1]
+    _csv545 = ud.fred_series("SP500", 5, freq="m")
     ud.fred_series("SP500", 5)
 finally:
-    ud.http_get = _hg544
-    if _env544 is not None:
-        _os544.environ["FRED_API_KEY"] = _env544
-check("v544 fred_series senza chiave: `freq` arriva al csv pubblico (era ignorato: tornavano le sedute), e senza "
+    ud.http_get = _hg545
+    if _env545 is not None:
+        _os545.environ["FRED_API_KEY"] = _env545
+check("v545 fred_series senza chiave: `freq` arriva al csv pubblico (era ignorato: tornavano le sedute), e senza "
       "`freq` l'indirizzo resta quello di prima",
-      len(_url544) == 2 and "fq=Monthly" in _url544[0] and "fas=avg" in _url544[0] and "fq=" not in _url544[1]
-      and _csv544 == [("2026-09-01", 7669.41), ("2026-10-01", 7726.69)])
+      len(_url545) == 2 and "fq=Monthly" in _url545[0] and "fas=avg" in _url545[0] and "fq=" not in _url545[1]
+      and _csv545 == [("2026-09-01", 7669.41), ("2026-10-01", 7726.69)])
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

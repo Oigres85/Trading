@@ -9961,7 +9961,31 @@ dell'11/11, fermato senza consegnare niente: lo prende questa versione.
   studio a richiesta, non una regola del libro. I nomi interni (`salvavita()`, `SOGLIA_SALVAVITA`, la chiave `[salvavita]`
   del registro) restano: cambiarli toccava il registro delle previsioni senza cambiare niente per chi legge.
 
-## v544 — FRED ha accorciato l'S&P 500 a un anno: due fornitori, e la storia corta si dichiara (17/11/2026)
+## v544 — il cambio in ogni operazione (17/11/2026)
+
+Il CEO, testuale: *"rendi strutturale l'analisi tenendo conto sempre del cambio in futuro in caso di vendita o
+acquisto"*. La domanda era nata nel pomeriggio: 8.000 € su TSMC a 352 $ col dollaro al massimo dell'anno sull'euro —
+«puoi inglobarmi nel pmc questo surplus?». Il sistema aveva il cambio del LIBRO (v516: carico e risultato in euro delle
+posizioni) ma non quello dell'OPERAZIONE: prima di comprare o vendere il conto in euro si faceva a mano.
+
+- **`numeri_libro.py`**: `incasso_eur` e la sua inversa `pareggio_usd` (una derivazione), `cambio_acquisto` (l'unità
+  di 5.000 € in euro: azioni, costo, carico per azione, pareggio a cambio fermo e negli scenari, stop e obiettivo in
+  euro), `cambio_vendita` (incasso, identità prezzo + cambio + costi, imposta in euro, i due pareggi), col carico della
+  stessa derivazione del blocco del libro. `cambio_libro` aggiunge a ogni posizione il suo pareggio in euro, che la
+  resa stampa in ogni analisi.
+- **`statistica.py`**: `ingresso` stampa la prova e l'acquisto in euro (`resa_ingresso`); comando nuovo `uscita TICKER
+  PREZZO [AZIONI]`; la riga del diario porta il cambio del giorno. Il cambio è quello del blocco del libro
+  (`cambio_del_giro`: BCE del giro, pipeline come ripiego dichiarato); senza cambio la resa lo dichiara.
+- **Convenzioni** in LIBRO §1decies, rilette dal gate: scarto della banca 0,0006 (dalla nota del 16/11), scenari −5%,
+  −2%, fermo, +2%, +5%. La commissione resta quella di §1terdecies (15 $ misurati a ottobre; la nota del 16/11 ne
+  porta 12,50: una sola nota, la riga non si tocca ancora).
+- **Registro**: chiave `[cambio_operazione]` nel formato e nel catalogo della scheda (marcatore «pareggio in euro» nel
+  blocco del cambio). COMPRO e VENDO nominano i due comandi; CLAUDE.md lo porta fra le regole dell'analisi in chat.
+- **Suite**: quattro controlli, stato costruito (cambio, prezzi, commissione e registro della fixture); il terzo passa
+  da `main`. Iniezioni su copie, una per copia.
+- **Liquidità**: 31.000 € dichiarati dal CEO la sera del 17/11 (libro e `config/portfolio_state.json`).
+
+## v545 — FRED ha accorciato l'S&P 500 a un anno: due fornitori, e la storia corta si dichiara (17/11/2026)
 
 **Il sintomo.** Dal run delle 02:15 UTC del 17/11/2026 `data/data.json` porta `macro.corp_profit.profits` con 2 punti
 (erano 20) e `sp500` con 4 (erano 58), con `ndx` fermo a 60; `macro.decouple` scende da 37 e 13 punti a 7 e 3. Il run
@@ -9995,7 +10019,7 @@ con 2 punti di profitti, tornava `null`: le due linee sparivano dalla tessera se
   blocco non c'è. La tessera scrive il motivo dove starebbe il grafico; il pannello scrive il gap con la SUA finestra
   misurata sulle serie («+15,5 pp su 4,8 anni») o «non calcolabile» col motivo; la riga del pacchetto fa lo stesso e
   nomina la fonte quando è un ripiego. «su 3 anni» ora si misura. I due gap del pannello escono dal formattatore unico
-  (erano «15.5» col punto). `BUILD_VERSION` e `?v=` a 544.
+  (erano «15.5» col punto). `BUILD_VERSION` e `?v=` a 545.
 - **Riprova sulla strada vera** (17/11, in sessione): FRED 11 mesi → Yahoo 64; i due blocchi ricostruiti sono IDENTICI,
   punto per punto, a quelli del run delle 00:04 (58 e 20 punti, gap +15,5 pp, NDX +38,3 pp, 37 e 13 nel disaccoppiamento).
   In browser, con i dati corti di oggi, la tessera dichiara l'assenza una volta sola (la prima stesura la ripeteva nel
@@ -10010,5 +10034,7 @@ con 2 punti di profitti, tornava `null`: le due linee sparivano dalla tessera se
   classe v207, fuori dal perimetro. Nel pannello dei profitti la spiegazione v334 («come si leggono le due linee») è
   assegnata a `extra` e sovrascritta due righe dopo: non è mai uscita. Il Nasdaq resta a chiusura di fine mese mentre
   l'S&P è una media mensile: due misure diverse sotto lo stesso confronto.
+- **Il numero.** Nato come v544 nella PR #241; rinumerato v545 all'unione, perché v544 l'aveva preso su `main`, alle
+  17:19 UTC dello stesso giorno, «il cambio in ogni operazione» (un'altra sessione). Il conflitto era solo qui.
 - **La lezione.** Una fonte può rispondere bene e CORTA. Il conto di ciò che torna si confronta con ciò che si è chiesto,
   e la differenza si dichiara: `_finestra_comune` proteggeva il calcolo, nessuno proteggeva la lunghezza.

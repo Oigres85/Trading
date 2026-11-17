@@ -54,9 +54,10 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~33.000 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 17/11/2026: la dichiara il CEO
-(*"ho 33k di cash"*), dopo le vendite di GOOGL del 13/11 (incasso netto 9.883,68 € e imposta 136 €, dalla nota della
-banca) e di AVGO del 16/11 (nota non ancora arrivata). Circa 10.000 € il CEO li destina alla quotazione di Anthropic.
+**Liquidità: ~31.000 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 17/11/2026: la dichiara il CEO
+la sera (*"la mia liquidità è a 31 ora"*; nel pomeriggio *"ho 33k di cash"*), dopo le vendite di GOOGL del 13/11
+(incasso netto 9.883,68 € e imposta 136 €, dalla nota della banca) e di AVGO del 16/11 (nota non ancora arrivata).
+Circa 10.000 € il CEO li destina alla quotazione di Anthropic.
 La stima del 16/11/2026 (~34.290 €) veniva da: i ~17.270 € stimati il
 02/11, più la vendita di GOOGL del 13/11 (37 a 294,71 $ = 10.904 $, meno 15 $ di commissione stimata, circa 9.850 € al
 riferimento BCE del 13/11, 1,1052), più la vendita di AVGO del 16/11 allo stop (24 a 329,75 $ = 7.914 $, meno 15 $,
@@ -967,6 +968,22 @@ d'acquisto e di quello di vendita (art. 9 TUIR). Il cambio è parte del risultat
 plusvalenza o una minusvalenza in euro. `numeri_libro.py` legge questa tabella (blocco «CAMBIO EURO/DOLLARO»): carico in
 euro a costo medio ponderato, risultato in euro scomposto in **effetto del prezzo** ed **effetto del cambio**, imposta in
 euro se si vendesse oggi.
+
+**Il cambio in OGNI operazione (CEO, 17/11/2026, v544)** — testuale: *"rendi strutturale l'analisi tenendo conto
+sempre del cambio in futuro in caso di vendita o acquisto"*. Prima di un acquisto `statistica.py ingresso TICKER
+PREZZO` stampa anche l'acquisto in euro: le azioni di un'unità, il **carico in euro per azione** con commissione e
+scarto dentro, e il **prezzo di pareggio in euro** — a che prezzo in dollari la vendita restituisce gli euro spesi —
+a cambio fermo e negli scenari. Prima di una vendita `statistica.py uscita TICKER PREZZO [AZIONI]` dà l'incasso in
+euro, il risultato diviso fra prezzo, cambio e costi, l'imposta sulla plusvalenza in euro e i due pareggi (in
+dollari e in euro). Il blocco del cambio di ogni analisi porta, per ogni posizione, il suo pareggio in euro.
+Convenzioni dichiarate (v240), rilette da un gate:
+- **Scarto di cambio della banca: 0,0006** per euro, a ogni conversione (nota informativa della banca del
+  16/11/2026 sulla vendita di GOOGL: «cambio medio, scarto 0,0006»): l'acquisto converte al cambio meno lo scarto,
+  la vendita al cambio più lo scarto. Il cambio vero è quello della banca al momento dell'eseguito: il riferimento
+  BCE del giorno è la stima;
+- **Scenari del cambio: −5%, −2%, fermo, +2%, +5%** dell'euro sul dollaro — unità di lettura, non previsioni;
+- la commissione è quella per ordine di §1terdecies (sulla nota del 16/11 la banca ha trattenuto 12,50 $: se la
+  prossima nota lo conferma, quella riga si aggiorna).
 
 | Data | Ticker | Operazione | Azioni | Prezzo $ | EUR/USD | Fonte del cambio | Note |
 |---|---|---|---|---|---|---|---|

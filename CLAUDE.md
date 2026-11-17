@@ -61,7 +61,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
   La scheda completa (`memoria/dati/scheda_analisi_*.md`, fuori da git) NON si manda più come allegato: si risponde in chat (CEO, 17/11/2026). **Forma statistica
   (v528)**: `statistica.py pagina` dice per ogni posizione cosa è successo nei casi simili contro la base; prima di
   OGNI operazione `statistica.py ingresso TICKER PREZZO --registra "intuizione"` (valore atteso in R, variante «aspetta
-  la conferma», gli stop e gli ordini con limite a confronto, riga nel diario `memoria/diario_ingressi.jsonl`); `statistica.py bilancio` misura l'intuito. Esce 1 se uno
+  la conferma», gli stop e gli ordini con limite a confronto, riga nel diario `memoria/diario_ingressi.jsonl`); `statistica.py bilancio` misura l'intuito. **Il cambio in ogni operazione (v544, CEO 17/11/2026)**: `ingresso` dà anche l'acquisto in euro (carico per azione, pareggio in dollari ai vari cambi), `statistica.py uscita TICKER PREZZO [AZIONI]` la vendita in euro (incasso, prezzo/cambio/costi, imposta); in chat ogni livello d'acquisto o di vendita porta il suo conto in euro. Esce 1 se uno
   strumento fallisce o una richiesta del registro è ASSENTE.
 - **`memoria/LIBRO.md`**: posizioni (§1), sorvegliati (§1bis), semaforo e calo dal massimo (§1ter), attesa (§1quater),
   decisioni ed esami (§1quinquies), tenuta (§1sexies), ordini (§1septies), conti dichiarati dall'emittente (§1octies),
@@ -118,7 +118,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
 **Scrivere il codice**
 - **Una grandezza, una derivazione** (v161): due implementazioni della stessa domanda divergono al primo ritocco. Una
   correzione si applica a TUTTI i rami e a tutte le superfici (v412). Formattatore unico, **virgola decimale**.
-- **Una fonte può rispondere bene e CORTA** (v544): si conta ciò che torna contro ciò che si è chiesto, e la
+- **Una fonte può rispondere bene e CORTA** (v545): si conta ciò che torna contro ciò che si è chiesto, e la
   differenza si dichiara nel dato (`sp500_storia`) e sulla pagina.
 - **Le assenze si dichiarano** (v406): «il sistema non ha il dato» e «ce l'ha e non lo passa» si leggono uguali. Le
   fonti hanno tre esiti — con voci, senza voci, NON letta (v389). Un buco non è uno zero (v205).

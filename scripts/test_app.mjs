@@ -10853,11 +10853,11 @@ check("v510 Fear & Greed: la data della rilevazione, i soli confronti che la fon
   if (senza.indexOf("la data della rilevazione non e' in questo snapshot") < 0) return "senza data: " + senza;
   return senza.indexOf("nel suo anno") < 0 || "senza storia stampa l'anno";`));
 
-/* ═══ v544 — LA SERIE DOPPIA CHE NON SI PUO' DISEGNARE SI DICHIARA ═══════════════════════════════════════════════════
+/* ═══ v545 — LA SERIE DOPPIA CHE NON SI PUO' DISEGNARE SI DICHIARA ═══════════════════════════════════════════════════
    Il 17/11/2026 FRED ha accorciato a un anno la serie dell'S&P 500: la pipeline ha pubblicato i profitti con 2 punti,
    `serieIndicatore("corp_profit")` ha restituito null e la tessera ha perso le due linee senza dirlo. Lo stato lo
    costruisce il check (v429): 24 mesi di Nasdaq, 2 trimestri di profitti, l'avviso della pipeline. */
-check("v544 serie doppia: la serie corta non si omette in silenzio — il motivo nomina la serie, il conto e l'avviso della pipeline", suVeriEsito(`
+check("v545 serie doppia: la serie corta non si omette in silenzio — il motivo nomina la serie, il conto e l'avviso della pipeline", suVeriEsito(`
   const m = DATA.macro || (DATA.macro = {});
   const salva = m.corp_profit;
   try {
@@ -10866,16 +10866,16 @@ check("v544 serie doppia: la serie corta non si omette in silenzio — il motivo
     m.corp_profit = { ndx, gap: null, ndx_gap: 12.5, worst_gap: 12.5, score: 96, label: "Allineati",
       sp500: [{ d: "2025-07-01", v: 100 }, { d: "2025-08-01", v: 101 }, { d: "2025-09-01", v: 99 }, { d: "2025-10-01", v: 104 }],
       profits: [{ d: "2025-07-01", v: 100 }, { d: "2025-10-01", v: 102 }],
-      sp500_storia: { intera: false, mesi: 11, chiesti: 64, avviso: "AVVISO-DI-PROVA-544" } };
+      sp500_storia: { intera: false, mesi: 11, chiesti: 64, avviso: "AVVISO-DI-PROVA-545" } };
     if (serieIndicatore("corp_profit") !== null) return "con 2 punti di profitti le due linee si disegnano lo stesso";
     const a = assenzaCoppia("corp_profit");
     if (!a) return "l'assenza non si dichiara";
     if (a.indexOf("Profitti reali") < 0) return "non nomina la serie corta: " + a;
     if (a.indexOf(" 2 punti") < 0) return "non dice quanti punti ha: " + a;
-    if (a.indexOf("AVVISO-DI-PROVA-544") < 0) return "non riporta l'avviso della pipeline: " + a;
+    if (a.indexOf("AVVISO-DI-PROVA-545") < 0) return "non riporta l'avviso della pipeline: " + a;
     const pan = contenutoDalPannello("corp_profit", "") || "";
     if (pan.indexOf("non calcolabile") < 0) return "senza gap il pannello non dice che non e' calcolabile";
-    if (pan.indexOf("AVVISO-DI-PROVA-544") < 0) return "senza gap il pannello non riporta il motivo";
+    if (pan.indexOf("AVVISO-DI-PROVA-545") < 0) return "senza gap il pannello non riporta il motivo";
     if (pan.indexOf("Le due linee non si possono disegnare") >= 0) return "il pannello ripete la frase che sta gia' sulla tessera";
     m.corp_profit.profits = [{ d: "2025-04-01", v: 100 }, { d: "2025-07-01", v: 101 }, { d: "2025-10-01", v: 102 }];
     if (assenzaCoppia("corp_profit") !== "") return "dichiara un'assenza quando le linee ci sono";
@@ -10885,7 +10885,7 @@ check("v544 serie doppia: la serie corta non si omette in silenzio — il motivo
     return true;
   } finally { m.corp_profit = salva; }`));
 
-check("v544 tessera: la dichiarazione dell'assenza arriva DENTRO la tessera disegnata (il collegamento, v399)", suVeriEsito(`
+check("v545 tessera: la dichiarazione dell'assenza arriva DENTRO la tessera disegnata (il collegamento, v399)", suVeriEsito(`
   const m = DATA.macro || (DATA.macro = {});
   const salva = m.corp_profit, _q = document.querySelector;
   const box = { innerHTML: "", querySelectorAll: () => [], querySelector: () => null, addEventListener: () => {},
@@ -10903,24 +10903,24 @@ check("v544 tessera: la dichiarazione dell'assenza arriva DENTRO la tessera dise
     return volte === 1 || "la tessera dichiara l'assenza delle due linee " + volte + " volte (ne serve una)";
   } finally { m.corp_profit = salva; document.querySelector = _q; }`));
 
-check("v544 pacchetto: il gap dell'S&P esce con la SUA finestra e con la fonte di ripiego; senza gap la riga dice perche'", suVeriEsito(`
+check("v545 pacchetto: il gap dell'S&P esce con la SUA finestra e con la fonte di ripiego; senza gap la riga dice perche'", suVeriEsito(`
   DATA.macro = DATA.macro || {};
   const riga = () => buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("- S&P 500 & Nasdaq 100 vs Profitti") === 0) || "";
   DATA.macro.corp_profit = { sp500: [{ d: "2021-07-01", v: 100 }, { d: "2026-04-01", v: 159.4 }],
     profits: [{ d: "2021-07-01", v: 100 }, { d: "2026-04-01", v: 143.9 }],
     gap: 15.5, ndx_gap: 38.3, worst_gap: 38.3, score: 53, label: "Tensione moderata",
-    sp500_storia: { intera: true, avviso: "RIPIEGO-DI-PROVA-544" } };
+    sp500_storia: { intera: true, avviso: "RIPIEGO-DI-PROVA-545" } };
   let r = riga();
   if (r.indexOf("+15,5 pp su una finestra di 4,8 anni") < 0) return "il gap non porta la sua finestra: " + r.slice(0, 220);
-  if (r.indexOf("RIPIEGO-DI-PROVA-544") < 0) return "la fonte di ripiego non si nomina: " + r.slice(0, 260);
+  if (r.indexOf("RIPIEGO-DI-PROVA-545") < 0) return "la fonte di ripiego non si nomina: " + r.slice(0, 260);
   DATA.macro.corp_profit = Object.assign({}, DATA.macro.corp_profit, { gap: null,
     sp500: [{ d: "2026-01-01", v: 100 }, { d: "2026-04-01", v: 100.4 }], profits: [{ d: "2026-01-01", v: 100 }, { d: "2026-04-01", v: 108.4 }],
-    sp500_storia: { intera: false, avviso: "CORTA-DI-PROVA-544" } });
+    sp500_storia: { intera: false, avviso: "CORTA-DI-PROVA-545" } });
   r = riga();
-  if (r.indexOf("calcolabile") < 0 || r.indexOf("CORTA-DI-PROVA-544") < 0) return "senza gap la riga non dice perche': " + r.slice(0, 260);
+  if (r.indexOf("calcolabile") < 0 || r.indexOf("CORTA-DI-PROVA-545") < 0) return "senza gap la riga non dice perche': " + r.slice(0, 260);
   return r.indexOf("S&P gap") < 0 || "senza gap la riga stampa comunque un gap dell'S&P: " + r.slice(0, 260);`));
 
-check("v544 tessera del disaccoppiamento: la finestra del gap si MISURA sulle serie (era scritta a mano, sopra sei mesi)", suVeriEsito(`
+check("v545 tessera del disaccoppiamento: la finestra del gap si MISURA sulle serie (era scritta a mano, sopra sei mesi)", suVeriEsito(`
   DATA.macro = DATA.macro || {};
   const sub = () => (indicatoriClassifica() || []).map(x => String(x.sub || "")).join(" | ");
   DATA.macro.decouple = { sp500: [{ d: "2026-01-01", v: 100 }, { d: "2026-04-01", v: 104 }, { d: "2026-07-01", v: 108 }],

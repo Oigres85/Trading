@@ -9667,7 +9667,7 @@ check("v520 il libro vero: la fotografia del broker datata, le righe delle posiz
 _src_nl520 = Path(NL.__file__).read_text(encoding="utf-8")
 check("v520 il collegamento in calcola: il broker letto una volta, passato al cambio col prezzo medio, e il ROI calcolato "
       "con lo stesso cambio del blocco; la sintesi stampa il blocco (calcola non gira offline: qui il testo e' la prova)",
-      "_broker = leggi_conto_broker()" in _src_nl520 and "broker=_broker, pmc=pmc)" in _src_nl520
+      "_broker = leggi_conto_broker()" in _src_nl520 and "broker=_broker, pmc=pmc," in _src_nl520
       and 'out["conto"] = roi_conto(_broker, qty, pmc, pat_pipe[0], cassa_eur)' in _src_nl520
       and 'L.extend(righe_roi(o["conto"]))' in _src_nl520)
 
@@ -11669,6 +11669,103 @@ check("v543 libro e istruzioni dicono la stessa cosa del codice: la regola 5 e i
       and "14/11/2026 — due regole eliminate" in _z0_543 and "nessuna vendita automatica" in _z0_543
       and "**Decisione del 14/11/2026**" in _dm543 and "| 14/11/2026 | Al −30%" not in _dm543
       and bool(_td543) and not [tk for tk, x in _td543.items() if "ramo secco" in (x.get("verdetto") or "")])
+
+# ════════════════════════════════════════════════════════ v544 — il cambio in OGNI operazione (CEO, 17/11/2026)
+# Il CEO, testuale: «rendi strutturale l'analisi tenendo conto sempre del cambio in futuro in caso di vendita o
+# acquisto». Lo stato si costruisce (v429): cambio, prezzi, commissione e registro sono della fixture, mai del giorno.
+_a544 = NL.cambio_acquisto(100.0, 1.25, 10.0, unita_eur=1000.0, stop=90.0, obiettivo=120.0) or {}
+_sc544 = {s["pct"]: s for s in _a544.get("scenari") or []}
+_par544 = [s["pareggio"] for s in _a544.get("scenari") or []]
+check("v544 l'acquisto in euro: un'unita' da 1.000 € a 100 $ col cambio a 1,25 compra 12 azioni al cambio MENO lo scarto, "
+      "il carico per azione porta commissione e scarto, e il pareggio E' il pareggio — venduta li' (commissione e scarto "
+      "d'uscita compresi) rende gli euro spesi, un centesimo sotto no — in ogni scenario; un euro piu' forte lo alza; "
+      "senza cambio niente conto, e la resa lo dichiara",
+      _a544.get("azioni") == 12 and abs(_a544["costo_eur"] - 1210 / (1.25 - NL.SCARTO_CAMBIO)) < 1e-9
+      and abs(_a544["carico_eur"] * 12 - _a544["costo_eur"]) < 1e-9 and _a544["carico_eur"] > _a544["nudo_eur"]
+      and tuple(s["pct"] for s in _a544["scenari"]) == NL.SCENARI_CAMBIO_PCT and 0 in _sc544
+      and all(abs(NL.incasso_eur(12, s["pareggio"], s["fx"], 10.0) - _a544["costo_eur"]) < 1e-6 for s in _a544["scenari"])
+      and NL.incasso_eur(12, _sc544[0]["pareggio"] - 0.01, 1.25, 10.0) < _a544["costo_eur"] < NL.incasso_eur(12, _sc544[0]["pareggio"] + 0.01, 1.25, 10.0)
+      and _sc544[0]["pareggio"] > 100.0 and _par544 == sorted(_par544) and len(set(_par544)) == len(_par544)
+      and _a544["stop"]["eur"] < 0 < _a544["obiettivo"]["eur"] and _a544["un_pct"] < 0
+      and NL.cambio_acquisto(100.0, None, 10.0) is None
+      and "NON letto" in NL.righe_cambio_acquisto(None, "AAA", 100.0, {})[0])
+
+_op544 = [{"tk": "EEE", "verso": "acquisto", "qta": 10.0, "prezzo": 100.0, "fx": 1.20, "data_testo": "x"}]
+_cl544 = NL.cambio_libro(_op544, {"EEE": 10}, {"EEE": 100.0}, 1.0, "BCE", None, commissione_usd=10.0)
+_co544 = (_cl544.get("coperte") or [{}])[0]
+_v544 = NL.cambio_vendita("EEE", 100.0, 10, _co544, 1.0, 10.0) if _co544.get("carico_eur") else {}
+_vm544 = NL.cambio_vendita("EEE", 100.0, 5, _co544, 1.0, 10.0) if _co544.get("carico_eur") else {}
+check("v544 la vendita in euro: il risultato e' l'identita' prezzo + cambio + commissione e scarto, e PRIMA dei costi e' "
+      "quello del blocco del libro (una derivazione, v161); l'imposta e' sulla plusvalenza in euro al netto dei costi; "
+      "comprata con l'euro a 1,20 e venduta a 1,00 il pareggio in euro sta SOTTO il prezzo medio in dollari, e li' la "
+      "vendita rende il carico; mezza posizione porta mezzo carico; il blocco del cambio di ogni analisi stampa lo stesso "
+      "pareggio per ogni posizione",
+      bool(_v544) and abs(_v544["pnl_eur"] - (_v544["effetto_prezzo"] + _v544["effetto_cambio"] + _v544["costi"])) < 1e-9
+      and abs((_v544["pnl_eur"] - _v544["costi"]) - _co544["pnl_eur"]) < 1e-9 and _v544["costi"] < 0
+      and abs(_v544["imposta"] - _v544["aliquota"] * _v544["pnl_eur"]) < 1e-9 and _v544["pnl_eur"] > 0
+      and abs(_v544["pareggio_usd"] - 100.0) < 1e-9 and _v544["pareggio_eur"] < 100.0
+      and abs(NL.incasso_eur(10, _v544["pareggio_eur"], 1.0, 10.0) - _v544["carico_eur"]) < 1e-6
+      and abs(_co544.get("pareggio_eur", 0) - _v544["pareggio_eur"]) < 1e-9
+      and abs(_vm544["carico_eur"] - _v544["carico_eur"] / 2) < 1e-9 and _vm544["di"] == 10
+      and "pareggio in euro a " + NL._it(_v544["pareggio_eur"], 2) + " $" in "\n".join(NL.righe_cambio(_cl544)))
+
+_cg544 = {"fx": 1.25, "fonte": "BCE, del 2026-01-02", "anno": None, "commissione_usd": 10.0}
+_muto544 = {"fx": None, "fonte": None, "anno": None, "commissione_usd": 10.0}
+_s544 = (ST528.prova, ST528.cambio_del_giro, ST528.universo, NL.leggi_operazioni, NL.leggi_conto_broker, ST528.DIARIO)
+_o544, _dr544 = {}, []
+try:
+    ST528.prova = lambda *a, **k: _p528
+    ST528.universo = lambda: (["EEE"], {"EEE": {"tk": "EEE", "qta": 10.0, "pmc": 100.0, "valuta": "USD"}})
+    NL.leggi_operazioni = lambda *a, **k: _op544
+    NL.leggi_conto_broker = lambda *a, **k: None
+    ST528.DIARIO = str(Path(tempfile.mkdtemp()) / "diario.jsonl")
+    for _nome544, _c544, _argv544 in (("ingresso", _cg544, ["ingresso", "T0", "100", "--registra", "prova"]),
+                                      ("ingresso_muto", _muto544, ["ingresso", "T0", "100"]),
+                                      ("uscita", _cg544, ["uscita", "EEE", "100"]),
+                                      ("uscita_muta", _muto544, ["uscita", "EEE", "100"]),
+                                      ("uscita_fuori", _cg544, ["uscita", "ZZZ", "100"])):
+        ST528.cambio_del_giro = lambda _c=_c544: _c
+        _b544 = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(_b544):
+                _rc544 = ST528.main(_argv544)
+        except Exception as _e544:
+            _rc544 = "ECCEZIONE " + type(_e544).__name__
+        _o544[_nome544] = (_rc544, _b544.getvalue())
+    if os.path.exists(ST528.DIARIO):
+        _dr544 = [_json.loads(x) for x in open(ST528.DIARIO, encoding="utf-8") if x.strip()]
+finally:
+    ST528.prova, ST528.cambio_del_giro, ST528.universo, NL.leggi_operazioni, NL.leggi_conto_broker, ST528.DIARIO = _s544
+_g544 = lambda n: _o544.get(n, (None, ""))
+check("v544 il collegamento, per la strada vera (main): `ingresso` stampa la prova E lo stesso acquisto in euro, e la riga "
+      "del diario porta il cambio del giorno; `uscita` stampa la vendita in euro; senza cambio tutti e due lo DICHIARANO "
+      "invece di contare con un cambio neutro (v406), e un nome che non e' nel libro esce con 1: "
+      + str({k: v[0] for k, v in _o544.items()}),
+      _g544("ingresso")[0] == 0 and "PROVA D'INGRESSO" in _g544("ingresso")[1]
+      and "IL CAMBIO NELL'ACQUISTO" in _g544("ingresso")[1] and "PAREGGIO IN EURO" in _g544("ingresso")[1]
+      and bool(_dr544) and _dr544[-1].get("eurusd") == 1.25 and _dr544[-1].get("intuizione") == "prova"
+      and _g544("ingresso_muto")[0] == 0 and "cambio NON letto" in _g544("ingresso_muto")[1]
+      and "PAREGGIO IN EURO" not in _g544("ingresso_muto")[1]
+      and _g544("uscita")[0] == 0 and "IL CAMBIO NELLA VENDITA" in _g544("uscita")[1] and "IN EURO a " in _g544("uscita")[1]
+      and _g544("uscita_muta")[0] == 1 and "cambio NON letto" in _g544("uscita_muta")[1]
+      and _g544("uscita_fuori")[0] == 1 and "non e' una posizione" in _g544("uscita_fuori")[1])
+
+_d544 = _lib474[_lib474.find("## 1decies"):_lib474.find("## 1undecies")]
+_m544 = re.search(r"[*][*]Scarto di cambio della banca: ([0-9]+,[0-9]+)[*][*]", _d544)
+_ms544 = re.search(r"[*][*]Scenari del cambio: ([^*]+)[*][*]", _d544)
+_sl544 = tuple(0 if "fermo" in x else int(x.replace("−", "-").replace("%", "").replace("+", "").strip())
+               for x in _ms544.group(1).split(",")) if _ms544 else None
+_fm544 = (Path(NL.__file__).resolve().parent.parent / "memoria" / "FORMATO_ANALISI.md").read_text(encoding="utf-8")
+_vc544 = __import__("scheda").REGISTRO.get("cambio_operazione")
+check("v544 libro, formato, catalogo e istruzioni dicono la stessa cosa del codice: lo scarto della banca e gli scenari "
+      "sono quelli dichiarati in LIBRO.md §1decies (v240); la richiesta e' nel registro del formato e nel catalogo della "
+      "scheda, con un marcatore che vive nel blocco del cambio di ogni analisi; COMPRO, VENDO e le istruzioni nominano "
+      "il comando della vendita in euro: " + str((_m544.group(1) if _m544 else None, _sl544)),
+      bool(_m544) and abs(NL._num_it(_m544.group(1)) - NL.SCARTO_CAMBIO) < 1e-12 and _sl544 == NL.SCENARI_CAMBIO_PCT
+      and "`[cambio_operazione]`" in _fm544 and _vc544 is not None
+      and [(m.tipo, m.testo, m.dentro) for m in _vc544.marcatori] == [("cambio", "pareggio in euro", True)]
+      and "statistica.py uscita" in _fm544 and "statistica.py uscita" in _cl543 and "v544" in _cl543)
+
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "544";
+const BUILD_VERSION = "545";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3911,7 +3911,7 @@ function indicatoriClassifica() {
     sub: `spread ${signTxt(m.yield_recession.current_curve, " pp")} · ${m.yield_recession.was_inverted_24m ? "invertita negli ultimi 24 mesi" : "nessuna inversione recente"}` });
   if ((m.decouple?.sp500 || []).length && (m.decouple?.gdp || []).length) {
     const gapD = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
-    /* v544 — «su 3 anni» era scritto a mano, e il 17/11/2026 stava sopra una finestra di sei mesi */
+    /* v545 — «su 3 anni» era scritto a mano, e il 17/11/2026 stava sopra una finestra di sei mesi */
     const ggD = sovrapposizioneGiorni(m.decouple.sp500, m.decouple.gdp);
     const finD = ggD ? `su ${fmtNum.format(Math.round(ggD / 365 * 10) / 10)} anni` : "su una finestra non misurabile";
     orf.push({ k: "decouple", nome: "Borsa vs economia reale", score: cl(100 - gapD * 0.9),
@@ -6153,7 +6153,7 @@ function renderIndicatori() {
        e' "la serie vince" ma "la serie vince quando e' davvero una serie". */
     const SERIE_MINIMA = 20;   // sotto, una linea dice meno di una scala con le zone nominate
     const seGrezza = serieIndicatore(r.k);
-    /* v544 — le due linee che mancano perche' una serie e' corta: il motivo si scrive sulla tessera */
+    /* v545 — le due linee che mancano perche' una serie e' corta: il motivo si scrive sulla tessera */
     const assenzaLinee = seGrezza ? "" : assenzaCoppia(r.k);
     const quanti = seGrezza
       ? (seGrezza.punti ? seGrezza.punti.length
@@ -6459,7 +6459,7 @@ const clsScore = (v) => v < 40 ? "neg" : v < 55 ? "warn" : "pos";
    dove non esiste resta il misuratore e la tessera lo DICHIARA, invece di far finta con una
    riga piatta a un punto. Per gli altri la pipeline ha cominciato ad accumulare (v224):
    fra qualche settimana avranno anche loro la loro linea, e comparira' da sola. */
-/* ═══ v544 — LA SERIE DOPPIA CHE NON SI PUO' DISEGNARE SI DICHIARA ════════════════════════
+/* ═══ v545 — LA SERIE DOPPIA CHE NON SI PUO' DISEGNARE SI DICHIARA ════════════════════════
    Il 17/11/2026 FRED ha accorciato a un anno la serie dell'S&P 500: la finestra comune con i
    profitti e' scesa a 2 trimestri, `serieIndicatore` ha restituito null e la tessera ha perso
    le due linee SENZA DIRLO — «il dato non c'e'» e «c'e' ma e' corto» si leggevano uguali (v406).
@@ -6550,7 +6550,7 @@ function serieIndicatore(k) {
       return (m.fed_market?.fedfunds || []).length > 2
         ? { punti: m.fed_market.fedfunds, soglie: [{ v: 4, testo: "4% (convenzione di lettura)", colore: "var(--yellow)" }], unita: "%" } : null;
     case "decouple": case "corp_profit": {
-      /* v544 — una derivazione sola (coppiaIndicatore): da qui passa solo cio' che si disegna */
+      /* v545 — una derivazione sola (coppiaIndicatore): da qui passa solo cio' che si disegna */
       const c = coppiaIndicatore(k);
       return c && c.doppia ? c : null;
     }
@@ -8551,7 +8551,7 @@ function openMacroInfo(key) {
         divario puo' restare aperto per anni.</div>${fin}` + extra;
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
     const ndxGapCol = cp.ndx_gap != null ? (cp.ndx_gap > 40 ? "var(--red)" : cp.ndx_gap > 20 ? "var(--yellow)" : "var(--green)") : "var(--muted)";
-    /* v544 — il gap porta la SUA finestra (misurata sulle serie), e quando la storia dell'S&P e' corta la
+    /* v545 — il gap porta la SUA finestra (misurata sulle serie), e quando la storia dell'S&P e' corta la
        pipeline non lo pubblica: si scrive «non calcolabile» col motivo, non un numero di tre mesi sotto
        l'etichetta di cinque anni. I due gap escono dal formattatore unico (virgola decimale, v442).
        Le due linee che mancano le dichiara la TESSERA, che questo contenuto lo porta dentro (v313): qui
@@ -10568,7 +10568,7 @@ function buildPrompt(opz) {
   if (perTitolo && m.corp_profit) potati.push("il confronto pluriennale fra indici e profitti aziendali reali");
   if (!perTitolo && m.corp_profit) {
     const ggCp = sovrapposizioneGiorni(m.corp_profit.sp500, m.corp_profit.profits);
-    /* v544 — il gap dell'S&P esce con la finestra su cui e' misurato; con la storia corta la pipeline non lo
+    /* v545 — il gap dell'S&P esce con la finestra su cui e' misurato; con la storia corta la pipeline non lo
        pubblica e la riga dice perche'. La fonte dell'S&P si nomina quando non e' la prima (ripiego dichiarato). */
     const avCp = m.corp_profit.sp500_storia?.avviso || "";
     let cpBp = (ggCp && m.corp_profit.gap != null)

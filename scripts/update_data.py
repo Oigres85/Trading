@@ -3760,7 +3760,7 @@ def fred_series(series_id, n=14, freq=None):
             except ValueError:
                 continue
         return out[-n:]
-    # v544 — SENZA CHIAVE `freq` ERA IGNORATO: il csv pubblico restituiva la frequenza nativa (per SP500, le sedute),
+    # v545 — SENZA CHIAVE `freq` ERA IGNORATO: il csv pubblico restituiva la frequenza nativa (per SP500, le sedute),
     # cioe' il difetto v207 rimasto vivo nel ramo che la sessione percorre. Il csv accetta la stessa aggregazione
     # dell'API (`fq`, `fas=avg`): misurato il 17/11/2026, SP500 mensile uguale al centesimo.
     fq = {"m": "&fq=Monthly&fas=avg", "q": "&fq=Quarterly&fas=avg"}.get(freq, "")
@@ -3768,7 +3768,7 @@ def fred_series(series_id, n=14, freq=None):
     return fredgraph(r.text)[-n:]      # v511 — un parser solo per la pipeline e l'analisi (comuni.py)
 
 
-# ═══ v544 — L'S&P 500 MENSILE HA DUE FORNITORI, E UNA STORIA CORTA SI DICHIARA ═════════════════════════════════════
+# ═══ v545 — L'S&P 500 MENSILE HA DUE FORNITORI, E UNA STORIA CORTA SI DICHIARA ═════════════════════════════════════
 # Il 17/11/2026, fra il run delle 00:04 UTC e quello delle 02:15, FRED ha accorciato la serie SP500 a UN ANNO (parte
 # dal 17/11/2025, anche chiedendo una data d'inizio; il Dow Jones sulla stessa FRED ne ha ancora dieci). Nessun
 # errore: una risposta valida, solo piu' corta. `fred_series("SP500", 64, freq="m")` ha dato 11 mesi invece di 64,
@@ -3894,7 +3894,7 @@ def blocco_corp_profit(cp, sp_let, ndx_pairs):
     """`macro.corp_profit`: S&P 500 e Nasdaq 100 contro i profitti aziendali (FRED CP), a base 100.
 
     `cp` trimestrale grezza, `sp_let` la lettura di `sp500_mensile`, `ndx_pairs` il Nasdaq mensile o None.
-    ⚠ v544 — IL GAP DELL'S&P SI PUBBLICA SOLO SULLA STORIA INTERA. Con una storia corta la finestra comune e' di
+    ⚠ v545 — IL GAP DELL'S&P SI PUBBLICA SOLO SULLA STORIA INTERA. Con una storia corta la finestra comune e' di
     pochi mesi, e quel numero sotto la stessa chiave si leggerebbe come il divario pluriennale (la soglia dei 40 pp
     e' pensata per cinque anni): `gap` e' None, `sp500_storia` dice perche', e il punteggio si fa sul solo Nasdaq.
     None quando non c'e' nessuno dei due confronti.
@@ -5414,7 +5414,7 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! systemic_risk: {e}", file=sys.stderr)
 
-    # v544 — UNA lettura dell'S&P 500 mensile per i due confronti qui sotto (v161), con due fornitori: vedi
+    # v545 — UNA lettura dell'S&P 500 mensile per i due confronti qui sotto (v161), con due fornitori: vedi
     # `sp500_mensile`. ~5 anni MENSILI (v207: senza `freq` arrivavano le sedute); il PIL ne usa gli ultimi 40.
     try:
         sp_let = sp500_mensile(64)
@@ -5443,7 +5443,7 @@ def fetch_macro():
                                                  auto_adjust=True)["Close"].dropna()
             ndx_pairs = [(str(d.date()), float(v)) for d, v in ndx_raw.items()]
         except Exception as e:  # noqa: BLE001
-            print(f"!! corp_profit, Nasdaq 100 non letto: {e}", file=sys.stderr)   # v544: era un `pass` muto
+            print(f"!! corp_profit, Nasdaq 100 non letto: {e}", file=sys.stderr)   # v545: era un `pass` muto
         _cpb = blocco_corp_profit(cp, sp_let, ndx_pairs)
         if _cpb:
             macro["corp_profit"] = _cpb

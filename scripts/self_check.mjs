@@ -151,7 +151,7 @@ const SUITE = [
   /* v508: 628 punti di chiamata (+3 sui CDS a ondate: data del nome, giorni a meta', causa dello spread mancante) -> 615 */
   /* v509: 633 punti di chiamata (+5 sul dot plot letto dalla Fed: pacchetto, perimetro, popup, lettura, ricevuta) -> 620 */
   /* v510: 645 punti di chiamata (+12 sui difetti letti come il destinatario e sul Fear & Greed datato) -> 630 */
-  /* v544: 650 punti di chiamata (+4 sulla serie doppia che non si disegna: assenza, tessera, pacchetto, finestra) -> 635 */
+  /* v545: 650 punti di chiamata (+4 sulla serie doppia che non si disegna: assenza, tessera, pacchetto, finestra) -> 635 */
   { file: "test_app.mjs",        cmd: "node",    minimo: 635, firma: /\d+\/\d+ check superati/ },
   /* v492: 236 punti di chiamata in test_update_data (+5 sulla fine del veicolo di quotazione, dal registro SEC) -> 225 */
   /* v496: 250 punti di chiamata (+14 sul file storico FINRA: variazione annua per data, percentile, i due canali) -> 240 */
@@ -168,7 +168,7 @@ const SUITE = [
   /* v512: 380 punti di chiamata (+8 sulle funzioni estratte per la sessione e i giorni di ICE conservati) -> 365 */
   /* v520: 402 punti di chiamata (+10 su ROIC e ROE: aliquota, medie, contiguita', scala, esercizi, collegamento) -> 390 */
   /* v521: 408 punti di chiamata (+6 sul prezzo del BTP con la sua data e il ripiego dichiarato) -> 395 */
-  /* v544: 430 punti di chiamata (+13 sull'S&P mensile a due fornitori e sulla storia corta dichiarata) -> 418 */
+  /* v545: 430 punti di chiamata (+13 sull'S&P mensile a due fornitori e sulla storia corta dichiarata) -> 418 */
   { file: "test_update_data.py", cmd: "python3", minimo: 418, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
@@ -236,7 +236,9 @@ const SUITE = [
      l'uscita standard al suo posto) -> 1134 */
   /* v543: 1147 punti di chiamata (+3: la sintesi operativa senza «scatta», le superfici senza la regola eliminata,
      libro e istruzioni coerenti col codice; sei controlli del salvavita riagganciati alla proprieta' opposta) -> 1137 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1137, firma: /\d+\/\d+ CHECK OK/ },
+  /* v544: +4 punti di chiamata (l'acquisto in euro col pareggio che e' il pareggio, la vendita in euro come
+     identita', il collegamento per la strada vera di `ingresso` e `uscita`, libro e istruzioni col codice) -> 1141 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1141, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];
