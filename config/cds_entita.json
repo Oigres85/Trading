@@ -61,6 +61,11 @@
   "BLK": null,
   "LLY": null,
   "DELL": "DELLN",
+  "LITE": null,
+  "VRT": null,
+  "NVO": null,
+  "NEE": "NXTENG",
+  "MRNA": null,
   "BTP-V28": "ITALY"
  },
  "note": {
@@ -68,6 +73,7 @@
   "XOM": "l'entita' di riferimento e' Exxon Mobil Corp; il nome della societa' quotata nella pipeline e' ExxonMobil Holdings Corporation",
   "BTP-V28": "il BTP e' un titolo della Repubblica Italiana: il suo CDS e' quello sovrano (Rep Italy), non quello di una societa'",
   "ORCL": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation",
-  "DELL": "il CDS e' su Dell Inc, la societa' operativa controllata, non sulla capogruppo quotata Dell Technologies Inc (verificato il 2026-10-18 sull'elenco ICE del 2026-10-16: DELLN, cedole 100 e 500)"
+  "DELL": "il CDS e' su Dell Inc, la societa' operativa controllata, non sulla capogruppo quotata Dell Technologies Inc (verificato il 2026-10-18 sull'elenco ICE del 2026-10-16: DELLN, cedole 100 e 500)",
+  "NEE": "il CDS e' su NextEra Energy Capital Holdings Inc, la finanziaria controllata, non sulla capogruppo quotata NextEra Energy Inc (verificato il 2026-11-17 sull'elenco ICE del 2026-11-16: NXTENG); LITE, VRT, NVO e MRNA non hanno un CDS compensato a ICE alla stessa data (NOVOBAN e' Novo Banco, non Novo Nordisk)"
  }
 }

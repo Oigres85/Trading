@@ -54,7 +54,10 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~34.290 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 16/11/2026: i ~17.270 € stimati il
+**Liquidità: ~33.000 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 17/11/2026: la dichiara il CEO
+(*"ho 33k di cash"*), dopo le vendite di GOOGL del 13/11 (incasso netto 9.883,68 € e imposta 136 €, dalla nota della
+banca) e di AVGO del 16/11 (nota non ancora arrivata). Circa 10.000 € il CEO li destina alla quotazione di Anthropic.
+La stima del 16/11/2026 (~34.290 €) veniva da: i ~17.270 € stimati il
 02/11, più la vendita di GOOGL del 13/11 (37 a 294,71 $ = 10.904 $, meno 15 $ di commissione stimata, circa 9.850 € al
 riferimento BCE del 13/11, 1,1052), più la vendita di AVGO del 16/11 allo stop (24 a 329,75 $ = 7.914 $, meno 15 $,
 circa 7.170 € al riferimento BCE del 16/11, 1,1014) — prima delle imposte sulle due plusvalenze; da confermare col
@@ -200,6 +203,11 @@ tecnica e nelle notizie, con l'etichetta che dichiara cosa sono.
 | BLK | BlackRock — gestione patrimoniale (CEO, 15/10/2026). Trimestrale del 14/10 sopra le attese: utile per azione rettificato 15,93 $ contro un consenso fra 14,24 e 14,40 secondo le fonti di stima (10,57 secondo i principi contabili, depresso da una rettifica non monetaria su acquisizioni passate), ricavi +19% sull'anno, 205 miliardi di afflussi netti nel trimestre, patrimonio gestito 15.500 miliardi. Il 14/10 ha aperto a +2,1%, toccato 1.106 e chiuso a 1.073,79 (+0,7%) su volumi al 90° percentile dell'anno: ha restituito gran parte del rialzo. Sotto la SMA50 (~1.107), sopra la SMA200 (~1.061); supporto 20 sedute 1.040,42. Correlazione col libro ~0,17: diversifica. Con GS ~0,5 e JPM ~0,6: in buona parte la stessa scommessa finanziaria. Fra i mandati il comunicato cita i finanziamenti agli hyperscaler: un canale verso il tema AI che la correlazione di oggi non mostra |
 | LLY | Eli Lilly — farmaci per obesita' e diabete (CEO, 17/10/2026). Il 16/10 a 1.257,03: -2,8% dal massimo storico (1.292,65 del 19/08), +9,1% in un mese ma con la media dei volumi a 20 sedute al 5° percentile dell'anno, cioe' un rialzo con poca partecipazione. La spinta del 14-15/10 sono i dati di Foundayo (il GLP-1 orale) e il posizionamento prima dei conti; il 30/09 la combinazione con eloralintide aveva dato il 23% di calo del peso ma piu' abbandoni per effetti collaterali, e il titolo era sceso. Sopra la zona d'ingresso: tirato, non si insegue. Pavimenti 1.163,50 (1 tocco) e 1.131-1.134 (2 tocchi, l'ultimo l'08/10). Correlazione col libro ~-0,37 e con QQQ ~-0,30 (60 sedute), beta sull'S&P 500 0,25: diversifica davvero. Con ABBV, AMGN e PFE ~0,6, con MRK e GILD ~0,4-0,5: dentro il farmaceutico e' in buona parte la stessa scommessa |
 | DELL | Dell Technologies — server e PC, concorrente diretto di SMCI (CEO, 18/10/2026). Il 14-15/10 −17% in due sedute dopo il declassamento di Barclays (da Overweight a Equal Weight, obiettivo da 603 a 574: le valutazioni dell'hardware sono salite più delle prove di spesa AI delle imprese, e i ricavi li gonfia il prezzo delle memorie); conti del 01/09 sopra le attese (EPS 6,76 contro 4,72 secondo Nasdaq), ricavi +58% sull'anno. Il 16/10 a 451,71: −24% dal massimo del 18/09 (595,51), doppio massimo 595 confermato sotto il collo 520,18, struttura rotta al ribasso, sotto il VWAP dai conti (532,79). Pavimenti 421,89–424,00 (2 tocchi, l'ultimo il 01/09; stop 390,07) e 368,14–378,66. Correlazione col libro ~0,64: stessa scommessa, non diversifica. Il CDS compensato a ICE è su Dell Inc, la controllata operativa. Trimestrale 24/11 |
+| LITE | Lumentum — ottica e laser per i data center. Dalla lista del CEO su Investing (17/11/2026) |
+| VRT | Vertiv — alimentazione e raffreddamento dei data center. Dalla lista del CEO su Investing (17/11/2026) |
+| NVO | Novo Nordisk (ADR) — farmaci per diabete e obesità. Dalla lista del CEO su Investing (17/11/2026) |
+| NEE | NextEra Energy — elettricità e rinnovabili. Dalla lista del CEO su Investing (17/11/2026) |
+| MRNA | Moderna — vaccini e terapie a mRNA. Dalla lista del CEO su Investing (17/11/2026) |
 
 ⚠ **Un candidato di rotazione dentro lo stesso tema NON diversifica**: sposta la stessa scommessa
 su un altro nome. SMCI e OKLO vivono entrambi sul capex AI, che e' il canale su cui il libro e'
@@ -968,7 +976,7 @@ euro se si vendesse oggi.
 | 02/11/2026 | INTC | vendita | 130 | 65,00 | 1,1172 | BCE, riferimento del 30/10/2026: l'ultimo pubblicato all'ora della vendita (pre-market, prima delle 14:15) | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione misurata 15 $ |
 | 02/11/2026 | AVGO | acquisto | 24 | 324,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
 | 02/11/2026 | WDC | acquisto | 24 | 342,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
-| 13/11/2026 | GOOGL | vendita | 37 | 294,71 | 1,1052 | BCE, riferimento del 13/11/2026 | detta dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 13/11/2026 | GOOGL | vendita | 37 | 294,71 | 1,1020 | Banca Sella, nota informativa del 16/11/2026 (cambio medio, scarto 0,0006) | ordine con limite a 290 eseguito a 294,711; commissione 12,50 $; incasso netto 9.883,68 €; imposta 136 € (CEO, 17/11/2026) |
 | 16/11/2026 | AVGO | vendita | 24 | 329,75 | 1,1014 | BCE, riferimento del 16/11/2026 | stop del CEO; 24 azioni, confermate dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 
 Regole del registro:

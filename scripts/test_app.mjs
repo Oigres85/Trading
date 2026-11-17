@@ -4690,16 +4690,25 @@ check("v352 istruzioni: la contraria si oppone alla conclusione vera, non a un v
   return /se sei arrivato a "tenere" o "aggiungere"/.test(b8)
       && !/se sei arrivato a "comprare"/.test(b8);`));
 
+/* 17/11/2026 — lo stato si COSTRUISCE (v429, v456): il check leggeva la data dei conti di NVDA dai dati del giorno e
+   contava i giorni arrotondando. Il giorno stesso dei conti, dal pomeriggio, il conto dava -1 («passato») mentre il
+   pacchetto li dichiarava ancora dentro l'orizzonte: rosso a calendario, e ha bloccato commit e push. Ora le tre date
+   (fra 10 giorni, passata, oltre l'orizzonte) le mette il check, a qualunque ora giri. */
 check("v352 orizzonti: un evento datato dentro il breve viene dichiarato dove serve", suVeri(`
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
-  if (!r || !r.earnings_date) return true;
-  const g = Math.round((new Date(r.earnings_date) - Date.now()) / 86400000);
-  const p = buildPromptTicker("NVDA");
-  const b7 = p.slice(p.indexOf("7) LA CHIUSURA"), p.indexOf("8) LA TESI"));
+  if (!r) return true;
+  const salva = r.earnings_date;
+  const fra = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const blocco7 = () => { const p = buildPromptTicker("NVDA"); return p.slice(p.indexOf("7) LA CHIUSURA"), p.indexOf("8) LA TESI")); };
   /* il pacchetto lo diceva nel calendario macro, a trenta righe da chi deve usarlo: un prezzo
      "a settimane" scritto due giorni prima di una trimestrale e' un altro oggetto */
-  if (g < 0 || g > 60) return !/EVENTO DENTRO L'ORIZZONTE BREVE/.test(b7);
-  return /EVENTO DENTRO L'ORIZZONTE BREVE/.test(b7) && b7.includes(String(r.earnings_date).slice(0, 10));`));
+  try {
+    r.earnings_date = fra(10);  const dentro = blocco7();
+    r.earnings_date = fra(-5);  const passato = blocco7();
+    r.earnings_date = fra(90);  const lontano = blocco7();
+    return /EVENTO DENTRO L'ORIZZONTE BREVE/.test(dentro) && dentro.includes(fra(10))
+        && !/EVENTO DENTRO L'ORIZZONTE BREVE/.test(passato) && !/EVENTO DENTRO L'ORIZZONTE BREVE/.test(lontano);
+  } finally { r.earnings_date = salva; }`));
 
 
 /* ══ v353 — DUE NUMERI CHE NON PORTAVANO INFORMAZIONE E OCCUPAVANO IL POSTO DI QUELLI CHE SI ══ */

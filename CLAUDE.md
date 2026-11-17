@@ -18,7 +18,8 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    nei pacchetti e nelle risposte. **Eccezione misurata (03/11/2026)**: le PREVISIONI entrano solo dal sistema
    previsionale (`previsioni.py`, LIBRO §1septdecies), in un blocco separato dai fatti, come probabilità col metodo, la
    base, l'intervallo e l'affidabilità misurata (sul passato senza futuro, poi dal vivo); metodi affiancati, mai mediati.
-2. **Si lavora su `main`** e si pusha subito; una PR che nasce si unisce. Prima di ogni push `git pull --rebase origin
+2. **Si lavora su `main`**; si pubblica UNA volta, a fine giornata o quando il CEO scrive «pubblica», non dopo ogni
+   messaggio (16/11/2026: *"devi sempre pubblicare? ci mette un sacco di tempo e brucia token"*); una PR che nasce si unisce. Prima di ogni push `git pull --rebase origin
    main` (sui conflitti in `data/data.json` vince la remota). Il push È la pubblicazione: la rete è prima, negli hook.
 3. **Alla fine di ogni giro di lavoro (non di una domanda: regola 10): `python3 scripts/stato_sistema.py`**, esito in 2-4 righe con ogni ⚠ per nome.
    Ciò che si sistema in sessione si sistema; ciò che chiede il CEO diventa una DOMANDA in `memoria/LIBRO.md`
@@ -57,7 +58,7 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
 - **L'analisi in chat** — un comando: `python3 scripts/analisi.py`. PRIMA `fonti_dirette.py` e `fonti_titoli.py`
   (letture alla fonte del giro, valide 30 minuti, in `memoria/dati/`), poi `numeri_libro`, `brief`, `schede_progetto`,
   `rotazione`, `posizionamento`, `indici`, `concorrenti`, `laboratorio riassunto` (v533), `previsioni pagina` (v536), `cieca bilancio` (v539), `tesi` (v540), POI `sintesi.py --registra`, DOPO `stato_sistema.py --giro`.
-  La scheda completa (`memoria/dati/scheda_analisi_*.md`, fuori da git) si manda come allegato. **Forma statistica
+  La scheda completa (`memoria/dati/scheda_analisi_*.md`, fuori da git) NON si manda più come allegato: si risponde in chat (CEO, 17/11/2026). **Forma statistica
   (v528)**: `statistica.py pagina` dice per ogni posizione cosa è successo nei casi simili contro la base; prima di
   OGNI operazione `statistica.py ingresso TICKER PREZZO --registra "intuizione"` (valore atteso in R, variante «aspetta
   la conferma», gli stop e gli ordini con limite a confronto, riga nel diario `memoria/diario_ingressi.jsonl`); `statistica.py bilancio` misura l'intuito. Esce 1 se uno
