@@ -45,6 +45,7 @@ calo dal massimo, l'esito della tenuta e le tesi restano MISURE: informano, non 
 | BE | 40 | 214,00 | USD | |
 | ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
 | WDC | 24 | 342,00 | USD | acquisto del **02/11/2026** dalla riserva, speculazione sul rimbalzo (testuale: *"Entrato 24 a pmc 342 Wdc"*). Carico in euro nel registro §1decies |
+| ANT | 120 | 105,00 | USD | Anthropic — acquisto del **19/11/2026**, primo giorno di contrattazione al Nasdaq (testuale: *"Entrato in ant 120 pezzi a 105 euro"*): registrati 105 **dollari** (il titolo tratta in dollari, apertura a 111,50 $), valuta da confermare (§1undecies). ⚠ Claude è un prodotto di Anthropic: solo fatti e misure, nessun giudizio (CLAUDE.md, istruzione 6). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 ⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
@@ -54,10 +55,13 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~31.000 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 17/11/2026: la dichiara il CEO
-la sera (*"la mia liquidità è a 31 ora"*; nel pomeriggio *"ho 33k di cash"*), dopo le vendite di GOOGL del 13/11
-(incasso netto 9.883,68 € e imposta 136 €, dalla nota della banca) e di AVGO del 16/11 (nota non ancora arrivata).
-Circa 10.000 € il CEO li destina alla quotazione di Anthropic.
+**Liquidità: ~19.500 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 19/11/2026: i ~31.000 € dichiarati
+dal CEO il 17/11 meno l'acquisto di ANT del 19/11 (120 a 105 $ = 12.600 $, più 15 $ di commissione stimata, circa
+11.480 € al riferimento BCE del 19/11, 1,0992, meno lo scarto della banca) — da confermare col saldo del broker e con
+la valuta del prezzo (§1undecies). La riserva per la quotazione di Anthropic è stata usata. Il 17/11/2026 il CEO
+dichiarava ~31.000 € la sera (*"la mia liquidità è a 31 ora"*; nel pomeriggio *"ho 33k di cash"*), dopo le
+vendite di GOOGL del 13/11 (incasso netto 9.883,68 € e imposta 136 €, dalla nota della banca) e di AVGO del 16/11
+(nota non ancora arrivata).
 La stima del 16/11/2026 (~34.290 €) veniva da: i ~17.270 € stimati il
 02/11, più la vendita di GOOGL del 13/11 (37 a 294,71 $ = 10.904 $, meno 15 $ di commissione stimata, circa 9.850 € al
 riferimento BCE del 13/11, 1,1052), più la vendita di AVGO del 16/11 allo stop (24 a 329,75 $ = 7.914 $, meno 15 $,
@@ -995,6 +999,7 @@ Convenzioni dichiarate (v240), rilette da un gate:
 | 02/11/2026 | WDC | acquisto | 24 | 342,00 | 1,1216 | BCE, riferimento del 02/11/2026 | cambio di Sella non dichiarato (CEO, 07/11/2026: *"euro"*): resta il riferimento BCE, dichiarato; commissione stimata 15 $ come quella di INTC |
 | 13/11/2026 | GOOGL | vendita | 37 | 294,71 | 1,1020 | Banca Sella, nota informativa del 16/11/2026 (cambio medio, scarto 0,0006) | ordine con limite a 290 eseguito a 294,711; commissione 12,50 $; incasso netto 9.883,68 €; imposta 136 € (CEO, 17/11/2026) |
 | 16/11/2026 | AVGO | vendita | 24 | 329,75 | 1,1014 | BCE, riferimento del 16/11/2026 | stop del CEO; 24 azioni, confermate dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 19/11/2026 | ANT | acquisto | 120 | 105,00 | 1,0992 | BCE, riferimento del 19/11/2026 | primo giorno di contrattazione al Nasdaq (apertura a 111,50 $); il CEO scrive «105 euro»: registrati 105 dollari, da confermare (§1undecies); cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -1118,8 +1123,17 @@ la sua tesi è tolta da §1novodecies. Il ricavato (circa 7.170 €) va nella li
 **Chiuse il 16/11/2026** (CEO: *"1 ok 24 · 2 nessuno"*): di Broadcom sono state vendute **24** azioni, come nel
 libro; sulle altre posizioni **nessuno stop attivo** al 16/11/2026.
 
+**Eseguita il 19/11/2026** (CEO: *"Entrato in ant 120 pezzi a 105 euro"*): ANT, 120 azioni il primo giorno di
+contrattazione (apertura a 111,50 $ alle 17:50 italiane). Registrata a 105 dollari: circa 11.480 € al riferimento BCE
+del 19/11 (1,0992), commissione stimata; la liquidità scende a circa 19.500 € (§1). La prova d'ingresso non si è
+potuta fare né scrivere nel diario: il titolo non ha storico. Su Anthropic l'analista non dà giudizi (CLAUDE.md,
+istruzione 6): la tesi di §1novodecies riporta solo la decisione del CEO.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
+| 19/11/2026 | ANT: i «105 euro» del messaggio sono 105 dollari per azione (così registrati: il titolo tratta in dollari e ha aperto a 111,50 $) o 105 euro? E dalla nota della banca: cambio applicato e commissione | cambia il carico (12.600 $, circa 11.480 €, oppure 12.600 €) e la liquidità | il CEO conferma, o manda la nota della banca |
+| 19/11/2026 | ANT: c'è uno stop attivo, e a che prezzo? (CEO, 17/11: *"con stop stretto"*) | la tesi di §1novodecies lo porta come prima condizione, e il livello non è nel libro | il CEO lo dichiara |
+| 19/11/2026 | Gli ordini con limite su TSMC (352 e 332 $) e su Meta (595 e 584 $) sono stati inseriti? Il 19/11 TSMC ha toccato 351,14 $ | un ordine a 352 $ sarebbe stato eseguito: posizione e liquidità cambierebbero | il CEO dice quali ordini ha dato e quali sono stati eseguiti |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
@@ -1540,6 +1554,12 @@ scritta PRIMA dell'acquisto (comando COMPRO, `memoria/FORMATO_ANALISI.md`).
 - deve essere vero: (1) ricavi a un anno sopra +25% {ricavi>=25}; (2) stime a 90 giorni non in calo oltre il 10% {stime>=-10}; (3) ai conti, tiene la quota nelle HBM
 - romperebbe: (1) stime a 90 giorni in calo oltre il 10%; (2) prezzi delle memorie in calo ai conti; (3) perdita di quota nelle HBM
 - verdetto (08/11/2026): TIENI — con MU pesa il 21,6%: lo stesso ciclo conta due volte
+
+### ANT — ⚠ Anthropic: Claude è un suo prodotto, l'analista non giudica
+- perché: decisione del CEO — riserva destinata alla quotazione dal 02/11/2026, ingresso il primo giorno «con stop stretto per fare anche speculazione» (CEO, 17/11/2026); l'analista non scrive una tesi sul nome, solo fatti e misure
+- deve essere vero: (1) lo stop del CEO non è toccato — livello da dichiarare, §1undecies; (2) prezzo non in tendenza rotta, quando lo storico basterà a misurarla {tendenza}; (3) ciò che il CEO aggiunge leggendo i primi conti da società quotata
+- romperebbe: (1) lo stop del CEO toccato; (2) la tendenza rotta, quando sarà misurabile; (3) ciò che il CEO dichiara come motivo d'uscita
+- verdetto (19/11/2026): NESSUNO — sul nome l'analista non giudica (CLAUDE.md, istruzione 6); decide il CEO
 
 ### BTP-V28
 - perché: BTP Valore ottobre 2028, la parte non azionaria del patrimonio: cedole e rimborso a scadenza dallo Stato

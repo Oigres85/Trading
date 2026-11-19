@@ -526,6 +526,27 @@
       "concorrenti_non_quotati": [
         "Toshiba"
       ]
+    },
+    "ANT": {
+      "nome": "Anthropic",
+      "mercati": [
+        {
+          "mercato": "modelli di intelligenza artificiale generativa (modelli linguistici e servizi collegati)",
+          "tipo": "nessuna",
+          "fonte": "nessuna quota di mercato pubblica e verificabile letta il 19/11/2026; Claude e' un prodotto di Anthropic: nessuna stima dell'analista (CLAUDE.md, istruzione 6)",
+          "verificato_il": "2026-11-19",
+          "quote": []
+        }
+      ],
+      "concorrenti_quotati": [
+        "GOOGL",
+        "MSFT",
+        "META"
+      ],
+      "concorrenti_non_quotati": [
+        "OpenAI",
+        "xAI (di SpaceX)"
+      ]
     }
   }
 }
