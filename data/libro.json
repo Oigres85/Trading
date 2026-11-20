@@ -1,54 +1,54 @@
 {
  "al": "2026-11-18",
  "sedute": 92,
- "generato": "2026-11-20T02:09:52+00:00",
- "quota_azionaria": 0.7817,
+ "generato": "2026-11-20T02:48:12+00:00",
+ "quota_azionaria": 0.776,
  "posizioni_al": "2026-11-19",
  "posizioni_giorni": 1,
  "sedute_scartate": {
-  "2026-11-19": 12
+  "2026-11-19": 5
  },
  "esclusi": {
-  "ANT": 0.0494
+  "ANT": 0.051
  },
  "perche_esclusi": {
   "ANT": "storia corta"
  },
- "volatilita": 0.594,
- "drawdown_max": -0.3344,
- "drawdown_oggi": -0.3112,
- "scommesse_effettive": 1.68,
+ "volatilita": 0.5938,
+ "drawdown_max": -0.3342,
+ "drawdown_oggi": -0.3126,
+ "scommesse_effettive": 1.69,
  "correlazione_media": 0.521,
- "scommesse_effettive_ribassi": 1.84,
+ "scommesse_effettive_ribassi": 1.85,
  "correlazione_ribassi": 0.459,
  "sedute_ribassi": 36,
  "pesi": {
-  "MU": 0.22,
-  "AMD": 0.2363,
+  "MU": 0.2229,
+  "AMD": 0.2256,
   "NVDA": 0.1817,
-  "PLTR": 0.0698,
-  "MRVL": 0.0272,
-  "RGTI": 0.0246,
-  "BE": 0.0305,
-  "SKHY": 0.0246,
-  "MSTR": 0.0696,
-  "CRWV": 0.0544,
-  "ORCL": 0.0305,
-  "WDC": 0.0308
+  "PLTR": 0.0722,
+  "MRVL": 0.0268,
+  "RGTI": 0.0255,
+  "BE": 0.0315,
+  "SKHY": 0.0254,
+  "MSTR": 0.0687,
+  "CRWV": 0.0562,
+  "ORCL": 0.0306,
+  "WDC": 0.0328
  },
  "contributo_rischio": {
-  "MU": 0.2746,
-  "AMD": 0.279,
-  "NVDA": 0.0858,
-  "PLTR": 0.0383,
-  "MRVL": 0.0352,
-  "RGTI": 0.0255,
-  "BE": 0.0442,
-  "SKHY": 0.0331,
-  "MSTR": 0.0492,
-  "CRWV": 0.08,
-  "ORCL": 0.0218,
-  "WDC": 0.0332
+  "MU": 0.2786,
+  "AMD": 0.2654,
+  "NVDA": 0.0859,
+  "PLTR": 0.0398,
+  "MRVL": 0.0347,
+  "RGTI": 0.0264,
+  "BE": 0.0459,
+  "SKHY": 0.0344,
+  "MSTR": 0.0487,
+  "CRWV": 0.083,
+  "ORCL": 0.0219,
+  "WDC": 0.0355
  },
  "volatilita_nome": {
   "MU": 0.801,
@@ -235,18 +235,18 @@
   }
  },
  "prezzi": {
-  "MU": 705.27,
-  "AMD": 530.14,
-  "NVDA": 150.96,
+  "MU": 690.44,
+  "AMD": 489.19,
+  "NVDA": 145.98,
   "PLTR": 156.67,
-  "MRVL": 145.54,
+  "MRVL": 138.47,
   "RGTI": 8.33,
   "BE": 170.98,
   "SKHY": 122.47,
-  "MSTR": 90.32,
+  "MSTR": 86.13,
   "CRWV": 47.83,
-  "ORCL": 113.89,
-  "WDC": 288.19,
+  "ORCL": 110.57,
+  "WDC": 296.78,
   "ANT": 97.17
  },
  "carico": {
