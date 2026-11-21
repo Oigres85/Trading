@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-21T20:14:55Z",
+ "updated_at": "2026-11-21T20:41:42Z",
  "eurusd": 1.097,
  "totals": {
   "usd_value": 0,
@@ -18595,16 +18595,16 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 60258.54,
+   "price": 60320.21,
    "price_asof": "2026-11-21",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 2.48,
+   "change_pct": 2.59,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -52.3,
-   "sma200_dist_pct": -16.8,
-   "sma50_dist_pct": -21.9,
+   "ath_dist_pct": -52.2,
+   "sma200_dist_pct": -16.7,
+   "sma50_dist_pct": -21.8,
    "w52_high": 97860.6,
    "w52_low": 55631.57,
    "w52_dist_pct": -38.4,
@@ -18612,8 +18612,8 @@
    "day_low": 55631.57,
    "support": 55631.57,
    "resistance": 81079.79,
-   "rsi": 23.3,
-   "volume": 61963837440,
+   "rsi": 23.6,
+   "volume": 60754141184,
    "vol_ratio": 2.12,
    "atr_14": 2916.75,
    "atr_pct": 4.84,
@@ -18625,7 +18625,7 @@
      62987.27,
      61901.82,
      58798.98,
-     60258.54
+     60320.21
     ],
     "m6": [
      64690.8,
@@ -18753,7 +18753,7 @@
      62987.27,
      61901.82,
      58798.98,
-     60258.54
+     60320.21
     ],
     "all": [
      386.94,
@@ -18902,7 +18902,7 @@
      78548.63,
      83553.85,
      77434.75,
-     60258.54
+     60320.21
     ],
     "m1": [
      77434.75,
@@ -18926,7 +18926,7 @@
      62987.27,
      61901.82,
      58798.98,
-     60258.54
+     60320.21
     ],
     "m3": [
      76403.77,
@@ -18994,7 +18994,7 @@
      62987.27,
      61901.82,
      58798.98,
-     60258.54
+     60320.21
     ],
     "y1": [
      85090.69,
@@ -19070,7 +19070,7 @@
      75746.93,
      73964.47,
      64855.84,
-     60258.54
+     60320.21
     ],
     "d1": [
      58792.21,
@@ -19194,21 +19194,23 @@
      60269.6,
      60167.97,
      60190.87,
-     60258.54
+     60207.53,
+     60265.57,
+     60320.84
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 14,
+   "health": 15,
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.74,
-   "sortino_1y": -1.01,
+   "sortino_1y": -1.0,
    "sharpe_6m": -0.53,
-   "sortino_6m": -0.77,
+   "sortino_6m": -0.76,
    "prepost": null,
-   "prezzo_limite_aggiustato": 60258.54,
+   "prezzo_limite_aggiustato": 60320.21,
    "risk_reward": "1:3.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19224,22 +19226,22 @@
     "w1": {
      "support": 55631.57,
      "resistance": 65365.13,
-     "change_pct": -7.14
+     "change_pct": -7.05
     },
     "m1": {
      "support": 55631.57,
      "resistance": 81079.79,
-     "change_pct": -22.18
+     "change_pct": -22.1
     },
     "m3": {
      "support": 55631.57,
      "resistance": 87363.76,
-     "change_pct": -21.13
+     "change_pct": -21.05
     },
     "y1": {
      "support": 55631.57,
      "resistance": 87363.76,
-     "change_pct": -17.22
+     "change_pct": -17.13
     }
    },
    "financials": [],
@@ -19262,74 +19264,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 60258.54,
+     "prezzo": 60320.21,
      "medie": {
       "sma10": {
-       "liv": 64272.18,
-       "dist_pct": -6.24
+       "liv": 64278.34,
+       "dist_pct": -6.16
       },
       "ema10": {
-       "liv": 64346.82,
-       "dist_pct": -6.35
+       "liv": 64358.04,
+       "dist_pct": -6.27
       },
       "sma20": {
-       "liv": 70103.92,
-       "dist_pct": -14.04
+       "liv": 70107.0,
+       "dist_pct": -13.96
       },
       "ema20": {
-       "liv": 68501.91,
-       "dist_pct": -12.03
+       "liv": 68507.78,
+       "dist_pct": -11.95
       },
       "sma30": {
-       "liv": 73223.44,
-       "dist_pct": -17.71
+       "liv": 73225.5,
+       "dist_pct": -17.62
       },
       "ema30": {
-       "liv": 71173.06,
-       "dist_pct": -15.34
+       "liv": 71177.04,
+       "dist_pct": -15.25
       },
       "sma50": {
-       "liv": 77139.24,
-       "dist_pct": -21.88
+       "liv": 77140.48,
+       "dist_pct": -21.8
       },
       "ema50": {
-       "liv": 73895.85,
-       "dist_pct": -18.45
+       "liv": 73898.27,
+       "dist_pct": -18.37
       },
       "sma100": {
-       "liv": 77631.07,
-       "dist_pct": -22.38
+       "liv": 77631.69,
+       "dist_pct": -22.3
       },
       "ema100": {
-       "liv": 74981.4,
-       "dist_pct": -19.64
+       "liv": 74982.62,
+       "dist_pct": -19.55
       },
       "sma200": {
-       "liv": 72428.23,
-       "dist_pct": -16.8
+       "liv": 72428.54,
+       "dist_pct": -16.72
       },
       "ema200": {
-       "liv": 74671.04,
-       "dist_pct": -19.3
+       "liv": 74671.65,
+       "dist_pct": -19.22
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 23.3,
+      "rsi14": 23.6,
       "macd": {
-       "linea": -4917.73,
-       "segnale": -3939.02,
-       "istogramma": -978.71
+       "linea": -4912.81,
+       "segnale": -3938.04,
+       "istogramma": -974.77
       },
-      "stoch_k": 22.6,
-      "stoch_d": 10.7,
-      "williams_r": -77.4,
-      "cci20": -117.7,
+      "stoch_k": 22.9,
+      "stoch_d": 10.8,
+      "williams_r": -77.1,
+      "cci20": -117.5,
       "adx14": 46.1,
       "di_su": 4.6,
       "di_giu": 42.3,
-      "momentum10": -13705.93
+      "momentum10": -13644.26
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19822,19 +19824,19 @@
       "o": 58802.6,
       "h": 60619.18,
       "l": 55631.57,
-      "c": 60258.54
+      "c": 60320.21
      }
     ],
     "performance": {
-     "s1": -7.09,
-     "m1": -21.94,
-     "m3": -20.87,
-     "m6": -7.0,
-     "a1": -15.38,
-     "ytd": -32.09,
-     "a3": 59.78,
-     "a5": 5.71,
-     "a10": 7980.9
+     "s1": -6.99,
+     "m1": -21.86,
+     "m3": -20.79,
+     "m6": -6.91,
+     "a1": -15.3,
+     "ytd": -32.02,
+     "a3": 59.95,
+     "a5": 5.81,
+     "a10": 7989.17
     },
     "stagionalita": [
      {
@@ -19947,9 +19949,9 @@
      }
     ]
    },
-   "rs_1m": -12.4,
+   "rs_1m": -12.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -8.6,
+   "rs_ndx_1m": -8.5,
    "beta_ndx": 0.64,
    "avg_corr": 0.4,
    "max_corr": 0.77,
@@ -68930,7 +68932,7 @@
      1220.99,
      1256.02,
      1386.5,
-     1446.3,
+     1446.29,
      1341.93,
      1400.14,
      1462.56,
@@ -70014,7 +70016,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.64,
+      "mediana": 1.63,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -75194,7 +75196,7 @@
      124.63,
      129.28,
      126.62,
-     134.89,
+     134.88,
      139.8,
      139.92,
      139.13,
@@ -95491,7 +95493,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -96168,7 +96170,7 @@
      123.58,
      115.79,
      115.57,
-     127.36,
+     127.35,
      140.21,
      140.59,
      129.75,
@@ -102618,7 +102620,7 @@
      284.33,
      290.47,
      309.08,
-     312.51,
+     312.5,
      301.63,
      299.71,
      266.92,
@@ -110418,7 +110420,7 @@
      324.5,
      348.61,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -116783,7 +116785,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -116834,7 +116836,7 @@
      128.42,
      130.68,
      128.64,
-     125.47,
+     125.48,
      125.9,
      131.91,
      136.18,
@@ -116940,7 +116942,7 @@
      352.96,
      313.87,
      334.37,
-     321.42,
+     321.43,
      301.14,
      316.17,
      300.45,
@@ -120942,7 +120944,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120975,7 +120977,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -121142,7 +121144,7 @@
      427.74,
      448.72,
      393.97,
-     377.21,
+     377.2,
      430.42,
      453.23,
      469.58,
@@ -121170,7 +121172,7 @@
      559.58,
      599.35,
      549.48,
-     603.73,
+     603.74,
      601.22,
      500.17,
      587.09,
@@ -122564,7 +122566,7 @@
        "acceso": false
       },
       "evento": {
-       "beta": 0.46,
+       "beta": 0.45,
        "r2": 0.083,
        "corr": 0.29,
        "campione": 50,
@@ -132739,7 +132741,7 @@
      3.2,
      3.15,
      3.17,
-     2.82,
+     2.83,
      2.67,
      2.77,
      2.93,
@@ -154232,7 +154234,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 74
+     "score": 76
     },
     {
      "label": "Treasury 10A",
@@ -159716,6 +159718,13 @@
     ],
     "ANT": [
      {
+      "titolo": "Better Recent IPO: SpaceX or Anthropic?",
+      "riassunto": "Key PointsSpaceX made $4.4 billion in profit in the third quarter.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-21T19:35:02Z",
+      "url": "https://www.nasdaq.com/articles/better-recent-ipo-spacex-or-anthropic"
+     },
+     {
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
@@ -159749,13 +159758,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-21T09:22:02Z",
       "url": "https://www.nasdaq.com/articles/what-will-anthropics-price-be-3-months-history-offers-answer-thats-strikingly-clear"
-     },
-     {
-      "titolo": "William Blair Initiates Coverage of Anthropic, PBC with Outperform",
-      "riassunto": "Fintel reports that on November 20, 2026, William Blair initiated coverage of Anthropic, PBC (NASDAQGS:ANT) with a Outperform recommendation.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T00:29:37Z",
-      "url": "https://www.nasdaq.com/articles/william-blair-initiates-coverage-anthropic-pbc-outperform"
      }
     ],
     "BE": [
@@ -160222,7 +160224,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-21T20:14:55Z"
+   "letto_il": "2026-11-21T20:41:42Z"
   }
  },
  "broker": null,
@@ -160274,6 +160276,13 @@
    ],
    "ANT": [
     {
+     "titolo": "Better Recent IPO: SpaceX or Anthropic?",
+     "riassunto": "Key PointsSpaceX made $4.4 billion in profit in the third quarter.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-21T19:35:02Z",
+     "url": "https://www.nasdaq.com/articles/better-recent-ipo-spacex-or-anthropic"
+    },
+    {
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
@@ -160307,13 +160316,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-21T09:22:02Z",
      "url": "https://www.nasdaq.com/articles/what-will-anthropics-price-be-3-months-history-offers-answer-thats-strikingly-clear"
-    },
-    {
-     "titolo": "William Blair Initiates Coverage of Anthropic, PBC with Outperform",
-     "riassunto": "Fintel reports that on November 20, 2026, William Blair initiated coverage of Anthropic, PBC (NASDAQGS:ANT) with a Outperform recommendation.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T00:29:37Z",
-     "url": "https://www.nasdaq.com/articles/william-blair-initiates-coverage-anthropic-pbc-outperform"
     }
    ],
    "BE": [
@@ -160780,7 +160782,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-21T20:14:55Z"
+  "letto_il": "2026-11-21T20:41:42Z"
  },
  "predictions": [
   {
@@ -160805,7 +160807,7 @@
   },
   {
    "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
-   "yes": 35,
+   "yes": 34,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
   },
   {
@@ -237842,6 +237844,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-21T20:14:56Z"
+  "generated_at": "2026-11-21T20:41:43Z"
  }
 }
