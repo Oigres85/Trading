@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-21T15:59:09Z",
+ "updated_at": "2026-11-21T16:34:44Z",
  "eurusd": 1.097,
  "totals": {
   "usd_value": 0,
@@ -18595,25 +18595,25 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 59839.48,
+   "price": 59915.82,
    "price_asof": "2026-11-21",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 1.77,
+   "change_pct": 1.9,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -52.6,
-   "sma200_dist_pct": -17.4,
-   "sma50_dist_pct": -22.4,
+   "ath_dist_pct": -52.5,
+   "sma200_dist_pct": -17.3,
+   "sma50_dist_pct": -22.3,
    "w52_high": 97860.6,
    "w52_low": 55631.57,
-   "w52_dist_pct": -38.9,
+   "w52_dist_pct": -38.8,
    "day_high": 60619.18,
    "day_low": 55631.57,
    "support": 55631.57,
    "resistance": 81079.79,
-   "rsi": 21.7,
-   "volume": 74298253312,
+   "rsi": 22.0,
+   "volume": 68018872320,
    "vol_ratio": 2.12,
    "atr_14": 2916.75,
    "atr_pct": 4.87,
@@ -18625,7 +18625,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59839.48
+     59915.82
     ],
     "m6": [
      64690.8,
@@ -18753,7 +18753,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59839.48
+     59915.82
     ],
     "all": [
      386.94,
@@ -18902,7 +18902,7 @@
      78548.63,
      83553.85,
      77434.75,
-     59839.48
+     59915.82
     ],
     "m1": [
      77434.75,
@@ -18926,7 +18926,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59839.48
+     59915.82
     ],
     "m3": [
      76403.77,
@@ -18994,7 +18994,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59839.48
+     59915.82
     ],
     "y1": [
      85090.69,
@@ -19070,7 +19070,7 @@
      75746.93,
      73964.47,
      64855.84,
-     59839.48
+     59915.82
     ],
     "d1": [
      58792.21,
@@ -19168,7 +19168,11 @@
      60116.29,
      59751.86,
      60047.55,
-     59843.72
+     59843.72,
+     59769.82,
+     59791.98,
+     59866.25,
+     59915.82
     ]
    },
    "earnings_date": null,
@@ -19180,9 +19184,9 @@
    "sharpe_1y": -0.75,
    "sortino_1y": -1.02,
    "sharpe_6m": -0.57,
-   "sortino_6m": -0.83,
+   "sortino_6m": -0.82,
    "prepost": null,
-   "prezzo_limite_aggiustato": 59839.48,
+   "prezzo_limite_aggiustato": 59915.82,
    "risk_reward": "1:3.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19198,22 +19202,22 @@
     "w1": {
      "support": 55631.57,
      "resistance": 65365.13,
-     "change_pct": -7.79
+     "change_pct": -7.67
     },
     "m1": {
      "support": 55631.57,
      "resistance": 81079.79,
-     "change_pct": -22.72
+     "change_pct": -22.62
     },
     "m3": {
      "support": 55631.57,
      "resistance": 87363.76,
-     "change_pct": -21.68
+     "change_pct": -21.58
     },
     "y1": {
      "support": 55631.57,
      "resistance": 87363.76,
-     "change_pct": -17.79
+     "change_pct": -17.69
     }
    },
    "financials": [],
@@ -19236,74 +19240,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 59839.48,
+     "prezzo": 59915.82,
      "medie": {
       "sma10": {
-       "liv": 64230.27,
-       "dist_pct": -6.84
+       "liv": 64237.9,
+       "dist_pct": -6.73
       },
       "ema10": {
-       "liv": 64270.63,
-       "dist_pct": -6.89
+       "liv": 64284.51,
+       "dist_pct": -6.8
       },
       "sma20": {
-       "liv": 70082.97,
-       "dist_pct": -14.62
+       "liv": 70086.78,
+       "dist_pct": -14.51
       },
       "ema20": {
-       "liv": 68462.0,
-       "dist_pct": -12.59
+       "liv": 68469.27,
+       "dist_pct": -12.49
       },
       "sma30": {
-       "liv": 73209.47,
-       "dist_pct": -18.26
+       "liv": 73212.02,
+       "dist_pct": -18.16
       },
       "ema30": {
-       "liv": 71146.02,
-       "dist_pct": -15.89
+       "liv": 71150.95,
+       "dist_pct": -15.79
       },
       "sma50": {
-       "liv": 77130.86,
-       "dist_pct": -22.42
+       "liv": 77132.39,
+       "dist_pct": -22.32
       },
       "ema50": {
-       "liv": 73879.42,
-       "dist_pct": -19.0
+       "liv": 73882.41,
+       "dist_pct": -18.9
       },
       "sma100": {
-       "liv": 77626.88,
-       "dist_pct": -22.91
+       "liv": 77627.64,
+       "dist_pct": -22.82
       },
       "ema100": {
-       "liv": 74973.1,
-       "dist_pct": -20.19
+       "liv": 74974.61,
+       "dist_pct": -20.09
       },
       "sma200": {
-       "liv": 72426.13,
-       "dist_pct": -17.38
+       "liv": 72426.52,
+       "dist_pct": -17.27
       },
       "ema200": {
-       "liv": 74666.87,
-       "dist_pct": -19.86
+       "liv": 74667.62,
+       "dist_pct": -19.76
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 21.7,
+      "rsi14": 22.0,
       "macd": {
-       "linea": -4951.16,
-       "segnale": -3945.71,
-       "istogramma": -1005.45
+       "linea": -4945.07,
+       "segnale": -3944.49,
+       "istogramma": -1000.58
       },
-      "stoch_k": 20.6,
-      "stoch_d": 10.0,
-      "williams_r": -79.4,
-      "cci20": -119.0,
+      "stoch_k": 20.9,
+      "stoch_d": 10.1,
+      "williams_r": -79.1,
+      "cci20": -118.7,
       "adx14": 46.1,
       "di_su": 4.6,
       "di_giu": 42.3,
-      "momentum10": -14124.99
+      "momentum10": -14048.65
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19796,19 +19800,19 @@
       "o": 58802.6,
       "h": 60619.18,
       "l": 55631.57,
-      "c": 59839.48
+      "c": 59915.82
      }
     ],
     "performance": {
-     "s1": -7.73,
-     "m1": -22.49,
-     "m3": -21.42,
-     "m6": -7.65,
-     "a1": -15.97,
-     "ytd": -32.56,
-     "a3": 58.67,
-     "a5": 4.97,
-     "a10": 7924.7
+     "s1": -7.62,
+     "m1": -22.39,
+     "m3": -21.32,
+     "m6": -7.53,
+     "a1": -15.87,
+     "ytd": -32.48,
+     "a3": 58.87,
+     "a5": 5.11,
+     "a10": 7934.94
     },
     "stagionalita": [
      {
@@ -19921,9 +19925,9 @@
      }
     ]
    },
-   "rs_1m": -12.9,
+   "rs_1m": -12.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -9.2,
+   "rs_ndx_1m": -9.1,
    "beta_ndx": 0.64,
    "avg_corr": 0.4,
    "max_corr": 0.77,
@@ -42114,7 +42118,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -44264,7 +44268,7 @@
     "gross_margin": 0.6585,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.64,
+    "peg": 0.58,
     "roa": 0.2058,
     "short_float": 0.0066,
     "buyback_yield": -0.0,
@@ -51310,7 +51314,7 @@
     "gross_margin": 0.1929,
     "enterprise_value": 1338540687360.0,
     "ev_ebitda": 136.058,
-    "peg": 4.37,
+    "peg": 4.03,
     "roa": 0.0135,
     "short_float": 0.0203,
     "buyback_yield": 0.0,
@@ -57196,7 +57200,7 @@
     "gross_margin": 0.6766,
     "enterprise_value": 3667561807872.0,
     "ev_ebitda": 17.83,
-    "peg": 1.47,
+    "peg": 1.43,
     "roa": 0.1441,
     "short_float": 0.0082,
     "buyback_yield": 0.0056,
@@ -63002,14 +63006,14 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -73308,7 +73312,7 @@
     "gross_margin": 0.6396,
     "enterprise_value": 443415855104.0,
     "ev_ebitda": 12.878,
-    "peg": 0.6,
+    "peg": 0.55,
     "roa": 0.0636,
     "short_float": 0.0248,
     "buyback_yield": -0.0196,
@@ -92328,7 +92332,7 @@
     "gross_margin": 0.4438,
     "enterprise_value": 432962732032.0,
     "ev_ebitda": 7.453,
-    "peg": 0.78,
+    "peg": 0.79,
     "roa": 0.0647,
     "short_float": 0.0135,
     "buyback_yield": 0.0297,
@@ -96142,7 +96146,7 @@
      123.58,
      115.79,
      115.57,
-     127.36,
+     127.35,
      140.21,
      140.59,
      129.75,
@@ -96159,7 +96163,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -98660,7 +98664,7 @@
     "gross_margin": 0.752,
     "enterprise_value": 373958639616.0,
     "ev_ebitda": 12.68,
-    "peg": 3.21,
+    "peg": 3.24,
     "roa": 0.1129,
     "short_float": 0.0108,
     "buyback_yield": 0.0154,
@@ -102592,7 +102596,7 @@
      284.33,
      290.47,
      309.08,
-     312.51,
+     312.5,
      301.63,
      299.71,
      266.92,
@@ -110392,7 +110396,7 @@
      324.5,
      348.61,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -116822,7 +116826,7 @@
      149.48,
      156.2,
      164.48,
-     166.55,
+     166.56,
      163.59,
      150.97,
      139.09,
@@ -120916,7 +120920,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120967,7 +120971,7 @@
      99.51,
      97.2,
      108.68,
-     129.69,
+     129.7,
      124.73,
      136.32,
      138.59,
@@ -121116,7 +121120,7 @@
      427.74,
      448.72,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -121144,7 +121148,7 @@
      559.58,
      599.35,
      549.48,
-     603.73,
+     603.74,
      601.22,
      500.17,
      587.09,
@@ -122538,7 +122542,7 @@
        "acceso": false
       },
       "evento": {
-       "beta": 0.46,
+       "beta": 0.45,
        "r2": 0.083,
        "corr": 0.29,
        "campione": 50,
@@ -123155,7 +123159,7 @@
      27.21,
      26.54,
      27.08,
-     26.9,
+     26.91,
      26.52,
      26.65,
      27.5,
@@ -154206,7 +154210,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 66
+     "score": 69
     },
     {
      "label": "Treasury 10A",
@@ -159690,6 +159694,13 @@
     ],
     "ANT": [
      {
+      "titolo": "Here's How Much Cash Anthropic Has After Its IPO, and Why It Could Be the Most Important Number for Investors to Know",
+      "riassunto": "Key PointsAnthropic raised $119.5 billion in gross proceeds from its IPO and a concurrent private placement, leaving it with an estimated $250 billion in cash and short-term investments.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-21T15:46:01Z",
+      "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
+     },
+     {
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
@@ -159723,13 +159734,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-21T00:29:37Z",
       "url": "https://www.nasdaq.com/articles/william-blair-initiates-coverage-anthropic-pbc-outperform"
-     },
-     {
-      "titolo": "Stocks Sink as Tech Rout Deepens",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -1.52% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.19%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.85%. December E-mini S&P futures (ESZ26 ) are down -1.47%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T00:10:36Z",
-      "url": "https://www.nasdaq.com/articles/stocks-sink-tech-rout-deepens"
      }
     ],
     "BE": [
@@ -160196,7 +160200,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-21T15:59:09Z"
+   "letto_il": "2026-11-21T16:34:44Z"
   }
  },
  "broker": null,
@@ -160248,6 +160252,13 @@
    ],
    "ANT": [
     {
+     "titolo": "Here's How Much Cash Anthropic Has After Its IPO, and Why It Could Be the Most Important Number for Investors to Know",
+     "riassunto": "Key PointsAnthropic raised $119.5 billion in gross proceeds from its IPO and a concurrent private placement, leaving it with an estimated $250 billion in cash and short-term investments.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-21T15:46:01Z",
+     "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
+    },
+    {
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
@@ -160281,13 +160292,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-21T00:29:37Z",
      "url": "https://www.nasdaq.com/articles/william-blair-initiates-coverage-anthropic-pbc-outperform"
-    },
-    {
-     "titolo": "Stocks Sink as Tech Rout Deepens",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -1.52% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.19%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -2.85%. December E-mini S&P futures (ESZ26 ) are down -1.47%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T00:10:36Z",
-     "url": "https://www.nasdaq.com/articles/stocks-sink-tech-rout-deepens"
     }
    ],
    "BE": [
@@ -160754,7 +160758,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-21T15:59:09Z"
+  "letto_il": "2026-11-21T16:34:44Z"
  },
  "predictions": [
   {
@@ -237732,7 +237736,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -237816,6 +237820,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-21T15:59:10Z"
+  "generated_at": "2026-11-21T16:34:45Z"
  }
 }
