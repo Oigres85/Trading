@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-21T16:34:44Z",
+ "updated_at": "2026-11-21T20:14:55Z",
  "eurusd": 1.097,
  "totals": {
   "usd_value": 0,
@@ -1995,7 +1995,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -3171,11 +3171,11 @@
    },
    "analisti": {
     "eps_ora": 17.6382,
-    "eps_90g_fa": 15.335,
-    "eps_7g_fa": 17.6547,
+    "eps_90g_fa": 15.3555,
+    "eps_7g_fa": 17.6907,
     "eps_anno_corrente": 8.0844,
-    "revisione_90g_pct": 15.02,
-    "revisione_7g_pct": -0.09,
+    "revisione_90g_pct": 14.87,
+    "revisione_7g_pct": -0.3,
     "su_30g": 35,
     "giu_30g": 3,
     "eps_min": 14.51,
@@ -3225,7 +3225,7 @@
     "gross_margin": 0.56,
     "enterprise_value": 689471619072.0,
     "ev_ebitda": 61.875,
-    "peg": 0.44,
+    "peg": 0.38,
     "roa": 0.059,
     "short_float": 0.0236,
     "buyback_yield": 0.0027,
@@ -5286,7 +5286,7 @@
     "gross_margin": 0.7492,
     "enterprise_value": 2966443261952.0,
     "ev_ebitda": 12.194,
-    "peg": 0.18,
+    "peg": 0.15,
     "roa": 0.5604,
     "short_float": 0.0121,
     "buyback_yield": 0.0132,
@@ -7086,7 +7086,7 @@
     "gross_margin": 0.8474,
     "enterprise_value": 335519645696.0,
     "ev_ebitda": 99.997,
-    "peg": 1.22,
+    "peg": 1.13,
     "roa": 0.1931,
     "short_float": 0.026,
     "buyback_yield": 0.0002,
@@ -8919,7 +8919,7 @@
     "gross_margin": 0.5222,
     "enterprise_value": 108580634624.0,
     "ev_ebitda": 38.094,
-    "peg": 0.34,
+    "peg": 0.3,
     "roa": 0.0413,
     "short_float": 0.0348,
     "buyback_yield": 0.0185,
@@ -12263,7 +12263,7 @@
     "gross_margin": 0.3177,
     "enterprise_value": 42428682240.0,
     "ev_ebitda": 70.364,
-    "peg": 0.32,
+    "peg": 0.27,
     "roa": 0.0745,
     "short_float": 0.0681,
     "buyback_yield": -0.0014,
@@ -13851,7 +13851,7 @@
     "gross_margin": 0.7738,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.15,
+    "peg": 0.13,
     "roa": 0.4643,
     "short_float": null,
     "buyback_yield": -0.089,
@@ -17354,12 +17354,12 @@
     "upside_pct": 191.3
    },
    "analisti": {
-    "eps_ora": -3.6423,
+    "eps_ora": -3.6383,
     "eps_90g_fa": -4.2377,
-    "eps_7g_fa": -4.7435,
-    "eps_anno_corrente": -4.7516,
-    "revisione_90g_pct": -14.05,
-    "revisione_7g_pct": -23.22,
+    "eps_7g_fa": -3.6423,
+    "eps_anno_corrente": -4.7491,
+    "revisione_90g_pct": -14.14,
+    "revisione_7g_pct": -0.11,
     "su_30g": 2,
     "giu_30g": 7,
     "eps_min": -10.47,
@@ -18595,28 +18595,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 59915.82,
+   "price": 60258.54,
    "price_asof": "2026-11-21",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 1.9,
+   "change_pct": 2.48,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -52.5,
-   "sma200_dist_pct": -17.3,
-   "sma50_dist_pct": -22.3,
+   "ath_dist_pct": -52.3,
+   "sma200_dist_pct": -16.8,
+   "sma50_dist_pct": -21.9,
    "w52_high": 97860.6,
    "w52_low": 55631.57,
-   "w52_dist_pct": -38.8,
+   "w52_dist_pct": -38.4,
    "day_high": 60619.18,
    "day_low": 55631.57,
    "support": 55631.57,
    "resistance": 81079.79,
-   "rsi": 22.0,
-   "volume": 68018872320,
+   "rsi": 23.3,
+   "volume": 61963837440,
    "vol_ratio": 2.12,
    "atr_14": 2916.75,
-   "atr_pct": 4.87,
+   "atr_pct": 4.84,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18625,7 +18625,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59915.82
+     60258.54
     ],
     "m6": [
      64690.8,
@@ -18753,7 +18753,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59915.82
+     60258.54
     ],
     "all": [
      386.94,
@@ -18902,7 +18902,7 @@
      78548.63,
      83553.85,
      77434.75,
-     59915.82
+     60258.54
     ],
     "m1": [
      77434.75,
@@ -18926,7 +18926,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59915.82
+     60258.54
     ],
     "m3": [
      76403.77,
@@ -18994,7 +18994,7 @@
      62987.27,
      61901.82,
      58798.98,
-     59915.82
+     60258.54
     ],
     "y1": [
      85090.69,
@@ -19070,7 +19070,7 @@
      75746.93,
      73964.47,
      64855.84,
-     59915.82
+     60258.54
     ],
     "d1": [
      58792.21,
@@ -19172,7 +19172,29 @@
      59769.82,
      59791.98,
      59866.25,
-     59915.82
+     59941.24,
+     59878.53,
+     60009.49,
+     60060.02,
+     60131.36,
+     60120.02,
+     59986.48,
+     60019.77,
+     59920.79,
+     60038.06,
+     59977.96,
+     60111.4,
+     60058.13,
+     60050.96,
+     59988.7,
+     60223.8,
+     60200.12,
+     60167.64,
+     60221.25,
+     60269.6,
+     60167.97,
+     60190.87,
+     60258.54
     ]
    },
    "earnings_date": null,
@@ -19181,12 +19203,12 @@
    "health": 14,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.75,
-   "sortino_1y": -1.02,
-   "sharpe_6m": -0.57,
-   "sortino_6m": -0.82,
+   "sharpe_1y": -0.74,
+   "sortino_1y": -1.01,
+   "sharpe_6m": -0.53,
+   "sortino_6m": -0.77,
    "prepost": null,
-   "prezzo_limite_aggiustato": 59915.82,
+   "prezzo_limite_aggiustato": 60258.54,
    "risk_reward": "1:3.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19202,22 +19224,22 @@
     "w1": {
      "support": 55631.57,
      "resistance": 65365.13,
-     "change_pct": -7.67
+     "change_pct": -7.14
     },
     "m1": {
      "support": 55631.57,
      "resistance": 81079.79,
-     "change_pct": -22.62
+     "change_pct": -22.18
     },
     "m3": {
      "support": 55631.57,
      "resistance": 87363.76,
-     "change_pct": -21.58
+     "change_pct": -21.13
     },
     "y1": {
      "support": 55631.57,
      "resistance": 87363.76,
-     "change_pct": -17.69
+     "change_pct": -17.22
     }
    },
    "financials": [],
@@ -19240,74 +19262,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 59915.82,
+     "prezzo": 60258.54,
      "medie": {
       "sma10": {
-       "liv": 64237.9,
-       "dist_pct": -6.73
+       "liv": 64272.18,
+       "dist_pct": -6.24
       },
       "ema10": {
-       "liv": 64284.51,
-       "dist_pct": -6.8
+       "liv": 64346.82,
+       "dist_pct": -6.35
       },
       "sma20": {
-       "liv": 70086.78,
-       "dist_pct": -14.51
+       "liv": 70103.92,
+       "dist_pct": -14.04
       },
       "ema20": {
-       "liv": 68469.27,
-       "dist_pct": -12.49
+       "liv": 68501.91,
+       "dist_pct": -12.03
       },
       "sma30": {
-       "liv": 73212.02,
-       "dist_pct": -18.16
+       "liv": 73223.44,
+       "dist_pct": -17.71
       },
       "ema30": {
-       "liv": 71150.95,
-       "dist_pct": -15.79
+       "liv": 71173.06,
+       "dist_pct": -15.34
       },
       "sma50": {
-       "liv": 77132.39,
-       "dist_pct": -22.32
+       "liv": 77139.24,
+       "dist_pct": -21.88
       },
       "ema50": {
-       "liv": 73882.41,
-       "dist_pct": -18.9
+       "liv": 73895.85,
+       "dist_pct": -18.45
       },
       "sma100": {
-       "liv": 77627.64,
-       "dist_pct": -22.82
+       "liv": 77631.07,
+       "dist_pct": -22.38
       },
       "ema100": {
-       "liv": 74974.61,
-       "dist_pct": -20.09
+       "liv": 74981.4,
+       "dist_pct": -19.64
       },
       "sma200": {
-       "liv": 72426.52,
-       "dist_pct": -17.27
+       "liv": 72428.23,
+       "dist_pct": -16.8
       },
       "ema200": {
-       "liv": 74667.62,
-       "dist_pct": -19.76
+       "liv": 74671.04,
+       "dist_pct": -19.3
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 22.0,
+      "rsi14": 23.3,
       "macd": {
-       "linea": -4945.07,
-       "segnale": -3944.49,
-       "istogramma": -1000.58
+       "linea": -4917.73,
+       "segnale": -3939.02,
+       "istogramma": -978.71
       },
-      "stoch_k": 20.9,
-      "stoch_d": 10.1,
-      "williams_r": -79.1,
-      "cci20": -118.7,
+      "stoch_k": 22.6,
+      "stoch_d": 10.7,
+      "williams_r": -77.4,
+      "cci20": -117.7,
       "adx14": 46.1,
       "di_su": 4.6,
       "di_giu": 42.3,
-      "momentum10": -14048.65
+      "momentum10": -13705.93
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19800,19 +19822,19 @@
       "o": 58802.6,
       "h": 60619.18,
       "l": 55631.57,
-      "c": 59915.82
+      "c": 60258.54
      }
     ],
     "performance": {
-     "s1": -7.62,
-     "m1": -22.39,
-     "m3": -21.32,
-     "m6": -7.53,
-     "a1": -15.87,
-     "ytd": -32.48,
-     "a3": 58.87,
-     "a5": 5.11,
-     "a10": 7934.94
+     "s1": -7.09,
+     "m1": -21.94,
+     "m3": -20.87,
+     "m6": -7.0,
+     "a1": -15.38,
+     "ytd": -32.09,
+     "a3": 59.78,
+     "a5": 5.71,
+     "a10": 7980.9
     },
     "stagionalita": [
      {
@@ -19925,9 +19947,9 @@
      }
     ]
    },
-   "rs_1m": -12.8,
+   "rs_1m": -12.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -9.1,
+   "rs_ndx_1m": -8.6,
    "beta_ndx": 0.64,
    "avg_corr": 0.4,
    "max_corr": 0.77,
@@ -36115,7 +36137,7 @@
     "gross_margin": 0.5137,
     "enterprise_value": 2859513675776.0,
     "ev_ebitda": 15.565,
-    "peg": 1.19,
+    "peg": 1.15,
     "roa": 0.0662,
     "short_float": 0.0096,
     "buyback_yield": -0.0,
@@ -38072,7 +38094,7 @@
     "gross_margin": 0.5035,
     "enterprise_value": 106325721088.0,
     "ev_ebitda": 18.123,
-    "peg": 0.3,
+    "peg": 0.26,
     "roa": 0.3721,
     "short_float": 0.0368,
     "buyback_yield": 0.0017,
@@ -39976,7 +39998,7 @@
     "gross_margin": 0.6086,
     "enterprise_value": 3164731342848.0,
     "ev_ebitda": 17.059,
-    "peg": 0.96,
+    "peg": 0.94,
     "roa": 0.1274,
     "short_float": 0.0149,
     "buyback_yield": 0.014,
@@ -42266,7 +42288,7 @@
     "gross_margin": 0.526,
     "enterprise_value": 97347551232.0,
     "ev_ebitda": 15.423,
-    "peg": 0.43,
+    "peg": 0.37,
     "roa": 0.2588,
     "short_float": 0.0518,
     "buyback_yield": 0.0265,
@@ -53091,7 +53113,7 @@
     "gross_margin": 0.2524,
     "enterprise_value": 106586374144.0,
     "ev_ebitda": 11.247,
-    "peg": 0.87,
+    "peg": 0.82,
     "roa": 0.0495,
     "short_float": 0.0334,
     "buyback_yield": 0.0048,
@@ -54933,16 +54955,16 @@
    "rating": {
     "key": "buy",
     "n": 43,
-    "target": 84.76,
-    "upside_pct": 49.4
+    "target": 84.55,
+    "upside_pct": 49.0
    },
    "analisti": {
-    "eps_ora": 3.7667,
-    "eps_90g_fa": 3.8133,
-    "eps_7g_fa": 3.7952,
-    "eps_anno_corrente": 3.5837,
-    "revisione_90g_pct": -1.22,
-    "revisione_7g_pct": -0.75,
+    "eps_ora": 3.7648,
+    "eps_90g_fa": 3.8163,
+    "eps_7g_fa": 3.7667,
+    "eps_anno_corrente": 3.5721,
+    "revisione_90g_pct": -1.35,
+    "revisione_7g_pct": -0.05,
     "su_30g": 11,
     "giu_30g": 25,
     "eps_min": 3.5584,
@@ -54987,12 +55009,12 @@
     "debt_to_equity": 59.857,
     "dividend_yield": 0.0,
     "price_to_book": 7.9543,
-    "target_mean": 84.7633,
+    "target_mean": 84.5488,
     "fcf": 25475807232.0,
     "gross_margin": 0.5069,
     "enterprise_value": 242258706432.0,
     "ev_ebitda": 15.182,
-    "peg": 0.93,
+    "peg": 0.91,
     "roa": 0.1712,
     "short_float": 0.0225,
     "buyback_yield": 0.0363,
@@ -59416,7 +59438,7 @@
     "gross_margin": 0.4879,
     "enterprise_value": 5015901044736.0,
     "ev_ebitda": 29.25,
-    "peg": 2.82,
+    "peg": 2.77,
     "roa": 0.2587,
     "short_float": 0.01,
     "buyback_yield": 0.0174,
@@ -61306,7 +61328,7 @@
     "gross_margin": 0.8103,
     "enterprise_value": 1466035339264.0,
     "ev_ebitda": 12.618,
-    "peg": 0.78,
+    "peg": 0.73,
     "roa": 0.1458,
     "short_float": 0.0341,
     "buyback_yield": 0.0183,
@@ -63006,14 +63028,14 @@
      247.18,
      258.21,
      275.82,
-     303.03,
+     303.04,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -63291,7 +63313,7 @@
     "gross_margin": 0.7728,
     "enterprise_value": 179623264256.0,
     "ev_ebitda": 13.925,
-    "peg": 0.65,
+    "peg": 0.64,
     "roa": 0.057,
     "short_float": 0.0368,
     "buyback_yield": 0.0847,
@@ -65104,7 +65126,7 @@
     "gross_margin": 0.7308,
     "enterprise_value": 94739906560.0,
     "ev_ebitda": 29.286,
-    "peg": 0.7,
+    "peg": 0.69,
     "roa": 0.0459,
     "short_float": 0.0262,
     "buyback_yield": 0.0202,
@@ -66955,7 +66977,7 @@
     "gross_margin": 0.7551,
     "enterprise_value": 1488584704000.0,
     "ev_ebitda": 28.484,
-    "peg": 0.34,
+    "peg": 0.3,
     "roa": 0.1537,
     "short_float": 0.0111,
     "buyback_yield": 0.0042,
@@ -68908,7 +68930,7 @@
      1220.99,
      1256.02,
      1386.5,
-     1446.29,
+     1446.3,
      1341.93,
      1400.14,
      1462.56,
@@ -69056,7 +69078,7 @@
     "gross_margin": 0.5434,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.72,
+    "peg": 0.68,
     "roa": 0.1828,
     "short_float": 0.003,
     "buyback_yield": 0.0119,
@@ -71184,7 +71206,7 @@
     "gross_margin": 0.4341,
     "enterprise_value": 51653365760.0,
     "ev_ebitda": 10.557,
-    "peg": 2.97,
+    "peg": 2.85,
     "roa": 0.0689,
     "short_float": 0.0972,
     "buyback_yield": 0.003,
@@ -72106,7 +72128,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -73002,7 +73024,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -75172,7 +75194,7 @@
      124.63,
      129.28,
      126.62,
-     134.88,
+     134.89,
      139.8,
      139.92,
      139.13,
@@ -75533,7 +75555,7 @@
     "gross_margin": 0.5762,
     "enterprise_value": 246198616064.0,
     "ev_ebitda": 16.332,
-    "peg": 2.9,
+    "peg": 2.91,
     "roa": 0.1319,
     "short_float": 0.0184,
     "buyback_yield": 0.0107,
@@ -77228,7 +77250,7 @@
      11.1,
      11.27,
      11.09,
-     11.07,
+     11.06,
      11.8,
      11.5,
      10.69,
@@ -79501,12 +79523,12 @@
     "upside_pct": 35.3
    },
    "analisti": {
-    "eps_ora": 6.0183,
+    "eps_ora": 6.393,
     "eps_90g_fa": 5.2919,
-    "eps_7g_fa": 5.9418,
-    "eps_anno_corrente": 1.9513,
-    "revisione_90g_pct": 13.73,
-    "revisione_7g_pct": 1.29,
+    "eps_7g_fa": 5.9843,
+    "eps_anno_corrente": 2.3906,
+    "revisione_90g_pct": 20.81,
+    "revisione_7g_pct": 6.83,
     "su_30g": 1,
     "giu_30g": 1,
     "eps_min": 3.04,
@@ -79556,7 +79578,7 @@
     "gross_margin": 0.5772,
     "enterprise_value": 40552632320.0,
     "ev_ebitda": 55.942,
-    "peg": 2.82,
+    "peg": 2.84,
     "roa": -0.0072,
     "short_float": 0.0499,
     "buyback_yield": -0.0317,
@@ -81340,7 +81362,7 @@
     "gross_margin": 0.6288,
     "enterprise_value": 197412503552.0,
     "ev_ebitda": 37.218,
-    "peg": 1.38,
+    "peg": 1.22,
     "roa": 0.1504,
     "short_float": 0.0115,
     "buyback_yield": 0.0076,
@@ -83062,7 +83084,7 @@
     "gross_margin": 0.7519,
     "enterprise_value": 230775750656.0,
     "ev_ebitda": 2159.588,
-    "peg": 6.28,
+    "peg": 5.92,
     "roa": -0.0078,
     "short_float": 0.0218,
     "buyback_yield": 0.0,
@@ -84756,7 +84778,7 @@
     "gross_margin": 0.6896,
     "enterprise_value": 281522733056.0,
     "ev_ebitda": 173.245,
-    "peg": 1.85,
+    "peg": 1.8,
     "roa": 0.0106,
     "short_float": 0.0254,
     "buyback_yield": 0.0035,
@@ -88084,7 +88106,7 @@
     "gross_margin": 0.7961,
     "enterprise_value": 52890910720.0,
     "ev_ebitda": 310.624,
-    "peg": 0.81,
+    "peg": 0.76,
     "roa": 0.0091,
     "short_float": 0.0363,
     "buyback_yield": -0.0,
@@ -90108,7 +90130,7 @@
     "gross_margin": 0.2981,
     "enterprise_value": 681462792192.0,
     "ev_ebitda": 8.741,
-    "peg": 1.25,
+    "peg": 1.26,
     "roa": 0.0675,
     "short_float": 0.0125,
     "buyback_yield": 0.0311,
@@ -94559,7 +94581,7 @@
     "gross_margin": 0.4901,
     "enterprise_value": 174272446464.0,
     "ev_ebitda": 5.841,
-    "peg": 0.87,
+    "peg": 0.88,
     "roa": 0.0898,
     "short_float": 0.0135,
     "buyback_yield": 0.0296,
@@ -95469,7 +95491,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.76,
+      "mediana": 1.75,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -96146,7 +96168,7 @@
      123.58,
      115.79,
      115.57,
-     127.35,
+     127.36,
      140.21,
      140.59,
      129.75,
@@ -96447,7 +96469,7 @@
     "gross_margin": 0.7372,
     "enterprise_value": 576479756288.0,
     "ev_ebitda": 18.099,
-    "peg": 0.57,
+    "peg": 0.58,
     "roa": 0.1074,
     "short_float": 0.0099,
     "buyback_yield": 0.0019,
@@ -100674,11 +100696,11 @@
    },
    "analisti": {
     "eps_ora": 10.1491,
-    "eps_90g_fa": 9.8884,
-    "eps_7g_fa": 10.1209,
+    "eps_90g_fa": 9.8923,
+    "eps_7g_fa": 10.1298,
     "eps_anno_corrente": -0.9854,
-    "revisione_90g_pct": 2.64,
-    "revisione_7g_pct": 0.28,
+    "revisione_90g_pct": 2.6,
+    "revisione_7g_pct": 0.19,
     "su_30g": 20,
     "giu_30g": 4,
     "eps_min": 8.91,
@@ -102596,7 +102618,7 @@
      284.33,
      290.47,
      309.08,
-     312.5,
+     312.51,
      301.63,
      299.71,
      266.92,
@@ -102815,25 +102837,25 @@
    "earnings_date": "2027-02-02",
    "rating": {
     "key": "hold",
-    "n": 29,
-    "target": 437.01,
-    "upside_pct": 0.3
+    "n": 30,
+    "target": 440.78,
+    "upside_pct": 1.2
    },
    "analisti": {
-    "eps_ora": 25.1198,
+    "eps_ora": 25.1257,
     "eps_90g_fa": 24.3976,
     "eps_7g_fa": 25.0479,
-    "eps_anno_corrente": 23.5652,
-    "revisione_90g_pct": 2.96,
-    "revisione_7g_pct": 0.29,
+    "eps_anno_corrente": 23.5527,
+    "revisione_90g_pct": 2.98,
+    "revisione_7g_pct": 0.31,
     "su_30g": 23,
     "giu_30g": 5,
     "eps_min": 23.53,
     "eps_max": 26.56,
-    "eps_n": 33,
+    "eps_n": 34,
     "target_min": 230.0,
-    "target_max": 542.0,
-    "target_mediana": 440.0
+    "target_max": 550.0,
+    "target_mediana": 441.0
    },
    "health": 61,
    "eps": 17.25,
@@ -102870,12 +102892,12 @@
     "debt_to_equity": 376.303,
     "dividend_yield": 0.0231,
     "price_to_book": 16.4182,
-    "target_mean": 437.0128,
+    "target_mean": 440.779,
     "fcf": 7376750080.0,
     "gross_margin": 0.7246,
     "enterprise_value": 276459683840.0,
     "ev_ebitda": 15.679,
-    "peg": 2.58,
+    "peg": 2.56,
     "roa": 0.0891,
     "short_float": 0.0233,
     "buyback_yield": -0.0,
@@ -108572,7 +108594,7 @@
     "gross_margin": 0.677,
     "enterprise_value": 329962913792.0,
     "ev_ebitda": 16.401,
-    "peg": 2.46,
+    "peg": 2.43,
     "roa": 0.1688,
     "short_float": 0.0096,
     "buyback_yield": -0.0,
@@ -110396,7 +110418,7 @@
      324.5,
      348.61,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -110714,7 +110736,7 @@
     "gross_margin": 0.2518,
     "enterprise_value": 221958275072.0,
     "ev_ebitda": 25.809,
-    "peg": 1.45,
+    "peg": 1.41,
     "roa": 0.0376,
     "short_float": 0.0196,
     "buyback_yield": 0.0065,
@@ -111638,7 +111660,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -112942,7 +112964,7 @@
     "gross_margin": 0.3802,
     "enterprise_value": 249825345536.0,
     "ev_ebitda": 11.075,
-    "peg": 3.91,
+    "peg": 3.8,
     "roa": 0.0525,
     "short_float": 0.0122,
     "buyback_yield": 0.0447,
@@ -115116,10 +115138,10 @@
    "analisti": {
     "eps_ora": 2.9541,
     "eps_90g_fa": 2.8954,
-    "eps_7g_fa": 2.937,
+    "eps_7g_fa": 2.9483,
     "eps_anno_corrente": 3.0522,
     "revisione_90g_pct": 2.03,
-    "revisione_7g_pct": 0.58,
+    "revisione_7g_pct": 0.2,
     "su_30g": 15,
     "giu_30g": 4,
     "eps_min": 2.54,
@@ -115169,7 +115191,7 @@
     "gross_margin": 0.749,
     "enterprise_value": 205603995648.0,
     "ev_ebitda": 8.245,
-    "peg": 8.4,
+    "peg": 8.36,
     "roa": 0.0559,
     "short_float": 0.0236,
     "buyback_yield": -0.0,
@@ -116761,7 +116783,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -116812,7 +116834,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -116826,7 +116848,7 @@
      149.48,
      156.2,
      164.48,
-     166.56,
+     166.55,
      163.59,
      150.97,
      139.09,
@@ -116918,7 +116940,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -117156,16 +117178,16 @@
    "rating": {
     "key": "buy",
     "n": 21,
-    "target": 1031.57,
-    "upside_pct": 30.5
+    "target": 1030.71,
+    "upside_pct": 30.4
    },
    "analisti": {
-    "eps_ora": 74.6924,
+    "eps_ora": 74.7187,
     "eps_90g_fa": 73.7634,
     "eps_7g_fa": 74.6928,
-    "eps_anno_corrente": 71.4653,
-    "revisione_90g_pct": 1.26,
-    "revisione_7g_pct": -0.0,
+    "eps_anno_corrente": 71.593,
+    "revisione_90g_pct": 1.3,
+    "revisione_7g_pct": 0.03,
     "su_30g": 21,
     "giu_30g": 2,
     "eps_min": 65.57,
@@ -117210,12 +117232,12 @@
     "debt_to_equity": 756.014,
     "dividend_yield": 0.0253,
     "price_to_book": 2.1549,
-    "target_mean": 1031.5714,
+    "target_mean": 1030.7142,
     "fcf": null,
     "gross_margin": 0.8129,
     "enterprise_value": 39173525504.0,
     "ev_ebitda": null,
-    "peg": 1.06,
+    "peg": 0.99,
     "roa": 0.0111,
     "short_float": 0.022,
     "buyback_yield": 0.0459,
@@ -119423,7 +119445,7 @@
     "gross_margin": 0.0,
     "enterprise_value": 589427441664.0,
     "ev_ebitda": null,
-    "peg": 1.36,
+    "peg": 1.32,
     "roa": 0.0137,
     "short_float": 0.009,
     "buyback_yield": 0.0383,
@@ -120920,7 +120942,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -120953,7 +120975,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -121148,7 +121170,7 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
@@ -121452,7 +121474,7 @@
     "gross_margin": 0.4828,
     "enterprise_value": 178580373504.0,
     "ev_ebitda": 14.879,
-    "peg": 0.94,
+    "peg": 0.91,
     "roa": 0.0385,
     "short_float": 0.014,
     "buyback_yield": 0.0115,
@@ -122542,7 +122564,7 @@
        "acceso": false
       },
       "evento": {
-       "beta": 0.45,
+       "beta": 0.46,
        "r2": 0.083,
        "corr": 0.29,
        "campione": 50,
@@ -125359,7 +125381,7 @@
     "gross_margin": 0.1991,
     "enterprise_value": 200482668544.0,
     "ev_ebitda": 11.31,
-    "peg": 0.32,
+    "peg": 0.28,
     "roa": 0.0864,
     "short_float": 0.0357,
     "buyback_yield": 0.0362,
@@ -127155,9 +127177,9 @@
    "earnings_date": "2027-02-02",
    "rating": {
     "key": "buy",
-    "n": 25,
-    "target": 1064.75,
-    "upside_pct": 131.2
+    "n": 26,
+    "target": 1048.34,
+    "upside_pct": 127.6
    },
    "analisti": {
     "eps_ora": 40.1345,
@@ -127171,9 +127193,9 @@
     "eps_min": 32.03,
     "eps_max": 49.3,
     "eps_n": 22,
-    "target_min": 659.0,
+    "target_min": 638.0,
     "target_max": 1425.0,
-    "target_mediana": 1150.0
+    "target_mediana": 1141.0
    },
    "health": 17,
    "eps": -89.62,
@@ -127210,7 +127232,7 @@
     "debt_to_equity": 31.278,
     "dividend_yield": 0.0,
     "price_to_book": 9.125,
-    "target_mean": 1064.754,
+    "target_mean": 1048.3403,
     "fcf": 142850000.0,
     "gross_margin": 0.4797,
     "enterprise_value": 41221578752.0,
@@ -128899,23 +128921,23 @@
    "rating": {
     "key": "strong_buy",
     "n": 30,
-    "target": 334.29,
-    "upside_pct": 101.1
+    "target": 332.55,
+    "upside_pct": 100.0
    },
    "analisti": {
-    "eps_ora": 9.8739,
+    "eps_ora": 9.9061,
     "eps_90g_fa": 9.0988,
     "eps_7g_fa": 9.8739,
     "eps_anno_corrente": 7.1907,
-    "revisione_90g_pct": 8.52,
-    "revisione_7g_pct": 0.0,
+    "revisione_90g_pct": 8.87,
+    "revisione_7g_pct": 0.33,
     "su_30g": 27,
     "giu_30g": 0,
     "eps_min": 8.729,
     "eps_max": 11.89,
     "eps_n": 31,
     "target_min": 240.0,
-    "target_max": 427.0,
+    "target_max": 416.0,
     "target_mediana": 333.5
    },
    "health": 18,
@@ -128953,12 +128975,12 @@
     "debt_to_equity": 61.012,
     "dividend_yield": 0.0015,
     "price_to_book": 11.6333,
-    "target_mean": 334.286,
+    "target_mean": 332.5527,
     "fcf": 2962249984.0,
     "gross_margin": 0.3811,
     "enterprise_value": 63657644032.0,
     "ev_ebitda": 19.967,
-    "peg": 0.55,
+    "peg": 0.49,
     "roa": 0.1194,
     "short_float": 0.0288,
     "buyback_yield": -0.0,
@@ -131153,7 +131175,7 @@
     "gross_margin": 0.8333,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 4.06,
+    "peg": 3.96,
     "roa": 0.1905,
     "short_float": 0.0121,
     "buyback_yield": 0.0083,
@@ -132717,7 +132739,7 @@
      3.2,
      3.15,
      3.17,
-     2.83,
+     2.82,
      2.67,
      2.77,
      2.93,
@@ -133303,7 +133325,7 @@
     "gross_margin": 0.6017,
     "enterprise_value": 296217182208.0,
     "ev_ebitda": 22.104,
-    "peg": 1.71,
+    "peg": 1.7,
     "roa": 0.0241,
     "short_float": 0.0,
     "buyback_yield": -0.0116,
@@ -145962,7 +145984,7 @@
   "news": {
    "voci": [
     {
-     "titolo": "Goldman’s SpaceX Pitch Helps Solve AI Debt Puzzle: Credit Weekly",
+     "titolo": "Goldman Sachs, Apollo Price $32 Billion SpaceX Bonds to Fund AI Chip Purchases",
      "riassunto": "Goldman Sachs Group Inc. spent more than a year trying to solve one of tech’s biggest headaches: how to pay for AI chips without wrecking corporate balance sheets.",
      "fonte": "Bloomberg",
      "quando": "2026-11-21T15:31:22Z",
@@ -154193,7 +154215,7 @@
    "calls": 985184
   },
   "risk_sentiment": {
-   "score": 29,
+   "score": 30,
    "label": "Risk-Off",
    "components": [
     {
@@ -154210,7 +154232,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 69
+     "score": 74
     },
     {
      "label": "Treasury 10A",
@@ -159653,7 +159675,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
+      "quando": "2026-11-21T18:56:37Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -159694,18 +159716,18 @@
     ],
     "ANT": [
      {
+      "titolo": "Stocks Meltdown as AI Trade Unravels",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-21T18:56:37Z",
+      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+     },
+     {
       "titolo": "Here's How Much Cash Anthropic Has After Its IPO, and Why It Could Be the Most Important Number for Investors to Know",
       "riassunto": "Key PointsAnthropic raised $119.5 billion in gross proceeds from its IPO and a concurrent private placement, leaving it with an estimated $250 billion in cash and short-term investments.",
       "fonte": "Nasdaq",
       "quando": "2026-11-21T15:46:01Z",
       "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
-     },
-     {
-      "titolo": "Stocks Meltdown as AI Trade Unravels",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
-      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
       "titolo": "Not Anthropic. Not SpaceX. This Is the AI Stock to Buy for the Long Term",
@@ -159785,7 +159807,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
+      "quando": "2026-11-21T18:56:37Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -159829,7 +159851,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
+      "quando": "2026-11-21T18:56:37Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -159870,6 +159892,13 @@
     ],
     "MSTR": [
      {
+      "titolo": "MSCI Is Cutting Strategy and Metaplanet From Its Indexes. Here's What It Means for Bitcoin Treasury Company Stocks.",
+      "riassunto": "Key PointsMSCI will remove Strategy and Metaplanet from its indexes at the close of Nov. 30.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-21T19:37:02Z",
+      "url": "https://www.nasdaq.com/articles/msci-cutting-strategy-and-metaplanet-its-indexes-heres-what-it-means-bitcoin-treasury"
+     },
+     {
       "titolo": "Why Strategy Stock Tanked 23% This Week",
       "riassunto": "Key PointsStrategy stock tumbled more than 22% this week as Bitcoin prices fell and equity dilution weighed on shares.",
       "fonte": "Nasdaq",
@@ -159903,13 +159932,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-18T20:32:42Z",
       "url": "https://www.nasdaq.com/articles/notable-wednesday-option-activity-mstr-dc-shoe"
-     },
-     {
-      "titolo": "Stock Indexes Finish Lower as Tech Stocks Retreat",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -1.03% on Tuesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.64%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.72%. December E-mini S&P futures (ESZ26 ) fell -1.07%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-18T19:39:46Z",
-      "url": "https://www.nasdaq.com/articles/stock-indexes-finish-lower-tech-stocks-retreat"
      }
     ],
     "MU": [
@@ -159917,7 +159939,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
+      "quando": "2026-11-21T18:56:37Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -159958,6 +159980,27 @@
     ],
     "NVDA": [
      {
+      "titolo": "Stocks Meltdown as AI Trade Unravels",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-21T18:56:37Z",
+      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+     },
+     {
+      "titolo": "Worried About a Market Crash? This AI Stock Should Bounce Back Fastest.",
+      "riassunto": "Key PointsAI stocks are vulnerable to shifts in market sentiment right now.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-21T18:47:02Z",
+      "url": "https://www.nasdaq.com/articles/worried-about-market-crash-ai-stock-should-bounce-back-fastest"
+     },
+     {
+      "titolo": "Should You Buy Nvidia Stock Right Now?",
+      "riassunto": "Key PointsNvidia is going through one of the most uncertain periods in its history, with a huge leadership shakeup.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-21T18:35:02Z",
+      "url": "https://www.nasdaq.com/articles/should-you-buy-nvidia-stock-right-now"
+     },
+     {
       "titolo": "Prediction: Nvidia Stock Will Be Worth This Much in 1 Year",
       "riassunto": "Key PointsNvidia founder Jensen Huang made a shock exit from the company on Nov. 12, casting a cloud of uncertainty over the future.",
       "fonte": "Nasdaq",
@@ -159972,32 +160015,11 @@
       "url": "https://www.nasdaq.com/articles/applied-materials-vs-nvidia-which-tech-stock-better-buy-2027"
      },
      {
-      "titolo": "Stocks Meltdown as AI Trade Unravels",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
-      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
-     },
-     {
       "titolo": "Nvidia Stock Falls to $150 Per Share. Is It a Buy Now?",
       "riassunto": "Key PointsNvidia is still a dominant company even without Jensen Huang.",
       "fonte": "Nasdaq",
       "quando": "2026-11-21T13:57:01Z",
       "url": "https://www.nasdaq.com/articles/nvidia-stock-falls-150-share-it-buy-now"
-     },
-     {
-      "titolo": "Is AMD the Stock to Buy With Nvidia in Limbo?",
-      "riassunto": "Key PointsAMD's growth lags Nvidia's.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T13:00:02Z",
-      "url": "https://www.nasdaq.com/articles/amd-stock-buy-nvidia-limbo"
-     },
-     {
-      "titolo": "Nvidia Just Issued a Major Warning to AMD and Intel Stock Investors",
-      "riassunto": "Key PointsNvidia is seeing phenomenal demand for its Vera server CPUs, which are being deployed by multiple hyperscalers and AI companies.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T12:14:02Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-just-issued-major-warning-amd-and-intel-stock-investors"
      }
     ],
     "ORCL": [
@@ -160005,7 +160027,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
+      "quando": "2026-11-21T18:56:37Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -160137,7 +160159,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:11:59Z",
+      "quando": "2026-11-21T18:56:37Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -160200,7 +160222,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-21T16:34:44Z"
+   "letto_il": "2026-11-21T20:14:55Z"
   }
  },
  "broker": null,
@@ -160211,7 +160233,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
+     "quando": "2026-11-21T18:56:37Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -160252,18 +160274,18 @@
    ],
    "ANT": [
     {
+     "titolo": "Stocks Meltdown as AI Trade Unravels",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-21T18:56:37Z",
+     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+    },
+    {
      "titolo": "Here's How Much Cash Anthropic Has After Its IPO, and Why It Could Be the Most Important Number for Investors to Know",
      "riassunto": "Key PointsAnthropic raised $119.5 billion in gross proceeds from its IPO and a concurrent private placement, leaving it with an estimated $250 billion in cash and short-term investments.",
      "fonte": "Nasdaq",
      "quando": "2026-11-21T15:46:01Z",
      "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
-    },
-    {
-     "titolo": "Stocks Meltdown as AI Trade Unravels",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
-     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
      "titolo": "Not Anthropic. Not SpaceX. This Is the AI Stock to Buy for the Long Term",
@@ -160343,7 +160365,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
+     "quando": "2026-11-21T18:56:37Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -160387,7 +160409,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
+     "quando": "2026-11-21T18:56:37Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -160428,6 +160450,13 @@
    ],
    "MSTR": [
     {
+     "titolo": "MSCI Is Cutting Strategy and Metaplanet From Its Indexes. Here's What It Means for Bitcoin Treasury Company Stocks.",
+     "riassunto": "Key PointsMSCI will remove Strategy and Metaplanet from its indexes at the close of Nov. 30.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-21T19:37:02Z",
+     "url": "https://www.nasdaq.com/articles/msci-cutting-strategy-and-metaplanet-its-indexes-heres-what-it-means-bitcoin-treasury"
+    },
+    {
      "titolo": "Why Strategy Stock Tanked 23% This Week",
      "riassunto": "Key PointsStrategy stock tumbled more than 22% this week as Bitcoin prices fell and equity dilution weighed on shares.",
      "fonte": "Nasdaq",
@@ -160461,13 +160490,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-18T20:32:42Z",
      "url": "https://www.nasdaq.com/articles/notable-wednesday-option-activity-mstr-dc-shoe"
-    },
-    {
-     "titolo": "Stock Indexes Finish Lower as Tech Stocks Retreat",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -1.03% on Tuesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.64%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.72%. December E-mini S&P futures (ESZ26 ) fell -1.07%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-18T19:39:46Z",
-     "url": "https://www.nasdaq.com/articles/stock-indexes-finish-lower-tech-stocks-retreat"
     }
    ],
    "MU": [
@@ -160475,7 +160497,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
+     "quando": "2026-11-21T18:56:37Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -160516,6 +160538,27 @@
    ],
    "NVDA": [
     {
+     "titolo": "Stocks Meltdown as AI Trade Unravels",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-21T18:56:37Z",
+     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+    },
+    {
+     "titolo": "Worried About a Market Crash? This AI Stock Should Bounce Back Fastest.",
+     "riassunto": "Key PointsAI stocks are vulnerable to shifts in market sentiment right now.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-21T18:47:02Z",
+     "url": "https://www.nasdaq.com/articles/worried-about-market-crash-ai-stock-should-bounce-back-fastest"
+    },
+    {
+     "titolo": "Should You Buy Nvidia Stock Right Now?",
+     "riassunto": "Key PointsNvidia is going through one of the most uncertain periods in its history, with a huge leadership shakeup.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-21T18:35:02Z",
+     "url": "https://www.nasdaq.com/articles/should-you-buy-nvidia-stock-right-now"
+    },
+    {
      "titolo": "Prediction: Nvidia Stock Will Be Worth This Much in 1 Year",
      "riassunto": "Key PointsNvidia founder Jensen Huang made a shock exit from the company on Nov. 12, casting a cloud of uncertainty over the future.",
      "fonte": "Nasdaq",
@@ -160530,32 +160573,11 @@
      "url": "https://www.nasdaq.com/articles/applied-materials-vs-nvidia-which-tech-stock-better-buy-2027"
     },
     {
-     "titolo": "Stocks Meltdown as AI Trade Unravels",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
-     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
-    },
-    {
      "titolo": "Nvidia Stock Falls to $150 Per Share. Is It a Buy Now?",
      "riassunto": "Key PointsNvidia is still a dominant company even without Jensen Huang.",
      "fonte": "Nasdaq",
      "quando": "2026-11-21T13:57:01Z",
      "url": "https://www.nasdaq.com/articles/nvidia-stock-falls-150-share-it-buy-now"
-    },
-    {
-     "titolo": "Is AMD the Stock to Buy With Nvidia in Limbo?",
-     "riassunto": "Key PointsAMD's growth lags Nvidia's.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T13:00:02Z",
-     "url": "https://www.nasdaq.com/articles/amd-stock-buy-nvidia-limbo"
-    },
-    {
-     "titolo": "Nvidia Just Issued a Major Warning to AMD and Intel Stock Investors",
-     "riassunto": "Key PointsNvidia is seeing phenomenal demand for its Vera server CPUs, which are being deployed by multiple hyperscalers and AI companies.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T12:14:02Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-just-issued-major-warning-amd-and-intel-stock-investors"
     }
    ],
    "ORCL": [
@@ -160563,7 +160585,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
+     "quando": "2026-11-21T18:56:37Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -160695,7 +160717,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:11:59Z",
+     "quando": "2026-11-21T18:56:37Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -160758,23 +160780,18 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-21T16:34:44Z"
+  "letto_il": "2026-11-21T20:14:55Z"
  },
  "predictions": [
   {
-   "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
-   "yes": 8,
-   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
-  },
-  {
    "question": "Will Bitcoin dip to $55,000 by December 31, 2026?",
-   "yes": 62,
+   "yes": 58,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-55000-by-december-31-2026-527-627-868-745-188-361-314-673-612-946-821-624-855-557-684-381-884-939-182-939-516"
   },
   {
-   "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
-   "yes": 88,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
+   "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
+   "yes": 7,
+   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
   },
   {
    "question": "Will the Fed increase interest rates by 50+ bps after the December 2026 meeting?",
@@ -160782,13 +160799,18 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-50-bps-after-the-december-2026-meeting-20260729232808637"
   },
   {
+   "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
+   "yes": 90,
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
+  },
+  {
    "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
-   "yes": 36,
+   "yes": 35,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
   },
   {
    "question": "Will Ethereum dip to $1,500 by December 31, 2026?",
-   "yes": 59,
+   "yes": 57,
    "link": "https://polymarket.com/event/will-ethereum-dip-to-1500-by-december-31-2026-865-787"
   }
  ],
@@ -237558,7 +237580,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 10,
-    "risk_sentiment": 29,
+    "risk_sentiment": 30,
     "credit": 75,
     "systemic_risk": 64,
     "corp_profit": 53,
@@ -237736,7 +237758,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 5 ore"
    },
    {
     "key": "sec_calendario",
@@ -237820,6 +237842,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-21T16:34:45Z"
+  "generated_at": "2026-11-21T20:14:56Z"
  }
 }
