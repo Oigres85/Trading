@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-22T12:58:50Z",
+ "updated_at": "2026-11-22T16:02:25Z",
  "eurusd": 1.097,
  "totals": {
   "usd_value": 0,
@@ -74,8 +74,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "ITALY",
-    "entita": "ITALY",
-    "contratto": "SNRFOR.USD.XR14",
+    "entita": "Rep Italy",
+    "contratto": "SNRFOR.USD.CR14",
     "cedola_pb": 100,
     "prezzo": 101.6202,
     "punti": -1.62,
@@ -985,7 +985,7 @@
      601.07,
      605.74,
      607.66,
-     606.0,
+     605.84,
      600.52,
      600.46,
      599.7,
@@ -1991,7 +1991,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -3130,7 +3130,7 @@
      445.98,
      438.83,
      436.39,
-     433.8,
+     433.82,
      435.52,
      429.33,
      431.18,
@@ -4411,7 +4411,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMD",
-    "entita": "AMD",
+    "entita": "Advanced Micro Devices Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 97.7887,
@@ -5202,12 +5202,12 @@
      135.45,
      136.03,
      135.56,
-     133.0,
+     132.99,
      130.99,
      128.9,
      130.43,
-     128.67,
-     128.06,
+     128.66,
+     128.07,
      126.78,
      128.1,
      127.05,
@@ -6467,7 +6467,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NVIDIA",
-    "entita": "NVIDIA",
+    "entita": "NVIDIA Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 98.0158,
@@ -12152,7 +12152,7 @@
      147.4,
      144.57,
      145.69,
-     146.17,
+     146.14,
      146.84,
      145.99,
      145.46,
@@ -14843,8 +14843,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "SKHYN",
-    "entita": "SKHYN",
-    "contratto": "SNRFOR.USD.XR14",
+    "entita": "SK hynix Inc",
+    "contratto": "SNRFOR.USD.CR14",
     "cedola_pb": 100,
     "prezzo": 102.0442,
     "punti": -2.04,
@@ -18435,7 +18435,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COREWEI",
-    "entita": "COREWEI",
+    "entita": "COREWEAVE INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 500,
     "prezzo": 77.7957,
@@ -18555,28 +18555,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 60683.06,
+   "price": 60833.17,
    "price_asof": "2026-11-22",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.98,
+   "change_pct": 1.23,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -51.9,
-   "sma200_dist_pct": -16.1,
-   "sma50_dist_pct": -20.8,
+   "ath_dist_pct": -51.8,
+   "sma200_dist_pct": -15.9,
+   "sma50_dist_pct": -20.6,
    "w52_high": 97860.6,
    "w52_low": 55149.57,
-   "w52_dist_pct": -38.0,
+   "w52_dist_pct": -37.8,
    "day_high": 61328.95,
    "day_low": 58680.21,
    "support": 55149.57,
    "resistance": 81079.79,
-   "rsi": 25.0,
-   "volume": 35980857344,
+   "rsi": 25.6,
+   "volume": 28878749696,
    "vol_ratio": 1.97,
    "atr_14": 2944.47,
-   "atr_pct": 4.85,
+   "atr_pct": 4.84,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18585,7 +18585,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60683.06
+     60833.17
     ],
     "m6": [
      65230.03,
@@ -18713,7 +18713,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60683.06
+     60833.17
     ],
     "all": [
      386.94,
@@ -18862,7 +18862,7 @@
      78548.63,
      83553.85,
      77434.75,
-     60683.06
+     60833.17
     ],
     "m1": [
      78248.45,
@@ -18886,7 +18886,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60683.06
+     60833.17
     ],
     "m3": [
      80901.46,
@@ -18954,7 +18954,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60683.06
+     60833.17
     ],
     "y1": [
      84648.36,
@@ -19030,87 +19030,105 @@
      75747.58,
      71342.97,
      64893.95,
-     60683.06
+     60833.17
     ],
     "d1": [
-     60084.34,
+     60091.0,
      60188.06,
      60193.99,
-     60153.5,
+     60153.51,
      60162.5,
-     60063.62,
+     60063.63,
      60049.47,
-     60076.35,
+     60076.34,
      60069.52,
-     59941.33,
+     59947.52,
      59964.58,
-     60023.51,
+     60023.74,
      60015.03,
      59909.85,
      59731.4,
-     59474.94,
+     59470.88,
      59491.58,
      59390.56,
-     59188.68,
-     59183.47,
+     59189.61,
+     59183.46,
      59357.2,
-     59077.25,
-     59090.98,
+     59074.7,
+     59090.87,
      59178.42,
-     59436.1,
+     59437.66,
      59321.58,
-     59070.28,
-     59316.68,
-     59173.41,
+     59071.47,
+     59314.31,
+     59180.69,
      59153.42,
-     59034.02,
-     58848.36,
-     58847.46,
+     59046.43,
+     58835.45,
+     58854.32,
      58802.44,
      58684.36,
-     58850.75,
+     58850.74,
      58980.48,
-     58961.48,
-     58874.44,
-     58920.71,
-     59049.6,
-     59015.98,
-     58987.11,
-     59042.96,
-     59037.93,
+     58961.41,
+     58864.37,
+     58919.71,
+     59051.22,
+     59017.25,
+     58982.78,
+     59042.97,
+     59041.9,
      59029.86,
-     58927.1,
-     59065.66,
+     58925.92,
+     59058.41,
      58981.1,
-     59267.8,
+     59266.65,
      59663.39,
-     59756.48,
+     59769.05,
      59674.94,
-     59655.4,
-     59696.51,
+     59649.38,
+     59697.77,
      59601.36,
-     59896.83,
-     59878.23,
+     59907.12,
+     59889.75,
      60126.29,
-     60788.17,
-     60824.67,
-     60921.25,
-     60773.57,
-     60615.21,
-     60653.59,
-     60835.86,
-     60803.97,
-     60875.3,
-     60856.92,
-     60959.85,
-     60904.27,
-     60979.43,
-     61050.61,
-     61130.74,
-     60533.56,
-     60577.05,
+     60737.6,
+     60819.04,
+     60916.41,
+     60769.74,
+     60612.14,
+     60653.58,
+     60816.53,
+     60805.0,
+     60875.31,
+     60856.91,
+     60959.84,
+     60904.26,
+     60978.28,
+     61050.6,
+     61130.75,
+     60527.66,
+     60576.29,
      60650.71,
-     60683.06
+     60683.06,
+     60632.63,
+     60704.86,
+     60669.08,
+     60734.62,
+     60613.14,
+     60678.89,
+     60697.44,
+     60652.86,
+     60629.88,
+     60585.42,
+     60905.56,
+     60813.64,
+     60898.2,
+     60795.3,
+     60796.39,
+     60732.41,
+     60669.08,
+     60872.51
     ]
    },
    "earnings_date": null,
@@ -19119,13 +19137,13 @@
    "health": 15,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.72,
-   "sortino_1y": -0.98,
-   "sharpe_6m": -0.48,
-   "sortino_6m": -0.69,
+   "sharpe_1y": -0.71,
+   "sortino_1y": -0.97,
+   "sharpe_6m": -0.47,
+   "sortino_6m": -0.67,
    "prepost": null,
-   "prezzo_limite_aggiustato": 60683.06,
-   "risk_reward": "1:3.5",
+   "prezzo_limite_aggiustato": 60833.17,
+   "risk_reward": "1:3.4",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -19140,22 +19158,22 @@
     "w1": {
      "support": 55149.57,
      "resistance": 64928.8,
-     "change_pct": -3.66
+     "change_pct": -3.42
     },
     "m1": {
      "support": 55149.57,
      "resistance": 81079.79,
-     "change_pct": -22.45
+     "change_pct": -22.26
     },
     "m3": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -24.99
+     "change_pct": -24.81
     },
     "y1": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -18.94
+     "change_pct": -18.74
     }
    },
    "financials": [],
@@ -19178,74 +19196,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 60683.06,
+     "prezzo": 60833.17,
      "medie": {
       "sma10": {
-       "liv": 63189.74,
-       "dist_pct": -3.97
+       "liv": 63204.75,
+       "dist_pct": -3.75
       },
       "ema10": {
-       "liv": 63656.22,
-       "dist_pct": -4.67
+       "liv": 63683.51,
+       "dist_pct": -4.48
       },
       "sma20": {
-       "liv": 69295.99,
-       "dist_pct": -12.43
+       "liv": 69303.49,
+       "dist_pct": -12.22
       },
       "ema20": {
-       "liv": 67743.09,
-       "dist_pct": -10.42
+       "liv": 67757.38,
+       "dist_pct": -10.22
       },
       "sma30": {
-       "liv": 72538.26,
-       "dist_pct": -16.34
+       "liv": 72543.26,
+       "dist_pct": -16.14
       },
       "ema30": {
-       "liv": 70486.36,
-       "dist_pct": -13.91
+       "liv": 70496.05,
+       "dist_pct": -13.71
       },
       "sma50": {
-       "liv": 76654.34,
-       "dist_pct": -20.84
+       "liv": 76657.35,
+       "dist_pct": -20.64
       },
       "ema50": {
-       "liv": 73371.51,
-       "dist_pct": -17.29
+       "liv": 73377.4,
+       "dist_pct": -17.1
       },
       "sma100": {
-       "liv": 77606.5,
-       "dist_pct": -21.81
+       "liv": 77608.0,
+       "dist_pct": -21.61
       },
       "ema100": {
-       "liv": 74694.78,
-       "dist_pct": -18.76
+       "liv": 74697.75,
+       "dist_pct": -18.56
       },
       "sma200": {
-       "liv": 72323.69,
-       "dist_pct": -16.1
+       "liv": 72324.44,
+       "dist_pct": -15.89
       },
       "ema200": {
-       "liv": 74518.85,
-       "dist_pct": -18.57
+       "liv": 74520.34,
+       "dist_pct": -18.37
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 25.0,
+      "rsi14": 25.6,
       "macd": {
-       "linea": -4934.06,
-       "segnale": -4140.13,
-       "istogramma": -793.93
+       "linea": -4922.08,
+       "segnale": -4137.74,
+       "istogramma": -784.35
       },
-      "stoch_k": 27.2,
-      "stoch_d": 18.9,
-      "williams_r": -72.8,
-      "cci20": -90.2,
+      "stoch_k": 27.9,
+      "stoch_d": 19.1,
+      "williams_r": -72.1,
+      "cci20": -89.7,
       "adx14": 48.3,
       "di_su": 5.4,
       "di_giu": 40.0,
-      "momentum10": -10659.91
+      "momentum10": -10509.8
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19738,19 +19756,19 @@
       "o": 60093.01,
       "h": 61328.95,
       "l": 58680.21,
-      "c": 60683.06
+      "c": 60833.17
      }
     ],
     "performance": {
-     "s1": -6.49,
-     "m1": -21.63,
-     "m3": -20.58,
-     "m6": -6.2,
-     "a1": -16.63,
-     "ytd": -31.61,
-     "a3": 60.91,
-     "a5": 6.45,
-     "a10": 8037.83
+     "s1": -6.26,
+     "m1": -21.44,
+     "m3": -20.38,
+     "m6": -5.96,
+     "a1": -16.43,
+     "ytd": -31.44,
+     "a3": 61.31,
+     "a5": 6.71,
+     "a10": 8057.96
     },
     "stagionalita": [
      {
@@ -19863,9 +19881,9 @@
      }
     ]
    },
-   "rs_1m": -12.6,
+   "rs_1m": -12.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -8.9,
+   "rs_ndx_1m": -8.7,
    "beta_ndx": 0.64,
    "avg_corr": 0.4,
    "max_corr": 0.77,
@@ -36867,7 +36885,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMZN",
-    "entita": "AMZN",
+    "entita": "Amazon Com Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.9395,
@@ -37413,7 +37431,7 @@
      98.35,
      84.39,
      94.22,
-     99.64,
+     99.65,
      83.74,
      89.74,
      116.26,
@@ -39513,7 +39531,7 @@
      271.16,
      271.17,
      269.34,
-     271.51,
+     271.5,
      270.85,
      269.58,
      268.82,
@@ -40764,7 +40782,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ALPHINC",
-    "entita": "ALPHINC",
+    "entita": "Alphabet Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 100.1894,
@@ -41724,7 +41742,7 @@
      199.67,
      214.77,
      243.03,
-     278.11,
+     278.12,
      259.91,
      283.8,
      285.22,
@@ -45058,8 +45076,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "TAISEM",
-    "entita": "TAISEM",
-    "contratto": "SNRFOR.USD.XR14",
+    "entita": "Taiwan Semicon Mfg Co Ltd",
+    "contratto": "SNRFOR.USD.CR14",
     "cedola_pb": 100,
     "prezzo": 101.7108,
     "punti": -1.71,
@@ -48484,7 +48502,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -45.3,
-      "meglio": 24.6
+      "meglio": 24.5
      },
      {
       "mese": 11,
@@ -48688,7 +48706,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "INTC",
-    "entita": "INTC",
+    "entita": "Intel Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 97.6661,
@@ -50172,7 +50190,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "SPACEXP",
-    "entita": "SPACEXP",
+    "entita": "SPACE EXPL TECH CORP",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 92.2681,
@@ -52083,7 +52101,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "TESLINC",
-    "entita": "TESLINC",
+    "entita": "Tesla Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 94.5372,
@@ -52656,9 +52674,9 @@
     "float_pct": 99.7,
     "avg_volume_30d": 3589375.0,
     "pe_ttm": 19.0844,
-    "forward_pe": 17.7332,
+    "forward_pe": 17.7405,
     "eps_ttm": 12.44,
-    "eps_forward": 13.3879,
+    "eps_forward": 13.3824,
     "revenue_fy": 34250000384.0,
     "net_income_fy": 4369999872.0,
     "revenue_growth": 0.454,
@@ -53743,7 +53761,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CONSENAG",
-    "entita": "CONSENAG",
+    "entita": "Constellation Energy Generation LLC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.0734,
@@ -55748,7 +55766,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NFLX",
-    "entita": "NFLX",
+    "entita": "Netflix Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.6242,
@@ -56757,9 +56775,9 @@
     "float_pct": 99.9,
     "avg_volume_30d": 23851139.0,
     "pe_ttm": 25.2881,
-    "forward_pe": 20.0208,
+    "forward_pe": 20.0184,
     "eps_ttm": 19.16,
-    "eps_forward": 24.2008,
+    "eps_forward": 24.2038,
     "revenue_fy": 346444988416.0,
     "net_income_fy": 142630993920.0,
     "revenue_growth": 0.188,
@@ -56868,7 +56886,7 @@
      },
      {
       "trim": "2026-06-30",
-      "azioni": 7427000000
+      "azioni": 7428434704
      },
      {
       "trim": "2026-03-31",
@@ -56891,7 +56909,7 @@
     },
     "var_trim": {
      "da": "2026-06-30",
-     "pct": 0.0
+     "pct": -0.02
     },
     "rotazione": {
      "pct": 0.32,
@@ -57952,7 +57970,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MSFT",
-    "entita": "MSFT",
+    "entita": "Microsoft Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.1259,
@@ -60166,7 +60184,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "APLINC",
-    "entita": "APLINC",
+    "entita": "Apple Inc.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.4218,
@@ -62052,7 +62070,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "METAPL",
-    "entita": "METAPL",
+    "entita": "META PLATFORMS INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.1138,
@@ -62568,7 +62586,7 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
@@ -64645,9 +64663,9 @@
     "float_pct": 99.7,
     "avg_volume_30d": 15777528.0,
     "pe_ttm": 63.0288,
-    "forward_pe": 18.2433,
+    "forward_pe": 18.2324,
     "eps_ttm": 1.39,
-    "eps_forward": 4.8023,
+    "eps_forward": 4.8052,
     "revenue_fy": 15431000064.0,
     "net_income_fy": 1444999936.0,
     "revenue_growth": 0.205,
@@ -66492,9 +66510,9 @@
     "float_pct": 98.8,
     "avg_volume_30d": 26036645.0,
     "pe_ttm": 38.8774,
-    "forward_pe": 15.7026,
+    "forward_pe": 15.6799,
     "eps_ttm": 7.83,
-    "eps_forward": 19.386,
+    "eps_forward": 19.414,
     "revenue_fy": 89103998976.0,
     "net_income_fy": 38264999936.0,
     "revenue_growth": 0.855,
@@ -67694,7 +67712,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "BROINC",
-    "entita": "BROINC",
+    "entita": "BROADCOM INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 96.0908,
@@ -68279,7 +68297,7 @@
      311.85,
      348.3,
      334.76,
-     354.12,
+     354.13,
      349.48,
      341.85,
      415.88,
@@ -69583,7 +69601,7 @@
      {
       "mese": 12,
       "media": 2.95,
-      "mediana": 4.33,
+      "mediana": 4.32,
       "positivi_pct": 71,
       "campione": 31,
       "peggio": -25.0,
@@ -72544,7 +72562,7 @@
      89.67,
      84.81,
      81.51,
-     76.13,
+     76.14,
      71.27,
      77.61,
      69.12,
@@ -74035,7 +74053,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ORCLE",
-    "entita": "ORCLE",
+    "entita": "Oracle Cop",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 90.4789,
@@ -74710,7 +74728,7 @@
      124.63,
      129.28,
      126.62,
-     134.89,
+     134.88,
      139.8,
      139.92,
      139.13,
@@ -76243,7 +76261,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MCD",
-    "entita": "MCD",
+    "entita": "McDONALDS Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.4589,
@@ -77049,7 +77067,7 @@
      60.33,
      60.5,
      60.4,
-     60.7,
+     60.73,
      60.19,
      59.9,
      59.69,
@@ -77084,7 +77102,7 @@
    "rating": {
     "key": "buy",
     "n": 9,
-    "target": 115.24,
+    "target": 115.25,
     "upside_pct": 98.7
    },
    "analisti": {
@@ -77099,9 +77117,9 @@
     "eps_min": 1.48,
     "eps_max": 4.1,
     "eps_n": 18,
-    "target_min": 81.73,
-    "target_max": 168.03,
-    "target_mediana": 121.62
+    "target_min": 81.74,
+    "target_max": 168.04,
+    "target_mediana": 121.63
    },
    "health": 15,
    "eps": 0.66,
@@ -77138,7 +77156,7 @@
     "debt_to_equity": 13.949,
     "dividend_yield": 0.0029,
     "price_to_book": null,
-    "target_mean": 115.2383,
+    "target_mean": 115.2463,
     "fcf": null,
     "gross_margin": 0.3383,
     "enterprise_value": null,
@@ -77150,7 +77168,7 @@
     "cross_currency": true,
     "ps": null,
     "ev_s": null,
-    "altman_z": 4.88,
+    "altman_z": 4.86,
     "altman_missing": 0,
     "altman_model": "Z''",
     "altman_al": "2026-09-30",
@@ -77158,7 +77176,7 @@
     "altman_x": [
      0.1332,
      0.3669,
-     0.059,
+     0.0561,
      2.3011
     ]
    },
@@ -77170,27 +77188,27 @@
     "debito": 996952000.0,
     "patrimonio": 7233845000.0,
     "bilancio_al": "2026-09-30",
-    "ocf_ttm": 789369000.0,
-    "capex_ttm": -430639000.0,
+    "ocf_ttm": 814052000.0,
+    "capex_ttm": -416655000.0,
     "trimestri": 4,
     "cashflow_al": "2026-09-30",
-    "fcf_ttm": 358730000.0,
-    "mesi_capex": 24.0,
+    "fcf_ttm": 397397000.0,
+    "mesi_capex": 24.8,
     "emissione_netta_pct": 0.01,
     "debito_netto": 137132000.0,
     "valuta": "CAD"
    },
    "credito": {
-    "oneri_ttm": 102460000.0,
-    "ebit_ttm": 612203000.0,
+    "oneri_ttm": 103042000.0,
+    "ebit_ttm": 582567000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "copertura": 5.98,
-    "oneri_var_4trim_pct": -76.4,
+    "copertura": 5.65,
+    "oneri_var_4trim_pct": -0.9,
     "oneri_trim": [
+     12985000,
      54438000,
      22754000,
-     12403000,
      12865000
     ],
     "debito_lungo": 996952000.0,
@@ -77214,9 +77232,9 @@
     },
     "ocf_ultimo_trim": 3287000.0,
     "ocf_ultimo_al": "2026-09-30",
-    "utile_12m": 397753000.0,
-    "ricavi_12m": 3479131000.0,
-    "var_magazzino_12m": -106596000.0,
+    "utile_12m": 372393000.0,
+    "ricavi_12m": 3279914000.0,
+    "var_magazzino_12m": -123189000.0,
     "dividendi_12m": -104480000.0,
     "trimestri": {
      "utile_12m": 4,
@@ -77241,10 +77259,6 @@
       "azioni": 435532979
      },
      {
-      "trim": "2026-06-30",
-      "azioni": 435532978
-     },
-     {
       "trim": "2026-03-31",
       "azioni": 435532978
      },
@@ -77255,6 +77269,10 @@
      {
       "trim": "2025-09-30",
       "azioni": 435407158
+     },
+     {
+      "trim": "2025-06-30",
+      "azioni": 435387448
      }
     ],
     "al": "2026-09-30",
@@ -77262,10 +77280,6 @@
     "var_anno": {
      "da": "2025-09-30",
      "pct": 0.03
-    },
-    "var_trim": {
-     "da": "2026-06-30",
-     "pct": 0.0
     },
     "rotazione": {
      "pct": 0.81,
@@ -77276,52 +77290,7 @@
     },
     "quotata_dal": "1996-03-14"
    },
-   "rendimento": {
-    "al": "2026-09-30",
-    "dal": "2025-10-01",
-    "aliquota": 0.2197,
-    "aliquota_base": "effettiva",
-    "roic": 0.0487,
-    "nopat": 389665292.2511933,
-    "capitale_medio": 8003737500.0,
-    "capitale_base": "media",
-    "roe": 0.0568,
-    "utile": 397753000.0,
-    "patrimonio_medio": 7007183500.0,
-    "patrimonio_base": "media",
-    "quota_patrimonio": 0.879,
-    "esercizi": [
-     {
-      "al": "2025-12-31",
-      "roic": 0.0618,
-      "roe": 0.0889,
-      "capitale_base": "media",
-      "patrimonio_base": "media"
-     },
-     {
-      "al": "2024-12-31",
-      "roic": 0.0449,
-      "roe": 0.0276,
-      "capitale_base": "media",
-      "patrimonio_base": "media"
-     },
-     {
-      "al": "2023-12-31",
-      "roic": 0.0287,
-      "roe": 0.0605,
-      "capitale_base": "media",
-      "patrimonio_base": "media"
-     },
-     {
-      "al": "2022-12-31",
-      "roic": 0.0017,
-      "roe": 0.0153,
-      "capitale_base": "fine",
-      "patrimonio_base": "fine"
-     }
-    ],
-    "valuta": "CAD"
-   },
+   "rendimento": null,
    "fuori_mercato": {
     "settimane": [
      {
@@ -78286,14 +78255,6 @@
       "margine_op": 9.2
      },
      {
-      "trim": "2026-06-30",
-      "ricavi": 813772000,
-      "utile": 25219000,
-      "operativo": 74139000,
-      "margine": 3.1,
-      "margine_op": 9.1
-     },
-     {
       "trim": "2026-03-31",
       "ricavi": 845365000,
       "utile": 130751000,
@@ -78316,6 +78277,14 @@
       "operativo": 82511000,
       "margine": -0.0,
       "margine_op": 13.4
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 877016000,
+      "utile": 320888000,
+      "operativo": 156260000,
+      "margine": 36.6,
+      "margine_op": 17.8
      }
     ]
    },
@@ -79061,7 +79030,7 @@
      205.8,
      205.09,
      210.79,
-     211.86,
+     211.87,
      214.11,
      207.09,
      208.87,
@@ -79118,9 +79087,9 @@
     "float_pct": 99.6,
     "avg_volume_30d": 3341037.0,
     "pe_ttm": null,
-    "forward_pe": 20.8139,
+    "forward_pe": 20.5895,
     "eps_ttm": -1.29,
-    "eps_forward": 10.0894,
+    "eps_forward": 10.1994,
     "revenue_fy": 6409699840.0,
     "net_income_fy": -240500000.0,
     "revenue_growth": -0.156,
@@ -79172,15 +79141,15 @@
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 136900000.0,
+    "oneri_ttm": 189300000.0,
     "ebit_ttm": -60700000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "copertura": -0.44,
-    "oneri_var_4trim_pct": -22.4,
+    "copertura": -0.32,
+    "oneri_var_4trim_pct": -19.3,
     "oneri_trim": [
-     38900000,
      37400000,
+     91300000,
      30400000,
      30200000
     ],
@@ -90849,7 +90818,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "XOM",
-    "entita": "XOM",
+    "entita": "Exxon Mobil Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.7939,
@@ -91414,7 +91383,7 @@
      40.75,
      41.92,
      40.05,
-     36.23,
+     36.22,
      38.7,
      36.23,
      34.54,
@@ -93072,7 +93041,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CVX",
-    "entita": "CVX",
+    "entita": "Chevron Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8335,
@@ -95292,7 +95261,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COP",
-    "entita": "COP",
+    "entita": "ConocoPhillips",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1836,
@@ -97169,7 +97138,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ABBVINC",
-    "entita": "ABBVINC",
+    "entita": "ABBVIE INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.9754,
@@ -102106,7 +102075,7 @@
      211.27,
      198.17,
      237.69,
-     253.54,
+     253.53,
      232.5,
      223.44,
      206.89,
@@ -103592,7 +103561,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMGN",
-    "entita": "AMGN",
+    "entita": "Amgen Inc.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.2213,
@@ -109270,10 +109239,7 @@
    "rs_ndx_1m": 4.8,
    "cds": {
     "stato": "assente",
-    "verificato": "2026-10-17",
-    "candidati": [
-     "PHILIP"
-    ]
+    "verificato": "2026-10-17"
    },
    "short_interest": {
     "stato": "misurato",
@@ -109914,7 +109880,7 @@
      324.5,
      348.61,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -110215,9 +110181,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 1227012.0,
     "pe_ttm": 33.866,
-    "forward_pe": 26.5924,
+    "forward_pe": 26.5767,
     "eps_ttm": 17.99,
-    "eps_forward": 22.9107,
+    "eps_forward": 22.9242,
     "revenue_fy": 47927001088.0,
     "net_income_fy": 4872999936.0,
     "revenue_growth": 0.049,
@@ -111152,7 +111118,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -111422,7 +111388,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "DE",
-    "entita": "DE",
+    "entita": "Deere & Co",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.4984,
@@ -113645,7 +113611,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "THWALT",
-    "entita": "THWALT",
+    "entita": "Walt Disney Co.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8648,
@@ -115859,7 +115825,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "PFE",
-    "entita": "PFE",
+    "entita": "Pfizer Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1789,
@@ -116267,7 +116233,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -116318,7 +116284,7 @@
      128.42,
      130.68,
      128.64,
-     125.47,
+     125.48,
      125.9,
      131.91,
      136.18,
@@ -116399,7 +116365,7 @@
      164.55,
      200.71,
      230.8,
-     237.33,
+     237.32,
      279.61,
      287.31,
      306.16,
@@ -116747,25 +116713,25 @@
     "debito": 480188000000.0,
     "patrimonio": 124929000000.0,
     "bilancio_al": "2026-09-30",
-    "ocf_ttm": -37858000000.0,
-    "capex_ttm": -2123000000.0,
+    "ocf_ttm": -41283000000.0,
+    "capex_ttm": -2179000000.0,
     "trimestri": 4,
     "cashflow_al": "2026-09-30",
-    "fcf_ttm": -39981000000.0,
-    "mesi_capex": 1142.5,
-    "mesi_operativi": 64.1,
+    "fcf_ttm": -43462000000.0,
+    "mesi_capex": 1113.2,
+    "mesi_operativi": 58.8,
     "debito_netto": 278057000000.0,
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 70869000000.0,
+    "oneri_ttm": 69746000000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "oneri_var_4trim_pct": 14.1,
+    "oneri_var_4trim_pct": 12.1,
     "oneri_trim": [
+     16970000000,
      16671000000,
      17082000000,
-     18093000000,
      19023000000
     ],
     "debito_corrente": 114076000000.0,
@@ -116784,10 +116750,10 @@
     },
     "ocf_ultimo_trim": 4181000000.0,
     "ocf_ultimo_al": "2026-09-30",
-    "utile_12m": 22169000000.0,
-    "ricavi_12m": 69698000000.0,
-    "riacquisti_12m": -17875000000.0,
-    "dividendi_12m": -6307000000.0,
+    "utile_12m": 19639000000.0,
+    "ricavi_12m": 64544000000.0,
+    "riacquisti_12m": -15200000000.0,
+    "dividendi_12m": -6180000000.0,
     "trimestri": {
      "utile_12m": 4,
      "ricavi_12m": 4,
@@ -117853,14 +117819,6 @@
       "margine_op": null
      },
      {
-      "trim": "2026-06-30",
-      "ricavi": 20338000000,
-      "utile": 6628000000,
-      "operativo": null,
-      "margine": 32.6,
-      "margine_op": null
-     },
-     {
       "trim": "2026-03-31",
       "ricavi": 17227000000,
       "utile": 5630000000,
@@ -117883,6 +117841,14 @@
       "operativo": null,
       "margine": 27.0,
       "margine_op": null
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 14583000000,
+      "utile": 3723000000,
+      "operativo": null,
+      "margine": 25.5,
+      "margine_op": null
      }
     ]
    },
@@ -117892,7 +117858,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "GS",
-    "entita": "GS",
+    "entita": "Goldman Sachs Gp Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.4117,
@@ -120093,7 +120059,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "JPM",
-    "entita": "JPM",
+    "entita": "JPMorgan Chase & Co",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.2999,
@@ -120418,7 +120384,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120451,7 +120417,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -120646,7 +120612,7 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
@@ -122772,11 +122738,11 @@
      173.12,
      190.03,
      218.36,
-     231.66,
+     231.67,
      246.53,
      220.53,
      243.16,
-     237.51,
+     237.52,
      264.5,
      234.98,
      240.34,
@@ -122801,7 +122767,7 @@
      525.54,
      541.98,
      579.35,
-     571.39,
+     571.4,
      632.85,
      740.07,
      763.92,
@@ -123022,7 +122988,7 @@
      1351.65,
      1346.22,
      1345.18,
-     1348.46
+     1348.43
     ]
    },
    "earnings_date": null,
@@ -124832,9 +124798,9 @@
     "float_pct": 92.6,
     "avg_volume_30d": 8308146.0,
     "pe_ttm": 16.164,
-    "forward_pe": 9.0722,
+    "forward_pe": 9.101,
     "eps_ttm": 17.2,
-    "eps_forward": 30.6453,
+    "eps_forward": 30.5484,
     "revenue_fy": 151197007872.0,
     "net_income_fy": 11377999872.0,
     "revenue_growth": 0.577,
@@ -126032,7 +125998,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "DELLN",
-    "entita": "DELLN",
+    "entita": "Dell Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.6057,
@@ -128349,13 +128315,13 @@
      169.27,
      168.21,
      166.88,
-     164.93,
+     164.92,
      165.45,
      163.58,
      164.71,
      165.14,
      165.44,
-     165.76,
+     165.79,
      165.14,
      164.97,
      165.22,
@@ -131815,7 +131781,10 @@
    "rs_ndx_1m": 9.5,
    "cds": {
     "stato": "assente",
-    "verificato": "2026-10-17"
+    "verificato": "2026-10-17",
+    "candidati": [
+     "NOVO BCO SA"
+    ]
    },
    "short_interest": {
     "stato": "misurato",
@@ -133958,7 +133927,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NXTENG",
-    "entita": "NXTENG",
+    "entita": "NextEra Energy Cap Hldgs Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.4359,
@@ -135780,7 +135749,7 @@
   },
   {
    "ticker": "ANT",
-   "name": "Anthropic, PBC",
+   "name": "Anthropic, PBC Class A Common Stock",
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
@@ -135846,7 +135815,7 @@
      87.14,
      87.32,
      86.32,
-     86.08,
+     86.09,
      85.0,
      84.55,
      84.98,
@@ -135870,7 +135839,7 @@
      87.54,
      85.83,
      86.33,
-     87.67
+     87.65
     ]
    },
    "earnings_date": null,
@@ -145425,11 +145394,25 @@
   "news": {
    "voci": [
     {
-     "titolo": "Goldman Sachs, Apollo Price $32 Billion SpaceX Bonds to Fund AI Chip Purchases",
-     "riassunto": "Goldman Sachs Group Inc. spent more than a year trying to solve one of tech’s biggest headaches: how to pay for AI chips without wrecking corporate balance sheets.",
+     "titolo": "Corporate America hunts for ‘generational’ growth in AI, trading cards and the L.A. airport",
+     "riassunto": "There’s been no shortage of trends deemed once-in-a-generation by executives on earnings calls.",
+     "fonte": "MarketWatch",
+     "quando": "2026-11-22T15:01:00Z",
+     "url": "https://www.marketwatch.com/story/corporate-america-hunts-for-generational-growth-in-ai-trading-cards-and-the-l-a-airport-3072eb1a?mod=mw_rss_topstories"
+    },
+    {
+     "titolo": "Fed’s Inflation Fight May Require More Hikes",
+     "riassunto": "Neil Dutta, head of US economic research at Renaissance Macro Research, tells Bloomberg This Weekend that the Federal Reserve made a mistake by holding rates steady in October and may need multiple hikes as inflation remains stubbornly above its 2% target. Speaking with hosts David Gura and Christina Ruffini, Dutta say",
      "fonte": "Bloomberg",
-     "quando": "2026-11-21T15:31:22Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-11-21/goldman-s-spacex-pitch-helps-solve-ai-debt-puzzle-credit-weekly"
+     "quando": "2026-11-22T14:19:26Z",
+     "url": "https://www.bloomberg.com/news/videos/2026-11-22/fed-s-inflation-fight-may-require-more-hikes-video"
+    },
+    {
+     "titolo": "Oil Shock Response Sets Emerging-Market Bond Winners and Losers",
+     "riassunto": "Fuel subsidies are driving a widening divide in emerging markets, with investors favoring bonds from nations that have taken the painful steps to curb them.",
+     "fonte": "Bloomberg",
+     "quando": "2026-11-22T13:30:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-22/oil-shock-response-sets-emerging-market-bond-winners-and-losers"
     },
     {
      "titolo": "Tech outages are fueling a new doomsday economy",
@@ -145535,29 +145518,14 @@
      "fonte": "CNBC Economia",
      "quando": "2026-11-10T23:53:58Z",
      "url": "https://www.cnbc.com/2026/11/10/cpi-inflation-report-october-2026.html"
-    },
-    {
-     "titolo": "China's goods surplus tops $1 trillion for a second year amid calls for Beijing to rebalance trade",
-     "riassunto": "China's trade surplus topped $1 trillion as of October, potentially intensifying complaints from trading partners already wary over the glut of cheap Chinese goods.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-11-10T10:24:13Z",
-     "url": "https://www.cnbc.com/2026/11/10/china-trade-october-exports-imports-surplus-.html"
-    },
-    {
-     "titolo": "3 unexpected reasons the October jobs report was so strong",
-     "riassunto": "October's jobs report blew past economist forecasts. Here are three reasons.",
-     "fonte": "CNBC Economia",
-     "quando": "2026-11-09T22:23:56Z",
-     "url": "https://www.cnbc.com/2026/11/09/october-jobs-report-hiring-by-sector.html"
     }
    ],
    "fonti": [
     "CNBC Economia",
-    "Bloomberg"
-   ],
-   "fonti_mute": [
+    "Bloomberg",
     "MarketWatch"
    ],
+   "fonti_mute": [],
    "fonti_non_lette": [],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
   },
@@ -153663,7 +153631,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 61
+     "score": 62
     },
     {
      "label": "Treasury 10A",
@@ -153893,7 +153861,7 @@
       "qqq": 58.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-11-20",
     "price": 177.24,
     "d1": -0.12,
@@ -154142,7 +154110,7 @@
       "qqq": 58.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-11-20",
     "price": 112.46,
     "d1": -2.95,
@@ -154308,7 +154276,7 @@
       "qqq": 58.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-11-20",
     "price": 199.54,
     "d1": -2.05,
@@ -154391,7 +154359,7 @@
       "qqq": 58.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-11-20",
     "price": 78.62,
     "d1": -2.76,
@@ -155195,7 +155163,7 @@
       "qqq": 58.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-11-20",
     "price": 149.01,
     "d1": -7.27,
@@ -155444,7 +155412,7 @@
       "qqq": 58.9
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-11-20",
     "price": 400.06,
     "d1": -10.6,
@@ -158842,14 +158810,14 @@
   "cds": {
    "fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
    "url": "https://www.ice.com/api/cds-settlement-prices/icc-single-names",
-   "letto": false,
-   "errore": "HTTP 403",
+   "letto": true,
+   "errore": null,
    "data": "2026-11-20",
    "date": {
-    "2026-11-20": 437
+    "2026-11-20": 697
    },
    "scadenza": "2031-12-20",
-   "entita_ice": null,
+   "entita_ice": 697,
    "tasso_pct": 3.88,
    "tasso_fonte": "EFFR del 2026-11-19 (NY Fed), proxy della curva SOFR della convenzione ISDA",
    "recupero": 0.4,
@@ -158858,8 +158826,8 @@
     "HY": {
      "serie": 47,
      "versione": 1,
-     "cedola": 500,
      "prezzo": 104.6319,
+     "cedola": 500,
      "data": "2026-11-20",
      "pb": 383.8,
      "var": {
@@ -158876,8 +158844,8 @@
     "IG": {
      "serie": 47,
      "versione": 1,
-     "cedola": 100,
      "prezzo": 101.5558,
+     "cedola": 100,
      "data": "2026-11-20",
      "pb": 65.6,
      "var": {
@@ -158920,7 +158888,12 @@
      "2026-10-22": "data.json del run delle 20:59 UTC (commit 20f3175)"
     }
    },
-   "unione": null,
+   "unione": {
+    "nuove": [],
+    "completate": {},
+    "difformi": 0,
+    "fuori_ordine": []
+   },
    "verificato": "2026-10-17",
    "sessione": null,
    "assenti": [
@@ -159098,6 +159071,13 @@
    "per_titolo": {
     "AMD": [
      {
+      "titolo": "Stocks Meltdown as AI Trade Unravels",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:50:08Z",
+      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+     },
+     {
       "titolo": "AMD Stock Just Plunged on a Short-Seller Report. Is This a Golden Buying Opportunity?",
       "riassunto": "Key PointsHunterbrook alleges AMD firmware reached a blacklisted Chinese company.",
       "fonte": "Nasdaq",
@@ -159110,13 +159090,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-22T03:20:02Z",
       "url": "https://www.nasdaq.com/articles/billionaire-david-tepper-just-made-massive-ai-chip-rotation-will-it-pay"
-     },
-     {
-      "titolo": "Stocks Meltdown as AI Trade Unravels",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T22:16:18Z",
-      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
       "titolo": "AMD’s Data Center Sales Jumped 97%. Is the Stock a Buy?",
@@ -159142,18 +159115,32 @@
     ],
     "ANT": [
      {
+      "titolo": "Stocks Meltdown as AI Trade Unravels",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:50:08Z",
+      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+     },
+     {
+      "titolo": "Why Broadcom Stock Could Double by 2030",
+      "riassunto": "Key PointsAI demand is driving rapid growth at Broadcom, yet the stock has lagged on financing and data center delays.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:20:02Z",
+      "url": "https://www.nasdaq.com/articles/why-broadcom-stock-could-double-2030"
+     },
+     {
+      "titolo": "Prediction: Anthropic Will Be the World’s Most Valuable Company by 2030",
+      "riassunto": "Key PointsAnthropic’s first trade valued it at about $2 trillion, a level one major investor didn’t expect it to reach until 2030.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T13:38:02Z",
+      "url": "https://www.nasdaq.com/articles/prediction-anthropic-will-be-worlds-most-valuable-company-2030"
+     },
+     {
       "titolo": "Prediction: Some Anthropic Investors Are About to Learn an Expensive Lesson",
       "riassunto": "Key PointsAnthropic secured more than $81 billion in funding, making it the largest IPO on record.",
       "fonte": "Nasdaq",
       "quando": "2026-11-22T01:01:38Z",
       "url": "https://www.nasdaq.com/articles/prediction-some-anthropic-investors-are-about-learn-expensive-lesson"
-     },
-     {
-      "titolo": "Stocks Meltdown as AI Trade Unravels",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T22:16:18Z",
-      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
       "titolo": "Better Recent IPO: SpaceX or Anthropic?",
@@ -159168,23 +159155,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-21T15:46:01Z",
       "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
-     },
-     {
-      "titolo": "Not Anthropic. Not SpaceX. This Is the AI Stock to Buy for the Long Term",
-      "riassunto": "Key PointsMore and more products will have AI embedded, and that's great news for power and sensory chip providers like On Semiconductor.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T14:42:02Z",
-      "url": "https://www.nasdaq.com/articles/not-anthropic-not-spacex-ai-stock-buy-long-term"
-     },
-     {
-      "titolo": "Should You Really Buy Anthropic Stock After Its Historic IPO? History Offers a Clear Answer.",
-      "riassunto": "Key PointsAnthropic completed its initial public offering (IPO) on Nov. 19, raising a record $81.3 billion at a valuation of approximately $1.5 trillion.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T09:44:02Z",
-      "url": "https://www.nasdaq.com/articles/should-you-really-buy-anthropic-stock-after-its-historic-ipo-history-offers-clear-answer"
      }
     ],
     "BE": [
+     {
+      "titolo": "Bloom Energy Stock Has Crashed Nearly 60%. Is It a Once-in-a-Decade Opportunity at $145, or Should You Keep Waiting for a Bigger Drop?",
+      "riassunto": "Key PointsRevenue rose 138% to $1.2 billion in the third quarter, and management raised full-year guidance for the third time this year.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:36:02Z",
+      "url": "https://www.nasdaq.com/articles/bloom-energy-stock-has-crashed-nearly-60-it-once-decade-opportunity-145-or-should-you-keep"
+     },
      {
       "titolo": "Should You Invest $1,000 in Bloom Energy Right Now?",
       "riassunto": "Key PointsBloom doubled revenue last quarter and raised its full-year 2026 outlook yet again.",
@@ -159219,13 +159199,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-20T13:12:00Z",
       "url": "https://www.nasdaq.com/articles/zacks-investment-ideas-feature-highlights-anthropic-spacex-amazon-vertiv-and-bloom-energy"
-     },
-     {
-      "titolo": "Stocks Erase Early Gains as Anthropic Optimism Fades",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.12% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.89%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.20%. December E-mini S&P futures (ESZ26 ) are down -0.20%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-20T00:14:31Z",
-      "url": "https://www.nasdaq.com/articles/stocks-erase-early-gains-anthropic-optimism-fades"
      }
     ],
     "CRWV": [
@@ -159233,7 +159206,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T22:16:18Z",
+      "quando": "2026-11-22T14:50:08Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -159277,7 +159250,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T22:16:18Z",
+      "quando": "2026-11-22T14:50:08Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -159362,6 +159335,13 @@
     ],
     "MU": [
      {
+      "titolo": "Stocks Meltdown as AI Trade Unravels",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:50:08Z",
+      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+     },
+     {
       "titolo": "Where Will Micron Stock Be in 3 Years?",
       "riassunto": "Micron Technology (NASDAQ:MU) has lost nearly half its market cap in five months. That's the bad news. The good news is that the semiconductor stock is still up nearly 120% year-to-date.",
       "fonte": "Nasdaq",
@@ -159383,13 +159363,6 @@
       "url": "https://www.nasdaq.com/articles/should-you-forget-nvidia-and-buy-these-2-ai-memory-stocks-instead"
      },
      {
-      "titolo": "Stocks Meltdown as AI Trade Unravels",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T22:16:18Z",
-      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
-     },
-     {
       "titolo": "Micron Stock Just Hit Its Lowest Price Since May. I'd Buy More Now.",
       "riassunto": "Key PointsMicron stock closed near $595 on Nov. 20, less than half the $1,213.56 record close it set on June 25.",
       "fonte": "Nasdaq",
@@ -159406,6 +159379,34 @@
     ],
     "NVDA": [
      {
+      "titolo": "Stocks Meltdown as AI Trade Unravels",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:50:08Z",
+      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+     },
+     {
+      "titolo": "Is Nvidia a Buy at $125? Here's My Honest Take",
+      "riassunto": "Key PointsNvidia just had its worst week since 2008, tumbling 23%.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:50:02Z",
+      "url": "https://www.nasdaq.com/articles/nvidia-buy-125-heres-my-honest-take"
+     },
+     {
+      "titolo": "Prediction: Anthropic Will Be the World’s Most Valuable Company by 2030",
+      "riassunto": "Key PointsAnthropic’s first trade valued it at about $2 trillion, a level one major investor didn’t expect it to reach until 2030.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T13:38:02Z",
+      "url": "https://www.nasdaq.com/articles/prediction-anthropic-will-be-worlds-most-valuable-company-2030"
+     },
+     {
+      "titolo": "SOXX and DRAM Are Down Between 35.6% and 51.9% From Their Highs. Here’s an Even Better Growth Stock ETF to Buy During the Nasdaq Correction.",
+      "riassunto": "Key PointsJensen Huang’s resignation as Nvidia’s CEO has accelerated the sell-off in semiconductor stocks.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T13:35:02Z",
+      "url": "https://www.nasdaq.com/articles/soxx-and-dram-are-down-between-356-and-519-their-highs-heres-even-better-growth-stock-etf"
+     },
+     {
       "titolo": "Nvidia Just Delivered Incredible Results. Buy This Artificial Intelligence (AI) Stock Instead If You’re Still Worried About the Semiconductor Giant’s Future",
       "riassunto": "Key PointsNvidia delivered impressive results and guidance, but concerns about the company's future continue to weigh on the stock.",
       "fonte": "Nasdaq",
@@ -159418,37 +159419,16 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-22T05:20:02Z",
       "url": "https://www.nasdaq.com/articles/where-will-nvidia-stock-be-20-years-answer-might-surprise-you"
-     },
-     {
-      "titolo": "Billionaire David Tepper Just Made a Massive AI Chip Rotation — Will It Pay Off?",
-      "riassunto": "Key PointsNvidia faces pressure as its CUDA moat weakens, which should benefit Alphabet, Broadcom, and AMD.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-22T03:20:02Z",
-      "url": "https://www.nasdaq.com/articles/billionaire-david-tepper-just-made-massive-ai-chip-rotation-will-it-pay"
-     },
-     {
-      "titolo": "Should You Forget Nvidia and Buy These 2 AI Memory Stocks Instead?",
-      "riassunto": "Key PointsNvidia has a lot of headline risks associated with it right now.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-22T01:23:02Z",
-      "url": "https://www.nasdaq.com/articles/should-you-forget-nvidia-and-buy-these-2-ai-memory-stocks-instead"
-     },
-     {
-      "titolo": "Nvidia Without Jensen Huang: 3 Things That Could Go Right and 3 That Could Go Wrong",
-      "riassunto": "Key PointsNvidia stock still has the potential to perform well if things go right.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-22T00:01:01Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-without-jensen-huang-3-things-could-go-right-and-3-could-go-wrong"
-     },
-     {
-      "titolo": "Alphabet Stock Just Hit a 1-Year Low. Why Is Google's Parent Borrowing So Much Money?",
-      "riassunto": "Key PointsAlphabet sold €6 billion and C$6 billion of bonds in November, about $10.9 billion combined, adding to a borrowing spree that has nearly tripled its long-term debt this year.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T23:20:48Z",
-      "url": "https://www.nasdaq.com/articles/alphabet-stock-just-hit-1-year-low-why-googles-parent-borrowing-so-much-money"
      }
     ],
     "ORCL": [
+     {
+      "titolo": "Stocks Meltdown as AI Trade Unravels",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T14:50:08Z",
+      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+     },
      {
       "titolo": "Should You Invest $1,000 in Bloom Energy Right Now?",
       "riassunto": "Key PointsBloom doubled revenue last quarter and raised its full-year 2026 outlook yet again.",
@@ -159462,13 +159442,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-22T00:00:25Z",
       "url": "https://www.nasdaq.com/articles/intuit-vs-oracle-which-technology-stock-better-buy-2027"
-     },
-     {
-      "titolo": "Stocks Meltdown as AI Trade Unravels",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T22:16:18Z",
-      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
       "titolo": "Oracle Corporation Reports Results of 2026 Annual Meeting of Stockholders",
@@ -159585,7 +159558,7 @@
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-21T22:16:18Z",
+      "quando": "2026-11-22T14:50:08Z",
       "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
      },
      {
@@ -159648,13 +159621,20 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-22T12:58:50Z"
+   "letto_il": "2026-11-22T16:02:25Z"
   }
  },
  "broker": null,
  "news_titoli": {
   "per_titolo": {
    "AMD": [
+    {
+     "titolo": "Stocks Meltdown as AI Trade Unravels",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:50:08Z",
+     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+    },
     {
      "titolo": "AMD Stock Just Plunged on a Short-Seller Report. Is This a Golden Buying Opportunity?",
      "riassunto": "Key PointsHunterbrook alleges AMD firmware reached a blacklisted Chinese company.",
@@ -159668,13 +159648,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-22T03:20:02Z",
      "url": "https://www.nasdaq.com/articles/billionaire-david-tepper-just-made-massive-ai-chip-rotation-will-it-pay"
-    },
-    {
-     "titolo": "Stocks Meltdown as AI Trade Unravels",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T22:16:18Z",
-     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
      "titolo": "AMD’s Data Center Sales Jumped 97%. Is the Stock a Buy?",
@@ -159700,18 +159673,32 @@
    ],
    "ANT": [
     {
+     "titolo": "Stocks Meltdown as AI Trade Unravels",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:50:08Z",
+     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+    },
+    {
+     "titolo": "Why Broadcom Stock Could Double by 2030",
+     "riassunto": "Key PointsAI demand is driving rapid growth at Broadcom, yet the stock has lagged on financing and data center delays.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:20:02Z",
+     "url": "https://www.nasdaq.com/articles/why-broadcom-stock-could-double-2030"
+    },
+    {
+     "titolo": "Prediction: Anthropic Will Be the World’s Most Valuable Company by 2030",
+     "riassunto": "Key PointsAnthropic’s first trade valued it at about $2 trillion, a level one major investor didn’t expect it to reach until 2030.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T13:38:02Z",
+     "url": "https://www.nasdaq.com/articles/prediction-anthropic-will-be-worlds-most-valuable-company-2030"
+    },
+    {
      "titolo": "Prediction: Some Anthropic Investors Are About to Learn an Expensive Lesson",
      "riassunto": "Key PointsAnthropic secured more than $81 billion in funding, making it the largest IPO on record.",
      "fonte": "Nasdaq",
      "quando": "2026-11-22T01:01:38Z",
      "url": "https://www.nasdaq.com/articles/prediction-some-anthropic-investors-are-about-learn-expensive-lesson"
-    },
-    {
-     "titolo": "Stocks Meltdown as AI Trade Unravels",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T22:16:18Z",
-     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
      "titolo": "Better Recent IPO: SpaceX or Anthropic?",
@@ -159726,23 +159713,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-21T15:46:01Z",
      "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
-    },
-    {
-     "titolo": "Not Anthropic. Not SpaceX. This Is the AI Stock to Buy for the Long Term",
-     "riassunto": "Key PointsMore and more products will have AI embedded, and that's great news for power and sensory chip providers like On Semiconductor.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T14:42:02Z",
-     "url": "https://www.nasdaq.com/articles/not-anthropic-not-spacex-ai-stock-buy-long-term"
-    },
-    {
-     "titolo": "Should You Really Buy Anthropic Stock After Its Historic IPO? History Offers a Clear Answer.",
-     "riassunto": "Key PointsAnthropic completed its initial public offering (IPO) on Nov. 19, raising a record $81.3 billion at a valuation of approximately $1.5 trillion.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T09:44:02Z",
-     "url": "https://www.nasdaq.com/articles/should-you-really-buy-anthropic-stock-after-its-historic-ipo-history-offers-clear-answer"
     }
    ],
    "BE": [
+    {
+     "titolo": "Bloom Energy Stock Has Crashed Nearly 60%. Is It a Once-in-a-Decade Opportunity at $145, or Should You Keep Waiting for a Bigger Drop?",
+     "riassunto": "Key PointsRevenue rose 138% to $1.2 billion in the third quarter, and management raised full-year guidance for the third time this year.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:36:02Z",
+     "url": "https://www.nasdaq.com/articles/bloom-energy-stock-has-crashed-nearly-60-it-once-decade-opportunity-145-or-should-you-keep"
+    },
     {
      "titolo": "Should You Invest $1,000 in Bloom Energy Right Now?",
      "riassunto": "Key PointsBloom doubled revenue last quarter and raised its full-year 2026 outlook yet again.",
@@ -159777,13 +159757,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-20T13:12:00Z",
      "url": "https://www.nasdaq.com/articles/zacks-investment-ideas-feature-highlights-anthropic-spacex-amazon-vertiv-and-bloom-energy"
-    },
-    {
-     "titolo": "Stocks Erase Early Gains as Anthropic Optimism Fades",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down -0.12% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -0.89%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.20%. December E-mini S&P futures (ESZ26 ) are down -0.20%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-20T00:14:31Z",
-     "url": "https://www.nasdaq.com/articles/stocks-erase-early-gains-anthropic-optimism-fades"
     }
    ],
    "CRWV": [
@@ -159791,7 +159764,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T22:16:18Z",
+     "quando": "2026-11-22T14:50:08Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -159835,7 +159808,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T22:16:18Z",
+     "quando": "2026-11-22T14:50:08Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -159920,6 +159893,13 @@
    ],
    "MU": [
     {
+     "titolo": "Stocks Meltdown as AI Trade Unravels",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:50:08Z",
+     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+    },
+    {
      "titolo": "Where Will Micron Stock Be in 3 Years?",
      "riassunto": "Micron Technology (NASDAQ:MU) has lost nearly half its market cap in five months. That's the bad news. The good news is that the semiconductor stock is still up nearly 120% year-to-date.",
      "fonte": "Nasdaq",
@@ -159941,13 +159921,6 @@
      "url": "https://www.nasdaq.com/articles/should-you-forget-nvidia-and-buy-these-2-ai-memory-stocks-instead"
     },
     {
-     "titolo": "Stocks Meltdown as AI Trade Unravels",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T22:16:18Z",
-     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
-    },
-    {
      "titolo": "Micron Stock Just Hit Its Lowest Price Since May. I'd Buy More Now.",
      "riassunto": "Key PointsMicron stock closed near $595 on Nov. 20, less than half the $1,213.56 record close it set on June 25.",
      "fonte": "Nasdaq",
@@ -159964,6 +159937,34 @@
    ],
    "NVDA": [
     {
+     "titolo": "Stocks Meltdown as AI Trade Unravels",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:50:08Z",
+     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+    },
+    {
+     "titolo": "Is Nvidia a Buy at $125? Here's My Honest Take",
+     "riassunto": "Key PointsNvidia just had its worst week since 2008, tumbling 23%.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:50:02Z",
+     "url": "https://www.nasdaq.com/articles/nvidia-buy-125-heres-my-honest-take"
+    },
+    {
+     "titolo": "Prediction: Anthropic Will Be the World’s Most Valuable Company by 2030",
+     "riassunto": "Key PointsAnthropic’s first trade valued it at about $2 trillion, a level one major investor didn’t expect it to reach until 2030.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T13:38:02Z",
+     "url": "https://www.nasdaq.com/articles/prediction-anthropic-will-be-worlds-most-valuable-company-2030"
+    },
+    {
+     "titolo": "SOXX and DRAM Are Down Between 35.6% and 51.9% From Their Highs. Here’s an Even Better Growth Stock ETF to Buy During the Nasdaq Correction.",
+     "riassunto": "Key PointsJensen Huang’s resignation as Nvidia’s CEO has accelerated the sell-off in semiconductor stocks.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T13:35:02Z",
+     "url": "https://www.nasdaq.com/articles/soxx-and-dram-are-down-between-356-and-519-their-highs-heres-even-better-growth-stock-etf"
+    },
+    {
      "titolo": "Nvidia Just Delivered Incredible Results. Buy This Artificial Intelligence (AI) Stock Instead If You’re Still Worried About the Semiconductor Giant’s Future",
      "riassunto": "Key PointsNvidia delivered impressive results and guidance, but concerns about the company's future continue to weigh on the stock.",
      "fonte": "Nasdaq",
@@ -159976,37 +159977,16 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-22T05:20:02Z",
      "url": "https://www.nasdaq.com/articles/where-will-nvidia-stock-be-20-years-answer-might-surprise-you"
-    },
-    {
-     "titolo": "Billionaire David Tepper Just Made a Massive AI Chip Rotation — Will It Pay Off?",
-     "riassunto": "Key PointsNvidia faces pressure as its CUDA moat weakens, which should benefit Alphabet, Broadcom, and AMD.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-22T03:20:02Z",
-     "url": "https://www.nasdaq.com/articles/billionaire-david-tepper-just-made-massive-ai-chip-rotation-will-it-pay"
-    },
-    {
-     "titolo": "Should You Forget Nvidia and Buy These 2 AI Memory Stocks Instead?",
-     "riassunto": "Key PointsNvidia has a lot of headline risks associated with it right now.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-22T01:23:02Z",
-     "url": "https://www.nasdaq.com/articles/should-you-forget-nvidia-and-buy-these-2-ai-memory-stocks-instead"
-    },
-    {
-     "titolo": "Nvidia Without Jensen Huang: 3 Things That Could Go Right and 3 That Could Go Wrong",
-     "riassunto": "Key PointsNvidia stock still has the potential to perform well if things go right.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-22T00:01:01Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-without-jensen-huang-3-things-could-go-right-and-3-could-go-wrong"
-    },
-    {
-     "titolo": "Alphabet Stock Just Hit a 1-Year Low. Why Is Google's Parent Borrowing So Much Money?",
-     "riassunto": "Key PointsAlphabet sold €6 billion and C$6 billion of bonds in November, about $10.9 billion combined, adding to a borrowing spree that has nearly tripled its long-term debt this year.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T23:20:48Z",
-     "url": "https://www.nasdaq.com/articles/alphabet-stock-just-hit-1-year-low-why-googles-parent-borrowing-so-much-money"
     }
    ],
    "ORCL": [
+    {
+     "titolo": "Stocks Meltdown as AI Trade Unravels",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T14:50:08Z",
+     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
+    },
     {
      "titolo": "Should You Invest $1,000 in Bloom Energy Right Now?",
      "riassunto": "Key PointsBloom doubled revenue last quarter and raised its full-year 2026 outlook yet again.",
@@ -160020,13 +160000,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-22T00:00:25Z",
      "url": "https://www.nasdaq.com/articles/intuit-vs-oracle-which-technology-stock-better-buy-2027"
-    },
-    {
-     "titolo": "Stocks Meltdown as AI Trade Unravels",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T22:16:18Z",
-     "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
      "titolo": "Oracle Corporation Reports Results of 2026 Annual Meeting of Stockholders",
@@ -160143,7 +160116,7 @@
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-21T22:16:18Z",
+     "quando": "2026-11-22T14:50:08Z",
      "url": "https://www.nasdaq.com/articles/stocks-meltdown-ai-trade-unravels"
     },
     {
@@ -160206,12 +160179,12 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-22T12:58:50Z"
+  "letto_il": "2026-11-22T16:02:25Z"
  },
  "predictions": [
   {
    "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
-   "yes": 6,
+   "yes": 7,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
   },
   {
@@ -160220,24 +160193,24 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
   },
   {
-   "question": "Will Jensen Huang rejoin NVIDIA by December 31, 2026?",
-   "yes": 6,
-   "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $58,000 on November 22?",
-   "yes": 99,
-   "link": "https://polymarket.com/event/bitcoin-above-58k-on-november-22-2026"
-  },
-  {
    "question": "Will there be no new be CEO of NVIDIA by December 31, 2028?",
-   "yes": 10,
+   "yes": 9,
    "link": "https://polymarket.com/event/will-candidate-a-be-the-next-ceo-of-nvidia"
   },
   {
-   "question": "Will Bitcoin dip to $55,000 in November?",
-   "yes": 27,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-55k-in-november-2026"
+   "question": "Will the price of Bitcoin be above $58,000 on November 22?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-58k-on-november-22-2026"
+  },
+  {
+   "question": "Will Bitcoin dip to $40,000 by December 31, 2026?",
+   "yes": 9,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-40000-by-december-31-2026-593-522-842-874-931-776-991-167-531-959"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $62,000 on November 22?",
+   "yes": 2,
+   "link": "https://polymarket.com/event/bitcoin-above-62k-on-november-22-2026"
   }
  ],
  "options": {
@@ -167693,7 +167666,7 @@
      ],
      "call_wall": 1600.0,
      "put_wall": 1300.0,
-     "opt_volume": 8302
+     "opt_volume": 8296
     },
     {
      "date": "2026-12-04",
@@ -214643,7 +214616,7 @@
      ],
      "call_wall": 400.0,
      "put_wall": 260.0,
-     "opt_volume": 3604
+     "opt_volume": 3605
     },
     {
      "date": "2026-12-11",
@@ -237218,7 +237191,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 21 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -237258,7 +237231,7 @@
     "age_days": 2,
     "max_age": 5,
     "status": "ok",
-    "note": "ICE non letto in questo run (HTTP 403): vale l'ultimo giorno raccolto"
+    "note": ""
    },
    {
     "key": "short_interest",
@@ -237302,6 +237275,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-22T12:58:51Z"
+  "generated_at": "2026-11-22T16:02:27Z"
  }
 }
