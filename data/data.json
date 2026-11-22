@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-22T20:29:12Z",
+ "updated_at": "2026-11-22T20:51:54Z",
  "eurusd": 1.097,
  "totals": {
   "usd_value": 0,
@@ -18555,11 +18555,11 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 60525.12,
+   "price": 60553.34,
    "price_asof": "2026-11-22",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.72,
+   "change_pct": 0.76,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -52.0,
@@ -18567,13 +18567,13 @@
    "sma50_dist_pct": -21.0,
    "w52_high": 97860.6,
    "w52_low": 55149.57,
-   "w52_dist_pct": -38.2,
+   "w52_dist_pct": -38.1,
    "day_high": 61328.95,
    "day_low": 58680.21,
    "support": 55149.57,
    "resistance": 81079.79,
-   "rsi": 24.4,
-   "volume": 27589578752,
+   "rsi": 24.5,
+   "volume": 27251369984,
    "vol_ratio": 1.97,
    "atr_14": 2944.47,
    "atr_pct": 4.86,
@@ -18585,7 +18585,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60525.12
+     60553.34
     ],
     "m6": [
      65230.03,
@@ -18713,7 +18713,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60525.12
+     60553.34
     ],
     "all": [
      386.94,
@@ -18862,7 +18862,7 @@
      78548.63,
      83553.85,
      77434.75,
-     60525.12
+     60553.34
     ],
     "m1": [
      78248.45,
@@ -18886,7 +18886,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60525.12
+     60553.34
     ],
     "m3": [
      80901.46,
@@ -18954,7 +18954,7 @@
      61901.82,
      58798.98,
      60094.09,
-     60525.12
+     60553.34
     ],
     "y1": [
      84648.36,
@@ -19030,7 +19030,7 @@
      75747.58,
      71342.97,
      64893.95,
-     60525.12
+     60553.34
     ],
     "d1": [
      60091.0,
@@ -19155,7 +19155,9 @@
      60632.05,
      60663.34,
      60621.24,
-     60494.43
+     60494.43,
+     60513.4,
+     60537.16
     ]
    },
    "earnings_date": null,
@@ -19166,10 +19168,10 @@
    "beta": null,
    "sharpe_1y": -0.72,
    "sortino_1y": -0.98,
-   "sharpe_6m": -0.5,
-   "sortino_6m": -0.72,
+   "sharpe_6m": -0.49,
+   "sortino_6m": -0.71,
    "prepost": null,
-   "prezzo_limite_aggiustato": 60525.12,
+   "prezzo_limite_aggiustato": 60553.34,
    "risk_reward": "1:3.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19185,22 +19187,22 @@
     "w1": {
      "support": 55149.57,
      "resistance": 64928.8,
-     "change_pct": -3.91
+     "change_pct": -3.86
     },
     "m1": {
      "support": 55149.57,
      "resistance": 81079.79,
-     "change_pct": -22.65
+     "change_pct": -22.61
     },
     "m3": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -25.19
+     "change_pct": -25.15
     },
     "y1": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -19.15
+     "change_pct": -19.11
     }
    },
    "financials": [],
@@ -19223,74 +19225,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 60525.12,
+     "prezzo": 60553.34,
      "medie": {
       "sma10": {
-       "liv": 63173.95,
-       "dist_pct": -4.19
+       "liv": 63176.77,
+       "dist_pct": -4.15
       },
       "ema10": {
-       "liv": 63627.5,
-       "dist_pct": -4.88
+       "liv": 63632.64,
+       "dist_pct": -4.84
       },
       "sma20": {
-       "liv": 69288.09,
-       "dist_pct": -12.65
+       "liv": 69289.5,
+       "dist_pct": -12.61
       },
       "ema20": {
-       "liv": 67728.04,
-       "dist_pct": -10.64
+       "liv": 67730.73,
+       "dist_pct": -10.6
       },
       "sma30": {
-       "liv": 72532.99,
-       "dist_pct": -16.56
+       "liv": 72533.93,
+       "dist_pct": -16.52
       },
       "ema30": {
-       "liv": 70476.17,
-       "dist_pct": -14.12
+       "liv": 70477.99,
+       "dist_pct": -14.08
       },
       "sma50": {
-       "liv": 76651.19,
-       "dist_pct": -21.04
+       "liv": 76651.75,
+       "dist_pct": -21.0
       },
       "ema50": {
-       "liv": 73365.32,
-       "dist_pct": -17.5
+       "liv": 73366.42,
+       "dist_pct": -17.46
       },
       "sma100": {
-       "liv": 77604.92,
-       "dist_pct": -22.01
+       "liv": 77605.2,
+       "dist_pct": -21.97
       },
       "ema100": {
-       "liv": 74691.65,
-       "dist_pct": -18.97
+       "liv": 74692.21,
+       "dist_pct": -18.93
       },
       "sma200": {
-       "liv": 72322.9,
-       "dist_pct": -16.31
+       "liv": 72323.04,
+       "dist_pct": -16.27
       },
       "ema200": {
-       "liv": 74517.28,
-       "dist_pct": -18.78
+       "liv": 74517.56,
+       "dist_pct": -18.74
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 24.4,
+      "rsi14": 24.5,
       "macd": {
-       "linea": -4946.66,
-       "segnale": -4142.65,
-       "istogramma": -804.01
+       "linea": -4944.41,
+       "segnale": -4142.2,
+       "istogramma": -802.21
       },
-      "stoch_k": 26.4,
-      "stoch_d": 18.6,
-      "williams_r": -73.6,
-      "cci20": -90.6,
+      "stoch_k": 26.5,
+      "stoch_d": 18.7,
+      "williams_r": -73.5,
+      "cci20": -90.5,
       "adx14": 48.3,
       "di_su": 5.4,
       "di_giu": 40.0,
-      "momentum10": -10817.85
+      "momentum10": -10789.63
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19783,19 +19785,19 @@
       "o": 60093.01,
       "h": 61328.95,
       "l": 58680.21,
-      "c": 60525.12
+      "c": 60553.34
      }
     ],
     "performance": {
-     "s1": -6.73,
-     "m1": -21.84,
-     "m3": -20.78,
-     "m6": -6.44,
-     "a1": -16.85,
-     "ytd": -31.79,
-     "a3": 60.49,
-     "a5": 6.17,
-     "a10": 8016.65
+     "s1": -6.69,
+     "m1": -21.8,
+     "m3": -20.75,
+     "m6": -6.4,
+     "a1": -16.81,
+     "ytd": -31.76,
+     "a3": 60.56,
+     "a5": 6.22,
+     "a10": 8020.43
     },
     "stagionalita": [
      {
@@ -19910,7 +19912,7 @@
    },
    "rs_1m": -12.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -9.1,
+   "rs_ndx_1m": -9.0,
    "beta_ndx": 0.64,
    "avg_corr": 0.4,
    "max_corr": 0.77,
@@ -48529,7 +48531,7 @@
       "positivi_pct": 60,
       "campione": 42,
       "peggio": -45.3,
-      "meglio": 24.5
+      "meglio": 24.6
      },
      {
       "mese": 11,
@@ -58746,7 +58748,7 @@
      187.52,
      190.07,
      182.04,
-     178.66,
+     178.67,
      169.5,
      168.37,
      190.29,
@@ -68360,7 +68362,7 @@
      702.69,
      704.46,
      696.35,
-     643.46,
+     643.47,
      573.45,
      583.34,
      667.8,
@@ -69640,7 +69642,7 @@
       "strumento": "QQQ",
       "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
       "beta": 1.63,
-      "r2": 0.548,
+      "r2": 0.547,
       "corr": 0.74,
       "campione": 250,
       "da": "2025-11-24",
@@ -71693,7 +71695,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.43,
+      "mediana": 1.42,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -72589,7 +72591,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -76807,7 +76809,7 @@
      11.1,
      11.27,
      11.09,
-     11.07,
+     11.06,
      11.8,
      11.5,
      10.69,
@@ -91410,7 +91412,7 @@
      40.75,
      41.92,
      40.05,
-     36.23,
+     36.22,
      38.7,
      36.23,
      34.54,
@@ -95008,7 +95010,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -102123,7 +102125,7 @@
      284.33,
      290.47,
      309.08,
-     312.5,
+     312.51,
      301.63,
      299.71,
      266.92,
@@ -109818,7 +109820,7 @@
      64.33,
      64.69,
      66.58,
-     72.6,
+     72.59,
      68.33,
      68.3,
      72.59,
@@ -111145,7 +111147,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -116392,7 +116394,7 @@
      164.55,
      200.71,
      230.8,
-     237.33,
+     237.32,
      279.61,
      287.31,
      306.16,
@@ -116417,7 +116419,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -116447,7 +116449,7 @@
      585.73,
      690.4,
      705.85,
-     730.87,
+     730.88,
      780.99,
      774.14,
      810.11,
@@ -120411,7 +120413,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120444,7 +120446,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -122029,7 +122031,7 @@
        "acceso": false
       },
       "evento": {
-       "beta": 0.45,
+       "beta": 0.46,
        "r2": 0.083,
        "corr": 0.29,
        "campione": 50,
@@ -122769,7 +122771,7 @@
      246.53,
      220.53,
      243.16,
-     237.52,
+     237.51,
      264.5,
      234.98,
      240.34,
@@ -153642,7 +153644,7 @@
    "calls": 985184
   },
   "risk_sentiment": {
-   "score": 28,
+   "score": 29,
    "label": "Risk-Off",
    "components": [
     {
@@ -153659,7 +153661,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 57
+     "score": 61
     },
     {
      "label": "Treasury 10A",
@@ -159143,6 +159145,13 @@
     ],
     "ANT": [
      {
+      "titolo": "When Can Anthropic Insiders Sell? What the Post-IPO Lockup Period Means for Shareholders.",
+      "riassunto": "Key PointsThe staggered lockup periods for Anthropic insiders range from a few weeks to 365 days.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-22T20:29:02Z",
+      "url": "https://www.nasdaq.com/articles/when-can-anthropic-insiders-sell-what-post-ipo-lockup-period-means-shareholders"
+     },
+     {
       "titolo": "Stocks Meltdown as AI Trade Unravels",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
@@ -159176,13 +159185,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-21T19:35:02Z",
       "url": "https://www.nasdaq.com/articles/better-recent-ipo-spacex-or-anthropic"
-     },
-     {
-      "titolo": "Here's How Much Cash Anthropic Has After Its IPO, and Why It Could Be the Most Important Number for Investors to Know",
-      "riassunto": "Key PointsAnthropic raised $119.5 billion in gross proceeds from its IPO and a concurrent private placement, leaving it with an estimated $250 billion in cash and short-term investments.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-21T15:46:01Z",
-      "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
      }
     ],
     "BE": [
@@ -159649,7 +159651,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-22T20:29:12Z"
+   "letto_il": "2026-11-22T20:51:54Z"
   }
  },
  "broker": null,
@@ -159701,6 +159703,13 @@
    ],
    "ANT": [
     {
+     "titolo": "When Can Anthropic Insiders Sell? What the Post-IPO Lockup Period Means for Shareholders.",
+     "riassunto": "Key PointsThe staggered lockup periods for Anthropic insiders range from a few weeks to 365 days.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-22T20:29:02Z",
+     "url": "https://www.nasdaq.com/articles/when-can-anthropic-insiders-sell-what-post-ipo-lockup-period-means-shareholders"
+    },
+    {
      "titolo": "Stocks Meltdown as AI Trade Unravels",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down -3.70% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed down -1.93%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -5.61%. December E-mini S&P futures (ESZ26 ) fell -3.34%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
@@ -159734,13 +159743,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-21T19:35:02Z",
      "url": "https://www.nasdaq.com/articles/better-recent-ipo-spacex-or-anthropic"
-    },
-    {
-     "titolo": "Here's How Much Cash Anthropic Has After Its IPO, and Why It Could Be the Most Important Number for Investors to Know",
-     "riassunto": "Key PointsAnthropic raised $119.5 billion in gross proceeds from its IPO and a concurrent private placement, leaving it with an estimated $250 billion in cash and short-term investments.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-21T15:46:01Z",
-     "url": "https://www.nasdaq.com/articles/heres-how-much-cash-anthropic-has-after-its-ipo-and-why-it-could-be-most-important-number"
     }
    ],
    "BE": [
@@ -160207,7 +160209,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-22T20:29:12Z"
+  "letto_il": "2026-11-22T20:51:54Z"
  },
  "predictions": [
   {
@@ -160217,18 +160219,13 @@
   },
   {
    "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
-   "yes": 7,
+   "yes": 6,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-december-2026-meeting-20260729232808635"
   },
   {
    "question": "Will Bitcoin reach $62,000 November 16-22?",
-   "yes": 25,
+   "yes": 35,
    "link": "https://polymarket.com/event/will-bitcoin-reach-62k-november-16-22-2026"
-  },
-  {
-   "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
-   "yes": 90,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
   },
   {
    "question": "Will the Fed increase interest rates by 50+ bps after the December 2026 meeting?",
@@ -160236,9 +160233,14 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-50-bps-after-the-december-2026-meeting-20260729232808637"
   },
   {
-   "question": "Will Jensen Huang rejoin NVIDIA by November 30, 2026?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-november-30-2026"
+   "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
+   "yes": 90,
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
+  },
+  {
+   "question": "Will Bitcoin dip to $55,000 by December 31, 2026?",
+   "yes": 56,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-55000-by-december-31-2026-527-627-868-745-188-361-314-673-612-946-821-624-855-557-684-381-884-939-182-939-516"
   }
  ],
  "options": {
@@ -237041,7 +237043,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 10,
-    "risk_sentiment": 28,
+    "risk_sentiment": 29,
     "credit": 75,
     "systemic_risk": 64,
     "corp_profit": 53,
@@ -237219,7 +237221,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 0 ore"
+    "note": "18 voci, la piu' recente di 1 ore"
    },
    {
     "key": "sec_calendario",
@@ -237303,6 +237305,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-22T20:29:12Z"
+  "generated_at": "2026-11-22T20:51:54Z"
  }
 }
