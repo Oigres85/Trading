@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-22T12:21:47Z",
+ "updated_at": "2026-11-22T12:58:50Z",
  "eurusd": 1.097,
  "totals": {
   "usd_value": 0,
@@ -74,8 +74,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "ITALY",
-    "entita": "Rep Italy",
-    "contratto": "SNRFOR.USD.CR14",
+    "entita": "ITALY",
+    "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.6202,
     "punti": -1.62,
@@ -508,7 +508,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -4411,7 +4411,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMD",
-    "entita": "Advanced Micro Devices Inc",
+    "entita": "AMD",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 97.7887,
@@ -6467,7 +6467,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NVIDIA",
-    "entita": "NVIDIA Corp",
+    "entita": "NVIDIA",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 98.0158,
@@ -14843,8 +14843,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "SKHYN",
-    "entita": "SK hynix Inc",
-    "contratto": "SNRFOR.USD.CR14",
+    "entita": "SKHYN",
+    "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.0442,
     "punti": -2.04,
@@ -18435,7 +18435,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COREWEI",
-    "entita": "COREWEAVE INC",
+    "entita": "COREWEI",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 500,
     "prezzo": 77.7957,
@@ -18555,28 +18555,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 61405.31,
+   "price": 60683.06,
    "price_asof": "2026-11-22",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 2.18,
+   "change_pct": 0.98,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -51.3,
-   "sma200_dist_pct": -15.1,
-   "sma50_dist_pct": -19.9,
+   "ath_dist_pct": -51.9,
+   "sma200_dist_pct": -16.1,
+   "sma50_dist_pct": -20.8,
    "w52_high": 97860.6,
    "w52_low": 55149.57,
-   "w52_dist_pct": -37.3,
-   "day_high": 61414.93,
+   "w52_dist_pct": -38.0,
+   "day_high": 61328.95,
    "day_low": 58680.21,
    "support": 55149.57,
    "resistance": 81079.79,
-   "rsi": 27.7,
-   "volume": 35592957952,
+   "rsi": 25.0,
+   "volume": 35980857344,
    "vol_ratio": 1.97,
-   "atr_14": 2950.61,
-   "atr_pct": 4.81,
+   "atr_14": 2944.47,
+   "atr_pct": 4.85,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18585,7 +18585,7 @@
      61901.82,
      58798.98,
      60094.09,
-     61405.31
+     60683.06
     ],
     "m6": [
      65230.03,
@@ -18713,7 +18713,7 @@
      61901.82,
      58798.98,
      60094.09,
-     61405.31
+     60683.06
     ],
     "all": [
      386.94,
@@ -18862,7 +18862,7 @@
      78548.63,
      83553.85,
      77434.75,
-     61405.31
+     60683.06
     ],
     "m1": [
      78248.45,
@@ -18886,7 +18886,7 @@
      61901.82,
      58798.98,
      60094.09,
-     61405.31
+     60683.06
     ],
     "m3": [
      80901.46,
@@ -18954,7 +18954,7 @@
      61901.82,
      58798.98,
      60094.09,
-     61405.31
+     60683.06
     ],
     "y1": [
      84648.36,
@@ -19030,7 +19030,7 @@
      75747.58,
      71342.97,
      64893.95,
-     61405.31
+     60683.06
     ],
     "d1": [
      60084.34,
@@ -19106,22 +19106,26 @@
      60904.27,
      60979.43,
      61050.61,
-     61130.74
+     61130.74,
+     60533.56,
+     60577.05,
+     60650.71,
+     60683.06
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 16,
+   "health": 15,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.69,
-   "sortino_1y": -0.95,
-   "sharpe_6m": -0.41,
-   "sortino_6m": -0.59,
+   "sharpe_1y": -0.72,
+   "sortino_1y": -0.98,
+   "sharpe_6m": -0.48,
+   "sortino_6m": -0.69,
    "prepost": null,
-   "prezzo_limite_aggiustato": 61405.31,
-   "risk_reward": "1:3.3",
+   "prezzo_limite_aggiustato": 60683.06,
+   "risk_reward": "1:3.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -19136,22 +19140,22 @@
     "w1": {
      "support": 55149.57,
      "resistance": 64928.8,
-     "change_pct": -2.51
+     "change_pct": -3.66
     },
     "m1": {
      "support": 55149.57,
      "resistance": 81079.79,
-     "change_pct": -21.53
+     "change_pct": -22.45
     },
     "m3": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -24.1
+     "change_pct": -24.99
     },
     "y1": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -17.97
+     "change_pct": -18.94
     }
    },
    "financials": [],
@@ -19162,11 +19166,11 @@
     "structure": "ribassista",
     "bos": "ribassista",
     "bull_fvg": 0,
-    "bear_fvg": 3,
+    "bear_fvg": 4,
     "last_fvg": {
      "dir": "ribassista",
-     "lo": 66055.1,
-     "hi": 67653.07
+     "lo": 60843.76,
+     "hi": 61380.88
     },
     "liq_above": 79568.95,
     "liq_below": null,
@@ -19174,74 +19178,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 61405.31,
+     "prezzo": 60683.06,
      "medie": {
       "sma10": {
-       "liv": 63261.96,
-       "dist_pct": -2.93
+       "liv": 63189.74,
+       "dist_pct": -3.97
       },
       "ema10": {
-       "liv": 63787.54,
-       "dist_pct": -3.73
+       "liv": 63656.22,
+       "dist_pct": -4.67
       },
       "sma20": {
-       "liv": 69332.1,
-       "dist_pct": -11.43
+       "liv": 69295.99,
+       "dist_pct": -12.43
       },
       "ema20": {
-       "liv": 67811.87,
-       "dist_pct": -9.45
+       "liv": 67743.09,
+       "dist_pct": -10.42
       },
       "sma30": {
-       "liv": 72562.33,
-       "dist_pct": -15.38
-      },
-      "ema30": {
-       "liv": 70532.96,
-       "dist_pct": -12.94
-      },
-      "sma50": {
-       "liv": 76668.79,
-       "dist_pct": -19.91
-      },
-      "ema50": {
-       "liv": 73399.83,
+       "liv": 72538.26,
        "dist_pct": -16.34
       },
+      "ema30": {
+       "liv": 70486.36,
+       "dist_pct": -13.91
+      },
+      "sma50": {
+       "liv": 76654.34,
+       "dist_pct": -20.84
+      },
+      "ema50": {
+       "liv": 73371.51,
+       "dist_pct": -17.29
+      },
       "sma100": {
-       "liv": 77613.72,
-       "dist_pct": -20.88
+       "liv": 77606.5,
+       "dist_pct": -21.81
       },
       "ema100": {
-       "liv": 74709.08,
-       "dist_pct": -17.81
+       "liv": 74694.78,
+       "dist_pct": -18.76
       },
       "sma200": {
-       "liv": 72327.3,
-       "dist_pct": -15.1
+       "liv": 72323.69,
+       "dist_pct": -16.1
       },
       "ema200": {
-       "liv": 74526.04,
-       "dist_pct": -17.61
+       "liv": 74518.85,
+       "dist_pct": -18.57
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 27.7,
+      "rsi14": 25.0,
       "macd": {
-       "linea": -4876.44,
-       "segnale": -4128.61,
-       "istogramma": -747.84
+       "linea": -4934.06,
+       "segnale": -4140.13,
+       "istogramma": -793.93
       },
-      "stoch_k": 30.7,
-      "stoch_d": 20.1,
-      "williams_r": -69.3,
-      "cci20": -87.8,
-      "adx14": 48.2,
-      "di_su": 5.6,
-      "di_giu": 39.9,
-      "momentum10": -9937.66
+      "stoch_k": 27.2,
+      "stoch_d": 18.9,
+      "williams_r": -72.8,
+      "cci20": -90.2,
+      "adx14": 48.3,
+      "di_su": 5.4,
+      "di_giu": 40.0,
+      "momentum10": -10659.91
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19732,21 +19736,21 @@
      {
       "d": "2026-11-22",
       "o": 60093.01,
-      "h": 61414.93,
+      "h": 61328.95,
       "l": 58680.21,
-      "c": 61405.31
+      "c": 60683.06
      }
     ],
     "performance": {
-     "s1": -5.38,
-     "m1": -20.7,
-     "m3": -19.63,
-     "m6": -5.08,
-     "a1": -15.64,
-     "ytd": -30.8,
-     "a3": 62.82,
-     "a5": 7.72,
-     "a10": 8134.69
+     "s1": -6.49,
+     "m1": -21.63,
+     "m3": -20.58,
+     "m6": -6.2,
+     "a1": -16.63,
+     "ytd": -31.61,
+     "a3": 60.91,
+     "a5": 6.45,
+     "a10": 8037.83
     },
     "stagionalita": [
      {
@@ -19859,9 +19863,9 @@
      }
     ]
    },
-   "rs_1m": -11.7,
+   "rs_1m": -12.6,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -8.0,
+   "rs_ndx_1m": -8.9,
    "beta_ndx": 0.64,
    "avg_corr": 0.4,
    "max_corr": 0.77,
@@ -36863,7 +36867,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMZN",
-    "entita": "Amazon Com Inc",
+    "entita": "AMZN",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.9395,
@@ -37409,7 +37413,7 @@
      98.35,
      84.39,
      94.22,
-     99.65,
+     99.64,
      83.74,
      89.74,
      116.26,
@@ -40760,7 +40764,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ALPHINC",
-    "entita": "Alphabet Inc",
+    "entita": "ALPHINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 100.1894,
@@ -45054,8 +45058,8 @@
    "cds": {
     "stato": "quotato",
     "codice": "TAISEM",
-    "entita": "Taiwan Semicon Mfg Co Ltd",
-    "contratto": "SNRFOR.USD.CR14",
+    "entita": "TAISEM",
+    "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.7108,
     "punti": -1.71,
@@ -48684,7 +48688,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "INTC",
-    "entita": "Intel Corp",
+    "entita": "INTC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 97.6661,
@@ -50168,7 +50172,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "SPACEXP",
-    "entita": "SPACE EXPL TECH CORP",
+    "entita": "SPACEXP",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 92.2681,
@@ -52079,7 +52083,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "TESLINC",
-    "entita": "Tesla Inc",
+    "entita": "TESLINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 94.5372,
@@ -53739,7 +53743,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CONSENAG",
-    "entita": "Constellation Energy Generation LLC",
+    "entita": "CONSENAG",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.0734,
@@ -55744,7 +55748,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NFLX",
-    "entita": "Netflix Inc",
+    "entita": "NFLX",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.6242,
@@ -57948,7 +57952,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MSFT",
-    "entita": "Microsoft Corp",
+    "entita": "MSFT",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.1259,
@@ -60162,7 +60166,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "APLINC",
-    "entita": "Apple Inc.",
+    "entita": "APLINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.4218,
@@ -62048,7 +62052,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "METAPL",
-    "entita": "META PLATFORMS INC",
+    "entita": "METAPL",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.1138,
@@ -67690,7 +67694,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "BROINC",
-    "entita": "BROADCOM INC",
+    "entita": "BROINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 96.0908,
@@ -68275,7 +68279,7 @@
      311.85,
      348.3,
      334.76,
-     354.13,
+     354.12,
      349.48,
      341.85,
      415.88,
@@ -68454,7 +68458,7 @@
      1220.99,
      1256.02,
      1386.5,
-     1446.3,
+     1446.29,
      1341.93,
      1400.14,
      1462.56,
@@ -74031,7 +74035,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ORCLE",
-    "entita": "Oracle Cop",
+    "entita": "ORCLE",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 90.4789,
@@ -76239,7 +76243,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "MCD",
-    "entita": "McDONALDS Corp",
+    "entita": "MCD",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.4589,
@@ -90845,7 +90849,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "XOM",
-    "entita": "Exxon Mobil Corp",
+    "entita": "XOM",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.7939,
@@ -93068,7 +93072,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "CVX",
-    "entita": "Chevron Corp",
+    "entita": "CVX",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8335,
@@ -95008,7 +95012,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -95288,7 +95292,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "COP",
-    "entita": "ConocoPhillips",
+    "entita": "COP",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1836,
@@ -97165,7 +97169,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "ABBVINC",
-    "entita": "ABBVIE INC",
+    "entita": "ABBVINC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.9754,
@@ -102123,7 +102127,7 @@
      284.33,
      290.47,
      309.08,
-     312.5,
+     312.51,
      301.63,
      299.71,
      266.92,
@@ -103588,7 +103592,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "AMGN",
-    "entita": "Amgen Inc.",
+    "entita": "AMGN",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.2213,
@@ -109266,7 +109270,10 @@
    "rs_ndx_1m": 4.8,
    "cds": {
     "stato": "assente",
-    "verificato": "2026-10-17"
+    "verificato": "2026-10-17",
+    "candidati": [
+     "PHILIP"
+    ]
    },
    "short_interest": {
     "stato": "misurato",
@@ -109905,7 +109912,7 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
      336.45,
      329.49,
@@ -111145,7 +111152,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 55,
+      "positivi_pct": 57,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -111415,7 +111422,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "DE",
-    "entita": "Deere & Co",
+    "entita": "DE",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.4984,
@@ -113638,7 +113645,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "THWALT",
-    "entita": "Walt Disney Co.",
+    "entita": "THWALT",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.8648,
@@ -115852,7 +115859,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "PFE",
-    "entita": "Pfizer Inc",
+    "entita": "PFE",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 103.1789,
@@ -116392,7 +116399,7 @@
      164.55,
      200.71,
      230.8,
-     237.32,
+     237.33,
      279.61,
      287.31,
      306.16,
@@ -116417,7 +116424,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -117885,7 +117892,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "GS",
-    "entita": "Goldman Sachs Gp Inc",
+    "entita": "GS",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.4117,
@@ -120086,7 +120093,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "JPM",
-    "entita": "JPMorgan Chase & Co",
+    "entita": "JPM",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 102.2999,
@@ -120411,7 +120418,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -120444,7 +120451,7 @@
      81.14,
      86.82,
      85.79,
-     92.86,
+     92.87,
      82.12,
      85.55,
      79.4,
@@ -120645,7 +120652,7 @@
      587.09,
      650.8,
      648.54,
-     694.84,
+     694.83,
      630.97,
      616.82,
      618.74,
@@ -122765,11 +122772,11 @@
      173.12,
      190.03,
      218.36,
-     231.67,
+     231.66,
      246.53,
      220.53,
      243.16,
-     237.52,
+     237.51,
      264.5,
      234.98,
      240.34,
@@ -122794,7 +122801,7 @@
      525.54,
      541.98,
      579.35,
-     571.4,
+     571.39,
      632.85,
      740.07,
      763.92,
@@ -126025,7 +126032,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "DELLN",
-    "entita": "Dell Inc",
+    "entita": "DELLN",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 99.6057,
@@ -131808,10 +131815,7 @@
    "rs_ndx_1m": 9.5,
    "cds": {
     "stato": "assente",
-    "verificato": "2026-10-17",
-    "candidati": [
-     "NOVO BCO SA"
-    ]
+    "verificato": "2026-10-17"
    },
    "short_interest": {
     "stato": "misurato",
@@ -133954,7 +133958,7 @@
    "cds": {
     "stato": "quotato",
     "codice": "NXTENG",
-    "entita": "NextEra Energy Cap Hldgs Inc",
+    "entita": "NXTENG",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
     "prezzo": 101.4359,
@@ -145435,13 +145439,6 @@
      "url": "https://www.cnbc.com/2026/11/21/emergency-prep-spending-tech-outages.html"
     },
     {
-     "titolo": "'Raise Taxes, Cut Spending': Bill Dudley on the Debt",
-     "riassunto": "As US debt costs continue to soar, former New York Fed President Bill Dudley and Kathryn Judge of Columbia Law School discuss how to address America’s fiscal crisis, and whether Treasury Secretary Scott Bessent’s efforts to bring yields under control will pay off. (Source: Bloomberg)",
-     "fonte": "Bloomberg",
-     "quando": "2026-11-21T13:04:30Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-11-21/-raise-taxes-cut-spending-bill-dudley-on-the-debt-video"
-    },
-    {
      "titolo": "Peterson: The Fed's chairman sees an AI revolution coming. Now he has to figure out what it means",
      "riassunto": "Kevin Warsh sees AI at a turning point. He faces tough questions on jobs and interest rates.",
      "fonte": "CNBC Economia",
@@ -145545,6 +145542,13 @@
      "fonte": "CNBC Economia",
      "quando": "2026-11-10T10:24:13Z",
      "url": "https://www.cnbc.com/2026/11/10/china-trade-october-exports-imports-surplus-.html"
+    },
+    {
+     "titolo": "3 unexpected reasons the October jobs report was so strong",
+     "riassunto": "October's jobs report blew past economist forecasts. Here are three reasons.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-09T22:23:56Z",
+     "url": "https://www.cnbc.com/2026/11/09/october-jobs-report-hiring-by-sector.html"
     }
    ],
    "fonti": [
@@ -153642,7 +153646,7 @@
    "calls": 985184
   },
   "risk_sentiment": {
-   "score": 30,
+   "score": 29,
    "label": "Risk-Off",
    "components": [
     {
@@ -153659,7 +153663,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 71
+     "score": 61
     },
     {
      "label": "Treasury 10A",
@@ -158838,14 +158842,14 @@
   "cds": {
    "fonte": "ICE Clear Credit — prezzi di fine giornata dei CDS a 5 anni (pubblici, gratuiti)",
    "url": "https://www.ice.com/api/cds-settlement-prices/icc-single-names",
-   "letto": true,
-   "errore": null,
+   "letto": false,
+   "errore": "HTTP 403",
    "data": "2026-11-20",
    "date": {
-    "2026-11-20": 697
+    "2026-11-20": 437
    },
    "scadenza": "2031-12-20",
-   "entita_ice": 697,
+   "entita_ice": null,
    "tasso_pct": 3.88,
    "tasso_fonte": "EFFR del 2026-11-19 (NY Fed), proxy della curva SOFR della convenzione ISDA",
    "recupero": 0.4,
@@ -158854,8 +158858,8 @@
     "HY": {
      "serie": 47,
      "versione": 1,
-     "prezzo": 104.6319,
      "cedola": 500,
+     "prezzo": 104.6319,
      "data": "2026-11-20",
      "pb": 383.8,
      "var": {
@@ -158872,8 +158876,8 @@
     "IG": {
      "serie": 47,
      "versione": 1,
-     "prezzo": 101.5558,
      "cedola": 100,
+     "prezzo": 101.5558,
      "data": "2026-11-20",
      "pb": 65.6,
      "var": {
@@ -158916,12 +158920,7 @@
      "2026-10-22": "data.json del run delle 20:59 UTC (commit 20f3175)"
     }
    },
-   "unione": {
-    "nuove": [],
-    "completate": {},
-    "difformi": 0,
-    "fuori_ordine": []
-   },
+   "unione": null,
    "verificato": "2026-10-17",
    "sessione": null,
    "assenti": [
@@ -159649,7 +159648,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-22T12:21:47Z"
+   "letto_il": "2026-11-22T12:58:50Z"
   }
  },
  "broker": null,
@@ -160207,7 +160206,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-22T12:21:47Z"
+  "letto_il": "2026-11-22T12:58:50Z"
  },
  "predictions": [
   {
@@ -160226,19 +160225,19 @@
    "link": "https://polymarket.com/event/will-jensen-huang-rejoin-nvidia-by-december-31-2026"
   },
   {
-   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
-   "yes": 29,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
+   "question": "Will the price of Bitcoin be above $58,000 on November 22?",
+   "yes": 99,
+   "link": "https://polymarket.com/event/bitcoin-above-58k-on-november-22-2026"
+  },
+  {
+   "question": "Will there be no new be CEO of NVIDIA by December 31, 2028?",
+   "yes": 10,
+   "link": "https://polymarket.com/event/will-candidate-a-be-the-next-ceo-of-nvidia"
   },
   {
    "question": "Will Bitcoin dip to $55,000 in November?",
-   "yes": 23,
+   "yes": 27,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-55k-in-november-2026"
-  },
-  {
-   "question": "Will Bitcoin dip to $40,000 by December 31, 2026?",
-   "yes": 12,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-40000-by-december-31-2026-593-522-842-874-931-776-991-167-531-959"
   }
  ],
  "options": {
@@ -237041,7 +237040,7 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 10,
-    "risk_sentiment": 30,
+    "risk_sentiment": 29,
     "credit": 75,
     "systemic_risk": 64,
     "corp_profit": 53,
@@ -237259,7 +237258,7 @@
     "age_days": 2,
     "max_age": 5,
     "status": "ok",
-    "note": ""
+    "note": "ICE non letto in questo run (HTTP 403): vale l'ultimo giorno raccolto"
    },
    {
     "key": "short_interest",
@@ -237303,6 +237302,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-22T12:21:48Z"
+  "generated_at": "2026-11-22T12:58:51Z"
  }
 }
