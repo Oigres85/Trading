@@ -10038,3 +10038,15 @@ con 2 punti di profitti, tornava `null`: le due linee sparivano dalla tessera se
   17:19 UTC dello stesso giorno, «il cambio in ogni operazione» (un'altra sessione). Il conflitto era solo qui.
 - **La lezione.** Una fonte può rispondere bene e CORTA. Il conto di ciò che torna si confronta con ciò che si è chiesto,
   e la differenza si dichiara: `_finestra_comune` proteggeva il calcolo, nessuno proteggeva la lunghezza.
+
+## v546 — il righello del dollaro oltre la soglia portava un «vedi» nella coda (23/11/2026)
+
+Il 23/11/2026 il commit delle memorie dell'analisi si è fermato su `coherence_check.mjs`: due incoerenze C9, la stessa
+riga nel pacchetto macro e nel pacchetto del titolo — «Righello Dollaro (DXY): 104,33 · 3 mesi +5,21% [COMPRESSIONE
+UTILI VALUTARIA: RIGHELLO ESTESO] — … (vedi tag FX nelle tabelle)». Il ramo con l'etichetta esiste da quando esiste il
+righello, ma il dollaro non aveva mai passato +5% a tre mesi da quando C9 legge la coda: un controllo che aspettava i
+dati invece di costruirsi lo stato (v429). La frase ora dice cosa fa il tag («il tag FX nelle tabelle marca i titoli
+esposti»); il detector non si tocca. In `test_app.mjs` un controllo costruisce i due stati (oltre la soglia con
+l'etichetta, entro la soglia) e legge la riga della coda; iniezione su una copia. File servito al browser: versione 546.
+Nello stesso giorno, osservazione aperta: `previsioni.py pagina` ha superato i 600 s dentro `analisi.py` per la seconda
+volta (la prima il 14/11) e da solo non ha finito in 25 minuti: va misurato e accorciato.

@@ -10932,6 +10932,23 @@ check("v545 tessera del disaccoppiamento: la finestra del gap si MISURA sulle se
                           gdp: [{ d: "2023-07-01", v: 100 }, { d: "2025-01-01", v: 104 }, { d: "2026-07-01", v: 107.8 }] };
   return sub().indexOf("su 3 anni") >= 0 || "tre anni non escono come 3 anni: " + sub().slice(0, 300);`));
 
+/* v546 — il righello del dollaro OLTRE la soglia: lo stato si costruisce (v429). Il 23/11/2026 il dollaro a 3 mesi ha
+   passato +5% per la prima volta da quando esiste il controllo C9, e la riga portava «vedi tag FX nelle tabelle»: un
+   imperativo nella coda, che ha fermato ogni commit. La riga dice cosa marca il tag, senza chiedere niente a chi legge. */
+check("v546 il righello del dollaro oltre la soglia non porta un imperativo nella coda del pacchetto: con la variazione a 3 mesi oltre +5% e la sua etichetta la riga nomina il tag FX senza un «vedi»; entro la soglia dice che l'impatto e' neutro", suVeri(`
+  const m = DATA.macro || (DATA.macro = {});
+  const salva = m.dollar_ruler;
+  const riga = () => (buildPrompt().split(String.fromCharCode(10)).find(x => x.indexOf("Righello Dollaro") >= 0) || "");
+  try {
+    m.dollar_ruler = { src: "DXY", value: 104.33, chg_3m_pct: 5.21, flag: "[COMPRESSIONE UTILI VALUTARIA: RIGHELLO ESTESO]" };
+    const oltre = riga();
+    m.dollar_ruler = { src: "DXY", value: 100.1, chg_3m_pct: 1.2, flag: null };
+    const entro = riga();
+    return oltre.indexOf("RIGHELLO ESTESO") >= 0 && oltre.indexOf("tag FX") >= 0
+        && !/(^|[^a-zA-Z])vedi([^a-zA-Z]|$)/i.test(oltre) && entro.indexOf("neutro") >= 0 && entro.indexOf("tag FX") < 0;
+  } finally { m.dollar_ruler = salva; }`));
+
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

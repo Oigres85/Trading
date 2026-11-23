@@ -152,7 +152,7 @@ const SUITE = [
   /* v509: 633 punti di chiamata (+5 sul dot plot letto dalla Fed: pacchetto, perimetro, popup, lettura, ricevuta) -> 620 */
   /* v510: 645 punti di chiamata (+12 sui difetti letti come il destinatario e sul Fear & Greed datato) -> 630 */
   /* v545: 650 punti di chiamata (+4 sulla serie doppia che non si disegna: assenza, tessera, pacchetto, finestra) -> 635 */
-  { file: "test_app.mjs",        cmd: "node",    minimo: 635, firma: /\d+\/\d+ check superati/ },
+  { file: "test_app.mjs",        cmd: "node",    minimo: 636, firma: /\d+\/\d+ check superati/ },
   /* v492: 236 punti di chiamata in test_update_data (+5 sulla fine del veicolo di quotazione, dal registro SEC) -> 225 */
   /* v496: 250 punti di chiamata (+14 sul file storico FINRA: variazione annua per data, percentile, i due canali) -> 240 */
   /* v498: 275 punti di chiamata (+6 sulla finestra di un mese del CDS, al netto dell'indice) -> 265 */
