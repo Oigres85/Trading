@@ -782,3 +782,9 @@ strumento: il gate della v505 non lascia l'una senza l'altra.
   dice RICHIESTA SENZA RIGHE OGGI, o uno strumento è fallito, la risposta lo dice in cima. Una famiglia servita da
   una RISERVA (v542: un'altra fonte, la pipeline, l'ultima lettura riuscita, una stima) si dice in una riga, con la
   fonte e la sua data: i dati ci sono, e chi legge sa da dove vengono.
+- **Chat breve, scheda allegata, titolo a richiesta (CEO, 23/11/2026).** Il CEO, vista la pagina online: *"Quello che
+  mi fornisci è molto ridotto rispetto alle informazioni online, perché?"*; fra le quattro strade proposte ha scelto
+  *"2 e 4 ok"*. Quindi: la risposta in chat resta la sintesi; la scheda completa torna allegata a OGNI analisi (il
+  17/11 il CEO aveva tolto gli allegati: vale questa decisione, più recente); e **il nome di un titolo scritto da
+  solo** chiede la scheda intera di quel nome — le sei famiglie per esteso, dalla scheda dell'analisi del giorno, o
+  da `/titolo` se l'analisi del giorno non c'è.
