@@ -238,7 +238,9 @@ const SUITE = [
      libro e istruzioni coerenti col codice; sei controlli del salvavita riagganciati alla proprieta' opposta) -> 1137 */
   /* v544: +4 punti di chiamata (l'acquisto in euro col pareggio che e' il pareggio, la vendita in euro come
      identita', il collegamento per la strada vera di `ingresso` e `uscita`, libro e istruzioni col codice) -> 1141 */
-  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1141, firma: /\d+\/\d+ CHECK OK/ },
+  /* v547: +3 punti di chiamata (la pagina delle previsioni non ricalibra e dichiara le date, i cinque moduli
+     riusano la calibrazione scaduta, le convenzioni nuove contro il libro) -> 1144 */
+  { file: "test_analisi_libro.py", cmd: "python3", minimo: 1144, firma: /\d+\/\d+ CHECK OK/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },
   { file: "fx_check.mjs",        cmd: "node",    minimo: null, firma: /GATE VALUTA:/ },
 ];

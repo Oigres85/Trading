@@ -22,6 +22,7 @@ Uso:
   python3 scripts/previsioni.py pagina      il blocco dell'analisi: previsioni di oggi, registro, bilancio (comando unico)
   python3 scripts/previsioni.py bilancio    l'affidabilita' dal vivo dal registro
   python3 scripts/previsioni.py aperte      le previsioni aperte del registro
+  python3 scripts/previsioni.py calibra     rifa' le calibrazioni scadute, FUORI dall'analisi (v547)
 """
 import importlib
 import os
@@ -54,17 +55,21 @@ TITOLI_MODULI = {"previsioni_titoli": "TITOLI E MERCATO — casi simili, soglia 
                  "previsioni_portafoglio": "PORTAFOGLIO — simulazione a blocchi dei rendimenti",
                  "previsioni_macro": "MACRO E SEMAFORO — serie storiche FRED",
                  "mercati_previsione": "MERCATI DI PREVISIONE — Polymarket, Kalshi, FedWatch"}
+GIORNI_CALIBRAZIONE = 7      # v547: oltre, una calibrazione riusata si dichiara ⚠ (LIBRO.md §1septdecies)
 
 
 def _lista(x):
     return list(x or [])
 
 
-def esegui_modulo(nome, B, posiz, adesso, rete=True, importa=importlib.import_module):
+def esegui_modulo(nome, B, posiz, adesso, rete=True, importa=importlib.import_module, tieni=False):
     """{'modulo', 'stato': letto | non eseguito, 'previsioni', 'righe', 'assenze', 'perche'} — tre esiti, mai un
     silenzio (v389). Ogni modulo con la sua firma: le chiamate stanno qui, in un posto solo."""
     out = {"modulo": nome, "titolo": TITOLI_MODULI.get(nome, nome), "previsioni": [], "righe": [], "assenze": [],
-           "perche": None}
+           "perche": None, "calibrazione": None}
+    # v547 — `tieni`: la calibrazione in cache si riusa anche scaduta (la pagina dell'analisi non ricalibra: i cinque
+    #   moduli insieme costano oltre dieci minuti); `calibra` la rifa' fuori dall'analisi
+    kt = {"tieni": True} if tieni else {}
     try:
         m = importa(nome)
     except Exception as e:  # noqa: BLE001
@@ -76,24 +81,24 @@ def esegui_modulo(nome, B, posiz, adesso, rete=True, importa=importlib.import_mo
     try:
         ass = []
         if nome == "previsioni_titoli":
-            cal = m.calibrazione(B, adesso=adesso, veicoli="pipeline")
+            cal = m.calibrazione(B, adesso=adesso, veicoli="pipeline", **kt)
             prev = m.previsioni_oggi(B, elenco, adesso)
             ass = _lista(getattr(prev, "assenze", None))
             righe = m.resa(prev, cal)
         elif nome == "previsioni_opzioni":
-            cal = m.calibrazione_lognormale(B, adesso=adesso)
+            cal = m.calibrazione_lognormale(B, adesso=adesso, **kt)
             prev = m.previsioni_oggi(B, elenco, adesso, rete=rete, calibrazione=cal, assenze=ass)
             righe = m.resa(prev, cal, ass)
         elif nome == "previsioni_portafoglio":
-            cal = m.calibrazione(B, adesso=adesso)
+            cal = m.calibrazione(B, adesso=adesso, **kt)
             prev = m.previsioni_oggi(B, diz, adesso, calib=cal)
             righe = m.resa(prev, cal)
         elif nome == "previsioni_macro":
-            cal = m.calibrazione(rete=rete, adesso=adesso)
+            cal = m.calibrazione(rete=rete, adesso=adesso, **kt)
             prev = m.previsioni_oggi(adesso, rete=rete, assenze=ass)
             righe = m.resa(prev, cal, ass)
         elif nome == "mercati_previsione":
-            cal = m.calibrazione(rete=rete, adesso=adesso)
+            cal = m.calibrazione(rete=rete, adesso=adesso, **kt)
             prev = m.previsioni_oggi(adesso, rete=rete)
             righe = m.resa(prev, cal, adesso=adesso)
         else:
@@ -101,7 +106,9 @@ def esegui_modulo(nome, B, posiz, adesso, rete=True, importa=importlib.import_mo
     except Exception as e:  # noqa: BLE001
         return dict(out, stato="non eseguito", perche=f"errore {type(e).__name__}: {str(e)[:160]}")
     righe = righe if isinstance(righe, list) else str(righe or "").splitlines()
-    return dict(out, stato="letto", previsioni=list(prev or []), righe=righe, assenze=ass)
+    quando = (cal.get("scritto") or cal.get("letto")) if isinstance(cal, dict) else None
+    return dict(out, stato="letto", previsioni=list(prev or []), righe=righe, assenze=ass,
+                calibrazione={"del": quando, "tenuta": bool(isinstance(cal, dict) and cal.get("tenuta"))})
 
 
 def mercato_aperto(adesso):
@@ -165,14 +172,14 @@ def da_registrare(previsioni, esistenti, B):
 
 
 def pagina(B=None, posiz=None, adesso=None, rete=True, registra=True, moduli=MODULI, percorso=None,
-           importa=importlib.import_module):
+           importa=importlib.import_module, tieni=True):
     """Le previsioni di oggi di tutti i moduli, il registro aggiornato (registra e risolve) e il bilancio dal vivo.
     {'adesso', 'esiti': [esegui_modulo], 'registro': {...} | None, 'perche_registro'}."""
     adesso = adesso or datetime.now(timezone.utc)
     if B is None or posiz is None:
         import laboratorio as LAB
         B, posiz = LAB.dati(adesso=adesso, rete=rete)
-    esiti = [esegui_modulo(n, B, posiz, adesso, rete=rete, importa=importa) for n in moduli]
+    esiti = [esegui_modulo(n, B, posiz, adesso, rete=rete, importa=importa, tieni=tieni) for n in moduli]
     tutte = [p for e in esiti for p in e["previsioni"]]
     reg, perche = None, None
     try:
@@ -203,6 +210,49 @@ def _righe(x):
     return x if isinstance(x, list) else str(x or "").splitlines()
 
 
+def righe_calibrazioni(pg):
+    """v547 — di quando sono le calibrazioni che danno l'affidabilita'. La pagina non ricalibra (lo fa `calibra`, fuori
+    dall'analisi): una calibrazione riusata oltre GIORNI_CALIBRAZIONE giorni si dichiara ⚠, le altre in una riga sola."""
+    voci, vecchie = [], []
+    for e in pg["esiti"]:
+        c = e.get("calibrazione") or {}
+        try:
+            quando = datetime.fromisoformat(str(c.get("del")))
+        except ValueError:
+            continue
+        quando = quando if quando.tzinfo else quando.replace(tzinfo=timezone.utc)
+        eta = (pg["adesso"] - quando).total_seconds() / 86400
+        nome = "mercati" if e["modulo"] == "mercati_previsione" else e["modulo"].replace("previsioni_", "")
+        voci.append(f"{nome} {quando.astimezone(ROMA):%d/%m}")
+        if c.get("tenuta") and eta > GIORNI_CALIBRAZIONE:
+            vecchie.append(f"{nome} ({int(eta)} giorni)")
+    if not voci:
+        return []
+    L = ["  calibrazioni (l'affidabilita' misurata sul passato): " + " · ".join(voci) + " — la pagina le riusa; si rifanno "
+         "fuori dall'analisi con `python3 scripts/previsioni.py calibra`"]
+    if vecchie:
+        L.append(f"  ⚠ calibrazioni piu' vecchie di {GIORNI_CALIBRAZIONE} giorni: " + ", ".join(vecchie) + " — da rifare")
+    return L
+
+
+def calibra(moduli=MODULI, adesso=None, rete=True, importa=importlib.import_module, B=None, posiz=None, scrivi=print):
+    """v547 — rifa' le calibrazioni scadute, un modulo alla volta, FUORI dall'analisi (puo' durare venti minuti): la
+    pagina poi le riusa. Per ogni modulo dice di quando e' la calibrazione che resta e quanto ci ha messo."""
+    import time
+    adesso = adesso or datetime.now(timezone.utc)
+    if B is None or posiz is None:
+        import laboratorio as LAB
+        B, posiz = LAB.dati(adesso=adesso, rete=rete)
+    ok = True
+    for n in moduli:
+        t0 = time.time()
+        e = esegui_modulo(n, B, posiz, adesso, rete=rete, importa=importa, tieni=False)
+        ok &= e["stato"] == "letto"
+        scrivi(f"{n}: " + (f"calibrazione del {(e.get('calibrazione') or {}).get('del')}" if e["stato"] == "letto"
+                           else f"⚠ {e['perche']}") + f" · {time.time() - t0:.0f} s")
+    return 0 if ok else 1
+
+
 def resa(pg):
     ora = pg["adesso"].astimezone(ROMA)
     L = [f"PREVISIONI (v536) — {ora:%d/%m/%Y %H:%M} ora italiana · eccezione MISURATA alla regola 1 (CEO, 03/11/2026): "
@@ -210,6 +260,7 @@ def resa(pg):
          "stanno affiancati, mai mediati (v200)",
          f"  {pg['n_oggi']} previsioni di oggi da {sum(1 for e in pg['esiti'] if e['stato'] == 'letto')} moduli su "
          f"{len(pg['esiti'])}"]
+    L += righe_calibrazioni(pg)
     for e in pg["esiti"]:
         L.append("")
         L.append(f"{e['titolo']} — " + ("letto" if e["stato"] == "letto" else "⚠ NON ESEGUITO"))
@@ -254,11 +305,13 @@ def main(argv):
         pg = pagina()
         print(resa(pg))
         return 1 if any(e["stato"] != "letto" for e in pg["esiti"]) or pg["registro"] is None else 0
+    if cmd == "calibra":
+        return calibra()
     if cmd in ("bilancio", "aperte"):
         R = importlib.import_module("registro_previsioni")
         print("\n".join(_righe(R.resa_bilancio(R.bilancio()) if cmd == "bilancio" else R.resa_aperte())))
         return 0
-    print(f"comando sconosciuto: {cmd} — pagina | bilancio | aperte")
+    print(f"comando sconosciuto: {cmd} — pagina | bilancio | aperte | calibra")
     return 2
 
 

@@ -11157,7 +11157,7 @@ def _finto536(nome):
     if nome == "previsioni_titoli":
         _AF = _il536.import_module("affidabilita")
         m = _ty536.SimpleNamespace()
-        m.calibrazione = lambda B, adesso=None, veicoli=None: {}
+        m.calibrazione = lambda B, adesso=None, veicoli=None, **k: {}
         m.previsioni_oggi = lambda B, posiz, adesso: [_AF.previsione(
             "titoli", "AAA", "AAA sopra 100 fra 20 sedute", 0.6, "casi_simili",
             _AF.evento_prezzo("AAA", "chiude_sopra", 100.0, "2026-11-02", 20), base=0.55, n=300,
@@ -11166,7 +11166,7 @@ def _finto536(nome):
         return m
     if nome == "previsioni_opzioni":
         m = _ty536.SimpleNamespace()
-        m.calibrazione_lognormale = lambda B, adesso=None: (_ for _ in ()).throw(RuntimeError("catena assente"))
+        m.calibrazione_lognormale = lambda B, adesso=None, **k: (_ for _ in ()).throw(RuntimeError("catena assente"))
         return m
     raise ImportError(f"{nome} assente nella prova")
 
@@ -11765,6 +11765,108 @@ check("v544 libro, formato, catalogo e istruzioni dicono la stessa cosa del codi
       and "`[cambio_operazione]`" in _fm544 and _vc544 is not None
       and [(m.tipo, m.testo, m.dentro) for m in _vc544.marcatori] == [("cambio", "pareggio in euro", True)]
       and "statistica.py uscita" in _fm544 and "statistica.py uscita" in _cl543 and "v544" in _cl543)
+
+
+# ═════════ v547 — la pagina delle previsioni sotto i 600 s (CEO, 23/11/2026: «Sistema blocco») ═════════
+# Il 14/11 e il 23/11 `previsioni.py pagina` ha superato i 600 s dentro il comando unico, e da solo non finiva in 25
+# minuti: il registro interrogava in rete TUTTI gli 815 mercati esterni aperti, uno alla volta, anche i non scaduti, e
+# le calibrazioni si rifacevano ogni 24 ore (oltre dieci minuti). Le prove del registro stanno nelle sue verifiche
+# (raccolte sopra, v536); qui la pagina, i moduli e le convenzioni. Lo stato si costruisce: date, cache e moduli finti.
+import previsioni as _PV547, registro_previsioni as _RP547, previsioni_titoli as _PT547, previsioni_opzioni as _PO547
+import previsioni_portafoglio as _PPo547, previsioni_macro as _PM547, mercati_previsione as _MP547
+_ora547 = _dtv536(2026, 11, 23, 18, 0, tzinfo=_tzv536.utc)
+_del547 = {"previsioni_titoli": "2026-11-10T10:00+00:00", "previsioni_opzioni": "2026-11-20T10:00+00:00",
+           "previsioni_portafoglio": "2026-11-01T10:00+00:00", "previsioni_macro": "2026-11-22T10:00+00:00",
+           "mercati_previsione": "2026-11-12T10:00+00:00"}
+_viste547 = []
+
+
+def _finto547(nome):
+    m = _ty536.SimpleNamespace()
+    if nome == "registro_previsioni":
+        m.risolvi_scadute = lambda B, adesso, rete=False, **k: {"risolte": []}
+        m.bilancio = lambda **k: {}
+        m.n_previsioni = lambda prev: {}
+        m.resa_bilancio = lambda b: []
+        m.resa_risolvi = lambda r: []
+        return m
+
+    def _cal(*a, **k):
+        _viste547.append((nome, bool(k.get("tieni"))))
+        # il portafoglio risponde «fresca» anche se vecchia: senza il segno «tenuta» la pagina non deve gridare
+        return {("letto" if nome == "mercati_previsione" else "scritto"): _del547[nome],
+                "tenuta": bool(k.get("tieni")) and nome != "previsioni_portafoglio"}
+    m.calibrazione = _cal
+    m.calibrazione_lognormale = _cal
+    m.previsioni_oggi = lambda *a, **k: []
+    m.resa = lambda *a, **k: []
+    return m
+
+
+_pg547 = _PV547.pagina(B={"QQQ": [{"t": "2026-11-20"}]}, posiz={"AAA": {"tk": "AAA", "qta": 1, "pmc": 1.0, "valuta": "USD"}},
+                       adesso=_ora547, rete=False, registra=False, importa=_finto547)
+_pagina547, _r547 = list(_viste547), _PV547.resa(_pg547)
+_viste547.clear()
+_scritte547 = []
+_rc547 = _PV547.calibra(B={"QQQ": [{"t": "2026-11-20"}]}, posiz={}, adesso=_ora547, rete=False, importa=_finto547,
+                        scrivi=_scritte547.append)
+_cal547 = [x for x in _r547.splitlines() if "calibrazioni" in x]
+_grida547 = " ".join(x for x in _cal547 if "⚠" in x)
+check("v547 la pagina delle previsioni NON ricalibra: chiede a ognuno dei cinque moduli la calibrazione in cache anche "
+      "scaduta, e `calibra` — il comando fuori dall'analisi — la chiede fresca; la pagina dice di quando sono, e grida ⚠ "
+      "solo per quelle riusate oltre la soglia dei giorni (titoli e mercati qui; non le opzioni di tre giorni, non il "
+      "portafoglio che non e' «tenuto»): " + _grida547[:160],
+      sorted(_pagina547) == sorted((n, True) for n in _PV547.MODULI)
+      and sorted(_viste547) == sorted((n, False) for n in _PV547.MODULI) and _rc547 == 0 and len(_scritte547) == len(_PV547.MODULI)
+      and len(_cal547) == 2 and "titoli 10/11" in _cal547[0] and "mercati 12/11" in _cal547[0]
+      and "previsioni.py calibra" in _cal547[0]
+      and "titoli (13 giorni)" in _grida547 and "mercati (11 giorni)" in _grida547
+      and "opzioni" not in _grida547 and "portafoglio" not in _grida547 and "macro" not in _grida547)
+
+_tmp547 = Path(tempfile.mkdtemp())
+_vecchia547 = "2026-10-01T00:00+00:00"
+_json.dump({"scritto": _vecchia547, "convenzioni": _PT547._convenzioni(), "passo": _PT547.PASSO, "universo": "un altro"},
+           open(_tmp547 / "titoli.json", "w"))
+_json.dump({"scritto": _vecchia547, "versione": _PO547.VERSIONE, "universo": ["ZZZ"]}, open(_tmp547 / "lognormale.json", "w"))
+_json.dump({"scritto": _vecchia547, "parametri": _PPo547._parametri(_PPo547.PERCORSI_CALIBRAZIONE)},
+           open(_tmp547 / "portafoglio.json", "w"))
+_json.dump({"letto": "2026-10-01T00:00:00+00:00", "righe": []}, open(_tmp547 / "mercati.json", "w"))
+_ten547 = {}
+try:
+    _ten547["titoli"] = _PT547.calibrazione({}, veicoli={}, adesso=_ora547, percorso=str(_tmp547 / "titoli.json"), tieni=True)
+    _ten547["lognormale"] = _PO547.calibrazione_lognormale({}, veicoli={}, adesso=_ora547,
+                                                           percorso=str(_tmp547 / "lognormale.json"), tieni=True)
+    _ten547["portafoglio"] = _PPo547.calibrazione({}, adesso=_ora547, cache=str(_tmp547 / "portafoglio.json"), tieni=True)
+    _ten547["mercati"] = _MP547.calibrazione(rete=False, adesso=_ora547, percorso=str(_tmp547 / "mercati.json"), tieni=True)
+except Exception as _e547:                               # un modulo che ricalcola o muore cade qui col suo nome (v407)
+    _ten547["errore"] = type(_e547).__name__ + ": " + str(_e547)[:120]
+_salva547 = (_PM547._leggi_json, _PM547.storia)
+try:
+    _st547 = {"serie": {}, "errori": []}
+    _conv547 = _PM547._impronta(_st547)["convenzioni"]
+    _PM547.storia = lambda rete=True, adesso=None: _st547
+    _PM547._leggi_json = lambda p: {"scritto": _vecchia547, "valutazioni": {"x": 1},
+                                    "impronta": {"serie": {"VECCHIA": [1, "2026-09-01", 2.0]}, "convenzioni": _conv547}}
+    _ten547["macro"] = _PM547.calibrazione(rete=False, adesso=_ora547, tieni=True)
+except Exception as _e547:
+    _ten547["errore"] = type(_e547).__name__ + ": " + str(_e547)[:120]
+finally:
+    _PM547._leggi_json, _PM547.storia = _salva547
+check("v547 ognuno dei cinque moduli riusa la sua calibrazione SCADUTA quando la pagina lo chiede, e la marca «tenuta» "
+      "(vecchia di settimane, universo o serie cambiati): nessuno ricalcola dentro l'analisi: "
+      + str(_ten547.get("errore") or sorted(k for k, v in _ten547.items() if not (isinstance(v, dict) and v.get("tenuta")))),
+      "errore" not in _ten547 and sorted(_ten547) == ["lognormale", "macro", "mercati", "portafoglio", "titoli"]
+      and all(isinstance(v, dict) and v.get("tenuta") is True for v in _ten547.values())
+      and _ten547["titoli"].get("scritto") == _vecchia547 and _ten547["macro"].get("valutazioni") == {"x": 1})
+
+_s547 = _lib474[_lib474.find("## 1septdecies"):_lib474.find("## 1octodecies")]
+_n547 = [re.search(p, _s547) for p in (r"[*][*]([0-9]+)[*][*]\s+insieme", r"tetto\s+di\s+[*][*]([0-9]+)[*][*]\s+secondi",
+                                       r"oltre\s+[*][*]([0-9]+)[*][*]\s+giorni")]
+check("v547 le convenzioni nuove sono quelle dichiarate in LIBRO.md §1septdecies (v240): quanti mercati esterni si "
+      "interrogano insieme, il tetto di secondi per giro, i giorni oltre i quali una calibrazione riusata si dichiara; e "
+      "le istruzioni nominano il comando che ricalibra fuori dall'analisi: " + str([m.group(1) if m else None for m in _n547]),
+      all(_n547) and int(_n547[0].group(1)) == _RP547.THREAD_ESTERNI and int(_n547[1].group(1)) == _RP547.TETTO_ESTERNI_S
+      and int(_n547[2].group(1)) == _PV547.GIORNI_CALIBRAZIONE and "previsioni.py calibra" in _cl543)
 
 
 _T = len(ESEGUITI)

@@ -423,7 +423,7 @@ def serie_universo(B, veicoli, adesso, escludi=(S.RIFERIMENTO,)):
             if b and tk not in escludi}
 
 
-def calibrazione_lognormale(B, veicoli=None, adesso=None, usa_cache=True, percorso=CACHE_CAL):
+def calibrazione_lognormale(B, veicoli=None, adesso=None, usa_cache=True, percorso=CACHE_CAL, tieni=False):
     """La calibrazione walk-forward del lognormale su B ({ticker: barre}), famiglia per famiglia, misurata con
     affidabilita.valuta. Riusata dalla cache se ha meno di 24 ore ed e' dello stesso universo e delle stesse regole."""
     adesso = adesso or datetime.now(timezone.utc)
@@ -432,8 +432,10 @@ def calibrazione_lognormale(B, veicoli=None, adesso=None, usa_cache=True, percor
         try:
             c = json.load(open(percorso, encoding="utf-8"))
             eta = (adesso - datetime.fromisoformat(c["scritto"])).total_seconds() / 3600
-            if 0 <= eta < ORE_CALIBRAZIONE and c.get("versione") == VERSIONE and c.get("universo") == universo:
+            fresca = 0 <= eta < ORE_CALIBRAZIONE and c.get("universo") == universo
+            if c.get("versione") == VERSIONE and (fresca or tieni):
                 c["da_cache"] = True
+                c["tenuta"] = not fresca       # v547: riusata oltre la sua validita' (la pagina non ricalibra)
                 return c
         except Exception:
             pass

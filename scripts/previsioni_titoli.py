@@ -388,7 +388,7 @@ def _eventi_storici(T, t):
     return ev
 
 
-def calibrazione(B, passo=PASSO, veicoli=None, adesso=None, percorso=CACHE, usa_cache=True):
+def calibrazione(B, passo=PASSO, veicoli=None, adesso=None, percorso=CACHE, usa_cache=True, tieni=False):
     """Per ogni titolo, una seduta ogni `passo` dopo il primo anno: la previsione fatta con fino = quella seduta e
     l'esito vero; poi affidabilita.valuta(ps, ys, basi) per tipo di evento e orizzonte ('tipo|h'). La base di ogni
     previsione e' anch'essa contata col solo passato. Salvata in memoria/dati (fuori da git) e riusata per 24 ore se
@@ -403,9 +403,10 @@ def calibrazione(B, passo=PASSO, veicoli=None, adesso=None, percorso=CACHE, usa_
         try:
             c = json.load(open(percorso, encoding="utf-8"))
             eta = (adesso - datetime.fromisoformat(c["scritto"])).total_seconds() / 3600
-            if (0 <= eta < VALIDITA_ORE and c.get("convenzioni") == _convenzioni() and c.get("passo") == passo
-                    and c.get("universo") == chiave_dati):
+            fresca = 0 <= eta < VALIDITA_ORE and c.get("universo") == chiave_dati
+            if c.get("convenzioni") == _convenzioni() and c.get("passo") == passo and (fresca or tieni):
                 c["riusata"] = True
+                c["tenuta"] = not fresca       # v547: riusata oltre la sua validita' (la pagina non ricalibra)
                 return c
         except Exception:
             pass

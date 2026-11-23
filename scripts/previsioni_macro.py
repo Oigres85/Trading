@@ -372,14 +372,17 @@ def _impronta(st):
     return {"serie": serie, "convenzioni": conv}
 
 
-def calibrazione(rete=True, adesso=None):
+def calibrazione(rete=True, adesso=None, tieni=False):
     """{'valutazioni': {'chiave|orizzonte|lato': valuta + 'non_disponibili', 'larghi', 'dal', 'al'}, 'storia': {sid:
     {prima, ultima, n}}, 'impronta', 'scritto', 'errori'}. Dalla cache se serie e convenzioni non sono cambiate."""
     st = storia(rete, adesso)
     imp = _impronta(st)
     cache = _leggi_json(CALIBRAZIONE)
-    if cache and cache.get("impronta") == imp:
+    # v547 — con `tieni` la calibrazione si riusa anche se le serie hanno un dato nuovo, purche' le convenzioni siano le stesse
+    stesse = bool(cache) and (cache.get("impronta") or {}).get("convenzioni") == imp["convenzioni"]
+    if cache and (cache.get("impronta") == imp or (tieni and stesse)):
         cache["errori"] = st["errori"]
+        cache["tenuta"] = cache.get("impronta") != imp
         return cache
     val = {}
     for ev in EVENTI:

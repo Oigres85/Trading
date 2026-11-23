@@ -10050,3 +10050,24 @@ esposti»); il detector non si tocca. In `test_app.mjs` un controllo costruisce 
 l'etichetta, entro la soglia) e legge la riga della coda; iniezione su una copia. File servito al browser: versione 546.
 Nello stesso giorno, osservazione aperta: `previsioni.py pagina` ha superato i 600 s dentro `analisi.py` per la seconda
 volta (la prima il 14/11) e da solo non ha finito in 25 minuti: va misurato e accorciato.
+
+## v547 — la pagina delle previsioni sotto i 600 s (23/11/2026)
+
+Il CEO, dopo l'analisi del 23/11 uscita senza il blocco delle previsioni: *"Sistema blocco"*. `previsioni.py pagina`
+aveva superato i 600 s dentro `analisi.py` il 14/11 e il 23/11, e rilanciato da solo non finiva in 25 minuti. Misurato
+con un tempo per modulo e la pila delle chiamate ogni minuto: i cinque moduli, a cache calda, **19 secondi**; il resto
+era in due posti.
+- **Il registro** (`registro_previsioni.risolvi_scadute`): a ogni giro interrogava in rete TUTTE le previsioni
+  esterne aperte — 815 il 23/11, 777 di Polymarket — una alla volta, anche le 678 non ancora scadute, e ogni giorno ne
+  entravano di nuove. Ora la fonte si interroga solo dalla scadenza che il mercato dichiara, sei insieme e con un tetto
+  di 90 secondi per giro; chi resta fuori resta aperto, si conta e la resa lo dice. Costo accettato: un mercato che si
+  chiude PRIMA della scadenza dichiarata si risolve nel registro solo alla scadenza.
+- **Le calibrazioni**: titoli, portafoglio, lognormale e macro si rifacevano ogni 24 ore (o a ogni dato nuovo), circa
+  undici minuti a cache fredda; i mercati ogni 7 giorni, altri sei. La pagina ora chiede a ogni modulo la calibrazione
+  in cache anche scaduta (`tieni`, a parita' di convenzioni), ne dice la data in una riga e grida ⚠ solo oltre 7
+  giorni; `python3 scripts/previsioni.py calibra` le rifa' fuori dall'analisi.
+- **Misura dopo**: la pagina vera, coi 137 mercati scaduti interrogati e 164 previsioni risolte, 13 secondi.
+- **Suite**: due prove nel registro (non scaduto non interrogato; insieme e col tetto, la fonte lenta rimandata) e tre
+  controlli (la pagina non ricalibra e dichiara le date; i cinque moduli riusano la cache scaduta; le convenzioni
+  contro il libro). La prova (d) del registro ha il mercato gia' scaduto: e' la condizione per interrogarlo. Iniezioni
+  su copie, una per copia.

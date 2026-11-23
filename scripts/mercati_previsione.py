@@ -713,7 +713,8 @@ def calibra(righe):
     return out
 
 
-def calibrazione(rete=True, adesso=None, forza=False, percorso=CACHE_CAL, get=None, campione=MAX_CAMPIONE):
+def calibrazione(rete=True, adesso=None, forza=False, percorso=CACHE_CAL, get=None, campione=MAX_CAMPIONE,
+                 tieni=False):
     """La calibrazione storica di Polymarket per anticipo (1, 7, 30 giorni dalla scadenza). Riusa la cache se ha meno di
     7 giorni; senza rete restituisce la cache anche vecchia, DICHIARANDOLO, o un esito «non disponibile»."""
     adesso = adesso or datetime.now(timezone.utc)
@@ -722,7 +723,9 @@ def calibrazione(rete=True, adesso=None, forza=False, percorso=CACHE_CAL, get=No
         # v537 — le misure si rifanno sempre dalle righe salvate: una regola nuova vale anche sulla cache, senza rete
         c["anticipi"] = calibra(c["righe"])
         c["campione"] = dict(c.get("campione") or {}, avvertenza=AVVERTENZA_CAMPIONE)
-    if c and not forza and adesso - datetime.fromisoformat(c["letto"]) <= timedelta(days=VALIDITA_CAL_GIORNI):
+    fresca = bool(c) and adesso - datetime.fromisoformat(c["letto"]) <= timedelta(days=VALIDITA_CAL_GIORNI)
+    if c and not forza and (fresca or tieni):
+        c["tenuta"] = not fresca           # v547: riusata oltre la sua validita' (la pagina non ricalibra)
         return c
     if not rete:
         if c:

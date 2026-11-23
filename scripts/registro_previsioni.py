@@ -49,6 +49,8 @@ PERFORMANCE = os.path.join(RADICE, "memoria", "registro_performance.jsonl")
 TIPI_PREZZO = ("chiude_sopra", "tocca_su", "tocca_giu", "chiude_sopra_media")
 TOLLERANZA_SCALA = 0.02        # la chiusura di 'dal' riletta oltre il 2% da quella registrata: barre riscalate (frazionamento)
 MAX_RIGHE = 20                 # le aperte elencate una per una al piu' 20: le altre si contano
+THREAD_ESTERNI = 6             # v547: i mercati esterni scaduti si interrogano insieme (LIBRO.md §1septdecies)
+TETTO_ESTERNI_S = 90           # v547: tetto in secondi per le fonti esterne in un giro; chi resta fuori si dice
 ESTERNI = {                    # genere → (modulo, funzione) di chi lo produce
     "serie": ("previsioni_macro", "risolvi_serie"),
     "portafoglio": ("previsioni_portafoglio", "risolvi_portafoglio"),
@@ -397,6 +399,31 @@ def _risolutori(adesso, B, rete, storia, righe_registro):
     }
 
 
+def _scadenza(r):
+    """La scadenza che il mercato dichiara (AAAA-MM-GG), dal risolutore o dal record; '' se non c'e'."""
+    return str((r.get("risolutore") or {}).get("scade") or r.get("scade") or "")[:10]
+
+
+def _esterni_insieme(f, righe, tetto=None, thread=None):
+    """v547 — ({id: risposta}, {id rimandati}): i record esterni interrogati tutti insieme, `thread` alla volta, entro
+    `tetto` secondi. Chi non ha risposto in tempo resta aperto e si conta: una fonte lenta non ferma il giro."""
+    from concurrent.futures import ThreadPoolExecutor, wait
+    tetto = TETTO_ESTERNI_S if tetto is None else tetto
+
+    def uno(r):
+        try:
+            return f(r.get("risolutore") or {}, r)
+        except Exception as ex:
+            return _esito(perche=f"risolutore di esterno in errore ({type(ex).__name__}: {str(ex)[:80]})", ferma=True)
+
+    ex = ThreadPoolExecutor(max_workers=thread or THREAD_ESTERNI)
+    fut = {ex.submit(uno, r): r["id"] for r in righe}
+    fatti, _ = wait(fut, timeout=tetto)
+    ex.shutdown(wait=False, cancel_futures=True)
+    pronte = {fut[x]: x.result() for x in fatti}
+    return pronte, {i for i in fut.values() if i not in pronte}
+
+
 def risolvi_scadute(B=None, adesso=None, percorso=REGISTRO, risolutori=None, rete=True, storia=None,
                     righe_registro=None):
     """Prova a risolvere ogni previsione aperta dal suo risolutore. B: {ticker: barre} (None = si leggono con
@@ -425,6 +452,14 @@ def risolvi_scadute(B=None, adesso=None, percorso=REGISTRO, risolutori=None, ret
             (lambda ris, rec, g=g: _esito(perche=f"risolutore di {g} non disponibile", ferma=True))
     out = {"risolte_ora": [], "non_risolvibili_ora": [], "aperte": [], "scritto": False, "nota_barre": nota_barre}
     nuove, cambiato = [], False
+    # v547 — i mercati ESTERNI. Fino al 23/11/2026 erano interrogati TUTTI a ogni giro, uno alla volta, anche quelli
+    #   non ancora scaduti: 815 richieste, oltre venti minuti, e ogni giorno di piu'. La fonte si interroga solo dalla
+    #   scadenza che il mercato dichiara, tutti insieme e con un tetto di tempo; chi resta fuori si conta (v406).
+    oggi = adesso.date().isoformat()
+    esterne = [r for r in aperte if (r.get("risolutore") or {}).get("genere") == "esterno" and "esterno" in R]
+    non_scadute = {r["id"]: _scadenza(r) for r in esterne if _scadenza(r) > oggi}
+    pronte, rimandate = _esterni_insieme(R["esterno"], [r for r in esterne if r["id"] not in non_scadute])
+    out["esterni"] = {"non_scaduti": len(non_scadute), "interrogati": len(pronte), "rimandati": len(rimandate)}
     for r in L["righe"]:
         if stato(r) != "aperta":
             nuove.append(r)
@@ -434,6 +469,12 @@ def risolvi_scadute(B=None, adesso=None, percorso=REGISTRO, risolutori=None, ret
         try:
             if g not in R:
                 e = _esito(perche=f"genere di risolutore sconosciuto: {g!r}", definitiva=True)
+            elif g == "esterno" and r["id"] in non_scadute:
+                e = _esito(perche=f"il mercato scade il {non_scadute[r['id']]}: la fonte si interroga dalla scadenza")
+            elif g == "esterno" and r["id"] in rimandate:
+                e = _esito(perche=f"non interrogata in questo giro: tetto di {TETTO_ESTERNI_S} s per le fonti esterne")
+            elif g == "esterno" and r["id"] in pronte:
+                e = pronte[r["id"]]
             else:
                 e = R[g](ris, r)
         except Exception as ex:
@@ -617,6 +658,13 @@ def resa_risolvi(e):
          + ("" if e["scritto"] else " · registro invariato")]
     if e.get("nota_barre"):
         L.append(f"  ⚠ {e['nota_barre']}")
+    x = e.get("esterni") or {}
+    if any(x.values()):
+        L.append(f"  mercati esterni: interrogati {x.get('interrogati', 0)} gia' scaduti · {x.get('non_scaduti', 0)} non "
+                 "ancora scaduti (la fonte si interroga dalla scadenza che il mercato dichiara)")
+        if x.get("rimandati"):
+            L.append(f"  ⚠ {x['rimandati']} mercati scaduti rimandati al prossimo giro: tetto di {TETTO_ESTERNI_S} s per "
+                     "le fonti esterne")
     for r in e["risolte_ora"][:MAX_RIGHE]:
         esito = "SI'" if r["esito"] else "NO"
         L.append(f"  {r['evento']} ({A.METODI.get(r['metodo'], r['metodo'])}, {_p(r['probabilita'])}): "
@@ -725,7 +773,7 @@ def _prove(V, tmp):
     serie = A.previsione("macro", "HY", "spread HY sopra 4% fra 10 sedute", 0.3, "serie_storiche",
                          A.evento_serie("BAMLH0A0HYM2", "tocca_sopra", 4.0, "2026-11-05", 10), scritto="2026-11-05T21:00+00:00")
     est = A.previsione("mercato", "FED", "taglio a dicembre", 0.7, "polymarket", A.evento_esterno("polymarket", "123", "Yes",
-                       "2026-12-10"), scritto="2026-11-05T21:00+00:00")
+                       "2026-11-09"), scritto="2026-11-05T21:00+00:00")
     registra([serie, est, _rec("AAA", "chiude_sopra", 100, "2026-11-05", 2, 0.5)], sera, p)
     vero = ESTERNI["serie"]
     ESTERNI["serie"] = ("modulo_che_non_esiste_v536", "risolvi_serie")
@@ -807,6 +855,45 @@ def _prove(V, tmp):
     e = risolvi_scadute({}, sera, p)
     V.append(("un registro assente non si crea risolvendo, e la resa lo dichiara",
               e.get("assente") and not os.path.exists(p) and "assente" in resa_bilancio(bilancio(p))[0], ""))
+
+    # (v547) i mercati esterni: prima della scadenza la fonte NON si interroga; gli scaduti insieme, col tetto di tempo
+    import threading
+    import time
+    p = os.path.join(tmp, "esterni.jsonl")
+
+    def _est(ident, scade):
+        return A.previsione("mercato", "EV" + ident, "evento " + ident, 0.5, "polymarket",
+                            A.evento_esterno("polymarket", ident, "Yes", scade), scritto="2026-11-05T21:00+00:00")
+    registra([_est("scaduto1", "2026-11-09"), _est("scaduto2", "2026-11-10"), _est("scaduto3", "2026-11-08"),
+              _est("futuro", "2026-12-10"), _est("lento", "2026-11-07")], sera, p)
+    chiesti, insieme, lucchetto = [], {"ora": 0, "max": 0}, threading.Lock()
+
+    def _fonte(ris):
+        with lucchetto:
+            chiesti.append(ris.get("id"))
+            insieme["ora"] += 1
+            insieme["max"] = max(insieme["max"], insieme["ora"])
+        time.sleep(1.5 if ris.get("id") == "lento" else 0.2)
+        with lucchetto:
+            insieme["ora"] -= 1
+        return True
+    global TETTO_ESTERNI_S
+    tetto_vero, TETTO_ESTERNI_S = TETTO_ESTERNI_S, 0.8
+    try:
+        e = risolvi_scadute(B, sera, p, risolutori={"esterno": _fonte})
+    finally:
+        TETTO_ESTERNI_S = tetto_vero
+    s = {r["risolutore"]["id"]: r for r in leggi(p)["righe"]}
+    V.append(("(v547) un mercato non ancora scaduto NON si interroga e resta aperto col perche'; gli scaduti si risolvono",
+              "futuro" not in chiesti and stato(s["futuro"]) == "aperta" and s["futuro"]["esito"] is None
+              and all(s[k]["esito"] is True for k in ("scaduto1", "scaduto2", "scaduto3"))
+              and any("scade il 2026-12-10" in perche for _i, perche, _f in e["aperte"]), f"chiesti {sorted(chiesti)}"))
+    V.append(("(v547) gli scaduti si interrogano INSIEME, e chi sfora il tetto di tempo resta aperto e si conta: il giro "
+              "non aspetta una fonte lenta",
+              insieme["max"] >= 2 and s["lento"]["esito"] is None and stato(s["lento"]) == "aperta"
+              and e.get("esterni") == {"non_scaduti": 1, "interrogati": 3, "rimandati": 1}
+              and any("rimandati" in x for x in resa_risolvi(e)) and any("non ancora" in x for x in resa_risolvi(e)),
+              f"insieme {insieme['max']} · {e.get('esterni')}"))
 
 
 # ───────────────────────── il comando ─────────────────────────

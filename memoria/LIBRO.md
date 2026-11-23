@@ -1440,6 +1440,11 @@ fotografia ogni **20** sedute e un mercato esterno una volta sola; si registra s
 chiuso e con la seduta appena chiusa nei dati (v538: in seduta una parte dell'esito è già nota). Le convenzioni dei singoli metodi stanno in testa ai
 loro moduli (previsioni_titoli, previsioni_opzioni, previsioni_portafoglio, previsioni_macro, mercati_previsione).
 
+**I tempi della pagina (v547, CEO, 23/11/2026: *"Sistema blocco"*)**: un mercato esterno si interroga in rete solo
+dalla scadenza che dichiara, **6** insieme e con un tetto di **90** secondi per giro (chi resta fuori si conta e si
+dice); la pagina dell'analisi non ricalibra — riusa le calibrazioni in cache e ne dice la data —, e una calibrazione
+riusata oltre **7** giorni si dichiara ⚠ e si rifà fuori dall'analisi con `python3 scripts/previsioni.py calibra`.
+
 ⚠ Quello che la misura ha detto subito (06/11/2026): i casi simili sui prezzi sono calibrati ma NON battono la base — il
 grosso dell'informazione sta nella volatilità del titolo, non nel suo stato; il lognormale batte la base sui tocchi
 (+10%/−10%, il carico) ma sottostima i rialzi e sovrastima i ribassi (deriva zero); la simulazione del portafoglio batte la

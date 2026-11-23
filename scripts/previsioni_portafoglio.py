@@ -466,7 +466,7 @@ def _parametri(percorsi):
             "analoghi": {k: list(v) for k, v in ANALOGHI.items()}, "versione": 2}
 
 
-def calibrazione(B, adesso=None, percorsi=PERCORSI_CALIBRAZIONE, rifai=False, cache=CACHE):
+def calibrazione(B, adesso=None, percorsi=PERCORSI_CALIBRAZIONE, rifai=False, cache=CACHE, tieni=False):
     """La calibrazione walk-forward del metodo sulle serie di B: {'scritto', 'parametri', 'serie', 'fuori',
     'valutazioni': {'analogo|h|variante': affidabilita.valuta}, 'basi': {'analogo|h': {'frequenza', 'n'}},
     'senza_base': {...}, 'secondi'}. Dalla cache se ha meno di VALIDITA_ORE ore e gli stessi parametri."""
@@ -476,8 +476,10 @@ def calibrazione(B, adesso=None, percorsi=PERCORSI_CALIBRAZIONE, rifai=False, ca
         try:
             c = json.load(open(cache, encoding="utf-8"))
             eta = (adesso - datetime.fromisoformat(c["scritto"])).total_seconds() / 3600
-            if 0 <= eta < VALIDITA_ORE and c.get("parametri") == par:
+            fresca = 0 <= eta < VALIDITA_ORE
+            if c.get("parametri") == par and (fresca or tieni):
                 c["dalla_cache"] = True
+                c["tenuta"] = not fresca       # v547: riusata oltre la sua validita' (la pagina non ricalibra)
                 return c
         except Exception:  # noqa: BLE001 — una cache illeggibile si rifa'
             pass
