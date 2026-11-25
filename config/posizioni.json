@@ -1,7 +1,7 @@
 {
  "_nota": "Posizioni del CEO. NON e' la lista dei simboli da seguire: quella resta config/ui_watchlist.json. Questo file e' una SOVRAPPOSIZIONE.",
  "_fonte": "modificato dalla dashboard",
- "aggiornato": "2026-11-19",
+ "aggiornato": "2026-11-25",
  "posizioni": [
   {
    "ticker": "BTP-V28",
@@ -35,8 +35,8 @@
   },
   {
    "ticker": "MRVL",
-   "qta": 42,
-   "pmc": 214.08,
+   "qta": 62,
+   "pmc": 187.6026,
    "valuta": "USD"
   },
   {
@@ -59,14 +59,14 @@
   },
   {
    "ticker": "MSTR",
-   "qta": 173,
-   "pmc": 173.3045,
+   "qta": 218,
+   "pmc": 153.7347,
    "valuta": "USD"
   },
   {
    "ticker": "CRWV",
-   "qta": 255,
-   "pmc": 76.14,
+   "qta": 325,
+   "pmc": 68.8089,
    "valuta": "USD",
    "mercato": "NASDAQ"
   },
@@ -84,8 +84,8 @@
   },
   {
    "ticker": "ANT",
-   "qta": 120,
-   "pmc": 105.0,
+   "qta": 140,
+   "pmc": 102.2143,
    "valuta": "USD"
   }
  ]
