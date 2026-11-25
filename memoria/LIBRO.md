@@ -45,7 +45,7 @@ calo dal massimo, l'esito della tenuta e le tesi restano MISURE: informano, non 
 | BE | 40 | 214,00 | USD | |
 | ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
 | WDC | 24 | 342,00 | USD | acquisto del **02/11/2026** dalla riserva, speculazione sul rimbalzo (testuale: *"Entrato 24 a pmc 342 Wdc"*). Carico in euro nel registro §1decies |
-| ANT | 140 | 102,2143 | USD | Anthropic — +20 azioni a ~85,50 $ dopo il primo acquisto, ricavate dal carico che il broker dichiara il 24/11/2026 (da 105,00 a 102,2143): data da confermare (§1undecies). Acquisto del **19/11/2026**, primo giorno di contrattazione al Nasdaq (testuale: *"Entrato in ant 120 pezzi a 105 euro"*): 105 **dollari**, confermati dal CEO il 20/11/2026 (*"Ant dollari"*); nessuno stop attivo (CEO, 20/11/2026). ⚠ Claude è un prodotto di Anthropic: solo fatti e misure, nessun giudizio (CLAUDE.md, istruzione 6). Carico in euro nel registro §1decies |
+| ANT | 140 | 102,2143 | USD | Anthropic — +20 azioni a ~85,50 $ dopo il primo acquisto, ricavate dal carico che il broker dichiara il 24/11/2026 (da 105,00 a 102,2143) e confermate dal CEO il 25/11/2026: giorno da confermare (§1undecies). Acquisto del **19/11/2026**, primo giorno di contrattazione al Nasdaq (testuale: *"Entrato in ant 120 pezzi a 105 euro"*): 105 **dollari**, confermati dal CEO il 20/11/2026 (*"Ant dollari"*); nessuno stop attivo (CEO, 20/11/2026). ⚠ Claude è un prodotto di Anthropic: solo fatti e misure, nessun giudizio (CLAUDE.md, istruzione 6). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 ⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
@@ -55,10 +55,10 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~9.500 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 25/11/2026: i ~19.500 € stimati il
-19/11 meno le 20 ANT aggiunte (1.710 $, circa 1.570 €) e le tre medie del 24/11 su MSTR, CRWV e MRVL (9.119 $ più
-45 $ di commissioni stimate, circa 8.364 € al riferimento BCE del 24/11, 1,0963, meno lo scarto della banca) — il
-saldo del broker è una domanda aperta (§1undecies). Il 19/11/2026 la stima era ~19.500 €: i ~31.000 € dichiarati
+**Liquidità: ~8.000 €** IN TUTTO, bloccata compresa, **tutta in euro** — dichiarata dal CEO il 25/11/2026 (*"8k"*),
+dopo le 20 ANT aggiunte (1.710 $) e le tre medie del 24/11 su MSTR, CRWV e MRVL (9.119 $ più le commissioni). La
+stima del libro era ~9.500 € (i ~19.500 € del 19/11 meno circa 1.570 € e circa 8.364 €): vale il saldo che dichiara
+il CEO. Nessun ordine con limite aperto (CEO, 25/11/2026). Il 19/11/2026 la stima era ~19.500 €: i ~31.000 € dichiarati
 dal CEO il 17/11 meno l'acquisto di ANT del 19/11 (120 a 105 $ = 12.600 $, più 15 $ di commissione stimata, circa
 11.480 € al riferimento BCE del 19/11, 1,0992, meno lo scarto della banca) — da confermare col saldo del broker; la
 valuta del prezzo è confermata (dollari, CEO 20/11/2026). La riserva per la quotazione di Anthropic è stata usata. Il 17/11/2026 il CEO
@@ -1149,11 +1149,13 @@ stessa schermata mostra ANT a 140 azioni (erano 120): +20 a ~85,50 $, in una dat
 25/11 il CEO manda la fotografia intera del conto (§1duodecies). Quando arriva la nota della banca si annotano cambio
 applicato e commissioni (§1decies).
 
+**Chiuse il 25/11/2026** (CEO: *"1 si"* · *"2 8k"* · *"3 no"*): le 20 ANT in più sono a circa 85,50 $ (resta da
+dire il giorno); la liquidità è 8.000 € (§1 e `config/portfolio_state.json`); nessun ordine con limite aperto,
+quindi §1septies resta senza ordini.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 25/11/2026 | ANT: le 20 azioni in più (da 120 a 140; carico da 105,00 a 102,2143, cioè circa 85,50 $ l'una) quando sono state comprate, e a che prezzo? | manca la riga in §1decies (data, prezzo, cambio): il carico in euro di ANT lo dà solo la fotografia del broker | il CEO dichiara data e prezzo, o manda la nota della banca |
-| 25/11/2026 | Liquidità dopo le medie del 24/11: qual è il saldo del broker? La stima è ~9.500 € (§1) | entra nel patrimonio intero e dice quanta riserva resta | il CEO dichiara il saldo |
-| 25/11/2026 | Ci sono ordini con limite ancora aperti (BE, ANT o altri)? Il 24/11 se n'è parlato in chat e §1septies non ne ha | un ordine aperto sotto il prezzo si esegue se la discesa continua: posizione e liquidità cambierebbero | il CEO dice quali ordini ha dato |
+| 25/11/2026 | ANT: le 20 azioni in più a circa 85,50 $ (prezzo confermato dal CEO il 25/11/2026) in che giorno sono state comprate? | manca la riga in §1decies, che vuole il giorno per il cambio: il carico in euro di ANT lo dà solo la fotografia del broker | il CEO dice il giorno, o manda la nota della banca |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
@@ -1198,7 +1200,7 @@ e la sua percentuale sono **somme delle righe**, non numeri stampati dal broker.
 euro delle quattordici righe sommano 204.069,57 € e i profitti 40.742,98 €, cioè i totali del
 broker a meno di un centesimo; il carico in dollari delle azioni che il broker stampa è 183.711,84 $, quello del
 libro (§1, quantità × prezzo medio) 183.711,59 $ — coincidono. Il controvalore dei titoli **non comprende la
-liquidità** (~9.500 €, §1). La fotografia precedente era del 31/10/2026 08:04 (totale titoli 291.357,08 €, profitto
+liquidità** (~8.000 €, §1). La fotografia precedente era del 31/10/2026 08:04 (totale titoli 291.357,08 €, profitto
 98.978,65 €, +51,48%): sta nella storia di questo file.
 
 **Storico delle operazioni chiuse** (schermata «STORICO OPERAZIONI»: plus/minusvalenza e imposte in euro, come il
