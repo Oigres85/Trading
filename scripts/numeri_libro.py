@@ -2336,13 +2336,18 @@ def leggi_conto_broker(testo=None):
 def carico_broker(broker, operazioni, tk):
     """v520 — il carico in euro di un titolo come il broker lo dichiara (controvalore meno profitto della fotografia):
     e' la base FISCALE, commissioni d'acquisto e margine di cambio compresi. Vale finche' sul nome non c'e'
-    un'operazione registrata DOPO la fotografia: allora {'superato': data} — un carico di prima di un'operazione e'
+    un'operazione registrata DOPO la fotografia o NELLO STESSO GIORNO (v548): allora {'superato': data} — un carico di
+    prima di un'operazione e'
     un altro carico. None se la fotografia non ha il nome o non ne porta il profitto in euro."""
     r = ((broker or {}).get("righe") or {}).get(tk)
     if not r or r.get("controvalore_eur") is None or r.get("profitto") is None or r.get("valuta") != "EUR":
         return None
     foto = str((broker or {}).get("fotografia") or "")[:10]
-    dopo = [o["data"] for o in (operazioni or []) if o.get("tk") == tk and o.get("data") and str(o["data"]) > foto]
+    # v548 — LO STESSO GIORNO VALE COME DOPO. Il registro delle operazioni ha la data e non l'ora: il 25/11/2026 la
+    # fotografia era delle 11:15 e l'acquisto di ANT delle 15:35, e con `>` il carico di prima (13.031 EUR) restava
+    # attaccato a 150 azioni, cioe' un cambio «effettivo» di 1,156 che non e' mai esistito. Nel dubbio il carico di
+    # prima non si usa (istruzione 1): una fotografia fatta la sera, dopo l'operazione, si ridichiara con la sua ora.
+    dopo = [o["data"] for o in (operazioni or []) if o.get("tk") == tk and o.get("data") and str(o["data"]) >= foto]
     if dopo:
         return {"superato": max(dopo)}
     return {"carico_eur": r["controvalore_eur"] - r["profitto"], "controvalore_eur": r["controvalore_eur"],
