@@ -45,7 +45,7 @@ calo dal massimo, l'esito della tenuta e le tesi restano MISURE: informano, non 
 | BE | 40 | 214,00 | USD | |
 | ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
 | WDC | 24 | 342,00 | USD | acquisto del **02/11/2026** dalla riserva, speculazione sul rimbalzo (testuale: *"Entrato 24 a pmc 342 Wdc"*). Carico in euro nel registro §1decies |
-| ANT | 140 | 102,2143 | USD | Anthropic — +20 azioni a ~85,50 $ dopo il primo acquisto, ricavate dal carico che il broker dichiara il 24/11/2026 (da 105,00 a 102,2143) e confermate dal CEO il 25/11/2026: giorno da confermare (§1undecies). Acquisto del **19/11/2026**, primo giorno di contrattazione al Nasdaq (testuale: *"Entrato in ant 120 pezzi a 105 euro"*): 105 **dollari**, confermati dal CEO il 20/11/2026 (*"Ant dollari"*); nessuno stop attivo (CEO, 20/11/2026). ⚠ Claude è un prodotto di Anthropic: solo fatti e misure, nessun giudizio (CLAUDE.md, istruzione 6). Carico in euro nel registro §1decies |
+| ANT | 140 | 102,2143 | USD | Anthropic — +20 azioni a ~85,50 $ dopo il primo acquisto, ricavate dal carico che il broker dichiara il 24/11/2026 (da 105,00 a 102,2143), comprate il **23/11/2026** (CEO, 25/11/2026: *"il 23."*). Acquisto del **19/11/2026**, primo giorno di contrattazione al Nasdaq (testuale: *"Entrato in ant 120 pezzi a 105 euro"*): 105 **dollari**, confermati dal CEO il 20/11/2026 (*"Ant dollari"*); nessuno stop attivo (CEO, 20/11/2026). ⚠ Claude è un prodotto di Anthropic: solo fatti e misure, nessun giudizio (CLAUDE.md, istruzione 6). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 ⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
@@ -1003,6 +1003,7 @@ Convenzioni dichiarate (v240), rilette da un gate:
 | 13/11/2026 | GOOGL | vendita | 37 | 294,71 | 1,1020 | Banca Sella, nota informativa del 16/11/2026 (cambio medio, scarto 0,0006) | ordine con limite a 290 eseguito a 294,711; commissione 12,50 $; incasso netto 9.883,68 €; imposta 136 € (CEO, 17/11/2026) |
 | 16/11/2026 | AVGO | vendita | 24 | 329,75 | 1,1014 | BCE, riferimento del 16/11/2026 | stop del CEO; 24 azioni, confermate dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 | 19/11/2026 | ANT | acquisto | 120 | 105,00 | 1,0992 | BCE, riferimento del 19/11/2026 | primo giorno di contrattazione al Nasdaq (apertura a 111,50 $); il CEO scrive «105 euro»: sono 105 dollari, confermati il 20/11/2026; cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 23/11/2026 | ANT | acquisto | 20 | 85,50 | 1,0939 | BCE, riferimento del 23/11/2026 | seconda tranche, dichiarata dal CEO il 25/11/2026; prezzo ricavato dal carico che il broker dichiara (da 105,00 a 102,2143 su 140 azioni) e confermato dal CEO; la seduta ha scambiato fra 84,61 e 94,24 $; cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 | 24/11/2026 | MSTR | acquisto | 45 | 78,50 | 1,0963 | BCE, riferimento del 24/11/2026 | media del CEO; prezzo ricavato dal carico che il broker dichiara (da 173,3045 a 153,7347 su 218 azioni); cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 | 24/11/2026 | CRWV | acquisto | 70 | 42,10 | 1,0963 | BCE, riferimento del 24/11/2026 | media del CEO; prezzo ricavato dal carico che il broker dichiara (da 76,1408 a 68,8089 su 325 azioni); cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 | 24/11/2026 | MRVL | acquisto | 20 | 132,00 | 1,0963 | BCE, riferimento del 24/11/2026 | media del CEO; prezzo ricavato dal carico che il broker dichiara (da 214,08 a 187,6026 su 62 azioni); cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
@@ -1149,13 +1150,12 @@ stessa schermata mostra ANT a 140 azioni (erano 120): +20 a ~85,50 $, in una dat
 25/11 il CEO manda la fotografia intera del conto (§1duodecies). Quando arriva la nota della banca si annotano cambio
 applicato e commissioni (§1decies).
 
-**Chiuse il 25/11/2026** (CEO: *"1 si"* · *"2 8k"* · *"3 no"*): le 20 ANT in più sono a circa 85,50 $ (resta da
-dire il giorno); la liquidità è 8.000 € (§1 e `config/portfolio_state.json`); nessun ordine con limite aperto,
+**Chiuse il 25/11/2026** (CEO: *"1 si"* · *"2 8k"* · *"3 no"*): le 20 ANT in più sono a circa 85,50 $, comprate
+il 23/11/2026 (CEO, lo stesso giorno: *"il 23."*; riga in §1decies); la liquidità è 8.000 € (§1 e `config/portfolio_state.json`); nessun ordine con limite aperto,
 quindi §1septies resta senza ordini.
 
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
-| 25/11/2026 | ANT: le 20 azioni in più a circa 85,50 $ (prezzo confermato dal CEO il 25/11/2026) in che giorno sono state comprate? | manca la riga in §1decies, che vuole il giorno per il cambio: il carico in euro di ANT lo dà solo la fotografia del broker | il CEO dice il giorno, o manda la nota della banca |
 
 ## 1duodecies. IL CONTO DAL BROKER — fotografia, carichi in euro e operazioni chiuse (v520)
 
