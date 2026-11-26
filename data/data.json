@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-11-26T14:38:41Z",
- "eurusd": 1.0989,
+ "updated_at": "2026-11-26T18:14:25Z",
+ "eurusd": 1.0972,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -77,24 +77,24 @@
     "entita": "Rep Italy",
     "contratto": "SNRFOR.USD.CR14",
     "cedola_pb": 100,
-    "prezzo": 101.6528,
-    "punti": -1.65,
-    "pb": 63.5,
+    "prezzo": 101.6813,
+    "punti": -1.68,
+    "pb": 62.8,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.7
+      "da": "2026-11-19",
+      "pb": 1.1
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -9.6
+      "da": "2026-10-28",
+      "pb": -9.1
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 61.7,
      "min_data": "2026-11-11",
@@ -104,35 +104,34 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 73.0,
-     "pb_a": 63.5,
-     "indice_da": 61.1,
+     "pb_da": 71.9,
+     "pb_a": 62.8,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -13.1,
-     "indice_pct": 4.5,
+     "nome_pct": -12.6,
+     "indice_pct": 5.1,
      "eccesso_pct": -16.8
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
      "pb_da": 61.7,
-     "pb_a": 63.5,
-     "indice_da": 61.2,
+     "pb_a": 62.8,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 2.8,
-     "indice_pct": 4.3,
-     "eccesso_pct": -1.4
+     "nome_pct": 1.7,
+     "indice_pct": 1.2,
+     "eccesso_pct": 0.5
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
@@ -509,7 +508,7 @@
      33.88,
      30.71,
      34.61,
-     44.62,
+     44.63,
      33.36,
      40.49,
      44.24,
@@ -999,10 +998,10 @@
      593.76,
      596.9,
      597.06,
-     599.88,
+     599.87,
      598.35,
      594.74,
-     596.38,
+     596.27,
      592.33,
      593.86,
      599.29
@@ -1996,7 +1995,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -3135,7 +3134,7 @@
      376.11,
      375.53,
      373.84,
-     371.05,
+     371.04,
      375.1,
      381.17,
      386.74,
@@ -3209,9 +3208,9 @@
     "float_pct": 98.6,
     "avg_volume_30d": 28702687.0,
     "pe_ttm": 86.7585,
-    "forward_pe": 23.0199,
+    "forward_pe": 23.0493,
     "eps_ttm": 4.68,
-    "eps_forward": 17.6382,
+    "eps_forward": 17.6157,
     "revenue_fy": 45435998208.0,
     "net_income_fy": 7725000192.0,
     "revenue_growth": 0.447,
@@ -4423,78 +4422,71 @@
     "entita": "Advanced Micro Devices Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 97.3653,
-    "punti": 2.63,
-    "pb": 160.6,
+    "prezzo": 97.3636,
+    "punti": 2.64,
+    "pb": 160.7,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 27.5
+      "da": "2026-11-19",
+      "pb": 22.8
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 44.5
+      "da": "2026-10-28",
+      "pb": 41.2
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 104.7,
      "min_data": "2026-10-16",
-     "max_pb": 160.6,
-     "max_data": "2026-11-25"
+     "max_pb": 160.7,
+     "max_data": "2026-11-26"
     },
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 116.1,
-     "pb_a": 160.6,
-     "indice_da": 61.1,
+     "pb_da": 119.5,
+     "pb_a": 160.7,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 38.3,
-     "indice_pct": 4.5,
-     "eccesso_pct": 32.4
+     "nome_pct": 34.5,
+     "indice_pct": 5.1,
+     "eccesso_pct": 28.0
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 133.2,
-     "pb_a": 160.6,
-     "indice_da": 61.2,
+     "pb_da": 137.8,
+     "pb_a": 160.7,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 20.6,
-     "indice_pct": 4.3,
-     "eccesso_pct": 15.6
+     "nome_pct": 16.6,
+     "indice_pct": 1.2,
+     "eccesso_pct": 15.1
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -27.5,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -17.5
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -23.4,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -20.3
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -6182,7 +6174,7 @@
      "a1": -15.45,
      "a3": 220.18,
      "a5": 358.92,
-     "a10": 6490.7
+     "a10": 6490.69
     },
     "stagionalita": [
      {
@@ -6484,24 +6476,24 @@
     "entita": "NVIDIA Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 98.1045,
+    "prezzo": 98.1033,
     "punti": 1.9,
     "pb": 143.3,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 22.3
+      "da": "2026-11-19",
+      "pb": 20.7
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 22.7
+      "da": "2026-10-28",
+      "pb": 19.4
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 97.1,
      "min_data": "2026-10-16",
@@ -6511,51 +6503,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 120.6,
+     "pb_da": 124.0,
      "pb_a": 143.3,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 18.9,
-     "indice_pct": 4.5,
-     "eccesso_pct": 13.8
+     "nome_pct": 15.6,
+     "indice_pct": 5.1,
+     "eccesso_pct": 10.0
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 121.0,
+     "pb_da": 122.6,
      "pb_a": 143.3,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 18.5,
-     "indice_pct": 4.3,
-     "eccesso_pct": 13.6
+     "nome_pct": 16.9,
+     "indice_pct": 1.2,
+     "eccesso_pct": 15.5
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -31.5,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -22.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -1.1,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 2.9
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -9822,7 +9807,7 @@
      "a1": 46.7,
      "a3": 136.91,
      "a5": 87.28,
-     "a10": 878.09
+     "a10": 878.08
     },
     "stagionalita": [
      {
@@ -12249,9 +12234,9 @@
     "float_pct": 98.2,
     "avg_volume_30d": 16567693.0,
     "pe_ttm": 92.6606,
-    "forward_pe": 28.5559,
+    "forward_pe": 28.7176,
     "eps_ttm": 1.65,
-    "eps_forward": 5.3541,
+    "eps_forward": 5.3239,
     "revenue_fy": 3829938944.0,
     "net_income_fy": 518305984.0,
     "revenue_growth": 1.381,
@@ -14915,16 +14900,42 @@
      "da": "2026-10-28",
      "a": "2026-11-26",
      "indice": "IG",
-     "stato": "indice n.d.",
-     "perche": "indice CDX IG non raccolto il 2026-11-26"
+     "stato": "misurato",
+     "pb_da": 59.9,
+     "pb_a": 55.9,
+     "indice_da": 60.7,
+     "indice_a": 63.8,
+     "nome_pct": -6.6,
+     "indice_pct": 5.1,
+     "eccesso_pct": -11.1
     },
     "finestra5": {
      "n": 5,
      "da": "2026-11-19",
      "a": "2026-11-26",
      "indice": "IG",
-     "stato": "indice n.d.",
-     "perche": "indice CDX IG non raccolto il 2026-11-26"
+     "stato": "misurato",
+     "pb_da": 55.2,
+     "pb_a": 55.9,
+     "indice_da": 63.0,
+     "indice_a": 63.8,
+     "nome_pct": 1.3,
+     "indice_pct": 1.2,
+     "eccesso_pct": 0.0
+    },
+    "rango5": {
+     "finestre": 24,
+     "minimo": 60
+    },
+    "azione": {
+     "finestra": {
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
+     },
+     "finestra5": {
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
+     }
     }
    },
    "short_interest": {
@@ -17314,7 +17325,7 @@
      41.71,
      42.15,
      41.66,
-     41.44,
+     41.43,
      41.8,
      41.56,
      41.81,
@@ -18453,78 +18464,71 @@
     "entita": "COREWEAVE INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 500,
-    "prezzo": 74.8206,
-    "punti": 25.18,
-    "pb": 1417.5,
+    "prezzo": 74.806,
+    "punti": 25.19,
+    "pb": 1418.6,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 277.1
+      "da": "2026-11-19",
+      "pb": 268.2
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 384.9
+      "da": "2026-10-28",
+      "pb": 426.1
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 992.5,
      "min_data": "2026-10-28",
-     "max_pb": 1417.5,
-     "max_data": "2026-11-25"
+     "max_pb": 1418.6,
+     "max_data": "2026-11-26"
     },
     "indice": "HY",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "HY",
      "stato": "misurato",
-     "pb_da": 1032.7,
-     "pb_a": 1417.5,
-     "indice_da": 345.3,
-     "indice_a": 377.8,
-     "nome_pct": 37.3,
-     "indice_pct": 9.4,
-     "eccesso_pct": 25.5
+     "pb_da": 992.5,
+     "pb_a": 1418.6,
+     "indice_da": 343.7,
+     "indice_a": 377.7,
+     "nome_pct": 42.9,
+     "indice_pct": 9.9,
+     "eccesso_pct": 30.1
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "HY",
      "stato": "misurato",
-     "pb_da": 1140.5,
-     "pb_a": 1417.5,
-     "indice_da": 362.0,
-     "indice_a": 377.8,
-     "nome_pct": 24.3,
-     "indice_pct": 4.4,
-     "eccesso_pct": 19.1
+     "pb_da": 1150.4,
+     "pb_a": 1418.6,
+     "indice_da": 370.5,
+     "indice_a": 377.7,
+     "nome_pct": 23.3,
+     "indice_pct": 1.9,
+     "eccesso_pct": 21.0
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -28.5,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -18.7
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -11.0,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -7.4
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -18571,28 +18575,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 60837.02,
+   "price": 60486.24,
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.76,
+   "change_pct": 0.18,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -51.8,
-   "sma200_dist_pct": -15.4,
-   "sma50_dist_pct": -18.5,
+   "ath_dist_pct": -52.1,
+   "sma200_dist_pct": -15.9,
+   "sma50_dist_pct": -19.0,
    "w52_high": 97860.6,
    "w52_low": 55149.57,
-   "w52_dist_pct": -37.8,
+   "w52_dist_pct": -38.2,
    "day_high": 61040.95,
-   "day_low": 60324.98,
+   "day_low": 60040.08,
    "support": 55149.57,
    "resistance": 76138.68,
-   "rsi": 29.4,
-   "volume": 35062980608,
+   "rsi": 28.0,
+   "volume": 26690781184,
    "vol_ratio": 1.26,
-   "atr_14": 2853.4,
-   "atr_pct": 4.69,
+   "atr_14": 2873.75,
+   "atr_pct": 4.75,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18601,7 +18605,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60837.02
+     60486.24
     ],
     "m6": [
      64098.5,
@@ -18729,7 +18733,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60837.02
+     60486.24
     ],
     "all": [
      386.94,
@@ -18878,7 +18882,7 @@
      78548.63,
      83553.85,
      77434.75,
-     60837.02
+     60486.24
     ],
     "m1": [
      75942.12,
@@ -18902,7 +18906,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60837.02
+     60486.24
     ],
     "m3": [
      86172.28,
@@ -18970,7 +18974,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60837.02
+     60486.24
     ],
     "y1": [
      90518.37,
@@ -19046,97 +19050,118 @@
      73964.47,
      64855.84,
      60094.09,
-     60837.02
+     60486.24
     ],
     "d1": [
-     60317.4,
-     60863.1,
-     60852.81,
-     60696.16,
-     60556.4,
-     60382.97,
-     60588.48,
-     60710.42,
-     60802.58,
-     60631.6,
-     60699.18,
+     60325.38,
+     60860.32,
+     60860.4,
+     60707.58,
+     60552.17,
+     60382.11,
+     60586.62,
+     60692.27,
+     60810.77,
+     60631.59,
+     60699.78,
      60843.9,
      60697.94,
-     60757.91,
+     60757.9,
      60926.07,
-     60890.73,
-     60941.83,
-     60655.65,
+     60870.4,
+     60945.11,
+     60656.16,
      60595.74,
-     60684.32,
-     60677.16,
-     60580.43,
-     60633.46,
+     60684.41,
+     60677.15,
+     60580.42,
+     60633.47,
      60723.05,
      60831.47,
-     60913.06,
-     60920.85,
-     60935.16,
-     60930.07,
+     60909.4,
+     60920.86,
+     60935.2,
+     60925.48,
      60893.43,
-     60867.16,
+     60867.0,
      60813.52,
      60915.03,
      60971.16,
      60809.34,
-     60733.26,
-     60504.45,
-     60468.5,
-     60492.82,
-     60546.59,
-     60438.13,
-     60494.29,
-     60429.67,
-     60395.54,
-     60502.34,
-     60483.66,
-     60560.04,
-     60506.23,
-     60534.99,
-     60526.6,
+     60731.99,
+     60500.0,
+     60470.12,
+     60492.98,
+     60541.54,
+     60440.48,
+     60499.68,
+     60430.19,
+     60395.55,
+     60500.56,
+     60475.79,
+     60560.03,
+     60502.73,
+     60536.86,
+     60529.22,
      60600.1,
-     60557.52,
-     60677.33,
+     60557.78,
+     60677.34,
      60851.37,
-     60788.38,
-     60872.82,
+     60794.3,
+     60870.78,
      60716.65,
      60730.93,
-     60868.88,
+     60868.87,
      60867.78,
      60807.56,
      60881.39,
      60740.25,
      60726.1,
      60464.22,
-     60440.56,
-     60422.8,
-     60527.37,
-     60592.64,
-     60585.43,
-     60674.93,
-     60631.77,
-     60793.49,
+     60440.57,
+     60422.81,
+     60527.38,
+     60602.53,
+     60587.92,
+     60662.5,
+     60639.09,
+     60792.16,
      60591.06,
-     60520.3,
-     60596.74,
-     60847.88,
-     60864.01,
-     60732.66,
+     60518.55,
+     60597.33,
+     60846.9,
+     60864.02,
+     60735.82,
      60741.91,
-     60773.55,
-     60781.32,
-     60816.26,
-     60762.78,
+     60769.1,
+     60779.83,
+     60814.63,
+     60775.96,
      60804.35,
      60777.48,
-     60742.67,
-     60837.02
+     60741.86,
+     60801.4,
+     60676.61,
+     60695.39,
+     60297.01,
+     60150.48,
+     60162.35,
+     60308.96,
+     60373.2,
+     60572.5,
+     60604.91,
+     60512.65,
+     60424.96,
+     60324.32,
+     60480.46,
+     60419.48,
+     60557.72,
+     60481.08,
+     60523.73,
+     60464.21,
+     60368.65,
+     60455.93,
+     60469.84
     ]
    },
    "earnings_date": null,
@@ -19145,12 +19170,12 @@
    "health": 16,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.84,
-   "sortino_1y": -1.14,
-   "sharpe_6m": -0.5,
-   "sortino_6m": -0.72,
+   "sharpe_1y": -0.85,
+   "sortino_1y": -1.15,
+   "sharpe_6m": -0.53,
+   "sortino_6m": -0.76,
    "prepost": null,
-   "prezzo_limite_aggiustato": 60837.02,
+   "prezzo_limite_aggiustato": 60486.24,
    "risk_reward": "1:2.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19166,22 +19191,22 @@
     "w1": {
      "support": 57241.84,
      "resistance": 64478.36,
-     "change_pct": -0.53
+     "change_pct": -1.1
     },
     "m1": {
      "support": 55149.57,
      "resistance": 80833.62,
-     "change_pct": -19.89
+     "change_pct": -20.35
     },
     "m3": {
      "support": 55149.57,
      "resistance": 87265.49,
-     "change_pct": -29.4
+     "change_pct": -29.81
     },
     "y1": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -13.73
+     "change_pct": -14.23
     }
    },
    "financials": [],
@@ -19204,74 +19229,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 60837.02,
+     "prezzo": 60486.24,
      "medie": {
       "sma10": {
-       "liv": 61201.2,
-       "dist_pct": -0.6
+       "liv": 61166.12,
+       "dist_pct": -1.11
       },
       "ema10": {
-       "liv": 61975.8,
-       "dist_pct": -1.84
+       "liv": 61912.02,
+       "dist_pct": -2.3
       },
       "sma20": {
-       "liv": 65956.66,
-       "dist_pct": -7.76
+       "liv": 65939.12,
+       "dist_pct": -8.27
       },
       "ema20": {
-       "liv": 65397.23,
-       "dist_pct": -6.97
+       "liv": 65363.82,
+       "dist_pct": -7.46
       },
       "sma30": {
-       "liv": 69905.8,
-       "dist_pct": -12.97
+       "liv": 69894.11,
+       "dist_pct": -13.46
       },
       "ema30": {
-       "liv": 68181.21,
-       "dist_pct": -10.77
+       "liv": 68158.58,
+       "dist_pct": -11.26
       },
       "sma50": {
-       "liv": 74685.39,
-       "dist_pct": -18.54
+       "liv": 74678.38,
+       "dist_pct": -19.0
       },
       "ema50": {
-       "liv": 71490.27,
-       "dist_pct": -14.9
+       "liv": 71476.52,
+       "dist_pct": -15.38
       },
       "sma100": {
-       "liv": 77482.73,
-       "dist_pct": -21.48
+       "liv": 77479.22,
+       "dist_pct": -21.93
       },
       "ema100": {
-       "liv": 73619.18,
-       "dist_pct": -17.36
+       "liv": 73612.24,
+       "dist_pct": -17.83
       },
       "sma200": {
-       "liv": 71921.95,
-       "dist_pct": -15.41
+       "liv": 71920.2,
+       "dist_pct": -15.9
       },
       "ema200": {
-       "liv": 74124.31,
-       "dist_pct": -17.93
+       "liv": 74120.82,
+       "dist_pct": -18.4
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 29.4,
+      "rsi14": 28.0,
       "macd": {
-       "linea": -4516.17,
-       "segnale": -4453.81,
-       "istogramma": -62.36
+       "linea": -4544.16,
+       "segnale": -4459.41,
+       "istogramma": -84.75
       },
-      "stoch_k": 34.9,
-      "stoch_d": 28.7,
-      "williams_r": -65.1,
-      "cci20": -46.9,
+      "stoch_k": 32.8,
+      "stoch_d": 28.0,
+      "williams_r": -67.2,
+      "cci20": -48.6,
       "adx14": 49.3,
-      "di_su": 11.8,
-      "di_giu": 37.6,
-      "momentum10": -4018.82
+      "di_su": 11.7,
+      "di_giu": 37.3,
+      "momentum10": -4369.61
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19763,20 +19788,20 @@
       "d": "2026-11-26",
       "o": 60378.57,
       "h": 61040.95,
-      "l": 60324.98,
-      "c": 60837.02
+      "l": 60040.08,
+      "c": 60486.24
      }
     ],
     "performance": {
-     "s1": 1.24,
-     "m1": -24.34,
-     "m3": -29.75,
-     "m6": -6.47,
-     "a1": -12.98,
-     "ytd": -31.44,
-     "a3": 61.32,
-     "a5": 6.72,
-     "a10": 8058.48
+     "s1": 0.65,
+     "m1": -24.77,
+     "m3": -30.16,
+     "m6": -7.01,
+     "a1": -13.48,
+     "ytd": -31.83,
+     "a3": 60.39,
+     "a5": 6.11,
+     "a10": 8011.43
     },
     "stagionalita": [
      {
@@ -19889,9 +19914,9 @@
      }
     ]
    },
-   "rs_1m": -12.9,
+   "rs_1m": -13.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -7.7,
+   "rs_ndx_1m": -8.2,
    "beta_ndx": 0.58,
    "avg_corr": 0.39,
    "max_corr": 0.77,
@@ -19903,28 +19928,28 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 27.1,
+   "price": 26.8,
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -4.21,
+   "change_pct": -5.27,
    "pe": null,
    "ath": 89.53,
-   "ath_dist_pct": -69.7,
-   "sma200_dist_pct": 44.0,
-   "sma50_dist_pct": 40.8,
+   "ath_dist_pct": -70.1,
+   "sma200_dist_pct": 42.4,
+   "sma50_dist_pct": 39.2,
    "w52_high": 40.03,
    "w52_low": 13.38,
-   "w52_dist_pct": -32.3,
+   "w52_dist_pct": -33.1,
    "day_high": 27.54,
-   "day_low": 26.59,
+   "day_low": 26.57,
    "support": 15.39,
    "resistance": 40.03,
-   "rsi": 55.9,
+   "rsi": 55.4,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 5.46,
-   "atr_pct": 20.14,
+   "atr_pct": 20.37,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -19933,7 +19958,7 @@
      26.62,
      26.36,
      28.29,
-     27.1
+     26.8
     ],
     "m6": [
      15.77,
@@ -20061,7 +20086,7 @@
      26.62,
      26.36,
      28.29,
-     27.1
+     26.8
     ],
     "all": [
      25.36,
@@ -20506,7 +20531,7 @@
      14.92,
      16.34,
      19.42,
-     27.1
+     26.8
     ],
     "m1": [
      16.91,
@@ -20530,7 +20555,7 @@
      26.62,
      26.36,
      28.29,
-     27.1
+     26.8
     ],
     "m3": [
      14.51,
@@ -20598,7 +20623,7 @@
      26.62,
      26.36,
      28.29,
-     27.1
+     26.8
     ],
     "y1": [
      17.19,
@@ -20690,7 +20715,20 @@
      26.84,
      27.04,
      27.09,
-     27.1
+     27.13,
+     27.04,
+     26.95,
+     26.91,
+     26.78,
+     26.93,
+     26.77,
+     26.77,
+     26.69,
+     26.67,
+     26.62,
+     26.6,
+     26.64,
+     26.78
     ]
    },
    "earnings_date": null,
@@ -20700,11 +20738,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": 0.3,
-   "sortino_1y": 0.48,
-   "sharpe_6m": 0.64,
-   "sortino_6m": 1.05,
+   "sortino_1y": 0.46,
+   "sharpe_6m": 0.63,
+   "sortino_6m": 1.03,
    "prepost": null,
-   "prezzo_limite_aggiustato": 27.1,
+   "prezzo_limite_aggiustato": 26.8,
    "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -20720,22 +20758,22 @@
     "w1": {
      "support": 15.39,
      "resistance": 40.03,
-     "change_pct": -24.49
+     "change_pct": -25.33
     },
     "m1": {
      "support": 15.39,
      "resistance": 40.03,
-     "change_pct": 60.26
+     "change_pct": 58.49
     },
     "m3": {
      "support": 13.8,
      "resistance": 40.03,
-     "change_pct": 86.77
+     "change_pct": 84.7
     },
     "y1": {
      "support": 13.38,
      "resistance": 40.03,
-     "change_pct": 57.19
+     "change_pct": 55.45
     }
    },
    "financials": [],
@@ -20758,74 +20796,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 27.1,
+     "prezzo": 26.8,
      "medie": {
       "sma10": {
-       "liv": 26.49,
-       "dist_pct": 2.29
+       "liv": 26.46,
+       "dist_pct": 1.27
       },
       "ema10": {
-       "liv": 26.37,
-       "dist_pct": 2.75
+       "liv": 26.32,
+       "dist_pct": 1.82
       },
       "sma20": {
-       "liv": 23.62,
-       "dist_pct": 14.75
+       "liv": 23.6,
+       "dist_pct": 13.55
       },
       "ema20": {
-       "liv": 24.18,
-       "dist_pct": 12.07
+       "liv": 24.15,
+       "dist_pct": 10.96
       },
       "sma30": {
-       "liv": 21.78,
-       "dist_pct": 24.45
+       "liv": 21.77,
+       "dist_pct": 23.13
       },
       "ema30": {
-       "liv": 22.66,
-       "dist_pct": 19.6
+       "liv": 22.64,
+       "dist_pct": 18.38
       },
       "sma50": {
        "liv": 19.25,
-       "dist_pct": 40.75
+       "dist_pct": 39.24
       },
       "ema50": {
-       "liv": 20.83,
-       "dist_pct": 30.13
+       "liv": 20.81,
+       "dist_pct": 28.76
       },
       "sma100": {
-       "liv": 17.72,
-       "dist_pct": 52.97
+       "liv": 17.71,
+       "dist_pct": 51.3
       },
       "ema100": {
        "liv": 19.12,
-       "dist_pct": 41.71
+       "dist_pct": 40.19
       },
       "sma200": {
        "liv": 18.82,
-       "dist_pct": 44.02
+       "dist_pct": 42.44
       },
       "ema200": {
        "liv": 18.41,
-       "dist_pct": 47.19
+       "dist_pct": 45.59
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 55.9,
+      "rsi14": 55.4,
       "macd": {
-       "linea": 2.68,
+       "linea": 2.65,
        "segnale": 2.29,
-       "istogramma": 0.38
+       "istogramma": 0.36
       },
-      "stoch_k": 47.5,
-      "stoch_d": 48.1,
-      "williams_r": -52.5,
-      "cci20": 58.7,
+      "stoch_k": 46.3,
+      "stoch_d": 47.7,
+      "williams_r": -53.7,
+      "cci20": 57.1,
       "adx14": 35.1,
       "di_su": 31.0,
       "di_giu": 19.2,
-      "momentum10": 8.4
+      "momentum10": 8.1
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -21317,20 +21355,20 @@
       "d": "2026-11-26",
       "o": 27.18,
       "h": 27.54,
-      "l": 26.59,
-      "c": 27.1
+      "l": 26.57,
+      "c": 26.8
      }
     ],
     "performance": {
-     "s1": -4.71,
-     "m1": 54.68,
-     "m3": 78.17,
-     "m6": 68.85,
-     "a1": 65.75,
-     "ytd": 86.77,
-     "a3": 109.75,
-     "a5": -0.33,
-     "a10": 103.3
+     "s1": -5.77,
+     "m1": 52.97,
+     "m3": 76.2,
+     "m6": 66.98,
+     "a1": 63.91,
+     "ytd": 84.7,
+     "a3": 107.43,
+     "a5": -1.43,
+     "a10": 101.05
     },
     "stagionalita": [
      {
@@ -21443,9 +21481,9 @@
      }
     ]
    },
-   "rs_1m": 67.3,
+   "rs_1m": 65.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 72.4,
+   "rs_ndx_1m": 70.6,
    "beta_ndx": -4.75,
    "avg_corr": -0.56,
    "max_corr": -0.39,
@@ -21457,16 +21495,16 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 26246.25,
+   "price": 26226.0,
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.56,
+   "change_pct": 0.48,
    "pe": null,
    "ath": 31616.5,
    "ath_dist_pct": -17.0,
-   "sma200_dist_pct": -7.0,
-   "sma50_dist_pct": -10.0,
+   "sma200_dist_pct": -7.1,
+   "sma50_dist_pct": -10.1,
    "w52_high": 31616.5,
    "w52_low": 22961.5,
    "w52_dist_pct": -17.0,
@@ -21474,11 +21512,11 @@
    "day_low": 25997.5,
    "support": 24976.5,
    "resistance": 29180.0,
-   "rsi": 39.2,
-   "volume": 96422,
+   "rsi": 39.0,
+   "volume": 121885,
    "vol_ratio": 1.08,
    "atr_14": 980.03,
-   "atr_pct": 3.73,
+   "atr_pct": 3.74,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -21487,7 +21525,7 @@
      26808.0,
      26275.75,
      26100.25,
-     26246.25
+     26226.0
     ],
     "m6": [
      30566.25,
@@ -21615,7 +21653,7 @@
      26808.0,
      26275.75,
      26100.25,
-     26246.25
+     26226.0
     ],
     "all": [
      3621.0,
@@ -21886,7 +21924,7 @@
      29513.0,
      30698.75,
      28534.0,
-     26246.25
+     26226.0
     ],
     "m1": [
      29979.5,
@@ -21910,7 +21948,7 @@
      26808.0,
      26275.75,
      26100.25,
-     26246.25
+     26226.0
     ],
     "m3": [
      29289.5,
@@ -21978,7 +22016,7 @@
      26808.0,
      26275.75,
      26100.25,
-     26246.25
+     26226.0
     ],
     "y1": [
      25302.25,
@@ -22038,29 +22076,29 @@
      25970.25,
      25901.0,
      25884.75,
-     25899.5,
+     25901.0,
      25887.25,
      25911.5,
-     25939.0,
+     25938.5,
      25888.0,
-     25916.0,
+     25915.5,
      25905.75,
      25855.0,
      25867.5,
      25797.0,
-     25722.0,
+     25723.0,
      25669.0,
      25730.25,
      25779.0,
      25807.75,
      25778.25,
-     25833.0,
+     25835.25,
      25892.25,
-     25840.75,
+     25840.0,
      25818.0,
      25770.5,
-     25736.75,
-     25665.75,
+     25735.75,
+     25663.5,
      25690.0,
      25596.75,
      25684.5,
@@ -22072,71 +22110,71 @@
      25659.75,
      25645.75,
      25643.25,
-     25567.75,
+     25567.5,
      25548.25,
-     25579.75,
+     25577.75,
      25533.0,
-     25486.5,
-     25480.0,
+     25485.25,
+     25479.25,
      25511.25,
      25534.25,
      25515.25,
      25539.25,
-     25503.25,
-     25516.25,
+     25501.5,
+     25516.0,
      25567.25,
      25496.75,
      25463.0,
      25414.5,
-     25441.0,
+     25441.75,
      25427.0,
      25410.5,
      25183.75,
      25138.75,
-     25459.75,
-     25346.5,
+     25462.25,
+     25347.25,
      25174.0,
-     25141.25,
+     25141.0,
      25173.0,
      25167.5,
      25135.0,
      25082.5,
      25093.5,
      25173.5,
-     25148.5,
-     25137.75,
+     25148.25,
+     25138.25,
      25280.25,
      25495.25,
      25627.0,
-     25506.0,
-     25631.25,
+     25505.0,
+     25631.0,
+     25695.25,
      25693.75,
-     25694.5,
-     25748.0,
-     25857.25,
-     25907.75,
-     25899.25,
-     26055.5,
+     25747.25,
+     25858.5,
+     25908.5,
+     25899.5,
+     26055.75,
      25975.0,
      26109.25,
      26025.25,
      26109.75,
      26104.75,
-     26014.5,
-     26016.75,
+     26014.75,
+     26017.75,
      26028.25,
      26027.25,
-     26010.25,
+     26010.5,
      25929.0,
-     26041.5,
-     26104.75,
+     26041.0,
+     26105.75,
      26091.75,
      26087.5,
      26094.75,
      26065.5,
      26029.25,
      26000.5,
-     26082.25,
+     26011.5,
      26066.5,
      26044.25,
      26093.75,
@@ -22144,21 +22182,21 @@
      26117.0,
      26130.0,
      26191.75,
-     26214.5,
+     26215.0,
      26246.25,
      26219.5,
      26211.0,
      26253.75,
      26297.25,
      26308.0,
-     26249.75,
+     26249.0,
      26229.25,
      26252.75,
      26262.0,
      26277.0,
      26318.0,
      26333.75,
-     26303.0,
+     26302.0,
      26302.25,
      26312.0,
      26305.0,
@@ -22181,11 +22219,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": 0.0,
-   "sortino_1y": 0.01,
+   "sortino_1y": 0.0,
    "sharpe_6m": -1.19,
    "sortino_6m": -1.57,
    "prepost": null,
-   "prezzo_limite_aggiustato": 26246.25,
+   "prezzo_limite_aggiustato": 26226.0,
    "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -22201,22 +22239,22 @@
     "w1": {
      "support": 24976.5,
      "resistance": 27137.0,
-     "change_pct": 4.46
+     "change_pct": 4.38
     },
     "m1": {
      "support": 24976.5,
      "resistance": 30178.0,
-     "change_pct": -12.45
+     "change_pct": -12.52
     },
     "m3": {
      "support": 24976.5,
      "resistance": 31616.5,
-     "change_pct": -10.39
+     "change_pct": -10.46
     },
     "y1": {
      "support": 22961.5,
      "resistance": 31616.5,
-     "change_pct": 3.73
+     "change_pct": 3.65
     }
    },
    "financials": [],
@@ -22243,74 +22281,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 26246.25,
+     "prezzo": 26226.0,
      "medie": {
       "sma10": {
-       "liv": 26673.83,
-       "dist_pct": -1.6
+       "liv": 26671.8,
+       "dist_pct": -1.67
       },
       "ema10": {
-       "liv": 26667.52,
-       "dist_pct": -1.58
+       "liv": 26663.84,
+       "dist_pct": -1.64
       },
       "sma20": {
-       "liv": 27340.85,
-       "dist_pct": -4.0
+       "liv": 27339.84,
+       "dist_pct": -4.07
       },
       "ema20": {
-       "liv": 27338.14,
-       "dist_pct": -3.99
+       "liv": 27336.21,
+       "dist_pct": -4.06
       },
       "sma30": {
-       "liv": 28088.79,
-       "dist_pct": -6.56
+       "liv": 28088.12,
+       "dist_pct": -6.63
       },
       "ema30": {
-       "liv": 27838.64,
-       "dist_pct": -5.72
+       "liv": 27837.34,
+       "dist_pct": -5.79
       },
       "sma50": {
-       "liv": 29170.19,
-       "dist_pct": -10.02
+       "liv": 29169.79,
+       "dist_pct": -10.09
       },
       "ema50": {
-       "liv": 28418.04,
-       "dist_pct": -7.64
+       "liv": 28417.25,
+       "dist_pct": -7.71
       },
       "sma100": {
-       "liv": 29226.36,
-       "dist_pct": -10.2
+       "liv": 29226.16,
+       "dist_pct": -10.27
       },
       "ema100": {
-       "liv": 28755.07,
-       "dist_pct": -8.72
+       "liv": 28754.67,
+       "dist_pct": -8.79
       },
       "sma200": {
-       "liv": 28222.9,
-       "dist_pct": -7.0
+       "liv": 28222.8,
+       "dist_pct": -7.08
       },
       "ema200": {
-       "liv": 28289.86,
-       "dist_pct": -7.22
+       "liv": 28289.66,
+       "dist_pct": -7.29
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 39.2,
+      "rsi14": 39.0,
       "macd": {
-       "linea": -847.95,
-       "segnale": -770.97,
-       "istogramma": -76.98
+       "linea": -849.56,
+       "segnale": -771.29,
+       "istogramma": -78.27
       },
-      "stoch_k": 34.1,
-      "stoch_d": 33.1,
-      "williams_r": -65.9,
-      "cci20": -55.5,
+      "stoch_k": 33.6,
+      "stoch_d": 32.9,
+      "williams_r": -66.4,
+      "cci20": -55.8,
       "adx14": 31.9,
       "di_su": 11.6,
       "di_giu": 31.2,
-      "momentum10": -2138.25
+      "momentum10": -2158.5
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -22803,19 +22841,19 @@
       "o": 26068.5,
       "h": 26436.0,
       "l": 25997.5,
-      "c": 26246.25
+      "c": 26226.0
      }
     ],
     "performance": {
-     "s1": -1.33,
-     "m1": -11.96,
-     "m3": -10.35,
-     "m6": -13.68,
-     "ytd": 3.39,
-     "a1": 5.4,
-     "a3": 83.53,
-     "a5": 103.29,
-     "a10": 495.39
+     "s1": -1.41,
+     "m1": -12.03,
+     "m3": -10.42,
+     "m6": -13.75,
+     "ytd": 3.31,
+     "a1": 5.32,
+     "a3": 83.39,
+     "a5": 103.13,
+     "a10": 494.93
     },
     "stagionalita": [
      {
@@ -22930,7 +22968,7 @@
    },
    "rs_1m": -5.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -0.3,
+   "rs_ndx_1m": -0.4,
    "beta_ndx": 0.99,
    "avg_corr": 0.72,
    "max_corr": 0.84,
@@ -22943,38 +22981,39 @@
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
    "price": 4711.21,
-   "price_asof": "2026-11-26",
+   "price_asof": null,
    "price_asof_arretrata_da": null,
-   "price_live": false,
+   "price_live": true,
    "change_pct": 0.29,
    "pe": null,
    "ath": 9385.59,
    "ath_dist_pct": -49.8,
    "sma200_dist_pct": -27.7,
-   "sma50_dist_pct": -20.0,
+   "sma50_dist_pct": -20.6,
    "w52_high": 9385.59,
    "w52_low": 3866.66,
    "w52_dist_pct": -49.8,
-   "day_high": 4817.77,
-   "day_low": 4704.65,
+   "day_high": 4823.36,
+   "day_low": 4672.55,
    "support": 4586.8,
-   "resistance": 5910.83,
-   "rsi": 35.5,
-   "volume": 170996,
+   "resistance": 6100.11,
+   "rsi": 35.1,
+   "volume": 205400,
    "vol_ratio": 0.83,
-   "atr_14": 255.28,
-   "atr_pct": 5.42,
+   "atr_14": 265.67,
+   "atr_pct": 5.64,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
     "w1": [
+     5137.89,
      4869.96,
      4708.54,
      5006.03,
-     4697.51,
-     4711.21
+     4697.51
     ],
     "m6": [
+     7847.71,
      8047.51,
      8228.7,
      8185.29,
@@ -23099,8 +23138,7 @@
      4869.96,
      4708.54,
      5006.03,
-     4697.51,
-     4711.21
+     4697.51
     ],
     "all": [
      651.22,
@@ -23465,6 +23503,7 @@
      4711.21
     ],
     "m1": [
+     5638.34,
      6012.44,
      5937.66,
      5730.74,
@@ -23485,10 +23524,10 @@
      4869.96,
      4708.54,
      5006.03,
-     4697.51,
-     4711.21
+     4697.51
     ],
     "m3": [
+     6852.58,
      6912.95,
      6696.96,
      6742.74,
@@ -23553,8 +23592,7 @@
      4869.96,
      4708.54,
      5006.03,
-     4697.51,
-     4711.21
+     4697.51
     ],
     "y1": [
      3960.87,
@@ -23652,13 +23690,13 @@
    "health": 18,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.25,
-   "sortino_1y": 0.34,
+   "sharpe_1y": 0.24,
+   "sortino_1y": 0.33,
    "sharpe_6m": -1.63,
    "sortino_6m": -2.1,
    "prepost": null,
    "prezzo_limite_aggiustato": 4711.21,
-   "risk_reward": "1:2.3",
+   "risk_reward": "1:2.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -23672,40 +23710,40 @@
    "tech_by_range": {
     "w1": {
      "support": 4586.8,
-     "resistance": 5065.74,
-     "change_pct": -3.26
+     "resistance": 5137.89,
+     "change_pct": -8.57
     },
     "m1": {
      "support": 4586.8,
      "resistance": 6100.11,
-     "change_pct": -21.64
+     "change_pct": -16.69
     },
     "m3": {
      "support": 4586.8,
      "resistance": 7171.52,
-     "change_pct": -31.85
+     "change_pct": -31.45
     },
     "y1": {
      "support": 3866.66,
      "resistance": 9385.59,
-     "change_pct": 18.94
+     "change_pct": 18.6
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 20,
+    "bias": 24,
     "label": "Distribuzione",
     "structure": "ribassista",
     "bos": null,
     "bull_fvg": 0,
-    "bear_fvg": 3,
+    "bear_fvg": 2,
     "last_fvg": {
      "dir": "ribassista",
-     "lo": 4817.77,
-     "hi": 4880.16
+     "lo": 5084.06,
+     "hi": 5259.09
     },
-    "liq_above": 5065.74,
+    "liq_above": 5137.89,
     "liq_below": 4586.8,
     "order_block": {
      "dir": "rialzista",
@@ -23715,78 +23753,85 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 4711.21,
+     "prezzo": 4697.51,
      "medie": {
       "sma10": {
-       "liv": 4955.81,
-       "dist_pct": -4.94
+       "liv": 5018.96,
+       "dist_pct": -6.4
       },
       "ema10": {
-       "liv": 4942.43,
-       "dist_pct": -4.68
+       "liv": 4993.81,
+       "dist_pct": -5.93
       },
       "sma20": {
-       "liv": 5195.0,
-       "dist_pct": -9.31
+       "liv": 5256.33,
+       "dist_pct": -10.63
       },
       "ema20": {
-       "liv": 5170.77,
-       "dist_pct": -8.89
+       "liv": 5219.14,
+       "dist_pct": -9.99
       },
       "sma30": {
-       "liv": 5358.88,
-       "dist_pct": -12.09
+       "liv": 5386.98,
+       "dist_pct": -12.8
       },
       "ema30": {
-       "liv": 5375.9,
-       "dist_pct": -12.36
+       "liv": 5421.74,
+       "dist_pct": -13.36
       },
       "sma50": {
-       "liv": 5888.8,
-       "dist_pct": -20.0
+       "liv": 5932.77,
+       "dist_pct": -20.82
       },
       "ema50": {
-       "liv": 5700.63,
-       "dist_pct": -17.36
+       "liv": 5741.01,
+       "dist_pct": -18.18
       },
       "sma100": {
-       "liv": 6344.2,
-       "dist_pct": -25.74
+       "liv": 6380.12,
+       "dist_pct": -26.37
       },
       "ema100": {
-       "liv": 6110.57,
-       "dist_pct": -22.9
+       "liv": 6138.84,
+       "dist_pct": -23.48
       },
       "sma200": {
-       "liv": 6517.02,
-       "dist_pct": -27.71
+       "liv": 6519.59,
+       "dist_pct": -27.95
       },
       "ema200": {
-       "liv": 6091.34,
-       "dist_pct": -22.66
+       "liv": 6105.21,
+       "dist_pct": -23.06
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 35.5,
+      "rsi14": 35.1,
       "macd": {
-       "linea": -307.56,
-       "segnale": -295.52,
-       "istogramma": -12.03
+       "linea": -303.8,
+       "segnale": -292.51,
+       "istogramma": -11.29
       },
-      "stoch_k": 13.6,
-      "stoch_d": 22.5,
-      "williams_r": -86.4,
-      "cci20": -79.4,
-      "adx14": 29.8,
-      "di_su": 18.6,
-      "di_giu": 33.7,
-      "momentum10": -631.52
+      "stoch_k": 12.1,
+      "stoch_d": 21.3,
+      "williams_r": -87.9,
+      "cci20": -96.0,
+      "adx14": 29.9,
+      "di_su": 19.2,
+      "di_giu": 34.9,
+      "momentum10": -677.85
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
+     {
+      "d": "2026-08-13",
+      "o": 6773.92,
+      "h": 6895.63,
+      "l": 6748.13,
+      "c": 6813.34
+     },
      {
       "d": "2026-08-14",
       "o": 6995.67,
@@ -24269,25 +24314,18 @@
       "h": 4823.36,
       "l": 4672.55,
       "c": 4697.51
-     },
-     {
-      "d": "2026-11-26",
-      "o": 4745.1,
-      "h": 4817.77,
-      "l": 4704.65,
-      "c": 4711.21
      }
     ],
     "performance": {
-     "s1": -8.3,
-     "m1": -16.44,
-     "m3": -31.25,
-     "m6": -39.97,
-     "ytd": 9.32,
-     "a1": 19.98,
-     "a3": 85.83,
-     "a5": 65.95,
-     "a10": 137.52
+     "s1": -7.3,
+     "m1": -14.11,
+     "m3": -27.41,
+     "m6": -39.9,
+     "ytd": 9.0,
+     "a1": 19.63,
+     "a3": 85.28,
+     "a5": 65.46,
+     "a10": 136.83
     },
     "stagionalita": [
      {
@@ -24400,9 +24438,9 @@
      }
     ]
    },
-   "rs_1m": -14.7,
+   "rs_1m": -9.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -9.5,
+   "rs_ndx_1m": -4.5,
    "beta_ndx": 0.53,
    "avg_corr": 0.2,
    "max_corr": 0.34,
@@ -27510,20 +27548,20 @@
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.22,
+   "change_pct": 0.09,
    "pe": null,
    "ath": 1.6,
    "ath_dist_pct": -31.5,
-   "sma200_dist_pct": -4.4,
-   "sma50_dist_pct": -1.9,
+   "sma200_dist_pct": -4.5,
+   "sma50_dist_pct": -2.0,
    "w52_high": 1.2,
    "w52_low": 1.09,
-   "w52_dist_pct": -8.6,
+   "w52_dist_pct": -8.7,
    "day_high": 1.1,
    "day_low": 1.1,
    "support": 1.09,
    "resistance": 1.13,
-   "rsi": 36.8,
+   "rsi": 34.7,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 0.00702,
@@ -28178,19 +28216,40 @@
      1.1,
      1.1,
      1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
+     1.1,
      1.1
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 34,
+   "health": 33,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.54,
-   "sortino_1y": -2.15,
-   "sharpe_6m": -3.1,
-   "sortino_6m": -3.74,
+   "sharpe_1y": -1.57,
+   "sortino_1y": -2.18,
+   "sharpe_6m": -3.16,
+   "sortino_6m": -3.8,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.1,
    "risk_reward": "1:2.0",
@@ -28208,22 +28267,22 @@
     "w1": {
      "support": 1.09,
      "resistance": 1.1,
-     "change_pct": 0.15
+     "change_pct": 0.02
     },
     "m1": {
      "support": 1.09,
      "resistance": 1.13,
-     "change_pct": -1.29
+     "change_pct": -1.42
     },
     "m3": {
      "support": 1.09,
      "resistance": 1.17,
-     "change_pct": -5.73
+     "change_pct": -5.86
     },
     "y1": {
      "support": 1.09,
      "resistance": 1.2,
-     "change_pct": -5.62
+     "change_pct": -5.74
     }
    },
    "financials": [],
@@ -28254,66 +28313,66 @@
      "medie": {
       "sma10": {
        "liv": 1.1,
-       "dist_pct": 0.03
+       "dist_pct": -0.09
       },
       "ema10": {
        "liv": 1.1,
-       "dist_pct": -0.11
+       "dist_pct": -0.22
       },
       "sma20": {
        "liv": 1.11,
-       "dist_pct": -0.88
+       "dist_pct": -1.0
       },
       "ema20": {
        "liv": 1.11,
-       "dist_pct": -0.65
+       "dist_pct": -0.77
       },
       "sma30": {
        "liv": 1.11,
-       "dist_pct": -1.23
+       "dist_pct": -1.35
       },
       "ema30": {
        "liv": 1.11,
-       "dist_pct": -1.09
+       "dist_pct": -1.21
       },
       "sma50": {
        "liv": 1.12,
-       "dist_pct": -1.89
+       "dist_pct": -2.01
       },
       "ema50": {
        "liv": 1.12,
-       "dist_pct": -1.79
+       "dist_pct": -1.92
       },
       "sma100": {
        "liv": 1.14,
-       "dist_pct": -3.35
+       "dist_pct": -3.47
       },
       "ema100": {
        "liv": 1.13,
-       "dist_pct": -2.87
+       "dist_pct": -2.99
       },
       "sma200": {
        "liv": 1.15,
-       "dist_pct": -4.37
+       "dist_pct": -4.5
       },
       "ema200": {
        "liv": 1.14,
-       "dist_pct": -3.85
+       "dist_pct": -3.98
       }
      },
-     "medie_battute": 1,
+     "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 36.8,
+      "rsi14": 34.7,
       "macd": {
        "linea": -0.01,
        "segnale": -0.01,
        "istogramma": -0.0
       },
-      "stoch_k": 27.9,
-      "stoch_d": 18.4,
-      "williams_r": -72.1,
-      "cci20": -76.5,
+      "stoch_k": 24.0,
+      "stoch_d": 17.1,
+      "williams_r": -76.0,
+      "cci20": -79.7,
       "adx14": 34.0,
       "di_su": 10.2,
       "di_giu": 23.9,
@@ -28814,15 +28873,15 @@
      }
     ],
     "performance": {
-     "s1": 0.13,
-     "m1": -1.68,
-     "m3": -5.89,
-     "m6": -5.47,
-     "a1": -5.64,
-     "ytd": -6.5,
-     "a3": 0.12,
-     "a5": -2.72,
-     "a10": 3.18
+     "s1": 0.0,
+     "m1": -1.8,
+     "m3": -6.02,
+     "m6": -5.59,
+     "a1": -5.76,
+     "ytd": -6.62,
+     "a3": -0.01,
+     "a5": -2.85,
+     "a10": 3.04
     },
     "stagionalita": [
      {
@@ -28949,37 +29008,37 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 5.46,
+   "price": 5.44,
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 2.4,
+   "change_pct": 2.0,
    "pe": null,
    "ath": 6.83,
-   "ath_dist_pct": -20.1,
-   "sma200_dist_pct": -12.1,
-   "sma50_dist_pct": -14.0,
+   "ath_dist_pct": -20.4,
+   "sma200_dist_pct": -12.5,
+   "sma50_dist_pct": -14.3,
    "w52_high": 6.83,
    "w52_low": 5.02,
-   "w52_dist_pct": -20.1,
+   "w52_dist_pct": -20.4,
    "day_high": 5.55,
    "day_low": 5.43,
    "support": 5.3,
    "resistance": 6.55,
-   "rsi": 30.3,
-   "volume": 25445,
+   "rsi": 29.2,
+   "volume": 29408,
    "vol_ratio": 0.4,
    "atr_14": 0.13515,
-   "atr_pct": 2.47,
-   "signal": "Trend debole",
-   "signal_class": "bad",
+   "atr_pct": 2.48,
+   "signal": "Ipervenduto",
+   "signal_class": "info",
    "sparks": {
     "w1": [
      5.48,
      5.63,
      5.36,
      5.33,
-     5.46
+     5.44
     ],
     "m6": [
      6.52,
@@ -29107,7 +29166,7 @@
      5.63,
      5.36,
      5.33,
-     5.46
+     5.44
     ],
     "all": [
      0.88,
@@ -29379,7 +29438,7 @@
      6.59,
      6.56,
      6.46,
-     5.46
+     5.44
     ],
     "m1": [
      6.64,
@@ -29403,7 +29462,7 @@
      5.63,
      5.36,
      5.33,
-     5.46
+     5.44
     ],
     "m3": [
      6.59,
@@ -29471,7 +29530,7 @@
      5.63,
      5.36,
      5.33,
-     5.46
+     5.44
     ],
     "y1": [
      5.1,
@@ -29558,7 +29617,7 @@
      5.4,
      5.4,
      5.42,
-     5.41,
+     5.4,
      5.41,
      5.41,
      5.41,
@@ -29670,16 +29729,16 @@
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 17,
+   "health": 16,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.11,
-   "sortino_1y": 0.15,
-   "sharpe_6m": -1.32,
-   "sortino_6m": -1.65,
+   "sharpe_1y": 0.1,
+   "sortino_1y": 0.14,
+   "sharpe_6m": -1.36,
+   "sortino_6m": -1.68,
    "prepost": null,
-   "prezzo_limite_aggiustato": 5.46,
-   "risk_reward": "1:4.0",
+   "prezzo_limite_aggiustato": 5.44,
+   "risk_reward": "1:4.1",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -29694,22 +29753,22 @@
     "w1": {
      "support": 5.3,
      "resistance": 5.73,
-     "change_pct": -0.3
+     "change_pct": -0.69
     },
     "m1": {
      "support": 5.3,
      "resistance": 6.64,
-     "change_pct": -17.78
+     "change_pct": -18.11
     },
     "m3": {
      "support": 5.3,
      "resistance": 6.83,
-     "change_pct": -17.2
+     "change_pct": -17.52
     },
     "y1": {
      "support": 5.02,
      "resistance": 6.83,
-     "change_pct": 6.97
+     "change_pct": 6.55
     }
    },
    "financials": [],
@@ -29732,74 +29791,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 5.46,
+     "prezzo": 5.44,
      "medie": {
       "sma10": {
        "liv": 5.66,
-       "dist_pct": -3.52
+       "dist_pct": -3.86
       },
       "ema10": {
-       "liv": 5.65,
-       "dist_pct": -3.27
+       "liv": 5.64,
+       "dist_pct": -3.59
       },
       "sma20": {
        "liv": 5.99,
-       "dist_pct": -8.88
+       "dist_pct": -9.22
       },
       "ema20": {
        "liv": 5.89,
-       "dist_pct": -7.29
+       "dist_pct": -7.62
       },
       "sma30": {
        "liv": 6.17,
-       "dist_pct": -11.56
+       "dist_pct": -11.9
       },
       "ema30": {
        "liv": 6.04,
-       "dist_pct": -9.57
+       "dist_pct": -9.9
       },
       "sma50": {
        "liv": 6.35,
-       "dist_pct": -14.0
+       "dist_pct": -14.33
       },
       "ema50": {
        "liv": 6.19,
-       "dist_pct": -11.83
+       "dist_pct": -12.17
       },
       "sma100": {
        "liv": 6.42,
-       "dist_pct": -14.91
+       "dist_pct": -15.24
       },
       "ema100": {
        "liv": 6.28,
-       "dist_pct": -13.09
+       "dist_pct": -13.42
       },
       "sma200": {
        "liv": 6.21,
-       "dist_pct": -12.13
+       "dist_pct": -12.48
       },
       "ema200": {
        "liv": 6.17,
-       "dist_pct": -11.43
+       "dist_pct": -11.78
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 30.3,
+      "rsi14": 29.2,
       "macd": {
        "linea": -0.28,
        "segnale": -0.22,
        "istogramma": -0.07
       },
-      "stoch_k": 15.1,
-      "stoch_d": 5.9,
-      "williams_r": -84.9,
-      "cci20": -91.8,
+      "stoch_k": 13.0,
+      "stoch_d": 5.2,
+      "williams_r": -87.0,
+      "cci20": -93.3,
       "adx14": 36.2,
       "di_su": 29.7,
       "di_giu": 54.9,
-      "momentum10": -0.72
+      "momentum10": -0.74
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -30292,19 +30351,19 @@
       "o": 5.48,
       "h": 5.55,
       "l": 5.43,
-      "c": 5.46
+      "c": 5.44
      }
     ],
     "performance": {
-     "s1": -2.92,
-     "m1": -17.54,
-     "m3": -18.62,
-     "m6": -14.14,
-     "ytd": -3.18,
-     "a1": 13.64,
-     "a3": 50.39,
-     "a5": 33.36,
-     "a10": 89.17
+     "s1": -3.31,
+     "m1": -17.86,
+     "m3": -18.94,
+     "m6": -14.47,
+     "ytd": -3.56,
+     "a1": 13.19,
+     "a3": 49.79,
+     "a5": 32.84,
+     "a10": 88.43
     },
     "stagionalita": [
      {
@@ -30417,9 +30476,9 @@
      }
     ]
    },
-   "rs_1m": -10.8,
+   "rs_1m": -11.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -5.6,
+   "rs_ndx_1m": -5.9,
    "beta_ndx": 0.59,
    "avg_corr": 0.45,
    "max_corr": 0.54,
@@ -30431,28 +30490,28 @@
    "currency": "PTS",
    "valuta_bilancio": "PTS",
    "price_src": "yahoo",
-   "price": 84.78,
+   "price": 84.97,
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 1.31,
+   "change_pct": 1.54,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -42.4,
-   "sma200_dist_pct": -4.4,
-   "sma50_dist_pct": -8.4,
+   "ath_dist_pct": -42.3,
+   "sma200_dist_pct": -4.2,
+   "sma50_dist_pct": -8.2,
    "w52_high": 119.48,
    "w52_low": 54.98,
-   "w52_dist_pct": -29.0,
-   "day_high": 85.23,
+   "w52_dist_pct": -28.9,
+   "day_high": 85.21,
    "day_low": 83.16,
    "support": 79.07,
    "resistance": 104.99,
-   "rsi": 42.5,
-   "volume": 66169,
+   "rsi": 42.9,
+   "volume": 89191,
    "vol_ratio": 0.86,
    "atr_14": 3.86,
-   "atr_pct": 4.55,
+   "atr_pct": 4.54,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -30461,7 +30520,7 @@
      80.17,
      82.05,
      83.68,
-     84.78
+     84.97
     ],
     "m6": [
      92.16,
@@ -30589,7 +30648,7 @@
      80.17,
      82.05,
      83.68,
-     84.78
+     84.97
     ],
     "all": [
      33.1,
@@ -30861,7 +30920,7 @@
      85.76,
      90.42,
      104.12,
-     84.78
+     84.97
     ],
     "m1": [
      102.78,
@@ -30885,7 +30944,7 @@
      80.17,
      82.05,
      83.68,
-     84.78
+     84.97
     ],
     "m3": [
      82.23,
@@ -30953,7 +31012,7 @@
      80.17,
      82.05,
      83.68,
-     84.78
+     84.97
     ],
     "y1": [
      58.65,
@@ -31027,7 +31086,7 @@
      80.59,
      80.39,
      80.3,
-     80.18,
+     80.17,
      80.27,
      80.28,
      80.55,
@@ -31056,10 +31115,10 @@
      82.44,
      82.41,
      82.37,
-     82.19,
+     82.18,
      82.47,
      82.5,
-     82.55,
+     82.54,
      82.5,
      82.52,
      82.61,
@@ -31078,7 +31137,7 @@
      83.33,
      83.31,
      83.41,
-     83.08,
+     83.07,
      83.11,
      83.05,
      82.99,
@@ -31114,7 +31173,7 @@
      83.94,
      83.84,
      84.01,
-     84.0,
+     84.01,
      84.05,
      84.04,
      83.98,
@@ -31127,7 +31186,7 @@
      84.35,
      84.18,
      84.05,
-     83.91,
+     83.9,
      83.98,
      84.01,
      84.09,
@@ -31156,11 +31215,11 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": 0.58,
-   "sortino_1y": 0.78,
-   "sharpe_6m": -0.2,
-   "sortino_6m": -0.27,
+   "sortino_1y": 0.79,
+   "sharpe_6m": -0.19,
+   "sortino_6m": -0.25,
    "prepost": null,
-   "prezzo_limite_aggiustato": 84.78,
+   "prezzo_limite_aggiustato": 84.97,
    "risk_reward": "1:2.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -31175,23 +31234,23 @@
    "tech_by_range": {
     "w1": {
      "support": 79.07,
-     "resistance": 85.23,
-     "change_pct": 0.95
+     "resistance": 85.21,
+     "change_pct": 1.18
     },
     "m1": {
      "support": 79.07,
      "resistance": 104.99,
-     "change_pct": -17.51
+     "change_pct": -17.33
     },
     "m3": {
      "support": 79.07,
      "resistance": 110.48,
-     "change_pct": 3.1
+     "change_pct": 3.33
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 44.55
+     "change_pct": 44.88
     }
    },
    "financials": [],
@@ -31214,74 +31273,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 84.78,
+     "prezzo": 84.97,
      "medie": {
       "sma10": {
-       "liv": 84.14,
-       "dist_pct": 0.76
+       "liv": 84.16,
+       "dist_pct": 0.96
       },
       "ema10": {
-       "liv": 84.58,
-       "dist_pct": 0.23
+       "liv": 84.62,
+       "dist_pct": 0.42
       },
       "sma20": {
-       "liv": 87.79,
-       "dist_pct": -3.42
+       "liv": 87.8,
+       "dist_pct": -3.22
       },
       "ema20": {
-       "liv": 87.27,
-       "dist_pct": -2.85
+       "liv": 87.29,
+       "dist_pct": -2.66
       },
       "sma30": {
        "liv": 92.3,
-       "dist_pct": -8.14
+       "dist_pct": -7.94
       },
       "ema30": {
-       "liv": 88.98,
-       "dist_pct": -4.72
+       "liv": 88.99,
+       "dist_pct": -4.52
       },
       "sma50": {
-       "liv": 92.53,
-       "dist_pct": -8.38
+       "liv": 92.54,
+       "dist_pct": -8.18
       },
       "ema50": {
-       "liv": 90.19,
-       "dist_pct": -6.0
+       "liv": 90.2,
+       "dist_pct": -5.8
       },
       "sma100": {
-       "liv": 89.18,
-       "dist_pct": -4.94
+       "liv": 89.19,
+       "dist_pct": -4.73
       },
       "ema100": {
-       "liv": 89.51,
-       "dist_pct": -5.29
+       "liv": 89.52,
+       "dist_pct": -5.08
       },
       "sma200": {
-       "liv": 88.66,
-       "dist_pct": -4.38
+       "liv": 88.67,
+       "dist_pct": -4.17
       },
       "ema200": {
        "liv": 85.37,
-       "dist_pct": -0.69
+       "dist_pct": -0.47
       }
      },
      "medie_battute": 2,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 42.5,
+      "rsi14": 42.9,
       "macd": {
-       "linea": -3.27,
+       "linea": -3.26,
        "segnale": -2.99,
-       "istogramma": -0.28
+       "istogramma": -0.27
       },
-      "stoch_k": 46.2,
-      "stoch_d": 34.2,
-      "williams_r": -53.8,
-      "cci20": -31.3,
+      "stoch_k": 47.8,
+      "stoch_d": 34.7,
+      "williams_r": -52.2,
+      "cci20": -30.9,
       "adx14": 28.8,
       "di_su": 16.4,
       "di_giu": 27.3,
-      "momentum10": -3.96
+      "momentum10": -3.77
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -31772,21 +31831,21 @@
      {
       "d": "2026-11-26",
       "o": 84.09,
-      "h": 85.23,
+      "h": 85.21,
       "l": 83.16,
-      "c": 84.78
+      "c": 84.97
      }
     ],
     "performance": {
-     "s1": 1.89,
-     "m1": -15.14,
-     "m3": 2.94,
-     "m6": -2.95,
-     "ytd": 47.91,
-     "a1": 35.93,
-     "a3": 24.51,
-     "a5": 37.85,
-     "a10": 42.18
+     "s1": 2.12,
+     "m1": -14.94,
+     "m3": 3.17,
+     "m6": -2.74,
+     "ytd": 48.24,
+     "a1": 36.24,
+     "a3": 24.79,
+     "a5": 38.16,
+     "a10": 42.5
     },
     "stagionalita": [
      {
@@ -31899,9 +31958,9 @@
      }
     ]
    },
-   "rs_1m": -10.5,
+   "rs_1m": -10.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -5.4,
+   "rs_ndx_1m": -5.2,
    "beta_ndx": -0.79,
    "avg_corr": -0.19,
    "max_corr": -0.08,
@@ -37229,24 +37288,24 @@
     "entita": "Amazon Com Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 100.1087,
+    "prezzo": 100.1088,
     "punti": -0.11,
     "pb": 97.6,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.6
+      "da": "2026-11-19",
+      "pb": 1.4
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 17.4
+      "da": "2026-10-28",
+      "pb": 15.9
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 77.5,
      "min_data": "2026-10-16",
@@ -37256,51 +37315,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 80.2,
+     "pb_da": 81.7,
      "pb_a": 97.6,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 21.6,
-     "indice_pct": 4.5,
-     "eccesso_pct": 16.4
+     "nome_pct": 19.4,
+     "indice_pct": 5.1,
+     "eccesso_pct": 13.6
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 96.0,
+     "pb_da": 96.1,
      "pb_a": 97.6,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 1.7,
-     "indice_pct": 4.3,
-     "eccesso_pct": -2.5
+     "nome_pct": 1.5,
+     "indice_pct": 1.2,
+     "eccesso_pct": 0.2
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -3.4,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 9.9
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -8.7,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -5.0
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -38029,9 +38081,9 @@
     "float_pct": 99.7,
     "avg_volume_30d": 4925218.0,
     "pe_ttm": 24.7682,
-    "forward_pe": 7.3426,
+    "forward_pe": 7.2286,
     "eps_ttm": 19.07,
-    "eps_forward": 64.3273,
+    "eps_forward": 65.3416,
     "revenue_fy": 13799000064.0,
     "net_income_fy": 4396000256.0,
     "revenue_growth": 0.61,
@@ -39933,9 +39985,9 @@
     "float_pct": null,
     "avg_volume_30d": 32193667.0,
     "pe_ttm": 14.2611,
-    "forward_pe": 17.8527,
+    "forward_pe": 17.8555,
     "eps_ttm": 19.15,
-    "eps_forward": 15.2974,
+    "eps_forward": 15.295,
     "revenue_fy": 471097999360.0,
     "net_income_fy": 235693621248.0,
     "revenue_growth": 0.247,
@@ -41135,24 +41187,24 @@
     "entita": "Alphabet Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 100.1353,
+    "prezzo": 100.1354,
     "punti": -0.14,
     "pb": 97.0,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 7.8
+      "da": "2026-11-19",
+      "pb": 6.6
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 17.6
+      "da": "2026-10-28",
+      "pb": 15.3
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 76.1,
      "min_data": "2026-10-16",
@@ -41162,51 +41214,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 79.3,
+     "pb_da": 81.7,
      "pb_a": 97.0,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 22.2,
-     "indice_pct": 4.5,
-     "eccesso_pct": 17.0
+     "nome_pct": 18.7,
+     "indice_pct": 5.1,
+     "eccesso_pct": 13.0
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 89.1,
+     "pb_da": 90.4,
      "pb_a": 97.0,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 8.8,
-     "indice_pct": 4.3,
-     "eccesso_pct": 4.3
+     "nome_pct": 7.3,
+     "indice_pct": 1.2,
+     "eccesso_pct": 6.0
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -14.8,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -3.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -3.3,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 0.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -42142,7 +42187,7 @@
      256.29,
      258.81,
      254.58,
-     250.93,
+     251.14,
      252.95,
      249.63,
      251.14,
@@ -45463,16 +45508,42 @@
      "da": "2026-10-28",
      "a": "2026-11-26",
      "indice": "IG",
-     "stato": "indice n.d.",
-     "perche": "indice CDX IG non raccolto il 2026-11-26"
+     "stato": "misurato",
+     "pb_da": 64.2,
+     "pb_a": 64.2,
+     "indice_da": 60.7,
+     "indice_a": 63.8,
+     "nome_pct": 0.1,
+     "indice_pct": 5.1,
+     "eccesso_pct": -4.8
     },
     "finestra5": {
      "n": 5,
      "da": "2026-11-19",
      "a": "2026-11-26",
      "indice": "IG",
-     "stato": "indice n.d.",
-     "perche": "indice CDX IG non raccolto il 2026-11-26"
+     "stato": "misurato",
+     "pb_da": 62.2,
+     "pb_a": 64.2,
+     "indice_da": 63.0,
+     "indice_a": 63.8,
+     "nome_pct": 3.2,
+     "indice_pct": 1.2,
+     "eccesso_pct": 1.9
+    },
+    "rango5": {
+     "finestre": 24,
+     "minimo": 60
+    },
+    "azione": {
+     "finestra": {
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
+     },
+     "finestra5": {
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
+     }
     }
    },
    "short_interest": {
@@ -45895,9 +45966,9 @@
     "float_pct": 95.1,
     "avg_volume_30d": 10001098.0,
     "pe_ttm": null,
-    "forward_pe": 48.2573,
+    "forward_pe": 48.2833,
     "eps_ttm": -5.17,
-    "eps_forward": 1.8584,
+    "eps_forward": 1.8574,
     "revenue_fy": 755766976.0,
     "net_income_fy": -639561984.0,
     "revenue_growth": 0.553,
@@ -49041,24 +49112,24 @@
     "entita": "Intel Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 97.7501,
+    "prezzo": 97.7487,
     "punti": 2.25,
     "pb": 151.6,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 3.3
+      "da": "2026-11-19",
+      "pb": 3.9
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 52.9
+      "da": "2026-10-28",
+      "pb": 52.0
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 86.6,
      "min_data": "2026-10-16",
@@ -49068,51 +49139,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 98.7,
+     "pb_da": 99.7,
      "pb_a": 151.6,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 53.6,
-     "indice_pct": 4.5,
-     "eccesso_pct": 47.0
+     "nome_pct": 52.2,
+     "indice_pct": 5.1,
+     "eccesso_pct": 44.7
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 148.2,
+     "pb_da": 147.7,
      "pb_a": 151.6,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 2.2,
-     "indice_pct": 4.3,
-     "eccesso_pct": -2.0
+     "nome_pct": 2.6,
+     "indice_pct": 1.2,
+     "eccesso_pct": 1.4
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -41.9,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -33.9
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -0.4,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 3.7
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -49439,7 +49503,7 @@
      114.61,
      116.27,
      117.79,
-     116.06,
+     116.09,
      115.64,
      116.45,
      116.83,
@@ -50534,78 +50598,71 @@
     "entita": "SPACE EXPL TECH CORP",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 92.0714,
+    "prezzo": 92.0664,
     "punti": 7.93,
-    "pb": 292.2,
+    "pb": 292.4,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 27.8
+      "da": "2026-11-19",
+      "pb": 23.4
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 50.7
+      "da": "2026-10-28",
+      "pb": 45.6
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 216.4,
      "min_data": "2026-10-16",
-     "max_pb": 292.2,
-     "max_data": "2026-11-25"
+     "max_pb": 292.4,
+     "max_data": "2026-11-26"
     },
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 241.5,
-     "pb_a": 292.2,
-     "indice_da": 61.1,
+     "pb_da": 246.8,
+     "pb_a": 292.4,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 21.0,
-     "indice_pct": 4.5,
-     "eccesso_pct": 15.8
+     "nome_pct": 18.5,
+     "indice_pct": 5.1,
+     "eccesso_pct": 12.7
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 264.5,
-     "pb_a": 292.2,
-     "indice_da": 61.2,
+     "pb_da": 269.0,
+     "pb_a": 292.4,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 10.5,
-     "indice_pct": 4.3,
-     "eccesso_pct": 5.9
+     "nome_pct": 8.7,
+     "indice_pct": 1.2,
+     "eccesso_pct": 7.4
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -14.2,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -2.4
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -11.2,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -7.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -51243,9 +51300,9 @@
     "float_pct": 71.4,
     "avg_volume_30d": 37403615.0,
     "pe_ttm": 417.7363,
-    "forward_pe": 176.0543,
+    "forward_pe": 175.6833,
     "eps_ttm": 0.91,
-    "eps_forward": 2.1592,
+    "eps_forward": 2.1638,
     "revenue_fy": 103569997824.0,
     "net_income_fy": 3220000000.0,
     "revenue_growth": -0.002,
@@ -52446,24 +52503,24 @@
     "entita": "Tesla Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 94.6456,
-    "punti": 5.35,
-    "pb": 226.5,
+    "prezzo": 94.6423,
+    "punti": 5.36,
+    "pb": 226.6,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.6
+      "da": "2026-11-19",
+      "pb": 0.7
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 24.9
+      "da": "2026-10-28",
+      "pb": 26.2
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 185.7,
      "min_data": "2026-10-19",
@@ -52473,51 +52530,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 201.6,
-     "pb_a": 226.5,
-     "indice_da": 61.1,
+     "pb_da": 200.4,
+     "pb_a": 226.6,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 12.4,
-     "indice_pct": 4.5,
-     "eccesso_pct": 7.5
+     "nome_pct": 13.1,
+     "indice_pct": 5.1,
+     "eccesso_pct": 7.6
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 224.9,
-     "pb_a": 226.5,
-     "indice_da": 61.2,
+     "pb_da": 225.9,
+     "pb_a": 226.6,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 0.7,
-     "indice_pct": 4.3,
-     "eccesso_pct": -3.4
+     "nome_pct": 0.3,
+     "indice_pct": 1.2,
+     "eccesso_pct": -0.9
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -6.7,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 6.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -0.9,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 3.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -53017,9 +53067,9 @@
     "float_pct": 99.7,
     "avg_volume_30d": 3695121.0,
     "pe_ttm": 18.9132,
-    "forward_pe": 17.5741,
+    "forward_pe": 17.557,
     "eps_ttm": 12.44,
-    "eps_forward": 13.3879,
+    "eps_forward": 13.4009,
     "revenue_fy": 34250000384.0,
     "net_income_fy": 4369999872.0,
     "revenue_growth": 0.454,
@@ -54111,24 +54161,24 @@
     "entita": "Constellation Energy Generation LLC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 101.0901,
+    "prezzo": 101.0908,
     "punti": -1.09,
-    "pb": 75.8,
+    "pb": 75.7,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 0.6
+      "da": "2026-11-19",
+      "pb": 0.5
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -0.6
+      "da": "2026-10-28",
+      "pb": 0.1
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 74.8,
      "min_data": "2026-11-03",
@@ -54138,51 +54188,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 76.4,
-     "pb_a": 75.8,
-     "indice_da": 61.1,
+     "pb_da": 75.7,
+     "pb_a": 75.7,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -0.8,
-     "indice_pct": 4.5,
-     "eccesso_pct": -5.0
+     "nome_pct": 0.1,
+     "indice_pct": 5.1,
+     "eccesso_pct": -4.8
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 75.1,
-     "pb_a": 75.8,
-     "indice_da": 61.2,
+     "pb_da": 75.2,
+     "pb_a": 75.7,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 0.8,
-     "indice_pct": 4.3,
-     "eccesso_pct": -3.3
+     "nome_pct": 0.7,
+     "indice_pct": 1.2,
+     "eccesso_pct": -0.6
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -9.0,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 3.5
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -10.5,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -6.8
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     },
     "nota": "il CDS e' sulla controllata operativa Constellation Energy Generation LLC, che e' l'emittente del debito: non sulla capogruppo quotata"
@@ -56121,24 +56164,24 @@
     "entita": "Netflix Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 101.6224,
+    "prezzo": 101.6234,
     "punti": -1.62,
     "pb": 64.1,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 3.9
+      "da": "2026-11-19",
+      "pb": 3.0
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 3.9
+      "da": "2026-10-28",
+      "pb": 4.5
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 55.2,
      "min_data": "2026-10-16",
@@ -56148,51 +56191,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 60.2,
+     "pb_da": 59.6,
      "pb_a": 64.1,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 6.4,
-     "indice_pct": 4.5,
-     "eccesso_pct": 1.9
+     "nome_pct": 7.5,
+     "indice_pct": 5.1,
+     "eccesso_pct": 2.3
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 60.3,
+     "pb_da": 61.0,
      "pb_a": 64.1,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 6.4,
-     "indice_pct": 4.3,
-     "eccesso_pct": 2.0
+     "nome_pct": 5.0,
+     "indice_pct": 1.2,
+     "eccesso_pct": 3.7
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -5.0,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 8.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -0.7,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 3.3
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -57128,9 +57164,9 @@
     "float_pct": 99.9,
     "avg_volume_30d": 24207546.0,
     "pe_ttm": 25.5705,
-    "forward_pe": 20.2443,
+    "forward_pe": 20.2419,
     "eps_ttm": 19.16,
-    "eps_forward": 24.2008,
+    "eps_forward": 24.2038,
     "revenue_fy": 346444988416.0,
     "net_income_fy": 142630993920.0,
     "revenue_growth": 0.188,
@@ -57239,7 +57275,7 @@
      },
      {
       "trim": "2026-06-30",
-      "azioni": 7427000000
+      "azioni": 7428434704
      },
      {
       "trim": "2026-03-31",
@@ -57262,7 +57298,7 @@
     },
     "var_trim": {
      "da": "2026-06-30",
-     "pct": 0.0
+     "pct": -0.02
     },
     "rotazione": {
      "pct": 0.33,
@@ -58331,24 +58367,24 @@
     "entita": "Microsoft Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 102.2017,
+    "prezzo": 102.2031,
     "punti": -2.2,
-    "pb": 51.6,
+    "pb": 51.5,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.3
+      "da": "2026-11-19",
+      "pb": 1.6
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -2.6
+      "da": "2026-10-28",
+      "pb": -2.2
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 49.3,
      "min_data": "2026-11-13",
@@ -58358,51 +58394,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 54.2,
-     "pb_a": 51.6,
-     "indice_da": 61.1,
+     "pb_da": 53.7,
+     "pb_a": 51.5,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -4.9,
-     "indice_pct": 4.5,
-     "eccesso_pct": -9.0
+     "nome_pct": -4.2,
+     "indice_pct": 5.1,
+     "eccesso_pct": -8.8
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 50.2,
-     "pb_a": 51.6,
-     "indice_da": 61.2,
+     "pb_da": 49.9,
+     "pb_a": 51.5,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 2.6,
-     "indice_pct": 4.3,
-     "eccesso_pct": -1.6
+     "nome_pct": 3.3,
+     "indice_pct": 1.2,
+     "eccesso_pct": 2.0
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -7.6,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 5.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -3.4,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 0.5
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -59209,7 +59238,7 @@
      276.59,
      279.73,
      277.06,
-     271.25,
+     271.24,
      272.45,
      266.33,
      259.35,
@@ -60551,24 +60580,24 @@
     "entita": "Apple Inc.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 102.3906,
+    "prezzo": 102.3921,
     "punti": -2.39,
-    "pb": 47.5,
+    "pb": 47.4,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
+      "da": "2026-11-19",
       "pb": 3.2
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -0.5
+      "da": "2026-10-28",
+      "pb": 0.4
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 43.9,
      "min_data": "2026-11-16",
@@ -60578,51 +60607,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 48.0,
-     "pb_a": 47.5,
-     "indice_da": 61.1,
+     "pb_da": 47.1,
+     "pb_a": 47.4,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -1.1,
-     "indice_pct": 4.5,
-     "eccesso_pct": -5.3
+     "nome_pct": 0.8,
+     "indice_pct": 5.1,
+     "eccesso_pct": -4.1
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 44.3,
-     "pb_a": 47.5,
-     "indice_da": 61.2,
+     "pb_da": 44.2,
+     "pb_a": 47.4,
+     "indice_da": 63.0,
      "indice_a": 63.8,
      "nome_pct": 7.2,
-     "indice_pct": 4.3,
-     "eccesso_pct": 2.8
+     "indice_pct": 1.2,
+     "eccesso_pct": 5.9
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 2.5,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 16.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 0.9,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 5.0
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -60673,7 +60695,7 @@
    "price_asof_arretrata_da": null,
    "price_live": false,
    "change_pct": 3.4,
-   "pe": 20.1,
+   "pe": 20.8,
    "ath": 793.02,
    "ath_dist_pct": -23.1,
    "sma200_dist_pct": -2.7,
@@ -61216,7 +61238,7 @@
     "target_mediana": 850.0
    },
    "health": 36,
-   "eps": 30.31,
+   "eps": 29.31,
    "beta": 1.28,
    "sharpe_1y": -0.17,
    "sortino_1y": -0.24,
@@ -61237,10 +61259,10 @@
     "float_shares": 2211199809.0,
     "float_pct": 99.9,
     "avg_volume_30d": 20972150.0,
-    "pe_ttm": 20.1217,
-    "forward_pe": 17.152,
-    "eps_ttm": 30.31,
-    "eps_forward": 35.558,
+    "pe_ttm": 20.8083,
+    "forward_pe": 17.0956,
+    "eps_ttm": 29.31,
+    "eps_forward": 35.6752,
     "revenue_fy": 241605001216.0,
     "net_income_fy": 75249000448.0,
     "revenue_growth": 0.261,
@@ -62442,24 +62464,24 @@
     "entita": "META PLATFORMS INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 99.1129,
+    "prezzo": 99.1123,
     "punti": 0.89,
     "pb": 120.1,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 7.4
+      "da": "2026-11-19",
+      "pb": 8.0
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 8.0
+      "da": "2026-10-28",
+      "pb": 6.1
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 105.4,
      "min_data": "2026-10-16",
@@ -62469,51 +62491,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 112.1,
+     "pb_da": 114.0,
      "pb_a": 120.1,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 7.1,
-     "indice_pct": 4.5,
-     "eccesso_pct": 2.5
+     "nome_pct": 5.3,
+     "indice_pct": 5.1,
+     "eccesso_pct": 0.2
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 112.7,
+     "pb_da": 112.0,
      "pb_a": 120.1,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 6.6,
-     "indice_pct": 4.3,
-     "eccesso_pct": 2.2
+     "nome_pct": 7.2,
+     "indice_pct": 1.2,
+     "eccesso_pct": 5.9
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -1.7,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 11.9
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -1.1,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 2.9
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -62963,7 +62978,7 @@
      252.61,
      254.68,
      248.87,
-     269.78,
+     269.77,
      287.18,
      325.25,
      329.9,
@@ -63224,9 +63239,9 @@
     "float_pct": 96.9,
     "avg_volume_30d": 10537001.0,
     "pe_ttm": 18.043,
-    "forward_pe": 12.3187,
+    "forward_pe": 12.3006,
     "eps_ttm": 10.93,
-    "eps_forward": 16.009,
+    "eps_forward": 16.0325,
     "revenue_fy": 43938000896.0,
     "net_income_fy": 9662000128.0,
     "revenue_growth": 0.108,
@@ -65037,9 +65052,9 @@
     "float_pct": 99.7,
     "avg_volume_30d": 15921921.0,
     "pe_ttm": 66.3022,
-    "forward_pe": 19.1908,
+    "forward_pe": 19.1793,
     "eps_ttm": 1.39,
-    "eps_forward": 4.8023,
+    "eps_forward": 4.8052,
     "revenue_fy": 15431000064.0,
     "net_income_fy": 1444999936.0,
     "revenue_growth": 0.205,
@@ -66888,9 +66903,9 @@
     "float_pct": 98.8,
     "avg_volume_30d": 26837475.0,
     "pe_ttm": 38.424,
-    "forward_pe": 15.5194,
+    "forward_pe": 15.5624,
     "eps_ttm": 7.83,
-    "eps_forward": 19.386,
+    "eps_forward": 19.3325,
     "revenue_fy": 89103998976.0,
     "net_income_fy": 38264999936.0,
     "revenue_growth": 0.855,
@@ -68101,24 +68116,24 @@
     "entita": "BROADCOM INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 96.0191,
+    "prezzo": 96.0166,
     "punti": 3.98,
-    "pb": 192.8,
+    "pb": 192.9,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 13.8
+      "da": "2026-11-19",
+      "pb": 13.7
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 32.0
+      "da": "2026-10-28",
+      "pb": 25.2
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 143.5,
      "min_data": "2026-10-16",
@@ -68128,51 +68143,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 160.7,
-     "pb_a": 192.8,
-     "indice_da": 61.1,
+     "pb_da": 167.6,
+     "pb_a": 192.9,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 19.9,
-     "indice_pct": 4.5,
-     "eccesso_pct": 14.8
+     "nome_pct": 15.1,
+     "indice_pct": 5.1,
+     "eccesso_pct": 9.5
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 179.0,
-     "pb_a": 192.8,
-     "indice_da": 61.2,
+     "pb_da": 179.2,
+     "pb_a": 192.9,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 7.7,
-     "indice_pct": 4.3,
-     "eccesso_pct": 3.3
+     "nome_pct": 7.6,
+     "indice_pct": 1.2,
+     "eccesso_pct": 6.3
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -12.1,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -0.0
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -15.0,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -11.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -68952,8 +68960,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 17,
-    "target": 2114.5,
-    "upside_pct": 62.3
+    "target": 2111.49,
+    "upside_pct": 62.0
    },
    "analisti": {
     "eps_ora": 56.9449,
@@ -68967,9 +68975,9 @@
     "eps_min": 37.43,
     "eps_max": 63.8912,
     "eps_n": 27,
-    "target_min": 850.06,
-    "target_max": 2868.99,
-    "target_mediana": 2257.04
+    "target_min": 848.85,
+    "target_max": 2864.9,
+    "target_mediana": 2253.82
    },
    "health": 19,
    "eps": 40.64,
@@ -69006,7 +69014,7 @@
     "debt_to_equity": 8.897,
     "dividend_yield": 0.0071,
     "price_to_book": null,
-    "target_mean": 2114.5012,
+    "target_mean": 2111.485,
     "fcf": null,
     "gross_margin": 0.5434,
     "enterprise_value": null,
@@ -69992,7 +70000,7 @@
      {
       "mese": 12,
       "media": 2.95,
-      "mediana": 4.33,
+      "mediana": 4.32,
       "positivi_pct": 71,
       "campione": 31,
       "peggio": -25.0,
@@ -71122,9 +71130,9 @@
     "float_pct": 97.9,
     "avg_volume_30d": 33027904.0,
     "pe_ttm": 17.625,
-    "forward_pe": 26.757,
+    "forward_pe": 26.6818,
     "eps_ttm": 2.08,
-    "eps_forward": 1.3701,
+    "eps_forward": 1.374,
     "revenue_fy": 45890998272.0,
     "net_income_fy": 3092999936.0,
     "revenue_growth": -0.043,
@@ -72061,7 +72069,7 @@
      {
       "mese": 4,
       "media": 0.33,
-      "mediana": 1.42,
+      "mediana": 1.43,
       "positivi_pct": 55,
       "campione": 42,
       "peggio": -16.0,
@@ -73164,7 +73172,7 @@
     ],
     "d1": [
      101.36,
-     99.68,
+     99.67,
      101.1,
      102.17,
      100.8,
@@ -74455,78 +74463,71 @@
     "entita": "Oracle Cop",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 89.2518,
+    "prezzo": 89.2451,
     "punti": 10.75,
-    "pb": 368.5,
+    "pb": 368.8,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 54.7
+      "da": "2026-11-19",
+      "pb": 54.0
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 76.8
+      "da": "2026-10-28",
+      "pb": 95.6
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 272.6,
      "min_data": "2026-10-29",
-     "max_pb": 368.5,
-     "max_data": "2026-11-25"
+     "max_pb": 368.8,
+     "max_data": "2026-11-26"
     },
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 291.7,
-     "pb_a": 368.5,
-     "indice_da": 61.1,
+     "pb_da": 273.2,
+     "pb_a": 368.8,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 26.3,
-     "indice_pct": 4.5,
-     "eccesso_pct": 20.9
+     "nome_pct": 35.0,
+     "indice_pct": 5.1,
+     "eccesso_pct": 28.4
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 313.8,
-     "pb_a": 368.5,
-     "indice_da": 61.2,
+     "pb_da": 314.8,
+     "pb_a": 368.8,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 17.4,
-     "indice_pct": 4.3,
-     "eccesso_pct": 12.6
+     "nome_pct": 17.2,
+     "indice_pct": 1.2,
+     "eccesso_pct": 15.7
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -20.4,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -9.5
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -8.8,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -5.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     },
     "nota": "ICE scrive il nome 'Oracle Cop': e' Oracle Corporation"
@@ -76668,24 +76669,24 @@
     "entita": "McDONALDS Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 103.4792,
+    "prezzo": 103.4814,
     "punti": -3.48,
-    "pb": 24.3,
+    "pb": 24.2,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.3
+      "da": "2026-11-19",
+      "pb": 0.4
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -0.8
+      "da": "2026-10-28",
+      "pb": -0.4
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 22.4,
      "min_data": "2026-11-09",
@@ -76695,51 +76696,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 25.1,
-     "pb_a": 24.3,
-     "indice_da": 61.1,
+     "pb_da": 24.6,
+     "pb_a": 24.2,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -3.2,
-     "indice_pct": 4.5,
-     "eccesso_pct": -7.4
+     "nome_pct": -1.7,
+     "indice_pct": 5.1,
+     "eccesso_pct": -6.5
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 23.0,
-     "pb_a": 24.3,
-     "indice_da": 61.2,
+     "pb_da": 23.8,
+     "pb_a": 24.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 5.6,
-     "indice_pct": 4.3,
-     "eccesso_pct": 1.2
+     "nome_pct": 1.9,
+     "indice_pct": 1.2,
+     "eccesso_pct": 0.6
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 13.6,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 29.3
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 3.5,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 7.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -77185,7 +77179,7 @@
      11.1,
      11.27,
      11.09,
-     11.06,
+     11.07,
      11.8,
      11.5,
      10.69,
@@ -77463,7 +77457,7 @@
     ],
     "d1": [
      57.61,
-     56.95,
+     56.92,
      57.24,
      58.05,
      57.83,
@@ -77507,8 +77501,8 @@
    "rating": {
     "key": "buy",
     "n": 9,
-    "target": 113.91,
-    "upside_pct": 85.1
+    "target": 113.76,
+    "upside_pct": 84.8
    },
    "analisti": {
     "eps_ora": 2.3503,
@@ -77522,9 +77516,9 @@
     "eps_min": 1.48,
     "eps_max": 3.86,
     "eps_n": 18,
-    "target_min": 82.38,
-    "target_max": 169.37,
-    "target_mediana": 113.14
+    "target_min": 82.27,
+    "target_max": 169.15,
+    "target_mediana": 112.99
    },
    "health": 18,
    "eps": 0.66,
@@ -77561,7 +77555,7 @@
     "debt_to_equity": 13.949,
     "dividend_yield": 0.0028,
     "price_to_book": null,
-    "target_mean": 113.9073,
+    "target_mean": 113.7562,
     "fcf": null,
     "gross_margin": 0.3383,
     "enterprise_value": null,
@@ -77573,7 +77567,7 @@
     "cross_currency": true,
     "ps": null,
     "ev_s": null,
-    "altman_z": 4.88,
+    "altman_z": 4.86,
     "altman_missing": 0,
     "altman_model": "Z''",
     "altman_al": "2026-09-30",
@@ -77581,7 +77575,7 @@
     "altman_x": [
      0.1332,
      0.3669,
-     0.059,
+     0.0561,
      2.3011
     ]
    },
@@ -77593,27 +77587,27 @@
     "debito": 996952000.0,
     "patrimonio": 7233845000.0,
     "bilancio_al": "2026-09-30",
-    "ocf_ttm": 789369000.0,
-    "capex_ttm": -430639000.0,
+    "ocf_ttm": 814052000.0,
+    "capex_ttm": -416655000.0,
     "trimestri": 4,
     "cashflow_al": "2026-09-30",
-    "fcf_ttm": 358730000.0,
-    "mesi_capex": 24.0,
+    "fcf_ttm": 397397000.0,
+    "mesi_capex": 24.8,
     "emissione_netta_pct": 0.01,
     "debito_netto": 137132000.0,
     "valuta": "CAD"
    },
    "credito": {
-    "oneri_ttm": 102460000.0,
-    "ebit_ttm": 612203000.0,
+    "oneri_ttm": 103042000.0,
+    "ebit_ttm": 582567000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "copertura": 5.98,
-    "oneri_var_4trim_pct": -76.4,
+    "copertura": 5.65,
+    "oneri_var_4trim_pct": -0.9,
     "oneri_trim": [
+     12985000,
      54438000,
      22754000,
-     12403000,
      12865000
     ],
     "debito_lungo": 996952000.0,
@@ -77637,9 +77631,9 @@
     },
     "ocf_ultimo_trim": 3287000.0,
     "ocf_ultimo_al": "2026-09-30",
-    "utile_12m": 397753000.0,
-    "ricavi_12m": 3479131000.0,
-    "var_magazzino_12m": -106596000.0,
+    "utile_12m": 372393000.0,
+    "ricavi_12m": 3279914000.0,
+    "var_magazzino_12m": -123189000.0,
     "dividendi_12m": -104480000.0,
     "trimestri": {
      "utile_12m": 4,
@@ -77664,10 +77658,6 @@
       "azioni": 435532979
      },
      {
-      "trim": "2026-06-30",
-      "azioni": 435532978
-     },
-     {
       "trim": "2026-03-31",
       "azioni": 435532978
      },
@@ -77678,6 +77668,10 @@
      {
       "trim": "2025-09-30",
       "azioni": 435407158
+     },
+     {
+      "trim": "2025-06-30",
+      "azioni": 435387448
      }
     ],
     "al": "2026-09-30",
@@ -77685,10 +77679,6 @@
     "var_anno": {
      "da": "2025-09-30",
      "pct": 0.03
-    },
-    "var_trim": {
-     "da": "2026-06-30",
-     "pct": 0.0
     },
     "rotazione": {
      "pct": 0.82,
@@ -77699,52 +77689,7 @@
     },
     "quotata_dal": "1996-03-14"
    },
-   "rendimento": {
-    "al": "2026-09-30",
-    "dal": "2025-10-01",
-    "aliquota": 0.2197,
-    "aliquota_base": "effettiva",
-    "roic": 0.0487,
-    "nopat": 389665292.2511933,
-    "capitale_medio": 8003737500.0,
-    "capitale_base": "media",
-    "roe": 0.0568,
-    "utile": 397753000.0,
-    "patrimonio_medio": 7007183500.0,
-    "patrimonio_base": "media",
-    "quota_patrimonio": 0.879,
-    "esercizi": [
-     {
-      "al": "2025-12-31",
-      "roic": 0.0618,
-      "roe": 0.0889,
-      "capitale_base": "media",
-      "patrimonio_base": "media"
-     },
-     {
-      "al": "2024-12-31",
-      "roic": 0.0449,
-      "roe": 0.0276,
-      "capitale_base": "media",
-      "patrimonio_base": "media"
-     },
-     {
-      "al": "2023-12-31",
-      "roic": 0.0287,
-      "roe": 0.0605,
-      "capitale_base": "media",
-      "patrimonio_base": "media"
-     },
-     {
-      "al": "2022-12-31",
-      "roic": 0.0017,
-      "roe": 0.0153,
-      "capitale_base": "fine",
-      "patrimonio_base": "fine"
-     }
-    ],
-    "valuta": "CAD"
-   },
+   "rendimento": null,
    "fuori_mercato": {
     "settimane": [
      {
@@ -78713,14 +78658,6 @@
       "margine_op": 9.2
      },
      {
-      "trim": "2026-06-30",
-      "ricavi": 813772000,
-      "utile": 25219000,
-      "operativo": 74139000,
-      "margine": 3.1,
-      "margine_op": 9.1
-     },
-     {
       "trim": "2026-03-31",
       "ricavi": 845365000,
       "utile": 130751000,
@@ -78743,6 +78680,14 @@
       "operativo": 82511000,
       "margine": -0.0,
       "margine_op": 13.4
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 877016000,
+      "utile": 320888000,
+      "operativo": 156260000,
+      "margine": 36.6,
+      "margine_op": 17.8
      }
     ]
    },
@@ -79545,9 +79490,9 @@
     "float_pct": 99.6,
     "avg_volume_30d": 3514492.0,
     "pe_ttm": null,
-    "forward_pe": 22.5326,
+    "forward_pe": 22.2896,
     "eps_ttm": -1.29,
-    "eps_forward": 10.0894,
+    "eps_forward": 10.1994,
     "revenue_fy": 6409699840.0,
     "net_income_fy": -240500000.0,
     "revenue_growth": -0.156,
@@ -79599,15 +79544,15 @@
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 136900000.0,
+    "oneri_ttm": 189300000.0,
     "ebit_ttm": -60700000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "copertura": -0.44,
-    "oneri_var_4trim_pct": -22.4,
+    "copertura": -0.32,
+    "oneri_var_4trim_pct": -19.3,
     "oneri_trim": [
-     38900000,
      37400000,
+     91300000,
      30400000,
      30200000
     ],
@@ -91307,24 +91252,24 @@
     "entita": "Exxon Mobil Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 102.7847,
-    "punti": -2.78,
+    "prezzo": 102.7865,
+    "punti": -2.79,
     "pb": 39.0,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 0.0
+      "da": "2026-11-19",
+      "pb": -0.0
      },
      "21": {
-      "da": "2026-10-27",
+      "da": "2026-10-28",
       "pb": -0.4
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 38.5,
      "min_data": "2026-11-10",
@@ -91334,51 +91279,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
      "pb_da": 39.4,
      "pb_a": 39.0,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
      "nome_pct": -1.0,
-     "indice_pct": 4.5,
-     "eccesso_pct": -5.3
+     "indice_pct": 5.1,
+     "eccesso_pct": -5.8
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
      "pb_da": 39.0,
      "pb_a": 39.0,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 0.1,
-     "indice_pct": 4.3,
-     "eccesso_pct": -4.0
+     "nome_pct": -0.0,
+     "indice_pct": 1.2,
+     "eccesso_pct": -1.3
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -11.6,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 0.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -1.6,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 2.4
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     },
     "nota": "l'entita' di riferimento e' Exxon Mobil Corp; il nome della societa' quotata nella pipeline e' ExxonMobil Holdings Corporation"
@@ -93535,24 +93473,24 @@
     "entita": "Chevron Corp",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 102.815,
-    "punti": -2.81,
-    "pb": 38.4,
+    "prezzo": 102.8168,
+    "punti": -2.82,
+    "pb": 38.3,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 0.3
+      "da": "2026-11-19",
+      "pb": 0.2
      },
      "21": {
-      "da": "2026-10-27",
+      "da": "2026-10-28",
       "pb": -0.3
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 37.8,
      "min_data": "2026-11-23",
@@ -93562,51 +93500,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 38.7,
-     "pb_a": 38.4,
-     "indice_da": 61.1,
+     "pb_da": 38.6,
+     "pb_a": 38.3,
+     "indice_da": 60.7,
      "indice_a": 63.8,
      "nome_pct": -0.7,
-     "indice_pct": 4.5,
-     "eccesso_pct": -5.0
+     "indice_pct": 5.1,
+     "eccesso_pct": -5.5
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
      "pb_da": 38.1,
-     "pb_a": 38.4,
-     "indice_da": 61.2,
+     "pb_a": 38.3,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 0.7,
-     "indice_pct": 4.3,
-     "eccesso_pct": -3.5
+     "nome_pct": 0.6,
+     "indice_pct": 1.2,
+     "eccesso_pct": -0.7
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -6.8,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 6.0
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 2.5,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 6.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -94550,9 +94481,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 6735400.0,
     "pe_ttm": 14.2276,
-    "forward_pe": 11.7476,
+    "forward_pe": 11.9168,
     "eps_ttm": 9.49,
-    "eps_forward": 11.4934,
+    "eps_forward": 11.3302,
     "revenue_fy": 68965998592.0,
     "net_income_fy": 11521000448.0,
     "revenue_growth": 0.293,
@@ -95481,7 +95412,7 @@
      {
       "mese": 2,
       "media": 1.49,
-      "mediana": 1.75,
+      "mediana": 1.76,
       "positivi_pct": 67,
       "campione": 42,
       "peggio": -20.5,
@@ -95764,24 +95695,24 @@
     "entita": "ConocoPhillips",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 103.1815,
+    "prezzo": 103.1835,
     "punti": -3.18,
-    "pb": 30.6,
+    "pb": 30.5,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.1
+      "da": "2026-11-19",
+      "pb": 0.9
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 0.4
+      "da": "2026-10-28",
+      "pb": 1.1
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 28.5,
      "min_data": "2026-11-09",
@@ -95791,51 +95722,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 30.2,
-     "pb_a": 30.6,
-     "indice_da": 61.1,
+     "pb_da": 29.4,
+     "pb_a": 30.5,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 1.3,
-     "indice_pct": 4.5,
-     "eccesso_pct": -3.0
+     "nome_pct": 3.9,
+     "indice_pct": 5.1,
+     "eccesso_pct": -1.2
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 29.5,
-     "pb_a": 30.6,
-     "indice_da": 61.2,
+     "pb_da": 29.6,
+     "pb_a": 30.5,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 3.9,
-     "indice_pct": 4.3,
-     "eccesso_pct": -0.4
+     "nome_pct": 3.1,
+     "indice_pct": 1.2,
+     "eccesso_pct": 1.8
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -8.1,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 4.5
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 0.5,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 4.5
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -96159,7 +96083,7 @@
      123.58,
      115.79,
      115.57,
-     127.35,
+     127.36,
      140.21,
      140.59,
      129.75,
@@ -96176,7 +96100,7 @@
      140.26,
      150.21,
      160.86,
-     166.39,
+     166.38,
      149.99,
      148.7,
      158.18,
@@ -97646,24 +97570,24 @@
     "entita": "ABBVIE INC",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 102.9814,
+    "prezzo": 102.9832,
     "punti": -2.98,
     "pb": 34.8,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.1
+      "da": "2026-11-19",
+      "pb": 0.7
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 2.5
+      "da": "2026-10-28",
+      "pb": 3.1
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 31.7,
      "min_data": "2026-10-28",
@@ -97673,51 +97597,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 32.4,
+     "pb_da": 31.7,
      "pb_a": 34.8,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 7.7,
-     "indice_pct": 4.5,
-     "eccesso_pct": 3.0
+     "nome_pct": 9.8,
+     "indice_pct": 5.1,
+     "eccesso_pct": 4.4
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 33.7,
+     "pb_da": 34.1,
      "pb_a": 34.8,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 3.4,
-     "indice_pct": 4.3,
-     "eccesso_pct": -0.9
+     "nome_pct": 2.1,
+     "indice_pct": 1.2,
+     "eccesso_pct": 0.8
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 2.8,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 17.0
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 3.0,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 7.1
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -100725,9 +100642,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 6072604.0,
     "pe_ttm": null,
-    "forward_pe": 17.4144,
+    "forward_pe": 17.4598,
     "eps_ttm": -3.13,
-    "eps_forward": 10.1491,
+    "eps_forward": 10.1227,
     "revenue_fy": 30987999232.0,
     "net_income_fy": -3862000128.0,
     "revenue_growth": 0.068,
@@ -104086,24 +104003,24 @@
     "entita": "Amgen Inc.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 103.2326,
+    "prezzo": 103.2346,
     "punti": -3.23,
-    "pb": 29.5,
+    "pb": 29.4,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.3
+      "da": "2026-11-19",
+      "pb": 0.8
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -1.4
+      "da": "2026-10-28",
+      "pb": -0.8
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 27.2,
      "min_data": "2026-11-12",
@@ -104113,51 +104030,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 30.9,
-     "pb_a": 29.5,
-     "indice_da": 61.1,
+     "pb_da": 30.2,
+     "pb_a": 29.4,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -4.6,
-     "indice_pct": 4.5,
-     "eccesso_pct": -8.7
+     "nome_pct": -2.6,
+     "indice_pct": 5.1,
+     "eccesso_pct": -7.3
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 28.2,
-     "pb_a": 29.5,
-     "indice_da": 61.2,
+     "pb_da": 28.6,
+     "pb_a": 29.4,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 4.7,
-     "indice_pct": 4.3,
-     "eccesso_pct": 0.4
+     "nome_pct": 2.8,
+     "indice_pct": 1.2,
+     "eccesso_pct": 1.5
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 5.4,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 19.9
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 6.3,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 10.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -110415,7 +110325,7 @@
      324.5,
      348.61,
      345.54,
-     336.45,
+     336.46,
      329.49,
      337.78,
      353.14,
@@ -110716,9 +110626,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 1270298.0,
     "pe_ttm": 35.632,
-    "forward_pe": 27.9791,
+    "forward_pe": 27.9626,
     "eps_ttm": 17.99,
-    "eps_forward": 22.9107,
+    "eps_forward": 22.9242,
     "revenue_fy": 47703998464.0,
     "net_income_fy": 4860000256.0,
     "revenue_growth": -0.018,
@@ -111657,7 +111567,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -111930,24 +111840,24 @@
     "entita": "Deere & Co",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 103.4935,
-    "punti": -3.49,
-    "pb": 24.0,
+    "prezzo": 103.4957,
+    "punti": -3.5,
+    "pb": 23.9,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.6
+      "da": "2026-11-19",
+      "pb": 1.2
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -0.1
+      "da": "2026-10-28",
+      "pb": 0.4
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 21.8,
      "min_data": "2026-11-12",
@@ -111957,51 +111867,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 24.1,
-     "pb_a": 24.0,
-     "indice_da": 61.1,
+     "pb_da": 23.5,
+     "pb_a": 23.9,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -0.4,
-     "indice_pct": 4.5,
-     "eccesso_pct": -4.6
+     "nome_pct": 1.8,
+     "indice_pct": 5.1,
+     "eccesso_pct": -3.2
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 22.4,
-     "pb_a": 24.0,
-     "indice_da": 61.2,
+     "pb_da": 22.7,
+     "pb_a": 23.9,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 7.2,
-     "indice_pct": 4.3,
-     "eccesso_pct": 2.8
+     "nome_pct": 5.1,
+     "indice_pct": 1.2,
+     "eccesso_pct": 3.9
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 0.2,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 14.0
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -0.6,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 3.4
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -112945,9 +112848,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 8979325.0,
     "pe_ttm": 22.3091,
-    "forward_pe": 14.652,
+    "forward_pe": 14.6859,
     "eps_ttm": 5.63,
-    "eps_forward": 8.5722,
+    "eps_forward": 8.5524,
     "revenue_fy": 102343999488.0,
     "net_income_fy": 9898999808.0,
     "revenue_growth": 0.155,
@@ -114158,24 +114061,24 @@
     "entita": "Walt Disney Co.",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 102.9037,
-    "punti": -2.9,
-    "pb": 36.5,
+    "prezzo": 102.9055,
+    "punti": -2.91,
+    "pb": 36.4,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.0
+      "da": "2026-11-19",
+      "pb": 0.7
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -1.4
+      "da": "2026-10-28",
+      "pb": -1.0
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 35.3,
      "min_data": "2026-11-09",
@@ -114185,51 +114088,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 37.9,
-     "pb_a": 36.5,
-     "indice_da": 61.1,
+     "pb_da": 37.5,
+     "pb_a": 36.4,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -3.8,
-     "indice_pct": 4.5,
-     "eccesso_pct": -7.9
+     "nome_pct": -2.7,
+     "indice_pct": 5.1,
+     "eccesso_pct": -7.5
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 35.5,
-     "pb_a": 36.5,
-     "indice_da": 61.2,
+     "pb_da": 35.7,
+     "pb_a": 36.4,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 2.9,
-     "indice_pct": 4.3,
-     "eccesso_pct": -1.3
+     "nome_pct": 2.1,
+     "indice_pct": 1.2,
+     "eccesso_pct": 0.8
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 13.9,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 29.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 2.6,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 6.8
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -116381,24 +116277,24 @@
     "entita": "Pfizer Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 103.1852,
+    "prezzo": 103.1872,
     "punti": -3.19,
-    "pb": 30.5,
+    "pb": 30.4,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 1.4
+      "da": "2026-11-19",
+      "pb": 0.8
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": -1.3
+      "da": "2026-10-28",
+      "pb": -0.7
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 28.3,
      "min_data": "2026-11-10",
@@ -116408,51 +116304,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 31.8,
-     "pb_a": 30.5,
-     "indice_da": 61.1,
+     "pb_da": 31.2,
+     "pb_a": 30.4,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": -4.1,
-     "indice_pct": 4.5,
-     "eccesso_pct": -8.2
+     "nome_pct": -2.3,
+     "indice_pct": 5.1,
+     "eccesso_pct": -7.1
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 29.1,
-     "pb_a": 30.5,
-     "indice_da": 61.2,
+     "pb_da": 29.6,
+     "pb_a": 30.4,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 4.8,
-     "indice_pct": 4.3,
-     "eccesso_pct": 0.4
+     "nome_pct": 2.9,
+     "indice_pct": 1.2,
+     "eccesso_pct": 1.6
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -3.1,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 10.2
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 1.4,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 5.5
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -116787,7 +116676,7 @@
      126.32,
      126.21,
      125.6,
-     110.64,
+     110.63,
      116.57,
      127.22,
      108.26,
@@ -116852,7 +116741,7 @@
      149.48,
      156.2,
      164.48,
-     166.55,
+     166.56,
      163.59,
      150.97,
      139.09,
@@ -116919,7 +116808,7 @@
      164.55,
      200.71,
      230.8,
-     237.33,
+     237.32,
      279.61,
      287.31,
      306.16,
@@ -116944,7 +116833,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -117174,7 +117063,7 @@
      801.81,
      802.11,
      799.48,
-     799.03,
+     799.11,
      799.61
     ]
    },
@@ -117267,25 +117156,25 @@
     "debito": 480188000000.0,
     "patrimonio": 124929000000.0,
     "bilancio_al": "2026-09-30",
-    "ocf_ttm": -37858000000.0,
-    "capex_ttm": -2123000000.0,
+    "ocf_ttm": -41283000000.0,
+    "capex_ttm": -2179000000.0,
     "trimestri": 4,
     "cashflow_al": "2026-09-30",
-    "fcf_ttm": -39981000000.0,
-    "mesi_capex": 1142.5,
-    "mesi_operativi": 64.1,
+    "fcf_ttm": -43462000000.0,
+    "mesi_capex": 1113.2,
+    "mesi_operativi": 58.8,
     "debito_netto": 278057000000.0,
     "valuta": "USD"
    },
    "credito": {
-    "oneri_ttm": 70869000000.0,
+    "oneri_ttm": 69746000000.0,
     "trimestri": 4,
     "conto_al": "2026-09-30",
-    "oneri_var_4trim_pct": 14.1,
+    "oneri_var_4trim_pct": 12.1,
     "oneri_trim": [
+     16970000000,
      16671000000,
      17082000000,
-     18093000000,
      19023000000
     ],
     "debito_corrente": 114076000000.0,
@@ -117304,10 +117193,10 @@
     },
     "ocf_ultimo_trim": 4181000000.0,
     "ocf_ultimo_al": "2026-09-30",
-    "utile_12m": 22169000000.0,
-    "ricavi_12m": 69698000000.0,
-    "riacquisti_12m": -17875000000.0,
-    "dividendi_12m": -6307000000.0,
+    "utile_12m": 19639000000.0,
+    "ricavi_12m": 64544000000.0,
+    "riacquisti_12m": -15200000000.0,
+    "dividendi_12m": -6180000000.0,
     "trimestri": {
      "utile_12m": 4,
      "ricavi_12m": 4,
@@ -118377,14 +118266,6 @@
       "margine_op": null
      },
      {
-      "trim": "2026-06-30",
-      "ricavi": 20338000000,
-      "utile": 6628000000,
-      "operativo": null,
-      "margine": 32.6,
-      "margine_op": null
-     },
-     {
       "trim": "2026-03-31",
       "ricavi": 17227000000,
       "utile": 5630000000,
@@ -118407,6 +118288,14 @@
       "operativo": null,
       "margine": 27.0,
       "margine_op": null
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 14583000000,
+      "utile": 3723000000,
+      "operativo": null,
+      "margine": 25.5,
+      "margine_op": null
      }
     ]
    },
@@ -118419,24 +118308,24 @@
     "entita": "Goldman Sachs Gp Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 101.3731,
+    "prezzo": 101.374,
     "punti": -1.37,
-    "pb": 69.6,
+    "pb": 69.5,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 3.5
+      "da": "2026-11-19",
+      "pb": 3.1
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 2.3
+      "da": "2026-10-28",
+      "pb": 2.9
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 64.7,
      "min_data": "2026-11-12",
@@ -118446,51 +118335,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 67.3,
-     "pb_a": 69.6,
-     "indice_da": 61.1,
+     "pb_da": 66.6,
+     "pb_a": 69.5,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 3.4,
-     "indice_pct": 4.5,
-     "eccesso_pct": -1.1
+     "nome_pct": 4.4,
+     "indice_pct": 5.1,
+     "eccesso_pct": -0.7
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 66.1,
-     "pb_a": 69.6,
-     "indice_da": 61.2,
+     "pb_da": 66.4,
+     "pb_a": 69.5,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 5.3,
-     "indice_pct": 4.3,
-     "eccesso_pct": 1.0
+     "nome_pct": 4.7,
+     "indice_pct": 1.2,
+     "eccesso_pct": 3.4
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -12.1,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -0.0
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -8.3,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -4.6
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -119384,7 +119266,7 @@
      317.47,
      316.6,
      316.66,
-     317.41
+     317.4
     ]
    },
    "earnings_date": "2027-01-14",
@@ -120625,24 +120507,24 @@
     "entita": "JPMorgan Chase & Co",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 102.2693,
+    "prezzo": 102.2707,
     "punti": -2.27,
-    "pb": 50.1,
+    "pb": 50.0,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 3.2
+      "da": "2026-11-19",
+      "pb": 2.8
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 2.4
+      "da": "2026-10-28",
+      "pb": 2.5
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 46.2,
      "min_data": "2026-11-04",
@@ -120652,51 +120534,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 47.7,
-     "pb_a": 50.1,
-     "indice_da": 61.1,
+     "pb_da": 47.6,
+     "pb_a": 50.0,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 5.0,
-     "indice_pct": 4.5,
-     "eccesso_pct": 0.5
+     "nome_pct": 5.2,
+     "indice_pct": 5.1,
+     "eccesso_pct": 0.1
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 46.8,
-     "pb_a": 50.1,
-     "indice_da": 61.2,
+     "pb_da": 47.2,
+     "pb_a": 50.0,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 6.9,
-     "indice_pct": 4.3,
-     "eccesso_pct": 2.5
+     "nome_pct": 6.0,
+     "indice_pct": 1.2,
+     "eccesso_pct": 4.7
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -5.7,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 7.3
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -2.3,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 1.7
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     }
    },
@@ -120948,7 +120823,7 @@
      26.78,
      26.72,
      26.52,
-     26.59,
+     26.6,
      26.77,
      28.98,
      30.36,
@@ -120981,7 +120856,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -121148,7 +121023,7 @@
      427.74,
      448.72,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -121176,7 +121051,7 @@
      559.58,
      599.35,
      549.48,
-     603.73,
+     603.74,
      601.22,
      500.17,
      587.09,
@@ -121413,7 +121288,7 @@
      1145.06,
      1146.09,
      1143.79,
-     1142.49,
+     1142.54,
      1143.14
     ]
    },
@@ -123187,7 +123062,7 @@
      27.21,
      26.54,
      27.08,
-     26.91,
+     26.9,
      26.52,
      26.65,
      27.5,
@@ -123474,7 +123349,7 @@
      1074.5,
      1035.03,
      1033.26,
-     997.42,
+     997.43,
      1018.84,
      1016.12,
      1024.35,
@@ -123556,7 +123431,7 @@
      1398.8,
      1394.9,
      1398.76,
-     1397.85
+     1397.83
     ]
    },
    "earnings_date": "2027-02-03",
@@ -125370,9 +125245,9 @@
     "float_pct": 92.5,
     "avg_volume_30d": 9114656.0,
     "pe_ttm": 17.2709,
-    "forward_pe": 9.6935,
+    "forward_pe": 9.7242,
     "eps_ttm": 17.2,
-    "eps_forward": 30.6453,
+    "eps_forward": 30.5484,
     "revenue_fy": 179129008128.0,
     "net_income_fy": 15502999552.0,
     "revenue_growth": 1.034,
@@ -126577,78 +126452,71 @@
     "entita": "Dell Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 99.3856,
+    "prezzo": 99.3852,
     "punti": 0.61,
     "pb": 113.9,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 14.3
+      "da": "2026-11-19",
+      "pb": 13.4
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 29.6
+      "da": "2026-10-28",
+      "pb": 31.7
      }
     },
     "storia": {
-     "giorni": 28,
+     "giorni": 29,
      "dal": "2026-10-16",
      "min_pb": 76.3,
      "min_data": "2026-10-16",
      "max_pb": 113.9,
-     "max_data": "2026-11-25"
+     "max_data": "2026-11-26"
     },
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 84.3,
+     "pb_da": 82.2,
      "pb_a": 113.9,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 35.1,
-     "indice_pct": 4.5,
-     "eccesso_pct": 29.3
+     "nome_pct": 38.5,
+     "indice_pct": 5.1,
+     "eccesso_pct": 31.8
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 99.6,
+     "pb_da": 100.5,
      "pb_a": 113.9,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 14.4,
-     "indice_pct": 4.3,
-     "eccesso_pct": 9.6
+     "nome_pct": 13.3,
+     "indice_pct": 1.2,
+     "eccesso_pct": 11.9
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 23,
+     "finestre": 24,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -40.8,
-      "mercato_pct": -12.1,
-      "eccesso_pct": -32.7
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": -5.1,
-      "mercato_pct": -3.9,
-      "eccesso_pct": -1.3
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     },
     "nota": "il CDS e' su Dell Inc, la societa' operativa controllata, non sulla capogruppo quotata Dell Technologies Inc (verificato il 2026-10-18 sull'elenco ICE del 2026-10-16: DELLN, cedole 100 e 500)"
@@ -127205,7 +127073,7 @@
     "target_mediana": 1066.0
    },
    "health": 18,
-   "eps": -105.94,
+   "eps": -89.62,
    "beta": 1.65,
    "sharpe_1y": 0.4,
    "sortino_1y": 0.55,
@@ -127228,7 +127096,7 @@
     "avg_volume_30d": 5231967.0,
     "pe_ttm": null,
     "forward_pe": 11.8746,
-    "eps_ttm": -105.94,
+    "eps_ttm": -89.62,
     "eps_forward": 40.1345,
     "revenue_fy": 3742799872.0,
     "net_income_fy": -6578999808.0,
@@ -131123,8 +130991,8 @@
    "rating": {
     "key": "hold",
     "n": 12,
-    "target": 45.76,
-    "upside_pct": 11.7
+    "target": 45.7,
+    "upside_pct": 11.5
    },
    "analisti": {
     "eps_ora": 23.3731,
@@ -131138,9 +131006,9 @@
     "eps_min": 17.71,
     "eps_max": 27.26,
     "eps_n": 9,
-    "target_min": 39.42,
-    "target_max": 64.06,
-    "target_mediana": 43.73
+    "target_min": 39.37,
+    "target_max": 63.97,
+    "target_mediana": 43.67
    },
    "health": 68,
    "eps": 3.96,
@@ -131177,7 +131045,7 @@
     "debt_to_equity": 61.744,
     "dividend_yield": 0.0439,
     "price_to_book": null,
-    "target_mean": 45.7597,
+    "target_mean": 45.6954,
     "fcf": null,
     "gross_margin": 0.8333,
     "enterprise_value": null,
@@ -134523,24 +134391,24 @@
     "entita": "NextEra Energy Cap Hldgs Inc",
     "contratto": "SNRFOR.USD.XR14",
     "cedola_pb": 100,
-    "prezzo": 101.3805,
+    "prezzo": 101.3813,
     "punti": -1.38,
     "pb": 69.4,
     "indicativo": false,
-    "data": "2026-11-25",
+    "data": "2026-11-26",
     "scadenza": "2031-12-20",
     "var": {
      "5": {
-      "da": "2026-11-18",
-      "pb": 2.9
+      "da": "2026-11-19",
+      "pb": 2.5
      },
      "21": {
-      "da": "2026-10-27",
-      "pb": 4.1
+      "da": "2026-10-28",
+      "pb": 4.9
      }
     },
     "storia": {
-     "giorni": 25,
+     "giorni": 26,
      "dal": "2026-10-16",
      "min_pb": 64.1,
      "min_data": "2026-11-09",
@@ -134550,51 +134418,44 @@
     "indice": "IG",
     "finestra": {
      "n": 21,
-     "da": "2026-10-27",
-     "a": "2026-11-25",
+     "da": "2026-10-28",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 65.3,
+     "pb_da": 64.5,
      "pb_a": 69.4,
-     "indice_da": 61.1,
+     "indice_da": 60.7,
      "indice_a": 63.8,
-     "nome_pct": 6.3,
-     "indice_pct": 4.5,
-     "eccesso_pct": 1.7
+     "nome_pct": 7.5,
+     "indice_pct": 5.1,
+     "eccesso_pct": 2.3
     },
     "finestra5": {
      "n": 5,
-     "da": "2026-11-18",
-     "a": "2026-11-25",
+     "da": "2026-11-19",
+     "a": "2026-11-26",
      "indice": "IG",
      "stato": "misurato",
-     "pb_da": 66.5,
+     "pb_da": 66.9,
      "pb_a": 69.4,
-     "indice_da": 61.2,
+     "indice_da": 63.0,
      "indice_a": 63.8,
-     "nome_pct": 4.3,
-     "indice_pct": 4.3,
-     "eccesso_pct": 0.0
+     "nome_pct": 3.7,
+     "indice_pct": 1.2,
+     "eccesso_pct": 2.4
     },
-    "ultima_ice": "2026-11-26",
     "rango5": {
-     "finestre": 20,
+     "finestre": 21,
      "minimo": 60
     },
     "azione": {
      "finestra": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 3.6,
-      "mercato_pct": -12.1,
-      "eccesso_pct": 17.9
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      },
      "finestra5": {
-      "stato": "misurato",
-      "mercato": "QQQ",
-      "titolo_pct": 0.7,
-      "mercato_pct": -3.9,
-      "eccesso_pct": 4.8
+      "stato": "buco",
+      "perche": "il titolo non ha una chiusura il 2026-11-26"
      }
     },
     "nota": "il CDS e' su NextEra Energy Capital Holdings Inc, la finanziaria controllata, non sulla capogruppo quotata NextEra Energy Inc (verificato il 2026-11-17 sull'elenco ICE del 2026-11-16: NXTENG); LITE, VRT, NVO e MRNA non hanno un CDS compensato a ICE alla stessa data (NOVOBAN e' Novo Banco, non Novo Nordisk)"
@@ -136358,7 +136219,7 @@
   },
   {
    "ticker": "ANT",
-   "name": "Anthropic, PBC",
+   "name": "Anthropic, PBC Class A Common Stock",
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
@@ -136850,8 +136711,8 @@
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
-   "value": 27.1,
-   "change_pct": -4.21,
+   "value": 26.8,
+   "change_pct": -5.27,
    "spark": [
     19.99,
     18.44,
@@ -136882,7 +136743,7 @@
     26.62,
     26.36,
     28.29,
-    27.1
+    26.8
    ],
    "asof": "2026-11-26"
   },
@@ -136932,14 +136793,14 @@
     {
      "mese": "2027-02",
      "simbolo": "ZQG27.CBT",
-     "prezzo": 95.72000122070312,
-     "tasso": 4.28
+     "prezzo": 95.71499633789062,
+     "tasso": 4.285
     },
     {
      "mese": "2027-01",
      "simbolo": "ZQF27.CBT",
-     "prezzo": 95.8550033569336,
-     "tasso": 4.145
+     "prezzo": 95.8499984741211,
+     "tasso": 4.15
     },
     {
      "mese": "2027-03",
@@ -136950,14 +136811,14 @@
     {
      "mese": "2027-05",
      "simbolo": "ZQK27.CBT",
-     "prezzo": 95.51499938964844,
-     "tasso": 4.485
+     "prezzo": 95.51000213623047,
+     "tasso": 4.49
     },
     {
      "mese": "2027-04",
      "simbolo": "ZQJ27.CBT",
-     "prezzo": 95.56500244140625,
-     "tasso": 4.435
+     "prezzo": 95.55999755859375,
+     "tasso": 4.44
     }
    ],
    "next_fomc": "2026-12-09",
@@ -136985,15 +136846,15 @@
      "riunione": "2027-01-27",
      "prezzata_dal_contratto": true,
      "metodo": "mese_dopo",
-     "mosse_25bp": 0.61,
-     "mosse_cumulate": 1.6,
-     "tasso_atteso_fine_mese": 4.28,
+     "mosse_25bp": 0.63,
+     "mosse_cumulate": 1.62,
+     "tasso_atteso_fine_mese": 4.285,
      "base_effr": 4.127,
      "contratto": "ZQG27.CBT",
-     "tasso_contratto": 4.28,
+     "tasso_contratto": 4.285,
      "cut_prob": null,
-     "hike_prob": 61,
-     "hold_prob": 39
+     "hike_prob": 63,
+     "hold_prob": 37
     },
     {
      "date": "2027-03-17",
@@ -137003,30 +136864,30 @@
      "giorni_vecchio": 17,
      "giorni_nuovo": 14,
      "giorni_mese": 31,
-     "mosse_25bp": 0.66,
-     "mosse_cumulate": 2.26,
-     "tasso_atteso_fine_mese": 4.446,
-     "base_effr": 4.28,
+     "mosse_25bp": 0.62,
+     "mosse_cumulate": 2.24,
+     "tasso_atteso_fine_mese": 4.44,
+     "base_effr": 4.285,
      "contratto": "ZQH27.CBT",
      "tasso_contratto": 4.355,
      "cut_prob": null,
-     "hike_prob": 66,
-     "hold_prob": 34
+     "hike_prob": 62,
+     "hold_prob": 38
     },
     {
      "date": "2027-04-28",
      "riunione": "2027-04-28",
      "prezzata_dal_contratto": true,
      "metodo": "mese_dopo",
-     "mosse_25bp": 0.16,
-     "mosse_cumulate": 2.42,
-     "tasso_atteso_fine_mese": 4.485,
-     "base_effr": 4.446,
+     "mosse_25bp": 0.2,
+     "mosse_cumulate": 2.44,
+     "tasso_atteso_fine_mese": 4.49,
+     "base_effr": 4.44,
      "contratto": "ZQK27.CBT",
-     "tasso_contratto": 4.485,
+     "tasso_contratto": 4.49,
      "cut_prob": null,
-     "hike_prob": 16,
-     "hold_prob": 84
+     "hike_prob": 20,
+     "hold_prob": 80
     }
    ]
   },
@@ -143963,15 +143824,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.0989",
-    "change_pct": 0.24,
+    "value": "1.0972",
+    "change_pct": 0.09,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "174.86",
-    "change_pct": 0.16,
+    "value": "174.73",
+    "change_pct": 0.08,
     "suffix": "%"
    }
   ],
@@ -144497,10 +144358,10 @@
     "symbol": "HG=F",
     "label": "Rame",
     "unita": "$/lb",
-    "value": 5.462,
-    "change_pct": 2.43,
-    "var_1y": 7.0,
-    "pos_range_1y": 21.0,
+    "value": 5.436,
+    "change_pct": 1.93,
+    "var_1y": 6.5,
+    "pos_range_1y": 19.5,
     "min_1y": 5.104,
     "max_1y": 6.804,
     "history": [
@@ -145010,7 +144871,7 @@
      },
      {
       "d": "2026-11-26",
-      "v": 5.462
+      "v": 5.436
      }
     ]
    },
@@ -145018,10 +144879,10 @@
     "symbol": "CL=F",
     "label": "Petrolio WTI",
     "unita": "$",
-    "value": 84.78,
-    "change_pct": 1.31,
-    "var_1y": 44.6,
-    "pos_range_1y": 51.2,
+    "value": 84.76,
+    "change_pct": 1.29,
+    "var_1y": 44.5,
+    "pos_range_1y": 51.1,
     "min_1y": 55.27,
     "max_1y": 112.95,
     "history": [
@@ -145531,7 +145392,7 @@
      },
      {
       "d": "2026-11-26",
-      "v": 84.78
+      "v": 84.76
      }
     ]
    },
@@ -145539,10 +145400,10 @@
     "symbol": "GC=F",
     "label": "Oro",
     "unita": "$/oz",
-    "value": 3602,
-    "change_pct": 1.88,
-    "var_1y": -13.5,
-    "pos_range_1y": 4.8,
+    "value": 3595,
+    "change_pct": 1.67,
+    "var_1y": -13.7,
+    "pos_range_1y": 4.4,
     "min_1y": 3515,
     "max_1y": 5318,
     "history": [
@@ -146052,7 +145913,7 @@
      },
      {
       "d": "2026-11-26",
-      "v": 3602.1
+      "v": 3594.9
      }
     ]
    }
@@ -146060,25 +145921,11 @@
   "news": {
    "voci": [
     {
-     "titolo": "Spain's De Cos Set to Succeed Lagarde as ECB President",
-     "riassunto": "Pablo Hernandez de Cos is set to become European Central Bank president, directing the region’s fight against inflation and possible bond turmoil. The 55-year-old Spaniard will take over from Christine Lagarde, who ends her term early on Feb. 7. Bloomberg's Zoe Schneeweiss reports from Frankfurt. (Source: Bloomberg)",
-     "fonte": "Bloomberg",
-     "quando": "2026-11-26T14:05:43Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-11-26/spain-s-de-cos-set-to-succeed-lagarde-as-ecb-president-video-mwxmko5n"
-    },
-    {
-     "titolo": "UK Is Latest Big European Economy to Report Diesel Demand Slump",
-     "riassunto": "The UK is the latest major European country to report faltering sales of diesel fuel amid sky-high prices triggered by conflicts in the Middle East and Ukraine.",
-     "fonte": "Bloomberg",
-     "quando": "2026-11-26T13:51:48Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-11-26/uk-is-latest-big-european-economy-to-report-diesel-demand-slump"
-    },
-    {
-     "titolo": "ECB Officials Saw More Tightening With Inflation Outlook Worse",
-     "riassunto": "European Central Bank officials meeting last month envisaged tightening monetary policy further in the future after the outlook for inflation worsened.",
-     "fonte": "Bloomberg",
-     "quando": "2026-11-26T13:09:36Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-11-26/ecb-officials-saw-more-tightening-with-inflation-outlook-worse"
+     "titolo": "Spain’s Pablo Hernández de Cos set to lead European Central Bank",
+     "riassunto": "De Cos will lead the ECB into a period of political uncertainty and choppy growth, after winning the backing needed to succeed Christine Lagarde next year.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-26T15:28:26Z",
+     "url": "https://www.cnbc.com/2026/11/26/pablo-hernandez-de-cos-ecb-president.html"
     },
     {
      "titolo": "U.S. tariff-hike threats pile pressure on partners to sign trade deals",
@@ -146088,18 +145935,11 @@
      "url": "https://www.cnbc.com/2026/11/26/us-tariffs-hike-trade-agreement.html"
     },
     {
-     "titolo": "Inflation-Wary Shoppers Prepare for Black Friday",
-     "riassunto": "Retailers had plenty of reasons to be worried about this year’s holiday season, but the latest round of earnings, from Dick’s Sporting Goods Inc. to Kohl’s Corp. and Dollar Tree Inc., show that shoppers are still spending briskly, despite their concerns about rising costs. Bloomberg's Shaquille Omari reports from New Y",
+     "titolo": "Gold Hovers Near 15-Month Low as Traders Eye Fed Path, AI Stocks",
+     "riassunto": "Gold hovered near the lowest level in about 15 months on Thursday, as investors weighed the prospect of further Federal Reserve rate hikes against a relief rally in wider markets amid a comeback in technology shares.",
      "fonte": "Bloomberg",
-     "quando": "2026-11-26T12:18:13Z",
-     "url": "https://www.bloomberg.com/news/videos/2026-11-26/inflation-wary-shoppers-prepare-for-black-friday-video"
-    },
-    {
-     "titolo": "Turkey’s Traders See Slower Rate Cut Pace as Reserves Shrink",
-     "riassunto": "Traders are dialing back bets on a December interest-rate cut in Turkey following a sharp drop in central bank reserves, raising concerns that policymakers may have a harder time supporting the lira.",
-     "fonte": "Bloomberg",
-     "quando": "2026-11-26T06:12:43Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-11-26/turkey-s-traders-see-slower-rate-cut-pace-as-reserves-shrink"
+     "quando": "2026-11-26T00:18:09Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-11-26/gold-edges-lower-as-us-inflation-data-fuels-bets-for-rate-hikes"
     },
     {
      "titolo": "Liesman: Why Greenspan could bet on productivity — and Warsh needs to hike",
@@ -146184,6 +146024,27 @@
      "fonte": "CNBC Economia",
      "quando": "2026-11-18T14:09:26Z",
      "url": "https://www.cnbc.com/2026/11/18/nvidia-us-ai-chip-export-controls-data-centers-.html"
+    },
+    {
+     "titolo": "Record diesel prices drive UK inflation to 1-year high of 3.6%",
+     "riassunto": "It put the U.K.'s annual inflation rate at a 1-year high.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-18T07:57:37Z",
+     "url": "https://www.cnbc.com/2026/11/18/uk-inflation-cpi-fuel-prices.html"
+    },
+    {
+     "titolo": "Japan exports in October surge 20.5%, beating estimates on robust chip shipments",
+     "riassunto": "Semiconductor shipments spiked almost 50% year on year.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-18T00:35:31Z",
+     "url": "https://www.cnbc.com/2026/11/18/japan-exports-october-imports-chips.html"
+    },
+    {
+     "titolo": "St. Louis Fed's Musalem says four more rate hikes may be needed in coming months",
+     "riassunto": "The forecast represents one of the most hawkish views among policymakers.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-11-17T13:40:54Z",
+     "url": "https://www.cnbc.com/2026/11/17/alberto-musalem-fed-interest-rates.html"
     }
    ],
    "fonti": [
@@ -154265,8 +154126,8 @@
    "us10": 4.85,
    "jp10": 2.71,
    "spread": 2.14,
-   "usdjpy": 159.17,
-   "usdjpy_chg_1m": 1.49,
+   "usdjpy": 159.29,
+   "usdjpy_chg_1m": 1.57,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -154294,7 +154155,7 @@
     },
     {
      "label": "VIX",
-     "score": 34
+     "score": 36
     },
     {
      "label": "Put/Call",
@@ -154302,7 +154163,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 56
+     "score": 51
     },
     {
      "label": "Treasury 10A",
@@ -154532,7 +154393,7 @@
       "qqq": 62.6
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-11-25",
     "price": 183.68,
     "d1": -0.56,
@@ -154615,7 +154476,7 @@
       "qqq": 62.6
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-11-25",
     "price": 218.26,
     "d1": -0.56,
@@ -154781,7 +154642,7 @@
       "qqq": 62.6
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-11-25",
     "price": 117.49,
     "d1": -0.2,
@@ -155279,7 +155140,7 @@
       "qqq": 62.6
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-11-25",
     "price": 81.77,
     "d1": 1.59,
@@ -155777,7 +155638,7 @@
       "qqq": 62.6
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-11-25",
     "price": 155.79,
     "d1": -0.83,
@@ -156083,7 +155944,7 @@
       "qqq": 62.6
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-11-25",
     "price": 422.46,
     "d1": -1.01,
@@ -158848,7 +158709,7 @@
    "fetched_at": "2026-11-26"
   },
   "smart_money": {
-   "score": 39,
+   "score": 40,
    "label": "Cauto",
    "smc_indices": {
     "sp500": {
@@ -158896,10 +158757,10 @@
    },
    "smc_avg": 20,
    "vix3m": 26.3,
-   "vix_term_ratio": 1.031,
+   "vix_term_ratio": 1.019,
    "ig_spread": 1.22,
    "hy_ig_ratio": 3.05,
-   "divergence": -24,
+   "divergence": -25,
    "divergence_label": "Smart money ottimista / Retail pessimista",
    "components": [
     {
@@ -158908,7 +158769,7 @@
     },
     {
      "label": "Struttura VIX (contango/backw.)",
-     "score": 48
+     "score": 52
     },
     {
      "label": "Spread HY/IG (fuga qualità)",
@@ -158998,7 +158859,7 @@
     },
     {
      "label": "Smart Money (VIX+HY/IG+P/C)",
-     "score": 39
+     "score": 40
     }
    ],
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
@@ -159192,8 +159053,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 103.64,
-   "chg_3m_pct": 4.24,
+   "value": 103.78,
+   "chg_3m_pct": 4.37,
    "flag": null,
    "src": "DXY"
   },
@@ -159215,14 +159076,14 @@
    "nasdaq": {
     "symbol": "NQ=F",
     "label": "Futures Nasdaq 100",
-    "price": 26239.75,
-    "change_pct": 1.07
+    "price": 26221.25,
+    "change_pct": 1.0
    },
    "sp500": {
     "symbol": "ES=F",
     "label": "Futures S&P 500",
-    "price": 7237.75,
-    "change_pct": 0.97
+    "price": 7234.5,
+    "change_pct": 0.92
    }
   },
   "froth": {
@@ -159469,8 +159330,7 @@
    "errore": null,
    "data": "2026-11-26",
    "date": {
-    "2026-11-25": 656,
-    "2026-11-26": 51
+    "2026-11-26": 707
    },
    "scadenza": "2031-12-20",
    "entita_ice": 707,
@@ -159482,36 +159342,36 @@
     "HY": {
      "serie": 47,
      "versione": 1,
-     "prezzo": 104.8728,
+     "prezzo": 104.8758,
      "cedola": 500,
-     "data": "2026-11-25",
-     "pb": 377.8,
+     "data": "2026-11-26",
+     "pb": 377.7,
      "var": {
       "5": {
-       "da": "2026-11-18",
-       "pb": 15.8
+       "da": "2026-11-19",
+       "pb": 7.2
       },
       "21": {
-       "da": "2026-10-27",
-       "pb": 32.5
+       "da": "2026-10-28",
+       "pb": 34.0
       }
      }
     },
     "IG": {
      "serie": 47,
      "versione": 1,
-     "prezzo": 101.6357,
+     "prezzo": 101.6367,
      "cedola": 100,
-     "data": "2026-11-25",
+     "data": "2026-11-26",
      "pb": 63.8,
      "var": {
       "5": {
-       "da": "2026-11-18",
-       "pb": 2.6
+       "da": "2026-11-19",
+       "pb": 0.8
       },
       "21": {
-       "da": "2026-10-27",
-       "pb": 2.7
+       "da": "2026-10-28",
+       "pb": 3.1
       }
      }
     }
@@ -159519,7 +159379,6 @@
    "storia": {
     "giorni": 30,
     "dal": "2026-10-16",
-    "in_corso": "2026-11-26",
     "parziali": [
      "2026-10-19",
      "2026-10-20",
@@ -159547,7 +159406,9 @@
    },
    "unione": {
     "nuove": [],
-    "completate": {},
+    "completate": {
+     "2026-11-26": 395
+    },
     "difformi": 0,
     "fuori_ordine": []
    },
@@ -159713,8 +159574,15 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T14:01:03Z",
+      "quando": "2026-11-26T16:15:32Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+     },
+     {
+      "titolo": "NVIDIA's Data Center Sales Jump 110%: Can NVDA Keep the Pace Ahead?",
+      "riassunto": "NVDA's Data Center revenues soar 110% to a record $107.6 billion, but can booming AI demand and new product ramp-ups sustain growth amid supply constraints?",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T12:28:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidias-data-center-sales-jump-110-can-nvda-keep-pace-ahead"
      },
      {
       "titolo": "Cathie Wood and Philippe Laffont Are on Opposite Sides of AMD Stock. Here's Who I Think Is Right.",
@@ -159743,16 +159611,23 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-25T22:43:01Z",
       "url": "https://www.nasdaq.com/articles/2-billionaire-funds-dumped-amd-last-quarter-it-sell"
-     },
-     {
-      "titolo": "Anthropic’s Chip Choices Could Change the Nvidia Story. Here’s How.",
-      "riassunto": "Key PointsNvidia is the leading AI accelerator company, with an estimated market share of 80% to 90% last year.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T20:53:02Z",
-      "url": "https://www.nasdaq.com/articles/anthropics-chip-choices-could-change-nvidia-story-heres-how"
      }
     ],
     "ANT": [
+     {
+      "titolo": "Alphabet Could Be the Safest Way to Own Anthropic. Here’s the Math.",
+      "riassunto": "Key PointsAlphabet's 13.7% stake in Anthropic is worth about $137 billion at the AI lab's current $1 trillion valuation.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T17:47:02Z",
+      "url": "https://www.nasdaq.com/articles/alphabet-could-be-safest-way-own-anthropic-heres-math"
+     },
+     {
+      "titolo": "Anthropic Is Down 7% Since Its IPO. History Says a $5,000 Investment Could Be Worth This Much in a Year.",
+      "riassunto": "Key PointsAnthropic raised the most money ever at IPO, but its stock has been falling since it hit a high on the first day of trading.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T15:33:02Z",
+      "url": "https://www.nasdaq.com/articles/anthropic-down-7-its-ipo-history-says-5000-investment-could-be-worth-much-year"
+     },
      {
       "titolo": "Should You Buy Anthropic Stock After Its IPO? Here’s What History Says About Record-Breaking Debuts.",
       "riassunto": "Key PointsAnthropic set a record for largest capital raise from an IPO.",
@@ -159780,20 +159655,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-25T22:35:02Z",
       "url": "https://www.nasdaq.com/articles/anthropic-stock-down-33-its-all-time-high-heres-what-5000-investment-could-be-worth-1-year"
-     },
-     {
-      "titolo": "Anthropic’s Chip Choices Could Change the Nvidia Story. Here’s How.",
-      "riassunto": "Key PointsNvidia is the leading AI accelerator company, with an estimated market share of 80% to 90% last year.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T20:53:02Z",
-      "url": "https://www.nasdaq.com/articles/anthropics-chip-choices-could-change-nvidia-story-heres-how"
-     },
-     {
-      "titolo": "Is the Anthropic IPO to Blame for Bitcoin's Recent Downturn? The Answer Might Surprise You.",
-      "riassunto": "Key PointsSome investors suspect that the Anthropic IPO caused people to dump Bitcoin so they could buy it.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T18:57:01Z",
-      "url": "https://www.nasdaq.com/articles/anthropic-ipo-blame-bitcoins-recent-downturn-answer-might-surprise-you-0"
      }
     ],
     "BE": [
@@ -159845,7 +159706,7 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T14:01:03Z",
+      "quando": "2026-11-26T16:15:32Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
      },
      {
@@ -159886,6 +159747,20 @@
     ],
     "MRVL": [
      {
+      "titolo": "Credo Technology Ahead of Q2 Earnings: How to Approach the Stock Now?",
+      "riassunto": "CRDO heads into Q2 earnings with strong AEC demand and growing optical opportunities, but premium valuation and execution risks warrant caution.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T14:30:00Z",
+      "url": "https://www.nasdaq.com/articles/credo-technology-ahead-q2-earnings-how-approach-stock-now"
+     },
+     {
+      "titolo": "Marvell Technology, Inc. (MRVL) is Attracting Investor Attention: Here is What You Should Know",
+      "riassunto": "Recently, Zacks.com users have been paying close attention to Marvell (MRVL). This makes it worthwhile to examine what the stock has in store.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T13:00:06Z",
+      "url": "https://www.nasdaq.com/articles/marvell-technology-inc-mrvl-attracting-investor-attention-here-what-you-should-know-3"
+     },
+     {
       "titolo": "Stocks Sharply Lower on AI Angst",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
@@ -159912,20 +159787,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-25T18:57:57Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-mostly-lower-rout-chipmakers-and-ai-stocks"
-     },
-     {
-      "titolo": "Notable ETF Inflow Detected - BAI, SNOW, MRVL, WDC",
-      "riassunto": "Looking today at week-over-week shares outstanding changes among the universe of ETFs covered at ETF Channel, one standout is the iShares AI Innovation and Tech Active ETF (Symbol: BAI) where we have detected an approximate $485.3 million dollar inflow -- that's a 4.8% increase",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T15:51:02Z",
-      "url": "https://www.nasdaq.com/articles/notable-etf-inflow-detected-bai-snow-mrvl-wdc"
-     },
-     {
-      "titolo": "Can MXL's AI Data Center Business Sustain Its Strong Growth Momentum?",
-      "riassunto": "MaxLinear's AI data center business is gaining momentum on strong optical demand, expanding customer engagements and new products despite supply constraints.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T11:47:00Z",
-      "url": "https://www.nasdaq.com/articles/can-mxls-ai-data-center-business-sustain-its-strong-growth-momentum"
      }
     ],
     "MSTR": [
@@ -159977,7 +159838,7 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T14:01:03Z",
+      "quando": "2026-11-26T16:15:32Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
      },
      {
@@ -160018,11 +159879,25 @@
     ],
     "NVDA": [
      {
+      "titolo": "Should You Buy Nvidia After Its Sharp Decline? Warren Buffett’s Long-Held Investment Philosophy Provides a Clear Answer",
+      "riassunto": "Key PointsNvidia has faced multiple setbacks over the last few weeks, but earnings remain strong.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T17:35:02Z",
+      "url": "https://www.nasdaq.com/articles/should-you-buy-nvidia-after-its-sharp-decline-warren-buffetts-long-held-investment"
+     },
+     {
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T14:01:03Z",
+      "quando": "2026-11-26T16:15:32Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+     },
+     {
+      "titolo": "President Donald Trump Considers Jensen Huang's Return to Nvidia a \"Great Decision,\" but It Doesn't Resolve a Critical Problem",
+      "riassunto": "Key PointsNvidia stock has been on a roller-coaster ride in November, with CEO Jensen Huang resigning and then being reinstated in the span of 11 days.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T14:26:01Z",
+      "url": "https://www.nasdaq.com/articles/president-donald-trump-considers-jensen-huangs-return-nvidia-great-decision-it-doesnt"
      },
      {
       "titolo": "How Much Is Jensen Huang Worth to Nvidia? The Stock Market Just Gave a Clear Answer",
@@ -160032,32 +159907,18 @@
       "url": "https://www.nasdaq.com/articles/how-much-jensen-huang-worth-nvidia-stock-market-just-gave-clear-answer"
      },
      {
+      "titolo": "NVIDIA's Data Center Sales Jump 110%: Can NVDA Keep the Pace Ahead?",
+      "riassunto": "NVDA's Data Center revenues soar 110% to a record $107.6 billion, but can booming AI demand and new product ramp-ups sustain growth amid supply constraints?",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T12:28:00Z",
+      "url": "https://www.nasdaq.com/articles/nvidias-data-center-sales-jump-110-can-nvda-keep-pace-ahead"
+     },
+     {
       "titolo": "Jensen Huang Is Back. Here's My Nvidia Stock Prediction for 2027.",
       "riassunto": "Key PointsNvidia's longtime CEO, Jensen Huang, abruptly left the company on Nov. 12.",
       "fonte": "Nasdaq",
       "quando": "2026-11-26T10:49:02Z",
       "url": "https://www.nasdaq.com/articles/jensen-huang-back-heres-my-nvidia-stock-prediction-2027"
-     },
-     {
-      "titolo": "Prediction: This Is What Nvidia Stock Will Be Worth by 2028",
-      "riassunto": "Key PointsNvidia is still dominating the industry.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-26T07:54:02Z",
-      "url": "https://www.nasdaq.com/articles/prediction-what-nvidia-stock-will-be-worth-2028"
-     },
-     {
-      "titolo": "Is Nvidia Stock a Buy After Dell's Record AI Backlog?",
-      "riassunto": "Key PointsDell's unshipped AI server orders climbed by about $37 billion in one quarter, to a record $132.3 billion.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-26T03:07:02Z",
-      "url": "https://www.nasdaq.com/articles/nvidia-stock-buy-after-dells-record-ai-backlog"
-     },
-     {
-      "titolo": "Stocks Sharply Lower on AI Angst",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T23:52:42Z",
-      "url": "https://www.nasdaq.com/articles/stocks-sharply-lower-ai-angst"
      }
     ],
     "ORCL": [
@@ -160065,8 +159926,29 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T14:01:03Z",
+      "quando": "2026-11-26T16:15:32Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+     },
+     {
+      "titolo": "How Will Oracle's Heavy AI Spending Shape the Stock's Cash Flow Trend?",
+      "riassunto": "ORCL's aggressive AI infrastructure spending is weighing on free cash flow, but rising cloud demand and easing capital expenditures could drive a turnaround.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T13:41:00Z",
+      "url": "https://www.nasdaq.com/articles/how-will-oracles-heavy-ai-spending-shape-stocks-cash-flow-trend"
+     },
+     {
+      "titolo": "Here's Why Oracle (ORCL) is a Strong Value Stock",
+      "riassunto": "Wondering how to pick strong, market-beating stocks for your investment portfolio? Look no further than the Zacks Style Scores.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T13:40:05Z",
+      "url": "https://www.nasdaq.com/articles/heres-why-oracle-orcl-strong-value-stock-1"
+     },
+     {
+      "titolo": "Oracle Corporation (ORCL) Is a Trending Stock: Facts to Know Before Betting on It",
+      "riassunto": "Oracle (ORCL) has received quite a bit of attention from Zacks.com users lately. Therefore, it is wise to be aware of the facts that can impact the stock's prospects.",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T13:00:06Z",
+      "url": "https://www.nasdaq.com/articles/oracle-corporation-orcl-trending-stock-facts-know-betting-it"
      },
      {
       "titolo": "Stocks Sharply Lower on AI Angst",
@@ -160081,27 +159963,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-25T22:44:33Z",
       "url": "https://www.nasdaq.com/articles/stocks-slump-tech-selloff-deepens"
-     },
-     {
-      "titolo": "Why Oracle Stock Slumped Today",
-      "riassunto": "Key PointsThe price of insuring Oracle's debt against default continues to rise.",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T20:40:12Z",
-      "url": "https://www.nasdaq.com/articles/why-oracle-stock-slumped-today"
-     },
-     {
-      "titolo": "Micron and 6 Other Big Names Are Down More Than 50%. Are They Bargains Now?",
-      "riassunto": "In this video, I will cover why the stock market sold off again after a one-day rally, what the latest inflation data and Dell's earnings tell us, and seven popular stocks that are now down more than 50% from their highs. Watch the short video to learn more, consider subscribing,",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T20:03:01Z",
-      "url": "https://www.nasdaq.com/articles/micron-and-6-other-big-names-are-down-more-50-are-they-bargains-now"
-     },
-     {
-      "titolo": "Stocks Settle Mostly Lower on a Rout in Chipmakers and AI Stocks",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.50% on Tuesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.85%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.99%. December E-mini S&P futures (ESZ26 ) fell -0.52%, and December E-mini Nasdaq...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-25T18:57:57Z",
-      "url": "https://www.nasdaq.com/articles/stocks-settle-mostly-lower-rout-chipmakers-and-ai-stocks"
      }
     ],
     "PLTR": [
@@ -160260,7 +160121,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-26T14:38:41Z"
+   "letto_il": "2026-11-26T18:14:25Z"
   }
  },
  "broker": null,
@@ -160271,8 +160132,15 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T14:01:03Z",
+     "quando": "2026-11-26T16:15:32Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+    },
+    {
+     "titolo": "NVIDIA's Data Center Sales Jump 110%: Can NVDA Keep the Pace Ahead?",
+     "riassunto": "NVDA's Data Center revenues soar 110% to a record $107.6 billion, but can booming AI demand and new product ramp-ups sustain growth amid supply constraints?",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T12:28:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidias-data-center-sales-jump-110-can-nvda-keep-pace-ahead"
     },
     {
      "titolo": "Cathie Wood and Philippe Laffont Are on Opposite Sides of AMD Stock. Here's Who I Think Is Right.",
@@ -160301,16 +160169,23 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-25T22:43:01Z",
      "url": "https://www.nasdaq.com/articles/2-billionaire-funds-dumped-amd-last-quarter-it-sell"
-    },
-    {
-     "titolo": "Anthropic’s Chip Choices Could Change the Nvidia Story. Here’s How.",
-     "riassunto": "Key PointsNvidia is the leading AI accelerator company, with an estimated market share of 80% to 90% last year.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T20:53:02Z",
-     "url": "https://www.nasdaq.com/articles/anthropics-chip-choices-could-change-nvidia-story-heres-how"
     }
    ],
    "ANT": [
+    {
+     "titolo": "Alphabet Could Be the Safest Way to Own Anthropic. Here’s the Math.",
+     "riassunto": "Key PointsAlphabet's 13.7% stake in Anthropic is worth about $137 billion at the AI lab's current $1 trillion valuation.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T17:47:02Z",
+     "url": "https://www.nasdaq.com/articles/alphabet-could-be-safest-way-own-anthropic-heres-math"
+    },
+    {
+     "titolo": "Anthropic Is Down 7% Since Its IPO. History Says a $5,000 Investment Could Be Worth This Much in a Year.",
+     "riassunto": "Key PointsAnthropic raised the most money ever at IPO, but its stock has been falling since it hit a high on the first day of trading.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T15:33:02Z",
+     "url": "https://www.nasdaq.com/articles/anthropic-down-7-its-ipo-history-says-5000-investment-could-be-worth-much-year"
+    },
     {
      "titolo": "Should You Buy Anthropic Stock After Its IPO? Here’s What History Says About Record-Breaking Debuts.",
      "riassunto": "Key PointsAnthropic set a record for largest capital raise from an IPO.",
@@ -160338,20 +160213,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-25T22:35:02Z",
      "url": "https://www.nasdaq.com/articles/anthropic-stock-down-33-its-all-time-high-heres-what-5000-investment-could-be-worth-1-year"
-    },
-    {
-     "titolo": "Anthropic’s Chip Choices Could Change the Nvidia Story. Here’s How.",
-     "riassunto": "Key PointsNvidia is the leading AI accelerator company, with an estimated market share of 80% to 90% last year.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T20:53:02Z",
-     "url": "https://www.nasdaq.com/articles/anthropics-chip-choices-could-change-nvidia-story-heres-how"
-    },
-    {
-     "titolo": "Is the Anthropic IPO to Blame for Bitcoin's Recent Downturn? The Answer Might Surprise You.",
-     "riassunto": "Key PointsSome investors suspect that the Anthropic IPO caused people to dump Bitcoin so they could buy it.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T18:57:01Z",
-     "url": "https://www.nasdaq.com/articles/anthropic-ipo-blame-bitcoins-recent-downturn-answer-might-surprise-you-0"
     }
    ],
    "BE": [
@@ -160403,7 +160264,7 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T14:01:03Z",
+     "quando": "2026-11-26T16:15:32Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
     },
     {
@@ -160444,6 +160305,20 @@
    ],
    "MRVL": [
     {
+     "titolo": "Credo Technology Ahead of Q2 Earnings: How to Approach the Stock Now?",
+     "riassunto": "CRDO heads into Q2 earnings with strong AEC demand and growing optical opportunities, but premium valuation and execution risks warrant caution.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T14:30:00Z",
+     "url": "https://www.nasdaq.com/articles/credo-technology-ahead-q2-earnings-how-approach-stock-now"
+    },
+    {
+     "titolo": "Marvell Technology, Inc. (MRVL) is Attracting Investor Attention: Here is What You Should Know",
+     "riassunto": "Recently, Zacks.com users have been paying close attention to Marvell (MRVL). This makes it worthwhile to examine what the stock has in store.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T13:00:06Z",
+     "url": "https://www.nasdaq.com/articles/marvell-technology-inc-mrvl-attracting-investor-attention-here-what-you-should-know-3"
+    },
+    {
      "titolo": "Stocks Sharply Lower on AI Angst",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
@@ -160470,20 +160345,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-25T18:57:57Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-mostly-lower-rout-chipmakers-and-ai-stocks"
-    },
-    {
-     "titolo": "Notable ETF Inflow Detected - BAI, SNOW, MRVL, WDC",
-     "riassunto": "Looking today at week-over-week shares outstanding changes among the universe of ETFs covered at ETF Channel, one standout is the iShares AI Innovation and Tech Active ETF (Symbol: BAI) where we have detected an approximate $485.3 million dollar inflow -- that's a 4.8% increase",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T15:51:02Z",
-     "url": "https://www.nasdaq.com/articles/notable-etf-inflow-detected-bai-snow-mrvl-wdc"
-    },
-    {
-     "titolo": "Can MXL's AI Data Center Business Sustain Its Strong Growth Momentum?",
-     "riassunto": "MaxLinear's AI data center business is gaining momentum on strong optical demand, expanding customer engagements and new products despite supply constraints.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T11:47:00Z",
-     "url": "https://www.nasdaq.com/articles/can-mxls-ai-data-center-business-sustain-its-strong-growth-momentum"
     }
    ],
    "MSTR": [
@@ -160535,7 +160396,7 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T14:01:03Z",
+     "quando": "2026-11-26T16:15:32Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
     },
     {
@@ -160576,11 +160437,25 @@
    ],
    "NVDA": [
     {
+     "titolo": "Should You Buy Nvidia After Its Sharp Decline? Warren Buffett’s Long-Held Investment Philosophy Provides a Clear Answer",
+     "riassunto": "Key PointsNvidia has faced multiple setbacks over the last few weeks, but earnings remain strong.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T17:35:02Z",
+     "url": "https://www.nasdaq.com/articles/should-you-buy-nvidia-after-its-sharp-decline-warren-buffetts-long-held-investment"
+    },
+    {
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T14:01:03Z",
+     "quando": "2026-11-26T16:15:32Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+    },
+    {
+     "titolo": "President Donald Trump Considers Jensen Huang's Return to Nvidia a \"Great Decision,\" but It Doesn't Resolve a Critical Problem",
+     "riassunto": "Key PointsNvidia stock has been on a roller-coaster ride in November, with CEO Jensen Huang resigning and then being reinstated in the span of 11 days.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T14:26:01Z",
+     "url": "https://www.nasdaq.com/articles/president-donald-trump-considers-jensen-huangs-return-nvidia-great-decision-it-doesnt"
     },
     {
      "titolo": "How Much Is Jensen Huang Worth to Nvidia? The Stock Market Just Gave a Clear Answer",
@@ -160590,32 +160465,18 @@
      "url": "https://www.nasdaq.com/articles/how-much-jensen-huang-worth-nvidia-stock-market-just-gave-clear-answer"
     },
     {
+     "titolo": "NVIDIA's Data Center Sales Jump 110%: Can NVDA Keep the Pace Ahead?",
+     "riassunto": "NVDA's Data Center revenues soar 110% to a record $107.6 billion, but can booming AI demand and new product ramp-ups sustain growth amid supply constraints?",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T12:28:00Z",
+     "url": "https://www.nasdaq.com/articles/nvidias-data-center-sales-jump-110-can-nvda-keep-pace-ahead"
+    },
+    {
      "titolo": "Jensen Huang Is Back. Here's My Nvidia Stock Prediction for 2027.",
      "riassunto": "Key PointsNvidia's longtime CEO, Jensen Huang, abruptly left the company on Nov. 12.",
      "fonte": "Nasdaq",
      "quando": "2026-11-26T10:49:02Z",
      "url": "https://www.nasdaq.com/articles/jensen-huang-back-heres-my-nvidia-stock-prediction-2027"
-    },
-    {
-     "titolo": "Prediction: This Is What Nvidia Stock Will Be Worth by 2028",
-     "riassunto": "Key PointsNvidia is still dominating the industry.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-26T07:54:02Z",
-     "url": "https://www.nasdaq.com/articles/prediction-what-nvidia-stock-will-be-worth-2028"
-    },
-    {
-     "titolo": "Is Nvidia Stock a Buy After Dell's Record AI Backlog?",
-     "riassunto": "Key PointsDell's unshipped AI server orders climbed by about $37 billion in one quarter, to a record $132.3 billion.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-26T03:07:02Z",
-     "url": "https://www.nasdaq.com/articles/nvidia-stock-buy-after-dells-record-ai-backlog"
-    },
-    {
-     "titolo": "Stocks Sharply Lower on AI Angst",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T23:52:42Z",
-     "url": "https://www.nasdaq.com/articles/stocks-sharply-lower-ai-angst"
     }
    ],
    "ORCL": [
@@ -160623,8 +160484,29 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T14:01:03Z",
+     "quando": "2026-11-26T16:15:32Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+    },
+    {
+     "titolo": "How Will Oracle's Heavy AI Spending Shape the Stock's Cash Flow Trend?",
+     "riassunto": "ORCL's aggressive AI infrastructure spending is weighing on free cash flow, but rising cloud demand and easing capital expenditures could drive a turnaround.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T13:41:00Z",
+     "url": "https://www.nasdaq.com/articles/how-will-oracles-heavy-ai-spending-shape-stocks-cash-flow-trend"
+    },
+    {
+     "titolo": "Here's Why Oracle (ORCL) is a Strong Value Stock",
+     "riassunto": "Wondering how to pick strong, market-beating stocks for your investment portfolio? Look no further than the Zacks Style Scores.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T13:40:05Z",
+     "url": "https://www.nasdaq.com/articles/heres-why-oracle-orcl-strong-value-stock-1"
+    },
+    {
+     "titolo": "Oracle Corporation (ORCL) Is a Trending Stock: Facts to Know Before Betting on It",
+     "riassunto": "Oracle (ORCL) has received quite a bit of attention from Zacks.com users lately. Therefore, it is wise to be aware of the facts that can impact the stock's prospects.",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T13:00:06Z",
+     "url": "https://www.nasdaq.com/articles/oracle-corporation-orcl-trending-stock-facts-know-betting-it"
     },
     {
      "titolo": "Stocks Sharply Lower on AI Angst",
@@ -160639,27 +160521,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-25T22:44:33Z",
      "url": "https://www.nasdaq.com/articles/stocks-slump-tech-selloff-deepens"
-    },
-    {
-     "titolo": "Why Oracle Stock Slumped Today",
-     "riassunto": "Key PointsThe price of insuring Oracle's debt against default continues to rise.",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T20:40:12Z",
-     "url": "https://www.nasdaq.com/articles/why-oracle-stock-slumped-today"
-    },
-    {
-     "titolo": "Micron and 6 Other Big Names Are Down More Than 50%. Are They Bargains Now?",
-     "riassunto": "In this video, I will cover why the stock market sold off again after a one-day rally, what the latest inflation data and Dell's earnings tell us, and seven popular stocks that are now down more than 50% from their highs. Watch the short video to learn more, consider subscribing,",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T20:03:01Z",
-     "url": "https://www.nasdaq.com/articles/micron-and-6-other-big-names-are-down-more-50-are-they-bargains-now"
-    },
-    {
-     "titolo": "Stocks Settle Mostly Lower on a Rout in Chipmakers and AI Stocks",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.50% on Tuesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.85%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -1.99%. December E-mini S&P futures (ESZ26 ) fell -0.52%, and December E-mini Nasdaq...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-25T18:57:57Z",
-     "url": "https://www.nasdaq.com/articles/stocks-settle-mostly-lower-rout-chipmakers-and-ai-stocks"
     }
    ],
    "PLTR": [
@@ -160818,7 +160679,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-26T14:38:41Z"
+  "letto_il": "2026-11-26T18:14:25Z"
  },
  "predictions": [
   {
@@ -160842,14 +160703,14 @@
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-december-2026-meeting-20260729232808636"
   },
   {
+   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
+   "yes": 28,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
+  },
+  {
    "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
    "yes": 13,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
-  },
-  {
-   "question": "Will Bitcoin dip to $50,000 in November?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50k-in-november-2026"
   }
  ],
  "options": {
@@ -169397,7 +169258,7 @@
      ],
      "call_wall": 1500.0,
      "put_wall": 900.0,
-     "opt_volume": 11633
+     "opt_volume": 11627
     },
     {
      "date": "2026-12-04",
@@ -241171,8 +241032,8 @@
    "sharpe": -1.46,
    "gain_pct": 1.8,
    "eur_value": 40720.0,
-   "vix": 27.1,
-   "vix_term": 1.031,
+   "vix": 26.8,
+   "vix_term": 1.019,
    "titles": {},
    "macro_scores": {
     "fear_greed": 15,
@@ -241181,7 +241042,7 @@
     "systemic_risk": 62,
     "corp_profit": 52,
     "sp500_pe": 74,
-    "smart_money": 39,
+    "smart_money": 40,
     "macroquant": 51,
     "seasonality": 94,
     "in:cpi": 43,
@@ -241354,7 +241215,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 3 ore"
    },
    {
     "key": "sec_calendario",
@@ -241438,6 +241299,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-26T14:38:42Z"
+  "generated_at": "2026-11-26T18:14:26Z"
  }
 }
