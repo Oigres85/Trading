@@ -29,6 +29,11 @@ che servono, mai output interi), niente giri lunghi di iniezioni senza necessit�
    **Nessuna famiglia di dati dipende da un solo fornitore (v542)**: una fonte che rifiuta non si ritenta e non si
    aggira (niente richieste travestite) — si passa alla successiva e lo si dice: altra fonte, pipeline, ultima lettura
    riuscita datata (`riserve.py`). Una lettura nuova con una fonte sola nasce con la sua riserva.
+   **Prima i dati del progetto, se affidabili (CEO, 26/11/2026: *"vorrei che tenessi più conto dei dati del progetto su
+   github se affidabili"*)**: nelle risposte si parte da ciò che il sistema ha già prodotto — `data/data.json` (notizie,
+   shock, segnali, calendario, rischio), `macro_pack`, libro, tesi, previsioni, registri — quando il run è successivo
+   all'ultima chiusura e passa `audit_data.py` (`stato_sistema.py` ne dà l'età). La lettura alla fonte completa ciò che
+   è più nuovo (il prezzo di seduta) o sostituisce ciò che è vecchio o rotto, e la risposta dice da dove viene ogni numero.
 5. **Investimento: analisi finanziaria, non regole rigide (14/11/2026).** Il salvavita a −30% e «i rami secchi si
    tagliano dopo il recupero» sono ELIMINATI: **nessuna vendita automatica**, nessuna vendita vietata. Tenere,
    vendere o mediare si decide con l'analisi del momento (conti, valutazione, credito, macro, tecnica, rischio), e

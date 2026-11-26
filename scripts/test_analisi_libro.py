@@ -9629,6 +9629,16 @@ check("v520 il carico in euro del broker (controvalore meno profitto) vale finch
       NL.carico_broker(_bk520, [], "AAA") == {"carico_eur": 10000.0, "controvalore_eur": 11000.0, "profitto_eur": 1000.0}
       and NL.carico_broker(_bk520, _op520, "BBB") == {"superato": "2026-11-02"}
       and NL.carico_broker(_bk520, [], "ZZZ") is None)
+# v548 — il 25/11/2026 la fotografia del broker era delle 11:15 e l'acquisto di ANT del pomeriggio: stessa data, e
+# il carico di prima restava buono per una posizione che non era piu' quella. Lo stato si costruisce: stessa
+# fotografia, un'operazione il giorno stesso e una il giorno prima.
+_op548s = [dict(_op520[0], data="2026-10-31", data_testo="31/10/2026")]
+_op548p = [dict(_op520[0], data="2026-10-30", data_testo="30/10/2026")]
+check("v548 un'operazione dello STESSO giorno della fotografia la supera (il registro ha la data e non l'ora: nel "
+      "dubbio il carico di prima non si usa); una del giorno prima no",
+      NL.carico_broker(_bk520, _op548s, "BBB") == {"superato": "2026-10-31"}
+      and NL.carico_broker(_bk520, _op548p, "BBB") == {"carico_eur": 5000.0, "controvalore_eur": 4000.0,
+                                                         "profitto_eur": -1000.0})
 _cb520 = NL.cambio_libro(_op520, {"AAA": 100, "BBB": 50}, {"AAA": 120.0, "BBB": 90.0}, 1.2, "BCE", None, 1000.0, 0.0,
                          broker=_bk520, pmc={"AAA": 110.0, "BBB": 100.0})
 _xa520 = next((x for x in _cb520["coperte"] if x["tk"] == "AAA"), {})

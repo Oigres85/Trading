@@ -34,18 +34,18 @@ calo dal massimo, l'esito della tenuta e le tesi restano MISURE: informano, non 
 | Ticker | Quantità | PMC | Valuta | Note |
 |---|---|---|---|---|
 | NVDA | 270 | **87,1667** | USD | ⚠ confermato dal CEO: `portfolio_state.json` diceva 81,167 ed era sbagliato |
-| MSTR | 173 | 173,3045 | USD | |
-| CRWV | 255 | 76,14 | USD | media del CEO del 23/10/2026: +50 azioni a ~54,53 $, ricavato dal carico che il broker dichiara (da 81,41 a 76,14); il 20/10/2026: +50 a ~63,86 $ (da 87,07 a 81,41); la prima il 14/10/2026: +50 a ~65,80 $ (da 97,199 a 87,07) |
+| MSTR | 218 | 153,7347 | USD | media del CEO del 24/11/2026: +45 azioni a ~78,50 $, ricavato dal carico che il broker dichiara (da 173,3045 a 153,7347) |
+| CRWV | 325 | 68,8089 | USD | media del CEO del 24/11/2026: +70 azioni a ~42,10 $, ricavato dal carico che il broker dichiara (da 76,1408 a 68,8089); media del CEO del 23/10/2026: +50 azioni a ~54,53 $, ricavato dal carico che il broker dichiara (da 81,41 a 76,14); il 20/10/2026: +50 a ~63,86 $ (da 87,07 a 81,41); la prima il 14/10/2026: +50 a ~65,80 $ (da 97,199 a 87,07) |
 | AMD | 100 | 153,916 | USD | |
 | PLTR | 100 | 113,50 | USD | |
 | MU | 70 | 87,63 | USD | |
 | RGTI | 663 | 22,147 | USD | media del CEO del 14/10/2026: +200 azioni a ~12,06 $ (carico da 26,5048 a 22,147) |
 | SKHY | 45 | 139,00 | USD | SK hynix, listata a Seoul — emittente estero, deposita 6-K/20-F |
-| MRVL | 42 | 214,08 | USD | |
+| MRVL | 62 | 187,6026 | USD | media del CEO del 24/11/2026: +20 azioni a 132,00 $, ricavato dal carico che il broker dichiara (da 214,08 a 187,6026) |
 | BE | 40 | 214,00 | USD | |
 | ORCL | 60 | 129,60 | USD | acquisto del **30/10/2026** a mercato, con la borsa USA aperta (testuale: *"Eseguito a mercato usa aperta due ore fa circa"*). Il prezzo l'ha corretto il CEO la sera stessa (testuale: *"Scusa … aggiungi acquisto Oracle 129.6 60 azioni"*): il primo dichiarato, 126,50, stava sotto il minimo della seduta (129,00 su due fonti, pre-market e after-hours compresi); 129,60 cade nell'intervallo della seduta (129,00–135,20). Carico in euro nel registro §1decies |
 | WDC | 24 | 342,00 | USD | acquisto del **02/11/2026** dalla riserva, speculazione sul rimbalzo (testuale: *"Entrato 24 a pmc 342 Wdc"*). Carico in euro nel registro §1decies |
-| ANT | 120 | 105,00 | USD | Anthropic — acquisto del **19/11/2026**, primo giorno di contrattazione al Nasdaq (testuale: *"Entrato in ant 120 pezzi a 105 euro"*): 105 **dollari**, confermati dal CEO il 20/11/2026 (*"Ant dollari"*); nessuno stop attivo (CEO, 20/11/2026). ⚠ Claude è un prodotto di Anthropic: solo fatti e misure, nessun giudizio (CLAUDE.md, istruzione 6). Carico in euro nel registro §1decies |
+| ANT | 150 | 100,40 | USD | Anthropic — +10 azioni a 75,00 $ il **25/11/2026** (CEO: *"mediato: ant 10 quote a 75"*; carico da 102,2143 a 100,40); +20 azioni a ~85,50 $ dopo il primo acquisto, ricavate dal carico che il broker dichiara il 24/11/2026 (da 105,00 a 102,2143), comprate il **23/11/2026** (CEO, 25/11/2026: *"il 23."*). Acquisto del **19/11/2026**, primo giorno di contrattazione al Nasdaq (testuale: *"Entrato in ant 120 pezzi a 105 euro"*): 105 **dollari**, confermati dal CEO il 20/11/2026 (*"Ant dollari"*); nessuno stop attivo (CEO, 20/11/2026). ⚠ Claude è un prodotto di Anthropic: solo fatti e misure, nessun giudizio (CLAUDE.md, istruzione 6). Carico in euro nel registro §1decies |
 | BTP-V28 | 40.000 nominali | 100 | EUR | BTP Valore Ott 2028 — valorizzato nominale × prezzo/100 |
 
 ⚠ **SMCI — venduta per intero il 19/10/2026**: 250 azioni a **32,81 $**, comprate il 16/10 a 31,60 con l'ordine
@@ -55,7 +55,12 @@ definitivo lo fa il broker in euro, col cambio di carico. Resta fra i sorvegliat
 storico del 31/10/2026): vendita con valuta **20/10/2026**, prezzo netto 32,75 $ (commissioni tolte), plusvalenza
 **+241,58 €**, imposte **62,81 €** — vale questo, non la stima in dollari qui sopra.
 
-**Liquidità: ~19.500 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 19/11/2026: i ~31.000 € dichiarati
+**Liquidità: ~7.300 €** IN TUTTO, bloccata compresa, **tutta in euro** — stima del 25/11/2026: gli 8.000 € dichiarati dal
+CEO in mattinata (*"8k"*) meno le 10 ANT comprate dopo l'apertura (750 $ più 15 $ di commissione stimata, circa
+698 €). Gli 8.000 € erano il saldo
+dopo le 20 ANT aggiunte (1.710 $) e le tre medie del 24/11 su MSTR, CRWV e MRVL (9.119 $ più le commissioni). La
+stima del libro era ~9.500 € (i ~19.500 € del 19/11 meno circa 1.570 € e circa 8.364 €): vale il saldo che dichiara
+il CEO. Nessun ordine con limite aperto (CEO, 25/11/2026). Il 19/11/2026 la stima era ~19.500 €: i ~31.000 € dichiarati
 dal CEO il 17/11 meno l'acquisto di ANT del 19/11 (120 a 105 $ = 12.600 $, più 15 $ di commissione stimata, circa
 11.480 € al riferimento BCE del 19/11, 1,0992, meno lo scarto della banca) — da confermare col saldo del broker; la
 valuta del prezzo è confermata (dollari, CEO 20/11/2026). La riserva per la quotazione di Anthropic è stata usata. Il 17/11/2026 il CEO
@@ -1000,6 +1005,11 @@ Convenzioni dichiarate (v240), rilette da un gate:
 | 13/11/2026 | GOOGL | vendita | 37 | 294,71 | 1,1020 | Banca Sella, nota informativa del 16/11/2026 (cambio medio, scarto 0,0006) | ordine con limite a 290 eseguito a 294,711; commissione 12,50 $; incasso netto 9.883,68 €; imposta 136 € (CEO, 17/11/2026) |
 | 16/11/2026 | AVGO | vendita | 24 | 329,75 | 1,1014 | BCE, riferimento del 16/11/2026 | stop del CEO; 24 azioni, confermate dal CEO il 16/11/2026; cambio di Sella non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 | 19/11/2026 | ANT | acquisto | 120 | 105,00 | 1,0992 | BCE, riferimento del 19/11/2026 | primo giorno di contrattazione al Nasdaq (apertura a 111,50 $); il CEO scrive «105 euro»: sono 105 dollari, confermati il 20/11/2026; cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 23/11/2026 | ANT | acquisto | 20 | 85,50 | 1,0939 | BCE, riferimento del 23/11/2026 | seconda tranche, dichiarata dal CEO il 25/11/2026; prezzo ricavato dal carico che il broker dichiara (da 105,00 a 102,2143 su 140 azioni) e confermato dal CEO; la seduta ha scambiato fra 84,61 e 94,24 $; cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 24/11/2026 | MSTR | acquisto | 45 | 78,50 | 1,0963 | BCE, riferimento del 24/11/2026 | media del CEO; prezzo ricavato dal carico che il broker dichiara (da 173,3045 a 153,7347 su 218 azioni); cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 24/11/2026 | CRWV | acquisto | 70 | 42,10 | 1,0963 | BCE, riferimento del 24/11/2026 | media del CEO; prezzo ricavato dal carico che il broker dichiara (da 76,1408 a 68,8089 su 325 azioni); cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 24/11/2026 | MRVL | acquisto | 20 | 132,00 | 1,0963 | BCE, riferimento del 24/11/2026 | media del CEO; prezzo ricavato dal carico che il broker dichiara (da 214,08 a 187,6026 su 62 azioni); cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
+| 25/11/2026 | ANT | acquisto | 10 | 75,00 | 1,0963 | BCE, riferimento del 24/11/2026: l'ultimo pubblicato all'ora dell'acquisto | terza tranche (CEO: *"mediato: ant 10 quote a 75"*); la seduta ha aperto a 77,93 $ e alle 15:55 italiane aveva toccato 73,85 $; cambio della banca non dichiarato: resta il riferimento BCE; commissione stimata 15 $ |
 
 Regole del registro:
 - **il cambio è quello APPLICATO dal broker** quando il CEO lo dichiara (sta nella conferma dell'eseguito); altrimenti il
@@ -1134,6 +1144,27 @@ dollari; su ANT non c'è nessuno stop; gli ordini con limite su TSMC e Meta non 
 nuova, liquidità invariata). Quando arriva la nota della banca su ANT si annotano cambio applicato e commissione
 (§1decies).
 
+**Eseguite il 24/11/2026, dette il 25/11** (CEO: *"si sono entrato ieri, ecco il portafoglio aggiornato"*): tre medie
+nel giorno in cui i semiconduttori hanno fatto −8,3% — MSTR +45 a ~78,50 $, CRWV +70 a ~42,10 $, MRVL +20 a 132,00 $
+(prezzi ricavati dal carico che il broker dichiara: 9.119 $ in tutto, circa 8.364 € al riferimento BCE del 24/11,
+1,0963, con tre commissioni stimate). Su BE e su ANT nessun acquisto quel giorno. La prova d'ingresso era nel diario
+prima dell'operazione, ai minimi di seduta delle 16:54 italiane (78,76 · 42,25 · 129,135): a favore solo su MSTR. La
+stessa schermata mostra ANT a 140 azioni (erano 120): +20 a ~85,50 $, in una data che il CEO non ha ancora detto. Il
+25/11 il CEO manda la fotografia intera del conto (§1duodecies). Quando arriva la nota della banca si annotano cambio
+applicato e commissioni (§1decies).
+
+**Chiuse il 25/11/2026** (CEO: *"1 si"* · *"2 8k"* · *"3 no"*): le 20 ANT in più sono a circa 85,50 $, comprate
+il 23/11/2026 (CEO, lo stesso giorno: *"il 23."*; riga in §1decies); la liquidità è 8.000 € (§1 e `config/portfolio_state.json`); nessun ordine con limite aperto,
+quindi §1septies resta senza ordini.
+
+**Eseguita il 25/11/2026** (CEO: *"mediato: ant 10 quote a 75"*): ANT, 10 azioni a 75,00 $ dopo l'apertura (seduta
+aperta a 77,93 $; alle 15:55 italiane il minimo era 73,85 $, sotto quello del 24/11, 75,61 $). Circa 698 € con la
+commissione stimata: il carico scende da 102,2143 a 100,40 $ su 150 azioni e la liquidità a circa 7.300 € (§1). Il
+CEO aveva chiesto i conti su 2.000 € al minimo del 24/11: ne ha messi circa 700. La prova d'ingresso non si può
+fare né scrivere nel diario: il titolo ha meno di 200 sedute. Su Anthropic l'analista non dà giudizi (CLAUDE.md,
+istruzione 6). La fotografia del broker di §1duodecies è delle 11:15 dello stesso giorno, cioè di PRIMA di questo
+acquisto: per ANT è superata (v548), e il carico in euro si ricostruisce dal registro di §1decies.
+
 | Aperta il | Cosa | Perché conta | Come si chiude |
 |---|---|---|---|
 
@@ -1148,34 +1179,40 @@ Perché vale più delle stime: il **carico in euro** (controvalore meno profitto
 il cambio di ogni acquisto e le commissioni comprese — e non cambia col prezzo: cambia solo con un'operazione. Per
 questo, dopo un acquisto o una vendita sul nome, la riga è **superata** e serve una fotografia nuova (il blocco lo dice).
 
-**Fotografia del broker: 31/10/2026 08:04** (sabato: prezzi della chiusura di venerdì 30/10)
+**Fotografia del broker: 25/11/2026 11:15** (mercoledì, prima dell'apertura: la colonna «Ultimo» è la chiusura di
+martedì 24/11; l'ora è quella in cui il CEO l'ha mandata, la schermata non la stampa)
 
 | Titolo | Controvalore € | Profitto | Valuta del profitto | Profitto % |
 |---|---|---|---|---|
-| AMD | 45.218,40 | 30.892,33 | EUR | +215,64 |
-| GOOGL | 9.273,28 | -71,16 | EUR | -0,76 |
-| BE | 7.272,10 | -139,79 | EUR | -1,89 |
-| CRWV | 12.524,03 | -4.494,74 | EUR | -26,41 |
-| INTC | 7.651,98 | 129,57 | EUR | +1,72 |
-| MRVL | 7.383,83 | -415,08 | EUR | -5,32 |
-| MU | 55.431,70 | 49.530,69 | EUR | +839,36 |
-| NVDA | 49.456,49 | 27.503,46 | EUR | +125,28 |
-| ORCL | 7.018,25 | 46,96 | EUR | +0,67 |
-| PLTR | 16.479,59 | 6.467,24 | EUR | +64,59 |
-| MSTR | 20.209,65 | -5.733,87 | EUR | -22,10 |
-| RGTI | 6.673,32 | -5.982,98 | EUR | -47,27 |
-| SKHY | 6.010,06 | 594,02 | EUR | +10,97 |
-| BTP-V28 | 40.754,40 | 652,00 | EUR | +1,63 |
-| TOTALE TITOLI | 291.357,08 | 98.978,65 | EUR | +51,48 |
-| TOTALE IN DOLLARI (azioni) | — | 109.080,76 | USD | +63,83 |
-| TOTALE IN EURO (BTP) | — | 652,00 | EUR | +1,63 |
+| AMD | 37.762,03 | 23.435,97 | EUR | +163,59 |
+| ANT | 10.477,74 | -2.552,97 | EUR | -19,59 |
+| BE | 5.716,32 | -1.695,58 | EUR | -22,88 |
+| CRWV | 12.654,43 | -7.052,30 | EUR | -35,79 |
+| MRVL | 7.454,12 | -2.752,78 | EUR | -26,97 |
+| MSTR | 15.458,45 | -13.706,76 | EUR | -47,00 |
+| MU | 40.284,83 | 34.383,82 | EUR | +582,68 |
+| NVDA | 38.335,99 | 16.382,79 | EUR | +74,63 |
+| ORCL | 6.006,36 | -930,30 | EUR | -13,41 |
+| PLTR | 14.728,51 | 4.716,16 | EUR | +47,10 |
+| RGTI | 4.604,42 | -8.052,09 | EUR | -63,62 |
+| SKHY | 4.604,69 | -811,36 | EUR | -14,98 |
+| WDC | 6.008,66 | -1.337,62 | EUR | -18,21 |
+| BTP-V28 | 40.716,00 | 716,00 | EUR | +1,79 |
+| TOTALE TITOLI | 244.812,56 | 40.742,99 | EUR | +19,97 |
+| TOTALE IN DOLLARI (azioni) | — | 39.639,18 | USD | +21,58 |
+| TOTALE IN EURO (BTP) | — | 716,00 | EUR | +1,79 |
 
-MSTR, RGTI e SKHY vengono dalla seconda schermata dello stesso sabato («VEDI TUTTI», mandata dal CEO il
-31/10/2026): a borsa chiusa i prezzi sono gli stessi della prima. Verificato: le tre righe insieme valgono 32.893,03 €
-con un profitto di −11.122,83 €, cioè esattamente la differenza fra i totali del broker e le altre dieci righe. Il
-controvalore dei titoli **non comprende la liquidità** (~24.000 €, §1). Verificato il 31/10/2026: il carico in dollari
-che il totale del broker implica (109.080,76 / 63,83%) è 170.893 $, quello del libro (§1, quantità × prezzo medio)
-170.893 $ — coincidono.
+La schermata del 25/11/2026, mandata dal CEO dopo le medie del 24/11, stampa per ogni titolo il **carico in euro**
+(«Controvalore Posizione €»), il prezzo di carico in euro e due profitti: quello sull'«Ultimo» (la chiusura del 24/11),
+che è il **Profitto** di questa tabella, e quello sul prezzo del pre-mercato. Il **Controvalore €** qui è carico più
+profitto sull'«Ultimo». Dei totali il broker stampa il carico (204.069,57 €), il profitto sull'«Ultimo»
+(40.742,99 €) e quello sul pre-mercato (30.043,89 €): la percentuale del totale, il totale in dollari
+e la sua percentuale sono **somme delle righe**, non numeri stampati dal broker. Verificato il 25/11/2026: i carichi in
+euro delle quattordici righe sommano 204.069,57 € e i profitti 40.742,98 €, cioè i totali del
+broker a meno di un centesimo; il carico in dollari delle azioni che il broker stampa è 183.711,84 $, quello del
+libro (§1, quantità × prezzo medio) 183.711,59 $ — coincidono. Il controvalore dei titoli **non comprende la
+liquidità** (~8.000 €, §1). La fotografia precedente era del 31/10/2026 08:04 (totale titoli 291.357,08 €, profitto
+98.978,65 €, +51,48%): sta nella storia di questo file.
 
 **Storico delle operazioni chiuse** (schermata «STORICO OPERAZIONI»: plus/minusvalenza e imposte in euro, come il
 broker le calcola)

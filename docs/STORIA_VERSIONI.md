@@ -10071,3 +10071,14 @@ era in due posti.
   controlli (la pagina non ricalibra e dichiara le date; i cinque moduli riusano la cache scaduta; le convenzioni
   contro il libro). La prova (d) del registro ha il mercato gia' scaduto: e' la condizione per interrogarlo. Iniezioni
   su copie, una per copia.
+
+## v548 — l'operazione dello stesso giorno supera la fotografia del broker (25/11/2026)
+
+Il 25/11 il CEO manda la fotografia del conto alle 11:15 e nel pomeriggio compra 10 ANT a 75,00 $. `carico_broker`
+confrontava le DATE con `>`: l'operazione, datata come la fotografia, non la superava, e il carico in euro di prima
+(13.031 €) restava attaccato a 150 azioni — un cambio «effettivo» di 1,156 che non è mai esistito. Il registro di §1decies
+ha la data e non l'ora: ora lo stesso giorno vale come dopo (`>=`), il carico di prima non si usa e quello del nome si
+ricostruisce dal registro. Una fotografia fatta la sera, dopo l'operazione, si ridichiara con la sua ora. Un controllo in
+`test_analisi_libro.py` (lo stato costruito: stessa fotografia, un'operazione il giorno stesso e una il giorno prima),
+validato con un'iniezione su una copia verificata per impronta. Nello stesso giro il libro: le tre medie del 24/11
+(MSTR, CRWV, MRVL), le 20 ANT del 23/11, le 10 ANT del 25/11, la liquidità dichiarata e la fotografia nuova del broker.
