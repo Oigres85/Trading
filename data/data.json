@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-11-26T22:04:16Z",
- "eurusd": 1.0975,
+ "updated_at": "2026-11-26T22:34:11Z",
+ "eurusd": 1.0971,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -18575,28 +18575,28 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 60710.7,
+   "price": 60545.43,
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.55,
+   "change_pct": 0.28,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -51.9,
-   "sma200_dist_pct": -15.6,
-   "sma50_dist_pct": -18.7,
+   "ath_dist_pct": -52.0,
+   "sma200_dist_pct": -15.8,
+   "sma50_dist_pct": -18.9,
    "w52_high": 97860.6,
    "w52_low": 55149.57,
-   "w52_dist_pct": -38.0,
+   "w52_dist_pct": -38.1,
    "day_high": 61040.95,
    "day_low": 60040.08,
    "support": 55149.57,
    "resistance": 76138.68,
-   "rsi": 28.9,
-   "volume": 22406942720,
-   "vol_ratio": 0.69,
+   "rsi": 28.2,
+   "volume": 22048694272,
+   "vol_ratio": 0.68,
    "atr_14": 2873.75,
-   "atr_pct": 4.73,
+   "atr_pct": 4.75,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -18605,7 +18605,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60710.7
+     60545.43
     ],
     "m6": [
      64098.5,
@@ -18733,7 +18733,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60710.7
+     60545.43
     ],
     "all": [
      386.94,
@@ -18882,7 +18882,7 @@
      78548.63,
      83553.85,
      77434.75,
-     60710.7
+     60545.43
     ],
     "m1": [
      75942.12,
@@ -18906,7 +18906,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60710.7
+     60545.43
     ],
     "m3": [
      86172.28,
@@ -18974,7 +18974,7 @@
      61210.98,
      59747.77,
      60378.2,
-     60710.7
+     60545.43
     ],
     "y1": [
      90518.37,
@@ -19050,7 +19050,7 @@
      73964.47,
      64855.84,
      60094.09,
-     60710.7
+     60545.43
     ],
     "d1": [
      60317.4,
@@ -19185,7 +19185,9 @@
      60897.04,
      60818.44,
      60788.49,
-     60710.7
+     60603.69,
+     60490.18,
+     60537.61
     ]
    },
    "earnings_date": null,
@@ -19194,12 +19196,12 @@
    "health": 16,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.84,
-   "sortino_1y": -1.14,
-   "sharpe_6m": -0.51,
-   "sortino_6m": -0.73,
+   "sharpe_1y": -0.85,
+   "sortino_1y": -1.15,
+   "sharpe_6m": -0.53,
+   "sortino_6m": -0.76,
    "prepost": null,
-   "prezzo_limite_aggiustato": 60710.7,
+   "prezzo_limite_aggiustato": 60545.43,
    "risk_reward": "1:2.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19215,22 +19217,22 @@
     "w1": {
      "support": 57241.84,
      "resistance": 64478.36,
-     "change_pct": -0.74
+     "change_pct": -1.01
     },
     "m1": {
      "support": 55149.57,
      "resistance": 80833.62,
-     "change_pct": -20.06
+     "change_pct": -20.27
     },
     "m3": {
      "support": 55149.57,
      "resistance": 87265.49,
-     "change_pct": -29.55
+     "change_pct": -29.74
     },
     "y1": {
      "support": 55149.57,
      "resistance": 87363.76,
-     "change_pct": -13.91
+     "change_pct": -14.15
     }
    },
    "financials": [],
@@ -19253,74 +19255,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 60710.7,
+     "prezzo": 60545.43,
      "medie": {
       "sma10": {
-       "liv": 61188.57,
-       "dist_pct": -0.78
+       "liv": 61172.04,
+       "dist_pct": -1.02
       },
       "ema10": {
-       "liv": 61952.83,
-       "dist_pct": -2.0
+       "liv": 61922.78,
+       "dist_pct": -2.22
       },
       "sma20": {
-       "liv": 65950.34,
-       "dist_pct": -7.94
+       "liv": 65942.08,
+       "dist_pct": -8.18
       },
       "ema20": {
-       "liv": 65385.2,
-       "dist_pct": -7.15
+       "liv": 65369.46,
+       "dist_pct": -7.38
       },
       "sma30": {
-       "liv": 69901.59,
-       "dist_pct": -13.15
+       "liv": 69896.08,
+       "dist_pct": -13.38
       },
       "ema30": {
-       "liv": 68173.06,
-       "dist_pct": -10.95
+       "liv": 68162.4,
+       "dist_pct": -11.17
       },
       "sma50": {
-       "liv": 74682.87,
-       "dist_pct": -18.71
+       "liv": 74679.56,
+       "dist_pct": -18.93
       },
       "ema50": {
-       "liv": 71485.32,
-       "dist_pct": -15.07
+       "liv": 71478.84,
+       "dist_pct": -15.3
       },
       "sma100": {
-       "liv": 77481.47,
-       "dist_pct": -21.64
+       "liv": 77479.81,
+       "dist_pct": -21.86
       },
       "ema100": {
-       "liv": 73616.68,
-       "dist_pct": -17.53
+       "liv": 73613.41,
+       "dist_pct": -17.75
       },
       "sma200": {
-       "liv": 71921.32,
-       "dist_pct": -15.59
+       "liv": 71920.49,
+       "dist_pct": -15.82
       },
       "ema200": {
-       "liv": 74123.06,
-       "dist_pct": -18.09
+       "liv": 74121.41,
+       "dist_pct": -18.32
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 28.9,
+      "rsi14": 28.2,
       "macd": {
-       "linea": -4526.25,
-       "segnale": -4455.83,
-       "istogramma": -70.42
+       "linea": -4539.44,
+       "segnale": -4458.46,
+       "istogramma": -80.97
       },
-      "stoch_k": 34.2,
-      "stoch_d": 28.4,
-      "williams_r": -65.8,
-      "cci20": -48.0,
+      "stoch_k": 33.1,
+      "stoch_d": 28.1,
+      "williams_r": -66.9,
+      "cci20": -48.4,
       "adx14": 49.3,
       "di_su": 11.7,
       "di_giu": 37.3,
-      "momentum10": -4145.14
+      "momentum10": -4310.41
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19813,19 +19815,19 @@
       "o": 60378.57,
       "h": 61040.95,
       "l": 60040.08,
-      "c": 60710.7
+      "c": 60545.43
      }
     ],
     "performance": {
-     "s1": 1.03,
-     "m1": -24.49,
-     "m3": -29.9,
-     "m6": -6.66,
-     "a1": -13.16,
-     "ytd": -31.58,
-     "a3": 60.98,
-     "a5": 6.5,
-     "a10": 8041.54
+     "s1": 0.75,
+     "m1": -24.7,
+     "m3": -30.09,
+     "m6": -6.92,
+     "a1": -13.4,
+     "ytd": -31.77,
+     "a3": 60.54,
+     "a5": 6.21,
+     "a10": 8019.37
     },
     "stagionalita": [
      {
@@ -19938,9 +19940,9 @@
      }
     ]
    },
-   "rs_1m": -13.1,
+   "rs_1m": -13.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -7.9,
+   "rs_ndx_1m": -8.1,
    "beta_ndx": 0.58,
    "avg_corr": 0.39,
    "max_corr": 0.77,
@@ -27572,20 +27574,20 @@
    "price_asof": "2026-11-26",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.09,
+   "change_pct": 0.07,
    "pe": null,
    "ath": 1.6,
-   "ath_dist_pct": -31.5,
+   "ath_dist_pct": -31.6,
    "sma200_dist_pct": -4.5,
    "sma50_dist_pct": -2.0,
    "w52_high": 1.2,
    "w52_low": 1.09,
-   "w52_dist_pct": -8.7,
+   "w52_dist_pct": -8.8,
    "day_high": 1.1,
    "day_low": 1.1,
    "support": 1.09,
    "resistance": 1.13,
-   "rsi": 34.7,
+   "rsi": 34.3,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 0.00702,
@@ -28284,6 +28286,9 @@
      1.1,
      1.1,
      1.1,
+     1.1,
+     1.1,
+     1.1,
      1.1
     ]
    },
@@ -28294,9 +28299,9 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -1.57,
-   "sortino_1y": -2.18,
-   "sharpe_6m": -3.16,
-   "sortino_6m": -3.8,
+   "sortino_1y": -2.19,
+   "sharpe_6m": -3.17,
+   "sortino_6m": -3.81,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.1,
    "risk_reward": "1:2.0",
@@ -28314,22 +28319,22 @@
     "w1": {
      "support": 1.09,
      "resistance": 1.1,
-     "change_pct": 0.02
+     "change_pct": 0.0
     },
     "m1": {
      "support": 1.09,
      "resistance": 1.13,
-     "change_pct": -1.42
+     "change_pct": -1.44
     },
     "m3": {
      "support": 1.09,
      "resistance": 1.17,
-     "change_pct": -5.86
+     "change_pct": -5.88
     },
     "y1": {
      "support": 1.09,
      "resistance": 1.2,
-     "change_pct": -5.74
+     "change_pct": -5.76
     }
    },
    "financials": [],
@@ -28360,66 +28365,66 @@
      "medie": {
       "sma10": {
        "liv": 1.1,
-       "dist_pct": -0.09
+       "dist_pct": -0.11
       },
       "ema10": {
        "liv": 1.1,
-       "dist_pct": -0.22
+       "dist_pct": -0.24
       },
       "sma20": {
        "liv": 1.11,
-       "dist_pct": -1.0
+       "dist_pct": -1.02
       },
       "ema20": {
        "liv": 1.11,
-       "dist_pct": -0.77
+       "dist_pct": -0.79
       },
       "sma30": {
        "liv": 1.11,
-       "dist_pct": -1.35
+       "dist_pct": -1.37
       },
       "ema30": {
        "liv": 1.11,
-       "dist_pct": -1.21
+       "dist_pct": -1.23
       },
       "sma50": {
        "liv": 1.12,
-       "dist_pct": -2.01
+       "dist_pct": -2.03
       },
       "ema50": {
        "liv": 1.12,
-       "dist_pct": -1.92
+       "dist_pct": -1.94
       },
       "sma100": {
        "liv": 1.14,
-       "dist_pct": -3.47
+       "dist_pct": -3.49
       },
       "ema100": {
        "liv": 1.13,
-       "dist_pct": -2.99
+       "dist_pct": -3.01
       },
       "sma200": {
        "liv": 1.15,
-       "dist_pct": -4.5
+       "dist_pct": -4.52
       },
       "ema200": {
        "liv": 1.14,
-       "dist_pct": -3.98
+       "dist_pct": -4.0
       }
      },
      "medie_battute": 0,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 34.7,
+      "rsi14": 34.3,
       "macd": {
        "linea": -0.01,
        "segnale": -0.01,
        "istogramma": -0.0
       },
-      "stoch_k": 24.0,
-      "stoch_d": 17.1,
-      "williams_r": -76.0,
-      "cci20": -79.7,
+      "stoch_k": 23.3,
+      "stoch_d": 16.9,
+      "williams_r": -76.7,
+      "cci20": -80.3,
       "adx14": 34.0,
       "di_su": 10.2,
       "di_giu": 23.9,
@@ -28920,15 +28925,15 @@
      }
     ],
     "performance": {
-     "s1": 0.0,
-     "m1": -1.8,
-     "m3": -6.02,
-     "m6": -5.59,
-     "a1": -5.76,
-     "ytd": -6.62,
-     "a3": -0.01,
-     "a5": -2.85,
-     "a10": 3.04
+     "s1": -0.02,
+     "m1": -1.83,
+     "m3": -6.04,
+     "m6": -5.61,
+     "a1": -5.78,
+     "ytd": -6.64,
+     "a3": -0.04,
+     "a5": -2.87,
+     "a10": 3.02
     },
     "stagionalita": [
      {
@@ -37872,7 +37877,7 @@
      98.35,
      84.39,
      94.22,
-     99.64,
+     99.65,
      83.74,
      89.74,
      116.26,
@@ -59285,7 +59290,7 @@
      276.59,
      279.73,
      277.06,
-     271.24,
+     271.25,
      272.45,
      266.33,
      259.35,
@@ -63018,14 +63023,14 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -68775,7 +68780,7 @@
      702.69,
      704.46,
      696.35,
-     643.47,
+     643.46,
      573.45,
      583.34,
      667.8,
@@ -69007,8 +69012,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 17,
-    "target": 2111.95,
-    "upside_pct": 62.1
+    "target": 2110.79,
+    "upside_pct": 62.0
    },
    "analisti": {
     "eps_ora": 56.9449,
@@ -69022,9 +69027,9 @@
     "eps_min": 37.43,
     "eps_max": 63.8912,
     "eps_n": 27,
-    "target_min": 849.03,
-    "target_max": 2865.53,
-    "target_mediana": 2254.31
+    "target_min": 848.57,
+    "target_max": 2863.96,
+    "target_mediana": 2253.08
    },
    "health": 19,
    "eps": 40.64,
@@ -69061,7 +69066,7 @@
     "debt_to_equity": 8.897,
     "dividend_yield": 0.0071,
     "price_to_book": null,
-    "target_mean": 2111.9487,
+    "target_mean": 2110.7905,
     "fcf": null,
     "gross_margin": 0.5434,
     "enterprise_value": null,
@@ -73012,7 +73017,7 @@
      89.67,
      84.81,
      81.51,
-     76.14,
+     76.13,
      71.27,
      77.61,
      69.12,
@@ -77226,7 +77231,7 @@
      11.1,
      11.27,
      11.09,
-     11.07,
+     11.06,
      11.8,
      11.5,
      10.69,
@@ -77548,8 +77553,8 @@
    "rating": {
     "key": "buy",
     "n": 9,
-    "target": 113.75,
-    "upside_pct": 84.8
+    "target": 113.78,
+    "upside_pct": 84.9
    },
    "analisti": {
     "eps_ora": 2.3503,
@@ -77563,9 +77568,9 @@
     "eps_min": 1.48,
     "eps_max": 3.86,
     "eps_n": 18,
-    "target_min": 82.27,
-    "target_max": 169.14,
-    "target_mediana": 112.98
+    "target_min": 82.29,
+    "target_max": 169.18,
+    "target_mediana": 113.01
    },
    "health": 18,
    "eps": 0.66,
@@ -77602,7 +77607,7 @@
     "debt_to_equity": 13.949,
     "dividend_yield": 0.0028,
     "price_to_book": null,
-    "target_mean": 113.7514,
+    "target_mean": 113.7801,
     "fcf": null,
     "gross_margin": 0.3383,
     "enterprise_value": null,
@@ -91904,7 +91909,7 @@
      40.75,
      41.92,
      40.05,
-     36.22,
+     36.23,
      38.7,
      36.23,
      34.54,
@@ -94187,7 +94192,7 @@
      45.14,
      48.09,
      47.75,
-     46.33,
+     46.34,
      42.6,
      44.08,
      46.63,
@@ -96179,7 +96184,7 @@
      123.58,
      115.79,
      115.57,
-     127.36,
+     127.35,
      140.21,
      140.59,
      129.75,
@@ -107622,7 +107627,7 @@
      "a1": 20.65,
      "a3": 62.36,
      "a5": 115.91,
-     "a10": 584.65
+     "a10": 584.64
     },
     "stagionalita": [
      {
@@ -110419,7 +110424,7 @@
      250.07,
      268.43,
      324.5,
-     348.61,
+     348.6,
      345.54,
      336.45,
      329.49,
@@ -116717,7 +116722,7 @@
      78.41,
      76.31,
      69.67,
-     72.91,
+     72.9,
      76.98,
      79.63,
      87.08,
@@ -116772,7 +116777,7 @@
      126.32,
      126.21,
      125.6,
-     110.63,
+     110.64,
      116.57,
      127.22,
      108.26,
@@ -116823,7 +116828,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -116837,7 +116842,7 @@
      149.48,
      156.2,
      164.48,
-     166.55,
+     166.56,
      163.59,
      150.97,
      139.09,
@@ -116929,7 +116934,7 @@
      352.96,
      313.87,
      334.37,
-     321.43,
+     321.42,
      301.14,
      316.17,
      300.45,
@@ -120919,7 +120924,7 @@
      26.78,
      26.72,
      26.52,
-     26.6,
+     26.59,
      26.77,
      28.98,
      30.36,
@@ -120952,7 +120957,7 @@
      81.14,
      86.82,
      85.79,
-     92.87,
+     92.86,
      82.12,
      85.55,
      79.4,
@@ -121025,7 +121030,7 @@
      137.15,
      142.3,
      133.05,
-     118.61,
+     118.62,
      119.02,
      119.32,
      124.66,
@@ -121119,7 +121124,7 @@
      427.74,
      448.72,
      393.97,
-     377.2,
+     377.21,
      430.42,
      453.23,
      469.58,
@@ -131087,8 +131092,8 @@
    "rating": {
     "key": "hold",
     "n": 12,
-    "target": 45.72,
-    "upside_pct": 11.6
+    "target": 45.7,
+    "upside_pct": 11.5
    },
    "analisti": {
     "eps_ora": 23.3731,
@@ -131102,9 +131107,9 @@
     "eps_min": 17.71,
     "eps_max": 27.26,
     "eps_n": 9,
-    "target_min": 39.39,
-    "target_max": 64.01,
-    "target_mediana": 43.69
+    "target_min": 39.37,
+    "target_max": 63.98,
+    "target_mediana": 43.67
    },
    "health": 68,
    "eps": 3.96,
@@ -131141,7 +131146,7 @@
     "debt_to_equity": 61.744,
     "dividend_yield": 0.0439,
     "price_to_book": null,
-    "target_mean": 45.7216,
+    "target_mean": 45.7011,
     "fcf": null,
     "gross_margin": 0.8333,
     "enterprise_value": null,
@@ -132710,7 +132715,7 @@
      3.2,
      3.15,
      3.17,
-     2.82,
+     2.83,
      2.67,
      2.77,
      2.93,
@@ -143920,15 +143925,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.0975",
-    "change_pct": 0.11,
+    "value": "1.0972",
+    "change_pct": 0.09,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "174.55",
-    "change_pct": -0.01,
+    "value": "174.61",
+    "change_pct": 0.02,
     "suffix": "%"
    }
   ],
@@ -154222,7 +154227,7 @@
    "us10": 4.85,
    "jp10": 2.71,
    "spread": 2.14,
-   "usdjpy": 159.22,
+   "usdjpy": 159.21,
    "usdjpy_chg_1m": 1.52,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
@@ -154259,7 +154264,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 55
+     "score": 52
     },
     {
      "label": "Treasury 10A",
@@ -159150,7 +159155,7 @@
   },
   "dollar_ruler": {
    "value": 103.78,
-   "chg_3m_pct": 4.38,
+   "chg_3m_pct": 4.37,
    "flag": null,
    "src": "DXY"
   },
@@ -159668,7 +159673,7 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T16:15:32Z",
+      "quando": "2026-11-26T22:04:38Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
      },
      {
@@ -159800,7 +159805,7 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T16:15:32Z",
+      "quando": "2026-11-26T22:04:38Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
      },
      {
@@ -159932,7 +159937,7 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T16:15:32Z",
+      "quando": "2026-11-26T22:04:38Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
      },
      {
@@ -159973,6 +159978,13 @@
     ],
     "NVDA": [
      {
+      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
+      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
+      "fonte": "Nasdaq",
+      "quando": "2026-11-26T22:29:34Z",
+      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+     },
+     {
       "titolo": "Nvidia Stock Has Found Its Next Big Catalyst, Making the Stock a Once-in-a-Decade Buying Opportunity.",
       "riassunto": "Key PointsNvidia noted on its latest earnings call that its physical AI revenue will more than quadruple in the current fiscal year.",
       "fonte": "Nasdaq",
@@ -159985,13 +159997,6 @@
       "fonte": "Nasdaq",
       "quando": "2026-11-26T17:35:02Z",
       "url": "https://www.nasdaq.com/articles/should-you-buy-nvidia-after-its-sharp-decline-warren-buffetts-long-held-investment"
-     },
-     {
-      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
-      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
-      "fonte": "Nasdaq",
-      "quando": "2026-11-26T16:15:32Z",
-      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
      },
      {
       "titolo": "Cerebras Expands AI Inference Reach: Can It Challenge NVDA & AMD?",
@@ -160020,7 +160025,7 @@
       "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-26T16:15:32Z",
+      "quando": "2026-11-26T22:04:38Z",
       "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
      },
      {
@@ -160215,7 +160220,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-26T22:04:16Z"
+   "letto_il": "2026-11-26T22:34:11Z"
   }
  },
  "broker": null,
@@ -160226,7 +160231,7 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T16:15:32Z",
+     "quando": "2026-11-26T22:04:38Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
     },
     {
@@ -160358,7 +160363,7 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T16:15:32Z",
+     "quando": "2026-11-26T22:04:38Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
     },
     {
@@ -160490,7 +160495,7 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T16:15:32Z",
+     "quando": "2026-11-26T22:04:38Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
     },
     {
@@ -160531,6 +160536,13 @@
    ],
    "NVDA": [
     {
+     "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
+     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
+     "fonte": "Nasdaq",
+     "quando": "2026-11-26T22:29:34Z",
+     "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
+    },
+    {
      "titolo": "Nvidia Stock Has Found Its Next Big Catalyst, Making the Stock a Once-in-a-Decade Buying Opportunity.",
      "riassunto": "Key PointsNvidia noted on its latest earnings call that its physical AI revenue will more than quadruple in the current fiscal year.",
      "fonte": "Nasdaq",
@@ -160543,13 +160555,6 @@
      "fonte": "Nasdaq",
      "quando": "2026-11-26T17:35:02Z",
      "url": "https://www.nasdaq.com/articles/should-you-buy-nvidia-after-its-sharp-decline-warren-buffetts-long-held-investment"
-    },
-    {
-     "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
-     "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
-     "fonte": "Nasdaq",
-     "quando": "2026-11-26T16:15:32Z",
-     "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
     },
     {
      "titolo": "Cerebras Expands AI Inference Reach: Can It Challenge NVDA & AMD?",
@@ -160578,7 +160583,7 @@
      "titolo": "Stock Indices Finish Off Their Lows as Dip Buyers Step In",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-26T16:15:32Z",
+     "quando": "2026-11-26T22:04:38Z",
      "url": "https://www.nasdaq.com/articles/stock-indices-finish-their-lows-dip-buyers-step"
     },
     {
@@ -160773,12 +160778,12 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-26T22:04:16Z"
+  "letto_il": "2026-11-26T22:34:11Z"
  },
  "predictions": [
   {
    "question": "Will the price of Bitcoin be between $60,000 and $62,000 on November 27?",
-   "yes": 57,
+   "yes": 55,
    "link": "https://polymarket.com/event/will-the-price-of-bitcoin-be-between-60000-62000-on-november-27-2026"
   },
   {
@@ -241393,6 +241398,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-26T22:04:17Z"
+  "generated_at": "2026-11-26T22:34:13Z"
  }
 }

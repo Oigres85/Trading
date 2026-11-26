@@ -1,4 +1,4 @@
-⟦ BUILD v546 · generato 26/11/2026 22:04 ⟧
+⟦ BUILD v546 · generato 26/11/2026 22:34 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 26/11/2026, 22:04:16 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 17:04, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,29% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1% · Fut S&P +0,92% · BTC +0,55% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~16.4h); il "→ agg." incorpora già il gap after.
+DATI AL 26/11/2026, 22:34:11 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 17:34, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,29% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1% · Fut S&P +0,92% · BTC +0,28% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~15.9h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 26/11/2026, 22:04:16 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-11-25 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile. ⚠ MA NON TUTTE: 2 quotazioni su 68 hanno gia' la barra di 2026-11-26, perche' le barre arrivano a scaglioni. Le righe che la portano sono piu' fresche di questa data, e ciascuna dichiara la propria: fra loro NON sono prezzate allo stesso istante.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 26/11/2026, 22:34:11 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. ⚠ LA BARRA GIORNALIERA SOTTO LA MAGGIORANZA DI QUEI NUMERI E' DEL 2026-11-25 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile. ⚠ MA NON TUTTE: 2 quotazioni su 68 hanno gia' la barra di 2026-11-26, perche' le barre arrivano a scaglioni. Le righe che la portano sono piu' fresche di questa data, e ciascuna dichiara la propria: fra loro NON sono prezzate allo stesso istante.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): ottobre 2026 · Inflazione PCE (a/a): ottobre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): ottobre 2026 · Non-Farm Payrolls: ottobre 2026 · Disoccupazione: ottobre 2026 · Fiducia consumatori (UMich): novembre 2026 · Curva 10A-2A: 25/11/2026 · Curva 10A-3M: 25/11/2026 · Treasury USA 30A: 24/11/2026 · Tasso reale 10A (TIPS): 24/11/2026 · Inflazione attesa 10A (breakeven): 25/11/2026 · Manifattura Philly Fed (al posto dell'ISM): novembre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -71,16 +71,16 @@ QUADRO MACRO:
 - Fear & Greed: 15 (Paura estrema) · rilevazione CNN del 25/11/2026 · la seduta prima 15, 1 settimana fa 16, 1 mese fa 30, 1 anno fa 18 · nel suo anno: 4° percentile su 250 rilevazioni (minimo 6, massimo 71)
 - VIX: 26.8 (-5,27% nell'ultima seduta [chiusura del 26/11] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
 - Fed Funds Rate: range ATTUALE 3,75–4,00% · tasso implicito futures 3,88% (media attesa del mese in corso, dal suo contratto) · PROSSIMA RIUNIONE FOMC: 09/12/2026 (il tasso resta valido fino alla prossima decisione FOMC)
-- Carry USA-Giappone: spread tassi 10A 2,14 pp (US10A 4.85%, JGB10A 2.71%), USD/JPY 159.22 (+1,52% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/12/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
+- Carry USA-Giappone: spread tassi 10A 2,14 pp (US10A 4.85%, JGB10A 2.71%), USD/JPY 159.21 (+1,52% 1 mese), tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online; prossima riunione BoJ 18/12/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1,13 — prevalgono le PUT = copertura/pessimismo (put 1607726, call 1428401). BANDE DI SOLA LETTURA, convenzione del mestiere e non un dato di questo file: sopra 1,1 prevalgono le put, sotto 0,7 le call, in mezzo e' zona centrale. ⚠ Il sistema NON ha lo storico di questa serie, quindi non puo' dire a quale percentile stia il valore di oggi: dove cominci un ESTREMO — che e' il punto in cui la lettura si rovescia in contrarian — qui non e' stabilito, e non va dedotto dalle due soglie qui sopra, che separano il verso e non l'intensita'.
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 8,1% del totale BIL+SHV+SPY (⚠ denominatore = la SOMMA delle masse, non SPY da solo; proxy AUM BIL+SHV $70B su $867B di BIL+SHV+SPY (SPY da solo $797B)) · Retail Cash: fondi monetari retail $3045,5 mld (FRED RMFNS, YoY +4,3%, 98° percentile 5A, riferito a ottobre 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
-- Righello Dollaro (DXY): 103.78 · 3 mesi +4,38% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
+- Righello Dollaro (DXY): 103.78 · 3 mesi +4,37% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7182,78 vs SMA125 7577,48 (-5,21%) · Nasdaq 100 26.046,9 vs SMA125 29.241,76 (-10,93%) — sopra = trend primario integro, sotto = deterioramento.
 - Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 26.221,25 (+1%) · S&P 500 (ES) 7234,5 (+0,92%) — in rialzo oltre il rumore: apertura USA attesa in gap-up.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 2,57× (-35% 5g) · TQQQ 3x NDX RVol 2× (-13,65% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
 - Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) -6,88% vs RSP (equi-pesato) -0,82% a 1M · spread -6,06pp — mese in ribasso per il cap-pesato; scendono entrambi, l'indice piu' dell'azione media: a cedere sono soprattutto i grandi (alert della pipeline se SPY+ con RSP− o spread >4pp; le bande dello scarto — da +1,5 pp a favore dell'indice, da -1 pp a favore dell'azione media — sono una convenzione di lettura). ⚠ L'ampiezza misura la DISTANZA fra i due indici, non la direzione: il verso lo da' il cap-pesato, e quello dell'equi-pesato si legge accanto.
 - Treasury USA 10A: 4.85% (-0,06 pp nell'ultima seduta) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,91% (FRED DGS10, osservazione del 2026-11-24): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
-- EUR/USD: 1.0975 (+0,11% nell'ultima seduta)
+- EUR/USD: 1.0972 (+0,09% nell'ultima seduta)
 - PIL USA (t/t ann.): 4.3% (riferito al 3° trimestre 2026 (luglio-settembre) · acquisito il 26/11/2026 · ultima uscita 25/11/2026 (ieri) · prossimo aggiornamento 23/12/2026 (calendario ufficiale, Gross Domestic Product, via FRED) · BEA, trimestrale · serie TRIMESTRALE, il dato più recente disponibile)
 - Vendite al dettaglio (m/m): 0.2% (riferito a ottobre 2026 · acquisito il 26/11/2026 · ultima uscita 17/11/2026 (9 giorni fa) · prossimo aggiornamento 16/12/2026 (calendario ufficiale, Advance Monthly Sales for Retail and Food Services, via FRED) · Census, mensile)
 - Non-Farm Payrolls: +165K (riferito a ottobre 2026 · acquisito il 26/11/2026 · ultima uscita 06/11/2026 (20 giorni fa) · prossimo aggiornamento 04/12/2026 (calendario ufficiale, Employment Situation, via FRED) · BLS, mensile)
@@ -100,11 +100,11 @@ QUADRO MACRO:
       Ghana redeemed a four-year domestic bond three months ahead of maturity, as the government sought to bolster investor confidence in an economy recovering from a debt restructuring.
     · [CNBC Economia, 7h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Spain’s Pablo Hernández de Cos set to lead European Central Bank
       De Cos will lead the ECB into a period of political uncertainty and choppy growth, after winning the backing needed to succeed Christine Lagarde next year.
-    · [CNBC Economia, 9h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] U.S. tariff-hike threats pile pressure on partners to sign trade deals
+    · [CNBC Economia, 10h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] U.S. tariff-hike threats pile pressure on partners to sign trade deals
       The U.S. planned a fresh tariff salvo on 14 trading partners, while offering some countries lower rates if they secure trade deals with Washington.
     · [Bloomberg, 22h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Gold Hovers Near 15-Month Low as Traders Eye Fed Path, AI Stocks
       Gold hovered near the lowest level in about 15 months on Thursday, as investors weighed the prospect of further Federal Reserve rate hikes against a relief rally in wider markets amid a comeback in technology shares.
-    · [CNBC Economia, 24h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Liesman: Why Greenspan could bet on productivity — and Warsh needs to hike
+    · [CNBC Economia, 25h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Liesman: Why Greenspan could bet on productivity — and Warsh needs to hike
       Alan Greenspan famously held the line on interest rates because he believed in the productivity promise of the internet boom. Why can't Kevin Warsh do the same?
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-12-04 Non-Farm Payrolls (precedente +165K) · 2026-12-04 Disoccupazione (precedente 4.1%) · 2026-12-10 Inflazione CPI (a/a) (precedente 3.9%). ⚠ Per 1 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich)): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 5 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-2A, Curva 10A-3M, Treasury USA 30A, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-12-01 MRVL · 2026-12-02 CRM · 2026-12-09 AVGO. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 1 accesi su 4 CALCOLABILI da una fonte — accesi: Inasprimento criteri di prestito. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "6/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 1 su 4.
@@ -164,7 +164,7 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 - Prossime "4 streghe" (quadruple witching): 18/12/2026 (tra 21 gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
-- Will the price of Bitcoin be between $60,000 and $62,000 on November 27?: 57% [Δ7g —]
+- Will the price of Bitcoin be between $60,000 and $62,000 on November 27?: 55% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the December 2026 meeting?: 94% [Δ7g —]
 - Will there be no change in Fed interest rates after the December 2026 meeting?: 4% [Δ7g —]
 - Will Bitcoin dip to $50,000 by December 31, 2026?: 28% [Δ7g —]
@@ -244,49 +244,49 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (95,2% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 6h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
+  [AMD] · [Nasdaq, 0h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
       The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...
   [AMD] · [Nasdaq, 6h fa] Cerebras Expands AI Inference Reach: Can It Challenge NVDA & AMD?
       CBRS is ramping up its AI inference capabilities with hyperscaler partnerships, wafer-scale innovations, and expanding capacity to challenge NVIDIA and Advanced Micro Devices.
   [BE] · [Nasdaq, 27h fa] Goldman Sachs Sees 52 More GW of Data Center Power in 2028. These 3 Stocks Look Best Positioned to Cash In.
       Key PointsRapid AI expansion should tighten power markets further and lift gas demand.
-  [BE] · [Nasdaq, 29h fa] This AI Power Stock More Than Doubled Its Revenue and Still Burned Cash. Which Number Matters More?
+  [BE] · [Nasdaq, 30h fa] This AI Power Stock More Than Doubled Its Revenue and Still Burned Cash. Which Number Matters More?
       Key PointsSurging power demand helped Bloom Energy’s third-quarter revenue jump 138% to $1.2 billion.
-  [CRWV] · [Nasdaq, 6h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
+  [CRWV] · [Nasdaq, 0h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
       The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...
-  [CRWV] · [Nasdaq, 22h fa] Stocks Sharply Lower on AI Angst
+  [CRWV] · [Nasdaq, 23h fa] Stocks Sharply Lower on AI Angst
       The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...
   [MRVL] · [Nasdaq, 6h fa] Lumentum Surges 55% in a Year: Should You Buy, Sell, or Hold the Stock?
       LITE stock soars 55% in a year on strong AI-driven optical networking demand, but rising costs, premium valuation, and acquisition uncertainty cloud its outlook.
   [MRVL] · [Nasdaq, 8h fa] Credo Technology Ahead of Q2 Earnings: How to Approach the Stock Now?
       CRDO heads into Q2 earnings with strong AEC demand and growing optical opportunities, but premium valuation and execution risks warrant caution.
-  [MSTR] · [Nasdaq, 22h fa] Stocks Sharply Lower on AI Angst
+  [MSTR] · [Nasdaq, 23h fa] Stocks Sharply Lower on AI Angst
       The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...
-  [MSTR] · [Nasdaq, 23h fa] Stocks Slump as Tech Selloff Deepens
+  [MSTR] · [Nasdaq, 24h fa] Stocks Slump as Tech Selloff Deepens
       The S&P 500 Index ($SPX ) (SPY ) is down by -2.88% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -2.04%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.29%. December E-mini S&P futures (ESZ26 ) are down -2.26%, and December E-mini Nasdaq...
-  [MU] · [Nasdaq, 6h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
+  [MU] · [Nasdaq, 0h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
       The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...
-  [MU] · [Nasdaq, 8h fa] Is Micron Stock a Buy After HPE Said Memory Will Stay Scarce Into 2028?
+  [MU] · [Nasdaq, 9h fa] Is Micron Stock a Buy After HPE Said Memory Will Stay Scarce Into 2028?
       Key PointsHPE expects memory supply to stay tight until at least the second half of calendar 2028.
+  [NVDA] · [Nasdaq, 0h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
+      The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...
   [NVDA] · [Nasdaq, 4h fa] Nvidia Stock Has Found Its Next Big Catalyst, Making the Stock a Once-in-a-Decade Buying Opportunity.
       Key PointsNvidia noted on its latest earnings call that its physical AI revenue will more than quadruple in the current fiscal year.
-  [NVDA] · [Nasdaq, 4h fa] Should You Buy Nvidia After Its Sharp Decline? Warren Buffett’s Long-Held Investment Philosophy Provides a Clear Answer
-      Key PointsNvidia has faced multiple setbacks over the last few weeks, but earnings remain strong.
-  [ORCL] · [Nasdaq, 6h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
+  [ORCL] · [Nasdaq, 0h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
       The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...
-  [ORCL] · [Nasdaq, 8h fa] How Will Oracle's Heavy AI Spending Shape the Stock's Cash Flow Trend?
+  [ORCL] · [Nasdaq, 9h fa] How Will Oracle's Heavy AI Spending Shape the Stock's Cash Flow Trend?
       ORCL's aggressive AI infrastructure spending is weighing on free cash flow, but rising cloud demand and easing capital expenditures could drive a turnaround.
-  [PLTR] · [Nasdaq, 22h fa] Stocks Sharply Lower on AI Angst
+  [PLTR] · [Nasdaq, 23h fa] Stocks Sharply Lower on AI Angst
       The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...
   [PLTR] · [Nasdaq, 23h fa] 'Big Short' Investor Michael Burry Just Closed His Bet Against the Nasdaq. Here's What Investors Should Do Now
       Key PointsMichael Burry sold the rest of his Nasdaq-100 put options this week and says his portfolio is now almost entirely long.
-  [RGTI] · [Nasdaq, 27h fa] QBTS vs. RGTI: Which Is the Better Quantum Computing Stock to Buy Now?
+  [RGTI] · [Nasdaq, 28h fa] QBTS vs. RGTI: Which Is the Better Quantum Computing Stock to Buy Now?
       D-Wave and Rigetti face contrasting commercial momentum. Discover why QBTS's stronger bookings and revenue visibility give it an edge.
   [RGTI] · [Nasdaq, 33h fa] Huang Is Back as NVDA CEO: Quantum ETFs to Buy Before the Next AI Surge
       Huang's return as NVDA CEO sparks a quantum stock rally, putting ETFs in focus as investors seek exposure to the next AI-driven computing surge.
-  [WDC] · [Nasdaq, 10h fa] Seagate Shares Tumble 46% in 6 months: Buy, Sell or Hold STX Now?
+  [WDC] · [Nasdaq, 11h fa] Seagate Shares Tumble 46% in 6 months: Buy, Sell or Hold STX Now?
       STX shares have slumped 45.8% in six months despite robust AI-driven storage demand, expanding margins and rising earnings estimates.
-  [WDC] · [Nasdaq, 12h fa] 4 Memory and Storage Stocks Cut by More Than 30% That I'd Buy Now and Hold for the Next Decade
+  [WDC] · [Nasdaq, 13h fa] 4 Memory and Storage Stocks Cut by More Than 30% That I'd Buy Now and Hold for the Next Decade
       Key PointsSandisk produced $6.3 billion of free cash flow in its last quarter and has no debt.
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
