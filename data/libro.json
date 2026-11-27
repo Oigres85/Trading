@@ -1,8 +1,8 @@
 {
  "al": "2026-11-27",
  "sedute": 98,
- "generato": "2026-11-27T18:40:22+00:00",
- "quota_azionaria": 0.7687,
+ "generato": "2026-11-27T21:47:40+00:00",
+ "quota_azionaria": 0.7688,
  "posizioni_al": "2026-11-19",
  "posizioni_giorni": 8,
  "sedute_scartate": {},
@@ -14,7 +14,7 @@
  },
  "volatilita": 0.6802,
  "drawdown_max": -0.4229,
- "drawdown_oggi": -0.3595,
+ "drawdown_oggi": -0.3594,
  "scommesse_effettive": 1.57,
  "correlazione_media": 0.575,
  "scommesse_effettive_ribassi": 1.68,
@@ -22,7 +22,7 @@
  "sedute_ribassi": 36,
  "pesi": {
   "MU": 0.2179,
-  "AMD": 0.2043,
+  "AMD": 0.2042,
   "NVDA": 0.1955,
   "PLTR": 0.0828,
   "MRVL": 0.0284,
@@ -31,12 +31,12 @@
   "SKHY": 0.0259,
   "MSTR": 0.0679,
   "CRWV": 0.0542,
-  "ORCL": 0.0307,
+  "ORCL": 0.0309,
   "WDC": 0.0337
  },
  "contributo_rischio": {
   "MU": 0.269,
-  "AMD": 0.2136,
+  "AMD": 0.2135,
   "NVDA": 0.152,
   "PLTR": 0.0467,
   "MRVL": 0.0351,
@@ -45,7 +45,7 @@
   "SKHY": 0.0337,
   "MSTR": 0.0477,
   "CRWV": 0.0763,
-  "ORCL": 0.022,
+  "ORCL": 0.0222,
   "WDC": 0.0344
  },
  "volatilita_nome": {
@@ -144,7 +144,7 @@
    "SKHY": 0.55,
    "MSTR": 0.5,
    "CRWV": 0.58,
-   "ORCL": 0.55,
+   "ORCL": 0.56,
    "WDC": 0.5
   },
   "BE": {
@@ -209,7 +209,7 @@
    "NVDA": 0.55,
    "PLTR": 0.37,
    "MRVL": 0.65,
-   "RGTI": 0.55,
+   "RGTI": 0.56,
    "BE": 0.72,
    "SKHY": 0.56,
    "MSTR": 0.45,
@@ -243,7 +243,7 @@
   "SKHY": 119.5,
   "MSTR": 81.62,
   "CRWV": 44.15,
-  "ORCL": 106.51,
+  "ORCL": 107.13,
   "WDC": 292.11,
   "ANT": 91.88
  },
