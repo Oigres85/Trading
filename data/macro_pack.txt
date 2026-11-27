@@ -1,4 +1,4 @@
-⟦ BUILD v546 · generato 27/11/2026 22:15 ⟧
+⟦ BUILD v546 · generato 27/11/2026 22:55 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -55,10 +55,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 27/11/2026, 22:15:57 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 17:15, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +4,34% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,42% · Fut S&P +0,83% · BTC -1,37% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~64.3h); il "→ agg." incorpora già il gap after.
+DATI AL 27/11/2026, 22:55:33 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 17:55, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +4,34% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,42% · Fut S&P +0,83% · BTC -1,22% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~63.6h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 27/11/2026, 22:15:57 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-11-27.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 27/11/2026, 22:55:33 · prossimo run: orario non disponibile — il cron di GitHub e' una coda, non un orario. La barra giornaliera sotto la maggioranza di quei numeri e' del 2026-11-27.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a): ottobre 2026 · Inflazione PCE (a/a): ottobre 2026 · PIL USA (t/t ann.): 3° trimestre 2026 (luglio-settembre) · Vendite al dettaglio (m/m): ottobre 2026 · Non-Farm Payrolls: ottobre 2026 · Disoccupazione: ottobre 2026 · Fiducia consumatori (UMich): novembre 2026 · Curva 10A-2A: 27/11/2026 · Curva 10A-3M: 27/11/2026 · Treasury USA 30A: 25/11/2026 · Tasso reale 10A (TIPS): 25/11/2026 · Inflazione attesa 10A (breakeven): 27/11/2026 · Manifattura Philly Fed (al posto dell'ISM): novembre 2026. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 · ⚠ PERCENTILE e POSIZIONE NELL'INTERVALLO SONO DUE GRANDEZZE DIVERSE, e su alcune materie prime compaiono entrambe: il PERCENTILE (nei digest storici, scritto "N°") conta quante rilevazioni della serie stanno sotto il valore di oggi; la POSIZIONE NELL'INTERVALLO (nel quadro macro, scritta "N% dell'intervallo annuale") misura dove cade fra il minimo e il massimo e non guarda quanto tempo il prezzo ci abbia passato. Coincidono solo agli estremi — un valore al proprio massimo da' 100 a entrambe — e nel mezzo divergono: sono due letture della stessa serie, non due conferme indipendenti.
@@ -77,7 +77,7 @@ QUADRO MACRO:
 - Righello Dollaro (DXY): 104.01 · 3 mesi +4,61% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7297,49 vs SMA125 7575,06 (-3,66%) · Nasdaq 100 26.726,39 vs SMA125 29.211,46 (-8,51%) — sopra = trend primario integro, sotto = deterioramento.
 - Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 26.765 (+1,42%) · S&P 500 (ES) 7308,25 (+0,83%) — in rialzo oltre il rumore: apertura USA attesa in gap-up.
-- Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 1,27× (-19,27% 5g) · TQQQ 3x NDX RVol 0,74× (-0,33% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
+- Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 1,28× (-19,27% 5g) · TQQQ 3x NDX RVol 0,75× (-0,33% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
 - Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) -5,7% vs RSP (equi-pesato) +0,44% a 1M · spread -6,13pp — mese in ribasso per il cap-pesato; l'indice scende MENTRE l'azione media sale: a cedere sono i grandi, non il mercato (alert della pipeline se SPY+ con RSP− o spread >4pp; le bande dello scarto — da +1,5 pp a favore dell'indice, da -1 pp a favore dell'azione media — sono una convenzione di lettura). ⚠ L'ampiezza misura la DISTANZA fra i due indici, non la direzione: il verso lo da' il cap-pesato, e quello dell'equi-pesato si legge accanto.
 - Treasury USA 10A: 4.94% (+0,09 pp nell'ultima seduta) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,85% (FRED DGS10, osservazione del 2026-11-25): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
 - EUR/USD: 1.0939 (-0,29% nell'ultima seduta)
@@ -98,11 +98,11 @@ QUADRO MACRO:
 - TITOLI MACRO — 4 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 2 pubblicate DOPO l'ultima chiusura USA del 2026-11-27, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [CNBC Economia, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Even the price of toys is on the rise. How Americans are scaling back holiday plans
       U.S. consumers face higher food, travel and gift costs in 2026 as inflation and Iran-war energy shocks pressure holiday budgets.
-    · [Bloomberg, 1h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Hungary Credit Outlook Lifted by S&P on Budget and Euro Ambition
+    · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Hungary Credit Outlook Lifted by S&P on Budget and Euro Ambition
       S&P Global Ratings lifted the outlook on Hungary’s sovereign debt to stable from negative, citing planned steps by Prime Minister Peter Magyar’s cabinet to cut the budget deficit and eventually adopt the euro.
-    · [MarketWatch, 7h fa] My friends play ‘credit-card roulette’ to see who pays for dinner — but one ‘winner’ still Venmoed me afterward. Should I say something?
+    · [MarketWatch, 8h fa] My friends play ‘credit-card roulette’ to see who pays for dinner — but one ‘winner’ still Venmoed me afterward. Should I say something?
       ‘I was stunned! I’ve lost my fair share, and won my fair share, and truly believe it all evens out over time.’
-    · [MarketWatch, 7h fa] Artificial intelligence usage is exploding, yet spending is stalling. Why a foundational rule of economics is breaking.
+    · [MarketWatch, 8h fa] Artificial intelligence usage is exploding, yet spending is stalling. Why a foundational rule of economics is breaking.
       For frontier model lab developers, the increased consumption of AI tokens (the means by which they get paid for their compute) is a positive. However, they don’t seem to be generating revenues from it at the same rate.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — le date macro sono APPUNTAMENTI CONFERMATI dal calendario ufficiale dell'ente che pubblica (via FRED), non stime: il sistema non proietta piu' date proprie. dati macro: 2026-12-04 Non-Farm Payrolls (precedente +165K) · 2026-12-04 Disoccupazione (precedente 4.1%) · 2026-12-10 Inflazione CPI (a/a) (precedente 3.9%). ⚠ Per 1 indicatori il calendario ufficiale non copre la serie e la data del prossimo aggiornamento NON E' DISPONIBILE (Fiducia consumatori (UMich)): non sono elencati sopra, e la loro assenza non significa che non escano. ⚠ Altri 5 indicatori HANNO una data confermata in finestra e non sono elencati sopra di proposito (Curva 10A-2A, Curva 10A-3M, Treasury USA 30A, Tasso reale 10A (TIPS), Inflazione attesa 10A (breakeven)): sono serie GIORNALIERE, escono a ogni seduta come il prezzo di un'azione, quindi la loro prossima uscita non e' un appuntamento che sposta i prezzi in un istante noto. La data la trovi nella riga dell'indicatore, sopra. trimestrali dei titoli seguiti (STIME dell'emittente, non nostre proiezioni): 2026-12-01 MRVL · 2026-12-02 CRM · 2026-12-09 AVGO. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 1 accesi su 4 CALCOLABILI da una fonte — accesi: Inasprimento criteri di prestito. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "6/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 1 su 4.
@@ -164,9 +164,9 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
 - Will there be no change in Fed interest rates after the December 2026 meeting?: 4% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the December 2026 meeting?: 94% [Δ7g —]
-- Will Bitcoin dip to $45,000 by December 31, 2026?: 13% [Δ7g —]
-- Will Bitcoin reach $62,500 in November?: 22% [Δ7g —]
-- Will Bitcoin dip to $50,000 by December 31, 2026?: 31% [Δ7g —]
+- Will Bitcoin dip to $45,000 by December 31, 2026?: 12% [Δ7g —]
+- Will Bitcoin reach $62,500 in November?: 24% [Δ7g —]
+- Will Bitcoin dip to $50,000 by December 31, 2026?: 30% [Δ7g —]
 ⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===
@@ -239,50 +239,50 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
 ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che questo pacchetto ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.
 ⚠ COSA SIGNIFICA L'ETICHETTA [TICKER]: e' il feed DELLA FONTE per quel titolo, non una garanzia che l'articolo parli di lui. I feed dei fornitori includono spesso pezzi su concorrenti, fornitori e sul comparto — su questo run alcune voci sono di quel tipo. Il titolo dell'articolo dice di chi parla davvero, e una voce su un'altra societa' resta informativa per il canale, non attribuibile al nome sotto cui compare.
 ⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato (correlazione misurata sopra 0.35) si muovono insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO (95% dell'azionario) e non per il peso del nome che la porta. Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.
-  [AMD] · [Nasdaq, 1h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
+  [AMD] · [Nasdaq, 0h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...
   [AMD] · [Nasdaq, 1h fa] Stocks Rally as a Rebound in the AI Trade Gathers Pace
       The S&P 500 Index ($SPX ) (SPY ) is up +1.14% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.71%. December E-mini S&P futures (ESZ26 ) are up +1.20%, and December E-mini Nasdaq 2futures...
-  [BE] · [Nasdaq, 4h fa] Noteworthy Friday Option Activity: MRNA, MCHP, BE
+  [BE] · [Nasdaq, 5h fa] Noteworthy Friday Option Activity: MRNA, MCHP, BE
       Looking at options trading activity among components of the S&P 500 index, there is noteworthy activity today in Moderna Inc (Symbol: MRNA), where a total volume of 69,658 contracts has been traded thus far today, a contract volume which is representative of approximately 7.
   [BE] · [Nasdaq, 8h fa] BE vs. FCEL: Which Fuel Cell Stock Has Stronger Long-Term Potential?
       Bloom Energy and FuelCell Energy vie for growth in the expanding fuel-cell market, but differences in earnings outlook, profitability and valuations set them apart.
   [CRWV] · [Nasdaq, 0h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...
-  [CRWV] · [Nasdaq, 4h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
+  [CRWV] · [Nasdaq, 5h fa] Stock Indices Finish Off Their Lows as Dip Buyers Step In
       The S&P 500 Index ($SPX ) (SPY ) closed down by -0.25% on Wednesday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +0.33%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed down -0.64%. December E-mini S&P futures (ESZ26 ) fell -0.27%, and December E-mini Nasdaq...
-  [MRVL] · [Nasdaq, 1h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
+  [MRVL] · [Nasdaq, 0h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...
-  [MRVL] · [Nasdaq, 1h fa] Stocks Rally as a Rebound in the AI Trade Gathers Pace
-      The S&P 500 Index ($SPX ) (SPY ) is up +1.14% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.71%. December E-mini S&P futures (ESZ26 ) are up +1.20%, and December E-mini Nasdaq 2futures...
-  [MSTR] · [Nasdaq, 8h fa] Strategy Just Bought Bitcoin for the 4th Straight Week. So Why Aren't Crypto Investors Bullish on MSTR Stock?
+  [MRVL] · [Nasdaq, 0h fa] Stocks Supported by a Recovery in the AI Trade
+      The S&P 500 Index ($SPX ) (SPY ) is up +0.77% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.75%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.90%. December E-mini S&P futures (ESZ26 ) are up +0.70%, and December E-mini Nasdaq 2futures...
+  [MSTR] · [Nasdaq, 9h fa] Strategy Just Bought Bitcoin for the 4th Straight Week. So Why Aren't Crypto Investors Bullish on MSTR Stock?
       Key PointsStrategy has bought 2,789 Bitcoin over the four-week period ending Nov. 23.
-  [MSTR] · [Nasdaq, 46h fa] Stocks Sharply Lower on AI Angst
+  [MSTR] · [Nasdaq, 47h fa] Stocks Sharply Lower on AI Angst
       The S&P 500 Index ($SPX ) (SPY ) is down by -2.54% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is down -1.48%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is down -4.16%. December E-mini S&P futures (ESZ26 ) are down -2.68%, and December E-mini Nasdaq...
+  [MU] · [Nasdaq, 1h fa] Stocks Supported by a Recovery in the AI Trade
+      The S&P 500 Index ($SPX ) (SPY ) is up +0.77% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.75%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.90%. December E-mini S&P futures (ESZ26 ) are up +0.70%, and December E-mini Nasdaq 2futures...
   [MU] · [Nasdaq, 1h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...
-  [MU] · [Nasdaq, 1h fa] Stocks Rally as a Rebound in the AI Trade Gathers Pace
-      The S&P 500 Index ($SPX ) (SPY ) is up +1.14% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.71%. December E-mini S&P futures (ESZ26 ) are up +1.20%, and December E-mini Nasdaq 2futures...
+  [NVDA] · [Nasdaq, 0h fa] Stocks Supported by a Recovery in the AI Trade
+      The S&P 500 Index ($SPX ) (SPY ) is up +0.77% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.75%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.90%. December E-mini S&P futures (ESZ26 ) are up +0.70%, and December E-mini Nasdaq 2futures...
   [NVDA] · [Nasdaq, 1h fa] Stocks Rally as a Rebound in the AI Trade Gathers Pace
       The S&P 500 Index ($SPX ) (SPY ) is up +1.14% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.71%. December E-mini S&P futures (ESZ26 ) are up +1.20%, and December E-mini Nasdaq 2futures...
-  [NVDA] · [Nasdaq, 1h fa] Tax-Savvy Ways to Support Charities and Family
-      In this episode of Motley Fool Hidden Gems Investing, Motley Fool personal finance expert Robert Brokamp and Motley Fool employee Stephanie Marini discuss:
-  [ORCL] · [Nasdaq, 1h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
+  [ORCL] · [Nasdaq, 0h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...
   [ORCL] · [Nasdaq, 2h fa] Noteworthy Friday Option Activity: DSGR, BA, ORCL
       Among the underlying components of the Russell 3000 index, we saw noteworthy options trading volume today in Distribution Solutions Group Inc (Symbol: DSGR), where a total of 1,498 contracts have traded so far, representing approximately 149,800 underlying shares. That amounts
-  [PLTR] · [Nasdaq, 4h fa] The Best 3 Stocks to Buy in December to Hold Into 2027
+  [PLTR] · [Nasdaq, 5h fa] The Best 3 Stocks to Buy in December to Hold Into 2027
       Key PointsNetflix says its churn improved year over year in the third quarter, even after price hikes.
-  [PLTR] · [Nasdaq, 5h fa] XLK, CSCO, PLTR, CRWD: Large Inflows Detected at ETF
+  [PLTR] · [Nasdaq, 6h fa] XLK, CSCO, PLTR, CRWD: Large Inflows Detected at ETF
       Looking today at week-over-week shares outstanding changes among the universe of ETFs covered at ETF Channel, one standout is the State Street Technology Select Sector SPDR ETF (Symbol: XLK) where we have detected an approximate $716.8 million dollar inflow -- that's a 0.7% incr
-  [RGTI] · [Nasdaq, 6h fa] RGTI vs IONQ: Which Quantum Computing Stock Has More Upside Potential?
+  [RGTI] · [Nasdaq, 7h fa] RGTI vs IONQ: Which Quantum Computing Stock Has More Upside Potential?
       Rigetti offers higher implied price target upside, while IonQ leads in commercial traction. Which quantum computing stock has greater growth potential?
-  [RGTI] · [Nasdaq, 9h fa] Here's How QBTS' Dual-Platform Roadmap Broadens Market Opportunities
+  [RGTI] · [Nasdaq, 10h fa] Here's How QBTS' Dual-Platform Roadmap Broadens Market Opportunities
       D-Wave is broadening its quantum computing opportunities through advances in annealing and gate-model technologies, targeting larger and fault-tolerant systems.
-  [WDC] · [Nasdaq, 1h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
+  [WDC] · [Nasdaq, 0h fa] Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound
       The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...
-  [WDC] · [Nasdaq, 1h fa] Stocks Rally as a Rebound in the AI Trade Gathers Pace
-      The S&P 500 Index ($SPX ) (SPY ) is up +1.14% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.97%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +1.71%. December E-mini S&P futures (ESZ26 ) are up +1.20%, and December E-mini Nasdaq 2futures...
+  [WDC] · [Nasdaq, 0h fa] Stocks Supported by a Recovery in the AI Trade
+      The S&P 500 Index ($SPX ) (SPY ) is up +0.77% today, the Dow Jones Industrial Average ($DOWI ) (DIA ) is up +0.75%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) is up +0.90%. December E-mini S&P futures (ESZ26 ) are up +0.70%, and December E-mini Nasdaq 2futures...
 ⚠ NON LETTI in questo run (nessuno dei canali ha risposto): SKHY. Per questi titoli l'assenza di notizie qui NON e' un'informazione: e' un buco della raccolta.
 
 === LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH, APPLICATA A QUESTO LIBRO ===
