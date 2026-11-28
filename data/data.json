@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-28T03:10:00Z",
+ "updated_at": "2026-11-28T03:42:05Z",
  "eurusd": 1.0972,
  "totals": {
   "usd_value": 0,
@@ -18357,7 +18357,7 @@
    "currency": "USD",
    "valuta_bilancio": "USD",
    "price_src": "yahoo",
-   "price": 59909.58,
+   "price": 59909.69,
    "price_asof": "2026-11-28",
    "price_asof_arretrata_da": null,
    "price_live": false,
@@ -18375,7 +18375,7 @@
    "support": 55149.57,
    "resistance": 76096.69,
    "rsi": 27.0,
-   "volume": 29827717120,
+   "volume": 29573818368,
    "vol_ratio": 0.67,
    "atr_14": 2758.61,
    "atr_pct": 4.6,
@@ -18387,7 +18387,7 @@
      59747.77,
      60378.2,
      60494.71,
-     59909.58
+     59909.69
     ],
     "m6": [
      64311.81,
@@ -18515,7 +18515,7 @@
      59747.77,
      60378.2,
      60494.71,
-     59909.58
+     59909.69
     ],
     "all": [
      386.94,
@@ -18664,7 +18664,7 @@
      78548.63,
      83553.85,
      77434.75,
-     59909.58
+     59909.69
     ],
     "m1": [
      75746.93,
@@ -18688,7 +18688,7 @@
      59747.77,
      60378.2,
      60494.71,
-     59909.58
+     59909.69
     ],
     "m3": [
      84383.01,
@@ -18756,7 +18756,7 @@
      59747.77,
      60378.2,
      60494.71,
-     59909.58
+     59909.69
     ],
     "y1": [
      90919.27,
@@ -18852,7 +18852,10 @@
      59971.95,
      59904.03,
      59913.28,
-     59908.27
+     59908.27,
+     59919.67,
+     59876.17,
+     59878.45
     ]
    },
    "earnings_date": null,
@@ -18866,7 +18869,7 @@
    "sharpe_6m": -0.5,
    "sortino_6m": -0.72,
    "prepost": null,
-   "prezzo_limite_aggiustato": 59909.58,
+   "prezzo_limite_aggiustato": 59909.69,
    "risk_reward": "1:2.9",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -18920,30 +18923,30 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 59909.58,
+     "prezzo": 59909.69,
      "medie": {
       "sma10": {
-       "liv": 60668.53,
+       "liv": 60668.54,
        "dist_pct": -1.25
       },
       "ema10": {
-       "liv": 61549.2,
+       "liv": 61549.22,
        "dist_pct": -2.66
       },
       "sma20": {
-       "liv": 65147.64,
+       "liv": 65147.65,
        "dist_pct": -8.04
       },
       "ema20": {
-       "liv": 64845.1,
+       "liv": 64845.11,
        "dist_pct": -7.61
       },
       "sma30": {
-       "liv": 69182.45,
+       "liv": 69182.46,
        "dist_pct": -13.4
       },
       "ema30": {
-       "liv": 67626.9,
+       "liv": 67626.91,
        "dist_pct": -11.41
       },
       "sma50": {
@@ -18976,7 +18979,7 @@
      "oscillatori": {
       "rsi14": 27.0,
       "macd": {
-       "linea": -4421.69,
+       "linea": -4421.68,
        "segnale": -4451.76,
        "istogramma": 30.07
       },
@@ -18987,7 +18990,7 @@
       "adx14": 49.0,
       "di_su": 12.5,
       "di_giu": 36.2,
-      "momentum10": -4984.37
+      "momentum10": -4984.25
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19480,19 +19483,19 @@
       "o": 59866.07,
       "h": 60164.19,
       "l": 59838.65,
-      "c": 59909.58
+      "c": 59909.69
      }
     ],
     "performance": {
      "s1": -2.05,
      "m1": -21.11,
      "m3": -30.48,
-     "m6": -6.54,
+     "m6": -6.53,
      "a1": -15.05,
      "ytd": -32.48,
      "a3": 58.86,
      "a5": 5.09,
-     "a10": 7934.1
+     "a10": 7934.12
     },
     "stagionalita": [
      {
@@ -58190,7 +58193,7 @@
      187.52,
      190.07,
      182.04,
-     178.67,
+     178.66,
      169.5,
      168.37,
      190.29,
@@ -62022,14 +62025,14 @@
      247.18,
      258.21,
      275.82,
-     303.04,
+     303.03,
      295.92,
      264.25,
      230.35,
      252.61,
      254.68,
      248.87,
-     269.77,
+     269.78,
      287.18,
      325.25,
      329.9,
@@ -63172,7 +63175,7 @@
      "ytd": -21.31,
      "a1": -13.29,
      "a3": -19.81,
-     "a5": -29.12,
+     "a5": -29.11,
      "a10": 180.55
     },
     "stagionalita": [
@@ -68922,7 +68925,7 @@
      {
       "mese": 7,
       "media": 5.06,
-      "mediana": 1.63,
+      "mediana": 1.64,
       "positivi_pct": 53,
       "campione": 32,
       "peggio": -21.6,
@@ -71909,7 +71912,7 @@
      89.67,
      84.81,
      81.51,
-     76.13,
+     76.14,
      71.27,
      77.61,
      69.12,
@@ -90916,7 +90919,7 @@
      179.42,
      185.01,
      191.9,
-     196.25,
+     196.26,
      202.44,
      193.85,
      183.7,
@@ -94830,7 +94833,7 @@
      123.58,
      115.79,
      115.57,
-     127.35,
+     127.36,
      140.21,
      140.59,
      129.75,
@@ -101212,7 +101215,7 @@
      284.33,
      290.47,
      309.08,
-     312.5,
+     312.51,
      301.63,
      299.71,
      266.92,
@@ -105124,7 +105127,7 @@
      547.01,
      542.04,
      568.28,
-     568.58,
+     568.57,
      574.21,
      576.63,
      542.32,
@@ -108919,9 +108922,9 @@
      250.07,
      268.43,
      324.5,
-     348.6,
+     348.61,
      345.54,
-     336.46,
+     336.45,
      329.49,
      337.78,
      353.14,
@@ -110140,7 +110143,7 @@
       "mese": 3,
       "media": 2.44,
       "mediana": 0.97,
-      "positivi_pct": 57,
+      "positivi_pct": 55,
       "campione": 42,
       "peggio": -11.2,
       "meglio": 20.5
@@ -115272,7 +115275,7 @@
      128.42,
      130.68,
      128.64,
-     125.48,
+     125.47,
      125.9,
      131.91,
      136.18,
@@ -119385,7 +119388,7 @@
      99.51,
      97.2,
      108.68,
-     129.69,
+     129.7,
      124.73,
      136.32,
      138.59,
@@ -119440,7 +119443,7 @@
      137.15,
      142.3,
      133.05,
-     118.62,
+     118.61,
      119.02,
      119.32,
      124.66,
@@ -119562,7 +119565,7 @@
      559.58,
      599.35,
      549.48,
-     603.74,
+     603.73,
      601.22,
      500.17,
      587.09,
@@ -157888,7 +157891,7 @@
       "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-28T02:21:34Z",
+      "quando": "2026-11-28T03:15:54Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
      },
      {
@@ -158020,7 +158023,7 @@
       "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-28T02:21:34Z",
+      "quando": "2026-11-28T03:15:54Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
      },
      {
@@ -158064,7 +158067,7 @@
       "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-28T02:21:34Z",
+      "quando": "2026-11-28T03:15:54Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
      },
      {
@@ -158152,7 +158155,7 @@
       "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-28T02:21:34Z",
+      "quando": "2026-11-28T03:15:54Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
      },
      {
@@ -158240,7 +158243,7 @@
       "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-28T02:21:34Z",
+      "quando": "2026-11-28T03:15:54Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
      },
      {
@@ -158372,7 +158375,7 @@
       "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
       "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
       "fonte": "Nasdaq",
-      "quando": "2026-11-28T02:21:34Z",
+      "quando": "2026-11-28T03:15:54Z",
       "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
      },
      {
@@ -158435,7 +158438,7 @@
     "Yahoo Finance"
    ],
    "finestra_giorni": 14,
-   "letto_il": "2026-11-28T03:10:00Z"
+   "letto_il": "2026-11-28T03:42:05Z"
   }
  },
  "broker": null,
@@ -158446,7 +158449,7 @@
      "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-28T02:21:34Z",
+     "quando": "2026-11-28T03:15:54Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
     },
     {
@@ -158578,7 +158581,7 @@
      "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-28T02:21:34Z",
+     "quando": "2026-11-28T03:15:54Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
     },
     {
@@ -158622,7 +158625,7 @@
      "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-28T02:21:34Z",
+     "quando": "2026-11-28T03:15:54Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
     },
     {
@@ -158710,7 +158713,7 @@
      "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-28T02:21:34Z",
+     "quando": "2026-11-28T03:15:54Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
     },
     {
@@ -158798,7 +158801,7 @@
      "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-28T02:21:34Z",
+     "quando": "2026-11-28T03:15:54Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
     },
     {
@@ -158930,7 +158933,7 @@
      "titolo": "Stocks Settle Sharply Higher as Chipmakers and AI Stocks Rebound",
      "riassunto": "The S&P 500 Index ($SPX ) (SPY ) closed up +1.60% on Friday, the Dow Jones Industrial Average ($DOWI ) (DIA ) closed up +1.18%, and the Nasdaq 100 Index ($IUXX ) (QQQ ) closed up +2.61%. December E-mini S&P futures (ESZ26 ) rose +1.57%, and December E-mini Nasdaq futures...",
      "fonte": "Nasdaq",
-     "quando": "2026-11-28T02:21:34Z",
+     "quando": "2026-11-28T03:15:54Z",
      "url": "https://www.nasdaq.com/articles/stocks-settle-sharply-higher-chipmakers-and-ai-stocks-rebound"
     },
     {
@@ -158993,7 +158996,7 @@
    "Yahoo Finance"
   ],
   "finestra_giorni": 14,
-  "letto_il": "2026-11-28T03:10:00Z"
+  "letto_il": "2026-11-28T03:42:05Z"
  },
  "predictions": [
   {
@@ -240125,7 +240128,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 5 ore"
+    "note": "18 voci, la piu' recente di 6 ore"
    },
    {
     "key": "sec_calendario",
@@ -240209,6 +240212,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-11-28T03:10:01Z"
+  "generated_at": "2026-11-28T03:42:06Z"
  }
 }
